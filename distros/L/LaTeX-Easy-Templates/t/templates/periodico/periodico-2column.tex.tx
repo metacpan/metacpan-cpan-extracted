@@ -6,7 +6,7 @@
 % based on https://www.overleaf.com/latex/templates/un-periodico/hhwxyzvcrpgk
 % modified by bliako
 
-\documentclass[letterpaper,twoside,12pt]{article}
+\documentclass[a4]{article}
 \usepackage[greek]{babel}
 \usepackage[Greek,Latin]{ucharclasses}
 %\usepackage[export]{adjustbox}

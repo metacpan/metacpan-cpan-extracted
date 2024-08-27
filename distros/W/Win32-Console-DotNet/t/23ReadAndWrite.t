@@ -23,6 +23,7 @@ BEGIN {
 }
 
 # Fix STDOUT redirection from prove
+# This workaround only works if STDERR has not also been redirected
 POSIX::dup2(fileno(STDERR), fileno(STDOUT));
 
 use constant FALSE  => !!'';

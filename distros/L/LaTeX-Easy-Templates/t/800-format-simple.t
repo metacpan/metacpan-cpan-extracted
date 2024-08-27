@@ -16,7 +16,7 @@ use lib 'blib/lib';
 
 use utf8; # we have hardcoded unicode strings
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Test::More;
 use Test::More::UTF8;

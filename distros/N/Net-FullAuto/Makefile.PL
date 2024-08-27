@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000778';
+our $VERSION='1.0000780';
 
 my $sudo=($^O eq 'cygwin')?'':'sudo ';
 print "AFTER BEGIN BLOCK FREEMEM: ".`${sudo}cat /proc/meminfo | grep MemFree`;
@@ -1294,6 +1294,10 @@ END
       if (exists $amazon{instance_type} &&
             $amazon{instance_type}=~/micro|nano/) {
          unless (grep { /devtools/ } @ARGV) {
+	    if ($ARGV[$#ARGV]=~/^\d+$/) {
+               pop @ARGV;pop @ARGV;
+            }
+            shift @ARGV if $ARGV[0] eq 'SKIP';
             my $argvs=join " ", @ARGV;
             my $exec_cmd="sudo su -c '"
                         ."yum -y groupinstall \'Development tools\';"
@@ -1820,7 +1824,6 @@ sub fa_install_mod {
 	       $cpanfil=$line;
 	    } elsif ($line=~s/^.*?CPAN_(?:FILE|COMMENT)[!|%]*[A-Z]\/[A-Z][A-Z]\/(.*$pp.*gz).*$/$1/ && $line=~/$pp/) {
 	       $cpanfil=$line;
-	       print "WHAT IS THIS=$cpanfil\n";
             } elsif (-1<index $info,"CPAN_FILE$p") {
                $cpanfil=$info;
                $cpanfil=~s/^.*?[A-Z]\/[A-Z][A-Z]\/(.*?[.]gz).*$/$1/s;
@@ -1853,7 +1856,6 @@ sub fa_install_mod {
 	       last;
             } elsif ($line=~/CPAN_USERID.*$pp/) {
                $line=~s/^.*?CPAN_USERID[!|%]*[A-Z]\/[A-Z][A-Z]\/(.*?$pp.*?gz).*$/$1/s;
-	       print "WHAT IS LINE=$line<==\n";
 	       $cpanfil=$line;
 	       last;
             } elsif (-1<index $info,"FULLNAME$p") {
@@ -1866,6 +1868,22 @@ sub fa_install_mod {
             if ($p eq 'Test::Base') {
                $cpanfil='INGY/Test-Base-0.89.tar.gz';
             }
+         } elsif (!$cpanfil) {
+            $info=`grep -a -A2 -B2 -m1 "[^:]${p}[^:]" "$d/Metadata" | sed 's/[^[:print:]]//g'`;
+	    if ($p=~/^$p\s*$/m) {
+               $info=~/^.*?[A-Z]\/[A-Z][A-Z]\/(.*?gz)CPAN_FILE.*$/s;  
+	       $cpanfil=$1;
+            }
+         } elsif ($cpanfil=~/[-]$pp/) {
+            $info=`grep -a -A2 -B2 -m1 "[^:]${p}" "$d/Metadata" | sed 's/[^[:print:]]//g'`;
+            print "INFONOW=$info\n";
+	    $info=~/^.*?[A-Z]\/[A-Z][A-Z]\/(.*?gz)CPAN_FILE.*$/s;
+            $cpanfil=$1;
+         } elsif ($cpanfil!~/$pp[-][0-9]/) {
+            $info=`grep -a -A2 -B2 -m1 "${p}[^:]" "$d/Metadata" | sed 's/[^[:print:]]//g'`;
+            print "INFONOW=$info\n";
+            $info=~/^.*?[A-Z]\/[A-Z][A-Z]\/(.*?gz)CPAN_FILE.*$/s;
+            $cpanfil=$1;
          }
          $cpanver=$cpanusr=$cpanfil;
 	 $cpanver=~s/^.*-(.*?).tar.gz$/$1/;
@@ -1914,7 +1932,6 @@ sub fa_install_mod {
          eval $ttmp;
          $ver=eval $ver;
          $force=($ver<$version)?1:0;
-	 print "WHAT IS THIS SHIT=$p and $ver and $version\n";
 	 $force=0 if $p eq 'TimeDate' and $ver eq '1.21' and $version eq '2.33';
 	 $force=0 if $p eq 'IO::Tee' and $ver eq '0.65' and $version eq '0.66';
       } else { $force=0 } 
@@ -1943,6 +1960,10 @@ sub fa_install_mod {
       } elsif ($version && $p eq 'Term::RawInput') {
          $p="REEDFISH/Term-RawInput-$version.tar.gz";
       }
+
+   print 'BEFORE GET ',`sudo cat /proc/meminfo | grep MemFree`;
+   print 'BEFORE GET ',`sudo cat /proc/meminfo | grep MemAvailable`;
+
       print "==> $p required."
       and print "*** Installing $p via CPAN\n"
       and
@@ -1950,10 +1971,37 @@ sub fa_install_mod {
          local $SIG{__DIE__}; # No sigdie handler;
          require CPAN;
 	 #CPAN::Shell->notest('get',$p);
-	 CPAN::Shell->notest('get',$cpanfil);
+	 #print "HERE WE AREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n";
+	 #CPAN::Shell->notest('get',$cpanfil);
+	 if (exists $amazon{instance_type} &&
+               $amazon{instance_type}=~/micro|nano/) {
+	    CPAN::Shell->get($cpanfil);
+         } else {
+            CPAN::Shell->notest('get',$p);
+         }
       };
       if ($@) {
          fa_die("CPAN Error: $@ $!\n");
+      }
+
+   print 'AFTER GET ',`sudo cat /proc/meminfo | grep MemFree`;
+   print 'AFTER GET ',`sudo cat /proc/meminfo | grep MemAvailable`;
+
+      if (exists $amazon{instance_type} &&
+	    $amazon{instance_type}=~/micro|nano/) {
+	 unless (grep { /notest/ } @ARGV) {
+	    if ($ARGV[$#ARGV]=~/^\d+$/) {
+               pop @ARGV;pop @ARGV;
+            }
+            shift @ARGV if $ARGV[0] eq 'SKIP';
+            my $argvs=join " ", @ARGV;
+            my $exec_cmd="sudo su -c '"
+                        ."sync;echo 3 > /proc/sys/vm/drop_caches;"
+                        ."swapoff -a && swapon -a';cd \"$cwd\";"
+                        ."$^X Makefile.PL $argvs SKIP notest 1";
+print "GOING TO LOOOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP\n";
+            exec $exec_cmd;
+         } 
       }
       if ($version && (-1<index $p,'Term-Menus')) {
          $p='Term::Menus';
@@ -1993,6 +2041,24 @@ sub fa_install_mod {
             close FH;
          } elsif ($p eq 'libnet') {
             open (FH,">$dir/libnet.cfg");
+            close FH;
+         } elsif ($p eq 'Test::YAML::Valid') {
+            open(FH,"<$dir/Makefile.PL");
+	    my @MakefilePL=<FH>;
+            close FH;
+            my $newfile='';
+            foreach my $line (@MakefilePL) {
+	       next if $line=~/use lib/;
+               if ($line=~/inc::/) {
+                  $newfile.="use lib '.';";
+		  $newfile.=$line;
+               } else {
+                  $newfile.=$line;
+               }
+            }
+            unlink "$dir/Makefile.PL";
+            open(FH,">$dir/Makefile.PL");
+            print FH $newfile;
             close FH;
          } elsif ($p eq 'Win32::API') {
             open(FH,"<$dir/Callback/Callback.xs");
@@ -2450,6 +2516,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('ExtUtils::Config','install','Makefile');
    &fa_install_module('ExtUtils::InstallPaths','install','Makefile');
    &fa_install_module('Test::Harness','install','Makefile','','3.33');
+   &fa_install_module('JSON::PP','install','Makefile');
    &fa_install_module('Module::Build::Tiny','install','Build');
    if ($^O ne 'cygwin'
          || grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
@@ -2490,10 +2557,14 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Compress::Raw::Zlib','install','Makefile');
    &fa_install_module('IO::Compress::Base::Common','install','Makefile');
    &fa_install_module('Compress::Zlib','install','Makefile');
+   &fa_install_module('Module::Install','install','Makefile');
+   &fa_install_module('YAML::Syck','install','Makefile');
+   &fa_install_module('YAML::XS','install','Makefile');
+   &fa_install_module('Test::YAML::Valid','install','Makefile');
    &fa_install_module('CPAN::Meta::YAML','install','Makefile');
    &fa_install_module('Parse::CPAN::Meta','install','Makefile');
    &fa_install_module('CPAN::Meta::Requirements','install','Makefile');
-   &fa_install_module('JSON::PP','install','Makefile');
+   #&fa_install_module('JSON::PP','install','Makefile');
    my $mod_info='';my $mod_build_version=0.3601;
    unless (-e "dependencies/CPAN/authors" &&
          !(grep {
@@ -2539,7 +2610,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    }
    if ($^O ne 'MSWin32' && $^O ne 'MSWin64' ||
          grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
-      &fa_install_module('IO::Tty','install','Makefile'); # IO::Pty required
+      &fa_install_module('IO::Pty','install','Makefile'); # IO::Pty required
       unless (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
          my $argv0=$ARGV[0]||'';
          exit if $argv0 eq 'install_IO_Pty_from_CPAN';
@@ -2650,6 +2721,10 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
          print "*** Running Build install\n";
 	 if (exists $amazon{instance_type} &&
                $amazon{instance_type}=~/micro|nano/) {
+            if ($ARGV[$#ARGV]=~/^\d+$/) {
+               pop @ARGV;pop @ARGV;
+            }
+            shift @ARGV if $ARGV[0] eq 'SKIP';
             print "*** Running sudo ./Build install\n";
             my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
                         ."cd \"$dir\";./Build install;"

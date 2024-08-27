@@ -1,5 +1,45 @@
 Revision history for DBIx-Squirrel
 
+1.3.6 2024-08-26 23:00
+
+-   REFACTOR / FIX
+    -   The argument partitioning code that isolates transformations
+        from bind-values has been re-written to (hopefully) avoid some
+        of the complaints evident when testing under some older Perls.
+    -   Much of the shitty old code in DBIx::Squirrel::util has been
+        reworked and, given its importance, covered by some new and
+        comprehensive unit tests.
+    -   Made good on an earlier idea to rename the iterator’s execute
+        method to start. Within that context, it makes more sense since
+        execute could reasonably be thought to require bind-params at
+        all call sites, but that isn’t always the case in the iterator
+        code. So a different name made sense, and execute has been
+        demoted to alias so as not to break anything.
+-   DOCUMENTATION
+    -   Minor updates.
+-   TESTS
+    -   Added compile test.
+    -   Added some important unit tests.
+    -   Monitoring test coverage now. More tests to come in forthcoming
+        releases.
+
+CURRENT TEST COVERAGE
+
+  ----------------------------------------------------------------------------------
+  File                             stmt   bran   cond     sub    pod    time   total
+  ------------------------------ ------ ------ ------ ------- ------ ------- -------
+  blib/lib/DBIx/Squirrel.pm        91.1   55.5   66.6   100.0    n/a    43.1    84.8
+  blib/lib/DBIx/Squirrel/db.pm     48.7   24.2   33.3    82.3    0.0     0.6    42.5
+  blib/lib/DBIx/Squirrel/dr.pm     84.8   57.1   33.3    88.8    0.0    39.0    68.5
+  blib/lib/DBIx/Squirrel/it.pm     70.9   40.9   75.0    75.9    0.0 4.6 0.7    60.0
+  …b/DBIx/Squirrel/result.pm       66.2   23.5    n/a    81.8    0.0 1.3 0.6    56.4
+  blib/lib/DBIx/Squirrel/rs.pm     68.0   20.0    n/a    82.6    0.0     9.7    62.2
+  blib/lib/DBIx/Squirrel/st.pm     82.6   63.3   66.6   100.0    0.0   100.0    76.3
+  …lib/DBIx/Squirrel/util.pm       83.0   56.5   66.6    87.5    0.0            72.8
+  Total                            73.5   42.5   60.3    85.4    0.0            64.5
+
+  ----------------------------------------------------------------------------------
+
 1.3.5 2024-08-26 07:40
 
 -   Fixed a problem recently introduced into how transformation
@@ -47,7 +87,7 @@ Revision history for DBIx-Squirrel
 -   Added the “count_all” method back into the iterator class, as well
     as ensuring that “count” does not affect a future call to “next”.
 -   Addressed build failures revealed by the CPAN Testers Matrix:
-    -   Rewrote &DBIx::Squirrel::util::part_args - failed on Perl
+    -   Rewrote &DBIx::Squirrel::util::args_partition - failed on Perl
         versions <= 5.18.4;
     -   Back to using “strict” and “warnings” - Modern::Perl having some
         issues with a bundle “all” in Perl versions <= 5.14.4.

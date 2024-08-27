@@ -1,7 +1,7 @@
 package Mail::DKIM::Algorithm::ed25519_sha256;
 use strict;
 use warnings;
-our $VERSION = '1.20240619'; # VERSION
+our $VERSION = '1.20240827'; # VERSION
 # ABSTRACT: ed25519 sha256 algorithm class
 
 # Copyright 2005-2006 Messiah College. All rights reserved.
@@ -67,7 +67,7 @@ Mail::DKIM::Algorithm::ed25519_sha256 - ed25519 sha256 algorithm class
 
 =head1 VERSION
 
-version 1.20240619
+version 1.20240827
 
 =head1 AUTHORS
 

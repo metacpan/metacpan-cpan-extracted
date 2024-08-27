@@ -1,5 +1,11 @@
 Revision history for Map::Tube
 
+3.74  2024-08-27T00:20:00+00:00
+      - Updated pod for Map::Tube::Cookbook.
+
+3.73  2024-08-27T00:05:00+00:00
+      - Added Map::Tube::Cookbook as suggested by @mohawk2.
+
 3.72  2024-08-26T01:50:00+00:00
       - Revert changes done in v3.65.
 

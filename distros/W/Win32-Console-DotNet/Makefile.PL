@@ -2,8 +2,6 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;
 
-die "OS unsupported\n" if $^O ne 'MSWin32';
-
 WriteMakefile(
   NAME              => 'Win32::Console::DotNet',
   VERSION_FROM      => 'lib/Win32/Console/DotNet.pm',
@@ -26,6 +24,7 @@ WriteMakefile(
     'IO::Null'                  => 1.01,
     'namespace::sweep'          => 0.006,
     'PerlX::Assert'             => 0.905,
+    'Platform::Windows'         => 0.002,
     'Type::Nano'                => 0.014,
     'Win32'                     => 0.54,
     'Win32::API'                => 0.79,

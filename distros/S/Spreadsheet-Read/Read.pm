@@ -38,7 +38,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.90";
+our $VERSION = "0.91";
 sub  Version { $VERSION }
 
 use Carp;
@@ -123,13 +123,17 @@ foreach my $p (@parsers) {
     }
 $can{sc} = __PACKAGE__;	# SquirrelCalc is built-in
 
+# Define ->get_active_sheet if not defined (yet)
 sub _def_gas {
-    defined $Spreadsheet::ParseExcel::VERSION  && $Spreadsheet::ParseExcel::VERSION  < 0.61 and
-	*Spreadsheet::ParseExcel::Workbook::get_active_sheet = sub { undef; };
-    defined $Spreadsheet::ParseODS::VERSION    && $Spreadsheet::ParseODS::VERSION    < 0.25 and
-	*Spreadsheet::ParseODS::Workbook::get_active_sheet   = sub { undef; };
-    defined $Excel::ValueReader::XLSX::VERSION && $Excel::ValueReader::XLSX::VERSION < 9.99 and
-	*Excel::ValueReader::XLSX::get_active_sheet          = sub { undef; };
+    for ([ 0.61, $Spreadsheet::ParseExcel::VERSION,  *Spreadsheet::ParseExcel::Workbook::get_active_sheet	],
+	 [ 0.25, $Spreadsheet::ParseODS::VERSION,    *Spreadsheet::ParseODS::Workbook::get_active_sheet		],
+	 [ 9.99, $Excel::ValueReader::XLSX::VERSION, *Excel::ValueReader::XLSX::get_active_sheet		],
+	 ) {
+	my ($mv, $v, $cb) = @$_;
+	defined $v && $v < $mv or next;
+	defined $cb && defined *{$cb}{CODE} and next;
+	*{$cb} = sub { undef };
+	}
     } # _def_gas
 
 my $debug = 0;
@@ -778,11 +782,12 @@ sub ReadData {
 	    0x16	=> "yyyy-mm-dd hh:mm",	# m-d-yy h:mm
 	    );
 	$oBook->{FormatStr}{$_} = $def_fmt{$_} for keys %def_fmt;
-	my $oFmt = $parse_type eq "XLSX"
+	my $oFmt = eval { $parse_type eq "XLSX"
 	    ? $can{xlsx} eq "Spreadsheet::XLSX"
 		? Spreadsheet::XLSX::Fmt2007->new
 		: Spreadsheet::ParseExcel::FmtDefault->new
-	    :     Spreadsheet::ParseExcel::FmtDefault->new;
+	    :     Spreadsheet::ParseExcel::FmtDefault->new
+	    };
 
 	$debug > 20 and _dump ("oBook before conversion", $oBook);
 	if ($can{xlsx} eq "Excel::ValueReader::XLSX" and !exists $oBook->{SheetCount}) {
@@ -1008,7 +1013,7 @@ sub ReadData {
 			    }
 			defined $fmt and $fmt =~ s/\\//g;
 			$opt{cells} and	# Formatted value
-			    $sheet{$cell} = defined $val ? $FmT && exists $def_fmt{$FmT->{FmtIdx}}
+			    $sheet{$cell} = $oFmt && defined $val ? $FmT && exists $def_fmt{$FmT->{FmtIdx}}
 				? $oFmt->ValFmt ($oWkC, $oBook)
 				: $oWkC->Value : undef;
 			if ($opt{attr}) {
@@ -1623,17 +1628,34 @@ Spreadsheet::Read tries to transparently read *any* spreadsheet and
 return its content in a universal manner independent of the parsing
 module that does the actual spreadsheet scanning.
 
+The parser has to be available and is not provided by this module.
+
+=head3 OpenOffice and LibreOffice (C<ODS> and C<SXC>)
+
 For OpenOffice and/or LibreOffice this module uses
+L<Spreadsheet::ParseODS|https://metacpan.org/pod/Spreadsheet::ParseODS> or
 L<Spreadsheet::ReadSXC|https://metacpan.org/release/Spreadsheet-ReadSXC>
+
+=head3 Microsoft Excel (C<XLSX> and C<XLS>)
 
 For Microsoft Excel this module uses
 L<Spreadsheet::ParseExcel|https://metacpan.org/release/Spreadsheet-ParseExcel>,
-L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX>, or
+L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX>,
+L<Excel::ValueReader::XLSX|https://metacpan.org/release/Excel-ValueReader-XLSX>, or
 L<Spreadsheet::XLSX|https://metacpan.org/release/Spreadsheet-XLSX> (strongly
 discouraged).
 
+=head3 CSV (C<CSV>)
+
 For CSV this module uses L<Text::CSV_XS|https://metacpan.org/release/Text-CSV_XS>
 or L<Text::CSV_PP|https://metacpan.org/release/Text-CSV>.
+
+=head3 Gnumeric (C<gnumeric>)
+
+For Gnumeric this module uses
+L<Spreadsheet::ReadGnumeric|https://metacpan.org/release/Spreadsheet-ReadGnumeric>.
+
+=head3 SquirrelCalc (C<sc>)
 
 For SquirrelCalc there is a very simplistic built-in parser
 
@@ -2521,6 +2543,11 @@ Show (parts of) a spreadsheet in plain text, CSV, or HTML
         -S <sheets> Only print sheets <sheets>. 'all' is a valid set
                     Default only prints the first sheet
         -R <rows>   Only print rows    <rows>. Default is 'all'
+                    Ranges and lists supported as 2,4-7,8-
+                    Trailing - is to end of data
+                    Negative rows count from tail -8--2 is allowed
+         --head[=n] Alias for -R1..n   where n defaults to 10
+         --tail[=n] Alias for -R-n-    where n defaults to 10
         -C <cols>   Only print columns <cols>. Default is 'all'
         -F <flds>   Only fields <flds> e.g. -FA3,B16
      Ordering (column numbers in result set *after* selection):
@@ -2531,6 +2558,10 @@ Show (parts of) a spreadsheet in plain text, CSV, or HTML
                     #r   - order on column # lexical descending
                     #rn  - order on column # numeric descending
  
+ Examples:
+     xlscat   -i foo.xls
+     xlscat   --in-sep=: --sort=3n -L /etc/passwd
+     xlsgrep  pattern file.ods
 
 =head2 C<xlsgrep>
 
@@ -2545,8 +2576,11 @@ Show (parts of) a spreadsheet that match a pattern in plain text, CSV, or HTML
         --list      Show supported spreadsheet formats and exit
         -u          Use unformatted values
         --strip[=#] Strip leading and/or traing spaces of all cells
+                    # & 01 = leading, # & 02 = trailing, 3 = default
+        --clip=#    Clip cells to max length #
         --noclip    Do not strip empty sheets and
                     trailing empty rows and columns
+        --no-empty  Skip empty rows
          --no-nl[=R] Replace all newlines in cells with R (default space)
         -e <enc>    Set encoding for input and output
         -b <enc>    Set encoding for input
@@ -2583,6 +2617,11 @@ Show (parts of) a spreadsheet that match a pattern in plain text, CSV, or HTML
         -S <sheets> Only print sheets <sheets>. 'all' is a valid set
                     Default only prints the first sheet
         -R <rows>   Only print rows    <rows>. Default is 'all'
+                    Ranges and lists supported as 2,4-7,8-
+                    Trailing - is to end of data
+                    Negative rows count from tail -8--2 is allowed
+         --head[=n] Alias for -R1..n   where n defaults to 10
+         --tail[=n] Alias for -R-n-    where n defaults to 10
         -C <cols>   Only print columns <cols>. Default is 'all'
         -F <flds>   Only fields <flds> e.g. -FA3,B16
      Ordering (column numbers in result set *after* selection):
@@ -2597,7 +2636,6 @@ Show (parts of) a spreadsheet that match a pattern in plain text, CSV, or HTML
      xlscat   -i foo.xls
      xlscat   --in-sep=: --sort=3n -L /etc/passwd
      xlsgrep  pattern file.ods
-
 
 =head2 C<xlsx2csv>
 
@@ -2637,6 +2675,13 @@ Show a spreadsheet in a perl/Tk spreadsheet widget
 Show the differences between two spreadsheets.
 
  usage: ssdiff [--verbose[=1]] file.xls file.xlsx
+
+=head1 Vulnerabilities
+
+As this is just a wrapper over the actual parsers, it cannot vouch for
+vulnerabilities in these parsers.  We try to keep up with the CVE's as
+published, and check for weaknesses. For a more thorough report see
+L<this security-posting|https://security.metacpan.org/2024/02/10/vulnerable-spreadsheet-parsing-modules.html>.
 
 =head1 TODO
 

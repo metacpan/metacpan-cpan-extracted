@@ -7,7 +7,6 @@ use warnings;
 use Test::More tests => 53;
 use Test::Exception;
 
-use IPC::Open3;
 use Perl::OSType qw( :all );
 use POSIX;
 use Symbol qw( gensym );
@@ -31,6 +30,7 @@ END {
 }
 
 # Fix STDOUT redirection from prove
+# This workaround only works if STDERR has not also been redirected
 POSIX::dup2(fileno(STDERR), fileno(STDOUT));
 
 SKIP: { skip 'Platform specific', 1 unless is_os_type('Unix') 

@@ -1,5 +1,10 @@
 Revision history for Pod-Simple-XHTML-WithHighlightConfig
 
+0.000003 - 2024-08-26
+  - removed roles, moving them to the MetaCPAN-Pod-HTML dist
+  - This module now exists only as a consumer of those roles, and is generally
+    not recommended to be used on its own
+
 0.000002 - 2017-10-08
   - moved implementation into a reusable role
 

@@ -23,6 +23,7 @@ BEGIN {
 }
 
 # Fix STDOUT redirection from prove
+# This workaround only works if STDERR has not also been redirected
 POSIX::dup2(fileno(STDERR), fileno(STDOUT));
 
 #-------------------
@@ -40,6 +41,10 @@ note 'Properties';
 #----------------
 
 my ($fg, $bg);
+
+SKIP: {
+  skip 'Output is redirected', 28 if System::Console->IsOutputRedirected;
+
 lives_ok( 
   sub { $bg = System::Console->BackgroundColor },
   'Console->BackgroundColor'
@@ -81,7 +86,7 @@ lives_ok(
 );
 
 ok(
-  defined(System::Console->Error),
+  openhandle(System::Console->Error),
   'Console->Error'
 );
 
@@ -91,7 +96,7 @@ lives_ok(
 );
 
 ok(
-  defined(System::Console->In),
+  openhandle(System::Console->In),
   'Console->In'
 );
 
@@ -136,7 +141,7 @@ lives_ok(
 );
 
 ok(
-  defined(System::Console->Out),
+  openhandle(System::Console->Out),
   'Console->Out'
 );
 
@@ -146,7 +151,11 @@ cmp_ok(
 );
 
 lives_ok(
-  sub { System::Console->Title('Test::More') },
+  sub { 
+    my $title = System::Console->Title; 
+    System::Console->Title('Test::More');
+    System::Console->Title($title);
+  },
   'Console->Title'
 );
 
@@ -191,9 +200,14 @@ cmp_ok(
   'Console->WindowTop'
 );
 
+} # SKIP
+
 #----------------------
 note 'System::Console';
 #----------------------
+
+SKIP: {
+  skip 'Output is redirected', 7 if System::Console->IsOutputRedirected;
 
 lives_ok(
   sub { System::Console->Clear() },
@@ -276,6 +290,8 @@ lives_ok(
   sub { System::Console->Beep() },
   'Console->Beep'
 );
+
+} # SKIP
 
 SKIP: {
   skip 'Manual test not enabled', 1 unless $ENV{"MANUAL_TESTS"};

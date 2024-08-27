@@ -4,6 +4,8 @@ use Mojolicious::Lite -signatures;
 
 plugin 'HTMX';
 
+my $record = {firstName => 'Joe', lastName => 'Blow', email => 'joe@blow.com'};
+
 get '/'      => 'index';
 get '/boost' => 'boost';
 
@@ -26,10 +28,24 @@ post '/trigger' => sub ($c) {
 
 };
 
-get '/click-to-edit'           => 'click-to-edit/index';
-get '/click-to-edit/contact/1' => 'click-to-edit/contact';
-put '/click-to-edit/contact/1' => 'click-to-edit/contact';
-get '/click-to-edit/contact/1/edit' => 'click-to-edit/contact-edit';
+get '/click-to-edit' => sub ($c) {
+    $c->render('click-to-edit/index', record => $record);
+};
+
+get '/click-to-edit/contact/1' => sub ($c) {
+    $c->render('click-to-edit/contact', record => $record);
+};
+
+put '/click-to-edit/contact/1' => sub ($c) {
+    $record->{firstName} = $c->param('firstName');
+    $record->{lastName}  = $c->param('lastName');
+    $record->{email}     = $c->param('email');
+    $c->render('click-to-edit/contact', record => $record);
+};
+
+get '/click-to-edit/contact/1/edit' => sub ($c) {
+    $c->render('click-to-edit/contact-edit', record => $record);
+};
 
 get '/refresh' => 'refresh';
 post '/refresh' => sub ($c) {
@@ -123,14 +139,15 @@ document.body.addEventListener("showMessage", function(e){
 @@ click-to-edit/contact.html.ep
 % layout 'default';
 
-<div hx-target="this" hx-swap="outerHTML">
-    <div><label>First Name</label>: Joe</div>
-    <div><label>Last Name</label>: Blow</div>
-    <div><label>Email</label>: joe@blow.com</div>
-    <button hx-get="/click-to-edit/contact/1/edit" class="btn btn-primary">
-        Click To Edit
-    </button>
-</div>
+%= t 'div', hx(target => 'this', swap => 'outherHTML') => begin
+
+    <div><label>First Name</label>: <%= $record->{firstName} %></div>
+    <div><label>Last Name</label>: <%= $record->{lastName} %></div>
+    <div><label>Email</label>: <%= $record->{email} %></div>
+
+    %= tag 'button', class => 'btn btn-primary', hx(get => '/click-to-edit/contact/1/edit'), 'Click To Edit'
+
+% end
 
 
 @@ click-to-edit/contact-edit.html.ep
@@ -138,18 +155,18 @@ document.body.addEventListener("showMessage", function(e){
 <form hx-put="/click-to-edit/contact/1" hx-target="this" hx-swap="outerHTML">
     <div>
         <label>First Name</label>
-        <input type="text" name="firstName" value="Joe">
+        <input type="text" name="firstName" value="<%= $record->{firstName} %>">
     </div>
     <div class="form-group">
         <label>Last Name</label>
-        <input type="text" name="lastName" value="Blow">
+        <input type="text" name="lastName" value="<%= $record->{lastName} %>">
     </div>
     <div class="form-group">
         <label>Email Address</label>
-        <input type="email" name="email" value="joe@blow.com">
+        <input type="email" name="email" value="<%= $record->{email} %>">
     </div>
     <button class="btn btn-primary">Submit</button>
-    <button class="btn btn-secondary" hx-get="/click-to-edit/contact/1">Cancel</button>
+    <button class="btn btn-danger" hx-get="/click-to-edit/contact/1">Cancel</button>
 </form> 
 
 

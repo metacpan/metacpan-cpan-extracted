@@ -59,7 +59,7 @@ use namespace::sweep;
 
 # version '...'
 our $version = 'v4.6.0';
-our $VERSION = '0.005000';
+our $VERSION = '0.005001';
 $VERSION = eval $VERSION;
 
 # authority '...'
@@ -545,6 +545,9 @@ I<Throws>: I<IllegalArgumentException> if the check fails.
     srWindowBottom
     dwMaximumWindowSizeX
     dwMaximumWindowSizeY
+
+    dwSize
+    bVisible
   )]; 
 
 =end private
@@ -764,6 +767,20 @@ I<See also>: I<CONSOLE_SCREEN_BUFFER_INFO> structure.
     srWindowBottom        => 8,
     dwMaximumWindowSizeX  => 9,
     dwMaximumWindowSizeY  => 10,
+  };
+
+=pod
+
+Constants for accessing the console cursor info array which contains information 
+about the console cursor.
+
+I<See also>: I<CONSOLE_CURSOR_INFO> structure.
+
+=cut
+
+  use constant {
+    dwSize    => 0,
+    bVisible  => 1,
   };
 
 =end private
@@ -1291,11 +1308,17 @@ operation is less than C<1> or greater than C<100>.
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
+      my @cci;
       my $hConsole = ConsoleOutputHandle();
-      my ($value) = Win32::Console::_GetConsoleCursorInfo($hConsole) 
-        or confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
-      $self->$orig($value);
-      return $value;
+      my $r = do {
+        @cci = Win32::Console::_GetConsoleCursorInfo($hConsole);
+        @cci > 1;
+      };
+      if ( !$r ) {
+        confess("WinIOError:\n$EXTENDED_OS_ERROR\n")
+      }
+      $self->$orig($cci[dwSize]);
+      return $cci[dwSize];
     }
     SET: {
       my $value = shift;
@@ -1304,11 +1327,22 @@ operation is less than C<1> or greater than C<100>.
         confess("ArgumentOutOfRangeException: value $value\n". 
           "$ResourceString{ArgumentOutOfRange_CursorSize}\n");
       }
+
+      my @cci;
       my $hConsole = ConsoleOutputHandle();
-      my (undef, $visible) = Win32::Console::_GetConsoleCursorInfo($hConsole)
-        or confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
-      Win32::Console::_SetConsoleCursorInfo($hConsole, $value, $visible)
-        or confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
+      my $r = do {
+        @cci = Win32::Console::_GetConsoleCursorInfo($hConsole);
+        @cci > 1;
+      };
+      if ( !$r ) {
+        confess("WinIOError:\n$EXTENDED_OS_ERROR\n")
+      }
+
+      $cci[dwSize] = $value;
+      $r = Win32::Console::_SetConsoleCursorInfo($hConsole, @cci);
+      if ( !$r ) {
+        confess("WinIOError:\n$EXTENDED_OS_ERROR\n")
+      }
       return;
     }
   };
@@ -1370,20 +1404,37 @@ I<True> if the cursor is visible; otherwise, I<false>.
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
+      my @cci;
       my $hConsole = ConsoleOutputHandle();
-      my (undef, $value) = Win32::Console::_GetConsoleCursorInfo($hConsole) 
-        or confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
-      $self->$orig($value);
-      return $value;
+      my $r = do {
+        @cci = Win32::Console::_GetConsoleCursorInfo($hConsole);
+        @cci > 1;
+      };
+      if ( !$r ) {
+        confess("WinIOError:\n$EXTENDED_OS_ERROR\n")
+      }
+      $self->$orig($cci[bVisible]);
+      return $cci[bVisible];
     }
     SET: {
       my $value = shift;
       $self->$orig($value);
+
+      my @cci;
       my $hConsole = ConsoleOutputHandle();
-      my ($size) = Win32::Console::_GetConsoleCursorInfo($hConsole)
-        or confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
-      Win32::Console::_SetConsoleCursorInfo($hConsole, $size, $value)
-        or confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
+      my $r = do {
+        @cci = Win32::Console::_GetConsoleCursorInfo($hConsole);
+        @cci > 1;
+      };
+      if ( !$r ) {
+        confess("WinIOError:\n$EXTENDED_OS_ERROR\n")
+      }
+
+      $cci[bVisible] = $value;
+      $r = Win32::Console::_SetConsoleCursorInfo($hConsole, @cci);
+      if ( !$r ) {
+        confess("WinIOError:\n$EXTENDED_OS_ERROR\n")
+      }
       return;
     }
   };
@@ -3800,7 +3851,7 @@ I<Returns>: an hash reference with informations about the console.
     if ( !$_haveReadDefaultColors ) {
       # Fetch the default foreground and background color for the
       # ResetColor method.
-      $$_defaultColors = $csbi[4] & 0xff;
+      $$_defaultColors = $csbi[wAttributes] & 0xff;
       $_haveReadDefaultColors = TRUE;
     }
 

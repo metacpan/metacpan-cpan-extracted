@@ -1,7 +1,7 @@
 package Mail::DKIM::Signature;
 use strict;
 use warnings;
-our $VERSION = '1.20240619'; # VERSION
+our $VERSION = '1.20240827'; # VERSION
 # ABSTRACT: represents a DKIM-Signature header
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -191,6 +191,11 @@ sub check_canonicalization {
     return 1;
 }
 
+sub set_verify_time {
+    my ( $self, $verify_time ) = @_;
+    $self->{_verify_time} = $verify_time;
+}
+
 # checks whether the expiration time on this signature is acceptable
 # returns a true value if acceptable, false otherwise
 #
@@ -198,7 +203,6 @@ sub check_expiration {
     my $self = shift;
     my $x    = $self->expiration;
     return 1 if not defined $x;
-
     $self->{_verify_time} ||= time();
     return ( $self->{_verify_time} <= $x );
 }
@@ -616,7 +620,7 @@ Mail::DKIM::Signature - represents a DKIM-Signature header
 
 =head1 VERSION
 
-version 1.20240619
+version 1.20240827
 
 =head1 CONSTRUCTORS
 

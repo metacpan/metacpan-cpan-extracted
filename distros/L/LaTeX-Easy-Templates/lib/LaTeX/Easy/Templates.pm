@@ -10,7 +10,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Exporter qw(import);
 our @EXPORT = qw(
@@ -324,8 +324,8 @@ sub format {
 	# that we have a latex src file
 	# else (below) we need to run untemplate()
 	if( $need_to_run_untemplate == 0 ){
-		# we have a latex src file,
-		# because caller has already run untemplate()
+		# We don't have a template file, we have a latex src file,
+		# because caller has already run untemplate() or none was required
 		if( $verbosity > 0 ){ $log->info(perl2dump($latex_info)."--end latex source parameters.\n${whoami} (via $parent), line ".__LINE__." : latex source file was specified in the input parameters, see above. There is no need to run untemplate() ...") }
 		if( ! -f $latex_info->{'filepath'} ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, latex source 'filepath' (".$latex_info->{'filepath'}.") does not exist or is not a file."); return undef }
 		if( ! exists($latex_info->{'content'}) || ! defined($latex_info->{'content'}) ){
@@ -367,6 +367,9 @@ sub format {
 		$template_info = Storable::dclone($ret->{'template'});
 		if( $verbosity > 0 ){ $log->info(perl2dump($latex_info)."--end latex source parameters.\n${whoami} (via $parent), line ".__LINE__." : latex source file has been created from specified template and template data via ".'untemplate()'.", see details above.") }
 	}
+
+	# we are not sure we have a $latex_info->{'content'} here
+	#die unless exists($latex_info->{'content'}) && defined($latex_info->{'content'});
 
 	my $outfile = $output_info->{'filepath'};
 	if( defined($outfile) && ($verbosity > 0) ){ $log->info("${whoami} (via $parent), line ".__LINE__." : output will be written to file '$outfile'."); }
@@ -435,8 +438,22 @@ sub format {
 
 	# this returns 1 on success or exception on failure
 	my $ret = eval { $latex_driver->run() };
-	if( $@ ){ $log->error("--begin output:\n".($latex_driver->stderr()//"<na>")."\n--end output.\n\n--begin parameters:\n".perl2dump(\%drivparams)."--end parameters.\n${whoami} (via $parent), line ".__LINE__." : error, failed to run latex on file '".$latex_info->{'filepath'}."' with above parameters, exception was caught: $@"); return undef };
-	if( $ret != 1 ){ $log->error("--begin output:\n".$latex_driver->stderr()."\n--end output.\n\n--begin parameters:\n".perl2dump(\%drivparams)."--end parameters.\n${whoami} (via $parent), line ".__LINE__." : error, failed to run latex on file '".$latex_info->{'filepath'}."' with above parameters (status was not 1): ".$latex_driver->stderr); return undef }
+	if( $@ ){
+		my ($filecontents, $aFH);
+		if( open($aFH, '<:utf8', $latex_info->{'filepath'}) ){
+			{ local $/ = undef; $filecontents = <$aFH> } close $aFH;
+		} else { $filecontents="<file contents na>"; $log->error("error, failed to open input latex file for reading '".$latex_info->{'filepath'}."' and will not be able to display the latex file contents for the error message following : $!"); }
+		$log->error("error caught:\n--begin file contents:\n${filecontents}\n--end file contents.\n\n--begin stderr:\n".($latex_driver->stderr()//"<stderr na>")."\n--end stderr.\n--begin stdout:\n".($latex_driver->stdout()//"<stdout na>")."\n--end stdout.\n\n--begin parameters:\n".perl2dump(\%drivparams)."--end parameters.\n${whoami} (via $parent), line ".__LINE__." : error, failed to run latex on file '".$latex_info->{'filepath'}."' with above parameters, exception was caught: $@");
+		return undef
+	}
+	if( $ret != 1 ){
+		my ($filecontents, $aFH);
+		if( open($aFH, '<:utf8', $latex_info->{'filepath'}) ){
+			{ local $/ = undef; $filecontents = <$aFH> } close $aFH;
+		} else { $filecontents="<file contents na>"; $log->error("error, failed to open input latex file for reading '".$latex_info->{'filepath'}."' and will not be able to display the latex file contents for the error message following : $!"); }
+		$log->error("error caught:\n--begin file contents:\n${filecontents}\n\n--end file contents.--begin stderr:\n".($latex_driver->stderr()//"<stderr na>")."\n--end stderr.\n--begin stdout:\n".($latex_driver->stdout()//"<stdout na>")."\n--end stdout.\n\n--begin parameters:\n".perl2dump(\%drivparams)."--end parameters.\n${whoami} (via $parent), line ".__LINE__." : error, failed to run latex on file '".$latex_info->{'filepath'}."' with above parameters (status was not 1): ".$latex_driver->stderr);
+		return undef
+	}
 
 	# the pdf output will be in the latex's basedir and its name
 	# will be the same as latex source file except the extension will be .pdf
@@ -1139,7 +1156,7 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 

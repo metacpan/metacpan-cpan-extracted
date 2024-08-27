@@ -11,8 +11,8 @@ BEGIN {
     %DBIx::Squirrel::util::EXPORT_TAGS = (
         constants   => ['E_EXP_STATEMENT', 'E_EXP_STH', 'E_EXP_REF',],
         diagnostics => ['throw',           'whine',],
-        transform   => ['part_args',       'transform',],
-        sql => ['get_trimmed_sql_and_digest', 'normalise_statement', 'study_statement', 'trim_sql_string', 'hash_sql_string',],
+        transform   => ['args_partition',  'transform',],
+        sql         => ['statement_trim',  'statement_normalise', 'statement_study', 'sql_trim', 'sql_digest',],
     );
     @DBIx::Squirrel::util::EXPORT_OK = @{
         $DBIx::Squirrel::util::EXPORT_TAGS{all} = [
@@ -84,90 +84,77 @@ sub whine {
     goto &Carp::cluck;
 }
 
-memoize('uniq');
-
 sub uniq {
     my %seen;
     return grep {!$seen{$_}++} @_;
 }
 
-memoize('is_viable_sql_string');
-
-sub is_viable_sql_string {
-    return defined($_[0]) && length($_[0]) && $_[0] =~ m/\S/;
+sub statement_study {
+    my($normal, $trimmed, $digest) = statement_normalise(@_);
+    return unless length($trimmed);
+    my %positions_to_params_map = do {
+        if (my @params = $trimmed =~ m{[\:\$\?]\w+\b}g) {
+            map {(1 + $_ => $params[$_])} 0 .. $#params;
+        }
+        else {
+            ();
+        }
+    };
+    return \%positions_to_params_map, $normal, $trimmed, $digest;
 }
 
-memoize('study_statement');
+sub statement_normalise {
+    my $trimmed = statement_trim(@_);
+    my $normal  = $trimmed;
+    $normal =~ s{[\:\$\?]\w+\b}{?}g if $NORMALISE_SQL;
+    return $normal, $trimmed, sql_digest($trimmed);
+}
 
-sub study_statement {
-    my($normalised, $trimmed_sql, $digest) = &normalise_statement;
-    return unless is_viable_sql_string($trimmed_sql);
-    my @placeholders = $trimmed_sql =~ m{[\:\$\?]\w+\b}g;
-    my $mapped_positions;
-    if (@placeholders) {
-        $mapped_positions = {map {(1 + $_ => $placeholders[$_])} (0 .. $#placeholders),};
+sub statement_trim {
+    my $sth_or_sql = shift;
+    if (ref($sth_or_sql)) {
+        if (UNIVERSAL::isa($sth_or_sql, 'DBIx::Squirrel::st')) {
+            return sql_trim($sth_or_sql->_private_state->{OriginalStatement});
+        }
+        elsif (UNIVERSAL::isa($sth_or_sql, 'DBI::st')) {
+            return sql_trim($sth_or_sql->{Statement});
+        }
+        else {
+            throw E_EXP_STH;
+        }
     }
-    return $mapped_positions, $normalised, $trimmed_sql, $digest;
+    else {
+        return sql_trim($sth_or_sql);
+    }
 }
 
-sub normalise_statement {
-    my($trimmed_sql, $digest) = &get_trimmed_sql_and_digest;
-    my $normalised = $trimmed_sql;
-    $normalised =~ s{[\:\$\?]\w+\b}{?}g if $NORMALISE_SQL;
-    return $normalised unless wantarray;
-    return $normalised, $trimmed_sql, $digest;
+memoize('sql_digest');
+
+sub sql_digest {
+    return sha256_base64(shift);
 }
 
-sub get_trimmed_sql_and_digest {
-    my $sth_or_sql_string = shift;
-    my $sql_string        = do {
-        if (ref $sth_or_sql_string) {
-            if (UNIVERSAL::isa($sth_or_sql_string, 'DBIx::Squirrel::st')) {
-                trim_sql_string($sth_or_sql_string->_private_state->{OriginalStatement});
-            }
-            elsif (UNIVERSAL::isa($sth_or_sql_string, 'DBI::st')) {
-                trim_sql_string($sth_or_sql_string->{Statement});
-            }
-            else {
-                throw E_EXP_STH;
-            }
-        }
-        else {
-            trim_sql_string($sth_or_sql_string);
-        }
-    };
-    return $sql_string unless wantarray;
-    return $sql_string, hash_sql_string($sql_string);
+memoize('sql_trim');
+
+sub sql_trim {
+    my $sql = defined($_[0]) && !ref($_[0]) ? shift : '';
+    $sql        =~ s{\s+--\s+.*$}{}gm;
+    $sql        =~ s{^[[:blank:]\r\n]+}{}gm;
+    $sql        =~ s{[[:blank:]\r\n]+$}{}gm;
+    return $sql =~ m/\S/ ? $sql : '';
 }
 
-memoize('trim_sql_string');
-
-sub trim_sql_string {
-    return do {
-        if (&is_viable_sql_string) {
-            my $sql = shift;
-            $sql =~ s{\s+-{2}\s+.*$}{}gm;
-            $sql =~ s{^[[:blank:]\r\n]+}{}gm;
-            $sql =~ s{[[:blank:]\r\n]+$}{}gm;
-            $sql;
-        }
-        else {
-            '';
-        }
-    };
-}
-
-memoize('hash_sql_string');
-
-sub hash_sql_string {
-    return is_viable_sql_string(@_) ? sha256_base64(@_) : undef;
-}
-
-sub part_args {
-    my @args = @_;
-    my @coderefs;
-    unshift @coderefs, pop(@args) while UNIVERSAL::isa($args[-1], 'CODE');
-    return \@coderefs, @args;
+sub args_partition {
+    my $s = scalar(@_);
+    my $n = $s;
+    return ([]) unless $n;
+    while ($n) {
+        last unless UNIVERSAL::isa($_[$n - 1], 'CODE');
+        $n -= 1;
+    }
+    return ([], @_) if $n == $s;
+    return ([@_])   if $n == 0;
+    return ([@_[$n .. $#_]], @_[0 .. $n - 1]);
 }
 
 # Runtime scoping of $_result allows caller to import and use "result" instead
@@ -198,9 +185,9 @@ sub transform {
             };
         }
     }
-    return @_         if wantarray;
+    return @_ if wantarray;
+    $_ = $_[0];
     return scalar(@_) if @_;
-    return do {$_ = $_[0]};
 }
 
 1;

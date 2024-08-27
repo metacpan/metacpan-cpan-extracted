@@ -2,14 +2,14 @@
 
 # xlscat:  show supported spreadsheet file as Text
 # xlsgrep: grep pattern
-#	   (m)'24 [2024-02-13] Copyright H.M.Brand 2005-2024
+#	   (m)'24 [2024-07-15] Copyright H.M.Brand 2005-2024
 
 require 5.008001;
 
 use strict;
 use warnings;
 
-our $VERSION = "3.28";
+our $VERSION = "3.31";
 (my $CMD = $0) =~ s{.*[\/]}{};
 
 my $is_grep = $0 =~ m/grep$/;	# xlsgrep
@@ -71,6 +71,14 @@ sub usage {
 	"       -S <sheets> Only print sheets <sheets>. 'all' is a valid set",
 	"                   Default only prints the first sheet",
 	"       -R <rows>   Only print rows    <rows>. Default is 'all'",
+	"                   Ranges and lists supported as 2,4-7,8-",
+	"                   Trailing - is to end of data",
+	"                   Negative rows count from tail -8--2 is allowed",
+	"        --head[=n] Alias for -R1..n   where n defaults to 10",
+	"        --tail[=n] Alias for -R-n-    where n defaults to 10",
+	"        --first=C  Only show rows where column C is a 'new' value",
+	"                   (suppress rows where value in column C is seen",
+	"                    before in column C). That includes empty fields",
 	"       -C <cols>   Only print columns <cols>. Default is 'all'",
 	"       -F <flds>   Only fields <flds> e.g. -FA3,B16",
 	"    Ordering (column numbers in result set *after* selection):",
@@ -132,6 +140,9 @@ GetOptions (
      "|out-sep-char=s"	=> \my $opt_s,	# Text separator
     "S|sheets=s"	=> \my $opt_S,	# Sheets to print
     "R|rows=s"		=> \my $opt_R,	# Rows to print
+      "head:10"		=> \my $opt_head,
+      "tail:10"		=> \my $opt_tail,
+      "first=s"		=> \my $opt_first,
     "C|columns=s"	=> \my $opt_C,	# Columns to print
     "F|fields=s"	=> \   $opt_F,
     "L|fit|align!"	=> \my $opt_L,	# Auto-size/align columns
@@ -174,6 +185,9 @@ sub list_parsers {
 	}
     exit $err;
     } # list_parsers
+
+$opt_head and $opt_R = "1-$opt_head";
+$opt_tail and $opt_R = "-$opt_tail-";
 
 $opt_B and $opt_L++;
 unless ($is_grep) {
@@ -432,6 +446,14 @@ if ($opt_H) {
 EOH
     }
 
+my %first;
+if ($opt_first) {
+    $opt_first =~ m/^([a-zA-Z]+)[0-9]*$/ and
+	$opt_first = (cell2cr (uc $1 . "1"))[0];
+    $opt_first =~ m/^[0-9]+$/ && $opt_first > 0 or
+	die "--first=C requires a numeric column index or a column index letter\n";
+    }
+
 my $name_len = 30;
 if ($opt_i) {
     my $nl = 0;
@@ -470,6 +492,8 @@ foreach my $si (1 .. $sc) {
 
     if (my $rows = $opt_R) {
 	$rows eq "all" and $rows = "1..$nr";	# all
+	$rows =~ s/--(\d+)/-($nr+1-$1)/ge;	# 3--2
+	$rows =~ s/-(\d+)(?=-)/($nr+1-$1)/ge;	# -3-
 	$rows =~ s/-$/-$nr/;			# 3,6-
 	$rows =~ s/-/../g;
 	eval "%{\$print{row}} = map { \$_ => 1 } $rows";
@@ -520,6 +544,9 @@ foreach my $si (1 .. $sc) {
 	$is_grep && $r > $opt_h &&
 	    ! first { defined $_ && $_ =~ $pattern } @row and next;
 	$skip_empty && ! first { length } @row and next;
+	if ($opt_first) {
+	    @row >= $opt_first && $first{$row[$opt_first - 1]}++ and next;
+	    }
 	if ($opt_D) {
 	    ddumper ($opt_D == 1 ? \@row :
 		{ map { $s->{cell}[$_ + 1][1] => $row[$_] } 0 .. $#row });
@@ -610,6 +637,15 @@ foreach my $si (1 .. $sc) {
 		# second row has column headers
 		$r && $d =~ m/\S/ or next;
 		$d =~ m/^(?:-|\s*(?:-\s*)?[0-9][0-9 .,]*)$/ or $align[$c] = "-";
+		}
+	    }
+	if ($skip_empty) { # Skip empty columns. Rows have already been skipped
+	    foreach my $i ( reverse 0 .. $#w) {
+		$w[$i] and next;
+
+		splice @w,     $i, 1;
+		splice @align, $i, 1;
+		splice @$_,    $i, 1 for grep { $#$_ >= $i } map { @{$_} } @data;
 		}
 	    }
 	}

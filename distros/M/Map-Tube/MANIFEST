@@ -8,6 +8,7 @@ lib/Map/Tube/Table.pm
 lib/Map/Tube/Route.pm
 lib/Map/Tube/Utils.pm
 lib/Map/Tube/Types.pm
+lib/Map/Tube/Cookbook.pm
 lib/Map/Tube/Pluggable.pm
 Makefile.PL
 LICENSE

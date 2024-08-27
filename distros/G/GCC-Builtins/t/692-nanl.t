@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use GCC::Builtins qw/:all/;
 
@@ -14,7 +14,7 @@ if( $expected =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ ){
 	my $dif = abs($res-$expected);
 	ok($dif<1e-09, "called nanl('some string') returned ($res) and expected ($expected) values differ ($dif) by less than 1e-09.");
 } else {
-	is($res, $expected, "called nanl('some string') returned ($res) and expected ($expected) values are identical.");
+	is(lc($res), lc($expected), "called nanl('some string') returned ($res) and expected ($expected) values are identical.");
 }
 diag("copy-this-expected-value 'nanl' => '$res',");
 

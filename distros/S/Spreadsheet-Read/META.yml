@@ -33,6 +33,7 @@ optional_features:
   opt_xls: 
     description: Provides parsing of Microsoft Excel files
     requires: 
+      OLE::Storage_Lite: "!= 0.21"
       Spreadsheet::ParseExcel: '0.34'
       Spreadsheet::ParseExcel::FmtDefault: 0
   opt_xlsx: 
@@ -43,14 +44,14 @@ optional_features:
 provides: 
   Spreadsheet::Read: 
     file: Read.pm
-    version: '0.90'
+    version: '0.91'
 recommends: 
   Data::Dumper: '2.183'
   Data::Peek: '0.52'
-  Encode: '3.20'
+  Encode: '3.21'
   File::Temp: '0.2311'
   IO::Scalar: 0
-  Test::More: '1.302198'
+  Test::More: '1.302201'
 requires: 
   Carp: 0
   Data::Dumper: 0
@@ -67,4 +68,4 @@ resources:
   bugtracker: https://github.com/Tux/Spreadsheet-Read/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Spreadsheet-Read
-version: '0.90'
+version: '0.91'

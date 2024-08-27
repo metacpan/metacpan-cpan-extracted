@@ -38,12 +38,14 @@ my %WriteMakefileArgs = (
     "DBD::Mock" => 0,
     "DBD::SQLite" => 0,
     "FindBin" => 0,
+    "Test::Compile" => 0,
+    "Test::MockModule" => 0,
     "Test::More" => 0,
     "Test::Warn" => 0,
     "lib" => 0,
     "open" => 0
   },
-  "VERSION" => "1.3.5",
+  "VERSION" => "1.3.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,6 +67,8 @@ my %FallbackPrereqs = (
   "Memoize" => 0,
   "Scalar::Util" => 0,
   "Sub::Name" => 0,
+  "Test::Compile" => 0,
+  "Test::MockModule" => 0,
   "Test::More" => 0,
   "Test::Warn" => 0,
   "YAML::Syck" => 0,

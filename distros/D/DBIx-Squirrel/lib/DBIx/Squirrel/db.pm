@@ -53,7 +53,7 @@ sub _private_state {
 sub prepare {
     my $self      = shift;
     my $statement = shift;
-    my($placeholders, $normalised_statement, $original_statement, $digest) = study_statement($statement);
+    my($placeholders, $normalised_statement, $original_statement, $digest) = statement_study($statement);
     throw E_EXP_STATEMENT unless defined($normalised_statement);
     my $sth = $self->SUPER::prepare($normalised_statement, @_);
     return unless defined($sth);
@@ -70,7 +70,7 @@ sub prepare {
 sub prepare_cached {
     my $self      = shift;
     my $statement = shift;
-    my($placeholders, $normalised_statement, $original_statement, $digest) = study_statement($statement);
+    my($placeholders, $normalised_statement, $original_statement, $digest) = statement_study($statement);
     throw E_EXP_STATEMENT unless defined($normalised_statement);
     my $sth = $self->SUPER::prepare_cached($normalised_statement, @_);
     return unless defined($sth);

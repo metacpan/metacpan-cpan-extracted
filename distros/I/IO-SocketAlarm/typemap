@@ -1,0 +1,10 @@
+TYPEMAP
+struct socketalarm*    O_SocketAlarm
+
+INPUT
+O_SocketAlarm
+    $var= get_magic_socketalarm($arg, OR_DIE);
+
+OUTPUT
+O_SocketAlarm
+    $arg= wrap_socketalarm($var);

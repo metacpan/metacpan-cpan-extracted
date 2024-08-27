@@ -15,12 +15,12 @@ my %WriteMakefileArgs = (
 	},
 	TEST_REQUIRES => {
 	    'Test::More' => '0',
-	'Benchmark' => '0',
+	    'Benchmark' => '0',
 	},
 	PREREQ_PM => {
-	'ExtUtils::MakeMaker' => '7.12',
-	'Exporter' => '0',
-	'DynaLoader' => '0',
+	    'ExtUtils::MakeMaker' => '7.12',
+	    'Exporter' => '0',
+	    'DynaLoader' => '0',
 	},
 	CCFLAGS  => '-Wall -std=c99',
 	OPTIMIZE => '-O3',
@@ -28,7 +28,6 @@ my %WriteMakefileArgs = (
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES => 'GCC-Builtins-*' },
 	postamble => {
-	    DEFICIENCIES_FILES => 'xt/deficiencies/*.t',
 	    BENCHMARK_FILES => 'xt/benchmarks/*.b',
 	},
 	META_ADD => {
@@ -86,15 +85,12 @@ sub MY::postamble {
     my (undef,%h) = @_;
     # require Data::Dumper; print STDERR Data::Dumper->Dump([\%h], [qw(mm_args{postamble})]);
     return "BENCHMARK_FILES=$h{BENCHMARK_FILES}\n"
-	 . "DEFICIENCIES_FILES=$h{DEFICIENCIES_FILES}\n"
 	. <<'POSTAMBLE';
 TEST_D = $(ABSPERLRUN) -MExtUtils::Command -e test_d --
 
 benchmarks :: $(BENCHMARK_FILES)
 	prove --blib $(INST_LIB) --blib $(INST_ARCHLIB) --verbose $^
 
-deficiencies :: $(DEFICIENCIES_FILES)
-	prove --blib $(INST_LIB) --blib $(INST_ARCHLIB) --verbose $^
 POSTAMBLE
 }
 

@@ -1,8 +1,17 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 
+1.20240827 2024-08-27 Australia/Melbourne
+  * Add missing Author prerequisite
+    Thanks to Giovanni <g.bechis@snb.it>
+  * Option to pass a time to the Validator to assert the time
+    which should be considered as "now" for expiry checks
+
 1.20240619 2024-06-19 Australia/Melbourne
   * Remove version check for Net::DNS, this fixes issues when using a
     development version of Net::DNS
+
+  * Add missing Test required Perl modules
+    Thanks to Giovanni <g.bechis@snb.it>
 
 1.20240124 2024-01-24 UTC
   * ARC: Return fail for any ARC set with an instance number greater than 50.

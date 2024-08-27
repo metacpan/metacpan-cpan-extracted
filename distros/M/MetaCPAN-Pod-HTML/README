@@ -1,0 +1,57 @@
+NAME
+    MetaCPAN::Pod::HTML - Format Pod as HTML for MetaCPAN
+
+SYNOPSIS
+      my $parser = MetaCPAN::Pod::HTML->new;
+      $parser->link_mappings({
+        'Pod::Simple::Subclassing' => '/pod/distribution/Pod-Simple/lib/Pod/Simple/Subclassing.pod',
+      });
+      $parser->output_string(\my $html);
+      $parser->parse_string_document($pod);
+
+DESCRIPTION
+    This is a subclass of Pod::Simple::XHTML with improved header linking,
+    link overrides, errata included in the HTML, and producing HTML5. Used
+    internally by MetaCPAN.
+
+ROLES
+    The behavior of this subclass is implemented through reusable roles:
+
+    *   Pod::Simple::Role::XHTML::HTML5
+
+    *   Pod::Simple::Role::XHTML::WithLinkMappings
+
+    *   Pod::Simple::Role::XHTML::WithExtraTargets
+
+    *   Pod::Simple::Role::XHTML::WithAccurateTargets
+
+    *   Pod::Simple::Role::XHTML::WithErrata
+
+    *   Pod::Simple::Role::XHTML::WithHighlightConfig
+
+    *   Pod::Simple::Role::StripVerbatimIndent
+
+DEFAULTS
+    anchor_items
+        By default, anchor_items is set to true.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
+    *   Olaf Alders <olaf@wundersolutions.com>
+
+    *   Randy Stauner <randy@magnificent-tears.com>
+
+    *   Moritz Onken <onken@netcubed.de>
+
+    *   Grant McLean <grant@mclean.net.nz>
+
+COPYRIGHT
+    Copyright (c) 2017 the MetaCPAN::Pod::HTML "AUTHOR" and "CONTRIBUTORS"
+    as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <http://dev.perl.org/licenses/>.
+

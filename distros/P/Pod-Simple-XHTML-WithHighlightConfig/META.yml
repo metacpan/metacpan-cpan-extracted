@@ -6,7 +6,7 @@ build_requires:
   Test::More: '0'
 configure_requires: {}
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,10 +18,11 @@ no_index:
     - xt
 requires:
   Moo: '0'
+  Pod::Simple::Role::XHTML::WithHighlightConfig: '0'
   Pod::Simple::XHTML: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Simple-XHTML-WithHighlightConfig
   license: http://dev.perl.org/licenses/
   repository: git://github.com/haarg/Pod-Simple-XHTML-WithHighlightConfig
-version: '0.000002'
+version: '0.000003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

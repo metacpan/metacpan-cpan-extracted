@@ -16,7 +16,7 @@ BEGIN {
 use namespace::autoclean;
 use Scalar::Util qw/weaken looks_like_number/;
 use Sub::Name;
-use DBIx::Squirrel::util qw/part_args throw transform whine/;
+use DBIx::Squirrel::util qw/args_partition throw transform whine/;
 
 use constant E_BAD_STH         => 'Expected a statement handle object';
 use constant E_BAD_SLICE       => 'Slice must be a reference to an ARRAY or HASH';
@@ -41,7 +41,7 @@ sub DESTROY {
 
 sub new {
     my $class = ref($_[0]) ? ref(shift) : shift;
-    my($transforms, $sth, @bind_values) = part_args(@_);
+    my($transforms, $sth, @bind_values) = args_partition(@_);
     throw E_BAD_STH unless UNIVERSAL::isa($sth, 'DBIx::Squirrel::st');
     my $self = bless {}, $class;
     $self->_private_state({
@@ -56,7 +56,7 @@ sub _buffer_charge {
     my($attr, $self) = shift->_private_state;
     my $sth = $attr->{sth};
     unless ($sth->{Executed}) {
-        return unless defined($self->execute);
+        return unless defined($self->start);
     }
     return unless $sth->{Active};
     my($slice, $buffer_size) = @{$attr}{qw/slice buffer_size/};
@@ -229,7 +229,7 @@ sub _private_state_reset {
 
 sub all {
     my $self = shift;
-    return unless defined($self->execute(@_));
+    return unless defined($self->start(@_));
     return $self->remaining;
 }
 
@@ -258,7 +258,7 @@ sub buffer_size_slice {
 sub count {
     my($attr, $self) = shift->_private_state;
     unless ($attr->{sth}->{Executed}) {
-        return unless defined($self->execute);
+        return unless defined($self->start);
     }
     while (defined($self->_result_fetch)) {;}
     return do {$_ = $attr->{results_count}};
@@ -267,57 +267,35 @@ sub count {
 sub count_fetched {
     my($attr, $self) = shift->_private_state;
     unless ($attr->{sth}->{Executed}) {
-        return unless defined($self->execute);
+        return unless defined($self->start);
     }
     return do {$_ = $attr->{results_count}};
-}
-
-sub execute {
-    my($attr,       $self)        = shift->_private_state;
-    my($transforms, @bind_values) = part_args(@_);
-    if (@{$transforms}) {
-        $attr->{transforms} = [@{$attr->{transforms_initial}}, @{$transforms}];
-    }
-    else {
-        $attr->{transforms} = [@{$attr->{transforms_initial}}]
-          unless defined($attr->{transforms}) && @{$attr->{transforms}};
-    }
-    if (@bind_values) {
-        $attr->{bind_values} = [@bind_values];
-    }
-    else {
-        $attr->{bind_values} = [@{$attr->{bind_values_initial}}]
-          unless defined($attr->{bind_values}) && @{$attr->{bind_values}};
-    }
-    my $sth = $attr->{sth};
-    $self->_private_state_reset;
-    return do {$_ = $attr->{execute_returned} = $sth->execute(@{$attr->{bind_values}})};
 }
 
 sub first {
     my($attr, $self) = shift->_private_state;
     unless ($attr->{sth}->{Executed}) {
-        return unless defined($self->execute);
+        return unless defined($self->start);
     }
     return do {$_ = exists($attr->{results_first}) ? $attr->{results_first} : $self->_result_fetch};
 }
 
 sub iterate {
     my $self = shift;
-    return unless defined($self->execute(@_));
+    return unless defined($self->start(@_));
     return do {$_ = $self};
 }
 
 sub reset {
     my $self = shift;
-    $self->execute;
+    $self->start;
     return $self;
 }
 
 sub last {
     my($attr, $self) = shift->_private_state;
     unless ($attr->{sth}->{Executed}) {
-        return unless defined($self->execute);
+        return unless defined($self->start);
         while (defined($self->_result_fetch)) {;}
     }
     return do {$_ = $attr->{results_last}};
@@ -326,7 +304,7 @@ sub last {
 sub last_fetched {
     my($attr, $self) = shift->_private_state;
     unless ($attr->{sth}->{Executed}) {
-        $self->execute;
+        $self->start;
         return;
     }
     return do {$_ = $attr->{results_last}};
@@ -336,7 +314,7 @@ sub next {
     my $self = shift;
     my $sth  = $self->sth;
     unless ($sth->{Executed}) {
-        return unless defined($self->execute);
+        return unless defined($self->start);
     }
     return do {$_ = $self->_result_fetch};
 }
@@ -345,7 +323,7 @@ sub remaining {
     my $self = shift;
     my $sth  = $self->sth;
     unless ($sth->{Executed}) {
-        return unless defined($self->execute);
+        return unless defined($self->start);
     }
     my @rows;
     push @rows, $self->_result_fetch while $sth->{Active};
@@ -357,7 +335,7 @@ sub rows {shift->sth->rows}
 
 sub single {
     my($attr, $self) = shift->_private_state;
-    return unless defined($self->execute);
+    return unless defined($self->start);
     return unless defined($self->_result_fetch);
     whine W_MORE_ROWS if @{$attr->{buffer}};
     return do {$_ = exists($attr->{results_first}) ? $attr->{results_first} : ()};
@@ -393,6 +371,32 @@ sub slice_buffer_size {
     return $self->slice, $self->buffer_size unless @_;
     return $self->slice(shift)->buffer_size(shift) if ref($_[0]);
     return $self->buffer_size(shift)->slice(shift);
+}
+
+sub start {
+    my($attr,       $self)        = shift->_private_state;
+    my($transforms, @bind_values) = args_partition(@_);
+    if (@{$transforms}) {
+        $attr->{transforms} = [@{$attr->{transforms_initial}}, @{$transforms}];
+    }
+    else {
+        $attr->{transforms} = [@{$attr->{transforms_initial}}]
+          unless defined($attr->{transforms}) && @{$attr->{transforms}};
+    }
+    if (@bind_values) {
+        $attr->{bind_values} = [@bind_values];
+    }
+    else {
+        $attr->{bind_values} = [@{$attr->{bind_values_initial}}]
+          unless defined($attr->{bind_values}) && @{$attr->{bind_values}};
+    }
+    my $sth = $attr->{sth};
+    $self->_private_state_reset;
+    return do {$_ = $attr->{execute_returned} = $sth->execute(@{$attr->{bind_values}})};
+}
+
+BEGIN {
+    *execute = subname(execute => \&start);
 }
 
 sub sth {shift->_private_state->{sth}}

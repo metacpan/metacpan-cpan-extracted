@@ -19,3 +19,8 @@ Revision history for GCC-Builtins
 0.05    2024/04/12 - 13:00
         Changed the test files > 666-*.t so that it attempts to detect if expected result is a number. If it is, then expected and returned results are checked on their abs difference being less than a small number, instead of comparing their equality.
 
+0.06    2024/08/26 - 20:00
+        In some systems (e.g. perl 5.12.5) expected 'Inf' or 'NaN' return values from a GCC builtin yield lower-case 'inf' and 'nan', failing the test. So, test files comparing expected and yielded values lower-case the "comparees" before the comparison.
+	Added to the documentation.
+
+

@@ -22,3 +22,7 @@ Revision history for LaTeX-Easy-Templates
         Test files under "xt/" are now included in the distribution, they were omitted in previous releases.
         Test files above 300 have been restructured and renamed.
         Enhanced documentation.
+
+0.06    2024-08-26/23:00
+        Added more verbose output when latex driver fails.
+        Removed some expletives.

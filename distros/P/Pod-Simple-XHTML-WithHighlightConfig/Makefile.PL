@@ -15,6 +15,7 @@ my %META = (
       requires => {
         'Moo' => 0,
         'Pod::Simple::XHTML' => 0,
+        'Pod::Simple::Role::XHTML::WithHighlightConfig' => 0,
       },
     },
     develop => { requires => {

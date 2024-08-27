@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/hadjiprocopis/perl-gcc-builtins/issues
   homepage: https://metacpan.org/module/GCC::Builtins
   repository: https://github.com/hadjiprocopis/perl-gcc-builtins
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

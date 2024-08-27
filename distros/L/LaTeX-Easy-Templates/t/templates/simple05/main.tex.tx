@@ -1,4 +1,4 @@
-\documentclass[letterpaper,twoside,12pt]{article}
+\documentclass[a4]{article}
 \begin{document}
 \title{ <: $data.title :> }
 \maketitle

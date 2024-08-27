@@ -1,7 +1,7 @@
 package Mail::DKIM::ARC::Verifier;
 use strict;
 use warnings;
-our $VERSION = '1.20240619'; # VERSION
+our $VERSION = '1.20240827'; # VERSION
 # ABSTRACT: verifies an ARC-Sealed message
 
 # Copyright 2017 FastMail Pty Ltd.  All Rights Reserved.
@@ -96,6 +96,11 @@ sub add_signature {
     croak 'wrong number of arguments' unless ( @_ == 2 );
 
     return if $self->{result};    # already failed
+
+    # Set verification time if we have one
+    if ($self->{verify_time}) {
+        $signature->set_verify_time($self->{verify_time});
+    }
 
     push @{ $self->{signatures} }, $signature;
 
@@ -621,7 +626,7 @@ Mail::DKIM::ARC::Verifier - verifies an ARC-Sealed message
 
 =head1 VERSION
 
-version 1.20240619
+version 1.20240827
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,64 @@
+{
+   "abstract" : "Format Pod as HTML for MetaCPAN",
+   "author" : [
+      "Graham Knop <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MetaCPAN-Pod-HTML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Entities" : "3.69",
+            "Moo" : "2.003000",
+            "Moo::Role" : "2.003000",
+            "Pod::Simple::XHTML" : "3.45",
+            "URL::Encode" : "0.03",
+            "namespace::clean" : "0.27"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/metacpan/MetaCPAN-Pod-HTML/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/metacpan/MetaCPAN-Pod-HTML.git",
+         "web" : "https://github.com/metacpan/MetaCPAN-Pod-HTML"
+      },
+      "x_IRC" : "irc://irc.perl.org/#metacpan"
+   },
+   "version" : "0.004000",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

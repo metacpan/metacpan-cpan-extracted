@@ -7,6 +7,7 @@ use warnings;
 use Test::More tests => 6;
 use Test::Exception;
 
+use English qw( -no_match_vars );
 use IPC::Open3;
 use Symbol qw( gensym );
 
@@ -22,7 +23,7 @@ subtest 'InputRedirect' => sub {
 
   lives_ok {
     my $pid = open3(my $in, my $out = gensym, my $err,
-      perl
+      $EXECUTABLE_NAME
       => q{-X}
       => q{-MWin32::Console::DotNet}
       => q{-e "print 0+System::Console->IsInputRedirected"}
@@ -37,7 +38,7 @@ subtest 'OutputRedirect' => sub {
 
   lives_ok {
     my $pid = open3(my $in, my $out = gensym, my $err,
-      perl
+      $EXECUTABLE_NAME
       => q{-X}
       => q{-MWin32::Console::DotNet}
       => q{-e "print 0+System::Console->IsOutputRedirected"}
@@ -52,7 +53,7 @@ subtest 'ErrorRedirect' => sub {
 
   lives_ok {
     my $pid = open3(my $in, my $out = gensym, my $err,
-      perl
+      $EXECUTABLE_NAME
       => q{-X}
       => q{-MWin32::Console::DotNet}
       => q{-e "print 0+System::Console->IsErrorRedirected"}

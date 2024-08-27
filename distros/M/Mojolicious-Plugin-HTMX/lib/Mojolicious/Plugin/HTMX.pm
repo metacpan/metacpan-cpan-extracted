@@ -3,8 +3,9 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
 use Mojo::JSON qw(encode_json decode_json);
+use Mojo::Util qw(xml_escape);
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 my @HX_RESWAPS = (qw[
     innerHTML
@@ -22,13 +23,17 @@ use constant HX_FALSE => 'false';
 
 use constant HTMX_STOP_POLLING => 286;
 use constant HTMX_CDN_URL      => 'https://unpkg.com/htmx.org';
+use constant HTMX_V1_CDN_URL   => 'https://unpkg.com/htmx.org@1.9.12';
+
 
 sub register {
 
     my ($self, $app) = @_;
 
-    $app->helper('htmx.asset'      => \&_htmx_js);
     $app->helper('is_htmx_request' => sub { _header(shift, 'HX-Request', HX_TRUE) });
+
+    $app->helper('htmx.asset'        => \&_htmx_js);
+    $app->helper('htmx.stop_polling' => sub { shift->rendered(HTMX_STOP_POLLING) });
 
     $app->helper('htmx.req.boosted'                 => sub { _header(shift, 'HX-Boosted', HX_TRUE) });
     $app->helper('htmx.req.current_url'             => sub { Mojo::URL->new(_header(shift, 'HX-Current-URL')) });
@@ -45,6 +50,29 @@ sub register {
         }
     );
 
+    $app->helper(
+        'htmx.req.to_hash' => sub {
+
+            my $c = shift;
+
+            my %hash = ();
+
+            my @helpers
+                = (
+                qw[boosted current_url history_restore_request prompt request target trigger_name trigger triggering_event]
+                );
+
+            for my $helper (@helpers) {
+                if (my $value = $c->helpers->htmx->req->$helper()) {
+                    $hash{$helper} = "$value";
+                }
+            }
+
+            return \%hash;
+
+        }
+    );
+
     $app->helper('htmx.res.location'    => \&_res_location);
     $app->helper('htmx.res.push_url'    => \&_res_push_url);
     $app->helper('htmx.res.redirect'    => \&_res_redirect);
@@ -57,6 +85,36 @@ sub register {
     $app->helper('htmx.res.trigger'              => sub { _res_trigger('default',      @_) });
     $app->helper('htmx.res.trigger_after_settle' => sub { _res_trigger('after_settle', @_) });
     $app->helper('htmx.res.trigger_after_swap'   => sub { _res_trigger('after_swap',   @_) });
+
+    $app->helper(
+        'hx' => sub {
+
+            my ($c, %attrs) = @_;
+            my $hx = {};
+
+            @$hx{map { y/_/-/; "hx-$_" } keys %attrs} = values %attrs;
+            return %{$hx};
+
+        }
+    );
+
+    $app->helper(
+        'hx_attr' => sub {
+
+            my ($c, %attrs) = @_;
+
+            my %hx     = $c->hx(%attrs);
+            my $result = '';
+
+            for my $attr (sort keys %hx) {
+                my $value = $hx{$attr};
+                $result .= qq{ $attr="} . xml_escape($value) . '"';
+            }
+
+            return Mojo::ByteStream->new($result);
+
+        }
+    );
 
 }
 
@@ -80,8 +138,8 @@ sub _header {
     my $value = $c->req->headers->header($header);
 
     if ($value && $check) {
-        return 1 if ($value eq $check);
-        return 0;
+        return !!1 if ($value eq $check);
+        return !!0;
     }
 
     return $value;
@@ -229,7 +287,14 @@ Mojolicious::Plugin::HTMX - Mojolicious Plugin for htmx
   % layout 'default';
   <h1>Trigger</h1>
 
+  <!-- Common -->
   <button hx-post="/trigger">Click Me</button>
+
+  <!-- Use "hx" helper -->
+  %= tag 'button', hx(post => '/trigger'), 'Click Me'
+
+  <!-- Use "hx_attr" helper -->
+  <button <%= hx_attr(post => '/trigger') %>>Click Me</button>
 
   <script>
   document.body.addEventListener("showMessage", function(e){
@@ -237,31 +302,65 @@ Mojolicious::Plugin::HTMX - Mojolicious Plugin for htmx
   });
   </script>
 
+
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::HTMX> is a L<Mojolicious> plugin to add htmx in your Mojolicious application.
+
 
 =head1 HELPERS
 
 L<Mojolicious::Plugin::HTMX> implements the following helpers.
 
+
 =head2 GENERIC HELPERS
 
 =head3 htmx->asset
 
+  # Load htmx from "https://unpkg.com/htmx.org"
   %= htmx->asset
+
+  # Load htmx from a provided URL
   %= htmx->asset(src => '/assets/js/htmx.min.js')
-  %= htmx->asset(ext => debug)
+
+  # Load an extension from "/dist/ext" directory
+  %= htmx->asset(ext => 'debug')
 
 Generate C<script> tag for include htmx script file in your template.
 
-=head3 htmx->is_htmx_request
+=head3 htmx->stop_polling
+
+Sets the HTTP status code to C<286> which is used by HTMX to halt polling requests.
+
+    $c->htmx->stop_polling;
+
+=head3 is_htmx_request
 
   if ($c->is_htmx_request) {
     # ...
   }
 
 Based on C<HX-Request> header.
+
+=head3 hx
+
+    %= tag 'button', hx(get => '/confirm', confirm => 'Confirm The Action'), 'Click For Confirm'
+    %= button_to Save => 'some_route', hx(patch => url_for('some_route'), swap => 'outerHTML', target => 'body')
+
+C<hx> helper convert the provided HASH attributes in "hx-" format. C<hx> helper is useful when use L<Mojolicious::Plugin::TagHelpers> helpers.
+
+=head3 hx_attr
+
+Alias for L<hx>.
+
+C<hx_attr> helper convert the HASH atteibutes in "hx-" format and generate a well-format string.
+
+    <button <%= hx_attr(get => '/confirm', confirm => 'Confirm The Action') %>>Click For Confirm</button>
+
+is equivalent to:
+
+    <button hx-get="/confirm" hx-confirm="Confirm The Action">Click For Confirm</button>
+
 
 =head2 REQUEST HELPERS
 
@@ -293,10 +392,6 @@ Based on C<HX-Prompt> header.
 
 Always C<true>.
 
-  if ($c->is_htmx_request) {
-    # ...
-  }
-
 Based on C<HX-Request> header.
 
 =head3 htmx->req->target
@@ -316,6 +411,10 @@ Based on C<HX-Trigger-Name> header.
 The C<id> of the triggered element if it exists.
 
 Based on C<HX-Trigger> header.
+
+=head3 htmx->req->to_hash
+
+Turn htmx request into a hash reference.
 
 
 =head2 RESPONSE HELPERS
@@ -492,10 +591,9 @@ L<https://github.com/giterlizzi/perl-Mojolicious-Plugin-HTMX>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2022-2023, Giuseppe Di Terlizzi
+Copyright (c) 2022-2024, Giuseppe Di Terlizzi
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
 
 =cut
-

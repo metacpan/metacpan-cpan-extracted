@@ -11,7 +11,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Test::More;
 use Test::More::UTF8;
@@ -75,7 +75,7 @@ my $latterparams = {
 		'simple05-in-memory' => {
 		   'latex' => {
 			# untemplate the in-memory template into this latex source file:
-			'basedir' => '/tmp/fuck',
+			'basedir' => '/tmp/adir',
 			# this must end in .tex
 			'filename' => 'aaa.tex',
 		   },

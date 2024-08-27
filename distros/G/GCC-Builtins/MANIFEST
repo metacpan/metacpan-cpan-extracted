@@ -53,6 +53,6 @@ t/pod-coverage.t
 t/pod.t
 typemap
 xt/benchmarks/01-clz.b
-xt/benchmarks/01-clzl.b
+xt/benchmarks/02-clzl.b
 xt/boilerplate.t
 META.json                                Module JSON meta-data (added by MakeMaker)

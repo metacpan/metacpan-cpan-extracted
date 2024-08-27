@@ -53,6 +53,7 @@ requires:
   IO::Null: '1.01'
   List::Util: '0'
   PerlX::Assert: '0.905'
+  Platform::Windows: '0.002'
   Symbol: '0'
   Type::Nano: '0.014'
   Win32: '0.54'
@@ -69,6 +70,6 @@ requires:
 resources:
   bugtracker: https://github.com/brickpool/Win32-Console-DotNet/issues
   repository: https://github.com/brickpool/Win32-Console-DotNet.git
-version: '0.005000'
+version: '0.005001'
 x_homepage: http://brickpool.de
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

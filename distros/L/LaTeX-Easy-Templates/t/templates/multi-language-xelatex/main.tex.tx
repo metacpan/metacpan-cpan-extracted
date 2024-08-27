@@ -3,7 +3,7 @@
 : # data will contain authors etc.
 : # private will contain filepath of template file etc.
 : ######################################################
-\documentclass[letterpaper,twoside,12pt]{article}
+\documentclass[a4]{article}
 \usepackage[greek]{babel}
 \usepackage[Greek,Latin]{ucharclasses}
 %\usepackage[export]{adjustbox}

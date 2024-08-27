@@ -1,6 +1,12 @@
 Revision history for Win32::Console::DotNet
 
-0.5   2024-08-20
+0.5.1   2024-08-26
+        - Bugfix error handling in 'CursorSize' and 'CursorVisible'
+        - Bigfix '03ConsoleDotNet.t' aborts with an exception
+        - Update 'MakeFile.PL' and add a dependency on 'Platform::Windows'
+        - Update Tests
+
+0.5     2024-08-20
         - Add 'Encode::Encoding' support (instead of using a code pages)
         - Add Windows code page aliases to the built-in encodings
         - Add 'Type::Tiny' support (if installed)

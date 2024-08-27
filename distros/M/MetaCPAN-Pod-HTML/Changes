@@ -1,0 +1,58 @@
+Revision history for MetaCPAN-Pod-HTML
+
+0.004000 - 2024-08-26
+  - new module MetaCPAN::Pod::HTML works the same as MetaCPAN::Pod::XHTML, but
+    outputs HTML5
+  - rename dist to MetaCPAN-Pod-HTML
+  - added Pod::Simple::Role::XHTML::HTML5 for HTML5 output
+  - import Pod::Simple::Role::XHTML::WithHighlightConfig into dist
+
+0.003002 - 2022-07-13
+  - fix links to sections with characters that must be encoded
+
+0.003001 - 2022-07-12
+  - fix StripVerbatimIndent when applied to classes using BUILD, such as
+    MetaCPAN::Pod::XHTML
+
+0.003000 - 2022-07-12
+  - add Pod::Simple::Role::XHTML::WithHighlightConfig role, to allow pod to
+    provide hints for syntax highlighting of verbatim sections
+  - fix stripping indentation from verbatim blocks to not always convert tabs
+    to spaces
+  - enable the anchor_items option by default
+  - split roles to provide more precise link targets and to add additional
+    compatibility targets
+  - prepare for compatibility with future Pod::Simple releases that will fix
+    the encoding of ids and link targets
+  - add additional link targets after processing the entire file, rather than
+    part way through. this will prevent the extra targets from taking priority
+    over later headings.
+  - various internal refactorings
+
+0.002001 - 2018-06-25
+  - increased Pod::Simple prereq version to compatible version.
+  - removed extraneous pod section
+  - test cleanups
+
+0.002000 - 2018-06-19
+  - split behavior into roles
+    - Pod::Simple::Role::XHTML::WithLinkMappings adds the link_mappings
+      attribute to adjust module link destinations.
+    - Pod::Simple::Role::XHTML::WithAccurateTargets adds additional link
+      targets for headings and items based on the full unfiltered name,
+      and the first word.
+    - Pod::Simple::Role::XHTML::WithErrata adds an errata section to the
+      HTML as is used by MetaCPAN.
+    - Pod::Simple::Role::StripVerbatimIndent strips indentation from
+      verbatim blocks, while not breaking tab indents.  This is a new
+      feature.
+
+  - added tests
+  - added documentation
+
+0.001002 - 2017-12-06
+  - list HTML::Entities as a prerequisite
+  - use more accurate Pod::Simple::XHTML prereq
+
+0.001001 - 2017-12-02
+  - Initial release extracted from MetaCPAN Server

@@ -1,4 +1,4 @@
-\documentclass[letterpaper,twoside,12pt]{article}
+\documentclass[a4]{article}
 \usepackage[greek]{babel}
 \usepackage[Greek,Latin]{ucharclasses}
 %\usepackage[export]{adjustbox}

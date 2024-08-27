@@ -1,7 +1,7 @@
 package Mail::DKIM::Verifier;
 use strict;
 use warnings;
-our $VERSION = '1.20240619'; # VERSION
+our $VERSION = '1.20240827'; # VERSION
 # ABSTRACT: verifies a DKIM-signed message
 
 # Copyright 2005-2009 Messiah College. All rights reserved.
@@ -98,6 +98,11 @@ sub add_signature {
     my $self = shift;
     croak 'wrong number of arguments' unless ( @_ == 1 );
     my ($signature) = @_;
+
+    # Set verification time if we have one
+    if ($self->{verify_time}) {
+        $signature->set_verify_time($self->{verify_time});
+    }
 
     # ignore signature headers once we've seen 50 or so
     # this protects against abuse.
@@ -500,7 +505,7 @@ Mail::DKIM::Verifier - verifies a DKIM-signed message
 
 =head1 VERSION
 
-version 1.20240619
+version 1.20240827
 
 =head1 SYNOPSIS
 

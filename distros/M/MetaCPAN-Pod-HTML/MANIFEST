@@ -1,0 +1,27 @@
+Changes
+lib/MetaCPAN/Pod/HTML.pm
+lib/MetaCPAN/Pod/XHTML.pm
+lib/Pod/Simple/Role/StripVerbatimIndent.pm
+lib/Pod/Simple/Role/WithHighlightConfig.pm
+lib/Pod/Simple/Role/XHTML/HTML5.pm
+lib/Pod/Simple/Role/XHTML/RepairLinkEncoding.pm
+lib/Pod/Simple/Role/XHTML/WithAccurateTargets.pm
+lib/Pod/Simple/Role/XHTML/WithErrata.pm
+lib/Pod/Simple/Role/XHTML/WithExtraTargets.pm
+lib/Pod/Simple/Role/XHTML/WithHighlightConfig.pm
+lib/Pod/Simple/Role/XHTML/WithLinkMappings.pm
+lib/Pod/Simple/Role/XHTML/WithPostProcess.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/accurate-targets.t
+t/errata.t
+t/extra-targets.t
+t/highlight-config.t
+t/html5.t
+t/link-mappings.t
+t/strip-indent.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

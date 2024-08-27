@@ -7,6 +7,7 @@ use warnings;
 use Test::More tests => 9;
 use Test::Exception;
 
+use English qw( -no_match_vars );
 use IPC::Open3;
 use Perl::OSType qw( is_os_type );
 use Symbol qw( gensym );
@@ -39,7 +40,7 @@ subtest 'RedirectedConsole_ReadKey' => sub {
 
   throws_ok {
     my $pid = open3(my $in, my $out, my $err = gensym,
-      perl
+      $EXECUTABLE_NAME
         => q{-MWin32::Console::DotNet}
         => q{-e "System::Console->ReadKey()"}
     ) or die $!;

@@ -1,4 +1,10 @@
-Revision history for Perl extension Mojolicious::Plugin::HTMX.
+Revision history Mojolicious::Plugin::HTMX
+
+1.03 2024-08-27
+    - Added HTMX_V1_CDN_URL constant
+    - Added "hx" and "hx_attr" helpers
+    - Added "htmx->stop_polling" helper
+    - Updated documentation and sample app
 
 1.02 2023-12-07
     - Added support for list of events (ARRAY) in HX-Trigger header (htmx 1.9.4)

@@ -160,6 +160,7 @@ t/signature.t
 t/signer.t
 t/signer_dk.t
 t/signer_expiration.t
+t/signer_expiration_set_time.t
 t/signer_policy.t
 t/simple_canonicalization.t
 t/test.ed.key

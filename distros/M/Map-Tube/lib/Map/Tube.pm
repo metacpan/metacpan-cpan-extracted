@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.72';
+$Map::Tube::VERSION   = '3.74';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.72
+Version 3.74
 
 =cut
 
@@ -62,38 +62,38 @@ documented in L<Map::Tube::Cookbook>.
 
 =head1 MAP LEADER BOARD
 
-    +---------------------+----------+------------------------------------------+
-    | Author              | PAUSE ID | Map Count (City)                         |
-    +---------------------+----------+------------------------------------------+
-    | Michal Josef Spacek | SKIM     | 22 (Bucharest, Budapest, Dnipropetrovsk, |
-    |                     |          | Kazan, Kharkiv, Kiev, KualaLumpur,       |
-    |                     |          | Malaga, Minsk, Moscow, Nanjing,          |
-    |                     |          | NizhnyNovgorod, Novosibirsk, Prague,     |
-    |                     |          | SaintPetersburg, Samara, Singapore,      |
-    |                     |          | Sofia, Tbilisi, Vienna, Warsaw,          |
-    |                     |          | Yekaterinburg                            |
-    |                     |          |                                          |
-    | Mohammad S Anwar    | MANWAR   | 7 (Barcelona, Delhi, Kolkatta, London,   |
-    |                     |          | Madrid, NYC, Tokyo)                      |
-    |                     |          |                                          |
-    | Gisbert W Selke     | GWS      | 4 (Beijing, Glasgow, KoelnBonn, Lyon)    |
-    |                     |          |                                          |
-    | Renee Baecker       | RENEEB   | 1 (Frankfurt)                            |
-    |                     |          |                                          |
-    | Stefan Limbacher    | STELIM   | 1 (Nuremberg)                            |
-    |                     |          |                                          |
-    | Slaven Rezic        | SREZIC   | 1 (Berlin)                               |
-    |                     |          |                                          |
-    | Errietta Kostala    | ERRIETTA | 1 (Athens)                               |
-    |                     |          |                                          |
-    | Marco Fontani       | MFONTANI | 1 (Milan)                                |
-    |                     |          |                                          |
-    | Soren Lund          | SLU      | 1 (Copenhagen)                           |
-    |                     |          |                                          |
-    | FUNG Cheok Yin      | CYFUNG   | 1 (Hong Kong)                            |
-    |                     |          |                                          |
-    | Vitali Peil         | VPEIL    | 1 (Bielefeld)                            |
-    +---------------------+----------+------------------------------------------+
+    +----------------------+----------+------------------------------------------+
+    | Author               | PAUSE ID | Map Count (City)                         |
+    +----------------------+----------+------------------------------------------+
+    | Michal Josef Spacek  | SKIM     | 22 (Bucharest, Budapest, Dnipropetrovsk, |
+    |                      |          | Kazan, Kharkiv, Kiev, KualaLumpur,       |
+    |                      |          | Malaga, Minsk, Moscow, Nanjing,          |
+    |                      |          | NizhnyNovgorod, Novosibirsk, Prague,     |
+    |                      |          | SaintPetersburg, Samara, Singapore,      |
+    |                      |          | Sofia, Tbilisi, Vienna, Warsaw,          |
+    |                      |          | Yekaterinburg                            |
+    |                      |          |                                          |
+    | Mohammad Sajid Anwar | MANWAR   | 7 (Barcelona, Delhi, Kolkatta, London,   |
+    |                      |          | Madrid, NYC, Tokyo)                      |
+    |                      |          |                                          |
+    | Gisbert W Selke      | GWS      | 4 (Beijing, Glasgow, KoelnBonn, Lyon)    |
+    |                      |          |                                          |
+    | Renee Baecker        | RENEEB   | 1 (Frankfurt)                            |
+    |                      |          |                                          |
+    | Stefan Limbacher     | STELIM   | 1 (Nuremberg)                            |
+    |                      |          |                                          |
+    | Slaven Rezic         | SREZIC   | 1 (Berlin)                               |
+    |                      |          |                                          |
+    | Errietta Kostala     | ERRIETTA | 1 (Athens)                               |
+    |                      |          |                                          |
+    | Marco Fontani        | MFONTANI | 1 (Milan)                                |
+    |                      |          |                                          |
+    | Soren Lund           | SLU      | 1 (Copenhagen)                           |
+    |                      |          |                                          |
+    | FUNG Cheok Yin       | CYFUNG   | 1 (Hong Kong)                            |
+    |                      |          |                                          |
+    | Vitali Peil          | VPEIL    | 1 (Bielefeld)                            |
+    +----------------------+----------+------------------------------------------+
 
 =cut
 
@@ -1406,6 +1406,8 @@ L<https://github.com/manwar/Map-Tube>
 =item * Gisbert W. Selke, C<< <gws at cpan.org> >>
 
 =item * Toby Inkster, C<< <tobyink at cpan.org> >>
+
+=item * Ed J, C<< <etj at cpan.org> >>
 
 =back
 

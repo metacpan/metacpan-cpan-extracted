@@ -489,7 +489,7 @@ VXS(version_tuple)
     SP -= items;
     {
 	SV * lobj;
-	int i;
+	size_t i;
 	VTYPECHECK(lobj, ST(0), "lobj");
 
 	SV** avptr = hv_fetchs(MUTABLE_HV(lobj), "version", 0);
@@ -525,7 +525,7 @@ VXS(version_from_tuple)
 
     for (i = 1; i < items; ++i) {
 	if (SvIV(ST(i)) < 0)
-	    Perl_croak(aTHX_ "Value %d in version is negative", SvIV(ST(i)));
+	    Perl_croak(aTHX_ "Value %" IVdf " in version is negative", SvIV(ST(i)));
 	UV value = SvUV(ST(i));
 	av_push(versions, newSVuv(value));
 	if (i != 1)
