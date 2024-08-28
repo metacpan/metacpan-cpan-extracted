@@ -2,13 +2,14 @@ package Net::RDAP::JCard::Address;
 use List::Util qw(any);
 use base qw(Net::RDAP::JCard::Property);
 use strict;
+use warnings;
 
 =pod
 
 =head1 NAME
 
-Net::RDAP::JCard::Address - a subclass of L<Net::RDAP::JCard::Property>
-representing a postal address.
+Net::RDAP::JCard::Address - a module representing a postal address in a
+L<Net::RDAP::JCard> object.
 
 =head1 SYNOPSIS
 

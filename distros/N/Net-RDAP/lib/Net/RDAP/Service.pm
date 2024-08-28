@@ -2,6 +2,7 @@ package Net::RDAP::Service;
 use Storable qw(dclone);
 use Net::RDAP;
 use strict;
+use warnings;
 
 sub new {
     my ($package, $base, $client) = @_;
@@ -12,11 +13,16 @@ sub new {
 }
 
 sub fetch {
-    my ($self, $type, $handle, %params) = @_;
+    my ($self, $type, $segments, %params) = @_;
 
     my $uri = dclone($self->base);
 
-    $uri->path_segments(grep { defined } $uri->path_segments, $type, $handle);
+    $uri->path_segments(grep { defined } (
+        $uri->path_segments,
+        $type,
+        'ARRAY' eq ref($segments) ? @{$segments} : $segments
+    ));
+
     $uri->query_form(%params);
 
     my %opt;
@@ -45,7 +51,7 @@ __END__
 
 =head1 NAME
 
-L<Net::RDAP::Service> - an interface to an RDAP server.
+L<Net::RDAP::Service> - a module which provides an interface to an RDAP server.
 
 =head1 SYNOPSIS
 

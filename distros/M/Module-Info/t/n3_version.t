@@ -1,8 +1,9 @@
 #!/usr/bin/perl -w
 
 use strict;
-use lib 't/lib';
+use lib './t/lib';
 use Test::More tests => 15;
+use lib '.';
 use Module::Info;
 
 my $has_version_pm = eval 'use version; 1';

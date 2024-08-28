@@ -3,20 +3,23 @@ use strict;
 use warnings;
 
 package    # hide from PAUSE
-  DBIx::Squirrel::it;
+  DBIx::Squirrel::Iterator;
 
-BEGIN {
-    require DBIx::Squirrel unless %DBIx::Squirrel::;
-    $DBIx::Squirrel::it::VERSION             = $DBIx::Squirrel::VERSION;
-    $DBIx::Squirrel::it::DEFAULT_SLICE       = [];                         # Faster!
-    $DBIx::Squirrel::it::DEFAULT_BUFFER_SIZE = 2;                          # Initial buffer size and autoscaling increment
-    $DBIx::Squirrel::it::BUFFER_SIZE_LIMIT   = 64;                         # Absolute maximum buffersize
-}
-
-use namespace::autoclean;
 use Scalar::Util qw/weaken looks_like_number/;
 use Sub::Name;
-use DBIx::Squirrel::util qw/args_partition throw transform whine/;
+use DBIx::Squirrel::Utils qw/args_partition throw whine/;
+use namespace::clean;
+
+BEGIN {
+    require DBIx::Squirrel unless keys(%DBIx::Squirrel::);
+    require Exporter;
+    $DBIx::Squirrel::Iterator::VERSION             = $DBIx::Squirrel::VERSION;
+    @DBIx::Squirrel::Iterator::ISA                 = qw/Exporter/;
+    @DBIx::Squirrel::Iterator::EXPORT_OK           = qw/result result_transform/;
+    $DBIx::Squirrel::Iterator::DEFAULT_SLICE       = [];                            # Faster!
+    $DBIx::Squirrel::Iterator::DEFAULT_BUFFER_SIZE = 2;                             # Initial buffer size and autoscaling increment
+    $DBIx::Squirrel::Iterator::BUFFER_SIZE_LIMIT   = 64;                            # Absolute maximum buffersize
+}
 
 use constant E_BAD_STH         => 'Expected a statement handle object';
 use constant E_BAD_SLICE       => 'Slice must be a reference to an ARRAY or HASH';
@@ -24,14 +27,14 @@ use constant E_BAD_BUFFER_SIZE => 'Maximum row count must be an integer greater 
 use constant W_MORE_ROWS       => 'Query would yield more than one result';
 use constant E_EXP_ARRAY_REF   => 'Expected an ARRAY-REF';
 
-sub DEFAULT_SLICE () {$DBIx::Squirrel::it::DEFAULT_SLICE}
+sub DEFAULT_SLICE () {$DBIx::Squirrel::Iterator::DEFAULT_SLICE}
 
-sub DEFAULT_BUFFER_SIZE () {$DBIx::Squirrel::it::DEFAULT_BUFFER_SIZE}
+sub DEFAULT_BUFFER_SIZE () {$DBIx::Squirrel::Iterator::DEFAULT_BUFFER_SIZE}
 
-sub BUFFER_SIZE_LIMIT () {$DBIx::Squirrel::it::BUFFER_SIZE_LIMIT}
+sub BUFFER_SIZE_LIMIT () {$DBIx::Squirrel::Iterator::BUFFER_SIZE_LIMIT}
 
 sub DESTROY {
-    return if DBIx::Squirrel::util::global_destruct_phase();
+    return if DBIx::Squirrel::Utils::global_destruct_phase();
     local($., $@, $!, $^E, $?, $_);
     my $self = shift;
     $self->_private_state_clear;
@@ -100,6 +103,62 @@ sub _buffer_size_init {
     return $self;
 }
 
+{
+    my %attr_by_id;
+
+    sub _private_state {
+        my $self = shift;
+        my $id   = 0+ $self;
+        my $attr = do {
+            $attr_by_id{$id} = {} unless defined($attr_by_id{$id});
+            $attr_by_id{$id};
+        };
+        unless (@_) {
+            return $attr, $self if wantarray;
+            return $attr;
+        }
+        unless (defined($_[0])) {
+            delete $attr_by_id{$id};
+            shift;
+        }
+        if (@_) {
+            $attr_by_id{$id} = {} unless defined($attr_by_id{$id});
+            if (UNIVERSAL::isa($_[0], 'HASH')) {
+                $attr_by_id{$id} = {%{$attr}, %{$_[0]}};
+            }
+            elsif (UNIVERSAL::isa($_[0], 'ARRAY')) {
+                $attr_by_id{$id} = {%{$attr}, @{$_[0]}};
+            }
+            else {
+                $attr_by_id{$id} = {%{$attr}, @_};
+            }
+        }
+        return $self;
+    }
+}
+
+sub _private_state_clear {
+    local($_);
+    my($attr, $self) = shift->_private_state;
+    delete $attr->{$_} foreach grep {exists($attr->{$_})} qw/
+      buffer
+      execute_returned
+      results_pending
+      results_count
+      results_first
+      results_last
+      /;
+    return $self;
+}
+
+sub _private_state_init {
+    shift->_buffer_init->_buffer_size_init->_results_count_init;
+}
+
+sub _private_state_reset {
+    shift->_private_state_clear->_private_state_init;
+}
+
 sub _result_fetch {
     my($attr, $self) = shift->_private_state;
     my $sth = $attr->{sth};
@@ -111,7 +170,7 @@ sub _result_fetch {
             return unless $self->_buffer_charge;
         }
         $result = shift(@{$attr->{buffer}});
-        ($results, $transformed) = $self->_result_transform($result);
+        ($results, $transformed) = $self->_result_process($result);
     } while $transformed && !@{$results};
     $result = shift(@{$results});
     $self->_results_push_pending($results) if @{$results};
@@ -130,15 +189,16 @@ sub _result_fetch_pending {
 }
 
 # Seemingly pointless, here, but intended to be overridden in subclasses.
-sub _result_prep_to_transform {$_[1]}
+sub _result_preprocess {$_[1]}
 
-sub _result_transform {
+sub _result_process {
+    local($_);
     my($attr, $self) = shift->_private_state;
-    my $result    = $self->_result_prep_to_transform(shift);
+    my $result    = $self->_result_preprocess(shift);
     my $transform = !!@{$attr->{transforms}};
     my @results   = do {
         if ($transform) {
-            map {transform($attr->{transforms}, $self->_result_prep_to_transform($_))} $result;
+            map {result_transform($attr->{transforms}, $self->_result_preprocess($_))} $result;
         }
         else {
             $result;
@@ -171,65 +231,42 @@ sub _results_push_pending {
     return $self;
 }
 
-{
-    my %attr_by_id;
+# Runtime scoping of $_result allows caller to import and use "result" instead
+# of "$_" during result transformation.
 
-    sub _private_state {
-        my $self = shift;
-        return unless ref($self);
-        my $id   = 0+ $self;
-        my $attr = do {
-            $attr_by_id{$id} = {} unless defined($attr_by_id{$id});
-            $attr_by_id{$id};
-        };
-        unless (@_) {
-            return $attr, $self if wantarray;
-            return $attr;
+our $_result;
+
+sub result {$_result}
+
+sub result_transform {
+    my @transforms = do {
+        if (UNIVERSAL::isa($_[0], 'ARRAY')) {
+            @{+shift};
         }
-        unless (defined($_[0])) {
-            delete $attr_by_id{$id};
+        elsif (UNIVERSAL::isa($_[0], 'CODE')) {
             shift;
         }
-        if (@_) {
-            $attr_by_id{$id} = {} unless defined($attr_by_id{$id});
-            if (UNIVERSAL::isa($_[0], 'HASH')) {
-                $attr_by_id{$id} = {%{$attr}, %{$_[0]}};
-            }
-            elsif (UNIVERSAL::isa($_[0], 'ARRAY')) {
-                $attr_by_id{$id} = {%{$attr}, @{$_[0]}};
-            }
-            else {
-                $attr_by_id{$id} = {%{$attr}, @_};
-            }
+        else {
+            ();
         }
-        return $self;
+    };
+    if (@transforms && @_) {
+        for my $transform (@transforms) {
+            last unless @_ = do {
+                local($_result) = @_;
+                local($_)       = $_result;
+                $transform->(@_);
+            };
+        }
     }
-}
-
-sub _private_state_clear {
-    my($attr, $self) = shift->_private_state;
-    delete $attr->{$_} foreach grep {exists($attr->{$_})} qw/
-      buffer
-      execute_returned
-      results_pending
-      results_count
-      results_first
-      results_last
-      /;
-    return $self;
-}
-
-sub _private_state_init {
-    shift->_buffer_init->_buffer_size_init->_results_count_init;
-}
-
-sub _private_state_reset {
-    shift->_private_state_clear->_private_state_init;
+    return @_ if wantarray;
+    $_ = $_[0];
+    return scalar(@_) if @_;
 }
 
 sub all {
     my $self = shift;
-    return unless defined($self->start(@_));
+    return unless defined($self->start);
     return $self->remaining;
 }
 

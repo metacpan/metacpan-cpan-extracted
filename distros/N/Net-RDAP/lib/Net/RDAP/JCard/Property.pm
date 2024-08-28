@@ -1,12 +1,13 @@
 package Net::RDAP::JCard::Property;
 use List::Util qw(pairmap);
 use strict;
+use warnings;
 
 =pod
 
 =head1 NAME
 
-L<Net::RDAP::JCard::Property> - an object representing a property of a
+L<Net::RDAP::JCard::Property> - a module representing a property of a
 L<Net::RDAP::JCard> object.
 
 =head1 SYNOPSIS
@@ -62,7 +63,7 @@ sub new {
         value_type  => $arrayref->[2],
         value       => $arrayref->[3],
     };
-    
+
     return bless($self, $package);
 }
 

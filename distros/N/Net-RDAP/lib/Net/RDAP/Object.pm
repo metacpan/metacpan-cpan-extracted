@@ -1,6 +1,7 @@
 package Net::RDAP::Object;
 use base qw(Net::RDAP::Base);
 use strict;
+use warnings;
 
 =pod
 

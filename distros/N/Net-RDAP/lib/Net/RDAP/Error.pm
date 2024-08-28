@@ -1,10 +1,11 @@
 package Net::RDAP::Error;
 use base qw(Net::RDAP::Object);
 use strict;
+use warnings;
 
 =head1 NAME
 
-L<Net::RDAP::Error> - an RDAP object representing an error.
+L<Net::RDAP::Error> - a module representing an RDAP error.
 
 =head1 DESCRIPTION
 

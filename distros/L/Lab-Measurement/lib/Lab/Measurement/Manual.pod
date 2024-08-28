@@ -14,20 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.903
-
-=head1 OVERVIEW
-
-Currently, the Lab::Measurement API consists of:
-
-=over
-
-=item *
-
-L</Lab::Moose>, the recommended, current API, based on B<Modern Perl>
-techniques
-
-=back
+version 3.904
 
 =head1 The Lab::Measurement package
 
@@ -471,11 +458,12 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 
 =back
 
-=head1 Legacy Lab::Measurement API
+=head1 Lab::Measurement::Legacy API
 
-This part is deprecated and will be removed with Lab::Measurement 3.9. 
-Please base new measurements on the Moose-based API and port your old scripts.
-For documentation, see the module files.
+Previous to Lab::Measurement 3.900, an older, non-Moose based API existed.
+This has now been removed; an archived version which does not see any further
+development anymore L<can be found on CPAN|https://metacpan.org/pod/Lab::Measurement::Legacy>.
+Please do not use it for new measurement scripts.
 
 =head1 CITING Lab::Measurement
 
@@ -498,6 +486,7 @@ This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
             2021       Andreas K. Huettel, Fabian Weinelt, Simon Reinhardt
             2022       Andreas K. Huettel, Mia Schambeck, Simon Reinhardt
             2023       Andreas K. Huettel, Mia Schambeck
+            2024       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -2,7 +2,6 @@
 use List::Util qw(any);
 use Test::More;
 use URI;
-use JSON;
 use strict;
 
 my $base = q{Net::RDAP};

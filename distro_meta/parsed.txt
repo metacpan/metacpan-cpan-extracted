@@ -93678,3 +93678,15 @@ H/HA/HAARG/Pod-Simple-XHTML-WithHighlightConfig-0.000003.tar.gz
 H/HM/HMBRAND/Spreadsheet-Read-0.91.tgz
 L/LN/LNATION/Term-ANSI-Sprintf-0.02.tar.gz
 L/LE/LEONT/version-0.9933.tar.gz
+I/IN/INGY/Alien-YAMLScript-0.1.73.tar.gz
+S/SP/SPWHITTON/App-papersway-1.002.tar.gz
+N/NE/NEILB/Module-Info-0.39.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000781.tar.gz
+C/CP/CPANIC/DBIx-Squirrel-1.4.0.tar.gz
+A/AK/AKHUETTEL/Lab-Measurement-3.904.tar.gz
+G/GD/GDT/Map-Tube-Rome-1.00.tar.gz
+G/GB/GBROWN/Net-RDAP-0.29.tar.gz
+E/EG/EGOR/Plack-Handler-Feersum-SS-0.04.tar.gz
+K/KA/KARJALA/RxPerl-v6.29.8.tar.gz
+B/BW/BWEST/SignalWire-ML-1.21.tar.gz
+I/IN/INGY/YAMLScript-0.1.73.tar.gz

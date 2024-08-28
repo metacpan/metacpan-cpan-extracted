@@ -2,13 +2,14 @@ package Net::RDAP::Object::Entity;
 use base qw(Net::RDAP::Object);
 use vCard;
 use strict;
+use warnings;
 
 =pod
 
 =head1 NAME
 
-L<Net::RDAP::Object::Entity> - a module representing an entity (person
-or organization).
+L<Net::RDAP::Object::Entity> - a module representing an entity (person or
+organization).
 
 =head1 DESCRIPTION
 

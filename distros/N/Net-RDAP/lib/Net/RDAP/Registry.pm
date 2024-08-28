@@ -5,6 +5,7 @@ use File::Slurp;
 use File::Spec;
 use File::stat;
 use JSON;
+use POSIX qw(getpwuid);
 use Net::RDAP::UA;
 use Net::RDAP::Registry::IANARegistry;
 use vars qw($UA $REGISTRY);
@@ -26,7 +27,8 @@ our $REGISTRY = {};
 
 =head1 NAME
 
-L<Net::RDAP::Registry> - an interface to the IANA RDAP registries.
+L<Net::RDAP::Registry> - a module which provides an interface to the IANA RDAP
+registries.
 
 =head1 SYNOPSIS
 
@@ -145,15 +147,15 @@ sub autnum {
     my %matches;
     SERVICE: foreach my $service ($registry->services) {
         VALUE: foreach my $value ($service->registries) {
-            if ($value == $autnum->toasplain) {
-                # exact match, create an entry for NNNN-NNNN where both sides are
-                # the same (simplifies sorting later)
+            if ($value =~ /^\d+$/ && $value == $autnum->toasplain) {
+                # exact match, create an entry for NNNN-NNNN where both sides
+                # are the same (simplifies sorting later)
                 $matches{sprintf('%d-%d', $value, $value)} = $package->get_best_url($service->urls);
                 last SERVICE;
 
             } elsif ($value =~ /^(\d+)-(\d+)$/) {
                 if ($1 <= $autnum->toasplain && $autnum->toasplain <= $2) {
-                    $matches{sprintf('%d-%d', $value, $value)} = $package->get_best_url($service->urls);
+                    $matches{$value} = $package->get_best_url($service->urls);
                     last VALUE;
                 }
             }
@@ -324,7 +326,13 @@ sub load_registry {
     if (!defined($REGISTRY->{$url})) {
         $package =~ s/:+/-/g;
 
-        my $file = sprintf('%s/%s-%s', File::Spec->tmpdir, $package, basename($url));
+        my $file = sprintf(
+            '%s/%s-%s-%s',
+            File::Spec->tmpdir,
+            $package,
+            basename($url),
+            getpwuid($<),
+        );
 
         #
         # $UA may have been injected by Net::RDAP->ua()

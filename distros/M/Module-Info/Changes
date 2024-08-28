@@ -1,5 +1,11 @@
 Revision history for perl module Module::Info
 
+0.39 2024-08-28 NEILB
+    - Fixed RT#129677 with patch from HAARG++.
+
+0.38 2024-08-28 NEILB
+    - Get rid of ' as package namespace separator
+
 0.37 2015-11-01 NEILB
     - Added a has_pod() method, which returns the path to the file
       containing the pod (it could be a .pod file), if there is one.

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::LinearStepSweep;
-$Lab::Moose::Instrument::LinearStepSweep::VERSION = '3.903';
+$Lab::Moose::Instrument::LinearStepSweep::VERSION = '3.904';
 #ABSTRACT: Role for linear step sweeps used by voltage/current sources.
 
 use v5.20;
@@ -80,7 +80,7 @@ sub linear_step_sweep {
     if ( $time < $last_timestamp ) {
 
         # should never happen
-        croak "time error";
+        # -> but it does seem to happen on Windows, so do not croak here.
     }
 
     # Do we have to wait to enforce the maximum rate or can we start right now?
@@ -128,7 +128,7 @@ Lab::Moose::Instrument::LinearStepSweep - Role for linear step sweeps used by vo
 
 =head1 VERSION
 
-version 3.903
+version 3.904
 
 =head1 METHODS
 
@@ -150,6 +150,7 @@ source_level, cached_source_level, source_level_timestamp >
 This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
+            2024       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

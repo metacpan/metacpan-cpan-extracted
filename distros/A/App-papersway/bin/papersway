@@ -32,13 +32,27 @@ use POSIX "floor", "mkfifo";
 use File::Basename "basename", "dirname";
 use File::Spec::Functions "catfile";
 use List::Util qw(first min max zip);
+use Data::Dumper;
 
 $| = 1;
+$Data::Dumper::Sortkeys = 1;
 
-my ($pipe, $i3status);
+my ($pipe, $i3status, $debug);
 
-GetOptions 'i3status!' => \$i3status
+GetOptions
+  'debug!'    => \$debug,
+  'i3status!' => \$i3status
   or die "failed to parse command line options";
+
+sub debugsay {
+    return unless $debug;
+    my @args = @_ > 1 ? (sprintf $_[0], @_[1..$#_]) : @_;
+    print STDERR "papersway: ", @args, "\n";
+}
+sub debugdump {
+    return unless $debug;
+    print STDERR Data::Dumper->Dump(@_) =~ s/^/papersway: /mgr;
+}
 
 if ($i3status) {
     $pipe = IO::Pipe->new;
@@ -204,6 +218,8 @@ for_each_node {
 	register_caffeinated($node);
     }
 };
+debugsay "initialised";
+debugdump [\%paper_ws], [qw(*paper_ws)];
 
 my $username = $ENV{LOGNAME} || $ENV{USER} || getpwuid $<;
 my $hostinfo = { name => "hostinfo",
@@ -277,8 +293,14 @@ for (;;) {
 	# container has gone.  Or a focus change might be due to a new
 	# container, in which case we might need to push one off.  Currently,
 	# if we can't handle it within the callback, then we always normalise.
+	debugsay "{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{";
+	debugsay "normalising for these changes: %s",
+	  join "; ", map $_->{change}, @pending_events;
+	debugdump [\%paper_ws], ["*paper_ws BEFORE"];
 	normalise_ws_cols();
 	signal_i3status();
+	debugdump [\%paper_ws], ["*paper_ws  AFTER"];
+	debugsay "}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}";
 	@pending_events = ();
     }
     process_msg(shift @pending_msgs) while @pending_msgs;
@@ -330,6 +352,11 @@ sub normalise_ws_cols {
 	}
     };
   DONE:
+    my %still_hidden = map +($_, 1), grep defined,
+      map $_->{name} =~ /\A\*(\d+)\*\z/, $wmipc->get_workspaces->recv->@*;
+    debugdump [\%still_hidden], ["*still_hidden"];
+    $ws->{off_left}  = [ grep $still_hidden{$_}, $ws->{off_left}->@*  ];
+    $ws->{off_right} = [ grep $still_hidden{$_}, $ws->{off_right}->@* ];
     my $cols = $ws->{cols};
     my $i = focused_col_idx($ws);
 
@@ -465,7 +492,7 @@ sub normalise_ws_cols {
     # Simple class to batch up commands before sending them.
     # Currently used only within process_msg subroutine.
     package App::papersway::cmds;
-$App::papersway::cmds::VERSION = '1.001';
+$App::papersway::cmds::VERSION = '1.002';
 sub new { bless { cmds => [], need_signal => 0 } => shift };
     sub cmd { my $self = shift; push $self->{cmds}->@*, @_ }
     sub need_signal { shift->{need_signal}++ }
@@ -806,8 +833,25 @@ sub hide_con {
     # Enable floating in order to preserve any rows the container might have.
     # Otherwise, Sway subsumes the rows to the hidden workspace and the
     # container with our known ID ceases to exist, s.t. we can't unhide it.
-    sprintf "[con_id=%s] floating enable, move container to workspace %s",
-      $_[0], "*$_[0]*"
+    #
+    # After enabling floating, resize the container to close to the size it
+    # will have when unhidden, assuming no ncols change.  This reduces
+    # observed flickering because the application has already rearranged its
+    # contents before the unfloat.
+    #
+    # There is still flickering with new containers are added to the row and
+    # when containers in the row are closed.  What would seem to be going on
+    # is that upon one of these events, other containers start resizing their
+    # contents before we get a chance to push/pull containers.  We then do
+    # that, and the other containers resize right back to where they were.
+    my $ws = $paper_ws{$focused_ws};
+    my $ppt = 100 / (!!$ws->{monocle} || $ws->{ncols});
+    debugsay "calculated hide_con resize width %dppt", $ppt;
+    sprintf +("[con_id=%s] ".join ", ",
+	      "floating enable",
+	      "resize set %dppt 100ppt",
+	      "move container to workspace %s"),
+		$_[0], $ppt, "*$_[0]*";
 }
 
 sub show_con {
@@ -838,7 +882,7 @@ papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -858,6 +902,10 @@ alternative.
 =item B<--i3status>
 
 Start a background instance of B<i3status>, filter and print its output.
+
+=item B<--debug>
+
+Enable some debug printing.
 
 =back
 

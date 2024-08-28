@@ -1,6 +1,7 @@
 package Net::RDAP::SearchResult;
 use base qw(Net::RDAP::Object);
 use strict;
+use warnings;
 
 sub domains     { $_[0]->objects('Net::RDAP::Object::Domain',        $_[0]->{'domainSearchResults'})        }
 sub nameservers { $_[0]->objects('Net::RDAP::Object::Nameserver',    $_[0]->{'nameserverSearchResults'})    }

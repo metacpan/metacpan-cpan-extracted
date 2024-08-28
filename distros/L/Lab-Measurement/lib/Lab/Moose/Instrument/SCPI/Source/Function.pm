@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Source::Function;
-$Lab::Moose::Instrument::SCPI::Source::Function::VERSION = '3.903';
+$Lab::Moose::Instrument::SCPI::Source::Function::VERSION = '3.904';
 #ABSTRACT: Role for the SCPI SOURce:FUNCtion subsystem
 
 use v5.20;
@@ -42,7 +42,7 @@ Lab::Moose::Instrument::SCPI::Source::Function - Role for the SCPI SOURce:FUNCti
 
 =head1 VERSION
 
-version 3.903
+version 3.904
 
 =head1 METHODS
 

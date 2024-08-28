@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package DBIx::Squirrel;
-$DBIx::Squirrel::VERSION = '1.3.6';
+$DBIx::Squirrel::VERSION = '1.4.0';
 =pod
 
 =encoding UTF-8
@@ -14,24 +14,26 @@ DBIx::Squirrel - A C<DBI> extension
 
 =head1 VERSION
 
-version 1.3.6
+version 1.4.0
 
 =cut
 
 use DBI;
 use Exporter;
+use List::Util   qw/uniq/;
 use Scalar::Util qw/reftype/;
 use Sub::Name;
-use DBIx::Squirrel::dr     ();
-use DBIx::Squirrel::db     ();
-use DBIx::Squirrel::st     ();
-use DBIx::Squirrel::it     ();
-use DBIx::Squirrel::rs     ();
-use DBIx::Squirrel::result ();
-use DBIx::Squirrel::util   qw/throw uniq/;
+use DBIx::Squirrel::dr          ();
+use DBIx::Squirrel::db          ();
+use DBIx::Squirrel::st          ();
+use DBIx::Squirrel::Iterator    ();
+use DBIx::Squirrel::ResultSet   ();
+use DBIx::Squirrel::ResultClass ();
+use DBIx::Squirrel::Utils       qw/throw/;
+use namespace::clean;
 
 BEGIN {
-    @DBIx::Squirrel::ISA                          = 'DBI';
+    @DBIx::Squirrel::ISA                          = qw/DBI/;
     *DBIx::Squirrel::EXPORT_OK                    = *DBI::EXPORT_OK;
     *DBIx::Squirrel::EXPORT_TAGS                  = *DBI::EXPORT_TAGS;
     *DBIx::Squirrel::err                          = *DBI::err;
@@ -42,14 +44,12 @@ BEGIN {
     *DBIx::Squirrel::connect                      = *DBIx::Squirrel::dr::connect;
     *DBIx::Squirrel::connect_cached               = *DBIx::Squirrel::dr::connect_cached;
     *DBIx::Squirrel::FINISH_ACTIVE_BEFORE_EXECUTE = *DBIx::Squirrel::st::FINISH_ACTIVE_BEFORE_EXECUTE;
-    *DBIx::Squirrel::DEFAULT_SLICE                = *DBIx::Squirrel::it::DEFAULT_SLICE;
-    *DBIx::Squirrel::DEFAULT_BUFFER_SIZE          = *DBIx::Squirrel::it::DEFAULT_BUFFER_SIZE;
-    *DBIx::Squirrel::BUFFER_SIZE_LIMIT            = *DBIx::Squirrel::it::BUFFER_SIZE_LIMIT;
-    *DBIx::Squirrel::NORMALISE_SQL                = *DBIx::Squirrel::util::NORMALISE_SQL;
-    *DBIx::Squirrel::NORMALIZE_SQL                = *DBIx::Squirrel::util::NORMALISE_SQL;
+    *DBIx::Squirrel::DEFAULT_SLICE                = *DBIx::Squirrel::Iterator::DEFAULT_SLICE;
+    *DBIx::Squirrel::DEFAULT_BUFFER_SIZE          = *DBIx::Squirrel::Iterator::DEFAULT_BUFFER_SIZE;
+    *DBIx::Squirrel::BUFFER_SIZE_LIMIT            = *DBIx::Squirrel::Iterator::BUFFER_SIZE_LIMIT;
 
     unless (defined $DBIx::Squirrel::VERSION) {
-        my $v = "1.3.6";
+        my $v = "1.4.0";
         *DBIx::Squirrel::VERSION = \$v;
     }
 }
@@ -98,7 +98,7 @@ sub import {
                     throw E_BAD_ENT_BIND
                       unless UNIVERSAL::isa($_[0], 'DBI::db')
                       or UNIVERSAL::isa($_[0], 'DBI::st')
-                      or UNIVERSAL::isa($_[0], 'DBIx::Squirrel::it');
+                      or UNIVERSAL::isa($_[0], 'DBIx::Squirrel::Iterator');
                     ${$symbol} = shift;
                     return ${$symbol};
                 }
@@ -127,7 +127,7 @@ sub import {
                 elsif (UNIVERSAL::isa(${$symbol}, 'DBI::st')) {
                     return ${$symbol}->execute(@params);
                 }
-                elsif (UNIVERSAL::isa(${$symbol}, 'DBIx::Squirrel::it')) {
+                elsif (UNIVERSAL::isa(${$symbol}, 'DBIx::Squirrel::Iterator')) {
                     return ${$symbol}->iterate(@params);
                 }
                 else {
@@ -817,7 +817,7 @@ Each stage of a transformation receives the latest version of the result via
 the argument-list (C<$_[0]> to be precise). For the sake of convenience (and
 for convention), this result is also available as C<$_>. If you prefer to
 rely on something like C<$_>, but would like something much less ephemeral,
-just C<use DBIx::Squirrel::util 'result'> and use the C<result> function
+just C<use DBIx::Squirrel::Utils 'result'> and use the C<result> function
 inside your transformation stage.
 
 Handing off to the next stage, or the caller, is with an explicit C<return>
@@ -1266,8 +1266,8 @@ at that value, preventing the kind of automatic adjustment described above.
 
 The following package globals define the relevant default settings:
 
-    $DBIx::Squirrel::it::DEFAULT_BUFFER_SIZE = 2;   # initial buffer-size
-    $DBIx::Squirrel::it::BUFFER_SIZE_LIMIT   = 64;  # maximum buffer-size
+    $DBIx::Squirrel::Iterator::DEFAULT_BUFFER_SIZE = 2;   # initial buffer-size
+    $DBIx::Squirrel::Iterator::BUFFER_SIZE_LIMIT   = 64;  # maximum buffer-size
 
 
 =head4 C<buffer_size_slice>
@@ -1311,9 +1311,9 @@ at that value, preventing the kind of automatic adjustment described above.
 
 The following package globals define the relevant default settings:
 
-    $DBIx::Squirrel::it::DEFAULT_SLICE       = [];  # slicing strategy
-    $DBIx::Squirrel::it::DEFAULT_BUFFER_SIZE = 2;   # initial buffer-size
-    $DBIx::Squirrel::it::BUFFER_SIZE_LIMIT   = 64;  # maximum buffer-size
+    $DBIx::Squirrel::Iterator::DEFAULT_SLICE       = [];  # slicing strategy
+    $DBIx::Squirrel::Iterator::DEFAULT_BUFFER_SIZE = 2;   # initial buffer-size
+    $DBIx::Squirrel::Iterator::BUFFER_SIZE_LIMIT   = 64;  # maximum buffer-size
 
 
 =head4 C<count>
@@ -1497,7 +1497,7 @@ used to change the slicing strategy, a reference to the iterator is returned.
 
 The following package global defines the default setting:
 
-    $DBIx::Squirrel::it::DEFAULT_SLICE       = [];  # slicing strategy
+    $DBIx::Squirrel::Iterator::DEFAULT_SLICE       = [];  # slicing strategy
 
 
 =head4 C<slice_buffer_size>
@@ -1541,9 +1541,9 @@ at that value, preventing the kind of automatic adjustment described above.
 
 The following package globals define the relevant default settings:
 
-    $DBIx::Squirrel::it::DEFAULT_SLICE       = [];  # slicing strategy
-    $DBIx::Squirrel::it::DEFAULT_BUFFER_SIZE = 2;   # initial buffer-size
-    $DBIx::Squirrel::it::BUFFER_SIZE_LIMIT   = 64;  # maximum buffer-size
+    $DBIx::Squirrel::Iterator::DEFAULT_SLICE       = [];  # slicing strategy
+    $DBIx::Squirrel::Iterator::DEFAULT_BUFFER_SIZE = 2;   # initial buffer-size
+    $DBIx::Squirrel::Iterator::BUFFER_SIZE_LIMIT   = 64;  # maximum buffer-size
 
 
 =head4 C<start>

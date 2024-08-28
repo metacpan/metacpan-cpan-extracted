@@ -1,3 +1,7 @@
+0.04
+
+     add keepalive and read_timeout opts
+
 0.03
 
      make Plack::Runner aware of host/port via server_ready cb

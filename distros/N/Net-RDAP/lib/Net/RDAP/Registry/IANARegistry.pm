@@ -2,12 +2,13 @@ package Net::RDAP::Registry::IANARegistry;
 use DateTime::Format::ISO8601;
 use Net::RDAP::Registry::IANARegistry::Service;
 use strict;
+use warnings;
 
 =pod
 
 =head1 NAME
 
-L<Net::RDAP::Registry::IANARegistry> - a class which represents an RDAP
+L<Net::RDAP::Registry::IANARegistry> - a module which represents an RDAP
 bootstrap registry.
 
 =head1 DESCRIPTION

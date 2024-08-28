@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "AnyEvent" => 0,
     "AnyEvent::I3" => 0,
+    "Data::Dumper" => 0,
     "File::Basename" => 0,
     "File::Spec::Functions" => 0,
     "Getopt::Long" => 0,
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.001",
+  "VERSION" => "1.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "AnyEvent" => 0,
   "AnyEvent::I3" => 0,
+  "Data::Dumper" => 0,
   "File::Basename" => 0,
   "File::Spec::Functions" => 0,
   "Getopt::Long" => 0,

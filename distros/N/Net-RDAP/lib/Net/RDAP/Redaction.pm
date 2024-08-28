@@ -1,5 +1,6 @@
 package Net::RDAP::Redaction;
 use strict;
+use warnings;
 
 =pod
 

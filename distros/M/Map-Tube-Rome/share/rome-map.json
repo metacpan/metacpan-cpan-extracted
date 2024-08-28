@@ -1,0 +1,464 @@
+{
+  "name": "Metropolitana di Roma",
+  "lines": {
+    "line": [
+      {
+        "id": "MA",
+        "name": "MA",
+        "color": "#ff6600"
+      },
+      {
+        "id": "MB",
+        "name": "MB",
+        "color": "#006cbf"
+      },
+      {
+        "id": "MC",
+        "name": "MC",
+        "color": "#008c4e"
+      }
+    ]
+  },
+  "stations": {
+    "station": [
+      {
+        "id": "ANAGNINA",
+        "name": "Anagnina",
+        "line": "MA",
+        "link": "CINECITTA"
+      },
+      {
+        "id": "CINECITTA",
+        "name": "Cinecittà",
+        "line": "MA",
+        "link": "ANAGNINA,SUBAUGUSTA"
+      },
+      {
+        "id": "SUBAUGUSTA",
+        "name": "Subaugusta",
+        "line": "MA",
+        "link": "CINECITTA,GIULIO_AGRICOLA"
+      },
+      {
+        "id": "GIULIO_AGRICOLA",
+        "name": "Giulio Agricola",
+        "line": "MA",
+        "link": "SUBAUGUSTA,LUCIO_SESTIO"
+      },
+      {
+        "id": "LUCIO_SESTIO",
+        "name": "Lucio Sestio",
+        "line": "MA",
+        "link": "GIULIO_AGRICOLA,NUMIDIO_QUADRATO"
+      },
+      {
+        "id": "NUMIDIO_QUADRATO",
+        "name": "Numidio Quadrato",
+        "line": "MA",
+        "link": "LUCIO_SESTIO,PORTA_FURBA"
+      },
+      {
+        "id": "PORTA_FURBA",
+        "name": "Porta Furba Quadraro",
+        "line": "MA",
+        "link": "NUMIDIO_QUADRATO,ARCO_TRAVERTINO"
+      },
+      {
+        "id": "ARCO_TRAVERTINO",
+        "name": "Arco di Travertino",
+        "line": "MA",
+        "link": "PORTA_FURBA,COLLI_ALBANI"
+      },
+      {
+        "id": "COLLI_ALBANI",
+        "name": "Colli Albani - Parco Appia Antica",
+        "line": "MA",
+        "link": "ARCO_TRAVERTINO,FURIO_CAMILLO"
+      },
+      {
+        "id": "FURIO_CAMILLO",
+        "name": "Furio Camillo",
+        "line": "MA",
+        "link": "COLLI_ALBANI,PONTE_LUNGO"
+      },
+      {
+        "id": "PONTE_LUNGO",
+        "name": "Ponte Lungo",
+        "line": "MA",
+        "link": "FURIO_CAMILLO,RE_DI_ROMA"
+      },
+      {
+        "id": "RE_DI_ROMA",
+        "name": "Re di Roma",
+        "line": "MA",
+        "link": "PONTE_LUNGO,SAN_GIOVANNI"
+      },
+      {
+        "id": "SAN_GIOVANNI",
+        "name": "San Giovanni",
+        "line": "MA,MC",
+        "link": "RE_DI_ROMA,MANZONI,LODI"
+      },
+      {
+        "id": "MANZONI",
+        "name": "Manzoni",
+        "line": "MA",
+        "link": "SAN_GIOVANNI,VITTORIO_EMANUELE"
+      },
+      {
+        "id": "VITTORIO_EMANUELE",
+        "name": "Vittorio Emanuele",
+        "line": "MA",
+        "link": "MANZONI,TERMINI"
+      },
+      {
+        "id": "TERMINI",
+        "name": "Termini",
+        "line": "MA,MB",
+        "link": "VITTORIO_EMANUELE,REPUBBLICA,CASTRO_PRETORIO,CAVOUR"
+      },
+      {
+        "id": "REPUBBLICA",
+        "name": "Repubblica - Teatro dell'Opera",
+        "line": "MA",
+        "link": "TERMINI,BARBERINI"
+      },
+      {
+        "id": "BARBERINI",
+        "name": "Barberini - Fontana di Trevi",
+        "line": "MA",
+        "link": "REPUBBLICA,SPAGNA"
+      },
+      {
+        "id": "SPAGNA",
+        "name": "Spagna",
+        "line": "MA",
+        "link": "BARBERINI,FLAMINIO"
+      },
+      {
+        "id": "FLAMINIO",
+        "name": "Flaminio - Piazza del Popolo",
+        "line": "MA",
+        "link": "SPAGNA,LEPANTO"
+      },
+      {
+        "id": "LEPANTO",
+        "name": "Lepanto",
+        "line": "MA",
+        "link": "FLAMINIO,OTTAVIANO"
+      },
+      {
+        "id": "OTTAVIANO",
+        "name": "Ottaviano San Pietro - Musei Vaticani",
+        "line": "MA",
+        "link": "LEPANTO,CIPRO"
+      },
+      {
+        "id": "CIPRO",
+        "name": "Cipro",
+        "line": "MA",
+        "link": "OTTAVIANO,VALLE_AURELIA"
+      },
+      {
+        "id": "VALLE_AURELIA",
+        "name": "Valle Aurelia",
+        "line": "MA",
+        "link": "CIPRO,BALDO_DEGLI_UBALDI"
+      },
+      {
+        "id": "BALDO_DEGLI_UBALDI",
+        "name": "Baldo degli Ubaldi",
+        "line": "MA",
+        "link": "VALLE_AURELIA,CORNELIA"
+      },
+      {
+        "id": "CORNELIA",
+        "name": "Cornelia",
+        "line": "MA",
+        "link": "BALDO_DEGLI_UBALDI,BATTISTINI"
+      },
+      {
+        "id": "BATTISTINI",
+        "name": "Battistini",
+        "line": "MA",
+        "link": "CORNELIA"
+      },
+      {
+        "id": "REBIBBIA",
+        "name": "Rebibbia",
+        "line": "MB",
+        "link": "PONTE_MAMMOLO"
+      },
+      {
+        "id": "PONTE_MAMMOLO",
+        "name": "Ponte Mammolo",
+        "line": "MB",
+        "link": "SANTA_MARIA_SOCCORSO,REBIBBIA"
+      },
+      {
+        "id": "SANTA_MARIA_SOCCORSO",
+        "name": "Santa Maria del Soccorso",
+        "line": "MB",
+        "link": "PONTE_MAMMOLO,PIETRALATA"
+      },
+      {
+        "id": "PIETRALATA",
+        "name": "Pietralata",
+        "line": "MB",
+        "link": "SANTA_MARIA_SOCCORSO,MONTI_TIBURTINI"
+      },
+      {
+        "id": "MONTI_TIBURTINI",
+        "name": "Monti Tiburtini",
+        "line": "MB",
+        "link": "PIETRALATA,QUINTILIANI"
+      },
+      {
+        "id": "QUINTILIANI",
+        "name": "Quintiliani",
+        "line": "MB",
+        "link": "MONTI_TIBURTINI,TIBURTINA"
+      },
+      {
+        "id": "TIBURTINA",
+        "name": "Tiburtina",
+        "line": "MB",
+        "link": "QUINTILIANI,BOLOGNA"
+      },
+      {
+        "id": "BOLOGNA",
+        "name": "Bologna",
+        "line": "MB",
+        "link": "POLICLINICO,TIBURTINA,SAN_AGNESE_ANNIBALIANO"
+      },
+      {
+        "id": "POLICLINICO",
+        "name": "Policlinico",
+        "line": "MB",
+        "link": "CASTRO_PRETORIO,BOLOGNA"
+      },
+      {
+        "id": "CASTRO_PRETORIO",
+        "name": "Castro Pretorio",
+        "line": "MB",
+        "link": "TERMINI,POLICLINICO"
+      },
+      {
+        "id": "JONIO",
+        "name": "Jonio",
+        "line": "MB",
+        "link": "CONCADORO"
+      },
+      {
+        "id": "CONCADORO",
+        "name": "Conca d'Oro",
+        "line": "MB",
+        "link": "JONIO,LIBIA"
+      },
+      {
+        "id": "LIBIA",
+        "name": "Libia",
+        "line": "MB",
+        "link": "CONCADORO,SAN_AGNESE_ANNIBALIANO"
+      },
+      {
+        "id": "SAN_AGNESE_ANNIBALIANO",
+        "name": "Sant'Agnese/Annibaliano",
+        "line": "MB",
+        "link": "LIBIA,BOLOGNA"
+      },
+      {
+        "id": "CAVOUR",
+        "name": "Cavour",
+        "line": "MB",
+        "link": "TERMINI,COLOSSEO"
+      },
+      {
+        "id": "COLOSSEO",
+        "name": "Colosseo",
+        "line": "MB",
+        "link": "CAVOUR,CIRCO_MASSIMO"
+      },
+      {
+        "id": "CIRCO_MASSIMO",
+        "name": "Circo Massimo",
+        "line": "MB",
+        "link": "COLOSSEO,PIRAMIDE"
+      },
+      {
+        "id": "PIRAMIDE",
+        "name": "Piramide",
+        "line": "MB",
+        "link": "CIRCO_MASSIMO,GARBATELLA"
+      },
+      {
+        "id": "GARBATELLA",
+        "name": "Garbatella",
+        "line": "MB",
+        "link": "PIRAMIDE,BASILICA_SAN_PAOLO"
+      },
+      {
+        "id": "BASILICA_SAN_PAOLO",
+        "name": "Basilica San Paolo",
+        "line": "MB",
+        "link": "GARBATELLA,MARCONI"
+      },
+      {
+        "id": "MARCONI",
+        "name": "Marconi",
+        "line": "MB",
+        "link": "BASILICA_SAN_PAOLO,EUR_MAGLIANA"
+      },
+      {
+        "id": "EUR_MAGLIANA",
+        "name": "EUR Magliana",
+        "line": "MB",
+        "link": "MARCONI,EUR_PALASPORT"
+      },
+      {
+        "id": "EUR_PALASPORT",
+        "name": "EUR Palasport",
+        "line": "MB",
+        "link": "EUR_MAGLIANA,EUR_FERMI"
+      },
+      {
+        "id": "EUR_FERMI",
+        "name": "EUR Fermi",
+        "line": "MB",
+        "link": "EUR_PALASPORT,LAURENTINA"
+      },
+      {
+        "id": "LAURENTINA",
+        "name": "Laurentina",
+        "line": "MB",
+        "link": "EUR_FERMI"
+      },
+      {
+        "id": "MONTE_COMPATRI_PANTANO",
+        "name": "Monte Compatri-Pantano",
+        "line": "MC",
+        "link": "GRANITI"
+      },
+      {
+        "id": "GRANITI",
+        "name": "Graniti",
+        "line": "MC",
+        "link": "MONTE_COMPATRI_PANTANO,FINOCCHIO"
+      },
+      {
+        "id": "FINOCCHIO",
+        "name": "Finocchio",
+        "line": "MC",
+        "link": "GRANITI,BOLOGNETTA"
+      },
+      {
+        "id": "BOLOGNETTA",
+        "name": "Bolognetta",
+        "line": "MC",
+        "link": "FINOCCHIO,BORGHESIANA"
+      },
+      {
+        "id": "BORGHESIANA",
+        "name": "Borghesiana",
+        "line": "MC",
+        "link": "BOLOGNETTA,DUE_LEONI_FONTANA_CANDIDA"
+      },
+      {
+        "id": "DUE_LEONI_FONTANA_CANDIDA",
+        "name": "Due Leoni - Fontana Candida",
+        "line": "MC",
+        "link": "BORGHESIANA,GROTTE_CELONI"
+      },
+      {
+        "id": "GROTTE_CELONI",
+        "name": "Grotte Celoni",
+        "line": "MC",
+        "link": "DUE_LEONI_FONTANA_CANDIDA,TORRE_GAIA"
+      },
+      {
+        "id": "TORRE_GAIA",
+        "name": "Torre Gaia",
+        "line": "MC",
+        "link": "GROTTE_CELONI,TORRE_ANGELA"
+      },
+      {
+        "id": "TORRE_ANGELA",
+        "name": "Torre Angela",
+        "line": "MC",
+        "link": "TORRE_GAIA,TORRENOVA"
+      },
+      {
+        "id": "TORRENOVA",
+        "name": "Torrenova",
+        "line": "MC",
+        "link": "TORRE_ANGELA,GIARDINETTI"
+      },
+      {
+        "id": "GIARDINETTI",
+        "name": "Giardinetti",
+        "line": "MC",
+        "link": "TORRENOVA,TORRE_MAURA"
+      },
+      {
+        "id": "TORRE_MAURA",
+        "name": "Torre Maura",
+        "line": "MC",
+        "link": "GIARDINETTI,TORRE_SPACCATA"
+      },
+      {
+        "id": "TORRE_SPACCATA",
+        "name": "Torre Spaccata",
+        "line": "MC",
+        "link": "TORRE_MAURA,ALESSANDRINO"
+      },
+      {
+        "id": "ALESSANDRINO",
+        "name": "Alessandrino",
+        "line": "MC",
+        "link": "TORRE_SPACCATA,PARCO_CENTOCELLE"
+      },
+      {
+        "id": "PARCO_CENTOCELLE",
+        "name": "Parco di Centocelle",
+        "line": "MC",
+        "link": "ALESSANDRINO,MIRTI"
+      },
+      {
+        "id": "MIRTI",
+        "name": "Mirti",
+        "line": "MC",
+        "link": "PARCO_CENTOCELLE,GARDENIE"
+      },
+      {
+        "id": "GARDENIE",
+        "name": "Gardenie",
+        "line": "MC",
+        "link": "MIRTI,TEANO"
+      },
+      {
+        "id": "TEANO",
+        "name": "Teano",
+        "line": "MC",
+        "link": "GARDENIE,MALATESTA"
+      },
+      {
+        "id": "MALATESTA",
+        "name": "Malatesta",
+        "line": "MC",
+        "link": "TEANO,PIGNETO"
+      },
+      {
+        "id": "PIGNETO",
+        "name": "Pigneto",
+        "line": "MC",
+        "link": "MALATESTA,LODI"
+      },
+      {
+        "id": "LODI",
+        "name": "Lodi",
+        "line": "MC",
+        "link": "PIGNETO,SAN_GIOVANNI"
+      }
+    ]
+  }
+}

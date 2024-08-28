@@ -1,8 +1,9 @@
 #!/usr/bin/perl -w
 
 use strict;
-use lib 't/lib';
+use lib './t/lib';
 use Test::More tests => 4;
+use lib '.';
 use Module::Info;
 
 my $baz = Module::Info->new_from_module( 'Baz' );

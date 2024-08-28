@@ -30,6 +30,7 @@
          "requires" : {
             "AnyEvent" : "0",
             "AnyEvent::I3" : "0",
+            "Data::Dumper" : "0",
             "File::Basename" : "0",
             "File::Spec::Functions" : "0",
             "Getopt::Long" : "0",
@@ -52,7 +53,7 @@
          "web" : "https://git.spwhitton.name/papersway"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "GPL-3.0-only"

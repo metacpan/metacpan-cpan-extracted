@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl
 
+v6.29.8 2024-08-27T23:01:33Z
+
+    - fixed memory leak of rx_subject, which was affecting many operators
+
 v6.29.7 2024-08-24T05:43:43Z
 
     - fixed op_exhaust_map to behave like rxjs (not execute its callback until previous observable

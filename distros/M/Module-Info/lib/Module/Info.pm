@@ -12,7 +12,7 @@ my $has_version_pm = eval 'use version; 1';
 our $AUTOLOAD;
 our $VERSION;
 
-$VERSION = eval 'use version; 1' ? 'version'->new('0.37') : '0.37';
+$VERSION = eval 'use version; 1' ? 'version'->new('0.39') : '0.39';
 $VERSION = eval $VERSION;
 
 
@@ -336,7 +336,7 @@ sub has_pod {
 
     my $filename = $self->file;
     
-    open my $file, $filename or return; # the file won't even open 
+    open my $file, "<", $filename or return; # the file won't even open 
     
     while( <$file> ) { 
         return $filename if /^=[a-z]/; 
@@ -348,7 +348,7 @@ sub has_pod {
 
     return unless -f $filename;
 
-    open $file, $filename or return;
+    open $file, "<", $filename or return;
     
     while( <$file> ) { 
         return $filename if /^=[a-z]/; 

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Agilent34460A;
-$Lab::Moose::Instrument::Agilent34460A::VERSION = '3.903';
+$Lab::Moose::Instrument::Agilent34460A::VERSION = '3.904';
 #ABSTRACT: Agilent 34460A TrueVolt series digital multimeter.
 
 use v5.20;
@@ -40,7 +40,7 @@ Lab::Moose::Instrument::Agilent34460A - Agilent 34460A TrueVolt series digital m
 
 =head1 VERSION
 
-version 3.903
+version 3.904
 
 =head1 DESCRIPTION
 

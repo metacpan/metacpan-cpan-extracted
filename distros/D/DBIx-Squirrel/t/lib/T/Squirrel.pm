@@ -4,6 +4,12 @@ use warnings;
 
 package T::Squirrel;
 
+use Cwd qw/realpath/;
+use DBD::Mock;
+use Test::More;
+use DBD::SQLite ();
+use namespace::clean;
+
 BEGIN {
     require Exporter;
     @T::Squirrel::ISA         = qw/Exporter/;
@@ -24,6 +30,8 @@ BEGIN {
               $TEST_DB_NAME
               @TEST_DB_CREDENTIALS
               @TEST_DB_CONNECT_ARGS
+              $DBD_SQLite_VERSION
+              $SKIP_SQLITE_PARAMVALUES_CHECKS
               /
         ],
         func => [
@@ -36,10 +44,6 @@ BEGIN {
     @T::Squirrel::EXPORT_OK        = (@{$T::Squirrel::EXPORT_TAGS{all}});
     @T::Squirrel::EXPORT           = (@{$T::Squirrel::EXPORT_TAGS{var}});
 }
-
-use Cwd qw/realpath/;
-use DBD::Mock;
-use Test::More;
 
 our $TEST_LIB_DIR = do {
     my $module = __PACKAGE__;
@@ -68,6 +72,14 @@ our($TEST_DB_DSN, $TEST_DB_USERNAME, $TEST_DB_PASSWORD, $TEST_DB_ATTR) = (
 );
 our @TEST_DB_CREDENTIALS  = ($TEST_DB_USERNAME, $TEST_DB_PASSWORD);
 our @TEST_DB_CONNECT_ARGS = ($TEST_DB_DSN, @TEST_DB_CREDENTIALS, $TEST_DB_ATTR);
+
+our $DBD_SQLite_VERSION = do {
+    (my $version = $DBD::SQLite::VERSION) =~ s/_(\d+)$/.$1/;
+    my @maj_min_fix = split(/\./, "${version}.0", 3);
+    @_ < 3 ? 0+sprintf('%d.%02d', @maj_min_fix[0,1]) : 0+sprintf('%d.%02d02d', @maj_min_fix);
+};
+
+our $SKIP_SQLITE_PARAMVALUES_CHECKS = $DBD_SQLite_VERSION < 1.056_000;
 
 sub diagdump {diag(explain(@_))}
 

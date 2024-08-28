@@ -2,10 +2,11 @@ package Net::RDAP::JCard;
 use Net::RDAP::JCard::Property;
 use Net::RDAP::JCard::Address;
 use strict;
+use warnings;
 
 =head1 NAME
 
-L<Net::RDAP::JCard> - an object representing an RDAP jCard object.
+L<Net::RDAP::JCard> - a module representing an RDAP jCard object.
 
 =head1 SYNOPSIS
 
@@ -43,7 +44,7 @@ sub new {
     my $self = {
         properties => [map { Net::RDAP::JCard::Property->new($_) } @{$arrayref}],
     };
-    
+
     return bless($self, $package);
 }
 

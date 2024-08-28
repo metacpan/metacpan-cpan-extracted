@@ -25,7 +25,7 @@ use Carp 'croak';
 #   (body)      This method calls the $function that RxPerl::Observable->new received as argument (and that initiates the subscription)
 #   (return)    This method returns a new RxPerl::Subscription object, that contains the "cleanup subref" returned by $function
 
-our $VERSION = "v6.29.7";
+our $VERSION = "v6.29.8";
 
 sub new {
     my ($class, $function) = @_;
@@ -51,7 +51,8 @@ sub subscribe {
     $subscriber->{error} //= sub {
         my ($err) = @_;
 
-        # TODO: shouldn't croak immediately, to be like rxjs, but on the next tick
+        # TODO: shouldn't croak immediately, to be like rxjs, but on the next tick. Also is bad because
+        # TODO: it won't call the @cbs
         croak $err;
     };
 

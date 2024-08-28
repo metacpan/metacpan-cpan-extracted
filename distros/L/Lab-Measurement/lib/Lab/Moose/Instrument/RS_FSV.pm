@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_FSV;
-$Lab::Moose::Instrument::RS_FSV::VERSION = '3.903';
+$Lab::Moose::Instrument::RS_FSV::VERSION = '3.904';
 #ABSTRACT: Rohde & Schwarz FSV Signal and Spectrum Analyzer
 
 use v5.20;
@@ -244,7 +244,7 @@ Lab::Moose::Instrument::RS_FSV - Rohde & Schwarz FSV Signal and Spectrum Analyze
 
 =head1 VERSION
 
-version 3.903
+version 3.904
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,11 @@
 Revision history for App::papersway
 
+1.002     2024-08-28 13:17:17+08:00 Asia/Shanghai
+    - Reduce resize flickering when moving along the row of windows.
+    - Prune windows that no longer exist from the lists of windows pushed off.
+      This fixes at least one bug.
+    - New --debug option.
+
 1.001     2024-05-28 16:57:54+01:00 Europe/London
     - New "scroll left", "scroll right" commands.
     - Rearrange papersway(1) somewhat.

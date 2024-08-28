@@ -3,16 +3,16 @@ use strict;
 use warnings;
 
 package    # hide from PAUSE
-  DBIx::Squirrel::result;
+  DBIx::Squirrel::ResultClass;
+
+use Sub::Name;
+use DBIx::Squirrel::Utils qw/throw/;
+use namespace::clean;
 
 BEGIN {
-    require DBIx::Squirrel unless %DBIx::Squirrel::;
-    $DBIx::Squirrel::result::VERSION = $DBIx::Squirrel::VERSION;
+    require DBIx::Squirrel unless keys(%DBIx::Squirrel::);
+    $DBIx::Squirrel::ResultClass::VERSION = $DBIx::Squirrel::VERSION;
 }
-
-use namespace::autoclean;
-use Sub::Name;
-use DBIx::Squirrel::util qw/throw/;
 
 use constant E_BAD_OBJECT     => 'A reference to either an array or hash was expected';
 use constant E_STH_EXPIRED    => 'Result is no longer associated with a statement';
@@ -36,6 +36,7 @@ sub row_class {
 }
 
 sub get_column {
+    local($_);
     my($self, $name) = @_;
     return unless defined($name);
     if (UNIVERSAL::isa($self, 'ARRAY')) {
@@ -66,6 +67,7 @@ sub get_column {
 our $AUTOLOAD;
 
 sub AUTOLOAD {
+    local($_);
     no strict 'refs';    ## no critic
     return if substr($AUTOLOAD, -7) eq 'DESTROY';
     my $name = $AUTOLOAD;

@@ -3,6 +3,7 @@ use base qw(Net::RDAP::Object);
 use Net::DNS::Domain;
 use Net::IP;
 use strict;
+use warnings;
 
 =pod
 

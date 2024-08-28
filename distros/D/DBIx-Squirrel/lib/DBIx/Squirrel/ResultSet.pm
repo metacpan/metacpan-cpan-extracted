@@ -2,23 +2,22 @@ use 5.010_001;
 use strict;
 use warnings;
 
-package              # hide from PAUSE
-  DBIx::Squirrel::rs;
+package    # hide from PAUSE
+  DBIx::Squirrel::ResultSet;
 
-BEGIN {
-    require DBIx::Squirrel unless %DBIx::Squirrel::;
-    $DBIx::Squirrel::rs::VERSION = $DBIx::Squirrel::VERSION;
-    @DBIx::Squirrel::rs::ISA     = qw/DBIx::Squirrel::it/;
-}
-
-use namespace::autoclean;
 use Scalar::Util qw/weaken/;
 use Sub::Name;
-use DBIx::Squirrel::util qw/transform/;
+use namespace::clean;
+
+BEGIN {
+    require DBIx::Squirrel unless keys(%DBIx::Squirrel::);
+    $DBIx::Squirrel::ResultSet::VERSION = $DBIx::Squirrel::VERSION;
+    @DBIx::Squirrel::ResultSet::ISA     = qw/DBIx::Squirrel::Iterator/;
+}
 
 sub DESTROY {
     no strict 'refs';    ## no critic
-    return if DBIx::Squirrel::util::global_destruct_phase();
+    return if DBIx::Squirrel::Utils::global_destruct_phase();
     local($., $@, $!, $^E, $?, $_);
     my $self      = shift;
     my $row_class = $self->row_class;
@@ -38,7 +37,7 @@ sub _autoloaded_accessors_unload {
     return $self;
 }
 
-sub _result_prep_to_transform {
+sub _result_preprocess {
     my $self = shift;
     return ref($_[0]) ? $self->_rebless(shift) : shift;
 }
@@ -65,7 +64,7 @@ sub _rebless {
 }
 
 sub result_class {
-    return 'DBIx::Squirrel::result';
+    return 'DBIx::Squirrel::ResultClass';
 }
 
 BEGIN {

@@ -6,15 +6,20 @@ no strict 'subs';    ## no critic
 package              # hide from PAUSE
   DBIx::Squirrel::db;
 
+use DBI;
+use Sub::Name;
+use DBIx::Squirrel::st    qw/statement_study/;
+use DBIx::Squirrel::Utils qw/throw/;
+use namespace::clean;
+
 BEGIN {
-    require DBIx::Squirrel unless %DBIx::Squirrel::;
+    require DBIx::Squirrel unless keys(%DBIx::Squirrel::);
     $DBIx::Squirrel::db::VERSION = $DBIx::Squirrel::VERSION;
-    @DBIx::Squirrel::db::ISA     = 'DBI::db';
+    @DBIx::Squirrel::db::ISA     = qw/DBI::db/;
 }
 
-use namespace::autoclean;
-use Sub::Name;
-use DBIx::Squirrel::util qw/:constants :sql throw/;
+use constant E_EXP_REF       => 'Expected a reference to a HASH or ARRAY';
+use constant E_EXP_STATEMENT => 'Expected a statement';
 
 sub _root_class {
     my $root_class = ref($_[0]) || $_[0];
@@ -25,7 +30,6 @@ sub _root_class {
 
 sub _private_state {
     my $self = shift;
-    return                      unless ref($self);
     $self->{private_ekorn} = {} unless defined($self->{private_ekorn});
     unless (@_) {
         return $self->{private_ekorn}, $self if wantarray;
@@ -55,9 +59,9 @@ sub prepare {
     my $statement = shift;
     my($placeholders, $normalised_statement, $original_statement, $digest) = statement_study($statement);
     throw E_EXP_STATEMENT unless defined($normalised_statement);
-    my $sth = $self->SUPER::prepare($normalised_statement, @_);
-    return unless defined($sth);
-    bless $sth, $self->_root_class . '::st';
+    my $sth = DBI::db::prepare($self, $normalised_statement, @_)
+      or throw $DBI::errstr;
+    $sth = bless($sth, $self->_root_class . '::st');
     $sth->_private_state({
         Placeholders        => $placeholders,
         NormalisedStatement => $normalised_statement,
@@ -72,9 +76,9 @@ sub prepare_cached {
     my $statement = shift;
     my($placeholders, $normalised_statement, $original_statement, $digest) = statement_study($statement);
     throw E_EXP_STATEMENT unless defined($normalised_statement);
-    my $sth = $self->SUPER::prepare_cached($normalised_statement, @_);
-    return unless defined($sth);
-    bless $sth, $self->_root_class . '::st';
+    my $sth = DBI::db::prepare_cached($self, $normalised_statement, @_)
+      or throw $DBI::errstr;
+    $sth = bless($sth, $self->_root_class . '::st');
     $sth->_private_state({
         Placeholders        => $placeholders,
         NormalisedStatement => $normalised_statement,

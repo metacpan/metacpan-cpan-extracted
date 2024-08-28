@@ -6,6 +6,7 @@ use HTTP::Date;
 use Mozilla::CA;
 use constant DEFAULT_CACHE_TTL => 300;
 use strict;
+use warnings;
 
 #
 # create a new object, which is just an LWP::UserAgent with
@@ -14,10 +15,10 @@ use strict;
 sub new {
     my ($package, %options) = @_;
 
-    $options{'agent'} = sprintf('%s/%f', $package, $Net::RDAP::VERSION)     unless (defined($options{'agent'}));
-    $options{'ssl_opts'} = {}                                               unless (defined($options{'ssl_opts'}));
-    $options{'ssl_opts'}->{'verify_hostname'} = 1                           unless (defined($options{'ssl_opts'}->{'verify_hostname'}));
-    $options{'ssl_opts'}->{'SSL_ca_file'} = Mozilla::CA::SSL_ca_file()      unless (defined($options{'ssl_opts'}->{'SSL_ca_file'}));
+    $options{'agent'} = sprintf('%s/%f', $package, $Net::RDAP::VERSION) unless (exists($options{'agent'}));
+    $options{'ssl_opts'} = {}                                           unless (exists($options{'ssl_opts'}));
+    $options{'ssl_opts'}->{'verify_hostname'} = 1                       unless (exists($options{'ssl_opts'}->{'verify_hostname'}));
+    $options{'ssl_opts'}->{'SSL_ca_file'} = Mozilla::CA::SSL_ca_file()  unless (exists($options{'ssl_opts'}->{'SSL_ca_file'}));
 
     return bless($package->SUPER::new(%options), $package);
 }
@@ -25,9 +26,9 @@ sub new {
 #
 # usage: $ua->mirror($url, $file, $ttl);
 #
-# this overrides the parent mirror() method to avoid a network roundtrip if a locally-
-# cached copy of the resource is less than $ttl seconds old. If not provided, the default
-# value for $ttl is 300 seconds.
+# this overrides the parent mirror() method to avoid a network roundtrip if a
+# locally-cached copy of the resource is less than $ttl seconds old. If not
+# provided, the default value for $ttl is 300 seconds.
 #
 sub mirror {
     my ($self, $url, $file, $ttl) = @_;
@@ -52,7 +53,18 @@ sub mirror {
     carp($response->status_line) unless ($response->is_success || 304 == $response->code);
 
     if (-e $file) {
-        my $mtime = (HTTP::Date->str2time($response->header('Expires') || $response->header('Date')) || time());
+        my $mtime = time();
+
+        foreach my $header (qw(expires date)) {
+            if ($response->header($header)) {
+                my $time = HTTP::Date->str2time($response->header($header));
+                if ($time) {
+                    $mtime = $time;
+                    last;
+                }
+            }
+        }
+
         utime(undef, $mtime, $file);
         chmod(0600, $file);
     }
@@ -68,7 +80,8 @@ __END__
 
 =head1 NAME
 
-L<Net::RDAP::UA> - an RDAP user agent, based on L<LWP::UserAgent>.
+L<Net::RDAP::UA> - a module which provides an RDAP user agent, based on
+L<LWP::UserAgent>.
 
 =head1 DESCRIPTION
 

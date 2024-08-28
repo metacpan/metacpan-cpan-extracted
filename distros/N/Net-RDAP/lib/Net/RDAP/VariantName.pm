@@ -1,5 +1,6 @@
 package Net::RDAP::VariantName;
 use strict;
+use warnings;
 
 =pod
 

@@ -5,8 +5,9 @@ use warnings;
 use base 'RxPerl::Observable';
 
 use Hash::Ordered;
+use Scalar::Util 'weaken';
 
-our $VERSION = "v6.29.7";
+our $VERSION = "v6.29.8";
 
 # over-rideable
 # sub _on_subscribe {
@@ -24,30 +25,35 @@ sub new {
     my ($class) = @_;
 
     my $subscribers_oh = Hash::Ordered->new();
+    weaken(my $w_subscribers_oh = $subscribers_oh);
 
-    my $self; $self = $class->SUPER::new(sub {
+    my $w_self;
+    my $self = $class->SUPER::new(sub {
         my ($subscriber) = @_;
 
-        if ($self->{_closed}) {
-            $self->_on_subscribe_closed($subscriber) if $self->can('_on_subscribe_closed');
-            my ($type, @args) = @{ $self->{_closed} };
+        if ($w_self->{_closed}) {
+            $w_self->_on_subscribe_closed($subscriber) if $w_self->can('_on_subscribe_closed');
+            my ($type, @args) = @{ $w_self->{_closed} };
             $subscriber->{$type}->(@args) if defined $subscriber->{$type};
             return;
         }
 
-        $subscribers_oh->set("$subscriber", $subscriber);
-        $self->_on_subscribe($subscriber) if $self->can('_on_subscribe');
+        $w_subscribers_oh->set("$subscriber", $subscriber);
+        $w_self->_on_subscribe($subscriber) if $w_self->can('_on_subscribe');
 
+        my $string = "$subscriber";
+        # return;
         return sub {
-            $subscribers_oh->delete("$subscriber");
+            $w_subscribers_oh and $w_subscribers_oh->delete($string);
         };
     });
+    weaken($w_self = $self);
 
     $self->{_closed} = 0;
     foreach my $type (qw/ error complete /) {
         $self->{$type} = sub {
-            return if $self->{_closed};
-            $self->{_closed} = [$type, @_];
+            return if $w_self->{_closed};
+            $w_self->{_closed} = [$type, @_];
             foreach my $subscriber ($subscribers_oh->values) {
                 $subscriber->{$type}->(@_) if defined $subscriber->{$type};
             }

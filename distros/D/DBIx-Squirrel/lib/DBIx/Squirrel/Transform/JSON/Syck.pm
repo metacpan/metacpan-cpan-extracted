@@ -5,8 +5,7 @@ package    # hide from PAUSE
   DBIx::Squirrel::Transform::JSON::Syck;
 
 BEGIN {
-    require DBIx::Squirrel
-      unless defined($DBIx::Squirrel::VERSION);
+    require DBIx::Squirrel unless keys(%DBIx::Squirrel::);
     require Exporter;
     $DBIx::Squirrel::Transform::JSON::Syck::VERSION   = $DBIx::Squirrel::VERSION;
     @DBIx::Squirrel::Transform::JSON::Syck::ISA       = qw/Exporter/;

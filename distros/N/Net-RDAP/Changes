@@ -1,5 +1,8 @@
 Revision history for perl module Net::RDAP:
 
+0.29 - 2024-08-27
+  - add the current user to the cache filename to avoid cache filename clashes.
+
 0.28 - 2024-08-08
   - all RDAP objects now know their position in the object hierarchy of the RDAP
     record that they appear in, and provide the parent(), top() and chain()

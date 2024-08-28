@@ -1,12 +1,13 @@
 package Net::RDAP::Notice;
 use base qw(Net::RDAP::Remark);
 use strict;
+use warnings;
 
 =pod
 
 =head1 NAME
 
-L<Net::RDAP::Notice> - an RDAP notice
+L<Net::RDAP::Notice> - a module representing an RDAP notice.
 
 =head1 DESCRIPTION
 

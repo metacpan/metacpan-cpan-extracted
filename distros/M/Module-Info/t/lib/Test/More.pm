@@ -336,7 +336,7 @@ sub isnt ($$;$) {
     $Test->isnt_eq(@_);
 }
 
-*isn't = \&isnt;
+# *isn't = \&isnt;
 
 
 =item B<like>

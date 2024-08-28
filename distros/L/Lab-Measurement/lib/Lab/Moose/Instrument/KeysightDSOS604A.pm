@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::KeysightDSOS604A;
-$Lab::Moose::Instrument::KeysightDSOS604A::VERSION = '3.903';
+$Lab::Moose::Instrument::KeysightDSOS604A::VERSION = '3.904';
 #ABSTRACT: Keysight DSOS604A infiniium S-Series Oscilloscope.
 
 use v5.20;
@@ -378,7 +378,7 @@ Lab::Moose::Instrument::KeysightDSOS604A - Keysight DSOS604A infiniium S-Series 
 
 =head1 VERSION
 
-version 3.903
+version 3.904
 
 =head1 SYNOPSIS
 

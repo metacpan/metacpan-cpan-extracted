@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ZI_HDAWG;
-$Lab::Moose::Instrument::ZI_HDAWG::VERSION = '3.903';
+$Lab::Moose::Instrument::ZI_HDAWG::VERSION = '3.904';
 #ABSTRACT: Zurich Instruments HDAWG Arbitrary Waveform Generator
 
 # Notes for further developement:
@@ -4588,7 +4588,7 @@ Lab::Moose::Instrument::ZI_HDAWG - Zurich Instruments HDAWG Arbitrary Waveform G
 
 =head1 VERSION
 
-version 3.903
+version 3.904
 
 =head1 Tested
 

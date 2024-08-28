@@ -34,8 +34,8 @@ my $artists = artists->_private_state;
 my $results  = artists->all;
 my $expected = ['Rush', 'Envy of None', 'Alex Lifeson', 'Simply Red', 'Skank', 'Smashing Pumpkins'];
 is_deeply($results, $expected, 'iteration, filtering, injection ok');
-is($artists->{buffer_size_fixed}, !!0,                                    'artists->{buffer_size_fixed}');
-is($artists->{buffer_size},       &DBIx::Squirrel::it::BUFFER_SIZE_LIMIT, 'artists->{buffer_size}');
+is($artists->{buffer_size_fixed}, !!0,                                          'artists->{buffer_size_fixed}');
+is($artists->{buffer_size},       &DBIx::Squirrel::Iterator::BUFFER_SIZE_LIMIT, 'artists->{buffer_size}');
 
 artists->buffer_size(8)->execute;
 $results = artists->all;

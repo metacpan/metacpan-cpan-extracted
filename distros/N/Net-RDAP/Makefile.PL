@@ -1,14 +1,15 @@
 #!/usr/bin/perl
 use ExtUtils::MakeMaker;
+use warnings;
 use strict;
 
 WriteMakefile(
-    'NAME'          => 'Net::RDAP',
-    'VERSION_FROM'  => 'lib/Net/RDAP.pm',
-    'ABSTRACT'      => 'an interface to the Registration Data Access Protocol (RDAP).',
-    'AUTHOR'        => ['Gavin Brown <gavin.brown@fastmail.uk>'],
-    'LICENSE'       => 'freebsd',
-    'PREREQ_PM' => {
+    NAME            => 'Net::RDAP',
+    VERSION_FROM    => 'lib/Net/RDAP.pm',
+    ABSTRACT        => 'An interface to the Registration Data Access Protocol (RDAP).',
+    AUTHOR          => ['Gavin Brown <gavin.brown@fastmail.uk>'],
+    LICENSE         => 'freebsd',
+    PREREQ_PM => {
         'DateTime::Format::ISO8601' => 0,
         'Digest::SHA'               => 0,
         'File::Basename'            => 0,
@@ -19,9 +20,9 @@ WriteMakefile(
         'HTTP::Date'                => 0,
         'HTTP::Request::Common'     => 0,
         'JSON'                      => 0,
-        'List::MoreUtils'           => 0,
         'LWP::Protocol::https'      => 0,
         'LWP::UserAgent'            => 0,
+        'List::MoreUtils'           => 0,
         'MIME::Type'                => 0,
         'Mozilla::CA'               => 0,
         'Net::ASN'                  => 0,
@@ -31,20 +32,22 @@ WriteMakefile(
         'Net::IP'                   => 0,
         'Test::More'                => 0,
         'URI'                       => 0,
-        'vCard'                     => 0,
         'XML::LibXML'               => 0,
+        'vCard'                     => 0,
     },
-    'META_MERGE' => {
-        'meta-spec' => { 'version' => 2 },
-         'resources' => {
-             'repository' => {
-                 'type' => 'git',
-                 'url'  => 'https://github.com/gbxyz/perl-Net-RDAP.git',
-                 'web'  => 'https://github.com/gbxyz/perl-Net-RDAP',
-             },
-             'bugtracker' => {
-                 'web' => 'https://github.com/gbxyz/perl-Net-RDAP/issues',
-             },
-         },
+    META_MERGE => {
+        'meta-spec' => {
+            version => 2
+        },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/gbxyz/perl-Net-RDAP.git',
+                web  => 'https://github.com/gbxyz/perl-Net-RDAP',
+            },
+            bugtracker => {
+                web => 'https://github.com/gbxyz/perl-Net-RDAP/issues',
+            },
+        },
     },
 );

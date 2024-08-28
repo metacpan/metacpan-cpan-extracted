@@ -4,319 +4,189 @@ use strict;
 use warnings;
 use JSON;
 use YAML::PP qw( Dump );
-use Data::Dumper;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
-
-our $VERSION = '1.20';
-our $AUTOLOAD;
+our $VERSION = '1.21';
 
 sub new {
-    my $proto = shift;
-    my $args  = shift;
-    my $class = ref($proto) || $proto;
-    my $self  = {};
-    
-    $self->{_content}->{version}        = $args->{version} ||= '1.0.0';
+    my ($class, $args) = @_;
+    my $self = {
+        _content => {
+            version => $args->{version} // '1.0.0',
+        },
+        _prompt => {},
+        _params => {},
+        _hints => [],
+        _SWAIG => {
+            defaults => {},
+            functions => [],
+            includes => [],
+            native_functions => [],
+        },
+        _pronounce => [],
+        _languages => [],
+        _post_prompt => {},
+    };
     return bless($self, $class);
 }
 
-# This adds the ai application to the section provided in the args,
-# taking all the previously set params and options for the AI and
-# attaching them to the application.
 sub add_aiapplication {
-    my $self    = shift;
-    my $section = shift;
-    my $app     = "ai";
-    my $args    = {};
+    my ($self, $section) = @_;
+    my $app = "ai";
+    my $args = {};
 
-    foreach my $data ('post_prompt', 'post_prompt_url', 'post_prompt_auth_user', 'post_prompt_auth_password', 'languages', 'hints', 'params', 'prompt', 'SWAIG', 'pronounce', 'global_data') {
-	next unless $self->{"_$data"};
-	$args->{$data} = $self->{"_$data"};
+    for my $data (qw(post_prompt post_prompt_url post_prompt_auth_user post_prompt_auth_password languages hints params prompt SWAIG pronounce global_data)) {
+        $args->{$data} = $self->{"_$data"} if exists $self->{"_$data"};
     }
 
-    push @{$self->{_content}->{sections}->{$section} },  { $app =>  $args };
-
-    return;
+    push @{$self->{_content}{sections}{$section}}, { $app => $args };
 }
 
-# Set context steps, overriding any existing steps
 sub set_context_steps {
-    my $self = shift;
-    my $context_name = shift;
-    my $steps = shift;
-
-    $self->{_prompt}->{contexts}->{$context_name}->{steps} = $steps;
-
-    return;
+    my ($self, $context_name, $steps) = @_;
+    $self->{_prompt}{contexts}{$context_name}{steps} = $steps;
 }
 
-# Add steps to context, appending to any existing steps
 sub add_context_steps {
-    my $self = shift;
-    my $context_name = shift;
-    my $steps = shift;
-
-    $self->{_prompt}->{contexts}->{$context_name}->{steps} //= [];
-    push @{$self->{_prompt}->{contexts}->{$context_name}->{steps}}, @$steps;
-
-    return;
+    my ($self, $context_name, $steps) = @_;
+    push @{$self->{_prompt}{contexts}{$context_name}{steps}}, @$steps;
 }
 
-# Set contexts for prompt, allowing for initial setup of multiple contexts
 sub set_prompt_contexts {
-    my $self = shift;
-    my $contexts = shift;
-
-    $self->{_prompt}->{contexts} = $contexts;
-
-    return;
+    my ($self, $contexts) = @_;
+    $self->{_prompt}{contexts} = $contexts;
 }
 
-# add application to section, providing all the app args.
 sub add_application {
-    my $self    = shift;
-    my $section = shift;
-    my $app     = shift;
-    my $args    = shift || {};
-
-    push @{$self->{_content}->{sections}->{$section} },  { $app =>  $args };
-
-    return;
+    my ($self, $section, $app, $args) = @_;
+    $args //= {};
+    push @{$self->{_content}{sections}{$section}}, { $app => $args };
 }
 
-# set post_url and optionally pass in post_user and post_password
 sub set_aipost_prompt_url {
-    my $self       = shift;
-    my $postprompt = shift;
-
-    while ( my ($k,$v) = each(%{$postprompt}) ) {
-	$self->{"_$k"} = $postprompt->{$k};
+    my ($self, $postprompt) = @_;
+    while (my ($k, $v) = each %$postprompt) {
+        $self->{"_$k"} = $v;
     }
-
-    return;
 }
 
-# Set global_data 
 sub set_global_data {
-    my $self = shift;
-
-    $self->{_global_data} = shift;
-
-    return;
+    my ($self, $data) = @_;
+    $self->{_global_data} = $data;
 }
 
-# Set params overriding any previously set params
 sub set_aiparams {
-    my $self = shift;
-
-    $self->{_params} = shift;
-
-    return;
+    my ($self, $params) = @_;
+    $self->{_params} = $params;
 }
 
-# Add one or more params
 sub add_aiparams {
-    my $self   = shift;
-    my $params = shift;
-    my @keys = ("end_of_speech_timeout", "attention_timeout", "outbound_attention_timeout", "background_file_loops", "background_file_volume", "digit_timeout", "energy_level" );
-
-    while ( my ($k,$v) = each(%{$params}) ) {
-	if ( grep { $_ eq $k } @keys ) {
-            $self->{_params}->{$k} = $v + 0;
-	} else {
-            $self->{_params}->{$k} = $v;
-	}
+    my ($self, $params) = @_;
+    my @numeric_keys = qw(end_of_speech_timeout attention_timeout outbound_attention_timeout background_file_loops background_file_volume digit_timeout energy_level);
+    
+    while (my ($k, $v) = each %$params) {
+        $self->{_params}{$k} = (grep { $_ eq $k } @numeric_keys) ? $v + 0 : $v;
     }
-
-    return;
 }
 
-# Set hints overriding any previously set hints
 sub set_aihints {
-    my $self  = shift;
-    my @hints = @_;
-
+    my ($self, @hints) = @_;
     $self->{_hints} = \@hints;
-
-    return;
 }
 
-# Add hints, and make sure they are uniq
 sub add_aihints {
-    my $self  = shift;
-    my @hints = @_;
+    my ($self, @hints) = @_;
     my %seen;
-
-    push  @{ $self->{_hints} }, @hints;
-    @{ $self->{_hints} } = grep { !$seen{$_}++ } @{ $self->{_hints} };
-
-    return;
+    push @{$self->{_hints}}, @hints;
+    @{$self->{_hints}} = grep { !$seen{$_}++ } @{$self->{_hints}};
 }
 
-# set SWAIG defaults overriding previous defaults
 sub add_aiswaigdefaults {
-    my $self  = shift;
-    my $SWAIG = shift;
-    $self->{_SWAIG}->{defaults} //= {};
-    
-    while ( my ($k,$v) = each(%{$SWAIG}) ) {
-	$self->{_SWAIG}->{defaults}->{$k} = $v;
+    my ($self, $SWAIG) = @_;
+    while (my ($k, $v) = each %$SWAIG) {
+        $self->{_SWAIG}{defaults}{$k} = $v;
     }
-
-    return;
 }
 
-# set SWAIG function
 sub add_aiswaigfunction {
-    my $self  = shift;
-    my $SWAIG = shift;
-    $self->{_SWAIG}->{functions} //= [];
-    
-    @{ $self->{_SWAIG}->{functions} } = (@{ $self->{_SWAIG}->{functions} }, $SWAIG);
-
-    return;
+    my ($self, $SWAIG) = @_;
+    push @{$self->{_SWAIG}{functions}}, $SWAIG;
 }
 
-# set pronounces overriding previous pronounces
 sub set_aipronounce {
-    my $self      = shift;
-    my $pronounce = shift;
-    $self->{_pronounce} //= [];
-    
+    my ($self, $pronounce) = @_;
     $self->{_pronounce} = $pronounce;
-
-    return;
 }
 
-# add pronounces appending to the list
 sub add_aipronounce {
-    my $self      = shift;
-    my $pronounce = shift;
-    $self->{_pronounce} //= [];
-    
-    @{ $self->{_pronounce} } = (@{ $self->{_pronounce} }, $pronounce);
-
-    return;
+    my ($self, $pronounce) = @_;
+    push @{$self->{_pronounce}}, $pronounce;
 }
 
-# set lanugages overriding previous languages
 sub set_ailanguage {
-    my $self     = shift;
-    my $language = shift;
-    $self->{_languages} //= [];
-    
+    my ($self, $language) = @_;
     $self->{_languages} = $language;
-
-    return;
 }
 
-# Add language appending to the list
 sub add_ailanguage {
-    my $self     = shift;
-    my $language = shift;
-    $self->{_languages} //= [];
-    
-    @{ $self->{_languages} } = (@{ $self->{_languages} }, $language);
-
-    return;
+    my ($self, $language) = @_;
+    push @{$self->{_languages}}, $language;
 }
 
-# Function included in SWAIG
 sub add_aiinclude {
-    my $self = shift;
-    my $include = shift;
-    $self->{_SWAIG}->{includes} //= [];
-    
-    @{ $self->{_SWAIG}->{includes} } = (@{ $self->{_SWAIG}->{includes}}, $include);
-    
-    return;
+    my ($self, $include) = @_;
+    push @{$self->{_SWAIG}{includes}}, $include;
 }
 
-# Function included in native SWAIG
 sub add_ainativefunction {
-    my $self   = shift;
-    my $native = shift;
-    $self->{_SWAIG}->{native_functions} //= [];
-    
-    @{ $self->{_SWAIG}->{native_functions} } = (@{ $self->{_SWAIG}->{native_functions}}, $native);
-
-    return;
+    my ($self, $native) = @_;
+    push @{$self->{_SWAIG}{native_functions}}, $native;
 }
 
-#set post_prompt
 sub set_aipost_prompt {
-    my $self       = shift;
-    my $postprompt = shift;
-    my @keys = ("confidence", "barge_confidence", "top_p", "temperature", "frequency_penalty", "presence_penalty");
+    my ($self, $postprompt) = @_;
+    my @numeric_keys = qw(confidence barge_confidence top_p temperature frequency_penalty presence_penalty);
     
-    while ( my ($k,$v) = each(%{$postprompt}) ) {
-	if ( grep { $_ eq $k } @keys ) {
-            $self->{_post_prompt}->{$k} = $v + 0;
-	} else {
-            $self->{_post_prompt}->{$k} = $v;
-	}
+    while (my ($k, $v) = each %$postprompt) {
+        $self->{_post_prompt}{$k} = (grep { $_ eq $k } @numeric_keys) ? $v + 0 : $v;
     }
-
-    return;
 }
 
-# Set the prompt text and other settings
 sub set_aiprompt {
-    my $self = shift;
-    my $prompt = shift;
-    my @keys = ("confidence", "barge_confidence", "top_p", "temperature", "frequency_penalty", "presence_penalty");
-
-    while ( my ($k,$v) = each(%{$prompt}) ) {
-        if ( grep { $_ eq $k } @keys ) {
-            $self->{_prompt}->{$k} = $v + 0;
-        } else {
-            $self->{_prompt}->{$k} = $v;
-        }
+    my ($self, $prompt) = @_;
+    my @numeric_keys = qw(confidence barge_confidence top_p temperature frequency_penalty presence_penalty);
+    
+    while (my ($k, $v) = each %$prompt) {
+        $self->{_prompt}{$k} = (grep { $_ eq $k } @numeric_keys) ? $v + 0 : $v;
     }
-
-    return;
 }
 
-# Return a SWAIG response with optional SWML if sections exist. 
 sub swaig_response {
-    my $self     = shift;
-    my $response = shift;
-
+    my ($self, $response) = @_;
     return $response;
 }
 
 sub swaig_response_json {
-    my $self     = shift;
-    my $response = shift;
-    my $json = JSON->new->allow_nonref;
-
-    return $json->pretty->utf8->encode( $response );
+    my ($self, $response) = @_;
+    return JSON->new->pretty->utf8->encode($response);
 }
 
-# Return oject as a perl ref
 sub render {
-    my $self = shift;
-
+    my ($self) = @_;
     return $self->{_content};
 }
 
-# Render the object to JSON;
 sub render_json {
-    my $self = shift;
-    my $json = JSON->new->allow_nonref;
-
-    return $json->pretty->utf8->encode( $self->{_content} )
+    my ($self) = @_;
+    return JSON->new->pretty->utf8->encode($self->{_content});
 }
 
-# Render the object to YAML;
 sub render_yaml {
-    my $self = shift;
-
+    my ($self) = @_;
     return Dump $self->{_content};
 }
 
 1;
+
 __END__
 
 =encoding utf8
@@ -324,6 +194,129 @@ __END__
 =head1 NAME
 
 SignalWire::ML - Light and fast SWML generator
+
+=head1 METHODS
+
+=head2 new($class, $args)
+
+Constructor method. Creates a new SignalWire::ML object with default values.
+
+=head2 Example
+
+Here's an example of how to use SignalWire::ML:
+
+    use SignalWire::ML;
+
+    # Create a new SignalWire::ML object
+    my $ml = SignalWire::ML->new({
+        version => '1.0.0'
+    });
+
+    # Set AI prompt
+    $ml->set_aiprompt({
+        text => "What's the weather like today?",
+        temperature => 0.7,
+        top_p => 0.9
+    });
+
+    # Set AI parameters
+    $ml->set_aiparams({
+        max_tokens => 150
+    });
+
+    # Add an AI application to a section
+    $ml->add_aiapplication('main');
+
+    # Render the result
+    my $json_output = $ml->render_json();
+    print $json_output;
+
+This example demonstrates creating a SignalWire::ML object, setting various parameters and contexts, adding applications, and then rendering the result as JSON.
+
+
+=head2 add_aiapplication($self, $section)
+
+Adds an AI application to the specified section.
+
+=head2 set_context_steps($self, $context_name, $steps)
+
+Sets the steps for a specific context in the prompt.
+
+=head2 add_context_steps($self, $context_name, $steps)
+
+Adds steps to an existing context in the prompt.
+
+=head2 set_prompt_contexts($self, $contexts)
+
+Sets the contexts for the prompt.
+
+=head2 add_application($self, $section, $app, $args)
+
+Adds an application to the specified section with given arguments.
+
+This method is used to add an application to a specific section in the SignalWire::ML object. 
+
+Example usage:
+
+    my $swml = SignalWire::ML->new({version => '1.0.0'});
+    
+    $swml->add_application("main", "answer");
+    
+    $swml->add_application("main", "play",
+        { urls => [ "https://github.com/freeswitch/freeswitch-sounds/raw/master/en/us/callie/ivr/48000/ivr-welcome_to_freeswitch.wav" ] });
+    
+    $swml->add_application("main", "hangup");
+    
+    $swml->add_aiapplication('main');
+    
+    print $swml->render_json;
+
+This example demonstrates creating a SignalWire::ML object, adding various applications including an answer, play, and hangup application, then adding an AI application to the 'main' section, and finally rendering the result as JSON.
+
+=head2 set_aipost_prompt_url($self, $postprompt)
+
+Sets the AI post-prompt URL and related parameters.
+
+=head2 set_global_data($self, $data)
+
+Sets the global data for the ML object.
+
+=head2 set_aiparams($self, $params)
+
+Sets the AI parameters.
+
+=head2 add_aiparams($self, $params)
+
+Adds additional AI parameters.
+
+=head2 set_aipost_prompt($self, $postprompt)
+
+Sets the AI post-prompt parameters.
+
+=head2 set_aiprompt($self, $prompt)
+
+Sets the AI prompt parameters.
+
+=head2 swaig_response($self, $response)
+
+Processes and returns the SWAIG response.
+
+=head2 swaig_response_json($self, $response)
+
+Processes the SWAIG response and returns it as JSON.
+
+=head2 render($self)
+
+Renders the content of the ML object.
+
+=head2 render_json($self)
+
+Renders the content of the ML object as JSON.
+
+=head2 render_yaml($self)
+
+Renders the content of the ML object as YAML.
+
 
 =head1 SYNOPSIS
 

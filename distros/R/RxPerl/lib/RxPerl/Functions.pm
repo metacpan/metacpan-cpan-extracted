@@ -14,7 +14,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.29.7";
+our $VERSION = "v6.29.8";
 
 sub _promise_class {
     my $fn = (caller(1))[3];

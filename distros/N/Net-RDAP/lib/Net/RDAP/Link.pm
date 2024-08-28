@@ -2,6 +2,7 @@ package Net::RDAP::Link;
 use URI;
 use MIME::Type;
 use strict;
+use warnings;
 
 =pod
 

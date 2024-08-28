@@ -1,0 +1,22 @@
+Changes
+lib/Map/Tube/Rome.pm
+lib/Map/Tube/Rome/Line/MA.pm
+lib/Map/Tube/Rome/Line/MB.pm
+lib/Map/Tube/Rome/Line/MC.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+maps/MA.png
+maps/MB.png
+maps/MC.png
+maps/Metropolitana-di-Roma.png
+share/rome-map.json
+t/00-load.t
+t/map-tube-rome.t
+xt/changes.t
+xt/kwalitee.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,6 +1,7 @@
 package Net::RDAP::EPPStatusMap;
 use base qw(Exporter);
 use strict;
+use warnings;
 
 our @EXPORT = qw(epp2rdap rdap2epp);
 
@@ -50,8 +51,8 @@ sub rdap2epp { $RMAP {$_[0]} }
 
 =head1 NAME
 
-L<Net::RDAP::EPPStatusMap> - a module which provides a mapping between
-EPP and RDAP status values.
+L<Net::RDAP::EPPStatusMap> - a module which provides a mapping between EPP and
+RDAP status values.
 
 =head1 SYNOPSIS
 

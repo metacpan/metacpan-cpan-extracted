@@ -2,11 +2,12 @@ package Net::RDAP::Object::IPNetwork;
 use base qw(Net::RDAP::Object);
 use Net::IP;
 use strict;
+use warnings;
 
 =head1 NAME
 
-L<Net::RDAP::Object::IPNetwork> - an RDAP object representing an IP
-address network.
+L<Net::RDAP::Object::IPNetwork> - a module representing an IPv4 or IPv6 address
+network.
 
 =head1 DESCRIPTION
 
@@ -90,7 +91,7 @@ sub range {
 
 Returns an array of L<Net::IP> objects representing the CIDR
 prefix(es) for this network registration (see
-L<https://bitbucket.org/nroecg/nro-rdap-cidr/src/master/nro-rdap-cidr.txt).
+L<https://bitbucket.org/nroecg/nro-rdap-cidr/src/master/nro-rdap-cidr.txt>).
 
 =cut
 
@@ -134,7 +135,7 @@ for example:
 
 sub domain {
     my $self = shift;
-    URI->new_abs(sprintf('../../domain/%s', $self->start->reverse_ip), $self->self->href);
+    return URI->new_abs(sprintf('../../domain/%s', $self->start->reverse_ip), $self->self->href);
 }
 
 =pod

@@ -1,5 +1,5 @@
 ---
-abstract: 'an interface to the Registration Data Access Protocol (RDAP).'
+abstract: 'An interface to the Registration Data Access Protocol (RDAP).'
 author:
   - 'Gavin Brown <gavin.brown@fastmail.uk>'
 build_requires:
@@ -45,5 +45,5 @@ requires:
 resources:
   bugtracker: https://github.com/gbxyz/perl-Net-RDAP/issues
   repository: https://github.com/gbxyz/perl-Net-RDAP.git
-version: 0.28
+version: 0.29
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,7 @@
 package Net::RDAP::ID;
 use base qw(Net::RDAP::Base);
 use strict;
+use warnings;
 
 =head1 NAME
 

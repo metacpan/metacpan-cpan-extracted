@@ -4,6 +4,7 @@ use Net::DNS::RR::DNSKEY;
 use Net::RDAP::Object::IPNetwork;
 use base qw(Net::RDAP::Object);
 use strict;
+use warnings;
 
 =pod
 

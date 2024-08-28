@@ -5,16 +5,21 @@ use warnings;
 package    # hide from PAUSE
   DBIx::Squirrel::st;
 
+use Digest::SHA qw/sha256_base64/;
+use Memoize;
+use Sub::Name;
+use DBIx::Squirrel::Utils qw/throw whine/;
+use namespace::clean;
+
 BEGIN {
-    require DBIx::Squirrel unless %DBIx::Squirrel::;
-    $DBIx::Squirrel::st::VERSION = $DBIx::Squirrel::VERSION;
-    @DBIx::Squirrel::st::ISA     = 'DBI::st';
+    require DBIx::Squirrel unless keys(%DBIx::Squirrel::);
+    require Exporter;
+    $DBIx::Squirrel::st::VERSION   = $DBIx::Squirrel::VERSION;
+    @DBIx::Squirrel::st::ISA       = qw/DBI::st Exporter/;
+    @DBIx::Squirrel::st::EXPORT_OK = qw/statement_digest statement_normalise statement_study statement_trim/;
 }
 
-use namespace::autoclean;
-use Sub::Name;
-use DBIx::Squirrel::util qw/throw whine/;
-
+use constant E_EXP_STH             => 'Expected a statement handle';
 use constant E_INVALID_PLACEHOLDER => 'Cannot bind invalid placeholder (%s)';
 use constant W_ODD_NUMBER_OF_ARGS  => 'Check bind values match placeholder scheme';
 
@@ -22,7 +27,6 @@ our $FINISH_ACTIVE_BEFORE_EXECUTE = !!1;
 
 sub _private_state {
     my $self = shift;
-    return                      unless ref($self);
     $self->{private_ekorn} = {} unless defined($self->{private_ekorn});
     unless (@_) {
         return $self->{private_ekorn}, $self if wantarray;
@@ -47,32 +51,37 @@ sub _private_state {
 }
 
 sub _placeholders_confirm_positional {
-    my $placeholders = shift;
-    return unless UNIVERSAL::isa($placeholders, 'HASH');
+    local($_);
+    my $self         = shift;
+    my $placeholders = $self->_private_state->{Placeholders};
     my @placeholders = values(%{$placeholders});
-    my $total_count  = scalar(@placeholders);
+    my $total_count  = @placeholders;
     my $count        = grep {m/^[\:\$\?]\d+$/} @placeholders;
     return $placeholders if $count == $total_count;
     return;
 }
 
 sub _placeholders_map_to_values {
-    my $placeholders = shift;
-    my @mappings     = do {
-        if (_placeholders_confirm_positional($placeholders)) {
-            map {($placeholders->{$_} => $_[$_ - 1])} keys(%{$placeholders});
+    local($_);
+    my $self       = shift;
+    my $positional = $self->_placeholders_confirm_positional;
+    my @mappings   = do {
+        if ($positional) {
+            map {($positional->{$_} => $_[$_ - 1])} keys(%{$positional});
         }
         else {
-            if (UNIVERSAL::isa($_[0], 'ARRAY')) {
-                whine W_ODD_NUMBER_OF_ARGS unless @{$_[0]} % 2 == 0;
-                @{$_[0]};
-            }
-            elsif (UNIVERSAL::isa($_[0], 'HASH')) {
+            if (UNIVERSAL::isa($_[0], 'HASH')) {
                 %{$_[0]};
             }
             else {
-                whine W_ODD_NUMBER_OF_ARGS unless @_ % 2 == 0;
-                @_;
+                if (UNIVERSAL::isa($_[0], 'ARRAY')) {
+                    whine W_ODD_NUMBER_OF_ARGS unless @{$_[0]} && @{$_[0]} % 2 == 0;
+                    @{$_[0]};
+                }
+                else {
+                    whine W_ODD_NUMBER_OF_ARGS unless @_ && @_ % 2 == 0;
+                    @_;
+                }
             }
         }
     };
@@ -81,11 +90,19 @@ sub _placeholders_map_to_values {
 }
 
 sub bind {
-    my($attr, $self) = shift->_private_state;
+    local($_);
+    my $self = shift;
     if (@_) {
-        my $placeholders = $attr->{Placeholders};
-        if ($placeholders && !_placeholders_confirm_positional($placeholders)) {
-            if (my %kv = @{_placeholders_map_to_values($placeholders, @_)}) {
+        if ($self->_placeholders_confirm_positional) {
+            if (UNIVERSAL::isa($_[0], 'ARRAY')) {
+                $self->bind_param($_, $_[0][$_ - 1]) for 1 .. scalar(@{$_[0]});
+            }
+            else {
+                $self->bind_param($_, $_[$_ - 1]) for 1 .. scalar(@_);
+            }
+        }
+        else {
+            if (my %kv = @{$self->_placeholders_map_to_values(@_)}) {
                 while (my($k, $v) = each(%kv)) {
                     if ($k =~ m/^[\:\$\?]?(?<bind_id>\d+)$/) {
                         throw E_INVALID_PLACEHOLDER, $k unless $+{bind_id};
@@ -97,48 +114,38 @@ sub bind {
                 }
             }
         }
-        else {
-            if (UNIVERSAL::isa($_[0], 'ARRAY')) {
-                for my $bind_id (1 .. scalar(@{$_[0]})) {
-                    $self->bind_param($bind_id, $_[0][$bind_id - 1]);
-                }
-            }
-            else {
-                for my $bind_id (1 .. scalar(@_)) {
-                    $self->bind_param($bind_id, $_[$bind_id - 1]);
-                }
-            }
-        }
     }
     return $self;
 }
 
 sub bind_param {
-    my($attr, $self) = shift->_private_state;
-    my($bind_param, $bind_value, @bind_attr) = @_;
-    my @bind_param_args = do {
-        if (my $placeholders = $attr->{Placeholders}) {
-            if ($bind_param =~ m/^[\:\$\?]?(?<bind_id>\d+)$/) {
-                $+{bind_id}, $bind_value, @bind_attr;
+    local($_);
+    my $self = shift;
+    my @args = do {
+        my($param, $value, @attr) = @_;
+        my $placeholders = $self->_private_state->{Placeholders};
+        if ($placeholders) {
+            if ($param =~ m/^[\:\$\?]?(?<bind_id>\d+)$/) {
+                $+{bind_id}, $value, @attr;
             }
             else {
-                if ($bind_param =~ m/^[\:\$\?]/) {
-                    map {($_, $bind_value, @bind_attr)}
-                    grep {$placeholders->{$_} eq $bind_param} keys(%{$placeholders});
-                }
-                else {
-                    map {($_, $bind_value, @bind_attr)}
-                    grep {$placeholders->{$_} eq ":$bind_param"} keys(%{$placeholders});
-                }
+                map {($_, $value, @attr)} do {
+                    if ($param =~ m/^[\:\$\?]/) {
+                        grep {$placeholders->{$_} eq $param} keys(%{$placeholders});
+                    }
+                    else {
+                        grep {$placeholders->{$_} eq ":$param"} keys(%{$placeholders});
+                    }
+                };
             }
         }
         else {
-            $bind_param, $bind_value, @bind_attr;
+            $param, $value, @attr;
         }
     };
-    return unless $self->SUPER::bind_param(@bind_param_args);
-    return @bind_param_args if wantarray;
-    return \@bind_param_args;
+    return unless $self->SUPER::bind_param(@args);
+    return @args if wantarray;
+    return \@args;
 }
 
 sub execute {
@@ -149,7 +156,7 @@ sub execute {
 }
 
 sub iterate {
-    return DBIx::Squirrel::it->new(@_);
+    return DBIx::Squirrel::Iterator->new(@_);
 }
 
 BEGIN {
@@ -159,13 +166,63 @@ BEGIN {
 }
 
 sub results {
-    return DBIx::Squirrel::rs->new(@_);
+    return DBIx::Squirrel::ResultSet->new(@_);
 }
 
 BEGIN {
     *resultset = subname(resultset => \&results);
     *rset      = subname(rset      => \&results);
     *rs        = subname(rs        => \&results);
+}
+
+memoize('statement_digest');
+
+sub statement_digest {sha256_base64(shift)}
+
+sub statement_normalise {
+    my $statement  = statement_trim(shift);
+    my $normalised = $statement;
+    $normalised =~ s{[\:\$\?]\w+\b}{?}g;
+    return $normalised, $statement, statement_digest($statement);
+}
+
+sub statement_study {
+    local($_);
+    my($normal, $trimmed, $digest) = statement_normalise(shift);
+    return unless length($trimmed);
+    my %positions_to_params_map = do {
+        if (my @params = $trimmed =~ m{[\:\$\?]\w+\b}g) {
+            map {(1 + $_ => $params[$_])} 0 .. $#params;
+        }
+        else {
+            ();
+        }
+    };
+    return \%positions_to_params_map, $normal, $trimmed, $digest;
+}
+
+sub statement_trim {
+    my $statement = do {
+        if (ref($_[0])) {
+            if (UNIVERSAL::isa($_[0], 'DBIx::Squirrel::st')) {
+                shift->_private_state->{OriginalStatement};
+            }
+            elsif (UNIVERSAL::isa($_[0], 'DBI::st')) {
+                shift->{Statement};
+            }
+            else {
+                throw(E_EXP_STH);
+            }
+        }
+        else {
+            defined($_[0]) ? shift : '';
+        }
+    };
+    $statement                  =~ s{\s+--\s+.*$}{}gm;
+    $statement                  =~ s{^[[:blank:]\r\n]+}{}gm;
+    $statement                  =~ s{[[:blank:]\r\n]+$}{}gm;
+    return '' unless $statement =~ m/\S/;
+    return $statement;
 }
 
 1;

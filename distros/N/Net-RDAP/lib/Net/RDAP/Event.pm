@@ -3,12 +3,13 @@ use DateTime::Format::ISO8601;
 use Net::RDAP::Link;
 use base qw(Net::RDAP::Base);
 use strict;
+use warnings;
 
 =pod
 
 =head1 NAME
 
-L<Net::RDAP::Event> - object representing an RDAP event.
+L<Net::RDAP::Event> - a module representing an RDAP event.
 
 =head1 DESCRIPTION
 

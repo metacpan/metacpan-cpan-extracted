@@ -261,6 +261,8 @@ Protocol (EPP) and Registration Data Access Protocol (RDAP) Status Mapping
 - [https://tools.ietf.org/html/rfc8288](https://tools.ietf.org/html/rfc8288) -  Web Linking
 - [https://tools.ietf.org/html/rfc8521](https://tools.ietf.org/html/rfc8521) -  Registration Data Access
 Protocol (RDAP) Object Tagging
+- [https://tools.ietf.org/html/rfc9536](https://tools.ietf.org/html/rfc9536) -  Registration Data Access
+Protocol (RDAP) Reverse Search
 - [https://tools.ietf.org/html/rfc9537](https://tools.ietf.org/html/rfc9537) -  Redacted Fields in the
 Registration Data Access Protocol (RDAP) Response
 
