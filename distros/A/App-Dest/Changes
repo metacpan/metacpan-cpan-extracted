@@ -1,5 +1,8 @@
 Revision history for App::Dest
 
+1.33      2024-08-28 19:15:23-07:00 America/Los_Angeles
+        - Fix bug with "preinstall NAME" not removing empty directory
+
 1.32      2023-08-21 13:35:34-07:00 America/Los_Angeles
         - Update to use more modern try syntax
 

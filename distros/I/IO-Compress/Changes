@@ -1,6 +1,20 @@
 CHANGES
 -------
 
+  2.213 28 August 2024
+
+      * version 2.213
+        Wed Aug 28 16:06:42 2024 +0100
+        020520f78490bf1a6b7351febd16fc19f351ddfe
+
+      * add perl5.40 to workflows
+        Sun Jun 16 16:56:37 2024 +0100
+        6d7dd85763f7cd0894a890208156187b8cac6597
+
+      * #57 Add stub moduile IO/Compress.pm
+        Sat May 25 08:53:57 2024 +0100
+        c6a05a69d62b8169d482d1b30a333b0cec4f5a06
+
   2.212 27 April 2024
 
       * no functional changes

@@ -58,7 +58,7 @@ sub mirror {
         foreach my $header (qw(expires date)) {
             if ($response->header($header)) {
                 my $time = HTTP::Date->str2time($response->header($header));
-                if ($time) {
+                if (defined($time)) {
                     $mtime = $time;
                     last;
                 }

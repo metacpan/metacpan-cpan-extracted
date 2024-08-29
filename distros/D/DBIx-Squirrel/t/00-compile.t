@@ -6,6 +6,7 @@ use Test::Compile;
 my @scripts = (
     'examples/transformations/01.pl',
     'examples/transformations/02.pl',
+    'examples/transformations/03.pl',
 );
 my $test = Test::Compile->new;
 $test->all_files_ok;

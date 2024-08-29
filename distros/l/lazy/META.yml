@@ -3,8 +3,6 @@ abstract: 'Lazily install missing Perl modules'
 author:
   - 'Olaf Alders <olaf@wundercounter.com>'
 build_requires:
-  App::cpm::Resolver::02Packages: '0'
-  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   LWP: '6.35'
@@ -12,14 +10,12 @@ build_requires:
   Path::Tiny: '0'
   Test::More: '0'
   Test::RequiresInternet: '0'
-  Test::TempDir::Tiny: '0'
-  local::lib: '2.000024'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,12 +27,15 @@ no_index:
     - t
     - xt
 requires:
-  App::cpm: '0.975'
+  App::cpm: '0.997017'
   App::cpm::CLI: '0'
+  Capture::Tiny: '0'
   Carp: '0'
   Getopt::Long: '0'
-  Module::Loaded: '0'
+  Sub::Identify: '0'
+  Sub::Name: '0'
   Try::Tiny: '0'
+  feature: '0'
   local::lib: '2.000024'
   perl: '5.010'
   strict: '0'
@@ -45,10 +44,10 @@ resources:
   bugtracker: https://github.com/oalders/lazy/issues
   homepage: https://github.com/oalders/lazy
   repository: https://github.com/oalders/lazy.git
-version: '0.000009'
+version: '1.000000'
 x_Dist_Zilla:
   perl:
-    version: '5.026001'
+    version: '5.034000'
   plugins:
     -
       class: Dist::Zilla::Plugin::PromptIfStale
@@ -62,7 +61,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Author::OALDERS/stale modules, build'
-      version: '0.055'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -74,15 +73,11 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Author::OALDERS/stale modules, release'
-      version: '0.055'
-    -
-      class: Dist::Zilla::Plugin::MAXMIND::TidyAll
-      name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.13'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@Author::OALDERS/CheckChangesHasContent'
@@ -91,13 +86,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '8'
       name: '@Author::OALDERS/MakeMaker'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@Author::OALDERS/CPANFile'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ContributorsFile
       name: '@Author::OALDERS/ContributorsFile'
@@ -105,47 +100,51 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::OALDERS/MetaJSON'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::OALDERS/MetaYAML'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::OALDERS/Manifest'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::OALDERS/MetaNoIndex'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::OALDERS/MetaConfig'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Author::OALDERS/MetaResources'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::OALDERS/License'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
-      version: '1.200011'
+      version: '1.200014'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
-          phase: runtime
+          phase: develop
           type: requires
-      name: '@Author::OALDERS/Prereqs'
-      version: '6.012'
+      name: '@Author::OALDERS/Modules for use with tidyall'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::OALDERS/ExecDir'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -161,9 +160,9 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/Test::PodSpelling'
       version: '2.007005'
     -
-      class: Dist::Zilla::Plugin::PodCoverageTests
-      name: '@Author::OALDERS/PodCoverageTests'
-      version: '6.012'
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::OALDERS/PodSyntaxTests'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Changes
       config:
@@ -172,22 +171,49 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/Test::CPAN::Changes'
       version: '0.012'
     -
+      class: Dist::Zilla::Plugin::Test::EOL
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/author/eol.t
+          finder:
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
+          trailing_whitespace: 1
+      name: '@Author::OALDERS/Test::EOL'
+      version: '0.19'
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
+      name: '@Author::OALDERS/Test::Pod::Coverage::Configurable'
+      version: '0.07'
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      config:
+        Dist::Zilla::Plugin::Test::Portability:
+          options: 'test_one_dot = 0'
+      name: '@Author::OALDERS/Test::Portability'
+      version: '2.001001'
+    -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::OALDERS/TestRelease'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Author::OALDERS/Test::ReportPrereqs'
-      version: '0.027'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::Test::TidyAll
       name: '@Author::OALDERS/Test::TidyAll'
       version: '0.04'
     -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@Author::OALDERS/Test::Version'
+      version: '1.09'
+    -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '8'
       name: '@Author::OALDERS/RunExtraTests'
       version: '0.029'
     -
@@ -200,78 +226,78 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::PodWeaver:
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Default/SingleEncoding'
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Name
               name: '@Default/Name'
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Version
               name: '@Default/Version'
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/prelude'
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Default/Leftovers'
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/postlude'
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Authors
               name: '@Default/Authors'
-              version: '4.015'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Default/Legal'
-              version: '4.015'
+              version: '4.019'
       name: '@Author::OALDERS/PodWeaver'
-      version: '4.008'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::OALDERS/PruneCruft'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@Author::OALDERS/CopyFilesFromBuild'
@@ -292,7 +318,6 @@ x_Dist_Zilla:
             - README.md
             - cpanfile
           exclude_match: []
-          follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''
           prune_directory: []
@@ -300,7 +325,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::OALDERS/Git::GatherDir'
-      version: '2.045'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -309,7 +334,7 @@ x_Dist_Zilla:
             - Install
           match: []
       name: '@Author::OALDERS/CopyFilesFromRelease'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -328,21 +353,21 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
-      version: '2.045'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.17.1
+          git_version: 2.34.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@Author::OALDERS/Git::Contributors'
-      version: '0.034'
+      version: '0.037'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -351,21 +376,29 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/ReadmeMdInBuild'
       version: '0.163250'
     -
+      class: Dist::Zilla::Plugin::StaticInstall
+      config:
+        Dist::Zilla::Plugin::StaticInstall:
+          dry_run: 1
+          mode: auto
+      name: '@Author::OALDERS/StaticInstall'
+      version: '0.012'
+    -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::OALDERS/ShareDir'
-      version: '6.012'
+      version: '6.032'
     -
-      class: Dist::Zilla::Plugin::TravisCI::StatusBadge
-      name: '@Author::OALDERS/TravisCI::StatusBadge'
-      version: '0.007'
+      class: Dist::Zilla::Plugin::CheckIssues
+      name: '@Author::OALDERS/CheckIssues'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::OALDERS/ConfirmRelease'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::OALDERS/UploadToCPAN'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -373,7 +406,7 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@Author::OALDERS/@Git::VersionManager/pluginbundle version'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
@@ -399,13 +432,14 @@ x_Dist_Zilla:
             - Changes
           match: []
       name: '@Author::OALDERS/@Git::VersionManager/CopyFilesFromRelease'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
+          signoff: '0'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -419,12 +453,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/release snapshot'
-      version: '2.045'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -432,16 +466,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000009
-          tag_format: v%v
-          tag_message: v%v
+          tag: v1.000000
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/Git::Tag'
-      version: '2.045'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -457,13 +491,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::OALDERS/@Git::VersionManager/NextRelease'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: 'increment $VERSION after %v release'
+          signoff: '0'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Build.PL
@@ -473,12 +508,12 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/post-release commit'
-      version: '2.045'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -487,10 +522,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
-      version: '2.045'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -498,7 +533,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -506,7 +541,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: DevelopRequires
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -514,11 +549,11 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -526,54 +561,57 @@ x_Dist_Zilla:
           dry_run: 0
           mode: auto
       name: StaticInstall
-      version: '0.011'
+      version: '0.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.012'
+      version: '6.032'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.012'
+    version: '6.032'
 x_contributors:
+  - 'E. Choroba <choroba@matfyz.cz>'
+  - 'Olaf Alders <olaf.alders@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
-x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0
 x_static_install: 1

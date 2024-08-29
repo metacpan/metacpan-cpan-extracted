@@ -1,12 +1,13 @@
 use 5.010_001;
 use strict;
 use warnings;
-use open ':std', ':encoding(utf8)';
 use Carp qw/croak/;
-use Test::More;
 use Test::Warn;
 use FindBin qw/$Bin/;
 use lib "$Bin/lib";
+
+use Test::More;
+use Test::More::UTF8;
 
 BEGIN {
     use_ok('DBIx::Squirrel', database_entities => [qw/db artist artists/]) || print "Bail out!\n";
@@ -34,13 +35,13 @@ my $artists = artists->_private_state;
 my $results  = artists->all;
 my $expected = ['Rush', 'Envy of None', 'Alex Lifeson', 'Simply Red', 'Skank', 'Smashing Pumpkins'];
 is_deeply($results, $expected, 'iteration, filtering, injection ok');
-is($artists->{buffer_size_fixed}, !!0,                                          'artists->{buffer_size_fixed}');
-is($artists->{buffer_size},       &DBIx::Squirrel::Iterator::BUFFER_SIZE_LIMIT, 'artists->{buffer_size}');
+is($artists->{cache_size_fixed}, !!0,                                          'artists->{cache_size_fixed}');
+is($artists->{cache_size},       &DBIx::Squirrel::Iterator::CACHE_SIZE_LIMIT, 'artists->{cache_size}');
 
-artists->buffer_size(8)->execute;
+artists->cache_size(8)->execute;
 $results = artists->all;
 is_deeply($results, $expected, 'iteration, filtering, injection ok');
-is($artists->{buffer_size_fixed}, !!1, 'artists->{buffer_size_fixed}');
-is($artists->{buffer_size},       8,   'artists->{buffer_size}');
+is($artists->{cache_size_fixed}, !!1, 'artists->{cache_size_fixed}');
+is($artists->{cache_size},       8,   'artists->{cache_size}');
 
 done_testing();

@@ -16,7 +16,12 @@ void watch_thread_log(void* buffer, int len) {
 #endif
 
 void* watch_thread_main(void* unused) {
-   while (do_watch()) {}
+   sigset_t mask;
+   sigfillset(&mask);
+   if (pthread_sigmask(SIG_BLOCK, &mask, NULL) != 0)
+      perror("pthread_sigmask");
+   else
+      while (do_watch()) {}
    return NULL;
 }
 

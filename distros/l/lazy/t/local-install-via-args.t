@@ -2,10 +2,9 @@ use strict;
 use warnings;
 use local::lib qw( --no-create );
 
-use Capture::Tiny qw( capture );
+use Capture::Tiny        qw( capture );
 use Path::Iterator::Rule ();
-use Test::More;
-use Test::TempDir::Tiny qw( tempdir );
+use Test::More import => [qw( diag done_testing like ok )];
 use Test::RequiresInternet (
     'cpan.metacpan.org'        => 443,
     'cpanmetadb.plackperl.org' => 80,
@@ -16,8 +15,7 @@ my $darkpan;
 my $dir;
 
 BEGIN {
-    use App::cpm::Resolver::02Packages ();
-    use Path::Tiny qw( path );
+    use Path::Tiny qw( path tempdir );
 
     $darkpan = path('t/test-data/darkpan')->stringify;
     $dir     = tempdir();
@@ -28,7 +26,8 @@ BEGIN {
 # don't accidentally try to install any test deps here.
 use lazy (
     '-L', $dir, '--workers', 1, '--resolver',
-    '02packages,' . $darkpan, $^V < 5.16 ? ( '--resolver', 'metadb' ) : (),
+    '02packages,' . $darkpan,
+    $^V < 5.16 ? ( '--resolver', 'metadb' ) : (),
     '--reinstall', '-v'
 );
 
@@ -40,15 +39,17 @@ my ( $stdout, $stderr, @result )
 like( $stderr, qr{installed}, 'module installed' );
 
 my $rule = Path::Iterator::Rule->new->file->nonempty;
-my $next = $rule->iter($dir);
 my $found;
-while ( defined( my $file = $next->() ) ) {
-    if ( $file =~ m{StaticInstall.pm\z} ) {
-        $found = 1;
-        last;
+{
+    my $next = $rule->iter($dir);
+    while ( defined( my $file = $next->() ) ) {
+        if ( $file =~ m{StaticInstall.pm\z} ) {
+            $found = 1;
+            last;
+        }
     }
+    ok( $found, 'file installed locally' );
 }
-ok( $found, 'file installed locally' );
 
 # Mostly helpful for CPANTesters reports
 if ( !$found ) {

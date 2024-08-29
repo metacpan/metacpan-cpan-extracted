@@ -1,10 +1,9 @@
-use 5.010_001;
-use strict;
-use warnings;
-
 package    # hide from PAUSE
   DBIx::Squirrel::ResultClass;
 
+use 5.010_001;
+use strict;
+use warnings;
 use Sub::Name;
 use DBIx::Squirrel::Utils qw/throw/;
 use namespace::clean;

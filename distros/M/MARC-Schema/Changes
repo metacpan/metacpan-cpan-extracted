@@ -1,7 +1,10 @@
 Revision history for MARC-Schema
 
+0.15  2024-08-29 10:58:51 CEST
+  - update schema gh#9. Thanks to Péter Király
+
 0.14  2023-03-11 15:43:00 CET
-  - fix gh#8 vy Steve Rogerson
+  - fix gh#8 by Steve Rogerson
   - add contributor
   - fix version
 

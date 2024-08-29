@@ -1,0 +1,5 @@
+1.0.0   Wed Aug 28 04:13:30 PM UTC 2024
+        - Initial release of API client for https://kanye.rest
+        - demo project for Perl API clients, using Util::H2O::More
+        - found via, https://www.freepublicapis.com/ - this will
+          be a lot of fun ...

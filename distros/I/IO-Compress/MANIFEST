@@ -16,6 +16,7 @@ examples/compress-zlib/gzgrep   perl
 examples/compress-zlib/gzstream perl
 lib/Compress/Zlib.pm
 lib/File/GlobMapper.pm
+lib/IO/Compress.pm
 lib/IO/Compress/FAQ.pod
 lib/IO/Compress/Adapter/Bzip2.pm
 lib/IO/Compress/Adapter/Deflate.pm

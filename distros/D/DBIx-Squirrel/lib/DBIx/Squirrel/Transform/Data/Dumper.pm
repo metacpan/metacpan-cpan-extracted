@@ -1,8 +1,9 @@
-use strict;
-use warnings;
-
 package    # hide from PAUSE
   DBIx::Squirrel::Transform::Data::Dumper;
+
+use strict;
+use warnings;
+use Data::Dumper;
 
 BEGIN {
     require DBIx::Squirrel unless keys(%DBIx::Squirrel::);
@@ -12,8 +13,6 @@ BEGIN {
     @DBIx::Squirrel::Transform::Data::Dumper::EXPORT_OK = qw/as_perl/;
     @DBIx::Squirrel::Transform::Data::Dumper::EXPORT    = @DBIx::Squirrel::Transform::Data::Dumper::EXPORT_OK;
 }
-
-use Data::Dumper;
 
 sub as_perl {
     return sub {

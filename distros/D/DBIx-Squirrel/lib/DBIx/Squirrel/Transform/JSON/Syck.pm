@@ -1,8 +1,9 @@
-use strict;
-use warnings;
-
 package    # hide from PAUSE
   DBIx::Squirrel::Transform::JSON::Syck;
+
+use strict;
+use warnings;
+use JSON::Syck;
 
 BEGIN {
     require DBIx::Squirrel unless keys(%DBIx::Squirrel::);
@@ -12,8 +13,6 @@ BEGIN {
     @DBIx::Squirrel::Transform::JSON::Syck::EXPORT_OK = qw/as_json/;
     @DBIx::Squirrel::Transform::JSON::Syck::EXPORT    = @DBIx::Squirrel::Transform::JSON::Syck::EXPORT_OK;
 }
-
-use JSON::Syck;
 
 sub as_json {
     return sub {

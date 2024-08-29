@@ -1,6 +1,7 @@
 use DBIx::Squirrel database_entities => [qw/db get_artist_by_id/];
 use DBIx::Squirrel::Transform::IO         qw/stderr/;
 use DBIx::Squirrel::Transform::JSON::Syck qw/as_json/;
+use DBIx::Squirrel::Iterator              qw/iterator result result_offset/;
 
 db do {
     DBIx::Squirrel->connect(
@@ -19,7 +20,7 @@ get_artist_by_id do {
 };
 
 foreach my $id (1 .. 9) {
-    get_artist_by_id($id => as_json() => stderr("%s\n"))->single;
+    get_artist_by_id($id => sub {print result_offset, " ", iterator, "\n"; result} => as_json() => stderr("%s\n"))->single;
 }
 
 db->disconnect();

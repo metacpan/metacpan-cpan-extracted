@@ -44,13 +44,15 @@ use SNMP::Info::Aggregate 'agg_ports_ifstack';
 
 our ($VERSION, %GLOBALS, %FUNCS, %MIBS, %MUNGE);
 
-$VERSION = '3.970001';
+$VERSION = '3.971000';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
     %SNMP::Info::Aggregate::MIBS,
     'FORTINET-CORE-MIB'      => 'fnSysSerial',
     'FORTINET-FORTIGATE-MIB' => 'fgVdMaxVdoms',
+    'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB' => 'fmSysVersion',
+    'FORTINET-FORTIAUTHENTICATOR-MIB' => 'facSysVersion',
 );
 
 %GLOBALS = (
@@ -111,7 +113,7 @@ sub os {
 sub os_ver {
     my $fortinet = shift;
 
-    my $ver = $fortinet->fgSysVersion() || '';
+    my $ver = $fortinet->fgSysVersion() || $fortinet->fmSysVersion() || $fortinet->facSysVersion() || '';
 
     if ( $ver =~ /(\d+[\.\d]+)/ ) {
         return $1;
@@ -174,6 +176,10 @@ Abstraction subclass for Fortinet network devices.
 
 =item F<FORTINET-CORE-MIB>
 
+=item F<FORTINET-FORTIAUTHENTICATOR-MIB>
+
+=item F<FORTINET-FORTIMANAGER-FORTIANALYZER-MIB>
+
 =item F<FORTINET-FORTIGATE-MIB>
 
 =item Inherited Classes' MIBs
@@ -204,7 +210,11 @@ Returns 'fortios'
 
 =item $fortinet->os_ver()
 
-Returns the software version extracted from (C<systemVersion>).
+Returns the software version extracted from the Fortinet MIB in this order:
+
+(C<fgSysVersion>)
+(C<fmSysVersion>)
+(C<facSysVersion>)
 
 =item $fortinet->serial()
 

@@ -1,5 +1,12 @@
 Revision history for lazy
 
+1.000000  2024-08-29 02:16:08Z
+    - Try to prevent deep recursion (GH#7) (Olaf Alders)
+    - Simplify (change) public API (GH#7) (Olaf Alders)
+    - Skip autoload and Net::DNS::Resolver classes
+    - Use a named coderef to help ensure we don't add the sub to \@inc twice
+    - Make tidy happy (GH#4) (E. Choroba)
+
 0.000009  2018-07-26 20:02:15Z
     - Use a relative file path in test
 

@@ -37,11 +37,11 @@ BEGIN {
 }
 
 
-eval ' use IO::Uncompress::Bunzip2 2.201 ;';
-eval ' use IO::Uncompress::RawInflate 2.201 ;';
-eval ' use IO::Uncompress::UnLzma 2.201 ;';
-eval ' use IO::Uncompress::UnXz 2.201 ;';
-eval ' use IO::Uncompress::UnZstd 2.201 ;';
+eval ' use IO::Uncompress::Bunzip2 2.213 ;';
+eval ' use IO::Uncompress::RawInflate 2.213 ;';
+eval ' use IO::Uncompress::UnLzma 2.213 ;';
+eval ' use IO::Uncompress::UnXz 2.213 ;';
+eval ' use IO::Uncompress::UnZstd 2.213 ;';
 
 my %methodNames;
 

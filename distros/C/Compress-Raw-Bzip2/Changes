@@ -1,7 +1,72 @@
 CHANGES
 -------
 
-  2.212 27 April 2024
+  2.213 28 August 2024
+
+      * version 2.213
+        Wed Aug 28 15:48:25 2024 +0100
+        63a2ca4e124d88914c000742f082126db9a99c03
+
+      * Use -xc++ when building with C++
+        Mon Jun 17 10:47:25 2024 +0100
+        85daf683caff0fe1b2dafc49998fd6355bdf0da0
+
+      * more fixes
+        Sun Jun 16 11:32:20 2024 +0100
+        3353249cb9e6e25e06aa9ee4d5c74d0cbb45b5a3
+
+      * upstream fixes
+        Sun Jun 16 11:20:58 2024 +0100
+
+      * version 2.213
+        Wed Aug 28 15:48:25 2024 +0100
+        63a2ca4e124d88914c000742f082126db9a99c03
+
+      * Use -xc++ when building with C++
+        Mon Jun 17 10:47:25 2024 +0100
+        85daf683caff0fe1b2dafc49998fd6355bdf0da0
+
+      * more fixes
+        Sun Jun 16 11:32:20 2024 +0100
+        3353249cb9e6e25e06aa9ee4d5c74d0cbb45b5a3
+
+      * upstream fixes
+        Sun Jun 16 11:20:58 2024 +0100
+        f01726f4ab5b1a229d710d45cf310018185ea744
+
+      * rework upstream workflow
+        Sun Jun 16 09:56:02 2024 +0100
+        4c1ba3c333de52e9ec32356c3f720bdccd8f2481
+
+      * rework upstream workflows
+        Sun Jun 16 09:42:05 2024 +0100
+        54cb21c1ac4b795fcd32306c91d07b68b6c8411d
+
+      * no werror for main macos workflow
+        Sun Jun 16 09:36:51 2024 +0100
+        cb9ae2fbec6fa6f0f196cc133ada3e282b80c96f
+
+      * fix  workflows
+        Sun Jun 16 09:33:04 2024 +0100
+        809481c0f36e640c70c24d07401bf2b8b06038a1
+
+      * Merge remote-tracking branch 'origin/master'
+        Sun Jun 16 09:24:46 2024 +0100
+        791d14716523804153a09ffb689b39143807b749
+
+      * Add workflow for perl 5.40
+        Sun Jun 16 09:19:11 2024 +0100
+        e94d2dac2dd3a04e7af5bb8efd461d188d14d21a
+
+      * Merge pull request #15 from haarg-contrib/silence-unused-var
+        Mon Jun 10 21:33:59 2024 +0100
+        a536bcd45bd65a0be8ca8b17fad11ecf0e7d75ef
+
+      * silence unused variable warnings
+        Mon Jun 10 21:15:34 2024 +0200
+        7798ad06a2b184112bffa54a7339771bfeec65c4
+
+  2.213 27 April 2024
 
       * no functional changes
 

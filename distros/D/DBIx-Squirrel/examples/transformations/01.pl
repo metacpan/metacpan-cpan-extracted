@@ -1,4 +1,5 @@
 use DBIx::Squirrel database_entities => [qw/db get_artist_id_by_name/];
+use DBIx::Squirrel::Iterator qw/iterator result result_offset/;
 
 db do {
     DBIx::Squirrel->connect(
@@ -19,7 +20,7 @@ get_artist_id_by_name do {
             print "----\n";
             print "Name: ", $artist->Name, "\n";
             return $artist;
-        } => sub {$_->ArtistId}
+        } => sub {print result_offset, " ", iterator, "\n"; result} => sub {$_->ArtistId}
     );
 };
 

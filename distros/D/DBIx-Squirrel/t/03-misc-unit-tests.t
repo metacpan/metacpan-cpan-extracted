@@ -1,13 +1,14 @@
 use 5.010_001;
 use strict;
 use warnings;
-use open ':std', ':encoding(utf8)';
-use Test::More;
-use Test::MockModule;
 use Test::Exception;
+use Test::MockModule;
 use Test::Warnings qw/warning/;
 use FindBin        qw/$Bin/;
 use lib "$Bin/lib";
+
+use Test::More;
+use Test::More::UTF8;
 
 BEGIN {
     use_ok('DBIx::Squirrel',           database_entity => 'db')            || print "Bail out!\n";

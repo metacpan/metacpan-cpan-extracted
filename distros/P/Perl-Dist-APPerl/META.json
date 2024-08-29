@@ -58,7 +58,7 @@
          "web" : "https://github.com/G4Vi/Perl-Dist-APPerl"
       }
    },
-   "version" : "v0.6.0",
+   "version" : "v0.6.1",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

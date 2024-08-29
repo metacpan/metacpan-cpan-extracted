@@ -1,8 +1,9 @@
 use 5.010_001;
 use strict;
 use warnings;
-use open ':std', ':encoding(utf8)';
+
 use Test::More;
+use Test::More::UTF8;
 
 BEGIN {
     use_ok('DBIx::Squirrel', database_entity => 'foo', database_entities => ['bar', 'baz']) || print "Bail out!\n";

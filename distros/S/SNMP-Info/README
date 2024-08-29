@@ -2,7 +2,7 @@ NAME
     SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 VERSION
-    SNMP::Info - Version 3.970001
+    SNMP::Info - Version 3.971000
 
 AUTHOR
     SNMP::Info is maintained by team of Open Source authors headed by Eric
@@ -637,6 +637,9 @@ SUBCLASSES
         SNMP::Info::Layer3::Altiga
             See documentation in SNMP::Info::Layer3::Altiga for details.
 
+        SNMP::Info::Layer3::Meraki
+            See documentation in SNMP::Info::Layer3::Meraki for details.
+
         SNMP::Info::Layer3::Arista
             See documentation in SNMP::Info::Layer3::Arista for details.
 
@@ -883,6 +886,11 @@ SUBCLASSES
             Subclass for redlion routers.
 
             See documentation in SNMP::Info::Layer3::Redlion for details.
+
+        SNMP::Info::Layer3::SilverPeak
+            Subclass for SilverPeak devices.
+
+            See documentation in SNMP::Info::Layer3::SilverPeak for details.
 
         SNMP::Info::Layer3::Scalance
             Subclass for Siemens Scalance devices.

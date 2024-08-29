@@ -37,6 +37,7 @@ BEGIN {
         func => [
             qw/
               diagdump
+              notedump
               /,
         ],
     );
@@ -82,5 +83,7 @@ our $DBD_SQLite_VERSION = do {
 our $SKIP_SQLITE_PARAMVALUES_CHECKS = $DBD_SQLite_VERSION < 1.056_000;
 
 sub diagdump {diag(explain(@_))}
+
+sub notedump {note(explain(@_))}
 
 1;

@@ -1,11 +1,11 @@
 
                            Archive-Zip-SimpleZip
 
-                               Version 1.000
+                               Version 1.001
 
-                                25 June 2022
+                               28 August 2024
 
-        Copyright (c) 2012-2022 Paul Marquess. All rights reserved.
+        Copyright (c) 2012-2024 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
            and/or modify it under the same terms as Perl itself.
 
@@ -24,7 +24,7 @@ Before you can build Archive-Zip-SimpleZip you need to have the following
 installed on your system:
 
     * Perl 5.006 or better.
-    * IO::Compress version 2.201 or better.
+    * IO::Compress version 2.213 or better.
 
 BUILDING THE MODULE
 -------------------

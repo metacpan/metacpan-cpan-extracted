@@ -2,8 +2,9 @@ use Test2::V0;
 use strict;
 use warnings;
 use IO::SocketAlarm 'socketalarm';
-use Socket;
+use Socket ":all";
 use Time::HiRes 'sleep';
+use IO::Socket;
 
 sub tcp_socketpair;
 sub collect_alarms {
@@ -69,6 +70,8 @@ sub tcp_socketpair {
       or $!{EINPROGRESS} or die "connect: $!";
    accept my $ss, $tcp_listen
       or die "accept: $!";
+   setsockopt($sc, IPPROTO_TCP, TCP_NODELAY, 1);
+   setsockopt($ss, IPPROTO_TCP, TCP_NODELAY, 1);
    return ($sc, $ss);
 }
 close $tcp_listen;

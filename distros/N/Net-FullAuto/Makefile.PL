@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000781';
+our $VERSION='1.0000788';
 
 my $sudo=($^O eq 'cygwin')?'':'sudo ';
 print "AFTER BEGIN BLOCK FREEMEM: ".`${sudo}cat /proc/meminfo | grep MemFree`;
@@ -203,8 +203,8 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
          local $SIG{__DIE__}; # No sigdie handler
          require CPAN;
          CPAN::HandleConfig->load;
-         CPAN::Shell::setup_output;
-         CPAN::Index->reload;
+         #CPAN::Shell::setup_output;
+         #CPAN::Index->reload;
       };
       my $d = $CPAN::Config->{build_dir};
       if (!(defined $d) || !(-d $d)) {
@@ -221,6 +221,8 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
       $ENV{CPAN_GZIP}=$CPAN::Config->{gzip} if defined $CPAN::Config->{gzip}
          && $CPAN::Config->{gzip};
       $ENV{CPAN_TAR}=$CPAN::Config->{tar} if defined $CPAN::Config->{tar}
+         && $CPAN::Config->{tar};
+      $ENV{CPAN_WGET}=$CPAN::Config->{wget} if defined $CPAN::Config->{wget}
          && $CPAN::Config->{tar};
    }
    # Bullet Proof Test for AWS EC2
@@ -1860,16 +1862,114 @@ sub fa_install_mod {
       } elsif ($version && $p eq 'Term::RawInput') {
          $p="REEDFISH/Term-RawInput-$version.tar.gz";
       }
-      print "==> $p required."
-      and print "*** Installing $p via CPAN\n"
-      and
-      eval {
-         local $SIG{__DIE__}; # No sigdie handler;
-         require CPAN;
-         CPAN::Shell->notest('get',$p);
-      };
-      if ($@) {
-         fa_die("CPAN Error: $@ $!\n");
+      if (exists $amazon{instance_type} &&
+            $amazon{instance_type}=~/micro|nano/) {
+         print "==> $p required."
+         and print "*** Installing $p via CPAN\n";
+         #if ($ARGV[$#ARGV]=~/^\d+$/) {
+         #   pop @ARGV;pop @ARGV;
+         #}
+         #shift @ARGV if $ARGV[0] eq 'SKIP';
+         #my $argvs=join " ", @ARGV;
+         #my $exec_cmd="sudo su -c '"
+         #            ."sync;echo 3 > /proc/sys/vm/drop_caches;"
+         #            ."swapoff -a && swapon -a';cd \"$cwd\";"
+         #            ."cpan -T $p;"
+         #            ."$^X Makefile.PL $argvs SKIP";
+         my $d=$ENV{CPAN_BUILD_DIR};
+         $d=~s/^(.*)\/.*$/$1/;
+	 my $authdir=$cpanfil;
+	 $authdir=~s/^(.*)\/.*/$1/;
+	 my $proc=$$;
+         my $getfile=$d.'/sources/authors/id/'.$cpanfil.'.tmp'.$proc;
+         my $getchek=$d.'/sources/authors/id/'.$authdir.'/CHECKSUMS';
+         my $cpanurl='https://cpan.org/authors/id/'.$cpanfil;
+	 my $cpan_gz=$cpanfil;
+	 $cpan_gz=~s/^.*\/(.*)$/$1/;
+	 my $cpan_bf=$cpan_gz;
+	 $cpan_bf=~s/[.]tar[.]gz.*$//;
+         my $cpanchk='https://cpan.org/authors/id/'.$authdir.'/CHECKSUMS';
+         fa_system('mkdir -vp '.$d.'/sources/authors/id/'.$authdir);
+         #fa_system($ENV{CPAN_WGET}." -nv -o - -O \"$getfile\" $cpanurl");
+         if ($ARGV[$#ARGV]!~/$cpan_gz/) {
+            if ($ARGV[$#ARGV]=~/^\d+$/) {
+               pop @ARGV;pop @ARGV;
+            }
+            shift @ARGV if $ARGV[0] eq 'SKIP';
+            my $argvs=join " ", @ARGV;
+            my $exec_cmd="sudo su -c '"
+                        ."sync;echo 3 > /proc/sys/vm/drop_caches;"
+                        ."swapoff -a && swapon -a';cd \"$cwd\";"
+                        .$ENV{CPAN_WGET}." -nv -o - -O \"$getfile\" $cpanurl;"
+                        .$ENV{CPAN_WGET}." -nv -o - -O \"$getchek\" $cpanchk;"
+                        ."$^X Makefile.PL $argvs SKIP $$ $cpan_gz";
+            exec $exec_cmd;
+         } else {
+            pop @ARGV;
+            my $pid=pop@ARGV;
+            $getfile=~s/${$}$/$pid/; 
+         }
+	 #print "WGET COMMAND=",'sudo '.$ENV{CPAN_WGET}." -O \"$getfile\" $cpanurl";
+         #fa_system($ENV{CPAN_WGET}." -nv -o - -O \"$getchek\" $cpanchk");
+         open(FH,"<$getchek") || fa_die("Cannot open $getchek $!");
+	 my $sha=0;
+         while (my $line=<FH>) {
+            if (-1<index $line,$cpan_gz) {
+               $sha=1;
+            } elsif ($sha) {
+               if (-1<index $line,'sha256') {
+                  $sha=$line;
+		  $sha=~s/^.*sha256['].*?['](.*)['].*$/$1/;
+		  chomp($sha);
+                  last;
+               }
+            }
+         } close(FH);
+         open(FILE, $getfile) or fa_die("Can't open '$getfile': $!");
+         binmode(FILE);
+         require Digest::SHA;
+         import Digest::SHA;
+         my $digestsha=Digest::SHA->new(256)->addfile(*FILE)->hexdigest;
+         if ($sha eq $digestsha) {
+            print(qq{ + CHECKSUM Test for $cpan_gz *PASSED* \n})
+               if $CPAN::DEBUG;
+         } else {
+            print "CHECKSUM test for $cpan_gz *FAILED*\n";
+            print "CALCULATED=$digestsha and ",
+                  "DOWNLOADED=$sha\n";
+            print "\nPress ANY key to terminate FullAuto ",
+                  "installation ...\n";
+            <STDIN>;
+            fa_die("FATAL ERROR! : ".
+               "CHECKSUM Test for $cpan_gz *FAILED*\n");
+         }
+         close(FILE);
+	 my $cpangz=$getfile;
+	 $cpangz=~s/^(.*).tmp$proc$/$1/;
+	 fa_system("mv $getfile $cpangz");
+	 opendir (DIR,$d) || fa_die("Error in opening dir $d\n");
+	 my $bf=0;
+         while( (my $itm=readdir(DIR))) {
+            if (-1<index $itm,$cpan_bf) {
+               $bf++;
+            }
+         }
+         closedir(DIR);
+	 fa_system("$ENV{CPAN_TAR} -C$ENV{CPAN_BUILD_DIR} -xf $cpangz");
+	 fa_system("mv -v $ENV{CPAN_BUILD_DIR}/$cpan_bf $ENV{CPAN_BUILD_DIR}/$cpan_bf-$bf");
+         #exec $exec_cmd;
+      } else {
+         print "==> $p required."
+         and print "*** Installing $p via CPAN\n"
+         and
+         eval {
+            local $SIG{__DIE__}; # No sigdie handler;
+            require CPAN;
+            CPAN::Shell->notest('get',$p);
+         };
+         if ($@) {
+            fa_die("CPAN Error: $@ $!\n");
+         }
       }
       if ($version && (-1<index $p,'Term-Menus')) {
          $p='Term::Menus';

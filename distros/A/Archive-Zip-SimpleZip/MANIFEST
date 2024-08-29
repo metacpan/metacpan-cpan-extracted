@@ -15,9 +15,6 @@ t/999pod.t
 t/meta-json.t
 t/meta-yaml.t
 t/compress/CompTestUtils.pm
-t/Test/Builder.pm
-t/Test/More.pm
-t/Test/Simple.pm
 t/mkTestZips
 t/files/jar.zip
 META.yml                                 Module YAML meta-data (added by MakeMaker)

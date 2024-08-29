@@ -8,6 +8,7 @@ README
 dist.ini
 examples/transformations/01.pl
 examples/transformations/02.pl
+examples/transformations/03.pl
 lib/DBIx/Squirrel.pm
 lib/DBIx/Squirrel/Iterator.pm
 lib/DBIx/Squirrel/ResultClass.pm

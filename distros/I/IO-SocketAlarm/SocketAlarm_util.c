@@ -20,6 +20,7 @@ int snprint_sockaddr(char *buffer, size_t buflen, struct sockaddr *addr) {
       return snprintf(buffer, buflen, "unix %s", ((struct sockaddr_un*)addr)->sun_path);
    }
 #endif
+   return snprintf(buffer, buflen, "(unsupported address family %d)", (int)addr->sa_family);
 }
 
 int parse_signal(SV *name_sv) {

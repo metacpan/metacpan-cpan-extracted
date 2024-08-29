@@ -16,7 +16,7 @@ severity = 3
 
 [InputOutput::RequireCheckedSyscalls]
 functions = :builtins
-exclude_functions = sleep
+exclude_functions = print sleep
 severity = 3
 
 [Moose::RequireCleanNamespace]
@@ -24,7 +24,7 @@ modules = Moose Moose::Role MooseX::Role::Parameterized Moose::Util::TypeConstra
 cleaners = namespace::autoclean
 
 [NamingConventions::Capitalization]
-package_exemptions = [A-Z]\w+|minFraud
+package_exemptions = lazy
 file_lexical_variables = [A-Z]\w+|[^A-Z]+
 global_variables = :starts_with_upper
 scoped_lexical_variables = [A-Z]\w+|[^A-Z]+

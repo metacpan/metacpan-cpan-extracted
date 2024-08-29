@@ -5,13 +5,13 @@ use File::Spec;
 use File::Slurp;
 use Test::More;
 use URI;
-use JSON::XS;
+use JSON;
 use File::Slurp;
 use strict;
 
 require_ok 'Net::RDAP::JCard';
 
-my $json = JSON::XS->new->utf8->decode(join('', read_file(File::Spec->catfile(abs_path(dirname(__FILE__)), q{jcard.json}))));
+my $json = JSON->new->utf8->decode(join('', read_file(File::Spec->catfile(abs_path(dirname(__FILE__)), q{jcard.json}))));
 
 is(ref($json), 'ARRAY');
 is(scalar(@{$json}), 2);

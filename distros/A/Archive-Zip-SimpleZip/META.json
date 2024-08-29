@@ -4,7 +4,7 @@
       "Paul Marquess <pmqs@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,23 +34,26 @@
       },
       "runtime" : {
          "recommends" : {
-            "IO::Compress::Bzip2" : "2.201",
-            "IO::Compress::Lzma" : "2.201",
-            "IO::Compress::Xz" : "2.201",
-            "IO::Compress::Zstd" : "2.201",
-            "IO::Uncompress::Bunzip2" : "2.201",
-            "IO::Uncompress::UnLzma" : "2.201",
-            "IO::Uncompress::UnXz" : "2.201",
-            "IO::Uncompress::UnZstd" : "2.201"
+            "IO::Compress::Bzip2" : "2.213",
+            "IO::Compress::Lzma" : "2.213",
+            "IO::Compress::Xz" : "2.213",
+            "IO::Compress::Zstd" : "2.213",
+            "IO::Uncompress::Bunzip2" : "2.213",
+            "IO::Uncompress::UnLzma" : "2.213",
+            "IO::Uncompress::UnXz" : "2.213",
+            "IO::Uncompress::UnZstd" : "2.213"
          },
          "requires" : {
-            "IO::Compress::Base" : "2.201",
-            "IO::Compress::Bzip2" : "2.201",
-            "IO::Compress::RawDeflate" : "2.201",
-            "IO::Compress::Zip" : "2.201",
-            "IO::Uncompress::Base" : "2.201",
-            "IO::Uncompress::RawInflate" : "2.201",
-            "IO::Uncompress::Unzip" : "2.201",
+            "IO::Compress::Base" : "2.213",
+            "IO::Compress::Bzip2" : "2.213",
+            "IO::Compress::Lzma" : "2.213",
+            "IO::Compress::RawDeflate" : "2.213",
+            "IO::Compress::Xz" : "2.213",
+            "IO::Compress::Zip" : "2.213",
+            "IO::Compress::Zstd" : "2.213",
+            "IO::Uncompress::Base" : "2.213",
+            "IO::Uncompress::RawInflate" : "2.213",
+            "IO::Uncompress::Unzip" : "2.213",
             "Perl::OSType" : "0"
          }
       }
@@ -67,6 +70,6 @@
          "web" : "https://github.com/pmqs/Archive-Zip-SimpleZip"
       }
    },
-   "version" : "1.000",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

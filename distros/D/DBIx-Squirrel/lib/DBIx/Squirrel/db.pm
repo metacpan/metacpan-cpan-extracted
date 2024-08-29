@@ -1,11 +1,10 @@
+package    # hide from PAUSE
+  DBIx::Squirrel::db;
+
 use 5.010_001;
 use strict;
 use warnings;
 no strict 'subs';    ## no critic
-
-package              # hide from PAUSE
-  DBIx::Squirrel::db;
-
 use DBI;
 use Sub::Name;
 use DBIx::Squirrel::st    qw/statement_study/;

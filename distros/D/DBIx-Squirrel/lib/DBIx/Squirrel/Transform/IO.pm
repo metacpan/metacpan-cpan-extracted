@@ -1,8 +1,9 @@
-use strict;
-use warnings;
-
 package    # hide from PAUSE
   DBIx::Squirrel::Transform::IO;
+
+use strict;
+use warnings;
+use DBIx::Squirrel::Iterator qw/result/;
 
 BEGIN {
     require DBIx::Squirrel unless keys(%DBIx::Squirrel::);
@@ -12,8 +13,6 @@ BEGIN {
     @DBIx::Squirrel::Transform::IO::EXPORT_OK = qw/stdout stderr/;
     @DBIx::Squirrel::Transform::IO::EXPORT    = @DBIx::Squirrel::Transform::IO::EXPORT_OK;
 }
-
-use DBIx::Squirrel::Iterator qw/result/;
 
 sub stdout {
     if (@_) {

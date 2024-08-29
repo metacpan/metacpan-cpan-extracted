@@ -1015,8 +1015,8 @@ DESCRIPTION
 
     The following package globals define the relevant default settings:
 
-        $DBIx::Squirrel::it::DEFAULT_BUFFER_SIZE = 2;   # initial buffer-size
-        $DBIx::Squirrel::it::BUFFER_SIZE_LIMIT   = 64;  # maximum buffer-size
+        $DBIx::Squirrel::it::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
+        $DBIx::Squirrel::it::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
 
    "buffer_size_slice"
         ($buffer_size, $slice) = $itor->buffer_size_slice();
@@ -1057,8 +1057,8 @@ DESCRIPTION
     The following package globals define the relevant default settings:
 
         $DBIx::Squirrel::it::DEFAULT_SLICE       = [];  # slicing strategy
-        $DBIx::Squirrel::it::DEFAULT_BUFFER_SIZE = 2;   # initial buffer-size
-        $DBIx::Squirrel::it::BUFFER_SIZE_LIMIT   = 64;  # maximum buffer-size
+        $DBIx::Squirrel::it::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
+        $DBIx::Squirrel::it::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
 
    "count"
         $count = $itor->count;
@@ -1271,8 +1271,8 @@ DESCRIPTION
     The following package globals define the relevant default settings:
 
         $DBIx::Squirrel::it::DEFAULT_SLICE       = [];  # slicing strategy
-        $DBIx::Squirrel::it::DEFAULT_BUFFER_SIZE = 2;   # initial buffer-size
-        $DBIx::Squirrel::it::BUFFER_SIZE_LIMIT   = 64;  # maximum buffer-size
+        $DBIx::Squirrel::it::DEFAULT_CACHE_SIZE = 2;   # initial buffer-size
+        $DBIx::Squirrel::it::CACHE_SIZE_LIMIT   = 64;  # maximum buffer-size
 
    "sth"
         $sth = $itor->sth;

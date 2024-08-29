@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  1.001 28 August  2024
+
+        * #20 Don't ship with Test::* modules
+          Wed Aug 28 15:13:30 2024 +0100
+          82ff415a949ce718ddfb9110214e788fc2d366da
+
   1.000 25 June  2022
 
         * version 1.000

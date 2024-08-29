@@ -1,6 +1,36 @@
 CHANGES
 -------
 
+  2.213 28 August 2024
+
+      * version 2.213
+        Wed Aug 28 15:42:15 2024 +0100
+        6db34434df59999e57aacfcb52a9cc8cb5161155
+
+      * Add zlib-ng 2.2.1 to workflow
+        Tue Jul 2 15:28:39 2024 +0100
+        fe3cd4a98c1e432fa06aed1617599424048d6ac8
+
+      * add zlib-ng 2.1.7 & 2.2.0
+        Wed Jun 19 17:07:02 2024 +0100
+        293d041abfa7763d3e8c4be8fa41024a80cd9a4b
+
+      * Add zlib-ng 2.1.7 & 2.2.0 to github workflow
+        Wed Jun 19 16:57:56 2024 +0100
+        2db84c21e4441a23d289e593f201597f0d863fe4
+
+      * remove Werror from clang legacy builds
+        Mon Jun 17 10:41:34 2024 +0100
+        d6440a3e08254c64bb8e5d8d805697d19895745b
+
+      * use -xc++ when building with C++
+        Mon Jun 17 08:04:20 2024 +0100
+        da8e6b716f81148e9720257414e41c724dc43cc0
+
+      * Add perl 5.40 to workflows
+        Sun Jun 16 17:42:29 2024 +0100
+        f7d1764f4e5a944c35ae3d27ae488c707e21784b
+
   2.212 27 April 2024
 
       * no functional changes

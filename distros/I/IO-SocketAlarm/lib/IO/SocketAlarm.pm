@@ -1,5 +1,5 @@
 package IO::SocketAlarm;
-$IO::SocketAlarm::VERSION = '0.001';
+$IO::SocketAlarm::VERSION = '0.002';
 # VERSION
 # ABSTRACT: Perform asynchronous actions when a socket changes status
 
@@ -11,12 +11,12 @@ require XSLoader;
 XSLoader::load('IO::SocketAlarm', $IO::SocketAlarm::VERSION);
 
 # All exports are part of the Util sub-package.
-package IO::SocketAlarm::Util {
+{package IO::SocketAlarm::Util;
+$IO::SocketAlarm::Util::VERSION = '0.002';
    our @EXPORT_OK= qw( socketalarm get_fd_table_str is_socket );
    use Exporter 'import';
    # Declared in XS
 }
-$IO::SocketAlarm::Util::VERSION = '0.001';
 
 sub import {
    splice(@_, 0, 1, 'IO::SocketAlarm::Util');
@@ -55,19 +55,30 @@ IO::SocketAlarm - Perform asynchronous actions when a socket changes status
 
 =head1 SYNOPSIS
 
-  use IO::SocketAlarm qw( socketalarm :events );
-  use POSIX ':signal_h';
-  
-  local $SIG{ALRM}= sub { die "got alarm"; };
-  # When the client goes away, send SIGALRM
-  my $alarm= socketalarm($socket);
+When the client goes away, send SIGALRM
+
+  use IO::SocketAlarm qw( socketalarm );
   ...
-  $alarm->cancel;  # stop receiving signal
+  unless (eval {
+    local $SIG{ALRM}= sub { die "got alarm"; };
+    my $alarm= socketalarm($socket);
+    long_running_function();
+    $alarm->cancel;  # stop watching socket
+    1;
+  }) {
+    warn "Interrupted long_running_task" if $@ =~ /^got alarm/;
+    ...
+  }
+
+In a more extreme example, when HTTP client goes away, terminate the current worker process and
+also kill the mysql query
+
+  # get MySQL connection ID
+  $con_id= $dbh->selectcol_arrayref("SELECT CONNECTION_ID()")->[0];
   
-  # More extreme example: when client goes away, terminate
-  # the current worker process and also kill the mysql query.
-  my $mysql_conn_id= $dbh->selectcoll_arrayref("SELECT CONNECTION_ID()")->[0];
-  my $alarm= socketalarm($socket, [ exec => 'mysql', -e => "kill $mysql_conn_id" ]);
+  # If $socket closes, kill this whole worker, and also kill
+  # the MySQL query from the server-side.
+  $alarm= socketalarm $s, [ exec => 'mysql','-e',"kill $con_id" ];
 
 =head1 DESCRIPTION
 
@@ -91,7 +102,8 @@ executing C<< mysql -e "kill $conn_id" >>.
 
 B<Second caveat:> This module's design isn't 100% portable beyond Linux and FreeBSD. On Windows,
 MacOS, and OpenBSD there is no way (that I've found) to poll for TCP 'FIN' status.  This module
-will probably still work for a HTTP worker behind a reverse proxy; see L</EVENT_EOF> below.
+will probably still work for a HTTP worker behind a reverse proxy; see
+L<EVENT_EOF|IO::SocketAlarm::Util/EVENT_EOF>.
 
 B<Third caveat:> While the module is thread-safe, per-se, it does introduce the sorts of
 confusion caused by concurrency, like checking C<< $alarm->triggered >> and having that status
@@ -122,6 +134,7 @@ a background thread will run C<@actions>.  It is a shortcut for L<new|/new> as f
     events => $event_mask,
     actions => \@actions,
   );
+  $alarm->start;
 
 =head1 ALARM OBJECT
 
@@ -136,6 +149,11 @@ When triggered, the alarm only runs its actions once.
 
 =head3 new
 
+  $alarm= IO::SocketAlarm->new(%attributes);
+
+Accepts attributes 'socket', 'events', and 'actions'.  Note that C<actions> will get translated
+a bit from how you specify them to what you see in the attribute afterward.
+
 =head2 Attributes
 
 =head3 socket
@@ -145,62 +163,13 @@ Perl virtual handle of some sort), and still be open.
 
 =head3 events
 
-This is a bit-mask of which events to trigger on.  Combine them with the bitwise-or operator:
+This is a bit-mask of which L<events|IO::SocketAlarm::Util/Event Constants> to trigger on.
+Combine them with the bitwise-or operator:
 
   # the default on Linux/FreeBSD:
   events => EVENT_SHUT,
   # the default on Windows/Mac/OpenBSD
   events => EVENT_SHUT|EVENT_EOF,
-
-=over
-
-=item EVENT_SHUT
-
-Triggers when the TCP connection is being shutdown (the TCP "FIN" flag) or any detectable
-condition that means communication on the socket is no longer possible and is the result of an
-external event.
-
-While this event is the whole point of this module, there actually isn't a good cross-platform
-way to identify this condition!  Linux and FreeBSD provide a reliable POLLRDHUP flag to poll()
-to get notified of the TCP 'FIN' flag, but on OpenBSD and Mac and Windows the best you can do
-is check for a zero-length "peek" on the socket, which only works if the application has already
-read all incoming data on the socket.  (but this works for typical HTTP worker pools where only
-one request will be sent from the reverse proxy to the worker, before closing the connection)
-
-The poll() POLLHUP flag also triggers this event, for socket types (or pipes) that emit this
-flag in a useful manner.
-
-=item EVENT_EOF
-
-Triggers when the file handle indicates EOF by a successful zero-length read.  This is checked
-by performing a C<< recv(sock, buf, len, MSG_PEEK|MSG_DONTWAIT) >> so that no actual data is
-removed from the socket.  If your peer writes data to the socket before closing it, you won't
-get this event until you read that data.  There is no efficient way to wait for this event when
-the peer has sent additional data; this module falls back to checking at short intervals in that
-case, which is inefficient and may fail to deliver the event when you need it delivered.
-
-But again, this generally works in a HTTP worker pool where this module is intended to be used.
-
-=item EVENT_IN
-
-Triggers if there is any data available to be read from the socket.  This sets the POLLIN flag
-on the call to poll().
-
-=item EVENT_PRI
-
-Triggers if there is any priority data available to be read from the socket.  This sets the
-POLLPRI flag on the call to poll().
-
-=item EVENT_CLOSE
-
-Triggers when another thread on this application has called "close" on the socket file handle.
-More specifically, it triggers when "stat()" fails or reports a different device or inode for
-the file descriptor, indicating that descriptor number has been closed or recycled.
-
-(it is a better idea to make sure you cancel the alarm before returning to any code which might
- close your end of the socket)
-
-=back
 
 =head3 actions
 
@@ -284,19 +253,19 @@ Wait before running the next action.
 
 =back
 
+=head3 action_count
+
+Shortcut for C<< scalar @actions >>, but avoids inflating the arrayref of actions.
+
 =head3 cur_action
 
 Returns -1 if the alarm is not yet triggered, else the number of the action being executed,
 ending with the integer beyond the max element of L</actions>.  Note that by the time your
 script reads this attribute, it may already have changed.
 
-=head2 action_count
-
-Shortcut for C<< scalar @{actions} >>, but avoids inflating the arrayref of actions.
-
 =head3 triggered
 
-Shortcut for C<< $cur_action == -1 >>
+Shortcut for C<< $cur_action >= 0 >>
 
 =head3 finished
 
@@ -320,7 +289,7 @@ Render the alarm as user-readable text, for diagnosis and logging.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

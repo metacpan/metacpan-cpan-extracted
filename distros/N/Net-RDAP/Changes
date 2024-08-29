@@ -1,5 +1,9 @@
 Revision history for perl module Net::RDAP:
 
+0.30 - 2024-08-29
+  - use JSON instead of JSON::XS in jcard.t.
+  - resolve warning in Net::RDAP::UA.
+
 0.29 - 2024-08-27
   - add the current user to the cache filename to avoid cache filename clashes.
 

@@ -26,7 +26,7 @@ our
     ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
      $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.970001';
+$VERSION = '3.971000';
 
 =head1 NAME
 
@@ -34,7 +34,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.970001
+SNMP::Info - Version 3.971000
 
 =head1 AUTHOR
 
@@ -768,6 +768,10 @@ See documentation in L<SNMP::Info::Layer3::AlteonAD> for details.
 
 See documentation in L<SNMP::Info::Layer3::Altiga> for details.
 
+=item SNMP::Info::Layer3::Meraki
+
+See documentation in L<SNMP::Info::Layer3::Meraki> for details.
+
 =item SNMP::Info::Layer3::Arista
 
 See documentation in L<SNMP::Info::Layer3::Arista> for details.
@@ -1056,6 +1060,12 @@ See documentation in L<SNMP::Info::Layer3::Pica8> for details.
 Subclass for redlion routers.
 
 See documentation in L<SNMP::Info::Layer3::Redlion> for details.
+
+=item SNMP::Info::Layer3::SilverPeak
+
+Subclass for SilverPeak devices.
+
+See documentation in L<SNMP::Info::Layer3::SilverPeak> for details.
 
 =item SNMP::Info::Layer3::Scalance
 
@@ -1800,10 +1810,12 @@ sub device_type {
         17163 => 'SNMP::Info::Layer3::Steelhead',
         19046 => 'SNMP::Info::Layer3::Lenovo',
         21091 => 'SNMP::Info::Layer2::Exinda',
+        23867 => 'SNMP::Info::Layer3::SilverPeak',
         25461 => 'SNMP::Info::Layer3::PaloAlto',
         25506 => 'SNMP::Info::Layer3::H3C',
         26543 => 'SNMP::Info::Layer3::IBMGbTor',
         26928 => 'SNMP::Info::Layer2::Aerohive',
+        29671 => 'SNMP::Info::Layer3::Meraki',
         30065 => 'SNMP::Info::Layer3::Arista',
         30803 => 'SNMP::Info::Layer3::VyOS',
         35098 => 'SNMP::Info::Layer3::Pica8',
@@ -1823,7 +1835,7 @@ sub device_type {
         96    => 'SNMP::Info::Layer3::Whiterabbit',
         171   => 'SNMP::Info::Layer3::DLink',
         207   => 'SNMP::Info::Layer2::Allied',
-	248   => 'SNMP::Info::Layer2::Hirschmann',
+        248   => 'SNMP::Info::Layer2::Hirschmann',
         266   => 'SNMP::Info::Layer2::Nexans',
         664   => 'SNMP::Info::Layer2::Adtran',
         674   => 'SNMP::Info::Layer3::Dell',

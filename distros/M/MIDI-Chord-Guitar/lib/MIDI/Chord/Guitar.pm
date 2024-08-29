@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI pitches for guitar chord voicings
 
-our $VERSION = '0.0705';
+our $VERSION = '0.0706';
 
 use strict;
 use warnings;
@@ -227,7 +227,7 @@ MIDI::Chord::Guitar - MIDI pitches for guitar chord voicings
 
 =head1 VERSION
 
-version 0.0705
+version 0.0706
 
 =head1 SYNOPSIS
 
@@ -379,7 +379,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2020-2024 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

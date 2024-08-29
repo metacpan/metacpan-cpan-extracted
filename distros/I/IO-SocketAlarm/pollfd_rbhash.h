@@ -111,6 +111,7 @@ inline size_t pollfd_rbhash_path_insert(void *rbhash, size_t capacity, pollfd_rb
 extern size_t pollfd_rbhash_path_delete_8(uint8_t *rbhash, pollfd_rbhash_path *path);
 extern size_t pollfd_rbhash_path_delete_16(uint16_t *rbhash, pollfd_rbhash_path *path);
 inline size_t pollfd_rbhash_path_delete(void *rbhash, size_t capacity, pollfd_rbhash_path *path) {
+   return
       (capacity <= POLLFD_RBHASH_MAX_ELEMENTS_8)? pollfd_rbhash_path_delete_8((uint8_t*) rbhash, path) :
       (capacity <= POLLFD_RBHASH_MAX_ELEMENTS_16)? pollfd_rbhash_path_delete_16((uint16_t*) rbhash, path) :
       pollfd_rbhash_capacity_bounds_assertion(capacity);

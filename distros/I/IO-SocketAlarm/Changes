@@ -1,3 +1,10 @@
+Version 0.002 - 2024-08-28
+
+  - Fix compat with FreeBSD, older perls, and various Linux
+    where -lpthread doesn't get added automatically.
+  - Also fixed a number of bugs that just didn't manifest on
+    mainstream Linux distros.
+
 Version 0.001 - 2024-08-27
 
   - Initial CPAN release

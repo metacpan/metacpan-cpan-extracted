@@ -4,30 +4,45 @@ lazy - Lazily install missing Perl modules
 
 # VERSION
 
-version 0.000009
+version 1.000000
 
 # SYNOPSIS
+
+    # At the command line
+    # --------------------------------------------------
 
     # Auto-install missing modules globally
     perl -Mlazy foo.pl
 
-    # Auto-install missing modules into local_foo/.  Note local::lib needs to
-    # precede lazy in this scenario in order for the script to compile on the
-    # first run.
-    perl -Mlocal::lib=local_foo -Mlazy foo.pl
+    # Auto-install missing modules into ./local
+    perl -Mlazy='-Llocal' foo.pl
 
-    # Auto-install missing modules into local/
-    use local::lib 'local';
-    use lazy;
+    # Auto-install missing modules into ./some-other-dir
+    perl -Mlazy='-Lsome-other-dir' foo.pl
+
+    # In your code
+    # --------------------------------------------------
 
     # Auto-install missing modules globally
     use lazy;
 
-    # Same as above, but explicity auto-install missing modules globally
-    use lazy qw( -g );
+    # Auto-install missing modules into ./local
+    use local::lib;
+    use lazy qw( -L local );
 
-    # Use a local::lib and get verbose, uncolored output
-    perl -Mlocal::lib=foo -Mlazy=-v,--no-color
+    # Auto-install missing modules into ./some-other-dir
+    use local::lib qw( some-other-dir );
+    use lazy qw( -L some-other-dir );
+
+    # Auto-install missing modules into ./some-other-dir and pass more options to App::cpm
+    use local::lib qw( some-other-dir );
+    use lazy qw( -L some-other-dir --man-pages --verbose --no-color );
+
+    # In a one-liner?
+    # --------------------------------------------------
+
+    # Install App::perlimports via a one-liner, but why would you want to?
+    perl -Mlazy -MApp::perlimports -E 'say "ok"'
 
 ## DESCRIPTION
 
@@ -39,12 +54,18 @@ install them manually.
 Not anymore!
 
 `lazy` will try to install any missing modules automatically, making your day
-just a little less long.  `lazy` uses [App::cpm](https://metacpan.org/pod/App::cpm) to perform this magic in the
+just a little less long.  `lazy` uses [App::cpm](https://metacpan.org/pod/App%3A%3Acpm) to perform this magic in the
 background.
 
 ## USAGE
 
-You can pass arguments directly to [App::cpm](https://metacpan.org/pod/App::cpm) via the import statement.
+    perl -Mlazy foo.pl
+
+Or use a local lib:
+
+    perl -Mlazy='-Llocal' foo.pl
+
+You can pass arguments directly to [App::cpm](https://metacpan.org/pod/App%3A%3Acpm) via the import statement.
 
     use lazy qw( --verbose );
 
@@ -54,37 +75,30 @@ Or
 
 You get the idea.
 
-This module uses [App::cpm](https://metacpan.org/pod/App::cpm)'s defaults, with the exception being that we
+This module uses [App::cpm](https://metacpan.org/pod/App%3A%3Acpm)'s defaults, with the exception being that we
 default to global installs rather than local.
 
 So, the default usage would be:
 
     use lazy;
 
-If you want to use a local lib:
+If you want to install to a local lib, use [local::lib](https://metacpan.org/pod/local%3A%3Alib) first:
 
-    use local::lib qw( my_local_lib );
-    use lazy;
-
-Lazy will automatically pick up on your chosen local::lib and install there.
-Just make sure that you `use local::lib` before you `use lazy`.
+    use local::lib qw( my-local-lib );
+    use lazy    q( -L my-local-lib );
 
 ## CAVEATS
-
-\* If not installing globally, `use local::lib` before you `use lazy`
-
-\* Don't pass the `-L` or `--local-lib-contained` args directly to `lazy`.  Use [local::lib](https://metacpan.org/pod/local::lib) directly to get the best (and least confusing) results.
 
 \* Remove `lazy` before you put your work into production.
 
 ## SEE ALSO
 
-[Acme::Magic::Pony](https://metacpan.org/pod/Acme::Magic::Pony), [lib::xi](https://metacpan.org/pod/lib::xi), [CPAN::AutoINC](https://metacpan.org/pod/CPAN::AutoINC), [Module::AutoINC](https://metacpan.org/pod/Module::AutoINC)
+[Acme::Intraweb](https://metacpan.org/pod/Acme%3A%3AIntraweb), [Acme::Magic::Pony](https://metacpan.org/pod/Acme%3A%3AMagic%3A%3APony), [CPAN::AutoINC](https://metacpan.org/pod/CPAN%3A%3AAutoINC), [lib::xi](https://metacpan.org/pod/lib%3A%3Axi), [Module::AutoINC](https://metacpan.org/pod/Module%3A%3AAutoINC), [Module::AutoLoad](https://metacpan.org/pod/Module%3A%3AAutoLoad), [The::Net](https://metacpan.org/pod/The%3A%3ANet) and [Class::Autouse](https://metacpan.org/pod/Class%3A%3AAutouse)
 
 ## ACKNOWLEDGEMENTS
 
-This entire idea was ripped off from [Acme::Magic::Pony](https://metacpan.org/pod/Acme::Magic::Pony).  The main difference
-is that we use [App::cpm](https://metacpan.org/pod/App::cpm) rather than [CPAN::Shell](https://metacpan.org/pod/CPAN::Shell).
+This entire idea was ripped off from [Acme::Magic::Pony](https://metacpan.org/pod/Acme%3A%3AMagic%3A%3APony).  The main difference
+is that we use [App::cpm](https://metacpan.org/pod/App%3A%3Acpm) rather than [CPAN::Shell](https://metacpan.org/pod/CPAN%3A%3AShell).
 
 # AUTHOR
 

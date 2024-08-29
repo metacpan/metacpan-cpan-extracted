@@ -1,8 +1,9 @@
-use strict;
-use warnings;
-
 package    # hide from PAUSE
   DBIx::Squirrel::Transform::YAML::Syck;
+
+use strict;
+use warnings;
+use YAML::Syck;
 
 BEGIN {
     require DBIx::Squirrel unless keys(%DBIx::Squirrel::);
@@ -12,8 +13,6 @@ BEGIN {
     @DBIx::Squirrel::Transform::YAML::Syck::EXPORT_OK = qw/as_yaml/;
     @DBIx::Squirrel::Transform::YAML::Syck::EXPORT    = @DBIx::Squirrel::Transform::YAML::Syck::EXPORT_OK;
 }
-
-use YAML::Syck;
 
 sub as_yaml {
     return sub {
