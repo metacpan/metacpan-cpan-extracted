@@ -15,7 +15,7 @@ Amazon::Sites - A class to represent Amazon sites
 
   my $site  = $sites->site('UK');
   say $site->currency; # GBP
-  say $site->tldr;     # co.uk
+  say $site->tldn;     # co.uk
   # etc
 
   my %urls = $sites->asin_urls('XXXXXXX');
@@ -36,10 +36,11 @@ use Feature::Compat::Class;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.1.6';
+our $VERSION = '0.1.7';
 
 class Amazon::Sites {
-  use Amazon::Site;
+
+  use Amazon::Site ();
 
   field $include :param = [];
   field $exclude :param = [];

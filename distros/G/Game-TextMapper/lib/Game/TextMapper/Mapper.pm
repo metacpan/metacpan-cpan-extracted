@@ -50,8 +50,10 @@ use Modern::Perl '2018';
 use Mojo::UserAgent;
 use Mojo::Base -base;
 use File::Slurper qw(read_text);
-use Encode qw(decode_utf8);
+use Encode qw(encode_utf8 decode_utf8);
+use Mojo::Util qw(url_escape);
 use File::ShareDir 'dist_dir';
+use Scalar::Util 'weaken';
 
 =head1 ATTRIBUTES
 
@@ -131,19 +133,24 @@ sub process {
   my $self = shift;
   my $line_id = 0;
   foreach (@_) {
-    if (/^(-?\d\d)(-?\d\d)(\d\d)?\s+(.*)/) {
+    if (/^(-?\d\d)(-?\d\d)(\d\d)?\s+(.*)/ or /^(-?\d\d+)\.(-?\d\d+)(?:\.(\d\d+))?\s+(.*)/) {
       my $region = $self->make_region(x => $1, y => $2, z => $3||'00', map => $self);
+      weaken($region->{map});
       my $rest = $4;
-      while (my ($tag, $label, $size) = $rest =~ /\b([a-z]+)=["“]([^"”]+)["”]\s*(\d+)/) {
+      while (my ($tag, $label, $size) = $rest =~ /\b([a-z]+)=["“]([^"”]+)["”]\s*(\d+)?/) {
 	if ($tag eq 'name') {
 	  $region->label($label);
-	  $region->size($size);
-	}
+          $region->size($size) if $size;
+	} else {
+	  # delay the calling of $self->other_info because the URL or the $self->glow_attributes might not be set
+	  push(@{$self->other()}, sub () { $self->other_info($region, $label, $size, "translate(0,45)", 'opacity="0.2"') });
+        }
 	$rest =~ s/\b([a-z]+)=["“]([^"”]+)["”]\s*(\d+)?//;
       }
       while (my ($label, $size, $transform) = $rest =~ /["“]([^"”]+)["”]\s*(\d+)?((?:\s*[a-z]+\([^\)]+\))*)/) {
-	if ($transform) {
-	  push(@{$self->other()}, $self->other_text($region, $label, $size, $transform));
+	if ($transform or $region->label) {
+	  # delay the calling of $self->other_text because the URL or the $self->glow_attributes might not be set
+	  push(@{$self->other()}, sub () { $self->other_text($region, $label, $size, $transform) });
 	} else {
 	  $region->label($label);
 	  $region->size($size);
@@ -154,8 +161,10 @@ sub process {
       $region->type(\@types);
       push(@{$self->regions}, $region);
       push(@{$self->things}, $region);
-    } elsif (/^(-?\d\d-?\d\d(?:\d\d)?(?:--?\d\d-?\d\d(?:\d\d)?)+)\s+(\S+)\s*(?:["“](.+)["”])?\s*(left|right)?\s*(\d+%)?/) {
+    } elsif (/^(-?\d\d-?\d\d(?:\d\d)?(?:--?\d\d-?\d\d(?:\d\d)?)+)\s+(\S+)\s*(?:["“](.+)["”])?\s*(left|right)?\s*(\d+%)?/
+             or /^(-?\d\d+\.-?\d\d+(?:\.\d\d+)?(?:--?\d\d+\.-?\d\d+(?:\.\d\d+)?)+)\s+(\S+)\s*(?:["“](.+)["”])?\s*(left|right)?\s*(\d+%)?/) {
       my $line = $self->make_line(map => $self);
+      weaken($line->{map});
       my $str = $1;
       $line->type($2);
       $line->label($3);
@@ -163,8 +172,8 @@ sub process {
       $line->start($5);
       $line->id('line' . $line_id++);
       my @points;
-      while ($str =~ /\G(-?\d\d)(-?\d\d)(\d\d)?-?/cg) {
-	push(@points, Game::TextMapper::Point->new(x => $1, y => $2, z => $3||'00'));
+      while ($str =~ /\G(?:(-?\d\d)(-?\d\d)(\d\d)?|(-?\d\d+)\.(-?\d\d+)\.(\d\d+)?)-?/cg) {
+	push(@points, Game::TextMapper::Point->new(x => $1||$4, y => $2||$5, z => $3||$6||'00'));
       }
       $line->points(\@points);
       push(@{$self->lines}, $line);
@@ -242,6 +251,21 @@ sub process {
   return $self;
 }
 
+sub svg_other {
+  my ($self) = @_;
+  my $data = "\n";
+  for my $other (@{$self->other()}) {
+    if (ref $other eq 'CODE') {
+      $data .= $other->();
+    } else {
+      $data .= $other;
+    }
+    $data .= "\n";
+  }
+  $self->other(undef);
+  return $data;
+}
+
 # Very similar to svg_label, but given that we have a transformation, we
 # translate the object to it's final position.
 sub other_text {
@@ -253,9 +277,25 @@ sub other_text {
   }
   my $data = sprintf(qq{    <g><text text-anchor="middle" %s %s>%s</text>},
                      $attributes, $self->glow_attributes||'', $label);
-  $data .= sprintf(qq{<text text-anchor="middle" %s>%s</text>},
-		   $attributes, $label);
+  my $url = $self->url;
+  $url =~ s/\%s/url_escape(encode_utf8($label))/e or $url .= url_escape(encode_utf8($label)) if $url;
+  $data .= sprintf(qq{<a xlink:href="%s"><text text-anchor="middle" %s>%s</text></a>},
+		   $url, $attributes, $label);
   $data .= qq{</g>\n};
+  return $data;
+}
+
+# Very similar to other_text, but without a link and we have extra attributes
+sub other_info {
+  my ($self, $region, $label, $size, $transform, $attributes) = @_;
+  $transform = sprintf("translate(%.1f,%.1f)", $region->pixels($self->offset)) . $transform;
+  $attributes .= " transform=\"$transform\"";
+  $attributes .= " " . $self->label_attributes if $self->label_attributes;
+  if ($size and not $attributes =~ s/\bfont-size="\d+pt"/font-size="$size"/) {
+    $attributes .= " font-size=\"$size\"";
+  }
+  my $data = sprintf(qq{    <g><text text-anchor="middle" %s %s>%s</text>}, $attributes, $self->glow_attributes||'', $label);
+  $data .= sprintf(qq{<text text-anchor="middle" %s>%s</text></g>\n}, $attributes, $label);
   return $data;
 }
 
@@ -465,7 +505,7 @@ sub svg {
   $doc .= $self->svg_line_labels();
   $doc .= $self->svg_labels();
   $doc .= $self->license() ||'';
-  $doc .= join("\n", @{$self->other()}) . "\n";
+  $doc .= $self->svg_other();
 
   # error messages
   my $y = 10;

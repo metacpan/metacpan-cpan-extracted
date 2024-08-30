@@ -591,7 +591,7 @@ static struct XSParseKeywordHooks hooks_try = {
       XPK_LITERAL("catch"),
       XPK_PREFIXED_BLOCK(
         /* optionally ($var), ($var isa Type) or ($var =~ m/.../) */
-        XPK_PARENSCOPE_OPT(
+        XPK_PARENS_OPT(
           XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR),
           XPK_CHOICE(
             XPK_SEQUENCE(XPK_LITERAL("isa"), XPK_TERMEXPR),
@@ -630,6 +630,6 @@ BOOT:
   Perl_custom_op_register(aTHX_ &pp_isa, &xop_isa);
 #endif
 
-  boot_xs_parse_keyword(0.06);
+  boot_xs_parse_keyword(0.35);
 
   register_xs_parse_keyword("try", &hooks_try, NULL);

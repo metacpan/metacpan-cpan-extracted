@@ -1,0 +1,14 @@
+0.9.9   Thu Aug 29 04:13:30 PM UTC 2024
+        - Initial release of API client for https://kanye.rest
+        - demo project for Perl API clients, using Util::H2O::More
+        - found via, https://www.freepublicapis.com/
+        - feature complete, but documentation and tweaks may be needed
+          based on feedback
+
+0.9.10  Thu Aug 29 04:13:31 PM UTC 2024
+        - Updated initial release of API client for https://api.chucknorris.io/jokes
+        - demo project for Perl API clients, using Util::H2O::More
+        - found via, https://www.freepublicapis.com/
+        - feature complete, but documentation and tweaks may be needed
+          based on feedback
+        - fixed POD and changelog

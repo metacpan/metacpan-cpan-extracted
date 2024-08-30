@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser.pm
-## Version v0.3.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.4.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2023/08/29
+## Modified 2024/08/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,12 +19,10 @@ BEGIN
     use vars qw( $ELEMENTS_DICTIONARY $ELEMENTS_DICTIONARY_EXTENDED $VERSION $DEBUG );
     use POSIX ();
     use Regexp::Common qw( Markdown );
-    use Nice::Try;
     use CSS::Object;
     use Scalar::Util ();
-    use Devel::Confess;
     our $DEBUG = 0;
-    our $VERSION = 'v0.3.2';
+    our $VERSION = 'v0.4.0';
     # Including vertical space like new lines
     our $ELEMENTS_DICTIONARY =
     {
@@ -2594,7 +2592,7 @@ Markdown::Parser - Markdown Parser Only
 
 =head1 VERSION
 
-    v0.3.2
+    v0.4.0
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Defer 0.10;
+package Syntax::Keyword::Defer 0.11;
 
 use v5.14;
 use warnings;

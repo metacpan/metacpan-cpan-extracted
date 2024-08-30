@@ -20,6 +20,36 @@
 #######################################################################
 
 
+2024-08-29  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000793 released
+
+	* Clean up after refactoring
+
+2024-08-29  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000792 released
+
+        * More refactoring to reduce cpan memory impact
+
+2024-08-29  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000791 released
+
+        * More refactoring to reduce cpan memory impact
+
+2024-08-29  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000790 released
+
+        * More refactoring to reduce cpan memory impact
+
+2024-08-29  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000789 released
+
+        * More refactoring to reduce cpan memory impact
+
 2024-08-28  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000788 released

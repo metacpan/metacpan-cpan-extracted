@@ -1,5 +1,14 @@
 Revision history for XS-Parse-Keyword
 
+0.45    2024-08-29
+        [CHANGES]
+         * Refuse to register operators that have neither `.new_op` nor
+           `.ppadd`, as these will never work
+
+        [BUGFIXES]
+         * Update for perl 5.41.3: `OP_SMARTMATCH` is now removed, so make
+           that registration conditional (RT155194)
+
 0.44    2024-07-19
         [BUGFIXES]
          * `boot_xs_parse_infix()` has to load `XS/Parse/Infix.pm`, the perl

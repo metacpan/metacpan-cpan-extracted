@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait::Awaitable 0.67;
+package Future::AsyncAwait::Awaitable 0.68;
 
 use v5.14;
 use warnings;

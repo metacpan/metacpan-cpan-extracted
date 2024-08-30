@@ -1,3 +1,8 @@
+0.50.0 2024-08-29 17:12:41 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - reload the browser window when an exception with status 7 is returned
+ - warn if trm() is called with undefined arguments
+
 0.49.6 2024-07-17 17:25:39 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix some more memory loops

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.811;
+package Object::Pad::MOP::Class 0.812;
 
 use v5.14;
 use warnings;
@@ -17,6 +17,8 @@ require Object::Pad;
 C<Object::Pad::MOP::Class> - meta-object representation of a C<Object::Pad> class
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 Instances of this class represent a class or role implemented by
 L<Object::Pad>. Accessors provide information about the class or role, and

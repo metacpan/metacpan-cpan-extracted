@@ -9,7 +9,7 @@ use File::Path qw(make_path);
 use File::Basename;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT  = qw(
   send_register_verify_code
   register
@@ -156,7 +156,7 @@ Circle::User - the user module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -410,9 +410,11 @@ Note: the phone register is only supported in China mainland.
 
 =head1 SEE ALSO
 
-See L<Circle::Common> for circle common module .
-See L<Circle::Wallet> for circle wallet module .
-See L<Circle::Block> for circle block module .
+See L<Circle::Common> for circle common module.
+
+See L<Circle::Wallet> for circle wallet module.
+
+See L<Circle::Block> for circle block module.
 
 =head1 COPYRIGHT AND LICENSE
 

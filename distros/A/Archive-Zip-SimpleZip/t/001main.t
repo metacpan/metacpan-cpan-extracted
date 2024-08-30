@@ -37,7 +37,7 @@ sub getContent
 {
     my $filename = shift;
 
-    my $u = new IO::Uncompress::Unzip $filename, Append => 1, @_
+    my $u = IO::Uncompress::Unzip->new($filename, Append => 1, @_)
         or die "Cannot open $filename: $UnzipError";
 
     isa_ok $u, "IO::Uncompress::Unzip";
@@ -124,7 +124,7 @@ sub roundTripUnixTime
 
     {
         title "no zip filname";
-        my $z = new Archive::Zip::SimpleZip ;
+        my $z = Archive::Zip::SimpleZip->new() ;
 
         is $z, undef ;
         is $SimpleZipError, "Missing Filename",
@@ -133,8 +133,8 @@ sub roundTripUnixTime
 
     {
         title "directory";
-        my $lex = new LexDir my $dir;
-        my $z = new Archive::Zip::SimpleZip $dir ;
+        my $lex = LexDir->new(my $dir);
+        my $z = Archive::Zip::SimpleZip->new($dir) ;
 
         is $z, undef ;
         is $SimpleZipError, "Illegal Filename",
@@ -143,10 +143,10 @@ sub roundTripUnixTime
 
     {
         title "zip file in directory that doesn't exist";
-        my $lex = new LexDir my $dir;
+        my $lex = LexDir->new(my $dir);
         my $zipfile = File::Spec->catfile($dir, "not", "exist", "x.zip");
 
-        my $z = new Archive::Zip::SimpleZip $zipfile ;
+        my $z = Archive::Zip::SimpleZip->new($zipfile) ;
 
         is $z, undef ;
         is $SimpleZipError, "Illegal Filename",
@@ -156,7 +156,7 @@ sub roundTripUnixTime
     SKIP:
     {
         title "file not writable";
-        my $lex = new LexFile my $zipfile;
+        my $lex = LexFile->new(my $zipfile);
 
         chmod 0444, $zipfile
             or skip "Cannot create non-writable file", 3 ;
@@ -166,7 +166,7 @@ sub roundTripUnixTime
 
         ok ! -w $zipfile, "  zip file not writable";
 
-        my $z = new Archive::Zip::SimpleZip $zipfile ;
+        my $z = Archive::Zip::SimpleZip->new($zipfile) ;
 
         is $z, undef ;
         is $SimpleZipError, "Illegal Filename",
@@ -178,7 +178,7 @@ sub roundTripUnixTime
 
     {
         title "filename undef";
-        my $z = new Archive::Zip::SimpleZip undef;
+        my $z = Archive::Zip::SimpleZip->new(undef);
 
         is $z, undef ;
         is $SimpleZipError, "Illegal Filename",
@@ -187,8 +187,8 @@ sub roundTripUnixTime
 
     {
         title "Bad parameter in new";
-        my $lex = new LexFile my $zipfile;
-        eval { my $z = new Archive::Zip::SimpleZip $zipfile, fred => 1 ; };
+        my $lex = LexFile->new(my $zipfile);
+        eval { my $z = Archive::Zip::SimpleZip->new($zipfile, fred => 1); };
 
         like $@,  qr/Parameter Error: unknown key value\(s\) fred/,
             "  value  is bad";
@@ -199,11 +199,11 @@ sub roundTripUnixTime
 
     {
         title "Bad parameter in add";
-        my $lex = new LexFile my $zipfile;
-        my $lex1 = new LexFile my $file1;
+        my $lex = LexFile->new(my $zipfile);
+        my $lex1 = LexFile->new(my $file1);
         writeFile($file1, "abc");
 
-        my $z = new Archive::Zip::SimpleZip $zipfile;
+        my $z = Archive::Zip::SimpleZip->new($zipfile);
         isa_ok $z, "Archive::Zip::SimpleZip";
         eval { $z->add($file1, Fred => 1) ; };
 
@@ -220,7 +220,7 @@ sub roundTripUnixTime
 
         my $zipfile ;
 
-        eval { my $z = new Archive::Zip::SimpleZip \$zipfile, Name => "fred"; } ;
+        eval { my $z = Archive::Zip::SimpleZip->new(\$zipfile, Name => "fred"); } ;
 
         like $@,  qr/name option not valid in constructor/,
             "  option invalid";
@@ -234,7 +234,7 @@ sub roundTripUnixTime
 
         my $zipfile ;
 
-        eval { my $z = new Archive::Zip::SimpleZip \$zipfile, Comment => "fred"; } ;
+        eval { my $z = Archive::Zip::SimpleZip->new(\$zipfile, Comment => "fred"); } ;
 
         like $@,  qr/comment option not valid in constructor/,
             "  option invalid";
@@ -249,7 +249,7 @@ sub roundTripUnixTime
 
         my $zipfile ;
 
-        my $z = new Archive::Zip::SimpleZip \$zipfile ;
+        my $z = Archive::Zip::SimpleZip->new(\$zipfile) ;
         eval {  $z->addString("", ZipComment => "fred"); } ;
 
         like $@,  qr/zipcomment option only valid in constructor/,
@@ -265,7 +265,7 @@ sub roundTripUnixTime
 
         my $zipfile;
 
-        my $z = new Archive::Zip::SimpleZip \$zipfile;
+        my $z = Archive::Zip::SimpleZip->new(\$zipfile);
         isa_ok $z, "Archive::Zip::SimpleZip";
         eval { $z->addString("abc") ; };
 
@@ -282,7 +282,7 @@ sub roundTripUnixTime
 
         my $zipfile;
 
-        my $z = new Archive::Zip::SimpleZip \$zipfile;
+        my $z = Archive::Zip::SimpleZip->new(\$zipfile);
         isa_ok $z, "Archive::Zip::SimpleZip";
         eval { $z->addFileHandle("abc") ; };
 
@@ -298,10 +298,10 @@ sub roundTripUnixTime
 {
     title "file doesn't exist";
 
-    my $lex1 = new LexFile my $zipfile;
+    my $lex1 = LexFile->new(my $zipfile);
     my $file1 = "notexist";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     is $z->add($file1), 0, "add not ok";
@@ -321,8 +321,8 @@ SKIP:
 {
     title "file cannot be read";
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex = new LexFile my $file1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex = LexFile->new(my $file1);
 
     writeFile($file1, "abc");
     chmod 0222, $file1 ;
@@ -332,7 +332,7 @@ SKIP:
 
     ok ! -r $file1, "  input file not readable";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     is $z->add($file1), 0, "add not ok";
@@ -350,10 +350,10 @@ SKIP:
 {
     title "one file cannot be read";
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex2 = new LexFile my $file1;
-    my $lex3 = new LexFile my $file2;
-    my $lex4 = new LexFile my $file3;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex2 = LexFile->new(my $file1);
+    my $lex3 = LexFile->new(my $file2);
+    my $lex4 = LexFile->new(my $file3);
 
     writeFile($file1, $file1);
     writeFile($file2, $file2);
@@ -365,7 +365,7 @@ SKIP:
 
     ok ! -r $file2, "  input file not readable";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($file1), "add $file1";
@@ -392,12 +392,12 @@ SKIP:
 {
     title "simple" ;
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex = new LexFile my $file1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex = LexFile->new(my $file1);
 
     writeFile($file1, "hello world");
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($file1), "add ok";
@@ -413,13 +413,13 @@ SKIP:
 {
     title "simple - no close" ;
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex = new LexFile my $file1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex = LexFile->new(my $file1);
 
     writeFile($file1, "hello world");
 
     {
-        my $z = new Archive::Zip::SimpleZip $zipfile ;
+        my $z = Archive::Zip::SimpleZip->new($zipfile) ;
         isa_ok $z, "Archive::Zip::SimpleZip";
 
         ok $z->add($file1), "add ok";
@@ -436,13 +436,13 @@ SKIP:
 {
     title "simple - no add" ;
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex = new LexFile my $file1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex = LexFile->new(my $file1);
 
     writeFile($file1, "hello world");
 
     {
-        my $z = new Archive::Zip::SimpleZip $zipfile ;
+        my $z = Archive::Zip::SimpleZip->new($zipfile) ;
         isa_ok $z, "Archive::Zip::SimpleZip";
 
         #ok $z->add($file1), "add ok";
@@ -455,8 +455,8 @@ SKIP:
 {
     title "simple dir" ;
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex = new LexDir my $dir1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex = LexDir->new(my $dir1);
 
     ok -d $dir1;
 
@@ -464,7 +464,7 @@ SKIP:
     ok mkdir $dir2;
     ok -d $dir2, "$dir2 is a directory";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($dir1), "add $dir1 ok";
@@ -484,10 +484,10 @@ SKIP:
 {
     title "Absolute path converted to relative" ;
 
-    my $lex1 = new LexFile my $zipfile;
+    my $lex1 = LexFile->new(my $zipfile);
 
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     my $dir1 = "fred" ;
@@ -512,8 +512,8 @@ SKIP:
         unless $symlink_exists;
 
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex = new LexDir my $dir1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex = LexDir->new(my $dir1);
 
     my $from = File::Spec->catfile($dir1, "from");
     my $link = File::Spec->catfile($dir1, "to");
@@ -524,7 +524,7 @@ SKIP:
     ok -d $dir1;
     ok -l $link;
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($link), "add ok";
@@ -543,8 +543,8 @@ SKIP:
         unless $symlink_exists;
 
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex = new LexDir my $dir1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex = LexDir->new(my $dir1);
 
     my $from = File::Spec->catfile($dir1, "from");
     my $link = File::Spec->catfile($dir1, "to");
@@ -555,7 +555,7 @@ SKIP:
     ok -d $dir1;
     ok -l $link;
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($link, StoreLinks => 1), "add ok";
@@ -574,8 +574,8 @@ SKIP:
         unless $symlink_exists;
 
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex = new LexDir my $dir1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex = LexDir->new(my $dir1);
 
     my $from = File::Spec->catfile($dir1, "from");
     my $link = File::Spec->catfile($dir1, "to");
@@ -589,7 +589,7 @@ SKIP:
 
     ok -l $link, "$link is a link";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($link, StoreLinks => 1), "add ok";
@@ -609,8 +609,8 @@ SKIP:
         unless $symlink_exists;
 
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex = new LexDir my $dir1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex = LexDir->new(my $dir1);
 
     my $from = File::Spec->catfile($dir1, "from");
     my $link = File::Spec->catfile($dir1, "to");
@@ -624,7 +624,7 @@ SKIP:
 
     ok -l $link, "$link is a link";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($link, StoreLinks => 0), "add ok";
@@ -646,9 +646,9 @@ SKIP:
         unless $symlink_exists;
 
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex2 = new LexFile my $file1;
-    my $lex3 = new LexDir my $dir1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex2 = LexFile->new(my $file1);
+    my $lex3 = LexDir->new(my $dir1);
 
     my $from = File::Spec->catfile($dir1, "from");
     my $link = File::Spec->catfile($dir1, "to");
@@ -657,7 +657,7 @@ SKIP:
 
     ok symlink("from" => $link), "create link";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile, Stream => 1 ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile, Stream => 1) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($from), "add file ok";
@@ -686,9 +686,9 @@ SKIP:
     title "mixed content - no symlink";
 
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex2 = new LexFile my $file1;
-    my $lex3 = new LexDir my $dir1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex2 = LexFile->new(my $file1);
+    my $lex3 = LexDir->new(my $dir1);
 
     my $from = File::Spec->catfile($dir1, "from");
     my $link = File::Spec->catfile($dir1, "to");
@@ -696,7 +696,7 @@ SKIP:
     writeFile($from, "hello world");
     writeFile($link, "not a link");
 
-    my $z = new Archive::Zip::SimpleZip $zipfile, Stream => 1 ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile, Stream => 1) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($from), "add file ok";
@@ -725,12 +725,12 @@ SKIP:
 #{
 #    title "Name ignored in constructor" ;
 #
-#    my $lex1 = new LexFile my $zipfile;
-#    my $lex = new LexFile my $file1;
+#    my $lex1 = LexFile->new(my $zipfile);
+#    my $lex = LexFile->new(my $file1);
 #
 #    writeFile($file1, "hello world");
 #
-#    my $z = new Archive::Zip::SimpleZip $zipfile, Name => "fred" ;
+#    my $z = Archive::Zip::SimpleZip->new($zipfile), Name => "fred" ;
 #    isa_ok $z, "Archive::Zip::SimpleZip";
 #
 #    ok $z->add($file1), "add ok";
@@ -746,12 +746,12 @@ SKIP:
 {
     title "Name not sticky" ;
 
-    my $lex1 = new LexFile my $zipfile;
-    my $lex = new LexFile my $file1;
+    my $lex1 = LexFile->new(my $zipfile);
+    my $lex = LexFile->new(my $file1);
 
     writeFile($file1, "hello world");
 
-    my $z = new Archive::Zip::SimpleZip $zipfile;
+    my $z = Archive::Zip::SimpleZip->new($zipfile);
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($file1, Name => "fred" ), "add ok";
@@ -771,14 +771,14 @@ SKIP:
     title "simple output to filehandle" ;
 
 
-    my $lex = new LexFile my $file1;
-    my $lex1 = new LexFile my $zfile;
+    my $lex = LexFile->new(my $file1);
+    my $lex1 = LexFile->new(my $zfile);
 
 
     open my $zipfile, ">$zfile";
     writeFile($file1, "hello world");
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($file1), "add ok";
@@ -796,17 +796,17 @@ SKIP:
 {
     title "simple output to stdout" ;
 
-    my $lex1 = new LexFile my $zipfile;
+    my $lex1 = LexFile->new(my $zipfile);
 
     open(SAVEOUT, ">&STDOUT");
     my $dummy = fileno SAVEOUT;
     open STDOUT, ">$zipfile" ;
 
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     writeFile($file1, "hello world");
 
-    my $z = new Archive::Zip::SimpleZip '-' ;
+    my $z = Archive::Zip::SimpleZip->new('-') ;
 
     isa_ok $z, "Archive::Zip::SimpleZip";
 
@@ -827,11 +827,11 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     writeFile($file1, "hello world");
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->add($file1), "add ok";
@@ -849,11 +849,11 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload = "hello world";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     ok $z->addString($payload, Name => "abc"), "addString ok";
@@ -870,12 +870,12 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload = "hello world";
     writeFile($file1, $payload);
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     my $fh;
@@ -894,11 +894,11 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     my $fh = $z->openMember(Name => "abc");
@@ -922,12 +922,12 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
 
     {
-        my $z = new Archive::Zip::SimpleZip $zipfile ;
+        my $z = Archive::Zip::SimpleZip->new($zipfile) ;
         isa_ok $z, "Archive::Zip::SimpleZip";
 
         my $fh = $z->openMember(Name => "abc");
@@ -951,12 +951,12 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
 
     {
-        my $z = new Archive::Zip::SimpleZip $zipfile ;
+        my $z = Archive::Zip::SimpleZip->new($zipfile) ;
         isa_ok $z, "Archive::Zip::SimpleZip";
 
         my $fh = $z->openMember(Name => "abc");
@@ -978,11 +978,11 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     my $fh = $z->openMember(Name => "abc");
@@ -1007,12 +1007,12 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
     my $payload2 = "goodnight vienna";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     my $fh = $z->openMember(Name => "abc");
@@ -1047,12 +1047,12 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
     my $payload2 = "goodnight vienna";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     my $fh = $z->openMember(Name => "abc");
@@ -1073,12 +1073,12 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
     my $payload2 = "goodnight vienna";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     my $fh = $z->openMember(Name => "abc");
@@ -1099,12 +1099,12 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
     my $payload2 = "goodnight vienna";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     my $fh = $z->openMember(Name => "abc");
@@ -1130,12 +1130,12 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
     my $payload2 = "goodnight vienna";
 
-    my $z = new Archive::Zip::SimpleZip $zipfile ;
+    my $z = Archive::Zip::SimpleZip->new($zipfile) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     my $fh = $z->openMember(Name => "abc");
@@ -1162,7 +1162,7 @@ for my $ix (1 .. 5)
     {
         title "To $to";
 
-        my $lex = new LexFile my $name2 ;
+        my $lex = LexFile->new(my $name2) ;
         my $output;
         my $buffer;
         my $zipfile;
@@ -1178,12 +1178,12 @@ for my $ix (1 .. 5)
         elsif ($to eq 'filehandle')
         {
             $zipfile = $name2;
-            $output = new IO::File ">$name2" ;
+            $output = IO::File->new(">$name2") ;
         }
 
         my $payload1 = "hello world";
 
-        my $z = new Archive::Zip::SimpleZip $zipfile ;
+        my $z = Archive::Zip::SimpleZip->new($zipfile) ;
         isa_ok $z, "Archive::Zip::SimpleZip";
 
         for my $m (1 .. $ix)
@@ -1218,7 +1218,7 @@ SKIP:
     skip "Encode not available", 1 if ! defined &Encode::find_encoding ;
 
     my $output;
-    eval { my $cs = new Archive::Zip::SimpleZip(\$output, Encode => 'fred'); } ;
+    eval { my $cs = Archive::Zip::SimpleZip->new(\$output, Encode => 'fred'); } ;
     like($@, qr/Unknown Encoding 'fred'/,
              "  Unknown Encoding 'fred'");
 }
@@ -1237,7 +1237,7 @@ SKIP:
     {
         title "Encode: To $to";
 
-        my $lex2 = new LexFile my $name2 ;
+        my $lex2 = LexFile->new(my $name2) ;
         my $output;
         my $buffer;
         my $zipfile;
@@ -1253,13 +1253,13 @@ SKIP:
         elsif ($to eq 'filehandle')
         {
             $zipfile = $name2;
-            $output = new IO::File ">$name2" ;
+            $output = IO::File->new(">$name2") ;
         }
 
-        my $z = new Archive::Zip::SimpleZip $output, Encode => 'utf8' ;
+        my $z = Archive::Zip::SimpleZip->new($output, Encode => 'utf8') ;
         isa_ok $z, "Archive::Zip::SimpleZip";
 
-        my $lex = new LexFile my $file1;
+        my $lex = LexFile->new(my $file1);
         writeFile($file1, $encString);
 
         ok $z->add($file1, Name => "1");
@@ -1295,7 +1295,7 @@ SKIP:
     {
         title "Encode: To $to";
 
-        my $lex2 = new LexFile my $name2 ;
+        my $lex2 = LexFile->new(my $name2) ;
         my $output;
         my $buffer;
         my $zipfile;
@@ -1311,13 +1311,13 @@ SKIP:
         elsif ($to eq 'filehandle')
         {
             $zipfile = $name2;
-            $output = new IO::File ">$name2" ;
+            $output = IO::File->new(">$name2") ;
         }
 
-        my $z = new Archive::Zip::SimpleZip $output ;
+        my $z = Archive::Zip::SimpleZip->new($output) ;
         isa_ok $z, "Archive::Zip::SimpleZip";
 
-        my $lex = new LexFile my $file1;
+        my $lex = LexFile->new(my $file1);
         writeFile($file1, $encString);
 
         ok $z->add($file1, Name => "1");
@@ -1348,7 +1348,7 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
     my $payload2 = "goodnight vienna";
@@ -1358,7 +1358,7 @@ SKIP:
     {
         title " $to";
 
-        my $lex2 = new LexFile my $name2 ;
+        my $lex2 = LexFile->new(my $name2) ;
         my $output;
         my $buffer;
         my $zipfile;
@@ -1374,10 +1374,10 @@ SKIP:
         elsif ($to eq 'filehandle')
         {
             $zipfile = $name2;
-            $output = new IO::File ">$name2" ;
+            $output = IO::File->new(">$name2") ;
         }
 
-        my $z = new Archive::Zip::SimpleZip $zipfile ;
+        my $z = Archive::Zip::SimpleZip->new($zipfile) ;
         isa_ok $z, "Archive::Zip::SimpleZip";
 
         my $fh1 = $z->openMember(Name => "abc");
@@ -1417,7 +1417,7 @@ SKIP:
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
     my $payload2 = "goodnight vienna";
@@ -1427,7 +1427,7 @@ SKIP:
     {
         title " $to";
 
-        my $lex2 = new LexFile my $name2 ;
+        my $lex2 = LexFile->new(my $name2) ;
         my $output;
         my $buffer;
         my $zipfile;
@@ -1443,10 +1443,10 @@ SKIP:
         elsif ($to eq 'filehandle')
         {
             $zipfile = $name2;
-            $output = new IO::File ">$name2" ;
+            $output = IO::File->new(">$name2") ;
         }
 
-        my $z = new Archive::Zip::SimpleZip $zipfile ;
+        my $z = Archive::Zip::SimpleZip->new($zipfile) ;
         isa_ok $z, "Archive::Zip::SimpleZip";
 
         my $fh1 = $z->openMember(Name => "abc");
@@ -1487,10 +1487,10 @@ SKIP:
     {
         title "CanonicalName => $canonical" ;
         my $output ;
-        my $z = new Archive::Zip::SimpleZip \$output, CanonicalName => $canonical;
+        my $z = Archive::Zip::SimpleZip->new(\$output, CanonicalName => $canonical);
         isa_ok $z, "Archive::Zip::SimpleZip";
 
-        my $lex = new LexFile my $file1;
+        my $lex = LexFile->new(my $file1);
         my $data1 = "one";
         my $data2 = "two";
         my $data3 = "three";
@@ -1526,7 +1526,7 @@ SKIP:
     # https://github.com/pmqs/Archive-Zip-SimpleZip/issues/16
 
     my $output ;
-    my $z = new Archive::Zip::SimpleZip \$output, AutoFlush => 1;
+    my $z = Archive::Zip::SimpleZip->new(\$output, AutoFlush => 1);
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     $z->addString("abcd", name => "fred");
@@ -1538,7 +1538,7 @@ __END__
 
     my $string;
     my $zipfile = \$string;
-    my $lex = new LexFile my $file1;
+    my $lex = LexFile->new(my $file1);
 
     my $payload1 = "hello world";
     my $payload2 = "goodnight vienna";
@@ -1549,7 +1549,7 @@ __END__
     {
         title " $to";
 
-        my $lex2 = new LexFile my $name2 ;
+        my $lex2 = LexFile->new(my $name2) ;
          $name2 = "/tmp/fred.zip";
         my $output;
         my $buffer;
@@ -1574,13 +1574,13 @@ __END__
         elsif ($to eq 'filehandle')
         {
             $zipfile = $name2;
-            $output = new IO::File ">$name2" ;
+            $output = IO::File->new(">$name2") ;
         }
 
-        my $z = new Archive::Zip::SimpleZip $zipfile ;
+        my $z = Archive::Zip::SimpleZip->new($zipfile) ;
         isa_ok $z, "Archive::Zip::SimpleZip";
 
-        my $lex = new LexFile my $file1;
+        my $lex = LexFile->new(my $file1);
         writeFile($file1, $payload1);
 
         ok $z->add($file1, Name => "1", Time => $t1);

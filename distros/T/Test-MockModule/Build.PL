@@ -16,13 +16,14 @@ my $builder = Module::Build->new(
 	},
 
 	configure_requires => {
-		'Module::Build' => '0.38',
+		'Module::Build' => '0.4234',
 	},
 	requires => {
 	    'perl'                => 5.006,
 		'Carp'                => 0,
 		'Scalar::Util'        => 0,
 		'SUPER'               => '1.20',
+		'Software::License' => '0.104006',
 	},
 	test_requires => {
 		'Test::More'          => 0.88,

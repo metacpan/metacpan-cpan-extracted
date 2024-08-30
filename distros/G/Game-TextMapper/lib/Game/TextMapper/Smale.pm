@@ -231,7 +231,7 @@ sub place_major {
   $x += $hex->[0];
   $y += $hex->[1];
   my $coordinates = Game::TextMapper::Point::coord($x, $y);
-  my $primary = $reverse_lookup{$world{$coordinates}};
+  my $primary = $reverse_lookup{$world{$coordinates}} || "";
   my ($color, $terrain) = split(' ', $world{$coordinates}, 2);
   if ($encounter eq 'settlement') {
     if ($primary eq 'plains') {
@@ -411,6 +411,7 @@ sub agriculture {
       my $coordinates = Game::TextMapper::Point::coord($x, $y);
       if ($world{$coordinates}) {
 	my ($color, $terrain) = split(' ', $world{$coordinates}, 2);
+        next unless $reverse_lookup{$world{$coordinates}};
 	$log->debug("  $coordinates is " . $world{$coordinates} . " ie. " . $reverse_lookup{$world{$coordinates}});
 	if ($reverse_lookup{$world{$coordinates}} eq 'plains') {
 	  $log->debug("   $coordinates is a candidate");
@@ -435,9 +436,8 @@ BW stands for "black & white", i.e. a true value skips background colours.
 
 sub generate_map {
   my ($self, $width, $height, $bw) = @_;
-  $width = 20 if not defined $width or $width < 1 or $width > 100;
-  $height = 10 if not defined $height or $height < 1 or $height > 100;
-
+  $width = 20 if not defined $width or $width < 1;
+  $height = 10 if not defined $height or $height < 1;
   my $seeds;
   for (my $y = 1; $y < $height + 3; $y += 5) {
     for (my $x = 1; $x < $width + 3; $x += 5) {
@@ -455,7 +455,7 @@ sub generate_map {
 
   # delete extra hexes we generated to fill the gaps
   for my $coordinates (keys %world) {
-    $coordinates =~ /(-?\d\d)(-?\d\d)/;
+    $coordinates =~ /(-?\d\d)(-?\d\d)/ or $coordinates =~ /(-?\d\d+)\.(-?\d\d+)/;
     delete $world{$coordinates} if $1 < 1 or $2 < 1;
     delete $world{$coordinates} if $1 > $width or $2 > $height;
   }

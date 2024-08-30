@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MetaFunctions 0.811;
+package Object::Pad::MetaFunctions 0.812;
 
 use v5.14;
 use warnings;
@@ -32,6 +32,8 @@ BEGIN {
 C<Object::Pad::MetaFunctions> - utility functions for C<Object::Pad> classes
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use v5.36;
    use Object::Pad::MetaFunctions qw( deconstruct_object );

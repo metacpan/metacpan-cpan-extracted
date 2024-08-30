@@ -1,0 +1,16 @@
+configure:
+  requires:
+    File::Which: 0
+
+runtime:
+  requires:
+    perl: '5.008001'
+    Cwd: 0
+    File::Temp: 0
+    File::Which: 0
+    IPC::Run: 0
+    Log::Log4perl: 0
+
+develop:
+  requires:
+    Dumbbench: 0

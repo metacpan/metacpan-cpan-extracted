@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright (C) 2009-2022  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2009-2023  Alex Schroeder <alex@gnu.org>
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -16,7 +16,7 @@
 
 package Game::TextMapper;
 
-our $VERSION = 1.05;
+our $VERSION = 1.08;
 
 use Game::TextMapper::Log;
 use Game::TextMapper::Point;
@@ -30,6 +30,8 @@ use Game::TextMapper::Schroeder::Alpine;
 use Game::TextMapper::Schroeder::Archipelago;
 use Game::TextMapper::Schroeder::Island;
 use Game::TextMapper::Traveller;
+use Game::TextMapper::Folkesten;
+use Game::TextMapper::Solo;
 
 use Modern::Perl '2018';
 use Mojolicious::Lite;
@@ -177,6 +179,7 @@ sub alpine_map {
 		$c->param('bump'),
 		$c->param('bottom'),
 		$c->param('arid'),
+		$c->param('climate'),
 		$c->param('wind'),
 		$seed,
 		$url,
@@ -235,8 +238,12 @@ get '/alpine/document' => sub {
     $seed = int(rand(1000000000));
     $c->param('seed' => $seed);
   }
-  for my $step (1 .. 18) {
-    my $map = alpine_map($c, $step);
+  # We'd like to use a smaller map because it is so slow, so default to height 5.
+  $c->param('height' => 5) unless $c->param('height');
+  # Let's remember the $data so we can query it for the parameters used.
+  my ($map, $data);
+  for my $step (1 .. 19) {
+    ($map, $data) = alpine_map($c, $step);
     my $mapper;
     if ($type eq 'hex') {
       $mapper = Game::TextMapper::Mapper::Hex->new(dist_dir => $dist_dir);
@@ -249,35 +256,91 @@ get '/alpine/document' => sub {
   };
   $c->stash("maps" => \@maps);
 
-  # The documentation needs all the defaults of Alpine::generate_map (but
-  # we'd like to use a smaller map because it is so slow).
-  my $width = $c->param('width') // 20;
-  my $height = $c->param('height') // 5; # instead of 10
-  my $steepness = $c->param('steepness') // 3;
-  my $peaks = $c->param('peaks') // int($width * $height / 40);
-  my $peak = $c->param('peak') // 10;
-  my $bumps = $c->param('bumps') // int($width * $height / 40);
-  my $bump = $c->param('bump') // 2;
-  my $bottom = $c->param('bottom') // 0;
-  my $arid = $c->param('arid') // 2;
-
   # Generate the documentation text based on the stashed maps.
   $c->render(template => 'alpine_document',
 	     seed => $seed,
-	     width => $width,
-	     height => $height,
-	     steepness => $steepness,
-	     peaks => $peaks,
-	     peak => $peak,
-	     bumps => $bumps,
-	     bump => $bump,
-	     bottom => $bottom,
-	     arid => $arid);
+	     width => $data->width,
+	     height => $data->height,
+	     steepness => $data->steepness,
+	     peaks => $data->peaks,
+	     peak => $data->peak,
+	     bumps => $data->bumps,
+	     bump => $data->bump,
+	     bottom => $data->bottom,
+	     arid => $data->arid,
+	     climate => $data->climate);
+};
+
+get '/alpine/random/interactive' => sub {
+  my $c = shift;
+  my $map = alpine_map($c);
+  my $type = $c->param('type') // 'hex';
+  my $mapper;
+  if ($type eq 'hex') {
+    $mapper = Game::TextMapper::Mapper::Hex->new(dist_dir => $dist_dir);
+  } else {
+    $mapper = Game::TextMapper::Mapper::Square->new(dist_dir => $dist_dir);
+  }
+  my $svg = $mapper->initialize($map)->svg;
+  $c->render(template => 'alpine_interactive',
+             map => $svg);
 };
 
 get '/alpine/parameters' => sub {
   my $c = shift;
   $c->render(template => 'alpine_parameters');
+};
+
+get '/folkesten' => sub {
+  my $c = shift;
+  if ($c->stash('format')||'' eq 'txt') {
+    $c->render(text => Game::TextMapper::Folkesten->new->generate_map());
+  } else {
+    $c->render(template => 'edit',
+	       map => Game::TextMapper::Folkesten->new->generate_map());
+  }
+};
+
+get '/folkesten/random' => sub {
+  my $c = shift;
+  my $map = Game::TextMapper::Folkesten->new->generate_map();
+  my $svg = Game::TextMapper::Mapper::Hex->new(dist_dir => $dist_dir)
+      ->initialize($map)
+      ->svg();
+  $c->render(text => $svg, format => 'svg');
+};
+
+get '/folkesten/random/text' => sub {
+  my $c = shift;
+  my $text = Game::TextMapper::Folkesten->new->generate_map();
+  $c->render(text => $text, format => 'txt');
+};
+
+get '/solo' => sub {
+  my $c = shift;
+  my $mapper = Game::TextMapper::Solo->new($c->req->params->to_hash);
+  if ($c->stash('format')||'' eq 'txt') {
+    $c->render(text => $mapper->generate_map());
+  } else {
+    $c->render(template => 'edit', map => $mapper->generate_map());
+  }
+};
+
+get '/solo/random' => sub {
+  my $c = shift;
+  my $mapper = Game::TextMapper::Solo->new($c->req->params->to_hash);
+  my $map = $mapper->generate_map();
+  my $svg = Game::TextMapper::Mapper::Hex->new(dist_dir => $dist_dir)
+      ->initialize($map)
+      ->svg();
+  $c->render(text => $svg, format => 'svg');
+};
+
+get '/solo/random/text' => sub {
+  my $c = shift;
+  my $mapper = Game::TextMapper::Solo->new($c->req->params->to_hash);
+  my $text = $mapper->generate_map();
+  $c->render(text => $text, format => 'txt');
 };
 
 # does not handle z coordinates
@@ -953,6 +1016,17 @@ L<https://campaignwiki.org/contrib/default.txt>
 Result:
 L<https://campaignwiki.org/text-mapper?map=include+forgotten-depths.txt>
 
+=head3 Bright library
+
+Example data:
+L<https://campaignwiki.org/contrib/bright-example.txt>
+
+Library:
+L<https://campaignwiki.org/contrib/bright.txt>
+
+Result:
+L<https://campaignwiki.org/text-mapper?map=include+bright-example.txt>
+
 =head3 Gnomeyland library
 
 Example data:
@@ -1152,7 +1226,7 @@ See L<Game::TextMapper::Schroeder::Alpine> for more information.
 
 =head3 Apocalypse
 
-The Alpine algorithm was developed by Alex Schroeder. See L<Hex describing the
+The Apocalypse algorithm was developed by Alex Schroeder. See L<Hex describing the
 post-apocalypse|https://alexschroeder.ch/wiki/2020-10-02_Hex_describing_the_post-apocalypse>
 for more information.
 
@@ -1469,7 +1543,8 @@ Schroeder's algorithm that's trying to recreate a medieval Swiss landscape, with
 no info to back it up, whatsoever. See it
 <%= link_to url_for('alpinedocument')->query(height => 5) => begin %>documented<% end %>.
 Click the submit button to generate the map itself. Or just keep reloading
-<%= link_to alpinerandom => begin %>this link<% end %>.
+<%= link_to alpinerandom => begin %>this link<% end %>, or try this this
+<%= link_to alpinerandominteractive => begin %>more interactive page<% end %>.
 You'll find the map description in a comment within the SVG file.
 </p>
 %= form_for alpine => begin
@@ -1492,8 +1567,8 @@ You'll find the map description in a comment within the SVG file.
 %= number_field bump => 2, min => 1, max => 2
 </td></tr><tr><td>Arid:</td><td>
 %= number_field arid => 2, min => 0, max => 2
-</td><td><td>
-</td><td></td><td>
+</td><td>Desert:</td><td>
+%= check_box climate => 'desert'
 </td></tr></table>
 <p>
 See the <%= link_to alpineparameters => begin %>documentation<% end %> for an
@@ -1579,6 +1654,30 @@ You'll find the map description in a comment within the SVG file.
 
 <hr>
 
+<p><%= link_to url_for('folkesten') => begin %>Folkesten<% end %> generates a 10×10 map based on Andreas Folkesten's blog post, <a href="http://arch-brick.blogspot.com/2023/08/hexmap-terrain-generator.html">Hexmap Terrain Generator</a>.
+Or just keep reloading <%= link_to url_for('folkestenrandom') => begin %>this link<% end %>.
+
+<hr>
+
+<p><%= link_to url_for('solo') => begin %>Solo<% end %> generates a map based on a semi-random walk by a party through the wilderness, exploring as it goes.
+Or just keep reloading <%= link_to url_for('solorandom') => begin %>this link<% end %>.
+
+%= form_for solo => begin
+<table>
+<tr><td>Rows:</td><td>
+%= number_field rows => 20, min => 5, max => 99
+</td>
+</tr><tr>
+<td>Columns:</td><td>
+%= number_field cols => 30, min => 5, max => 99
+</td></tr></table>
+<p>
+%= submit_button "Generate Map Data"
+</p>
+% end
+
+<hr>
+
 <p>Ideas and work in progress…
 
 <p><%= link_to url_for('island') => begin %>Island<% end %> generates a hotspot-inspired island chain.
@@ -1638,8 +1737,8 @@ When creating elevations, we surround each hex with a number of other hexes at
 one altitude level lower. The number of these surrounding lower levels is
 controlled by the <strong>steepness</strong> parameter (default 3). Lower means
 steeper. Floating points are allowed. Please note that the maximum numbers of
-neighbors considered is the 6 immediate neighbors and the 12 neighbors one step
-away.
+neighbours considered is the 6 immediate neighbours and the 12 neighbours one
+step away.
 </p>
 <p>
 Examples:
@@ -1686,9 +1785,16 @@ grow to their neighbouring hexes.
 </p>
 <p>
 Examples:
-<%= link_to url_for('alpinerandom')->query(height => 10, width => 15, peaks => 2, stepness => 2, arid => 2) => begin %>fewer, steeper mountains<% end %>,
-<%= link_to url_for('alpinerandom')->query(height => 10, width => 15, peaks => 2, stepness => 2, arid => 1) => begin %>less forest<% end %>,
-<%= link_to url_for('alpinerandom')->query(height => 10, width => 15, peaks => 2, stepness => 2, arid => 0) => begin %>very arid<% end %>
+<%= link_to url_for('alpinerandom')->query(height => 10, width => 15, peaks => 2, steepness => 2, arid => 2) => begin %>fewer, steeper mountains<% end %>,
+<%= link_to url_for('alpinerandom')->query(height => 10, width => 15, peaks => 2, steepness => 2, arid => 1) => begin %>less forest<% end %>,
+<%= link_to url_for('alpinerandom')->query(height => 10, width => 15, peaks => 2, steepness => 2, arid => 0) => begin %>very arid<% end %>
+</p>
+<p>
+The <strong>climate</strong> flag tries to turn it all into a desert. Works well
+with low hills, a higher steepness, an arid value of 0, and fewer peaks.
+</p>
+Example:
+<%= link_to url_for('alpinerandom')->query(height => 6, width => 30, peaks => 3, peak => 7, steepness => 5, arid => 0, climate => 'desert') => begin %>Australian desert<% end %>
 </p>
 
 
@@ -1698,22 +1804,22 @@ Examples:
 <h1>Alpine Map: How does it get created?</h1>
 
 <p>How do we get to the following map?
-<%= link_to url_for('alpinedocument')->query(width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid) => begin %>Reload<% end %>
+<%= link_to url_for('alpinedocument')->query(width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid, climate => $climate) => begin %>Reload<% end %>
 to get a different one. If you like this particular map, bookmark
-<%= link_to url_for('alpinerandom')->query(seed => $seed, width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid) => begin %>this link<% end %>,
+<%= link_to url_for('alpinerandom')->query(seed => $seed, width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid, climate => $climate) => begin %>this link<% end %>,
 and edit it using
-<%= link_to url_for('alpine')->query(seed => $seed, width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid) => begin %>this link<% end %>,
+<%= link_to url_for('alpine')->query(seed => $seed, width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid, climate => $climate) => begin %>this link<% end %>,
 </p>
 
 %== $maps->[$#$maps]
 
 <p>First, we pick <%= $peaks %> peaks and set their altitude to <%= $peak %>.
 Then we loop down to 1 and for every hex we added in the previous run, we add
-<%= $steepness %> neighbors at a lower altitude, if possible. We actually vary
-steepness, so the steepness given is just an average. We'll also consider
-neighbors one step away. If our random growth missed any hexes, we just copy the
-height of a neighbor. If we can't find a suitable neighbor within a few tries,
-just make a hole in the ground (altitude 0).</p>
+<%= $steepness %> neighbours at a lower altitude, if possible. We take fractions
+into account: 2.2 means we'll add 2 neighbours and there's a 20% we'll add a
+third. We'll also consider neighbours one step away. If our random growth missed
+any hexes, we just copy the height of a neighbour. If we can't find a suitable
+neighbour within a few tries, just make a hole in the ground (altitude 0).</p>
 
 <p>The number of peaks can be changed using the <em>peaks</em> parameter. Please
 note that 0 <em>peaks</em> will result in no land mass.</p>
@@ -1721,11 +1827,6 @@ note that 0 <em>peaks</em> will result in no land mass.</p>
 <p>The initial altitude of those peaks can be changed using the <em>peak</em>
 parameter. Please note that a <em>peak</em> smaller than 7 will result in no
 sources for rivers.</p>
-
-<p>The number of adjacent hexes at a lower altitude can be changed using the
-<em>steepness</em> parameter. Floating points are allowed. Please note that the
-maximum numbers of neighbors considered is the 6 immediate neighbors and the 12
-neighbors one step away.</p>
 
 %== shift(@$maps)
 
@@ -1746,7 +1847,7 @@ regions at the same altitude.</p>
 %== shift(@$maps)
 
 <p>We determine the flow of water by having water flow to one of the lowest
-neighbors if possible. Water doesn't flow upward, and if there is already water
+neighbours if possible. Water doesn't flow upward, and if there is already water
 coming our way, then it won't flow back. It has reached a dead end.</p>
 
 %== shift(@$maps)
@@ -1759,9 +1860,9 @@ coming our way, then it won't flow back. It has reached a dead end.</p>
 "flooding" lakes, looking for a way to the edge of the map. If we're lucky, our
 search will soon hit upon a sequence of arrows that leads to ever lower
 altitudes and to the edge of the map. An outlet! We start with all the hexes
-that don't have an arrow. For each one of those, we look at its neighbors. These
-are our initial candidates. We keep expanding our list of candidates as we add
-at neighbors of neighbors. At every step we prefer the lowest of these
+that don't have an arrow. For each one of those, we look at its neighbours.
+These are our initial candidates. We keep expanding our list of candidates as we
+add at neighbours of neighbours. At every step we prefer the lowest of these
 candidates. Once we have reached the edge of the map, we backtrack and change
 any arrows pointing the wrong way.</p>
 
@@ -1795,7 +1896,7 @@ shadow.</p>
 
 %== shift(@$maps)
 
-<p>Any hex <em>with a river</em> that flows towards a neighbor at the same
+<p>Any hex <em>with a river</em> that flows towards a neighbour at the same
 altitude is insufficiently drained. These are marked as swamps. The background
 color of the swamp depends on the altitude: grey if altitude 6 and higher,
 otherwise dark-grey.</p>
@@ -1821,11 +1922,10 @@ url_with('alpinedocument')->query({peaks => 1}) => begin %>lonely mountain<% end
 <p>Any remaining hexes have no water nearby and are considered to be little more
 arid. At high altitudes, they get "light-grey grass"; at lower altitudes they
 get "light-green bushes". For these lower altitude badlands, we add more variety
-by simulating areas where conditions are bad. We pick a quarter of these hexes,
-and deteriorate them, and their immediate neighbours. That is, we take little
-"circles" of seven hexes each, and place them in these areas. Whenever they
-overlap, conditions deteriorate even further: light-green bushes → light-green
-grass → dust grass → dust hill → dust desert.</p>
+by simulating areas where conditions are bad: If they don't have contact with
+some sort of trees or swamp, the bushes turn to grass, and if the grass is only
+surrounded by grass, desert, or water, it turns to light-grey desert if altitude
+is ≥ 3, otherwise to dust desert.</p>
 
 <p>You probably need fewer peaks on your map to verify this (a <%= link_to
 url_with('alpinedocument')->query({peaks => 1}) => begin %>lonely mountain<% end
@@ -1864,20 +1964,74 @@ city.</p>
 
 %== shift(@$maps)
 
-<p>Trails connect every settlement to any neighbor that is one or two hexes
-away. If no such neighbor can be found, we try to find neighbors that are three
-hexes away. If there are multiple options, we prefer the one at a lower
+<p>Trails connect every settlement to any neighbour that is one or two hexes
+away. If no such neighbour can be found, we try to find neighbours that are
+three hexes away. If there are multiple options, we prefer the one at a lower
 altitude.</p>
 
 %== shift(@$maps)
 
-<p>Finally, we take advantage of the fact that rivers continue into the ocean.
-We identify river mouths where the altitude change is just 1 (i.e. no cliff) and
+<p>We take advantage of the fact that rivers continue into the ocean. We
+identify river mouths where the altitude change is just 1 (i.e. no cliff) and
 extend the land into the water using a blue-green swamp. These are coastal
 marshes. We also check the next hex along the (invisible) river to check if this
 an ocean hex. If it is, we change it to water.
 
 %== shift(@$maps)
+
+<p>If the climate is set to "desert", we try a desertification by search and
+replace operation to use more reds, to use more bushland, to use more desert.
+
+%== shift(@$maps)
+
+
+@@ alpine_interactive.html.ep
+% layout 'default';
+% title 'Alpine Interaction';
+<h1>Alpine Interaction</h1>
+
+%== $map
+
+%= form_for alpinerandominteractive => begin
+<table>
+<tr><td>Width:</td><td>
+%= number_field width => 30, min => 5, max => 99
+</td><td>Bottom:</td><td>
+%= number_field bottom => 0, min => 0, max => 10
+</td><td>Peaks:</td><td>
+%= number_field peaks => 5, min => 0, max => 20
+</td><td>Bumps:</td><td>
+%= number_field bumps => 2, min => 0, max => 20
+</td></tr>
+<tr><td>Height:</td><td>
+%= number_field height => 10, min => 5, max => 99
+</td><td>Steepness:</td><td>
+%= number_field steepness => 3, min => 1, max => 20, step => 0.1
+</td><td>Peak:</td><td>
+%= number_field peak => 10, min => 7, max => 10
+</td><td>Bump:</td><td>
+%= number_field bump => 2, min => 1, max => 2
+</td></tr>
+<tr><td>Arid:</td><td>
+%= number_field arid => 2, min => 0, max => 2, step => 0.1
+</td><td>Step:</td><td>
+%= number_field step => undef, min => 1, max => 20
+</td><td>Desert:</td><td>
+%= check_box climate => 'desert'
+</td></tr></table>
+<p>
+See the <%= link_to alpineparameters => begin %>documentation<% end %> for an
+explanation of what these parameters do. See it
+<%= link_to url_with('alpinedocument') => begin %>documented<% end %>.
+<p>
+%= radio_button type => 'hex', id => 'hex', checked => undef
+%= label_for hex => 'Hex'
+%= radio_button type => 'square', id => 'square'
+%= label_for square => 'Square'
+<p>
+%= submit_button "Generate Map"
+</p>
+% end
 
 @@ layouts/default.html.ep
 <!DOCTYPE html>

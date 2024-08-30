@@ -67,7 +67,7 @@ sub getContent
 {
     my $filename = shift;
 
-    my $u = new IO::Uncompress::Unzip $filename, Append => 1, @_
+    my $u = IO::Uncompress::Unzip->new($filename, Append => 1, @_)
         or die "Cannot open $filename: $UnzipError";
 
     isa_ok $u, "IO::Uncompress::Unzip";
@@ -104,7 +104,7 @@ sub createZip
     # my %extra = %{ shift @_ // {} };
     my %extra = @_ ? %{ shift @_ } : {} ;
 
-    my $z = new Archive::Zip::SimpleZip $filename, %extra, CanonicalName => 0 ;
+    my $z = Archive::Zip::SimpleZip->new($filename, %extra, CanonicalName => 0) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     for my $x (@data)
@@ -184,7 +184,7 @@ if(1)
 
     {
         title "no zip filname";
-        my $z = new Archive::Zip::StreamedUnzip ;
+        my $z = Archive::Zip::StreamedUnzip->new() ;
 
         is $z, undef ;
         is $StreamedUnzipError, "Missing Filename",
@@ -194,8 +194,8 @@ if(1)
     if (1)
     {
         title "directory";
-        my $lex = new LexDir my $dir;
-        my $z = new Archive::Zip::StreamedUnzip $dir ;
+        my $lex = LexDir->new(my $dir);
+        my $z = Archive::Zip::StreamedUnzip->new($dir) ;
 
         is $z, undef ;
         is $StreamedUnzipError, "Illegal Filename",
@@ -204,10 +204,10 @@ if(1)
 
     {
         title "zip file in directory that doesn't exist";
-        my $lex = new LexDir my $dir;
+        my $lex = LexDir->new(my $dir);
         my $zipfile = File::Spec->catfile($dir, "not", "exist", "x.zip");
 
-        my $z = new Archive::Zip::StreamedUnzip $zipfile ;
+        my $z = Archive::Zip::StreamedUnzip->new($zipfile) ;
 
         is $z, undef ;
         like $StreamedUnzipError, qr/cannot open file/,
@@ -217,7 +217,7 @@ if(1)
 #    SKIP:
 #    {
 #        title "file not readable";
-#        my $lex = new LexFile my $zipfile;
+#        my $lex = LexFile->new(my $zipfile);
 
 #        chmod 0444, $zipfile
 #            or skip "Cannot create non-readable file", 3 ;
@@ -227,7 +227,7 @@ if(1)
 
 #        ok ! -r $zipfile, "  zip file not readable";
 
-#        my $z = new Archive::Zip::StreamedUnzip $zipfile ;
+#        my $z = Archive::Zip::StreamedUnzip->new($zipfile) ;
 
 #        is $z, undef ;
 #        is $StreamedUnzipError, "Illegal Filename",
@@ -239,7 +239,7 @@ if(1)
 
     {
         title "filename undef";
-        my $z = new Archive::Zip::StreamedUnzip undef;
+        my $z = Archive::Zip::StreamedUnzip->new(undef);
 
         is $z, undef ;
         is $StreamedUnzipError, "Illegal Filename",
@@ -249,8 +249,8 @@ if(1)
     if (0) # TODO
     {
         title "Bad parameter in new";
-        my $lex = new LexFile my $zipfile;
-        eval { my $z = new Archive::Zip::StreamedUnzip $zipfile, fred => 1 ; };
+        my $lex = LexFile->new(my $zipfile);
+        eval { my $z = Archive::Zip::StreamedUnzip->new($zipfile, fred => 1) ; };
 
         like $@,  qr/Archive::Zip::StreamedUnzip: unknown key value(s) fred at/,
             "  value  is bad";
@@ -303,7 +303,7 @@ if (1)
                         skip "Skipping Zstd with Streaming", 57
                             if  $method == ZIP_CM_ZSTD && $streamed;
 
-                        my $lex = new LexFile my $name2 ;
+                        my $lex = LexFile->new(my $name2) ;
                         my $output;
                         my $buffer;
                         my $zipfile;
@@ -319,7 +319,7 @@ if (1)
                         elsif ($to eq 'filehandle')
                         {
                             $zipfile = $name2;
-                            $output = new IO::File ">$name2" ;
+                            $output = IO::File->new(">$name2") ;
                         }
 
                         my $create =
@@ -339,7 +339,7 @@ if (1)
                                                     Zip64      => $zip64
                                                     } ) ;
 
-                        my $z = new Archive::Zip::StreamedUnzip $zipfile ;
+                        my $z = Archive::Zip::StreamedUnzip->new($zipfile) ;
                         isa_ok $z, "Archive::Zip::StreamedUnzip";
 
 
@@ -504,7 +504,7 @@ SKIP:
     {
         title "Zip file with exactly 64k members (but not Zip64)" ;
 
-        my $z = new Archive::Zip::StreamedUnzip "$TestZipsDir/test64k-notzip64.zip" ;
+        my $z = Archive::Zip::StreamedUnzip->new("$TestZipsDir/test64k-notzip64.zip") ;
         isa_ok $z, "Archive::Zip::StreamedUnzip";
 
         my $expectedMembers = 0xFFFF;
@@ -525,7 +525,7 @@ SKIP:
     {
         title "Zip file with exactly 64k members (is Zip64)" ;
 
-        my $z = new Archive::Zip::StreamedUnzip "$TestZipsDir/test64k.zip" ;
+        my $z = Archive::Zip::StreamedUnzip->new("$TestZipsDir/test64k.zip") ;
         isa_ok $z, "Archive::Zip::StreamedUnzip";
 
         my $expectedMembers = 0xFFFF;
@@ -547,7 +547,7 @@ SKIP:
     {
         title "Zip file with  64k + 1 members (must be Zip64)" ;
 
-        my $z = new Archive::Zip::StreamedUnzip "$TestZipsDir/test64k-plus1.zip" ;
+        my $z = Archive::Zip::StreamedUnzip->new("$TestZipsDir/test64k-plus1.zip") ;
         isa_ok $z, "Archive::Zip::StreamedUnzip";
 
         my $expectedMembers = 0xFFFF + 1;
@@ -599,7 +599,7 @@ SKIP:
             my $entries = @$in ;
             my @names   = map { $_->[0] } @$in ;
 
-            my $z = new Archive::Zip::StreamedUnzip $zipfile ;
+            my $z = Archive::Zip::StreamedUnzip->new($zipfile) ;
             isa_ok $z, "Archive::Zip::StreamedUnzip", "created object for file $zipfile";
             for my $m (@$in)
             {

@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -1445,7 +1445,10 @@ static void dumpfh(FILE *fh)
       case SAVEt_I32:
       case SAVEt_INT:
       case SAVEt_IV:
+#if (PERL_REVISION == 5) && (PERL_VERSION <= 40)
+      /* was removed in 5.41.3 */
       case SAVEt_LONG:
+#endif
 #if (PERL_REVISION == 5) && (PERL_VERSION >= 20)
       case SAVEt_STRLEN:
 #endif

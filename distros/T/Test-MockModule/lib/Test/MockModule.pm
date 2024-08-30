@@ -5,7 +5,8 @@ use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.178.0';
+# This is now auto-updated at release time by the github action
+$VERSION = '0.179.0';
 
 sub import {
     my ( $class, @args ) = @_;

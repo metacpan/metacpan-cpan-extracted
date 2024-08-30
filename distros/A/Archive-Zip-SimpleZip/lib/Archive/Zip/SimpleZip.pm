@@ -19,7 +19,7 @@ require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleZipError);
 
 $SimpleZipError= '';
-$VERSION = "1.001";
+$VERSION = "1.002";
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw( $SimpleZipError ) ;
@@ -67,7 +67,7 @@ our %PARAMS = (
 
 sub _ckParams
 {
-    my $got = shift || IO::Compress::Base::Parameters::new();
+    my $got = shift || IO::Compress::Base::Parameters->new();
     my $top = shift;
 
     $got->parse(\%PARAMS, @_)
@@ -116,7 +116,7 @@ sub _illegalFilename
 #    my $filename = shift ;
 #    #my %opts
 #
-#    my $z = new Archive::Zip::SimpleZip $filename, @_;
+#    my $z = Archive::Zip::SimpleZip->new($filename, @_);
 #
 #    if (ref $from eq 'ARRAY')
 #    {
@@ -162,7 +162,7 @@ sub new
             return _illegalFilename
         }
 
-        $fh = new IO::File ">$outValue"
+        $fh = IO::File->new(">$outValue")
             or return _illegalFilename;
     }
     elsif( $outType eq 'buffer' || $outType eq 'handle')
@@ -379,7 +379,7 @@ sub add
     }
     elsif (-f $filename)
     {
-        my $fh = new IO::File "<$filename"
+        my $fh = IO::File->new("<$filename")
             or die "Cannot open file $filename: $!";
 
         binmode $fh;
@@ -808,16 +808,16 @@ Archive::Zip::SimpleZip - Create Zip Archives
 
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
-    my $z = new Archive::Zip::SimpleZip "my.zip"
+    my $z = Archive::Zip::SimpleZip->('my.zip')
         or die "Cannot create zip file: $SimpleZipError\n" ;
 
-    $z->add("/some/file1.txt");
-    $z->addString("some text", Name => "myfile");
-    $z->addFileHandle($FH, Name => "myfile2") ;
+    $z->add('/some/file1.txt');
+    $z->addString("some text", Name => 'myfile');
+    $z->addFileHandle($FH, Name => 'myfile2') ;
 
-    $fh = $z->openMember(Name => "mydata1.txt");
-    print $fh "some data" ;
-    $fh->print("some more data") ;
+    $fh = $z->openMember(Name => 'mydata1.txt');
+    print $fh 'some data' ;
+    $fh->print('some more data') ;
     close $fh;
 
     $z->close();
@@ -840,11 +840,11 @@ Below is an example of how this module is used to add the two files
 
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
-    my $z = new Archive::Zip::SimpleZip "my1.zip"
+    my $z = Archive::Zip::SimpleZip->('my1.zip')
         or die "Cannot create zip file: $SimpleZipError\n" ;
 
-    $z->add("/some/file1.txt");
-    $z->add("/some/file2.txt");
+    $z->add('/some/file1.txt');
+    $z->add('/some/file2.txt');
 
     $z->close();
 
@@ -854,10 +854,11 @@ C<addString> method, like this
 
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
-    my $z = new Archive::Zip::SimpleZip "my2.zip"
+    my $z = Archive::Zip::SimpleZip->('my2.zip')
         or die "Cannot create zip file: $SimpleZipError\n" ;
 
-    $z->addString($myData, Name => "file2.txt");
+    my $myData = "some data";
+    $z->addString($myData, Name => 'file2.txt');
 
     $z->close();
 
@@ -867,37 +868,40 @@ file output functions, like C<print>.
 
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
-    my $z = new Archive::Zip::SimpleZip "my3.zip"
+    my $z = Archive::Zip::SimpleZip->('my3.zip')
         or die "Cannot create zip file: $SimpleZipError\n" ;
 
-    my $fh = $z->openMember(Name => "file3.txt");
+    my $fh = $z->openMember(Name => 'file3.txt');
 
-    $fh->print("some data");
-    # can also use print $fh "some data"
+    $fh->print('some data');
 
-    print $fh "more data" ;
+    print $fh 'more data' ;
 
     $fh->close() ;
     # can also use close $fh;
 
     $z->close();
 
-You can also "drop" a filehandle into a zip archive.
+You can also I<drop> an open filehandle that is open for reading into a zip archive.
 
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
-    my $z = new Archive::Zip::SimpleZip "my4.zip"
+    my $z = Archive::Zip::SimpleZip->('my4.zip')
         or die "Cannot create zip file: $SimpleZipError\n" ;
 
-    my $fh = $z->addFileHandle(FH, Name => "file3.txt");
+    open my $data, '<', 'somedata'
+        or die "Cannot open 'somedata': $!\";
+
+    # drop the $data filehandle into the zip file, naming it 'file3.txt;
+    my $fh = $z->addFileHandle($data, Name => 'file3.txt');
 
     $z->close();
 
 =head2 Constructor
 
-     $z = new Archive::Zip::SimpleZip "myzipfile.zip" [, OPTIONS] ;
-     $z = new Archive::Zip::SimpleZip \$buffer [, OPTIONS] ;
-     $z = new Archive::Zip::SimpleZip $filehandle [, OPTIONS] ;
+     $z = Archive::Zip::SimpleZip->new('myzipfile.zip' [, OPTIONS]) ;
+     $z = Archive::Zip::SimpleZip->new(\$buffer [, OPTIONS]) ;
+     $z = Archive::Zip::SimpleZip->new($filehandle [, OPTIONS]) ;
 
 The constructor takes one mandatory parameter along with zero or more
 optional parameters.
@@ -1045,8 +1049,8 @@ C<ZIP_CM_STORE>.
 
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
-    my $z = new Archive::Zip::SimpleZip "my.zip",
-                             Method => ZIP_CM_STORE
+    my $z = Archive::Zip::SimpleZip->new('my.zip',
+                                         Method => ZIP_CM_STORE)
         or die "Cannot create zip file: $SimpleZipError\n" ;
 
     $z->add("file1");
@@ -1089,7 +1093,8 @@ This option is not valid in the constructor.
 This option controls whether the I<archive member name> is
 I<normalized> into Unix format before being written to the zip archive.
 
-It is recommended that you keep this option enabled unless you really need
+It is very strongly recommended that you keep this option enabled unless you
+have a use cae where you really need
 to create a non-standard Zip archive.
 
 This is what APPNOTE.TXT has to say on what should be stored in the zip
@@ -1150,29 +1155,29 @@ Here are some examples
 
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
-    my $z = new Archive::Zip::SimpleZip "my.zip"
+    my $z = Archive::Zip::SimpleZip->new('my.zip')
         or die "$SimpleZipError\n" ;
 
-    # store "my/abc.txt" in the zip archive
-    $z->add("/my/abc.txt") ;
+    # store 'my/abc.txt' in the zip archive
+    $z->add('/my/abc.txt') ;
 
-    # store "/my/abc.txt" in the zip archive
-    $z->add("/my/abc.txt", CanonoicalName => 0) ;
+    # store '/my/abc.txt' in the zip archive as an absolute path
+    $z->add('/my/abc.txt', CanonoicalName => 0) ;
 
-    # store "xyz" in the zip archive
-    $z->add("/some/file", Name => "xyz") ;
+    # store '/some/file' as 'xyz' in the zip archive
+    $z->add('/some/file', Name => 'xyz') ;
 
-    # store "file3.txt" in the zip archive
-    $z->add("/my/file3.txt", FilterName => sub { s#.*/## } ) ;
+    # store 'file3.txt' in the zip archive by using a filter to remove the leading path
+    $z->add('/my/file3.txt', FilterName => sub { s#.*/## } ) ;
 
-    # no Name option, so store "" in the zip archive
-    $z->addString("payload data") ;
+    # no Name option, so store "" as the name in the zip archive
+    $z->addString('payload data') ;
 
-    # store "xyz" in the zip archive
-    $z->addString("payload data", Name => "xyz") ;
+    # store 'xyz' in the zip archive
+    $z->addString('payload data', Name => 'xyz') ;
 
-    # store "/abc/def" in the zip archive
-    $z->addString("payload data", Name => "/abc/def", CanonoicalName => 0) ;
+    # store '/abc/def' in the zip archive as an absolute path
+    $z->addString('payload data', Name => '/abc/def', CanonoicalName => 0) ;
 
     $z->close();
 
@@ -1284,7 +1289,7 @@ the encoding you have request exists.
 
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
-    my $z = new Archive::Zip::SimpleZip "my.zip"
+    my $z = Archive::Zip::SimpleZip->new('my.zip')
         or die "$SimpleZipError\n" ;
 
     $z->addString("payload data", Encode => "utf8") ;
@@ -1504,7 +1509,7 @@ Add all the "C" files in the current directory to the zip archive "my.zip".
 
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
-    my $z = new Archive::Zip::SimpleZip "my.zip"
+    my $z = Archive::Zip::SimpleZip->new('my.zip')
         or die "$SimpleZipError\n" ;
 
     for ( <*.c> )
@@ -1524,10 +1529,10 @@ store the zip archive in the variable C<$zipData>.
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
     my $zipData ;
-    my $z = new Archive::Zip::SimpleZip \$zipData
+    my $z = Archive::Zip::SimpleZip->new(\$zipData)
         or die "$SimpleZipError\n" ;
 
-    $z->add("part1.txt");
+    $z->add('part1.txt');
     $z->close();
 
 
@@ -1538,10 +1543,10 @@ member "part2.txt" without having to read anything from the filesystem.
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
     my $zipData ;
-    my $z = new Archive::Zip::SimpleZip \$zipData
+    my $z = Archive::Zip::SimpleZip->(\$zipData)
         or die "$SimpleZipError\n" ;
 
-    $z->addString("some text", Name => "part2.txt");
+    $z->addString('some text', Name => 'part2.txt');
     $z->close();
 
 
@@ -1553,7 +1558,7 @@ the path from the filename before it gets written to the zip archive,
 
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
-    my $z = new Archive::Zip::SimpleZip "my.zip"
+    my $z = Archive::Zip::SimpleZip->new('my.zip')
         or die "$SimpleZipError\n" ;
 
     for ( </some/path/*.c> )
@@ -1583,7 +1588,7 @@ relative path.
 
     my $filename = "found.zip";
     my $dir = "myDir";
-    my $z = new Archive::Zip::SimpleZip $filename
+    my $z = Archive::Zip::SimpleZip->new($filename)
         or die "Cannot open file $filename\n";
 
     find( sub { $z->add($_) if ! -d $_ }, $dir);
@@ -1615,7 +1620,7 @@ do just that
         unless @ARGV >= 2 ;
 
     my $zipFile = shift ;
-    my $zip = new Archive::Zip::SimpleZip $zipFile
+    my $zip = Archive::Zip::SimpleZip->new($zipFile)
                 or die "Cannot create zip file '$zipFile': $SimpleZipError";
 
     for my $Zfile (@ARGV)
@@ -1646,17 +1651,17 @@ in conjunction with the C<Net::FTP::get> method as shown below.
     use Net::FTP;
     use Archive::Zip::SimpleZip qw($SimpleZipError);
 
-    my $zipFile = "json.zip";
+    my $zipFile = 'json.zip';
     my $host = 'ftp.perl.org';
-    my $path = "/pub/CPAN";
+    my $path = '/pub/CPAN';
 
-    my $zip = new Archive::Zip::SimpleZip $zipFile
+    my $zip = Archive::Zip::SimpleZip->new($zipFile)
             or die "Cannot create zip file '$zipFile': $SimpleZipError";
 
-    my $ftp = new Net::FTP($host)
+    my $ftp = Net::FTP->new($host)
         or die "Cannot connect to $host: $@";
 
-    $ftp->login("anonymous",'-anonymous@')
+    $ftp->login('anonymous','-anonymous@')
         or die "Cannot login ", $ftp->message;
 
     $ftp->cwd($path)
@@ -1694,7 +1699,7 @@ shows how this is done.
             or die "Cannot addFileHandle file '$file': $SimpleZipError\n" ;
 
         $fh->close()
-            or die "Cannot close", $ftp->message;
+            or die 'Cannot close', $ftp->message;
     }
 
 One point to be aware of with the C<Net::FTP::retr>. Not all FTP servers
@@ -1710,15 +1715,15 @@ The script below, zipstdin. shows how to create a zip file using data read from 
 
     use Archive::Zip::SimpleZip qw($SimpleZipError);
 
-    my $zipFile = "stdin.zip";
+    my $zipFile = 'stdin.zip';
 
-    my $zip = new Archive::Zip::SimpleZip $zipFile
+    my $zip = Archive::Zip::SimpleZip->new($zipFile)
             or die "Cannot create zip file '$zipFile': $SimpleZipError";
     $zip->adFilehandle(STDIN, Name => "data.txt") ;
 
 or this, to do the whole thing from the commandline
 
-    echo abc | perl -MArchive::Zip::SimpleZip -e 'Archive::Zip::SimpleZip->new("stdin.zip")->addFileHandle(STDIN, Name => "data.txt")'
+    echo abc | perl -MArchive::Zip::SimpleZip -e 'Archive::Zip::SimpleZip->new('stdin.zip')->addFileHandle(STDIN, Name => 'data.txt')'
 
 
 =head1 Importing
@@ -1800,7 +1805,7 @@ have to set the C<Stream> option when you call the constructor.
     use Archive::Zip::SimpleZip qw($SimpleZipError) ;
 
     my $zipData ;
-    my $z = new Archive::Zip::SimpleZip '-',
+    my $z = Archive::Zip::SimpleZip->new('-'),
                         Stream => 1
         or die "$SimpleZipError\n" ;
 

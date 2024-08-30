@@ -47,6 +47,8 @@ these are the ones:
 
 =item * L<Game::TextMapper::Smale>
 
+=item * L<Game::TextMapper::Solo>
+
 =item * L<Game::TextMapper::Traveller>
 
 =back

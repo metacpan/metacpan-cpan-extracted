@@ -4,6 +4,7 @@ lib/Game/TextMapper/Apocalypse.pm
 lib/Game/TextMapper/Command/random.pm
 lib/Game/TextMapper/Command/render.pm
 lib/Game/TextMapper/Constants.pm
+lib/Game/TextMapper/Folkesten.pm
 lib/Game/TextMapper/Gridmapper.pm
 lib/Game/TextMapper/Line.pm
 lib/Game/TextMapper/Line/Hex.pm
@@ -22,6 +23,7 @@ lib/Game/TextMapper/Schroeder/Hex.pm
 lib/Game/TextMapper/Schroeder/Island.pm
 lib/Game/TextMapper/Schroeder/Square.pm
 lib/Game/TextMapper/Smale.pm
+lib/Game/TextMapper/Solo.pm
 lib/Game/TextMapper/Traveller.pm
 LICENSE
 Makefile.PL
@@ -30,6 +32,8 @@ README.md
 script/text-mapper
 share/apocalypse.txt
 share/black-and-white.txt
+share/bright-example.txt
+share/bright.txt
 share/default.txt
 share/extract-svg.pl
 share/forgotten-depths.txt

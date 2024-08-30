@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::FieldAttr 0.811;
+package Object::Pad::MOP::FieldAttr 0.812;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,8 @@ require Object::Pad;
 C<Object::Pad::MOP::FieldAttr> - meta-object representation of a field attribute for C<Object::Pad>
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This API provides a way for pure-perl implementations of field attributes to be
 provided. Pure-perl attributes cannot currently add new I<behaviour> to the

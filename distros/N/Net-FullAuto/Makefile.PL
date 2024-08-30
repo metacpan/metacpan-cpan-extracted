@@ -25,13 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000788';
-
-my $sudo=($^O eq 'cygwin')?'':'sudo ';
-print "AFTER BEGIN BLOCK FREEMEM: ".`${sudo}cat /proc/meminfo | grep MemFree`;
-print "AFTER BEGIN BLOCK STARTING AVAILABLE: ".`${sudo}cat /proc/meminfo | grep MemAvailable` unless $^O eq 'cygwin';
-
-print `env`,"\n\n\n";
+our $VERSION='1.0000793';
 
 if ($ENV{'AUTOMATED_TESTING'}) {
 #if (1) {
@@ -198,7 +192,7 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
       }
       @INC=@TMPINC;
    }
-   unless (grep { /SKIP|CPAN|figlet|NOTEST/ } @ARGV) {
+   unless (grep { /SKIP|CPAN|figlet/ } @ARGV) {
       eval {
          local $SIG{__DIE__}; # No sigdie handler
          require CPAN;
@@ -233,13 +227,6 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
       my $token=`curl -X PUT  -s "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`;
       my $instance_type=`curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-type`;
       $amazon{instance_type}=$instance_type;
-      print "FREEMEM AFTER AMAZON CHECK: ",`sudo cat /proc/meminfo | grep MemFree`;
-      print "AVAILABLE AFTER AMAZON CHECK: ",`sudo cat /proc/meminfo | grep MemAvailable`;
-      if ($instance_type=~/micro|nano/) {
-	      #`sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'`
-      }
-      print "FREEMEM AFTER CLEAR CACHES: ",`sudo cat /proc/meminfo | grep MemFree`;
-      print "AVAILABLE AFTER CLEAR CACHES: ",`sudo cat /proc/meminfo | grep MemAvailable`;
    }
 
 };
@@ -787,6 +774,7 @@ END
    ($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
    my $instver='';
    ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
+   $instver='' unless (-1<index $mod_info,'INST_VERSION');
    my $cpanfil='';
    ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
    my $cpanver='';
@@ -798,6 +786,7 @@ END
       # delete it from the vendor_perl area before we attempt to
       # install Pod::Man. We are doing this ONLY on Amazaon AMI
       # systems currently.
+#print "DO WE GET TO THIS PROBLEMATIC AREA AT ALL???\n";<STDIN>;
       fa_system("sudo echo y | /bin/rm -rf \"$instfile\"");
    } elsif (2<$exec_cnt) {
       my $timeout=300;my $a='';
@@ -1352,6 +1341,8 @@ END
 
     my $message=<<'END';
 
+
+
    ======================================================================
    This message times out in two minutes so FullAuto Install can continue
    ======================================================================
@@ -1641,13 +1632,6 @@ sub fa_find_latest {
    }
    $look=~s/::/-/g;
    print "***** Looking for Most Recent \"$look Dir\" \n";
-   if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
-      #print `sudo cat /proc/meminfo | grep MemFree`;
-      #print `sudo cat /proc/meminfo | grep MemAvailable`;
-      fa_system("sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'");
-      #print `sudo cat /proc/meminfo | grep MemFree`;
-      #print `sudo cat /proc/meminfo | grep MemAvailable`;
-   }
    my $d=$ENV{CPAN_BUILD_DIR}||'';
    unless ($d) {
       eval {
@@ -1718,13 +1702,13 @@ sub look_inside_dir {
    }
    close(LI);
    if ($tar) {
-      unless ($CPAN::Config->{tar}) {
+      unless ($ENV{CPAN_TAR} || $CPAN::Config->{tar}) {
          if (-e '/usr/sfw/bin/gtar') {
-            $CPAN::Config->{tar}='/usr/sfw/bin/gtar';
+            $ENV{CPAN_TAR}=$CPAN::Config->{tar}='/usr/sfw/bin/gtar';
          } elsif (-e '/usr/bin/tar') {
-            $CPAN::Config->{tar}='/usr/bin/tar';
+            $ENV{CPAN_TAR}=$CPAN::Config->{tar}='/usr/bin/tar';
          } elsif (-e '/usr/local/bin/tar') {
-            $CPAN::Config->{tar}='/usr/local/bin/tar';
+            $ENV{CPAN_TAR}=$CPAN::Config->{tar}='/usr/local/bin/tar';
          } else {
             print "\n\n   FATAL ERROR!: The 'tar' utility is".
                " missing.\n".
@@ -1740,13 +1724,13 @@ sub look_inside_dir {
             ($system_type eq 'ubuntu') ||
             ($system_type eq 'rhel') ||
             ($system_type eq 'centos')) {
-         print "***** Untar: sudo ",$CPAN::Config->{tar}," xvf $tar\n";
-         fa_system("sudo ".$CPAN::Config->{tar}." xvf $tar");
+         print "***** Untar: sudo ",$ENV{CPAN_TAR}," xvf $tar\n";
+         fa_system("sudo ".$ENV{CPAN_TAR}." xvf $tar");
       } else {
-         print "***** Untar: ",$CPAN::Config->{tar}," xvf $tar\n";
-         fa_system($CPAN::Config->{tar}." xvf $tar");
+         print "***** Untar: ",$ENV{CPAN_TAR}," xvf $tar\n";
+         fa_system($ENV{CPAN_TAR}." xvf $tar");
       }
-      chdir $CPAN::Config->{build_dir};
+      chdir $ENV{CPAN_BUILD_DIR}||$CPAN::Config->{build_dir};
       $tar=~s/[.]tar$//;
       return "$d/$tar";
    }
@@ -1797,8 +1781,6 @@ sub fa_install_mod {
          /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
          } @ARGV)) {
       print "\n";
-      #local $SIG{__DIE__}; # No sigdie handler
-      #CPAN::Shell->m($p);
       eval {
          local $SIG{__DIE__}; # No sigdie handler;
          require CPAN;
@@ -1817,6 +1799,7 @@ sub fa_install_mod {
          ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
       }
       if (!$version && ($instver<$cpanver)) {
+#print "DO WE GET TO THIS PROBLEMATIC AREA AT ALL???\n";<STDIN>;
          unlink $instfile if $exec_cnt;
          $version=$cpanver;
       }
@@ -1862,114 +1845,16 @@ sub fa_install_mod {
       } elsif ($version && $p eq 'Term::RawInput') {
          $p="REEDFISH/Term-RawInput-$version.tar.gz";
       }
-      if (exists $amazon{instance_type} &&
-            $amazon{instance_type}=~/micro|nano/) {
-         print "==> $p required."
-         and print "*** Installing $p via CPAN\n";
-         #if ($ARGV[$#ARGV]=~/^\d+$/) {
-         #   pop @ARGV;pop @ARGV;
-         #}
-         #shift @ARGV if $ARGV[0] eq 'SKIP';
-         #my $argvs=join " ", @ARGV;
-         #my $exec_cmd="sudo su -c '"
-         #            ."sync;echo 3 > /proc/sys/vm/drop_caches;"
-         #            ."swapoff -a && swapon -a';cd \"$cwd\";"
-         #            ."cpan -T $p;"
-         #            ."$^X Makefile.PL $argvs SKIP";
-         my $d=$ENV{CPAN_BUILD_DIR};
-         $d=~s/^(.*)\/.*$/$1/;
-	 my $authdir=$cpanfil;
-	 $authdir=~s/^(.*)\/.*/$1/;
-	 my $proc=$$;
-         my $getfile=$d.'/sources/authors/id/'.$cpanfil.'.tmp'.$proc;
-         my $getchek=$d.'/sources/authors/id/'.$authdir.'/CHECKSUMS';
-         my $cpanurl='https://cpan.org/authors/id/'.$cpanfil;
-	 my $cpan_gz=$cpanfil;
-	 $cpan_gz=~s/^.*\/(.*)$/$1/;
-	 my $cpan_bf=$cpan_gz;
-	 $cpan_bf=~s/[.]tar[.]gz.*$//;
-         my $cpanchk='https://cpan.org/authors/id/'.$authdir.'/CHECKSUMS';
-         fa_system('mkdir -vp '.$d.'/sources/authors/id/'.$authdir);
-         #fa_system($ENV{CPAN_WGET}." -nv -o - -O \"$getfile\" $cpanurl");
-         if ($ARGV[$#ARGV]!~/$cpan_gz/) {
-            if ($ARGV[$#ARGV]=~/^\d+$/) {
-               pop @ARGV;pop @ARGV;
-            }
-            shift @ARGV if $ARGV[0] eq 'SKIP';
-            my $argvs=join " ", @ARGV;
-            my $exec_cmd="sudo su -c '"
-                        ."sync;echo 3 > /proc/sys/vm/drop_caches;"
-                        ."swapoff -a && swapon -a';cd \"$cwd\";"
-                        .$ENV{CPAN_WGET}." -nv -o - -O \"$getfile\" $cpanurl;"
-                        .$ENV{CPAN_WGET}." -nv -o - -O \"$getchek\" $cpanchk;"
-                        ."$^X Makefile.PL $argvs SKIP $$ $cpan_gz";
-            exec $exec_cmd;
-         } else {
-            pop @ARGV;
-            my $pid=pop@ARGV;
-            $getfile=~s/${$}$/$pid/; 
-         }
-	 #print "WGET COMMAND=",'sudo '.$ENV{CPAN_WGET}." -O \"$getfile\" $cpanurl";
-         #fa_system($ENV{CPAN_WGET}." -nv -o - -O \"$getchek\" $cpanchk");
-         open(FH,"<$getchek") || fa_die("Cannot open $getchek $!");
-	 my $sha=0;
-         while (my $line=<FH>) {
-            if (-1<index $line,$cpan_gz) {
-               $sha=1;
-            } elsif ($sha) {
-               if (-1<index $line,'sha256') {
-                  $sha=$line;
-		  $sha=~s/^.*sha256['].*?['](.*)['].*$/$1/;
-		  chomp($sha);
-                  last;
-               }
-            }
-         } close(FH);
-         open(FILE, $getfile) or fa_die("Can't open '$getfile': $!");
-         binmode(FILE);
-         require Digest::SHA;
-         import Digest::SHA;
-         my $digestsha=Digest::SHA->new(256)->addfile(*FILE)->hexdigest;
-         if ($sha eq $digestsha) {
-            print(qq{ + CHECKSUM Test for $cpan_gz *PASSED* \n})
-               if $CPAN::DEBUG;
-         } else {
-            print "CHECKSUM test for $cpan_gz *FAILED*\n";
-            print "CALCULATED=$digestsha and ",
-                  "DOWNLOADED=$sha\n";
-            print "\nPress ANY key to terminate FullAuto ",
-                  "installation ...\n";
-            <STDIN>;
-            fa_die("FATAL ERROR! : ".
-               "CHECKSUM Test for $cpan_gz *FAILED*\n");
-         }
-         close(FILE);
-	 my $cpangz=$getfile;
-	 $cpangz=~s/^(.*).tmp$proc$/$1/;
-	 fa_system("mv $getfile $cpangz");
-	 opendir (DIR,$d) || fa_die("Error in opening dir $d\n");
-	 my $bf=0;
-         while( (my $itm=readdir(DIR))) {
-            if (-1<index $itm,$cpan_bf) {
-               $bf++;
-            }
-         }
-         closedir(DIR);
-	 fa_system("$ENV{CPAN_TAR} -C$ENV{CPAN_BUILD_DIR} -xf $cpangz");
-	 fa_system("mv -v $ENV{CPAN_BUILD_DIR}/$cpan_bf $ENV{CPAN_BUILD_DIR}/$cpan_bf-$bf");
-         #exec $exec_cmd;
-      } else {
-         print "==> $p required."
-         and print "*** Installing $p via CPAN\n"
-         and
-         eval {
-            local $SIG{__DIE__}; # No sigdie handler;
-            require CPAN;
-            CPAN::Shell->notest('get',$p);
-         };
-         if ($@) {
-            fa_die("CPAN Error: $@ $!\n");
-         }
+      print "==> $p required."
+      and print "*** Installing $p via CPAN\n"
+      and
+      eval {
+         local $SIG{__DIE__}; # No sigdie handler;
+         require CPAN;
+         CPAN::Shell->notest('get',$p);
+      };
+      if ($@) {
+         fa_die("CPAN Error: $@ $!\n");
       }
       if ($version && (-1<index $p,'Term-Menus')) {
          $p='Term::Menus';
@@ -2118,11 +2003,7 @@ END
                                  ."$^X Makefile.PL SKIP $argvs Net::SSLeay 2";
                      exec $exec_cmd;
                   } else {
-                     #print `sudo cat /proc/meminfo | grep MemFree`;
-                     #print `sudo cat /proc/meminfo | grep MemAvailable`;
                      fa_system("sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'");
-                     #print `sudo cat /proc/meminfo | grep MemFree`;
-                     #print `sudo cat /proc/meminfo | grep MemAvailable`;
                   }
                } else {
                   if ($ARGV[$#ARGV]=~/^\d+$/) {
@@ -2263,7 +2144,6 @@ END
       print "*** $p Loaded Successfully\n";
       $ENV{LOADED_MODULES}.="|$p";
       $exec_cnt=0;
-      #fa_system("sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';swapoff -a && swapon -a");
       print "\n",`sudo cat /proc/meminfo | grep MemFree`;
       my $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
       print $memavail;
@@ -2351,11 +2231,10 @@ sub size_fmt {
 }
 if (exists $amazon{instance_type}) {
    if ($amazon{instance_type}=~/micro/) {
-	   print "ARGVVVVVV=",join ' ',@ARGV,"\n";
       unless (grep { /CPAN|SKIP/ } @ARGV) {
          fa_system('sudo dnf -y install perl-YAML.noarch perl-Net-SSLeay.x86_64');
-print "BEFORE CPAN LOOPING FREEMEM: ".`sudo cat /proc/meminfo | grep MemFree`;
-print "BEFORE CPAN LOOPING STARTING AVAILABLE: ".`sudo cat /proc/meminfo | grep MemAvailable`;
+#print "BEFORE CPAN LOOPING FREEMEM: ".`sudo cat /proc/meminfo | grep MemFree`;
+#print "BEFORE CPAN LOOPING STARTING AVAILABLE: ".`sudo cat /proc/meminfo | grep MemAvailable`;
          my $cwd=&cwd;
          my $argvs=join " ", @ARGV;
          my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
@@ -2364,10 +2243,9 @@ print "BEFORE CPAN LOOPING STARTING AVAILABLE: ".`sudo cat /proc/meminfo | grep 
          exec $exec_cmd;
       } elsif (!grep { /SKIP/ } @ARGV) {
          pop @ARGV;
-         #fa_system('sudo dnf -y install perl-YAML.noarch perl-Net-SSLeay.x86_64');
          print "\n";
 	 my $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
-print "BEFORE LOADING CPAN TO CHECK FOR RELEASE: $memavail\n";
+#print "BEFORE LOADING CPAN TO CHECK FOR RELEASE: $memavail\n";
 	 $memavail=~s/^.*?(\d+).*$/$1/s;
          eval {
             local $SIG{__DIE__}; # No sigdie handler
@@ -2383,17 +2261,17 @@ print "BEFORE LOADING CPAN TO CHECK FOR RELEASE: $memavail\n";
 END
          my $d = $CPAN::Config->{build_dir};
 	 $d=~s/^(.*)\/.*$/$1/;
-         $release=`cat $d/Metadata | grep -a Net-FullAuto`;
+         $release=
+            `cat $d/Metadata | grep -a Net-FullAuto | sed 's/[^[:print:]]//g'`;
 	 chomp($release);
 
-print "WHAT IS RELEASE FOR PARSING:\n\n$release<==\n\n";
-
-	 $release=~s/^.*\n.*RE\/(.*?)\s+CPAN.*$/$1/s;
-print "PARSING OUTCOME=$release<==\n\n";
+#print "WHAT IS RELEASE FOR PARSING:\n\n$release<==\n\n";
+	 $release=~s/^.*?[+]R\/RE\/(.*?)CPAN_FILE.*$/$1/s;
+#print "PARSING OUTCOME=$release<==\n\n";
          $low_mem.=<<END;
    Installing FullAuto on an Amazon AWS $amazon{instance_type} instance via
    the commandline cpan utility requires a different approach. The cpan
-   utility places its entire module catalog in memory, and on an aws
+   utility places its entire module catalog in memory, and on an AWS 
    $amazon{instance_type} instance, there just isn't the capacity to make it work
    as expected. Instead, exit out of the cpan utility, and then restart it,
    but run the bottom command *instead* of "install Net::FullAuto":
@@ -2402,26 +2280,19 @@ print "PARSING OUTCOME=$release<==\n\n";
    
    \$ <sudo> cpan    ( <== restart 'cpan' [if sudo was used, use it again])
 
-   cpan[1]> install $release
-
+   cpan[1]> install $release  <==
+            ======================================
 END
          $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
          my $mem_avail=$memavail;
          $memavail=~s/^.*?(\d+).*$/$1/s;
          print "$mem_avail\n\n";
-         #if (int($memavail)<220000) {
-         if (int($memavail)<150000) {
+         if (int($memavail)<220000) {
+         #if (int($memavail)<150000) {
             print "$low_mem\n\n";
             exit;
-         } else {
-            #my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
-            #            ."swapoff -a && swapon -a;"
-            #            ."$^X Makefile.PL SKIP CPAN";
-            #exec $exec_cmd;
          }
       }
-   } elsif (!grep { /SKIP/ } @ARGV) {
-	   #fa_system('sudo dnf -y install perl-YAML.noarch');
    }
 }
 print "\n";

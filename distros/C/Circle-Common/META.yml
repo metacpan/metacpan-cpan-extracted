@@ -19,6 +19,8 @@ no_index:
     - t
     - inc
 requires:
+  File::Share: '0.27'
+  File::ShareDir::Install: '0.14'
   JSON: '4.10'
   LWP::Protocol::https: '6.14'
   LWP::UserAgent: '6.67'
@@ -27,5 +29,5 @@ requires:
   URL::Encode: '0.03'
   YAML: '1.30'
   perl: '5.006'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

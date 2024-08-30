@@ -33,3 +33,8 @@ Revision history for builtins
 
     * Added support for builtin::unimport
       (thanks Andreas!)
+
+
+0.000007  Thu Aug 29 21:05:29 2024
+
+    * Fixed issues with Perl 5.40

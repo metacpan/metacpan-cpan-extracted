@@ -176,6 +176,8 @@ static OP *new_op(pTHX_ const struct HooksAndData hd, U32 flags, OP *lhs, OP *rh
     return (*hd.hooks->new_op)(aTHX_ flags, lhs, rhs, parsedata, hd.data);
   }
 
+  assert(hd.hooks->ppaddr);
+
   OP *ret;
   if(hd.hooks->flags & XPI_FLAG_LISTASSOC) {
     OP *listop = lhs;
@@ -1114,6 +1116,9 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
   }
 #endif
 
+  if(!hooks->new_op && !hooks->ppaddr)
+    croak("Cannot register third-party infix operator without at least one of .new_op or .ppaddr");
+
   struct Registration *reg;
   Newx(reg, 1, struct Registration);
 
@@ -1217,7 +1222,9 @@ void XSParseInfix_boot(pTHX)
   reg_builtin(aTHX_ "<=>", XPI_CLS_ORDERING, OP_NCMP);
 
   /* other predicates */
+#ifdef OP_SMARTMATCH /* removed in perl 5.41.3 */
   reg_builtin(aTHX_ "~~", XPI_CLS_SMARTMATCH, OP_SMARTMATCH);
+#endif
   reg_builtin(aTHX_ "=~", XPI_CLS_MATCHRE, OP_MATCH);
   /* TODO: !~ */
 #ifdef HAVE_OP_ISA

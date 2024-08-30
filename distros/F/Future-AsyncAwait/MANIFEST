@@ -8,6 +8,7 @@ hax/docatch.c.inc
 hax/newOP_CUSTOM.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
+hax/PL_savetype_name.c.inc
 hax/README
 hax/save_clearpadrange.c.inc
 lib/Future/AsyncAwait.pm

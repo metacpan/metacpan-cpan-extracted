@@ -1,5 +1,10 @@
 Revision history for Future-AsyncAwait
 
+0.68    2024-08-29
+        [BUGFIXES]
+         * Updated to latest hax/ support files: #ifdef around SAVEt_LONG for
+           perl 5.41.3 which removed it
+
 0.67    2024-08-19
         [CHANGES]
          * Use `File::ShareDir` for storing .h include file, rather than

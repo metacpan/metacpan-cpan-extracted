@@ -55,6 +55,9 @@ check:
 # for all the directories and files we want to watch.
 run:
 	morbo --verbose --listen http://*:3010 script/text-mapper --watch text-mapper.conf --watch lib
+
+upload:
+	rsync --archive --itemize-changes share/*.txt sibirocobombus:campaignwiki.org/contrib
 EOT
   return join "\n", @ret;
 }

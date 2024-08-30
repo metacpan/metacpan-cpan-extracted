@@ -20,6 +20,7 @@
 #include "XSParseSublike.h"
 
 #include "perl-backcompat.c.inc"
+#include "PL_savetype_name.c.inc"
 
 #if !HAVE_PERL_VERSION(5, 24, 0)
   /* On perls before 5.24 we have to do some extra work to save the itervar

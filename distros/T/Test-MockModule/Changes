@@ -1,4 +1,11 @@
-Revision history for Test::MockModule
+# NOTE: Starting on Aug 29, 2024, this file will no longer be updated. Please see
+  the release notes for versions of this module published on GitHub: 
+  https://github.com/geofffranks/test-mockmodule/releases
+
+# Revision history for Test::MockModule pre Aug 29, 2024
+
+v0.179.0
+- 82881df - Bump Module::Build requirement by @atoomic in #65
 
 v0.178.0
 - 6724a30 - Simplify CI workflow - Nicolas R

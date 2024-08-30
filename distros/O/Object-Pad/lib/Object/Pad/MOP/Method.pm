@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Method 0.811;
+package Object::Pad::MOP::Method 0.812;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,8 @@ require Object::Pad;
 C<Object::Pad::MOP::Method> - meta-object representation of a method of a C<Object::Pad> class
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 Instances of this class represent a method of a class implemented by
 L<Object::Pad>. Accessors provide information about the method.

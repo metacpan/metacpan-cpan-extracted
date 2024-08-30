@@ -109,14 +109,15 @@ sub coordinates {
 
 =head3 coord($x, $y, $separator)
 
-Return "0101" or "-01-01" for coordinates. Often this what we want in text.
+Return "0101" or "-01-01" for coordinates. Often this is what we want in text.
+this works up to 99.
 
 =cut
 
 sub coord {
   my ($x, $y, $separator) = @_;
-  $separator //= "";
-  # print (1,1) as 0101; print (-1,-1) as -01-01
+  $separator //= ($x > 99 || $y > 99 ? "." : "");
+  # print (1,1) as 0101; print (-1,-1) as -01-01; print (100,100) as 100.100
   return sprintf("%0*d$separator%0*d",
 		 ($x < 0 ? 3 : 2), $x,
 		 ($y < 0 ? 3 : 2), $y);

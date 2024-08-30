@@ -1,3 +1,16 @@
+1.08
+
+- Add CC0 to bright.txt.
+
+1.07
+
+- Add Solo algorithm.
+
+1.06
+
+- Add Folkesten algorithm.
+- Add Bright library.
+
 1.05
 
 - Add offset and alignment properties to lines (rivers, trails).

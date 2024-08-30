@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  1.002 29 August  2024
+
+        * Rewrite iindirect "new" to "->new"
+          Thu Aug 29 11:15:35 2024 +0100
+          68c9fd0fb502a5bb5332a0d3262f8d28d94f56a1
+
   1.001 28 August  2024
 
         * #20 Don't ship with Test::* modules

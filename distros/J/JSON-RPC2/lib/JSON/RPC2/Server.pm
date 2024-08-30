@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.1.2';
+our $VERSION = 'v2.1.3';
 
 use JSON::MaybeXS;
 
@@ -53,7 +53,7 @@ sub execute {
     croak 'second param must be callback' if ref $cb ne 'CODE';
 
     undef $@;
-    my $request = ref $json ? $json : eval { decode_json($json) };
+    my $request = ref $json ? $json : eval { JSON::MaybeXS->new(allow_nonref=>0)->decode($json) };
     if ($@) {
         return _error($cb, undef, ERR_PARSE, 'Parse error.');
     }
@@ -204,7 +204,7 @@ JSON::RPC2::Server - Transport-independent JSON-RPC 2.0 server
 
 =head1 VERSION
 
-This document describes JSON::RPC2::Server version v2.1.2
+This document describes JSON::RPC2::Server version v2.1.3
 
 
 =head1 SYNOPSIS
@@ -286,7 +286,7 @@ be done in non-blocking way - this way several methods can be executing
 in parallel on server).
 
 
-=head1 INTERFACE 
+=head1 INTERFACE
 
 =head2 new
 

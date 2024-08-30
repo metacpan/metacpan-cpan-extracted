@@ -2,7 +2,7 @@ package Object::HashBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 our $HB_VERSION = $VERSION;
 # The next line is for inlining
 # <-- START -->
@@ -236,13 +236,18 @@ sub _build_new {
     my $new_lookup = $Object::HashBase::NEW_LOOKUP //= {};
     $new_lookup->{$new} = 1;
 
-    return (
-        new           => $new,
-        add_pre_init  => $add_pre_init,
-        add_post_init => $add_post_init,
-        _pre_init     => $_pre_init,
-        _post_init    => $_post_init,
-    );
+    my %out;
+
+    {
+        no strict 'refs';
+        $out{new}           = $new           unless defined(&{"${into}\::new"});
+        $out{add_pre_init}  = $add_pre_init  unless defined(&{"${into}\::add_pre_init"});
+        $out{add_post_init} = $add_post_init unless defined(&{"${into}\::add_post_init"});
+        $out{_pre_init}     = $_pre_init     unless defined(&{"${into}\::_pre_init"});
+        $out{_post_init}    = $_post_init    unless defined(&{"${into}\::_post_init"});
+    }
+
+    return %out;
 }
 
 1;

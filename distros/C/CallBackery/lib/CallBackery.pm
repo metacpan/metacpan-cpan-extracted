@@ -38,7 +38,7 @@ use CallBackery::Database;
 use CallBackery::User;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.49.6';
+our $VERSION = '0.50.0';
 
 =head2 config
 

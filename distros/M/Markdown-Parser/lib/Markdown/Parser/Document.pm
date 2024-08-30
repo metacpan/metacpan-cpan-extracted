@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Document.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2022/09/19
+## Modified 2024/08/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,11 +17,9 @@ BEGIN
     use warnings;
     use parent qw( Markdown::Parser::Element );
     use vars qw( $VERSION );
-    use Nice::Try;
     use URI;
     use Scalar::Util ();
-    use Devel::Confess;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.3.0';
     use constant MERMAID_RSRC_URI => 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js';
     use constant MERMAID_INIT     => "mermaid.initialize({startOnLoad:true});";
     # https://katex.org/
@@ -64,12 +62,10 @@ sub add_css_link
     my $url  = shift( @_ ) || return( $self->error( "No css link uri provided" ) );
     my $opts = {};
     $opts = shift( @_ ) if( $self->_is_hash( $_[-1] ) );
-    my $uri;
-    try
-    {
-        $uri = URI->new( $url );
-    }
-    catch( $e )
+    local $@;
+    # try-catch
+    my $uri = eval{ URI->new( $url ) };
+    if( $@ )
     {
         return( $self->error( "Bad uri provided for this css link: '$url'" ) );
     }
@@ -116,12 +112,10 @@ sub add_js_link
     my $url  = shift( @_ ) || return( $self->error( "No JavaScript link uri provided" ) );
     my $opts = {};
     $opts = shift( @_ ) if( $self->_is_hash( $_[-1] ) );
-    my $uri;
-    try
-    {
-        $uri = URI->new( $url );
-    }
-    catch( $e )
+    local $@;
+    # try-catch
+    my $uri = eval{ URI->new( $url ) };
+    if( $@ )
     {
         return( $self->error( "Bad uri provided for this JavaScript link: '$url'" ) );
     }
@@ -556,7 +550,7 @@ Markdown::Parser::Document - Markdown Document Element
 
 =head1 VERSION
 
-    v0.2.0
+    v0.3.0
 
 =head1 DESCRIPTION
 

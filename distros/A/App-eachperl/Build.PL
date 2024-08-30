@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -7,7 +8,9 @@ my $build = Module::Build->new(
    module_name => 'App::eachperl',
    requires => {
       'perl' => 5.026,
-      'Object::Pad' => '0.74', # 0.73 + bugfix
+      'Object::Pad' => '0.800',
+      'Object::Pad::FieldAttr::Checked' => '0.04',
+      'Data::Checks' => '0.08',
 
       'Attribute::Storage' => 0,
       'Commandable::Finder::MethodAttributes' => 0,
@@ -20,7 +23,7 @@ my $build = Module::Build->new(
       'Syntax::Keyword::Dynamically' => 0,
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

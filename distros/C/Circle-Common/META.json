@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "File::Share" : "0.27",
+            "File::ShareDir::Install" : "0.14",
             "JSON" : "4.10",
             "LWP::Protocol::https" : "6.14",
             "LWP::UserAgent" : "6.67",
@@ -49,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

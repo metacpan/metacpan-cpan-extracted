@@ -83,7 +83,14 @@ sub svg_region {
   my $x = $self->x;
   my $y = $self->y;
   my $z = $self->z;
-  my $id = "hex$x$y" . ($z != 0 ? $z : ''); # z-axis 0 means no z axis for the $id
+  my $id = "hex";
+  if ($x < 100 and $y < 100 and $z < 100) {
+    $id .= "$x$y";
+    $id .= $z if $z != 0;
+  } else {
+    $id .= "$x.$y";
+    $id .= ".$z" if $z != 0;
+  }
   my $points = join(" ", map { sprintf("%.1f,%.1f", $self->pixels($offset, @$_)) } $self->corners());
   return qq{    <polygon id="$id" $attributes points="$points" />\n}
 }

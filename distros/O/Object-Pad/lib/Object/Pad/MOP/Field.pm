@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Field 0.811;
+package Object::Pad::MOP::Field 0.812;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,8 @@ require Object::Pad;
 C<Object::Pad::MOP::Field> - meta-object representation of data field of a C<Object::Pad> class
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 Instances of this class represent a data field of a class implemented by
 L<Object::Pad>. Accessors provide information about the field. The special

@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.1.2';
+our $VERSION = 'v2.1.3';
 
 use JSON::MaybeXS;
 use Scalar::Util qw( weaken refaddr );
@@ -115,7 +115,7 @@ sub batch_response {
     croak 'require 1 param' if @_ != 2;
 
     undef $@;
-    my $response = ref $json ? $json : eval { decode_json($json) };
+    my $response = ref $json ? $json : eval { JSON::MaybeXS->new(allow_nonref=>0)->decode($json) };
     if ($@) {
         return [ 'Parse error' ];
     }
@@ -137,7 +137,7 @@ sub response {      ## no critic (ProhibitExcessComplexity RequireArgUnpacking)
     croak 'require 1 param' if @_ != 2;
 
     undef $@;
-    my $response = ref $json ? $json : eval { decode_json($json) };
+    my $response = ref $json ? $json : eval { JSON::MaybeXS->new(allow_nonref=>0)->decode($json) };
     if ($@) {
         return 'Parse error';
     }
@@ -198,7 +198,7 @@ JSON::RPC2::Client - Transport-independent JSON-RPC 2.0 client
 
 =head1 VERSION
 
-This document describes JSON::RPC2::Client version v2.1.2
+This document describes JSON::RPC2::Client version v2.1.3
 
 
 =head1 SYNOPSIS
@@ -234,7 +234,7 @@ This document describes JSON::RPC2::Client version v2.1.2
  #
  # EXAMPLE of simple blocking STDIN-STDOUT client
  #
- 
+
  $client = JSON::RPC2::Client->new();
  $json_request = $client->call('method', @params);
 
@@ -259,7 +259,7 @@ Can be used both in sync (simple, for blocking I/O) and async
 (for non-blocking I/O in event-based environment) mode.
 
 
-=head1 INTERFACE 
+=head1 INTERFACE
 
 =head2 new
 

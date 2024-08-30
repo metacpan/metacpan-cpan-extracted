@@ -3,11 +3,11 @@ abstract: 'a wrapper script for iterating multiple F<perl> binaries'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,20 +16,22 @@ name: App-eachperl
 provides:
   App::eachperl:
     file: lib/App/eachperl.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   Attribute::Storage: '0'
   Commandable::Finder::MethodAttributes: '0'
   Commandable::Invocation: '0'
   Config::Tiny: '0'
   Convert::Color::XTerm: '0.06'
+  Data::Checks: '0.08'
   IO::Term::Status: '0'
   IPC::Run: '0'
-  Object::Pad: '0.74'
+  Object::Pad: '0.800'
+  Object::Pad::FieldAttr::Checked: '0.04'
   String::Tagged: '0.17'
   Syntax::Keyword::Dynamically: '0'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

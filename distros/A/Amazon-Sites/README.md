@@ -20,7 +20,7 @@ Hopefully, these are all green.
     my $az_uk = $az->site('UK');
 
     say $az_uk->currency; # GBP
-    say $az_uk->tldr;     # co.uk
+    say $az_uk->tldn;     # co.uk
     say $az_uk->domain;   # amazon.co.uk
 
 For more documentation visit:

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/List.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2022/09/19
+## Modified 2024/08/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,9 +17,8 @@ BEGIN
     use warnings;
     use parent qw( Markdown::Parser::Element );
     use vars qw( $VERSION );
-    use Devel::Confess;
     use constant TAB_SPACES => '    ';
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -132,7 +131,7 @@ Markdown::Parser::List - Markdown List Element
 
 =head1 VERSION
 
-    v0.2.0
+    v0.3.0
 
 =head1 DESCRIPTION
 

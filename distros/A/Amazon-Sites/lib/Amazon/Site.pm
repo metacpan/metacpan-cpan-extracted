@@ -1,5 +1,3 @@
-package Amazon::Site;
-
 =head1 NAME
 
 Amazon::Site - A class to represent an Amazon site

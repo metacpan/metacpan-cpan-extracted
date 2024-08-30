@@ -82,3 +82,23 @@ static OP *S_newSLUGOP(pTHX_ int idx)
   op->op_private = idx;
   return op;
 }
+
+#ifndef newLISTOPn
+/* newLISTOPn was added in 5.39.3 */
+#  define newLISTOPn(type, flags, ...)  S_newLISTOPn(aTHX_ type, flags, __VA_ARGS__)
+static OP *S_newLISTOPn(pTHX_ OPCODE type, U32 flags, ...)
+{
+  va_list args;
+  va_start(args, flags);
+
+  OP *o = newLISTOP(OP_LIST, 0, NULL, NULL);
+
+  OP *kid;
+  while((kid = va_arg(args, OP *)))
+    o = op_append_elem(OP_LIST, o, kid);
+
+  va_end(args);
+
+  return op_convert_list(type, flags, o);
+}
+#endif

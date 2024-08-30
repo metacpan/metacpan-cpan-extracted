@@ -19,7 +19,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $StreamedUnzipError);
 
-$VERSION = '1.001';
+$VERSION = '1.002';
 $StreamedUnzipError = '';
 
 @ISA    = qw(IO::Uncompress::Unzip Exporter);
@@ -75,7 +75,7 @@ sub new
             return _illegalFilename
         }
 
-        $fh = new IO::File "<$inValue"
+        $fh = IO::File->new("<$inValue")
             or return _setError(undef, undef, "cannot open file '$inValue': $!");
     }
     elsif( $inType eq 'buffer' || $inType eq 'handle')
@@ -454,7 +454,7 @@ Archive::Zip::StreamedUnzip - Read Zip Archives in streaming mode
 
     use Archive::Zip::StreamedUnzip qw($StreamedUnzipError) ;
 
-    my $z = new Archive::Zip::StreamedUnzip "my.zip"
+    my $z = Archive::Zip::StreamedUnzip->new('my.zip')
         or die "Cannot open zip file: $StreamedUnzipError\n" ;
 
 
@@ -471,7 +471,7 @@ Archive::Zip::StreamedUnzip - Read Zip Archives in streaming mode
     my $comment = $member->comment();
 
     # open a filehandle to read from a zip member
-    $fh = $member->open("mydata1.txt");
+    $fh = $member->open('mydata1.txt');
 
     # read blocks of data
     read($fh, $buffer, 1234) ;
@@ -513,9 +513,9 @@ called L<Archive::Zip::SimpleZip>, that can create Zip archives.
 
 =head2 Constructor
 
-     $z = new Archive::Zip::StreamedUnzip "myzipfile.zip" [, OPTIONS] ;
-     $z = new Archive::Zip::StreamedUnzip \$buffer [, OPTIONS] ;
-     $z = new Archive::Zip::StreamedUnzip $filehandle [, OPTIONS] ;
+     $z = Archive::Zip::StreamedUnzip->new('myzipfile.zip' [, OPTIONS]) ;
+     $z = Archive::Zip::StreamedUnzip->new(\$buffer [, OPTIONS]) ;
+     $z = Archive::Zip::StreamedUnzip->new($filehandle [, OPTIONS]) ;
 
 The constructor takes one mandatory parameter along with zero or more
 optional parameters.
@@ -564,10 +564,10 @@ Standard usage is
 
     use Archive::Zip::StreamedUnzip qw($StreamedUnzipError) ;
 
-    my $match = "hello";
-    my $zipfile = "my.zip";
+    my $match = 'hello';
+    my $zipfile = 'my.zip';
 
-    my $z = new Archive::Zip::StreamedUnzip $zipfile
+    my $z = Archive::Zip::StreamedUnzip->new($zipfile)
         or die "Cannot open zip file: $StreamedUnzipError\n" ;
 
     while (my $member = $z->next())
@@ -615,8 +615,8 @@ Returns a filehandle that can be used to read the uncompressed content.
 
     use Archive::Zip::StreamedUnzip qw($StreamedUnzipError) ;
 
-    my $zipfile = "my.zip";
-    my $z = new Archive::Zip::StreamedUnzip $zipfile
+    my $zipfile = 'my.zip';
+    my $z = Archive::Zip::StreamedUnzip->new($zipfile)
         or die "Cannot open zip file: $StreamedUnzipError\n" ;
 
     while (my $member = $z->next())
@@ -631,10 +631,10 @@ prints matching strings.
 
     use Archive::Zip::StreamedUnzip qw($StreamedUnzipError) ;
 
-    my $match = "hello";
-    my $zipfile = "my.zip";
+    my $match = 'hello;
+    my $zipfile = 'my.zip';
 
-    my $z = new Archive::Zip::StreamedUnzip $zipfile
+    my $z = Archive::Zip::StreamedUnzip->new($zipfile)
         or die "Cannot open zip file: $StreamedUnzipError\n" ;
 
     while (my $member = $z->next())
@@ -662,18 +662,18 @@ In fact it will work with any level of nesting.
         while (my $member = $unzip->next())
         {
             my $name = $unzip->name();
-            print "  " x $depth . "$name\n" ;
+            print '  ' x $depth . "$name\n" ;
 
             if ($name =~ /\.zip$/i)
             {
                 my $fh = $member->open();
-                my $newunzip = new Archive::Zip::StreamedUnzip $fh;
+                my $newunzip = Archive::Zip::StreamedUnzip->new($fh);
                 walk($newunzip, $depth + 1);
             }
         }
     }
 
-    my $unzip = new Archive::Zip::StreamedUnzip $zipfile
+    my $unzip = Archive::Zip::StreamedUnzip->new($zipfile)
                 or die "Cannot open '$zipfile': $StreamedUnzipError";
 
     print "$zipfile\n" ;

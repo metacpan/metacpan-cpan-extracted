@@ -3,9 +3,9 @@ NAME
     autoinstalls other modules during run-time
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.004 of
     Acme::CPANModules::ModuleAutoinstallers (from Perl distribution
-    Acme-CPANModules-ModuleAutoinstallers), released on 2023-10-29.
+    Acme-CPANModules-ModuleAutoinstallers), released on 2024-08-29.
 
 DESCRIPTION
     These "module autoinstallers" modules can automatically install missing
@@ -20,14 +20,10 @@ DESCRIPTION
     "perlfunc" under the "require" function.
 
 ACME::CPANMODULES ENTRIES
+    lazy
     lib::xi
-        Author: GFUJI <https://metacpan.org/author/GFUJI>
-
     Module::AutoINC
-        Author: MACKENZIE <https://metacpan.org/author/MACKENZIE>
-
     Require::Hook::More
-        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -74,6 +70,9 @@ SOURCE
 SEE ALSO
     Acme::CPANModules::ModuleAutoloaders
 
+    Acme::CPANModules::LoadingModules for a more general list of modules
+    related to loading other Perl moduless.
+
     Acme::CPANModules - about the Acme::CPANModules namespace
 
     cpanmodules - CLI tool to let you browse/view the lists
@@ -98,7 +97,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2020 by perlancar
+    This software is copyright (c) 2024, 2023, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

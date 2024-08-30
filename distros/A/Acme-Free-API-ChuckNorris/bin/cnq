@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use strict;
+use warnings;
+
+use Dispatch::Fu;
+use Acme::Free::API::ChuckNorris qw//;
+use Util::H2O::More              qw/Getopt2h2o o2d/;
+
+my $subcommand = shift @ARGV;
+
+#>>>
+dispatch {
+  xdefault shift, q{random};
+} $subcommand,
+  random     => sub { do_random(\@ARGV) },
+  categories => \&do_categories,
+  search     => sub { do_search(@ARGV)  },
+  help       => \&do_help,
+;
+#<<< 
+
+sub do_categories {
+    my ($ARGV) = @_;
+    my $cnq    = Acme::Free::API::ChuckNorris->new;
+    my $cats   = $cnq->categories;
+    printf STDERR "Found %d categories\n", scalar @{ o2d $cats };
+    foreach my $cat ( $cats->all ) {
+        say " $cat";
+    }
+    return $cats;
+}
+
+sub do_random {
+    my ($ARGV) = @_;
+    my $o      = Getopt2h2o $ARGV, {}, qw/category=s/;
+    my $cnq    = Acme::Free::API::ChuckNorris->new;
+    return printf "%s\n", $cnq->random( category => $o->category );
+}
+
+sub do_search {
+    die "fatal cnq: 'search' subcommand requires search terms\n" if not @_;
+    my $terms  = join " ", @_;
+    my $cnq    = Acme::Free::API::ChuckNorris->new;
+    my $ret    = $cnq->search( terms => $terms );
+    my $quotes = $ret->result;
+    printf STDERR "Found %d quotes\n", $ret->total;
+    if ( $ret->total == 0 ) {
+        warn "warning: cnq: no results for '$terms'\n";
+        exit;
+    }
+    foreach my $quote ( $quotes->all ) {
+        say $quote->value;
+    }
+    return;
+}
+
+sub do_help {
+    warn "warning cnq: subcommand may be one of the following: 'random', 'categories', 'search'\n";
+}
+
+__END__

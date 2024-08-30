@@ -114,7 +114,7 @@ static PADNAME *S_newPADNAMEpvn(pTHX_ const char *pv, STRLEN n)
 
 #ifndef OpLASTSIB_set
    /* older perls don't need to store this at all */
-#  define OpLASTSIB_set(op,parent)
+#  define OpLASTSIB_set(op,parent) ((op)->op_sibling = NULL)
 #endif
 
 #ifndef op_convert_list

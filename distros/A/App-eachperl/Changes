@@ -1,5 +1,13 @@
 Revision history for App-eachperl
 
+0.10    2024-08-29
+        [CHANGES]
+         * Added `install_no_system` config option
+         * Apply validation constraint checks by using
+           `Object::Pad::FieldAttr::Checked` + `Data::Checks`.
+         * Use Object::Pad v0.800 to get non-experimental field init
+           expressions
+
 0.09    2022-12-12
         [CHANGES]
          * Added `uninstall` command

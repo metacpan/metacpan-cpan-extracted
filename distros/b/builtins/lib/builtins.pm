@@ -3,16 +3,19 @@ package builtins;
 use 5.036;
 use warnings;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 sub import {
+    no warnings 'shadow';
     warnings->unimport('experimental::builtin');
     builtin->import( grep { not /^(?:un)?import$/ } keys %builtin:: );
 }
 
 sub unimport {
     warnings->import('experimental::builtin');
-    builtin->unimport( grep { not /^(?:un)?import$/ } keys %builtin:: );
+    if ($builtin::{unimport}) {
+        builtin->unimport( grep { not /^(?:un)?import$/ } keys %builtin:: );
+    }
 }
 
 
@@ -53,9 +56,11 @@ This document describes C<builtins> version 0.000001
 
 Perl 5.36 introduced numerous new built-in functions to the core.
 Unfortunately, for backwards compatibility, none of them are
-automatically available. And all of them are still experimental.
+automatically available. And all of them are experimental
+until Perl 5.40 (and then only if you actual specify C<use v5.40>).
 
-Which means, if you want them all, you have to preface your code with:
+Which means, if you want them all in Perl 5.36 or 5.38,
+you have to preface your code with:
 
     use experimental 'builtin';
     use builtin qw(

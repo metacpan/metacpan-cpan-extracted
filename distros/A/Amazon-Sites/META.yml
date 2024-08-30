@@ -19,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  Feature::Compat::Class: '0'
+  Feature::Compat::Class: '0.04'
   perl: '5.026000'
 resources:
   bugtracker: https://github.com/davorg-cpan/amazon-sites/issues
   repository: git://github.com/davorg-cpan/amazon-sites.git
-version: v0.1.6
+version: v0.1.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

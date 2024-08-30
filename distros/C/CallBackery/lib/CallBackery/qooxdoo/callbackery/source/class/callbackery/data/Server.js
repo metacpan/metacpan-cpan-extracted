@@ -49,16 +49,28 @@ qx.Class.define("callbackery.data.Server", {
             var localeMgr = qx.locale.Manager.getInstance();
             var newArgs = Array.prototype.slice.call(arguments);
             newArgs[0] = function(ret, exc, id) {
-                if (exc && exc.code == 6) {
-                    var login = callbackery.ui.Login.getInstance();
-                    login.addListenerOnce('login', function(e) {
-                        var ret = e.getData();
-                        origThis.setSessionCookie(ret.sessionCookie);
-                        origArguments.callee.base.apply(origThis, origArguments);
-                    });
+                if (exc) {
+                    switch (exc.code) {
+                        case 6:
+                            let login = callbackery.ui.Login.getInstance();
+                            login.addListenerOnce('login', (e) => {
+                                let ret = e.getData();
+                                origThis.setSessionCookie(ret.sessionCookie);
+                                origArguments.callee.base.apply(origThis, origArguments);
+                            });
 
-                    login.open();
-                    return;
+                            login.open();
+                            return;
+                        case 7:
+                            const msg = callbackery.ui.MsgBox.getInstance();
+                            msg.addListenerOnce('ok', (e) => { window.location.reload(true); });
+                            msg.info(
+                                this.tr('Session Expired'),
+                                this.xtr(exc.message),
+                                false
+                            );
+                            return;
+                    }
                 }
                 try {
                   handler(ret, exc, id);

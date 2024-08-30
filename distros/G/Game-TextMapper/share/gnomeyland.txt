@@ -32,6 +32,7 @@ soil attributes fill="#b0b446"
 dark-soil attributes fill="#c97457"
 
 # coastlines, deserts
+rock attributes fill="#b0856a"
 dust attributes fill="#ede787"
 sand attributes fill="#e3bea3"
 water attributes fill="#6ebae7"

@@ -34,11 +34,11 @@ Circle::Wallet - the circle chain SDK in PERL
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -570,7 +570,15 @@ Please report any bugs or feature requests to C<bug-circle-chain at rt.cpan.org>
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Circle-Chain>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+=head1 SEE ALSO
 
+See L<Circle::Common> for circle common module.
+
+See L <Circle::User> for circle user module .
+
+See L<Circle::Wallet> for circle wallet module.
+
+See L<Circle::Block> for circle block module.
 
 
 =head1 SUPPORT

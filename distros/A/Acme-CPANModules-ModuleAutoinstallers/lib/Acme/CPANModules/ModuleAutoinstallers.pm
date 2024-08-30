@@ -3,13 +3,13 @@ package Acme::CPANModules::ModuleAutoinstallers;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2024-08-29'; # DATE
 our $DIST = 'Acme-CPANModules-ModuleAutoinstallers'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $LIST = {
     summary => 'List of modules that autoinstalls other modules during run-time',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 These "module autoinstallers" modules can automatically install missing module
 during run-time using one of installers (usually `cpanm` a.k.a.
@@ -21,8 +21,9 @@ run the Perl script to see which module it tries and fails to load.
 They work by installing a hook in `@INC`. Read more about require hooks in
 `perlfunc` under the `require` function.
 
-_
+MARKDOWN
     entries => [
+        {module => 'lazy'},
         {module => 'lib::xi'},
         {module => 'Module::AutoINC'},
         {module => 'Require::Hook::More'}, # actually autoinstalling feature not yet implemented
@@ -44,7 +45,7 @@ Acme::CPANModules::ModuleAutoinstallers - List of modules that autoinstalls othe
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::ModuleAutoinstallers (from Perl distribution Acme-CPANModules-ModuleAutoinstallers), released on 2023-10-29.
+This document describes version 0.004 of Acme::CPANModules::ModuleAutoinstallers (from Perl distribution Acme-CPANModules-ModuleAutoinstallers), released on 2024-08-29.
 
 =head1 DESCRIPTION
 
@@ -62,17 +63,13 @@ C<perlfunc> under the C<require> function.
 
 =over
 
-=item L<lib::xi>
+=item L<lazy>
 
-Author: L<GFUJI|https://metacpan.org/author/GFUJI>
+=item L<lib::xi>
 
 =item L<Module::AutoINC>
 
-Author: L<MACKENZIE|https://metacpan.org/author/MACKENZIE>
-
 =item L<Require::Hook::More>
-
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 
@@ -123,6 +120,9 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Mod
 
 L<Acme::CPANModules::ModuleAutoloaders>
 
+L<Acme::CPANModules::LoadingModules> for a more general list of modules related
+to loading other Perl moduless.
+
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 
 L<cpanmodules> - CLI tool to let you browse/view the lists
@@ -151,7 +151,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

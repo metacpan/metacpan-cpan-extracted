@@ -1,13 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.73 ':experimental(init_expr)';
+use warnings;
+use Object::Pad 0.800;
 
-package App::eachperl 0.09;
+package App::eachperl 0.10;
 class App::eachperl;
+
+use Object::Pad::FieldAttr::Checked 0.04;
+use Data::Checks 0.08 qw( Str Maybe );
 
 use Config::Tiny;
 use Syntax::Keyword::Dynamically;
@@ -56,27 +60,35 @@ For more detail see the manpage for the eachperl(1) script.
 
 =cut
 
+my $VersionString;
+BEGIN {
+   $VersionString = Data::Checks::StrMatch qr/^v?\d+(?:\.\d+)*$/;
+}
+
 field $_perls;
-field $_no_system_perl :param;
-field $_no_test        :param;
-field $_since_version  :param;
-field $_until_version  :param;
-field $_use_devel      :param;
-field $_only_if        :param;
-field $_reverse        :param;
-field $_stop_on_fail   :param;
+field $_install_no_system :param                                = undef;
+field $_no_system_perl    :param;
+field $_no_test           :param;
+field $_since_version     :param :Checked(Maybe $VersionString);
+field $_until_version     :param :Checked(Maybe $VersionString);
+field $_use_devel         :param;
+field $_only_if           :param :Checked(Maybe Str);
+field $_reverse           :param;
+field $_stop_on_fail      :param;
 
 field $_io_term = IO::Term::Status->new_for_stdout;
 
 class App::eachperl::_Perl {
-   field $name         :param :reader;
-   field $fullpath     :param :reader;
-   field $version      :param :reader;
+   field $name         :param :reader  :Checked(Str);
+   field $fullpath     :param :reader  :Checked(Str);
+   field $version      :param :reader  :Checked($VersionString);
    field $is_threads   :param :reader;
    field $is_debugging :param :reader;
    field $is_devel     :param :reader;
    field $selected            :mutator;
 }
+
+field @_perlobjs;
 
 ADJUST
 {
@@ -93,10 +105,11 @@ method maybe_apply_config ( $path )
 
    my $config = Config::Tiny->read( $path );
 
-   $_perls         //= $config->{_}{perls};
-   $_since_version //= $config->{_}{since_version};
-   $_until_version //= $config->{_}{until_version};
-   $_only_if       //= $config->{_}{only_if};
+   $_perls             //= $config->{_}{perls};
+   $_since_version     //= $config->{_}{since_version};
+   $_until_version     //= $config->{_}{until_version};
+   $_only_if           //= $config->{_}{only_if};
+   $_install_no_system //= $config->{_}{install_no_system};
 }
 
 method postprocess_config ()
@@ -106,11 +119,10 @@ method postprocess_config ()
       m/^v/ or $_ = "v$_";
       # E.g. --until 5.14 means until the /end/ of the 5.14 series; so 5.14.999
       $_ .= ".999" if \$_ == \$_until_version and $_ !~ m/\.\d+\./;
-      $_ = version->parse( $_ );
+      $_ = version->parse( $_ )->stringify;
    }
 
    if( my $perlnames = $_perls ) {
-      $_perls = \my @perls;
       foreach my $perl ( split m/\s+/, $perlnames ) {
          chomp( my $fullpath = `which $perl` );
          $? and warn( "Can't find perl at $perl" ), next;
@@ -123,7 +135,7 @@ method postprocess_config ()
          my $debug = $ccflags =~ m/-DDEBUGGING\b/;
          my $devel = ( $ver =~ m/^v\d+\.(\d+)/ )[0] % 2;
 
-         push @perls, App::eachperl::_Perl->new(
+         push @_perlobjs, App::eachperl::_Perl->new(
             name         => $perl,
             fullpath     => $fullpath,
             version      => $ver,
@@ -137,7 +149,7 @@ method postprocess_config ()
 
 method perls ()
 {
-   my @perls = @$_perls;
+   my @perls = @_perlobjs;
    @perls = reverse @perls if $_reverse;
 
    return map {
@@ -346,7 +358,7 @@ method command_install
    :Command_arg("module", "name of the module (or \".\" for current directory)")
    ( $module )
 {
-   dynamically $_no_system_perl = 1;
+   dynamically $_no_system_perl = 1 if $_install_no_system;
 
    return $self->command_install_local if $module eq ".";
    return $self->cpan( 'CPAN::Shell->install($ARGV[0])', $module );

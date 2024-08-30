@@ -1,4 +1,4 @@
-use Test::More;
+use Test::More import => [qw( done_testing is is_deeply isa_ok ok )];
 
 use Amazon::Sites;
 

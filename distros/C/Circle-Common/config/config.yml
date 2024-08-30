@@ -1,0 +1,67 @@
+http:
+  protocol: https
+  sslSupport: true
+  host: circle-node.net
+  timeoutRead: 5000
+  timeoutWrite: 5000
+  retryWaitTime: 500
+  retryCount: 5
+user: ## user apis
+  sessionPath: .ccl/circle.properties
+  path:
+    sendRegisterVerifyCode: /user/v1/node/register/send-verify-code
+    register: /user/v1/node/register
+    sendVerifyCode: /user/v1/node/send-verify-code
+    login: /user/v1/node/login
+    logout: /user/v1/node/logout
+    sendPayVerifyCode: /user/v1/node/pay/send-verify-code
+    setPayPassword: /user/v1/node/pay/set-password
+    havePayPassword: /user/v1/node/have-pay-password
+    sendResetPasswordVerifyCode: /user/v1/node/reset-password/send-verify-code
+    resetPassword: /user/v1/node/reset-password
+    addContacts: /user/v1/node/add-contacts
+    listContacts: /user/v1/node/list-contacts
+    saveOrUpdateUserInfo: /user/v1/node/save-or-update-userinfo
+    userInfo: /user/v1/node/get-user-info
+wallet:
+  path: ## wallet apis
+    initWalletPackage: /wallet/v1/node/initWalletPackage
+    createWallet: /wallet/v1/node/createWallet
+    listWallet: /wallet/v1/node/listWallet
+    listPubkey: /wallet/v1/node/listPubkey
+    listPubkeyHash: /wallet/v1/node/listPubkeyHash
+    balanceOfAddress: /wallet/v1/node/getBalanceOfAddress
+    balanceOfWallet: /wallet/v1/node/getBalanceOfWallet
+    pubKeyHashFromAddress: /wallet/v1/node/getPubKeyHashFromAddress
+    sendTo: /wallet/v1/node/sendTo
+    pay: /wallet/v1/node/pay
+    requestCharge: /wallet/v1/node/requestCharge
+    assetsOfWallet: /wallet/v1/node/getAssetsOfWallet
+    searchTxByType: /wallet/v1/node/searchTxByType
+    searchTxByTime: /wallet/v1/node/searchTxByTime
+    assetsOfAddress: /wallet/v1/node/getAssetsOfAddress
+    letMeTry: /activity/v1/node/letMeTry
+    fetchMyBlock: /miner/v1/node/fetchMyBlock
+    postMyBlock: /miner/v1/node/postMyBlock
+    ## public wallet apis
+    getAddressByUid: /wallet/public/v1/get-address-by-uid
+    uploadUidAndAddress: /wallet/public/v1/upload-uid-and-address
+    getAssetsOfAddress: /wallet/public/v1/get-assets-of-address
+    getBalanceByAddress: /wallet/public/v1/get-balance-by-address
+    searchTransaction: /wallet/public/v1/search-transaction
+block:
+  path: # block apis
+    blockchainHashListPath: /block/v1/node/get-block-hashlist
+    blockchainPath: /block/v1/node/get-block
+    blockchainHeaderListPath: /block/v1/node/get-block-header-list
+    blockchainDataPath: /block/v1/node/get-block-data
+    blockchainTailsHashListPath: /block/v1/node/get-blocktails-hashlist
+    blockchainTailsPOPath: /block/v1/node/get-blocktails-po
+    transactionByTxIdPath: /block/v1/node/gettx-by-txid
+    searchTxByTxIdPath: /block/v1/node/search-tx-by-txid
+    searchTxByAddressPath: /block/v1/node/search-tx-by-address
+    searchUTXOsPath: /block/v1/node/search-utxos
+assets:
+  path: ## assets apis
+    upload: /assets/v1/node/upload
+    download: /assets/v1/node/download

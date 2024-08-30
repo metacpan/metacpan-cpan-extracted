@@ -1,0 +1,40 @@
+---
+abstract: 'Capture queries executed during a Catalyst route with DBI::Log'
+author:
+  - 'David Precious <davidp@preshweb.co.uk>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-Profile-DBI-Log
+requires:
+  Catalyst::Controller: '0'
+  CatalystX::InjectComponent: '0'
+  DBI::Log: '0'
+  DDP: '0'
+  Data::UUID: '0'
+  DateTime: '0'
+  File::stat: '0'
+  HTML::Entities: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Path::Tiny: '0'
+  Time::HiRes: '0'
+  namespace::autoclean: '0'
+resources:
+  bugtracker: https://github.com/bigpresh/Catalyst-Plugin-Profile-DBI-Log/issues
+  homepage: https://github.com/bigpresh/Catalyst-Plugin-Profile-DBI-Log
+  repository: git://github.com/bigpresh/Catalyst-Plugin-Profile-DBI-Log.git
+version: '0.02'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

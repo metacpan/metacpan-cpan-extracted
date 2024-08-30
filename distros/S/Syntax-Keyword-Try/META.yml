@@ -7,9 +7,9 @@ build_requires:
   Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
-  XS::Parse::Keyword::Builder: '0.06'
+  XS::Parse::Keyword::Builder: '0.35'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,15 +18,15 @@ name: Syntax-Keyword-Try
 provides:
   Syntax::Keyword::Try:
     file: lib/Syntax/Keyword/Try.pm
-    version: '0.29'
+    version: '0.30'
   Syntax::Keyword::Try::Deparse:
     file: lib/Syntax/Keyword/Try/Deparse.pm
-    version: '0.29'
+    version: '0.30'
 requires:
-  XS::Parse::Keyword: '0.06'
+  XS::Parse::Keyword: '0.35'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.29'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

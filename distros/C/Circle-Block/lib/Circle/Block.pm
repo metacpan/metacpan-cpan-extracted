@@ -9,7 +9,7 @@ use Try::Tiny;
 use URL::Encode;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @EXPORT = qw(
   get_block_hashlist
@@ -158,7 +158,7 @@ Circle::Block - the block module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -324,9 +324,11 @@ how to set min_output_key? In the response,  we can get outputs:
 
 =head1 SEE ALSO
 
-See L<Circle::Common> for circle common module .
-See L<Circle::Wallet> for circle wallet module .
-See L<Circle::User> for circle user module .
+See L<Circle::Common> for circle common module.
+
+See L<Circle::Wallet> for circle wallet module.
+
+See L<Circle::User> for circle user module.
 
 =head1 COPYRIGHT AND LICENSE
 

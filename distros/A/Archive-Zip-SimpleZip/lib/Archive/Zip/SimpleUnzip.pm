@@ -19,7 +19,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleUnzipError);
 
-$VERSION = '1.001';
+$VERSION = '1.002';
 $SimpleUnzipError = '';
 
 @ISA    = qw(IO::Uncompress::Unzip Exporter);
@@ -34,7 +34,7 @@ our %PARAMS = (
 
 sub _ckParams
 {
-    my $got = IO::Compress::Base::Parameters::new();
+    my $got = IO::Compress::Base::Parameters->new();
 
     $got->parse(\%PARAMS, @_)
         or _myDie("Parameter Error: " . $got->getError())  ;
@@ -94,7 +94,7 @@ sub new
             return _illegalFilename
         }
 
-        $fh = new IO::File "<$inValue"
+        $fh = IO::File->new("<$inValue")
             or return _setError(undef, undef, "cannot open file '$inValue': $!");
     }
     elsif( $inType eq 'buffer' || $inType eq 'handle')
@@ -806,7 +806,7 @@ sub STORABLE_thaw
         if ($self->isFile())
         {
             my $handle = $self->open();
-            my $fh = new IO::File ">$filename"
+            my $fh = IO::File->new(">$filename")
                 or return _setError("Cannot open file '$filename': $!");
             #$fh->binmode(); # not available in 5.8.0
 
@@ -972,7 +972,7 @@ Archive::Zip::SimpleUnzip - Read Zip Archives
 
     use Archive::Zip::SimpleUnzip qw($SimpleUnzipError) ;
 
-    my $z = new Archive::Zip::SimpleUnzip "my.zip"
+    my $z = Archive::Zip::SimpleUnzip->NEW('my.zip')
         or die "Cannot open zip file: $SimpleUnzipError\n" ;
 
     # How many members in the archive?
@@ -982,21 +982,21 @@ Archive::Zip::SimpleUnzip - Read Zip Archives
     my @names = $z->names();
 
     # Test member existence
-    if ($z->exists("abc.txt"))
+    if ($z->exists('abc.txt'))
     {
      ...
     }
 
     # Extract member to filesystem
-    $z->extract("member") ;
-    $z->extract("member", "outfile") ;
+    $z->extract('member') ;
+    $z->extract('member', 'outfile') ;
 
 
     # Read the zip comment
     my $comment = $zip->comment();
 
     # Select a member by name
-    my $member = $z->member("abc.txt");
+    my $member = $z->member('abc.txt');
     my $name = $member->name();
     my $content = $member->content();
     my $comment = $member->comment();
@@ -1050,9 +1050,9 @@ Note that the code assume that the zip archive is being read from a seekable fil
 
 =head2 Constructor
 
-     $z = new Archive::Zip::SimpleUnzip "myzipfile.zip" [, OPTIONS] ;
-     $z = new Archive::Zip::SimpleUnzip \$buffer [, OPTIONS] ;
-     $z = new Archive::Zip::SimpleUnzip $filehandle [, OPTIONS] ;
+     $z = Archive::Zip::SimpleUnzip->new('myzipfile.zip' [, OPTIONS]) ;
+     $z = Archive::Zip::SimpleUnzip->new(\$buffer [, OPTIONS]) ;
+     $z = Archive::Zip::SimpleUnzip->new($filehandle [, OPTIONS]) ;
 
 The constructor takes one mandatory parameter along with zero or more
 optional parameters.
@@ -1117,7 +1117,7 @@ If the optional parameter $outfile is specified, the payload is written to that 
 
 Returns the comment, if any, associated with the zip archive.
 
-=item $z->exists("name")
+=item $z->exists('name')
 
 Tests for the existence of member "name" in the zip archive.
 
@@ -1139,10 +1139,10 @@ Standard usage is
 
     use Archive::Zip::SimpleUnzip qw($SimpleUnzipError) ;
 
-    my $match = "hello";
-    my $zipfile = "my.zip";
+    my $match = 'hello';
+    my $zipfile = 'my.zip';
 
-    my $z = new Archive::Zip::SimpleUnzip $zipfile
+    my $z = Archive::Zip::SimpleUnzip->new($zipfile)
         or die "Cannot open zip file: $SimpleUnzipError\n" ;
 
     while (my $member = $z->next())
@@ -1215,10 +1215,10 @@ read the contents of the member
 
     use Archive::Zip::SimpleUnzip qw($SimpleUnzipError) ;
 
-    my $z = new Archive::Zip::SimpleUnzip "my1.zip"
+    my $z = Archive::Zip::SimpleUnzip->new('my1.zip')
         or die "Cannot open zip file: $SimpleUnzipError\n" ;
 
-    my $name = "abc.txt";
+    my $name = 'abc.txt';
     if ($z->exists($name))
     {
         print $z->content($name);
@@ -1232,8 +1232,8 @@ read the contents of the member
 
     use Archive::Zip::SimpleUnzip qw($SimpleUnzipError) ;
 
-    my $zipfile = "my.zip";
-    my $z = new Archive::Zip::SimpleUnzip $zipfile
+    my $zipfile = 'my.zip';
+    my $z = Archive::Zip::SimpleUnzip->new($zipfile)
         or die "Cannot open zip file: $SimpleUnzipError\n" ;
 
     my $members = $z->names();
@@ -1253,10 +1253,10 @@ constructor to automaticaly skip members that just contain directories.
 
     use Archive::Zip::SimpleUnzip qw($SimpleUnzipError) ;
 
-    my $match = "hello";
-    my $zipfile = "my.zip";
+    my $match = 'hello';
+    my $zipfile = 'my.zip';
 
-    my $z = new Archive::Zip::SimpleUnzip $zipfile, FilesOnly => 1
+    my $z = Archive::Zip::SimpleUnzip->new($zipfile, FilesOnly => 1)
         or die "Cannot open zip file: $SimpleUnzipError\n" ;
 
     while (my $member = $z->next())
@@ -1282,10 +1282,10 @@ to get a filehandle for each member of a zip archive which it passes to  C<Archi
     my $input  = shift ;
     my $output = shift ;
 
-    my $unzip = new Archive::Zip::SimpleUnzip $input
+    my $unzip = Archive::Zip::SimpleUnzip->new($input)
                     or die "Cannot open '$input': $SimpleUnzipError";
 
-    my $zip = new Archive::Zip::SimpleZip $output, Level => Z_BEST_COMPRESSION
+    my $zip = Archive::Zip::SimpleZip->new($output, Level => Z_BEST_COMPRESSION)
             or die "Cannot create zip file '$output': $SimpleZipError";
 
     while (my $member = $unzip->next())

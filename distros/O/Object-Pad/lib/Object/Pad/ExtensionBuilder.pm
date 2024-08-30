@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::ExtensionBuilder 0.811;
+package Object::Pad::ExtensionBuilder 0.812;
 
 use v5.14;
 use warnings;
@@ -13,6 +13,8 @@ use warnings;
 C<Object::Pad::ExtensionBuilder> - build-time support for extensions to C<Object::Pad>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 In F<Build.PL>:
 

@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -26,9 +26,11 @@
             "Commandable::Invocation" : "0",
             "Config::Tiny" : "0",
             "Convert::Color::XTerm" : "0.06",
+            "Data::Checks" : "0.08",
             "IO::Term::Status" : "0",
             "IPC::Run" : "0",
-            "Object::Pad" : "0.74",
+            "Object::Pad" : "0.800",
+            "Object::Pad::FieldAttr::Checked" : "0.04",
             "String::Tagged" : "0.17",
             "Syntax::Keyword::Dynamically" : "0",
             "perl" : "5.026"
@@ -36,14 +38,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "App::eachperl" : {
          "file" : "lib/App/eachperl.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -52,6 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

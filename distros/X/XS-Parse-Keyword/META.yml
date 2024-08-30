@@ -19,20 +19,20 @@ name: XS-Parse-Keyword
 provides:
   XS::Parse::Infix:
     file: lib/XS/Parse/Infix.pm
-    version: '0.44'
+    version: '0.45'
   XS::Parse::Infix::Builder:
     file: lib/XS/Parse/Infix/Builder.pm
-    version: '0.44'
+    version: '0.45'
   XS::Parse::Keyword:
     file: lib/XS/Parse/Keyword.pm
-    version: '0.44'
+    version: '0.45'
   XS::Parse::Keyword::Builder:
     file: lib/XS/Parse/Keyword/Builder.pm
-    version: '0.44'
+    version: '0.45'
 requires:
   File::ShareDir: '1.00'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.44'
+version: '0.45'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

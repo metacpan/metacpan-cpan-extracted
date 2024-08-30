@@ -5,7 +5,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Amazon/Sites.pm',
     MIN_PERL_VERSION  => '5.26.0',
     PREREQ_PM         => {
-        Feature::Compat::Class => 0,
+        Feature::Compat::Class => 0.04,
     },
     TEST_REQUIRES => {
         Test::More => 0,

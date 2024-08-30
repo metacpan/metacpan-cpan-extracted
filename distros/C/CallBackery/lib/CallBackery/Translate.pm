@@ -130,8 +130,14 @@ use overload
     };
 
 sub trm ($str,@args) {
-    # make sure the arguments are stringified
-    return bless [$str,map { "$_" } @args];
+    # make sure the arguments are stringified, warn if undefined
+    return bless [$str,map {
+        if (not defined $_) {
+            my ($package, $filename, $line) = caller;
+            warn "Undefined argument for str='$str' from $package line $line";
+        }
+        "$_"
+    } @args];
 }
 
 =head2 $str->TO_JSON

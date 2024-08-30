@@ -1,5 +1,9 @@
 Revision history for Object-Pad
 
+0.812   2024-08-29
+        [BUGFIXES]
+         * Fix for perl 5.41.3, when `SAVEt_LONG` was removed
+
 0.811   2024-08-21
         [CHANGES]
          * Accept requesting additional attributes to the

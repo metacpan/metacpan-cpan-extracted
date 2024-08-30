@@ -3,9 +3,25 @@ NAME
 
 SYNOPSIS
         use Markdown::Parser;
+        my $p = Markdown::Parser->new;
+        # Maybe with some callback?
+        my $p = Markdown::Parser->new( callback => sub
+        {
+            my $obj = shift( @_ );
+            # Do some processing with that Markdown object..
+        });
+        my $doc = $p->parse( $some_markdown_string ) || 
+            die( $p->error );
+        my $doc = $p->parse_file( $some_file ) ||
+            die( $p->error );
+        # Each element is an object inheriting from Markdown::Parser::Element
+        printf( "%d children object collected.\n", $doc->children->length );
+        my $markdown = $doc->as_markdown;
+        my $html = $doc->as_string;
+        my $pod = $doc->as_pod;
 
 VERSION
-        v0.1.0
+        v0.4.0
 
 DESCRIPTION
     Markdown::Parser is an object oriented Markdown parser
@@ -33,6 +49,13 @@ CONSTRUCTOR
         *[HTML4] Hypertext Markup Language Version 4
 
         would match either "HTML4" or "html4" or even "hTmL4"
+
+    callback
+        Provided with a code reference, and this will register it as a
+        callback to be triggered for every Markdown object encountered while
+        parsing the data provided.
+
+        You can also provide "undef"
 
     css_grid
         A boolean value to set whether to return the tables as a css grid
@@ -77,6 +100,13 @@ METHODS
   abbreviation_case_sensitive
     Boolean value that affects the way abbreviation are retrieved with
     "get_abbreviation" in Markdown::Parser::Document
+
+  callback
+    Sets or gets a code reference, and this will register it as a callback
+    to be triggered for every Markdown object encountered while parsing the
+    data provided.
+
+    You can also set "undef" to deactivate this feature.
 
   charset
     Sets or gets the character set for the document. Typically something
@@ -154,6 +184,14 @@ METHODS
 
     Here 1 and 2 are provided thanks to the "footnote_ref_sequence" and
     allocated to each Markdown::Parser::FootnoteReference
+
+  from_html
+    Provided with an HTML::Object::Element, presumably an
+    HTML::Object::Document object, and this will do its best to import it as
+    a Markdown::Parser::Document object.
+
+    It returns a Markdown::Parser::Document object upon success, and if an
+    error occurred, it returns "undef"
 
   katex_delimiter
     Sets or gets an array reference.

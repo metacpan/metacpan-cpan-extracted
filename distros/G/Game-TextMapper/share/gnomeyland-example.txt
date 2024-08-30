@@ -39,6 +39,7 @@
 1003 soil "soil"
 1004 dark-soil "dark-soil"
 1005 sand "sand"
+1006 rock "rock"
 
 1101 light-green "light-green"
 1102 green "green"

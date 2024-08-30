@@ -20,7 +20,7 @@ BEGIN {
 
 return 1 if $NO_RUN;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 # <-- START -->
 
 sub warnings(&) {

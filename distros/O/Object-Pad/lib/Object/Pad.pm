@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.811;
+package Object::Pad 0.812;
 
 use v5.14;
 use warnings;
@@ -29,6 +29,8 @@ require mro;
 require Object::Pad::MOP::Class;
 
 =encoding UTF-8
+
+=for highlighter language=perl
 
 =head1 NAME
 
@@ -982,7 +984,7 @@ default behaviour in a future version. For now it must be requested specially:
       ...
    }
 
-I<Since version 0.70.>
+I<Since version 0.70; non-experimental since version 0.805.>
 
 An C<ADJUST> block can marked with a C<:params> attribute, meaning that it
 consumes additional constructor parameters by assigning them into lexical
@@ -1170,8 +1172,12 @@ before using the C<class> or C<roll> keywords:
 
 Z<>
 
+=for highlighter
+
    class keyword enabled 'use strict' but this will be removed in a later version at FILE line 3.
    class keyword enabled 'use warnings' but this will be removed in a later version at FILE line 3.
+
+=for highlighter language=perl
 
 =head2 Yield True
 
@@ -1236,8 +1242,12 @@ exist, but its value will be C<B> during the superconstructor. After the
 superconstructor, the C<BUILD> and C<ADJUST> blocks are invoked before the
 completed object is returned to the user. The result will therefore be:
 
+=for highlighter
+
    Value seen by superconstructor is B
    Value seen by user is C
+
+=for highlighter language=perl
 
 =head1 STYLE SUGGESTIONS
 
@@ -1507,6 +1517,8 @@ module L<Devel::MAT::Tool::Object::Pad>. This will provide new commands and
 extend existing ones to better assist with analysing details related to
 C<Object::Pad> classes and instances of them.
 
+=for highlighter
+
    pmat> fields 0x55d7c173d4b8
    The field AV ARRAY(3)=NativeClass at 0x55d7c173d4b8
    Ix Field   Value
@@ -1517,6 +1529,8 @@ C<Object::Pad> classes and instances of them.
    REF() at 0x55d7c17606d8 is:
    └─the %hfield field of ARRAY(3)=NativeClass at 0x55d7c173d4b8, which is:
    ...
+
+=for highlighter language=perl
 
 =head1 DESIGN TODOs
 

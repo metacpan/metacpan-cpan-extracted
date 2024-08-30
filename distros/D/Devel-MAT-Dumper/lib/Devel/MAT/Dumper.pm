@@ -9,7 +9,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use File::Basename qw( basename );
 use File::Spec;

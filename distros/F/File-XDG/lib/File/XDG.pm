@@ -8,7 +8,7 @@ use Ref::Util qw( is_coderef is_arrayref );
 use if $^O eq 'MSWin32', 'Win32';
 
 # ABSTRACT: Basic implementation of the XDG base directory specification
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 
 
@@ -265,7 +265,7 @@ File::XDG - Basic implementation of the XDG base directory specification
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 
@@ -598,7 +598,7 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2021 by Síle Ekaterin Aman.
+This software is copyright (c) 2012-2022 by Síle Ekaterin Aman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

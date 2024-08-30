@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Table.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2022/09/19
+## Modified 2024/08/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,9 +19,8 @@ BEGIN
     use vars qw( $VERSION );
     use POSIX ();
     use Scalar::Util ();
-    use Devel::Confess;
     use constant CHAR2PIXELS => 8;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -372,7 +371,7 @@ Markdown::Parser::Table - Markdown Table Element
 
 =head1 VERSION
 
-    v0.2.0
+    v0.3.0
 
 =head1 DESCRIPTION
 

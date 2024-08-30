@@ -64,7 +64,9 @@ static char *PL_savetype_name[] PERL_UNUSED_DECL = {
   [SAVEt_INT_SMALL]           = "INT_SMALL",
   [SAVEt_ITEM]                = "ITEM",
   [SAVEt_IV]                  = "IV",
+#ifdef SAVEt_LONG  /* removed by perl 5.41.3 */
   [SAVEt_LONG]                = "LONG",
+#endif
   [SAVEt_MORTALIZESV]         = "MORTALIZESV",
   [SAVEt_NSTAB]               = "NSTAB",
   [SAVEt_OP]                  = "OP",

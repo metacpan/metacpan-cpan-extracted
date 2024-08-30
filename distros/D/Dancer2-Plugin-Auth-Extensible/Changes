@@ -1,5 +1,11 @@
 Revision history for Dancer2-Plugin-Auth-Extensible
 
+0.711 Thu 29 Aug 10:28:00 BST 2024
+
+    [BUG FIXES]
+
+    * Ensure uninit warnings not emitted
+
 0.710 Sat 15 May 08:02:00 BST 2021
 
     [BUG FIXES]

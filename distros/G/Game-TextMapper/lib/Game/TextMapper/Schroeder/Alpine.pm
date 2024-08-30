@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2021  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2009-2023  Alex Schroeder <alex@gnu.org>
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -61,6 +61,7 @@ has 'bumps';
 has 'bump';
 has 'bottom';
 has 'arid';
+has 'climate';
 has 'wind';
 
 sub place_peak {
@@ -103,8 +104,9 @@ sub grow_mountains {
     $n = int($n);
     next if $n < 1;
     for (1 .. $n) {
-      # try to find an empty neighbor; abort after six attempts
-      for (1 .. 6) {
+      # try to find an empty neighbor; make more attempts if we're looking for
+      # more neighbours
+      for my $attempt (1 .. 3 + $n) {
 	my ($x, $y) = $self->neighbor($coordinates, $self->random_neighbor());
 	next unless $self->legal($x, $y);
 	my $other = coordinates($x, $y);
@@ -113,8 +115,12 @@ sub grow_mountains {
 	  ($x, $y) = $self->neighbor2($coordinates, $self->random_neighbor2());
 	  next unless $self->legal($x, $y);
 	  $other = coordinates($x, $y);
-	  # if this is also taken, try again
-	  next if $altitude->{$other};
+	  # if this is also taken, try again – but if we've already had four
+	  # attempts, jump!
+          if ($altitude->{$other}) {
+            $coordinates = $other if $attempt > 4;
+            next;
+          }
 	}
 	# if we found an empty neighbor, set its altitude
 	$altitude->{$other} = $current_altitude > 0 ? $current_altitude - 1 : 0;
@@ -636,7 +642,7 @@ sub bogs {
 }
 
 sub dry {
-  my ($self, $world, $altitude) = @_;
+  my ($self, $world, $altitude, $rivers) = @_;
   my @dry;
   for my $coordinates (shuffle sort keys %$world) {
     if ($world->{$coordinates} !~ /mountain|hill|water|ocean|swamp|grass|forest|firs|trees/) {
@@ -648,26 +654,46 @@ sub dry {
       }
     }
   }
-  return unless @dry;
-  # dry some of them up
-  my @seeds = @dry[0..@dry/4];
-  for my $coordinates (@seeds) {
-    $self->drier($world, $coordinates);
+
+ BUSHES:
+  for my $coordinates (@dry) {
     for my $i ($self->neighbors()) {
       my ($x, $y) = $self->neighbor($coordinates, $i);
       next unless $self->legal($x, $y);
       my $other = coordinates($x, $y);
-      $self->drier($world, $other);
+      next BUSHES if $world->{$other} =~ /forest|firs|trees|swamp/;
+    }
+    if ($altitude->{$coordinates} >= 5) {
+      $world->{$coordinates} =~ s/light-green bushes/light-grey grass/;
+    } elsif ($altitude->{$coordinates} >= 3) {
+      $world->{$coordinates} =~ s/light-green bushes/grey grass/;
+    } else {
+      $world->{$coordinates} =~ s/light-green bushes/dark-grey grass/;
+    }
+  }
+
+ GRASS:
+  for my $coordinates (@dry) {
+    next if $self->with_river($rivers, $coordinates);
+    for my $i ($self->neighbors()) {
+      my ($x, $y) = $self->neighbor($coordinates, $i);
+      next unless $self->legal($x, $y);
+      my $other = coordinates($x, $y);
+      next GRASS if $world->{$other} !~ /grass|desert|water/;
+    }
+    if ($altitude->{$coordinates} >= 3) {
+      $world->{$coordinates} =~ s/(light-|dark-)?grey grass/light-grey desert/;
+    } else {
+      $world->{$coordinates} =~ s/(light-|dark-)?grey grass/dust desert/;
     }
   }
 }
 
-sub drier {
-  my ($self, $world, $coordinates) = @_;
-  $world->{$coordinates} =~ s/light-green bushes/light-green grass/
-      or $world->{$coordinates} =~ s/light-green grass/dust grass/
-      or $world->{$coordinates} =~ s/dust grass/dust hill/
-      or $world->{$coordinates} =~ s/dust hill/dust desert/;
+sub with_river {
+  my ($self, $rivers, $coordinates) = @_;
+  for my $river (@$rivers) {
+    return 1 if grep { $coordinates eq $_ } (@$river);
+  }
 }
 
 sub settlements {
@@ -810,6 +836,28 @@ sub marshlands {
   }
 }
 
+sub desertification {
+  my ($self, $world, $altitude, $rivers) = @_;
+  return unless $self->climate eq 'desert';
+  for my $coordinates (keys %$world) {
+    if ($self->with_river($rivers, $coordinates)) {
+      $world->{$coordinates} =~ s/light-grey/light-green/
+          or $world->{$coordinates} =~ s/dark-green/green/
+    } else {
+      $world->{$coordinates} =~ s/light-green bushes/rock bushes/
+          or $world->{$coordinates} =~ s/light-grey grass/rock bush/
+          or $world->{$coordinates} =~ s/dark-grey grass/dark-soil bush/
+          or $world->{$coordinates} =~ s/^grey grass/rock bush/
+          or $altitude->{$coordinates} >= 4 and $world->{$coordinates} =~ s/light-grey desert/dark-soil desert/
+          or $altitude->{$coordinates} >= 2 and $world->{$coordinates} =~ s/(dust|light-grey) desert/light-grey desert/
+    }
+     $world->{$coordinates} =~ s/dark-grey swamp2?/light-green bushes/
+        or $world->{$coordinates} =~ s/^grey swamp2?/light-grey bushes/
+        or $world->{$coordinates} =~ s/fir-forest/trees/
+        or $world->{$coordinates} =~ s/firs/trees/;
+  }
+}
+
 sub generate {
   my ($self, $world, $altitude, $water, $rivers, $settlements, $trails, $canyons, $step) = @_;
   # $flow indicates that there is actually a river in this hex
@@ -831,11 +879,12 @@ sub generate {
     sub { $self->canyons($world, $altitude, $rivers, $canyons, $dry); },
     sub { $self->swamps($world, $altitude, $water, $flow, $dry); },
     sub { $self->forests($world, $altitude, $flow, $dry); },
-    sub { $self->dry($world, $altitude); },
+    sub { $self->dry($world, $altitude, $rivers); },
     sub { $self->cliffs($world, $altitude); },
     sub { push(@$settlements, $self->settlements($world, $flow)); },
     sub { push(@$trails, $self->trails($altitude, $settlements)); },
     sub { $self->marshlands($world, $altitude, $rivers); },
+    sub { $self->desertification($world, $altitude, $rivers); },
     # make sure you look at "alpine_document.html.ep" if you change this list!
     # make sure you look at '/alpine/document' if you add to this list!
       );
@@ -881,6 +930,7 @@ sub generate_map {
   $self->bump(shift // 2);
   $self->bottom(shift // 0);
   $self->arid(shift // 2);
+  $self->climate(shift ? 'desert' : 'temperate');
   $self->wind(shift); # or random
   my $seed = shift||time;
   my $url = shift;
@@ -938,6 +988,7 @@ sub generate_map {
   push(@lines, "# Seed: $seed");
   push(@lines, "# Documentation: " . $url) if $url;
   my $map = join("\n", @lines);
+  return $map, $self if wantarray;
   return $map;
 }
 

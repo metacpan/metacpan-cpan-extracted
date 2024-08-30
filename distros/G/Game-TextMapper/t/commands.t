@@ -41,6 +41,7 @@ sub test_random_map {
 test_random_map('default');
 test_random_map('Smale', 'Game::TextMapper::Smale');
 test_random_map('Apocalypse', 'Game::TextMapper::Apocalypse');
+test_random_map('Folkesten', 'Game::TextMapper::Folkesten');
 test_random_map('Traveller', 'Game::TextMapper::Traveller');
 test_random_map('Alpine (hex)', qw'Game::TextMapper::Schroeder::Alpine --role Game::TextMapper::Schroeder::Hex');
 test_random_map('Alpine (square)', qw'Game::TextMapper::Schroeder::Alpine --role Game::TextMapper::Schroeder::Square');

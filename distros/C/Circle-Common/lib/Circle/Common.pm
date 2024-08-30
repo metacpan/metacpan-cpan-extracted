@@ -12,6 +12,7 @@ use Try::Tiny;
 use YAML;
 use JSON;
 use Carp;
+use File::Share ':all';
 
 our @EXPORT_OK = qw(
   load_config
@@ -20,7 +21,7 @@ our @EXPORT_OK = qw(
   http_json_get
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $config = undef;
 
@@ -30,8 +31,9 @@ sub load_config {
     }
 
     my $config = {};
+    my $config_path = dist_file('Circle-Common', 'config.yml');
     try {
-        my $content = slurp('./lib/Circle/config.yml');
+        my $content = slurp($config_path);
         $config = Load($content);
     }
     catch {
@@ -169,7 +171,7 @@ Circle::Common - the common module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -253,7 +255,9 @@ Invokes the http json post request to circle chain server. the response data con
 =head1 SEE ALSO
 
 See L<Circle::User> for circle user module.
+
 See L<Circle::Wallet> for circle wallet module.
+
 See L<Circle::Block> for circle block module.
 
 

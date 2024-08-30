@@ -70,7 +70,7 @@ The width of the map, defaults to 20.
 =head2 region_size
 
 The size of regions sharing the same terrain type, on average, defaults to 5
-hexes. The algorithm computes the number hexes, divides it by the region size,
+hexes. The algorithm computes the number of hexes, divides it by the region size,
 and that's the number of seeds it starts with (C<rows> × C<cols> ÷
 C<region_size>).
 

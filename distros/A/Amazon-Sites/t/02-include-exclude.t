@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More import => [qw( done_testing is_deeply ok )];
 use Test::Exception;
 
 use Amazon::Sites;

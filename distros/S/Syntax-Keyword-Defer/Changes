@@ -1,5 +1,10 @@
 Revision history for Syntax-Keyword-Defer
 
+0.11    2024-08-29
+        [BUGFIXES]
+         * Fix for perl 5.41.3 which removed `SAVEt_LONG`. This wasn't used here
+           directly but did appear in hax/perl-additions.c.inc.
+
 0.10    2023-09-21
         [CHANGES]
          * Removed `Syntax/Keyword/Finally.pm`

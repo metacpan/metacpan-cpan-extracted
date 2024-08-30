@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Feature::Compat::Class" : "0",
+            "Feature::Compat::Class" : "0.04",
             "perl" : "5.026000"
          }
       },
@@ -55,6 +55,6 @@
          "web" : "https://github.com/davorg-cpan/amazon-sites"
       }
    },
-   "version" : "v0.1.6",
+   "version" : "v0.1.7",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

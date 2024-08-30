@@ -65,7 +65,7 @@ sub getContent
 {
     my $filename = shift;
 
-    my $u = new IO::Uncompress::Unzip $filename, Append => 1, @_
+    my $u = IO::Uncompress::Unzip->new($filename, Append => 1, @_)
         or die "Cannot open $filename: $UnzipError";
 
     isa_ok $u, "IO::Uncompress::Unzip";
@@ -102,7 +102,7 @@ sub createZip
     # my %extra = %{ shift @_ // {} };
     my @extra = @_ ? %{ shift @_ } : () ;
 
-    my $z = new Archive::Zip::SimpleZip $filename, @extra, CanonicalName => 0 ;
+    my $z = Archive::Zip::SimpleZip->new($filename, @extra, CanonicalName => 0) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     for my $x (@data)
@@ -131,7 +131,7 @@ sub createZipByName
     # my %extra = %{ shift @_ // {} };
     my @extra = @_ ? %{ shift @_ } : () ;
 
-    my $z = new Archive::Zip::SimpleZip $filename, @extra, CanonicalName => 0 ;
+    my $z = Archive::Zip::SimpleZip->new($filename, @extra, CanonicalName => 0) ;
     isa_ok $z, "Archive::Zip::SimpleZip";
 
     for my $name (keys %data)
@@ -217,7 +217,7 @@ if(1)
 
     {
         title "no zip filname";
-        my $z = new Archive::Zip::SimpleUnzip ;
+        my $z = Archive::Zip::SimpleUnzip->new() ;
 
         is $z, undef ;
         is $SimpleUnzipError, "Missing Filename",
@@ -227,8 +227,8 @@ if(1)
     if (1)
     {
         title "directory";
-        my $lex = new LexDir my $dir;
-        my $z = new Archive::Zip::SimpleUnzip $dir ;
+        my $lex = LexDir->new(my $dir);
+        my $z = Archive::Zip::SimpleUnzip->new($dir) ;
 
         is $z, undef ;
         is $SimpleUnzipError, "Illegal Filename",
@@ -237,10 +237,10 @@ if(1)
 
     {
         title "zip file in directory that doesn't exist";
-        my $lex = new LexDir my $dir;
+        my $lex = LexDir->new(my $dir);
         my $zipfile = File::Spec->catfile($dir, "not", "exist", "x.zip");
 
-        my $z = new Archive::Zip::SimpleUnzip $zipfile ;
+        my $z = Archive::Zip::SimpleUnzip->new($zipfile) ;
 
         is $z, undef ;
         like $SimpleUnzipError, qr/cannot open file/,
@@ -250,7 +250,7 @@ if(1)
 #    SKIP:
 #    {
 #        title "file not readable";
-#        my $lex = new LexFile my $zipfile;
+#        my $lex = LexFile->new(my $zipfile);
 
 #        chmod 0444, $zipfile
 #            or skip "Cannot create non-readable file", 3 ;
@@ -260,7 +260,7 @@ if(1)
 
 #        ok ! -r $zipfile, "  zip file not readable";
 
-#        my $z = new Archive::Zip::SimpleUnzip $zipfile ;
+#        my $z = Archive::Zip::SimpleUnzip->new($zipfile) ;
 
 #        is $z, undef ;
 #        is $SimpleUnzipError, "Illegal Filename",
@@ -272,7 +272,7 @@ if(1)
 
     {
         title "filename undef";
-        my $z = new Archive::Zip::SimpleUnzip undef;
+        my $z = Archive::Zip::SimpleUnzip->new(undef);
 
         is $z, undef ;
         is $SimpleUnzipError, "Illegal Filename",
@@ -282,8 +282,8 @@ if(1)
     if (0) # TODO
     {
         title "Bad parameter in new";
-        my $lex = new LexFile my $zipfile;
-        eval { my $z = new Archive::Zip::SimpleUnzip $zipfile, fred => 1 ; };
+        my $lex = LexFile->new(my $zipfile);
+        eval { my $z = Archive::Zip::SimpleUnzip->new($zipfile, fred => 1) ; };
 
         like $@,  qr/Archive::Zip::SimpleUnzip: unknown key value(s) fred at/,
             "  value  is bad";
@@ -332,7 +332,7 @@ if (1)
                             if  $method == ZIP_CM_ZSTD && $streamed;
 
 
-                        my $lex = new LexFile my $name2 ;
+                        my $lex = LexFile->new(my $name2) ;
                         my $output;
                         my $buffer;
                         my $zipfile;
@@ -348,7 +348,7 @@ if (1)
                         elsif ($to eq 'filehandle')
                         {
                             $zipfile = $name2;
-                            $output = new IO::File ">$name2" ;
+                            $output = IO::File->new(">$name2") ;
                         }
 
                         my $create =
@@ -368,7 +368,7 @@ if (1)
                                                     Zip64      => $zip64
                                                     } ) ;
 
-                        my $z = new Archive::Zip::SimpleUnzip $zipfile ;
+                        my $z = Archive::Zip::SimpleUnzip->new($zipfile) ;
                         isa_ok $z, "Archive::Zip::SimpleUnzip";
 
                         {
@@ -549,7 +549,7 @@ if (1)
                         {
                             title "filesOnly" ;
 
-                            my $z = new Archive::Zip::SimpleUnzip $zipfile,  filesOnly => 1 ;
+                            my $z = Archive::Zip::SimpleUnzip->new($zipfile,  filesOnly => 1) ;
                             isa_ok $z, "Archive::Zip::SimpleUnzip";
 
                             {
@@ -636,7 +636,7 @@ if (1)
 
     use Cwd;
 
-    my $lex = new PushDir;
+    my $lex = PushDir->new();
 
     my $output;
     my $buffer;
@@ -657,7 +657,7 @@ if (1)
 
     createZipByName($zipfile, \%create) ;
 
-    my $unzip = new Archive::Zip::SimpleUnzip $zipfile ;
+    my $unzip = Archive::Zip::SimpleUnzip->new($zipfile) ;
 
     is scalar $unzip->names(), keys %create;
 
@@ -702,7 +702,7 @@ if (1)
 
     use Cwd;
 
-    my $lex = new PushDir;
+    my $lex = PushDir->new();
 
     my $output;
     my $buffer;
@@ -717,7 +717,7 @@ if (1)
                 "d3/f3"              => [ "",      'dir',  [] ],
             } ) ;
 
-    my $unzip = new Archive::Zip::SimpleUnzip $zipfile ;
+    my $unzip = Archive::Zip::SimpleUnzip->new($zipfile) ;
 
 
     title "output file already exists & is writable, so overwrite";
@@ -775,11 +775,11 @@ if (1)
     #       59               62  -5%                            3 files
 
     my $zipfile = "./t/files/jar.zip" ;
-    my $z = new Archive::Zip::SimpleUnzip $zipfile
+    my $z = Archive::Zip::SimpleUnzip->new($zipfile)
         or diag $SimpleUnzipError ;
     isa_ok $z, "Archive::Zip::SimpleUnzip";
 
-    my $lex = new PushDir;
+    my $lex = PushDir->new();
 
     ok ! -d "META-INF" ;
 
@@ -806,7 +806,7 @@ SKIP:
     {
         title "Zip file with exactly 64k members (but not Zip64)" ;
 
-        my $z = new Archive::Zip::SimpleUnzip "$TestZipsDir/test64k-notzip64.zip" ;
+        my $z = Archive::Zip::SimpleUnzip->new("$TestZipsDir/test64k-notzip64.zip") ;
         isa_ok $z, "Archive::Zip::SimpleUnzip";
 
         my $expectedMembers = 0xFFFF;
@@ -829,7 +829,7 @@ SKIP:
     {
         title "Zip file with exactly 64k members (is Zip64)" ;
 
-        my $z = new Archive::Zip::SimpleUnzip "$TestZipsDir/test64k.zip" ;
+        my $z = Archive::Zip::SimpleUnzip->new("$TestZipsDir/test64k.zip") ;
         isa_ok $z, "Archive::Zip::SimpleUnzip";
 
         my $expectedMembers = 0xFFFF;
@@ -852,7 +852,7 @@ SKIP:
     {
         title "Zip file with  64k + 1 members (must be Zip64)" ;
 
-        my $z = new Archive::Zip::SimpleUnzip "$TestZipsDir/test64k-plus1.zip" ;
+        my $z = Archive::Zip::SimpleUnzip->new("$TestZipsDir/test64k-plus1.zip") ;
         isa_ok $z, "Archive::Zip::SimpleUnzip";
 
         my $expectedMembers = 0xFFFF + 1;
@@ -906,7 +906,7 @@ SKIP:
             my $entries = @$in ;
             my @names   = map { $_->[0] } @$in ;
 
-            my $z = new Archive::Zip::SimpleUnzip $zipfile ;
+            my $z = Archive::Zip::SimpleUnzip->new($zipfile) ;
             isa_ok $z, "Archive::Zip::SimpleUnzip", "created object for file $zipfile";
             is $z->names(), $entries, "Has $entries members";
             is_deeply [ $z->names() ], [ @names ], "names are ok" ;

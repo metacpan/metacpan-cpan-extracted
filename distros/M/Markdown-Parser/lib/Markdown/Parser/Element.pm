@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Element.pm
-## Version v0.2.1
+## Version v0.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2022/09/22
+## Modified 2024/08/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,10 +18,8 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
-    use Nice::Try;
     use CSS::Object;
-    use Devel::Confess;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -629,7 +627,7 @@ Markdown::Parser::Element - Markdown Element Object Class
 
 =head1 VERSION
 
-    v0.2.1
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -913,6 +911,87 @@ Returns the element object being added for chaining.
 =head2 links
 
 Returns an L<array object|Module::Generic::Array> of L<Markdown::Parser::Link> objects.
+
+=head2 look
+
+    my $array = $e->look(
+        tag => $tag,
+        # or 'up'
+        direction => 'down',
+        class => $class,
+    );
+
+This will crawl the element tree in search of matching elements, and returns an L<array object|Module::Generic::Array>.
+
+Upon error, it sets an L<exception object|Module::Generic::Exception> and returns C<undef> in scalar context and an empty list in list context.
+
+It takes the following options:
+
+=over 4
+
+=item * C<class>
+
+An element class.
+
+=item * C<direction>
+
+The direction to crawl. Either C<down> or C<up>.
+
+=item * C<tag>
+
+A tag to look for.
+
+=back
+
+=head2 look_down
+
+    my $array = $e->look(
+        tag => $tag,
+        class => $class,
+    );
+
+This will crawl down the element tree in search of matching elements, and returns an L<array object|Module::Generic::Array>.
+
+Upon error, it sets an L<exception object|Module::Generic::Exception> and returns C<undef> in scalar context and an empty list in list context.
+
+It takes the following options:
+
+=over 4
+
+=item * C<class>
+
+An element class.
+
+=item * C<tag>
+
+A tag to look for.
+
+=back
+
+=head2 look_up
+
+    my $array = $e->look(
+        tag => $tag,
+        class => $class,
+    );
+
+This will crawl up the element tree in search of matching elements, and returns an L<array object|Module::Generic::Array>.
+
+Upon error, it sets an L<exception object|Module::Generic::Exception> and returns C<undef> in scalar context and an empty list in list context.
+
+It takes the following options:
+
+=over 4
+
+=item * C<class>
+
+An element class.
+
+=item * C<tag>
+
+A tag to look for.
+
+=back
 
 =head2 make_html_parser
 
