@@ -35,6 +35,15 @@ static bool is_async = FALSE;
 static AV *dynamicstack;
 #endif
 
+#define ENSURE_HV(sv)  S_ensure_hv(aTHX_ sv)
+static HV *S_ensure_hv(pTHX_ SV *sv)
+{
+  if(SvTYPE(sv) == SVt_PVHV)
+    return (HV *)sv;
+
+  croak("Expected HV, got SvTYPE(sv)=%d", SvTYPE(sv));
+}
+
 typedef struct {
   SV *var;    /* is HV * if keysv is set; indicates an HELEM */
   SV *keysv;
@@ -42,8 +51,8 @@ typedef struct {
   int saveix;
 } DynamicVar;
 
-#define newSVdynamicvar() S_newSVdynamicvar(aTHX)
-static SV *S_newSVdynamicvar(pTHX)
+#define newSVdynamicvar(var, key) S_newSVdynamicvar(aTHX_ var, key)
+static SV *S_newSVdynamicvar(pTHX_ SV *var, SV *key)
 {
   SV *ret = newSV(sizeof(DynamicVar));
 
@@ -54,6 +63,21 @@ static SV *S_newSVdynamicvar(pTHX)
     SvREFCNT_dec(tmpRV);
   }
 #endif
+
+  DynamicVar *dyn = (void *)SvPVX((SV *)ret);
+
+  dyn->var    = var;
+  dyn->keysv  = key;
+  dyn->saveix = PL_savestack_ix;
+
+  if(key) {
+    HV *hv = ENSURE_HV(var);
+    HE *he = hv_fetch_ent(hv, key, 0, 0);
+    dyn->oldval = he ? newSVsv(HeVAL(he)) : NULL;
+  }
+  else {
+    dyn->oldval = newSVsv(var);
+  }
 
   return ret;
 }
@@ -86,8 +110,8 @@ typedef struct {
   bool is_outer;
 } SuspendedDynamicVar;
 
-#define newSVsuspendeddynamicvar() S_newSVsuspendeddynamicvar(aTHX)
-static SV *S_newSVsuspendeddynamicvar(pTHX)
+#define newSVsuspendeddynamicvar(var, key, is_outer) S_newSVsuspendeddynamicvar(aTHX_ var, key, is_outer)
+static SV *S_newSVsuspendeddynamicvar(pTHX_ SV *var, SV *key, bool is_outer)
 {
   SV *ret = newSV(sizeof(SuspendedDynamicVar));
 
@@ -98,6 +122,22 @@ static SV *S_newSVsuspendeddynamicvar(pTHX)
     SvREFCNT_dec(tmpRV);
   }
 #endif
+
+  SuspendedDynamicVar *suspdyn = (void *)SvPVX((SV *)ret);
+
+  suspdyn->var   = var;
+  suspdyn->keysv = key;
+
+  if(key) {
+      HV *hv = ENSURE_HV(var);
+      HE *he = hv_fetch_ent(hv, key, 0, 0);
+      suspdyn->curval = he ? newSVsv(HeVAL(he)) : NULL;
+  }
+  else {
+      suspdyn->curval = newSVsv(var);
+  }
+
+  suspdyn->is_outer = is_outer;
 
   return ret;
 }
@@ -127,17 +167,6 @@ static int dmd_help_suspendeddynamicvar(pTHX_ DMDContext *ctx, const SV *sv)
 #  define av_top_index(av)  AvFILL(av)
 #endif
 
-static SV *av_top(AV *av)
-{
-  return AvARRAY(av)[av_top_index(av)];
-}
-
-static SV *av_push_r(AV *av, SV *sv)
-{
-  av_push(av, sv);
-  return sv;
-}
-
 #ifndef hv_deletes
 #  define hv_deletes(hv, key, flags) \
     hv_delete((hv), ("" key ""), (sizeof(key)-1), (flags))
@@ -153,46 +182,18 @@ static void S_hv_setsv_or_delete(pTHX_ HV *hv, SV *key, SV *val)
     sv_setsv(HeVAL(hv_fetch_ent(hv, key, 1, 0)), val);
 }
 
-#define ENSURE_HV(sv)  S_ensure_hv(aTHX_ sv)
-static HV *S_ensure_hv(pTHX_ SV *sv)
-{
-  if(SvTYPE(sv) == SVt_PVHV)
-    return (HV *)sv;
-
-  croak("Expected HV, got SvTYPE(sv)=%d", SvTYPE(sv));
-}
-
-#define pushdyn(var)  S_pushdyn(aTHX_ var)
-static void S_pushdyn(pTHX_ SV *var)
-{
-  DynamicVar *dyn = (void *)SvPVX(
-    av_push_r(dynamicstack, newSVdynamicvar())
-  );
-
-  dyn->var    = var;
-  dyn->keysv  = NULL;
-  dyn->oldval = newSVsv(var);
-  dyn->saveix = PL_savestack_ix;
-}
-
-#define pushdynhelem(hv,keysv,curval)  S_pushdynhelem(aTHX_ hv,keysv,curval)
-static void S_pushdynhelem(pTHX_ HV *hv, SV *keysv, SV *curval)
-{
-  DynamicVar *dyn = (void *)SvPVX(
-    av_push_r(dynamicstack, newSVdynamicvar())
-  );
-
-  dyn->var    = (SV *)hv;
-  dyn->keysv  = keysv;
-  dyn->oldval = newSVsv(curval);
-  dyn->saveix = PL_savestack_ix;
-}
-
 static void S_popdyn(pTHX_ void *_data)
 {
   AV *stack = dynamicstack;
 
-  DynamicVar *dyn = (void *)SvPVX(av_top(stack));
+  IV ix = av_top_index(stack);
+  assert(ix > -1);
+
+  SV *dv = AvARRAY(stack)[ix];
+  assert(dv);
+
+  DynamicVar *dyn = (void *)SvPVX(dv);
+  assert(dyn);
   if(dyn->var != (SV *)_data)
     croak("ARGH: dynamicstack top mismatch");
 
@@ -209,8 +210,8 @@ static void S_popdyn(pTHX_ void *_data)
     sv_setsv_mg(dyn->var, dyn->oldval);
   }
 
-  SvREFCNT_dec(dyn->var);
-  SvREFCNT_dec(dyn->oldval);
+  SvREFCNT_dec(dyn->var); dyn->var = NULL;
+  SvREFCNT_dec(dyn->oldval); dyn->oldval = NULL;
 
   SvREFCNT_dec(sv);
 }
@@ -237,24 +238,13 @@ static void hook_postsuspend(pTHX_ CV *cv, HV *modhookdata, void *hookdata)
       hv_stores(modhookdata, "Syntax::Keyword::Dynamically/suspendedvars", (SV *)suspendedvars);
     }
 
-    SuspendedDynamicVar *suspdyn = (void *)SvPVX(
-      av_push_r(suspendedvars, newSVsuspendeddynamicvar())
-    );
-
-    suspdyn->var   = dyn->var;   /* steal */
-    suspdyn->keysv = dyn->keysv; /* steal */
-    suspdyn->is_outer = FALSE;
+    av_push(suspendedvars,
+      newSVsuspendeddynamicvar(dyn->var, dyn->keysv, false));
 
     if(dyn->keysv) {
-      HV *hv = ENSURE_HV(dyn->var);
-      HE *he = hv_fetch_ent(hv, dyn->keysv, 0, 0);
-      suspdyn->curval = he ? newSVsv(HeVAL(he)) : NULL;
-
-      hv_setsv_or_delete(hv, dyn->keysv, dyn->oldval);
+      hv_setsv_or_delete(ENSURE_HV(dyn->var), dyn->keysv, dyn->oldval);
     }
     else {
-      suspdyn->curval = newSVsv(dyn->var);
-
       sv_setsv_mg(dyn->var, dyn->oldval);
     }
     SvREFCNT_dec(dyn->oldval);
@@ -273,23 +263,8 @@ static void hook_postsuspend(pTHX_ CV *cv, HV *modhookdata, void *hookdata)
       hv_stores(modhookdata, "Syntax::Keyword::Dynamically/suspendedvars", (SV *)suspendedvars);
     }
 
-    SuspendedDynamicVar *suspdyn = (void *)SvPVX(
-      av_push_r(suspendedvars, newSVsuspendeddynamicvar())
-    );
-
-    suspdyn->var = SvREFCNT_inc(dyn->var);
-    suspdyn->is_outer = TRUE;
-
-    if(dyn->keysv) {
-      HV *hv = ENSURE_HV(dyn->var);
-      HE *he = hv_fetch_ent(hv, dyn->keysv, 0, 0);
-      suspdyn->keysv = SvREFCNT_inc(dyn->keysv);
-      suspdyn->curval = he ? newSVsv(HeVAL(he)) : NULL;
-    }
-    else {
-      suspdyn->keysv = NULL;
-      suspdyn->curval = newSVsv(dyn->var);
-    }
+    av_push(suspendedvars,
+      newSVsuspendeddynamicvar(SvREFCNT_inc(dyn->var), SvREFCNT_inc(dyn->keysv), true));
   }
 }
 
@@ -305,17 +280,14 @@ static void hook_preresume(pTHX_ CV *cv, HV *modhookdata, void *hookdata)
   for(i = max; i >= 0; i--) {
     SuspendedDynamicVar *suspdyn = (void *)SvPVX(avp[i]);
 
-    if(suspdyn->keysv) {
-      HV *hv = ENSURE_HV(suspdyn->var);
-      HE *he = hv_fetch_ent(hv, suspdyn->keysv, 0, 0);
-      pushdynhelem(hv, suspdyn->keysv, he ? HeVAL(he) : NULL);
+    SV *var = suspdyn->var;
+    av_push(dynamicstack,
+      newSVdynamicvar(var, suspdyn->keysv));
 
-      hv_setsv_or_delete(hv, suspdyn->keysv, suspdyn->curval);
+    if(suspdyn->keysv) {
+      hv_setsv_or_delete((HV *)var, suspdyn->keysv, suspdyn->curval);
     }
     else {
-      SV *var = suspdyn->var;
-      pushdyn(var);
-
       sv_setsv_mg(var, suspdyn->curval);
     }
     SvREFCNT_dec(suspdyn->curval);
@@ -352,7 +324,8 @@ static OP *pp_startdyn(pTHX)
   SV *var = (PL_op->op_flags & OPf_STACKED) ? TOPs : PAD_SV(PL_op->op_targ);
 
   if(is_async) {
-    pushdyn(SvREFCNT_inc(var));
+    av_push(dynamicstack,
+      newSVdynamicvar(SvREFCNT_inc(var), NULL));
     SAVEDESTRUCTOR_X(&S_popdyn, var);
   }
   else {
@@ -397,37 +370,36 @@ static OP *pp_helemdyn(pTHX)
   dSP;
   SV * keysv = POPs;
   HV * const hv = MUTABLE_HV(POPs);
-  bool preexisting;
-  HE *he;
-  SV **svp;
 
   /* Take a long-lived copy of keysv */
   keysv = newSVsv(keysv);
 
-  preexisting = hv_exists_ent(hv, keysv, 0);
-  he = hv_fetch_ent(hv, keysv, 1, 0);
-  svp = &HeVAL(he);
+  bool preexisting = hv_exists_ent(hv, keysv, 0);
+  HE *he;
 
   if(is_async) {
     SvREFCNT_inc((SV *)hv);
 
-    if(preexisting)
-      pushdynhelem(hv, keysv, *svp);
-    else
-      pushdynhelem(hv, keysv, NULL);
+    av_push(dynamicstack,
+      newSVdynamicvar((SV *)hv, keysv));
     SAVEDESTRUCTOR_X(&S_popdyn, (SV *)hv);
+
+    /* must fetch -after- calling newSVdynamicvar() */
+    he = hv_fetch_ent(hv, keysv, 1, 0);
   }
   else {
     DynamicVar *dyn;
     Newx(dyn, 1, DynamicVar);
 
+    he = hv_fetch_ent(hv, keysv, 1, 0);
+
     dyn->var   = SvREFCNT_inc(hv);
     dyn->keysv = SvREFCNT_inc(keysv);
-    dyn->oldval = preexisting ? newSVsv(*svp) : NULL;
+    dyn->oldval = preexisting ? newSVsv(HeVAL(he)) : NULL;
     SAVEDESTRUCTOR_X(&S_restore, dyn);
   }
 
-  PUSHs(*svp);
+  PUSHs(HeVAL(he));
 
   RETURN;
 }

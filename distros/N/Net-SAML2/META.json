@@ -5,7 +5,7 @@
       "Timothy Legge <timlegge@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -97,87 +97,87 @@
    "provides" : {
       "Net::SAML2" : {
          "file" : "lib/Net/SAML2.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::AttributeConsumingService" : {
          "file" : "lib/Net/SAML2/AttributeConsumingService.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Binding::POST" : {
          "file" : "lib/Net/SAML2/Binding/POST.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Binding::Redirect" : {
          "file" : "lib/Net/SAML2/Binding/Redirect.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Binding::SOAP" : {
          "file" : "lib/Net/SAML2/Binding/SOAP.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::IdP" : {
          "file" : "lib/Net/SAML2/IdP.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Object::Response" : {
          "file" : "lib/Net/SAML2/Object/Response.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Protocol::Artifact" : {
          "file" : "lib/Net/SAML2/Protocol/Artifact.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Protocol::ArtifactResolve" : {
          "file" : "lib/Net/SAML2/Protocol/ArtifactResolve.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Protocol::Assertion" : {
          "file" : "lib/Net/SAML2/Protocol/Assertion.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Protocol::AuthnRequest" : {
          "file" : "lib/Net/SAML2/Protocol/AuthnRequest.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Protocol::LogoutRequest" : {
          "file" : "lib/Net/SAML2/Protocol/LogoutRequest.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Protocol::LogoutResponse" : {
          "file" : "lib/Net/SAML2/Protocol/LogoutResponse.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::RequestedAttribute" : {
          "file" : "lib/Net/SAML2/RequestedAttribute.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Role::ProtocolMessage" : {
          "file" : "lib/Net/SAML2/Role/ProtocolMessage.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Role::VerifyXML" : {
          "file" : "lib/Net/SAML2/Role/VerifyXML.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::SP" : {
          "file" : "lib/Net/SAML2/SP.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Types" : {
          "file" : "lib/Net/SAML2/Types.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::Util" : {
          "file" : "lib/Net/SAML2/Util.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::XML::Sig" : {
          "file" : "lib/Net/SAML2/XML/Sig.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "Net::SAML2::XML::Util" : {
          "file" : "lib/Net/SAML2/XML/Util.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       }
    },
    "release_status" : "stable",
@@ -191,7 +191,7 @@
          "web" : "https://github.com/perl-net-saml2/perl-Net-SAML2"
       }
    },
-   "version" : "0.80",
+   "version" : "0.81",
    "x_contributors" : [
       "Timothy Legge <timlegge@gmail.com>",
       "Wesley Schwengle <waterkip@cpan.org>",
@@ -209,7 +209,7 @@
    "x_maintainers" : [
       "Timothy Legge <timlegge@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

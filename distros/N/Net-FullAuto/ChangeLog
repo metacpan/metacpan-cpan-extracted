@@ -20,6 +20,18 @@
 #######################################################################
 
 
+2024-08-30  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000795 released
+
+        * Fixed prompting for module updates to Makefile.PL
+
+2024-08-30  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000794 released
+
+        * Added prompting for module updates to Makefile.PL
+
 2024-08-29  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000793 released

@@ -4,36 +4,60 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.08';
 
-use Moo;
+use Rope;
+use Rope::Autoload;
 use Term::Size::ReadKey;
 use Module::Load;
+use Types::Standard qw/Int Str Enum HashRef/;
 
 use overload "&{}" => sub {
 	my $self = shift; 
 	return sub { $self->render(@_); } 
 };
 
-has max_width => (
-	is => 'rw',
-	default => sub {
+property max_width => (
+	initable => 1,
+	writeable => 1,
+	type => Int,
+	builder => sub {
 		Term::Size::ReadKey::chars *STDOUT{IO};
 	}
 );
 
-has font => (
-	is => 'rw',
-	default => sub { 'Boomer' }
+property pad => (
+	initable => 1,
+	writeable => 1,
+	type => Int,
+	value => 0,
 );
 
-has color => (
-	is => 'rw'
+property font => (
+	initable => 1,
+	writeable => 1,
+	type => Str,
+	value => 'Boomer'
 );
 
-has color_map => (
-	is => 'rw',
-	default => sub { return {
+property align => (
+	initable => 1,
+	writeable => 1,
+	type => Enum[qw( left center right )],
+	value => 'left'
+);
+
+property color => (
+	initable => 1,
+	type => Str,
+	writeable => 1,
+);
+
+property color_map => (
+	initable => 1,
+	writeable => 1,
+	type => HashRef,
+	builder => sub { return {
 		black => "\e[30m",
 		red => "\e[31m",
 		green => "\e[32m",
@@ -53,13 +77,13 @@ has color_map => (
 	} }
 );
 
-sub font_class {
+function font_class => sub {
 	my $class = sprintf "Ascii::Text::Font::%s", $_[0]->font;
 	load $class;
 	return $class;
-}
+};
 
-sub render {
+function render => sub {
 	my ($self, $text) = @_;
 	my $class = $self->font_class->new;
 	my @words = split /\s+/, $text;
@@ -108,22 +132,30 @@ sub render {
 	if ($self->color && $self->color_map->{$self->color}) {
 		print "\e[0m";
 	}
-}
+};
 
-sub new_line {
+function new_line => sub {
 	return ($_[0]->max_width, [],[],[],[],[],[]);
-}
+};
 
-sub print_line {
+function print_line => sub {
 	my ($self, $line) = @_;
+	my $line_width = @{$line->[0]};
+	my $pad = $self->align eq 'center' 
+		? ($self->max_width - $line_width) / 2
+		: $self->align eq 'right'
+		? $self->max_width - $line_width
+		: $self->pad;
+	$pad = $pad ? " " x $pad : ""; 
 	for (@{$line}) {
 		if ($self->color && $self->color_map->{$self->color}) {
 			print $self->color_map->{$self->color};
 		}
+		print $pad;
 		print join "", @{$_};
 		print "\n";
 	}
-}
+};
 
 1;
 
@@ -135,7 +167,7 @@ Ascii::Text - module for generating ASCII text in various fonts and styles
 
 =head1 VERSION
 
-Version 0.04
+Version 0.08
 
 =cut
 
@@ -147,7 +179,10 @@ Perhaps a little code snippet.
 
 	use Ascii::Text;
 
-	my $foo = Ascii::Text->new(color => 'red');
+	my $foo = Ascii::Text->new(
+		color => 'red',
+		align => 'center'
+	);
 
 	$foo->("Hello World");
 
@@ -185,11 +220,23 @@ Set/Get the max width of a line of text by default this uses L<Term::Size::ReadK
 
 	$ascii->max_width(100);
 
+=head2 pad
+
+Set/Get the left padding of the text on a line. When "align" is set to center or right this value will become redundant. The default value is 0.
+
+	$ascii->pad(10);
+
 =head2 font
 
 Set/Get the reference to the font class.
 
 	$ascii->font("Boomer");
+
+=head2 align
+
+Set/Get the alignment of the text on the line. Options are left, center or right.
+
+	$ascii->align('right');
 
 =head2 color
 

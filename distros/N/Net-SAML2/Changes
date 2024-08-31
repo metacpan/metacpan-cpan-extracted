@@ -1,5 +1,33 @@
 Revision history for Perl extension Net::SAML2.
 
+0.81 -- Fri Aug 30 15:16:41 ADT 2024
+
+     This release is dedicated to the memory of Abe Timmerman (ABELTJE)
+
+     [Compatibility Deprecation Warning]
+     As of Release 0.79 the following have been changed and the old version may be
+     removed in an upcoming release.
+
+     - Net::SAML2::Protocol::Artifact
+         - response_to changed to in_response_to
+     - Net::SAML2::Protocol::LogoutResponse
+         - response_to changed to in_response_to
+
+    [Significant Changes]
+    - Reverts "Fix #123 Useless cert_text" as the cert_text is not so useless...
+    - Note that the latest versions of libxml2 may have made some incompatable
+    changes.  These changes do not seem to impact this module and will be reviewed
+    closer in a future version.
+
+    [Detailed Change Log]
+    - ad9c30f Fix pod issues
+    - 2e0028b Disable author testing update to libxml2 or catalog required
+    - 7ba6750 Revert f3e8e5f4fbfa70c79b1ee4a8850be8a6ba4ede27 Fixes #123 Useless cert_text
+    - 049ba76 Disable author testing update to libxml2 or catalog required
+    - 51ae4c8 Revert #123 Useless cert_text
+    - ca65479 Increment repo version
+    - b33c185 v0.80
+
 0.80 -- Sat Jun 22 13:13:42 ADT 2024
 
     [Compatibility Deprecation Warning]

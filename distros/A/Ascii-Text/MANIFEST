@@ -1,8 +1,11 @@
+bin/ascii_text
 Changes
 ignore.txt
 lib/Ascii/Text.pm
+lib/Ascii/Text/Cmd.pm
 lib/Ascii/Text/Font.pm
 lib/Ascii/Text/Font/Amongus.pm
+lib/Ascii/Text/Font/Banner.pm
 lib/Ascii/Text/Font/Boomer.pm
 lib/Ascii/Text/Font/Straight.pm
 Makefile.PL
@@ -13,5 +16,6 @@ t/01-odea.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

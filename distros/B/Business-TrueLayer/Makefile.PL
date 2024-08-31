@@ -14,10 +14,13 @@ WriteMakefile(
     PREREQ_PM => {
         'Moose'                 => "2.1400",
         'Mojolicious'           => "8.52",
+        'Mojo::JWT'             => "0.09",
         'Try::Tiny::SmartCatch' => "0.5",
         'IO::Socket::SSL'       => "2.009",
         'Crypt::JWT'            => '0.024',
         'Crypt::PK::ECC'        => '0.068',
+        'Crypt::OpenSSL::RSA'   => '0.33',
+        'Crypt::OpenSSL::Bignum'=> '0.09',
         'Data::GUID'            => '0.049',
         'DateTime::Format::DateParse' => '0.05',
         'namespace::autoclean'  => '0.27',
@@ -35,8 +38,8 @@ WriteMakefile(
         resources => {
             license    => 'http://dev.perl.org/licenses/',
             homepage   => 'https://metacpan.org/module/Business::TrueLayer',
-            bugtracker => 'https://github.com/Humanstate/business-truelayer/issues',
-            repository => 'https://github.com/Humanstate/business-truelayer'
+            bugtracker => 'https://github.com/payprop/business-truelayer/issues',
+            repository => 'https://github.com/payprop/business-truelayer'
         },
     },
     test => {

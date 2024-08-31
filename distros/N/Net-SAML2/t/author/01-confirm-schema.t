@@ -3,7 +3,7 @@ use warnings;
 use Test::Lib;
 use Test::Net::SAML2;
 
-if (!$ENV{AUTHOR_TESTING}) {
+if (!$ENV{DISABLED_AUTHOR_TESTING}) {
     plan skip_all => 'Author test skipped';
 }
 

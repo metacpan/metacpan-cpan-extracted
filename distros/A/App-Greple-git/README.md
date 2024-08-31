@@ -7,6 +7,10 @@ git - Greple git module
 
     greple -Mgit ...
 
+# VERSION
+
+Version 1.00
+
 # DESCRIPTION
 
 App::Greple::git is a greple module to support git command
@@ -32,6 +36,10 @@ App::Greple::git is a greple module to support git command
     <div>
             <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-git/main/images/git-blame-label-small.jpg">
     </div>
+
+- **--color-blame-by-author**
+
+    Read [git-blame(1)](http://man.he.net/man1/git-blame) output and apply unique color for each author.
 
 - **--color-header-by-author**
 
@@ -82,7 +90,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2021-2023 Kazumasa Utashiro.
+Copyright 2021-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

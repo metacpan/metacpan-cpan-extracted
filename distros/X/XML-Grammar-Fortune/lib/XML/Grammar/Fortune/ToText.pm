@@ -1,5 +1,5 @@
 package XML::Grammar::Fortune::ToText;
-$XML::Grammar::Fortune::ToText::VERSION = '0.0900';
+$XML::Grammar::Fortune::ToText::VERSION = '0.1000';
 use warnings;
 use strict;
 
@@ -762,7 +762,7 @@ XML::Grammar::Fortune::ToText - convert the FortunesXML grammar to plaintext.
 
 =head1 VERSION
 
-version 0.0900
+version 0.1000
 
 =head1 SYNOPSIS
 

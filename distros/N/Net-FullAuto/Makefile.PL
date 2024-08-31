@@ -25,7 +25,9 @@
 #
 ################################################################
 
-our $VERSION='1.0000793';
+our $VERSION='1.0000795';
+
+print `env`,"\n\n\n";
 
 if ($ENV{'AUTOMATED_TESTING'}) {
 #if (1) {
@@ -714,28 +716,27 @@ if (exists $ENV{PAR_TEMP}) {
 unless (exists $ENV{FA_EDITOR} || grep { /Encrypted|SKIP|CPAN/i } @ARGV) {
    print $fa_banner;
    sleep 2;
-   unless (exists $ENV{PAR_TEMP} || keys %amazon) {
+   unless (exists $ENV{PAR_TEMP}) { # || keys %amazon) {
       my $message=<<'END';
     ___                     _            _     _
    |_ _|_ __  _ __  ___ _ _| |_ __ _ _ _| |_  | | This message times out in
     | || '  \| '_ \/ _ \ '_|  _/ _` | ' \  _| |_| 2 minutes so the FullAuto
    |___|_|_|_| .__/\___/_|  \__\__,_|_||_\__| (_) install can continue.
              |_| 
-                   The FullAuto install behaves differently than other CPAN
-   module installations. Normally CPAN will NOT update a dependency module
-   if it already exists on the system, even if it is an older version. CPAN
-   will NOT remove the same module found in more than one location, even if
-   the old one has precedence in @INC (meaning it will always load the old
-   one.) FullAuto does not work with "local::lib" - so this install **WILL**
-   UPDATE ALL DEPENDENCIES (over 100 of them) and remove any duplicates. If
-   this is not acceptable to you, then do not install FullAuto on this host,
-   or in the default Perl location. Either use a host where FullAuto can do
-   this, or create a 2nd Perl installation that FullAuto can "own".
+                 It is very likely your system has a number of outdated Perl
+   modules. Some of these older modules might be incompatible with FullAuto.
+   There is also the problem of older modules having precedence in @INC
+   (meaning the old incompatible module is the only one that loads.) FullAuto
+   does not support a local::lib installation. Please select how you wish
+   the FullAuto install to handle older installed modules. If you don't make
+   a selection, FullAuto will default to *NOT* updating older modules:                   
 
-   Do you wish to continue this install?
 END
       my $timeout=120;
-      my $fae="No   (FullAuto Setup will exit)";
+      my $fae="Exit FullAuto Setup";
+      my $fau="Update ALL modules (Recommended - might break older Perl code)";
+      my $fan="Do NOT update modules (FullAuto might not work properly)";
+      $ENV{CPAN_OUTDATED_MODULES}='ignore';
       {
          local $SIG{__DIE__}; # No sigdie handler
          eval {
@@ -743,12 +744,15 @@ END
             alarm $timeout;
             my $menu1 = [
                         $message,
-                        [ "Yes", sub{ return 'Yes' } ],
-                        [ $fae, sub{ return 'No' } ], 
+                        [ $fau, sub{ return 'update' } ],
+                        [ "Prompt for each module", sub{ return 'choose' } ],
+                        [ $fan, sub{ return 'ignore' } ],
+                        [ $fae, sub{ return 'exit' } ], 
                         ];
             my $selection=&menu($menu1);
             exit 0 if $selection eq ']quit[';
-            exit 0 if -1<index $selection, 'No';
+            exit 0 if -1<index $selection, 'exit';
+            $ENV{CPAN_OUTDATED_MODULES}=$selection;
             alarm 0;
          };
       } print "\n\n   FullAuto install continues . . .\n\n";
@@ -760,26 +764,26 @@ END
    $exec_cnt=$ARGV[$#ARGV];
    $exec_cnt++;
    my $module_fail=$ARGV[$#ARGV-1];
-   my $mod_info='';
-   eval {
-      local $SIG{__DIE__}; # No sigdie handler;
-      require CPAN;
-      {
-         local *STDOUT;
-         open(STDOUT, ">", \$mod_info);
-         CPAN::Shell->m($module_fail);
-      }
-   };
-   my $instfile='';
-   ($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
-   my $instver='';
-   ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
-   $instver='' unless (-1<index $mod_info,'INST_VERSION');
-   my $cpanfil='';
-   ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
-   my $cpanver='';
-   ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
-   if ($exec_cnt==1 && ($cpanver ne $instver)) {
+   #my $mod_info='';
+   #eval {
+   #   local $SIG{__DIE__}; # No sigdie handler;
+   #   require CPAN;
+   #   {
+   #      local *STDOUT;
+   #      open(STDOUT, ">", \$mod_info);
+   #      CPAN::Shell->m($module_fail);
+   #   }
+   #};
+   #my $instfile='';
+   #($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
+   #my $instver='';
+   #($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
+   #$instver='' unless (-1<index $mod_info,'INST_VERSION');
+   #my $cpanfil='';
+   #($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
+   #my $cpanver='';
+   #($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
+   #if ($exec_cnt==1 && ($cpanver ne $instver)) {
       # Amazon's AMI has Pod::Man installed in the vendor_perl
       # directory which has precedence over the system directory
       # this module actually belongs in. The only solution is to
@@ -787,11 +791,33 @@ END
       # install Pod::Man. We are doing this ONLY on Amazaon AMI
       # systems currently.
 #print "DO WE GET TO THIS PROBLEMATIC AREA AT ALL???\n";<STDIN>;
-      fa_system("sudo echo y | /bin/rm -rf \"$instfile\"");
+   #   fa_system("sudo echo y | /bin/rm -rf \"$instfile\"");
+   my $version='';my $cpanfil='';
+   if ($exec_cnt==1) {
+      ($version,$cpanfil)=cpan_modules($module_fail);
    } elsif (2<$exec_cnt) {
       my $timeout=300;my $a='';
       {
          local $SIG{__DIE__}; # No sigdie handler
+         my $mod_info='';
+         eval {
+            local $SIG{__DIE__}; # No sigdie handler;
+            require CPAN;
+            {
+               local *STDOUT;
+               open(STDOUT, ">", \$mod_info);
+               CPAN::Shell->m($module_fail);
+            }
+         };
+         my $instfile='';
+         ($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
+         my $instver='';
+         ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
+         $instver='' unless (-1<index $mod_info,'INST_VERSION');
+         my $cpanfil='';
+         ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
+         my $cpanver='';
+         ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
          eval {
             local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
             alarm $timeout;
@@ -1356,6 +1382,7 @@ END
    FullAuto Setup to validate and install any missing dependencies?
    (Default is 'yes')
 
+
 END
    my $timeout=120;
    my $fae="No   (FullAuto Setup will exit)";
@@ -1781,28 +1808,25 @@ sub fa_install_mod {
          /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
          } @ARGV)) {
       print "\n";
-      eval {
-         local $SIG{__DIE__}; # No sigdie handler;
-         require CPAN;
-         {
-            local *STDOUT;
-            open(STDOUT, ">", \$mod_info);
-            CPAN::Shell->m($p);
-         }
-      };
-      print $mod_info;
-      my $instver='';my $cpanver='';
-      if ($mod_info) {
-         ($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
-         ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
-         ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
-         ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
-      }
-      if (!$version && ($instver<$cpanver)) {
-#print "DO WE GET TO THIS PROBLEMATIC AREA AT ALL???\n";<STDIN>;
-         unlink $instfile if $exec_cnt;
-         $version=$cpanver;
-      }
+      #eval {
+      #   local $SIG{__DIE__}; # No sigdie handler;
+      #   require CPAN;
+      #   {
+      #      local *STDOUT;
+      #      open(STDOUT, ">", \$mod_info);
+      #      CPAN::Shell->m($p);
+      #   }
+      #};
+      #my $instver='';my $cpanver='';
+      #if ($mod_info) {
+      #   ($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
+      #   ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
+      #   ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
+      #   ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
+      #}
+      #if (!$version && ($instver<$cpanver)) {
+      ($version,$cpanfil)=cpan_modules($p);
+      #}
    } else {
       $cpanfil=$p;
    }
@@ -2204,7 +2228,7 @@ sub menu {
    while (1) {
       print "$m->[0]\n";
       print map { "\t$_. $m->[$_][0]\n" } (1..$#$m);
-      print "\n\n   PLEASE ENTER A CHOICE: ";
+      print "\n   PLEASE ENTER A CHOICE: ";
       chomp ($choice = <STDIN>);
       last if ( ($choice > 0) && ($choice <= $#$m ));
       print "You chose '$choice'.  That is not a valid option.\n\n";
@@ -2266,22 +2290,22 @@ END
 	 chomp($release);
 
 #print "WHAT IS RELEASE FOR PARSING:\n\n$release<==\n\n";
-	 $release=~s/^.*?[+]R\/RE\/(.*?)CPAN_FILE.*$/$1/s;
+	 $release=~s/^.*?[+]R\/RE\/(.*?gz)CPAN_.*$/$1/s;
 #print "PARSING OUTCOME=$release<==\n\n";
          $low_mem.=<<END;
    Installing FullAuto on an Amazon AWS $amazon{instance_type} instance via
    the commandline cpan utility requires a different approach. The cpan
    utility places its entire module catalog in memory, and on an AWS 
    $amazon{instance_type} instance, there just isn't the capacity to make it work
-   as expected. Instead, exit out of the cpan utility, and then restart it,
-   but run the bottom command *instead* of "install Net::FullAuto":
+   as expected. Instead, exit out of the cpan utility, and then restart
+   it, but run the bottom command *instead* of "install Net::FullAuto":
 
    cpan[3]> exit    ( <== type 'exit' at prompt *first*, then restart cpan )
    
    \$ <sudo> cpan    ( <== restart 'cpan' [if sudo was used, use it again])
 
    cpan[1]> install $release  <==
-            ======================================
+            ==============================================
 END
          $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
          my $mem_avail=$memavail;
@@ -6335,6 +6359,94 @@ sub fa_find_editor {
          return $path.$editor;
       }
    } return 0;
+}
+
+sub cpan_modules {
+   my $p=$_[0];
+   my $mod_info='';
+   my $version='';
+   print "PPPPP=$p and THIS=",$ENV{CPAN_OUTDATED_MODULES},"<==\n";
+   eval {
+      local $SIG{__DIE__}; # No sigdie handler;
+      require CPAN;
+      {
+         local *STDOUT;
+         open(STDOUT, ">", \$mod_info);
+         CPAN::Shell->m($p);
+      }
+   };
+   my $instfile='';
+   ($instfile=$mod_info)=~s/^.*INST_FILE\s+[(]([^)]+).*$/$1/s;
+   my $instver='';
+   ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
+   $instver=0 unless (-1<index $mod_info,'INST_VERSION');
+   my $cpanfil='';
+   ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
+   my $cpanver='';
+   ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
+   print "INSTVER=$instfile<==\n";
+   if ($ENV{CPAN_OUTDATED_MODULES} eq 'update') {
+#print "DO WE GET TO THIS PROBLEMATIC AREA AT ALL???\n";<STDIN>;
+      print $mod_info;
+      unlink $instfile;
+      $version=$cpanver;
+      return $version,$cpanfil;
+   } elsif ($ENV{CPAN_OUTDATED_MODULES} eq 'choose' &&
+         ($instfile ne 'not installed') and ($instver<$cpanver)) {
+      chomp($mod_info);chomp($mod_info);
+      my $message=<<'END';
+     ___       _      _      _          _   __  __         _      _
+    / _ \ _  _| |_ __| |__ _| |_ ___ __| | |  \/  |___  __| |_  _| |___
+   | (_) | || |  _/ _` / _` |  _/ -_) _` | | |\/| / _ \/ _` | || | / -_)
+    \___/ \_,_|\__\__,_\__,_|\__\___\__,_| |_|  |_\___/\__,_|\_,_|_\___|
+END
+      $message.=<<END;
+ 
+   UPDATE $p ?
+
+   $mod_info 
+END
+      my $timeout=120;
+      my $fae="Exit FullAuto Setup";
+      my $upd="UPDATE $p ONLY";
+      my $skp="SKIP -> DO NOT UPDATE $p";
+      my $fau="Update ALL remaining modules";
+      my $fan="Do NOT update all remaining modules";
+      $ENV{CPAN_OUTDATED_MODULES}='ignore';
+      {
+         local $SIG{__DIE__}; # No sigdie handler
+         eval {
+            local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+            alarm $timeout;
+            my $menu1 = [
+                        $message,
+                        [ $upd, sub{ return 'only' } ],
+                        [ $skp, sub{ return 'skip' } ],
+                        [ $fau, sub{ return 'update' } ],
+                        [ $fan, sub{ return 'ignore' } ],
+                        [ $fae, sub{ return 'exit' } ],
+                        ];
+            my $selection=&menu($menu1);
+            exit 0 if $selection eq ']quit[';
+            exit 0 if -1<index $selection, 'exit';
+            $ENV{CPAN_OUTDATED_MODULES}=$selection
+               if $selection eq 'update' || $selection eq 'ignore';
+            alarm 0;
+         }; $selection='ignore' unless $selection;
+      } 
+      if ($selection eq 'only' || $selection eq 'update') {
+         unlink $instfile;
+         $version=$cpanver;
+      }
+      print "\n\n   FullAuto install continues . . .\n\n";
+      return $version,$cpanfil;
+   } else {
+      if ($ENV{CPAN_OUTDATED_MODULES}) {
+	 print "   **** NOT UPDATING $p ****\n\n";
+      }
+      print $mod_info;
+      return $version,$cpanfil;
+   }
 }
 
 package MY; # so that "SUPER" works right

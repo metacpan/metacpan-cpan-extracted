@@ -5,7 +5,7 @@ Business::TrueLayer - Perl library for interacting with the TrueLayer v3 API
 
 # VERSION
 
-v0.02
+v0.04
 
 # SYNOPSIS
 
@@ -36,6 +36,15 @@ v0.02
 
     if ( $Payment->settled ) {
         ...
+    }
+
+    # create a mandate, then create a payment
+    my $Mandate = $TrueLayer->create_mandate( $args );
+
+    if ( $Mandate->authorized ) {
+        my $Payment = $TrueLayer->create_payment_from_mandate(
+            $Mandate,$amount_in_minor_units
+        );
     }
 
 # DESCRIPTION
@@ -102,6 +111,45 @@ the caller
 
 Any issues here will result in an exception being thrown.
 
+## create\_mandate
+
+Instantiates a [Business::TrueLayer::Mandate](https://metacpan.org/pod/Business%3A%3ATrueLayer%3A%3AMandate) object then calls the
+API to create it - will return the object to allow you to inspect it
+and call methods on it.
+
+    my $Mandate = $TrueLayer->create_mandate( $args );
+
+`$args` should be a hash reference of the necessary attributes to
+instantiate a [Business::TrueLayer::Mandate](https://metacpan.org/pod/Business%3A%3ATrueLayer%3A%3AMandate) object - see the perldoc
+for that class for the attributes required.
+
+Any issues here will result in an exception being thrown.
+
+## get\_mandate
+
+Calls the API to get the details for a mandate for the given id then
+instantiates a [Business::TrueLayer::Mandate](https://metacpan.org/pod/Business%3A%3ATrueLayer%3A%3AMandate) object for return to
+the caller
+
+    my $Mandate = $TrueLayer->get_mandate( $mandate_id );
+
+Any issues here will result in an exception being thrown.
+
+## create\_payment\_from\_mandate
+
+Returns a [Business::TrueLayer::Payment](https://metacpan.org/pod/Business%3A%3ATrueLayer%3A%3APayment) object after having called
+the TrueLayer API for a particular mandate
+
+    my $Payment = $TrueLayer->create_payment_from_mandate(
+        $Mandate,
+        $amount_in_minor_units,
+    );
+
+`$Mandate` should be a Business::TrueLayer::Mandate object, and
+`$amount_in_minor_units` should be exactly that.
+
+Any issues here will result in an exception being thrown.
+
 # SEE ALSO
 
 [Business::TrueLayer::MerchantAccount](https://metacpan.org/pod/Business%3A%3ATrueLayer%3A%3AMerchantAccount)
@@ -120,4 +168,4 @@ This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. If you would like to contribute documentation,
 features, bug fixes, or anything else then please raise an issue / pull request:
 
-    https://github.com/Humanstate/business-truelayer
+    https://github.com/payprop/business-truelayer

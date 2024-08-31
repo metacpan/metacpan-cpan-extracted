@@ -3,14 +3,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 54;
+use Test::More tests => 63;
 use Test::XML::Ordered qw(is_xml_ordered);
 
 use Encode qw/ decode /;
 
 use XML::Grammar::Fortune ();
 
-# TEST:$num_texts=18
+# TEST:$num_texts=19
 
 my @tests = (
     qw(
@@ -20,6 +20,7 @@ my @tests = (
         facts-fort-5-author-href
         facts-fort-6-fact-lang--elems
         irc-conversation-4-several-convos
+        irc-conversation-5-with-see-also
         irc-convos-and-raw-fortunes-1
         raw-fort-empty-info-1
         quote-fort-sample-1
@@ -34,6 +35,14 @@ my @tests = (
         quote-fort-sample-10-with-hyperlink
     )
 );
+
+# TEST:$xhtml5=3;
+my %test_with_xhtml5 =
+    map { $_ => 1 } (
+    'irc-conversation-4-several-convos',
+    'irc-conversation-5-with-see-also',
+    'quote-fort-sample-10-with-hyperlink',
+    );
 
 my @common = ( validation => 0, load_ext_dtd => 0, no_network => 1 );
 
@@ -114,6 +123,37 @@ foreach my $fn_base (@tests)
             {},
             "Testing for Good XSLTing of '$fn_base'",
         );
+
+        if ( exists( $test_with_xhtml5{$fn_base} ) )
+        {
+            my $results_buffer = "";
+
+            $converter->run(
+                {
+                    input       => $filename,
+                    output      => \$results_buffer,
+                    xslt_params => +{
+                        'fortune.xhtml5.mode' => q#'1'#,
+                    }
+                }
+            );
+
+            # TEST*$xhtml5
+            unlike( $results_buffer, qr/[ \t]$/ms,
+                "No trailing space for '$fn_base'",
+            );
+
+            # TEST*$xhtml5
+            is_xml_ordered(
+                [ string => normalize_xml($results_buffer), @common, ],
+                [
+                    location => "./t/data/xhtml5-mode-results/$fn_base.xhtml",
+                    @common,
+                ],
+                {},
+                "Testing for Good XSLTing of '$fn_base'",
+            );
+        }
     }
 }
 1;

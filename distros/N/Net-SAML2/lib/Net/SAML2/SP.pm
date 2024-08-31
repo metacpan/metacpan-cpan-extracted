@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.80'; # VERSION
+our $VERSION = '0.81'; # VERSION
 
 use Moose;
 
@@ -523,7 +523,7 @@ Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.80
+version 0.81
 
 =head1 SYNOPSIS
 

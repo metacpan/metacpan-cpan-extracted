@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Util::H2O::More qw/ddd/;
+use Acme::Free::API::Stonks qw//;
+
+my $stonk = Acme::Free::API::Stonks->new;
+
+printf STDERR "%-5s %-8s %-4s %4s\n", "tick", "sentiment", "score", "comments"; 
+foreach my $s (sort {$a->ticker cmp $b->ticker} $stonk->stonks->all) {
+  printf "%-5s %-8s % 4.3f % 4d\n", $s->ticker // "na", $s->sentiment // "na", $s->sentiment_score // "nan", $s->no_of_comments // "nan";
+}
+
+__END__

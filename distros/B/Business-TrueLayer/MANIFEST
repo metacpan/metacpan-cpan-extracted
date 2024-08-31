@@ -14,11 +14,15 @@ lib/Business/TrueLayer/Provider/Filter.pm
 lib/Business/TrueLayer/Provider/Scheme.pm
 lib/Business/TrueLayer/Remitter.pm
 lib/Business/TrueLayer/Request.pm
+lib/Business/TrueLayer/Role/Status.pm
 lib/Business/TrueLayer/Signer.pm
 lib/Business/TrueLayer/Types.pm
 lib/Business/TrueLayer/Types/Beneficiary.pm
 lib/Business/TrueLayer/Types/User.pm
 lib/Business/TrueLayer/User.pm
+lib/Business/TrueLayer/Webhook.pm
+lib/Business/TrueLayer/Webhook/Mandate.pm
+lib/Business/TrueLayer/Webhook/Resource.pm
 Makefile.PL
 MANIFEST
 README.md
@@ -39,6 +43,7 @@ t/business/truelayer/remitter.t
 t/business/truelayer/request.t
 t/business/truelayer/signer.t
 t/business/truelayer/user.t
+t/business/truelayer/webhook.t
 t/ec512-private-key-FOR-TEST.pem
 t/ec512-public-key-FOR-TEST.pem
 xt/000_changes.t

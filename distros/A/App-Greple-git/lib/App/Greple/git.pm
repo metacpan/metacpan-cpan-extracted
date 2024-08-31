@@ -1,6 +1,6 @@
 package App::Greple::git;
 
-our $VERSION = "0.04";
+our $VERSION = "1.00";
 
 use v5.14;
 use warnings;
@@ -36,6 +36,10 @@ git - Greple git module
 
     greple -Mgit ...
 
+=head1 VERSION
+
+Version 1.00
+
 =head1 DESCRIPTION
 
 App::Greple::git is a greple module to support git command
@@ -68,6 +72,10 @@ Set F<$HOME/.gitconfig> like this:
 <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-git/main/images/git-blame-label-small.jpg">
 
 =end html
+
+=item B<--color-blame-by-author>
+
+Read L<git-blame(1)> output and apply unique color for each author.
 
 =item B<--color-header-by-author>
 
@@ -125,7 +133,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2021-2023 Kazumasa Utashiro.
+Copyright 2021-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -137,19 +145,36 @@ __DATA__
 define :ID:      [0-9a-f^][0-9a-f]{7,39}
 define :LINE:    ^:ID:\b.+
 define :LABEL:   ^:ID:\b.+?\d\)
-define :UNIQSUB: sub{s/\s.*//r}
+
+option --color-by-id   --uniqsub 'sub{s/\h.*//r}'
+option --color-by-user --uniqsub 'sub{substr($_,11,17)}'
 
 option --color-blame --color-blame-line
 
 option --color-blame-line \
-	--all --need=0 --uniqcolor --uniqsub :UNIQSUB: \
+	--all --need=0 --uniqcolor --color-by-id \
 	--re :LINE: --face +E-D
 
 option --color-blame-label \
-	--all --need=0 --uniqcolor --uniqsub :UNIQSUB: \
+	--all --need=0 --uniqcolor --color-by-id \
 	--re :LABEL: --face -D
 
-define :COMMIT_HEADER: ^([*| ] )*commit(?s:.*?)(?=^([*| ] )*\n|\z)
+option --color-blame-by-author \
+	--all --need=0 --uniqcolor --color-by-user \
+	--re :LABEL: --face -D
+
+define :COMMIT_HEADER: <<EOS
+    (?x)
+    ^([*| ] )*         # --graph
+    commit \s+         # commit
+    [0-9a-f]{7,40}     # hash
+    (\s+ \(.+\) )?     # (HEAD -> main)
+    \n
+    (
+      ([*| ][/\\ ])*
+      (\w.+\n)
+    )+
+EOS
 
 option --grep-commit-header --re <COMMIT_HEADER>
 

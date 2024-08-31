@@ -93751,3 +93751,15 @@ P/PE/PEVANS/Syntax-Keyword-Defer-0.11.tar.gz
 P/PE/PEVANS/Syntax-Keyword-Try-0.30.tar.gz
 G/GF/GFRANKS/Test-MockModule-v0.179.0.tar.gz
 P/PE/PEVANS/XS-Parse-Keyword-0.45.tar.gz
+O/OO/OODLER/Acme-Free-API-Stonks-1.0.0.tar.gz
+A/AN/ANDK/CPAN-2.37.tar.gz
+U/UT/UTASHIRO/App-Greple-git-1.00.tar.gz
+L/LN/LNATION/Ascii-Text-0.08.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000795.tar.gz
+L/LE/LEEJO/Business-TrueLayer-0.04.tar.gz
+O/OE/OETIKER/CallBackery-0.50.1.tar.gz
+P/PE/PERLANCAR/Math-Image-CalcResized-0.006.tar.gz
+T/TI/TIMLEGGE/Net-SAML2-0.81.tar.gz
+L/LN/LNATION/Rope-Cmd-0.02.tar.gz
+P/PE/PEVANS/Syntax-Keyword-Dynamically-0.14.tar.gz
+S/SH/SHLOMIF/XML-Grammar-Fortune-0.1000.tar.gz

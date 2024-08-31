@@ -3,8 +3,8 @@ NAME
     by ImageMagick-like geometry specification
 
 VERSION
-    This document describes version 0.005 of Math::Image::CalcResized (from
-    Perl distribution Math-Image-CalcResized), released on 2021-10-12.
+    This document describes version 0.006 of Math::Image::CalcResized (from
+    Perl distribution Math-Image-CalcResized), released on 2024-08-29.
 
 FUNCTIONS
   calc_image_resized_size
@@ -17,15 +17,15 @@ FUNCTIONS
 
     Examples:
 
-    *   Example #1:
+    *   no resizing:
 
          calc_image_resized_size(size => "2592x1944", resize => ""); # -> [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #2:
+    *   scale (down) to 20%:
 
          calc_image_resized_size(size => "2592x1944", resize => "20%"); # -> [200, "OK (envelope generated)", "518x388"]
 
-    *   Example #3:
+    *   scale (down) width to 20% but height to 40%:
 
          calc_image_resized_size(size => "2592x1944", resize => "20%x40%");
 
@@ -33,7 +33,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "518x777"]
 
-    *   Example #4:
+    *   scale (down) width to 20% but height to 40% (first percent sign is
+        optional):
 
          calc_image_resized_size(size => "2592x1944", resize => "20x40%");
 
@@ -41,11 +42,11 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "518x777"]
 
-    *   Example #5:
+    *   set width to 1024px:
 
          calc_image_resized_size(size => "2592x1944", resize => 1024); # -> [200, "OK (envelope generated)", "1024x768"]
 
-    *   Example #6:
+    *   shrink width to 1024px:
 
          calc_image_resized_size(size => "2592x1944", resize => "1024>");
 
@@ -53,7 +54,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "1024x768"]
 
-    *   Example #7:
+    *   shrink width to 10240px (no effect since width is already less than
+        10240px):
 
          calc_image_resized_size(size => "2592x1944", resize => "10240>");
 
@@ -61,7 +63,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #8:
+    *   enlarge width to 1024px (no effect since width is already greater
+        than 1024px:
 
          calc_image_resized_size(size => "2592x1944", resize => "1024^");
 
@@ -69,7 +72,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #9:
+    *   enlarge width to 10240px:
 
          calc_image_resized_size(size => "2592x1944", resize => "10240^");
 
@@ -77,7 +80,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "10240x7680"]
 
-    *   Example #10:
+    *   set height to 1024px:
 
          calc_image_resized_size(size => "2592x1944", resize => "x1024");
 
@@ -85,7 +88,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "1365x1024"]
 
-    *   Example #11:
+    *   shrink height to 768px:
 
          calc_image_resized_size(size => "2592x1944", resize => "x768>");
 
@@ -93,7 +96,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "1024x768"]
 
-    *   Example #12:
+    *   shrink height to 7680px (no effect since height is already less than
+        7680px):
 
          calc_image_resized_size(size => "2592x1944", resize => "x7680>");
 
@@ -101,7 +105,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #13:
+    *   enlarge height to 768px (no effect since height is already greater
+        than 768px):
 
          calc_image_resized_size(size => "2592x1944", resize => "x768^");
 
@@ -109,7 +114,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #14:
+    *   enlarge height to 7680px:
 
          calc_image_resized_size(size => "2592x1944", resize => "x7680^");
 
@@ -117,7 +122,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "10240x7680"]
 
-    *   Example #15:
+    *   fit image inside 20000x10000 (no effect since it already fits):
 
          calc_image_resized_size(size => "2592x1944", resize => "20000x10000");
 
@@ -125,7 +130,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #16:
+    *   fit image inside 20000x1000 (height is reduced to 1000 to make the
+        image fit):
 
          calc_image_resized_size(size => "2592x1944", resize => "20000x1000");
 
@@ -133,7 +139,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "1333x1000"]
 
-    *   Example #17:
+    *   fit image inside 100x200:
 
          calc_image_resized_size(size => "2592x1944", resize => "100x200");
 
@@ -141,7 +147,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "100x75"]
 
-    *   Example #18:
+    *   fit image inside 100x100:
 
          calc_image_resized_size(size => "2592x1944", resize => "100x100");
 
@@ -149,7 +155,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "100x75"]
 
-    *   Example #19:
+    *   fit a 10000x5000 area inside image:
 
          calc_image_resized_size(size => "2592x1944", resize => "10000x5000^");
 
@@ -157,7 +163,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "10000x7500"]
 
-    *   Example #20:
+    *   fit a 5000x10000 area inside image:
 
          calc_image_resized_size(size => "2592x1944", resize => "5000x10000^");
 
@@ -165,7 +171,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "13333x10000"]
 
-    *   Example #21:
+    *   fit a 100x100 area inside image (no effect since the image can
+        already fit that area):
 
          calc_image_resized_size(size => "2592x1944", resize => "100x100^");
 
@@ -173,7 +180,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #22:
+    *   set dimension to 100x100:
 
          calc_image_resized_size(size => "2592x1944", resize => "100x100!");
 
@@ -181,7 +188,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "100x100"]
 
-    *   Example #23:
+    *   shrink image to fit inside 10000x5000px (no effect since image
+        already fits):
 
          calc_image_resized_size(size => "2592x1944", resize => "10000x5000>");
 
@@ -189,23 +197,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #24:
-
-         calc_image_resized_size(size => "2592x1944", resize => "5000x10000>");
-
-        Result:
-
-         [200, "OK (envelope generated)", "2592x1944"]
-
-    *   Example #25:
-
-         calc_image_resized_size(size => "2592x1944", resize => "3000x1000>");
-
-        Result:
-
-         [200, "OK (envelope generated)", "2592x1944"]
-
-    *   Example #26:
+    *   shrink image to fit inside 2000x1000px:
 
          calc_image_resized_size(size => "2592x1944", resize => "2000x1000>");
 
@@ -213,7 +205,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "1333x1000"]
 
-    *   Example #27:
+    *   shrink image to fit inside 100x100px:
 
          calc_image_resized_size(size => "2592x1944", resize => "100x100>");
 
@@ -221,7 +213,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "100x75"]
 
-    *   Example #28:
+    *   enlarge image to fit 10000x5000px inside it:
 
          calc_image_resized_size(size => "2592x1944", resize => "10000x5000<");
 
@@ -229,7 +221,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "10000x7500"]
 
-    *   Example #29:
+    *   enlarge image to fit 5000x10000px inside it:
 
          calc_image_resized_size(size => "2592x1944", resize => "5000x10000<");
 
@@ -237,7 +229,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "13333x10000"]
 
-    *   Example #30:
+    *   enlarge image to fit 3000x1000px inside it (no effect since image
+        already fits):
 
          calc_image_resized_size(size => "2592x1944", resize => "3000x1000<");
 
@@ -245,23 +238,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #31:
-
-         calc_image_resized_size(size => "2592x1944", resize => "2000x1000<");
-
-        Result:
-
-         [200, "OK (envelope generated)", "2592x1944"]
-
-    *   Example #32:
-
-         calc_image_resized_size(size => "2592x1944", resize => "100x100<");
-
-        Result:
-
-         [200, "OK (envelope generated)", "2592x1944"]
-
-    *   Example #33:
+    *   shrink shortest side to 1024px:
 
          calc_image_resized_size(size => "2592x1944", resize => "1024^>");
 
@@ -269,7 +246,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "1365x1024"]
 
-    *   Example #34:
+    *   shrink shortest side to 10240px (no effect since shortest side
+        1944px is already less than 10240px):
 
          calc_image_resized_size(size => "2592x1944", resize => "10240^>");
 
@@ -277,7 +255,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #35:
+    *   enlarge shortest side to 1024px (no effect since shortest side is
+        already greater than 1024px):
 
          calc_image_resized_size(size => "2592x1944", resize => "1024^<");
 
@@ -285,7 +264,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #36:
+    *   enlarge shortest side to 10240px:
 
          calc_image_resized_size(size => "2592x1944", resize => "10240^<");
 
@@ -293,7 +272,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "13653x10240"]
 
-    *   Example #37:
+    *   shrink longest side to 1024px:
 
          calc_image_resized_size(size => "2592x1944", resize => "^1024>");
 
@@ -301,7 +280,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "1024x768"]
 
-    *   Example #38:
+    *   shrink longest side to 10240px (no effect since longest side 2592px
+        is already less than 10240px):
 
          calc_image_resized_size(size => "2592x1944", resize => "^10240>");
 
@@ -309,7 +289,8 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #39:
+    *   enlarge longest side to 1024px (no effect since longest side 2592px
+        is already greater than 1024px):
 
          calc_image_resized_size(size => "2592x1944", resize => "^1024<");
 
@@ -317,7 +298,7 @@ FUNCTIONS
 
          [200, "OK (envelope generated)", "2592x1944"]
 
-    *   Example #40:
+    *   enlarge longest side to 10240px:
 
          calc_image_resized_size(size => "2592x1944", resize => "^10240<");
 
@@ -544,6 +525,8 @@ FUNCTIONS
 
     *   resize* => *str*
 
+        (No description)
+
     Returns an enveloped result (an array).
 
     First element ($status_code) is an integer containing HTTP-like status
@@ -581,13 +564,13 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020 by perlancar
+    This software is copyright (c) 2024, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

@@ -63,7 +63,6 @@
             "IO::Zlib" : "0",
             "JSON::PP" : "0",
             "LWP::UserAgent" : "0",
-            "Log::Log4perl" : "0",
             "MIME::Base64" : "0",
             "Module::Build" : "0",
             "Module::Signature" : "0",
@@ -94,6 +93,6 @@
          "url" : "https://github.com/andk/cpanpm"
       }
    },
-   "version" : "2.36",
+   "version" : "2.37",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

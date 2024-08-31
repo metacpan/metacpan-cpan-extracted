@@ -58,16 +58,22 @@ qx.Class.define("callbackery.data.Server", {
                                 origThis.setSessionCookie(ret.sessionCookie);
                                 origArguments.callee.base.apply(origThis, origArguments);
                             });
-
                             login.open();
                             return;
                         case 7:
-                            const msg = callbackery.ui.MsgBox.getInstance();
-                            msg.addListenerOnce('ok', (e) => { window.location.reload(true); });
-                            msg.info(
-                                this.tr('Session Expired'),
-                                this.xtr(exc.message),
-                                false
+                            if (window.console){
+                                window.console.log("Session Expired. Reloading page");
+                            }
+                            callbackery.ui.Busy.getInstance().vanish();
+                            let mb = callbackery.ui.MsgBox.getInstance()
+                            mb.addListenerOnce('choice',(e) => {
+                                if (e.getData() == 'ok'){
+                                     window.location.reload(true);
+                                }
+                            });
+                            mb.info(
+                                mb.tr('Session Expired'),
+                                mb.xtr(exc.message)
                             );
                             return;
                     }

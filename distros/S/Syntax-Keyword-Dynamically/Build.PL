@@ -13,6 +13,8 @@ if( $^O eq "MSWin32" ) {
    push @extra_compiler_flags, "-DNO_XSLOCKS=1";
 }
 
+push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
+
 my $build = Module::Build->new(
    module_name => "Syntax::Keyword::Dynamically",
    test_requires => {

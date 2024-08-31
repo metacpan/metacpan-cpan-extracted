@@ -23,11 +23,14 @@ requires:
   Carp: '0'
   Complete::Country: '0.003'
   Crypt::JWT: '0.024'
+  Crypt::OpenSSL::Bignum: '0.09'
+  Crypt::OpenSSL::RSA: '0.33'
   Crypt::PK::ECC: '0.068'
   Data::GUID: '0.049'
   DateTime::Format::DateParse: '0.05'
   IO::Socket::SSL: '2.009'
   JSON: '0'
+  Mojo::JWT: '0.09'
   Mojolicious: '8.52'
   Moose: '2.1400'
   MooseX::Aliases: '0.11'
@@ -35,9 +38,9 @@ requires:
   namespace::autoclean: '0.27'
   perl: '5.020000'
 resources:
-  bugtracker: https://github.com/Humanstate/business-truelayer/issues
+  bugtracker: https://github.com/payprop/business-truelayer/issues
   homepage: https://metacpan.org/module/Business::TrueLayer
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/Humanstate/business-truelayer
-version: '0.03'
+  repository: https://github.com/payprop/business-truelayer
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

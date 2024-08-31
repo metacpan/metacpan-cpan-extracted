@@ -67,6 +67,7 @@ match:
     |BBAXTER/FlatFile-DataStore-\d           # hangs after t/FlatFile-DataStore-Toc.t
     |BDFOY/File-Find-Closures-1.08           # maybe hopped into unauthorized area?
     |BEANZ/Device-RFXCOM-                    # spits out EV: error in callback (ignoring): closed at t/01-rx.t line 116
+    |BENBOOTH/GH-0.69\.                      # pass:fail 6:271
     |BFG/MojoX-Run-\d                        # hangs with 5.14.0-382
     |BFREE/OpenGL-Image-\d
     |BFREE/OpenGL-\d
@@ -124,6 +125,7 @@ match:
     |.*/Google-Ads-AdWords-Client-[1-4]\.    # avoid non-latest version (5.7.0)
     |.*/Google-Ads-AdWords-Client-5\.[1-6]\. # avoid non-latest version (5.7.0)
     |DUFF/Module-Install-RPM-0.01            # see https://rt.cpan.org/Ticket/Display.html?id=67027
+    |DWATSON/App-DNS-Adblock-0.015.tar.gz    # https://github.com/terminalfool/App-DNS-Adblock/issues/1
     |DWC/DBIx-NamedDSN-0.11.tar.gz           # asks questions
     |EBRUNI/WWW-BBB-API-\d                   # asks questions
     |EBRUNI/HTML-DBTable-0.05.tar.gz         # user interaction required
@@ -157,8 +159,7 @@ match:
     |GEOTIGER/Oracle-Trigger-\d              # may call both CPANPLUS::install and CPAN::install
     |GGARAND/PerlQt-3.008.tar.gz             # disk scans taking forever
     |GKNAUSS/WebService-Upcoming             # for members only
-    |GLLORE/App-SeismicUnixGui-0.81.4.tar.gz # runs a find on / during setup
-    |GLLORE/App-SeismicUnixGui-0.82.0.tar.gz # runs a find on / during setup
+    |GLLORE/App-SeismicUnixGui-              # https://rt.cpan.org/Ticket/Display.html?id=146901 (runs a find on / during setup)
     |GOLOGO/Podcast-ESLPodcast-Splitter-v0.0.1 # only fails on cpantesters
     |GONERI/Ocsinventory-Agent-0.0.8.tar.gz  # hangs
     |GONERI/Ocsinventory-Agent-\d            # hanger
@@ -195,6 +196,7 @@ match:
     |INA/Modern/Open/Modern-Open-\d          # Message-ID: <87zjfc7itv.fsf at cvrsnica.herceg.de>
     |INGY/Module-Install-TestML-0.02.tar.gz  # unsuited for testing: https://github.com/testml-lang/testml/wiki/TestML-and-CPAN
     |ISHIGAKI/PPM-Make-\d                    # asks questions
+    |ITUB/Chemistry-File-SMILES-0.47.tar.gz  # https://rt.cpan.org/Ticket/Display.html?id=149871
     |IVAN/Business-OnlinePayment-eSelectPlus-\d # hangs with 5.14.0-357
     |IVAN/Net-APP-0.2.tar.gz                 # looks like abandoned since 2001
     |IX/Apache-Wombat-0.5.1.tar.gz           # asks questions
@@ -233,6 +235,7 @@ match:
     |KAZUHO/Parallel-Prefork-0.02            # hangs
     |KAZUHO/Server-Starter-0.11              # hangs
     |KENTNL/Path-FindDev-0.4.0.tar.gz        # http://www.cpantesters.org/cpan/report/8d9bf222-39ee-11e3-bbd4-fb49f34aa4a3
+    |KHS/Gearman-SlotManager-0.3.tar.gz      # https://rt.cpan.org/Ticket/Display.html?id=82638
     |KIMURA/Comprss-Zlib-1.12-bin-1-Mac.tgz
     |KWILLIAMS/Apache-Filter-1.024.tar.gz    # https://rt.cpan.org/Ticket/Display.html?id=34604
     |KESTEB/POE-Component-Client-Stomp-0.05.tar.gz # hangs in t/02_basic.t with 5.10 proper
@@ -263,8 +266,10 @@ match:
     |LUSOL/tkjuke-2.2.1.tar.gz               # asks questions
     |LZE/CGI-CMS-\d                          # asks questions about paths
     |MACKENNA/IPC-MMA-0.81.tar.gz
+    |MAJA/Net-DNS-Dynamic-Proxyserver-1\.2\. # RT 149189
     |MAKLER/Authen-CyrusSASL-0.01.tar.gz     # seems abandoned since 2001
     |MANOWAR/RadiusPerl-0.13.tar.gz          # hangs in test.pl
+    |MANWAR/Debug-Client-0.31.tar.gz         # https://github.com/PadreIDE/Debug-Client/issues/13
     |MARNANEL/Flickr-Embed-0.01              # hangs in test basic.t
     |MARNANEL/Net-RGTP-0.10.tar.gz
     |MARTIJN/Data-Transform-SSL-0.02.tar.gz  # memory accident?
@@ -272,6 +277,7 @@ match:
     |MAUNDER/Apache-AppCluster-0.02.tar.gz
     |MAXM/MMM-OracleDump-0.01.tar.gz         # user interaction required
     |MCMAHON/WWW-Mechanize-Pluggable-1.03.tar.gz # killed the cpan shell with kill(); I don't understand how
+    |MERKYS/Chemistry-Ring-0.21.tar.gz       # https://rt.cpan.org/Ticket/Display.html?id=149871
     |METZZO/TiVo-HME-1.3\.tar.gz             # seems abandoned since 2005
     |MFERRIS/Class-DBI-DB2-0.16.tar.gz       # asks questions
     |MJGARDNER/Dist-Zilla-Plugin-RequiresExternal-\d # endless loop if JSON::PP missing???
@@ -312,6 +318,7 @@ match:
     |OESTERHOL/Aut-0.11.tar.gz               # looks like abandoned since 2004
     |OKHARCH/Parallel-DataPipe-0.11.tar.gz   # https://rt.cpan.org/Ticket/Display.html?id=132464
     |PATL/autorequire-0.08.tar.gz
+    |PBOETTCH/ARCv2-1.05.tar.gz              # tests run forever in background, no green test report since 2018, no reverse deps
     |PERFSONAR/perfSONAR_PS-DB-RRD-0.09.tar.gz # looks like abandoned since 2008
     |PERIGRIN/Git-Wrapper-\d                 # some huge kill triggered?
     |PERLER/CatalystX-ExtJS-Direct-\d        #
@@ -354,6 +361,7 @@ match:
     |SCOTT/Attribute-Persistent-1.1.tar.gz   # fails with out of memory and blocks the box for quite a while
     |SDPRICE/Linux-DVB-DVBT-Apps-QuartzPVR-\d
     |SEGAN/POE-Component-LaDBI-1.2.1
+    |SETH/MediaWiki-Bot-5\.007000\.tar\.gz   # unmaintained, failing since 2023-08, rejecting bug reports, testing seems like a waste of time
     |SETHJ/MIDI-Music-0.01                   # user interaction required
     |SHERZODR/MySQL-TableInfo-1.01.tar.gz    # seems like abandoned since 2001
     |SHLOMIF/XML-Grammar-Screenplay-\d       # t/to-xhtml.t took ~17 minutes
@@ -425,6 +433,7 @@ match:
     |YAPPO/HTTP-Engine-0.0.16.tar.gz         # ditto but not with all perls
     |YAPPO/HTTP-Engine-0.0.17.tar.gz         # and once again
     |YAPPO/HTTP-Engine-0.0.1..tar.gz         # preventing the next case
+    |YAPPO/HTTP-Engine-0.03005.tar.gz        # last pass report 2013
     |ANONWB/WWW-Patent-Page-\d               # downloads something largish
     |YEWEI/Jvm-0.9.\d                        # looks like abandoned since 2002
     |YEWENBIN/PDE-                           # probably a broken Makefile.PL that tries to install Module::Build even if it is installed and calls CPAN recursively; in any case an endless loop
@@ -432,6 +441,7 @@ match:
     |ZEFRAM/DynaLoader-Functions-0.000       # as above
     |ZEFRAM/DateTime-TimeZone-Tzfile-0.006   # as above
     |ZENIN/Tk-MenuHash-1.12.tar.gz
+    |ZIALI/Mojolicious-Plugin-JSONAPI-2.6.tar.gz # red since 2021; https://rt.cpan.org/Ticket/Display.html?id=134645
     |ZIEFLE/WWW-LEO-0.01.tar.gz              # rt 34540
     |ZINIGOR/libeve-perl_0.05.orig.tar.gz    # hangs
     |ZMAN/SPOPSx-Ginsu-0.58.tar.gz

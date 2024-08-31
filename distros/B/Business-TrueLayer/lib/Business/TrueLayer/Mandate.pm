@@ -5,6 +5,8 @@ package Business::TrueLayer::Mandate;
 Business::TrueLayer::Mandate - class representing a mandate
 as used in the TrueLayer v3 API.
 
+Business::TrueLayer::Mandate uses the Status role.
+
 =head1 SYNOPSIS
 
     my $Mandate = Business::TrueLayer::Mandate->new(
@@ -19,6 +21,7 @@ use feature qw/ signatures postderef /;
 
 use Moose;
 extends 'Business::TrueLayer::Request';
+with 'Business::TrueLayer::Role::Status';
 use Moose::Util::TypeConstraints;
 no warnings qw/ experimental::signatures experimental::postderef /;
 
@@ -33,8 +36,6 @@ use namespace::autoclean;
 =over
 
 =item id (Str)
-
-=item status (Str)
 
 =item type (Str)
 
@@ -99,28 +100,11 @@ has remitter => (
     required => 1,
 );
 
-=head2 authorizing
-
-=head2 authorized
-
-Check if the mandate is at a current state:
-
-    if ( $Mandate->authorizing ) {
-        ...
-    }
-
-=cut
-
-sub authorizing { shift->_is_status( 'authorizing' ); }
-sub authorized  { shift->_is_status( 'authorized' ); }
-
-sub _is_status ( $self,$status ) {
-    return ( $self->status // '' ) eq $status ? 1 : 0;
-}
-
 =head1 SEE ALSO
 
 L<Business::TrueLayer::User>
+
+L<Business::TrueLayer::Role::Status>
 
 =cut
 

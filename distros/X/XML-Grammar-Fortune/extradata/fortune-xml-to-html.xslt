@@ -10,6 +10,7 @@
  />
 
 <xsl:param name="fortune.id"></xsl:param>
+<xsl:param name="fortune.xhtml5.mode"></xsl:param>
 <xsl:param name="filter-facts-list.id"></xsl:param>
 <xsl:param name="filter.lang">en-US</xsl:param>
 
@@ -101,8 +102,30 @@ namespace-->
 </xsl:template>
 
 <xsl:template match="fortune">
-    <div class="fortune">
-        <h3 id="{@id}"><xsl:call-template name="get_header" /></h3>
+    <xsl:variable name="elem_name">
+        <xsl:choose>
+            <xsl:when test="$fortune.xhtml5.mode">
+                <xsl:value-of select="'article'" />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="'div'" />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+    <xsl:element name="{$elem_name}">
+        <xsl:attribute name="class">
+            <xsl:value-of select="'fortune'" />
+        </xsl:attribute>
+        <xsl:choose>
+            <xsl:when test="$fortune.xhtml5.mode">
+                <header>
+                    <xsl:call-template name="get_header_wrapper" />
+                </header>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="get_header_wrapper" />
+            </xsl:otherwise>
+        </xsl:choose>
         <xsl:choose>
             <xsl:when test="irc">
                 <xsl:apply-templates select="irc" />
@@ -118,7 +141,38 @@ namespace-->
             </xsl:when>
 
         </xsl:choose>
-    </div>
+
+        <xsl:if test="seealso">
+            <xsl:variable name="elem_seealso">
+                <xsl:choose>
+                    <xsl:when test="$fortune.xhtml5.mode">
+                        <xsl:value-of select="'section'" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="'div'" />
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+            <xsl:element name="{$elem_seealso}">
+                <xsl:attribute name="class">
+                    <xsl:value-of select="'seealso'" />
+                </xsl:attribute>
+                <xsl:choose>
+                    <xsl:when test="$fortune.xhtml5.mode">
+                        <header>
+                            <h4>See Also</h4>
+                        </header>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <h4>See Also</h4>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:apply-templates mode="copy-html-ns" select="seealso/*" />
+            </xsl:element>
+        </xsl:if>
+
+    </xsl:element>
+
 </xsl:template>
 
 <xsl:template match="body">
@@ -176,6 +230,10 @@ namespace-->
             <xsl:call-template name="get_irc_default_header" />
         </xsl:otherwise>
     </xsl:choose>
+</xsl:template>
+
+<xsl:template name="get_header_wrapper">
+    <h3 id="{@id}"><xsl:call-template name="get_header" /></h3>
 </xsl:template>
 
 <xsl:template name="render_info">

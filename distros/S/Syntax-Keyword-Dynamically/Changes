@@ -1,5 +1,13 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.14    2024-08-30
+        [CHANGES]
+         * Various internal adjustments of code for better debugging
+
+        [BUGFIXES]
+         * Updated to latest hax/ support files: avoids SAVEt_LONG, now
+           removed in perl 5.41.3
+
 0.13    2023-09-21
         [CHANGES]
          * Remember to implement `no Syntax::Keyword::Dynamically`

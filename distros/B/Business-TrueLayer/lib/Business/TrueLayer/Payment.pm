@@ -5,6 +5,8 @@ package Business::TrueLayer::Payment;
 Business::TrueLayer::Payment - class representing a payment
 as used in the TrueLayer v3 API.
 
+Business::TrueLayer::Payment uses the Status role.
+
 =head1 SYNOPSIS
 
     my $Payment = Business::TrueLayer::Payment->new(
@@ -19,6 +21,7 @@ use feature qw/ signatures postderef /;
 
 use Moose;
 extends 'Business::TrueLayer::Request';
+with 'Business::TrueLayer::Role::Status';
 use Moose::Util::TypeConstraints;
 no warnings qw/ experimental::signatures experimental::postderef /;
 
@@ -32,8 +35,6 @@ use namespace::autoclean;
 =over
 
 =item id (Str)
-
-=item status (Str)
 
 =item resource_token (Str)
 
@@ -119,43 +120,13 @@ sub hosted_payment_page_link (
         . ( $return_uri ? ( '&return_uri=' . $return_uri ) : '' )
 }
 
-=head2 authorization_required
-
-=head2 authorizing
-
-=head2 authorized
-
-=head2 executed
-
-=head2 settled
-
-=head2 failed
-
-Check if the payment is at a current state:
-
-    if ( $Payment->authorization_required ) {
-        # get a payment link
-        my $link = $Payment->hosted_payment_page_link;
-    }
-
-=cut
-
-sub authorization_required { shift->_is_status( 'authorization_required' ); }
-sub authorizing            { shift->_is_status( 'authorizing' ); }
-sub authorized             { shift->_is_status( 'authorized' ); }
-sub executed               { shift->_is_status( 'executed' ); }
-sub settled                { shift->_is_status( 'settled' ); }
-sub failed                 { shift->_is_status( 'failed' ); }
-
-sub _is_status ( $self,$status ) {
-    return ( $self->status // '' ) eq $status ? 1 : 0;
-}
-
 =head1 SEE ALSO
 
 L<Business::TrueLayer::Payment::Method>
 
 L<Business::TrueLayer::User>
+
+L<Business::TrueLayer::Role::Status>
 
 =cut
 

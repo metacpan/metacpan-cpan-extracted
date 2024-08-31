@@ -7,7 +7,7 @@ Business::TrueLayer - Perl library for interacting with the TrueLayer v3 API
 
 =head1 VERSION
 
-v0.03
+v0.04
 
 =head1 SYNOPSIS
 
@@ -83,7 +83,7 @@ use Business::TrueLayer::Signer;
 use Business::TrueLayer::Types;
 use Business::TrueLayer::User;
 
-$Business::TrueLayer::VERSION = '0.03';
+$Business::TrueLayer::VERSION = '0.04';
 
 =head1 METHODS
 
@@ -376,7 +376,7 @@ This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. If you would like to contribute documentation,
 features, bug fixes, or anything else then please raise an issue / pull request:
 
-    https://github.com/Humanstate/business-truelayer
+    https://github.com/payprop/business-truelayer
 
 =cut
 

@@ -1,15 +1,17 @@
 package Ascii::Text::Font::Amongus;
 
-use Moo;
+use Rope;
+use Rope::Autoload;
 
 extends 'Ascii::Text::Font';
 
-has character_height => (
-	is => 'ro',
-	default => sub { 4 }
+property character_height => (
+	initable => 0,
+	writable => 0,
+	value => 4,
 );
 
-sub character_A {
+function character_A => sub {
 	my @character = $_[0]->default_character(8);
 	$character[0][3] = $character[0][4] = $character[1][3] = $character[1][4] = $character[2][3] = $character[2][4] = $character[3][1] = $character[3][2] = $character[3][5] = $character[3][6] = '_';
 	$character[1][2] = $character[2][1] = '/';
@@ -17,9 +19,9 @@ sub character_A {
 	$character[3][0] = $character[2][2] = $character[3][4] = '(';
 	$character[2][5] = $character[3][3] = $character[3][7] = ')';
 	return \@character;
-}
+};
 
-sub character_B {
+function character_B => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[0][4] = $character[1][3] = $character[2][3] = $character[3][1] = $character[3][2] = $character[3][3] = $character[3][4] = '_';
 	$character[1][0] = $character[3][0] = '(';
@@ -28,9 +30,9 @@ sub character_B {
 	$character[2][5] = '<';
 	$character[3][5] = '/';
 	return \@character;
-}
+};
 
-sub character_C {
+function character_C => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][2] = $character[0][3] = $character[0][4] = $character[1][3] = $character[1][4] = $character[2][3] = $character[2][4] = $character[3][2] = $character[3][3] = $character[3][4] = '_';
 	$character[1][5] = $character[3][5] = ')';
@@ -38,9 +40,9 @@ sub character_C {
 	$character[1][1] = '/';
 	$character[3][1] = '\\';
 	return \@character;
-}
+};
 
-sub character_D {
+function character_D => sub {
 	my @character = $_[0]->default_character(7);
 	$character[0][1] = $character[0][4] = $character[0][2] = $character[0][3] = $character[1][3] = $character[2][3] = $character[3][1] = $character[3][2] = $character[3][3] = $character[3][4] = '_';
 	$character[1][0] = $character[3][0] = $character[2][2] = '(';
@@ -48,25 +50,25 @@ sub character_D {
 	$character[1][5] = '\\';
 	$character[3][5] = '/';
 	return \@character;
-}
+};
 
-sub character_E {
+function character_E => sub {
 	my @character = $_[0]->default_character(6);
 	$character[1][0] = $character[3][0] = '(';
 	$character[1][5] = $character[2][1] = $character[2][4] = $character[3][5] = ')';
 	$character[1][2] = $character[1][3] = $character[1][4] = $character[2][2] = $character[2][3] = $character[3][2] = $character[3][3] = $character[3][4] = $character[0][1] = $character[0][2] = $character[0][3] = $character[0][4] = '_';
 	return \@character;
-}
+};
 
-sub character_F {
+function character_F => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[0][4] = $character[1][2] = $character[1][3] = $character[1][4] = $character[2][2] = $character[2][3] = $character[3][1] = $character[3][2] = '_';
 	$character[1][0] = $character[3][0] = '(';
 	$character[1][5] = $character[2][1] = $character[2][4] = $character[3][3] = ')';
 	return \@character;
-}
+};
 
-sub character_G {
+function character_G => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][2] = $character[0][3] = $character[0][4] = $character[1][3] = $character[1][4] = $character[2][3] = $character[3][2] = $character[3][3] = $character[3][4] = '_';
 	$character[2][0] = $character[2][2] = '(';
@@ -76,25 +78,25 @@ sub character_G {
 	$character[2][4] = '-';
 	$character[2][5] = '.';
 	return \@character;
-}
+};
 
-sub character_H {
+function character_H => sub {
 	my @character = $_[0]->default_character(7);
 	$character[0][1] = $character[0][5] = $character[1][3] = $character[2][3] = $character[3][1] = $character[3][5] = '_';
 	$character[1][0] = $character[1][4] = $character[2][5] = $character[3][0] = $character[3][4] = '(';
 	$character[1][2] = $character[1][6] = $character[2][1] = $character[3][2] = $character[3][6] = ')';
 	return \@character;
-}
+};
 
-sub character_I {
+function character_I => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[0][4] = $character[1][1] = $character[1][4] = $character[2][1] = $character[2][4] = $character[3][1] = $character[3][2] = $character[3][3] = $character[3][4] = '_';
 	$character[1][0] = $character[3][0] = $character[2][3] = '(';
 	$character[1][5] = $character[3][5] = $character[2][2] = ')';
 	return \@character;
-}
+};
 
-sub character_J {
+function character_J => sub {
 	my @character = $_[0]->default_character(7);
 	$character[0][2] = $character[0][3] = $character[0][4] = $character[0][5] = $character[1][2] = $character[1][5] = $character[2][2] = $character[3][1] = $character[3][2] = $character[3][3] = $character[3][4] = '_';
 	$character[1][1] = $character[2][4] = '(';
@@ -103,9 +105,9 @@ sub character_J {
 	$character[2][1] = '-';
 	$character[3][0] = '\\';
 	return \@character;
-}
+};
 
-sub character_K {
+function character_K => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][4] = $character[3][1] = $character[3][4] = '_';
 	$character[1][0] = $character[2][4] = $character[3][0] = '(';
@@ -113,17 +115,17 @@ sub character_K {
 	$character[1][3] = '/';
 	$character[3][3] = '\\';
 	return \@character;
-}
+};
 
-sub character_L {
+function character_L => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][2] = $character[2][3] = $character[2][4] = $character[3][1] = $character[3][2] = $character[3][3] = $character[3][4] = '_';
 	$character[1][0] = $character[2][2] = $character[3][0] = '(';
 	$character[1][3] = $character[2][1] = $character[3][5] = ')';
 	return \@character;
-}
+};
 
-sub character_M {
+function character_M => sub {
 	my @character = $_[0]->default_character(8);
 	$character[0][1] = $character[0][2] = $character[0][5] = $character[0][6] = $character[3][1] = $character[3][6] = '_';
 	$character[1][0] = $character[2][6] = $character[3][0] = '(';
@@ -131,26 +133,26 @@ sub character_M {
 	$character[1][3] = $character[3][3] = $character[3][5] = '\\';
 	$character[1][4] = $character[3][2] = $character[3][4] = '/';
 	return \@character;
-}
+};
 
-sub character_N {
+function character_N => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][4] = $character[3][1] = $character[3][4] = '_';
 	$character[1][0] = $character[1][3] = $character[2][4] = $character[3][0] = '(';
 	$character[1][5] = $character[2][1] = $character[3][2] = $character[3][5] = ')';
 	$character[1][2] = $character[3][3] = '\\';
 	return \@character;
-}
+};
 
-sub character_O {
+function character_O => sub {
 	my @character = $_[0]->default_character(7);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[0][4] = $character[0][5] = $character[3][1] = $character[3][2] = $character[3][3] = $character[3][4] = $character[3][5] = $character[1][3] = $character[2][3] = '_';
 	$character[1][0] = $character[3][0] = $character[2][2] = $character[2][5] = '(';
 	$character[1][6] = $character[2][1] = $character[2][4] = $character[3][6] = ')';
 	return \@character;
-}
+};
 
-sub character_P {
+function character_P => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[0][4] = $character[1][3] = $character[2][2] = $character[2][3] = $character[2][4] = $character[3][1] = $character[3][2] = '_';
 	$character[1][0] = $character[3][0] = '(';
@@ -158,9 +160,9 @@ sub character_P {
 	$character[1][5] = '\\';
 	$character[2][5] = '/';
 	return \@character;
-}
+};
 
-sub character_Q {
+function character_Q => sub {
 	my @character = $_[0]->default_character(7);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[0][4] = $character[0][5] = $character[3][1] = $character[3][2] = $character[3][3] = $character[1][3] = $character[2][3] = '_';
 	$character[1][0] = $character[3][0] = $character[2][2] = $character[2][5] = '(';
@@ -168,9 +170,9 @@ sub character_Q {
 	$character[3][4] = '/';
 	$character[3][5] = $character[3][6] = '\\';
 	return \@character;
-}
+};
 
-sub character_R {
+function character_R => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[0][4] = $character[1][3] = $character[3][1] = $character[3][4] = '_';
 	$character[1][0] = $character[3][0] = '(';
@@ -178,9 +180,9 @@ sub character_R {
 	$character[3][3] = $character[1][5] = '\\';
 	$character[2][5] = '/';
 	return \@character;
-}
+};
 
-sub character_S {
+function character_S => sub {
 	my @character = $_[0]->default_character(5);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[1][2] = $character[1][3] = $character[2][1] = $character[2][2] = $character[3][1] = $character[3][2] = $character[3][3] = '_';
 	$character[1][0] = $character[3][4] = '/';
@@ -189,25 +191,25 @@ sub character_S {
 	$character[1][4] = ')';
 	$character[3][0] = '(';
 	return \@character;
-}
+};
 
-sub character_T {
+function character_T => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[0][4] = $character[1][1] = $character[1][4] = $character[3][2] = $character[3][3] = '_';
 	$character[1][0] = $character[2][3] = $character[3][1] = '(';
 	$character[1][5] = $character[2][2] = $character[3][4] = ')';
 	return \@character;
-}
+};
 
-sub character_U {
+function character_U => sub {
 	my @character = $_[0]->default_character(8);
 	$character[0][1] = $character[0][2] = $character[0][5] = $character[0][6] = $character[2][3] = $character[2][4] = $character[3][1] = $character[3][2] = $character[3][3] = $character[3][4] = $character[3][5] = $character[3][6] = '_';
 	$character[1][0] = $character[1][4] = $character[2][2] = $character[2][6] = $character[3][0] = '(';
 	$character[1][3] = $character[1][7] = $character[2][1] = $character[2][5] = $character[3][7] = ')';
 	return \@character;
-}
+};
 
-sub character_V {
+function character_V => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][4] = '_';
 	$character[1][2] = $character[2][1] = $character[3][2] = '\\';
@@ -215,9 +217,9 @@ sub character_V {
 	$character[1][3] = $character[2][4] = $character[3][3] = '/';
 	$character[1][5] = ')';
 	return \@character;
-}
+};
 
-sub character_W {
+function character_W => sub {
 	my @character = $_[0]->default_character(8);
 	$character[0][1] = $character[0][6] = $character[3][1] = $character[3][2] = $character[3][5] = $character[3][6] = '_';
 	$character[1][0] = $character[3][0] = '(';
@@ -227,9 +229,9 @@ sub character_W {
 	$character[2][1] = ')';
 	$character[2][6] = '(';
 	return \@character;
-}
+};
 
-sub character_X {
+function character_X => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][4] = $character[3][1] = $character[3][4] = '_';
 	$character[1][0] = $character[2][4] = $character[3][0] = '(';
@@ -237,9 +239,9 @@ sub character_X {
 	$character[1][3] = $character[3][2] = '/';
 	$character[1][5] = $character[2][1] = $character[3][5] = ')';
 	return \@character;
-}
+};
 
-sub character_Y {
+function character_Y => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][4] = $character[3][2] = $character[3][3] = '_';
 	$character[1][0] = $character[3][1] = '(';
@@ -247,70 +249,70 @@ sub character_Y {
 	$character[1][2] = $character[2][1] = '\\';
 	$character[1][3] = $character[2][4] = '/';
 	return \@character;
-}
+};
 
-sub character_Z {
+function character_Z => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[0][4] = $character[1][1] = $character[2][4] = $character[3][1] = $character[3][2] = $character[3][3] = $character[3][4] = '_';
 	$character[1][0] = $character[3][0] = '(';
 	$character[1][5] = $character[3][5] = ')';
 	$character[2][1] = $character[2][3] = '/';
 	return \@character;
-}
+};
 
-sub character_a { $_[0]->character_A }
+function character_a => sub { $_[0]->character_A };
 
-sub character_b { $_[0]->character_B }
+function character_b => sub { $_[0]->character_B };
 
-sub character_c { $_[0]->character_C }
+function character_c => sub { $_[0]->character_C };
 
-sub character_d { $_[0]->character_D }
+function character_d => sub { $_[0]->character_D };
 
-sub character_e { $_[0]->character_E }
+function character_e => sub { $_[0]->character_E };
 
-sub character_f { $_[0]->character_F }
+function character_f => sub { $_[0]->character_F };
 
-sub character_g { $_[0]->character_G }
+function character_g => sub { $_[0]->character_G };
 
-sub character_h { $_[0]->character_H }
+function character_h => sub { $_[0]->character_H };
 
-sub character_i { $_[0]->character_I }
+function character_i => sub { $_[0]->character_I };
 
-sub character_j { $_[0]->character_J }
+function character_j => sub { $_[0]->character_J };
 
-sub character_k { $_[0]->character_K }
+function character_k => sub { $_[0]->character_K };
 
-sub character_l { $_[0]->character_L }
+function character_l => sub { $_[0]->character_L };
 
-sub character_m { $_[0]->character_M }
+function character_m => sub { $_[0]->character_M };
 
-sub character_n { $_[0]->character_N }
+function character_n => sub { $_[0]->character_N };
 
-sub character_o { $_[0]->character_O }
+function character_o => sub { $_[0]->character_O };
 
-sub character_p { $_[0]->character_P }
+function character_p => sub { $_[0]->character_P };
 
-sub character_q { $_[0]->character_Q }
+function character_q => sub { $_[0]->character_Q };
 
-sub character_r { $_[0]->character_R }
+function character_r => sub { $_[0]->character_R };
 
-sub character_s { $_[0]->character_S }
+function character_s => sub { $_[0]->character_S };
 
-sub character_t { $_[0]->character_T }
+function character_t => sub { $_[0]->character_T };
 
-sub character_u { $_[0]->character_U }
+function character_u => sub { $_[0]->character_U };
 
-sub character_v { $_[0]->character_V }
+function character_v => sub { $_[0]->character_V };
 
-sub character_w { $_[0]->character_W }
+function character_w => sub { $_[0]->character_W };
 
-sub character_x { $_[0]->character_X }
+function character_x => sub { $_[0]->character_X };
 
-sub character_y { $_[0]->character_Y }
+function character_y => sub { $_[0]->character_Y };
 
-sub character_z { $_[0]->character_Z }
+function character_z => sub { $_[0]->character_Z };
 
-sub character_0 {
+function character_0 => sub {
 	my @character = $_[0]->default_character(7);
 	$character[0][2] = $character[0][3] = $character[0][4] = $character[3][2] = $character[3][3] = $character[3][4] = $character[1][3] = $character[2][3] = '_';
 	$character[1][1] = $character[3][5] = '/';
@@ -318,18 +320,18 @@ sub character_0 {
 	$character[2][0] = $character[2][2] = '(';
 	$character[2][4] = $character[2][6] = ')';
 	return \@character;
-}
+};
 
-sub character_1 {
+function character_1 => sub {
 	my @character = $_[0]->default_character(4);
 	$character[0][1] = $character[0][2] = $character[3][1] = $character[3][2] = '_';
 	$character[1][0] = '/';
 	$character[1][3] = $character[2][1] = $character[3][3] = ')';
 	$character[2][2] = $character[3][0] = '(';
 	return \@character;
-}
+};
 
-sub character_2 {
+function character_2 => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[1][1] = $character[1][2] = $character[2][3] = $character[3][1] = $character[3][2] = $character[3][3] = $character[3][4] = '_';
 	$character[1][0] = $character[3][0] = '(';
@@ -337,9 +339,9 @@ sub character_2 {
 	$character[1][4] = '\\';
 	$character[3][5] = ')';
 	return \@character;
-}
+};
 
-sub character_3 {
+function character_3 => sub {
 	my @character = $_[0]->default_character(5);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[1][1] = $character[1][2] = $character[2][2] = $character[3][1] = $character[3][2] = $character[3][3] = '_';
 	$character[1][0] = $character[3][0] = $character[2][1] = '(';
@@ -347,9 +349,9 @@ sub character_3 {
 	$character[2][4] = '\\';
 	$character[1][4] = ')';
 	return \@character;
-}
+};
 
-sub character_4 {
+function character_4 => sub {
 	my @character = $_[0]->default_character(6);
 	$character[0][2] = $character[0][3] = $character[2][4] = $character[2][1] = $character[3][3] = '_';
 	$character[2][0] = $character[3][2] = '(';
@@ -358,9 +360,9 @@ sub character_4 {
 	$character[1][2] = '.';
 	$character[2][5] = $character[3][4] = ')';
 	return \@character;
-}
+};
 
-sub character_5 {
+function character_5 => sub {
 	my @character = $_[0]->default_character(5);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[1][2] = $character[1][3] = $character[2][1] = $character[2][2] = $character[3][1] = $character[3][2] = $character[3][3] = '_';
 	$character[1][0] = $character[2][0] = '|';
@@ -369,9 +371,9 @@ sub character_5 {
 	$character[2][4] = '\\';
 	$character[3][4] = '/';
 	return \@character;
-}
+};
 
-sub character_6 {
+function character_6 => sub {
 	my @character = $_[0]->default_character(5);
 	$character[0][2] = $character[2][2] = '_';
 	$character[1][1] = $character[2][0] = $character[3][4] = '/';
@@ -379,18 +381,18 @@ sub character_6 {
 	$character[1][3] = ')';
 	$character[3][1] = $character[3][2] = $character[3][3] = '_';
 	return \@character;
-}
+};
 
-sub character_7 {
+function character_7 => sub {
 	my @character = $_[0]->default_character(5);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[1][1] = $character[1][2] = $character[3][1] = '_';
 	$character[2][1] = $character[2][3] = $character[3][2] = '/';
 	$character[1][0] = $character[3][0] = '(';
 	$character[1][4] = ')';
 	return \@character;
-}
+};
 
-sub character_8 {
+function character_8 => sub {
 	my @character = $_[0]->default_character(5);
 	$character[0][1] = $character[0][2] = $character[0][3] = $character[1][2] = $character[2][2] = $character[3][1] = $character[3][2] = $character[3][3] = '_';
 	$character[2][0] = $character[3][4] = '/';
@@ -398,21 +400,21 @@ sub character_8 {
 	$character[1][0] = '(';
 	$character[1][4] = ')';
 	return \@character;
-}
+};
 
-sub character_9 {
+function character_9 => sub {
 	my @character = $_[0]->default_character(5);
 	$character[0][1] = $character[0][2] = $character[0][3] =  $character[1][2] =  $character[2][1] =  $character[3][2] = '_';
 	$character[1][0] = $character[2][4] =  $character[3][3] = '/';
 	$character[1][4] =  $character[2][0] = '\\';
 	$character[3][1] = '(';
 	return \@character;
-}
+};
 
-sub space {
+function space => sub {
 	my @character = $_[0]->default_character(6);
 	return \@character;
-}
+};
 
 1;
 
@@ -424,7 +426,7 @@ Ascii::Text::Font::Amongus - Amongus font
 
 =head1 VERSION
 
-Version 0.04
+Version 0.08
 
 =cut
 

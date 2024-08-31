@@ -1,0 +1,22 @@
+#!usr/bin/perl
+
+use lib 'lib';
+
+use Ascii::Text::Cmd;
+
+Ascii::Text::Cmd->run(@ARGV);
+
+__END__
+
+=head1 NAME
+  
+ascii_text - script for generating ASCII text in various fonts and style
+  
+=head1 USAGE
+
+	ascii_text help
+	
+	ascii_text a=center t="Hello World" c=bright_red
+  
+=cut
+

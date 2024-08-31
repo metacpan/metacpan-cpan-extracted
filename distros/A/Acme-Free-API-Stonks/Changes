@@ -1,0 +1,4 @@
+1.0.0   Thu Aug 30 04:13:30 PM UTC 2024
+        - Initial release of API client for https://tradestie.com/apps/reddit/api/
+        - demo project for Perl API clients, using Util::H2O::More
+        - found via, https://www.freepublicapis.com/

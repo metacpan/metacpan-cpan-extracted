@@ -17,10 +17,13 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-	'Moo' => 0,
+	'Rope' => 0.40,
+	'Rope::Cmd' => 0.02,
+	'Type::Tiny' => 0,
 	'Term::Size::ReadKey' => 0,
 	'Module::Load' => 0
     },
+    EXE_FILES => [ 'bin/ascii_text' ],
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Ascii-Text-*' },
 );

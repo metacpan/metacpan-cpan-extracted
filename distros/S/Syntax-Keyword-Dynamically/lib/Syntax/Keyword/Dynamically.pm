@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2018-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Dynamically 0.13;
+package Syntax::Keyword::Dynamically 0.14;
 
 use v5.14;
 use warnings;
@@ -18,6 +18,8 @@ XSLoader::load( __PACKAGE__, our $VERSION );
 C<Syntax::Keyword::Dynamically> - dynamically change the value of a variable
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Syntax::Keyword::Dynamically;
 

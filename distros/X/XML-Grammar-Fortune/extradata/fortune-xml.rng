@@ -144,6 +144,18 @@
                     <ref name="common_info" />
                 </element>
             </choice>
+            <optional>
+                <element name="seealso">
+                    <choice>
+                        <element name="ul">
+                            <ref name="inside_quote_list" />
+                        </element>
+                        <element name="ol">
+                            <ref name="inside_quote_list" />
+                        </element>
+                    </choice>
+                </element>
+            </optional>
         </element>
     </define>
 

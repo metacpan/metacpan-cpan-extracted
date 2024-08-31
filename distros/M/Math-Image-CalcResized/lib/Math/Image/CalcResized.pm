@@ -7,9 +7,9 @@ use warnings;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-12'; # DATE
+our $DATE = '2024-08-29'; # DATE
 our $DIST = 'Math-Image-CalcResized'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our @EXPORT_OK = qw(calc_image_resized_size);
 our %SPEC;
@@ -229,61 +229,57 @@ _
         },
     },
     examples => [
-        {args=>{size=>"2592x1944", resize=>""}, naked_result=>"2592x1944"},
+        {args=>{size=>"2592x1944", resize=>""}, naked_result=>"2592x1944", summary=>"no resizing"},
 
-        {args=>{size=>"2592x1944", resize=>"20%"}, naked_result=>"518x388"},
+        {args=>{size=>"2592x1944", resize=>"20%"}, naked_result=>"518x388", summary=>"scale (down) to 20%"},
 
-        {args=>{size=>"2592x1944", resize=>"20%x40%"}, naked_result=>"518x777"},
-        {args=>{size=>"2592x1944", resize=>"20x40%"}, naked_result=>"518x777"},
+        {args=>{size=>"2592x1944", resize=>"20%x40%"}, naked_result=>"518x777", summary=>"scale (down) width to 20% but height to 40%"},
+        {args=>{size=>"2592x1944", resize=>"20x40%"}, naked_result=>"518x777", summary=>"scale (down) width to 20% but height to 40% (first percent sign is optional)"},
 
-        {args=>{size=>"2592x1944", resize=>"1024"}, naked_result=>"1024x768"},
+        {args=>{size=>"2592x1944", resize=>"1024"}, naked_result=>"1024x768", summary=>"set width to 1024px"},
 
-        {args=>{size=>"2592x1944", resize=>"1024>"}, naked_result=>"1024x768"},
-        {args=>{size=>"2592x1944", resize=>"10240>"}, naked_result=>"2592x1944"},
+        {args=>{size=>"2592x1944", resize=>"1024>"}, naked_result=>"1024x768", summary=>"shrink width to 1024px"},
+        {args=>{size=>"2592x1944", resize=>"10240>"}, naked_result=>"2592x1944", summary=>"shrink width to 10240px (no effect since width is already less than 10240px)"},
 
-        {args=>{size=>"2592x1944", resize=>"1024^"}, naked_result=>"2592x1944"},
-        {args=>{size=>"2592x1944", resize=>"10240^"}, naked_result=>"10240x7680"},
+        {args=>{size=>"2592x1944", resize=>"1024^"}, naked_result=>"2592x1944", summary=>"enlarge width to 1024px (no effect since width is already greater than 1024px"},
+        {args=>{size=>"2592x1944", resize=>"10240^"}, naked_result=>"10240x7680", summary=>"enlarge width to 10240px"},
 
-        {args=>{size=>"2592x1944", resize=>"x1024"}, naked_result=>"1365x1024"},
+        {args=>{size=>"2592x1944", resize=>"x1024"}, naked_result=>"1365x1024", summary=>"set height to 1024px"},
 
-        {args=>{size=>"2592x1944", resize=>"x768>"}, naked_result=>"1024x768"},
-        {args=>{size=>"2592x1944", resize=>"x7680>"}, naked_result=>"2592x1944"},
+        {args=>{size=>"2592x1944", resize=>"x768>"}, naked_result=>"1024x768", summary=>"shrink height to 768px"},
+        {args=>{size=>"2592x1944", resize=>"x7680>"}, naked_result=>"2592x1944", summary=>"shrink height to 7680px (no effect since height is already less than 7680px)"},
 
-        {args=>{size=>"2592x1944", resize=>"x768^"}, naked_result=>"2592x1944"},
-        {args=>{size=>"2592x1944", resize=>"x7680^"}, naked_result=>"10240x7680"},
+        {args=>{size=>"2592x1944", resize=>"x768^"}, naked_result=>"2592x1944", summary=>"enlarge height to 768px (no effect since height is already greater than 768px)"},
+        {args=>{size=>"2592x1944", resize=>"x7680^"}, naked_result=>"10240x7680", summary=>"enlarge height to 7680px"},
 
-        {args=>{size=>"2592x1944", resize=>"20000x10000"}, naked_result=>"2592x1944"},
-        {args=>{size=>"2592x1944", resize=>"20000x1000"}, naked_result=>"1333x1000"},
-        {args=>{size=>"2592x1944", resize=>"100x200"}, naked_result=>"100x75"},
-        {args=>{size=>"2592x1944", resize=>"100x100"}, naked_result=>"100x75"},
+        {args=>{size=>"2592x1944", resize=>"20000x10000"}, naked_result=>"2592x1944", summary=>"fit image inside 20000x10000 (no effect since it already fits)"},
+        {args=>{size=>"2592x1944", resize=>"20000x1000"}, naked_result=>"1333x1000", summary=>"fit image inside 20000x1000 (height is reduced to 1000 to make the image fit)"},
+        {args=>{size=>"2592x1944", resize=>"100x200"}, naked_result=>"100x75", summary=>"fit image inside 100x200"},
+        {args=>{size=>"2592x1944", resize=>"100x100"}, naked_result=>"100x75", summary=>"fit image inside 100x100"},
 
-        {args=>{size=>"2592x1944", resize=>"10000x5000^"}, naked_result=>"10000x7500"},
-        {args=>{size=>"2592x1944", resize=>"5000x10000^"}, naked_result=>"13333x10000"},
-        {args=>{size=>"2592x1944", resize=>"100x100^"}, naked_result=>"2592x1944"},
+        {args=>{size=>"2592x1944", resize=>"10000x5000^"}, naked_result=>"10000x7500", summary=>"fit a 10000x5000 area inside image"},
+        {args=>{size=>"2592x1944", resize=>"5000x10000^"}, naked_result=>"13333x10000", summary=>"fit a 5000x10000 area inside image"},
+        {args=>{size=>"2592x1944", resize=>"100x100^"}, naked_result=>"2592x1944", summary=>"fit a 100x100 area inside image (no effect since the image can already fit that area)"},
 
-        {args=>{size=>"2592x1944", resize=>"100x100!"}, naked_result=>"100x100"},
+        {args=>{size=>"2592x1944", resize=>"100x100!"}, naked_result=>"100x100", summary=>"set dimension to 100x100"},
 
-        {args=>{size=>"2592x1944", resize=>"10000x5000>"}, naked_result=>"2592x1944"},
-        {args=>{size=>"2592x1944", resize=>"5000x10000>"}, naked_result=>"2592x1944"},
-        {args=>{size=>"2592x1944", resize=>"3000x1000>"}, naked_result=>"2592x1944"}, #?
-        {args=>{size=>"2592x1944", resize=>"2000x1000>"}, naked_result=>"1333x1000"},
-        {args=>{size=>"2592x1944", resize=>"100x100>"}, naked_result=>"100x75"},
+        {args=>{size=>"2592x1944", resize=>"10000x5000>"}, naked_result=>"2592x1944", summary=>"shrink image to fit inside 10000x5000px (no effect since image already fits)"},
+        {args=>{size=>"2592x1944", resize=>"2000x1000>"}, naked_result=>"1333x1000", summary=>"shrink image to fit inside 2000x1000px"},
+        {args=>{size=>"2592x1944", resize=>"100x100>"}, naked_result=>"100x75", summary=>"shrink image to fit inside 100x100px"},
 
-        {args=>{size=>"2592x1944", resize=>"10000x5000<"}, naked_result=>"10000x7500"},
-        {args=>{size=>"2592x1944", resize=>"5000x10000<"}, naked_result=>"13333x10000"},
-        {args=>{size=>"2592x1944", resize=>"3000x1000<"}, naked_result=>"2592x1944"}, #?
-        {args=>{size=>"2592x1944", resize=>"2000x1000<"}, naked_result=>"2592x1944"},
-        {args=>{size=>"2592x1944", resize=>"100x100<"}, naked_result=>"2592x1944"},
+        {args=>{size=>"2592x1944", resize=>"10000x5000<"}, naked_result=>"10000x7500", summary=>"enlarge image to fit 10000x5000px inside it"},
+        {args=>{size=>"2592x1944", resize=>"5000x10000<"}, naked_result=>"13333x10000", summary=>"enlarge image to fit 5000x10000px inside it"},
+        {args=>{size=>"2592x1944", resize=>"3000x1000<"}, naked_result=>"2592x1944", summary=>"enlarge image to fit 3000x1000px inside it (no effect since image already fits)"},
 
-        {args=>{size=>"2592x1944", resize=>"1024^>"}, naked_result=>"1365x1024"},
-        {args=>{size=>"2592x1944", resize=>"10240^>"}, naked_result=>"2592x1944"},
-        {args=>{size=>"2592x1944", resize=>"1024^<"}, naked_result=>"2592x1944"},
-        {args=>{size=>"2592x1944", resize=>"10240^<"}, naked_result=>"13653x10240"},
+        {args=>{size=>"2592x1944", resize=>"1024^>"}, naked_result=>"1365x1024", summary=>"shrink shortest side to 1024px"},
+        {args=>{size=>"2592x1944", resize=>"10240^>"}, naked_result=>"2592x1944", summary=>"shrink shortest side to 10240px (no effect since shortest side 1944px is already less than 10240px)"},
+        {args=>{size=>"2592x1944", resize=>"1024^<"}, naked_result=>"2592x1944", summary=>"enlarge shortest side to 1024px (no effect since shortest side is already greater than 1024px)"},
+        {args=>{size=>"2592x1944", resize=>"10240^<"}, naked_result=>"13653x10240", summary=>"enlarge shortest side to 10240px"},
 
-        {args=>{size=>"2592x1944", resize=>"^1024>"}, naked_result=>"1024x768"},
-        {args=>{size=>"2592x1944", resize=>"^10240>"}, naked_result=>"2592x1944"},
-        {args=>{size=>"2592x1944", resize=>"^1024<"}, naked_result=>"2592x1944"},
-        {args=>{size=>"2592x1944", resize=>"^10240<"}, naked_result=>"10240x7680"},
+        {args=>{size=>"2592x1944", resize=>"^1024>"}, naked_result=>"1024x768", summary=>"shrink longest side to 1024px"},
+        {args=>{size=>"2592x1944", resize=>"^10240>"}, naked_result=>"2592x1944", summary=>"shrink longest side to 10240px (no effect since longest side 2592px is already less than 10240px)"},
+        {args=>{size=>"2592x1944", resize=>"^1024<"}, naked_result=>"2592x1944", summary=>"enlarge longest side to 1024px (no effect since longest side 2592px is already greater than 1024px)"},
+        {args=>{size=>"2592x1944", resize=>"^10240<"}, naked_result=>"10240x7680", summary=>"enlarge longest side to 10240px"},
     ],
     links => [
         {url=>'prog:imgsize'},
@@ -391,7 +387,7 @@ Math::Image::CalcResized - Calculate dimensions of image/video resized by ImageM
 
 =head1 VERSION
 
-This document describes version 0.005 of Math::Image::CalcResized (from Perl distribution Math-Image-CalcResized), released on 2021-10-12.
+This document describes version 0.006 of Math::Image::CalcResized (from Perl distribution Math-Image-CalcResized), released on 2024-08-29.
 
 =head1 FUNCTIONS
 
@@ -408,15 +404,15 @@ Examples:
 
 =over
 
-=item * Example #1:
+=item * no resizing:
 
  calc_image_resized_size(size => "2592x1944", resize => ""); # -> [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #2:
+=item * scale (down) to 20%:
 
  calc_image_resized_size(size => "2592x1944", resize => "20%"); # -> [200, "OK (envelope generated)", "518x388"]
 
-=item * Example #3:
+=item * scale (down) width to 20% but height to 40%:
 
  calc_image_resized_size(size => "2592x1944", resize => "20%x40%");
 
@@ -424,7 +420,7 @@ Result:
 
  [200, "OK (envelope generated)", "518x777"]
 
-=item * Example #4:
+=item * scale (down) width to 20% but height to 40% (first percent sign is optional):
 
  calc_image_resized_size(size => "2592x1944", resize => "20x40%");
 
@@ -432,11 +428,11 @@ Result:
 
  [200, "OK (envelope generated)", "518x777"]
 
-=item * Example #5:
+=item * set width to 1024px:
 
  calc_image_resized_size(size => "2592x1944", resize => 1024); # -> [200, "OK (envelope generated)", "1024x768"]
 
-=item * Example #6:
+=item * shrink width to 1024px:
 
  calc_image_resized_size(size => "2592x1944", resize => "1024>");
 
@@ -444,7 +440,7 @@ Result:
 
  [200, "OK (envelope generated)", "1024x768"]
 
-=item * Example #7:
+=item * shrink width to 10240px (no effect since width is already less than 10240px):
 
  calc_image_resized_size(size => "2592x1944", resize => "10240>");
 
@@ -452,7 +448,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #8:
+=item * enlarge width to 1024px (no effect since width is already greater than 1024px:
 
  calc_image_resized_size(size => "2592x1944", resize => "1024^");
 
@@ -460,7 +456,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #9:
+=item * enlarge width to 10240px:
 
  calc_image_resized_size(size => "2592x1944", resize => "10240^");
 
@@ -468,7 +464,7 @@ Result:
 
  [200, "OK (envelope generated)", "10240x7680"]
 
-=item * Example #10:
+=item * set height to 1024px:
 
  calc_image_resized_size(size => "2592x1944", resize => "x1024");
 
@@ -476,7 +472,7 @@ Result:
 
  [200, "OK (envelope generated)", "1365x1024"]
 
-=item * Example #11:
+=item * shrink height to 768px:
 
  calc_image_resized_size(size => "2592x1944", resize => "x768>");
 
@@ -484,7 +480,7 @@ Result:
 
  [200, "OK (envelope generated)", "1024x768"]
 
-=item * Example #12:
+=item * shrink height to 7680px (no effect since height is already less than 7680px):
 
  calc_image_resized_size(size => "2592x1944", resize => "x7680>");
 
@@ -492,7 +488,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #13:
+=item * enlarge height to 768px (no effect since height is already greater than 768px):
 
  calc_image_resized_size(size => "2592x1944", resize => "x768^");
 
@@ -500,7 +496,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #14:
+=item * enlarge height to 7680px:
 
  calc_image_resized_size(size => "2592x1944", resize => "x7680^");
 
@@ -508,7 +504,7 @@ Result:
 
  [200, "OK (envelope generated)", "10240x7680"]
 
-=item * Example #15:
+=item * fit image inside 20000x10000 (no effect since it already fits):
 
  calc_image_resized_size(size => "2592x1944", resize => "20000x10000");
 
@@ -516,7 +512,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #16:
+=item * fit image inside 20000x1000 (height is reduced to 1000 to make the image fit):
 
  calc_image_resized_size(size => "2592x1944", resize => "20000x1000");
 
@@ -524,7 +520,7 @@ Result:
 
  [200, "OK (envelope generated)", "1333x1000"]
 
-=item * Example #17:
+=item * fit image inside 100x200:
 
  calc_image_resized_size(size => "2592x1944", resize => "100x200");
 
@@ -532,7 +528,7 @@ Result:
 
  [200, "OK (envelope generated)", "100x75"]
 
-=item * Example #18:
+=item * fit image inside 100x100:
 
  calc_image_resized_size(size => "2592x1944", resize => "100x100");
 
@@ -540,7 +536,7 @@ Result:
 
  [200, "OK (envelope generated)", "100x75"]
 
-=item * Example #19:
+=item * fit a 10000x5000 area inside image:
 
  calc_image_resized_size(size => "2592x1944", resize => "10000x5000^");
 
@@ -548,7 +544,7 @@ Result:
 
  [200, "OK (envelope generated)", "10000x7500"]
 
-=item * Example #20:
+=item * fit a 5000x10000 area inside image:
 
  calc_image_resized_size(size => "2592x1944", resize => "5000x10000^");
 
@@ -556,7 +552,7 @@ Result:
 
  [200, "OK (envelope generated)", "13333x10000"]
 
-=item * Example #21:
+=item * fit a 100x100 area inside image (no effect since the image can already fit that area):
 
  calc_image_resized_size(size => "2592x1944", resize => "100x100^");
 
@@ -564,7 +560,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #22:
+=item * set dimension to 100x100:
 
  calc_image_resized_size(size => "2592x1944", resize => "100x100!");
 
@@ -572,7 +568,7 @@ Result:
 
  [200, "OK (envelope generated)", "100x100"]
 
-=item * Example #23:
+=item * shrink image to fit inside 10000x5000px (no effect since image already fits):
 
  calc_image_resized_size(size => "2592x1944", resize => "10000x5000>");
 
@@ -580,23 +576,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #24:
-
- calc_image_resized_size(size => "2592x1944", resize => "5000x10000>");
-
-Result:
-
- [200, "OK (envelope generated)", "2592x1944"]
-
-=item * Example #25:
-
- calc_image_resized_size(size => "2592x1944", resize => "3000x1000>");
-
-Result:
-
- [200, "OK (envelope generated)", "2592x1944"]
-
-=item * Example #26:
+=item * shrink image to fit inside 2000x1000px:
 
  calc_image_resized_size(size => "2592x1944", resize => "2000x1000>");
 
@@ -604,7 +584,7 @@ Result:
 
  [200, "OK (envelope generated)", "1333x1000"]
 
-=item * Example #27:
+=item * shrink image to fit inside 100x100px:
 
  calc_image_resized_size(size => "2592x1944", resize => "100x100>");
 
@@ -612,7 +592,7 @@ Result:
 
  [200, "OK (envelope generated)", "100x75"]
 
-=item * Example #28:
+=item * enlarge image to fit 10000x5000px inside it:
 
  calc_image_resized_size(size => "2592x1944", resize => "10000x5000<");
 
@@ -620,7 +600,7 @@ Result:
 
  [200, "OK (envelope generated)", "10000x7500"]
 
-=item * Example #29:
+=item * enlarge image to fit 5000x10000px inside it:
 
  calc_image_resized_size(size => "2592x1944", resize => "5000x10000<");
 
@@ -628,7 +608,7 @@ Result:
 
  [200, "OK (envelope generated)", "13333x10000"]
 
-=item * Example #30:
+=item * enlarge image to fit 3000x1000px inside it (no effect since image already fits):
 
  calc_image_resized_size(size => "2592x1944", resize => "3000x1000<");
 
@@ -636,23 +616,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #31:
-
- calc_image_resized_size(size => "2592x1944", resize => "2000x1000<");
-
-Result:
-
- [200, "OK (envelope generated)", "2592x1944"]
-
-=item * Example #32:
-
- calc_image_resized_size(size => "2592x1944", resize => "100x100<");
-
-Result:
-
- [200, "OK (envelope generated)", "2592x1944"]
-
-=item * Example #33:
+=item * shrink shortest side to 1024px:
 
  calc_image_resized_size(size => "2592x1944", resize => "1024^>");
 
@@ -660,7 +624,7 @@ Result:
 
  [200, "OK (envelope generated)", "1365x1024"]
 
-=item * Example #34:
+=item * shrink shortest side to 10240px (no effect since shortest side 1944px is already less than 10240px):
 
  calc_image_resized_size(size => "2592x1944", resize => "10240^>");
 
@@ -668,7 +632,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #35:
+=item * enlarge shortest side to 1024px (no effect since shortest side is already greater than 1024px):
 
  calc_image_resized_size(size => "2592x1944", resize => "1024^<");
 
@@ -676,7 +640,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #36:
+=item * enlarge shortest side to 10240px:
 
  calc_image_resized_size(size => "2592x1944", resize => "10240^<");
 
@@ -684,7 +648,7 @@ Result:
 
  [200, "OK (envelope generated)", "13653x10240"]
 
-=item * Example #37:
+=item * shrink longest side to 1024px:
 
  calc_image_resized_size(size => "2592x1944", resize => "^1024>");
 
@@ -692,7 +656,7 @@ Result:
 
  [200, "OK (envelope generated)", "1024x768"]
 
-=item * Example #38:
+=item * shrink longest side to 10240px (no effect since longest side 2592px is already less than 10240px):
 
  calc_image_resized_size(size => "2592x1944", resize => "^10240>");
 
@@ -700,7 +664,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #39:
+=item * enlarge longest side to 1024px (no effect since longest side 2592px is already greater than 1024px):
 
  calc_image_resized_size(size => "2592x1944", resize => "^1024<");
 
@@ -708,7 +672,7 @@ Result:
 
  [200, "OK (envelope generated)", "2592x1944"]
 
-=item * Example #40:
+=item * enlarge longest side to 10240px:
 
  calc_image_resized_size(size => "2592x1944", resize => "^10240<");
 
@@ -766,6 +730,7 @@ Ref: L<http://www.imagemagick.org/script/command-line-processing.php#geometry>
 =item * B<size>* => I<str>
 
 ImageE<sol>video size, in <widthE<gt>x<heightE<gt> format, e.g. 2592x1944.
+
 
 
 =back
@@ -945,6 +910,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<resize>* => I<str>
 
+(No description)
+
 
 =back
 
@@ -986,13 +953,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
