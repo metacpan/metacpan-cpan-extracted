@@ -1,0 +1,14 @@
+-----
+
+0.0.3   2024-09-01
+    Fix dependencies:
+        - perl: 5.20
+        - XDR::Parse *is* required
+        - Log::Any is *not*
+    Fix version number in =head1 VERSION section
+
+0.0.2   2024-08-31
+    Fix POD errors
+
+0.0.1   2024-08-31
+    Initial release

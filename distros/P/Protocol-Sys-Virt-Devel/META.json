@@ -1,0 +1,56 @@
+{
+   "abstract" : "Development helper for Protocol::Sys::Virt and its dependants",
+   "author" : [
+      "Erik Huelsmann <ehuels@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Protocol-Sys-Virt-Devel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.32",
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XDR::Parse" : "v0.3.1",
+            "perl" : "v5.20.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ehuelsmann/perl-protocol-sys-virt-devel.git",
+         "web" : "https://github.com/ehuelsmann/perl-protocol-sys-virt-devel"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

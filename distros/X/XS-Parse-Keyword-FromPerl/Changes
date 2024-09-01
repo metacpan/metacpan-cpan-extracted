@@ -1,5 +1,17 @@
 Revision history for XS-Parse-Keyword-FromPerl
 
+0.10    2024-08-31
+        [CHANGES]
+         * Updates for XPK v0.37:
+            + Added `XPK_WARNING` and the conditional variants
+         * Updates for XPK v0.39:
+            + Added optional `XPK_ARITHEXPR_OPT`, `XPK_TERMEXPR_OPT` and
+              `XPK_LISTEXPR_OPT`
+
+        [BUGFIXES]
+         * Update to latest hax/ support files to avoid compile-time failure
+           on missing `SAVEt_LONG`, removed in perl 5.41.3
+
 0.09    2024-01-06
         [CHANGES]
          * Quiet the meta::experimental warnings of meta 0.003_002

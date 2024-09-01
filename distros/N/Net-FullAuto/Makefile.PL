@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000795';
+our $VERSION='1.0000796';
 
 print `env`,"\n\n\n";
 
@@ -220,6 +220,10 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
          && $CPAN::Config->{tar};
       $ENV{CPAN_WGET}=$CPAN::Config->{wget} if defined $CPAN::Config->{wget}
          && $CPAN::Config->{tar};
+      if ($ENV{PERL_LOCAL_LIB_ROOT} || ($ENV{LOGNAME} ne 'root' &&
+            (-f "$ENV{HOME}/perl5"))) {
+         $ENV{CPAN_LOCAL_LIB}="$ENV{HOME}/perl5";
+      }
    }
    # Bullet Proof Test for AWS EC2
    # https://serverfault.com/questions/462903/how-to-know-if-a-machine-is-an-ec2-instance
@@ -734,7 +738,7 @@ unless (exists $ENV{FA_EDITOR} || grep { /Encrypted|SKIP|CPAN/i } @ARGV) {
 END
       my $timeout=120;
       my $fae="Exit FullAuto Setup";
-      my $fau="Update ALL modules (Recommended - might break older Perl code)";
+      my $fau="Update ALL modules (RECOMMENDED - might break older Perl code)";
       my $fan="Do NOT update modules (FullAuto might not work properly)";
       $ENV{CPAN_OUTDATED_MODULES}='ignore';
       {
@@ -750,6 +754,7 @@ END
                         [ $fae, sub{ return 'exit' } ], 
                         ];
             my $selection=&menu($menu1);
+	    print "SELECTION=$selection<==\n";
             exit 0 if $selection eq ']quit[';
             exit 0 if -1<index $selection, 'exit';
             $ENV{CPAN_OUTDATED_MODULES}=$selection;
@@ -830,7 +835,7 @@ END
 
      $module_fail
 
-     $mod_info
+$mod_info
 
    The FullAuto installation will not succeed without this
    module installed and loaded.
@@ -1335,24 +1340,7 @@ END
    unless (-1<index $yins,'wget') {
       fa_system("sudo yum -y install 'wget'");
    }
-   unless (-e '/usr/local/bin/figlet') {
-      fa_system("(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;make install)");
-      unless (-e "figlet-2.2.5.tar.gz") {
-         my $cmd="tar zxvf dependencies/FIGlet_fonts/fig*gz;".
-                 "cd figlet-2.2.5;make install";
-         fa_system($cmd);
-      }
-      if (exists $amazon{instance_type} &&
-            $amazon{instance_type}=~/micro|nano/) {
-         unless (grep { /figlet/ } @ARGV) {
-            my $argvs=join " ", @ARGV;
-            my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
-                        ."swapoff -a && swapon -a;"
-                        ."$^X Makefile.PL $argvs figlet 1";
-            exec $exec_cmd;
-         }
-      }
-   }
+   install_figlet();
    unless (-1<index $yins,'nano') {
       fa_system("sudo yum -y install 'nano'");
    }
@@ -1404,16 +1392,9 @@ END
    }
    print "\n\n   FullAuto install continues . . .\n\n";
 
-   unless (-e '/usr/local/bin/figlet') {
-      fa_system("sudo yum -y install wget openssl-devel zlib-devel");
-      fa_system("(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;make install)");
-      unless (-e "figlet-2.2.5.tar.gz") {
-         my $cmd="tar zxvf dependencies/FIGlet_fonts/fig*gz;".
-                 "cd figlet-2.2.5;make install";
-         fa_system($cmd);
-      }
-      fa_system("sudo yum -y install 'nano'");
-   }
+   fa_system("sudo yum -y install wget openssl-devel zlib-devel"); 
+   install_figlet();
+   fa_system("sudo yum -y install 'nano'");
 
 } elsif (!can_cc() && (exists $amazon{'suse'})) {
 
@@ -2151,13 +2132,14 @@ END
             $exec_cnt=0;
          }
       } elsif (lc($task) eq 'install') {
-         my $sudo=0;
-         if (($system_type eq 'amazon_linux') ||
-               ($system_type eq 'ubuntu') ||
-               ($system_type eq 'rhel') ||
-               ($system_type eq 'centos')) {
-            $sudo='sudo ';
-         }
+	      #my $sudo=0;
+	      #if (($system_type eq 'amazon_linux') ||
+	      # ($system_type eq 'ubuntu') ||
+	      # ($system_type eq 'rhel') ||
+	      # ($system_type eq 'centos')) {
+	      #$sudo='sudo ';
+	      #}
+	 my $sudo='';
          my $argvs=join " ", @ARGV;
          select STDOUT;
          $log->close() if $log && -1<index $log,'*';
@@ -2233,7 +2215,7 @@ sub menu {
       last if ( ($choice > 0) && ($choice <= $#$m ));
       print "You chose '$choice'.  That is not a valid option.\n\n";
    }
-   &{$m->[$choice][1]};
+   &{$m->[$choice][1]};#<-DO NOT REMOVE
 }
 
 sub size_fmt {
@@ -6367,14 +6349,17 @@ sub cpan_modules {
    my $version='';
    print "PPPPP=$p and THIS=",$ENV{CPAN_OUTDATED_MODULES},"<==\n";
    eval {
-      local $SIG{__DIE__}; # No sigdie handler;
-      require CPAN;
-      {
-         local *STDOUT;
-         open(STDOUT, ">", \$mod_info);
-         CPAN::Shell->m($p);
-      }
+      local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+      alarm 10;
+      local $SIG{__DIE__}=sub{ print "GOD DAMN IT=$@" }; # No sigdie handler;
+      local *STDOUT;
+      open(STDOUT, ">", \$mod_info) || die "CANNOT OPEN STDOUT $!\n";
+      CPAN::Shell->m($p);
+      close(STDOUT);
+      alarm 0;
    };
+   print "CPAN::Shell BLOCK ERROR=$@\n" if $@;
+   print "MODINFO=$mod_info<==\n";sleep 1;
    my $instfile='';
    ($instfile=$mod_info)=~s/^.*INST_FILE\s+[(]([^)]+).*$/$1/s;
    my $instver='';
@@ -6447,6 +6432,44 @@ END
       print $mod_info;
       return $version,$cpanfil;
    }
+}
+
+sub install_figlet {
+
+   if (($ENV{CPAN_LOCAL_LIB} && !(-f $ENV{CPAN_LOCAL_LIB}."/bin/figlet")) 
+         || !(-e '/usr/local/bin/figlet')) {
+      my $cmd="(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;".
+              "sed -i 's/, (c)//g' zipio.h;make install)";
+      if ($ENV{CPAN_LOCAL_LIB}) {
+         my $str='make DEFAULTFONTDIR='.$ENV{CPAN_LOCAL_LIB}.'\/'.
+                 'share\/figlet prefix='.$ENV{CPAN_LOCAL_LIB}.' install';
+         $cmd=~s/make install/$str/;
+      }
+      fa_system($cmd);
+      unless (-e "figlet-2.2.5.tar.gz") {
+         my $cmd="tar zxvf dependencies/FIGlet_fonts/fig*gz;".
+                 "cd figlet-2.2.5;".
+		 "sed -i 's/, (c)//g' zipio.h;".
+		 "make install";
+         if ($ENV{CPAN_LOCAL_LIB}) {
+            my $str='make DEFAULTFONTDIR='.$ENV{CPAN_LOCAL_LIB}.'\/'.
+	            'share\/figlet prefix='.$ENV{CPAN_LOCAL_LIB}.' install';
+            $cmd=~s/make install/$str/;
+         }
+         fa_system($cmd);
+      }
+      if (exists $amazon{instance_type} &&
+            $amazon{instance_type}=~/micro|nano/) {
+         unless (grep { /figlet/ } @ARGV) {
+            my $argvs=join " ", @ARGV;
+            my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
+                        ."swapoff -a && swapon -a;"
+                        ."$^X Makefile.PL $argvs figlet 1";
+            exec $exec_cmd;
+         }
+      }
+   }
+
 }
 
 package MY; # so that "SUPER" works right

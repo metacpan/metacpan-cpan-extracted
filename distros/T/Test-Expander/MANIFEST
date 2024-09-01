@@ -14,9 +14,11 @@ t/.proverc
 t/.proverc-cover
 t/Test
 t/Test/Expander
+t/Test/Expander/_colorize.t
 t/Test/Expander/_determine_testee.env
 t/Test/Expander/_determine_testee.t
 t/Test/Expander/_error.t
+t/Test/Expander/_export_most_symbols.t
 t/Test/Expander/_new_test_message.t
 t/Test/Expander/_parse_options.t
 t/Test/Expander/_set_env.t

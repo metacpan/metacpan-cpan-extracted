@@ -26,6 +26,7 @@
             "ExtUtils::Config" : "0",
             "ExtUtils::Helpers" : "0.007",
             "ExtUtils::InstallPaths" : "0",
+            "File::ShareDir::Tiny" : "0",
             "Getopt::Long" : "2.36",
             "List::Util" : "1.33",
             "Parse::CPAN::Meta" : "0",
@@ -65,6 +66,7 @@
             "File::Copy" : "0",
             "File::Find" : "0",
             "File::Path" : "0",
+            "File::ShareDir::Tiny" : "0",
             "File::Spec::Functions" : "0",
             "Getopt::Long" : "2.36",
             "List::Util" : "1.33",
@@ -94,36 +96,41 @@
             "blib" : "0",
             "lib" : "0",
             "perl" : "5.010"
-         },
-         "suggests" : {
-            "File::ShareDir" : "1.000"
          }
       }
    },
    "provides" : {
       "Dist::Build" : {
          "file" : "lib/Dist/Build.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Dist::Build::Core" : {
          "file" : "lib/Dist/Build/Core.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Dist::Build::Serializer" : {
          "file" : "lib/Dist/Build/Serializer.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Dist::Build::ShareDir" : {
          "file" : "lib/Dist/Build/ShareDir.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Dist::Build::XS" : {
          "file" : "lib/Dist/Build/XS.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Dist::Build::XS::Conf" : {
          "file" : "lib/Dist/Build/XS/Conf.pm",
-         "version" : "0.011"
+         "version" : "0.012"
+      },
+      "Dist::Build::XS::Export" : {
+         "file" : "lib/Dist/Build/XS/Export.pm",
+         "version" : "0.012"
+      },
+      "Dist::Build::XS::Import" : {
+         "file" : "lib/Dist/Build/XS/Import.pm",
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -137,7 +144,7 @@
          "web" : "https://github.com/Leont/dist-build"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

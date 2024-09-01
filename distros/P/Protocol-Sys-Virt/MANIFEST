@@ -1,0 +1,15 @@
+CHANGES
+cpanfile
+eg/remote.pl
+lib/Protocol/Sys/Virt.pm
+lib/Protocol/Sys/Virt/KeepAlive.pm
+lib/Protocol/Sys/Virt/KeepAlive/XDR.pm
+lib/Protocol/Sys/Virt/Remote.pm
+lib/Protocol/Sys/Virt/Remote/XDR.pm
+lib/Protocol/Sys/Virt/Transport.pm
+lib/Protocol/Sys/Virt/Transport/XDR.pm
+Makefile.PL
+MANIFEST
+README.pod
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

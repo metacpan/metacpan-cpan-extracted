@@ -93763,3 +93763,14 @@ T/TI/TIMLEGGE/Net-SAML2-0.81.tar.gz
 L/LN/LNATION/Rope-Cmd-0.02.tar.gz
 P/PE/PEVANS/Syntax-Keyword-Dynamically-0.14.tar.gz
 S/SH/SHLOMIF/XML-Grammar-Fortune-0.1000.tar.gz
+P/PE/PERLANCAR/Acme-CPANModules-UnixCommandWrappers-0.009.tar.gz
+L/LN/LNATION/Ascii-Text-0.09.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000796.tar.gz
+R/RA/RAWLEYFOW/SlapbirdAPM-Agent-Dancer2-0.003.tar.gz
+L/LE/LEONT/Dist-Build-0.012.tar.gz
+L/LE/LEONT/Dist-Build-XS-Alien-0.001.tar.gz
+G/GD/GDT/Map-Tube-Rome-1.01.tar.gz
+P/PE/PEVANS/XS-Parse-Keyword-FromPerl-0.10.tar.gz
+E/EH/EHUELS/Protocol-Sys-Virt-v10.3.2.tar.gz
+E/EH/EHUELS/Protocol-Sys-Virt-Devel-v0.0.3.tar.gz
+J/JS/JSF/Test-Expander-2.5.1.tar.gz

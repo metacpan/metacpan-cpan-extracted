@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Rope;
 use Rope::Autoload;
@@ -64,7 +64,7 @@ property color_map => (
 		yellow => "\e[33m",
 		blue => "\e[34m",
 		magenta => "\e[35m",
-		cyan => "\e[35m",
+		cyan => "\e[36m",
 		white => "\e[37m",
 		bright_black => "\e[90m",
 		bright_red => "\e[91m",
@@ -167,7 +167,7 @@ Ascii::Text - module for generating ASCII text in various fonts and styles
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

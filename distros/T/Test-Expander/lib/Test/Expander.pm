@@ -2,12 +2,12 @@
 package Test::Expander;
 
 # The versioning is conform with https://semver.org
-our $VERSION = '2.5.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.5.1';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
   FATAL    => qw( all ),
-  NONFATAL => qw( deprecated exec internal malloc newline portable recursion );
+  NONFATAL => qw( deprecated exec internal malloc newline once portable redefine recursion uninitialized );
 
 use Const::Fast;
 use File::chdir;
@@ -80,7 +80,10 @@ our @EXPORT = (
   qw( BAIL_OUT bail_on_failure dies_ok is_deeply lives_ok new_ok require_ok restore_failure_handler throws_ok use_ok ),
 );
 
-*BAIL_OUT = \&bail_out;                                     # Explicit "sub BAIL_OUT" would be untestable
+{
+  no warnings qw( once );
+  *BAIL_OUT = \&bail_out;                                   # Explicit "sub BAIL_OUT" would be untestable
+}
 
 sub bail_on_failure {
   _set_failure_handler(
@@ -111,7 +114,7 @@ sub import {
   }
   my $options = _parse_options( \@exports, $test_file );
 
-  _export_most_symbols( $options, $test_file );
+  _export_most_symbols( $test_file );
   _set_env( $options->{ -target }, $test_file );
   _mock_builtins( $options ) if defined( $CLASS ) && exists( $options->{ -builtins } );
 
@@ -246,7 +249,7 @@ sub _error {
 }
 
 sub _export_most_symbols {
-  my ( $options, $test_file ) = @_;
+  my ( $test_file ) = @_;
 
   $TEST_FILE = path( $test_file )->absolute->stringify if path( $test_file )->exists;
 
@@ -274,7 +277,7 @@ sub _export_symbols {
       $NOTE->( $FMT_SET_TO, _colorize( $name, 'exported' ), $constants{ $name }->( $value, $CLASS ) );
     }
     elsif ( $name =~ /^ \$ (?: CLASS | METHOD | METHOD_REF )$/x ) {
-      $NOTE->( $FMT_UNSET_VAR, _colorize( $name, 'unexported' ) ) unless defined( $value );
+      $NOTE->( $FMT_UNSET_VAR, _colorize( $name, 'unexported' ) );
     }
   }
 

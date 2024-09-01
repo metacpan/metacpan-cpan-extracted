@@ -1,0 +1,12 @@
+-----
+
+10.3.2   2024-09-01
+    * Fix POD errors
+    * Add LibVirt git tag name to the =head1 VERSION section
+
+10.3.1   2024-09-01
+    * Fix POD errors
+    * Fix various template expansion errors
+
+10.3.0   2024-08-31
+    Initial release

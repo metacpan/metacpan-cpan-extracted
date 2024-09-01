@@ -1,10 +1,11 @@
 package Map::Tube::Rome::Line::MA;
 
-$Map::Tube::Rome::Line::MA::VERSION   = '1.00';
+$Map::Tube::Rome::Line::MA::VERSION   = '1.01';
 $Map::Tube::Rome::Line::MA::AUTHORITY = 'cpan:GDT';
 
 use 5.010;
-use strict; use warnings;
+use strict;
+use warnings;
 
 =head1 NAME
 
@@ -14,37 +15,37 @@ Map::Tube::Rome::Line::MA - Rome Subway Map: Linea A.
 
 Rome Subway Map: Linea A
 
-    +---------------------------------------+-----------------------------------------------------------------------+
-    | Station Name                          | Connected To                                                          |
-    +---------------------------------------+-----------------------------------------------------------------------+
-    | Anagnina                              | Cinecittà                                                             |
-    | Cinecittà                             | Anagnina, Subaugusta                                                  |
-    | Subaugusta                            | Cinecittà, Giulio Agricola                                            |
-    | Giulio Agricola                       | Subaugusta, Lucio Sestio                                              |
-    | Lucio Sestio                          | Giulio Agricola, Numidio Quadrato                                     |
-    | Numidio Quadrato                      | Lucio Sestio, Porta Furba Quadraro                                    |
-    | Porta Furba Quadraro                  | Numidio Quadrato, Arco di Travertino                                  |
-    | Arco di Travertino                    | Porta Furba Quadraro, Colli Albani - Parco Appia Antica               |
-    | Colli Albani - Parco Appia Antica     | Arco di Travertino, Furio Camillo                                     |
-    | Furio Camillo                         | Colli Albani - Parco Appia Antica, Ponte Lungo                        |
-    | Ponte Lungo                           | Furio Camillo, Re di Roma                                             |
-    | Re di Roma                            | Ponte Lungo, San Giovanni                                             |
-    | San Giovanni                          | Re di Roma, Manzoni                                                   |
-    | Manzoni                               | San Giovanni, Vittorio Emanuele                                       |
-    | Vittorio Emanuele                     | Manzoni, Termini                                                      |
-    | Termini                               | Vittorio Emanuele, Repubblica - Teatro dell'Opera                     |
-    | Repubblica - Teatro dell'Opera        | Termini, Barberini - Fontana di Trevi                                 |
-    | Barberini - Fontana di Trevi          | Repubblica - Teatro dell'Opera, Spagna                                |
-    | Spagna                                | Barberini - Fontana di Trevi, Flaminio - Piazza del Popolo            |
-    | Flaminio - Piazza del Popolo          | Spagna, Lepanto                                                       |
-    | Lepanto                               | Flaminio - Piazza del Popolo, Ottaviano San Pietro - Musei Vaticani   |
-    | Ottaviano San Pietro - Musei Vaticani | Lepanto, Cipro                                                        |
-    | Cipro                                 | Ottaviano San Pietro - Musei Vaticani, Valle Aurelia                  |
-    | Valle Aurelia                         | Cipro, Baldo degli Ubaldi                                             |
-    | Baldo degli Ubaldi                    | Valle Aurelia, Cornelia                                               |
-    | Cornelia                              | Baldo degli Ubaldi, Battistini                                        |
-    | Battistini                            | Cornelia                                                              |
-    +---------------------------------------+-----------------------------------------------------------------------+
+    +-----------------------------------------+-------------------------------------------------------------------------+
+    | Station Name                            | Connected To                                                            |
+    +-----------------------------------------+-------------------------------------------------------------------------+
+    | Anagnina                                | Cinecittà                                                               |
+    | Cinecittà                               | Anagnina, Subaugusta                                                    |
+    | Subaugusta                              | Cinecittà, Giulio Agricola                                              |
+    | Giulio Agricola                         | Subaugusta, Lucio Sestio                                                |
+    | Lucio Sestio                            | Giulio Agricola, Numidio Quadrato                                       |
+    | Numidio Quadrato                        | Lucio Sestio, Porta Furba Quadraro                                      |
+    | Porta Furba Quadraro                    | Numidio Quadrato, Arco di Travertino                                    |
+    | Arco di Travertino                      | Porta Furba Quadraro, Colli Albani - Parco Appia Antica                 |
+    | Colli Albani - Parco Appia Antica       | Arco di Travertino, Furio Camillo                                       |
+    | Furio Camillo                           | Colli Albani - Parco Appia Antica, Ponte Lungo                          |
+    | Ponte Lungo                             | Furio Camillo, Re di Roma                                               |
+    | Re di Roma                              | Ponte Lungo, San Giovanni                                               |
+    | San Giovanni                            | Re di Roma, Manzoni                                                     |
+    | Manzoni                                 | San Giovanni, Vittorio Emanuele                                         |
+    | Vittorio Emanuele                       | Manzoni, Termini                                                        |
+    | Termini                                 | Vittorio Emanuele, Repubblica - Teatro dell'Opera                       |
+    | Repubblica - Teatro dell'Opera          | Termini, Barberini - Fontana di Trevi                                   |
+    | Barberini - Fontana di Trevi            | Repubblica - Teatro dell'Opera, Spagna                                  |
+    | Spagna                                  | Barberini - Fontana di Trevi, Flaminio - Piazza del Popolo              |
+    | Flaminio - Piazza del Popolo            | Spagna, Lepanto                                                         |
+    | Lepanto                                 | Flaminio - Piazza del Popolo, Ottaviano - San Pietro - Musei Vaticani   |
+    | Ottaviano - San Pietro - Musei Vaticani | Lepanto, Cipro                                                          |
+    | Cipro                                   | Ottaviano San Pietro - Musei Vaticani, Valle Aurelia                    |
+    | Valle Aurelia                           | Cipro, Baldo degli Ubaldi                                               |
+    | Baldo degli Ubaldi                      | Valle Aurelia, Cornelia                                                 |
+    | Cornelia                                | Baldo degli Ubaldi, Battistini                                          |
+    | Battistini                              | Cornelia                                                                |
+    +-----------------------------------------+-------------------------------------------------------------------------+
 
 =head1 NOTE
 
@@ -102,4 +103,4 @@ the same terms as the Perl 5 programming language system itself.
 
 =cut
 
-1; # End of Map::Tube::Rome::Line::MA
+1;    # End of Map::Tube::Rome::Line::MA

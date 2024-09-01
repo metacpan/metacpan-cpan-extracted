@@ -1,11 +1,11 @@
 package Test::Expander::Constants;
 
-our $VERSION = '2.5.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.5.1';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
   FATAL    => qw( all ),
-  NONFATAL => qw( deprecated exec internal malloc newline portable recursion );
+  NONFATAL => qw( deprecated exec internal malloc newline once portable redefine recursion uninitialized );
 
 use B                qw( svref_2object );
 use Const::Fast;

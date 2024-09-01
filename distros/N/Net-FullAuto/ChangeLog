@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-08-31  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000796 released
+
+        * Updated figlet install for local::lib
+
 2024-08-30  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000795 released

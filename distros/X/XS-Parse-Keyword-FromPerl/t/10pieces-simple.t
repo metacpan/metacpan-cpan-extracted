@@ -8,7 +8,7 @@ use Test2::V0;
 use XS::Parse::Keyword::FromPerl qw(
    KEYWORD_PLUGIN_EXPR KEYWORD_PLUGIN_STMT
    XPK_IDENT XPK_IDENT_OPT XPK_PACKAGENAME XPK_COMMA XPK_VSTRING
-   XPK_LEXVARNAME XPK_LEXVAR_SCALAR XPK_KEYWORD
+   XPK_LEXVARNAME XPK_LEXVAR_SCALAR XPK_KEYWORD XPK_WARNING
    register_xs_parse_keyword
 );
 use Optree::Generate qw(
@@ -125,5 +125,32 @@ BEGIN {
    my $ok = keyword here;
    ok( $ok, 'keyword' );
 }
+
+# warning
+my @warnings;
+BEGIN { $SIG{__WARN__} = sub { push @warnings, $_[0] }; }
+
+BEGIN {
+   register_xs_parse_keyword( warning =>
+      permit_hintkey => "main/warning",
+      pieces => [XPK_WARNING("oopsie here")],
+      build => sub {
+         my ( $outref, $args, $hookdata ) = @_;
+
+         $$outref = newSVOP(OP_CONST, 0, 1);
+         return KEYWORD_PLUGIN_EXPR;
+      },
+   );
+}
+
+{
+   BEGIN { $^H{"main/warning"}++ }
+   my $ok = warning;
+   ok( $ok, 'warning' );
+   is( \@warnings, [match(qr/^oopsie here at /)],
+      'XPK_WARNING raised a warning' );
+}
+
+BEGIN { undef $SIG{__WARN__} }
 
 done_testing;

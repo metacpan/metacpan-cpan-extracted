@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Dist/Build.pm',
@@ -14,7 +14,9 @@ my @module_files = (
     'Dist/Build/Serializer.pm',
     'Dist/Build/ShareDir.pm',
     'Dist/Build/XS.pm',
-    'Dist/Build/XS/Conf.pm'
+    'Dist/Build/XS/Conf.pm',
+    'Dist/Build/XS/Export.pm',
+    'Dist/Build/XS/Import.pm'
 );
 
 

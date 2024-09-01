@@ -9,6 +9,7 @@ use lib 't/lib';
 use DistGen qw/undent/;
 use XSLoader;
 use ExtUtils::HasCompiler 0.024 'can_compile_loadable_object';
+use File::ShareDir::Tiny ':ALL';
 
 local $ENV{PERL_INSTALL_QUIET};
 local $ENV{PERL_MB_OPT};
@@ -43,6 +44,7 @@ if ($has_compiler) {
 		#include "perl.h"
 		#include "XSUB.h"
 		#include "foo.h"
+		#include "bar.h"
 
 		MODULE = Foo::Bar                PACKAGE = Foo::Bar
 
@@ -56,16 +58,25 @@ if ($has_compiler) {
 	$dist->add_file('include/foo.h', undent(<<'		---'));
 		char* foo();
 		---
+	$dist->add_file('inc/auto/share/module/TestLib/include/bar.h', undent(<<'		---'));
+		#define BAR 1
+		---
 	$dist->add_file('src/foo.c', undent(<<'		---'));
 		char* foo() {
 			return "Hello World!\n";
 		}
 		---
 	$dist->add_file('planner/xs.pl', undent(<<'		---'));
+		use lib 'inc';
 		load_module("Dist::Build::XS");
+		load_module("Dist::Build::XS::Export");
+		load_module("Dist::Build::XS::Import");
+
+		export_headers(dir => 'include');
 		add_xs(
 			include_dirs  => [ 'include' ],
 			extra_sources => [ glob 'src/*.c' ],
+			import        => [ 'TestLib' ],
 		);
 		---
 }
@@ -149,13 +160,10 @@ sub _slurp { do { local (@ARGV,$/)=$_[0]; <> } }
 
   require blib;
   blib->import;
-  if (eval { require File::ShareDir }) {
-    ok( -d File::ShareDir::dist_dir('Foo-Bar'), 'sharedir has been made');
-    ok( -f File::ShareDir::dist_file('Foo-Bar', 'file.txt'), 'sharedir file has been made');
-    require Foo::Bar;
-    ok( -d File::ShareDir::module_dir('Foo::Bar'), 'sharedir has been made');
-    ok( -f File::ShareDir::module_file('Foo::Bar', 'file.txt'), 'sharedir file has been made');
-  }
+  ok( -d dist_dir('Foo-Bar'), 'sharedir has been made');
+  ok( -f dist_file('Foo-Bar', 'file.txt'), 'sharedir file has been made');
+  ok( -d module_dir('Foo::Bar'), 'sharedir has been made');
+  ok( -f module_file('Foo::Bar', 'file.txt'), 'sharedir file has been made');
   ok( -d catdir(qw/blib lib auto share dist Foo-Bar/), 'dist sharedir has been made');
   ok( -f catfile(qw/blib lib auto share dist Foo-Bar file.txt/), 'dist sharedir file has been made');
   ok( -d catdir(qw/blib lib auto share module Foo-Bar/), 'moduole sharedir has been made');
@@ -169,6 +177,7 @@ sub _slurp { do { local (@ARGV,$/)=$_[0]; <> } }
         my $libref = pop @DynaLoader::dl_librefs;
         DynaLoader::dl_unload_file($libref);
     }
+    ok( -f module_file('Foo::Bar', 'include/foo.h'), 'header file has been exported');
   }
 
   require CPAN::Meta;

@@ -1,0 +1,28 @@
+---
+abstract: 'Development helper for Protocol::Sys::Virt and its dependants'
+author:
+  - 'Erik Huelsmann <ehuels@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.32'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Protocol-Sys-Virt-Devel
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XDR::Parse: v0.3.1
+  perl: v5.20.0
+resources:
+  repository: git://github.com/ehuelsmann/perl-protocol-sys-virt-devel.git
+version: v0.0.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,33 @@
+---
+abstract: 'Dist::Build extension to use Alien modules.'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires: {}
+configure_requires:
+  Dist::Build: '0.003'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.046, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Build-XS-Alien
+provides:
+  Dist::Build::XS::Alien:
+    file: lib/Dist/Build/XS/Alien.pm
+    version: '0.001'
+requires:
+  Alien::Base::Wrapper: '0'
+  Carp: '0'
+  Dist::Build::XS: '0.012'
+  ExtUtils::Builder::Planner::Extension: '0'
+  ExtUtils::Helpers: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Leont/dist-build-xs-alien/issues
+  repository: https://github.com/Leont/dist-build-xs-alien.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

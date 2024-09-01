@@ -1,0 +1,179 @@
+NAME
+    Acme::CPANModules::UnixCommandWrappers - List of various CLIs that wrap
+    existing Unix commands
+
+VERSION
+    This document describes version 0.009 of
+    Acme::CPANModules::UnixCommandWrappers (from Perl distribution
+    Acme-CPANModules-UnixCommandWrappers), released on 2024-08-13.
+
+DESCRIPTION
+    These CLI's usually are meant to be called as the Unix commands they
+    wrap, e.g.:
+
+     alias ssh=sshwrap-hostcolor
+
+    But they perform additional stuffs.
+
+    If you know of others, please drop me a message.
+
+    Keywords: CLI, wrapper, Unix utilities
+
+ACME::CPANMODULES ENTRIES
+    App::ImageMagickUtils
+        Simple wrappers for ImageMagick's convert to process multiple
+        filenames and automatically set output filenames.
+
+        Scripts: convert-image-to, convert-image-to-pdf
+
+    App::CpMvUtils
+        Wrappers for cp & mv to adjust relative symlinks.
+
+        Scripts: cp-and-adjust-symlinks, mv-and-adjust-symlinks
+
+    App::diffwc
+        Wraps (or filters output of) diff to add colors and highlight words.
+
+        Scripts: diffwc, diffwc-filter-u
+
+    App::DiffDocText
+        Diffs two office word-processor documents by first converting them
+        to plaintext.
+
+        Script: diff-doc-text
+
+    App::DiffPDFText
+        Diffs two PDF files by first converting to plaintext.
+
+        Script: diff-pdf-text
+
+    App::DiffXlsText
+        Diffs two office spreadsheets by first converting them to
+        directories of CSV files.
+
+        Script: diff-xls-text
+
+    App::sdif
+        Provides sdif (diff side-by-side with nice color theme), cdif
+        (highlight words with nice color scheme), and watchdiff (watch
+        command and diff output).
+
+        Scripts: sdif, cdif, watchdiff
+
+    App::gitwrap
+        Wraps git to do additional stuff, e.g. set user+email automatically.
+
+        Script: gitwrap
+
+    App::GrepUtils
+        Print lines that match terms (each term need not be in particular
+        order, support negative search).
+
+        Script: grep-terms
+
+    App::manwrap::pm
+        Wraps man to search for (and tab-complete) Perl module
+        documentation.
+
+        Script: manwrap-pm
+
+    App::rsynccolor
+        Wraps rsync to add color to output, particularly highlighting
+        deletion.
+
+        Script: rsynccolor
+
+    App::rsync::new2old
+        Wraps rsync to check that source is newer than target.
+
+        Script: rsync-new2old
+
+    App::sshwrap::hostcolor
+        Wraps ssh to remember the background terminal color of each
+        user+host you went to.
+
+        Script: sshwrap-hostcolor
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n UnixCommandWrappers
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries UnixCommandWrappers | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=UnixCommandWrappers -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::UnixCommandWrappers -E'say $_->{module} for @{ $Acme::CPANModules::UnixCommandWrappers::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-UnixCommandWrappers>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-UnixCommandWrappers>
+    .
+
+SEE ALSO
+    Other variants for "grep": Acme::CPANModules::GrepVariants
+
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024, 2022, 2021, 2020, 2018 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Unix
+    CommandWrappers>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

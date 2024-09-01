@@ -14,6 +14,8 @@ lib/Dist/Build/Serializer.pm
 lib/Dist/Build/ShareDir.pm
 lib/Dist/Build/XS.pm
 lib/Dist/Build/XS/Conf.pm
+lib/Dist/Build/XS/Export.pm
+lib/Dist/Build/XS/Import.pm
 prereqs.yml
 t/00-compile.t
 t/lib/DistGen.pm

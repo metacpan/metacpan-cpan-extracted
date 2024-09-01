@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
  */
 #include "EXTERN.h"
 #include "perl.h"
@@ -215,8 +215,11 @@ SV *to_array(SV *self)
     if     (strEQ(type, "XPK_BLOCK"))           piece = (struct XSParseKeywordPieceType)XPK_BLOCK;
     else if(strEQ(type, "XPK_ANONSUB"))         piece = (struct XSParseKeywordPieceType)XPK_ANONSUB;
     else if(strEQ(type, "XPK_ARITHEXPR"))       piece = (struct XSParseKeywordPieceType)XPK_ARITHEXPR;
+    else if(strEQ(type, "XPK_ARITHEXPR_OPT"))   piece = (struct XSParseKeywordPieceType)XPK_ARITHEXPR_OPT;
     else if(strEQ(type, "XPK_TERMEXPR"))        piece = (struct XSParseKeywordPieceType)XPK_TERMEXPR;
+    else if(strEQ(type, "XPK_TERMEXPR_OPT"))    piece = (struct XSParseKeywordPieceType)XPK_TERMEXPR_OPT;
     else if(strEQ(type, "XPK_LISTEXPR"))        piece = (struct XSParseKeywordPieceType)XPK_LISTEXPR;
+    else if(strEQ(type, "XPK_LISTEXPR_OPT"))    piece = (struct XSParseKeywordPieceType)XPK_LISTEXPR_OPT;
     else if(strEQ(type, "XPK_IDENT"))           piece = (struct XSParseKeywordPieceType)XPK_IDENT;
     else if(strEQ(type, "XPK_IDENT_OPT"))       piece = (struct XSParseKeywordPieceType)XPK_IDENT_OPT;
     else if(strEQ(type, "XPK_PACKAGENAME"))     piece = (struct XSParseKeywordPieceType)XPK_PACKAGENAME;
@@ -240,6 +243,18 @@ SV *to_array(SV *self)
       piece = (struct XSParseKeywordPieceType)XPK_KEYWORD(savepv(SvPV_nolen(svp[1])));
     else if(strEQ(type, "XPK_FAILURE"))
       piece = (struct XSParseKeywordPieceType)XPK_FAILURE(savepv(SvPV_nolen(svp[1])));
+    else if(strEQ(type, "XPK_WARNING"))
+      piece = (struct XSParseKeywordPieceType)XPK_WARNING(savepv(SvPV_nolen(svp[1])));
+    else if(strEQ(type, "XPK_WARNING_AMBIGUOUS"))
+      piece = (struct XSParseKeywordPieceType)XPK_WARNING_AMBIGUOUS(savepv(SvPV_nolen(svp[1])));
+    else if(strEQ(type, "XPK_WARNING_DEPRECATED"))
+      piece = (struct XSParseKeywordPieceType)XPK_WARNING_DEPRECATED(savepv(SvPV_nolen(svp[1])));
+    else if(strEQ(type, "XPK_WARNING_EXPERIMENTAL"))
+      piece = (struct XSParseKeywordPieceType)XPK_WARNING_EXPERIMENTAL(savepv(SvPV_nolen(svp[1])));
+    else if(strEQ(type, "XPK_WARNING_PRECEDENCE"))
+      piece = (struct XSParseKeywordPieceType)XPK_WARNING_PRECEDENCE(savepv(SvPV_nolen(svp[1])));
+    else if(strEQ(type, "XPK_WARNING_SYNTAX"))
+      piece = (struct XSParseKeywordPieceType)XPK_WARNING_SYNTAX(savepv(SvPV_nolen(svp[1])));
     /* Structural */
     else if(strEQ(type, "XPK_SEQUENCE"))
       piece = (struct XSParseKeywordPieceType)XPK_SEQUENCE_pieces(
@@ -379,6 +394,6 @@ register_xs_parse_keyword(const char *name, ...)
     register_xs_parse_keyword(savepv(name), hooksptr, dataptr);
 
 BOOT:
-  boot_xs_parse_keyword(0.35);
+  boot_xs_parse_keyword(0.39);
 
   S_setup_constants(aTHX);

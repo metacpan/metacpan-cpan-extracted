@@ -179,7 +179,7 @@ sub _gen_default_filedata {
         }
       },
       "generated_by": "Leon Timmermans",
-      "dynamic_config": 0,
+      "dynamic_config": 1,
       "meta-spec": {
         "url": "https://metacpan.org/pod/CPAN::Meta::Spec",
         "version": 2.0

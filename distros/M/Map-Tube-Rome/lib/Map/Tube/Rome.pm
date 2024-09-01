@@ -4,14 +4,14 @@ use 5.010;
 use strict;
 use warnings;
 
-use File::Share qw(dist_file);
+use File::ShareDir qw(dist_file);
 use Moo;
 use namespace::autoclean;
 
-$Map::Tube::Rome::VERSION   = '1.00';
+$Map::Tube::Rome::VERSION   = '1.01';
 $Map::Tube::Rome::AUTHORITY = 'cpan:GDT';
 
-has json => (is => 'ro', default => sub { dist_file('Map-Tube-Rome','rome-map.json') });
+has json => (is => 'ro', default => sub { dist_file('Map-Tube-Rome', 'rome-map.json') });
 
 with 'Map::Tube';
 

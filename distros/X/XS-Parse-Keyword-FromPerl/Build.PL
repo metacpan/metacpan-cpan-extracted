@@ -10,13 +10,13 @@ my $build = Module::Build->new(
    module_name => "XS::Parse::Keyword::FromPerl",
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Keyword::Builder' => '0.35',
+      'XS::Parse::Keyword::Builder' => '0.39',
       'XS::Parse::Infix::Builder' => 0,
    },
    requires => {
       'perl' => '5.026',
       'meta' => '0.003_002',
-      'XS::Parse::Keyword' => '0.35',
+      'XS::Parse::Keyword' => '0.39',
       'XS::Parse::Infix' => '0.35',
       ( $^V lt v5.36.0 ? ( 'builtin::Backport' => 0 ) : () ),
    },

@@ -1,0 +1,50 @@
+0.009   2024-08-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist
+          Acme-CPANModules-{CLI-Wrapper-UnixCommand,UnixCommandWrappers}.
+
+
+0.008   2022-03-18  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract (add 'List of ...') to follow convention.
+
+
+0.007   2021-11-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add entries: App::CpMvUtils, App::ImageMagickUtils.
+
+	- Mention related list: Acme::CPANModules::GrepVariants.
+
+
+0.006   2021-07-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Add entry: App::DiffPDFText.
+
+
+0.005   2020-11-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Add grep-terms.
+
+	- Remove lcpanm (cpanm is not a Unix command).
+
+
+0.004   2020-10-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add diff-xls-text.
+
+
+0.003   2020-08-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add App::sdif.
+
+
+0.002   2020-08-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Add diff-doc-text.
+
+
+0.001   2018-09-30  Released-By: PERLANCAR
+
+        - First release.

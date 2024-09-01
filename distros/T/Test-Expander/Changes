@@ -1,5 +1,8 @@
 Changelog for Test-Expander
 
+2.5.1 2024-08-31
+    - Defatalize 'define once only' warning during direct symbol table access.
+
 2.5.0 2024-02-10
     - Support control of colorization report belogning to the read-only variables $CLASS, $METHOD, and $METHOD_REF.
 

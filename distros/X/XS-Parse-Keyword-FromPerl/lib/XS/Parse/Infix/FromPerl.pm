@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix::FromPerl 0.09;
+package XS::Parse::Infix::FromPerl 0.10;
 
 use v5.26; # XS code needs op_class() and the OPclass_* constants
 use warnings;

@@ -1,0 +1,3 @@
+runtime:
+  requires:
+    Dist::Build::XS: 0.012

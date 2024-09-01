@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword::FromPerl 0.09;
+package XS::Parse::Keyword::FromPerl 0.10;
 
 use v5.26; # XS code needs op_class() and the OPclass_* constants
 use warnings;
@@ -180,6 +180,11 @@ C<undef> will be passed to the callbacks instead.
 
 The following functions can be used to generate parsing pieces.
 
+Many simple piece types have an variant which is optional; if the input source
+does not look like the expected syntax for the piece type then it will emit
+C<undef> rather than raise an error. These piece types have their names
+suffixed by C<_OPT>.
+
 =head3 XPK_BLOCK
 
 A block of code, returned in the I<op> field.
@@ -188,15 +193,15 @@ A block of code, returned in the I<op> field.
 
 An anonymous subroutine, returned in the I<cv> field.
 
-=head3 XPK_ARITHEXPR
+=head3 XPK_ARITHEXPR, XPK_ARITHEXPR_OPT
 
 An arithemetic expression, returned in the I<op> field.
 
-=head3 XPK_TERMEXPR
+=head3 XPK_TERMEXPR, XPK_TERMEXPR_OPT
 
 A term expression, returned in the I<op> field.
 
-=head3 XPK_LISTEXPR
+=head3 XPK_LISTEXPR, XPK_LISTEXPR_OPT
 
 A list expression, returned in the I<op> field.
 
@@ -204,13 +209,9 @@ A list expression, returned in the I<op> field.
 
 An identifier, returned as a string in the I<sv> field.
 
-The C<_OPT> variant is optional.
-
 =head3 XPK_PACKAGENAME, XPK_PACKAGENAME_OPT
 
 A package name, returned as a string in the I<sv> field.
-
-The C<_OPT> variant is optional.
 
 =head3 XPK_LEXVARNAME
 
@@ -224,8 +225,6 @@ C<XPK_LEXVAR_HASH>; or C<XPK_LEXVAR_ANY> for convenience to set all three.
 =head3 XPK_VSTRING, XPK_VSTRING_OPT
 
 A version string, returned as a L<version> object instance in the I<sv> field.
-
-The C<_OPT> variant is optional.
 
 =head3 XPK_LEXVAR
 
@@ -273,6 +272,23 @@ is returned.
 
 Calls the perl C<intro_my()> function immediately. No input is consumed and no
 output value is generated.
+
+=head3 XPK_WARNING
+
+   XPK_WARNING($message)
+
+Emits a warning by callling the core perl C<warn()> function immediately.
+
+=head3 XPK_WARNING_...
+
+   XPK_WARNING_AMBIGUOUS($message)
+   XPK_WARNING_DEPRECATED($message)
+   XPK_WARNING_EXPERIMENTAL($message)
+   XPK_WARNING_PRECEDENCE($message)
+   XPK_WARNING_SYNTAX($message)
+
+Several variants of L</XPK_WARNING> that are conditional on various warning
+categories being enabled.
 
 =head3 XPK_SEQUENCE
 
@@ -383,7 +399,7 @@ foreach (qw(
 }
 # Single-SV parametric pieces
 foreach (qw(
-      LEXVARNAME LEXVAR LEXVAR_MY LITERAL KEYWORD FAILURE
+      LEXVARNAME LEXVAR LEXVAR_MY LITERAL KEYWORD FAILURE WARNING
    )) {
    my $name = "XPK_$_";
    push @EXPORT_OK, $name;

@@ -6,11 +6,11 @@ my $text = Ascii::Text->new( font => 'Boomer', align  => 'center' );
 
 $text->("Hello World");
 
-$text->font("Banner");
+$text->font("Block");
 
 $text->("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
 
-is($text->font_class, 'Ascii::Text::Font::Banner');
+is($text->font_class, 'Ascii::Text::Font::Block');
 
 ok(1);
 

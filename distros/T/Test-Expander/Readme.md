@@ -377,41 +377,42 @@ All remaining elements of the **%ENV** hash gets emptied (without localization) 
     - the cascading definition of environment variables can be used, which means that
         - during the evaluation of current line environment variables defined in the same file above can be applied.
         For example if such **.env** file contains
-
+            ```perl
                 VAR1 = 'ABC'
                 VAR2 = lc( $ENV{ VAR1 } )
-
+            ```
             and neither **VAR1** nor **VAR2** will be overwritten during the evaluation of subsequent lines in the same or other
             **.env** files, the **%ENV** hash will contain at least the following entries:
-
+            ```perl
                 VAR1 => 'ABC'
                 VAR2 => 'abc'
-
+            ```
         - during the evaluation of current line also environment variables defined in a higher-level **.env** file can be used.
         For example if **t/Foo/Bar/Baz.env** contains
-
+            ```perl
                 VAR0 = 'XYZ '
-
+            ```
             and **t/Foo/Bar/Baz/myMethod.env** contains
-
+            ```perl
                 VAR1 = 'ABC'
                 VAR2 = lc( $ENV{ VAR0 } . $ENV{ VAR1 } )
-
+            ```
             and neither **VAR0**, nor **VAR1**, nor **VAR2** will be overwritten during the evaluation of subsequent lines in the same
             or other **.env** files, the **%ENV** hash will contain at least the following entries:
-
+            ```perl
                 VAR0 => 'XYZ '
                 VAR1 => 'ABC'
                 VAR2 => 'xyz abc'
+            ```
     - the value of the environment variable (if provided) is evaluated by the
     [string eval](https://perldoc.perl.org/functions/eval) so that
         - constant values must be quoted;
         - variables and subroutines must not be quoted:
-
+            ```perl
                 NAME_CONST = 'VALUE'
                 NAME_VAR   = $KNIB::App::MyApp::Constants::ABC
                 NAME_FUNC  = join(' ', $KNIB::App::MyApp::Constants::DEF)
-
+            ```
 All environment variables set up in this manner are logged to STDOUT
 using [note](https://metacpan.org/pod/Test2::Tools::Basic#DIAGNOSTICS).
 

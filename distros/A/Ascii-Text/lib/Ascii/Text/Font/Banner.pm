@@ -445,7 +445,7 @@ Ascii::Text::Font::Banner - Banner font
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -465,192 +465,569 @@ Instantiate a new Ascii::Text::Font::Boomer object.
 
 	my $font = Ascii::Text::Font::Boomer->new();
 
+
 =head2 character_A
 
-todo
+	   #
+	  # #
+	 #   #
+	#     #
+	#######
+	#     #
+	#     #
 
 =head2 character_B
 
+	#######
+	#     #
+	#     #
+	#### #
+	#     #
+	#     #
+	#######
 
 =head2 character_C
 
+	 #####
+	#     #
+	#
+	#
+	#
+	#     #
+	 #####
 
 =head2 character_D
 
+	######
+	#     #
+	#     #
+	#     #
+	#     #
+	#     #
+	######
 
 =head2 character_E
 
+	#######
+	#
+	#
+	#####
+	#
+	#
+	#######
 
 =head2 character_F
 
+	#######
+	#
+	#
+	#####
+	#
+	#
+	#
 
 =head2 character_G
 
+	 #####
+	#
+	#
+	#  ####
+	#     #
+	#     #
+	 # ###
 
 =head2 character_H
 
+	#     #
+	#     #
+	#     #
+	#######
+	#     #
+	#     #
+	#     #
 
 =head2 character_I
 
+	  ###
+	   #
+	   #
+	   #
+	   #
+	   #
+	  ###
 
 =head2 character_J
 
+	      #
+	      #
+	      #
+	      #
+	#     #
+	#     #
+	 #####
 
 =head2 character_K
 
+	#    #
+	#   #
+	#  #
+	###
+	#  #
+	#   #
+	#    #
 
 =head2 character_L
 
+	#
+	#
+	#
+	#
+	#
+	#
+	#######
 
 =head2 character_M
 
+	#     #
+	##   ##
+	# # # #
+	#  #  #
+	#     #
+	#     #
+	#     #
 
 =head2 character_N
 
+	#     #
+	##    #
+	# #   #
+	#  #  #
+	#   # #
+	#    ##
+	#     #
 
 =head2 character_O
 
+	#######
+	#     #
+	#     #
+	#     #
+	#     #
+	#     #
+	#######
 
 =head2 character_P
 
+	######
+	#     #
+	#     #
+	######
+	#
+	#
+	#
 
 =head2 character_Q
 
+	 #####
+	#     #
+	#     #
+	#     #
+	#   # #
+	#    #
+	 #### #
 
 =head2 character_R
 
+	######
+	#     #
+	#     #
+	######
+	#   #
+	#    #
+	#     #
 
 =head2 character_S
 
+	 #####
+	#     #
+	#
+	 #####
+	      #
+	#     #
+	 #####
 
 =head2 character_T
 
+	#######
+	   #
+	   #
+	   #
+	   #
+	   #
+	   #
 
 =head2 character_U
 
+	#     #
+	#     #
+	#     #
+	#     #
+	#     #
+	#     #
+	 #####
 
 =head2 character_V
 
+	#     #
+	#     #
+	#     #
+	#     #
+	 #   #
+	  # #
+	   #
 
 =head2 character_W
 
+	#     #
+	#  #  #
+	#  #  #
+	#  #  #
+	#  #  #
+	#  #  #
+	 ## ##
 
 =head2 character_X
 
+	#     #
+	 #   #
+	  # #
+	   #
+	  # #
+	 #   #
+	#     #
 
 =head2 character_Y
 
+	#     #
+	 #   #
+	  # #
+	   #
+	   #
+	   #
+	   #
 
 =head2 character_Z
 
+	#######
+	     #
+	    #
+	   #
+	  #
+	 #
+	#######
 
 =head2 character_a
 
+	 ###
+	#  #
+	# ##
+	 # #
 
 =head2 character_b
 
+	#
+	#
+	###
+	#  #
+	#  #
+	###
 
 =head2 character_c
 
+	 ##
+	#
+	#
+	 ##
 
 =head2 character_d
 
+	   #
+	   #
+	 ###
+	#  #
+	#  #
+	 ###
 
 =head2 character_e
 
+	 ##
+	# ##
+	##
+	 ##
 
 =head2 character_f
 
+	  #
+	 # #
+	 #
+	###
+	 #
+	 #
 
 =head2 character_g
 
+	 ###
+	#  #
+	 ##
+	#
+	 ###
 
 =head2 character_h
 
+	#
+	#
+	###
+	#  #
+	#  #
+	#  #
 
 =head2 character_i
 
+	 #
+
+	##
+	 #
+	 #
+	###
 
 =head2 character_j
 
+	  #
+
+	  #
+	  #
+	# #
+	 #
 
 =head2 character_k
 
+	#
+	#
+	# #
+	##
+	# #
+	#  #
 
 =head2 character_l
 
+	##
+	 #
+	 #
+	 #
+	 #
+	###
 
 =head2 character_m
 
+	 #  #
+	# ## #
+	#    #
+	#    #
 
 =head2 character_n
 
+	###
+	#  #
+	#  #
+	#  #
 
 =head2 character_o
 
+	  ##
+	 #  #
+	 #  #
+	  ##
 
 =head2 character_p
 
+	###
+	#  #
+	#  #
+	###
+	#
 
 =head2 character_q
 
+	   ###
+	  #   #
+	  #   #
+	   ###
+	      #
 
 =head2 character_r
 
+	###
+	#  #
+	#
+	#
 
 =head2 character_s
 
+	 ###
+	##
+	  ##
+	###
 
 =head2 character_t
 
+	 #
+	 #
+	###
+	 #
+	 #
+	  ##
 
 =head2 character_u
 
+	#  #
+	#  #
+	#  #
+	 ###
 
 =head2 character_v
 
+	#   #
+	#   #
+	 # #
+	  #
 
 =head2 character_w
 
+	#   #
+	#   #
+	# # #
+	## ##
 
 =head2 character_x
 
+	#  #
+	 ##
+	 ##
+	#  #
 
 =head2 character_y
 
+	#  #
+	 # #
+	  #
+	 #
 
 =head2 character_z
 
+	####
+	  #
+	 #
+	####
 
 =head2 character_0
 
+	  ###
+	 #   #
+	#     #
+	#     #
+	#     #
+	 #   #
+	  ###
 
 =head2 character_1
 
+	  #
+	 ##
+	# #
+	  #
+	  #
+	  #
+	#####
 
 =head2 character_2
 
+	 #####
+	#     #
+	      #
+	 #####
+	#
+	#
+	#######
 
 =head2 character_3
 
+	 #####
+	#     #
+	      #
+	 #####
+	      #
+	#     #
+	 #####
 
 =head2 character_4
 
+	#
+	#    #
+	#    #
+	#    #
+	 ######
+	     #
+	     #
 
 =head2 character_5
 
+	#######
+	#
+	#
+	######
+	      #
+	#     #
+	 #####
 
 =head2 character_6
 
+	 #####
+	#     #
+	#
+	######
+	#     #
+	#     #
+	 #####
 
 =head2 character_7
 
-       
+	#######
+	#    #
+	    #
+	   #
+	  #
+	  #
+	  #
+
 =head2 character_8
 
+	 #####
+	#     #
+	#     #
+	 #####
+	#     #
+	#     #
+	 #####
 
 =head2 character_9
 
+	 #####
+	#     #
+	#     #
+	 ######
+	      #
+	#     #
+	 ######
        
 =head1 AUTHOR
 

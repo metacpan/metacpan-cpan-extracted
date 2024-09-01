@@ -1,10 +1,11 @@
 package Map::Tube::Rome::Line::MC;
 
-$Map::Tube::Rome::Line::MC::VERSION   = '1.00';
+$Map::Tube::Rome::Line::MC::VERSION   = '1.01';
 $Map::Tube::Rome::Line::MC::AUTHORITY = 'cpan:GDT';
 
 use 5.010;
-use strict; use warnings;
+use strict;
+use warnings;
 
 =head1 NAME
 
@@ -94,4 +95,4 @@ the same terms as the Perl 5 programming language system itself.
 
 =cut
 
-1; # End of Map::Tube::Rome::Line::MC
+1;    # End of Map::Tube::Rome::Line::MC
