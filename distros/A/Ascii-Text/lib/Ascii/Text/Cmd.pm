@@ -4,15 +4,15 @@ use Rope::Cmd;
 use Types::Standard qw/Str Int Bool Enum/;
 use Ascii::Text;
 
-title 'Ascii::Text command line application';
- 
+title(Ascii::Text->new( font => 'Boomer', align => 'center', color => 'green')->stringify('Ascii Text', 1));
+
 abstract 'script for generating ASCII text in various fonts and styles';
  
 option text => (
         type => Str,
         description => "text to print",
 	option_alias => 't',
-	value => "Ascii Text"
+	value => "Hello World"
 );
 
 option pad => (
@@ -42,13 +42,23 @@ option font => (
 	value => 'Boomer'
 );
 
+option fh => (
+	type => Str,
+	description => 'file to write the ascii text to',
+);
+
 sub callback {
         my ($self) = @_; 
+	my $fh;
+	if ($self->fh) {
+		open $fh, '>', $self->fh or die $!;
+	}
 	my $ascii = Ascii::Text->new(
 		align => $self->align,
 		color => $self->color,
 		pad => $self->pad,
-		font => $self->font
+		font => $self->font,
+		($fh ? (fh => $fh) : ()),
 	);
 	$ascii->($self->text);
 }

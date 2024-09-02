@@ -39,6 +39,13 @@ my %WriteMakefile_args = (
 
   META_MERGE => {
     'meta-spec'    => { version => 2 },
+    prereqs        => {
+      develop      => {
+        requires   => {
+          'Devel::Gladiator' => 0,
+        },
+      },
+    },
     resources      => {
       repository   => {
         type       => 'git',
@@ -49,7 +56,9 @@ my %WriteMakefile_args = (
       x_IRC        => 'irc://irc.perl.org/#redis',
     },
     x_contributors => [
+      '5c30 <10b39ae0@13os.net>',
       'Dan Book <grinnz@grinnz.com>',
+      'Lukas Mai <lukasmai.403@gmail.com>',
       'Mike Magowan <mike@magowan.co.uk>',
       'Sergey Zasenko <d3fin3@gmail.com>',
     ],

@@ -62,45 +62,10 @@ class TestCase::Operator::IsType {
       }
     }
     
-    # Any object
-    {
-      {
-        my $value : object;
-        
-        unless ($value is_type object) {
-          return 0;
-        }
-      }
-      
-      {
-        my $value : Point;
-        
-        if ($value is_type object) {
-          return 0;
-        }
-      }
-      
-      {
-        my $value : Stringable;
-        
-        if ($value is_type object) {
-          return 0;
-        }
-      }
-      
-      {
-        my $value : int;
-        
-        if ($value is_type object) {
-          return 0;
-        }
-      }
-    }
-    
     # Any object array
     {
       {
-        my $value : object[];
+        my $value = new object[0];
         
         unless ($value is_type object[]) {
           return 0;
@@ -108,7 +73,15 @@ class TestCase::Operator::IsType {
       }
       
       {
-        my $value : Point[];
+        my $value = (object)new object[0];
+        
+        unless ($value is_type object[]) {
+          return 0;
+        }
+      }
+      
+      {
+        my $value : object[];
         
         if ($value is_type object[]) {
           return 0;
@@ -116,7 +89,7 @@ class TestCase::Operator::IsType {
       }
       
       {
-        my $value : Point;
+        my $value = Point->new;
         
         if ($value is_type object[]) {
           return 0;
@@ -124,7 +97,7 @@ class TestCase::Operator::IsType {
       }
       
       {
-        my $value : Stringable[];
+        my $value = new Point[0];
         
         if ($value is_type object[]) {
           return 0;
@@ -132,12 +105,21 @@ class TestCase::Operator::IsType {
       }
       
       {
-        my $value : int[];
+        my $value = new Stringable[0];
         
         if ($value is_type object[]) {
           return 0;
         }
       }
+      
+      {
+        my $value = new int[0];
+        
+        if ($value is_type object[]) {
+          return 0;
+        }
+      }
+      
     }
     
     # An object type

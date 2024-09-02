@@ -20,7 +20,7 @@ The mutex native APIs in L<SPVM> are the APIs for mutex.
 
 =head1 Details
 
-These APIs implements read-write locks in Linux/UNIX and L<slim reader/writer (SRW) locks|https://learn.microsoft.com/en-us/windows/win32/sync/slim-reader-writer--srw--locks> in Windows.
+These APIs implements read-write locks in Linux and UNIX and L<slim reader/writer (SRW) locks|https://learn.microsoft.com/en-us/windows/win32/sync/slim-reader-writer--srw--locks> in Windows.
 
 =head1 Native APIs
 
@@ -42,9 +42,9 @@ C<void (*lock)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment"
 
 Locks the mutex I<mutex>.
 
-Calls the L<pthread_rwlock_wrlock|https://linux.die.net/man/3/pthread_rwlock_wrlock> function in Linux/UNIX.
+Calls the L<pthread_rwlock_wrlock|https://linux.die.net/man/3/pthread_rwlock_wrlock> function in Linux and UNIX.
 
-Calls the L<AcquireSRWLockExclusive|https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-acquiresrwlockexclusive> function in Windows.
+Calls L<AcquireSRWLockExclusive|https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-acquiresrwlockexclusive> function in Windows.
 
 =head2 unlock
 
@@ -52,9 +52,9 @@ C<void (*unlock)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environmen
 
 Unlocks the mutex I<mutex>.
 
-Calls the L<pthread_rwlock_unlock|https://linux.die.net/man/3/pthread_rwlock_unlock> function in Linux/UNIX.
+Calls the L<pthread_rwlock_unlock|https://linux.die.net/man/3/pthread_rwlock_unlock> function in Linux and UNIX.
 
-Calls the L<ReleaseSRWLockExclusive|https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-releasesrwlockexclusive> function in Windows.
+Calls L<ReleaseSRWLockExclusive|https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-releasesrwlockexclusive> function in Windows.
 
 =head2 reader_lock
 
@@ -62,9 +62,9 @@ C<void (*reader_lock)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Envir
 
 Locks the mutex I<mutex> for reading.
 
-Calls the L<pthread_rwlock_rdlock|https://linux.die.net/man/3/pthread_rwlock_rdlock> function in Linux/UNIX.
+Calls the L<pthread_rwlock_rdlock|https://linux.die.net/man/3/pthread_rwlock_rdlock> function in Linux and UNIX.
 
-Calls the L<AcquireSRWLockShared|https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-acquiresrwlockshared> function in Windows.
+Calls L<AcquireSRWLockShared|https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-acquiresrwlockshared> function in Windows.
 
 =head2 reader_unlock
 
@@ -72,9 +72,9 @@ C<void (*reader_unlock)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Env
 
 Unlocks the mutex I<mutex> for reading.
 
-Calls the L<pthread_rwlock_unlock|https://linux.die.net/man/3/pthread_rwlock_unlock> function in Linux/UNIX.
+Calls the L<pthread_rwlock_unlock|https://linux.die.net/man/3/pthread_rwlock_unlock> function in Linux and UNIX.
 
-Calls the L<ReleaseSRWLockShared|https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-releasesrwlockshared> function in Windows.
+Calls L<ReleaseSRWLockShared|https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-releasesrwlockshared> function in Windows.
 
 =head1 Native API IDs
 

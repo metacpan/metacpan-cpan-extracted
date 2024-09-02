@@ -24765,6 +24765,299 @@ sub get_view_properties {
 }
 
 #
+# highlight_presentation_regex
+#
+# Highlight all matches of sample in text frame text using specified color.
+# 
+# @param string $name Document name. (required)
+# @param string $regex Regular expression. (required)
+# @param string $color Highlighting color. (required)
+# @param boolean $ignore_case True to search ignoring char case. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'regex' => {
+        data_type => 'string',
+        description => 'Regular expression.',
+        required => '1',
+    },
+    'color' => {
+        data_type => 'string',
+        description => 'Highlighting color.',
+        required => '1',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True to search ignoring char case.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'highlight_presentation_regex' } = { 
+    	summary => 'Highlight all matches of sample in text frame text using specified color.',
+        params => $params,
+        returns => 'DocumentReplaceResult',
+        };
+}
+# @return DocumentReplaceResult
+#
+sub highlight_presentation_regex {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling highlight_presentation_regex");
+    }
+
+    # verify the required parameter 'regex' is set
+    unless (exists $args{'regex'} && defined $args{'regex'} && $args{'regex'}) {
+      croak("Missing the required parameter 'regex' when calling highlight_presentation_regex");
+    }
+
+    # verify the required parameter 'color' is set
+    unless (exists $args{'color'} && defined $args{'color'} && $args{'color'}) {
+      croak("Missing the required parameter 'color' when calling highlight_presentation_regex");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/highlightRegex';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'regex'} && defined $args{'regex'}) {
+        $query_params->{'regex'} = $self->{api_client}->to_query_value($args{'regex'});
+    }
+
+    # query params
+    if (exists $args{'color'} && defined $args{'color'}) {
+        $query_params->{'color'} = $self->{api_client}->to_query_value($args{'color'});
+    }
+
+    # query params
+    if (exists $args{'ignore_case'} && defined $args{'ignore_case'}) {
+        $query_params->{'ignoreCase'} = $self->{api_client}->to_boolean_query_value($args{'ignore_case'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('DocumentReplaceResult', $response);
+    return $_response_object;
+}
+
+#
+# highlight_presentation_text
+#
+# Highlight all matches of sample using specified color.
+# 
+# @param string $name Document name. (required)
+# @param string $text Text sample to highlight. (required)
+# @param string $color Highlighting color. (required)
+# @param boolean $whole_words_only Match only whole words. (optional, default to false)
+# @param boolean $ignore_case True to search ignoring char case. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'text' => {
+        data_type => 'string',
+        description => 'Text sample to highlight.',
+        required => '1',
+    },
+    'color' => {
+        data_type => 'string',
+        description => 'Highlighting color.',
+        required => '1',
+    },
+    'whole_words_only' => {
+        data_type => 'boolean',
+        description => 'Match only whole words.',
+        required => '0',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True to search ignoring char case.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'highlight_presentation_text' } = { 
+    	summary => 'Highlight all matches of sample using specified color.',
+        params => $params,
+        returns => 'DocumentReplaceResult',
+        };
+}
+# @return DocumentReplaceResult
+#
+sub highlight_presentation_text {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling highlight_presentation_text");
+    }
+
+    # verify the required parameter 'text' is set
+    unless (exists $args{'text'} && defined $args{'text'} && $args{'text'}) {
+      croak("Missing the required parameter 'text' when calling highlight_presentation_text");
+    }
+
+    # verify the required parameter 'color' is set
+    unless (exists $args{'color'} && defined $args{'color'} && $args{'color'}) {
+      croak("Missing the required parameter 'color' when calling highlight_presentation_text");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/highlightText';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'text'} && defined $args{'text'}) {
+        $query_params->{'text'} = $self->{api_client}->to_query_value($args{'text'});
+    }
+
+    # query params
+    if (exists $args{'color'} && defined $args{'color'}) {
+        $query_params->{'color'} = $self->{api_client}->to_query_value($args{'color'});
+    }
+
+    # query params
+    if (exists $args{'whole_words_only'} && defined $args{'whole_words_only'}) {
+        $query_params->{'wholeWordsOnly'} = $self->{api_client}->to_boolean_query_value($args{'whole_words_only'});
+    }
+
+    # query params
+    if (exists $args{'ignore_case'} && defined $args{'ignore_case'}) {
+        $query_params->{'ignoreCase'} = $self->{api_client}->to_boolean_query_value($args{'ignore_case'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('DocumentReplaceResult', $response);
+    return $_response_object;
+}
+
+#
 # highlight_shape_regex
 #
 # Highlight all matches of sample in text frame text using specified color.
@@ -24774,7 +25067,6 @@ sub get_view_properties {
 # @param int $shape_index Shape index. (required)
 # @param string $regex Regular expression. (required)
 # @param string $color Highlighting color. (required)
-# @param boolean $whole_words_only Match only whole words. (optional, default to false)
 # @param boolean $ignore_case True to search ignoring char case. (optional, default to false)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -24805,11 +25097,6 @@ sub get_view_properties {
         data_type => 'string',
         description => 'Highlighting color.',
         required => '1',
-    },
-    'whole_words_only' => {
-        data_type => 'boolean',
-        description => 'Match only whole words.',
-        required => '0',
     },
     'ignore_case' => {
         data_type => 'boolean',
@@ -24891,11 +25178,6 @@ sub highlight_shape_regex {
     # query params
     if (exists $args{'color'} && defined $args{'color'}) {
         $query_params->{'color'} = $self->{api_client}->to_query_value($args{'color'});
-    }
-
-    # query params
-    if (exists $args{'whole_words_only'} && defined $args{'whole_words_only'}) {
-        $query_params->{'wholeWordsOnly'} = $self->{api_client}->to_boolean_query_value($args{'whole_words_only'});
     }
 
     # query params
@@ -27574,6 +27856,262 @@ sub replace_image_online {
     }
     if ( exists $args{'image'} && $args{'image'}) {
         push(@$files, $args{'image'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# replace_presentation_regex
+#
+# Replace text with a new value using a regex.
+# 
+# @param string $name Document name. (required)
+# @param string $pattern Text value pattern to be replaced. (required)
+# @param string $new_value Text value to replace with. (required)
+# @param boolean $ignore_case True if character case must be ignored. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'pattern' => {
+        data_type => 'string',
+        description => 'Text value pattern to be replaced.',
+        required => '1',
+    },
+    'new_value' => {
+        data_type => 'string',
+        description => 'Text value to replace with.',
+        required => '1',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True if character case must be ignored.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'replace_presentation_regex' } = { 
+    	summary => 'Replace text with a new value using a regex.',
+        params => $params,
+        returns => 'DocumentReplaceResult',
+        };
+}
+# @return DocumentReplaceResult
+#
+sub replace_presentation_regex {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling replace_presentation_regex");
+    }
+
+    # verify the required parameter 'pattern' is set
+    unless (exists $args{'pattern'} && defined $args{'pattern'} && $args{'pattern'}) {
+      croak("Missing the required parameter 'pattern' when calling replace_presentation_regex");
+    }
+
+    # verify the required parameter 'new_value' is set
+    unless (exists $args{'new_value'} && defined $args{'new_value'} && $args{'new_value'}) {
+      croak("Missing the required parameter 'new_value' when calling replace_presentation_regex");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/replaceRegex';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'pattern'} && defined $args{'pattern'}) {
+        $query_params->{'pattern'} = $self->{api_client}->to_query_value($args{'pattern'});
+    }
+
+    # query params
+    if (exists $args{'new_value'} && defined $args{'new_value'}) {
+        $query_params->{'newValue'} = $self->{api_client}->to_query_value($args{'new_value'});
+    }
+
+    # query params
+    if (exists $args{'ignore_case'} && defined $args{'ignore_case'}) {
+        $query_params->{'ignoreCase'} = $self->{api_client}->to_boolean_query_value($args{'ignore_case'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('DocumentReplaceResult', $response);
+    return $_response_object;
+}
+
+#
+# replace_presentation_regex_online
+#
+# Replace text with a new value using a regex.
+# 
+# @param File $document Document data. (required)
+# @param string $pattern Text regex pattern to be replaced. (required)
+# @param string $new_value Text value to replace with. (required)
+# @param boolean $ignore_case True if character case must be ignored. (optional, default to false)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'pattern' => {
+        data_type => 'string',
+        description => 'Text regex pattern to be replaced.',
+        required => '1',
+    },
+    'new_value' => {
+        data_type => 'string',
+        description => 'Text value to replace with.',
+        required => '1',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True if character case must be ignored.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'replace_presentation_regex_online' } = { 
+    	summary => 'Replace text with a new value using a regex.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub replace_presentation_regex_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling replace_presentation_regex_online");
+    }
+
+    # verify the required parameter 'pattern' is set
+    unless (exists $args{'pattern'} && defined $args{'pattern'} && $args{'pattern'}) {
+      croak("Missing the required parameter 'pattern' when calling replace_presentation_regex_online");
+    }
+
+    # verify the required parameter 'new_value' is set
+    unless (exists $args{'new_value'} && defined $args{'new_value'} && $args{'new_value'}) {
+      croak("Missing the required parameter 'new_value' when calling replace_presentation_regex_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/replaceRegex';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'pattern'} && defined $args{'pattern'}) {
+        $query_params->{'pattern'} = $self->{api_client}->to_query_value($args{'pattern'});
+    }
+
+    # query params
+    if (exists $args{'new_value'} && defined $args{'new_value'}) {
+        $query_params->{'newValue'} = $self->{api_client}->to_query_value($args{'new_value'});
+    }
+
+    # query params
+    if (exists $args{'ignore_case'} && defined $args{'ignore_case'}) {
+        $query_params->{'ignoreCase'} = $self->{api_client}->to_boolean_query_value($args{'ignore_case'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.11
+## Version v1.3.12
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2024/08/11
+## Modified 2024/09/02
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.3.11';
+    our $VERSION = 'v1.3.12';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -772,13 +772,6 @@ if( \$INC{'threads.pm'} && !CORE::exists( \$INC{'forks.pm'} ) )
 CORE::local \$Nice::Try::WANT;
 CORE::local ( \$Nice::Try::EXCEPTION, \$Nice::Try::DIED, \$Nice::Try::CATCH_DIED, \@Nice::Try::RETVAL, \@Nice::Try::VOID );
 CORE::local \$Nice::Try::WANTARRAY = CORE::wantarray;
-CORE::local \$Nice::Try::TRY = CORE::sub
-{
-    \@Nice::Try::LAST_VAL = CORE::do __TRY_OPEN_NL__{ __BLOCK_PLACEHOLDER__ };__TRY__CLOSE_NL__
-    CORE::return( \@Nice::Try::LAST_VAL ) if( !CORE::defined( \$Nice::Try::WANTARRAY ) && CORE::scalar( \@Nice::Try::LAST_VAL ) );
-    CORE::return( \$Nice::Try::VOID[0] = \$Nice::Try::SENTINEL );
-};
-__FINALLY_BLOCK__ CORE::local \$Nice::Try::HAS_CATCH = $has_catch_clause;
 EOT
             if( !$self->{is_tied} && !$self->{dont_want} && !$self->{is_overloaded} )
             {
@@ -815,6 +808,73 @@ if( CORE::defined( \$Nice::Try::WANTARRAY ) && !\$Nice::Try::THREADED && !( !COR
 }
 EOT
             }
+            $try_sub .= <<EOT;
+CORE::local \$Nice::Try::TRY = CORE::sub
+{
+    \@Nice::Try::LAST_VAL = CORE::do __TRY_OPEN_NL__{ __BLOCK_PLACEHOLDER__ };__TRY__CLOSE_NL__
+    CORE::return( \@Nice::Try::LAST_VAL ) if( !CORE::defined( \$Nice::Try::WANTARRAY ) && CORE::scalar( \@Nice::Try::LAST_VAL ) );
+    \$Nice::Try::VOID[0] = \$Nice::Try::SENTINEL;
+    if( CORE::defined( \$Nice::Try::WANT ) && CORE::length( \$Nice::Try::WANT ) )
+    {
+        if( \$Nice::Try::WANT eq 'OBJECT' )
+        {
+            CORE::return( Nice::Try::ObjectContext->new( sub{ \$Nice::Try::VOID[0] } )->callback() );
+        }
+        elsif( \$Nice::Try::WANT eq 'CODE' )
+        {
+            CORE::return( sub{ \$Nice::Try::VOID[0] } );
+        }
+        elsif( \$Nice::Try::WANT eq 'HASH' )
+        {
+            CORE::return( { dummy => \$Nice::Try::VOID[0] } );
+        }
+        elsif( \$Nice::Try::WANT eq 'ARRAY' )
+        {
+            CORE::return( [ \$Nice::Try::VOID[0] ] );
+        }
+        elsif( \$Nice::Try::WANT eq 'REFSCALAR' )
+        {
+            CORE::return( \\\$Nice::Try::VOID[0] );
+        }
+        elsif( \$Nice::Try::WANT eq 'GLOB' )
+        {
+            CORE::return( \*{ \$Nice::Try::VOID[0] } );
+        }
+        elsif( \$Nice::Try::WANT eq 'LIST' )
+        {
+            CORE::return( \$Nice::Try::VOID[0] );
+        }
+        elsif( \$Nice::Try::WANT eq 'BOOLEAN' )
+        {
+            CORE::return( \$Nice::Try::VOID[0] );
+        }
+        elsif( \$Nice::Try::WANT eq 'VOID' )
+        {
+            CORE::return( \$Nice::Try::VOID[0] );
+        }
+        elsif( \$Nice::Try::WANT eq 'SCALAR' )
+        {
+            CORE::return( \$Nice::Try::VOID[0] );
+        }
+    }
+    else
+    {
+        if( \$Nice::Try::WANTARRAY ) 
+        {
+            CORE::return( \$Nice::Try::VOID[0] );
+        }
+        elsif( defined( \$Nice::Try::WANTARRAY ) ) 
+        {
+            CORE::return( \$Nice::Try::VOID[0] );
+        }
+        else 
+        {
+            CORE::return( \$Nice::Try::VOID[0] );
+        }
+    }
+};
+__FINALLY_BLOCK__ CORE::local \$Nice::Try::HAS_CATCH = $has_catch_clause;
+EOT
             $try_sub .= <<EOT;
 {
     CORE::local \$\@;
@@ -1276,6 +1336,8 @@ if( ( CORE::defined( \$Nice::Try::WANTARRAY ) || ( defined( \$Nice::Try::BREAK )
       ( Scalar::Util::blessed( \$Nice::Try::RETVAL[0] ) && !\$Nice::Try::RETVAL[0]->isa( 'Nice::Try::SENTINEL' ) ) 
     ) ) 
 {
+    \$Nice::Try::NEED_TO_RETURN++ if( defined( \$Nice::Try::BREAK ) && \$Nice::Try::BREAK eq 'return' );
+    no warnings 'void';
 EOT
         if( CORE::scalar( CORE::keys( %warnings:: ) ) && 
             CORE::exists( $warnings::Bits{args_array_with_signatures} ) )
@@ -1291,7 +1353,7 @@ EOT
         {
             if( \$Nice::Try::WANT eq 'LIST' )
             {
-                CORE::return( \@Nice::Try::RETVAL );
+                \$Nice::Try::NEED_TO_RETURN ? CORE::return( \@Nice::Try::RETVAL ) : \@Nice::Try::RETVAL;
             }
             elsif( \$Nice::Try::WANT eq 'VOID' )
             {
@@ -1309,51 +1371,52 @@ EOT
                 }
                 elsif( defined( \$Nice::Try::BREAK ) && \$Nice::Try::BREAK eq 'return' )
                 {
-                    CORE::return( \$Nice::Try::RETVAL[0] );
+                    \$Nice::Try::NEED_TO_RETURN ? CORE::return( \$Nice::Try::RETVAL[0] ) : \$Nice::Try::RETVAL[0];
                 }
             }
             elsif( \$Nice::Try::WANT eq 'OBJECT' )
             {
-                CORE::return( \$Nice::Try::RETVAL[0] );
+                \$Nice::Try::NEED_TO_RETURN ? CORE::return( \$Nice::Try::RETVAL[0] ) : \$Nice::Try::RETVAL[0];
             }
             elsif( \$Nice::Try::WANT eq 'REFSCALAR' )
             {
-                CORE::return( \\\$Nice::Try::RETVAL[0] );
+                \$Nice::Try::NEED_TO_RETURN ? CORE::return( \\\$Nice::Try::RETVAL[0] ) : \\\$Nice::Try::RETVAL[0];
             }
             elsif( \$Nice::Try::WANT eq 'SCALAR' )
             {
-                CORE::return( \$Nice::Try::RETVAL[0] );
+                \$Nice::Try::NEED_TO_RETURN ? CORE::return( \$Nice::Try::RETVAL[0] ) : \$Nice::Try::RETVAL[0];
             }
             elsif( \$Nice::Try::WANT eq 'BOOLEAN' )
             {
-                CORE::return( \$Nice::Try::RETVAL[0] );
+                \$Nice::Try::NEED_TO_RETURN ? CORE::return( \$Nice::Try::RETVAL[0] ) : \$Nice::Try::RETVAL[0];
             }
             elsif( \$Nice::Try::WANT eq 'CODE' )
             {
-                CORE::return( \$Nice::Try::RETVAL[0] );
+                \$Nice::Try::NEED_TO_RETURN ? CORE::return( \$Nice::Try::RETVAL[0] ) : \$Nice::Try::RETVAL[0];
             }
             elsif( \$Nice::Try::WANT eq 'HASH' )
             {
-                CORE::return( { \@Nice::Try::RETVAL } );
+                \$Nice::Try::NEED_TO_RETURN ? CORE::return( { \@Nice::Try::RETVAL } ) : { \@Nice::Try::RETVAL };
             }
             elsif( \$Nice::Try::WANT eq 'ARRAY' )
             {
-                CORE::return( \\\@Nice::Try::RETVAL );
+                \$Nice::Try::NEED_TO_RETURN ? CORE::return( \\\@Nice::Try::RETVAL ) : \\\@Nice::Try::RETVAL;
             }
             elsif( \$Nice::Try::WANT eq 'GLOB' )
             {
-                CORE::return( \$Nice::Try::RETVAL[0] );
+                \$Nice::Try::NEED_TO_RETURN ? CORE::return( \$Nice::Try::RETVAL[0] ) : \$Nice::Try::RETVAL[0];
             }
         }
         else
         {
-            CORE::return( \$Nice::Try::WANTARRAY ? \@Nice::Try::RETVAL : \$Nice::Try::RETVAL[0] );
+            \$Nice::Try::NEED_TO_RETURN ? CORE::return( \$Nice::Try::WANTARRAY ? \@Nice::Try::RETVAL : \$Nice::Try::RETVAL[0] ) : \$Nice::Try::WANTARRAY ? \@Nice::Try::RETVAL : \$Nice::Try::RETVAL[0];
         }
     }
 }
 elsif( scalar( \@Nice::Try::VOID ) && ( !Scalar::Util::blessed( \$Nice::Try::VOID[0] ) || ( Scalar::Util::blessed( \$Nice::Try::VOID[0] ) && !\$Nice::Try::VOID[0]->isa( 'Nice::Try::SENTINEL' ) ) ) )
 {
-    CORE::return( scalar( \@Nice::Try::VOID ) > 1 ? \@Nice::Try::VOID : \$Nice::Try::VOID[0] );
+    no warnings 'void';
+    scalar( \@Nice::Try::VOID ) > 1 ? \@Nice::Try::VOID : \$Nice::Try::VOID[0];
 }
 EOT
         $last_return_block =~ s/\n/ /gs unless( $self->{debug_code} );
@@ -1362,7 +1425,7 @@ EOT
         # my $token = PPI::Token->new( "; \{ $try_catch_code \}" ) || die( "Unable to create token" );
         # NOTE: 2021-05-11 (Jacques): Need to remove blocks so that next or last statements can be effective.
         my $envelop = <<EOT;
-; CORE::local( \$Nice::Try::BREAK, \@Nice::Try::LAST_VAL );
+; CORE::local( \$Nice::Try::BREAK, \@Nice::Try::LAST_VAL ); local \$Nice::Try::NEED_TO_RETURN = 0 unless( defined( \$Nice::Try::NEED_TO_RETURN ) );
 \{
 __TRY_CATCH_CODE__
 \}
@@ -2039,7 +2102,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.11
+    v1.3.12
 
 =head1 DESCRIPTION
 

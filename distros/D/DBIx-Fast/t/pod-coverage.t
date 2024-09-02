@@ -1,8 +1,11 @@
 #!perl -T
-use 5.006;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+
+unless ( $ENV{'DBIX_FAST_TEST'} ) {
+    plan skip_all => "DBIx::Fast No test POD";
+}
 
 # Ensure a recent version of Test::Pod::Coverage
 my $min_tpc = 1.08;

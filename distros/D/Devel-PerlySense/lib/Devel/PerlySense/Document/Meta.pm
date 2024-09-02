@@ -14,7 +14,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Document::Meta;
-$Devel::PerlySense::Document::Meta::VERSION = '0.0221';
+$Devel::PerlySense::Document::Meta::VERSION = '0.0223';
 
 
 

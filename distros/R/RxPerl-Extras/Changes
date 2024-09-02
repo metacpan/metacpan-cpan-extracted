@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl-Extras
 
+v0.0.5 2024-09-01T20:52:45Z
+
+    - fixed tests
+
 v0.0.4 2024-08-24T06:53:43Z
 
     - fixed op_exhaust_map_with_latest to not execute its callback until the right time

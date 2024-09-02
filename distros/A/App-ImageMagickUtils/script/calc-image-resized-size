@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-08-29'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Math/Image/CalcResized/calc_image_resized_size",
@@ -38,7 +38,7 @@ calc-image-resized-size - Given size of an image (in WxH, e.g. "2592x1944") and 
 
 =head1 VERSION
 
-This document describes version 0.022 of calc-image-resized-size (from Perl distribution App-ImageMagickUtils), released on 2024-01-15.
+This document describes version 0.023 of calc-image-resized-size (from Perl distribution App-ImageMagickUtils), released on 2024-08-29.
 
 =head1 SYNOPSIS
 
@@ -222,202 +222,182 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
-=head2 Example #1
+=head2 no resizing
 
  % calc-image-resized-size 2592x1944 ''
  2592x1944
 
-=head2 Example #2
+=head2 scale (down) to 20%
 
  % calc-image-resized-size 2592x1944 20%
  518x388
 
-=head2 Example #3
+=head2 scale (down) width to 20% but height to 40%
 
  % calc-image-resized-size 2592x1944 20%x40%
  518x777
 
-=head2 Example #4
+=head2 scale (down) width to 20% but height to 40% (first percent sign is optional)
 
  % calc-image-resized-size 2592x1944 20x40%
  518x777
 
-=head2 Example #5
+=head2 set width to 1024px
 
  % calc-image-resized-size 2592x1944 1024
  1024x768
 
-=head2 Example #6
+=head2 shrink width to 1024px
 
  % calc-image-resized-size 2592x1944 '1024>'
  1024x768
 
-=head2 Example #7
+=head2 shrink width to 10240px (no effect since width is already less than 10240px)
 
  % calc-image-resized-size 2592x1944 '10240>'
  2592x1944
 
-=head2 Example #8
+=head2 enlarge width to 1024px (no effect since width is already greater than 1024px
 
  % calc-image-resized-size 2592x1944 1024^
  2592x1944
 
-=head2 Example #9
+=head2 enlarge width to 10240px
 
  % calc-image-resized-size 2592x1944 10240^
  10240x7680
 
-=head2 Example #10
+=head2 set height to 1024px
 
  % calc-image-resized-size 2592x1944 x1024
  1365x1024
 
-=head2 Example #11
+=head2 shrink height to 768px
 
  % calc-image-resized-size 2592x1944 'x768>'
  1024x768
 
-=head2 Example #12
+=head2 shrink height to 7680px (no effect since height is already less than 7680px)
 
  % calc-image-resized-size 2592x1944 'x7680>'
  2592x1944
 
-=head2 Example #13
+=head2 enlarge height to 768px (no effect since height is already greater than 768px)
 
  % calc-image-resized-size 2592x1944 x768^
  2592x1944
 
-=head2 Example #14
+=head2 enlarge height to 7680px
 
  % calc-image-resized-size 2592x1944 x7680^
  10240x7680
 
-=head2 Example #15
+=head2 fit image inside 20000x10000 (no effect since it already fits)
 
  % calc-image-resized-size 2592x1944 20000x10000
  2592x1944
 
-=head2 Example #16
+=head2 fit image inside 20000x1000 (height is reduced to 1000 to make the image fit)
 
  % calc-image-resized-size 2592x1944 20000x1000
  1333x1000
 
-=head2 Example #17
+=head2 fit image inside 100x200
 
  % calc-image-resized-size 2592x1944 100x200
  100x75
 
-=head2 Example #18
+=head2 fit image inside 100x100
 
  % calc-image-resized-size 2592x1944 100x100
  100x75
 
-=head2 Example #19
+=head2 fit a 10000x5000 area inside image
 
  % calc-image-resized-size 2592x1944 10000x5000^
  10000x7500
 
-=head2 Example #20
+=head2 fit a 5000x10000 area inside image
 
  % calc-image-resized-size 2592x1944 5000x10000^
  13333x10000
 
-=head2 Example #21
+=head2 fit a 100x100 area inside image (no effect since the image can already fit that area)
 
  % calc-image-resized-size 2592x1944 100x100^
  2592x1944
 
-=head2 Example #22
+=head2 set dimension to 100x100
 
  % calc-image-resized-size 2592x1944 100x100!
  100x100
 
-=head2 Example #23
+=head2 shrink image to fit inside 10000x5000px (no effect since image already fits)
 
  % calc-image-resized-size 2592x1944 '10000x5000>'
  2592x1944
 
-=head2 Example #24
-
- % calc-image-resized-size 2592x1944 '5000x10000>'
- 2592x1944
-
-=head2 Example #25
-
- % calc-image-resized-size 2592x1944 '3000x1000>'
- 2592x1944
-
-=head2 Example #26
+=head2 shrink image to fit inside 2000x1000px
 
  % calc-image-resized-size 2592x1944 '2000x1000>'
  1333x1000
 
-=head2 Example #27
+=head2 shrink image to fit inside 100x100px
 
  % calc-image-resized-size 2592x1944 '100x100>'
  100x75
 
-=head2 Example #28
+=head2 enlarge image to fit 10000x5000px inside it
 
  % calc-image-resized-size 2592x1944 '10000x5000<'
  10000x7500
 
-=head2 Example #29
+=head2 enlarge image to fit 5000x10000px inside it
 
  % calc-image-resized-size 2592x1944 '5000x10000<'
  13333x10000
 
-=head2 Example #30
+=head2 enlarge image to fit 3000x1000px inside it (no effect since image already fits)
 
  % calc-image-resized-size 2592x1944 '3000x1000<'
  2592x1944
 
-=head2 Example #31
-
- % calc-image-resized-size 2592x1944 '2000x1000<'
- 2592x1944
-
-=head2 Example #32
-
- % calc-image-resized-size 2592x1944 '100x100<'
- 2592x1944
-
-=head2 Example #33
+=head2 shrink shortest side to 1024px
 
  % calc-image-resized-size 2592x1944 '1024^>'
  1365x1024
 
-=head2 Example #34
+=head2 shrink shortest side to 10240px (no effect since shortest side 1944px is already less than 10240px)
 
  % calc-image-resized-size 2592x1944 '10240^>'
  2592x1944
 
-=head2 Example #35
+=head2 enlarge shortest side to 1024px (no effect since shortest side is already greater than 1024px)
 
  % calc-image-resized-size 2592x1944 '1024^<'
  2592x1944
 
-=head2 Example #36
+=head2 enlarge shortest side to 10240px
 
  % calc-image-resized-size 2592x1944 '10240^<'
  13653x10240
 
-=head2 Example #37
+=head2 shrink longest side to 1024px
 
  % calc-image-resized-size 2592x1944 '^1024>'
  1024x768
 
-=head2 Example #38
+=head2 shrink longest side to 10240px (no effect since longest side 2592px is already less than 10240px)
 
  % calc-image-resized-size 2592x1944 '^10240>'
  2592x1944
 
-=head2 Example #39
+=head2 enlarge longest side to 1024px (no effect since longest side 2592px is already greater than 1024px)
 
  % calc-image-resized-size 2592x1944 '^1024<'
  2592x1944
 
-=head2 Example #40
+=head2 enlarge longest side to 10240px
 
  % calc-image-resized-size 2592x1944 '^10240<'
  10240x7680

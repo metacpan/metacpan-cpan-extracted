@@ -12,7 +12,7 @@ This document describes system setting in the SPVM language.
 
 SPVM opens own standard input, standard output, and standard error for a runtime just after a runtime is build.
 
-Their open modes are set to the L<binary mode|https://learn.microsoft.com/en-us/cpp/c-runtime-library/text-and-binary-mode-file-i-o?view=msvc-170> in Windows.
+Their open modes are set to L<binary mode|https://learn.microsoft.com/en-us/cpp/c-runtime-library/text-and-binary-mode-file-i-o?view=msvc-170> in Windows.
 
 The L<print operator|SPVM::Document::Language::Operators/"print Operator"> outputs to this SPVM's standard output.
 
@@ -38,7 +38,7 @@ When the new thread finished, the new runtime stack must be released.
 
 Currently, user data cannot be got and set in a runtime stack.
 
-If thread-specific user data is needed, the thread ID is got by the L<Thread#get_id|SPVM::Thread#get_id> method and this thread ID can be a key of a L<hash|SPVM::Hash> for thread-specific user data. In this case, the L<Hash|SPVM::Hash> class is not thread safe, a lock using a L<mutex|SPVM::Sync::Mutex> is needed.
+If thread-specific user data is needed, the thread ID is got by L<Thread#get_id|SPVM::Thread#get_id> method and this thread ID can be a key of a L<hash|SPVM::Hash> for thread-specific user data. In this case, L<Hash|SPVM::Hash> class is not thread safe, a lock using a L<mutex|SPVM::Sync::Mutex> is needed.
 
 =head2 Atomic Operations
 
@@ -54,7 +54,7 @@ Coroutine threads such as L<goroutines|SPVM::Go> don't have to worry about thing
 
 Updating the count of allocated memory blocks is an atomic operation and thread safe. It is protected by a mutex. 
 
-The count of all allocated memory blocks in a runtime is managed and is got by the L<get_memory_blocks_count|SPVM::Document::NativeAPI/"get_memory_blocks_count"> native API.
+The count of all allocated memory blocks in a runtime is managed and is got by L<get_memory_blocks_count|SPVM::Document::NativeAPI/"get_memory_blocks_count"> native API.
 
 =head3 Updating Runtime Cache
 

@@ -1,8 +1,13 @@
 #!perl -T
-use 5.006;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+
+eval "use DBD::SQLite 1.74";
+
+unless ( $ENV{'DBIX_FAST_TEST'} ) {
+    plan skip_all => "DBIx::Fast No test POD";
+}
 
 # Ensure a recent version of Test::Pod
 my $min_tp = 1.22;

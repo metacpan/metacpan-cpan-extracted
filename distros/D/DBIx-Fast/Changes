@@ -1,5 +1,16 @@
 Revision history for DBIx-Fast
 
+0.11	01/09/24
+	- SQL::Abstract
+	
+0.10	01/09/24
+	- _make_dsn
+	- _check_dsn
+	- driver && dbd
+	- t/functions.t
+	
+0.09	01/01/20
+	
 0.08	26/01/16
 	- Force UTF8
 	
@@ -21,4 +32,4 @@ Revision history for DBIx-Fast
 0.02	mar mar 17 00:20:48 CET 2015
 	- extra_args -> time NOW()
 
-0.01
+0.01	-

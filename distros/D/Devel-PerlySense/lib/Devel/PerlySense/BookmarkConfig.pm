@@ -20,7 +20,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::BookmarkConfig;
-$Devel::PerlySense::BookmarkConfig::VERSION = '0.0221';
+$Devel::PerlySense::BookmarkConfig::VERSION = '0.0223';
 
 
 use Spiffy -Base;

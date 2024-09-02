@@ -32,6 +32,13 @@ my $finder = Commandable::Finder::Packages->new(
    base => "MyTest::Command",
 );
 
+$finder->add_global_options(
+   { name => "one", into => \my $ONE,
+      description => "the 'one' option" },
+   { name => "two=", into => \my $TWO, default => 444,
+      description => "the 'two' option" },
+);
+
 sub output_from_command
 {
    my ( $cmd ) = @_;
@@ -55,9 +62,17 @@ sub output_from_command
    my $output = output_from_command( "help" );
 
    is( $output, <<'EOF', 'Output from builtin help command' );
-help: Display a list of available commands
-one : the one command
-two : the two command
+COMMANDS:
+  help: Display a list of available commands
+  one : the one command
+  two : the two command
+
+GLOBAL OPTIONS:
+    --one
+      the 'one' option
+
+    --two <value>
+      the 'two' option (default: 444)
 EOF
 }
 

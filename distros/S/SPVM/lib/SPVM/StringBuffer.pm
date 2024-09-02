@@ -31,7 +31,15 @@ The StringBuffer class in L<SPVM> has methods to manipulate string buffers.
 
 The L</"string"> stored in a StringBuffer object always starts at index 0.
 
-The charactors in the range that is greater than or equal to the L</"length"> field and less than the L</"capacity"> field are filled with "\0".
+The charactors in the range that is greater than or equal to L</"length"> field and less than L</"capacity"> field are filled with "\0".
+
+=head1 Interfaces
+
+=over 2
+
+L<Cloneable|SPVM::Cloneable>
+
+=back
 
 =head1 Fields
 
@@ -143,15 +151,21 @@ This buffer is unsafe because it continues to point to the old string if the int
 
 C<method set_length : void ($length : int);>
 
-Sets the L</"length"> fields.
+Sets L</"length"> fields.
 
-If the length $length is greater than the L</"length"> field, the characters of the exceeding part are filled with "\0".
+If the length $length is greater than L</"length"> field, the characters of the exceeding part are filled with "\0".
 
 =head2 set
 
 C<method set : void ($string : string);>
 
 Sets the string $string.
+
+=head2 clone
+
+C<method clone ();>
+
+Clones this string buffer and returns it.
 
 =head1 Copyright & License
 

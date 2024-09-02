@@ -1,0 +1,13 @@
+This module provides Moose type constraints that use Scalar::Type to
+check that parameters are really integers, numbers or Booleans, and not
+just scalars that can behave like those but are really strings.
+
+To install, do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may use, modify and distribute this code under the terms of either the GNU
+General Public Licence, version 2, or the Artistic Licence. The full text of
+these can be found in the files GPL2.txt and ARTISTIC.txt respectively.

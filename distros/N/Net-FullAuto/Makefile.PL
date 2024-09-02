@@ -25,18 +25,18 @@
 #
 ################################################################
 
-our $VERSION='1.0000796';
+our $VERSION='1.0000801';
 
-print `env`,"\n\n\n";
+#print `env`,"\n\n\n";
 
 if ($ENV{'AUTOMATED_TESTING'}) {
 #if (1) {
 
    my $message=<<'END';
 
-      DEAR CPAN TESTERS:
+      DEAR CPAN TESTERS (and all who are interested):
 
-      Net::FullAuto has nearly 200 CPAN module dependencies. 
+      Net::FullAuto has nearly 200 CPAN module dependencies.
 
       One of the major goals of Net::FullAuto is easy and reliable
       installation on all Linux/Unix and Windows/Cygwin hosts.
@@ -52,27 +52,33 @@ if ($ENV{'AUTOMATED_TESTING'}) {
       increasingly using machine images with inconsistent Perl installations.
       Many of the these users are not Perl experts, and would not be able
       to successfully remedy these issues on their own.
- 
+
       Because of the large number of dependencies, and the almost impossible
       task of keeping current with them all under default CPAN configurations
-      and rules, a decision was made to go with continuous integration of
-      updated modules with every Net::FullAuto install.
+      and rules, a decision was made to write what amounts to a custom installer.
 
-      That means this Makefile.PL will update dependant modules, and remove
-      older versions of modules installed in different locations that
+      That Makefile.PL will *NOT* update dependant modules by default, nor
+      remove older versions of modules installed in different locations that
       cause them to load ahead of the desired one.
 
-      Users are warned up front of this behavior, and have a 2 minute window
-      to abort installation.
+      However, users will be prompted to decided how the install should go
+      about meeting this need. They will be asked to allow ALL needed
+      updates (which is RECOMMENDED and states that, but also states the
+      caveat that updated modules "might" break legacy code.
 
-      This author is fully aware of the "local::lib" approach to coping with
-      some of these issues, but local::lib solves the problem only for a
+      Users are warned up front of this behavior, and have a 2 minute window
+      to abort installation before it continues with a default of NOT
+      updating dependent modules if the user fails or declines to make a
+      decisive selection.
+
+      FullAuto is FULLY compatible with the "local::lib" approach to coping
+      with these issues, but local::lib solves the problem only for a
       specific user, and not at the system level.
 
       With the advent of machine images, "whole systems" are now spun up in
       seconds, and just as quickly discarded. Users are going to have less
-      and less patience for software that does not install and work almost as
-      fast and reliably.
+      and less patience for software that does not install and work almost
+      as fast and reliably.
 
       Continuous integration is the trend, and Net::FullAuto is an early
       adopter. However, it has caused problems for CPAN testers, which is
@@ -82,14 +88,14 @@ if ($ENV{'AUTOMATED_TESTING'}) {
       Of course you are welcome and invited to test or use Net::FullAuto at
       any time, - simply comment out the AUTOMATED_TESTING environment
       variable conditional at the top of Makefile.PL and replace it with:
-    
+
          if (1) {
 
       To avoid issues - I suggest testing on a virgin virtual machine.
       Net::FullAuto installs on an Amazon Free Tier micro server without
       issue. Just launch one up, and install cpan with this command:
 
-      sudo yum -y install cpan  (on FreeBSD: 'su' then 'pkg_add -r perl')
+      sudo dnf -y install cpan  (on FreeBSD: 'su' then 'pkg_add -r perl')
                                 (See instructions at line 1529 for openSuSe)
 
       run cpan and at the cpan command prompt type "install Net::FullAuto".
@@ -99,18 +105,33 @@ if ($ENV{'AUTOMATED_TESTING'}) {
       Net::FullAuto will install successfully on any Linux flavor or FreeBSD
       server in Amazon EC2. It will also install with Cygwin on Windows.
 
+      Anyone reviewing the code below will note a great deal of logic to
+      assist the installation of FullAuto in the Amazon EC2 environment.
+      Note that this **DOES NOT** mean this is an "Amazon EC2" only module.
+      Quite the contrary. However, AWS is a great place to evaluate FullAuto
+      for *FREE* with their "Free Tier" offering for new AWS users.
+
+      I am interested in writing the same helper logic for Google, Microsoft
+      Azure, and all other Cloud environments. Let me know if you are
+      interested in, or even better - FUNDING that effort.
+
       I am willing and eager to work with anyone who is curious or
       interested in the Net::FullAuto project.
 
       Thank you,
       Brian Kelly
-      August 19, 2024
+      September 1, 2024
 
       Brian.Kelly@FullAuto.com
 
+      (Note: This message has been updated from 2016. Currently only
+             Amazon Linux has been fully tested as of Sept. 1, 2024. More
+             system compatibilty will be tested and corrected [if needed]
+             in the months ahead.)
+
 END
 
-   print $message; 
+   print $message;
    exit 0;
 
 }
@@ -119,6 +140,15 @@ our $aws;
 our %amazon;
 $ENV{LOADED_MODULES}||='';
 BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
+
+   # September 1, 2024 NOTE:  The Windows installer has NOT been
+   # updated in years and is currently not functioning. There  are plans
+   # to update it "soon". In the meantime, FullAuto does install
+   # in Cygwin (www.cygwin.com) via the cpan commandline installer.
+   # Brian Kelly
+
+   # The code comprising 2/3 of this BEGIN block is used exclusively by
+   # the FullAuto MS Windows Installer. You can download the Windows
 
    # All the code in this BEGIN block is used exclusively by the
    # FullAuto MS Windows Installer. You can download the Windows
@@ -194,6 +224,7 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
       }
       @INC=@TMPINC;
    }
+   ### START OF NON-WINDOWS CODE
    unless (grep { /SKIP|CPAN|figlet/ } @ARGV) {
       eval {
          local $SIG{__DIE__}; # No sigdie handler
@@ -256,12 +287,12 @@ use Config;
 use if (check_for_cpan()),'CPAN';
 unshift @ExtUtils::MakeMaker::Overridable, 'pm_to_blib'; # this enables
         # pm_to_blib to be overwritten in Makefile rather than ignored
-*{MyClass::_using_sudo} = sub { return 1 }; # Override default local::lib
-                                            # Net::FullAuto is currently
-                                            # not compatible with local::lib
-                                            # When CPAN is found in an
-                                            # unconfigured condition,
-                                            # "sudo" instead of local::lib.
+*{MyClass::_using_sudo} = sub { return 1 }; # Override default local::lib.
+                                            # Net::FullAuto does not currently
+         # NOTE: local::lib is now          # default to local::lib when CPAN
+         # supported but the install        # is discovered to be unconfigured.
+         # does not default to local::lib   # "sudo" is auto-configured instead
+                                            # local::lib.
 $ENV{'CYGWIN'}='nodosfilewarning' if $^O eq 'cygwin';
 use lib '.';
 use subs qw/version name sign author license perl_version/;
@@ -640,12 +671,11 @@ unless (grep { /CPAN|SKIP/ } @ARGV) {
             my $run_cpan="echo y | $^X -e \"require CPAN;".
                   'require CPAN::FirstTime;'.
                   '*{CPAN::FirstTime::_using_sudo}'. # Override default local::lib
-                  '= sub { return 1 };'.             # Net::FullAuto is currently
-                                                     # not compatible with
-                                                     # local::lib. When CPAN is
-                                                     # found in an unconfigured 
-                                                     # condition, "sudo" instead
-                                                     # of local::lib is chosen.
+                  '= sub { return 1 };'.             # Net::FullAuto does not currently
+                  # NOTE: local::lib is now          # default to local::lib when CPAN
+                  # supported but the install        # is discovered to be unconfigured.
+                  # does not default to local::lib   # "sudo" is auto-configured instead
+                                                     # local::lib.
                   "CPAN::FirstTime::init(\'$Config{privlib}\');\" 2>&1";
             fa_system($run_cpan);
          }
@@ -717,7 +747,8 @@ if (exists $ENV{PAR_TEMP}) {
       if -e $ENV{PAR_TEMP}.'/inc/inc/Module/Install.pm';
    $PARdir=$ENV{PAR_TEMP};
 }
-unless (exists $ENV{FA_EDITOR} || grep { /Encrypted|SKIP|CPAN/i } @ARGV) {
+unless (exists $ENV{FA_EDITOR} ||
+      grep { /Encrypted|SKIP|CPAN|figlet/i } @ARGV) {
    print $fa_banner;
    sleep 2;
    unless (exists $ENV{PAR_TEMP}) { # || keys %amazon) {
@@ -731,14 +762,14 @@ unless (exists $ENV{FA_EDITOR} || grep { /Encrypted|SKIP|CPAN/i } @ARGV) {
    modules. Some of these older modules might be incompatible with FullAuto.
    There is also the problem of older modules having precedence in @INC
    (meaning the old incompatible module is the only one that loads.) FullAuto
-   does not support a local::lib installation. Please select how you wish
+   DOES NOW support a local::lib installation. Please select how you wish
    the FullAuto install to handle older installed modules. If you don't make
    a selection, FullAuto will default to *NOT* updating older modules:                   
 
 END
       my $timeout=120;
       my $fae="Exit FullAuto Setup";
-      my $fau="Update ALL modules (RECOMMENDED - might break older Perl code)";
+      my $fau="Update ALL modules (*RECOMMENDED* - might break older Perl code)";
       my $fan="Do NOT update modules (FullAuto might not work properly)";
       $ENV{CPAN_OUTDATED_MODULES}='ignore';
       {
@@ -754,7 +785,6 @@ END
                         [ $fae, sub{ return 'exit' } ], 
                         ];
             my $selection=&menu($menu1);
-	    print "SELECTION=$selection<==\n";
             exit 0 if $selection eq ']quit[';
             exit 0 if -1<index $selection, 'exit';
             $ENV{CPAN_OUTDATED_MODULES}=$selection;
@@ -769,34 +799,6 @@ END
    $exec_cnt=$ARGV[$#ARGV];
    $exec_cnt++;
    my $module_fail=$ARGV[$#ARGV-1];
-   #my $mod_info='';
-   #eval {
-   #   local $SIG{__DIE__}; # No sigdie handler;
-   #   require CPAN;
-   #   {
-   #      local *STDOUT;
-   #      open(STDOUT, ">", \$mod_info);
-   #      CPAN::Shell->m($module_fail);
-   #   }
-   #};
-   #my $instfile='';
-   #($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
-   #my $instver='';
-   #($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
-   #$instver='' unless (-1<index $mod_info,'INST_VERSION');
-   #my $cpanfil='';
-   #($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
-   #my $cpanver='';
-   #($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
-   #if ($exec_cnt==1 && ($cpanver ne $instver)) {
-      # Amazon's AMI has Pod::Man installed in the vendor_perl
-      # directory which has precedence over the system directory
-      # this module actually belongs in. The only solution is to
-      # delete it from the vendor_perl area before we attempt to
-      # install Pod::Man. We are doing this ONLY on Amazaon AMI
-      # systems currently.
-#print "DO WE GET TO THIS PROBLEMATIC AREA AT ALL???\n";<STDIN>;
-   #   fa_system("sudo echo y | /bin/rm -rf \"$instfile\"");
    my $version='';my $cpanfil='';
    if ($exec_cnt==1) {
       ($version,$cpanfil)=cpan_modules($module_fail);
@@ -828,6 +830,9 @@ END
             alarm $timeout;
             $mod_info=~s/^.*?(CPAN.*)$/$1/s;
             $mod_info=~s/^\s*/      /mg;
+            $mod_info=~s/^Reading.*?$//m;
+            $mod_info=~s/^\s+Database.*?$//m;
+            $mod_info=~s/^\s*//s;
             my $message=<<END;
 
    FATAL ERROR!: The following Perl CPAN module could not be
@@ -835,7 +840,7 @@ END
 
      $module_fail
 
-$mod_info
+     $mod_info
 
    The FullAuto installation will not succeed without this
    module installed and loaded.
@@ -1728,16 +1733,16 @@ sub look_inside_dir {
          }
       }
       chdir $d;
-      if (($system_type eq 'amazon_linux') ||
-            ($system_type eq 'ubuntu') ||
-            ($system_type eq 'rhel') ||
-            ($system_type eq 'centos')) {
-         print "***** Untar: sudo ",$ENV{CPAN_TAR}," xvf $tar\n";
-         fa_system("sudo ".$ENV{CPAN_TAR}." xvf $tar");
-      } else {
+      #if (($system_type eq 'amazon_linux') ||
+      #      ($system_type eq 'ubuntu') ||
+      #      ($system_type eq 'rhel') ||
+      #      ($system_type eq 'centos')) {
+      #   print "***** Untar: sudo ",$ENV{CPAN_TAR}," xvf $tar\n";
+      #   fa_system("sudo ".$ENV{CPAN_TAR}." xvf $tar");
+      #} else {
          print "***** Untar: ",$ENV{CPAN_TAR}," xvf $tar\n";
          fa_system($ENV{CPAN_TAR}." xvf $tar");
-      }
+	 #}
       chdir $ENV{CPAN_BUILD_DIR}||$CPAN::Config->{build_dir};
       $tar=~s/[.]tar$//;
       return "$d/$tar";
@@ -1789,25 +1794,7 @@ sub fa_install_mod {
          /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
          } @ARGV)) {
       print "\n";
-      #eval {
-      #   local $SIG{__DIE__}; # No sigdie handler;
-      #   require CPAN;
-      #   {
-      #      local *STDOUT;
-      #      open(STDOUT, ">", \$mod_info);
-      #      CPAN::Shell->m($p);
-      #   }
-      #};
-      #my $instver='';my $cpanver='';
-      #if ($mod_info) {
-      #   ($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
-      #   ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
-      #   ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
-      #   ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
-      #}
-      #if (!$version && ($instver<$cpanver)) {
       ($version,$cpanfil)=cpan_modules($p);
-      #}
    } else {
       $cpanfil=$p;
    }
@@ -1867,13 +1854,7 @@ sub fa_install_mod {
          $p='Term::RawInput';
       }
       if (lc($task) eq 'install') {
-         my $sudo='';
-         if (($system_type eq 'amazon_linux') ||
-               ($system_type eq 'ubuntu') ||
-               ($system_type eq 'rhel') ||
-               ($system_type eq 'centos')) {
-            $sudo='sudo ';
-         }
+	 my $sudo='';
          $cpanfil=~s/^.*\/(.*)$/$1/;
          $cpanfil=~s/^(.*)-.*$/$1/;
          $cpanfil=~s/-/::/;  
@@ -2301,7 +2282,7 @@ END
       }
    }
 }
-print "\n";
+#print "\n";
 if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Capture::Tiny','install','Makefile');
    &fa_install_module('Test::LeakTrace','install','Makefile');
@@ -2435,7 +2416,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Mail::Header','install','Makefile');
    &fa_install_module('Mail::Field','install','Makefile');
    &fa_install_module('Test::NoWarnings','install','Makefile');
-   &fa_install_module('Convert::BinHex','install','Makefile');
+   #&fa_install_module('Convert::BinHex','install','Makefile');
    &fa_install_module('MIME::Base64','install','Makefile');
    &fa_install_module('MIME::Entity','install','Makefile');
    &fa_install_module('HTTP::Negotiate','install','Makefile');
@@ -2568,7 +2549,6 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Import::Into','install','Makefile');
    &fa_install_module('Sub::Exporter','install','Makefile');
    &fa_install_module('Sub::Exporter::Util','install','Makefile');
-   &fa_install_module('Sub::Defer','install','Makefile');
    &fa_install_module('Sub::Quote','install','Makefile');
    &fa_install_module('Moo','install','Makefile');
    &fa_install_module('MooX::Types::MooseLike','install','Makefile');
@@ -4736,6 +4716,12 @@ if ($get_BerkeleyDB && $^O ne 'cygwin') {
             $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
             my $pre="/usr/local/BerkeleyDB.$ver";
             $pre=$PREFIX."BerkeleyDB$ver" if $PREFIX;
+            if ($ENV{CPAN_LOCAL_LIB}) {
+               $pre=$ENV{CPAN_LOCAL_LIB}."/BerkeleyDB.$ver";
+	       unless (-e "$ENV{CPAN_LOCAL_LIB}/var") {
+                  fa_system("mkdir -v $ENV{CPAN_LOCAL_LIB}/var");
+               }
+            }
             build_berkeleydb($filename,$uniq,$pre,$PREFIX,'');
          } else {
             download_berkeleydb();
@@ -4897,7 +4883,8 @@ sub download_berkeleydb {
 
    my $source=$last_known_good_location;
    FA::LWP::UserAgent->config;
-   print "Fetching with LWP:\n  $source\n";
+   print "Fetching with LWP:\n  $source\n"
+      unless grep { /BDB/ } @ARGV;
    my $Ua;
    eval {
       local $SIG{__DIE__}; # No sigdie handler;
@@ -5059,7 +5046,7 @@ sub download_berkeleydb {
          }
          my $tar=$ENV{CPAN_TAR}||$CPAN::Config->{tar}||'tar';
          print "***** Untar1: sudo ",$tar," xvf $filename\n";
-         fa_system("sudo ".$tar." xvf $filename");
+         fa_system($tar." xvf $filename");
       } else {
          unless ($already_downloaded) {
             select STDOUT;
@@ -5098,6 +5085,12 @@ sub download_berkeleydb {
    $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
    my $pre="/usr/local/BerkeleyDB.$ver";
    $pre=$PREFIX."BerkeleyDB$ver" if $PREFIX;
+   if ($ENV{CPAN_LOCAL_LIB}) {
+      $pre=$ENV{CPAN_LOCAL_LIB}."/BerkeleyDB.$ver";
+      unless (-e "$ENV{CPAN_LOCAL_LIB}/var") {
+         fa_system("mkdir -v $ENV{CPAN_LOCAL_LIB}/var");
+      }
+   }
    build_berkeleydb($filename,$uniq,$pre,$PREFIX,'');
    unless (exists $ENV{'BERKELEYDB_INCLUDE'} &&
          $ENV{'BERKELEYDB_INCLUDE'}) {
@@ -5158,11 +5151,12 @@ sub build_berkeleydb {
          $CPAN::Config->{make}='/usr/local/bin/make';
       }
    }
-   print "*** Starting Encrypted BerkeleyDB build\n";
+   print "*** Starting BerkeleyDB build\n";
+   my $pfx=" prefix=$pre" if $pre;
    fa_system("(cd ${filename}_$uniq/build_unix;".
-         $CPAN::Config->{make}." install) 2>&1")
+         $CPAN::Config->{make}."$pfx install) 2>&1")
       || warn $!;
-   print "*** Completed Encrypted BerkeleyDB build\n";
+   print "*** Completed BerkeleyDB build\n";
    my $ver=$filename;
    $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
    $berkeleydb=$pre.'/lib';
@@ -5175,6 +5169,7 @@ sub build_berkeleydb {
    $ENV{'DB_FILE_NAME'}="-ldb-$ver";
    $ENV{'LD_LIBRARY_PATH'}=$berkeleydb;
    $ENV{'LD_RUN_PATH'}=$ENV{'LD_LIBRARY_PATH'};
+   print `env`;
 
 }
 
@@ -5695,17 +5690,17 @@ print FH '/* program: fullauto'."\n".
 "#include <stdlib.h>\n\n".
 "int main(int argc, char *argv[])\n".
 '{'."\n".
-"\tsetuid(0);\n".
-"\tseteuid(0);\n".
 "\texecv(REAL_PL, argv);\n".
 '}'."\n";
 
 close FH;
 
 my $timeout=120;my $selection='';
-if (keys %amazon) {
+if ($ENV{CPAN_LOCAL_LIB}) {
+   $selection='Install with 700 Permissions on FullAuto Files Only (Default)'; 
+} elsif (keys %amazon) {
    $selection='Install with 777 Permissions on FullAuto Files Only (Default)';
-} elsif (!exists $ENV{FA_BERKELEY}) {
+} elsif (0 && !exists $ENV{FA_BERKELEY}) {
    {
       local $SIG{__DIE__}; # No sigdie handler
       local $SIG{TERM};
@@ -5717,8 +5712,6 @@ if (keys %amazon) {
          my %perms_menu=();
          unless ($^O eq 'cygwin') {
             @list=("Install with 777 Permissions on FullAuto Files Only (Default)\n\n",
-                   #'Install with Setuid Permissions (Experimental)',
-                   #'Install with Setgid Permissions (Experimental)',
                    'Install with 770 Permissions on FullAuto Files Only (Experimental)'
                   );
             my $banner="\n   *** THIS SCREEN WILL TIMEOUT AND CHOOSE ".
@@ -5736,7 +5729,7 @@ if (keys %amazon) {
                Scroll => 1,
                Banner => $banner,
 
-            ); 
+            );
          } else {
             @list=("Install with 777 Permissions on FullAuto Files Only (Default)\n\n",
                    'Install with 770 Permissions on FullAuto Files Only (Experimental)'
@@ -5758,7 +5751,11 @@ if (keys %amazon) {
 
             );
          }
-         $selection=Term::Menus::Menu(\%perms_menu);
+         if ($ENV{CPAN_LOCAL_LIB}) {
+            $selection = '700 Permissions';
+         } else {
+            $selection=Term::Menus::Menu(\%perms_menu);
+         }
          alarm 0;
       };
       exit if $selection eq ']quit[';
@@ -5773,13 +5770,14 @@ if (keys %amazon) {
    $selection='Install with 770 Permissions on FullAuto Files Only (Experimental)';
 } elsif (-1<index $ENV{FA_BERKELEY},'777 Permssions') {
    $selection='Install with 777 Permissions on FullAuto Files Only (Default)';
+} else {
+   $selection='Install with 777 Permissions on FullAuto Files Only (Default)';
 }
 
 my $permission = '777 Permissions';
-if (-1<index $selection,'Setuid') {
-   $permission = 'Setuid';
-} elsif (-1<index $selection,'Setgid') {
-   $permission = 'Setgid';
+if (-1<index $selection,'700 Permissions') {
+   $permission = '700 Permissions';
+   $cygwin_berkeley_db_mode=700 if $^O eq 'cygwin';
 } elsif (-1<index $selection,'770 Permissions') {
    $permission = '770 Permissions';
    $cygwin_berkeley_db_mode=770 if $^O eq 'cygwin';
@@ -6316,7 +6314,8 @@ END
 WriteAll();
 
 if (keys %amazon) {
-   fa_system('sudo make install');
+	#fa_system('sudo make install');
+   fa_system('make install');
    if (exists $amazon{argv}) {
       my $p=$amazon{argv}->[0];
       my $username=getlogin || getpwuid($<);
@@ -6344,10 +6343,10 @@ sub fa_find_editor {
 }
 
 sub cpan_modules {
+
    my $p=$_[0];
    my $mod_info='';
    my $version='';
-   print "PPPPP=$p and THIS=",$ENV{CPAN_OUTDATED_MODULES},"<==\n";
    eval {
       local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
       alarm 10;
@@ -6359,7 +6358,6 @@ sub cpan_modules {
       alarm 0;
    };
    print "CPAN::Shell BLOCK ERROR=$@\n" if $@;
-   print "MODINFO=$mod_info<==\n";sleep 1;
    my $instfile='';
    ($instfile=$mod_info)=~s/^.*INST_FILE\s+[(]([^)]+).*$/$1/s;
    my $instver='';
@@ -6369,16 +6367,17 @@ sub cpan_modules {
    ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
    my $cpanver='';
    ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
-   print "INSTVER=$instfile<==\n";
+   chomp($mod_info);chomp($mod_info);
+   $mod_info=~s/^Reading.*?$//m;
+   $mod_info=~s/^\s+Database.*?$//m;
+   $mod_info=~s/^\s*//s;
    if ($ENV{CPAN_OUTDATED_MODULES} eq 'update') {
-#print "DO WE GET TO THIS PROBLEMATIC AREA AT ALL???\n";<STDIN>;
       print $mod_info;
       unlink $instfile;
       $version=$cpanver;
       return $version,$cpanfil;
    } elsif ($ENV{CPAN_OUTDATED_MODULES} eq 'choose' &&
          ($instfile ne 'not installed') and ($instver<$cpanver)) {
-      chomp($mod_info);chomp($mod_info);
       my $message=<<'END';
      ___       _      _      _          _   __  __         _      _
     / _ \ _  _| |_ __| |__ _| |_ ___ __| | |  \/  |___  __| |_  _| |___
@@ -6387,9 +6386,9 @@ sub cpan_modules {
 END
       $message.=<<END;
  
-   UPDATE $p ?
+    UPDATE $p ?
 
-   $mod_info 
+    $mod_info 
 END
       my $timeout=120;
       my $fae="Exit FullAuto Setup";
@@ -6398,6 +6397,7 @@ END
       my $fau="Update ALL remaining modules";
       my $fan="Do NOT update all remaining modules";
       $ENV{CPAN_OUTDATED_MODULES}='ignore';
+      my $selection='';
       {
          local $SIG{__DIE__}; # No sigdie handler
          eval {
@@ -6411,7 +6411,7 @@ END
                         [ $fan, sub{ return 'ignore' } ],
                         [ $fae, sub{ return 'exit' } ],
                         ];
-            my $selection=&menu($menu1);
+            $selection=&menu($menu1);
             exit 0 if $selection eq ']quit[';
             exit 0 if -1<index $selection, 'exit';
             $ENV{CPAN_OUTDATED_MODULES}=$selection
@@ -6420,24 +6420,28 @@ END
          }; $selection='ignore' unless $selection;
       } 
       if ($selection eq 'only' || $selection eq 'update') {
+         $ENV{CPAN_OUTDATED_MODULES}='choose'
+            if $selection eq 'only';
+         $ENV{CPAN_OUTDATED_MODULES}='update'
+            if $selection eq 'update';
          unlink $instfile;
          $version=$cpanver;
+      } elsif ($selection eq 'skip') {
+         $ENV{CPAN_OUTDATED_MODULES}='choose';
+         print "   **** NOT UPDATING $p ****\n\n";
       }
-      print "\n\n   FullAuto install continues . . .\n\n";
       return $version,$cpanfil;
-   } else {
-      if ($ENV{CPAN_OUTDATED_MODULES}) {
-	 print "   **** NOT UPDATING $p ****\n\n";
-      }
-      print $mod_info;
-      return $version,$cpanfil;
+   } elsif ($ENV{CPAN_OUTDATED_MODULES} eq 'ignore') {
+      print "   **** NOT UPDATING $p ****\n\n";
    }
+   print "    ",$mod_info;
+   return $version,$cpanfil;
 }
 
 sub install_figlet {
 
    if (($ENV{CPAN_LOCAL_LIB} && !(-f $ENV{CPAN_LOCAL_LIB}."/bin/figlet")) 
-         || !(-e '/usr/local/bin/figlet')) {
+         || (!$ENV{CPAN_LOCAL_LIB} && !(-e '/usr/local/bin/figlet'))) {
       my $cmd="(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;".
               "sed -i 's/, (c)//g' zipio.h;make install)";
       if ($ENV{CPAN_LOCAL_LIB}) {
@@ -6643,7 +6647,7 @@ sub MY::constants {
    $inherited =~
       s/(PERM_R_X = \d+)/$1\nPERM_D-X = 750\nPERM_D_X = 700\nPERM_WRX = 777/m;
    $inherited =~
-      s/(PERM_WRX = \d+)/$1\nPERM_OG_ = 770/m;
+      s/(PERM_WRX = \d+)/$1\nPERM_OG_ = 770\nPERM_DXX = 755/m;
    if ($^O eq 'cygwin') {
       $inherited =~
          s#^INSTALL_BASE.*$#INSTALL_BASE = /usr/lib/perl5#m;
@@ -6690,12 +6694,10 @@ sub MY::install {
    use Config;
    my $inherited = shift->SUPER::install(@_);
 
-   if ($permission eq 'Setuid') {
-      $inherited =~ s/(install ::.*)$/$1 setuid_permissions/m;
-   } elsif ($permission eq 'Setgid') {
-      $inherited =~ s/(install ::.*)$/$1 setgid_permissions/m;
-   } elsif ($permission eq '770 Permissions') {
+   if ($permission eq '770 Permissions') {
       $inherited =~ s/(install ::.*)$/$1 owner_group_permissions/m;
+   } elsif ($permission eq '700 Permissions') {
+      $inherited =~ s/(install ::.*)$/$1 local_lib_permissions/m;
    } else {
       $inherited =~ s/(install ::.*)$/$1 full_access_permissions/m;
    }
@@ -6720,22 +6722,6 @@ sub MY::install {
             "\$(DESTINSTALLSITESCRIPT)\/fa\n"; 
    }
 
-   $inherited .= "\nsetuid_permissions ::\n".
-     "\t\$(NOECHO) \$(ECHO) \"Applying Setuid Permissions\"\n".
-      "\t\$(NOECHO) \$(CHMOD) \$(PERM_S+X) \$(DESTINSTALLSITESCRIPT)\/fullauto\$(EXE_EXT)\n".
-      "\t\$(NOECHO) \$(CHMOD) \$(PERM_R+X) \$(DESTINSTALLSITESCRIPT)\/fullauto.pl\n".
-      "\t\$(NOECHO) \$(CHMOD) \$(PERM_R_X) \$(DESTINSTALLSITELIB)\/Net\/FullAuto.pm\n".
-      "\t\$(NOECHO) \$(CHMOD) \$(PERM_D_X) \$(DESTINSTALLSITELIB)\/Net\/FullAuto\n".
-      "\t\$(NOECHO) \$(CHMOD) \$(PERM_R_X) \$(DESTINSTALLSITELIB)\/Net\/FullAuto\/*\n".
-      $link;
-   $inherited .= "\nsetgid_permissions ::\n".
-      "\t\$(NOECHO) \$(ECHO) \"Applying Setgid Permissions\"\n".
-      "\t\$(NOECHO) \$(CHMOD) \$(PERM_G_X) \$(DESTINSTALLSITESCRIPT)\/fullauto\$(EXE_EXT)\n".
-      "\t\$(NOECHO) \$(CHMOD) \$(PERM_R-X) \$(DESTINSTALLSITESCRIPT)\/fullauto.pl\n".
-      "\t\$(NOECHO) \$(CHMOD) \$(PERM_R-X) \$(DESTINSTALLSITELIB)\/Net\/FullAuto.pm\n".
-      "\t\$(NOECHO) \$(CHMOD) \$(PERM_D-X) \$(DESTINSTALLSITELIB)\/Net\/FullAuto\n".
-      "\t\$(NOECHO) \$(CHMOD) \$(PERM_R-X) \$(DESTINSTALLSITELIB)\/Net\/FullAuto\/*\n".
-      $link;
    $inherited .= "\nowner_group_permissions ::\n".
       "\t\$(NOECHO) \$(ECHO) \"Applying 770 Permissions\"\n".
       "\t\$(NOECHO) \$(CHMOD) \$(PERM_R+X) \$(DESTINSTALLSITESCRIPT)\/fullauto\$(EXE_EXT)\n".
@@ -6753,6 +6739,23 @@ sub MY::install {
       "then \$(CHMOD) \$(PERM_OG_) /var/db/Berkeley; fi\n";
       "\t\$(NOECHO) if [ -d /var/db/Berkeley/FullAuto ];".
       "then \$(CHMOD) \$(PERM_OG_) /var/db/Berkeley/FullAuto; fi\n";
+   $inherited .= "\nlocal_lib_permissions ::\n".
+      "\t\$(NOECHO) \$(ECHO) \"Applying 700 Permissions\"\n".
+      "\t\$(NOECHO) \$(CHMOD) \$(PERM_D_X) \$(DESTINSTALLSITESCRIPT)\/fullauto\$(EXE_EXT)\n".
+      "\t\$(NOECHO) \$(CHMOD) \$(PERM_D_X) \$(DESTINSTALLSITESCRIPT)\/fullauto.pl\n".
+      "\t\$(NOECHO) \$(CHMOD) \$(PERM_D_X) \$(DESTINSTALLSITELIB)\/Net\/FullAuto.pm\n".
+      "\t\$(NOECHO) \$(CHMOD) \$(PERM_D_X) \$(DESTINSTALLSITELIB)\/Net\/FullAuto\n".
+      "\t\$(NOECHO) \$(CHMOD) \$(PERM_D_X) \$(DESTINSTALLSITELIB)\/Net\/FullAuto\/*\n".
+      "\t\$(NOECHO) \$(CHMOD) \$(PERM_D_X) \$(DESTINSTALLSITELIB)\/Net\/FullAuto\/Custom\n".
+      "\t\$(NOECHO) \$(CHMOD) \$(PERM_D_X) \$(DESTINSTALLSITELIB)\/Net\/FullAuto\/Custom\/*\n".
+      $link.
+      "\t\$(NOECHO) \$(CHMOD) \$(PERM_DXX) \$(INSTALL_BASE)/var\n".
+      "\t\$(NOECHO) if [ -d  \$(INSTALL_BASE)/var/db ];".
+      "then \$(CHMOD) \$(PERM_D_X)  \$(INSTALL_BASE)/var/db; fi\n";
+      "\t\$(NOECHO) if [ -d  \$(INSTALL_BASE)/var/db/Berkeley ];".
+      "then \$(CHMOD) \$(PERM_D_X)  \$(INSTALL_BASE)/var/db/Berkeley; fi\n";
+      "\t\$(NOECHO) if [ -d  \$(INSTALL_BASE)/var/db/Berkeley/FullAuto ];".
+      "then \$(CHMOD) \$(PERM_D_X)  \$(INSTALL_BASE)/var/db/Berkeley/FullAuto; fi\n";
    $inherited .= "\t\$(SED) \'s/^[ ]*our[ ]*\\(.\\)".
       "cygwin_berkeley_db_mode[ ]*[=].*/".'our \\1'.
       "cygwin_berkeley_db_mode = \$(PERM_OG_);/g\' ".

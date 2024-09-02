@@ -7,18 +7,27 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
+
+
+
+
+
+
+
+
+
 enum {
-  SPVM_IMPLEMENT_C_STRING_CALL_STACK_ALLOCATION_FAILED,
-  SPVM_IMPLEMENT_C_STRING_VALUE_ASSIGN_NON_ASSIGNABLE_TYPE,
+  SPVM_IMPLEMENT_C_STRING_ASSIGN_NON_ASSIGNABLE_TYPE,
   SPVM_IMPLEMENT_C_STRING_ASSIGN_READ_ONLY_STRING_TO_MUTABLE_TYPE,
   SPVM_IMPLEMENT_C_STRING_DIVIDE_ZERO,
   SPVM_IMPLEMENT_C_STRING_STRING_CONCAT_LEFT_UNDEFINED,
   SPVM_IMPLEMENT_C_STRING_STRING_CONCAT_RIGHT_UNDEFINED,
   SPVM_IMPLEMENT_C_STRING_NEW_OBJECT_FAILED,
   SPVM_IMPLEMENT_C_STRING_NEW_ARRAY_FAILED,
-  SPVM_IMPLEMENT_C_STRING_ARRRAY_LENGTH_SMALL,
+  SPVM_IMPLEMENT_C_STRING_NEW_ARRRAY_LENGTH_SMALL,
   SPVM_IMPLEMENT_C_STRING_NEW_STRING_FAILED,
-  SPVM_IMPLEMENT_C_STRING_STRING_LENGTH_SMALL,
+  SPVM_IMPLEMENT_C_STRING_NEW_STRING_LEN_FAILED,
+  SPVM_IMPLEMENT_C_STRING_NEW_STRING_LEN_LENGTH_SMALL,
   SPVM_IMPLEMENT_C_STRING_ARRAY_UNDEFINED,
   SPVM_IMPLEMENT_C_STRING_ELEMENT_ACCESS_INDEX_OUT_OF_RANGE,
   SPVM_IMPLEMENT_C_STRING_ELEMENT_ASSIGN_NON_ASSIGNABLE_TYPE,
@@ -26,47 +35,52 @@ enum {
   SPVM_IMPLEMENT_C_STRING_UNBOXING_CONVERSION_FROM_UNDEF,
   SPVM_IMPLEMENT_C_STRING_UNBOXING_CONVERSION_NON_CORRESPONDING_NUMERIC_OBJECT_TYPE,
   SPVM_IMPLEMENT_C_STRING_WEAKEN_BACK_REFERENCE_ALLOCATION_FAILED,
-  SPVM_IMPLEMENT_C_STRING_COPY_OPERAND_INVALID,
-  SPVM_IMPLEMENT_C_STRING_WARN_AT,
-  SPVM_IMPLEMENT_C_STRING_WARN_UNDEF,
-  SPVM_IMPLEMENT_C_STRING_CALL_INSTANCE_METHOD_IMPLEMENT_NOT_FOUND,
   SPVM_IMPLEMENT_C_STRING_ERROR_BASIC_TYPE_NOT_FOUND,
   SPVM_IMPLEMENT_C_STRING_ERROR_FIELD_NOT_FOUND,
   SPVM_IMPLEMENT_C_STRING_ERROR_CLASS_VAR_NOT_FOUND,
-  SPVM_IMPLEMENT_C_STRING_ERROR_CLASS_NOT_FOUND,
   SPVM_IMPLEMENT_C_STRING_ERROR_METHOD_NOT_FOUND,
   SPVM_IMPLEMENT_C_STRING_CALL_INSTANCE_METHOD_INVOCANT_UNDEF,
+  SPVM_IMPLEMENT_C_STRING_CALL_INSTANCE_METHOD_IMPLEMENT_NOT_FOUND,
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 static const char* SPVM_IMPLEMENT_STRING_LITERALS[] = {
-  "The memory allocation for the call stack failed.",
-  "The value cannnot be cast to the non-assignable type.",
-  "The read-only string cannnot be cast to the mutable string type.",
-  "Integral type values cannnot be divided by 0.",
-  "The left operand of the \".\" operator must be defined.",
-  "The right operand of the \".\" operator must be defined.",
-  "The object creating failed.",
-  "The array creating failed.",
-  "The length of the array must be greater than or equal to 0.",
-  "The string creating failed.",
-  "The length of the string must be greater than or equal to 0.",
-  "The array must be defined.",
-  "The index of the element access must be greater than or equal to 0 and less than the length of the array.",
-  "The element cannnot be assigned to the non-assignable type.",
-  "The invocant of the field access must be defined.",
-  "The unboxing conversion cannnot be performed on the undefined value.",
-  "The source of the unboxing conversion must be the corresponding numeric object type.",
-  "The memory allocation for the weaken back reference failed.",
-  "The operand of the copy operator must be a string type, a numeric type, or a multi numeric type.",
-  "\n  at %s%s%s line %d\n",
-  "Warning\n  at %s%s%s line %d\n",
-  "The implementation of the \"%s\" method in the \"%s\" interface is not found.",
-  "The %s basic type is not found.",
-  "The %s field is not found.",
-  "The %s class variable in the %s class is not found.",
-  "The %s class is not found.",
-  "The %s method in the %s class is not found.",
-  "The invocant must be defined.",
+  "An assignment failed. The right operand does not satisfy type assignability.",
+  "A read-only string cannnot be cast to mutable string type.",
+  "A value of an integer type cannnot be divided by 0.",
+  "The left operand of . operator must be defined.",
+  "The right operand of . operator must be defined.",
+  "A new operator failed. The memory allocation failed.",
+  "A new operator to create an array failed. The memory allocation failed.",
+  "A new operator to create an array failed. The length must be a non-negative integer.",
+  "A string creation failed. The memory allocation failed.",
+  "The new_string_len operator failed. The memory allocation failed.",
+  "The new_string_len operator failed. The length of the string must be a non-negative integer.",
+  "An array access failed. The array must be defined.",
+  "An array access failed. The index must be a non-negative integer.",
+  "An array setting failed. The element does not satisfy type assignability.",
+  "An array setting failed. The invocant must be defined.",
+  "An unboxing conversion failed. The operand must defined.",
+  "An unboxing conversion failed. The destination type must be a numeric object type corresponding to the source type of the operand.",
+  "The weaken operator failed. The memory allocation for the weaken back reference failed.",
+  "%s basic type is not found.",
+  "%s#%s field is not found.",
+  "%s#%s class variable is not found.",
+  "%s#%s method is not found.",
+  "An instance method call failed. The invocant of the method call for %s#%s method must be defined.",
+  "An instance method call failed. The implementation of %s#%s method is not found.",
 };
 
 enum {
@@ -79,13 +93,13 @@ enum {
   SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP,
 };
 
-static inline void* SPVM_IMPLEMENT_GET_BASIC_TYPE_BY_NAME(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, char* message, int32_t* error_id) {
+static inline void* SPVM_IMPLEMENT_GET_BASIC_TYPE_BY_NAME(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, char* tmp_buffer, int32_t tmp_buffer_length, int32_t* error_id) {
 
   void* basic_type = env->api->runtime->get_basic_type_by_name(env->runtime, basic_type_name);
 
   if (!basic_type) {
-    snprintf(message, 256, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ERROR_BASIC_TYPE_NOT_FOUND], basic_type_name);
-    void* exception = env->new_string_nolen_no_mortal(env, stack, message);
+    snprintf(tmp_buffer, tmp_buffer_length, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ERROR_BASIC_TYPE_NOT_FOUND], basic_type_name);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, tmp_buffer);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -93,13 +107,13 @@ static inline void* SPVM_IMPLEMENT_GET_BASIC_TYPE_BY_NAME(SPVM_ENV* env, SPVM_VA
   return basic_type;
 }
 
-static inline void* SPVM_IMPLEMENT_GET_FIELD_STATIC_BY_NAME(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* field_name, char* message, int32_t* error_id) {
+static inline void* SPVM_IMPLEMENT_GET_FIELD_STATIC_BY_NAME(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* field_name, char* tmp_buffer, int32_t tmp_buffer_length, int32_t* error_id) {
   
   void* field = env->get_field_static(env, stack, basic_type_name, field_name);
   
   if (!field) {
-    snprintf(message, 256, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ERROR_FIELD_NOT_FOUND], field_name);
-    void* exception = env->new_string_nolen_no_mortal(env, stack, message);
+    snprintf(tmp_buffer, tmp_buffer_length, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ERROR_FIELD_NOT_FOUND], basic_type_name, field_name);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, tmp_buffer);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -107,13 +121,13 @@ static inline void* SPVM_IMPLEMENT_GET_FIELD_STATIC_BY_NAME(SPVM_ENV* env, SPVM_
   return field;
 }
 
-static inline int32_t SPVM_IMPLEMENT_GET_FIELD_OFFSET_BY_NAME(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* field_name, char* message, int32_t* error_id) {
+static inline int32_t SPVM_IMPLEMENT_GET_FIELD_OFFSET_BY_NAME(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* field_name, char* tmp_buffer, int32_t tmp_buffer_length, int32_t* error_id) {
   
   void* field = env->get_field_static(env, stack, basic_type_name, field_name);
   
   if (!field) {
-    snprintf(message, 256, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ERROR_FIELD_NOT_FOUND], field_name);
-    void* exception = env->new_string_nolen_no_mortal(env, stack, message);
+    snprintf(tmp_buffer, tmp_buffer_length, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ERROR_FIELD_NOT_FOUND], basic_type_name, field_name);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, tmp_buffer);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
     return -1;
@@ -124,13 +138,13 @@ static inline int32_t SPVM_IMPLEMENT_GET_FIELD_OFFSET_BY_NAME(SPVM_ENV* env, SPV
   return field_offset;
 }
 
-static inline void* SPVM_IMPLEMENT_GET_CLASS_VAR_BY_NAME(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* class_var_name, char* message, int32_t* error_id) {
+static inline void* SPVM_IMPLEMENT_GET_CLASS_VAR_BY_NAME(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* class_var_name, char* tmp_buffer, int32_t tmp_buffer_length, int32_t* error_id) {
 
   void* class_var = env->get_class_var(env, stack, basic_type_name, class_var_name);
   
   if (!class_var) {
-    snprintf(message, 256, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ERROR_CLASS_VAR_NOT_FOUND], class_var_name);
-    void* exception = env->new_string_nolen_no_mortal(env, stack, message);
+    snprintf(tmp_buffer, tmp_buffer_length, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ERROR_CLASS_VAR_NOT_FOUND], basic_type_name, class_var_name);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, tmp_buffer);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -138,13 +152,13 @@ static inline void* SPVM_IMPLEMENT_GET_CLASS_VAR_BY_NAME(SPVM_ENV* env, SPVM_VAL
   return class_var;
 }
 
-static inline void* SPVM_IMPLEMENT_GET_METHOD_BY_NAME(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* method_name, char* message, int32_t* error_id) {
+static inline void* SPVM_IMPLEMENT_GET_METHOD_BY_NAME(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* method_name, char* tmp_buffer, int32_t tmp_buffer_length, int32_t* error_id) {
 
   void* method = env->get_method(env, stack, basic_type_name, method_name);
   
   if (!method) {
-    snprintf(message, 256, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ERROR_METHOD_NOT_FOUND], method_name);
-    void* exception = env->new_string_nolen_no_mortal(env, stack, message);
+    snprintf(tmp_buffer, tmp_buffer_length, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ERROR_METHOD_NOT_FOUND], basic_type_name, method_name);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, tmp_buffer);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -364,7 +378,7 @@ static inline void SPVM_IMPLEMENT_MOVE_OBJECT_WITH_TYPE_CHECK(SPVM_ENV* env, SPV
     env->assign_object(env, stack, out, in);
   }
   else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_VALUE_ASSIGN_NON_ASSIGNABLE_TYPE]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ASSIGN_NON_ASSIGNABLE_TYPE]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -648,7 +662,7 @@ static inline void SPVM_IMPLEMENT_NEW_OBJECT_ARRAY(SPVM_ENV* env, SPVM_VALUE* st
     }
   }
   else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ARRRAY_LENGTH_SMALL]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_ARRRAY_LENGTH_SMALL]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -667,7 +681,7 @@ static inline void SPVM_IMPLEMENT_NEW_MULDIM_ARRAY(SPVM_ENV* env, SPVM_VALUE* st
     }
   }
   else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ARRRAY_LENGTH_SMALL]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_ARRRAY_LENGTH_SMALL]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -686,7 +700,7 @@ static inline void SPVM_IMPLEMENT_NEW_MULNUM_ARRAY(SPVM_ENV* env, SPVM_VALUE* st
     }
   }
   else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ARRRAY_LENGTH_SMALL]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_ARRRAY_LENGTH_SMALL]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -705,7 +719,7 @@ static inline void SPVM_IMPLEMENT_NEW_BYTE_ARRAY(SPVM_ENV* env, SPVM_VALUE* stac
     }
   }
   else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ARRRAY_LENGTH_SMALL]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_ARRRAY_LENGTH_SMALL]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -724,7 +738,7 @@ static inline void SPVM_IMPLEMENT_NEW_SHORT_ARRAY(SPVM_ENV* env, SPVM_VALUE* sta
     }
   }
   else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ARRRAY_LENGTH_SMALL]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_ARRRAY_LENGTH_SMALL]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -743,7 +757,7 @@ static inline void SPVM_IMPLEMENT_NEW_INT_ARRAY(SPVM_ENV* env, SPVM_VALUE* stack
     }
   }
   else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ARRRAY_LENGTH_SMALL]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_ARRRAY_LENGTH_SMALL]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -762,7 +776,7 @@ static inline void SPVM_IMPLEMENT_NEW_LONG_ARRAY(SPVM_ENV* env, SPVM_VALUE* stac
     }
   }
   else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ARRRAY_LENGTH_SMALL]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_ARRRAY_LENGTH_SMALL]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -781,7 +795,7 @@ static inline void SPVM_IMPLEMENT_NEW_FLOAT_ARRAY(SPVM_ENV* env, SPVM_VALUE* sta
     }
   }
   else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ARRRAY_LENGTH_SMALL]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_ARRRAY_LENGTH_SMALL]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -800,7 +814,7 @@ static inline void SPVM_IMPLEMENT_NEW_DOUBLE_ARRAY(SPVM_ENV* env, SPVM_VALUE* st
     }
   }
   else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ARRRAY_LENGTH_SMALL]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_ARRRAY_LENGTH_SMALL]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -823,7 +837,7 @@ static inline void SPVM_IMPLEMENT_NEW_STRING_LEN(SPVM_ENV* env, SPVM_VALUE* stac
   if (length >= 0) {
     void* string = env->new_string_no_mortal(env, stack, NULL, length);
     if (string == NULL) {
-      void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_STRING_FAILED]);
+      void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_STRING_LEN_FAILED]);
       env->set_exception(env, stack, exception);
       *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
     }
@@ -832,7 +846,7 @@ static inline void SPVM_IMPLEMENT_NEW_STRING_LEN(SPVM_ENV* env, SPVM_VALUE* stac
     }
   }
   else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_STRING_LENGTH_SMALL]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_STRING_LEN_LENGTH_SMALL]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -2663,7 +2677,8 @@ static inline void SPVM_IMPLEMENT_CALL_INSTANCE_METHOD(SPVM_ENV* env, SPVM_VALUE
   
   void* method = NULL;
   if (!object) {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_CALL_INSTANCE_METHOD_INVOCANT_UNDEF]);
+    snprintf(tmp_buffer, tmp_buffer_length, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_CALL_INSTANCE_METHOD_INVOCANT_UNDEF], interface_name, method_name);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, tmp_buffer);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -2671,7 +2686,7 @@ static inline void SPVM_IMPLEMENT_CALL_INSTANCE_METHOD(SPVM_ENV* env, SPVM_VALUE
     method = env->get_instance_method(env, stack, object, method_name);
     
     if (!method) {
-      snprintf(tmp_buffer, tmp_buffer_length, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_CALL_INSTANCE_METHOD_IMPLEMENT_NOT_FOUND], method_name, interface_name);
+      snprintf(tmp_buffer, tmp_buffer_length, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_CALL_INSTANCE_METHOD_IMPLEMENT_NOT_FOUND], interface_name, method_name);
       void* exception = env->new_string_nolen_no_mortal(env, stack, tmp_buffer);
       env->set_exception(env, stack, exception);
       *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;

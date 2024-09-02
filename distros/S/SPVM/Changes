@@ -1,3 +1,68 @@
+0.990007 2023-09-02
+  [New Features]
+    * Add StringBuffer#clone method.
+    * Add Fn#is_any_numeric_array method.
+    * Add Fn#array_length method.
+    * Add Fn#get_elem_size method.
+    * Add Fn#get_elem_type_name method.
+    * Add Fn#print_stderr method.
+    * Add Fn#say_stderr method.
+  [Document Fix]
+    * Fix links in docs for Fn class.
+    * Fix the definition of length native API.
+      [Before]
+      int32_t (*length)(SPVM_ENV*, void* array);
+      
+      [After]
+      int32_t (*length)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+      
+      And improve the docs.
+      
+  [Document Changes]
+    * "=head1 Inheritance" is changed to "=head1 Super Class".
+  [Changes]
+    * "=head1 Inheritance" outputted by spvmdist command is changed to "=head1 Super Class".
+    * Add "=head1 See Also" section to the output from spvmdist command.
+    * Improve "Description" outputted from spmvdist command.
+    * Add commented meta-spec "release_status" option to Makefile.PL outputted from spvmdist command.
+    * "the foo type" in docs, exception messages, compilation messages are changed to "foo type".
+    * The type conversion from float constant to double is allowed.
+  [Exception Message Changes]
+    * Improve exception messages outputted from spvmdist command.
+    * The heading of a compilation error message is changed from [Compile Error] to [Compilation Error]
+    * Improve exception messages in operators.
+    * Improve exception messages in the instance method call.
+  [Test Improvement]
+    * Add a test for Fn#split method when a input is an empty string.
+    * Clean up tests for array operations.
+    * Clean up tests for type cast.
+  [Bug Fix]
+    * Fix a bug mention by "Segfault:compile_type_name" https://github.com/yuki-kimoto/SPVM/issues/554.
+    * Fix a bug that wrong static method call cause an segmentation fault.
+    * Fix a bug that the compile error message of 256 or more characters is cut off.
+    * Fix a bug that constant narrowing conversion causes a compilation error in the distribute type is a numeric array type.
+      
+      https://github.com/yuki-kimoto/SPVM/issues/560
+  [Complilation Message Improvement]
+    * Use field notation "MyClass#foo field" in compilation error messages.
+    * Use class variable notation "MyClass#$Foo class variable" in compilation error messages.
+    * Use method notation "MyClass#foo method" in compilation error messages.
+  [Bug Fix with Incompatible Changes]
+    * There are some imcompatible changes in is_type operator to fix the following bug.
+      
+      https://github.com/yuki-kimoto/SPVM/issues/545
+      
+      For this, is_type operator must check runtime type instead of compile-time type if TYPE is an object type including object[].
+      
+      And if TYPE is any object type(object), an compilation error occurs.
+  [Incompatible Changes]
+    * warn operator output a stack trace even if the end of the input string is "\n".
+      Along with this, the same change occurs in warn Native API.
+      
+      The reason of this change is that debugging data with trailing \n does not show a stack trace.
+      
+      We will add Fn#print_stderr and Fn#say_stderr to achieve the original behavior, no stack trace, of warn operator.
+    
 0.990006 2023-05-09
   [Feature Improvement]
     * Users know caller when a class loading from a Perl script failed.

@@ -6,7 +6,13 @@ SYNOPSIS
       use Protocol::Redis::XS;
       my $redis = Protocol::Redis::XS->new(api => 1);
       $redis->parse("+OK\r\n");
-      $redis->get_message;
+      my $message = $redis->get_message;
+
+      # create message
+      print $redis->encode({type => '*', data => [
+        {type => '$', data => 'string'},
+        {type => '+', data => 'OK'},
+      ]});
 
 DESCRIPTION
     This provides a fast parser for the Redis protocol using the code from
@@ -21,10 +27,14 @@ METHODS
     As per Protocol::Redis, API version 1.
 
   parse
+      $redis->parse("*2\r\n$4ping\r\n\r\n");
+
     Parse a chunk of data (calls "on_message" callback if defined and a
     complete message is received).
 
   get_message
+      while (my $message = $redis->get_message) { ... }
+
     Return a message. This is a potentially nested data structure, for
     example as follows:
 
@@ -39,7 +49,17 @@ METHODS
       }
 
   on_message
+      $redis->on_message(sub { my ($redis, $message) = @_; ... });
+
     Set callback for "parse".
+
+  encode
+      my $string = $redis->encode({type => '*', data => [
+        {type => '+', data => 'test'},
+        {type => '$', data => 'test'},
+      ]});
+
+    Encode data into redis message.
 
 THREADS
     This module will work on a threaded perl and will work with threads,

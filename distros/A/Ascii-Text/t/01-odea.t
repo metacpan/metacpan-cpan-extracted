@@ -12,6 +12,10 @@ $text->("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
 
 is($text->font_class, 'Ascii::Text::Font::Block');
 
+my $a = $text->stringify("A");
+
+print $a;
+
 ok(1);
 
 done_testing();

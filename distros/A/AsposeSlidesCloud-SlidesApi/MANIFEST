@@ -143,6 +143,7 @@ lib/AsposeSlidesCloud/Object/OleObjectFrame.pm
 lib/AsposeSlidesCloud/Object/OneValueChartDataPoint.pm
 lib/AsposeSlidesCloud/Object/OneValueSeries.pm
 lib/AsposeSlidesCloud/Object/Operation.pm
+lib/AsposeSlidesCloud/Object/OperationError.pm
 lib/AsposeSlidesCloud/Object/OperationProgress.pm
 lib/AsposeSlidesCloud/Object/OrderedMergeRequest.pm
 lib/AsposeSlidesCloud/Object/OuterShadowEffect.pm

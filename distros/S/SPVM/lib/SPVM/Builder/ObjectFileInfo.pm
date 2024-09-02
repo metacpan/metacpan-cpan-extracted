@@ -73,7 +73,7 @@ Gets and sets the C<file> field, an object file name.
   my $compile_info = $object_file_info->compile_info;
   $object_file_info->compile_info($compile_info);
 
-Gets and sets the C<compile_info> field, a L<SPVM::Builder::CompileInfo> object.
+Gets and sets the C<compile_info> field, an L<SPVM::Builder::CompileInfo> object.
 
 =head1 Class Methods
 
@@ -103,7 +103,7 @@ undef
 
   my $object_file_info = $object_file_info->to_string;
 
-Returns the L</"file"> field.
+Returns L</"file"> field.
 
 =head1 Operators
 
@@ -119,7 +119,7 @@ Always true.
 
   my $object_file_info_name = "$object_file_info";
 
-Alias for the L</"to_string"> method.
+Alias for L</"to_string"> method.
 
 =head1 Copyright & License
 

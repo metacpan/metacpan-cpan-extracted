@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Acme::Glue::VERSION = "2024.07";
+$Acme::Glue::VERSION = "2024.10";
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 =head1 VERSION
 
-2024.07
+2024.10
 
 =head1 DESCRIPTION
 
@@ -242,7 +242,7 @@ Thanks to all who contributed a snippet
 
 L<https://www.formulanon.com/glue>
 
-L<https://www.youtube.com/watch?v=ir6f2SvsXPA&feature=youtu.be&list=PLOOlhkMvt_o4y627mpaCGrO4ughSEeUgb&t=1046>
+L<https://www.youtube.com/watch?v=OXcHLAL_luU>
 
 L<https://leejo.github.io/acme-glue-talk/presentation.html#1>
 

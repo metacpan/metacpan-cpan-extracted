@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Command 0.12;
+package Commandable::Command 0.13;
 
 use v5.26;
 use warnings;
@@ -71,8 +71,8 @@ A CODE reference to the code actually implementing the command.
 
 sub name        { shift->[0] }
 sub description { shift->[1] }
-sub arguments   { @{ shift->[2] } }
-sub options     { %{ shift->[3] } }
+sub arguments   { shift->[2]->@* }
+sub options     { shift->[3]->%* }
 sub package     { shift->[4] }
 sub code        { shift->[5] }
 
@@ -142,8 +142,16 @@ structure:
 
    $name = $optspec->name;
 
-A string giving the name of the option. This is the name it will be given in
-the options hash provided to the command subroutine.
+A string giving the primary human-readable name of the option.
+
+=head2 keyname
+
+   $keyname = $optspec->keyname;
+
+A string giving the name this option will be given in the options hash
+provided to the command subroutine. This is generated from the human-readable
+name, but hyphens are converted to underscores, to make it simpler to use as a
+hash key in Perl code.
 
 =head2 names
 
@@ -194,39 +202,56 @@ C<undef>.
 
 =head2 typespec
 
-   $type = $optspec->typespec;
+I<Since version 0.13> no longer supported.
 
-If defined, gives a type specification that any user-supplied value must
+=head2 matches
+
+   $re = $optspec->matches;
+
+If defined, gives a precompiled regexp that any user-supplied value must
 conform to.
 
-The C<i> type must be a string giving a (possibly-negative) decimal integer.
+A few shortcuts are provided, which are used if the provided name ends in
+C<=i> (for "integer"), C<=u> (for "unsigned integer", i.e. non-negative) or
+C<=f> (for "float").
 
 =cut
+
+my %typespecs = (
+   i => [ "be an integer", qr/^-?\d+$/ ],
+   u => [ "be a non-negative integer", qr/^\d+$/ ],
+   f => [ "be a floating-point number", qr/^-?\d+(?:\.\d+)?$/ ],
+);
 
 sub new ( $class, %args )
 {
    warn "Use of $args{name} in a Commandable command option name; should be " . $args{name} =~ s/:$/=/r
       if $args{name} =~ m/:$/;
-   $args{typespec} = $2 if $args{name} =~ s/([=:])(.+?)$/$1/;
-   if( defined( my $typespec = $args{typespec} ) ) {
-      $typespec eq "i" or
-         die "Unrecognised typespec $typespec";
+
+   if( $args{name} =~ s/([=:])(.+?)$/$1/ ) {
+      # Convert a type abbreviation
+      my $typespec = $typespecs{$2} or
+         die "Unrecognised typespec $2";
+
+      ( $args{match_msg}, $args{matches} ) = @$typespec;
    }
    $args{mode} = "value" if $args{name} =~ s/[=:]$//;
    $args{mode} = "multi_value" if $args{multi};
    my @names = split m/\|/, delete $args{name};
    $args{mode} //= "set";
    $args{negatable} //= 1 if $args{mode} eq "bool";
-   bless [ \@names, @args{qw( description mode default negatable typespec )} ], $class;
+   bless [ \@names, @args{qw( description mode default negatable matches match_msg )} ], $class;
 }
 
 sub name        { shift->[0]->[0] }
-sub names       { @{ shift->[0] } }
+sub keyname     { shift->name =~ s/-/_/gr }
+sub names       { shift->[0]->@* }
 sub description { shift->[1] }
 sub mode        { shift->[2] }
 sub default     { shift->[3] }
 sub negatable   { shift->[4] }
-sub typespec    { shift->[5] }
+sub matches     { shift->[5] }
+sub match_msg   { shift->[6] }
 
 sub mode_expects_value { shift->mode =~ m/value$/ }
 

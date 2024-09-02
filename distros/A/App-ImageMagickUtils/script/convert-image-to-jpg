@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-08-29'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ImageMagickUtils/convert_image_to_jpg",
@@ -41,7 +41,7 @@ convert-image-to-jpg - Convert images to JPG using ImageMagick's 'convert' utili
 
 =head1 VERSION
 
-This document describes version 0.022 of convert-image-to-jpg (from Perl distribution App-ImageMagickUtils), released on 2024-01-15.
+This document describes version 0.023 of convert-image-to-jpg (from Perl distribution App-ImageMagickUtils), released on 2024-08-29.
 
 =head1 SYNOPSIS
 

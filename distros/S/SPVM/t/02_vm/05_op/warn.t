@@ -82,7 +82,8 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
       write_script_file($script_file, $func_call);
       system("$^X -Mblib $script_file 2> $output_file");
       my $output = slurp_binmode($output_file);
-      is($output, "\x0A");
+      like($output, qr/\x0A/);
+      like($output, qr|^  TestCase::Operator::Warn->test_warn_newline at .*TestCase/Operator/Warn.spvm line \d+|m);
     }
     
     # test_warn_long_lines
@@ -91,7 +92,8 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
       write_script_file($script_file, $func_call);
       system("$^X -Mblib $script_file 2> $output_file");
       my $output = slurp_binmode($output_file);
-      is($output, "AAAAAAAAAAAAA\x0ABBBBBBBBBBBBBBBBBBB\x0ACCCCCCCCCCCCCCCCCCCCCCCCCCC\x0ADDDDDDDDDDDDDDDDDDDDDDDDD\x0AEEEEEEEEEEEEEEEEEEEEEE\x0AFFFFFFFFFFFFFF\x0A");
+      like($output, qr|AAAAAAAAAAAAA\x0ABBBBBBBBBBBBBBBBBBB\x0ACCCCCCCCCCCCCCCCCCCCCCCCCCC\x0ADDDDDDDDDDDDDDDDDDDDDDDDD\x0AEEEEEEEEEEEEEEEEEEEEEE\x0AFFFFFFFFFFFFFF\x0A|);
+      like($output, qr|^  TestCase::Operator::Warn->test_warn_long_lines at .*TestCase/Operator/Warn.spvm line \d+|m);
     }
 
     # test_warn_empty
@@ -129,6 +131,43 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
       my $output = slurp_binmode($output_file);
       like($output, qr|^Int\(0x[0-9a-fA-F]+\)\n  TestCase::Operator::Warn->test_warn_object_type at .*TestCase/Operator/Warn.spvm line 39|);
     }
+    
+    # test_Fn_print_stderr
+    {
+      my $func_call = 'SPVM::TestCase::Operator::Warn->test_Fn_print_stderr';
+      write_script_file($script_file, $func_call);
+      system("$^X -Mblib $script_file 2> $output_file");
+      my $output = slurp_binmode($output_file);
+      is($output, 'Hello');
+    }
+    
+    # test_Fn_print_stderr_undef
+    {
+      my $func_call = 'SPVM::TestCase::Operator::Warn->test_Fn_print_stderr_undef';
+      write_script_file($script_file, $func_call);
+      system("$^X -Mblib $script_file 2> $output_file");
+      my $output = slurp_binmode($output_file);
+      is($output, '');
+    }
+    
+    # test_Fn_say_stderr
+    {
+      my $func_call = 'SPVM::TestCase::Operator::Warn->test_Fn_say_stderr';
+      write_script_file($script_file, $func_call);
+      system("$^X -Mblib $script_file 2> $output_file");
+      my $output = slurp_binmode($output_file);
+      is($output, "Hello\x{0A}");
+    }
+    
+    # test_Fn_say_stderr_undef
+    {
+      my $func_call = 'SPVM::TestCase::Operator::Warn->test_Fn_say_stderr_undef';
+      write_script_file($script_file, $func_call);
+      system("$^X -Mblib $script_file 2> $output_file");
+      my $output = slurp_binmode($output_file);
+      is($output, "\x{0A}");
+    }
+    
   }
 }
 

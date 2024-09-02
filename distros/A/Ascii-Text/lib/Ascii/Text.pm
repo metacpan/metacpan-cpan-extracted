@@ -4,13 +4,13 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 use Rope;
 use Rope::Autoload;
 use Term::Size::ReadKey;
 use Module::Load;
-use Types::Standard qw/Int Str Enum HashRef/;
+use Types::Standard qw/Int Str Enum HashRef FileHandle/;
 
 use overload "&{}" => sub {
 	my $self = shift; 
@@ -77,14 +77,29 @@ property color_map => (
 	} }
 );
 
+property fh => (
+	initable => 1,
+	writeable => 1,
+	builder => sub {
+		return *STDOUT;
+	}
+);
+
 function font_class => sub {
 	my $class = sprintf "Ascii::Text::Font::%s", $_[0]->font;
 	load $class;
 	return $class;
 };
 
+function stringify => sub {
+	my ($self, $text, $wrap) = @_;
+	my $stringify = [];
+	$self->render($text, $stringify);
+	return join "", grep { $wrap ? $_ !~ m/^\s+$/ : $_ } @{$stringify};
+};
+
 function render => sub {
-	my ($self, $text) = @_;
+	my ($self, $text, $stringify) = @_;
 	my $class = $self->font_class->new;
 	my @words = split /\s+/, $text;
 	my %character_map;
@@ -109,7 +124,7 @@ function render => sub {
 
 			my $next = $characters[$i + 1];
 			if ($next && $width < scalar @{$character_map{$next}->[0]}) {
-				$self->print_line(\@line);
+				$self->print_line(\@line, $stringify);
 				($width, @line) = $self->new_line();
 			}
 		}
@@ -126,11 +141,16 @@ function render => sub {
 				next;
 			}
 		}
-		$self->print_line(\@line);
+		$self->print_line(\@line, $stringify);
 		($width, @line) = $self->new_line();
 	}
 	if ($self->color && $self->color_map->{$self->color}) {
-		print "\e[0m";
+		if ($stringify) {
+			push @{$stringify}, "\e[0m";
+		} else {
+			my $fh = $self->fh;
+			print $fh "\e[0m";
+		}
 	}
 };
 
@@ -139,21 +159,32 @@ function new_line => sub {
 };
 
 function print_line => sub {
-	my ($self, $line) = @_;
+	my ($self, $line, $stringify) = @_;
 	my $line_width = @{$line->[0]};
 	my $pad = $self->align eq 'center' 
 		? ($self->max_width - $line_width) / 2
 		: $self->align eq 'right'
 		? $self->max_width - $line_width
 		: $self->pad;
-	$pad = $pad ? " " x $pad : ""; 
+	$pad = $pad && $pad > 0 ? " " x $pad : ""; 
+	my $fh = $self->fh;
 	for (@{$line}) {
+		next unless scalar @{$_};
 		if ($self->color && $self->color_map->{$self->color}) {
-			print $self->color_map->{$self->color};
+			if ($stringify) {
+				push @{$stringify}, $self->color_map->{$self->color};
+			} else {
+				print $fh $self->color_map->{$self->color};
+			}
 		}
-		print $pad;
-		print join "", @{$_};
-		print "\n";
+		my $l = $pad;
+		$l .= join "", @{$_};
+		$l .= "\n";
+		if ($stringify) {
+			push @{$stringify}, $l;
+		} else {
+			print $fh $l;
+		}
 	}
 };
 
@@ -167,15 +198,11 @@ Ascii::Text - module for generating ASCII text in various fonts and styles
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
 =head1 SYNOPSIS
-
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
 
 	use Ascii::Text;
 
@@ -206,9 +233,25 @@ Instantiate a new Ascii::Text object.
 
 =head2 render
 
-Print to the terminal the passed string as ascii text.
+Render the passed string as ascii text. By default this will print to the terminal.
 
 	$ascii->render("Hello World");
+
+...
+
+You can capture lines of text instead by passing an array reference as the second argument.
+
+	my $lines = [];
+	$ascii->render("Hello World", $lines);
+	print join "", @{$lines};
+
+=head2 stringify
+
+Stringify the ascii text. Optionally you can pass an additional true value which will wrap the ascii text removing trailing empty lines which maybe unused based on the character set.
+
+	$ascii->stringify("Hello World");
+
+	$ascii->stringify("Hello World", 1);
 
 =cut
 
@@ -252,6 +295,14 @@ Override the default ANSI color map.
 		red => "\e[31m",
 		...
 	});
+
+=head2 fh
+
+A filehandle to print the ascii text.
+
+	open my $fh, '>', 'test.txt';
+	$ascii->fh($fh);
+	$ascii->("Hello World");
 
 =head1 AUTHOR
 

@@ -3,11 +3,13 @@
 #
 #  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes::Attrs 0.12;
+package Commandable::Finder::SubAttributes::Attrs 0.13;
 
 use v5.26;
 use warnings;
-use experimental qw( signatures );
+# We can't use 'signatures' feature here because the order of attributes vs.
+# signature changed in perl 5.28. The syntax we want to use only works on 5.28
+# onwards but it would be nice to still support 5.26 for a while longer.
 
 use Carp;
 use meta 0.003_003;
@@ -26,22 +28,25 @@ using L<Commandable::Finder::SubAttributes>. It should not be used directly.
 
 =cut
 
-sub import_into ( $pkg, $caller )
+sub import_into
 {
+   my ( $pkg, $caller ) = @_;
    # Importing these lexically is a bit of a mess.
    my $callermeta = meta::package->get( $caller );
 
    $callermeta->add_symbol( '&MODIFY_CODE_ATTRIBUTES' => \&MODIFY_CODE_ATTRIBUTES );
-   push @{ $callermeta->get_or_add_symbol( '@ISA' )->reference }, __PACKAGE__;
+   push $callermeta->get_or_add_symbol( '@ISA' )->reference->@*, __PACKAGE__;
 }
 
-sub Command_description :ATTR(CODE) ( $class, $text )
+sub Command_description :ATTR(CODE)
 {
+   my ( $class, $text ) = @_;
    return $text;
 }
 
-sub Command_arg :ATTR(CODE,MULTI) ( $class, $args, $name, $description )
+sub Command_arg :ATTR(CODE,MULTI)
 {
+   my ( $class, $args, $name, $description ) = @_;
    my $optional = $name =~ s/\?$//;
    my $slurpy   = $name =~ s/\.\.\.$//;
 
@@ -58,8 +63,9 @@ sub Command_arg :ATTR(CODE,MULTI) ( $class, $args, $name, $description )
    return $args;
 }
 
-sub Command_opt :ATTR(CODE,MULTI) ( $class, $opts, $name, $description = undef, $default = undef )
+sub Command_opt :ATTR(CODE,MULTI)
 {
+   my ( $class, $opts, $name, $description, $default ) = @_;
    my $mode = "set";
    $mode = "value" if $name =~ s/=$//;
    $mode = "inc"   if $name =~ s/\+$//;

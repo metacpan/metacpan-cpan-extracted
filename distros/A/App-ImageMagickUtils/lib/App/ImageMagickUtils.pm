@@ -8,9 +8,9 @@ use Log::ger;
 use Perinci::Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-08-29'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 our %SPEC;
 
@@ -518,7 +518,7 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.022 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2024-01-15.
+This document describes version 0.023 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2024-08-29.
 
 =head1 DESCRIPTION
 

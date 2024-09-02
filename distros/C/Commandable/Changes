@@ -1,5 +1,17 @@
 Revision history for Commandable
 
+0.13    2024-09-01
+        [CHANGES]
+         * Added `->add_global_options` method to support global options
+         * Support `=u` (unsigned) and `=f` (float) option types as well as
+           arbitrary regexp match validation
+
+        [BUGFIXES]
+         * Ensure that hyphens are converted to underscores when setting
+           default values for options
+         * Ensure that mode=bool options always have a defined value, even if
+           false
+
 0.12    2024-08-21
         [CHANGES]
          * Moved `->parse_invocation` out of Command into Finder

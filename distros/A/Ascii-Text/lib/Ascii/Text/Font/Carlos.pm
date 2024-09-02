@@ -869,7 +869,7 @@ Ascii::Text::Font::Carlos - Carlos font
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

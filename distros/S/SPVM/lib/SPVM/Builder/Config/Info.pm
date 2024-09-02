@@ -219,7 +219,7 @@ The SPVM::Builder::Config::Info class has methods to manipulate config informati
 
   my $config_info = SPVM::Builder::Config::Info->new(%options);
 
-Creates a L<SPVM::Builder::Config::Info> object given the class name $class_name and returns it.
+Creates an L<SPVM::Builder::Config::Info> object given the class name $class_name and returns it.
 
 The class specified by $class_name and classes loaded by the class are compiled and the runtime is generated.
 
@@ -251,7 +251,7 @@ Returns the all class and interface names except for anon classes and classes ge
 
   my $has_config_file = $config_info->has_config_file($class_name);
   
-If the class given by the class name has a config file, returns 1. Otherwise, returns 0.
+If the class given by the class name has a config file, returns 1, otherwise returns 0.
 
 Exceptions:
 
@@ -261,7 +261,7 @@ The class name $class_name must be defined. Otherwise, an exception is thrown.
 
   my $is_resource_loader = $config_info->is_resource_loader($class_name);
   
-If the class given by the class name $class_name is a class that load resources, returns 1. Otherwise, returns 0.
+If the class given by the class name $class_name is a class that load resources, returns 1, otherwise returns 0.
 
 Exceptions:
 
@@ -287,17 +287,17 @@ Returns the content of the config for the class given by the class name $class_n
 
 Exceptions:
 
-Exceptions thrown by the L</"get_config_file"> method could be thrown.
+Exceptions thrown by L</"get_config_file"> method could be thrown.
 
 =head2 get_config
 
   my $config = $config_info->get_config($class_name);
 
-Returns the L<config|SPVM::Builder::Config> for the class given by the class name $class_name.
+Returns a L<config|SPVM::Builder::Config> object for the class given by the class name $class_name.
 
 Exceptions:
 
-Exceptions thrown by the L</"get_config_file"> method could be thrown.
+Exceptions thrown by L</"get_config_file"> method could be thrown.
 
 =head1 Copyright & License
 

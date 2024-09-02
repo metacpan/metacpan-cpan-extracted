@@ -314,7 +314,7 @@ sub generate_perl_class_file {
   my $description;
   my $main_doc;
   if ($interface) {
-    $description = "The $class_name interface in L<SPVM> has interface methods to do someting.";
+    $description = "$class_name interface in L<SPVM> has interface methods to do someting.";
     $main_doc  = <<"EOS";
 =head1 Usage
 
@@ -331,7 +331,7 @@ sub generate_perl_class_file {
 EOS
   }
   elsif ($resource) {
-    $description = "The $class_name resource in L<SPVM> is a L<resouce|SPVM::Document::Resource> to do someting.";
+    $description = "$class_name in L<SPVM> is a L<resource|SPVM::Document::Resource> for something.";
     
     my $native = $self->native;
     my $new_method;
@@ -454,7 +454,7 @@ MyClass.$native_module_ext:
 EOS
   }
   else {
-    $description = "The $class_name class in L<SPVM> has methods to do someting.";
+    $description = "$class_name class in L<SPVM> has methods to do someting.";
     $main_doc  = <<"EOS";
 =head1 Usage
 
@@ -464,7 +464,7 @@ EOS
 
 
 
-=head1 Inheritance
+=head1 Super Class
 
 
 
@@ -485,6 +485,10 @@ EOS
 
 
 =head1 Instance Methods
+
+
+
+=head1 See Also
 
 
 
@@ -846,7 +850,10 @@ WriteMakefile(
   test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
   clean => {FILES => ['.spvm_build', 't/.spvm_build']},
   META_MERGE => {
-    'meta-spec' => { version => 2 },
+    'meta-spec' => {
+      version => 2,
+      # release_status => 'stable', # stable, testing, or unstable
+    },
     resources => {
       repository => {
         type => 'git',
@@ -1117,11 +1124,11 @@ sub generate_dist {
   my $class_name = $self->class_name;
   
   unless (length $class_name) {
-    confess("The class name must be specified");
+    confess("A class name must be specified");
   }
   
   if ($class_name =~ /-/) {
-    confess("The class name cannnot contain \"-\"");
+    confess("The class name \"$class_name\" cannnot contain \"-\"");
   }
   
   my $native = $self->native;
@@ -1129,7 +1136,7 @@ sub generate_dist {
   my $resource = $self->resource;
   
   if ($interface && $resource) {
-    die "The --interface option and the --resource option cannot be specified at the same time"
+    die "--interface option and --resource option cannot be specified at the same time"
   }
   
   my $class_name_rel_file = $class_name;
@@ -1184,7 +1191,7 @@ sub generate_dist {
     # Generate Makefile.PL file
     $self->generate_makefile_pl_file;
     
-    # Generate t/basic.t file
+    # Generate basic test file
     $self->generate_basic_test_file;
 
     # Generate basic test SPVM class file
@@ -1221,7 +1228,7 @@ SPVM::Dist - Generating SPVM Distrubution
 
 =head2 Description
 
-The SPVM::Dist class has methods to generate an SPVM Distrubution.
+SPVM::Dist class has methods to generate an SPVM Distrubution.
 
 =head2 Usage
 

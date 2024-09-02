@@ -187,6 +187,17 @@ my $seed = time();
     
     ok(SPVM::TestCase::Module::Fn->get_compile_type_name);
     
+    ok(SPVM::TestCase::Module::Fn->is_any_numeric_array);
+    
+    ok(SPVM::TestCase::Module::Fn->array_length);
+    
+    ok(SPVM::TestCase::Module::Fn->get_elem_size);
+    
+    ok(SPVM::TestCase::Module::Fn->get_elem_type_name);
+    
+    # Tests for Fn#print_stderr is at t/05_op/warn.t
+    
+    # Tests for Fn#say_stderr is at t/05_op/warn.t
   }
   
   # Extra

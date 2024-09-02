@@ -126,12 +126,12 @@ int32_t SPVM_VM_call_method(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_METHO
     
     call_stack = SPVM_API_new_memory_block(env, stack, total_vars_size + 1);
     if (call_stack == NULL) {
-      void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_CALL_STACK_ALLOCATION_FAILED]);
+      void* exception = env->new_string_nolen_no_mortal(env, stack, "A creation of a method call stack failed. The memory allocation failed.");
       env->set_exception(env, stack, exception);
       error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
       return error_id;
     }
-
+    
     int32_t call_stack_offset = 0;
     
     // Double variables
@@ -177,9 +177,7 @@ int32_t SPVM_VM_call_method(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_METHO
   int32_t object_ref_count_offset = env->api->runtime->get_object_ref_count_offset(env->runtime);
   int32_t object_length_offset = env->api->runtime->get_object_length_offset(env->runtime);
   
-  // Buffer for string convertion
-  // double need 17 digit
-  // int64_t need 21 gidit (-9223372036854775808 + (null character))
+  // Temporary buffer for string-to-numeric convertion and exception messages
   char tmp_buffer[256];
   
   int32_t native_scope_id = env->enter_scope(env, stack);

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::Packages 0.12;
+package Commandable::Finder::Packages 0.13;
 
 use v5.26;
 use warnings;
@@ -248,7 +248,7 @@ sub _commands ( $self )
 
 sub find_commands ( $self )
 {
-   return values %{ $self->_commands };
+   return values $self->_commands->%*;
 }
 
 sub find_command ( $self, $cmd )

@@ -11,10 +11,31 @@
 
 (load "cl-seq")  ;; find-if
 
-(require 'pc-select)  ;; next-line-nomark
 (require 'gud)        ;; perldb
 (require 'grep)       ;; grep-find (or rather grep-host-defaults-alist)
 (require 'thingatpt)  ;; thing-at-point, etc.
+
+
+
+(defun ps/next-line-nomark (&optional arg)
+  "Deactivate mark; move cursor vertically down ARG lines.
+If there is no character in the target line exactly under the current column,
+the cursor is positioned after the character in that line which spans this
+column, or at the end of the line if it is not long enough.
+If there is no line in the buffer after this one, behavior depends on the
+value of `next-line-add-newlines'.  If non-nil, it inserts a newline character
+to create a line, and moves the cursor to that line.  Otherwise it moves the
+cursor to the end of the buffer (if already at the end of the buffer, an error
+is signaled).
+
+The command \\[set-goal-column] can be used to create
+a semipermanent goal column to which this command always moves.
+Then it does not try to move vertically.  This goal column is stored
+in `goal-column', which is nil when there is none."
+  (interactive "p")
+  (setq mark-active nil)
+  (next-line arg)
+  (setq this-command 'next-line))
 
 
 
@@ -139,7 +160,7 @@ region is active"
 
 ;; Regex Tool
 (load "regex-tool" nil t)
-(load "dropdown-list" nil t)
+;; Disabled: doesn't work in Emacs 29: (load "dropdown-list" nil t)
 
 
 ;; lang-refactor-perl
@@ -392,6 +413,90 @@ See the POD docs for how to enable flymake."
 
 
 
+(defun ps/fontify-pod-buffer (buffer-name)
+  "Mark up a buffer with text from pod2text."
+  (interactive)
+  (save-excursion
+    (set-buffer buffer-name)
+    (goto-char (point-min))
+    (while (search-forward-regexp "
+ \\{4,\\}" nil t)
+      (let* ((point-start (point)))
+        (search-forward-regexp "
+")
+        (backward-char)
+        (put-text-property point-start (point) 'face '(:foreground "Gray50"))   ;;TODO: Move to config variable
+        )
+      )
+    )
+  )
+
+
+
+(defun ps/display-text-in-buffer (type name text)
+  (let ((buffer-name (format "*%s %s*" type name)))
+    (with-current-buffer (get-buffer-create buffer-name)
+      (erase-buffer)
+      (insert text)
+      (goto-char 1)
+      (ps/fontify-pod-buffer buffer-name)
+      (display-buffer (current-buffer))
+      )
+    )
+  )
+
+
+
+(defun ps/parse-sexp (result)
+;;  (message "RESPONSE AS TEXT |%s|" result)
+  ;; TODO: check for "Error: " and display the error message
+  (if (string= result "")
+      '()
+    (let ((response-alist (eval (car (read-from-string result)))))
+      response-alist
+      )
+    )
+  )
+
+
+
+;;;(ps/parse-result-into-alist "'((\"class-overview\" . \"Hej baberiba [ Class::Accessor ]\") (\"class_name\" . \"Class::Accessor\") (\"message\" . \"Whatever\"))")
+;;(ps/parse-result-into-alist "'((\"class_name\" . \"alpha\"))")
+
+
+
+(defun ps/shell-command-to-string (command args-string)
+  "Run command with args-string and return the response"
+
+  (let* ((response
+          (if (and ps/use-prepare-shell-command (string= command "perly_sense"))
+              (scp/shell-command-to-string
+               default-directory
+               (concat command " --stdin ") args-string)
+            (shell-command-to-string (concat command " " args-string))
+            )))
+;;    (message "Called (%s), got (%s)" command response)
+    response
+    )
+)
+
+
+
+(defun ps/command (command &optional options)
+  "Call 'perly_sense COMMAND OPTIONS' and some additional default
+options, and return the parsed result as a sexp"
+  (unless options (setq options ""))
+  (ps/parse-sexp
+   (ps/shell-command-to-string
+    "perly_sense"
+    (format "%s --width_display=%s %s"
+            command
+            (- (window-width) 2)
+            options
+            ))))
+
+
+
 ; should use something that fontifies
 (defun ps/display-pod-for-module (module)
   (let* ((result-alist
@@ -423,19 +528,6 @@ See the POD docs for how to enable flymake."
 
 
 
-(defun ps/display-text-in-buffer (type name text)
-  (let ((buffer-name (format "*%s %s*" type name)))
-    (with-current-buffer (get-buffer-create buffer-name)
-      (erase-buffer)
-      (insert text)
-      (goto-char 1)
-      (ps/fontify-pod-buffer buffer-name)
-      (display-buffer (current-buffer))
-      )
-    )
-  )
-
-
 (defun ps/display-doc-message-or-buffer (doc-type name text)
   (cond ((string= doc-type "hint")
          (message "%s" text))
@@ -451,71 +543,85 @@ See the POD docs for how to enable flymake."
 
 
 
-(defun ps/fontify-pod-buffer (buffer-name)
-  "Mark up a buffer with text from pod2text."
-  (interactive)
-  (save-excursion
-    (set-buffer buffer-name)
-    (goto-char (point-min))
-    (while (search-forward-regexp "
- \\{4,\\}" nil t)
-      (let* ((point-start (point)))
-        (search-forward-regexp "
-")
-        (backward-char)
-        (put-text-property point-start (point) 'face '(:foreground "Gray50"))   ;;TODO: Move to config variable
-        )
-      )
-    )
+(defun ps/compile-and-then (command &optional post-compilation)
+  "Run COMMAND using the compiler function.
+
+If the POST-COMPILATION lambda is non-nil, invoke it after the
+compilation has finished."
+  (lexical-let
+      ((post-compile-lambda0 (or post-compile-lambda (lambda () )))
+       (finish-callback))
+    (setq finish-callback
+          (lambda (buf msg)
+            (setq compilation-finish-functions (delq finish-callback compilation-finish-functions))
+            (funcall post-compile-lambda0)
+            ))
+    (push finish-callback compilation-finish-functions)
+    (compile command))
   )
 
 
 
-(defun ps/run-file (&optional use-alternate-command run-with-coverage)
-  "Run the current file"
-  (interactive "P")
+(defun ps/run-file-run-command (command dir-run-from &optional post-compile-lambda)
+  "Run COMMAND from DIR-RUN-FROM using the compiler function.
 
-  ;;If it's the compilation buffer, recompile, else run file
-  (if (string= (buffer-name) "*compilation*")
-      (progn
-        (message "Recompile file...")
-        (recompile)
-        )
-
-    (message "Run File...")
-    (let ((alternate-command-option
-           (if use-alternate-command "--use_alternate_command" "")))
-      (ps/run-file-with-options alternate-command-option run-with-coverage)
-      )
-    )
-  )
-
-
-
-(defun ps/is-cpan-module-installed? (module-name)
-  "Return t if MODULE-NAME is installed, else nil."
+If POST-COMPILE-LAMBDA is non-nil, invoke it after the
+compilation has finished."
   (with-temp-buffer
-    (shell-command (format "perl -M%s -e 1" module-name) t nil)
-    ;; Empty buffer ==> no output ==> module is installed
-    (eq (point-max) (point-min))))
-
-
-
-(defun ps/ensure-cpan-module-is-installed (module-name)
-  "Display error and throw exception unless
-  MODULE-NAME is installed"
-  (unless (ps/is-cpan-module-installed? module-name)
-    (error "CPAN module (%s) is not installed." module-name)))
-
-
-
-(defun ps/run-file-with-coverage (&optional use-alternate-command)
-  "Run the current file with Devel::Cover enabled and collect
-Devel::CoverX::Covered data"
-  (interactive "P")
-  (ps/ensure-cpan-module-is-installed "Devel::CoverX::Covered")
-  (ps/run-file use-alternate-command t)
+    (cd dir-run-from)
+    (ps/compile-and-then command post-compile-lambda)
+    )
   )
+
+
+
+(defun ps/command-on-current-file-location (command &optional options)
+  "Call perly_sense COMMAND with the current file and row/col,
+and return the parsed result as a sexp"
+  (unless options (setq options ""))
+  (ps/command
+   command
+   (format "\"--file=%s\" --row=%s --col=%s %s"
+           (buffer-file-name)
+           (ps/current-line)
+           (+ 1 (current-column))
+           options)))
+
+
+
+(defun ps/async-shell-command-to-string (command callback)
+  "Run command asynchronously and call callback with the
+response"
+  (lexical-let
+      ((command-string command)
+       (callback-fun callback))
+;;     (message "Calling (%s)" command-string)
+    (async-shell-command-to-string
+     command
+     (lambda (response)
+;;        (message "Called (%s), got (%s)" command-string response)
+       (funcall callback-fun response)
+       ))))
+
+
+
+(defun ps/async-command-on-current-file-location (command callback &optional options)
+  "Call perly_sense COMMAND with the current file and row/col,
+call CALLBACK with the parsed result as a sexp"
+  (unless options (setq options ""))
+  (lexical-let ((callback-fun callback))
+    (ps/async-shell-command-to-string
+     (format "perly_sense %s \"--file=%s\" --row=%s --col=%s %s --width_display=%s"
+             command
+             (buffer-file-name)
+             (ps/current-line)
+             (+ 1 (current-column))
+             options
+             (- (window-width) 2))
+     (lambda (output)
+       (funcall callback-fun (ps/parse-sexp output))
+       )
+     )))
 
 
 
@@ -578,72 +684,65 @@ covered runs"
 
 
 
-(defun ps/debug-file (&optional use-alternate-command)
-  "Debug the current file"
+(defun ps/run-file (&optional use-alternate-command run-with-coverage)
+  "Run the current file"
   (interactive "P")
 
-  (if (not (buffer-file-name))
-      (message "No file to debug")
-    (message "Debug File...")
-    (let* ((alternate-command-option
-            (if use-alternate-command "--use_alternate_command" ""))
-           (result-alist (ps/command-on-current-file-location
-                          "debug_file"
-                          alternate-command-option))
-           (dir-debug-from (alist-value result-alist "dir_debug_from"))
-           (command-debug (alist-value result-alist "command_debug"))
-           (message-string (alist-value result-alist "message")))
-      (if command-debug
-          (progn
-            (let ((command-debug-without-quotes
-                   (replace-regexp-in-string "[\"']" "" command-debug)))
-              (ps/debug-file-debug-command
-               command-debug-without-quotes
-               dir-debug-from))))
-      (if message-string
-          (message message-string)))))
+  ;;If it's the compilation buffer, recompile, else run file
+  (if (string= (buffer-name) "*compilation*")
+      (progn
+        (message "Recompile file...")
+        (recompile)
+        )
 
-
-(defun ps/compile-and-then (command &optional post-compilation)
-  "Run COMMAND using the compiler function.
-
-If the POST-COMPILATION lambda is non-nil, invoke it after the
-compilation has finished."
-  (lexical-let
-      ((post-compile-lambda0 (or post-compile-lambda (lambda () )))
-       (finish-callback))
-    (setq finish-callback
-          (lambda (buf msg)
-            (setq compilation-finish-functions (delq finish-callback compilation-finish-functions))
-            (funcall post-compile-lambda0)
-            ))
-    (push finish-callback compilation-finish-functions)
-    (compile command))
+    (message "Run File...")
+    (let ((alternate-command-option
+           (if use-alternate-command "--use_alternate_command" "")))
+      (ps/run-file-with-options alternate-command-option run-with-coverage)
+      )
+    )
   )
 
 
 
-(defun ps/run-file-run-command (command dir-run-from &optional post-compile-lambda)
-  "Run COMMAND from DIR-RUN-FROM using the compiler function.
-
-If POST-COMPILE-LAMBDA is non-nil, invoke it after the
-compilation has finished."
+(defun ps/is-cpan-module-installed? (module-name)
+  "Return t if MODULE-NAME is installed, else nil."
   (with-temp-buffer
-    (cd dir-run-from)
-    (ps/compile-and-then command post-compile-lambda)
-    )
+    (shell-command (format "perl -M%s -e 1" module-name) t nil)
+    ;; Empty buffer ==> no output ==> module is installed
+    (eq (point-max) (point-min))))
+
+
+
+(defun ps/ensure-cpan-module-is-installed (module-name)
+  "Display error and throw exception unless
+  MODULE-NAME is installed"
+  (unless (ps/is-cpan-module-installed? module-name)
+    (error "CPAN module (%s) is not installed." module-name)))
+
+
+
+(defun ps/run-file-with-coverage (&optional use-alternate-command)
+  "Run the current file with Devel::Cover enabled and collect
+Devel::CoverX::Covered data"
+  (interactive "P")
+  (ps/ensure-cpan-module-is-installed "Devel::CoverX::Covered")
+  (ps/run-file use-alternate-command t)
   )
 
 
 
-(defun ps/rerun-file ()
-  "Rerun the current compilation buffer"
-  (interactive)
-  (if (ps/goto-buffer-name "*compilation*")
-      (recompile)
-    (message "Can't re-run: No Run File in progress.")
-    )
-  )
+
+(defun ps/gud-query-cmdline (command)
+  (let* ((minor-mode 'perldb)
+         (hist-sym (gud-symbol 'history nil minor-mode))
+         (cmd-name (gud-val 'command-name minor-mode)))
+    (unless (boundp hist-sym) (set hist-sym nil))
+    (read-from-minibuffer
+     (format "Run %s (like this): " minor-mode)
+     command
+     gud-minibuffer-local-map nil
+     hist-sym)))
 
 
 
@@ -673,38 +772,61 @@ compilation has finished."
      (setq paragraph-start comint-prompt-regexp)
      (run-hooks 'perldb-mode-hook))))
 
-(defun ps/gud-query-cmdline (command)
-  (let* ((minor-mode 'perldb)
-         (hist-sym (gud-symbol 'history nil minor-mode))
-         (cmd-name (gud-val 'command-name minor-mode)))
-    (unless (boundp hist-sym) (set hist-sym nil))
-    (read-from-minibuffer
-     (format "Run %s (like this): " minor-mode)
-     command
-     gud-minibuffer-local-map nil
-     hist-sym)))
+
+
+(defun ps/debug-file (&optional use-alternate-command)
+  "Debug the current file"
+  (interactive "P")
+
+  (if (not (buffer-file-name))
+      (message "No file to debug")
+    (message "Debug File...")
+    (let* ((alternate-command-option
+            (if use-alternate-command "--use_alternate_command" ""))
+           (result-alist (ps/command-on-current-file-location
+                          "debug_file"
+                          alternate-command-option))
+           (dir-debug-from (alist-value result-alist "dir_debug_from"))
+           (command-debug (alist-value result-alist "command_debug"))
+           (message-string (alist-value result-alist "message")))
+      (if command-debug
+          (progn
+            (let ((command-debug-without-quotes
+                   (replace-regexp-in-string "[\"']" "" command-debug)))
+              (ps/debug-file-debug-command
+               command-debug-without-quotes
+               dir-debug-from))))
+      (if message-string
+          (message message-string)))))
 
 
 
-(defun ps/smart-docs-at-point ()
-  "Display documentation for the code at point."
+(defun ps/goto-buffer-name (buffer-name)
+  "Go to the currently named 'buffer-name' buffer, if any."
+  (let* ((target-buffer (get-buffer buffer-name)))
+    (if target-buffer
+        (let* ((compilation-window (get-buffer-window target-buffer "visible")))
+          (progn
+            (if compilation-window (select-window compilation-window))
+            (switch-to-buffer buffer-name)
+            )
+          )
+      (message (format "There is no %s buffer to go to." buffer-name))
+      nil
+      )
+    )
+  )
+
+
+
+(defun ps/rerun-file ()
+  "Rerun the current compilation buffer"
   (interactive)
-  (ps/display-docs-from-command
-   "Smart docs..."
-   '(lambda ()
-      (ps/command-on-current-file-location "smart_doc"))))
-
-
-
-(defun ps/class-method-docs (class-name method)
-  "Display documentation for the 'method' of 'class-name'."
-  (interactive)
-  (ps/display-docs-from-command
-   (format "Finding docs for method (%s)..." method)
-   '(lambda ()
-      (ps/command
-       "method_doc"
-       (format "--class_name=%s --method_name=%s --dir_origin=." class-name method)))))
+  (if (ps/goto-buffer-name "*compilation*")
+      (recompile)
+    (message "Can't re-run: No Run File in progress.")
+    )
+  )
 
 
 
@@ -728,6 +850,28 @@ calling command."
       (message "%s" message-string))
     )
   )
+
+
+
+(defun ps/smart-docs-at-point ()
+  "Display documentation for the code at point."
+  (interactive)
+  (ps/display-docs-from-command
+   "Smart docs..."
+   '(lambda ()
+      (ps/command-on-current-file-location "smart_doc"))))
+
+
+
+(defun ps/class-method-docs (class-name method)
+  "Display documentation for the 'method' of 'class-name'."
+  (interactive)
+  (ps/display-docs-from-command
+   (format "Finding docs for method (%s)..." method)
+   '(lambda ()
+      (ps/command
+       "method_doc"
+       (format "--class_name=%s --method_name=%s --dir_origin=." class-name method)))))
 
 
 
@@ -887,24 +1031,40 @@ If not, search for an empty string.
 
 
 
-(defun ps/find-project-sub-declaration-at-point ()
-  "Run ack from the project dir, looking for the method/word/sub
-at point. Default to a sensible ack command line.
+(defun ps/class-method-at-point ()
+  "Return the method name at (or very near) point, or nil if none was found."
+  (save-excursion
+    (if (looking-at "[ \n(]") (backward-char)) ;; if at end of method name, move into it
+    (if (looking-at "[a-zA-Z0-9_]")                ;; we may be on a method name
+        (while (looking-at "[a-zA-Z0-9_]") (backward-char))   ;; position at beginning of word
+      )
+    (if (looking-at ">") (backward-char))
+    (if (looking-at "[\\\\-]>\\([a-zA-Z0-9_]+\\)")            ;; If on -> or \>, capture method name
+        (match-string 1)
+      nil
+      )
+    )
+  )
 
-Look for 'method', 'sub', 'has' (somehwat simplistic atm).
+
+
+(defun ps/method-of-method-or-object-at-point ()
+  "Find name of method of method call at point. This can be:
+
+   ->like_t|his
+   $lik|e->this
+
+Return the method name, or nil.
 "
-  (interactive)
-  (ps/find-project-method-regex-at-point "^\\s*(sub|method|has)\\s+[\"']?\\+?%s\\b")
-)
-
-
-
-(defun ps/find-project-method-callers-at-point ()
-  "Run ack from the project dir, looking for method calls of the
-method/word/sub at point. Default to a sensible ack command line."
-  (interactive)
-  (ps/find-project-method-regex-at-point "->\\s*%s\\b")
-)
+  (or
+   (and  ;; $ob|ject->method
+    (or
+     (and (looking-back "$[a-zA-Z0-9_]*") (looking-at "[a-zA-Z0-0_]*->\\([a-zA-Z0-9_]+\\)"))
+     (looking-at "$[a-zA-Z0-9_]*->\\([a-zA-Z0-9_]+\\)"))
+    (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
+   (ps/class-method-at-point)  ;; ->me|thod
+   nil
+   ))
 
 
 
@@ -935,23 +1095,24 @@ If not, search for the word at point.
 
 
 
-(defun ps/method-of-method-or-object-at-point ()
-  "Find name of method of method call at point. This can be:
+(defun ps/find-project-sub-declaration-at-point ()
+  "Run ack from the project dir, looking for the method/word/sub
+at point. Default to a sensible ack command line.
 
-   ->like_t|his
-   $lik|e->this
-
-Return the method name, or nil.
+Look for 'method', 'sub', 'has' (somehwat simplistic atm).
 "
-  (or
-   (and  ;; $ob|ject->method
-    (or
-     (and (looking-back "$[a-zA-Z0-9_]*") (looking-at "[a-zA-Z0-0_]*->\\([a-zA-Z0-9_]+\\)"))
-     (looking-at "$[a-zA-Z0-9_]*->\\([a-zA-Z0-9_]+\\)"))
-    (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
-   (ps/class-method-at-point)  ;; ->me|thod
-   nil
-   ))
+  (interactive)
+  (ps/find-project-method-regex-at-point "^\\s*(sub|method|has)\\s+[\"']?\\+?%s\\b")
+)
+
+
+
+(defun ps/find-project-method-callers-at-point ()
+  "Run ack from the project dir, looking for method calls of the
+method/word/sub at point. Default to a sensible ack command line."
+  (interactive)
+  (ps/find-project-method-regex-at-point "->\\s*%s\\b")
+)
 
 
 
@@ -993,6 +1154,90 @@ col is 0, the point isn't moved in that dimension."
 
 
 
+(defun ps/get-alist-from-list (list-of-alist key value)
+  "Return the first alist in list which aliast's key is value, or
+nil if none was found"
+  (catch 'found
+    (dolist (alist list-of-alist)
+      (let ((alist-item-value (alist-value alist key)))
+        (if (string= alist-item-value value)
+            (throw 'found alist)
+          nil)))))
+
+
+
+(defun ps/choose-class-alist-from-class-list-with-dropdown (what-text class-list)
+  "Let the user choose a class-alist from the lass-list of Class
+definitions using a dropdown list.
+
+Return class-alist with (keys: class_name, file, row), or nil if
+none was chosen."
+  (let* ((class-description-list (mapcar (lambda (class-alist)
+                                    (alist-value class-alist "class_description")
+                                    ) class-list))
+         (n (dropdown-list class-description-list))
+         )
+    (if n
+        (let ((chosen-class-description (nth n class-description-list)))
+          (ps/get-alist-from-list
+           class-list "class_description" chosen-class-description)
+          )
+      nil
+      )
+    )
+  )
+
+
+
+(defun ps/choose-class-alist-from-class-list (what-text class-list)
+  "Let the user choose a class-alist from the lass-list of Class
+definitions.
+
+Return class-alist with (keys: class_name, file, row), or nil if
+none was chosen."
+  (ps/choose-class-alist-from-class-list-with-dropdown what-text class-list)
+  )
+
+
+
+;; Not used
+(defun ps/choose-class-alist-from-class-list-with-completing-read (what-text class-list)
+  "Let the user choose a class-alist from the lass-list of Class
+definitions using completing read.
+
+Return class-alist with (keys: class_name, file, row)"
+  (let* ((class-description-list (mapcar (lambda (class-alist)
+                                    (alist-value class-alist "class_description")
+                                    ) class-list))
+         (chosen-class-description (completing-read
+                             (format "%s: " what-text)
+                             class-description-list
+                             nil
+                             "force"
+                             nil
+                             nil
+                             (car class-description-list)
+                             ))
+         )
+    (ps/get-alist-from-list class-list "class-description" chosen-class-description)
+    )
+  )
+
+
+
+(defun ps/go-to-class-alist (class-alist)
+  "Go to the Class class-alist (keys: class_name, file, row)"
+  (let ((class-name (alist-value class-alist "class_name"))
+        (class-inheritance (alist-value class-alist "class_inheritance"))
+        (file (alist-value class-alist "file"))
+        (row (alist-num-value class-alist "row")))
+    (ps/find-file-location file row 1)
+    (message "%s" class-inheritance)
+    )
+  )
+
+
+
 (defun ps/go-to-base-class-at-point ()
   "Go to the Base Class of the Class at point. If ambigous, let
 the the user choose a Class."
@@ -1024,23 +1269,6 @@ the the user choose a Class."
 
 
 
-(defun ps/go-to-use-section ()
-  "Set mark and go to the end of the 'use Module' section."
-  (interactive)
-  (message "Goto the 'use Module' section...")
-  (let* ((use-position (ps/find-use-module-section-position)))
-    (if (not use-position)
-        (message "No 'use Module' section found")
-      (push-mark)
-      (goto-char use-position)
-      (next-line-nomark)
-      (beginning-of-line)
-      )
-    )
-  )
-
-
-
 (defun ps/find-use-module-section-position ()
   "Return the position of the end of the last use Module
 statement in the file, or nil if none was found."
@@ -1051,6 +1279,23 @@ statement in the file, or nil if none was found."
           (search-forward-regexp ";")
           (point))
       nil
+      )
+    )
+  )
+
+
+
+(defun ps/go-to-use-section ()
+  "Set mark and go to the end of the 'use Module' section."
+  (interactive)
+  (message "Goto the 'use Module' section...")
+  (let* ((use-position (ps/find-use-module-section-position)))
+    (if (not use-position)
+        (message "No 'use Module' section found")
+      (push-mark)
+      (goto-char use-position)
+      (ps/next-line-nomark)
+      (beginning-of-line)
       )
     )
   )
@@ -1073,19 +1318,29 @@ statement in the file, or nil if none was found."
   )
 
 
-(defun ps/goto-buffer-name (buffer-name)
-  "Go to the currently named 'buffer-name' buffer, if any."
-  (let* ((target-buffer (get-buffer buffer-name)))
-    (if target-buffer
-        (let* ((compilation-window (get-buffer-window target-buffer "visible")))
-          (progn
-            (if compilation-window (select-window compilation-window))
-            (switch-to-buffer buffer-name)
-            )
-          )
-      (message (format "There is no %s buffer to go to." buffer-name))
-      nil
-      )
+(defun ps/choose-from-strings-alist (prompt items-alist)
+  "Let user choose amongst the strings in items-alist.
+
+If appropriate (given the number of items in items-alist), use a
+dropdown-list, otherwise a completing read with 'prompt'.
+
+Return the chosen string, or nil if the user canceled.
+"
+  (if (< (length items-alist) ps/dropdown-max-items-to-display)
+      (let* ((n (dropdown-list items-alist)))
+        (if n
+            (nth n items-alist)
+          nil
+          ))
+    (completing-read
+     (format "%s: " prompt)
+     items-alist
+     nil
+     "force"
+     nil
+     nil
+     (car items-alist)
+     )
     )
   )
 
@@ -1146,31 +1401,40 @@ You must have a File::Corresponding config file (called
 
 
 
-(defun ps/choose-from-strings-alist (prompt items-alist)
-  "Let user choose amongst the strings in items-alist.
-
-If appropriate (given the number of items in items-alist), use a
-dropdown-list, otherwise a completing read with 'prompt'.
-
-Return the chosen string, or nil if the user canceled.
-"
-  (if (< (length items-alist) ps/dropdown-max-items-to-display)
-      (let* ((n (dropdown-list items-alist)))
-        (if n
-            (nth n items-alist)
-          nil
-          ))
-    (completing-read
-     (format "%s: " prompt)
-     items-alist
-     nil
-     "force"
-     nil
-     nil
-     (car items-alist)
-     )
-    )
+(defun ps/vc-project (vcs project-dir)
+  "Display the Project view for the VCS (e.g. 'svn', 'none') for
+the PROJECT-DIR, e.g. run svn-status for PROJECT-DIR."
+  (cond
+   ((string= vcs "svn")
+    (message "SVN status...")
+    (svn-status project-dir))
+   ((string= vcs "git")
+    ;; For other git modes, introduce a customization var and branch here
+    (message "Magit status...")
+    (condition-case nil
+        (magit-status project-dir)
+      (error
+       (message "A Git repository was found, but the Magit mode isn't loaded"))))
+   (t
+    (message "No VCS...")
+    (dired project-dir))
+   )
   )
+
+
+
+(defun ps/get-first-magit-status-buffer-refreshed ()
+  "Return the first buffer found that is a Magit status buffer,
+or nil if none exists.
+
+If a Magit buffer is found, magit-refresh it before returning it.
+"
+  (let ((magit-buffer (find-buffer-name-match "^\\*magit: ")))
+    (if magit-buffer
+        (with-current-buffer magit-buffer (magit-refresh))
+      )
+    magit-buffer
+    ))
 
 
 
@@ -1195,45 +1459,6 @@ project dir if there is no vc."
 
 
 
-(defun ps/vc-project (vcs project-dir)
-  "Display the Project view for the VCS (e.g. 'svn', 'none') for
-the PROJECT-DIR, e.g. run svn-status for PROJECT-DIR."
-  (cond
-   ((string= vcs "svn")
-    (message "SVN status...")
-    (svn-status project-dir))
-   ((string= vcs "git")
-    ;; For other git modes, introduce a customization var and branch here
-    (message "Magit status...")
-    (condition-case nil
-        (magit-status project-dir)
-      (error
-       (message "A Git repository was found, but the Magit mode isn't loaded"))))
-   (t
-    (message "No VCS...")
-    (dired project-dir))
-   )
-  )
-
-
-
-
-
-
-(defun ps/get-first-magit-status-buffer-refreshed ()
-  "Return the first buffer found that is a Magit status buffer,
-or nil if none exists.
-
-If a Magit buffer is found, magit-refresh it before returning it.
-"
-  (let ((magit-buffer (find-buffer-name-match "^\\*magit: ")))
-    (if magit-buffer
-        (with-current-buffer magit-buffer (magit-refresh))
-      )
-    magit-buffer
-    ))
-
-
 (defun ps/current-package-name ()
   "Return the name of the current package statement, or nil if
   there isn't one."
@@ -1243,6 +1468,21 @@ If a Magit buffer is found, magit-refresh it before returning it.
         (let (( package-name (match-string 1) ))
           package-name)
       nil)))
+
+
+
+(defun ps/package-name-from-file ()
+  "Return the name of the current file as if it was a package
+name, or return nil if not found."
+  (interactive)
+  (let* ((file-name (buffer-file-name)))
+    (if (string-match "\\blib/\\(.+?\\)\\.pm$" file-name)
+        (let* ((name-part (match-string 1 file-name)))
+          (replace-regexp-in-string "/" "::" name-part)
+          )
+      )))
+
+
 
 (defun ps/edit-copy-package-name ()
   "Copy (put in the kill-ring) the name of the current package
@@ -1321,16 +1561,7 @@ display it in the echo area"
   (message "Copied file name '%s'" (buffer-file-name))
   )
 
-(defun ps/package-name-from-file ()
-  "Return the name of the current file as if it was a package
-name, or return nil if not found."
-  (interactive)
-  (let* ((file-name (buffer-file-name)))
-    (if (string-match "\\blib/\\(.+?\\)\\.pm$" file-name)
-        (let* ((name-part (match-string 1 file-name)))
-          (replace-regexp-in-string "/" "::" name-part)
-          )
-      )))
+
 
 (defun ps/edit-copy-package-name-from-file ()
   "Copy (put in the kill-ring) the name of the current file as if
@@ -1412,6 +1643,27 @@ The default module name is any module name at point.
 
 
 
+;; Thanks to Phil Jackson at
+;; http://www.shellarchive.co.uk/Shell.html#sec21
+(defun ps/increment-number-at-point (&optional amount)
+  "Increment the number under point by AMOUNT.
+
+Return a list with the items (original number, amount, new
+number), or nil if there was no number at point."
+  (interactive "p")
+  (let ((num (number-at-point)))
+    (if (numberp num)
+      (let ((newnum (+ num amount))
+            (p (point)))
+        (save-excursion
+          (skip-chars-backward "-.0123456789")
+          (delete-region (point) (+ (point) (length (number-to-string num))))
+          (insert (number-to-string newnum)))
+        (goto-char p)
+        (list num amount newnum)
+        )
+      nil)))
+
 
 
 ;; Thanks to Jonathan Rockway at
@@ -1444,54 +1696,6 @@ The default module name is any module name at point.
             )
           )
       (message "Could not find a test count"))))
-
-
-
-;; Thanks to Phil Jackson at
-;; http://www.shellarchive.co.uk/Shell.html#sec21
-(defun ps/increment-number-at-point (&optional amount)
-  "Increment the number under point by AMOUNT.
-
-Return a list with the items (original number, amount, new
-number), or nil if there was no number at point."
-  (interactive "p")
-  (let ((num (number-at-point)))
-    (if (numberp num)
-      (let ((newnum (+ num amount))
-            (p (point)))
-        (save-excursion
-          (skip-chars-backward "-.0123456789")
-          (delete-region (point) (+ (point) (length (number-to-string num))))
-          (insert (number-to-string newnum)))
-        (goto-char p)
-        (list num amount newnum)
-        )
-      nil)))
-
-
-
-(defun ps/assist-sync-test-count ()
-  "Synchronize Test::More test count with the one reported by the
-current test run, if any"
-  (interactive)
-  (let
-      ((message
-        (catch 'message
-          (save-excursion
-            (let ((expected-count (ps/expected-test-count))
-                  (current-count (ps/current-test-count)))
-              (if (eq expected-count nil)
-                  (throw 'message "No *compilation* buffer with a test run found."))
-              (if (eq current-count nil)
-                  (throw 'message "No test count found in the current buffer"))
-              (if (= expected-count current-count)
-                  (throw 'message
-                         (format
-                          "Current test count is the same as the expected count (%s)"
-                          expected-count))
-                (ps/set-test-count current-count expected-count)
-                nil))))))
-    (if message (message "%s" message))))
 
 
 
@@ -1528,6 +1732,34 @@ current test run, if any"
     (and (re-search-forward "tests\\s-+=>\\s-*\\([0-9]+\\)" nil t)
          (string-to-number (match-string 1)))))
 
+
+
+;; TODO: Duplicate defun name??
+;; (defun ps/increment-number-at-point (&optional amount)
+;;   "Synchronize Test::More test count with the one reported by the
+;; current test run, if any"
+;;   (interactive)
+;;   (let
+;;       ((message
+;;         (catch 'message
+;;           (save-excursion
+;;             (let ((expected-count (ps/expected-test-count))
+;;                   (current-count (ps/current-test-count)))
+;;               (if (eq expected-count nil)
+;;                   (throw 'message "No *compilation* buffer with a test run found."))
+;;               (if (eq current-count nil)
+;;                   (throw 'message "No test count found in the current buffer"))
+;;               (if (= expected-count current-count)
+;;                   (throw 'message
+;;                          (format
+;;                           "Current test count is the same as the expected count (%s)"
+;;                           expected-count))
+;;                 (ps/set-test-count current-count expected-count)
+;;                 nil))))))
+;;     (if message (message "%s" message))))
+
+
+
 (defun ps/looking-backwards-at-comment-line ()
   (save-excursion
     (beginning-of-line)
@@ -1536,6 +1768,15 @@ current test run, if any"
       (forward-line -1)
       (looking-at-p "\\s*?#")))
   )
+
+
+
+(defun ps/looking-at-comment-line ()
+  (save-excursion
+      (beginning-of-line)
+      (looking-at-p "\\s*?#")))
+
+
 
 (defun ps/backward-to-first-comment-line ()
   "Move point back to the first line that isn't preceeded by a
@@ -1563,11 +1804,6 @@ Return point, or nil if there was no comment line."
       (beginning-of-line)
       (looking-at-p "\\s*?#")))
   )
-
-(defun ps/looking-at-comment-line ()
-  (save-excursion
-      (beginning-of-line)
-      (looking-at-p "\\s*?#")))
 
 (defun ps/forward-to-last-comment-line ()
   "Assume point is on a comment line. Move point forward to the
@@ -1725,105 +1961,6 @@ Create the call stack first using ps/edit-find-callers-at-point.
 
 
 
-(defun ps/command-on-current-file-location (command &optional options)
-  "Call perly_sense COMMAND with the current file and row/col,
-and return the parsed result as a sexp"
-  (unless options (setq options ""))
-  (ps/command
-   command
-   (format "\"--file=%s\" --row=%s --col=%s %s"
-           (buffer-file-name)
-           (ps/current-line)
-           (+ 1 (current-column))
-           options)))
-
-
-
-(defun ps/async-command-on-current-file-location (command callback &optional options)
-  "Call perly_sense COMMAND with the current file and row/col,
-call CALLBACK with the parsed result as a sexp"
-  (unless options (setq options ""))
-  (lexical-let ((callback-fun callback))
-    (ps/async-shell-command-to-string
-     (format "perly_sense %s \"--file=%s\" --row=%s --col=%s %s --width_display=%s"
-             command
-             (buffer-file-name)
-             (ps/current-line)
-             (+ 1 (current-column))
-             options
-             (- (window-width) 2))
-     (lambda (output)
-       (funcall callback-fun (ps/parse-sexp output))
-       )
-     )))
-
-
-
-(defun ps/command (command &optional options)
-  "Call 'perly_sense COMMAND OPTIONS' and some additional default
-options, and return the parsed result as a sexp"
-  (unless options (setq options ""))
-  (ps/parse-sexp
-   (ps/shell-command-to-string
-    "perly_sense"
-    (format "%s --width_display=%s %s"
-            command
-            (- (window-width) 2)
-            options
-            ))))
-
-
-
-(defun ps/shell-command-to-string (command args-string)
-  "Run command with args-string and return the response"
-
-  (let* ((response
-          (if (and ps/use-prepare-shell-command (string= command "perly_sense"))
-              (scp/shell-command-to-string
-               default-directory
-               (concat command " --stdin ") args-string)
-            (shell-command-to-string (concat command " " args-string))
-            )))
-;;    (message "Called (%s), got (%s)" command response)
-    response
-    )
-)
-
-
-
-(defun ps/async-shell-command-to-string (command callback)
-  "Run command asynchronously and call callback with the
-response"
-  (lexical-let
-      ((command-string command)
-       (callback-fun callback))
-;;     (message "Calling (%s)" command-string)
-    (async-shell-command-to-string
-     command
-     (lambda (response)
-;;        (message "Called (%s), got (%s)" command-string response)
-       (funcall callback-fun response)
-       ))))
-
-
-
-(defun ps/go-to-method-new ()
-  "Go to the 'new' method."
-  (interactive)
-  (message "Goto the 'new' method...")
-  (let ((new-location-alist
-         (or
-          (ps/find-method-in-buffer "new")
-          (ps/find-method-in-file "new"))))
-    (if new-location-alist
-        (ps/go-to-location-alist new-location-alist)
-      (message "Could not find any 'new' method")
-      )
-    )
-  )
-
-
-
 (defun ps/find-method-in-buffer (method-name)
   "Find a method named METHOD-NAME in the buffer and return an
 alist with (keys: row, col), or nil if no method was found."
@@ -1893,87 +2030,20 @@ area."
   )
 
 
-(defun ps/go-to-class-alist (class-alist)
-  "Go to the Class class-alist (keys: class_name, file, row)"
-  (let ((class-name (alist-value class-alist "class_name"))
-        (class-inheritance (alist-value class-alist "class_inheritance"))
-        (file (alist-value class-alist "file"))
-        (row (alist-num-value class-alist "row")))
-    (ps/find-file-location file row 1)
-    (message "%s" class-inheritance)
-    )
-  )
-
-
-
-(defun ps/choose-class-alist-from-class-list (what-text class-list)
-  "Let the user choose a class-alist from the lass-list of Class
-definitions.
-
-Return class-alist with (keys: class_name, file, row), or nil if
-none was chosen."
-  (ps/choose-class-alist-from-class-list-with-dropdown what-text class-list)
-  )
-
-
-
-(defun ps/choose-class-alist-from-class-list-with-dropdown (what-text class-list)
-  "Let the user choose a class-alist from the lass-list of Class
-definitions using a dropdown list.
-
-Return class-alist with (keys: class_name, file, row), or nil if
-none was chosen."
-  (let* ((class-description-list (mapcar (lambda (class-alist)
-                                    (alist-value class-alist "class_description")
-                                    ) class-list))
-         (n (dropdown-list class-description-list))
-         )
-    (if n
-        (let ((chosen-class-description (nth n class-description-list)))
-          (ps/get-alist-from-list
-           class-list "class_description" chosen-class-description)
-          )
-      nil
+(defun ps/go-to-method-new ()
+  "Go to the 'new' method."
+  (interactive)
+  (message "Goto the 'new' method...")
+  (let ((new-location-alist
+         (or
+          (ps/find-method-in-buffer "new")
+          (ps/find-method-in-file "new"))))
+    (if new-location-alist
+        (ps/go-to-location-alist new-location-alist)
+      (message "Could not find any 'new' method")
       )
     )
   )
-
-
-
-;; Not used
-(defun ps/choose-class-alist-from-class-list-with-completing-read (what-text class-list)
-  "Let the user choose a class-alist from the lass-list of Class
-definitions using completing read.
-
-Return class-alist with (keys: class_name, file, row)"
-  (let* ((class-description-list (mapcar (lambda (class-alist)
-                                    (alist-value class-alist "class_description")
-                                    ) class-list))
-         (chosen-class-description (completing-read
-                             (format "%s: " what-text)
-                             class-description-list
-                             nil
-                             "force"
-                             nil
-                             nil
-                             (car class-description-list)
-                             ))
-         )
-    (ps/get-alist-from-list class-list "class-description" chosen-class-description)
-    )
-  )
-
-
-
-(defun ps/get-alist-from-list (list-of-alist key value)
-  "Return the first alist in list which aliast's key is value, or
-nil if none was found"
-  (catch 'found
-    (dolist (alist list-of-alist)
-      (let ((alist-item-value (alist-value alist key)))
-        (if (string= alist-item-value value)
-            (throw 'found alist)
-          nil)))))
 
 
 
@@ -2009,119 +2079,6 @@ t on success, else nil"
 
 
 
-(defun ps/class-overview-for-class-at-point ()
-  "Display the Class Overview for the current class"
-  (interactive)
-  (ps/class-overview-with-argstring
-   (format
-    "--file=%s --row=%s --col=%s"
-    (buffer-file-name)
-    (ps/current-line)
-    (+ 1 (current-column)))))
-
-
-
-(defun ps/class-overview-inheritance-for-class-at-point ()
-  "Display the Class Inheritance Overview for the current class"
-  (interactive)
-  (ps/class-overview-x-for-class-at-point "inheritance"))
-
-
-
-(defun ps/class-overview-api-for-class-at-point ()
-  "Display the Class API Overview for the current class"
-  (interactive)
-  (ps/class-overview-x-for-class-at-point "api"))
-
-
-
-(defun ps/class-overview-bookmarks-for-class-at-point ()
-  "Display the Class Bookmarks Overview for the current class"
-  (interactive)
-  (ps/class-overview-x-for-class-at-point "bookmarks"))
-
-
-
-(defun ps/class-overview-uses-for-class-at-point ()
-  "Display the Class Uses Overview for the current class"
-  (interactive)
-  (ps/class-overview-x-for-class-at-point "uses"))
-
-
-
-(defun ps/class-overview-neighbourhood-for-class-at-point ()
-  "Display the Class NeighbourHood Overview for the current class"
-  (interactive)
-  (ps/class-overview-x-for-class-at-point "neighbourhood"))
-
-
-
-(defun ps/class-overview-x-for-class-at-point (show-what)
-  "Display the Class Overview with --show=x for the current class"
-  (ps/class-overview-with-argstring
-   (format
-    "--show=%s --file=%s --row=%s --col=%s"
-    show-what
-    (buffer-file-name)
-    (ps/current-line)
-    (+ 1 (current-column)))))
-
-
-
-(defun ps/class-overview-with-argstring (argstring)
-  "Call perly_sense class_overview with argstring and display Class Overview with the response"
-  (interactive)
-  (message "Class Overview...")
-  (let* ((result-alist (ps/command "class_overview" argstring))
-         (class-name (alist-value result-alist "class_name"))
-         (class-overview (alist-value result-alist "class_overview"))
-         (message-string (alist-value result-alist "message"))
-         (dir (alist-value result-alist "dir")))
-    (if class-name
-        (ps/display-class-overview class-name class-overview dir))
-    (if message-string
-        (message message-string))))
-
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun ps/parse-sexp (result)
-;;  (message "RESPONSE AS TEXT |%s|" result)
-  ;; TODO: check for "Error: " and display the error message
-  (if (string= result "")
-      '()
-    (let ((response-alist (eval (car (read-from-string result)))))
-      response-alist
-      )
-    )
-  )
-
-
-;;;(ps/parse-result-into-alist "'((\"class-overview\" . \"Hej baberiba [ Class::Accessor ]\") (\"class_name\" . \"Class::Accessor\") (\"message\" . \"Whatever\"))")
-;;(ps/parse-result-into-alist "'((\"class_name\" . \"alpha\"))")
-
-
-
-
-
-(defun ps/regex-tool ()
-  "Bring up the Regex Tool"
-  (interactive)
-  (setq regex-tool-backend "Perl")
-  (regex-tool)
-  (set-buffer "*Regex*")
-  (if (= (point-min) (point-max))
-      (progn
-        (insert "//msi")
-        (goto-char 2)
-        )
-
-    )
-  )
-
-
-
 ;; PerlySense Class major mode
 
 ;;;
@@ -2131,54 +2088,6 @@ t on success, else nil"
 
 (defvar ps/class-name nil "The name of the name in the current Class Overview buffer.")
 (make-variable-buffer-local 'ps/class-name)
-
-
-
-(defun ps/display-class-overview (class-name overview-text dir)
-  (let ((buffer-name "*Class Overview*"))
-    (with-current-buffer (get-buffer-create buffer-name)
-;; (message "dir (%s)" dir)
-
-      (setq default-directory dir)
-      (toggle-read-only t)(toggle-read-only)  ; No better way?
-      (erase-buffer)
-      (insert overview-text)
-
-      (ps/class-mode)
-      (ps/fontify-class-overview-buffer buffer-name)
-      (ps/class-find-default-heading class-name)
-      (switch-to-buffer (current-buffer))  ;; before: display-buffer
-      (toggle-read-only t)
-      (setq ps/class-name class-name)  ;; Buffer local
-      )
-    )
-  )
-
-
-
-(defun ps/class-find-default-heading (class-name)
-  "Position point at the first available heading in importance
-order, e.g. first Inheritance, then Api, etc."
-  (or
-   (ps/class-find-current-class-name class-name)
-   (ps/class-find-api)
-   (ps/class-find-bookmarks)
-   (ps/class-find-used)
-   (ps/class-find-neighbourhood)
-   nil
-  ))
-
-
-
-;; ;; Set point where class-name is mentioned in brackets
-;; (defun ps/search-class-name (class-name)
-;;   (let ((class-name-box (format "[ %s " class-name)))
-;;     (goto-char (point-min))
-;;     (search-forward class-name-box)
-;;     (search-backward "[ ")
-;;     (forward-char)
-;;     )
-;;   )
 
 
 
@@ -2195,6 +2104,88 @@ Return t if found, or nil if not"
           (forward-char)
           t)
       nil)))
+
+
+
+(defun ps/class-find-neighbourhood ()
+  "Navigate to the * NeighbourHood * in the Class Overview"
+  (interactive)
+  (push-mark)
+  (goto-char (point-min))
+  (if (search-forward "* NeighbourHood *" nil t)
+      (progn
+        (search-forward "[<" nil t)
+        (backward-char)
+        t)
+    nil))
+
+
+
+(defun ps/class-find-used ()
+  "Navigate to the * Uses * in the Class Overview"
+  (interactive)
+  (push-mark)
+  (goto-char (point-min))
+  (if (search-forward "* Uses *" nil t)
+      (progn
+        (beginning-of-line 2)
+        (forward-char)
+        t)
+    nil))
+
+
+
+(defun ps/class-find-bookmarks ()
+  "Navigate to the * Bookmarks * in the Class Overview"
+  (interactive)
+  (push-mark)
+  (goto-char (point-min))
+  (if (search-forward "* Bookmarks *" nil t)
+      (progn
+        (beginning-of-line 2)
+        (if (looking-at "-")
+            (beginning-of-line 2))
+        t)
+    nil))
+
+
+
+(defun ps/class-find-api ()
+  "Navigate to the * API * in the Class Overview.
+Return t if found, else nil."
+  (interactive)
+  (push-mark)
+  (goto-char (point-min))
+  (if (search-forward "* API *" nil t)
+      (progn
+        (beginning-of-line 2)
+        t)
+    nil))
+
+
+
+(defun ps/class-find-api-new ()
+  "Navigate to the new method in the Class Overview"
+  (interactive)
+  (push-mark)
+  (goto-char (point-min))
+  (search-forward-regexp ".>new\\b" nil t)
+  (backward-char 3)
+  )
+
+
+
+(defun ps/class-find-default-heading (class-name)
+  "Position point at the first available heading in importance
+order, e.g. first Inheritance, then Api, etc."
+  (or
+   (ps/class-find-current-class-name class-name)
+   (ps/class-find-api)
+   (ps/class-find-bookmarks)
+   (ps/class-find-used)
+   (ps/class-find-neighbourhood)
+   nil
+  ))
 
 
 
@@ -2258,37 +2249,147 @@ Return t if found, or nil if not"
 
 
 
-(defun ps/compile-goto-error-file-line ()
-  "Go to the file + line specified on the row at point, or ask for a
-text to parse for a file + line."
-  (interactive)
-  (let* ((file_row (ps/compile-get-file-line-from-buffer) )
-         (file (nth 0 file_row))
-         (row (nth 1 file_row)))
-    (if file
-        (ps/find-file-location file (string-to-number row) 1)
-      (let* ((file_row (ps/compile-get-file-line-from-user-input) )
-             (file (nth 0 file_row))
-             (row (nth 1 file_row)))
-        (if file
-            (ps/find-file-location file (string-to-number row) 1)
-          (message "No 'FILE line N' found")
-          )
-        )
+(defun ps/display-class-overview (class-name overview-text dir)
+  (let ((buffer-name "*Class Overview*"))
+    (with-current-buffer (get-buffer-create buffer-name)
+;; (message "dir (%s)" dir)
+
+      (setq default-directory dir)
+      (toggle-read-only t)(toggle-read-only)  ; No better way?
+      (erase-buffer)
+      (insert overview-text)
+
+      (ps/class-mode)
+      (ps/fontify-class-overview-buffer buffer-name)
+      (ps/class-find-default-heading class-name)
+      (switch-to-buffer (current-buffer))  ;; before: display-buffer
+      (toggle-read-only t)
+      (setq ps/class-name class-name)  ;; Buffer local
       )
     )
   )
 
 
-(defun ps/compile-get-file-line-from-user-input ()
-  "Ask for a text to parse for a file + line, parse it using
-'ps/compile-get-file-line-from-buffer'. Return what it
-returns."
-  (with-temp-buffer
-    (insert (read-string "FILE, line N text: " (current-kill 0 t)))
-    (ps/compile-get-file-line-from-buffer)
+
+(defun ps/class-overview-with-argstring (argstring)
+  "Call perly_sense class_overview with argstring and display Class Overview with the response"
+  (interactive)
+  (message "Class Overview...")
+  (let* ((result-alist (ps/command "class_overview" argstring))
+         (class-name (alist-value result-alist "class_name"))
+         (class-overview (alist-value result-alist "class_overview"))
+         (message-string (alist-value result-alist "message"))
+         (dir (alist-value result-alist "dir")))
+    (if class-name
+        (ps/display-class-overview class-name class-overview dir))
+    (if message-string
+        (message message-string))))
+
+
+
+(defun ps/class-overview-for-class-at-point ()
+  "Display the Class Overview for the current class"
+  (interactive)
+  (ps/class-overview-with-argstring
+   (format
+    "--file=%s --row=%s --col=%s"
+    (buffer-file-name)
+    (ps/current-line)
+    (+ 1 (current-column)))))
+
+
+
+(defun ps/class-overview-x-for-class-at-point (show-what)
+  "Display the Class Overview with --show=x for the current class"
+  (ps/class-overview-with-argstring
+   (format
+    "--show=%s --file=%s --row=%s --col=%s"
+    show-what
+    (buffer-file-name)
+    (ps/current-line)
+    (+ 1 (current-column)))))
+
+
+
+(defun ps/class-overview-inheritance-for-class-at-point ()
+  "Display the Class Inheritance Overview for the current class"
+  (interactive)
+  (ps/class-overview-x-for-class-at-point "inheritance"))
+
+
+
+(defun ps/class-overview-api-for-class-at-point ()
+  "Display the Class API Overview for the current class"
+  (interactive)
+  (ps/class-overview-x-for-class-at-point "api"))
+
+
+
+(defun ps/class-overview-bookmarks-for-class-at-point ()
+  "Display the Class Bookmarks Overview for the current class"
+  (interactive)
+  (ps/class-overview-x-for-class-at-point "bookmarks"))
+
+
+
+(defun ps/class-overview-uses-for-class-at-point ()
+  "Display the Class Uses Overview for the current class"
+  (interactive)
+  (ps/class-overview-x-for-class-at-point "uses"))
+
+
+
+(defun ps/class-overview-neighbourhood-for-class-at-point ()
+  "Display the Class NeighbourHood Overview for the current class"
+  (interactive)
+  (ps/class-overview-x-for-class-at-point "neighbourhood"))
+
+
+
+(defun ps/class-find-structure ()
+  "Navigate to the * Structure * in the Class Overview"
+  (interactive)
+  (push-mark)
+  (goto-char (point-min))
+  (search-forward "* Structure *" nil t)
+  (search-forward "-" nil t)
+  (beginning-of-line 2)
+  )
+
+
+
+;; ;; Set point where class-name is mentioned in brackets
+;; (defun ps/search-class-name (class-name)
+;;   (let ((class-name-box (format "[ %s " class-name)))
+;;     (goto-char (point-min))
+;;     (search-forward class-name-box)
+;;     (search-backward "[ ")
+;;     (forward-char)
+;;     )
+;;   )
+
+
+
+
+
+
+
+
+(defun ps/regex-tool ()
+  "Bring up the Regex Tool"
+  (interactive)
+  (setq regex-tool-backend "Perl")
+  (regex-tool)
+  (set-buffer "*Regex*")
+  (if (= (point-min) (point-max))
+      (progn
+        (insert "//msi")
+        (goto-char 2)
+        )
+
     )
   )
+
 
 
 (defun ps/compile-get-file-line-from-buffer ()
@@ -2314,29 +2415,55 @@ point, or an empty list () if none was found."
 
 
 
+(defun ps/compile-get-file-line-from-user-input ()
+  "Ask for a text to parse for a file + line, parse it using
+'ps/compile-get-file-line-from-buffer'. Return what it
+returns."
+  (with-temp-buffer
+    (insert (read-string "FILE, line N text: " (current-kill 0 t)))
+    (ps/compile-get-file-line-from-buffer)
+    )
+  )
+
+
+(defun ps/compile-goto-error-file-line ()
+  "Go to the file + line specified on the row at point, or ask for a
+text to parse for a file + line."
+  (interactive)
+  (let* ((file_row (ps/compile-get-file-line-from-buffer) )
+         (file (nth 0 file_row))
+         (row (nth 1 file_row)))
+    (if file
+        (ps/find-file-location file (string-to-number row) 1)
+      (let* ((file_row (ps/compile-get-file-line-from-user-input) )
+             (file (nth 0 file_row))
+             (row (nth 1 file_row)))
+        (if file
+            (ps/find-file-location file (string-to-number row) 1)
+          (message "No 'FILE line N' found")
+          )
+        )
+      )
+    )
+  )
+
 
 
 ;;;;;
 
 
-(defun ps/class-goto-at-point ()
-  "Go to the class/method/bookmark at point"
-  (interactive)
-  (message "Goto at point")
-  (let* ((class-name (ps/find-class-name-at-point)))
-         (if class-name
-             (progn
-               (message (format "Going to class (%s)" class-name))
-               (ps/find-source-for-module class-name)
-               )
-           (if (not (ps/class-goto-method-at-point))
-               (if (not (ps/class-goto-bookmark-at-point))
-                   (message "No Class/Method/Bookmark at point")
-                 )
-             )
-           )
-         )
-  )
+
+(defun ps/class-current-class ()
+  "Return the class currenlty being displayed in the Class Overview buffer.
+Use the buffer ps/class-name, or find the buffer name in the
+buffer."
+  (or
+   ps/class-name
+   (save-excursion
+     (message "PS internal: Warning: looking for the class name in the buffer text (obsolete?)")
+     (goto-char (point-min))
+     (search-forward-regexp "\\[<\\(\\w+\\) *>\\]" nil t)
+     (match-string 1))))
 
 
 
@@ -2351,47 +2478,6 @@ return t, or return nil if no method could be found at point."
           (ps/class-method-go-to current-class method)
           t
           )
-      nil
-      )
-    )
-  )
-
-
-
-(defun ps/class-docs-at-point ()
-  "Display docs for the class/method at point"
-  (interactive)
-  (message "Docs at point")
-  (let* ((class-name (ps/find-class-name-at-point)))
-         (if class-name
-             (progn
-               (message (format "Finding docs for class (%s)" class-name))
-               (ps/display-pod-for-module class-name)
-               )
-           (let* ((method (ps/class-method-at-point))  ;;;'
-                  (current-class (ps/class-current-class)))
-             (if (and current-class method)
-                 (ps/class-method-docs current-class method)
-               (message "No Class or Method at point")
-               )
-             )
-           )
-         )
-
-  )
-
-
-
-(defun ps/class-method-at-point ()
-  "Return the method name at (or very near) point, or nil if none was found."
-  (save-excursion
-    (if (looking-at "[ \n(]") (backward-char)) ;; if at end of method name, move into it
-    (if (looking-at "[a-zA-Z0-9_]")                ;; we may be on a method name
-        (while (looking-at "[a-zA-Z0-9_]") (backward-char))   ;; position at beginning of word
-      )
-    (if (looking-at ">") (backward-char))
-    (if (looking-at "[\\\\-]>\\([a-zA-Z0-9_]+\\)")            ;; If on -> or \>, capture method name
-        (match-string 1)
       nil
       )
     )
@@ -2417,6 +2503,70 @@ Return t if there was any, else nil"
     )
   )
 
+
+
+
+(defun ps/find-class-name-at-point ()
+  "Return the class name at point, or nil if none was found"
+  (save-excursion
+    (if (looking-at "[\\[]")
+        (forward-char) ;; So we can search backwards without fear of missing the current char
+      )
+    (if (search-backward-regexp "[][]" nil t)
+        (if (looking-at "[\\[]")
+            (progn  ;; TODO: only match on the class name, this matches e.g. [ $blah ]
+              (search-forward-regexp "\\w+" nil t)
+              (match-string 0)
+              )
+          )
+      )
+    )
+  )
+
+
+
+(defun ps/class-goto-at-point ()
+  "Go to the class/method/bookmark at point"
+  (interactive)
+  (message "Goto at point")
+  (let* ((class-name (ps/find-class-name-at-point)))
+         (if class-name
+             (progn
+               (message (format "Going to class (%s)" class-name))
+               (ps/find-source-for-module class-name)
+               )
+           (if (not (ps/class-goto-method-at-point))
+               (if (not (ps/class-goto-bookmark-at-point))
+                   (message "No Class/Method/Bookmark at point")
+                 )
+             )
+           )
+         )
+  )
+
+
+
+(defun ps/class-docs-at-point ()
+  "Display docs for the class/method at point"
+  (interactive)
+  (message "Docs at point")
+  (let* ((class-name (ps/find-class-name-at-point)))
+         (if class-name
+             (progn
+               (message (format "Finding docs for class (%s)" class-name))
+               (ps/display-pod-for-module class-name)
+               )
+           (let* ((method (ps/class-method-at-point))  ;;;'
+                  (current-class (ps/class-current-class)))
+             (if (and current-class method)
+                 (ps/class-method-docs current-class method)
+               (message "No Class or Method at point")
+               )
+             )
+           )
+         )
+
+  )
 
 
 
@@ -2454,20 +2604,6 @@ or go to the Bookmark at point"
 
 
 
-(defun ps/class-current-class ()
-  "Return the class currenlty being displayed in the Class Overview buffer.
-Use the buffer ps/class-name, or find the buffer name in the
-buffer."
-  (or
-   ps/class-name
-   (save-excursion
-     (message "PS internal: Warning: looking for the class name in the buffer text (obsolete?)")
-     (goto-char (point-min))
-     (search-forward-regexp "\\[<\\(\\w+\\) *>\\]" nil t)
-     (match-string 1))))
-
-
-
 (defun ps/class-quit ()
   "Quit the Class Overview buffer"
   (interactive)
@@ -2485,105 +2621,6 @@ buffer."
   (search-forward "* Inheritance *" nil t)
   (search-forward "[<" nil t)
   (backward-char)
-  )
-
-
-
-(defun ps/class-find-neighbourhood ()
-  "Navigate to the * NeighbourHood * in the Class Overview"
-  (interactive)
-  (push-mark)
-  (goto-char (point-min))
-  (if (search-forward "* NeighbourHood *" nil t)
-      (progn
-        (search-forward "[<" nil t)
-        (backward-char)
-        t)
-    nil))
-
-
-
-(defun ps/class-find-used ()
-  "Navigate to the * Uses * in the Class Overview"
-  (interactive)
-  (push-mark)
-  (goto-char (point-min))
-  (if (search-forward "* Uses *" nil t)
-      (progn
-        (beginning-of-line 2)
-        (forward-char)
-        t)
-    nil))
-
-
-
-(defun ps/class-find-bookmarks ()
-  "Navigate to the * Bookmarks * in the Class Overview"
-  (interactive)
-  (push-mark)
-  (goto-char (point-min))
-  (if (search-forward "* Bookmarks *" nil t)
-      (progn
-        (beginning-of-line 2)
-        (if (looking-at "-")
-            (beginning-of-line 2))
-        t)
-    nil))
-
-
-
-(defun ps/class-find-structure ()
-  "Navigate to the * Structure * in the Class Overview"
-  (interactive)
-  (push-mark)
-  (goto-char (point-min))
-  (search-forward "* Structure *" nil t)
-  (search-forward "-" nil t)
-  (beginning-of-line 2)
-  )
-
-
-
-(defun ps/class-find-api ()
-  "Navigate to the * API * in the Class Overview.
-Return t if found, else nil."
-  (interactive)
-  (push-mark)
-  (goto-char (point-min))
-  (if (search-forward "* API *" nil t)
-      (progn
-        (beginning-of-line 2)
-        t)
-    nil))
-
-
-
-(defun ps/class-find-api-new ()
-  "Navigate to the new method in the Class Overview"
-  (interactive)
-  (push-mark)
-  (goto-char (point-min))
-  (search-forward-regexp ".>new\\b" nil t)
-  (backward-char 3)
-  )
-
-
-
-(defun ps/find-class-name-at-point ()
-  "Return the class name at point, or nil if none was found"
-  (save-excursion
-    (if (looking-at "[\\[]")
-        (forward-char) ;; So we can search backwards without fear of missing the current char
-      )
-    (if (search-backward-regexp "[][]" nil t)
-        (if (looking-at "[\\[]")
-            (progn  ;; TODO: only match on the class name, this matches e.g. [ $blah ]
-              (search-forward-regexp "\\w+" nil t)
-              (match-string 0)
-              )
-          )
-      )
-    )
   )
 
 

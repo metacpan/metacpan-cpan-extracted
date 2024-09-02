@@ -6,7 +6,7 @@ use parent "Protocol::Redis";
 use XS::Object::Magic;
 use XSLoader;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 XSLoader::load "Protocol::Redis::XS", $VERSION;
 
@@ -16,7 +16,7 @@ sub new {
   my $on_message = delete $args{on_message};
 
   my $self = bless \%args, $class;
-  return unless $self->api == 1;
+  return undef unless $self->api == 1;
   $self->on_message($on_message) if defined $on_message;
 
   $self->_create;
@@ -49,7 +49,13 @@ Protocol::Redis::XS - hiredis based parser compatible with Protocol::Redis
   use Protocol::Redis::XS;
   my $redis = Protocol::Redis::XS->new(api => 1);
   $redis->parse("+OK\r\n");
-  $redis->get_message;
+  my $message = $redis->get_message;
+
+  # create message
+  print $redis->encode({type => '*', data => [
+    {type => '$', data => 'string'},
+    {type => '+', data => 'OK'},
+  ]});
 
 =head1 DESCRIPTION
 
@@ -67,10 +73,14 @@ As per L<Protocol::Redis>, API version 1.
 
 =head2 parse
 
+  $redis->parse("*2\r\n$4ping\r\n\r\n");
+
 Parse a chunk of data (calls L</on_message> callback if defined and a complete
 message is received).
 
 =head2 get_message
+
+  while (my $message = $redis->get_message) { ... }
 
 Return a message. This is a potentially nested data structure, for example as
 follows:
@@ -87,7 +97,18 @@ follows:
 
 =head2 on_message
 
+  $redis->on_message(sub { my ($redis, $message) = @_; ... });
+
 Set callback for L</parse>.
+
+=head2 encode
+
+  my $string = $redis->encode({type => '*', data => [
+    {type => '+', data => 'test'},
+    {type => '$', data => 'test'},
+  ]});
+
+Encode data into redis message.
 
 =head1 THREADS
 

@@ -93774,3 +93774,17 @@ P/PE/PEVANS/XS-Parse-Keyword-FromPerl-0.10.tar.gz
 E/EH/EHUELS/Protocol-Sys-Virt-v10.3.2.tar.gz
 E/EH/EHUELS/Protocol-Sys-Virt-Devel-v0.0.3.tar.gz
 J/JS/JSF/Test-Expander-2.5.1.tar.gz
+C/CA/CAVAC/Acme-Free-API-Geodata-GeoIP-1.0.tar.gz
+L/LE/LEEJO/Acme-Glue-2024.10.tar.gz
+P/PE/PERLANCAR/App-ImageMagickUtils-0.023.tar.gz
+L/LN/LNATION/Ascii-Text-0.11.tar.gz
+A/AS/ASPOSE/AsposeSlidesCloud-SlidesApi-24.08.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000801.tar.gz
+P/PE/PEVANS/Commandable-0.13.tar.gz
+H/HD/HDELGADO/DBIx-Fast-0.11.tar.gz
+J/JO/JOHANL/Devel-PerlySense-0.0223.tar.gz
+D/DC/DCANTRELL/MooseX-Types-StrictScalarTypes-1.0.0.tar.gz
+J/JD/JDEGUEST/Nice-Try-v1.3.12.tar.gz
+D/DB/DBOOK/Protocol-Redis-XS-0.08.tar.gz
+K/KA/KARJALA/RxPerl-Extras-v0.0.5.tar.gz
+K/KI/KIMOTO/SPVM-0.990007.tar.gz

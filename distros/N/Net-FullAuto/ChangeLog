@@ -20,6 +20,36 @@
 #######################################################################
 
 
+2024-09-01  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000801 released
+
+        * Fixed another Makefile.PL bug
+
+2024-09-01  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000800 released
+
+        * Fixed another Makefile.PL bug
+
+2024-09-01  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000799 released
+
+        * Fixed another Makefile.PL bug 
+
+2024-09-01  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000798 released
+
+        * Makefile.PL bug fix
+
+2024-09-01  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000797 released
+
+        * FullAuto is now compatible with local::lib
+
 2024-08-31  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000796 released

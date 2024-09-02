@@ -4,7 +4,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 # VERSION
 
-2024.07
+2024.10
 
 # DESCRIPTION
 
@@ -215,7 +215,7 @@ Thanks to all who contributed a snippet
 
 [https://www.formulanon.com/glue](https://www.formulanon.com/glue)
 
-[https://www.youtube.com/watch?v=ir6f2SvsXPA&feature=youtu.be&list=PLOOlhkMvt\_o4y627mpaCGrO4ughSEeUgb&t=1046](https://www.youtube.com/watch?v=ir6f2SvsXPA&feature=youtu.be&list=PLOOlhkMvt_o4y627mpaCGrO4ughSEeUgb&t=1046)
+[https://www.youtube.com/watch?v=OXcHLAL\_luU](https://www.youtube.com/watch?v=OXcHLAL_luU)
 
 [https://leejo.github.io/acme-glue-talk/presentation.html#1](https://leejo.github.io/acme-glue-talk/presentation.html#1)
 

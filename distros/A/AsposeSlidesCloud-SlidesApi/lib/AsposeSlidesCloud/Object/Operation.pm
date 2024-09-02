@@ -37,6 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::OperationError;
 use AsposeSlidesCloud::Object::OperationProgress;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -155,7 +156,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'error' => {
-    	datatype => 'string',
+    	datatype => 'OperationError',
     	base_name => 'Error',
     	description => '',
     	format => '',
@@ -173,7 +174,7 @@ __PACKAGE__->swagger_types( {
     'failed' => 'DateTime',
     'canceled' => 'DateTime',
     'finished' => 'DateTime',
-    'error' => 'string'
+    'error' => 'OperationError'
 } );
 
 __PACKAGE__->attribute_map( {

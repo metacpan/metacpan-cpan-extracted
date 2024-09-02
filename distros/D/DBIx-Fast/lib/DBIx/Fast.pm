@@ -2,43 +2,46 @@ package DBIx::Fast;
 
 =head1 NAME
  
-    DBIx::Fast - DBI fast & easy (another one...)
-
+DBIx::Fast - DBI fast & easy (another one...)
+   
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 use strict;
 use warnings FATAL => 'all';
 
 =head1 SYNOPSIS
  
-        use DBIx::Fast;
+use DBIx::Fast;
 
-        my $d = DBIx::Fast->new( db => 'test' , user => 'test' , passwd => 'test');
+$DB = DBIx::Fast->new( dsn => 'dbi:MariaDB:database=test:host' , user => 'test' , passwd => 'test');
+$DB = DBIx::Fast->new( db => 'test', user => 'test', passwd => 'test', driver => 'MariaDB' );
+$DB = DBIx::Fast->new( db => 'test', user => 'test', passwd => 'test', driver => 'mysql', trace => '1' , profile => '!Statement:!MethodName' );
 
-        my $d = DBIx::Fast->new( db => 'test' , user => 'test' , passwd => 'test',
-                                 trace => '1' , profile => '!Statement:!MethodName' );
+say $DB->last_error;
+Dumper $DB->errors;
 
-        for (qw(cc co ce)) {
-            $d->execute('SELECT * FROM '.$_);
-        }
+$DB->all('SELECT * FROM test WHERE 1');
 
-        print Dumper $d->errors;
+$Results = $DB->results;
+$Results = $DB->all('SELECT * FROM test WHERE expire > ?',$time);
 
-        $d->all('SELECT * FROM test WHERE 1');
+$Hash = $DB->hash('SELECT * FROM test WHERE id = ?',$id);
+$Hash = $DB->results;
 
-        print Dumper $d->results;
+$Value = $DB->val('SELECT name FROM test WHERE id = ?',1);
 
-        $d->all('SELECT * FROM test WHERE expire > ?',$time);
+$DB->insert('table', { name => 'New Name', status  => 1 }, time => 'create_time');
 
-        my $all = $d->results;
+$DB->update('table', { sen => { name => 'update t3st' }, where => { id => 1 } });
+$DB->update('table', { sen => { name => 'update t3st' }, where => { id => 1 } }, time => 'mod_time');
 
-        $d->hash('SELECT * FROM test WHERE id = ?,$id);
+$DB->up('table, { name => 'Update Name' } , { id => 1 } );
+$DB->up('table, { name => 'Update Name' } , { id => 1 } , time => 'mod_time');
 
-        my $hash = $d->results;
-
-        say $d->last_id;
+say $DB->last_sql;
+say $DB->last_id;
 
 =head1 DESCRIPTION
 
@@ -48,22 +51,80 @@ use warnings FATAL => 'all';
 
 use Carp;
 use Moo;
-use DBIx::Connector;
-use DateTime::Format::MySQL;
 
+use DBI;
+use DBIx::Connector;
+use SQL::Abstract;
+
+=head2 SQL::Abstract
+=cut
+has SQL => ( is => 'rw' );
+
+=head2 db
+ Database
+=cut
 has db  => ( is => 'rw' );
+
+=head2 dbd
+ Database type
+=cut
 has dbd => ( is => 'rwp');
 
+=head2 errors
+ Array with all errors
+=cut
 has errors   => ( is => 'rwp');
 
+=head2 last_error
+ String with the last error
+=cut
+has last_error => ( is => 'rwp' );
+
+=head2 last_sql
+ Return last SQL sentence
+=cut
 has last_sql => ( is => 'rw');
+
+=head2 last_id
+ Return last insert id
+=cut
 has last_id  => ( is => 'rw');
 
+=head2 sql
+ SQL stmt
+=cut
 has sql => ( is => 'rw' );
 
+=head2 p
+=cut
 has p   => ( is => 'rw' );
 
+=head2 results
+ Last fetch results
+=cut
 has results  => ( is => 'rw');
+
+=head2 dsn
+=cut
+has dsn => ( is => 'rwp' );
+
+=head2 dbi_args
+=cut
+has dbi_args => ( is => 'rwp' );
+
+=head2 _build_sql
+=cut
+
+=head2 now
+  NOW() - Timestamp
+=cut
+sub now {
+    my $self = shift;
+
+    my ($sec, $min, $hour, $mday, $mon , $year) = localtime;
+
+    return sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year + 1900, $mon + 1, $mday, $hour, $min, $sec);
+}
 
 =head2 set_error
     Add error to the array
@@ -80,6 +141,7 @@ sub set_error {
     my $Errors = $self->errors;
     push @{$Errors} ,$error;
 
+    $self->_set_last_error(qq{$error->{time} - [$error->{id}] - $error->{error}});
     $self->_set_errors($Errors);
 }
 
@@ -88,33 +150,54 @@ sub set_error {
 =cut
 sub BUILD {
     my ($self,$args) = @_;
-    
-    my $dbi_args = {
-	RaiseError => $args->{Error} // 0,
-	PrintError => $args->{PrintError} // 0,
-	mysql_enable_utf8 => 1,
-	AutoCommit => 1,
+    my $DConf;
+
+    $args->{host} = '127.0.0.1' unless $args->{host};
+
+    $DConf->{args} = {
+	RaiseError => $args->{Error} // 1,
+	PrintError => $args->{PrintError} // 1,
+	AutoCommit => $args->{AutoCommit} // 1,
     };
 
-    my $dsn = $args->{dsn} ? $self->_check_dsn($args->{dsn}) : $self->_make_dsn($args);
-
+    $DConf->{quote} = $args->{quote} if $args->{quote};
+    
+    $self->_set_dsn($args->{dsn} ? $self->_check_dsn($args->{dsn}) : $self->_make_dsn($args));
+    $self->_set_dbi_args($DConf);
+    
     if ( $self->dbd eq 'mysql' ) {
-	$dbi_args->{mysql_enable_utf8} = 1;
+	$DConf->{args}->{mysql_enable_utf8} = 1 if $args->{mysql_enable_utf8};
     }
     
-    $self->db(DBIx::Connector->new( $dsn, 
+    $self->_set_dbi_args($DConf);
+
+    $self->SQL(SQL::Abstract->new);
+    $self->db(DBIx::Connector->new( $self->dsn, 
 				    $args->{user}, $args->{passwd},
-				    $dbi_args ));
+				    $self->dbi_args->{args} ));
 
     $self->db->mode('ping');
-
+    
+    $self->db->dbh->quote($self->dbi_args->{quote}) if $self->dbi_args->{quote};
+    
     $self->db->dbh->{HandleError} = sub {
 	$self->set_error($DBI::err,$DBI::errstr);
     };
 
     $self->db->dbh->trace($args->{trace},'dbix-fast-trace') if $args->{trace};
 
-    $self->profile($args->{profile}) if $args->{profile};
+    $self->_profile($args->{profile}) if $args->{profile};
+}
+
+=head2 _Driver_dbd
+=cut
+sub _Driver_dbd {
+    my $self = shift;
+    my $dbd  = shift;
+    
+    map { $self->_set_dbd($_) if lc($dbd) eq lc($_) } qw(SQLite Pg MariaDB mysql);
+
+    $self->Exception("Error DBD Driver : $dbd") unless $self->dbd;
 }
 
 =head2 check_dsn
@@ -124,11 +207,11 @@ sub _check_dsn {
     my $self = shift;
     my $dsn  = shift;
 
-    my ($dbi,$server,$db,$host) = split ':', $dsn;
+    my ($dbi,$driver,$db,$host) = split ':', $dsn;
+    
+    $self->_Driver_dbd($driver);
 
-    map { $self->_set_dbd($_) if $server eq $_ } qw(sqlite pg mysql);
-
-    $self->Exception("Server not valid : $server") unless $self->dbd;    
+    return $dsn;
 }
 
 =head2 make_dsn
@@ -137,25 +220,20 @@ sub _check_dsn {
 sub _make_dsn {
     my $self = shift;
     my $args = shift;
+
+    $self->Exception("DBD Driver : Not defined") unless $args->{driver};
+
+    $self->_Driver_dbd($args->{driver});
+
+    return 'dbi:SQLite:dbname='.$args->{db} if $args->{driver} eq 'SQLite';
     
-    if ( $args->{host} && $args->{host} eq 'sqlite' ) {
-	$self->_set_dbd('sqlite');
-	return 'dbi:SQLite:'.$args->{db};
-    } elsif ( $args->{db} eq 'pg' ) {
-	$self->_set_dbd('pg');
-        $args->{host} = '127.0.0.1' unless $args->{host};
-	return 'dbi:pg:database='.$args->{db}.':'.$args->{host};
-    } else {
-	$self->_set_dbd('mysql');
-	$args->{host} = '127.0.0.1' unless $args->{host};
-	return 'dbi:mysql:database='.$args->{db}.':'.$args->{host};
-    }
+    return 'dbi:'.$self->dbd.':database='.$args->{db}.':'.$args->{host};
 }
 
 =head2 profile
     Save profile log : dbix-fast--PID.log
 =cut
-sub profile {
+sub _profile {
     my $self = shift;
     my $stat = shift."/DBI::ProfileDumper/";
 
@@ -175,7 +253,9 @@ sub all {
     my $res = $self->db->dbh->selectall_arrayref($self->sql,
 						 { Slice => {} },@{$self->p});
 
-    $self->results($res) unless $DBI::err;
+    $self->Exception("ERROR all()") if $DBI::err;
+    
+    $self->results($res);
 }
 
 =head2 hash
@@ -192,7 +272,9 @@ sub hash {
 
     my $res = $sth->fetchrow_hashref;
 
-    $self->results($res) unless $DBI::err;
+    $self->Exception("hash()") if $DBI::err;
+    
+    $self->results($res);
 }
 
 =head2 val
@@ -218,12 +300,11 @@ sub array {
 
     $sth->execute(@{$self->p});
 
-    unless ( $DBI::err ) {
-	my @rows = @{ $self->db->dbh->selectcol_arrayref(
-			  $self->sql, undef, @{ $self->p } ) };
+    $self->Exception("array()") if $DBI::err;
 
-	$self->results(\@rows);
-    }
+    my @rows = @{ $self->db->dbh->selectcol_arrayref( $self->sql, undef, @{ $self->p } ) };
+    
+    $self->results(\@rows);
 }
 
 =head2 count
@@ -307,10 +388,9 @@ sub execute {
 	}
     }
 
-    unless ( $DBI::err ) {
-	$self->results($res);
-    }
-
+    $self->Exception("execute()") if $DBI::err;
+    
+    $self->results($res);
 }
 
 =head2 up
@@ -320,9 +400,9 @@ sub up {
     my ($self,$table,$data,$where,$time) = @_;
 
     if ( $time ) {
-	$self->update( $self->TableName(shift) , { sen => $data , where => $where } , time => $time );
+	$self->update( $self->TableName($table) , { sen => $data , where => $where } , time => $time );
     } else {
-	$self->update( $self->TableName(shift) , { sen => $data , where => $where } );
+	$self->update( $self->TableName($table) , { sen => $data , where => $where } );
     }
 }
 
@@ -340,7 +420,6 @@ sub update {
     $skeel->{sen} = $self->extra_args($skeel->{sen},@_) if scalar @_ > 0;
 
     my @p;
-
     my $sql = "UPDATE $table SET ";
 
     for ( keys %{$skeel->{sen}} ) {
@@ -391,12 +470,15 @@ sub insert {
     $self->sql($sql);
     $self->execute_prepare(@p);
 
-    if ( $self->dbd eq 'mysql' ) {
+    if ( $self->dbd eq 'MariaDB' ) {
+	$self->last_id($self->db->dbh->{mariadb_insertid});
+    } elsif ( $self->dbd eq 'mysql' ) {
 	$self->last_id($self->db->dbh->{mysql_insertid});
-    } elsif ( $self->dbd eq 'sqlite' ) {
+    } elsif ( $self->dbd eq 'SQLite' ) {
 	$self->last_id($self->db->dbh->sqlite_last_insert_rowid());
+    } elsif ( $self->dbd eq 'Pg' ) {
+	$self->last_id($self->db->dbh->last_insert_id(undef,undef,$table,undef));
     }
-
 }
 
 =head2 delete
@@ -429,9 +511,8 @@ sub extra_args {
     my $skeel = shift;
     my %args  = @_;
 
-    $skeel->{$args{time}} = DateTime::Format::MySQL->format_datetime(DateTime->now)
-	if $args{time};
-
+    $skeel->{$args{time}} = $self->now() if $args{time};
+    
     return $skeel;
 }
 
@@ -492,7 +573,7 @@ sub TableName {
     my $self  = shift;
     my $table = shift;
 
-    return 1 unless $table =~ /\W/;
+    return $table unless $table =~ /\W/;
 
     $self->Exception("TableName not valid: $table");
 }
@@ -503,8 +584,14 @@ sub TableName {
 sub Exception {
     my $self = shift;
     my $msg  = shift;
+
+    return unless $self->dbi_args->{args}->{PrintError};
     
-    carp "Exception: $msg";
+    my $out  = "Exception: $msg - ";
+
+    $out .= $self->last_error if $self->last_error;
+    
+    carp $out;
 }
 
 =head1 AUTHOR

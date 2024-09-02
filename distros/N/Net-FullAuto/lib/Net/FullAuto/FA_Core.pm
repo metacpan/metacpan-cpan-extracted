@@ -891,7 +891,7 @@ our $crypt_cipher='DES';our $save_main_pass=0;
 our $password_from='user_input';our $amazoncleanup='';
 our $funkyprompt='\\\\137\\\\146\\\\165\\\\156\\\\153\\\\171\\\\120'.
                  '\\\\162\\\\157\\\\155\\\\160\\\\164\\\\137';
-our $specialperms='none';our $gatekeep_expir_shown=0;
+our $gatekeep_expir_shown=0;
 {
    my $ex=$0;
    if ($^O eq 'cygwin') {
@@ -901,10 +901,8 @@ our $specialperms='none';our $gatekeep_expir_shown=0;
    }
    if (-u $ex) {
       umask(077);
-      $specialperms='setuid';
    } elsif (-g $ex) {
       umask(007);
-      $specialperms='setgid';
    }
 };
 
@@ -5538,7 +5536,11 @@ sub acquire_fa_lock
       my $mkdflag=0;
       unless (exists $Net::FullAuto::FA_Core::Hosts{$mr}
             {'berkeley_db_path'}) {
-         if (-w "/var/db/Berkeley/FullAuto") {
+         if ($ENV{PERL_LOCAL_LIB_ROOT} &&
+               -w "$ENV{PERL_LOCAL_LIB_ROOT}/var/db/Berkeley/FullAuto") {
+            $Hosts{"__Master_${$}__"}{'berkeley_db_path'}=
+	       "$ENV{PERL_LOCAL_LIB_ROOT}/var/db/Berkeley/FullAuto";
+         } elsif (-w "/var/db/Berkeley/FullAuto") {
             $Hosts{"__Master_${$}__"}{'berkeley_db_path'}=
                "/var/db/Berkeley/FullAuto/";
          } else {
@@ -5564,14 +5566,14 @@ sub acquire_fa_lock
                $Net::FullAuto::FA_Core::fa_perm==365;
          my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').'mkdir -p '.
                  $m.$Hosts{$mr}{'berkeley_db_path'}.'Locks';
-         ($stdout,$stderr)=&setuid_cmd($cmd,5);
+         ($stdout,$stderr)=&pty_cmd($cmd,5);
          &handle_error($stderr) if $stderr && -1==index $stderr,'mode of';
          if ($m) {
             my $cd=cwd();
             chdir $m.$Hosts{$mr}{'berkeley_db_path'}.'Locks';
             my $cmd=$Net::FullAuto::FA_Core::gbp->('bash').
                     'bash -c umask u=rwx,g=rwx,o=rwx';
-            ($stdout,$stderr)=&setuid_cmd($cmd,5);
+            ($stdout,$stderr)=&pty_cmd($cmd,5);
             chdir $cd;
          }
       }
@@ -5644,7 +5646,7 @@ sub acquire_fa_lock
                $Net::FullAuto::FA_Core::fa_perm==365;
          my $cmd=$Net::FullAuto::FA_Core::gbp->('chmod')."chmod -Rv $mode ".
                  $Hosts{$mr}{'berkeley_db_path'}.'Locks/*';
-         ($stdout,$stderr)=&setuid_cmd($cmd,5);
+         ($stdout,$stderr)=&pty_cmd($cmd,5);
          &handle_error($stderr) if $stderr && -1==index $stderr,'mode of';
       }
    }
@@ -6224,7 +6226,7 @@ print $Net::FullAuto::FA_Core::LOG "BEFOREKILL -> ",join ' ',@{$cmd},"\n"
    my ($stdout_capture,$stderr_capture)=('','');
    ($stdout_capture,$stderr_capture)=
          Capture::Tiny::capture {
-      ($ignore,$stdout)=&setuid_cmd($cmd,5);
+      ($ignore,$stdout)=&pty_cmd($cmd,5);
    };
    $stdout||='';
    if (wantarray) {
@@ -6262,7 +6264,7 @@ sub testpid
       my ($stdout_capture,$stderr_capture)=('','');
       ($stdout_capture,$stderr_capture)=
             Capture::Tiny::capture {
-         ($stdout,$stderr)=&setuid_cmd($cmd,5); # Save Pound Sign
+         ($stdout,$stderr)=&pty_cmd($cmd,5); # Save Pound Sign
       };
       if ($stdout_capture=~s/^stdout: ?//) {
          $stdout=$stdout_capture;
@@ -6277,7 +6279,7 @@ sub testpid
                 ." then echo 1; else echo 0; fi\""
                 .'|'."${sedpath}sed ".' -e '."\'s/^/stdout: /' ".'2>&1' ];
       my $stdout='';my $stderr='';
-      ($stdout,$stderr)=&setuid_cmd($cmd,5);
+      ($stdout,$stderr)=&pty_cmd($cmd,5);
    }
    print $Net::FullAuto::FA_Core::LOG
       "\nppppppp &main::testpid() ppppppp STDOUT ",
@@ -6468,7 +6470,34 @@ sub host_hash
       }
    }
    if (!exists $Hosts{"__Master_${$}__"}{'berkeley_db_path'}) {
-      unless (-d '/var/db/Berkeley/FullAuto') {
+      if ($ENV{PERL_LOCAL_LIB_ROOT} &&
+            !(-d "$ENV{PERL_LOCAL_LIB_ROOT}/var/db/Berkeley/FullAuto")) {
+         my $mode=$Net::FullAuto::FA_Core::cygwin_berkeley_db_mode;
+         my $m=($^O eq 'cygwin')?"-m $mode ":'';
+         $m='-m 777 ' if $^O ne 'cygwin' &&
+               $Net::FullAuto::FA_Core::fa_perm==365;
+         unless (-d "$ENV{PERL_LOCAL_LIB_ROOT}/var/db") {
+            my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').'mkdir -p '.
+                    $m."$ENV{PERL_LOCAL_LIB_ROOT}/var/db";
+            my $stdout='';my $stderr='';
+            ($stdout,$stderr)=&pty_cmd($cmd,5);
+            &handle_error($stderr) if $stderr;
+         }
+         unless (-d "$ENV{PERL_LOCAL_LIB_ROOT}/var/db/Berkeley") {
+            my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').'mkdir -p '.
+                    $m."$ENV{PERL_LOCAL_LIB_ROOT}/var/db/Berkeley";
+            my $stdout='';my $stderr='';
+            ($stdout,$stderr)=&pty_cmd($cmd,5);
+            &handle_error($stderr) if $stderr;
+         }
+         unless (-d "$ENV{PERL_LOCAL_LIB_ROOT}/var/db/Berkeley/FullAuto") {
+            my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').'mkdir -p '.
+                    $m."$ENV{PERL_LOCAL_LIB_ROOT}/var/db/Berkeley/FullAuto";
+            my $stdout='';my $stderr='';
+            ($stdout,$stderr)=&pty_cmd($cmd,5);
+            &handle_error($stderr) if $stderr;
+         }
+      } elsif (!$ENV{PERL_LOCAL_LIB_ROOT} && !(-d '/var/db/Berkeley/FullAuto')) {
          my $mode=$Net::FullAuto::FA_Core::cygwin_berkeley_db_mode;
          my $m=($^O eq 'cygwin')?"-m $mode ":'';
          $m='-m 777 ' if $^O ne 'cygwin' &&
@@ -6477,31 +6506,39 @@ sub host_hash
             my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').'mkdir -p '.
                     $m.'/var/db';
             my $stdout='';my $stderr='';
-            ($stdout,$stderr)=&setuid_cmd($cmd,5);
+            ($stdout,$stderr)=&pty_cmd($cmd,5);
             &handle_error($stderr) if $stderr;
          }
          unless (-d '/var/db/Berkeley') {
             my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').'mkdir -p '.
                     $m.'/var/db/Berkeley';
             my $stdout='';my $stderr='';
-            ($stdout,$stderr)=&setuid_cmd($cmd,5);
+	    print "WHAT IS COMMAND=$cmd<==\n";
+            ($stdout,$stderr)=&pty_cmd($cmd,5);
             &handle_error($stderr) if $stderr;
          }
          unless (-d '/var/db/Berkeley/FullAuto') {
             my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').'mkdir -p '.
                     $m.'/var/db/Berkeley/FullAuto';
             my $stdout='';my $stderr='';
-            ($stdout,$stderr)=&setuid_cmd($cmd,5);
+            ($stdout,$stderr)=&pty_cmd($cmd,5);
             &handle_error($stderr) if $stderr;
          }
       }
-      if (!(-d '/var/db/Berkeley/FullAuto' && -w _)) {
+      if ($ENV{PERL_LOCAL_LIB_ROOT} &&
+	      !(-d "$ENV{PERL_LOCAL_LIB_ROOT}/var/db/Berkeley/FullAuto" && -w _)) {
+         &handle_error("Cannot Write to Berkeley FullAuto Directory :".
+            "\n\n             ".
+            "$ENV{PERL_LOCAL_LIB_ROOT}//var/db/Berkeley/FullAuto");
+         $Hosts{"__Master_${$}__"}{'berkeley_db_path'}=
+            "$ENV{PERL_LOCAL_LIB_ROOT}/var/db/Berkeley/FullAuto/";
+      } elsif (!$ENV{PERL_LOCAL_LIB_ROOT} && !(-d '/var/db/Berkeley/FullAuto' && -w _)) {
          &handle_error("Cannot Write to Berkeley FullAuto Directory :".
             "\n\n             ".
             '/var/db/Berkeley/FullAuto');
+         $Hosts{"__Master_${$}__"}{'berkeley_db_path'}=
+            '/var/db/Berkeley/FullAuto/';
       }
-      $Hosts{"__Master_${$}__"}{'berkeley_db_path'}=
-         '/var/db/Berkeley/FullAuto/';
    } elsif (!(-d $Hosts{"__Master_${$}__"}{'berkeley_db_path'} && -w _)) {
       handle_error("Cannot Write to Berkeley FullAuto Directory :".
          "\n\n             ".
@@ -7766,18 +7803,11 @@ sub pty_do_cmd
    STDERR->fdopen($tty,">") or &handle_error("STDERR: ".($!)); # Save Pound Sign
    CORE::close $tty; # Save Pound Sign
    $| = 1; # Save Pound Sign
-   #my $flag=''; # Save Pound Sign
-   #if (!$flag || lc($flag) ne '__use_parent_env__') {
-   if ($^O ne 'cygwin' && $Net::FullAuto::FA_Core::specialperms eq 'setgid') {
-      $ENV{PATH} = ''; # Save Pound Sign
-      $ENV{ENV}  = ''; # Save Pound Sign
-   } else {
-      $ENV{PATH}=~/^(.*)$/; # Save Pound Sign
-      $ENV{PATH}=$1; # Save Pound Sign
-      $ENV{ENV}||=''; # Save Pound Sign
-      $ENV{ENV}=~/^(.*)$/; # Save Pound Sign
-      $ENV{ENV}=$1; # Save Pound Sign
-   }
+   $ENV{PATH}=~/^(.*)$/; # Save Pound Sign
+   $ENV{PATH}=$1; # Save Pound Sign
+   $ENV{ENV}||=''; # Save Pound Sign
+   $ENV{ENV}=~/^(.*)$/; # Save Pound Sign
+   $ENV{ENV}=$1; # Save Pound Sign
    $ENV{DISPLAY}=''; # Save Pound Sign
    if ((!$Net::FullAuto::FA_Core::cron
          || $Net::FullAuto::FA_Core::debug)
@@ -9862,34 +9892,34 @@ my $get_modules=sub {
          my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').
                  'mkdir -p '.$m."\'$fadir/Custom\'";
          my $stdout='';my $stderr='';
-         ($stdout,$stderr)=&setuid_cmd($cmd,5);
+         ($stdout,$stderr)=&pty_cmd($cmd,5);
          &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
       }
       unless (-d "$fadir/Custom/$username") {
          my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').
                  'mkdir -p '.$m."\'$fadir/Custom/$username\'";
          my $stdout='';my $stderr='';
-         ($stdout,$stderr)=&setuid_cmd($cmd,5);
+         ($stdout,$stderr)=&pty_cmd($cmd,5);
          &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
       }
       unless (-d "$fadir/Custom/$username/$type") {
          my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').
                  'mkdir -p '.$m."\'$fadir/Custom/$username/$type\'";
          my $stdout='';my $stderr='';
-         ($stdout,$stderr)=&setuid_cmd($cmd,5);
+         ($stdout,$stderr)=&pty_cmd($cmd,5);
          &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
       }
       my $cmd=$Net::FullAuto::FA_Core::gbp->('cp').'cp '.
            "\'$fadir/Custom/fa_".lc($type).'.pm\' '.
            "\'$fadir/Custom/$username/$type\'";
-      my ($stdout,$stderr)=&setuid_cmd($cmd,5);
+      my ($stdout,$stderr)=&pty_cmd($cmd,5);
       &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
    }
    if ($mkdflag && $^O eq 'cygwin') {
       my $mode=$Net::FullAuto::FA_Core::cygwin_berkeley_db_mode;
       my $cmd=$Net::FullAuto::FA_Core::gbp->('chmod')."chmod -Rv $mode ".
               "\'$fadir/Custom/$username/$type\'";
-      my ($stdout,$stderr)=&setuid_cmd($cmd,5);
+      my ($stdout,$stderr)=&pty_cmd($cmd,5);
       &Net::FullAuto::FA_Core::handle_error($stderr)
          if $stderr && -1==index $stderr,'mode of';
    }
@@ -9898,7 +9928,7 @@ my $get_modules=sub {
    my $sedpath=$Net::FullAuto::FA_Core::gbp->('sed');
    $cmd="$cmd | ${sedpath}sed -e \'s/^/stdout: /\' 2>&1";
    my @return=();
-   my ($stdout,$stderr)=&setuid_cmd($cmd,5);
+   my ($stdout,$stderr)=&pty_cmd($cmd,5);
    &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
    foreach my $entry (split "\n",$stdout) {
       next if $entry eq '.';
@@ -10698,7 +10728,7 @@ my $define_modules_menu_fa_code_sub=sub {
                           'mkdir -p '.$m."$fadir/Custom";
                   my $stdout='';my $stderr='';
                   ($stdout,$stderr)=
-                     &Net::FullAuto::FA_Core::setuid_cmd($cmd,5);
+                     &Net::FullAuto::FA_Core::pty_cmd($cmd,5);
                   &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
                }
                unless (-d "$fadir/Custom/$username") {
@@ -10706,7 +10736,7 @@ my $define_modules_menu_fa_code_sub=sub {
                           'mkdir -p '.$m."$fadir/Custom/$username";
                   my $stdout='';my $stderr='';
                   ($stdout,$stderr)=
-                     &Net::FullAuto::FA_Core::setuid_cmd($cmd,5);
+                     &Net::FullAuto::FA_Core::pty_cmd($cmd,5);
                   &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
                }
                unless (-d "$fadir/Custom/$username/Code") {
@@ -10714,14 +10744,14 @@ my $define_modules_menu_fa_code_sub=sub {
                           'mkdir -p '.$m."$fadir/Custom/$username/Code";
                   my $stdout='';my $stderr='';
                   ($stdout,$stderr)=
-                     &Net::FullAuto::FA_Core::setuid_cmd($cmd,5);
+                     &Net::FullAuto::FA_Core::pty_cmd($cmd,5);
                   &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
                }
                my $cmd=$Net::FullAuto::FA_Core::gbp->('cp').'cp '.
                    "$fadir/Custom/fa_code.pm ".
                    "$fadir/Custom/$username/Code";
                my ($stdout,$stderr)=
-                      &Net::FullAuto::FA_Core::setuid_cmd($cmd,5);
+                      &Net::FullAuto::FA_Core::pty_cmd($cmd,5);
                &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
                if ($^O eq 'cygwin') {
                   my $mode=$Net::FullAuto::FA_Core::cygwin_berkeley_db_mode;
@@ -10729,7 +10759,7 @@ my $define_modules_menu_fa_code_sub=sub {
                        "chmod -Rv $mode ".
                        "$fadir/Custom/$username/Code/*";
                   my ($stdout,$stderr)=
-                        &Net::FullAuto::FA_Core::setuid_cmd($cmd,5);
+                        &Net::FullAuto::FA_Core::pty_cmd($cmd,5);
                   &Net::FullAuto::FA_Core::handle_error($stderr)
                      if $stderr && -1==index $stderr,'mode of';
                }
@@ -13593,7 +13623,11 @@ sub connect_berkeleydb
    my $mr="__Master_".$$."__";
    unless (exists $Net::FullAuto::FA_Core::Hosts{$mr}
          {'berkeley_db_path'}) {
-      if (-w "/var/db/Berkeley/FullAuto") {
+      if ($ENV{PERL_LOCAL_LIB_ROOT} &&
+             -w "$ENV{PERL_LOCAL_LIB_ROOT}/var/db/Berkeley/FullAuto") {
+         $Hosts{"__Master_${$}__"}{'berkeley_db_path'}=
+            "$ENV{PERL_LOCAL_LIB_ROOT}/var/db/Berkeley/FullAuto/";
+      } elsif (-w "/var/db/Berkeley/FullAuto") {
          $Hosts{"__Master_${$}__"}{'berkeley_db_path'}=
             "/var/db/Berkeley/FullAuto/";
       } else {
@@ -13618,14 +13652,14 @@ sub connect_berkeleydb
       my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').'mkdir -p '.
               $m.$Hosts{$mr}{'berkeley_db_path'}.$dbname;
       my $stdout='';my $stderr='';
-      ($stdout,$stderr)=&Net::FullAuto::FA_Core::setuid_cmd($cmd,5);
+      ($stdout,$stderr)=&Net::FullAuto::FA_Core::pty_cmd($cmd,5);
       &handle_error($stderr) if $stderr;
       if ($m) {
          my $cd=cwd();
          chdir $m.$Hosts{$mr}{'berkeley_db_path'}.$dbname;
          my $cmd=$Net::FullAuto::FA_Core::gbp->('bash').
                  'bash -c "umask u=rwx,g=rwx,o=rwx"';
-         ($stdout,$stderr)=&Net::FullAuto::FA_Core::setuid_cmd($cmd,5);
+         ($stdout,$stderr)=&Net::FullAuto::FA_Core::pty_cmd($cmd,5);
          chdir $cd;
       }
    } elsif ($^O eq 'cygwin' &&
@@ -13672,7 +13706,7 @@ sub connect_berkeleydb
       my $cmd=$Net::FullAuto::FA_Core::gbp->('chmod')."chmod -Rv $mode ".
               $Hosts{$mr}{'berkeley_db_path'}.$dbname.'/'.
               "${Net::FullAuto::FA_Core::progname}_${kind}_$lc_dbname.db";
-      my ($stdout,$stderr)=&Net::FullAuto::FA_Core::setuid_cmd($cmd,5);
+      my ($stdout,$stderr)=&Net::FullAuto::FA_Core::pty_cmd($cmd,5);
       &handle_error($stderr) if $stderr && -1==index $stderr,'mode of';
    }
    return $dbenv,$bdb;
@@ -14419,7 +14453,7 @@ END
                         my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').
                                 'mkdir -p '.$m."$fadir/Custom";
                         my $stdout='';my $stderr='';
-                        ($stdout,$stderr)=&setuid_cmd($cmd,5);
+                        ($stdout,$stderr)=&pty_cmd($cmd,5);
                         &Net::FullAuto::FA_Core::handle_error($stderr)
                            if $stderr;
                      }
@@ -14427,7 +14461,7 @@ END
                         my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').
                                 'mkdir -p '.$m."$fadir/Custom/$username";
                         my $stdout='';my $stderr='';
-                        ($stdout,$stderr)=&setuid_cmd($cmd,5);
+                        ($stdout,$stderr)=&pty_cmd($cmd,5);
                         &Net::FullAuto::FA_Core::handle_error($stderr)
                            if $stderr;
                      }
@@ -14435,14 +14469,14 @@ END
                         my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').
                                 'mkdir -p '.$m."$fadir/Custom/$username/$type";
                         my $stdout='';my $stderr='';
-                        ($stdout,$stderr)=&setuid_cmd($cmd,5);
+                        ($stdout,$stderr)=&pty_cmd($cmd,5);
                         &Net::FullAuto::FA_Core::handle_error($stderr)
                            if $stderr;
                      }
                      my $cmd=$Net::FullAuto::FA_Core::gbp->('cp').'cp '.
                           "$fadir/Custom/fa_".lc($type).'.pm '.
                           "$fadir/Custom/$username/$type";
-                     ($stdout,$stderr)=&setuid_cmd($cmd,5);
+                     ($stdout,$stderr)=&pty_cmd($cmd,5);
                      &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
                      if ($^O eq 'cygwin') {
                         my $mode=
@@ -14450,7 +14484,7 @@ END
                         my $cmd=$Net::FullAuto::FA_Core::gbp->('chmod').
                              "chmod -Rv $mode ".
                              "$fadir/Custom/$username/$type/*";
-                        my ($stdout,$stderr)=&setuid_cmd($cmd,5);
+                        my ($stdout,$stderr)=&pty_cmd($cmd,5);
                         &Net::FullAuto::FA_Core::handle_error($stderr)
                            if $stderr && -1==index $stderr,'mode of';
                      }
@@ -16661,8 +16695,7 @@ print $Net::FullAuto::FA_Core::LOG "ID_PROMPTLINE=$line<==\n"
 
 }
 
-sub ping
-{
+sub ping{
    my @topcaller=caller;
    print "ping() CALLER=",(join ' ',@topcaller),"\n"
       if $Net::FullAuto::FA_Core::debug;
@@ -16670,38 +16703,16 @@ sub ping
       (join ' ',@topcaller),"\n" if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    my $cmd='';my $stdout='';my $stderr='';my $didping=10;
-   if ($specialperms eq 'setuid') {
-      if ($^O eq 'cygwin') {
-         $cmd=[ $Net::FullAuto::FA_Core::gbp->('ping').
-                "ping",'-n','1',$_[0],"2>&1" ];
-      } else {
-         my $bashpath=$Net::FullAuto::FA_Core::gbp->('bash');
-         my $pth=$Hosts{"__Master_${$}__"}{'FA_Core'}."ping$$.sh";
-         open(TP,">$pth") || Net::FullAuto::FA_Core::handle_error(
-            "CANNOT OPEN $pth $!");
-         print TP $Net::FullAuto::FA_Core::gbp->('ping')."ping -c1 $_[0] 2>&1"; 
-         CORE::close(TP);
-         $cmd=[ "${bashpath}bash",$pth,"2>&1" ];
-      }
+   if ($^O eq 'cygwin') {
+      $cmd=[ $Net::FullAuto::FA_Core::gbp->('ping')."ping -n 1 $_[0]" ];
    } else {
-      if ($^O eq 'cygwin') {
-         $cmd=[ $Net::FullAuto::FA_Core::gbp->('ping')."ping -n 1 $_[0]" ];
-      } else {
-         $cmd=[ $Net::FullAuto::FA_Core::gbp->('ping')."ping -c1 $_[0]" ];
-      }
+      $cmd=[ $Net::FullAuto::FA_Core::gbp->('ping')."ping -c1 $_[0]" ];
    }
    eval {
-      unless ($specialperms eq 'setuid') {
-         ($stdout,$stderr)=$localhost->cmd($cmd->[0],5);
-      } else {
-         $didping=7;
-         ($stdout,$stderr)=&setuid_cmd($cmd,5);
-      }
+      $didping=7;
+      ($stdout,$stderr)=&pty_cmd($cmd,5);
    };
    my $ev_err=$@||'';
-   if ($specialperms eq 'setuid' && $^O ne 'cygwin') {
-      unlink $Hosts{"__Master_${$}__"}{'FA_Core'}."ping$$.sh";
-   } 
    if ($ev_err) {
       if (wantarray) {
          return 0,
@@ -16922,14 +16933,14 @@ sub cwd
    }
 }
 
-sub setuid_cmd
+sub pty_cmd
 {
    my @topcaller=caller; # Save Pound Sign
-   print "\nINFO: setuid_cmd() (((((((CALLER))))))):\n       ",
+   print "\nINFO: pty_cmd() (((((((CALLER))))))):\n       ",
       (join ' ',@topcaller),"\n\n"
       if !$Net::FullAuto::FA_Core::cron &&
       $Net::FullAuto::FA_Core::debug;
-   print $Net::FullAuto::FA_Core::LOG "setuid_cmd() CALLER=",
+   print $Net::FullAuto::FA_Core::LOG "pty_cmd() CALLER=",
       (join ' ',@topcaller),"\n"
       if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*'; # Save Pound Sign
@@ -17262,7 +17273,7 @@ print $Net::FullAuto::FA_Core::LOG "main::cmd() LAUNCING ***NEW*** HANDLE=",
          my $sedpath=$Net::FullAuto::FA_Core::gbp->('sed');
          $cmd="$self | ${sedpath}sed -e \'s/^/stdout: /\' 2>&1";
       }
-      ($stdout,$stderr)=&setuid_cmd($cmd,$cmd_timeout);
+      ($stdout,$stderr)=&pty_cmd($cmd,$cmd_timeout);
       &handle_error($stderr,'-1') if $stderr;
    }
    if ($all) {

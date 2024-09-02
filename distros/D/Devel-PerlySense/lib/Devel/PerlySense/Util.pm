@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Util;
-$Devel::PerlySense::Util::VERSION = '0.0221';
+$Devel::PerlySense::Util::VERSION = '0.0223';
 use base "Exporter";
 
 our @EXPORT = (

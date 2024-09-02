@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+use v5.38;
+use strict;
+use warnings;
+
+use Acme::Free::API::Geodata::GeoIP;
+
+my $ip = shift @ARGV;
+if(!defined($ip)) {
+    die("Usage: geoip IPADDRESS");
+}
+  
+my $agent = Acme::Free::API::Geodata::GeoIP->new(debug => 1);
+
+my $geodata = $agent->lookup($ip);
+
+if(!defined($geodata)) {
+    die("Lookup failed");
+}
+
+print "$ip is hosted by ", $geodata->{org}, " in ", $geodata->{city}, " (", $geodata->{country}, ")\n";
+

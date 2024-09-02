@@ -27,6 +27,14 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
+## Enhancements in Version 24.8
+
+* Added **StartSplit** and **StartUploadAndSplit** methods to async API.
+* Added **ReplacePresentationRegex** and **ReplacePresentationRegexOnline** methods.
+* Added **HighlightPresentationText** and **HighlightPresentationRegex** methods.
+* Added **OperationError** class; changed **Operation**.**Error** property type from string to **OperationError**.
+* Removed **wholeWordsOnly** parameter from **ReplaceShapeRegex** method.
+
 ## Enhancements in Version 24.7
 
 * Added **TemplatesPath** property to **Html5ExportOptions** class. It enables using custom templates in conversion to Html5 format.

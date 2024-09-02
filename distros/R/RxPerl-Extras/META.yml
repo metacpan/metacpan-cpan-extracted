@@ -27,7 +27,7 @@ no_index:
 provides:
   RxPerl::Extras:
     file: lib/RxPerl/Extras.pm
-    version: v0.0.4
+    version: v0.0.5
 requires:
   RxPerl: '0'
   perl: '5.010'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://gitlab.com/karjala/rxperl-extras/issues
   homepage: https://gitlab.com/karjala/rxperl-extras
   repository: https://gitlab.com/karjala/rxperl-extras.git
-version: v0.0.4
+version: v0.0.5
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

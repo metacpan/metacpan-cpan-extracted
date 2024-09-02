@@ -73,7 +73,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Plugin::Syntax::Moose;
-$Devel::PerlySense::Plugin::Syntax::Moose::VERSION = '0.0221';
+$Devel::PerlySense::Plugin::Syntax::Moose::VERSION = '0.0223';
 
 
 

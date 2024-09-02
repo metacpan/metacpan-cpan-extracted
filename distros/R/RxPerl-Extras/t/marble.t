@@ -8,6 +8,7 @@ use RxPerl::Test;
 
 use RxPerl::SyncTimers ':all';
 use RxPerl::Extras ':all';
+use Mojo::Promise;
 
 subtest 'op_exhaust_map_with_latest' => sub {
     my $o = rx_timer(0, 10)->pipe(

@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Nice-Try/issues
   repository: https://gitlab.com/jackdeguest/Nice-Try
-version: v1.3.11
+version: v1.3.12
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

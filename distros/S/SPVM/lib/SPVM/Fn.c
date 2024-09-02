@@ -356,7 +356,7 @@ int32_t SPVM__Fn__memcpy(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   if (!(env->is_string(env, stack, obj_dest) || env->is_numeric_array(env, stack, obj_dest) || env->is_mulnum_array(env, stack, obj_dest))) {
-    return env->die(env, stack, "The type of the dest $dest must be the string type, a numeric array type, or a multi-numeric array type.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The type of the dest $dest must be string type, a numeric array type, or a multi-numeric array type.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!obj_source) {
@@ -364,7 +364,7 @@ int32_t SPVM__Fn__memcpy(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   if (!(env->is_string(env, stack, obj_source) || env->is_numeric_array(env, stack, obj_source) || env->is_mulnum_array(env, stack, obj_source))) {
-    return env->die(env, stack, "The type of the source $source must be the string type, a numeric array type, or a multi-numeric array type.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The type of the source $source must be string type, a numeric array type, or a multi-numeric array type.", __func__, FILE_NAME, __LINE__);
   }
   
   if (env->is_read_only(env, stack, obj_dest)) {
@@ -415,7 +415,7 @@ int32_t SPVM__Fn__memmove(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   if (!(env->is_string(env, stack, obj_dest) || env->is_numeric_array(env, stack, obj_dest) || env->is_mulnum_array(env, stack, obj_dest))) {
-    return env->die(env, stack, "The type of the dest $dest must be the string type, a numeric array type, or a multi numeric array type.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The type of the dest $dest must be string type, a numeric array type, or a multi numeric array type.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!obj_source) {
@@ -423,7 +423,7 @@ int32_t SPVM__Fn__memmove(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
 
   if (!(env->is_string(env, stack, obj_source) || env->is_numeric_array(env, stack, obj_source) || env->is_mulnum_array(env, stack, obj_source))) {
-    return env->die(env, stack, "The type of the source $source must be the string type, a numeric array type, or a multi numeric array type.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The type of the source $source must be string type, a numeric array type, or a multi numeric array type.", __func__, FILE_NAME, __LINE__);
   }
 
   if (env->is_read_only(env, stack, obj_dest)) {
@@ -742,6 +742,68 @@ int32_t SPVM__Fn__get_compile_type_name(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_compile_type_name = env->get_compile_type_name(env, stack, basic_type_name, type_dimension, type_flag);
   
   stack[0].oval = obj_compile_type_name;
+  
+  return 0;
+}
+
+int32_t SPVM__Fn__array_length(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_array = stack[0].oval;
+  
+  if (!obj_array) {
+    return env->die(env, stack, "The array $array must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  int32_t is_array = env->is_array(env, stack, obj_array);
+  
+  if (!is_array) {
+    return env->die(env, stack, "The type of the array $array must be an array type.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  int32_t length = env->length(env, stack, obj_array);
+  
+  stack[0].ival = length;
+  
+  return 0;
+}
+
+int32_t SPVM__Fn__get_elem_size(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_array = stack[0].oval;
+  
+  if (!obj_array) {
+    return env->die(env, stack, "The array $array must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  int32_t is_array = env->is_array(env, stack, obj_array);
+  
+  if (!is_array) {
+    return env->die(env, stack, "The type of the array $array must be an array type.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  int32_t elem_size = env->get_elem_size(env, stack, obj_array);
+  
+  stack[0].ival = elem_size;
+  
+  return 0;
+}
+
+int32_t SPVM__Fn__print_stderr(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_string = stack[0].oval;
+  
+  env->print_stderr(env, stack, obj_string);
+  
+  return 0;
+}
+
+int32_t SPVM__Fn__say_stderr(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_string = stack[0].oval;
+  
+  env->print_stderr(env, stack, obj_string);
+  
+  fputc('\n', env->spvm_stderr(env, stack));
   
   return 0;
 }

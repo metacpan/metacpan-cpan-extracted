@@ -1,3 +1,12 @@
+0.08 - 2024-09-01
+- Fix memory leak in encodeMultiBulk (mauke)
+- Fix memory leak when encoding bad data (mauke)
+- Optimize encoding by writing the message to a single SV (mauke)
+- Support building against hiredis 1.0 and newer (5c30)
+  - Note that though hiredis 1.0 supports RESP3, Protocol::Redis::XS does not yet fully support
+    RESP3 and it will likely require a different 'api' value passed to the constructor.
+- Avoid context sensitive return value when an unknown 'api' value is passed
+
 0.07 - 2019-12-25
 - Increase Protocol::Redis requirement for test fixes
 

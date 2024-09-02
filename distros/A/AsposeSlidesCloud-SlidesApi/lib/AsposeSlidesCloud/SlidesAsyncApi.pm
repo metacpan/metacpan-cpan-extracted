@@ -971,4 +971,385 @@ sub start_save_presentation {
     return $_response_object;
 }
 
+#
+# start_split
+#
+# 
+# 
+# @param string $name  (required)
+# @param string $format  (required)
+# @param ExportOptions $options  (optional)
+# @param int $width  (optional)
+# @param int $height  (optional)
+# @param int $from  (optional)
+# @param int $to  (optional)
+# @param string $dest_folder  (optional)
+# @param string $password  (optional)
+# @param string $folder  (optional)
+# @param string $storage  (optional)
+# @param string $fonts_folder  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'ExportOptions',
+        description => '',
+        required => '0',
+    },
+    'width' => {
+        data_type => 'int',
+        description => '',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => '',
+        required => '0',
+    },
+    'from' => {
+        data_type => 'int',
+        description => '',
+        required => '0',
+    },
+    'to' => {
+        data_type => 'int',
+        description => '',
+        required => '0',
+    },
+    'dest_folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'start_split' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+        };
+}
+# @return string
+#
+sub start_split {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling start_split");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling start_split");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/async/{name}/split/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'width'} && defined $args{'width'}) {
+        $query_params->{'width'} = $self->{api_client}->to_query_value($args{'width'});
+    }
+
+    # query params
+    if (exists $args{'height'} && defined $args{'height'}) {
+        $query_params->{'height'} = $self->{api_client}->to_query_value($args{'height'});
+    }
+
+    # query params
+    if (exists $args{'from'} && defined $args{'from'}) {
+        $query_params->{'from'} = $self->{api_client}->to_query_value($args{'from'});
+    }
+
+    # query params
+    if (exists $args{'to'} && defined $args{'to'}) {
+        $query_params->{'to'} = $self->{api_client}->to_query_value($args{'to'});
+    }
+
+    # query params
+    if (exists $args{'dest_folder'} && defined $args{'dest_folder'}) {
+        $query_params->{'destFolder'} = $self->{api_client}->to_query_value($args{'dest_folder'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'options'} && $args{'options'}) {
+        $_body_data = $args{'options'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# start_upload_and_split
+#
+# 
+# 
+# @param File $document Document data. (required)
+# @param string $format  (required)
+# @param string $dest_folder  (optional, default to )
+# @param int $width  (optional)
+# @param int $height  (optional)
+# @param int $from  (optional)
+# @param int $to  (optional)
+# @param string $password  (optional)
+# @param string $storage  (optional)
+# @param string $fonts_folder  (optional)
+# @param ExportOptions $options  (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'dest_folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'width' => {
+        data_type => 'int',
+        description => '',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => '',
+        required => '0',
+    },
+    'from' => {
+        data_type => 'int',
+        description => '',
+        required => '0',
+    },
+    'to' => {
+        data_type => 'int',
+        description => '',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'options' => {
+        data_type => 'ExportOptions',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'start_upload_and_split' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+        };
+}
+# @return string
+#
+sub start_upload_and_split {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling start_upload_and_split");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling start_upload_and_split");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/async/split/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'dest_folder'} && defined $args{'dest_folder'}) {
+        $query_params->{'destFolder'} = $self->{api_client}->to_query_value($args{'dest_folder'});
+    }
+
+    # query params
+    if (exists $args{'width'} && defined $args{'width'}) {
+        $query_params->{'width'} = $self->{api_client}->to_query_value($args{'width'});
+    }
+
+    # query params
+    if (exists $args{'height'} && defined $args{'height'}) {
+        $query_params->{'height'} = $self->{api_client}->to_query_value($args{'height'});
+    }
+
+    # query params
+    if (exists $args{'from'} && defined $args{'from'}) {
+        $query_params->{'from'} = $self->{api_client}->to_query_value($args{'from'});
+    }
+
+    # query params
+    if (exists $args{'to'} && defined $args{'to'}) {
+        $query_params->{'to'} = $self->{api_client}->to_query_value($args{'to'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # body params
+    if ( exists $args{'options'} && $args{'options'}) {
+        $_body_data = $args{'options'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
 1;

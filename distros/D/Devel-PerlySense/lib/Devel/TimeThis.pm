@@ -23,7 +23,7 @@ use warnings;
 use utf8;
 
 package Devel::TimeThis;
-$Devel::TimeThis::VERSION = '0.0221';
+$Devel::TimeThis::VERSION = '0.0223';
 
 
 

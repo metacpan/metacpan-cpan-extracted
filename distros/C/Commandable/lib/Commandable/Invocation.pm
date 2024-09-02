@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2018-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Invocation 0.12;
+package Commandable::Invocation 0.13;
 
 use v5.26;
 use warnings;

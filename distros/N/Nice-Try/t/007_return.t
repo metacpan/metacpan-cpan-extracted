@@ -48,16 +48,17 @@ use Nice::Try;
 
 # return inside eval{} inside try{}
 {
+    my $rv = sub {
+        my $two;
+        try {
+            my $one = eval { return 1 };
+            $two = $one + 1;
+        }
+        catch {}
+        return $two;
+    }->();
     is(
-        ( sub {
-            my $two;
-            try {
-                my $one = eval { return 1 };
-                $two = $one + 1;
-            }
-            catch {}
-            return $two;
-        } )->(),
+        $rv,
         2,
         'return in eval{} inside try{} behaves as expected'
     );

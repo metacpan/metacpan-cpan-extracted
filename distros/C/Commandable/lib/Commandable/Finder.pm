@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder 0.12;
+package Commandable::Finder 0.13;
 
 use v5.26;
 use warnings;
@@ -90,6 +90,104 @@ sub configure ( $self, %conf )
    return $self;
 }
 
+=head2 add_global_options
+
+   $finder->add_global_options( @optspecs );
+
+I<Since version 0.13.>
+
+Adds additional global options to the stored set.
+
+Each is specified as a HASH reference containing keys to specify one option,
+in the same style as the per-command options used by
+L<Commandable::Finder::Packages>.
+
+In addition, each should also provide a key named C<into>, whose value should
+be a SCALAR or CODE reference to be used for applying the value for the option
+when it is parsed. SCALAR references will be assigned to directly; CODE
+references will be invoked with the option's name and value as positional
+arguments:
+
+   $$into = $value;
+   $into->( $name, $value );
+
+This style permits a relatively easy upgrade from such modules as
+L<Getopt::Long>, to handle global options.
+
+   GetOptions(
+      'verbose|v+' => \my $VERBOSE,
+      'silent|s'   => \my $SILENT,
+   ) or exit 1;
+
+Can now become
+
+   $finder->add_global_options(
+      { name => "verbose|v", mode => "inc", into => \my $VERBOSE,
+         description => "Increase verbosity of output" },
+      { name => "silent|s", into => \my $SILENT,
+         description => "Silence output entirely" },
+   );
+
+with the added benefit of automated integration with the global C<help>
+command, more consistent option parsing along with other command handling, and
+so on.
+
+=cut
+
+sub add_global_options ( $self, @optspecs )
+{
+   foreach my $optspec ( @optspecs ) {
+      my $into = $optspec->{into};
+      my $opt = Commandable::Command::_Option->new( %$optspec );
+
+      my $name = $opt->name;
+      defined $into or
+         croak "Global option $name requires an 'into'";
+      ( ref $into ) =~ m/^(?:SCALAR|CODE)$/ or
+         croak "Global option $name 'into' must be a SCALAR or CODE reference; got ";
+
+      $self->{global_options}{ $_ } = $opt for $opt->names;
+      $self->{global_options_into}{ $opt->keyname } = $into;
+   }
+
+   return $self;
+}
+
+=head2 handle_global_options
+
+   $finder->handle_global_options( $cinv );
+
+I<Since version 0.13.>
+
+Extracts global options from the command invocation and process them into the
+C<into> references previously supplied.
+
+Normally it would not be necessary to invoke this directly, because the main
+L</find_and_invoke> method does this anyway. It is provided in case the
+implementing program performs its own command handling or changes the logic in
+some other way.
+
+=cut
+
+sub handle_global_options ( $self, $cinv )
+{
+   my $global_optspecs = $self->{global_options}
+      or return;
+
+   my $opts = $self->parse_invocation_options( $cinv, $global_optspecs, passthrough => 1 );
+
+   foreach ( keys %$opts ) {
+      my $value = $opts->{$_};
+      my $into = $self->{global_options_into}{$_};
+      if( ref $into eq "SCALAR" ) {
+         $into->$* = $value;
+      }
+      else {
+         $into->( $_, $value );
+      }
+   }
+}
+
 =head2 find_commands
 
    @commands = $finder->find_commands;
@@ -125,87 +223,7 @@ sub parse_invocation ( $self, $command, $cinv )
    my @args;
 
    if( my %optspec = $command->options ) {
-      push @args, my $opts = {};
-      my @remaining;
-
-      while( defined( my $token = $cinv->pull_token ) ) {
-         last if $token eq "--";
-
-         my $spec;
-         my $value_in_token;
-         my $token_again;
-
-         my $value = 1;
-         if( $token =~ s/^--([^=]+)(=|$)// ) {
-            my ( $opt, $equal ) = ($1, $2);
-            if( !$optspec{$opt} and $opt =~ /no-(.+)/ ) {
-               $spec = $optspec{$1} and $spec->negatable
-                  or die "Unrecognised option name --$opt\n";
-               $value = undef;
-            }
-            else {
-               $spec = $optspec{$opt} or die "Unrecognised option name --$opt\n";
-               $value_in_token = length $equal;
-            }
-         }
-         elsif( $token =~ s/^-(.)// ) {
-            $spec = $optspec{$1} or die "Unrecognised option name -$1\n";
-            if( $spec->mode_expects_value ) {
-               $value_in_token = length $token;
-            }
-            elsif( $self->{config}{bundling} and length $token and length($1) == 1 ) {
-               $token_again = "-$token";
-               undef $token;
-            }
-         }
-         else {
-            push @remaining, $token;
-            if( $self->{config}{require_order} ) {
-               last;
-            }
-            else {
-               next;
-            }
-         }
-
-         my $name = $spec->name;
-
-         if( $spec->mode_expects_value ) {
-            $value = $value_in_token ? $token
-                                     : ( $cinv->pull_token // die "Expected value for option --$name\n" );
-         }
-         else {
-            die "Unexpected value for parameter $name\n" if $value_in_token or length $token;
-         }
-
-         if( defined( my $typespec = $spec->typespec ) ) {
-            if( $typespec eq "i" ) {
-               $value =~ m/^-?\d+$/ or
-                  die "Value for parameter $name must be an integer\n";
-            }
-         }
-
-         $name =~ s/-/_/g;
-
-         if( $spec->mode eq "multi_value" ) {
-            push @{ $opts->{$name} }, $value;
-         }
-         elsif( $spec->mode eq "inc" ) {
-            $opts->{$name}++;
-         }
-         else {
-            $opts->{$name} = $value;
-         }
-
-         $token = $token_again, redo if defined $token_again;
-      }
-
-      $cinv->putback_tokens( @remaining );
-
-      foreach my $spec ( values %optspec ) {
-         my $name = $spec->name;
-         $opts->{$name} = $spec->default if defined $spec->default and !exists $opts->{$name};
-      }
+      push @args, $self->parse_invocation_options( $cinv, \%optspec );
    }
 
    foreach my $argspec ( $command->arguments ) {
@@ -232,6 +250,110 @@ sub parse_invocation ( $self, $command, $cinv )
    return @args;
 }
 
+sub parse_invocation_options ( $self, $cinv, $optspec, %params )
+{
+   my $passthrough = $params{passthrough};
+
+   my $opts = {};
+   my @remaining;
+
+   while( defined( my $token = $cinv->pull_token ) ) {
+      if( $token eq "--" ) {
+         push @remaining, $token if $passthrough;
+         last;
+      }
+
+      my $spec;
+      my $value_in_token;
+      my $token_again;
+
+      my $value = 1;
+      my $orig = $token;
+
+      if( $token =~ s/^--([^=]+)(=|$)// ) {
+         my ( $opt, $equal ) = ($1, $2);
+         if( !$optspec->{$opt} and $opt =~ /no-(.+)/ ) {
+            $spec = $optspec->{$1} and $spec->negatable
+               or die "Unrecognised option name --$opt\n";
+            $value = undef;
+         }
+         elsif( $spec = $optspec->{$opt} ) {
+            $value_in_token = length $equal;
+         }
+         else {
+            die "Unrecognised option name --$opt\n" unless $passthrough;
+            push @remaining, $orig;
+            next;
+         }
+      }
+      elsif( $token =~ s/^-(.)// ) {
+         unless( $spec = $optspec->{$1} ) {
+            die "Unrecognised option name -$1\n" unless $passthrough;
+            push @remaining, $orig;
+            next;
+         }
+         if( $spec->mode_expects_value ) {
+            $value_in_token = length $token;
+         }
+         elsif( $self->{config}{bundling} and length $token and length($1) == 1 ) {
+            $token_again = "-$token";
+            undef $token;
+         }
+      }
+      else {
+         push @remaining, $token;
+         if( $self->{config}{require_order} ) {
+            last;
+         }
+         else {
+            next;
+         }
+      }
+
+      my $name = $spec->name;
+
+      if( $spec->mode_expects_value ) {
+         $value = $value_in_token ? $token
+                                  : ( $cinv->pull_token // die "Expected value for option --$name\n" );
+      }
+      else {
+         die "Unexpected value for parameter $name\n" if $value_in_token or length $token;
+      }
+
+      if( defined( my $matches = $spec->matches ) ) {
+         $value =~ $matches or
+            die "Value for --$name option must " . $spec->match_msg . "\n";
+      }
+
+      my $keyname = $spec->keyname;
+
+      if( $spec->mode eq "multi_value" ) {
+         push $opts->{$keyname}->@*, $value;
+      }
+      elsif( $spec->mode eq "inc" ) {
+         $opts->{$keyname}++;
+      }
+      elsif( $spec->mode eq "bool" ) {
+         $opts->{$keyname} = !!$value;
+      }
+      else {
+         $opts->{$keyname} = $value;
+      }
+
+      $token = $token_again, redo if defined $token_again;
+   }
+
+   $cinv->putback_tokens( @remaining );
+
+   foreach my $spec ( values %$optspec ) {
+      my $keyname = $spec->keyname;
+      $opts->{$keyname} = $spec->default if
+         defined $spec->default and !exists $opts->{$keyname};
+   }
+
+   return $opts;
+}
+
 =head2 find_and_invoke
 
    $result = $finder->find_and_invoke( $cinv );
@@ -249,6 +371,10 @@ while the invocation string is non-empty.
 sub find_and_invoke ( $self, $cinv )
 {
    my $multiple = $self->{config}{allow_multiple_commands};
+
+   # global options come first
+   $self->handle_global_options( $cinv )
+      if $self->{global_options};
 
    my $result;
    {
@@ -359,10 +485,11 @@ sub _join
    help $commandname
 
 With no arguments, prints a summary table of known command names and their
-descriptive text.
+descriptive text. If any global options have been registered, these are
+described as well.
 
 With a command name argument, prints more descriptive text about that command,
-additionally detailing the arguments.
+additionally detailing the arguments and options.
 
 The package that implements a particular command can provide more output by
 implementing a method called C<commandable_more_help>, which will take as a
@@ -372,13 +499,46 @@ extra output it wishes.
 
 =cut
 
+sub _print_optspecs ( $optspecs )
+{
+   # @optspecs may contain duplicates; filter them
+   my %primary_names = map { $_->name => 1 } values %$optspecs;
+   my @optspecs = @$optspecs{ sort keys %primary_names };
+
+   my $first = 1;
+   foreach my $optspec ( @optspecs ) {
+      Commandable::Output->printf( "\n" ) unless $first; undef $first;
+
+      my $default = $optspec->default;
+      my $value   = $optspec->mode eq "value" ? " <value>" : "";
+      my $no      = $optspec->negatable       ? "[no-]"    : "";
+
+      Commandable::Output->printf( "    %s\n",
+         _join( ", ", map {
+            Commandable::Output->format_note( length $_ > 1 ? "--$no$_$value" : "-$_$value", 1 )
+         } $optspec->names )
+      );
+      Commandable::Output->printf( "      %s%s\n",
+         $optspec->description,
+         ( defined $default ? " (default: $default)" : "" ),
+      );
+   }
+}
+
 sub builtin_command_helpsummary ( $self )
 {
    my @commands = sort { $a->name cmp $b->name } $self->find_commands;
 
+   Commandable::Output->print_heading( "COMMANDS:" );
    _print_table2 ": ", map {
-      [ Commandable::Output->format_note( $_->name ), $_->description ]
+      [ "  " . Commandable::Output->format_note( $_->name ), $_->description ]
    } @commands;
+
+   if( my $opts = $self->{global_options} ) {
+      Commandable::Output->printf( "\n" );
+      Commandable::Output->print_heading( "GLOBAL OPTIONS:" );
+      _print_optspecs( $opts );
+   }
 }
 
 sub builtin_command_helpcmd ( $self, $cmdname )
@@ -415,28 +575,7 @@ sub builtin_command_helpcmd ( $self, $cmdname )
       Commandable::Output->printf( "\n" );
       Commandable::Output->print_heading( "OPTIONS:" );
 
-      # %optspecs contains duplicates; filter them
-      my %primary_names = map { $_->name => 1 } values %optspecs;
-      my @primary_optspecs = @optspecs{ sort keys %primary_names };
-
-      my $first = 1;
-      foreach my $optspec ( @primary_optspecs ) {
-         Commandable::Output->printf( "\n" ) unless $first; undef $first;
-
-         my $default = $optspec->default;
-         my $value   = $optspec->mode eq "value" ? " <value>" : "";
-         my $no      = $optspec->negatable       ? "[no-]"    : "";
-
-         Commandable::Output->printf( "    %s\n",
-            _join( ", ", map {
-               Commandable::Output->format_note( length $_ > 1 ? "--$no$_$value" : "-$_$value", 1 )
-            } $optspec->names )
-         );
-         Commandable::Output->printf( "      %s%s\n",
-            $optspec->description,
-            ( defined $default ? " (default: $default)" : "" ),
-         );
-      }
+      _print_optspecs( \%optspecs );
    }
 
    if( @argspecs ) {

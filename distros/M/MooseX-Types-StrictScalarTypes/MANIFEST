@@ -1,0 +1,13 @@
+GPL2.txt
+ARTISTIC.txt
+README
+MANIFEST.SKIP
+MANIFEST
+t/moosex-types-strictscalartypes.t
+lib/MooseX/Types/StrictScalarTypes.pm
+Makefile.PL
+CHANGELOG
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

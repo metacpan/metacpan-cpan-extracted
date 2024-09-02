@@ -63,12 +63,13 @@ my $perl5lib = "$ENV{PERL5LIB}$path_sep$blib_arch$path_sep$blib_lib";
   
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "=head1 Usage"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "=head1 Details"));
-  ok(SPVM::Builder::Util::file_contains($perl_class_file, "=head1 Inheritance"));
+  ok(SPVM::Builder::Util::file_contains($perl_class_file, "=head1 Super Class"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "=head1 Interfaces"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "=head1 Enumerations"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "=head1 Fields"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "=head1 Class Methods"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "=head1 Instance Methods"));
+  ok(SPVM::Builder::Util::file_contains($perl_class_file, "=head1 See Also"));
   
   my $spvm_class_file = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.spvm";
   ok(-f $spvm_class_file);
@@ -91,6 +92,7 @@ my $perl5lib = "$ENV{PERL5LIB}$path_sep$blib_arch$path_sep$blib_lib";
   ok(SPVM::Builder::Util::file_contains($makefile_pl_file, q|mit|));
   ok(SPVM::Builder::Util::file_contains($makefile_pl_file, '[--user-name]'));
   ok(SPVM::Builder::Util::file_contains($makefile_pl_file, '[--user-email]'));
+  ok(SPVM::Builder::Util::file_contains($makefile_pl_file, q|# release_status => 'stable',|));
   
   # VERSION_FROM must be included in Makefile.PL to resolve CPAN module dependencies.
   # VERSION is not sufficient.
@@ -680,7 +682,7 @@ for my $test_index (0 .. 1) {
   my $perl_class_file = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.pm";
   ok(-f $perl_class_file);
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "package SPVM::Foo;"));
-  ok(SPVM::Builder::Util::file_contains($perl_class_file, "L<resouce|SPVM::Document::Resource>"));
+  ok(SPVM::Builder::Util::file_contains($perl_class_file, "L<resource|SPVM::Document::Resource>"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "MyClass.config:"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "MyClass.c:"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "new_gnu99"));
@@ -745,7 +747,7 @@ for my $test_index (0 .. 1) {
   my $perl_class_file = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.pm";
   ok(-f $perl_class_file);
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "package SPVM::Foo;"));
-  ok(SPVM::Builder::Util::file_contains($perl_class_file, "L<resouce|SPVM::Document::Resource>"));
+  ok(SPVM::Builder::Util::file_contains($perl_class_file, "L<resource|SPVM::Document::Resource>"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "MyClass.config:"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "MyClass.cpp:"));
   ok(SPVM::Builder::Util::file_contains($perl_class_file, "new_cpp"));

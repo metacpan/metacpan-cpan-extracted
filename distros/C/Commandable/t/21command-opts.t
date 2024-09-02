@@ -17,6 +17,8 @@ package MyTest::Command::one {
       { name => "multi",     description => "multi option", multi => 1 },
       { name => "hyphenated-name|h", description => "option with hyphen in its name" },
       { name => "number|n=i", description => "number option" },
+      { name => "count|c=u", description => "count option" },
+      { name => "size=f", description => "float option" },
    );
    sub run {}
 }
@@ -25,7 +27,7 @@ package MyTest::Command::two {
    use constant COMMAND_NAME => "two";
    use constant COMMAND_DESC => "the two command";
    use constant COMMAND_OPTS => (
-      { name => "default", description => "default option", default => "value" },
+      { name => "with-default", description => "default option", default => "value" },
    );
    sub run {}
 }
@@ -126,7 +128,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "" );
 
-   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { default => "value" } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { with_default => "value" } ],
       '$cmd->parse_invocation with default option' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -148,7 +150,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "--no-silent" );
 
-   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { silent => undef } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { silent => !!0 } ],
       '$cmd->parse_invocation with negated option' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -175,22 +177,45 @@ my $finder = Commandable::Finder::Packages->new(
       '$cmd->parse_invocation fails with value to incrementable option' );
 }
 
-# i-typed options check for numerical
+# typed options
 {
    my $cmd = $finder->find_command( "one" );
 
-   my $inv = Commandable::Invocation->new( "-n1" );
-
    ok( lives {
-      is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { number => 1 } ],
+      is( [ $finder->parse_invocation( $cmd,
+               Commandable::Invocation->new( "-n1" ) ) ],
+          [ { number => 1 } ],
          '$cmd->parse_invocation with integer-numerical option' );
       } );
 
-   $inv = Commandable::Invocation->new( "-nBAD" );
-
-   like( dies { $finder->parse_invocation( $cmd, $inv ) },
-      qr/^Value for parameter number must be an integer/,
+   like( dies { $finder->parse_invocation( $cmd,
+            Commandable::Invocation->new( "-nBAD" ) ) },
+      qr/^Value for --number option must be an integer/,
       '$cmd->parse_invocation fails with non-integer value' );
+
+   ok( lives {
+      is( [ $finder->parse_invocation( $cmd,
+               Commandable::Invocation->new( "-c5" ) ) ],
+          [ { count => 5 } ],
+         '$cmd->parse_invocation with integer count option' );
+      } );
+
+   like( dies { $finder->parse_invocation( $cmd,
+            Commandable::Invocation->new( "-c-5" ) ) },
+      qr/^Value for --count option must be a non-negative integer/,
+      '$cmd->parse_invocation fails with negative count' );
+
+   ok( lives {
+      is( [ $finder->parse_invocation( $cmd,
+               Commandable::Invocation->new( "--size=1.234" ) ) ],
+          [ { size => 1.234 } ],
+         '$cmd->parse_invocation with size option' );
+      } );
+
+   like( dies { $finder->parse_invocation( $cmd,
+            Commandable::Invocation->new( "--size=BAD" ) ) },
+      qr/^Value for --size option must be a floating-point number/,
+      '$cmd->parse_invocation fails with bad size' );
 }
 
 done_testing;

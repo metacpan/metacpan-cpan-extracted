@@ -1,0 +1,55 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown",
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MooseX-Types-StrictScalarTypes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "1.06",
+            "MooseX::Types" : "0.5",
+            "MooseX::Types::Moose" : "0.5",
+            "Scalar::Type" : "v1.0.1",
+            "Test2::V0" : "0.000159"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DrHyde/perl-modules-MooseX-Types-StrictScalarTypes/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/DrHyde/perl-modules-MooseX-Types-StrictScalarTypes"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

@@ -56,7 +56,7 @@
    "provides" : {
       "RxPerl::Extras" : {
          "file" : "lib/RxPerl/Extras.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.5"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://gitlab.com/karjala/rxperl-extras"
       }
    },
-   "version" : "v0.0.4",
+   "version" : "v0.0.5",
    "x_authority" : "cpan:KARJALA",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1

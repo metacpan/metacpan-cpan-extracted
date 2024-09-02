@@ -45,7 +45,7 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { \1; } }';
-    compile_not_ok($source, qr'The operand of the reference operator must be a variable');
+    compile_not_ok($source, qr'The operand of reference operator must be a variable');
   }
 }
 
@@ -115,17 +115,17 @@ use Test::More;
   
   {
     my $source = 'class MyClass : interface_t { our $FOO : int; }';
-    compile_not_ok($source, qr/The interface cannnot have class variables/);
+    compile_not_ok($source, qr/An interface cannnot have class variables/);
   }
   
   {
     my $source = 'class MyClass : interface_t { has foo : int; }';
-    compile_not_ok($source, qr/The interface cannnot have fields/);
+    compile_not_ok($source, qr/An interface cannnot have fields/);
   }
   
   {
     my $source = 'class MyClass : interface_t { static method foo : void (); }';
-    compile_not_ok($source, q|The non-native method must have the block.|);
+    compile_not_ok($source, q|A non-native method must have a block.|);
   }
   
   {
@@ -172,31 +172,31 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method foo : void (); }';
-    compile_not_ok($source, qr/The non-native method must have the block/);
+    compile_not_ok($source, qr/A non-native method must have a block/);
   }
   {
     my $source = 'class MyClass { static method foo : void () { static method : int () { } } }';
-    compile_not_ok($source, qr/The anon method must be an instance method/);
+    compile_not_ok($source, qr/An anon method must be an instance method/);
   }
   {
     my $source = 'class MyClass { required method foo : void () { } }';
-    compile_not_ok($source, qr/The method defined in the class cannnot have the method attribute "required"/);
+    compile_not_ok($source, qr/MyClass#foo method cannnot have the method attribute "required"/);
   }
   {
     my $source = 'class MyClass { method foo : void () { } method foo : void () { } }';
-    compile_not_ok($source, qr/Redeclaration of the "foo" method in the "MyClass" class/);
+    compile_not_ok($source, qr/Redeclaration of MyClass#foo method/);
   }
   {
     my $source = 'class MyClass : mulnum_t { method foo : void () { } }';
-    compile_not_ok($source, qr/The multi-numeric type cannnot have methods/);
+    compile_not_ok($source, qr/A multi-numeric type cannnot have methods/);
   }
   {
     my $source = 'class MyClass : mulnum_t { our $FOO : int; }';
-    compile_not_ok($source, qr/The multi-numeric type cannnot have class variables/);
+    compile_not_ok($source, qr/A multi-numeric type cannnot have class variables/);
   }
   {
     my $source = 'class MyClass : mulnum_t { }';
-    compile_not_ok($source, qr/The multi-numeric type must have at least one field/);
+    compile_not_ok($source, qr/A multi-numeric type must have at least one field/);
   }
   {
     my $source = 'class MyClass : mulnum_t { }';
@@ -276,19 +276,19 @@ use Test::More;
   }
   {
     my $source = 'class MyClass { native method foo : void () { } }';
-    compile_not_ok($source, qr/The native method cannnot have the block/);
+    compile_not_ok($source, qr/A native method cannnot have its block/);
   }
   {
     my $source = 'class MyClass { method DESTROY : int () { } }';
-    compile_not_ok($source, qr/The return type of the DESTROY destructor method must be the void type/);
+    compile_not_ok($source, qr/The return type of DESTROY method must be the void type/);
   }
   {
     my $source = 'class MyClass { static method DESTROY : void () { } }';
-    compile_not_ok($source, qr/The DESTROY destructor method must be an instance method/);
+    compile_not_ok($source, qr/DESTROY method must be an instance method/);
   }
   {
     my $source = 'class MyClass { method DESTROY : void ($var : int) { } }';
-    compile_not_ok($source, qr/The DESTROY destructor method cannnot have arguments/);
+    compile_not_ok($source, qr/DESTROY method cannnot have arguments/);
   }
 }
 
@@ -312,7 +312,7 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { my $MyClass::foo; }; }';
-    compile_not_ok($source, qr/The local variable "\$MyClass::foo" cannnot contain "::"/);
+    compile_not_ok($source, qr/The local variable name "\$MyClass::foo" cannnot contain "::"/);
   }
 }
 
@@ -328,11 +328,11 @@ use Test::More;
   }
   {
     my $source = 'class MyClass { static method main : void () { 1 += 1; }; }';
-    compile_not_ok($source, qr/The left operand of the special assign operator must be mutable/);
+    compile_not_ok($source, qr/The left operand of a special assignment operator must be mutable/);
   }
   {
     my $source = 'class MyClass { static method main : void () { 1 = 1; }; }';
-    compile_not_ok($source, qr/The left operand of the assign operator must be mutable/);
+    compile_not_ok($source, qr/The left operand of assignment operator must be mutable/);
   }
 }
 

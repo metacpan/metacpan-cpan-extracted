@@ -224,9 +224,7 @@ void SPVM_PRECOMPILE_build_method_source(SPVM_PRECOMPILE* precompile, SPVM_STRIN
   }
   
   // Convert string
-  SPVM_STRING_BUFFER_add(string_buffer, "  char convert_string_buffer[21];\n");
-  SPVM_STRING_BUFFER_add(string_buffer, "  char message[256];\n");
-  
+  SPVM_STRING_BUFFER_add(string_buffer, "  char tmp_buffer[256];\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  int32_t basic_type_id;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  int32_t object_basic_type_id = 0;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  int32_t src_basic_type_id;\n");
@@ -310,7 +308,6 @@ void SPVM_PRECOMPILE_build_method_source(SPVM_PRECOMPILE* precompile, SPVM_STRIN
   SPVM_STRING_BUFFER_add(string_buffer, "  char* file;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  int32_t field_index;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  int32_t fields_length;\n");
-  SPVM_STRING_BUFFER_add(string_buffer, "  char tmp_buffer[256];\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  void* decl_class_var;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  void* decl_method;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  int32_t decl_field_offset;\n");
@@ -475,7 +472,7 @@ void SPVM_PRECOMPILE_build_method_source(SPVM_PRECOMPILE* precompile, SPVM_STRIN
           SPVM_PRECOMPILE_add_basic_type(precompile, string_buffer, basic_type_name);
           SPVM_STRING_BUFFER_add(string_buffer, " = SPVM_IMPLEMENT_GET_BASIC_TYPE_BY_NAME(env, stack, \"");
           SPVM_STRING_BUFFER_add(string_buffer, basic_type_name);
-          SPVM_STRING_BUFFER_add(string_buffer, "\", message, &error_id);\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "\", tmp_buffer, sizeof(tmp_buffer), &error_id);\n");
           SPVM_STRING_BUFFER_add(string_buffer, "    if (error_id) {\n"
                                                 "      goto END_OF_METHOD;\n"
                                                 "    }\n");
@@ -506,7 +503,7 @@ void SPVM_PRECOMPILE_build_method_source(SPVM_PRECOMPILE* precompile, SPVM_STRIN
           SPVM_STRING_BUFFER_add(string_buffer, basic_type_name);
           SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
           SPVM_STRING_BUFFER_add(string_buffer, class_var_name);
-          SPVM_STRING_BUFFER_add(string_buffer, "\", message, &error_id);\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "\", tmp_buffer, sizeof(tmp_buffer), &error_id);\n");
           SPVM_STRING_BUFFER_add(string_buffer, "    if (error_id) {\n"
                                                 "      goto END_OF_METHOD;\n"
                                                 "    }\n");
@@ -537,7 +534,7 @@ void SPVM_PRECOMPILE_build_method_source(SPVM_PRECOMPILE* precompile, SPVM_STRIN
           SPVM_STRING_BUFFER_add(string_buffer, basic_type_name);
           SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
           SPVM_STRING_BUFFER_add(string_buffer, field_name);
-          SPVM_STRING_BUFFER_add(string_buffer, "\", message, &error_id);\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "\", tmp_buffer, sizeof(tmp_buffer), &error_id);\n");
           SPVM_STRING_BUFFER_add(string_buffer, "    if (error_id) {\n"
                                                 "      goto END_OF_METHOD;\n"
                                                 "    }\n");
@@ -567,7 +564,7 @@ void SPVM_PRECOMPILE_build_method_source(SPVM_PRECOMPILE* precompile, SPVM_STRIN
           SPVM_STRING_BUFFER_add(string_buffer, basic_type_name);
           SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
           SPVM_STRING_BUFFER_add(string_buffer, method_name);
-          SPVM_STRING_BUFFER_add(string_buffer, "\", message, &error_id);\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "\", tmp_buffer, sizeof(tmp_buffer), &error_id);\n");
           SPVM_STRING_BUFFER_add(string_buffer, "    if (error_id) {\n"
                                                 "      goto END_OF_METHOD;\n"
                                                 "    }\n");
