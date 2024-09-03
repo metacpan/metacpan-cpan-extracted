@@ -15,7 +15,7 @@ use warnings;
 
 our ($XS_VERSION, $VERSION);
 BEGIN {
-$VERSION = "1.644"; # ==> ALSO update the version in the pod text below!
+$VERSION = "1.645"; # ==> ALSO update the version in the pod text below!
 $XS_VERSION = $VERSION;
 $VERSION =~ tr/_//d;
 }
@@ -147,7 +147,7 @@ sure that your issue isn't related to the driver you're using.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to DBI version 1.644
+This is the DBI specification that corresponds to DBI version 1.645
 (see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
@@ -8286,11 +8286,11 @@ Security, especially the "SQL Injection" attack:
 
 =head2 FAQ
 
-See L<http://faq.dbi-support.com/>
+See L<http://dbi.perl.org/support/>
 
 =head1 AUTHORS
 
-DBI by Tim Bunce, L<http://www.tim.bunce.name>
+DBI by Tim Bunce (1994-2024), The DBI developer group (2024..)
 
 This pod text by Tim Bunce, J. Douglas Dunlop, Jonathan Leffler and others.
 Perl by Larry Wall and the C<perl5-porters>.
@@ -8298,7 +8298,7 @@ Perl by Larry Wall and the C<perl5-porters>.
 =head1 COPYRIGHT
 
 The DBI module is Copyright (c) 1994-2024 Tim Bunce. Ireland.
-All rights reserved.
+The DBI developer group (2024-2024) All rights reserved.
 
 You may distribute under the terms of either the GNU General Public
 License or the Artistic License, as specified in the Perl 5.10.0 README file.
@@ -8353,8 +8353,7 @@ A couple of specific DBI features have been sponsored by enlightened companies:
 
 The development of the swap_inner_handle() method was sponsored by BizRate.com (L<http://BizRate.com>)
 
-The development of DBD::Gofer and related modules was sponsored by
-Shopzilla.com (L<http://Shopzilla.com>), where I currently work.
+The development of DBD::Gofer and related modules was sponsored by Shopzilla.com (L<https::connexity.com>).
 
 =head1 CONTRIBUTING
 
@@ -8470,6 +8469,209 @@ connect and disconnect for every database access becomes superfluous.
 =item SQL Parser
 
 See also the L<SQL::Statement> module, SQL parser and engine.
+
+=back
+
+=head1 TODO
+
+=head2 Documentation
+
+These entries are still to be written:
+
+=over 2
+
+
+=item DBIf_TRACE_CON
+
+=item DBIf_TRACE_DBD
+
+=item DBIf_TRACE_ENC
+
+=item DBIf_TRACE_SQL
+
+=item DBIf_TRACE_TXN
+
+=item DBIpp_cm_XX
+
+=item DBIpp_cm_br
+
+=item DBIpp_cm_cs
+
+=item DBIpp_cm_dd
+
+=item DBIpp_cm_dw
+
+=item DBIpp_cm_hs
+
+=item DBIpp_ph_XX
+
+=item DBIpp_ph_cn
+
+=item DBIpp_ph_cs
+
+=item DBIpp_ph_qm
+
+=item DBIpp_ph_sp
+
+=item DBIpp_st_XX
+
+=item DBIpp_st_bs
+
+=item DBIpp_st_qq
+
+=item SQL_ALL_TYPES
+
+=item SQL_ARRAY
+
+=item SQL_ARRAY_LOCATOR
+
+=item SQL_BIGINT
+
+=item SQL_BINARY
+
+=item SQL_BIT
+
+=item SQL_BLOB
+
+=item SQL_BLOB_LOCATOR
+
+=item SQL_BOOLEAN
+
+=item SQL_CHAR
+
+=item SQL_CLOB
+
+=item SQL_CLOB_LOCATOR
+
+=item SQL_CURSOR_DYNAMIC
+
+=item SQL_CURSOR_FORWARD_ONLY
+
+=item SQL_CURSOR_KEYSET_DRIVEN
+
+=item SQL_CURSOR_STATIC
+
+=item SQL_CURSOR_TYPE_DEFAULT
+
+=item SQL_DATE
+
+=item SQL_DATETIME
+
+=item SQL_DECIMAL
+
+=item SQL_DOUBLE
+
+=item SQL_FLOAT
+
+=item SQL_GUID
+
+=item SQL_INTEGER
+
+=item SQL_INTERVAL
+
+=item SQL_INTERVAL_DAY
+
+=item SQL_INTERVAL_DAY_TO_HOUR
+
+=item SQL_INTERVAL_DAY_TO_MINUTE
+
+=item SQL_INTERVAL_DAY_TO_SECOND
+
+=item SQL_INTERVAL_HOUR
+
+=item SQL_INTERVAL_HOUR_TO_MINUTE
+
+=item SQL_INTERVAL_HOUR_TO_SECOND
+
+=item SQL_INTERVAL_MINUTE
+
+=item SQL_INTERVAL_MINUTE_TO_SECOND
+
+=item SQL_INTERVAL_MONTH
+
+=item SQL_INTERVAL_SECOND
+
+=item SQL_INTERVAL_YEAR
+
+=item SQL_INTERVAL_YEAR_TO_MONTH
+
+=item SQL_LONGVARBINARY
+
+=item SQL_LONGVARCHAR
+
+=item SQL_MULTISET
+
+=item SQL_MULTISET_LOCATOR
+
+=item SQL_NUMERIC
+
+=item SQL_REAL
+
+=item SQL_REF
+
+=item SQL_ROW
+
+=item SQL_SMALLINT
+
+=item SQL_TIME
+
+=item SQL_TIMESTAMP
+
+=item SQL_TINYINT
+
+=item SQL_TYPE_DATE
+
+=item SQL_TYPE_TIME
+
+=item SQL_TYPE_TIMESTAMP
+
+=item SQL_TYPE_TIMESTAMP_WITH_TIMEZONE
+
+=item SQL_TYPE_TIME_WITH_TIMEZONE
+
+=item SQL_UDT
+
+=item SQL_UDT_LOCATOR
+
+=item SQL_UNKNOWN_TYPE
+
+=item SQL_VARBINARY
+
+=item SQL_VARCHAR
+
+=item SQL_WCHAR
+
+=item SQL_WLONGVARCHAR
+
+=item SQL_WVARCHAR
+
+=item connect_test_perf
+
+=item constant
+
+=item dbi_profile
+
+=item dbi_profile_merge
+
+=item dbi_profile_merge_nodes
+
+=item dbi_time
+
+=item disconnect_all
+
+=item driver_prefix
+
+=item dump_dbd_registry
+
+=item dump_handle
+
+=item init_rootclass
+
+=item install_driver
+
+=item installed_methods
+
+=item setup_driver
 
 =back
 

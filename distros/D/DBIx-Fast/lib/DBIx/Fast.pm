@@ -1,53 +1,9 @@
 package DBIx::Fast;
 
-=head1 NAME
- 
-DBIx::Fast - DBI fast & easy (another one...)
-   
-=cut
-
-our $VERSION = '0.11';
-
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
-=head1 SYNOPSIS
- 
-use DBIx::Fast;
-
-$DB = DBIx::Fast->new( dsn => 'dbi:MariaDB:database=test:host' , user => 'test' , passwd => 'test');
-$DB = DBIx::Fast->new( db => 'test', user => 'test', passwd => 'test', driver => 'MariaDB' );
-$DB = DBIx::Fast->new( db => 'test', user => 'test', passwd => 'test', driver => 'mysql', trace => '1' , profile => '!Statement:!MethodName' );
-
-say $DB->last_error;
-Dumper $DB->errors;
-
-$DB->all('SELECT * FROM test WHERE 1');
-
-$Results = $DB->results;
-$Results = $DB->all('SELECT * FROM test WHERE expire > ?',$time);
-
-$Hash = $DB->hash('SELECT * FROM test WHERE id = ?',$id);
-$Hash = $DB->results;
-
-$Value = $DB->val('SELECT name FROM test WHERE id = ?',1);
-
-$DB->insert('table', { name => 'New Name', status  => 1 }, time => 'create_time');
-
-$DB->update('table', { sen => { name => 'update t3st' }, where => { id => 1 } });
-$DB->update('table', { sen => { name => 'update t3st' }, where => { id => 1 } }, time => 'mod_time');
-
-$DB->up('table, { name => 'Update Name' } , { id => 1 } );
-$DB->up('table, { name => 'Update Name' } , { id => 1 } , time => 'mod_time');
-
-say $DB->last_sql;
-say $DB->last_id;
-
-=head1 DESCRIPTION
-
-=head1 SUBROUTINES/METHODS
-
-=cut
+our $VERSION = '0.12';
 
 use Carp;
 use Moo;
@@ -56,67 +12,22 @@ use DBI;
 use DBIx::Connector;
 use SQL::Abstract;
 
-=head2 SQL::Abstract
-=cut
-has SQL => ( is => 'rw' );
+has args    => ( is => 'rwp' );
+has db      => ( is => 'rw'  );
+has dbd     => ( is => 'rwp' );
+has dsn     => ( is => 'rwp' ); # DSN String
+has errors  => ( is => 'rwp' ); # Array errors
+has results => ( is => 'rw'  ); # Last return
+has sql     => ( is => 'rw'  ); # SQL Actual
+has p       => ( is => 'rw'  );
+has Q       => ( is => 'rw'  ); # SQL::Abstract
 
-=head2 db
- Database
-=cut
-has db  => ( is => 'rw' );
-
-=head2 dbd
- Database type
-=cut
-has dbd => ( is => 'rwp');
-
-=head2 errors
- Array with all errors
-=cut
-has errors   => ( is => 'rwp');
-
-=head2 last_error
- String with the last error
-=cut
+has last_id    => ( is => 'rw'  );
 has last_error => ( is => 'rwp' );
+has last_sql   => ( is => 'rw'  );
 
-=head2 last_sql
- Return last SQL sentence
-=cut
-has last_sql => ( is => 'rw');
-
-=head2 last_id
- Return last insert id
-=cut
-has last_id  => ( is => 'rw');
-
-=head2 sql
- SQL stmt
-=cut
-has sql => ( is => 'rw' );
-
-=head2 p
-=cut
-has p   => ( is => 'rw' );
-
-=head2 results
- Last fetch results
-=cut
-has results  => ( is => 'rw');
-
-=head2 dsn
-=cut
-has dsn => ( is => 'rwp' );
-
-=head2 dbi_args
-=cut
-has dbi_args => ( is => 'rwp' );
-
-=head2 _build_sql
-=cut
-
-=head2 now
-  NOW() - Timestamp
+=head2 C<now>
+   Timestamp Mysql format
 =cut
 sub now {
     my $self = shift;
@@ -150,35 +61,36 @@ sub set_error {
 =cut
 sub BUILD {
     my ($self,$args) = @_;
-    my $DConf;
 
-    $args->{host} = '127.0.0.1' unless $args->{host};
-
-    $DConf->{args} = {
-	RaiseError => $args->{Error} // 1,
-	PrintError => $args->{PrintError} // 1,
-	AutoCommit => $args->{AutoCommit} // 1,
+    my $DConf = {
+	DBI => {
+	    RaiseError => $args->{RaiseError} // 0,
+	    PrintError => $args->{PrintError} // 0,
+	    AutoCommit => $args->{AutoCommit} // 1
+	},
+	Auth => {
+	    user     => $args->{user}     // '',
+	    password => $args->{password} // '',
+	    host     => $args->{host}     // ''
+	}
     };
-
-    $DConf->{quote} = $args->{quote} if $args->{quote};
     
+    $DConf->{DBI}->{mysql_enable_utf8} = 1 if $args->{mysql_enable_utf8};
+    $DConf->{quote} = $args->{quote}       if $args->{quote};
+
+    $self->_set_args($DConf);
+
     $self->_set_dsn($args->{dsn} ? $self->_check_dsn($args->{dsn}) : $self->_make_dsn($args));
-    $self->_set_dbi_args($DConf);
-    
-    if ( $self->dbd eq 'mysql' ) {
-	$DConf->{args}->{mysql_enable_utf8} = 1 if $args->{mysql_enable_utf8};
-    }
-    
-    $self->_set_dbi_args($DConf);
 
-    $self->SQL(SQL::Abstract->new);
-    $self->db(DBIx::Connector->new( $self->dsn, 
-				    $args->{user}, $args->{passwd},
-				    $self->dbi_args->{args} ));
+    $self->Q( SQL::Abstract->new );
+
+    $self->db( DBIx::Connector->new( $self->dsn, 
+				     $args->{user}, $args->{passwd},
+				     $self->args->{DBI} ) );
 
     $self->db->mode('ping');
     
-    $self->db->dbh->quote($self->dbi_args->{quote}) if $self->dbi_args->{quote};
+    $self->db->dbh->quote($self->args->{quote}) if $self->args->{quote};
     
     $self->db->dbh->{HandleError} = sub {
 	$self->set_error($DBI::err,$DBI::errstr);
@@ -200,6 +112,28 @@ sub _Driver_dbd {
     $self->Exception("Error DBD Driver : $dbd") unless $self->dbd;
 }
 
+sub _dsn_dbi {
+    my $self = shift;
+    my $dsn  = shift;
+    
+    my ($dbi,$driver,$db,$host) = split ':', $dsn;
+    
+    $self->Exception("DSN DBI: $dbi") unless $dbi eq 'dbi';
+
+#    if ( $driver eq 'SQLite' ) {
+#        $db =~ s/^(dbname|database)\=(.*)$/$2/;
+#    } elsif ( $driver eq 'Pg' ) {
+#    } else {
+#        $self->Exception("DSN Host") unless $host;
+#    }
+
+    $self->Exception("DSN DataBase: $db") unless $db;
+
+    $self->_Driver_dbd($driver);
+
+    return $dsn;
+}
+
 =head2 check_dsn
     Check DSN string
 =cut
@@ -207,27 +141,71 @@ sub _check_dsn {
     my $self = shift;
     my $dsn  = shift;
 
-    my ($dbi,$driver,$db,$host) = split ':', $dsn;
-    
-    $self->_Driver_dbd($driver);
+    ## DSN DBI = ^dbi
+    return $self->_dsn_dbi($dsn) if $dsn =~ /^dbi/;
 
-    return $dsn;
+    ## DSN to DBI
+    return $self->_dsn_to_dbi($dsn);
 }
 
 =head2 make_dsn
-    Make DSN string
+    Make DSN DBI string
 =cut
 sub _make_dsn {
     my $self = shift;
     my $args = shift;
 
-    $self->Exception("DBD Driver : Not defined") unless $args->{driver};
+    $self->Exception("DSN Driver: Not defined") unless $args->{driver};
 
     $self->_Driver_dbd($args->{driver});
 
     return 'dbi:SQLite:dbname='.$args->{db} if $args->{driver} eq 'SQLite';
+
+    $self->Exception("DSN Host: Not defined") unless $args->{host};
     
     return 'dbi:'.$self->dbd.':database='.$args->{db}.':'.$args->{host};
+}
+
+=head2 C<_dsn_to_dbi>
+ Return a DBI DSN
+=cut
+sub _dsn_to_dbi {
+    my $self = shift;
+    my $dsn  = shift;
+    my $URI;
+    
+    #SQLite
+    if ( $dsn =~ /^sqlite:\/\/\/(.*)$/ ) {
+	$self->_set_dbd('SQLite');
+	return 'dbi:SQLite:dbname='.$1; # , schema => 'sqlite' , db => $1 };
+    }
+    
+    ($URI->{schema},$URI->{UI},$URI->{connect},$URI->{db}) = ( $dsn =~ /^(.*):\/\/(.*)\@(.*)\/(.*)$/g );
+
+    $self->Exception("_dsn_to_dbi : schema") unless $URI->{schema};
+    
+    $URI->{connect} =~ /:/ ? ($URI->{host},$URI->{port}) = split ':',$URI->{connect} : $URI->{host} = $URI->{connect};
+    $URI->{UI}      =~ /:/ ? ($URI->{user},$URI->{password}) = split ':',$URI->{UI}  : $URI->{user} = $URI->{UI};
+
+    ## Loop Attrs + Value
+    if ( $URI->{db} =~ s/^(.*)\?(.*)$/$1/ ) {
+        ($URI->{attribute},$URI->{value}) = split '=',$2;
+    }
+
+    if ( $dsn =~ /^(postgres|postgresql):/ ) {
+	$self->_set_dbd('Pg');
+	$URI->{DSN} = 'dbi:Pg:dbname='.$URI->{db}.';host='.$URI->{host}.';port='.$URI->{port};
+    } elsif ( $dsn =~ /^(mariadb):/ ) {
+	$self->_set_dbd('MariaDB');
+	$URI->{DSN} = 'dbi:MariaDB:dbname='.$URI->{db}.';host='.$URI->{host}.';port='.$URI->{port};
+    } elsif ( $dsn =~ /^(mysql|mysqlx):/ ) {
+	$self->_set_dbd('mysql');
+	$URI->{DSN} = 'dbi:mysql:dbname='.$URI->{db}.';host='.$URI->{host}.';port='.$URI->{port};
+    } else {
+	$self->Exception("_dsn_to_dbi : $dsn");
+    }
+
+    return $URI->{DSN};
 }
 
 =head2 profile
@@ -256,6 +234,29 @@ sub all {
     $self->Exception("ERROR all()") if $DBI::err;
     
     $self->results($res);
+}
+
+=head2 flat
+    Execute SQL and return array
+=cut
+sub flat {
+    my $self = shift;
+
+    $self->q(@_);
+
+    my $sth = $self->db->dbh->prepare($self->sql);
+
+    $sth->execute(@{$self->p});
+
+    my @Flat;
+    
+    while(my $row = $sth->fetchrow_array) {
+	push @Flat,$row;
+    }
+
+    $self->results(\@Flat);
+
+    return @Flat;
 }
 
 =head2 hash
@@ -538,8 +539,7 @@ sub make_sen {
     $self->p(\@p);
 }
 
-=head2
-    Make query   
+=head2 q - Make Query   
 =cut
 sub q {
     my $self = shift;
@@ -573,6 +573,8 @@ sub TableName {
     my $self  = shift;
     my $table = shift;
 
+    $self->Exception("TableName not defined") unless $table;
+    
     return $table unless $table =~ /\W/;
 
     $self->Exception("TableName not valid: $table");
@@ -584,18 +586,108 @@ sub TableName {
 sub Exception {
     my $self = shift;
     my $msg  = shift;
-
-    return unless $self->dbi_args->{args}->{PrintError};
     
-    my $out  = "Exception: $msg - ";
+    return unless $self->args->{DBI}->{PrintError};
 
-    $out .= $self->last_error if $self->last_error;
-    
+    my $out  = "Exception: $msg";
+
+    $out .= " - Last error: ".$self->last_error if $self->last_error;
+
     carp $out;
 }
 
-=head1 AUTHOR
+1;
 
+__END__
+
+=head1 NAME
+ 
+DBIx::Fast - DBI fast & easy (another one...)
+
+=head1 SYNOPSIS
+
+    use DBIx::Fast;
+
+    $DB = DBIx::Fast->new( dsn => 'dbi:MariaDB:database=test:host', user => 'test', passwd => 'test' );
+
+    $DB = DBIx::Fast->new( db => 'test', user => 'test', passwd => 'test', driver => 'MariaDB', trace => '1', profile => '!Statement:!MethodName' );
+
+    $DB->all('SELECT * FROM test WHERE 1');
+
+    $Results = $DB->results;
+    $Results = $DB->all('SELECT * FROM test WHERE expire > ?',$time);
+
+    $Hash = $DB->hash('SELECT * FROM test WHERE id = ?',$id);
+    $Hash = $DB->results;
+
+    @Array = $DB->flat('SELECT id FROM users');
+
+    $Value = $DB->val('SELECT name FROM test WHERE id = ?',1);
+
+    $DB->insert('table', { name => 'New Name', status  => 1 }, time => 'create_time');
+
+    $DB->update('table', { sen => { name => 'update t3st' }, where => { id => 1 } });
+    $DB->update('table', { sen => { name => 'update t3st' }, where => { id => 1 } }, time => 'mod_time');
+
+    $DB->up('table, { name => 'Update Name' } , { id => 1 } );
+    $DB->up('table, { name => 'Update Name' } , { id => 1 } , time => 'mod_time');
+
+    $DB->last_sql;
+    $DB->last_id;
+
+    $DB->last_error;
+    $DB->errors;
+
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=over
+
+=item Q
+
+ SQL::Abstractor
+
+=item args
+
+ Args to invocate DBIx::Fast
+
+=item db
+
+ DataBase Handle
+
+=item dbd
+
+ DataBase Driver
+
+=item dsn
+
+ DSN - Data Source Name
+
+=item errors
+
+ All errors
+
+=item last_sql
+
+ Last SQL Executed
+
+=item last_id
+
+ Last insert ID
+
+=item last_error
+
+ Last error
+
+=item results
+
+ Last result
+
+=back
+
+=head1 AUTHOR
 
 =head1 BUGS
 
@@ -618,23 +710,15 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Fast>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/DBIx-Fast>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/DBIx-Fast>
+L<https://metacpan.org/pod/DBIx::Fast>
 
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/DBIx-Fast/>
 
 =back
-
-
-=head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 

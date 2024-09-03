@@ -37,7 +37,6 @@
             "Capture::Tiny" : "0",
             "Carp" : "0",
             "Config::Tiny" : "2.08",
-            "File::HomeDir::Tiny" : "0",
             "File::Spec" : "3.19",
             "Getopt::Long" : "0",
             "IO::Prompt::Tiny" : "0",
@@ -63,6 +62,6 @@
          "url" : "https://github.com/garu/App-cpanminus-reporter"
       }
    },
-   "version" : "0.21",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

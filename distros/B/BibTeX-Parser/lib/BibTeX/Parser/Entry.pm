@@ -285,8 +285,8 @@ BibTeX::Parser::Entry - Contains a single entry of a BibTeX document.
 
 =head1 SYNOPSIS
 
-This class ist a wrapper for a single BibTeX entry. It is usually created
-by a BibTeX::Parser.
+This class is a wrapper for a single BibTeX entry. It is usually created
+by BibTeX::Parser.
 
     use BibTeX::Parser::Entry;
 
@@ -303,9 +303,6 @@ by a BibTeX::Parser.
 
 	    print $entry->to_string;
     }
-
-   
-
 
 
 =head1 FUNCTIONS
@@ -387,6 +384,17 @@ Return raw BibTeX entry (if available).
 Returns a text of the BibTeX entry in BibTeX format.  Options are
 a hash.  
 
+The return string is the entry reformated with lines indented by 4
+spaces and the @entrytype uppercased. Example:
+
+    @BOOK{Knuth:TAOCP1,
+        author = {Knuth, Donald E.},
+        publisher = {Addison-Wesley},
+        title = {The Art of Computer Programming},
+        year = {1968},
+        url = {https://www-cs-faculty.stanford.edu/~knuth/taocp.html},
+    }
+
 =over 4
 
 =item C<canonize_names>
@@ -416,7 +424,7 @@ Can take values 'Uppercase' (the default), 'Lowercase' or 'Titlecase'
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 AUTHOR
 
@@ -426,7 +434,7 @@ Karl Berry <karl@freefriends.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013-2023 by Gerhard Gossen and Boris Veytsman and Karl Berry
+This software is copyright (c) 2013-2024 by Gerhard Gossen and Boris Veytsman and Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

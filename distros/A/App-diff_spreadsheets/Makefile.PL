@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::diff_spreadsheets",
   "PREREQ_PM" => {
     "Algorithm::Diff" => 0,
+    "Capture::Tiny" => "0.48",
     "Carp" => 0,
     "Data::Dumper::Interp" => "6.007",
     "Encode" => "3.00",
@@ -45,7 +46,6 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Capture::Tiny" => 0,
     "Carp::Always" => 0,
     "Cwd" => 0,
     "Data::Dumper" => 0,
@@ -71,7 +71,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "parent" => 0
   },
-  "VERSION" => "1.024",
+  "VERSION" => "1.025",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,7 +80,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Algorithm::Diff" => 0,
-  "Capture::Tiny" => 0,
+  "Capture::Tiny" => "0.48",
   "Carp" => 0,
   "Carp::Always" => 0,
   "Cwd" => 0,

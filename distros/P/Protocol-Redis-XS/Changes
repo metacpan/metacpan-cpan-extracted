@@ -1,3 +1,6 @@
+0.09 - 2024-09-02
+- Throw an exception on unknown 'api' version (und3f)
+
 0.08 - 2024-09-01
 - Fix memory leak in encodeMultiBulk (mauke)
 - Fix memory leak when encoding bad data (mauke)

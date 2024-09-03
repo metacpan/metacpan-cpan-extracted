@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Contact;
-$Telegram::Bot::Object::Contact::VERSION = '0.025';
+$Telegram::Bot::Object::Contact::VERSION = '0.026';
 # ABSTRACT: The base class for Telegram 'Contact' objects.
 
 
@@ -29,7 +29,7 @@ Telegram::Bot::Object::Contact - The base class for Telegram 'Contact' objects.
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 DESCRIPTION
 
@@ -52,11 +52,15 @@ James Green <jkg@earth.li>
 
 Julien Fiegehenn <simbabque@cpan.org>
 
+=item *
+
+Albert Cester <albert.cester@web.de>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by James Green.
+This software is copyright (c) 2024 by James Green.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

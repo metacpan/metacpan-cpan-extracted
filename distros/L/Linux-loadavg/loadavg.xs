@@ -7,7 +7,7 @@
 #include "XSUB.h"
 #include "stdlib.h"
 
-/* VERSION: 0.14 */
+/* VERSION: 0.15 */
 
 MODULE = Linux::loadavg		PACKAGE = Linux::loadavg		
 
@@ -28,6 +28,7 @@ PPCODE:
       croak("invalid nelem (%d)", nelem);
    if ((rc = getloadavg(loadavg, nelem)) != nelem)
       croak("getloadavg failed (%d)", rc);
+   EXTEND(SP,nelem);
    for(i=0; i<nelem; i++) {
      PUSHs(sv_2mortal(newSVnv(loadavg[i])));
    }

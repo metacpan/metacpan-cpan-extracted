@@ -51,19 +51,19 @@
    "provides" : {
       "ExtUtils::Helpers" : {
          "file" : "lib/ExtUtils/Helpers.pm",
-         "version" : "0.027"
+         "version" : "0.028"
       },
       "ExtUtils::Helpers::Unix" : {
          "file" : "lib/ExtUtils/Helpers/Unix.pm",
-         "version" : "0.027"
+         "version" : "0.028"
       },
       "ExtUtils::Helpers::VMS" : {
          "file" : "lib/ExtUtils/Helpers/VMS.pm",
-         "version" : "0.027"
+         "version" : "0.028"
       },
       "ExtUtils::Helpers::Windows" : {
          "file" : "lib/ExtUtils/Helpers/Windows.pm",
-         "version" : "0.027"
+         "version" : "0.028"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/extutils-helpers"
       }
    },
-   "version" : "0.027",
+   "version" : "0.028",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -1,5 +1,5 @@
 package ExtUtils::Helpers::VMS;
-$ExtUtils::Helpers::VMS::VERSION = '0.027';
+$ExtUtils::Helpers::VMS::VERSION = '0.028';
 use strict;
 use warnings FATAL => 'all';
 
@@ -89,7 +89,7 @@ ExtUtils::Helpers::VMS - VMS specific helper bits
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =for Pod::Coverage make_executable
 detildefy

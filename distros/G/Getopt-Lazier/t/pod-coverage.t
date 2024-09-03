@@ -1,10 +1,11 @@
-#!perl -T
+#!perl
+use 5.006;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use Test::More;
 
-unless ( $ENV{'DBIX_FAST_TEST'} ) {
-    plan skip_all => "DBIx::Fast No test POD";
+unless ( $ENV{RELEASE_TESTING} ) {
+    plan( skip_all => "Author tests not required for installation" );
 }
 
 # Ensure a recent version of Test::Pod::Coverage

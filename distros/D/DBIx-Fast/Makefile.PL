@@ -1,6 +1,5 @@
-use 5.006;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -15,12 +14,14 @@ WriteMakefile(
 	'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
-	'Test::More' => 0,
+	'Test::More'      => 0,
+	'Test::Exception' => 0.43,
+	'DBD::SQLite'     => 1.50,
     },
     PREREQ_PM => {
+	'Moo'             => 1,
 	'SQL::Abstract'   => 2.00,
 	'DBIx::Connector' => 0.53,
-	'Moo' => 1,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'DBIx-Fast-*' },

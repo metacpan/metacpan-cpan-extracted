@@ -1,6 +1,6 @@
 package LaTeX::ToUnicode::Tables;
 BEGIN {
-  $LaTeX::ToUnicode::Tables::VERSION = '0.54';
+  $LaTeX::ToUnicode::Tables::VERSION = '0.55';
 }
 use strict;
 use warnings;
@@ -39,6 +39,7 @@ our %MARKUPS = (
     'bf'  => 'b',
     'cal' => '',
     'em'  => 'em',
+    'french' => '',  # polyglossia
     'it'  => 'i',
     'rm'  => '',
     'sc'  => '', # qqq should uppercasify
@@ -55,6 +56,7 @@ our %MARKUPS = (
 our %ARGUMENT_COMMANDS = (
     'emph'      => ['\textem{', '}'], # \textem doesn't exist, but we handle it
     'enquote'   => ["`",        "'"],
+    'natexlab'  => ["",         ""],  # natbib
     'path'      => ['\texttt{', '}'], # ugh, might not be a braced argument
 );
 
@@ -718,7 +720,7 @@ L<https://github.com/borisveytsman/bibtexperllibs>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2010-2023 Gerhard Gossen, Boris Veytsman, Karl Berry
+Copyright 2010-2024 Gerhard Gossen, Boris Veytsman, Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl5 programming language system itself.

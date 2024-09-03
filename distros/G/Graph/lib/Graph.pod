@@ -197,6 +197,12 @@ As of 0.9731 this preserves C<multiedged> and C<multivertexed> IDs.
 
 See L</"Clearing cached results">.
 
+=item weak_connectivity_undirected_graph_clear_cache
+
+    $g->weak_connectivity_undirected_graph_clear_cache;
+
+See L</"Clearing cached results">.
+
 =item undirected_copy_attributes
 
 Added in 0.9731. Like L</undirected_copy> but also sets the copy's
@@ -689,6 +695,26 @@ Returns the graph.
     $g->rename_vertices(sub { uc $_[0] })
 
 Calls a function for each vertex-name, renaming it to the return value.
+
+Returns the graph.
+
+=item filter_vertices
+
+    $g->filter_vertices(sub { my ($g, $v)=@_; $v =~ /^a/i })
+
+Calls a function for each vertex; if it returns false, the vertex
+is deleted. Passed the graph, the vertex, and if C<multivertexed>, the ID
+(called once per "incarnation", i.e. ID).
+
+Returns the graph.
+
+=item filter_edges
+
+    $g->filter_edges(sub { my ($g, $u, $v, $id)=@_; $id eq 'Bakerloo' })
+
+Calls a function for each edge; if it returns false, the edge
+is deleted. Passed the graph, the vertices, and if C<multiedged>, the ID
+(called once per "incarnation", i.e. ID).
 
 Returns the graph.
 

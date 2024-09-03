@@ -22,6 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "DBD::SQLite" : "1.5",
+            "Test::Exception" : "0.43",
             "Test::More" : "0"
          }
       },
@@ -40,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

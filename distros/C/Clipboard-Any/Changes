@@ -1,3 +1,9 @@
+0.012   2024-08-30  Released-By: PERLANCAR; Urgency: medium
+
+        - internal] Make some variables available outside of package:
+          $known_clipboard_managers, $sch_clipboard_manager.
+
+
 0.011   2023-04-13  Released-By: PERLANCAR; Urgency: medium
 
         - [cli clipadd] Add --tee option.

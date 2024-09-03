@@ -14,7 +14,7 @@ BEGIN {
 
 use Graph::AdjacencyMap qw(:flags :fields);
 
-our $VERSION = '0.9731';
+our $VERSION = '0.9732';
 
 require 5.006; # Weak references are absolutely required.
 
@@ -421,8 +421,15 @@ sub delete_vertex_by_id {
     &expect_non_unionfind;
     my ($g, $v, $id) = @_;
     return $g unless &has_vertex_by_id;
-    # TODO: what to about the edges at this vertex?
-    # If the multiness of this vertex goes to zero, delete the edges?
+    if ($g->[ _V ]->get_multi_ids( $v ) == 1) {
+      # only incarnation, zap edges
+      my @i = &_vertex_ids_multi;
+      pop @i; # the id
+      my $E = $g->[ _E ];
+      my @edges = $E->paths_from(@i);
+      push @edges, $E->paths_to(@i) if !&is_undirected;
+      $E->del_path( $_ ) for @edges;
+    }
     $g->[ _V ]->del_path_by_multi_id( $v, $id );
     $g->[ _G ]++;
     return $g;
@@ -982,6 +989,34 @@ sub rename_vertices {
     $g->rename_vertex($_, $code->($_))
 	for grep !$seen{$_}++, $g->[ _V ]->paths;
     return $g;
+}
+
+sub filter_vertices {
+  my ($g, $code) = @_;
+  my @v = &_vertices05;
+  if (&is_multivertexed) {
+    for my $v (@v) {
+      $g->delete_vertex_by_id($v, $_) for
+        grep !$code->($g, $v, $_), $g->get_multivertex_ids($v);
+    }
+  } else {
+    $g->delete_vertices(grep !$code->($g, $_), @v);
+  }
+  $g;
+}
+
+sub filter_edges {
+  my ($g, $code) = @_;
+  my @e = &_edges05;
+  if (&is_multiedged) {
+    for my $e (@e) {
+      $g->delete_edge_by_id(@$e, $_) for
+        grep !$code->($g, @$e, $_), $g->get_multiedge_ids(@$e);
+    }
+  } else {
+    $g->delete_edges(map @$_, grep !$code->($g, @$_), @e);
+  }
+  $g;
 }
 
 sub as_hashes {
@@ -1772,16 +1807,12 @@ sub _copy_edges {
   }
 }
 
-sub _undirected_copy_compute {
+sub undirected_copy {
+  &expect_directed;
   my $gc = $_[0]->new(undirected=>1);
   _copy_vertices($_[0], $gc);
   _copy_edges($_[0], $gc);
   $gc;
-}
-
-sub undirected_copy {
-  &expect_directed;
-  _check_cache($_[0], 'undirected_copy', [], \&_undirected_copy_compute);
 }
 
 *undirected_copy_graph = \&undirected_copy;
@@ -1795,16 +1826,12 @@ sub undirected_copy_attributes {
   $gc;
 }
 
-sub _directed_copy_compute {
+sub directed_copy {
+  &expect_undirected;
   my $gc = $_[0]->new(undirected=>0);
   _copy_vertices($_[0], $gc);
   _copy_edges($_[0], $gc, 0, 1);
   $gc;
-}
-
-sub directed_copy {
-  &expect_undirected;
-  _check_cache($_[0], 'directed_copy', [], \&_directed_copy_compute);
 }
 
 *directed_copy_graph = \&directed_copy;
@@ -1874,11 +1901,10 @@ my %_cache_type =
     (
      'connectivity'        => ['_ccc'],
      'strong_connectivity' => ['_scc'],
+     'weak_connectivity_undirected_graph' => ['_wcug'],
      'biconnectivity'      => ['_bcc'],
      'SPT_Dijkstra'        => ['_spt_di', 'SPT_Dijkstra_root'],
      'SPT_Bellman_Ford'    => ['_spt_bf', 'SPT_Bellman_Ford_root'],
-     'undirected_copy'     => ['_undirected'],
-     'directed_copy'       => ['_directed'],
      'transitive_closure_matrix' => ['_tcm'],
     );
 
@@ -2024,33 +2050,40 @@ sub is_weakly_connected {
 
 *weakly_connected = \&is_weakly_connected;
 
+# because recreating undirected copy every time has different hash ordering
+# so weakly_connected_component_by_index etc would be unstable
+sub _weakly_connected_undir_graph {
+    _check_cache($_[0], 'weak_connectivity_undirected_graph', [],
+			   \&undirected_copy);
+}
+
 sub weakly_connected_components {
     &expect_directed;
-    splice @_, 0, 1, &undirected_copy;
+    splice @_, 0, 1, &_weakly_connected_undir_graph;
     goto &connected_components;
 }
 
 sub weakly_connected_component_by_vertex {
     &expect_directed;
-    splice @_, 0, 1, &undirected_copy;
+    splice @_, 0, 1, &_weakly_connected_undir_graph;
     goto &connected_component_by_vertex;
 }
 
 sub weakly_connected_component_by_index {
     &expect_directed;
-    splice @_, 0, 1, &undirected_copy;
+    splice @_, 0, 1, &_weakly_connected_undir_graph;
     goto &connected_component_by_index;
 }
 
 sub same_weakly_connected_components {
     &expect_directed;
-    splice @_, 0, 1, &undirected_copy;
+    splice @_, 0, 1, &_weakly_connected_undir_graph;
     goto &same_connected_components;
 }
 
 sub weakly_connected_graph {
     &expect_directed;
-    splice @_, 0, 1, &undirected_copy;
+    splice @_, 0, 1, &_weakly_connected_undir_graph;
     goto &connected_graph;
 }
 

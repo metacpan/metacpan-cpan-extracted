@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::RecordReader;
 #ABSTRACT: Koha biblio/authority records reader
-$Koha::Contrib::Tamil::RecordReader::VERSION = '0.072';
+$Koha::Contrib::Tamil::RecordReader::VERSION = '0.073';
 use Moose;
 
 with 'MooseX::RW::Reader';
@@ -294,7 +294,7 @@ Koha::Contrib::Tamil::RecordReader - Koha biblio/authority records reader
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head1 SYNOPSYS
 
@@ -323,7 +323,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Fréderic Démians.
+This software is Copyright (c) 2024 by Fréderic Démians.
 
 This is free software, licensed under:
 

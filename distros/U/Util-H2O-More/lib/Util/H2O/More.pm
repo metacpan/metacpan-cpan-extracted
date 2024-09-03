@@ -5,8 +5,8 @@ package Util::H2O::More;
 use parent q/Exporter/;
 use Util::H2O ();
 
-our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o ini2o h2o2ini o2ini Getopt2h2o ddd dddie tr4h2o yaml2h2o yaml2o/);
-our $VERSION = q{0.3.7};
+our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o ini2o h2o2ini HTTPTiny2h2o o2ini Getopt2h2o ddd dddie tr4h2o yaml2h2o yaml2o/);
+our $VERSION = q{0.4.0};
 
 use feature 'state';
 
@@ -324,6 +324,27 @@ sub yaml2o($) {
 
 # NOTE: no h2o2yaml or o2yaml, but can add one if somebody needs it ... please file an issue on the tracker (GH these days)
 
+# This method assumes a response HASH reference returned by HTTP::Tiny; so
+# it looks for $ref->{content}, and if anything is found there it will attempt
+# to turn it into a Perl data structure usin JSON::XS::Maybe::decode_json; it
+# them applies "d2o -autoundef" to it
+sub HTTPTiny2h2o($) {
+  my $ref = shift;
+  if (ref $ref eq q{HASH} and exists $ref->{content}) {
+    require JSON::MaybeXS; # tries to load the JSON module you want, exports decode_json, encode_json
+    h2o $ref, qw/content/;
+    if ($ref->content) {
+      my $content = d2o -autoundef, JSON::MaybeXS::decode_json($ref->content); # this may die
+      $ref->content($content);  
+    }
+  }
+  else {
+    die qq{Provided parameter must be a proper HASH reference returned by HTTP::Tiny that contains a 'content' HASH key.};
+  }
+
+  return $ref;
+}
+
 1;
 
 __END__
@@ -471,7 +492,7 @@ cleaning up their Perl with C<Util::H2O>!
 
 =head1 METHODS
 
-=head2 C<baptise REF, PKG, LIST>
+=head2 C<baptise [-recurse] REF, PKG, LIST>
 
 Takes the same first 2 parameters as C<bless>; with the addition
 of a list that defines a set of default accessors that do not
@@ -480,7 +501,9 @@ rely on the top level keys of the provided hash reference.
 The B<-recurse> option:
 
 Like C<baptise>, but creates accessors recursively for a nested
-hash reference. Uses C<h2o>'s C<-recurse> flag.
+hash reference. Uses C<h2o>'s C<-recurse> flag. I know it's weird
+having a I<-recurse> option for a method called, I<baptise>. I
+don't make the rule :-).
 
 Note: The accessors created in the nested hashes are handled
 directly by C<h2o> by utilizing the C<-recurse> flag. This means
@@ -576,6 +599,60 @@ C<baptise> and friends.
     # ...
     # now $o can be used to query all possible options, even if they were
     # never passed at the commandline 
+
+=head2 C<HTTPTiny2h2o REF>
+
+This method is particularly handy when dealing with L<HTTP::Tiny> responses,
+which are generally returned as C<HASH> references of the form,
+
+  {
+    status  => 200,
+    content => q/some string, could be JSON, etc/,
+    ...
+  }
+
+The method is aware of this structure, and if the C<content> key exists,
+it will decode the contents of C<content> as JSON, and if successful will
+apply C<d2o -autoundef> to it. The ideal result is that the serialized JSON
+returned by the C<HTTP::Tiny> web request can be accessed directly in a
+chained way, e.g., Given a C<HTTP::Tiny> response C<HASH> of the form,
+
+  my $response = {
+    status => 200,
+    content => q/{"foo":"bar","baz":{"herp"=>"derp"}}/,
+  }
+
+Then, the following will work like so:
+
+  use Util::H2O::More qw/HTTPTiny2h2o/;
+  
+  my $response = HTTP::Tiny->new->get(...);
+  
+  HTTPTiny2h2o $response;
+  say $response->content->herp;             # says "derp"
+
+Or more succinctly,
+
+  use Util::H2O::More qw/HTTPTiny2h2o/;
+  
+  my $response = HTTPTiny2h2o HTTP::Tiny->new->get(...);
+  
+  say $response->content->herp;             # says "derp" 
+
+=head3 C<HTTPTiny2h2o> May C<die>!
+
+If something is wrong with C<REF>, then C<HTTPTiny2h2o> will throw an exception
+via C<die>, so it's good to be confident of what you're passing to it.
+
+Similarly, any exceptions thrown by L<JSON::MaybeXS>'s C<decode_json> is allowed
+to propagate up.
+
+=head2 Note on the Serialization Format
+
+At this time, only serialized C<JSON> content is handled. If another serialization
+format is needed, please let the module author know. This method also doesn't check
+any headers to see what type it's supposed to be. The validity of the JSON is solely
+determined by C<decode_json>.
 
 =head2 C<yaml2h2o FILENAME_OR_YAML_STRING>
 
@@ -838,7 +915,7 @@ the form:
 
 =head3 C<-autoundef>
 
-There is an optional flag for C<d2o> that will allow one to one to call a
+There is an optional flag for C<d2o> that will allow one to call a
 non-existing key using its setter form, and via C<AUTOLOAD> will return
 C<undef>, this saves some code and piercing the veil into the HASH itself;
 

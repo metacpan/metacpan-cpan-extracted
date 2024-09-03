@@ -1,31 +1,31 @@
 #!perl -T
+use lib '/Users/real/Mios/code/DBIx-Fast/lib/';
+
 use strict;
 use warnings FATAL => 'all';
 
 use Test::More;
 use DBIx::Fast;
-
+use Data::Dumper;
+use feature 'say';
 eval "use DBD::SQLite 1.74";
+plan skip_all => "DBD::SQLite 1.74" if $@;
 
-if ( $@ ) {
-    plan skip_all => "DBD::SQLite 1.74";
-} else {
-    plan tests => 18;
-}
+#plan tests => 18;
 
 my $db = DBIx::Fast->new(
     db     => 't/db/test.db',
     driver => 'SQLite',
-    Error  => 0,
+    RaiseError => 0,
     PrintError => 0 );
+
+can_ok($db,qw(insert update delete q val all hash array count));
 
 $db->delete('test', { id => { '>' => 0 } });
 
 for (qw(be eb)) { $db->execute("SELECT * FROM $_"); }
 
 is ref $db->errors,'ARRAY','Errors OK';
-
-can_ok($db,qw(insert update delete q val all hash array count));
 
 is $db->val('select count(*) from test'), 0, 'empty';
 
@@ -44,6 +44,16 @@ $db->up('test', { name => 'update test' }, { id => 1 }, time => 'time' );
 
 $val = $db->val('select name from test where id = ?',1);
 like $val, qr/update test/, 'update tests';
+
+$db->insert('test',{ name => rand(6) }, time => 'time') for 1 .. 5;
+
+my @flat = $db->flat('SELECT name FROM test WHERE 1');
+
+is ref \@flat,'ARRAY','flat() ARRAY';
+is scalar(@flat),6,'flat() Scalar 6';
+
+$db->flat('SELECT name FROM test WHERE 1');
+is ref $db->results,'ARRAY','Results Flat OK';
 
 $db->array('SELECT * FROM test WHERE 1');
 is ref $db->results,'ARRAY','Results Array OK';

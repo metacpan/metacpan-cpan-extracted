@@ -1,30 +1,17 @@
-package GoodMap;
+package BadSample;
 
 use 5.006;
 use Moo;
-use namespace::autoclean;
+use namespace::clean;
 
-has xml => (is => 'ro', default => sub { File::Spec->catfile('t', 'good-map.xml') });
-with 'Map::Tube';
-
-package BadMap;
-
-use 5.006;
-use Moo;
-use namespace::autoclean;
-
-has json => (is => 'ro', default => sub { File::Spec->catfile('t', 'bad-map.json') });
+has xml => (is => 'ro', default => sub { return File::Spec->catfile('t', 'bad-sample.xml') });
 with 'Map::Tube';
 
 package main;
 
 use 5.006;
 use strict; use warnings;
-use Test::More;
+use Test::Map::Tube;
 
-my $min_ver = '0.60';
-eval "use Test::Map::Tube $min_ver tests => 1";
-plan skip_all => "Test::Map::Tube $min_ver required." if $@;
-
-local $SIG{__WARN__} = sub { };
-not_ok_map(BadMap->new);
+local $SIG{__WARN__} = sub {};
+not_ok_map(BadSample->new);

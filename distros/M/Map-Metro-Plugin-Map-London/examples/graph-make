@@ -1,0 +1,136 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $g = read_doogal_graph(map "examples/$_", qw(line-colours.csv doogal-tunnel-lines.csv));
+
+if (1) {
+# to produce a graphviz input file:
+require GraphViz2;
+graphvizify(my $g2 = $g->undirected_copy_attributes);
+my $gv = GraphViz2->from_graph($g2);
+print $gv->dot_input;
+} elsif (0) {
+write_mapmetro_graph($g);
+} else {
+write_maptube_graph($g);
+}
+
+sub write_mapmetro_graph {
+  my ($g, $file) = @_;
+  print "--stations\n";
+  print "$_\n" for sort $g->vertices;
+  my $l2c = $g->get_graph_attribute('line2colour');
+  print "\n--lines\n";
+  my %line2id = map {my$o=$_;s#[^a-zA-Z0-9]##g;($o,$_)} keys %$l2c;
+  print "$line2id{$_}|$_|$_|color:", strip_colour($l2c->{$_}), "\n" for sort keys %$l2c;
+  my @edges = sort {$a->[0]cmp$b->[0] || $a->[1]cmp$b->[1]} $g->undirected_copy->unique_edges;
+  my @segments;
+  for my $e (@edges) {
+    my ($f, $t) = sort @$e;
+    my %lines_ft = map +($_=>undef), $g->get_multiedge_ids($f, $t);
+    my %lines_tf = map +($_=>undef), $g->get_multiedge_ids($t, $f);
+    my %all_lines; @all_lines{keys %lines_ft, keys %lines_tf} = ();
+    push @segments, join(',', map
+      +(!exists $lines_ft{$_} ? '<-' : exists $lines_tf{$_} ? '' : '->').$line2id{$_},
+      sort keys %all_lines)."|$f|$t\n";
+  }
+  print "\n--segments\n";
+  print $_ for sort @segments;
+}
+
+sub _next_successor {
+  my @k = sort keys %{$_[1]}; # deterministic
+  !@k ? () : $k[0];
+}
+sub _next_root {
+  my ($g, @k) = ($_[0]->{graph}, sort $_[0]->unseen); # deterministic
+  !@k ? () : (grep $g->degree($_) == 1, @k)[0] || $k[0];
+}
+sub select_only_line {
+  my ($g, $id) = @_;
+  $g->undirected_copy # doesn't copy attributes
+    ->filter_edges(sub {$_[3] eq $id})
+    ->filter_vertices(sub {!$_[0]->is_isolated_vertex($_[1])});
+}
+sub strip_colour {local $_=shift;s#:.*##;$_}
+sub write_maptube_graph {
+  my ($g) = @_;
+  require JSON::PP;
+  require Graph::Traversal::DFS;
+  my $json = JSON::PP->new->canonical->pretty;
+  my %data;
+  my $l2c = $g->get_graph_attribute('line2colour');
+  push @{$data{lines}{line}}, {id=>$_, name=>$_, color=>strip_colour $l2c->{$_}}
+    for sort keys %$l2c;
+  $data{name} = 'London Tube';
+  for my $line (keys %$l2c) {
+    my $g2 = select_only_line($g, $line);
+    my $d = Graph::Traversal::DFS->new($g2, next_root=>\&_next_root, next_successor=>\&_next_successor);
+    my @dfs_v = $d->dfs; # returns post-order
+    for my $v_ind (0..$#dfs_v) {
+      my $h = $g->get_vertex_attribute(my $v = $dfs_v[$v_ind], 'line2seq')||{};
+      $h->{$line} = $v_ind + 1;
+      $g->set_vertex_attribute($v, line2seq=>$h);
+    }
+  }
+  my (%init2num, %name2id);
+  for my $v (sort $g->vertices) {
+    my $id = uc substr $v, 0, 1;
+    $name2id{$v} = $id . sprintf "%03d", ++$init2num{$id};
+  }
+  for my $v (sort $g->vertices) {
+    my %s = (id=>$name2id{$v}, name=>$v);
+    $s{link} = join ',', map $name2id{$_}, sort my @to = $g->successors($v);
+    my $h = $g->get_vertex_attribute($v, 'line2seq');
+    $s{line} = join ',', map "$_:$h->{$_}", sort keys %$h;
+    push @{$data{stations}{station}}, \%s;
+  }
+  print $json->encode(\%data);
+}
+
+sub namefix {
+  local $_=shift;
+  s# \(.*\)$## if !/Olympia/;
+  s#St\. James#St James#;
+  s#Kings Cr#King's Cr#;
+  s#St\. Pancras#St Pancras#;
+  s#St\. Johns#St John's#;
+  s#Earls#Earl's#;
+  s#Regents#Regent's#;
+  s#Shepherds#Shepherd's#;
+  s# and # & #;
+  $_;
+}
+sub read_doogal_graph {
+  die 'usage: read_doogal_graph($colours_csv, $lines_csv)' if @_ != 2;
+  require Text::CSV_XS;
+  require Graph;
+  my ($colours_csv, $lines_csv) = @_;
+  my $aoa = Text::CSV_XS::csv(in => $colours_csv);
+  shift @$aoa; # drop header
+  my %line2colour = map +($_->[0],"#$_->[1]"), @$aoa;
+  $aoa = Text::CSV_XS::csv(in => $lines_csv);
+  shift @$aoa; # drop header
+  my $g = Graph->new(multiedged=>1); # directed as eg Stockholm has 1-way
+  $g->set_graph_attribute(line2colour=>\%line2colour);
+  my %ign;
+  for (@$aoa) {
+    my ($line, $from, $to) = @$_;
+    $_ = namefix($_) for $from, $to;
+    ($ign{$line}++ || warn "ignoring $line\n"), next if !$line2colour{$line};
+    $g->add_edge_by_id($from, $to, $line);
+    $g->add_edge_by_id($to, $from, $line);
+  }
+  $g;
+}
+
+sub graphvizify {
+  my ($g) = @_;
+  my $l2c = $g->get_graph_attribute('line2colour');
+  for my $ft ($g->edges) {
+    $g->set_edge_attribute_by_id(@$ft, $_, graphviz=>{color=>$l2c->{$_}})
+      for $g->get_multiedge_ids(@$ft);
+  }
+}

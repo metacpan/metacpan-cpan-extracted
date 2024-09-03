@@ -1,4 +1,4 @@
-﻿MathSciNet </mathscinet/index.html>
+MathSciNet </mathscinet/index.html>
 
     *
       Clipboard </mathscinet/clipboard.html>

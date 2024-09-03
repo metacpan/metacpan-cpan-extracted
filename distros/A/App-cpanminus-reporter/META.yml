@@ -23,7 +23,6 @@ requires:
   Capture::Tiny: '0'
   Carp: '0'
   Config::Tiny: '2.08'
-  File::HomeDir::Tiny: '0'
   File::Spec: '3.19'
   Getopt::Long: '0'
   IO::Prompt::Tiny: '0'
@@ -40,5 +39,5 @@ requires:
 resources:
   bugtracker: https://github.com/garu/App-cpanminus-reporter/issues/
   repository: https://github.com/garu/App-cpanminus-reporter
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

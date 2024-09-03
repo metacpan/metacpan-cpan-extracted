@@ -1,5 +1,5 @@
 package ExtUtils::Helpers;
-$ExtUtils::Helpers::VERSION = '0.027';
+$ExtUtils::Helpers::VERSION = '0.028';
 use strict;
 use warnings FATAL => 'all';
 use Exporter 5.57 'import';
@@ -19,8 +19,9 @@ BEGIN {
 }
 
 sub man1_pagename {
-	my $filename = shift;
-	return basename($filename).".$Config{man1ext}";
+	my ($filename, $ext) = @_;
+	$ext ||= $Config{man1ext};
+	return basename($filename).".$ext";
 }
 
 my %separator = (
@@ -32,12 +33,13 @@ my %separator = (
 my $separator = $separator{$^O} || '::';
 
 sub man3_pagename {
-	my ($filename, $base) = @_;
+	my ($filename, $base, $ext) = @_;
 	$base ||= 'lib';
+	$ext  ||= $Config{man3ext};
 	my ($vols, $dirs, $file) = splitpath(canonpath(abs2rel($filename, $base)));
 	$file = basename($file, qw/.pm .pod/);
 	my @dirs = grep { length } splitdir($dirs);
-	return join $separator, @dirs, "$file.$Config{man3ext}";
+	return join $separator, @dirs, "$file.$ext";
 }
 
 1;
@@ -56,7 +58,7 @@ ExtUtils::Helpers - Various portability utilities for module builders
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
@@ -84,11 +86,11 @@ This function splits a string the same way as the local platform does.
 
 This function substitutes a tilde at the start of a path with the users homedir in an appropriate manner.
 
-=head2 man1_pagename($filename)
+=head2 man1_pagename($filename, $ext = $Config{man1ext})
 
 Returns the man page filename for a script.
 
-=head2 man3_pagename($filename, $basedir)
+=head2 man3_pagename($filename, $basedir = 'lib', $ext = $Config{man3ext})
 
 Returns the man page filename for a Perl library.
 

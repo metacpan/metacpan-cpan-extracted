@@ -1,5 +1,9 @@
 Revision history for App-cpanminus-reporter
 
+    BUG FIXES:
+      - remove use of File::HomeDir::Tiny, to enable use on
+        perl 5.41.3+ (karen etheridge)
+
 0.21 2023-07-19
     BUG FIXES:
       - fix tarball issue that prevented installation on FreeBSD

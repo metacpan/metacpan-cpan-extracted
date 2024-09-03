@@ -18,17 +18,19 @@ my %WriteMakefileArgs = (
   "NAME" => "Util::H2O::More",
   "PREREQ_PM" => {
     "Config::Tiny" => "2.28",
+    "JSON::MaybeXS" => 0,
     "Util::H2O" => "0.24",
     "YAML" => 0
   },
   "TEST_REQUIRES" => {
     "Config::Tiny" => "2.28",
     "File::Temp" => 0,
+    "JSON::MaybeXS" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "YAML" => 0
   },
-  "VERSION" => "0.3.7",
+  "VERSION" => "0.4.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +40,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Config::Tiny" => "2.28",
   "File::Temp" => 0,
+  "JSON::MaybeXS" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Util::H2O" => "0.24",

@@ -1,0 +1,70 @@
+{
+   "abstract" : "Map::Metro map for London",
+   "author" : [
+      "Ed J <etj@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Map-Metro-Plugin-Map-London",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.63_03",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.45"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Map::Metro" : "0.2300",
+            "Moose" : "2.1400",
+            "namespace::autoclean" : "0.24",
+            "perl" : "5.012000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_dynamic_config" : 0,
+      "bugtracker" : {
+         "web" : "https://github.com/mohawk2/p5-Map-Metro-London/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mohawk2/p5-Map-Metro-London.git",
+         "web" : "https://github.com/mohawk2/p5-Map-Metro-London"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

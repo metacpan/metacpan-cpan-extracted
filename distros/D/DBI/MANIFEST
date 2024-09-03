@@ -8,6 +8,7 @@ INSTALL
 LICENSE
 MANIFEST
 Makefile.PL			The Makefile generator
+cpanfile
 Perl.xs				Test harness (currently) for Driver.xst
 README.md
 dbd_xsh.h			Prototypes for standard Driver.xst interface
@@ -22,6 +23,7 @@ dbixs_rev.pl			Utility to write dbixs_rev.h
 ex/perl_dbi_nulls_test.pl	A test script for forms of IS NULL qualification in SQL
 ex/profile.pl                   A test script for DBI::Profile
 ex/corogofer.pl                 A test script for DBD::Gofer::Transport::corostream
+ex/unicode_test.pl
 lib/Bundle/DBI.pm		A bundle for automatic installation via CPAN.
 lib/DBD/DBM.pm			A driver for DBM files (uses DBD::File)
 lib/DBD/ExampleP.pm		A very simple example Driver module
@@ -43,6 +45,7 @@ lib/DBD/Mem.pm                  A pure-perl in-memory driver using DBI::DBD::Sql
 lib/DBD/NullP.pm		An empty example Driver module
 lib/DBD/Proxy.pm		Proxy driver
 lib/DBD/Sponge.pm		A driver for fake cursors (precached data)
+lib/DBI/Changes.pm
 lib/DBI/Const/GetInfo/ANSI.pm	GetInfo data based on ANSI standard
 lib/DBI/Const/GetInfo/ODBC.pm	GetInfo data based on ODBC standard
 lib/DBI/Const/GetInfoReturn.pm	GetInfo return values plus tools based on standards
@@ -69,7 +72,7 @@ lib/DBI/ProfileSubs.pm
 lib/DBI/ProxyServer.pm		The proxy drivers server
 lib/DBI/PurePerl.pm		A DBI.xs emulation in Perl
 lib/DBI/SQL/Nano.pm		A 'smaller than micro' SQL parser
-lib/DBI/Util/_accessor.pm       A very¬cut-down version of Class::Accessor::Fast
+lib/DBI/Util/_accessor.pm       A very cut-down version of Class::Accessor::Fast
 lib/DBI/Util/CacheMemory.pm     A very cut-down version of Cache::Memory
 lib/DBI/W32ODBC.pm		An experimental DBI emulation layer for Win32::ODBC
 lib/Win32/DBIODBC.pm		An experimental Win32::ODBC emulation layer for DBI
@@ -118,8 +121,6 @@ t/87gofer_cache.t
 t/90sql_type_cast.t
 t/91_store_warning.t
 t/lib.pl		Utility functions for test scripts
-t/pod.t
-t/pod-coverage.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

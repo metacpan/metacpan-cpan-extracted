@@ -1,7 +1,7 @@
 ---
 abstract: 'Database independent interface for Perl'
 author:
-  - 'Tim Bunce (dbi-users@perl.org)'
+  - 'DBI team (dbi-users@perl.org)'
 build_requires:
   ExtUtils::MakeMaker: '6.48'
   Test::Simple: '0.90'
@@ -34,12 +34,12 @@ resources:
   homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/dbi
-version: '1.644'
+version: '1.645'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_suggests:
-  Clone: 0.34
+  Clone: 0.47
   DB_File: 0
   MLDBM: 0
   Net::Daemon: 0
-  RPC::PlServer: 0.2001
-  SQL::Statement: 1.402
+  RPC::PlServer: 0.202
+  SQL::Statement: 1.414

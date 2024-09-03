@@ -31,6 +31,7 @@ lib/Telegram/Bot/Object/Invoice.pm
 lib/Telegram/Bot/Object/KeyboardButton.pm
 lib/Telegram/Bot/Object/Location.pm
 lib/Telegram/Bot/Object/LoginUrl.pm
+lib/Telegram/Bot/Object/Member.pm
 lib/Telegram/Bot/Object/Message.pm
 lib/Telegram/Bot/Object/MessageEntity.pm
 lib/Telegram/Bot/Object/PassportData.pm

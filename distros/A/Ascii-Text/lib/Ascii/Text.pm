@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Rope;
 use Rope::Autoload;
@@ -198,7 +198,7 @@ Ascii::Text - module for generating ASCII text in various fonts and styles
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

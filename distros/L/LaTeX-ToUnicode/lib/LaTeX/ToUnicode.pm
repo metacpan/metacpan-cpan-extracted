@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package LaTeX::ToUnicode;
 BEGIN {
-  $LaTeX::ToUnicode::VERSION = '0.54';
+  $LaTeX::ToUnicode::VERSION = '0.55';
 }
 #ABSTRACT: Convert LaTeX commands to Unicode (simplistically)
 
@@ -95,13 +95,17 @@ sub convert {
     # they don't fit well with any of the tables.
     # 
     # /~, or ~ at the beginning of a line, is probably part of a url or
-    # path, not a tie. Otherwise, consider it a space, since a no-break
-    # spot in TeX is most likely fine to break in text or HTML.
+    # path, not a tie. Otherwise, consider it a space, since we can't
+    # distinguish true no-break spots (Donald~E. Knuth) from ties that
+    # are only relevant to a particular line width.
     # 
     $string =~ s,([^/])~,$1 ,g;
     
     # Remove kerns. Clearly needs generalizing/sharpening to recognize
     # dimens better, and plenty of other commands could use it.
+    # Here, we only handle literal dimensions ("+1.3pt"), not dimens
+    # referring to control sequences, with or without factors
+    # ("1.1\baselineskip").
     #_debug("before kern: $string");
     my $dimen_re = qr/[-+]?[0-9., ]+[a-z][a-z]\s*/;
     $string =~ s!\\kern${endcw}${dimen_re}!!g;
@@ -109,6 +113,12 @@ sub convert {
     # What the heck, let's do \hfuzz and \vfuzz too. They come up pretty
     # often and practically the same thing (plus ignore optional =)..
     $string =~ s!\\[hv]fuzz${endcw}=?\s*${dimen_re}!!g;    
+
+    # And here is \penalty. natbib outputs \penalty0 sometimes.
+    # Similar with $dimen_re, we only handle literal and decimal
+    # integers here, not things like "0 or `A.
+    my $number_re = qr/[-+]?[0-9]+\s*/;
+    $string =~ s!\\penalty${endcw}\s*${number_re}!!g;    
 
     # After all the conversions, $string contains \x{....} constructs
     # (Perl Unicode characters) where translations have happened. Change
@@ -770,7 +780,7 @@ L<https://github.com/borisveytsman/bibtexperllibs>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2010-2023 Gerhard Gossen, Boris Veytsman, Karl Berry
+Copyright 2010-2024 Gerhard Gossen, Boris Veytsman, Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl5 programming language system itself.

@@ -179,3 +179,11 @@
           for cleaning up old code with lots of HASH and ARRAY refs
           very easily
         - fixed test warnings
+
+0.4.0 Tue Sep 03 02:27:00 2024
+        - new minor version!
+        - added HTTPTiny2h2o, which will take an HTTP::Tiny response HASH,
+          the apply "d2o -autoundef" to whatever is returned via "contents"
+        - HTTPTiny2h2o doesn't attempt to trap any exceptions or verify before
+          the "decode_json" that it is actually JSON
+        - see updated POD for HTTPTiny2h2o for more details

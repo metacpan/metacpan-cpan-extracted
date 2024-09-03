@@ -9,21 +9,21 @@ use Exporter::Rinci qw(import);
 use IPC::System::Options 'system', 'readpipe', 'run', -log=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-13'; # DATE
+our $DATE = '2024-08-30'; # DATE
 our $DIST = 'Clipboard-Any'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
-my $known_clipboard_managers = [qw/klipper parcellite clipit xclip/];
-my $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
+our $known_clipboard_managers = [qw/klipper parcellite clipit xclip/];
+our $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
 our %argspecopt_clipboard_manager = (
     clipboard_manager => {
         summary => 'Explicitly set clipboard manager to use',
         schema => $sch_clipboard_manager,
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 The default, when left undef, is to detect what clipboard manager is running.
 
-_
+MARKDOWN
         cmdline_aliases => {m=>{}},
     },
 );
@@ -32,12 +32,12 @@ our %argspec0_index = (
     index => {
         summary => 'Index of item in history (0 means the current/latest, 1 the second latest, and so on)',
         schema => 'int*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 If the index exceeds the number of items in history, empty string or undef will
 be returned instead.
 
-_
+MARKDOWN
     },
 );
 
@@ -46,7 +46,7 @@ our %SPEC;
 $SPEC{':package'} = {
     v => 1.1,
     summary => 'Common interface to clipboard manager functions',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This module provides common functions related to clipboard manager.
 
@@ -54,18 +54,18 @@ Supported clipboard manager: KDE Plasma's Klipper (`klipper`), `parcellite`,
 `clipit`, `xclip`. Support for more clipboard managers, e.g. on Windows or other
 Linux desktop environment is welcome.
 
-_
+MARKDOWN
 };
 
 $SPEC{'detect_clipboard_manager'} = {
     v => 1.1,
     summary => 'Detect which clipboard manager program is currently running',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Will return a string containing name of clipboard manager program, e.g.
 `klipper`. Will return undef if no known clipboard manager is detected.
 
-_
+MARKDOWN
     result_naked => 1,
     result => {
         schema => $sch_clipboard_manager,
@@ -142,9 +142,9 @@ sub detect_clipboard_manager {
 $SPEC{'clear_clipboard_history'} = {
     v => 1.1,
     summary => 'Delete all clipboard items',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
-_
+MARKDOWN
     args => {
         %argspecopt_clipboard_manager,
     },
@@ -194,9 +194,9 @@ sub clear_clipboard_history {
 $SPEC{'clear_clipboard_content'} = {
     v => 1.1,
     summary => 'Delete current clipboard content',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
-_
+MARKDOWN
     args => {
         %argspecopt_clipboard_manager,
     },
@@ -238,13 +238,13 @@ sub clear_clipboard_content {
 $SPEC{'get_clipboard_content'} = {
     v => 1.1,
     summary => 'Get the clipboard content (most recent, history index [0])',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Caveats for klipper: Non-text item is not retrievable by getClipboardContents().
 If the current item is e.g. an image, then the next text item from history will
 be returned instead, or empty string if none exists.
 
-_
+MARKDOWN
     args => {
         %argspecopt_clipboard_manager,
     },
@@ -302,7 +302,7 @@ sub get_clipboard_content {
 $SPEC{'list_clipboard_history'} = {
     v => 1.1,
     summary => 'List the clipboard history',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Caveats for klipper: 1) Klipper does not provide method to get the length of
 history. So we retrieve history item one by one using getClipboardHistoryItem(i)
@@ -312,7 +312,7 @@ empty result.
 
 2) Non-text items are not retrievable by getClipboardHistoryItem().
 
-_
+MARKDOWN
     args => {
         %argspecopt_clipboard_manager,
     },
@@ -382,9 +382,9 @@ sub list_clipboard_history {
 $SPEC{'get_clipboard_history_item'} = {
     v => 1.1,
     summary => 'Get a clipboard history item',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
-_
+MARKDOWN
     args => {
         %argspecopt_clipboard_manager,
         %argspec0_index,
@@ -439,12 +439,12 @@ sub get_clipboard_history_item {
 $SPEC{'add_clipboard_content'} = {
     v => 1.1,
     summary => 'Add a new content to the clipboard',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 For `xclip`: when adding content, the primary selection is set. The clipboard
 content is unchanged.
 
-_
+MARKDOWN
     args => {
         %argspecopt_clipboard_manager,
         content => {
@@ -522,7 +522,7 @@ Clipboard::Any - Common interface to clipboard manager functions
 
 =head1 VERSION
 
-This document describes version 0.011 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2023-04-13.
+This document describes version 0.012 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2024-08-30.
 
 =head1 DESCRIPTION
 
@@ -871,7 +871,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

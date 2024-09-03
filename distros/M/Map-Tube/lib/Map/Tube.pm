@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.74';
+$Map::Tube::VERSION   = '3.76';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.74
+Version 3.76
 
 =cut
 
@@ -661,7 +661,7 @@ Please refer to the L<documentation|Map::Tube::Plugin::FuzzyFind> for more info.
 Map data can be represented in JSON or XML format. The preferred  format is JSON.
 C<Map::Tube v3.23> or above comes with a handy script C<map-data-converter>, that
 can be used to change the data format of an existing map data.Below is how we can
-represet the sample map:
+represent the sample map:
 
       A(1)  ----  B(2)
      /              \
@@ -717,7 +717,7 @@ represet the sample map:
 
 =head2 DATA VALIDATION
 
-The package L<Test::Map::Tube> can easily be used to validate raw map data.Anyone
+The package L<Test::Map::Tube> can easily be used to validate raw map data. Anyone
 building a new map using L<Map::Tube> is advised to have a unit test as a part of
 their distribution.Just like in L<Map::Tube::London> package,there is a unit test
 something like below:
@@ -725,45 +725,32 @@ something like below:
     use strict; use warnings;
     use Test::More;
     use Map::Tube::London;
-
-    eval "use Test::Map::Tube";
-    plan skip_all => "Test::Map::Tube required" if $@;
-
+    use Test::Map::Tube;
     ok_map(Map::Tube::London->new);
 
 =head2 FUNCTIONAL VALIDATION
 
-The package L<Test::Map::Tube> v0.09 or above  can easily be used to validate map
-basic functions provided by L<Map::Tube>. However we recommend v0.35 or above.
+The package L<Test::Map::Tube> can easily be used to validate map
+basic functions provided by L<Map::Tube>.
 
     use strict; use warnings;
     use Test::More;
-
-    my $min_ver = 0.35;
-    eval "use Test::Map::Tube $min_ver";
-    plan skip_all => "Test::Map::Tube $min_ver required" if $@;
-
+    use Test::Map::Tube;
     use Map::Tube::London;
     ok_map_functions(Map::Tube::London->new);
 
-The package L<Test::Map::Tube> v0.17 or above  can easily be used to validate map
-routing functions provided by L<Map::Tube>. However we recommend v0.35 or above.
+It can also easily be used to validate map routing functions provided
+by L<Map::Tube>:
 
     use strict; use warnings;
     use Test::More;
-
-    my $min_ver = 0.35;
-    eval "use Test::Map::Tube $min_ver tests => 1";
-    plan skip_all => "Test::Map::Tube $min_ver required" if $@;
-
+    use Test::Map::Tube;
     use Map::Tube::London;
     my $map = Map::Tube::London->new;
-
     my @routes = (
         "Route 1|Tower Gateway|Aldgate|Tower Gateway,Tower Hill,Aldgate",
         "Route 2|Liverpool Street|Monument|Liverpool Street,Bank,Monument",
     );
-
     ok_map_routes($map, \@routes);
 
 =cut
@@ -1386,8 +1373,6 @@ L<https://github.com/manwar/Map-Tube>
 =head1 SEE ALSO
 
 =over 2
-
-=item * L<Map::Tube::Cookbook>
 
 =item * L<Map::Tube::CLI>
 

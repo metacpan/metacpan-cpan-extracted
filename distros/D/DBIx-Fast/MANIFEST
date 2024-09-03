@@ -2,14 +2,14 @@ Changes
 ignore.txt
 lib/DBIx/Fast.pm
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST				This list of files
 README
 t/db/test.db
 t/db/test.sqlite
 t/00-load.t
 t/functions.t
+t/exception.t
 t/methods.t
-t/pod-coverage.t
 t/pod.t
 t/sql-abstract.t
 t/x_log.t

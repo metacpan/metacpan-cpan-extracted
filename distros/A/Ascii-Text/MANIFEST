@@ -9,6 +9,11 @@ lib/Ascii/Text/Font/Banner.pm
 lib/Ascii/Text/Font/Block.pm
 lib/Ascii/Text/Font/Boomer.pm
 lib/Ascii/Text/Font/Carlos.pm
+lib/Ascii/Text/Font/Chunky.pm
+lib/Ascii/Text/Font/Coinstak.pm
+lib/Ascii/Text/Font/Colossal.pm
+lib/Ascii/Text/Font/Cricket.pm
+lib/Ascii/Text/Font/Doh.pm
 lib/Ascii/Text/Font/Drpepper.pm
 lib/Ascii/Text/Font/Straight.pm
 Makefile.PL

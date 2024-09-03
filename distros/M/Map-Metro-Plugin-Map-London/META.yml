@@ -1,0 +1,33 @@
+---
+abstract: 'Map::Metro map for London'
+author:
+  - 'Ed J <etj@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: 6.63_03
+  File::ShareDir::Install: '0.06'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Map-Metro-Plugin-Map-London
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Map::Metro: '0.2300'
+  Moose: '2.1400'
+  namespace::autoclean: '0.24'
+  perl: '5.012000'
+resources:
+  X_dynamic_config: 0
+  bugtracker: https://github.com/mohawk2/p5-Map-Metro-London/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mohawk2/p5-Map-Metro-London.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

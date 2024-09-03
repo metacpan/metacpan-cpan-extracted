@@ -1,9 +1,9 @@
 This archive contains the distribution Util-H2O-More,
-version 0.3.7:
+version 0.4.0:
 
   Provides C<baptise>, semantically and idiomatically just like C<bless> but creates accessors for you. It does other cool things to make Perl code easier to read and maintain, too.
 
-This software is copyright (c) 2023 by oodler577.
+This software is copyright (c) 2023-present by oodler577.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

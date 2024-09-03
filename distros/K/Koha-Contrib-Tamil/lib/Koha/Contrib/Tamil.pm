@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil;
 # ABSTRACT: Various scripts to manage Koha instances
-$Koha::Contrib::Tamil::VERSION = '0.072';
+$Koha::Contrib::Tamil::VERSION = '0.073';
 use warnings;
 use strict;
 
@@ -18,7 +18,7 @@ Koha::Contrib::Tamil - Various scripts to manage Koha instances
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head1 DESCRIPTION
 
@@ -46,7 +46,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Fréderic Démians.
+This software is Copyright (c) 2024 by Fréderic Démians.
 
 This is free software, licensed under:
 

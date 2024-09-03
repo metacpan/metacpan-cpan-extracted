@@ -6,6 +6,7 @@ loadavg.xs
 Makefile.PL
 MANIFEST
 META.yml
+META.json
 README
 t/loadavg-benchmark.pl
 t/test.t

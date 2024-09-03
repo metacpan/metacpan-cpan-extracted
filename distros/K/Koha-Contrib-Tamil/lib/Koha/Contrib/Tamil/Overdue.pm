@@ -1,5 +1,5 @@
 package Koha::Contrib::Tamil::Overdue;
-$Koha::Contrib::Tamil::Overdue::VERSION = '0.072';
+$Koha::Contrib::Tamil::Overdue::VERSION = '0.073';
 use Moose;
 use Modern::Perl;
 use YAML qw/ Dump LoadFile /;
@@ -342,7 +342,7 @@ Koha::Contrib::Tamil::Overdue
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head1 ATTRIBUTES
 
@@ -371,7 +371,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Fréderic Démians.
+This software is Copyright (c) 2024 by Fréderic Démians.
 
 This is free software, licensed under:
 

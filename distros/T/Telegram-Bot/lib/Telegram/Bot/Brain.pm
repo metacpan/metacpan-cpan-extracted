@@ -1,5 +1,5 @@
 package Telegram::Bot::Brain;
-$Telegram::Bot::Brain::VERSION = '0.025';
+$Telegram::Bot::Brain::VERSION = '0.026';
 # ABSTRACT: A base class to make your very own Telegram bot
 
 
@@ -246,6 +246,19 @@ sub answerInlineQuery {
   return $api_response;
 }
 
+sub setMyCommands {		# after v0.025
+  my $self = shift;
+  my $args = shift || {};
+  
+  my $send_args = {};
+  croak "no commands supplied" unless $args->{commands};
+  $send_args->{commands} = encode_json $args->{commands};
+  $send_args->{language_code} = $args->{language_code} if ($args->{language_code}//'') ne '';
+  my $token = $self->token || croak "no token?";
+  my $url = "https://api.telegram.org/bot${token}/setMyCommands";
+  return $self->_post_request($url, $send_args);
+}
+
 sub _add_getUpdates_handler {
   my $self = shift;
 
@@ -294,6 +307,7 @@ sub _process_message {
     $update = Telegram::Bot::Object::Message->create_from_hash($item->{channel_post}, $self)        if $item->{channel_post};
     $update = Telegram::Bot::Object::Message->create_from_hash($item->{edited_channel_post}, $self) if $item->{edited_channel_post};
     $update = Telegram::Bot::Object::InlineQuery->create_from_hash($item->{inline_query}, $self)    if $item->{inline_query};
+    $update = Telegram::Bot::Object::Message->create_from_hash($item->{my_chat_member}, $self)      if $item->{my_chat_member};		# after v0.025
 
     # if we got to this point without creating a response, it must be a type we
     # don't handle yet
@@ -335,7 +349,7 @@ Telegram::Bot::Brain - A base class to make your very own Telegram bot
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -579,11 +593,15 @@ James Green <jkg@earth.li>
 
 Julien Fiegehenn <simbabque@cpan.org>
 
+=item *
+
+Albert Cester <albert.cester@web.de>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by James Green.
+This software is copyright (c) 2024 by James Green.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

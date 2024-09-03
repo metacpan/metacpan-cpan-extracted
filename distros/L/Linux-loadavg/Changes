@@ -54,3 +54,7 @@ Revision history for Perl extension Linux::loadavg.
 0.14  Sat Aug 24 01:22:00 2024
         - POD fix
         - Added LICENSE file to MANIFEST
+
+0.15  Mon Sep  2 12:34:00 2024
+	- Add missing 'EXTEND(SP,nelem)' to XS
+	- Version bump

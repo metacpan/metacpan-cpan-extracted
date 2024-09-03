@@ -24,7 +24,7 @@ no_index:
     - t
     - inc
 requires:
-  Protocol::Redis: '1.0011'
+  Protocol::Redis: '1.0021'
   XS::Object::Magic: '0'
   XSLoader: '0'
   parent: '0'
@@ -33,7 +33,7 @@ resources:
   IRC: irc://irc.perl.org/#redis
   bugtracker: https://github.com/dgl/protocol-redis-xs/issues
   repository: https://github.com/dgl/protocol-redis-xs.git
-version: '0.08'
+version: '0.09'
 x_contributors:
   - '5c30 <10b39ae0@13os.net>'
   - 'Dan Book <grinnz@grinnz.com>'

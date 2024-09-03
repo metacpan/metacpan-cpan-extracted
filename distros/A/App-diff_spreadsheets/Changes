@@ -1,3 +1,4 @@
+v1.025 - Avoid tester issues with terminal size when there is no tty
 v1.024 - Remove deprecated "use feature 'switch'"
 v1.023 - Remove multiple 'use version' statements (deprecated in Perl 5.39)
 v1.022 - Fix bug where files were considered identical if they differed

@@ -1,17 +1,17 @@
 #!perl -T
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use Test::More;
 
-eval "use DBD::SQLite 1.74";
+plan skip_all => "DBIx::Fast No test POD" unless $ENV{'DBIX_FAST_TEST'};
 
-unless ( $ENV{'DBIX_FAST_TEST'} ) {
-    plan skip_all => "DBIx::Fast No test POD";
-}
+eval "use Test::Pod 1.52";
+plan skip_all => "Test::Pod 1.52 required for testing POD" if $@;
 
-# Ensure a recent version of Test::Pod
-my $min_tp = 1.22;
-eval "use Test::Pod $min_tp";
-plan skip_all => "Test::Pod $min_tp required for testing POD" if $@;
+eval "use Test::Pod::Coverage 1.10";
+plan skip_all => "Test::Pod::Coverage 1.10 required for testing POD coverage" if $@;
 
-all_pod_files_ok();
+eval "use Pod::Coverage 0.23";
+plan skip_all => "Pod::Coverage 0.23 required for testing POD coverage" if $@;
+
+all_pod_coverage_ok();

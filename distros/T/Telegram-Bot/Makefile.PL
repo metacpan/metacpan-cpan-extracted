@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A base class to make your very own Telegram bot",
-  "AUTHOR" => "Justin Hawkins <justin\@eatmorecode.com>, James Green <jkg\@earth.li>, Julien Fiegehenn <simbabque\@cpan.org>",
+  "AUTHOR" => "Justin Hawkins <justin\@eatmorecode.com>, James Green <jkg\@earth.li>, Julien Fiegehenn <simbabque\@cpan.org>, Albert Cester <albert.cester\@web.de>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "Mojolicious" => "8.00",
     "Test::Exception" => "0.43"
   },
-  "VERSION" => "0.025",
+  "VERSION" => "0.026",
   "test" => {
     "TESTS" => "t/*.t"
   }

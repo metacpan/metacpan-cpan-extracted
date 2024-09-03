@@ -3,9 +3,11 @@
 
 #########################
 
-use v5.12;
+use v5.8;
 use strict;
 use warnings;
+
+our $VERSION = '0.15';
 
 use Test::Simple tests => 8;
 

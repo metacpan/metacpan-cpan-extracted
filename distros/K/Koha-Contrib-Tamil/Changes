@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
+0.073 2024-09-02
+
+  - koha-coce-url avec images locales
+
 0.071 2023-06-26
 
   - koha-dump-biblio pour 22.11 et supérieur

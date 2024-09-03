@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008_001;
 
-our $VERSION = '1.0011';
+our $VERSION = '1.0021';
 
 require Carp;
 
@@ -14,7 +14,7 @@ sub new {
 
     my $self = {@_};
 
-    return unless $self->{api} == '1';
+    Carp::croak(qq/Unknown Protocol::Redis API version $self->{api}/) unless $self->{api} == '1';
 
     bless $self, $class;
 
@@ -170,7 +170,7 @@ Protocol::Redis - Redis protocol parser/encoder with asynchronous capabilities.
 =head1 SYNOPSIS
 
     use Protocol::Redis;
-    my $redis = Protocol::Redis->new(api => 1) or die "API v1 not supported";
+    my $redis = Protocol::Redis->new(api => 1);
 
     $redis->parse("+foo\r\n");
 
@@ -207,11 +207,10 @@ should specify API version during Protocol::Redis construction.
 
 =head2 C<new>
 
-    my $redis = Protocol::Redis->new(api => 1)
-        or die "API v1 not supported";
+    my $redis = Protocol::Redis->new(api => 1);
 
 Construct Protocol::Redis object with specific API version support.
-If specified API version not supported constructor returns undef.
+If specified API version not supported constructor should raise an exception.
 Client libraries should always specify API version.
 
 =head2 C<parse>
@@ -267,7 +266,7 @@ Get API version.
 
 =head1 AUTHOR
 
-Sergey Zasenko, C<undef@cpan.org>.
+Serhii Zasenko, C<undef@cpan.org>.
 
 =head1 CREDITS
 
@@ -289,7 +288,7 @@ Yaroslav Korshak (yko)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2019, Sergey Zasenko.
+Copyright (C) 2011-2024, Serhii Zasenko.
 
 This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl 5.10.

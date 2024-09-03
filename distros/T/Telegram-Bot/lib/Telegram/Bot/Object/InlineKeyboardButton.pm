@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::InlineKeyboardButton;
-$Telegram::Bot::Object::InlineKeyboardButton::VERSION = '0.025';
+$Telegram::Bot::Object::InlineKeyboardButton::VERSION = '0.026';
 # ABSTRACT: The base class for Telegram 'InlineKeyboardButton' type objects
 
 
@@ -39,7 +39,7 @@ Telegram::Bot::Object::InlineKeyboardButton - The base class for Telegram 'Inlin
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 DESCRIPTION
 
@@ -62,11 +62,15 @@ James Green <jkg@earth.li>
 
 Julien Fiegehenn <simbabque@cpan.org>
 
+=item *
+
+Albert Cester <albert.cester@web.de>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by James Green.
+This software is copyright (c) 2024 by James Green.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

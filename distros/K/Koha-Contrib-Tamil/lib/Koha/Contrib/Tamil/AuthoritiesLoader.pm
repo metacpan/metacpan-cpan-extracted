@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::AuthoritiesLoader;
 #ABSTRACT: Authorities loader into a Koha instance
-$Koha::Contrib::Tamil::AuthoritiesLoader::VERSION = '0.072';
+$Koha::Contrib::Tamil::AuthoritiesLoader::VERSION = '0.073';
 use Moose;
 
 extends 'AnyEvent::Processor';
@@ -105,7 +105,7 @@ Koha::Contrib::Tamil::AuthoritiesLoader - Authorities loader into a Koha instanc
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head1 AUTHOR
 
@@ -113,7 +113,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Fréderic Démians.
+This software is Copyright (c) 2024 by Fréderic Démians.
 
 This is free software, licensed under:
 

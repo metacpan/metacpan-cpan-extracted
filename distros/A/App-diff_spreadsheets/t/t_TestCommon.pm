@@ -64,6 +64,10 @@ BEGIN{
   # Disable buffering
   STDERR->autoflush(1);
   STDOUT->autoflush(1);
+
+  # Assume a fixed terminal width for testing, and avoid probing the terminal
+  # (there may be no terminal in some test setups).
+  $ENV{COLUMNS} = 80;
 }
 use POSIX ();
 use utf8;
@@ -94,18 +98,20 @@ our @EXPORT_OK = qw/$savepath $debug $silent $verbose %dvs dprint dprintf/;
 use Import::Into;
 use Data::Dumper;
 
-unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
-  # unless we are testing DDI
-  #$Data::Dumper::Interp::Foldwidth = undef; # use terminal width
-  $Data::Dumper::Interp::Useqq = "controlpics:unicode";
-}
-
 use Cwd qw/getcwd abs_path/;
 use POSIX qw/INT_MAX/;
 use File::Basename qw/dirname/;
 use Capture::Tiny qw/capture capture_merged tee_merged/;
 use Env qw/@PATH @PERL5LIB/;  # ties @PATH, @PERL5LIB
 use Config;
+
+BEGIN {
+  unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
+    # unless we are testing DDI
+    #$Data::Dumper::Interp::Foldwidth = undef; # use terminal width
+    $Data::Dumper::Interp::Useqq = "controlpics:unicode";
+  }
+}
 
 sub bug(@) { @_=("BUG FOUND:",@_); goto &Carp::confess }
 

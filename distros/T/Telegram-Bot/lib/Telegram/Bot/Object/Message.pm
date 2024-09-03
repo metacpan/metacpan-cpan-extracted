@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Message;
-$Telegram::Bot::Object::Message::VERSION = '0.025';
+$Telegram::Bot::Object::Message::VERSION = '0.026';
 # ABSTRACT: The base class for the Telegram type "Message".
 
 
@@ -29,6 +29,7 @@ use Telegram::Bot::Object::PassportData;
 use Telegram::Bot::Object::InlineKeyboardMarkup;
 use Telegram::Bot::Object::ReplyKeyboardMarkup;
 use Telegram::Bot::Object::InlineQuery;
+use Telegram::Bot::Object::Member;		# after v0.026
 
 use Data::Dumper;
 
@@ -97,6 +98,7 @@ sub fields {
                                                             channel_chat_created migrate_to_chat_id
                                                             migrate_from_chat_id connected_website/],
           'Telegram::Bot::Object::User'                 => [qw/from forward_from new_chat_members left_chat_member /],
+	  'Telegram::Bot::Object::Member'               => [qw/new_chat_member old_chat_member /],		# after v0.021
 
           'Telegram::Bot::Object::Chat'                 => [qw/chat forward_from_chat/],
           'Telegram::Bot::Object::Message'              => [qw/reply_to_message pinned_message/],
@@ -155,7 +157,7 @@ Telegram::Bot::Object::Message - The base class for the Telegram type "Message".
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 DESCRIPTION
 
@@ -187,11 +189,15 @@ James Green <jkg@earth.li>
 
 Julien Fiegehenn <simbabque@cpan.org>
 
+=item *
+
+Albert Cester <albert.cester@web.de>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by James Green.
+This software is copyright (c) 2024 by James Green.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

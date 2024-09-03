@@ -6,7 +6,7 @@ use parent "Protocol::Redis";
 use XS::Object::Magic;
 use XSLoader;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 XSLoader::load "Protocol::Redis::XS", $VERSION;
 
@@ -15,8 +15,10 @@ sub new {
 
   my $on_message = delete $args{on_message};
 
+  Carp::croak(qq/Unknown Protocol::Redis API version $args{api}/)
+    unless defined $args{api} and $args{api} == 1;
+
   my $self = bless \%args, $class;
-  return undef unless $self->api == 1;
   $self->on_message($on_message) if defined $on_message;
 
   $self->_create;

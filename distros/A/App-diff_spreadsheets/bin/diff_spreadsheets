@@ -5,8 +5,8 @@
 # related or neighboring rights.  Attribution is requested but is not required.
 use strict; use warnings FATAL => 'all';
 
-our $VERSION = '1.024'; # VERSION
-our $DATE = '2024-08-25'; # DATE
+our $VERSION = '1.025'; # VERSION
+our $DATE = '2024-09-02'; # DATE
 
 #use 5.12; # for unicode_strings
 use v5.18; # for lexical_subs
@@ -113,20 +113,31 @@ sub _get_terminal_width() {  # returns undef if unknowable
     local *_; # Try to avoid clobbering special filehandle "_"
     # This does not actualy work; https://github.com/Perl/perl5/issues/19142
 
-    my $fh = -t STDERR ? *STDERR :
-             -t STDOUT ? *STDOUT :
-             -t STDIN  ? *STDIN  :
-        do{my $fh; for("/dev/tty",'CONOUT$') { last if open $fh, $_ } $fh} ;
-    my $wmsg = ""; # Suppress a "didn't work" warning from Term::ReadKey.
-                   # On some platforms (different libc?) "stty" directly
-                   # outputs "stdin is not a tty" which we can not trap.
-                   # Probably this is a Term::Readkey bug where it should
-                   # redirect such messages to /dev/null...
-    my ($width, $height) = do {
-      local $SIG{'__WARN__'} = sub { $wmsg .= $_[0] };
-      $fh ? eval{ Term::ReadKey::GetTerminalSize($fh) } : ()
-    };
-    return( (defined($width) && $width > 0) ? $width : undef );
+    my $fh =
+      -t STDOUT ? *STDOUT :
+      -t STDERR ? *STDERR :
+       # under Windows the filehandle must be an *output* handle
+       do{my $fh; for("/dev/tty",'CONOUT$') { last if open $fh, $_ } $fh}
+         || (-t STDIN && *STDIN)
+       ;
+    my ($width, $height);
+    if ($fh) {
+      # Some platforms (bsd?) carp if the terminal size can not be determined.
+      # We don't want to see any such warnings.  Also there might be a
+      # __WARN__ trap which we don't want to trigger
+      #
+      # Sigh.  It never ends!  On some platforms (different libc?)
+      # "stty" directly prints "stdin is not a tty" which we can not trap.
+      # Probably this is a bug in Term::Readkey where it should redirect
+      # such messages to /dev/null.  So we have to do it here.
+      require Capture::Tiny;
+      () = Capture::Tiny::capture_merged(sub{
+        delete local $INC{__WARN__};
+        delete local $INC{__DIE__};
+        ($width, $height) = eval{ Term::ReadKey::GetTerminalSize($fh) };
+      });
+    }
+    return $width; # possibly undef (sometimes seems to be zero ?!?)
   }
 }
 

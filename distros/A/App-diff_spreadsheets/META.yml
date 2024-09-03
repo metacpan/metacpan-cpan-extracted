@@ -3,7 +3,6 @@ abstract: 'Diff spreadsheets or CSVs showing changed cells'
 author:
   - 'Jim Avera'
 build_requires:
-  Capture::Tiny: '0'
   Carp::Always: '0'
   Cwd: '0'
   Data::Dumper: '0'
@@ -39,6 +38,7 @@ meta-spec:
 name: App-diff_spreadsheets
 requires:
   Algorithm::Diff: '0'
+  Capture::Tiny: '0.48'
   Carp: '0'
   Data::Dumper::Interp: '6.007'
   Encode: '3.00'
@@ -66,7 +66,7 @@ resources:
   bugtracker: https://github.com/jimav/App-diff_spreadsheets/issues
   homepage: https://github.com/jimav/App-diff_spreadsheets
   repository: https://github.com/jimav/App-diff_spreadsheets.git
-version: '1.024'
+version: '1.025'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: CC0-1.0

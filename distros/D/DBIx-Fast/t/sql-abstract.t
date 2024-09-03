@@ -1,4 +1,5 @@
 #!perl -T
+use lib '/Users/real/Mios/code/DBIx-Fast/lib/';
 use strict;
 use warnings FATAL => 'all';
 
@@ -7,12 +8,12 @@ use Test::More;
 use DBIx::Fast;
 
 eval "use SQL::Abstract 2.00";
+plan skip_all => "SQL::Abstract 2.00" if $@;
 
-if ( $@ ) {
-    plan skip_all => "SQL::Abstract 2.00";
-} else {
-    plan tests => 15;
-}
+eval "use DBD::SQLite 1.50";
+plan skip_all => "DBD::SQLite 1.50" if $@;
+
+plan tests => 15;
 
 my $db = DBIx::Fast->new(
     db     => 't/db/test.db',
@@ -20,13 +21,13 @@ my $db = DBIx::Fast->new(
     Error  => 1,
     PrintError => 1 );
 
-is ref $db->SQL,'SQL::Abstract','SQL::Abstract ISA';
+is ref $db->Q,'SQL::Abstract','Q() - SQL::Abstract ISA';
 
 for my $Method ( qw(select insert update delete) ) {
-    can_ok($db->SQL,$Method);
+    can_ok($db->Q,$Method);
 }
 
-my $Abs = $db->SQL;
+my $Abs = $db->Q;
 my ($stmt,@bind);
 
 my (%data,%where,%field);
@@ -56,7 +57,7 @@ is $stmt,'SELECT * FROM tickets WHERE ( requestor = ? AND status != ? AND ( work
 
 ($stmt, @bind) = $Abs->update('tickets', \%field, \%where);
 
-is scalar(@bind),4,'SQL::Abstract update() bind=2';
+is scalar(@bind),4,'SQL::Abstract update() bind=4';
 is $stmt,'UPDATE tickets SET email = ?, message = ? WHERE ( id = ? AND user = ? )',
     'SQL::Abstract update() stmt';
 

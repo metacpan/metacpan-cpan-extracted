@@ -12,7 +12,7 @@ my %WriteMakefileArgs = (
   'ABSTRACT' => 'Convert LaTeX commands to Unicode',
   'AUTHOR' => 'Gerhard Gossen <gerhard.gossen@googlemail.com> and Boris Veytsman <boris@varphi.com> and Karl Berry <karl@freefriends.com>',
     'BUILD_REQUIRES' => {
-	'Pod-LaTeX' => '0.61'
+	'Pod::LaTeX' => '0.61'
     },
   'CONFIGURE_REQUIRES' => {
     'ExtUtils::MakeMaker' => '6.31'

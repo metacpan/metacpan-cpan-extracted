@@ -1,6 +1,6 @@
 package BibTeX::Parser;
 {
-  $BibTeX::Parser::VERSION = '1.04';
+  $BibTeX::Parser::VERSION = '1.05';
 }
 # ABSTRACT: A pure perl BibTeX parser
 use warnings;
@@ -282,7 +282,7 @@ Parses BibTeX files.
     use BibTeX::Parser;
 	use IO::File;
 
-    my $fh     = IO::File->new("filename");
+    my $fh = IO::File->new("filename");
 
     # Create parser object ...
     my $parser = BibTeX::Parser->new($fh);
@@ -324,10 +324,11 @@ Parameters:
 
 Returns the next parsed entry or undef.
 
+
 =head1 NOTES
 
-The fields C<author> and C<editor> are canonized, see
-L<BibTeX::Parser::Author>
+The fields C<author> and C<editor> are canonicalized, see
+L<BibTeX::Parser::Author>.
 
 
 =head1 SEE ALSO
@@ -357,7 +358,7 @@ Karl Berry <karl@freefriends.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013-2023 by Gerhard Gossen and Boris Veytsman and Karl Berry.
+This software is copyright (c) 2013-2024 by Gerhard Gossen and Boris Veytsman and Karl Berry.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

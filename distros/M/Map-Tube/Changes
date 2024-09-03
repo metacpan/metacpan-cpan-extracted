@@ -1,5 +1,11 @@
 Revision history for Map::Tube
 
+3.76  2024-09-02T12:40:00+00:00
+      - Updated pod w.r.t Test::Map::Tube, thanks @mohawk2.
+
+3.75  2024-09-02T12:20:00+00:00
+      - Added Test::Map::Tube to the dist, thanks @mohawk2.
+
 3.74  2024-08-27T00:20:00+00:00
       - Updated pod for Map::Tube::Cookbook.
 

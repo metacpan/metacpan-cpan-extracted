@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package Main;
-$Main::VERSION = '0.072';
+$Main::VERSION = '0.073';
 # PODNAME: koha-cloud
 # ABSTRACT: Creates HTML keywords clouds from Koha Zebra Indexes
 
@@ -88,7 +88,7 @@ koha-cloud - Creates HTML keywords clouds from Koha Zebra Indexes
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head1 USAGE
 
@@ -182,7 +182,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Fréderic Démians.
+This software is Copyright (c) 2024 by Fréderic Démians.
 
 This is free software, licensed under:
 

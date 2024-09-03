@@ -15,6 +15,7 @@ use LWP;
 use LWP::UserAgent;
 use JSON;
 use Business::ISBN;
+use Koha::Biblios;
 
 
 binmode(STDOUT, ":encoding(utf8)");
@@ -46,47 +47,62 @@ sub create_json_data {
     my $koha = Koha::Contrib::Tamil::Koha->new();
 
     my %record_per_isbn;
+    my @ret;
     for my $biblionumber (@bibs) {
-        my $record = $koha->get_biblio($biblionumber);
-        my $field = $record->field($tag->{isbn});
-        next unless $field;
-        my $isbn = $field->subfield('a');
-        next unless $isbn;
-        # Clean ISBN
-        $isbn = Business::ISBN->new($isbn);
-        next unless $isbn;
-        next unless $isbn->is_valid;
-        $isbn = $isbn->isbn;
-        my $title = $record->field($tag->{title});
-        next unless $title;
-        $title = $is_unimarc
-            ? $title->subfield('a')
-            : join(' ', map { $_->[1] } @{$title->subf});
-        $record_per_isbn{$isbn} = [ $biblionumber, $title ];
+        my $biblio = Koha::Biblios->find( $biblionumber );
+        if ($biblio->cover_images->count) {
+            # Image locale
+            push @ret, [
+                $biblionumber,
+                $biblio->title,
+                "/cgi-bin/koha/opac-image.pl?biblionumber=$biblionumber"
+            ];
+        }
+        else {
+            # Chercher chez Amazon
+            my $record = MARC::Moose::Record::new_from($biblio->metadata->record(), 'Legacy');
+            my $field = $record->field($tag->{isbn});
+            next unless $field;
+            my $isbn = $field->subfield('a');
+            next unless $isbn;
+            # Clean ISBN
+            $isbn = Business::ISBN->new($isbn);
+            next unless $isbn;
+            next unless $isbn->is_valid;
+            $isbn = $isbn->isbn;
+            my $title = $record->field($tag->{title});
+            next unless $title;
+            $title = $is_unimarc
+                ? $title->subfield('a')
+                : join(' ', map { $_->[1] } @{$title->subf});
+            $record_per_isbn{$isbn} = [ $biblionumber, $title ];
+        }
     }
 
-    my $url = $coce . "/cover?provider=aws&id=" . join(',', keys %record_per_isbn);
-    my $ua = LWP::UserAgent->new(
-        agent    => "Koha::Contrib::Tamil/1.0",
-        timeout  => 10000,
-        ssl_opts => { SSL_verify_mode => 0}
-    );
-    my $req = HTTP::Request->new(GET => $url);
-    my $res = $ua->request($req);
-    if ( ! $res->is_success ) {
-        say "ERREUR: $url";
-        say $res->status_line;
-        exit;
+    if (my @isbns = keys %record_per_isbn) {
+        my $url = $coce . "/cover?provider=aws&id=" . join(',', @isbns);
+        my $ua = LWP::UserAgent->new(
+            agent    => "Koha::Contrib::Tamil/1.0",
+            timeout  => 10000,
+            ssl_opts => { SSL_verify_mode => 0}
+        );
+        my $req = HTTP::Request->new(GET => $url);
+        my $res = $ua->request($req);
+        if ( ! $res->is_success ) {
+            say "ERREUR: $url";
+            say $res->status_line;
+            exit;
+        }
+        my $content = $res->content;
+        my $image_per_isbn = from_json($content);
+        while ( my ($isbn, $image) =  each %$image_per_isbn ) {
+            my $infos = $record_per_isbn{$isbn};
+            next unless $infos;
+            push @$infos, $image;
+            push  @ret, $infos;
+        }
     }
-    my $content = $res->content;
-    my $image_per_isbn = from_json($content);
-    my @ret;
-    while ( my ($isbn, $image) =  each %$image_per_isbn ) {
-        my $infos = $record_per_isbn{$isbn};
-        next unless $infos;
-        push @$infos, $image;
-        push  @ret, $infos;
-    }
+
     say to_json(\@ret, {pretty => 1});
 }
 
@@ -107,7 +123,7 @@ koha-coce-url - Generate a JSON structure of Cover url via Coce
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head1 DESCRIPTION
 
@@ -174,7 +190,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Fréderic Démians.
+This software is Copyright (c) 2024 by Fréderic Démians.
 
 This is free software, licensed under:
 

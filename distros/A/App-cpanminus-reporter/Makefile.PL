@@ -19,7 +19,6 @@ WriteMakefile(
         'Capture::Tiny'                 => 0,
         'Carp'                          => 0,
         'Config::Tiny'                  => 2.08,
-        'File::HomeDir::Tiny'           => 0,
         'File::Spec'                    => 3.19,
         'Getopt::Long'                  => 0,
         'IO::Prompt::Tiny'              => 0,

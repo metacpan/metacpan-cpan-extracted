@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::File" => 0,
     "IO::String" => 0,
-    "LaTeX::ToUnicode" => "0.52",
+    "LaTeX::ToUnicode" => "0.55",
     "Test::More" => "0.88"
   },
   "TEST_REQUIRES" => {

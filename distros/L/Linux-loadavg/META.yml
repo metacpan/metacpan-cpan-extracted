@@ -3,7 +3,7 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Linux-loadavg
-version: 0.13
+version: 0.15
 abstract: Get system load averages (via getloadavg(3C) system call)
 author:              
   - Niels van Dijke <CpanDotOrgAtPerlboyDotNet>

@@ -77,8 +77,7 @@ sub new {
 	$attr{ next_numeric } ? \&Graph::_next_numeric :
 	\&Graph::_next_random;
     $self->{ next_root } = $default_next if !exists $self->{ next_root };
-    $self->{ first_root } =
-	exists $self->{ next_root } ? $self->{ next_root } : $default_next
+    $self->{ first_root } = $self->{ next_root }
 	if !exists $self->{ first_root };
     $self->{ next_successor } = $default_next if !exists $self->{ next_successor };
     if (exists $attr{ has_a_cycle }) {
@@ -205,7 +204,7 @@ sub next {
 	}
 	return if !@next and !$self->{ next_root };
 	return if !@next and !(@next = $self->{ next_root }->( $self, { map +($_=>$_), $self->unseen } ));
-	return if $self->{ seen }->contains($next[0]); # Sanity check.
+	return if !defined $next[0] or $self->{ seen }->contains($next[0]); # Sanity check.
 	push @{ $self->{ roots } }, $next[0];
     }
     $self->visit_preorder( @next ) if @next;
@@ -406,6 +405,7 @@ Called with arguments ($v, $self).
 Called when choosing the first root (start) vertex for traversal.
 Called with arguments ($self, $unseen) where $unseen is a hash
 reference with the unseen vertices as keys.
+If not supplied, defaults to the same as C<next_root>.
 
 =item next_root
 

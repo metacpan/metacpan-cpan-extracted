@@ -3,11 +3,10 @@ package App::cpanminus::reporter;
 use warnings;
 use strict;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Carp ();
 use File::Spec     3.19;
-use File::HomeDir::Tiny ();
 use Test::Reporter 1.54;
 use CPAN::Testers::Common::Client 0.13;
 use CPAN::Testers::Common::Client::Config;
@@ -42,7 +41,7 @@ sub new {
 
   $self->build_dir(
     $params{build_dir}
-      || File::Spec->catdir( File::HomeDir::Tiny::home(), '.cpanm' )
+      || File::Spec->catdir( _home(), '.cpanm' )
   );
 
   $self->build_logfile(
@@ -575,6 +574,11 @@ sub get_meta_for {
   return;
 }
 
+sub _home {
+  $^O eq 'MSWin32' && "$]" < 5.016
+    ? $ENV{HOME} || $ENV{USERPROFILE}
+    : (<~>)[0]
+}
 
 42;
 __END__

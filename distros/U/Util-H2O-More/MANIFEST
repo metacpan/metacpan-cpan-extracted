@@ -26,6 +26,7 @@ t/07-config-tiny.t
 t/08-config-tiny.t
 t/09-tr4h2o.t
 t/10-yaml2o.t
+t/11-HTTPTiny2h2o.t
 t/lib/Bar.pm
 t/lib/Foo.pm
 t/release-kwalitee.t
