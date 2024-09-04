@@ -985,11 +985,11 @@ __END__
 
 =head1 NAME
 
-Ascii::Text::Font::Coinstak - The great new Ascii::Text::Font::Coinstak!
+Ascii::Text::Font::Coinstak - Coinstak font
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

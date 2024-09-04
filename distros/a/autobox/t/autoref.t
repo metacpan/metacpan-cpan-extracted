@@ -55,7 +55,7 @@ like(
     is((\@array)->join(', '), '1, 2, 3', q{(\@array)->join(', ') == '1, 2, 3'});
     is_deeply((\%hash)->keys, [ qw(alpha gamma) ], q{(\%hash)->keys == [ 'alpha', 'gamma' ]});
 
-    # now confirm that @array and %hash receivers work
+    # now confirm that @array and %hash invocants work
     is(@array->join(', '), '1, 2, 3', q{@array->join(', ') == '1, 2, 3'});
     is_deeply(%hash->keys, [ qw(alpha gamma) ], q{%hash->keys == [ 'alpha', 'gamma' ]});
 
@@ -65,7 +65,7 @@ like(
     is(((@array))->join(', '), '1, 2, 3', q{((@array))->join(', ') == '1, 2, 3'});
     is_deeply(((%hash))->keys, [ qw(alpha gamma) ], q{((%hash))->keys == [ 'alpha', 'gamma' ]});
 
-    # now confirm that @$array and %$hash receivers work
+    # now confirm that @$array and %$hash invocants work
     is(@$array->join(', '), '1, 2, 3', q{@$array->join(', ') == '1, 2, 3'});
     is_deeply(%$hash->keys, [ qw(alpha gamma) ], q{%$hash->keys == [ 'alpha', 'gamma' ]});
 

@@ -1,8 +1,41 @@
-#define PERL_CORE
+#ifdef WIN32 /* Win32 doesn't get PERL_CORE, so use the next best thing */
+#define PERL_NO_GET_CONTEXT
+#endif
 
 #include "EXTERN.h"
 #include "perl.h"
+
+/*
+ * chocolateboy 2009-02-08
+ *
+ * for binary compatibility (see perlapi.h), XS modules perform a function call to
+ * access each and every interpreter variable. So, for instance, an innocuous-looking
+ * reference to PL_op becomes:
+ *
+ *     (*Perl_Iop_ptr(my_perl))
+ *
+ * This (obviously) impacts performance. Internally, PL_op is accessed as:
+ *
+ *     my_perl->Iop
+ *
+ * (in threaded/multiplicity builds (see intrpvar.h)), which is significantly faster.
+ *
+ * defining PERL_CORE gets us the fast version, at the expense of a future maintenance release
+ * possibly breaking things: https://groups.google.com/group/perl.perl5.porters/browse_thread/thread/9ec0da3f02b3b5a
+ *
+ * Rather than globally defining PERL_CORE, which pokes its fingers into various headers, exposing
+ * internals we'd rather not see, just define it for XSUB.h, which includes
+ * perlapi.h, which imposes the speed limit.
+ */
+
+#ifdef WIN32 /* thanks to Andy Grundman for pointing out problems with this on ActivePerl >= 5.10 */
 #include "XSUB.h"
+#else /* not WIN32 */
+#define PERL_CORE
+#include "XSUB.h"
+#undef PERL_CORE
+#endif
+
 #define NEED_sv_2pv_flags
 #include "ppport.h"
 
@@ -22,10 +55,6 @@ OP * autobox_method(pTHX);
 
 void auto_ref(pTHX_ OP *invocant, UNOP *parent, OP *prev);
 
-#ifndef MUTABLE_GV /* XXX missing from ppport.h */
-    #define MUTABLE_GV(p) ((GV *)MUTABLE_PTR(p))
-#endif
-
 #define AUTOBOX_TYPE_RETURN(type) STMT_START { \
     *len = (sizeof(type) - 1); return type;    \
 } STMT_END
@@ -34,26 +63,38 @@ static const char *autobox_type(pTHX_ SV * const sv, STRLEN *len) {
     switch (SvTYPE(sv)) {
         case SVt_NULL:
             AUTOBOX_TYPE_RETURN("UNDEF");
+
         case SVt_IV:
-            AUTOBOX_TYPE_RETURN("INTEGER");
-        case SVt_PVIV:
-            if (SvIOK(sv)) {
-                AUTOBOX_TYPE_RETURN("INTEGER");
+            /*
+             * as of perl v5.10.1, references (e.g. \[]), which were previously
+             * SVt_RV, are now SVt_IV with the SVf_ROK flag set
+             */
+            if (SvROK(sv)) {
+                AUTOBOX_TYPE_RETURN("REF");
             } else {
-                AUTOBOX_TYPE_RETURN("STRING");
+                AUTOBOX_TYPE_RETURN("INTEGER");
             }
+
         case SVt_NV:
-            if (SvIOK(sv)) {
+            if (SvIOK(sv) || SvUOK(sv)) { /* XXX not sure this is ever true */
                 AUTOBOX_TYPE_RETURN("INTEGER");
             } else {
                 AUTOBOX_TYPE_RETURN("FLOAT");
             }
+
+        case SVt_PVIV:
+            if (SvIOK(sv) || SvUOK(sv)) {
+                AUTOBOX_TYPE_RETURN("INTEGER");
+            } else {
+                AUTOBOX_TYPE_RETURN("STRING");
+            }
+
         case SVt_PVNV:
             /*
              * integer before float:
              * https://rt.cpan.org/Ticket/Display.html?id=46814
              */
-            if (SvIOK(sv)) {
+            if (SvIOK(sv) || SvUOK(sv)) {
                 AUTOBOX_TYPE_RETURN("INTEGER");
             } else if (SvNOK(sv)) {
                 AUTOBOX_TYPE_RETURN("FLOAT");
@@ -61,7 +102,11 @@ static const char *autobox_type(pTHX_ SV * const sv, STRLEN *len) {
                 AUTOBOX_TYPE_RETURN("STRING");
             }
 
-        #ifdef SVt_RV /* no longer defined by default if PERL_CORE is defined */
+        /*
+         * as of perl v5.10.1, this is an alias for SVt_IV (with the SVf_ROK
+         * flag set)
+         */
+        #if PERL_BCDVERSION < 0x5010001
             case SVt_RV:
         #endif
 
@@ -79,11 +124,15 @@ static const char *autobox_type(pTHX_ SV * const sv, STRLEN *len) {
             } else {
                 AUTOBOX_TYPE_RETURN("STRING");
             }
+
+        /*
+         * XXX this can actually represent any SV type
+         */
         case SVt_PVLV:
             if (SvROK(sv)) {
                 AUTOBOX_TYPE_RETURN("REF");
             } else if (LvTYPE(sv) == 't' || LvTYPE(sv) == 'T') { /* tied lvalue */
-                if (SvIOK(sv)) {
+                if (SvIOK(sv) || SvUOK(sv)) {
                     AUTOBOX_TYPE_RETURN("INTEGER");
                 } else if (SvNOK(sv)) {
                     AUTOBOX_TYPE_RETURN("FLOAT");
@@ -93,16 +142,22 @@ static const char *autobox_type(pTHX_ SV * const sv, STRLEN *len) {
             } else {
                 AUTOBOX_TYPE_RETURN("LVALUE");
             }
+
         case SVt_PVAV:
             AUTOBOX_TYPE_RETURN("ARRAY");
+
         case SVt_PVHV:
             AUTOBOX_TYPE_RETURN("HASH");
+
         case SVt_PVCV:
             AUTOBOX_TYPE_RETURN("CODE");
+
         case SVt_PVGV:
             AUTOBOX_TYPE_RETURN("GLOB");
+
         case SVt_PVFM:
             AUTOBOX_TYPE_RETURN("FORMAT");
+
         case SVt_PVIO:
             AUTOBOX_TYPE_RETURN("IO");
 
@@ -122,7 +177,7 @@ static const char *autobox_type(pTHX_ SV * const sv, STRLEN *len) {
 }
 
 /*
- * convert array/hash invocants to arrayref/hashref e.g.:
+ * convert array/hash invocants to arrayref/hashref, e.g.:
  *
  *     @foo->bar -> (\@foo)->bar
  */
@@ -201,7 +256,7 @@ OP * autobox_check_entersub(pTHX_ OP *o) {
      *
      * XXX this is fixed in #33311:
      *
-     *     http://www.nntp.perl.org/group/perl.perl5.porters/2008/02/msg134131.html
+     *     https://www.nntp.perl.org/group/perl.perl5.porters/2008/02/msg134131.html
      */
     if ((PL_hints & 0x80020000) != 0x80020000) {
         goto done;
@@ -287,7 +342,7 @@ OP * autobox_check_entersub(pTHX_ OP *o) {
 
     /*
      * if the invocant is an @array, %hash, @{ ... } or %{ ... }, then
-     * "auto-ref" it i.e. the optree equivalent of inserting a backslash
+     * "auto-ref" it, i.e. the optree equivalent of inserting a backslash
      * before it:
      *
      *     @foo->bar -> (\@foo)->bar
@@ -328,8 +383,10 @@ static SV * autobox_method_common(pTHX_ SV * method, U32* hashp) {
         return NULL;
     }
 
-    // bail out if the invocant is NULL (not to be confused with undef) e.g.
-    // from a buggy XS module
+    /*
+     * bail out if the invocant is NULL (not to be confused with undef), e.g.
+     * from a buggy XS module
+     */
     if (!invocant) {
         return NULL;
     }
@@ -346,7 +403,7 @@ static SV * autobox_method_common(pTHX_ SV * method, U32* hashp) {
     /* XXX do non-objects have magic attached? */
     SvGETMAGIC(invocant);
 
-    /* the "bindings hash", which maps datatypes to package names */
+    /* the "bindings hash", which maps the names of native types to package names */
     autobox_bindings = (HV *)(PTABLE_fetch(AUTOBOX_OP_MAP, PL_op));
 
     if (!autobox_bindings) {
@@ -404,7 +461,7 @@ static SV * autobox_method_common(pTHX_ SV * method, U32* hashp) {
     /*
      * SvPV_nolen_const returns the method name as a const char *,
      * stringifying names that are not strings (e.g. undef, SvIV,
-     * SvNV &c.) - see name.t
+     * SvNV etc.) - see name.t
      */
     gv = gv_fetchmethod(
         stash ? stash : (HV*)packsv,

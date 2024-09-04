@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 # we need to do this manually.
-# schwern++: http://www.nntp.perl.org/group/perl.qa/2013/01/msg13351.html
+# schwern++: https://www.nntp.perl.org/group/perl.qa/2013/01/msg13351.html
 print '1..1', $/;
 
 {

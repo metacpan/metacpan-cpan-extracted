@@ -7,6 +7,9 @@
 
 #define newOP_CUSTOM(func, flags)                    S_newOP_CUSTOM(aTHX_ func, flags)
 #define newUNOP_CUSTOM(func, flags, first)           S_newUNOP_CUSTOM(aTHX_ func, flags, first)
+#if HAVE_PERL_VERSION(5, 22, 0)
+#  define newUNOP_AUX_CUSTOM(func, flags, first, aux)  S_newUNOP_AUX_CUSTOM(aTHX_ func, flags, first, aux)
+#endif
 #define newSVOP_CUSTOM(func, flags, sv)              S_newSVOP_CUSTOM(aTHX_ func, flags, sv)
 #define newBINOP_CUSTOM(func, flags, first, last)    S_newBINOP_CUSTOM(aTHX_ func, flags, first, last)
 #define newLISTOP_CUSTOM(func, flags, first, last)   S_newLISTOP_CUSTOM(aTHX_ func, flags, first, last)
@@ -34,6 +37,20 @@ static OP *S_newUNOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first)
   unop->op_ppaddr = func;
   return (OP *)unop;
 }
+
+#if HAVE_PERL_VERSION(5, 22, 0)
+static OP *S_newUNOP_AUX_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, UNOP_AUX_item *aux)
+{
+  UNOP_AUX *unop;
+#if HAVE_PERL_VERSION(5,22,0)
+  unop = (UNOP_AUX *)newUNOP_AUX(OP_CUSTOM, flags, first, aux);
+#else
+  croak("TODO: create newUNOP_AUX_CUSTOM");
+#endif
+  unop->op_ppaddr = func;
+  return (OP *)unop;
+}
+#endif
 
 static OP *S_newSVOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, SV *sv)
 {
@@ -132,15 +149,3 @@ static OP *S_newLOGOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, OP *
 
   return o;
 }
-
-#if HAVE_PERL_VERSION(5, 22, 0)
-#  define newUNOP_AUX_CUSTOM(func, flags, first, aux)  S_newUNOP_AUX_CUSTOM(aTHX_ func, flags, first, aux)
-
-static OP *S_newUNOP_AUX_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, UNOP_AUX_item *aux)
-{
-  UNOP_AUX *unop;
-  unop = (UNOP_AUX *)newUNOP_AUX(OP_CUSTOM, flags, first, aux);
-  unop->op_ppaddr = func;
-  return (OP *)unop;
-}
-#endif

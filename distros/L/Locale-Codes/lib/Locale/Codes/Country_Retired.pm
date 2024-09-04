@@ -3,7 +3,7 @@ Locale::Codes::Country_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Sat Jun  1 11:32:16 EDT 2024
+#    Generated on: Wed Aug 28 15:38:27 EDT 2024
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.79';
+$VERSION='3.80';
 
 $Locale::Codes::Retired{'country'}{'alpha-2'}{'code'} = {
    q(an) => q(Netherlands Antilles),
@@ -689,6 +689,7 @@ $Locale::Codes::Retired{'country'}{'un-alpha-3'}{'name'} = {
    q(macedonia, the former yugoslav republic of) => [ q(MKD), q(Macedonia, The former Yugoslav Republic of) ],
    q(netherlands) => [ q(NLD), q(Netherlands) ],
    q(swaziland) => [ q(SWZ), q(Swaziland) ],
+   q(t&#252;rkiye) => [ q(TUR), q(T&#252;rkiye) ],
    q(tanzania, united republic of) => [ q(TZA), q(Tanzania, United Republic of) ],
    q(turkey) => [ q(TUR), q(Turkey) ],
 };
@@ -701,6 +702,7 @@ $Locale::Codes::Retired{'country'}{'un-numeric'}{'name'} = {
    q(netherlands) => [ q(528), q(Netherlands) ],
    q(sark) => [ q(680), q(Sark) ],
    q(swaziland) => [ q(748), q(Swaziland) ],
+   q(t&#252;rkiye) => [ q(792), q(T&#252;rkiye) ],
    q(tanzania, united republic of) => [ q(834), q(Tanzania, United Republic of) ],
    q(turkey) => [ q(792), q(Turkey) ],
 };

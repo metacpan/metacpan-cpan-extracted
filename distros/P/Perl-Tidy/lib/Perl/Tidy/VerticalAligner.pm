@@ -5,9 +5,9 @@ use Carp;
 
 { #<<< A non-indenting brace to contain all lexical variables
 
-our $VERSION = '20240511';
+our $VERSION = '20240903';
 use English qw( -no_match_vars );
-use Scalar::Util 'refaddr';
+use Scalar::Util 'refaddr';    # perl 5.8.1 and later
 use Perl::Tidy::VerticalAligner::Alignment;
 use Perl::Tidy::VerticalAligner::Line;
 
@@ -106,9 +106,9 @@ sub Fault {
     # except if there has been a bug introduced by a recent program change.
     # Please add comments at calls to Fault to explain why the call
     # should not occur, and where to look to fix it.
-    my ( $package0, $filename0, $line0, $subroutine0 ) = caller(0);
-    my ( $package1, $filename1, $line1, $subroutine1 ) = caller(1);
-    my ( $package2, $filename2, $line2, $subroutine2 ) = caller(2);
+    my ( $package0_uu, $filename0_uu, $line0,    $subroutine0_uu ) = caller(0);
+    my ( $package1_uu, $filename1,    $line1,    $subroutine1 )    = caller(1);
+    my ( $package2_uu, $filename2_uu, $line2_uu, $subroutine2 )    = caller(2);
     my $pkg = __PACKAGE__;
 
     my $input_stream_name = get_input_stream_name();
@@ -511,11 +511,24 @@ sub get_recoverable_spaces {
 use constant DEBUG_VALIGN      => 0;
 use constant SC_LONG_LINE_DIFF => 12;
 
+my %is_opening_token;
 my %is_closing_token;
+my %is_digit_char;
+my %is_plus_or_minus;
 
 BEGIN {
-    my @q = qw< } ) ] >;
+
+    my @q = qw< { ( [ >;
+    @is_opening_token{@q} = (1) x scalar(@q);
+
+    @q = qw< } ) ] >;
     @is_closing_token{@q} = (1) x scalar(@q);
+
+    @q = qw( 0 1 2 3 4 5 6 7 8 9 );
+    @is_digit_char{@q} = (1) x scalar(@q);
+
+    @q = qw( + - );
+    @is_plus_or_minus{@q} = (1) x scalar(@q);
 }
 
 #--------------------------------------------
@@ -1149,7 +1162,8 @@ sub fix_terminal_ternary {
     my $pad_length = 0;
     foreach my $j ( 0 .. $maximum_field_index - 1 ) {
         my $tok = $rtokens_old->[$j];
-        my ( $raw_tok, $lev, $tag, $tok_count ) = decode_alignment_token($tok);
+        my ( $raw_tok, $lev, $tag_uu, $tok_count_uu ) =
+          decode_alignment_token($tok);
         if ( $raw_tok eq '?' ) {
             $depth_question = $lev;
 
@@ -1207,7 +1221,7 @@ sub fix_terminal_ternary {
             # Note that this padding will remain even if the terminal value goes
             # out on a separate line.  This does not seem to look to bad, so no
             # mechanism has been included to undo it.
-            my $field1        = shift @fields;
+            my $field1_uu     = shift @fields;
             my $field_length1 = shift @field_lengths;
             my $len_colon     = length($colon);
             unshift @fields, ( $colon, $pad . $therest );
@@ -1644,7 +1658,7 @@ sub _flush_comment_lines {
     # look for excessively long lines
     my $max_excess = 0;
     foreach my $item ( @{$rgroup_lines} ) {
-        my ( $str, $str_len ) = @{$item};
+        my ( $str_uu, $str_len ) = @{$item};
         my $excess =
           $str_len + $leading_space_count - $group_maximum_line_length;
         if ( $excess > $max_excess ) {
@@ -1736,7 +1750,7 @@ sub _flush_group_lines {
     #------------------------------------------------------------------------
 
     # STEP 1: Remove most unmatched tokens. They block good alignments.
-    my ( $max_lev_diff, $saw_side_comment ) =
+    my ( $max_lev_diff_uu, $saw_side_comment, $saw_signed_number ) =
       delete_unmatched_tokens( $rgroup_lines, $group_level );
 
     # STEP 2: Sweep top to bottom, forming subgroups of lines with exactly
@@ -1784,7 +1798,7 @@ sub _flush_group_lines {
 
     # STEP 6: add sign padding to columns numbers if needed
     pad_signed_number_columns($rgroup_lines)
-      if ($rOpts_valign_signed_numbers);
+      if ( $saw_signed_number && $rOpts_valign_signed_numbers );
 
     # STEP 7: pad wide equals
     pad_wide_equals_columns($rgroup_lines)
@@ -1945,7 +1959,7 @@ sub _flush_group_lines {
             }
 
             my $j_terminal_match = $new_line->{'j_terminal_match'};
-            my ( $jbeg, $jend ) = get_rgroup_jrange();
+            my ( $jbeg, $jend_uu ) = get_rgroup_jrange();
             if ( !defined($jbeg) ) {
 
                 # safety check, shouldn't happen
@@ -2329,7 +2343,8 @@ sub sweep_left_to_right {
             my $var = pop(@todo);
             $ng_beg = $var->[1];
         }
-        my ( $raw_tok, $lev, $tag, $tok_count ) = decode_alignment_token($tok);
+        my ( $raw_tok, $lev, $tag_uu, $tok_count_uu ) =
+          decode_alignment_token($tok);
         push @todo, [ $i, $ng_beg, $ng_end, $raw_tok, $lev ];
     }
 
@@ -2408,7 +2423,7 @@ sub sweep_left_to_right {
         return if ( !defined($ngb) || $nge <= $ngb );
         foreach my $ng ( $ngb .. $nge ) {
 
-            my ( $jbeg, $jend ) = @{ $rgroups->[$ng] };
+            my ( $jbeg, $jend_uu ) = @{ $rgroups->[$ng] };
             my $line = $rlines->[$jbeg];
             my $col  = $line->get_column($itok);
             my $move = $col_want - $col;
@@ -2858,8 +2873,9 @@ EOM
         # This will prevent them from interfering with the final alignment.
 
         # Returns:
-        my $max_lev_diff     = 0;    # used to avoid a call to prune_tree
-        my $saw_side_comment = 0;    # used to avoid a call for side comments
+        my $max_lev_diff      = 0;    # used to avoid a call to prune_tree
+        my $saw_side_comment  = 0;    # used to avoid a call for side comments
+        my $saw_signed_number = 0;    # used to avoid a call for -vsn
 
         # Handle no lines -- shouldn't happen
         return unless @{$rlines};
@@ -2870,7 +2886,7 @@ EOM
             my $jmax   = $line->{'jmax'};
             my $length = $line->{'rfield_lengths'}->[$jmax];
             $saw_side_comment = $length > 0;
-            return ( $max_lev_diff, $saw_side_comment );
+            return ( $max_lev_diff, $saw_side_comment, $saw_signed_number );
         }
 
         # ignore hanging side comments in these operations
@@ -2882,7 +2898,8 @@ EOM
 
         # nothing to do if all lines were hanging side comments
         my $jmax = @{$rnew_lines} - 1;
-        return ( $max_lev_diff, $saw_side_comment ) if ( $jmax < 0 );
+        return ( $max_lev_diff, $saw_side_comment, $saw_signed_number )
+          if ( $jmax < 0 );
 
         #----------------------------------------------------
         # Create a hash of alignment token info for each line
@@ -2920,9 +2937,10 @@ EOM
         #--------------------------------------------
         # PASS 3: compare all lines for common tokens
         #--------------------------------------------
-        match_line_pairs( $rlines, $rnew_lines, \@subgroups, $group_level );
+        $saw_signed_number =
+          match_line_pairs( $rlines, $rnew_lines, \@subgroups, $group_level );
 
-        return ( $max_lev_diff, $saw_side_comment );
+        return ( $max_lev_diff, $saw_side_comment, $saw_signed_number );
     } ## end sub delete_unmatched_tokens
 
     sub make_alignment_info {
@@ -3155,8 +3173,9 @@ EOM
                 foreach my $i ( 0 .. $imax ) {
                     my $tok = $rtokens->[$i];
                     next if ( $tok eq '#' );    # shouldn't happen
-                    my ( $iii, $il, $ir, $raw_tok, $lev, $tag, $tok_count ) =
-                      @{ $rhash->{$tok} };
+                    my ( $iii_uu, $il, $ir, $raw_tok, $lev, $tag_uu,
+                        $tok_count )
+                      = @{ $rhash->{$tok} };
 
                     #------------------------------------------------------
                     # Here is the basic RULE: remove an unmatched alignment
@@ -3326,6 +3345,9 @@ sub match_line_pairs {
     my ( $line, $rtokens, $rpatterns, $rfield_lengths, $imax, $list_type,
         $ci_level );
 
+    # Return parameter to avoid calls to sub pad_signed_number_columns
+    my $saw_signed_number;
+
     # loop over subgroups
     foreach my $item ( @{$rsubgroups} ) {
         my ( $jbeg, $jend ) = @{$item};
@@ -3350,6 +3372,23 @@ sub match_line_pairs {
             $imax           = @{$rtokens} - 2;
             $list_type      = $line->{'list_type'};
             $ci_level       = $line->{'ci_level'};
+
+            # Quick approxmiate check for signed numbers in this line.
+            # This speeds up large runs by about 0.5%
+            if ( !$saw_signed_number ) {
+
+                my $rfields = $line->{'rfields'};
+                foreach my $i ( 0 .. $imax + 1 ) {
+                    next if ( index( $rpatterns->[$i], 'n' ) < 0 );
+                    my $field = $rfields->[$i];
+                    if (   index( $field, '-' ) >= 0
+                        || index( $field, '+' ) >= 0 )
+                    {
+                        $saw_signed_number = 1;
+                        last;
+                    }
+                }
+            }
 
             # nothing to do for first line
             next if ( $jj == $jbeg );
@@ -3461,7 +3500,7 @@ sub match_line_pairs {
             }
         }
     }
-    return;
+    return $saw_signed_number;
 } ## end sub match_line_pairs
 
 sub compare_patterns {
@@ -3470,10 +3509,10 @@ sub compare_patterns {
 
     my $group_level = $rcall_hash->{group_level};
     my $tok         = $rcall_hash->{tok};
-    my $tok_m       = $rcall_hash->{tok_m};
-    my $pat         = $rcall_hash->{pat};
-    my $pat_m       = $rcall_hash->{pat_m};
-    my $pad         = $rcall_hash->{pad};
+##  my $tok_m       = $rcall_hash->{tok_m};
+    my $pat   = $rcall_hash->{pat};
+    my $pat_m = $rcall_hash->{pat_m};
+    my $pad   = $rcall_hash->{pad};
 
     # helper routine for sub match_line_pairs to decide if patterns in two
     # lines match well enough..Given
@@ -3490,7 +3529,7 @@ sub compare_patterns {
 
     use constant EXPLAIN_COMPARE_PATTERNS => 0;
 
-    my ( $alignment_token, $lev, $tag, $tok_count ) =
+    my ( $alignment_token, $lev, $tag_uu, $tok_count_uu ) =
       decode_alignment_token($tok);
 
     # We have to be very careful about aligning commas
@@ -3674,7 +3713,7 @@ sub get_line_token_info {
             $i++;
             last if ( $i > $imax );
             last if ( $tok eq '#' );
-            my ( $raw_tok, $lev, $tag, $tok_count ) =
+            my ( $raw_tok_uu, $lev, $tag_uu, $tok_count_uu ) =
               @{ $all_token_info[$jj]->[$i] };
 
             last if ( $tok eq '#' );
@@ -3720,7 +3759,7 @@ sub get_line_token_info {
             foreach my $tok ( @{$rtokens} ) {
                 $itok++;
                 last if ( $itok > $imax );
-                my ( $raw_tok, $lev, $tag, $tok_count ) =
+                my ( $raw_tok, $lev, $tag_uu, $tok_count_uu ) =
                   @{ $all_token_info[$jj]->[$itok] };
                 last if ( $raw_tok eq '#' );
                 foreach my $lev_test (@levs) {
@@ -3915,7 +3954,7 @@ sub prune_alignment_tree {
           ];
 
         return;
-    };    ## end sub end_node
+    }; ## end $end_node = sub
 
     #-----------------------------------------------------
     # Prune Tree Step 2. Loop to form the tree of matches.
@@ -3926,8 +3965,8 @@ sub prune_alignment_tree {
         my $jm = $jp - 1;
 
         # Pull out needed values for the next line
-        my ( $lev_min, $lev_max, $rtoken_patterns, $rlevs, $rtoken_indexes,
-            $is_monotonic, $imax_true, $imax )
+        my ( $lev_min_uu, $lev_max_uu, $rtoken_patterns, $rlevs,
+            $rtoken_indexes, $is_monotonic_uu, $imax_true_uu, $imax_uu )
           = @{ $rline_values->[$jp] };
 
         # Transfer levels and patterns for this line to the working arrays.
@@ -4046,8 +4085,8 @@ sub prune_alignment_tree {
         last if ( !@todo_list );
         my @todo_next;
         foreach my $np (@todo_list) {
-            my ( $jbeg_p, $jend_p, $np_p, $lev_p, $pat_p, $nc_beg_p, $nc_end_p,
-                $rindexes_p )
+            my ( $jbeg_p, $jend_p, $np_p_uu, $lev_p, $pat_p_uu, $nc_beg_p,
+                $nc_end_p, $rindexes_p_uu )
               = @{ $match_tree[$depth]->[$np] };
             my $nlines_p = $jend_p - $jbeg_p + 1;
 
@@ -4080,8 +4119,8 @@ sub prune_alignment_tree {
 
             # loop to keep or delete each child node
             foreach my $nc ( $nc_beg_p .. $nc_end_p ) {
-                my ( $jbeg_c, $jend_c, $np_c, $lev_c, $pat_c, $nc_beg_c,
-                    $nc_end_c )
+                my ( $jbeg_c, $jend_c, $np_c_uu, $lev_c_uu, $pat_c_uu,
+                    $nc_beg_c_uu, $nc_end_c_uu )
                   = @{ $match_tree[ $depth + 1 ]->[$nc] };
                 my $nlines_c     = $jend_c - $jbeg_c + 1;
                 my $is_monotonic = $rline_values->[$jbeg_c]->[5];
@@ -4111,7 +4150,7 @@ sub prune_alignment_tree {
             my $imax    = @{$rtokens} - 2;
             foreach my $i ( 0 .. $imax ) {
                 my $tok = $rtokens->[$i];
-                my ( $raw_tok, $lev, $tag, $tok_count ) =
+                my ( $raw_tok_uu, $lev, $tag_uu, $tok_count_uu ) =
                   decode_alignment_token($tok);
                 if ( $lev > $level_keep ) {
                     push @idel, $i;
@@ -4220,10 +4259,10 @@ sub Dump_tree_groups {
             return ( $is_marginal, $imax_align );
         }
 
-        my $jmax_0           = $line_0->{'jmax'};
-        my $jmax_1           = $line_1->{'jmax'};
-        my $rtokens_1        = $line_1->{'rtokens'};
-        my $rtokens_0        = $line_0->{'rtokens'};
+        my $jmax_0    = $line_0->{'jmax'};
+        my $jmax_1    = $line_1->{'jmax'};
+        my $rtokens_1 = $line_1->{'rtokens'};
+##      my $rtokens_0        = $line_0->{'rtokens'};
         my $rfield_lengths_0 = $line_0->{'rfield_lengths'};
         my $rfield_lengths_1 = $line_1->{'rfield_lengths'};
         my $rpatterns_0      = $line_0->{'rpatterns'};
@@ -4242,7 +4281,7 @@ sub Dump_tree_groups {
         my $j0_max_pad = 0;
 
         foreach my $j ( 0 .. $jmax_1 - 2 ) {
-            my ( $raw_tok, $lev, $tag, $tok_count ) =
+            my ( $raw_tok, $lev, $tag_uu, $tok_count_uu ) =
               decode_alignment_token( $rtokens_1->[$j] );
             if ( $raw_tok && $lev == $group_level ) {
                 if ( !$raw_tokb ) { $raw_tokb = $raw_tok }
@@ -4752,7 +4791,7 @@ sub align_side_comments {
         # Loop over the groups with side comments
         my $column_limit;
         foreach my $ngr (@todo) {
-            my ( $jbeg, $jend ) = @{ $rgroups->[$ngr] };
+            my ( $jbeg, $jend_uu ) = @{ $rgroups->[$ngr] };
 
             # Note that since all lines in a group have common alignments, we
             # just have to work on one of the lines (the first line).
@@ -4854,10 +4893,7 @@ sub align_side_comments {
 
 use constant DEBUG_VSN => 0;
 
-my %is_digit_char;
-my %is_plus_or_minus;
 my %is_leading_sign_pattern;
-my %is_opening_token;
 
 BEGIN {
 
@@ -4870,14 +4906,6 @@ BEGIN {
 
     @is_leading_sign_pattern{@q} = (1) x scalar(@q);
 
-    @q = qw( 0 1 2 3 4 5 6 7 8 9 );
-    @is_digit_char{@q} = (1) x scalar(@q);
-
-    @q = qw( + - );
-    @is_plus_or_minus{@q} = (1) x scalar(@q);
-
-    @q = qw< { ( [ >;
-    @is_opening_token{@q} = (1) x scalar(@q);
 }
 
 sub min_max_median {
@@ -5000,7 +5028,7 @@ EOM
 
     my ( $min_unsigned_length, $max_unsigned_length, $median_unsigned_length )
       = min_max_median( \@len_unsigned );
-    my ( $min_signed_length, $max_signed_length, $median_signed_length ) =
+    my ( $min_signed_length_uu, $max_signed_length, $median_signed_length ) =
       min_max_median( \@len_signed );
 
     # Skip padding if no signed numbers exceed unsigned numbers in length
@@ -5501,9 +5529,15 @@ sub pad_signed_number_columns {
                 my $old_col   = $columns[$jcol];
                 my $col       = $alignment->{column};
 
-                # only do this if the text has a leading digit
-                if (   $col < $old_col
-                    && $rfields->[$jcol] =~ /^[+-]?\d/ )
+                if (
+                    $col < $old_col
+
+                    # only do this if the text has a leading digit
+                    && $rfields->[$jcol] =~ /^([+-]?)\d/
+
+                    # and a signed number has been seen - issue c375
+                    && ( $1 || $column_info{$jcol}->{signed_count} )
+                  )
                 {
                     my $spaces_needed = $old_col - $col;
                     my $spaces_available =
@@ -6618,9 +6652,9 @@ sub get_output_line_number {
         my $outdent_long_lines        = $rinput->{outdent_long_lines};
         my $rvertical_tightness_flags = $rinput->{rvertical_tightness_flags};
         my $level                     = $rinput->{level};
-        my $level_end                 = $rinput->{level_end};
-        my $Kend                      = $rinput->{Kend};
-        my $maximum_line_length       = $rinput->{maximum_line_length};
+##      my $level_end                 = $rinput->{level_end};
+        my $Kend                = $rinput->{Kend};
+        my $maximum_line_length = $rinput->{maximum_line_length};
 
         # Useful -gcs test cases for wide characters are
         # perl527/(method.t.2, reg_mesg.t, mime-header.t)

@@ -18,7 +18,7 @@ sub assertCookieValue {
 sub assertGenCookieValue {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $client, $req, $opts, $expected ) = @_;
-    my $result = $client->p->genCookie( $req, %$opts );
+    my $result = $client->p->genDomainCookie( $req, %$opts );
     my $str    = join( ',', map { "$_=$opts->{$_}" } sort keys %$opts );
     is( $result, $expected, "Correct cookie result for $str" );
 }

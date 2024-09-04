@@ -23,7 +23,7 @@ $outh->print( scalar do { <DATA> }
    =~ s/__BUILDER_CFLAGS__/$quoted_cflags/r );
 
 __DATA__
-package XS::Parse::Keyword::Builder_data 0.45;
+package XS::Parse::Keyword::Builder_data 0.46;
 
 use v5.14;
 use warnings;

@@ -270,7 +270,7 @@ subtest "Use code on different RP" => sub {
     count(1);
 };
 
-subtest "Test authentication failures in token exchante" => sub {
+subtest "Test authentication failures in token grant" => sub {
 
     # Get new code for RP1
     $query =
@@ -314,7 +314,25 @@ subtest "Test authentication failures in token exchante" => sub {
     is( getHeader( $res, "WWW-Authenticate" ), "Basic" );
     count(1);
 
-    # Bad auth (form)
+    # Bad auth (header)
+    ok(
+        $res = $op->_post(
+            "/oauth2/token",
+            IO::String->new($query),
+            accept => 'text/html',
+            length => length($query),
+            custom => {
+                HTTP_AUTHORIZATION => "Basic " . encode_base64("rpid:"),
+            },
+        ),
+        "Post auth code on correct RP"
+    );
+    count(1);
+    expectReject( $res, 401, "invalid_client" );
+    is( getHeader( $res, "WWW-Authenticate" ), "Basic" );
+    count(1);
+
+    # Bad auth (form) - invalid client secret
     $query = buildForm( {
             grant_type    => 'authorization_code',
             code          => $code,
@@ -337,6 +355,26 @@ subtest "Test authentication failures in token exchante" => sub {
     expectReject( $res, 400, "invalid_client" );
     is( getHeader( $res, "WWW-Authenticate" ), undef );
     count(1);
+
+    subtest "Bad auth (form) - missing client secret" => sub {
+        ok(
+            $res = $op->_post(
+                "/oauth2/token",
+                {
+                    grant_type   => 'authorization_code',
+                    code         => $code,
+                    redirect_uri => 'http://rp.com/',
+                    client_id    => 'rpid',
+                },
+                accept => 'text/html',
+            ),
+            "Post auth code on correct RP"
+        );
+        count(1);
+        expectReject( $res, 400, "invalid_client" );
+        is( getHeader( $res, "WWW-Authenticate" ), undef );
+        count(1);
+    };
 
     # Correct parameters
     $query = buildForm( {

@@ -22,7 +22,7 @@
 #
 #    For brief instructions, try 'perltidy -h'.
 #    For more complete documentation, try 'man perltidy'
-#    or visit http://perltidy.sourceforge.net
+#    or visit the GitHub site https://perltidy.github.io/perltidy/
 #
 #    This script is an example of the default style.  It was formatted with:
 #
@@ -54,10 +54,12 @@
 
 package Perl::Tidy;
 
-# perlver reports minimum version needed is 5.8.0
+# perlver reports minimum version needed is 5.8.1
 # 5.004 needed for IO::File
 # 5.008 needed for wide characters
-use 5.008;
+# 5.008001 needed for utf8::is_utf8
+# 5.008001 needed for Scalar::Util::refaddr
+use 5.008001;
 use warnings;
 use strict;
 use Exporter;
@@ -103,21 +105,23 @@ use File::Copy;
 # perl stat function index names, based on
 #    https://perldoc.perl.org/functions/stat
 use constant {
-    _dev_     => 0,     # device number of filesystem
-    _ino_     => 1,     # inode number
-    _mode_    => 2,     # file mode  (type and permissions)
-    _nlink_   => 3,     # number of (hard) links to the file
-    _uid_     => 4,     # numeric user ID of file's owner
-    _gid_     => 5,     # numeric group ID of file's owner
-    _rdev_    => 6,     # the device identifier (special files only)
-    _size_    => 7,     # total size of file, in bytes
-    _atime_   => 8,     # last access time in seconds since the epoch
-    _mtime_   => 9,     # last modify time in seconds since the epoch
-    _ctime_   => 10,    # inode change time in seconds since the epoch (*)
-    _blksize_ => 11,    # preferred I/O size in bytes for interacting with
-                        # the file (may vary from file to file)
-    _blocks_  => 12,    # actual number of system-specific blocks allocated
-                        # on disk (often, but not always, 512 bytes each)
+
+    _mode_  => 2,    # file mode  (type and permissions)
+    _uid_   => 4,    # numeric user ID of file's owner
+    _gid_   => 5,    # numeric group ID of file's owner
+    _atime_ => 8,    # last access time in seconds since the epoch
+    _mtime_ => 9,    # last modify time in seconds since the epoch
+
+##  _dev_     => 0,     # device number of filesystem
+##  _ino_     => 1,     # inode number
+##  _nlink_   => 3,     # number of (hard) links to the file
+##  _rdev_    => 6,     # the device identifier (special files only)
+##  _size_    => 7,     # total size of file, in bytes
+##  _ctime_   => 10,    # inode change time in seconds since the epoch (*)
+##  _blksize_ => 11,    # preferred I/O size in bytes for interacting with
+##                      # the file (may vary from file to file)
+##  _blocks_  => 12,    # actual number of system-specific blocks allocated
+##                      # on disk (often, but not always, 512 bytes each)
 };
 
 BEGIN {
@@ -131,7 +135,7 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20240511';
+    $VERSION = '20240903';
 } ## end BEGIN
 
 sub DESTROY {
@@ -306,7 +310,7 @@ EOM
 
 sub stream_slurp {
 
-    my ($filename) = @_;
+    my ( $filename, $timeout_in_seconds ) = @_;
 
     # Read the text in $filename and
     # return:
@@ -358,7 +362,22 @@ EOM
     else {
         if ( $filename eq '-' ) {
             local $INPUT_RECORD_SEPARATOR = undef;
-            my $buf = <>;
+            my $buf;
+            if ( $timeout_in_seconds && $timeout_in_seconds > 0 ) {
+                eval {
+                    local $SIG{ALRM} = sub { die "alarm\n" };
+                    alarm($timeout_in_seconds);
+                    $buf = <>;
+                    alarm(0);
+                    1;
+                }
+                  or Die(
+"Timeout reading stdin using -tos=$timeout_in_seconds seconds. Use -tos=0 to skip timeout check.\n"
+                  );
+            }
+            else {
+                $buf = <>;
+            }
             $rinput_string = \$buf;
         }
         else {
@@ -477,7 +496,7 @@ sub is_char_mode {
 
     # This function isolates the call to Perl's internal function
     # utf8::is_utf8() which is true for strings represented in an 'upgraded
-    # form'. It is available after Perl version 5.8.
+    # form'. It is available AFTER Perl version 5.8.
     # See https://perldoc.perl.org/Encode.
     # See also comments in Carp.pm and other modules using this function
 
@@ -502,7 +521,11 @@ my $md5_hex = sub {
     my $octets = Encode::encode( "utf8", $buf );
     my $digest = md5_hex($octets);
     return $digest;
-};
+}; ## end $md5_hex = sub
+
+sub get_iteration_count {
+    return $rstatus->{iteration_count};
+}
 
 BEGIN {
 
@@ -664,7 +687,7 @@ EOM
             }
         }
         return $hash_ref;
-    };
+    }; ## end $get_hash_ref = sub
 
     %input_hash = ( %defaults, %input_hash );
     my $argv               = $input_hash{'argv'};
@@ -715,9 +738,9 @@ EOM
         # except if there has been a bug introduced by a recent program change.
         # Please add comments at calls to Fault to explain why the call
         # should not occur, and where to look to fix it.
-        my ( $package0, $filename0, $line0, $subroutine0 ) = caller(0);
-        my ( $package1, $filename1, $line1, $subroutine1 ) = caller(1);
-        my ( $package2, $filename2, $line2, $subroutine2 ) = caller(2);
+        my ( $package0_uu, $filename0_uu, $line0, $subroutine0_uu ) = caller(0);
+        my ( $package1_uu, $filename1,    $line1, $subroutine1 )    = caller(1);
+        my ( $package2_uu, $filename2_uu, $line2_uu, $subroutine2 ) = caller(2);
         my $pkg = __PACKAGE__;
 
         my $input_stream_name = $rstatus->{'input_name'};
@@ -839,6 +862,9 @@ EOM
         @ARGV_saved = ( $ARGV[-2], $ARGV[-1] );
     }
 
+    # see if -wvt was entered on the command line before @ARGV is changed
+    my $wvt_in_args = grep { /-(wvt|warn-variable-types)=/ } @ARGV;
+
     #-------------------------
     # get command line options
     #-------------------------
@@ -927,6 +953,7 @@ EOM
         dump-unusual-variables
         dump-mixed-call-parens
         dump-mismatched-args
+        dump-mismatched-returns
         )
       )
     {
@@ -974,7 +1001,12 @@ EOM
     my ( $in_place_modify, $backup_extension, $delete_backup ) =
       $self->check_in_place_modify( $source_stream, $destination_stream );
 
-    Perl::Tidy::Formatter::check_options($rOpts);
+    my $line_range_clipped = $rOpts->{'line-range-tidy'}
+      && ( $self->[_line_tidy_begin_] > 1
+        || defined( $self->[_line_tidy_end_] ) );
+
+    Perl::Tidy::Formatter::check_options( $rOpts, $wvt_in_args, $num_files,
+        $line_range_clipped );
     Perl::Tidy::Tokenizer::check_options($rOpts);
     Perl::Tidy::VerticalAligner::check_options($rOpts);
     if ( $rOpts->{'format'} eq 'html' ) {
@@ -1315,9 +1347,8 @@ sub backup_method_copy {
 "problem re-opening $input_file for write for -b option; check file and directory permissions: $OS_ERROR\n"
       );
 
-    if ( $self->[_is_encoded_data_] ) {
-        binmode $fout, ":raw:encoding(UTF-8)";
-    }
+    if ( $self->[_is_encoded_data_] ) { binmode $fout, ":raw:encoding(UTF-8)" }
+    else                              { binmode $fout }
 
     # Now copy the formatted output to it..
     # output must be SCALAR ref..
@@ -1454,9 +1485,8 @@ sub backup_method_move {
 "problem re-opening $input_file for write for -b option; check file and directory permissions: $OS_ERROR\n"
       );
 
-    if ( $self->[_is_encoded_data_] ) {
-        binmode $fout, ":raw:encoding(UTF-8)";
-    }
+    if ( $self->[_is_encoded_data_] ) { binmode $fout, ":raw:encoding(UTF-8)" }
+    else                              { binmode $fout }
 
     # Now copy the formatted output to it..
     # output must be SCALAR ref..
@@ -1622,7 +1652,8 @@ sub get_decoded_string_buffer {
 
     my $rOpts = $self->[_rOpts_];
 
-    my $rinput_string = stream_slurp($input_file);
+    my $rinput_string =
+      stream_slurp( $input_file, $rOpts->{'timeout-in-seconds'} );
     return unless ( defined($rinput_string) );
 
     # Note that we could have a zero size input string here if it
@@ -2130,7 +2161,7 @@ sub process_all_files {
             # add option to change path here
             if ( defined( $rOpts->{'output-path'} ) ) {
 
-                my ( $base, $old_path ) = fileparse($fileroot);
+                my ( $base, $old_path_uu ) = fileparse($fileroot);
                 my $new_path = $rOpts->{'output-path'};
                 if ( !-d $new_path ) {
                     mkdir($new_path)    # Default MODE is 0777
@@ -3128,7 +3159,7 @@ sub line_diff {
     my ( $s1, $s2 ) = @_;
 
     # Given two strings, Return
-    #  $diff_marker = a string with carat (^) symbols indicating differences
+    #  $diff_marker = a string with caret (^) symbols indicating differences
     #  $pos1 = character position of first difference; pos1=-1 if no difference
 
     # Form exclusive or of the strings, which has null characters where strings
@@ -3178,7 +3209,7 @@ sub compare_string_buffers {
             $str = substr( $str, 0, $lenmax ) . "...";
         }
         return $str;
-    };
+    }; ## end $truncate = sub
     while (1) {
         if ($linei) {
             $last_nonblank_line  = $linei;
@@ -3421,7 +3452,7 @@ sub generate_options {
             }
         }
         return;
-    };
+    }; ## end $add_option = sub
 
     # Install long option names which have a simple abbreviation.
     # Options with code '!' get standard negation ('no' for long names,
@@ -3450,6 +3481,7 @@ sub generate_options {
     $add_option->( 'warning-output',             'w',     '!' );
     $add_option->( 'add-terminal-newline',       'atnl',  '!' );
     $add_option->( 'line-range-tidy',            'lrt',   '=s' );
+    $add_option->( 'timeout-in-seconds',         'tos',   '=i' );
 
     # options which are both toggle switches and values moved here
     # to hide from tidyview (which does not show category 0 flags):
@@ -3507,6 +3539,7 @@ sub generate_options {
     $category = 3;    # Whitespace control
     ########################################
     $add_option->( 'add-trailing-commas',                       'atc',   '!' );
+    $add_option->( 'add-lone-trailing-commas',                  'altc',  '!' );
     $add_option->( 'add-semicolons',                            'asc',   '!' );
     $add_option->( 'add-whitespace',                            'aws',   '!' );
     $add_option->( 'block-brace-tightness',                     'bbt',   '=i' );
@@ -3514,9 +3547,11 @@ sub generate_options {
     $add_option->( 'delete-old-whitespace',                     'dws',   '!' );
     $add_option->( 'delete-repeated-commas',                    'drc',   '!' );
     $add_option->( 'delete-trailing-commas',                    'dtc',   '!' );
+    $add_option->( 'delete-lone-trailing-commas',               'dltc',  '!' );
     $add_option->( 'delete-weld-interfering-commas',            'dwic',  '!' );
     $add_option->( 'delete-semicolons',                         'dsm',   '!' );
     $add_option->( 'function-paren-vertical-alignment',         'fpva',  '!' );
+    $add_option->( 'delay-trailing-comma-operations',           'dtco',  '!' );
     $add_option->( 'keyword-paren-inner-tightness',             'kpit',  '=i' );
     $add_option->( 'keyword-paren-inner-tightness-list',        'kpitl', '=s' );
     $add_option->( 'logical-padding',                           'lop',   '!' );
@@ -3555,35 +3590,36 @@ sub generate_options {
     ########################################
     $category = 4;    # Comment controls
     ########################################
-    $add_option->( 'closing-side-comment-else-flag',    'csce', '=i' );
-    $add_option->( 'closing-side-comment-interval',     'csci', '=i' );
-    $add_option->( 'closing-side-comment-list',         'cscl', '=s' );
-    $add_option->( 'closing-side-comment-maximum-text', 'csct', '=i' );
-    $add_option->( 'closing-side-comment-prefix',       'cscp', '=s' );
-    $add_option->( 'closing-side-comment-warnings',     'cscw', '!' );
-    $add_option->( 'closing-side-comments',             'csc',  '!' );
-    $add_option->( 'closing-side-comments-balanced',    'cscb', '!' );
-    $add_option->( 'code-skipping',                     'cs',   '!' );
-    $add_option->( 'code-skipping-begin',               'csb',  '=s' );
-    $add_option->( 'code-skipping-end',                 'cse',  '=s' );
-    $add_option->( 'format-skipping',                   'fs',   '!' );
-    $add_option->( 'format-skipping-begin',             'fsb',  '=s' );
-    $add_option->( 'format-skipping-end',               'fse',  '=s' );
-    $add_option->( 'hanging-side-comments',             'hsc',  '!' );
-    $add_option->( 'indent-block-comments',             'ibc',  '!' );
-    $add_option->( 'indent-spaced-block-comments',      'isbc', '!' );
-    $add_option->( 'fixed-position-side-comment',       'fpsc', '=i' );
-    $add_option->( 'minimum-space-to-comment',          'msc',  '=i' );
-    $add_option->( 'non-indenting-braces',              'nib',  '!' );
-    $add_option->( 'non-indenting-brace-prefix',        'nibp', '=s' );
-    $add_option->( 'outdent-long-comments',             'olc',  '!' );
-    $add_option->( 'outdent-static-block-comments',     'osbc', '!' );
-    $add_option->( 'static-block-comment-prefix',       'sbcp', '=s' );
-    $add_option->( 'static-block-comments',             'sbc',  '!' );
-    $add_option->( 'static-side-comment-prefix',        'sscp', '=s' );
-    $add_option->( 'static-side-comments',              'ssc',  '!' );
-    $add_option->( 'ignore-side-comment-lengths',       'iscl', '!' );
-    $add_option->( 'ignore-perlcritic-comments',        'ipc',  '!' );
+    $add_option->( 'closing-side-comment-else-flag',      'csce',  '=i' );
+    $add_option->( 'closing-side-comment-interval',       'csci',  '=i' );
+    $add_option->( 'closing-side-comment-list',           'cscl',  '=s' );
+    $add_option->( 'closing-side-comment-exclusion-list', 'cscxl', '=s' );
+    $add_option->( 'closing-side-comment-maximum-text',   'csct',  '=i' );
+    $add_option->( 'closing-side-comment-prefix',         'cscp',  '=s' );
+    $add_option->( 'closing-side-comment-warnings',       'cscw',  '!' );
+    $add_option->( 'closing-side-comments',               'csc',   '!' );
+    $add_option->( 'closing-side-comments-balanced',      'cscb',  '!' );
+    $add_option->( 'code-skipping',                       'cs',    '!' );
+    $add_option->( 'code-skipping-begin',                 'csb',   '=s' );
+    $add_option->( 'code-skipping-end',                   'cse',   '=s' );
+    $add_option->( 'format-skipping',                     'fs',    '!' );
+    $add_option->( 'format-skipping-begin',               'fsb',   '=s' );
+    $add_option->( 'format-skipping-end',                 'fse',   '=s' );
+    $add_option->( 'hanging-side-comments',               'hsc',   '!' );
+    $add_option->( 'indent-block-comments',               'ibc',   '!' );
+    $add_option->( 'indent-spaced-block-comments',        'isbc',  '!' );
+    $add_option->( 'fixed-position-side-comment',         'fpsc',  '=i' );
+    $add_option->( 'minimum-space-to-comment',            'msc',   '=i' );
+    $add_option->( 'non-indenting-braces',                'nib',   '!' );
+    $add_option->( 'non-indenting-brace-prefix',          'nibp',  '=s' );
+    $add_option->( 'outdent-long-comments',               'olc',   '!' );
+    $add_option->( 'outdent-static-block-comments',       'osbc',  '!' );
+    $add_option->( 'static-block-comment-prefix',         'sbcp',  '=s' );
+    $add_option->( 'static-block-comments',               'sbc',   '!' );
+    $add_option->( 'static-side-comment-prefix',          'sscp',  '=s' );
+    $add_option->( 'static-side-comments',                'ssc',   '!' );
+    $add_option->( 'ignore-side-comment-lengths',         'iscl',  '!' );
+    $add_option->( 'ignore-perlcritic-comments',          'ipc',   '!' );
 
     ########################################
     $category = 5;    # Linebreak controls
@@ -3721,6 +3757,9 @@ sub generate_options {
     $add_option->( 'warn-mismatched-arg-undercount-cutoff', 'wmauc', '=i' );
     $add_option->( 'warn-mismatched-arg-overcount-cutoff',  'wmaoc', '=i' );
     $add_option->( 'warn-mismatched-arg-exclusion-list',    'wmaxl', '=s' );
+    $add_option->( 'warn-mismatched-returns',               'wmr',   '!' );
+    $add_option->( 'warn-mismatched-return-types',          'wmrt',  '=s' );
+    $add_option->( 'warn-mismatched-return-exclusion-list', 'wmrxl', '=s' );
 
     $add_option->( 'add-interbracket-arrows',       'aia', '!' );
     $add_option->( 'delete-interbracket-arrows',    'dia', '!' );
@@ -3740,6 +3779,7 @@ sub generate_options {
     $add_option->( 'dump-integer-option-range',       'dior',  '!' );
     $add_option->( 'dump-long-names',                 'dln',   '!' );
     $add_option->( 'dump-mismatched-args',            'dma',   '!' );
+    $add_option->( 'dump-mismatched-returns',         'dmr',   '!' );
     $add_option->( 'dump-mixed-call-parens',          'dmcp',  '!' );
     $add_option->( 'dump-options',                    'dop',   '!' );
     $add_option->( 'dump-profile',                    'dpro',  '!' );
@@ -3748,7 +3788,6 @@ sub generate_options {
     $add_option->( 'dump-unusual-variables',          'duv',   '!' );
     $add_option->( 'dump-want-left-space',            'dwls',  '!' );
     $add_option->( 'dump-want-right-space',           'dwrs',  '!' );
-    $add_option->( 'experimental',                    'exp',   '=s' );
     $add_option->( 'fuzzy-line-length',               'fll',   '!' );
     $add_option->( 'help',                            'h',     EMPTY_STRING );
     $add_option->( 'short-concatenation-item-length', 'scl',   '=i' );
@@ -3843,6 +3882,7 @@ sub generate_options {
       cuddled-break-option=1
       delete-old-newlines
       delete-repeated-commas
+      delete-lone-trailing-commas
       delete-semicolons
       dump-block-minimum-lines=20
       dump-block-types=sub
@@ -3856,6 +3896,7 @@ sub generate_options {
       indent-columns=4
       integer-range-check=2
       interbracket-arrow-complexity=1
+      delay-trailing-comma-operations
       iterations=1
       keep-old-blank-lines=1
       keyword-paren-inner-tightness=1
@@ -3918,6 +3959,7 @@ sub generate_options {
       code-skipping
       format-skipping
       default-tabsize=8
+      timeout-in-seconds=10
 
       whitespace-cycle=0
       entab-leading-whitespace=0
@@ -4046,6 +4088,7 @@ sub generate_options {
         'square-bracket-vertical-tightness'         => [ 0, 2 ],
         'square-bracket-vertical-tightness-closing' => [ 0, 3 ],
         'starting-indentation-level'                => [ 0, undef ],
+        'timeout-in-seconds'                        => [ 0, undef ],
         'vertical-tightness'                        => [ 0, 2 ],
         'vertical-tightness-closing'                => [ 0, 3 ],
         'valign-signed-numbers-limit'               => [ 0, undef ],
@@ -4373,8 +4416,8 @@ sub process_command_line {
 
     my @q = @_;
     my (
-        $perltidyrc_stream,  $is_Windows, $Windows_type,
-        $rpending_complaint, $dump_options_type
+        $perltidyrc_stream,     $is_Windows_uu, $Windows_type_uu,
+        $rpending_complaint_uu, $dump_options_type
     ) = @q;
 
     my $use_cache = !defined($perltidyrc_stream) && !$dump_options_type;
@@ -4586,8 +4629,11 @@ EOM
 "exiting because profile '$config_file' could not be opened\n"
                 );
             }
+            filter_unknown_options(
+                $rconfig_string, $roption_category,
+                $rexpansion,     $rconfig_file_chatter
+            );
         }
-
         if ($saw_dump_profile) {
             dump_config_file( $rconfig_string, $config_file,
                 $rconfig_file_chatter );
@@ -4610,7 +4656,7 @@ EOM
 
                 if ( !GetOptions( \%Opts, @{$roption_string} ) ) {
                     Die(
-"Error in this config file: $config_file  \nUse -npro to ignore this file, -h for help'\n"
+"Error in this config file: $config_file  \nUse -npro to ignore this file, -dpro to dump it, -h for help'\n"
                     );
                 }
 
@@ -4655,6 +4701,7 @@ EOM
                 #  dump-integer-option-range
                 #  dump-long-names
                 #  dump-mismatched-args
+                #  dump-mismatched-returns
                 #  dump-mixed-call-parens
                 #  dump-options
                 #  dump-profile
@@ -4722,6 +4769,8 @@ EOM
 
 sub make_grep_alias_string {
     my ($rOpts) = @_;
+
+    # pre-process the --grep-alias-list parameter
 
     # Defaults: list operators in List::Util
     # Possible future additions:  pairfirst pairgrep pairmap
@@ -4954,7 +5003,7 @@ EOM
             }
         }
         return;
-    };
+    }; ## end $check_blank_count = sub
 
     # check for reasonable number of blank lines and fix to avoid problems
     $check_blank_count->( 'blank-lines-before-subs',          '-blbs' );
@@ -5410,7 +5459,7 @@ sub find_config_file {
         return 0 unless $config_file;
         ${$rconfig_file_chatter} .= "# Testing: $config_file\n";
         return -f $config_file;
-    };
+    }; ## end $exists_config_file = sub
 
     # Sub to search upward for config file
     my $resolve_config_file = sub {
@@ -5434,7 +5483,7 @@ sub find_config_file {
             }
         }
         return $config_file;
-    };
+    }; ## end $resolve_config_file = sub
 
     my $config_file;
 
@@ -5487,7 +5536,7 @@ sub find_config_file {
     if ($is_Windows) {
 
         if ($Windows_type) {
-            my ( $os, $system, $allusers ) =
+            my ( $os_uu, $system, $allusers ) =
               Win_Config_Locs( $rpending_complaint, $Windows_type );
 
             # Check All Users directory, if there is one.
@@ -5584,9 +5633,84 @@ sub dump_config_file {
     return;
 } ## end sub dump_config_file
 
+sub filter_unknown_options {
+
+    my (
+        $rconfig_string, $roption_category,
+        $rexpansion,     $rconfig_file_chatter
+    ) = @_;
+
+    # Look through the configuration file for lines beginning with '---' and
+    # - remove the line if the option is unknown, or
+    # - remove the extra dash if the option is known
+    # See git #146 for discussion
+
+    # Given:
+    #   $rconfig_string = string ref to a .perltidyrc configuration file
+    #   $roption_category = ref to hash with long_names as key
+    #   $rexpansion = ref to hash with abbreviations as key
+    #   $rconfig_file_chatter = messages displayed in --dump-profile
+    #
+    # Update:
+    #   $rconfig_string and $rconfig_file_chatter
+
+    # quick check to skip most files
+    if ( ${$rconfig_string} !~ /^\s*---\w/m ) { return }
+
+    my $new_config_string;
+    my $change_notices = EMPTY_STRING;
+    my @lines          = split /^/, ${$rconfig_string};
+    foreach my $line (@lines) {
+        chomp $line;
+
+        # look for lines beginning with '---'
+        if ( $line && $line =~ /^\s*---(\w[\w-]*)/ ) {
+            my $word = $1;
+
+            # first look for a long name or an abbreviation
+            my $is_known = $roption_category->{$word} || $rexpansion->{$word};
+
+            # then look for prefix 'no' or 'no-' on a long name
+            if ( !$is_known && $word =~ s/^no-?// ) {
+                $is_known = $roption_category->{$word};
+            }
+
+            if ( !$is_known ) {
+                $change_notices .= "#  removing unknown option line $line\n";
+                next;
+            }
+            else {
+                $change_notices .= "#  accepting and fixing line $line\n";
+                $line =~ s/-//;
+            }
+        }
+        $new_config_string .= $line . "\n";
+    }
+
+    if ($change_notices) {
+        ${$rconfig_file_chatter} .= "# Filter operations:\n" . $change_notices;
+        ${$rconfig_string} = $new_config_string;
+    }
+    return;
+} ## end sub filter_unknown_options
+
 sub read_config_file {
 
     my ( $rconfig_string, $config_file, $rexpansion ) = @_;
+
+    # Read and process the contents of a perltidyrc command file
+
+    # Given:
+    #   $rconfig_string = ref to the file as a string
+    #   $config_file = name of the file, for error reporting
+    #   $rexpansion = ref to hash of abbreviations; if this config file defines
+    #                 any abbreviations they will be added to it
+
+    # Return:
+    #   \@config_list = ref to final parameters and values which will be
+    #     placed in @ARGV for processing by GetOptions
+    #   $death_message = error message returned if a fatal error occurs
+
     my @config_list = ();
 
     # file is bad if non-empty $death_message is returned
@@ -5692,6 +5816,15 @@ sub strip_comment {
 
     # Strip any comment from a command line
     my ( $instr, $config_file, $line_no ) = @_;
+
+    # Given:
+    #   $instr = string with the text of an input line
+    #   $config_file = filename, for error messages
+    #   $line_no = line number, for error messages
+    # Return:
+    #   string with any comment removed
+    #   $msg = any error message
+
     my $msg = EMPTY_STRING;
 
     # check for full-line comment
@@ -5926,8 +6059,10 @@ Copyright 2000-2024, Steve Hancock
 Perltidy is free software and may be copied under the terms of the GNU
 General Public License, which is included in the distribution files.
 
-Complete documentation for perltidy can be found using 'man perltidy'
-or on the internet at http://perltidy.sourceforge.net.
+Documentation can be found using 'man perltidy'
+or at GitHub      https://perltidy.github.io/perltidy/
+or at metacpan    https://metacpan.org/pod/distribution/Perl-Tidy/bin/perltidy
+or at Sourceforge https://perltidy.sourceforge.net
 EOM
     return;
 } ## end sub show_version
@@ -6127,7 +6262,7 @@ semicolons.
 
 If you are unable to see this entire text, try "perltidy -h | more"
 For more detailed information, and additional options, try "man perltidy",
-or go to the perltidy home page at http://perltidy.sourceforge.net
+or see https://metacpan.org/pod/distribution/Perl-Tidy/bin/perltidy
 EOF
 
     return;

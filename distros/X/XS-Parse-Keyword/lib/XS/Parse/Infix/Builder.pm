@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix::Builder 0.45;
+package XS::Parse::Infix::Builder 0.46;
 
 use v5.14;
 use warnings;
@@ -72,7 +72,9 @@ sub extra_compiler_flags
 
    require File::ShareDir;
    require File::Spec;
-   return "-I" . File::Spec->catdir( File::ShareDir::dist_dir( "XS-Parse-Keyword" ), "include" ),
+   require XS::Parse::Infix;
+
+   return "-I" . File::Spec->catdir( File::ShareDir::module_dir( "XS::Parse::Infix" ), "include" ),
       XS::Parse::Infix::Builder_data->BUILDER_CFLAGS;
 }
 

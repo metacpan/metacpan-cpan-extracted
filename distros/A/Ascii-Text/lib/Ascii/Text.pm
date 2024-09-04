@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Rope;
 use Rope::Autoload;
@@ -100,6 +100,7 @@ function stringify => sub {
 
 function render => sub {
 	my ($self, $text, $stringify) = @_;
+	$text =~ s/[^ 0-9A-Za-z]//;
 	my $class = $self->font_class->new;
 	my @words = split /\s+/, $text;
 	my %character_map;
@@ -198,7 +199,7 @@ Ascii::Text - module for generating ASCII text in various fonts and styles
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

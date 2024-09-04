@@ -40,8 +40,8 @@ autobox - call methods on native types
 
     # can, isa, VERSION, import and unimport can be accessed via autobox_class
 
-        42->autobox_class->isa('MyNumber')
-        say []->autobox_class->VERSION
+        42->autobox_class->isa('MyNumber');
+        say []->autobox_class->VERSION;
 
 =head1 DESCRIPTION
 
@@ -78,7 +78,8 @@ resolves to:
 
     ARRAY::for_each([ 1 .. 10 ], sub { ... })
 
-Values beginning with the array C<@> and hash C<%> sigils are passed by reference, i.e. under the default bindings:
+Values beginning with the array C<@> and hash C<%> sigils are passed by
+reference, i.e. under the default bindings:
 
     @array->join(', ')
     @{ ... }->length()
@@ -152,7 +153,7 @@ Autoboxing can be turned off entirely by using the C<no> syntax:
 
     "Hello, world!"->bar(); # runtime error
 
-Autoboxing is not performed for barewords i.e.
+Autoboxing is not performed for barewords, i.e.
 
     my $foo = Foo->new();
 
@@ -245,7 +246,7 @@ three different types of value:
 
 =item *
 
-A class name e.g.
+A class name, e.g.
 
     use autobox INTEGER => 'MyInt';
 
@@ -256,7 +257,7 @@ the corresponding C<value>.
 =item *
 
 A namespace: this is a class prefix (up to and including the final '::')
-to which the specified type name (INTEGER, FLOAT, STRING &c.) will be appended:
+to which the specified type name (INTEGER, FLOAT, STRING etc.) will be appended:
 
 Thus:
 
@@ -309,7 +310,7 @@ Which in turn is equivalent to:
     }
 
 Namespaces in DEFAULT values have the default type name appended, which, in the case of defaulted SCALAR types,
-is SCALAR rather than INTEGER, FLOAT &c.
+is SCALAR rather than INTEGER, FLOAT etc.
 
 Thus:
 
@@ -327,7 +328,7 @@ is equivalent to:
         FLOAT   => 'MyNamespace::SCALAR',
         STRING  => 'MyNamespace::SCALAR',
         ARRAY   => 'MyArray',
-        HASH    => 'MyArray',
+        HASH    => 'MyHash',
         CODE    => 'MyCode',
     }
 
@@ -351,7 +352,7 @@ This doesn't work:
 
     use autobox;
 
-    undef->foo() # runtime error
+    undef->foo(); # runtime error
 
 This works:
 
@@ -412,7 +413,7 @@ is equivalent to:
     }
 
 Virtual types can also be passed to C<unimport> via the C<no autobox> syntax. This disables autoboxing
-for the corresponding subtypes e.g.
+for the corresponding subtypes, e.g.
 
     no autobox qw(NUMBER);
 
@@ -435,7 +436,7 @@ would result in the following bindings:
     3.1415927->bar       -> [ MyNumber, MyScalar ]
     "Hello, world!"->baz -> [ MyScalar ]
 
-Note that DEFAULT bindings take precedence over virtual type bindings i.e.
+Note that DEFAULT bindings take precedence over virtual type bindings, i.e.
 
     use autobox {
         UNIVERSAL => 'MyUniversal',
@@ -446,7 +447,7 @@ is equivalent to:
 
   use autobox {
       INTEGER => [ 'MyDefault', 'MyUniversal' ],
-      FLOAT   => [ 'MyDefault', 'MyUniversal' ], # ... &c.
+      FLOAT   => [ 'MyDefault', 'MyUniversal' ], # ... etc.
   }
 
 =head2 DEBUG
@@ -485,11 +486,11 @@ or
 =head2 import
 
 This method sets up autobox bindings for the current lexical scope. It can be used to implement
-autobox extensions i.e. lexically-scoped modules that provide autobox bindings for one or more
+autobox extensions, i.e. lexically-scoped modules that provide autobox bindings for one or more
 native types without requiring calling code to C<use autobox>.
 
 This is done by subclassing autobox and overriding C<import>. This allows extensions to effectively
-translate C<use MyModule> into a bespoke C<use autobox> call e.g.:
+translate C<use MyModule> into a bespoke C<use autobox> call, e.g.:
 
     package String::Trim;
 
@@ -518,7 +519,7 @@ Note that C<trim> is defined in an auxiliary class rather than in String::Trim i
 String::Trim's own methods (i.e. the methods it inherits from autobox) being exposed to C<STRING> types.
 
 This module can now be used without a C<use autobox> statement to enable the C<trim> method in the current
-lexical scope e.g.:
+lexical scope, e.g.:
 
     #!/usr/bin/env perl
 
@@ -531,7 +532,7 @@ lexical scope e.g.:
 =head2 autobox_class
 
 autobox adds a single method to all autoboxed types: C<autobox_class>. This can be used to
-call L<UNIVERSAL|UNIVERSAL> methods i.e. C<can>, C<DOES>, C<import>, C<isa>, C<unimport> and C<VERSION> e.g.
+call L<UNIVERSAL|UNIVERSAL> methods, i.e. C<can>, C<DOES>, C<import>, C<isa>, C<unimport> and C<VERSION>, e.g.
 
     if (sub { ... }->autobox_class->can('curry')) ...
     if (42->autobox_class->isa('SCALAR')) ...
@@ -540,7 +541,7 @@ Note: C<autobox_class> must B<always> be used when calling these methods. Callin
 directly on native types produces the same results as calling them with autobox disabled
 e.g.:
 
-    42->isa('NUMBER') # "" (interpeted as "42"->isa("NUMBER"))
+    42->isa('NUMBER') # "" (interpreted as "42"->isa("NUMBER"))
     []->can('push')   # Error: Can't call method "can" on unblessed reference
 
 =head1 EXPORTS
@@ -550,7 +551,7 @@ e.g.:
 autobox includes an additional module, autobox::universal, which exports a single subroutine, C<type>.
 
 This sub returns the type of its argument within autobox (which is essentially longhand for the type names
-used within perl). This value is used by autobox to associate a method invocant with its designated classes e.g.
+used within perl). This value is used by autobox to associate a method invocant with its designated classes, e.g.
 
     use autobox::universal qw(type);
 
@@ -560,7 +561,7 @@ used within perl). This value is used by autobox to associate a method invocant 
     type(undef) # UNDEF
 
 autobox::universal is loaded automatically by autobox, and, as its name suggests, can be used to install
-a universal C<type> method for autoboxed values e.g.
+a universal C<type> method for autoboxed values, e.g.
 
     use autobox UNIVERSAL => 'autobox::universal';
 
@@ -624,7 +625,7 @@ Perl's special-casing for the C<print BLOCK ...> syntax (see L<perlsub>) means t
     print { 'foo', 'bar', @_ }->foo();
 
     # but this doesn't
-    print { @_ }->foo() ? 1 : 0
+    print { @_ }->foo() ? 1 : 0;
 
 In the latter case, the solution is to supply something
 other than a HASH ref literal as the first argument
@@ -649,14 +650,14 @@ to C<print()>:
 =head3 eval EXPR
 
 Like most pragmas, autobox performs operations at compile time, and,
-as a result, runtime string C<eval>s are not executed within its scope i.e. this
-doesn't work:
+as a result, runtime string C<eval>s are not executed within its scope, i.e.
+this doesn't work:
 
     use autobox;
 
     eval "42->foo";
 
-The workaround is to use autobox within the C<eval> e.g.
+The workaround is to use autobox within the C<eval>, e.g.
 
     eval <<'EOS';
         use autobox;
@@ -678,7 +679,7 @@ which depends on values being blessed - doesn't apply.
 
 =head1 VERSION
 
-3.0.1
+3.0.2
 
 =head1 SEE ALSO
 
@@ -700,9 +701,9 @@ chocolateboy <chocolate@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2003-2018 by chocolateboy.
+Copyright (c) 2003-2024 by chocolateboy.
 
 This library is free software; you can redistribute it and/or modify it under the
-terms of the L<Artistic License 2.0|http://www.opensource.org/licenses/artistic-license-2.0.php>.
+terms of the L<Artistic License 2.0|https://www.opensource.org/licenses/artistic-license-2.0.php>.
 
 =cut

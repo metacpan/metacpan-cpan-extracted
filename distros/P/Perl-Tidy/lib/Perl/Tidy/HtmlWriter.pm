@@ -7,7 +7,7 @@
 package Perl::Tidy::HtmlWriter;
 use strict;
 use warnings;
-our $VERSION = '20240511';
+our $VERSION = '20240903';
 
 use Carp;
 use English qw( -no_match_vars );
@@ -179,7 +179,7 @@ PRE_END
 
     my $title = $rOpts->{'title'};
     if ( !$title ) {
-        ( $title, my $path ) = fileparse($input_file);
+        ( $title, my $path_uu ) = fileparse($input_file);
     }
     my $toc_item_count = 0;
     my $in_toc_package = EMPTY_STRING;
@@ -233,7 +233,7 @@ sub add_toc_item {
             ${$rin_toc_package} = EMPTY_STRING;
         }
         return;
-    };
+    }; ## end $end_package_list = sub
 
     my $start_package_list = sub {
         my ( $unique_name, $package ) = @_;
@@ -244,7 +244,7 @@ sub add_toc_item {
 EOM
         ${$rin_toc_package} = $package;
         return;
-    };
+    }; ## end $start_package_list = sub
 
     # start the table of contents on the first item
     if ( !${$rtoc_item_count} ) {
@@ -514,8 +514,8 @@ sub check_options {
     # X11 color names for default settings that seemed to look ok
     # (these color names are only used for programming clarity; the hex
     # numbers are actually written)
+##  use constant SaddleBrown   => "#8B4513";
     use constant ForestGreen   => "#228B22";
-    use constant SaddleBrown   => "#8B4513";
     use constant magenta4      => "#8B008B";
     use constant IndianRed3    => "#CD5555";
     use constant DeepSkyBlue4  => "#00688B";
@@ -788,7 +788,7 @@ sub pod_to_html {
             if ($in_toc) { push @toc, $line }
         }
         return;
-    };
+    }; ## end $html_print = sub
 
     # loop over lines of html output from pod2html and merge in
     # the necessary perltidy html sections
@@ -1007,13 +1007,13 @@ sub make_frame {
     # 3. - the frame which contains them
 
     # get basenames for relative links
-    my ( $toc_basename, $toc_path ) = fileparse($toc_filename);
-    my ( $src_basename, $src_path ) = fileparse($src_filename);
+    my ( $toc_basename, $toc_path_uu ) = fileparse($toc_filename);
+    my ( $src_basename, $src_path_uu ) = fileparse($src_filename);
 
     # 1. Make the table of contents panel, with appropriate changes
     # to the anchor names
-    my $src_frame_name = 'SRC';
-    my $first_anchor   = write_toc_html(
+    my $src_frame_name  = 'SRC';
+    my $first_anchor_uu = write_toc_html(
         {
             title          => $title,
             toc_filename   => $toc_filename,
@@ -1064,7 +1064,7 @@ sub write_toc_html {
 <h1><a href=\"$src_basename#-top-" target="$src_frame_name">$title</a></h1>
 EOM
 
-    my $first_anchor =
+    my $first_anchor_uu =
       change_anchor_names( $rtoc, $src_basename, "$src_frame_name" );
     $fh->print( join EMPTY_STRING, @{$rtoc} );
 

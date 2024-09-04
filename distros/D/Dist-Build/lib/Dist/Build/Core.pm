@@ -1,5 +1,5 @@
 package Dist::Build::Core;
-$Dist::Build::Core::VERSION = '0.012';
+$Dist::Build::Core::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use Exporter 5.57 'import';
 our @EXPORT_OK = qw/copy mkdir rm_r make_executable manify tap_harness install/;
 
 use Carp qw/croak/;
-use ExtUtils::Helpers 0.007 qw/man1_pagename man3_pagename/;
+use ExtUtils::Helpers 0.028 qw/make_executable man1_pagename man3_pagename/;
 use ExtUtils::Install ();
 use File::Basename qw/dirname/;
 use File::Copy ();
@@ -164,7 +164,7 @@ sub add_methods {
 			my @files = keys %scripts, keys %sdocs;
 			for my $source (@files) {
 				next unless contains_pod($source);
-				my $destination = catfile('blib', 'bindoc', man1_pagename($source));
+				my $destination = catfile('blib', 'bindoc', man1_pagename($source, $section1));
 				$planner->manify($source, $destination, $section1);
 				$man1{$source} = $destination;
 			}
@@ -182,8 +182,9 @@ sub add_methods {
 	});
 
 	$planner->add_delegate('lib_files', sub {
-		my ($planner, @files) = @_;
-		my %modules = map { $_ => catfile('blib', $_) } @files;
+		my ($planner, %args) = @_;
+		my $base    = $args{base} // 'lib';
+		my %modules = map { $_ => catfile('blib', 'lib', abs2rel($_, $base)) } @{ $args{files} };
 
 		for my $source (keys %modules) {
 			$planner->copy_file($source, $modules{$source});
@@ -194,7 +195,7 @@ sub add_methods {
 			my $section3 = $planner->config->get('man3ext');
 			my @files = grep { contains_pod($_) } keys %modules;
 			for my $source (@files) {
-				my $destination = catfile('blib', 'libdoc', man3_pagename($source));
+				my $destination = catfile('blib', 'libdoc', man3_pagename($source, $base, $section3));
 				$planner->manify($source, $destination, $section3);
 				$man3{$source} = $destination;
 			}
@@ -204,9 +205,9 @@ sub add_methods {
 	});
 
 	$planner->add_delegate('lib_dir', sub {
-		my ($planner, $dir) = @_;
-		my @files = find(qr/\.p(?:m|od)$/, $dir);
-		$planner->lib_files(@files);
+		my ($planner, $base) = @_;
+		my @files = find(qr/\.p(?:m|od)$/, $base);
+		$planner->lib_files(base => $base, files => \@files);
 	});
 
 	$planner->add_delegate('autoclean', sub {
@@ -255,11 +256,6 @@ sub rm_r {
 	my (@sources) = @_;
 	remove_tree(@sources);
 	return;
-}
-
-sub make_executable {
-	my ($target) = @_;
-	ExtUtils::Helpers::make_executable($target);
 }
 
 sub manify {
@@ -336,7 +332,7 @@ Dist::Build::Core - core functions for Dist::Build
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 DESCRIPTION
 

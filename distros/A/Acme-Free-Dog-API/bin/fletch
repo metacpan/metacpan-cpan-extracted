@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use strict;
+use warnings;
+
+use Dispatch::Fu;
+use Acme::Free::Dog::API qw//;
+use Util::H2O::More      qw/ddd Getopt2h2o o2d/;
+
+use constant {
+    EXIT_SUCCESS => 0,
+    EXIT_ERROR   => 1,
+};
+
+my $subcommand = shift @ARGV;
+my $fletch       = Acme::Free::Dog::API->new;
+
+#>>>
+dispatch {
+    xdefault shift, q{random};
+}
+$subcommand,
+  breeds    => sub { exit do_breeds() },
+  help      => sub { exit do_help() },
+  images    => sub { exit do_images( \@ARGV ) },
+  random    => sub { exit do_random( \@ARGV ) },
+  subbreeds => sub { exit do_subbreeds( \@ARGV ) },
+;
+#<<<
+
+#  fletch breeds
+sub do_breeds {
+    my $dogs = $fletch->breeds;
+    printf STDERR "Found %d breeds ('+' indicates subbreeds exist)\n", scalar( keys %$dogs );
+    foreach my $breed ( sort { $a cmp $b } keys %$dogs ) {
+        printf "%s%s\n", $breed, ( $dogs->$breed->all ) ? " +" : "";
+    }
+    return EXIT_SUCCESS;
+}
+
+#  fletch sub-breeds --breed BREED #(req'd)
+sub do_subbreeds {
+    my ($ARGV) = @_;
+    my $o      = Getopt2h2o $ARGV, {}, qw/breed=s/;
+
+    # require --breed
+    if ( not $o->breed ) {
+        warn "FATAL: --breed BREED, is required\n";
+        return EXIT_ERROR;
+    }
+    my $dogs = $fletch->subbreeds( breed => $o->breed );
+    printf STDERR "Found %d subbreed%s for %s\n", scalar @$dogs, ( scalar @$dogs != 1 ) ? "s" : "", $o->breed;
+    foreach my $subbreed ( sort { $a cmp $b } @$dogs ) {
+        printf "%s\n", $subbreed;
+    }
+    return EXIT_SUCCESS;
+}
+
+# fletch images --breed BREED      #(req'd)
+# fletch breeds | xargs -I% fletch images --breed %
+sub do_images {
+    my ($ARGV) = @_;
+    my $o      = Getopt2h2o $ARGV, {}, qw/breed=s/;
+
+    # require --breed
+    if ( not $o->breed ) {
+        warn "FATAL: --breed BREED, is required\n";
+        return EXIT_ERROR;
+    }
+
+    my $images = $fletch->images( breed => $o->breed );
+
+    foreach my $url ( $images->all ) {
+        say $url;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+# fletch random [--breed BREED]
+sub do_random {
+    my ($ARGV) = @_;
+    my $o      = Getopt2h2o $ARGV, {}, qw/breed=s/;
+
+    printf "%s\n", $fletch->random( breed => $o->breed );
+
+    return EXIT_SUCCESS;
+}
+
+sub do_help {
+    warn "fletch! subcommand may be one of the following: 'breed', 'images --breed BREED', 'random [--breed BREED]', 'subbreed --breed BREED' or 'help' (prints this!)\n";
+}
+
+__END__

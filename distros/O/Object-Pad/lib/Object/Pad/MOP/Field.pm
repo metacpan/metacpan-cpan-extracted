@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Field 0.812;
+package Object::Pad::MOP::Field 0.813;
 
 use v5.14;
 use warnings;

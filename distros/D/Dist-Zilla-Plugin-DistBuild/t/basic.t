@@ -17,6 +17,7 @@ my $tzil = Builder->from_config(
 						minimum_perl => $],
 					}
 				],
+				'ShareDir',
 				'MetaJSON',
 			),
 		},

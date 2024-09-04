@@ -1,3 +1,8 @@
+0.008   2024-08-30  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli clipadd] Add option --split-by.
+
+
 0.007   2023-04-13  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Update to Clipboard::Any 0.011 to reflect to the generated

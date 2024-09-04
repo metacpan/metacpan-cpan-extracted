@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Acme/Insult/Glax.pm
+minil.toml
+script/glax_insult.pl
+t/00_compile.t
+META.yml
+MANIFEST

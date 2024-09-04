@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -14,7 +14,6 @@
 #include "XSParseSublike.h"
 
 #include "perl-backcompat.c.inc"
-#include "sv_setrv.c.inc"
 
 #ifdef HAVE_DMD_HELPER
 #  define WANT_DMD_API_044
@@ -25,7 +24,6 @@
 #include "lexer-additions.c.inc"
 #include "exec_optree.c.inc"
 #include "forbid_outofblock_ops.c.inc"
-#include "force_list_keeping_pushmark.c.inc"
 #include "optree-additions.c.inc"
 #include "newOP_CUSTOM.c.inc"
 
@@ -752,45 +750,7 @@ static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
       break;
 
     case FIELD_INIT_CLASSEXPR:
-    {
-      OP *op = args[argi++]->op;
-
-      SV *defaultsv = newSV(0);
-
-      /* An OP_CONST whose op_type is OP_CUSTOM.
-       * This way we avoid the opchecker and finalizer doing bad things to our
-       * defaultsv SV by setting it SvREADONLY_on().
-       */
-      OP *fieldop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, SvREFCNT_inc(defaultsv));
-
-      OP *lhs, *rhs;
-
-      switch(sigil) {
-        case '$':
-          *out = newBINOP(OP_SASSIGN, 0, op_contextualize(op, G_SCALAR), fieldop);
-          break;
-
-        case '@':
-          sv_setrv_noinc(defaultsv, (SV *)newAV());
-          lhs = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF, fieldop);
-          goto field_array_hash_common;
-
-        case '%':
-          sv_setrv_noinc(defaultsv, (SV *)newHV());
-          lhs = newUNOP(OP_RV2HV, OPf_MOD|OPf_REF, fieldop);
-          goto field_array_hash_common;
-
-field_array_hash_common:
-          rhs = op_contextualize(op, G_LIST);
-          *out = newBINOP(OP_AASSIGN, 0,
-            force_list_keeping_pushmark(rhs),
-            force_list_keeping_pushmark(lhs));
-          break;
-      }
-
-      mop_field_set_default_sv(fieldmeta, defaultsv);
-    }
-    break;
+      croak("Unreachable");
 
     case FIELD_INIT_BLOCK:
       is_block = TRUE;
@@ -899,11 +859,11 @@ static const struct XSParseKeywordHooks kwhooks_field = {
     XPK_TAGGEDCHOICE(
       XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initblock)),
         XPK_TAG(FIELD_INIT_BLOCK),
-      XPK_SEQUENCE(XPK_EQUALS, XPK_PREFIXED_TERMEXPR_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_AUTOSEMI),
+      XPK_SEQUENCE(XPK_EQUALS, XPK_PREFIXED_LISTEXPR_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_AUTOSEMI),
         XPK_TAG(FIELD_INIT_EXPR),
-      XPK_SEQUENCE(XPK_DOREQUALS, XPK_PREFIXED_TERMEXPR_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_AUTOSEMI),
+      XPK_SEQUENCE(XPK_DOREQUALS, XPK_PREFIXED_LISTEXPR_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_AUTOSEMI),
         XPK_TAG(FIELD_INIT_DOREXPR),
-      XPK_SEQUENCE(XPK_OREQUALS, XPK_PREFIXED_TERMEXPR_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_AUTOSEMI),
+      XPK_SEQUENCE(XPK_OREQUALS, XPK_PREFIXED_LISTEXPR_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_AUTOSEMI),
         XPK_TAG(FIELD_INIT_OREXPR)
     ),
     {0}
@@ -917,13 +877,7 @@ static const struct XSParseKeywordHooks kwhooks_has = {
   .check = &check_field,
 
   .pieces = (const struct XSParseKeywordPieceType []){
-    XPK_WARNING_DEPRECATED("'has' is deprecated; use 'field' instead"),
-    XPK_LEXVARNAME(XPK_LEXVAR_ANY),
-    XPK_ATTRIBUTES,
-    XPK_CHOICE(
-      XPK_SEQUENCE(XPK_EQUALS, XPK_TERMEXPR, XPK_AUTOSEMI),
-      XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initblock))
-    ),
+    XPK_FAILURE("'has' is no longer supported; use 'field' instead"),
     {0}
   },
   .build = &build_field,
@@ -2025,7 +1979,7 @@ BOOT:
   DMD_SET_PACKAGE_HELPER("Object::Pad::MOP::Class", &dumppackage_class);
 #endif
 
-  boot_xs_parse_keyword(0.39); /* XPK_LISTEXPR_OPT */
+  boot_xs_parse_keyword(0.46); /* XPK_PREFIXED_LISTEXPR_ENTERLEAVE */
 
   register_xs_parse_keyword("class", &kwhooks_class, (void *)METATYPE_CLASS);
   register_xs_parse_keyword("role",  &kwhooks_role,  (void *)METATYPE_ROLE);

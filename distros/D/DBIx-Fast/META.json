@@ -1,12 +1,12 @@
 {
-   "abstract" : "DBI fast & easy (another one...)",
+   "abstract" : "DBIx::Fast - DBI fast & easy (another one...)",
    "author" : [
       "Harun Delgado <hdp@nurmol.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -37,11 +37,18 @@
             "DBIx::Connector" : "0.53",
             "Moo" : "1",
             "SQL::Abstract" : "2",
-            "perl" : "5.006"
+            "perl" : "5.008"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.12",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/SeHarrys/dbix-fast"
+      }
+   },
+   "version" : "0.14",
+   "x_homepage" : "",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

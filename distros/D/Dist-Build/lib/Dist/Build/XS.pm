@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.012';
+$Dist::Build::XS::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -117,7 +117,7 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ version 0.012
 
  load_module('Dist::Build::XS');
  add_xs(
-   module_name   => 'Foo::Bar',
+   module        => 'Foo::Bar',
    extra_sources => [ glob 'src/*.c' ],
    libraries     => [ 'foo' ],
  );

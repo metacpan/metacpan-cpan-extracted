@@ -7,7 +7,7 @@ package Locale::Codes::Language;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'gen_mods' is run.
-#    Generated on: Sat Jun  1 11:05:09 EDT 2024
+#    Generated on: Wed Aug 28 15:36:08 EDT 2024
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ require 5.006;
 use Exporter qw(import);
 
 our($VERSION,@EXPORT);
-$VERSION   = '3.79';
+$VERSION   = '3.80';
 
 ################################################################################
 use if $] >= 5.027007, 'deprecate';

@@ -37,6 +37,9 @@ $Data{'langvar'}{'iana'}{'orig'}{'name'} = {
    "Latvian orthography used before 1920s (\"veca druka\")",
    "Lengua de señas Albarradas"      => "Lengua de senas Albarradas",
    "Østgrønlandsk"               => "Ostgronlandsk",
+   "Gherdëina standard of Ladin"  => "Ghereina standard of Ladin",
+   "Pe̍h-ōe-jī orthography/romanization" => "Peh-oe-ji orthography/romanization",
+   "Tâi-lô orthography/romanization" => "Tai-lo orthography/romanization",
 };
 
 $Data{'langvar'}{'iana'}{'ignore'} = {

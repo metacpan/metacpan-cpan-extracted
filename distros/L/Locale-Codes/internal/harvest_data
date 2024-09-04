@@ -23,7 +23,7 @@ use Mojo::DOM;
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.79';
+$VERSION='3.80';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -319,10 +319,10 @@ initial header line).
    sub _read_country_genc {
       while (@$in) {
          my $ele     = shift(@$in);
-         my $alpha2  = $$ele{'2-character Code'};
+         my $alpha2  = $$ele{'2-Char Code'};
          next  if (! $alpha2);
          next  if ($alpha2 eq '[None]');
-         my $alpha3  = $$ele{'3-character Code'};
+         my $alpha3  = $$ele{'3-Char Code'};
          my $num     = $$ele{'Numeric Code'};
          my $country = $$ele{'Name'};
          next  if ($country =~ /^entity/i);
@@ -1691,7 +1691,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.79';
+\$VERSION='3.80';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 

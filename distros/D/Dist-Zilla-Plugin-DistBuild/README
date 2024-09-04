@@ -1,5 +1,5 @@
 This archive contains the distribution Dist-Zilla-Plugin-DistBuild,
-version 0.001:
+version 0.002:
 
   Build a Build.PL that uses Dist::Build
 

@@ -1,5 +1,9 @@
 Revision history for Map::Tube
 
+3.77  2024-09-03T14:50:00+00:00
+      - Proposed fix for CPANTESTER failed report.
+      https://www.cpantesters.org/cpan/report/f74db456-6964-11ef-98b0-b3c3213a625c
+
 3.76  2024-09-02T12:40:00+00:00
       - Updated pod w.r.t Test::Map::Tube, thanks @mohawk2.
 

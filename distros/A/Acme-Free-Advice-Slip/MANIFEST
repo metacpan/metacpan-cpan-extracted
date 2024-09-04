@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Acme/Free/Advice/Slip.pm
+minil.toml
+script/advice_slip.pl
+t/00_compile.t
+META.yml
+MANIFEST

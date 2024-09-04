@@ -4632,17 +4632,18 @@ __END__
 
 =head1 NAME
 
-Ascii::Text::Font::Doh - The great new Ascii::Text::Font::Doh!
+Ascii::Text::Font::Doh - Doh font
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
 =head1 SYNOPSIS
 
 Quick summary of what the module does.
+
 	use Ascii::Text::Font::Doh;
 
 	my $foo = Ascii::Text::Font::Doh->new();

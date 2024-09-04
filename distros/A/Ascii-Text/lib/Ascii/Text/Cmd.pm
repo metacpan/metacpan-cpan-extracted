@@ -4,7 +4,7 @@ use Rope::Cmd;
 use Types::Standard qw/Str Int Bool Enum/;
 use Ascii::Text;
 
-title(Ascii::Text->new( font => 'Boomer', align => 'center', color => 'green')->stringify('Ascii Text', 1));
+title(Ascii::Text->new( font => 'Poison', align => 'center', color => 'green')->stringify('Ascii Text', 1));
 
 abstract 'script for generating ASCII text in various fonts and styles';
  
@@ -57,7 +57,7 @@ sub callback {
 		align => $self->align,
 		color => $self->color,
 		pad => $self->pad,
-		font => $self->font,
+		font => ucfirst($self->font),
 		($fh ? (fh => $fh) : ()),
 	);
 	$ascii->($self->text);

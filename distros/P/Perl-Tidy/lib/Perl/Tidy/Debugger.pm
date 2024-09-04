@@ -8,7 +8,7 @@ package Perl::Tidy::Debugger;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-our $VERSION = '20240511';
+our $VERSION = '20240903';
 
 use constant EMPTY_STRING => q{};
 use constant SPACE        => q{ };
@@ -67,14 +67,14 @@ sub write_debug_entry {
     # to the .DEBUG file when the -D flag is entered.
     my ( $self, $line_of_tokens ) = @_;
 
-    my $input_line = $line_of_tokens->{_line_text};
-
-    my $rtoken_type = $line_of_tokens->{_rtoken_type};
-    my $rtokens     = $line_of_tokens->{_rtokens};
-    my $rlevels     = $line_of_tokens->{_rlevels};
-
+    my $rtoken_type       = $line_of_tokens->{_rtoken_type};
+    my $rtokens           = $line_of_tokens->{_rtokens};
     my $input_line_number = $line_of_tokens->{_line_number};
-    my $line_type         = $line_of_tokens->{_line_type};
+
+##  uncomment if needed:
+##  my $input_line  = $line_of_tokens->{_line_text};
+##  my $rlevels     = $line_of_tokens->{_rlevels};
+##  my $line_type   = $line_of_tokens->{_line_type};
 
     my $token_str              = "$input_line_number: ";
     my $reconstructed_original = "$input_line_number: ";

@@ -4,6 +4,8 @@ ignore.txt
 lib/Ascii/Text.pm
 lib/Ascii/Text/Cmd.pm
 lib/Ascii/Text/Font.pm
+lib/Ascii/Text/Font/3d.pm
+lib/Ascii/Text/Font/3x5.pm
 lib/Ascii/Text/Font/Amongus.pm
 lib/Ascii/Text/Font/Banner.pm
 lib/Ascii/Text/Font/Block.pm
@@ -14,8 +16,22 @@ lib/Ascii/Text/Font/Coinstak.pm
 lib/Ascii/Text/Font/Colossal.pm
 lib/Ascii/Text/Font/Cricket.pm
 lib/Ascii/Text/Font/Doh.pm
+lib/Ascii/Text/Font/Doom.pm
+lib/Ascii/Text/Font/Dotmatrix.pm
 lib/Ascii/Text/Font/Drpepper.pm
+lib/Ascii/Text/Font/Poison.pm
+lib/Ascii/Text/Font/Rev.pm
+lib/Ascii/Text/Font/Slsscript.pm
+lib/Ascii/Text/Font/Small.pm
+lib/Ascii/Text/Font/Smkeyboard.pm
+lib/Ascii/Text/Font/Speed.pm
+lib/Ascii/Text/Font/Standard.pm
+lib/Ascii/Text/Font/Stellar.pm
 lib/Ascii/Text/Font/Straight.pm
+lib/Ascii/Text/Font/Tanja.pm
+lib/Ascii/Text/Font/Thick.pm
+lib/Ascii/Text/Font/Thin.pm
+lib/Ascii/Text/Font/Tinkertoy.pm
 Makefile.PL
 MANIFEST			This list of files
 README

@@ -1,0 +1,28 @@
+---
+abstract: 'Perl client for arcus cache cluster'
+author:
+  - 'JaM2in <koo05131@jam2in.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  IO::Socket::PortState: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Arcus-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::SHA: '0'
+  POSIX::AtFork: '0'
+  XSLoader: '0'
+  parent: '0'
+version: v0.5.0

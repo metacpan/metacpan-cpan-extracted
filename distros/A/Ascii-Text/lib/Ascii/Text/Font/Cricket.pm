@@ -1046,17 +1046,18 @@ __END__
 
 =head1 NAME
 
-Ascii::Text::Font::Cricket - The great new Ascii::Text::Font::Cricket!
+Ascii::Text::Font::Cricket - Cricket font 
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
 =head1 SYNOPSIS
 
 Quick summary of what the module does.
+
 	use Ascii::Text::Font::Cricket;
 
 	my $foo = Ascii::Text::Font::Cricket->new();

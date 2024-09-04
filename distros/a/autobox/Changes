@@ -1,10 +1,17 @@
 Revision history for Perl extension autobox
 
-3.0.1 Sat 5 May 20:50:14 2018
+3.0.2 - 2024-09-03
+
+    - GH #15: fix debugger test (thanks, djerius)
+    - upgrade ppport.h from 3.42 to 3.68
+    - GH #12: fix doc typo (thanks, guimard)
+    - GH #14: fix changelog typo (thanks, EdwardBetts)
+
+3.0.1 - 2018-05-05
 
     - GH #11: fix version declaration on 5.8 (thanks, Grinnz)
 
-3.0.0 Sat 5 May 18:10:16 2018
+3.0.0 - 2018-05-05
 
     - breaking change:
         - the behaviour of UNIVERSAL methods like $native->can and
@@ -17,7 +24,7 @@ Revision history for Perl extension autobox
     - switch to SemVer i.e. 2.86 (v2.860.0) -> 3.0.0 (v3.0.0)
     - upgrade ppport.h from 3.35 -> 3.42
 
-2.86 Fri 20 Apr 20:07:29 2018
+2.86 - 2018-04-20
 
     - GH #9: fix bug which prevented autoboxing working
       under the debugger on perl 5.22+ (thanks, skington)
@@ -26,18 +33,18 @@ Revision history for Perl extension autobox
       exempted when the method is a variable e.g. Foo->$bar
     - add operator-overloading note to the gotchas section (GH #7)
 
-2.85 Mon 27 Feb 18:18:19 2017
+2.85 - 2017-02-27
 
     - fix failing test under 5.25.10 with -Ddefault_inc_excludes_dot
       (thanks, Kent Fredric)
 
-2.84 Fri 26 Aug 20:35:48 2016
+2.84 - 2016-08-26
 
     - compatibility fix for perl >= 5.25
       (thanks, mat813, karenetheridge and eserte)
     - upgrade ppport.h from 3.20 to 3.35
 
-2.83 Sun Feb 1 21:34:01 2015
+2.83 - 2015-02-01
 
     - RT #100247: fix assertion failures on 5.21.x perls
       with -DDEBUGGING (thanks, ilmari and Father Chrysostomos)
@@ -45,72 +52,72 @@ Revision history for Perl extension autobox
       (thanks, ppisar)
     - RT #89754: INSTALLDIRS fix (thanks, Kent Fredric)
 
-2.82 Sat Oct 26 12:44:52 2013
+2.82 - 2013-10-26
 
     - simplify test to avoid portability woes
 
-2.81 Sat Oct 26 11:32:31 2013
+2.81 - 2013-10-26
 
     - fix failing test on Windows
 
-2.80 Fri Oct 25 19:32:12 2013
+2.80 - 2013-10-25
 
     - RT #71777: fix segfault in destructor called during
       global destruction (thanks, Tomas Doran)
         - added t/rt_71777.t
     - fix doc typo (thanks, David Steinbrunner)
 
-2.79 Tue Apr 30 21:22:05 2013
+2.79 - 2013-04-30
 
     - allow import arguments to be passed as a hashref
         - added t/import_hashref.t
     - doc tweaks
 
-2.78 Tue Apr 30 18:53:54 2013
+2.78 - 2013-04-30
 
     - RT #80400: fix segfault in destructor called in END block
       (thanks, Tokuhiro Matsuno)
         - added t/rt_80400.t
 
-2.77  Thu Dec 13 19:59:48 2012
+2.77 - 2012-12-13
 
     - doc tweaks
     - add multiple-arg auto-ref tests
 
-2.76  Wed Nov 21 14:35:33 2012
+2.76 - 2012-11-21
 
     - fix breaking tests in perl >= 5.17.5: update error
       message pattern (thanks, rjbs)
     - upgrade ppport.h from 3.19 to 3.20
 
-2.75  Thu Jul 21 22:07:26 2011
+2.75 - 2011-07-21
 
     - POD spelling fixes (thanks, Jonathan Yu and gregor herrmann)
 
-2.74  Wed Jul 20 14:25:52 2011
+2.74 - 2011-07-20
 
     - portability fix for perl >= 5.14 (thanks, chorny)
 
-2.73  Sun Mar 13 16:35:28 2011
+2.73 - 2011-03-13
 
     - Makefile.PL fix
 
-2.72  Fri Jan 28 12:16:34 2011
+2.72 - 2011-01-28
 
     - fix conflict with `use re "taint"` (thanks, Peter Rabbitson)
 
-2.71  Thu Sep 23 02:28:10 2010
+2.71 - 2010-09-23
 
     - fix for recent perls: remove cargo-cultism
 
-2.70  Wed Mar 17 19:27:44 2010
+2.70 - 2010-03-17
 
     - replace autobox_can and autobox_isa with autobox_class.
       this also fixes import, unimport and VERSION
         - added t/version.t
         - renamed t/universal.t -> t/autobox_class.t
 
-2.60  Wed Mar 17 16:34:56 2010
+2.60 - 2010-03-17
 
     - fix RT #46814 (thanks, Tye McQueen)
         - added t/rt_46814.t
@@ -121,15 +128,15 @@ Revision history for Perl extension autobox
           $native->autobox_isa and $native->autobox_can
         - added t/rt_55652.t
 
-2.55  Sun May 25 03:20:54 2008
+2.55 - 2008-05-25
 
     - fix MANIFEST again - restore Changes
 
-2.54  Sun May 25 00:36:04 2008
+2.54 - 2008-05-25
 
     - fix MANIFEST
 
-2.53  Sat May 24 22:19:45 2008
+2.53 - 2008-05-24
 
     - add support for UNIVERSAL virtual type
         - added t/universal.t
@@ -139,11 +146,11 @@ Revision history for Perl extension autobox
     - portability fix for non-gcc compilers (thanks, chris)
     - misc code/documentation fixes/cleanups
 
-2.52  Tue May 20 12:24:01 2008
+2.52 - 2008-05-20
 
     - more type fixes
 
-2.51  Tue May 20 10:40:32 2008
+2.51 - 2008-05-20
 
     - fix type identification for former INTEGERs and FLOATs
       (thanks, Mitchell N Charity)
@@ -151,86 +158,86 @@ Revision history for Perl extension autobox
     - fix for perl 5.11 (thanks, Andreas Koenig)
     - document `eval EXPR` gotcha
 
-2.50  Mon May 19 17:39:22 2008
+2.50 - 2008-05-19
 
     - add support for INTEGER, FLOAT, NUMBER and STRING
         - added scalar.t
     - updated documentation
 
-2.43  Thu May 15 21:14:08 2008
+2.43 - 2008-05-15
 
     - fix @isa bug
         - added t/isa.t
     - scope cleanup
     - documentation tweak
 
-2.42  Tue May 13 22:22:55 2008
+2.42 - 2008-05-13
 
     - upgrade ppport.h to 3.13_03 to s/workaround/fix/
 
-2.41  Tue May 13 20:02:37 2008
+2.41 - 2008-05-13
 
     - work around $value->$method segfault with non-string method
       names under perls <= 5.8.8
     - added license info
 
-2.40  Mon May 12 23:51:26 2008
+2.40 - 2008-05-12
 
     - support @array and %hash (thanks, Yuval Kogman (nothingmuch)
       and Matthijs van Duin (xmath))
         - added t/autoref.t
-    - fix $value->$method segfault with undef, integer, float &c.
+    - fix $value->$method segfault with undef, integer, float etc.
       (i.e. non-string) method names (thanks, John Goulah)
 
-2.30  Fri May  9 01:52:19 2008
+2.30 - 2008-05-09
 
     - support $value->$method, where $method is a method name or
       subroutine reference:
         - added t/name.t
         - added t/coderef.t
 
-2.23  Sun Feb 24 15:17:05 2008
+2.23 - 2008-02-24
 
     - rm redundant $^H hacking
 
-2.22  Sun Feb 24 14:44:58 2008
+2.22 - 2008-02-24
 
     - added hints.t
 
-2.21  Fri Feb 22 21:40:54 2008
+2.21 - 2008-02-22
 
     - merge unimport.t and time_travel.t into unmerge.t
     - more tests
 
-2.20  Thu Feb 21 23:30:53 2008
+2.20 - 2008-02-21
 
     - Fix broken merging
         - corrected merge.t
         - added time_travel.t to verify correctness
 
-2.11  Wed Feb 20 21:06:25 2008
+2.11 - 2008-02-20
 
     - Windows portability fix: ANSIfy C99-ism (thanks, Taro Nishino)
     - revert broken micro-optimization
 
-2.10  Wed Feb 20 02:16:42 2008
+2.10 - 2008-02-20
 
     - fix + add tests for:
         - unimport
         - default namespace(s) in an array ref
 
-2.02  Sun Feb 17 16:59:28 2008
+2.02 - 2008-02-17
 
     - doc tweak
     - POD formatting
 
-2.01  Sun Feb 17 03:56:22 2008
+2.01 - 2008-02-17
 
     - documentation fix:
         - rm reference to $class->SUPER::import(TYPE => __PACKAGE__)
           and explain why an auxiliary class should be used
 
-2.00  Sun Feb 17 02:29:11 2008
+2.00 - 2008-02-17
 
     - API changes:
         - autobox with one or more args leaves the unspecified
@@ -248,25 +255,25 @@ Revision history for Perl extension autobox
     - merge.t: test merging
     - beef up the default DEBUG handler so that it shows the superclasses
       of the synthetic classes
-    - Windows compatibilty fix (thanks, Alexandr Ciornii)
+    - Windows compatibility fix (thanks, Alexandr Ciornii)
     - misc optimizations, cleanups
 
-1.22  Sun Sep 23 22:27:44 2007
+1.22 - 2007-09-23
 
     - (Perl_ck_subr and Perl_ck_null): fix build failure on Windows
 
-1.21  Sun Sep 23 20:35:37 2007
+1.21 - 2007-09-23
 
     - (Makefile): fix build failure on Windows (thanks, Alexandr Ciornii)
 
-1.20  Sun Sep 23 14:05:39 2007
+1.20 - 2007-09-23
 
     - (ptable.h): fix build failures on perl >= 5.9.3
       (thanks, Andreas Koenig)
     - (Perl_pp_method_named): fix build failure on Windows
       (thanks, randyk and Alexandr Ciornii)
 
-1.10  Thu Nov 23 20:32:53 2006
+1.10 - 2006-11-23
 
     - moved END handler into XS
     - updated SEE ALSO section
@@ -274,50 +281,50 @@ Revision history for Perl extension autobox
     - fix and test for UNDEF => ''
     - portability fixlet for Windows
 
-1.04  Mon Nov 20 00:25:50 2006
+1.04 - 2006-11-20
 
     - fix threaded perl pessimization
-    - applied patch: http://rt.cpan.org/Public/Bug/Display.html?id=22868
+    - applied patch: https://rt.cpan.org/Public/Bug/Display.html?id=22868
       (thanks, Steve Peters)
     - documentation fixlet
     - portability fixlet
 
-1.03  Sat Apr 23 20:35:16 2005
+1.03 - 2005-04-23
 
     - workaround and test for %^H bug
     - require perl >= 5.8
 
-1.02  Tue Apr 12 20:52:02 2005
+1.02 - 2005-04-12
 
     - re-fixed Makefile.PL/META.yml + copyright
 
-1.01  Tue Apr 12 19:58:49 2005
+1.01 - 2005-04-12
 
     - compatibility/portability fixes + isolate ptr table
       from perl's implementation
 
-1.00  Tue Apr 12 01:16:52 2005
+1.00 - 2005-04-12
 
     - rewrite: no longer requires a patch
 
-0.11  Tue Feb 3 13:21:47 2004
+0.11 - 2004-02-03
 
     - Added patch for perl-5.8.3
 
-0.10  Fri Dec 12 15:24:16 2003
+0.10 - 2003-12-12
 
     - fixed obsolete reference to perl-5.8.1 in POD
 
-0.09  Fri Dec 12 11:53:02 2003
+0.09 - 2003-12-12
 
     - Added patch for perl-5.8.2
 
-0.08  Fri Oct 17 11:50:34 2003
+0.08 - 2003-10-17
 
     - removed obsolete references to perl-5.8.1-RC4
       from README
 
-0.07  Tue Oct 14 13:34:16 2003
+0.07 - 2003-10-14
 
     - updated patch to work against perl-5.8.1. This
       patch should be applied to a clean perl-5.8.1 tree.
@@ -326,7 +333,7 @@ Revision history for Perl extension autobox
     - added typemap() static method to autobox.pm to
       facilitate subclassing
 
-0.06  Mon Aug 18 17:40:53 2003
+0.06 - 2003-08-18
 
     - this version provides an updated patch. it should be
       applied to a clean perl-5.8.1-RC4 tree
@@ -336,13 +343,13 @@ Revision history for Perl extension autobox
     - added tests and documentation for old VERSION() and
       new UNDEF features
 
-0.05  Mon Aug 11 03:13:04 2003
+0.05 - 2003-08-11
 
     - autobox.pm update: no change to the patch
     - cleaned up implementation of isa() and can()
     - added support for VERSION() (untested)
 
-0.04  Sun Aug 10 14:57:18 2003
+0.04 - 2003-08-10
 
     - this version provides a new patch which ensures
       that undef values aren't autoboxed. it should
@@ -353,19 +360,19 @@ Revision history for Perl extension autobox
       installs of autobox.pm aren't shadowed by old
       versions (thanks, Michael G Schwern)
 
-0.03  Sun Aug 10 03:17:16 2003
+0.03 - 2003-08-10
 
     - added support for can() and isa()
     - documented `print { hashref_expression() }`
       issues/workarounds
 
-0.02  Wed Aug 6 16:49:45 2003
+0.02 - 2003-08-06
 
     - the patch is now a single file
     - instructions for applying the patch added to README
     - documentation fixlets for the patch and module
 
-0.01  Mon Aug 4 01:00:18 2003
+0.01 - 2003-08-04
 
     - original version; created by h2xs 1.21 with
       options -n autobox-0.01

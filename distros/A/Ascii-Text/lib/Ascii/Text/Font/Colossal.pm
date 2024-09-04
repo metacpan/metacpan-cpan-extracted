@@ -1569,11 +1569,11 @@ __END__
 
 =head1 NAME
 
-Ascii::Text::Font::Colossal - The great new Ascii::Text::Font::Colossal!
+Ascii::Text::Font::Colossal - Colossal font 
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

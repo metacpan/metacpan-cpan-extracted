@@ -1,3 +1,8 @@
+1.242480  2024-09-03 20:17:31-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * [bugfix] Don't colorize Cisco "show line" improperly
+ * [feature] Implement initial colorizing of "show line" properly
+
 1.242131  2024-07-31 15:46:54-06:00 America/Denver
  Joelle Maslak <jmaslak@antelope.net>
  * [bugfix] Ciena "chassis power show" removed a space by mistake

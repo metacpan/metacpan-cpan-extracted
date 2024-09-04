@@ -753,6 +753,10 @@ KEYWORDS
 
  has
 
+    Since version 0.813 this keyword is no longer recognised.
+
+    It used to be an earlier version of what is now the "field" keyword.
+
        has $var;
        has @var;
        has %var;
@@ -761,16 +765,8 @@ KEYWORDS
     
        has $var { BLOCK }
 
-    A now-deprecated older version of the "field" keyword.
-
-    This generally behaves like field, except that inline expressions are
-    evaluated immediately, once, during class declaration time. These are
-    not stored to be evaluated for each constructor.
-
     Because of the one-shot immediate nature of these initialisation
-    expressions (and a bunch of other reasons), the has keyword is now
-    discouraged for use and will emit compile-time warnings in the
-    deprecated category. Use the field keyword instead.
+    expressions (and a bunch of other reasons), the keyword was removed.
 
     If you need to evaluate an expression exactly once during the class
     declaration and assign its now-constant value to every instace, store
@@ -988,7 +984,7 @@ KEYWORDS
     lexical variables.
 
     Before the block itself, a list of lexical variables are introduced,
-    inside parentheses. The name of each one is preceeded by a colon, and
+    inside parentheses. The name of each one is preceded by a colon, and
     consumes a constructor parameter of the same name. These parameters are
     considered "consumed" for the purposes of a :strict(params) check.
 

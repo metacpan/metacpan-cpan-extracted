@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.012';
+$Dist::Build::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ our @EXPORT = qw/Build Build_PL/;
 use Carp qw/croak/;
 use CPAN::Meta;
 use ExtUtils::Config;
-use ExtUtils::Helpers 0.007 qw/split_like_shell detildefy make_executable man1_pagename man3_pagename/;
+use ExtUtils::Helpers 0.007 qw/split_like_shell detildefy make_executable/;
 use ExtUtils::InstallPaths;
 use File::Find ();
 use File::Spec::Functions qw/catfile catdir abs2rel /;
@@ -162,7 +162,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

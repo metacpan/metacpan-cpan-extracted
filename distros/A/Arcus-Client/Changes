@@ -1,0 +1,7 @@
+2024-09-04 [version 0.5.0]
+## 🐣 New Features
+* First release of Arcus::Client perl module.
+## 📝 Documentation
+* Add perl docs for Arcus::Client module.
+## ✅ Testing
+* Add Github actions CI.

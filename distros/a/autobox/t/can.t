@@ -52,7 +52,7 @@ use Test::More tests => 12;
         # anywhere in perl5100delta
         #
         # [1] probably this: https://github.com/Perl/perl5/commit/e1a479c5e0
-        skip "MRO bug on perl < v5.10", 2 unless ($] >= 5.010000);
+        skip 'MRO bug on perl < v5.10', 2 unless ($] >= 5.010000);
         ok(42->autobox_class->can('foo'), '$can_merged_2->autobox_class->can("foo") == true');
         ok(not(42->autobox_class->can('bar')), '$can_merged_2->autobox_class->can("bar") == false');
     }

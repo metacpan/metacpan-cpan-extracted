@@ -23,8 +23,8 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
-share/include/XSParseInfix.h
-share/include/XSParseKeyword.h
+share-infix/include/XSParseInfix.h
+share-keyword/include/XSParseKeyword.h
 src/infix.c
 src/infix.h
 src/keyword.c

@@ -10,7 +10,7 @@ package Perl::Tidy::IOScalar;
 use strict;
 use warnings;
 use Carp;
-our $VERSION = '20240511';
+our $VERSION = '20240903';
 
 use constant DEVEL_MODE   => 0;
 use constant EMPTY_STRING => q{};
@@ -94,8 +94,7 @@ EOM
     return $self->[0]->[$i];
 } ## end sub getline
 
-sub print    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
-{
+sub print {
     my ( $self, $msg ) = @_;
     my $mode = $self->[1];
     if ( $mode ne 'w' ) {

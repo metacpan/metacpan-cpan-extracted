@@ -1,5 +1,8 @@
 Revision history for Syntax-Infix-Smartmatch
 
+0.008     2024-09-03 19:34:10+02:00 Europe/Brussels
+          - Use XS::Parse::Infix module dir for include files
+
 0.007     2024-08-04 21:10:49+02:00 Europe/Brussels
           - Depend on a recent enough XS::Parse::Infix for the include path
           - Depend on recent Dist::Build

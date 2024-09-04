@@ -33,7 +33,7 @@ use strict;
 use warnings;
 use English qw( -no_match_vars );
 
-our $VERSION = '20240511';
+our $VERSION = '20240903';
 
 use Carp;
 
@@ -252,6 +252,7 @@ BEGIN {
         _rclosing_brace_indentation_hash_    => $i++,
         _show_indentation_table_             => $i++,
         _rnon_indenting_brace_stack_         => $i++,
+        _rbareword_info_                     => $i++,
     };
 } ## end BEGIN
 
@@ -304,9 +305,9 @@ sub Fault {
     # except if there has been a bug introduced by a recent program change.
     # Please add comments at calls to Fault to explain why the call
     # should not occur, and where to look to fix it.
-    my ( $package0, $filename0, $line0, $subroutine0 ) = caller(0);
-    my ( $package1, $filename1, $line1, $subroutine1 ) = caller(1);
-    my ( $package2, $filename2, $line2, $subroutine2 ) = caller(2);
+    my ( $package0_uu, $filename0_uu, $line0,    $subroutine0_uu ) = caller(0);
+    my ( $package1_uu, $filename1,    $line1,    $subroutine1 )    = caller(1);
+    my ( $package2_uu, $filename2_uu, $line2_uu, $subroutine2 )    = caller(2);
     my $pkg = __PACKAGE__;
 
     # Catch potential error of Fault not called as a method
@@ -616,6 +617,7 @@ EOM
     $self->[_true_brace_error_count_]             = 0;
     $self->[_rnon_indenting_brace_stack_]         = [];
     $self->[_show_indentation_table_]             = 0;
+    $self->[_rbareword_info_]                     = {};
 
     $self->[_rclosing_brace_indentation_hash_] = {
         valid                 => undef,
@@ -1144,7 +1146,7 @@ sub show_indentation_table {
     push @output_lines, <<EOM;
 Table of nesting level differences at closing braces.
 This might help localize brace errors if the file was previously formatted.
-line:  (brace level) - (level expected from old indentation)
+line: error=[new brace level]-[old indentation level]
 EOM
     foreach my $i (@pre_indexes) {
         my $lno  = $rhistory_line_number->[$i];
@@ -2216,7 +2218,7 @@ sub prepare_for_a_new_file {
             my $len_1 = length($tok_1);
             my $len_2 = length($tok_2);
 
-            my $pre_type_0 = 'w';
+            ##my $pre_type_0 = 'w';
             my $pre_type_1 = 'd';
             my $pre_type_2 = 'w';
 
@@ -2437,7 +2439,7 @@ EOM
         }
 
         # now its safe to report errors
-        my $severe_error = $tokenizer->report_tokenization_errors();
+        my $severe_error_uu = $tokenizer->report_tokenization_errors();
 
         # TODO: Could propagate a severe error up
 
@@ -2702,8 +2704,8 @@ EOM
           )
         {
             # For possible future use..
-            my $subname = $2;
-            my $package = $1 ? $1 : EMPTY_STRING;
+            ##my $subname = $2;
+            ##my $package = $1 ? $1 : EMPTY_STRING;
         }
         else {
             return;
@@ -2716,7 +2718,7 @@ EOM
         my $next_char = EMPTY_STRING;
         if ( $input_line =~ m/\s*(\S)/gcx ) { $next_char = $1 }
         if ( !$next_char || $next_char eq '#' ) {
-            ( $next_char, my $i_next ) =
+            ( $next_char, my $i_next_uu ) =
               $self->find_next_nonblank_token( $max_token_index,
                 $rtokens, $max_token_index );
         }
@@ -2781,8 +2783,8 @@ EOM
           )
         {
             # For possible future use..
-            my $subname = $2;
-            my $package = $1 ? $1 : EMPTY_STRING;
+            ##my $subname = $2;
+            ##my $package = $1 ? $1 : EMPTY_STRING;
         }
         else {
             return;
@@ -2792,7 +2794,7 @@ EOM
         my $next_char = EMPTY_STRING;
         if ( $input_line =~ m/\s*(\S)/gcx ) { $next_char = $1 }
         if ( !$next_char || $next_char eq '#' ) {
-            ( $next_char, my $i_next ) =
+            ( $next_char, my $i_next_uu ) =
               $self->find_next_nonblank_token( $max_token_index,
                 $rtokens, $max_token_index );
         }
@@ -3060,7 +3062,7 @@ EOM
             # An identifier followed by '->' is not indirect object;
             # fixes b1175, b1176. Fix c257: Likewise for other tokens like
             # comma, semicolon, closing brace, and single space.
-            my ( $next_nonblank_token, $i_next ) =
+            my ( $next_nonblank_token, $i_next_uu ) =
               $self->find_next_noncomment_token( $i, $rtokens,
                 $max_token_index );
             $type = 'Z' if ( !$Z_test_hash{$next_nonblank_token} );
@@ -3117,7 +3119,7 @@ EOM
                     # if this is an empty list, (), then it is not an
                     # error; for example, we might have a constant pi and
                     # invoke it with pi() or just pi;
-                    my ( $next_nonblank_token, $i_next ) =
+                    my ( $next_nonblank_token, $i_next_uu ) =
                       $self->find_next_nonblank_token( $i, $rtokens,
                         $max_token_index );
 
@@ -3209,7 +3211,7 @@ EOM
             my $rvars = $rparen_vars->[$paren_depth];
             if ( defined($rvars) ) {
                 $container_type = $rparen_type->[$paren_depth];
-                ( my $type_lp, $want_brace ) = @{$rvars};
+                ( my $type_lp_uu, $want_brace ) = @{$rvars};
             }
         }
 
@@ -3231,7 +3233,7 @@ EOM
 
         my $rvars = $rparen_vars->[$paren_depth];
         if ( defined($rvars) ) {
-            my ( $type_lp, $want_brace ) = @{$rvars};
+            my ( $type_lp, $want_brace_uu ) = @{$rvars};
             if ( $type_lp && $type_lp eq '{' ) {
                 $type = '}';
             }
@@ -3456,7 +3458,7 @@ EOM
 
                 my $rvars = $rparen_vars->[ $paren_depth + 1 ];
                 if ( defined($rvars) ) {
-                    my ( $type_lp, $want_brace ) = @{$rvars};
+                    my ( $type_lp_uu, $want_brace ) = @{$rvars};
 
                     # OLD: Now verify that this is not a trailing form
                     # FIX for git #124: we have to skip this check because
@@ -3719,14 +3721,16 @@ EOM
         my $self = shift;
 
         # '*' = typeglob, or multiply?
-        if ( $expecting == UNKNOWN && $last_nonblank_type eq 'Z' ) {
-            if (   $next_type ne 'b'
+        if ( $expecting == UNKNOWN ) {
+            if (   $last_nonblank_type eq 'Z'
+                && $next_type ne 'b'
                 && $next_type ne '('
                 && $next_type ne '#' )    # Fix c036
             {
                 $expecting = TERM;
             }
         }
+
         if ( $expecting == TERM ) {
             $self->scan_simple_identifier();
         }
@@ -3824,6 +3828,12 @@ EOM
         {
             # mark it as a perltidy label type
             $type = 'J';
+        }
+
+        # mark colon as attribute if an error would occur otherwise; git #162
+        elsif ( !$rcurrent_depth->[QUESTION_COLON] ) {
+            $type = 'A';
+            $self->[_in_attribute_list_] = 1;
         }
 
         # otherwise, it should be part of a ?/: operator
@@ -3938,7 +3948,7 @@ EOM
         if ( ( $expecting != OPERATOR )
             && $is_file_test_operator{$next_tok} )
         {
-            my ( $next_nonblank_token, $i_next ) =
+            my ( $next_nonblank_token, $i_next_uu ) =
               $self->find_next_nonblank_token( $i + 1, $rtokens,
                 $max_token_index );
 
@@ -3963,7 +3973,6 @@ EOM
         elsif ( $expecting == OPERATOR ) {
         }
         else {
-
             if ( $next_type eq 'w' ) {
                 $type = 'm';
             }
@@ -4396,7 +4405,7 @@ EOM
         my $self = shift;
 
         $self->scan_bare_identifier();
-        my ( $next_nonblank_tok2, $i_next2 ) =
+        my ( $next_nonblank_tok2, $i_next2_uu ) =
           $self->find_next_nonblank_token( $i, $rtokens, $max_token_index );
 
         if ($next_nonblank_tok2) {
@@ -4600,6 +4609,11 @@ EOM
 
                 }
 
+                # patch for Syntax::Operator::In, git #162
+                elsif ( $tok eq 'in' && $next_nonblank_token eq ':' ) {
+
+                }
+
                 # Fix part 1 for git #63 in which a comment falls
                 # between an -> and the following word.  An
                 # alternate fix would be to change operator_expected
@@ -4705,7 +4719,7 @@ EOM
             && $expecting != OPERATOR
             && $next_nonblank_token eq ':' )
         {
-            my ( $nn_nonblank_token, $i_nn ) =
+            my ( $nn_nonblank_token, $i_nn_uu ) =
               $self->find_next_nonblank_token( $i_next, $rtokens,
                 $max_token_index );
             $sub_attribute_ok_here =
@@ -4715,6 +4729,79 @@ EOM
         }
         return $sub_attribute_ok_here;
     } ## end sub sub_attribute_ok_here
+
+    use constant DEBUG_BAREWORD => 0;
+
+    sub saw_bareword_function {
+        my ( $self, $bareword ) = @_;
+        $self->[_rbareword_info_]->{$current_package}->{$bareword}
+          ->{function_count}++;
+        return;
+    } ## end sub saw_bareword_function
+
+    sub saw_bareword_constant {
+        my ( $self, $bareword ) = @_;
+        $self->[_rbareword_info_]->{$current_package}->{$bareword}
+          ->{constant_count}++;
+        return;
+    } ## end sub saw_bareword_constant
+
+    sub get_bareword_counts {
+        my ( $self, $bareword ) = @_;
+
+        # Given:
+        #   $bareword = a bareword
+        # Return:
+        #   $function_count = number of times seen as function taking >0 args
+        #   $constant_count = number of times seen as function taking  0 args
+        # Note:
+        #   $function_count > 0 implies that a TERM should come next
+        #   $constant_count > 0 implies that an OPERATOR **may** come next,
+        #      but this can be incorrect if $bareword can take 0 or more args.
+        # This is used to help guess tokenization around unknown barewords.
+        my $function_count;
+        my $constant_count;
+        my $rbareword_info_tok = $self->[_rbareword_info_]->{$current_package};
+        if ($rbareword_info_tok) {
+            $rbareword_info_tok = $rbareword_info_tok->{$bareword};
+            if ($rbareword_info_tok) {
+                $function_count = $rbareword_info_tok->{function_count};
+                $constant_count = $rbareword_info_tok->{constant_count};
+
+                # a positive function count overrides a constant count
+                if ($function_count) { $constant_count = 0 }
+            }
+        }
+        if ( !defined($function_count) ) { $function_count = 0 }
+        if ( !defined($constant_count) ) { $constant_count = 0 }
+        return ( $function_count, $constant_count );
+    } ## end sub get_bareword_counts
+
+    # hashes used to help determine a bareword type
+    my %is_wiUC;
+    my %is_function_follower;
+    my %is_constant_follower;
+    my %is_use_require_no;
+
+    BEGIN {
+        my @qz = qw( w i U C );
+        @is_wiUC{@qz} = (1) x scalar(@qz);
+
+        @qz = qw( use require no );
+        @is_use_require_no{@qz} = (1) x scalar(@qz);
+
+        # These pre-token types after a bareword imply that it
+        # is not a constant, except when '(' is followed by ')'.
+        @qz = qw# ( [ { $ @ " ' m #;
+        @is_function_follower{@qz} = (1) x scalar(@qz);
+
+        # These pre-token types after a bareword imply that it
+        # MIGHT be a constant, but it also might be a function taking
+        # 0 or more call args.
+        @qz = qw# ; ) ] } if unless #;
+        push @qz, ',';
+        @is_constant_follower{@qz} = (1) x scalar(@qz);
+    }
 
     sub do_BAREWORD {
 
@@ -5039,6 +5126,87 @@ EOM
             $self->do_UNKNOWN_BAREWORD($next_nonblank_token);
         }
 
+        #----------------------------------------------------------------
+        # Save info for use in later guessing. Even for types 'i' and 'U'
+        # because those may be marked as type 'w' (barewords) elsewhere.
+        #----------------------------------------------------------------
+        if (   $is_wiUC{$type}
+            && $statement_type ne 'use'
+            && $statement_type ne '_use' )
+        {
+            my $result = "unknown";
+
+            # Words are marked 'function' if they appear in a role which
+            # is not consistent with a constant value. Typically they are
+            # function calls.
+            if (   $type eq 'U'
+                || $is_function_follower{$next_nonblank_token} )
+            {
+
+                my $empty_parens = 0;
+                if ( $next_nonblank_token eq '(' && $i_next < $max_token_index )
+                {
+                    my $tok_next_p1 = $rtokens->[ $i_next + 1 ];
+                    if ( substr( $tok_next_p1, 0, 1 ) eq SPACE
+                        && $i_next + 2 <= $max_token_index )
+                    {
+                        $tok_next_p1 = $rtokens->[ $i_next + 2 ];
+                    }
+                    $empty_parens = $tok_next_p1 eq ')';
+                }
+
+                if ( !$empty_parens ) {
+
+                    # not a constant term - probably a function
+                    $result = "function";
+                    $self->saw_bareword_function($tok);
+                }
+            }
+
+            # Words are marked 'constant' if they appear in a role
+            # consistent with a constant value.  However, they may simply
+            # be functions which optionally take zero args. So if a word
+            # appears as both constant and function, it is not a constant.
+            elsif ($type eq 'C'
+                || $is_constant_follower{$next_nonblank_token} )
+            {
+
+                my $is_hash_key = $next_nonblank_token eq '}'
+                  && (
+                    $last_nonblank_type eq 'L'
+                    || (   $last_nonblank_type eq 'm'
+                        && $last_last_nonblank_type eq 'L' )
+                  );
+
+                if (
+
+                    # not a hash key like {bareword} or {-bareword}
+                    !$is_hash_key
+
+                    # not a package name, etc
+                    && ( $last_nonblank_type ne 'k'
+                        || !$is_use_require_no{$last_nonblank_token} )
+
+                    # skip arrow calls, which can go either way
+                    && $last_nonblank_token ne '->'
+                  )
+                {
+                    # possibly a constant or constant function
+                    $result = "constant";
+                    $self->saw_bareword_constant($tok);
+                }
+                else {
+                    $result = "other bareword";
+                }
+            }
+            else {
+            }
+
+            if ( DEBUG_BAREWORD && $result ne 'other bareword' ) {
+                print
+"$input_line_number: $result: $tok: type=$type : last_tok=$last_nonblank_token : next_tok='$next_nonblank_token'\n";
+            }
+        }
         return $is_last;
 
     } ## end sub do_BAREWORD
@@ -5680,7 +5848,7 @@ EOM
                     # done if nothing left to scan on this line
                     last if ( $i > $max_token_index );
 
-                    my ( $next_nonblank_token, $i_next ) =
+                    my ( $next_nonblank_token_uu, $i_next ) =
                       find_next_nonblank_token_on_this_line( $i, $rtokens,
                         $max_token_index );
 
@@ -6289,10 +6457,9 @@ BEGIN {
     push @q, '->';    # was previously in UNKNOWN
     @op_expected_table{@q} = (TERM) x scalar(@q);
 
-    # Always UNKNOWN following these types;
-    # previously had '->' in this list for c030
-    @q = qw( w );
-    @op_expected_table{@q} = (UNKNOWN) x scalar(@q);
+    # No UNKNOWN table types:
+    #  removed '->' for c030, now always TERM
+    #  removed 'w' for c392 to allow use of 'function_count' info in the sub
 
     # Always expecting OPERATOR ...
     # 'n' and 'v' are currently excluded because they might be VERSION numbers
@@ -6551,8 +6718,23 @@ sub operator_expected {
         return OPERATOR;
     }
 
+    # Section 2E: bareword
+    if ( $last_nonblank_type eq 'w' ) {
+
+        # see if this has been seen in the role of a function taking args
+        my $rinfo = $self->[_rbareword_info_]->{$current_package};
+        if ($rinfo) {
+            $rinfo = $rinfo->{$last_nonblank_token};
+            if ($rinfo) {
+                my $function_count = $rinfo->{function_count};
+                if ( $function_count && $function_count > 0 ) { return TERM }
+            }
+        }
+        return UNKNOWN;
+    }
+
     #-----------------------------------
-    # Section 2E: file handle or similar
+    # Section 2F: file handle or similar
     #-----------------------------------
     if ( $last_nonblank_type eq 'Z' ) {
 
@@ -6841,7 +7023,7 @@ sub decide_if_code_block {
     # USES GLOBAL VARIABLES: $last_nonblank_token
     my ( $self, $i, $rtokens, $rtoken_type, $max_token_index ) = @_;
 
-    my ( $next_nonblank_token, $i_next ) =
+    my ( $next_nonblank_token, $i_next_uu ) =
       $self->find_next_nonblank_token( $i, $rtokens, $max_token_index );
 
     # we are at a '{' where a statement may appear.
@@ -7208,7 +7390,7 @@ sub decrease_nesting_depth {
         # Fix part #2 for git82: use saved type for propagation of type 'Z'
         # through type L-R braces.  Perl seems to allow ${bareword}
         # as an indirect object, but nothing much more complex than that.
-        ( $statement_type, my $saved_type, my $saved_token ) =
+        ( $statement_type, my $saved_type, my $saved_token_uu ) =
           @{ $rnested_statement_type->[$aa][ $rcurrent_depth->[$aa] ] };
         if (   $aa == BRACE
             && $saved_type eq 'Z'
@@ -7359,7 +7541,7 @@ sub peek_ahead_for_nonblank_token {
         next if ( $line =~ /^#/ );         # skip comment
 
         # Updated from 2 to 3 to get trigraphs, added for case b1175
-        my ( $rtok, $rmap, $rtype ) = pre_tokenize( $line, 3 );
+        my ( $rtok, $rmap_uu, $rtype_uu ) = pre_tokenize( $line, 3 );
         my $j = $max_token_index + 1;
 
         foreach my $tok ( @{$rtok} ) {
@@ -7386,8 +7568,8 @@ sub guess_if_pattern_or_conditional {
     #   msg = a warning or diagnostic message
     # USES GLOBAL VARIABLES: $last_nonblank_token
 
-    my ( $self, $i, $rtokens, $rtoken_type, $rtoken_map, $max_token_index ) =
-      @_;
+    my ( $self, $i, $rtokens, $rtoken_type, $rtoken_map_uu, $max_token_index )
+      = @_;
     my $is_pattern = 0;
     my $msg        = "guessing that ? after $last_nonblank_token starts a ";
 
@@ -7397,7 +7579,7 @@ sub guess_if_pattern_or_conditional {
     else {
         my $ibeg = $i;
         $i = $ibeg + 1;
-        my $next_token = $rtokens->[$i];    # first token after ?
+        ##my $next_token = $rtokens->[$i];    # first token after ?
 
         # look for a possible ending ? on this line..
         my $in_quote        = 1;
@@ -7492,14 +7674,29 @@ sub guess_if_pattern_or_division {
     #   $is_pattern = 0 if probably division,  =1 if probably a pattern
     #   msg = a warning or diagnostic message
     # USES GLOBAL VARIABLES: $last_nonblank_token
-    my ( $self, $i, $rtokens, $rtoken_type, $rtoken_map, $max_token_index ) =
-      @_;
-    my $is_pattern = 0;
-    my $msg        = "guessing that / after $last_nonblank_token starts a ";
-    my $ibeg       = $i;
+    my ( $self, $i, $rtokens, $rtoken_type, $rtoken_map_uu, $max_token_index )
+      = @_;
+    my $msg =
+"guessing that / after $last_nonblank_token type '$last_nonblank_type' starts a ";
+    my $ibeg = $i;
 
+    # use info collected for barewords to help decide
+    my ( $function_count, $constant_count ) =
+      $self->get_bareword_counts($last_nonblank_token);
+    my $is_pattern = 0;
+
+    # anything more on this line?
     if ( $i >= $max_token_index ) {
-        $msg .= "division (no end to pattern found on the line)\n";
+        if ($function_count) {
+            $is_pattern = 1;
+            $msg .=
+"pattern (no end to pattern found on the line, but function count=$function_count)\n";
+        }
+        else {
+            $is_pattern = 0;
+            $msg .=
+"division (no end to pattern found on the line, function count=0)\n";
+        }
     }
     else {
         my $divide_possible =
@@ -7508,6 +7705,7 @@ sub guess_if_pattern_or_division {
         if ( $divide_possible < 0 ) {
             $msg        = "pattern (division not possible here)\n";
             $is_pattern = 1;
+            $self->saw_bareword_function($last_nonblank_token);
             return ( $is_pattern, $msg );
         }
 
@@ -7558,14 +7756,20 @@ sub guess_if_pattern_or_division {
 
         if ($in_quote) {
 
-            # we didn't find an ending / on this line, so we bias towards
-            # division
-            if ( $divide_possible >= 0 ) {
-                $is_pattern = 0;
-                $msg .= "division (no ending / on this line)\n";
+            # we didn't find an ending / on this line
+            # first use any bareword info
+            if ($function_count) {
+                $msg .=
+"pattern - no ending / on this line but have function count=$function_count\n";
+                $is_pattern = 1;
+            }
+            elsif ( $divide_possible >= 0 ) {
+                $is_pattern     = 0;
+                $constant_count = 0 unless defined($constant_count);
+                $msg .=
+"division (no ending / on this line, function count=0, constant count=$constant_count)\n";
             }
             else {
-
                 # assuming a multi-line pattern ... this is risky, but division
                 # does not seem possible.  If this fails, it would either be due
                 # to a syntax error in the code, or the division_expected logic
@@ -7575,7 +7779,7 @@ sub guess_if_pattern_or_division {
             }
         }
 
-        # we found an ending /, so we bias slightly towards a pattern
+        # we found an ending /, it might terminate a pattern
         else {
 
             my $pattern_expected =
@@ -7591,8 +7795,20 @@ sub guess_if_pattern_or_division {
                     # Increase weight of divide if a pure number follows
                     $divide_possible += $next_token =~ /^\d+$/;
 
+                    # start with any bareword info
+                    if ($function_count) {
+                        $msg .=
+"pattern - division works too but have function count=$function_count\n";
+                        $is_pattern = 1;
+                    }
+                    elsif ($constant_count) {
+                        $msg .=
+"constant - division works too but have constant count=$constant_count\n";
+                        $is_pattern = 0;
+                    }
+
                     # Check for known constants in the numerator, like 'pi'
-                    if ( $is_known_constant{$last_nonblank_token} ) {
+                    elsif ( $is_known_constant{$last_nonblank_token} ) {
                         $msg .=
 "division (pattern works too but saw known constant '$last_nonblank_token')\n";
                         $is_pattern = 0;
@@ -7735,14 +7951,12 @@ sub scan_bare_identifier_do {
 
     ) = @_;
 
-    my $i_begin = $i;
     my $package = undef;
 
     my $i_beg = $i;
 
     # we have to back up one pretoken at a :: since each : is one pretoken
     if ( $tok eq '::' ) { $i_beg-- }
-    if ( $tok eq '->' ) { $i_beg-- }
     my $pos_beg = $rtoken_map->[$i_beg];
     pos($input_line) = $pos_beg;
 
@@ -7754,9 +7968,8 @@ sub scan_bare_identifier_do {
     if (
         $input_line =~ m{
          \G\s*                # start at pos
-         ( (?:\w*(?:'|::)) )* # $1 = maybe package name like A:: A::B:: or A'
-         (?:(?:->)?           #      maybe followed by '->'
-         (\w+))?              # $2 = maybe followed by sub name
+         ( (?:\w*(?:'|::))* ) # $1 = maybe package name like A:: A::B:: or A'
+         (\w+)?               # $2 = maybe followed by sub name
         }gcx
       )
     {
@@ -7770,8 +7983,18 @@ sub scan_bare_identifier_do {
 
         my $sub_name = EMPTY_STRING;
         if ( defined($2) ) { $sub_name = $2; }
-        if ( defined($1) ) {
+        if ( defined($1) && length($1) ) {
             $package = $1;
+
+            # patch: check for package call A::B::C->
+            # in this case, C is part of the package name
+            if ($sub_name) {
+                if ( $input_line =~ m{ \G\s*(?:->) }gcx ) {
+                    $package .= $sub_name;
+                    $sub_name = EMPTY_STRING;
+                }
+                pos($input_line) = $pos;
+            }
 
             # patch: don't allow isolated package name which just ends
             # in the old style package separator (single quote).  Example:
@@ -7811,10 +8034,6 @@ sub scan_bare_identifier_do {
                 $self->report_v_string($tok);
             }
 
-            elsif ( $ris_constant->{$package}{$sub_name} ) {
-                $type = 'C';
-            }
-
             # bareword after sort has implied empty prototype; for example:
             # @sorted = sort numerically ( 53, 29, 11, 32, 7 );
             # This has priority over whatever the user has specified.
@@ -7822,6 +8041,12 @@ sub scan_bare_identifier_do {
                 && $last_nonblank_type eq 'k' )
             {
                 $type = 'Z';
+            }
+
+            # issue c382: this elsif statement moved from above because
+            # previous check for type 'Z' after sort has priority.
+            elsif ( $ris_constant->{$package}{$sub_name} ) {
+                $type = 'C';
             }
 
             # Note: strangely, perl does not seem to really let you create
@@ -8178,7 +8403,7 @@ sub do_scan_package {
         # package NAMESPACE VERSION
         # package NAMESPACE BLOCK
         # package NAMESPACE VERSION BLOCK
-        my ( $next_nonblank_token, $i_next ) =
+        my ( $next_nonblank_token, $i_next_uu ) =
           $self->find_next_nonblank_token( $i, $rtokens, $max_token_index );
 
         # check that something recognizable follows, but do not parse.
@@ -9362,14 +9587,14 @@ EOM
                 }
 
                 # check for multiple definitions of a sub
-                ( $next_nonblank_token, my $i_next ) =
+                ( $next_nonblank_token, my $i_next_uu ) =
                   find_next_nonblank_token_on_this_line( $i, $rtokens,
                     $max_token_index );
             }
 
             if ( $next_nonblank_token =~ /^(\s*|#)$/ )
             {    # skip blank or side comment
-                my ( $rpre_tokens, $rpre_types ) =
+                my ( $rpre_tokens, $rpre_types_uu ) =
                   $self->peek_ahead_for_n_nonblank_pre_tokens(1);
                 if ( defined($rpre_tokens) && @{$rpre_tokens} ) {
                     $next_nonblank_token = $rpre_tokens->[0];
@@ -9650,7 +9875,7 @@ sub is_possible_numerator {
             $i++;
         }
 
-        my ( $next_nonblank_token, $i_next ) =
+        my ( $next_nonblank_token, $i_next_uu ) =
           $self->find_next_nonblank_token( $i, $rtokens, $max_token_index );
 
         if ( $pattern_test{$next_nonblank_token} ) {
@@ -9706,8 +9931,10 @@ sub find_angle_operator_termination {
 
     my $filter;
 
+    my $expecting_TERM = $expecting == TERM;
+
     # we just have to find the next '>' if a term is expected
-    if ( $expecting == TERM ) { $filter = '[\>]' }
+    if ($expecting_TERM) { $filter = '[\>]' }
 
     # we have to guess if we don't know what is expected
     elsif ( $expecting == UNKNOWN ) { $filter = '[\>\;\=\#\|\<]' }
@@ -9849,7 +10076,7 @@ EOM
 
             # Now let's see where we stand....
             # OK if math op not possible
-            if ( $expecting == TERM ) {
+            if ($expecting_TERM) {
             }
 
             elsif ($is_html_tag) {
@@ -9906,7 +10133,7 @@ EOM
 
         # didn't find ending >
         else {
-            if ( $expecting == TERM ) {
+            if ($expecting_TERM) {
                 $self->warning("No ending > for angle operator\n");
             }
         }
@@ -9931,9 +10158,9 @@ sub scan_number_do {
       @_;
     my $pos_beg = $rtoken_map->[$i];
     my $pos;
-    my $i_begin = $i;
-    my $number  = undef;
-    my $type    = $input_type;
+    ##my $i_begin = $i;
+    my $number = undef;
+    my $type   = $input_type;
 
     my $first_char = substr( $input_line, $pos_beg, 1 );
 
@@ -10094,7 +10321,7 @@ sub find_here_doc {
         $i,
         $rtokens,
         $rtoken_type,
-        $rtoken_map,
+        $rtoken_map_uu,
         $max_token_index
 
     ) = @_;
@@ -10237,7 +10464,7 @@ sub do_quote {
         $quoted_string_2,
         $rtokens,
         $rtoken_type,
-        $rtoken_map,
+        $rtoken_map_uu,
         $max_token_index,
 
     ) = @_;
@@ -10527,20 +10754,20 @@ sub follow_quoted_string {
 } ## end sub follow_quoted_string
 
 sub indicate_error {
-    my ( $self, $msg, $line_number, $input_line, $pos, $carrat ) = @_;
+    my ( $self, $msg, $line_number, $input_line, $pos, $caret ) = @_;
     $self->interrupt_logfile();
     $self->warning($msg);
     $self->write_error_indicator_pair( $line_number, $input_line, $pos,
-        $carrat );
+        $caret );
     $self->resume_logfile();
     return;
 } ## end sub indicate_error
 
 sub write_error_indicator_pair {
-    my ( $self, $line_number, $input_line, $pos, $carrat ) = @_;
+    my ( $self, $line_number, $input_line, $pos, $caret ) = @_;
     my ( $offset, $numbered_line, $underline ) =
       make_numbered_line( $line_number, $input_line, $pos );
-    $underline = write_on_underline( $underline, $pos - $offset, $carrat );
+    $underline = write_on_underline( $underline, $pos - $offset, $caret );
     $self->warning( $numbered_line . "\n" );
     $underline =~ s/\s+$//;
     $self->warning( $underline . "\n" );
@@ -10727,7 +10954,7 @@ For the following tokens, the "type" of a token is just the token itself.
 .. :: << >> ** && .. || // -> => += -= .= %= &= |= ^= *= <>
 ( ) <= >= == =~ !~ != ++ -- /= x=
 ... **= <<= >>= &&= ||= //= <=>
-, + - / * | % ! x ~ = \ ? : . < > ^ &
+, + - / * | % ! x ~ = \ ? : . < > ^ & ^^
 
 The following additional token types are defined:
 
@@ -10890,7 +11117,7 @@ BEGIN {
 
     my @digraphs = qw(
       .. :: << >> ** && || // -> => += -= .= %= &= |= ^= *= <>
-      <= >= == =~ !~ != ++ -- /= x= ~~ ~. |. &. ^.
+      <= >= == =~ !~ != ++ -- /= x= ~~ ~. |. &. ^. ^^
     );
     @is_digraph{@digraphs} = (1) x scalar(@digraphs);
 
@@ -11270,7 +11497,7 @@ BEGIN {
       **= += -= .= /= *= %= x= &= |= ^= <<= >>= &&= ||= //=
       <= >= == != => \ > < % * / ? & | ** <=> ~~ !~~ <<~
       f F pp mm Y p m U J G j >> << ^ t
-      ~. ^. |. &. ^.= |.= &.=
+      ~. ^. |. &. ^.= |.= &.= ^^
       #;
     push( @value_requestor_type, ',' )
       ;    # (perl doesn't like a ',' in a qw block)

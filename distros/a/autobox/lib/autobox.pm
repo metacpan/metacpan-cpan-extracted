@@ -13,7 +13,7 @@ use Storable;
 
 # XXX this declaration must be on a single line
 # https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
-use version 0.77; our $VERSION = version->declare('v3.0.1');
+use version 0.77; our $VERSION = version->declare('v3.0.2');
 
 XSLoader::load 'autobox', $VERSION;
 
@@ -98,7 +98,7 @@ sub _generate_class($) {
     };
 }
 
-# expose the autobox class (for can, isa &c.)
+# expose the autobox class (for can, isa etc.)
 # https://rt.cpan.org/Ticket/Display.html?id=55565
 sub _make_class_accessor ($) {
     my $class = shift;

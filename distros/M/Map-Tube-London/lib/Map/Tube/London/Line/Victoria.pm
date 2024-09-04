@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Victoria;
 
-$Map::Tube::London::Line::Victoria::VERSION   = '1.37';
+$Map::Tube::London::Line::Victoria::VERSION   = '1.39';
 $Map::Tube::London::Line::Victoria::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Victoria - London Tube Map: Victoria Line.
 
 =head1 VERSION
 
-Version 1.37
+Version 1.39
 
 =head1 DESCRIPTION
 
@@ -26,9 +26,9 @@ London Tube Map: Victoria Line.
     | Tottenham Hale           | Blackhorse Road, Seven Sisters                 |
     | Seven Sisters            | Tottenham Hale, Finsbury Park                  |
     | Finsbury Park            | Seven Sisters, Highbury & Islington            |
-    | Highbury & Islington     | Finsbury Park, King's Cross St. Pancras        |
-    | King's Cross St. Pancras | Highbury & Islington, Euston                   |
-    | Euston                   | King's Cross St. Pancras, Warren Street        |
+    | Highbury & Islington     | Finsbury Park, King's Cross St Pancras        |
+    | King's Cross St Pancras  | Highbury & Islington, Euston                   |
+    | Euston                   | King's Cross St Pancras, Warren Street        |
     | Warren Street            | Euston, Oxford Circus                          |
     | Oxford Circus            | Warren Street, Green Park                      |
     | Green Park               | Oxford Circus, Victoria                        |
@@ -60,7 +60,7 @@ London Tube Map: Victoria Line.
 =item * The station "Highbury & Islington" is also part of
           L<Overground Line|Map::Tube::London::Line::Overground>
 
-=item * The station "King's Cross St. Pancras" is also part of
+=item * The station "King's Cross St Pancras" is also part of
           L<Circle Line|Map::Tube::London::Line::Circle>
         | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
         | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>

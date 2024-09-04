@@ -1,0 +1,67 @@
+---
+X_No_Archive: Yes
+abstract: "Code That Wasn't Raised Right"
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Test2::V0: '0.000159'
+configure_requires:
+  Archive::Tar: '0'
+  CPAN::Meta: '0'
+  ExtUtils::Config: '0.003'
+  ExtUtils::Helpers: '0.02'
+  ExtUtils::Install: '0'
+  ExtUtils::InstallPaths: '0.002'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  Getopt::Long: '2.36'
+  IO::Uncompress::Unzip: '0'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Insult
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - author
+    - builder
+optional_features:
+  evil:
+    description: 'Acme::Insult::Evil support'
+    requires:
+      Acme::Insult::Evil: '0'
+  json:
+    description: '-json support in insult.pl'
+    requires:
+      JSON::Tiny: '0.58'
+  pirate:
+    description: 'Acme::Insult::Pirate support'
+    requires:
+      Acme::Insult::Pirate: '0'
+provides:
+  Acme::Insult:
+    file: lib/Acme\Insult.pm
+    version: '1.0'
+recommends:
+  Acme::Insult::Evil: '0'
+  Acme::Insult::Pirate: '0'
+requires:
+  Acme::Insult::Glax: '0'
+  Getopt::Long: '0'
+  perl: v5.38.0
+resources:
+  bugtracker: https://github.com/sanko/Acme-Insult/issues
+  homepage: https://github.com/sanko/Acme-Insult
+  repository: https://github.com/sanko/Acme-Insult.git
+version: '1.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,5 +1,12 @@
 Revision history for Map::Tube::London
 
+1.39  2024-09-03
+      - Refactored and tidied up test t/map-tube-london.t.
+
+1.38  2024-09-03
+      - Added Elizabeth line, etc, thanks @mohawk2.
+      - Updated dependency on Map::Tube v3.77.
+
 1.37  2024-08-26
       - sort london-map.json keys, thanks @mohawk2.
 

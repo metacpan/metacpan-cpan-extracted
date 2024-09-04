@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::HammersmithCity;
 
-$Map::Tube::London::Line::HammersmithCity::VERSION   = '1.37';
+$Map::Tube::London::Line::HammersmithCity::VERSION   = '1.39';
 $Map::Tube::London::Line::HammersmithCity::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::HammersmithCity - London Tube Map: Hammersmith & City L
 
 =head1 VERSION
 
-Version 1.37
+Version 1.39
 
 =head1 DESCRIPTION
 
@@ -33,9 +33,9 @@ London Tube Map: Hammersmith & City Line.
     | Edgware Road             | Paddington, Baker Street                        |
     | Baker Street             | Edgware Road, Great Portland Street             |
     | Great Portland Street    | Baker Street, Euston Square                     |
-    | Euston Square            | Great Portland Street, King's Cross St. Pancras |
-    | King's Cross St. Pancras | Euston Square, Farringdon                       |
-    | Farringdon               | King's Cross St. Pancras, Barbican              |
+    | Euston Square            | Great Portland Street, King's Cross St Pancras |
+    | King's Cross St Pancras  | Euston Square, Farringdon                       |
+    | Farringdon               | King's Cross St Pancras, Barbican              |
     | Barbican                 | Farringdon, Moorgate                            |
     | Moorgate                 | Barbican, Liverpool Street                      |
     | Liverpool Street         | Moorgate, Aldgate East                          |
@@ -107,7 +107,7 @@ London Tube Map: Hammersmith & City Line.
         | L<District Line|Map::Tube::London::Line::District>
         | L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
 
-=item * The station "King's Cross St. Pancras" is also part of
+=item * The station "King's Cross St Pancras" is also part of
           L<Circle Line|Map::Tube::London::Line::Circle>
         | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
         | L<Northern Line|Map::Tube::London::Line::Northern>

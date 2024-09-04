@@ -1,0 +1,18 @@
+name = "Acme-Free-Advice"
+badges = ["github-actions/ci.yml", "metacpan"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+license = "artistic_2"
+markdown_maker = "Pod::Markdown::Github"
+
+[no_index]
+directory=[
+    "t",
+    "xt",
+    "eg",
+    "author",
+    "builder"
+]
+
+[Metadata]
+X_No_Archive = 'Yes'

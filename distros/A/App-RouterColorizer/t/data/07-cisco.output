@@ -460,3 +460,63 @@ Interface           Role Sts Cost      Prio.Nbr Type
 [32mPo1                 Root FWD 2         128.512  P2p[0m
 [33mGi1/0/5             Desg LRN 4         128.5    P2p[0m
 
+sw09#show line
+   Tty Typ     Tx/Rx    A Modem  Roty AccO AccI   Uses   Noise  Overruns   Int
+     0 CTY              -    -      -    -    -      0       0     0/0       -
+*    1 VTY              -    -      -    -    -      1       0     0/0       -
+     2 VTY              -    -      -    -    -      0       0     0/0       -
+     3 VTY              -    -      -    -    -      0       0     0/0       -
+     4 VTY              -    -      -    -    -      0       0     0/0       -
+     5 VTY              -    -      -    -    -      0       0     0/0       -
+     6 VTY              -    -      -    -    -      0       0     0/0       -
+     7 VTY              -    -      -    -    -      0       0     0/0       -
+     8 VTY              -    -      -    -    -      0       0     0/0       -
+     9 VTY              -    -      -    -    -      0       0     0/0       -
+    10 VTY              -    -      -    -    -      0       0     0/0       -
+    11 VTY              -    -      -    -    -      0       0     0/0       -
+    12 VTY              -    -      -    -    -      0       0     0/0       -
+    13 VTY              -    -      -    -    -      0       0     0/0       -
+    14 VTY              -    -      -    -    -      0       0     0/0       -
+    15 VTY              -    -      -    -    -      0       0     0/0       -
+    16 VTY              -    -      -    -    -      0       0     0/0       -
+
+sw09#show line console 0
+   Tty Typ     Tx/Rx    A Modem  Roty AccO AccI   Uses   Noise  Overruns   Int
+     0 CTY              -    -      -    -    -      0       0     0/0       -
+
+[36mLine 0, Location: "", Type: ""[0m
+Length: 24 lines, Width: 80 columns
+[36mBaud rate (TX/RX) is [4m9[24m600/[4m9[24m600, no parity, 2 stopbits, 8 databits[0m
+[32mStatus: Ready[0m
+[36mStatus: Bogus[0m
+Capabilities: none
+[36mModem state: Foo[0m
+[32mModem state: Idle[0m
+[32mModem state: Ready[0m
+RJ45 Console is in use
+USB Console baud rate = [4m9[24m600
+Special Chars: Escape  Hold  Stop  Start  Disconnect  Activation
+                ^^x    none   -     -       none         
+Timeouts:      Idle EXEC    Idle Session   Modem Answer  Session   Dispatch
+               00:10:00        never                        none     not set
+                            Idle Session Disconnect Warning
+                              never 
+                            Login-sequence User Response
+                             00:00:30
+                            Autoselect Initial Wait
+                              not set 
+Modem type is unknown.
+Session limit is not set.
+Time since activation: never
+Editing is enabled.
+History is enabled, history size is 20.
+DNS resolution in show commands is enabled
+Full user help is disabled
+Allowed input transports are none.
+Allowed output transports are telnet ssh.
+Preferred transport is telnet.
+Shell: enabled
+Shell trace: off
+No output characters are padded
+No special data dispatching characters
+

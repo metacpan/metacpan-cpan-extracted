@@ -7,7 +7,7 @@
 #if PTRSIZE == 8
     /*
      * This is one of Thomas Wang's hash functions for 64-bit integers from:
-     * http://www.concentric.net/~Ttwang/tech/inthash.htm
+     * https://gist.github.com/badboy/6267743
      */
     U32 ptr_hash(PTRV u) {
         u = (~u) + (u << 18);
@@ -21,7 +21,7 @@
 #else
     /*
      * This is one of Bob Jenkins' hash functions for 32-bit integers
-     * from: http://burtleburtle.net/bob/hash/integer.html
+     * from: https://burtleburtle.net/bob/hash/integer.html
      */
     U32 ptr_hash(PTRV u) {
         u = (u + 0x7ed55d16) + (u << 12);

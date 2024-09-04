@@ -10,11 +10,7 @@ package main;
 
 use 5.006;
 use strict; use warnings;
-use Test::More;
-
-my $min_ver = '0.60';
-eval "use Test::Map::Tube $min_ver tests => 1";
-plan skip_all => "Test::Map::Tube $min_ver required." if $@;
+use Test::Map::Tube tests => 1;
 
 my @routes = <DATA>;
 ok_map_routes(CommonLinesMap->new(experimental =>1), \@routes);

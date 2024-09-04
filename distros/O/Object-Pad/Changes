@@ -1,5 +1,15 @@
 Revision history for Object-Pad
 
+0.813   2024-09-03
+        [CHANGES]
+         * Removed the `has` keyword; it now immediately throws a compiletime
+           error
+
+        [BUGFIXES]
+         * Ensure that the RHS of a field init expression permits any kind of
+           listexpr, including `( VAL ) x COUNT`
+         * Fix some docs typoes (thanks Nick Morrott) (RT155106)
+
 0.812   2024-08-29
         [BUGFIXES]
          * Fix for perl 5.41.3, when `SAVEt_LONG` was removed

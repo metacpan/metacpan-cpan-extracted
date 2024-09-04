@@ -3,14 +3,14 @@ use Test::More;
 use strict;
 use IO::String;
 use URI::Escape;
+use Plack::Response;
 
 require 't/test-lib.pm';
 
 my $res;
 my $tmp;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel      => 'error',
             customPlugins => 't::pdata',
@@ -21,6 +21,14 @@ my $client = LLNG::Manager::Test->new(
 # Two simple access to see if pdata is set and restored
 ok( $res = $client->_get( '/', ), 'Simple access' );
 $tmp = expectCookie( $res, 'lemonldappdata' );
+
+unlike(
+    Plack::Response->new(@$res)->headers->header('Set-Cookie'),
+    qr/lemonldappdata=[^,]*domain=/,
+    "Domain not set in pdata cookie"
+);
+count(1);
+
 ok( $tmp eq uri_escape('{"mytest":1}'), 'Pdata is {"mytest":1}' )
   or explain( $tmp, uri_escape('{"mytest":1}') );
 count(2);
@@ -28,6 +36,12 @@ count(2);
 ok( $res = $client->_get( '/', cookie => 'lemonldappdata=' . $tmp, ),
     'Second simple access' );
 $tmp = expectCookie( $res, 'lemonldappdata' );
+unlike(
+    Plack::Response->new(@$res)->headers->header('Set-Cookie'),
+    qr/lemonldappdata=[^,]*domain=/,
+    "Domain not set in pdata cookie"
+);
+count(1);
 ok( $tmp eq uri_escape('{"mytest":2}'), 'Pdata is {"mytest":2}' )
   or explain( $tmp, uri_escape('{"mytest":2}') );
 count(2);

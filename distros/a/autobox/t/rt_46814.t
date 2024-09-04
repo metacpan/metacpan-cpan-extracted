@@ -6,9 +6,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 9;
 
 use autobox::universal 'type';
+
+is type(2 > 1), 'INTEGER', 'true is an INTEGER (1)';
+is type(2 < 1), 'INTEGER', 'false is an INTEGER (0)';
 
 my $f = 3.1415927;
 

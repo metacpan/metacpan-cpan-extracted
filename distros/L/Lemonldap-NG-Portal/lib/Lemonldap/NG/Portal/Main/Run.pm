@@ -93,21 +93,41 @@ sub handler {
 
     # Save pdata
     if ( $sp or %{ $req->pdata } ) {
-        my %v = (
-            name   => $self->conf->{cookieName} . 'pdata',
-            secure => $self->conf->{securedCookie},
-            (
-                %{ $req->pdata }
-                ? ( value => uri_escape( JSON::to_json( $req->pdata ) ) )
-                : ( value => '', expires => 'Wed, 21 Oct 2015 00:00:00 GMT' )
-            ),
-            (
-                $self->conf->{pdataDomain}
-                ? ( domain => $self->conf->{pdataDomain}, )
-                : ()
-            ),
-        );
-        push @{ $res->[1] }, 'Set-Cookie', $self->genCookie( $req, %v );
+        my %pdata_options = ();
+        $pdata_options{domain} = $self->conf->{pdataDomain}
+          if $self->conf->{pdataDomain};
+
+        if ( %{ $req->pdata } ) {
+            push @{ $res->[1] }, 'Set-Cookie',
+              $self->cookie(
+                name   => $self->conf->{cookieName} . 'pdata',
+                secure => $self->conf->{securedCookie},
+                value  => uri_escape( JSON::to_json( $req->pdata ) ),
+                %pdata_options,
+              );
+
+        }
+        else {
+            push @{ $res->[1] }, 'Set-Cookie',
+              $self->cookie(
+                name    => $self->conf->{cookieName} . 'pdata',
+                secure  => $self->conf->{securedCookie},
+                value   => '',
+                expires => 'Wed, 21 Oct 2015 00:00:00 GMT',
+                %pdata_options,
+              );
+
+            # Avoid regressions with #3228
+            push @{ $res->[1] }, 'Set-Cookie',
+              $self->genDomainCookie(
+                $req,
+                name    => $self->conf->{cookieName} . 'pdata',
+                secure  => $self->conf->{securedCookie},
+                value   => '',
+                expires => 'Wed, 21 Oct 2015 00:00:00 GMT',
+                %pdata_options,
+              );
+        }
     }
     return $res;
 }
@@ -240,7 +260,7 @@ sub processRefreshSession {
 
     # Avoid interferences when refresh is run on multiple sessions
     # in the same request
-    $req->sessionInfo({});
+    $req->sessionInfo( {} );
     $req->steps( [
             'getUser',
             @{ $self->betweenAuthAndData },
@@ -313,7 +333,7 @@ sub _unauthLogout {
     $self->logger->debug("Removing $self->{conf}->{cookieName} cookie");
     $req->pdata( {} );
     $req->addCookie(
-        $self->genCookie(
+        $self->genDomainCookie(
             $req,
             name    => $self->conf->{cookieName},
             secure  => $self->conf->{securedCookie},
@@ -732,7 +752,7 @@ sub _deleteSession {
 
         # Create an obsolete cookie to remove it
         $req->addCookie(
-            $self->genCookie(
+            $self->genDomainCookie(
                 $req,
                 name    => $self->conf->{cookieName} . 'http',
                 value   => 0,
@@ -747,7 +767,7 @@ sub _deleteSession {
 
     # Create an obsolete cookie to remove it
     $req->addCookie(
-        $self->genCookie(
+        $self->genDomainCookie(
             $req,
             name    => $self->conf->{cookieName},
             value   => 0,
@@ -926,18 +946,23 @@ sub fullUrl {
 }
 
 # Generates a cookie header which can depend on the request
-sub genCookie {
+# If no domain was explicitely specified, use the default SSO domain
+sub genDomainCookie {
     my ( $self, $req, %h ) = @_;
-    $h{path} ||= '/';
-    $h{HttpOnly} //= $self->conf->{httpOnly};
-    $h{max_age}  //= $self->conf->{cookieExpiration}
-      if ( $self->conf->{cookieExpiration} );
-    $h{SameSite} ||= $self->cookieSameSite;
-    $h{domain}   ||= $self->getCookieDomain($req);
-    return $self->assemble_cookie(%h);
+
+    $h{domain} ||= $self->getCookieDomain($req);
+    return $self->cookie(%h);
 }
 
-# Deprecated method, does not handle dynamic portal URL
+# DEPRECATED, #3228
+sub genCookie {
+    my ( $self, $req, %h ) = @_;
+    return $self->cookie(%h);
+}
+
+# Generate a cookie header
+# If no domain was explicitely specified, only the portal will see
+# this cookie
 sub cookie {
     my ( $self, %h ) = @_;
     $h{path} ||= '/';

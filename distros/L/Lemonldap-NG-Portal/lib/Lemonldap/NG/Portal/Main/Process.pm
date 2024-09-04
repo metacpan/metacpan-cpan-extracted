@@ -409,7 +409,7 @@ sub extractFormInfo {
         and $req->cookies->{ $self->conf->{cookieName} } )
     {
         $req->addCookie(
-            $self->genCookie(
+            $self->genDomainCookie(
                 $req,
                 name    => $self->conf->{cookieName},
                 value   => 0,
@@ -601,8 +601,8 @@ sub store {
     my $session = $self->getApacheSession(
         $req->id,
         hashStore => $req->data->{hashStore},
-        force => $req->{force},
-        info  => $infos
+        force     => $req->{force},
+        info      => $infos
     );
     return PE_APACHESESSIONERROR unless $session;
 
@@ -630,7 +630,7 @@ sub buildCookie {
     my ( $self, $req ) = @_;
     if ( $req->id ) {
         $req->addCookie(
-            $self->genCookie(
+            $self->genDomainCookie(
                 $req,
                 name   => $self->conf->{cookieName},
                 value  => $req->id,
@@ -639,7 +639,7 @@ sub buildCookie {
         );
         if ( $self->conf->{securedCookie} >= 2 ) {
             $req->addCookie(
-                $self->genCookie(
+                $self->genDomainCookie(
                     $req,
                     name   => $self->conf->{cookieName} . "http",
                     value  => $req->{sessionInfo}->{_httpSession},

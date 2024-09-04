@@ -6,7 +6,7 @@ use lib 'inc';
 use ExtUtils::CChecker 0.11;
 use Module::Build::with::XSTests;
 
-my @extra_compiler_flags = qw( -Ishare/include -Ihax );
+my @extra_compiler_flags = qw( -Ishare-keyword/include -Ishare-infix/include -Ihax );
 
 # Perl 5.36 made -std=c99 standard; before then we'll have to request it specially
 push @extra_compiler_flags, qw( -std=c99 ) if $^V lt v5.36.0;
@@ -57,7 +57,10 @@ my $build = Module::Build::with::XSTests->new(
       'Module::Build' => '0.4004', # test_requires
    },
    share_dir => {
-      dist => [ 'share' ],
+      module => {
+         "XS::Parse::Infix"   => [ 'share-infix' ],
+         "XS::Parse::Keyword" => [ 'share-keyword' ],
+      },
    },
    license => 'perl',
    create_license => 1,

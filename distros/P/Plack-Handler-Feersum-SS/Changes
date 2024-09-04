@@ -1,3 +1,7 @@
+0.05
+
+     add max_connnection_reqs option
+
 0.04
 
      add keepalive and read_timeout opts

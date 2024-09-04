@@ -12,4 +12,4 @@ use Test::More tests => 1;
 $ENV{PERLDB_OPTS} = 'NonStop=1';
 
 chomp(my $got = capturex($^X, '-d', "$Bin/debugger.pl"));
-is $got, 'foo -> bar -> baz -> quux', 'runs under perl -d';
+like($got, qr{\bfoo -> bar -> baz -> quux\b}, 'runs under perl -d');

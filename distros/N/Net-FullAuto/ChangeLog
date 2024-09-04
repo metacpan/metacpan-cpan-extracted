@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-09-03  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000802 released
+
+        * Added code to install on AWS nano servers
+
 2024-09-01  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000801 released

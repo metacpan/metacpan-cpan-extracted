@@ -36,5 +36,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/stash/Feersum.git
-version: '1.500'
+version: '1.501'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

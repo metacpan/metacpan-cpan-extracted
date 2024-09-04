@@ -460,3 +460,63 @@ Gi1/0/5             Desg BLK 4         128.5    P2p Dispute
 Po1                 Root FWD 2         128.512  P2p
 Gi1/0/5             Desg LRN 4         128.5    P2p
 
+sw09#show line
+   Tty Typ     Tx/Rx    A Modem  Roty AccO AccI   Uses   Noise  Overruns   Int
+     0 CTY              -    -      -    -    -      0       0     0/0       -
+*    1 VTY              -    -      -    -    -      1       0     0/0       -
+     2 VTY              -    -      -    -    -      0       0     0/0       -
+     3 VTY              -    -      -    -    -      0       0     0/0       -
+     4 VTY              -    -      -    -    -      0       0     0/0       -
+     5 VTY              -    -      -    -    -      0       0     0/0       -
+     6 VTY              -    -      -    -    -      0       0     0/0       -
+     7 VTY              -    -      -    -    -      0       0     0/0       -
+     8 VTY              -    -      -    -    -      0       0     0/0       -
+     9 VTY              -    -      -    -    -      0       0     0/0       -
+    10 VTY              -    -      -    -    -      0       0     0/0       -
+    11 VTY              -    -      -    -    -      0       0     0/0       -
+    12 VTY              -    -      -    -    -      0       0     0/0       -
+    13 VTY              -    -      -    -    -      0       0     0/0       -
+    14 VTY              -    -      -    -    -      0       0     0/0       -
+    15 VTY              -    -      -    -    -      0       0     0/0       -
+    16 VTY              -    -      -    -    -      0       0     0/0       -
+
+sw09#show line console 0
+   Tty Typ     Tx/Rx    A Modem  Roty AccO AccI   Uses   Noise  Overruns   Int
+     0 CTY              -    -      -    -    -      0       0     0/0       -
+
+Line 0, Location: "", Type: ""
+Length: 24 lines, Width: 80 columns
+Baud rate (TX/RX) is 9600/9600, no parity, 2 stopbits, 8 databits
+Status: Ready
+Status: Bogus
+Capabilities: none
+Modem state: Foo
+Modem state: Idle
+Modem state: Ready
+RJ45 Console is in use
+USB Console baud rate = 9600
+Special Chars: Escape  Hold  Stop  Start  Disconnect  Activation
+                ^^x    none   -     -       none         
+Timeouts:      Idle EXEC    Idle Session   Modem Answer  Session   Dispatch
+               00:10:00        never                        none     not set
+                            Idle Session Disconnect Warning
+                              never 
+                            Login-sequence User Response
+                             00:00:30
+                            Autoselect Initial Wait
+                              not set 
+Modem type is unknown.
+Session limit is not set.
+Time since activation: never
+Editing is enabled.
+History is enabled, history size is 20.
+DNS resolution in show commands is enabled
+Full user help is disabled
+Allowed input transports are none.
+Allowed output transports are telnet ssh.
+Preferred transport is telnet.
+Shell: enabled
+Shell trace: off
+No output characters are padded
+No special data dispatching characters
+

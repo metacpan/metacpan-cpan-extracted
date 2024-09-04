@@ -1,0 +1,31 @@
+deps/arcus-c-client-1.14.0.tar.gz
+deps/arcus-zookeeper-3.5.9-p3.tar.gz
+deps/install.sh
+
+lib/Arcus/Base.pm
+lib/Arcus/Client.pm
+
+t/Arcus-Client.t
+t/ArcusTestCommon.pm
+t/arithmetic.t
+t/big-value.t
+t/commands.t
+t/delete.t
+t/fork.t
+t/get.t
+t/magic.t
+t/multi-op.t
+t/serialize.t
+t/store.t
+t/thread.t
+
+Base.xs
+Changes
+cpanfile
+Makefile.PL
+MANIFEST
+ppport.h
+README.md
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

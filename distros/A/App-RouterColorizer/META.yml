@@ -23,7 +23,7 @@ name: App-RouterColorizer
 provides:
   App::RouterColorizer:
     file: lib/App/RouterColorizer.pm
-    version: '1.242131'
+    version: '1.242480'
 requires:
   English: '0'
   Import::Into: '0'
@@ -37,7 +37,7 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/App-RouterColorizer/issues
   repository: git://github.com/jmaslak/App-RouterColorizer.git
-version: '1.242131'
+version: '1.242480'
 x_contributor_covenant:
   version: 0.02
 x_generated_by_perl: v5.38.2

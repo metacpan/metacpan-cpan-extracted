@@ -1,0 +1,11 @@
+requires 'Digest::SHA';
+requires 'POSIX::AtFork';
+requires 'parent';
+requires 'XSLoader';
+# requires 'perl';
+
+on test => sub {
+    requires 'Test::More';
+    requires 'Test::Deep';
+    requires 'IO::Socket::PortState';
+};

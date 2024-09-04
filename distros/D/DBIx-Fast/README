@@ -1,77 +1,234 @@
 NAME
-	DBIx::Fast - DBI Fast
+        DBIx::Fast - DBI fast & easy (another one...)
 
 SYNOPSIS
+        use DBIx::Fast;
 
-	cpanm DBIx::Fast
+        $db = DBIx::Fast->new( dsn => 'dbi:MariaDB:database=test:host', user => 'test', password => 'test' );
 
-INSTALLATION
+        $db = DBIx::Fast->new( db => 'test', user => 'u', password => 'p', driver => 'MariaDB', trace => '1', profile => '!Statement:!MethodName' );
 
-To install this module, run the following commands:
+        $db->all('SELECT * FROM test WHERE 1');
 
-        perl Makefile.PL
-        make
-        make test
-        make install
+        $Results = $db->results;
+        $Results = $db->all('SELECT * FROM test WHERE expire > ?',$time);
 
-SUPPORT AND DOCUMENTATION
+        $Hash = $db->hash('SELECT * FROM test WHERE id = ?',$id);
+        $Hash = $db->results;
 
-After installing, you can find documentation for this module with the
-perldoc command.
+        @Array = $db->flat('SELECT id FROM users');
 
-    perldoc DBIx::Fast
+        $Value = $db->val('SELECT name FROM test WHERE id = ?',1);
 
-You can also look for information at:
+        $db->insert('table', { name => 'New Name', status  => 1 }, time => 'create_time');
 
-    RT, CPAN's request tracker (report bugs here)
-            http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Fast
+        $db->update('table', { sen => { name => 'update t3st' }, where => { id => 1 } });
+        $db->update('table', { sen => { name => 'update t3st' }, where => { id => 1 } }, time => 'mod_time');
 
-    AnnoCPAN, Annotated CPAN documentation
-            http://annocpan.org/dist/DBIx-Fast
+        $db->up('table', { name => 'Update Name' } , { id => 1 } );
+        $db->up('table', { name => 'Update Name' } , { id => 1 } , time => 'mod_time');
 
-    CPAN Ratings
-            http://cpanratings.perl.org/d/DBIx-Fast
+        $db->delete('test', { id => 1 });
 
-    Search CPAN
-            http://search.cpan.org/dist/DBIx-Fast/
+        $db->last_sql;
+        $db->last_id;
 
+        $db->last_error;
+        $db->errors;
+
+DESCRIPTION
+SUBROUTINES/METHODS
+    Q
+         SQL::Abstractor
+
+    args
+         Args to invocate DBIx::Fast
+
+    db
+         DataBase Handle
+
+    dbd
+         DataBase Driver
+
+    dsn
+         DSN - Data Source Name
+
+    errors
+         All errors
+
+    p
+         Params to bind
+
+    sql
+         SQL Sentence
+
+    last_sql
+         Last SQL Executed
+
+    last_id
+         Last insert ID
+
+    last_error
+         Last error
+
+    results
+         Last result
+
+  "now"
+       Timestamp Mysql format
+
+  "set_error"
+        Add error to the array
+
+  "BUILD"
+        Build Moo
+
+  "_check_dbd"
+        Set DataBase Driver
+
+  "_dsn_dbi"
+        DSN to DBI String
+
+  "_check_dsn"
+        Check DSN string
+
+  "make_dsn"
+        Make DSN DBI string
+
+  "_dsn_to_dbi"
+        Return a DBI DSN
+
+  "profile"
+        Save profile log : dbix-fast--PID.log
+
+  "all"
+        Execute a SQL sentence and return all data in arrayref
+
+  "flat"
+        Execute SQL and return array
+
+  "hash"
+        Execute a SQL sentence and return one hash
+
+  "val"
+        Return a one value
+
+  "array"
+        Execute a SQL sentence and return array
+
+  "count"
+        Return count total from a table
+
+  "make_where"
+  "execute"
+        Execute SQL
+
+  "up"
+        Update shortcut statment : up( table , data , where , time )
+
+        $db->up('table', { name => "New Name" } , { id => 1 } );
+        $db->up('table', { name => "New Name" } , { id => 1 } , time => 'time_update' );
+
+  "update"
+            $db->update('test', {
+                               sen   => { uid => 1 , name => 'mrtest' ,status => 1 },
+                               where => { id => 33 },
+            }, time => 'update_time');
+
+  "insert"
+        Insert statment
+
+        $db->insert('test',
+               {
+                   name => 'tester',
+                   status => 0
+               }, time => 'date' );
+
+  "delete"
+       Delete statment : delete( table , hash );
+
+       $db->delete('test', { id => $db->last_id });
+       $db->delete('test', { id => 1 });
+
+  "extra_args"
+        Time : NOW() time in mysql format
+
+  "make_sen"
+        FIXME : Hacer con execute_prepare
+
+  "q"
+        Make Query
+
+  "execute_prepare"
+        Exute and prepare
+
+  "TableName"
+        Table name any character or _
+
+  "Exception"
+        Make a exception Carp()
+
+AUTHOR
+BUGS
+    Please report any bugs or feature requests to "bug-business-es-nif at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Fast>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBIx::Fast
+
+    You can also look for information at:
+
+    *  RT: CPAN's request tracker (report bugs here)
+
+       <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Fast>
+
+    *  MetaCPAN
+
+       <https://metacpan.org/pod/DBIx::Fast>
+
+    *  Search CPAN
+
+       <http://search.cpan.org/dist/DBIx-Fast/>
 
 LICENSE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
 
-Copyright (C) 2014 Harun Delgado
+    <http://www.perlfoundation.org/artistic_license_2_0>
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by the
+    Package. If you institute patent litigation (including a cross-claim or
+    counterclaim) against any party alleging that the Package constitutes
+    direct or contributory patent infringement, then this Artistic License
+    to you shall terminate on the date that such litigation is filed.
 
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

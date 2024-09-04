@@ -1767,6 +1767,12 @@ sub checkEndPointAuthenticationCredentials {
             "Relying Party $rp is public, do not check client secret");
     }
     else {
+        if ( $method eq "none" ) {
+            $self->logger->error(
+                "Relying Party $rp is confidential but no known method was used"
+                  . " to authenticate on token endpoint" );
+            return undef;
+        }
         if ( $method =~ /^client_secret_(?:basic|post)$/ ) {
             unless ($client_secret) {
                 $self->logger->error(

@@ -1,0 +1,72 @@
+---
+abstract: 'Bio::EnsEMBL - Ensembl Core API'
+author:
+  - 'Arne Becker <arne@example.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-EnsEMBL
+requires:
+  Bio::Annotation::DBLink: '0'
+  Bio::LocatableSeq: '0'
+  Bio::PrimarySeqI: '0'
+  Bio::Root::Root: '0'
+  Bio::Seq: '0'
+  Bio::SeqFeature::FeaturePair: '0'
+  Bio::SeqFeature::Generic: '0'
+  Bio::SimpleAlign: '0'
+  Bio::Species: '0'
+  Carp: '0'
+  Config::IniFiles: '0'
+  Cwd: '0'
+  DBI: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  English: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  HTTP::Tiny: '0'
+  IO::Compress::Bzip2: '0'
+  IO::Compress::Gzip: '0'
+  IO::Compress::Zip: '0'
+  IO::File: '0'
+  IO::Uncompress::Bunzip2: '0'
+  IO::Uncompress::Gunzip: '0'
+  IO::Uncompress::Unzip: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  POSIX: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Sys::Hostname: '0'
+  Text::Wrap: '0'
+  Tie::RefHash: '0'
+  Time::HiRes: '0'
+  URI::Escape: '0'
+  base: '0'
+  bytes: '0'
+  constant: '0'
+  integer: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Ensembl/ensembl/issues
+  homepage: http://www.ensembl.org
+  repository: git://github.com/Ensembl/ensembl.git
+version: 112.0.0
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Apache-2.0

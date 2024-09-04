@@ -76,7 +76,7 @@ use constant BACKSLASH    => q{\\};
 use Carp;
 use English    qw( -no_match_vars );
 use List::Util qw( min max first );    # min, max first are in Perl 5.8
-our $VERSION = '20240511';
+our $VERSION = '20240903';
 
 # The Tokenizer will be loaded with the Formatter
 ##use Perl::Tidy::Tokenizer;    # for is_keyword()
@@ -127,9 +127,9 @@ sub Fault {
     # except if there has been a bug introduced by a recent program change.
     # Please add comments at calls to Fault to explain why the call
     # should not occur, and where to look to fix it.
-    my ( $package0, $filename0, $line0, $subroutine0 ) = caller(0);
-    my ( $package1, $filename1, $line1, $subroutine1 ) = caller(1);
-    my ( $package2, $filename2, $line2, $subroutine2 ) = caller(2);
+    my ( $package0_uu, $filename0_uu, $line0,    $subroutine0_uu ) = caller(0);
+    my ( $package1_uu, $filename1,    $line1,    $subroutine1 )    = caller(1);
+    my ( $package2_uu, $filename2_uu, $line2_uu, $subroutine2 )    = caller(2);
     my $pkg = __PACKAGE__;
 
     my $input_stream_name = get_input_stream_name();
@@ -156,9 +156,9 @@ sub Fault_Warn {
 
     # This is the same as Fault except that it calls Warn instead of Die
     # and returns.
-    my ( $package0, $filename0, $line0, $subroutine0 ) = caller(0);
-    my ( $package1, $filename1, $line1, $subroutine1 ) = caller(1);
-    my ( $package2, $filename2, $line2, $subroutine2 ) = caller(2);
+    my ( $package0_uu, $filename0_uu, $line0,    $subroutine0_uu ) = caller(0);
+    my ( $package1_uu, $filename1,    $line1,    $subroutine1 )    = caller(1);
+    my ( $package2_uu, $filename2_uu, $line2_uu, $subroutine2 )    = caller(2);
     my $input_stream_name = get_input_stream_name();
 
     Warn(<<EOM);
@@ -202,6 +202,7 @@ my (
     $rOpts_add_newlines,
     $rOpts_add_whitespace,
     $rOpts_add_trailing_commas,
+    $rOpts_add_lone_trailing_commas,
     $rOpts_blank_lines_after_opening_block,
     $rOpts_block_brace_tightness,
     $rOpts_block_brace_vertical_tightness,
@@ -224,6 +225,7 @@ my (
     $rOpts_delete_old_whitespace,
     $rOpts_delete_side_comments,
     $rOpts_delete_trailing_commas,
+    $rOpts_delete_lone_trailing_commas,
     $rOpts_delete_weld_interfering_commas,
     $rOpts_extended_continuation_indentation,
     $rOpts_format_skipping,
@@ -310,6 +312,7 @@ my (
     %is_other_brace_follower,
     %is_kwU,
     %is_re_match_op,
+    %is_my_state_our,
 
     # INITIALIZER: sub check_options
     $controlled_comma_style,
@@ -389,12 +392,16 @@ my (
     %call_paren_style,
 
     # INITIALIZER: sub initialize_warn_variable_types
-    %warn_variable_types,
-    %is_warn_variable_excluded_name,
+    $rwarn_variable_types,
+    $ris_warn_variable_excluded_name,
 
     # INITIALIZER: sub initialize_warn_mismatched_args
-    %warn_mismatched_arg_types,
-    %is_warn_mismatched_arg_excluded_name,
+    $rwarn_mismatched_arg_types,
+    $ris_warn_mismatched_arg_excluded_name,
+
+    # INITIALIZER: sub initialize_warn_mismatched_returns
+    $rwarn_mismatched_return_types,
+    $ris_warn_mismatched_return_excluded_name,
 
     # regex patterns for text identification.
     # Most can be configured by user parameters.
@@ -446,6 +453,8 @@ my (
 
     # INITIALIZER: sub make_closing_side_comment_list_pattern
     $closing_side_comment_list_pattern,
+    $closing_side_comment_want_asub,
+    $closing_side_comment_exclusion_pattern,
 
     # Table to efficiently find indentation and max line length
     # from level.
@@ -594,6 +603,7 @@ BEGIN {
         _in_brace_tabbing_disagreement_    => $i++,
 
         _saw_VERSION_in_this_file_ => $i++,
+        _saw_use_strict_           => $i++,
         _saw_END_or_DATA_          => $i++,
 
         _rK_weld_left_         => $i++,
@@ -637,7 +647,10 @@ BEGIN {
         # these vars are defined after call to respace tokens:
         _rK_package_list_                 => $i++,
         _rK_AT_underscore_by_sub_seqno_   => $i++,
+        _rK_first_self_by_sub_seqno_      => $i++,
         _rK_bless_by_sub_seqno_           => $i++,
+        _rK_return_by_sub_seqno_          => $i++,
+        _rK_wantarray_by_sub_seqno_       => $i++,
         _rK_sub_by_seqno_                 => $i++,
         _ris_my_sub_by_seqno_             => $i++,
         _rsub_call_paren_info_by_seqno_   => $i++,
@@ -911,6 +924,9 @@ BEGIN {
     @q = qw( =~ !~);
     @is_re_match_op{@q} = (1) x scalar(@q);
 
+    @q = qw ( my state our );
+    @is_my_state_our{@q} = (1) x scalar(@q);
+
 } ## end BEGIN
 
 {    ## begin closure to count instances
@@ -987,6 +1003,7 @@ sub new {
     # Initialize the $self array reference.
     # To add an item, first add a constant index in the BEGIN block above.
     my $self = [];
+    bless $self, $class;
 
     # Basic data structures...
     $self->[_rlines_] = [];    # = ref to array of lines of the file
@@ -1026,9 +1043,14 @@ sub new {
 
     # Variables for --warn-mismatched-args and
     #               --dump-mismatched-args
+    #               --dump-mismatched-returns
+    #               --warn-mismatched-returns
     $self->[_rK_package_list_]                 = [];
     $self->[_rK_AT_underscore_by_sub_seqno_]   = {};
+    $self->[_rK_first_self_by_sub_seqno_]      = {};
     $self->[_rK_bless_by_sub_seqno_]           = {};
+    $self->[_rK_return_by_sub_seqno_]          = {};
+    $self->[_rK_wantarray_by_sub_seqno_]       = {};
     $self->[_rsub_call_paren_info_by_seqno_]   = {};
     $self->[_rDOLLAR_underscore_by_sub_seqno_] = {};
     $self->[_rK_sub_by_seqno_]                 = {};
@@ -1090,6 +1112,7 @@ sub new {
     $self->[_tabbing_disagreement_count_]      = 0;
     $self->[_in_tabbing_disagreement_]         = 0;
     $self->[_saw_VERSION_in_this_file_]        = !$rOpts->{'pass-version-line'};
+    $self->[_saw_use_strict_]                  = 0;
     $self->[_saw_END_or_DATA_]                 = 0;
     $self->[_first_brace_tabbing_disagreement_] = undef;
     $self->[_in_brace_tabbing_disagreement_]    = undef;
@@ -1154,8 +1177,6 @@ sub new {
             Fault("These indexes in self not initialized: (@non_existant)\n");
         }
     }
-
-    bless $self, $class;
 
     # Safety check..this is not a class yet
     if ( _increment_count() > 1 ) {
@@ -1448,6 +1469,198 @@ sub split_words {
     return split /\s+/, $str;
 } ## end sub split_words
 
+sub K_next_code {
+    my ( $self, $KK, $rLL ) = @_;
+
+    # return the index of the next nonblank, non-comment token after $KK
+    # Given:
+    #   $KK  = index of the token in $rLL
+    #   $rLL = optional array to use (default is $self->[_rLL_])
+    return if ( !defined($KK) );
+    return if ( $KK < 0 );
+
+    # use the standard array unless given otherwise
+    $rLL = $self->[_rLL_] if ( !defined($rLL) );
+    my $Num  = @{$rLL};
+    my $Knnb = $KK + 1;
+    while ( $Knnb < $Num ) {
+        if ( !defined( $rLL->[$Knnb] ) ) {
+
+            # We seem to have encountered a gap in our array.
+            # This shouldn't happen because sub write_line() pushed
+            # items into the $rLL array.
+            Fault("Undefined entry for k=$Knnb") if (DEVEL_MODE);
+            return;
+        }
+        my $type = $rLL->[$Knnb]->[_TYPE_];
+        if ( $type ne 'b' && $type ne '#' ) {
+            return $Knnb;
+        }
+        $Knnb++;
+    }
+    return;
+} ## end sub K_next_code
+
+sub K_next_nonblank {
+
+    my ( $self, $KK, $rLL ) = @_;
+
+    # Return the index of the next nonblank token after $KK, or
+    # return undef if none
+    # Given:
+    #   $KK  = index of the token in $rLL
+    #   $rLL = optional array to use (default is $self->[_rLL_])
+
+    # NOTE: does not skip over the leading type 'q' of a hanging side comment
+    # (use K_next_code)
+    return if ( !defined($KK) );
+    return if ( $KK < 0 );
+
+    # The third arg allows this routine to be used on any array.  This is
+    # useful in sub respace_tokens when we are copying tokens from an old $rLL
+    # to a new $rLL array.  But usually the third arg will not be given and we
+    # will just use the $rLL array in $self.
+    $rLL = $self->[_rLL_] if ( !defined($rLL) );
+    my $Num  = @{$rLL};
+    my $Knnb = $KK + 1;
+    return       if ( $Knnb >= $Num );
+    return $Knnb if ( $rLL->[$Knnb]->[_TYPE_] ne 'b' );
+    return       if ( ++$Knnb >= $Num );
+    return $Knnb if ( $rLL->[$Knnb]->[_TYPE_] ne 'b' );
+
+    # Backup loop. Very unlikely to get here; it means we have neighboring
+    # blanks in the token stream.
+    $Knnb++;
+    while ( $Knnb < $Num ) {
+
+        # Safety check, this fault shouldn't happen:  The $rLL array is the
+        # main array of tokens, so all entries should be used.  It is
+        # initialized in sub write_line, and then re-initialized by sub
+        # store_token() within sub respace_tokens.  Tokens are pushed on
+        # so there shouldn't be any gaps.
+        if ( !defined( $rLL->[$Knnb] ) ) {
+            Fault("Undefined entry for k=$Knnb") if (DEVEL_MODE);
+            return;
+        }
+        if ( $rLL->[$Knnb]->[_TYPE_] ne 'b' ) { return $Knnb }
+        $Knnb++;
+    }
+    return;
+} ## end sub K_next_nonblank
+
+sub K_previous_code {
+
+    my ( $self, $KK, $rLL ) = @_;
+
+    # Return the index of the previous nonblank, non-comment token before $KK
+    # Given:
+    #   $KK  = index of the token in $rLL
+    #   $rLL = optional array to use (default is $self->[_rLL_])
+    # Call with $KK=undef to start search at the top of the array
+
+    # use the standard array unless given otherwise
+    $rLL = $self->[_rLL_] unless ( defined($rLL) );
+    my $Num = @{$rLL};
+    if ( !defined($KK) ) { $KK = $Num }
+
+    if ( $KK > $Num ) {
+
+        # This fault can be caused by a programming error in which a bad $KK is
+        # given.  The caller should make the first call with KK_new=undef to
+        # avoid this error.
+        Fault(
+"Program Bug: K_previous_nonblank_new called with K=$KK which exceeds $Num"
+        ) if (DEVEL_MODE);
+        return;
+    }
+    my $Kpnb = $KK - 1;
+    while ( $Kpnb >= 0 ) {
+        my $type = $rLL->[$Kpnb]->[_TYPE_];
+        if (   $type ne 'b'
+            && $type ne '#' )
+        {
+            return $Kpnb;
+        }
+        $Kpnb--;
+    }
+    return;
+} ## end sub K_previous_code
+
+sub K_previous_nonblank {
+
+    my ( $self, $KK, $rLL ) = @_;
+
+    # Return index of previous nonblank token before item $KK;
+    # Given:
+    #   $KK  = index of the token in $rLL
+    #   $rLL = optional array to use (default is $self->[_rLL_])
+    # Call with $KK=undef to start search at the top of the array
+    # NOTE: does not skip over the leading type 'q' of a hanging side comment
+    # (use K_previous_code)
+
+    # use the standard array unless given otherwise
+    $rLL = $self->[_rLL_] unless ( defined($rLL) );
+    my $Num = @{$rLL};
+    if ( !defined($KK) ) { $KK = $Num }
+    if ( $KK > $Num ) {
+
+        # This fault can be caused by a programming error in which a bad $KK is
+        # given.  The caller should make the first call with KK_new=undef to
+        # avoid this error.
+        Fault(
+"Program Bug: K_previous_nonblank_new called with K=$KK which exceeds $Num"
+        ) if (DEVEL_MODE);
+        return;
+    }
+    my $Kpnb = $KK - 1;
+    return       if ( $Kpnb < 0 );
+    return $Kpnb if ( $rLL->[$Kpnb]->[_TYPE_] ne 'b' );
+    return       if ( --$Kpnb < 0 );
+    return $Kpnb if ( $rLL->[$Kpnb]->[_TYPE_] ne 'b' );
+
+    # Backup loop. We should not get here unless some routine
+    # slipped repeated blanks into the token stream.
+    return if ( --$Kpnb < 0 );
+    while ( $Kpnb >= 0 ) {
+        if ( $rLL->[$Kpnb]->[_TYPE_] ne 'b' ) { return $Kpnb }
+        $Kpnb--;
+    }
+    return;
+} ## end sub K_previous_nonblank
+
+sub K_first_code {
+    my ( $self, $rLL ) = @_;
+
+    # Given:
+    #   $rLL = optional token array to override default
+    # Return:
+    #   index $K of first non-blank, non-comment code token
+
+    $rLL = $self->[_rLL_] unless ( defined($rLL) );
+
+    return unless @{$rLL};
+    my $type = $rLL->[0]->[_TYPE_];
+    if ( $type ne 'b' && $type ne '#' ) { return 0 }
+    return $self->K_next_code(0);
+} ## end sub K_first_code
+
+sub K_last_code {
+    my ( $self, $rLL ) = @_;
+
+    # Given:
+    #   $rLL = optional token array to override default
+    # Return:
+    #   index of last non-blank, non-comment code token, or undef
+
+    $rLL = $self->[_rLL_] unless ( defined($rLL) );
+
+    return unless @{$rLL};
+    my $KK   = @{$rLL} - 1;
+    my $type = $rLL->[$KK]->[_TYPE_];
+    if ( $type ne 'b' && $type ne '#' ) { return $KK }
+    return $self->K_previous_code($KK);
+} ## end sub K_last_code
+
 ###########################################
 # CODE SECTION 3: Check and process options
 ###########################################
@@ -1456,7 +1669,7 @@ sub check_options {
 
     # This routine is called to check the user-supplied run parameters
     # and to configure the control hashes to them.
-    $rOpts = shift;
+    ( $rOpts, my $wvt_in_args, my $num_files, my $line_range_clipped ) = @_;
 
     initialize_whitespace_hashes();
 
@@ -1493,9 +1706,10 @@ sub check_options {
 
     initialize_call_paren_style();
 
-    initialize_warn_variable_types();
+    initialize_warn_variable_types( $wvt_in_args, $num_files,
+        $line_range_clipped );
 
-    initialize_warn_mismatched_args();
+    initialize_warn_mismatched();
 
     make_bli_pattern();
 
@@ -1520,7 +1734,9 @@ sub check_options {
     # dump, we can turn off indent-only to get these structures for a -dump.
     if ( $rOpts->{'indent-only'} ) {
 
-        if ( $rOpts->{'dump-mismatched-args'} ) {
+        if (   $rOpts->{'dump-mismatched-args'}
+            || $rOpts->{'dump-mismatched-returns'} )
+        {
             $rOpts->{'indent-only'} = 0;
         }
 
@@ -1980,7 +2196,7 @@ sub initialize_space_after_keyword {
 
     # default keywords for which space is introduced before an opening paren
     # (at present, including them messes up vertical alignment)
-    my @sak = qw(my local our and or xor err eq ne if else elsif until
+    my @sak = qw(my local our state and or xor err eq ne if else elsif until
       unless while for foreach return switch case given when catch);
     %space_after_keyword = map { $_ => 1 } @sak;
 
@@ -2128,7 +2344,7 @@ sub initialize_token_break_preferences {
             }
         }
         return;
-    };
+    }; ## end $break_after = sub
 
     my $break_before = sub {
         my @toks = @_;
@@ -2142,7 +2358,7 @@ sub initialize_token_break_preferences {
             }
         }
         return;
-    };
+    }; ## end $break_before = sub
 
     $break_after->(@all_operators) if ( $rOpts->{'break-after-all-operators'} );
     $break_before->(@all_operators)
@@ -2180,29 +2396,9 @@ sub initialize_token_break_preferences {
         $break_before_container_types{'('} = $_ if $_ && $_ > 0;
     }
 
-    #--------------------------------------------------------------
-    # The combination -lp -iob -vmll -bbx=2 can be unstable (b1266)
-    #--------------------------------------------------------------
-    # The -vmll and -lp parameters do not really work well together.
-    # To avoid instabilities, we will change any -bbx=2 to -bbx=1 (stable).
-    # NOTE: we could make this more precise by looking at any exclusion
-    # flags for -lp, and allowing -bbx=2 for excluded types.
-    if (   $rOpts->{'variable-maximum-line-length'}
-        && $rOpts->{'ignore-old-breakpoints'}
-        && $rOpts->{'line-up-parentheses'} )
-    {
-        my @changed;
-        foreach my $key ( keys %break_before_container_types ) {
-            if ( $break_before_container_types{$key} == 2 ) {
-                $break_before_container_types{$key} = 1;
-                push @changed, $key;
-            }
-        }
-        if (@changed) {
+    # Note: a fix for b1266 previously here is now covered by the
+    # updates for b1470, b1474, so it has been removed.
 
-            # we could write a warning here
-        }
-    }
     return;
 } ## end sub initialize_token_break_preferences
 
@@ -2538,9 +2734,10 @@ sub initialize_global_option_vars {
     # Make global vars for frequently used options for efficiency
     #------------------------------------------------------------
 
-    $rOpts_add_newlines        = $rOpts->{'add-newlines'};
-    $rOpts_add_trailing_commas = $rOpts->{'add-trailing-commas'};
-    $rOpts_add_whitespace      = $rOpts->{'add-whitespace'};
+    $rOpts_add_newlines             = $rOpts->{'add-newlines'};
+    $rOpts_add_trailing_commas      = $rOpts->{'add-trailing-commas'};
+    $rOpts_add_lone_trailing_commas = $rOpts->{'add-lone-trailing-commas'};
+    $rOpts_add_whitespace           = $rOpts->{'add-whitespace'};
     $rOpts_blank_lines_after_opening_block =
       $rOpts->{'blank-lines-after-opening-block'};
     $rOpts_block_brace_tightness = $rOpts->{'block-brace-tightness'};
@@ -2577,6 +2774,8 @@ sub initialize_global_option_vars {
       $rOpts->{'extended-continuation-indentation'};
     $rOpts_delete_side_comments   = $rOpts->{'delete-side-comments'};
     $rOpts_delete_trailing_commas = $rOpts->{'delete-trailing-commas'};
+    $rOpts_delete_lone_trailing_commas =
+      $rOpts->{'delete-lone-trailing-commas'};
     $rOpts_delete_weld_interfering_commas =
       $rOpts->{'delete-weld-interfering-commas'};
     $rOpts_format_skipping   = $rOpts->{'format-skipping'};
@@ -2972,13 +3171,13 @@ EOM
         $pos_last = pos($opt_style);
         if (
             $opt_style =~ m{
-             \G
+             \G(?:      #    fix git #142
                (\s+)    # 1. whitespace
              | ([\}\]]) # 2. closing bracket
              | (->)     # 3. arrow
              | ([\[\{]) # 4. opening bracket
              | (.*)     # 5. something else, error
-
+             )
             }gcx
           )
         {
@@ -3070,7 +3269,7 @@ sub initialize_whitespace_hashes {
     my @spaces_both_sides = qw#
       + - * / % ? = . : x < > | & ^ .. << >> ** && .. || // => += -=
       .= %= x= &= |= ^= *= <> <= >= == =~ !~ /= != ... <<= >>= ~~ !~~
-      **= &&= ||= //= <=> A k f w F n C Y U G v P S
+      **= &&= ||= //= <=> A k f w F n C Y U G v P S ^^
       #;
 
     my @spaces_left_side = qw<
@@ -3241,6 +3440,7 @@ sub set_whitespace_flags {
 
     my $j_tight_closing_paren = -1;
     my $rLL                   = $self->[_rLL_];
+    my $K_closing_container   = $self->[_K_closing_container_];
     my $jmax                  = @{$rLL} - 1;
 
     %opening_container_inside_ws = ();
@@ -3276,7 +3476,7 @@ sub set_whitespace_flags {
             $ws = $rOpts_space_signature_paren == 0 ? WS_NO : WS_YES;
         }
         return $ws;
-    };
+    }; ## end $ws_signature_paren = sub
 
     my $last_token = SPACE;
     my $last_type  = 'b';
@@ -3300,12 +3500,12 @@ sub set_whitespace_flags {
     # main loop over all tokens to define the whitespace flags
     my $last_type_is_opening;
     my $j = -1;
+    my $type;
     foreach my $rtokh ( @{$rLL} ) {
 
         $j++;
 
-        my $type = $rtokh->[_TYPE_];
-        if ( $type eq 'b' ) {
+        if ( ( $type = $rtokh->[_TYPE_] ) eq 'b' ) {
             $rwhitespace_flags->[$j] = WS_OPTIONAL;
             next;
         }
@@ -3319,7 +3519,6 @@ sub set_whitespace_flags {
         # Handle space on the inside of opening braces.
         #---------------------------------------------------------------
 
-        #    /^[L\{\(\[]$/
         if ($last_type_is_opening) {
 
             $last_type_is_opening = 0;
@@ -3368,7 +3567,9 @@ sub set_whitespace_flags {
                 # to bt=1.  Note that here we must set tightness=1 and not 2 so
                 # that the closing space is also avoided
                 # (via the $j_tight_closing_paren flag in coding)
-                if ( $type eq 'w' && $token =~ /^\^/ ) { $tightness_here = 1 }
+                if ( $type eq 'w' && substr( $token, 0, 1 ) eq '^' ) {
+                    $tightness_here = 1;
+                }
 
                 #=============================================================
 
@@ -3378,11 +3579,15 @@ sub set_whitespace_flags {
                 elsif ( $tightness_here > 1 ) {
                     $ws = WS_NO;
                 }
+                elsif ( $token eq '<<>>' ) {
+
+                    # double diamond is usually spaced
+                    $ws = WS_YES;
+                }
                 else {
 
                     # find the index of the closing token
-                    my $j_closing =
-                      $self->[_K_closing_container_]->{$last_seqno};
+                    my $j_closing = $K_closing_container->{$last_seqno};
 
                     # If the closing token is less than five characters ahead
                     # we must take a closer look
@@ -3391,11 +3596,20 @@ sub set_whitespace_flags {
                         && $rLL->[$j_closing]->[_TYPE_SEQUENCE_] eq
                         $last_seqno )
                     {
-                        $ws =
-                          ws_in_container( $j, $j_closing, $rLL, $type, $token,
-                            $last_token );
-                        if ( $ws == WS_NO ) {
+                        # quick check
+                        if ( $j + 1 >= $j_closing ) {
+                            $ws                    = WS_NO;
                             $j_tight_closing_paren = $j_closing;
+                        }
+
+                        # slow check
+                        else {
+                            $ws =
+                              ws_in_container( $j, $j_closing, $rLL, $type,
+                                $token, $last_token );
+                            if ( $ws == WS_NO ) {
+                                $j_tight_closing_paren = $j_closing;
+                            }
                         }
                     }
                     else {
@@ -3543,7 +3757,6 @@ sub set_whitespace_flags {
         #---------------------------------------------------------------
         # Whitespace Rules Section 4:
         #---------------------------------------------------------------
-        #    /^[L\{\(\[]$/
         elsif ( $is_opening_type{$type} ) {
 
             $last_type_is_opening = 1;
@@ -3861,22 +4074,25 @@ sub ws_in_container {
     #  WS_NO  if there is just one token in the container (with exceptions)
     #  WS_YES otherwise
 
-    #------------------------------------
-    # Look forward for the closing token;
-    #------------------------------------
-    if ( $j + 1 > $j_closing ) { return WS_NO }
+    # double diamond is usually spaced
+    if ( $token eq '<<>>' ) { return WS_YES }
 
-    # Patch to count '-foo' as single token so that
-    # each of  $a{-foo} and $a{foo} and $a{'foo'} do
-    # not get spaces with default formatting.
+    # quick check
+    if ( $j + 1 >= $j_closing ) { return WS_NO }
+
+    # special cases...
+
+    # Count '-foo' as single token so that each of
+    #    $a{-foo} and $a{foo} and $a{'foo'}
+    # do not get spaces with default formatting.
     my $j_here = $j;
     ++$j_here
       if ( $token eq '-'
         && $last_token eq '{'
         && $rLL->[ $j + 1 ]->[_TYPE_] eq 'w' );
 
-    # Patch to count a sign separated from a number as a single token, as
-    # in the following line. Otherwise, it takes two steps to converge:
+    # Count a sign separated from a number as a single token, as in the
+    # following line. Otherwise, it takes two steps to converge:
     #    deg2rad(-  0.5)
     if (   ( $type eq 'm' || $type eq 'p' )
         && $j < $j_closing + 1
@@ -3887,33 +4103,16 @@ sub ws_in_container {
         $j_here = $j + 2;
     }
 
-    # $j_next is where a closing token should be if the container has
-    # just a "single" token
-    if ( $j_here + 1 > $j_closing ) { return WS_NO }
+    # recheck..
+    if ( $j_here + 1 >= $j_closing ) { return WS_NO }
+
+    # check for a blank after the first token
     my $j_next =
       ( $rLL->[ $j_here + 1 ]->[_TYPE_] eq 'b' )
       ? $j_here + 2
       : $j_here + 1;
 
-    #-----------------------------------------------------------------
-    # Now decide: if we get to the closing token we will keep it tight
-    #-----------------------------------------------------------------
-    if (
-        $j_next == $j_closing
-
-        # OLD PROBLEM: but watch out for this: [ [ ]    (misc.t)
-        # No longer necessary because of the previous check on sequence numbers
-        ##&& $last_token ne $token
-
-        # double diamond is usually spaced
-        && $token ne '<<>>'
-
-      )
-    {
-        return WS_NO;
-    }
-
-    return WS_YES;
+    return $j_next == $j_closing ? WS_NO : WS_YES;
 
 } ## end sub ws_in_container
 
@@ -4017,7 +4216,7 @@ EOM
 
         @q = qw(
           .. :: << >> ** && || // -> => += -= .= %= &= |= ^= *= <>
-          <= >= == =~ !~ != ++ -- /= x= ~~ ~. |. &. ^.
+          <= >= == =~ !~ != ++ -- /= x= ~~ ~. |. &. ^. ^^
         );
         @is_digraph{@q} = (1) x scalar(@q);
 
@@ -4641,6 +4840,12 @@ EOM
         # set strength of && a little higher than ||
         $right_bond_strength{'&&'} = NOMINAL;
         $left_bond_strength{'&&'}  = $left_bond_strength{'||'} + 0.1;
+
+        # set strength of ^^ between && and ||. See git157.
+        # "1 || 0 ^^ 0 || 1" = true, so ^^ is stronger than ||
+        # "1 ^^ 1 && 0" = true,      so && is stronger than ^^
+        $right_bond_strength{'^^'} = NOMINAL;
+        $left_bond_strength{'^^'}  = $left_bond_strength{'||'} + 0.05;
 
         $left_bond_strength{';'}  = VERY_STRONG;
         $right_bond_strength{';'} = VERY_WEAK;
@@ -5434,7 +5639,7 @@ sub bad_pattern {
 
     # See if a pattern will compile.
     # Note: this sub is also called from Tokenizer
-    my $regex = eval { qr/$pattern/ };
+    my $regex_uu = eval { qr/$pattern/ };
     return $EVAL_ERROR;
 } ## end sub bad_pattern
 
@@ -5687,11 +5892,28 @@ sub make_closing_side_comment_list_pattern {
 
     # turn any input list into a regex for recognizing selected block types
     $closing_side_comment_list_pattern = '^\w+';
-    if ( defined( $rOpts->{'closing-side-comment-list'} )
-        && $rOpts->{'closing-side-comment-list'} )
-    {
+
+    # '1' is an impossible block name
+    $closing_side_comment_exclusion_pattern = '^1';
+
+    # Need a separate flag for anonymous subs because they are the only
+    # types where the side comment might follow a ';'
+    $closing_side_comment_want_asub = 1;
+
+    my $cscl = $rOpts->{'closing-side-comment-list'};
+    if ( defined($cscl) && $cscl ) {
         $closing_side_comment_list_pattern =
-          make_block_pattern( '-cscl', $rOpts->{'closing-side-comment-list'} );
+          make_block_pattern( '-cscl', $cscl );
+        $closing_side_comment_want_asub = $cscl =~ /\basub\b/;
+    }
+
+    my $cscxl = $rOpts->{'closing-side-comment-exclusion-list'};
+    if ( defined($cscxl) && $cscxl ) {
+        $closing_side_comment_exclusion_pattern =
+          make_block_pattern( '-cscxl', $cscxl );
+        if ( $cscxl =~ /\basub\b/ ) {
+            $closing_side_comment_want_asub = 0;
+        }
     }
     return;
 } ## end sub make_closing_side_comment_list_pattern
@@ -5814,39 +6036,47 @@ sub make_bl_pattern {
     my $bl_list_string           = '*';
     my $bl_exclusion_list_string = 'sort map grep eval asub';
 
-    if ( defined( $rOpts->{'brace-left-list'} )
-        && $rOpts->{'brace-left-list'} )
-    {
-        $bl_list_string = $rOpts->{'brace-left-list'};
+    my $bl_long_name   = 'opening-brace-on-new-line';
+    my $bll_long_name  = 'brace-left-list';
+    my $blxl_long_name = 'brace-left-exclusion-list';
+    my $sbl_long_name  = 'opening-sub-brace-on-new-line';
+    my $asbl_long_name = 'opening-anonymous-sub-brace-on-new-line';
+
+    if ( defined( $rOpts->{$bll_long_name} ) && $rOpts->{$bll_long_name} ) {
+        $bl_list_string = $rOpts->{$bll_long_name};
     }
     if ( $bl_list_string =~ /\bsub\b/ ) {
-        $rOpts->{'opening-sub-brace-on-new-line'} ||=
-          $rOpts->{'opening-brace-on-new-line'};
+        $rOpts->{$sbl_long_name} ||= $rOpts->{$bl_long_name};
     }
     if ( $bl_list_string =~ /\basub\b/ ) {
-        $rOpts->{'opening-anonymous-sub-brace-on-new-line'} ||=
-          $rOpts->{'opening-brace-on-new-line'};
+        $rOpts->{$asbl_long_name} ||= $rOpts->{$bl_long_name};
     }
 
     $bl_pattern = make_block_pattern( '-bll', $bl_list_string );
 
     # for -bl, a list with '*' turns on -sbl and -asbl
     if ( $bl_pattern =~ /\.\*/ ) {
-        $rOpts->{'opening-sub-brace-on-new-line'} ||=
-          $rOpts->{'opening-brace-on-new-line'};
-        $rOpts->{'opening-anonymous-sub-brace-on-new-line'} ||=
-          $rOpts->{'opening-anonymous-brace-on-new-line'};
+
+        if ( !defined( $rOpts->{$sbl_long_name} ) ) {
+            $rOpts->{$sbl_long_name} = $rOpts->{$bl_long_name};
+        }
+
+        if (  !defined( $rOpts->{$asbl_long_name} )
+            && defined( $rOpts->{$bll_long_name} ) )
+        {
+            $rOpts->{$asbl_long_name} = $rOpts->{$bl_long_name};
+        }
     }
 
-    if ( defined( $rOpts->{'brace-left-exclusion-list'} )
-        && $rOpts->{'brace-left-exclusion-list'} )
+    if ( defined( $rOpts->{$blxl_long_name} )
+        && $rOpts->{$blxl_long_name} )
     {
-        $bl_exclusion_list_string = $rOpts->{'brace-left-exclusion-list'};
+        $bl_exclusion_list_string = $rOpts->{$blxl_long_name};
         if ( $bl_exclusion_list_string =~ /\bsub\b/ ) {
-            $rOpts->{'opening-sub-brace-on-new-line'} = 0;
+            $rOpts->{$sbl_long_name} = 0;
         }
         if ( $bl_exclusion_list_string =~ /\basub\b/ ) {
-            $rOpts->{'opening-anonymous-sub-brace-on-new-line'} = 0;
+            $rOpts->{$asbl_long_name} = 0;
         }
     }
 
@@ -6635,15 +6865,23 @@ EOM
     # Act on -warn-variable-types if requested and the logger is available
     # (the logger is deactivated during iterations)
     $self->warn_variable_types()
-      if ( %warn_variable_types
+      if ( %{$rwarn_variable_types}
         && $self->[_logger_object_] );
 
-    $self->warn_mismatched_args()
-      if ( $rOpts->{'warn-mismatched-args'}
-        && $self->[_logger_object_] );
+    if (   $rOpts->{'warn-mismatched-args'}
+        || $rOpts->{'warn-mismatched-returns'} )
+    {
+        $self->warn_mismatched()
+          if ( $self->[_logger_object_] );
+    }
 
     if ( $rOpts->{'dump-mismatched-args'} ) {
         $self->dump_mismatched_args();
+        Exit(0);
+    }
+
+    if ( $rOpts->{'dump-mismatched-returns'} ) {
+        $self->dump_mismatched_returns();
         Exit(0);
     }
 
@@ -6810,7 +7048,7 @@ sub find_loop_label {
         last if ( $line_type ne 'CODE' );
 
         my $rK_range = $line_of_tokens->{_rK_range};
-        my ( $Kfirst, $Klast ) = @{$rK_range};
+        my ( $Kfirst, $Klast_uu ) = @{$rK_range};
 
         # skip a blank line
         next if ( !defined($Kfirst) );
@@ -7056,7 +7294,7 @@ EOM
                 }
             }
             my $rarg = { seqno => $seqno };
-            $self->count_sub_args($rarg);
+            $self->count_sub_input_args($rarg);
             my $count = $rarg->{shift_count_min};
             if ( !defined($count) ) { $count = '*' }
 
@@ -7076,7 +7314,7 @@ EOM
             $name =~ s/\(.*$//;
 
             my $rarg = { seqno => $seqno };
-            $self->count_sub_args($rarg);
+            $self->count_sub_input_args($rarg);
             my $count = $rarg->{shift_count_min};
             if ( !defined($count) ) { $count = '*' }
 
@@ -7554,7 +7792,7 @@ sub set_ci {
             return $is_block_with_ci{$block_type};
         }
         return;
-    };
+    }; ## end $map_block_follows = sub
 
     my $redo_preceding_comment_ci = sub {
 
@@ -7568,7 +7806,7 @@ sub set_ci {
             }
         }
         return;
-    };
+    }; ## end $redo_preceding_comment_ci = sub
 
     # Definitions of the sequence of ci_values being maintained:
     # $ci_last      = the ci value of the previous non-blank, non-comment token
@@ -7583,12 +7821,11 @@ sub set_ci {
     foreach my $rtoken_K ( @{$rLL} ) {
 
         $KK++;
-        $type = $rtoken_K->[_TYPE_];
 
         #------------------
         # Section 1. Blanks
         #------------------
-        if ( $type eq 'b' ) {
+        if ( ( $type = $rtoken_K->[_TYPE_] ) eq 'b' ) {
 
             $rtoken_K->[_CI_LEVEL_] = $ci_next;
 
@@ -8467,7 +8704,7 @@ sub set_CODE_type {
                 $CODE_type = $no_leading_space ? 'SBCX' : 'SBC';
                 next;
             }
-            elsif ($last_line_had_side_comment
+            elsif ( $last_line_had_side_comment
                 && !$rOpts_maximum_consecutive_blank_lines
                 && $rLL->[$Kfirst]->[_LEVEL_] > 0 )
             {
@@ -8544,6 +8781,404 @@ sub set_CODE_type {
     return \@ix_side_comments;
 } ## end sub set_CODE_type
 
+sub block_seqno_of_paren_keyword {
+
+    my ( $self, $KK ) = @_;
+
+    # Find brace at '){' after keyword such as for, foreach, ...
+    # SEE ALSO: sub block_seqno_of_paren_seqno
+
+    # Given:
+    #   $KK = index of a keyword followed by parens and block '... ( ) {'
+    #         such as 'for', 'foreach', 'while', 'if', 'elsif' ..
+    # Return:
+    #   $seqno of the opening block brace for this keyword, if any
+    #   $K_end_iterator = index of the last token of an iterator, if any
+    # or
+    #   nothing if not found
+
+    #         'for my $var (..) { ... }'
+    #           ^               ^
+    #           |               |
+    #           --$KK           --$seqno of brace that we want
+
+    my $rLL = $self->[_rLL_];
+
+    # look ahead for an opening paren
+    my $K_paren = $self->[_rK_next_seqno_by_K_]->[$KK];
+    return unless defined($K_paren);
+    my $token_paren = $rLL->[$K_paren]->[_TOKEN_];
+    return unless ( $token_paren eq '(' );
+
+    # found a paren, but does it belong to this keyword?
+    my $seqno_paren = $rLL->[$K_paren]->[_TYPE_SEQUENCE_];
+
+    # see if this opening paren immediately follows the keyword
+    my $K_n = $self->K_next_code($KK);
+    return unless $K_n;
+
+    # is it the next token? this is the common case
+    my $K_end_iterator;
+    my $saw_my;
+    my $token_KK = $rLL->[$KK]->[_TOKEN_];
+    if ( $K_n != $K_paren ) {
+
+        # look for 'for $var (', 'for my $var (', 'for my (', 'for $var ('
+        if ( $is_for_foreach{$token_KK} ) {
+            my $type_K_n  = $rLL->[$K_n]->[_TYPE_];
+            my $token_K_n = $rLL->[$K_n]->[_TOKEN_];
+
+            # skip past a 'my'
+            if ( $type_K_n eq 'k' ) {
+                if ( $is_my_state_our{$token_K_n} ) {
+                    $K_n    = $self->K_next_code($K_n);
+                    $saw_my = 1;
+                }
+                else { return }
+            }
+
+            # skip an identifier
+            if ( $K_n && $K_n != $K_paren && $rLL->[$K_n]->[_TYPE_] eq 'i' ) {
+                $K_n = $self->K_next_code($K_n);
+
+                # force this iterator to be entered as new lexical
+                $K_end_iterator = $K_paren;
+            }
+        }
+    }
+
+    # we must be at the paren
+    return unless ( $K_n && $K_n == $K_paren );
+
+    # now jump to the closing paren
+    $K_paren = $self->[_K_closing_container_]->{$seqno_paren};
+
+    # then look for the opening brace immediately after it
+    my $K_brace = $self->K_next_code($K_paren);
+    return unless ($K_brace);
+
+    # check for experimental 'for list': for my ( $a, $b) (@list) {
+    #                                              ^
+    if (   $rLL->[$K_brace]->[_TOKEN_] eq '('
+        && !$K_end_iterator
+        && $is_for_foreach{$token_KK} )
+    {
+        if ( !$saw_my ) { $K_end_iterator = $K_brace }
+        my $seqno_test = $rLL->[$K_brace]->[_TYPE_SEQUENCE_];
+        my $K_test     = $self->[_K_closing_container_]->{$seqno_test};
+        return unless $K_test;
+        $K_brace = $self->K_next_code($K_test);
+        return unless ($K_brace);
+    }
+
+    return unless ( $rLL->[$K_brace]->[_TOKEN_] eq '{' );
+    my $seqno_brace = $rLL->[$K_brace]->[_TYPE_SEQUENCE_];
+    return unless ($seqno_brace);
+    my $block_type = $self->[_rblock_type_of_seqno_]->{$seqno_brace};
+
+    # Verify that this is the correct brace
+    if ( $block_type ne $token_KK ) {
+
+        # If not, this is unexpected and should be investigated
+        # (the block type may have been mis-marked)
+        my $lno = $rLL->[$KK]->[_LINE_INDEX_] + 1;
+        DEVEL_MODE && Fault(<<EOM);
+at line $lno: found block type $block_type: expecting $token_KK - please check
+EOM
+        return;
+    }
+
+    return ( $seqno_brace, $K_end_iterator );
+} ## end sub block_seqno_of_paren_keyword
+
+sub has_complete_package {
+    my ($self) = @_;
+
+    # return true if this file appears to contain at least one complete package
+
+    my $Klast = $self->K_last_code();
+    return unless defined($Klast);
+
+    my $rLL = $self->[_rLL_];
+
+    my $rK_package_list = $self->[_rK_package_list_];
+    return unless ( defined($rK_package_list) && @{$rK_package_list} );
+
+    # look for a file like this:
+    # package A::B
+    # ...
+    # 1;
+
+    my $KK   = $rK_package_list->[0];
+    my $item = $rLL->[$KK];
+    my $type = $item->[_TYPE_];
+
+    # Stored K values may be off by 1 due to an added blank
+    if ( $type eq 'b' ) {
+        $KK += 1;
+        $item = $rLL->[$KK];
+        $type = $item->[_TYPE_];
+    }
+
+    # safety check - shouldn't happen
+    return unless ( $type eq 'P' );
+    my $level = $item->[_LEVEL_];
+    return unless ( $level == 0 );
+
+    # Look for '1;' at next package, if any, and at end of file
+    my @K_semicolon_test = ($Klast);
+    if ( @{$rK_package_list} > 1 ) {
+        my $K_package = $rK_package_list->[1];
+        my $Ktest     = $self->K_previous_code($K_package);
+        push @K_semicolon_test, $Ktest;
+    }
+
+    foreach my $Ktest (@K_semicolon_test) {
+        if ( $rLL->[$Ktest]->[_TYPE_] eq 'b' ) { $Ktest -= 1 }
+        if ( $Ktest > $KK && $Ktest && $rLL->[$Ktest]->[_TYPE_] eq ';' ) {
+            my $K1 = $self->K_previous_code($Ktest);
+            if ( $K1 && $rLL->[$K1]->[_TOKEN_] eq '1' ) {
+                return 1;
+            }
+        }
+    }
+    return;
+} ## end sub has_complete_package
+
+sub is_complete_script {
+    my ( $self, $rline_type_count, $rkeyword_count ) = @_;
+
+    # Guess if we are formatting a complete script
+    # Return: true or false
+
+    # Goal: help decide if we should skip certain warning checks when
+    # operating on just part of a script (such as from an editor).
+
+    #----------------------------------------------------------------
+    # TEST 1: Assume a file with known extension is a complete script
+    #----------------------------------------------------------------
+    my %is_standard_file_extension = (
+        'pm'  => 1,
+        'pl'  => 1,
+        'plx' => 1,
+        't'   => 1,
+    );
+    my $input_stream_name = get_input_stream_name();
+
+    # look for a file extension
+    my $pos_dot        = rindex( $input_stream_name, '.' );
+    my $file_extension = EMPTY_STRING;
+    if ( $pos_dot > 0 ) {
+        $file_extension = substr( $input_stream_name, $pos_dot + 1 );
+
+        # allow additional digits, like .pm.0, .pm.1 etc
+        if (   defined($file_extension)
+            && length($file_extension)
+            && $file_extension =~ /^\d+$/ )
+        {
+            my $str = substr( $input_stream_name, 0, $pos_dot );
+            $pos_dot = rindex( $str, '.' );
+            if ( $pos_dot > 0 ) {
+                $file_extension = substr( $str, $pos_dot + 1 );
+            }
+        }
+
+        return 1 if $is_standard_file_extension{ lc($file_extension) };
+    }
+
+    #-------------------------------------------------------------
+    # TEST 2: a positive starting level implies an incomplete script
+    #-------------------------------------------------------------
+    my $rLL = $self->[_rLL_];
+    return unless ( @{$rLL} );
+    my $sil = $rLL->[0]->[_LEVEL_];
+    return if ($sil);
+
+    #------------------------------------
+    # TEST 3: look for a complete package
+    #------------------------------------
+    return 1 if $self->has_complete_package();
+
+    #----------------------------
+    # TEST 4: examine other clues
+    #----------------------------
+    my $rlines     = $self->[_rlines_];
+    my $line_count = @{$rlines};
+    return unless ($line_count);
+
+    my $input_line    = $rlines->[0]->{_line_text};
+    my $saw_hash_bang = substr( $input_line, 0, 2 ) eq '#!'
+      && $input_line =~ /^\#\!.*perl\b/;
+
+    my $rK_package_list = $self->[_rK_package_list_];
+    my $saw_package     = defined($rK_package_list) && @{$rK_package_list};
+    my $sub_count       = +keys %{ $self->[_ris_sub_block_] };
+    my $use_count       = 0;
+    $use_count += $rkeyword_count->{use}     if $rkeyword_count->{use};
+    $use_count += $rkeyword_count->{require} if $rkeyword_count->{require};
+
+    # Make a guess using the available clues. No single clue is conclusive.
+    my $score = 0;
+
+    # starting indicators
+    $score += 50
+      if ( $saw_hash_bang
+        || $self->[_saw_use_strict_]
+        || $saw_package );
+
+    $score +=
+        $use_count > 1 ? 50
+      : $use_count > 0 ? 25
+      :                  0;
+
+    # interior indicators
+    $score +=
+        $line_count > 50 ? 50
+      : $line_count > 25 ? 25
+      :                    0;
+    $score +=
+        $sub_count > 1 ? 50
+      : $sub_count > 0 ? 25
+      :                  0;
+
+    # common filter keywords
+    foreach (qw(exit print printf open system exec die)) {
+        if ( $rkeyword_count->{$_} ) { $score += 50; last; }
+    }
+
+    $score += 50 if $rline_type_count->{POD};
+
+    # ending indicator
+    $score += 50 if $self->[_saw_END_or_DATA_];
+
+    if ( $score >= 100 ) { return 1 }
+    return;
+} ## end sub is_complete_script
+
+use constant DEBUG_USE_CONSTANT => 0;
+
+sub get_qw_list {
+    my ( $self, $Kn ) = @_;
+
+    # Given:
+    #  $Kn = index of start of a qw quote
+    # Return:
+    #  ($K_last_q, \@list) to list of words, or
+    #  nothing if error
+
+    my $rLL = $self->[_rLL_];
+    return unless ($Kn);
+    my $type_n = $rLL->[$Kn]->[_TYPE_];
+    return unless ( $type_n eq 'q' );
+    my $token_n  = $rLL->[$Kn]->[_TOKEN_];
+    my $K_last_q = $Kn;
+
+    # collect a multi-line qw
+    my $string = $token_n;
+    foreach my $Knn ( $Kn + 1 .. @{$rLL} - 1 ) {
+        my $type_nn = $rLL->[$Knn]->[_TYPE_];
+        next if ( $type_nn eq 'b' );
+        last if ( $type_nn ne 'q' );
+        $string .= SPACE . $rLL->[$Knn]->[_TOKEN_];
+        $K_last_q = $Knn;
+    }
+
+    $string = substr( $string, 2 );        # remove qw
+    $string =~ s/^\s*//;                   # trim left
+    $string = substr( $string, 1 );        # remove opening mark char
+    $string = substr( $string, 0, -1 );    # remove closing mark char
+    $string =~ s/^\s*//;                   # trim left
+    $string =~ s/\s*$//;                   # trim right
+
+    my @list = split /\s+/, $string;
+    return ( $K_last_q, \@list );
+} ## end sub get_qw_list
+
+sub expand_quoted_word_list {
+    my ( $self, $Kbeg ) = @_;
+
+    # Expand a list quoted words
+    # Given:
+    #   $Kbeg = index of the start of a list of quoted words
+    # Returns:
+    #   ref to list if found words
+    #   undef if not successful, or non-constant list item encountered
+    my $rLL = $self->[_rLL_];
+    return unless ($Kbeg);
+    my $Klimit = @{$rLL} - 1;
+    my @list;
+    my $Kn = $Kbeg - 1;
+    while ( ++$Kn <= $Klimit ) {
+
+        my $type  = $rLL->[$Kn]->[_TYPE_];
+        my $token = $rLL->[$Kn]->[_TOKEN_];
+
+        next if ( $type eq 'b' );
+        next if ( $type eq '#' );
+        next if ( $token eq '(' );
+        next if ( $token eq ')' );
+        next if ( $token eq ',' );
+        last if ( $type eq ';' );
+        last if ( $token eq '}' );
+
+        if ( $type eq 'q' ) {
+
+            # qw list
+            my ( $K_last_q, $rlist ) = $self->get_qw_list($Kn);
+            return if ( !defined($K_last_q) );
+            if ( $K_last_q > $Kn ) { $Kn = $K_last_q }
+            push @list, @{$rlist};
+        }
+        elsif ( $type eq 'Q' ) {
+
+            # single quoted word
+            next if ( length($token) < 3 );
+            my $name = substr( $token, 1, -1 );
+            push @list, $name;
+        }
+
+        else {
+
+            # Give up on anything else..
+            # some examples where we have to quit:
+            #  @EXPORT = Archive::Tar::Constant->_list_consts( __PACKAGE__ );
+            #  @EXPORT = ( @CONSTANTS, qw( %ALL_CODESETS));
+            #  @EXPORT = ( @{$EXPORT_TAGS{standard}}, ..
+            return;
+        }
+    }
+    return \@list;
+
+} ## end sub expand_quoted_word_list
+
+sub expand_EXPORT_list {
+    my ( $self, $KK, $rhash ) = @_;
+
+    # Given:
+    #  $KK = index of variable @EXPORT or @EXPORT_OK
+    #  $rhash = a hash to fill
+    # Task:
+    #  Update $rhash with any quoted words which follow any subsequent '='
+
+    my $rLL = $self->[_rLL_];
+    my $Kn  = $self->K_next_code($KK);
+
+    # Require a following '='
+    return unless ( $Kn && $rLL->[$Kn]->[_TYPE_] eq '=' );
+
+    # Move to the next token
+    $Kn = $self->K_next_code($Kn);
+    return unless ($Kn);
+
+    # Get any list
+    my $rlist = $self->expand_quoted_word_list($Kn);
+    return unless ($rlist);
+
+    # Include the listed words in the hash
+    foreach ( @{$rlist} ) { $rhash->{$_} = 1 }
+    return;
+} ## end sub expand_EXPORT_list
+
 sub scan_variable_usage {
 
     my ( $self, $roption ) = @_;
@@ -8569,15 +9204,36 @@ sub scan_variable_usage {
     #            see_line    => $see_line,    # line referenced in note
     #          };
 
-    # issues are indicated by these names:
-    #  u - unused
-    #  r - reused scope
-    #  s - reused sigil
-    #  p - package boundaries crossed
+    my $rLL                  = $self->[_rLL_];
+    my $rlines               = $self->[_rlines_];
+    my $rblock_type_of_seqno = $self->[_rblock_type_of_seqno_];
+    my $ris_sub_block        = $self->[_ris_sub_block_];
+    my $K_closing_container  = $self->[_K_closing_container_];
 
-    # Default is to do all checks if no control hash received
+    # check for file without code (could be all pod or comments)
+    return unless defined( $self->K_first_code() );
+
+    # issues are indicated by these names:
+    my %unusual_variable_issue_note = (
+        c => "unused constant",
+        p => "package crossing",
+        r => "reused",
+        s => "multi-sigil",
+        u => "unused lexical",
+    );
+
+    # Default is to do all checks if no control hash received (dump mode)
     if ( !defined($roption) ) {
-        $roption = { 'r' => 1, 's' => 1, 'p' => 1, 'u' => 1 };
+        foreach my $key ( keys %unusual_variable_issue_note ) {
+            $roption->{$key} = 1;
+        }
+    }
+
+    my $issue_type_string = "Issue types are";
+    foreach my $letter ( reverse sort keys %unusual_variable_issue_note ) {
+        next if ( !$roption->{$letter} );
+        my $txt = $unusual_variable_issue_note{$letter};
+        $issue_type_string .= " '$letter'=$txt";
     }
 
     # Unpack the control hash
@@ -8585,19 +9241,12 @@ sub scan_variable_usage {
     my $check_cross_package = $roption->{'p'};
     my $check_unused        = $roption->{'u'};
     my $check_reused        = $roption->{'r'};
+    my $check_constant      = $roption->{'c'};
 
-    my $rLL                  = $self->[_rLL_];
-    my $rlines               = $self->[_rlines_];
-    my $rblock_type_of_seqno = $self->[_rblock_type_of_seqno_];
-    my $ris_sub_block        = $self->[_ris_sub_block_];
-    my $K_closing_container  = $self->[_K_closing_container_];
-    my $rK_next_seqno_by_K   = $self->[_rK_next_seqno_by_K_];
-
-    my %is_my_state    = ( 'my' => 1, 'state' => 1 );
-    my %is_valid_sigil = ( '$'  => 1, '@'     => 1, '%' => 1 );
+    my %is_valid_sigil = ( '$' => 1, '@' => 1, '%' => 1 );
 
     # Variables defining current state:
-    my $current_package = 'package main';
+    my $current_package = 'main';
 
     # The basic idea of this routine is straightforward:
     # - We create a stack of block braces
@@ -8614,11 +9263,14 @@ sub scan_variable_usage {
 
     # There are lots of details, but that's the main idea. A difficulty is
     # when 'my' vars are created in the control section of blocks such as
-    # for, foreach, if, unless, .. These follow special rules. The
+    # for, foreach, if, unless, .. these follow special rules. The
     # way it is done here is to propagate such vars in a special control
     # layer stack entry which is pushed on just before these blocks.
 
-    my $rblock_stack = [];
+    my $rblock_stack   = [];
+    my $rconstant_hash = {};
+    my $ruse_vars_hash = {};
+    my $rEXPORT_hash   = {};
 
     #---------------------------------------
     # sub to push a block brace on the stack
@@ -8636,7 +9288,7 @@ sub scan_variable_usage {
         push @{$rblock_stack},
           { seqno => $seqno, package => $current_package, rvars => $rvars };
         return;
-    };
+    }; ## end $push_block_stack = sub
 
     $push_block_stack->(SEQ_ROOT);
 
@@ -8657,38 +9309,53 @@ sub scan_variable_usage {
     #   $package = what package was in effect when it was defined
     #   $KK = token index (for sorting)
 
-    # Variables for a batch of lexical varis being collected:
-    my $my_keyword;                # 'state' or 'my' keyword for this set
-    my $K_end_my          = -1;    # max token index of this set
-    my $my_starting_count = 0;     # the initial token count for this set
+    # Variables for a batch of lexical vars being collected:
+    my $my_keyword;                 # 'state' or 'my' keyword for this set
+    my $K_end_my           = -1;    # max token index of this set
+    my $in_signature_seqno = 0;     # true while scanning a signature
+    my $my_starting_count  = 0;     # the initial token count for this set
 
     # Variables for warning messages:
-    my @warnings;                  # array of warning messages
-    my %package_warnings;          # warning messages for package cross-over
-    my %sub_count_by_package;      # how many subs defined in a package
+    my @warnings;                   # array of warning messages
+    my %package_warnings;           # warning messages for package cross-over
+    my %sub_count_by_package;       # how many subs defined in a package
 
     # Variables for scanning interpolated quotes:
-    my $ix_HERE_END = -1;          # the line index of the last here target read
-    my $in_interpolated_quote;     # in multiline quote with interpolation?
+    my $ix_HERE_END = -1;         # the line index of the last here target read
+    my $in_interpolated_quote;    # in multiline quote with interpolation?
 
-    #--------------------------------
-    # sub to checkin a new identifier
-    #--------------------------------
-    my $checkin_new_identifier = sub {
-        my ($KK) = @_;
+    #-------------------------------------------------------
+    # sub to check for overlapping usage, issues 'r' and 's'
+    #-------------------------------------------------------
+    my $check_for_overlapping_variables = sub {
 
-        # Store the new identifier at index $KK
-        my $name       = $rLL->[$KK]->[_TOKEN_];
-        my $line_index = $rLL->[$KK]->[_LINE_INDEX_];
+        my ( $name, $KK ) = @_;
 
-        # Perform checks for reused names
+        # Given:
+        #   $name = a variable with sigil, such as '$var', '%var', '@var';
+        #   $KK   = index associated with this variable
+        #   $line_index = index of line where this name first appears
+        # Task:
+        #   Create a warning if this overlaps a previously defined variable
+        # Returns:
+        #   true if error, variable is not of expected form with sigil
+        #   false if no error
+
         my $sigil = EMPTY_STRING;
         my $word  = EMPTY_STRING;
         if ( $name =~ /^(\W+)(\w+)$/ ) {
             $sigil = $1;
             $word  = $2;
         }
+        else {
 
+            # give up, flag as error
+            # could be something like '$' or '@' in a signature, or
+            # for $Storable::downgrade_restricted (0, 1, ...
+            return 1;
+        }
+
+        # Perform checks for reused names
         my @sigils_to_test;
         if ($check_sigil) {
             if ($check_reused) {
@@ -8707,13 +9374,20 @@ sub scan_variable_usage {
             # neither
         }
 
-        # Look up the stack to see if this name has been seen, possibly
-        # with a different sigil
+        # See if this name has been seen, possibly with a different sigil
         if (@sigils_to_test) {
-            foreach my $item ( @{$rblock_stack} ) {
-                my $rhash = $item->{rvars};
+
+            # Look at stack and 'use vars' hash
+            foreach
+              my $item ( @{$rblock_stack}, $ruse_vars_hash->{$current_package} )
+            {
+
+                # distinguish between stack item and use vars item
+                my $rhash = defined( $item->{seqno} ) ? $item->{rvars} : $item;
+
                 foreach my $sig (@sigils_to_test) {
                     my $test_name = $sig . $word;
+
                     next unless ( $rhash->{$test_name} );
                     my $first_line = $rhash->{$test_name}->{line_index} + 1;
                     my $letter;
@@ -8721,9 +9395,11 @@ sub scan_variable_usage {
                     my $see_line = 0;
                     if ( $sig eq $sigil ) {
                         my $as_iterator =
-                          $is_my_state{$my_keyword}
-                          ? EMPTY_STRING
-                          : ' as iterator';
+                          defined($my_keyword)
+                          && ( $my_keyword eq 'for'
+                            || $my_keyword eq 'foreach' )
+                          ? ' as iterator'
+                          : EMPTY_STRING;
                         $note   = "reused$as_iterator - see line $first_line";
                         $letter = 'r';
                     }
@@ -8733,6 +9409,8 @@ sub scan_variable_usage {
                           "overlaps $test_name in scope - see line $see_line";
                         $letter = 's';
                     }
+
+                    my $line_index = $rLL->[$KK]->[_LINE_INDEX_];
                     push @warnings,
                       {
                         name        => $name,
@@ -8747,6 +9425,36 @@ sub scan_variable_usage {
                 }
             }
         }
+        return;
+    }; ## end $check_for_overlapping_variables = sub
+
+    #--------------------------------
+    # sub to checkin a new identifier
+    #--------------------------------
+    my $checkin_new_lexical = sub {
+        my ($KK) = @_;
+
+        # Store the new identifier at index $KK
+
+        my $name       = $rLL->[$KK]->[_TOKEN_];
+        my $line_index = $rLL->[$KK]->[_LINE_INDEX_];
+
+        # Special checks for signature variables
+        if ($in_signature_seqno) {
+
+            # must be in top signature layer
+            my $parent = $self->parent_seqno_by_K($KK);
+            return if ( $parent != $in_signature_seqno );
+
+            # must be preceded by a comma or opening paren
+            my $Kp = $self->K_previous_code($KK);
+            return if ( !$Kp );
+            my $token_p = $rLL->[$Kp]->[_TOKEN_];
+            return if ( $token_p ne ',' && $token_p ne '(' );
+        }
+
+        my $bad_name = $check_for_overlapping_variables->( $name, $KK );
+        return if ($bad_name);
 
         # Store this lexical variable
         my $rhash = $rblock_stack->[-1]->{rvars};
@@ -8758,7 +9466,7 @@ sub scan_variable_usage {
             K          => $KK,
         };
         return;
-    };
+    }; ## end $checkin_new_lexical = sub
 
     #--------------------------------------------------
     # sub to update counts for a list of variable names
@@ -8812,7 +9520,175 @@ sub scan_variable_usage {
             }
         }
         return;
-    };
+    }; ## end $update_use_count = sub
+
+    my $checkin_new_constant = sub {
+        my ( $KK, $word ) = @_;
+        my $line_index = $rLL->[$KK]->[_LINE_INDEX_];
+        my $rvars      = {
+            count      => 0,
+            line_index => $line_index,
+            package    => $current_package,
+            K          => $KK,
+        };
+        $rconstant_hash->{$current_package}->{$word} = $rvars;
+        return;
+    }; ## end $checkin_new_constant = sub
+
+    my $push_new_EXPORT = sub {
+        my ( $KK, $package ) = @_;
+
+        # Save index of any @EXPORT and @EXPORT_OK lists
+        $package = $current_package unless ($package);
+        push @{ $rEXPORT_hash->{$package} }, $KK;
+        return;
+    }; ## end $push_new_EXPORT = sub
+
+    my $scan_use_vars = sub {
+        my ($KK) = @_;
+        my $Kn = $self->K_next_code($KK);
+        return unless ($Kn);
+        my $rlist = $self->expand_quoted_word_list($Kn);
+        return unless ($rlist);
+        my $line_index = $rLL->[$KK]->[_LINE_INDEX_];
+        $my_keyword = 'use vars';
+        foreach my $name ( @{$rlist} ) {
+            my $bad_name = $check_for_overlapping_variables->( $name, $KK );
+            next if ($bad_name);
+            my $rvars = {
+                line_index => $line_index,
+                package    => $current_package,
+                K          => $KK,
+            };
+            $ruse_vars_hash->{$current_package}->{$name} = $rvars;
+        }
+        return;
+    }; ## end $scan_use_vars = sub
+
+    my $scan_use_constant = sub {
+        my ($KK) = @_;
+        my $Kn = $self->K_next_code($KK);
+        return unless ($Kn);
+        my $type_n  = $rLL->[$Kn]->[_TYPE_];
+        my $token_n = $rLL->[$Kn]->[_TOKEN_];
+
+        # version?
+        if ( $type_n eq 'n' || $type_n eq 'v' ) {
+            $Kn      = $self->K_next_code($Kn);
+            $type_n  = $rLL->[$Kn]->[_TYPE_];
+            $token_n = $rLL->[$Kn]->[_TOKEN_];
+        }
+
+        if ( $token_n eq '(' ) {
+            $Kn      = $self->K_next_code($Kn);
+            $type_n  = $rLL->[$Kn]->[_TYPE_];
+            $token_n = $rLL->[$Kn]->[_TOKEN_];
+        }
+
+        # use constant _meth1_=>1;
+        if ( $type_n eq 'w' ) {
+            $checkin_new_constant->( $Kn, $token_n );
+        }
+
+        # use constant '_meth1_',1;
+        elsif ( $type_n eq 'Q' ) {
+
+            # don't try to handle anything strange
+            if ( length($token_n) < 3 ) { return }
+            my $name = substr( $token_n, 1, -1 );
+            $checkin_new_constant->( $Kn, $name );
+        }
+
+        # use constant qw(_meth2_ 2);
+        elsif ( $type_n eq 'q' ) {
+            my $name;
+            if ( $token_n =~ /qw\s*.(\w+)/ ) {
+                $name = $1;
+                $checkin_new_constant->( $Kn, $name );
+            }
+        }
+
+        # A hash ref with multiple definitions:
+        # use constant { _meth3_=>3, _meth4_=>4};
+        # use constant { '_meth3_',3, '_meth4_',4};
+        elsif ( $type_n eq '{' && $token_n eq '{' ) {
+            my $seqno_n = $rLL->[$Kn]->[_TYPE_SEQUENCE_];
+            return unless $seqno_n;
+            my $Kc = $self->[_K_closing_container_]->{$seqno_n};
+            return unless $Kc;
+
+            # loop to collect constants in hash ref
+            my $Knn               = $self->K_next_code($Kn);
+            my $total_comma_count = 0;
+            my $last_type         = ',';
+            my $level_start       = $rLL->[$Knn]->[_LEVEL_];
+
+            foreach my $Kx ( $Knn .. $Kc - 1 ) {
+                my $type  = $rLL->[$Kx]->[_TYPE_];
+                my $token = $rLL->[$Kx]->[_TOKEN_];
+                next if ( $type eq 'b' || $type eq '#' );
+                my $level = $rLL->[$Kx]->[_LEVEL_];
+                next if ( $level > $level_start );
+                if ( $level < $level_start ) {
+                    ## shouldn't happen
+                    my $lno = $rLL->[$Kx]->[_LINE_INDEX_] + 1;
+                    DEBUG_USE_CONSTANT
+                      && Fault("$lno: level=$level > start=$level_start\n");
+                    return;
+                }
+                if ( $last_type eq ',' && !( $total_comma_count % 2 ) ) {
+                    if ( $type eq 'w' ) {
+                        $checkin_new_constant->( $Kx, $token );
+                    }
+                    elsif ( $type eq 'Q' ) {
+                        if ( length($token) < 3 ) { return }
+                        my $name = substr( $token, 1, -1 );
+                        $checkin_new_constant->( $Kx, $name );
+                    }
+                    else {
+                        my $lno = $rLL->[$Kx]->[_LINE_INDEX_] + 1;
+                        DEBUG_USE_CONSTANT
+                          && Fault(
+                            "$lno: unexpected type: type=$type token=$token\n");
+                        return;
+                    }
+                }
+                else {
+                    if ( $type eq ',' || $type eq '=>' ) {
+                        $total_comma_count++;
+                    }
+                }
+                $last_type = $type;
+            }
+        }
+
+        elsif ( $type_n eq ';' ) {
+
+        }
+
+        else {
+            my $ln = $rLL->[$KK]->[_LINE_INDEX_] + 1;
+            DEBUG_USE_CONSTANT && Fault("$ln: unknown use constant syntax\n");
+        }
+        return;
+    }; ## end $scan_use_constant = sub
+
+    my $update_constant_count = sub {
+        my ( $KK, $word ) = @_;
+        if ( !defined($word) ) { $word = $rLL->[$KK]->[_TOKEN_] }
+        my $package = $current_package;
+        my $pos     = rindex( $word, '::' );
+        if ( $pos >= 0 ) {
+            $package = $pos > 0 ? substr( $word, 0, $pos ) : 'main';
+            $word    = substr( $word, $pos + 2 );
+        }
+        return if ( !defined( $rconstant_hash->{$package} ) );
+        my $rvars = $rconstant_hash->{$package}->{$word};
+        return if ( !defined($rvars) );
+        return if ( $KK <= $rvars->{K} );
+        $rvars->{count}++;
+        return;
+    }; ## end $update_constant_count = sub
 
     #-----------------------------------------------
     # sub to check for zero counts when stack closes
@@ -8820,9 +9696,16 @@ sub scan_variable_usage {
     my $check_for_unused_names = sub {
         my ($rhash) = @_;
         foreach my $name ( keys %{$rhash} ) {
-            my $entry = $rhash->{$name};
-            my $count = $entry->{count};
+            my $entry   = $rhash->{$name};
+            my $count   = $entry->{count};
+            my $keyword = $entry->{keyword};
+
             if ( !$count ) {
+
+                # typically global vars are for external access so we
+                # do not report them as type 'u' (unused)
+                next if ( $keyword eq 'our' || $keyword eq 'use vars' );
+
                 push @warnings,
                   {
                     name        => $name,
@@ -8836,7 +9719,7 @@ sub scan_variable_usage {
             }
         }
         return;
-    };
+    }; ## end $check_for_unused_names = sub
 
     #---------------------------------------
     # sub to scan interpolated text for vars
@@ -8853,124 +9736,7 @@ sub scan_variable_usage {
             $update_use_count->( $sigil_string, $word, $brace );
         }
         return;
-    };
-
-    #-------------------------------------------------------------
-    # sub to look for '){' after keyword such as for, foreach, ...
-    #-------------------------------------------------------------
-    my $seqno_brace_after_paren = sub {
-
-        my ($KK) = @_;
-
-        # Given:
-        #   $KK = index of the keyword followed by parens and block '... ( ) {'
-        #         such as 'for', 'foreach', 'while', 'if', 'elsif' ..
-        # Return:
-        #   - $seqno of the opening block brace for this keyword, if any
-        #   - nothing otherwise
-
-        #         'for my $var (..) { ... }'
-        #           ^               ^
-        #           |               |
-        #           --$KK           --$seqno of brace that we want
-
-        # look ahead for an opening paren
-        my $K_paren = $rK_next_seqno_by_K->[$KK];
-        return unless defined($K_paren);
-        my $token_paren = $rLL->[$K_paren]->[_TOKEN_];
-        return unless ( $token_paren eq '(' );
-
-        # found a paren, but does it belong to this keyword?
-        my $seqno_paren = $rLL->[$K_paren]->[_TYPE_SEQUENCE_];
-
-        # see if this opening paren immediately follows the keyword
-        my $K_n = $self->K_next_code($KK);
-        return unless $K_n;
-
-        # is it the next token? this is the common case
-        my $K_end_iterator;
-        my $saw_my;
-        my $token_KK = $rLL->[$KK]->[_TOKEN_];
-        if ( $K_n != $K_paren ) {
-
-            # look for 'for $var (', 'for my $var (', 'for my (', 'for $var ('
-            if ( $is_for_foreach{$token_KK} ) {
-                my $type_K_n  = $rLL->[$K_n]->[_TYPE_];
-                my $token_K_n = $rLL->[$K_n]->[_TOKEN_];
-
-                # skip past a 'my'
-                if ( $type_K_n eq 'k' ) {
-                    if ( $is_my_state{$token_K_n} ) {
-                        $K_n    = $self->K_next_code($K_n);
-                        $saw_my = 1;
-                    }
-                    else { return }
-                }
-
-                # skip an identifier
-                if ( $K_n && $K_n != $K_paren && $rLL->[$K_n]->[_TYPE_] eq 'i' )
-                {
-                    $K_n = $self->K_next_code($K_n);
-
-                    # force this iterator to be entered as new lexical
-                    $K_end_iterator = $K_paren;
-                }
-            }
-        }
-
-        # we must be at the paren
-        return unless ( $K_n && $K_n == $K_paren );
-
-        # now jump to the closing paren
-        $K_paren = $self->[_K_closing_container_]->{$seqno_paren};
-
-        # then look for the opening brace immediately after it
-        my $K_brace = $self->K_next_code($K_paren);
-        return unless ($K_brace);
-
-        # check for experimental 'for list': for my ( $a, $b) (@list) {
-        #                                              ^
-        if (   $rLL->[$K_brace]->[_TOKEN_] eq '('
-            && !$K_end_iterator
-            && $is_for_foreach{$token_KK} )
-        {
-            if ( !$saw_my ) { $K_end_iterator = $K_brace }
-            my $seqno_test = $rLL->[$K_brace]->[_TYPE_SEQUENCE_];
-            my $K_test     = $self->[_K_closing_container_]->{$seqno_test};
-            return unless $K_test;
-            $K_brace = $self->K_next_code($K_test);
-            return unless ($K_brace);
-        }
-
-        return unless ( $rLL->[$K_brace]->[_TOKEN_] eq '{' );
-        my $seqno_brace = $rLL->[$K_brace]->[_TYPE_SEQUENCE_];
-        return unless ($seqno_brace);
-        my $block_type = $rblock_type_of_seqno->{$seqno_brace};
-
-        # Verify that this is the correct brace
-        if ( $block_type ne $token_KK ) {
-
-            # If not, this is unexpected and should be investigated
-            # (the block type may have been mis-marked)
-            my $lno = $rLL->[$KK]->[_LINE_INDEX_] + 1;
-            DEVEL_MODE && Fault(<<EOM);
-at line $lno: found block type $block_type: expecting $token_KK - please check
-EOM
-            return;
-        }
-
-        # Found the brace. Mark an iterator as a new lexical variable in order
-        # to catch something like:
-        #    my $i;
-        #    foreach $i(...) { }
-        # where the iterator $i is not the same as the first $i,
-        # We should be beyond any existing $K_end_my, but check anyway:
-        if ( $K_end_iterator && $K_end_iterator > $K_end_my ) {
-            $K_end_my   = $K_end_iterator;
-            $my_keyword = $token_KK;
-        }
-        return ($seqno_brace);
-    };
+    }; ## end $scan_quoted_text = sub
 
     #-------------------------------------------------------------
     # sub to find the next opening brace seqno of an if-elsif- chain
@@ -8998,7 +9764,8 @@ EOM
         #           --$KK     --$seqno of brace that we want
         #
         if ( $rLL->[$K_n]->[_TOKEN_] eq 'elsif' ) {
-            $seqno_block = $seqno_brace_after_paren->($K_n);
+            ( $seqno_block, my $K_last_iterator_uu ) =
+              $self->block_seqno_of_paren_keyword($K_n);
         }
 
         # For an 'else' the brace will be the next token
@@ -9026,7 +9793,7 @@ EOM
             $push_block_stack->( $seqno_block, $rpopped_vars );
         }
         return;
-    };
+    }; ## end $push_next_if_chain = sub
 
     my $scan_braced_id = sub {
         my ($KK) = @_;
@@ -9066,7 +9833,56 @@ EOM
         }
         $update_use_count->( $sigil_string, $word, $bracket );
         return;
-    };
+    }; ## end $scan_braced_id = sub
+
+    my $check_sub_signature = sub {
+        my ($KK) = @_;
+
+        # looking for a sub signature
+        #    sub xxx (...) {
+        #    -------
+        #          | |   | |
+        #        $KK $Kn | |
+        #                  $K_opening_brace
+
+        # Note: this version cannot handle signatures within signatures.
+        # Inner signatures are currently ignored. For example, only the
+        # outermost $a below will be checked in this line:
+
+        #  sub xyz ($a = sub ($a) { $a."z" }) { $a->("a")."y" }
+
+        # What happens is that variable $K_end_my is set by the first
+        # signature, and the second signature is within it and so does
+        # not get activated. A stack scheme would be necessary to handle
+        # this, but does not seem necessary because this probably only
+        # occurs in test code, and the only downside is that we limit
+        # some checking.
+
+        my $Kn = $self->K_next_code($KK);
+        return unless ( $rLL->[$Kn]->[_TOKEN_] eq '(' );
+        my $seqno_paren = $rLL->[$Kn]->[_TYPE_SEQUENCE_];
+        return unless ($seqno_paren);
+        my $K_closing_paren = $self->[_K_closing_container_]->{$seqno_paren};
+        my $K_opening_brace = $self->K_next_code($K_closing_paren);
+        return unless ($K_opening_brace);
+        my $seqno_brace = $rLL->[$K_opening_brace]->[_TYPE_SEQUENCE_];
+        my $token_brace = $rLL->[$K_opening_brace]->[_TOKEN_];
+        return unless ( $seqno_brace && $token_brace eq '{' );
+
+        # Treat signature variables like my variables
+        # Create special block on the stack..see note above for
+        # $is_if_unless
+        if ( $K_opening_brace > $K_end_my ) {
+            $K_end_my           = $K_opening_brace;
+            $my_keyword         = 'sub signature';
+            $in_signature_seqno = $seqno_paren;
+            $push_block_stack->($seqno_brace);
+        }
+        return;
+    }; ## end $check_sub_signature = sub
+
+    my $rkeyword_count   = {};
+    my $rline_type_count = {};
 
     #--------------------
     # Loop over all lines
@@ -9075,7 +9891,10 @@ EOM
     foreach my $line_of_tokens ( @{$rlines} ) {
         $ix_line++;
         my $line_type = $line_of_tokens->{_line_type};
-        next if ( $line_type ne 'CODE' );
+        if ( $line_type ne 'CODE' ) {
+            $rline_type_count->{$line_type}++;
+            next;
+        }
 
         my ( $Kfirst, $Klast ) = @{ $line_of_tokens->{_rK_range} };
         next unless defined($Kfirst);
@@ -9099,6 +9918,14 @@ EOM
 
                     # always push a block
                     if ($block_type) {
+
+                        # exit signature if we will push a duplicate block
+                        if (   $in_signature_seqno
+                            && @{$rblock_stack}
+                            && $seqno == $rblock_stack->[-1]->{seqno} )
+                        {
+                            $in_signature_seqno = 0;
+                        }
 
                         $push_block_stack->($seqno);
 
@@ -9197,10 +10024,10 @@ EOM
             #----------
             elsif ( $type eq 'k' ) {
 
-                #---------------------------------
-                # look for keyword 'my' or 'state'
-                #---------------------------------
-                if ( $is_my_state{$token} ) {
+                #----------------------------------------------
+                # look for lexical keyword 'my', 'state', 'our'
+                #----------------------------------------------
+                if ( $is_my_state_our{$token} ) {
                     $my_keyword = $token;
 
                     # Set '$K_end_my' to be the last $K index of the variables
@@ -9230,8 +10057,21 @@ EOM
                 # such as 'for my $var (..) { ... }'
                 #--------------------------------------------------
                 elsif ( $is_if_unless_while_until_for_foreach{$token} ) {
-                    my $seqno_brace = $seqno_brace_after_paren->($KK);
+                    my ( $seqno_brace, $K_end_iterator ) =
+                      $self->block_seqno_of_paren_keyword($KK);
                     if ($seqno_brace) {
+
+                        # Found the brace. Mark an iterator as a new lexical
+                        # variable in order to catch something like:
+                        #    my $i;
+                        #    foreach $i(...) { }
+                        # where the iterator $i is not the same as the first
+                        # $i, We should be beyond any existing $K_end_my, but
+                        # check anyway:
+                        if ( $K_end_iterator && $K_end_iterator > $K_end_my ) {
+                            $K_end_my   = $K_end_iterator;
+                            $my_keyword = $token;
+                        }
 
                         # Variables created between these keywords and their
                         # opening brace have special scope rules. We will
@@ -9243,8 +10083,11 @@ EOM
                         $push_block_stack->($seqno_brace);
                     }
                 }
+                elsif ( $token eq 'sub' ) {
+                    $check_sub_signature->($KK);
+                }
                 else {
-                    # no other keywords to check
+                    $rkeyword_count->{$token}++;
                 }
             }
 
@@ -9255,11 +10098,11 @@ EOM
 
                 # Still collecting 'my' vars?
                 if ( $KK <= $K_end_my ) {
-                    $checkin_new_identifier->($KK);
+                    $checkin_new_lexical->($KK);
                 }
 
                 # Not collecting 'my' vars - update counts
-                elsif ($check_unused) {
+                elsif ( $check_unused || $check_constant ) {
 
                     my $sigil_string = EMPTY_STRING;
                     my $word         = EMPTY_STRING;
@@ -9267,17 +10110,52 @@ EOM
                     # The regex below will match numbers, like '$34x', but that
                     # should not be a problem because it will not match a hash
                     # key.
-                    if ( $token =~ /^(\W+)(\w+)$/ ) {
-                        $sigil_string = $1;
+                    if ( $token =~ /^(\W+)?(\w.*)$/ ) {
+                        $sigil_string = $1 if ($1);
                         $word         = $2;
-                        my $sigil = substr( $sigil_string, -1, 1 );
-                        if ( !$is_valid_sigil{$sigil} ) {
-                            $sigil_string = EMPTY_STRING;
-                            $word         = EMPTY_STRING;
+
+                        if ( $check_constant && $word ) {
+
+                            # look for constant invoked like '&ORD' or '->ORD'
+                            if ( !$sigil_string || $sigil_string eq '&' ) {
+                                $update_constant_count->( $KK, $word );
+                            }
+                            elsif ( $sigil_string eq '@'
+                                && index( $word, 'EXPORT' ) >= 0 )
+                            {
+                                # Looking for stuff like:
+                                #   @EXPORT_OK
+                                #   @ALPHA::BETA::EXPORT
+                                my $package = $current_package;
+                                my $name    = $word;
+                                my $pos     = rindex( $word, '::' );
+                                if ( $pos >= 0 ) {
+                                    $package = substr( $word, 0, $pos );
+                                    $name    = substr( $word, $pos + 2 );
+                                }
+                                if ( $name eq 'EXPORT' || $name eq 'EXPORT_OK' )
+                                {
+                                    $push_new_EXPORT->( $KK, $package );
+                                }
+                            }
+                            else { }
+                        }
+
+                        if ($sigil_string) {
+                            my $sigil = substr( $sigil_string, -1, 1 );
+                            if ( !$is_valid_sigil{$sigil} ) {
+                                $sigil_string = EMPTY_STRING;
+                                $word         = EMPTY_STRING;
+                            }
                         }
                     }
 
-                    if ( $sigil_string && $word ) {
+                    if (   $check_unused
+                        && $sigil_string
+                        && $word
+                        && $word =~ /\w+/ )
+                    {
+
                         my $Kn = $self->K_next_code($KK);
                         my $bracket;
                         if ( defined($Kn) ) {
@@ -9294,11 +10172,22 @@ EOM
                 }
             }
 
+            #----------------
+            # a sub statement
+            #----------------
+            elsif ( $type eq 'S' ) {
+                $check_sub_signature->($KK);
+            }
+
             #--------------------
             # a package statement
             #--------------------
             elsif ( $type eq 'P' ) {
-                my $package = $token;
+                my ( $keyword, $package ) = split /\s+/, $token, 2;
+
+                # keyword 'package' may be on a previous line
+                if ( !$package ) { $package = $keyword }
+
                 if ( $package ne $current_package ) {
                     $current_package = $package;
 
@@ -9419,6 +10308,44 @@ EOM
                     $in_interpolated_quote = 0;
                 }
             }
+            elsif ( $type eq 'w' ) {
+                if ( $token eq 'vars' ) {
+                    my $Kp = $self->K_previous_code($KK);
+                    if (   defined($Kp)
+                        && $rLL->[$Kp]->[_TOKEN_] eq 'use'
+                        && $rLL->[$Kp]->[_TYPE_] eq 'k' )
+                    {
+                        $scan_use_vars->($KK);
+                    }
+                }
+                if ($check_constant) {
+                    if ( $token eq 'constant' ) {
+                        my $Kp = $self->K_previous_code($KK);
+                        if (   defined($Kp)
+                            && $rLL->[$Kp]->[_TOKEN_] eq 'use'
+                            && $rLL->[$Kp]->[_TYPE_] eq 'k' )
+                        {
+                            $scan_use_constant->($KK);
+                        }
+                        else {
+                            $update_constant_count->($KK);
+                        }
+                    }
+                    else {
+                        $update_constant_count->($KK);
+                    }
+                }
+            }
+            elsif ( $type eq 'C' ) {
+                if ($check_constant) {
+                    $update_constant_count->($KK);
+                }
+            }
+            elsif ( $type eq 'U' ) {
+                if ($check_constant) {
+                    $update_constant_count->($KK);
+                }
+            }
             else {
                 # skip all other token types
             }
@@ -9428,6 +10355,33 @@ EOM
     #----------
     # Finish up
     #----------
+
+    # skip final 'c' and 'u' output if this appears to be a snippet
+    my $is_possible_snippet = $roption->{is_possible_snippet};
+    my $more_u_checks =
+         $check_unused
+      && @{$rblock_stack} == 1
+      && keys %{ $rblock_stack->[0]->{rvars} };
+    my $more_c_checks = $check_constant && keys %{$rconstant_hash};
+
+    if ( $is_possible_snippet
+        && ( $more_u_checks || $more_c_checks ) )
+    {
+
+        # the flag $is_possible_snippet = 0:No  1:Uncertain   2:Yes
+        if (   $is_possible_snippet == 1
+            && $self->is_complete_script( $rline_type_count, $rkeyword_count ) )
+        {
+            # not a snippet
+        }
+
+        # is possible snippet: deactivate 'c' and 'u
+        else {
+            $check_unused   = 0;
+            $check_constant = 0;
+        }
+    }
+
     if ( @{$rblock_stack} != 1 ) {
 
         # shouldn't happen for a balanced input file
@@ -9438,6 +10392,56 @@ EOM
             foreach my $item ( @{$rblock_stack} ) {
                 my $rhash = $item->{rvars};
                 $check_for_unused_names->($rhash);
+            }
+        }
+    }
+
+    if ($check_constant) {
+        my @warnings_c;
+        my %packages_with_warnings;
+        foreach my $package ( keys %{$rconstant_hash} ) {
+            my $rhash = $rconstant_hash->{$package};
+            next if ( !defined($rhash) );
+            foreach my $name ( keys %{$rhash} ) {
+                my $entry = $rconstant_hash->{$package}->{$name};
+                next if ( $entry->{count} );
+                push @warnings_c,
+                  {
+                    name        => $name,
+                    keyword     => 'use constant',
+                    see_line    => EMPTY_STRING,
+                    note        => "appears unused in package $package",
+                    line_number => $entry->{line_index} + 1,
+                    letter      => 'c',
+                    package     => $package,
+                    K           => $entry->{K},
+                  };
+                $packages_with_warnings{$package} = 1;
+            }
+        }
+
+        # filter out constants found in @EXPORT and @EXPORT_OK
+        if (@warnings_c) {
+
+            # expand relevant EXPORT lists
+            my $rEXPORT_words_by_package = {};
+            foreach my $package ( keys %packages_with_warnings ) {
+                my $rKlist = $rEXPORT_hash->{$package};
+                next unless ($rKlist);
+                $rEXPORT_words_by_package->{$package} = {};
+                foreach my $KK ( @{$rKlist} ) {
+                    $self->expand_EXPORT_list( $KK,
+                        $rEXPORT_words_by_package->{$package} );
+                }
+            }
+
+            # remove warnings in EXPORT lists
+            foreach my $rwarning (@warnings_c) {
+                my $package = $rwarning->{package};
+                my $name    = $rwarning->{name};
+                my $rhash   = $rEXPORT_words_by_package->{$package};
+                next if ( $rhash && $rhash->{$name} );
+                push @warnings, $rwarning;
             }
         }
     }
@@ -9467,11 +10471,28 @@ EOM
         }
     }
 
-    # Sort on token index and issue type
-    my @sorted =
-      sort { $a->{K} <=> $b->{K} || $a->{letter} cmp $b->{letter} } @warnings;
+    if (@warnings) {
 
-    return \@sorted;
+        # filter out certain common 'our' variables from all warnings
+        #  because they are common and difficult to fix, and
+        # sort on token index and issue type
+
+        my %is_exempted_global_name;
+        my @q = qw( $VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD );
+        @is_exempted_global_name{@q} = (1) x scalar(@q);
+
+        @warnings =
+          sort { $a->{K} <=> $b->{K} || $a->{letter} cmp $b->{letter} }
+
+          # FIXME: this limitation may eventually just be for 'our' vars
+          # after 'use vars' coding is finalized
+          grep {
+            ( $_->{keyword} ne 'our' && $_->{keyword} ne 'use vars' )
+              || !$is_exempted_global_name{ $_->{name} }
+          } @warnings;
+    }
+
+    return ( \@warnings, $issue_type_string );
 } ## end sub scan_variable_usage
 
 sub dump_unusual_variables {
@@ -9479,12 +10500,15 @@ sub dump_unusual_variables {
 
     # process a --dump-unusual-variables(-duv) command
 
-    my $rlines = $self->scan_variable_usage();
+    my ( $rlines, $issue_type_string ) = $self->scan_variable_usage();
     return unless ( $rlines && @{$rlines} );
+
+    my $input_stream_name = get_input_stream_name();
 
     # output for multiple types
     my $output_string = <<EOM;
-Issue abbreviations  u=unused  r=reused  s=multi-sigil  p=package crossing
+$input_stream_name: output for --dump-unusual-variables
+$issue_type_string
 Line:Issue: Var: note
 EOM
     foreach my $item ( @{$rlines} ) {
@@ -9501,44 +10525,51 @@ EOM
     return;
 } ## end sub dump_unusual_variables
 
-sub initialize_warn_variable_types {
+sub initialize_warn_hash {
+    my ( $long_name, $default, $rall_opts, $wvt_in_args ) = @_;
 
-    # Initialization for:
-    #    --warn-variable-types=s and
-    #    --warn-variable-exclusion-list=s
-    %warn_variable_types            = ();
-    %is_warn_variable_excluded_name = ();
+    # Given:
+    #   $long_name   = full option name
+    #   $default     = default value
+    #   $rall_opts   = all possible options
+    #   $wvt_in_args = special flag for --warn-variable-types only
+    # Return the corresponding option hash
 
-    #----------------------------
-    # Parse --warn-variable-types
-    #----------------------------
-    my $wvt_key    = 'warn-variable-types';
-    my $wvt_option = $rOpts->{$wvt_key};
-    return unless ($wvt_option);
-
-    # Specific options:
+    # Example of all possible options for --warn-variable-types=s
     #  r - reused scope
     #  s - reused sigil
     #  p - package boundaries crossed by lexical variables
+    #  u - only if -wvt and filename(s) are on command line; see git #151
 
     # Other controls:
     #  0 - none of the above
     #  1 - all of the above
     #  * - all of the above
-    #  u - [NOT AVAILABLE, use --dump-unusual-variables]
 
     # Example:
     #  -wvt='s r'  : do check types 's' and 'r'
 
-    my @all_opts = qw(r s p);
+    # Other warn options use different letters
+
+    my $rwarn_hash = {};
+
+    if ( !$rall_opts || !@{$rall_opts} ) {
+        Fault("all_options is empty for call with option $long_name\n");
+        return $rwarn_hash;
+    }
+
+    my $user_option_string = $rOpts->{$long_name};
+    if ( !defined($user_option_string) ) { $user_option_string = $default }
+    return $rwarn_hash unless ($user_option_string);
+
     my %is_valid_option;
-    @is_valid_option{@all_opts} = (1) x scalar(@all_opts);
+    @is_valid_option{ @{$rall_opts} } = (1) x scalar( @{$rall_opts} );
 
     # allow comma separators
-    $wvt_option =~ s/,/ /g;
+    $user_option_string =~ s/,/ /g;
 
-    my @opts = split_words($wvt_option);
-    return unless (@opts);
+    my @opts = split_words($user_option_string);
+    return $rwarn_hash unless (@opts);
 
     # check a single item
     if ( @opts == 1 ) {
@@ -9548,60 +10579,234 @@ sub initialize_warn_variable_types {
         # but give a warning because this may not be allowed in the future
         if ( length($opt) > 1 ) {
             @opts = split //, $opt;
-            Warn("Please use space-separated letters in --$wvt_key\n");
+            Warn("Please use space-separated letters in --$long_name\n");
         }
         elsif ( $opt eq '*' || $opt eq '1' ) {
             @opts = keys %is_valid_option;
         }
         elsif ( $opt eq '0' ) {
-            return;
+            return $rwarn_hash;
         }
         else {
-            # should be one of r,s,p - catch any error below
+            # should be one of r,s,p, maybe u - catch any error below
         }
     }
 
     my $msg = EMPTY_STRING;
     foreach my $opt (@opts) {
         if ( $is_valid_option{$opt} ) {
-            $warn_variable_types{$opt} = 1;
+            $rwarn_hash->{$opt} = 1;
         }
         else {
             if ( $opt =~ /^[01\*]$/ ) {
                 $msg .=
-                  "--$wvt_key cannot contain $opt mixed with other options\n";
+                  "--$long_name cannot contain $opt mixed with other options\n";
             }
-            elsif ( $opt eq 'u' ) {
-                Warn(<<EOM);
---$wvt_key=u is not available; use --dump-unusual-variables=u to find unused vars
+
+            # Special check for -wvt
+            # Deactivated for now to allow -wvt in perltidyrc files. This can
+            # eventually be removed if allowing this does not cause problems.
+            elsif ( 0
+                && ( $opt eq 'u' || $opt eq 'c' )
+                && $long_name eq 'warn-variable-types' )
+            {
+                if ( !$wvt_in_args ) {
+                    Warn(<<EOM);
+--$long_name=$opt is not allowed in a .perltidyrc configuration file
 EOM
+                }
+                else {
+                    Warn(<<EOM);
+--$long_name=$opt is only available when processing specific filenames
+EOM
+                }
             }
             else {
-                $msg .= "--$wvt_key has unexpected symbol: '$opt'\n";
+                $msg .= "--$long_name has unexpected symbol: '$opt'\n";
             }
         }
     }
     if ($msg) { Die($msg) }
+    return $rwarn_hash;
+} ## end sub initialize_warn_hash
 
-    #-------------------------------------
-    # Parse --warn-variable-exclusion-list
-    #-------------------------------------
-    my $wvxl_key       = 'warn-variable-exclusion-list';
-    my $excluded_names = $rOpts->{$wvxl_key};
+sub make_excluded_name_hash {
+    my ($option_name)       = @_;
+    my $rexcluded_name_hash = {};
+    my $excluded_names      = $rOpts->{$option_name};
     if ($excluded_names) {
         $excluded_names =~ s/,/ /g;
         my @xl      = split_words($excluded_names);
         my $err_msg = EMPTY_STRING;
         foreach my $name (@xl) {
-            if ( $name !~ /^[\$\@\%]?\w+$/ ) {
-                $err_msg .= "-wvxl has unexpected name: '$name'\n";
+            if ( $name =~ /^([\$\@\%\*])?(\w+)?(\*)?$/ ) {
+                my $left_star  = $1;
+                my $key        = $2;
+                my $right_star = $3;
+                if ( defined($left_star) ) {
+                    if ( $left_star ne '*' ) {
+                        if ( defined($key) ) {
+
+                            # append sigil to the bareword
+                            $key = $left_star . $key;
+                        }
+                        else {
+
+                            # word not given: '$*' is ok but just '$' is not
+                            if ($right_star) { $key = $left_star }
+                        }
+                        $left_star = EMPTY_STRING;
+                    }
+                }
+
+                # Wildcard matching codes:
+                # 1 = no stars
+                # 2 = left star only
+                # 3 = right star only
+                # 4 = both left and right stars
+                my $code = 1;
+                $code += 1 if ($left_star);
+                $code += 2 if ($right_star);
+                if ( !defined($key) ) {
+                    $err_msg .= "--$option_name has unexpected name: '$name'\n";
+                }
+                else {
+                    $rexcluded_name_hash->{$key} = $code;
+                }
+            }
+            else {
+                $err_msg .= "--$option_name has unexpected name: '$name'\n";
             }
         }
         if ($err_msg) { Die($err_msg) }
-        @is_warn_variable_excluded_name{@xl} = (1) x scalar(@xl);
+    }
+    return $rexcluded_name_hash;
+} ## end sub make_excluded_name_hash
+
+sub wildcard_match {
+
+    my ( $name, $rwildcard_match_list ) = @_;
+
+    # Given:
+    #    $name = a string to test for a match
+    #    $rwildcard_match_list = a list of [key,code] pairs:
+    #        key  = a string to match
+    #        code = 2, 3, or 4 is match type (see comments below)
+    # Return:
+    #    true for a match
+    #    false for no match
+
+    # For example, key='$pack' with code=3 is short for '$pack*'
+    # which will match '$package', '$packer', etc
+
+    # Loop over all possible matchs
+    foreach ( @{$rwildcard_match_list} ) {
+        my ( $key, $code ) = @{$_};
+        my $len_key  = length($key);
+        my $len_name = length($name);
+        next if ( $len_name < $len_key );
+
+        # code 2 = left star only
+        if ( $code == 2 ) {
+            if ( substr( $name, -$len_key, $len_key ) eq $key ) { return 1 }
+        }
+
+        # code 3 = right star only
+        elsif ( $code == 3 ) {
+            if ( substr( $name, 0, $len_key ) eq $key ) { return 1 }
+        }
+
+        # code 4 = both left and right stars
+        elsif ( $code == 4 ) {
+            if ( index( $name, $key, 0 ) >= 0 ) { return 1 }
+        }
+        else {
+            DEVEL_MODE && Fault("unexpected code '$code' for '$name'\n");
+        }
     }
     return;
+} ## end sub wildcard_match
+
+sub initialize_warn_variable_types {
+
+    my ( $wvt_in_args, $num_files, $line_range_clipped ) = @_;
+
+    # Initialization for:
+    #    --warn-variable-types=s and
+    #    --warn-variable-exclusion-list=s
+    # Given:
+    #   $wvt_in_args = true if the -wvt parameter was on the command line
+    #   $num_files = number of files on the command line
+
+    my @all_opts = qw(r s p u c);
+    $rwarn_variable_types =
+      initialize_warn_hash( 'warn-variable-types', 0, \@all_opts,
+        $wvt_in_args );
+
+    # Check for issues 'u' or 'c' cannot be fully made if we are working
+    # on a partial file (snippet), so we save info about that.
+    if ( $rwarn_variable_types->{u} || $rwarn_variable_types->{c} ) {
+
+        # Three value switch: 0=NO, 1=MAYBE 2=DEFINITELY
+        my $is_possible_snippet = 1;
+
+        # assume snippet if incomplete line range is being formatted
+        if ($line_range_clipped) {
+            $is_possible_snippet = 2;
+        }
+
+        # assume complete script if operating on multiple files or if
+        # operating on one file and -wvt came in on the command line
+        if ( $is_possible_snippet == 1 && $num_files ) {
+            if ( $num_files > 1 || $wvt_in_args && $num_files ) {
+                $is_possible_snippet = 0;
+            }
+        }
+
+        $rwarn_variable_types->{is_possible_snippet} = $is_possible_snippet;
+    }
+
+    $ris_warn_variable_excluded_name =
+      make_excluded_name_hash('warn-variable-exclusion-list');
+    return;
 } ## end sub initialize_warn_variable_types
+
+sub filter_excluded_names {
+
+    # Given:
+    #   $rwarnigns = ref to list of warning info hashes
+    #   $rexcluded_name_hash = ref to hash with excluded names
+    # Return updated $rwarnings with excluded names removed
+    my ( $rwarnings, $rexcluded_name_hash ) = @_;
+    if ( @{$rwarnings} && $rexcluded_name_hash ) {
+
+        # Check for exact matches
+        $rwarnings =
+          [ grep { !$rexcluded_name_hash->{ $_->{name} } } @{$rwarnings} ];
+
+        # See if there are any wildcard names
+        my @excluded_wildcards;
+        foreach my $key ( keys %{$rexcluded_name_hash} ) {
+            my $code = $rexcluded_name_hash->{$key};
+            if ( $code != 1 ) {
+                push @excluded_wildcards, [ $key, $code ];
+            }
+        }
+
+        if (@excluded_wildcards) {
+            my @tmp;
+            foreach my $item ( @{$rwarnings} ) {
+                my $name = $item->{name};
+                if ( wildcard_match( $name, \@excluded_wildcards ) ) {
+                    next;
+                }
+                push @tmp, $item;
+            }
+            $rwarnings = \@tmp;
+        }
+    }
+    return $rwarnings;
+} ## end sub filter_excluded_names
 
 sub warn_variable_types {
     my ($self) = @_;
@@ -9610,36 +10815,46 @@ sub warn_variable_types {
 
     my $wv_key    = 'warn-variable-types';
     my $wv_option = $rOpts->{$wv_key};
-    return unless (%warn_variable_types);
+    return unless ( %{$rwarn_variable_types} );
 
-    my $rwarnings = $self->scan_variable_usage( \%warn_variable_types );
+    my ( $rwarnings, $issue_type_string ) =
+      $self->scan_variable_usage($rwarn_variable_types);
     return unless ( $rwarnings && @{$rwarnings} );
 
-    my $message = "Begin scan for --$wv_key=$wv_option\n";
-    $message .= <<EOM;
-Issue abbreviations  r=reused  s=multi-sigil  p=package crossing
-Line:Issue: Var: note
-EOM
+    $rwarnings =
+      filter_excluded_names( $rwarnings, $ris_warn_variable_excluded_name );
 
-    # output the results, ignoring any excluded names
+    # loop to form error messages
+    my $message_middle = EMPTY_STRING;
     foreach my $item ( @{$rwarnings} ) {
-        my $name = $item->{name};
-        next if ( $is_warn_variable_excluded_name{$name} );
+        my $name    = $item->{name};
         my $lno     = $item->{line_number};
         my $letter  = $item->{letter};
         my $keyword = $item->{keyword};
         my $note    = $item->{note};
         if ($note) { $note = ": $note" }
-        $message .= "$lno:$letter: $keyword $name$note\n";
+        $message_middle .= "$lno:$letter: $keyword $name$note\n";
     }
-    $message .= "End scan for --$wv_key=$wv_option:\n";
-    warning($message);
+
+    if ($message_middle) {
+        my $message = "Begin scan for --$wv_key=$wv_option\n";
+        $message .= <<EOM;
+$issue_type_string
+Line:Issue: Var: note
+EOM
+        $message .= $message_middle;
+        $message .= "End scan for --$wv_key=$wv_option:\n";
+        warning($message);
+    }
     return;
 } ## end sub warn_variable_types
 
 sub block_seqno_of_paren_seqno {
 
     my ( $self, $seqno_paren ) = @_;
+
+    # Find brace at '){' after paren of keyword such as for, foreach, ...
+    # SEE ALSO: sub block_seqno_of_paren_keyword
 
     # Given:
     #  $seqno_paren = sequence number of the paren following a keyword which
@@ -9655,9 +10870,6 @@ sub block_seqno_of_paren_seqno {
     #     |   | K_opening_brace => return sequno of this brace
     #     |   K_closing_paren
     #     $seqno_paren = seqno of this paren pair
-
-    # NOTE: sub '$seqno_brace_after_paren' in sub 'scan_variable_usage' is
-    # similar but sufficiently different that the two subs cannot be merged.
 
     return unless $seqno_paren;
     my $K_closing_paren = $self->[_K_closing_container_]->{$seqno_paren};
@@ -9741,8 +10953,9 @@ sub dump_mixed_call_parens {
       sort { lc $a->{type} cmp lc $b->{type} || $a->{name} cmp $b->{name} }
       @mixed_counts;
 
-    my $output_string = <<EOM;
-counts with and without call parens made by --dump-mixed-call-parens
+    my $input_stream_name = get_input_stream_name();
+    my $output_string     = <<EOM;
+$input_stream_name: output for --dump-mixed-call-parens
 use -wcp=s and/or nwcp=s to find line numbers, where s is a string of words
 types are 'k'=builtin keyword 'U'=user sub  'w'=other word
 type:word:+count:-count
@@ -10047,7 +11260,7 @@ sub interbracket_arrow_check {
         my $msg  = "$first_word $num_changes '->'$ess1 at line$ess2 $str\n";
         warning($msg);
         return;
-    };
+    }; ## end $warn = sub
 
     # Complexity control flag:
     #  =0 left container must just contain a single token
@@ -10274,11 +11487,24 @@ EOM
             my $type_m = $rLL->[$K_m]->[_TYPE_];
             if ( $type_m eq 'b' && $K_m > $Kfirst ) { $K_m-- }
             my $seqno_m = $rLL->[$K_m]->[_TYPE_SEQUENCE_];
+
+            # patch to delete asub csc's (c380)
+            if ( !$seqno_m && $K_m && $rLL->[$K_m]->[_TYPE_] eq ';' ) {
+                $K_m    = $K_m - 1;
+                $type_m = $rLL->[$K_m]->[_TYPE_];
+                if ( $type_m eq 'b' && $K_m > $Kfirst ) { $K_m-- }
+                if ( $K_m == $Kfirst ) {
+                    $seqno_m = $rLL->[$K_m]->[_TYPE_SEQUENCE_];
+                }
+            }
+
             if ($seqno_m) {
                 my $block_type_m = $rblock_type_of_seqno->{$seqno_m};
                 if (   $block_type_m
                     && $token        =~ /$closing_side_comment_prefix_pattern/
-                    && $block_type_m =~ /$closing_side_comment_list_pattern/ )
+                    && $block_type_m =~ /$closing_side_comment_list_pattern/
+                    && $block_type_m !~
+                    /$closing_side_comment_exclusion_pattern/ )
                 {
                     $delete_side_comment = 1;
                 }
@@ -10448,8 +11674,17 @@ my $rK_package_list;
 # new index K of @_ tokens
 my $rK_AT_underscore_by_sub_seqno;
 
-# new index K of bless tokens
+# new index K of first $self tokens for each sub
+my $rK_first_self_by_sub_seqno;
+
+# new index K of first 'bless' for each sub
 my $rK_bless_by_sub_seqno;
+
+# new index K of 'return' for each sub
+my $rK_return_by_sub_seqno;
+
+# new index K of 'wantarray' for each sub
+my $rK_wantarray_by_sub_seqno;
 
 # info about list of sub call args
 my $rsub_call_paren_info_by_seqno;
@@ -10495,7 +11730,10 @@ sub initialize_respace_tokens_closure {
 
     $rK_package_list               = $self->[_rK_package_list_];
     $rK_AT_underscore_by_sub_seqno = $self->[_rK_AT_underscore_by_sub_seqno_];
+    $rK_first_self_by_sub_seqno    = $self->[_rK_first_self_by_sub_seqno_];
     $rK_bless_by_sub_seqno         = $self->[_rK_bless_by_sub_seqno_];
+    $rK_return_by_sub_seqno        = $self->[_rK_return_by_sub_seqno_];
+    $rK_wantarray_by_sub_seqno     = $self->[_rK_wantarray_by_sub_seqno_];
     $rsub_call_paren_info_by_seqno = $self->[_rsub_call_paren_info_by_seqno_];
     $rDOLLAR_underscore_by_sub_seqno =
       $self->[_rDOLLAR_underscore_by_sub_seqno_];
@@ -10757,16 +11995,16 @@ sub respace_tokens_inner_loop {
     # Loop to copy all tokens on one line, making any spacing changes,
     # while also collecting information needed by later subs.
     #-----------------------------------------------------------------
+    my $type;
     foreach my $KK ( $Kfirst .. $Klast ) {
 
         # Update closure variable needed by sub store_token
         $Ktoken_vars = $KK;
 
         my $rtoken_vars = $rLL->[$KK];
-        my $type        = $rtoken_vars->[_TYPE_];
 
         # Handle a blank space ...
-        if ( $type eq 'b' ) {
+        if ( ( $type = $rtoken_vars->[_TYPE_] ) eq 'b' ) {
 
             # Delete it if not wanted by whitespace rules
             # or we are deleting all whitespace
@@ -10843,20 +12081,36 @@ sub respace_tokens_inner_loop {
                 #----------------------------------------------------------
                 else {
 
-                    # if this is a list ..
+                    # if this looks like a list ..
                     my $rtype_count = $rtype_count_by_seqno->{$type_sequence};
-                    if (   $rtype_count
-                        && $rtype_count->{','}
-                        && !$rtype_count->{';'}
-                        && !$rtype_count->{'f'} )
+                    if (   !$rtype_count
+                        || !$rtype_count->{';'} && !$rtype_count->{'f'} )
                     {
 
                         # if NOT preceded by a comma..
                         if ( $last_nonblank_code_type ne ',' ) {
 
                             # insert a comma if requested
-                            if (   $rOpts_add_trailing_commas
-                                && %trailing_comma_rules )
+                            if (
+                                   $rOpts_add_trailing_commas
+                                && %trailing_comma_rules
+
+                                # and...
+                                && (
+
+                                    # ... there is a comma or fat_comma
+                                    $rtype_count
+                                    && (   $rtype_count->{','}
+                                        || $rtype_count->{'=>'} )
+
+                                    # ... or exception for nested container
+                                    || (
+                                        $rOpts_add_lone_trailing_commas
+                                        && $is_closing_type{
+                                            $last_nonblank_code_type}
+                                    )
+                                )
+                              )
                             {
                                 $self->add_trailing_comma( $KK, $Kfirst,
                                     $trailing_comma_rules{$token} );
@@ -10868,8 +12122,15 @@ sub respace_tokens_inner_loop {
 
                             # delete a trailing comma if requested
                             my $deleted;
-                            if (   $rOpts_delete_trailing_commas
-                                && %trailing_comma_rules )
+                            if (
+                                   $rOpts_delete_trailing_commas
+                                && %trailing_comma_rules
+                                && $rtype_count
+                                && $rtype_count->{','}
+                                && (   $rOpts_delete_lone_trailing_commas
+                                    || $rtype_count->{','} > 1
+                                    || $rtype_count->{'=>'} )
+                              )
                             {
                                 $deleted =
                                   $self->delete_trailing_comma( $KK, $Kfirst,
@@ -11088,17 +12349,59 @@ sub respace_tokens_inner_loop {
                       scalar @{$rLL_new};
                 }
 
-                # Remember new K and name of blessed object for -dma option
-                if (   $last_nonblank_code_token eq 'bless'
-                    && $last_nonblank_code_type eq 'k'
-                    && $current_sub_seqno )
+                # Remember new K of the first '$self' in a sub for -dma option
+                if ( $token eq '$self' && $current_sub_seqno ) {
+                    $rK_first_self_by_sub_seqno->{$current_sub_seqno} ||=
+                      scalar @{$rLL_new};
+                }
+
+                # Remember new K and name of blessed objects for -dma option
+                if (
+                    (
+                           $last_nonblank_code_token eq 'bless'
+                        && $last_nonblank_code_type eq 'k'
+                    )
+                    || (
+                           $last_last_nonblank_code_token eq 'bless'
+                        && $last_last_nonblank_code_type eq 'k'
+                        && (
+
+                            $last_nonblank_code_token eq 'my'
+                            || $last_nonblank_code_token eq '('
+                        )
+                    )
+                  )
                 {
                     push @{ $rK_bless_by_sub_seqno->{$current_sub_seqno} },
                       [ scalar @{$rLL_new}, $token ];
                 }
             }
+            elsif ( $type eq 'w' ) {
+                if (   $last_nonblank_code_token eq 'use'
+                    && $last_nonblank_code_type eq 'k' )
+                {
+                    if ( $token eq 'strict' ) { $self->[_saw_use_strict_] = 1 }
+                }
+            }
             else {
                 # Could be something like '* STDERR' or '$ debug'
+            }
+        }
+
+        # handle keywords
+        elsif ( $type eq 'k' ) {
+            if ( $token eq 'return' ) {
+
+                # remember the new K of this 'return; this may be
+                # off by 1 if a blank gets inserted before it
+                push
+                  @{ $rK_return_by_sub_seqno->{$current_sub_seqno} },
+                  scalar @{$rLL_new};
+            }
+            if ( $token eq 'wantarray' ) {
+                push
+                  @{ $rK_wantarray_by_sub_seqno->{$current_sub_seqno} },
+                  scalar @{$rLL_new};
             }
         }
 
@@ -11266,6 +12569,18 @@ EOM
                 else {
                     complain( "deleted repeated '=>'\n", $lno );
                     next;
+                }
+            }
+
+            # remember input line index of first '=>' if -wtc is used
+            if (%trailing_comma_rules) {
+                my $seqno = $seqno_stack{ $depth_next - 1 };
+                if ( defined($seqno)
+                    && !defined( $self->[_rfirst_comma_line_index_]->{$seqno} )
+                  )
+                {
+                    $self->[_rfirst_comma_line_index_]->{$seqno} =
+                      $rtoken_vars->[_LINE_INDEX_];
                 }
             }
         }
@@ -11997,6 +13312,33 @@ sub add_phantom_semicolon {
     return;
 } ## end sub add_phantom_semicolon
 
+sub delay_trailing_comma_op {
+    my $self = shift;
+
+    # Returns:
+    #   true if a trailing comma operation should be skipped
+    #   false otherwise
+
+    # This can prevent unwanted path-dependent formatting when both
+    # line breaks are changing and we are only adding or deleting
+    # commas, but not both. See git #156
+
+    # permission must be given
+    return if ( !$rOpts->{'delay-trailing-comma-operations'} );
+
+    # we must be at the first of multiple iterations
+    my $it             = Perl::Tidy::get_iteration_count();
+    my $max_iterations = $rOpts->{'iterations'};
+    if ( $it == 1 && $max_iterations > 1 ) {
+
+        # if so, force another iteration
+        my $file_writer_object = $self->[_file_writer_object_];
+        $file_writer_object->not_converged();
+        return 1;
+    }
+    return;
+} ## end sub delay_trailing_comma_op
+
 sub add_trailing_comma {
 
     # Implement the --add-trailing-commas flag to the line end before index $KK:
@@ -12049,8 +13391,8 @@ sub add_trailing_comma {
         }
     }
 
-    # if so, add a comma
-    if ($match) {
+    # If so, and not delayed, add a comma
+    if ( $match && !$self->delay_trailing_comma_op() ) {
 
         # any blank after the comma will be added before the closing paren,
         # below
@@ -12139,9 +13481,10 @@ sub delete_trailing_comma {
         }
     }
 
-    # If no match, delete it
-    if ( !$match ) {
+    # If no match and not delayed
+    if ( !$match && !$self->delay_trailing_comma_op() ) {
 
+        # delete it
         return $self->unstore_last_nonblank_token(',');
     }
     return;
@@ -12395,15 +13738,92 @@ sub match_trailing_comma_rule {
     my $type_sequence = $rLL->[$KK]->[_TYPE_SEQUENCE_];
     return unless ($type_sequence);
     my $closing_token = $rLL->[$KK]->[_TOKEN_];
-    my $rtype_count   = $self->[_rtype_count_by_seqno_]->{$type_sequence};
-    return unless ( defined($rtype_count) && $rtype_count->{','} );
     my $is_permanently_broken =
       $self->[_ris_permanently_broken_]->{$type_sequence};
 
-    # Note that _ris_broken_container_ also stores the line diff
-    # but it is not available at this early stage.
     my $K_opening = $self->[_K_opening_container_]->{$type_sequence};
     return if ( !defined($K_opening) );
+    my $iline_first     = $self->[_rfirst_comma_line_index_]->{$type_sequence};
+    my $iline_last      = $rLL_new->[$Kp]->[_LINE_INDEX_];
+    my $rtype_count     = $self->[_rtype_count_by_seqno_]->{$type_sequence};
+    my $comma_count     = 0;
+    my $fat_comma_count = 0;
+    my $comma_count_inner = 0;
+
+    if ($rtype_count) {
+        $comma_count     = $rtype_count->{','};
+        $fat_comma_count = $rtype_count->{'=>'};
+    }
+
+    # Check for cases where adding a lone comma may interfere with welding.
+    if (   $if_add
+        && !$comma_count
+        && $is_closing_type{$last_nonblank_code_type} )
+    {
+
+        # check for nesting closing containers
+        my $Kpp = $self->K_previous_nonblank( undef, $rLL_new );
+        return if ( !defined($Kpp) );
+        my $seqno_pp = $rLL_new->[$Kpp]->[_TYPE_SEQUENCE_];
+        my $type_pp  = $rLL_new->[$Kpp]->[_TYPE_];
+
+        # nesting containers have sequence numbers which differ by 1
+        my $is_nesting_right =
+             $seqno_pp
+          && $is_closing_type{$type_pp}
+          && ( $seqno_pp == $type_sequence + 1 );
+
+        # Do not add a comma which will be deleted by
+        # --delete-weld-interfering commas (b1471)
+        if (   $is_nesting_right
+            && $rOpts_delete_weld_interfering_commas )
+        {
+            return;
+        }
+
+        # Must return if no fat comma and not fully nesting
+        if ( !$fat_comma_count ) {
+
+            # containers must be nesting on the right
+            return unless ($is_nesting_right);
+
+            # inner container must have commas
+            my $rtype_count_pp = $self->[_rtype_count_by_seqno_]->{$seqno_pp};
+            return unless ($rtype_count_pp);
+            $comma_count_inner = $rtype_count_pp->{','};
+##          my $fat_comma_count_inner = $rtype_count_pp->{'=>'};
+            return if ( !$comma_count_inner );
+            return if ( $comma_count_inner < 2 );
+
+            # and inner container must be multiline
+            $iline_first = $self->[_rfirst_comma_line_index_]->{$seqno_pp};
+            my $iline_c = $rLL_new->[$Kpp]->[_LINE_INDEX_];
+            return if ( !defined($iline_first) );
+            return if ( $iline_c <= $iline_first );
+
+            # the containers must be nesting on the left
+            my $Ktest = $self->K_next_nonblank( $K_opening, $rLL_new );
+            return unless ($Ktest);
+            my $seqno_test = $rLL_new->[$Ktest]->[_TYPE_SEQUENCE_];
+            if ( !$seqno_test || $seqno_test != $seqno_pp ) {
+                return;
+            }
+
+            # if outer container type is paren, must be sub call
+            my $token = $rLL_new->[$K_opening]->[_TOKEN_];
+            if ( $token eq '(' ) {
+                my $Km     = $self->K_previous_nonblank( $K_opening, $rLL_new );
+                my $type_p = $Km ? $rLL_new->[$Km]->[_TYPE_] : 'b';
+                ## see also sub count_return_values_wanted
+                my $is_function_call =
+                     $type_p eq 'U'
+                  || $type_p eq 'i'
+                  || $type_p eq 'w'
+                  || $type_p eq '->';
+                return unless ($is_function_call);
+            }
+        }
+    }
 
     # multiline definition 1: opening and closing tokens on different lines
     my $iline_o                  = $rLL_new->[$K_opening]->[_LINE_INDEX_];
@@ -12412,8 +13832,8 @@ sub match_trailing_comma_rule {
     my $has_multiline_containers = $line_diff_containers > 0;
 
     # multiline definition 2: first and last commas on different lines
-    my $iline_first = $self->[_rfirst_comma_line_index_]->{$type_sequence};
-    my $iline_last  = $rLL_new->[$Kp]->[_LINE_INDEX_];
+    # Note that _ris_broken_container_ also stores the line diff
+    # but it is not available at this early stage.
     my $has_multiline_commas;
     my $line_diff_commas = 0;
     if ( !defined($iline_first) ) {
@@ -12457,7 +13877,7 @@ sub match_trailing_comma_rule {
     # 'm' matches a Multiline list
     #-----------------------------
     elsif ( $trailing_comma_style eq 'm' ) {
-        $match = $is_multiline;
+        $match = $is_multiline && ( $comma_count || $comma_count_inner );
     }
 
     #----------------------------------
@@ -12481,7 +13901,7 @@ sub match_trailing_comma_rule {
 
         # There must be no more than one comma per line for both 'h' and 'i'
         # The new_comma_count here will include the trailing comma.
-        my $new_comma_count = $rtype_count->{','};
+        my $new_comma_count = $comma_count;
         $new_comma_count += 1 if ($if_add);
         my $excess_commas = $new_comma_count - $line_diff_commas - 1;
         if ( $excess_commas > 0 ) {
@@ -12522,13 +13942,30 @@ sub match_trailing_comma_rule {
             }
         }
 
-        # a list of key=>value pairs with at least 2 fat commas is a match
-        # for both 'h' and 'i'
-        my $fat_comma_count = $rtype_count->{'=>'};
-        if ( !$match && $fat_comma_count && $fat_comma_count >= 2 ) {
+        # check fat commas
+        if (
+              !$match
+            && $fat_comma_count
+            && (
 
-            # comma count (including trailer) and fat comma count must differ by
-            # by no more than 1. This allows for some small variations.
+                # - a list of key=>value pairs with at least 2 fat commas is a
+                # match for both 'h' and 'i'
+                $fat_comma_count >= 2
+
+                # - an isolated fat comma is a match for type 'h'
+                || (
+                       $fat_comma_count == 1
+                    && $new_comma_count == 1
+                    ## && $if_add ## removed to fix b1476
+                    && $trailing_comma_style eq 'h'
+                )
+            )
+          )
+        {
+
+            # but comma count (including trailer) and fat comma count must
+            # differ by by no more than 1. This allows for some small
+            # variations.
             my $comma_diff = $new_comma_count - $fat_comma_count;
             $match = ( $comma_diff >= -1 && $comma_diff <= 1 );
         }
@@ -12749,165 +14186,6 @@ sub copy_token_as_type {
     return \@rnew_token;
 } ## end sub copy_token_as_type
 
-sub K_next_code {
-    my ( $self, $KK, $rLL ) = @_;
-
-    # return the index of the next nonblank, non-comment token after $KK
-    # Given:
-    #   $KK  = index of the token in $rLL
-    #   $rLL = optional array to use (default is $self->[_rLL_])
-    return if ( !defined($KK) );
-    return if ( $KK < 0 );
-
-    # use the standard array unless given otherwise
-    $rLL = $self->[_rLL_] if ( !defined($rLL) );
-    my $Num  = @{$rLL};
-    my $Knnb = $KK + 1;
-    while ( $Knnb < $Num ) {
-        if ( !defined( $rLL->[$Knnb] ) ) {
-
-            # We seem to have encountered a gap in our array.
-            # This shouldn't happen because sub write_line() pushed
-            # items into the $rLL array.
-            Fault("Undefined entry for k=$Knnb") if (DEVEL_MODE);
-            return;
-        }
-        my $type = $rLL->[$Knnb]->[_TYPE_];
-        if ( $type ne 'b' && $type ne '#' ) {
-            return $Knnb;
-        }
-        $Knnb++;
-    }
-    return;
-} ## end sub K_next_code
-
-sub K_next_nonblank {
-
-    my ( $self, $KK, $rLL ) = @_;
-
-    # Return the index of the next nonblank token after $KK, or
-    # return undef if none
-    # Given:
-    #   $KK  = index of the token in $rLL
-    #   $rLL = optional array to use (default is $self->[_rLL_])
-
-    # NOTE: does not skip over the leading type 'q' of a hanging side comment
-    # (use K_next_code)
-    return if ( !defined($KK) );
-    return if ( $KK < 0 );
-
-    # The third arg allows this routine to be used on any array.  This is
-    # useful in sub respace_tokens when we are copying tokens from an old $rLL
-    # to a new $rLL array.  But usually the third arg will not be given and we
-    # will just use the $rLL array in $self.
-    $rLL = $self->[_rLL_] if ( !defined($rLL) );
-    my $Num  = @{$rLL};
-    my $Knnb = $KK + 1;
-    return       if ( $Knnb >= $Num );
-    return $Knnb if ( $rLL->[$Knnb]->[_TYPE_] ne 'b' );
-    return       if ( ++$Knnb >= $Num );
-    return $Knnb if ( $rLL->[$Knnb]->[_TYPE_] ne 'b' );
-
-    # Backup loop. Very unlikely to get here; it means we have neighboring
-    # blanks in the token stream.
-    $Knnb++;
-    while ( $Knnb < $Num ) {
-
-        # Safety check, this fault shouldn't happen:  The $rLL array is the
-        # main array of tokens, so all entries should be used.  It is
-        # initialized in sub write_line, and then re-initialized by sub
-        # store_token() within sub respace_tokens.  Tokens are pushed on
-        # so there shouldn't be any gaps.
-        if ( !defined( $rLL->[$Knnb] ) ) {
-            Fault("Undefined entry for k=$Knnb") if (DEVEL_MODE);
-            return;
-        }
-        if ( $rLL->[$Knnb]->[_TYPE_] ne 'b' ) { return $Knnb }
-        $Knnb++;
-    }
-    return;
-} ## end sub K_next_nonblank
-
-sub K_previous_code {
-
-    my ( $self, $KK, $rLL ) = @_;
-
-    # Return the index of the previous nonblank, non-comment token before $KK
-    # Given:
-    #   $KK  = index of the token in $rLL
-    #   $rLL = optional array to use (default is $self->[_rLL_])
-    # Call with $KK=undef to start search at the top of the array
-
-    # use the standard array unless given otherwise
-    $rLL = $self->[_rLL_] unless ( defined($rLL) );
-    my $Num = @{$rLL};
-    if ( !defined($KK) ) { $KK = $Num }
-
-    if ( $KK > $Num ) {
-
-        # This fault can be caused by a programming error in which a bad $KK is
-        # given.  The caller should make the first call with KK_new=undef to
-        # avoid this error.
-        Fault(
-"Program Bug: K_previous_nonblank_new called with K=$KK which exceeds $Num"
-        ) if (DEVEL_MODE);
-        return;
-    }
-    my $Kpnb = $KK - 1;
-    while ( $Kpnb >= 0 ) {
-        my $type = $rLL->[$Kpnb]->[_TYPE_];
-        if (   $type ne 'b'
-            && $type ne '#' )
-        {
-            return $Kpnb;
-        }
-        $Kpnb--;
-    }
-    return;
-} ## end sub K_previous_code
-
-sub K_previous_nonblank {
-
-    my ( $self, $KK, $rLL ) = @_;
-
-    # Return index of previous nonblank token before item $KK;
-    # Given:
-    #   $KK  = index of the token in $rLL
-    #   $rLL = optional array to use (default is $self->[_rLL_])
-    # Call with $KK=undef to start search at the top of the array
-    # NOTE: does not skip over the leading type 'q' of a hanging side comment
-    # (use K_previous_code)
-
-    # use the standard array unless given otherwise
-    $rLL = $self->[_rLL_] unless ( defined($rLL) );
-    my $Num = @{$rLL};
-    if ( !defined($KK) ) { $KK = $Num }
-    if ( $KK > $Num ) {
-
-        # This fault can be caused by a programming error in which a bad $KK is
-        # given.  The caller should make the first call with KK_new=undef to
-        # avoid this error.
-        Fault(
-"Program Bug: K_previous_nonblank_new called with K=$KK which exceeds $Num"
-        ) if (DEVEL_MODE);
-        return;
-    }
-    my $Kpnb = $KK - 1;
-    return       if ( $Kpnb < 0 );
-    return $Kpnb if ( $rLL->[$Kpnb]->[_TYPE_] ne 'b' );
-    return       if ( --$Kpnb < 0 );
-    return $Kpnb if ( $rLL->[$Kpnb]->[_TYPE_] ne 'b' );
-
-    # Backup loop. We should not get here unless some routine
-    # slipped repeated blanks into the token stream.
-    return if ( --$Kpnb < 0 );
-    while ( $Kpnb >= 0 ) {
-        if ( $rLL->[$Kpnb]->[_TYPE_] ne 'b' ) { return $Kpnb }
-        $Kpnb--;
-    }
-    return;
-} ## end sub K_previous_nonblank
-
 sub parent_seqno_by_K {
 
     # Return the sequence number of the parent container of token K, if any.
@@ -12933,7 +14211,8 @@ sub parent_seqno_by_K {
     # unbalanced files, last sequence number will either be undefined or it may
     # be at a deeper level.  In either case we will just return SEQ_ROOT to
     # have a defined value and allow formatting to proceed.
-    my $parent_seqno  = SEQ_ROOT;
+    my $parent_seqno = SEQ_ROOT;
+    return $parent_seqno if ( !defined($KK) );
     my $type_sequence = $rLL->[$KK]->[_TYPE_SEQUENCE_];
     if ($type_sequence) {
         $parent_seqno = $self->[_rparent_of_seqno_]->{$type_sequence};
@@ -12962,21 +14241,19 @@ sub parent_seqno_by_K {
 sub parent_sub_seqno {
     my ( $self, $seqno_paren ) = @_;
 
-    # Find sequence number of the sub or asub which contains a given sequenced
-    # item
+    # Find sequence number of the named sub (not asub) which contains a given
+    # sequenced item
 
     # Given:
     #  $seqno_paren = sequence number of a token within the sub
     # Returns:
-    #  $seqno of the sub (or asub), or
+    #  $seqno of the sub, or
     #  nothing if no sub found
     return unless defined($seqno_paren);
     my $parent_seqno = $seqno_paren;
     while ( $parent_seqno = $self->[_rparent_of_seqno_]->{$parent_seqno} ) {
         last if ( $parent_seqno == SEQ_ROOT );
-        if (   $self->[_ris_sub_block_]->{$parent_seqno}
-            || $self->[_ris_asub_block_]->{$parent_seqno} )
-        {
+        if ( $self->[_ris_sub_block_]->{$parent_seqno} ) {
             return $parent_seqno;
         }
     }
@@ -12988,20 +14265,18 @@ sub parent_sub_seqno_by_K {
 
     # NOTE: not currently called but keep for possible future development
 
-    # Find sequence number of the sub or asub which contains a given token
+    # Find sequence number of the named sub which contains a given token
     # Given:
     #  $K = index K of a token
     # Returns:
-    #  $seqno of the sub (or asub), or
+    #  $seqno of the sub, or
     #  nothing if no sub found
 
     return unless defined($KK);
 
     my $seqno_sub;
     my $parent_seqno = $self->parent_seqno_by_K($KK);
-    if (   $self->[_ris_sub_block_]->{$parent_seqno}
-        || $self->[_ris_asub_block_]->{$parent_seqno} )
-    {
+    if ( $self->[_ris_sub_block_]->{$parent_seqno} ) {
         $seqno_sub = $parent_seqno;
     }
     else {
@@ -13472,90 +14747,358 @@ BEGIN {
     @is_keyword_returning_scalar{@q} = (1) x scalar(@q);
 }
 
-sub count_list_args {
+sub count_list_elements {
     my ( $self, $rarg_list ) = @_;
 
-    my $seqno        = $rarg_list->{seqno_list};
-    my $is_signature = $rarg_list->{is_signature};
-    my $shift_count  = $is_signature ? 0 : $rarg_list->{shift_count_min};
-    my $self_name    = $is_signature ? EMPTY_STRING : $rarg_list->{self_name};
-
-    # return undef if we return early
-    $rarg_list->{shift_count_min} = undef;
-
     # Given:
-    #   $seqno        = sequence number of a list for counting items
+    #   $seqno_list   = sequence number of a paren of list to be counted, or
+    #   $K_list_start = starting index of list (for 'return' lists)
+    #   $shift_count_min  = starting min arg count items to include
+    #   $shift_count_max  = starting max arg count items to include
     #   $is_signature = true if this is a sub signature list
-    #   $shift_count  = starting number of '$var=shift;' items to include
-    #   $self_name    = first arg name, if known
+    #   $self_name    = name of first arg found
 
     # Return:
-    #   - the number of args, or
-    #   - '*' if the number cannot be determined in a simple way
-    #   - '*' if the list contains non-scalar items
+    #   -shift_count_min  => starting min arg count items to include, or
+    #      undef if a specific number was not determined
+    #   -shift_count_max  => starting max arg count items to include
+    #      undef if a specific number was not determined
+    #   -self_name => possibly updated name of first arg
+    #   -initialized => a hash entry maintained by this routine
+    #     for keeping track of repeated calls for 'return' lists
 
     # Method:
-    #   - the basic idea is to count commas within the parens
-    #   - for non-signature lists, do not count an initial
-    #     '$self' or '$class' variable
+    #   - The basic method is to count commas, but
+    #   - if we encounter sigils @ or % or other problems which prevent a
+    #     count, then we do a simple return; the count will then be indefinite.
+
+    # Set the counts to undef in case we have to do a simple return upon
+    # encountering an indeterminate list count
+    my $shift_count_min_input = $rarg_list->{shift_count_min};
+##  my $shift_count_max_input = $rarg_list->{shift_count_max};
+    $rarg_list->{shift_count_min} = undef;
+    $rarg_list->{shift_count_max} = undef;
+
+    my $seqno_list   = $rarg_list->{seqno_list};
+    my $K_list_start = $rarg_list->{K_list_start};
+    my $is_signature = $rarg_list->{is_signature};
+    my $self_name    = $is_signature ? EMPTY_STRING : $rarg_list->{self_name};
 
     my $rLL = $self->[_rLL_];
+    my $K_list_end;
 
-    return unless ( defined($seqno) );
-    my $K_opening = $self->[_K_opening_container_]->{$seqno};
-    my $K_closing = $self->[_K_closing_container_]->{$seqno};
-    return unless ( defined($K_closing) );
+    # Input option 1: $seqno_list is a container
+    my $is_return_list;
+    if ( defined($seqno_list) ) {
+        $K_list_start = $self->[_K_opening_container_]->{$seqno_list};
+        $K_list_end   = $self->[_K_closing_container_]->{$seqno_list};
+        return unless ( defined($K_list_end) );
+    }
 
-    my $level_opening = $rLL->[$K_opening]->[_LEVEL_];
-    my $arg_count     = $shift_count;
+    # Input option 2: $K_list_start is the index of a token,
+    # such as 'return', which has trailing args to count.
+    elsif ( defined($K_list_start) ) {
+
+        # Skip past a leading blank if necessary
+        if ( $rLL->[$K_list_start]->[_TYPE_] eq 'b' ) { $K_list_start++ }
+
+        $is_return_list = $rLL->[$K_list_start]->[_TYPE_] eq 'k'
+          && $rLL->[$K_list_start]->[_TOKEN_] eq 'return';
+        $K_list_end = @{$rLL} - 1;
+
+        # Optimization for common case of simple return
+        my $Kn = $self->K_next_code($K_list_start);
+        return unless ($Kn);
+        my $type_n = $rLL->[$Kn]->[_TYPE_];
+        if (   $type_n eq ';'
+            || $is_closing_type{$type_n}
+            || ( $type_n eq 'k' && $is_if_unless{ $rLL->[$Kn]->[_TOKEN_] } ) )
+        {
+            $rarg_list->{shift_count_max} = 0;
+            return;
+        }
+
+        # Check for 'return ()'
+        if ( $rLL->[$Kn]->[_TOKEN_] eq '(' ) {
+            my $Knn = $self->K_next_code($Kn);
+            if ( $Knn && $rLL->[$Knn]->[_TOKEN_] eq ')' ) {
+                $rarg_list->{shift_count_max} = 0;
+                return;
+            }
+        }
+    }
+
+    else {
+        DEVEL_MODE && Fault("Neither seqno_list nor K_list_start defined\n");
+        return;
+    }
+
+    # Initialize the arg count for this call.  We start with any 'shift' counts
+    # previously seen if this is not a signature or 'return' list
+    my $arg_count = 0;
+    if ( $seqno_list && $shift_count_min_input && !$is_signature ) {
+        $arg_count = $shift_count_min_input;
+    }
+
+    # For signature lists we need to remember a minimum
     my $arg_count_min;
+
+    my @seqno_stack;
+    if ($seqno_list) { push @seqno_stack, $seqno_list }
+
+    my $KK = $K_list_start;
+    my $KK_last_last_nb;
+    my $KK_last_nb;
+    my $KK_this_nb = $K_list_start;
+
+    my $backup_on_last = sub {
+
+        # exclude the latest token upon encountering end of list
+        # to avoid adding 1 extra comma at the end
+        $KK_this_nb      = $KK_last_nb;
+        $KK_last_nb      = $KK_last_last_nb;
+        $KK_last_last_nb = undef;
+        return;
+    }; ## end $backup_on_last = sub
 
     #--------------------------------------------------------
     # Main loop to scan the container looking for list items.
     #--------------------------------------------------------
-    foreach my $KK ( $K_opening + 1 .. $K_closing - 1 ) {
+    while ( ++$KK < $K_list_end ) {
+
+        # safety check - shouldn't happen
+        if ( !$KK || $KK <= $KK_this_nb ) {
+            if (DEVEL_MODE) {
+                my $lno = $rLL->[$KK_this_nb]->[_LINE_INDEX_] + 1;
+                Fault("near line $lno: index $KK decreased, was $KK_this_nb\n");
+            }
+            return;
+        }
 
         my $type = $rLL->[$KK]->[_TYPE_];
-        next if ( $type eq 'b' );
-        next if ( $type eq '#' );
+        next   if ( $type eq 'b' );
+        next   if ( $type eq '#' );
+        last   if ( $type eq ';' );
+        return if ( $type eq '..' );
 
-        # Only look at top-level tokens
-        my $level = $rLL->[$KK]->[_LEVEL_];
-        next if ( $level > $level_opening + 1 );
+        # i.e., ($str=~/(\d+)(\w+)/) may be a list of n items
+        return if ( $type eq '=~' );
 
+        $KK_last_last_nb = $KK_last_nb;
+        $KK_last_nb      = $KK_this_nb;
+        $KK_this_nb      = $KK;
         my $token = $rLL->[$KK]->[_TOKEN_];
 
+        # Handle a sequenced item
+        if ( my $seqno = $rLL->[$KK]->[_TYPE_SEQUENCE_] ) {
+
+            if ( $is_opening_type{$type} ) {
+                if ( $token eq '(' ) {
+
+                    # Skip past args to args to subs not returning
+                    # lists, like 'pop(' 'length('
+                    if ($KK_last_nb) {
+                        my $token_last = $rLL->[$KK_last_nb]->[_TOKEN_];
+                        my $type_last  = $rLL->[$KK_last_nb]->[_TYPE_];
+                        if (   $type_last eq 'k'
+                            && $is_non_interfering_keyword{$token_last} )
+                        {
+                            $KK = $self->[_K_closing_container_]->{$seqno};
+                            next;
+                        }
+                    }
+
+                    # If not a list..
+                    if ( !$self->is_list_by_seqno($seqno) ) {
+
+                        # always enter a container following 'return', as in:
+                        #   return (find_sub($subname) =~ /^(.*):(\d+)-(\d+)$/);
+                        if ( $is_return_list && $KK_last_nb == $K_list_start ) {
+                            push @seqno_stack, $seqno;
+                            next;
+                        }
+
+                        my $Kc = $self->[_K_closing_container_]->{$seqno};
+                        if ( !$Kc ) { $backup_on_last->(); last }
+
+                        # Enter nested parens with inner list
+                        #   ( ( $v1, $v2) )
+                        #   | |         | |
+                        # $KK $Kn   $Kc_p $Kc
+                        if ( $self->[_rhas_list_]->{$seqno} ) {
+                            my $Kc_p = $self->K_previous_code($Kc);
+                            if ( $Kc_p && $rLL->[$Kc_p]->[_TOKEN_] eq ')' ) {
+                                my $seqno_c_p =
+                                  $rLL->[$Kc_p]->[_TYPE_SEQUENCE_];
+                                if ( $seqno_c_p && $seqno_c_p == $seqno + 1 ) {
+                                    my $Kn = $self->K_next_code($KK);
+                                    if ( $Kn && $rLL->[$Kn]->[_TOKEN_] eq '(' )
+                                    {
+                                        push @seqno_stack, $seqno;
+                                        next;
+                                    }
+                                }
+                            }
+                        }
+
+                        # enter a list slice, such as '(caller)[1,2]'
+                        my $Kn = $self->K_next_code($Kc);
+                        if ( $Kn && $rLL->[$Kn]->[_TOKEN_] eq '[' ) {
+                            my $seqno_next = $rLL->[$Kn]->[_TYPE_SEQUENCE_];
+                            if (   $seqno_next
+                                && $self->is_list_by_seqno($seqno_next) )
+                            {
+                                $KK = $Kn;
+                                push @seqno_stack, $seqno_next;
+                                next;
+                            }
+                        }
+
+                        my $KK_n = $self->K_next_code($KK);
+                        if ($KK_n) {
+
+                            # look for something like return (@list), which
+                            # will not be marked as a list due to lack of a
+                            # comma
+                            my $type_KK_n  = $rLL->[$KK_n]->[_TYPE_];
+                            my $token_KK_n = $rLL->[$KK_n]->[_TOKEN_];
+                            if ( $type_KK_n eq 't' || $type_KK_n eq 'i' ) {
+                                my $sigil = substr( $token_KK_n, 0, 1 );
+                                if ( $sigil eq '@' || $sigil eq '%' ) { return }
+                            }
+                            elsif ( $type_KK_n eq 'k' ) {
+
+                                # look for something like
+                                #     return (map { ...
+                                if ( !$is_non_interfering_keyword{$token_KK_n} )
+                                {
+                                    return;
+                                }
+                            }
+                            else { }
+                        }
+                    }
+
+                    # a list..
+                    else {
+
+                        # Descend into a paren list in some special cases:
+                        if ($KK_last_nb) {
+
+                            my $token_last = $rLL->[$KK_last_nb]->[_TOKEN_];
+                            my $type_last  = $rLL->[$KK_last_nb]->[_TYPE_];
+
+                            # 'return (' or 'my ('
+                            my $ok = $type_last eq 'k'
+                              && ( $token_last eq 'return'
+                                || $token_last eq 'my' );
+
+                            # ',('
+                            $ok ||= $type_last eq ',';
+
+                            # '(('
+                            $ok ||= $token_last eq '(';
+
+                            # 'wantarray ? ('
+                            $ok ||=
+                                 $KK_last_last_nb
+                              && $is_return_list
+                              && $rLL->[$KK_last_nb]->[_TYPE_] eq '?'
+                              && $rLL->[$KK_last_last_nb]->[_TOKEN_] eq
+                              'wantarray';
+
+                            if ($ok) {
+                                push @seqno_stack, $seqno;
+                                next;
+                            }
+                        }
+                    }
+                }
+
+                # Otherwise skip past this container
+                $KK = $self->[_K_closing_container_]->{$seqno};
+                next;
+            }
+            elsif ( $is_closing_type{$type} ) {
+                my $seqno_test = pop @seqno_stack;
+                if ( $seqno_test && $seqno_test eq $seqno ) {
+
+                    # hide all closing tokens to avoid adding an extra
+                    # comma at the end at something like '$x,)'
+                    $backup_on_last->();
+                    next;
+                }
+                $backup_on_last->();
+                last;
+            }
+            elsif ( $type eq '?' ) {
+
+                # continue scanning ternary for 'return wantarray ?'
+                if (   $rLL->[$KK_last_nb]->[_TOKEN_] eq 'wantarray'
+                    && $rLL->[$KK_last_nb]->[_TYPE_] eq 'k'
+                    && $KK_last_last_nb
+                    && $rLL->[$KK_last_last_nb]->[_TOKEN_] eq 'return'
+                    && $rLL->[$KK_last_last_nb]->[_TYPE_] eq 'k' )
+                {
+                    push @seqno_stack, $seqno;
+                    next;
+                }
+
+                # give up in a return list
+                if ($is_return_list) {
+                    return;
+                }
+
+                # otherwise skip past this ternary
+                $KK = $self->[_K_closing_ternary_]->{$seqno};
+                next;
+            }
+            elsif ( $type eq ':' ) {
+                my $seqno_test = pop @seqno_stack;
+                if ( $seqno_test && $seqno_test eq $seqno ) {
+
+                    # for wantarray ternary, assume one item after ':'
+                    # TODO: if wantarray was preceded by '!' then we should
+                    # swap the two counts here
+                    $arg_count_min = 1;
+                    $backup_on_last->();
+                    last;
+                }
+                $backup_on_last->();
+                last;
+            }
+            else {
+                DEVEL_MODE
+                  && Fault("unexpected seqno=$seqno for type='$type'\n");
+            }
+        }
+
         # handle identifiers
-        if ( $type eq 'i' || $type eq 't' ) {
+        elsif ( $type eq 'i' || $type eq 't' ) {
             my $sigil = substr( $token, 0, 1 );
 
-            # Give up if we find list sigils not preceded by 'scalar'
+            # give up if we find list sigils not preceded by 'scalar'
             if ( $sigil eq '%' || $sigil eq '@' ) {
                 my $K_last = $self->K_previous_code($KK);
                 if ( defined($K_last) ) {
-                    my $type_last  = $rLL->[$K_last]->[_TYPE_];
+                    my $type_last = $rLL->[$K_last]->[_TYPE_];
+                    next if ( $type_last eq '+' || $type_last eq 'p' );
+                    next if ( $type_last eq q{\\} );
+                    next if ( $type_last eq '!' );
                     my $token_last = $rLL->[$K_last]->[_TOKEN_];
                     next if ( $type_last eq 'k' && $token_last eq 'scalar' );
-                    next if ( $type_last eq '+' );
-                    next if ( $type_last eq q{\\} );
                 }
                 return;
             }
 
-            elsif ($sigil eq '$'
-                && !$is_signature
+            # remember the name of the first item, maybe something like '$self'
+            elsif ( $sigil eq '$'
                 && !$self_name
                 && !$arg_count )
             {
                 $self_name = $token;
                 $rarg_list->{self_name} = $self_name;
             }
-
-            # Give up if we find an indexed ref to $_[..]
-            elsif ( length($token) >= 5 && substr( $token, 0, 3 ) eq '$_[' ) {
-                return;
-            }
-
             else {
                 # continue search
             }
@@ -13582,7 +15125,22 @@ sub count_list_args {
         elsif ( $is_kwU{$type} ) {
 
             # Something like 'length $str' is ok
-            next if ( $type eq 'k' && $is_non_interfering_keyword{$token} );
+            if ( $type eq 'k' ) {
+
+                # Something like 'length $str' is ok
+                next if ( $is_non_interfering_keyword{$token} );
+
+                next if ( $token eq 'wantarray' );
+
+                # hop over asubs
+                next if ( $token eq 'sub' );
+
+                # something like return 1 if ...
+                if ( $is_if_unless{$token} ) {
+                    $backup_on_last->();
+                    last;
+                }
+            }
 
             # Certain subsequent tokens prevent problems
             my $Kn = $self->K_next_code($KK);
@@ -13620,16 +15178,22 @@ sub count_list_args {
     }
 
     # Increase the count by 1 if the list does not have a trailing comma
-    my $K_last = $self->K_previous_code($K_closing);
-    if ( $rLL->[$K_last]->[_TYPE_] ne ',' ) { $arg_count++ }
+    if (   defined($KK_this_nb)
+        && $KK_this_nb > $K_list_start
+        && $rLL->[$KK_this_nb]->[_TYPE_] ne ',' )
+    {
+        $arg_count++;
+    }
+
     if ( !defined($arg_count_min) ) {
         $arg_count_min = $arg_count;
     }
+
     $rarg_list->{shift_count_min} = $arg_count_min;
     $rarg_list->{shift_count_max} = $arg_count;
     return;
 
-} ## end sub count_list_args
+} ## end sub count_list_elements
 
 # A constant to limit backward searches
 use constant MANY_TOKENS => 100;
@@ -13692,55 +15256,27 @@ sub count_prototype_args {
     return ( $count_min, $count_max );
 } ## end sub count_prototype_args
 
-sub count_sub_args {
-    my ( $self, $item ) = @_;
+sub find_sub_token {
 
-    # Given: hash ref with
-    #   seqno  => $seqno_block = sequence number of a sub block
-    #   K_last_at_underscore  => optional: index K of last ref to @_
+    my ( $self, $seqno_block ) = @_;
 
-    # Updates hash ref with values for keys:
-    #   shift_count_min  => minimum absolute number of args
-    #   shift_count_max  => maximum absolute number of args
-    #   self_name    => name of first arg (if it can be determined)
-    #   is_signature => true if args are in a signature
-    # These keys are left undefined if they cannot be determined.
-    # 'shift_count_min' and 'shift_count_max' are the same except for
-    # a signature or prototype.
+    # Given:
+    #   $seqno_block = sequence number of a sub block brace
+    # Return:
+    #   $Ksub = index of the actual 'sub' token for the sub
+    #           this will include the name of a named sub, and any prototype
+    #   undef   if cannot find it; this is not a critical sub, so no heroics
+    #
+    # Notation:
+    #
+    #    sub find_sub_token {
+    #    |                  |
+    #    $Ksub              --$K_opening_container for $seqno_block
 
-    my $seqno_block = $item->{seqno};
-    return unless ($seqno_block);
+    my $rLL = $self->[_rLL_];
 
-    # Pull out optional optimization flag. If this is true then there
-    # may be calls to this sub with args, so we should to do a full
-    # search of the entire sub if this would cause a -wma warning.
-    my $max_arg_count = $item->{max_arg_count};
-
-    # Do not count the args if we saw '$_[...'
-    if ( $self->[_rDOLLAR_underscore_by_sub_seqno_]->{$seqno_block} ) {
-        return;
-    }
-
-    # Find index '$K' of the last '@_' in this sub, if any
-    # Note on '$K_last_at_underscore': if we exit with only seeing shifts,
-    # but a pre-scan saw @_ somewhere after the last K, then the count
-    # is dubious and we do a simple return
-    my $K_last_at_underscore = 0;
-    my $rKlist = $self->[_rK_AT_underscore_by_sub_seqno_]->{$seqno_block};
-    if ( defined($rKlist) ) {
-        $K_last_at_underscore = $rKlist->[-1];
-    }
-
-    my $saw_pop_at_underscore;
-
-    my $rLL             = $self->[_rLL_];
-    my $K_opening_block = $self->[_K_opening_container_]->{$seqno_block};
-    my $rlines          = $self->[_rlines_];
-    my $ix_HERE_END     = -1;
-
-    # Optimization: find the previous type 'S' token with the sub name .. this
-    # was saved by sub respace_tokens. May need to back up 1 token if spaces
-    # were deleted.  This is only defined for named subs, not anonymous subs.
+    # See if sub respace_tokens saved the index of the previous type 'S'
+    # for us. May need to back up 1 token if spaces were deleted.
     my $K_sub = $self->[_rK_sub_by_seqno_]->{$seqno_block};
     if ( defined($K_sub) ) {
         my $type = $rLL->[$K_sub]->[_TYPE_];
@@ -13759,32 +15295,156 @@ expecting type 'S' and token=$block_type
 found type '$type' and token='$token'
 EOM
                 }
+
+                # This shouldn't happen, but try to keep going
+                # with the help of the search loop below.
                 $K_sub = undef;
             }
         }
     }
 
-    #---------------------------------------------------------------
+    # Must search for it...
     # Scan backward from the opening brace to find the keyword 'sub'
-    #---------------------------------------------------------------
     if ( !defined($K_sub) ) {
-        my $Kt_min = $K_opening_block - MANY_TOKENS;
+
+        # We normally only arrive here for anonymous subs. But also
+        # if --indent-only is set because respace_tokens is skipped.
+        my $K_opening_block = $self->[_K_opening_container_]->{$seqno_block};
+        my $Kt_min          = $K_opening_block - MANY_TOKENS;
         if ( $Kt_min < 0 ) { $Kt_min = 0 }
         foreach my $Kt ( reverse( $Kt_min .. $K_opening_block ) ) {
             my $token = $rLL->[$Kt]->[_TOKEN_];
             my $type  = $rLL->[$Kt]->[_TYPE_];
-            if (
-                substr( $token, 0, 3 ) eq 'sub'
-                && (   $type eq 'S'
-                    || $type eq 'k'
-                    || $type eq 'i' )
-              )
+            if ( $type eq 'S' ) {
+
+                # type 'S' could be 'method xxx' or '$fn=sub () {' - see c372
+                $K_sub = $Kt;
+                last;
+            }
+            if ( ( $type eq 'k' || $type eq 'i' )
+                && substr( $token, 0, 3 ) eq 'sub' )
             {
+
+                # anonymous subs are type 'k'
                 $K_sub = $Kt;
                 last;
             }
         }
     }
+    return $K_sub;
+} ## end sub find_sub_token
+
+sub count_sub_input_args {
+    my ( $self, $item ) = @_;
+
+    # Given: $item = hash ref with
+    #   seqno  => $seqno_block = sequence number of a sub block
+    #   max_arg_count => optional optimization flag, see note below
+
+    # Updates hash ref $item with values for keys:
+    #   shift_count_min  => minimum absolute number of input args
+    #   shift_count_max  => maximum absolute number of input args
+    #   self_name    => name of first arg (if it can be determined)
+    #   is_signature => true if args are in a signature
+    #   .. plus several other quantities of interest to the caller
+    # These keys are left undefined if they cannot be determined.
+    # 'shift_count_min' and 'shift_count_max' are the same except for
+    # a signature or prototype.
+
+    my $seqno_block = $item->{seqno};
+    return unless ($seqno_block);
+
+    # Pull out optional optimization flag. If this is true then there
+    # may be calls to this sub with args, so we should to do a full
+    # search of the entire sub if this would cause a -wma warning.
+    my $max_arg_count = $item->{max_arg_count};
+
+    my $rLL                 = $self->[_rLL_];
+    my $rlines              = $self->[_rlines_];
+    my $K_opening_container = $self->[_K_opening_container_];
+    my $K_closing_container = $self->[_K_closing_container_];
+    my $K_opening_block     = $self->[_K_opening_container_]->{$seqno_block};
+
+    # Find index '$K' of the last '@_' in this sub, if any
+    # Note on '$K_last_at_underscore': if we exit with only seeing shifts,
+    # but a pre-scan saw @_ somewhere after the last K, then the count
+    # is dubious and we do a simple return
+    my $K_last_at_underscore = 0;
+    my $rKlist = $self->[_rK_AT_underscore_by_sub_seqno_]->{$seqno_block};
+    if ( defined($rKlist) ) {
+        $K_last_at_underscore = $rKlist->[-1];
+    }
+
+    # Note on $_[n]: if there are any shifts of @_ or references to @_, we
+    # cannot use these for a count. Otherwise, we can use the range of n in
+    # $_[n] to get an expected arg count if all indexes n are simple integers.
+    # So for example if we see anything like $_[2+$i] we have to give up.
+    my $seqno_at_index_min;
+    my $at_index_min;
+    my $at_index_max;
+
+    my $dollar_underscore_zero_name = sub {
+
+        # Find the first arg name for a sub which references $_[0] and does
+        # not do shifting. There are two possibilities:
+        #   return '$word' in something like '$word = $_[0];'
+        #   return nothing otherwise
+        return unless ( $seqno_at_index_min && $at_index_min == 0 );
+        my $Ko = $K_opening_container->{$seqno_at_index_min};
+        my $Kc = $K_closing_container->{$seqno_at_index_min};
+        return unless ( $Ko && $Kc );
+        my $K_semicolon = $self->K_next_code($Kc);
+        return unless ( $K_semicolon && $rLL->[$K_semicolon]->[_TYPE_] eq ';' );
+        my $K_m = $self->K_previous_code($Ko);
+        return unless ( $K_m && $rLL->[$K_m]->[_TOKEN_] eq '$_' );
+        my $K_mm = $self->K_previous_code($K_m);
+        return unless ( $K_mm && $rLL->[$K_mm]->[_TYPE_] eq '=' );
+        my $K_mmm = $self->K_previous_code($K_mm);
+        return unless ( $K_mmm && $rLL->[$K_mmm]->[_TYPE_] eq 'i' );
+        my $name = $rLL->[$K_mmm]->[_TOKEN_];
+        return unless ( $name =~ /^\$\w/ );
+        return $name;
+    }; ## end $dollar_underscore_zero_name = sub
+
+    my $rseqno_DOLLAR_underscore =
+      $self->[_rDOLLAR_underscore_by_sub_seqno_]->{$seqno_block};
+    if ( !defined($rKlist) && $rseqno_DOLLAR_underscore ) {
+        my $ok;
+        foreach my $seqno_DOLLAR ( @{$rseqno_DOLLAR_underscore} ) {
+            $ok = 0;
+            my $Ko = $K_opening_container->{$seqno_DOLLAR};
+            my $Kn = $self->K_next_code($Ko);
+            last unless ($Kn);
+            last unless ( $rLL->[$Kn]->[_TYPE_] eq 'n' );
+            my $token = ( $rLL->[$Kn]->[_TOKEN_] );
+            last unless ( $token =~ /^\d+$/ );
+            my $Knn = $self->K_next_code($Kn);
+            my $Kc  = $K_closing_container->{$seqno_DOLLAR};
+            last unless ( $Knn && $Kc && $Knn == $Kc );
+
+            if ( !defined($at_index_min) || $token < $at_index_min ) {
+                $at_index_min = $token;
+                if ( !defined($seqno_at_index_min) ) {
+                    $seqno_at_index_min = $seqno_DOLLAR;
+                }
+            }
+            if ( !defined($at_index_max) || $token > $at_index_max ) {
+                $at_index_max = $token;
+            }
+            $ok = 1;
+        }
+        if ( !$ok ) {
+            $at_index_min = undef;
+            $at_index_max = undef;
+        }
+    }
+
+    # flag indicating we saw a "pop @_" or just "pop;";
+    my $saw_pop_at_underscore;
+
+    my $ix_HERE_END = -1;
+
+    my $K_sub = $self->find_sub_token($seqno_block);
 
     # shouldn't happen:
     if ( !defined($K_sub) || $K_sub >= $K_opening_block ) {
@@ -13826,7 +15486,7 @@ EOM
         my $seqno_list = $rLL->[$Ksub_p]->[_TYPE_SEQUENCE_];
         $item->{seqno_list}   = $seqno_list;
         $item->{is_signature} = 1;
-        $self->count_list_args($item);
+        $self->count_list_elements($item);
 
         # We are finished for a signature list
         return;
@@ -13848,15 +15508,28 @@ EOM
     my $semicolon_count_after_last_shift = 0;
     my $in_interpolated_quote;
 
-    my $KK = $K_opening;
+    my $KK         = $K_opening;
+    my $KK_this_nb = $KK;
     while ( ++$KK < $K_closing ) {
+
+        # safety check - shouldn't happen
+        if ( !$KK || $KK <= $KK_this_nb ) {
+            if (DEVEL_MODE) {
+                my $lno = $rLL->[$KK_this_nb]->[_LINE_INDEX_] + 1;
+                Fault("near line $lno: index $KK decreased, was $KK_this_nb\n");
+            }
+            return;
+        }
 
         my $type = $rLL->[$KK]->[_TYPE_];
         next if ( $type eq 'b' );
         next if ( $type eq '#' );
+        $KK_this_nb = $KK;
 
         my $token = $rLL->[$KK]->[_TOKEN_];
-        if ( $type eq 'i' ) {
+
+        # Note that '$_' here is marked as type 'Z': print $_[0];
+        if ( $type eq 'i' || $type eq 'Z' ) {
 
             # look for '@_'
             if ( $token eq '@_' ) {
@@ -13890,8 +15563,10 @@ EOM
                     $item->{is_signature}    = 0;
                     $item->{shift_count_min} = $shift_count;
                     $item->{shift_count_max} = $shift_count;
-                    $item->{self_name}       = $self_name;
-                    $self->count_list_args($item);
+                    $self->count_list_elements($item);
+
+                    # NOTE: this could disagree with $_[n] usage; we
+                    # ignore this for now.
                     return;
                 }
 
@@ -13905,7 +15580,12 @@ EOM
                 # Found $_: currently the search ends at '$_['
                 my $Kn = $self->K_next_code($KK);
                 if ( $Kn && $rLL->[$Kn]->[_TOKEN_] eq '[' ) {
-                    return;
+
+                    # Give up unless we might be able to define a count
+                    # when there are just references to $_[n] values
+                    if ( !defined($at_index_max) || $shift_count ) {
+                        return;
+                    }
                 }
             }
 
@@ -13971,10 +15651,11 @@ EOM
                 }
 
                 # Just give up if this shift is not followed by a semicolon or
-                # closing brace. This is the safe thing to do to avoid false
-                # errors. There are too many ways for problems to arise.
+                # closing brace or arrow. This is the safe thing to do to avoid
+                # false errors. There are too many ways for problems to arise.
                 # Especially if the next token is one of '||' '//' 'or'.
-                return if ( $type_p ne ';' && $Kp ne $K_closing );
+                return
+                  if ( $type_p ne ';' && $type_p ne '->' && $Kp ne $K_closing );
                 my $level = $rLL->[$KK]->[_LEVEL_];
 
                 # Give up on lower level shifts
@@ -13988,9 +15669,6 @@ EOM
                 $shift_count++;
                 $semicolon_count_after_last_shift = 0;
 
-                # Skip past any parens and @_; let the semicolon be seen next
-                if ( $KK < $Kp - 1 ) { $KK = $Kp - 1 }
-
                 # Save self name:
                 #    '$self = shift'
                 #      |    |   |
@@ -13999,16 +15677,56 @@ EOM
                     my $K_m = $self->K_previous_code($KK);
                     return unless ( defined($K_m) );
                     my $type_m = $rLL->[$K_m]->[_TYPE_];
-                    if ( $type_m eq '=' ) {
 
-                        my $K_mm = $self->K_previous_code($K_m);
-                        return unless defined($K_mm);
-                        if ( $rLL->[$K_mm]->[_TYPE_] eq 'i' ) {
+                    # For something like: sub get_thing {shift->{thing}}
+                    # use $_[0] as the name
+                    if ( $type_p eq '->' ) {
+                        if ( $type_m eq '{' || $type_m eq ';' ) {
+                            $self_name = '$_[0]';
+                            $item->{self_name} = $self_name;
+                        }
+                    }
+                    else {
+                        if ( $type_m eq '=' ) {
+
+                            my $K_mm = $self->K_previous_code($K_m);
+                            return unless defined($K_mm);
+
+                            my $type_mm  = $rLL->[$K_mm]->[_TYPE_];
                             my $token_mm = $rLL->[$K_mm]->[_TOKEN_];
-                            $self_name = $token_mm;
+                            my $seqno_mm = $rLL->[$K_mm]->[_TYPE_SEQUENCE_];
+
+                            # check for $self in parens, like ($self)=shift
+                            if ( $seqno_mm && $token_mm eq ')' ) {
+                                my $Ko = $K_opening_container->{$seqno_mm};
+                                $K_mm = $self->K_next_code($Ko);
+                                if ($K_mm) {
+                                    $type_mm  = $rLL->[$K_mm]->[_TYPE_];
+                                    $token_mm = $rLL->[$K_mm]->[_TOKEN_];
+                                }
+                            }
+
+                            if ( $type_mm eq 'i' ) {
+                                $self_name = $token_mm;
+
+                                # we store self_name immediately because it will
+                                # be needed even if we cannot get an arg count
+                                $item->{self_name} = $self_name;
+                            }
                         }
                     }
                 }
+
+                # Skip past any parens and @_; let the semicolon be seen next
+                if ( $KK < $Kp - 1 ) { $KK = $Kp - 1 }
+
+            }
+            elsif ( $token eq 'bless' ) {
+
+                # Could look for something like the following:
+                #  my $self = bless {}, $class;
+                #  my $self = bless {}, shift;
+
             }
             elsif ( $is_if_unless{$token} ) {
 
@@ -14028,7 +15746,6 @@ EOM
                         {
                             $item->{shift_count_min} = $shift_count;
                             $item->{shift_count_max} = $shift_count;
-                            $item->{self_name}       = $self_name;
                         }
                         return;
                     }
@@ -14153,14 +15870,259 @@ EOM
     #--------------------------------
     # the whole file has been scanned
     #--------------------------------
+
+    # if no shifts @_ and no references to @_, look for $[n]
+    if ( defined($at_index_max) && !$shift_count ) {
+        $shift_count = $at_index_max + 1;
+
+        # Create a self name like '$_[0]' if we can't find user-defined name.
+        # Then any sub calls with '$_[0]->' will be recognized as self
+        # calls by sub cross_check_sub_calls.
+        if ( !$self_name && $at_index_min == 0 ) {
+            $self_name         = $dollar_underscore_zero_name->();
+            $self_name         = '$_[0]' unless ($self_name);
+            $item->{self_name} = $self_name;
+        }
+    }
+
     if ( !$saw_pop_at_underscore ) {
         $item->{shift_count_min} = $shift_count;
         $item->{shift_count_max} = $shift_count;
-        $item->{self_name}       = $self_name;
     }
     return;
 
-} ## end sub count_sub_args
+} ## end sub count_sub_input_args
+
+use constant DEBUG_RETURN_COUNT => 0;
+
+sub count_sub_return_args {
+    my ( $self, $item ) = @_;
+
+    # Given: $item = hash ref with
+    #   seqno  => sequence number of a sub block
+    # Set values for these keys in '$item':
+    #   return_count_min  => minimum number of output args
+    #                        = undef if indeterminate, such as @list
+    #   K_return_count_min => K value of the min
+    #   return_count_max  => maximum number of output args
+    #                        = undef if indeterminate, such as @list
+    #   K_return_count_max => K value of the max
+    my $seqno_sub = $item->{seqno};
+    return unless ($seqno_sub);
+
+    my $rKlist = $self->[_rK_return_by_sub_seqno_]->{$seqno_sub};
+    return if ( !defined($rKlist) );
+
+    # loop over all return statements in this sub
+    my $rLL                  = $self->[_rLL_];
+    my $rhash                = {};
+    my $rK_return_count_hash = {};
+
+    # retain old vars during transition phase
+    my $return_count_min;
+    my $return_count_max;
+
+    foreach ( @{$rKlist} ) {
+        my $K_return = $rLL->[$_]->[_TYPE_] eq 'b' ? $_ + 1 : $_;
+##      my $type     = $rLL->[$K_return]->[_TYPE_];
+        my $token = $rLL->[$K_return]->[_TOKEN_];
+        if ( $token ne 'return' ) {
+            DEVEL_MODE && Fault("expecting 'return' but got $token\n");
+            last;
+        }
+        $rhash->{K_list_start} = $K_return;
+        $self->count_list_elements($rhash);
+        my $count = $rhash->{shift_count_max};
+        if ( !defined($count) ) {
+            $item->{return_count_indefinite} = $K_return;
+            $item->{return_count_max}        = undef;
+            last;
+        }
+
+        # new count?
+        if ( !$rK_return_count_hash->{$count} ) {
+            $rK_return_count_hash->{$count} = $K_return;
+        }
+
+        # retain old vars during transition phase
+        # Note: using <= to match old results but could use <
+        if ( !defined($return_count_min) || $count <= $return_count_min ) {
+            $return_count_min           = $count;
+            $item->{return_count_min}   = $count;
+            $item->{K_return_count_min} = $K_return;
+        }
+
+        # Note: using >= to match old results but could use >
+        if ( !defined($return_count_max) || $count >= $return_count_max ) {
+            $return_count_max           = $count;
+            $item->{return_count_max}   = $count;
+            $item->{K_return_count_max} = $K_return;
+        }
+    }
+
+    $item->{rK_return_count_hash} = $rK_return_count_hash;
+
+    if ( DEBUG_RETURN_COUNT > 1 ) {
+        my $min = $item->{return_count_min};
+        my $max = $item->{return_count_max};
+        $min = '*' unless defined($min);
+        $max = '*' unless defined($max);
+        print "DEBUG_RETURN: returning min=$min max=$max\n";
+    }
+    return;
+} ## end sub count_sub_return_args
+
+sub count_return_values_wanted {
+    my ( $self, $item ) = @_;
+
+    # Given: $item = a hash ref with
+    #   seqno_list => sequence number the call arg list of a sub call
+    # Set value for this key in '$item':
+    #   return_count_wanted => number of return items wanted from the call
+    #                        = undef if indeterminate, such as @list
+
+    # get the sequence number of the call arg list for this call
+    my $seqno_list = $item->{seqno_list};
+    return unless ($seqno_list);
+
+    # Give up if call is followed by a bound operator, for example
+    #     my ( $fh, $tmpfile ) = $self->io()->tempfile( DIR => $dir );
+    #                                      |
+    #                                      ^--$Kc
+    my $rLL  = $self->[_rLL_];
+    my $Kc   = $self->[_K_closing_container_]->{$seqno_list};
+    my $Kc_n = $self->K_next_code($Kc);
+    if ($Kc_n) {
+        my $type_n = $rLL->[$Kc_n]->[_TYPE_];
+        my $ok     = $type_n eq ';' || $is_closing_type{$type_n};
+        if ( !$ok && $type_n eq 'k' ) {
+            my $token_n = $rLL->[$Kc_n]->[_TOKEN_];
+            $ok ||= $is_if_unless{$token_n};
+            $ok ||= $is_and_or{$token_n};
+        }
+        return unless $ok;
+    }
+
+    my $Ko   = $self->[_K_opening_container_]->{$seqno_list};
+    my $K_m  = $self->K_previous_code($Ko);
+    my $K_mm = $self->K_previous_code($K_m);
+    return unless ( defined($K_mm) );
+    my $type_m  = $rLL->[$K_m]->[_TYPE_];
+    my $token_m = $rLL->[$K_m]->[_TOKEN_];
+    my $type_mm = $rLL->[$K_mm]->[_TYPE_];
+
+    # start of backwards search depends on the call type...
+    # note: see var $rsub_call_paren_info_by_seqno in sub respace_tokens
+    my $K_equals;
+
+    # 'function('
+    if ( $type_m eq 'U' || $type_m eq 'w' ) {
+        $K_equals = $K_mm;
+    }
+
+    # '->function('
+    elsif ( $type_m eq 'i' && $type_mm eq '->' ) {
+        my $K_mmm = $self->K_previous_code($K_mm);
+        my $K_mm4 = $self->K_previous_code($K_mmm);
+        return unless defined($K_mm4);
+        my $type_mmm = $rLL->[$K_mmm]->[_TYPE_];
+
+        # something like '$self->function('
+        if ( $type_mmm eq 'i' ) {
+            $K_equals = $K_mm4;
+        }
+
+        # something complex like '$hash_of_objects{my_obj}->function('
+        else {
+
+            # TBD:
+            return;
+        }
+    }
+
+    # '&function('
+    elsif ( $type_m eq 'i' && substr( $token_m, 0, 1 ) eq '&' ) {
+        $K_equals = $K_mm;
+    }
+
+    # '$function->('  [ TODO: simple anonymous sub call, not used yet ]
+    elsif ( $type_m eq '->' && $type_mm eq 'i' ) {
+        my $K_mmm = $self->K_previous_code($K_mm);
+        $K_equals = $K_mmm;
+    }
+
+    # error
+    else {
+        DEVEL_MODE
+          && Fault(
+"unexpected call with type_m=$type_m token_m=$token_m type_mm=$type_mm\n"
+          );
+        return;
+    }
+
+    # look for '='
+    # Note that this ignores a return via a slice, like
+    #          ($v1,$v2) =(f(x))[1,3]
+    # because this is an array return, and we just want explicit lists
+    if ( !$K_equals || $rLL->[$K_equals]->[_TYPE_] ne '=' ) {
+        return;
+    }
+
+    my $K_c = $self->K_previous_code($K_equals);
+    return unless ( defined($K_c) );
+    my $type_c  = $rLL->[$K_c]->[_TYPE_];
+    my $token_c = $rLL->[$K_c]->[_TOKEN_];
+    if ( $token_c ne ')' ) {
+
+        # Handle @array = f(x) or $scalar=f(x), and things like
+        #   $rhash->{vv} = f();
+        #   $hash{vv} = f();
+        #   $array[$index] = f();
+        if ( $is_closing_type{$type_c} ) {
+
+            # backup from the closing brace to any identifier
+            # Note: currently only going back one index, a sub could
+            # be written to handle more complex things
+            my $seqno_c = $rLL->[$K_c]->[_TYPE_SEQUENCE_];
+            return if ( !$seqno_c );
+            my $Ko_c = $self->[_K_opening_container_]->{$seqno_c};
+            return unless ($Ko_c);
+            my $K_c_new = $self->K_previous_code($Ko_c);
+            return unless ($K_c_new);
+            $type_c  = $rLL->[$K_c_new]->[_TYPE_];
+            $token_c = $rLL->[$K_c_new]->[_TOKEN_];
+
+            if ( $type_c eq '->' ) {
+                $K_c_new = $self->K_previous_code($K_c_new);
+                return unless ($K_c_new);
+                $type_c  = $rLL->[$K_c_new]->[_TYPE_];
+                $token_c = $rLL->[$K_c_new]->[_TOKEN_];
+            }
+        }
+
+        if ( $type_c eq 'i' || $type_c eq 't' ) {
+            my $sigil = substr( $token_c, 0, 1 );
+            if ( $sigil eq '$' ) {
+                $item->{return_count_wanted} = 1;
+                $item->{want_scalar}         = 1;
+            }
+        }
+        return;
+    }
+
+    # Count elements in (list of values)=f(x)
+    my $seqno_lhs = $rLL->[$K_c]->[_TYPE_SEQUENCE_];
+    return unless ($seqno_lhs);
+    my $rhash = {};
+    $rhash->{seqno_list} = $seqno_lhs;
+    $self->count_list_elements($rhash);
+    my $return_count_wanted = $rhash->{shift_count_max};
+    if ( DEBUG_RETURN_COUNT > 1 ) {
+        print "DEBUG_RETURN_COUNT: want $return_count_wanted\n";
+    }
+    $item->{return_count_wanted} = $return_count_wanted;
+    return;
+} ## end sub count_return_values_wanted
 
 sub sub_def_info_maker {
 
@@ -14258,8 +16220,11 @@ sub sub_def_info_maker {
         my $call_item = $rprelim_call_info->{$key};
         $item->{max_arg_count} = $call_item->{max_arg_count};
 
-        # Add a count of the number of args
-        $self->count_sub_args($item);
+        # Add a count of the number of input args
+        $self->count_sub_input_args($item);
+
+        # Add a count of the number of return args
+        $self->count_sub_return_args($item);
 
         # Store the sub info by sequence number
         $sub_info_by_seqno{$seqno} = $item;
@@ -14287,6 +16252,33 @@ sub update_sub_call_paren_info {
 
     my @package_stack = reverse( @{$rpackage_lookup_list} );
     my ( $current_package, $Kbegin, $Kend ) = @{ pop @package_stack };
+
+    my $is_dollar_underscore_zero = sub {
+
+        my ($K_closing_bracket) = @_;
+
+        # Given:
+        #   $K_closing_bracket - index of a ']'
+        # Return:
+        #   true of this is the end of '$_[0]'
+        #   false otherwise
+        #
+        #  return $_[0]->PP_decode_json(...
+        #             |
+        #             ---$K_closing_bracket
+        return unless ($K_closing_bracket);
+        my $seqno = $rLL->[$K_closing_bracket]->[_TYPE_SEQUENCE_];
+        return unless ($seqno);
+        my $Ko = $K_opening_container->{$seqno};
+        return unless ($Ko);
+        my $Knum = $self->K_next_code($Ko);
+        return unless ( $Knum && $rLL->[$Knum]->[_TOKEN_] eq '0' );
+        my $Kc = $self->K_next_code($Knum);
+        return unless ( $Kc eq $K_closing_bracket );
+        my $K_p = $self->K_previous_code($Ko);
+        return unless ( $rLL->[$K_p]->[_TOKEN_] eq '$_' );
+        return 1;
+    }; ## end $is_dollar_underscore_zero = sub
 
     #----------------------------------------------
     # Loop over sequence numbers of all call parens
@@ -14319,15 +16311,36 @@ sub update_sub_call_paren_info {
             $name              = substr( $name, 1 );
         }
 
-        my $call_type   = $is_ampersand_call ? '&' : EMPTY_STRING;
+        my $call_type = $is_ampersand_call ? '&' : EMPTY_STRING;
+
         my $caller_name = EMPTY_STRING;
+        my $class_name  = EMPTY_STRING;
         if ( $type_mm eq '->' ) {
             $call_type = '->';
             my $K_m   = $self->K_previous_code($Ko);
             my $K_mm  = $self->K_previous_code($K_m);
             my $K_mmm = $self->K_previous_code($K_mm);
-            if ( defined($K_mmm) && $rLL->[$K_mmm]->[_TYPE_] eq 'i' ) {
-                $caller_name = $rLL->[$K_mmm]->[_TOKEN_];
+            if ( defined($K_mmm) ) {
+                my $type_mmm  = $rLL->[$K_mmm]->[_TYPE_];
+                my $token_mmm = $rLL->[$K_mmm]->[_TOKEN_];
+                if ( $type_mmm eq 'i' ) {
+                    $caller_name = $token_mmm;
+                }
+                elsif ( $type_mmm eq 'w' ) {
+
+                    ##  A::B->do_something( $var1, $var2 );
+                    ##  wwww->iiiiiiiiiiii{ iiiii, iiiii };
+                    if ( index( $token_mmm, '::' ) >= 0 ) {
+                        $class_name = $token_mmm;
+                        $class_name =~ s/::$//;
+                    }
+                }
+                elsif ( $token_mmm eq ']' ) {
+                    if ( $is_dollar_underscore_zero->($K_mmm) ) {
+                        $caller_name = '$_[0]';
+                    }
+                }
+                else { }
             }
         }
 
@@ -14340,6 +16353,11 @@ sub update_sub_call_paren_info {
             $name    = $2;
             $package =~ s/\'/::/g;
             $package =~ s/::$//;
+        }
+        else {
+            if ($class_name) {
+                $package = $class_name;
+            }
         }
         if ( !$package ) { $package = 'main' }
 
@@ -14376,14 +16394,17 @@ sub update_sub_call_paren_info {
         }
 
         # The arg count is undefined if there are non-scalars in the list
+        $item->{seqno_list} = $seqno;
         if ($arg_count) {
-            $item->{seqno_list}      = $seqno;
             $item->{is_signature}    = 0;
             $item->{shift_count_min} = 0;
             $item->{self_name}       = EMPTY_STRING;
-            $self->count_list_args($item);
+            $self->count_list_elements($item);
             $arg_count = $item->{shift_count_min};
         }
+
+        # get the return count expected for this call by scanning to the left
+        $self->count_return_values_wanted($item);
 
         # update the hash of info for this item
         my $line_number = $rLL->[$Ko]->[_LINE_INDEX_] + 1;
@@ -14393,41 +16414,160 @@ sub update_sub_call_paren_info {
         $item->{line_number} = $line_number;
         $item->{call_type}   = $call_type;
         $item->{caller_name} = $caller_name;
-        $item->{seqno}       = $seqno;
+        $item->{class_name}  = $class_name;
     }
     return;
 } ## end sub update_sub_call_paren_info
 
-sub cross_check_call_args {
+{
+    #-----------------------------------------------------
+    # Sub to look at first use of $self in a specified sub
+    #-----------------------------------------------------
+    my %self_call_cache;
+    my %is_oo_call_cache;
 
-    my ( $self, $warn_mode ) = @_;
+    sub initialize_self_call_cache {
+        my $self = shift;
 
-    # Input parameter:
-    #  $warn_mode = true  for --warn-mismatched-args
-    #  $warn_mode = false for --dump-mismatched-args
+        # must be called once per file before first call to sub self_call_check
+        %self_call_cache  = ();
+        %is_oo_call_cache = ();
+        return;
+    } ## end sub initialize_self_call_cache
 
-    # The current possible checks are indicated by these letters:
+    sub self_call_check {
+        my ( $self, $seqno_sub ) = @_;
+
+        # Try to decide if a sub call with '$self->' is a call to an
+        # internal sub by looking at the first '$self' usage.
+
+        # Given:
+        #   $seqno_sub = sequence number of sub to be checked
+        # Return:
+        #   $is_self_call = true if this is an internal $self-> call
+        #                   based on the first $self in the sub.
+        #   $is_oo_call   = true if a call '$self->' appears to be
+        #         within an OO framework which hides the $self arg.
+        # This uses the variable _rK_first_self_by_sub_seqno_ which
+        # is set by sub respace_tokens.
+
+        my $is_self_call = $self_call_cache{$seqno_sub};
+        my $is_oo_call   = $is_oo_call_cache{$seqno_sub};
+
+        if ( !defined($is_self_call) ) {
+            $is_self_call = 0;
+            $is_oo_call   = 0;
+
+            my $rLL = $self->[_rLL_];
+            my $K_first_self =
+              $self->[_rK_first_self_by_sub_seqno_]->{$seqno_sub};
+
+            # an index K stored by respace_tokens may be 1 low
+            $K_first_self++
+              if ( $K_first_self
+                && $rLL->[$K_first_self]->[_TYPE_] eq 'b' );
+
+            my $Kn     = $self->K_next_code($K_first_self);
+            my $type_n = $Kn ? $rLL->[$Kn]->[_TYPE_] : 'b';
+
+            #-----------------------------------------
+            # Try 3a. if "$self->" then assume OO call
+            #-----------------------------------------
+            if ( $type_n eq '->' ) {
+                $is_self_call = 1;
+
+                # Also set a flag to reduce the call arg count by 1
+                # because it looks this is an OO system which
+                # hides the $self call arg.
+                # NOTE: to be sure, we could scan all sub args
+                # in advance to check that all first sub args
+                # are not named $self
+                $is_oo_call = 1;
+            }
+
+            #--------------------------
+            # Try 3b. "$self = bless"
+            #--------------------------
+            elsif ( $type_n eq '=' ) {
+                my $Knn = $self->K_next_code($Kn);
+                $is_self_call = $Knn && $rLL->[$Knn]->[_TOKEN_] eq 'bless';
+            }
+
+            # none of the above
+            else { }
+
+            $self_call_cache{$seqno_sub}  = $is_self_call;
+            $is_oo_call_cache{$seqno_sub} = $is_oo_call;
+        }
+        return ( $is_self_call, $is_oo_call );
+    } ## end sub self_call_check
+}
+
+use constant DEBUG_SELF => 0;
+
+sub cross_check_sub_calls {
+
+    my ($self) = @_;
+
+    # This routine looks for issues for these parameters:
+    #   --dump-mismatched-args
+    #   --warn-mismatched-args
+    #   --dump-mismatched-returns
+    #   --warn-mismatched-returns
+
+    # It returns a hash of values with any warnings found
+
+    my $rLL = $self->[_rLL_];
+
+    # The mismatched-args checks are indicated by these letters:
     # a = both method and non-method calls to a sub
     #     - even for two subs in a different package
     # o = overcount: call arg counts exceed number expected by a sub
     # u = undercount: call arg counts less than number expected by a sub
     #     - except if expecting N or less (N=4 by default)
     # i = indeterminate: expected number of args was not determined
-
-    # initialize for dump mode
-    my $ris_mismatched_call_type = { 'a' => 1, 'o' => 1, 'u' => 1, 'i' => 1 };
+    my %call_arg_issue_note = (
+        a => "both method and non-method calls to a sub",
+        o => "excess args passed",
+        u => "fewer args than expected passed",
+        i => "indeterminate sub arg count",
+    );
+    my %do_mismatched_call_type           = %call_arg_issue_note;
     my $mismatched_arg_undercount_cutoff  = 0;
     my $mismatched_arg_overcount_cutoff   = 0;
     my $ris_mismatched_call_excluded_name = {};
 
-    if ($warn_mode) {
-        $ris_mismatched_call_type = \%warn_mismatched_arg_types;
+    # The mismatched-returns checks are indicated by these letters:
+    my %return_issue_note = (
+        x => "want array but no return seen",
+        y => "want scalar but no return seen",
+        o => "want array with excess count",
+        u => "want array with count not matched by sub",
+        s => "want scalar but sub only returns arrays with count >1",
+    );
+    my %do_mismatched_return_type           = %return_issue_note;
+    my $ris_mismatched_return_excluded_name = {};
+
+    # initialize a cache used for efficiency
+    $self->initialize_self_call_cache();
+
+    my $is_dump =
+      $rOpts->{'dump-mismatched-args'} || $rOpts->{'dump-mismatched-returns'};
+
+    # initialize if not in a dump mode
+    if ( !$is_dump ) {
+
+        %do_mismatched_call_type = %{$rwarn_mismatched_arg_types};
         $mismatched_arg_undercount_cutoff =
           $rOpts->{'warn-mismatched-arg-undercount-cutoff'};
         $mismatched_arg_overcount_cutoff =
           $rOpts->{'warn-mismatched-arg-overcount-cutoff'};
         $ris_mismatched_call_excluded_name =
-          \%is_warn_mismatched_arg_excluded_name;
+          $ris_warn_mismatched_arg_excluded_name;
+
+        %do_mismatched_return_type = %{$rwarn_mismatched_return_types};
+        $ris_mismatched_return_excluded_name =
+          $ris_warn_mismatched_return_excluded_name;
     }
 
     # hardwired name exclusions
@@ -14455,7 +16595,6 @@ sub cross_check_call_args {
     #----------------------------------
     # Preliminary min and max call args
     #----------------------------------
-
     # This is preliminary because some of the calls will eventually be
     # rejected if they appear to be to external objects. This info is
     # needed to optimize the sub arg search in the case of zero args.
@@ -14517,54 +16656,73 @@ sub cross_check_call_args {
     #----------------------------------------------
     # Now split method calls into self and external
     #----------------------------------------------
+    my @debug_warnings;
     foreach my $seqno (@method_call_seqnos) {
-        my $rcall_item  = $rsub_call_paren_info_by_seqno->{$seqno};
-        my $package     = $rcall_item->{package};
-        my $name        = $rcall_item->{name};
-        my $caller_name = $rcall_item->{caller_name};
-        my $key         = $package . '::' . $name;
+        my $rcall_item       = $rsub_call_paren_info_by_seqno->{$seqno};
+        my $package          = $rcall_item->{package};
+        my $name             = $rcall_item->{name};
+        my $caller_name      = $rcall_item->{caller_name};
+        my $class_name       = $rcall_item->{class_name};
+        my $key_receiver_sub = $package . '::' . $name;
         my $is_self_call;
 
         # Find the sub which contains this call
-        my $seqno_sub = $self->parent_sub_seqno($seqno);
-        if ($seqno_sub) {
-
-            # NOTE: calls within anonymous subs are currently skipped
-            # but could eventually be included.
-            my $item = $rsub_info_by_seqno->{$seqno_sub};
+        my $seqno_sub_parent = $self->parent_sub_seqno($seqno);
+        if ($seqno_sub_parent) {
+            my $item = $rsub_info_by_seqno->{$seqno_sub_parent};
             if ($item) {
 
-                # Key assumptions for deciding if a call is to an internal sub:
-                # 1. Look for a first arg like '$self' which matches the
-                # name of the calling object, like '$self->'
-                if (   $item->{self_name}
-                    && $item->{self_name} eq $caller_name )
-                {
-                    # 2. Assume that the first arg of the sub is its object
-                    # if no direct calls to the sub were seen
-                    my $key_sub = $item->{package} . '::' . $item->{name};
-                    $is_self_call = !$common_hash{$key_sub}->{direct_calls};
+                my $key_parent_sub   = $item->{package} . '::' . $item->{name};
+                my $parent_self_name = $item->{self_name};
+                my $caller_is_dollar_self = $caller_name eq '$self';
+
+                # Decide if this method call is to an internal sub:
+                #  Try 1 and Try 2 are general, for any object name
+                #  Try 3 and Try 4 are guesses for common uses of '$self'
+
+                #------------------------------------------------
+                # Try 1: Parent sub self name matches caller name
+                #------------------------------------------------
+                if ($parent_self_name) {
+
+                    # and the only calls to parent sub (if any) are arrow calls.
+                    if (
+                        $parent_self_name eq $caller_name
+                        && (  !$common_hash{$key_parent_sub}->{direct_calls}
+                            || $caller_is_dollar_self )
+                      )
+                    {
+                        $is_self_call = 1;
+                    }
                 }
 
-                # 3. If not, see if the name was blessed in the containing sub
-                else {
-                    my $rK_bless_list = $rK_bless_by_sub_seqno->{$seqno_sub};
+                #---------------------------------------------------------
+                # Try 2. See if the name was blessed in the containing sub
+                #---------------------------------------------------------
+                if ( !$is_self_call ) {
+                    my $item_self = $item->{self_name};
+                    $item_self = 'undef' unless $item_self;
+                    my $rK_bless_list =
+                      $rK_bless_by_sub_seqno->{$seqno_sub_parent};
                     if ($rK_bless_list) {
                         my $Ko = $K_opening_container->{$seqno};
                         foreach my $blessing ( @{$rK_bless_list} ) {
 
-                            # Index K and blessed name were stored with sub
+                            # Index K and blessed name were stored with sub.
+                            # $K_blessed may be 1 token before K of '$self'
                             my ( $K_blessed, $name_blessed ) = @{$blessing};
 
                             # name of blessed object must match
                             next if ( $name_blessed ne $caller_name );
 
-                            # bless must be at top sub level
-                            my $parent_seqno =
-                              $self->parent_seqno_by_K($K_blessed);
+                            # keyword 'bless' must be at top sub level. We have
+                            # to back up 1 token in case $self is in parens.
+                            my $Kp = $self->K_previous_code($K_blessed);
+                            next if ( !$Kp );
+                            my $parent_seqno = $self->parent_seqno_by_K($Kp);
                             next
                               if (!$parent_seqno
-                                || $parent_seqno != $seqno_sub );
+                                || $parent_seqno != $seqno_sub_parent );
 
                             # bless must be before the call
                             next if ( $K_blessed > $Ko );
@@ -14574,16 +16732,128 @@ sub cross_check_call_args {
                         }
                     }
                 }
+
+                #-------------------------------------------------------
+                # Try 3. Caller is '$self'; look at first '$self' in sub
+                #-------------------------------------------------------
+                if ( !$is_self_call && $caller_is_dollar_self ) {
+                    ( $is_self_call, $rcall_item->{is_oo_call} ) =
+                      $self->self_call_check($seqno_sub_parent);
+                }
+
+                #-------------------------------------------------------------
+                # Try 4. caller is '$self': receiver='$self', '$class', '$_[0]'
+                #-------------------------------------------------------------
+                if ( !$is_self_call && $caller_is_dollar_self ) {
+                    my $seqno_sub_called =
+                      $rsub_seqno_by_key->{$key_receiver_sub};
+                    if ($seqno_sub_called) {
+                        my $item_called =
+                          $rsub_info_by_seqno->{$seqno_sub_called};
+                        my $receiver = $item_called->{self_name};
+
+                        #------------------------------------------------
+                        # Try 4a: receiver has some recognized self names
+                        #------------------------------------------------
+                        if (
+                            $receiver
+                            && (   $receiver eq $caller_name
+                                || $receiver eq '$class'
+                                || $receiver eq '$_[0]' )
+                          )
+                        {
+                            $is_self_call = 1;
+                        }
+
+                        #-----------------------------------
+                        # Try 4b: check for a recursive call
+                        #-----------------------------------
+                        else {
+                            $is_self_call =
+                              $seqno_sub_called == $seqno_sub_parent;
+                        }
+                    }
+                }
+
+                if (   DEBUG_SELF
+                    && !$is_self_call
+                    && $caller_is_dollar_self
+                    && $seqno_sub_parent )
+                {
+                    my $Ko_sub      = $K_opening_container->{$seqno_sub_parent};
+                    my $ln_parent   = $rLL->[$Ko_sub]->[_LINE_INDEX_] + 1;
+                    my $Ko          = $K_opening_container->{$seqno};
+                    my $ln          = $rLL->[$Ko]->[_LINE_INDEX_] + 1;
+                    my $parent_self = $item->{self_name};
+                    my $receiver_self = 'missing';
+                    my $ln_receiver   = 'undef';
+                    my $seqno_sub_called =
+                      $rsub_seqno_by_key->{$key_receiver_sub};
+
+                    if ($seqno_sub_called) {
+                        my $item_called =
+                          $rsub_info_by_seqno->{$seqno_sub_called};
+                        $receiver_self = $item_called->{self_name};
+                        my $Ko_receiver =
+                          $K_opening_container->{$seqno_sub_called};
+                        $ln_receiver = $rLL->[$Ko_receiver]->[_LINE_INDEX_] + 1;
+                    }
+
+                    # use DEBUG_SELF=3 to see missing subs
+                    else {
+                        next if ( DEBUG_SELF < 3 );
+                    }
+
+                    # use DEBUG_SELF=2 to see undef-self-undef
+                    next
+                      if ( DEBUG_SELF < 2 && !$parent_self && !$receiver_self );
+                    if ( !$parent_self )   { $parent_self   = 'undef' }
+                    if ( !$receiver_self ) { $receiver_self = 'undef' }
+                    push @debug_warnings,
+                      {
+                        Ko            => $Ko,
+                        caller_name   => $caller_name,
+                        parent_self   => $parent_self,
+                        receiver_self => $receiver_self,
+                        sub_called    => $name,
+                        line_number   => $ln,
+                        ln_parent     => $ln_parent,
+                        ln_receiver   => $ln_receiver,
+                      };
+                }
             }
         }
 
         # Save this method call as either an internal (self) or external call
         if ($is_self_call) {
-            push @{ $common_hash{$key}->{self_calls} }, $rcall_item;
+            push @{ $common_hash{$key_receiver_sub}->{self_calls} },
+              $rcall_item;
         }
         else {
-            $rcall_item->{is_external_call} = 1;
+
+            # mark calls made by unknown (non-self) objects, we can't track
+            # them, but we can track calls at the class level.
+            if ( !$class_name ) {
+                $rcall_item->{is_unknown_object_call} = 1;
+            }
         }
+    }
+
+    if ( DEBUG_SELF && @debug_warnings ) {
+        @debug_warnings = sort { $a->{Ko} <=> $b->{Ko} } @debug_warnings;
+        my $output_string = EMPTY_STRING;
+        foreach my $item (@debug_warnings) {
+##          my $caller_name   = $item->{caller_name};
+            my $parent_self   = $item->{parent_self};
+            my $receiver_self = $item->{receiver_self};
+            my $sub_called    = $item->{sub_called};
+            my $line_number   = $item->{line_number};
+            my $ln_parent     = $item->{ln_parent};
+            my $ln_receiver   = $item->{ln_receiver};
+            $output_string .=
+"$line_number: \$self->$sub_called in parent line $ln_parent with self=$parent_self to receiver line $ln_receiver with self=$receiver_self\n";
+        }
+        warning($output_string);
     }
 
     #-------------------------------
@@ -14629,27 +16899,37 @@ sub cross_check_call_args {
 
     }
 
-    #-------------------------------------------------------------------------
-    # Loop to compare call methods and arg counts of calls and sub definitions
-    #-------------------------------------------------------------------------
+    #--------------------------------------------------------------
+    # Loop over all sub calls to compare call and return arg counts
+    #--------------------------------------------------------------
     foreach my $seqno ( keys %{$rsub_call_paren_info_by_seqno} ) {
 
         my $rcall_item = $rsub_call_paren_info_by_seqno->{$seqno};
 
-        # Skip external method calls
-        next if ( $rcall_item->{is_external_call} );
+        # Skip method calls by unknown objects
+        next if ( $rcall_item->{is_unknown_object_call} );
 
-        my $arg_count = $rcall_item->{arg_count};
-        my $package   = $rcall_item->{package};
-        my $name      = $rcall_item->{name};
-        my $call_type = $rcall_item->{call_type};
-        my $key       = $package . '::' . $name;
+        my $arg_count           = $rcall_item->{arg_count};
+        my $return_count_wanted = $rcall_item->{return_count_wanted};
+        my $want_scalar         = $rcall_item->{want_scalar};
+        my $package             = $rcall_item->{package};
+        my $name                = $rcall_item->{name};
+        my $call_type           = $rcall_item->{call_type};
+        my $key                 = $package . '::' . $name;
 
-        my ( $shift_count_min, $shift_count_max, $self_name );
+        my ( $shift_count_min,  $shift_count_max,  $self_name );
+        my ( $return_count_min, $return_count_max, $return_count_indefinite );
+        my ($rK_return_count_hash);
+
+        # look for the sub ..
         my $seqno_sub = $rsub_seqno_by_key->{$key};
+        my $rK_return_list;
+        my $saw_wantarray;
         if ( defined($seqno_sub) ) {
 
             my $rsub_item = $rsub_info_by_seqno->{$seqno_sub};
+            $saw_wantarray =
+              defined( $self->[_rK_wantarray_by_sub_seqno_]->{$seqno_sub} );
 
             # skip 'my' subs for now, they need special treatment. If
             # anonymous subs are added, 'my' subs could also be added then.
@@ -14660,14 +16940,25 @@ sub cross_check_call_args {
                 if ( $call_type eq '&' && $rsub_item->{prototype} ) {
                     $shift_count_max = $rsub_item->{shift_count_max_amp};
                 }
-                $self_name = $rsub_item->{self_name};
+                $self_name        = $rsub_item->{self_name};
+                $return_count_min = $rsub_item->{return_count_min};
+                $return_count_max = $rsub_item->{return_count_max};
+                $return_count_indefinite =
+                  $rsub_item->{return_count_indefinite};
+                $rK_return_list =
+                  $self->[_rK_return_by_sub_seqno_]->{$seqno_sub};
+                $common_hash{$key}->{rK_return_list} = $rK_return_list;
+                $rK_return_count_hash = $rsub_item->{rK_return_count_hash};
             }
         }
 
-        # compare caller/sub arg counts if posible
+        #------------------------------------
+        # compare caller/sub input arg counts
+        #------------------------------------
         if ( defined($shift_count_min) && defined($arg_count) ) {
-
-            if ( $call_type eq '->' ) { $arg_count += 1 }
+            if ( $call_type eq '->' && !$rcall_item->{is_oo_call} ) {
+                $arg_count += 1;
+            }
             my $excess = $arg_count - $shift_count_min;
 
             my $max = $common_hash{$key}->{max_arg_count};
@@ -14691,18 +16982,149 @@ sub cross_check_call_args {
                 }
             }
             else {
+                ## $excess = 0
+            }
+        }
+
+        #--------------------------------------------
+        # compare caller/sub return counts if posible
+        #--------------------------------------------
+
+        # rhs check: only check subs returning finite lists (i.e. not '@list');
+        next if ($return_count_indefinite);
+
+        # lhs check: only check when a finite return list is wanted
+        next if ( !$return_count_wanted );
+
+        # ignore scalar if wantarray seen
+        next if ( $want_scalar && $saw_wantarray );
+
+        # update min-max want ranges for the output report
+        my $max = $common_hash{$key}->{want_count_max};
+        my $min = $common_hash{$key}->{want_count_min};
+        if ( !defined($max) || $return_count_wanted > $max ) {
+            $common_hash{$key}->{want_count_max} = $return_count_wanted;
+        }
+        if ( !defined($min) || $return_count_wanted < $min ) {
+            $common_hash{$key}->{want_count_min} = $return_count_wanted;
+        }
+
+        # return issue 'x': want array but no return seen
+        # return issue 'y': want scalar but no return seen
+        if ( !defined($rK_return_list) ) {
+            if ($want_scalar) {
+                push @{ $common_hash{$key}->{return_issues}->{y} }, $rcall_item;
+            }
+            else {
+                push @{ $common_hash{$key}->{return_issues}->{x} }, $rcall_item;
+            }
+        }
+
+        # safety check
+        elsif ( !defined($return_count_max) ) {
+
+            # shouldn't happen-should be defined if $rK_return_list is defined
+            DEVEL_MODE && Fault("return_count_max should be defined here\n");
+        }
+
+        # check for exact match
+        elsif ( $return_count_wanted == $return_count_max ) {
+            ## ok
+        }
+
+        # return issue 'o': overwant
+        elsif ( $return_count_wanted > $return_count_max ) {
+
+            # but no error for scalar request of 1 when max 0 returned
+            if ( !$want_scalar ) {
+                push @{ $common_hash{$key}->{return_issues}->{o} }, $rcall_item;
+            }
+        }
+
+        # if want less than max...
+        else {
+
+            # issue 'u': want array for an unmatched count less than max
+            # issue 's': want scalar but all return counts are >1
+            if ( defined($rK_return_count_hash) ) {
+                my $K_return = $rK_return_count_hash->{$return_count_wanted};
+                if ( !defined($K_return) ) {
+                    if ($want_scalar) {
+                        push @{ $common_hash{$key}->{return_issues}->{s} },
+                          $rcall_item;
+                    }
+                    else {
+                        push @{ $common_hash{$key}->{return_issues}->{u} },
+                          $rcall_item;
+                    }
+                }
+            }
+            else {
+                ## safety check, shouldn't happen
+                DEVEL_MODE && Fault("return count hash not defined\n");
             }
         }
     }
 
-    #--------------------
-    # Now look for issues
-    #--------------------
-    my @warnings;
+    #------------------------------------
+    # Construct one-line warning messages
+    #------------------------------------
+    my @call_arg_warnings;
+    my @return_warnings;
     my $max_shift_count_with_undercount = 0;
     my $number_of_undercount_warnings   = 0;
 
-    # Look at each key:
+    # variables with information about a sub needed for warning output:
+    my (
+
+        $lno,              $name,
+        $shift_count_min,  $shift_count_max,
+        $min_arg_count,    $max_arg_count,
+        $return_count_min, $return_count_max,
+        $want_count_min,   $want_count_max,
+    );
+
+    my $push_call_arg_warning = sub {
+        my ( $letter, $note ) = @_;
+        my $shift_count = $shift_count_min;
+        if ( $shift_count_min ne '*' && $shift_count_min ne $shift_count_max ) {
+            $shift_count = "$shift_count_min-$shift_count_max";
+        }
+        my $output_line =
+"$lno:$letter:$name:$shift_count:$min_arg_count:$max_arg_count: $note\n";
+        push @call_arg_warnings,
+          {
+            line_number => $lno,
+            letter      => $letter,
+            name        => $name,
+            output_line => $output_line,
+          };
+        return;
+    }; ## end $push_call_arg_warning = sub
+
+    my $push_return_warning = sub {
+        my ( $letter, $note, $lno_return ) = @_;
+        my $return_count = $return_count_min;
+        if (   $return_count_min ne '*'
+            && $return_count_min ne $return_count_max )
+        {
+            $return_count = "$return_count_min-$return_count_max";
+        }
+        my $output_line =
+"$lno_return:$letter:$name:$return_count:$want_count_min:$want_count_max: $note\n";
+        push @return_warnings,
+          {
+            line_number => $lno_return,
+            letter      => $letter,
+            name        => $name,
+            output_line => $output_line,
+          };
+        return;
+    }; ## end $push_return_warning = sub
+
+    #-------------------
+    # Loop over each sub
+    #-------------------
     foreach my $key ( keys %common_hash ) {
         my $item = $common_hash{$key};
 
@@ -14710,25 +17132,41 @@ sub cross_check_call_args {
         my $rsub_item = $item->{rsub_item};
         next unless defined($rsub_item);
 
-        my $name = $rsub_item->{name};
-        next if ( $ris_mismatched_call_excluded_name->{$name} );
-
-        my $lno           = $rsub_item->{line_number};
+        $name = $rsub_item->{name};
+        $lno  = $rsub_item->{line_number};
+##      my $rK_return_list = $item->{rK_return_list};
         my $rself_calls   = $item->{self_calls};
         my $rdirect_calls = $item->{direct_calls};
         my $num_self      = defined($rself_calls)   ? @{$rself_calls}   : 0;
         my $num_direct    = defined($rdirect_calls) ? @{$rdirect_calls} : 0;
 
-        my $shift_count_min = $rsub_item->{shift_count_min};
-        my $shift_count_max = $rsub_item->{shift_count_max};
+##      my $K_return_count_min = $rsub_item->{K_return_count_min};
+        my $K_return_count_max = $rsub_item->{K_return_count_max};
 
-        $shift_count_max = '*' unless defined($shift_count_max);
-        $shift_count_min = '*' unless defined($shift_count_min);
+        $shift_count_min  = $rsub_item->{shift_count_min};
+        $shift_count_max  = $rsub_item->{shift_count_max};
+        $return_count_min = $rsub_item->{return_count_min};
+        $return_count_max = $rsub_item->{return_count_max};
+        $min_arg_count    = $item->{min_arg_count};
+        $max_arg_count    = $item->{max_arg_count};
+        $want_count_min   = $item->{want_count_min};
+        $want_count_max   = $item->{want_count_max};
 
-        my $max_arg_count = $item->{max_arg_count};
-        my $min_arg_count = $item->{min_arg_count};
-        $max_arg_count = '*' unless defined($max_arg_count);
-        $min_arg_count = '*' unless defined($min_arg_count);
+        # change undefs to '*' for the output text
+        foreach (
+
+            $shift_count_min,  $shift_count_max,
+            $return_count_min, $return_count_max,
+            $min_arg_count,    $max_arg_count,
+            $want_count_min,   $want_count_max,
+          )
+        {
+            $_ = '*' unless defined($_);
+        }
+
+        #-----------------------------------------------------------------
+        # Make a one-line message for each mismatch call issue of this sub
+        #-----------------------------------------------------------------
 
         my $rover_count     = $item->{over_count};
         my $runder_count    = $item->{under_count};
@@ -14738,8 +17176,9 @@ sub cross_check_call_args {
         #--------------------------------------------------
         # issue 'a': subs with both self-> and direct calls
         #--------------------------------------------------
-        if ( $num_self && $num_direct && $ris_mismatched_call_type->{'a'} ) {
+        if ( $num_self && $num_direct && $do_mismatched_call_type{'a'} ) {
 
+            my $letter             = 'a';
             my $lines_self_calls   = stringify_line_range($rself_calls);
             my $lines_direct_calls = stringify_line_range($rdirect_calls);
             my $self_name          = $rsub_item->{self_name};
@@ -14749,82 +17188,52 @@ sub cross_check_call_args {
             my $str  = $self_name . '->call' . $ess1;
             my $note =
 "$num_self $str($lines_self_calls) and $num_direct call$ess2($lines_direct_calls)";
-            push @warnings,
-              {
-                line_number     => $lno,
-                letter          => 'a',
-                name            => $name,
-                shift_count_min => $shift_count_min,
-                shift_count_max => $shift_count_max,
-                min_arg_count   => $min_arg_count,
-                max_arg_count   => $max_arg_count,
-                note            => $note,
-              };
+            $push_call_arg_warning->( $letter, $note );
         }
 
         #---------------------------------------------------------
         # Ignore calls to a sub which was not defined in this file
         #---------------------------------------------------------
         if ( !defined($rsub_item) ) {
+            next;
         }
 
         #-------------------------------------------------------------------
         # issue 'i': indeterminate. Could not determine a specific arg count
         #-------------------------------------------------------------------
-        elsif ( $shift_count_min eq '*' ) {
-            if ( $ris_mismatched_call_type->{'i'} ) {
-                my $letter = 'i';
+        if ( $shift_count_min eq '*' ) {
+            my $letter = 'i';
+            if ( $do_mismatched_call_type{$letter} ) {
 
                 # skip *:*:* (no disagreement - call counts also indeterminate)
                 next
                   if ( $shift_count_min eq $min_arg_count
                     && $shift_count_min eq $max_arg_count );
 
-                my $note = "indeterminate sub arg count";
-                push @warnings,
-                  {
-                    line_number     => $lno,
-                    letter          => $letter,
-                    name            => $name,
-                    shift_count_min => $shift_count_min,
-                    shift_count_max => $shift_count_max,
-                    min_arg_count   => $min_arg_count,
-                    max_arg_count   => $max_arg_count,
-                    note            => $note,
-                  };
+                my $note = $call_arg_issue_note{$letter};
+                $push_call_arg_warning->( $letter, $note );
             }
         }
 
-        # check counts
+        # otherwise check call arg counts
         else {
 
             #---------------------
             # issue 'o': overcount
             #---------------------
-            if ($num_over_count) {
-                if (   $ris_mismatched_call_type->{'o'}
-                    && $shift_count_max >= $mismatched_arg_overcount_cutoff )
-                {
-
-                    my $lines_over_count = stringify_line_range($rover_count);
-                    my $total            = $num_direct + $num_self;
-                    my $note;
-                    my $letter = 'o';
-                    $note =
-"excess args at $num_over_count of $total calls($lines_over_count)";
-
-                    push @warnings,
-                      {
-                        line_number     => $lno,
-                        letter          => $letter,
-                        name            => $name,
-                        shift_count_min => $shift_count_min,
-                        shift_count_max => $shift_count_max,
-                        min_arg_count   => $min_arg_count,
-                        max_arg_count   => $max_arg_count,
-                        note            => $note,
-                      };
-                }
+            if (   $num_over_count
+                && $do_mismatched_call_type{'o'}
+                && $shift_count_max >= $mismatched_arg_overcount_cutoff )
+            {
+                my $letter     = 'o';
+                my $line_range = stringify_line_range($rover_count);
+                my $total      = $num_direct + $num_self;
+                my $note       = $call_arg_issue_note{$letter};
+                $note .=
+                  $total > 1
+                  ? " at $num_over_count of $total calls ($line_range)"
+                  : " at $line_range";
+                $push_call_arg_warning->( $letter, $note );
             }
 
             #----------------------
@@ -14837,49 +17246,128 @@ sub cross_check_call_args {
                 }
 
                 # Skip the warning for small lists with undercount
-                if (   $ris_mismatched_call_type->{'u'}
+                if (   $do_mismatched_call_type{'u'}
                     && $shift_count_min >= $mismatched_arg_undercount_cutoff )
                 {
-                    my $lines_under_count = stringify_line_range($runder_count);
-                    my $total             = $num_direct + $num_self;
-                    my $note;
-                    my $letter = 'u';
-                    $note =
-"arg undercount at $num_under_count of $total calls($lines_under_count)";
+                    my $letter     = 'u';
+                    my $line_range = stringify_line_range($runder_count);
+                    my $total      = $num_direct + $num_self;
+
+                    my $note = $call_arg_issue_note{$letter};
+                    $note .=
+                      $total > 1
+                      ? " at $num_under_count of $total calls ($line_range)"
+                      : " at $line_range";
 
                     $number_of_undercount_warnings++;
-                    push @warnings,
-                      {
-                        line_number     => $lno,
-                        letter          => $letter,
-                        name            => $name,
-                        shift_count_min => $shift_count_min,
-                        shift_count_max => $shift_count_max,
-                        min_arg_count   => $min_arg_count,
-                        max_arg_count   => $max_arg_count,
-                        note            => $note,
-                      };
+                    $push_call_arg_warning->( $letter, $note );
                 }
             }
         }
+
+        #-------------------------------------------------------------------
+        # Make a one-line message for each mismatch return issue of this sub
+        #-------------------------------------------------------------------
+        my $return_issues = $item->{return_issues};
+        if ($return_issues) {
+            foreach my $letter ( keys %return_issue_note ) {
+                next if ( !$do_mismatched_return_type{$letter} );
+                my $rissues = $return_issues->{$letter};
+                my $number  = defined($rissues) ? @{$rissues} : 0;
+                next unless ($number);
+                my $line_range = stringify_line_range($rissues);
+                my $total      = $num_direct + $num_self;
+
+                my $note = $return_issue_note{$letter};
+                $note .=
+                  $total > 1
+                  ? " at $number of $total calls ($line_range)"
+                  : " at $line_range";
+
+                # The one-line message shows the line number of the return
+                # with the maximum count if there are returns. If no returns
+                # (types 'x' and 'y') it shows the first line of the sub ($lno).
+                my $lno_return =
+                  defined($K_return_count_max)
+                  ? $rLL->[$K_return_count_max]->[_LINE_INDEX_] + 1
+                  : $lno;
+
+                $push_return_warning->( $letter, $note, $lno_return );
+            } ## end loop to save one line for mismatched returns
+        }
     }
 
-    if (@warnings) {
-        @warnings = sort {
-                 $a->{line_number} <=> $b->{line_number}
-              || $a->{letter} cmp $b->{letter}
-        } @warnings;
-    }
-
-    my $hint = EMPTY_STRING;
-    if ($number_of_undercount_warnings) {
-        my $wmauc_min = $max_shift_count_with_undercount + 1;
-        $hint = <<EOM;
+    #-----------------------------------------------
+    # Make the sorted/filtered call arg issue report
+    #-----------------------------------------------
+    my $rcall_arg_warnings = sort_warnings( \@call_arg_warnings );
+    $rcall_arg_warnings = filter_excluded_names( $rcall_arg_warnings,
+        $ris_mismatched_call_excluded_name );
+    my $call_arg_warning_output = EMPTY_STRING;
+    my $call_arg_hint           = EMPTY_STRING;
+    if ( @{$rcall_arg_warnings} ) {
+        my $header =
+          "Issue types are 'a'=arrow mismatch 'u'=undercount 'o'=overcount";
+        if ($is_dump) { $header .= " 'i'=indeterminate" }
+        $call_arg_warning_output = <<EOM;
+$header
+Line:Issue:Sub:#args:Min:Max: note
+EOM
+        foreach ( @{$rcall_arg_warnings} ) {
+            $call_arg_warning_output .= $_->{output_line};
+        }
+        if ( !$is_dump && $number_of_undercount_warnings ) {
+            my $wmauc_min = $max_shift_count_with_undercount + 1;
+            $call_arg_hint = <<EOM;
 Note: use -wmauc=$wmauc_min or greater to prevent undercount warnings in this file
 EOM
+            $call_arg_warning_output .= $call_arg_hint;
+        }
     }
-    return ( \@warnings, $hint );
-} ## end sub cross_check_call_args
+
+    #---------------------------------------------
+    # Make the sorted/filtered return issue report
+    #---------------------------------------------
+    my $rreturn_warnings = sort_warnings( \@return_warnings );
+    $rreturn_warnings = filter_excluded_names( $rreturn_warnings,
+        $ris_mismatched_return_excluded_name );
+
+    my $return_warning_output = EMPTY_STRING;
+    if ( @{$rreturn_warnings} ) {
+        $return_warning_output = <<EOM;
+Issue types 'u'=under-want 'o'=over-want 'x'=no return 's'=scalar-array mix
+Line:Issue:Sub:#Returned:Min_wanted:Max_wanted: note
+EOM
+        foreach ( @{$rreturn_warnings} ) {
+            $return_warning_output .= $_->{output_line};
+        }
+    }
+
+    return {
+        call_arg_warning_output => $call_arg_warning_output,
+        return_warning_output   => $return_warning_output,
+    };
+} ## end sub cross_check_sub_calls
+
+sub sort_warnings {
+
+    # Given:
+    #   $rwarnigns = ref to list of warning info hashes
+    # Return updated $rwarnings
+    #   - Sorted by line number
+    my ($rwarnings) = @_;
+    if ( @{$rwarnings} ) {
+
+        # sort by line number
+        $rwarnings = [
+            sort {
+                     $a->{line_number} <=> $b->{line_number}
+                  || $a->{letter} cmp $b->{letter}
+            } @{$rwarnings}
+        ];
+    }
+    return $rwarnings;
+} ## end sub sort_warnings
 
 sub stringify_line_range {
     my ($rcalls) = @_;
@@ -14903,190 +17391,96 @@ sub stringify_line_range {
     return $string;
 } ## end sub stringify_line_range
 
-sub initialize_warn_mismatched_args {
+sub initialize_warn_mismatched {
 
-    # Initialization for:
-    #    --warn-mismatched-args
-    #    --warn-mismatched-arg-types=s
-    #    --warn-mismatched-arg-exclusion-list=s
-    %warn_mismatched_arg_types            = ();
-    %is_warn_mismatched_arg_excluded_name = ();
-    return unless $rOpts->{'warn-mismatched-args'};
-
-    # Note: coding here is similar to sub initialize_warn_variable_types
-
-    #-----------------------------------
-    # Parse --warn-mismatched-arg-types
-    #-----------------------------------
-    my $wmat_key    = 'warn-mismatched-arg-types';
-    my $wmat_option = $rOpts->{$wmat_key};
-    $wmat_option = '1' unless defined($wmat_option);
-
-    # The -indent-only option skips production of data structures needed by
-    # the --warn-mismatched-args
-    if ( $rOpts->{'indent-only'} ) {
-        my $wma_key = 'warn-mismatched-args';
-        Warn("Note: '--$wma_key' is ignored if '--indent-only' is set\n");
-        return;
-    }
-
-    # Specific options:
     #  a - mismatched arrow operator calls
     #  o - overcount
     #  u - undercount
+    $rwarn_mismatched_arg_types =
+      initialize_warn_hash( 'warn-mismatched-arg-types', 1, [qw(a o u)] );
+    $ris_warn_mismatched_arg_excluded_name =
+      make_excluded_name_hash('warn-mismatched-arg-exclusion-list');
 
-    # Other controls:
-    #  0 - none of the above
-    #  1 - all of the above
-    #  * - all of the above
-
-    # Example:
-    #  -wmat='a o' : do check types 'a' and 'o'
-    #  -wmat='u'   : do check type 'u'
-
-    my @all_opts = qw(a o u);
-    my %is_valid_option;
-    @is_valid_option{@all_opts} = (1) x scalar(@all_opts);
-
-    # allow comma separators
-    $wmat_option =~ s/,/ /g;
-
-    my @opts = split_words($wmat_option);
-    return unless (@opts);
-
-    # check a single item
-    if ( @opts == 1 ) {
-        my $opt = $opts[0];
-
-        # Split a single option of bundled letters like 'ao' into 'a o'
-        # but give a warning because this may not be allowed in the future
-        if ( length($opt) > 1 ) {
-            @opts = split //, $opt;
-            Warn("Please use space-separated letters in --$wmat_key\n");
-        }
-        elsif ( $opt eq '*' || $opt eq '1' ) {
-            @opts = keys %is_valid_option;
-        }
-        elsif ( $opt eq '0' ) {
-            return;
-        }
-        else {
-            # should be one of a o u - catch any error below
-        }
-    }
-
-    my $msg = EMPTY_STRING;
-    foreach my $opt (@opts) {
-        if ( $is_valid_option{$opt} ) {
-            $warn_mismatched_arg_types{$opt} = 1;
-        }
-        else {
-            if ( $opt =~ /^[01\*]$/ ) {
-                $msg .=
-                  "--$wmat_key cannot contain $opt mixed with other options\n";
-            }
-            else {
-                $msg .= "--$wmat_key has unexpected symbol: '$opt'\n";
-            }
-        }
-    }
-    if ($msg) { Die($msg) }
-
-    #--------------------------------------------
-    # Parse --warn-mismatched-arg-exclusion-list
-    #--------------------------------------------
-    my $wmcxl_key      = 'warn-mismatched-arg-exclusion-list';
-    my $excluded_names = $rOpts->{$wmcxl_key};
-    if ($excluded_names) {
-        $excluded_names =~ s/,/ /g;
-        my @xl      = split_words($excluded_names);
-        my $err_msg = EMPTY_STRING;
-        foreach my $name (@xl) {
-            if ( $name !~ /^[\$\@\%]?\w+$/ ) {
-                $err_msg .= "-wmcxl has unexpected name: '$name'\n";
-            }
-        }
-        if ($err_msg) { Die($err_msg) }
-        @is_warn_mismatched_arg_excluded_name{@xl} = (1) x scalar(@xl);
-    }
+    #  x - want array but no return seen
+    #  o - want array with excess count
+    #  u - want array with unmatched count
+    #  y - want scalar but no return seen
+    #  s - want scalar but only arrays with count > 1 returned
+    $rwarn_mismatched_return_types =
+      initialize_warn_hash( 'warn-mismatched-return-types', 1,
+        [qw(x o u y s)] );
+    $ris_warn_mismatched_return_excluded_name =
+      make_excluded_name_hash('warn-mismatched-return-exclusion-list');
     return;
-} ## end sub initialize_warn_mismatched_args
+} ## end sub initialize_warn_mismatched
 
-sub warn_mismatched_args {
+sub warn_mismatched {
     my ($self) = @_;
 
-    # process a --warn-mismatched-args command
+    # process both --warn-mismatched-args and --warn-mismatched-returns,
+    my $rhash = $self->cross_check_sub_calls();
 
-    # additional control parameters are:
-    # - warn-mismatched-arg-types
-    # - warn-mismatched-arg-exclusion-list
-    # - warn-mismatched-arg-undercount-cutoff
-    # - warn-mismatched-arg-overcount-cutoff
-
-    my ( $rwarnings, $hint ) = $self->cross_check_call_args(1);
-    return unless ( $rwarnings && @{$rwarnings} );
-
-    my $wma_key       = 'warn-mismatched-args';
-    my $output_string = "Begin scan for --$wma_key\n";
-    $output_string .= <<EOM;
-Issue abbreviations a=arrow mismatch u=undercount o=overcount
-Line:Issue:Name:#args:Min:Max: note
+    my $wma_key = 'warn-mismatched-args';
+    if ( $rOpts->{$wma_key} ) {
+        my $output_lines = $rhash->{call_arg_warning_output};
+        if ($output_lines) {
+            chomp $output_lines;
+            warning(<<EOM);
+Begin scan for --$wma_key
+$output_lines
+End scan for --$wma_key
 EOM
-
-    # output the results, ignoring any excluded names
-    foreach my $item ( @{$rwarnings} ) {
-        my $lno             = $item->{line_number};
-        my $letter          = $item->{letter};
-        my $name            = $item->{name};
-        my $shift_count_min = $item->{shift_count_min};
-        my $shift_count_max = $item->{shift_count_max};
-        my $min_arg_count   = $item->{min_arg_count};
-        my $max_arg_count   = $item->{max_arg_count};
-        my $note            = $item->{note};
-        my $shift_count =
-            $shift_count_min eq $shift_count_max
-          ? $shift_count_min
-          : "$shift_count_min-$shift_count_max";
-        $output_string .=
-"$lno:$letter:$name:$shift_count:$min_arg_count:$max_arg_count: $note\n";
+        }
     }
-    if ($hint) { $output_string .= $hint }
-    $output_string .= "End scan for --$wma_key\n";
-    warning($output_string);
 
+    my $wmr_key = 'warn-mismatched-returns';
+    if ( $rOpts->{$wmr_key} ) {
+        my $output_lines = $rhash->{return_warning_output};
+        if ($output_lines) {
+            chomp $output_lines;
+            warning(<<EOM);
+Begin scan for --$wmr_key
+$output_lines
+End scan for --$wmr_key
+EOM
+        }
+    }
     return;
-} ## end sub warn_mismatched_args
+} ## end sub warn_mismatched
 
 sub dump_mismatched_args {
     my ($self) = @_;
 
     # process a --dump-mismatched-args command
-
-    my ( $rwarnings, $hint ) = $self->cross_check_call_args(0);
-    return unless ( $rwarnings && @{$rwarnings} );
-    my $output_string = <<EOM;
-Issue abbreviations a=arrow mismatch u=undercount o=overcount i=indeterminate
-Line:Issue:Name:#args:Min:Max: note
+    my $rhash         = $self->cross_check_sub_calls();
+    my $output_string = $rhash->{call_arg_warning_output};
+    if ($output_string) {
+        my $input_stream_name = get_input_stream_name();
+        chomp $output_string;
+        print {*STDOUT} <<EOM;
+$input_stream_name: output for --dump-mismatched-args
+$output_string
 EOM
-    foreach my $item ( @{$rwarnings} ) {
-        my $lno             = $item->{line_number};
-        my $letter          = $item->{letter};
-        my $name            = $item->{name};
-        my $note            = $item->{note};
-        my $shift_count_min = $item->{shift_count_min};
-        my $shift_count_max = $item->{shift_count_max};
-        my $min_arg_count   = $item->{min_arg_count};
-        my $max_arg_count   = $item->{max_arg_count};
-        my $shift_count =
-            $shift_count_min eq $shift_count_max
-          ? $shift_count_min
-          : "$shift_count_min-$shift_count_max";
-        $output_string .=
-"$lno:$letter:$name:$shift_count:$min_arg_count:$max_arg_count: $note\n";
     }
-    print {*STDOUT} $output_string;
     return;
 } ## end sub dump_mismatched_args
+
+sub dump_mismatched_returns {
+    my ($self) = @_;
+
+    # process a --dump-mismatched-returns command
+    my $rhash         = $self->cross_check_sub_calls();
+    my $output_string = $rhash->{return_warning_output};
+    if ($output_string) {
+        my $input_stream_name = get_input_stream_name();
+        chomp $output_string;
+        print {*STDOUT} <<EOM;
+$input_stream_name: output for --dump-mismatched-returns
+$output_string
+EOM
+    }
+    return;
+} ## end sub dump_mismatched_returns
 
 sub check_for_old_break {
     my ( $self, $KK, $rkeep_break_hash, $rbreak_hash ) = @_;
@@ -15188,6 +17582,12 @@ sub keep_old_line_breaks {
             # leading '->' use a value of 2 which causes a soft
             # break rather than a hard break
             if ( $type eq '->' ) {
+
+                # ignore -bom after an opening token ( a syntax error, b1475 )
+                my $Kp = $self->K_previous_nonblank($Kfirst);
+                next if ( !defined($Kp) );
+                next if ( $is_opening_type{ $rLL->[$Kp]->[_TYPE_] } );
+
                 $rbreak_before_Kfirst->{$Kfirst} = 2;
             }
 
@@ -15883,7 +18283,7 @@ sub setup_new_weld_measurements {
 
     my $iline_oo = $rLL->[$Kouter_opening]->[_LINE_INDEX_];
     my $rK_range = $rlines->[$iline_oo]->{_rK_range};
-    my ( $Kfirst, $Klast ) = @{$rK_range};
+    my ( $Kfirst, $Klast_uu ) = @{$rK_range};
 
     #-------------------------------------------------------------------------
     # We now define a reference index, '$Kref', from which to start measuring
@@ -15933,7 +18333,7 @@ sub setup_new_weld_measurements {
                 if ( $type_prev eq '=>' ) {
                     my $iline_prev    = $rLL->[$Kprev]->[_LINE_INDEX_];
                     my $rK_range_prev = $rlines->[$iline_prev]->{_rK_range};
-                    my ( $Kfirst_prev, $Klast_prev ) = @{$rK_range_prev};
+                    my ( $Kfirst_prev, $Klast_prev_uu ) = @{$rK_range_prev};
                     foreach my $KK ( reverse( $Kfirst_prev .. $Kref - 1 ) ) {
                         next if ( $rLL->[$KK]->[_TYPE_] eq 'b' );
                         $Kref = $KK;
@@ -16289,7 +18689,7 @@ sub weld_nested_containers {
             foreach my $iline ( $iline_oo + 1 .. $iline_io ) {
                 my $rK_range = $rlines->[$iline]->{_rK_range};
                 next unless defined($rK_range);
-                my ( $Kfirst, $Klast ) = @{$rK_range};
+                my ( $Kfirst, $Klast_uu ) = @{$rK_range};
                 next unless defined($Kfirst);
                 if ( $rLL->[$Kfirst]->[_TYPE_] eq '->' ) {
                     $do_not_weld_rule = 7;
@@ -16805,7 +19205,7 @@ sub weld_nested_quotes {
             return if ( $test_type ne $quote_type );
         }
         return 1;
-    };
+    }; ## end $is_single_quote = sub
 
     # Length tolerance - same as previously used for sub weld_nested
     my $multiline_tol =
@@ -16937,7 +19337,7 @@ sub weld_nested_quotes {
             # Check the length of the last line (fixes case b1039)
             if ( !$do_not_weld ) {
                 my $rK_range_ic = $rlines->[$iline_ic]->{_rK_range};
-                my ( $Kfirst_ic, $Klast_ic ) = @{$rK_range_ic};
+                my ( $Kfirst_ic, $Klast_ic_uu ) = @{$rK_range_ic};
                 my $excess_ic =
                   $self->excess_line_length_for_Krange( $Kfirst_ic,
                     $Kouter_closing );
@@ -17077,7 +19477,7 @@ sub mark_short_nested_blocks {
         my $length = $self->cumulative_length_before_K($K) - $starting_lentot;
         my $excess_length = $length + $length_tol - $maximum_text_length;
         return ($excess_length);
-    };
+    }; ## end $excess_length_to_K = sub
 
     # loop over all containers
     my @open_block_stack;
@@ -17260,7 +19660,7 @@ sub do_non_indenting_braces {
         my $KK             = $K_opening_container->{$seqno};
         my $line_of_tokens = $rlines->[$ix];
         my $rK_range       = $line_of_tokens->{_rK_range};
-        my ( $Kfirst, $Klast ) = @{$rK_range};
+        my ( $Kfirst_uu, $Klast ) = @{$rK_range};
         $rspecial_side_comment_type->{$Klast} = 'NIB';
         push @K_stack, [ $KK, 1 ];
         my $Kc = $K_closing_container->{$seqno};
@@ -17553,7 +19953,7 @@ sub break_before_list_opening_containers {
 
             my $iline    = $rLL->[$KK]->[_LINE_INDEX_];
             my $rK_range = $rlines->[$iline]->{_rK_range};
-            my ( $Kfirst, $Klast ) = @{$rK_range};
+            my ( $Kfirst, $Klast_uu ) = @{$rK_range};
             next unless ( $KK == $Kfirst );
         }
 
@@ -18711,10 +21111,10 @@ sub is_fragile_block_type {
         #----------------------------------
         # Loop over tokens on this line ...
         #----------------------------------
+        my $type;
         foreach my $KK ( $K_begin_loop .. $K_terminal ) {
 
-            my $type = $rLL->[$KK]->[_TYPE_];
-            next if ( $type eq 'b' );
+            next if ( ( $type = $rLL->[$KK]->[_TYPE_] ) eq 'b' );
 
             #------------------------
             # Handle sequenced tokens
@@ -19235,17 +21635,17 @@ sub process_all_lines {
 
                     # get updated indentation levels
                     my $rK_range = $line_of_tokens->{_rK_range};
-                    my ( $K_first, $K_last ) = @{$rK_range};
-                    if ( defined($K_first) ) {
-                        my $level_0 = $self->[_radjusted_levels_]->[$K_first];
+                    my ( $Kfirst, $Klast_uu ) = @{$rK_range};
+                    if ( defined($Kfirst) ) {
+                        my $level_0 = $self->[_radjusted_levels_]->[$Kfirst];
                         my $ci_level_0 =
-                          $self->[_rLL_]->[$K_first]->[_CI_LEVEL_];
+                          $self->[_rLL_]->[$Kfirst]->[_CI_LEVEL_];
                         $line_of_tokens->{_level_0}    = $level_0;
                         $line_of_tokens->{_ci_level_0} = $ci_level_0;
                     }
 
                     $logger_object->black_box( $line_of_tokens,
-                        $vertical_aligner_object->get_output_line_number );
+                        $vertical_aligner_object->get_output_line_number() );
                 }
             }
 
@@ -19499,8 +21899,8 @@ EOM
             my $j_e = $subgroup[$k] - 1;
 
             # index i is the actual line number of a keyword
-            my ( $i_b, $tok_b, $count_b ) = @{ $group[$j_b] };
-            my ( $i_e, $tok_e, $count_e ) = @{ $group[$j_e] };
+            my ( $i_b,    $tok_b_uu, $count_b ) = @{ $group[$j_b] };
+            my ( $i_e_uu, $tok_e_uu, $count_e ) = @{ $group[$j_e] };
             my $num = $count_e - $count_b + 1;
 
             # This subgroup runs from line $ib to line $ie-1, but may contain
@@ -19512,18 +21912,18 @@ EOM
                 my $nog_b = my $nog_e = 1;
                 if ( @iblanks && !$rOpts_kgb_delete ) {
                     my $j_bb = $j_b + $num - 1;
-                    my ( $i_bb, $tok_bb, $count_bb ) = @{ $group[$j_bb] };
+                    my ( $i_bb_uu, $tok_bb_uu, $count_bb ) = @{ $group[$j_bb] };
                     $nog_b = $count_bb - $count_b + 1 == $num;
 
                     my $j_ee = $j_e - ( $num - 1 );
-                    my ( $i_ee, $tok_ee, $count_ee ) = @{ $group[$j_ee] };
+                    my ( $i_ee_uu, $tok_ee_uu, $count_ee ) = @{ $group[$j_ee] };
                     $nog_e = $count_e - $count_ee + 1 == $num;
                 }
                 if ( $nog_b && $k > $kbeg ) {
                     kgb_insert_blank_after( $i_b - 1 );
                 }
                 if ( $nog_e && $k < $kend ) {
-                    my ( $i_ep, $tok_ep, $count_ep ) =
+                    my ( $i_ep, $tok_ep_uu, $count_ep_uu ) =
                       @{ $group[ $j_e + 1 ] };
                     kgb_insert_blank_after( $i_ep - 1 );
                 }
@@ -20340,9 +22740,9 @@ EOM
         }
 
         DEBUG_STORE && do {
-            my ( $a, $b, $c ) = caller();
+            my ( $pkg, $file_uu, $lno ) = caller();
             print {*STDOUT}
-"STORE: from $a $c: storing token $token type $type lev=$level at $max_index_to_go\n";
+"STORE: from $pkg $lno: storing token $token type $type lev=$level at $max_index_to_go\n";
         };
         return;
     } ## end sub store_token_to_go
@@ -22180,9 +24580,9 @@ sub compare_indentation_levels {
         }
 
         DEBUG_FORCE && do {
-            my ( $a, $b, $c ) = caller();
+            my ( $pkg, $file_uu, $lno ) = caller();
             my $msg =
-"FORCE $forced_breakpoint_count after call from $a $c with i=$i max=$max_index_to_go";
+"FORCE $forced_breakpoint_count after call from $pkg $lno with i=$i max=$max_index_to_go";
             if ( !defined($i_nonblank) ) {
                 $i = EMPTY_STRING unless defined($i);
                 $msg .= " but could not set break after i='$i'\n";
@@ -22295,11 +24695,11 @@ EOM
 
         if ( $i_start < 0 ) {
             $i_start = 0;
-            my ( $a, $b, $c ) = caller();
+            my ( $pkg, $file_uu, $lno ) = caller();
 
             # Bad call, can only be due to a recent programming change.
             Fault(
-"Program Bug: undo_forced_breakpoint_stack from $a $c has bad i=$i_start "
+"Program Bug: undo_forced_breakpoint_stack from $pkg $lno has bad i=$i_start "
             ) if (DEVEL_MODE);
             return;
         }
@@ -22312,18 +24712,18 @@ EOM
                 $forced_breakpoint_count--;
 
                 DEBUG_UNDOBP && do {
-                    my ( $a, $b, $c ) = caller();
+                    my ( $pkg, $file_uu, $lno ) = caller();
                     print {*STDOUT}
-"UNDOBP: undo forced_breakpoint i=$i $forced_breakpoint_undo_count from $a $c max=$max_index_to_go\n";
+"UNDOBP: undo forced_breakpoint i=$i $forced_breakpoint_undo_count from $pkg $lno max=$max_index_to_go\n";
                 };
             }
 
             # shouldn't happen, but not a critical error
             else {
                 if (DEVEL_MODE) {
-                    my ( $a, $b, $c ) = caller();
+                    my ( $pkg, $file_uu, $lno ) = caller();
                     Fault(<<EOM);
-Program Bug: undo_forced_breakpoint from $a $c has i=$i but max=$max_index_to_go
+Program Bug: undo_forced_breakpoint from $pkg $lno has i=$i but max=$max_index_to_go
 EOM
                 }
             }
@@ -24585,7 +26985,7 @@ EOM
         my $nmax   = @{$ri_end} - 1;
         my $ibeg_1 = $ri_beg->[ $n - 1 ];
         my $iend_1 = $ri_end->[ $n - 1 ];
-        my $ibeg_2 = $ri_beg->[$n];
+##      my $ibeg_2 = $ri_beg->[$n];
         my $iend_2 = $ri_end->[$n];
 
         if ($itok) {
@@ -25861,7 +28261,7 @@ sub correct_lp_indentation {
 
                     $actual_pos = $predicted_pos;
 
-                    my ( $indent, $offset, $is_leading, $exists ) =
+                    my ( $indent, $offset, $is_leading_uu, $exists_uu ) =
                       get_saved_opening_indentation($align_seqno);
                     if ( defined($indent) ) {
 
@@ -26091,7 +28491,7 @@ sub correct_lp_indentation_pass_1 {
 
             if ( $available_spaces > 0 ) {
                 my $delete_want = min( $available_spaces, $excess );
-                my $deleted_spaces =
+                my $deleted_spaces_uu =
                   $self->reduce_lp_indentation( $ibeg, $delete_want );
                 $available_spaces = $self->get_available_spaces_to_go($ibeg);
             }
@@ -26953,8 +29353,6 @@ sub do_colon_breaks {
     # These routines and variables are involved in finding good
     # places to break long lists.
 
-    use constant DEBUG_BREAK_LISTS => 0;
-
     my (
 
         $block_type,
@@ -27061,6 +29459,11 @@ sub do_colon_breaks {
             # boost tol for combination -lp -xci
             if ($rOpts_extended_continuation_indentation) {
                 $lp_tol_boost = 2;
+
+                # and one more for -lp -xci -vmll (b1470, b1474, b1266)
+                if ($rOpts_variable_maximum_line_length) {
+                    $lp_tol_boost = max( 2, $rOpts_indent_columns );
+                }
             }
 
             # boost tol for combination -lp and any -vtc > 0, but only for
@@ -27636,7 +30039,7 @@ EOM
             # Loop Section B: Handle a sequenced token
             #-----------------------------------------
             if ($type_sequence) {
-                $self->break_lists_type_sequence;
+                $self->break_lists_type_sequence();
             }
 
             #------------------------------------------
@@ -29158,9 +31561,9 @@ EOM
         my $identifier_count = $rhash_A->{_identifier_count_A};
 
         # Derived variables:
-        my $ritem_lengths          = $rhash_A->{_ritem_lengths};
-        my $ri_term_begin          = $rhash_A->{_ri_term_begin};
-        my $ri_term_end            = $rhash_A->{_ri_term_end};
+##      my $ritem_lengths          = $rhash_A->{_ritem_lengths};
+##      my $ri_term_begin          = $rhash_A->{_ri_term_begin};
+##      my $ri_term_end            = $rhash_A->{_ri_term_end};
         my $ri_term_comma          = $rhash_A->{_ri_term_comma};
         my $rmax_length            = $rhash_A->{_rmax_length};
         my $comma_count            = $rhash_A->{_comma_count};
@@ -29168,15 +31571,15 @@ EOM
         my $first_term_length      = $rhash_A->{_first_term_length};
         my $i_first_comma          = $rhash_A->{_i_first_comma};
         my $i_last_comma           = $rhash_A->{_i_last_comma};
-        my $i_true_last_comma      = $rhash_A->{_i_true_last_comma};
+##      my $i_true_last_comma      = $rhash_A->{_i_true_last_comma};
 
         # Variables received from caller
-        my $i_opening_paren     = $rhash_IN->{i_opening_paren};
-        my $i_closing_paren     = $rhash_IN->{i_closing_paren};
-        my $rcomma_index        = $rhash_IN->{rcomma_index};
-        my $next_nonblank_type  = $rhash_IN->{next_nonblank_type};
-        my $list_type           = $rhash_IN->{list_type};
-        my $interrupted         = $rhash_IN->{interrupted};
+        my $i_opening_paren = $rhash_IN->{i_opening_paren};
+##      my $i_closing_paren     = $rhash_IN->{i_closing_paren};
+        my $rcomma_index       = $rhash_IN->{rcomma_index};
+        my $next_nonblank_type = $rhash_IN->{next_nonblank_type};
+        my $list_type          = $rhash_IN->{list_type};
+##      my $interrupted         = $rhash_IN->{interrupted};
         my $rdo_not_break_apart = $rhash_IN->{rdo_not_break_apart};
         my $must_break_open     = $rhash_IN->{must_break_open};
 
@@ -29223,13 +31626,13 @@ EOM
         $item_count      = $hash_B->{_item_count_B};
 
         # New variables
-        my $columns                 = $hash_B->{_columns};
-        my $formatted_columns       = $hash_B->{_formatted_columns};
-        my $formatted_lines         = $hash_B->{_formatted_lines};
-        my $max_width               = $hash_B->{_max_width};
-        my $new_identifier_count    = $hash_B->{_new_identifier_count};
-        my $number_of_fields        = $hash_B->{_number_of_fields};
-        my $odd_or_even             = $hash_B->{_odd_or_even};
+        my $columns              = $hash_B->{_columns};
+        my $formatted_columns    = $hash_B->{_formatted_columns};
+        my $formatted_lines      = $hash_B->{_formatted_lines};
+        my $max_width            = $hash_B->{_max_width};
+        my $new_identifier_count = $hash_B->{_new_identifier_count};
+        my $number_of_fields     = $hash_B->{_number_of_fields};
+##      my $odd_or_even             = $hash_B->{_odd_or_even};
         my $packed_columns          = $hash_B->{_packed_columns};
         my $packed_lines            = $hash_B->{_packed_lines};
         my $pair_width              = $hash_B->{_pair_width};
@@ -30247,9 +32650,9 @@ sub set_nobreaks {
     if ( $i >= 0 && $i <= $j && $j <= $max_index_to_go ) {
 
         0 && do {
-            my ( $a, $b, $c ) = caller();
+            my ( $pkg, $file_uu, $lno ) = caller();
             print {*STDOUT}
-"NOBREAK: forced_breakpoint $forced_breakpoint_count from $a $c with i=$i max=$max_index_to_go type=$types_to_go[$i]\n";
+"NOBREAK: forced_breakpoint $forced_breakpoint_count from $pkg $lno with i=$i max=$max_index_to_go type=$types_to_go[$i]\n";
         };
 
         @nobreak_to_go[ $i .. $j ] = (1) x ( $j - $i + 1 );
@@ -30258,9 +32661,9 @@ sub set_nobreaks {
     # shouldn't happen; non-critical error
     else {
         if (DEVEL_MODE) {
-            my ( $a, $b, $c ) = caller();
+            my ( $pkg, $file_uu, $lno ) = caller();
             Fault(<<EOM);
-NOBREAK ERROR: from $a $c with i=$i j=$j max=$max_index_to_go
+NOBREAK ERROR: from $pkg $lno with i=$i j=$j max=$max_index_to_go
 EOM
         }
     }
@@ -31397,7 +33800,7 @@ EOM
                         my $ci_level =
                           $rlp_object_list->[$i_debug]->get_ci_level();
                         my $old_level = $rlp_object_list->[$i]->get_level();
-                        my $old_ci_level =
+                        my $old_ci_level_uu =
                           $rlp_object_list->[$i]->get_ci_level();
                         Fault(<<EOM);
 program bug with -lp: want to delete $deleted_spaces from item $i, but old=$old_spaces deleted: lev=$level ci=$ci_level  deleted: level=$old_level ci=$ci_level
@@ -31803,7 +34206,7 @@ sub convey_batch_to_vertical_aligner {
         # one less than the number of fields. If this is not true then
         # an error has been introduced in sub make_alignment_patterns.
         if (DEVEL_MODE) {
-            my ( $rtokens, $rfields, $rpatterns, $rfield_lengths ) =
+            my ( $rtokens, $rfields, $rpatterns_uu, $rfield_lengths_uu ) =
               @{$rline_alignment};
             if ( @{$rfields} && ( @{$rtokens} != ( @{$rfields} - 1 ) ) ) {
                 my $nt  = @{$rtokens};
@@ -32243,7 +34646,6 @@ EOM
     # for efficient access by sub .._token_loop needs.
     my $ralignment_type_to_go;
     my $ralignment_counts;
-    my $ralignment_hash_by_line;
 
     sub set_vertical_alignment_markers {
 
@@ -32265,9 +34667,8 @@ EOM
         #----------------------------
         # Initialize return variables
         #----------------------------
-        $ralignment_type_to_go   = [];
-        $ralignment_counts       = [];
-        $ralignment_hash_by_line = [];
+        $ralignment_type_to_go = [];
+        $ralignment_counts     = [];
 
         # NOTE: closing side comments can insert up to 2 additional tokens
         # beyond the original $max_index_to_go, so we need to check ri_last for
@@ -32300,6 +34701,17 @@ EOM
             my $token = $tokens_to_go[$max_i];
             my $KK    = $K_to_go[$max_i];
 
+            my $is_closing_block = $types_to_go[$i_terminal] eq '}'
+              && $tokens_to_go[$i_terminal] eq '}';
+
+            # Patch to check for asub closing side comments (c380)
+            # These follow '};' rather than bare '}'
+            $is_closing_block ||=
+                 $types_to_go[$i_terminal] eq ';'
+              && $i_terminal == $inext_to_go[0]
+              && $types_to_go[0] eq '}'
+              && $tokens_to_go[0] eq '}';
+
             # Do not align various special side comments
             my $do_not_align = (
 
@@ -32311,8 +34723,7 @@ EOM
                     && $token =~ /$static_side_comment_pattern/ )
 
                   # or a closing side comment
-                  || ( $types_to_go[$i_terminal] eq '}'
-                    && $tokens_to_go[$i_terminal] eq '}'
+                  || ( $is_closing_block
                     && $token =~ /$closing_side_comment_prefix_pattern/ )
             );
 
@@ -32340,7 +34751,6 @@ EOM
 
             if ( !$do_not_align ) {
                 $ralignment_type_to_go->[$max_i] = '#';
-                $ralignment_hash_by_line->[$max_line]->{$max_i} = '#';
                 $ralignment_counts->[$max_line]++;
             }
         }
@@ -32374,8 +34784,7 @@ EOM
         }
 
       RETURN:
-        return ( $ralignment_type_to_go, $ralignment_counts,
-            $ralignment_hash_by_line );
+        return ( $ralignment_type_to_go, $ralignment_counts );
     } ## end sub set_vertical_alignment_markers
 
     my %is_dot_question_colon;
@@ -32398,9 +34807,6 @@ EOM
         # three closure variables needed by sub 'make_alignment_patterns':
         #  $ralignment_type_to_go - alignment type of tokens, like '=', if any
         #  $ralignment_counts - number of alignment tokens in the line
-        #  $ralignment_hash - this contains all of the alignments for this
-        #    line.  It is not yet used but is available for future coding in
-        #    case there is a need to do a preliminary scan of alignment tokens.
 
         my $level_beg = $levels_to_go[$ibeg];
         my $token_beg = $tokens_to_go[$ibeg];
@@ -32408,7 +34814,6 @@ EOM
 
         my $last_vertical_alignment_BEFORE_index = -1;
         my $vert_last_nonblank_type              = $type_beg;
-        my $vert_last_nonblank_token             = $token_beg;
 
         # ----------------------------------------------------------------
         # Initialization code merged from 'sub delete_needless_alignments'
@@ -32444,11 +34849,11 @@ EOM
         # --------------------------------------------
         # Loop over each token in this output line ...
         # --------------------------------------------
+        my $type;
         foreach my $i ( $ibeg + 1 .. $iend ) {
 
-            next if ( $types_to_go[$i] eq 'b' );
+            next if ( ( $type = $types_to_go[$i] ) eq 'b' );
 
-            my $type  = $types_to_go[$i];
             my $token = $tokens_to_go[$i];
             my $alignment_type;
 
@@ -32493,7 +34898,6 @@ EOM
                     if ( $ralignment_type_to_go->[$imate] ) {
                         $ralignment_type_to_go->[$imate] = EMPTY_STRING;
                         $ralignment_counts->[$line]--;
-                        delete $ralignment_hash_by_line->[$line]->{$imate};
                     }
                     pop @imatch_list;
                 }
@@ -32610,7 +35014,7 @@ EOM
                     #    elsif ( $b ) { &b }
                     #          ^-------------------aligned parens
                     if ( $vert_last_nonblank_type eq 'k'
-                        && !$is_if_unless_elsif{$vert_last_nonblank_token} )
+                        && !$is_if_unless_elsif{ $tokens_to_go[ $i - 2 ] } )
                     {
                         $alignment_type = EMPTY_STRING;
                     }
@@ -32711,14 +35115,12 @@ EOM
 
                 else {
                     $ralignment_type_to_go->[$i] = $alignment_type;
-                    $ralignment_hash_by_line->[$line]->{$i} = $alignment_type;
                     $ralignment_counts->[$line]++;
                     push @imatch_list, $i;
                 }
             }
 
-            $vert_last_nonblank_type  = $type;
-            $vert_last_nonblank_token = $token;
+            $vert_last_nonblank_type = $type;
         }
         return;
     } ## end sub set_vertical_alignment_markers_token_loop
@@ -32837,15 +35239,15 @@ sub make_vertical_alignments {
     #---------------------------------------------------------
     # Step 1: Define the alignment tokens for the entire batch
     #---------------------------------------------------------
-    my ( $ralignment_type_to_go, $ralignment_counts, $ralignment_hash_by_line );
+    my ( $ralignment_type_to_go, $ralignment_counts );
 
     # We only need to make this call if vertical alignment of code is
     # requested or if a line might have a side comment.
     if (   $rOpts_valign_code
         || $types_to_go[$max_index_to_go] eq '#' )
     {
-        ( $ralignment_type_to_go, $ralignment_counts, $ralignment_hash_by_line )
-          = $self->set_vertical_alignment_markers( $ri_first, $ri_last );
+        ( $ralignment_type_to_go, $ralignment_counts ) =
+          $self->set_vertical_alignment_markers( $ri_first, $ri_last );
     }
 
     #----------------------------------------------
@@ -32864,7 +35266,6 @@ sub make_vertical_alignments {
             $iend,
             $ralignment_type_to_go,
             $ralignment_counts->[$line],
-            $ralignment_hash_by_line->[$line]
 
         );
         push @{$rline_alignments}, $rtok_fld_pat_len;
@@ -33720,7 +36121,7 @@ sub undo_contained_ci {
                 }
 
                 # we might be able to handle a pad of -1 by removing a blank
-                # token
+                # token.
                 if ( $pad_spaces < 0 ) {
 
                     # Deactivated for -kpit due to conflict. This block deletes
@@ -33728,9 +36129,21 @@ sub undo_contained_ci {
                     # but it may conflict with user spacing requests.  For now
                     # it is just deactivated if the -kpit option is used.
                     if ( $pad_spaces == -1 ) {
-                        if (   $ipad > $ibeg
+                        if (
+                               $ipad > $ibeg
                             && $types_to_go[ $ipad - 1 ] eq 'b'
-                            && !%keyword_paren_inner_tightness )
+                            && !%keyword_paren_inner_tightness
+
+                            # additional tests added for c385:
+                            && (
+                                $types_to_go[$inext_next] eq $types_to_go[$ipad]
+                                || (
+                                    $types_to_go[$ipad] eq '!'
+                                    && ( $types_to_go[ $ipad + 1 ] eq
+                                        $types_to_go[$inext_next] )
+                                )
+                            )
+                          )
                         {
                             $self->pad_token( $ipad - 1, $pad_spaces );
                         }
@@ -34054,7 +36467,6 @@ sub xlp_tweak {
             $iend,
             $ralignment_type_to_go,
             $alignment_count,
-            $ralignment_hash
 
         ) = @_;
 
@@ -34067,9 +36479,6 @@ sub xlp_tweak {
         #  $ibeg, $iend - index range of this line in the _to_go arrays
         #  $ralignment_type_to_go - alignment type of tokens, like '=', if any
         #  $alignment_count - number of alignment tokens in the line
-        #  $ralignment_hash - this contains all of the alignments for this
-        #    line.  It is not yet used but is available for future coding in
-        #    case there is a need to do a preliminary scan of alignment tokens.
 
         # The arrays which are created contain strings that can be tested by
         # the vertical aligner to see if consecutive lines can be aligned
@@ -34089,23 +36498,6 @@ sub xlp_tweak {
         #   field.  These should normally each match before alignment is
         #   allowed, even when the alignment tokens match.
         # @field_lengths - the display width of each field
-
-        if (DEVEL_MODE) {
-            my $new_count = 0;
-            if ( defined($ralignment_hash) ) {
-                $new_count = keys %{$ralignment_hash};
-            }
-            my $old_count = $alignment_count;
-            $old_count = 0 unless ($old_count);
-            if ( $new_count != $old_count ) {
-                my $K   = $K_to_go[$ibeg];
-                my $rLL = $self->[_rLL_];
-                my $lnl = $rLL->[$K]->[_LINE_INDEX_];
-                Fault(
-"alignment hash token count gives count=$new_count but old count is $old_count near line=$lnl\n"
-                );
-            }
-        }
 
         # -------------------------------------
         # Shortcut for lines without alignments
@@ -34177,7 +36569,14 @@ sub xlp_tweak {
 
         $patterns[0] = EMPTY_STRING;
         my %token_count;
+        my $type;
         for my $i ( $ibeg .. $iend ) {
+
+            # handle a blank space
+            if ( ( $type = $types_to_go[$i] ) eq 'b' ) {
+                $patterns[$j] .= $type;
+                next;
+            }
 
             #-------------------------------------------------------------
             # Part 1: keep track of containers balanced on this line only.
@@ -34185,7 +36584,6 @@ sub xlp_tweak {
             # These are used below to prevent unwanted cross-line alignments.
             # Unbalanced containers already avoid aligning across
             # container boundaries.
-            my $type = $types_to_go[$i];
             if ( $type_sequence_to_go[$i] ) {
                 my $token = $tokens_to_go[$i];
                 if ( $is_opening_token{$token} ) {
@@ -34404,11 +36802,7 @@ sub xlp_tweak {
             # Part 3: continue accumulating the next pattern
             #-----------------------------------------------
 
-            if ( $type eq 'b' ) {
-                $patterns[$j] .= $type;
-            }
-
-            elsif ( $is_k_w_n_C_bang{$type} ) {
+            if ( $is_k_w_n_C_bang{$type} ) {
 
                 # for keywords we have to use the actual text
                 if ( $type eq 'k' ) {
@@ -34516,7 +36910,6 @@ sub xlp_tweak {
         my $ilast_blank;
         for ( $ibeg .. $iterm ) {
             my $type = $types_to_go[$_];
-
             if ( $type eq 'b' ) {
                 $ilast_blank = $_;
                 next;
@@ -36091,8 +38484,7 @@ sub set_vertical_tightness_flags {
 
             my $is_semicolon_terminated;
             if ( $n + 1 == $n_last_line ) {
-                my ( $terminal_type, $i_terminal ) =
-                  terminal_type_i( $ibeg_next, $iend_next );
+                my $terminal_type = terminal_type_i( $ibeg_next, $iend_next );
                 $is_semicolon_terminated = $terminal_type eq ';'
                   && $nesting_depth_to_go[$iend_next] <
                   $nesting_depth_to_go[$ibeg_next];
@@ -36498,7 +38890,8 @@ sub set_vertical_tightness_flags {
             if (   $type eq 'k'
                 && $csc_new_statement_ok
                 && $is_if_elsif_else_unless_while_until_for_foreach{$token}
-                && $token =~ /$closing_side_comment_list_pattern/ )
+                && $token =~ /$closing_side_comment_list_pattern/
+                && $token !~ /$closing_side_comment_exclusion_pattern/ )
             {
                 $self->set_block_text_accumulator($i);
             }
@@ -36676,6 +39069,53 @@ sub set_vertical_tightness_flags {
     } ## end sub balance_csc_text
 } ## end closure balance_csc_text
 
+sub get_asub_block_label {
+    my ( $self, $seqno ) = @_;
+
+    # Given:
+    #   $seqno = the sequence number of an asub block
+    # Return:
+    #   $block_label = the text # that will be displayed before 'sub' in its
+    #   closing side comment.
+    # Note: see similar inline code in sub find_selected_blocks
+
+    # Example:
+    #     my $doit = sub { ...
+    #                    |
+    #                    ^----------walk back from here to get
+    # $block_label = '$doit ='
+
+    my $block_label = EMPTY_STRING;
+    return $block_label unless ($seqno);
+    my $K_opening = $self->[_K_opening_container_]->{$seqno};
+    my $rLL       = $self->[_rLL_];
+    return $block_label unless ($K_opening);
+    my $K_search_min = max( 0, $K_opening - 6 );
+    my ( $saw_equals, $saw_fat_comma, $blank_count, $nonblank_count );
+    my $text = EMPTY_STRING;
+
+    foreach my $KK ( reverse( $K_search_min .. $K_opening - 1 ) ) {
+        my $token_type = $rLL->[$KK]->[_TYPE_];
+        my $token      = $rLL->[$KK]->[_TOKEN_];
+
+        # first nonblank, keyword 'sub', is not part of the label
+        if ($nonblank_count) { $text = $token . $text }
+
+        if ( $token_type eq 'b' ) { $blank_count++; next }
+        else                      { $nonblank_count++ }
+        if ( $token_type eq '=>' ) { $saw_fat_comma++; next }
+        if ( $token_type eq '=' )  { $saw_equals++;    next }
+        if ( $token_type eq 'i' && $saw_equals
+            || ( $token_type eq 'w' || $token_type eq 'Q' ) && $saw_fat_comma )
+        {
+            $block_label = $text;
+            $block_label =~ s/\s*$//;
+            last;
+        }
+    }
+    return $block_label;
+} ## end sub get_asub_block_label
+
 sub add_closing_side_comment {
 
     my ( $self, $ri_first, $ri_last ) = @_;
@@ -36699,6 +39139,27 @@ sub add_closing_side_comment {
     #---------------------------------------------------------------
     my $have_side_comment = $types_to_go[$max_index_to_go] eq '#';
 
+    # Special check for asub closing side comments (c380)
+    # These are the only types which follow '};' instead of a bare '}'
+    if ( $terminal_type eq ';' && $closing_side_comment_want_asub ) {
+        if (   $types_to_go[0] eq '}'
+            && $tokens_to_go[0] eq '}'
+            && $i_terminal == $inext_to_go[0] )
+        {
+            my $seqno = $type_sequence_to_go[0];
+            if ( $self->[_ris_asub_block_]->{$seqno} ) {
+
+                # reset the terminal token to be the closing brace so
+                # that the code below ignores the trailing semicolon
+                $terminal_type = '}';
+                $i_terminal    = 0;
+
+                # create a name for this asub block
+                $block_label = $self->get_asub_block_label($seqno);
+            }
+        }
+    }
+
     # if this line might end in a block closure..
     if (
         $terminal_type eq '}'
@@ -36720,13 +39181,8 @@ sub add_closing_side_comment {
         # .. and if this is one of the types of interest
         && $block_type_to_go[$i_terminal] =~
         /$closing_side_comment_list_pattern/
-
-        # .. but not an anonymous sub
-        # These are not normally of interest, and their closing braces are
-        # often followed by commas or semicolons anyway.  This also avoids
-        # possible erratic output due to line numbering inconsistencies
-        # in the cases where their closing braces terminate a line.
-        && $block_type_to_go[$i_terminal] ne 'sub'
+        && $block_type_to_go[$i_terminal] !~
+        /$closing_side_comment_exclusion_pattern/
 
         # ..and the corresponding opening brace must is not in this batch
         # (because we do not need to tag one-line blocks, although this

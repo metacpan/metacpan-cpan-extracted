@@ -34,6 +34,7 @@ t/rt_71777.t
 t/rt_80400.t
 t/scalar.t
 t/type.t
+t/undefs.t
 t/universal_type.t
 t/unmerge.t
 t/version.t

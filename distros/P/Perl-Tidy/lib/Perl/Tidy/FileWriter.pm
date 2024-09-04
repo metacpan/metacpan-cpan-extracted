@@ -16,7 +16,7 @@
 package Perl::Tidy::FileWriter;
 use strict;
 use warnings;
-our $VERSION = '20240511';
+our $VERSION = '20240903';
 
 use constant DEVEL_MODE   => 0;
 use constant EMPTY_STRING => q{};
@@ -97,9 +97,9 @@ sub Fault {
     # except if there has been a bug introduced by a recent program change.
     # Please add comments at calls to Fault to explain why the call
     # should not occur, and where to look to fix it.
-    my ( $package0, $filename0, $line0, $subroutine0 ) = caller(0);
-    my ( $package1, $filename1, $line1, $subroutine1 ) = caller(1);
-    my ( $package2, $filename2, $line2, $subroutine2 ) = caller(2);
+    my ( $package0_uu, $filename0_uu, $line0,    $subroutine0_uu ) = caller(0);
+    my ( $package1_uu, $filename1,    $line1,    $subroutine1 )    = caller(1);
+    my ( $package2_uu, $filename2_uu, $line2_uu, $subroutine2 )    = caller(2);
     my $pkg = __PACKAGE__;
 
     # Catch potential error of Fault not called as a method
@@ -223,6 +223,15 @@ sub setup_convergence_test {
     $self->[_K_last_arrival_]          = -1;
     return;
 } ## end sub setup_convergence_test
+
+sub not_converged {
+    my $self = shift;
+
+    # Block convergence of this iteration. This is currently needed
+    # when adding/deleting commas is delayed by 1 iteration (see git #156)
+    $self->[_K_arrival_order_matches_] = 0;
+    return;
+} ## end sub not_converged
 
 sub get_convergence_check {
     my ($self) = @_;

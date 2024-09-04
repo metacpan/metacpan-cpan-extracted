@@ -510,6 +510,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
     case XS_PARSE_KEYWORD_ARITHEXPR:
     case XS_PARSE_KEYWORD_TERMEXPR:
+    case XS_PARSE_KEYWORD_LISTEXPR:
     {
       if(is_enterleave)
         ENTER;
@@ -526,7 +527,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       /* TODO: This auto-parens behaviour ought to be tuneable, depend on how
        * many args, open at i=0 and close at i=MAX, etc...
        */
-      if(lex_peek_unichar(0) == '(') {
+      if(type != XS_PARSE_KEYWORD_LISTEXPR && lex_peek_unichar(0) == '(') {
         /* consume a fullexpr and stop at the close paren */
         lex_read_unichar(0);
 
@@ -551,6 +552,9 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
           case XS_PARSE_KEYWORD_TERMEXPR:
             THISARG.op = parse_termexpr(optflag);
             break;
+          case XS_PARSE_KEYWORD_LISTEXPR:
+            THISARG.op = parse_listexpr(optflag);
+            break;
         }
         CHECK_PARSEFAIL;
       }
@@ -565,16 +569,6 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
       return;
     }
-
-    case XS_PARSE_KEYWORD_LISTEXPR:
-      THISARG.op = parse_listexpr(optflag);
-      CHECK_PARSEFAIL;
-
-      if(want && THISARG.op)
-        THISARG.op = op_contextualize(THISARG.op, want);
-
-      (*argidx)++;
-      return;
 
     case XS_PARSE_KEYWORD_IDENT:
       THISARG.sv = lex_scan_ident();

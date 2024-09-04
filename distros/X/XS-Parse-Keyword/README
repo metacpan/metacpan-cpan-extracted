@@ -365,20 +365,6 @@ PIECES AND PIECE TYPES
     Variants of XPK_TERMEXPR which puts the expression in void or scalar
     context.
 
- XPK_PREFIXED_TERMEXPR_ENTERLEAVE
-
-       XPK_PREFIXED_TERMEXPR_ENTERLEAVE(pieces ...)
-
-    A variant of XPK_TERMEXPR which expects a sequence pieces first before
-    it parses a term expression, similar to how
-    XPK_PREFIXED_BLOCK_ENTERLEAVE works. The entire operation is wrapped in
-    an ENTER/LEAVE pair.
-
-    This is intended just for use of XPK_SETUP pieces as prefixes. Any
-    other pieces which actually parse real input are likely to cause
-    overly-complex, subtle, or outright ambiguous grammars, and should be
-    avoided.
-
  XPK_LISTEXPR, XPK_LISTEXPR_OPT
 
     atomic, emits op.
@@ -391,6 +377,21 @@ PIECES AND PIECE TYPES
  XPK_LISTEXPR_LISTCTX, XPK_LISTEXPR_LISTCTX_OPT
 
     Variant of XPK_LISTEXPR which puts the expression in list context.
+
+ XPK_PREFIXED_TERMEXPR_ENTERLEAVE, XPK_PREFIXED_LISTEXPR_ENTERLEAVE
+
+       XPK_PREFIXED_TERMEXPR_ENTERLEAVE(pieces ...)
+       XPK_PREFIXED_LISTEXPR_ENTERLEAVE(pieces ...)
+
+    Variants of XPK_TERMEXPR or XPK_LISTEXPR which expect a sequence pieces
+    first before it parses a term expression, similar to how
+    XPK_PREFIXED_BLOCK_ENTERLEAVE works. The entire operation is wrapped in
+    an ENTER/LEAVE pair.
+
+    These are intended just for use of XPK_SETUP pieces as prefixes. Any
+    other pieces which actually parse real input are likely to cause
+    overly-complex, subtle, or outright ambiguous grammars, and should be
+    avoided.
 
  XPK_IDENT, XPK_IDENT_OPT
 

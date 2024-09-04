@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Compare" : "1.25",
             "File::Basename" : "2.6",
             "File::ShareDir" : "1.114",
             "JSON" : "2.90",
@@ -58,43 +59,43 @@
    "provides" : {
       "Map::Tube" : {
          "file" : "lib/Map/Tube.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "Map::Tube::Cookbook" : {
          "file" : "lib/Map/Tube/Cookbook.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "Map::Tube::Line" : {
          "file" : "lib/Map/Tube/Line.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "Map::Tube::Node" : {
          "file" : "lib/Map/Tube/Node.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "Map::Tube::Pluggable" : {
          "file" : "lib/Map/Tube/Pluggable.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "Map::Tube::Route" : {
          "file" : "lib/Map/Tube/Route.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "Map::Tube::Table" : {
          "file" : "lib/Map/Tube/Table.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "Map::Tube::Types" : {
          "file" : "lib/Map/Tube/Types.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "Map::Tube::Utils" : {
          "file" : "lib/Map/Tube/Utils.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "Test::Map::Tube" : {
          "file" : "lib/Test/Map/Tube.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       }
    },
    "release_status" : "stable",
@@ -105,6 +106,6 @@
          "web" : "https://github.com/manwar/Map-Tube"
       }
    },
-   "version" : "3.76",
+   "version" : "3.77",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

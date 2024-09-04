@@ -3014,6 +3014,7 @@ country:
       AT: Austria
       AU: Australia
       AW: Aruba
+      AX: Aland Islands
       AZ: Azerbaijan
       BA: Bosnia and Herzegovina
       BB: Barbados
@@ -3028,7 +3029,7 @@ country:
       BM: Bermuda
       BN: Brunei Darussalam
       BO: Bolivia (Plurinational State of)
-      BQ: Bonaire, Sint Eustatius, and Saba
+      BQ: Caribbean Netherlands
       BR: Brazil
       BS: Bahamas
       BT: Bhutan
@@ -3183,6 +3184,7 @@ country:
       PM: Saint Pierre and Miquelon
       PN: Pitcairn
       PR: Puerto Rico
+      PS: Palestine, State of
       PT: Portugal
       PW: Palau
       PY: Paraguay
@@ -3206,6 +3208,7 @@ country:
       SG: Singapore
       SH: Saint Helena, Ascension, and Tristan Da Cunha
       SI: Slovenia
+      SJ: Svalbard and Jan Mayen
       SK: Slovakia
       SL: Sierra Leone
       SM: San Marino
@@ -3236,6 +3239,7 @@ country:
       TZ: Tanzania
       UA: Ukraine
       UG: Uganda
+      UM: United States Minor Outlying Islands
       US: United States of America
       UY: Uruguay
       UZ: Uzbekistan
@@ -3279,6 +3283,9 @@ country:
       akrotiri: 
         - QZ
         - Akrotiri
+      aland islands: 
+        - AX
+        - Aland Islands
       albania: 
         - AL
         - Albania
@@ -3363,9 +3370,6 @@ country:
       bolivia (plurinational state of): 
         - BO
         - Bolivia (Plurinational State of)
-      bonaire, sint eustatius, and saba: 
-        - BQ
-        - Bonaire, Sint Eustatius, and Saba
       bosnia and herzegovina: 
         - BA
         - Bosnia and Herzegovina
@@ -3405,6 +3409,9 @@ country:
       canada: 
         - CA
         - Canada
+      caribbean netherlands: 
+        - BQ
+        - Caribbean Netherlands
       cayman islands: 
         - KY
         - Cayman Islands
@@ -3843,6 +3850,9 @@ country:
       palau: 
         - PW
         - Palau
+      palestine, state of: 
+        - PS
+        - Palestine, State of
       palmyra atoll: 
         - XL
         - Palmyra Atoll
@@ -3981,6 +3991,9 @@ country:
       svalbard: 
         - XR
         - Svalbard
+      svalbard and jan mayen: 
+        - SJ
+        - Svalbard and Jan Mayen
       sweden: 
         - SE
         - Sweden
@@ -4047,6 +4060,9 @@ country:
       united kingdom of great britain and northern ireland: 
         - GB
         - United Kingdom of Great Britain and Northern Ireland
+      united states minor outlying islands: 
+        - UM
+        - United States Minor Outlying Islands
       united states of america: 
         - US
         - United States of America
@@ -4098,6 +4114,7 @@ country:
       AFG: Afghanistan
       AGO: Angola
       AIA: Anguilla
+      ALA: Aland Islands
       ALB: Albania
       AND: Andorra
       ARE: United Arab Emirates
@@ -4114,7 +4131,7 @@ country:
       BDI: Burundi
       BEL: Belgium
       BEN: Benin
-      BES: Bonaire, Sint Eustatius, and Saba
+      BES: Caribbean Netherlands
       BFA: Burkina Faso
       BGD: Bangladesh
       BGR: Bulgaria
@@ -4280,6 +4297,7 @@ country:
       PRK: Korea, North
       PRT: Portugal
       PRY: Paraguay
+      PSE: Palestine, State of
       PYF: French Polynesia
       QAT: Qatar
       REU: Reunion
@@ -4292,6 +4310,7 @@ country:
       SGP: Singapore
       SGS: South Georgia and South Sandwich Islands
       SHN: Saint Helena, Ascension, and Tristan Da Cunha
+      SJM: Svalbard and Jan Mayen
       SLB: Solomon Islands
       SLE: Sierra Leone
       SLV: El Salvador
@@ -4326,6 +4345,7 @@ country:
       TZA: Tanzania
       UGA: Uganda
       UKR: Ukraine
+      UMI: United States Minor Outlying Islands
       URY: Uruguay
       USA: United States of America
       UZB: Uzbekistan
@@ -4374,6 +4394,9 @@ country:
       akrotiri: 
         - XQZ
         - Akrotiri
+      aland islands: 
+        - ALA
+        - Aland Islands
       albania: 
         - ALB
         - Albania
@@ -4458,9 +4481,6 @@ country:
       bolivia (plurinational state of): 
         - BOL
         - Bolivia (Plurinational State of)
-      bonaire, sint eustatius, and saba: 
-        - BES
-        - Bonaire, Sint Eustatius, and Saba
       bosnia and herzegovina: 
         - BIH
         - Bosnia and Herzegovina
@@ -4500,6 +4520,9 @@ country:
       canada: 
         - CAN
         - Canada
+      caribbean netherlands: 
+        - BES
+        - Caribbean Netherlands
       cayman islands: 
         - CYM
         - Cayman Islands
@@ -4938,6 +4961,9 @@ country:
       palau: 
         - PLW
         - Palau
+      palestine, state of: 
+        - PSE
+        - Palestine, State of
       palmyra atoll: 
         - XPL
         - Palmyra Atoll
@@ -5076,6 +5102,9 @@ country:
       svalbard: 
         - XSV
         - Svalbard
+      svalbard and jan mayen: 
+        - SJM
+        - Svalbard and Jan Mayen
       sweden: 
         - SWE
         - Sweden
@@ -5142,6 +5171,9 @@ country:
       united kingdom of great britain and northern ireland: 
         - GBR
         - United Kingdom of Great Britain and Northern Ireland
+      united states minor outlying islands: 
+        - UMI
+        - United States Minor Outlying Islands
       united states of america: 
         - USA
         - United States of America
@@ -5262,6 +5294,7 @@ country:
       239: South Georgia and South Sandwich Islands
       242: Fiji
       246: Finland
+      248: Aland Islands
       250: France
       254: French Guiana
       258: French Polynesia
@@ -5270,6 +5303,7 @@ country:
       266: Gabon
       268: Georgia
       270: Gambia
+      275: Palestine, State of
       276: Germany
       288: Ghana
       292: Gibraltar
@@ -5341,7 +5375,7 @@ country:
       531: Curacao
       533: Aruba
       534: Sint Maarten
-      535: Bonaire, Sint Eustatius, and Saba
+      535: Caribbean Netherlands
       540: New Caledonia
       548: Vanuatu
       554: New Zealand
@@ -5352,6 +5386,7 @@ country:
       574: Norfolk Island
       578: Norway
       580: Northern Mariana Islands
+      581: United States Minor Outlying Islands
       583: Micronesia (Federated States of)
       584: Marshall Islands
       585: Palau
@@ -5399,6 +5434,7 @@ country:
       729: Sudan
       732: Western Sahara
       740: Suriname
+      744: Svalbard and Jan Mayen
       748: Eswatini
       752: Sweden
       756: Switzerland
@@ -5469,6 +5505,9 @@ country:
       akrotiri: 
         - 900
         - Akrotiri
+      aland islands: 
+        - 248
+        - Aland Islands
       albania: 
         - '008'
         - Albania
@@ -5553,9 +5592,6 @@ country:
       bolivia (plurinational state of): 
         - '068'
         - Bolivia (Plurinational State of)
-      bonaire, sint eustatius, and saba: 
-        - 535
-        - Bonaire, Sint Eustatius, and Saba
       bosnia and herzegovina: 
         - '070'
         - Bosnia and Herzegovina
@@ -5595,6 +5631,9 @@ country:
       canada: 
         - 124
         - Canada
+      caribbean netherlands: 
+        - 535
+        - Caribbean Netherlands
       cayman islands: 
         - 136
         - Cayman Islands
@@ -6033,6 +6072,9 @@ country:
       palau: 
         - 585
         - Palau
+      palestine, state of: 
+        - 275
+        - Palestine, State of
       palmyra atoll: 
         - 927
         - Palmyra Atoll
@@ -6171,6 +6213,9 @@ country:
       svalbard: 
         - 930
         - Svalbard
+      svalbard and jan mayen: 
+        - 744
+        - Svalbard and Jan Mayen
       sweden: 
         - 752
         - Sweden
@@ -6237,6 +6282,9 @@ country:
       united kingdom of great britain and northern ireland: 
         - 826
         - United Kingdom of Great Britain and Northern Ireland
+      united states minor outlying islands: 
+        - 581
+        - United States Minor Outlying Islands
       united states of america: 
         - 840
         - United States of America
@@ -7509,7 +7557,7 @@ country:
       TON: Tonga
       TTO: Trinidad and Tobago
       TUN: Tunisia
-      TUR: T&#252;rkiye
+      TUR: Turkiye
       TUV: Tuvalu
       TZA: United Republic of Tanzania
       UGA: Uganda
@@ -8183,9 +8231,6 @@ country:
       syrian arab republic: 
         - SYR
         - Syrian Arab Republic
-      t&#252;rkiye: 
-        - TUR
-        - T&#252;rkiye
       tajikistan: 
         - TJK
         - Tajikistan
@@ -8210,6 +8255,9 @@ country:
       tunisia: 
         - TUN
         - Tunisia
+      turkiye: 
+        - TUR
+        - Turkiye
       turkmenistan: 
         - TKM
         - Turkmenistan
@@ -8503,7 +8551,7 @@ country:
       780: Trinidad and Tobago
       784: United Arab Emirates
       788: Tunisia
-      792: T&#252;rkiye
+      792: Turkiye
       795: Turkmenistan
       796: Turks and Caicos Islands
       798: Tuvalu
@@ -9178,9 +9226,6 @@ country:
       syrian arab republic: 
         - 760
         - Syrian Arab Republic
-      t&#252;rkiye: 
-        - 792
-        - T&#252;rkiye
       tajikistan: 
         - 762
         - Tajikistan
@@ -9205,6 +9250,9 @@ country:
       tunisia: 
         - 788
         - Tunisia
+      turkiye: 
+        - 792
+        - Turkiye
       turkmenistan: 
         - 795
         - Turkmenistan
@@ -9450,6 +9498,7 @@ currency:
       YER: Yemeni Rial
       ZAR: Rand
       ZMW: Zambian Kwacha
+      ZWG: Zimbabwe Gold
       ZWL: Zimbabwe Dollar
     name: 
       adb unit of account: 
@@ -9977,6 +10026,9 @@ currency:
       zimbabwe dollar: 
         - ZWL
         - Zimbabwe Dollar
+      zimbabwe gold: 
+        - ZWG
+        - Zimbabwe Gold
       zloty: 
         - PLN
         - Zloty
@@ -10105,6 +10157,7 @@ currency:
       882: Tala
       886: Yemeni Rial
       901: New Taiwan Dollar
+      924: Zimbabwe Gold
       925: Leone
       926: Bolivar Soberano
       927: Unidad Previsional
@@ -10685,6 +10738,9 @@ currency:
       zimbabwe dollar: 
         - 932
         - Zimbabwe Dollar
+      zimbabwe gold: 
+        - 924
+        - Zimbabwe Gold
       zloty: 
         - 985
         - Zloty
@@ -46556,7 +46612,7 @@ langvar:
       fonxsamp: X-SAMPA transcription
       gallo: Gallo
       gascon: Gascon
-      gherd: GherdÃ«ina standard of Ladin
+      gherd: Ghereina standard of Ladin
       grclass: Classical Occitan orthography
       grital: Italian-inspired Occitan orthography
       grmistr: Mistralian or Mistralian-inspired Occitan orthography
@@ -46571,7 +46627,6 @@ langvar:
       kkcor: Common Cornish orthography of Revived Cornish
       kociewie: The Kociewie dialect of Polish
       kscor: Standard Cornish orthography of Revived Cornish
-      laukika: Classical Sanskrit
       lemosin: Limousin
       lengadoc: Languedocien
       lipaw: The Lipovaz dialect of Resian
@@ -46620,7 +46675,6 @@ langvar:
       ucrcor: Unified Cornish Revised orthography of Revived Cornish
       ulster: Ulster dialect of Scots
       unifon: Unifon phonetic alphabet
-      vaidika: Vedic Sanskrit
       valbadia: Val Badia standard of Ladin
       valencia: Valencian
       vallader: Vallader idiom of Romansh
@@ -46692,9 +46746,6 @@ langvar:
       classical occitan orthography: 
         - grclass
         - Classical Occitan orthography
-      classical sanskrit: 
-        - laukika
-        - Classical Sanskrit
       common cornish orthography of revived cornish: 
         - kkcor
         - Common Cornish orthography of Revived Cornish
@@ -46725,9 +46776,9 @@ langvar:
       german orthography of 1996: 
         - 1996
         - German orthography of 1996
-      gherdã«ina standard of ladin: 
-        - ~
-        - GherdÃ«ina standard of Ladin
+      ghereina standard of ladin: 
+        - gherd
+        - Ghereina standard of Ladin
       hepburn romanization: 
         - hepburn
         - Hepburn romanization
@@ -46962,9 +47013,6 @@ langvar:
       vallader idiom of romansh: 
         - vallader
         - Vallader idiom of Romansh
-      vedic sanskrit: 
-        - vaidika
-        - Vedic Sanskrit
       vivaro-alpine: 
         - vivaraup
         - Vivaro-Alpine

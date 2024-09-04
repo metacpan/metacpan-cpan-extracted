@@ -1,0 +1,11 @@
+TYPEMAP
+Arcus_API *      T_ARCUS_API
+
+INPUT
+T_ARCUS_API
+  IV tmp = SvIV((SV *) SvRV($arg));
+  $var = INT2PTR(Arcus_API *, tmp);
+
+OUTPUT
+T_ARCUS_API
+  sv_setref_pv($arg, class, (void*) $var);

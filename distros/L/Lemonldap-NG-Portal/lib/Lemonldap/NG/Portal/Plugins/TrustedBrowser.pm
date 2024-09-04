@@ -194,8 +194,7 @@ sub storeBrowser {
 
                 # Cookie available 30 days by default
                 $req->addCookie(
-                    $self->p->genCookie(
-                        $req,
+                    $self->p->cookie(
                         name    => $self->cookieName,
                         value   => $ps->id,
                         max_age => $self->timeout,
@@ -404,7 +403,17 @@ sub removeCookie {
     my ( $self, $req ) = @_;
 
     $req->addCookie(
-        $self->p->genCookie(
+        $self->p->cookie(
+            name    => $self->cookieName,
+            value   => 0,
+            expires => 'Wed, 21 Oct 2015 00:00:00 GMT',
+            secure  => $self->conf->{securedCookie},
+        )
+    );
+
+    # Avoid regressions with #3228
+    $req->addCookie(
+        $self->p->genDomainCookie(
             $req,
             name    => $self->cookieName,
             value   => 0,

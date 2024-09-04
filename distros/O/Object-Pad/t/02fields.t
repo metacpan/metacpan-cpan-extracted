@@ -116,6 +116,13 @@ class Holder {
    Evil->new->test;
 }
 
+{
+   class FieldWithListExpr {
+      field @array = ( 0 ) x 5;
+   }
+   pass( 'Code compiles with listexpr as field initialiser' );
+}
+
 ok( !eval <<'EOPERL',
    class SelfInField {
       field $x = $self + 1;

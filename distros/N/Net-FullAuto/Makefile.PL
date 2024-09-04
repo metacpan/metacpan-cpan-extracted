@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000801';
+our $VERSION='1.0000802';
 
 #print `env`,"\n\n\n";
 
@@ -225,7 +225,16 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
       @INC=@TMPINC;
    }
    ### START OF NON-WINDOWS CODE
-   unless (grep { /SKIP|CPAN|figlet/ } @ARGV) {
+   # Bullet Proof Test for AWS EC2
+   # https://serverfault.com/questions/462903/how-to-know-if-a-machine-is-an-ec2-instance
+   $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
+   $aws=(-1<index $aws,'yes')?1:0;
+   if ($aws) {
+      my $token=`curl -X PUT  -s "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`;
+      my $instance_type=`curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-type`;
+      $amazon{instance_type}=$instance_type;
+   }
+   unless (($aws && $amazon{instance_type}=~/nano/) || grep { /SKIP|CPAN|figlet/ } @ARGV) {
       eval {
          local $SIG{__DIE__}; # No sigdie handler
          require CPAN;
@@ -238,7 +247,7 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
          $d=(getpwuid $>)[7].'/.cpan/build';
          unless (-d $d) {
             unless (-d "/root/.cpan/build") {
-               fa_die("ERROR - Can't locate .cpan/build directory");
+               die("ERROR - Can't locate .cpan/build directory");
             } else {
                $d='/root/.cpan/build';
             }
@@ -256,16 +265,6 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
          $ENV{CPAN_LOCAL_LIB}="$ENV{HOME}/perl5";
       }
    }
-   # Bullet Proof Test for AWS EC2
-   # https://serverfault.com/questions/462903/how-to-know-if-a-machine-is-an-ec2-instance
-   $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
-   $aws=(-1<index $aws,'yes')?1:0;
-   if ($aws) {
-      my $token=`curl -X PUT  -s "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`;
-      my $instance_type=`curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-type`;
-      $amazon{instance_type}=$instance_type;
-   }
-
 };
 
 sub check_for_cpan {
@@ -1794,7 +1793,32 @@ sub fa_install_mod {
          /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
          } @ARGV)) {
       print "\n";
-      ($version,$cpanfil)=cpan_modules($p);
+      if (exists $amazon{instance_type} && $amazon{instance_type}=~/nano/) {
+         local $SIG{__DIE__}; # No sigdie handler
+         CPAN::Shell->m($p);
+         eval {
+            local $SIG{__DIE__}; # No sigdie handler;
+            require CPAN;
+            {
+               local *STDOUT;
+               open(STDOUT, ">", \$mod_info);
+               CPAN::Shell->m($p);
+            }
+         };
+         my $instver='';my $cpanver='';
+         if ($mod_info) {
+            ($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
+            ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
+            ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
+            ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
+         }
+         if (!$version && ($instver<$cpanver)) {
+            unlink $instfile if $exec_cnt && $p ne 'ExtUtils::MakeMaker';
+            $version=$cpanver;
+         }
+      } else {
+         ($version,$cpanfil)=cpan_modules($p);
+      }
    } else {
       $cpanfil=$p;
    }
@@ -2217,7 +2241,7 @@ sub size_fmt {
    return sprintf("%.2f TB",$size / (1024*1024*1024*1024));
 }
 if (exists $amazon{instance_type}) {
-   if ($amazon{instance_type}=~/micro/) {
+   if ($amazon{instance_type}=~/micro|nano/) {
       unless (grep { /CPAN|SKIP/ } @ARGV) {
          fa_system('sudo dnf -y install perl-YAML.noarch perl-Net-SSLeay.x86_64');
 #print "BEFORE CPAN LOOPING FREEMEM: ".`sudo cat /proc/meminfo | grep MemFree`;
@@ -2240,10 +2264,10 @@ if (exists $amazon{instance_type}) {
          };
          my $low_mem=<<'END';
 
-    _    _____      __   __  __ ___ __  __  ___  _____   ___
-   | |  / _ \ \    / /  |  \/  | __|  \/  |/ _ \| _ \ \ / / |
-   | |_| (_) \ \/\/ /   | |\/| | _|| |\/| | (_) |   /\ V /|_|
-   |____\___/ \_/\_/    |_|  |_|___|_|  |_|\___/|_|_\ |_| (_)
+    ___ ___ ___ _____ _   ___ _____    _  _ ___ ___ ___  ___ ___
+   | _ \ __/ __|_   _/_\ | _ \_   _|  | \| | __| __|   \| __|   \
+   |   / _|\__ \ | |/ _ \|   / | |    | .` | _|| _|| |) | _|| |) |
+   |_|_\___|___/ |_/_/ \_\_|_\ |_|    |_|\_|___|___|___/|___|___/
 
 END
          my $d = $CPAN::Config->{build_dir};
@@ -2256,19 +2280,21 @@ END
 	 $release=~s/^.*?[+]R\/RE\/(.*?gz)CPAN_.*$/$1/s;
 #print "PARSING OUTCOME=$release<==\n\n";
          $low_mem.=<<END;
-   Installing FullAuto on an Amazon AWS $amazon{instance_type} instance via
-   the commandline cpan utility requires a different approach. The cpan
-   utility places its entire module catalog in memory, and on an AWS 
-   $amazon{instance_type} instance, there just isn't the capacity to make it work
-   as expected. Instead, exit out of the cpan utility, and then restart
-   it, but run the bottom command *instead* of "install Net::FullAuto":
+   Installing Net::FullAuto on an Amazon AWS $amazon{instance_type} instance via
+   the commandline cpan utility requires one restart. The cpan utility places
+   its entire module catalog in memory during an initial startup, and on a 
+   $amazon{instance_type} instance, there just isn't enough memory left over to do
+   the entire build. After an initial startup, the catalog is on disk and will
+   be read from disk, not memory. Therefore, after a restart of the cpan
+   utility (not the server - a reboot is not necessary), there will be enough
+   memory for the build to succeed as expected. Please exit out of the cpan
+   utility, and then restart it.
 
    cpan[3]> exit    ( <== type 'exit' at prompt *first*, then restart cpan )
    
    \$ <sudo> cpan    ( <== restart 'cpan' [if sudo was used, use it again])
 
-   cpan[1]> install $release  <==
-            ==============================================
+   cpan[1]> install Net::FullAuto  <==
 END
          $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
          my $mem_avail=$memavail;

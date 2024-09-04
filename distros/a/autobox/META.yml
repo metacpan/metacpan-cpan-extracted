@@ -3,12 +3,12 @@ abstract: 'call methods on native types'
 author:
   - 'chocolateboy <chocolate@cpan.org>'
 build_requires:
-  IPC::System::Simple: '1.25'
-  Test::Fatal: '0.014'
+  IPC::System::Simple: '1.30'
+  Test::Fatal: '0.017'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/chocolateboy/autobox/issues
   repository: https://github.com/chocolateboy/autobox
-version: v3.0.1
+version: v3.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

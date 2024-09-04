@@ -85,7 +85,7 @@ like(
     );
 
     # make sure we don't segfault if the method is undef, an integer, a float
-    # &c. (see RT #35820)
+    # etc. (see RT #35820)
 
     like(
         exception { no warnings 'uninitialized'; []->$undef },

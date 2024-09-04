@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MetaFunctions 0.812;
+package Object::Pad::MetaFunctions 0.813;
 
 use v5.14;
 use warnings;
@@ -58,7 +58,7 @@ These functions all involve a certain amount of encapsulation-breaking into
 the object instances being operated on. This sort of thing shouldn't be
 encouraged in most regular code, but there can be occasions when it is useful;
 such as debug printing of values, generic serialisation, or tightly-coupled
-unit tests that wish to operate on the interals of the object instances they
+unit tests that wish to operate on the internals of the object instances they
 test.
 
 Therefore, use of these functions should be considered "last-resort". Consider
@@ -123,7 +123,7 @@ Returns a reference to the named field storage variable of the given instance
 object. The I<$fieldname> should be specified as the class name and the field
 name separated by a dot (C<.>) (as per L</deconstruct_object>).
 
-The class name may also be omitted; at which point the first occurance of a
+The class name may also be omitted; at which point the first occurrence of a
 field of the given name found in any component class it matched instead.
 
 If no matching field is found, an exception is thrown.

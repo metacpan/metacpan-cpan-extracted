@@ -1,10 +1,8 @@
 #!perl -T
-use lib '/Users/real/Mios/code/DBIx-Fast/lib/';
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use Test::More;
-
 use DBIx::Fast;
 
 eval "use SQL::Abstract 2.00";

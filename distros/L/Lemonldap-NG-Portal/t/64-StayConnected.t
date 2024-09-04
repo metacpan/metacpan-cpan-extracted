@@ -2,11 +2,11 @@ use warnings;
 use Test::More;
 use strict;
 use IO::String;
+use Plack::Response;
 
 require 't/test-lib.pm';
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                => 'error',
             useSafeJail             => 1,
@@ -48,6 +48,11 @@ subtest "Register session, use it, then logout" => sub {
     my $id = expectCookie($res);
     expectRedirection( $res, 'http://auth.example.com/' );
     my $cid = expectCookie( $res, 'llngpersistent' );
+    unlike(
+        Plack::Response->new(@$res)->headers->header('Set-Cookie'),
+        qr/llngpersistent=[^,]*domain=/,
+        "Domain not set in stayconnected cookie"
+    );
     ok( $res->[1]->[5] =~ /\bsecure\b/, ' Secure cookie found' )
       or explain( $res->[1]->[5], 'Secure cookie found' );
 
@@ -115,6 +120,11 @@ subtest "Make sure connection ID is saved on first login too" => sub {
     my $id = expectCookie($res);
     expectRedirection( $res, 'http://auth.example.com/' );
     my $cid = expectCookie( $res, 'llngpersistent' );
+    unlike(
+        Plack::Response->new(@$res)->headers->header('Set-Cookie'),
+        qr/llngpersistent=[^,]*domain=/,
+        "Domain not set in stayconnected cookie"
+    );
     ok( $res->[1]->[5] =~ /\bsecure\b/, ' Secure cookie found' )
       or explain( $res->[1]->[5], 'Secure cookie found' );
 

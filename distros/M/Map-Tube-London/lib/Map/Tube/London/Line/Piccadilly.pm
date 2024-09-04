@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Piccadilly;
 
-$Map::Tube::London::Line::Piccadilly::VERSION   = '1.37';
+$Map::Tube::London::Line::Piccadilly::VERSION   = '1.39';
 $Map::Tube::London::Line::Piccadilly::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Piccadilly - London Tube Map: Piccadilly Line.
 
 =head1 VERSION
 
-Version 1.37
+Version 1.39
 
 =head1 DESCRIPTION
 
@@ -60,9 +60,9 @@ London Tube Map: Piccadilly Line.
     | Leicester Square          | Piccadilly Circus, Covent Garden              |
     | Covent Garden             | Leicester Square, Holborn                     |
     | Holborn                   | Covent Garden, Russell Square                 |
-    | Russell Square            | Holborn, King's Square St. Pancras            |
-    | King's Square St. Pancras | Russell Square, Caledonian Road               |
-    | Caledonian Road           | King's Square St. Pancras, Holloway Road      |
+    | Russell Square            | Holborn, King's Square St Pancras            |
+    | King's Square St Pancras  | Russell Square, Caledonian Road               |
+    | Caledonian Road           | King's Square St Pancras, Holloway Road      |
     | Holloway Road             | Caledonian Road, Arsenal                      |
     | Arsenal                   | Holloway Road, Finsbury Park                  |
     | Finsbury Park             | Arsenal, Manor House                          |
@@ -120,7 +120,7 @@ London Tube Map: Piccadilly Line.
 =item * The station "Ickenham" is also part of
           L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
 
-=item * The station "King's Cross St. Pancras" is also part of
+=item * The station "King's Cross St Pancras" is also part of
           L<Circle Line|Map::Tube::London::Line::Circle>
         | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
         | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>

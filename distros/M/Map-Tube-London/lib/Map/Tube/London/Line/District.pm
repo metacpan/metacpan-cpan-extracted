@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::District;
 
-$Map::Tube::London::Line::District::VERSION   = '1.37';
+$Map::Tube::London::Line::District::VERSION   = '1.39';
 $Map::Tube::London::Line::District::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::District - London Tube Map: District Line.
 
 =head1 VERSION
 
-Version 1.37
+Version 1.39
 
 =head1 DESCRIPTION
 
@@ -186,7 +186,7 @@ London Tube Map: District Line.
           L<Circle Line|Map::Tube::London::Line::Circle>
         | L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
 
-=item * The station "St. James's Park" is also part of
+=item * The station "St James's Park" is also part of
           L<Circle Line|Map::Tube::London::Line::Circle>
 
 =item * The station "Stepney Green" is also part of

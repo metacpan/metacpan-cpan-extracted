@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.812;
+package Object::Pad 0.813;
 
 use v5.14;
 use warnings;
@@ -762,6 +762,10 @@ they appear within are permitted.
 
 =head2 has
 
+I<Since version 0.813> this keyword is no longer recognised.
+
+It used to be an earlier version of what is now the L</field> keyword.
+
    has $var;
    has @var;
    has %var;
@@ -770,16 +774,8 @@ they appear within are permitted.
 
    has $var { BLOCK }
 
-A now-deprecated older version of the L</field> keyword.
-
-This generally behaves like C<field>, except that inline expressions are
-evaluated immediately, once, during class declaration time. These are I<not>
-stored to be evaluated for each constructor.
-
 Because of the one-shot immediate nature of these initialisation expressions
-(and a bunch of other reasons), the C<has> keyword is now discouraged for use
-and will emit compile-time warnings in the C<deprecated> category. Use the
-C<field> keyword instead.
+(and a bunch of other reasons), the keyword was removed.
 
 If you need to evaluate an expression exactly once during the class
 declaration and assign its now-constant value to every instace, store it in a
@@ -991,7 +987,7 @@ consumes additional constructor parameters by assigning them into lexical
 variables.
 
 Before the block itself, a list of lexical variables are introduced, inside
-parentheses. The name of each one is preceeded by a colon, and consumes a
+parentheses. The name of each one is preceded by a colon, and consumes a
 constructor parameter of the same name. These parameters are considered
 "consumed" for the purposes of a C<:strict(params)> check.
 
