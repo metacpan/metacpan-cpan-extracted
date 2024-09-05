@@ -1,11 +1,14 @@
 ##----------------------------------------------------------------------------
 ## CSS Object Oriented - ~/lib/CSS/Object/Format/Inline.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/08/09
-## Modified 2020/08/09
+## Modified 2024/09/05
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package CSS::Object::Format::Inline;
 BEGIN
@@ -13,8 +16,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( CSS::Object::Format );
-    use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 sub init
@@ -95,7 +97,7 @@ sub rule_as_string
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -119,7 +121,7 @@ CSS::Object::Format - CSS Object Oriented Stringificator for Inline CSS
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

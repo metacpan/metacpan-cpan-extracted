@@ -91,6 +91,8 @@ can_ok( $cldr, 'day_period' );
 can_ok( $cldr, 'day_periods' );
 can_ok( $cldr, 'decode_sql_arrays' );
 can_ok( $cldr, 'error' );
+can_ok( $cldr, 'extend_timezones_cities' );
+can_ok( $cldr, 'fatal' );
 can_ok( $cldr, 'interval_formats' );
 can_ok( $cldr, 'l10n' );
 can_ok( $cldr, 'language' );
@@ -216,11 +218,12 @@ SKIP:
         number_systems number_systems_l10n person_name_defaults
         rbnf refs scripts scripts_l10n subdivisions
         subdivisions_l10n territories territories_l10n
-        time_formats timezones timezones_cities timezones_formats
-        timezones_info timezones_names unit_aliases
-        unit_constants unit_conversions unit_prefixes unit_prefs
-        unit_quantities units_l10n variants variants_l10n
-        week_preferences
+        time_formats timezones timezones_cities
+        timezones_cities_extended timezones_cities_supplemental
+        timezones_formats timezones_info timezones_names
+        unit_aliases unit_constants unit_conversions
+        unit_prefixes unit_prefs unit_quantities units_l10n
+        variants variants_l10n week_preferences
      )];
     is_deeply( \@tables, $expected, 'tables' );
 };
@@ -2547,7 +2550,8 @@ foreach my $test_name ( sort( keys( %$tests ) ) )
     # Taking a cue at how perl itself handled this issue:
     # <https://github.com/Perl/perl5/issues/17134>
     # <https://github.com/Perl/perl5/issues/17853>
-    if( ( $Config{uselongdouble} || ( exists( $Config{uselongdouble} ) && !defined( $Config{uselongdouble} ) ) ) && 
+    if( exists( $Config{uselongdouble} ) && 
+        ( $Config{uselongdouble} || !defined( $Config{uselongdouble} ) ) && 
         ( $test_name eq 'language_populations' || $test_name eq 'unit_constants' ) )
     {
         pass( "Skipping test ${test_name} under $^O due to perl compilation with 'uselongdouble'" );

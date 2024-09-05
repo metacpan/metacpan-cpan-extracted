@@ -1,5 +1,8 @@
 Revision history for Perl module Apache2::API
 
+v0.3.1 2024-09-04T20:28:56+0900
+    - Removed dependency on Devel::Confess. Best added by the user himself
+
 v0.3.0 2024-04-10T06:34:12+0900
     - Improved method bailout.
     - Added method is_aborted in Apache2::API::Request

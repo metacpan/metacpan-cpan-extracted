@@ -5,8 +5,8 @@ lib/Apache2/SSI.pm
 lib/Apache2/SSI/Common.pm
 lib/Apache2/SSI/Datetime.pod
 lib/Apache2/SSI/File.pm
-lib/Apache2/SSI/File/Type.pm
 lib/Apache2/SSI/File/Type.json
+lib/Apache2/SSI/File/Type.pm
 lib/Apache2/SSI/Finfo.pm
 lib/Apache2/SSI/Notes.pm
 lib/Apache2/SSI/SemStat.pod

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields/Field.pm
-## Version v1.1.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.1.2
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2024/01/03
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,6 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
     use DB::Object::Fields::Overloaded;
-    use Devel::Confess;
     use Module::Generic::Array;
     use overload (
         '""'    => 'as_string',
@@ -52,7 +51,7 @@ BEGIN
         fallback => 1,
     );
     use Want;
-    our $VERSION = 'v1.1.1';
+    our $VERSION = 'v1.1.2';
 };
 
 use strict;
@@ -465,7 +464,7 @@ This would yield:
 
 =head1 VERSION
 
-    v1.1.1
+    v1.1.2
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,8 @@
 Revision history for Perl module CSS::Object
 
+v0.2.0 2024-09-05T14:19:10+0900
+    - Removing some dependencies
+
 v0.1.6 2023-10-11T16:34:15+0900
     - Corrected malformed signature for distribution release
 

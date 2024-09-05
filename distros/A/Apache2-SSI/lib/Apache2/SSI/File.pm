@@ -1,3 +1,15 @@
+##----------------------------------------------------------------------------
+## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/File.pm
+## Version v0.1.2
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2020/12/18
+## Modified 2024/09/04
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 #----------------------------------------------------------------------------
 # Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/File.pm
 # Version v0.1.1
@@ -33,14 +45,13 @@ BEGIN
         require APR::Const;
         APR::Const->import( -compile => qw( :filetype FINFO_NORM ) );
     }
-    # use Devel::Confess;
     our( $DEBUG );
     use overload (
         q{""}    => sub    { $_[0]->filename },
         bool     => sub () { 1 },
         fallback => 1,
     );
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
     our $DIR_SEP = $Apache2::SSI::Common::DIR_SEP;
 };
 
@@ -281,7 +292,7 @@ Apache2::SSI::File - Apache2 Server Side Include File Object Class
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

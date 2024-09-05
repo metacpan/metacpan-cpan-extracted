@@ -1,11 +1,11 @@
 ## <https://perl.apache.org/docs/2.0/api/APR/Finfo.html>
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/Finfo.pm
-## Version v0.1.2
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.1.3
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/18
-## Modified 2022/10/21
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -24,7 +24,6 @@ BEGIN
     use DateTime;
     use DateTime::Format::Strptime;
     use File::Basename ();
-    use Nice::Try;
     our( $AUTOLOAD, $ERROR );
     use overload (
         q{""}    => sub    { $_[0]->{filepath} },
@@ -72,7 +71,7 @@ BEGIN
     use constant FILETYPE_UNKFILE => 127;
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -93,7 +92,9 @@ sub init
     if( $r )
     {
         # <https://perl.apache.org/docs/2.0/api/Apache2/RequestRec.html#toc_C_filename_>
-        try
+        local $@;
+        # try-catch
+        eval
         {
             my $finfo;
             if( $r->filename eq $file )
@@ -106,17 +107,17 @@ sub init
                 $r->finfo( $finfo );
             }
             $self->{apr_finfo} = $finfo;
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
             # This makes it possible to query this api even if provided with a non-existing file
-            if( $e =~ /No[[:blank:]\h]+such[[:blank:]\h]+file[[:blank:]\h]+or[[:blank:]\h]+directory/i )
+            if( $@ =~ /No[[:blank:]\h]+such[[:blank:]\h]+file[[:blank:]\h]+or[[:blank:]\h]+directory/i )
             {
                 $self->{_data} = [];
             }
             else
             {
-                return( $self->error( "Unable to set the APR::Finfo object: $e" ) );
+                return( $self->error( "Unable to set the APR::Finfo object: $@" ) );
             }
         }
     }
@@ -506,7 +507,9 @@ sub _datetime
     my $t = shift( @_ );
     return( $self->error( "No epoch time was provided." ) ) if( !length( $t ) );
     return( $self->error( "Invalid epoch time provided \"$t\"." ) ) if( $t !~ /^\d+$/ );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         my $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
         my $fmt = DateTime::Format::Strptime->new(
@@ -515,11 +518,12 @@ sub _datetime
         );
         $dt->set_formatter( $fmt );
         return( Apache2::SSI::Datetime->new( $dt ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to get the datetime object for \"$t\": $e" ) );
+        return( $self->error( "Unable to get the datetime object for \"$t\": $@" ) );
     }
+    return( $rv );
 }
 
 # NOTE: Apache2::SSI::Datetime class
@@ -676,7 +680,7 @@ Apache2::SSI::Finfo - Apache2 Server Side Include File Info Object Class
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

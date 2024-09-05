@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/Common.pm
-## Version v0.1.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.1.2
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/13
-## Modified 2022/10/21
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,10 +19,9 @@ BEGIN
     use vars qw( $VERSION $OS2SEP $DIR_SEP );
     use File::Spec ();
     use IO::File;
-    use Nice::Try;
     use Scalar::Util ();
     use URI;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
     # https://en.wikipedia.org/wiki/Path_(computing)
     # perlport
     our $OS2SEP  =
@@ -180,7 +179,9 @@ sub slurp
     my $file = $args->{filename} || $args->{file} || $self->filename;
     return( $self->error( "No filename found." ) ) if( !length( $file ) );
     my $binmode = $args->{binmode} // '';
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         my $fh = IO::File->new( "<$file" ) ||
         return( $self->error( "Unable to open file \"$file\" in read mode: $!" ) );
@@ -197,11 +198,12 @@ sub slurp
             local $/;
             return( scalar( <$fh> ) );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occured while trying to open and read file \"$file\": $e" ) );
+        return( $self->error( "An error occured while trying to open and read file \"$file\": $@" ) );
     }
+    return( $rv );
 }
 
 sub slurp_utf8
@@ -234,7 +236,7 @@ Apache2::SSI::Common - Apache2 Server Side Include Common Resources
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 SYNOPSIS
 

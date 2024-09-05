@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.5.0
+## Version v0.5.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2024/04/27
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,6 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $DICT $LINK_ELEMENTS $FATAL_ERROR $GLOBAL_DOM $VERSION );
     use curry;
-    use Devel::Confess;
     use Encode ();
     use Filter::Util::Call;
     use HTML::Object::Closing;
@@ -34,7 +33,7 @@ BEGIN
     use JSON;
     use Module::Generic::File qw( file );
     use Scalar::Util ();
-    our $VERSION = 'v0.5.0';
+    our $VERSION = 'v0.5.1';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -115,7 +114,6 @@ sub import
     
     if( $hash->{try_catch} )
     {
-        # Nice::Try is among our dependency, so we can load it safely
         require Nice::Try;
         Nice::Try->export_to_level( 1, @_ );
     }
@@ -903,7 +901,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.5.0
+    v0.5.1
 
 =head1 DESCRIPTION
 

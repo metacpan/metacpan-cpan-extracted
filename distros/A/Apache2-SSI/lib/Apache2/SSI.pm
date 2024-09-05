@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI.pm
-## Version v0.2.8
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.10
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/17
-## Modified 2023/10/11
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -62,12 +62,11 @@ BEGIN
     use Encode ();
     use HTML::Entities ();
     use IO::Select;
-    use Nice::Try;
     use Regexp::Common qw( net Apache2 );
     use Scalar::Util ();
     use URI;
     use version;
-    our $VERSION = 'v0.2.8';
+    our $VERSION = 'v0.2.10';
     use constant PERLIO_IS_ENABLED => $Config{useperlio};
     # As of Apache 2.4.41 and mod perl 2.0.11 Apache2::SubProcess::spawn_proc_prog() is not working
     use constant MOD_PERL_SPAWN_PROC_PROG_WORKING => 0;
@@ -802,25 +801,28 @@ sub apache_response_handler
     }
     else
     {
-        try
+        local $@;
+        # try-catch
+        $res = eval
         {
-            $res = Encode::encode( 'utf8', $res, Encode::FB_CROAK );
-        }
-        catch( $e )
+            Encode::encode( 'utf8', $res, Encode::FB_CROAK );
+        };
+        if( $@ )
         {
-            $r->log->error( "${class} encountered an error while trying to encode data into utf8: $e" );
+            $r->log->error( "${class} encountered an error while trying to encode data into utf8: $@" );
             return( &Apache2::Const::DECLINED );
         }
         
         my $len = length( $res );
-        try
+        # try-catch
+        eval
         {
             $r->headers_out->set( 'Content-Length' => $len );
             my $sent = $r->print( $res );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            $r->log->error( "${class} encountered an error while sending resulting data via Apache2::Filter->print: $e" );
+            $r->log->error( "${class} encountered an error while sending resulting data via Apache2::Filter->print: $@" );
         }
         return( &Apache2::Const::OK );
     }
@@ -892,13 +894,16 @@ sub apache_filter_handler
         $r->log->debug( "${class} [PerlOutputFilterHandler]: Data received is empty. Nothing to do." );
         return( &Apache2::Const::OK );
     }
-    try
+
+    local $@;
+    # try-catch
+    $html = eval
     {
-        $html = Encode::decode( 'utf8', $html, Encode::FB_CROAK );
-    }
-    catch( $e )
+        Encode::decode( 'utf8', $html, Encode::FB_CROAK );
+    };
+    if( $@ )
     {
-        $r->log->error( "${class} [PerlOutputFilterHandler]: Failed to decode data from utf8: $e" );
+        $r->log->error( "${class} [PerlOutputFilterHandler]: Failed to decode data from utf8: $@" );
         return( &Apache2::Const::DECLINED );
     }
     
@@ -950,27 +955,29 @@ sub apache_filter_handler
     }
     else
     {
-        try
+        # try-catch
+        $res = eval
         {
-            $res = Encode::encode( 'utf8', $res, Encode::FB_CROAK );
-        }
-        catch( $e )
+            Encode::encode( 'utf8', $res, Encode::FB_CROAK );
+        };
+        if( $@ )
         {
-            $r->log->error( "${class} [PerlOutputFilterHandler]: encountered an error while trying to encode data into utf8: $e" );
+            $r->log->error( "${class} [PerlOutputFilterHandler]: encountered an error while trying to encode data into utf8: $@" );
             return( &Apache2::Const::DECLINED );
         }
         
         # $r->headers_out->unset( 'Content-Length' );
         my $len = length( $res );
-        try
+        # try-catch
+        eval
         {
             $r->headers_out->set( 'Content-Length' => $len );
             my $sent = $f->print( "$res" );
             $r->log->debug( "${class} [PerlOutputFilterHandler]: ${sent} bytes sent out." ) if( $debug > 0 );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            $r->log->error( "${class} encountered an error while sending resulting data via Apache2::Filter->print: $e" );
+            $r->log->error( "${class} encountered an error while sending resulting data via Apache2::Filter->print: $@" );
         }
         # This will cause a segfault
         # $r->rflush;
@@ -1121,7 +1128,9 @@ sub clone
 sub decode_base64
 {
     my $self = shift( @_ );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         my $v = join( '', @_ );
         if( $self->mod_perl )
@@ -1135,44 +1144,53 @@ sub decode_base64
         }
         $v = Encode::decode( 'utf8', $v ) if( $self->_has_utf8( $v ) );
         return( $v );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while decoding base64 data: $e" ) );
+        return( $self->error( "Error while decoding base64 data: $@" ) );
     }
+    return( $rv );
 }
 
 sub decode_entities
 {
     my $self = shift( @_ );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         return( HTML::Entities::decode_entities( @_ ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while decoding html entities data: $e" ) );
+        return( $self->error( "Error while decoding html entities data: $@" ) );
     }
+    return( $rv );
 }
 
 sub decode_uri
 {
     my $self = shift( @_ );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         require URI::Escape::XS;
         return( URI::Escape::XS::uri_unescape( @_ ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while decoding uri: $e" ) );
+        return( $self->error( "Error while decoding uri: $@" ) );
     }
+    return( $rv );
 }
 
 sub decode_url
 {
     my $self = shift( @_ );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         if( $self->mod_perl )
         {
@@ -1184,11 +1202,12 @@ sub decode_url
             require URL::Encode;
             return( URL::Encode::url_decode_utf8( @_ ) );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while url decoding data: $e" ) );
+        return( $self->error( "Error while url decoding data: $@" ) );
     }
+    return( $rv );
 }
 
 sub document_filename { return( shift->uri->filename( @_ ) ); }
@@ -1223,7 +1242,9 @@ sub echomsg { return( shift->_set_get_scalar( 'echomsg', @_ ) ); }
 sub encode_base64
 {
     my $self = shift( @_ );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         my $v = join( '', @_ );
         $v = Encode::encode( 'utf8', $v, Encode::FB_CROAK ) if( Encode::is_utf8( $v ) );
@@ -1236,61 +1257,73 @@ sub encode_base64
             require MIME::Base64;
             return( MIME::Base64::encode( $v, '' ) );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while encoding data into base64: $e" ) );
+        return( $self->error( "Error while encoding data into base64: $@" ) );
     }
+    return( $rv );
 }
 
 sub encode_entities
 {
     my $self = shift( @_ );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         return( HTML::Entities::encode_entities( join( '', @_ ) ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while encoding data into html entities: $e" ) );
+        return( $self->error( "Error while encoding data into html entities: $@" ) );
     }
+    return( $rv );
 }
 
 sub encode_md5
 {
     my $self = shift( @_ );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         require Digest::MD5;
         my $v = join( '', @_ );
         $v = Encode::encode( 'utf8', $v, Encode::FB_CROAK ) if( Encode::is_utf8( $v ) );
         return( Digest::MD5::md5_hex( $v ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while encoding data into md5 hex: $e" ) );
+        return( $self->error( "Error while encoding data into md5 hex: $@" ) );
     }
+    return( $rv );
 }
 
 sub encode_uri
 {
     my $self = shift( @_ );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         require URI::Escape::XS;
         # return( URI::Escape::uri_escape_utf8( join( '', @_ ) ) );
         return( URI::Escape::XS::uri_escape( join( '', @_ ) ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while encoding uri: $e" ) );
+        return( $self->error( "Error while encoding uri: $@" ) );
     }
+    return( $rv );
 }
 
 sub encode_url
 {
     my $self = shift( @_ );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         if( $self->mod_perl )
         {
@@ -1303,11 +1336,12 @@ sub encode_url
             require URL::Encode;
             return( URL::Encode::url_encode_utf8( join( '', @_ ) ) );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while url encoding data: $e" ) );
+        return( $self->error( "Error while url encoding data: $@" ) );
     }
+    return( $rv );
 }
 
 sub env
@@ -1527,17 +1561,20 @@ sub notes
     
     if( $r )
     {
-        try
+        local $@;
+        # try-catch
+        my $rv = eval
         {
             $r->pnotes( $var => $new ) if( $new_value_set );
             my $val = $r->pnotes( $var );
             $val //= $notes->get( $var ) if( $notes );
             return( $val );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occurred trying to ", (defined( $new ) ? 'set/' : ''), " get the note value for variable \"${var}\"", (defined( $new ) ? " with value '${new}" : ''), ": $e" ) );
+            return( $self->error( "An error occurred trying to ", (defined( $new ) ? 'set/' : ''), " get the note value for variable \"${var}\"", (defined( $new ) ? " with value '${new}" : ''), ": $@" ) );
         }
+        return( $rv );
     }
     return( $notes->get( $var ) ) if( $notes );
     return( '' );
@@ -1621,7 +1658,9 @@ sub parse_echo
     if( $args->{decoding} && lc( $args->{decoding} ) ne 'none' )
     {
         $args->{decoding} = lc( $args->{decoding} );
-        try
+        local $@;
+        # try-catch
+        eval
         {
             if( $args->{decoding} eq 'url' )
             {
@@ -1639,10 +1678,10 @@ sub parse_echo
             {
                 $value = $self->decode_entities( $value );
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            $self->error( "Decoding of value with method \"$args->{decoding}\" for variable \"$args->{var}\" failed: $e" );
+            $self->error( "Decoding of value with method \"$args->{decoding}\" for variable \"$args->{var}\" failed: $@" );
             return( $self->errmsg );
         }
     }
@@ -1650,7 +1689,9 @@ sub parse_echo
     if( $args->{encoding} && lc( $args->{encoding} ) ne 'none' )
     {
         $args->{encoding} = lc( $args->{encoding} );
-        try
+        local $@;
+        # try-catch
+        eval
         {
             if( $args->{encoding} eq 'url' )
             {
@@ -1668,10 +1709,10 @@ sub parse_echo
             {
                 $value = $self->encode_entities( $value );
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            $self->error( "Enecoding of value with method \"$args->{decoding}\" for variable \"$args->{var}\" failed: $e" );
+            $self->error( "Enecoding of value with method \"$args->{decoding}\" for variable \"$args->{var}\" failed: $@" );
             return( $self->errmsg );
         }
     }
@@ -1977,16 +2018,18 @@ sub parse_expr
     
     my $exp = $self->{_exp};
     my $hash = {};
-    try
+    local $@;
+    # try-catch
+    eval
     {
         local $SIG{ALRM} = sub{ die( "Timeout!\n" ) };
-        alarm( 90 );
+        alarm(90);
         $hash = $exp->parse( $text );
-        alarm( 0 );
-    }
-    catch( $e )
+        alarm(0);
+    };
+    if( $@ )
     {
-        return( $self->error( "Error parsing expression '$text': $e" ) );
+        return( $self->error( "Error parsing expression '$text': $@" ) );
     }
     my $res = [];
     $opts->{top} = 1;
@@ -2060,14 +2103,17 @@ sub parse_func_env
     my $env = $self->env;
     if( $r )
     {
-        try
+        local $@;
+        # try-catch
+        my $rv = eval
         {
             return( $r->subprocess_env( $var ) || $env->{ $var } || $self->notes( $var ) );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occurred trying to get the environment value for variable \"${var}\": $e" ) );
+            return( $self->error( "An error occurred trying to get the environment value for variable \"${var}\": $@" ) );
         }
+        return( $rv );
     }
     else
     {
@@ -2340,7 +2386,9 @@ sub parse_set
     if( $args->{decoding} && lc( $args->{decoding} ) ne 'none' )
     {
         $args->{decoding} = lc( $args->{decoding} );
-        try
+        local $@;
+        # try-catch
+        eval
         {
             if( $args->{decoding} eq 'url' )
             {
@@ -2358,10 +2406,10 @@ sub parse_set
             {
                 $args->{value} = $self->decode_entities( $args->{value} );
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            $self->error( "Decoding of value with method \"$args->{decoding}\" for variable \"$args->{var}\" failed: $e" );
+            $self->error( "Decoding of value with method \"$args->{decoding}\" for variable \"$args->{var}\" failed: $@" );
             return( $self->errmsg );
         }
     }
@@ -2371,7 +2419,9 @@ sub parse_set
     if( $args->{encoding} && lc( $args->{encoding} ) ne 'none' )
     {
         $args->{encoding} = lc( $args->{encoding} );
-        try
+        local $@;
+        # try-catch
+        eval
         {
             if( $args->{encoding} eq 'url' )
             {
@@ -2389,10 +2439,10 @@ sub parse_set
             {
                 $args->{value} = $self->encode_entities( $args->{value} );
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            $self->error( "Enecoding of value with method \"$args->{decoding}\" for variable \"$args->{var}\" failed: $e" );
+            $self->error( "Enecoding of value with method \"$args->{decoding}\" for variable \"$args->{var}\" failed: $@" );
             return( $self->errmsg );
         }
     }
@@ -2469,14 +2519,16 @@ sub remote_ip
         # In Apache v2.4 or higher, client_ip is used instead of remote_ip
         my $c = $r->connection;
         my $coderef = $c->can( 'client_ip' ) // $c->can( 'remote_ip' );
-        try
+        local $@;
+        # try-catch
+        eval
         {
             $coderef->( $c, $new ) if( $new );
             $ip = $coderef->( $c );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            $self->error( "Unable to get the remote ip with the method Apache2::Connection->", ( $c->can( 'client_ip' ) ? 'client_ip' : 'remote_ip' ), ": $e" );
+            $self->error( "Unable to get the remote ip with the method Apache2::Connection->", ( $c->can( 'client_ip' ) ? 'client_ip' : 'remote_ip' ), ": $@" );
         }
         $ip = $self->parse_echo({ var => 'REMOTE_ADDR' }) if( !CORE::length( $ip ) );
     }
@@ -2502,15 +2554,17 @@ sub server_version
     my $vers = '';
     if( $self->mod_perl )
     {
-        try
+        local $@;
+        # try-catch
+        eval
         {
             my $desc = Apache2::ServerUtil::get_server_description();
             if( $desc =~ /\bApache\/([\d\.]+)/ )
             {
                 $vers = $1;
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
         }
     }
@@ -2587,18 +2641,21 @@ sub _format_time
     my $tz;
     # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
     # "Cannot determine local time zone"
-    try
+    local $@;
+    # try-catch
+    eval
     {
         require DateTime::TimeZone;
         $tz = DateTime::TimeZone->new( name => 'local' );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
         warn( "Your system is missing key timezone components. Reverting to UTC instead of local time zone.\n" );
     }
     
-    try
+    # try-catch
+    my $rv = eval
     {
         my $dt = DateTime->from_epoch( %$params );
         if( length( $format ) )
@@ -2615,12 +2672,13 @@ sub _format_time
         {
             return( $dt->format_cldr( $dt->locale->date_format_full ) );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        $self->error( "An error occurred getting a DateTime object for time \"$time\" with format \"$format\": $e" );
+        $self->error( "An error occurred getting a DateTime object for time \"$time\" with format \"$format\": $@" );
         return( $self->errmsg );
     }
+    return( $rv );
 }
 
 sub _handle_ifs
@@ -2661,19 +2719,22 @@ sub _ipmatch
     my $self = shift( @_ );
     my $subnet = shift( @_ ) || return( $self->error( "No subnet provided" ) );
     my $ip   = shift( @_ ) || $self->remote_ip;
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         local $SIG{__WARN__} = sub{};
         require Net::Subnet;
         my $net = Net::Subnet::subnet_matcher( $subnet );
         my $res = $net->( $ip );
         return( $res ? 1 : 0 );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        $self->error( "Error while calling Net::Subnet: $e" );
-        return( 0 );
+        $self->error( "Error while calling Net::Subnet: $@" );
+        return(0);
     }
+    return( $rv );
 }
 
 sub _is_ip

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Query.pm
-## Version v0.3.8
+## Version v0.3.9
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/10/20
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -19,10 +19,9 @@ BEGIN
     use warnings;
     use parent qw( DB::Object::Query );
     use vars qw( $VERSION $DEBUG );
-    use Devel::Confess;
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.3.8';
+    our $VERSION = 'v0.3.9';
 };
 
 use strict;
@@ -238,7 +237,7 @@ DB::Object::Mysql::Query - Query Object for MySQL
 
 =head1 VERSION
 
-    v0.3.8
+    v0.3.9
 
 =head1 DESCRIPTION
 

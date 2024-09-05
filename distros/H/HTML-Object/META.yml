@@ -25,11 +25,10 @@ no_index:
     - t
     - inc
 requires:
-  CSS::Object: v0.1.5
+  CSS::Object: v0.2.0
   Config: '0'
   Data::UUID: '1.226'
   DateTime::Format::Strptime: '1.79'
-  Devel::Confess: '0.009004'
   Digest::MD5: '2.58'
   Encode: '3.08'
   Exporter: '5.74'
@@ -38,9 +37,10 @@ requires:
   HTML::Selector::XPath: '0.28'
   JSON: '4.10'
   List::Util: '1.56'
-  Module::Generic: v0.37.0
+  Locale::Unicode: v0.3.6
+  Module::Generic: v0.37.5
   POSIX: '0'
-  Promise::Me: v0.4.11
+  Promise::Me: v0.5.0
   Scalar::Util: '1.60'
   Time::HiRes: '1.9764'
   URI: '5.28'
@@ -57,5 +57,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/HTML-Object/issues
   repository: https://gitlab.com/jackdeguest/HTML-Object
-version: v0.5.0
+version: v0.5.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

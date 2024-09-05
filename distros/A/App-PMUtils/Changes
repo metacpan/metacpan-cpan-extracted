@@ -1,3 +1,8 @@
+0.745   2024-08-30  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli pmcost] [ux] Make -H as short alias for --time-hires.
+
+
 0.744   2023-05-12  Released-By: PERLANCAR; Urgency: medium
 
         - [cli pmcost] Add option --time-hires to adjust with

@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
         'strict'        => 0,
         'warnings'      => 0,
         'DateTime::TimeZone::Alias' => '0.06',
-        'Nice::Try'     => 'v1.3.1',
+        # 'Nice::Try'     => 'v1.3.1',
     },
     TEST_REQUIRES =>
     {

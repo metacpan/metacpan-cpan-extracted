@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Tables.pm
-## Version v1.0.0
+## Version v1.0.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/11/17
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -24,10 +24,9 @@ BEGIN
     use parent qw( DB::Object );
     use vars qw( $VERSION $DEBUG );
     use DB::Object::Fields;
-    use Devel::Confess;
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v1.0.0';
+    our $VERSION = 'v1.0.1';
 };
 
 use strict;
@@ -892,7 +891,7 @@ DB::Object::Tables - Database Table Object
 
 =head1 VERSION
 
-    v1.0.0
+    v1.0.1
 
 =head1 DESCRIPTION
 

@@ -22,7 +22,7 @@ my $fmt = Apache2::API::DateTime->new;
 isa_ok( $fmt, 'Apache2::API::DateTime' );
 
 # To generate this list:
-# egrep -E '^sub ' ./lib/Apache2/API/DateTime.pm | perl -lnE 'my $m = [split(/\s+/, $_)]->[1]; say "can_ok( \$fmt, ''$m'' );"'
+# perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$fmt, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/Apache2/API/DateTime.pm
 can_ok( $fmt, 'format_datetime' );
 can_ok( $fmt, 'parse_date' );
 can_ok( $fmt, 'parse_datetime' );

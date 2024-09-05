@@ -100,7 +100,7 @@ Apache2::SSI::SharedMem - Apache2 SSI Notes Shared Memory Manipulation
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

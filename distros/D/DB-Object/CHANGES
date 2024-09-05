@@ -1,5 +1,11 @@
 Revision history for Perl module DB::Object
 
+v1.4.2 2024-09-05T14:30:34+0900
+    - Updated dependencies
+
+v1.4.1 2024-09-04T22:27:26+0900
+    - Removed some dependencies
+
 v1.4.0 2024-04-13T17:55:40+0900
     - Modified method connect() in DB::Object to use a timeout of 5 seconds, otherwise on some system, the connect attempt would hang for a long time.
 

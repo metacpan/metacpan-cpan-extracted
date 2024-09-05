@@ -1,5 +1,12 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.45  2024-09-04T12:50:00+00:00
+      - Removed broken/unwanted links.
+
+0.44  2024-09-04T12:25:00+00:00
+      - Added as_png, as_graph, thanks @mohawk2.
+      - Upgraded dependency on Map::Tube v3.77.
+
 0.43  2024-08-18T23:45:00+00:00
       - Pod changes about installation, thanks @mohawk2.
 

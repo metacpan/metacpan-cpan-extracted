@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Japanese DateTime Parser/Formatter - ~/lib/DateTime/Format/JP.pm
-## Version v0.1.4
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.1.6
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/18
-## Modified 2023/10/11
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,8 +22,7 @@ BEGIN
         $ZENKAKU_NUMBERS $KANJI_NUMBERS $ZENKAKU_TO_ROMAN $KANJI_TO_ROMAN $WEEKDAYS
         $WEEKDAYS_RE $TIME_RE $TIME_ZENKAKU_RE $TIME_KANJI_RE $ERROR
     );
-    use Nice::Try;
-    our $VERSION = 'v0.1.4';
+    our $VERSION = 'v0.1.6';
     our $DICT = [];
     our $ZENKAKU_NUMBERS = [];
     our $KANJI_NUMBERS   = [];
@@ -917,7 +916,9 @@ sub make_datetime
         $opts->{hour} += 12;
     }
     
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         my $dt;
         if( $opts->{era} && ref( $opts->{era} ) )
@@ -946,16 +947,17 @@ sub make_datetime
             }
         
             $dt = DateTime->new( %$p );
-        }
+        };
         $dt->set_hour( $opts->{hour} ) if( $opts->{hour} );
         $dt->set_minute( $opts->{minute} ) if( $opts->{minute} );
         $dt->set_second( $opts->{second} ) if( $opts->{second} );
         return( $dt );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $e );
+        return( $@ );
     }
+    return( $rv );
 }
 
 sub message
@@ -1234,7 +1236,6 @@ sub _set_get_zenkaku
         use vars qw( $ERROR );
         use DateTime;
         use DateTime::TimeZone;
-        use Nice::Try;
         use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
     };
 
@@ -1282,7 +1283,9 @@ sub _set_get_zenkaku
         my $self = shift( @_ );
         my $field = shift( @_ );
         my $ref = $self->{ $field };
-        try
+        local $@;
+        # try-catch
+        my $rv = eval
         {
             if( ref( $ref ) eq 'ARRAY' && scalar( @$ref ) == 3 )
             {
@@ -1296,16 +1299,17 @@ sub _set_get_zenkaku
             {
                 return( DateTime->now( time_zone => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) ) );
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( $e ) );
+            return( $self->error( $@ ) );
         }
+        return( $rv );
     }
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -1338,7 +1342,7 @@ DateTime::Format::JP - Japanese DateTime Parser and Formatter
 
 =head1 VERSION
 
-    v0.1.4
+    v0.1.6
 
 =head1 DESCRIPTION
 

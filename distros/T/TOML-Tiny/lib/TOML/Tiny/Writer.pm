@@ -1,5 +1,5 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.17';
+$TOML::Tiny::Writer::VERSION = '0.18';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -9,6 +9,8 @@ use B qw(SVf_IOK SVf_NOK svref_2object);
 use Data::Dumper qw(Dumper);
 use TOML::Tiny::Grammar qw($BareKey $DateTime $SpecialFloat);
 use TOML::Tiny::Util qw(is_strict_array);
+
+use constant CORE_BOOL => defined &builtin::is_bool;
 
 my @KEYS;
 
@@ -60,6 +62,9 @@ sub to_toml {
   }
 
   if ($ref eq '') {
+    if (CORE_BOOL && builtin::is_bool($data)) {
+        return $data ? 'true' : 'false';
+    }
     # Thanks to ikegami on Stack Overflow for the trick!
     # https://stackoverflow.com/questions/12686335/how-to-tell-apart-numeric-scalars-and-string-scalars-in-perl/12693984#12693984
     # note: this must come before any regex can flip this flag off
@@ -275,7 +280,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 AUTHOR
 

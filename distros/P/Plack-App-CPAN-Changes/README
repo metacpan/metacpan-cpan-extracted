@@ -9,6 +9,11 @@ SYNOPSIS
      my $psgi_ar = $obj->call($env);
      my $app = $obj->to_app;
 
+DESCRIPTION
+    Plack application which prints changelog record. Record is defined by
+    CPAN::Changes object, which is created from some file (like Changes) in
+    CPAN distribution.
+
 METHODS
   "new"
      my $obj = Plack::App::CPAN::Changes->new(%parameters);
@@ -208,5 +213,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

@@ -52,7 +52,6 @@ requires:
   DateTime::Format::Strptime: '1.79'
   DateTime::TimeZone: '2.51'
   DateTime::TimeZone::Catalog::Extend: v0.3.0
-  Devel::Confess: '0'
   Encode: '3.01'
   Exporter: '5.70'
   HTTP::AcceptLanguage: '0.02'
@@ -74,5 +73,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Apache2-API/issues
   repository: https://gitlab.com/jackdeguest/Apache2-API
-version: v0.3.0
+version: v0.3.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

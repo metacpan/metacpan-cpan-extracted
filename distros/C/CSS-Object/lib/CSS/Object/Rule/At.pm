@@ -1,11 +1,14 @@
 ##----------------------------------------------------------------------------
-## CSS Object Oriented - ~/lib/CSS/Object/Rule.pm
-## Version v0.1.0
+## CSS Object Oriented - ~/lib/CSS/Object/Rule/At.pm
+## Version v0.2.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.local>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/21
-## Modified 2020/06/21
+## Modified 2024/09/05
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package CSS::Object::Rule::At;
 BEGIN
@@ -13,12 +16,11 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( CSS::Object::Rule );
-    use Devel::Confess;
     use overload (
         '""' => 'as_string',
         fallback => 1,
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 sub init
@@ -34,12 +36,12 @@ sub css { return( shift->_set_get_object( 'css', 'CSS::Object', @_ ) ); }
 
 sub name { return( shift->_set_get_scalar_as_object( 'name', @_ ) ); }
 
-## e.g. keyframe
+# e.g. keyframe
 sub value { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
 
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -56,7 +58,7 @@ CSS::Object::Rule::At - CSS Object Oriented At-Rule
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

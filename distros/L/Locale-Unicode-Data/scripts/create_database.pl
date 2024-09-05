@@ -62,24 +62,26 @@ EOT
 
 my $dict =
 {
-    apply_patch         => { type => 'boolean', default => 1 },
-    cldr_version        => { type => 'string' },
-    created             => { type => 'datetime' },
-    db_file             => { type => 'file', default => $tmpfile },
-    log_file            => { type => 'file', default => $logfile },
-    maintainer          => { type => 'string', default => \$MAINTAINER },
-    patch_only          => { type => 'boolean', default => 0, action => 1 },
-    replace             => { type => 'boolean', default => 0 },
-    use_log             => { type => 'boolean', default => 0 },
+    apply_patch                 => { type => 'boolean', default => 1 },
+    cldr_version                => { type => 'string' },
+    created                     => { type => 'datetime' },
+    db_file                     => { type => 'file', default => $tmpfile },
+    extend                      => { type => 'boolean', default => 0, action => 1 },
+    extended_timezones_cities   => { type => 'file' },
+    log_file                    => { type => 'file', default => $logfile },
+    maintainer                  => { type => 'string', default => \$MAINTAINER },
+    patch_only                  => { type => 'boolean', default => 0, action => 1 },
+    replace                     => { type => 'boolean', default => 0 },
+    use_log                     => { type => 'boolean', default => 0 },
 
     # Generic options
-    quiet               => { type => 'boolean', default => 0 },
-    debug               => { type => 'integer', alias => [qw(d)], default => \$DEBUG },
-    verbose             => { type => 'integer', default => \$VERBOSE },
-    v                   => { type => 'code', code => sub{ printf( STDOUT "2f\n", $VERSION ); } },
+    quiet                       => { type => 'boolean', default => 0 },
+    debug                       => { type => 'integer', alias => [qw(d)], default => \$DEBUG },
+    verbose                     => { type => 'integer', default => \$VERBOSE },
+    v                           => { type => 'code', code => sub{ printf( STDOUT "2f\n", $VERSION ); } },
     # help                => { type => 'code', alias => [qw(?)], code => sub{ pod2usage(1); } },
-    help                => { type => 'code', alias => [qw(?)], code => sub{ pod2usage( -exitstatus => 1, -verbose => 99, -sections => [qw( NAME SYNOPSIS DESCRIPTION COMMANDS OPTIONS AUTHOR COPYRIGHT )] ); } },
-    man                 => { type => 'code', code => sub{ pod2usage( -exitstatus => 0, -verbose => 2 ); } },
+    help                        => { type => 'code', alias => [qw(?)], code => sub{ pod2usage( -exitstatus => 1, -verbose => 99, -sections => [qw( NAME SYNOPSIS DESCRIPTION COMMANDS OPTIONS AUTHOR COPYRIGHT )] ); } },
+    man                         => { type => 'code', code => sub{ pod2usage( -exitstatus => 0, -verbose => 2 ); } },
 };
 # Create backup of arguments
 our @argv = @ARGV;
@@ -322,7 +324,7 @@ sub process
         territories => "INSERT INTO territories (territory, parent, gdp, literacy_percent, population, languages, contains, currency, calendars, min_days, first_day, weekend, status) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         territories_l10n => "INSERT INTO territories_l10n (locale, territory, locale_name, alt) VALUES(?, ?, ?, ?)",
         time_formats => "INSERT INTO time_formats (region, territory, locale, time_format, time_allowed) VALUES(?, ?, ?, ?, ?)",
-        timezones => "INSERT INTO timezones (timezone, territory, region, tzid, metazone, tz_bcpid, is_golden, is_preferred,is_canonical,  alias) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        timezones => "INSERT INTO timezones (timezone, territory, region, tzid, metazone, tz_bcpid, is_golden, is_primary, is_preferred, is_canonical,  alias) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         timezones_cities => "INSERT INTO timezones_cities (locale, timezone, city, alt) VALUES(?, ?, ?, ?)",
         timezones_formats => "INSERT INTO timezones_formats (locale, type, subtype, format_pattern) VALUES(?, ?, ?, ?)",
         timezones_info => "INSERT INTO timezones_info (timezone, metazone, start, until) VALUES(?, ?, ?, ?)",
@@ -2390,7 +2392,7 @@ sub process
         }
         my $territory = $el->getAttribute( 'iso3166' ) ||
             die( "No territory code defined for this primary zone '${tz}': ", $el->toString() );
-        $tzs->{ $tz }->{is_golden} = 1;
+        $tzs->{ $tz }->{is_primary} = 1;
         $tzs->{ $tz }->{territory} = $territory unless( $tzs->{ $tz }->{territory} );
     }
     
@@ -2409,6 +2411,7 @@ sub process
             metazone => ( $el->getAttribute( 'other' ) || die( "No attribute 'other' for this time zone '${tz}': ", $el->toString() ) ),
             # By default
             is_golden => 0,
+            is_primary => 0,
         };
         if( index( $tz, '/' ) != -1 )
         {
@@ -2590,6 +2593,7 @@ sub process
                 {
                     $tzs->{ $tz }->{tz_bcpid} = $def->{tzid};
                     $tzs->{ $tz }->{alias} = [grep( $_ ne $tz, @{$def->{alias}} )];
+                    $tzs->{ $tz }->{is_primary} = 0 unless( defined( $tzs->{ $tz }->{is_primary} ) );
                     $tzs->{ $tz }->{is_preferred} = 0 unless( defined( $tzs->{ $tz }->{is_preferred} ) );
                     $tzs->{ $tz }->{is_canonical} = 0 unless( defined( $tzs->{ $tz }->{is_canonical} ) );
                     $out->print( "alias added to time zone '${tz}'. " ) if( $DEBUG );
@@ -2618,6 +2622,7 @@ sub process
                     $tz_info->{region} = [split( '/', $tz )]->[0];
                     $tz_info->{tz_bcpid} = $def->{tzid};
                     $tz_info->{alias} = [grep( $_ ne $tz, @{$def->{alias}} )];
+                    $tz_info->{is_primary} = 0;
                     $tz_info->{is_preferred} = 0;
                     $tz_info->{is_canonical} = 0;
                     $tzs->{ $tz } = $tz_info;
@@ -2678,6 +2683,7 @@ sub process
         {
             $def->{region} = 'World';
         }
+        $def->{is_primary} //= 0;
         eval
         {
             $sth->bind_param( 1, $def->{timezone}, SQL_VARCHAR );
@@ -2687,9 +2693,10 @@ sub process
             $sth->bind_param( 5, $def->{metazone}, SQL_VARCHAR );
             $sth->bind_param( 6, $def->{tz_bcpid}, SQL_VARCHAR );
             $sth->bind_param( 7, $def->{is_golden}, SQL_BOOLEAN );
-            $sth->bind_param( 8, $def->{is_preferred}, SQL_BOOLEAN );
-            $sth->bind_param( 9, $def->{is_canonical}, SQL_BOOLEAN );
-            $sth->bind_param( 10, to_array( $def->{alias} ), SQL_VARCHAR );
+            $sth->bind_param( 8, $def->{is_primary}, SQL_BOOLEAN );
+            $sth->bind_param( 9, $def->{is_preferred}, SQL_BOOLEAN );
+            $sth->bind_param( 10, $def->{is_canonical}, SQL_BOOLEAN );
+            $sth->bind_param( 11, to_array( $def->{alias} ), SQL_VARCHAR );
             $sth->execute;
         } || die( "Error adding time zone information for time zone '${tz}': ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
         $out->print( "ok\n" ) if( $DEBUG );
@@ -3216,11 +3223,12 @@ sub process
             }
             # The CLDR uses 001 (World) to signify the default value.
             # We set the default value in the SQL schema, so we do not need this.
-            if( $code eq '001' )
-            {
-                next;
-            }
-            elsif( !exists( $territoryInfo->{ $territory } ) )
+            # if( $code eq '001' )
+            # {
+            #     next;
+            # }
+            # elsif( !exists( $territoryInfo->{ $territory } ) )
+            if( !exists( $territoryInfo->{ $territory } ) )
             {
                 die( "Unknown territory territory code '${territory}' for property 'region' with value '${code}'. Not previous defined in CLDR as a territory." );
             }
@@ -6393,6 +6401,114 @@ sub process
     return(1);
 }
 
+sub extend
+{
+    &extend_timezones_cities;
+}
+
+sub extend_timezones_cities
+{
+    &log( "Adding extended time zones cities data." );
+    my $file = $opts->{extended_timezones_cities};
+    if( !$file )
+    {
+        warn( "No extended time zones cities JSON data file was provided." );
+        return(0);
+    }
+    elsif( !$file->exists )
+    {
+        warn( "The extended time zones cities JSON data file provided (${$file}) does not exist." );
+        return(0);
+    }
+    elsif( $file->is_empty )
+    {
+        warn( "The extended time zones cities JSON data file provided (${$file}) is empty." );
+        return(0);
+    }
+    elsif( !$file->can_read )
+    {
+        warn( "The extended time zones cities JSON data file provided (${$file}) is missing read privilege for user ID $>." );
+        return(0);
+    }
+
+    my $cities = $file->load_json;
+    if( !$cities )
+    {
+        warn( "Error decoding JSON data: ", $file->error );
+        return(0);
+    }
+    elsif( ref( $cities ) ne 'HASH' )
+    {
+        warn( "I was expecting the time zones cities extended data JSON file to be an hash reference, but it is not. Please check." );
+        return(0);
+    }
+    &log( "Preparing SQL query to add the time zones cities extended data." );
+    # We do not use the column 'alt'
+    my $sth = $dbh->prepare( "INSERT OR IGNORE INTO timezones_cities_supplemental (locale, timezone, city) VALUES(?, ?, ?)" );
+    if( !$sth )
+    {
+        warn( "Error preparing SQL query to add the time zones cities extended data: ", $dbh->errstr );
+        return(0);
+    }
+    $dbh->begin_work;
+    my $added = 0;
+    foreach my $tz ( sort( keys( %$cities ) ) )
+    {
+        my $def = $cities->{ $tz };
+        if( !exists( $def->{locales} ) )
+        {
+            warn( "The entry for the time zone '${tz}' is missing the property 'locales'. Please check the JSON file format." );
+            $dbh->rollback;
+            return(0);
+        }
+        elsif( !defined( $def->{locales} ) )
+        {
+            warn( "Found a property 'locales' for the time zone '${tz}', but its value is undefined! Please check the JSON file format." );
+            $dbh->rollback;
+            return(0);
+        }
+        elsif( ref( $def->{locales} ) ne 'HASH' )
+        {
+            warn( "The value for the property 'locales' for the time zone '${tz}' is not an hash reference. Please check the JSON file format." );
+            $dbh->rollback;
+            return(0);
+        }
+        foreach my $key ( sort( keys( %{$def->{locales}} ) ) )
+        {
+            ( my $locale = $key ) =~ tr/_/-/;
+            if( $locale !~ /^[a-z]{2,3}(?:\-(?:[A-Z]{2}|\d{3}))?$/ )
+            {
+                warn( "Bad locale '${locale}' found for time zone '${tz}'. Please check the JSON data." );
+                $dbh->rollback;
+                return(0);
+            }
+            elsif( !length( $def->{locales}->{ $key } // '' ) )
+            {
+                warn( "City value is empty for the locale '${locale}' in the time zone '${tz}'. Please check the JSON data." );
+                $dbh->rollback;
+                return(0);
+            }
+
+            local $@;
+            # try-catch
+            my $rv = eval
+            {
+                $sth->execute( $locale, $tz, $def->{locales}->{ $key } );
+            };
+            if( !$rv )
+            {
+                warn( "An error occurred while trying to add the extended city for locale '${locale}' and for time zone '${tz}' into table 'timezones_cities_supplemental': ", ( $@ || $sth->errstr ) );
+                $dbh->rollback;
+                return(0);
+            }
+            $added += $sth->rows;
+        }
+    }
+    $dbh->commit;
+    &log( "${added} time zones extended cities added." );
+    return(1);
+}
+
 sub find_interval_repeating_field
 {
     my $ref = shift( @_ );
@@ -6940,9 +7056,14 @@ create_database.pl - Build CLDR SQLite Database
     create_database.pl --debug 4 \
         --maintainer John Doe \
         --replace \
+        --extended-timezones-cities /some/where/timezones_supplemental_cities.json \
         --db-file /some/where/db.sqlite3 \
         --created 2024-07-01 /some/where/cldr-common-45.0
     create_database.pl --noapply-patch /some/where/cldr-common-45.0
+    create_database.pl --debug 4 \
+        --extend \
+        --extended-timezones-cities /some/where/timezones_supplemental_cities.json \
+        --db-file /some/where/db.sqlite3 \
 
 Get help:
 
@@ -7014,6 +7135,35 @@ Enable debug mode with considerable verbosity using an integer. Above 4, the deb
 =head2 --nodebug
 
 Disable debug mode.
+
+=head2 --extend
+
+Extends the existing SQLite database by adding the time zones extended cities data, and then quits.
+
+This command requires that the option C<--extended-timezones-cities> be also provided.
+
+=head2 --extended-timezones-cities
+
+Path to a JSON-formatted file containing extended data for time zones cities.
+
+By default, the Unicode CLDR data provide very few time zone cities that are used with the C<v> or C<V> format pattern characters. Using this option, you can tell this script to load those data onto the table C<timezones_cities_supplemental>, and those data will automatically be made available from the SQL view C<timezones_cities_extended>, which is built as a union between the original table C<timezones_cities> and the supplemental data in table C<timezones_cities_supplemental>
+
+The format of the JSON data must be as follows:
+
+    {
+       "Asia/Tokyo" : {
+          "locales" : {
+             "ar" : "طوكيو",
+             "az" : "Tokio",
+             "be" : "Токіо",
+             "bg" : "Токио",
+             "bn" : "টোকিও",
+             # etc...
+          }
+        }
+    }
+
+You can get a list of all known time zones with the method L<timezones_cities|Locale::Unicode::Data/timezones_cities>
 
 =head2 --help, -h, -?
 

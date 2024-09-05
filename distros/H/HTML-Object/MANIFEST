@@ -70,6 +70,7 @@ lib/HTML/Object/DOM/Element/Pre.pm
 lib/HTML/Object/DOM/Element/Progress.pm
 lib/HTML/Object/DOM/Element/Quote.pm
 lib/HTML/Object/DOM/Element/Script.pm
+lib/HTML/Object/DOM/Element/Search.pm
 lib/HTML/Object/DOM/Element/Select.pm
 lib/HTML/Object/DOM/Element/Shared.pm
 lib/HTML/Object/DOM/Element/Slot.pm

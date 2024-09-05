@@ -7,7 +7,6 @@ BEGIN
     use vars qw( $DEBUG );
     use Test::More qw( no_plan );
     use DateTime::TimeZone;
-    use Nice::Try;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -20,16 +19,18 @@ BEGIN
 use strict;
 use warnings;
 
+local $@;
 foreach my $alias ( sort( keys( %$DateTime::TimeZone::Catalog::Extend::ALIAS_CATALOG ) ) )
 {
-    try
+    # try-catch
+    eval
     {
         my $tz = DateTime::TimeZone->new( name => $alias );
         isa_ok( $tz => 'DateTime::TimeZone', $alias );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        fail( "Failed to instantiate a DateTime::TimeZone object for alias \"$alias\": $e" );
+        fail( "Failed to instantiate a DateTime::TimeZone object for alias \"$alias\": $@" );
     }
 }
 

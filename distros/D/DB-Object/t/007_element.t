@@ -45,6 +45,7 @@ my $elem = DB::Object::Query::Element->new;
 isa_ok( $elem, 'DB::Object::Query::Element' );
 
 # egrep -E '^sub ' ./lib/DB/Object/Query/Element.pm | perl -lnE 'my $m = [split(/\s+/, $_)]->[1]; say "can_ok( \$elem, ''$m'' );"'
+# perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$elem, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/DB/Object/Query/Element.pm
 can_ok( $elem, 'init' );
 can_ok( $elem, 'elements' );
 can_ok( $elem, 'field' );

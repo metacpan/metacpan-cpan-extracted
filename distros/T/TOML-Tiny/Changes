@@ -1,6 +1,9 @@
+0.18 2024-09-04
+- Support builtin booleans (GH#31) (Tina Mller (tinita))
+
 0.17 2024-06-03
-    - regexp for values which match a DateTime should be anchored to start and
-      end of string (GH#30) (djerius)
+- regexp for values which match a DateTime should be anchored to start and end
+  of string (GH#30) (djerius)
 
 0.16 2023-05-31
 - Remove when (GH#25) (Olaf Alders)

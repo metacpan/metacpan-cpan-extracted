@@ -24,7 +24,6 @@ no_index:
 requires:
   DateTime: '1.54'
   DateTime::TimeZone: '2.52'
-  Nice::Try: v1.1.2
   parent: '0'
   perl: '5.014000'
   strict: '0.238'
@@ -33,5 +32,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DateTime-Format-JP/issues
   repository: https://gitlab.com/jackdeguest/DateTime-Format-JP
-version: v0.1.4
+version: v0.1.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/DateTime.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2023/10/21
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -21,8 +21,7 @@ BEGIN
 	use vars qw( $VERSION );
 	use APR::Date;
 	use DateTime;
-	use Devel::Confess;
-	our $VERSION = 'v0.1.1';
+	our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -160,7 +159,7 @@ Apache2::API::DateTime - HTTP DateTime Manipulation and Formatting
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

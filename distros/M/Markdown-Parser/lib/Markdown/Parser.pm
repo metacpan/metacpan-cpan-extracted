@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser.pm
-## Version v0.4.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.4.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2024/08/30
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,7 @@ BEGIN
     use CSS::Object;
     use Scalar::Util ();
     our $DEBUG = 0;
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.4.1';
     # Including vertical space like new lines
     our $ELEMENTS_DICTIONARY =
     {
@@ -2398,7 +2398,6 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( $ELEMENTS_DICTIONARY $ELEMENTS_DICTIONARY_EXTENDED $VERSION );
-    use Devel::Confess;
     our $VERSION = 'v0.1.0';
     our $ELEMENTS_DICTIONARY = $Markdown::Parser::ELEMENTS_DICTIONARY;
     our $ELEMENTS_DICTIONARY_EXTENDED = $Markdown::Parser::ELEMENTS_DICTIONARY_EXTENDED;
@@ -2592,7 +2591,7 @@ Markdown::Parser - Markdown Parser Only
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.1
 
 =head1 DESCRIPTION
 

@@ -1,27 +1,29 @@
 ##----------------------------------------------------------------------------
-## CSS Object Oriented - ~/lib/CSS/Object/Rule.pm
-## Version v0.1.0
+## CSS Object Oriented - ~/lib/CSS/Object/Rule/Keyframes.pm
+## Version v0.2.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.local>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/21
-## Modified 2020/06/21
+## Modified 2024/09/05
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package CSS::Object::Rule::Keyframes;
 BEGIN
 {
     use strict;
     use warnings;
-    ## We add CSS::Object in our @ISA so that we can add rule to our KeyframesRule package
-    ## KeyFrames are special rules that are blocks of further rules
+    # We add CSS::Object in our @ISA so that we can add rule to our KeyframesRule package
+    # KeyFrames are special rules that are blocks of further rules
     use parent qw( CSS::Object::Rule::At CSS::Object );
-    use Devel::Confess;
     use Want ();
     use overload (
         '""' => 'as_string',
         fallback => 1,
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 sub init
@@ -82,7 +84,7 @@ sub type { return( shift->_set_get_scalar_as_object( 'type', @_ ) ); }
 
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -99,7 +101,7 @@ CSS::Object::Rule::Keyframes - CSS Object Oriented Rule
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

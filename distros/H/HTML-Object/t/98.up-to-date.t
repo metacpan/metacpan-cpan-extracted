@@ -20,7 +20,6 @@ BEGIN
     use DateTime;
     use DateTime::Format::Strptime;
     use DateTime::TimeZone;
-    use Devel::Confess;
     use HTML::Entities ();
     use HTML::Object::DOM;
     use HTML::Object::DOM::Element::Shared;
@@ -28,7 +27,6 @@ BEGIN
     use LWP::UserAgent;
     use Module::Generic::Array;
     use Module::Generic::File qw( file );
-    use Nice::Try;
     use URI;
     use constant MOZILLA_BASE_URL => 'https://developer.mozilla.org';
     use open ':std' => ':utf8';
@@ -212,7 +210,9 @@ sub fetch_class
     if( $json_file->exists )
     {
         my $json_data = $json_file->load_utf8;
-        try
+        local $@;
+        # try-catch
+        eval
         {
             $json = $j->decode( $json_data );
             $json_file->close;
@@ -233,10 +233,10 @@ sub fetch_class
                 }
             };
             $crawl->( $json );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            die( "An error occurred while trying to decode json: $e\n" );
+            die( "An error occurred while trying to decode json: $@\n" );
         }
     }
     else
@@ -1003,15 +1003,17 @@ sub _save_to_json
 {
     my $data = shift( @_ );
     my $file = shift( @_ );
-    try
+    local $@;
+    # try-catch
+    eval
     {
         my $json_data = $j->encode( $data );
         $file->unload_utf8( $json_data );
         $file->close;
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        die( "An error occurred while trying to encode and save json data to file \"$file\": $e\n" );
+        die( "An error occurred while trying to encode and save json data to file \"$file\": $@\n" );
     }
 }
 
@@ -1191,11 +1193,13 @@ sub _check_cache_http
     my $tz;
     # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
     # "Cannot determine local time zone"
-    try
+    local $@;
+    # try-catch
+    eval
     {
         $tz = DateTime::TimeZone->new( name => 'local' );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
         warn( "Your system is missing key timezone components. Reverting to UTC instead of local time zone.\n" );

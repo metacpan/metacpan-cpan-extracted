@@ -1,5 +1,8 @@
 Revision history for Perl module Markdown::Parser
 
+v0.4.1 2024-09-05T16:05:38+0900
+    - Corrected overlooked dependency that needed to be removed
+
 v0.4.0 2024-08-30T06:56:24+0900
     - Removing some deependencies
 

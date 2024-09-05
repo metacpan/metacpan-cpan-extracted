@@ -1,11 +1,14 @@
 ##----------------------------------------------------------------------------
 ## CSS Object Oriented - ~/lib/CSS/Object/Value.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.local>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/21
-## Modified 2020/06/21
+## Modified 2024/09/05
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package CSS::Object::Value;
 BEGIN
@@ -15,12 +18,11 @@ BEGIN
     use parent qw( CSS::Object::Element );
     use CSS::Object::Comment;
     use CSS::Object::Format;
-    use Devel::Confess;
     use overload (
         '""' => 'as_string',
         fallback => 1,
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 sub init
@@ -36,8 +38,8 @@ sub init
     return( $self );
 }
 
-## Inherited
-## sub format
+# Inherited
+# sub format
 
 sub as_string
 {
@@ -148,7 +150,7 @@ sub _comment_data_to_object
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -190,7 +192,7 @@ CSS::Object::Value - CSS Object Oriented Value
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

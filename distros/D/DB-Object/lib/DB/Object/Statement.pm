@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.6.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.6.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/03/16
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -26,8 +26,7 @@ BEGIN
     use Class::Struct qw( struct );
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.6.0';
-    use Devel::Confess;
+    our $VERSION = 'v0.6.1';
 };
 
 use strict;
@@ -1238,7 +1237,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.6.0
+v0.6.1
 
 =head1 DESCRIPTION
 

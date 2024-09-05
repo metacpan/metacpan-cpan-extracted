@@ -24,7 +24,8 @@ my %WriteMakefileArgs = (
     "List::Util" => "1.55",
     "Moo" => "2.003004",
     "Role::REST::Client" => "0.23",
-    "Type::Tiny" => "1.004002"
+    "Type::Tiny" => "1.004002",
+    "URI::Escape::XS" => "0.14"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000135",
     "Test::More" => 0
   },
-  "VERSION" => "0.015001",
+  "VERSION" => "0.015002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +54,8 @@ my %FallbackPrereqs = (
   "Role::REST::Client" => "0.23",
   "Test2::V0" => "0.000135",
   "Test::More" => 0,
-  "Type::Tiny" => "1.004002"
+  "Type::Tiny" => "1.004002",
+  "URI::Escape::XS" => "0.14"
 );
 
 

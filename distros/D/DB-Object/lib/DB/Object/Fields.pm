@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields.pm
-## Version v1.2.0
+## Version v1.2.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2023/11/10
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -20,8 +20,7 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
     use DB::Object::Fields::Field;
-    use Devel::Confess;
-    our $VERSION = 'v1.2.0';
+    our $VERSION = 'v1.2.1';
 };
 
 use strict;
@@ -268,7 +267,7 @@ DB::Object::Fields - Tables Fields Object Accessor
 
 =head1 VERSION
 
-    v1.2.0
+    v1.2.1
 
 =head1 DESCRIPTION
 

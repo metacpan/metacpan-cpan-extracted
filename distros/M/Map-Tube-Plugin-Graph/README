@@ -1,4 +1,4 @@
-Map-Tube-Plugin-Graph
+Map::Tube::Plugin::Graph
 
 The README  is  used  to  introduce the module and provide instructions on how to
 install the module, any machine dependencies it may have (for example C compilers
@@ -32,15 +32,8 @@ You can also look for information at:
     BUG Report
         https://github.com/manwar/Map-Tube-Plugin-Graph/issues
 
-    AnnoCPAN: Annotated CPAN documentation
-        http://annocpan.org/dist/Map-Tube-Plugin-Graph
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Map-Tube-Plugin-Graph
-
     Search MetaCPAN
         https://metacpan.org/dist/Map-Tube-Plugin-Graph
-
 
 LICENSE AND COPYRIGHT
 
@@ -50,7 +43,7 @@ This program is free software; you can redistribute it and/or modify it under th
 terms of the the Artistic License (2.0).You may obtain a copy of the full license
 at:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+    http://www.perlfoundation.org/artistic_license_2_0
 
 Any  use,  modification, and distribution of the Standard or Modified Versions is
 governed by this Artistic License.By using, modifying / distributing the Package,

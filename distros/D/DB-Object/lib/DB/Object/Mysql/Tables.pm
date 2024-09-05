@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Tables.pm
-## Version v1.0.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.0.2
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/04/11
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -23,7 +23,6 @@ BEGIN
     use warnings;
     use parent qw( DB::Object::Mysql DB::Object::Tables );
     use vars qw( $VERSION $DEBUG $TYPE_TO_CONSTANT );
-    use Devel::Confess;
     # <https://dev.mysql.com/doc/refman/8.0/en/data-types.html>
     # the 'constant' property in the dictionary hash is added in structure()
     # See also: SELECT DISTINCT(data_type) FROM information_schema.columns ORDER by data_type
@@ -70,7 +69,7 @@ BEGIN
     qr/^(json)\b/                       => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'json' },
     };
     our $DEBUG = 0;
-    our $VERSION = 'v1.0.1';
+    our $VERSION = 'v1.0.2';
 };
 
 use strict;
@@ -651,7 +650,7 @@ DB::Object::Mysql::Tables - MySQL Table Object
 
 =head1 VERSION
 
-    v1.0.1
+    v1.0.2
 
 =head1 DESCRIPTION
 

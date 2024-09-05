@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v1.1.1
+## Version v1.1.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/04/11
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -262,8 +262,7 @@ BEGIN
     };
     # DBI->trace(5);
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.1.1';
-    use Devel::Confess;
+    our $VERSION = 'v1.1.2';
 };
 
 use strict;
@@ -942,7 +941,7 @@ DB::Object::Mysql - Mysql Database Object
     
 =head1 VERSION
 
-    v1.1.1
+    v1.1.2
 
 =head1 DESCRIPTION
 

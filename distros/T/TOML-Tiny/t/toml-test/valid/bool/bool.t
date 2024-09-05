@@ -6,6 +6,8 @@ use Math::BigInt;
 use Math::BigFloat;
 use TOML::Tiny;
 
+use constant CORE_BOOL => defined &builtin::is_bool;
+
 local $Data::Dumper::Sortkeys = 1;
 local $Data::Dumper::Useqq    = 1;
 
@@ -59,6 +61,13 @@ is($reparsed, $expected1, 'bool/bool - to_toml') or do{
   diag '';
   diag 'REPARSED FROM REGENERATED TOML:';
   diag Dumper($reparsed);
+};
+
+subtest 'builtin booleans' => sub {
+    plan skip_all => 'No builtin::is_bool', unless CORE_BOOL;
+    my $data = { t => !!1, f => !!0 };
+    my $toml = to_toml($data);
+    is $toml, $regenerated;
 };
 
 done_testing;

@@ -6,7 +6,9 @@ use Carp;
 use v5.14;
 
 # version
-our $VERSION  = '1.34';
+# https://blogs.perl.org/users/grinnz/2018/04/a-guide-to-versions-in-perl.html
+# https://github.com/andk/pause/blob/master/doc/operating-model.md#36-developer-releases
+our $VERSION  = '1.35';
 our $FGC_MODE = 'UTF-8';
 
 #------------------------------------------------------------------------------
@@ -58,7 +60,7 @@ push @EXPORT_OK, qw[
 	collapse     htmlesc    trim      ltrim
 	rtrim        repeat     unquote   no_space
 	nospace      jsquote    crunchlines
-	file_get_contents
+	file_get_contents		substr_count
 ];
 
 # the following functions return true or false based on their input
@@ -605,7 +607,10 @@ Checks if the string contains substring
 
   $var = contains("Hello world", "Hello");   # true
   $var = contains("Hello world", "llo wor"); # true
+  $var = contains("Hello world", "");        # true
   $var = contains("Hello world", "QQQ");     # false
+  $var = contains(undef, "QQQ");             # false
+  $var = contains("Hello world", undef);     # false
 
   # Also works with grep
   @arr = grep { contains("cat") } @input;
@@ -615,13 +620,14 @@ Checks if the string contains substring
 sub contains {
 	my ($str, $substr) = @_;
 
-	if (!defined($str)) {
-		return undef;
-	}
-
-	if (!$substr) {
+	# If we don't see a substr we operate on $_ grep/map style
+	if (scalar(@_) == 1) {
 		$substr = $str;
 		$str    = $_;
+	}
+
+	if (!defined($str) || !defined($substr)) {
+		return undef;
 	}
 
 	my $ret = index($str, $substr, 0) != -1;
@@ -635,7 +641,10 @@ Checks if the string starts with the characters in substring
 
   $var = startwith("Hello world", "Hello"); # true
   $var = startwith("Hello world", "H");     # true
+  $var = startwith("Hello world", "");      # true
   $var = startwith("Hello world", "Q");     # false
+  $var = startwith(undef, "Q");             # false
+  $var = startwith("Hello world", undef);   # false
 
   # Also works with grep
   @arr = grep { startswith("X") } @input;
@@ -645,13 +654,14 @@ Checks if the string starts with the characters in substring
 sub startswith {
 	my ($str, $substr) = @_;
 
-	if (!defined($str)) {
-		return undef;
-	}
-
-	if (!$substr) {
+	# If we don't see a substr we operate on $_ grep/map style
+	if (scalar(@_) == 1) {
 		$substr = $str;
 		$str    = $_;
+	}
+
+	if (!defined($str) || !defined($substr)) {
+		return undef;
 	}
 
 	my $ret = index($str, $substr, 0) == 0;
@@ -665,7 +675,10 @@ Checks if the string ends with the characters in substring
 
   $var = endswith("Hello world", "world");   # true
   $var = endswith("Hello world", "d");       # true
+  $var = endswith("Hello world", "");        # true
   $var = endswith("Hello world", "QQQ");     # false
+  $var = endswith(undef, "QQQ");             # false
+  $var = endswith("Hello world", undef);     # false
 
   # Also works with grep
   @arr = grep { endswith("z") } @input;
@@ -675,13 +688,14 @@ Checks if the string ends with the characters in substring
 sub endswith {
 	my ($str, $substr) = @_;
 
-	if (!defined($str)) {
-		return undef;
-	}
-
-	if (!$substr) {
+	# If we don't see a substr we operate on $_ grep/map style
+	if (scalar(@_) == 1) {
 		$substr = $str;
 		$str    = $_;
+	}
+
+	if (!defined($str) || !defined($substr)) {
+		return undef;
 	}
 
 	my $len   = length($substr);
@@ -803,6 +817,43 @@ sub file_get_contents {
 		return $ret;
 	}
 }
+
+#########################################################################
+
+=head2 substr_count($haystack, $needle)
+
+Count the occurences of a substr inside of a larger string. Returns
+an integer value with the number of matches, or C<undef> if the input
+is invalid.
+
+  my $cnt = substr_count("Perl is really rad", "r"); # 3
+  my $num = substr_count("Perl is really rad", "Q"); # 0
+
+=cut
+
+sub substr_count {
+	my ($haystack, $needle) = @_;
+
+	if (!defined($needle) || !defined($haystack)) { return undef; }
+	if ($haystack eq ''   || $needle eq '')       { return 0; }
+
+	my $pos     = 0;
+	my $matches = 0;
+
+	while (1) {
+		$pos = index($haystack, $needle, $pos);
+
+		if ($pos < 0) {
+			last;
+		}
+
+		$matches++;
+		$pos++;
+	}
+
+	return $matches;
+}
+
 
 # return true
 1;

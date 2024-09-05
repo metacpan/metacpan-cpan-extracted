@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Request.pm
-## Version v0.2.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2024/04/10
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -46,7 +46,6 @@ BEGIN
     use Apache2::API::Status;
     use Cookie::Jar;
     use DateTime;
-    use Devel::Confess;
     use Encode ();
     use File::Which ();
     use HTTP::AcceptLanguage;
@@ -56,7 +55,7 @@ BEGIN
     use URI;
     use URI::Escape;
     use Want;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
     our( $SERVER_VERSION, $ERROR );
 };
 
@@ -1646,7 +1645,7 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,6 @@
 Build.PL
 Changes
+examples/async-fetch.pl
 lib/Web/PageMeta.pm
 MANIFEST			This list of files
 META.json

@@ -2,6 +2,7 @@ Changes
 Changes.pm
 CONCEPT
 examples/app_changes.pl
+images/app_changes.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

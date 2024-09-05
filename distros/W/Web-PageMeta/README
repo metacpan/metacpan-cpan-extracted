@@ -86,6 +86,10 @@ ACCESSORS
 
     Returns description of the page.
 
+ canonical_url
+
+    Returns open-graph url. If not present returns "url".
+
  image
 
     Returns image location of the page.

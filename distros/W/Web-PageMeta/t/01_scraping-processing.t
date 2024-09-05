@@ -43,6 +43,10 @@ subtest 'geizhals.at' => sub {
         'Huawei MateBook 14 AMD Space Grey (2020), Ryzen 5 4600H, 16GB RAM ab € 906,55 (2021) | Preisvergleich Geizhals Österreich',
         'title()'
     );
+    is( $wmeta->description,
+        '✔ Preisvergleich für Huawei MateBook 14 AMD Space Grey (2020), Ryzen 5 4600H, 16GB RAM ✔ Produktinfo ⇒ Display: 14", 2160x1440, 185ppi, 60Hz, glare, IPS, 300cd/m², 100% sRGB • CPU: AMD Ryzen 5 4600H, 6C/12T, … ✔ Notebooks ✔ Testberichte ✔ Günstig kaufen',
+        'description()'
+    );
     is($wmeta->image, 'https://gzhls.at/i/44/81/2374481-n0.jpg', 'image()');
 };
 

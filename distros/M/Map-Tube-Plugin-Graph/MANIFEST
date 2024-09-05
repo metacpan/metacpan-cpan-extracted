@@ -1,16 +1,12 @@
 Changes
 lib/Map/Tube/Plugin/Graph.pm
 lib/Map/Tube/Plugin/Graph/Utils.pm
-Makefile.PL
 LICENSE
-MANIFEST
+Makefile.PL
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/00-load.t
-xt/manifest.t
-xt/pod.t
-xt/changes.t
-xt/meta-json.t
-xt/meta-yml.t
+t/as_image.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

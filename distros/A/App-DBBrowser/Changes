@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.415  2024-09-05
+        Extended argument 'column': use horizontal format.
+
 2.414  2024-06-13
         Bugfix Informix 'not matches'.
         Bugfix in 'replace' function: allow empty replacement string.

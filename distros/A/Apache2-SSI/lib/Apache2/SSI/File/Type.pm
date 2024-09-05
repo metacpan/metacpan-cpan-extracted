@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/File/Type.pm
-## Version v0.1.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.1.2
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/27
-## Modified 2022/10/21
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,10 +23,9 @@ BEGIN
     use File::Spec ();
     use IO::File;
     use JSON;
-    use Nice::Try;
     use Scalar::Util ();
     use URI::file;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
     # Translation of type in magic file to unpack template and byte count
     our $TEMPLATES = 
     {
@@ -95,16 +94,19 @@ sub init
         local $/;
         my $buf = scalar( <$io> );
         $io->close;
-        try
+        local $@;
+        # try-catch
+        my $rv = eval
         {
             my $j = JSON->new->relaxed->allow_nonref;
             $MAGIC_DATA = $self->{magic_data} = $j->decode( $buf );
-            return( 1 );
-        }
-        catch( $e )
+            return(1);
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occured while trying to json decode ", length( $buf ), " bytes of json data: $e" ) );
+            return( $self->error( "An error occured while trying to json decode ", length( $buf ), " bytes of json data: $@" ) );
         }
+        return( $rv );
     };
     
     if( $opts->{magic} )

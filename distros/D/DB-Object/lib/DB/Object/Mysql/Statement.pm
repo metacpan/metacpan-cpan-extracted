@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Statement.pm
-## Version v0.300.1
+## Version v0.300.2
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/11/04
+## Modified 2024/09/04
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -34,9 +35,8 @@ BEGIN
     use warnings;
     use parent qw( DB::Object::Statement DB::Object::Mysql );
     use vars qw( $VERSION $DEBUG );
-    use Devel::Confess;
     our $DEBUG = 0;
-    our $VERSION = 'v0.300.1';
+    our $VERSION = 'v0.300.2';
 };
 
 use strict;
@@ -311,7 +311,7 @@ DB::Object::Mysql::Query - Statement Object for MySQL
 
 =head1 VERSION
 
-   v0.300.1
+   v0.300.2
 
 =head1 DESCRIPTION
 

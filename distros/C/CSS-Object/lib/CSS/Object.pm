@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## CSS Object Oriented - ~/lib/CSS/Object.pm
-## Version v0.1.6
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/24
-## Modified 2023/10/11
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -27,8 +27,7 @@ BEGIN
     use CSS::Object::Selector;
     use CSS::Object::Value;
     use Want ();
-    use Devel::Confess;
-    our $VERSION = 'v0.1.6';
+    our $VERSION = 'v0.2.0';
 };
 
 sub init
@@ -337,7 +336,6 @@ sub remove_rule
 sub rules { return( $_[0]->elements->map(sub{ $_[0]->_is_a( $_, 'CSS::Object::Rule' ) ? $_ : () }) ); }
 
 1;
-
 # NOTE POD
 __END__
 
@@ -411,7 +409,7 @@ Creating dynamically rules:
 
 =head1 VERSION
 
-    v0.1.6
+    v0.2.0
 
 =head1 DESCRIPTION
 

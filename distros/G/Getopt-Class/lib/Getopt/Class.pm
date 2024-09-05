@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v1.1.0
+## Version v1.1.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2024/07/20
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,13 +20,12 @@ BEGIN
     use Clone;
     use DateTime;
     use DateTime::Format::Strptime;
-	use Devel::Confess;
     use Getopt::Long;
     use Module::Generic::Array;
     use Module::Generic::File qw( file );
     use Module::Generic::Scalar;
     use Scalar::Util;
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.1.2';
 };
 
 use strict;
@@ -214,7 +213,7 @@ sub init
         {
             if( $def->{type} eq 'file' )
             {
-                if( $self->_can_overload( $def->{default} => '""' ) )
+                if( !ref( $def->{default} ) || $self->_can_overload( $def->{default} => '""' ) )
                 {
                     $opts->{ $k2_under } = "$def->{default}";
                 }
@@ -628,7 +627,7 @@ sub postprocess
                 $opts->{ $k } = $self->_set_get_number( $k, $opts->{ $k } );
             }
         }
-        elsif( $def->{type} eq 'file' )
+        elsif( $def->{type} eq 'file' && length( $opts->{ $k } // '' ) )
         {
             $opts->{ $k } = file( $opts->{ $k } );
         }
@@ -671,7 +670,6 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    use Devel::Confess;
 };
 
 use strict;
@@ -848,7 +846,6 @@ BEGIN
     use strict;
     use warnings;
     use Scalar::Util;
-    use Devel::Confess;
     use constant VALUES_CLASS => 'Getopt::Class::Value';
 };
 
@@ -997,7 +994,6 @@ BEGIN
     use warnings;
     use parent -norequire, qw( Getopt::Class::Repository Module::Generic );
     use Scalar::Util;
-    use Devel::Confess;
 };
 
 # tie( %$opts, 'Getopt::Class::Alias', $dictionary );
@@ -1226,7 +1222,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v1.1.0
+    v1.1.2
 
 =head1 DESCRIPTION
 

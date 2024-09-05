@@ -55,3 +55,9 @@ Revision history for Perl extension Try::ALRM.
 0.82 Tue Jul 26 12:05:12 2023
         - added better ABSTRAC description
         - maintenance release, no functional changes
+
+0.99 Thu Sep 05 12:05:12 2024
+        - maintenance release
+        - fixed min Perl version to 5.10 to get rid of failing test reports
+        - there are no versions 0.83-0.98
+        - jumped to 0.99 so we can get her to 1.0 at some point

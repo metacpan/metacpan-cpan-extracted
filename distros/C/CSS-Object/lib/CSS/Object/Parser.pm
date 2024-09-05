@@ -1,11 +1,14 @@
 ##----------------------------------------------------------------------------
 ## CSS Object Oriented - ~/lib/CSS/Object/Parser.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.local>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/21
-## Modified 2020/06/21
+## Modified 2024/09/05
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package CSS::Object::Parser;
 BEGIN
@@ -13,8 +16,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 sub init
@@ -34,7 +36,7 @@ sub css { return( shift->_set_get_object( 'css', 'CSS::Object', @_ ) ); }
 sub parse_string { return( shift->error( "You cannot use this class directly. Please use one of the Parser subclasses." ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -53,7 +55,7 @@ CSS::Object::Parser - CSS Object Oriented Parser
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

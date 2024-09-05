@@ -207,8 +207,10 @@ CREATE TABLE variants (
 CREATE UNIQUE INDEX idx_variants_unique ON variants(variant);
 
 -- NOTE: Source: supplemental->supplementalData.xml->//timeData/hours
+-- See <https://unicode.org/reports/tr35/tr35-dates.html#Time_Data>
 CREATE TABLE time_formats (
      time_format_id     INTEGER
+    -- "regions allows either region codes (001, JP) or locale IDs (gu_IN)."
     -- JP or ml_IN
     -- territory and locale provides the breakdown of the field 'region'
     ,region             VARCHAR(20) NOT NULL COLLATE NOCASE
@@ -217,7 +219,7 @@ CREATE TABLE time_formats (
     ,locale             VARCHAR(20) COLLATE NOCASE
     -- Default values as defined in the specifications
     ,time_format        VARCHAR(1) DEFAULT 'H'
-    ,time_allowed       TEXT[] DEFAULT '{"H", "h"}'
+    ,time_allowed       TEXT[] DEFAULT '["H", "h"]'
     ,PRIMARY KEY(time_format_id)
     ,CHECK( region REGEXP '^[a-zA-Z0-9\-]+$' )
     ,CHECK( time_format REGEXP '^[a-zA-Z]$' )
@@ -300,6 +302,8 @@ CREATE TABLE timezones (
     -- CLDR misuses the territory code '001' as a mean to specify whether a time zone is 'golden'.
     -- See <https://www.unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
     ,is_golden          BOOLEAN DEFAULT FALSE
+    -- See <https://unicode.org/reports/tr35/tr35-dates.html#Primary_Zones>
+    ,is_primary         BOOLEAN DEFAULT FALSE
     -- Is the preferred time zone for this territory
     ,is_preferred       BOOLEAN DEFAULT FALSE
     -- Is this timezone the canonical one?
@@ -631,6 +635,52 @@ CREATE TABLE timezones_cities (
     ,FOREIGN KEY(timezone) REFERENCES timezones(timezone) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 CREATE UNIQUE INDEX idx_timezones_cities_unique ON timezones_cities(locale, timezone, IFNULL(alt, ''));
+
+-- This table contains the localised city data from GeoNames open data
+-- <http://www.geonames.org>
+-- GeoNames is a project of Unxos GmbH, Tutilostrasse 17d, 9011 St. Gallen, Switzerland. 
+-- Its data is licensed under a Creative Commons Attribution 4.0 License.
+CREATE TABLE timezones_cities_supplemental (
+     tz_city_id         INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    ,timezone           VARCHAR(42) NOT NULL COLLATE NOCASE
+    ,city               TEXT NOT NULL
+    ,alt                VARCHAR(20)
+    ,PRIMARY KEY(tz_city_id)
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,FOREIGN KEY(timezone) REFERENCES timezones(timezone) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX idx_timezones_cities_supplemental_unique ON timezones_cities_supplemental(locale, timezone, IFNULL(alt, ''));
+
+-- This creates a view where the data from timezones_cities take precedence over the ones from timezones_cities_supplemental
+-- This is a workaround to achieve a FULL OUTER JOIN, which is not normally supported by SQLite
+-- Views are supported in SQLite since version 3.0.0 released in 2004, and we require version 3.6.19 or higher to operate
+CREATE VIEW timezones_cities_extended AS
+SELECT
+    COALESCE(c.rowid, e.rowid) AS rowid,
+    COALESCE(c.tz_city_id, e.tz_city_id) AS tz_city_id,
+    COALESCE(c.locale, e.locale) AS locale,
+    COALESCE(c.timezone, e.timezone) AS timezone,
+    COALESCE(c.city, e.city) AS city,
+    COALESCE(c.alt, e.alt) AS alt
+FROM 
+    timezones_cities c
+    LEFT JOIN timezones_cities_supplemental e ON c.tz_city_id = e.tz_city_id
+WHERE 
+    c.tz_city_id IS NOT NULL OR e.tz_city_id IS NOT NULL
+UNION
+SELECT
+    COALESCE(c.rowid, e.rowid) AS rowid,
+    COALESCE(c.tz_city_id, e.tz_city_id) AS tz_city_id,
+    COALESCE(c.locale, e.locale) AS locale,
+    COALESCE(c.timezone, e.timezone) AS timezone,
+    COALESCE(c.city, e.city) AS city,
+    COALESCE(c.alt, e.alt) AS alt
+FROM 
+    timezones_cities_supplemental e
+    LEFT JOIN timezones_cities c ON c.tz_city_id = e.tz_city_id
+WHERE 
+    e.tz_city_id IS NOT NULL OR c.tz_city_id IS NOT NULL;
 
 -- NOTE: Source: main/*.xml->/ldml/dates/timeZoneNames/zone[@type]
 CREATE TABLE timezones_formats (

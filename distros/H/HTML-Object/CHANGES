@@ -1,5 +1,8 @@
 Revision history for Perl module HTML::Object
 
+v0.5.1 2024-09-05T14:47:58+0900
+    - Removed some dependencies
+
 v0.5.0 2024-05-04T20:56:57+0900
     - Added method various class function in HTML::Object::XQuery for the special package XQuery
     - Changed method name new_collection() to new_collection_elements() in HTML::Object::DOM::Element

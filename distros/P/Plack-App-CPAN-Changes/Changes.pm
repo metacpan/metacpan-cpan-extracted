@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 use Plack::Util::Accessor qw(changes generator title);
-use Tags::HTML::CPAN::Changes;
+use Tags::HTML::CPAN::Changes 0.06;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub _css {
 	my ($self, $env) = @_;
@@ -73,6 +73,11 @@ Plack::App::CPAN::Changes - Plack application to view CPAN::Changes object.
  my $obj = Plack::App::CPAN::Changes->new(%parameters);
  my $psgi_ar = $obj->call($env);
  my $app = $obj->to_app;
+
+=head1 DESCRIPTION
+
+Plack application which prints changelog record. Record is defined by
+L<CPAN::Changes> object, which is created from some file (like Changes) in CPAN distribution.
 
 =head1 METHODS
 
@@ -265,6 +270,14 @@ Returns L<Plack::Component> object.
  #   </body>
  # </html>
 
+=begin html
+
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Plack-App-CPAN-Changes/master/images/app_changes.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Plack-App-CPAN-Changes/master/images/app_changes.png" alt="Example screenshot" width="300px" height="300px" />
+</a>
+
+=end html
+
 =head1 DEPENDENCIES
 
 L<Plack::Component::Tags::HTML>,
@@ -289,6 +302,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

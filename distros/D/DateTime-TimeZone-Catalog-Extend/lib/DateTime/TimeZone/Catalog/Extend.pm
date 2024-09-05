@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Extend DateTime::TimeZone catalog - ~/lib/DateTime/TimeZone/Catalog/Extend.pm
-## Version v0.3.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.3.3
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/11/29
-## Modified 2023/10/11
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## 
@@ -21,8 +21,7 @@ BEGIN
     use vars qw( $VERSION @ISA $ALIAS_CATALOG $ZONE_MAP );
     our @ISA = qw( Exporter );
     use DateTime::TimeZone::Alias;
-    use Nice::Try;
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.3.3';
 };
 
 use strict;
@@ -449,16 +448,18 @@ $ALIAS_CATALOG =
 sub import
 {
     my $class = shift( @_ );
+    local $@;
     foreach my $alias ( keys( %$ALIAS_CATALOG ) )
     {
         next if( DateTime::TimeZone::Alias->is_defined( $alias ) );
-        try
+        # try-catch
+        eval
         {
             DateTime::TimeZone::Alias->add( $alias => $ALIAS_CATALOG->{ $alias }->{offset}->[0] );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            warnings::warn( "Warning only: error trying to add time zone alias '$alias' (" . $ALIAS_CATALOG->{ $alias }->{comment} . ") with time zone offset '" . $ALIAS_CATALOG->{ $alias }->{offset}->[0] . "': $e\n" ) if( warnings::enabled() );
+            warnings::warn( "Warning only: error trying to add time zone alias '$alias' (" . $ALIAS_CATALOG->{ $alias }->{comment} . ") with time zone offset '" . $ALIAS_CATALOG->{ $alias }->{offset}->[0] . "': $@\n" ) if( warnings::enabled() );
         }
     }
 }
@@ -508,7 +509,7 @@ DateTime::TimeZone::Catalog::Extend - Extend DateTime::TimeZone catalog
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.3
 
 =head1 DESCRIPTION
 

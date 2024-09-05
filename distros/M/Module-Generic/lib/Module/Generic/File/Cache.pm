@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Cache.pm
-## Version v0.2.6
+## Version v0.2.7
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/16
-## Modified 2022/09/28
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     $CACHE_REPO = [];
     $CACHE_TO_OBJECT = {};
     $DEBUG = 0;
-    our $VERSION = 'v0.2.6';
+    our $VERSION = 'v0.2.7';
 };
 
 use strict;
@@ -755,9 +755,12 @@ sub _str2key
     {
         return( Data::UUID->new->create_str );
     }
-    elsif( $key =~ /^\d+$/ )
+    # We do not actually use any path, but this is for standardisation with Module::Generic::SharedMem
+    my $path;
+    ( $key, $path ) = ref( $key ) eq 'ARRAY' ? @$key : ( $key, [getpwuid($>)]->[7] );
+    $path = [getpwuid($path)]->[7] if( $path =~ /^\d+$/ );
+    if( $key =~ /^\d+$/ )
     {
-        my $rand = $key;
         my $id = $self->ftok( $key ) ||
             return( $self->error( "Unable to get a key using IPC::SysV::ftok: $!" ) );
         return( $id );
@@ -766,8 +769,6 @@ sub _str2key
     {
         my $id = 0;
         $id += $_ for( unpack( "C*", $key ) );
-        # We use the root as a reliable and stable path.
-        # I initially though about using __FILE__, but during testing this would be in ./blib/lib and beside one user might use a version of this module somewhere while the one used under Apache/mod_perl2 could be somewhere else and this would render the generation of the IPC key unreliable and unrepeatable
         my $val = $self->ftok( $id );
         return( $val );
     }
@@ -910,7 +911,7 @@ Module::Generic::File::Cache - File-based Cache
 
 =head1 VERSION
 
-    v0.2.6
+    v0.2.7
 
 =head1 DESCRIPTION
 

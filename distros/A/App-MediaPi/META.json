@@ -1,0 +1,93 @@
+{
+   "abstract" : "Media Player for Raspberry Pi or other devices with very small screen.",
+   "author" : [
+      "Mathias Kende <mathias@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "raspberry",
+      "pi",
+      "media",
+      "player",
+      "vlc",
+      "audio"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-MediaPi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "local",
+         "vendor",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "perl" : "v5.26.0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Devel::Cover" : "0"
+         },
+         "suggests" : {
+            "CPAN::Uploader" : "0",
+            "Dist::Setup" : "0",
+            "PAR::Packer" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IPC::Run" : "0",
+            "Tkx" : "0",
+            "X11::Protocol" : "0",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Common::Index::Mux::Ordered" : "0",
+            "Test::Pod" : "1.22"
+         },
+         "requires" : {
+            "Readonly" : "0",
+            "Test2::V0" : "0",
+            "Test::CPANfile" : "0",
+            "Test::More" : "0"
+         },
+         "suggests" : {
+            "IPC::Run3" : "0",
+            "Perl::Tidy" : "20220613",
+            "Test2::Tools::PerlCritic" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mkende/mediapi/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mkende/mediapi"
+      }
+   },
+   "version" : 0.01,
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

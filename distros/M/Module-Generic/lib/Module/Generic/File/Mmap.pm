@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Mmap.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/07/26
-## Modified 2022/08/05
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,7 @@ BEGIN
     use Module::Generic::File qw( file sys_tmpdir );
     # use Nice::Try;
     our $HAS_CACHE_MMAP = 0;
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -152,8 +152,6 @@ sub locked { return(1); }
 
 sub mode { return( shift->_set_get_scalar( 'mode', @_ ) ); }
 
-# NOTE: for compatibility with other API: Module::Generic::File::Cache and Module::Generic::SharedMem, open() is available, but merely return the current object.
-# sub open { return( $_[0] ); }
 sub open
 {
     my $self = shift( @_ );
@@ -169,6 +167,7 @@ sub open
     $opts->{size} = $self->size unless( length( $opts->{size} ) );
     $opts->{size} = int( $opts->{size} );
     $opts->{mode} //= '';
+    $opts->{key} = $opts->{key}->[0] if( ref( $opts->{key} // '' ) eq 'ARRAY' );
     $opts->{key} //= '';
     no strict 'subs';
     my $serial;
@@ -678,9 +677,12 @@ sub _str2key
     {
         return( Data::UUID->new->create_str );
     }
-    elsif( $key =~ /^\d+$/ )
+    # We do not actually use any path, but this is for standardisation with Module::Generic::SharedMem
+    my $path;
+    ( $key, $path ) = ref( $key ) eq 'ARRAY' ? @$key : ( $key, [getpwuid($>)]->[7] );
+    $path = [getpwuid($path)]->[7] if( $path =~ /^\d+$/ );
+    if( $key =~ /^\d+$/ )
     {
-        my $rand = $key;
         my $id = $self->ftok( $key ) ||
             return( $self->error( "Unable to get a key using ftok: $!" ) );
         return( $id );
@@ -689,8 +691,6 @@ sub _str2key
     {
         my $id = 0;
         $id += $_ for( unpack( "C*", $key ) );
-        # We use the root as a reliable and stable path.
-        # I initially though about using __FILE__, but during testing this would be in ./blib/lib and beside one user might use a version of this module somewhere while the one used under Apache/mod_perl2 could be somewhere else and this would render the generation of the IPC key unreliable and unrepeatable
         my $val = $self->ftok( $id );
         return( $val );
     }
@@ -804,7 +804,7 @@ Module::Generic::File::Mmap - MMap File Class
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 L<Module::Generic::File::Mmap> implements a Mmap cache mechanism using L<Cache::FastMmap>, which is an XS module. The api is very similar to its counterpart with L<Module::Generic::File::Cache> and L<Module::Generic::SharedMem>, but has the advantage of sharing data over a file like L<Module::Generic::File::Cache>, but using Mmap and being very fast.
 

@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph::Utils;
 
-$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.43';
+$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.45';
 $Map::Tube::Plugin::Graph::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph::Utils - Helper package for Map::Tube::Plugin::Graph.
 
 =head1 VERSION
 
-Version 0.43
+Version 0.45
 
 =cut
 
@@ -17,13 +17,11 @@ use 5.006;
 use strict; use warnings;
 use GraphViz2;
 use Data::Dumper;
-use MIME::Base64;
 use Map::Tube::Utils qw(is_valid_color);
 use Map::Tube::Exception::MissingLineName;
 use Map::Tube::Exception::InvalidLineName;
 use Map::Tube::Exception::InvalidColorName;
 use Map::Tube::Exception::InvalidColorHexCode;
-use File::Temp qw(tempfile tempdir);
 use parent 'Exporter';
 
 our @EXPORT_OK = qw(graph_line_image graph_map_image);
@@ -70,107 +68,64 @@ sub graph_line_image {
     my $bgcolor = $map->bgcolor;
     $bgcolor    = _graph_bgcolor($color) unless defined $bgcolor;
 
-    my $graph  = GraphViz2->new(
+    my $g = $map->as_graph;
+    $g->set_graph_attribute(graphviz => {
         edge   => { color     => $color,
                     arrowsize => $ARROWSIZE },
         node   => { shape     => $SHAPE     },
-        global => { directed  => $DIRECTED  },
         graph  => { label     => _graph_line_label($line_name, $map->name),
                     labelloc  => $LABELLOC,
-                    bgcolor   => $bgcolor });
-
-    my $stations = $line->get_stations;
-    foreach my $node (@$stations) {
-        $graph->add_node(name      => $node->name,
-                         color     => $color,
-                         fontcolor => $color);
-    }
-
+                    bgcolor   => $bgcolor }
+    });
     my $skip = $map->{skip};
-    foreach my $node (@$stations) {
-        my $from = $node->name;
-        foreach (split /\,/,$node->link) {
-            my $to = $map->get_node_by_id($_);
-            next if (defined $skip
-                     &&
-                     (exists $skip->{$line_name}->{$from}->{$to->name}
-                      ||
-                      exists $skip->{$line_name}->{$to->name}->{$from}));
-
-            if (grep /$line_name/, (map { $_->name } @{$to->line})) {
-                $graph->add_edge(from => $from, to => $to->name);
-            }
-            else {
-                $graph->add_edge(from  => $from,
-                                 to    => $to->name,
-                                 color => $color,
-                                 style => $STYLE);
-            }
-        }
-    }
-
-    return _graph_encode_image($graph);
+    $g->filter_edges(sub { !exists $skip->{$_[3]}{$_[1]}{$_[2]} }) if defined $skip;
+    my @line_v = $g->copy->filter_edges(sub { $_[3] eq $line_name})
+      ->filter_vertices(sub { !$_[0]->is_isolated_vertex($_[1]) })->vertices;
+    my %line = map +($_=>undef), @line_v;
+    my %neighbour = map +($_=>undef), $g->neighbours_by_radius(@line_v, 1);
+    $g->filter_vertices(sub { exists $line{$_[1]} || exists $neighbour{$_[1]} });
+    $g->set_vertex_attribute($_, graphviz=>{color => $color, fontcolor => $color})
+      for @line_v;
+    my %seen;
+    $g->filter_edges(sub {
+      return 0 if exists $neighbour{$_[1]}; # zap if from is neighbour
+      return 0 if exists $line{$_[1]} and exists $line{$_[2]} and $_[3] ne $line_name;
+      return 0 if $_[3] ne $line_name and $seen{$_[1]}{$_[2]}++;
+      $g->set_edge_attribute_by_id(@_[1..3], graphviz=>{style => $STYLE})
+        if $_[3] ne $line_name;
+      1; # keep
+    });
+    GraphViz2->from_graph($g)->run(format => 'png')->dot_output;
 }
 
 sub graph_map_image {
     my ($map) = @_;
-
     my $bgcolor = $map->bgcolor;
     $bgcolor = $BGCOLOR unless defined $bgcolor;
-
-    my $graph  = GraphViz2->new(
-        node   => { shape     => $SHAPE     },
+    my $g = $map->as_graph;
+    $g->set_graph_attribute(graphviz => {
+        node   => { shape     => $SHAPE, color => $NODE_COLOR, fontcolor => $NODE_COLOR },
         edge   => { arrowsize => $ARROWSIZE },
-        global => { directed  => $DIRECTED  },
         graph  => { label     => _graph_map_label($map->name),
                     labelloc  => $LABELLOC,
                     bgcolor   => $bgcolor
-        });
-
-    my $lines    = $map->lines;
-    my $stations = [];
-    foreach my $line (@$lines) {
-        next unless defined ($line->name);
-
-        foreach my $station (@{$map->get_stations($line->name)}) {
-            push @$stations, $station;
-            my $color  = $NODE_COLOR;
-            my $_lines = $station->line;
-            $color = $line->color if ((scalar(@$_lines) == 1) && defined $line->color);
-            $graph->add_node(name      => $station->name,
-                             color     => $color,
-                             fontcolor => $color);
         }
+    });
+    my $l2c = $g->get_graph_attribute('line2colour');
+    for my $v ($g->vertices) {
+      my %lines; @lines{map $g->get_multiedge_ids(@$_), $g->edges_at($v)} = ();
+      next if keys %lines != 1;
+      my $l = (keys %lines)[0];
+      next unless defined (my $color = $l2c->{$l});
+      $g->set_vertex_attribute($v, graphviz=>{color => $color, fontcolor => $color});
     }
-
-    my $seen = {};
-    foreach my $station (@$stations) {
-        my $from = $station->name;
-        foreach (split /\,/,$station->link) {
-            my $to = $map->get_node_by_id($_);
-            next if $seen->{$from}->{$to->name};
-            $graph->add_edge(from => $from, to => $to->name);
-            $seen->{$from}->{$to->name} = 1;
-        }
-    }
-
-    return _graph_encode_image($graph);
+    my %seen; $g->filter_edges(sub { !$seen{$_[1]}{$_[2]}++ });
+    GraphViz2->from_graph($g)->run(format => 'png')->dot_output;
 }
 
 #
 #
 # PRIVATE METHODS
-
-sub _graph_encode_image {
-    my ($graph) = @_;
-
-    my $dir = tempdir(CLEANUP => 1);
-    my ($fh, $filename) = tempfile(DIR => $dir);
-    $graph->run(format => 'png', output_file => "$filename");
-    my $raw_string = do { local $/ = undef; <$fh>; };
-
-    return encode_base64($raw_string);
-}
 
 sub _graph_line_label {
     my ($line_name, $map_name) = @_;
@@ -253,7 +208,7 @@ sub _graph_contrast_color {
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -261,9 +216,8 @@ L<https://github.com/manwar/Map-Tube-Plugin-Graph>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-map-tube at rt.cpan.org>,  or
-through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Map-Tube-Plugin-Graph>.
-I will  be notified and then you'll automatically be notified of progress on your
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Map-Tube-Plugin-Graph/issues>.
+I will be notified and then you'll automatically be notified of progress on your
 bug as I make changes.
 
 =head1 SUPPORT
@@ -276,60 +230,52 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUG Report
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube-Plugin-Graph>
+L<https://github.com/manwar/Map-Tube-Plugin-Graph/issues>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * Search MetaCPAN
 
-L<http://annocpan.org/dist/Map-Tube-Plugin-Graph>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Map-Tube-Plugin-Graph>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Map-Tube-Plugin-Graph/>
+L<https://metacpan.org/dist/Map-Tube-Plugin-Graph>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2017 Mohammad S Anwar.
+Copyright (C) 2015 - 2024 Mohammad S Anwar.
 
-This  program  is  free software; you can redistribute it and/or modify it under
-the  terms  of the the Artistic License (2.0). You may obtain a copy of the full
+This program is free software; you can redistribute it and/or modify it under
+the terms of the the Artistic License (2.0). You may obtain a copy of the full
 license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
 
-Any  use,  modification, and distribution of the Standard or Modified Versions is
+Any use, modification, and distribution of the Standard or Modified Versions is
 governed by this Artistic License.By using, modifying or distributing the Package,
 you accept this license. Do not use, modify, or distribute the Package, if you do
 not accept this license.
 
 If your Modified Version has been derived from a Modified Version made by someone
 other than you,you are nevertheless required to ensure that your Modified Version
- complies with the requirements of this license.
+complies with the requirements of this license.
 
-This  license  does  not grant you the right to use any trademark,  service mark,
+This license does not grant you the right to use any trademark, service mark,
 tradename, or logo of the Copyright Holder.
 
 This license includes the non-exclusive, worldwide, free-of-charge patent license
-to make,  have made, use,  offer to sell, sell, import and otherwise transfer the
+to make, have made, use, offer to sell, sell, import and otherwise transfer the
 Package with respect to any patent claims licensable by the Copyright Holder that
-are  necessarily  infringed  by  the  Package. If you institute patent litigation
-(including  a  cross-claim  or  counterclaim) against any party alleging that the
+are necessarily infringed by the Package. If you institute patent litigation
+(including a cross-claim or counterclaim) against any party alleging that the
 Package constitutes direct or contributory patent infringement,then this Artistic
 License to you shall terminate on the date that such litigation is filed.
 
-Disclaimer  of  Warranty:  THE  PACKAGE  IS  PROVIDED BY THE COPYRIGHT HOLDER AND
-CONTRIBUTORS  "AS IS'  AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
-WARRANTIES    OF   MERCHANTABILITY,   FITNESS   FOR   A   PARTICULAR  PURPOSE, OR
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND
+CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
 NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS
 REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT,
-INDIRECT, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
+INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
 OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut

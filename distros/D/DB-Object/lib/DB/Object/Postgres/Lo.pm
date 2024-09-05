@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Lo.pm
-## Version v0.300.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Version v0.300.2
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/11/04
+## Modified 2024/09/04
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -19,8 +20,7 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
-    use Devel::Confess;
-    our $VERSION = 'v0.300.1';
+    our $VERSION = 'v0.300.2';
 };
 
 use strict;

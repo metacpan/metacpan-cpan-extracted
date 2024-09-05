@@ -22,14 +22,14 @@ my %WriteMakefileArgs = (
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => 
     {
-        'strict'        => 0,
-        'warnings'      => 0,
-        'parent'        => 0,
-        'overload'      => '1.22',
-        'overloading'   => '0.02',
-        'Devel::Confess'    => '0.009004',
-        'Module::Generic'   => 'v0.32.4',
-        'Want'          => '0.29',
+        'strict'            => 0,
+        'warnings'          => 0,
+        'parent'            => 0,
+        'overload'          => '1.22',
+        'overloading'       => '0.02',
+        # 'Devel::Confess'    => '0.009004',
+        'Module::Generic'   => 'v0.37.3',
+        'Want'              => '0.29',
     },
     TEST_REQUIRES =>
     {

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v1.2.0
+## Version v1.2.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/04/09
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -464,8 +464,7 @@ BEGIN
         },
     };
     our $PLACEHOLDER_REGEXP = qr/(?:\?|\$(?<index>\d+))/;
-    our $VERSION = 'v1.2.0';
-    use Devel::Confess;
+    our $VERSION = 'v1.2.1';
 };
 
 use strict;
@@ -847,6 +846,7 @@ sub databases
         $dbh = $self;
     }
     my $temp = $dbh->do( "SELECT datname FROM pg_database" )->fetchall_arrayref;
+    return( $self->error( $dbh->errstr ) ) if( !$temp );
     my @dbases = map( $_->[0], @$temp );
     return( @dbases );
 }
@@ -1932,7 +1932,7 @@ DB::Object::Postgres - SQL API
     
 =head1 VERSION
 
-    v1.2.0
+    v1.2.1
 
 =head1 DESCRIPTION
 
@@ -2438,6 +2438,8 @@ In list context, it returns an array of schema lines, and in scalar context, it 
 =head2 on_conflict
 
 See L<DB::Object::Postgres::Tables/on_conflict>
+
+=head2 for Pod::Coverage pg_notifies
 
 =head2 pg_ping
 

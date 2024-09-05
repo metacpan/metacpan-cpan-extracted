@@ -1,0 +1,12 @@
+Changes
+cpanfile
+lib/App/MediaPi.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+script/mediapi
+t/000-load.t
+t/001-cpanfile.t
+t/001-podsyntax.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

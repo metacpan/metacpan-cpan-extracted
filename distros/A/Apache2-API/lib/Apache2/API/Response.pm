@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Response.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2023/10/21
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -19,7 +19,6 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
-    use Devel::Confess;
     use Apache2::Request;
     use Apache2::Const -compile => qw( :common :http );
     use Apache2::Log ();
@@ -33,7 +32,7 @@ BEGIN
     use Cookie::Jar;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -905,7 +904,7 @@ Apache2::API::Response - Apache2 Outgoing Response Access and Manipulation
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

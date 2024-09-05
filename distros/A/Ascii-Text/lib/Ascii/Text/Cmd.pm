@@ -3,6 +3,7 @@ package Ascii::Text::Cmd;
 use Rope::Cmd;
 use Types::Standard qw/Str Int Bool Enum/;
 use Ascii::Text;
+use Module::Load;
 
 title(Ascii::Text->new( font => 'Poison', align => 'center', color => 'green')->stringify('Ascii Text', 1));
 
@@ -47,20 +48,42 @@ option fh => (
 	description => 'file to write the ascii text to',
 );
 
+option image => (
+	type => Bool,
+	description => 'write the ascii text to an image, used in conjunction with fh and imager_font.',
+	option_alias => 'i',
+	value => 0
+);
+
+option imager_font => (
+	type => Str,
+	description => 'path to imager ttf font',
+	option_alias => 'if',
+);
+
 sub callback {
         my ($self) = @_; 
 	my $fh;
-	if ($self->fh) {
+	my $class = 'Ascii::Text';
+	if ($self->image) {
+		$class = 'Ascii::Text::Image';
+	}
+	load($class);
+	if (!$self->image && $self->fh) {
 		open $fh, '>', $self->fh or die $!;
 	}
-	my $ascii = Ascii::Text->new(
+	my $ascii = $class->new(
 		align => $self->align,
 		color => $self->color,
 		pad => $self->pad,
 		font => ucfirst($self->font),
+		imager_font => $self->imager_font,
 		($fh ? (fh => $fh) : ()),
 	);
-	$ascii->($self->text);
+	if (!$self->image && $self->fh) {
+		close $fh;
+	}
+	$ascii->($self->text, ($self->image ? ($self->fh, 1) : ()));
 }
 
 1;

@@ -258,10 +258,11 @@ sub __choose_extension {
         }
         elsif ( $extension eq $sf->{col} ) {
             my $prompt = defined $opt->{prompt} ? $opt->{prompt} : '';
+            my @pre = ( undef );
             # Choose
             my $col = $tc->choose(
-                [ undef, map { '- ' . $_ } @$qt_cols ],
-                { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, undef => '<<' }
+                [ @pre, @$qt_cols ],
+                { %{$sf->{i}{lyt_h}}, info => $info, prompt => $prompt, undef => '<<' }
             );
             $ax->print_sql_info( $info );
             if ( ! defined $col ) {

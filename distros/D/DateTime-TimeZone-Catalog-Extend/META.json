@@ -33,7 +33,6 @@
       "runtime" : {
          "requires" : {
             "DateTime::TimeZone::Alias" : "0.06",
-            "Nice::Try" : "v1.3.1",
             "perl" : "5.026001",
             "strict" : "0",
             "warnings" : "0"
@@ -56,6 +55,6 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-TimeZone-Catalog-Extend"
       }
    },
-   "version" : "v0.3.1",
+   "version" : "v0.3.3",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

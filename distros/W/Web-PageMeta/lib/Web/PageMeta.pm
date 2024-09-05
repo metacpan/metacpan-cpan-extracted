@@ -1,6 +1,6 @@
 package Web::PageMeta;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use 5.010;
 use Moose;
@@ -9,7 +9,7 @@ use MooseX::StrictConstructor;
 use URI;
 use URI::QueryParam;
 use Log::Any qw($log);
-use Future '0.44';
+use Future;
 use Future::AsyncAwait;
 use Future::HTTP::AnyEvent;
 use Web::Scraper::LibXML;
@@ -81,6 +81,13 @@ has 'description' => (
     is      => 'ro',
     lazy    => 1,
     default => sub {return $_[0]->page_meta->{description} // ''},
+);
+
+has 'canonical_url' => (
+    isa     => Uri,
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {return $_[0]->page_meta->{url} // $_[0]->url},
 );
 
 has 'image_data' => (
@@ -433,6 +440,10 @@ Returns title of the page.
 =head2 description
 
 Returns description of the page.
+
+=head2 canonical_url
+
+Returns open-graph url. If not present returns L</url>.
 
 =head2 image
 

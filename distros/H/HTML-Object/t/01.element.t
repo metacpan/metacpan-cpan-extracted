@@ -18,6 +18,8 @@ BEGIN
 use strict;
 use warnings;
 
+my $p = HTML::Object->new;
+# perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$p, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/HTML/Object/Element.pm
 can_ok( 'HTML::Object::Element', 'address' );
 can_ok( 'HTML::Object::Element', 'all_attr' );
 can_ok( 'HTML::Object::Element', 'all_attr_names' );
@@ -100,7 +102,6 @@ can_ok( 'HTML::Object::Element', 'tag' );
 can_ok( 'HTML::Object::Element', 'traverse' );
 can_ok( 'HTML::Object::Element', 'unshift_content' );
 
-my $p = HTML::Object->new;
 my $doc = $p->parse_file( './t/test.html' ) || BAIL_OUT( $p->error );
 my $body = $doc->look_down( _tag => 'body' )->first;
 SKIP:

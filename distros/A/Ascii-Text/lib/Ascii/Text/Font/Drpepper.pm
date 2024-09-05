@@ -611,7 +611,7 @@ Ascii::Text::Font::Drpepper - Drpepper font
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 

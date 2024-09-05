@@ -1,3 +1,8 @@
+0.04 2024-09-04T19:26:28+02:00
+ - Add DESCRIPTION section to doc.
+ - Add example image to doc.
+ - Add explicit version of Tags helper to use.
+
 0.03 2024-08-05T10:41:59+02:00
  - Fix tests.
 

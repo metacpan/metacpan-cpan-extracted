@@ -989,7 +989,7 @@ Ascii::Text::Font::Coinstak - Coinstak font
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 

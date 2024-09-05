@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## CSS Object Oriented - ~/lib/CSS/Object/Rule.pm
-## Version v0.1.3
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/21
-## Modified 2021/11/28
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,13 +16,12 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( CSS::Object::Element );
-    use Devel::Confess;
     use Want ();
     use overload (
         '""' => 'as_string',
         fallback => 1,
     );
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.2.0';
 };
 
 sub init
@@ -197,7 +196,7 @@ sub selectors_as_string
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -214,7 +213,7 @@ CSS::Object::Rule - CSS Object Oriented Rule
 
 =head1 VERSION
 
-    v0.1.3
+    v0.2.0
 
 =head1 DESCRIPTION
 

@@ -24,6 +24,7 @@ isa_ok( $s => 'Apache2::API::Status' );
 # for m in `egrep -E '^sub ([a-z]\w+)' ./lib/Apache2/API/Status.pm| awk '{ print $2 }'`; do echo "can_ok( \$s => '$m' );"; done
 # or
 # egrep -E '^sub ' ./lib/Apache2/API/Status.pm | perl -lnE 'my $m = [split(/\s+/, $_)]->[1]; say "can_ok( \$s, ''$m'' );"'
+# perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$s, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/Apache2/API/Status.pm
 can_ok( $s, 'convert_short_lang_to_long' );
 can_ok( $s, 'is_info' );
 can_ok( $s, 'is_success' );

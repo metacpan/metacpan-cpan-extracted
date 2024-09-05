@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/URI.pm
-## Version v0.1.2
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.1.3
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/18
-## Modified 2022/10/21
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,9 +20,6 @@ BEGIN
     use Apache2::SSI::Finfo;
     use Cwd;
     use File::Spec ();
-    # Used for debugging
-    # use Devel::Confess;
-    use Nice::Try;
     use Scalar::Util ();
     require constant;
     use URI;
@@ -37,14 +34,13 @@ BEGIN
         require Apache2::Const;
         Apache2::Const->import( compile => qw( :common :http OK DECLINED ) );
     }
-    # use Devel::Confess;
     our( $DEBUG );
     use overload (
         q{""}    => sub    { $_[0]->document_uri->as_string },
         bool     => sub () { 1 },
         fallback => 1,
     );
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
     our $DIR_SEP = $Apache2::SSI::Common::DIR_SEP;
 };
 
@@ -669,7 +665,9 @@ sub lookup_uri
             return( $rr );
         }
         
-        try
+        local $@;
+        # try-catch
+        my $rv = eval
         {
             # No, we cannot use $rr->uri. This would give us the initial requested uri, not the redirected uri
             my $u = URI->new( $hdrs->{Location} );
@@ -684,12 +682,13 @@ sub lookup_uri
                 my $new_r = $self->lookup_uri( $uri );
                 return( $new_r );
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            $self->error( "An error occurred while creating URI object for \"$hdrs->{Location}\": $e" );
+            $self->error( "An error occurred while creating URI object for \"$hdrs->{Location}\": $@" );
             return( $rr );
         }
+        return( $rv );
     }   
     return( $rr );
 }
@@ -726,14 +725,17 @@ sub new_uri
     my $self = shift( @_ );
     my $class = URI_CLASS;
     my $uri = shift( @_ );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         return( $class->new( $uri ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to instantiate an URI object with \"$uri\": $e" ) );
+        return( $self->error( "Unable to instantiate an URI object with \"$uri\": $@" ) );
     }
+    return( $rv );
 }
 
 sub parent
@@ -1026,7 +1028,7 @@ Apache2::SSI::URI - Apache2 Server Side Include URI Object Class
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

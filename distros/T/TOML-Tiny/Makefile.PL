@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.17",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t t/toml-test/invalid/array/*.t t/toml-test/invalid/bool/*.t t/toml-test/invalid/control/*.t t/toml-test/invalid/datetime/*.t t/toml-test/invalid/encoding/*.t t/toml-test/invalid/float/*.t t/toml-test/invalid/inline-table/*.t t/toml-test/invalid/integer/*.t t/toml-test/invalid/key/*.t t/toml-test/invalid/string/*.t t/toml-test/invalid/table/*.t t/toml-test/valid/*.t t/toml-test/valid/array/*.t t/toml-test/valid/bool/*.t t/toml-test/valid/comment/*.t t/toml-test/valid/datetime/*.t t/toml-test/valid/float/*.t t/toml-test/valid/inline-table/*.t t/toml-test/valid/integer/*.t t/toml-test/valid/key/*.t t/toml-test/valid/string/*.t t/toml-test/valid/table/*.t"
   }

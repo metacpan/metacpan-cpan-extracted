@@ -34,7 +34,6 @@
          "requires" : {
             "DateTime" : "1.54",
             "DateTime::TimeZone" : "2.52",
-            "Nice::Try" : "v1.1.2",
             "parent" : "0",
             "perl" : "5.014000",
             "strict" : "0.238",
@@ -61,6 +60,6 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Format-JP"
       }
    },
-   "version" : "v0.1.4",
+   "version" : "v0.1.6",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

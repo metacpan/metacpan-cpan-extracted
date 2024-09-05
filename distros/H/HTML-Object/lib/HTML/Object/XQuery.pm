@@ -31,6 +31,19 @@ use warnings;
     *xq = \&HTML::Object::DOM::Element::xq;
 }
 
+# NOTE: DateTimeFormat class
+# package
+#     DateTimeFormat;
+# BEGIN
+# {
+#     use strict;
+#     use warnings;
+#     use parent qw( HTML::Object::DateTime::Format );
+# };
+# 
+# use strict;
+# use warnings;
+
 # NOTE: xQuery class
 package xQuery;
 BEGIN

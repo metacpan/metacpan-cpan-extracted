@@ -1,5 +1,11 @@
 Revision history for Perl module Getopt::Class
 
+v1.1.2 2024-09-05T14:34:18+0900
+    - Removed some dependencies
+
+v1.1.1 2024-07-21T15:16:18+0900
+    - Minor bug in default file value when not a reference
+
 v1.1.0 2024-07-20T17:45:11+0900
     - Improved handling of default value when type is 'file', otherwise Getopt::Long would trigger some error
     - Removed dependency on Nice::Try

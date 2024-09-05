@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
         'warnings'      => '1.44',
         'DateTime'      => '1.54',
         'DateTime::TimeZone' => '2.52',
-        'Nice::Try'     => 'v1.1.2',
+        # 'Nice::Try'     => 'v1.1.2',
     },
     TEST_REQUIRES =>
     {

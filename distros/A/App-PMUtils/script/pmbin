@@ -8,9 +8,9 @@ use App::PMUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-05-12'; # DATE
+our $DATE = '2024-08-30'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.744'; # VERSION
+our $VERSION = '0.745'; # VERSION
 
 our %SPEC;
 $SPEC{pmbin} = {
@@ -123,7 +123,7 @@ pmbin - List scripts that come with the same distribution of a Perl module
 
 =head1 VERSION
 
-This document describes version 0.744 of pmbin (from Perl distribution App-PMUtils), released on 2023-05-12.
+This document describes version 0.745 of pmbin (from Perl distribution App-PMUtils), released on 2024-08-30.
 
 =head1 SYNOPSIS
 
@@ -340,7 +340,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

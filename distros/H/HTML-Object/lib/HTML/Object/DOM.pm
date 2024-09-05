@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM.pm
-## Version v0.2.0
+## Version v0.5.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2022/09/18
+## Modified 2024/05/04
 ## All rights reserved
 ## 
 ## 
@@ -230,7 +230,7 @@ BEGIN
     # An hash reference map to lowercase HTML tag name to perl class, for those who have special classes, otherwise the fallback is HTML::Object::Element.
     our $TAG_TO_CLASS = {};
     our $GLOBAL_DOM;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.5.0';
 };
 
 use strict;
@@ -525,7 +525,7 @@ HTML::Object::DOM - HTML Object DOM Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.5.0
 
 =head1 DESCRIPTION
 

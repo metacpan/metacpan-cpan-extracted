@@ -21,8 +21,7 @@ my $qq = Apache2::API::Query->new( 'foo=1&foo=2&bar=3;bog=abc;bar=7;fluffy=3' );
 isa_ok( $qq, 'Apache2::API::Query' );
 
 # To generate this list:
-# egrep -E '^sub ' ./lib/Apache2/API/Query.pm | perl -lnE 'my $m = [split(/\s+/, $_)]->[1]; say "can_ok( \$qq, ''$m'' );"'
-# egrep -E '^sub ' ./lib/URI/Query.pm | perl -lnE 'my $m = [split(/\s+/, $_)]->[1]; say "can_ok( \$qq, ''$m'' );"'
+# perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$qq, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/Apache2/API/Query.pm
 can_ok( $qq, 'strip' );
 can_ok( $qq, 'strip_except' );
 can_ok( $qq, 'strip_null' );

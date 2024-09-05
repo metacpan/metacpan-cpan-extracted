@@ -3,7 +3,7 @@ use warnings;
 
 package Try::ALRM;
 
-our $VERSION = q{0.82};
+our $VERSION = q{0.99};
 
 use Exporter qw/import/;
 our @EXPORT    = qw(try_once retry ALRM finally timeout tries);

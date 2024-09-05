@@ -17,6 +17,10 @@ ascii_text - script for generating ASCII text in various fonts and style
 	ascii_text help
 	
 	ascii_text a=center t="Hello World" c=bright_red
+
+or print to an image
+
+	ascii_text t="Hello World" i=1 if=path/to/RobotoMono.ttf fh=hello.png c=bright_red
   
 =cut
 

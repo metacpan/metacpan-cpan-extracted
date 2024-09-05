@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Cache/Tables.pm
-## Version v0.100.4
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.100.5
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/10/20
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -22,8 +22,7 @@ BEGIN
     use JSON;
     use Fcntl qw( :flock );
     use Module::Generic::File qw( sys_tmpdir );
-    use Devel::Confess;
-    our $VERSION = 'v0.100.4';
+    our $VERSION = 'v0.100.5';
 };
 
 use strict;
@@ -235,7 +234,7 @@ DB::Object::Cache::Tables - Table Cache
     
 =head1 VERSION
 
-    v0.100.4
+    v0.100.5
 
 =head1 DESCRIPTION
 

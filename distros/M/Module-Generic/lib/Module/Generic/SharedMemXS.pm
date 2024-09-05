@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.2.2
+## Version v0.2.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2024/05/03
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -109,7 +109,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.2.3';
 };
 
 use strict;
@@ -1193,19 +1193,27 @@ sub _str2key
     {
         return( &IPC::SysV::IPC_PRIVATE );
     }
-    elsif( $key =~ /^\d+$/ )
+    my $path;
+    ( $key, $path ) = ref( $key ) eq 'ARRAY' ? @$key : ( $key, [getpwuid($>)]->[7] );
+    $path = [getpwuid($path)]->[7] if( $path =~ /^\d+$/ );
+    $path ||= File::Spec->rootdir();
+    if( $key =~ /^\d+$/ )
     {
-        my $id = &IPC::SysV::ftok( __FILE__, $key ) ||
+        my $id = &IPC::SysV::ftok( $path, $key ) ||
             return( $self->error( "Unable to get a key using IPC::SysV::ftok: $!" ) );
         return( $id );
     }
     else
     {
-        my $id = 0;
-        $id += $_ for( unpack( "C*", $key ) );
+        # my $id = 0;
+        # $id += $_ for( unpack( "C*", $key ) );
+        require Digest::SHA;
+        my $hash = Digest::SHA::sha1_base64( $key );
+        my $id = ord( substr( $hash, 0, 1 ) );
         # We use the root as a reliable and stable path.
-        # I initially though about using __FILE__, but during testing this would be in ./blib/lib and beside one user might use a version of this module somewhere while the one used under Apache/mod_perl2 could be somewhere else and this would render the generation of the IPC key unreliable and unrepeatable
-        my $val = &IPC::SysV::ftok( File::Spec->rootdir(), $id );
+        # I initially thought about using __FILE__, but during testing this would be in ./blib/lib and beside one user might use a version of this module somewhere while the one used under Apache/mod_perl2 could be somewhere else and this would render the generation of the IPC key unreliable and unrepeatable
+        # my $val = &IPC::SysV::ftok( File::Spec->rootdir(), $id );
+        my $val = &IPC::SysV::ftok( $path, $id );
         return( $val );
     }
 }
@@ -1440,7 +1448,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.3
 
 =head1 DESCRIPTION
 

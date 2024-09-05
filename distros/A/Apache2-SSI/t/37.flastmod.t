@@ -10,7 +10,6 @@ BEGIN
     our $BASE_URI;
     use DateTime;
     use DateTime::Format::Strptime;
-    use Nice::Try;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -18,7 +17,9 @@ use strict;
 use warnings;
 
 my( $inc_ts, $me_ts, $year );
-try
+local $@;
+# try-catch
+eval
 {
     my $dt = DateTime->now( time_zone => 'local' );
     $year = $dt->year;
@@ -42,10 +43,10 @@ try
     );
     $me_ts->set_formatter( $fmt2 );
     diag( __FILE__, " last modification date time is '$me_ts'." ) if( $DEBUG );
-}
-catch( $e )
+};
+if( $@ )
 {
-    BAIL_OUT( $e );
+    BAIL_OUT( $@ );
 }
 
 my $tests =

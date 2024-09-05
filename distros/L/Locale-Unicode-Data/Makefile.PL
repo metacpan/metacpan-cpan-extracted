@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
         'Locale::Unicode'       => 'v0.3.5',
         'Scalar::Util'          => 0,
         # 2004-11-05
-        'URI::file'             => '4.19',
+        # 'URI::file'             => '4.19',
         # Version compatible with perl v5.10
         'Want'                  => '0.17',
     },

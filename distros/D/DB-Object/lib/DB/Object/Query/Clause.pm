@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query/Clause.pm
-## Version v0.1.0
-## Copyright(c) 2019-2023 DEGUEST Pte. Ltd.
+## Version v1.0.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/08
-## Modified 2023/07/08
+## Modified 2024/09/04
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -17,13 +18,12 @@ BEGIN
     use common::sense;
     use parent qw( DB::Object::Query::Elements );
     use vars qw( $VERSION );
-    use Devel::Confess;
     use overload (
         '""'    => 'as_string',
         'bool'  => sub{1},
         fallback => 1,
     );
-    our $VERSION = 'v1.0.0';
+    our $VERSION = 'v1.0.1';
 };
 
 use strict;
@@ -273,7 +273,7 @@ And the associated values would be automatically bound to the query upon executi
 
 =head1 VERSION
 
-v0.1.0
+v1.0.1
 
 =head1 DESCRIPTION
 

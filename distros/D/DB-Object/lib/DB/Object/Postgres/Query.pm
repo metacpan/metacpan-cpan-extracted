@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Query.pm
-## Version v0.3.0
+## Version v0.3.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/03/22
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -19,9 +19,8 @@ BEGIN
     use warnings;
     use parent qw( DB::Object::Query );
     use vars qw( $VERSION $DEBUG );
-    use Devel::Confess;
     use Want;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -754,7 +753,7 @@ DB::Object::Postgres::Query - Query Object for PostgreSQL
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 

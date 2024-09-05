@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.015001';
+$Net::Silverpeak::Orchestrator::VERSION = '0.015002';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -9,6 +9,7 @@ use Types::Standard qw( Bool Str );
 use Carp qw( croak );
 use HTTP::CookieJar;
 use List::Util qw( any );
+use URI::Escape::XS qw( uri_escape );
 # use Data::Dumper::Concise;
 
 no warnings "experimental::signatures";
@@ -75,6 +76,16 @@ sub _error_handler ($self, $res) {
         : $res->response->decoded_content;
 
     croak('error (' . $res->code . '): ' . $error_message);
+}
+
+sub _post_with_params ($self, $endpoint, $params, @rest) {
+    my $uri_params = $self->_urlencode_data($params);
+    my $uri = $endpoint;
+    $uri .= $endpoint =~ /\?/
+        ? '&' . $uri_params
+        : '?' . $uri_params;
+
+    return $self->post($uri, @rest);
 }
 
 
@@ -145,8 +156,8 @@ sub list_templategroups($self) {
 
 sub get_templategroup($self, $name) {
     my $res = $self->_is_version_93
-        ? $self->get('/gms/rest/template/templateGroups?templateGroup=' . $name)
-        : $self->get('/gms/rest/template/templateGroups/' . $name);
+        ? $self->get('/gms/rest/template/templateGroups', { templateGroup => $name })
+        : $self->get('/gms/rest/template/templateGroups/' . uri_escape($name));
     $self->_error_handler($res)
         unless $res->code == 200;
     # version 9.3+ returns an array with a single hashref
@@ -172,9 +183,9 @@ sub update_templates_of_templategroup($self, $name, $templatenames) {
         unless ref $templatenames eq 'ARRAY';
 
     my $res = $self->_is_version_93
-        ? $self->post("/gms/rest/template/templateSelection?templateGroup=$name",
-            $templatenames)
-        : $self->post('/gms/rest/template/templateSelection/' . $name,
+        ? $self->_post_with_params('/gms/rest/template/templateSelection',
+            { templateGroup => $name }, $templatenames)
+        : $self->post('/gms/rest/template/templateSelection/' . uri_escape($name),
             $templatenames);
     $self->_error_handler($res)
         unless $res->code == 200;
@@ -184,8 +195,8 @@ sub update_templates_of_templategroup($self, $name, $templatenames) {
 
 sub update_templategroup($self, $name, $data) {
     my $res = $self->_is_version_93
-        ? $self->post("/gms/rest/template/templateGroups?templateGroup=$name", $data)
-        : $self->post('/gms/rest/template/templateGroups/' . $name, $data);
+        ? $self->_post_with_params('/gms/rest/template/templateGroups', { templateGroup => $name }, $data)
+        : $self->post('/gms/rest/template/templateGroups/' . uri_escape($name), $data);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -194,8 +205,8 @@ sub update_templategroup($self, $name, $data) {
 
 sub delete_templategroup($self, $name) {
     my $res = $self->_is_version_93
-        ? $self->delete("/gms/rest/template/templateGroups?templateGroup=$name")
-        : $self->delete('/gms/rest/template/templateGroups/' . $name);
+        ? $self->delete('/gms/rest/template/templateGroups', { templateGroup => $name })
+        : $self->delete('/gms/rest/template/templateGroups/' . uri_escape($name));
     $self->_error_handler($res)
         unless $res->code == 204;
     return 1;
@@ -227,9 +238,10 @@ sub get_vrf_by_id ($self) {
 
 
 sub get_vrf_security_policies_by_ids ($self, $source_vrf_id, $destination_vrf_id) {
+    my $mapname = $source_vrf_id . '_' . $destination_vrf_id;
     my $res = $self->_is_version_93
-        ? $self->get('/gms/rest/vrf/config/securityPolicies?map=' . $source_vrf_id . '_' . $destination_vrf_id)
-        : $self->get('/gms/rest/vrf/config/securityPolicies/' . $source_vrf_id . '_' . $destination_vrf_id);
+        ? $self->get('/gms/rest/vrf/config/securityPolicies', { map => $mapname })
+        : $self->get('/gms/rest/vrf/config/securityPolicies/' . uri_escape($mapname));
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -237,9 +249,10 @@ sub get_vrf_security_policies_by_ids ($self, $source_vrf_id, $destination_vrf_id
 
 
 sub update_vrf_security_policies_by_ids ($self, $source_vrf_id, $destination_vrf_id, $data) {
+    my $mapname = $source_vrf_id . '_' . $destination_vrf_id;
     my $res = $self->_is_version_93
-        ? $self->post('/gms/rest/vrf/config/securityPolicies?map=' . $source_vrf_id . '_' . $destination_vrf_id, $data)
-        : $self->post('/gms/rest/vrf/config/securityPolicies/' . $source_vrf_id . '_' . $destination_vrf_id, $data);
+        ? $self->_post_with_params('/gms/rest/vrf/config/securityPolicies', { map => $mapname }, $data)
+        : $self->post('/gms/rest/vrf/config/securityPolicies/' . uri_escape($mapname), $data);
     $self->_error_handler($res)
         unless $res->code == 204;
     return 1;
@@ -256,8 +269,8 @@ sub list_appliances($self) {
 
 sub get_appliance($self, $id) {
     my $res = $self->_is_version_93
-        ? $self->get('/gms/rest/appliance?nePk=' . $id)
-        : $self->get('/gms/rest/appliance/' . $id);
+        ? $self->get('/gms/rest/appliance', { nePk => $id })
+        : $self->get('/gms/rest/appliance/' . uri_escape($id));
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -266,8 +279,8 @@ sub get_appliance($self, $id) {
 
 sub get_appliance_extrainfo ($self, $id) {
     my $res = $self->_is_version_93
-        ? $self->get("/gms/rest/appliance/extraInfo?nePk=$id")
-        : $self->get("/gms/rest/appliance/extraInfo/$id");
+        ? $self->get('/gms/rest/appliance/extraInfo', { nePk => $id })
+        : $self->get('/gms/rest/appliance/extraInfo/'. uri_escape($id));
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -292,8 +305,8 @@ sub list_groups ($self) {
 
 sub get_deployment ($self, $id) {
     my $res = $self->_is_version_93
-        ? $self->get("/gms/rest/deployment?nePk=$id")
-        : $self->get("/gms/rest/deployment/$id");
+        ? $self->get('/gms/rest/deployment', { nePk => $id })
+        : $self->get('/gms/rest/deployment/' . uri_escape($id));
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -302,8 +315,8 @@ sub get_deployment ($self, $id) {
 
 sub get_interface_state ($self, $id) {
     my $res = $self->_is_version_93
-        ? $self->get("/gms/rest/interfaceState?nePk=$id")
-        : $self->get("/gms/rest/interfaceState/$id");
+        ? $self->get('/gms/rest/interfaceState', { nePk => $id })
+        : $self->get('/gms/rest/interfaceState/'. uri_escape($id));
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -320,8 +333,8 @@ sub get_interface_labels_by_type ($self) {
 
 sub get_appliance_ipsla_configs ($self, $id) {
     my $res = $self->_is_version_93
-        ? $self->get("/gms/rest/ipsla/config/managers?nePk=$id")
-        : $self->get("/gms/rest/ipsla/config/managers/$id");
+        ? $self->get('/gms/rest/ipsla/config/managers', { nePk => $id })
+        : $self->get('/gms/rest/ipsla/config/managers/' . uri_escape($id));
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -330,8 +343,8 @@ sub get_appliance_ipsla_configs ($self, $id) {
 
 sub get_appliance_ipsla_states ($self, $id) {
     my $res = $self->_is_version_93
-        ? $self->get("/gms/rest/ipsla/state/managers?nePk=$id")
-        : $self->get("/gms/rest/ipsla/state/managers/$id");
+        ? $self->get('/gms/rest/ipsla/state/managers', { nePk => $id })
+        : $self->get('/gms/rest/ipsla/state/managers/'. uri_escape($id));
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -340,8 +353,8 @@ sub get_appliance_ipsla_states ($self, $id) {
 
 sub get_appliance_bgp_system_config ($self, $id, $params = {}) {
     my $res = $self->_is_version_93
-        ? $self->get("/gms/rest/bgp/config/system?nePk=$id", $params)
-        : $self->get("/gms/rest/bgp/config/system/$id", $params);
+        ? $self->get('/gms/rest/bgp/config/system', { nePk => $id, $params->%* })
+        : $self->get('/gms/rest/bgp/config/system/' . uri_escape($id), $params);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -350,8 +363,8 @@ sub get_appliance_bgp_system_config ($self, $id, $params = {}) {
 
 sub get_appliance_bgp_system_config_allvrfs ($self, $id, $params = {}) {
     my $res = $self->_is_version_93
-        ? $self->get("/gms/rest/bgp/config/allVrfs/system?nePk=$id", $params)
-        : $self->get("/gms/rest/bgp/config/allVrfs/system/$id", $params);
+        ? $self->get('/gms/rest/bgp/config/allVrfs/system', { nePk => $id, $params->%* })
+        : $self->get('/gms/rest/bgp/config/allVrfs/system/' . uri_escape($id), $params);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -360,8 +373,8 @@ sub get_appliance_bgp_system_config_allvrfs ($self, $id, $params = {}) {
 
 sub get_appliance_bgp_neighbors ($self, $id, $params = {}) {
     my $res = $self->_is_version_93
-        ? $self->get("/gms/rest/bgp/config/allVrfs/neighbor?nePk=$id", $params)
-        : $self->get("/gms/rest/bgp/config/allVrfs/neighbor/$id", $params);
+        ? $self->get('/gms/rest/bgp/config/allVrfs/neighbor', { nePk => $id, $params->%* })
+        : $self->get('/gms/rest/bgp/config/allVrfs/neighbor/' . uri_escape($id), $params);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -405,8 +418,8 @@ sub list_addressgroup_names($self) {
 
 sub get_addressgroup($self, $name) {
     my $res = $self->_is_version_93
-        ? $self->get('/gms/rest/ipObjects/addressGroup/?name=' . $name)
-        : $self->get('/gms/rest/ipObjects/addressGroup/' . $name);
+        ? $self->get('/gms/rest/ipObjects/addressGroup', { name => $name })
+        : $self->get('/gms/rest/ipObjects/addressGroup/' . uri_escape($name));
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -435,8 +448,8 @@ sub update_addressgroup($self, $name, $data) {
 
 sub delete_addressgroup($self, $name) {
     my $res = $self->_is_version_93
-        ? $self->delete('/gms/rest/ipObjects/addressGroup/?name=' . $name)
-        : $self->delete('/gms/rest/ipObjects/addressGroup/' . $name);
+        ? $self->delete('/gms/rest/ipObjects/addressGroup', { name => $name })
+        : $self->delete('/gms/rest/ipObjects/addressGroup/' . uri_escape($name));
     $self->_error_handler($res)
         unless $res->code == 204;
     return 1;
@@ -461,8 +474,8 @@ sub list_servicegroup_names($self) {
 
 sub get_servicegroup($self, $name) {
     my $res = $self->_is_version_93
-        ? $self->get('/gms/rest/ipObjects/serviceGroup/?name=' . $name)
-        : $self->get('/gms/rest/ipObjects/serviceGroup/' . $name);
+        ? $self->get('/gms/rest/ipObjects/serviceGroup', { name => $name })
+        : $self->get('/gms/rest/ipObjects/serviceGroup/' . uri_escape($name));
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -491,8 +504,8 @@ sub update_servicegroup($self, $name, $data) {
 
 sub delete_servicegroup($self, $name) {
     my $res = $self->_is_version_93
-        ? $self->delete('/gms/rest/ipObjects/serviceGroup/?name=' . $name)
-        : $self->delete('/gms/rest/ipObjects/serviceGroup/' . $name);
+        ? $self->delete('/gms/rest/ipObjects/serviceGroup', { name => $name })
+        : $self->delete('/gms/rest/ipObjects/serviceGroup/' . uri_escape($name));
     $self->_error_handler($res)
         unless $res->code == 204;
     return 1;
@@ -525,8 +538,8 @@ sub create_or_update_domain_application($self, $domain, $data) {
 
 sub delete_domain_application($self, $domain) {
     my $res = $self->_is_version_93
-        ? $self->delete('/gms/rest/applicationDefinition/dnsClassification?domain=' . $domain)
-        : $self->delete('/gms/rest/applicationDefinition/dnsClassification/' . $domain);
+        ? $self->delete('/gms/rest/applicationDefinition/dnsClassification', { domain => $domain })
+        : $self->delete('/gms/rest/applicationDefinition/dnsClassification/' . uri_escape($domain));
     $self->_error_handler($res)
         unless $res->code == 200;
     return 1;
@@ -591,7 +604,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.015001
+version 0.015002
 
 =head1 SYNOPSIS
 

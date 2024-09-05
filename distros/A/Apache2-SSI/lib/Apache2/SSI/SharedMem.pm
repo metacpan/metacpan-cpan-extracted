@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/SharedMem.pm
-## Version v0.1.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.1.2
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2022/10/21
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,7 +20,6 @@ BEGIN
     use vars qw( $VERSION $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS @EXPORT_OK %EXPORT_TAGS $N $SHEM_REPO );
     use Config;
     use JSON ();
-    use Nice::Try;
     use Scalar::Util ();
     use constant SHM_BUFSIZ     =>  65536;
     use constant SEM_LOCKER     =>  0;
@@ -100,7 +99,7 @@ EOT
     # Credits IPC::Shareable
     our $N = do { my $foo = eval { pack "L!", 0 }; $@ ? '' : '!' };
     our $SHEM_REPO = {};
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -192,7 +191,9 @@ sub exists
     # Remove the create bit
     $flags = ( $flags ^ &IPC::SysV::IPC_CREAT );
     my $semid;
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         $semid = semget( $serial, 3, $flags );
         if( defined( $semid ) )
@@ -203,15 +204,16 @@ sub exists
         }
         else
         {
-            return( 0 ) if( $! =~ /\bNo[[:blank:]]+such[[:blank:]]+file\b/ );
+            return(0) if( $! =~ /\bNo[[:blank:]]+such[[:blank:]]+file\b/ );
             return;
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
         semctl( $semid, 0, &IPC::SysV::IPC_RMID, 0 ) if( $semid );
-        return( 0 );
+        return(0);
     }
+    return( $rv );
 }
 
 sub flags
@@ -272,24 +274,27 @@ sub lock
     $self->unlock if( $self->locked );
     my $semid = $self->semid ||
         return( $self->error( "No semaphore id set yet." ) );
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         local $SIG{ALRM} = sub{ die( "timeout" ); };
         alarm( $timeout );
         my $rc = $self->op( @{$SEMOP_ARGS->{ $type }} );
-        alarm( 0 );
-        if( $rc )
-        {
-            $self->locked( $type );
-        }
-        else
-        {
-            return( $self->error( "Failed to set a lock on semaphore id \"$semid\": $!" ) );
-        }
-    }
-    catch( $e )
+        alarm(0);
+        return( $rc );
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to set a lock: $e" ) );
+        return( $self->error( "Unable to set a lock: $@" ) );
+    }
+    if( $rv )
+    {
+        $self->locked( $type );
+    }
+    else
+    {
+        return( $self->error( "Failed to set a lock on semaphore id \"$semid\": $!" ) );
     }
     return( $self );
 }
@@ -352,6 +357,7 @@ sub open
     my $id = shmget( $serial, $opts->{size}, $flags );
     if( defined( $id ) )
     {
+        # Got shared memory
     }
     else
     {
@@ -456,7 +462,9 @@ sub read
     my $first_char = substr( $buffer, 0, 1 );
     my $j = JSON->new->utf8->relaxed->allow_nonref;
     my $data;
-    try
+    local $@;
+    # try-catch
+    eval
     {
         # Does the value have any typical json format? " for a string, { for an hash and [ for an array
         if( $first_char eq '"' || $first_char eq '{' || $first_char eq '[' )
@@ -467,10 +475,10 @@ sub read
         {
             $data = $buffer;
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        $self->error( "An error occured while json decoding data: $e", ( length( $buffer ) <= 1024 ? "\nData is: '$buffer'" : '' ) );
+        $self->error( "An error occured while json decoding data: $@", ( length( $buffer ) <= 1024 ? "\nData is: '$buffer'" : '' ) );
         # Maybe it's a string that starts with '{' or " or [ and triggered an error because it was not actually json data?
         # So we return the data stored as it is
         if( @_ )
@@ -605,13 +613,15 @@ sub write
     my @callinfo = caller;
     my $j = JSON->new->utf8->relaxed->allow_nonref->convert_blessed;
     my $encoded;
-    try
+    local $@;
+    # try-catch
+    eval
     {
         $encoded = $j->encode( $data );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occured json encoding data provided: $e" ) );
+        return( $self->error( "An error occured json encoding data provided: $@" ) );
     }
     
     if( length( $encoded ) > $size )

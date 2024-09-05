@@ -10,3 +10,5 @@
 ^pod2htm
 ^_build/
 ^.git/
+^xt/
+\.sw.$

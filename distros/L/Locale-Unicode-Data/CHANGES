@@ -1,5 +1,16 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.0.0 2024-09-05T15:03:16+0900
+    - Added column is_primary to table timezones and associated documentation
+    - Enabled array field search with the advanced search option 'has'
+    - Corrected a bug in setting the absolute file path to the SQLite database on Windows
+    - Corrected default value for column 'time_allowed' in table time_formats
+    - Added table 'timezones_cities_supplemental' and view 'timezones_cities_extended'
+    - Added method 'extend_timezones_cities'
+    - Updated the 'create_database.pl' script to allow the addition of time zones cities extended data from a JSON file
+    - Updated the documentation for the 'create_database.pl' script
+    - Updated the documentation for Locale::Unicode::Data
+
 v0.2.0 2024-08-18T12:12:26+0900
     - Added more data from CLDR with 5 new tables: metazones, timezones_city, timezones_formats, timezones_names and metazones_names, and their method to support the 'v' and 'V' formatting pattern
     - Improved the documentation

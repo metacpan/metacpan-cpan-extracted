@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Prereqs-From-cpmfile
 
+v0.0.6  2024-09-05 14:59:46 JST
+  - Remove "develop" from default phases
+  - Require perl v5.40
+
 v0.0.5  2023-08-04 07:17:04 JST
   - Use defer
   - Fix usage of Module::cpmfile::Prereqs->walk

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/Notes.pm
-## Version v0.1.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.1.2
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2022/10/21
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,8 +21,7 @@ BEGIN
     # 512Kb
     use constant MAX_SIZE => 524288;
     use Apache2::SSI::SharedMem ':all';
-    use Nice::Try;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -67,11 +66,13 @@ sub do
     return( $self->error( "Code provided ($code) is not actually a code reference." ) ) if( ref( $code ) ne 'CODE' );
     my $data = $self->read_mem || return;
     @keys = sort( keys( %$data ) ) unless( scalar( @keys ) );
+    local $@;
     foreach my $k ( @keys )
     {
         my $k_orig = $k;
         my $v = $data->{ $k };
-        try
+        # try-catch
+        eval
         {
             # Code can modify values in-place like:
             # sub
@@ -81,10 +82,10 @@ sub do
             $code->( $k, $v );
             # Store possibly updated value
             $data->{ $k_orig } = $v;
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "Callback died with error: $e" ) );
+            return( $self->error( "Callback died with error: $@" ) );
         }
     }
     # No need to bother if there was no keys in the first place
@@ -234,7 +235,7 @@ Apache2::SSI::Notes - Apache2 Server Side Include Notes
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

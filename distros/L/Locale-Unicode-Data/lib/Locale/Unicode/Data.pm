@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v0.2.0
+## Version v1.0.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2024/08/05
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## 
@@ -31,7 +31,6 @@ BEGIN
     use JSON;
     use Locale::Unicode v0.3.5;
     use Scalar::Util ();
-    use URI::file ();
     use Want;
     use constant {
         HAS_CONSTANTS => ( version->parse( $DBD::SQLite::VERSION ) >= 1.48 ? 1 : 0 ),
@@ -40,7 +39,7 @@ BEGIN
     our $CLDR_VERSION = '45.0';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v1.0.0';
 };
 
 sub INIT
@@ -49,8 +48,7 @@ sub INIT
     $DB_FILE = File::Spec->catpath( $vol, $parent, 'unicode_cldr.sqlite3' );
     unless( File::Spec->file_name_is_absolute( $DB_FILE ) )
     {
-        my $cwd = URI->new( URI::file->cwd )->file( $^O );
-        $DB_FILE = URI::file->new( $DB_FILE )->abs( $cwd )->file( $^O );
+        $DB_FILE = File::Spec->rel2abs( $DB_FILE );
     }
 };
 
@@ -63,6 +61,7 @@ sub new
     my $self = bless( {} => ( ref( $this ) || $this ) );
     $self->{datafile} = $DB_FILE;
     $self->{decode_sql_arrays} = 1;
+    $self->{extend_timezones_cities} = 1;
     $self->{fatal} = ( $FATAl_EXCEPTIONS // 0 );
     my @args = @_;
     if( scalar( @args ) == 1 &&
@@ -590,6 +589,11 @@ sub error
     }
     return( ref( $self ) ? $self->{error} : $ERROR );
 }
+
+sub extend_timezones_cities { return( shift->_set_get_prop({
+    field   => 'extend_timezones_cities',
+    type    => 'boolean',
+}, @_ ) ); }
 
 sub fatal { return( shift->_set_get_prop( 'fatal', @_ ) ); }
 
@@ -1616,7 +1620,7 @@ sub timezone { return( shift->_fetch_one({
 sub timezones { return( shift->_fetch_all({
     id          => 'timezones',
     table       => 'timezones',
-    by          => [qw( territory region tzid tz_bcpid metazone is_golden )],
+    by          => [qw( territory region tzid tz_bcpid metazone is_golden is_primary is_canonical )],
     has_array   => [qw( alias )],
 }, @_ ) ); }
 
@@ -1671,25 +1675,38 @@ sub timezone_canonical
         {
             $sth->execute( @{$ref->{alias}} );
         } || return( $self->error( "Error executing SQL query '$sth->{Statement}' with statement ID ${sth_id} to retrieve one of " . scalar( @{$ref->{alias}} ) . " timezone(s) information:", ( $@ || $sth->errstr ), " with SQL query: ", $sth->{Statement} ) );
-        $ref = $sth->fetchrow_hashref;
-        return( $ref->{timezone} ) if( $ref->{is_canonical} );
+        my $all = $sth->fetchall_arrayref({});
+        foreach my $this ( @$all )
+        {
+            return( $this->{timezone} ) if( $this->{is_canonical} );
+        }
     }
     return( '' );
 }
 
-sub timezone_city { return( shift->_fetch_one({
-    id          => 'get_timezone_city',
-    field       => 'timezone',
-    table       => 'timezones_cities',
-    requires    => [qw( locale alt )],
-    default     => { alt => undef },
-}, @_ ) ); }
+sub timezone_city
+{
+    my $self = shift( @_ );
+    my $is_extended = $self->extend_timezones_cities;
+    return( $self->_fetch_one({
+        id          => 'get_timezone_city',
+        field       => 'timezone',
+        table       => ( $is_extended ? 'timezones_cities_extended' : 'timezones_cities' ),
+        requires    => [qw( locale alt )],
+        default     => { alt => undef },
+    }, @_ ) );
+}
 
-sub timezones_cities { return( shift->_fetch_all({
-    id          => 'timezones_cities',
-    table       => 'timezones_cities',
-    by          => [qw( locale alt )],
-}, @_ ) ); }
+sub timezones_cities
+{
+    my $self = shift( @_ );
+    my $is_extended = $self->extend_timezones_cities;
+    return( $self->_fetch_all({
+        id          => 'timezones_cities',
+        table       => ( $is_extended ? 'timezones_cities_extended' : 'timezones_cities' ),
+        by          => [qw( locale alt )],
+    }, @_ ) );
+}
 
 sub timezone_formats { return( shift->_fetch_one({
     id          => 'get_timezone_formats',
@@ -2218,19 +2235,59 @@ sub _fetch_all
         push( @$skeleton, "${status} = ?" );
         push( @$by_keys, "=${status}" );
     }
-    # my $by_key = scalar( @$by ) ? join( '_', sort( @$by ) ) : '';
+
+    my( $has, $has_keys, $has_values );
+    if( $opts->{has} && scalar( @$sql_arrays_in ) )
+    {
+        my $has_elems = [];
+        if( ref( $opts->{has} ) eq 'HASH' )
+        {
+            @$has_elems = %{$opts->{has}};
+        }
+        elsif( ref( $opts->{has} ) eq 'ARRAY' )
+        {
+            $has_elems = $opts->{has};
+        }
+        elsif( scalar( @$sql_arrays_in ) == 1 )
+        {
+            $has_elems = [ $sql_arrays_in->[0] => $opts->{has} ];
+        }
+        else
+        {
+            return( $self->error( "There are ", scalar( @$sql_arrays_in ), " fields with array. You need to specify which one you want to check for value '", ( $opts->{has} // 'undef' ), "'" ) );
+        }
+        $has = [];
+        $has_keys = [];
+        $has_values = [];
+        for( my $i = 0; $i < scalar( @$has_elems ); $i += 2 )
+        {
+            my $f = $has_elems->[$i];
+            unless( $f =~ /^[a-zA-z][a-zA-z0-9]+$/ )
+            {
+                return( $self->error( "Invalid field name '${f}' for table '${table}'. It should only contain alpha numeric characters." ) );
+            }
+            push( @$has_keys, $f );
+            push( @$has_values, $has_elems->[$i + 1] );
+            push( @$has, "EXISTS (SELECT * FROM JSON_EACH(${f}) WHERE JSON_EACH.value IS ?)" );
+        }
+    }
+
     my $by_key = scalar( @$by_keys ) ? join( '_', @$by_keys ) : '';
-    my $sth_id = $by_key ? "${id}_with_${by_key}_order_${order}" : "${id}_order_${order}";
+    my $sth_id = $by_key
+        ? "${id}_with_${by_key}" . ( defined( $has ) ? '_has_' . join( '_', @$has_keys ) : '' ) . "_order_${order}"
+        : defined( $has )
+            ? "${id}_with_has_" . join( '_', @$has_keys ) . "_order_${order}"
+            : "${id}_order_${order}";
     local $" = ', ';
     local $@;
-    if( $by_key )
+    if( $by_key || defined( $has ) )
     {
         unless( $sth = $self->_get_cached_statement( $sth_id ) )
         {
             my $dbh = $self->_dbh || return( $self->pass_error );
             $sth = eval
             {
-                $dbh->prepare( "SELECT * FROM ${table} WHERE " . join( ' AND ', @$skeleton ) . " ORDER BY ${order}" )
+                $dbh->prepare( "SELECT * FROM ${table} WHERE " . join( ' AND ', @$skeleton ) . ( defined( $has ) ? ( ( scalar( @$skeleton ) ? ' AND (' : '' ) . join( ' OR ', @$has ) . ( scalar( @$skeleton ) ? ')' : '' ) ) : '' ) . " ORDER BY ${order}" )
             } || return( $self->error( "Unable to prepare SQL query to retrieve all ${what} information for fields @$by: ", ( $@ || $dbh->errstr ) ) );
             $self->_set_cached_statement( $sth_id => $sth );
         }
@@ -2250,7 +2307,7 @@ sub _fetch_all
 
     eval
     {
-        $sth->execute( scalar( @$by_values ) ? @$by_values : () )
+        $sth->execute( ( scalar( @$by_values ) ? @$by_values : () ), ( defined( $has_values ) ? @$has_values : () ) )
     } || return( $self->error( "Error executing SQL query '$sth->{Statement}' to retrieve all ${what}". ( $by_key ? " with fields @$by" : '' ), ": ", ( $@ || $sth->errstr ), " with SQL query: ", $sth->{Statement} ) );
     my $all = $sth->fetchall_arrayref({});
     $self->_decode_utf8( $all ) if( MISSING_AUTO_UTF8_DECODING );
@@ -2635,7 +2692,7 @@ sub FREEZE
     my $self = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
     my $class = CORE::ref( $self );
-    my @keys = qw( datafile decode_sql_arrays );
+    my @keys = qw( datafile decode_sql_arrays fatal );
     my %hash = ();
     @hash{ @keys } = @$self{ @keys };
     # Return an array reference rather than a list so this works with Sereal and CBOR
@@ -3541,6 +3598,8 @@ Locale::Unicode::Data - Unicode CLDR SQL Data
     my $all = $cldr->timezones( metazone => 'Singapore' );
     my $all = $cldr->timezones( is_golden => undef );
     my $all = $cldr->timezones( is_golden => 1 );
+    my $all = $cldr->timezones( is_primary => 1 );
+    my $all = $cldr->timezones( is_canonical => 1 );
     my $ref = $cldr->timezone_city(
         locale => 'fr',
         timezone => 'Asia/Tokyo',
@@ -3661,7 +3720,7 @@ Or, you could set the global variable C<$FATAl_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.2.0
+    v1.0.0
 
 =head1 DESCRIPTION
 
@@ -6110,6 +6169,22 @@ A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Tabl
     $cldr->decode_sql_arrays(1); # on
 
 Sets or gets the boolean value used to specify whether you want this API to automatically decode SQL arrays into perl arrays using L<JSON::XS>
+
+This is set to true by default, upon object instantiation.
+
+=head2 extend_timezones_cities
+
+    my $bool = $cldr->extend_timezones_cities;
+    $cldr->extend_timezones_cities(0); # off
+    $cldr->extend_timezones_cities(1); # on
+
+Sets or gets the boolean value used to specify whether you want to use the time zones cities extended data, if any were added, or not.
+
+To add the time zones cities extended data, see the Unicode CLDR SQLite database script option C<--extended-timezones-cities>
+
+Normally, this SQLite database comes by default with an extended set of time zones cities data for 421 time zones and their main city across 88 locales, courtesy of the GeoNames database, and online work the author of this distribution has performed.
+
+See also the method L<timezone_city|/timezone_city> and L<timezones_cities|/timezones_cities>
 
 This is set to true by default, upon object instantiation.
 
@@ -8585,6 +8660,7 @@ A C<territory> code as can be found in table L<territories|/"Table territories">
         metazone    => 'Japan',
         tz_bcpid    => 'jptyo',
         is_golden   => 1,
+        is_primary  => 0,
         is_preferred => 0,
         is_canonical => 0,
     }
@@ -8631,7 +8707,13 @@ A boolean specifying whether this timezone is a golden timezone.
 
 A C<timezone> is deemed C<golden> if it is specified in the C<CLDR> as part of the L<primaryZones|https://unicode.org/reports/tr35/tr35-dates.html#Primary_Zones> or if the C<timezone> territory is C<001> (World).
 
-As explained in the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>, "[t]he golden zones are those in mapZone supplemental data under the territory "001"."
+As explained in the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>, "[t]he golden zones are those in mapZone supplemental data under the territory C<001>."
+
+=item * C<is_primary>
+
+A boolean specifying whether this timezone is a primary timezone.
+
+As explained in the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Primary_Zones>, this "specifies the dominant zone for a region; this zone should use the region name for its generic location name even though there are other canonical zones available in the same region. For example, C<Asia/Shanghai> is displayed as C<China Time>, instead of C<Shanghai Time>"
 
 =item * C<is_preferred>
 
@@ -8659,6 +8741,8 @@ A boolean specifying whether this timezone is the canonical timezone, since it c
     my $array_ref = $cldr->timezones( metazone => 'Japan' );
     # Returns all the timezones that are 'golden' timezones
     my $array_ref = $cldr->timezones( is_golden => 1 );
+    my $array_ref = $cldr->timezones( is_primary => 1 );
+    my $array_ref = $cldr->timezones( is_canonical => 1 );
 
 Returns all the C<timezone> information as an array reference of hash reference from the L<table timezones|/"Table timezones">
 
@@ -8689,6 +8773,14 @@ A Unicode metazone ID.
 =item * C<is_golden>
 
 A boolean expressing whether this time zone is C<golden> (in Unicode parlance), or not. C<1> for true, and C<0> for false.
+
+=item * C<is_primary>
+
+A boolean specifying whether this timezone is a primary timezone.
+
+=item * C<is_canonical>
+
+A boolean specifying whether this timezone is the canonical timezone, since it can have multiple aliases.
 
 =back
 
@@ -8723,6 +8815,12 @@ If an error occurred, this sets an L<exception object|Locale::Unicode::Data::Exc
     }
 
 Returns an hash reference of a C<timezone> localised exemplar city from the table L<timezones_cities|/"Table timezones_cities"> for a given C<locale> ID, C<timezone> and C<alt> value. If no C<alt> value is provided, it will default to C<undef>
+
+The behaviour of this method is altered depending on whether L<extend_timezones_cities|/extend_timezones_cities> is set to a true boolean value or not. If set to true, this will retrieve the data from the table C<timezones_cities_extended> instead of the C<timezones_cities>
+
+By default, L<extend_timezones_cities|/extend_timezones_cities> is set to true, and the L<Locale::Unicode::Data> distribution comes with an extended set of time zones cities. The default Unicode CLDR data comes only with a minimal set.
+
+This method is especially used to format the pattern characters C<v> and C<V>. See the section on L<Format Patterns|/"Format Patterns"> for more about this.
 
 The meaning of the fields are as follows:
 
@@ -8764,6 +8862,12 @@ Known values are: C<undef> and C<secondary>
     );
 
 Returns all timezone localised representative city name from L<table timezones_cities|/"Table timezones_cities"> as an array reference of hash reference.
+
+The behaviour of this method is altered depending on whether L<extend_timezones_cities|/extend_timezones_cities> is set to a true boolean value or not. If set to true, this will retrieve the data from the table C<timezones_cities_extended> instead of the C<timezones_cities>
+
+By default, L<extend_timezones_cities|/extend_timezones_cities> is set to true, and the L<Locale::Unicode::Data> distribution comes with an extended set of time zones cities. The default Unicode CLDR data comes only with a minimal set.
+
+This method is especially used to format the pattern characters C<v> and C<V>. See the section on L<Format Patterns|/"Format Patterns"> for more about this.
 
 A combination of the following fields may be provided to filter the information returned:
 
@@ -10045,7 +10149,7 @@ Numeric hour (2 digits, zero pad if needed), narrow dayPeriod if used
 
 =back
 
-=item * C<d> day
+=item * C<d> day of month
 
 Day of month (numeric).
 
@@ -10067,7 +10171,7 @@ Numeric: 2 digits, zero pad if needed
 
 =back
 
-=item * C<D> day
+=item * C<D> day of year
 
 The field length specifies the minimum number of digits, with zero-padding as necessary.
 
@@ -11149,6 +11253,43 @@ or, querying the L<calendar terms|/calendar_term>:
     ]
 
 Of course, instead of returning an hash reference, as it normally would, it will return an array reference of hash reference.
+
+You can check if a table field containing an array has a certain value. For example:
+
+    my $all = $cldr->metazones(
+        has => [territories => 'CA'],
+    );
+
+This will return all metazone entries that have the array value C<CA> in the field C<territories>.
+
+You can specify more than one field:
+
+    my $all = $cldr->metazones(
+        has => [territories => 'CA', timezones => 'America/Chicago'],
+    );
+
+You can also use an hash reference instead of an array reference:
+
+    my $all = $cldr->metazones(
+        has => {
+            territories => 'CA',
+            timezones => 'America/Chicago',
+        },
+    );
+
+And if the table contains only one array field, then you do not have tp specify the field name:
+
+    my $all = $cldr->aliases(
+        has => 'America/Toronto',
+    );
+
+This will implicitly use the field C<replacement>. However, if there are more than one array field, and you do not specify which one, then an error will be triggered. For example:
+
+    my $all = $cldr->metazones(
+        has => 'CA',
+    );
+    say $cldr->error->message;
+    # "There are 2 fields with array. You need to specify which one you want to check for value 'CA'"
 
 You can also ensure a certain order based on a field value. For example, you want to retrieve the C<day> terms using L<calendar_term|/calendar_term>, but the C<term_name> are string, and we want to ensure the results are sorted in this order: C<mon>, C<tue>, C<wed>, C<thu>, C<fri>, C<sat> and C<sun>
 
@@ -12777,6 +12918,10 @@ A string field.
 A string field.
 
 =item * C<is_golden>
+
+A boolean field.
+
+=item * C<is_primary>
 
 A boolean field.
 

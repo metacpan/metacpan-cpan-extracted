@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v1.1.2
+## Version v1.1.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/04/06
+## Modified 2024/09/04
 ## All rights reserved
 ## 
 ## 
@@ -81,8 +81,7 @@ BEGIN
         };
     }
     our $PLACEHOLDER_REGEXP = qr/\?(?<index>\d+)/;
-    our $VERSION = 'v1.1.2';
-    use Devel::Confess;
+    our $VERSION = 'v1.1.3';
 };
 
 use strict;
@@ -1430,7 +1429,7 @@ DB::Object::SQLite - DB Object SQLite Driver
     
 =head1 VERSION
 
-    v1.1.2
+    v1.1.3
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## CSS Object Oriented - ~/lib/CSS/Object/Property.pm
-## Version v0.1.1
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/21
-## Modified 2021/04/28
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,8 +18,7 @@ BEGIN
     use parent qw( CSS::Object::Element );
     use CSS::Object::Format;
     use CSS::Object::Value;
-    use Devel::Confess;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.2.0';
 };
 
 sub init
@@ -135,7 +134,7 @@ sub values { return( shift->_set_get_object_array_object( 'values', 'CSS::Object
 sub values_as_string { return( $_[0]->format->values_as_string( $_[0]->values ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -156,7 +155,7 @@ CSS::Object::Property - CSS Object Oriented Property
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.0
 
 =head1 DESCRIPTION
 
