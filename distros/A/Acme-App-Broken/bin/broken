@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+print "The great new Acme::App::Broken!\n";

@@ -6,11 +6,18 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Wrapper around C<Alien::OpenMP> that provides helpful C MACROs and runtime functions",
   "AUTHOR" => "oodler <oodler\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "OpenMP-Simple",
   "LICENSE" => "perl",
@@ -18,7 +25,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Alien::OpenMP" => 0,
     "Inline::C" => 0,
-    "OpenMP::Environment" => 0
+    "OpenMP::Environment" => 0,
+    "Util::H2O::More" => "0.3.4"
   },
   "TEST_REQUIRES" => {
     "Alien::OpenMP" => 0,
@@ -30,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Util::H2O::More" => "0.3.4"
   },
-  "VERSION" => "0.1.2",
+  "VERSION" => "0.1.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,3 +67,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

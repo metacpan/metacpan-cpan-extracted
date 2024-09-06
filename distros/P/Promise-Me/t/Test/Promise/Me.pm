@@ -121,6 +121,7 @@ sub runtest
         {
             diag( "[$medium] -> [$serialiser], [P1] Parameter received is '", overload::StrVal( $_[0] ), "'" ) if( $DEBUG );
             isa_ok( $_[0], ['Module::Generic::File'], "[P1] PID $$: Value passed to then is an object file" );
+            $_[0];
         })->catch(sub
         {
             fail( 'concurrency test 1 with error: ' . $_[0] );
@@ -157,6 +158,7 @@ sub runtest
         })->then(sub
         {
             isa_ok( $_[0], ['Module::Generic::File'], "[P2] PID $$: Value passed to then #2 is an object file" );
+            $_[0];
         })->catch(sub
         {
             fail( 'concurrency test 2 with error: ' . $_[0] );

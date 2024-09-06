@@ -5,7 +5,7 @@
 ## Copyright(c) 2019 Jacques Deguest
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/05/29
-## Modified 2020/05/20
+## Modified 2020/06/13
 ## All rights reserved.
 ## 
 ## This program is free software; you can redistribute it and/or modify it 
@@ -113,6 +113,7 @@ The L<HTTP::Response>
 The size in bytes of the file fetched
 
 =back
+
 =item B<download>(  )
 
 

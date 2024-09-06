@@ -1,0 +1,106 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+our $VERSION = '1.000000';
+
+use Search::Elasticsearch;
+use App::cpm 0.997017 ();
+use App::cpm::CLI     ();
+use Cwd;
+sub execute;
+
+my $bin = shift @ARGV;
+
+if (not $bin) {
+    print "🤗 No binary provided\n";
+    exit 0;
+}
+my $local_lib = getcwd . "/.cpx"; 
+
+# Check if it is already installed (and execute) 
+if (-f "$local_lib/bin/$bin") {
+    print "⚓ Found executable already installed\n";
+    execute($local_lib, $bin);
+}
+
+my $es = Search::Elasticsearch->new(
+        client           => '2_0::Direct',
+        cxn_pool         => 'Static::NoPing',
+        nodes            => 'https://fastapi.metacpan.org/v1',
+        send_get_body_as => 'POST',
+    );
+
+my $files = undef;
+my @hits = ();
+
+# Search MetaCPAN API for script 
+# Try multiple "common" places
+# Suboptimal, but we don't have EXE_FILES from EUMM 
+# nor script_files from MB in CPAN::Meta::Spec
+foreach my $dir ("bin", "scripts", "script", ".") {
+    my $path = "$bin";
+    if ($dir ne ".") {
+        $path = "$dir/" . $path
+    }
+  
+    $files = $es->search(
+        index => 'cpan',
+        type  => 'file',
+        size  => 10,
+        body  => {
+            query => {
+                filtered => {
+                    query  => { match_all => {} },
+                    filter => {
+                and  => [
+                            { term => { 'path'      => "$path"} },
+                            { term => { 'directory' => \0 } },
+                            { term => { 'status' => 'latest' } },
+                        ]
+                    },
+                },
+            },
+        },
+        fields => [ 'release', 'author', 'download_url' ],
+    );
+
+    
+    @hits = @{ $files->{hits}->{hits} };
+    if (scalar @hits > 0) {
+    print "🎯 Found [$dir/$bin]\n";
+        last;
+    }
+}
+
+# We are out of the loop, maybe because we processed all attempts...
+if (scalar @hits < 1) {
+    print "😞 Not found\n";
+    exit -1;
+}   
+
+# Not exited? Assemble informations for installation 
+my $to_install = $hits[0]->{fields}->{download_url};
+print "📦 Release to install [$to_install]\n";
+
+# Install locally with cpm
+print "🔧 Will install into $local_lib\n";
+my $cpm = App::cpm::CLI->new;
+$cpm->run( 'install', "-L$local_lib", $to_install );
+
+
+# The ultimate goal: execute! 
+sub execute {
+    my $ll = shift; # Local Lib
+    my $b = shift; # bin
+
+    if (-f "$ll/bin/$b") {
+    exec "perl", "-Mlocal::lib=$ll", "$ll/bin/$b", @ARGV;
+    } else {
+        print "💀 Executable was found, but not installed correctly\n";
+        exit -1;
+    }
+}
+
+execute($local_lib, $bin);

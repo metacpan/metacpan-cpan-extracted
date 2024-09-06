@@ -16,6 +16,7 @@ use File::Temp ();
 use IO::File ();
 use Data::Dumper ();
 use Exporter 5.57 'import';
+use JSON::PP 'encode_json';
 
 our @EXPORT_OK = qw(undent);
 
@@ -50,8 +51,9 @@ sub reset {
   my %options = @_;
 
   $options{name} ||= 'Simple';
+  my %tempargs = $^O eq 'MSWin32' ? (TMPDIR => 1) : (DIR => File::Spec->curdir, CLEANUP => 1);
   $options{dir} ||= File::Spec->rel2abs(File::Temp::tempdir(
-    DIR => File::Spec->curdir, CLEANUP => 1
+    %tempargs,
   ));
 
   my %data = (
@@ -95,6 +97,8 @@ sub revert {
   }
   $self->_gen_default_filedata;
 }
+
+my $has_cpan_requirements_dynamic = eval { require CPAN::Requirements::Dynamic };
 
 sub _gen_default_filedata {
   my $self = shift;
@@ -153,40 +157,42 @@ sub _gen_default_filedata {
     ok 1;
     ---
 
-  $self->$add_unless('META.json', undent(<<"    ----"));
-	{
-		"name": "Foo-Bar",
-		"version": 0.001,
-		"author": [
-			"David Golden <dagolden\@cpan.org>",
-			"Leon Timmermans <leont\@cpan.org>"
-		],
-		"abstract": "A testing dist",
-		"license": "perl_5",
-		"prereqs": {
-			"configure": {
-				"requires": {
-					"Module::Build::Tiny": 0
-				}
-			},
-			"runtime": {
-				"requires": {
-					"perl": 5.006
-				}
-			}
-		},
-		"generated_by": "Leon Timmermans",
-		"dynamic_config": 1,
-		"meta-spec": {
-			"url": "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-			"version": 2
-		},
-        "x_dynamic_prereqs": {
-			"version": 1,
-			"expressions": [ { "condition": [ "has_perl", "$]"], "prereqs": { "Bar": 1 } } ]
+  my %meta = (
+    name => 'Foo-Bar',
+    version => 0.001,
+    author => [
+      "David Golden <dagolden\@cpan.org>",
+      "Leon Timmermans <leont\@cpan.org>"
+    ],
+    abstract => 'A testing dist',
+    license => 'perl_5',
+    prereqs => {
+      configure => {
+        requires => {
+          'Module::Build::Tiny' => 0
         }
-	  }
-    ----
+      },
+      runtime => {
+        requires => {
+          perl => 5.006
+        }
+      }
+    },
+    generated_by => 'Leon Timmermans',
+    dynamic_config => 1,
+    "meta-spec" => {
+      url => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
+      version => 2
+    },
+  );
+
+  if ($has_cpan_requirements_dynamic) {
+    $meta{x_dynamic_prereqs} = {
+      version => 1,
+      expressions => [ { condition => [ 'has_perl', "$]"], prereqs => { 'Bar' => 1 } } ]
+    };
+  }
+  $self->$add_unless('META.json', encode_json(\%meta));
 }
 
 sub name { shift()->{name} }

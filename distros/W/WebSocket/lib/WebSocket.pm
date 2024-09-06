@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## WebSocket Client & Server - ~/lib/WebSocket.pm
-## Version v0.2.0
+## Version v0.2.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/09/13
-## Modified 2023/04/29
+## Modified 2024/09/05
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ BEGIN
     our %EXPORT_TAGS = ( all => [qw( WS_OK WS_GONE WS_PROTOCOL_ERROR WS_NOT_ACCEPTABLE WS_NO_STATUS WS_CLOSED_ABNORMALLY WS_BAD_MESSAGE WS_FORBIDDEN WS_MESSAGE_TOO_LARGE WS_EXTENSIONS_NOT_AVAILABLE WS_INTERNAL_SERVER_ERROR WS_TLS_HANDSHAKE_FAIL WEBSOCKET_DRAFT_VERSION_DEFAULT )] );
     $EXPORT_TAGS{ws} = $EXPORT_TAGS{all};
     our @EXPORT_OK = qw( WS_OK WS_GONE WS_PROTOCOL_ERROR WS_NOT_ACCEPTABLE WS_NO_STATUS WS_CLOSED_ABNORMALLY WS_BAD_MESSAGE WS_FORBIDDEN WS_MESSAGE_TOO_LARGE WS_EXTENSIONS_NOT_AVAILABLE WS_INTERNAL_SERVER_ERROR WS_TLS_HANDSHAKE_FAIL WEBSOCKET_DRAFT_VERSION_DEFAULT );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 sub init
@@ -82,7 +82,7 @@ WebSocket - WebSocket Client & Server
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

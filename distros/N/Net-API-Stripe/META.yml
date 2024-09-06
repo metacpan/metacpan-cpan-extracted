@@ -25,17 +25,15 @@ requires:
   DateTime: '1.51'
   DateTime::Format::Strptime: '1.76'
   DateTime::TimeZone: '2.36'
-  Devel::Confess: '0.009004'
   Digest::MD5: '2.55'
   Digest::SHA: '6.02'
   Encode: '3.01'
-  HTTP::Promise: v0.3.1
+  HTTP::Promise: v0.5.2
   JSON: '4.02'
   MIME::Base64: '3.15'
   MIME::QuotedPrint: '3.13'
-  Module::Generic: v0.32.5
+  Module::Generic: v0.37.5
   Net::IP: '1.26'
-  Nice::Try: v1.3.5
   Regexp::Common: '2017060201'
   Scalar::Util: '1.54'
   URI::Escape: '3.31'
@@ -51,5 +49,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Net-API-Stripe/issues
   repository: https://gitlab.com/jackdeguest/Net-API-Stripe
-version: v2.0.4
+version: v2.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,12 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Telegram API - ~/lib/Net/API/Telegram/Generic.pm
-## Version v0.100.1
-## Copyright(c) 2019 Jacques Deguest
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.100.2
+## Copyright(c) 2020 Jacques Deguest
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/06/02
-## Modified 2020/05/21
+## Modified 2024/09/05
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Telegram::Generic;
 BEGIN
@@ -20,11 +23,10 @@ BEGIN
     use DateTime::TimeZone;
     use File::Temp;
     use File::Spec;
-    ## For the JSON::true and JSON::false
+    # For the JSON::true and JSON::false
     use JSON;
-    use Nice::Try;
 	use Net::API::Telegram::Number;
-	our( $VERSION ) = 'v0.100.1';
+	our( $VERSION ) = 'v0.100.2';
 };
 
 sub init
@@ -63,14 +65,11 @@ sub as_hash
     	my $this = shift( @_ );
 		if( Scalar::Util::blessed( $this ) )
 		{
-			## $self->_message( 3, "\tvalue to check '$this' is an object of type '", ref( $this ), "'." );
 			#my $ref = $self->{ $k }->as_hash( $anti_loop );
 			#return( $ref );
 			if( $this->can( 'as_hash' ) )
 			{
-				## $self->_message( 3, "\t\tobject can 'as_hash'" );
 				my $h = $this->as_hash( $anti_loop );
-				## $self->_message( 3, "\t\tobject '", ref( $this ), "' returned value is: ", sub{ $self->dumper( $h ) } );
 				return( $h ) if( length( $h ) );
 			}
 			elsif( overload::Overloaded( $this ) )
@@ -88,20 +87,16 @@ sub as_hash
 		}
 		elsif( ref( $this ) eq 'ARRAY' )
 		{
-			## $self->_message( 3, "\tvalue to check '$this' is an array reference." );
 			my $arr = [];
 			foreach my $that ( @$this )
 			{
 				my $v = $crawl->( $that );
-				## $self->_message( 3, "\t\tReturned value to add to array is '$v': ", sub{ $self->dumper( $v ) } );
 				push( @$arr, $v ) if( length( $v ) );
 			}
-			## $self->_messagef( 3, "\treturning %d items in this array.", scalar( @$arr ) );
 			return( $arr );
 		}
 		elsif( ref( $this ) eq 'HASH' )
 		{
-			## $self->_message( 3, "\tvalue to check '$this' is a hash reference." );
 			return( $this ) if( exists( $this->{ $anti_loop } ) );
 			$this->{ $anti_loop }++;
 			my $ref = {};
@@ -113,7 +108,6 @@ sub as_hash
 		}
 		else
 		{
-			## $self->_message( 3, "\tvalue to check '$this' is a scalar, returning it." );
 			return( $this );
 		}
     };
@@ -124,11 +118,9 @@ sub as_hash
     	## Only process keys if their corresponding method exists in their package
     	if( defined( &{ "${class}::${k}" } ) )
     	{
-    		## $self->_message( 3, "Getting data for $k" );
     		if( $self->_is_boolean( $k ) )
     		{
     			$hash->{ $k } = ( $self->{ $k } ? JSON::true : JSON::false );
-    			## $self->_message( 3, "\tvalue set to boolean '$hash->{$k}'" );
     		}
     		else
     		{
@@ -179,7 +171,6 @@ sub _download
 	$uri->path( $uri->path . '/' . $path );
 	my $datadir = File::Spec->tmpdir;
 	my $tmpdir = File::Temp::tempdir( 'telegram-file-XXXXXXX', DIR => $datadir, CLEANUP => $parent->cleanup_temp );
-	##( $fh, $file ) = tempfile( "data-XXXXXXX", SUFFIX => ".${ext}", DIR => $tmpdir );
 	my $filepath = File::Temp::mktemp( "$tmpdir/data-XXXXXXX" );
 	$filepath .= '.' . $opts->{ext} if( $opts->{ext} );
 	my $req = JDev::HTTP::Request->new( 'GET' => $uri );
@@ -248,7 +239,6 @@ sub _instantiate_object
 	return( $self->{ $name } ) if( exists( $self->{ $name } ) && Scalar::Util::blessed( $self->{ $name } ) );
 	my $class = shift( @_ );
 	# print( STDERR __PACKAGE__, "::_instantiate_object() called for name '$name' and class '$class'\n" );
-	# $self->message( 3, "called for name '$name' and class '$class'." );
 	my $this;
 	my $h = 
 	{
@@ -258,22 +248,22 @@ sub _instantiate_object
 	};
 	$h->{_dbh} = $self->{_dbh} if( $self->{_dbh} );
 	my $o;
-	try
+	local $@;
+    # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
+    eval( "require $class;" ) unless( defined( *{"${class}::"} ) );
+    # print( STDERR __PACKAGE__, "::_instantiate_object(): Error while loading module $class? $@\n" );
+    return( $self->error( "Unable to load module $class: $@" ) ) if( $@ );
+	# try-catch
+	eval
 	{
-		## https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
-		eval( "require $class;" ) unless( defined( *{"${class}::"} ) );
-		# print( STDERR __PACKAGE__, "::_instantiate_object(): Error while loading module $class? $@\n" );
-		# $self->message( 3, "Error while loading module $class? $@" );
-		return( $self->error( "Unable to load module $class: $@" ) ) if( $@ );
 		$o = @_ ? $class->new( $h, @_ ) : $class->new( $h );
-		return( $self->pass_error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
-	}
-	catch( $e ) 
+	};
+	if( $@ )
 	{
 		# print( STDERR __PACKAGE__, "::_instantiate_object() An error occured while loading module $class for name '$name': $e\n" );
-		return( $self->error({ code => 500, message => $e }) );
+		return( $self->error({ code => 500, message => $@ }) );
 	}
-	# $self->message( 3, "Returning newly generated object $o with structure: ", $self->dumper( $o ) );
+    return( $self->pass_error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
 	return( $o );
 }
 
@@ -288,7 +278,6 @@ sub _object_type_to_class
 	my $self = shift( @_ );
 	my $type = shift( @_ ) || return( $self->error( "No object type was provided" ) );
 	my $ref  = $Net::API::Telegram::TYPE2CLASS;
-	$self->_messagef( 3, "\$TYPE2CLASS has %d elements", scalar( keys( %$ref ) ) );
 	return( $self->error( "No object type '$type' known to get its related class for field $self->{_field}" ) ) if( !exists( $ref->{ $type } ) );
 	return( $ref->{ $type } );
 }
@@ -406,7 +395,6 @@ sub _set_get_object_array
     	my $arr = [];
     	for( my $i = 0; $i < scalar( @$ref ); $i++ )
     	{
-    		$self->_message( 3, "Calling method $class->$field with value '", $ref->[$i], "'" );
     		## Either the value provided is not defined, and we just instantiate an empty object, or 
     		## the value is a hash and we instantiate a new object with those parameters, or
     		## we have been provided an existing object
@@ -465,7 +453,6 @@ sub _set_get_object_variant
 			my $ref = shift( @_ );
 			my $type = $ref->{ 'object' } || return( $self->error( "No object type could be found in hash: ", sub{ $self->_dumper( $ref ) } ) );
 			my $class = $self->_object_type_to_class( $type );
-			$self->_message( 3, "Object type $type has class $class" );
 			my $o = $self->_instantiate_object( $field, $class, $ref );
 			$self->{ $field } = $o;
 			## return( $class->new( %$ref ) );
@@ -495,4 +482,3 @@ sub _set_get_object_variant
 1;
 
 __END__
-

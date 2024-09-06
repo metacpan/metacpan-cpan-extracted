@@ -265,7 +265,6 @@ sub _append
     my $self = shift( @_ );
     return( $self->pass_error ) if( $self->error );
 
-    # if( ref( $_[0] ) )
     if( $self->_is_object( $_[0] ) && $_[0]->can( 'read' ) )
     {
         $_[0]->read( my $buf, $self->max_message_size );

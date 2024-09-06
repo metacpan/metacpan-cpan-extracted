@@ -5,7 +5,7 @@
 #
 package NOTEDB::binary;
 
-$NOTEDB::binary::VERSION = "1.12";
+$NOTEDB::binary::VERSION = "1.13";
 
 use strict;
 use IO::Seekable;
@@ -451,7 +451,7 @@ NOTEDB::binary - module lib for accessing a notedb from perl
 
 	# get all existing notes
 	%all_notes = $db->get_all();
-	# format of returnes hash like the one from get_search above
+	# format of returns hash like the one from get_search above
 
 	# get the next noteid available
 	$next_num = $db->get_nextnum();
@@ -481,7 +481,7 @@ However, both versions provides identical interfaces, which means, you do
 not need to change your code, if you want to switch to another database format.
 
 Currently, NOTEDB module is only used by note itself. But feel free to use it
-within your own project! Perhaps someone want to implement a webinterface to
+within your own project! Perhaps someone want to implement a web interface to
 note...
 
 =head1 USAGE

@@ -1,11 +1,15 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Person.pm
-## Version v0.201.0
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.201.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2022/10/29
+## Modified 2024/09/05
+## All rights reserved.
 ## 
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Connect::Person;
 BEGIN
@@ -16,8 +20,7 @@ BEGIN
     use vars qw( $VERSION );
     use DateTime;
     use DateTime::Format::Strptime;
-    use Nice::Try;
-    our( $VERSION ) = 'v0.201.0';
+    our( $VERSION ) = 'v0.201.1';
 };
 
 use strict;
@@ -44,7 +47,8 @@ sub dob
     my $self = shift( @_ );
     if( @_ )
     {
-        ## There may be a hash provided with undefined values for each of the properties, so we need to check that
+        local $@;
+        # There may be a hash provided with undefined values for each of the properties, so we need to check that
         my $ref = shift( @_ );
         my $dt;
         if( $self->_is_object( $ref ) && $ref->isa( 'DateTime' ) )
@@ -60,22 +64,24 @@ sub dob
                 return( $self->error( "Hash provided for person date of birth is missing the $k property" ) ) if( !$ref->{ $k } );
             }
             @$ref{ qw( hour minute second ) } = ( 0, 0, 0 );
-            try
+            # try-catch
+            eval
             {
                 $dt = DateTime->new( %$ref );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
                 return( $self->error( "An error occurred while trying to create a datetime object from this person's date of birth (year = '$ref->{year}', month = '$ref->{month}', day = '$ref->{day}'." ) );
             }
         }
         
         my $tz;
-        try
+        # try-catch
+        eval
         {
             $tz = DateTime::TimeZone->new( name => 'local' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
             $tz = DateTime::TimeZone->new( name => 'UTC' );
         }
@@ -178,7 +184,7 @@ See documentation in L<Net::API::Stripe> for example to make api calls to Stripe
 
 =head1 VERSION
 
-    v0.201.0
+    v0.201.1
 
 =head1 DESCRIPTION
 

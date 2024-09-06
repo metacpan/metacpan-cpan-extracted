@@ -593,6 +593,7 @@ The L<HTTP::Response>
 The size in bytes of the file fetched
 
 =back
+
 EOT
 			}
 			elsif( exists( $all_objects->{ $type } ) )

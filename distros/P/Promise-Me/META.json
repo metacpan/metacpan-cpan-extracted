@@ -36,8 +36,8 @@
             "Config" : "0",
             "Errno" : "0",
             "Filter::Util::Call" : "1.59",
-            "Module::Generic" : "v0.35.4",
-            "Nice::Try" : "v1.3.10",
+            "Module::Generic" : "v0.37.5",
+            "Nice::Try" : "v1.3.12",
             "POSIX" : "0",
             "PPI" : "1.278",
             "Scalar::Util" : "1.50",
@@ -72,6 +72,6 @@
          "web" : "https://gitlab.com/jackdeguest/Promise-Me"
       }
    },
-   "version" : "v0.4.11",
+   "version" : "v0.5.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

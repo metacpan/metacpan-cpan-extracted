@@ -1,0 +1,72 @@
+Revision history for Perl module Promise::Me
+
+v0.5.0 2024-09-05T13:11:13+0900
+    - Improved code
+
+v0.4.11 2024-04-25T23:38:38+0900
+    - Minor corrections in resolve to pass the variable $_ to the sub routine called in then()
+    - Improvements allowing embedded promises
+
+v0.4.10 2024-03-22T16:50:25+0900
+    - Improved unit tests
+
+v0.4.9 2024-03-22T14:04:36+0900
+    - Minor correction of untrapped condition
+
+v0.4.8 2023-10-11T21:11:43+0900
+    - Corrected malformed signature for distribution release
+
+v0.4.7 2022-12-22T13:36:21+0900
+    - Corrected the END block when a variable is undefined
+
+v0.4.6 2022-09-28T16:36:48+0900
+    - Attempt at correcting a unit test.
+
+v0.4.5 2022-09-27T14:14:25+0900
+    - Better handling of error upon opening shared memory
+    - Improved unit test
+    - Added the 'tmpdir' parameter when instantiating a new promise, which will be passed to Module::Generic::File::Cache, as required, and the related tmpdir() method.
+    - Improved cleanup in the END block
+
+v0.4.4 2022-08-24T16:31:19+0900
+    - Added new instance argument 'medium' and related method
+    - Better handling of error upon writing to shared memory
+    - Updated documentation for result() method
+
+v0.4.3 2022-08-12T13:28:34+0900
+    - Minor improvement for sleep in test units
+
+v0.4.2 2022-08-07T17:26:03+0900
+    - Improvements in storing shared results, locking resources beforehand
+
+v0.4.1 2022-08-06T13:28:15+0900
+    - Minor improvement in test units
+
+v0.4.0 2022-08-03T19:50:31+0900
+    - Change dependency from Storable to Storable::Improved for improved efficiency and support for glob and XS objects.
+    - Added the object instantiation option "serialiser" and its corresponding method.
+    - Now, can choose interchangeably between CBOR::XS, Sereal or Storable to serialise data
+    - Now, also one can choose interchangeably, between memory, mmap or file as a medium to share data among processes
+    - Improved documentation
+
+v0.3.0 2022-04-07T18:22:58+0900
+    - Added $_ as an array reference containing the code reference for resolve() and reject()
+
+v0.2.2 2022-04-03T05:55:48+0900
+    - Corrected a small bug in _share_vars when falling back to cache file
+
+v0.2.1 2022-03-30T13:51:28+0900
+    - Implemented fallback when shared memory is not available
+
+v0.2.0 2022-03-18T21:26:23+0900
+    - Add support for shared cache file if shared memory is not supported or desired
+    - Corrected a bug when terminating shared variable space in END block
+
+v0.1.2 2021-10-07T22:21:38+0900
+    - Documentation improvement
+
+v0.1.1 2021-06-20T12:11:08+0900
+    - Correcting typos in the documentation
+
+v0.1.0 2021-06-20T10:06:37+0900
+    - initial release

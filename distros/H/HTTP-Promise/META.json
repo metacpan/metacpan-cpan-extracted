@@ -48,8 +48,8 @@
             "IO::File" : "0",
             "JSON" : "4.10",
             "JSON::XS" : "4.03",
-            "Module::Generic" : "v0.35.2",
-            "Promise::Me" : "v0.4.10",
+            "Module::Generic" : "v0.37.5",
+            "Promise::Me" : "v0.5.0",
             "Regexp::Common" : "2017060201",
             "Scalar::Util" : "1.63",
             "Socket" : "2.037",
@@ -88,6 +88,6 @@
          "web" : "https://gitlab.com/jackdeguest/HTTP-Promise"
       }
    },
-   "version" : "v0.5.1",
+   "version" : "v0.5.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

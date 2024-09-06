@@ -1,5 +1,8 @@
 Revision history for Perl module DB::Object
 
+v1.4.3 2024-09-06T17:33:04+0900
+    - Correcting unit test
+
 v1.4.2 2024-09-05T14:30:34+0900
     - Updated dependencies
 

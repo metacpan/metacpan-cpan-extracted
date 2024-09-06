@@ -40,6 +40,7 @@ Förtsch
 Gianni
 Gisle
 Graham
+HOTP
 Herzog
 Heuristic
 Honma
@@ -78,6 +79,7 @@ Miller
 Miyagawa
 OIDs
 OS2
+OTP
 Olaf
 OpenLDAP
 Parkhurst
@@ -104,6 +106,7 @@ Split
 Stosberg
 TCP
 TLS
+TOTP
 Tatsuhiko
 Taylor
 Torsten
@@ -133,6 +136,7 @@ brainbuz
 brian
 capoeirab
 carnil
+cryptographic
 data
 davewood
 ddick
@@ -156,6 +160,7 @@ hakon
 happy
 herrmann
 hiratara
+hotp
 http
 https
 icap
@@ -186,6 +191,7 @@ nntp
 nntps
 oid
 olaf
+otpauth
 perlbotix
 piotr
 pop
@@ -210,6 +216,7 @@ symkat
 telnet
 tn3270
 torsten
+totp
 unicode
 uppercasing
 urn

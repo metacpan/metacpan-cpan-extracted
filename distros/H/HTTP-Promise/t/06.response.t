@@ -25,6 +25,7 @@ $res = HTTP::Promise::Response->new;
 isa_ok( $res => ['HTTP::Promise::Response'] );
 
 # for m in `egrep -E '^sub ([a-z]\w+)' ./lib/HTTP/Promise/Response.pm| awk '{ print $2 }'`; do echo "can_ok( \$res => '$m' );"; done
+# perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$res, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/HTTP/Promise/Response.pm
 can_ok( $res => 'as_string' );
 can_ok( $res => 'base' );
 can_ok( $res => 'clone' );

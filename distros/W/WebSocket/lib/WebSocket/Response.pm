@@ -277,8 +277,9 @@ sub parse
     {
         return(1) unless( defined( $_[0] ) );
         # Add data to buffer
-        # return( $self->pass_error ) unless( $self->_append( @_ ) );
         $self->_append( @_ ) || return( $self->pass_error );
+        # my $rv = $self->_append( @_ );
+        # return( $self->pass_error ) if( !defined( $rv ) );
         unless( $self->buffer->match( qr{^HTTP/1\.1[[:blank:]\h]+101 } ) )
         {
             my $bad_line = ( $self->buffer->length > 80 ? $self->buffer->substr( 0, 77 )->append( '...' ) : $self->buffer );
@@ -391,7 +392,14 @@ sub version
         {
             $v = [split( /[[:blank:]\h]*\,[[:blank:]\h]*/, "$v" )];
         }
-        $self->_set_get_object_array_object( 'version', 'WebSocket::Version', $v );
+        my $ref = [];
+        foreach my $s ( @$v )
+        {
+            my $vers = WebSocket::Version->new( $s ) ||
+                return( WebSocket::Version->error );
+            push( @$ref, $vers );
+        }
+        $self->_set_get_object_array_object( 'version', 'WebSocket::Version', $ref );
     }
     return( $self->_set_get_object_array_object( 'version', 'WebSocket::Version' )->first );
 }

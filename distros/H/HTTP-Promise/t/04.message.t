@@ -26,6 +26,7 @@ $m = HTTP::Promise::Message->new;
 isa_ok( $m => ['HTTP::Promise::Message'] );
 
 # for m in `egrep -E '^sub ([a-z]\w+)' ./lib/HTTP/Promise/Message.pm| awk '{ print $2 }'`; do echo "can_ok( \$m => '$m' );"; done
+# perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$m, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/HTTP/Promise/Message.pm
 can_ok( $m => 'add_content' );
 can_ok( $m => 'add_content_utf8' );
 can_ok( $m => 'add_part' );

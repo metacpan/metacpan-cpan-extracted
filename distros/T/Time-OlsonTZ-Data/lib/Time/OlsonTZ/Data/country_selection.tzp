@@ -2061,15 +2061,10 @@ use strict;
 		alpha2_code => "MN",
 		olson_name => "Mongolia",
 		regions => {
-			"Bayan-Olgiy, Govi-Altai, Hovd, Uvs, Zavkhan" => {
+			"Bayan-Olgii, Hovd, Uvs" => {
 				location_coords => "+4801+09139",
-				olson_description => "Bayan-Olgiy, Govi-Altai, Hovd, Uvs, Zavkhan",
+				olson_description => "Bayan-Olgii, Hovd, Uvs",
 				timezone_name => "Asia/Hovd",
-			},
-			"Dornod, Sukhbaatar" => {
-				location_coords => "+4804+11430",
-				olson_description => "Dornod, Sukhbaatar",
-				timezone_name => "Asia/Choibalsan",
 			},
 			"most of Mongolia" => {
 				location_coords => "+4755+10653",

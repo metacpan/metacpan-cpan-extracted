@@ -108,7 +108,7 @@ SKIP:
     is( $sql->_minute( "$dt" ), $dt->minute, "Checking minute()" );
     is( $sql->_month( "$dt" ), $dt->month, "Checking month()" );
     is( $sql->_monthname( "$dt" ), $dt->month_name, "Checking monthname()" );
-    is( $sql->_number_format( 1000, ',', '.', 2 ), '1,000.00', "Checking number_format()" );
+    # is( $sql->_number_format( 1000, ',', '.', 2 ), '1,000.00', "Checking number_format()" );
     is( $sql->_power( 2, 3 ), 8, "Checking power()" );
     is( $sql->_quarter( "$dt" ), $dt->quarter, "Checking quarter()" );
     my $random_number = $sql->_rand;

@@ -3,7 +3,7 @@
 
 package NOTEDB::pwsafe3;
 
-$NOTEDB::pwsafe3::VERSION = "1.08";
+$NOTEDB::pwsafe3::VERSION = "1.09";
 use strict;
 use Data::Dumper;
 use Time::Local;
@@ -28,7 +28,7 @@ sub new {
     my $self = {};
     bless($self,$class);
 
-    $self->{dbname}  = $param{dbname}   || File::Spec->catfile($ENV{HOME}, ".notedb");
+    $self->{dbname}  = $param{dbname}   || File::Spec->catfile($ENV{HOME}, ".notedb.psafe3");
 
     $self->{mtime}    = $self->get_stat();
     $self->{unread}   = 1;
@@ -568,7 +568,7 @@ NOTEDB::pwsafe3 - module lib for accessing a notedb from perl
 
 	# get all existing notes
 	%all_notes = $db->get_all();
-	# format of returnes hash like the one from get_search above
+	# format of returns hash like the one from get_search above
 
 	# get the next noteid available
 	$next_num = $db->get_nextnum();
@@ -595,7 +595,7 @@ You can use this module for accessing a note database. This backend uses
 a text file for storage and Config::General for accessing the file.
 
 Currently, NOTEDB module is only used by note itself. But feel free to use it
-within your own project! Perhaps someone want to implement a webinterface to
+within your own project! Perhaps someone want to implement a web interface to
 note...
 
 =head1 USAGE

@@ -32,7 +32,7 @@ my $serialiser = 'cbor';
 my $s = Module::Generic::SharedMemXS->new(
 {
     create  => 1,
-    key     => 'pm_' . $$ . $$,
+    key     => 'pm_mem_cbor_' . $$,
     mode    => 0666,
     size    => 10240,
 }) || do

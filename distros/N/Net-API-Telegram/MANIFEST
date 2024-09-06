@@ -1,4 +1,4 @@
-Changes
+CHANGES
 lib/Net/API/Telegram.pm
 lib/Net/API/Telegram/Animation.pm
 lib/Net/API/Telegram/Audio.pm
@@ -40,7 +40,6 @@ lib/Net/API/Telegram/InlineQueryResultLocation.pm
 lib/Net/API/Telegram/InlineQueryResultMpeg4Gif.pm
 lib/Net/API/Telegram/InlineQueryResultPhoto.pm
 lib/Net/API/Telegram/InlineQueryResultVenue.pm
-lib/Net/API/Telegram/InlineQueryResultVideo-fields.txt
 lib/Net/API/Telegram/InlineQueryResultVideo.pm
 lib/Net/API/Telegram/InlineQueryResultVoice.pm
 lib/Net/API/Telegram/InputContactMessageContent.pm
@@ -105,5 +104,8 @@ MANIFEST
 README
 scripts/telegram-doc2perl-methods.pl
 t/001_load.t
+t/002_pod.t
+t/999_kwalitee.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

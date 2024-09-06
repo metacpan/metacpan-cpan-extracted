@@ -23,6 +23,7 @@ my $s = HTTP::Promise::Status->new;
 isa_ok( $s => ['HTTP::Promise::Status'] );
 
 # for m in `egrep -E '^sub ([a-z]\w+)' ./lib/HTTP/Promise/Status.pm| awk '{ print $2 }'`; do echo "can_ok( \$s => '$m' );"; done
+# perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$s, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/HTTP/Promise/Status.pm
 can_ok( $s => 'convert_short_lang_to_long' );
 can_ok( $s => 'is_cacheable_by_default' );
 can_ok( $s => 'is_client_error' );

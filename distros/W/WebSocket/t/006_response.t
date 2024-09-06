@@ -21,13 +21,16 @@ is( $res->error->message => 'Wrong response line. Got "foo", but expected someth
 $res = WebSocket::Response->new( debug => $DEBUG );
 $rv = $res->parse( ( "1234567890" x 10 ) . "\x0d\x0a" );
 ok( !defined( $rv ), 'bad response line (2)' );
-is( $res->error->message => 'Wrong response line. Got "12345678901234567890123456789012345678901234567890123456789012345678901234567...", but expected something starting with "HTTP/1.1 101 "', 'bad response error (2)' );
+my $err = $res->error;
+# is( $res->error->message => 'Wrong response line. Got "12345678901234567890123456789012345678901234567890123456789012345678901234567...", but expected something starting with "HTTP/1.1 101 "', 'bad response error (2)' );
+is( $err->message => 'Wrong response line. Got "12345678901234567890123456789012345678901234567890123456789012345678901234567...", but expected something starting with "HTTP/1.1 101 "', 'bad response error (2)' );
 
 local $WebSocket::Common::MAX_MESSAGE_SIZE = 1024;
 
 $res = WebSocket::Response->new( debug => $DEBUG );
 $rv = $res->parse( 'x' x ( 1024 * 10 ) );
 ok( !defined( $rv ), 'response data too big' );
+diag( "Return value is '${rv}'" ) if( defined( $rv ) );
 is( $res->error->message => 'Message is too long', 'response lines too big error' );
 
 done_testing();

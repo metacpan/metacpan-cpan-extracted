@@ -1,5 +1,5 @@
 package Module::Build::Tiny;
-$Module::Build::Tiny::VERSION = '0.050';
+$Module::Build::Tiny::VERSION = '0.051';
 use strict;
 use warnings;
 use Exporter 5.57 'import';
@@ -219,7 +219,7 @@ Module::Build::Tiny - A tiny replacement for Module::Build
 
 =head1 VERSION
 
-version 0.050
+version 0.051
 
 =head1 SYNOPSIS
 

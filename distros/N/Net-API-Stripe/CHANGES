@@ -1,5 +1,8 @@
 Revision history for Perl module Net::API::Stripe
 
+v2.0.5 2024-09-05T21:51:03+0900
+    - Updated dependencies
+
 v2.0.4 2023-10-11T20:35:52+0900
     - Corrected malformed signature for distribution release
 

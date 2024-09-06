@@ -1,5 +1,8 @@
 Revision history for Perl module HTTP::Promise
 
+v0.5.2 2024-09-05T21:07:34+0900
+    - Updated dependencies
+
 v0.5.1 2024-03-27T16:53:48+0900
     - Minor correction of undefined variable in HTTP::Promise
     - Correcting minor bug in _read_body() in HTTP::Promise

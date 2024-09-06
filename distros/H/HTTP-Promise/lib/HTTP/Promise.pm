@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.5.1
+## Version v0.5.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2024/02/27
+## Modified 2024/09/05
 ## All rights reserved.
 ## 
 ## 
@@ -59,7 +59,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.5.1';
+    our $VERSION = 'v0.5.2';
 };
 
 use strict;
@@ -901,6 +901,7 @@ sub request
             ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ),
             ( defined( $self->{medium} ) ? ( medium => $self->{medium} ) : () ),
             ( defined( $self->{shared_mem_size} ) ? ( result_shared_mem_size => $self->{shared_mem_size} ) : () ),
+            ( defined( $opts->{promise_debug} ) ? ( debug => $opts->{promise_debug} ) : () ),
         }) || return( $self->pass_error( Promise::Me->error ) );
         return( $prom );
     }
@@ -929,7 +930,6 @@ sub send
     # my $timeout = time() + $self->timeout;
     my $timeout = $self->timeout;
     my $uri = $req->uri;
-    # my ($scheme, $username, $password, $host, $port, $path_query);
     if( !$uri->scheme )
     {
         $uri->scheme( 'http' );
@@ -1149,6 +1149,7 @@ sub send
             $self->_load_class( 'Crypt::Misc' ) || return( $self->pass_error );
             my $authorization = 'Basic ' . Crypt::Misc::encode_b64( "${unescape_username}:${unescape_password}" );
             $headers->header( Authorization => 'Basic ' . $authorization );
+            $uri->userinfo( undef );
         }
 
         # set Cookie header
@@ -2305,7 +2306,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.5.1
+    v0.5.2
 
 =head1 DESCRIPTION
 

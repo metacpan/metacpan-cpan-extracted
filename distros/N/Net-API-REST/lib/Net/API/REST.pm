@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v1.2.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.2.3
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2024/02/09
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,7 +25,6 @@ BEGIN
     use Apache2::Reload;
     use JSON::PP ();
     use Regexp::Common;
-    use Devel::Confess;
     use Scalar::Util ();
     # use Crypt::JWT;
     # 2019-09-26
@@ -40,7 +39,7 @@ BEGIN
     use Net::API::REST::Request;
     use Net::API::REST::Response;
     use Apache2::API::Status;
-    $VERSION = 'v1.2.1';
+    $VERSION = 'v1.2.3';
 };
 
 use strict;
@@ -145,11 +144,12 @@ sub handler : method
         debug       => $debug,
         request     => $req,
         response    => $resp,
-    ) || do
+    );
+    if( !defined( $self ) )
     {
         $r->log_error( "Error instantiating a new $class object: ", $class->error );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-    };
+    }
     
     if( my $code = $self->log_handler )
     {
@@ -287,7 +287,7 @@ sub handler : method
     }
     elsif( !$ep->is_method_allowed( $http_meth ) )
     {
-        return( Apache2::Const::HTTP_METHOD_NOT_ALLOWED );
+        return( $self->reply({ code => Apache2::Const::HTTP_METHOD_NOT_ALLOWED }) );
     }
     else
     {
@@ -1610,7 +1610,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v1.2.1
+    v1.2.3
 
 =head1 DESCRIPTION
 

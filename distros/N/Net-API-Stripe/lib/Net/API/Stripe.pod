@@ -82,7 +82,7 @@ Other methods are describe below and the parameters they take are documented in 
 
 =head1 VERSION
 
-    v2.0.4
+    v2.0.5
 
 =head1 DESCRIPTION
 

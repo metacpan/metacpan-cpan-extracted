@@ -1,51 +1,47 @@
-  # note 1.3.13        -*- sh -*- 
-  #
-  # This is a sample config for the note script
-  # There are useful defaults set in note itself.
-  # 
-  # Copy it to your $HOME as .noterc
-  #
-  # note is Copyright (c) 1999-2013 Thomas Linden. 
-  # You can contact me per email: <tom at linden dot at>
-  #
-  # Comments start with #, empty lines will be ignored.
-  #
-  # To turn on an option, set it to: 1, on or yes
-  # To turn off an option, set it to: 0, off or no
-  #
-  # An option consists of an atribute-value pair separated
-  # by minimum one space (more spaces and/or tabs are allowed)
-  # and an optional equal sign in between.
-  #
-  # Variable names are case in-sensitive.
-  #
-  # Refer to the manpage to learn more about the config
+# note 1.4.1        -*- conf -*- 
+#
+# This  is a  sample  config  for the  note  script  There are  useful
+# defaults set in note itself.
+# 
+# Copy it to your $HOME as .noterc
+#
+# Comments start with #, empty lines will be ignored.
+#
+# To turn on an option, set it to: 1, on or yes
+# To turn off an option, set it to: 0, off or no
+#
+# An option  consists of an  atribute-value pair separated  by minimum
+# one  space (more  spaces and/or  tabs are  allowed) and  an optional
+# equal sign in between.
+#
+# Variable names are case in-sensitive.
+#
+# Refer to the manpage to learn more about the config
 
   
 
 
-  #
-  # you need to decide which database backend you want
-  # to use. Please refer to the corresponding documentation
-  # for closer information about the certain backend!
-  # Currently supported types: "binary", "dbm", "mysql",
-  # "general", "dumper", "pwsafe3" or "text".
-  # You must also edit/uncomment one section below for the
-  # backend you want to use!
+#
+# you need  to decide which database  backend you want to  use. Please
+# refer  to the  corresponding  documentation  for closer  information
+# about  the certain  backend!  Currently  supported types:  "binary",
+# "dbm", "mysql", "general", "dumper",  "pwsafe3" or "text".  You must
+# also edit/uncomment  one section below  for the backend you  want to
+# use!
 dbdriver = binary
 
 
 
-  #
-  # BINARY backend (the default)
+#
+# BINARY backend (the default)
 binary::dbname       = ~/.notedb     # filename
 binary::MaxNoteByte  = 4096          # max bytes per note entry
 binary::MaxTimeByte  = 64            # max bytes for the date
 
 
 
-  #
-  # MYSQL backend
+#
+# MYSQL backend
 mysql::dbhost          = localhost   # hostname
 mysql::dbport          = 3306        # tcp port
 mysql::dbuser          = you         # db login
@@ -55,152 +51,146 @@ mysql::encrypt_passwd  = 0           # mysql::dbpasswd is
                                      # encrypted (note --encrypt)
 
 
-  #
-  # DBM backend
-dbm::directory = ~/.notedbm          # directory
+#
+# DBM backend
+dbm::directory = ~/.notedb.dbm
 
 
 
-  #
-  # GENERAL backend
-general::dbname = ~/.notedb          # filename
+#
+# GENERAL backend
+general::dbname = ~/.notedb.txt
 
 
-  #
-  # TEXT backend
-text::dbname = ~/.notedb             # filename
+#
+# TEXT backend
+text::dbname = ~/.notedb.storable
 
 
-  #
-  # DUMPER backend
-dumper::dbname = ~/.notedb             # filename
+#
+# DUMPER backend
+dumper::dbname = ~/.notedb.dumper
 
 
 
-  #
-  # Password Safe v3 backend
-  # Some notes on this one:
-  # This backend maintains encryption itself, which is
-  # mandatory as well. So you'll have to disable encryption
-  # (UseEncryption = NO)!
-  #
-  # The Password Safe v3 file has its own fields for
-  # password and username, which note doesn't have. To be
-  # compatible, the pwsafe3 backend parses the note text
-  # for those fields and stores them accordignly to the db:
-  #
-  # For username field: user|username|login|account|benutzer
-  # For passwd field: password|pass|passwd|kennwort|pw
-  #
-  # If it doesn't find it, it will put empty strings
-  # into the pwsafe3 database.
-  #
-  # The pwsafe3 database can be accessed by Password Safe
-  # (see: http://passwordsafe.sourceforge.net/) or other
-  # tools which support the format (see: 
-  # http://passwordsafe.sourceforge.net/relatedprojects.shtml)
-pwsafe3::dbname = ~/db.psafe3             # filename
+#
+# Password  Safe v3  backend  Some  notes on  this  one: This  backend
+# maintains encryption itself,  which is mandatory as  well. So you'll
+# have to disable encryption (UseEncryption = NO)!
+#
+# The  Password Safe  v3  file has  its own  fields  for password  and
+# username, which  note doesn't  have. To  be compatible,  the pwsafe3
+# backend  parses the  note  text  for those  fields  and stores  them
+# accordignly to the db:
+#
+# For username field: user|username|login|account|benutzer
+# For passwd field: password|pass|passwd|kennwort|pw
+#
+# If it  doesn't find it, it  will put empty strings  into the pwsafe3
+# database.
+#
+# The  pwsafe3  database  can  be  accessed  by  Password  Safe  (see:
+# http://passwordsafe.sourceforge.net/) or  other tools  which support
+# the                           format                           (see:
+# http://passwordsafe.sourceforge.net/relatedprojects.shtml)
+pwsafe3::dbname = ~/.notedb.psafe3
 
 
-  #
-  # You can use encryption with note, that means notes and
-  # timestamps will be stored encrypted. This is supported
-  # by every db-backend.
+#
+# You can  use encryption with  note, that means notes  and timestamps
+# will be stored encrypted. This is supported by every db-backend, but
+# not  the pwsafe3  backend because  this one  has builtin  encryption
+# support.
 UseEncryption = NO
 
 
   
-  #
-  # Specify the encryption protocol. The appropriate perl
-  # module needs to be installed. Possible velues are
-  # IDEA, DES or Blowfish, the default is IDEA.
+#
+# Specify the  encryption protocol. The appropriate  perl module needs
+# to  be installed.  Possible velues  are IDEA,  DES or  Blowfish, the
+# default is IDEA.
 CryptMethod  = IDEA
 
 
   
-  #
-  # You can run note always in interactive mode by simply
-  # typing "note". The default is: YES.
+#
+# You can run note always in interactive mode by simply
+# typing "note". The default is: YES.
 AlwaysInteractive = YES
 
 
 
-  #
-  # In interactive mode, note issues a list command if you 
-  # simply hit enter. By turning this on, it will issue a
-  # longlist command instead if you hit just enter. 
-  # The default is: NO
+#
+# In interactive  mode, note issues a  list command if you  simply hit
+# enter. By turning this on, it  will issue a longlist command instead
+# if you hit just enter.  The default is: NO
 DefaultLong = NO
 
 
 
-  #
-  # You can use an external editor everytime from note instead
-  # of STDIN for creating new notes. The default is: YES
+#
+# You can use an external editor  everytime from note instead of STDIN
+# for creating new notes. The default is: YES
 AlwaysEditor = YES
 
 
 
-  #
-  # By default, note looks in the environment for a variable
-  # $EDITOR or, if this is not the case, for $VISUAL and as
-  # fallback it uses 'vi'.
-  # You can override this by setting this variable here.
+#
+# By default, note looks in the environment for a variable $EDITOR or,
+# if this is not  the case, for $VISUAL and as  fallback it uses 'vi'.
+# You can override this by setting this variable here.
 PreferredEditor = 
 
 
 
-  #
-  # If you don't prefer that note updates the timestamp of a
-  # note after editing, turn this on. It will
-  # keep the original timestamp if this option is set.
-  # The default is: NO
+#
+# If you don't prefer that note  updates the timestamp of a note after
+# editing, turn this  on. It will keep the original  timestamp if this
+# option is set.  The default is: NO
 KeepTimeStamp = NO
 
 
 
-  #
-  # You can specify your own topic separator here.
-  # The default topic separator is a normal slash: "/"
+#
+# You can  specify your own  topic separator here.  The  default topic
+# separator is a normal slash: "/"
 TopicSeparator = /
 
 
 
-  #
-  # The maximum width for displaying a note, in CHARS.
-  # Depends on your screen-size. You can set it to 
-  # "auto", if you wish that note should determine the
-  # available size automatically.
+#
+# The maximum width for displaying a  note, in CHARS.  Depends on your
+# screen-size. You can set it to  "auto", if you wish that note should
+# determine the available size automatically.
 MaxLen = auto
 
 
 
-  #
-  # Turn this off if you dont want note to automatically
-  # clear the screen after displaying something and after
-  # exit. The default is: NO
+#
+# Turn  this off  if you  dont want  note to  automatically clear  the
+# screen after displaying something and after exit. The default is: NO
 AutoClear = NO
 
 
 
-  #
-  # note can use colors for output, turn this of, if
-  # you don't like it, or if your terminal does
-  # not support it. The default is: YES
+#
+# note can use colors for output, turn  this of, if you don't like it,
+# or if your terminal does not support it. The default is: YES
 UseColors = NO
 
 
 
-  #
-  # Color-definitions of the various items. Will only 
-  # take effect, if "UseColors" is turned on!
-  #
-  # The following colors are available:
-  # black, red, green, yellow, blue, magenta, cyan and white.  
-  #
-  # For bold color write it uppercase (BLACK will be bold black).
-  # For underlined color append an underscore (blue_ will be underlined blue).
-  # For inverted color append an "I" (greenI will be inverted green).
+#
+# Color-definitions of  the various items.  Will only take  effect, if
+# "UseColors" is turned on!
+#
+# The following colors are available: black, red, green, yellow, blue,
+# magenta, cyan and white.
+#
+# For bold color  write it uppercase (BLACK will be  bold black).  For
+# underlined  color append  an  underscore (blue_  will be  underlined
+# blue).  For  inverted color append  an "I" (greenI will  be inverted
+# green).
 BorderColor		BLACK
 NumberColor		blue
 NoteColor		green
@@ -209,84 +199,82 @@ TopicColor		BLACK
 
 
   
-  #
-  # Additional to colors, you can also do a little bit of formatting your
-  # notes (bold, underlined, italic) text. The default is: YES.
+#
+# Additional to  colors, you can  also do  a little bit  of formatting
+# your notes (bold, underlined, italic) text. The default is: YES.
 FormatText = NO
 
 
 
-  #
-  # You might specify your own directory for temporary files.
-  # note needs to create some temp files during editing of notes.
-  # You could protect this directory using the command: chmod 700 directory.
-  # The default is: /tmp
+#
+# You  might specify  your own  directory for  temporary files.   note
+# needs to create some temp files  during editing of notes.  You could
+# protect this directory using the  command: chmod 700 directory.  The
+# default is: /tmp
 TempDirectory = ~/tmp
 
 
 
-  #
-  # You can jump to a topic by typing "cd 13" in interactive mode.
-  # The deault is: NO
+#
+# You can jump to a topic by  typing "cd 13" in interactive mode.  The
+# deault is: NO
 ShortCd = YES
 
 
 
-  #
-  # note can use a cached copy of the note database for list/tree/search
-  # this is currently only supported by the binary and the mysql backends,
-  # the general and text backends have an internal cache.
-  # The default is: NO
+#
+# note can use a cached copy of the note database for list/tree/search
+# this  is  currently only  supported  by  the  binary and  the  mysql
+# backends, the general and text backends have an internal cache.  The
+# default is: NO
 Cache = NO
 
 
 
-  #
-  # You can define your very own time format for time stamps
-  # YY   - the last 2 digits of a year
-  # YYYY - year
-  # MM   - month
-  # DD   - day
-  # hh   - hours
-  # mm   - minutes
-  # ss   - seconds
-  # This is the default: (18.10.2000 21:32:08)
+#
+# You can define your very own time format for time stamps
+# YY   - the last 2 digits of a year
+# YYYY - year
+# MM   - month
+# DD   - day
+# hh   - hours
+# mm   - minutes
+# ss   - seconds
+# This is the default: (18.10.2000 21:32:08)
 TimeFormat = DD.MM.YYYY hh:mm:ss 
 
 
 
-  #
-  # You can make note readonly which is useful for database copies
-  # The default is: NO
+#
+# You can make  note readonly which is useful for  database copies The
+# default is: NO
 ReadOnly = NO
 
 
 
-  #
-  # Note may separate titles and topics using horizontal lines when
-  # listing them. You can turn on this behavior by setting
-  # PrintLines to YES.
-  # The default is: NO
+#
+# Note  may separate  titles and  topics using  horizontal lines  when
+# listing them. You can turn on this behavior by setting PrintLines to
+# YES.  The default is: NO
 PrintLines = NO
 
 
 
-  #
-  # Add a hash to identify notes. Such a hash will persist several
-  # importy/export cycles and makes each single note unique.
+#
+# Add  a hash  to identify  notes. Such  a hash  will persist  several
+# importy/export cycles and makes each single note unique.
 AddTicket = NO
 
 
-  #
-  # Show an entry on startup. If you want it, create such an entry
-  # and supply its number here
+#
+# Show an entry on  startup. If you want it, create  such an entry and
+# supply its number here
 motd = 
 
 
-  #
-  #
-  # That's all about it for now.
-  # If you still have any questiosn, please feel free to contact
-  # me by email: Thomas Linden <tom at linden dot at>
-  #
-  #
+#
+# Enable JSON formatted backups. The option will be removed in version
+# 1.5 and become  the only available option.  In  earlier versions: if
+# unset or set to NO, YAML will be used.
+UseJSON = YES
+

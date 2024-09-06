@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Generic.pm
-## Version v0.101.0
+## Version v0.101.1
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/12/02
-## All rights reserved
+## Modified 2024/09/05
+## All rights reserved.
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -18,10 +19,8 @@ BEGIN
     use parent qw( Module::Generic );
     use Module::Generic::Exception;
     use vars qw( $VERSION );
-    use Nice::Try;
-    use Devel::Confess;
     use Want;
-    our( $VERSION ) = 'v0.101.0';
+    our( $VERSION ) = 'v0.101.1';
 };
 
 use strict;
@@ -61,12 +60,12 @@ sub _address_populate
     # No 'state' property
     my $map =
     {
-    line1 => 'line1',
-    line2 => 'line2',
-    city => 'city',
-    state => 'state',
-    postal_code => 'zip',
-    country => 'country',
+        line1 => 'line1',
+        line2 => 'line2',
+        city => 'city',
+        state => 'state',
+        postal_code => 'zip',
+        country => 'country',
     };
     if( $self->_is_hash( $addr ) )
     {
@@ -150,7 +149,9 @@ sub _instantiate_object
     };
     $h->{_dbh} = $self->{_dbh} if( $self->{_dbh} );
     my $o;
-    try
+    local $@;
+    # try-catch
+    my $rv = eval
     {
         # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
         # my $class_file = join( '/', split( /::/, $class ) ) . '.pm';
@@ -163,6 +164,7 @@ sub _instantiate_object
 #       {
 #           my $rc = eval( "require $class;" );
 #       }
+        local $@;
         my $rc = eval{ $self->_load_class( $class ); };
         # print( STDERR __PACKAGE__, "::_instantiate_object(): Error while loading module $class? $@\n" );
         return( $self->error( "Unable to load module $class: $@" ) ) if( $@ );
@@ -177,12 +179,17 @@ sub _instantiate_object
         {
             $o = @_ ? $class->new( $h, @_ ) : $class->new( $h );
         }
-        return( $self->pass_error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
-    }
-    catch( $e ) 
+        return( $o );
+    };
+    if( $@ )
     {
-        return( $self->error({ code => 500, message => $e }) );
+        return( $self->error({ code => 500, message => $@ }) );
     }
+    elsif( !defined( $rv ) )
+    {
+        return( $self->pass_error );
+    }
+    return( $self->pass_error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
     return( $o );
 }
 
@@ -380,7 +387,7 @@ Net::API::Stripe::Generic - A Stripe Generic Module
 
 =head1 VERSION
 
-    v0.101.0
+    v0.101.1
 
 =head1 DESCRIPTION
 

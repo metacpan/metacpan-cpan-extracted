@@ -8,7 +8,6 @@ BEGIN
     use JSON;
     use Module::Generic::File qw( cwd file tempfile );
     use Scalar::Util qw( reftype );
-    use Nice::Try;
     use_ok( 'Text::PO' ) || BAIL_OUT( "Cannot load Test::PO" );
     our $DEBUG = 0;
 };
@@ -25,14 +24,16 @@ my $ref = $po->as_hash;
 is( reftype( $ref ), 'HASH', 'as_hash' );
 is( scalar( keys( %$ref ) ), 8, 'as_hash returns 8 elements' );
 my $json = $po->as_json;
-try
+local $@;
+# try-catch
+eval
 {
     my $data = JSON->new->allow_nonref->decode( $json );
     is( reftype( $data ), 'HASH', 'as_json' );
-}
-catch($e)
+};
+if( $@ )
 {
-    diag( "Decoding json data produced an error: $e" );
+    diag( "Decoding json data produced an error: $@" );
     fail( 'as_json' );
 }
 

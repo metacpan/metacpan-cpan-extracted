@@ -262,6 +262,7 @@ sub parse_body
         $self->challenge( $challenge );
     }
     return( $self->error( "Excessive unknown data found in request body: ", $self->buffer->scalar ) ) if( $self->buffer->length );
+    # return( $self->error( "Message is too long" ) ) if( $self->buffer->length );
     $self->is_done(1);
     
     if( !$self->{_parse_postprocessed} && $self->is_done )

@@ -1,0 +1,29 @@
+NAME
+    Devel::Cover::Report::Codecov::Service::GithubActions - gather env vars
+    from Github Actions for Codecov report
+
+DESCRIPTION
+    Glue between Devel::Cover::Report::Codecov and Github Actions.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-devel-cover-report-codecov-service-githubac
+    tions/issues>.
+
+SEE ALSO
+    Devel::Cover::Report::Codecov.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2024 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

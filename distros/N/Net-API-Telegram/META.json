@@ -4,7 +4,7 @@
       "Jacques Deguest (jack@deguest.jp)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,7 +38,6 @@
             "Data::UUID" : "1.224",
             "DateTime" : "1.51",
             "DateTime::TimeZone" : "2.36",
-            "Devel::Confess" : "0.009004",
             "Devel::StackTrace" : "2.04",
             "Encode" : "3.01",
             "Errno" : "1.30",
@@ -58,22 +57,35 @@
             "IO::File" : "1.41",
             "JSON" : "4.02",
             "LWP::UserAgent" : "6.39",
-            "Module::Generic" : "v0.11.6",
+            "Module::Generic" : "v0.37.5",
             "Net::IP" : "1.26",
-            "Nice::Try" : "v0.1.2",
             "Number::Format" : "1.75",
             "POSIX" : "1.88",
             "Scalar::Util" : "1.54",
-            "Test::Simple" : "0.44",
             "Time::HiRes" : "1.9760",
             "constant" : "0",
             "parent" : "0",
-            "perl" : "5.006000",
+            "perl" : "5.016000",
             "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.600.1",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/jackdeguest/Net-API-Telegram/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://gitlab.com/jackdeguest/Net-API-Telegram"
+      }
+   },
+   "version" : "v0.600.3",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

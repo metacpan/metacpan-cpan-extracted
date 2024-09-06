@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 58;
+plan tests => 59;
 
 my @module_files = (
     'URI.pm',
@@ -51,6 +51,7 @@ my @module_files = (
     'URI/news.pm',
     'URI/nntp.pm',
     'URI/nntps.pm',
+    'URI/otpauth.pm',
     'URI/pop.pm',
     'URI/rlogin.pm',
     'URI/rsync.pm',

@@ -1,0 +1,111 @@
+Revision history for Perl module Net::API::REST
+
+v1.2.3 2024-09-05T21:23:31+0900
+    - Updated dependencies
+
+v1.2.2 2024-02-22T19:03:02+0900
+    - Minor correction in handler when returning a 405 error
+
+v1.2.1 2024-02-09T15:39:56+0900
+    - Minor correction in Net::API::REST::JWT
+
+v1.2.0 2023-12-04T15:41:23+0900
+    - Added the '_params' property in endpoints definitions accessible as the method 'params' in Net::API::Rest::Endpoint
+
+v1.1.0 2023-11-19T09:03:58+0900
+    - Improved code
+
+v1.0.2 2023-10-11T20:34:58+0900
+    - Corrected malformed signature for distribution release
+
+v1.0.1 2023-06-10T19:56:22+0900
+    - Minor documentation update
+    - Minor enhancement of method in Net::API::REST::Endpoint
+    - Correcting missing method variables() in Net::API::REST::Request
+
+v1.0.0 2023-06-10T15:49:55+0900
+    - Major design change by inheriting from Apache2::API for a lot of the methods and focusing here on the RESTful related ones.
+
+v0.8.1 2023-03-24T16:24:44+0900
+    - Changing approach in method reply() in Net::API::REST for post-response callback using $r->pool->cleanup_register
+    - Corrected method route() for using per HTTP method class method, such as _get => My::Module->list
+    - Corrected method variables() in class Net::API::REST::Endpoint to use the right support method.
+
+v0.8.0 2023-01-05T12:01:28+0900
+    - Adding support in method reply() in Net::API::REST for Text::PO::String and its 'locale' value, if set
+
+v0.7.3 2023-01-04T16:18:44+0900
+    - Correcting minor oversight in handling pre-flight check with OPTIONS when _delete, _get, _head, _post, _put are used.
+
+v0.7.2 2023-01-04T15:17:41+0900
+    - Corrected bug overlooking multiple implicit supported HTTP methods declaration in method route() in Net::API::REST
+
+v0.7.1 2023-01-01T18:14:23+0900
+    - Ensured method is set in upper case when request handler is _delete, _get, _head, _post, _put
+
+v0.7.0 2022-12-28T19:27:25+0900
+    - Added support for multiple HTTP methods for one endpoint with
+    - Corrected a missing check on whether an HTTP method is supported for an endpoint.
+      It was there for the OPTIONS preflight check, but not for the actual request.
+
+v0.6.4 2022-06-29T07:23:49+0900
+    - Improved quality with more strict code
+
+v0.6.3 2022-06-28T19:59:22+0900
+    - Added method is_allowed() in Net::API::REST to check early on if an ip is allowed to access the REST api.
+    - Added documentation and added Apache constants to Net::API::REST::Status
+    - Added methods escape, unescape, uri_escape and uri_unescape in Net::API::REST::Response
+    - Added handlers to check allowance for various attributes, such as network, api access before calling endpoint code
+    - Added check for request content-type if provided against supported content-type. See <https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html>
+    - Added an option to set a size limit for payload sent to the server using the perl option Net_API_REST_MAX_SIZE in Apache configuration. See data method in Net::API::REST::Request.
+    - Minor improvement to accept array as object in Net::API::REST, Net::API::REST::Request and Net::API::REST::Response
+    - Improvement in print() in autoloading data-compressing library
+    - Added package Net::API::REST::RC to represent a return code and message
+    - Updated route() and routes() to check for method capability only using class ( $cl->can( $meth) ) rather than object
+    - Added methods parse_date, str2datetime, str2time, time2datetime, time2str pointing to their equivalent in Net::API::REST::DateTime for backward compatibility
+
+v0.6.2 2020-12-11T20:15:03+0900
+    - Modified jwt_encode to allow to pass additional parameters accepted by Net::API::REST::JWT::jwt_encode
+    - Updated the as_string method in Net::API::REST::Cookies which required a domain to be set
+    - Added methods acceptable, dnt, document_uri, gateway_interface, is_secure, mod_perl, mod_perl_version, redirect_error_notes, redirect_query_string, redirect_status, redirect_url, remote_port, request_uri, script_filename, script_name, script_uri, script_url, server_addr, server_protocol, server_signature and server_software to Net::API::REST::Request
+    - Correcting an inaccurate, albeit working, call to Encode in encode_utf8 and decode_utf8 in Net::API::REST
+
+v0.6.1 2020-10-07T23:22:04+0900
+
+v0.6.0 2020-06-15T00:13:42+0900
+    - Added Net::API::REST::Request::Params and Net::API::Rest::Request::Upload to handle uploaded data and provide full access to the underlying Apache APR::Request methods
+    - Added method decode and encode for url-encoded data in Net::API::REST::Request and Net::API::REST::Response and decode_url and encode_url to Net::API::REST
+    - Added new method apr for easy access to Net::API::REST::Request::Params
+    - Added new method param to access Net::API::REST::Request::Params param method
+    - Added method uploads to return an array reference of all Net::API::REST::Request::Upload object matching upload fields
+    - Added method subnet_of to check if current connection socket address is a subnet of the provided ip or block of ips
+
+v0.5.9 2020-06-13T16:51:22+0900
+    - Implemented Net::API::REST::Query to implement a workaround to URI::Query version 0.16 bug RT #132815 for its lack of utf8 decoding on query strings.
+
+v0.5.8 2020-06-13T15:54:57+0900
+    - Updated Net::API::REST::Request to implement a workaround to URI::Query version 0.16 bug RT #132815 for its lack of utf8 decoding on query strings.
+
+v0.5.7 2020-06-04T09:35:53+0900
+    - Added method args in Net::API::REST::Request for convenience with Apache2::Request args method for those used to call it.
+
+v0.5.6 2020-05-21T08:04:00+0900
+    - Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020
+
+v0.5.5 2020-05-16T18:33:00+0900
+    - Making minor corrections
+    - Changing version numbering
+    - Requiring Devel::Declare maximum version 0.006019 because more recent version breaks TryCatch
+
+v0.5.4 2020-04-14T16:42:00+0900
+
+v0.5.3 2020-03-26T15:17:00+0900
+
+v0.5.2 2019-12-13T19:41:00+0900
+
+v0.5.1 2020-12-11T23:24:00+0900
+
+v0.4.0 2019-11-13T16:25:43+0900
+
+v0.1.0 2019-09-07T13:55:17+0900
+    - original version; created by ExtUtils::ModuleMaker 0.63

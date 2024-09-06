@@ -2,8 +2,17 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 
-# Call 'perldoc ExtUtils::MakeMaker' for details of how to influence
-# the contents of the Makefile that is written.
+sub MY::distsignature
+{
+    return << 'EOT';
+distsignature : distmeta
+	$(NOECHO) ./dev/cleanup.pl
+	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }' \
+	  -e '	  or die "Could not add SIGNATURE to MANIFEST: $${'\''@'\''}"' --
+	$(NOECHO) cd $(DISTVNAME) && $(TOUCH) SIGNATURE
+	cd $(DISTVNAME) && cpansign -s
+EOT
+}
 
 my %WriteMakefileArgs = (
     NAME                => 'WebSocket',
@@ -12,36 +21,36 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM       => 'lib/WebSocket.pm',
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
-        'constant'      => 0,
-        'overload'      => 0,
-        'parent'        => 0,
-        'strict'        => '0.238',
-        'vars'          => 0,
-        'warnings'      => '1.44',
-        'Config'        => 0,
-        'Digest::MD5'   => '2.58',
-        'Digest::SHA'   => '6.02',
-        'Encode'        => '3.08',
-        'HTTP::Headers' => '6.22',
-        'HTTP::Request' => '6.22',
-        'HTTP::Response'=> '6.22',
-        'HTTP::Status'  => '6.22',
-        'IO::Select'    => '1.41',
-        'IO::Socket'    => '1.42',
-        'IO::Socket::INET' => '1.41',
-        'JSON'          => '4.03',
-        'List::Util'    => '1.56',
-        'MIME::Base64'  => '3.16',
-        'Module::Generic'=> 'v0.32.4',
-        'Nice::Try'     => 'v1.1.2',
-        'POSIX'         => '1.53_01',
+        'constant'          => 0,
+        'overload'          => 0,
+        'parent'            => 0,
+        'strict'            => '0.238',
+        'vars'              => 0,
+        'warnings'          => '1.44',
+        'Config'            => 0,
+        'Digest::MD5'       => '2.58',
+        'Digest::SHA'       => '6.02',
+        'Encode'            => '3.08',
+        'HTTP::Headers'     => '6.22',
+        'HTTP::Request'     => '6.22',
+        'HTTP::Response'    => '6.22',
+        'HTTP::Status'      => '6.22',
+        'IO::Select'        => '1.41',
+        'IO::Socket'        => '1.42',
+        'IO::Socket::INET'  => '1.41',
+        'JSON'              => '4.03',
+        'List::Util'        => '1.56',
+        'MIME::Base64'      => '3.16',
+        'Module::Generic'   => 'v0.37.5',
+        'Nice::Try'         => 'v1.3.13',
+        'POSIX'             => '1.53_01',
         # Just to ensure URI::_generic does not die when requiring it
-        'Regexp::IPv6'  => 0,
-        'Scalar::Util'  => '1.56',
-        'Socket'        => '2.031',
-        'URI'           => '5.09',
-        'URI::ws'       => '0.03',
-        'Want'          => '0.29',
+        'Regexp::IPv6'      => 0,
+        'Scalar::Util'      => '1.56',
+        'Socket'            => '2.031',
+        'URI'               => '5.21',
+        'URI::ws'           => '0.03',
+        'Want'              => '0.29',
     },
     TEST_REQUIRES =>
     {
@@ -56,7 +65,7 @@ my %WriteMakefileArgs = (
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => 'v5.14.0',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp', PREOP => './dev/cleanup.pl' },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
     clean               => { FILES => 'WebSocket-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },

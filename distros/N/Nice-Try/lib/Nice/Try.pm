@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.12
+## Version v1.3.13
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2024/09/02
+## Modified 2024/09/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.3.12';
+    our $VERSION = 'v1.3.13';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -770,8 +770,13 @@ if( \$INC{'threads.pm'} && !CORE::exists( \$INC{'forks.pm'} ) )
     \$Nice::Try::THREADED = threads->tid;
 }
 CORE::local \$Nice::Try::WANT;
-CORE::local ( \$Nice::Try::EXCEPTION, \$Nice::Try::DIED, \$Nice::Try::CATCH_DIED, \@Nice::Try::RETVAL, \@Nice::Try::VOID );
+CORE::local ( \$Nice::Try::EXCEPTION, \$Nice::Try::DIED, \$Nice::Try::CATCH_DIED, \@Nice::Try::RETVAL, \@Nice::Try::VOID, \$Nice::Try::RETURN );
 CORE::local \$Nice::Try::WANTARRAY = CORE::wantarray;
+CORE::local \$Nice::Try::RETURN = sub
+{
+    \$Nice::Try::NEED_TO_RETURN++;
+    return( wantarray() ? \@_ : \$_[0] );
+};
 EOT
             if( !$self->{is_tied} && !$self->{dont_want} && !$self->{is_overloaded} )
             {
@@ -1600,6 +1605,61 @@ sub _process_loop_breaks
             }
             next;
         }
+        elsif( $class eq 'PPI::Token::Word' && 
+               ( $e->content // '' ) eq 'return' &&
+               $e->sprevious_sibling &&
+               # Should be enough
+               $e->sprevious_sibling->class eq 'PPI::Token::Operator' )
+               # $e->sprevious_sibling->class eq 'PPI::Token::Operator' &&
+               # ( $e->sprevious_sibling->content // '' ) =~ /^$/ )
+        {
+            my $break_code;
+            my @to_remove;
+            # return( # something );
+            if( $e->snext_sibling &&
+                $e->snext_sibling->class eq 'PPI::Structure::List' )
+            {
+                my $list = $e->snext_sibling;
+                push( @to_remove, $list );
+                $break_code = "return( \$Nice::Try::RETURN->${list} )";
+            }
+            # return( "" ) or return( '' )
+            elsif( $e->snext_sibling && 
+                   $e->snext_sibling->isa( 'PPI::Token::Quote' ) )
+            {
+                my $list = $e->snext_sibling;
+                push( @to_remove, $list );
+                $break_code = "return( \$Nice::Try::RETURN->(${list}) );";
+            }
+            # return;
+            elsif( $e->snext_sibling && 
+                   $e->snext_sibling->class eq 'PPI::Token::Structure' &&
+                   $e->snext_sibling->content eq ';' )
+            {
+                $break_code = "return( \$Nice::Try::RETURN->() );";
+            }
+            else
+            {
+                my $list = '';
+                my $next_elem;
+                my $prev_elem = $e;
+                while( $next_elem = $prev_elem->snext_sibling )
+                {
+                    last if( $next_elem->content eq ';' );
+                    $list .= $next_elem->content;
+                    push( @to_remove, $next_elem );
+                    $prev_elem = $next_elem;
+                }
+                $break_code = "return( \$Nice::Try::RETURN->(${list}) );";
+            }
+            my $break_doc = PPI::Document->new( \$break_code, readonly => 1 );
+            my $new_elem = $break_doc->first_element;
+            $new_elem->remove;
+            $self->_message( 5, "New element is object '", sub{ overload::StrVal( $new_elem ) }, "' -> $new_elem" ) if( $self->{debug} >= 5 );
+            # Not yet implemented as of 2021-05-11 dixit PPI, so we use a hack to make it available anyhow
+            $e->replace( $new_elem );
+            $_->remove for( @to_remove );
+        }
         
         if( $e->can('elements') && $e->elements )
         {
@@ -2102,7 +2162,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.12
+    v1.3.13
 
 =head1 DESCRIPTION
 

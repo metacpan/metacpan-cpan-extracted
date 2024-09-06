@@ -8,7 +8,6 @@ mysql/README
 VERSION
 config/rc
 config/noterc
-install.sh
 README
 UPGRADE
 note.pod

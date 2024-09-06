@@ -51,5 +51,5 @@
 		"zone1970.tab",
 		"zonenow.tab",
 	],
-	version => "2024a",
+	version => "2024b",
 }

@@ -37,6 +37,7 @@ do { my $x = {
                                       'Data::Dumper' => '0',
                                       'Encode' => '0',
                                       'Exporter' => '5.57',
+                                      'MIME::Base32' => '0',
                                       'MIME::Base64' => '2',
                                       'Net::Domain' => '0',
                                       'Scalar::Util' => '0',

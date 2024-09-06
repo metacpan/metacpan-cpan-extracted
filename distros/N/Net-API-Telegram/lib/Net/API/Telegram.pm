@@ -1,12 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Telegram API - ~/lib/Net/API/Telegram.pm
-## Version v0.600.1
-## Copyright(c) 2020 Jacques Deguest
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.600.3
+## Copyright(c) 2024 Jacques Deguest
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/05/29
-## Modified 2020/05/21
+## Modified 2024/09/06
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Telegram;
 BEGIN
@@ -22,7 +25,6 @@ BEGIN
 	use Data::UUID;
 	use JSON;
 	use Encode ();
-	use Nice::Try;
 	use File::Map;
 	use Class::Struct qw( struct );
 	use Devel::StackTrace;
@@ -38,15 +40,14 @@ BEGIN
 	use HTTP::Request;
 	use HTTP::Request::Common;
 	use HTTP::Response;
-	## We load Net::API::Telegram::Update because we test the existence of its methods for the setup of handlers
+	# We load Net::API::Telegram::Update because we test the existence of its methods for the setup of handlers
 	use Net::API::Telegram::Update;
-	use Devel::Confess;
-    our( $VERSION ) = 'v0.600.1';
+    our( $VERSION ) = 'v0.600.3';
 	use constant TELEGRAM_BASE_API_URI => 'https://api.telegram.org/bot';
 	use constant TELEGRAM_DL_FILE_URI => 'https://api.telegram.org/file/bot';
-	## We do not use the port 80 or 880 by default, because they are commonly used for other things
+	# We do not use the port 80 or 880 by default, because they are commonly used for other things
 	use constant DEFAULT_PORT => 8443;
-	## 50Mb
+	# 50Mb
 	use constant FILE_MAX_SIZE => 52428800;
 };
 
@@ -150,7 +151,6 @@ sub init
 	$self->{ 'http_response' } = '';
 	$self->authorised_ips( $self->{authorised_ips} ) if( $self->{authorised_ips} && ref( $self->{authorised_ips} ) eq 'ARRAY' );
 	## Customisation
-	$self->message( 3, "Initialising webhook..." ) if( $self->{webhook} );
 	$self->webhook( $self->{webhook} );
 	return( $self );
 }
@@ -198,7 +198,6 @@ sub authorised_ips
 					return( '' );
 				};
 			}
-			$self->messagef( 3, "IP block provided has %d IP addresses, starts with %s and ends with %s", $ip->size, $ip->ip, $ip->last_ip );
 			foreach my $existing_ip ( @$ips )
 			{
 				## We found an existing ip same as the one we are adding, so we skip
@@ -252,9 +251,6 @@ sub cleanup
 {
 	my $self = shift( @_ );
     my( $pack, $file, $line ) = caller;
-    $self->message( 3, "Called from package $pack in file $file at line $line" );
-	$self->message( 3, "Cleaning up call from pid $$..." );
-	$self->message( 3, "This is", ( $$ == $self->{pid} ? '' : ' not' ), " the parent process with pid $$." );
 	## Wrap it up within 5 seconds max
 	alarm( 5 );
 	eval
@@ -265,7 +261,6 @@ sub cleanup
 	alarm( 0 );
 	if( $@ =~ /timeout/i )
 	{
-		$self->message( 1, "Timeout when cleaning up before exiting." );
 	}
 	return( $self );
 }
@@ -288,15 +283,17 @@ sub conf_file
 		$fh->binmode( ':utf8' );
 		my $data = join( '', $fh->getlines );
 		$fh->close;
-		try
+		local $@;
+		# try-catch
+		eval
 		{
 			my $json = JSON->new->relaxed->decode( $data );
 			$self->{conf_data} = $json;
 			$self->{conf_file} = $file;
-		}
-		catch( $e )
+		};
+		if( $@ )
 		{
-			return( $self->error( "An error occured while json decoding configuration file $file: $e" ) );
+			return( $self->error( "An error occured while json decoding configuration file $file: $@" ) );
 		}
 	}
 	return( $self->{conf_data} );
@@ -317,13 +314,14 @@ sub data2json
 		$data =~ s/\"\[|\]\"//gs;
 	}
 	my $json;
-	try
+	local $@;
+	# try-catch
+	eval
 	{
 		$json = $self->json->decode( $data );
-	}
-	catch( $e )
+	};
+	if( $@ )
 	{
-		$self->message( 3, "An error occured while trying to decode json: $e" );
 		my $tmpdir = $self->temp_dir;
 		my $file = File::Temp::mktemp( "$tmpdir/json-XXXXXXX" );
 		$file .= '.js';
@@ -333,7 +331,7 @@ sub data2json
 		$io->print( $data ) || return( $self->error( "Unable to write data to json file $file: $!" ) );
 		$io->close;
 		chmod( 0666, $file );
-		return( $self->error( sprintf( "An error occured while attempting to parse %d bytes of data into json: $e\nFailed raw data was saved in file $file", length( $data ) ) ) );
+		return( $self->error( sprintf( "An error occured while attempting to parse %d bytes of data into json: $@\nFailed raw data was saved in file $file", length( $data ) ) ) );
 	}
 	return( $json );
 }
@@ -397,7 +395,6 @@ sub launch_daemon
 {
 	my $self = shift( @_ );
 	my( $pack, $file, $line ) = caller;
-	$self->message( 3, "Called from package $pack in file $file at line $line" );
 	my $params = 
 	{
 		LocalPort => $self->{port} || DEFAULT_PORT,
@@ -409,7 +406,6 @@ sub launch_daemon
 	my $httpd;
 	if( $self->{use_ssl} )
 	{
-		$self->message( 3, "Launching the HTTP ssl daemon with parameters ", sub{ $self->dumper( $params ) } );
 		return( $self->error( "No ssl key specified." ) ) if( !$self->{ssl_key} );
 		return( $self->error( "No ssl certificate specified." ) ) if( !$self->{ssl_cert} );
 		return( $self->error( "SSL key specified $self->{ssl_key} does not exist." ) ) if( !-e( $self->{ssl_key} ) );
@@ -422,7 +418,6 @@ sub launch_daemon
 	}
 	else
 	{
-		$self->message( 3, "Launching the HTTP daemon with parameters ", sub{ $self->dumper( $params ) } );
 		$httpd = HTTP::Daemon->new( %$params ) || return( $self->error( "Could not launch the HTTP daemon: $!" ) );
 		#$httpd = HTTP::Daemon->new( %$params ) || return( $self->error( "Could not launch the HTTP daemon: $!" ) );
 	}
@@ -445,9 +440,7 @@ sub log
 		}
 	}
     my @msg  = @_;
-    # $self->message( 1, @msg ) if( -t( STDIN ) );
     my( $pack, $file, $line ) = caller;
-    $self->message( 3, "Called from package $pack in file $file at line $line" );
     my @time = localtime();
     my $tz = DateTime::TimeZone->new( 'name' => 'local' );
     my $dt = DateTime->from_epoch( epoch => time(), time_zone => $tz->name );
@@ -475,12 +468,10 @@ sub log
         	$log_io->printf( "${stamp}: %s\n", $msg->text ) || return( $self->error( "Unable to print to log file $self->{log_file}: $!" ) );
         }
         $stamp .= "<$name> " if( $msg->chat->title );
-        $self->messagef( 1, "${stamp}: %s", $msg->text );
     } 
     else 
     {
     	my $msg = join( '', @_ );
-        $self->message( 1, "${stamp}: $msg" );
     }
     return( $self );
 }
@@ -532,7 +523,7 @@ sub query
 		if( Scalar::Util::blessed( $data->{certificate} ) )
 		{
 			my $obj = $data->{certificate};
-			return( $self->error( "File object is not an Net::API::Telegram::InputFile object." ) ) if( !$obj->isa( 'Net::API::Telegram::InputFile' ) );
+			return( $self->error( "File object is not an Net::API::Telegram::InputFile object." ) ) if( $self->_is_object( $obj ) && !$obj->isa( 'Net::API::Telegram::InputFile' ) );
 			$baseName = $obj->filename || 'certificate.pem';
 			$cert = $obj->content;
 		}
@@ -552,9 +543,7 @@ sub query
 	{
 		if( $self->{encode_with_json} )
 		{
-			$self->message( 3, "Encapsulating query using json payload" );
 			my $payload = $self->json->utf8->encode( $data );
-			$self->message( 3, "Payload is now: $payload" );
 			$headers->header( 'Content-Type' => 'application/json; charset=utf-8' );
 			$req = HTTP::Request->new( 'POST', $uri, $headers, $payload );
 		}
@@ -584,24 +573,21 @@ sub query
 		}
 	}
 	$req->header( 'Accept' => 'application/json' );
-	$self->message( 3, "Post request is: ", $req->as_string );
 	my $agent = $self->agent;
-	try
+	local $@;
+	# try-catch
+	my $rv = eval
 	{
         $resp = $agent->request( $req );
-        $self->{ 'http_request' } = $req;
-        $self->{ 'http_response' } = $resp;
-        ## if( $resp->code == 200 ) 
+        $self->{http_request} = $req;
+        $self->{http_response} = $resp;
         if( $resp->is_success )
         {
-        	$self->message( 3, "Request successful, decoding its content" );
             my $hash = $self->json->utf8->decode( $resp->decoded_content );
-            $self->message( 3, "Returning $hash: ", sub{ $self->dumper( $hash ) } );
             return( $hash );
         }
         else 
         {
-        	$self->messagef( 3, "Request failed with error %s", $resp->message );
             if( $resp->header( 'Content_Type' ) =~ m{text/html} ) 
             {
                 return( $sef->error({
@@ -613,24 +599,26 @@ sub query
             else 
             {
                 my $hash = $self->json->utf8->decode( $resp->decoded_content );
-                $self->message( 3, "Error returned by Telegram is: ", sub{ $self->dumper( $hash ) } );
-                $self->message( 3, "Creating error from Telegram error $hash->{description}" );
                 $hash->{message} = delete( $hash->{description} );
                 $hash->{code} = delete( $hash->{error_code} );
-                return( $self->error( $hash->{ 'error' } // $hash ) );
+                return( $self->error( $hash->{error} // $hash ) );
             }
         }
-	}
-	catch
+	};
+	if( $@ )
 	{
-		$self->message( 3, "Returning error $_" );
         return( $self->error({
 			'type' => "Could not decode HTTP response: $_", 
 			$resp
 				? ( 'message' => $resp->status_line . ' - ' . $resp->content )
 				: (),
         }) );
-	};
+	}
+	elsif( !defined( $rv ) )
+	{
+	    return( $self->pass_error );
+	}
+	return( $rv );
 }
 
 sub start 
@@ -668,7 +656,6 @@ sub start
     local $SIG{ 'INT' } = sub
     {
 		my $sig = @_;
-		$self->message( 3, "Called with signal $sig" );
     	$self->cleanup;
     	exit( 0 );
     };
@@ -678,7 +665,6 @@ sub start
     local $SIG{ '__DIE__' } = sub
     {
 		my( $pack, $file, $line ) = caller;
-		$self->message( 3, "Fatal error triggered from package $pack in file $file at line $line" );
 		$self->error( join( '', @_  ) );
 		my $trace = $self->error->trace;
     	$self->log( "Fatal error, terminating. ", @_, "\n$trace\n" );
@@ -700,7 +686,6 @@ sub start
 	elsif( $self->{skip_past_messages} < 0 )
 	{
 		$check_messages_after = $start->clone->subtract( seconds => abs( $self->{skip_past_messages} ) );
-		$self->message( 3, "Will check messages only from $check_messages_after onward" );
 	}
 	my $handlers = $self->{ '_handlers' };
 	
@@ -718,7 +703,6 @@ sub start
 	my $log_io = $self->{_log_io};
     if( $self->{webhook} )
     {
-    	$self->message( 3, "Starting the daemon using webhook" );
     	return( $self->error( "HTTP daemon object is gone!" ) ) if( !$httpd );
     	#my $uri = URI->new( ( $self->{use_ssl} ? 'https' : 'http' ) . '://' . $self->{host} );
     	my $uri = URI->new( $httpd->url );
@@ -736,15 +720,13 @@ sub start
     	{
 			$uri->port( $self->port );
     	}
-    	$self->message( 3, "Webhook path is: $self->{webhook_path}" );
     	$uri->path( ( $self->{external_path} ? $self->{external_path} : '' ) . $self->{webhook_path} );
     	$self->{webhook_uri} = $uri;
     	$self->{pid} = $$;
-    	$self->message( 3, "Accepting webhooks connections on port $self->{port} with uri $uri from pid $$" );
     	my $params = 
     	{
     		url => $uri,
-    		## Simultaneous connections. Since this is not threaded, we accept only one
+    		# Simultaneous connections. Since this is not threaded, we accept only one
     		max_connections => ( $self->{max_connections} || 1 ),
     	};
     	if( $self->{use_ssl} && $self->{ssl_cert} )
@@ -771,8 +753,6 @@ sub start
 				warn( "Error on accept: $!\n" );
 				next;
 			};
-			## XXX Temporary
-			# $client->debug( 3 );
         	
 			$client->autoflush( 1 );
 			my $pid = POSIX::getpid();
@@ -825,12 +805,10 @@ sub start
 					{
 						$remote_addr = Net::IP->new( Socket::inet_ntoa( $client->peeraddr ) );
 					}
-					$self->message( 3, "Connection received from $remote_addr" );
 					## First Check the IP
 					if( !$ip_check )
 					{
 						$ip_check++;
-						$self->messagef( 3, "Remote address is: '%s'.", $remote_addr->ip );
 						my $ok_ips = $self->authorised_ips;
 						if( scalar( @$ok_ips ) )
 						{
@@ -860,22 +838,18 @@ sub start
 						last;
 					}
 					## We need to send back a reply to Telegram quicly or Telegram will issue a "read timeout" error and will re-send the message
-					$self->message( 3, "Returning http code 200 to Telegram." );
 					$client->send_response( HTTP::Response->new( 200 ) );
 					my $res = $self->data2json( $req->decoded_content );
 					$client->close();
 					
-					$self->message( 3, "Data received: ", sub{ $self->dumper( $res ) } );
 					my $upd = $self->_response_to_object( 'Net::API::Telegram::Update', $res ) || do
 					{
-						$self->message( 1, "Error trying to instantiate object Net::API::Telegram::Update: ", $self->error->message );
 						$self->error( "Could not create a Net::API::Telegram::Update with following data: " . $self->dumper( $res ) );
 						$client->send_response( HTTP::Response->new( 500 ) );
 						next;
 					};
 					## Get the Webhook information for possible error
 					my $info = $self->getWebhookInfo;
-					$self->messagef( 3, "WebHookInfo returned:\nallowed_updates: %s\nhas_custom_certificate: %s\nlast_error_date: %s\nlast_error_message: %s\nmax_connections: %s\npending_update_count: %s\nurl: %s", $info->allowed_updates, $info->has_custom_certificate, $info->last_error_date, $info->last_error_message, $info->max_connections, $info->pending_update_count, $info->url );
 					if( length( $info->last_error_message ) )
 					{
 						my $err_time = $info->last_error_date;
@@ -889,14 +863,12 @@ sub start
 						my $msg = $upd->message;
 						$self->log( $msg );
 						## return( $msg );
-						$self->message( 3, "Checking for handler." );
 						foreach my $k ( keys( %$res ) )
 						{
 							next if( !exists( $handlers->{ $k } ) );
 							my $v = $upd->$k;
 							my $code = $handlers->{ $k };
 							next if( ref( $code ) ne 'CODE' );
-							$self->message( 3, "Calling handler $k" );
 							alarm( $self->{timeout} );
 							eval
 							{
@@ -920,7 +892,6 @@ sub start
 							if( $@ =~ /timeout/i )
 							{
 								## $client->send_response( HTTP::Response->new( 504 ) );
-								$self->message( 3, "Timeout while calling handler $k" );
 								warn( "Timeout while calling handler $k\n" );
 								next REQUEST;
 							}
@@ -928,7 +899,6 @@ sub start
 							{
 								$self->error( $@ );
 								my $trace = $self->error->trace;
-								$self->message( 3, "Error while calling handler $k: $trace" );
 								## $client->send_response( HTTP::Response->new( 500 ) );
 								warn( "Error while calling handler $k: $@\n" );
 								next REQUEST;
@@ -948,17 +918,14 @@ sub start
         }
 		my $interval = Time::HiRes::tv_interval( $start_time );
 		my( $user, $system, $cuser, $csystem ) = CORE::times();
-		$self->message( 3, "Webhook http daemon took user time $user and system time $system. It took $interval seconds." );
     }
     else 
     {
-    	$self->message( 3, "Starting the polling." );
     	my $start_time = [Time::HiRes::gettimeofday()];
     	my $poll_interval = ( $self->{poll_interval} || 10 );
         POLL: while( 1 ) 
         {
         	last if( $self->{_stop_polling} );
-        	$self->message( 3, "Fetching update with office $self->{offset}" );
             my $all = $self->getUpdates( offset => $self->{offset} ) || do
             {
             	$self->error( "Error while trying to get update: ", $self->error->message );
@@ -966,18 +933,15 @@ sub start
             	next;
             };
 #             my $results = $res->{result};
-#             $self->message( 3, "Result received frm Telegram: ", sub{ $self->dumper( $results ) } );
 #             my $all = $self->_response_array_to_object( 'Net::API::Telegram::Update', $results ) || do
 #             {
 #             	$self->error( "Unable to get the objects for data received: ", sub{ $self->dumper( $results ) } );
 #             	next;
 #             };
-            $self->messagef( 3, "Found %d updates received.", scalar( @$all ) );
             REQUEST: foreach my $upd ( @$all )
             {
                 $self->{offset} = $upd->update_id + 1;
                 my $msg_epoch = $upd->message->date if( $upd->message );
-            	$self->messagef( 3, "Checking update id %s with time $msg_epoch", $upd->update_id );
                 if( !$self->{skip_past_messages} || 
                 	( $check_messages_after && $msg_epoch && $msg_epoch > $check_messages_after ) || 
                 	( $msg_epoch && $msg_epoch > $start ) )
@@ -985,14 +949,12 @@ sub start
                     my $msg = $upd->message;
                     $self->log( $msg );
                     ## return( $msg );
-                    $self->message( 3, "Checking for handler." );
                     foreach my $k ( keys( %$res ) )
                     {
                     	next if( !exists( $handlers->{ $k } ) );
                     	my $v = $upd->$k;
                     	my $code = $handlers->{ $k };
                     	next if( ref( $code ) ne 'CODE' );
-                    	$self->message( 3, "Calling handler $k" );
                     	alarm( $self->{timeout} );
                     	eval
                     	{
@@ -1017,19 +979,16 @@ sub start
                     	}
                     	elsif( $@ )
                     	{
-                    		$self->message( 3, "Error while calling handler: $@" );
                     		next REQUEST;
                     	}
                     }
                 } 
             }
             ## Sleep a few before doing next query
-            $self->message( 3, "Sleeping $poll_interval seconds." );
             sleep( $poll_interval );
         }
 		my $interval = Time::HiRes::tv_interval( $start_time );
 		my( $user, $system, $cuser, $csystem ) = CORE::times();
-		$self->message( 3, "Polling took user time $user and system time $system. It took $interval seconds." );
     }
     return;
 }
@@ -1080,7 +1039,6 @@ sub webhook
 		$self->{webhook} = $v;
 		if( $v )
 		{
-			$self->message( 3, "Launching daemon..." );
 			$self->launch_daemon if( !$self->{ 'httpd' } );
 			$self->{webhook_path} = '/' . lc( $self->generate_uuid );
 		}
@@ -2133,7 +2091,7 @@ sub sendMessage
 	my $hash = $self->query({
 		'method' => 'sendMessage',
 		'data' => $form,
-	}) || return( $self->error( "Unable to make post query for method sendMessage: ", $self->error->message ) );
+	}) || return( $self->error( "Unable to make post query for method sendMessage: ", $self->error ) );
 	if( my $t_error = $self->_has_telegram_error( $hash ) )
 	{
 		return( $self->error( $t_error ) );
@@ -2718,7 +2676,6 @@ sub _has_telegram_error
 	my $desc = $hash->{description};
 	my $code = $hash->{error_code};
 	my $o = Net::API::Telegram::Error->new;
-	$o->message( $desc );
 	$o->code( $code );
 	if( exists( $hash->{parameters} ) && ref( $hash->{parameters} ) eq 'HASH' )
 	{
@@ -2726,7 +2683,6 @@ sub _has_telegram_error
 		{
 			$desc .= ' ' if( length( $desc ) );
 			$desc .= sprintf( 'Retry after %d seconds', $hash->{parameters}->{retry_after} );
-			$o->message( $desc );
 			$o->retry_after( $hash->{parameters}->{retry_after} );
 		}
 	}
@@ -2800,29 +2756,23 @@ sub _options2form
 	local $crawl = sub
 	{
 		my $this = shift( @_ );
-		## $self->message( 3, "\tChecking '$this'" );
 		if( Scalar::Util::blessed( $this ) )
 		{
 			$this->debug( $self->debug ) if( ref( $this ) =~ /Net::API::Telegram::/ && $this->can( 'debug' ) );
-			## $self->message( 3, "'$this' is a blessed object." );
 			if( $this->can( 'as_hash' ) )
 			{
-				## $self->message( 3, "'$this' can do as_hash: ", sub{ $self->dumper( $this ) } );
 				return( $this->as_hash( $opt_anti_loop ) );
 			}
 			elsif( overload::Overloaded( $this ) )
 			{
-				## $self->message( 3, "'$this' is overloaded. Returning '$this'." );
 				return( "$this" );
 			}
 			elsif( $this->can( 'as_string' ) )
 			{
-				## $self->message( 3, "'$this' can do as_string()." );
 				return( $this->as_string );
 			}
 			else
 			{
-				## $self->message( 3, "Clueless what to do with '$this'." );
 				warn( "Warning: do not know what to do with this object '$this'. It does not support as_hash, as_string and is not overloaded.\n" );
 			}
 		}
@@ -2855,12 +2805,10 @@ sub _options2form
 		## Not an object, a hash, an array. It's got to be a scalar...
 		else
 		{
-			## $self->message( 3, "\tReturning scalar '$this'." );
 			return( $this );
 		}
 	};
 	
-	$self->message( 3, "Provided options data is: ", sub{ $self->dumper( $opts ) } );
 	foreach my $k ( keys( %$opts ) )
 	{
 		if( length( $opts->{ $k } ) )
@@ -2868,7 +2816,6 @@ sub _options2form
 			$form->{ $k } = $crawl->( $opts->{ $k } );
 		}
 	}
-	$self->message( 3, "Resulting form data is: ", sub{ $self->dumper( $form ) } );
 	return( $form );
 }
 
@@ -2914,18 +2861,18 @@ sub _response_to_object
 	my $class = shift( @_ );
 	my $hash  = shift( @_ ) || return( $self->error( "No hash was provided" ) );
 	return( $self->error( "Hash provided ($hash) is not a hash reference." ) ) if( $hash && ref( $hash ) ne 'HASH' );
-	$self->message( 3, "Called for class $class with hash $hash" );
 	$self->_load( [ $class ] ) || return( undef() );
 	my $o;
-	try
+	local $@;
+	# try-catch
+	eval
 	{
 		$o = $class->new( $self, $hash );
-	}
-	catch( $e )
+	};
+	if( $@ )
 	{
-		return( $self->error( "Canot instantiate object for class $class: $e" ) );
+		return( $self->error( "Canot instantiate object for class $class: $@" ) );
 	}
-	$self->message( 3, "Returning object $o for class $class" );
 	return( $o );
 }
 
@@ -2935,21 +2882,22 @@ sub _response_array_to_object
 	my $class = shift( @_ );
 	my $arr   = shift( @_ ) || return( $self->error( "No array reference was provided" ) );
 	return( $self->error( "Array provided ($arr) is not an array reference." ) ) if( $arr && ref( $arr ) ne 'ARRAY' );
-	$self->message( 3, "Called for class $class with array $arr" );
 	$self->_load( [ $class ] ) || return( undef() );
 	my $all = [];
+	local $@;
 	foreach my $ref ( @$arr )
 	{
 		if( ref( $ref ) eq 'HASH' )
 		{
 			my $o;
-			try
+			# try-catch
+			eval
 			{
 				$o = $class->new( $self, $ref );
-			}
-			catch( $e )
+			};
+			if( $@ )
 			{
-				return( $self->error( "Unable to instantiate an object of class $class: $e" ) );
+				return( $self->error( "Unable to instantiate an object of class $class: $@" ) );
 			}
 			push( @$all, $o );
 		}
@@ -2965,10 +2913,6 @@ sub _response_array_to_object
 # {
 # 	my $self = shift( @_ );
 #     my( $pack, $file, $line ) = caller;
-#     $self->message( 3, "Called from package $pack in file $file at line $line" );
-# 	$self->message( 3, "Cleaning up call from pid $$..." );
-# 	$self->message( 3, "Pid $$ is a child pid. We don't cleanup." ) if( exists( $CHILDREN->{ $$ } ) );
-# 	$self->message( 3, "Current children pid registered are: ", join( ', ', sort( keys( %$CHILDREN ) ) ) );
 # 	$self->cleanup unless( exists( $CHILDREN->{ $$ } ) );
 # 	## Wrap it up within 5 seconds max
 # 	alarm( 5 );
@@ -2980,7 +2924,6 @@ sub _response_array_to_object
 # 	alarm( 0 );
 # 	if( $@ =~ /timeout/i )
 # 	{
-# 		$self->message( 1, "Timeout when cleaning up before exiting." );
 # 	}
 # };
 
@@ -3000,7 +2943,7 @@ Net::API::Telegram - Telegram Bot Interface
 		debug => $DEBUG,
 		webhook => 1,
 		## This would contain a token property with the Telegram api token
-		config_file => "./settings.json",
+		conf_file => "./settings.json",
 		## Since we are testing, we want to process even old messages
 		skip_past_messages => -86400,
 		# use_ssl => 1,
@@ -3024,13 +2967,13 @@ Net::API::Telegram - Telegram Bot Interface
 
 =head1 VERSION
 
-This is version v0.600.1
+This is version v0.600.3
 
 =head1 DESCRIPTION
 
 L<Net::API::Telegram> is a powerful and yet simple interface to Telegram Bot api.
 
-L<Net::API::Telegram> inherits from L<Module::Generic> and all its module excepted for L<Net::API::Telegram::Generic> and L<Net::API::Telegram::Number> are aut generated base don Telegram api online documentation.
+L<Net::API::Telegram> inherits from L<Module::Generic> and all its module excepted for L<Net::API::Telegram::Generic> and L<Net::API::Telegram::Number> are auto generated based on Telegram api online documentation.
 
 =head1 CORE METHODS
 
@@ -5589,4 +5532,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

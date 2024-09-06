@@ -7,7 +7,6 @@ BEGIN
     use vars qw( $DEBUG );
     use Test::More;
     use WebSocket::Request;
-    # use Devel::Confess;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 

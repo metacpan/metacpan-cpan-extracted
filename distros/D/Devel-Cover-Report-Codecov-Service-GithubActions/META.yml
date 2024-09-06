@@ -1,0 +1,44 @@
+---
+abstract: 'gather env vars from Github Actions for Codecov report'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test2::Plugin::BailOnFail: '0'
+  Test2::Require::AuthorTesting: '0'
+  Test2::Require::Module: '0'
+  Test2::Tools::Spec: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Cover-Report-Codecov-Service-GithubActions
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Devel::Cover::Report::Codecov::Service::GithubActions:
+    file: lib/Devel/Cover/Report/Codecov/Service/GithubActions.pm
+    version: '0.001000'
+requires:
+  Devel::Cover::Report::Codecov: '0'
+  perl: '5.008001'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Devel-Cover-Report-Codecov-Service-GithubActions/project
+  bugtracker: https://github.com/tobyink/p5-devel-cover-report-codecov-service-githubactions/issues
+  homepage: https://metacpan.org/release/Devel-Cover-Report-Codecov-Service-GithubActions
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-devel-cover-report-codecov-service-githubactions.git
+version: '0.001000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

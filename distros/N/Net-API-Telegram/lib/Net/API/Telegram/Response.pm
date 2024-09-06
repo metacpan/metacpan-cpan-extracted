@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Telegram API - ~/lib/Net/API/Telegram/Response.pm
-## Version 0.2
+## Version v0.200.1
 ## Copyright(c) 2019 Jacques Deguest
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/05/29
-## Modified 2019/06/02
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,12 +23,11 @@ BEGIN
     @EXPORT      = qw( );
     %EXPORT_TAGS = ();
     @EXPORT_OK   = qw( );
-    $VERSION     = '0.2';
-	use Devel::Confess;
+    $VERSION     = 'v0.200.1';
 };
 
 {
-	## https://core.telegram.org/bots/api
+	# https://core.telegram.org/bots/api
 	$DEBUG = 3;
 	$VERBOSE = 0;
 }

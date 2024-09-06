@@ -1,11 +1,15 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/TimeZone.pm
-## Version v0.100.0
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Version v0.100.1
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2024/09/05
+## All rights reserved.
 ## 
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::TimeZone;
 BEGIN
@@ -15,13 +19,12 @@ BEGIN
     use vars qw( $VERSION );
     use parent qw( Module::Generic );
     use DateTime::TimeZone;
-    use Nice::Try;
     use overload ('""'     => 'name',
                   '=='     => sub { _obj_eq(@_) },
                   '!='     => sub { !_obj_eq(@_) },
                   fallback => 1,
                  );
-    our( $VERSION ) = 'v0.100.0';
+    our( $VERSION ) = 'v0.100.1';
 };
 
 use strict;
@@ -33,13 +36,15 @@ sub init
     my $init = shift( @_ );
     my $value = shift( @_ );
     my $tz;
-    try
+    local $@;
+    # try-catch
+    eval
     {
         $tz = DateTime::TimeZone->new( name => $value, @_ );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Invalid time zone '${tz}': $e" ) );
+        return( $self->error( "Invalid time zone '${tz}': $@" ) );
     }
     $self->{tz} = $tz;
     return( $self->SUPER::init( @_ ) );
@@ -94,7 +99,7 @@ Net::API::Stripe::TimeZone - A Time Zone Object
 
 =head1 VERSION
 
-    v0.100.0
+    v0.100.1
 
 =head1 DESCRIPTION
 

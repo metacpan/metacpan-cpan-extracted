@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.4.11
+## Version v0.5.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2024/04/25
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -125,7 +125,7 @@ BEGIN
     our $OBJECTS_REPO = [];
     our $EXCEPTION_CLASS = 'Module::Generic::Exception';
     our $SERIALISER = 'storable';
-    our $VERSION = 'v0.4.11';
+    our $VERSION = 'v0.5.0';
 };
 
 use strict;
@@ -1558,7 +1558,9 @@ sub _set_shared_space
     my $p =
     {
         create  => 1,
-        key     => $key,
+        # The user ID $> will be used by Module::Generic::SharedMemXS to derive the user home path, which serves as a key parameter to IPC::SysV::ftok()
+        key     => ( ( defined( $self->{medium} ) && $self->{medium} eq 'memory' ) ? [$key, $>] : $key ),
+        # key     => [$key, $>],
         mode    => 0666,
         debug   => $self->debug,
         # storable => 1,
@@ -1645,8 +1647,10 @@ sub _set_shared_space
             $p->{tmpdir} = $tmpdir;
         }
         my $s = Module::Generic::File::Cache->new( %$p ) || return( $self->error( "Unable to create shared cache file object: ", Module::Generic::File::Cache->error ) );
-        $shm = $s->open ||
+        if( !( $shm = $s->open ) )
+        {
             return( $self->error( "Unable to open shared cache file object: ", $s->error ) );
+        }
     }
     $self->shared_mem( $shm );
     
@@ -2515,7 +2519,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.4.11
+    v0.5.0
 
 =head1 DESCRIPTION
 
@@ -3310,7 +3314,7 @@ L<Mozilla documentation on promises|https://developer.mozilla.org/en-US/docs/Web
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021-2022 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+Copyright(c) 2021-2024 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
 
 All rights reserved
 

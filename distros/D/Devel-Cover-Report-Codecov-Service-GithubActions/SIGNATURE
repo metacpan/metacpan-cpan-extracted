@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 21798c731a5a5867ef418026f3e8a8ad7f1272c2752ddaab92a75af51ed1af44 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 3f313d1d2c69a9a9e993e04a69aef9633981749b898e2423d0520cbbe2330e34 Changes
+SHA256 7eee7f53cbafe0a7e592ca2cfe83a192769e1715ab467b6ef5a750a906991381 INSTALL
+SHA256 80067f577fa565f34f833e302cac68ea1435f3863885540f94071ccd6d5e900d LICENSE
+SHA256 ddb41f5c97988fe31e93f58533ad7d1c80aa79ad36c30884a591a609afd1f9ec MANIFEST
+SHA256 f1960ec8c455ddd4dc86e28ab86292aa63b8e52bd49896484d95482f2e93eee9 META.json
+SHA256 6bdaebbbab8caecca0c7faea6b67259b47f226d4010ece75a5d00a500b202006 META.yml
+SHA256 f2b5974e0e82924212f76d06686763f8e47048a6dbd1727202fc3f967c8d00e9 Makefile.PL
+SHA256 9da13091dc871119fc280d8949b81a50a947380a24642c3ff115b8bb05c124ea README
+SHA256 9233d67a2b2ddd62402e7adbf7c4c2ddfaec257367af732f42025332c666fdf2 dist.ini
+SHA256 b039ee8dc1ba7a364b5a24cd4e8a5d55d02975bca71456b175e90f6f1f79003c doap.ttl
+SHA256 71b47109da59745d8f09f02448ad2686f1b17b8d51438cc3033e35682657c809 lib/Devel/Cover/Report/Codecov/Service/GithubActions.pm
+SHA256 4f681999b38b9fbe747b27ef71d9be2d8ce97e9d95a90a44f8969fc4b038d6e1 t/00start.t
+SHA256 10e86031fc83b9be04e8c5d0a177ce01e1a24c5aa42e993dfec18273759a46ef t/01basic.t
+SHA256 49687c421740863f18e478cda7d9b4bcdfdb6ea732a7bd739297f3ff030ec6b7 t/unit/Devel/Cover/Report/Codecov/Service/GithubActions.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCZtqwtQAKCRDOv4Eoaip9
+OQnaAKCltHlu11tDqx8yF/L8xi0VqGb9XQCfcO6XCnsMda5cj5VBekuDo9XAN6k=
+=1ar0
+-----END PGP SIGNATURE-----

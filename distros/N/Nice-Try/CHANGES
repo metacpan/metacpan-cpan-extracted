@@ -1,5 +1,9 @@
 Revision history for Perl module Nice::Try.
 
+v1.3.13 2024-09-06T09:59:05+0900
+    - Improved handling of conditional return
+    - Improved handling of conditional return
+
 v1.3.12 2024-09-02T13:39:19+0900
     - Fixed inside vs outside return for Bug #7 (Gitlab). Thanks to Clay Fouts for catching this.
 

@@ -19,15 +19,15 @@ my $commentincdata = << "END";
 </catalog>
 END
 
-my $minikeepcdataincomment = << "end";
+my $minikeepcdataincomment = << "END";
 <catalog xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xi="http://www.w3.org/2001/XInclude"><book/>
 <!-- <![CDATA[ ...]]> -->
 </catalog>
-end
+END
 
-my $minidropcdataincomment = << "end";
+my $minidropcdataincomment = << "END";
 <catalog xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xi="http://www.w3.org/2001/XInclude"><book/></catalog>
-end
+END
 
 my $minikeepcommentincdata = << "END";
 <catalog xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xi="http://www.w3.org/2001/XInclude"><book/>

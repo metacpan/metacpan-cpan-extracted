@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/JWT.pm
-## Version v0.100.3
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.100.4
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2024/02/09
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -24,7 +24,6 @@ BEGIN
     our @EXPORT = qw();
 
     # use Carp;
-    use Devel::Confess;
     use Crypt::Misc qw(decode_b64u encode_b64u);
     # use JSON::MaybeXS qw(decode_json encode_json);
     # JSON::XS does not play well with ModPerl, so luckily we can use the Pure Perl version
@@ -38,7 +37,7 @@ BEGIN
     use Compress::Raw::Zlib;
     use Scalar::Util qw(looks_like_number);
     # Crypt::JWT version 0.024
-    our $VERSION = 'v0.100.3';
+    our $VERSION = 'v0.100.4';
 };
 
 use strict;

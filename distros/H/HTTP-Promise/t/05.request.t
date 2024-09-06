@@ -24,6 +24,7 @@ $req = HTTP::Promise::Request->new;
 isa_ok( $req => ['HTTP::Promise::Request'] );
 
 # for m in `egrep -E '^sub ([a-z]\w+)' ./lib/HTTP/Promise/Request.pm| awk '{ print $2 }'`; do echo "can_ok( \$req => '$m' );"; done
+# perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$req, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/HTTP/Promise/Request.pm
 can_ok( $req => 'accept_decodable' );
 can_ok( $req => 'clone' );
 can_ok( $req => 'cookie_jar' );

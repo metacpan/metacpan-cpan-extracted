@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe.pm
-## Version v2.0.4
+## Version v2.0.5
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/07/19
-## Modified 2023/10/11
+## Modified 2024/09/05
 ## All rights reserved.
 ## 
 ## 
@@ -33,7 +33,6 @@ BEGIN
     use Data::Random qw( rand_chars );
     use DateTime;
     use DateTime::Format::Strptime;
-    use Devel::Confess;
     use Digest::MD5 qw( md5_base64 );
     use Digest::SHA ();
     use HTTP::Promise;
@@ -45,7 +44,6 @@ BEGIN
     use MIME::Base64 ();
     use Module::Generic::File qw( sys_tmpdir );
     use Net::IP;
-    use Nice::Try;
     use Regexp::Common;
     use Scalar::Util ();
     use URI::Escape;
@@ -53,7 +51,7 @@ BEGIN
     use constant API_BASE => 'https://api.stripe.com/v1';
     use constant FILES_BASE => 'https://files.stripe.com/v1';
     use constant STRIPE_WEBHOOK_SOURCE_IP => [qw( 54.187.174.169 54.187.205.235 54.187.216.72 54.241.31.99 54.241.31.102 54.241.34.107 )];
-    our $VERSION = 'v2.0.4';
+    our $VERSION = 'v2.0.5';
     our $EXCEPTION_CLASS = 'Net::API::Stripe::Exception';
 };
 
@@ -1526,13 +1524,15 @@ sub api_uri
     if( @_ )
     {
         my $url = shift( @_ );
-        try
+        local $@;
+        # try-catch
+        eval
         {
             $self->{api_uri} = URI->new( $url );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            CORE::return( $self->error( "Bad URI ($url) provided for base Stripe api: $e" ) );
+            CORE::return( $self->error( "Bad URI ($url) provided for base Stripe api: $@" ) );
         }
     }
     CORE::return( $self->{api_uri}->clone ) if( Scalar::Util::blessed( $self->{api_uri} ) && $self->{api_uri}->isa( 'URI' ) );
@@ -1573,15 +1573,17 @@ sub conf_file
         }
         my $data = $f->load_utf8 || 
             CORE::return( $self->error( "Unable to open configuration file $file: ", $f->error ) );
-        try
+        local $@;
+        # try-catch
+        eval
         {
             my $json = JSON->new->relaxed->decode( $data );
             $self->{conf_data} = $json;
             $self->{conf_file} = $file;
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            CORE::return( $self->error( "An error occured while json decoding configuration file $file: $e" ) );
+            CORE::return( $self->error( "An error occured while json decoding configuration file $file: $@" ) );
         }
     }
     CORE::return( $self->{conf_data} );
@@ -1659,13 +1661,15 @@ sub file_api_uri
     if( @_ )
     {
         my $url = shift( @_ );
-        try
+        local $@;
+        # try-catch
+        eval
         {
             $self->{file_api_uri} = URI->new( $url );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            CORE::return( $self->error( "Bad URI ($url) provided for base files Stripe api: $e" ) );
+            CORE::return( $self->error( "Bad URI ($url) provided for base files Stripe api: $@" ) );
         }
     }
     CORE::return( $self->{file_api_uri}->clone ) if( Scalar::Util::blessed( $self->{file_api_uri} ) && $self->{file_api_uri}->isa( 'URI' ) );
@@ -1914,13 +1918,15 @@ sub webhook_validate_signature
     # Must be a hash hmac with sha256, e.g. 5257a869e7ecebeda32affa62cdca3fa51cad7e77a0e56ff536d0ce8e108d8bd
     CORE::return( $self->error({ code => 400, message => "Invalid signature received in Stripe event data" }) ) if( $q->{v1} !~ /^[a-z0-9]{64}$/ );
     my $dt;
-    try
+    local $@;
+    # try-catch
+    eval
     {
         $dt = DateTime->from_epoch( epoch => $q->{t}, time_zone => 'local' );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        CORE::return( $self->error({ code => 400, message => "Invalid timestamp ($q->{t}): $e" }) );
+        CORE::return( $self->error({ code => 400, message => "Invalid timestamp ($q->{t}): $@" }) );
     }
     
     # This needs to be in real utf8, ie NOT perl internal utf8
@@ -16092,7 +16098,9 @@ sub _check_parameters
                     if( $dict->{type} eq 'date' &&
                         $args->{ $k } =~ /^(?<year>\d{4})[\.|\-](?<month>\d{1,2})[\.|\-](?<day>\d{1,2})$/ )
                     {
-                        try
+                        local $@;
+                        # try-catch
+                        eval
                         {
                             $dt = DateTime(
                                 year => int( $+{year} ),
@@ -16104,16 +16112,18 @@ sub _check_parameters
                                 time_zone => $tz
                             );
                             $args->{ $k } = $dt;
-                        }
-                        catch( $e )
+                        };
+                        if( $@ )
                         {
-                            push( @$err, "Invalid date (" . $args->{ $k } . ") provided for parameter \"$k\": $e" );
+                            push( @$err, "Invalid date (" . $args->{ $k } . ") provided for parameter \"$k\": $@" );
                         }
                     }
                     elsif( $dict->{type} eq 'datetime' &&
                         $args->{ $k } =~ /^(?<year>\d{4})[\.|\-](?<month>\d{1,2})[\.|\-](?<day>\d{1,2})[T|[:blank:]]+(?<hour>\d{1,2}):(?<minute>\d{1,2}):(?<second>\d{1,2})$/ )
                     {
-                        try
+                        local $@;
+                        # try-catch
+                        eval
                         {
                             $dt = DateTime(
                                 year => int( $+{year} ),
@@ -16125,24 +16135,26 @@ sub _check_parameters
                                 time_zone => $tz
                             );
                             $args->{ $k } = $dt;
-                        }
-                        catch( $e )
+                        };
+                        if( $@ )
                         {
-                            push( @$err, "Invalid datetime (" . $args->{ $k } . ") provided for parameter \"$k\": $e" );
+                            push( @$err, "Invalid datetime (" . $args->{ $k } . ") provided for parameter \"$k\": $@" );
                         }
                     }
                     elsif( $args->{ $k } =~ /^\d+$/ )
                     {
-                        try
+                        local $@;
+                        # try-catch
+                        eval
                         {
                             $dt = DateTime->from_epoch(
                                 epoch => $args->{ $k },
                                 time_zone => $tz,
                             );
-                        }
-                        catch( $e )
+                        };
+                        if( $@ )
                         {
-                            push( @$err, "Invalid timestamp (" . $args->{ $k } . ") provided for parameter \"$k\": $e" );
+                            push( @$err, "Invalid timestamp (" . $args->{ $k } . ") provided for parameter \"$k\": $@" );
                         }
                     }
                     if( $dt )
@@ -16655,7 +16667,9 @@ sub _instantiate
     CORE::return( $self->{ $name } ) if( exists( $self->{ $name } ) && Scalar::Util::blessed( $self->{ $name } ) );
     my $class = shift( @_ );
     my $this;
-    try
+    local $@;
+    # try-catch
+    eval
     {
         # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
         # require $class unless( defined( *{"${class}::"} ) );
@@ -16666,10 +16680,10 @@ sub _instantiate
             'verbose'   => $self->verbose,
         ) || CORE::return( $self->pass_error( $class->error ) );
         $this->{parent} = $self;
-    }
-    catch( $e ) 
+    };
+    if( $@ )
     {
-        CORE::return( $self->error({ code => 500, message => $e }) );
+        CORE::return( $self->error({ code => 500, message => $@ }) );
     }
     CORE::return( $this );
 }
@@ -16827,7 +16841,9 @@ sub _response_to_object
     my $hash  = $self->_get_args( @_ );
     # my $callbacks = $CALLBACKS->{ $class };
     my $o;
-    try
+    local $@;
+    # try-catch
+    eval
     {
         # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
         # eval( "require $class;" ) unless( defined( *{"${class}::"} ) );
@@ -16838,10 +16854,10 @@ sub _response_to_object
             '_debug' => $self->{debug},
             '_dbh' => $self->{_dbh},
         }, $hash ) || CORE::return( $self->pass_error( $class->error ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        CORE::return( $self->error( $e ) );
+        CORE::return( $self->error( $@ ) );
     }
     CORE::return( $self->pass_error( $class->error ) ) if( !defined( $o ) );
     CORE::return( $o );
@@ -16878,7 +16894,7 @@ AUTOLOAD
     
     if( CORE::defined( $code ) )
     {
-        $code = Nice::Try->implement( $code ) if( CORE::index( $code, 'try' ) != -1 );
+        # $code = Nice::Try->implement( $code ) if( CORE::index( $code, 'try' ) != -1 );
         # print( STDERR __PACKAGE__, "::AUTOLOAD: updated code for method \"$meth\" ($AUTOLOAD) and \$self '$self' is:\n$code\n" ) if( $DEBUG >= 4 );
         my $saved = $@;
         {

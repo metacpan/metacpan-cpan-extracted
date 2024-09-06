@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # note - console notes management with database and encryption support.
-# Copyright (C) 1999-2017 T.v.Dein   (see README for details!)
+# Copyright (C) 1999-2024 T.v.Dein   (see README for details!)
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,10 +17,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#                               - Thomas Linden <tom at linden dot at>
+#                               - Thomas von Dein <tom at vondein dot org>
 #
 # latest version on:
 # http://www.daemon.de/note/
+# https://github.com/TLINDEN/note/
 #
 
 use lib qw(blib/lib);
@@ -38,6 +39,7 @@ use Getopt::Long;
 use FileHandle;
 use File::Spec;
 use YAML;
+use JSON::PP;
 
 
 #
@@ -71,6 +73,7 @@ my (
     $opt_, $opt_i, $opt_r, $opt_e, $opt_d, $opt_enc,
     $opt_s, $opt_t, $opt_T, $opt_l, $opt_L, $opt_c,
     $opt_D, $opt_I, $opt_o, $opt_h, $opt_n, $opt_v,
+    $opt_j,
 
     #
     # set from commandline (or interactive)
@@ -121,7 +124,7 @@ my (
      'autoclear'         => 0,
      'maxlen'            => 'auto',
      'defaultlong'       => 0,
-     'dbdriver'          => 'binary',
+     'dbdriver'          => 'binary', # will be depcrecated in 1.5.0 and replaced by dumper.
      'timeformat'        => 'DD.MM.YYYY hh:mm:ss',
      'usecolors'         => 0,
      'addticket'         => 0,
@@ -133,7 +136,8 @@ my (
      'printlines'        => 0,
      'cache'             => 0,
      'preferrededitor'   => '',
-     'motd'              => ''
+     'motd'              => '',
+     'usejson'           => 0, # will be the default in the future
 );
 
 # these are not customizable at runtime!
@@ -141,7 +145,7 @@ $hardparams = "(readonly|maxlen|dbdriver|useencryption|cryptmethod)";
 $CONF       = File::Spec->catfile($ENV{HOME}, ".noterc");
 $USER       = getlogin || getpwuid($<); chomp $USER;
 $TOPIC      = 1;
-$VERSION    = "1.3.26";
+$VERSION    = "1.4.1";
 $CurDepth   = 1;        # the current depth inside the topic "directory" structure...
 $maxlen     = "auto";
 $timelen    = 22;
@@ -214,6 +218,7 @@ else {
               "list|l:s"          => \$opt_l, # string,  optional
               "longlist|L:s"      => \$opt_L, # string,  optional
               "dump|Dump|D:s"     => \$opt_D, # string,  optional
+              "json|j"            => \$opt_j, # bool,  optional
               "import|Import|I:s" => \$opt_I, # string,  optional
               "overwrite|o!"      => \$opt_o, # no arg
               "help|h|?!"         => \$opt_h, # no arg
@@ -275,6 +280,10 @@ else {
     }
     else {
       $dump_file = "-";        # use STDIN
+    }
+
+    if (defined $opt_j) {
+        $conf{usejson} = 1; # force JSON
     }
   }
   elsif (defined $opt_I) {
@@ -468,7 +477,7 @@ else {
   if(scalar keys %all > 0) {
     my $id = (keys %all)[0];
     if($all{$id}->{date} !~ /^\d+\.\d+?/) {
-      print "notedb seems to be encrypted!\n";
+      print "Warning! Encryption is not enabled, but notedb seems to be encrypted or in a non-text binary format. Please check your db file and your config!\n";
       exit(1);
     }
   }
@@ -923,6 +932,7 @@ sub edit {
 
 sub dump {
     my(%res, $num, $DUMP);
+
     # $dump_file
     if ($dump_file eq "-") {
       $DUMP = *STDOUT;
@@ -931,8 +941,11 @@ sub dump {
       open (DUMPFILE, ">$dump_file") or die "could not open $dump_file\n";
       $DUMP = *DUMPFILE;
     }
+
     select $DUMP;
+
     %res = $db->get_all();
+
     # FIXME: prepare hashing in NOTEDB class
     foreach $num (sort { $a <=> $b } keys %res) {
       print STDOUT "dumping note number $num to $dump_file\n" if($dump_file ne "-");
@@ -947,7 +960,17 @@ sub dump {
       my $date = $res{$num}->{date};
       $res{$num} = { body => $body, title => $title, path => $path, date => $date};
     }
-    print Dump(\%res);
+
+    if($conf{usejson}) {
+        my $json = JSON::PP->new->utf8->pretty;
+        print $json->encode(\%res);
+    }
+    else {
+        warn "Deprecation notice: YAML export format will not be supported in the future!
+Enable JSON using the UseJSON config parameter or the -j commandline parameter!";
+        print Dump(\%res);
+    }
+
     close(DUMPFILE);
     select STDOUT;
 }
@@ -964,9 +987,16 @@ sub import {
       $DUMP = *DUMPFILE;
     }
 
-    my $yaml = join '', <$DUMP>;
+    my $serialized = join '', <$DUMP>;
 
-    my $res = Load($yaml);
+    my $res;
+
+    if($serialized =~ /^\{/) {
+        $res = decode_json($serialized);
+    }
+    else {
+        $res = Load($serialized);
+    }
 
     foreach my $number (keys %{$res}) {
       my $note;

@@ -1,0 +1,80 @@
+Revision history for Perl module Text::PO
+
+v0.7.1 2024-09-05T22:52:38+0900
+    - Updated dependencies
+
+v0.7.0 2023-12-10T17:42:59+0900
+    - Minor improvement when parsing a GNU PO file with dash comments found alone
+    - Code improvement for speed
+
+v0.6.4 2023-10-31T13:55:56+0900
+    - Changing objects default value from empty string to undef
+
+v0.6.3 2023-10-23T12:06:45+0900
+    - Improved documentation for Text::PO::Element
+
+v0.6.2 2023-10-15T16:24:13+0900
+    - Minor correction of a bug due to a missing JavaScript function in scripts/gettext.js
+
+v0.6.1 2023-06-14T19:46:54+0900
+    - Correcting minor bug due to lack of precision in Text::PO::Element
+
+v0.6.0 2023-04-14T21:28:01+0900
+    - Added JavaScript function fetchLocalen() in share/gettext.js
+
+v0.5.0 2023-01-04T19:55:54+0900
+    - Changed gettext.js class GettextString property 'lang' to 'locale'
+    - Implemented the class Text::PO::String containing the localised string and its locale property returned by Text::PO::Gettext methods
+
+v0.4.1 2022-12-30T20:56:12+0900
+    - Implemented a minor improvement in gettext.js to stringify msgids that are objects.
+
+v0.4.0 2022-12-30T20:08:59+0900
+    - Improved the gettext.js JavaScript library to have gettext() and other methods return a GettextString object containing the "lang" property. This is useful to know the actual language of the string returned. It inherits from String object class and stringifies automatically.
+    - Updated POD documentation for gettext.js
+
+v0.3.0 2022-12-29T22:53:32+0900
+    - Improved the exists() method in Text::PO to take an optional hash or hash reference of parameters.
+
+v0.2.4 2022-12-09T20:07:10+0900
+    - Improved documentation for scripts/po.pl
+
+v0.2.3 2022-07-11T00:01:25+0900
+    - Trapped lack of local time zone support.
+
+v0.2.2 2022-07-08T08:19:53+0900
+    - More test units correction.
+
+v0.2.1 2022-07-06T15:41:53+0900
+    - Corrected error in test unit.
+
+v0.2.0 2022-07-06T06:25:56+0900
+    - Made the code more strict and cleaned it a bit.
+    - Removed the use of INIT blocks.
+
+v0.1.8 2022-07-05T13:46:04+0900
+    - Corrected current_lang() test in test units and improved its method in Text::PO
+
+v0.1.7 2022-07-04T15:17:16+0900
+    - Added alias gettextf to getTextf
+
+v0.1.6 2021-08-03T11:58:28+0900
+    - Corrected test units
+
+v0.1.5 2021-08-02T09:46:24+0900
+    - Corrected test units
+
+v0.1.4 2021-07-31T06:22:04+0900
+    - Improved parsing of po files when there are leading blank lines to be ignored
+
+v0.1.3 2021-07-30T18:36:27+0900
+    - Added methods getDaysLong, getDaysShort, getMonthsLong, getMonthsShort, getNumericDict, getNumericPosixDIct to Text::PO::Gettext
+
+v0.1.2 2021-07-28T15:18:39+0900
+    - Corrected unnecessary module call
+
+v0.1.1 2021-07-27T17:05:57+0900
+    - Corrected test unit
+
+v0.1.0 2021-07-24T17:17:08+0900
+    - Initial release version

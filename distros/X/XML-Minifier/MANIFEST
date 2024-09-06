@@ -1,12 +1,12 @@
 Build.PL
 Changes
-LICENSE
-META.json
-README.md
-cpanfile
 lib/XML/Minifier.pm
-minil.toml
-scripts/xml-minifier
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+script/xml-minifier
 t/00_compile.t
 t/01_default.t
 t/02_identity.t
@@ -31,9 +31,9 @@ t/20_preserveattributes.t
 t/21_nestedcontent.t
 t/22_dtdprotection.t
 t/23_scale.t
+t/24_spacesinattributes.t
+t/50_completexmlspace.t
 t/data/entitynotag.xml
 t/data/entitywithtag.xml
 t/data/inc.xml
 t/data/xinclude.xml
-META.yml
-MANIFEST

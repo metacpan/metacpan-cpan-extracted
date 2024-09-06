@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Telegram API - ~/lib/Net/API/Telegram/InputFile.pm
-## Version 0.1
+## Version v0.100.1
 ## Copyright(c) 2019 Jacques Deguest
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/05/29
-## Modified 2019/10/31
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,8 +21,7 @@ BEGIN
 	use Cwd ();
 	use File::Type;
 	use Scalar::Util;
-    our( $VERSION ) = '0.1';
-	use Devel::Confess;
+    our( $VERSION ) = 'v0.100.1';
 };
 
 sub init
@@ -221,4 +220,3 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 L<Net::API::Telegram>
 
 =cut
-

@@ -12,14 +12,15 @@ note [options] [ number [,number...]]
 
 =head1 DESCRIPTION
 
-B<note> is a small console program written in perl, which allows 
-you to manage notes similar to programs like "knotes" but from 
-the commandline. Note can use different database-backends for 
-notes-storage. It ships with a DBI-based mysql-module(which 
-can also be used for other by DBI supported DBMS), another 
-module, which uses a binary file for storage and a DBM module.
-There are also two modules available which uses a text file.
-Note supports since version 1.0.0 encryption(IDEA or DES)!
+B<note> is a  small console program written in perl,  which allows you
+to manage notes similar to programs like "knotes" but from the command
+line. Note  can use different database-backends  for notes-storage. It
+ships with a  DBI-based mysql-module(which can also be  used for other
+by DBI supported  DBMS), another module, which uses a  binary file for
+storage and a DBM module.  There  are also two modules available which
+uses a text  file.  Note supports since  version 1.0.0 encryption(IDEA
+or DES)! And  last but not least the PWSafe3  format is also supported
+by the pwsafe3 backend, which is encrypted by default.
 
 
 =head1 OPTIONS
@@ -77,6 +78,10 @@ the specified ones.
 Dumps all notes to the textfile <file>. If <file> is a "-" it will 
 be printed out to standard output (STDOUT).
 
+=item I<-j --json>
+
+Use JSON format for exports created using -D. The importer determines
+the format to be used automatically.
 
 =item I<-I, --Import file | ->
 
@@ -108,7 +113,7 @@ for details on this mode.
 =item I<--encrypt cleartext>
 
 Encrypt the given clear text string. You would need that if you want to
-store the mysql password not in cleartext in the config(if you are using
+store the mysql password not in cleartext in the config (if you are using
 the mysql backend!).
 
 
@@ -140,7 +145,7 @@ note from STDIN until EOF. This makes it possible to pipe text into a new note, 
 =head2 GENERAL USAGE
 
 If you don't know, how to run note, try "note -h" first.
-It will tell you all available commandline options.
+It will tell you all available command line options.
 
 To create a new note, simply run "note". You can enter
 the note (the length is by default limited to 4096 bytes,
@@ -188,7 +193,7 @@ To delete note 1,2 and 3, use "-d 1-3".
 If you cannot remember, which note you are looking for, you
 can use the search capability of note: "note -s <searchstring>".
 note will search the whole note database case insensitive for
-an occurence of this string and tell you the number and first-
+an occurrence of this string and tell you the number and first-
 line it has.
 
 You can extend the searchstring using B<AND>, B<OR> ( and ) and
@@ -206,9 +211,9 @@ display it's second line.
 These rules apply for the interactive search too.
 
 You need to know, that note searches for the expression in every
-note. In other words, "moses AND lenin" searches for an occurence
+note. In other words, "moses AND lenin" searches for an occurrence
 of "moses" and "lenin" in ONE note. Or, if you are looking for
-"mike OR daniel", then it searches for an occurence of "mike" or
+"mike OR daniel", then it searches for an occurrence of "mike" or
 daniel" in ONE note. Thus a note with the text "mike oldfield" will
 match that search.
 
@@ -288,7 +293,7 @@ topic.  You will get strange results without it!
 
 =head2 INTERACTIVE MODE
 
-If you start note with the commandline flag B<-i>, then it starts
+If you start note with the command line flag B<-i>, then it starts
 with an interactive interface.
 It will start with a listing under the default top-topic ("/").
 You can enter the name of a topic to change to that topic. This works
@@ -316,8 +321,8 @@ You can achieve the same result by simply pressing enter at any time.
 You can create a new note by simply pressing B<N> or B<n>. You favorite
 editor will be started and you can enter your note text. If you are already
 under a topic then this new note will automatically go to this topic.
-note adds an aditional line to the top of the note with the topic. But
-you can of course specify your own topic.
+note adds an additional line to the top of the note with the topic. But
+you can, of course, specify your own topic.
 
 Note will tell you which number it has assigned to the newly created note.
 
@@ -338,7 +343,7 @@ Say if you delete 1 and 2, then 3 will become 1, 4 will become 5 and so forth.
 
 =item B<S [expression]>
 
-You can search for the occurence of a text in your notes-database with the
+You can search for the occurrence of a text in your notes-database with the
 command B<S> or B<s>. If you omit an expression note will ask you for one.
 
 If your search criteria matches on exactly one entry, note will display
@@ -393,14 +398,14 @@ Quit note.
 
 You can also dump the contents of your note-database into a
 ASCII-textfile(I<-D>). You can use this file later to import it into
-your note-database(-I). This is usefull, if you want quickly trans-
+your note-database(-I). This is useful, if you want quickly trans-
 fer your notes from one host to another (i.e. you could mail
 your note-dump form your office to home and import it there
 for further use).
 
 The dumps from the two versions of note are in the same format.
 Using dumps it is also possible to reinitialize your database. You
-can use the "-o" switch whcih causes note to overwrite your existing
+can use the "-o" switch which causes note to overwrite your existing
 database. This is very handy if you changed heavily your config. And
 it is required, if you changed: encryption, db-driver, (binary-format)
 and the password. You can use the following command for reinitializing:
@@ -414,7 +419,7 @@ What the hell, does this do?! Step by step:
 =item *
 
 B<note -D -> creates a note-database dump and prints it out
-to stantdard output.
+to standard output.
 
 =item *
 
@@ -466,8 +471,8 @@ character. Here are the available things, you can do:
 
 The text will be formatted using the actually note-color.
 
-The hidden formatting will use blue forground and blue background
-to hide a string from the terminal, which is usefull for passwords.
+The hidden formatting will use blue foreground and blue background
+to hide a string from the terminal, which is useful for passwords.
 
 If you set "FormatText" to I<simple> then the formatting can be
 done this way instead:
@@ -495,7 +500,7 @@ Crypt::DES
 Crypt::CBC
 
 After turning on encryption, note will ask you for a passphrase
-everytime it runs! It will *not* store this passphrase!
+every time it runs! It will *not* store this passphrase!
 So, don't forget it! Be careful!
 
 
@@ -507,7 +512,7 @@ You can use a configuration file with note but it is not required.
 Note will use default values if there is no config.
 
 The default config file is B<~/.noterc>. You may specify another
-one with the commandline flag I<--config>.
+one with the command line flag I<--config>.
 
 Comments start with #, empty lines will be ignored.
 
@@ -534,6 +539,6 @@ T.v.Dein <tlinden@cpan.org>
 
 =head1 VERSION
 
-1.3.20
+1.4.0
 
 =cut

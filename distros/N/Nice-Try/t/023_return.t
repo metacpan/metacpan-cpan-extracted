@@ -3,10 +3,11 @@ use strict;
 use warnings;
 use lib './lib';
 use Test::More;
-plan tests => 14;
+# plan tests => 14;
 our $t = 0;
 our $f = 0;
 use Nice::Try;
+# use Nice::Try debug => 5, debug_file => './dev/debug_return_023.pl', debug_code => 1;
 my $should_be_undef;
 # try { $i++ } catch { }
 my $rv = (sub{ 
@@ -48,3 +49,42 @@ is( $t, 0, 'try-catch return' );
 ok( !defined( $should_be_undef ) );
 is( $f, 1, 'finally called' );
 
+sub check_or_return
+{
+    try
+    {
+        &check(0) || return( "ok" );
+        # &check(1) || $debug++, return;
+        &check(2) || diag "Damn.", return "not ok";
+        return( "not ok" );
+    }
+    catch( $e )
+    {
+        warn( "Something went wrong: $e" );
+    }
+    return( "nope" );
+}
+
+sub check_or_return2
+{
+    try
+    {
+        &check(1) || return( "not ok" );
+        return( "ok" );
+    }
+    catch( $e )
+    {
+        warn( "Something went wrong: $e" );
+    }
+    return( "nope" );
+}
+
+sub check { return($_[0]) }
+
+is( &check_or_return, "ok", "&do_something || return" );
+
+is( &check_or_return2, "ok", "&do_something || return" );
+
+done_testing();
+
+__END__

@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000802';
+our $VERSION='1.0000806';
 
 #print `env`,"\n\n\n";
 
@@ -225,26 +225,96 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
       @INC=@TMPINC;
    }
    ### START OF NON-WINDOWS CODE
-   # Bullet Proof Test for AWS EC2
-   # https://serverfault.com/questions/462903/how-to-know-if-a-machine-is-an-ec2-instance
-   $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
-   $aws=(-1<index $aws,'yes')?1:0;
-   if ($aws) {
-      my $token=`curl -X PUT  -s "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`;
-      my $instance_type=`curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-type`;
-      $amazon{instance_type}=$instance_type;
-   }
-   unless (($aws && $amazon{instance_type}=~/nano/) || grep { /SKIP|CPAN|figlet/ } @ARGV) {
+   BEGIN {
+      # Bullet Proof Test for AWS EC2
+      # https://serverfault.com/questions/462903/how-to-know-if-a-machine-is-an-ec2-instance
+      $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
+      $aws=(-1<index $aws,'yes')?1:0;
+      if ($aws) {
+         my $token=`curl -X PUT  -s "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`;
+         my $instance_type=`curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-type`;
+         $amazon{instance_type}=$instance_type;
+      }
+      if ($amazon{instance_type}=~/nano/ &&
+            exists $ENV{PERL5_CPAN_IS_RUNNING_IN_RECURSION}) {
+         my $message=<<'END';
+                                 _                                _          _
+   __ _ __  __ _ _ _    _ _  ___| |_   ____  _ _ __ _ __  ___ _ _| |_ ___ __| |
+  / _| '_ \/ _` | ' \  | ' \/ _ \  _| (_-< || | '_ \ '_ \/ _ \ '_|  _/ -_) _` |
+  \__| .__/\__,_|_||_| |_||_\___/\__| /__/\_,_| .__/ .__/\___/_|  \__\___\__,_|
+     |_|                                      |_|  |_|
+END
+         $message.=<<END;
+
+  You are attempting to install Net::FullAuto on an Amazon AWS EC2
+  $amazon{instance_type} instance. The cpan utility requires more
+  memory to function successfully than ths instance provides. To
+  install Net::FullAuto, use the "Complete" installer that bundles
+  all dependencies. This installer has much lower resource demands
+  than the cpan commandline utility. Download the installer bundle
+  here: 
+  
+  https://sourceforge.net/projects/fullauto/files/Net-FullAuto-Complete-$VERSION.tar.gz
+
+END
+         print $message;
+         exit 1;
+
+      } elsif ($amazon{instance_type}=~/nano|micro/ and 
+            $ENV{USER} ne 'root') {
+         my $message=<<'END';
+
+
+    __  __         _      _                         _
+   |  \/  |_  _ __| |_   | |__  ___    _ _ ___  ___| |_
+   | |\/| | || (_-<  _|  | '_ \/ -_)  | '_/ _ \/ _ \  _|
+   |_|  |_|\_,_/__/\__|  |_.__/\___|  |_| \___/\___/\__|
+
+END
+	$message.=<<END;
+   Because of the severe memory and resource limitations of an AWS
+   $amazon{instance_type} instance, the Net::FullAuto installer will
+   only work seamlessly when started with sudo or the root user.
+   (If you want to avoid using root, you need to use a small or
+   larger AWS EC2 instance.) Micro and Nano sized instances require
+   the root user or sudo. To use sudo restart this installer with
+   this command:
+
+   sudo perl Makefile.PL
+
+
+END
+         print $message;
+         die "User $ENV{USER} is not supported, log in as root or use sudo";
+      }
+      sub check_for_cpan {
+
+         my $check=`perl -MCPAN -e 1 2>&1`;
+         if (-1<index $check,"Can't locate CPAN") {
+            if ($aws) {
+               system('sudo dnf -y install cpan');
+               my $cmd='mkdir -pv '.(getpwuid $>)[7].'/.cpan/build';
+               `$cmd` || die "Cannot $cmd $!";
+            } else {
+               my $die="Can't locate CPAN.pm in \@INC ".
+                       "(you may need to install the CPAN module)\n$!";
+               die $die;
+            }
+         } return 1;
+      }
+   };
+   unless (grep { /SKIP|CPAN|figlet/ } @ARGV) {
+      use if (check_for_cpan()),'CPAN';
       eval {
          local $SIG{__DIE__}; # No sigdie handler
          require CPAN;
          CPAN::HandleConfig->load;
-         #CPAN::Shell::setup_output;
-         #CPAN::Index->reload;
       };
       my $d = $CPAN::Config->{build_dir};
       if (!(defined $d) || !(-d $d)) {
          $d=(getpwuid $>)[7].'/.cpan/build';
+         my $cmd='mkdir -pv '.(getpwuid $>)[7].'/.cpan/build';
+         `$cmd` || die "Cannot $cmd $!";
          unless (-d $d) {
             unless (-d "/root/.cpan/build") {
                die("ERROR - Can't locate .cpan/build directory");
@@ -264,23 +334,11 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
             (-f "$ENV{HOME}/perl5"))) {
          $ENV{CPAN_LOCAL_LIB}="$ENV{HOME}/perl5";
       }
+      if ($instance_type=~/nano/) {
+         `sudo su -c 'echo 3 > /proc/sys/vm/drop_caches'`
+      }
    }
 };
-
-sub check_for_cpan {
-
-   my $check=`perl -MCPAN -e 1 2>&1`;
-   if (-1<index $check,"Can't locate CPAN") {
-      if ($aws) {
-         system('sudo dnf -y install cpan');
-      } else {
-         my $die="Can't locate CPAN.pm in \@INC ".
-                 "(you may need to install the CPAN module)\n$!";
-         die $die;
-      }
-   } return 1;
-
-}
 
 use Config;
 use if (check_for_cpan()),'CPAN';
@@ -750,7 +808,7 @@ unless (exists $ENV{FA_EDITOR} ||
       grep { /Encrypted|SKIP|CPAN|figlet/i } @ARGV) {
    print $fa_banner;
    sleep 2;
-   unless (exists $ENV{PAR_TEMP}) { # || keys %amazon) {
+   unless (exists $ENV{PAR_TEMP}) {
       my $message=<<'END';
     ___                     _            _     _
    |_ _|_ __  _ __  ___ _ _| |_ __ _ _ _| |_  | | This message times out in
@@ -763,7 +821,7 @@ unless (exists $ENV{FA_EDITOR} ||
    (meaning the old incompatible module is the only one that loads.) FullAuto
    DOES NOW support a local::lib installation. Please select how you wish
    the FullAuto install to handle older installed modules. If you don't make
-   a selection, FullAuto will default to *NOT* updating older modules:                   
+   a selection, FullAuto will default to *NOT* updating older modules:
 
 END
       my $timeout=120;
@@ -781,7 +839,7 @@ END
                         [ $fau, sub{ return 'update' } ],
                         [ "Prompt for each module", sub{ return 'choose' } ],
                         [ $fan, sub{ return 'ignore' } ],
-                        [ $fae, sub{ return 'exit' } ], 
+                        [ $fae, sub{ return 'exit' } ],
                         ];
             my $selection=&menu($menu1);
             exit 0 if $selection eq ']quit[';
@@ -798,41 +856,22 @@ END
    $exec_cnt=$ARGV[$#ARGV];
    $exec_cnt++;
    my $module_fail=$ARGV[$#ARGV-1];
-   my $version='';my $cpanfil='';
+   my $version='';my $cpanfil='';my $instfile='';my $mod_info='';
    if ($exec_cnt==1) {
-      ($version,$cpanfil)=cpan_modules($module_fail);
+      ($version,$cpanfil,$instfile,$mod_info)=cpan_modules($module_fail);
+      fa_system("sudo echo y | /bin/rm -rf \"$instfile\"");
    } elsif (2<$exec_cnt) {
-      my $timeout=300;my $a='';
-      {
-         local $SIG{__DIE__}; # No sigdie handler
-         my $mod_info='';
-         eval {
-            local $SIG{__DIE__}; # No sigdie handler;
-            require CPAN;
-            {
-               local *STDOUT;
-               open(STDOUT, ">", \$mod_info);
-               CPAN::Shell->m($module_fail);
-            }
-         };
-         my $instfile='';
-         ($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
-         my $instver='';
-         ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
-         $instver='' unless (-1<index $mod_info,'INST_VERSION');
-         my $cpanfil='';
-         ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
-         my $cpanver='';
-         ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
-         eval {
-            local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
-            alarm $timeout;
-            $mod_info=~s/^.*?(CPAN.*)$/$1/s;
-            $mod_info=~s/^\s*/      /mg;
-            $mod_info=~s/^Reading.*?$//m;
-            $mod_info=~s/^\s+Database.*?$//m;
-            $mod_info=~s/^\s*//s;
-            my $message=<<END;
+      my $timeout=300;
+      ($version,$cpanfil,$instfile,$mod_info)=cpan_modules($module_fail);
+      eval {
+         local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+         alarm $timeout;
+         $mod_info=~s/^.*?(CPAN.*)$/$1/s;
+         $mod_info=~s/^\s*/      /mg;
+         $mod_info=~s/^Reading.*?$//m;
+         $mod_info=~s/^\s+Database.*?$//m;
+         $mod_info=~s/^\s*//s;
+         my $message=<<END;
 
    FATAL ERROR!: The following Perl CPAN module could not be
                  installed on your system:
@@ -850,14 +889,13 @@ END
       Brian.Kelly\@FullAuto.com
 
 END
-            print $message;
-            if (exists $ENV{PAR_TEMP}) {
-               print "   Press ANY key to exit.\n\n";<STDIN>;
-            }
-            return;
-         };
-         alarm 0;
+         print $message;
+         if (exists $ENV{PAR_TEMP}) {
+            print "   Press ANY key to exit.\n\n";<STDIN>;
+         }
+         return;
       };
+      alarm 0;
       exit 1;
    }
 }
@@ -1316,24 +1354,7 @@ END
    unless (exists $groups{'Installed'}->{'Development tools'}) {
       fa_system("sudo yum -y update");
       fa_system("sudo yum -y clean all");
-      if (exists $amazon{instance_type} &&
-            $amazon{instance_type}=~/micro|nano/) {
-         unless (grep { /devtools/ } @ARGV) {
-            if ($ARGV[$#ARGV]=~/^\d+$/) {
-               pop @ARGV;pop @ARGV;
-            }
-            shift @ARGV if $ARGV[0] eq 'SKIP';
-            my $argvs=join " ", @ARGV;
-            my $exec_cmd="sudo su -c '"
-                        ."yum -y groupinstall \'Development tools\';"
-                        ."sync;echo 3 > /proc/sys/vm/drop_caches;"
-                        ."swapoff -a && swapon -a';"
-                        ."$^X Makefile.PL $argvs SKIP devtools 1";
-            exec $exec_cmd;
-         }
-      } else {
-         fa_system("sudo yum -y groupinstall 'Development tools'");
-      }
+      fa_system("sudo yum -y groupinstall 'Development tools'");
    }
    unless (-1<index $yins,'openssl-devel') {
       fa_system("sudo yum -y install 'openssl-devel'");
@@ -2132,7 +2153,7 @@ END
          if ($@ && -1==index $@,'Attempt to reload') {
             warn $@;
          } else {
-            print "*** $p Loaded Successfully\n";
+            print "\n\n*** $p Loaded Successfully\n\n";
             $ENV{LOADED_MODULES}.="|$p";
             $exec_cnt=0;
          }
@@ -2152,7 +2173,7 @@ END
       }
    } elsif (exists $amazon{instance_type} &&
          $amazon{instance_type}=~/micro/) { 
-      print "*** $p Loaded Successfully\n";
+      print "\n\n*** $p Loaded Successfully\n\n";
       $ENV{LOADED_MODULES}.="|$p";
       $exec_cnt=0;
       print "\n",`sudo cat /proc/meminfo | grep MemFree`;
@@ -2173,7 +2194,7 @@ END
          print "\n";
       }
    } else {
-      print "*** $p Loaded Successfully\n";
+      print "\n\n*** $p Loaded Successfully\n\n";
       $ENV{LOADED_MODULES}.="|$p";
       $exec_cnt=0;
    }
@@ -2252,7 +2273,7 @@ if (exists $amazon{instance_type}) {
                      ."swapoff -a && swapon -a;"
                      ."cd \"$cwd\";$^X Makefile.PL $argvs CPAN";
          exec $exec_cmd;
-      } elsif (!grep { /SKIP/ } @ARGV) {
+      } elsif (grep { /figlet/ } @ARGV) {
          pop @ARGV;
          print "\n";
 	 my $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
@@ -2295,6 +2316,7 @@ END
    \$ <sudo> cpan    ( <== restart 'cpan' [if sudo was used, use it again])
 
    cpan[1]> install Net::FullAuto  <==
+
 END
          $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
          my $mem_avail=$memavail;
@@ -2302,13 +2324,12 @@ END
          print "$mem_avail\n\n";
          if (int($memavail)<220000) {
          #if (int($memavail)<150000) {
-            print "$low_mem\n\n";
+            print $low_mem;sleep 5;
             exit;
          }
       }
    }
 }
-#print "\n";
 if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Capture::Tiny','install','Makefile');
    &fa_install_module('Test::LeakTrace','install','Makefile');
@@ -6492,9 +6513,8 @@ sub install_figlet {
             $amazon{instance_type}=~/micro|nano/) {
          unless (grep { /figlet/ } @ARGV) {
             my $argvs=join " ", @ARGV;
-            my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
-                        ."swapoff -a && swapon -a;"
-                        ."$^X Makefile.PL $argvs figlet 1";
+            my $exec_cmd="sudo su -c 'echo 3 > /proc/sys/vm/drop_caches';"
+                        ."$^X Makefile.PL SKIP $argvs figlet 1";
             exec $exec_cmd;
          }
       }

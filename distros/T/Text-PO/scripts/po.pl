@@ -1,11 +1,11 @@
 #!/usr/local/bin/perl
 ##----------------------------------------------------------------------------
-## PO Files Manipulation - ~/lib//media/sf_src/perl/Text-PO/scripts/po.pl
-## Version v0.2.0
+## PO Files Manipulation - ~/lib//mnt/src/perl/Text-PO/scripts/po.pl
+## Version v0.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/24
-## Modified 2022/12/29
+## Modified 2024/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,13 +19,12 @@ BEGIN
     use DateTime;
     use Getopt::Class;
     use IO::File;
-    use Nice::Try;
     use Pod::Usage;
     use Text::PO;
     use Text::PO::MO;
     use Text::Wrap ();
     our $PLURALS = {};
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 {
@@ -323,29 +322,31 @@ sub init_po
     {
         my $f = $opt->new_file( $opts->{settings} );
         bailout( "Settings json file specified \"$opts->{settings}\" does not exist.\n" ) if( !$f->exists );
-        try
+        local $@;
+        # try-catch
+        my $json = eval
         {
             my $data = $f->load;
             my $j = JSON->new->utf8->relaxed;
-            my $json = $j->decode( $data );
-            # Make sure all fields are normalised
-            foreach my $k ( keys( %$json ) )
-            {
-                ( my $k2 = $k ) =~ tr/-/_/;
-                $json->{ $k2 } = CORE::delete( $json->{ $k } );
-            }
-            
-            foreach my $k ( @$fields )
-            {
-                # command line options take priority
-                next if( defined( $opts->{ $k } ) && length( $opts->{ $k } ) );
-                $opts->{ $k } = $json->{ $k } if( exists( $json->{ $k } ) );
-            }
-        }
-        catch( $e )
+            $j->decode( $data );
+        };
+        if( $@ )
         {
-            warn( "An error occurred while trying to decode json data from file \"$opts->{settings}\": $e\n" );
+            warn( "An error occurred while trying to decode json data from file \"$opts->{settings}\": $@\n" );
             return;
+        }
+        # Make sure all fields are normalised
+        foreach my $k ( keys( %$json ) )
+        {
+            ( my $k2 = $k ) =~ tr/-/_/;
+            $json->{ $k2 } = CORE::delete( $json->{ $k } );
+        }
+        
+        foreach my $k ( @$fields )
+        {
+            # command line options take priority
+            next if( defined( $opts->{ $k } ) && length( $opts->{ $k } ) );
+            $opts->{ $k } = $json->{ $k } if( exists( $json->{ $k } ) );
         }
     }
     
@@ -948,7 +949,7 @@ po - GNU PO file manager
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 OPTIONS
 

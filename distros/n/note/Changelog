@@ -1,637 +1,680 @@
-================================================================================
-1.3.26:         fixed installer, on newer perls NOTEDB/* is being ignored
-================================================================================
-1.3.25:         fixed indents
-================================================================================
-1.3.24:         removed bashism in mysql installer.
-================================================================================
-1.3.23:         defect distritbution. do not use.
-================================================================================
-1.3.22:		fixed bug in mysql backend.
-		added retry feature for NOTEDB::pwsafe3 backend save() password
-		entering. bails out after 5 retries.
-================================================================================
+-*-text-*-
+
+1.4.0:
+Added support for JSON encoded export files instead of YAML.
+Currently this is just an option, which can be set in the config
+with UseJSON or commandline -j. The old export format is now
+being considered deprecated (a warning will be shown) and will
+be removed in 1.5. Fixes https://github.com/TLINDEN/note/issues/10.
+
+A helper script has been added to help to combine two notedb's
+into one: contrib/sync-combine-two-yaml-exports-into-one.pl. It is
+still using YAML mode, JSON support will be added in the future.
+
+
+
+1.3.26:
+fixed installer, on newer perls NOTEDB/* is being ignored
+
+
+
+1.3.25:
+fixed indents
+
+
+
+1.3.24:
+removed bashism in mysql installer.
+
+
+
+1.3.23:
+defect distritbution. do not use.
+
+
+
+1.3.22:
+fixed bug in mysql backend.
+added retry feature for NOTEDB::pwsafe3 backend save() password
+entering. bails out after 5 retries.
+
+
+
 1.3.21:
-		Changed note id generation in NOTEDB::pwsafe3::_uuid(), again.
-		Instead of crc checksums and the loop to avoid duplicates, I just
-		use a counter and sort the entries by ctime, so that older entries
-		keep their note id. Also this should fix a rare bug, where the
-		code hangs because of said loop.
-================================================================================
+Changed note id generation in NOTEDB::pwsafe3::_uuid(), again.
+Instead of crc checksums and the loop to avoid duplicates, I just
+use a counter and sort the entries by ctime, so that older entries
+keep their note id. Also this should fix a rare bug, where the
+code hangs because of said loop.
+
+
+
 1.3.20:
-		fixed bug in NOTEDB::pwsafe3::_retrieve(), it iterated over the
-		records unsorted which resulted in different note ids each time
-		the program runs.
-================================================================================
+fixed bug in NOTEDB::pwsafe3::_retrieve(), it iterated over the
+records unsorted which resulted in different note ids each time
+the program runs.
+
+
+
 1.3.19:
-		revert fix in NOTEDB::pwsafe3::filechanged(), use > again.
-================================================================================
+revert fix in NOTEDB::pwsafe3::filechanged(), use > again.
+
+
+
 1.3.18:
-		fixed unit tests and added more (lots of them)
+fixed unit tests and added more (lots of them)
+fixed several bugs in backend modules, which I found during
+writing of the unit tests.
 
-		fixed several bugs in backend modules, which I found during
-		writing of the unit tests.
-================================================================================
+
+
 1.3.17:
-		applied patch by Bill Carlson, which fixes string length issues
-		in non-interactive search mode.
+applied patch by Bill Carlson, which fixes string length issues
+in non-interactive search mode.
+fixed usage text (-h) so that it now contains the available
+options.
 
-		fixed usage text (-h) so that it now contains the available
-		options.
-================================================================================
+
+
 1.3.16:
-		fixed checking of encrypted notes when encryption is turned off.
-		instead of checking note id 1, we now check the first entry,
-		whatever id it may have.
-================================================================================
+fixed checking of encrypted notes when encryption is turned off.
+instead of checking note id 1, we now check the first entry,
+whatever id it may have.
+
+
+
 1.3.15:
-		fixed bug in NOTEDB::pwsafe3 backend, it converted the date
-		of a note entry into the wrong formatted timestamp.
-================================================================================
+fixed bug in NOTEDB::pwsafe3 backend, it converted the date
+of a note entry into the wrong formatted timestamp.
+
+
+
 1.3.14:
-		fixed bug in NOTEDB::pwsafe3 backend, it used lockging on the
-		database file for reading, which is wrong.
-================================================================================
+fixed bug in NOTEDB::pwsafe3 backend, it used lockging on the
+database file for reading, which is wrong.
+
+
+
 1.3.13:
 ADDED:		new config parameter 'motd', a note entry which will be shown
-		on startup (if exists).
+on startup (if exists).
 CHANGED:	the prompt will now show if the current instance is running
-		in readonly mode.
-================================================================================
+in readonly mode.
+
+
+
 1.3.12:
 FIXED:		NOTEDB::general data backend module did overwrite records if
-		there were some deleted ones in the database.
-================================================================================
+there were some deleted ones in the database.
+
+
+
 1.3.11:
 FIXED:		NOTEDB::pwsafe3 contained the old python stuff in delete code.
-================================================================================
+
+
+
 1.3.10:
 FIXED:		the YAML export/import change were missing too. grml...
 FIXED:		NOTEDB::general backend fixed loading Config::General
-================================================================================
+
+
+
 1.3.9:
 FIXED:		bin/note were missing. for whatever reason, I don't know.
-================================================================================
+
+
+
 1.3.8:
 ADDED:		New backend added: NOTEDB::pwsafe3, which adds support to store
-		notes in a Password Safe v3 database.
+notes in a Password Safe v3 database.
 FIXED:		-d didn't work, because of a typo in mode assignment.
-================================================================================
+
+
+
 1.3.7:
 ADDED:		added ticket feature, which adds a unique id to each
-		new note, which persists during imports/exports. the
-		id is a randomly generated string.
-================================================================================
+new note, which persists during imports/exports. the
+id is a randomly generated string.
+
+
+
 1.3.6:
 ADDED:          Added test cases for "make test"
 ADDED:		Added test for optional and required perl modules in
-		Makefile.PL
+Makefile.PL
 FIXED:		NOTEDB::dumper version string were wrong, therefore
-		cpan didn't index is properly.
-================================================================================
+cpan didn't index is properly.
+
+
+
 1.3.5:
 FIXED:		Applied patch by Elmar Loos which fixes misbehavior for
-		-t and -T (identical output)
+-t and -T (identical output)
 FIXED:		Fixed import bug which omitted the timestamp of the last
-		entry, supmitted by Bill Barnard.
+entry, supmitted by Bill Barnard.
 FIXED:		Fixed another import "bug" (or design flaw) which caused
-		imported notes to get new numbering after importing them.
-		Submitted by Bill Barnard.
+imported notes to get new numbering after importing them.
+Submitted by Bill Barnard.
 CHANGED:	Until 1.3.4 missing Crypt:: modules lead to unencrypted
-		fallback by note. From 1.3.5 on this will no more happen,
-		it croaks now until you install the desired modules
-		or modify your configuration to use no encryption.
+fallback by note. From 1.3.5 on this will no more happen,
+it croaks now until you install the desired modules
+or modify your configuration to use no encryption.
 CHANGED:	default config and default settings without config have
-		been changed. They are now simpler, no colours or anything
-		so that it works better out of the box in any terminal
-		window or shell (e.g. on dark ones or the like).
+been changed. They are now simpler, no colours or anything
+so that it works better out of the box in any terminal
+window or shell (e.g. on dark ones or the like).
 ADDED:		New interactive mode command: "c". It is now possible to
-		change note's behavior at runtime. No database related 
-		parameters can be modified.
-================================================================================
+change note's behavior at runtime. No database related 
+parameters can be modified.
+
+
+
 1.3.4:
 ADDED:		Each note now contains a "ticket number" which identifies
-		it against other notes. Those tickets are not changing when
-		notes will be reorganized.
-
+it against other notes. Those tickets are not changing when
+notes will be reorganized.
 ADDED:		added support for less to view note entries instead of
-		just printing it to STDOUT. (interactive mode).
-================================================================================
+just printing it to STDOUT. (interactive mode).
+
+
+
 1.3.3:
 ADDED:          new configfile parameter PrintLines (default: YES), which
-                controls wether listings are separated by horizontal lines.
-================================================================================
+controls wether listings are separated by horizontal lines.
+
+
+
 1.3.2:
 FIXED:          NOTEDB::mysql backend parameter fixed (dbtype)
 FIXED:          NOTEDB::mysql didn't fetch topics correctly
 FIXED:          NOTEDB::text didn't correctly return last highest note id
-================================================================================
+
+
+
 1.3.1:
 FIXED:          most config variables not related to drivers had
-	 	invalid sentence in note, so the new ones of the new config
-		were ignored.
+invalid sentence in note, so the new ones of the new config
+were ignored.
 FIXED:		added version to NOTEDB::text.
 FIXED:		fixed handling of NOTEDB::crypt_supported, now encryption
-		works again.
+works again.
 ADDED:		NOTEDB::text now supports internal caching too.
 CHANGED:        lock() sets the umask internally to 022, so that other
-		users are able to read the lockfile.
-================================================================================
+users are able to read the lockfile.
+
+
+
 1.3.0:
 ADDED:          new config option: ReadOnly
 ADDED:          new database backend: NOTEDB::text, which uses the Storable
-		module.
+module.
 CHANGED:        the data import will now written to db once.
 CHANGED:        added global database locking support, which is usually
-                useful in multiuser environments.
+useful in multiuser environments.
 ADDED:          new database backend: NOTEDB::general, which uses the
-                Config::General module.
+Config::General module.
 CLEANUP:        almost everywhere
 CHANGED:        noterc config format changed! especially the config for
-	        backend drivers has changed a lot.
+backend drivers has changed a lot.
 CHANGED:        the configuration variables are now stored in a hash, this
-                saved some global variables, the driver variables are stored
-                in an extra hash, which contains one key per driver, this
-                hash gets supplied to the driver backend module 1:1.
+saved some global variables, the driver variables are stored
+in an extra hash, which contains one key per driver, this
+hash gets supplied to the driver backend module 1:1.
 CHANGED:        the libpath variable has been removed, it didnt't work either.
-                use now .. instead, so that a local installation for a non
-	        root user is still possible.
-================================================================================
+use now .. instead, so that a local installation for a non
+root user is still possible.
+
+
+
 1.2.6:
 FIXED:		the binary driver (NOTEDB::binary) encounters now if a note
-		entry is bigger then MaxNoteByte. It prints the overlapping
-		part to STDERR, and a warning message and finally saves
-		the complete, unchanged note entry to an external text file.
+entry is bigger then MaxNoteByte. It prints the overlapping
+part to STDERR, and a warning message and finally saves
+the complete, unchanged note entry to an external text file.
 
-================================================================================
+
+
 1.2.5:
 FIXED:          removed any file/path actions using '/'. replaced by portable
-                functions by using File::Spec. This makes it possible to run
-		note unchanged on win32 (and possibly any other) environments.
-
+functions by using File::Spec. This makes it possible to run
+note unchanged on win32 (and possibly any other) environments.
 FIXED:          added a whitespace to the prompt in interactive mode to
-                circumvent a bug in the win32 Term::ReadLine module which causes
-		the cursor to be displayed on the left side (column 0) of
-		the screen.
-
+circumvent a bug in the win32 Term::ReadLine module which causes
+the cursor to be displayed on the left side (column 0) of
+the screen.
 FIXED:		added "or die" code to some commands which are running inside
-                an eval{} block to fetch errors. Without the "or die"s no
-		error could ever catched.
-
+an eval{} block to fetch errors. Without the "or die"s no
+error could ever catched.
 CHANGED:        removed HOME variable support of the noterc. in fact, if it
-                exists, no error will occur, but it will no longer be used.
-		It didn't work in older versions anyway.
-
+exists, no error will occur, but it will no longer be used.
+It didn't work in older versions anyway.
 ADDED:          It is now possible to quit note using CTRL-D (or: EOF)
 
-================================================================================
+
+
 1.2.4:
 CHANGED:    	in the function find_editor() the alternatives vim and pico
-		has been removed because they would never had a match.
+has been removed because they would never had a match.
 FIXED:		applied patch by Bill Barnard <bill@barnard-engineering.com>
-		which fixes a bug in the sub format() which features bold
-		hidden or underlined text. Now its possible to use a ^ char
-		in hidden texts too. I applied the same for the other regexps.
+which fixes a bug in the sub format() which features bold
+hidden or underlined text. Now its possible to use a ^ char
+in hidden texts too. I applied the same for the other regexps.
 ADDED:		if the config variable FormatText is set to 'simple' then
-		only one * _ { or / will make the text tagged with them to
-		be displayed formatted, instead of two.
+only one * _ { or / will make the text tagged with them to
+be displayed formatted, instead of two.
 ADDED:		added Term::ReadLine support (auto-completion and history).
 
-================================================================================
+
+
 1.2.3:
 ADDED:		if FormatText is enabled one can now use a new special format
-		tag: //. If a text is surrounded by two slashes, i.e.: //blah//
-		then it appears "invisible" by using blue forground and blue
-		background color for displaying. This is handy for passwords
-		since no nobody can grab you password by looking at your
-		monitor, but you can copy&paste it.
+tag: //. If a text is surrounded by two slashes, i.e.: //blah//
+then it appears "invisible" by using blue forground and blue
+background color for displaying. This is handy for passwords
+since no nobody can grab you password by looking at your
+monitor, but you can copy&paste it.
 
-================================================================================
+
+
 1.2.2:
 FIXED:		oneliner note entries caused breaked displaying in interactive
-		mode.
+mode.
 FIXED:		list displaying in interactiv mode corrected. the width of the
-		note number will now correctly used.
+note number will now correctly used.
 CHANGED:	the default setting of note will now be to use an external
-		editor instead of stdin.
+editor instead of stdin.
 CHANGED:	the unneccessary apostrophes in listings has been removed.
 ADDED:		the note version will be displayed in the titlebar of interactive
-		mode.
+mode.
 ADDED:		new config variable AutoClear, which is turned on by default,
-		which controls wether the screen shall be cleared after each
-		item (display, list and so on).
+which controls wether the screen shall be cleared after each
+item (display, list and so on).
 
-================================================================================
+
+
 1.2.1:
 CHANGED:	added the correct installation instructions to the README file.
 REMOVED: 	removed the usage guidelines from te README file. This information
-		were redundant because its also contained in the manpage.
+were redundant because its also contained in the manpage.
 FIXED:		on FreeBSD the setting of MaxLen to 'auto' had no effect because the
-		output of 'stty -a' which I use in note to determine the actual
-		size of the terminal, is different from that on linux.
+output of 'stty -a' which I use in note to determine the actual
+size of the terminal, is different from that on linux.
 ADDED:		topics can now be abbreviated in interactive mode, which
-		avoids typing. abbreviation works only if an explicit
-		match could be found, otherwise the available topics that
-		matches will be suggested.
+avoids typing. abbreviation works only if an explicit
+match could be found, otherwise the available topics that
+matches will be suggested.
 
-================================================================================
+
+
 1.2.0:
 CHANGED:        using Makemaker instead of self-written code in Makefile.PL
-                for installation. No more dependency checks built-in because
-                note runs out-of-the-box without additional modules, as a matter fact.
+for installation. No more dependency checks built-in because
+note runs out-of-the-box without additional modules, as a matter fact.
 ADDED:          if a search matches exactly on one note it will be displayed
-                directly, which avoids typing.
+directly, which avoids typing.
 CHANGED:        the main if-else contruct for calling the several subs has
-                been replaced by a simple closure call.
+been replaced by a simple closure call.
 CHANGED:        notes will now displayed in a slightly simpler fashion in interactive
-		mode, without the separator line between the title and the note.
+mode, without the separator line between the title and the note.
 ADDED:		note can now determine automatically the width and height of
-		the terminal window it runs in (in interactive mode only) and
-		sets the width/height of what it prints accordingly. the config
-		variable "MaxLen" must be set to "auto" (which is the default
-		from now on) to get this to work.
+the terminal window it runs in (in interactive mode only) and
+sets the width/height of what it prints accordingly. the config
+variable "MaxLen" must be set to "auto" (which is the default
+from now on) to get this to work.
 ADDED:          any interactive command will now clear the screen before it does
-		anything. this look much more uncluttered.
+anything. this look much more uncluttered.
 ADDED:          if multiple notes are printed at once (i.e. note 1,2) then the
-		separator line between them will no more being printed because
-		every notes title is preceded by a line anyway.
+separator line between them will no more being printed because
+every notes title is preceded by a line anyway.
 CHANGED:	by default the default operation mode is now interactive mode,
-		which is somewhat kindlier to new users.
+which is somewhat kindlier to new users.
 CHANGED:	changed to order which editor note tries to find. vi got now
-		higher precedence, because it is likely installed on almost 
-		any unix system.
+higher precedence, because it is likely installed on almost 
+any unix system.
 CHANGED:        cosmetics.
 NOTE:		increased minor version number from 1 to 2 to indicate that
-		development begun after 2 1/2 years pause again :-)
+development begun after 2 1/2 years pause again :-)
 
-================================================================================
+
 
 1.1.2:
 FIXED:		Empty notes will no longer stored.
 ADDED:		A new config option which allows you to specify a time format
-		other than the default one which is used by note.
+other than the default one which is used by note.
 
-================================================================================
+
 
 1.1.1:
 FIXED:		Some odd typos in README and note.pod.
 FIXED:		if ShortCd was on and one used "cd 3" and after that "cd .."
-		then the current topic was wrong (empty $PATH).
+then the current topic was wrong (empty $PATH).
 FIXED:		if the current topic contained no notes and one created a new
-		note without specifying a topic, then note did not add a 
-		proper topic (also because of empty $PATH).
+note without specifying a topic, then note did not add a 
+proper topic (also because of empty $PATH).
 CHANGED:	the default colors are now visible both on black and white
-		backgrounds, see next entry.
+backgrounds, see next entry.
 ADDED:		two more color values: <white_black> and <bold>.
 CHANGED:	the color hash is now in ::main instead of ::C.
 
-================================================================================
+
 
 1.1.0:
 CHANGED:	does no more use the external touch command to create a new
-		file, use perls open() instead.
+file, use perls open() instead.
 CHANGED:	excluded some of the help texts from the usage message and the
-		interactive help command to a manpage.
+interactive help command to a manpage.
 ADDED:		new commandline flag "--encrypt" which one can use to encrypt
-		the mysql database password. This will be decrypted before
-		connecting to the db. There is also a new config file option
-		"encrypt_passwd" which indicates an encrypted db-password.
+the mysql database password. This will be decrypted before
+connecting to the db. There is also a new config file option
+"encrypt_passwd" which indicates an encrypted db-password.
 ADDED:		another new config option "ShortCd", which can be set to "yes"
-		or 1 and if set, then a command like "cd 13" would jump
-		directly to the topic of the note with the number 13.
+or 1 and if set, then a command like "cd 13" would jump
+directly to the topic of the note with the number 13.
 ADDED:		now you can at any time cd back to the "root" of the
-		topic-structure using the command "cd /".
+topic-structure using the command "cd /".
 CHANGED:	mysql.pm does now only do a table-lock on single write
-		accesses, no more on the whole session. This allows one to
-		access the same db twice or more.
+accesses, no more on the whole session. This allows one to
+access the same db twice or more.
 FIXED:		Changed README and Changelog for readability on 80 by 25
-		displays. And changed indentation of the note script itself.
+displays. And changed indentation of the note script itself.
 ADDED:		NOTEDB.pm - a generic module, which holds some methods, which
-		are used by binary.pm, mysql.pm and dbm.pm.
+are used by binary.pm, mysql.pm and dbm.pm.
 ADDED:		NOTEDB.pm generate_search(), which allows one to
-		use AND, OR and various combinations of them using ( and ).
+use AND, OR and various combinations of them using ( and ).
 ADDED:		a search does now return the 2nd line of a note if a matching
-		note's first line is a topic.
+note's first line is a topic.
 CHANGED:	use "unshift" instead of push to add $libpath to @INC.
 ADDED:		a new feature, Caching of notes. supported by binary.pm and
-		mysql.pm. To turn it on, one need to set "Cache" in the config
-		to a true value.
+mysql.pm. To turn it on, one need to set "Cache" in the config
+to a true value.
 CHANGED:	oop-ized and re-indented the modules dbm.pm, mysql.pm and
-		binary.pm.
+binary.pm.
 ADDED:		You can now specify a port for the mysql backend ("DbPort").
 
-================================================================================
+
 
 1.0.9:		jumped directly to 1.1.0, too many additions.
 
-================================================================================
+
 
 1.0.8:
 FIXED:		typo in noterc shipped with package may caused confusion
-		(BLOWFISH instead of Blowfish).
+(BLOWFISH instead of Blowfish).
 CHANGED:	changed the way note manages temporary filez. It uses now a
-		random string instead of just it's own PID. It does also change
-		it's umask to 077 and, if applicable (on ext2 filesystems)
-		issues "chattr +s" which will cause the ext2 inodes to be
-		zero'd after file deletion.
+random string instead of just it's own PID. It does also change
+it's umask to 077 and, if applicable (on ext2 filesystems)
+issues "chattr +s" which will cause the ext2 inodes to be
+zero'd after file deletion.
 ADDED:		A new config option allows the user to specify her own
-		temp-directory. The default is still /tmp.
+temp-directory. The default is still /tmp.
 
-================================================================================
+
 
 1.0.7:
 FIXED:		there was a bug in the search expression, use now \Q and \E.
 ADDED:		--config <file> allows one to use another config than the
-		default.
+default.
 
-================================================================================
+
 
 1.0.6:
 FIXED:		there were some odd bugs in commandline parsing, some options
-		were unavailable.
+were unavailable.
 FIXED:		Forgot "PreferredEditor" config-option in the new config format.
 FIXED:		the interactive "cd .." command has ignored the presence of a 
-		"DefaultLong" setting(and search too)... thx to Peter.
+"DefaultLong" setting(and search too)... thx to Peter.
 CHANGED:	Optimized a little bit the output routine, now it is better to
-		read.
+read.
 ADDED:		sub format and appropriate config-option for text formatting
-		capabilities.
+capabilities.
 CHANGED:	changed getconfig regexp, which allows now also to use 
-		Option = Param.
+Option  Param.
 FIXED:		was not possible to override config-options, which are set by
-		default to something.
+default to something.
 ADDED:		note checks now, if a database os actually really encrypted and
-		exits with an error if it s and the user turned off encryption.
-		This protects her from destroying it's own database ..
+exits with an error if it s and the user turned off encryption.
+This protects her from destroying it's own database ..
 
-================================================================================
+
 
 1.0.5:
 FIXED:		the T (and t respectively) printed nothing out since 1.0.3!
-		It does it now again...
+It does it now again...
 ADDED:		a new database backend added, NOTEDB::dbm, which uses DBM
-		files for storage.
+files for storage.
 FIXED:		&display-tree returns now, if there is no note, otherwise it
-		would die because of an undefined refernce.
+would die because of an undefined refernce.
 CHANGED:	Changed the config file format completely. It is now no more
-		a perl file, instead it is a simple plain text file which note
-		parses.
+a perl file, instead it is a simple plain text file which note
+parses.
 CHANGED:	Changed the way, note loads it database backend. It uses now
-		the $dbdriver variable as module-name, which makes it possible
-		easily to write your own backend without the need to change
-		note itself.
+the $dbdriver variable as module-name, which makes it possible
+easily to write your own backend without the need to change
+note itself.
 FIXED:		Removed Getopt::Long option "bundling", causes errors with perl 
-		5.6.0 and is not senceful.
+5.6.0 and is not senceful.
 FIXED:		Added the Getopt::Long option "no_ignore_case". In 1.0.4 options
-		were case insensitive causing -i to be interpreted as --import
-		instead of --interactive ;-(((
-		
+were case insensitive causing -i to be interpreted as --import
+instead of --interactive ;-(((
 Thanks to Peter Palmreuter for the following fixed/additions:
 ADDED:		a new config option $DEFAULT_LIST, which causes note,
-		if turned to "LONG", to use long-listing as default.
-		But it will still be able to use short-listing if you
-		explicit specify that.
+if turned to "LONG", to use long-listing as default.
+But it will still be able to use short-listing if you
+explicit specify that.
 FIXED:		sub search prints now an appropriate error-message in
-		case no searchstring was given instead of jumping to
-		usage.
+case no searchstring was given instead of jumping to
+usage.
 CHANGED:	Changed the text in the interactive help to reflect 
-		changes of verion 1.0.3 (t and T).
+changes of verion 1.0.3 (t and T).
 
-================================================================================
+
 
 1.0.4:
 CHANGED:	Moved from @ARGV-parsing to Getopt::Long, adding options is now
-		much easier and I do now understand my own code ;-)
+much easier and I do now understand my own code ;-)
 ADDED:		--raw, the "Raw Mode", which turns off any formatting of output.
 
-================================================================================
+
 
 1.0.3:
 ADDED:		"-" works also for --dump, but in the other direction. It causes
-		note to dump to standard output instead into a file.
+note to dump to standard output instead into a file.
 ADDED:		you can specify - as filename for use with --import and if you
-		want to create a new note. "-" stands for standardinput and
-		it allows you to pipe another commands output to note!
+want to create a new note. "-" stands for standardinput and
+it allows you to pipe another commands output to note!
 ADDED:		you can now use an environment variable for the passphrase
-		(when using encryption). If it is present, note will not ask
-		for a passphrase. This is very useful in comination with the
-		addition above, for use in scripts.
+(when using encryption). If it is present, note will not ask
+for a passphrase. This is very useful in comination with the
+addition above, for use in scripts.
 CHANGED:	the interactive help screen is now coloured.
 ADDED:		-o commandline switch, which causes note to overwrite an
-		existing database when importing data from a previous dump.
-		Very handy if you want to re-initialize your db, i.e. if you
-		changed the format.
+existing database when importing data from a previous dump.
+Very handy if you want to re-initialize your db, i.e. if you
+changed the format.
 ADDED:		the long-tree-view (-T) displays now also the note-number of
-		each note.
+each note.
 
-================================================================================
+
 
 1.0.2:
 ADDED:		Topic-Tree overview command (-t or -T).
 ADDED:		Enhanced list command in interactive mode, you can now specify
-		a topic which notes you want to see.
+a topic which notes you want to see.
 CHANGED:	updated the help and usage sections to reflect the additions
-		above.
+above.
 
-================================================================================
+
 
 1.0.1:
 FIXED:		fixed bug in NOTEDB::mysql, which caused note to store NULL
-		values in db, if encryption was off. A really dump failure :-(
+values in db, if encryption was off. A really dump failure :-(
 
-================================================================================
+
 
 1.0.0:
 CHANGED:	removed install.sh. use now a Makefile for installation.
 ADDED:		Encryption support. Note can now encrypt notes using IDEA
-		or DES as encryption-protocols(symetric).
+or DES as encryption-protocols(symetric).
 
-================================================================================
+
 
 0.9:
 FIXED:		There were many new bugs after my last changes *grrrrr*. fixed.
-		Works now properly, with both backends!
+Works now properly, with both backends!
 FIXED:		and another bug: recounting of numbers did not take care about
-		the existing order! If you deleted note #12, then note #13
-		became not neccessarily #12! Instead it becames any other
-		number (kind of randomly...). 
+the existing order! If you deleted note #12, then note #13
+became not neccessarily #12! Instead it becames any other
+number (kind of randomly...). 
 CHANGED:	NOTEDB::binary set_del function changed, it does no more require
-		a temporary file for number recount. Instead it uses get_all and
-		stores all notes in RAM and then rewrites the database.
+a temporary file for number recount. Instead it uses get_all and
+stores all notes in RAM and then rewrites the database.
 FIXED:		fixed the set_new call within note. It used 0 as the first param
-		(number) which is not useful since we dont have support for
-		autoincrement from all database backends.
+(number) which is not useful since we dont have support for
+autoincrement from all database backends.
 FIXED:		fixed the function set_recountnum in NITEDB::mysql, it was also
-		incorrect :-((( 0.8 seemed to be a very bad early alpha...
+incorrect :-((( 0.8 seemed to be a very bad early alpha...
 FIXED:		there was a bug in NOTEDB::binary which caused not to recount
-		note numbers after deleting one :-(
+note numbers after deleting one :-(
 
 
-================================================================================
 
 0.8:
 ADDED:		NOTEDB::binary. so now 0.8 is ready for shipping !
 FIXED: 		regexp bug fixed. It was only possible to delete 2 items
-		together
-		separated by comma ("d 1,2,3,4" deleted only 1,2!).
+together
+separated by comma ("d 1,2,3,4" deleted only 1,2!).
 ADDED:		Some new config options which reflects the new module structure.
-		So you can change your database backend without the need to
-		replace the note script itself.
+So you can change your database backend without the need to
+replace the note script itself.
 FIXED:		the previously added feature "cd <topic>" didn't really work :-(
 ADDED:		NOTEDB::mysql added. Perlmodule, which I will use within 
-		note from now on instead of buildin functions for accessing the
-		database. From now on I only need to maintain one version of
-		note, since the module interface will be identical between the
-		bin and sql version.
+note from now on instead of buildin functions for accessing the
+database. From now on I only need to maintain one version of
+note, since the module interface will be identical between the
+bin and sql version.
 CHANGED:	The SQL code does not use Mysql.pm anymore. Instead it is coded
-		using the more portable DBI module. This allows one easily to 
-		switch to anther database, which is supported by DBI.
+using the more portable DBI module. This allows one easily to 
+switch to anther database, which is supported by DBI.
 CHANGED:	Locking. The db-table will now be locked before note accesses
-		it.
+it.
 FIXED:		width of listings is now always the same independent of the
-		stringlength of a certain note.
+stringlength of a certain note.
 
 
-================================================================================
 
 0.7:
 ADDED:		one can now use the unix-like "cd" command to change to another 
-		topic, thus use "cd topicname" instead just typing "topicname"!
+topic, thus use "cd topicname" instead just typing "topicname"!
 FIXED:		there was a smal regex bug which maked it impossible to use
-		such topics: "4 test", in such a case note just displayed note
-		number 4 instead of cd'ing to topic "4 test".
+such topics: "4 test", in such a case note just displayed note
+number 4 instead of cd'ing to topic "4 test".
 ADDED:		a new config option "$KEEP_TIMESTAMP" allows a user to disable 
-		note's default behavior of updating the timestamp of a note
-		after editing it.
+note's default behavior of updating the timestamp of a note
+after editing it.
 
-
-
-================================================================================
 
 
 0.6:
 FIXED:		oops - the new suptopic feature confused the commandline-mode of
-		note! quickly corrected! so subtopics also available from
-		commandline.
+note! quickly corrected! so subtopics also available from
+commandline.
 FIXED:		a small bug fiyed, it was impossible to use -D or -I from
-		commandline, if $ALWAYS_INT was turned on, now it is.
+commandline, if $ALWAYS_INT was turned on, now it is.
 FIXED:		fixed problem with local/global variable $time, which confused
-		the script under certain circumstances, now $time is no more
-		global, it will be read in (using &getdate) locally by &new
-		and &edit.
+the script under certain circumstances, now $time is no more
+global, it will be read in (using &getdate) locally by &new
+and &edit.
 CHANGED:	The Topic separator is no longer hardcoded, one can customize
-		it using the $TopicSep variable, the default is now /, the
-		backslash will no more work!
+it using the $TopicSep variable, the default is now /, the
+backslash will no more work!
 CHANGED:	use perl buildin localtime() function instead of
-		GNU date, which is possibly not installed on every target
-		system (i.e. win32), therefore better portability!
+GNU date, which is possibly not installed on every target
+system (i.e. win32), therefore better portability!
 CHANGED:	use now the strict module
 ADDED:		Support for subtopics added (and sub-sub-..-topics).
 CHANGED:	Removed the "T" command, it is now obsolete.
 CHANGED:	behavior of list command changed, now shows topics as well as
-		notes under the current topic(if there are some).
+notes under the current topic(if there are some).
 CHANGED:	The ".." command takes you now one level higher in your topic-
-		structure.
+structure.
 ADDED:		A new config option $PreferredEditor, which you can use to 
-		specify your own choice of editor.		
+specify your own choice of editor.		
 FIXED:		A bug at line 769 causing single note where smaller than note-
-		listings
-
-
-
-================================================================================
+listings
 
 
 
 0.5:
 ADDED:		Topic support(requested). You can sort the various notes under
-		different topics now.
+different topics now.
 FIXED:		There was another bug, which caused the list command to display
-		the notes with a too high value of $maxlen.
-
-
-
-================================================================================
+the notes with a too high value of $maxlen.
 
 
 
 0.4.2:
 ADDED:		If run in interactive mode, note will at first do a list
-		command.
+command.
 FIXED:		A bug caused note to save bogus timestamps after editing a note.
 CHANGED:	It does no more print 3 newlines before the menu in interactive
-		mode.
+mode.
 FIXED:		Some more vars will be resetted during each loop in interactive
-		mode. $ListType.
-
-
-
-================================================================================
+mode. $ListType.
 
 
 
 0.4.1:
 ADDED:		The install.sh script for the mysql version is no able to 
-		install the required Mysql module directly from CPAN, thanks
-		to David A. Bandel!
+install the required Mysql module directly from CPAN, thanks
+to David A. Bandel!
 FIXED:		The mysql version did not display notes (i.e.: "note 3" did
-		nothing)
+nothing)
 CHANGED:	Again, the sql-format of the mysql database has been changed.
-		Now there are only 3 fields, the number filed is the primary
-		key, the id field in previous versions was a waste of
-		diskspace...
+Now there are only 3 fields, the number filed is the primary
+key, the id field in previous versions was a waste of
+diskspace...
 CHANGED:	The format of the dump-output has been changed.
 ADDED:		It is now possible to import previously dumped notes into the
-		notedb
-		(dumps from both versions are compatible with each other)
+notedb
+(dumps from both versions are compatible with each other)
 FIXED:		the function num_bereich() had a bug, which caused ot to ignore under
-		some circumstances one number (i.e. "note -d 4-13" did nothing).
-
-
-
-================================================================================
+some circumstances one number (i.e. "note -d 4-13" did nothing).
 
 
 
 0.4:
 CHANGED:	ok, mysql support is back again (upon requests). therefore there
-		are two different version of the script in the same time with
-		the same features, one for mysql and the other one for the
-		binary database.
+are two different version of the script in the same time with
+the same features, one for mysql and the other one for the
+binary database.
 ADDED:		Dump to textfile capability. Later on I want to dump it into a 
-		palm readable format, any help is welcome!
+palm readable format, any help is welcome!
 ADDED:		interactive mode.
 CHANGED:	Better modularity, better code.
 CHANGED:	note can now run without the need of a config file. If does not
-		exist, it will try to work with default values.
+exist, it will try to work with default values.
 ADDED:		sub num_bereich(), which allows one to specify more then one
-		number for deletion or displaying (i.e.: "-d 1,4,7" or "-d 4-9")
-
-
-
-================================================================================
+number for deletion or displaying (i.e.: "-d 1,4,7" or "-d 4-9")
 
 
 
 0.3:
 CHANGED:	it uses no more a mysql database, but a binary file instead.
-		This is much faster!
+This is much faster!
 ADDED:		note can display the notes with colors, it is turned off by
-		default
+default
 
-
-================================================================================
 
 
 0.2:
 FIXED:		now any occurence of ' will be masked with \' before storage
-		to the mysql database.
+to the mysql database.
 FIXED:		now numbers of notes will be recounted, if one delete one note,
-		so the list of notes will everytime start with 1,2,3,...
+so the list of notes will everytime start with 1,2,3,...
 CHANGED:	the look of the list output has been changed, similar to a table
 
 
-================================================================================
 
 0.1:
 INITIAL RELEASE.

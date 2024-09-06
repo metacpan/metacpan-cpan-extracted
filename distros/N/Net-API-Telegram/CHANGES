@@ -1,0 +1,23 @@
+Revision history for Perl module Net::API::Telegram
+
+v0.600.3 2024-09-06T17:44:56+0900
+    - Removed dependencies
+
+v0.600.2 2024-09-05T22:39:51+0900
+    - Updated dependencies
+
+v0.600.1 2020-05-21T08:18:25+0900
+	- Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020
+	- Corrected version numbering
+
+0.6 2020-03-28T18:40:38+0900
+	- Updated the api based on the updated Telegram api documentation
+
+0.5 2020-03-28T16:47:15+0900
+
+0.4.1 2020-03-28T16:17:04+0900
+
+0.3.0 2019-11-22T19:52:44+0900
+
+0.1.0 2019-10-31T14:40:08+0900
+    - original version; created by ExtUtils::ModuleMaker 0.63

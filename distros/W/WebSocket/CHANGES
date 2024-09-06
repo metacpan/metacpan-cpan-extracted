@@ -1,5 +1,8 @@
 Revision history for Perl module WebSocket
 
+v0.2.1 2024-09-06T17:23:44+0900
+    - Updated dependencies
+
 v0.2.0 2023-10-06T10:36:30+0900
     - Improved documentation and code
     - Corrected a missing module requirement (WebSocket::Response) in WebSocket::Connection

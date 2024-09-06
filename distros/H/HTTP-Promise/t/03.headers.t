@@ -22,6 +22,7 @@ my( $h, $h2, $rv );
 $h = HTTP::Promise::Headers->new;
 isa_ok( $h, ['HTTP::Promise::Headers'] );
 # for m in `egrep -E '^=head2 (\w+)' ./lib/HTTP/Promise/Headers.pm| awk '{ print $2 }'`; do echo "can_ok( \$h => '$m' );"; done
+# perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$h, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/HTTP/Promise/Headers.pm
 can_ok( $h => 'new' );
 can_ok( $h => 'add' );
 can_ok( $h => 'as_string' );
