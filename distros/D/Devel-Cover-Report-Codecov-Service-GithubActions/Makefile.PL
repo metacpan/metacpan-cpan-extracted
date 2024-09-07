@@ -35,7 +35,7 @@ my $meta = {
   "provides"         => {
                           "Devel::Cover::Report::Codecov::Service::GithubActions" => {
                             file => "lib/Devel/Cover/Report/Codecov/Service/GithubActions.pm",
-                            version => "0.001000",
+                            version => 0.001001,
                           },
                         },
   "release_status"   => "stable",
@@ -52,7 +52,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Devel-Cover-Report-Codecov-Service-GithubActions/project",
                         },
-  "version"          => "0.001000",
+  "version"          => 0.001001,
   "x_static_install" => 1,
 };
 

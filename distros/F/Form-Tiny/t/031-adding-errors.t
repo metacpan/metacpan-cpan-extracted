@@ -23,13 +23,14 @@ use Test::Exception;
 my $form = TestForm->new(input => {});
 ok !$form->valid;
 is scalar @{$form->errors}, 3;
-is $form->errors->[0]->error, 'error 1';
+is $form->errors->[0]->get_error, 'error 1';
 is $form->errors->[1]->field, 'field';
-is $form->errors->[1]->error, 'error 2';
-is $form->errors->[2]->error, 'error 3';
+is $form->errors->[1]->get_error, 'error 2';
+is $form->errors->[2]->get_error, 'error 3';
 
 dies_ok {
 	$form->add_error(does_not_exist => 'error');
 };
 
 done_testing;
+

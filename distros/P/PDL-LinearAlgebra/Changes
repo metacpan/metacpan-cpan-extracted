@@ -1,3 +1,6 @@
+0.40 2024-09-06
+- moved augment, mstack, tricpy, t to PDL 2.091
+
 0.39 2024-07-23
 - bump minimum PDL to 2.083 as tricpy needs ArgOrder
 

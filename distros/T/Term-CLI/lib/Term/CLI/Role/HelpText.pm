@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Role::HelpText 0.059000;
+package Term::CLI::Role::HelpText 0.060000;
 
 use 5.014;
 use warnings;
@@ -193,6 +193,12 @@ sub usage_text {
             $sub_commands_text = '{'
                 . join( '|', map { 'B<' . $_->name . '>' } @sub_commands )
                 . '}';
+
+            my $term_width = eval { $self->root_node->term->term_width } // 80;
+            my $max_width = int($term_width / 2);
+            if (length $sub_commands_text > $max_width) {
+                $sub_commands_text = 'I<sub-command>';
+            }
         }
         $usage_suffix .= ' ' if length $usage_suffix;
         $usage_suffix .= $sub_commands_text;
@@ -221,7 +227,7 @@ Term::CLI::Role::HelpText - Role for generating help text in Term::CLI
 
 =head1 VERSION
 
-version 0.059000
+version 0.060000
 
 =head1 SYNOPSIS
 

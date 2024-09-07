@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package meta 0.004;
+package meta 0.005;
 
 use v5.14;
 use warnings;
@@ -60,10 +60,8 @@ can be silenced by
    use meta;
    no warnings 'meta::experimental';
 
-I<Since version 0.003_003> the various C<undef>-returning variants of
-C<can_...> like functions or methods have aliases called C<try_get_...> as
-this may be a more suitable naming pattern. The older C<can_...> variants are
-likely to be removed soon.
+I<Since version 0.005> the various C<can_...>-prefixed variant accessor
+methods print deprecation warnings. They are likely to be removed soon.
 
 =cut
 
@@ -126,6 +124,27 @@ package, if it exists. Throws an exception if not.
    $metaglob = $metapkg->can_glob( $name );
 
 Similar to L</get_glob> but returns undef if the glob does not exist.
+
+=head2 list_globs
+
+   @metaglobs = $metapkg->list_globs;
+
+I<Since version 0.005.>
+
+Returns a list of all the globs in the package that may refer to symbols (i.e.
+not subpackages). They are returned in no particular order.
+
+=head2 list_subpackage_globs
+
+=head2 list_all_globs
+
+   @metaglobs = $metapkg->list_subpackage_globs;
+   @metaglobs = $metapkg->list_all_globs;
+
+I<Since version 0.005.>
+
+Returns a list of all the globs in the package that refer to subpackages, or
+all globs, including subpackages. They are returned in no particular order.
 
 =head2 get_symbol
 
@@ -245,7 +264,7 @@ I<Since version 0.003_003.>
 
 Similar to L</get> but creates the symbol if it didn't already exist.
 
-=head2 name
+=head2 basename
 
    $name = $metaglob->basename;
 

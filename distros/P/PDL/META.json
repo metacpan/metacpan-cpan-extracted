@@ -56,7 +56,6 @@
             "Term::ReadKey" : "2.34"
          },
          "requires" : {
-            "Alien::proj" : "1.27",
             "Data::Dumper" : "2.121",
             "File::Map" : "0.57",
             "File::Which" : "0",
@@ -97,6 +96,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.090",
+   "version" : "2.091",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

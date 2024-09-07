@@ -1,5 +1,17 @@
 -----
 
+10.3.3   2024-09-06
+    [Breaking]
+        * Change signature on 'receive()' method in Transport to
+          collect and return the return values of the callbacks;
+          in Future-based code, these return values can be used
+          to throttle receiving of data.
+          A new 'need()' function is introduced to return what
+          used to be returned by 'receive()'.
+        * Change signature of 'on_send()' callback in Transport,
+          adding an '$opaque' value which is to be returned after
+          successful transfer of the data.
+
 10.3.2   2024-09-01
     * Fix POD errors
     * Add LibVirt git tag name to the =head1 VERSION section

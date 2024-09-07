@@ -3,7 +3,7 @@
 #
 package PDL::Complex;
 
-our @EXPORT_OK = qw(Ctan Catan re im i cplx real r2C i2C Cr2p Cp2r Cadd Csub Cmul Cprodover Cscale Cdiv Ceq Cconj Cabs Cabs2 Carg Csin Ccos Cexp Clog Cpow Csqrt Casin Cacos Csinh Ccosh Ctanh Casinh Cacosh Catanh Cproj Croots rCpolynomial );
+our @EXPORT_OK = qw(Ctan Catan re im i cplx real r2C i2C Cr2p Cp2r Cadd Csub Cmul Cprodover Cscale Cdiv Ceq Cconj Cabs Cabs2 Carg Csin Ccos Cexp Clog Cpow Csqrt Casin Cacos Csinh Ccosh Ctanh Casinh Cacosh Catanh Cproj Croots rCpolynomial Ctricpy Cmstack Caugment );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core();
@@ -29,7 +29,7 @@ use warnings;
 use Carp;
 our $VERSION = '2.009';
 
-=encoding iso-8859-1
+=encoding utf8
 
 =head1 NAME
 
@@ -254,7 +254,10 @@ sub i { $i->copy + (@_ ? $_[0] : 0) };
 *asinh = \&Casinh;
 *acosh = \&Cacosh;
 *atanh = \&Catanh;
-#line 258 "Complex.pm"
+*tricpy = \&Ctricpy;
+*mstack = \&Cmstack;
+*augment = \&Caugment;
+#line 261 "Complex.pm"
 
 
 =head1 FUNCTIONS
@@ -265,7 +268,7 @@ sub i { $i->copy + (@_ ? $_[0] : 0) };
 
 
 
-#line 330 "complex.pd"
+#line 333 "complex.pd"
 
 =head2 from_native
 
@@ -367,7 +370,33 @@ sub real($) {
    return $_[0] unless UNIVERSAL::isa($_[0],'PDL::Complex'); # NOOP unless complex
    bless $_[0]->slice(''), 'PDL';
 }
-#line 371 "Complex.pm"
+
+=head2 t
+
+=for usage
+
+ $pdl = $pdl->t(SCALAR(conj))
+ conj : Conjugate Transpose = 1 | Transpose = 0, default = 0;
+
+=for ref
+
+Convenient function for transposing real or complex 2D array(s).
+For complex data, if conj is true returns conjugate transposed array(s).
+Supports broadcasting. Not exported.
+
+Originally by Grégory Vanuxem.
+
+=cut
+
+sub t {
+  my ($m, $conj) = @_;
+  my $ndims = $m->dims;
+  my $r = $ndims > 2 ? $m->xchg(1,2) :
+    $ndims > 1 ? $m->dummy(1) :
+    $m->dummy(1)->dummy(1);
+  $conj ? $r->conj : $r;
+}
+#line 400 "Complex.pm"
 
 
 =head2 r2C
@@ -832,7 +861,7 @@ BEGIN {*Ccos = \&PDL::Complex::Ccos;
 
 
 
-#line 683 "complex.pd"
+#line 712 "complex.pd"
 
 =head2 Ctan
 
@@ -847,7 +876,7 @@ Does not work inplace.
 =cut
 
 sub Ctan($) { Csin($_[0]) / Ccos($_[0]) }
-#line 851 "Complex.pm"
+#line 880 "Complex.pm"
 
 
 =head2 Cexp
@@ -1011,7 +1040,7 @@ BEGIN {*Cacos = \&PDL::Complex::Cacos;
 
 
 
-#line 830 "complex.pd"
+#line 859 "complex.pd"
 
 =head2 Catan
 
@@ -1027,7 +1056,7 @@ sub Catan($) {
    my $z = shift;
    Cmul Clog(Cdiv (PDL::Complex::i()+$z, PDL::Complex::i()-$z)), PDL->pdl(0, 0.5);
 }
-#line 1031 "Complex.pm"
+#line 1060 "Complex.pm"
 
 
 =head2 Csinh
@@ -1253,7 +1282,7 @@ BEGIN {*Croots = \&PDL::Complex::Croots;
 
 
 
-#line 998 "complex.pd"
+#line 1027 "complex.pd"
 
 =head2 re, im
 
@@ -1277,7 +1306,7 @@ sub slice :lvalue {
   $ret;
 }
 }
-#line 1281 "Complex.pm"
+#line 1310 "Complex.pm"
 
 
 =head2 rCpolynomial
@@ -1318,8 +1347,112 @@ BEGIN {*rCpolynomial = \&PDL::Complex::rCpolynomial;
 
 
 
+=head2 Ctricpy
 
-#line 1063 "complex.pd"
+=for sig
+
+  Signature: (A(c=2,m,n);[o] C(c=2,m,n); int uplo)
+
+=for usage
+
+tricpy(PDL(A), int(uplo), PDL(C))
+
+=for example
+
+  $c = $a->tricpy($uplo); # explicit uplo
+  $c = $a->tricpy;        # default upper
+
+or
+
+  tricpy($a, $uplo, $c);  # modify c
+
+=for ref
+
+Copy triangular part to another matrix. If uplo == 0 copy upper triangular
+part.
+
+Originally by Grégory Vanuxem.
+
+=for bad
+
+Ctricpy does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+BEGIN {*Ctricpy = \&PDL::Complex::Ctricpy;
+}
+
+
+
+
+
+=head2 Cmstack
+
+=for sig
+
+  Signature: (x(c=2,n,m);y(c,n,p);[o]out(c,n,q=CALC($SIZE(m)+$SIZE(p))))
+
+=for ref
+
+Combine two 2D ndarrays into a single ndarray, along the second
+("vertical") dim.
+This routine does backward and forward dataflow automatically.
+
+Originally by Grégory Vanuxem.
+
+=for bad
+
+Cmstack does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+BEGIN {*Cmstack = \&PDL::Complex::Cmstack;
+}
+
+
+
+
+
+=head2 Caugment
+
+=for sig
+
+  Signature: (x(c=2,n);y(c,p);[o]out(c,q=CALC($SIZE(n)+$SIZE(p))))
+
+=for ref
+
+Combine two ndarrays into a single ndarray along the 0-th ("horizontal") dim.
+This routine does backward and forward dataflow automatically.
+
+Originally by Grégory Vanuxem.
+
+=for bad
+
+Caugment does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+BEGIN {*Caugment = \&PDL::Complex::Caugment;
+}
+
+
+
+
+
+
+#line 1169 "complex.pd"
 
 # undocumented compatibility functions (thanks to Luis Mochan!)
 sub Catan2 { Clog( $_[1] + i()*$_[0])/i }
@@ -1415,7 +1548,7 @@ in the file COPYING in the PDL distribution.
 perl(1), L<PDL>.
 
 =cut
-#line 1419 "Complex.pm"
+#line 1552 "Complex.pm"
 
 # Exit with OK status
 

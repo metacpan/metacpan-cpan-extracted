@@ -74,7 +74,8 @@ char *_dims_from_args(AV *av, SV **svs, IV n) {
     PDL_Indx nvals = p->nvals, v;
     if (nvals > 10) warn("creating > 10 dim ndarray (ndarray arg)!");
     for (v = 0; v < nvals; v++) {
-      PDL_Anyval anyval = pdl_get_offs(p, v);
+      PDL_Anyval anyval = { PDL_INVALID, {0} };
+      ANYVAL_FROM_CTYPE_OFFSET(anyval, p->datatype, PDL_REPRP(p), PDL_REPROFFS(p)+v);
       if (anyval.type < 0) return "Error getting value from ndarray";
       SV *dv = newSV(0);
       ANYVAL_TO_SV(dv, anyval);
@@ -336,7 +337,8 @@ firstvals_nophys(x)
     PDL_Indx i, maxvals = PDLMIN(10, x->nvals);
     EXTEND(SP, maxvals);
     for(i=0; i<maxvals; i++) {
-      PDL_Anyval anyval = pdl_get_offs(x, i);
+      PDL_Anyval anyval = { PDL_INVALID, {0} };
+      ANYVAL_FROM_CTYPE_OFFSET(anyval, x->datatype, PDL_REPRP(x), PDL_REPROFFS(x)+i);
       if (anyval.type < 0) barf("Error getting value, type=%d", anyval.type);
       SV *sv = sv_newmortal();
       ANYVAL_TO_SV(sv, anyval);
@@ -360,12 +362,12 @@ flags(x)
     PDL_FLAG_DUMP(PDL_LIST_FLAGS_PDLSTATE, x->state)
 
 int
-set_donttouchdata(it,size)
+set_donttouchdata(it,size=-1)
       pdl *it
       IV size
       CODE:
             it->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-            it->nbytes = size;
+            if (size >= 0) it->nbytes = size;
             RETVAL = 1;
       OUTPUT:
             RETVAL
@@ -391,6 +393,15 @@ freedata(it)
 	} else if(it->data) {
 		die("Trying to free data of pdl with data != 0 and datasv==0");
 	}
+
+IV
+datasv_refcount(p)
+  pdl *p
+  CODE:
+    if (!p->datasv) barf("NULL datasv");
+    RETVAL = SvREFCNT((SV*)p->datasv);
+  OUTPUT:
+    RETVAL
 
 int
 set_data_by_offset(it,orig,offset)
@@ -666,13 +677,23 @@ at_bad_c(x,pos)
     for (ipos=x->ndims; ipos<pos_count; ipos++)
       if (pos[ipos] != 0)
         barf("Invalid position %"IND_FLAG" at dimension %"IND_FLAG, pos[ipos], ipos);
-    result=pdl_at(PDL_REPRP(x), x->datatype, pos, x->dims,
-        PDL_REPRINCS(x), PDL_REPROFFS(x),
-	x->ndims);
+    PDL_Indx ioff = pdl_get_offset(pos, x->dims, PDL_REPRINCS(x), PDL_REPROFFS(x), x->ndims);
+    if (ioff >= 0)
+      ANYVAL_FROM_CTYPE_OFFSET(result, x->datatype, PDL_REPRP(x), ioff);
     if (result.type < 0) barf("Position out of range");
    badflag = (x->state & PDL_BADVAL) > 0;
    if (badflag) {
-     volatile PDL_Anyval badval = pdl_get_pdl_badvalue(x);
+     volatile PDL_Anyval badval = { PDL_INVALID, {0} };
+     if (!(x->has_badvalue && x->badvalue.type != x->datatype)) {
+       if (x->has_badvalue)
+         badval = x->badvalue;
+       else {
+#define X(datatype, ctype, ppsym, ...) \
+          badval.type = datatype; badval.value.ppsym = PDL.bvals.ppsym;
+         PDL_GENERICSWITCH(PDL_TYPELIST_ALL, x->datatype, X, )
+#undef X
+       }
+     }
      if (badval.type < 0) barf("Error getting badvalue, type=%d", badval.type);
      int isbad = ANYVAL_ISBAD(result, badval);
      if (isbad == -1) barf("ANYVAL_ISBAD error on types %d, %d", result.type, badval.type);
@@ -701,18 +722,20 @@ listref_c(x)
    volatile PDL_Anyval pdl_val = { PDL_INVALID, {0} }; /* same reason as below */
    volatile PDL_Anyval pdl_badval = { PDL_INVALID, {0} };
   CODE:
-    /*
-    # note:
-    #  the badvalue is stored in a PDL_Anyval, but that's what pdl_at()
-    #  returns
-    */
-
    int stop = 0, badflag = (x->state & PDL_BADVAL) > 0;
    if (badflag) {
-      pdl_badval = pdl_get_pdl_badvalue( x );
-      if (pdl_badval.type < 0) barf("Error getting badvalue, type=%d", pdl_badval.type);
+     if (!(x->has_badvalue && x->badvalue.type != x->datatype)) {
+       if (x->has_badvalue)
+         pdl_badval = x->badvalue;
+       else {
+#define X(datatype, ctype, ppsym, ...) \
+          pdl_badval.type = datatype; pdl_badval.value.ppsym = PDL.bvals.ppsym;
+         PDL_GENERICSWITCH(PDL_TYPELIST_ALL, x->datatype, X, )
+#undef X
+       }
+     }
+     if (pdl_badval.type < 0) barf("Error getting badvalue, type=%d", pdl_badval.type);
    }
-
    pdl_barf_if_error(pdl_make_physvaffine( x ));
    void *data = PDL_REPRP(x);
    AV *av = newAV();
@@ -721,7 +744,10 @@ listref_c(x)
    PDL_Indx *incs = PDL_REPRINCS(x), offs = PDL_REPROFFS(x);
    for(ind=0; ind < x->ndims; ind++) inds[ind] = 0;
    while(!stop) {
-      pdl_val = pdl_at( data, x->datatype, inds, x->dims, incs, offs, x->ndims );
+      pdl_val.type = PDL_INVALID;
+      PDL_Indx ioff = pdl_get_offset(inds, x->dims, PDL_REPRINCS(x), offs, x->ndims);
+      if (ioff >= 0)
+        ANYVAL_FROM_CTYPE_OFFSET(pdl_val, x->datatype, data, ioff);
       if (pdl_val.type < 0) croak("Position out of range");
       if (badflag) {
 	 /* volatile because gcc optimiser otherwise won't recalc for complex double when long-double code added */
@@ -738,7 +764,6 @@ listref_c(x)
 	 ANYVAL_TO_SV(sv, pdl_val);
       }
       av_store( av, lind, sv );
-
       lind++;
       stop = 1;
       for(ind = 0; ind < x->ndims; ind++) {
@@ -763,10 +788,8 @@ set_c(x,pos,value)
     PDL_Indx ipos;
    CODE:
     pdl_barf_if_error(pdl_make_physvaffine( x ));
-
     if (pos == NULL || pos_count < x->ndims)
        croak("Invalid position");
-
     /*  allow additional trailing indices
      *  which must be all zero, i.e. a
      *  [3,1,5] ndarray is treated as an [3,1,5,1,1,1,....]
@@ -775,7 +798,6 @@ set_c(x,pos,value)
     for (ipos=x->ndims; ipos<pos_count; ipos++)
       if (pos[ipos] != 0)
          croak("Invalid position");
-
     pdl_barf_if_error(pdl_set(PDL_REPRP(x), x->datatype, pos, x->dims,
         PDL_REPRINCS(x), PDL_REPROFFS(x),
 	x->ndims,value));
@@ -790,7 +812,7 @@ BOOT:
    PDL_CORE_LIST(X)
 #undef X
 #define X(symbol, ctype, ppsym, shortctype, defbval, ...) \
-  PDL.bvals.shortctype = defbval;
+  PDL.bvals.ppsym = defbval;
    PDL_TYPELIST_ALL(X)
 #undef X
    /*
@@ -966,25 +988,48 @@ sclr(it)
         pdl_barf_if_error(pdl_make_physdims(it));
         if (it->nvals > 1) barf("multielement ndarray in 'sclr' call");
         pdl_barf_if_error(pdl_make_physvaffine( it ));
-        RETVAL = pdl_at0(it);
+        RETVAL.type = PDL_INVALID;
+        if (it->nvals == 1)
+          ANYVAL_FROM_CTYPE_OFFSET(RETVAL, it->datatype, PDL_REPRP(it), PDL_REPROFFS(it));
         if (RETVAL.type < 0) croak("Position out of range");
     OUTPUT:
         RETVAL
 
 SV *
 initialize(class)
-        SV *class
-        CODE:
-        HV *bless_stash = SvROK(class)
-          ? SvSTASH(SvRV(class)) /* a reference to a class */
-          : gv_stashsv(class, 0); /* a class name */
-        RETVAL = newSV(0);
-        pdl *n = pdl_pdlnew();
-        if (!n) pdl_pdl_barf("Error making null pdl");
-        pdl_SetSV_PDL(RETVAL,n);   /* set a null PDL to this SV * */
-        RETVAL = sv_bless(RETVAL, bless_stash); /* bless appropriately  */
-        OUTPUT:
-        RETVAL
+  SV *class
+  CODE:
+    HV *bless_stash = SvROK(class)
+      ? SvSTASH(SvRV(class)) /* a reference to a class */
+      : gv_stashsv(class, 0); /* a class name */
+    RETVAL = newSV(0);
+    pdl *n = pdl_pdlnew();
+    if (!n) pdl_pdl_barf("Error making null pdl");
+    pdl_SetSV_PDL(RETVAL,n);   /* set a null PDL to this SV * */
+    RETVAL = sv_bless(RETVAL, bless_stash); /* bless appropriately  */
+    OUTPUT:
+    RETVAL
+
+# undocumented for present. returns PDL still needing dims and datatype
+SV *
+new_around_datasv(class, datasv_pointer)
+  SV *class
+  IV datasv_pointer
+  CODE:
+    HV *bless_stash = SvROK(class)
+      ? SvSTASH(SvRV(class)) /* a reference to a class */
+      : gv_stashsv(class, 0); /* a class name */
+    RETVAL = newSV(0);
+    pdl *n = pdl_pdlnew();
+    if (!n) pdl_pdl_barf("Error making null pdl");
+    pdl_SetSV_PDL(RETVAL,n);   /* set a null PDL to this SV * */
+    RETVAL = sv_bless(RETVAL, bless_stash); /* bless appropriately  */
+    /* set the datasv to what was supplied */
+    n->datasv = (void*)datasv_pointer;
+    SvREFCNT_inc((SV*)(datasv_pointer));
+    n->data = SvPV_nolen((SV*)datasv_pointer);
+  OUTPUT:
+    RETVAL
 
 SV *
 get_dataref(self)
@@ -1227,9 +1272,12 @@ broadcastover_n(code, pdl1, ...)
 	EXTEND(SP,items);
 	PUSHs(sv_2mortal(newSViv((sd-1))));
 	for(i=0; i<npdls; i++) {
-		SV *sv = sv_newmortal();
-		ANYVAL_TO_SV(sv, pdl_get_offs(pdls[i],pdl_brc.offs[i]));
-		PUSHs(sv);
+            PDL_Anyval anyval = { PDL_INVALID, {0} };
+            ANYVAL_FROM_CTYPE_OFFSET(anyval, pdls[i]->datatype, PDL_REPRP(pdls[i]), pdl_brc.offs[i]);
+            if (anyval.type < 0) die("Error getting value from ndarray");
+            SV *sv = sv_newmortal();
+            ANYVAL_TO_SV(sv, anyval);
+            PUSHs(sv);
 	}
 	PUTBACK;
 	perl_call_sv(code,G_DISCARD);

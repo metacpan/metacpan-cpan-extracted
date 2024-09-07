@@ -100,7 +100,7 @@ use strict;
   BEGIN{ $^W = $warningFlag;}
 }
 
-=encoding Latin-1
+=encoding utf8
 
 =head1 NAME
 
@@ -202,9 +202,8 @@ its second element.
 
 pp_def("gesvd",
        HandleBad => 0,
-	Pars => '[io]A(m,n); int jobu(); int jobvt(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info()',
+	Pars => '[io]A(m,n); int jobu(); int jobvt(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info()',
 	RedoDimsCode => '
-	  $SIZE(minmn) = PDLMIN($SIZE(m),$SIZE(n));
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobu), tmp==1 || tmp==2, $PDL(U), $SIZE(p), $SIZE(m))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvt), tmp==1 || tmp==2, $PDL(VT), $SIZE(s), $SIZE(n))
 	',
@@ -365,10 +364,8 @@ Note that the routine returns VT = V\', not V.
 ');
 pp_def("gesdd",
        HandleBad => 0,
-	RedoDimsCode => '$SIZE(r) = PDLMIN($SIZE(m),$SIZE(n));',
-	Pars => '[io]A(m,n); int jobz(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info(); int [t]iwork(iworkn);',
+	Pars => '[io]A(m,n); int jobz(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info(); int [t]iwork(iworkn);',
 	RedoDimsCode => '
-	  $SIZE(minmn) = PDLMIN($SIZE(m),$SIZE(n));
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)<$SIZE(n)), $PDL(U), $SIZE(p), $SIZE(minmn))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)>=$SIZE(n)), $PDL(VT), $SIZE(s), $SIZE(minmn))
 	  $SIZE(iworkn) = 8*$SIZE(minmn);
@@ -2746,10 +2743,9 @@ workspace than syevx.
 
 pp_def("syevx",
        HandleBad => 0,
-	Pars => 'A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn);',
+	Pars => 'A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn=CALC(5*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp, $PDL(z), $SIZE(p), $SIZE(n))
-	  $SIZE(iworkn) = 5 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
@@ -3460,11 +3456,10 @@ pp_def("sygvx",
 	Pars => '[io]A(n,n); int itype(); int jobz(); int range();
 	  int uplo(); [io]B(n,n); vl(); vu(); int il(); int iu(); abstol();
 	  int [o]m(); [o]w(n); [o]Z(p,p); int [o]ifail(n); int [o]info();
-	  int [t]iwork(iworkn);
+	  int [t]iwork(iworkn=CALC(5*$SIZE(n)));
 	',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp, $PDL(Z), $SIZE(p), $SIZE(n))
-	  $SIZE(iworkn) = 5 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
@@ -3755,11 +3750,10 @@ system of equations A * X = B.
 
 pp_def("gesvx",
        HandleBad => 0,
-	Pars => '[io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info(); [t]work(workn); int [t]iwork(n);',
+	Pars => '[io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); int [t]iwork(n);',
 	RedoDimsCode => '
 	  $SIZE(p) = $SIZE(n); /* Ubuntu LAPACK 3 writes to r anyway */
 	  $SIZE(q) = $SIZE(n); /* Ubuntu LAPACK 3 writes to c anyway */
-	  $SIZE(workn) = 4 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
@@ -4488,10 +4482,9 @@ equations A * X = B.
 
 pp_def("posvx",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info(); int [t]iwork(n); [t]work(workn);',
+	Pars => '[io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n)));',
 	RedoDimsCode => '
 	  $SIZE(p) = $SIZE(n); /* Ubuntu LAPACK 3 writes to s anyway */
-	  $SIZE(workn) = 3 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
@@ -5126,10 +5119,9 @@ value.
 
 pp_def("gelsd",
        HandleBad => 0,
-	Pars => '[io]A(m,n); [io]B(p,q); rcond(); [o]s(minmn); int [o]rank();int [o]info(); int [t]iwork(iworkn);',
+	Pars => '[io]A(m,n); [io]B(p,q); rcond(); [o]s(minmn=CALC(PDLMAX(1,PDLMIN($SIZE(m),$SIZE(n))))); int [o]rank();int [o]info(); int [t]iwork(iworkn);',
 	GenericTypes => [F,D],
 	RedoDimsCode => '
-	  $SIZE(minmn) = PDLMAX(1,PDLMIN($SIZE(m),$SIZE(n)));
 	  integer smlsiz = FORTRAN(ilaenv)(&c_nine, "DGELSD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
 	  integer size_i = (integer) (log((double) $SIZE(minmn) / (double) (smlsiz + 1)) /log(2.)) + 1;
 	  $SIZE(iworkn) = $SIZE(minmn) * (3 * PDLMAX(size_i,0) + 11);
@@ -5499,8 +5491,7 @@ problem
 # TODO IPIV = min(m,n)
 pp_def("getrf",
        HandleBad => 0,
-	RedoDimsCode => '$SIZE(p) = PDLMIN($SIZE(m),$SIZE(n));',
-	Pars => '[io]A(m,n); int [o]ipiv(p); int [o]info()',
+	Pars => '[io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		extern int FORTRAN($TFD(s,d)getrf)(integer *m, integer *n, $GENERIC() *a, integer *
@@ -5558,8 +5549,7 @@ This is the right-looking Level 3 BLAS version of the algorithm.
 
 pp_def("getf2",
        HandleBad => 0,
-	RedoDimsCode => '$SIZE(p) = PDLMIN($SIZE(m),$SIZE(n));',
-	Pars => '[io]A(m,n); int [o]ipiv(p); int [o]info()',
+	Pars => '[io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		extern int FORTRAN($TFD(s,d)getf2)(integer *m, integer *n, $GENERIC() *a, integer *
@@ -6767,8 +6757,7 @@ than max(underflow, 1/overflow).
 
 pp_def("gecon",
        HandleBad => 0,
-	Pars => 'A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn);',
-	RedoDimsCode => '$SIZE(workn) = 4 * $SIZE(n);',
+	Pars => 'A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(4*$SIZE(n)));',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char pnorm = \'I\';
@@ -6836,8 +6825,7 @@ condition number is computed as
 
 pp_def("sycon",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info(); int [t]iwork(n); [t]work(workn);',
-	RedoDimsCode => '$SIZE(workn) = 2 * $SIZE(n);',
+	Pars => '[phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info(); int [t]iwork(n); [t]work(workn=CALC(2*$SIZE(n)));',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -6905,8 +6893,7 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
 
 pp_def("pocon",
        HandleBad => 0,
-	Pars => 'A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn);',
-	RedoDimsCode => '$SIZE(workn) = 3 * $SIZE(n);',
+	Pars => 'A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n)));',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -6968,8 +6955,7 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
 
 pp_def("trcon",
        HandleBad => 0,
-	Pars => 'A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn);',
-	RedoDimsCode => '$SIZE(workn) = 3 * $SIZE(n);',
+	Pars => 'A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n)));',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -8776,11 +8762,10 @@ matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.
 
 pp_def("trevc",
        HandleBad => 0,
-	Pars => '[io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn);',
+	Pars => '[io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(3*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
-	  $SIZE(workn) = 3 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
@@ -8965,11 +8950,10 @@ magnitude has magnitude 1; here the magnitude of a complex number
 
 pp_def("tgevc",
        HandleBad => 0,
-	Pars => '[io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn);',
+	Pars => '[io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
-	  $SIZE(workn) = 6 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
@@ -10468,63 +10452,6 @@ the exponent range, as is found on a Cray.
  labad ($underflow, $overflow);
 
 ');
-################################################################################
-#
-#		OTHER AUXILIARY ROUTINES
-#
-################################################################################
-pp_def(
-	'tricpy',
-	Pars => 'A(m,n);[o] C(m,n)',
-	OtherPars => 'int uplo',
-	OtherParsDefaults => {uplo => 0},
-	ArgOrder => [qw(A uplo C)],
-	GenericTypes => [ppdefs_all()],
-	Code => '
-		if ($COMP(uplo))
-		{
-			broadcastloop %{
-				loop(n,m) %{
-					$C() = $A();
-					if (m >= n) break;
-				%}
-			%}
-		}
-		else
-		{
-			broadcastloop %{
-				loop(m,n) %{
-					$C() = $A();
-					if (n >= m) break;
-				%}
-			%}
-		}
-	',
-	Doc => <<'EOT'
-=for usage
-
-tricpy(PDL(A), int(uplo), PDL(C))
-
-=for example
-
-	use PDL::LinearAlgebra;
-
-	$c = $a->tricpy($uplo);	# explicit uplo
-	$c = $a->tricpy;			# default upper
-or
-	use PDL::LinearAlgebra::Real;
-
-	tricpy($a, $uplo, $c);	# modify c
-
-=for ref
-
-Copy triangular part to another matrix. If uplo == 0 copy upper triangular part.
-
-=cut
-
-EOT
-
-);
 
 pp_def(
 	'cplx_eigen',
@@ -10599,95 +10526,12 @@ as computed by geev or geevx.
 EOT
 );
 
-
-pp_def(
-	'augment',
-	DefaultFlow => 1,
-	TwoWay => 1,
-	Pars => 'x(n); y(p);[o]out(q)',
-	RedoDimsCode => '$SIZE(q) = $SIZE(n) + $SIZE(p);',
-	Code => '
-	  loop(n) %{
-		$out(q=>n) = $x();
-	  %}
-	  register PDL_Indx i,j = 0;
-	  for (i=$SIZE(n); i < $SIZE(q); i++,j++)
-		$out(q=>i) = $y(p=>j);
-	',
-       BackCode => '
-	  loop(n) %{
-		$x() = $out(q=>n);
-	  %}
-	  register PDL_Indx i,j = 0;
-	  for (i=$SIZE(n); i < $SIZE(q); i++,j++)
-		$y(p=>j) = $out(q=>i);
-       ',
-	Doc => <<EOT
-=for ref
-
-Combine two ndarrays into a single ndarray.
-This routine does backward and forward dataflow automatically.
-
-=cut
-
-EOT
-
-);
-
-pp_def(
-	'mstack',
-	DefaultFlow => 1,
-	TwoWay => 1,
-	Pars => 'x(n,m);y(n,p);[o]out(n,q);',
-	RedoDimsCode => '$SIZE(q) = $SIZE(m) + $SIZE(p);',
-	Code => '
-	  register PDL_Indx i,j;
-	  loop(m,n) %{
-		$out(q=>m) = $x();
-	  %}
-	  j=0;
-	  for (i = $SIZE(m); i < $SIZE(q) ;i++,j++)
-	  {
-		  loop(n)%{
-			$out(q=>i) = $y(p=>j);
-		  %}
-	  }
-	',
-
-       BackCode => '
-	  register PDL_Indx i,j;
-	  loop(m,n) %{
-		$x() = $out(q=>m);
-	  %}
-	  j=0;
-	  for (i = $SIZE(m); i < $SIZE(q) ;i++,j++)
-	  {
-		  loop(n)%{
-			$y(p=>j) = $out(q=>i);
-		  %}
-	  }
-       ',
-
-	Doc => <<EOT
-=for ref
-
-Combine two ndarrays into a single ndarray.
-This routine does backward and forward dataflow automatically.
-
-=cut
-
-EOT
-
-);
-
 pp_addhdr('
 float ftrace(int n, float *mat);
 double dtrace(int n, double *mat);
 ');
-pp_def(
-	'charpol',
-	RedoDimsCode => '$SIZE(p) = $SIZE(n) + 1;',
-	Pars => 'A(n,n);[o]Y(n,n);[o]out(p);',
+pp_def('charpol',
+	Pars => 'A(n,n);[o]Y(n,n);[o]out(p=CALC($SIZE(n)+1));',
 	GenericTypes => [F,D],
 	Code => '
 	int i,k;

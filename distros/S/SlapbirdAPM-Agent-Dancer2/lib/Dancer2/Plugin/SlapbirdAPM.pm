@@ -1,5 +1,8 @@
 package Dancer2::Plugin::SlapbirdAPM;
 
+use strict;
+use warnings;
+
 use LWP::UserAgent     ();
 use Const::Fast        qw(const);
 use SlapbirdAPM::Trace ();
@@ -9,11 +12,12 @@ use JSON::MaybeXS ();
 use Dancer2::Plugin;
 use LWP::UserAgent;
 use System::Info;
+use DBIx::Tracer;
 use feature 'say';
 
 our $VERSION = $SlapbirdAPM::Agent::Dancer2::VERSION;
 
-# $Carp::Internal{__PACKAGE__} = 1;
+$Carp::Internal{__PACKAGE__} = 1;
 
 const my $OS => System::Info->new->os;
 
@@ -57,8 +61,18 @@ has _ua => (
 );
 
 my $stack          = [];
+my $queries        = [];
 my $in_request     = 0;
 my $should_request = 0;
+
+DBIx::Tracer->new(
+    sub {
+        my %args = @_;
+        if ($in_request) {
+            push @$queries, { sql => $args{sql}, total_time => $args{time} };
+        }
+    }
+);
 
 {
 
@@ -110,10 +124,12 @@ sub _call_home {
       $self->_unfold_headers( $dancer2_request->headers );
     $response{error} = $error;
     $response{error} //= undef;
-    $response{os}        = $OS;
-    $response{requestor} = $dancer2_request->header('x-slapbird-name');
-    $response{handler}   = undef;
-    $response{stack}     = $stack;
+    $response{os}          = $OS;
+    $response{requestor}   = $dancer2_request->header('x-slapbird-name');
+    $response{handler}     = undef;
+    $response{stack}       = $stack;
+    $response{num_queries} = scalar @$queries;
+    $response{queries}     = $queries;
 
     my $ua = LWP::UserAgent->new();
     my $slapbird_response;
@@ -186,23 +202,12 @@ sub BUILD {
             }
         );
 
-        my @usable_modules = qw(Dancer2 Dancer2::Core Dancer2::Core::App
-          DBI DBIx::Class DBIx::Class::ResultSet DBIx::Class::Result
-          DBD::pg DBD::mysql);
+        my @modules = (
+            qw(Dancer2 Dancer2::Core Dancer2::Core::App),
+            @{ $self->trace_modules }
+        );
 
-        for ( $self->trace_modules->@* ) {
-            next if $_ eq __PACKAGE__;
-
-            eval("no warnings; use $_");
-
-            if ($@) {
-                next;
-            }
-            else {
-                push @usable_modules, $_;
-            }
-        }
-        SlapbirdAPM::Trace->trace_pkgs(@usable_modules);
+        SlapbirdAPM::Trace->trace_pkgs(@modules);
     }
 
     my $request;
@@ -217,6 +222,7 @@ sub BUILD {
                 my ($app) = @_;
                 $in_request = 1;
                 $stack      = [];
+                $queries    = [];
                 $request    = $app->request;
             }
         )

@@ -1,14 +1,18 @@
 -----
 
+0.0.4   2024-09-01
+    * Add XDR::Parse version number as part of "extract_all" returned data.
+    * Add README.pod
+
 0.0.3   2024-09-01
-    Fix dependencies:
+    * Fix dependencies:
         - perl: 5.20
         - XDR::Parse *is* required
         - Log::Any is *not*
-    Fix version number in =head1 VERSION section
+    * Fix version number in =head1 VERSION section
 
 0.0.2   2024-08-31
-    Fix POD errors
+    * Fix POD errors
 
 0.0.1   2024-08-31
-    Initial release
+    * Initial release

@@ -29,12 +29,12 @@
          "requires" : {
             "Devel::CheckLib" : "0",
             "ExtUtils::F77" : "1.26",
-            "PDL" : "2.083"
+            "PDL" : "2.091"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "2.083"
+            "PDL" : "2.091"
          }
       },
       "test" : {
@@ -55,7 +55,7 @@
          "web" : "https://github.com/PDLPorters/pdl-linearalgebra"
       }
    },
-   "version" : "0.39",
+   "version" : "0.40",
    "x_IRC" : "irc://irc.perl.org/#pdl",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

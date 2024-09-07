@@ -12,6 +12,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+    requires 'Software::License';
     recommends 'Test::Perl::Critic';
     recommends 'Test::Pod::Coverage';
     recommends 'Test::Pod';

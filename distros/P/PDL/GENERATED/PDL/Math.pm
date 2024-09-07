@@ -794,6 +794,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Complex roots of a complex polynomial, given coefficients in order
 of decreasing powers. Only works for degree >= 1.
+Uses the Jenkins-Traub algorithm (see
+L<https://en.wikipedia.org/wiki/Jenkins%E2%80%93Traub_algorithm>).
 As of 2.086, works with native-complex data.
 
 =for usage
@@ -822,7 +824,7 @@ sub PDL::polyroots {
   PDL::_polyroots_int(@args);
   $natcplx ? $args[2]->czip($args[3]) : @args[2,3];
 }
-#line 826 "Math.pm"
+#line 828 "Math.pm"
 
 *polyroots = \&PDL::polyroots;
 
@@ -859,7 +861,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 388 "math.pd"
+#line 390 "math.pd"
 sub PDL::polyfromroots {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -882,7 +884,7 @@ sub PDL::polyfromroots {
   }
   $natcplx ? $outs[0] : @outs;
 }
-#line 886 "Math.pm"
+#line 888 "Math.pm"
 
 *polyfromroots = \&PDL::polyfromroots;
 
@@ -919,7 +921,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 433 "math.pd"
+#line 435 "math.pd"
 sub PDL::polyval {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -943,7 +945,7 @@ sub PDL::polyval {
   }
   $natcplx ? $outs[0] : @outs;
 }
-#line 947 "Math.pm"
+#line 949 "Math.pm"
 
 *polyval = \&PDL::polyval;
 
@@ -953,7 +955,7 @@ sub PDL::polyval {
 
 
 
-#line 470 "math.pd"
+#line 472 "math.pd"
 
 =head1 BUGS
 
@@ -973,7 +975,7 @@ distribution. If this file is separated from the PDL distribution,
 the PDL copyright notice should be included in the file.
 
 =cut
-#line 977 "Math.pm"
+#line 979 "Math.pm"
 
 # Exit with OK status
 

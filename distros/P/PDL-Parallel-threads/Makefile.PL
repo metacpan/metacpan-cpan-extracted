@@ -1,23 +1,18 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use PDL::Core::Dev;
-
-my @package = qw(threads.pd threads PDL::Parallel::threads);
-my %hash = pdlpp_stdargs(\@package);
-$hash{PM}{'SIMD.pm'} = '$(INST_LIBDIR)/threads/SIMD.pm';
 
 WriteMakefile(
-	%hash,
+	NAME => 'PDL::Parallel::threads',
+	VERSION_FROM => 'lib/PDL/Parallel/threads.pm',
 	LICENSE  => 'perl',
 	MIN_PERL_VERSION => '5.14.0',
 	CONFIGURE_REQUIRES => {
-		PDL             => '2.058', # trans_parent
 		'ExtUtils::MakeMaker' => '7.14',
 	},
 	PREREQ_PM => {
-		'PDL'             => '2.058',
-		'threads::shared' => '1.21',   # shared_clone
+		'PDL'             => '2.091', # new_around_datasv etc
+		'threads::shared' => '1.21',  # shared_clone
 	},
 	TEST_REQUIRES => {
 		'Test::Warn' => 0,
@@ -41,7 +36,3 @@ WriteMakefile(
 		},
 	},
 );
-
-sub MY::postamble {
-  pdlpp_postamble(\@package);
-}

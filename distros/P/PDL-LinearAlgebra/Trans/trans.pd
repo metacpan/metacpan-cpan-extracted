@@ -39,7 +39,7 @@ use PDL::LinearAlgebra::Real qw //;
 use PDL::LinearAlgebra::Complex qw //;
 use strict;
 
-=encoding Latin-1
+=encoding utf8
 
 =head1 NAME
 
@@ -72,10 +72,7 @@ pp_add_exported('', ' mexp mexpts mlog msqrt mpow
 			csc acsc csch acsch toreal pi');
 
 pp_def('geexp',
-          Pars => '[io,phys]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn);',
-	  RedoDimsCode => '
-	    $SIZE(wspn) = 3 * $SIZE(n) * $SIZE(n);
-	  ',
+          Pars => '[io,phys]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn=CALC(3*$SIZE(n)*$SIZE(n)));',
        	  GenericTypes => [D],
           Code => '
 /* ----------------------------------------------------------------------| 

@@ -4,6 +4,8 @@
 
 /* algorithm 419 collected algorithms from acm.
    algorithm appeared in comm. acm, vol. 15, no. 02, p. 097. */
+/* available in 2024 from https://calgo.acm.org/
+   see https://en.wikipedia.org/wiki/Jenkins%E2%80%93Traub_algorithm */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +42,7 @@ static double are,mre,eta,infin,smalno,base;
 /* driver to test cpoly */
 int main()
 {
-  int fail;
+  char *fail = NULL;
   double p[50],pi[50],zr[50],zi[50];
 
   int i;
@@ -185,10 +187,8 @@ void prtz(int n,double zr[], double zi[])
 }
 #endif
 
-
-/* rjrw 10/04/2000: fix for cos 94: was -.060756474L */
-#define COSR (-.069756474L)
-#define SINR (.99756405L)
+#define COSR (-0.0697564737441253008L)
+#define SINR (0.997564050259824248L)
 
 char *cpoly(double opr[], double opi[], int degree,
 	   double zeror[], double zeroi[])
@@ -216,8 +216,8 @@ char *cpoly(double opr[], double opi[], int degree,
   if (opr[0] == 0.0 && opi[0] == 0.0)
     return "algorithm fails if the leading coefficient is zero.";
 
-  double xx,yy,xxx,bnd;
-  complex double zc,tc,sc,pvc;
+  double xx=0.0,yy=0.0,xxx=0.0,bnd=0.0;
+  complex double zc=0.0,tc=0.0,sc=0.0,pvc=0.0;
   char *failreason = NULL;
   int cnt1,cnt2,i,idnn2;
 
@@ -235,7 +235,7 @@ char *cpoly(double opr[], double opi[], int degree,
     goto returnlab;
   }
 
-  xx = .70710678L;
+  xx = 0.70710678118654752438L;
   yy = -xx;
 
   /* Remove the zeros at the origin if any */
@@ -283,6 +283,8 @@ char *cpoly(double opr[], double opi[], int degree,
 
       /* First stage calculation, no shift */
       tc = noshft(5,nn,tc,hc,pc);
+      if (isnan(creal(tc)) || isnan(cimag(tc)))
+        return "noshft returned NaN";
 
       /* Inner loop to select a shift. */
       for (cnt2=1;failreason && (cnt2<10);cnt2++) {
@@ -329,13 +331,13 @@ static complex double noshft(int l1, int nn, complex double tc, complex double h
   /*  Computes the derivative polynomial as the initial h
       polynomial and computes l1 no-shift h polynomials. */
   int i,jj,n = nn-1,nm1 = n-1,nm2=nm1-1;
-  for (i=0;i<n;i++) {
-    double xni = n-i;
-    hc[i] = xni*pc[i]/((double)(n));
-  }
+  for (i=0;i<n;i++)
+    hc[i] = (n-i)*pc[i] / n;
   for (jj=0;jj<l1;jj++) {
     if (cmod(hc[nm2]) > eta*10.0*cmod(pc[nm2])) {
       tc = cdivid(-pc[n], hc[nm1]);
+      if (isnan(creal(tc)) || isnan(cimag(tc)))
+        return tc; /* error, stop now */
       for (i=0;i<nm1;i++) {
 	int j = nm1-i;
 	hc[j] = pc[j] + tc * hc[j-1];
@@ -360,8 +362,10 @@ static int fxshft(int l2, int nn, complex double shc[], complex double qpc[], co
 	approximate zero if successful.
 
 	l2    - Limit of fixed shift steps
-	zc    - Approximate zero if conv is .true.
-	conv  - Flag indicating convergence of stage 3 iteration
+
+        output:
+	zc    - Approximate zero if true return
+	returns true if convergence of stage 3 iteration
      */
 {
   int test,pasd,boolvar;
@@ -386,36 +390,28 @@ static int fxshft(int l2, int nn, complex double shc[], complex double qpc[], co
 
     /* Test for convergence unless stage 3 has failed once or
        this is the last h polynomial */
-    if (!boolvar && test && j != l2) {
-      if (cmod(*tc-otc) < .5*cmod(*zc)) {
-	if (pasd) {
-
-	  /* The weak convergence test has been passed twice, start the
-	     third stage iteration, after saving the current h polynomial
-	     and shift */
-	  for (i=0;i<n;i++) {
-	    shc[i] = hc[i];
-	  }
-	  complex double svsc = *sc;
-	  if (vrshft(10,nn,qpc,pc,qhc,hc,tc,sc,pvc,zc))
-	    return TRUE;
-
-	  /* The iteration failed to converge
-	     Turn off testing and restore h,s,pv and t */
-	  test = FALSE;
-	  for (i=0;i<n;i++) {
-	    hc[i] = shc[i];
-	  }
-	  *sc = svsc;
-	  *pvc = polyev(nn,*sc,pc,qpc);
-	  boolvar = calct(nn,*sc,*pvc,qhc,hc,tc);
-	} else {
-	  pasd = TRUE;
-	}
-      }
-    } else {
-      pasd = FALSE;
+    if (boolvar || !test || j == l2-1) continue;
+    if (cmod(*tc-otc) >= .5*cmod(*zc)) { pasd = FALSE; continue; }
+    if (!pasd) { pasd = TRUE; continue; }
+    /* The weak convergence test has been passed twice, start the
+       third stage iteration, after saving the current h polynomial
+       and shift */
+    for (i=0;i<n;i++) {
+      shc[i] = hc[i];
     }
+    complex double svsc = *sc;
+    if (vrshft(10,nn,qpc,pc,qhc,hc,tc,sc,pvc,zc))
+      return TRUE;
+
+    /* The iteration failed to converge
+       Turn off testing and restore h,s,pv and t */
+    test = FALSE;
+    for (i=0;i<n;i++) {
+      hc[i] = shc[i];
+    }
+    *sc = svsc;
+    *pvc = polyev(nn,*sc,pc,qpc);
+    boolvar = calct(nn,*sc,*pvc,qhc,hc,tc);
   }
 
   /* Attempt an iteration with final h polynomial from second stage */
@@ -428,10 +424,10 @@ static int vrshft(int l3, int nn, complex double qpc[], complex double pc[], com
 	 l3      - Limit of steps in stage 3
 	 zc      - On entry contains the initial iterate,
 	           On exit, it contains the final iterate (if it converges).
-	 conv    - TRUE if iteration converges
+	 returns TRUE if iteration converges
      */
 {
-  double mp,ms,omp,relstp;
+  double omp = 0,relstp = 0;
   int i,j,boolvar;
   int b = FALSE;
   *sc = *zc;
@@ -441,8 +437,7 @@ static int vrshft(int l3, int nn, complex double qpc[], complex double pc[], com
 
     /* Evaluate p at s and test for convergence */
     *pvc = polyev(nn,*sc,pc,qpc);
-    mp = cmod(*pvc);
-    ms = cmod(*sc);
+    double mp = cmod(*pvc), ms = cmod(*sc);
     if (mp <= 20.0L*errev(nn,ms,mp,qpc)) {
       /* Polynomial value is smaller in value than a bound on the error
 	 in evaluating p, terminate the iteration */
@@ -560,22 +555,23 @@ static double cauchy(int nn, complex double pc[])
   pc[n] = -creal(pc[n]) + I*cimag(pc[n]);
 
   /* Compute upper estimate of bound */
-  xm = exp( (log(-creal(pc[n])) - log(creal(pc[0])))/((double)n) );
+  x = exp( (log(-creal(pc[n])) - log(creal(pc[0])))/n );
   if (creal(pc[nm]) != 0.0) {
     /* If Newton step at the origin is better, use it */
-    x = -creal(pc[n])/creal(pc[nm]);
-    if (x < xm)
-      xm = x;
+    xm = -creal(pc[n])/creal(pc[nm]);
+    if (xm < x)
+      x = xm;
   }
 
   /* Chop the interval (0,x) until f <= 0 */
-  do {
-    x = xm;
-    xm *= .1;
+  while (1) {
+    xm = x*.1;
     f = creal(pc[0]);
     for (i=1;i<nn;i++)
       f = f*xm+creal(pc[i]);
-  } while (f > 0.);
+    if (f <= 0.) break;
+    x = xm;
+  }
   dx = x;
 
   /* Do Newton iteration until x converges to two decimal places */
@@ -647,6 +643,7 @@ static complex double cdivid(complex double a, complex double b)
   } else {
     double r = bi/br;
     double d = br+r*bi;
+    if (isinf(d)) return 0 + 0*I; /* clang 3.4.1 has 1/inf = NaN so we dodge */
     return (ar+ai*r + I*(ai-ar*r))/d;
   }
 }
@@ -730,5 +727,6 @@ static void init(int nncr)
        cf e.g. errev() above */
     are = eta;
     mre = 2.0L*sqrt(2.0L)*eta;
+    nmax = 1;
   }
 }

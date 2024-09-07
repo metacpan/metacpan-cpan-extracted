@@ -331,12 +331,6 @@ Libtmp/Fit/Polynomial.pm
 Libtmp/Fit/t/poly.t
 Libtmp/Func.pm
 Libtmp/Func_demo.pm
-Libtmp/GIS/Makefile.PL
-Libtmp/GIS/Proj/Makefile.PL
-Libtmp/GIS/Proj/Proj.pd
-Libtmp/GIS/Proj/README
-Libtmp/GIS/Proj/t/gis_proj.t
-Libtmp/GIS/Proj/TODO
 Libtmp/GSL/CDF/Demo.pm
 Libtmp/GSL/CDF/gsl_cdf.pd
 Libtmp/GSL/CDF/Makefile.PL
@@ -592,11 +586,10 @@ Libtmp/Transform/Cartography/earth_water-2048x1024.png
 Libtmp/Transform/Cartography/Makefile.PL
 Libtmp/Transform/Makefile.PL
 Libtmp/Transform/Proj4/Makefile.PL
-Libtmp/Transform/Proj4/Proj4.pd
-Libtmp/Transform/Proj4/README
+Libtmp/Transform/Proj4/proj4.pd
+Libtmp/Transform/Proj4/t/gis_proj.t
 Libtmp/Transform/Proj4/t/proj_transform.t
 Libtmp/Transform/Proj4/t/proj_transform2.t
-Libtmp/Transform/Proj4/TODO
 Libtmp/Transform/t/transform.t
 Libtmp/Transform/transform.pd
 m51.fits
@@ -679,7 +672,6 @@ GENERATED/PDL/Complex.pm                 mod=PDL::Complex pd=Basic/Complex/compl
 GENERATED/PDL/Compression.pm             mod=PDL::Compression pd=Libtmp/Compression/compression.pd (added by pdlpp_mkgen)
 GENERATED/PDL/FFT.pm                     mod=PDL::FFT pd=Libtmp/FFT/fft.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Fit/Gaussian.pm            mod=PDL::Fit::Gaussian pd=Libtmp/Fit/Gaussian/gaussian.pd (added by pdlpp_mkgen)
-GENERATED/PDL/GIS/Proj.pm                mod=PDL::GIS::Proj pd=Libtmp/GIS/Proj/Proj.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Graphics/IIS.pm            mod=PDL::Graphics::IIS pd=Graphics/IIS/iis.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Graphics/OpenGLQ.pm        mod=PDL::Graphics::OpenGLQ pd=Graphics/TriD/OpenGLQ/openglq.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Graphics/TriD/Rout.pm      mod=PDL::Graphics::TriD::Rout pd=Graphics/TriD/Rout/rout.pd (added by pdlpp_mkgen)
@@ -736,5 +728,5 @@ GENERATED/PDL/Primitive.pm               mod=PDL::Primitive pd=Basic/Primitive/p
 GENERATED/PDL/Slatec.pm                  mod=PDL::Slatec pd=Libtmp/Slatec/slatec.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Slices.pm                  mod=PDL::Slices pd=Basic/Slices/slices.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Transform.pm               mod=PDL::Transform pd=Libtmp/Transform/transform.pd (added by pdlpp_mkgen)
-GENERATED/PDL/Transform/Proj4.pm         mod=PDL::Transform::Proj4 pd=Libtmp/Transform/Proj4/Proj4.pd (added by pdlpp_mkgen)
+GENERATED/PDL/Transform/Proj4.pm         mod=PDL::Transform::Proj4 pd=Libtmp/Transform/Proj4/proj4.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Ufunc.pm                   mod=PDL::Ufunc pd=Basic/Ufunc/ufunc.pd (added by pdlpp_mkgen)

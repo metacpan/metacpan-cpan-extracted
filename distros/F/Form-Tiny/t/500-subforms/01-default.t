@@ -63,7 +63,7 @@ subtest 'testing default' => sub {
 };
 
 subtest 'testing default with error' => sub {
-	my $form = Form::Parent->new(subform_default => { value1 => [] });
+	my $form = Form::Parent->new(subform_default => {value1 => []});
 	$form->set_input({});
 
 	my $err = try sub {

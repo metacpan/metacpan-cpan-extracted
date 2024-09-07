@@ -40,12 +40,14 @@ _get_attr_hash(rv, create)
       croak("Cannot fetch attributes hash of a non-reference value");
     subject = SvRV(rv);
 
-    for(magic = mg_find(subject, PERL_MAGIC_ext); magic; magic = magic->mg_moremagic) {
-      if(magic->mg_type == PERL_MAGIC_ext && magic->mg_virtual == &vtbl) {
-        hash = magic->mg_obj;
-        break;
+    if(SvTYPE(subject) >= SVt_PVMG)
+      /* Perl doesn't like calling mg_find() on non-magical SVs */
+      for(magic = mg_find(subject, PERL_MAGIC_ext); magic; magic = magic->mg_moremagic) {
+        if(magic->mg_type == PERL_MAGIC_ext && magic->mg_virtual == &vtbl) {
+          hash = magic->mg_obj;
+          break;
+        }
       }
-    }
 
     if(!hash && !create)
       XSRETURN_UNDEF;

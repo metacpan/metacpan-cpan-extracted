@@ -41,15 +41,15 @@ for my $error (@{$form->errors}) {
 
 	for ($error->field) {
 		if (/no_message/) {
-			$no_message_error = $error->error;
+			$no_message_error = $error->get_error;
 		}
 		elsif (/plain_message/) {
-			isnt $error->error, $no_message_error, 'error message is not default';
-			like $error->error, qr/just a string/, 'error message ok';
+			isnt $error->get_error, $no_message_error, 'error message is not default';
+			like $error->get_error, qr/just a string/, 'error message ok';
 		}
 		elsif (/stringified_message/) {
-			isnt $error->error, $no_message_error, 'error message is not default';
-			like $error->error, qr/it stringifies/, 'error message ok';
+			isnt $error->get_error, $no_message_error, 'error message is not default';
+			like $error->get_error, qr/it stringifies/, 'error message ok';
 		}
 	}
 }
@@ -66,3 +66,4 @@ dies_ok {
 };
 
 done_testing();
+

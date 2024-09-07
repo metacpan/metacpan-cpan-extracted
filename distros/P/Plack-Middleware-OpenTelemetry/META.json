@@ -41,7 +41,7 @@
          "web" : "https://github.com/abh/Plack-Middleware-OpenTelemetry"
       }
    },
-   "version" : "0.240230",
+   "version" : "0.242510",
    "x_generated_by_perl" : "v5.38.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT"

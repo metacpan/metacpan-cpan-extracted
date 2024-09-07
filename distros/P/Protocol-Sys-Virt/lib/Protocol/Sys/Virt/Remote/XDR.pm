@@ -9,7 +9,7 @@
 #
 ####################################################################
 
-package Protocol::Sys::Virt::Remote::XDR v10.3.2;
+package Protocol::Sys::Virt::Remote::XDR v10.3.3;
 
 use constant {
     VIR_TYPED_PARAM_INT     => 1,
@@ -32956,7 +32956,7 @@ Protocol::Sys::Virt::Remote::XDR - Constants and (de)serializers for remote serv
 
 =head1 VERSION
 
-v10.3.2
+v10.3.3
 
 Based on LibVirt tag v10.3.0
 

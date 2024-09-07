@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.588-2-g43346043
+package JSON::Schema::Modern; # git description: v0.589-7-gff74ddd3
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.589';
+our $VERSION = '0.590';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -35,7 +35,7 @@ use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Result;
 use JSON::Schema::Modern::Document;
-use JSON::Schema::Modern::Utilities qw(get_type canonical_uri E abort annotate_self jsonp is_type assert_uri);
+use JSON::Schema::Modern::Utilities qw(get_type canonical_uri E abort annotate_self jsonp is_type assert_uri local_annotations);
 use namespace::clean;
 
 our @CARP_NOT = qw(
@@ -378,7 +378,11 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       } qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict)),
     };
 
-    # we're going to set collect_annotations during evaluation when we see an unevaluated* keyword,
+    # this hash will be added to at each level of schema evaluation
+    $state->{seen_data_properties} = {} if $config_override->{_strict_schema_data};
+
+    # we're going to set collect_annotations during evaluation when we see an unevaluated* keyword
+    # (or for object data when the _strict_schema_data configuration is set),
     # but after we pass to a new data scope we'll clear it again.. unless we've got the config set
     # globally for the entire evaluation, so we store that value in a high bit.
     $state->{collect_annotations} = ($state->{collect_annotations}//0) << 8;
@@ -395,6 +399,15 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     }
     else {
       $valid = E({ %$state, exception => 1 }, 'EXCEPTION: '.$e);
+    }
+  }
+
+  if ($state->{seen_data_properties}) {
+    my @unevaluated_properties = grep !$state->{seen_data_properties}{$_}, keys $state->{seen_data_properties}->%*;
+    $valid &&= !@unevaluated_properties;
+    foreach my $property (sort @unevaluated_properties) {
+      ()= E({ %$state, data_path => $property }, 'unknown keyword found in schema: %s',
+        $property =~ m{/([^/]+)$});
     }
   }
 
@@ -417,7 +430,8 @@ sub validate_schema ($self, $schema, $config_override = {}) {
   my $metaschema_uri = is_plain_hashref($schema) && $schema->{'$schema'} ? $schema->{'$schema'}
     : $self->METASCHEMA_URIS->{$self->specification_version // $self->SPECIFICATION_VERSION_DEFAULT};
 
-  return $self->evaluate($schema, $metaschema_uri, $config_override);
+  return $self->evaluate($schema, $metaschema_uri,
+    { %$config_override, $self->strict || $config_override->{strict} ? (_strict_schema_data => 1) : () });
 }
 
 sub get ($self, $uri_reference) {
@@ -606,7 +620,10 @@ sub _eval_subschema ($self, $data, $schema, $state) {
 
   # in order to collect annotations from applicator keywords only when needed, we twiddle the low
   # bit if we see a local unevaluated* keyword, and clear it again as we move on to a new data path.
-  $state->{collect_annotations} |= 0+(exists $schema->{unevaluatedItems} || exists $schema->{unevaluatedProperties});
+  # We also set it when _strict_schema_data is set, but only for object data instances.
+  $state->{collect_annotations} |=
+    0+(exists $schema->{unevaluatedItems} || exists $schema->{unevaluatedProperties}
+      || !!$state->{seen_data_properties} && (my $is_object_data = is_plain_hashref($data)));
 
   # in order to collect annotations for unevaluated* keywords, we sometimes need to ignore the
   # suggestion to short_circuit evaluation at this scope (but lower scopes are still fine)
@@ -667,6 +684,22 @@ sub _eval_subschema ($self, $data, $schema, $state) {
   if ($state->{strict} and keys %unknown_keywords) {
     abort($state, 'unknown keyword%s found: %s', keys %unknown_keywords > 1 ? 's' : '',
       join(', ', sort keys %unknown_keywords));
+  }
+
+  # Note: we can remove all of this entirely and just rely on strict mode when we (eventually!) remove
+  # the traverse phase and replace with evaluate-against-metaschema.
+  if ($state->{seen_data_properties} and $is_object_data) {
+    # record the locations of all local properties
+    $state->{seen_data_properties}{jsonp($state->{data_path}, $_)} |= 0 foreach keys %$data;
+
+    my @evaluated_properties = map {
+      my $keyword = $_->{keyword};
+      (grep $keyword eq $_, qw(properties additionalProperties patternProperties unevaluatedProperties))
+        ? $_->{annotation}->@* : ();
+    } local_annotations($state);
+
+    # tick off properties that were recognized by this subschema
+    $state->{seen_data_properties}{jsonp($state->{data_path}, $_)} |= 1 foreach @evaluated_properties;
   }
 
   if ($valid and $state->{collect_annotations} and $state->{spec_version} !~ qr/^draft(7|2019-09)$/) {
@@ -1042,6 +1075,10 @@ sub _fetch_from_uri ($self, $uri_reference) {
   }
 }
 
+# Mojo::JSON::JSON_XS is false when the environment variable $MOJO_NO_JSON_XS is set
+# and also checks if Cpanel::JSON::XS is installed.
+# Mojo::JSON falls back to its own pure-perl encoder/decoder but does not support all the options
+# that we require here.
 use constant _JSON_BACKEND => Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP';
 
 # used for internal encoding as well (when caching serialized schemas)
@@ -1162,7 +1199,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.589
+version 0.590
 
 =head1 SYNOPSIS
 
@@ -1218,7 +1255,7 @@ specification version.
 
 =head2 output_format
 
-One of: C<flag>, C<basic>, C<strict_basic>, C<detailed>, C<verbose>, C<terse>. Defaults to C<basic>.
+One of: C<flag>, C<basic>, C<strict_basic>, C<terse>. Defaults to C<basic>.
 C<strict_basic> can only be used with C<specification_version = draft2019-09>.
 Passed to L<JSON::Schema::Modern::Result/output_format>.
 
@@ -1713,16 +1750,22 @@ You can use it thusly:
   my $schema = $js->get($uri);
   my ($schema, $canonical_uri) = $js->get($uri);
 
-Fetches the Perl data structure representing the JSON Schema at the indicated identifier (uri or
+Fetches the Perl data structure represented by the indicated identifier (uri or
 uri-reference). When called in list context, the canonical URI of that location is also returned, as
 a L<Mojo::URL>. Returns C<undef> if the schema with that URI has not been loaded (or cached).
+
+Note that the data so returned may not be a JSON Schema, if the document encapsulating this location
+is a subclass of L<JSON::Schema::Modern::Document> (for example
+L<JSON::Schema::Modern::Document::OpenAPI>, which contains addressable locations of various semantic
+types).
 
 =head2 get_document
 
   my $document = $js->get_document($uri_reference);
 
-Fetches the L<JSON::Schema::Modern::Document> object that contains the provided identifier (uri or
-uri-reference). C<undef> if the schema with that URI has not been loaded (or cached).
+Fetches the L<JSON::Schema::Modern::Document> object (or subclass) that contains the provided
+identifier (uri or uri-reference). C<undef> if the schema with that URI has not been loaded (or
+cached).
 
 =head1 CACHING
 

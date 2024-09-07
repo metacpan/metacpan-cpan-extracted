@@ -1,5 +1,5 @@
 package Form::Tiny::Meta;
-$Form::Tiny::Meta::VERSION = '2.24';
+$Form::Tiny::Meta::VERSION = '2.25';
 use v5.10;
 use strict;
 use warnings;
@@ -522,7 +522,8 @@ reference of parameters, which are the attributes specified above.
 	my $error = $meta->build_error($class => %params);
 
 Builds an error of class C<"Form::Tiny::Class::$class"> and uses C<%params> to
-contsruct it. If a custom message was defined for this type, it will be used.
+contsruct it. If a custom message was defined for this type, it will be used
+instead of any error passed in C<%params>.
 
 =head3 run_hooks_for
 

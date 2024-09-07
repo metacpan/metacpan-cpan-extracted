@@ -32,7 +32,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Devel-Cover-Report-Codecov-Service-GithubActions";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Devel-Cover-Report-Codecov-Service-GithubActions/v_0-001000>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Devel-Cover-Report-Codecov-Service-GithubActions/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Devel-Cover-Report-Codecov-Service-GithubActions/v_0-001001>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-devel-cover-report-codecov-service-githubactions>;
@@ -47,6 +47,21 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Devel-Cover-Report-Codecov-Service-GithubActions-0.001000.tar.gz>;
 	doap:revision        "0.001000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Devel-Cover-Report-Codecov-Service-GithubActions/v_0-001001>
+	a                    doap:Version;
+	dc:identifier        "Devel-Cover-Report-Codecov-Service-GithubActions-0.001001"^^xsd:string;
+	dc:issued            "2024-09-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Improvements to the output of `configuration` based on codecov documentation.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Devel-Cover-Report-Codecov-Service-GithubActions/v_0-001000>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Devel-Cover-Report-Codecov-Service-GithubActions-0.001001.tar.gz>;
+	doap:revision        "0.001001"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -695,13 +695,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1530 "transform.pd"
+#line 1531 "transform.pd"
 
 sub PDL::match {
   # Set default for rectification to 0 for simple matching...
   push @_, {} if ref($_[-1]) ne 'HASH';
   my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
-#line 1535 "transform.pd"
+#line 1536 "transform.pd"
   unless(@k) {
       $_[-1]->{rectify} = 0;
   }
@@ -924,7 +924,7 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1760 "transform.pd"
+#line 1761 "transform.pd"
           };
       } else {
           # Non-rectified output -- generate a CDi_j matrix instead of the simple formalism.
@@ -968,7 +968,7 @@ sub map {
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1803 "transform.pd"
+#line 1804 "transform.pd"
           };
       }
     }
@@ -1087,7 +1087,7 @@ sub map {
 
 
 
-#line 1920 "transform.pd"
+#line 1921 "transform.pd"
 
 ######################################################################
 
@@ -1127,7 +1127,7 @@ sub unmap {
   return $me->inverse->map($data,@params);
 }
 
-#line 1963 "transform.pd"
+#line 1964 "transform.pd"
 
 =head2 t_inverse
 
@@ -1171,7 +1171,7 @@ sub inverse {
   }, ref $me;
 }
 
-#line 2010 "transform.pd"
+#line 2011 "transform.pd"
 
 =head2 t_compose
 
@@ -1267,7 +1267,7 @@ sub compose {
   return bless($me,'PDL::Transform::Composition');
 }
 
-#line 2109 "transform.pd"
+#line 2110 "transform.pd"
 
 =head2 t_wrap
 
@@ -1334,7 +1334,7 @@ sub _pow_op {
     t_compose(@l);
 }
 
-#line 2182 "transform.pd"
+#line 2183 "transform.pd"
 
 =head2 t_identity
 
@@ -1368,7 +1368,7 @@ sub new {
   return bless $me,$class;
 }
 
-#line 2220 "transform.pd"
+#line 2221 "transform.pd"
 
 =head2 t_lookup
 
@@ -1621,7 +1621,7 @@ sub t_lookup {
   return $me;
 }
 
-#line 2480 "transform.pd"
+#line 2481 "transform.pd"
 
 =head2 t_linear
 
@@ -1933,7 +1933,7 @@ sub stringify {
 }
 }
 
-#line 2795 "transform.pd"
+#line 2796 "transform.pd"
 
 =head2 t_scale
 
@@ -1954,12 +1954,12 @@ sub t_scale {
     my($scale) = shift;
     my($y) = shift;
     return t_linear(scale=>$scale,%{$y})
-#line 2816 "transform.pd"
+#line 2817 "transform.pd"
         if(ref $y eq 'HASH');
     t_linear(Scale=>$scale,$y,@_);
 }
 
-#line 2823 "transform.pd"
+#line 2824 "transform.pd"
 
 =head2 t_offset
 
@@ -1980,13 +1980,13 @@ sub t_offset {
     my($pre) = shift;
     my($y) = shift;
     return t_linear(pre=>$pre,%{$y})
-#line 2844 "transform.pd"
+#line 2845 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(pre=>$pre,$y,@_);
 }
 
-#line 2852 "transform.pd"
+#line 2853 "transform.pd"
 
 =head2 t_rot
 
@@ -2008,13 +2008,13 @@ sub t_rotate    {
     my $rot = shift;
     my($y) = shift;
     return t_linear(rot=>$rot,%{$y})
-#line 2874 "transform.pd"
+#line 2875 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(rot=>$rot,$y,@_);
 }
 
-#line 2884 "transform.pd"
+#line 2885 "transform.pd"
 
 =head2 t_fits
 
@@ -2175,7 +2175,7 @@ sub t_fits {
   return $me;
 }
 
-#line 3053 "transform.pd"
+#line 3054 "transform.pd"
 
 =head2 t_code
 
@@ -2268,7 +2268,7 @@ sub t_code {
   $me;
 }
 
-#line 3152 "transform.pd"
+#line 3153 "transform.pd"
 
 =head2 t_cylindrical
 
@@ -2440,7 +2440,7 @@ sub t_radial {
   $me;
 }
 
-#line 3330 "transform.pd"
+#line 3331 "transform.pd"
 
 =head2 t_quadratic
 
@@ -2555,7 +2555,7 @@ sub t_quadratic {
     $me;
 }
 
-#line 3449 "transform.pd"
+#line 3450 "transform.pd"
 
 =head2 t_cubic
 
@@ -2695,7 +2695,7 @@ sub t_cubic {
     $me;
 }
 
-#line 3595 "transform.pd"
+#line 3596 "transform.pd"
 
 =head2 t_quartic
 
@@ -2814,7 +2814,7 @@ sub t_quartic {
     $me;
 }
 
-#line 3718 "transform.pd"
+#line 3719 "transform.pd"
 
 =head2 t_spherical
 
@@ -2947,7 +2947,7 @@ sub t_spherical {
     $me;
   }
 
-#line 3855 "transform.pd"
+#line 3856 "transform.pd"
 
 =head2 t_projective
 

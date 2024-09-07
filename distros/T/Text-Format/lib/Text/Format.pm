@@ -1,5 +1,5 @@
 package Text::Format;
-$Text::Format::VERSION = '0.62';
+$Text::Format::VERSION = '0.63';
 require 5.006;
 
 
@@ -54,28 +54,31 @@ sub format($@)
     $line   = shift @words;
     $abbrev = $this->__is_abbrev($line)
         if defined $line;
-    while ( defined( $_ = shift @words ) )
+    my $nextword;
+
+    while ( defined( $nextword = shift @words ) )
     {
 
-        if ( length($_) + length($line) < $width - 1
+        if ( length($nextword) + length($line) < $width - 1
             || ( $line !~ /[.?!]['"]?$/ || $abbrev )
-            && length($_) + length($line) < $width )
+            && length($nextword) + length($line) < $width )
         {
             $line .= ' '
                 if $line =~ /[.?!]['"]?$/ && !$abbrev;
-            $line .= ' ' . $_;
+            $line .= ' ' . $nextword;
         }
         else
         {
             last;
         }
-        $abbrev = $this->__is_abbrev($_);
+        $abbrev = $this->__is_abbrev($nextword);
     }
-    ( $line, $_ ) = $this->__do_break( $line, $_ )
+    ( $line, $nextword ) = $this->__do_break( $line, $nextword )
         if $this->{'_nobreak'} && defined $line;
-    push @wrap, $this->__make_line( $line, $findent, $width, defined $_ )
+    push @wrap,
+        $this->__make_line( $line, $findent, $width, defined($nextword) )
         if defined $line;
-    $line = $_;
+    $line = $nextword;
     $width =
         $this->{'_cols'} -
         $this->{'_bindent'} -
@@ -84,28 +87,28 @@ sub format($@)
     $abbrev = 0;
     $abbrev = $this->__is_abbrev($line)
         if defined $line;
-    while ( defined( $_ = shift @words ) )
+    while ( defined( $nextword = shift @words ) )
     {
 
-        if ( length($_) + length($line) < $width - 1
+        if ( length($nextword) + length($line) < $width - 1
             || ( $line !~ /[.?!]['"]?$/ || $abbrev )
-            && length($_) + length($line) < $width )
+            && length($nextword) + length($line) < $width )
         {
             $line .= ' '
                 if $line =~ /[.?!]['"]?$/ && !$abbrev;
-            $line .= ' ' . $_;
+            $line .= ' ' . $nextword;
         }
         else
         {
-            ( $line, $_ ) = $this->__do_break( $line, $_ )
+            ( $line, $nextword ) = $this->__do_break( $line, $nextword )
                 if $this->{'_nobreak'};
             push @wrap,
-                $this->__make_line( $line, $bindent, $width, defined $_ )
+                $this->__make_line( $line, $bindent, $width, defined $nextword )
                 if defined $line;
-            $line = $_;
+            $line = $nextword;
         }
-        $abbrev = $this->__is_abbrev($_)
-            if defined $_;
+        $abbrev = $this->__is_abbrev($nextword)
+            if defined $nextword;
     }
     push @wrap, $this->__make_line( $line, $bindent, $width, 0 )
         if defined $line;
@@ -168,13 +171,13 @@ sub paragraphs($@)
     }
 
     $cnt = 0;
-    for (@wrap)
+    for my $nextword (@wrap)
     {
         $this->{'_hindcurr'} = $this->{'_hindtext'}->[$cnt]
             if $this->{'_hindent'};
         $this->{'_hindcurr'} = ''
             unless defined $this->{'_hindcurr'};
-        $line = $this->format($_);
+        $line = $this->format($nextword);
         push @ret, $line . $end
             if defined $line && length $line > 0;
         ++$cnt;
@@ -203,21 +206,22 @@ sub center($@)
     my ($tabs);
     my $width = $this->{'_cols'} - $this->{'_lmargin'} - $this->{'_rmargin'};
 
-    for (@center)
+    for my $nextword (@center)
     {
-        s/(?:^\s+|\s+$)|\n//g;
-        $tabs = tr/\t//;    # count tabs
-        substr( $_, 0, 0 ) =
+        $nextword =~ s/(?:^\s+|\s+$)|\n//g;
+        $tabs = ( $nextword =~ tr/\t// );    # count tabs
+        substr( $nextword, 0, 0 ) =
             ' ' x
             int(
-            ( $width - length($_) - $tabs * $this->{'_tabs'} + $tabs ) / 2 )
-            if length > 0;
-        substr( $_, 0, 0 ) = ' ' x $this->{'_lmargin'}
-            if length > 0;
-        substr( $_, length ) = "\n";
+            ( $width - length($nextword) - $tabs * $this->{'_tabs'} + $tabs ) /
+                2 )
+            if length($nextword) > 0;
+        substr( $nextword, 0, 0 ) = ' ' x $this->{'_lmargin'}
+            if length($nextword) > 0;
+        substr( $nextword, length($nextword) ) = "\n";
     }
 
-    wantarray
+    return wantarray
         ? @center
         : join '', @center;
 }
@@ -635,13 +639,14 @@ sub __make_line($$$$$)
         my $ws     = int( $spaces / int( @words / 2 ) );  # for filling all gaps
         $spaces %= int( @words / 2 )
             if $ws > 0;    # if we must fill between every single word
-        for ( reverse @words )
+    WORDS_LOOP:
+        for my $nextword ( reverse @words )
         {
-            next
-                if /^\S/;
-            substr( $_, 0, 0 ) = ' ' x $ws;
-            $spaces || next;
-            substr( $_, 0, 0 ) = ' ';
+            next WORDS_LOOP
+                if $nextword =~ /^\S/;
+            substr( $nextword, 0, 0 ) = ' ' x $ws;
+            $spaces || next WORDS_LOOP;
+            substr( $nextword, 0, 0 ) = ' ';
             --$spaces;
         }
         $line = join '', @words;
@@ -686,6 +691,7 @@ sub __do_break($$$)
     my @words    = split /\s+/, $line
         if defined $line;
     my $last_word = $words[$#words];
+    local $_;
 
     for ( keys %{ $this->{'_nobreakregex'} } )
     {
@@ -735,7 +741,7 @@ B<Text::Format> - Various subroutines to format text.
 
 =head1 VERSION
 
-version 0.62
+version 0.63
 
 =head1 SYNOPSIS
 
@@ -1163,7 +1169,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gabor Egressy.
+This software is copyright (c) 2024 by Gabor Egressy.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,6 @@
 cpanfile
 lib/Dancer2/Plugin/SlapbirdAPM.pm
+lib/DBIx/Tracer.pm
 lib/SlapbirdAPM/Agent/Dancer2.pm
 lib/SlapbirdAPM/Trace.pm
 lib/SlapbirdAPM/Trace/Tracer.pm

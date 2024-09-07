@@ -3,7 +3,7 @@
 #
 package PDL::LinearAlgebra::Complex;
 
-our @EXPORT_OK = qw(__Ccgtsv __Ncgtsv cgtsv __Ccgesvd __Ncgesvd cgesvd __Ccgesdd __Ncgesdd cgesdd __Ccggsvd __Ncggsvd cggsvd __Ccgeev __Ncgeev cgeev __Ccgeevx __Ncgeevx cgeevx __Ccggev __Ncggev cggev __Ccggevx __Ncggevx cggevx __Ccgees __Ncgees cgees __Ccgeesx __Ncgeesx cgeesx __Ccgges __Ncgges cgges __Ccggesx __Ncggesx cggesx __Ccheev __Ncheev cheev __Ccheevd __Ncheevd cheevd __Ccheevx __Ncheevx cheevx __Ccheevr __Ncheevr cheevr __Cchegv __Nchegv chegv __Cchegvd __Nchegvd chegvd __Cchegvx __Nchegvx chegvx __Ccgesv __Ncgesv cgesv __Ccgesvx __Ncgesvx cgesvx __Ccsysv __Ncsysv csysv __Ccsysvx __Ncsysvx csysvx __Cchesv __Nchesv chesv __Cchesvx __Nchesvx chesvx __Ccposv __Ncposv cposv __Ccposvx __Ncposvx cposvx __Ccgels __Ncgels cgels __Ccgelsy __Ncgelsy cgelsy __Ccgelss __Ncgelss cgelss __Ccgelsd __Ncgelsd cgelsd __Ccgglse __Ncgglse cgglse __Ccggglm __Ncggglm cggglm __Ccgetrf __Ncgetrf cgetrf __Ccgetf2 __Ncgetf2 cgetf2 __Ccsytrf __Ncsytrf csytrf __Ccsytf2 __Ncsytf2 csytf2 __Ccchetrf __Ncchetrf cchetrf __Cchetf2 __Nchetf2 chetf2 __Ccpotrf __Ncpotrf cpotrf __Ccpotf2 __Ncpotf2 cpotf2 __Ccgetri __Ncgetri cgetri __Ccsytri __Ncsytri csytri __Cchetri __Nchetri chetri __Ccpotri __Ncpotri cpotri __Cctrtri __Nctrtri ctrtri __Cctrti2 __Nctrti2 ctrti2 __Ccgetrs __Ncgetrs cgetrs __Ccsytrs __Ncsytrs csytrs __Cchetrs __Nchetrs chetrs __Ccpotrs __Ncpotrs cpotrs __Cctrtrs __Nctrtrs ctrtrs __Cclatrs __Nclatrs clatrs __Ccgecon __Ncgecon cgecon __Ccsycon __Ncsycon csycon __Cchecon __Nchecon checon __Ccpocon __Ncpocon cpocon __Cctrcon __Nctrcon ctrcon __Ccgeqp3 __Ncgeqp3 cgeqp3 __Ccgeqrf __Ncgeqrf cgeqrf __Ccungqr __Ncungqr cungqr __Ccunmqr __Ncunmqr cunmqr __Ccgelqf __Ncgelqf cgelqf __Ccunglq __Ncunglq cunglq __Ccunmlq __Ncunmlq cunmlq __Ccgeqlf __Ncgeqlf cgeqlf __Ccungql __Ncungql cungql __Ccunmql __Ncunmql cunmql __Ccgerqf __Ncgerqf cgerqf __Ccungrq __Ncungrq cungrq __Ccunmrq __Ncunmrq cunmrq __Cctzrzf __Nctzrzf ctzrzf __Ccunmrz __Ncunmrz cunmrz __Ccgehrd __Ncgehrd cgehrd __Ccunghr __Ncunghr cunghr __Cchseqr __Nchseqr chseqr __Cctrevc __Nctrevc ctrevc __Cctgevc __Nctgevc ctgevc __Ccgebal __Ncgebal cgebal __Cclange __Nclange clange __Cclansy __Nclansy clansy __Cclantr __Nclantr clantr __Ccgemm __Ncgemm cgemm __Ccmmult __Ncmmult cmmult __Cccrossprod __Nccrossprod ccrossprod __Ccsyrk __Ncsyrk csyrk __Ccdot __Ncdot cdot __Ccdotc __Ncdotc cdotc __Ccaxpy __Ncaxpy caxpy __Ccnrm2 __Ncnrm2 cnrm2 __Ccasum __Ncasum casum __Ccscal __Ncscal cscal __Ccsscal __Ncsscal csscal __Ccrotg __Ncrotg crotg __Cclacpy __Nclacpy clacpy __Cclaswp __Nclaswp claswp ctricpy cmstack __Cccharpol __Nccharpol ccharpol );
+our @EXPORT_OK = qw(__Ccgtsv __Ncgtsv cgtsv __Ccgesvd __Ncgesvd cgesvd __Ccgesdd __Ncgesdd cgesdd __Ccggsvd __Ncggsvd cggsvd __Ccgeev __Ncgeev cgeev __Ccgeevx __Ncgeevx cgeevx __Ccggev __Ncggev cggev __Ccggevx __Ncggevx cggevx __Ccgees __Ncgees cgees __Ccgeesx __Ncgeesx cgeesx __Ccgges __Ncgges cgges __Ccggesx __Ncggesx cggesx __Ccheev __Ncheev cheev __Ccheevd __Ncheevd cheevd __Ccheevx __Ncheevx cheevx __Ccheevr __Ncheevr cheevr __Cchegv __Nchegv chegv __Cchegvd __Nchegvd chegvd __Cchegvx __Nchegvx chegvx __Ccgesv __Ncgesv cgesv __Ccgesvx __Ncgesvx cgesvx __Ccsysv __Ncsysv csysv __Ccsysvx __Ncsysvx csysvx __Cchesv __Nchesv chesv __Cchesvx __Nchesvx chesvx __Ccposv __Ncposv cposv __Ccposvx __Ncposvx cposvx __Ccgels __Ncgels cgels __Ccgelsy __Ncgelsy cgelsy __Ccgelss __Ncgelss cgelss __Ccgelsd __Ncgelsd cgelsd __Ccgglse __Ncgglse cgglse __Ccggglm __Ncggglm cggglm __Ccgetrf __Ncgetrf cgetrf __Ccgetf2 __Ncgetf2 cgetf2 __Ccsytrf __Ncsytrf csytrf __Ccsytf2 __Ncsytf2 csytf2 __Ccchetrf __Ncchetrf cchetrf __Cchetf2 __Nchetf2 chetf2 __Ccpotrf __Ncpotrf cpotrf __Ccpotf2 __Ncpotf2 cpotf2 __Ccgetri __Ncgetri cgetri __Ccsytri __Ncsytri csytri __Cchetri __Nchetri chetri __Ccpotri __Ncpotri cpotri __Cctrtri __Nctrtri ctrtri __Cctrti2 __Nctrti2 ctrti2 __Ccgetrs __Ncgetrs cgetrs __Ccsytrs __Ncsytrs csytrs __Cchetrs __Nchetrs chetrs __Ccpotrs __Ncpotrs cpotrs __Cctrtrs __Nctrtrs ctrtrs __Cclatrs __Nclatrs clatrs __Ccgecon __Ncgecon cgecon __Ccsycon __Ncsycon csycon __Cchecon __Nchecon checon __Ccpocon __Ncpocon cpocon __Cctrcon __Nctrcon ctrcon __Ccgeqp3 __Ncgeqp3 cgeqp3 __Ccgeqrf __Ncgeqrf cgeqrf __Ccungqr __Ncungqr cungqr __Ccunmqr __Ncunmqr cunmqr __Ccgelqf __Ncgelqf cgelqf __Ccunglq __Ncunglq cunglq __Ccunmlq __Ncunmlq cunmlq __Ccgeqlf __Ncgeqlf cgeqlf __Ccungql __Ncungql cungql __Ccunmql __Ncunmql cunmql __Ccgerqf __Ncgerqf cgerqf __Ccungrq __Ncungrq cungrq __Ccunmrq __Ncunmrq cunmrq __Cctzrzf __Nctzrzf ctzrzf __Ccunmrz __Ncunmrz cunmrz __Ccgehrd __Ncgehrd cgehrd __Ccunghr __Ncunghr cunghr __Cchseqr __Nchseqr chseqr __Cctrevc __Nctrevc ctrevc __Cctgevc __Nctgevc ctgevc __Ccgebal __Ncgebal cgebal __Cclange __Nclange clange __Cclansy __Nclansy clansy __Cclantr __Nclantr clantr __Ccgemm __Ncgemm cgemm __Ccmmult __Ncmmult cmmult __Cccrossprod __Nccrossprod ccrossprod __Ccsyrk __Ncsyrk csyrk __Ccdot __Ncdot cdot __Ccdotc __Ncdotc cdotc __Ccaxpy __Ncaxpy caxpy __Ccnrm2 __Ncnrm2 cnrm2 __Ccasum __Ncasum casum __Ccscal __Ncscal cscal __Ccsscal __Ncsscal csscal __Ccrotg __Ncrotg crotg __Cclacpy __Nclacpy clacpy __Cclaswp __Nclaswp claswp __Cccharpol __Nccharpol ccharpol );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -43,7 +43,7 @@ use PDL::LinearAlgebra::Real;
 	BEGIN{ $^W = $warningFlag ; }
 }
 
-=encoding Latin-1
+=encoding utf8
 
 =head1 NAME
 
@@ -68,14 +68,6 @@ These routines accept either float or double ndarrays.
 
 =cut
 #line 71 "Complex.pm"
-
-
-=head1 FUNCTIONS
-
-=cut
-
-
-
 
 *__Ccgtsv = \&PDL::__Ccgtsv;
 
@@ -158,7 +150,7 @@ sub PDL::cgtsv {
   goto &PDL::__Ncgtsv;
 }
 *cgtsv = \&PDL::cgtsv;
-#line 162 "Complex.pm"
+#line 154 "Complex.pm"
 
 *__Ccgesvd = \&PDL::__Ccgesvd;
 
@@ -177,7 +169,7 @@ sub PDL::cgtsv {
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int jobu(); int jobvt(); [o]s(minmn);complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); [t]rwork(rworkn))
+  Signature: (complex [io]A(m,n); int jobu(); int jobvt(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n))));complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); [t]rwork(rworkn=CALC(5*$SIZE(minmn))))
 
 =for ref
 
@@ -197,7 +189,7 @@ sub PDL::cgesvd {
   goto &PDL::__Ncgesvd;
 }
 *cgesvd = \&PDL::cgesvd;
-#line 201 "Complex.pm"
+#line 193 "Complex.pm"
 
 *__Ccgesdd = \&PDL::__Ccgesdd;
 
@@ -216,7 +208,7 @@ sub PDL::cgesvd {
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int jobz(); [o]s(minmn);complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
+  Signature: (complex [io]A(m,n); int jobz(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n))));complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
 
 =for ref
 
@@ -236,7 +228,7 @@ sub PDL::cgesdd {
   goto &PDL::__Ncgesdd;
 }
 *cgesdd = \&PDL::cgesdd;
-#line 240 "Complex.pm"
+#line 232 "Complex.pm"
 
 *__Ccggsvd = \&PDL::__Ccggsvd;
 
@@ -255,7 +247,7 @@ sub PDL::cgesdd {
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int jobu(); int jobv(); int jobq();complex  [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n);complex  [o]U(q,q);complex  [o]V(r,r);complex  [o]Q(s,s); int [o]iwork(n); int [o]info(); [t]rwork(rworkn))
+  Signature: (complex [io]A(m,n); int jobu(); int jobv(); int jobq();complex  [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n);complex  [o]U(q,q);complex  [o]V(r,r);complex  [o]Q(s,s); int [o]iwork(n); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
 
 =for ref
 
@@ -271,7 +263,7 @@ sub PDL::cggsvd {
   goto &PDL::__Ncggsvd;
 }
 *cggsvd = \&PDL::cggsvd;
-#line 275 "Complex.pm"
+#line 267 "Complex.pm"
 
 *__Ccgeev = \&PDL::__Ccgeev;
 
@@ -290,7 +282,7 @@ sub PDL::cggsvd {
 
 =for sig
 
-  Signature: (complex A(n,n); int jobvl(); int jobvr();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]info(); [t]rwork(rworkn))
+  Signature: (complex A(n,n); int jobvl(); int jobvr();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
 
 =for ref
 
@@ -306,7 +298,7 @@ sub PDL::cgeev {
   goto &PDL::__Ncgeev;
 }
 *cgeev = \&PDL::cgeev;
-#line 310 "Complex.pm"
+#line 302 "Complex.pm"
 
 *__Ccgeevx = \&PDL::__Ccgeevx;
 
@@ -325,7 +317,7 @@ sub PDL::cgeev {
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); [t]rwork(rworkn))
+  Signature: (complex [io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
 
 =for ref
 
@@ -341,7 +333,7 @@ sub PDL::cgeevx {
   goto &PDL::__Ncgeevx;
 }
 *cgeevx = \&PDL::cgeevx;
-#line 345 "Complex.pm"
+#line 337 "Complex.pm"
 
 *__Ccggev = \&PDL::__Ccggev;
 
@@ -360,7 +352,7 @@ sub PDL::cgeevx {
 
 =for sig
 
-  Signature: (complex A(n,n); int [phys]jobvl();int [phys]jobvr();complex B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]info(); [t]rwork(rworkn))
+  Signature: (complex A(n,n); int [phys]jobvl();int [phys]jobvr();complex B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))))
 
 =for ref
 
@@ -376,7 +368,7 @@ sub PDL::cggev {
   goto &PDL::__Ncggev;
 }
 *cggev = \&PDL::cggev;
-#line 380 "Complex.pm"
+#line 372 "Complex.pm"
 
 *__Ccggevx = \&PDL::__Ccggevx;
 
@@ -395,7 +387,7 @@ sub PDL::cggev {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();complex [io,phys]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn); int [t]bwork(bworkn); int [t]iwork(iworkn))
+  Signature: (complex [io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();complex [io,phys]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn=CALC(6*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn))
 
 =for ref
 
@@ -411,7 +403,7 @@ sub PDL::cggevx {
   goto &PDL::__Ncggevx;
 }
 *cggevx = \&PDL::cggevx;
-#line 415 "Complex.pm"
+#line 407 "Complex.pm"
 
 *__Ccgees = \&PDL::__Ccgees;
 
@@ -459,7 +451,7 @@ sub PDL::cgees {
   goto &PDL::__Ncgees;
 }
 *cgees = \&PDL::cgees;
-#line 463 "Complex.pm"
+#line 455 "Complex.pm"
 
 *__Ccgeesx = \&PDL::__Ccgeesx;
 
@@ -506,7 +498,7 @@ sub PDL::cgeesx {
   goto &PDL::__Ncgeesx;
 }
 *cgeesx = \&PDL::cgeesx;
-#line 510 "Complex.pm"
+#line 502 "Complex.pm"
 
 *__Ccgges = \&PDL::__Ccgges;
 
@@ -525,7 +517,7 @@ sub PDL::cgeesx {
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();int [o]info(); [t]rwork(rworkn); int [t]bwork(bworkn);SV* select_func)
+  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn);SV* select_func)
 
 =for ref
 
@@ -553,7 +545,7 @@ sub PDL::cgges {
   goto &PDL::__Ncgges;
 }
 *cgges = \&PDL::cgges;
-#line 557 "Complex.pm"
+#line 549 "Complex.pm"
 
 *__Ccggesx = \&PDL::__Ccggesx;
 
@@ -572,7 +564,7 @@ sub PDL::cgges {
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); [t]rwork(rworkn); int [t]bwork(bworkn); int [t]iwork(iworkn);SV* select_func)
+  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn=CALC($SIZE(n)+2));SV* select_func)
 
 =for ref
 
@@ -600,7 +592,7 @@ sub PDL::cggesx {
   goto &PDL::__Ncggesx;
 }
 *cggesx = \&PDL::cggesx;
-#line 604 "Complex.pm"
+#line 596 "Complex.pm"
 
 *__Ccheev = \&PDL::__Ccheev;
 
@@ -619,7 +611,7 @@ sub PDL::cggesx {
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int jobz(); int uplo(); [o]w(n); int [o]info(); [t]rwork(rworkn))
+  Signature: (complex [io]A(n,n); int jobz(); int uplo(); [o]w(n); int [o]info(); [t]rwork(rworkn=CALC(3*($SIZE(n)-2))))
 
 =for ref
 
@@ -635,7 +627,7 @@ sub PDL::cheev {
   goto &PDL::__Ncheev;
 }
 *cheev = \&PDL::cheev;
-#line 639 "Complex.pm"
+#line 631 "Complex.pm"
 
 *__Ccheevd = \&PDL::__Ccheevd;
 
@@ -670,7 +662,7 @@ sub PDL::cheevd {
   goto &PDL::__Ncheevd;
 }
 *cheevd = \&PDL::cheevd;
-#line 674 "Complex.pm"
+#line 666 "Complex.pm"
 
 *__Ccheevx = \&PDL::__Ccheevx;
 
@@ -689,7 +681,7 @@ sub PDL::cheevd {
 
 =for sig
 
-  Signature: (complex A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn); int [t]iwork(iworkn))
+  Signature: (complex A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
 
 =for ref
 
@@ -705,7 +697,7 @@ sub PDL::cheevx {
   goto &PDL::__Ncheevx;
 }
 *cheevx = \&PDL::cheevx;
-#line 709 "Complex.pm"
+#line 701 "Complex.pm"
 
 *__Ccheevr = \&PDL::__Ccheevr;
 
@@ -740,7 +732,7 @@ sub PDL::cheevr {
   goto &PDL::__Ncheevr;
 }
 *cheevr = \&PDL::cheevr;
-#line 744 "Complex.pm"
+#line 736 "Complex.pm"
 
 *__Cchegv = \&PDL::__Cchegv;
 
@@ -759,7 +751,7 @@ sub PDL::cheevr {
 
 =for sig
 
-  Signature: (complex [io]A(n,n);int itype();int jobz(); int uplo();complex [io]B(n,n);[o]w(n); int [o]info(); [t]rwork(rworkn))
+  Signature: (complex [io]A(n,n);int itype();int jobz(); int uplo();complex [io]B(n,n);[o]w(n); int [o]info(); [t]rwork(rworkn=CALC(3*($SIZE(n)-2))))
 
 =for ref
 
@@ -775,7 +767,7 @@ sub PDL::chegv {
   goto &PDL::__Nchegv;
 }
 *chegv = \&PDL::chegv;
-#line 779 "Complex.pm"
+#line 771 "Complex.pm"
 
 *__Cchegvd = \&PDL::__Cchegvd;
 
@@ -810,7 +802,7 @@ sub PDL::chegvd {
   goto &PDL::__Nchegvd;
 }
 *chegvd = \&PDL::chegvd;
-#line 814 "Complex.pm"
+#line 806 "Complex.pm"
 
 *__Cchegvx = \&PDL::__Cchegvx;
 
@@ -832,7 +824,7 @@ sub PDL::chegvd {
   Signature: (complex [io]A(n,n);int itype();int jobz();int range();
 	  int uplo();complex [io]B(n,n);vl();vu();int il();
 	  int iu();abstol();int [o]m();[o]w(n);complex 
-	  [o]Z(p,p);int [o]ifail(n);int [o]info(); [t]rwork(rworkn); int [t]iwork(iworkn);
+	  [o]Z(p,p);int [o]ifail(n);int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n)));
 	)
 
 =for ref
@@ -849,7 +841,7 @@ sub PDL::chegvx {
   goto &PDL::__Nchegvx;
 }
 *chegvx = \&PDL::chegvx;
-#line 853 "Complex.pm"
+#line 845 "Complex.pm"
 
 *__Ccgesv = \&PDL::__Ccgesv;
 
@@ -884,7 +876,7 @@ sub PDL::cgesv {
   goto &PDL::__Ncgesv;
 }
 *cgesv = \&PDL::cgesv;
-#line 888 "Complex.pm"
+#line 880 "Complex.pm"
 
 *__Ccgesvx = \&PDL::__Ccgesvx;
 
@@ -903,7 +895,7 @@ sub PDL::cgesv {
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int trans(); int fact();complex  [io]B(n,m);complex  [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); [o]rpvgrw(); int [o]info(); [t]rwork(rworkn); [t]work(rworkn))
+  Signature: (complex [io]A(n,n); int trans(); int fact();complex  [io]B(n,m);complex  [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); [o]rpvgrw(); int [o]info(); [t]rwork(rworkn=CALC(4*$SIZE(n))); [t]work(rworkn))
 
 =for ref
 
@@ -924,7 +916,7 @@ sub PDL::cgesvx {
   goto &PDL::__Ncgesvx;
 }
 *cgesvx = \&PDL::cgesvx;
-#line 928 "Complex.pm"
+#line 920 "Complex.pm"
 
 *__Ccsysv = \&PDL::__Ccsysv;
 
@@ -959,7 +951,7 @@ sub PDL::csysv {
   goto &PDL::__Ncsysv;
 }
 *csysv = \&PDL::csysv;
-#line 963 "Complex.pm"
+#line 955 "Complex.pm"
 
 *__Ccsysvx = \&PDL::__Ccsysvx;
 
@@ -994,7 +986,7 @@ sub PDL::csysvx {
   goto &PDL::__Ncsysvx;
 }
 *csysvx = \&PDL::csysvx;
-#line 998 "Complex.pm"
+#line 990 "Complex.pm"
 
 *__Cchesv = \&PDL::__Cchesv;
 
@@ -1029,7 +1021,7 @@ sub PDL::chesv {
   goto &PDL::__Nchesv;
 }
 *chesv = \&PDL::chesv;
-#line 1033 "Complex.pm"
+#line 1025 "Complex.pm"
 
 *__Cchesvx = \&PDL::__Cchesvx;
 
@@ -1064,7 +1056,7 @@ sub PDL::chesvx {
   goto &PDL::__Nchesvx;
 }
 *chesvx = \&PDL::chesvx;
-#line 1068 "Complex.pm"
+#line 1060 "Complex.pm"
 
 *__Ccposv = \&PDL::__Ccposv;
 
@@ -1099,7 +1091,7 @@ sub PDL::cposv {
   goto &PDL::__Ncposv;
 }
 *cposv = \&PDL::cposv;
-#line 1103 "Complex.pm"
+#line 1095 "Complex.pm"
 
 *__Ccposvx = \&PDL::__Ccposvx;
 
@@ -1118,7 +1110,7 @@ sub PDL::cposv {
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int fact();complex  [io]B(n,m);complex  [io]af(n,n); int [io]equed(); [o]s(p);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(rworkn); [t]work(workn))
+  Signature: (complex [io]A(n,n); int uplo(); int fact();complex  [io]B(n,m);complex  [io]af(n,n); int [io]equed(); [o]s(p);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))); [t]work(workn=CALC(4*$SIZE(n))))
 
 =for ref
 
@@ -1134,7 +1126,7 @@ sub PDL::cposvx {
   goto &PDL::__Ncposvx;
 }
 *cposvx = \&PDL::cposvx;
-#line 1138 "Complex.pm"
+#line 1130 "Complex.pm"
 
 *__Ccgels = \&PDL::__Ccgels;
 
@@ -1174,7 +1166,7 @@ sub PDL::cgels {
   goto &PDL::__Ncgels;
 }
 *cgels = \&PDL::cgels;
-#line 1178 "Complex.pm"
+#line 1170 "Complex.pm"
 
 *__Ccgelsy = \&PDL::__Ccgelsy;
 
@@ -1193,7 +1185,7 @@ sub PDL::cgels {
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); int [io]jpvt(n); int [o]rank();int [o]info(); [t]rwork(rworkn))
+  Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); int [io]jpvt(n); int [o]rank();int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
 
 =for ref
 
@@ -1209,7 +1201,7 @@ sub PDL::cgelsy {
   goto &PDL::__Ncgelsy;
 }
 *cgelsy = \&PDL::cgelsy;
-#line 1213 "Complex.pm"
+#line 1205 "Complex.pm"
 
 *__Ccgelss = \&PDL::__Ccgelss;
 
@@ -1228,7 +1220,7 @@ sub PDL::cgelsy {
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); [o]s(r); int [o]rank();int [o]info(); [t]rwork(rworkn))
+  Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); [o]s(r); int [o]rank();int [o]info(); [t]rwork(rworkn=CALC(5*PDLMIN($SIZE(m),$SIZE(n)))))
 
 =for ref
 
@@ -1244,7 +1236,7 @@ sub PDL::cgelss {
   goto &PDL::__Ncgelss;
 }
 *cgelss = \&PDL::cgelss;
-#line 1248 "Complex.pm"
+#line 1240 "Complex.pm"
 
 *__Ccgelsd = \&PDL::__Ccgelsd;
 
@@ -1263,7 +1255,7 @@ sub PDL::cgelss {
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); [o]s(minmn); int [o]rank();int [o]info(); int [t]iwork(iworkn); [t]rwork(rworkn))
+  Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); [o]s(minmn=CALC(PDLMAX(1,PDLMIN($SIZE(m),$SIZE(n))))); int [o]rank();int [o]info(); int [t]iwork(iworkn); [t]rwork(rworkn))
 
 =for ref
 
@@ -1279,7 +1271,7 @@ sub PDL::cgelsd {
   goto &PDL::__Ncgelsd;
 }
 *cgelsd = \&PDL::cgelsd;
-#line 1283 "Complex.pm"
+#line 1275 "Complex.pm"
 
 *__Ccgglse = \&PDL::__Ccgglse;
 
@@ -1314,7 +1306,7 @@ sub PDL::cgglse {
   goto &PDL::__Ncgglse;
 }
 *cgglse = \&PDL::cgglse;
-#line 1318 "Complex.pm"
+#line 1310 "Complex.pm"
 
 *__Ccggglm = \&PDL::__Ccggglm;
 
@@ -1349,7 +1341,7 @@ sub PDL::cggglm {
   goto &PDL::__Ncggglm;
 }
 *cggglm = \&PDL::cggglm;
-#line 1353 "Complex.pm"
+#line 1345 "Complex.pm"
 
 *__Ccgetrf = \&PDL::__Ccgetrf;
 
@@ -1368,7 +1360,7 @@ sub PDL::cggglm {
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int [o]ipiv(p); int [o]info())
+  Signature: (complex [io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
 
 =for ref
 
@@ -1384,7 +1376,7 @@ sub PDL::cgetrf {
   goto &PDL::__Ncgetrf;
 }
 *cgetrf = \&PDL::cgetrf;
-#line 1388 "Complex.pm"
+#line 1380 "Complex.pm"
 
 *__Ccgetf2 = \&PDL::__Ccgetf2;
 
@@ -1403,7 +1395,7 @@ sub PDL::cgetrf {
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int [o]ipiv(p); int [o]info())
+  Signature: (complex [io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
 
 =for ref
 
@@ -1419,7 +1411,7 @@ sub PDL::cgetf2 {
   goto &PDL::__Ncgetf2;
 }
 *cgetf2 = \&PDL::cgetf2;
-#line 1423 "Complex.pm"
+#line 1415 "Complex.pm"
 
 *__Ccsytrf = \&PDL::__Ccsytrf;
 
@@ -1454,7 +1446,7 @@ sub PDL::csytrf {
   goto &PDL::__Ncsytrf;
 }
 *csytrf = \&PDL::csytrf;
-#line 1458 "Complex.pm"
+#line 1450 "Complex.pm"
 
 *__Ccsytf2 = \&PDL::__Ccsytf2;
 
@@ -1489,7 +1481,7 @@ sub PDL::csytf2 {
   goto &PDL::__Ncsytf2;
 }
 *csytf2 = \&PDL::csytf2;
-#line 1493 "Complex.pm"
+#line 1485 "Complex.pm"
 
 *__Ccchetrf = \&PDL::__Ccchetrf;
 
@@ -1524,7 +1516,7 @@ sub PDL::cchetrf {
   goto &PDL::__Ncchetrf;
 }
 *cchetrf = \&PDL::cchetrf;
-#line 1528 "Complex.pm"
+#line 1520 "Complex.pm"
 
 *__Cchetf2 = \&PDL::__Cchetf2;
 
@@ -1559,7 +1551,7 @@ sub PDL::chetf2 {
   goto &PDL::__Nchetf2;
 }
 *chetf2 = \&PDL::chetf2;
-#line 1563 "Complex.pm"
+#line 1555 "Complex.pm"
 
 *__Ccpotrf = \&PDL::__Ccpotrf;
 
@@ -1594,7 +1586,7 @@ sub PDL::cpotrf {
   goto &PDL::__Ncpotrf;
 }
 *cpotrf = \&PDL::cpotrf;
-#line 1598 "Complex.pm"
+#line 1590 "Complex.pm"
 
 *__Ccpotf2 = \&PDL::__Ccpotf2;
 
@@ -1629,7 +1621,7 @@ sub PDL::cpotf2 {
   goto &PDL::__Ncpotf2;
 }
 *cpotf2 = \&PDL::cpotf2;
-#line 1633 "Complex.pm"
+#line 1625 "Complex.pm"
 
 *__Ccgetri = \&PDL::__Ccgetri;
 
@@ -1664,7 +1656,7 @@ sub PDL::cgetri {
   goto &PDL::__Ncgetri;
 }
 *cgetri = \&PDL::cgetri;
-#line 1668 "Complex.pm"
+#line 1660 "Complex.pm"
 
 *__Ccsytri = \&PDL::__Ccsytri;
 
@@ -1683,7 +1675,7 @@ sub PDL::cgetri {
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn))
+  Signature: (complex [io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn=CALC(2*$SIZE(n))))
 
 =for ref
 
@@ -1699,7 +1691,7 @@ sub PDL::csytri {
   goto &PDL::__Ncsytri;
 }
 *csytri = \&PDL::csytri;
-#line 1703 "Complex.pm"
+#line 1695 "Complex.pm"
 
 *__Cchetri = \&PDL::__Cchetri;
 
@@ -1718,7 +1710,7 @@ sub PDL::csytri {
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn))
+  Signature: (complex [io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn=CALC(2*$SIZE(n))))
 
 =for ref
 
@@ -1734,7 +1726,7 @@ sub PDL::chetri {
   goto &PDL::__Nchetri;
 }
 *chetri = \&PDL::chetri;
-#line 1738 "Complex.pm"
+#line 1730 "Complex.pm"
 
 *__Ccpotri = \&PDL::__Ccpotri;
 
@@ -1769,7 +1761,7 @@ sub PDL::cpotri {
   goto &PDL::__Ncpotri;
 }
 *cpotri = \&PDL::cpotri;
-#line 1773 "Complex.pm"
+#line 1765 "Complex.pm"
 
 *__Cctrtri = \&PDL::__Cctrtri;
 
@@ -1804,7 +1796,7 @@ sub PDL::ctrtri {
   goto &PDL::__Nctrtri;
 }
 *ctrtri = \&PDL::ctrtri;
-#line 1808 "Complex.pm"
+#line 1800 "Complex.pm"
 
 *__Cctrti2 = \&PDL::__Cctrti2;
 
@@ -1839,7 +1831,7 @@ sub PDL::ctrti2 {
   goto &PDL::__Nctrti2;
 }
 *ctrti2 = \&PDL::ctrti2;
-#line 1843 "Complex.pm"
+#line 1835 "Complex.pm"
 
 *__Ccgetrs = \&PDL::__Ccgetrs;
 
@@ -1880,7 +1872,7 @@ sub PDL::cgetrs {
   goto &PDL::__Ncgetrs;
 }
 *cgetrs = \&PDL::cgetrs;
-#line 1884 "Complex.pm"
+#line 1876 "Complex.pm"
 
 *__Ccsytrs = \&PDL::__Ccsytrs;
 
@@ -1915,7 +1907,7 @@ sub PDL::csytrs {
   goto &PDL::__Ncsytrs;
 }
 *csytrs = \&PDL::csytrs;
-#line 1919 "Complex.pm"
+#line 1911 "Complex.pm"
 
 *__Cchetrs = \&PDL::__Cchetrs;
 
@@ -1950,7 +1942,7 @@ sub PDL::chetrs {
   goto &PDL::__Nchetrs;
 }
 *chetrs = \&PDL::chetrs;
-#line 1954 "Complex.pm"
+#line 1946 "Complex.pm"
 
 *__Ccpotrs = \&PDL::__Ccpotrs;
 
@@ -1985,7 +1977,7 @@ sub PDL::cpotrs {
   goto &PDL::__Ncpotrs;
 }
 *cpotrs = \&PDL::cpotrs;
-#line 1989 "Complex.pm"
+#line 1981 "Complex.pm"
 
 *__Cctrtrs = \&PDL::__Cctrtrs;
 
@@ -2026,7 +2018,7 @@ sub PDL::ctrtrs {
   goto &PDL::__Nctrtrs;
 }
 *ctrtrs = \&PDL::ctrtrs;
-#line 2030 "Complex.pm"
+#line 2022 "Complex.pm"
 
 *__Cclatrs = \&PDL::__Cclatrs;
 
@@ -2067,7 +2059,7 @@ sub PDL::clatrs {
   goto &PDL::__Nclatrs;
 }
 *clatrs = \&PDL::clatrs;
-#line 2071 "Complex.pm"
+#line 2063 "Complex.pm"
 
 *__Ccgecon = \&PDL::__Ccgecon;
 
@@ -2086,7 +2078,7 @@ sub PDL::clatrs {
 
 =for sig
 
-  Signature: (complex A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); [t]rwork(rworkn); [t]work(workn))
+  Signature: (complex A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))); [t]work(workn=CALC(4*$SIZE(n))))
 
 =for ref
 
@@ -2102,7 +2094,7 @@ sub PDL::cgecon {
   goto &PDL::__Ncgecon;
 }
 *cgecon = \&PDL::cgecon;
-#line 2106 "Complex.pm"
+#line 2098 "Complex.pm"
 
 *__Ccsycon = \&PDL::__Ccsycon;
 
@@ -2121,7 +2113,7 @@ sub PDL::cgecon {
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn))
+  Signature: (complex A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))))
 
 =for ref
 
@@ -2137,7 +2129,7 @@ sub PDL::csycon {
   goto &PDL::__Ncsycon;
 }
 *csycon = \&PDL::csycon;
-#line 2141 "Complex.pm"
+#line 2133 "Complex.pm"
 
 *__Cchecon = \&PDL::__Cchecon;
 
@@ -2156,7 +2148,7 @@ sub PDL::csycon {
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn))
+  Signature: (complex A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))))
 
 =for ref
 
@@ -2172,7 +2164,7 @@ sub PDL::checon {
   goto &PDL::__Nchecon;
 }
 *checon = \&PDL::checon;
-#line 2176 "Complex.pm"
+#line 2168 "Complex.pm"
 
 *__Ccpocon = \&PDL::__Ccpocon;
 
@@ -2191,7 +2183,7 @@ sub PDL::checon {
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); [t]work(workn); [t]rwork(n))
+  Signature: (complex A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); [t]rwork(n))
 
 =for ref
 
@@ -2207,7 +2199,7 @@ sub PDL::cpocon {
   goto &PDL::__Ncpocon;
 }
 *cpocon = \&PDL::cpocon;
-#line 2211 "Complex.pm"
+#line 2203 "Complex.pm"
 
 *__Cctrcon = \&PDL::__Cctrcon;
 
@@ -2226,7 +2218,7 @@ sub PDL::cpocon {
 
 =for sig
 
-  Signature: (complex A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); [t]work(workn); [t]rwork(n))
+  Signature: (complex A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); [t]rwork(n))
 
 =for ref
 
@@ -2242,7 +2234,7 @@ sub PDL::ctrcon {
   goto &PDL::__Nctrcon;
 }
 *ctrcon = \&PDL::ctrcon;
-#line 2246 "Complex.pm"
+#line 2238 "Complex.pm"
 
 *__Ccgeqp3 = \&PDL::__Ccgeqp3;
 
@@ -2261,7 +2253,7 @@ sub PDL::ctrcon {
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int [io]jpvt(n);complex  [o]tau(k); int [o]info(); [t]rwork(rworkn))
+  Signature: (complex [io]A(m,n); int [io]jpvt(n);complex  [o]tau(k); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
 
 =for ref
 
@@ -2277,7 +2269,7 @@ sub PDL::cgeqp3 {
   goto &PDL::__Ncgeqp3;
 }
 *cgeqp3 = \&PDL::cgeqp3;
-#line 2281 "Complex.pm"
+#line 2273 "Complex.pm"
 
 *__Ccgeqrf = \&PDL::__Ccgeqrf;
 
@@ -2312,7 +2304,7 @@ sub PDL::cgeqrf {
   goto &PDL::__Ncgeqrf;
 }
 *cgeqrf = \&PDL::cgeqrf;
-#line 2316 "Complex.pm"
+#line 2308 "Complex.pm"
 
 *__Ccungqr = \&PDL::__Ccungqr;
 
@@ -2347,7 +2339,7 @@ sub PDL::cungqr {
   goto &PDL::__Ncungqr;
 }
 *cungqr = \&PDL::cungqr;
-#line 2351 "Complex.pm"
+#line 2343 "Complex.pm"
 
 *__Ccunmqr = \&PDL::__Ccunmqr;
 
@@ -2382,7 +2374,7 @@ sub PDL::cunmqr {
   goto &PDL::__Ncunmqr;
 }
 *cunmqr = \&PDL::cunmqr;
-#line 2386 "Complex.pm"
+#line 2378 "Complex.pm"
 
 *__Ccgelqf = \&PDL::__Ccgelqf;
 
@@ -2417,7 +2409,7 @@ sub PDL::cgelqf {
   goto &PDL::__Ncgelqf;
 }
 *cgelqf = \&PDL::cgelqf;
-#line 2421 "Complex.pm"
+#line 2413 "Complex.pm"
 
 *__Ccunglq = \&PDL::__Ccunglq;
 
@@ -2452,7 +2444,7 @@ sub PDL::cunglq {
   goto &PDL::__Ncunglq;
 }
 *cunglq = \&PDL::cunglq;
-#line 2456 "Complex.pm"
+#line 2448 "Complex.pm"
 
 *__Ccunmlq = \&PDL::__Ccunmlq;
 
@@ -2487,7 +2479,7 @@ sub PDL::cunmlq {
   goto &PDL::__Ncunmlq;
 }
 *cunmlq = \&PDL::cunmlq;
-#line 2491 "Complex.pm"
+#line 2483 "Complex.pm"
 
 *__Ccgeqlf = \&PDL::__Ccgeqlf;
 
@@ -2522,7 +2514,7 @@ sub PDL::cgeqlf {
   goto &PDL::__Ncgeqlf;
 }
 *cgeqlf = \&PDL::cgeqlf;
-#line 2526 "Complex.pm"
+#line 2518 "Complex.pm"
 
 *__Ccungql = \&PDL::__Ccungql;
 
@@ -2556,7 +2548,7 @@ sub PDL::cungql {
   goto &PDL::__Ncungql;
 }
 *cungql = \&PDL::cungql;
-#line 2560 "Complex.pm"
+#line 2552 "Complex.pm"
 
 *__Ccunmql = \&PDL::__Ccunmql;
 
@@ -2591,7 +2583,7 @@ sub PDL::cunmql {
   goto &PDL::__Ncunmql;
 }
 *cunmql = \&PDL::cunmql;
-#line 2595 "Complex.pm"
+#line 2587 "Complex.pm"
 
 *__Ccgerqf = \&PDL::__Ccgerqf;
 
@@ -2626,7 +2618,7 @@ sub PDL::cgerqf {
   goto &PDL::__Ncgerqf;
 }
 *cgerqf = \&PDL::cgerqf;
-#line 2630 "Complex.pm"
+#line 2622 "Complex.pm"
 
 *__Ccungrq = \&PDL::__Ccungrq;
 
@@ -2661,7 +2653,7 @@ sub PDL::cungrq {
   goto &PDL::__Ncungrq;
 }
 *cungrq = \&PDL::cungrq;
-#line 2665 "Complex.pm"
+#line 2657 "Complex.pm"
 
 *__Ccunmrq = \&PDL::__Ccunmrq;
 
@@ -2696,7 +2688,7 @@ sub PDL::cunmrq {
   goto &PDL::__Ncunmrq;
 }
 *cunmrq = \&PDL::cunmrq;
-#line 2700 "Complex.pm"
+#line 2692 "Complex.pm"
 
 *__Cctzrzf = \&PDL::__Cctzrzf;
 
@@ -2731,7 +2723,7 @@ sub PDL::ctzrzf {
   goto &PDL::__Nctzrzf;
 }
 *ctzrzf = \&PDL::ctzrzf;
-#line 2735 "Complex.pm"
+#line 2727 "Complex.pm"
 
 *__Ccunmrz = \&PDL::__Ccunmrz;
 
@@ -2766,7 +2758,7 @@ sub PDL::cunmrz {
   goto &PDL::__Ncunmrz;
 }
 *cunmrz = \&PDL::cunmrz;
-#line 2770 "Complex.pm"
+#line 2762 "Complex.pm"
 
 *__Ccgehrd = \&PDL::__Ccgehrd;
 
@@ -2801,7 +2793,7 @@ sub PDL::cgehrd {
   goto &PDL::__Ncgehrd;
 }
 *cgehrd = \&PDL::cgehrd;
-#line 2805 "Complex.pm"
+#line 2797 "Complex.pm"
 
 *__Ccunghr = \&PDL::__Ccunghr;
 
@@ -2836,7 +2828,7 @@ sub PDL::cunghr {
   goto &PDL::__Ncunghr;
 }
 *cunghr = \&PDL::cunghr;
-#line 2840 "Complex.pm"
+#line 2832 "Complex.pm"
 
 *__Cchseqr = \&PDL::__Cchseqr;
 
@@ -2871,7 +2863,7 @@ sub PDL::chseqr {
   goto &PDL::__Nchseqr;
 }
 *chseqr = \&PDL::chseqr;
-#line 2875 "Complex.pm"
+#line 2867 "Complex.pm"
 
 *__Cctrevc = \&PDL::__Cctrevc;
 
@@ -2890,7 +2882,7 @@ sub PDL::chseqr {
 
 =for sig
 
-  Signature: (complex [io]T(n,n); int side();int howmny();int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn))
+  Signature: (complex [io]T(n,n); int side();int howmny();int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(5*$SIZE(n))))
 
 =for ref
 
@@ -2906,7 +2898,7 @@ sub PDL::ctrevc {
   goto &PDL::__Nctrevc;
 }
 *ctrevc = \&PDL::ctrevc;
-#line 2910 "Complex.pm"
+#line 2902 "Complex.pm"
 
 *__Cctgevc = \&PDL::__Cctgevc;
 
@@ -2925,7 +2917,7 @@ sub PDL::ctrevc {
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int side();int howmny();complex  [io]B(n,n);int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn))
+  Signature: (complex [io]A(n,n); int side();int howmny();complex  [io]B(n,n);int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
 
 =for ref
 
@@ -2941,7 +2933,7 @@ sub PDL::ctgevc {
   goto &PDL::__Nctgevc;
 }
 *ctgevc = \&PDL::ctgevc;
-#line 2945 "Complex.pm"
+#line 2937 "Complex.pm"
 
 *__Ccgebal = \&PDL::__Ccgebal;
 
@@ -2976,7 +2968,7 @@ sub PDL::cgebal {
   goto &PDL::__Ncgebal;
 }
 *cgebal = \&PDL::cgebal;
-#line 2980 "Complex.pm"
+#line 2972 "Complex.pm"
 
 *__Cclange = \&PDL::__Cclange;
 
@@ -3011,7 +3003,7 @@ sub PDL::clange {
   goto &PDL::__Nclange;
 }
 *clange = \&PDL::clange;
-#line 3015 "Complex.pm"
+#line 3007 "Complex.pm"
 
 *__Cclansy = \&PDL::__Cclansy;
 
@@ -3046,7 +3038,7 @@ sub PDL::clansy {
   goto &PDL::__Nclansy;
 }
 *clansy = \&PDL::clansy;
-#line 3050 "Complex.pm"
+#line 3042 "Complex.pm"
 
 *__Cclantr = \&PDL::__Cclantr;
 
@@ -3081,7 +3073,7 @@ sub PDL::clantr {
   goto &PDL::__Nclantr;
 }
 *clantr = \&PDL::clantr;
-#line 3085 "Complex.pm"
+#line 3077 "Complex.pm"
 
 *__Ccgemm = \&PDL::__Ccgemm;
 
@@ -3126,7 +3118,7 @@ sub PDL::cgemm {
   goto &PDL::__Ncgemm;
 }
 *cgemm = \&PDL::cgemm;
-#line 3130 "Complex.pm"
+#line 3122 "Complex.pm"
 
 *__Ccmmult = \&PDL::__Ccmmult;
 
@@ -3161,7 +3153,7 @@ sub PDL::cmmult {
   goto &PDL::__Ncmmult;
 }
 *cmmult = \&PDL::cmmult;
-#line 3165 "Complex.pm"
+#line 3157 "Complex.pm"
 
 *__Cccrossprod = \&PDL::__Cccrossprod;
 
@@ -3196,7 +3188,7 @@ sub PDL::ccrossprod {
   goto &PDL::__Nccrossprod;
 }
 *ccrossprod = \&PDL::ccrossprod;
-#line 3200 "Complex.pm"
+#line 3192 "Complex.pm"
 
 *__Ccsyrk = \&PDL::__Ccsyrk;
 
@@ -3231,7 +3223,7 @@ sub PDL::csyrk {
   goto &PDL::__Ncsyrk;
 }
 *csyrk = \&PDL::csyrk;
-#line 3235 "Complex.pm"
+#line 3227 "Complex.pm"
 
 *__Ccdot = \&PDL::__Ccdot;
 
@@ -3266,7 +3258,7 @@ sub PDL::cdot {
   goto &PDL::__Ncdot;
 }
 *cdot = \&PDL::cdot;
-#line 3270 "Complex.pm"
+#line 3262 "Complex.pm"
 
 *__Ccdotc = \&PDL::__Ccdotc;
 
@@ -3302,7 +3294,7 @@ sub PDL::cdotc {
   goto &PDL::__Ncdotc;
 }
 *cdotc = \&PDL::cdotc;
-#line 3306 "Complex.pm"
+#line 3298 "Complex.pm"
 
 *__Ccaxpy = \&PDL::__Ccaxpy;
 
@@ -3337,7 +3329,7 @@ sub PDL::caxpy {
   goto &PDL::__Ncaxpy;
 }
 *caxpy = \&PDL::caxpy;
-#line 3341 "Complex.pm"
+#line 3333 "Complex.pm"
 
 *__Ccnrm2 = \&PDL::__Ccnrm2;
 
@@ -3372,7 +3364,7 @@ sub PDL::cnrm2 {
   goto &PDL::__Ncnrm2;
 }
 *cnrm2 = \&PDL::cnrm2;
-#line 3376 "Complex.pm"
+#line 3368 "Complex.pm"
 
 *__Ccasum = \&PDL::__Ccasum;
 
@@ -3407,7 +3399,7 @@ sub PDL::casum {
   goto &PDL::__Ncasum;
 }
 *casum = \&PDL::casum;
-#line 3411 "Complex.pm"
+#line 3403 "Complex.pm"
 
 *__Ccscal = \&PDL::__Ccscal;
 
@@ -3442,7 +3434,7 @@ sub PDL::cscal {
   goto &PDL::__Ncscal;
 }
 *cscal = \&PDL::cscal;
-#line 3446 "Complex.pm"
+#line 3438 "Complex.pm"
 
 *__Ccsscal = \&PDL::__Ccsscal;
 
@@ -3477,7 +3469,7 @@ sub PDL::csscal {
   goto &PDL::__Ncsscal;
 }
 *csscal = \&PDL::csscal;
-#line 3481 "Complex.pm"
+#line 3473 "Complex.pm"
 
 *__Ccrotg = \&PDL::__Ccrotg;
 
@@ -3512,7 +3504,7 @@ sub PDL::crotg {
   goto &PDL::__Ncrotg;
 }
 *crotg = \&PDL::crotg;
-#line 3516 "Complex.pm"
+#line 3508 "Complex.pm"
 
 *__Cclacpy = \&PDL::__Cclacpy;
 
@@ -3547,7 +3539,7 @@ sub PDL::clacpy {
   goto &PDL::__Nclacpy;
 }
 *clacpy = \&PDL::clacpy;
-#line 3551 "Complex.pm"
+#line 3543 "Complex.pm"
 
 *__Cclaswp = \&PDL::__Cclaswp;
 
@@ -3582,40 +3574,7 @@ sub PDL::claswp {
   goto &PDL::__Nclaswp;
 }
 *claswp = \&PDL::claswp;
-#line 3586 "Complex.pm"
-
-*ctricpy = \&PDL::ctricpy;
-
-
-
-
-
-
-=head2 cmstack
-
-=for sig
-
-  Signature: (x(c,n,m);y(c,n,p);[o]out(c,n,q))
-
-=for ref
-
-Combine two 3D ndarrays into a single ndarray.
-This routine does backward and forward dataflow automatically.
-
-=for bad
-
-cmstack does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*cmstack = \&PDL::cmstack;
-
-
-
+#line 3578 "Complex.pm"
 
 *__Cccharpol = \&PDL::__Cccharpol;
 
@@ -3634,7 +3593,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(c=2,n,n);[o]Y(c=2,n,n);[o]out(c=2,p); [t]rwork(rworkn))
+  Signature: (A(c=2,n,n);[o]Y(c=2,n,n);[o]out(c=2,p=CALC($SIZE(n)+1)); [t]rwork(rworkn=CALC(2*$SIZE(n)*$SIZE(n))))
 
 =for ref
 
@@ -3651,7 +3610,7 @@ sub PDL::ccharpol {
 }
 *ccharpol = \&PDL::ccharpol;
 
-#line 5093 "complex.pd"
+#line 4961 "complex.pd"
 
 =head1 AUTHOR
 
@@ -3662,7 +3621,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 3666 "Complex.pm"
+#line 3625 "Complex.pm"
 
 # Exit with OK status
 

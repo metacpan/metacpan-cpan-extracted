@@ -115,10 +115,23 @@ It is entirely possible, although a bit tedious, to use the module without
 importing L<Form::Tiny> package. The following example declares a form with a
 single field taken from the example above.
 
-The code present in C<metaobject.pl> example should result in a form that has
-the same capabilities as the one below:
+These two packages should result in a form with the same capabilities.
 
-	package MyForm;
+	package MyForm1;
+
+	use Moo;
+	use Form::Tiny::Utils qw(:meta_handlers);
+
+	my $meta = create_form_meta(__PACKAGE__, qw())
+		->set_form_roles(['Form::Tiny::Form']);
+
+	__PACKAGE__->form_meta->add_field(
+		'field-name' => (
+			required => 1,
+		)
+	);
+
+	package MyForm2;
 
 	use Form::Tiny;
 
@@ -126,11 +139,10 @@ the same capabilities as the one below:
 		required => 1,
 	);
 
-	1;
-
-B<Notice:> building your form like this should be done only for educational
-purposes. Changes in import procedure are not covered by the 3 month
-deprecation period policy.
+B<Notice:> trying to build your form from scratch to match exactly what
+Form::Tiny importer is doing should only be done for educational purposes.
+Changes in import procedure are not covered by the 3 month deprecation period
+policy.
 
 =head1 SEE ALSO
 

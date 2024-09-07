@@ -360,4 +360,25 @@ is $y.'', "
 ", 'squaretotri broadcasts right';
 }
 
+{
+my $A = pdl '[1 2 3; 4 5 6; 7 8 9]';
+my $up = pdl '[1 2 3; 0 5 6; 0 0 9]';
+my $lo = pdl '[1 0 0; 4 5 0; 7 8 9]';
+my $got;
+ok tapprox($got = $A->tricpy(0), $up), 'upper triangle #1' or diag "got: $got";
+tricpy($A, 0, $got = null);
+ok tapprox($got, $up), 'upper triangle #2' or diag "got: $got";
+ok tapprox($got = $A->tricpy, $up), 'upper triangle #3' or diag "got: $got";
+ok tapprox($got = $A->tricpy(1), $lo), 'lower triangle #1' or diag "got: $got";
+tricpy($A, 1, $got = null);
+ok tapprox($got, $lo), 'lower triangle #2' or diag "got: $got";
+ok tapprox($got = $A->mstack($up), pdl('[1 2 3; 4 5 6; 7 8 9; 1 2 3; 0 5 6; 0 0 9]')) or diag "got: $got";
+ok tapprox($got = sequence(2,3)->augment(sequence(3,3)+10), pdl('[0 1 10 11 12; 2 3 13 14 15; 4 5 16 17 18]')) or diag "got: $got";
+my $B = pdl('[i 2+4i 3+5i; 0 3i 7+9i]');
+ok tapprox($got = $B->t, pdl('[i 0; 2+4i 3i; 3+5i 7+9i]')) or diag "got: $got";
+ok tapprox($got = $B->t(1), pdl('[-i 0; 2-4i -3i; 3-5i 7-9i]')) or diag "got: $got";
+ok tapprox($got = sequence(3)->t, pdl('[0; 1; 2]')) or diag "got: $got";
+is_deeply $got = [pdl(3)->t->dims], [1,1] or diag "got: ", explain $got;
+}
+
 done_testing;

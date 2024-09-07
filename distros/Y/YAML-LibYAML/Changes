@@ -1,3 +1,10 @@
+v0.901.0 2024-09-06 23:56:41+02:00
+ - Change version scheme
+ - Fix missing linebreak in pod from Dist::Zilla conversion
+
+0.90 2024-09-06 23:44:13+02:00
+ - Change from Zilla::Dist to Dist::Zilla
+
 0.89 Sat 27 Jan 2024 01:44:08 AM CET
  - Recognise core booleans on Perl 5.36+ at dump time (PR#114 PEVANS++)
 

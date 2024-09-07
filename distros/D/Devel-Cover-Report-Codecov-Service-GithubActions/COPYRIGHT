@@ -3,20 +3,20 @@ Upstream-Name: Devel-Cover-Report-Codecov-Service-GithubActions
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Devel-Cover-Report-Codecov-Service-GithubActions
 
-Files: README
- lib/Devel/Cover/Report/Codecov/Service/GithubActions.pm
- t/00start.t
- t/01basic.t
- t/unit/Devel/Cover/Report/Codecov/Service/GithubActions.t
-Copyright: This software is copyright (c) 2024 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: Changes
  META.json
  META.yml
  dist.ini
  doap.ttl
 Copyright: Copyright 2024 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/Devel/Cover/Report/Codecov/Service/GithubActions.pm
+ t/00start.t
+ t/01basic.t
+ t/unit/Devel/Cover/Report/Codecov/Service/GithubActions.t
+Copyright: This software is copyright (c) 2024 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT

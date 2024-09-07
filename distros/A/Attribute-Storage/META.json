@@ -1,10 +1,10 @@
 {
-   "abstract" : "declare and retrieve named attributes about CODE",
+   "abstract" : "declare and retrieve named attributes data",
    "author" : [
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -16,27 +16,31 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "Test::More" : "0.88",
-            "Test::NoWarnings" : "0"
+            "ExtUtils::CBuilder" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
          "requires" : {
             "XSLoader" : "0",
+            "meta" : "0.005",
             "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Attribute::Storage" : {
          "file" : "lib/Attribute/Storage.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -45,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

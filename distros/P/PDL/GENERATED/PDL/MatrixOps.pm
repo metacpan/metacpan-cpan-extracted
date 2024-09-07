@@ -3,7 +3,7 @@
 #
 package PDL::MatrixOps;
 
-our @EXPORT_OK = qw(identity stretcher inv det determinant eigens_sym eigens svd lu_decomp lu_decomp2 lu_backsub simq squaretotri tritosquare );
+our @EXPORT_OK = qw(identity stretcher inv det determinant eigens_sym eigens svd lu_decomp lu_decomp2 lu_backsub simq squaretotri tritosquare tricpy mstack augment );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -23,6 +23,8 @@ use DynaLoader;
 
 
 #line 9 "matrixops.pd"
+
+=encoding utf8
 
 use strict;
 use warnings;
@@ -130,7 +132,7 @@ document it!
 
 use Carp;
 use strict;
-#line 134 "MatrixOps.pm"
+#line 136 "MatrixOps.pm"
 
 
 =head1 FUNCTIONS
@@ -141,7 +143,7 @@ use strict;
 
 
 
-#line 124 "matrixops.pd"
+#line 126 "matrixops.pd"
 
 =head2 identity
 
@@ -172,7 +174,7 @@ sub identity {
   $was_pdl ? bless $out, ref($n) : $out;
 }
 
-#line 157 "matrixops.pd"
+#line 159 "matrixops.pd"
 
 =head2 stretcher
 
@@ -198,7 +200,7 @@ sub stretcher {
   $out;
 }
 
-#line 188 "matrixops.pd"
+#line 190 "matrixops.pd"
 
 =head2 inv
 
@@ -292,7 +294,7 @@ sub inv {
   $x;
 }
 
-#line 288 "matrixops.pd"
+#line 290 "matrixops.pd"
 
 =head2 det
 
@@ -346,7 +348,7 @@ sub det {
   defined $lu ? $lu->diagonal(0,1)->prodover * $par : PDL->zeroes(sbyte,1);
 }
 
-#line 347 "matrixops.pd"
+#line 349 "matrixops.pd"
 
 =head2 determinant
 
@@ -428,7 +430,7 @@ sub determinant {
 
   return $sum;
 }
-#line 432 "MatrixOps.pm"
+#line 434 "MatrixOps.pm"
 
 
 =head2 eigens_sym
@@ -686,7 +688,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 703 "matrixops.pd"
+#line 686 "matrixops.pd"
 
 =head2 lu_decomp
 
@@ -861,7 +863,7 @@ sub lu_decomp {
    wantarray ? ($out,$permute,$parity) : $out;
 }
 
-#line 882 "matrixops.pd"
+#line 865 "matrixops.pd"
 
 =head2 lu_decomp2
 
@@ -978,7 +980,7 @@ sub lu_decomp2 {
   wantarray ? ($out,$perm,$par) : $out;
 }
 
-#line 1004 "matrixops.pd"
+#line 987 "matrixops.pd"
 
 =head2 lu_backsub
 
@@ -1203,7 +1205,7 @@ BROADCAST_OK:
    }
    $out;
 }
-#line 1207 "MatrixOps.pm"
+#line 1209 "MatrixOps.pm"
 
 
 =head2 simq
@@ -1322,8 +1324,112 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+=head2 tricpy
 
-#line 1329 "matrixops.pd"
+=for sig
+
+  Signature: (A(m,n);[o] C(m,n); int uplo)
+
+=for usage
+
+tricpy(PDL(A), int(uplo), PDL(C))
+
+=for example
+
+  $c = $a->tricpy($uplo); # explicit uplo
+  $c = $a->tricpy;        # default upper
+
+or
+
+  tricpy($a, $uplo, $c);  # modify c
+
+=for ref
+
+Copy triangular part to another matrix. If uplo == 0 copy upper triangular
+part.
+
+Originally by Grégory Vanuxem.
+
+=for bad
+
+tricpy does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*tricpy = \&PDL::tricpy;
+
+
+
+
+
+
+=head2 mstack
+
+=for sig
+
+  Signature: (x(n,m);y(n,p);[o]out(n,q=CALC($SIZE(m)+$SIZE(p))))
+
+=for ref
+
+Combine two 2D ndarrays into a single ndarray, along the second
+("vertical") dim.
+This routine does backward and forward dataflow automatically.
+
+Originally by Grégory Vanuxem.
+
+=for bad
+
+mstack does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*mstack = \&PDL::mstack;
+
+
+
+
+
+
+=head2 augment
+
+=for sig
+
+  Signature: (x(n); y(p);[o]out(q=CALC($SIZE(n)+$SIZE(p))))
+
+=for ref
+
+Combine two ndarrays into a single ndarray along the 0-th ("horizontal") dim.
+This routine does backward and forward dataflow automatically.
+
+Originally by Grégory Vanuxem.
+
+=for bad
+
+augment does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*augment = \&PDL::augment;
+
+
+
+
+
+
+
+#line 1395 "matrixops.pd"
 
 =head1 AUTHOR
 
@@ -1335,7 +1441,7 @@ itself.  If this file is separated from the PDL distribution, then the
 PDL copyright notice should be included in this file.
 
 =cut
-#line 1339 "MatrixOps.pm"
+#line 1445 "MatrixOps.pm"
 
 # Exit with OK status
 

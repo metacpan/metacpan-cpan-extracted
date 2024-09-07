@@ -6,4 +6,9 @@ Home page:    <https://metacpan.org/release/Devel-Cover-Report-Codecov-Service-G
 Bug tracker:  <https://github.com/tobyink/p5-devel-cover-report-codecov-service-githubactions/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.001001	2024-09-06
+
+ - Improvements to the output of `configuration` based on codecov
+   documentation.
+
 0.001000	2024-09-06	Initial release

@@ -8,9 +8,8 @@ build_requires:
   Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '7.14'
-  PDL: '2.058'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,11 +24,11 @@ no_index:
   file:
     - README.pod
 requires:
-  PDL: '2.058'
+  PDL: '2.091'
   perl: '5.014000'
   threads::shared: '1.21'
 resources:
   bugtracker: http://github.com/PDLPorters/PDL-Parallel-threads/issues
   repository: git://github.com/PDLPorters/PDL-Parallel-threads.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

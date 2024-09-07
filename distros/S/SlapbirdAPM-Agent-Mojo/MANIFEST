@@ -1,4 +1,5 @@
 cpanfile
+lib/DBIx/Tracer.pm
 lib/Mojolicious/Plugin/SlapbirdAPM.pm
 lib/SlapbirdAPM/Agent/Mojo.pm
 lib/SlapbirdAPM/Trace.pm

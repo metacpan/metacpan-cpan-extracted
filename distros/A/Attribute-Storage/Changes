@@ -1,5 +1,14 @@
 Revision history for Attribute-Storage
 
+0.11    2024-09-06
+        [CHANGES]
+         * Added ability to apply, query, and find attributes on scalar, array
+           and hash variables, as well as subroutines
+         * Use `meta` to simplify internals previously built using
+           `no strict 'refs'`
+         * Swapped unit tests from `Test::More` to `Test2::V0`
+         * Avoid test-time dependency on `Test::NoWarnings`
+
 0.10    2022-04-28
         [CHANGES]
          * Refresh module documentation style

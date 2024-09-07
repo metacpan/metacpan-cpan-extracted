@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Tree 0.059000;
+package Term::CLI::Argument::Tree 0.060000;
 
 use warnings;
 
@@ -169,7 +169,7 @@ Term::CLI::Argument::Tree - class for tree arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.059000
+version 0.060000
 
 =head1 SYNOPSIS
 

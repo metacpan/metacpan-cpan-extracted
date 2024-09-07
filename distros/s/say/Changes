@@ -1,7 +1,12 @@
-Revision history for Perl extension say
+## say commit log
 
-0.02    Thu Oct  6 08:00:34 JST 2016
-        - fix for Perl version older than 5.10
+https://github.com/bayashi/say/commits/master
 
-0.01    Wed Oct 5 7:44:50 JST 2016
-        - original version
+## Tags
+
+https://github.com/bayashi//tags
+
+## Last Release
+
+0.03   Sat Sep  7 03:34:21 UTC 2024
+    - https://github.com/bayashi/say/compare/0.02...0.03

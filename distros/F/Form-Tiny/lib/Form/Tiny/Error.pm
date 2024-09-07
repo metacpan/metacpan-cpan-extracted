@@ -1,5 +1,5 @@
 package Form::Tiny::Error;
-$Form::Tiny::Error::VERSION = '2.24';
+$Form::Tiny::Error::VERSION = '2.25';
 use v5.10;
 use strict;
 use warnings;
@@ -32,12 +32,19 @@ sub default_error
 	return 'Unknown error';
 }
 
+sub get_error
+{
+	my ($self) = @_;
+
+	return $self->error;
+}
+
 sub as_string
 {
 	my ($self) = @_;
 
 	my $field = $self->field // 'general';
-	my $error = $self->error;
+	my $error = $self->get_error;
 	return "$field - $error";
 }
 
@@ -46,7 +53,7 @@ sub as_string
 
 	# Internal use only
 	package Form::Tiny::Error::NestedFormError;
-$Form::Tiny::Error::NestedFormError::VERSION = '2.24';
+$Form::Tiny::Error::NestedFormError::VERSION = '2.25';
 use parent -norequire, 'Form::Tiny::Error';
 
 }
@@ -54,7 +61,7 @@ use parent -norequire, 'Form::Tiny::Error';
 {
 
 	package Form::Tiny::Error::InvalidFormat;
-$Form::Tiny::Error::InvalidFormat::VERSION = '2.24';
+$Form::Tiny::Error::InvalidFormat::VERSION = '2.25';
 use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
@@ -66,7 +73,7 @@ use parent -norequire, 'Form::Tiny::Error';
 {
 
 	package Form::Tiny::Error::Required;
-$Form::Tiny::Error::Required::VERSION = '2.24';
+$Form::Tiny::Error::Required::VERSION = '2.25';
 use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
@@ -78,19 +85,37 @@ use parent -norequire, 'Form::Tiny::Error';
 {
 
 	package Form::Tiny::Error::IsntStrict;
-$Form::Tiny::Error::IsntStrict::VERSION = '2.24';
-use parent -norequire, 'Form::Tiny::Error';
+$Form::Tiny::Error::IsntStrict::VERSION = '2.25';
+use Moo;
+	use Types::Standard qw(Str);
+
+	extends 'Form::Tiny::Error';
+
+	has 'extra_field' => (
+		is => 'ro',
+		isa => Str,
+		required => 1,
+	);
 
 	sub default_error
 	{
 		return 'input data has unexpected fields';
+	}
+
+	sub get_error
+	{
+		my ($self) = @_;
+
+		my $field = $self->extra_field;
+		my $error = $self->error;
+		return "$field: $error";
 	}
 }
 
 {
 
 	package Form::Tiny::Error::DoesNotValidate;
-$Form::Tiny::Error::DoesNotValidate::VERSION = '2.24';
+$Form::Tiny::Error::DoesNotValidate::VERSION = '2.25';
 use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
@@ -115,7 +140,7 @@ Form::Tiny::Error - form error wrapper
 	);
 
 	my $field = $error->field; # field name or undef
-	my $data = $error->error; # error message or nested error object
+	my $data = $error->get_error; # error message or nested error object
 
 	# concatenated error message: "$field - $data"
 	my $message = $error->as_string;
@@ -128,7 +153,7 @@ Form::Tiny::Error - form error wrapper
 The form errors class features field name which caused validation error, error
 message and automatic stringification.
 
-The C<< $error->error >> can return a nested error object in case of nested
+The C<< $error->get_error >> can return a nested error object in case of nested
 forms.
 
 A couple of in-place subclasses are provided to differentiate the type of error

@@ -10,25 +10,23 @@ configure_requires:
   Module::Build::Pluggable: '0'
   Module::Build::Pluggable::CPANfile: '0.05'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
-license: perl
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: say
-provides:
-  say:
-    file: lib/say.pm
-    version: '0.02'
+no_index:
+  directory:
+    - t
+    - xt
+    - share
 requires:
   Perl6::Say: '0'
   perl: '5.008005'
 resources:
-  IRC:
-    url: irc://chat.freenode.org/#bayadev
-    web: http://webchat.freenode.net/?channels=%23bayadev
   bugtracker: http://github.com/bayashi/say/issues
-  license: http://dev.perl.org/licenses/
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/bayashi/say
-version: '0.02'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,15 +4,22 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "say",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "share"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -38,28 +45,18 @@
          }
       }
    },
-   "provides" : {
-      "say" : {
-         "file" : "lib/say.pm",
-         "version" : "0.02"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "http://github.com/bayashi/say/issues"
       },
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
          "url" : "http://github.com/bayashi/say"
-      },
-      "x_IRC" : {
-         "url" : "irc://chat.freenode.org/#bayadev",
-         "web" : "http://webchat.freenode.net/?channels=%23bayadev"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

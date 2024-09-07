@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use strict;
+use warnings;
+
+use Dispatch::Fu;
+use Acme::Free::Public::APIs qw//;
+use Util::H2O::More          qw/d2o ddd Getopt2h2o o2d/;
+use open qw(:std :utf8);     # Ensures input/output are treated as UTF-8
+use Encode;
+
+use constant {
+  EXIT_SUCCESS => 0,
+  EXIT_ERROR   => 1,
+};
+
+my $subcommand = shift @ARGV;
+
+#>>>
+dispatch {
+  xdefault shift, q{random};
+}
+$subcommand,
+  apis   => sub { exit do_apis( \@ARGV )   },
+  random => sub { exit do_random( \@ARGV ) },
+  help   => \&do_help,
+  ;
+#<<<
+
+sub do_apis {
+    my ($ARGV) = @_;
+    my $o      = Getopt2h2o $ARGV, {}, qw/details id=s/;
+    my $apis   = Acme::Free::Public::APIs->new->apis(id => $o->id);
+
+    foreach my $api (sort { $a->id <=> $b->id } ($apis->all)) {
+      if ( $o->details) {
+        my $out     = <<EOAPI;
+id:            %d
+title:         %s%s
+site URL:      %s
+methods:       %s 
+health:        %d 
+documentation: %s
+description:   %s
+EOAPI
+        printf $out, $api->id, ($api->emoji) ? sprintf("(%s) ",$api->emoji) : "",, $api->title, $api->source, $api->methods, $api->health, $api->documentation, $api->description;
+      }
+      else {
+        printf "% 4d % 4d %s\n", $api->id, $api->health, $api->title;
+      }
+    } 
+
+    my $count = scalar ($apis->all);
+    printf STDERR "Found %d API%s\n", $count, ($count != 1) ? "s" : "";
+
+    return EXIT_SUCCESS;
+}
+
+sub do_random {
+    my $api     = Acme::Free::Public::APIs->new->random;
+    my $out     = <<EOAPI;
+id:            %d
+title:         %s%s
+site URL:      %s
+methods:       %s 
+health:        %d 
+documentation: %s
+description:   %s
+EOAPI
+    printf $out, $api->id, ($api->emoji) ? sprintf("(%s) ",$api->emoji) : "",, $api->title, $api->source, $api->methods, $api->health, $api->documentation, $api->description;
+    return EXIT_SUCCESS;
+}
+
+sub do_help {
+    warn "warning freeapi: subcommand may be one of the following: 'random' or 'help' (prints this!)\n";
+}
+
+__END__

@@ -7,6 +7,8 @@ use warnings;
 use PDL::Types qw(ppdefs_all);
 
 pp_addpm({At=>'Top'},<<'EOD');
+=encoding utf8
+
 use strict;
 use warnings;
 
@@ -1305,6 +1307,89 @@ pp_def("tritosquare",
 Convert a triangular vector to lower-triangular square matrix storage.
 Does not touch upper half of output.
 ',
+);
+
+pp_def('tricpy',
+  Pars => 'A(m,n);[o] C(m,n)',
+  OtherPars => 'int uplo',
+  OtherParsDefaults => {uplo => 0},
+  ArgOrder => [qw(A uplo C)],
+  GenericTypes => [ppdefs_all()],
+  Code => '
+if ($COMP(uplo)) { /* lower */
+  broadcastloop %{ loop(n,m=:n+1) %{ $C() = $A(); %} %}
+} else {
+  broadcastloop %{ loop(n,m=n) %{ $C() = $A(); %} %}
+}
+',
+  Doc => <<'EOT',
+=for usage
+
+tricpy(PDL(A), int(uplo), PDL(C))
+
+=for example
+
+  $c = $a->tricpy($uplo); # explicit uplo
+  $c = $a->tricpy;        # default upper
+
+or
+
+  tricpy($a, $uplo, $c);  # modify c
+
+=for ref
+
+Copy triangular part to another matrix. If uplo == 0 copy upper triangular
+part.
+
+Originally by Grégory Vanuxem.
+EOT
+);
+
+pp_def('mstack',
+  DefaultFlow => 1,
+  TwoWay => 1,
+  Pars => 'x(n,m);y(n,p);[o]out(n,q=CALC($SIZE(m)+$SIZE(p)));',
+  GenericTypes => [ppdefs_all()],
+  Code => '
+loop (m,n) %{ $out(q=>m) = $x(); %}
+loop (q=$SIZE(m),n) %{ $out() = $y(p=>q-$SIZE(m)); %}
+',
+  BackCode => '
+loop (m,n) %{ $x() = $out(q=>m); %}
+loop (q=$SIZE(m),n) %{ $y(p=>q-$SIZE(m)) = $out(); %}
+',
+  Doc => <<EOT
+=for ref
+
+Combine two 2D ndarrays into a single ndarray, along the second
+("vertical") dim.
+This routine does backward and forward dataflow automatically.
+
+Originally by Grégory Vanuxem.
+EOT
+);
+
+pp_def('augment',
+  DefaultFlow => 1,
+  TwoWay => 1,
+  Pars => 'x(n); y(p);[o]out(q=CALC($SIZE(n)+$SIZE(p)))',
+  GenericTypes => [ppdefs_all()],
+  Code => '
+loop (q=:$SIZE(n)) %{ $out() = $x(n=>q); %}
+loop (q=$SIZE(n))  %{ $out() = $y(p=>q-$SIZE(n)); %}
+',
+  BackCode => '
+loop (q=:$SIZE(n)) %{ $x(n=>q)          = $out(); %}
+loop (q=$SIZE(n))  %{ $y(p=>q-$SIZE(n)) = $out(); %}
+',
+  Doc => <<EOT
+=for ref
+
+Combine two ndarrays into a single ndarray along the 0-th ("horizontal") dim.
+This routine does backward and forward dataflow automatically.
+
+Originally by Grégory Vanuxem.
+EOT
 );
 
 pp_addpm({At=>'Bot'},<<'EOD');

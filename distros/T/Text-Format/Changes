@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::Format.
 
+0.63    2024-09-07
+    - Replace many uses of $_ with explicit and lexical variables.
+        - https://github.com/shlomif/perl-Module-Format/issues/2
+        - Thanks to @mikecappella
+
 0.62    2020-10-16
     - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
         - Move to @SHLOMIF

@@ -128,14 +128,13 @@ for my $type_letter (keys %workspaces) {
 my $slice = $workspaces{d}->(2:-3);
 throws_ok {
 	$slice->share_as('slice');
-} qr/share_pdls: Could not share an ndarray under.*because the ndarray is a slice/
+} qr/share_pdls: Could not share an ndarray under.*because the ndarray does not have any allocated memory/
 , 'Sharing a slice croaks';
 
 my $rotation = $workspaces{d}->rotate(5);
 throws_ok {
 	$rotation->share_as('rotation')
-} qr/share_pdls: Could not share an ndarray under.*because the ndarray is a slice/
+} qr/share_pdls: Could not share an ndarray under.*because the ndarray does not have any allocated memory/
 , 'Sharing a rotation (slice) croaks';
-
 
 done_testing();

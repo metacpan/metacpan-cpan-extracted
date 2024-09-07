@@ -19,11 +19,11 @@ use constant {
 
 use strict;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 $VERSION = eval $VERSION;
 
 @PDL::LinearAlgebra::ISA = qw/PDL::Exporter/;
-@PDL::LinearAlgebra::EXPORT_OK = qw/t diag issym minv mtriinv msyminv mposinv mdet mposdet mrcond positivise
+@PDL::LinearAlgebra::EXPORT_OK = qw/diag issym minv mtriinv msyminv mposinv mdet mposdet mrcond positivise
 				mdsvd msvd mgsvd mpinv mlu mhessen mchol mqr mql mlq mrq meigen meigenx
 				mgeigen  mgeigenx msymeigen msymeigenx msymgeigen msymgeigenx
 				msolve mtrisolve msymsolve mpossolve msolvex msymsolvex mpossolvex
@@ -41,8 +41,6 @@ package # hide from CPAN indexer
 our $floatformat  = "%4.4g";    # Default print format for long numbers
 our $doubleformat = "%6.6g";
 our @ISA = @ISA ? @ISA : 'PDL'; # so still operates when no PDL::Complex
-
-*tricpy = \&PDL::LinearAlgebra::Complex::ctricpy;
 }
 ########################################################################
 
@@ -180,14 +178,6 @@ sub PDL::_norm {
 	my $scale = $m->mv(0,-1)->index($index)->mv(-1,0);
 	$scale = $scale->conj/$scale->abs;
 	return $trans ? $m->t*$scale->dummy(2) : $m*$scale->dummy(2)->t;
-}
-
-*t = \&PDL::t;
-sub PDL::t {
-  my $d = $_[0]->dims_internal;
-  my ($m, $conj) = @_;
-  my $r = ($m->dims > $d+1) ? $m->xchg($d,$d+1) : $m->dummy($d);
-  $conj ? $r->conj : $r;
 }
 
 =head2 issym
@@ -361,7 +351,6 @@ use attributes 'PDL', \&PDL::diag, 'lvalue';
 
 Returns symmetric or Hermitian matrix from lower or upper triangular matrix.
 Supports inplace and threading.
-Uses L<tricpy|PDL::LinearAlgebra::Real/tricpy> or L<ctricpy|PDL::LinearAlgebra::Complex/ctricpy> from Lapack.
 
 =for usage
 

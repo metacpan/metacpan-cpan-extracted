@@ -64,12 +64,12 @@ WriteMakefile(
     x_IRC => 'irc://irc.perl.org/#pdl',
   },
   CONFIGURE_REQUIRES =>  {
-    "PDL" => '2.083',
+    "PDL" => '2.091',
     "Devel::CheckLib" => 0,
     "ExtUtils::F77" => '1.26',
   },
   PREREQ_PM => {
-    "PDL" => '2.083', # ArgOrder, used by tricpy
+    "PDL" => '2.091', # tricpy etc
   },
   TEST_REQUIRES =>  {
     "Test::More" => '0.88', # done_testing

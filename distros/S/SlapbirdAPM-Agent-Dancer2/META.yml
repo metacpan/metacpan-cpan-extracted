@@ -22,6 +22,7 @@ no_index:
 requires:
   Carp: '0'
   Const::Fast: '0.014'
+  DBI: '0'
   Dancer2: '0'
   ExtUtils::MakeMaker: '7.12'
   JSON::MaybeXS: '1.004008'
@@ -36,5 +37,5 @@ resources:
   bugtracker: https://github.com/mollusc-labs/slapbird/issues
   license: http://www.opensource.org/licenses/mit
   repository: https://github.com/mollusc-labs/slapbird
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

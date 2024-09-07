@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,13 +32,12 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "7.14",
-            "PDL" : "2.058"
+            "ExtUtils::MakeMaker" : "7.14"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "2.058",
+            "PDL" : "2.091",
             "perl" : "5.014000",
             "threads::shared" : "1.21"
          }
@@ -61,6 +60,6 @@
          "web" : "http://github.com/PDLPorters/PDL-Parallel-threads"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

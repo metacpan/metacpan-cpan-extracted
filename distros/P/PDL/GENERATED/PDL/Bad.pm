@@ -431,7 +431,7 @@ flag set.
 
 
 
-#line 512 "bad.pd"
+#line 516 "bad.pd"
 
 *nbad = \&PDL::nbad;
 sub PDL::nbad {
@@ -440,7 +440,7 @@ sub PDL::nbad {
 	return $tmp;
 }
 
-#line 512 "bad.pd"
+#line 516 "bad.pd"
 *ngood = \&PDL::ngood;
 sub PDL::ngood {
 	my($x) = @_; my $tmp;
@@ -448,7 +448,7 @@ sub PDL::ngood {
 	return $tmp;
 }
 
-#line 524 "bad.pd"
+#line 528 "bad.pd"
 
 =head2 nbad
 
@@ -912,7 +912,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1065 "bad.pd"
+#line 1069 "bad.pd"
 
 =head1 AUTHOR
 

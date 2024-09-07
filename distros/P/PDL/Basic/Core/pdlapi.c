@@ -68,7 +68,7 @@
 
 #define PDL_RECURSE_CHECK(var) \
   if (var > 1000) \
-    return pdl_make_error_simple(PDL_EUSERERROR, "PDL:Internal Error: data structure recursion limit exceeded (max 1000 levels)\n\tThis could mean that you have found an infinite-recursion error in PDL, or\n\tthat you are building data structures with very long dataflow dependency\n\tchains.  You may want to try using sever() to break the dependency.\n")
+    return pdl_make_error_simple(PDL_EUSERERROR, "PDL:Internal Error: data structure recursion limit exceeded (max 1000 levels)\n\tThis could mean that you have found an infinite-recursion error in PDL, or\n\tthat you are building data structures with very long dataflow dependency\n\tchains.  You may want to try using sever() to break the dependency")
 
 extern Core PDL;
 
@@ -586,9 +586,9 @@ pdl_error pdl_setdims_careful(pdl *it)
 	return PDL_err;
 }
 
+/*CORE21 unused*/
 PDL_Anyval pdl_get_offs(pdl *it, PDL_Indx offs) {
-	PDL_Indx dummy1=offs+1; PDL_Indx dummy2=1;
-	return pdl_at(it->data, it->datatype, &offs, &dummy1, &dummy2, 0, 1);
+    return (PDL_Anyval){ PDL_INVALID, {0} };
 }
 
 pdl_error pdl__addchildtrans(pdl *it,pdl_trans *trans)
@@ -998,6 +998,7 @@ void pdl_propagate_badflag( pdl *it, int newval ) {
     PDL_END_CHILDLOOP(it)
 }
 
+/*CORE21 use pdl_error, replace fprintf*/
 void pdl_propagate_badvalue( pdl *it ) {
     PDL_DECL_CHILDLOOP(it)
     PDL_START_CHILDLOOP(it)
@@ -1005,27 +1006,27 @@ void pdl_propagate_badvalue( pdl *it ) {
 	PDL_Indx i;
 	for( i = trans->vtable->nparents; i < trans->vtable->npdls; i++ ) {
 	    pdl *child = trans->pdls[i];
+            PDL_Anyval typedval;
+            ANYVAL_TO_ANYVAL_NEWTYPE(it->badvalue, typedval, child->datatype);
+            if (typedval.type < 0) {
+                fprintf(stderr, "propagate_badvalue: error making typedval\n");
+                return;
+            }
             child->has_badvalue = 1;
-            child->badvalue = it->badvalue;
+            child->badvalue = typedval;
 	    /* make sure we propagate to grandchildren, etc */
 	    pdl_propagate_badvalue( child );
         } /* for: i */
     PDL_END_CHILDLOOP(it)
 } /* pdl_propagate_badvalue */
 
+/*CORE21 unused*/
 PDL_Anyval pdl_get_badvalue( int datatype ) {
-    PDL_Anyval retval = { PDL_INVALID, {0} };
-#define X(datatype, ctype, ppsym, shortctype, ...) \
-    retval.type = datatype; retval.value.ppsym = PDL.bvals.shortctype;
-    PDL_GENERICSWITCH(PDL_TYPELIST_ALL, datatype, X, return retval)
-#undef X
-    return retval;
+  return (PDL_Anyval){ PDL_INVALID, {0} };
 }
 
 PDL_Anyval pdl_get_pdl_badvalue( pdl *it ) {
-  if (it->has_badvalue && it->badvalue.type != it->datatype)
-    return (PDL_Anyval){ PDL_INVALID, {0} };
-  return it->has_badvalue ? it->badvalue : pdl_get_badvalue( it->datatype );
+  return (PDL_Anyval){ PDL_INVALID, {0} };
 }
 
 pdl_trans *pdl_create_trans(pdl_transvtable *vtable) {

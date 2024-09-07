@@ -42,9 +42,11 @@ t/16.release-detail.t
 t/18.release-detail-perl-local.t
 t/18.release-detail-perl-remote.t
 t/19.find_similar_commands.t
+t/PerlbrewTestHelpers.pm
 t/app-perlbrew-path-installation.t
 t/app-perlbrew-path.t
 t/bashrc_content.t
+t/bashrc_executes.t
 t/builddir.t
 t/command-alias.t
 t/command-available.t
@@ -85,6 +87,6 @@ t/installation2.t
 t/installation3.t
 t/list_modules.t
 t/test.tar.gz
-t/test_helpers.pl
+t/test2_helpers.pl
 t/unit-files-are-the-same.t
 t/util-find-similar-tokens.t

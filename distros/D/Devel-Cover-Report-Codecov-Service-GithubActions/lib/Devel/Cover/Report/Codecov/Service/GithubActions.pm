@@ -5,7 +5,7 @@ use warnings;
 package Devel::Cover::Report::Codecov::Service::GithubActions;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001000';
+our $VERSION   = '0.001001';
 
 sub detect {
 	return $ENV{GITHUB_ACTIONS};
@@ -13,14 +13,13 @@ sub detect {
 
 sub configuration {
 	return {
-		service   => 'githubactions',
+		service   => 'custom',
 		commit    => $ENV{GITHUB_SHA},
 		build     => sprintf( '%s.%s.%s', $ENV{GITHUB_RUN_ID}, $ENV{GITHUB_RUN_NUMBER}, $ENV{GITHUB_RUN_ATTEMPT} ),
 		build_url => sprintf( '%s/%s/actions/runs/%s', $ENV{GITHUB_SERVER_URL}, $ENV{GITHUB_REPOSITORY}, $ENV{GITHUB_RUN_ID} ),
 		job       => $ENV{GITHUB_RUN_ID},
-		branch    => $ENV{GITHUB_REF_TYPE} eq 'branch' ? $ENV{GITHUB_HEAD_REF} : undef,
-		tag       => $ENV{GITHUB_REF_TYPE} eq 'tag' ? $ENV{GITHUB_HEAD_REF} : undef,
 		slug      => $ENV{GITHUB_REPOSITORY},
+		$ENV{GITHUB_REF_TYPE} => $ENV{GITHUB_HEAD_REF},
 	};
 }
 

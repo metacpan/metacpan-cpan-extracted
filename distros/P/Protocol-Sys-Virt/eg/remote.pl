@@ -27,14 +27,15 @@ my $transport;
 my $remote;
 my $prot = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Data::Dumper;
+use JSON::PP;
+my $json = JSON::PP->new->canonical(1);
 sub handle_reply {
     my (%args) = @_;
     my $proc = $args{header}->{proc};
 
-    print 'header: ' . Dumper( $args{header} );
-    print Dumper( $args{error} ) if $args{error};
-#    print Dumper( $args{data} );
+    say 'header: ' . $json->encode( $args{header} );
+    say $json->encode( $args{error} ) if $args{error};
+#    say Dumper( $args{data} );
     if ($proc == $prot->PROC_CONNECT_OPEN) {
 #        $remote->call( $prot->PROC_CONNECT_LIST_ALL_DOMAINS,
 #                       { need_results => 99, flags => 0 } );
@@ -57,7 +58,7 @@ sub handle_reply {
         # for my $v ( @{ $args{data}->{vols} } ) {
         #     $dl = $v if $v->{name} eq 'releaser.qcow2';
         # }
-        # print 'reading: ' . Dumper( $dl );
+        # say 'reading: ' . Dumper( $dl );
         # $remote->call( $prot->PROC_STORAGE_VOL_DOWNLOAD,
         #                { vol => $dl, offset => 0, length => 0, flags => 0 } );
     }
@@ -69,8 +70,8 @@ sub handle_reply {
 sub handle_stream {
     my (%args) = @_;
 
-    print 'header(stream): ' . Dumper( $args{header} );
-    print Dumper( $args{error} ) if $args{error};
+    say 'header(stream): ' . $json->encode( $args{header} );
+    say $json->encode( $args{error} ) if $args{error};
 
     my $len = length( $args{data} // '' );
     say 'length: ' . $len;
@@ -87,12 +88,15 @@ sub start_transport {
     $transport = Protocol::Sys::Virt::Transport->new(
         role => 'client',
         on_send => sub {
+            my $opaque = shift;
             while (my $data = shift) {
                 $log->trace("Writing data... " . length($data));
                 $log->trace(unpack("H*", $data));
                 $stream->write($data);
             }
             $log->trace("Writing data (finished)");
+
+            return $opaque;
         });
 }
 
@@ -131,7 +135,8 @@ do {
 
     $remote->start_auth($protocol->AUTH_NONE, on_complete => \&auth_complete);
     while (not $eof) {
-        my ($len, $type) = $transport->receive($data);
+        $transport->receive($data);
+        my ($len, $type) = $transport->need;
         die "Unexpected type $type" unless $type eq 'data';
         $log->trace("Starting socket read... $len");
         ($data, $eof) = await $stream->read_exactly( $len );

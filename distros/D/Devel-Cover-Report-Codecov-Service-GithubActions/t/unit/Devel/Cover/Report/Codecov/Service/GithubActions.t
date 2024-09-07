@@ -51,13 +51,12 @@ describe "method `configuration`" => sub {
 		local $ENV{GITHUB_HEAD_REF} = 'xyzzy';
 		
 		is( $CLASS->configuration, hash {
-			field service   => 'githubactions';
+			field service   => 'custom';
 			field commit    => 'abc123';
 			field build     => sprintf( '%s.%s.%s', 1, 2, 3 );
 			field build_url => sprintf( '%s/%s/actions/runs/%s', 'https://example.com', 'foo/bar', 1 );
 			field job       => 1;
 			field branch    => 'xyzzy';
-			field tag       => undef;
 			field slug      => 'foo/bar';
 		} );
 	};
@@ -75,12 +74,11 @@ describe "method `configuration`" => sub {
 		local $ENV{GITHUB_HEAD_REF} = 'xyzzy';
 		
 		is( $CLASS->configuration, hash {
-			field service   => 'githubactions';
+			field service   => 'custom';
 			field commit    => 'abc123';
 			field build     => sprintf( '%s.%s.%s', 1, 2, 3 );
 			field build_url => sprintf( '%s/%s/actions/runs/%s', 'https://example.com', 'foo/bar', 1 );
 			field job       => 1;
-			field branch    => undef;
 			field tag       => 'xyzzy';
 			field slug      => 'foo/bar';
 		} );

@@ -1,5 +1,5 @@
 Name:           perl-Term-CLI
-Version:        0.058002
+Version:        0.060000
 Release:        1%{?dist}
 Summary:        CLI interpreter based on Term::ReadLine
 License:        GPL+ or Artistic
@@ -105,6 +105,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
+* Fri Sep 6 2024 Steven Bakker <sbakker@cpan.org> 0.060000-1
+- New upstream release
+* Sun Jan 14 2024 Steven Bakker <sbakker@cpan.org> 0.059000-1
+- New upstream release
 * Mon Aug 22 2022 Steven Bakker <sbakker@cpan.org> 0.058002-1
 - New upstream release
 * Sun Feb 25 2018 Steven Bakker <sbakker@cpan.org> 0.02-1

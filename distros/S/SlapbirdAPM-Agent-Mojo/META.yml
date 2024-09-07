@@ -22,6 +22,7 @@ no_index:
 requires:
   Carp: '0'
   Const::Fast: '0.014'
+  DBI: '0'
   IPC::Open2: '0'
   Mojolicious: '0'
   System::Info: '0.064'
@@ -34,5 +35,5 @@ resources:
   bugtracker: https://github.com/mollusc-labs/slapbird/issues
   license: http://www.opensource.org/licenses/mit
   repository: https://github.com/mollusc-labs/slapbird
-version: 0.005
+version: 0.007
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

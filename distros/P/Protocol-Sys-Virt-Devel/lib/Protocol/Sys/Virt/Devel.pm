@@ -3,7 +3,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures';
 
-package Protocol::Sys::Virt::Devel v0.0.3;
+package Protocol::Sys::Virt::Devel v0.0.4;
 
 use parent 'Exporter';
 our @EXPORT_OK = qw( extract_all );
@@ -246,6 +246,7 @@ sub extract_all($libvirt) {
             } @modules
         },
         header_syms => \@h_syms,
+        xdr_parse_version => $XDR::Parse::VERSION,
     };
 }
 
@@ -260,7 +261,7 @@ Protocol::Sys::Virt::Devel - Helper module for Protocol::Sys::Virt and dependant
 
 =head1 VERSION
 
-0.0.3
+0.0.4
 
 =head1 SYNOPSIS
 
@@ -316,6 +317,10 @@ the public C<libvirt> headers (and an internal header hiding some of the
 protocol constants).
 
 Each array element is a hashref with the following keys:
+
+=item * xdr_parse_version
+
+The value of the C<$XDR::Parse::VERSION> dependency.
 
 =over 8
 

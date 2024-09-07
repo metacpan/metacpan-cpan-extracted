@@ -12,18 +12,25 @@ use warnings;
 use Test::More;
 
 BEGIN {
-	plan skip_all => 'these tests require Object::Pad'
-		unless eval { require Object::Pad; };
+	my $has_object_pad = eval {
+		require Object::Pad;
+		Object::Pad->VERSION('0.57');
+		Object::Pad->import;
+		1;
+	};
+
+	plan skip_all => 'these tests require Object::Pad 0.57'
+		unless $has_object_pad;
 }
 
-class ParentForm :repr(HASH)
+class ParentForm : repr(HASH)
 {
 	use Form::Tiny -nomoo;
 
 	form_field 'f1';
 }
 
-class ChildForm isa ParentForm :repr(HASH)
+class ChildForm : isa(ParentForm) : repr(HASH)
 {
 	use Form::Tiny -nomoo;
 
@@ -31,10 +38,12 @@ class ChildForm isa ParentForm :repr(HASH)
 }
 
 my $form = ChildForm->new;
-$form->set_input({
-	f1 => 'field f1',
-	f2 => 'field f2',
-});
+$form->set_input(
+	{
+		f1 => 'field f1',
+		f2 => 'field f2',
+	}
+);
 
 ok $form->valid;
 can_ok $form, 'form_meta';

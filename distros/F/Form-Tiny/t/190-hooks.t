@@ -72,7 +72,7 @@ for my $aref (@data) {
 	}
 	for my $error (@{$form->errors}) {
 		is($error->field, "name.*", "error namespace valid");
-		is($error->error, "error got overwritten", "error message ok");
+		is($error->get_error, "error got overwritten", "error message ok");
 	}
 
 	note Dumper($input);
@@ -80,3 +80,4 @@ for my $aref (@data) {
 }
 
 done_testing();
+

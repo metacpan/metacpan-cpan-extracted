@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Attribute::Storage qw( get_subattr );
 
@@ -21,14 +21,14 @@ sub myfunc :Value("first generation")
 {
 }
 
-is_deeply( get_subattr( "myfunc", "Value" ), [ "first generation" ], 'First generation of attribute' );
+is( get_subattr( "myfunc", "Value" ), [ "first generation" ], 'First generation of attribute' );
 
 {
    no warnings 'redefine';
    *myfunc = sub :Value("second generation") {}
 }
 
-is_deeply( get_subattr( "myfunc", "Value" ), [ "second generation" ], 'Second generation of attribute' );
-is_deeply( \@destroyed, [ "first generation" ], 'First generation got destroyed' );
+is( get_subattr( "myfunc", "Value" ), [ "second generation" ], 'Second generation of attribute' );
+is( \@destroyed, [ "first generation" ], 'First generation got destroyed' );
 
 done_testing;

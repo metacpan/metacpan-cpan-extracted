@@ -1,5 +1,9 @@
 Revision history for Perl extension Form::Tiny.
 
+2.25 Sat Sep 7 2024
+	- strict plugin now collects and reports the names of fields which are unexpected (each field in its own error)
+	- Error class has new method get_error, which returns full error message (old error method result may be incomplete)
+
 2.24 Tue Mar 26 2024
 	- fix error when validation fails on deeply nested field (two levels down or more)
 

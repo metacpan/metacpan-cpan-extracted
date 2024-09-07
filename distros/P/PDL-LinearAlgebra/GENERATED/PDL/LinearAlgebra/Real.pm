@@ -3,7 +3,7 @@
 #
 package PDL::LinearAlgebra::Real;
 
-our @EXPORT_OK = qw(gtsv gesvd gesdd ggsvd geev geevx ggev ggevx gees geesx gges ggesx syev syevd syevx syevr sygv sygvd sygvx gesv gesvx sysv sysvx posv posvx gels gelsy gelss gelsd gglse ggglm getrf getf2 sytrf sytf2 potrf potf2 getri sytri potri trtri trti2 getrs sytrs potrs trtrs latrs gecon sycon pocon trcon geqp3 geqrf orgqr ormqr gelqf orglq ormlq geqlf orgql ormql gerqf orgrq ormrq tzrzf ormrz gehrd orghr hseqr trevc tgevc gebal gebak lange lansy lantr gemm mmult crossprod syrk dot axpy nrm2 asum scal rot rotg lasrt lacpy laswp lamch labad tricpy cplx_eigen augment mstack charpol );
+our @EXPORT_OK = qw(gtsv gesvd gesdd ggsvd geev geevx ggev ggevx gees geesx gges ggesx syev syevd syevx syevr sygv sygvd sygvx gesv gesvx sysv sysvx posv posvx gels gelsy gelss gelsd gglse ggglm getrf getf2 sytrf sytf2 potrf potf2 getri sytri potri trtri trti2 getrs sytrs potrs trtrs latrs gecon sycon pocon trcon geqp3 geqrf orgqr ormqr gelqf orglq ormlq geqlf orgql ormql gerqf orgrq ormrq tzrzf ormrz gehrd orghr hseqr trevc tgevc gebal gebak lange lansy lantr gemm mmult crossprod syrk dot axpy nrm2 asum scal rot rotg lasrt lacpy laswp lamch labad cplx_eigen charpol );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -46,7 +46,7 @@ use strict;
   BEGIN{ $^W = $warningFlag;}
 }
 
-=encoding Latin-1
+=encoding utf8
 
 =head1 NAME
 
@@ -161,7 +161,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int jobu(); int jobvt(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info())
+  Signature: ([io]A(m,n); int jobu(); int jobvt(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info())
 
 =for ref
 
@@ -264,7 +264,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int jobz(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
+  Signature: ([io]A(m,n); int jobz(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
 
 =for ref
 
@@ -1895,7 +1895,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn))
+  Signature: (A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
 
 =for ref
 
@@ -2387,7 +2387,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   Signature: ([io]A(n,n); int itype(); int jobz(); int range();
 	  int uplo(); [io]B(n,n); vl(); vu(); int il(); int iu(); abstol();
 	  int [o]m(); [o]w(n); [o]Z(p,p); int [o]ifail(n); int [o]info();
-	  int [t]iwork(iworkn);
+	  int [t]iwork(iworkn=CALC(5*$SIZE(n)));
 	)
 
 =for ref
@@ -2610,7 +2610,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info(); [t]work(workn); int [t]iwork(n))
+  Signature: ([io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); int [t]iwork(n))
 
 =for ref
 
@@ -3195,7 +3195,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info(); int [t]iwork(n); [t]work(workn))
+  Signature: ([io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n))))
 
 =for ref
 
@@ -3695,7 +3695,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); [io]B(p,q); rcond(); [o]s(minmn); int [o]rank();int [o]info(); int [t]iwork(iworkn))
+  Signature: ([io]A(m,n); [io]B(p,q); rcond(); [o]s(minmn=CALC(PDLMAX(1,PDLMIN($SIZE(m),$SIZE(n))))); int [o]rank();int [o]info(); int [t]iwork(iworkn))
 
 =for ref
 
@@ -3955,7 +3955,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int [o]ipiv(p); int [o]info())
+  Signature: ([io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
 
 =for ref
 
@@ -4017,7 +4017,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int [o]ipiv(p); int [o]info())
+  Signature: ([io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
 
 =for ref
 
@@ -5135,7 +5135,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn))
+  Signature: (A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(4*$SIZE(n))))
 
 =for ref
 
@@ -5198,7 +5198,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info(); int [t]iwork(n); [t]work(workn))
+  Signature: ([phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info(); int [t]iwork(n); [t]work(workn=CALC(2*$SIZE(n))))
 
 =for ref
 
@@ -5263,7 +5263,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn))
+  Signature: (A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n))))
 
 =for ref
 
@@ -5322,7 +5322,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn))
+  Signature: (A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n))))
 
 =for ref
 
@@ -6660,7 +6660,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn))
+  Signature: ([io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(3*$SIZE(n))))
 
 =for ref
 
@@ -6812,7 +6812,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn))
+  Signature: ([io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
 
 =for ref
 
@@ -8022,48 +8022,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 tricpy
-
-=for sig
-
-  Signature: (A(m,n);[o] C(m,n); int uplo)
-
-=for usage
-
-tricpy(PDL(A), int(uplo), PDL(C))
-
-=for example
-
-	use PDL::LinearAlgebra;
-
-	$c = $a->tricpy($uplo);	# explicit uplo
-	$c = $a->tricpy;			# default upper
-or
-	use PDL::LinearAlgebra::Real;
-
-	tricpy($a, $uplo, $c);	# modify c
-
-=for ref
-
-Copy triangular part to another matrix. If uplo == 0 copy upper triangular part.
-
-=for bad
-
-tricpy does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*tricpy = \&PDL::tricpy;
-
-
-
-
-
-
 =head2 cplx_eigen
 
 =for sig
@@ -8107,67 +8065,11 @@ sub PDL::cplx_eigen {
 
 
 
-=head2 augment
-
-=for sig
-
-  Signature: (x(n); y(p);[o]out(q))
-
-=for ref
-
-Combine two ndarrays into a single ndarray.
-This routine does backward and forward dataflow automatically.
-
-=for bad
-
-augment does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*augment = \&PDL::augment;
-
-
-
-
-
-
-=head2 mstack
-
-=for sig
-
-  Signature: (x(n,m);y(n,p);[o]out(n,q))
-
-=for ref
-
-Combine two ndarrays into a single ndarray.
-This routine does backward and forward dataflow automatically.
-
-=for bad
-
-mstack does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*mstack = \&PDL::mstack;
-
-
-
-
-
-
 =head2 charpol
 
 =for sig
 
-  Signature: (A(n,n);[o]Y(n,n);[o]out(p))
+  Signature: (A(n,n);[o]Y(n,n);[o]out(p=CALC($SIZE(n)+1)))
 
 =for ref
 
@@ -8191,7 +8093,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 10755 "real.pd"
+#line 10599 "real.pd"
 
 =head1 AUTHOR
 
@@ -8202,7 +8104,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 8206 "Real.pm"
+#line 8108 "Real.pm"
 
 # Exit with OK status
 

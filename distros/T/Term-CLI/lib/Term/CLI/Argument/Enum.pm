@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Enum 0.059000;
+package Term::CLI::Argument::Enum 0.060000;
 
 use 5.014;
 use warnings;
@@ -131,7 +131,7 @@ Term::CLI::Argument::Enum - class for "enum" string arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.059000
+version 0.060000
 
 =head1 SYNOPSIS
 

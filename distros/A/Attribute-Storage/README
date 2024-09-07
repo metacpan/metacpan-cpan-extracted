@@ -1,7 +1,6 @@
 NAME
 
-    Attribute::Storage - declare and retrieve named attributes about CODE
-    references
+    Attribute::Storage - declare and retrieve named attributes data
 
 SYNOPSIS
 
@@ -32,9 +31,9 @@ SYNOPSIS
 DESCRIPTION
 
     This package provides a base, where a package using it can define
-    handlers for particular code attributes. Other packages, using the
-    package that defines the code attributes, can then use them to annotate
-    subs.
+    handlers for particular named attributes. Other packages, using the
+    package that defines the attributes, can then use them to annotate
+    subroutines or variables.
 
     This is similar to Attribute::Handlers, with the following key
     differences:
@@ -57,6 +56,9 @@ DESCRIPTION
       only execute handlers at defined phases such as BEGIN or INIT, and
       cannot reexecute the handlers in a file once it has been reloaded.
 
+    Since version 0.11 this module also supports attributes on scalar,
+    array and hash variables.
+
 ATTRIBUTES
 
     Each attribute that the defining package wants to define should be done
@@ -66,8 +68,6 @@ ATTRIBUTES
     stored, to be returned later when queried by get_subattr or
     get_subattrs. The return value must be defined, or else the attribute
     will be marked as a compile error for perl to handle accordingly.
-
-    Only CODE attributes are supported at present.
 
        sub AttributeName :ATTR(CODE)
        {
@@ -138,11 +138,14 @@ ATTRIBUTES
           return;
        }
 
+    Only CODE attributes support the NAME flag; it cannot be applied when
+    SCALAR, ARRAY or HASH are also present.
+
     When applied to an anonymous function (sub { ... }), the name will
     appear as __ANON__.
 
     Normally it is an error to attempt to apply the same attribute more
-    than once to the same function. Sometimes however, it would make sense
+    than once to the same target. Sometimes however, it would make sense
     for an attribute to be applied many times. If the ATTR() list is given
     the MULTI flag, then applying it more than once will be allowed. Each
     invocation of the handling code will be given the previous value that
@@ -195,28 +198,49 @@ FUNCTIONS
 
  get_subattrs
 
-       $attrs = get_subattrs( $sub )
+       $attrs = get_subattrs( $sub );
 
     Returns a HASH reference containing all the attributes defined on the
     given sub. The sub should either be passed as a CODE reference, or as a
-    name in the caller's package. If no attributes are defined, a reference
-    to an empty HASH is returned.
+    name in the caller's package.
 
-    The returned HASH reference is a new shallow clone, the caller may
-    modify this hash arbitrarily without breaking the stored data, or other
-    users of it.
+ get_varattrs
+
+       $attrs = get_varattrs( $varref );
+
+    Since version 0.11.
+
+    Returns a HASH reference containing all the attributes defined on the
+    given variable, which should be passed in by reference.
+
+    In both of the above functions, the returned HASH reference is a new
+    shallow clone, and the caller may modify this hash arbitrarily without
+    breaking the stored data or other users of it. If no attributes are
+    defined then a reference to an empty HASH is returned.
 
  get_subattr
 
-       $value = get_subattr( $sub, $attrname )
+       $value = get_subattr( $sub, $attrname );
 
     Returns the value of a single named attribute on the given sub. The sub
     should either be passed as a CODE reference, or as a name in the
-    caller's package. If the attribute is not defined, undef is returned.
+    caller's package.
+
+ get_varattr
+
+       $value = get_varattr( $varref, $attrname );
+
+    Since version 0.11.
+
+    Returns the value of a single named attribute on the given variable,
+    which should be passed in by reference.
+
+    In both of the above functions, if the attribute is not defined then
+    undef is returned.
 
  apply_subattrs
 
-       $sub = apply_subattrs( @attrs_kvlist, $sub )
+       $sub = apply_subattrs( @attrs_kvlist, $sub );
 
     A utility function to help apply attributes dynamically to the given
     CODE reference. The CODE reference is given last so that calls to the
@@ -224,8 +248,8 @@ FUNCTIONS
     compiletime.
 
        apply_subattrs
-        Title => "Here is my title",
-        sub { return $title };
+          Title => "Here is my title",
+          sub { return $title };
 
     Is equivalent to
 
@@ -244,17 +268,17 @@ FUNCTIONS
 
  apply_subattrs_for_pkg
 
-       $sub = apply_subattrs_for_pkg( $pkg, @attrs_kvlist, $sub )
+       $sub = apply_subattrs_for_pkg( $pkg, @attrs_kvlist, $sub );
 
     As apply_subattrs but allows passing a specific package name, rather
     than using caller.
 
  find_subs_with_attr
 
-       %subs = find_subs_with_attr( $pkg, $attrname, %opts )
+       %subs = find_subs_with_attr( $pkg, $attrname, %opts );
 
     A utility function to find CODE references in the given package that
-    have the name attribute applied. The symbol table is checked for the
+    have the named attribute applied. The symbol table is checked for the
     given package, looking for CODE references that have the named
     attribute applied. These are returned in a key-value list, where the
     key gives the name of the function and the value is a CODE reference to
@@ -268,24 +292,41 @@ FUNCTIONS
 
        %subs = find_subs_with_attr( mro::get_linear_isa( $class ), $attrname );
 
-    Takes the following named options:
+ find_vars_with_attr
+
+       %vars = find_vars_with_attr( $pkg, $attrname, %opts );
+
+    Since version 0.11.
+
+    A utility function to find SCALAR, ARRAY or HASH references in the
+    given package that have the named attribute applied. The symbol table
+    is checked for the given package, looking for variable references that
+    have the named attribute applied. These are returned in a key-value
+    list, where the key gives the name of the variable and the value is a
+    reference to it.
+
+    Unlike for "find_subs_with_attr", the $pkg argument must be a single
+    package name; no subclass search takes place.
+
+    Both of the above functions take the following named options:
 
     matching => Regexp | CODE
 
       If present, gives a filter regexp or CODE reference to apply to
-      symbol names.
+      names. Subs will be given as plain names; variable names will include
+      the leading sigil.
 
-         $name =~ $matching
-         $matching->( local $_ = $name )
+         $name =~ $matching;
+         $matching->( local $_ = $name );
 
     filter => CODE
 
-      If present, gives a filter CODE reference to apply to the function
+      If present, gives a filter CODE reference to apply to the target
       references before they are accepted as results. Note that this allows
       the possibility that the first match for a given method name to be
       rejected, while later ones are accepted.
 
-         $filter->( $cv, $name, $package )
+         $filter->( $ref, $name, $package );
 
 AUTHOR
 

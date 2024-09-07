@@ -1,11 +1,11 @@
 Changes
-Makefile.PL
 examples/barrier-sync.pl
 examples/perl-barrier.pl
 examples/simple-parallelize.pl
 examples/test-memory-consumption.pl
-threads.pd
-SIMD.pm
+lib/PDL/Parallel/threads.pm
+lib/PDL/Parallel/threads/SIMD.pm
+Makefile.PL
 MANIFEST			This list of files
 README.pod
 t/00-load.t
@@ -18,4 +18,3 @@ t/20_simd.t
 t/30_sharing_from_threads.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
-GENERATED/PDL/Parallel/threads.pm        mod=PDL::Parallel::threads pd=threads.pd (added by pdlpp_mkgen)

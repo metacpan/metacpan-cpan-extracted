@@ -1,3 +1,4 @@
+=encoding utf8
 
 =head1 NAME
 
@@ -718,10 +719,33 @@ transpose rows and columns.
 
 sub PDL::transpose {
   my ($this) = @_;
-  $this->getndims > 1 ? $this->xchg(0,1) :
-  $this->getndims > 0 ? $this->dummy(0) :
+  my $ndims = $this->dims;
+  $ndims > 1 ? $this->xchg(0,1) :
+  $ndims > 0 ? $this->dummy(0) :
   $this->dummy(0)->dummy(0);
 }
 
-1;
+=head2 t
 
+=for usage
+
+ $pdl = $pdl->t(SCALAR(conj))
+ conj : Conjugate Transpose = 1 | Transpose = 0, default = 0;
+
+=for ref
+
+Convenient function for transposing real or complex 2D array(s).
+For complex data, if conj is true returns conjugate transposed array(s).
+Supports broadcasting. Not exported.
+
+Originally by Grégory Vanuxem.
+
+=cut
+
+sub PDL::t {
+  my ($m, $conj) = @_;
+  my $r = $m->transpose;
+  ($conj && !$r->type->real) ? $r->conj : $r;
+}
+
+1;

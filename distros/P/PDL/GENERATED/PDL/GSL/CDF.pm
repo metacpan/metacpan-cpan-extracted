@@ -81,7 +81,7 @@ while C<P(1) = p(1)>, C<Q(1) = 1 - p(1)>.
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Beta Distribution (gsl_cdf_beta_*)
 
@@ -190,7 +190,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Binomial Distribution (gsl_cdf_binomial_*)
 
@@ -249,7 +249,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Cauchy Distribution (gsl_cdf_cauchy_*)
 
@@ -358,7 +358,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Chi-squared Distribution (gsl_cdf_chisq_*)
 
@@ -467,7 +467,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Exponential Distribution (gsl_cdf_exponential_*)
 
@@ -576,7 +576,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Exponential Power Distribution (gsl_cdf_exppow_*)
 
@@ -635,7 +635,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The F-distribution (gsl_cdf_fdist_*)
 
@@ -744,7 +744,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Flat (Uniform) Distribution (gsl_cdf_flat_*)
 
@@ -853,7 +853,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Gamma Distribution (gsl_cdf_gamma_*)
 
@@ -962,7 +962,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Gaussian Distribution (gsl_cdf_gaussian_*)
 
@@ -1071,7 +1071,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Geometric Distribution (gsl_cdf_geometric_*)
 
@@ -1130,7 +1130,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Type-1 Gumbel Distribution (gsl_cdf_gumbel1_*)
 
@@ -1239,7 +1239,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Type-2 Gumbel Distribution (gsl_cdf_gumbel2_*)
 
@@ -1348,7 +1348,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Hypergeometric Distribution (gsl_cdf_hypergeometric_*)
 
@@ -1407,7 +1407,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Laplace Distribution (gsl_cdf_laplace_*)
 
@@ -1516,7 +1516,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Logistic Distribution (gsl_cdf_logistic_*)
 
@@ -1625,7 +1625,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Lognormal Distribution (gsl_cdf_lognormal_*)
 
@@ -1784,7 +1784,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Pareto Distribution (gsl_cdf_pareto_*)
 
@@ -1893,7 +1893,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Pascal Distribution (gsl_cdf_pascal_*)
 
@@ -1952,7 +1952,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Poisson Distribution (gsl_cdf_poisson_*)
 
@@ -2011,7 +2011,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Rayleigh Distribution (gsl_cdf_rayleigh_*)
 
@@ -2120,7 +2120,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The t-distribution (gsl_cdf_tdist_*)
 
@@ -2229,7 +2229,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Unit Gaussian Distribution (gsl_cdf_ugaussian_*)
 
@@ -2338,7 +2338,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "gsl_cdf.pd"
+#line 136 "gsl_cdf.pd"
 
 =head2 The Weibull Distribution (gsl_cdf_weibull_*)
 
@@ -2449,7 +2449,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 168 "gsl_cdf.pd"
+#line 164 "gsl_cdf.pd"
 
 =head1 AUTHOR
 

@@ -6,8 +6,8 @@
 use strict;
 use warnings;
 
-# Should be 5.
-use Test::More tests => 5;
+# Should be 6.
+use Test::More tests => 6;
 
 use Text::Format;
 
@@ -45,4 +45,19 @@ ok( 1, "Text::Format loaded." );
 
     # TEST
     is( scalar(@results), 3, "columns and bodyIndent" );
+}
+
+{
+    my $formatter = Text::Format->new();
+
+    my $s = "";
+    $s .= $formatter->format($_) foreach ( 'first el ', 'second el' );
+
+    # https://github.com/shlomif/perl-Module-Format/issues/2
+    # TEST
+    like(
+        $s,
+        qr#\A\s*first\s* el\s*second\s*el\s*\z#ms,
+        "formatting \$_ [ GH#2 ]"
+    );
 }

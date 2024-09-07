@@ -42,7 +42,7 @@ use PDL::LinearAlgebra::Real qw //;
 use PDL::LinearAlgebra::Complex qw //;
 use strict;
 
-=encoding Latin-1
+=encoding utf8
 
 =head1 NAME
 
@@ -79,7 +79,7 @@ PDL routine sec. If you need to call it specify its origin module : PDL::Basic::
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn))
+  Signature: ([io,phys]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn=CALC(3*$SIZE(n)*$SIZE(n))))
 
 =for ref
 
@@ -242,7 +242,7 @@ sub PDL::ctrfun {
 }
 *ctrfun = \&PDL::ctrfun;
 
-#line 807 "trans.pd"
+#line 804 "trans.pd"
 my $pi;
 BEGIN { $pi = pdl(3.1415926535897932384626433832795029) }
 sub pi () { $pi->copy };

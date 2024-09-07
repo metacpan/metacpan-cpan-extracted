@@ -96,7 +96,7 @@ use PDL::LinearAlgebra::Real;
 	BEGIN{ $^W = $warningFlag ; }
 }
 
-=encoding Latin-1
+=encoding utf8
 
 =head1 NAME
 
@@ -205,12 +205,10 @@ pp_defc("gesvd",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,m,n); int jobu(); int jobvt(); [o]s(minmn); [o]U(2,p,p); [o]VT(2,s,s); int [o]info(); [t]rwork(rworkn);',
+	Pars => '[io]A(2,m,n); int jobu(); int jobvt(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(2,p,p); [o]VT(2,s,s); int [o]info(); [t]rwork(rworkn=CALC(5*$SIZE(minmn)));',
 	RedoDimsCode => '
-	  $SIZE(minmn) = PDLMIN($SIZE(m),$SIZE(n));
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobu), tmp==1 || tmp==2, $PDL(U), $SIZE(p), $SIZE(m))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvt), tmp==1 || tmp==2, $PDL(VT), $SIZE(s), $SIZE(n))
-	  $SIZE(rworkn) = 5 * $SIZE(minmn);
 	',
 	Code => generate_code '
 		integer lwork = -1;
@@ -298,9 +296,8 @@ pp_defc("gesdd",
 		$GENERIC() *rwork, integer *iwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,m,n); int jobz(); [o]s(minmn); [o]U(2,p,p); [o]VT(2,s,s); int [o]info(); int [t]iwork(iworkn);',
+	Pars => '[io]A(2,m,n); int jobz(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(2,p,p); [o]VT(2,s,s); int [o]info(); int [t]iwork(iworkn);',
 	RedoDimsCode => '
-	  $SIZE(minmn) = PDLMIN($SIZE(m),$SIZE(n));
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)<$SIZE(n)), $PDL(U), $SIZE(p), $SIZE(minmn))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)>=$SIZE(n)), $PDL(VT), $SIZE(s), $SIZE(minmn))
 	  $SIZE(iworkn) = 8 * $SIZE(minmn);
@@ -393,12 +390,11 @@ pp_defc("ggsvd",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,m,n); int jobu(); int jobv(); int jobq(); [io]B(2,p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n); [o]U(2,q,q); [o]V(2,r,r); [o]Q(2,s,s); int [o]iwork(n); int [o]info(); [t]rwork(rworkn);',
+	Pars => '[io]A(2,m,n); int jobu(); int jobv(); int jobq(); [io]B(2,p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n); [o]U(2,q,q); [o]V(2,r,r); [o]Q(2,s,s); int [o]iwork(n); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobu), tmp, $PDL(U), $SIZE(q), $SIZE(m))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobv), tmp, $PDL(V), $SIZE(r), $SIZE(p))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobq), tmp, $PDL(Q), $SIZE(s), $SIZE(n))
-	  $SIZE(rworkn) = 2 * $SIZE(n);
 	',
 	Code => generate_code '
 		char pjobu = \'N\';
@@ -480,11 +476,10 @@ pp_defc("geev",
 		integer *ldvr, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => 'A(2,n,n); int jobvl(); int jobvr(); [o]w(2,n); [o]vl(2,m,m); [o]vr(2,p,p); int [o]info(); [t]rwork(rworkn);',
+	Pars => 'A(2,n,n); int jobvl(); int jobvr(); [o]w(2,n); [o]vl(2,m,m); [o]vr(2,p,p); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(vl), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(vr), $SIZE(p), $SIZE(n))
-	  $SIZE(rworkn) = 2 * $SIZE(n);
 	',
 	Code => generate_code '
 		char jvl = \'N\';
@@ -543,13 +538,12 @@ pp_defc("geevx",
 		*work, integer *lwork, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]w(2,n); [o]vl(2,m,m); [o]vr(2,p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); [t]rwork(rworkn);',
+	Pars => '[io]A(2,n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]w(2,n); [o]vl(2,m,m); [o]vr(2,p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(vl), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(vr), $SIZE(p), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp == 1 || tmp == 3, $PDL(rconde), $SIZE(q), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp == 2 || tmp == 3, $PDL(rcondv), $SIZE(r), $SIZE(n))
-	  $SIZE(rworkn) = 2 * $SIZE(n);
 	',
 	Code => generate_code '
 		char jvl = \'N\';
@@ -646,11 +640,10 @@ pp_defc("ggev",
 		$GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => 'A(2,n,n); int [phys]jobvl();int [phys]jobvr();B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VL(2,m,m);[o]VR(2,p,p);int [o]info(); [t]rwork(rworkn);',
+	Pars => 'A(2,n,n); int [phys]jobvl();int [phys]jobvr();B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VL(2,m,m);[o]VR(2,p,p);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(VR), $SIZE(p), $SIZE(n))
-	  $SIZE(rworkn) = 8 * $SIZE(n);
 	',
 	Code => generate_code '
 		integer lwork = -1;
@@ -718,13 +711,12 @@ pp_defc("ggevx",
 		bwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VL(2,m,m);[o]VR(2,p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn); int [t]bwork(bworkn); int [t]iwork(iworkn);',
+	Pars => '[io,phys]A(2,n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VL(2,m,m);[o]VR(2,p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn=CALC(6*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(VR), $SIZE(p), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp != 2, $PDL(rconde), $SIZE(r), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp != 1, $PDL(rcondv), $SIZE(s), $SIZE(n))
-	  $SIZE(rworkn) = 6 * $SIZE(n);
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp != 1, $PDL(iwork), $SIZE(iworkn), $SIZE(n) + 2)
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp == 1 || tmp == 2 || tmp == 3, $PDL(bwork), $SIZE(bworkn), $SIZE(n))
 	',
@@ -1042,12 +1034,11 @@ pp_defc("gges",
 		logical *bwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,n,n); int jobvsl();int jobvsr();int sort();[io]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VSL(2,m,m);[o]VSR(2,p,p);int [o]sdim();int [o]info(); [t]rwork(rworkn); int [t]bwork(bworkn);',
+	Pars => '[io]A(2,n,n); int jobvsl();int jobvsr();int sort();[io]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VSL(2,m,m);[o]VSR(2,p,p);int [o]sdim();int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsl), tmp, $PDL(VSL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsr), tmp, $PDL(VSR), $SIZE(p), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sort), tmp, $PDL(bwork), $SIZE(bworkn), $SIZE(n))
-	  $SIZE(rworkn) = 8 * $SIZE(n);
 	',
 	OtherPars => "SV* select_func" ,
 	Code => generate_code '
@@ -1144,13 +1135,11 @@ pp_defc("ggesx",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VSL(2,m,m);[o]VSR(2,p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); [t]rwork(rworkn); int [t]bwork(bworkn); int [t]iwork(iworkn);',
+	Pars => '[io]A(2,n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VSL(2,m,m);[o]VSR(2,p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn=CALC($SIZE(n)+2));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsl), tmp, $PDL(VSL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsr), tmp, $PDL(VSR), $SIZE(p), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sort), tmp, $PDL(bwork), $SIZE(bworkn), $SIZE(n))
-	  $SIZE(rworkn) = 8 * $SIZE(n);
-	  $SIZE(iworkn) = $SIZE(n) + 2;
 	',
 	OtherPars => "SV* select_func" ,
 	Code => generate_code '
@@ -1261,10 +1250,7 @@ pp_defc("heev",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,n,n); int jobz(); int uplo(); [o]w(n); int [o]info(); [t]rwork(rworkn);',
-	RedoDimsCode => '
-	  $SIZE(rworkn) = 3*($SIZE(n)-2);
-	',
+	Pars => '[io]A(2,n,n); int jobz(); int uplo(); [o]w(n); int [o]info(); [t]rwork(rworkn=CALC(3*($SIZE(n)-2)));',
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -1398,11 +1384,9 @@ pp_defc("heevx",
 		$GENERIC() *rwork, integer *iwork, integer *ifail, integer *info);
 EOF
        HandleBad => 0,
-	Pars => 'A(2,n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(2,p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn); int [t]iwork(iworkn);',
+	Pars => 'A(2,n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(2,p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp, $PDL(z), $SIZE(p), $SIZE(n))
-	  $SIZE(rworkn) = 7 * $SIZE(n);
-	  $SIZE(iworkn) = 5 * $SIZE(n);
 	',
 	Code => generate_code '
 		char jz = \'N\';
@@ -1595,10 +1579,7 @@ pp_defc("hegv",
 		$GENERIC() *w, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,n,n);int itype();int jobz(); int uplo();[io]B(2,n,n);[o]w(n); int [o]info(); [t]rwork(rworkn);',
-	RedoDimsCode => '
-	  $SIZE(rworkn) = 3*($SIZE(n)-2);
-	',
+	Pars => '[io]A(2,n,n);int itype();int jobz(); int uplo();[io]B(2,n,n);[o]w(n); int [o]info(); [t]rwork(rworkn=CALC(3*($SIZE(n)-2)));',
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -1747,12 +1728,10 @@ EOF
 	Pars => '[io]A(2,n,n);int itype();int jobz();int range();
 	  int uplo();[io]B(2,n,n);vl();vu();int il();
 	  int iu();abstol();int [o]m();[o]w(n);
-	  [o]Z(2,p,p);int [o]ifail(n);int [o]info(); [t]rwork(rworkn); int [t]iwork(iworkn);
+	  [o]Z(2,p,p);int [o]ifail(n);int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n)));
 	',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp, $PDL(Z), $SIZE(p), $SIZE(n))
-	  $SIZE(rworkn) = 7 * $SIZE(n);
-	  $SIZE(iworkn) = 5 * $SIZE(n);
 	',
 	Code => generate_code '
 		char jz = \'N\';
@@ -1868,11 +1847,10 @@ pp_defc("gesvx",
 		rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,n,n); int trans(); int fact(); [io]B(2,n,m); [io]af(2,n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(2,n,m); [o]rcond(); [o]ferr(m); [o]berr(m); [o]rpvgrw(); int [o]info(); [t]rwork(rworkn); [t]work(rworkn);',
+	Pars => '[io]A(2,n,n); int trans(); int fact(); [io]B(2,n,m); [io]af(2,n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(2,n,m); [o]rcond(); [o]ferr(m); [o]berr(m); [o]rpvgrw(); int [o]info(); [t]rwork(rworkn=CALC(4*$SIZE(n))); [t]work(rworkn);',
 	RedoDimsCode => '
 	  $SIZE(p) = $SIZE(n); /* Ubuntu LAPACK 3 writes to r anyway */
 	  $SIZE(q) = $SIZE(n); /* Ubuntu LAPACK 3 writes to c anyway */
-	  $SIZE(rworkn) = 4 * $SIZE(n);
 	',
 	Code => generate_code '
 		char ptrans, pfact, pequed;
@@ -2237,11 +2215,9 @@ pp_defc("posvx",
 		berr, $GENERIC() *work, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,n,n); int uplo(); int fact(); [io]B(2,n,m); [io]af(2,n,n); int [io]equed(); [o]s(p); [o]X(2,n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(rworkn); [t]work(workn);',
+	Pars => '[io]A(2,n,n); int uplo(); int fact(); [io]B(2,n,m); [io]af(2,n,n); int [io]equed(); [o]s(p); [o]X(2,n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))); [t]work(workn=CALC(4*$SIZE(n)));',
 	RedoDimsCode => '
 	  $SIZE(p) = $SIZE(n); /* Ubuntu LAPACK 3 writes to s anyway */
-	  $SIZE(rworkn) = 2 * $SIZE(n);
-	  $SIZE(workn) = 4 * $SIZE(n);
 	',
 	Code => generate_code '
 		char pfact;
@@ -2361,10 +2337,7 @@ pp_defc("gelsy",
 		lwork, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,m,n); [io]B(2,p,q); rcond(); int [io]jpvt(n); int [o]rank();int [o]info(); [t]rwork(rworkn);',
-	RedoDimsCode => '
-	  $SIZE(rworkn) = 2 * $SIZE(n);
-	',
+	Pars => '[io]A(2,m,n); [io]B(2,p,q); rcond(); int [io]jpvt(n); int [o]rank();int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n)));',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -2414,10 +2387,7 @@ pp_defc("gelss",
 		lwork, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,m,n); [io]B(2,p,q); rcond(); [o]s(r); int [o]rank();int [o]info(); [t]rwork(rworkn);',
-	RedoDimsCode => '
-	  $SIZE(rworkn) = 5 * PDLMIN($SIZE(m),$SIZE(n));
-	',
+	Pars => '[io]A(2,m,n); [io]B(2,p,q); rcond(); [o]s(r); int [o]rank();int [o]info(); [t]rwork(rworkn=CALC(5*PDLMIN($SIZE(m),$SIZE(n))));',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -2467,9 +2437,8 @@ pp_defc("gelsd",
 		lwork,  $GENERIC() *rwork, integer *iwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,m,n); [io]B(2,p,q); rcond(); [o]s(minmn); int [o]rank();int [o]info(); int [t]iwork(iworkn); [t]rwork(rworkn);',
+	Pars => '[io]A(2,m,n); [io]B(2,p,q); rcond(); [o]s(minmn=CALC(PDLMAX(1,PDLMIN($SIZE(m),$SIZE(n))))); int [o]rank();int [o]info(); int [t]iwork(iworkn); [t]rwork(rworkn);',
 	RedoDimsCode => '
-	  $SIZE(minmn) = PDLMAX(1,PDLMIN($SIZE(m),$SIZE(n)));
 	  integer smlsiz = FORTRAN(ilaenv)(&c_nine, "CGELSD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
 	  integer size_i = (integer) (log((double) $SIZE(minmn) / (double) (smlsiz + 1)) /log(2.)) + 1;
 	  $SIZE(iworkn) = $SIZE(minmn) * (3 * PDLMAX(size_i,0) + 11);
@@ -2630,8 +2599,7 @@ pp_defc("getrf",
 		lda, integer *ipiv, integer *info);
 EOF
        HandleBad => 0,
-	RedoDimsCode => '$SIZE(p) = PDLMIN($SIZE(m),$SIZE(n));',
-	Pars => '[io]A(2,m,n); int [o]ipiv(p); int [o]info()',
+	Pars => '[io]A(2,m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info()',
 	Code => generate_code '
 		FORTRAN($TFD(c,z)getrf)(
 		&(integer){$SIZE(m)},
@@ -2648,8 +2616,7 @@ pp_defc("getf2",
 		lda, integer *ipiv, integer *info);
 EOF
        HandleBad => 0,
-	RedoDimsCode => '$SIZE(p) = PDLMIN($SIZE(m),$SIZE(n));',
-	Pars => '[io]A(2,m,n); int [o]ipiv(p); int [o]info()',
+	Pars => '[io]A(2,m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info()',
 	Code => generate_code '
 		FORTRAN($TFD(c,z)getf2)(
 		&(integer){$SIZE(m)},
@@ -2872,10 +2839,7 @@ pp_defc("sytri",
 		lda, integer *ipiv, $GENERIC() *work, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn);',
-	RedoDimsCode => '
-	  $SIZE(workn) = 2 * $SIZE(n);
-	',
+	Pars => '[io]A(2,n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn=CALC(2*$SIZE(n)));',
 	Code => generate_code '
              char puplo = \'U\';
 		if ($uplo())
@@ -2896,10 +2860,7 @@ pp_defc("hetri",
 		lda, integer *ipiv, $GENERIC() *work, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn);',
-	RedoDimsCode => '
-	  $SIZE(workn) = 2 * $SIZE(n);
-	',
+	Pars => '[io]A(2,n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn=CALC(2*$SIZE(n)));',
 	Code => generate_code '
              char puplo = \'U\';
 		if ($uplo())
@@ -3225,11 +3186,7 @@ pp_defc("gecon",
 		rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => 'A(2,n,n); int norm(); anorm(); [o]rcond();int [o]info(); [t]rwork(rworkn); [t]work(workn);',
-	RedoDimsCode => '
-	  $SIZE(rworkn) = 2 * $SIZE(n);
-	  $SIZE(workn) = 4 * $SIZE(n);
-	',
+	Pars => 'A(2,n,n); int norm(); anorm(); [o]rcond();int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))); [t]work(workn=CALC(4*$SIZE(n)));',
 	Code => generate_code '
              char pnorm = \'I\';
 		if($norm())
@@ -3253,8 +3210,7 @@ pp_defc("sycon",
 		work, integer *info);
 EOF
        HandleBad => 0,
-	Pars => 'A(2,n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn);',
-	RedoDimsCode => '$SIZE(workn) = 4 * $SIZE(n);',
+	Pars => 'A(2,n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n)));',
 	Code => generate_code '
              char puplo = \'U\';
 		if($uplo())
@@ -3278,8 +3234,7 @@ pp_defc("hecon",
 		work, integer *info);
 EOF
        HandleBad => 0,
-	Pars => 'A(2,n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn);',
-	RedoDimsCode => '$SIZE(workn) = 4 * $SIZE(n);',
+	Pars => 'A(2,n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n)));',
 	Code => generate_code '
              char puplo = \'U\';
 		if($uplo())
@@ -3308,8 +3263,7 @@ pp_defc("pocon",
 		rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => 'A(2,n,n); int uplo(); anorm(); [o]rcond();int [o]info(); [t]work(workn); [t]rwork(n);',
-	RedoDimsCode => '$SIZE(workn) = 4 * $SIZE(n);',
+	Pars => 'A(2,n,n); int uplo(); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); [t]rwork(n);',
 	Code => generate_code '
              char puplo = \'U\';
 		if($uplo())
@@ -3337,8 +3291,7 @@ pp_defc("trcon",
 		lda, $GENERIC() *rcond, $GENERIC() *work, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => 'A(2,n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); [t]work(workn); [t]rwork(n);',
-	RedoDimsCode => '$SIZE(workn) = 4 * $SIZE(n);',
+	Pars => 'A(2,n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); [t]rwork(n);',
 	Code => generate_code '
              char puplo = \'U\';
              char pdiag = \'N\';
@@ -3369,8 +3322,7 @@ pp_defc("geqp3",
 		$GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,m,n); int [io]jpvt(n); [o]tau(2,k); int [o]info(); [t]rwork(rworkn);',
-	RedoDimsCode => '$SIZE(rworkn) = 2 * $SIZE(n);',
+	Pars => '[io]A(2,m,n); int [io]jpvt(n); [o]tau(2,k); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n)));',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -4224,11 +4176,10 @@ pp_defc("trevc",
 		$GENERIC() *work, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]T(2,n,n); int side();int howmny();int select(q);[o]VL(2,m,m); [o]VR(2,p,p);int [o]m(); int [o]info(); [t]work(workn);',
+	Pars => '[io]T(2,n,n); int side();int howmny();int select(q);[o]VL(2,m,m); [o]VR(2,p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(5*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
-	  $SIZE(workn) = 5 * $SIZE(n);
 	',
 	Code => generate_code '
 		char pside,phowmny;
@@ -4277,11 +4228,10 @@ pp_defc("tgevc",
 		integer *mm, integer *m, $GENERIC() *work, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,n,n); int side();int howmny(); [io]B(2,n,n);int select(q);[o]VL(2,m,m); [o]VR(2,p,p);int [o]m(); int [o]info(); [t]work(workn);',
+	Pars => '[io]A(2,n,n); int side();int howmny(); [io]B(2,n,n);int select(q);[o]VL(2,m,m); [o]VR(2,p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
-	  $SIZE(workn) = 6 * $SIZE(n);
 	',
 	Code => generate_code '
 		char pside,phowmny;
@@ -4940,84 +4890,6 @@ EOF
 		&(integer){1});
 ');
 
-################################################################################
-#
-#		OTHER AUXILIARY ROUTINES
-#
-################################################################################
-pp_def(
-	'ctricpy',
-	Pars => 'A(c=2,m,n);[o] C(c=2,m,n)',
-	OtherPars => 'int uplo',
-	OtherParsDefaults => {uplo => 0},
-	ArgOrder => [qw(A uplo C)],
-	Code => '
-		if ($COMP(uplo))
-		{
-			broadcastloop %{
-				loop (n,m) %{
-					loop(c) %{ $C() = $A(); %}
-					if (m >= n) break;
-				%}
-			%}
-		}
-		else
-		{
-			broadcastloop %{
-				loop (m,n) %{
-					loop(c) %{ $C() = $A(); %}
-					if (n >= m) break;
-				%}
-			%}
-		}
-	',
-	Doc => undef
-);
-
-pp_bless('PDL');
-pp_def(
-	'cmstack',
-	DefaultFlow => 1,
-	TwoWay => 1,
-	Pars => 'x(c,n,m);y(c,n,p);[o]out(c,n,q);',
-	RedoDimsCode => '$SIZE(q) = $SIZE(m) + $SIZE(n);',
-	Code => '
-	  loop(m,n,c) %{
-		$out(q=>m) = $x();
-	  %}
-	  register PDL_Indx i,j=0;
-	  for (i = $SIZE(m); i < $SIZE(q); i++,j++)
-	  {
-		  loop(n,c) %{
-			$out(q=>i) = $y(p=>j);
-		  %}
-	  }	
-	',
-
-       BackCode => '
-	  loop(m,n,c) %{
-		$x() = $out(q=>m);
-	  %}
-	  register PDL_Indx i,j=0;
-	  for (i = $SIZE(m); i < $SIZE(q) ;i++,j++)
-	  {
-		  loop(n,c)%{
-			$y(p=>j) = $out(q=>i);
-		  %}
-	  }
-       ',
-	Doc => <<EOT
-
-=for ref
-
-Combine two 3D ndarrays into a single ndarray.
-This routine does backward and forward dataflow automatically.
-
-=cut
-EOT
-
-);
-
 pp_addhdr('
 void cftrace(int n, void *a1, void *a2);
 void cdtrace(int n, void *a1, void *a2);
@@ -5030,11 +4902,7 @@ pp_defc('charpol',
 	$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
 	integer *ldc);
 EOF
-	Pars => 'A(c=2,n,n);[o]Y(c=2,n,n);[o]out(c=2,p); [t]rwork(rworkn);',
-	RedoDimsCode => '
-	  $SIZE(p) = $SIZE(n) + 1;
-	  $SIZE(rworkn) = 2 * $SIZE(n) * $SIZE(n);
-	',
+	Pars => 'A(c=2,n,n);[o]Y(c=2,n,n);[o]out(c=2,p=CALC($SIZE(n)+1)); [t]rwork(rworkn=CALC(2*$SIZE(n)*$SIZE(n)));',
 	Code => '
 	int i,j,k;
 	$GENERIC() tr[2], b[2];

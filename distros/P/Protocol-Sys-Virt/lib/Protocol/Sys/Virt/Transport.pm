@@ -1,9 +1,21 @@
+####################################################################
+#
+#     This file was generated using XDR::Parse version v0.3.1,
+#        XDR::Gen version 0.0.2 and LibVirt version v10.3.0
+#
+#      Don't edit this file, use the source template instead
+#
+#                 ANY CHANGES HERE WILL BE LOST !
+#
+####################################################################
+
 
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Transport;
+package Protocol::Sys::Virt::Transport v10.3.3;
 
+use Carp qw(croak);
 use Log::Any qw($log);
 
 use Protocol::Sys::Virt::Transport::XDR;
@@ -13,16 +25,16 @@ my $msgs = 'Protocol::Sys::Virt::Transport::XDR';
 sub new {
     my ($class, %args) = @_;
     return bless {
-        buf => '',
-        fds => undef,
-        expect => 'START', # first state of the state machine...
-        want => -1,
-        role => $args{role},
-        serial => 1,
-        prog_cb => {},
-        on_send => $args{on_send},
-        on_sendfd => ($args{on_sendfd}
-                      // sub { die 'Connection does not support sending file descriptors' })
+        buf         => '',
+        fds         => undef,
+        expect      => 'START', # first state of the state machine...
+        want        => -1,
+        need_length => 4,
+        need_type   => 'data',
+        role        => $args{role},
+        serial      => 1,
+        prog_cb     => {},
+        on_send     => $args{on_send},
     }, $class;
 };
 
@@ -51,8 +63,7 @@ sub _dispatch {
 
     if ($status == $msgs->OK) {
         if ($type < 0 or $type > $#dispatch) {
-            # croak "Unsupported frame type $type";
-            die;
+            croak $log->fatal("Unsupported frame type $type");
         }
 
         my $hole;
@@ -64,7 +75,7 @@ sub _dispatch {
             $data = undef;
         }
         $log->trace("Invoking callback $dispatch[$type] on program $prog");
-        $self->{prog_cb}->{$prog}->{$dispatch[$type]}->(
+        return $self->{prog_cb}->{$prog}->{$dispatch[$type]}->(
             header => $hdr,
             data   => $data,
             fds    => $fds,
@@ -75,10 +86,9 @@ sub _dispatch {
         if ($type == $msgs->STREAM
             and $self->{role} eq 'server') { # client message
             # no payload
-            $self->{prog_cb}->{$prog}->{on_stream}->(
+            return $self->{prog_cb}->{$prog}->{on_stream}->(
                 header => $hdr,
                 );
-            return;
         }
 
         #deserialize the server error...
@@ -89,18 +99,19 @@ sub _dispatch {
             or $type == $msgs->STREAM
             or $type == $msgs->STREAM_HOLE
             or $type == $msgs->REPLY_WITH_FDS) {
-            $self->{prog_cb}->{$prog}->{$dispatch[$type]}->(
+            $log->trace("Invoking callback $dispatch[$type] on program $prog");
+            return $self->{prog_cb}->{$prog}->{$dispatch[$type]}->(
                 header => $hdr,
                 error  => $err,
                 );
         }
         else {
-            # croak "Status ERROR not supported on frame type $type";
+            croak $log->fatal( "Status ERROR not supported on frame type $type" );
         }
     }
     elsif ($status == $msgs->CONTINUE) {
         if ($type == $msgs->STREAM) {
-            $self->{prog_cb}->{$prog}->{on_stream}->(
+            return $self->{prog_cb}->{$prog}->{on_stream}->(
                 header => $hdr,
                 data => $data
                 );
@@ -109,18 +120,21 @@ sub _dispatch {
             my $hole;
             my $idx = 0;
             $msgs->deserialize_StreamHole( $hole, $idx, $self->{buf} );
-            $self->{prog_cb}->{$prog}->{on_stream}->(
+            $log->trace("Invoking callback $dispatch[$type] on program $prog");
+            return $self->{prog_cb}->{$prog}->{on_stream}->(
                 header => $hdr,
                 hole => $hole
                 );
         }
         else {
-            # croak "Status CONTINUE not supported on frame type $type";
+            croak $log->fatal( "Status CONTINUE not supported on frame type $type" );
         }
     }
     else {
-        # croak unsupported 'status' value
+        croak $log->fatal( "Unsupported 'status' value ($status)" );
     }
+
+    # unreachable
 }
 
 # state machine
@@ -132,7 +146,8 @@ sub _dispatch {
 #  FD (awaiting file descriptors)
 
 sub _receive {
-    my ($self, $data) = @_;
+    my ($self, $data)   = @_;
+    my @dispatch_values = ();
 
     if ($data) {
         if ($self->{expect} eq 'FD') {
@@ -155,15 +170,19 @@ sub _receive {
         if ($self->{expect} eq 'FRAMELEN') {
             my $len = length($self->{buf});
             if ($self->{want} > $len) {
-                return ($self->{want} - $len, 'data');
+                $self->{need_length} = $self->{want} - $len;
+                $self->{need_type}   = 'data';
+                last;
             }
             $self->{want} = unpack('L>', $self->{buf} );
             if ($self->{want} < ($msgs->LEN_MAX
                                  + $msgs->HEADER_MAX)) {
-                die 'Received message too short';
+                croak $log->fatal(
+                    "Received message too short (length: $self->{want})" );
             }
             if ($self->{want} > $msgs->STRING_MAX) {
-                die 'Received message too big';
+                croak $log->fatal(
+                    "Received message too big (length: $self->{want})" );
             }
 
             $self->{expect} = 'FRAMEDATA';
@@ -171,7 +190,9 @@ sub _receive {
         if ($self->{expect} eq 'FRAMEDATA') {
             my $len = length($self->{buf});
             if ($self->{want} > $len) {
-                return ($self->{want} - $len, 'data');
+                $self->{need_length} = $self->{want} - $len;
+                $self->{need_type}   = 'data';
+                last;
             }
 
             # we have our frame
@@ -199,20 +220,32 @@ sub _receive {
         if ($self->{expect} eq 'FD') {
             my $len = scalar( @{ $self->{fds} } );
             if ($self->{want_fds} > $len) {
-                return ($self->{want_fds} - $len, 'fd');
+                $self->{need_length} = $self->{want_fds} - $len;
+                $self->{need_type}   = 'fd';
+                last;
             }
         }
         # we have our frame *and* (optionally) FDs
-        $self->_dispatch;
+
+        my $dv = $self->_dispatch;
+        push @dispatch_values, $dv if defined $dv;
+
         $self->{expect} = 'START';
     }
+
+    return @dispatch_values;
 }
 
+
+sub need {
+    my $self = shift;
+    return ($self->{need_length}, $self->{need_type});
+}
 
 sub receive {
     my ($self, $data, %args) = @_;
 
-    $self->_receive($data, %args);
+    return $self->_receive($data, %args);
 }
 
 sub _send {
@@ -233,14 +266,14 @@ sub _send {
         $serial = $args{serial};
     }
     else {
-        # croak "Missing 'serial' argument for frame type $type";
+        croak $log->fatal( "Missing 'serial' argument for frame type $type" );
     }
     $msgs->serialize_Header(
         {
-            prog => $prog,
-            vers => $version,
-            proc => $proc,
-            type => $type,
+            prog   => $prog,
+            vers   => $version,
+            proc   => $proc,
+            type   => $type,
             serial => $serial,
             status => $status,
         },
@@ -254,7 +287,7 @@ sub _send {
 
         my $len = pack('L>',
                        4 + length($hdr) + length($args{data} // 0));
-        $self->{on_send}->( $len, $hdr, $args{data} );
+        return $self->{on_send}->( $serial, $len, $hdr, $args{data} );
         ###BUG: Send FDs
     }
     elsif ($status == $msgs->ERROR) {
@@ -265,7 +298,7 @@ sub _send {
         }
 
         my $len = pack('L>', 4 + length($hdr) + length($payload));
-        $self->{on_send}->( $len, $hdr, $payload );
+        return $self->{on_send}->( $serial, $len, $hdr, $payload );
     }
     elsif ($status == $msgs->CONTINUE) {
         my $payload;
@@ -277,17 +310,17 @@ sub _send {
             $payload = $args{data};
         }
         else {
-            # croak "Unsupported frame type $type with status CONTINUE";
+            croak $log->fatal( "Unsupported frame type $type with status CONTINUE" );
         }
 
         my $len = pack('L>', 4 + length($hdr) + length($payload // ''));
-        $self->{on_send}->( $len, $hdr, $payload );
+        return $self->{on_send}->( $serial, $len, $hdr, $payload );
     }
     else {
-        # croak "Unsupported frame status $status";
+        croak $log->fatal( "Unsupported frame status $status" );
     }
 
-    return $serial;
+    # unreachable
 }
 
 1;
@@ -297,6 +330,12 @@ __END__
 =head1 NAME
 
 Protocol::Sys::Virt::Transport - Low level Libvirt connection protocol
+
+=head1 VERSION
+
+v10.3.3
+
+Based on LibVirt tag v10.3.0
 
 =head1 SYNOPSIS
 
@@ -326,10 +365,16 @@ is invoked with data to be transmitted.
 
 =head2 on_send
 
-  $on_send->( $chunk [, ..., $chunkN ] );
+  $on_send->( $opaque, $chunk [, ..., $chunkN ] );
 
-Invoked with any number of argumens, each a chunk of data to be transmitted
-over the connection stream.
+Invoked with any number of arguments, each a chunk of data to be transmitted
+over the connection stream, except the first (C<$opaque>) value.
+
+In case the chunk is an arrayref, the chunk contains file descriptors to be
+transferred.
+
+Must return the C<$opaque> value after transferring the data, or C<die>
+in case of an error.
 
 =head1 CONSTRUCTOR
 
@@ -352,29 +397,29 @@ be called with multiple arguments:
 
 =head1 METHODS
 
-=head2 receive
+=head2 need
 
-  $transport->receive( $data, [ type => 'fd' ] );
+  my ($length, $type) = $transport->need;
 
-Feed data received on the connection stream to the protocol transport
-instance.  When C<$data> is a file descriptor, the C<< type => 'fd' >>
+Returns the C<$type> of data expected by the next call to C<receive>
+(values are C<data> and C<fd>) as well as the number of file handles
+(in case of C<fd> type) or bytes (in case of C<data> type) expected.
 
-
-The function returns a list of 2 elements:
-
-=over 8
-
-=item * The number of items expected on the next call to C<receive>
-
-=item * The type of item to receive on the next call; this can be
-  C<data> or C<fd>
-
-When the value C<fd> is returned, the protocol expects a file descriptor
+When the C<fd> type is indicated, the protocol expects a file descriptor
 as the next C<$data> argument.  File descriptors can only be passed over
 Unix domain sockets; over any other connection, this should result in a
 fatal error at the caller.
 
-=back
+=head2 receive
+
+  my @cb_values = $transport->receive( $data, [ type => 'fd' ] );
+
+Feed data received on the connection stream to the protocol transport
+instance.  When C<$data> is a file descriptor, the C<< type => 'fd' >>
+should be passed.
+
+The function collects and returns the values of the event callbacks as they
+are invoked as part of processing the protocol input.
 
 =head2 register
 
@@ -396,25 +441,26 @@ In case where C<$type> is C<CALL> or C<CALL_WITH_FDS>, the C<$serial> returned
 by the sender function must be used to link messages passed to C<on_reply> or
 C<on_stream> to the call that triggered the replies.
 
-The callbacks are called as follows:
+The callbacks are called as follows, with any return values collected and returned
+by the C<receive> function:
 
 =over 8
 
 =item * on_call
 
-  $on_call->(header => $hdr, data => $data, [fds => $fds]);
+  my $rv = $on_call->(header => $hdr, data => $data, [fds => $fds]);
 
 Called for messages of type C<CALL> and C<CALL_WITH_FDS>.  The difference
 between the two is that the latter is passed an array of file descriptors
 in the C<fds> key.  The C<header> key contains the deserialized header.
 
 The C<data> key contains the undecoded data of the C<*_args> structure
-associated with C<$hdr->{proc}>.
+associated with C<< $hdr->{proc} >>.
 
 =item * on_reply
 
-  $on_reply->(header => $hdr, data  => $data, [fds => $fds]);
-  $on_reply->(header => $hdr, error => $err);
+  my $rv = $on_reply->(header => $hdr, data  => $data, [fds => $fds]);
+  my $rv = $on_reply->(header => $hdr, error => $err);
 
 Called for messages of type C<REPLY> or C<REPLY_WITH_FDS>.  The difference
 between the two is that the latter is passed an array of file descriptors
@@ -428,16 +474,16 @@ error structure and neither C<data> nor C<fds> keys are supplied.
 
 =item * on_message
 
-  $on_message->(header => $hdr, data  => $data);
+  my $rv = $on_message->(header => $hdr, data  => $data);
 
 Called for messages of type C<MESSAGE>.  The C<data> key contains the undecoded
 data of the C<*_msg> structure associated with C<$hdr->{proc}>.
 
 =item * on_stream
 
-  $on_stream->(header => $hdr, data => $data);
-  $on_stream->(header => $hdr, hole => $hole);
-  $on_stream->(header => $hdr, error => $err);
+  my $rv = $on_stream->(header => $hdr, data => $data);
+  my $rv = $on_stream->(header => $hdr, hole => $hole);
+  my $rv = $on_stream->(header => $hdr, error => $err);
 
 Called for messages of type C<STREAM> or C<STREAM_HOLE>.  C<$data> is the raw
 stream data to be written to the stream.  C<$hole> is the deserialized stream
@@ -448,3 +494,4 @@ hole structure.  C<$err> is the deserialized error structure.
 =head1 LICENSE AND COPYRIGHT
 
 See the LICENSE file in this distribution.
+

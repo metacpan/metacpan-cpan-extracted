@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2024 -- leonerd@leonerd.org.uk
 
-package Attribute::Storage 0.10;
+package Attribute::Storage 0.11;
 
 use v5.14;
 use warnings;
@@ -15,12 +15,16 @@ XSLoader::load( __PACKAGE__, our $VERSION );
 
 use B qw( svref_2object );
 
+use meta 0.005;  # ->list_globs
+no warnings 'meta::experimental';
+
 =head1 NAME
 
-C<Attribute::Storage> - declare and retrieve named attributes about CODE
-references
+C<Attribute::Storage> - declare and retrieve named attributes data
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    package My::Package;
 
@@ -49,8 +53,8 @@ references
 =head1 DESCRIPTION
 
 This package provides a base, where a package using it can define handlers for
-particular code attributes. Other packages, using the package that defines the
-code attributes, can then use them to annotate subs.
+particular named attributes. Other packages, using the package that defines
+the attributes, can then use them to annotate subroutines or variables.
 
 This is similar to C<Attribute::Handlers>, with the following key differences:
 
@@ -83,6 +87,9 @@ the handlers in a file once it has been reloaded.
 
 =back
 
+I<Since version 0.11> this module also supports attributes on scalar, array
+and hash variables.
+
 =cut
 
 sub import
@@ -94,6 +101,7 @@ sub import
    #Attribute::Lexical->import( 'CODE:ATTR' => \&handle_attr_ATTR );
 
    my $caller = caller;
+   my $metacaller = meta::get_package( $caller );
 
    my $sub = sub {
       my ( $pkg, $ref, @attrs ) = @_;
@@ -106,13 +114,15 @@ sub import
       } @attrs;
    };
 
-   no strict 'refs';
-   *{$caller . "::MODIFY_CODE_ATTRIBUTES"} = $sub;
+   $metacaller->add_symbol( '&MODIFY_CODE_ATTRIBUTES',   $sub );
+   $metacaller->add_symbol( '&MODIFY_SCALAR_ATTRIBUTES', $sub );
+   $metacaller->add_symbol( '&MODIFY_ARRAY_ATTRIBUTES',  $sub );
+   $metacaller->add_symbol( '&MODIFY_HASH_ATTRIBUTES',   $sub );
 
    # Some simple Exporter-like logic. Just does function refs
    foreach my $symb ( @_ ) {
       $sub = __PACKAGE__->can( $symb ) or croak __PACKAGE__." has no function '$symb'";
-      *{$caller . "::$symb"} = $sub;
+      $metacaller->add_symbol( '&'.$symb, $sub );
    }
 }
 
@@ -125,8 +135,6 @@ passing in the arguments. Whatever it returns is stored, to be returned later
 when queried by C<get_subattr> or C<get_subattrs>. The return value must be
 defined, or else the attribute will be marked as a compile error for perl to
 handle accordingly.
-
-Only C<CODE> attributes are supported at present.
 
    sub AttributeName :ATTR(CODE)
    {
@@ -196,11 +204,14 @@ use the C<NAME> flag to the C<ATTR()> list.
       return;
    }
 
+Only C<CODE> attributes support the C<NAME> flag; it cannot be applied when
+C<SCALAR>, C<ARRAY> or C<HASH> are also present.
+
 When applied to an anonymous function (C<sub { ... }>), the name will appear
 as C<__ANON__>.
 
 Normally it is an error to attempt to apply the same attribute more than once
-to the same function. Sometimes however, it would make sense for an attribute
+to the same target. Sometimes however, it would make sense for an attribute
 to be applied many times. If the C<ATTR()> list is given the C<MULTI> flag,
 then applying it more than once will be allowed. Each invocation of the
 handling code will be given the previous value that was returned, or C<undef>
@@ -259,10 +270,8 @@ sub handle_attr_ATTR
 
    my %type;
    foreach ( split m/\s*,\s*/, $opts ) {
-      m/^CODE$/ and next;
-
-      m/^SCALAR|HASH|ARRAY$/ and 
-         croak "Only CODE attributes are supported currently";
+      m/^(?:CODE|SCALAR|ARRAY|HASH)$/ and 
+         ( $type{lc $_} = 1 ), next;
 
       m/^RAWDATA$/ and
          ( $type{raw} = 1 ), next;
@@ -274,6 +283,13 @@ sub handle_attr_ATTR
          ( $type{name} = 1 ), next;
 
       croak "Unrecognised attribute option $_";
+   }
+
+   if( $type{name} ) {
+      # TODO: maybe this could be made to work but it seems to require a lot
+      # of hunting around in the symbol table or lexical pad to work out the
+      # name when given only a reference. Probably not worth it?
+      $type{lc $_} and croak "Cannot apply NAME to :ATTR($_)" for qw( SCALAR ARRAY HASH );
    }
 
    $attrs->{ATTR} = \%type;
@@ -288,6 +304,11 @@ sub handle_attr
    my $cv = $pkg->can( $attrname ) or return 1;
    my $cvattrs = _get_attr_hash( $cv, 0 ) or return 1;
    my $type = $cvattrs->{ATTR} or return 1;
+
+   my $reftype = ref $ref;
+
+   $reftype =~ m/^(?:CODE|SCALAR|ARRAY|HASH)$/ && $type->{lc $reftype} or
+      croak "Cannot apply :$attrname to $reftype reference";
 
    my @opts;
    if( $type->{raw} ) {
@@ -334,15 +355,25 @@ sub handle_attr
 
 =head2 get_subattrs
 
-   $attrs = get_subattrs( $sub )
+   $attrs = get_subattrs( $sub );
 
 Returns a HASH reference containing all the attributes defined on the given
 sub. The sub should either be passed as a CODE reference, or as a name in the
-caller's package. If no attributes are defined, a reference to an empty HASH
-is returned.
+caller's package.
 
-The returned HASH reference is a new shallow clone, the caller may modify this
-hash arbitrarily without breaking the stored data, or other users of it.
+=head2 get_varattrs
+
+   $attrs = get_varattrs( $varref );
+
+I<Since version 0.11.>
+
+Returns a HASH reference containing all the attributes defined on the given
+variable, which should be passed in by reference.
+
+In both of the above functions, the returned HASH reference is a new shallow
+clone, and the caller may modify this hash arbitrarily without breaking the
+stored data or other users of it. If no attributes are defined then a
+reference to an empty HASH is returned.
 
 =cut
 
@@ -362,16 +393,36 @@ sub get_subattrs
       defined $cv or croak "$caller has no sub $sub";
    }
 
-   return { %{ _get_attr_hash( $cv, 0 ) || {} } }; # clone
+   my $attrhash = _get_attr_hash( $cv, 0 ) or return {};
+   return { %$attrhash };
+}
+
+sub get_varattrs
+{
+   my ( $varref ) = @_;
+
+   my $attrhash = _get_attr_hash( $varref, 0 ) or return {};
+   return { %$attrhash };
 }
 
 =head2 get_subattr
 
-   $value = get_subattr( $sub, $attrname )
+   $value = get_subattr( $sub, $attrname );
 
 Returns the value of a single named attribute on the given sub. The sub should
-either be passed as a CODE reference, or as a name in the caller's package. If
-the attribute is not defined, C<undef> is returned.
+either be passed as a CODE reference, or as a name in the caller's package.
+
+=head2 get_varattr
+
+   $value = get_varattr( $varref, $attrname );
+
+I<Since version 0.11.>
+
+Returns the value of a single named attribute on the given variable, which
+should be passed in by reference.
+
+In both of the above functions, if the attribute is not defined then C<undef>
+is returned.
 
 =cut
 
@@ -395,17 +446,25 @@ sub get_subattr
    return $attrhash->{$attr};
 }
 
+sub get_varattr
+{
+   my ( $varref, $attr ) = @_;
+
+   my $attrhash = _get_attr_hash( $varref, 0 ) or return undef;
+   return $attrhash->{$attr};
+}
+
 =head2 apply_subattrs
 
-   $sub = apply_subattrs( @attrs_kvlist, $sub )
+   $sub = apply_subattrs( @attrs_kvlist, $sub );
 
 A utility function to help apply attributes dynamically to the given CODE
 reference. The CODE reference is given last so that calls to the function
 appear similar in visual style to the same applied at compiletime.
 
    apply_subattrs
-    Title => "Here is my title",
-    sub { return $title };
+      Title => "Here is my title",
+      sub { return $title };
 
 Is equivalent to
 
@@ -424,7 +483,7 @@ potentially-unsafe or user-supplied data.
 
 =head2 apply_subattrs_for_pkg
 
-   $sub = apply_subattrs_for_pkg( $pkg, @attrs_kvlist, $sub )
+   $sub = apply_subattrs_for_pkg( $pkg, @attrs_kvlist, $sub );
 
 As C<apply_subattrs> but allows passing a specific package name, rather than
 using C<caller>.
@@ -452,10 +511,10 @@ sub apply_subattrs
 
 =head2 find_subs_with_attr
 
-   %subs = find_subs_with_attr( $pkg, $attrname, %opts )
+   %subs = find_subs_with_attr( $pkg, $attrname, %opts );
 
 A utility function to find CODE references in the given package that have the
-name attribute applied. The symbol table is checked for the given package,
+named attribute applied. The symbol table is checked for the given package,
 looking for CODE references that have the named attribute applied. These are
 returned in a key-value list, where the key gives the name of the function and
 the value is a CODE reference to it.
@@ -467,25 +526,41 @@ heirarchy of packages, via the use of L<mro>:
 
    %subs = find_subs_with_attr( mro::get_linear_isa( $class ), $attrname );
 
-Takes the following named options:
+=head2 find_vars_with_attr
+
+   %vars = find_vars_with_attr( $pkg, $attrname, %opts );
+
+I<Since version 0.11.>
+
+A utility function to find SCALAR, ARRAY or HASH references in the given
+package that have the named attribute applied. The symbol table is checked for
+the given package, looking for variable references that have the named
+attribute applied. These are returned in a key-value list, where the key gives
+the name of the variable and the value is a reference to it.
+
+Unlike for L</find_subs_with_attr>, the C<$pkg> argument must be a single
+package name; no subclass search takes place.
+
+Both of the above functions take the following named options:
 
 =over 8
 
 =item matching => Regexp | CODE
 
-If present, gives a filter regexp or CODE reference to apply to symbol names.
+If present, gives a filter regexp or CODE reference to apply to names. Subs
+will be given as plain names; variable names will include the leading sigil.
 
-   $name =~ $matching
-   $matching->( local $_ = $name )
+   $name =~ $matching;
+   $matching->( local $_ = $name );
 
 =item filter => CODE
 
-If present, gives a filter CODE reference to apply to the function references
+If present, gives a filter CODE reference to apply to the target references
 before they are accepted as results. Note that this allows the possibility
 that the first match for a given method name to be rejected, while later ones
 are accepted.
 
-   $filter->( $cv, $name, $package )
+   $filter->( $ref, $name, $package );
 
 =back
 
@@ -506,9 +581,10 @@ sub find_subs_with_attr
    my %ret;
 
    foreach $pkg ( ref $pkg ? @$pkg : $pkg ) {
-      no strict 'refs';
+      my $metapkg = meta::get_package( $pkg );
 
-      foreach my $symname ( keys %{$pkg."::"} ) {
+      foreach my $metaglob ( $metapkg->list_globs ) {
+         my $symname = $metaglob->basename;
          # First definition wins
          exists $ret{$symname} and next;
 
@@ -523,6 +599,49 @@ sub find_subs_with_attr
          $filter and not $filter->( $cv, $symname, $pkg ) and next;
 
          $ret{$symname} = $cv;
+      }
+   }
+
+   return %ret;
+}
+
+sub find_vars_with_attr
+{
+   my ( $pkg, $attrname, %opts ) = @_;
+
+   my $matching = $opts{matching};
+   $matching = do {
+      my $re = $matching;
+      sub { $_ =~ $re }
+   } if ref $matching eq "Regexp";
+
+   my $filter = $opts{filter};
+
+   my %ret;
+
+   {
+      my $metapkg = meta::get_package( $pkg );
+
+      foreach my $metaglob ( $metapkg->list_globs ) {
+         foreach (
+            [ '$' => $metaglob->try_get_scalar ],
+            [ '@' => $metaglob->try_get_array ],
+            [ '%' => $metaglob->try_get_hash ]
+         ) {
+            my ( $sigil, $metasym ) = @$_;
+            next unless $metasym;
+
+            my $varname = $sigil . $metaglob->basename;
+            my $varref  = $metasym->reference;
+
+            $matching and not $matching->( local $_ = $varname ) and next;
+
+            next unless defined get_varattr( $varref, $attrname );
+
+            $filter and not $filter->( $varref, $varname, $pkg ) and next;
+
+            $ret{$varname} = $varref;
+         }
       }
    }
 

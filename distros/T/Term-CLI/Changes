@@ -1,3 +1,17 @@
+0.060000 -- 2024-09-06
+
+    Term::CLI::Role::HelpText
+      - Prevent very long usage lines with sub-commands.
+        Replace a long list of sub-commands with I<sub-command>.
+
+    Term::CLI::L10N/nl.pm
+      - Fix missing ')' in translation of help text.
+
+    Term::CLI::Command
+      - Fixes to _check_arguments (Term::CLI::Command)
+        Remove trailing space from error message and change quoting
+        to use double quotes inside the message.
+
 0.059000 -- 2022-01-14
 
     - Handle negatable options in completion and help text (closes #27)

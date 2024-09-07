@@ -44,10 +44,8 @@ DESCRIPTION
        use meta;
        no warnings 'meta::experimental';
 
-    Since version 0.003_003 the various undef-returning variants of can_...
-    like functions or methods have aliases called try_get_... as this may
-    be a more suitable naming pattern. The older can_... variants are
-    likely to be removed soon.
+    Since version 0.005 the various can_...-prefixed variant accessor
+    methods print deprecation warnings. They are likely to be removed soon.
 
 FUNCTIONS
 
@@ -107,6 +105,29 @@ METHODS ON meta::package
        $metaglob = $metapkg->can_glob( $name );
 
     Similar to "get_glob" but returns undef if the glob does not exist.
+
+ list_globs
+
+       @metaglobs = $metapkg->list_globs;
+
+    Since version 0.005.
+
+    Returns a list of all the globs in the package that may refer to
+    symbols (i.e. not subpackages). They are returned in no particular
+    order.
+
+ list_subpackage_globs
+
+ list_all_globs
+
+       @metaglobs = $metapkg->list_subpackage_globs;
+       @metaglobs = $metapkg->list_all_globs;
+
+    Since version 0.005.
+
+    Returns a list of all the globs in the package that refer to
+    subpackages, or all globs, including subpackages. They are returned in
+    no particular order.
 
  get_symbol
 
@@ -221,7 +242,7 @@ METHODS ON meta::glob
 
     Similar to "get" but creates the symbol if it didn't already exist.
 
- name
+ basename
 
        $name = $metaglob->basename;
 

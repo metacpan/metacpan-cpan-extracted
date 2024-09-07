@@ -99,7 +99,7 @@ C<message> and translate errors in C<after_error> hook:
 		my ($self, $error) = @_;
 
 		$error->set_error(
-			do_translate($error->error)
+			do_translate($error->get_error)
 		);
 	);
 

@@ -2,7 +2,7 @@ package say;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub import {
     my $class  = shift;
@@ -62,7 +62,7 @@ And if you would pass args to B<say> like below, then some features are enabled 
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/say"><img src="https://secure.travis-ci.org/bayashi/say.png?_t=1475708487"/></a> <a href="https://coveralls.io/r/bayashi/say"><img src="https://coveralls.io/repos/bayashi/say/badge.png?_t=1475708487&branch=master"/></a>
+<a href="http://travis-ci.org/bayashi/say"><img src="https://secure.travis-ci.org/bayashi/say.png?_t=1725680061"/></a> <a href="https://coveralls.io/r/bayashi/say"><img src="https://coveralls.io/repos/bayashi/say/badge.png?_t=1725680061&branch=master"/></a>
 
 =end html
 

@@ -50,13 +50,22 @@ subtest 'testing invalid format message' => sub {
 };
 
 subtest 'testing strict message' => sub {
-	$form->set_input({required => 1, loose => 1});
+	$form->set_input({required => 1, loose => 1, nested => {loose => 1}});
 
 	ok !$form->valid, 'validation failed ok';
-	is_deeply $form->errors_hash, {
-		'' => ['strictmsg']
+
+	# ensure deterministic order of errors
+	my $errors = $form->errors_hash;
+	@{$errors->{''}} = sort @{$errors->{''}};
+
+	is_deeply $errors, {
+		'' => [
+			'loose: strictmsg',
+			'nested: strictmsg',
+		]
 		},
 		'errors ok';
 };
 
 done_testing();
+

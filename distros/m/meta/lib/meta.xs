@@ -170,12 +170,24 @@ static void S_warn_experimental(pTHX_ const char *fname)
     sv_2mortal(newSVpvf("%s is experimental and may be changed or removed without notice", fname)));
 }
 
+#define warn_sub_deprecated(cv)  S_warn_sub_deprecated(aTHX_ cv)
+static void S_warn_sub_deprecated(pTHX_ CV *cv)
+{
+  GV *gv = CvGV(cv);
+
+  Perl_ck_warner(aTHX_ packWARN(WARN_DEPRECATED),
+    "%s::%s() is deprecated and may be removed without notice",
+      GvNAME(GvSTASH(gv)), GvNAME(gv));
+}
+
 // Flags for get-alike methods
 enum {
   GET_OR_UNDEF,
   GET_OR_THROW,
   GET_OR_ADD,
   ADD_OR_THROW,
+
+  GET_OR_UNDEF_WITH_WARNING,
 };
 
 static SV *S_get_metaglob_slot(pTHX_ SV *metaglob, U8 svt, const char *slotname, U8 ix)
@@ -195,6 +207,7 @@ static SV *S_get_metaglob_slot(pTHX_ SV *metaglob, U8 svt, const char *slotname,
   switch(ix) {
     case GET_OR_THROW:
       croak("Glob does not have a %s slot", slotname);
+    case GET_OR_UNDEF_WITH_WARNING:
     case GET_OR_UNDEF:
       return &PL_sv_undef;
   }
@@ -241,11 +254,13 @@ name(SV *metapkg)
 SV *
 get_glob(SV *metapkg, SV *name)
   ALIAS:
-    can_glob = GET_OR_UNDEF
+    can_glob = GET_OR_UNDEF_WITH_WARNING
     get_glob = GET_OR_THROW
     try_get_glob = GET_OR_UNDEF
   CODE:
   {
+    if(ix == GET_OR_UNDEF_WITH_WARNING)
+      warn_sub_deprecated(cv);
     HV *stash = MUST_STASH_FROM_REFSV(metapkg);
     HE *he = hv_fetch_ent(stash, name, 0, 0);
     if(he) {
@@ -256,6 +271,7 @@ get_glob(SV *metapkg, SV *name)
     else switch(ix) {
       case GET_OR_THROW:
         CROAK_QUOTED_PREFIX("Package does not contain a glob called ", SVfARG(name));
+      case GET_OR_UNDEF_WITH_WARNING:
       case GET_OR_UNDEF:
         RETVAL = &PL_sv_undef;
         break;
@@ -267,13 +283,15 @@ get_glob(SV *metapkg, SV *name)
 SV *
 get_symbol(SV *metapkg, SV *name, SV *value = NULL)
   ALIAS:
-    can_symbol = GET_OR_UNDEF
+    can_symbol = GET_OR_UNDEF_WITH_WARNING
     get_symbol = GET_OR_THROW
     try_get_symbol = GET_OR_UNDEF
     get_or_add_symbol = GET_OR_ADD
     add_symbol = ADD_OR_THROW
   CODE:
   {
+    if(ix == GET_OR_UNDEF_WITH_WARNING)
+      warn_sub_deprecated(cv);
 
     bool create = ix >= GET_OR_ADD;
 
@@ -393,6 +411,7 @@ get_symbol(SV *metapkg, SV *name, SV *value = NULL)
     else switch(ix) {
       case GET_OR_THROW:
         CROAK_QUOTED_PREFIX("Package has no symbol named ", SVfARG(name));
+      case GET_OR_UNDEF_WITH_WARNING:
       case GET_OR_UNDEF:
         RETVAL = &PL_sv_undef;
         break;
@@ -461,6 +480,37 @@ remove_symbol(SV *metapkg, SV *name)
     }
     else
       croak("TODO: Not sure what to do with SvTYPE(sv)=%d\n", SvTYPE(sv));
+  }
+
+void
+list_globs(SV *metapkg)
+  ALIAS:
+    list_all_globs        = 0
+    list_globs            = 1
+    list_subpackage_globs = 2
+  PPCODE:
+  {
+    HV *stash = MUST_STASH_FROM_REFSV(metapkg);
+    UV retcount = 0;
+    hv_iterinit(stash);
+    HE *he;
+    while((he = hv_iternext(stash))) {
+      GV *gv = (GV *)HeVAL(he);
+      assert(SvTYPE(gv) == SVt_PVGV);
+      if(ix) {
+        STRLEN keylen;
+        const char *keypv = HePV(he, keylen);
+        bool is_subpackage = keylen > 2 && keypv[keylen-2] == ':' && keypv[keylen-1] == ':';
+        if(ix == 1 && is_subpackage)
+          continue;
+        if(ix == 2 && !is_subpackage)
+          continue;
+      }
+      EXTEND(SP, 1);
+      mPUSHs(wrap_sv_refsv((SV *)gv));
+      retcount++;
+    }
+    XSRETURN(retcount);
   }
 
 MODULE = meta    PACKAGE = meta::symbol
@@ -541,40 +591,48 @@ basename(SV *metaglob)
 
 SV *get_scalar(SV *metaglob)
   ALIAS:
-    can_scalar = GET_OR_UNDEF
+    can_scalar = GET_OR_UNDEF_WITH_WARNING
     get_scalar = GET_OR_THROW
     try_get_scalar = GET_OR_UNDEF
   CODE:
+    if(ix == GET_OR_UNDEF_WITH_WARNING)
+      warn_sub_deprecated(cv);
     RETVAL = S_get_metaglob_slot(aTHX_ metaglob, SVt_PVMG, "scalar", ix);
   OUTPUT:
     RETVAL
 
 SV *get_array(SV *metaglob)
   ALIAS:
-    can_array = GET_OR_UNDEF
+    can_array = GET_OR_UNDEF_WITH_WARNING
     get_array = GET_OR_THROW
     try_get_array = GET_OR_UNDEF
   CODE:
+    if(ix == GET_OR_UNDEF_WITH_WARNING)
+      warn_sub_deprecated(cv);
     RETVAL = S_get_metaglob_slot(aTHX_ metaglob, SVt_PVAV, "array", ix);
   OUTPUT:
     RETVAL
 
 SV *get_hash(SV *metaglob)
   ALIAS:
-    can_hash = GET_OR_UNDEF
+    can_hash = GET_OR_UNDEF_WITH_WARNING
     get_hash = GET_OR_THROW
     try_get_hash = GET_OR_UNDEF
   CODE:
+    if(ix == GET_OR_UNDEF_WITH_WARNING)
+      warn_sub_deprecated(cv);
     RETVAL = S_get_metaglob_slot(aTHX_ metaglob, SVt_PVHV, "hash", ix);
   OUTPUT:
     RETVAL
 
 SV *get_code(SV *metaglob)
   ALIAS:
-    can_code = GET_OR_UNDEF
+    can_code = GET_OR_UNDEF_WITH_WARNING
     get_code = GET_OR_THROW
     try_get_code = GET_OR_UNDEF
   CODE:
+    if(ix == GET_OR_UNDEF_WITH_WARNING)
+      warn_sub_deprecated(cv);
     RETVAL = S_get_metaglob_slot(aTHX_ metaglob, SVt_PVCV, "code", ix);
   OUTPUT:
     RETVAL

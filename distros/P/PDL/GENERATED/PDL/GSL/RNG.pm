@@ -4727,7 +4727,7 @@ sub ran_bivariate_gaussian {
 
 
 
-#line 966 "gsl_random.pd"
+#line 968 "gsl_random.pd"
 
        sub ran_dir {
 	 my ($obj,$ndim,$n) = @_;
@@ -4801,7 +4801,7 @@ else {
 
 
 
-#line 1022 "gsl_random.pd"
+#line 1024 "gsl_random.pd"
 
 sub ran_shuffle_vec {
 my ($obj,@in) = @_;
@@ -4809,7 +4809,7 @@ $obj->ran_shuffle(my $p = PDL->sequence(PDL::indx(), 0+@in));
 @in[$p->list];
 }
 
-#line 1030 "gsl_random.pd"
+#line 1032 "gsl_random.pd"
 sub ran_choose_vec {
 my ($obj,$nout,@in) = @_;
 $obj->ran_choose(PDL->sequence(PDL::indx(), 0+@in),my $pout = PDL->zeroes(PDL::indx(), $nout));

@@ -1,5 +1,5 @@
 package Plack::Middleware::OpenTelemetry;
-$Plack::Middleware::OpenTelemetry::VERSION = '0.240230';
+$Plack::Middleware::OpenTelemetry::VERSION = '0.242510';
 # ABSTRACT: Plack middleware to setup OpenTelemetry tracing
 
 use v5.36.0;
@@ -132,9 +132,6 @@ sub set_status_code ($self, $span, $res) {
     {
         $span->set_status(SPAN_STATUS_ERROR);
     }
-    elsif ($status_code >= 100) {
-        $span->set_status(SPAN_STATUS_OK);
-    }
 }
 
 1;
@@ -145,7 +142,7 @@ Plack::Middleware::OpenTelemetry - Plack middleware to setup OpenTelemetry spans
 
 =head1 VERSION
 
-version 0.240230
+version 0.242510
 
 =head1 SYNOPSIS
 

@@ -166,7 +166,7 @@ The elements are:
 	H (i,j) = r (i+j-m+1),  otherwise
 	where m is the size of the vector.
 
-If c is a scalar number, it's determinant can be computed by:
+If c is a scalar number, its determinant can be computed by:
 
 			floor(n/2)    n
 	Det(H(n)) = (-1)      *      n

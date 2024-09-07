@@ -3,7 +3,7 @@
 #
 package PDL::Transform::Proj4;
 
-our @EXPORT_OK = qw(t_proj t_proj_adams_hemi t_proj_adams_ws1 t_proj_adams_ws2 t_proj_aea t_proj_aeqd t_proj_affine t_proj_airy t_proj_aitoff t_proj_alsk t_proj_apian t_proj_august t_proj_axisswap t_proj_bacon t_proj_bertin1953 t_proj_bipc t_proj_boggs t_proj_bonne t_proj_calcofi t_proj_cart t_proj_cass t_proj_cc t_proj_ccon t_proj_cea t_proj_chamb t_proj_col_urban t_proj_collg t_proj_comill t_proj_crast t_proj_defmodel t_proj_deformation t_proj_denoy t_proj_eck1 t_proj_eck2 t_proj_eck3 t_proj_eck4 t_proj_eck5 t_proj_eck6 t_proj_eqc t_proj_eqdc t_proj_eqearth t_proj_etmerc t_proj_euler t_proj_fahey t_proj_fouc t_proj_fouc_s t_proj_gall t_proj_geoc t_proj_geocent t_proj_geogoffset t_proj_geos t_proj_gins8 t_proj_gn_sinu t_proj_gnom t_proj_goode t_proj_gs48 t_proj_gs50 t_proj_gstmerc t_proj_guyou t_proj_hammer t_proj_hatano t_proj_healpix t_proj_helmert t_proj_hgridshift t_proj_horner t_proj_igh t_proj_igh_o t_proj_imw_p t_proj_isea t_proj_kav5 t_proj_kav7 t_proj_krovak t_proj_labrd t_proj_laea t_proj_lagrng t_proj_larr t_proj_lask t_proj_latlon t_proj_latlong t_proj_lcc t_proj_lcca t_proj_leac t_proj_lee_os t_proj_longlat t_proj_lonlat t_proj_loxim t_proj_lsat t_proj_mbt_fps t_proj_mbt_s t_proj_mbtfpp t_proj_mbtfpq t_proj_mbtfps t_proj_merc t_proj_mil_os t_proj_mill t_proj_misrsom t_proj_moll t_proj_molobadekas t_proj_molodensky t_proj_murd1 t_proj_murd2 t_proj_murd3 t_proj_natearth t_proj_natearth2 t_proj_nell t_proj_nell_h t_proj_nicol t_proj_noop t_proj_nsper t_proj_nzmg t_proj_ob_tran t_proj_ocea t_proj_oea t_proj_omerc t_proj_ortel t_proj_ortho t_proj_patterson t_proj_pconic t_proj_peirce_q t_proj_pipeline t_proj_poly t_proj_pop t_proj_push t_proj_putp1 t_proj_putp2 t_proj_putp3 t_proj_putp3p t_proj_putp4p t_proj_putp5 t_proj_putp5p t_proj_putp6 t_proj_putp6p t_proj_qsc t_proj_qua_aut t_proj_rhealpix t_proj_robin t_proj_rouss t_proj_rpoly t_proj_s2 t_proj_sch t_proj_set t_proj_sinu t_proj_somerc t_proj_stere t_proj_sterea t_proj_tcc t_proj_tcea t_proj_times t_proj_tinshift t_proj_tissot t_proj_tmerc t_proj_tobmerc t_proj_topocentric t_proj_tpeqd t_proj_tpers t_proj_unitconvert t_proj_ups t_proj_urm5 t_proj_urmfps t_proj_utm t_proj_vandg t_proj_vandg2 t_proj_vandg3 t_proj_vandg4 t_proj_vgridshift t_proj_vitk1 t_proj_wag1 t_proj_wag2 t_proj_wag3 t_proj_wag4 t_proj_wag5 t_proj_wag6 t_proj_wag7 t_proj_webmerc t_proj_weren t_proj_wink1 t_proj_wink2 t_proj_wintri t_proj_xyzgridshift _proj4_dummy );
+our @EXPORT_OK = qw( t_proj t_proj_adams_hemi t_proj_adams_ws1 t_proj_adams_ws2 t_proj_aea t_proj_aeqd t_proj_affine t_proj_airy t_proj_aitoff t_proj_alsk t_proj_apian t_proj_august t_proj_axisswap t_proj_bacon t_proj_bertin1953 t_proj_bipc t_proj_boggs t_proj_bonne t_proj_calcofi t_proj_cart t_proj_cass t_proj_cc t_proj_ccon t_proj_cea t_proj_chamb t_proj_col_urban t_proj_collg t_proj_comill t_proj_crast t_proj_defmodel t_proj_deformation t_proj_denoy t_proj_eck1 t_proj_eck2 t_proj_eck3 t_proj_eck4 t_proj_eck5 t_proj_eck6 t_proj_eqc t_proj_eqdc t_proj_eqearth t_proj_etmerc t_proj_euler t_proj_fahey t_proj_fouc t_proj_fouc_s t_proj_gall t_proj_geoc t_proj_geogoffset t_proj_geos t_proj_gins8 t_proj_gn_sinu t_proj_gnom t_proj_goode t_proj_gs48 t_proj_gs50 t_proj_gstmerc t_proj_guyou t_proj_hammer t_proj_hatano t_proj_healpix t_proj_helmert t_proj_hgridshift t_proj_horner t_proj_igh t_proj_igh_o t_proj_imw_p t_proj_isea t_proj_kav5 t_proj_kav7 t_proj_krovak t_proj_labrd t_proj_laea t_proj_lagrng t_proj_larr t_proj_lask t_proj_latlon t_proj_lcc t_proj_lcca t_proj_leac t_proj_lee_os t_proj_lonlat t_proj_loxim t_proj_lsat t_proj_mbt_fps t_proj_mbt_s t_proj_mbtfpp t_proj_mbtfpq t_proj_mbtfps t_proj_merc t_proj_mil_os t_proj_mill t_proj_misrsom t_proj_moll t_proj_molobadekas t_proj_molodensky t_proj_murd1 t_proj_murd2 t_proj_murd3 t_proj_natearth t_proj_natearth2 t_proj_nell t_proj_nell_h t_proj_nicol t_proj_noop t_proj_nsper t_proj_nzmg t_proj_ob_tran t_proj_ocea t_proj_oea t_proj_omerc t_proj_ortel t_proj_ortho t_proj_patterson t_proj_pconic t_proj_peirce_q t_proj_pipeline t_proj_poly t_proj_pop t_proj_push t_proj_putp1 t_proj_putp2 t_proj_putp3 t_proj_putp3p t_proj_putp4p t_proj_putp5 t_proj_putp5p t_proj_putp6 t_proj_putp6p t_proj_qsc t_proj_qua_aut t_proj_rhealpix t_proj_robin t_proj_rouss t_proj_rpoly t_proj_s2 t_proj_sch t_proj_set t_proj_sinu t_proj_somerc t_proj_stere t_proj_sterea t_proj_tcc t_proj_tcea t_proj_times t_proj_tinshift t_proj_tissot t_proj_tmerc t_proj_tobmerc t_proj_topocentric t_proj_tpeqd t_proj_tpers t_proj_unitconvert t_proj_ups t_proj_urm5 t_proj_urmfps t_proj_utm t_proj_vandg t_proj_vandg2 t_proj_vandg3 t_proj_vandg4 t_proj_vgridshift t_proj_vitk1 t_proj_wag1 t_proj_wag2 t_proj_wag3 t_proj_wag4 t_proj_wag5 t_proj_wag6 t_proj_wag7 t_proj_webmerc t_proj_weren t_proj_wink1 t_proj_wink2 t_proj_wintri t_proj_xyzgridshift );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -22,21 +22,22 @@ BEGIN {
 use PDL::LiteF;
 use PDL::NiceSlice;
 use PDL::Transform;
-use PDL::GIS::Proj;
+use Alien::proj;
+if ($^O =~ /MSWin32/ and $Alien::proj::VERSION le '1.25') {
+  $ENV{PATH} = join ';', (Alien::proj->bin_dirs, $ENV{PATH});
+}
 
 
 }
 
 
 
-#line 27 "Proj4.pd"
+#line 207 "proj4.pd"
 
-#
 # PDL::Transform::Proj4
 #
 # Judd Taylor, USF IMaRS
 # 4 Apr 2006
-#
 
 =head1 NAME
 
@@ -53,7 +54,7 @@ PDL::Transform::Proj4 - PDL::Transform interface to the Proj4 projection library
  $t = t_proj( proj_params => "+proj=ortho +ellps=WGS84 +lon_0=-90 +lat_0=40" );
  $w = pgwin(xs);
  $w->lines($t->apply($x)->clean_lines());
- 
+
  # Using the aliased functions:
  # Make an orthographic map of Earth
  use PDL::Transform::Cartography;
@@ -85,9 +86,9 @@ but that is not required otherwise. See the SYNOPSIS above.
 
 Other than t_proj(), all of the other transforms below have been autogenerated, and may not work
 properly. The main problem is determining the parameters a projection requires from the proj
-library itself. 
+library itself.
 
-Due to the difficulties in doing this, there may be times when the proj docs specify a parameter 
+Due to the difficulties in doing this, there may be times when the proj docs specify a parameter
 for a projection that won't work using the anon-hash type specification. In that case, just throw
 that parameter in the proj_params string, and everything should work fine.
 
@@ -97,10 +98,10 @@ that parameter in the proj_params string, and everything should work fine.
 
 =head3 proj_params
 
-This is a string containing the proj "plus style" parameters. This would be similar to what you 
+This is a string containing the proj "plus style" parameters. This would be similar to what you
 would put on the command line for the 'proj' tool. Like "+proj=ortho +ellps=WGS84 +lon_0=-90 +lat_0=40".
 
-This parameter overrides the others below when it contains parameters that are also specified 
+This parameter overrides the others below when it contains parameters that are also specified
 explicitly.
 
 =head3 proj
@@ -161,23 +162,23 @@ Radius of the Earth.
 
 =head3 R_A
 
-Radius of a sphere with equivalent surface area of specified ellipse. 
+Radius of a sphere with equivalent surface area of specified ellipse.
 
 =head3 R_V
 
-Radius of a sphere with equivalent volume of specified ellipse. 
+Radius of a sphere with equivalent volume of specified ellipse.
 
 =head3 R_a
 
-Arithmetic mean of the major and minor axis, Ra = (a + b)/2. 
+Arithmetic mean of the major and minor axis, Ra = (a + b)/2.
 
 =head3 R_g
 
-Geometric mean of the major and minor axis, Rg = (ab)1/2. 
+Geometric mean of the major and minor axis, Rg = (ab)1/2.
 
 =head3 R_h
 
-Harmonic mean of the major and minor axis, Rh = 2ab/(a + b). 
+Harmonic mean of the major and minor axis, Rh = 2ab/(a + b).
 
 =head3 R_lat_a=phi
 
@@ -189,7 +190,7 @@ Geometric mean of the principle radii at latitude phi.
 
 =head3 b
 
-Semiminor axis or polar radius 
+Semiminor axis or polar radius
 
 =head3 f
 
@@ -201,7 +202,7 @@ Reciprocal flattening, +rf=1/f
 
 =head3 e
 
-Eccentricity +e=e 
+Eccentricity +e=e
 
 =head3 es
 
@@ -209,29 +210,29 @@ Eccentricity squared +es=e2
 
 =cut
 
-sub new 
+sub new
 {
     my $proto = shift;
     my $sub = "PDL::Transform::Proj4::new()";
     #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
     my $class = ref($proto) || $proto;
     my $self  = $class->SUPER::new( @_ );
-    
+
     bless ($self, $class);
-    
+
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
-    
+
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
     #$dd2->Indent(1);
     #print STDERR $dd2->Dump();
-        
+
     $self->{name} = "Proj4";
 
     # Grab our options:
-    
+
     # Used in the general sense:
     $self->{params}->{proj_params} = PDL::Transform::_opt( $o, ['proj_params','params'] );
 
@@ -239,23 +240,23 @@ sub new
     $self->{general_params} = [ qw( proj x_0 y_0 lat_0 lon_0 units init ) ];
     foreach my $param ( @{ $self->{general_params} } )
         { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    
+
     # Options that have no value (like "+over"):
     $self->{bool_params} = [ qw( no_defs over geoc ) ];
     foreach my $param ( @{ $self->{bool_params} } )
         { $self->{params}->{$param} = ( PDL::Transform::_opt( $o, [ $param ] ) ) ? 'ON' : undef; }
-    
+
     # Options for the Earth figure: (ellipsoid, etc):
     $self->{earth_params} = [ qw( ellps R R_A R_V R_a R_g R_h R_lat_a R_lat_g b f rf e es ) ];
     foreach my $param ( @{ $self->{earth_params} } )
         { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    
+
     # First process the old params that may already be in the string:
     # These override the specific params set above:
     if( defined( $self->{params}->{proj_params} ) )
     {
         $self->{orig_proj_params} = $self->{params}->{proj_params};
-        
+
         my @params = split( /\s+/, $self->{orig_proj_params} );
         foreach my $param ( @params )
         {
@@ -268,14 +269,14 @@ sub new
             elsif( $param =~ /^\+(\S+)/ )
             {   # Boolean option
                 $self->{params}->{$1} = 'ON';
-            }                
+            }
         }
     }
-    
+
     # Update the proj_string to current options:
     #
     $self->update_proj_string();
-    
+
     #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
     #$dd->Indent(1);
     #print STDERR $dd->Dump();
@@ -285,7 +286,7 @@ sub new
     #    (and do some proj stuff here as well)
 
     # Forward transformation:
-    $self->{func} = sub 
+    $self->{func} = sub
     {
         my $in = shift;
         my $opt = shift;
@@ -293,11 +294,11 @@ sub new
         # Always set the badflag to 1 here, to handle possible bad projection values:
         $out->badflag(1);
         $out->inplace(1);
-        PDL::GIS::Proj::fwd_transform( $out, $opt->{proj_params} );
+        PDL::Transform::Proj4::fwd_transform( $out, $opt->{proj_params} );
     };
 
     # Inverse transformation:
-    $self->{inv} = sub 
+    $self->{inv} = sub
     {
         my $in = shift;
         my $opt = shift;
@@ -305,7 +306,7 @@ sub new
         # Always set the badflag to 1 here, to handle possible bad projection values:
         $out->badflag(1);
         $out->inplace(1);
-        PDL::GIS::Proj::inv_transform( $out, $opt->{proj_params} );
+        PDL::Transform::Proj4::inv_transform( $out, $opt->{proj_params} );
     };
 
     return $self;
@@ -315,24 +316,24 @@ sub update_proj_string
 {
     my $self = shift;
     my $sub = "PDL::Transform::Proj4::update_proj_string()";
-    
+
     # (Re)Generate the proj_params string from the options passed:
     #
     delete( $self->{params}->{proj_params} );
     my $proj_string = "";
-    
+
     foreach my $param ( sort keys %{ $self->{params} } )
-#line 321 "Proj4.pd"
+#line 498 "proj4.pd"
     {
         next unless defined( $self->{params}->{$param} );
-        
-        $proj_string .= ( $self->{params}->{$param} eq 'ON' ) 
+
+        $proj_string .= ( $self->{params}->{$param} eq 'ON' )
                         ? "+$param " : " +$param=" . $self->{params}->{$param} . " ";
         #print STDERR "$sub: Adding \'$proj_string\'...\n";
     }
-    
+
     #print STDERR "$sub: Final proj_params: \'$proj_string\'\n";
-    
+
     $self->{params}->{proj_params} = $proj_string;
 } # End of update_proj_string()...
 
@@ -343,14 +344,170 @@ sub proj_params
     return $self->{params}->{proj_params};
 } # End of proj_params()...
 
-sub t_proj 
-{ 
+# Returns a string with information about what parameters proj will
+# actually use, this includes defaults, and +init=file stuff. It's
+# the same as running 'proj -v'. It uses the proj command line, so
+# it might not work with all shells. I've tested it with bash.
+sub get_proj_info
+{
+    my $params = shift;
+    my @a = split(/\n/, `echo | proj -v $params`);
+    pop(@a);
+    return join("\n", @a);
+}
+
+sub t_proj
+{
     PDL::Transform::Proj4->new( @_ );
 } # End of t_proj()...
 
 1;
+#line 366 "Proj4.pm"
 
-#line 353 "Proj4.pd"
+
+=head1 FUNCTIONS
+
+=cut
+
+
+
+
+
+
+=head2 fwd_transform
+
+=for sig
+
+  Signature: (lonlat(n=2); [o] xy(n); char* params)
+
+=for ref
+
+PROJ forward transformation $params is a string of the projection
+transformation parameters.
+
+Returns a pdl with x, y values at positions 0, 1. The units are dependent
+on PROJ behavior. They will be PDL->null if an error has occurred.
+
+=for bad
+
+Ignores bad elements of $lat and $lon, and sets the corresponding elements
+of $x and $y to BAD
+
+=for bad
+
+fwd_transform processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*fwd_transform = \&PDL::fwd_transform;
+
+
+
+
+
+
+=head2 inv_transform
+
+=for sig
+
+  Signature: (xy(n=2); [o] lonlat(n); char* params)
+
+=for ref
+
+PROJ inverse transformation $params is a string of the projection
+transformation parameters.
+
+Returns a pdl with lon, lat values at positions 0, 1. The units are
+dependent on PROJ behavior. They will be PDL->null if an error has
+occurred.
+
+=for bad
+
+Ignores bad elements of $lat and $lon, and sets the corresponding elements
+of $x and $y to BAD
+
+=for bad
+
+inv_transform processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*inv_transform = \&PDL::inv_transform;
+
+
+
+
+
+#line 196 "proj4.pd"
+
+=head2 proj_version
+
+Returns a 3-element list with PROJ major, minor, patch version-numbers.
+Not exported.
+
+=cut
+
+my %SKIP = map +($_=>1), qw(
+  and or Special for Madagascar
+  fixed Earth For CH1903
+);
+sub load_projection_information {
+    my $text = do { open my $fh, '-|', qw(proj -lP) or die "proj -lP: $!"; local $/; <$fh> };
+    my @chunks = $text =~ /(.+?)(?=(?:^\S|\z))/gms;
+    chomp for @chunks;
+    my %descriptions = map {
+      my ($id, $rest) = split /\s*:\s*/, $_, 2;
+    } @chunks;
+    my %info;
+    foreach my $projection ( sort keys %descriptions ) {
+        my $description = $descriptions{$projection};
+        my %hash = (CODE => $projection);
+        my @lines = split( /\n/, $description );
+        chomp @lines;
+        # Full name of this projection:
+        ($hash{NAME}, my $temp) = splice @lines, 0, 2;
+        if ($temp) {
+          # The second line is usually a list of projection types this one is:
+          $temp =~ s/no inv\.*,*//;
+          $temp =~ s/or//;
+          my @temp_types = split(/[,&\s]/, $temp );
+          my @types = grep( /.+/, @temp_types );
+          $hash{CATEGORIES} = \@types;
+        }
+        # If there's more than 2 lines, then it usually is a listing of parameters:
+        # General parameters for all projections:
+        $hash{PARAMS}{GENERAL} =
+            [ qw( x_0 y_0 lon_0 units init no_defs geoc over ) ];
+        # Earth Figure Parameters:
+        $hash{PARAMS}{EARTH} =
+            [ qw( ellps b f rf e es R R_A R_V R_a R_g R_h R_lat_g ) ];
+        # Projection Specific Parameters:
+        $hash{PARAMS}{PROJ} = [
+          grep !$SKIP{$_}, map {s/=//; s/[,\[\]]//sg; $_}
+            grep length, map split(/\s+/), @lines
+        ];
+        # Can this projection do inverse?
+        $hash{INVERSE} = ( $description =~ /no inv/ ) ? 0 : 1;
+        $info{$projection} = \%hash;
+    }
+    # A couple of overrides:
+    #
+    $info{ob_tran}{PARAMS}{PROJ} =
+        [ 'o_proj', 'o_lat_p', 'o_lon_p', 'o_alpha', 'o_lon_c',
+          'o_lat_c', 'o_lon_1', 'o_lat_1', 'o_lon_2', 'o_lat_2' ];
+    $info{nzmg}{CATEGORIES} = [ 'fixed Earth' ];
+    return \%info;
+}
+
+#line 542 "proj4.pd"
 
 =head1 FUNCTIONS
 
@@ -360,46 +517,46 @@ This is the main entry point for the generalized interface. See above on its usa
 
 =cut
 
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 =head2 t_proj_adams_hemi
 
-Autogenerated transformation function for Proj4 projection code adams_hemi. 
+Autogenerated transformation function for Proj4 projection code adams_hemi.
 
 The full name for this projection is Adams Hemisphere in a Square.
 
 =cut
 
-sub t_proj_adams_hemi 
+sub t_proj_adams_hemi
     { 'PDL::Transform::Proj4::adams_hemi'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_adams_ws1
 
-Autogenerated transformation function for Proj4 projection code adams_ws1. 
+Autogenerated transformation function for Proj4 projection code adams_ws1.
 
 The full name for this projection is Adams World in a Square I.
 
 =cut
 
-sub t_proj_adams_ws1 
+sub t_proj_adams_ws1
     { 'PDL::Transform::Proj4::adams_ws1'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_adams_ws2
 
-Autogenerated transformation function for Proj4 projection code adams_ws2. 
+Autogenerated transformation function for Proj4 projection code adams_ws2.
 
 The full name for this projection is Adams World in a Square II.
 
 =cut
 
-sub t_proj_adams_ws2 
+sub t_proj_adams_ws2
     { 'PDL::Transform::Proj4::adams_ws2'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_aea
 
-Autogenerated transformation function for Proj4 projection code aea. 
+Autogenerated transformation function for Proj4 projection code aea.
 
 The full name for this projection is Albers Equal Area.
 
@@ -417,13 +574,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_aea 
+sub t_proj_aea
     { 'PDL::Transform::Proj4::aea'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_aeqd
 
-Autogenerated transformation function for Proj4 projection code aeqd. 
+Autogenerated transformation function for Proj4 projection code aeqd.
 
 The full name for this projection is Azimuthal Equidistant.
 
@@ -441,25 +598,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_aeqd 
+sub t_proj_aeqd
     { 'PDL::Transform::Proj4::aeqd'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_affine
 
-Autogenerated transformation function for Proj4 projection code affine. 
+Autogenerated transformation function for Proj4 projection code affine.
 
 The full name for this projection is Affine transformation.
 
 =cut
 
-sub t_proj_affine 
+sub t_proj_affine
     { 'PDL::Transform::Proj4::affine'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_airy
 
-Autogenerated transformation function for Proj4 projection code airy. 
+Autogenerated transformation function for Proj4 projection code airy.
 
 The full name for this projection is Airy.
 
@@ -477,121 +634,121 @@ Projection Parameters
 
 =cut
 
-sub t_proj_airy 
+sub t_proj_airy
     { 'PDL::Transform::Proj4::airy'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_aitoff
 
-Autogenerated transformation function for Proj4 projection code aitoff. 
+Autogenerated transformation function for Proj4 projection code aitoff.
 
 The full name for this projection is Aitoff.
 
 =cut
 
-sub t_proj_aitoff 
+sub t_proj_aitoff
     { 'PDL::Transform::Proj4::aitoff'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_alsk
 
-Autogenerated transformation function for Proj4 projection code alsk. 
+Autogenerated transformation function for Proj4 projection code alsk.
 
 The full name for this projection is Modified Stereographic of Alaska.
 
 =cut
 
-sub t_proj_alsk 
+sub t_proj_alsk
     { 'PDL::Transform::Proj4::alsk'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_apian
 
-Autogenerated transformation function for Proj4 projection code apian. 
+Autogenerated transformation function for Proj4 projection code apian.
 
 The full name for this projection is Apian Globular I.
 
 =cut
 
-sub t_proj_apian 
+sub t_proj_apian
     { 'PDL::Transform::Proj4::apian'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_august
 
-Autogenerated transformation function for Proj4 projection code august. 
+Autogenerated transformation function for Proj4 projection code august.
 
 The full name for this projection is August Epicycloidal.
 
 =cut
 
-sub t_proj_august 
+sub t_proj_august
     { 'PDL::Transform::Proj4::august'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_axisswap
 
-Autogenerated transformation function for Proj4 projection code axisswap. 
+Autogenerated transformation function for Proj4 projection code axisswap.
 
 The full name for this projection is Axis ordering.
 
 =cut
 
-sub t_proj_axisswap 
+sub t_proj_axisswap
     { 'PDL::Transform::Proj4::axisswap'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_bacon
 
-Autogenerated transformation function for Proj4 projection code bacon. 
+Autogenerated transformation function for Proj4 projection code bacon.
 
 The full name for this projection is Bacon Globular.
 
 =cut
 
-sub t_proj_bacon 
+sub t_proj_bacon
     { 'PDL::Transform::Proj4::bacon'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_bertin1953
 
-Autogenerated transformation function for Proj4 projection code bertin1953. 
+Autogenerated transformation function for Proj4 projection code bertin1953.
 
 The full name for this projection is Bertin 1953.
 
 =cut
 
-sub t_proj_bertin1953 
+sub t_proj_bertin1953
     { 'PDL::Transform::Proj4::bertin1953'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_bipc
 
-Autogenerated transformation function for Proj4 projection code bipc. 
+Autogenerated transformation function for Proj4 projection code bipc.
 
 The full name for this projection is Bipolar conic of western hemisphere.
 
 =cut
 
-sub t_proj_bipc 
+sub t_proj_bipc
     { 'PDL::Transform::Proj4::bipc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_boggs
 
-Autogenerated transformation function for Proj4 projection code boggs. 
+Autogenerated transformation function for Proj4 projection code boggs.
 
 The full name for this projection is Boggs Eumorphic.
 
 =cut
 
-sub t_proj_boggs 
+sub t_proj_boggs
     { 'PDL::Transform::Proj4::boggs'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_bonne
 
-Autogenerated transformation function for Proj4 projection code bonne. 
+Autogenerated transformation function for Proj4 projection code bonne.
 
 The full name for this projection is Bonne (Werner lat_1=90).
 
@@ -607,61 +764,61 @@ Projection Parameters
 
 =cut
 
-sub t_proj_bonne 
+sub t_proj_bonne
     { 'PDL::Transform::Proj4::bonne'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_calcofi
 
-Autogenerated transformation function for Proj4 projection code calcofi. 
+Autogenerated transformation function for Proj4 projection code calcofi.
 
 The full name for this projection is Cal Coop Ocean Fish Invest Lines/Stations.
 
 =cut
 
-sub t_proj_calcofi 
+sub t_proj_calcofi
     { 'PDL::Transform::Proj4::calcofi'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_cart
 
-Autogenerated transformation function for Proj4 projection code cart. 
+Autogenerated transformation function for Proj4 projection code cart.
 
 The full name for this projection is Geodetic/cartesian conversions.
 
 =cut
 
-sub t_proj_cart 
+sub t_proj_cart
     { 'PDL::Transform::Proj4::cart'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_cass
 
-Autogenerated transformation function for Proj4 projection code cass. 
+Autogenerated transformation function for Proj4 projection code cass.
 
 The full name for this projection is Cassini.
 
 =cut
 
-sub t_proj_cass 
+sub t_proj_cass
     { 'PDL::Transform::Proj4::cass'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_cc
 
-Autogenerated transformation function for Proj4 projection code cc. 
+Autogenerated transformation function for Proj4 projection code cc.
 
 The full name for this projection is Central Cylindrical.
 
 =cut
 
-sub t_proj_cc 
+sub t_proj_cc
     { 'PDL::Transform::Proj4::cc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_ccon
 
-Autogenerated transformation function for Proj4 projection code ccon. 
+Autogenerated transformation function for Proj4 projection code ccon.
 
 The full name for this projection is Central Conic.
 
@@ -677,13 +834,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_ccon 
+sub t_proj_ccon
     { 'PDL::Transform::Proj4::ccon'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_cea
 
-Autogenerated transformation function for Proj4 projection code cea. 
+Autogenerated transformation function for Proj4 projection code cea.
 
 The full name for this projection is Equal Area Cylindrical.
 
@@ -699,13 +856,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_cea 
+sub t_proj_cea
     { 'PDL::Transform::Proj4::cea'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_chamb
 
-Autogenerated transformation function for Proj4 projection code chamb. 
+Autogenerated transformation function for Proj4 projection code chamb.
 
 The full name for this projection is Chamberlin Trimetric.
 
@@ -731,13 +888,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_chamb 
+sub t_proj_chamb
     { 'PDL::Transform::Proj4::chamb'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_col_urban
 
-Autogenerated transformation function for Proj4 projection code col_urban. 
+Autogenerated transformation function for Proj4 projection code col_urban.
 
 The full name for this projection is Colombia Urban.
 
@@ -753,157 +910,157 @@ Projection Parameters
 
 =cut
 
-sub t_proj_col_urban 
+sub t_proj_col_urban
     { 'PDL::Transform::Proj4::col_urban'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_collg
 
-Autogenerated transformation function for Proj4 projection code collg. 
+Autogenerated transformation function for Proj4 projection code collg.
 
 The full name for this projection is Collignon.
 
 =cut
 
-sub t_proj_collg 
+sub t_proj_collg
     { 'PDL::Transform::Proj4::collg'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_comill
 
-Autogenerated transformation function for Proj4 projection code comill. 
+Autogenerated transformation function for Proj4 projection code comill.
 
 The full name for this projection is Compact Miller.
 
 =cut
 
-sub t_proj_comill 
+sub t_proj_comill
     { 'PDL::Transform::Proj4::comill'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_crast
 
-Autogenerated transformation function for Proj4 projection code crast. 
+Autogenerated transformation function for Proj4 projection code crast.
 
 The full name for this projection is Craster Parabolic (Putnins P4).
 
 =cut
 
-sub t_proj_crast 
+sub t_proj_crast
     { 'PDL::Transform::Proj4::crast'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_defmodel
 
-Autogenerated transformation function for Proj4 projection code defmodel. 
+Autogenerated transformation function for Proj4 projection code defmodel.
 
 The full name for this projection is Deformation model.
 
 =cut
 
-sub t_proj_defmodel 
+sub t_proj_defmodel
     { 'PDL::Transform::Proj4::defmodel'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_deformation
 
-Autogenerated transformation function for Proj4 projection code deformation. 
+Autogenerated transformation function for Proj4 projection code deformation.
 
 The full name for this projection is Kinematic grid shift.
 
 =cut
 
-sub t_proj_deformation 
+sub t_proj_deformation
     { 'PDL::Transform::Proj4::deformation'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_denoy
 
-Autogenerated transformation function for Proj4 projection code denoy. 
+Autogenerated transformation function for Proj4 projection code denoy.
 
 The full name for this projection is Denoyer Semi-Elliptical.
 
 =cut
 
-sub t_proj_denoy 
+sub t_proj_denoy
     { 'PDL::Transform::Proj4::denoy'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_eck1
 
-Autogenerated transformation function for Proj4 projection code eck1. 
+Autogenerated transformation function for Proj4 projection code eck1.
 
 The full name for this projection is Eckert I.
 
 =cut
 
-sub t_proj_eck1 
+sub t_proj_eck1
     { 'PDL::Transform::Proj4::eck1'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_eck2
 
-Autogenerated transformation function for Proj4 projection code eck2. 
+Autogenerated transformation function for Proj4 projection code eck2.
 
 The full name for this projection is Eckert II.
 
 =cut
 
-sub t_proj_eck2 
+sub t_proj_eck2
     { 'PDL::Transform::Proj4::eck2'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_eck3
 
-Autogenerated transformation function for Proj4 projection code eck3. 
+Autogenerated transformation function for Proj4 projection code eck3.
 
 The full name for this projection is Eckert III.
 
 =cut
 
-sub t_proj_eck3 
+sub t_proj_eck3
     { 'PDL::Transform::Proj4::eck3'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_eck4
 
-Autogenerated transformation function for Proj4 projection code eck4. 
+Autogenerated transformation function for Proj4 projection code eck4.
 
 The full name for this projection is Eckert IV.
 
 =cut
 
-sub t_proj_eck4 
+sub t_proj_eck4
     { 'PDL::Transform::Proj4::eck4'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_eck5
 
-Autogenerated transformation function for Proj4 projection code eck5. 
+Autogenerated transformation function for Proj4 projection code eck5.
 
 The full name for this projection is Eckert V.
 
 =cut
 
-sub t_proj_eck5 
+sub t_proj_eck5
     { 'PDL::Transform::Proj4::eck5'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_eck6
 
-Autogenerated transformation function for Proj4 projection code eck6. 
+Autogenerated transformation function for Proj4 projection code eck6.
 
 The full name for this projection is Eckert VI.
 
 =cut
 
-sub t_proj_eck6 
+sub t_proj_eck6
     { 'PDL::Transform::Proj4::eck6'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_eqc
 
-Autogenerated transformation function for Proj4 projection code eqc. 
+Autogenerated transformation function for Proj4 projection code eqc.
 
 The full name for this projection is Equidistant Cylindrical (Plate Carree).
 
@@ -921,13 +1078,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_eqc 
+sub t_proj_eqc
     { 'PDL::Transform::Proj4::eqc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_eqdc
 
-Autogenerated transformation function for Proj4 projection code eqdc. 
+Autogenerated transformation function for Proj4 projection code eqdc.
 
 The full name for this projection is Equidistant Conic.
 
@@ -945,37 +1102,37 @@ Projection Parameters
 
 =cut
 
-sub t_proj_eqdc 
+sub t_proj_eqdc
     { 'PDL::Transform::Proj4::eqdc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_eqearth
 
-Autogenerated transformation function for Proj4 projection code eqearth. 
+Autogenerated transformation function for Proj4 projection code eqearth.
 
 The full name for this projection is Equal Earth.
 
 =cut
 
-sub t_proj_eqearth 
+sub t_proj_eqearth
     { 'PDL::Transform::Proj4::eqearth'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_etmerc
 
-Autogenerated transformation function for Proj4 projection code etmerc. 
+Autogenerated transformation function for Proj4 projection code etmerc.
 
 The full name for this projection is Extended Transverse Mercator.
 
 =cut
 
-sub t_proj_etmerc 
+sub t_proj_etmerc
     { 'PDL::Transform::Proj4::etmerc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_euler
 
-Autogenerated transformation function for Proj4 projection code euler. 
+Autogenerated transformation function for Proj4 projection code euler.
 
 The full name for this projection is Euler.
 
@@ -993,97 +1150,85 @@ Projection Parameters
 
 =cut
 
-sub t_proj_euler 
+sub t_proj_euler
     { 'PDL::Transform::Proj4::euler'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_fahey
 
-Autogenerated transformation function for Proj4 projection code fahey. 
+Autogenerated transformation function for Proj4 projection code fahey.
 
 The full name for this projection is Fahey.
 
 =cut
 
-sub t_proj_fahey 
+sub t_proj_fahey
     { 'PDL::Transform::Proj4::fahey'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_fouc
 
-Autogenerated transformation function for Proj4 projection code fouc. 
+Autogenerated transformation function for Proj4 projection code fouc.
 
 The full name for this projection is Foucaut.
 
 =cut
 
-sub t_proj_fouc 
+sub t_proj_fouc
     { 'PDL::Transform::Proj4::fouc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_fouc_s
 
-Autogenerated transformation function for Proj4 projection code fouc_s. 
+Autogenerated transformation function for Proj4 projection code fouc_s.
 
 The full name for this projection is Foucaut Sinusoidal.
 
 =cut
 
-sub t_proj_fouc_s 
+sub t_proj_fouc_s
     { 'PDL::Transform::Proj4::fouc_s'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_gall
 
-Autogenerated transformation function for Proj4 projection code gall. 
+Autogenerated transformation function for Proj4 projection code gall.
 
 The full name for this projection is Gall (Gall Stereographic).
 
 =cut
 
-sub t_proj_gall 
+sub t_proj_gall
     { 'PDL::Transform::Proj4::gall'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_geoc
 
-Autogenerated transformation function for Proj4 projection code geoc. 
+Autogenerated transformation function for Proj4 projection code geoc.
 
 The full name for this projection is Geocentric Latitude.
 
 =cut
 
-sub t_proj_geoc 
+sub t_proj_geoc
     { 'PDL::Transform::Proj4::geoc'->new( @_ ); }
-#line 451 "Proj4.pd"
-
-=head2 t_proj_geocent
-
-Autogenerated transformation function for Proj4 projection code geocent. 
-
-The full name for this projection is Geocentric.
-
-=cut
-
-sub t_proj_geocent 
-    { 'PDL::Transform::Proj4::geocent'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_geogoffset
 
-Autogenerated transformation function for Proj4 projection code geogoffset. 
+Autogenerated transformation function for Proj4 projection code geogoffset.
 
 The full name for this projection is Geographic Offset.
 
 =cut
 
-sub t_proj_geogoffset 
+sub t_proj_geogoffset
     { 'PDL::Transform::Proj4::geogoffset'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_geos
 
-Autogenerated transformation function for Proj4 projection code geos. 
+Autogenerated transformation function for Proj4 projection code geos.
 
 The full name for this projection is Geostationary Satellite View.
 
@@ -1099,25 +1244,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_geos 
+sub t_proj_geos
     { 'PDL::Transform::Proj4::geos'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_gins8
 
-Autogenerated transformation function for Proj4 projection code gins8. 
+Autogenerated transformation function for Proj4 projection code gins8.
 
 The full name for this projection is Ginsburg VIII (TsNIIGAiK).
 
 =cut
 
-sub t_proj_gins8 
+sub t_proj_gins8
     { 'PDL::Transform::Proj4::gins8'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_gn_sinu
 
-Autogenerated transformation function for Proj4 projection code gn_sinu. 
+Autogenerated transformation function for Proj4 projection code gn_sinu.
 
 The full name for this projection is General Sinusoidal Series.
 
@@ -1135,61 +1280,61 @@ Projection Parameters
 
 =cut
 
-sub t_proj_gn_sinu 
+sub t_proj_gn_sinu
     { 'PDL::Transform::Proj4::gn_sinu'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_gnom
 
-Autogenerated transformation function for Proj4 projection code gnom. 
+Autogenerated transformation function for Proj4 projection code gnom.
 
 The full name for this projection is Gnomonic.
 
 =cut
 
-sub t_proj_gnom 
+sub t_proj_gnom
     { 'PDL::Transform::Proj4::gnom'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_goode
 
-Autogenerated transformation function for Proj4 projection code goode. 
+Autogenerated transformation function for Proj4 projection code goode.
 
 The full name for this projection is Goode Homolosine.
 
 =cut
 
-sub t_proj_goode 
+sub t_proj_goode
     { 'PDL::Transform::Proj4::goode'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_gs48
 
-Autogenerated transformation function for Proj4 projection code gs48. 
+Autogenerated transformation function for Proj4 projection code gs48.
 
 The full name for this projection is Modified Stereographic of 48 U.S..
 
 =cut
 
-sub t_proj_gs48 
+sub t_proj_gs48
     { 'PDL::Transform::Proj4::gs48'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_gs50
 
-Autogenerated transformation function for Proj4 projection code gs50. 
+Autogenerated transformation function for Proj4 projection code gs50.
 
 The full name for this projection is Modified Stereographic of 50 U.S..
 
 =cut
 
-sub t_proj_gs50 
+sub t_proj_gs50
     { 'PDL::Transform::Proj4::gs50'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_gstmerc
 
-Autogenerated transformation function for Proj4 projection code gstmerc. 
+Autogenerated transformation function for Proj4 projection code gstmerc.
 
 The full name for this projection is Gauss-Schreiber Transverse Mercator (aka Gauss-Laborde Reunion).
 
@@ -1209,25 +1354,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_gstmerc 
+sub t_proj_gstmerc
     { 'PDL::Transform::Proj4::gstmerc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_guyou
 
-Autogenerated transformation function for Proj4 projection code guyou. 
+Autogenerated transformation function for Proj4 projection code guyou.
 
 The full name for this projection is Guyou.
 
 =cut
 
-sub t_proj_guyou 
+sub t_proj_guyou
     { 'PDL::Transform::Proj4::guyou'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_hammer
 
-Autogenerated transformation function for Proj4 projection code hammer. 
+Autogenerated transformation function for Proj4 projection code hammer.
 
 The full name for this projection is Hammer & Eckert-Greifendorff.
 
@@ -1245,25 +1390,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_hammer 
+sub t_proj_hammer
     { 'PDL::Transform::Proj4::hammer'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_hatano
 
-Autogenerated transformation function for Proj4 projection code hatano. 
+Autogenerated transformation function for Proj4 projection code hatano.
 
 The full name for this projection is Hatano Asymmetrical Equal Area.
 
 =cut
 
-sub t_proj_hatano 
+sub t_proj_hatano
     { 'PDL::Transform::Proj4::hatano'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_healpix
 
-Autogenerated transformation function for Proj4 projection code healpix. 
+Autogenerated transformation function for Proj4 projection code healpix.
 
 The full name for this projection is HEALPix.
 
@@ -1279,73 +1424,73 @@ Projection Parameters
 
 =cut
 
-sub t_proj_healpix 
+sub t_proj_healpix
     { 'PDL::Transform::Proj4::healpix'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_helmert
 
-Autogenerated transformation function for Proj4 projection code helmert. 
+Autogenerated transformation function for Proj4 projection code helmert.
 
 The full name for this projection is 3(6)-, 4(8)- and 7(14)-parameter Helmert shift.
 
 =cut
 
-sub t_proj_helmert 
+sub t_proj_helmert
     { 'PDL::Transform::Proj4::helmert'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_hgridshift
 
-Autogenerated transformation function for Proj4 projection code hgridshift. 
+Autogenerated transformation function for Proj4 projection code hgridshift.
 
 The full name for this projection is Horizontal grid shift.
 
 =cut
 
-sub t_proj_hgridshift 
+sub t_proj_hgridshift
     { 'PDL::Transform::Proj4::hgridshift'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_horner
 
-Autogenerated transformation function for Proj4 projection code horner. 
+Autogenerated transformation function for Proj4 projection code horner.
 
 The full name for this projection is Horner polynomial evaluation.
 
 =cut
 
-sub t_proj_horner 
+sub t_proj_horner
     { 'PDL::Transform::Proj4::horner'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_igh
 
-Autogenerated transformation function for Proj4 projection code igh. 
+Autogenerated transformation function for Proj4 projection code igh.
 
 The full name for this projection is Interrupted Goode Homolosine.
 
 =cut
 
-sub t_proj_igh 
+sub t_proj_igh
     { 'PDL::Transform::Proj4::igh'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_igh_o
 
-Autogenerated transformation function for Proj4 projection code igh_o. 
+Autogenerated transformation function for Proj4 projection code igh_o.
 
 The full name for this projection is Interrupted Goode Homolosine Oceanic View.
 
 =cut
 
-sub t_proj_igh_o 
+sub t_proj_igh_o
     { 'PDL::Transform::Proj4::igh_o'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_imw_p
 
-Autogenerated transformation function for Proj4 projection code imw_p. 
+Autogenerated transformation function for Proj4 projection code imw_p.
 
 The full name for this projection is International Map of the World Polyconic.
 
@@ -1365,85 +1510,85 @@ Projection Parameters
 
 =cut
 
-sub t_proj_imw_p 
+sub t_proj_imw_p
     { 'PDL::Transform::Proj4::imw_p'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_isea
 
-Autogenerated transformation function for Proj4 projection code isea. 
+Autogenerated transformation function for Proj4 projection code isea.
 
 The full name for this projection is Icosahedral Snyder Equal Area.
 
 =cut
 
-sub t_proj_isea 
+sub t_proj_isea
     { 'PDL::Transform::Proj4::isea'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_kav5
 
-Autogenerated transformation function for Proj4 projection code kav5. 
+Autogenerated transformation function for Proj4 projection code kav5.
 
 The full name for this projection is Kavraisky V.
 
 =cut
 
-sub t_proj_kav5 
+sub t_proj_kav5
     { 'PDL::Transform::Proj4::kav5'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_kav7
 
-Autogenerated transformation function for Proj4 projection code kav7. 
+Autogenerated transformation function for Proj4 projection code kav7.
 
 The full name for this projection is Kavraisky VII.
 
 =cut
 
-sub t_proj_kav7 
+sub t_proj_kav7
     { 'PDL::Transform::Proj4::kav7'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_krovak
 
-Autogenerated transformation function for Proj4 projection code krovak. 
+Autogenerated transformation function for Proj4 projection code krovak.
 
 The full name for this projection is Krovak.
 
 =cut
 
-sub t_proj_krovak 
+sub t_proj_krovak
     { 'PDL::Transform::Proj4::krovak'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_labrd
 
-Autogenerated transformation function for Proj4 projection code labrd. 
+Autogenerated transformation function for Proj4 projection code labrd.
 
 The full name for this projection is Laborde.
 
 =cut
 
-sub t_proj_labrd 
+sub t_proj_labrd
     { 'PDL::Transform::Proj4::labrd'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_laea
 
-Autogenerated transformation function for Proj4 projection code laea. 
+Autogenerated transformation function for Proj4 projection code laea.
 
 The full name for this projection is Lambert Azimuthal Equal Area.
 
 =cut
 
-sub t_proj_laea 
+sub t_proj_laea
     { 'PDL::Transform::Proj4::laea'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_lagrng
 
-Autogenerated transformation function for Proj4 projection code lagrng. 
+Autogenerated transformation function for Proj4 projection code lagrng.
 
 The full name for this projection is Lagrange.
 
@@ -1459,61 +1604,49 @@ Projection Parameters
 
 =cut
 
-sub t_proj_lagrng 
+sub t_proj_lagrng
     { 'PDL::Transform::Proj4::lagrng'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_larr
 
-Autogenerated transformation function for Proj4 projection code larr. 
+Autogenerated transformation function for Proj4 projection code larr.
 
 The full name for this projection is Larrivee.
 
 =cut
 
-sub t_proj_larr 
+sub t_proj_larr
     { 'PDL::Transform::Proj4::larr'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_lask
 
-Autogenerated transformation function for Proj4 projection code lask. 
+Autogenerated transformation function for Proj4 projection code lask.
 
 The full name for this projection is Laskowski.
 
 =cut
 
-sub t_proj_lask 
+sub t_proj_lask
     { 'PDL::Transform::Proj4::lask'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_latlon
 
-Autogenerated transformation function for Proj4 projection code latlon. 
+Autogenerated transformation function for Proj4 projection code latlon.
 
 The full name for this projection is Lat/long (Geodetic alias).
 
 =cut
 
-sub t_proj_latlon 
+sub t_proj_latlon
     { 'PDL::Transform::Proj4::latlon'->new( @_ ); }
-#line 451 "Proj4.pd"
-
-=head2 t_proj_latlong
-
-Autogenerated transformation function for Proj4 projection code latlong. 
-
-The full name for this projection is Lat/long (Geodetic alias).
-
-=cut
-
-sub t_proj_latlong 
-    { 'PDL::Transform::Proj4::latlong'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_lcc
 
-Autogenerated transformation function for Proj4 projection code lcc. 
+Autogenerated transformation function for Proj4 projection code lcc.
 
 The full name for this projection is Lambert Conformal Conic.
 
@@ -1535,13 +1668,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_lcc 
+sub t_proj_lcc
     { 'PDL::Transform::Proj4::lcc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_lcca
 
-Autogenerated transformation function for Proj4 projection code lcca. 
+Autogenerated transformation function for Proj4 projection code lcca.
 
 The full name for this projection is Lambert Conformal Conic Alternative.
 
@@ -1557,13 +1690,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_lcca 
+sub t_proj_lcca
     { 'PDL::Transform::Proj4::lcca'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_leac
 
-Autogenerated transformation function for Proj4 projection code leac. 
+Autogenerated transformation function for Proj4 projection code leac.
 
 The full name for this projection is Lambert Equal Area Conic.
 
@@ -1581,61 +1714,49 @@ Projection Parameters
 
 =cut
 
-sub t_proj_leac 
+sub t_proj_leac
     { 'PDL::Transform::Proj4::leac'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_lee_os
 
-Autogenerated transformation function for Proj4 projection code lee_os. 
+Autogenerated transformation function for Proj4 projection code lee_os.
 
 The full name for this projection is Lee Oblated Stereographic.
 
 =cut
 
-sub t_proj_lee_os 
+sub t_proj_lee_os
     { 'PDL::Transform::Proj4::lee_os'->new( @_ ); }
-#line 451 "Proj4.pd"
-
-=head2 t_proj_longlat
-
-Autogenerated transformation function for Proj4 projection code longlat. 
-
-The full name for this projection is Lat/long (Geodetic alias).
-
-=cut
-
-sub t_proj_longlat 
-    { 'PDL::Transform::Proj4::longlat'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_lonlat
 
-Autogenerated transformation function for Proj4 projection code lonlat. 
+Autogenerated transformation function for Proj4 projection code lonlat.
 
 The full name for this projection is Lat/long (Geodetic).
 
 =cut
 
-sub t_proj_lonlat 
+sub t_proj_lonlat
     { 'PDL::Transform::Proj4::lonlat'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_loxim
 
-Autogenerated transformation function for Proj4 projection code loxim. 
+Autogenerated transformation function for Proj4 projection code loxim.
 
 The full name for this projection is Loximuthal.
 
 =cut
 
-sub t_proj_loxim 
+sub t_proj_loxim
     { 'PDL::Transform::Proj4::loxim'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_lsat
 
-Autogenerated transformation function for Proj4 projection code lsat. 
+Autogenerated transformation function for Proj4 projection code lsat.
 
 The full name for this projection is Space oblique for LANDSAT.
 
@@ -1653,73 +1774,73 @@ Projection Parameters
 
 =cut
 
-sub t_proj_lsat 
+sub t_proj_lsat
     { 'PDL::Transform::Proj4::lsat'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_mbt_fps
 
-Autogenerated transformation function for Proj4 projection code mbt_fps. 
+Autogenerated transformation function for Proj4 projection code mbt_fps.
 
 The full name for this projection is McBryde-Thomas Flat-Pole Sine (No. 2).
 
 =cut
 
-sub t_proj_mbt_fps 
+sub t_proj_mbt_fps
     { 'PDL::Transform::Proj4::mbt_fps'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_mbt_s
 
-Autogenerated transformation function for Proj4 projection code mbt_s. 
+Autogenerated transformation function for Proj4 projection code mbt_s.
 
 The full name for this projection is McBryde-Thomas Flat-Polar Sine (No. 1).
 
 =cut
 
-sub t_proj_mbt_s 
+sub t_proj_mbt_s
     { 'PDL::Transform::Proj4::mbt_s'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_mbtfpp
 
-Autogenerated transformation function for Proj4 projection code mbtfpp. 
+Autogenerated transformation function for Proj4 projection code mbtfpp.
 
 The full name for this projection is McBride-Thomas Flat-Polar Parabolic.
 
 =cut
 
-sub t_proj_mbtfpp 
+sub t_proj_mbtfpp
     { 'PDL::Transform::Proj4::mbtfpp'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_mbtfpq
 
-Autogenerated transformation function for Proj4 projection code mbtfpq. 
+Autogenerated transformation function for Proj4 projection code mbtfpq.
 
 The full name for this projection is McBryde-Thomas Flat-Polar Quartic.
 
 =cut
 
-sub t_proj_mbtfpq 
+sub t_proj_mbtfpq
     { 'PDL::Transform::Proj4::mbtfpq'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_mbtfps
 
-Autogenerated transformation function for Proj4 projection code mbtfps. 
+Autogenerated transformation function for Proj4 projection code mbtfps.
 
 The full name for this projection is McBryde-Thomas Flat-Polar Sinusoidal.
 
 =cut
 
-sub t_proj_mbtfps 
+sub t_proj_mbtfps
     { 'PDL::Transform::Proj4::mbtfps'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_merc
 
-Autogenerated transformation function for Proj4 projection code merc. 
+Autogenerated transformation function for Proj4 projection code merc.
 
 The full name for this projection is Mercator.
 
@@ -1735,37 +1856,37 @@ Projection Parameters
 
 =cut
 
-sub t_proj_merc 
+sub t_proj_merc
     { 'PDL::Transform::Proj4::merc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_mil_os
 
-Autogenerated transformation function for Proj4 projection code mil_os. 
+Autogenerated transformation function for Proj4 projection code mil_os.
 
 The full name for this projection is Miller Oblated Stereographic.
 
 =cut
 
-sub t_proj_mil_os 
+sub t_proj_mil_os
     { 'PDL::Transform::Proj4::mil_os'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_mill
 
-Autogenerated transformation function for Proj4 projection code mill. 
+Autogenerated transformation function for Proj4 projection code mill.
 
 The full name for this projection is Miller Cylindrical.
 
 =cut
 
-sub t_proj_mill 
+sub t_proj_mill
     { 'PDL::Transform::Proj4::mill'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_misrsom
 
-Autogenerated transformation function for Proj4 projection code misrsom. 
+Autogenerated transformation function for Proj4 projection code misrsom.
 
 The full name for this projection is Space oblique for MISR.
 
@@ -1781,49 +1902,49 @@ Projection Parameters
 
 =cut
 
-sub t_proj_misrsom 
+sub t_proj_misrsom
     { 'PDL::Transform::Proj4::misrsom'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_moll
 
-Autogenerated transformation function for Proj4 projection code moll. 
+Autogenerated transformation function for Proj4 projection code moll.
 
 The full name for this projection is Mollweide.
 
 =cut
 
-sub t_proj_moll 
+sub t_proj_moll
     { 'PDL::Transform::Proj4::moll'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_molobadekas
 
-Autogenerated transformation function for Proj4 projection code molobadekas. 
+Autogenerated transformation function for Proj4 projection code molobadekas.
 
 The full name for this projection is Molodensky-Badekas transformation.
 
 =cut
 
-sub t_proj_molobadekas 
+sub t_proj_molobadekas
     { 'PDL::Transform::Proj4::molobadekas'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_molodensky
 
-Autogenerated transformation function for Proj4 projection code molodensky. 
+Autogenerated transformation function for Proj4 projection code molodensky.
 
 The full name for this projection is Molodensky transform.
 
 =cut
 
-sub t_proj_molodensky 
+sub t_proj_molodensky
     { 'PDL::Transform::Proj4::molodensky'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_murd1
 
-Autogenerated transformation function for Proj4 projection code murd1. 
+Autogenerated transformation function for Proj4 projection code murd1.
 
 The full name for this projection is Murdoch I.
 
@@ -1841,13 +1962,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_murd1 
+sub t_proj_murd1
     { 'PDL::Transform::Proj4::murd1'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_murd2
 
-Autogenerated transformation function for Proj4 projection code murd2. 
+Autogenerated transformation function for Proj4 projection code murd2.
 
 The full name for this projection is Murdoch II.
 
@@ -1865,13 +1986,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_murd2 
+sub t_proj_murd2
     { 'PDL::Transform::Proj4::murd2'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_murd3
 
-Autogenerated transformation function for Proj4 projection code murd3. 
+Autogenerated transformation function for Proj4 projection code murd3.
 
 The full name for this projection is Murdoch III.
 
@@ -1889,85 +2010,85 @@ Projection Parameters
 
 =cut
 
-sub t_proj_murd3 
+sub t_proj_murd3
     { 'PDL::Transform::Proj4::murd3'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_natearth
 
-Autogenerated transformation function for Proj4 projection code natearth. 
+Autogenerated transformation function for Proj4 projection code natearth.
 
 The full name for this projection is Natural Earth.
 
 =cut
 
-sub t_proj_natearth 
+sub t_proj_natearth
     { 'PDL::Transform::Proj4::natearth'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_natearth2
 
-Autogenerated transformation function for Proj4 projection code natearth2. 
+Autogenerated transformation function for Proj4 projection code natearth2.
 
 The full name for this projection is Natural Earth 2.
 
 =cut
 
-sub t_proj_natearth2 
+sub t_proj_natearth2
     { 'PDL::Transform::Proj4::natearth2'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_nell
 
-Autogenerated transformation function for Proj4 projection code nell. 
+Autogenerated transformation function for Proj4 projection code nell.
 
 The full name for this projection is Nell.
 
 =cut
 
-sub t_proj_nell 
+sub t_proj_nell
     { 'PDL::Transform::Proj4::nell'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_nell_h
 
-Autogenerated transformation function for Proj4 projection code nell_h. 
+Autogenerated transformation function for Proj4 projection code nell_h.
 
 The full name for this projection is Nell-Hammer.
 
 =cut
 
-sub t_proj_nell_h 
+sub t_proj_nell_h
     { 'PDL::Transform::Proj4::nell_h'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_nicol
 
-Autogenerated transformation function for Proj4 projection code nicol. 
+Autogenerated transformation function for Proj4 projection code nicol.
 
 The full name for this projection is Nicolosi Globular.
 
 =cut
 
-sub t_proj_nicol 
+sub t_proj_nicol
     { 'PDL::Transform::Proj4::nicol'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_noop
 
-Autogenerated transformation function for Proj4 projection code noop. 
+Autogenerated transformation function for Proj4 projection code noop.
 
 The full name for this projection is No operation.
 
 =cut
 
-sub t_proj_noop 
+sub t_proj_noop
     { 'PDL::Transform::Proj4::noop'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_nsper
 
-Autogenerated transformation function for Proj4 projection code nsper. 
+Autogenerated transformation function for Proj4 projection code nsper.
 
 The full name for this projection is Near-sided perspective.
 
@@ -1983,25 +2104,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_nsper 
+sub t_proj_nsper
     { 'PDL::Transform::Proj4::nsper'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_nzmg
 
-Autogenerated transformation function for Proj4 projection code nzmg. 
+Autogenerated transformation function for Proj4 projection code nzmg.
 
 The full name for this projection is New Zealand Map Grid.
 
 =cut
 
-sub t_proj_nzmg 
+sub t_proj_nzmg
     { 'PDL::Transform::Proj4::nzmg'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_ob_tran
 
-Autogenerated transformation function for Proj4 projection code ob_tran. 
+Autogenerated transformation function for Proj4 projection code ob_tran.
 
 The full name for this projection is General Oblique Transformation.
 
@@ -2035,13 +2156,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_ob_tran 
+sub t_proj_ob_tran
     { 'PDL::Transform::Proj4::ob_tran'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_ocea
 
-Autogenerated transformation function for Proj4 projection code ocea. 
+Autogenerated transformation function for Proj4 projection code ocea.
 
 The full name for this projection is Oblique Cylindrical Equal Area.
 
@@ -2063,13 +2184,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_ocea 
+sub t_proj_ocea
     { 'PDL::Transform::Proj4::ocea'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_oea
 
-Autogenerated transformation function for Proj4 projection code oea. 
+Autogenerated transformation function for Proj4 projection code oea.
 
 The full name for this projection is Oblated Equal Area.
 
@@ -2089,13 +2210,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_oea 
+sub t_proj_oea
     { 'PDL::Transform::Proj4::oea'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_omerc
 
-Autogenerated transformation function for Proj4 projection code omerc. 
+Autogenerated transformation function for Proj4 projection code omerc.
 
 The full name for this projection is Oblique Mercator.
 
@@ -2125,49 +2246,49 @@ Projection Parameters
 
 =cut
 
-sub t_proj_omerc 
+sub t_proj_omerc
     { 'PDL::Transform::Proj4::omerc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_ortel
 
-Autogenerated transformation function for Proj4 projection code ortel. 
+Autogenerated transformation function for Proj4 projection code ortel.
 
 The full name for this projection is Ortelius Oval.
 
 =cut
 
-sub t_proj_ortel 
+sub t_proj_ortel
     { 'PDL::Transform::Proj4::ortel'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_ortho
 
-Autogenerated transformation function for Proj4 projection code ortho. 
+Autogenerated transformation function for Proj4 projection code ortho.
 
 The full name for this projection is Orthographic.
 
 =cut
 
-sub t_proj_ortho 
+sub t_proj_ortho
     { 'PDL::Transform::Proj4::ortho'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_patterson
 
-Autogenerated transformation function for Proj4 projection code patterson. 
+Autogenerated transformation function for Proj4 projection code patterson.
 
 The full name for this projection is Patterson Cylindrical.
 
 =cut
 
-sub t_proj_patterson 
+sub t_proj_patterson
     { 'PDL::Transform::Proj4::patterson'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_pconic
 
-Autogenerated transformation function for Proj4 projection code pconic. 
+Autogenerated transformation function for Proj4 projection code pconic.
 
 The full name for this projection is Perspective Conic.
 
@@ -2185,205 +2306,205 @@ Projection Parameters
 
 =cut
 
-sub t_proj_pconic 
+sub t_proj_pconic
     { 'PDL::Transform::Proj4::pconic'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_peirce_q
 
-Autogenerated transformation function for Proj4 projection code peirce_q. 
+Autogenerated transformation function for Proj4 projection code peirce_q.
 
 The full name for this projection is Peirce Quincuncial.
 
 =cut
 
-sub t_proj_peirce_q 
+sub t_proj_peirce_q
     { 'PDL::Transform::Proj4::peirce_q'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_pipeline
 
-Autogenerated transformation function for Proj4 projection code pipeline. 
+Autogenerated transformation function for Proj4 projection code pipeline.
 
 The full name for this projection is Transformation pipeline manager.
 
 =cut
 
-sub t_proj_pipeline 
+sub t_proj_pipeline
     { 'PDL::Transform::Proj4::pipeline'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_poly
 
-Autogenerated transformation function for Proj4 projection code poly. 
+Autogenerated transformation function for Proj4 projection code poly.
 
 The full name for this projection is Polyconic (American).
 
 =cut
 
-sub t_proj_poly 
+sub t_proj_poly
     { 'PDL::Transform::Proj4::poly'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_pop
 
-Autogenerated transformation function for Proj4 projection code pop. 
+Autogenerated transformation function for Proj4 projection code pop.
 
 The full name for this projection is Retrieve coordinate value from pipeline stack.
 
 =cut
 
-sub t_proj_pop 
+sub t_proj_pop
     { 'PDL::Transform::Proj4::pop'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_push
 
-Autogenerated transformation function for Proj4 projection code push. 
+Autogenerated transformation function for Proj4 projection code push.
 
 The full name for this projection is Save coordinate value on pipeline stack.
 
 =cut
 
-sub t_proj_push 
+sub t_proj_push
     { 'PDL::Transform::Proj4::push'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_putp1
 
-Autogenerated transformation function for Proj4 projection code putp1. 
+Autogenerated transformation function for Proj4 projection code putp1.
 
 The full name for this projection is Putnins P1.
 
 =cut
 
-sub t_proj_putp1 
+sub t_proj_putp1
     { 'PDL::Transform::Proj4::putp1'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_putp2
 
-Autogenerated transformation function for Proj4 projection code putp2. 
+Autogenerated transformation function for Proj4 projection code putp2.
 
 The full name for this projection is Putnins P2.
 
 =cut
 
-sub t_proj_putp2 
+sub t_proj_putp2
     { 'PDL::Transform::Proj4::putp2'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_putp3
 
-Autogenerated transformation function for Proj4 projection code putp3. 
+Autogenerated transformation function for Proj4 projection code putp3.
 
 The full name for this projection is Putnins P3.
 
 =cut
 
-sub t_proj_putp3 
+sub t_proj_putp3
     { 'PDL::Transform::Proj4::putp3'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_putp3p
 
-Autogenerated transformation function for Proj4 projection code putp3p. 
+Autogenerated transformation function for Proj4 projection code putp3p.
 
 The full name for this projection is Putnins P3'.
 
 =cut
 
-sub t_proj_putp3p 
+sub t_proj_putp3p
     { 'PDL::Transform::Proj4::putp3p'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_putp4p
 
-Autogenerated transformation function for Proj4 projection code putp4p. 
+Autogenerated transformation function for Proj4 projection code putp4p.
 
 The full name for this projection is Putnins P4'.
 
 =cut
 
-sub t_proj_putp4p 
+sub t_proj_putp4p
     { 'PDL::Transform::Proj4::putp4p'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_putp5
 
-Autogenerated transformation function for Proj4 projection code putp5. 
+Autogenerated transformation function for Proj4 projection code putp5.
 
 The full name for this projection is Putnins P5.
 
 =cut
 
-sub t_proj_putp5 
+sub t_proj_putp5
     { 'PDL::Transform::Proj4::putp5'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_putp5p
 
-Autogenerated transformation function for Proj4 projection code putp5p. 
+Autogenerated transformation function for Proj4 projection code putp5p.
 
 The full name for this projection is Putnins P5'.
 
 =cut
 
-sub t_proj_putp5p 
+sub t_proj_putp5p
     { 'PDL::Transform::Proj4::putp5p'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_putp6
 
-Autogenerated transformation function for Proj4 projection code putp6. 
+Autogenerated transformation function for Proj4 projection code putp6.
 
 The full name for this projection is Putnins P6.
 
 =cut
 
-sub t_proj_putp6 
+sub t_proj_putp6
     { 'PDL::Transform::Proj4::putp6'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_putp6p
 
-Autogenerated transformation function for Proj4 projection code putp6p. 
+Autogenerated transformation function for Proj4 projection code putp6p.
 
 The full name for this projection is Putnins P6'.
 
 =cut
 
-sub t_proj_putp6p 
+sub t_proj_putp6p
     { 'PDL::Transform::Proj4::putp6p'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_qsc
 
-Autogenerated transformation function for Proj4 projection code qsc. 
+Autogenerated transformation function for Proj4 projection code qsc.
 
 The full name for this projection is Quadrilateralized Spherical Cube.
 
 =cut
 
-sub t_proj_qsc 
+sub t_proj_qsc
     { 'PDL::Transform::Proj4::qsc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_qua_aut
 
-Autogenerated transformation function for Proj4 projection code qua_aut. 
+Autogenerated transformation function for Proj4 projection code qua_aut.
 
 The full name for this projection is Quartic Authalic.
 
 =cut
 
-sub t_proj_qua_aut 
+sub t_proj_qua_aut
     { 'PDL::Transform::Proj4::qua_aut'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_rhealpix
 
-Autogenerated transformation function for Proj4 projection code rhealpix. 
+Autogenerated transformation function for Proj4 projection code rhealpix.
 
 The full name for this projection is rHEALPix.
 
@@ -2401,37 +2522,37 @@ Projection Parameters
 
 =cut
 
-sub t_proj_rhealpix 
+sub t_proj_rhealpix
     { 'PDL::Transform::Proj4::rhealpix'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_robin
 
-Autogenerated transformation function for Proj4 projection code robin. 
+Autogenerated transformation function for Proj4 projection code robin.
 
 The full name for this projection is Robinson.
 
 =cut
 
-sub t_proj_robin 
+sub t_proj_robin
     { 'PDL::Transform::Proj4::robin'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_rouss
 
-Autogenerated transformation function for Proj4 projection code rouss. 
+Autogenerated transformation function for Proj4 projection code rouss.
 
 The full name for this projection is Roussilhe Stereographic.
 
 =cut
 
-sub t_proj_rouss 
+sub t_proj_rouss
     { 'PDL::Transform::Proj4::rouss'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_rpoly
 
-Autogenerated transformation function for Proj4 projection code rpoly. 
+Autogenerated transformation function for Proj4 projection code rpoly.
 
 The full name for this projection is Rectangular Polyconic.
 
@@ -2447,25 +2568,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_rpoly 
+sub t_proj_rpoly
     { 'PDL::Transform::Proj4::rpoly'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_s2
 
-Autogenerated transformation function for Proj4 projection code s2. 
+Autogenerated transformation function for Proj4 projection code s2.
 
 The full name for this projection is S2.
 
 =cut
 
-sub t_proj_s2 
+sub t_proj_s2
     { 'PDL::Transform::Proj4::s2'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_sch
 
-Autogenerated transformation function for Proj4 projection code sch. 
+Autogenerated transformation function for Proj4 projection code sch.
 
 The full name for this projection is Spherical Cross-track Height.
 
@@ -2487,49 +2608,49 @@ Projection Parameters
 
 =cut
 
-sub t_proj_sch 
+sub t_proj_sch
     { 'PDL::Transform::Proj4::sch'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_set
 
-Autogenerated transformation function for Proj4 projection code set. 
+Autogenerated transformation function for Proj4 projection code set.
 
 The full name for this projection is Set coordinate value.
 
 =cut
 
-sub t_proj_set 
+sub t_proj_set
     { 'PDL::Transform::Proj4::set'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_sinu
 
-Autogenerated transformation function for Proj4 projection code sinu. 
+Autogenerated transformation function for Proj4 projection code sinu.
 
 The full name for this projection is Sinusoidal (Sanson-Flamsteed).
 
 =cut
 
-sub t_proj_sinu 
+sub t_proj_sinu
     { 'PDL::Transform::Proj4::sinu'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_somerc
 
-Autogenerated transformation function for Proj4 projection code somerc. 
+Autogenerated transformation function for Proj4 projection code somerc.
 
 The full name for this projection is Swiss. Obl. Mercator.
 
 =cut
 
-sub t_proj_somerc 
+sub t_proj_somerc
     { 'PDL::Transform::Proj4::somerc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_stere
 
-Autogenerated transformation function for Proj4 projection code stere. 
+Autogenerated transformation function for Proj4 projection code stere.
 
 The full name for this projection is Stereographic.
 
@@ -2545,73 +2666,73 @@ Projection Parameters
 
 =cut
 
-sub t_proj_stere 
+sub t_proj_stere
     { 'PDL::Transform::Proj4::stere'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_sterea
 
-Autogenerated transformation function for Proj4 projection code sterea. 
+Autogenerated transformation function for Proj4 projection code sterea.
 
 The full name for this projection is Oblique Stereographic Alternative.
 
 =cut
 
-sub t_proj_sterea 
+sub t_proj_sterea
     { 'PDL::Transform::Proj4::sterea'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_tcc
 
-Autogenerated transformation function for Proj4 projection code tcc. 
+Autogenerated transformation function for Proj4 projection code tcc.
 
 The full name for this projection is Transverse Central Cylindrical.
 
 =cut
 
-sub t_proj_tcc 
+sub t_proj_tcc
     { 'PDL::Transform::Proj4::tcc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_tcea
 
-Autogenerated transformation function for Proj4 projection code tcea. 
+Autogenerated transformation function for Proj4 projection code tcea.
 
 The full name for this projection is Transverse Cylindrical Equal Area.
 
 =cut
 
-sub t_proj_tcea 
+sub t_proj_tcea
     { 'PDL::Transform::Proj4::tcea'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_times
 
-Autogenerated transformation function for Proj4 projection code times. 
+Autogenerated transformation function for Proj4 projection code times.
 
 The full name for this projection is Times.
 
 =cut
 
-sub t_proj_times 
+sub t_proj_times
     { 'PDL::Transform::Proj4::times'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_tinshift
 
-Autogenerated transformation function for Proj4 projection code tinshift. 
+Autogenerated transformation function for Proj4 projection code tinshift.
 
 The full name for this projection is Triangulation based transformation.
 
 =cut
 
-sub t_proj_tinshift 
+sub t_proj_tinshift
     { 'PDL::Transform::Proj4::tinshift'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_tissot
 
-Autogenerated transformation function for Proj4 projection code tissot. 
+Autogenerated transformation function for Proj4 projection code tissot.
 
 The full name for this projection is Tissot.
 
@@ -2629,13 +2750,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_tissot 
+sub t_proj_tissot
     { 'PDL::Transform::Proj4::tissot'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_tmerc
 
-Autogenerated transformation function for Proj4 projection code tmerc. 
+Autogenerated transformation function for Proj4 projection code tmerc.
 
 The full name for this projection is Transverse Mercator.
 
@@ -2651,37 +2772,37 @@ Projection Parameters
 
 =cut
 
-sub t_proj_tmerc 
+sub t_proj_tmerc
     { 'PDL::Transform::Proj4::tmerc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_tobmerc
 
-Autogenerated transformation function for Proj4 projection code tobmerc. 
+Autogenerated transformation function for Proj4 projection code tobmerc.
 
 The full name for this projection is Tobler-Mercator.
 
 =cut
 
-sub t_proj_tobmerc 
+sub t_proj_tobmerc
     { 'PDL::Transform::Proj4::tobmerc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_topocentric
 
-Autogenerated transformation function for Proj4 projection code topocentric. 
+Autogenerated transformation function for Proj4 projection code topocentric.
 
 The full name for this projection is Geocentric/Topocentric conversion.
 
 =cut
 
-sub t_proj_topocentric 
+sub t_proj_topocentric
     { 'PDL::Transform::Proj4::topocentric'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_tpeqd
 
-Autogenerated transformation function for Proj4 projection code tpeqd. 
+Autogenerated transformation function for Proj4 projection code tpeqd.
 
 The full name for this projection is Two Point Equidistant.
 
@@ -2703,13 +2824,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_tpeqd 
+sub t_proj_tpeqd
     { 'PDL::Transform::Proj4::tpeqd'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_tpers
 
-Autogenerated transformation function for Proj4 projection code tpers. 
+Autogenerated transformation function for Proj4 projection code tpers.
 
 The full name for this projection is Tilted perspective.
 
@@ -2729,25 +2850,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_tpers 
+sub t_proj_tpers
     { 'PDL::Transform::Proj4::tpers'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_unitconvert
 
-Autogenerated transformation function for Proj4 projection code unitconvert. 
+Autogenerated transformation function for Proj4 projection code unitconvert.
 
 The full name for this projection is Unit conversion.
 
 =cut
 
-sub t_proj_unitconvert 
+sub t_proj_unitconvert
     { 'PDL::Transform::Proj4::unitconvert'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_ups
 
-Autogenerated transformation function for Proj4 projection code ups. 
+Autogenerated transformation function for Proj4 projection code ups.
 
 The full name for this projection is Universal Polar Stereographic.
 
@@ -2763,13 +2884,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_ups 
+sub t_proj_ups
     { 'PDL::Transform::Proj4::ups'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_urm5
 
-Autogenerated transformation function for Proj4 projection code urm5. 
+Autogenerated transformation function for Proj4 projection code urm5.
 
 The full name for this projection is Urmaev V.
 
@@ -2789,13 +2910,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_urm5 
+sub t_proj_urm5
     { 'PDL::Transform::Proj4::urm5'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_urmfps
 
-Autogenerated transformation function for Proj4 projection code urmfps. 
+Autogenerated transformation function for Proj4 projection code urmfps.
 
 The full name for this projection is Urmaev Flat-Polar Sinusoidal.
 
@@ -2811,13 +2932,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_urmfps 
+sub t_proj_urmfps
     { 'PDL::Transform::Proj4::urmfps'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_utm
 
-Autogenerated transformation function for Proj4 projection code utm. 
+Autogenerated transformation function for Proj4 projection code utm.
 
 The full name for this projection is Universal Transverse Mercator (UTM).
 
@@ -2837,73 +2958,73 @@ Projection Parameters
 
 =cut
 
-sub t_proj_utm 
+sub t_proj_utm
     { 'PDL::Transform::Proj4::utm'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_vandg
 
-Autogenerated transformation function for Proj4 projection code vandg. 
+Autogenerated transformation function for Proj4 projection code vandg.
 
 The full name for this projection is van der Grinten (I).
 
 =cut
 
-sub t_proj_vandg 
+sub t_proj_vandg
     { 'PDL::Transform::Proj4::vandg'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_vandg2
 
-Autogenerated transformation function for Proj4 projection code vandg2. 
+Autogenerated transformation function for Proj4 projection code vandg2.
 
 The full name for this projection is van der Grinten II.
 
 =cut
 
-sub t_proj_vandg2 
+sub t_proj_vandg2
     { 'PDL::Transform::Proj4::vandg2'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_vandg3
 
-Autogenerated transformation function for Proj4 projection code vandg3. 
+Autogenerated transformation function for Proj4 projection code vandg3.
 
 The full name for this projection is van der Grinten III.
 
 =cut
 
-sub t_proj_vandg3 
+sub t_proj_vandg3
     { 'PDL::Transform::Proj4::vandg3'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_vandg4
 
-Autogenerated transformation function for Proj4 projection code vandg4. 
+Autogenerated transformation function for Proj4 projection code vandg4.
 
 The full name for this projection is van der Grinten IV.
 
 =cut
 
-sub t_proj_vandg4 
+sub t_proj_vandg4
     { 'PDL::Transform::Proj4::vandg4'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_vgridshift
 
-Autogenerated transformation function for Proj4 projection code vgridshift. 
+Autogenerated transformation function for Proj4 projection code vgridshift.
 
 The full name for this projection is Vertical grid shift.
 
 =cut
 
-sub t_proj_vgridshift 
+sub t_proj_vgridshift
     { 'PDL::Transform::Proj4::vgridshift'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_vitk1
 
-Autogenerated transformation function for Proj4 projection code vitk1. 
+Autogenerated transformation function for Proj4 projection code vitk1.
 
 The full name for this projection is Vitkovsky I.
 
@@ -2921,37 +3042,37 @@ Projection Parameters
 
 =cut
 
-sub t_proj_vitk1 
+sub t_proj_vitk1
     { 'PDL::Transform::Proj4::vitk1'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_wag1
 
-Autogenerated transformation function for Proj4 projection code wag1. 
+Autogenerated transformation function for Proj4 projection code wag1.
 
 The full name for this projection is Wagner I (Kavraisky VI).
 
 =cut
 
-sub t_proj_wag1 
+sub t_proj_wag1
     { 'PDL::Transform::Proj4::wag1'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_wag2
 
-Autogenerated transformation function for Proj4 projection code wag2. 
+Autogenerated transformation function for Proj4 projection code wag2.
 
 The full name for this projection is Wagner II.
 
 =cut
 
-sub t_proj_wag2 
+sub t_proj_wag2
     { 'PDL::Transform::Proj4::wag2'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_wag3
 
-Autogenerated transformation function for Proj4 projection code wag3. 
+Autogenerated transformation function for Proj4 projection code wag3.
 
 The full name for this projection is Wagner III.
 
@@ -2967,85 +3088,85 @@ Projection Parameters
 
 =cut
 
-sub t_proj_wag3 
+sub t_proj_wag3
     { 'PDL::Transform::Proj4::wag3'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_wag4
 
-Autogenerated transformation function for Proj4 projection code wag4. 
+Autogenerated transformation function for Proj4 projection code wag4.
 
 The full name for this projection is Wagner IV.
 
 =cut
 
-sub t_proj_wag4 
+sub t_proj_wag4
     { 'PDL::Transform::Proj4::wag4'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_wag5
 
-Autogenerated transformation function for Proj4 projection code wag5. 
+Autogenerated transformation function for Proj4 projection code wag5.
 
 The full name for this projection is Wagner V.
 
 =cut
 
-sub t_proj_wag5 
+sub t_proj_wag5
     { 'PDL::Transform::Proj4::wag5'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_wag6
 
-Autogenerated transformation function for Proj4 projection code wag6. 
+Autogenerated transformation function for Proj4 projection code wag6.
 
 The full name for this projection is Wagner VI.
 
 =cut
 
-sub t_proj_wag6 
+sub t_proj_wag6
     { 'PDL::Transform::Proj4::wag6'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_wag7
 
-Autogenerated transformation function for Proj4 projection code wag7. 
+Autogenerated transformation function for Proj4 projection code wag7.
 
 The full name for this projection is Wagner VII.
 
 =cut
 
-sub t_proj_wag7 
+sub t_proj_wag7
     { 'PDL::Transform::Proj4::wag7'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_webmerc
 
-Autogenerated transformation function for Proj4 projection code webmerc. 
+Autogenerated transformation function for Proj4 projection code webmerc.
 
 The full name for this projection is Web Mercator / Pseudo Mercator.
 
 =cut
 
-sub t_proj_webmerc 
+sub t_proj_webmerc
     { 'PDL::Transform::Proj4::webmerc'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_weren
 
-Autogenerated transformation function for Proj4 projection code weren. 
+Autogenerated transformation function for Proj4 projection code weren.
 
 The full name for this projection is Werenskiold I.
 
 =cut
 
-sub t_proj_weren 
+sub t_proj_weren
     { 'PDL::Transform::Proj4::weren'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_wink1
 
-Autogenerated transformation function for Proj4 projection code wink1. 
+Autogenerated transformation function for Proj4 projection code wink1.
 
 The full name for this projection is Winkel I.
 
@@ -3061,13 +3182,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_wink1 
+sub t_proj_wink1
     { 'PDL::Transform::Proj4::wink1'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_wink2
 
-Autogenerated transformation function for Proj4 projection code wink2. 
+Autogenerated transformation function for Proj4 projection code wink2.
 
 The full name for this projection is Winkel II.
 
@@ -3083,13 +3204,13 @@ Projection Parameters
 
 =cut
 
-sub t_proj_wink2 
+sub t_proj_wink2
     { 'PDL::Transform::Proj4::wink2'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_wintri
 
-Autogenerated transformation function for Proj4 projection code wintri. 
+Autogenerated transformation function for Proj4 projection code wintri.
 
 The full name for this projection is Winkel Tripel.
 
@@ -3105,34 +3226,23 @@ Projection Parameters
 
 =cut
 
-sub t_proj_wintri 
+sub t_proj_wintri
     { 'PDL::Transform::Proj4::wintri'->new( @_ ); }
-#line 451 "Proj4.pd"
+#line 629 "proj4.pd"
 
 =head2 t_proj_xyzgridshift
 
-Autogenerated transformation function for Proj4 projection code xyzgridshift. 
+Autogenerated transformation function for Proj4 projection code xyzgridshift.
 
 The full name for this projection is Geocentric grid shift.
 
 =cut
 
-sub t_proj_xyzgridshift 
+sub t_proj_xyzgridshift
     { 'PDL::Transform::Proj4::xyzgridshift'->new( @_ ); }
-#line 3123 "Proj4.pm"
+#line 565 "proj4.pd"
 
-*_proj4_dummy = \&PDL::_proj4_dummy;
-
-
-
-
-
-
-
-#line 434 "Proj4.pd"
-
-#line 379 "Proj4.pd"
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    adams_hemi
 #
 package # hide from PAUSE
@@ -3150,7 +3260,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3174,9 +3284,9 @@ sub new
 } # End of PDL::Transform::adams_hemi::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    adams_ws1
 #
 package # hide from PAUSE
@@ -3194,7 +3304,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3218,9 +3328,9 @@ sub new
 } # End of PDL::Transform::adams_ws1::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    adams_ws2
 #
 package # hide from PAUSE
@@ -3238,7 +3348,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3262,9 +3372,9 @@ sub new
 } # End of PDL::Transform::adams_ws2::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    aea
 #
 package # hide from PAUSE
@@ -3282,7 +3392,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3306,9 +3416,9 @@ sub new
 } # End of PDL::Transform::aea::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    aeqd
 #
 package # hide from PAUSE
@@ -3326,7 +3436,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3350,9 +3460,9 @@ sub new
 } # End of PDL::Transform::aeqd::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    affine
 #
 package # hide from PAUSE
@@ -3370,7 +3480,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3394,9 +3504,9 @@ sub new
 } # End of PDL::Transform::affine::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    airy
 #
 package # hide from PAUSE
@@ -3414,7 +3524,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3438,9 +3548,9 @@ sub new
 } # End of PDL::Transform::airy::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    aitoff
 #
 package # hide from PAUSE
@@ -3458,7 +3568,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3482,9 +3592,9 @@ sub new
 } # End of PDL::Transform::aitoff::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    alsk
 #
 package # hide from PAUSE
@@ -3502,7 +3612,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3526,9 +3636,9 @@ sub new
 } # End of PDL::Transform::alsk::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    apian
 #
 package # hide from PAUSE
@@ -3546,7 +3656,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3570,9 +3680,9 @@ sub new
 } # End of PDL::Transform::apian::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    august
 #
 package # hide from PAUSE
@@ -3590,7 +3700,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3614,9 +3724,9 @@ sub new
 } # End of PDL::Transform::august::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    axisswap
 #
 package # hide from PAUSE
@@ -3634,7 +3744,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3658,9 +3768,9 @@ sub new
 } # End of PDL::Transform::axisswap::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    bacon
 #
 package # hide from PAUSE
@@ -3678,7 +3788,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3702,9 +3812,9 @@ sub new
 } # End of PDL::Transform::bacon::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    bertin1953
 #
 package # hide from PAUSE
@@ -3722,7 +3832,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3746,9 +3856,9 @@ sub new
 } # End of PDL::Transform::bertin1953::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    bipc
 #
 package # hide from PAUSE
@@ -3766,7 +3876,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3790,9 +3900,9 @@ sub new
 } # End of PDL::Transform::bipc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    boggs
 #
 package # hide from PAUSE
@@ -3810,7 +3920,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3834,9 +3944,9 @@ sub new
 } # End of PDL::Transform::boggs::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    bonne
 #
 package # hide from PAUSE
@@ -3854,7 +3964,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3878,9 +3988,9 @@ sub new
 } # End of PDL::Transform::bonne::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    calcofi
 #
 package # hide from PAUSE
@@ -3898,7 +4008,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3922,9 +4032,9 @@ sub new
 } # End of PDL::Transform::calcofi::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    cart
 #
 package # hide from PAUSE
@@ -3942,7 +4052,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -3966,9 +4076,9 @@ sub new
 } # End of PDL::Transform::cart::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    cass
 #
 package # hide from PAUSE
@@ -3986,7 +4096,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4010,9 +4120,9 @@ sub new
 } # End of PDL::Transform::cass::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    cc
 #
 package # hide from PAUSE
@@ -4030,7 +4140,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4054,9 +4164,9 @@ sub new
 } # End of PDL::Transform::cc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    ccon
 #
 package # hide from PAUSE
@@ -4074,7 +4184,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4098,9 +4208,9 @@ sub new
 } # End of PDL::Transform::ccon::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    cea
 #
 package # hide from PAUSE
@@ -4118,7 +4228,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4142,9 +4252,9 @@ sub new
 } # End of PDL::Transform::cea::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    chamb
 #
 package # hide from PAUSE
@@ -4162,7 +4272,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4186,9 +4296,9 @@ sub new
 } # End of PDL::Transform::chamb::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    col_urban
 #
 package # hide from PAUSE
@@ -4206,7 +4316,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4230,9 +4340,9 @@ sub new
 } # End of PDL::Transform::col_urban::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    collg
 #
 package # hide from PAUSE
@@ -4250,7 +4360,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4274,9 +4384,9 @@ sub new
 } # End of PDL::Transform::collg::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    comill
 #
 package # hide from PAUSE
@@ -4294,7 +4404,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4318,9 +4428,9 @@ sub new
 } # End of PDL::Transform::comill::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    crast
 #
 package # hide from PAUSE
@@ -4338,7 +4448,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4362,9 +4472,9 @@ sub new
 } # End of PDL::Transform::crast::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    defmodel
 #
 package # hide from PAUSE
@@ -4382,7 +4492,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4406,9 +4516,9 @@ sub new
 } # End of PDL::Transform::defmodel::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    deformation
 #
 package # hide from PAUSE
@@ -4426,7 +4536,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4450,9 +4560,9 @@ sub new
 } # End of PDL::Transform::deformation::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    denoy
 #
 package # hide from PAUSE
@@ -4470,7 +4580,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4494,9 +4604,9 @@ sub new
 } # End of PDL::Transform::denoy::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    eck1
 #
 package # hide from PAUSE
@@ -4514,7 +4624,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4538,9 +4648,9 @@ sub new
 } # End of PDL::Transform::eck1::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    eck2
 #
 package # hide from PAUSE
@@ -4558,7 +4668,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4582,9 +4692,9 @@ sub new
 } # End of PDL::Transform::eck2::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    eck3
 #
 package # hide from PAUSE
@@ -4602,7 +4712,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4626,9 +4736,9 @@ sub new
 } # End of PDL::Transform::eck3::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    eck4
 #
 package # hide from PAUSE
@@ -4646,7 +4756,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4670,9 +4780,9 @@ sub new
 } # End of PDL::Transform::eck4::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    eck5
 #
 package # hide from PAUSE
@@ -4690,7 +4800,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4714,9 +4824,9 @@ sub new
 } # End of PDL::Transform::eck5::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    eck6
 #
 package # hide from PAUSE
@@ -4734,7 +4844,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4758,9 +4868,9 @@ sub new
 } # End of PDL::Transform::eck6::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    eqc
 #
 package # hide from PAUSE
@@ -4778,7 +4888,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4802,9 +4912,9 @@ sub new
 } # End of PDL::Transform::eqc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    eqdc
 #
 package # hide from PAUSE
@@ -4822,7 +4932,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4846,9 +4956,9 @@ sub new
 } # End of PDL::Transform::eqdc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    eqearth
 #
 package # hide from PAUSE
@@ -4866,7 +4976,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4890,9 +5000,9 @@ sub new
 } # End of PDL::Transform::eqearth::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    etmerc
 #
 package # hide from PAUSE
@@ -4910,7 +5020,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4934,9 +5044,9 @@ sub new
 } # End of PDL::Transform::etmerc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    euler
 #
 package # hide from PAUSE
@@ -4954,7 +5064,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -4978,9 +5088,9 @@ sub new
 } # End of PDL::Transform::euler::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    fahey
 #
 package # hide from PAUSE
@@ -4998,7 +5108,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5022,9 +5132,9 @@ sub new
 } # End of PDL::Transform::fahey::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    fouc
 #
 package # hide from PAUSE
@@ -5042,7 +5152,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5066,9 +5176,9 @@ sub new
 } # End of PDL::Transform::fouc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    fouc_s
 #
 package # hide from PAUSE
@@ -5086,7 +5196,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5110,9 +5220,9 @@ sub new
 } # End of PDL::Transform::fouc_s::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    gall
 #
 package # hide from PAUSE
@@ -5130,7 +5240,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5154,9 +5264,9 @@ sub new
 } # End of PDL::Transform::gall::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    geoc
 #
 package # hide from PAUSE
@@ -5174,7 +5284,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5198,53 +5308,9 @@ sub new
 } # End of PDL::Transform::geoc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
-#    geocent
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::geocent;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::geocent::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) ) 
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Geocentric";
-    $self->{proj_code} = "geocent";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::geocent::new()...
-
-1;
-#line 379 "Proj4.pd"
-
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    geogoffset
 #
 package # hide from PAUSE
@@ -5262,7 +5328,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5286,9 +5352,9 @@ sub new
 } # End of PDL::Transform::geogoffset::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    geos
 #
 package # hide from PAUSE
@@ -5306,7 +5372,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5330,9 +5396,9 @@ sub new
 } # End of PDL::Transform::geos::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    gins8
 #
 package # hide from PAUSE
@@ -5350,7 +5416,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5374,9 +5440,9 @@ sub new
 } # End of PDL::Transform::gins8::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    gn_sinu
 #
 package # hide from PAUSE
@@ -5394,7 +5460,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5418,9 +5484,9 @@ sub new
 } # End of PDL::Transform::gn_sinu::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    gnom
 #
 package # hide from PAUSE
@@ -5438,7 +5504,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5462,9 +5528,9 @@ sub new
 } # End of PDL::Transform::gnom::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    goode
 #
 package # hide from PAUSE
@@ -5482,7 +5548,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5506,9 +5572,9 @@ sub new
 } # End of PDL::Transform::goode::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    gs48
 #
 package # hide from PAUSE
@@ -5526,7 +5592,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5550,9 +5616,9 @@ sub new
 } # End of PDL::Transform::gs48::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    gs50
 #
 package # hide from PAUSE
@@ -5570,7 +5636,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5594,9 +5660,9 @@ sub new
 } # End of PDL::Transform::gs50::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    gstmerc
 #
 package # hide from PAUSE
@@ -5614,7 +5680,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5638,9 +5704,9 @@ sub new
 } # End of PDL::Transform::gstmerc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    guyou
 #
 package # hide from PAUSE
@@ -5658,7 +5724,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5682,9 +5748,9 @@ sub new
 } # End of PDL::Transform::guyou::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    hammer
 #
 package # hide from PAUSE
@@ -5702,7 +5768,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5726,9 +5792,9 @@ sub new
 } # End of PDL::Transform::hammer::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    hatano
 #
 package # hide from PAUSE
@@ -5746,7 +5812,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5770,9 +5836,9 @@ sub new
 } # End of PDL::Transform::hatano::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    healpix
 #
 package # hide from PAUSE
@@ -5790,7 +5856,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5814,9 +5880,9 @@ sub new
 } # End of PDL::Transform::healpix::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    helmert
 #
 package # hide from PAUSE
@@ -5834,7 +5900,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5858,9 +5924,9 @@ sub new
 } # End of PDL::Transform::helmert::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    hgridshift
 #
 package # hide from PAUSE
@@ -5878,7 +5944,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5902,9 +5968,9 @@ sub new
 } # End of PDL::Transform::hgridshift::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    horner
 #
 package # hide from PAUSE
@@ -5922,7 +5988,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5946,9 +6012,9 @@ sub new
 } # End of PDL::Transform::horner::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    igh
 #
 package # hide from PAUSE
@@ -5966,7 +6032,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -5990,9 +6056,9 @@ sub new
 } # End of PDL::Transform::igh::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    igh_o
 #
 package # hide from PAUSE
@@ -6010,7 +6076,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6034,9 +6100,9 @@ sub new
 } # End of PDL::Transform::igh_o::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    imw_p
 #
 package # hide from PAUSE
@@ -6054,7 +6120,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6078,9 +6144,9 @@ sub new
 } # End of PDL::Transform::imw_p::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    isea
 #
 package # hide from PAUSE
@@ -6098,7 +6164,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6122,9 +6188,9 @@ sub new
 } # End of PDL::Transform::isea::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    kav5
 #
 package # hide from PAUSE
@@ -6142,7 +6208,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6166,9 +6232,9 @@ sub new
 } # End of PDL::Transform::kav5::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    kav7
 #
 package # hide from PAUSE
@@ -6186,7 +6252,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6210,9 +6276,9 @@ sub new
 } # End of PDL::Transform::kav7::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    krovak
 #
 package # hide from PAUSE
@@ -6230,7 +6296,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6254,9 +6320,9 @@ sub new
 } # End of PDL::Transform::krovak::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    labrd
 #
 package # hide from PAUSE
@@ -6274,7 +6340,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6298,9 +6364,9 @@ sub new
 } # End of PDL::Transform::labrd::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    laea
 #
 package # hide from PAUSE
@@ -6318,7 +6384,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6342,9 +6408,9 @@ sub new
 } # End of PDL::Transform::laea::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    lagrng
 #
 package # hide from PAUSE
@@ -6362,7 +6428,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6386,9 +6452,9 @@ sub new
 } # End of PDL::Transform::lagrng::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    larr
 #
 package # hide from PAUSE
@@ -6406,7 +6472,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6430,9 +6496,9 @@ sub new
 } # End of PDL::Transform::larr::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    lask
 #
 package # hide from PAUSE
@@ -6450,7 +6516,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6474,9 +6540,9 @@ sub new
 } # End of PDL::Transform::lask::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    latlon
 #
 package # hide from PAUSE
@@ -6494,7 +6560,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6518,53 +6584,9 @@ sub new
 } # End of PDL::Transform::latlon::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
-#    latlong
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::latlong;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::latlong::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) ) 
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Lat/long (Geodetic alias)";
-    $self->{proj_code} = "latlong";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::latlong::new()...
-
-1;
-#line 379 "Proj4.pd"
-
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    lcc
 #
 package # hide from PAUSE
@@ -6582,7 +6604,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6606,9 +6628,9 @@ sub new
 } # End of PDL::Transform::lcc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    lcca
 #
 package # hide from PAUSE
@@ -6626,7 +6648,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6650,9 +6672,9 @@ sub new
 } # End of PDL::Transform::lcca::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    leac
 #
 package # hide from PAUSE
@@ -6670,7 +6692,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6694,9 +6716,9 @@ sub new
 } # End of PDL::Transform::leac::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    lee_os
 #
 package # hide from PAUSE
@@ -6714,7 +6736,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6738,53 +6760,9 @@ sub new
 } # End of PDL::Transform::lee_os::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
-#    longlat
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::longlat;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::longlat::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) ) 
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Lat/long (Geodetic alias)";
-    $self->{proj_code} = "longlat";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::longlat::new()...
-
-1;
-#line 379 "Proj4.pd"
-
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    lonlat
 #
 package # hide from PAUSE
@@ -6802,7 +6780,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6826,9 +6804,9 @@ sub new
 } # End of PDL::Transform::lonlat::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    loxim
 #
 package # hide from PAUSE
@@ -6846,7 +6824,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6870,9 +6848,9 @@ sub new
 } # End of PDL::Transform::loxim::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    lsat
 #
 package # hide from PAUSE
@@ -6890,7 +6868,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6914,9 +6892,9 @@ sub new
 } # End of PDL::Transform::lsat::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    mbt_fps
 #
 package # hide from PAUSE
@@ -6934,7 +6912,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -6958,9 +6936,9 @@ sub new
 } # End of PDL::Transform::mbt_fps::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    mbt_s
 #
 package # hide from PAUSE
@@ -6978,7 +6956,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7002,9 +6980,9 @@ sub new
 } # End of PDL::Transform::mbt_s::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    mbtfpp
 #
 package # hide from PAUSE
@@ -7022,7 +7000,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7046,9 +7024,9 @@ sub new
 } # End of PDL::Transform::mbtfpp::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    mbtfpq
 #
 package # hide from PAUSE
@@ -7066,7 +7044,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7090,9 +7068,9 @@ sub new
 } # End of PDL::Transform::mbtfpq::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    mbtfps
 #
 package # hide from PAUSE
@@ -7110,7 +7088,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7134,9 +7112,9 @@ sub new
 } # End of PDL::Transform::mbtfps::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    merc
 #
 package # hide from PAUSE
@@ -7154,7 +7132,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7178,9 +7156,9 @@ sub new
 } # End of PDL::Transform::merc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    mil_os
 #
 package # hide from PAUSE
@@ -7198,7 +7176,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7222,9 +7200,9 @@ sub new
 } # End of PDL::Transform::mil_os::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    mill
 #
 package # hide from PAUSE
@@ -7242,7 +7220,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7266,9 +7244,9 @@ sub new
 } # End of PDL::Transform::mill::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    misrsom
 #
 package # hide from PAUSE
@@ -7286,7 +7264,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7310,9 +7288,9 @@ sub new
 } # End of PDL::Transform::misrsom::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    moll
 #
 package # hide from PAUSE
@@ -7330,7 +7308,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7354,9 +7332,9 @@ sub new
 } # End of PDL::Transform::moll::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    molobadekas
 #
 package # hide from PAUSE
@@ -7374,7 +7352,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7398,9 +7376,9 @@ sub new
 } # End of PDL::Transform::molobadekas::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    molodensky
 #
 package # hide from PAUSE
@@ -7418,7 +7396,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7442,9 +7420,9 @@ sub new
 } # End of PDL::Transform::molodensky::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    murd1
 #
 package # hide from PAUSE
@@ -7462,7 +7440,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7486,9 +7464,9 @@ sub new
 } # End of PDL::Transform::murd1::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    murd2
 #
 package # hide from PAUSE
@@ -7506,7 +7484,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7530,9 +7508,9 @@ sub new
 } # End of PDL::Transform::murd2::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    murd3
 #
 package # hide from PAUSE
@@ -7550,7 +7528,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7574,9 +7552,9 @@ sub new
 } # End of PDL::Transform::murd3::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    natearth
 #
 package # hide from PAUSE
@@ -7594,7 +7572,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7618,9 +7596,9 @@ sub new
 } # End of PDL::Transform::natearth::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    natearth2
 #
 package # hide from PAUSE
@@ -7638,7 +7616,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7662,9 +7640,9 @@ sub new
 } # End of PDL::Transform::natearth2::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    nell
 #
 package # hide from PAUSE
@@ -7682,7 +7660,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7706,9 +7684,9 @@ sub new
 } # End of PDL::Transform::nell::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    nell_h
 #
 package # hide from PAUSE
@@ -7726,7 +7704,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7750,9 +7728,9 @@ sub new
 } # End of PDL::Transform::nell_h::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    nicol
 #
 package # hide from PAUSE
@@ -7770,7 +7748,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7794,9 +7772,9 @@ sub new
 } # End of PDL::Transform::nicol::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    noop
 #
 package # hide from PAUSE
@@ -7814,7 +7792,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7838,9 +7816,9 @@ sub new
 } # End of PDL::Transform::noop::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    nsper
 #
 package # hide from PAUSE
@@ -7858,7 +7836,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7882,9 +7860,9 @@ sub new
 } # End of PDL::Transform::nsper::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    nzmg
 #
 package # hide from PAUSE
@@ -7902,7 +7880,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7926,9 +7904,9 @@ sub new
 } # End of PDL::Transform::nzmg::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    ob_tran
 #
 package # hide from PAUSE
@@ -7946,7 +7924,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -7970,9 +7948,9 @@ sub new
 } # End of PDL::Transform::ob_tran::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    ocea
 #
 package # hide from PAUSE
@@ -7990,7 +7968,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8014,9 +7992,9 @@ sub new
 } # End of PDL::Transform::ocea::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    oea
 #
 package # hide from PAUSE
@@ -8034,7 +8012,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8058,9 +8036,9 @@ sub new
 } # End of PDL::Transform::oea::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    omerc
 #
 package # hide from PAUSE
@@ -8078,7 +8056,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8102,9 +8080,9 @@ sub new
 } # End of PDL::Transform::omerc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    ortel
 #
 package # hide from PAUSE
@@ -8122,7 +8100,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8146,9 +8124,9 @@ sub new
 } # End of PDL::Transform::ortel::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    ortho
 #
 package # hide from PAUSE
@@ -8166,7 +8144,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8190,9 +8168,9 @@ sub new
 } # End of PDL::Transform::ortho::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    patterson
 #
 package # hide from PAUSE
@@ -8210,7 +8188,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8234,9 +8212,9 @@ sub new
 } # End of PDL::Transform::patterson::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    pconic
 #
 package # hide from PAUSE
@@ -8254,7 +8232,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8278,9 +8256,9 @@ sub new
 } # End of PDL::Transform::pconic::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    peirce_q
 #
 package # hide from PAUSE
@@ -8298,7 +8276,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8322,9 +8300,9 @@ sub new
 } # End of PDL::Transform::peirce_q::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    pipeline
 #
 package # hide from PAUSE
@@ -8342,7 +8320,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8366,9 +8344,9 @@ sub new
 } # End of PDL::Transform::pipeline::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    poly
 #
 package # hide from PAUSE
@@ -8386,7 +8364,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8410,9 +8388,9 @@ sub new
 } # End of PDL::Transform::poly::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    pop
 #
 package # hide from PAUSE
@@ -8430,7 +8408,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8454,9 +8432,9 @@ sub new
 } # End of PDL::Transform::pop::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    push
 #
 package # hide from PAUSE
@@ -8474,7 +8452,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8498,9 +8476,9 @@ sub new
 } # End of PDL::Transform::push::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    putp1
 #
 package # hide from PAUSE
@@ -8518,7 +8496,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8542,9 +8520,9 @@ sub new
 } # End of PDL::Transform::putp1::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    putp2
 #
 package # hide from PAUSE
@@ -8562,7 +8540,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8586,9 +8564,9 @@ sub new
 } # End of PDL::Transform::putp2::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    putp3
 #
 package # hide from PAUSE
@@ -8606,7 +8584,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8630,9 +8608,9 @@ sub new
 } # End of PDL::Transform::putp3::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    putp3p
 #
 package # hide from PAUSE
@@ -8650,7 +8628,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8674,9 +8652,9 @@ sub new
 } # End of PDL::Transform::putp3p::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    putp4p
 #
 package # hide from PAUSE
@@ -8694,7 +8672,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8718,9 +8696,9 @@ sub new
 } # End of PDL::Transform::putp4p::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    putp5
 #
 package # hide from PAUSE
@@ -8738,7 +8716,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8762,9 +8740,9 @@ sub new
 } # End of PDL::Transform::putp5::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    putp5p
 #
 package # hide from PAUSE
@@ -8782,7 +8760,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8806,9 +8784,9 @@ sub new
 } # End of PDL::Transform::putp5p::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    putp6
 #
 package # hide from PAUSE
@@ -8826,7 +8804,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8850,9 +8828,9 @@ sub new
 } # End of PDL::Transform::putp6::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    putp6p
 #
 package # hide from PAUSE
@@ -8870,7 +8848,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8894,9 +8872,9 @@ sub new
 } # End of PDL::Transform::putp6p::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    qsc
 #
 package # hide from PAUSE
@@ -8914,7 +8892,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8938,9 +8916,9 @@ sub new
 } # End of PDL::Transform::qsc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    qua_aut
 #
 package # hide from PAUSE
@@ -8958,7 +8936,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -8982,9 +8960,9 @@ sub new
 } # End of PDL::Transform::qua_aut::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    rhealpix
 #
 package # hide from PAUSE
@@ -9002,7 +8980,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9026,9 +9004,9 @@ sub new
 } # End of PDL::Transform::rhealpix::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    robin
 #
 package # hide from PAUSE
@@ -9046,7 +9024,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9070,9 +9048,9 @@ sub new
 } # End of PDL::Transform::robin::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    rouss
 #
 package # hide from PAUSE
@@ -9090,7 +9068,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9114,9 +9092,9 @@ sub new
 } # End of PDL::Transform::rouss::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    rpoly
 #
 package # hide from PAUSE
@@ -9134,7 +9112,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9158,9 +9136,9 @@ sub new
 } # End of PDL::Transform::rpoly::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    s2
 #
 package # hide from PAUSE
@@ -9178,7 +9156,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9202,9 +9180,9 @@ sub new
 } # End of PDL::Transform::s2::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    sch
 #
 package # hide from PAUSE
@@ -9222,7 +9200,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9246,9 +9224,9 @@ sub new
 } # End of PDL::Transform::sch::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    set
 #
 package # hide from PAUSE
@@ -9266,7 +9244,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9290,9 +9268,9 @@ sub new
 } # End of PDL::Transform::set::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    sinu
 #
 package # hide from PAUSE
@@ -9310,7 +9288,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9334,9 +9312,9 @@ sub new
 } # End of PDL::Transform::sinu::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    somerc
 #
 package # hide from PAUSE
@@ -9354,7 +9332,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9378,9 +9356,9 @@ sub new
 } # End of PDL::Transform::somerc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    stere
 #
 package # hide from PAUSE
@@ -9398,7 +9376,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9422,9 +9400,9 @@ sub new
 } # End of PDL::Transform::stere::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    sterea
 #
 package # hide from PAUSE
@@ -9442,7 +9420,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9466,9 +9444,9 @@ sub new
 } # End of PDL::Transform::sterea::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    tcc
 #
 package # hide from PAUSE
@@ -9486,7 +9464,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9510,9 +9488,9 @@ sub new
 } # End of PDL::Transform::tcc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    tcea
 #
 package # hide from PAUSE
@@ -9530,7 +9508,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9554,9 +9532,9 @@ sub new
 } # End of PDL::Transform::tcea::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    times
 #
 package # hide from PAUSE
@@ -9574,7 +9552,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9598,9 +9576,9 @@ sub new
 } # End of PDL::Transform::times::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    tinshift
 #
 package # hide from PAUSE
@@ -9618,7 +9596,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9642,9 +9620,9 @@ sub new
 } # End of PDL::Transform::tinshift::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    tissot
 #
 package # hide from PAUSE
@@ -9662,7 +9640,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9686,9 +9664,9 @@ sub new
 } # End of PDL::Transform::tissot::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    tmerc
 #
 package # hide from PAUSE
@@ -9706,7 +9684,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9730,9 +9708,9 @@ sub new
 } # End of PDL::Transform::tmerc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    tobmerc
 #
 package # hide from PAUSE
@@ -9750,7 +9728,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9774,9 +9752,9 @@ sub new
 } # End of PDL::Transform::tobmerc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    topocentric
 #
 package # hide from PAUSE
@@ -9794,7 +9772,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9818,9 +9796,9 @@ sub new
 } # End of PDL::Transform::topocentric::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    tpeqd
 #
 package # hide from PAUSE
@@ -9838,7 +9816,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9862,9 +9840,9 @@ sub new
 } # End of PDL::Transform::tpeqd::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    tpers
 #
 package # hide from PAUSE
@@ -9882,7 +9860,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9906,9 +9884,9 @@ sub new
 } # End of PDL::Transform::tpers::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    unitconvert
 #
 package # hide from PAUSE
@@ -9926,7 +9904,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9950,9 +9928,9 @@ sub new
 } # End of PDL::Transform::unitconvert::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    ups
 #
 package # hide from PAUSE
@@ -9970,7 +9948,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -9994,9 +9972,9 @@ sub new
 } # End of PDL::Transform::ups::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    urm5
 #
 package # hide from PAUSE
@@ -10014,7 +9992,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10038,9 +10016,9 @@ sub new
 } # End of PDL::Transform::urm5::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    urmfps
 #
 package # hide from PAUSE
@@ -10058,7 +10036,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10082,9 +10060,9 @@ sub new
 } # End of PDL::Transform::urmfps::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    utm
 #
 package # hide from PAUSE
@@ -10102,7 +10080,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10126,9 +10104,9 @@ sub new
 } # End of PDL::Transform::utm::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    vandg
 #
 package # hide from PAUSE
@@ -10146,7 +10124,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10170,9 +10148,9 @@ sub new
 } # End of PDL::Transform::vandg::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    vandg2
 #
 package # hide from PAUSE
@@ -10190,7 +10168,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10214,9 +10192,9 @@ sub new
 } # End of PDL::Transform::vandg2::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    vandg3
 #
 package # hide from PAUSE
@@ -10234,7 +10212,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10258,9 +10236,9 @@ sub new
 } # End of PDL::Transform::vandg3::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    vandg4
 #
 package # hide from PAUSE
@@ -10278,7 +10256,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10302,9 +10280,9 @@ sub new
 } # End of PDL::Transform::vandg4::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    vgridshift
 #
 package # hide from PAUSE
@@ -10322,7 +10300,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10346,9 +10324,9 @@ sub new
 } # End of PDL::Transform::vgridshift::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    vitk1
 #
 package # hide from PAUSE
@@ -10366,7 +10344,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10390,9 +10368,9 @@ sub new
 } # End of PDL::Transform::vitk1::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    wag1
 #
 package # hide from PAUSE
@@ -10410,7 +10388,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10434,9 +10412,9 @@ sub new
 } # End of PDL::Transform::wag1::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    wag2
 #
 package # hide from PAUSE
@@ -10454,7 +10432,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10478,9 +10456,9 @@ sub new
 } # End of PDL::Transform::wag2::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    wag3
 #
 package # hide from PAUSE
@@ -10498,7 +10476,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10522,9 +10500,9 @@ sub new
 } # End of PDL::Transform::wag3::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    wag4
 #
 package # hide from PAUSE
@@ -10542,7 +10520,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10566,9 +10544,9 @@ sub new
 } # End of PDL::Transform::wag4::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    wag5
 #
 package # hide from PAUSE
@@ -10586,7 +10564,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10610,9 +10588,9 @@ sub new
 } # End of PDL::Transform::wag5::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    wag6
 #
 package # hide from PAUSE
@@ -10630,7 +10608,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10654,9 +10632,9 @@ sub new
 } # End of PDL::Transform::wag6::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    wag7
 #
 package # hide from PAUSE
@@ -10674,7 +10652,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10698,9 +10676,9 @@ sub new
 } # End of PDL::Transform::wag7::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    webmerc
 #
 package # hide from PAUSE
@@ -10718,7 +10696,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10742,9 +10720,9 @@ sub new
 } # End of PDL::Transform::webmerc::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    weren
 #
 package # hide from PAUSE
@@ -10762,7 +10740,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10786,9 +10764,9 @@ sub new
 } # End of PDL::Transform::weren::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    wink1
 #
 package # hide from PAUSE
@@ -10806,7 +10784,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10830,9 +10808,9 @@ sub new
 } # End of PDL::Transform::wink1::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    wink2
 #
 package # hide from PAUSE
@@ -10850,7 +10828,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10874,9 +10852,9 @@ sub new
 } # End of PDL::Transform::wink2::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    wintri
 #
 package # hide from PAUSE
@@ -10894,7 +10872,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10918,9 +10896,9 @@ sub new
 } # End of PDL::Transform::wintri::new()...
 
 1;
-#line 379 "Proj4.pd"
+#line 565 "proj4.pd"
 
-# Autogenerated code for the Proj4 projection code: 
+# Autogenerated code for the Proj4 projection code:
 #    xyzgridshift
 #
 package # hide from PAUSE
@@ -10938,7 +10916,7 @@ sub new
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
     my $o = $_[0];
-    unless( (ref $o) ) 
+    unless( (ref $o) )
         { $o = {@_}; }
     #use Data::Dumper;
     #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
@@ -10962,16 +10940,16 @@ sub new
 } # End of PDL::Transform::xyzgridshift::new()...
 
 1;
-#line 486 "Proj4.pd"
+#line 652 "proj4.pd"
 
 
-=head1 AUTHOR & MAINTAINER
+=head1 AUTHOR
 
 Judd Taylor, Orbital Systems, Ltd.
 judd dot t at orbitalsystems dot com
 
 =cut
-#line 10975 "Proj4.pm"
+#line 10953 "Proj4.pm"
 
 # Exit with OK status
 

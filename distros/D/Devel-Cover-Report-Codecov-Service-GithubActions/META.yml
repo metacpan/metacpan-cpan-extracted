@@ -29,7 +29,7 @@ optional_features: {}
 provides:
   Devel::Cover::Report::Codecov::Service::GithubActions:
     file: lib/Devel/Cover/Report/Codecov/Service/GithubActions.pm
-    version: '0.001000'
+    version: '0.001001'
 requires:
   Devel::Cover::Report::Codecov: '0'
   perl: '5.008001'
@@ -39,6 +39,6 @@ resources:
   homepage: https://metacpan.org/release/Devel-Cover-Report-Codecov-Service-GithubActions
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-devel-cover-report-codecov-service-githubactions.git
-version: '0.001000'
+version: '0.001001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Attribute::Storage qw( get_subattr );
 
@@ -20,11 +20,11 @@ sub Foo :ATTR(CODE,NAME)
 
 sub myfunc :Foo("red","blue") { }
 
-is_deeply( get_subattr( \&myfunc, "Foo" ),
+is( get_subattr( \&myfunc, "Foo" ),
    { package => "main", subname => "myfunc", values => [ "red", "blue" ] },
    'sub name visible for :ATTR(NAME)' );
 
-is_deeply( get_subattr( sub :Foo("green") { }, "Foo" ),
+is( get_subattr( sub :Foo("green") { }, "Foo" ),
    { package => "main", subname => "__ANON__", values => [ "green" ] },
    'sub name for :ATTR(NAME) on anonymous function' );
 

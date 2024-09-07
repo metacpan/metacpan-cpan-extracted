@@ -41,7 +41,6 @@ recommends:
   PGPLOT: '2.29'
   Term::ReadKey: '2.34'
 requires:
-  Alien::proj: '1.27'
   Data::Dumper: '2.121'
   File::Map: '0.57'
   File::Which: '0'
@@ -59,5 +58,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdl/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/pdl.git
-version: '2.090'
+version: '2.091'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

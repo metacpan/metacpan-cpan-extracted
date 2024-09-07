@@ -60,4 +60,25 @@ no warnings qw( meta::experimental );
       'created-symbol now exists' );
 }
 
+# ->list_*_globs
+{
+   my $metapkg = meta::package->get( "meta" );
+   my @metaglobs = $metapkg->list_globs;
+
+   # Don't be too sensitive to what globs we found
+   ok( scalar @metaglobs, 'list_globs returned a list of globs' );
+   ok( scalar( grep { $_->basename eq "get_package" } @metaglobs ),
+      'list_globs result included a glob for "get_package"' );
+   ok( !scalar( grep { $_->basename eq "package::" } @metaglobs ),
+      'list_globs does not return subpackages' );
+
+   my @metaglobs_pkgs = $metapkg->list_subpackage_globs;
+   ok( scalar( grep { $_->basename eq "package::" } @metaglobs_pkgs ),
+      'list_subpackage_globs returns subpackages' );
+
+   my @metaglobs_all = $metapkg->list_all_globs;
+   ok( @metaglobs + @metaglobs_pkgs == @metaglobs_all,
+      'list_all_globs returns a list totalling the prior two' );
+}
+
 done_testing;

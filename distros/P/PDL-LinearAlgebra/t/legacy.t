@@ -41,10 +41,6 @@ $aa = pdl('[[[0 1] [2 3] [4 5]] [[6  7] [8  9] [10 11]] [[12 13] [14 15] [16 17]
 my $up = pdl('[[[0 1] [2 3] [4 5]] [[0  0] [8  9] [10 11]] [[0 0] [0 0] [16 17]]]')->cplx;
 my $lo = pdl('[[[0 1] [0 0] [0 0]] [[6  7] [8  9] [0 0]] [[12 13] [14 15] [16 17]]]')->cplx;
 
-runtest($aa, 'ctricpy', $up, [0]);
-runtest($aa, 'ctricpy', $up);
-runtest($aa, 'ctricpy', $lo, [1]);
-
 do './t/common.pl'; die if $@;
 
 done_testing;

@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Command 0.059000;
+package Term::CLI::Command 0.060000;
 
 use 5.014;
 use warnings;
@@ -244,8 +244,8 @@ sub _check_arguments {
                 return (
                     %args,
                     status => -1,
-                    error  => "arg#$argno (" . $arg_spec->name . "), '$arg': "
-                        . $arg_spec->error . q{ }
+                    error  => qq{arg#$argno (} . $arg_spec->name . qq{), "$arg": }
+                        . $arg_spec->error
                 );
             }
             push @{ $args{arguments} }, $arg_value;
@@ -331,7 +331,7 @@ Term::CLI::Command - Class for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.059000
+version 0.060000
 
 =head1 SYNOPSIS
 
