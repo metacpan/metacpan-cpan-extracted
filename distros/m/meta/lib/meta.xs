@@ -513,6 +513,92 @@ list_globs(SV *metapkg)
     XSRETURN(retcount);
   }
 
+void
+_list_symbols(SV *metapkg, SV *sigils)
+  PPCODE:
+  {
+    HV *stash = MUST_STASH_FROM_REFSV(metapkg);
+    const char *sigilfilter = sigils && SvOK(sigils) ? SvPV_nolen(sigils) : NULL;
+
+    UV retcount = 0;
+    hv_iterinit(stash);
+    HE *he;
+    while((he = hv_iternext(stash))) {
+      STRLEN keylen;
+      const char *keypv = HePV(he, keylen);
+      bool is_subpackage = keylen > 2 && keypv[keylen-2] == ':' && keypv[keylen-1] == ':';
+      if(is_subpackage)
+        continue;
+#define PUSH_SVREF_IF(sv, sigil)                               \
+      if((sv) &&                                               \
+          (!sigilfilter || strchr(sigilfilter, sigil))) {      \
+        SV *_sv = (SV *)(sv);                                  \
+        SV *namesv = newSVpvf("%c%.*s", sigil, keylen, keypv); \
+        if(HeUTF8(he)) SvUTF8_on(namesv);                      \
+        EXTEND(SP, 2);                                         \
+        mPUSHs(namesv);                                        \
+        mPUSHs(wrap_sv_refsv(_sv));                            \
+        retcount += 2;                                         \
+      }
+
+      SV *sv = HeVAL(he);
+      if(SvTYPE(sv) == SVt_PVGV) {
+        GV *gv = (GV *)sv;
+
+        PUSH_SVREF_IF(GvSV(gv), '$');
+        PUSH_SVREF_IF(GvAV(gv), '@');
+        PUSH_SVREF_IF(GvHV(gv), '%');
+        PUSH_SVREF_IF(GvCV(gv), '&');
+      }
+      else if(SvROK(sv)) {
+        // GV-less optimisation; this is an RV to one kind of element
+        SV *rv = SvRV(sv);
+        U8 type = SvTYPE(rv);
+
+        PUSH_SVREF_IF(type <= SVt_PVMG ? rv : NULL, '$');
+        PUSH_SVREF_IF(type == SVt_PVAV ? rv : NULL, '@');
+        PUSH_SVREF_IF(type == SVt_PVHV ? rv : NULL, '%');
+        PUSH_SVREF_IF(type == SVt_PVCV ? rv : NULL, '&');
+      }
+      else
+        croak("TODO: Not sure what to do with SvTYPE(sv)=%d\n", SvTYPE(sv));
+    }
+#undef PUSH_SVREF_IF
+    XSRETURN(retcount);
+  }
+
+void
+list_subpackages(SV *metapkg)
+  PPCODE:
+  {
+    HV *stash = MUST_STASH_FROM_REFSV(metapkg);
+    UV retcount = 0;
+    hv_iterinit(stash);
+    HE *he;
+    while((he = hv_iternext(stash))) {
+      STRLEN keylen;
+      const char *keypv = HePV(he, keylen);
+      bool is_subpackage = keylen > 2 && keypv[keylen-2] == ':' && keypv[keylen-1] == ':';
+      if(!is_subpackage)
+        continue;
+
+      GV *gv = (GV *)HeVAL(he);
+      assert(SvTYPE(gv) == SVt_PVGV);
+      HV *substash = GvHV(gv);
+
+      EXTEND(SP, 2);
+
+      mPUSHp(keypv, keylen - 2);
+      if(HeUTF8(he))
+        SvUTF8_on(*SP);
+
+      mPUSHs(wrap_stash(substash));
+
+      retcount += 2;
+    }
+    XSRETURN(retcount);
+  }
+
 MODULE = meta    PACKAGE = meta::symbol
 
 bool

@@ -11,7 +11,7 @@ my $build = Module::Build->new(
    },
    requires => {
       'perl' => '5.014',
-      'meta' => '0.005',
+      'meta' => '0.006',
 
       'XSLoader' => 0,
    },

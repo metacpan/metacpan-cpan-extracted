@@ -18,7 +18,7 @@ Following Perl modules should be installed:
     make test
     make install
 
-# Sample program codetext
+# Sample program podviewer
 
 This package comes with a sample script **podviewer**. You can invoke
 it from the command line after install.

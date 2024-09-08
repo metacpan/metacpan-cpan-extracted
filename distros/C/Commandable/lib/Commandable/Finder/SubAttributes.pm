@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes 0.13;
+package Commandable::Finder::SubAttributes 0.14;
 
 use v5.26;
 use warnings;
@@ -14,7 +14,10 @@ use Carp;
 
 use Commandable::Command;
 
-use constant HAVE_ATTRIBUTE_STORAGE => eval { require Attribute::Storage };
+use constant HAVE_ATTRIBUTE_STORAGE => eval {
+   require Attribute::Storage;
+   Attribute::Storage->VERSION( '0.12' );
+};
 
 =head1 NAME
 
@@ -107,6 +110,30 @@ happened.
 An optional third argument may be present to specify a default value, if not
 provided by the invocation.
 
+=head1 GLOBAL OPTION ATTRIBUTES
+
+I<Since version 0.14> this module also allows attaching attributes to package
+variables in the package that stores the subroutines (often C<main>), which
+will then be handled automatically as global options by the finder.
+
+Remember that these have to be I<package> variables (i.e. declared with
+C<our>); lexical variables (declared with C<my>) will not work.
+
+   our $VERBOSE
+      :GlobalOption("verbose|v+", "Increase the verbosity of status output");
+
+This often serves as a convenient alternative to modules like L<Getopt::Long>,
+because it integrates with the C<help> command automatically.
+
+=head2 GlobalOption
+
+   :GlobalOption("optname", "description")
+
+Gives the name for this global option and its description. These are handled
+in the same way as for L</Command_opt> given above, except that no default is
+handled here. Instead, if the variable already has a value that will be taken
+as its default.
+
 =cut
 
 sub import ( $pkg, @syms )
@@ -183,6 +210,26 @@ sub new ( $class, %args )
    }, $class;
 
    $self->configure( %args ) if %args;
+
+   # TODO: This package name should probably be separately configurable
+   if( my %global_opts = Attribute::Storage::find_vars_with_attr( $package, "GlobalOption" ) ) {
+      foreach my $varname ( sort keys %global_opts ) {
+         my $varref = $global_opts{$varname};
+
+         my $optspec = Attribute::Storage::get_varattr( $varref, "GlobalOption" );
+         my ( $name, $description ) = @$optspec;
+
+         my %optspec = (
+            name        => $name,
+            description => $description,
+            into        => $varref,
+         );
+
+         $optspec{default} = $$varref if defined $$varref;
+
+         $self->add_global_options( \%optspec );
+      }
+   }
 
    return $self;
 }

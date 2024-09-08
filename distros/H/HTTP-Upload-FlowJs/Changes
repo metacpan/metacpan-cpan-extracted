@@ -1,5 +1,9 @@
-0.01 20180303
-    . Released on an unsuspecting world
-    . Spun off from an unreleased chat application, "mychat"
+0.02 2024-09-08
+    * Fix test suite, replace isn't() by isnt()
+    * No code changes, no need to upgrade
+
+0.01 2018-03-03
+    * Released on an unsuspecting world
+    * Spun off from an unreleased chat application, "mychat"
 	. Many bugfixes, documentation and test contribution
 	  by Dmitry Latin (https://github.com/dim0xff)

@@ -1,6 +1,7 @@
 .gitignore
 Changes
 lib/Time/Slideshow.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

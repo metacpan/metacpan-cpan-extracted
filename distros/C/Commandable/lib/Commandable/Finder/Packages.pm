@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::Packages 0.13;
+package Commandable::Finder::Packages 0.14;
 
 use v5.26;
 use warnings;

@@ -1,5 +1,11 @@
 Revision history for Perl extension Tk::PodViewer.
 
+0.03  Fri Aug 23 2024
+	- corrected README.md
+	- fixed non breakable spaces tags
+	- fixed indent of Verbatim tags inside items
+	- added Tk::PodViewer::Full class
+
 0.02  Fri Aug 23 2024
 	- added demo executable 'podviewer'
 	- fixed zooming

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 338;
+plan tests => 326;
 
 my @module_files = (
     'DateTime/TimeZone.pm',
@@ -171,7 +171,6 @@ my @module_files = (
     'DateTime/TimeZone/Asia/Beirut.pm',
     'DateTime/TimeZone/Asia/Bishkek.pm',
     'DateTime/TimeZone/Asia/Chita.pm',
-    'DateTime/TimeZone/Asia/Choibalsan.pm',
     'DateTime/TimeZone/Asia/Colombo.pm',
     'DateTime/TimeZone/Asia/Damascus.pm',
     'DateTime/TimeZone/Asia/Dhaka.pm',
@@ -251,12 +250,7 @@ my @module_files = (
     'DateTime/TimeZone/Australia/Melbourne.pm',
     'DateTime/TimeZone/Australia/Perth.pm',
     'DateTime/TimeZone/Australia/Sydney.pm',
-    'DateTime/TimeZone/CET.pm',
-    'DateTime/TimeZone/CST6CDT.pm',
     'DateTime/TimeZone/Catalog.pm',
-    'DateTime/TimeZone/EET.pm',
-    'DateTime/TimeZone/EST.pm',
-    'DateTime/TimeZone/EST5EDT.pm',
     'DateTime/TimeZone/Europe/Andorra.pm',
     'DateTime/TimeZone/Europe/Astrakhan.pm',
     'DateTime/TimeZone/Europe/Athens.pm',
@@ -296,7 +290,6 @@ my @module_files = (
     'DateTime/TimeZone/Europe/Warsaw.pm',
     'DateTime/TimeZone/Europe/Zurich.pm',
     'DateTime/TimeZone/Floating.pm',
-    'DateTime/TimeZone/HST.pm',
     'DateTime/TimeZone/Indian/Chagos.pm',
     'DateTime/TimeZone/Indian/Maldives.pm',
     'DateTime/TimeZone/Indian/Mauritius.pm',
@@ -304,16 +297,12 @@ my @module_files = (
     'DateTime/TimeZone/Local/Android.pm',
     'DateTime/TimeZone/Local/Unix.pm',
     'DateTime/TimeZone/Local/VMS.pm',
-    'DateTime/TimeZone/MET.pm',
-    'DateTime/TimeZone/MST.pm',
-    'DateTime/TimeZone/MST7MDT.pm',
     'DateTime/TimeZone/OffsetOnly.pm',
     'DateTime/TimeZone/OlsonDB.pm',
     'DateTime/TimeZone/OlsonDB/Change.pm',
     'DateTime/TimeZone/OlsonDB/Observance.pm',
     'DateTime/TimeZone/OlsonDB/Rule.pm',
     'DateTime/TimeZone/OlsonDB/Zone.pm',
-    'DateTime/TimeZone/PST8PDT.pm',
     'DateTime/TimeZone/Pacific/Apia.pm',
     'DateTime/TimeZone/Pacific/Auckland.pm',
     'DateTime/TimeZone/Pacific/Bougainville.pm',
@@ -344,8 +333,7 @@ my @module_files = (
     'DateTime/TimeZone/Pacific/Tahiti.pm',
     'DateTime/TimeZone/Pacific/Tarawa.pm',
     'DateTime/TimeZone/Pacific/Tongatapu.pm',
-    'DateTime/TimeZone/UTC.pm',
-    'DateTime/TimeZone/WET.pm'
+    'DateTime/TimeZone/UTC.pm'
 );
 
 

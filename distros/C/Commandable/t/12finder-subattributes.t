@@ -5,6 +5,7 @@ use warnings;
 
 use Test2::V0;
 
+use Commandable::Invocation;
 use Commandable::Finder::SubAttributes;
 
 BEGIN {
@@ -14,6 +15,9 @@ BEGIN {
 
 package MyTest::Commands {
    use Commandable::Finder::SubAttributes ':attrs';
+
+   our $globalopt
+      :GlobalOption("global=");
 
    sub command_one
       :Command_description("the one command")
@@ -86,6 +90,15 @@ my $finder = Commandable::Finder::SubAttributes->new(
          multi  => { mode => "multi_value", negatable => F() },
       },
       'metadata of options to two' );
+}
+
+# global options
+{
+   # TODO: we don't really have a way to query about these, so we'll just
+   # have to invoke them to observe side-effects
+   $finder->handle_global_options( Commandable::Invocation->new( "--global=1234" ) );
+   is( $MyTest::Commands::globalopt, 1234,
+      '->handle_global_options set the value of $globalopt' );
 }
 
 done_testing;

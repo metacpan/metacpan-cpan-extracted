@@ -6,7 +6,7 @@ HTTP::Upload::FlowJs - handle resumable multi-part HTTP uploads with flowjs
 
 This synopsis assumes a [Plack](https://metacpan.org/pod/Plack)/[PSGI](https://metacpan.org/pod/PSGI)-like environment. There are
 plugins for [Dancer](https://metacpan.org/pod/Dancer) and [Mojolicious](https://metacpan.org/pod/Mojolicious) planned. See
-[HTTP::Upload::FlowJs::Examples](https://metacpan.org/pod/HTTP::Upload::FlowJs::Examples) for longer examples.
+[HTTP::Upload::FlowJs::Examples](https://metacpan.org/pod/HTTP%3A%3AUpload%3A%3AFlowJs%3A%3AExamples) for longer examples.
 
 The `flow.js` workflow assumes that your application handles two kinds of
 requests, POST requests for storing the payload data and GET requests for
@@ -199,7 +199,7 @@ Return the incoming directory name.
 
 ## `$flowjs->mime`
 
-Return the [MIME::Detect](https://metacpan.org/pod/MIME::Detect) instance.
+Return the [MIME::Detect](https://metacpan.org/pod/MIME%3A%3ADetect) instance.
 
 ## `$flowjs->jsConfig`
 
@@ -344,7 +344,7 @@ this MIME type. Unrecognized files will be blocked.
 
 This allows for finer-grained checking of the MIME-type. See also
 the `allowedContentType` argument in the constructor and
-[->disallowedContentType](https://metacpan.org/pod/->disallowedContentType) for a more convenient way to quickly
+[->disallowedContentType](https://metacpan.org/pod/-%3EdisallowedContentType) for a more convenient way to quickly
 check the upload type.
 
 ## `$flowjs->combineChunks $info, $sessionPrefix, $target_fh, $digest )`
@@ -423,7 +423,7 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Upload-FlowJs](https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Upload-FlowJs)
-or via mail to [bug-http-upload-flowjs@rt.cpan.org](https://metacpan.org/pod/bug-http-upload-flowjs@rt.cpan.org).
+or via mail to [bug-http-upload-flowjs@rt.cpan.org](https://metacpan.org/pod/bug-http-upload-flowjs%40rt.cpan.org).
 
 # AUTHOR
 

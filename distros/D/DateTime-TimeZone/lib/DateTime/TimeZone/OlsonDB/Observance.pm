@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.62';
+our $VERSION = '2.63';
 
 use DateTime::Duration;
 use DateTime::TimeZone::OlsonDB;
@@ -86,11 +86,32 @@ sub local_start_datetime { $_[0]->{local_start_datetime} }
 sub formatted_short_name {
     my $self   = shift;
     my $letter = shift;
+    my $rule   = shift;
 
     my $format = $self->format;
     return $format unless $format =~ /%/;
 
+    if ( $format eq '%z' ) {
+        return $self->offset_as_z_format($rule);
+    }
+
     return sprintf( $format, $letter );
+}
+
+sub offset_as_z_format {
+    my $self = shift;
+    my $rule = shift;
+
+    my $offset = $self->total_offset;
+    $offset += $rule->offset_from_std if $rule;
+    my $sign = $offset < 0 ? '-' : '+';
+    $offset = abs($offset);
+    my $h = int( $offset / 3600 );
+    my $m = ( $offset % 3600 ) / 60;
+    if ( $m == 0 ) {
+        return sprintf( '%s%02d', $sign, $h );
+    }
+    return sprintf( '%s%02d%02d', $sign, $h, $m );
 }
 
 sub expand_from_rules {
@@ -158,7 +179,8 @@ sub expand_from_rules {
                 local_start_datetime => $dt + DateTime::Duration->new(
                     seconds => $self->total_offset + $rule->offset_from_std
                 ),
-                short_name => $self->formatted_short_name( $rule->letter ),
+                short_name =>
+                    $self->formatted_short_name( $rule->letter, $rule ),
                 observance => $self,
                 rule       => $rule,
             );

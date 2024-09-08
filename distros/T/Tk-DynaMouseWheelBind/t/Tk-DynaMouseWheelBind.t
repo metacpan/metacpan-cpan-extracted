@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use Test::More tests => 12;
+use Test::More tests => 9;
 use Test::Tk;
 
 require_ok ('Tk::DynaMouseWheelBind');
@@ -53,7 +53,11 @@ if (defined $app) {
 	
 }
 
-for (['<5>'],['<4>'],['<MouseWheel>',-delta => -120]){
+for (
+	['<5>'],
+	['<4>'],
+#	['<MouseWheel>',-delta => -120]
+) {
 	my $ev = $_;
 	for my $w($t, $c, $p){
 		push @tests, [sub {

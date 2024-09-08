@@ -4,13 +4,13 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HTTP-Upload-FlowJs",
    "no_index" : {
@@ -19,10 +19,39 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Filter::signatures" : "0.10",
+            "JSON" : "0",
+            "MIME::Detect" : "0",
+            "Test::More" : "0",
+            "Text::CleanFragment" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302007"
+         }
+      }
+   },
    "provides" : {
       "HTTP::Upload::FlowJs" : {
          "file" : "lib/HTTP/Upload/FlowJs.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -36,7 +65,7 @@
          "web" : "https://github.com/Corion/HTTP-Upload-FlowJs"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27202",
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

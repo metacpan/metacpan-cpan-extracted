@@ -93914,3 +93914,16 @@ S/SB/SBAKKER/Term-CLI-0.060000.tar.gz
 S/SH/SHLOMIF/Text-Format-0.63.tar.gz
 T/TI/TINITA/YAML-LibYAML-v0.901.0.tar.gz
 L/LN/LNATION/Zleep-0.01.tar.gz
+P/PE/PERLANCAR/Acme-CPANModules-UnixCommandImplementations-0.001.tar.gz
+P/PE/PEVANS/Attribute-Storage-0.12.tar.gz
+P/PE/PEVANS/Commandable-0.14.tar.gz
+D/DR/DROLSKY/DateTime-TimeZone-2.63.tar.gz
+P/PE/PEVANS/Device-AVR-UPDI-0.16.tar.gz
+C/CO/CORION/HTTP-Upload-FlowJs-0.02.tar.gz
+E/ET/ETJ/PDL-2.092.tar.gz
+P/PE/PEVANS/meta-0.006.tar.gz
+J/JD/JDEGUEST/Module-Generic-v0.37.6.tar.gz
+R/RE/REEDFISH/Term-Menus-3.039.tar.gz
+C/CO/CORION/Time-Slideshow-0.04.tar.gz
+H/HA/HANJE/Tk-DynaMouseWheelBind-0.07.tar.gz
+H/HA/HANJE/Tk-PodViewer-0.03.tar.gz

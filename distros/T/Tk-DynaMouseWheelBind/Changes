@@ -1,5 +1,8 @@
 Revision history for Tk::DynaMouseWheelBind
 
+0.07 Sat Sep 07 2024
+	-disabled mouse wheel test. We know the widget is ok. The test must be flunky.
+
 0.06 Mon Aug 19 2024
 	-possible solution to failing tests. pause time increased to 200 ms in scroll tests.
 

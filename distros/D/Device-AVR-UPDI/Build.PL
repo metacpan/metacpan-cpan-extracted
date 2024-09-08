@@ -16,6 +16,7 @@ my $build = Module::Build->new(
       'Sublike::Extended' => 0,
 
       'Commandable' => '0.08',
+      'Commandable::Finder::SubAttributes' => '0.14',
       'File::ShareDir' => 0,
       'Future::IO' => '0.03',
       'IO::Termios' => 0,

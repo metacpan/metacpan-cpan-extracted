@@ -229,7 +229,7 @@ my $mswin = $Config{'osname'} eq 'MSWin32';
 use Getopt::Long;
 use Tk;
 require Tk::Compound;
-require Tk::PodViewer;
+require Tk::PodViewer::Full;
 require Tk::DialogBox;
 
 #hard code defaults
@@ -305,8 +305,6 @@ $options{'-font'} = $font if defined $font;
 $options{'-zoom'} = $zoom if defined $zoom;
 
 $app = new MainWindow;
-$app->bind('<Control-o>', \&dialogPop);
-$app->bind('<Control-f>', \&searchPop);
 $app->after(300, sub {
 	if (@ARGV) {
 		my $source = shift @ARGV;
@@ -319,52 +317,6 @@ my $toolframe = $app->Frame->pack(
 	-padx => 2,
 	-pady => 2,
 );
-
-#creating previous button
-$toolframe->Button(
-	-relief => 'flat',
-#	-image => buttonimage($arrowleft, 'Previous'),
-	-text => '<- Previous',
-	-command => sub {
-		$viewer->previous
-	},
-)->pack(@bpack);
-
-#creating next button
-$toolframe->Button(
-	-relief => 'flat',
-	-text => '-> Next',
-	-command => sub {
-		$viewer->next
-	},
-)->pack(@bpack);
-
-#creating zoom in button
-$toolframe->Button(
-	-relief => 'flat',
-	-text => '+ Zoom',
-	-command => sub {
-		$viewer->zoomIn
-	},
-)->pack(@bpack);
-
-#creating zoom out button
-$toolframe->Button(
-	-relief => 'flat',
-	-text => '- Zoom',
-	-command => sub {
-		$viewer->zoomOut
-	},
-)->pack(@bpack);
-
-#creating zoom reset button
-$toolframe->Button(
-	-relief => 'flat',
-	-text => '0 Zoom',
-	-command => sub {
-		$viewer->zoomReset
-	},
-)->pack(@bpack);
 
 #creating the dialog box
 $dialog = $app->DialogBox(
@@ -381,14 +333,17 @@ $tf->Button(
 	-command => sub {
 		my @op = ();
 		@op = (-popover => $app) unless $mswin;
-		$current = $app->getOpenFile(@op);
-		$dialog->deiconify;
+		my $new = $app->getOpenFile(@op);
+		if (defined $new) {
+			$current = $new;
+			$dialog->{'selected_button'} = 'Ok';
+		}
 	},
 )->pack(@bpack);
 $dialog->configure(-focus => $entry);
 
 #creating the viewer
-$viewer = $app->PodViewer(%options,
+$viewer = $app->PodViewerFull(%options,
 	-loadcall => sub {
 		my $source = shift;
 		if ($source) {
@@ -398,53 +353,8 @@ $viewer = $app->PodViewer(%options,
 		}
 	}
 )->pack(-expand => 1, -fill => 'both');
+$viewer->Subwidget('txt')->bind('<Control-o>', \&dialogPop);
 
-#create the search bar
-my $searchbar = $app->Frame;
-
-#searchframe
-my $case = '-case';
-my $find = '';
-my $reg = '-exact';
-$searchbar->Label(
-	-anchor => 'e',
-	-text => 'Find',
-	-width => 7,
-)->pack(@bpack);
-my $search = $searchbar->Entry(
-	-textvariable => \$find,
-)->pack(@bpack, -expand => 1, -fill => 'x');
-# TODO
-$search->bind('<Escape>', \&searchClose);
-$search->bind('<Return>', sub { $viewer->FindNext('-forward', $reg, $case, $find) });
-$searchbar->Button(
-	-text => 'Next',
-	-command => sub { $viewer->FindNext('-forward', $reg, $case, $find) },
-)->pack(@bpack); 
-$searchbar->Button(
-	-text => 'Previous',
-	-command => sub { $viewer->FindNext('-backward', $reg, $case, $find) },
-)->pack(@bpack);
-$searchbar->Button(
-	-text => 'All',
-	-command => sub { $viewer->FindAll($reg, $case, $find) },
-)->pack(@bpack);
-$searchbar->Checkbutton(
-	-text => 'Case',
-	-onvalue => '-case',
-	-offvalue => '-nocase',
-	-variable => \$case,
-)->pack(@bpack);
-$searchbar->Checkbutton(
-	-text => 'Reg',
-	-onvalue => '-regexp',
-	-offvalue => '-exact',
-	-variable => \$reg,
-)->pack(@bpack);
-$searchbar->Button(
-	-text => 'Close',
-	-command => \&searchClose,
-)->pack(@bpack);
 
 $app->geometry('800x600+150+150');
 $viewer->focus;
@@ -455,12 +365,3 @@ sub dialogPop {
 	$viewer->load($current) if $button eq 'Ok';
 }
 
-sub searchClose {
-	$searchbar->packForget if $searchbar->ismapped;
-	$viewer->focus;
-}
-
-sub searchPop {
-	$searchbar->pack(-fill => 'x', -padx => 2, -pady => 2) unless $searchbar->ismapped;
-	$search->focus;
-}

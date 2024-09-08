@@ -18,7 +18,7 @@ BEGIN {
   *NEW_PERL = ($] >= 5.010) ? sub(){1} : sub(){0};
 }
 
-our $VERSION = '3.038';
+our $VERSION = '3.039';
 
 
 use 5.006;
@@ -6169,10 +6169,6 @@ END
                            if $Selected->{$MenuUnit_hash_ref}->{$item};
                         my $cd=&Data::Dump::Streamer::Dump(
                            $test_result_loop)->Out();
-                        $cd=&transform_sicm($cd,$numbor,
-                           \@all_menu_items_array,\%picks,\%pn,
-                           $return_from_child_menu,$log_handle,
-                           $MenuUnit_hash_ref->{Name});
                         $cd=&transform_pmsi($cd,
                            $Conveyed,$SaveMMap,
                            $picks_from_parent);

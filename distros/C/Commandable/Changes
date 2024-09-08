@@ -1,5 +1,10 @@
 Revision history for Commandable
 
+0.14    2024-09-07
+        [CHANGES]
+         * Support discovering global options as attributes on package scalar
+           variables in the SubAttributes finder
+
 0.13    2024-09-01
         [CHANGES]
          * Added `->add_global_options` method to support global options

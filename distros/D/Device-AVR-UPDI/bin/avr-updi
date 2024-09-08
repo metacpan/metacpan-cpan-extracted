@@ -2,16 +2,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
 use v5.20;
 use warnings;
 
 use Commandable;
-use Commandable::Finder::SubAttributes 0.08 ':attrs';
+use Commandable::Finder::SubAttributes 0.14 ':attrs';
 
 use Device::AVR::UPDI;
-use Getopt::Long;
 use List::Util qw( first );
 
 =head1 NAME
@@ -74,15 +73,27 @@ hex.
 
 STDOUT->autoflush;
 
-GetOptions(
-   'port|P=s' => \( my $PORT = "/dev/ttyUSB0" ),
-   'part|p=s' => \( my $PART ),
-   'baud|B=i' => \( my $BAUD ),
+our $PORT
+   :GlobalOption("port|P=",
+                 "Path to the device where the UPDI adapter is connected")
+   = "/dev/ttyUSB0";
 
-   'erase|e' => \( my $ERASE ),
+our $PART
+   :GlobalOption("part|p=",
+                 "Name of the ATmega or ATtiny chip that is expected");
 
-   'binary'   => \( my $BINARY ),
-) or exit 1;
+our $BAUD
+   :GlobalOption("baud|B=u",
+                 "Sets a different baud rate for communications")
+   = 115200;
+
+our $ERASE
+   :GlobalOption("erase|e",
+                 "Send the CHIPERASE key as well as the NVMPROG key");
+
+our $BINARY
+   :GlobalOption("binary",
+                 "Files read from or written to will be in raw binary format");
 
 my $updi;
 sub make_updi

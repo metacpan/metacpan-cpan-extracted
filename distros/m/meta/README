@@ -37,6 +37,17 @@ DESCRIPTION
     as part of Perl core, as the implementation for PPC 0022. See the link
     in the "SEE ALSO" section.
 
+    This module attempts to find a balance between accurately representing
+    low-level concepts within the current implementation of the Perl
+    interpreter, while also providing higher-level abstractions that
+    provide useful behaviour for code that uses it. One place this can be
+    seen is the lower-level "list_globs" method, which directly maps to the
+    way that GVs are stored in symbol table stashes but requires the user
+    to be aware of the GV-less optimisised storage of CVs, as compared to
+    the higher-level "list_symbols" method which provides an abstraction
+    over this complication and presents the more useful but less accurate
+    impression of separately named symbols that neatly map to their values.
+
     Since version 0.003_002 all the entry-point functions and constructors
     in this module will provoke warnings in the meta::experimental
     category. They can be silenced by
@@ -116,6 +127,8 @@ METHODS ON meta::package
     symbols (i.e. not subpackages). They are returned in no particular
     order.
 
+    For a more convenient return value form, see also "list_symbols".
+
  list_subpackage_globs
 
  list_all_globs
@@ -128,6 +141,8 @@ METHODS ON meta::package
     Returns a list of all the globs in the package that refer to
     subpackages, or all globs, including subpackages. They are returned in
     no particular order.
+
+    For a more convenient return value form, see also "list_subpackages".
 
  get_symbol
 
@@ -194,6 +209,37 @@ METHODS ON meta::package
 
        $metapkg->try_get_symbol( '$variable' ) and
           $metapkg->remove_symbol( '$variable' );
+
+ list_symbols
+
+       %sub_metasyms = $metapkg->list_symbols;
+       %sub_metasyms = $metapkg->list_symbols( sigils => $filter );
+
+    Since version 0.006.
+
+    Returns an even-sized key/value list containing the symbols within the
+    given package instance. Each symbol is returned as a pair, with its
+    sigil-prefixed basename first, followed by a metasymbol instance
+    representing it. Since the sigil-prefixed names must be unique, it is
+    convenient to assign this list into a hash. The symbols are returned in
+    no particular order.
+
+    If the optional sigils named parameter is given, it should be a string
+    of possible symbol sigils (the characters $, @, % or &). In this case,
+    only symbols whose sigil is present in this string will be returned.
+
+ list_subpackages
+
+       %sub_metapkgs = $metapkg->list_subpackages;
+
+    Since version 0.006.
+
+    Returns an even-sized key/value list containing the immediate
+    sub-packages of the given package instance. Each sub-package is
+    returned as a pair, with its basename first (minus the "::" suffix),
+    followed by a metapackage instance representing it. Since the names of
+    each sub-package must be unique, it is convenient to assign this list
+    into a hash. The sub-packages are returned in no particular order.
 
 METHODS ON METASYMBOLS
 

@@ -12,7 +12,7 @@ name: Term-Menus
 provides:
   Term::Menus:
     file: lib/Term/Menus.pm
-    version: 3.038
+    version: 3.039
   TMMemHandle:
     file: lib/Term/Menus.pm
 requires:
@@ -24,4 +24,4 @@ requires:
   Term::RawInput: 0
 resources:
   license: http://www.gnu.org/licenses/agpl.html 
-version: 3.038
+version: 3.039

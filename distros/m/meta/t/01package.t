@@ -44,4 +44,14 @@ no warnings qw( meta::experimental );
       'Name of the main package from get_this_package' );
 }
 
+# subpackages
+{
+   my %sub_metapkgs = meta::get_package( "meta" )->list_subpackages;
+   ok( keys %sub_metapkgs, '->list_subpackages returned some entries' );
+
+   ok( my $package_metapkg = $sub_metapkgs{"package"},
+      'subpackage for "package" exists' );
+   is( $package_metapkg->name, "meta::package", 'name of "package" subpackage' );
+}
+
 done_testing;

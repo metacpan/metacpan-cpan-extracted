@@ -1,5 +1,10 @@
 Revision history for Device-AVR-UPDI
 
+0.16    2024-09-07
+        [CHANGES]
+         * Neater handling of global commandline options by Commandable,
+           ensuring they're automatically documented by 'help' command
+
 0.15    2024-08-14
         [CHANGES]
          * Update to Object::Pad v0.807

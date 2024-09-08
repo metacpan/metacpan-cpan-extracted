@@ -59,9 +59,9 @@ for my $elements (3..10) {
                 push @order, $s->current_slide_index( $time );
             };
             
-            isn't join(",",@order), join(",",@{$s->slides}), "Shuffle permutes for $permutation";
-            #isn't $order[0], 1, "We never start with the first image";
-            #isn't $order[-1], $s->slides->[-1], "We never end with the last image";
+            isnt join(",",@order), join(",",@{$s->slides}), "Shuffle permutes for $permutation";
+            #isnt $order[0], 1, "We never start with the first image";
+            #isnt $order[-1], $s->slides->[-1], "We never end with the last image";
             
             my %missing= map { $_ => 1 } 0..$slides -1;
             delete @missing{ @order };

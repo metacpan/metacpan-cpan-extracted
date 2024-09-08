@@ -1,12 +1,14 @@
 bin/podviewer
 Changes
 lib/Tk/PodViewer.pm
+lib/Tk/PodViewer/Full.pm
 Makefile.PL
 MANIFEST
 README.md
 t/01-Tk-PodViewer-file.t
 t/02-Tk-PodViewer-ref.t
 t/03-Tk-PodViewer-module.t
+t/04-Tk-PodViewer-full.t
 t/sample.pod
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

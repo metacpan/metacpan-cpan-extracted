@@ -1,5 +1,11 @@
 Revision history for Attribute-Storage
 
+0.12    2024-09-07
+        [CHANGES]
+         * Use the much-neater `->list_symbols` method from meta v0.006, which
+           doesn't get confused about GV-less CV optimisations in the symbol
+           table
+
 0.11    2024-09-06
         [CHANGES]
          * Added ability to apply, query, and find attributes on scalar, array

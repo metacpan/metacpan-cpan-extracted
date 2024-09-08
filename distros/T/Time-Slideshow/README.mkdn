@@ -246,7 +246,7 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=Time-Slideshow](https://rt.cpan.org/Public/Dist/Display.html?Name=Time-Slideshow)
-or via mail to [time-slideshow@rt.cpan.org](https://metacpan.org/pod/time-slideshow@rt.cpan.org).
+or via mail to [time-slideshow@rt.cpan.org](https://metacpan.org/pod/time-slideshow%40rt.cpan.org).
 
 # AUTHOR
 

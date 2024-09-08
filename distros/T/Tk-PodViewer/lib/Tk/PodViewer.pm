@@ -3,7 +3,7 @@ package Tk::PodViewer;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.03';
 use base qw(Tk::Derived Tk::Frame);
 
 Construct Tk::Widget 'PodViewer';
@@ -32,7 +32,8 @@ Tk::PodViewer - Simple ROText based pod viewer.
 =head1 DESCRIPTION
 
 Tk::PodViewer is a simple pod viewer.
-It inherits L<Tk::Frame>, but delegates all options and methods to L<Tk::ROText>.
+It inherits L<Tk::Frame>, but delegates all options and many
+methods to L<Tk::ROText>.
 
 It supports most of the pod tags. It ignores the following tags:
 
@@ -114,7 +115,16 @@ sub Populate {
 		DEFAULT => [ $text ],
 	);
 	$self->Delegates(
-		DEFAULT => $text,
+		'compare' => $text,
+		'delete' => $text,
+		'get' => $text,
+		'insert' => $text,
+		'index' => $text,
+		'tagBind' => $text,
+		'tagCget' => $text,
+		'tagConfigure' => $text,
+		'tagRanges' => $text,
+		DEFAULT => $self,
 	);
 	$self->after(10, ['postConfig', $self]);
 }
@@ -200,7 +210,7 @@ sub configureDerived {
 		} elsif ($style =~ /L/) {
 			push @tagopt, -foreground => $self->cget('-linkcolor')
 		} elsif ($style =~ /S/) {
-			push @tagopt, -wrap => 'none'
+#			push @tagopt, -wrap => 'none'
 		}
 		my $tfont = $self->fontCompose($font, @fontopt);
 #		my $newstyle = "$tag$style";
@@ -290,6 +300,7 @@ sub configureTags {
 			$self->configureDerived($base, $font, @der);
 		}
 	}
+	$self->tagConfigure('nbspace', -foreground => $self->cget('-background'))
 }
 
 sub fontCompose {
@@ -416,6 +427,7 @@ sub load {
 	$self->current($source);
 
 	#convert module name to file
+	my $original = $source;
 	if ($source =~ s/\:\:/\//g) {
 		for ('pod', 'pm') {
 			my $test = Tk::findINC("$source.$_");
@@ -434,6 +446,11 @@ sub load {
 		}
 	}
 
+	unless ((-e $source) or (ref $source)) {
+		warn "Source '$original' not found\n";
+		return
+	};
+
 	#initializing pull parser
 	my $p = new Pod::Simple::PullParser;
 	$p->set_source($source);
@@ -447,7 +464,9 @@ sub load {
 
 			} elsif (length($name) eq 1) {
 				my $tname = $self->stackTop;
-				if (defined $tname) {
+				if ($name eq 'S') {
+					$self->{'nbspaces'} = 1;
+				} elsif (defined $tname) {
 					my $font = $self->tagCget($tname, '-font');
 					my $der = $self->tagDerived($tname, $name);
 					$self->configureDerived($tname, $font, $name) unless $self->tagExists($der);
@@ -468,6 +487,10 @@ sub load {
 				$self->indentUp if $self->inItem;
 				$self->stackPush($name);
 
+			} elsif ($name =~ /^Verbatim/) {
+				$self->indentUp if $self->inItem;
+				$self->stackPush($name);
+
 			} else {
 				$self->stackPush($name) if $self->stackable($name)
 			}
@@ -480,8 +503,23 @@ sub load {
 
 			my $indent = $self->indentStackTop;
 			push @tags, $indent if defined $indent;
-
-			$self->insert('end', $token->text, [ @tags ]); 
+			
+			my @blob = ();
+			my $text = $token->text;
+			if (exists $self->{'nbspaces'}) {
+				my @words = split(/\s/, $text);
+				while (@words) {
+					my $w = shift @words;
+					if (@words) {
+						push @blob, $w, [@tags], '-', ['nbspace'] 
+					} else {
+						push @blob, $w, [@tags] 
+					}
+				}
+			} else {
+				push @blob, $text, [ @tags ]
+			}
+			$self->insert('end', @blob); 
 
 		} elsif($token->is_end) {
 			my $name = $token->tagname;
@@ -497,7 +535,12 @@ sub load {
 				$self->indentDown if $self->inItem;
 				$self->insert('end', "\n\n");
 				$self->stackPull;
+			} elsif ($name =~ /^Verbatim/) {
+				$self->indentDown if $self->inItem;
+				$self->insert('end', "\n\n");
+				$self->stackPull;
 			} else {
+				delete $self->{'nbspaces'} if $name eq 'S';
 				$self->insert('end', "\n") unless length($name) eq 1;
 				$self->insert('end', "\n") if $name =~ /^head/ ;
 				$self->insert('end', "\n") if $name =~ /^Verbatim/ ;
@@ -699,10 +742,6 @@ Hans Jeuken (hanje at cpan dot org)
 =head1 BUGS AND CAVEATS
 
 If you find any bugs, please contact the author.
-
-=head1 TODO
-
-Change the S command into real non breakable spaces instead of just a wrap to none.
 
 =head1 SEE ALSO
 

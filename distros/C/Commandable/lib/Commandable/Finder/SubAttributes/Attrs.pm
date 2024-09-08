@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes::Attrs 0.13;
+package Commandable::Finder::SubAttributes::Attrs 0.14;
 
 use v5.26;
 use warnings;
@@ -15,7 +15,7 @@ use Carp;
 use meta 0.003_003;
 no warnings qw( meta::experimental );
 
-use Attribute::Storage;
+use Attribute::Storage 0.12;
 
 =head1 NAME
 
@@ -85,6 +85,12 @@ sub Command_opt :ATTR(CODE,MULTI)
    push @$opts, \%optspec;
 
    return $opts;
+}
+
+sub GlobalOption :ATTR(SCALAR)
+{
+   my ( $class, $name, $description ) = @_;
+   return [ $name, $description ];
 }
 
 =head1 AUTHOR

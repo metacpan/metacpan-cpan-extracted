@@ -8,7 +8,7 @@ use Text::CleanFragment 'clean_fragment';
 use Data::Dumper;
 use MIME::Detect;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use JSON qw(encode_json decode_json);
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v0.37.6 2024-09-08T17:52:18+0900
+    - Corrected unit test
+
 v0.37.5 2024-09-05T13:02:03+0900
     - Improved Module::Generic::File::Cache and Module::Generic::File::Mmap
 

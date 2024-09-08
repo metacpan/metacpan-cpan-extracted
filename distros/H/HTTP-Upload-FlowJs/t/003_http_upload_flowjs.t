@@ -61,7 +61,7 @@ for my $session_id (1..3) {
         flowTotalSize => 2226376
     }, $session_id);
 };
-isn't $chunkName{1}, $chunkName{2}, "Different sessions get different filenames";
+isnt $chunkName{1}, $chunkName{2}, "Different sessions get different filenames";
 
    $flowjs = HTTP::Upload::FlowJs->new(
     incomingDirectory => $tempdir,

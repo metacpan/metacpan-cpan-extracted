@@ -265,13 +265,13 @@ use Test::Fatal;
         year => 2000, month     => 10, day => 5,
         hour => 15,   time_zone => 'America/Chicago',
     );
-    is( $dt->hour,   15,     'hour is 15' );
+    is( $dt->hour,    15,    'hour is 15' );
     is( $dt->offset, -18000, 'offset is -18000' );
-    is( $dt->is_dst, 1,      'is dst' );
+    is( $dt->is_dst,  1,     'is dst' );
 
     $dt->set_time_zone('America/New_York');
     is( $dt->offset, -14400, 'offset is -14400' );
-    is( $dt->is_dst, 1,      'is dst' );
+    is( $dt->is_dst,  1,     'is dst' );
     is(
         $dt->hour, 16,
         'America/New_York is exactly one hour later than America/Chicago - hour'
@@ -296,12 +296,12 @@ use Test::Fatal;
     );
 
     is( $dt->offset, -21600, 'offset should be -21600' );
-    is( $dt->is_dst, 0,      'is not dst' );
+    is( $dt->is_dst,  0,     'is not dst' );
 
     $dt->subtract( hours => 1 );
 
     is( $dt->offset, -18000, 'offset should be -18000' );
-    is( $dt->is_dst, 1,      'is not dst' );
+    is( $dt->is_dst,  1,     'is not dst' );
     is( $dt->hour,   1, 'crossing DST boundary does not change local hour' );
 }
 
@@ -403,12 +403,12 @@ SKIP:
         hour => 3,    time_zone => 'America/Chicago',
     );
 
-    is( $dt->hour,   3,      'hour should be 3' );
+    is( $dt->hour,    3,     'hour should be 3' );
     is( $dt->offset, -18000, 'offset should be -18000' );
 
     $dt->subtract( seconds => 1 );
 
-    is( $dt->hour,   1,      'hour should be 1' );
+    is( $dt->hour,    1,     'hour should be 1' );
     is( $dt->offset, -21600, 'offset should be -21600' );
 }
 

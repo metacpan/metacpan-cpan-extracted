@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.62';
+our $VERSION = '2.63';
 
 # Note that while we make use of DateTime::Duration in this module if we
 # actually try to load it here all hell breaks loose with circular
@@ -393,7 +393,7 @@ sub _generate_spans_until_match {
                         + $rule->offset_from_std
                 ),
                 short_name => $self->{last_observance}
-                    ->formatted_short_name( $rule->letter ),
+                    ->formatted_short_name( $rule->letter, $rule ),
                 observance => $self->{last_observance},
                 rule       => $rule,
                 );
@@ -620,7 +620,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 2.62
+version 2.63
 
 =head1 SYNOPSIS
 

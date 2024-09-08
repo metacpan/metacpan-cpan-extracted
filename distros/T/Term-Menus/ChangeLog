@@ -1,3 +1,10 @@
+2024-09-07  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.039
+
+        * Removed inappropriate transform_sicm when
+	  not tip menu
+
 2024-07-19  Brian M. Kelly  <Brian.Kelly@fullauto.com>
 
         * Version 3.038

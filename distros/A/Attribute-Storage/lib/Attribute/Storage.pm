@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2008-2024 -- leonerd@leonerd.org.uk
 
-package Attribute::Storage 0.11;
+package Attribute::Storage 0.12;
 
 use v5.14;
 use warnings;
@@ -15,7 +15,7 @@ XSLoader::load( __PACKAGE__, our $VERSION );
 
 use B qw( svref_2object );
 
-use meta 0.005;  # ->list_globs
+use meta 0.006;  # ->list_symbols
 no warnings 'meta::experimental';
 
 =head1 NAME
@@ -583,14 +583,15 @@ sub find_subs_with_attr
    foreach $pkg ( ref $pkg ? @$pkg : $pkg ) {
       my $metapkg = meta::get_package( $pkg );
 
-      foreach my $metaglob ( $metapkg->list_globs ) {
-         my $symname = $metaglob->basename;
+      # If we were on perl 5.36+ we could use multivariable foreach
+      my %metasyms = $metapkg->list_symbols( sigils => '&' );
+      foreach ( keys %metasyms ) {
+         my $metasym = $metasyms{$_};
+         my $symname = $_ =~ s/^&//r;
+         my $cv = $metasym->reference;
+
          # First definition wins
          exists $ret{$symname} and next;
-
-         # Perl seems to cache mechods in derived class symbol tables
-         # Skip these entries
-         my $cv = $pkg->can( $symname ) or next;
 
          $matching and not $matching->( local $_ = $symname ) and next;
 
@@ -622,26 +623,19 @@ sub find_vars_with_attr
    {
       my $metapkg = meta::get_package( $pkg );
 
-      foreach my $metaglob ( $metapkg->list_globs ) {
-         foreach (
-            [ '$' => $metaglob->try_get_scalar ],
-            [ '@' => $metaglob->try_get_array ],
-            [ '%' => $metaglob->try_get_hash ]
-         ) {
-            my ( $sigil, $metasym ) = @$_;
-            next unless $metasym;
+      # If we were on perl 5.36+ we could use multivariable foreach
+      my %metasyms = $metapkg->list_symbols( sigils => '$@%' );
+      foreach my $varname ( keys %metasyms ) {
+         my $metasym = $metasyms{$varname};
+         my $varref  = $metasym->reference;
 
-            my $varname = $sigil . $metaglob->basename;
-            my $varref  = $metasym->reference;
+         $matching and not $matching->( local $_ = $varname ) and next;
 
-            $matching and not $matching->( local $_ = $varname ) and next;
+         next unless defined get_varattr( $varref, $attrname );
 
-            next unless defined get_varattr( $varref, $attrname );
+         $filter and not $filter->( $varref, $varname, $pkg ) and next;
 
-            $filter and not $filter->( $varref, $varname, $pkg ) and next;
-
-            $ret{$varname} = $varref;
-         }
+         $ret{$varname} = $varref;
       }
    }
 

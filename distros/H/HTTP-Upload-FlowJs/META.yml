@@ -2,9 +2,13 @@
 abstract: 'handle resumable multi-part HTTP uploads with flowjs'
 author:
   - 'Max Maischein <corion@cpan.org>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302007'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,10 +21,19 @@ no_index:
 provides:
   HTTP::Upload::FlowJs:
     file: lib/HTTP/Upload/FlowJs.pm
-    version: '0.01'
+    version: '0.02'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Filter::signatures: '0.10'
+  JSON: '0'
+  MIME::Detect: '0'
+  Test::More: '0'
+  Text::CleanFragment: '0'
+  perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/Corion/HTTP-Upload-FlowJs.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

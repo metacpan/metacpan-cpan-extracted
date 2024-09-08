@@ -74,4 +74,25 @@ sub func {}
       '$metapkg->get_symbol for code not confused by GV-less optimisation' );
 }
 
+# ->list_symbols
+{
+   my $metapkg = meta::package->get( "main" );
+   my %metasyms = $metapkg->list_symbols;
+
+   ok( $metasyms{'$VAR'}, '->list_symbols found $VAR' );
+   ref_is( $metasyms{'$VAR'}->reference, \$VAR,
+      '->list_symbols returned the correct $VAR' );
+
+   ok( $metasyms{'@VAR'}, '->list_symbols found @VAR' );
+   ref_is( $metasyms{'@VAR'}->reference, \@VAR,
+      '->list_symbols returned the correct @VAR' );
+
+   ok( $metasyms{'&func'}, '->list_symbols found &func via GV-less optimisation' );
+   ref_is( $metasyms{'&func'}->reference, \&func,
+      '->list_symbols returned the correct &func' );
+
+   %metasyms = $metapkg->list_symbols( sigils => '$' );
+   ok( !$metasyms{'@VAR'}, '->list_symbols sigil filtering omits array' );
+}
+
 done_testing;

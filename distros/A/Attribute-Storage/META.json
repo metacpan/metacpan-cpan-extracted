@@ -27,7 +27,7 @@
       "runtime" : {
          "requires" : {
             "XSLoader" : "0",
-            "meta" : "0.005",
+            "meta" : "0.006",
             "perl" : "5.014"
          }
       },
@@ -40,7 +40,7 @@
    "provides" : {
       "Attribute::Storage" : {
          "file" : "lib/Attribute/Storage.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

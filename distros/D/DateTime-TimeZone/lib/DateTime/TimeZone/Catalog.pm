@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.62';
+our $VERSION = '2.63';
 
 our @ALL =
 qw(
@@ -176,7 +176,6 @@ qw(
   Asia/Beirut
   Asia/Bishkek
   Asia/Chita
-  Asia/Choibalsan
   Asia/Colombo
   Asia/Damascus
   Asia/Dhaka
@@ -256,11 +255,6 @@ qw(
   Australia/Melbourne
   Australia/Perth
   Australia/Sydney
-  CET
-  CST6CDT
-  EET
-  EST
-  EST5EDT
   Europe/Andorra
   Europe/Astrakhan
   Europe/Athens
@@ -299,14 +293,9 @@ qw(
   Europe/Volgograd
   Europe/Warsaw
   Europe/Zurich
-  HST
   Indian/Chagos
   Indian/Maldives
   Indian/Mauritius
-  MET
-  MST
-  MST7MDT
-  PST8PDT
   Pacific/Apia
   Pacific/Auckland
   Pacific/Bougainville
@@ -338,7 +327,6 @@ qw(
   Pacific/Tarawa
   Pacific/Tongatapu
   UTC
-  WET
 );
 
 our @CATEGORY_NAMES =
@@ -524,7 +512,6 @@ Barnaul
 Beirut
 Bishkek
 Chita
-Choibalsan
 Colombo
 Damascus
 Dhaka
@@ -1220,7 +1207,6 @@ Asia/Yangon
   'mn' => [ qw(
 Asia/Ulaanbaatar
 Asia/Hovd
-Asia/Choibalsan
 ) ],
   'mo' => [ qw(
 Asia/Macau
@@ -1705,6 +1691,7 @@ our %LINKS =
   'Asia/Bahrain' => 'Asia/Qatar',
   'Asia/Brunei' => 'Asia/Kuching',
   'Asia/Calcutta' => 'Asia/Kolkata',
+  'Asia/Choibalsan' => 'Asia/Ulaanbaatar',
   'Asia/Chongqing' => 'Asia/Shanghai',
   'Asia/Chungking' => 'Asia/Shanghai',
   'Asia/Dacca' => 'Asia/Dhaka',
@@ -1744,6 +1731,8 @@ our %LINKS =
   'Brazil/DeNoronha' => 'America/Noronha',
   'Brazil/East' => 'America/Sao_Paulo',
   'Brazil/West' => 'America/Manaus',
+  'CET' => 'Europe/Brussels',
+  'CST6CDT' => 'America/Chicago',
   'Canada/Atlantic' => 'America/Halifax',
   'Canada/Central' => 'America/Winnipeg',
   'Canada/Eastern' => 'America/Toronto',
@@ -1755,6 +1744,9 @@ our %LINKS =
   'Chile/Continental' => 'America/Santiago',
   'Chile/EasterIsland' => 'Pacific/Easter',
   'Cuba' => 'America/Havana',
+  'EET' => 'Europe/Athens',
+  'EST' => 'America/Panama',
+  'EST5EDT' => 'America/New_York',
   'Egypt' => 'Africa/Cairo',
   'Eire' => 'Europe/Dublin',
   'Etc/GMT' => 'UTC',
@@ -1799,6 +1791,7 @@ our %LINKS =
   'GMT-0' => 'UTC',
   'GMT0' => 'UTC',
   'Greenwich' => 'UTC',
+  'HST' => 'Pacific/Honolulu',
   'Hongkong' => 'Asia/Hong_Kong',
   'Iceland' => 'Africa/Abidjan',
   'Indian/Antananarivo' => 'Africa/Nairobi',
@@ -1816,6 +1809,9 @@ our %LINKS =
   'Japan' => 'Asia/Tokyo',
   'Kwajalein' => 'Pacific/Kwajalein',
   'Libya' => 'Africa/Tripoli',
+  'MET' => 'Europe/Brussels',
+  'MST' => 'America/Phoenix',
+  'MST7MDT' => 'America/Denver',
   'Mexico/BajaNorte' => 'America/Tijuana',
   'Mexico/BajaSur' => 'America/Mazatlan',
   'Mexico/General' => 'America/Mexico_City',
@@ -1823,6 +1819,7 @@ our %LINKS =
   'NZ-CHAT' => 'Pacific/Chatham',
   'Navajo' => 'America/Denver',
   'PRC' => 'Asia/Shanghai',
+  'PST8PDT' => 'America/Los_Angeles',
   'Pacific/Chuuk' => 'Pacific/Port_Moresby',
   'Pacific/Enderbury' => 'Pacific/Kanton',
   'Pacific/Funafuti' => 'Pacific/Tarawa',
@@ -1858,12 +1855,13 @@ our %LINKS =
   'US/Samoa' => 'Pacific/Pago_Pago',
   'Universal' => 'UTC',
   'W-SU' => 'Europe/Moscow',
+  'WET' => 'Europe/Lisbon',
   'Zulu' => 'UTC'
 )
 
 ;
 
-sub OlsonVersion { '2024a' }
+sub OlsonVersion { '2024b' }
 
 
 1;
@@ -2054,7 +2052,6 @@ so that applications can easily present a list of timezones.
   Asia/Bangkok
   Asia/Beirut
   Asia/Bishkek
-  Asia/Choibalsan
   Asia/Colombo
   Asia/Damascus
   Asia/Dhaka
@@ -2915,8 +2912,7 @@ so that applications can easily present a list of timezones.
 =head3 Mongolia (MN)
 
   Asia/Ulaanbaatar - most of Mongolia
-  Asia/Hovd - Bayan-Olgiy, Govi-Altai, Hovd, Uvs, Zavkhan
-  Asia/Choibalsan - Dornod, Sukhbaatar
+  Asia/Hovd - Bayan-Olgii, Hovd, Uvs
 
 =head3 Montenegro (ME)
 
@@ -3483,6 +3479,7 @@ A linked zone is an alias from one name to another.
   Asia/Bahrain => Asia/Qatar
   Asia/Brunei => Asia/Kuching
   Asia/Calcutta => Asia/Kolkata
+  Asia/Choibalsan => Asia/Ulaanbaatar
   Asia/Chongqing => Asia/Shanghai
   Asia/Chungking => Asia/Shanghai
   Asia/Dacca => Asia/Dhaka
@@ -3522,6 +3519,8 @@ A linked zone is an alias from one name to another.
   Brazil/DeNoronha => America/Noronha
   Brazil/East => America/Sao_Paulo
   Brazil/West => America/Manaus
+  CET => Europe/Brussels
+  CST6CDT => America/Chicago
   Canada/Atlantic => America/Halifax
   Canada/Central => America/Winnipeg
   Canada/Eastern => America/Toronto
@@ -3533,6 +3532,9 @@ A linked zone is an alias from one name to another.
   Chile/Continental => America/Santiago
   Chile/EasterIsland => Pacific/Easter
   Cuba => America/Havana
+  EET => Europe/Athens
+  EST => America/Panama
+  EST5EDT => America/New_York
   Egypt => Africa/Cairo
   Eire => Europe/Dublin
   Etc/GMT => UTC
@@ -3577,6 +3579,7 @@ A linked zone is an alias from one name to another.
   GMT-0 => UTC
   GMT0 => UTC
   Greenwich => UTC
+  HST => Pacific/Honolulu
   Hongkong => Asia/Hong_Kong
   Iceland => Africa/Abidjan
   Indian/Antananarivo => Africa/Nairobi
@@ -3594,6 +3597,9 @@ A linked zone is an alias from one name to another.
   Japan => Asia/Tokyo
   Kwajalein => Pacific/Kwajalein
   Libya => Africa/Tripoli
+  MET => Europe/Brussels
+  MST => America/Phoenix
+  MST7MDT => America/Denver
   Mexico/BajaNorte => America/Tijuana
   Mexico/BajaSur => America/Mazatlan
   Mexico/General => America/Mexico_City
@@ -3601,6 +3607,7 @@ A linked zone is an alias from one name to another.
   NZ-CHAT => Pacific/Chatham
   Navajo => America/Denver
   PRC => Asia/Shanghai
+  PST8PDT => America/Los_Angeles
   Pacific/Chuuk => Pacific/Port_Moresby
   Pacific/Enderbury => Pacific/Kanton
   Pacific/Funafuti => Pacific/Tarawa
@@ -3636,6 +3643,7 @@ A linked zone is an alias from one name to another.
   US/Samoa => Pacific/Pago_Pago
   Universal => UTC
   W-SU => Europe/Moscow
+  WET => Europe/Lisbon
   Zulu => UTC
 
 =cut

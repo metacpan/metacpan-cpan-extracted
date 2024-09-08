@@ -1,5 +1,10 @@
 Revision history for meta
 
+0.006   2024-09-06
+        [CHANGES]
+         * Added `$metapkg->list_symbols` and `$metapkg->list_subpackages`
+           methods
+
 0.005   2024-09-06
         [CHANGES]
          * Added `meta::package->list_globs` and variations

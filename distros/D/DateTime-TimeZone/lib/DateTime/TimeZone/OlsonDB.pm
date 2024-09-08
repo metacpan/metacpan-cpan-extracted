@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.62';
+our $VERSION = '2.63';
 
 use DateTime::Duration;
 use DateTime::TimeZone::OlsonDB::Rule;
@@ -14,10 +14,13 @@ my $x = 1;
 our %MONTHS = map { $_ => $x++ } qw( Jan Feb Mar Apr May Jun
     Jul Aug Sep Oct Nov Dec);
 
+# 2024b accidentally used "April" instead of "Apr".
+$MONTHS{April} = $MONTHS{Apr};
+
 $x = 1;
 our %DAYS = map { $_ => $x++ } qw( Mon Tue Wed Thu Fri Sat Sun );
 
-our $PLUS_ONE_DAY_DUR  = DateTime::Duration->new( days => 1 );
+our $PLUS_ONE_DAY_DUR  = DateTime::Duration->new( days =>  1 );
 our $MINUS_ONE_DAY_DUR = DateTime::Duration->new( days => -1 );
 
 sub new {
@@ -301,7 +304,7 @@ DateTime::TimeZone::OlsonDB - An object to represent an Olson time zone database
 
 =head1 VERSION
 
-version 2.62
+version 2.63
 
 =head1 SYNOPSIS
 

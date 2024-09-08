@@ -6,28 +6,24 @@ NAME
 SYNOPSIS
 
     This synopsis assumes a Plack/PSGI-like environment. There are plugins
-    for Dancer and Mojolicious planned.
+    for Dancer and Mojolicious planned. See HTTP::Upload::FlowJs::Examples
+    for longer examples.
+
+    The flow.js workflow assumes that your application handles two kinds of
+    requests, POST requests for storing the payload data and GET requests
+    for retrieving information about uploaded parts. You will have to make
+    various calls to the HTTP::Upload::FlowJs object to validate the
+    incoming request at every stage.
 
       use HTTP::Upload::FlowJs;
     
-      my @parameter_names = (
-        'file', # The name of the file
-        'flowChunkNumber', # The index of the chunk in the current upload.
-                           # First chunk is 1 (no base-0 counting here).
-        'flowTotalChunks', # The total number of chunks.
-        'flowChunkSize', # The general chunk size. Using this value and
-                         # flowTotalSize you can calculate the total number of
-                         # chunks. Please note that the size of the data received in
-                         # the HTTP might be lower than flowChunkSize of this for
-                         # the last chunk for a file.
-        'flowTotalSize', #  The total file size.
-        'flowIdentifier', # A unique identifier for the file contained in the request.
-        'flowFilename', # The original file name (since a bug in Firefox results in
-                        # the file name not being transmitted in chunk
-                        # multipart posts).
-        'flowRelativePath', # The file's relative path when selecting a directory
-                            # (defaults to file name in all browsers except Chrome).
+      my $uploads = '/tmp/flowjs_uploads/';
+      my $flowjs = HTTP::Upload::FlowJs->new(
+          incomingDirectory => $uploads,
+          allowedContentType => sub { $_[0] =~ m!^image/! },
       );
+    
+      my @parameter_names = $flowjs->parameter_names();
     
       # In your POST handler for /upload:
       sub POST_upload {
@@ -37,12 +33,6 @@ SYNOPSIS
         @info{ @parameter_names } = @{$params}{@parameter_names};
         $info{ localChunkSize } = -s $params{ file };
         # or however you get the size of the uploaded chunk
-    
-        my $uploads = '/tmp/flowjs_uploads/';
-        my $flowjs = HTTP::Upload::FlowJs->new(
-            incomingDirectory => $uploads,
-            allowedContentType => sub { $_[0] =~ m!^image/! },
-        );
     
         # you might want to set this so users don't clobber each others upload
         my $session_id = '';
@@ -94,10 +84,6 @@ SYNOPSIS
         my $params = params();
         my %info;
         @info{ @parameter_names} = @{$params}{@parameter_names};
-        my $flowjs = HTTP::Upload::FlowJs->new(
-            incomingDirectory => $uploads,
-            allowedContentType => sub { $_[0] =~ m!^image/! },
-        );
     
         my @invalid = $flowjs->validateRequest( 'GET', \%info, session->{connid} );
         if( @invalid ) {
@@ -124,14 +110,14 @@ SYNOPSIS
 
 OVERVIEW
 
-    flow.js is a client-side Javascript upload library that uploads a file
-    in multiple parts. It requires two API points on the server side, one
-    GET API point to check whether a part already has been uploaded
-    completely and one POST API point to send the data of each partial
-    upload to. This Perl module implements the backend functionality for
-    both endpoints. It does not implement the handling of the HTTP requests
-    themselves, but you likely already use a framework like Mojolicious or
-    Dancer for that.
+    flow.js <https://github.com/flowjs/flow.js> is a client-side Javascript
+    upload library that uploads a file in multiple parts. It requires two
+    API points on the server side, one GET API point to check whether a
+    part already has been uploaded completely and one POST API point to
+    send the data of each partial upload to. This Perl module implements
+    the backend functionality for both endpoints. It does not implement the
+    handling of the HTTP requests themselves, but you likely already use a
+    framework like Mojolicious or Dancer for that.
 
 METHODS
 
@@ -148,11 +134,21 @@ METHODS
           },
       );
 
+      incomingDirectory - path for the temporary upload parts
+
+      Required
+
       maxChunkCount - hard maximum chunks allowed for a single upload
+
+      Default 1000
 
       maxFileSize - hard maximum total file size for a single upload
 
+      Default 10_000_000
+
       maxChunkSize - hard maximum chunk size for a single chunk
+
+      Default 1048576
 
       minChunkSize - hard minimum chunk size for a single chunk
 
@@ -162,7 +158,21 @@ METHODS
       works on the first chunk. If the first chunk is too small, its file
       type cannot be checked.
 
+      forceChunkSize - force all chunks to be less or equal than
+      maxChunkSize
+
+      Default: true
+
+      Otherwise, the last chunk will be greater than or equal to
+      maxChunkSize (the last uploaded chunk will be at least this size and
+      up to two the size).
+
+      Note: when forceChunkSize is false it only make chunkSize value in
+      "jsConfig" equal to maxChunkSize/2.
+
       simultaneousUploads - simultaneously allowed uploads per file
+
+      Default 3
 
       This is just an indication to the Javascript flow.js client if you
       pass it the configuration from this object. This is not enforced in
@@ -175,19 +185,55 @@ METHODS
       If you need more advanced checking, do so after you've determined a
       file upload as complete with $flowjs->uploadComplete.
 
+      fileParameterName - The name of the multipart POST parameter to use
+      for the file chunk
+
+      Default file
+
     More interesting limits would be hard maxima for the number of pending
     uploads or the number of outstanding chunks per user/session. Checking
     these would entail a call to glob for each check and thus would be
     fairly disk-intensive on some systems.
 
+ $flowjs->incomingDirectory
+
+    Return the incoming directory name.
+
+ $flowjs->mime
+
+    Return the MIME::Detect instance.
+
  $flowjs->jsConfig
 
+ $flowjs->jsConfigStr
+
+      # Perl HASH
       my $config = $flowjs->jsConfig(
+          target => '/upload',
+      );
+    
+      # JSON string
+      my $config = $flowjs->jsConfigStr(
           target => '/upload',
       );
 
     Create a JSON string that encapsulates the configuration of the Perl
-    object for inclusion with the JS side of the world
+    object for inclusion with the JS side of the world.
+
+ $flowjs->parameter_names
+
+        my $params = params();                 # request params
+        my @parameter_names = $flowjs->parameter_names; # params needed by Flowjs
+    
+        my %info;
+        @info{ @parameter_names } = @{$params}{@parameter_names};
+    
+        $info{ file }           = $params{ file };
+        $info{ localChunkSize } = -s $params{ file };
+    
+        my @invalid = $flowjs->validateRequest( 'POST', \%info );
+
+    Returns needed params for validating request.
 
  $flowjs->validateRequest
 
@@ -202,6 +248,9 @@ METHODS
 
     Does formal validation of the request HTTP parameters. It does not
     check previously stored information.
+
+    Note when POST there are addition required params localChunkSize and
+    $self-{fileParameterName}> (default 'file').
 
  $flowJs->expectedChunkSize
 
@@ -369,7 +418,7 @@ REPOSITORY
 
 SUPPORT
 
-    The public support forum of this module is http://perlmonks.org/.
+    The public support forum of this module is https://perlmonks.org/.
 
 BUG TRACKER
 
@@ -383,7 +432,7 @@ AUTHOR
 
 COPYRIGHT (c)
 
-    Copyright 2009-2017 by Max Maischein corion@cpan.org.
+    Copyright 2009-2018 by Max Maischein corion@cpan.org.
 
 LICENSE
 

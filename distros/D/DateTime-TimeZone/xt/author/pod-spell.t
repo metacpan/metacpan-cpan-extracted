@@ -89,10 +89,8 @@ Bucharest
 Budapest
 Buenos_Aires
 Burkina
-CET
 CN
 CPAN
-CST6CDT
 CX
 CY
 Cabo
@@ -118,7 +116,6 @@ Chicago
 Chihuahua
 Chisinau
 Chita
-Choibalsan
 Ciudad_Juarez
 Colombo
 Cordoba
@@ -150,10 +147,7 @@ Dubai
 Dublin
 Dushanbe
 EE
-EET
 EG
-EST
-EST5EDT
 Easter
 Edmonton
 Efate
@@ -205,7 +199,6 @@ Guyana
 HK
 HN
 HPUX
-HST
 HU
 Halifax
 Havana
@@ -286,12 +279,9 @@ London
 Lord_Howe
 Los_Angeles
 Louisville
-MET
 MF
 MH
 MQ
-MST
-MST7MDT
 MX
 MZ
 Maarten
@@ -363,7 +353,6 @@ OlsonDB
 Omsk
 Oral
 PN
-PST8PDT
 PY
 Pacific
 Pago_Pago
@@ -513,7 +502,6 @@ Vincennes
 Vladivostok
 Volgograd
 Vostok
-WET
 WF
 WS
 Warsaw
@@ -546,6 +534,7 @@ da
 datetime
 dave
 deceased
+distros
 dmaki
 drolsky
 env
