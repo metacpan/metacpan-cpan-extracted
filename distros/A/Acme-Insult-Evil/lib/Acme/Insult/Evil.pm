@@ -1,4 +1,4 @@
-package Acme::Insult::Evil 1.0 {    # https://www.freepublicapis.com/evil-insult-generator
+package Acme::Insult::Evil 1.1 {    # https://www.freepublicapis.com/evil-insult-generator
     use v5.38;
     use HTTP::Tiny;
     use JSON::Tiny qw[decode_json];
@@ -113,5 +113,11 @@ Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 I'm inflicting this upon the world because L<oodler577|https://github.com/oodler577/> invited me to help expand Perl's
 coverage of smaller open APIs. Blame them or L<join us|https://github.com/oodler577/FreePublicPerlAPIs> in the effort.
+
+=begin stopwords
+
+RESTful
+
+=end stopwords
 
 =cut

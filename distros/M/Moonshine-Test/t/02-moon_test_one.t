@@ -43,7 +43,7 @@ check_test(
     {
         ok => 1,
         name => "render instance: <p>test</p>",
-        depth => 3,
+        depth => 6,
         completed => 1,
     },
     'test render_me(p)'
@@ -64,7 +64,7 @@ check_test(
     {
         ok => 1,
         name => "function: arrayref is ref - is_deeply",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked arrayref'
@@ -85,7 +85,7 @@ check_test(
     {
         ok => 1,
         name => "function: hashref is ref - is_deeply",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked hashref'
@@ -106,7 +106,7 @@ check_test(
     {
         ok => 1,
         name => "function: array is array - reference - is_deeply",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked array'
@@ -127,7 +127,7 @@ check_test(
     {
         ok => 1,
         name => "function: hash is hash - reference - is_deeply",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked hash'
@@ -147,7 +147,7 @@ check_test(
     {
         ok => 1,
         name => "'function: obj is Object - blessed - is - Test::Moon' isa 'Test::Moon'",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked obj'
@@ -167,7 +167,7 @@ check_test(
     {
         ok => 1,
         name => "catch is like - a horrible death",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked catch(die)'
@@ -189,7 +189,7 @@ check_test(
     {
         ok => 0,
         name => "render instance: <div class=\"test\">test</div>",
-        depth => 3,
+        depth => 6,
         diag => "         got: '< class=\"test\">test</>'\n    expected: '<div class=\"test\">test</div>'"
     },
     'test broken()'
@@ -225,7 +225,7 @@ check_test(
     {
         ok => 1,
         name => "function: true is true - 1",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked true'
@@ -244,7 +244,7 @@ check_test(
     {
         ok => 1,
         name => "function: false is false - 0",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked false'
@@ -263,7 +263,7 @@ check_test(
     {
         ok => 1,
         name => "function: undefined is undef",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked undef'
@@ -284,7 +284,7 @@ check_test(
     {
         ok => 1,
         name => "function: ref_scalar_key is ref - has scalar key: thing - is - 1234",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test ref_key_scalar'
@@ -302,7 +302,7 @@ check_test(
     {
         ok => 0,
         name => "No key passed to test - ref_key_scalar - testing - function: ref_scalar_key",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked ref_scalar_key no key '
@@ -323,7 +323,7 @@ check_test(
     {
         ok => 1,
         name => "function: ref_ref_key is ref - has ref key: thing - is_deeply - ref",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test ref_key_ref'
@@ -344,7 +344,7 @@ check_test(
     {
         ok => 1,
         name => "function: ref_refa_key is ref - has ref key: thing - is_deeply - ref",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test ref_key_ref'
@@ -362,7 +362,7 @@ check_test(
     {
         ok => 0,
         name => "No key passed to test - ref_key_ref - testing - function: ref_ref_key",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked ref_key_ref no key'
@@ -383,7 +383,7 @@ check_test(
     {
         ok => 1,
         name => "function: ref_index is ref - has scalar index: 0 - is - thing",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test ref_index_scalar'
@@ -401,7 +401,7 @@ check_test(
     {
         ok => 0,
         name => "No index passed to test - ref_index_scalar - testing - function: ref_index",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked ref_index_scalar no key'
@@ -420,7 +420,7 @@ check_test(
     {
         ok => 1,
         name => "function: ref_index is ref - has ref index: 1 - is_deeply - ref",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test ref_index_ref'
@@ -438,7 +438,7 @@ check_test(
     {
         ok => 0,
         name => "No index passed to test - ref_index_ref - testing - function: ref_index",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked ref_index_ref no index'
@@ -460,7 +460,7 @@ check_test(
     {
         ok => 1,
         name => "function: ref_like_key is ref - has scalar key: exception - like - mehhh the world has ended",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test ref_key_like'
@@ -478,7 +478,7 @@ check_test(
     {
         ok => 0,
         name => "No key passed to test - ref_key_like - testing - function: ref_like_key",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked ref_key_like no key'
@@ -499,7 +499,7 @@ check_test(
     {
         ok => 1,
         name => "function: ref_like_ref is ref - has scalar index: 1 - like - mehhh the world has ended",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test ref_index_like'
@@ -517,7 +517,7 @@ check_test(
     {
         ok => 0,
         name => "No index passed to test - ref_index_like - testing - function: ref_like_key",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked ref_key_like no key'
@@ -538,7 +538,7 @@ check_test(
     {
         ok => 1,
         name => "function: list_like_ref is list - has scalar index: 1 - like - mehhh the world has ended",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test list_index_like'
@@ -556,7 +556,7 @@ check_test(
     {
         ok => 0,
         name => "No index passed to test - list_index_like - testing - function: list_like_ref",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked list_index_like no key'
@@ -577,7 +577,7 @@ check_test(
     {
         ok => 1,
         name => "function: list_index is list - has scalar index: 0 - is - thing",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test list_index_scalar'
@@ -595,7 +595,7 @@ check_test(
     {
         ok => 0,
         name => "No index passed to test - list_index_scalar - testing - function: list_index",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked list_index_scalar no key'
@@ -614,7 +614,7 @@ check_test(
     {
         ok => 1,
         name => "function: list_index is list - has ref index: 1 - is_deeply - ref",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test list_index_ref'
@@ -632,7 +632,7 @@ check_test(
     {
         ok => 0,
         name => "No index passed to test - list_index_ref - testing - function: list_index",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked list_index_ref no index'
@@ -653,7 +653,7 @@ check_test(
     {
         ok => 1,
         name => "function: list_key is list - has scalar key: yes - is - okay something slow",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test list_key_scalar'
@@ -671,7 +671,7 @@ check_test(
     {
         ok => 0,
         name => "No key passed to test - list_key_scalar - testing - function: list_key",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked list_key_scalar no key'
@@ -690,7 +690,7 @@ check_test(
     {
         ok => 1,
         name => "function: list_key is list - has ref key: thing - is_deeply - ref",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test list_key_ref'
@@ -708,7 +708,7 @@ check_test(
     {
         ok => 0,
         name => "No key passed to test - list_key_ref - testing - function: list_key",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked list_key_ref no key'
@@ -727,7 +727,7 @@ check_test(
     {
         ok => 1,
         name => "function: list_key is list - has scalar key: yes - like - something",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test list_key_like'
@@ -745,7 +745,7 @@ check_test(
     {
         ok => 0,
         name => "No key passed to test - list_key_like - testing - function: list_key",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked list_key_like no key'
@@ -762,7 +762,7 @@ check_test(
     {
         ok => 1,
         name => "function: list_key is ok",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked ok'
@@ -779,7 +779,7 @@ check_test(
     {
         ok => 1,
         name => "function: list_key - skip",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked skip'
@@ -801,7 +801,7 @@ check_test(
     {
         ok => 1,
         name => "'function: ref_ind_obj is ref - has obj index: 0 - isa_ok - Thing' isa 'Thing'",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked ref_index_obj'
@@ -822,7 +822,7 @@ check_test(
     {
         ok => 1,
         name => "'function: list_ind_obj is list - has obj index: 0 - isa_ok - Thing' isa 'Thing'",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked list_index_obj'
@@ -840,7 +840,7 @@ check_test(
     {
         ok => 1,
         name => "function: list_ind_obj is list - count - is - 1",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked count'
@@ -858,7 +858,7 @@ check_test(
     {
         ok => 1,
         name => "function: ref_ind_obj is ref - count - is - 1",
-        depth => 2,
+        depth => 5,
         completed => 1,
     },
     'test mocked ref_count'

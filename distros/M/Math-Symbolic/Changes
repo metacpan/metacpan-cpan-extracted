@@ -1,5 +1,8 @@
 Revision history for Perl extension Math::Symbolic.
 
+0.613  Sun Sep 8 13:17 2024
+    - Fix for broken constant folding in simplification code.
+
 0.612  Mon Jun 17 08:10 2013
     - Attempt to fix versioning issues, take two.
 

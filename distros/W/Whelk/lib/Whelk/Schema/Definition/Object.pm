@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Object;
-$Whelk::Schema::Definition::Object::VERSION = '0.06';
+$Whelk::Schema::Definition::Object::VERSION = '1.00';
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 attr '?properties' => undef;
@@ -14,6 +14,7 @@ sub openapi_dump
 	}
 
 	my $res = {
+		%{$self->_openapi_dump_extra_rules},
 		type => 'object',
 	};
 
@@ -79,28 +80,28 @@ sub inhale
 
 	if (ref $value eq 'HASH') {
 		my $properties = $self->properties;
-		return undef unless $properties;
+		if ($properties) {
+			foreach my $key (keys %$properties) {
+				if (!exists $value->{$key}) {
+					return "object[$key]->required"
+						if $properties->{$key}->required;
 
-		foreach my $key (keys %$properties) {
-			if (!exists $value->{$key}) {
-				return "object[$key]->required"
-					if $properties->{$key}->required;
+					next;
+				}
 
-				next;
+				my $inhaled = $properties->{$key}->inhale($value->{$key});
+				return "object[$key]->$inhaled" if defined $inhaled;
 			}
 
-			my $inhaled = $properties->{$key}->inhale($value->{$key});
-			return "object[$key]->$inhaled" if defined $inhaled;
-		}
-
-		if ($self->strict && keys %$value > keys %$properties) {
-			foreach my $key (keys %$value) {
-				next if exists $properties->{$key};
-				return "object[$key]->redundant";
+			if ($self->strict && keys %$value > keys %$properties) {
+				foreach my $key (keys %$value) {
+					next if exists $properties->{$key};
+					return "object[$key]->redundant";
+				}
 			}
 		}
 
-		return undef;
+		return $self->_inhale_extra_rules($value);
 	}
 
 	return 'object';

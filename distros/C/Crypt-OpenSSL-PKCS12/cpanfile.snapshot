@@ -1,0 +1,594 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Algorithm-Diff-1.201
+    pathname: R/RJ/RJBS/Algorithm-Diff-1.201.tar.gz
+    provides:
+      Algorithm::Diff 1.201
+      Algorithm::Diff::_impl 1.201
+    requirements:
+      ExtUtils::MakeMaker 0
+  Archive-Any-Lite-0.11
+    pathname: I/IS/ISHIGAKI/Archive-Any-Lite-0.11.tar.gz
+    provides:
+      Archive::Any::Lite 0.11
+      Archive::Any::Lite::Tar 0.11
+      Archive::Any::Lite::Zip 0.11
+    requirements:
+      Archive::Tar 1.76
+      Archive::Zip 0
+      ExtUtils::MakeMaker 0
+      ExtUtils::MakeMaker::CPANfile 0.09
+      File::Spec 0
+      File::Temp 0.19
+      IO::Uncompress::Bunzip2 0
+      IO::Zlib 0
+  Archive-Zip-1.68
+    pathname: P/PH/PHRED/Archive-Zip-1.68.tar.gz
+    provides:
+      Archive::Zip 1.68
+      Archive::Zip::Archive 1.68
+      Archive::Zip::BufferedFileHandle 1.68
+      Archive::Zip::DirectoryMember 1.68
+      Archive::Zip::FileMember 1.68
+      Archive::Zip::Member 1.68
+      Archive::Zip::MemberRead 1.68
+      Archive::Zip::MockFileHandle 1.68
+      Archive::Zip::NewFileMember 1.68
+      Archive::Zip::StringMember 1.68
+      Archive::Zip::Tree 1.68
+      Archive::Zip::ZipFileMember 1.68
+    requirements:
+      Compress::Raw::Zlib 2.017
+      Encode 0
+      ExtUtils::MakeMaker 0
+      File::Basename 0
+      File::Copy 0
+      File::Find 0
+      File::Path 0
+      File::Spec 0.80
+      File::Temp 0
+      IO::File 0
+      IO::Handle 0
+      IO::Seekable 0
+      Time::Local 0
+      perl 5.006
+  Array-Diff-0.09
+    pathname: N/NE/NEILB/Array-Diff-0.09.tar.gz
+    provides:
+      Array::Diff 0.09
+    requirements:
+      Algorithm::Diff 1.19
+      Class::Accessor::Fast 0
+      ExtUtils::MakeMaker 0
+      base 0
+      perl 5.008
+      strict 0
+      warnings 0
+  Class-Accessor-0.51
+    pathname: K/KA/KASEI/Class-Accessor-0.51.tar.gz
+    provides:
+      Class::Accessor 0.51
+      Class::Accessor::Fast 0.51
+      Class::Accessor::Faster 0.51
+    requirements:
+      ExtUtils::MakeMaker 0
+      base 1.01
+  Class-XSAccessor-1.19
+    pathname: S/SM/SMUELLER/Class-XSAccessor-1.19.tar.gz
+    provides:
+      Class::XSAccessor 1.19
+      Class::XSAccessor::Array 1.19
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0
+      Time::HiRes 0
+      XSLoader 0
+      perl 5.008
+  Crypt-OpenSSL-Guess-0.15
+    pathname: A/AK/AKIYM/Crypt-OpenSSL-Guess-0.15.tar.gz
+    provides:
+      Crypt::OpenSSL::Guess 0.15
+    requirements:
+      Config 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.64
+      File::Spec 0
+      Symbol 0
+      perl 5.008001
+  Crypt-OpenSSL-PKCS10-0.26
+    pathname: T/TI/TIMLEGGE/Crypt-OpenSSL-PKCS10-0.26.tar.gz
+    provides:
+      Crypt::OpenSSL::PKCS10 0.26
+    requirements:
+      Crypt::OpenSSL::Guess 0.11
+      Crypt::OpenSSL::RSA 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      XSLoader 0
+      perl 5.008
+  Crypt-OpenSSL-RSA-0.33
+    pathname: T/TO/TODDR/Crypt-OpenSSL-RSA-0.33.tar.gz
+    provides:
+      Crypt::OpenSSL::RSA 0.33
+    requirements:
+      Crypt::OpenSSL::Random 0
+      ExtUtils::MakeMaker 0
+      Test::More 0
+      perl 5.006
+  Crypt-OpenSSL-Random-0.17
+    pathname: R/RU/RURBAN/Crypt-OpenSSL-Random-0.17.tar.gz
+    provides:
+      Crypt::OpenSSL::Random 0.17
+    requirements:
+      Crypt::OpenSSL::Guess 0.11
+      ExtUtils::MakeMaker 0
+  Data-Binary-0.01
+    pathname: S/SN/SNKWATT/Data-Binary-0.01.tar.gz
+    provides:
+      Data::Binary 0.01
+    requirements:
+      ExtUtils::MakeMaker 6.30
+  Data-Dump-1.25
+    pathname: G/GA/GARU/Data-Dump-1.25.tar.gz
+    provides:
+      Data::Dump 1.25
+      Data::Dump::FilterContext undef
+      Data::Dump::Filtered undef
+      Data::Dump::Trace 0.02
+      Data::Dump::Trace::Call 0.02
+      Data::Dump::Trace::Wrapper 0.02
+    requirements:
+      ExtUtils::MakeMaker 0
+      Symbol 0
+      Test 0
+      perl 5.006
+  Data-OptList-0.114
+    pathname: R/RJ/RJBS/Data-OptList-0.114.tar.gz
+    provides:
+      Data::OptList 0.114
+    requirements:
+      ExtUtils::MakeMaker 6.78
+      List::Util 0
+      Params::Util 0
+      Sub::Install 0.921
+      perl 5.012
+      strict 0
+      warnings 0
+  Data-Section-0.200008
+    pathname: R/RJ/RJBS/Data-Section-0.200008.tar.gz
+    provides:
+      Data::Section 0.200008
+    requirements:
+      Encode 0
+      ExtUtils::MakeMaker 6.78
+      MRO::Compat 0.09
+      Sub::Exporter 0.979
+      perl 5.012
+      strict 0
+      warnings 0
+  Devel-Symdump-2.18
+    pathname: A/AN/ANDK/Devel-Symdump-2.18.tar.gz
+    provides:
+      Devel::Symdump 2.18
+      Devel::Symdump::Export undef
+    requirements:
+      Compress::Zlib 0
+      ExtUtils::MakeMaker 0
+      Test::More 0
+      perl 5.004
+  ExtUtils-MakeMaker-CPANfile-0.09
+    pathname: I/IS/ISHIGAKI/ExtUtils-MakeMaker-CPANfile-0.09.tar.gz
+    provides:
+      ExtUtils::MakeMaker::CPANfile 0.09
+    requirements:
+      CPAN::Meta::Converter 2.141170
+      Cwd 0
+      ExtUtils::MakeMaker 6.17
+      File::Path 0
+      Module::CPANfile 0
+      Test::More 0.88
+      version 0.76
+  File-Find-Object-0.3.8
+    pathname: S/SH/SHLOMIF/File-Find-Object-0.3.8.tar.gz
+    provides:
+      File::Find::Object v0.3.8
+      File::Find::Object::Base v0.3.8
+      File::Find::Object::DeepPath v0.3.8
+      File::Find::Object::PathComp v0.3.8
+      File::Find::Object::Result v0.3.8
+      File::Find::Object::TopPath v0.3.8
+    requirements:
+      Carp 0
+      Class::XSAccessor 0
+      ExtUtils::MakeMaker 0
+      Fcntl 0
+      File::Spec 0
+      List::Util 0
+      Module::Build 0.28
+      integer 0
+      parent 0
+      perl 5.008
+      strict 0
+      warnings 0
+  JSON-4.10
+    pathname: I/IS/ISHIGAKI/JSON-4.10.tar.gz
+    provides:
+      JSON 4.10
+      JSON::Backend::PP 4.10
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0
+  MRO-Compat-0.15
+    pathname: H/HA/HAARG/MRO-Compat-0.15.tar.gz
+    provides:
+      MRO::Compat 0.15
+    requirements:
+      ExtUtils::MakeMaker 0
+      perl 5.006
+  Module-Build-0.4234
+    pathname: L/LE/LEONT/Module-Build-0.4234.tar.gz
+    provides:
+      Module::Build 0.4234
+      Module::Build::Base 0.4234
+      Module::Build::Compat 0.4234
+      Module::Build::Config 0.4234
+      Module::Build::Cookbook 0.4234
+      Module::Build::Dumper 0.4234
+      Module::Build::Notes 0.4234
+      Module::Build::PPMMaker 0.4234
+      Module::Build::Platform::Default 0.4234
+      Module::Build::Platform::MacOS 0.4234
+      Module::Build::Platform::Unix 0.4234
+      Module::Build::Platform::VMS 0.4234
+      Module::Build::Platform::VOS 0.4234
+      Module::Build::Platform::Windows 0.4234
+      Module::Build::Platform::aix 0.4234
+      Module::Build::Platform::cygwin 0.4234
+      Module::Build::Platform::darwin 0.4234
+      Module::Build::Platform::os2 0.4234
+      Module::Build::PodParser 0.4234
+    requirements:
+      CPAN::Meta 2.142060
+      Cwd 0
+      Data::Dumper 0
+      ExtUtils::CBuilder 0.27
+      ExtUtils::Install 0
+      ExtUtils::Manifest 0
+      ExtUtils::Mkbootstrap 0
+      ExtUtils::ParseXS 2.21
+      File::Basename 0
+      File::Compare 0
+      File::Copy 0
+      File::Find 0
+      File::Path 0
+      File::Spec 0.82
+      Getopt::Long 0
+      Module::Metadata 1.000002
+      Perl::OSType 1
+      TAP::Harness 3.29
+      Text::Abbrev 0
+      Text::ParseWords 0
+      perl 5.006001
+      version 0.87
+  Module-CPANTS-Analyse-1.02
+    pathname: I/IS/ISHIGAKI/Module-CPANTS-Analyse-1.02.tar.gz
+    provides:
+      Module::CPANTS::Analyse 1.02
+      Module::CPANTS::Kwalitee 1.02
+      Module::CPANTS::Kwalitee::BrokenInstaller 1.02
+      Module::CPANTS::Kwalitee::CpantsErrors 1.02
+      Module::CPANTS::Kwalitee::Distname 1.02
+      Module::CPANTS::Kwalitee::Distros 1.02
+      Module::CPANTS::Kwalitee::Files 1.02
+      Module::CPANTS::Kwalitee::FindModules 1.02
+      Module::CPANTS::Kwalitee::License 1.02
+      Module::CPANTS::Kwalitee::Manifest 1.02
+      Module::CPANTS::Kwalitee::MetaYML 1.02
+      Module::CPANTS::Kwalitee::NeedsCompiler 1.02
+      Module::CPANTS::Kwalitee::Pod 1.02
+      Module::CPANTS::Kwalitee::Prereq 1.02
+      Module::CPANTS::Kwalitee::Repackageable 1.02
+      Module::CPANTS::Kwalitee::Signature 1.02
+      Module::CPANTS::Kwalitee::Uses 1.02
+      Module::CPANTS::Kwalitee::Version 1.02
+    requirements:
+      Archive::Any::Lite 0.06
+      Archive::Tar 1.76
+      Array::Diff 0.04
+      CPAN::Meta::Validator 2.133380
+      CPAN::Meta::YAML 0.008
+      Class::Accessor 0.19
+      Data::Binary 0
+      ExtUtils::MakeMaker 0
+      ExtUtils::MakeMaker::CPANfile 0.09
+      File::Find::Object v0.2.1
+      JSON::PP 0
+      List::Util 1.33
+      Module::Find 0
+      Parse::Distname 0
+      Perl::PrereqScanner::NotQuiteLite 0.9901
+      Software::License 0.103012
+      Text::Balanced 0
+      perl 5.008001
+      version 0.73
+  Module-CPANfile-1.1004
+    pathname: M/MI/MIYAGAWA/Module-CPANfile-1.1004.tar.gz
+    provides:
+      Module::CPANfile 1.1004
+      Module::CPANfile::Environment undef
+      Module::CPANfile::Prereq undef
+      Module::CPANfile::Prereqs undef
+      Module::CPANfile::Requirement undef
+    requirements:
+      CPAN::Meta 2.12091
+      CPAN::Meta::Prereqs 2.12091
+      ExtUtils::MakeMaker 0
+      parent 0
+  Module-Find-0.16
+    pathname: C/CR/CRENZ/Module-Find-0.16.tar.gz
+    provides:
+      Module::Find 0.16
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Find 0
+      File::Spec 0
+      Test::More 0
+      perl 5.008001
+  Params-Util-1.102
+    pathname: R/RE/REHSACK/Params-Util-1.102.tar.gz
+    provides:
+      Params::Util 1.102
+      Params::Util::PP 1.102
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 0
+      File::Basename 0
+      File::Copy 0
+      File::Path 0
+      File::Spec 0
+      IPC::Cmd 0
+      Scalar::Util 1.18
+      XSLoader 0.22
+      parent 0
+  Parse-Distname-0.05
+    pathname: I/IS/ISHIGAKI/Parse-Distname-0.05.tar.gz
+    provides:
+      Parse::Distname 0.05
+    requirements:
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      ExtUtils::MakeMaker::CPANfile 0.09
+  Perl-PrereqScanner-NotQuiteLite-0.9917
+    pathname: I/IS/ISHIGAKI/Perl-PrereqScanner-NotQuiteLite-0.9917.tar.gz
+    provides:
+      Perl::PrereqScanner::NotQuiteLite 0.9917
+      Perl::PrereqScanner::NotQuiteLite::App undef
+      Perl::PrereqScanner::NotQuiteLite::Context undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Aliased undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::AnyMoose undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Autouse undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Catalyst undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::ClassAccessor undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::ClassAutouse undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::ClassLoad undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Core undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Inline undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::KeywordDeclare undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Later undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Mixin undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::ModuleRuntime undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::MojoBase undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Moose undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::MooseXDeclare undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::ObjectPad undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Only undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::POE undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::PackageVariant undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Plack undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Prefork undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Superclass undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Syntax undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::SyntaxCollector undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::TestClassMost undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::TestMore undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::TestRequires undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::UniversalVersion undef
+      Perl::PrereqScanner::NotQuiteLite::Parser::Unless undef
+      Perl::PrereqScanner::NotQuiteLite::Tokens undef
+      Perl::PrereqScanner::NotQuiteLite::Util undef
+      Perl::PrereqScanner::NotQuiteLite::Util::CPANfile undef
+      Perl::PrereqScanner::NotQuiteLite::Util::Prereqs undef
+    requirements:
+      CPAN::Meta::Prereqs 2.150010
+      CPAN::Meta::Requirements 2.140
+      Data::Dump 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      ExtUtils::MakeMaker::CPANfile 0.09
+      Module::CPANfile 1.1004
+      Module::CoreList 3.11
+      Module::Find 0
+      Parse::Distname 0
+      Regexp::Trie 0
+      parent 0
+      perl 5.008001
+  Pod-Coverage-0.23
+    pathname: R/RC/RCLAMP/Pod-Coverage-0.23.tar.gz
+    provides:
+      Pod::Coverage 0.23
+      Pod::Coverage::CountParents undef
+      Pod::Coverage::ExportOnly undef
+      Pod::Coverage::Extractor 0.23
+      Pod::Coverage::Overloader undef
+    requirements:
+      Devel::Symdump 2.01
+      ExtUtils::MakeMaker 0
+      Pod::Find 0.21
+      Pod::Parser 1.13
+      Test::More 0
+  Pod-Parser-1.66
+    pathname: M/MA/MAREKR/Pod-Parser-1.66.tar.gz
+    provides:
+      Pod::Cache 1.66
+      Pod::Cache::Item 1.66
+      Pod::Find 1.66
+      Pod::Hyperlink 1.66
+      Pod::InputObjects 1.66
+      Pod::InputSource 1.66
+      Pod::InteriorSequence 1.66
+      Pod::List 1.66
+      Pod::Paragraph 1.66
+      Pod::ParseTree 1.66
+      Pod::ParseUtils 1.66
+      Pod::Parser 1.66
+      Pod::PlainText 2.07
+      Pod::Select 1.66
+    requirements:
+      Cwd 0
+      ExtUtils::MakeMaker 0
+      File::Basename 0
+      Test::More 0.6
+  Regexp-Trie-0.02
+    pathname: D/DA/DANKOGAI/Regexp-Trie-0.02.tar.gz
+    provides:
+      Regexp::Trie 0.02
+    requirements:
+      ExtUtils::MakeMaker 0
+  Software-License-0.104006
+    pathname: L/LE/LEONT/Software-License-0.104006.tar.gz
+    provides:
+      Software::License 0.104006
+      Software::License::AGPL_3 0.104006
+      Software::License::Apache_1_1 0.104006
+      Software::License::Apache_2_0 0.104006
+      Software::License::Artistic_1_0 0.104006
+      Software::License::Artistic_1_0_Perl 0.104006
+      Software::License::Artistic_2_0 0.104006
+      Software::License::BSD 0.104006
+      Software::License::CC0_1_0 0.104006
+      Software::License::Custom 0.104006
+      Software::License::EUPL_1_1 0.104006
+      Software::License::EUPL_1_2 0.104006
+      Software::License::FreeBSD 0.104006
+      Software::License::GFDL_1_2 0.104006
+      Software::License::GFDL_1_3 0.104006
+      Software::License::GPL_1 0.104006
+      Software::License::GPL_2 0.104006
+      Software::License::GPL_3 0.104006
+      Software::License::ISC 0.104006
+      Software::License::LGPL_2_1 0.104006
+      Software::License::LGPL_3_0 0.104006
+      Software::License::MIT 0.104006
+      Software::License::Mozilla_1_0 0.104006
+      Software::License::Mozilla_1_1 0.104006
+      Software::License::Mozilla_2_0 0.104006
+      Software::License::None 0.104006
+      Software::License::OpenSSL 0.104006
+      Software::License::Perl_5 0.104006
+      Software::License::PostgreSQL 0.104006
+      Software::License::QPL_1_0 0.104006
+      Software::License::SSLeay 0.104006
+      Software::License::Sun 0.104006
+      Software::License::Zlib 0.104006
+      Software::LicenseUtils 0.104006
+    requirements:
+      Carp 0
+      Data::Section 0
+      ExtUtils::MakeMaker 6.78
+      File::Spec 0
+      IO::Dir 0
+      Module::Load 0
+      Text::Template 0
+      parent 0
+      perl 5.012
+      strict 0
+      utf8 0
+      warnings 0
+  Sub-Exporter-0.991
+    pathname: R/RJ/RJBS/Sub-Exporter-0.991.tar.gz
+    provides:
+      Sub::Exporter 0.991
+      Sub::Exporter::Util 0.991
+    requirements:
+      Carp 0
+      Data::OptList 0.100
+      ExtUtils::MakeMaker 6.78
+      Params::Util 0.14
+      Sub::Install 0.92
+      perl 5.012
+      strict 0
+      warnings 0
+  Sub-Install-0.929
+    pathname: R/RJ/RJBS/Sub-Install-0.929.tar.gz
+    provides:
+      Sub::Install 0.929
+    requirements:
+      B 0
+      Carp 0
+      ExtUtils::MakeMaker 6.78
+      Scalar::Util 0
+      perl 5.008000
+      strict 0
+      warnings 0
+  Test-CPAN-Meta-JSON-0.16
+    pathname: B/BA/BARBIE/Test-CPAN-Meta-JSON-0.16.tar.gz
+    provides:
+      Test::CPAN::Meta::JSON 0.16
+      Test::CPAN::Meta::JSON::Version 0.16
+    requirements:
+      ExtUtils::MakeMaker 0
+      IO::File 0
+      JSON 2.15
+      Test::Builder 0
+      Test::Builder::Tester 0
+      Test::More 0.70
+  Test-Kwalitee-1.28
+    pathname: E/ET/ETHER/Test-Kwalitee-1.28.tar.gz
+    provides:
+      Test::Kwalitee 1.28
+    requirements:
+      Cwd 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      Module::CPANTS::Analyse 0.92
+      Test::Builder 0.88
+      parent 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Test-Pod-1.52
+    pathname: E/ET/ETHER/Test-Pod-1.52.tar.gz
+    provides:
+      Test::Pod 1.52
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Find 0
+      Pod::Simple 3.05
+      Test::Builder::Tester 1.02
+      Test::More 0.62
+      perl 5.008
+  Test-Pod-Coverage-1.10
+    pathname: N/NE/NEILB/Test-Pod-Coverage-1.10.tar.gz
+    provides:
+      Test::Pod::Coverage 1.10
+    requirements:
+      ExtUtils::MakeMaker 0
+      Pod::Coverage 0
+      Test::Builder 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Text-Template-1.61
+    pathname: M/MS/MSCHOUT/Text-Template-1.61.tar.gz
+    provides:
+      Text::Template 1.61
+      Text::Template::Preprocess 1.61
+    requirements:
+      Carp 0
+      Encode 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      base 0
+      perl 5.008
+      strict 0
+      warnings 0

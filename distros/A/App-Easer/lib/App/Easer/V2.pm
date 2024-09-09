@@ -3,7 +3,7 @@ use v5.24;
 use warnings;
 use experimental qw< signatures >;
 no warnings qw< experimental::signatures >;
-{ our $VERSION = '2.006' }
+{ our $VERSION = '2.007004' }
 use Carp;
 
 use parent 'Exporter';
@@ -17,6 +17,7 @@ sub dd (@stuff) {
    no warnings;
    require Data::Dumper;
    local $Data::Dumper::Indent = 1;
+   local $Data::Dumper::Sortkeys = 1;
    Data::Dumper::Dumper(
         @stuff == 0 ? []
       : (ref($stuff[0]) || @stuff % 2) ? \@stuff
@@ -37,16 +38,18 @@ sub import ($package, @args) {
    my $target = caller;
    my @args_for_exporter;
    our %registered;
+
+   my $parent_class = 'App::Easer::V2::Command';
    while (@args) {
       my $request = shift @args;
       if ($request eq '-command') {
          $registered{$target} = 1;
          no strict 'refs';
-         push @{$target . '::ISA'}, 'App::Easer::V2::Command';
+         push @{$target . '::ISA'}, $parent_class;
       }
       elsif ($request eq '-inherit') {
          no strict 'refs';
-         push @{$target . '::ISA'}, 'App::Easer::V2::Command';
+         push @{$target . '::ISA'}, $parent_class;
       }
       elsif ($request eq '-register') {
          $registered{$target} = 1;
@@ -60,6 +63,14 @@ sub import ($package, @args) {
          no warnings 'once';
          ${$target . '::app_easer_spec'} = shift @args;
       } ## end elsif ($request eq '-spec')
+      elsif ($request eq '-parent') { # 2024-08-28 EXPERIMENTAL
+         Carp::croak "no parent class provided"
+           unless @args;
+         $parent_class = shift @args;
+
+         # make sure it's required
+         App::Easer::V2::Command->load_module($parent_class);
+      }
       else { push @args_for_exporter, $request }
    } ## end while (@args)
    $package->export_to_level(1, $package, @args_for_exporter);
@@ -69,6 +80,7 @@ package App::Easer::V2::Command;
 use Scalar::Util 'blessed';
 use List::Util 'any';
 use English '-no_match_vars';
+use Scalar::Util qw< weaken >;
 
 # some stuff can be managed via a hash reference kept in a "slot",
 # allowing for overriding should be easy either with re-defining the
@@ -98,6 +110,19 @@ sub _rwad ($self, @n) {
    return wantarray ? $aref->@* : [$aref->@*];
 }
 
+sub _rw_prd ($self, @n) {
+   my $slot = $self->slot;
+   my $name = (caller(1))[3] =~ s{.*::}{}rmxs;
+   if (@n) {
+      $slot->{$name} = $n[0];
+   }
+   elsif (ref(my $ref_to_default = $slot->{$name})) {
+      my $parent = $self->parent;
+      $slot->{$name} = $parent ? $parent->$name : $$ref_to_default;
+   }
+   return $slot->{$name};
+}
+
 # these "attributes" would point to stuff that is normally "scalar" and
 # used as specification overall. It can be overridden but probably it's
 # just easier to stick in a hash inside the slot. We don't want to put
@@ -117,16 +142,109 @@ sub default_child ($self, @r) { $self->_rw(@r) }
 sub description ($self, @r) { $self->_rw(@r) }
 sub environment_prefix ($self, @r) { $self->_rw(@r) }
 sub execution_reason ($self, @r) { $self->_rw(@r) }
-sub force_auto_children ($self, @r) { $self->_rw(@r) }
 sub fallback_to ($self, @r) { $self->_rw(@r) }
+sub final_commit_stack ($self, @r) { $self->_rwa(@r) }
+sub force_auto_children ($self, @r) { $self->_rw(@r) }
 sub hashy_class ($self, @r) { $self->_rw(@r) }
 sub help ($self, @r) { $self->_rw(@r) }
 sub help_channel ($slf, @r) { $slf->_rw(@r) }
 sub name ($s, @r) { $s->_rw(@r) // ($s->aliases)[0] // '**no name**' }
+sub options_help ($s, @r) { $s->_rw(@r) }
 sub params_validate ($self, @r) { $self->_rw(@r) }
 sub parent ($self, @r) { $self->_rw(@r) }
+sub pre_execute ($self, @r) { $self->_rwa(@r) }
 sub residual_args ($self, @r) { $self->_rwa(@r) }
-sub sources ($self, @r) { $self->_rwa(@r) }
+sub _last_cmdline ($self, @r) { $self->_rw(@r) }
+sub _sources ($self, @r) { $self->_rwn(sources => @r) }
+sub usage ($self, @r) { $self->_rw(@r) }
+
+sub config_hash_key ($self, @r) { $self->_rw_prd(@r) }
+
+sub is_root ($self) { ! defined($self->parent) }
+sub root ($self) {
+   my $slot = $self->slot;
+   return $slot->{root} //= do {
+      my $retval = $self;
+      while (defined(my $parent = $retval->parent)) {
+         $retval = $parent;
+      }
+      $retval;
+   };
+}
+
+sub child ($self, @newval) {
+   my $slot = $self->slot;
+   if (@newval) {
+      $slot->{child} = $newval[0];
+      weaken($slot->{child});
+   }
+   return $slot->{child};
+}
+sub is_leaf ($self) { ! defined($self->child) }
+sub leaf ($self) {
+   my $slot = $self->slot;
+   if (! exists($slot->{leaf})) {
+      my $retval = $self;
+      while (defined(my $parent = $retval->child)) {
+         $retval = $parent;
+      }
+      $slot->{leaf} = $retval;
+      weaken($slot->{leaf});
+   }
+   return $slot->{leaf};
+}
+
+
+# 2024-08-27 expand to allow hashref in addition to arrayref
+# backwards-compatibility contract is that overriding this function allows
+# returning the list of sources to use, which might be composed of a single
+# hashref...
+sub sources ($self, @new) {
+   my $r;
+   my $slot = $self->slot;
+   if (@new) { # setter + getter
+      $r = $slot->{sources} = $new[0];
+   }
+   else {   # getter only, set default if *nothing* has been set yet
+      state $default_array =
+         [ qw< +CmdLine +Environment +Parent=70 +Default=100 > ];
+      state $default_hash  = {
+         current => [ qw< +CmdLine +Environment +Default +ParentSlices > ],
+         final   => [ ],
+      };
+      state $default_hash_v2_008 = {
+         current => [ qw< +CmdLine +Environment +Default +ParentSlices > ],
+         final   => [ ],
+      };
+      $r = $slot->{sources};
+      $r = $slot->{sources} =
+         ! defined($r)            ? Carp::confess()
+         : $r eq 'default-array'  ? $default_array
+         : $r eq 'default-hash'   ? $default_hash
+         : $r eq 'v2.008'         ? $default_hash_v2_008
+         :                         Carp::confess()
+         unless ref($r); # string-based, get either default
+   }
+   Carp::confess() unless defined($r);
+
+   return $r->@* if ref($r) eq 'ARRAY'; # backwards-compatible behaviour
+   return \$r if ref($r) eq 'HASH';     # new behaviour
+   Carp::confess(); # unsupported condition
+}
+
+# getter only
+sub _sources_for_phase ($self, $phase) {
+   my @sources = $self->sources; # might call an overridden thing
+
+   return ${$sources[0]}->{$phase}
+      if @sources == 1
+         && ref($sources[0]) eq 'REF'
+         && ref(${$sources[0]}) eq 'HASH';
+
+   # backwards compatibility means that we only support the "current"
+   # phase and do nothing for other ones.
+   return $phase eq 'current' ? \@sources : ();
+}
 
 sub supports ($self, $what) {
    any { $_ eq $what } $self->aliases;
@@ -154,15 +272,19 @@ sub inherit_options ($self, @names) {
          @options = grep { $_->{transmit} // 0 } $self->parent->options;
       }
       else {
-         my $namerx   = qr{\A(?:$_)\z};
+         my $name_exact = ref($_) ? undef : $_;
+         my $name_rx    = qr{\A(?:$_)\z};
          my $ancestor = $self->parent;
          while ($ancestor) {
             push @options, my @pass =  # FIXME something's strange here
               grep {
                my $name = $self->name_for_option($_);
-               (!$_->{transmit_exact})
-                 && $name =~ m{$namerx}
-                 && !$got{$name};
+               ($_->{transmit} // 0)
+               && (! $got{$name}++)     # inherit once only
+               && (
+                  (defined($name_exact) && $name eq $name_exact)
+                  || (! $_->{transmit_exact} && $name =~ m{$name_rx})
+               );
               } $ancestor->options;
             $ancestor = $ancestor->parent;
          } ## end while ($ancestor)
@@ -179,15 +301,19 @@ sub new ($pkg, @args) {
       auto_environment       => 0,
       children               => [],
       children_prefixes      => [$pkg . '::Cmd'],
+      config_hash_key        => \'merged',
       default_child          => 'help',
       environment_prefix     => '',
       fallback_to            => undef,
+      final_commit_stack     => [],
       force_auto_children    => undef,
       hashy_class            => __PACKAGE__,
       help_channel           => '-STDOUT:encoding(UTF-8)',
       options                => [],
       params_validate        => undef,
-      sources => [qw< +CmdLine +Environment +Parent=70 +Default=100 >],
+      pre_execute            => [],
+      residual_args          => [],
+      sources                => 'default-array',   # 2024-08-24 defer
       ($pkg_spec // {})->%*,
       (@args && ref $args[0] ? $args[0]->%* : @args),
    };
@@ -195,7 +321,7 @@ sub new ($pkg, @args) {
    return $self;
 } ## end sub new
 
-sub merge_hashes ($self, @hrefs) {
+sub merge_hashes ($self, @hrefs) { # FIXME this seems way more complicated than needed
    my (%retval, %is_overridable);
    for my $href (@hrefs) {
       for my $src_key (keys $href->%*) {
@@ -209,17 +335,12 @@ sub merge_hashes ($self, @hrefs) {
    return \%retval;
 } ## end sub merge_hashes
 
-# collect options values from $args (= [...]) & other sources
-# sets own configuration and residual_args
-# acts based on what is provided by method options()
-sub collect ($self, @args) {
-   my @sequence;    # stuff collected from Sources, w/ context
-   my @slices;      # ditto, no context
-   my $config = {};      # merged configuration
+sub _collect ($self, $sources, @args) {
    my @residual_args;    # what is left from the @args at the end
 
+   my $slot = $self->slot;
    my $last_priority = 0;
-   for my $source ($self->sources) {
+   for my $source ($sources->@*) {
       my ($src, @opts) = ref($source) eq 'ARRAY' ? $source->@* : $source;
       my $meta = (@opts && ref $opts[0]) ? shift @opts : {};
       my $locator = $src;
@@ -230,20 +351,81 @@ sub collect ($self, @args) {
       }
       my $sub = $self->ref_to_sub($locator)
         or die "unhandled source for $locator\n";
+
       my ($slice, $residuals) = $sub->($self, \@opts, \@args);
       push @residual_args, $residuals->@* if defined $residuals;
-      $last_priority = my $priority = $meta->{priority} //= $last_priority + 10;
-      push @sequence, [$priority, $src, \@opts, $locator, $slice];
-      for (my $i = $#sequence; $i > 0; --$i) {
-         last if $sequence[$i - 1][0] <= $sequence[$i][0];
-         @sequence[$i - 1, $i] = @sequence[$i, $i - 1];
-      }
-      $config = $self->merge_hashes(map {$_->[-1]} @sequence);
-      $self->_rwn(config => {merged => $config, sequence => \@sequence});
-   } ## end for my $source ($self->...)
 
-   # save and return
-   $self->residual_args(\@residual_args);
+      # whatever happened in the source, it might have changed the
+      # internals and we need to re-load them from the current config
+      my $latest = $self->_rwn('config') // {};
+      my @sequence = ($latest->{sequence} //= [])->@*;    # legacy
+      my %all_eslices_at = ($latest->{all_eslices_at} // {})->%*; # v2.8
+      my %command_eslices_at = ($latest->{command_eslices_at} // {})->%*;
+
+      # only operate if the source returned something to track
+      if ($slice) {
+         $last_priority = my $priority
+            = $meta->{priority} //= $last_priority + 10;
+
+         my $eslice = [$priority, $src, \@opts, $locator, $slice];
+
+         # new way of collecting the aggregated configuration
+         # the merge takes into account priorities across all command
+         # layers, this function encapsulates getting all of them
+         push(($all_eslices_at{$priority} //= [])->@*, $eslice);
+         push(($command_eslices_at{$priority} //= [])->@*, $eslice);
+
+         # older way of collecting the aggregated configuration
+         push @sequence, $eslice;
+         for (my $i = $#sequence; $i > 0; --$i) {
+            last if $sequence[$i - 1][0] <= $sequence[$i][0];
+            @sequence[$i - 1, $i] = @sequence[$i, $i - 1];
+         }
+      }
+
+      # whatever happened, re-compute the aggregated configuration in the
+      # new "matrix" way and in the legacy way
+      my $matrix_config = $self->merge_hashes(
+         map { $_->[-1] }                 # take slice out of eslice
+         map { $all_eslices_at{$_}->@* }  # unroll all eslices
+         sort { $a <=> $b }               # sort by priority
+         keys(%all_eslices_at)            # keys is the priority
+      );
+      my $legacy_config = $self->merge_hashes(map {$_->[-1]} @sequence);
+
+      # save configuration at each step, so that each following source
+      # can take advantage of configurations collected so far. This is
+      # important for e.g. sources that load options from files whose
+      # path is provided as an option itself.
+      $self->_rwn(
+         config => {
+            merged             => $legacy_config,
+            merged_legacy      => $legacy_config,
+            'v2.008'           => $matrix_config,
+            sequence           => \@sequence,
+            all_eslices_at     => \%all_eslices_at,
+            command_eslices_at => \%command_eslices_at,
+         }
+      );
+   } ## end for my $source ($self->...)
+   #App::Easer::V2::d(config => $self->_rwn('config'));
+
+   # return what's left
+   return \@residual_args;
+}
+
+sub collect ($self, @args) {
+   if (my $sources = $self->_sources_for_phase('current')) {
+      $self->residual_args($self->_collect($sources, @args));
+   }
+   return $self;
+} ## end sub collect
+
+# last round of configuration options collection
+sub final_collect ($self) {
+   if (my $sources = $self->_sources_for_phase('final')) {
+      $self->_collect($sources);
+   }
    return $self;
 } ## end sub collect
 
@@ -258,49 +440,87 @@ sub getopt_config ($self, @n) {
    return $value->@*;
 } ## end sub getopt_config
 
+# This source is not supposed to accept "options", although it might in
+# the future, e.g. to set a specific getopt_config instead of setting it
+# as a general parameter. On the other hand, it does focus on processing
+# $args
 sub source_CmdLine ($self, $ignore, $args) {
    my @args = $args->@*;
 
    require Getopt::Long;
    Getopt::Long::Configure('default', $self->getopt_config);
 
-   my %option_for;
-   my @specs = map {
-      my $go = $_->{getopt};
-      ref($go) eq 'ARRAY'
-        ? ($go->[0] => sub { $go->[1]->(\%option_for, @_) })
-        : $go;
-     }
-     grep { exists $_->{getopt} } $self->options;
+   my (%option_for, @specs, %name_for);
+   for my $option ($self->options) {
+      next unless exists($option->{getopt});
+      my $go = $option->{getopt};
+      if (ref($go) eq 'ARRAY') {
+         my ($string, $callback) = $go->@*;
+         push @specs, $string, sub { $callback->(\%option_for, @_) };
+         $go = $string;
+      }
+      else {
+         push @specs, $go;
+      }
+
+      my ($go_name) = $go =~ m{\A(\w[-\w]*)}mxs;
+      my $official_name = $self->name_for_option($option);
+      $name_for{$go_name} = $official_name if $go_name ne $official_name;
+   }
+
    Getopt::Long::GetOptionsFromArray(\@args, \%option_for, @specs)
      or die "bailing out\n";
 
    # Check if we want to forbid the residual @args to start with a '-'
    my $strict = !$self->allow_residual_options;
-   if ($strict && @args && $args[0] =~ m{\A -}mxs) {
-      Getopt::Long::Configure('default', 'gnu_getopt');
-      Getopt::Long::GetOptionsFromArray(\@args, {});
-      die "bailing out\n";
-   }
+   die "bailing out (allow_residual_options is false and got <@args>)"
+      if $strict && @args && $args[0] =~ m{\A - . }mxs;
+
+   # remap names where the official one is different from the getopt one
+   $self->_rename_options_inplace(\%option_for, \%name_for);
+
+   $self->_last_cmdline( { option_for => \%option_for, args => \@args });
 
    return (\%option_for, \@args);
 } ## end sub source_CmdLine
 
+sub _rename_options_inplace ($self, $collected, $name_for) {
+   my %renamed;
+   for my $go_name (sort { $a cmp $b } keys $name_for->%*) {
+      next unless exists $collected->{$go_name};
+      my $official_name = $name_for->{$go_name};
+      $renamed{$official_name} = delete($collected->{$go_name});
+   }
+   $collected->{$_} = $renamed{$_} for keys %renamed;
+   return $self;
+}
+
+sub source_LastCmdLine ($self, @ignore) {
+   my $last = $self->_last_cmdline or return {};
+   return $last->{option_for};
+}
+
 sub name_for_option ($self, $o) {
    return $o->{name} if defined $o->{name};
-   return $1 if defined $o->{getopt} && $o->{getopt} =~ m{\A(\w+)}mxs;
+   return $1
+     if defined $o->{getopt} && $o->{getopt} =~ m{\A(\w[-\w]*)}mxs;
    return lc $o->{environment}
      if defined $o->{environment} && $o->{environment} ne '1';
    return '~~~';
 } ## end sub name_for_option
 
-sub source_Default ($self, @ignore) {
+sub source_Default ($self, $opts, @ignore) {
+   my %opts = $opts->@*;
+   my $include_inherited = $opts{include_inherited};
    return {
       map { $self->name_for_option($_) => $_->{default} }
       grep { exists $_->{default} }
-      grep { !$_->{inherited} } $self->options
+      grep { $include_inherited || !$_->{inherited} } $self->options
    };
-} ## end sub source_Default
+}
+sub source_FinalDefault ($self, @i) {
+   return $self->source_Default([ include_inherited => 1]);
+}
 
 sub source_FromTrail ($self, $trail, @ignore) {
    my $conf = $self->config_hash;
@@ -329,7 +549,10 @@ sub environment_variable_name ($self, $ospec) {
    return uc(join '', @prefixes, $self->name_for_option($ospec));
 } ## end sub environment_variable_name
 
-sub source_Environment ($self, @ignore) {
+
+sub source_Environment ($self, $opts, @ignore) {
+   my %opts = $opts->@*;
+   my $include_inherited = $opts{include_inherited};
    return {
       map {
          my $en = $self->environment_variable_name($_);
@@ -337,9 +560,12 @@ sub source_Environment ($self, @ignore) {
            && exists($ENV{$en})
            ? ($self->name_for_option($_) => $ENV{$en})
            : ();
-      } grep { !$_->{inherited} } $self->options
+      } grep { $include_inherited || !$_->{inherited} } $self->options
    };
 } ## end sub source_Environment
+sub source_FinalEnvironment ($self, @i) {
+   return $self->source_Environment([ include_inherited => 1 ]);
+}
 
 sub source_JsonFileFromConfig ($self, $key, @ignore) {
    $key = $key->[0] // 'config';
@@ -367,6 +593,22 @@ sub source_Parent ($self, @ignore) {
    return $parent->config_hash(0);
 }
 
+sub source_ParentSlices ($self, @ignore) {
+   my $parent = $self->parent or return; # no Parent, no Party
+
+   my $latest = $self->_rwn('config');
+   $self->_rwn(config => ($latest = {})) unless defined $latest;
+   my $all_eslices_at = $latest->{all_eslices_at} //= {};
+
+   # get all stuff from parent, keeping priorities.
+   my $pslices_at = $parent->config_hash(1)->{all_eslices_at} // {};
+   for my $priority (keys($pslices_at->%*)) {
+      my $eslices = $all_eslices_at->{$priority} //= [];
+      push $eslices->@*, $pslices_at->{$priority}->@*;
+   }
+
+   return;
+}
 
 # get the assembled config for the command. It supports the optional
 # additional boolean parameter $blame to get back a more structured
@@ -375,7 +617,7 @@ sub source_Parent ($self, @ignore) {
 sub config_hash ($self, $blame = 0) {
    my $config = $self->_rwn('config') // {};
    return $config if $blame;
-   return $config->{merged} // {};
+   return $config->{$self->config_hash_key} // {};
 }
 
 # get one or more specific configurtion values
@@ -392,12 +634,79 @@ sub set_config ($self, $key, @value) {
    return $self;
 } ## end sub set_config
 
-# commit collected options values, called after collect ends
+# totally replace whatever has been collected at this level
+sub set_config_hash ($self, $new, $full = 0) {
+   if (! $full) {
+      my $previous = $self->_rwn('config') // {};
+      my $key = $self->config_hash_key;
+      $new = { $previous->%*, merged => $new, override => $new };
+   }
+   $self->_rwn(config => $new);
+   return $self;
+}
+
+sub inject_configs ($self, $data, $priority = 1000) {
+
+   # we define an on-the-fly source and get it considered through the
+   # regular source-handling mechanism by _collect
+   $self->_collect(
+      [
+         sub ($self, $opts, $args) {
+            my $latest = $self->_rwn('config');
+            $self->_rwn(config => ($latest = {})) unless $latest;
+            my $queue = $latest->{all_eslices_at}{$priority} //= [];
+            push $queue->@*, [ $priority, injection => [], '', $data ];
+            return;
+         },
+      ]
+   );
+}
+
+# (intermediate) commit collected options values, called after collect ends
 sub commit ($self, @n) {
    my $commit = $self->_rw(@n);
-   return $commit if @n;
+   return $commit if @n;  # setter, don't call the commit callback
    return unless $commit;
    return $self->ref_to_sub($commit)->($self);
+} ## end sub commit
+
+# final commit of collected options values, called after final_collect ends
+# this method tries to "propagate" the call up to the parent (and the root
+# eventually) unless told not to do so. This should allow concentrating
+# some housekeeping operations in the root command while still waiting for
+# all options to have been collected
+sub final_commit ($self, @n) {
+   return $self->_rw(@n) if @n;  # setter, don't call the callback
+
+   # we operate down at the slot level because we want to separate the case
+   # where key 'final_commit' is absent (defaulting to propagation up to
+   # the parent) and where it's set but otherwise false (in which case
+   # there is no propagation).
+   my $slot = $self->slot;
+
+   # put "myself" onto the call stack for final_commit
+   my $stack = $slot->{final_commit_stack} //= [];
+   push $stack->@*, $self;
+
+   if (exists($slot->{final_commit})) {
+      my $commit = $slot->{final_commit};
+
+      # if $commit is false (but present, because it exists) then we
+      # stop and do not propagate to the parent
+      return unless $commit;
+
+      # otherwise, we call it and its return value will tell us whether to
+      # propagate to the parent too or stop here
+      my $propagate_to_parent = $self->ref_to_sub($commit)->($self);
+      return unless $propagate_to_parent;
+   }
+
+   # here we try to propagate to the parent... if it exists
+   my $parent = $self->parent;
+   return unless $parent;  # we're root, no parent, no propagation up
+
+   $parent->final_commit_stack([$stack->@*]);
+   return $parent->final_commit;
 } ## end sub commit
 
 # validate collected options values, called after commit ends.
@@ -418,11 +727,11 @@ sub validate ($self, @n) {
       require Params::Validate;
       if (my $config_validator = $params_validate->{config} // undef) {
          my @array = $self->config_hash;
-         Params::Validate::validate(\@array, $config_validator);
+         &Params::Validate::validate(\@array, $config_validator);
       }
       if (my $args_validator = $params_validate->{args} // undef) {
          my @array = $self->residual_args;
-         Params::Validate::validate_pos(\@array, $args_validator->@*);
+         &Params::Validate::validate_pos(\@array, $args_validator->@*);
       }
    }
    else {} # no validation needed
@@ -491,13 +800,15 @@ sub find_child ($self) {
 # module names
 sub list_children ($self) {
    my @children = $self->children;
+
+   # handle auto-loading of children from modules in @INC via prefixes
    require File::Spec;
    my @expanded_inc = map {
       my ($v, $dirs) = File::Spec->splitpath($_, 'no-file');
       [$v, File::Spec->splitdir($dirs)];
    } @INC;
    my %seen;
-   push @children, map {
+   my @autoloaded_children = map {
       my @parts = split m{::}mxs, $_ . 'x';
       substr(my $bprefix = pop @parts, -1, 1, '');
       map {
@@ -518,14 +829,19 @@ sub list_children ($self) {
          else { () }
       } @expanded_inc;
    } $self->children_prefixes;
-   push @children, map {
+   push @autoloaded_children, map {
       my $prefix = $_;
+      my $prefix_length = length($prefix);
       grep { !$seen{$_}++ }
         grep {
-         my $this_prefix = substr $_, 0, length $prefix;
-         $this_prefix eq $prefix;
+         (substr($_, 0, length $prefix) eq $prefix)
+            && (index($_, ':', $prefix_length) < 0);
         } keys %App::Easer::V2::registered;
    } $self->children_prefixes;
+
+   # auto-loaded children are appended with consistent sorting
+   push @children, sort { $a cmp $b } @autoloaded_children;
+
    push @children, $self->auto_children
      if $self->force_auto_children // @children;
    return @children;
@@ -548,8 +864,9 @@ sub auto_help ($self) { return $self->_auto_child('help', 1) }
 
 sub auto_tree ($self) { return $self->_auto_child('tree', 1) }
 
-sub run_help ($self) { return $self->auto_help->run($self->name) }
-sub full_help_text ($s) { return $s->auto_help->collect_help_for($s) }
+sub run_help ($self, $mode = 'help') { $self->auto_help->run($mode) }
+
+sub full_help_text ($s, @as) { $s->auto_help->collect_help_for($s, @as) }
 
 sub load_module ($sop, $module) {
    my $file = "$module.pm" =~ s{::}{/}grmxs;
@@ -578,6 +895,32 @@ sub instantiate ($sop, $class, @args) {
    return $class->new(@args);
 }
 
+sub _reparent ($self, $child) {
+   $child->parent($self);
+   $self->child($child); # saves a weak reference to $child
+
+   # 2024-08-27 propagate sources configurations
+   if (! ref($child->_sources)) { # still default, my need to set it
+      my ($first, @rest) = $self->sources;
+      if (ref($first) eq 'REF') {  # new approach, propagate
+         my $ssources = $$first;
+         $child->_sources(my $csources = { $ssources->%* });
+         if (my $next = $ssources->{next}) {
+            my @csources =
+                 ref($next) eq 'ARRAY' ? $next->@*
+               : ref($next) eq 'CODE'  ? $next->($child)
+               :                         Carp::confess(); # no clue
+            $csources->{current} = \@csources;
+         }
+      }
+   }
+
+   # propagate pre-execute callbacks down the line
+   $child->pre_execute_schedule($self->pre_execute);
+
+   return $child;
+}
+
 # transform one or more children "hints" into instances.
 sub inflate_children ($self, @hints) {
    my $hashy = $self->hashy_class;
@@ -586,11 +929,10 @@ sub inflate_children ($self, @hints) {
       if (!blessed($child)) {    # actually inflate it
          $child =
              ref($child) eq 'ARRAY' ? $self->instantiate($child->@*)
-           : ref($child) eq 'HASH' ? $self->instantiate($hashy, $child)
-           :                         $self->instantiate($child);
+           : ref($child) eq 'HASH'  ? $self->instantiate($hashy, $child)
+           :                          $self->instantiate($child);
       } ## end if (!blessed($child))
-      $child->parent($self);
-      $child;
+      $self->_reparent($child);  # returns $child
    } grep { defined $_ } @hints;
 } ## end sub inflate_children
 
@@ -610,6 +952,31 @@ sub execute ($self) {
    return $sub->($self);
 }
 
+sub pre_execute_schedule ($self, @specs) {
+   if (my $spec = $self->_rw) {
+      my $sub = $self->ref_to_sub($spec) or die "nothing for pre_execute_schedule\n";
+      return $sub->($self, @specs);
+   }
+
+   # default approach is to append to the current ones
+   $self->pre_execute([$self->pre_execute, @specs]);
+   return $self;
+}
+
+sub pre_execute_run ($self) {
+   if (my $spec = $self->_rw) {
+      my $sub = $self->ref_to_sub($spec) or die "nothing to pre-execute\n";
+      return $sub->($self);
+   }
+
+   # default is to run 'em all
+   for my $spec ($self->pre_execute) {
+      my $sub = $self->ref_to_sub($spec) or die "nothing to pre-execute\n";
+      $sub->($self);
+   }
+   return $self;
+}
+
 sub run ($self, $name, @args) {
    $self->call_name($name);
    $self->collect(@args);
@@ -617,7 +984,12 @@ sub run ($self, $name, @args) {
    $self->validate;
    my ($child, @child_args) = $self->find_child;
    return $child->run(@child_args) if defined $child;
+
+   # we're the executors
    $self->execution_reason($child_args[0]);
+   $self->final_collect;  # no @args passed in this collection
+   $self->final_commit;
+   $self->pre_execute_run;
    return $self->execute;
 } ## end sub run
 
@@ -653,10 +1025,8 @@ sub list_commands_for ($self, $target = undef) {
    return join "\n", @lines;
 } ## end sub list_commands_for
 
-sub help_channel ($self) { $self->target->help_channel }
-
 sub _build_printout_facility ($self) {
-   my $channel = $self->help_channel;
+   my $channel = $self->target->help_channel;
    my $refch = ref $channel;
 
    return $channel if $refch eq 'CODE';
@@ -710,7 +1080,8 @@ sub execute ($self) {
 
 package App::Easer::V2::Command::Help;
 push our @ISA, 'App::Easer::V2::Command::Commands';
-sub aliases                { 'help' }
+our @aliases = qw< help usage >;
+sub aliases                { @aliases }
 sub allow_residual_options { 0 }
 sub description            { 'Print help for (sub)command' }
 sub help                   { 'print a help command' }
@@ -819,20 +1190,27 @@ sub __commandline_help ($getopt) {
 } ## end sub __commandline_help ($getopt)
 
 sub execute ($self) {
-   $self->printout($self->collect_help_for($self->target));
+   $self->printout($self->collect_help_for($self->target, $self->call_name));
    return 0;
 }
 
-sub collect_help_for ($self, $target = undef) {
-   $target //= $self->target;
+sub collect_help_for ($self, $target, $mode = 'help') {
    my @stuff;
 
-   push @stuff, $target->help, "\n\n";
+   my $trim_and_prefix = sub ($text, $prefix = '    ') {
+      $text =~ s{\A\s+|\s+\z}{}gmxs;    # trim
+      $text =~ s{^}{$prefix}gmxs;       # add some indentation
+      return $text;
+   };
 
-   if (defined(my $description = $target->description)) {
-      $description =~ s{\A\s+|\s+\z}{}gmxs;    # trim
-      $description =~ s{^}{    }gmxs;          # add some indentation
-      push @stuff, "Description:\n$description\n\n";
+   push @stuff, ($target->help // 'no concise help yet'), "\n\n";
+
+   if ($mode eq 'help' && defined(my $description = $target->description)) {
+      push @stuff, "Description:\n", $trim_and_prefix->($description), "\n\n";
+   }
+
+   if (defined(my $usage = $target->usage)) {
+      push @stuff, "Usage:\n", $trim_and_prefix->($usage), "\n\n";
    }
 
    # Print this only for sub-commands, not for the root
@@ -840,31 +1218,52 @@ sub collect_help_for ($self, $target = undef) {
      $target->aliases
      if $target->parent;
 
-   if (my @options = $target->options) {
+   my @options = $target->options;
+   my $options_help = $target->options_help;
+   if (@options || defined($options_help)) {
       push @stuff, "Options:\n";
-      my $n = 0;                               # count the option
-      for my $opt (@options) {
-         push @stuff, "\n" if $n++;            # from second line on
 
-         push @stuff, sprintf "%15s: %s\n", $target->name_for_option($opt),
-           $opt->{help} // '';
+      $options_help //= {};
+      if (! ref($options_help)) {
+         push @stuff, $trim_and_prefix->($options_help), "\n\n";
+      }
+      else {
+         my $preamble = $options_help->{preamble} // undef;
+         push @stuff, $trim_and_prefix->($preamble), "\n\n"
+            if defined($preamble);
 
-         if (exists $opt->{getopt}) {
-            my @lines = __commandline_help($opt->{getopt});
-            push @stuff, sprintf "%15s  command-line: %s\n", '',
-              shift(@lines);
-            push @stuff,
-              map { sprintf "%15s                %s\n", '', $_ } @lines;
-         } ## end if (exists $opt->{getopt...})
+         my $n = 0;                               # count the option
+         for my $opt (@options) {
+            push @stuff, "\n" if $n++;            # from second line on
 
-         if (defined(my $env = $self->environment_variable_name($opt))) {
-            push @stuff, sprintf "%15s   environment: %s\n", '', $env;
-         }
+            push @stuff, sprintf "%15s: %s\n", $target->name_for_option($opt),
+            $opt->{help} // '';
 
-         push @stuff, sprintf "%15s       default: %s\n", '',
-           $opt->{default} // '*undef*'
-           if exists $opt->{default};
-      } ## end for my $opt (@options)
+            if (exists $opt->{getopt}) {
+               my @lines = __commandline_help($opt->{getopt});
+               push @stuff, sprintf "%15s  command-line: %s\n", '',
+               shift(@lines);
+               push @stuff,
+               map { sprintf "%15s                %s\n", '', $_ } @lines;
+            } ## end if (exists $opt->{getopt...})
+
+            if (defined(my $env = $self->environment_variable_name($opt))) {
+               push @stuff, sprintf "%15s   environment: %s\n", '', $env;
+            }
+
+            if (exists($opt->{default})) {
+               my $default = $opt->{default};
+               my $print = ! defined($default) ? '*undef*'
+                  : ! ref($default) ? $default
+                  : do { require JSON::PP; JSON::PP::encode_json($default) };
+               push @stuff, sprintf "%15s       default: %s\n", '', $print;
+            }
+         } ## end for my $opt (@options)
+
+         my $postamble = $options_help->{postamble} // undef;
+         push @stuff, "\n", $trim_and_prefix->($postamble), "\n"
+            if defined($postamble);
+      }
 
       push @stuff, "\n";
    } ## end if (my @options = $target...)

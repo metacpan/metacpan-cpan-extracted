@@ -21,7 +21,7 @@ configure_requires:
   IO::Uncompress::Unzip: '0'
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -49,8 +49,8 @@ optional_features:
       Acme::Insult::Pirate: '0'
 provides:
   Acme::Insult:
-    file: lib/Acme\Insult.pm
-    version: '1.0'
+    file: lib/Acme/Insult.pm
+    version: '1.1'
 recommends:
   Acme::Insult::Evil: '0'
   Acme::Insult::Pirate: '0'
@@ -62,6 +62,6 @@ resources:
   bugtracker: https://github.com/sanko/Acme-Insult/issues
   homepage: https://github.com/sanko/Acme-Insult
   repository: https://github.com/sanko/Acme-Insult.git
-version: '1.0'
+version: '1.1'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

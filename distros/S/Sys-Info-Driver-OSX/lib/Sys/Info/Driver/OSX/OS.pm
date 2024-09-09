@@ -1,5 +1,5 @@
 package Sys::Info::Driver::OSX::OS;
-$Sys::Info::Driver::OSX::OS::VERSION = '0.7961';
+$Sys::Info::Driver::OSX::OS::VERSION = '0.7962';
 use strict;
 use warnings;
 
@@ -65,6 +65,7 @@ my $MACOS = {
     12 => 'Monterey',
     13 => 'Ventura',
     14 => 'Sonoma',
+    15 => 'Sequoia',
 };
 
 # unimplemented
@@ -356,7 +357,7 @@ Sys::Info::Driver::OSX::OS
 
 =head1 VERSION
 
-version 0.7961
+version 0.7962
 
 =head1 SYNOPSIS
 

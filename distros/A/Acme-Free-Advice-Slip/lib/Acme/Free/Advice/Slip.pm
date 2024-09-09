@@ -1,4 +1,4 @@
-package Acme::Free::Advice::Slip 1.0 {    # https://api.adviceslip.com/
+package Acme::Free::Advice::Slip 1.1 {    # https://api.adviceslip.com/
     use v5.38;
     use HTTP::Tiny;
     use JSON::Tiny qw[decode_json];

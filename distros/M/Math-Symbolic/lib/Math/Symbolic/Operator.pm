@@ -60,7 +60,7 @@ use Math::Symbolic::Derivative qw//;
 
 use base 'Math::Symbolic::Base';
 
-our $VERSION = '0.612';
+our $VERSION = '0.613';
 
 =head1 CLASS DATA
 
@@ -844,11 +844,16 @@ sub simplify {
                     ? Math::Symbolic::Operator->new('neg', $mul)
                     : $mul;                
             }
-            
-            my $const;
-            $const = Math::Symbolic::Constant->new($const) if defined $const and $const != 0;
 
-            $const = shift @vars if not defined $const;
+            my $const = 0;
+            $const += $_ foreach @const;
+            if ( $const == 0 ) {
+              $const = shift @vars;
+            }
+            else {
+              $const = Math::Symbolic::Constant->new($const);
+            }
+
             foreach ( @vars ) {
                 $const = Math::Symbolic::Operator->new('+', $const, $_);
             }

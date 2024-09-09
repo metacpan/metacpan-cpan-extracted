@@ -1,4 +1,4 @@
-package Acme::Insult::Glax 1.0 {    # https://www.freepublicapis.com/insult-api
+package Acme::Insult::Glax 1.1 {    # https://www.freepublicapis.com/insult-api
     use v5.38;
     use HTTP::Tiny;
     use JSON::Tiny qw[decode_json];
@@ -212,5 +212,11 @@ Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 I'm inflicting this upon the world because L<oodler577|https://github.com/oodler577/> invited me to help expand Perl's
 coverage of smaller open APIs. Blame them or L<join us|https://github.com/oodler577/FreePublicPerlAPIs> in the effort.
+
+=begin stopwords
+
+RESTful libInsult
+
+=end stopwords
 
 =cut

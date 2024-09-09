@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Integer;
-$Whelk::Schema::Definition::Integer::VERSION = '0.06';
+$Whelk::Schema::Definition::Integer::VERSION = '1.00';
 use Whelk::StrictBase 'Whelk::Schema::Definition::Number';
 
 sub openapi_dump
@@ -7,6 +7,7 @@ sub openapi_dump
 	my ($self, $openapi_obj, %hints) = @_;
 
 	my $res = {
+		%{$self->_openapi_dump_extra_rules},
 		type => 'integer',
 	};
 
@@ -32,7 +33,7 @@ sub _inhale
 	my $inhaled = $self->SUPER::_inhale($value);
 	return $inhaled if defined $inhaled;
 	return 'integer' unless $value == int($value);
-	return undef;
+	return $self->_inhale_extra_rules($value);
 }
 
 sub _exhale

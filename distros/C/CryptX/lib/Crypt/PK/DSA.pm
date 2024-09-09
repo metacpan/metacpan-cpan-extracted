@@ -2,7 +2,7 @@ package Crypt::PK::DSA;
 
 use strict;
 use warnings;
-our $VERSION = '0.080';
+our $VERSION = '0.081';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_message dsa_sign_hash dsa_verify_hash )] );
@@ -77,14 +77,17 @@ sub import_key {
   }
   croak "FATAL: invalid key data" unless $data;
 
-  if ($data =~ /-----BEGIN (DSA PRIVATE|DSA PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    return $self->_import($data);
+  if ($data =~ /-----BEGIN (DSA PRIVATE|DSA PUBLIC|PRIVATE|ENCRYPTED PRIVATE|PUBLIC) KEY-----(.+?)-----END (DSA PRIVATE|DSA PUBLIC|PRIVATE|ENCRYPTED PRIVATE|PUBLIC) KEY-----/s) {
+    return $self->_import_pem($data, $password);
   }
-  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
-    $data = pem_to_der($data) or croak "FATAL: PEM/key decode failed";
-    my ($typ, $p, $q, $g, $y) = Crypt::PK::_ssh_parse($data);
-    return $self->_import_hex(unpack('H*',$p), unpack('H*',$q), unpack('H*',$g), undef, unpack('H*',$y)) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
+  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.+?)-----END CERTIFICATE-----/s) {
+    return $self->_import_pem($data, undef);
+  }
+  elsif ($data =~ /-----BEGIN OPENSSH PRIVATE KEY-----(.+?)-----END OPENSSH PRIVATE KEY-----/s) {
+    return $self->_import_openssh($data, $password);
+  }
+  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.+?)---- END SSH2 PUBLIC KEY ----/s) {
+    return $self->_import_openssh($data, undef);
   }
   elsif ($data =~ /ssh-dss\s+(\S+)/) {
     $data = decode_b64("$1");
@@ -92,7 +95,8 @@ sub import_key {
     return $self->_import_hex(unpack('H*',$p), unpack('H*',$q), unpack('H*',$g), undef, unpack('H*',$y)) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
   }
   else {
-    return $self->_import($data);
+    my $rv = eval { $self->_import($data) } || eval { $self->_import_pkcs8($data, $password) };
+    return $rv if $rv;
   }
   croak "FATAL: invalid or unsupported DSA key format";
 }

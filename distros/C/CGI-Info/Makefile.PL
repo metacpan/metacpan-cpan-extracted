@@ -9,6 +9,15 @@ if(!-w $tmpdir) {
 	exit(0);
 }
 
+my $distargs = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$distargs->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
 	NAME		=> 'CGI::Info',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -36,6 +45,7 @@ WriteMakefile(
 		'strict' => 0,
 		'warnings' => 0,
 		'IPC::System::Simple' => 0,
+		'Taint::Runtime' => 0,
 		'Test::Warn' => 0,
 		'Tie::Filehandle::Preempt::Stdin' => 0,
 	}, PREREQ_PM => {
@@ -43,7 +53,7 @@ WriteMakefile(
 		'URI::Heuristic' => 0,
 		# 'Sub::Private' => 0,
 		'Sys::Hostname' => 0,
-		'File::Spec' => 0,
+		'File::Spec' => 3.4,
 		'Cwd' => 0,
 		'Socket' => 0,
 		'List::MoreUtils' => 0,
@@ -56,8 +66,7 @@ WriteMakefile(
 		'Class::Autouse' => 0,
 		'namespace::clean' => 0,
 		'Sys::Path' => 0,
-	},
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	}, dist => $distargs,
 	clean		=> { FILES => 'CGI-Info-*' },
 	# META_ADD => {
 		# provides => {}

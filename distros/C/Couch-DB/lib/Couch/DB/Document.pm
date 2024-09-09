@@ -7,7 +7,7 @@
 
 package Couch::DB::Document;
 use vars '$VERSION';
-$VERSION = '0.005';
+$VERSION = '0.006';
 
 use Couch::DB::Util;
 
@@ -183,7 +183,9 @@ sub create($%)
 	$query{batch} = 'ok'
 		if exists $args{batch} ? delete $args{batch} : $self->batch;
 
+	# When the _id is (accidentally) undef, no new one will be picked
 	$data->{_id} ||= $self->id;
+	defined $data->{_id} or delete $data->{_id};
 
 	$self->couch->call(POST => $self->db->_pathToDB,  # !!
 		send     => $data,

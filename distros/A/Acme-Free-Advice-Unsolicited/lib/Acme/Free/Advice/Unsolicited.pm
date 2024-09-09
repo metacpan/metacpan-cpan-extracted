@@ -1,4 +1,4 @@
-package Acme::Free::Advice::Unsolicited 1.0 {    # https://kk-advice.koyeb.app/api
+package Acme::Free::Advice::Unsolicited 1.1 {    # https://kk-advice.koyeb.app/api
     use v5.38;
     use HTTP::Tiny;
     use JSON::Tiny qw[decode_json];
@@ -31,7 +31,7 @@ __END__
 
 =head1 NAME
 
-Acme::Free::Advice::Unsolicited - Solicit Unsolicited Advice from the Unsolicited Advice API
+Acme::Free::Advice::Unsolicited - Solicit Unsolicited Advice from Kevin Kelly
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ Acme::Free::Advice::Unsolicited - Solicit Unsolicited Advice from the Unsolicite
 
 =head1 DESCRIPTION
 
-Acme::Free::Advice::Unsolicited provides wisdom from author and leading tech observer, L<Kevin
+Acme::Free::Advice::Unsolicited provides wisdom from author and leading technology observer, L<Kevin
 Kelly|https://en.wikipedia.org/wiki/Kevin_Kelly_(editor)>.
 
 =head1 METHODS

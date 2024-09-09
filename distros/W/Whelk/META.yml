@@ -17,18 +17,19 @@ no_index:
   directory:
     - ex
 requires:
+  Clone: '0'
   Kelp: '2.16'
   Kelp::Module::YAML: '2.00'
   List::Util: '1.44'
   Role::Tiny: '0'
   Text::Levenshtein: '0'
-  YAML::PP: '0.034'
+  YAML::PP: '0.038'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/Kelp-framework/Whelk/issues
   homepage: https://kelp-framework.github.io#whelk
   repository: git://github.com/Kelp-framework/Whelk.git
-version: '0.06'
+version: '1.00'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

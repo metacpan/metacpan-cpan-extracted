@@ -23,11 +23,11 @@ $t->request(GET '/header', 'X-test1' => 25)
 	->code_is(400)
 	->json_cmp({error => re(qr{Header parameters .+\[X-Test2\]->required})});
 
-$t->request(GET '/header', 'X-test1' => 25.5, 'X-test2' => '')
+$t->request(GET '/header', 'X-test1' => 25.5, 'X-test2' => 0)
 	->code_is(400)
 	->json_cmp({error => re(qr{Header parameters .+\[X-Test1\]->integer})});
 
-$t->request(GET '/header', 'X-test1' => 25, 'X-test2' => '')
+$t->request(GET '/header', 'X-test1' => 25, 'X-test2' => 0)
 	->code_is(200)
 	->json_cmp(JSON::PP::false);
 

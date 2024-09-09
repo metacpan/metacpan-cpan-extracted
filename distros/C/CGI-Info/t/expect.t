@@ -1,16 +1,19 @@
-#!perl -wT
+#!perl -w
 
 use strict;
 use warnings;
-use Test::Most tests => 14;
-use Test::NoWarnings;
-use Test::Warn;
+# use Test::Most tests => 14;
+use Test::Most;
+# use Test::NoWarnings;
+# use Test::Warn;
 
 BEGIN {
-	use_ok('CGI::Info');
+	# use_ok('CGI::Info');
 }
 
 PARAMS: {
+	plan(skip_all => 'The expect argument is deprecated');
+
 	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
 	$ENV{'REQUEST_METHOD'} = 'GET';
 

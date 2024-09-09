@@ -9,8 +9,6 @@ use Crypt::OpenSSL::PKCS10 qw( :const );
 
 my ($major, $minor, $patch) = openssl_version();
 
-diag("OpenSSL version: $major.$minor $patch\n");
-
 my $req = Crypt::OpenSSL::PKCS10->new;
 $req->set_subject("/C=RO/O=UTI/OU=ssi");
 $req->add_ext(Crypt::OpenSSL::PKCS10::NID_key_usage,"critical,digitalSignature,keyEncipherment");

@@ -40,7 +40,7 @@ subtest 'schemas are strict' => sub {
 				}
 			},
 		);
-	} qr{attribute 'times' is not valid for class .+Array\Q. Did you mean 'items'?\E};
+	} qr{attribute 'times' is not valid for class .+Array\. Did you mean.+'items'};
 
 	throws_ok {
 		Whelk::Schema->build(

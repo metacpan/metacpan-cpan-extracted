@@ -3,10 +3,10 @@ ltc/ciphers/blowfish.obj ltc/ciphers/camellia.obj ltc/ciphers/cast5.obj ltc/ciph
 ltc/ciphers/idea.obj ltc/ciphers/kasumi.obj ltc/ciphers/khazad.obj ltc/ciphers/kseed.obj \
 ltc/ciphers/multi2.obj ltc/ciphers/noekeon.obj ltc/ciphers/rc2.obj ltc/ciphers/rc5.obj \
 ltc/ciphers/rc6.obj ltc/ciphers/safer/safer.obj ltc/ciphers/safer/saferp.obj ltc/ciphers/serpent.obj \
-ltc/ciphers/skipjack.obj ltc/ciphers/tea.obj ltc/ciphers/twofish/twofish.obj ltc/ciphers/xtea.obj \
-ltc/encauth/ccm/ccm_add_aad.obj ltc/encauth/ccm/ccm_add_nonce.obj ltc/encauth/ccm/ccm_done.obj \
-ltc/encauth/ccm/ccm_init.obj ltc/encauth/ccm/ccm_memory.obj ltc/encauth/ccm/ccm_process.obj \
-ltc/encauth/ccm/ccm_reset.obj ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj \
+ltc/ciphers/skipjack.obj ltc/ciphers/sm4.obj ltc/ciphers/tea.obj ltc/ciphers/twofish/twofish.obj \
+ltc/ciphers/xtea.obj ltc/encauth/ccm/ccm_add_aad.obj ltc/encauth/ccm/ccm_add_nonce.obj \
+ltc/encauth/ccm/ccm_done.obj ltc/encauth/ccm/ccm_init.obj ltc/encauth/ccm/ccm_memory.obj \
+ltc/encauth/ccm/ccm_process.obj ltc/encauth/ccm/ccm_reset.obj ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj \
 ltc/encauth/chachapoly/chacha20poly1305_decrypt.obj ltc/encauth/chachapoly/chacha20poly1305_done.obj \
 ltc/encauth/chachapoly/chacha20poly1305_encrypt.obj ltc/encauth/chachapoly/chacha20poly1305_init.obj \
 ltc/encauth/chachapoly/chacha20poly1305_memory.obj ltc/encauth/chachapoly/chacha20poly1305_setiv.obj \
@@ -62,9 +62,10 @@ ltc/misc/crypt/crypt_register_hash.obj ltc/misc/crypt/crypt_register_prng.obj lt
 ltc/misc/crypt/crypt_unregister_cipher.obj ltc/misc/crypt/crypt_unregister_hash.obj \
 ltc/misc/crypt/crypt_unregister_prng.obj ltc/misc/error_to_string.obj ltc/misc/hkdf/hkdf.obj \
 ltc/misc/mem_neq.obj ltc/misc/padding/padding_depad.obj ltc/misc/padding/padding_pad.obj \
-ltc/misc/pbes/pbes.obj ltc/misc/pbes/pbes1.obj ltc/misc/pbes/pbes2.obj ltc/misc/pkcs12/pkcs12_kdf.obj \
-ltc/misc/pkcs12/pkcs12_utf8_to_utf16.obj ltc/misc/pkcs5/pkcs_5_1.obj ltc/misc/pkcs5/pkcs_5_2.obj \
-ltc/misc/ssh/ssh_decode_sequence_multi.obj ltc/misc/ssh/ssh_encode_sequence_multi.obj \
+ltc/misc/password_free.obj ltc/misc/pbes/pbes.obj ltc/misc/pbes/pbes1.obj ltc/misc/pbes/pbes2.obj \
+ltc/misc/pem/pem.obj ltc/misc/pem/pem_pkcs.obj ltc/misc/pem/pem_read.obj ltc/misc/pem/pem_ssh.obj \
+ltc/misc/pkcs12/pkcs12_kdf.obj ltc/misc/pkcs12/pkcs12_utf8_to_utf16.obj ltc/misc/pkcs5/pkcs_5_1.obj \
+ltc/misc/pkcs5/pkcs_5_2.obj ltc/misc/ssh/ssh_decode_sequence_multi.obj ltc/misc/ssh/ssh_encode_sequence_multi.obj \
 ltc/misc/zeromem.obj ltc/modes/cbc/cbc_decrypt.obj ltc/modes/cbc/cbc_done.obj ltc/modes/cbc/cbc_encrypt.obj \
 ltc/modes/cbc/cbc_getiv.obj ltc/modes/cbc/cbc_setiv.obj ltc/modes/cbc/cbc_start.obj \
 ltc/modes/cfb/cfb_decrypt.obj ltc/modes/cfb/cfb_done.obj ltc/modes/cfb/cfb_encrypt.obj \
@@ -95,23 +96,24 @@ ltc/pk/asn1/der/printable_string/der_decode_printable_string.obj ltc/pk/asn1/der
 ltc/pk/asn1/der/printable_string/der_length_printable_string.obj ltc/pk/asn1/der/sequence/der_decode_sequence_ex.obj \
 ltc/pk/asn1/der/sequence/der_decode_sequence_flexi.obj ltc/pk/asn1/der/sequence/der_decode_sequence_multi.obj \
 ltc/pk/asn1/der/sequence/der_encode_sequence_ex.obj ltc/pk/asn1/der/sequence/der_encode_sequence_multi.obj \
-ltc/pk/asn1/der/sequence/der_length_sequence.obj ltc/pk/asn1/der/sequence/der_sequence_free.obj \
-ltc/pk/asn1/der/sequence/der_sequence_shrink.obj ltc/pk/asn1/der/set/der_encode_set.obj \
-ltc/pk/asn1/der/set/der_encode_setof.obj ltc/pk/asn1/der/short_integer/der_decode_short_integer.obj \
+ltc/pk/asn1/der/sequence/der_flexi_sequence_cmp.obj ltc/pk/asn1/der/sequence/der_length_sequence.obj \
+ltc/pk/asn1/der/sequence/der_sequence_free.obj ltc/pk/asn1/der/sequence/der_sequence_shrink.obj \
+ltc/pk/asn1/der/set/der_encode_set.obj ltc/pk/asn1/der/set/der_encode_setof.obj ltc/pk/asn1/der/short_integer/der_decode_short_integer.obj \
 ltc/pk/asn1/der/short_integer/der_encode_short_integer.obj ltc/pk/asn1/der/short_integer/der_length_short_integer.obj \
 ltc/pk/asn1/der/teletex_string/der_decode_teletex_string.obj ltc/pk/asn1/der/teletex_string/der_length_teletex_string.obj \
 ltc/pk/asn1/der/utctime/der_decode_utctime.obj ltc/pk/asn1/der/utctime/der_encode_utctime.obj \
 ltc/pk/asn1/der/utctime/der_length_utctime.obj ltc/pk/asn1/der/utf8/der_decode_utf8_string.obj \
 ltc/pk/asn1/der/utf8/der_encode_utf8_string.obj ltc/pk/asn1/der/utf8/der_length_utf8_string.obj \
-ltc/pk/asn1/oid/pk_get_oid.obj ltc/pk/asn1/oid/pk_oid_cmp.obj ltc/pk/asn1/oid/pk_oid_str.obj \
-ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.obj ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.obj \
-ltc/pk/asn1/x509/x509_decode_subject_public_key_info.obj ltc/pk/asn1/x509/x509_encode_subject_public_key_info.obj \
-ltc/pk/dh/dh.obj ltc/pk/dh/dh_check_pubkey.obj ltc/pk/dh/dh_export.obj ltc/pk/dh/dh_export_key.obj \
-ltc/pk/dh/dh_free.obj ltc/pk/dh/dh_generate_key.obj ltc/pk/dh/dh_import.obj ltc/pk/dh/dh_set.obj \
-ltc/pk/dh/dh_set_pg_dhparam.obj ltc/pk/dh/dh_shared_secret.obj ltc/pk/dsa/dsa_decrypt_key.obj \
-ltc/pk/dsa/dsa_encrypt_key.obj ltc/pk/dsa/dsa_export.obj ltc/pk/dsa/dsa_free.obj \
-ltc/pk/dsa/dsa_generate_key.obj ltc/pk/dsa/dsa_generate_pqg.obj ltc/pk/dsa/dsa_import.obj \
-ltc/pk/dsa/dsa_make_key.obj ltc/pk/dsa/dsa_set.obj ltc/pk/dsa/dsa_set_pqg_dsaparam.obj \
+ltc/pk/asn1/oid/pk_get.obj ltc/pk/asn1/oid/pk_oid_cmp.obj ltc/pk/asn1/oid/pk_oid_str.obj \
+ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.obj ltc/pk/asn1/pkcs8/pkcs8_get.obj ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.obj \
+ltc/pk/asn1/x509/x509_decode_spki.obj ltc/pk/asn1/x509/x509_decode_subject_public_key_info.obj \
+ltc/pk/asn1/x509/x509_encode_subject_public_key_info.obj ltc/pk/dh/dh.obj ltc/pk/dh/dh_check_pubkey.obj \
+ltc/pk/dh/dh_export.obj ltc/pk/dh/dh_export_key.obj ltc/pk/dh/dh_free.obj ltc/pk/dh/dh_generate_key.obj \
+ltc/pk/dh/dh_import.obj ltc/pk/dh/dh_import_pkcs8.obj ltc/pk/dh/dh_set.obj ltc/pk/dh/dh_set_pg_dhparam.obj \
+ltc/pk/dh/dh_shared_secret.obj ltc/pk/dsa/dsa_decrypt_key.obj ltc/pk/dsa/dsa_encrypt_key.obj \
+ltc/pk/dsa/dsa_export.obj ltc/pk/dsa/dsa_free.obj ltc/pk/dsa/dsa_generate_key.obj \
+ltc/pk/dsa/dsa_generate_pqg.obj ltc/pk/dsa/dsa_import.obj ltc/pk/dsa/dsa_import_pkcs8.obj \
+ltc/pk/dsa/dsa_init.obj ltc/pk/dsa/dsa_make_key.obj ltc/pk/dsa/dsa_set.obj ltc/pk/dsa/dsa_set_pqg_dsaparam.obj \
 ltc/pk/dsa/dsa_shared_secret.obj ltc/pk/dsa/dsa_sign_hash.obj ltc/pk/dsa/dsa_verify_hash.obj \
 ltc/pk/dsa/dsa_verify_key.obj ltc/pk/ec25519/ec25519_crypto_ctx.obj ltc/pk/ec25519/ec25519_export.obj \
 ltc/pk/ec25519/ec25519_import_pkcs8.obj ltc/pk/ec25519/tweetnacl.obj ltc/pk/ecc/ecc.obj \
@@ -130,7 +132,7 @@ ltc/pk/ecc/ltc_ecc_points.obj ltc/pk/ecc/ltc_ecc_projective_add_point.obj ltc/pk
 ltc/pk/ecc/ltc_ecc_verify_key.obj ltc/pk/ed25519/ed25519_export.obj ltc/pk/ed25519/ed25519_import.obj \
 ltc/pk/ed25519/ed25519_import_pkcs8.obj ltc/pk/ed25519/ed25519_import_raw.obj ltc/pk/ed25519/ed25519_import_x509.obj \
 ltc/pk/ed25519/ed25519_make_key.obj ltc/pk/ed25519/ed25519_sign.obj ltc/pk/ed25519/ed25519_verify.obj \
-ltc/pk/pkcs1/pkcs_1_i2osp.obj ltc/pk/pkcs1/pkcs_1_mgf1.obj ltc/pk/pkcs1/pkcs_1_oaep_decode.obj \
+ltc/pk/pka_key.obj ltc/pk/pkcs1/pkcs_1_i2osp.obj ltc/pk/pkcs1/pkcs_1_mgf1.obj ltc/pk/pkcs1/pkcs_1_oaep_decode.obj \
 ltc/pk/pkcs1/pkcs_1_oaep_encode.obj ltc/pk/pkcs1/pkcs_1_os2ip.obj ltc/pk/pkcs1/pkcs_1_pss_decode.obj \
 ltc/pk/pkcs1/pkcs_1_pss_encode.obj ltc/pk/pkcs1/pkcs_1_v1_5_decode.obj ltc/pk/pkcs1/pkcs_1_v1_5_encode.obj \
 ltc/pk/rsa/rsa_decrypt_key.obj ltc/pk/rsa/rsa_encrypt_key.obj ltc/pk/rsa/rsa_export.obj \
@@ -196,5 +198,4 @@ clean:
 	$(RM_F) $(OBJS) liballinone.lib
 
 .c.obj:
-        cl /Iltm /Iltc/headers /DLTC_SOURCE /DLTC_NO_TEST /DLTC_NO_PROTOTYPES /DLTM_DESC /DARGTYPE=4 $(CFLAGS) /c $< /Fo$@
- 
+	cl /Iltm /Iltc/headers /DLTC_SOURCE /DLTC_NO_TEST /DLTC_NO_PROTOTYPES /DLTC_NO_WIN32_BCRYPT /DLTM_DESC /DARGTYPE=4 $(CFLAGS) /c $< /Fo$@

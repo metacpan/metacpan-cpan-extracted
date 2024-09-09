@@ -1,5 +1,5 @@
 package Sys::Info::Driver::OSX::Device;
-$Sys::Info::Driver::OSX::Device::VERSION = '0.7961';
+$Sys::Info::Driver::OSX::Device::VERSION = '0.7962';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Sys::Info::Driver::OSX::Device
 
 =head1 VERSION
 
-version 0.7961
+version 0.7962
 
 =head1 SYNOPSIS
 

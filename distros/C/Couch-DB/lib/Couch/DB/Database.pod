@@ -415,7 +415,7 @@ example: for error handling
   sub handle($result, $doc, %details) { ... }
   $db->saveBulk(@save, issues => \&handle);
 
-=item $obj-E<gt>B<search>( [\%search|\@%search, %options] )
+=item $obj-E<gt>B<search>( [\%query|\@queries, %options] )
 
  [CouchDB API "GET /{db}/_all_docs"]
  [CouchDB API "POST /{db}/_all_docs"]
@@ -425,13 +425,15 @@ example: for error handling
  [CouchDB API "POST /{db}/_local_docs/queries", UNTESTED]
  [CouchDB API "GET /{db}/_partition/{partition}/_all_docs", UNTESTED]
 
-Get the documents, optionally limited by a view.  If there are searches,
-then C<POST> is used, otherwise the C<GET> version.  The returned
-structure depends on the searches and the number of searches.  Of course,
-this method support pagination.
+Get the documents, optionally limited by a view.  If there are queries,
+then C<POST> is used, otherwise the C<GET> endpoint.
 
-The usual way to use this method with a view, is by calling
-L<Couch::DB::Design::viewSearch()|Couch::DB::Design/"Views">.
+The returned structure depends on the C<%query> and the number of
+C<@queries> (an ARRAY of query HASHes).  This method support pagination,
+but only when a single query is given.
+
+The preferred way to use this method with a C<view>, is by calling
+L<Couch::DB::Design::viewSearch()|Couch::DB::Design/"Views"> on its C<design> object.
 
  -Option   --Default
   design     undef
@@ -472,8 +474,8 @@ Be warned: doing it this way is memory hungry: better use paging.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.005,
-built on June 23, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.006,
+built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

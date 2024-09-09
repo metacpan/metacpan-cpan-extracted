@@ -8,7 +8,7 @@
 
 package Log::Report;
 use vars '$VERSION';
-$VERSION = '1.37';
+$VERSION = '1.38';
 
 use base 'Exporter';
 
@@ -102,9 +102,6 @@ sub report($@)
             or return;
     }
 
-    $opts->{errno} ||= $!+0 || $? || 1
-        if use_errno($reason) && !defined $opts->{errno};
-
     unless(Log::Report::Dispatcher->can('collectLocation'))
     {   # internal Log::Report error can result in "deep recursions".
         eval "require Carp"; Carp::confess($message);
@@ -134,12 +131,14 @@ sub report($@)
     }
 
     $message->to(undef) if $to;  # overrule destination of message
-
     if(my $disp_name = $message->to)
     {   @disp = grep $_->name eq $disp_name, @disp;
         push @disp, $try if defined $try && $disp_name ne 'try';
         @disp or return;
     }
+
+    $opts->{errno} //= $message->errno //
+		(use_errno($reason) ? ($!+0 || $?) : is_fatal($reason) ? 1 : undef);
 
     my $domain = $message->domain;
     if(my $filters = $reporter->{filters})

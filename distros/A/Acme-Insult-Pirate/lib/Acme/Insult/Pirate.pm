@@ -1,4 +1,4 @@
-package Acme::Insult::Pirate 1.0 {
+package Acme::Insult::Pirate 1.1 {
     use v5.38;
     use HTTP::Tiny;
 
@@ -81,5 +81,11 @@ Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 I'm inflicting this upon the world because L<oodler577|https://github.com/oodler577/> invited me to help expand Perl's
 coverage of smaller open APIs. Blame them or L<join us|https://github.com/oodler577/FreePublicPerlAPIs> in the effort.
+
+=begin stopwords
+
+containin' followin' throwin'
+
+=end stopwords
 
 =cut

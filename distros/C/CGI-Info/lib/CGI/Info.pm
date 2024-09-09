@@ -1,6 +1,7 @@
 package CGI::Info;
 
 # TODO: remove the expect argument
+# TODO:	look into params::check or params::validate and/or giving a subroutine for the allow parameter to params()
 
 use warnings;
 use strict;
@@ -25,11 +26,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.82
+Version 0.83
 
 =cut
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 =head1 SYNOPSIS
 
@@ -76,13 +77,15 @@ our $stdin_data;	# Class variable storing STDIN in case the class
 
 sub new
 {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+	my $class = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {
-		warn __PACKAGE__, ': expect must be a reference to an array';
-		return;
+	if($args{expect}) {
+		if(ref($args{expect}) ne 'ARRAY') {
+			warn __PACKAGE__, ': expect must be a reference to an array';
+			return;
+		}
+		warn __PACKAGE__, ': expect is deprecated, use allow instead';
 	}
 
 	if(!defined($class)) {
@@ -450,7 +453,7 @@ constructor.
 	my $info = CGI::Info->new();
 	my $allowed = {
 		foo => qr/^\d*$/,	# foo must be a number, or empty
-		bar => undef,
+		bar => undef,		# bar can be given and be any value
 		xyzzy => qr/^[\w\s-]+$/,	# must be alphanumeric
 						# to prevent XSS, and non-empty
 						# as a sanity check
@@ -497,6 +500,7 @@ sub params {
 	if(defined($params->{expect})) {
 		if(ref($params->{expect}) eq 'ARRAY') {
 			$self->{expect} = $params->{expect};
+			$self->_warn('expect is deprecated, use allow instead');
 		} else {
 			$self->_warn('expect must be a reference to an array');
 		}
@@ -869,6 +873,7 @@ sub _warn {
 	my $warning = $params->{'warning'};
 
 	return unless($warning);
+
 	if($self eq __PACKAGE__) {
 		# Called from class method
 		carp($warning);
@@ -901,7 +906,7 @@ sub _warn {
 #	when called _get_params('arg', @_);
 sub _get_params
 {
-	my $self = shift;
+	shift;
 	my $default = shift;
 
 	if(ref($_[0]) eq 'HASH') {
@@ -911,7 +916,7 @@ sub _get_params
 
 	my %rc;
 
-	if(scalar(@_) % 2 == 0) {
+	if((scalar(@_) % 2) == 0) {
 		%rc = @_;
 	} elsif(scalar(@_) == 1) {
 		if(defined($default)) {
@@ -1432,7 +1437,7 @@ sub is_robot {
 		}
 		return 1;
 	}
-	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|ClaudeBot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|Yak\/1\.0|ZoominfoBot/i) {
+	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|ClaudeBot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|Yak\/1\.0|ZoominfoBot/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}

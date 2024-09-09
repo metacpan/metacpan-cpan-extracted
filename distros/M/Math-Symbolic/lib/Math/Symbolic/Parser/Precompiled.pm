@@ -1,5 +1,5 @@
 package Math::Symbolic::Parser::Precompiled;
-our $VERSION = '0.612';
+our $VERSION = '0.613';
 
 use strict;
 

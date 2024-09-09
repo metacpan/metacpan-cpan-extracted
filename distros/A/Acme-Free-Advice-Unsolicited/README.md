@@ -1,7 +1,7 @@
 [![Actions Status](https://github.com/sanko/Acme-Free-Advice-Unsolicited/actions/workflows/ci.yml/badge.svg)](https://github.com/sanko/Acme-Free-Advice-Unsolicited/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Acme-Free-Advice-Unsolicited.svg)](https://metacpan.org/release/Acme-Free-Advice-Unsolicited)
 # NAME
 
-Acme::Free::Advice::Unsolicited - Solicit Unsolicited Advice from the Unsolicited Advice API
+Acme::Free::Advice::Unsolicited - Solicit Unsolicited Advice from Kevin Kelly
 
 # SYNOPSIS
 
@@ -12,7 +12,7 @@ say advice( 224 )->{advice};
 
 # DESCRIPTION
 
-Acme::Free::Advice::Unsolicited provides wisdom from author and leading tech observer, [Kevin
+Acme::Free::Advice::Unsolicited provides wisdom from author and leading technology observer, [Kevin
 Kelly](https://en.wikipedia.org/wiki/Kevin_Kelly_\(editor\)).
 
 # METHODS

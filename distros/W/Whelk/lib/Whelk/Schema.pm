@@ -1,5 +1,5 @@
 package Whelk::Schema;
-$Whelk::Schema::VERSION = '0.06';
+$Whelk::Schema::VERSION = '1.00';
 use Kelp::Base -strict;
 use Whelk::Schema::Definition;
 use Carp;
@@ -177,6 +177,10 @@ Boolean - whether the value is required to be present. C<true> by default.
 
 String - an optional description used for the schema in the OpenAPI document.
 
+=item * rules
+
+An array reference of hashes. See L</Extra rules>.
+
 =back
 
 =head3 null
@@ -279,6 +283,69 @@ schema will still only copy the keys which were defined, so this is usually not
 required.
 
 =back
+
+=head2 Extra rules
+
+Whelk does not define a full JSONSchema spec with all its rules. To allow
+configuration, you can specify extra rules when needed which will be used
+during validation and may optionally add some keys to the OpenAPI spec of that
+field. While all field types allow defining extra rules, it makes little sense
+to use them for types C<boolean>, C<null> and C<empty> - rules will do nothing
+for them.
+
+An example of adding some rules is showcased below:
+
+	{
+		type => 'integer',
+		rules => [
+			{
+				openapi => {
+					minimum => '5',
+				},
+				hint => '(>=5)',
+				code => sub {
+					my $value = shift;
+
+					return $value >= 5;
+				},
+			},
+		],
+	}
+
+As shown, a C<rules> array reference may be defined, containing hash
+references. Each rule (represented by a hash reference) must contain C<hint> (a
+very short error message notifying the end user what's wrong), C<code> (a sub
+reference, which will be passed the value and must return C<true> if the value
+is valid) and optionally C<openapi> (a hash reference, containing keys which
+will be added to OpenAPI document).
+
+There may be multiple rules in each field, and each rule can contain multiple
+C<openapi> keys (but only a single C<code> and C<hint>). This system is very
+bare-bones and a bit verbose, but it makes it very easy to write your own
+library of validations, implementing the parts of JSONSchema you need (or even
+the full schema - please publish to CPAN if you do!). Just write a function
+which will return a given hash reference and it becomes quite powerful:
+
+	sub greater_or_equal
+	{
+		my ($arg) = @_;
+
+		return {
+			openapi => {
+				minimum => $arg,
+			},
+			hint => "(>=$arg)",
+			code => sub { shift() >= $arg },
+		};
+	}
+
+	... then
+	{
+		type => 'integer',
+		rules => [
+			greater_or_equal(5),
+		],
+	}
 
 =head1 METHODS
 

@@ -1,4 +1,12 @@
 Revision history for Lingua-Postcodes
+v0.005  2024-09-08
+        - Update changes file (incl. missing v0.003 info)
+v0.004  2024-09-08
+        - Add additional countries
+        - Update docs
+        - Add xt test to confirm all countries covered
+v0.003  2018-02-21
+        - Added additional entries for India 
 v0.002  2016-12-30
         - name() no longer exported by default
         - Changed from base Exporter to use exporter 'import'

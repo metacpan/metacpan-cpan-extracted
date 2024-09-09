@@ -178,7 +178,7 @@ sub progress()
   <table id="status-explain">
   <tr><td>DONE</td>
       <td class="count">$status_counts{DONE}</td>
-      <td>Minimally tested: visual inspection only.</td></tr>
+      <td>Minimally tested: sometimes visual inspection only.</td></tr>
   <tr><td>PARTIAL</td>
       <td class="count">$status_counts{PARTIAL}</td>
       <td>Minimally tested, not completely implemented.</td></tr>

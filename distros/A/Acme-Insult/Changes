@@ -1,5 +1,9 @@
 Revision history for Perl extension Acme::Insult
 
+1.1 2024-09-08T13:11:46Z
+
+    - fix meta
+
 1.0 2024-09-03T16:01:28Z
 
     - original version

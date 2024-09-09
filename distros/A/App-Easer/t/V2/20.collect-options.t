@@ -31,7 +31,7 @@ my $app = {
          getopt      => 'kabooz|k',
       },
    ],
-   'default-child' => 'bar',
+   default_child   => 'bar',
    children        => [
       [
          Bar => { # the spec for this is here, implementation in module Bar

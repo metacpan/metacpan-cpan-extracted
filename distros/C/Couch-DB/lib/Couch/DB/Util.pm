@@ -7,7 +7,7 @@
 
 package Couch::DB::Util;
 use vars '$VERSION';
-$VERSION = '0.005';
+$VERSION = '0.006';
 
 use parent 'Exporter';
 

@@ -1,12 +1,14 @@
 package Whelk::Schema::Definition;
-$Whelk::Schema::Definition::VERSION = '0.06';
+$Whelk::Schema::Definition::VERSION = '1.00';
 use Whelk::StrictBase;
 use Carp;
 use Kelp::Util;
 use Scalar::Util qw(blessed);
-use Storable qw(dclone);
+use Clone qw();
 use Data::Dumper;
 use JSON::PP;
+
+use Whelk::Schema::ExtraRule;
 
 # no import loop, load Whelk::Schema for child classes
 require Whelk::Schema;
@@ -14,6 +16,7 @@ require Whelk::Schema;
 attr name => undef;
 attr '?required' => !!1;
 attr '?description' => undef;
+attr '?rules' => sub { [] };
 
 sub create
 {
@@ -32,6 +35,7 @@ sub new
 	delete $args{name};
 
 	my $self = $class->SUPER::new(%args);
+	$self->rules([map { Whelk::Schema::ExtraRule->new(%$_) } @{$self->rules // []}]);
 
 	$self->_resolve;
 	return $self;
@@ -74,6 +78,30 @@ sub _build
 	}
 }
 
+sub _inhale_extra_rules
+{
+	my ($self, $value) = @_;
+
+	foreach my $rule (@{$self->rules}) {
+		my $error = $rule->inhale($value);
+		return $error if defined $error;
+	}
+
+	return undef;
+}
+
+sub _openapi_dump_extra_rules
+{
+	my ($self) = @_;
+
+	my %result;
+	foreach my $rule (@{$self->rules}) {
+		%result = (%result, %{$rule->openapi});
+	}
+
+	return \%result;
+}
+
 sub clone
 {
 	my ($self, %more_data) = @_;
@@ -82,7 +110,7 @@ sub clone
 	# NOTE: since cloning uses the constructor, the name is automatically
 	# removed from the resulting object.
 
-	my $data = dclone({%{$self}});
+	my $data = Clone::clone({%{$self}});
 	$data = Kelp::Util::merge($data, \%more_data, 1);
 	return $class->new(%$data);
 }
@@ -216,6 +244,10 @@ inside an object or inside C<parameters> for an endpoint.
 =head2 description
 
 OpenAPI description of this definition.
+
+=head2 rules
+
+An array reference of extra validation rules.
 
 =head1 METHODS
 

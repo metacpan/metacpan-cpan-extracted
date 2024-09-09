@@ -60,7 +60,7 @@ use Stow::Util qw(set_debug_level debug error set_test_mode
                   adjust_dotfile unadjust_dotfile);
 
 our $ProgramName = 'stow';
-our $VERSION = '2.4.0';
+our $VERSION = '2.4.1';
 
 our $LOCAL_IGNORE_FILE  = '.stow-local-ignore';
 our $GLOBAL_IGNORE_FILE = '.stow-global-ignore';
@@ -431,17 +431,17 @@ sub stow_contents {
 
         my $package_node_path = join_paths($pkg_subdir, $node);
         my $target_node = $node;
+        my $target_node_path = join_paths($target_subdir, $target_node);
+        next NODE if $self->ignore($stow_path, $package, $target_node_path);
 
         if ($self->{dotfiles}) {
             my $adjusted = adjust_dotfile($node);
             if ($adjusted ne $node) {
                 debug(4, 1, "Adjusting: $node => $adjusted");
                 $target_node = $adjusted;
+                $target_node_path = join_paths($target_subdir, $target_node);
             }
         }
-        my $target_node_path = join_paths($target_subdir, $target_node);
-
-        next NODE if $self->ignore($stow_path, $package, $target_node_path);
 
         $self->stow_node(
             $stow_path,
@@ -800,6 +800,9 @@ sub unstow_contents {
 
         my $package_node = $node;
         my $target_node = $node;
+        my $target_node_path = join_paths($target_subdir, $target_node);
+
+        next NODE if $self->ignore($self->{stow_path}, $package, $target_node_path);
 
         if ($self->{dotfiles}) {
             if ($self->{compat}) {
@@ -819,13 +822,11 @@ sub unstow_contents {
                 if ($adjusted ne $node) {
                     debug(4, 1, "Adjusting: $node => $adjusted");
                     $target_node = $adjusted;
+                    $target_node_path = join_paths($target_subdir, $target_node);
                 }
             }
         }
         my $package_node_path = join_paths($pkg_subdir, $package_node);
-        my $target_node_path = join_paths($target_subdir, $target_node);
-
-        next NODE if $self->ignore($self->{stow_path}, $package, $target_node_path);
 
         $self->unstow_node(
             $package,

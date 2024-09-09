@@ -1,5 +1,5 @@
 package Sys::Info::Driver::OSX::Device::CPU;
-$Sys::Info::Driver::OSX::Device::CPU::VERSION = '0.7961';
+$Sys::Info::Driver::OSX::Device::CPU::VERSION = '0.7962';
 use 5.010;
 use strict;
 use warnings;
@@ -82,7 +82,7 @@ sub identify {
                             grep { $pm{$_} ne ' 0 MHz' }
                             grep { $_ =~ m{ \QHW active frequency\E }xms }
                             keys %pm;
-                    my @clusters_speed = sort { $a <=> $b}
+                    my @clusters_speed = sort { $a <=> $b }
                                             map {
                                                 (
                                                     split m{\s+}xms,
@@ -168,7 +168,7 @@ Sys::Info::Driver::OSX::Device::CPU
 
 =head1 VERSION
 
-version 0.7961
+version 0.7962
 
 =head1 SYNOPSIS
 

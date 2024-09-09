@@ -2,7 +2,7 @@ package Crypt::PK::Ed25519;
 
 use strict;
 use warnings;
-our $VERSION = '0.080';
+our $VERSION = '0.081';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( )] );
@@ -63,21 +63,17 @@ sub import_key {
   }
   croak "FATAL: invalid key data" unless $data;
 
-  if ($data =~ /-----BEGIN PUBLIC KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    return $self->_import($data);
+  if ($data =~ /-----BEGIN (PUBLIC|PRIVATE|ENCRYPTED PRIVATE) KEY-----(.+?)-----END (PUBLIC|PRIVATE|ENCRYPTED PRIVATE) KEY-----/s) {
+    return $self->_import_pem($data, $password);
   }
-  elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    return $self->_import_pkcs8($data, $password);
+  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.+?)-----END CERTIFICATE-----/s) {
+    return $self->_import_pem($data, undef);
   }
-  elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    return $self->_import_pkcs8($data, $password);
+  elsif ($data =~ /-----BEGIN OPENSSH (PUBLIC|PRIVATE) KEY-----(.+?)-----END/s) {
+    return $self->_import_openssh($data, $password);
   }
-  elsif ($data =~ /-----BEGIN ED25519 PRIVATE KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    return $self->_import_pkcs8($data, $password);
+  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.+?)---- END SSH2 PUBLIC KEY ----/s) {
+    return $self->_import_openssh($data, undef);
   }
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) { # JSON
     my $h = CryptX::_decode_json("$1");
@@ -85,21 +81,6 @@ sub import_key {
       return $self->_import_raw(decode_b64u($h->{d}), 1) if $h->{d}; # private
       return $self->_import_raw(decode_b64u($h->{x}), 0) if $h->{x}; # public
     }
-  }
-  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----/sg) {
-    $data = pem_to_der($data) or croak "FATAL: PEM/cert decode failed";
-    return $self->_import_x509($data);
-  }
-  elsif ($data =~ /-----BEGIN OPENSSH PRIVATE KEY-----(.*?)-----END/sg) {
-    #XXX-FIXME-TODO
-    # https://crypto.stackexchange.com/questions/71789/openssh-ed2215-private-key-format
-    # https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.key?annotate=HEAD
-    croak "FATAL: OPENSSH PRIVATE KEY not supported";
-  }
-  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
-    $data = pem_to_der($data) or croak "FATAL: PEM/key decode failed";
-    my ($typ, $pubkey) = Crypt::PK::_ssh_parse($data);
-    return $self->_import_raw($pubkey, 0) if $typ eq 'ssh-ed25519' && length($pubkey) == 32;
   }
   elsif ($data =~ /(ssh-ed25519)\s+(\S+)/) {
     $data = decode_b64("$2");
@@ -123,7 +104,7 @@ sub export_key_pem {
   local $SIG{__DIE__} = \&CryptX::_croak;
   my $key = $self->export_key_der($type||'');
   return unless $key;
-  return der_to_pem($key, "ED25519 PRIVATE KEY", $password, $cipher) if substr($type, 0, 7) eq 'private';
+  return der_to_pem($key, "PRIVATE KEY", $password, $cipher) if substr($type, 0, 7) eq 'private';
   return der_to_pem($key, "PUBLIC KEY") if substr($type,0, 6) eq 'public';
 }
 

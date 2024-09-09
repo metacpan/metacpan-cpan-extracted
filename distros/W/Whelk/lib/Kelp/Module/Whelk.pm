@@ -1,5 +1,5 @@
 package Kelp::Module::Whelk;
-$Kelp::Module::Whelk::VERSION = '0.06';
+$Kelp::Module::Whelk::VERSION = '1.00';
 use Kelp::Base 'Kelp::Module';
 use Kelp::Util;
 use Carp;
@@ -131,14 +131,8 @@ sub _install_openapi
 		path => $config
 	} unless ref $config eq 'HASH';
 
-	croak "Wrong path for openapi"
-		unless $config->{path} =~ m{^/};
-
 	my $openapi_class = $self->_load_package($config->{class} // 'Whelk::OpenAPI');
 	$self->openapi_generator($openapi_class->new);
-
-	my $formatter_class = $self->_load_package($config->{formatter} // $args->{formatter}, 'Whelk::Formatter');
-	my $formatter = $formatter_class->new(app => $self->app);
 
 	$self->openapi_generator->parse(
 		app => $app,
@@ -148,15 +142,23 @@ sub _install_openapi
 		schemas => Whelk::Schema->all_schemas,
 	);
 
-	$app->add_route(
-		[GET => $config->{path}] => sub {
-			my ($app) = @_;
+	if (defined $config->{path}) {
+		croak "Wrong path for openapi"
+			unless $config->{path} =~ m{^/};
 
-			my $generated = $self->openapi_generator->generate();
+		my $formatter_class = $self->_load_package($config->{formatter} // $args->{formatter}, 'Whelk::Formatter');
+		my $formatter = $formatter_class->new(app => $self->app);
 
-			return $formatter->format_response($app, $generated, 'openapi');
-		}
-	);
+		$app->add_route(
+			[GET => $config->{path}] => sub {
+				my ($app) = @_;
+
+				my $generated = $self->openapi_generator->generate();
+
+				return $formatter->format_response($app, $generated, 'openapi');
+			}
+		);
+	}
 }
 
 1;

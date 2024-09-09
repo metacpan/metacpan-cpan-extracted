@@ -8,7 +8,7 @@
 
 package Dancer2::Plugin::LogReport;
 use vars '$VERSION';
-$VERSION = '1.37';
+$VERSION = '1.38';
 
 
 use warnings;
@@ -17,7 +17,7 @@ use version;
 
 BEGIN { use Log::Report () }  # require very early   XXX MO: useless?
 
-use Dancer2::Plugin;
+use Dancer2::Plugin 0.207;
 use Dancer2::Plugin::LogReport::Message;
 use Log::Report  'log-report', syntax => 'REPORT',
     message_class => 'Dancer2::Plugin::LogReport::Message';

@@ -1,5 +1,12 @@
 Revision history for CGI-Info
 
+0.83	Sun  8 Sep 08:52:23 EDT 2024
+	Mark Go-http-client as a robot
+	Support CircleCI
+	Fix t/script.t which failed on some platforms
+	Use gtar to create a distribution on Macs
+	Mark 'expect' as deprecated
+
 0.82	Thu Aug  8 07:51:02 EDT 2024
 	Mark ClaudeBot as a robot
 	Mark YaK/1.0 as a robot

@@ -7,6 +7,16 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.38: Mon  9 Sep 11:00:15 CEST 2024
+
+	Fixes:
+	- Require Dancer2 >= 0.207 for test [cpantesters], [GitHub issue #13]
+	- error code must be set when the script exists with error or panic
+	  [Any Beverley]
+
+	Improvements:
+	- add _errno attribute to messages
+
 version 1.37: Fri 28 Jun 11:08:19 CEST 2024
 
 	Fixes:

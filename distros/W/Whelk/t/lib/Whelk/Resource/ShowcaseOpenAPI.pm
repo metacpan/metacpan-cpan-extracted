@@ -12,6 +12,15 @@ sub api
 			type => 'integer',
 			description => 'Internal ID',
 			example => 1337,
+			rules => [
+				{
+					openapi => {
+						minimum => 1,
+					},
+					hint => '(>=1)',
+					code => sub { shift() >= 1 },
+				},
+			],
 		}
 	);
 

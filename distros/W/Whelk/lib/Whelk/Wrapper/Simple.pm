@@ -1,5 +1,5 @@
 package Whelk::Wrapper::Simple;
-$Whelk::Wrapper::Simple::VERSION = '0.06';
+$Whelk::Wrapper::Simple::VERSION = '1.00';
 use Kelp::Base 'Whelk::Wrapper';
 use Kelp::Exception;
 

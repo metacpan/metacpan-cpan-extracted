@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Array;
-$Whelk::Schema::Definition::Array::VERSION = '0.06';
+$Whelk::Schema::Definition::Array::VERSION = '1.00';
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 attr '?items' => undef;
@@ -10,6 +10,7 @@ sub openapi_dump
 	my ($self, $openapi_obj, %hints) = @_;
 
 	my $res = {
+		%{$self->_openapi_dump_extra_rules},
 		type => 'array',
 		($self->items ? (items => $self->items->openapi_schema($openapi_obj)) : ()),
 	};
@@ -35,23 +36,23 @@ sub inhale
 
 	if (ref $value eq 'ARRAY') {
 		my $type = $self->items;
-		return undef unless $type;
-
-		foreach my $index (keys @$value) {
-			my $inhaled = $type->inhale($value->[$index]);
-			return "array[$index]->$inhaled" if defined $inhaled;
+		if ($type) {
+			foreach my $index (keys @$value) {
+				my $inhaled = $type->inhale($value->[$index]);
+				return "array[$index]->$inhaled" if defined $inhaled;
+			}
 		}
 
-		return undef;
+		return $self->_inhale_extra_rules($value);
 	}
 	elsif ($self->lax) {
 		my $type = $self->items;
-		return undef unless $type;
+		if ($type) {
+			my $inhaled = $type->inhale($value);
+			return "array[0]->$inhaled" if defined $inhaled;
+		}
 
-		my $inhaled = $type->inhale($value);
-		return "array[0]->$inhaled" if defined $inhaled;
-
-		return undef;
+		return $self->_inhale_extra_rules($value);
 	}
 
 	return 'array';

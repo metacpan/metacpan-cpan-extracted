@@ -14,8 +14,6 @@ my $pass   = 'testing';
 
 my ($major, $minor, $patch) = openssl_version();
 
-diag("OpenSSL version: $major.$minor $patch\n");
-
 my $certfile;
 if ($major le "1.1" )  {
     $certfile = catdir($base, 'test_le_1.1.p12');

@@ -12,7 +12,7 @@ say advice;
 
 # DESCRIPTION
 
-Acme::Free::Advice spits out advice. Good advice. Bad advice. Advice. It's a forture cookie.
+Acme::Free::Advice spits out advice. Good advice. Bad advice. Advice. It's a fortune cookie.
 
 # METHODS
 

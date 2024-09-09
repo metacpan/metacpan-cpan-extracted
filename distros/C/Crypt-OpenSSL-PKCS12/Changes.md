@@ -1,5 +1,9 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+# 1.92 2024-09-08
+
+Addition of new feature supporting the OpenSSL info option, all via PR [#44](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/44) from @timlegge
+
 ## 1.91 Mon Jun 24 22:00:13 CEST 2024
 
 Due to a mistake with the release numbering, the two trial releases, should not have been `1.10` and `1.11`, but `1.91` and `1.92` respectively. So there will be a jump from 1.9 to 1.91, since 1.9 is equivalent to 1.90.

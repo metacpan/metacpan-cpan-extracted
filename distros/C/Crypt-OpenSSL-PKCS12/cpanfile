@@ -10,6 +10,7 @@ on 'test' => sub {
   requires "Crypt::OpenSSL::Guess" => "0.11";
   requires "Crypt::OpenSSL::PKCS10" => "0";
   requires "Data::Dumper" => "0";
+  requires "Digest::SHA" => "0";
   requires "File::Spec::Functions" => "0";
   requires "Test::More" => "0";
 };

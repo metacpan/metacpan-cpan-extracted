@@ -3,6 +3,13 @@
 	  All code was made by Mark Overmeer.
 	  Attributes refer to people who made contributions in ideas and bug-reports.
 
+version 0.006: Mon  9 Sep 09:42:09 CEST 2024
+
+	Fixes:
+	- search(query) parameter 'reduce' typo.
+	- create document with _id==undef (or not set) will block an id to be created.
+	  github pull#1 [Paulinsche]
+
 version 0.005: Sun 23 Jun 09:33:12 CEST 2024
 
 	Changes:

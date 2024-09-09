@@ -376,8 +376,8 @@ undef, a C<null> document will be used.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.005,
-built on June 23, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.006,
+built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

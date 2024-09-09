@@ -360,152 +360,152 @@ check_tests(
         {
             ok        => 1,
             name      => "render instance: <p>test</p>",
-            depth     => 4,
+            depth    => 7,
             completed => 1,
         },
         {
             ok        => 1,
             name      => "function: arrayref is ref - is_deeply",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok        => 1,
             name      => "function: hashref is ref - is_deeply",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok        => 1,
             name      => "function: array is array - reference - is_deeply",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok        => 1,
             name      => "function: hash is hash - reference - is_deeply",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok        => 1,
             name      => "'function: obj is Object - blessed - is - Test::Moon' isa 'Test::Moon'",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok        => 1,
             name      => "catch is like - a horrible death",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok        => 1,
             name      => "function: true is true - 1",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok        => 1,
             name      => "function: false is false - 0",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok        => 1,
             name      => "function: undefined is undef",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
 "function: ref_scalar_key is ref - has scalar key: thing - is - 1234",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
 "function: ref_ref_key is ref - has ref key: thing - is_deeply - ref",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
 "function: ref_refa_key is ref - has ref key: thing - is_deeply - ref",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
               "function: ref_index is ref - has scalar index: 0 - is - thing",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
               "function: ref_index is ref - has ref index: 1 - is_deeply - ref",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
 "function: ref_like_key is ref - has scalar key: exception - like - mehhh the world has ended",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
 "function: ref_like_ref is ref - has scalar index: 1 - like - mehhh the world has ended",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
 "function: list_like_ref is list - has scalar index: 1 - like - mehhh the world has ended",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
               "function: list_index is list - has scalar index: 0 - is - thing",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
 "function: list_index is list - has ref index: 1 - is_deeply - ref",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
 "function: list_key is list - has scalar key: yes - is - okay something slow",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
 "function: list_key is list - has ref key: thing - is_deeply - ref",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {
             ok => 1,
             name =>
 "function: list_key is list - has scalar key: yes - like - something",
-            depth     => 3,
+            depth    => 6,
             completed => 1,
         },
         {

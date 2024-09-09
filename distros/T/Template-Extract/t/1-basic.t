@@ -1,13 +1,15 @@
 #!/usr/bin/perl
 
 use strict;
-use Test::More tests => 15;
+use Test::More tests => 16;
 
+# TEST
 use_ok('Template::Extract');
 
 my ( $template, $document, $data );
 
 my $obj = Template::Extract->new;
+# TEST
 isa_ok( $obj, 'Template::Extract' );
 
 $template = << '.';
@@ -27,6 +29,7 @@ this text is ignored, too.</li></ul>
 
 $data = Template::Extract->new->extract( $template, $document );
 
+# TEST
 is_deeply(
     $data,
     {
@@ -66,6 +69,7 @@ $document = << '.';
 
 $data = Template::Extract->new->extract( $template, $document );
 
+# TEST
 is_deeply(
     $data,
     { record => [ map { { para => $_ } } 'hello', 'world', ', how are you?' ] },
@@ -106,6 +110,7 @@ this text is ignored, also.</li></ol>
 
 $data = Template::Extract->new->extract( $template, $document );
 
+# TEST
 is_deeply(
     $data,
     {
@@ -156,6 +161,7 @@ _meraydoe_
 
 $data = Template::Extract->new->extract( $template, $document );
 
+# TEST
 is_deeply(
     $data,
     {
@@ -169,6 +175,7 @@ is_deeply(
 my $ext_data = { F => 'fa' };
 $data = Template::Extract->new->extract( $template, $document, $ext_data );
 
+# TEST
 is_deeply(
     $data,
     {
@@ -180,6 +187,7 @@ is_deeply(
     'external data'
 );
 
+# TEST
 is_deeply( $data, $ext_data, 'ext_data should be the same as data' );
 
 $template = << '.';
@@ -199,6 +207,7 @@ $document = << '.';
 
 $data = Template::Extract->new->extract( $template, $document );
 
+# TEST
 is_deeply(
     $data,
     {
@@ -235,6 +244,7 @@ $document = << '.';
 
 $data = Template::Extract->new->extract( $template, $document );
 
+# TEST
 is_deeply(
     $data,
     {
@@ -263,11 +273,13 @@ $document = " hello name<br>";
 
 $data = Template::Extract->new->extract( $template, $document );
 
+# TEST
 is_deeply( $data, { item => [ { foo => 'name' } ] }, 'extra prepended data' );
 
 $Template::Extract::EXACT = 1;
 $data = Template::Extract->new->extract( $template, $document );
 
+# TEST
 is( $data, undef, 'partial match when $EXACT == 1 should fail' );
 
 $Template::Extract::EXACT = 0;
@@ -277,6 +289,7 @@ $document = '2004-12-17';
 
 $data = Template::Extract->new->extract( $template, $document );
 
+# TEST
 is_deeply( $data, { year => 2004, month => 12, day => 17 }, 'trailing match' );
 
 $template = '<%year>-<%month>-<%day>';
@@ -286,6 +299,7 @@ $data =
   Template::Extract->new( { TAG_STYLE => 'mason' } )
   ->extract( $template, $document );
 
+# TEST
 is_deeply(
     $data,
     { year => 2004, month => 12, day => 17 },
@@ -301,4 +315,17 @@ $template = '<h2>[% d =~ /((?!<h2|<\/h2).+?)/ %]</h2>';
 
 $data = Template::Extract->new->extract( $template, $document );
 
+# TEST
 is_deeply( $data, { d => 'hello' }, 'capturing regex' );
+
+$document = << '.';
+<p>hello</p>
+<p>42</p>
+.
+
+$template = '<p>[% a.b =~ /(\d+)/ %]</p>';
+
+$data = Template::Extract->new->extract( $template, $document );
+
+# TEST
+is_deeply( $data, { a => { b => '42' }}, 'structured var with capturing regex' );

@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 use Test::Most tests => 4;
-use constant SITE =>'https://api.github.com/repos/nigelhorne/CGI-Info/issues';
-use constant URL =>'api.github.com';
+use constant URL => 'https://api.github.com/repos/nigelhorne/CGI-Info/issues';
+use constant SITE =>'api.github.com';
 
 RT: {
 	# RT system, deprecated
@@ -15,8 +15,8 @@ RT: {
 				diag('WWW::RT::CPAN required to check for open tickets');
 				skip('WWW::RT::CPAN required to check for open tickets', 3);
 			} elsif(my @rc = @{WWW::RT::CPAN::list_dist_active_tickets(dist => 'CGI-Info')}) {
-				ok($rc[0] == 200);
-				ok($rc[1] eq 'OK');
+				cmp_ok($rc[0], '==', 200);
+				cmp_ok($rc[1], 'eq', 'OK');
 				my @tickets = $rc[2] ? @{$rc[2]} : ();
 
 				foreach my $ticket(@tickets) {
@@ -50,6 +50,7 @@ GITHUB: {
 				} else {
 					my $s = IO::Socket::INET->new(
 						PeerAddr => SITE,
+						PeerPort => 'http(80)',
 						Timeout => 5
 					);
 					if($s) {
@@ -70,12 +71,13 @@ GITHUB: {
 							}
 							cmp_ok(scalar(@issues), '==', 0, 'There are no opentickets');
 						} else {
-							diag(URL, ': failed to get data');
-							fail('Failed to get data');
+							diag(URL, ': failed to get data - ignoring');
+							# fail('Failed to get data');
+							skip(URL . ': failed to get data - ignoring', 1);
 						}
 					} else {
-						diag("Can't connect to ", SITE);
-						skip("Can't connect to " . SITE, 1);
+						diag("Can't connect to ", SITE, ": $IO::Socket::errstr");
+						skip("Can't connect to " . SITE . ": $IO::Socket::errstr", 1);
 					}
 				}
 			}

@@ -57,6 +57,7 @@ components:
       description: Internal ID
       example: 1337
       type: integer
+      minimum: 1
 info:
   contact:
     email: snail@whelk.com

@@ -8,7 +8,7 @@
 
 package Log::Report::Message;
 use vars '$VERSION';
-$VERSION = '1.37';
+$VERSION = '1.38';
 
 
 use warnings;
@@ -110,6 +110,12 @@ sub classes()
 sub to(;$)
 {   my $self = shift;
     @_ ? $self->{_to} = shift : $self->{_to};
+}
+
+
+sub errno(;$)
+{	my $self = shift;
+	@_ ? $self->{_errno} = shift : $self->{_errno};
 }
 
 

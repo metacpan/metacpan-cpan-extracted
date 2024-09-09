@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README.md
-TODO.md
 cpanfile
 dist.ini
 ex/TodoApp/app.psgi
@@ -49,6 +48,7 @@ lib/Whelk/Schema/Definition/Number.pm
 lib/Whelk/Schema/Definition/Object.pm
 lib/Whelk/Schema/Definition/String.pm
 lib/Whelk/Schema/Definition/_Scalar.pm
+lib/Whelk/Schema/ExtraRule.pm
 lib/Whelk/StrictBase.pm
 lib/Whelk/Wrapper.pm
 lib/Whelk/Wrapper/Simple.pm
@@ -71,6 +71,7 @@ t/eager_resource.t
 t/exhale.t
 t/generated_template.t
 t/inhale.t
+t/inhale_extra_rules.t
 t/kelp_custom.t
 t/kelp_moo.t
 t/lib/CustomContext.pm

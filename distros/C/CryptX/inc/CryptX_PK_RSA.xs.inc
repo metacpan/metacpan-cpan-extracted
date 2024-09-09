@@ -56,16 +56,68 @@ _import_pkcs8(Crypt::PK::RSA self, SV * key_data, SV * passwd)
     PPCODE:
     {
         int rv;
-        unsigned char *data=NULL, *pwd=NULL;
-        STRLEN data_len=0, pwd_len=0;
+        unsigned char *data = NULL;
+        STRLEN data_len = 0;
+        password_ctx pw_ctx = { cryptx_internal_password_cb_getpw, cryptx_internal_password_cb_free, passwd };
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        if (SvOK(passwd)) {
-          pwd = (unsigned char *)SvPVbyte(passwd, pwd_len);
-        }
         if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
-        rv = rsa_import_pkcs8(data, (unsigned long)data_len, pwd, (unsigned long)pwd_len, &self->key);
+        if (SvOK(passwd)) {
+          rv = rsa_import_pkcs8(data, (unsigned long)data_len, &pw_ctx, &self->key);
+        }
+        else {
+          rv = rsa_import_pkcs8(data, (unsigned long)data_len, NULL, &self->key);
+        }
         if (rv != CRYPT_OK) croak("FATAL: rsa_import_pkcs8 failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
+_import_pem(Crypt::PK::RSA self, SV * key_data, SV * passwd)
+    PPCODE:
+    {
+        int rv;
+        unsigned char *data = NULL;
+        STRLEN data_len = 0;
+        password_ctx pw_ctx = { cryptx_internal_password_cb_getpw, cryptx_internal_password_cb_free, passwd };
+        ltc_pka_key key_from_pem;
+
+        data = (unsigned char *)SvPVbyte(key_data, data_len);
+        if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
+        if (SvOK(passwd)) {
+          rv = pem_decode_pkcs(data, (unsigned long)data_len, &key_from_pem, &pw_ctx);
+        }
+        else {
+          rv = pem_decode_pkcs(data, (unsigned long)data_len, &key_from_pem, NULL);
+        }
+        if (rv != CRYPT_OK) croak("FATAL: pem_decode_pkcs failed: %s", error_to_string(rv));
+        if (key_from_pem.id != LTC_PKA_RSA) croak("FATAL: pem_decode_pkcs decoded non-RSA key");
+        self->key = key_from_pem.u.rsa;
+        XPUSHs(ST(0)); /* return self */
+    }
+
+
+void
+_import_openssh(Crypt::PK::RSA self, SV * key_data, SV * passwd)
+    PPCODE:
+    {
+        int rv;
+        unsigned char *data = NULL;
+        STRLEN data_len = 0;
+        password_ctx pw_ctx = { cryptx_internal_password_cb_getpw, cryptx_internal_password_cb_free, passwd };
+        ltc_pka_key key_from_pem;
+
+        data = (unsigned char *)SvPVbyte(key_data, data_len);
+        if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
+        if (SvOK(passwd)) {
+          rv = pem_decode_openssh(data, (unsigned long)data_len, &key_from_pem, &pw_ctx);
+        }
+        else {
+          rv = pem_decode_openssh(data, (unsigned long)data_len, &key_from_pem, NULL);
+        }
+        if (rv != CRYPT_OK) croak("FATAL: pem_decode_openssh failed: %s", error_to_string(rv));
+        if (key_from_pem.id != LTC_PKA_RSA) croak("FATAL: pem_decode_openssh decoded non-RSA key");
+        self->key = key_from_pem.u.rsa;
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -295,10 +347,10 @@ export_key_der(Crypt::PK::RSA self, char * type)
         RETVAL
 
 SV *
-encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * oaep_hash = "SHA1", SV * oaep_lparam = NULL)
+encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * mgf_hash = "SHA1", SV * oaep_lparam = NULL, const char * lparam_hash = NULL)
     CODE:
     {
-        int rv, hash_id;
+        int rv, mgf_hash_id, lparam_hash_id;
         unsigned char *lparam_ptr=NULL;
         STRLEN lparam_len=0;
         unsigned char *data_ptr=NULL;
@@ -310,19 +362,26 @@ encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "oaep", 4)) {
-          hash_id = cryptx_internal_find_hash(oaep_hash);
-          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
+          mgf_hash_id = cryptx_internal_find_hash(mgf_hash);
+          if (mgf_hash_id == -1) croak("FATAL: find_hash failed for '%s'", mgf_hash);
+          if (lparam_hash) {
+            lparam_hash_id = cryptx_internal_find_hash(lparam_hash);
+            if (lparam_hash_id == -1) croak("FATAL: find_hash failed for '%s'", lparam_hash);
+          }
+          else {
+            lparam_hash_id = mgf_hash_id;
+          }
           if (oaep_lparam) lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
                                   &self->pstate, self->pindex,
-                                  hash_id, LTC_PKCS_1_OAEP, &self->key);
+                                  mgf_hash_id, lparam_hash_id, LTC_PKCS_1_OAEP, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, NULL, 0,
                                   &self->pstate, self->pindex,
-                                  0, LTC_PKCS_1_V1_5, &self->key);
+                                  0, -1, LTC_PKCS_1_V1_5, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
@@ -340,10 +399,10 @@ encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
         RETVAL
 
 SV *
-decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * oaep_hash = "SHA1", SV * oaep_lparam = NULL)
+decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * mgf_hash = "SHA1", SV * oaep_lparam = NULL, const char * lparam_hash = NULL)
     CODE:
     {
-        int rv, hash_id, stat;
+        int rv, lparam_hash_id, mgf_hash_id, stat;
         unsigned char *lparam_ptr=NULL;
         STRLEN lparam_len=0;
         unsigned char *data_ptr=NULL;
@@ -355,18 +414,25 @@ decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "oaep", 4)) {
-          hash_id = cryptx_internal_find_hash(oaep_hash);
-          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
+          mgf_hash_id = cryptx_internal_find_hash(mgf_hash);
+          if (mgf_hash_id == -1) croak("FATAL: find_hash failed for '%s'", mgf_hash);
+          if (lparam_hash) {
+            lparam_hash_id = cryptx_internal_find_hash(lparam_hash);
+            if (lparam_hash_id == -1) croak("FATAL: find_hash failed for '%s'", lparam_hash);
+          }
+          else {
+            lparam_hash_id = mgf_hash_id;
+          }
           if (oaep_lparam) lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_decrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
-                                  hash_id, LTC_PKCS_1_OAEP, &stat, &self->key);
+                                    mgf_hash_id, lparam_hash_id, LTC_PKCS_1_OAEP, &stat, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_decrypt_key_ex failed: %s", error_to_string(rv));
           if (stat != 1) croak("FATAL: rsa_decrypt - not valid OAEP packet");
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           rv = rsa_decrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, NULL, 0,
-                                  0, LTC_PKCS_1_V1_5, &stat, &self->key);
+                                  0, -1, LTC_PKCS_1_V1_5, &stat, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_decrypt_key_ex failed: %s", error_to_string(rv));
           if (stat != 1) croak("FATAL: rsa_decrypt - invalid");
           RETVAL = newSVpvn((char*)buffer, buffer_len);

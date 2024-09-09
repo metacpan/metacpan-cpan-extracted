@@ -18,6 +18,9 @@
 # endif
 #endif
 
+/* HACK: https://github.com/DCIT/perl-CryptX/issues/105 (replacement for SvPOK(sv) suggestet by Leont) */
+#define SvPOK_spec(sv) (SvOK(sv) && (!SvROK(sv) || SvAMAGIC(sv)))
+
 #undef LTC_SOURCE
 #include "tomcrypt.h"
 #include "tommath.h"
@@ -161,6 +164,44 @@ typedef struct x25519_struct {          /* used by Crypt::PK::X25519 */
   curve25519_key key;
   int initialized;
 } *Crypt__PK__X25519;
+
+STATIC int cryptx_internal_password_cb_getpw(void **p, unsigned long *l, void *u) {
+  dTHX; /* fetch context */
+  SV *passwd = u;
+  void *pwd = NULL;
+  STRLEN pwd_len = 0;
+
+  if (p == NULL) {
+    *l = 0;
+    return 1;
+  }
+  if (passwd == NULL || !SvOK(passwd)) {
+    *p = NULL;
+    *l = 0;
+    return 1;
+  }
+  pwd = SvPVbyte(passwd, pwd_len);
+  if (pwd == NULL || pwd_len == 0) {
+    *p = NULL;
+    *l = 0;
+    return 1;
+  }
+  Newz(0, *p, pwd_len, unsigned char);
+  if (*p == NULL) {
+    *l = 0;
+    return 1;
+  }
+  Copy(pwd, *p, pwd_len, unsigned char);
+  *l = pwd_len;
+
+  return 0;
+}
+
+STATIC void cryptx_internal_password_cb_free(void *p) {
+  dTHX; /* fetch context */
+  Safefree(p);
+  return;
+}
 
 STATIC int cryptx_internal_mp2hex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
   int len, rv;

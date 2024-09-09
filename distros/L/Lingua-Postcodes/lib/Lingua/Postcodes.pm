@@ -1,5 +1,5 @@
 package Lingua::Postcodes;
-$Lingua::Postcodes::VERSION = '0.003';
+$Lingua::Postcodes::VERSION = '0.005';
 use strict;
 use warnings;
 use utf8;
@@ -63,12 +63,14 @@ my %POSTCODES = (
     FO => { EN => 'Postal code' },
     FR => { EN => 'Postal code', FR => 'Code postal' },
     GA => { EN => 'Postal code' },
-    GB => { EN => 'Postcode', FR => '?' },
+    GB => { EN => 'Postcode' },
     GE => { EN => 'Postal code' },
     GF => { EN => 'Code postal' },
     GG => { EN => 'Postcode' },
+    GH => { EN => 'Postcode' },
     GI => { EN => 'Postcode' },
     GL => { EN => 'Postal code' },
+    GN => { EN => 'Postcode' },
     GP => { EN => 'Code postal' },
     GR => { EN => 'Postal code' },
     GS => { EN => 'Postcode' },
@@ -97,12 +99,14 @@ my %POSTCODES = (
     KE => { EN => 'Postal code' },
     KG => { EN => 'Postal code' },
     KH => { EN => 'Postal code' },
+    KN => { EN => 'Post code'},
     KR => { EN => 'Postal code' },
     KW => { EN => 'Postal code' },
     KY => { EN => 'Postal code' },
     KZ => { EN => 'Postal code' },
     LA => { EN => 'Postal code' },
     LB => { EN => 'Postal code' },
+    LC => { EN => 'Postcode' },
     LI => { EN => 'PLZ' },
     LK => { EN => 'Postal code' },
     LR => { EN => 'Postal code' },
@@ -123,8 +127,10 @@ my %POSTCODES = (
     MN => { EN => 'Postal code' },
     MP => { EN => 'ZIP codes' },
     MQ => { EN => 'Code postal' },
+    MS => { EN => 'Postcode' },
     MT => { EN => 'Postal code' },
     MV => { EN => 'Postal code' },
+    MW => { EN => 'Post Code' },
     MX => { EN => 'Código postal' },
     MY => { EN => 'Postal code' },
     MZ => { EN => 'Postal code' },
@@ -166,6 +172,7 @@ my %POSTCODES = (
     SK => { EN => 'PSČ' },
     SM => { EN => 'CPI' },
     SN => { EN => 'Code postal' },
+    SO => { EN => 'Postcode'},
     SS => { EN => 'Postal code' },
     SV => { EN => 'Código postal' },
     SZ => { EN => 'Postal code' },
@@ -178,17 +185,20 @@ my %POSTCODES = (
     TR => { EN => 'Postal code' },
     TT => { EN => 'Postal code' },
     TW => { EN => 'Postal code' },
+    TZ => { EN => 'Postcode' },
     UA => { EN => 'Postal code' },
-    US => { EN => 'ZIP codes' },
+    UM => { EN => 'ZIP code'},
+    US => { EN => 'ZIP code' },
     UY => { EN => 'Postal code', ES => 'Código postal' },
     UZ => { EN => 'Postal code' },
     VA => { EN => 'CAP' },
     VC => { EN => 'Postal code' },
     VE => { EN => 'Postal code', ES => 'Código postal' },
     VG => { EN => 'Postal code' },
-    VI => { EN => 'ZIP codes' },
+    VI => { EN => 'ZIP code' },
     VN => { EN => 'Postal code' },
     WF => { EN => 'Code postal' },
+    WS => { EN => 'Postcode' },
     YT => { EN => 'Code postal' },
     ZA => { EN => 'Postal code' },
     ZM => { EN => 'Postal code' },
@@ -222,7 +232,7 @@ Lingua::Postcodes - Returns the names of postcodes/zipcodes
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -243,6 +253,10 @@ version 0.003
     print 'The Japanese name of a postcode in Japan is:', name('JP', 'JP');
     # The Japanese name of a postcode in Japan is 郵便番号
 
+    # Unknown postcodes/systems
+    print 'No postal code system for this country' if Lingua::Postcodes::name('ZZZZZZ') eq undef;
+    print 'We do not have the translation' if Lingua::Postcodes::name('GB', 'FR') eq 'undef';
+
 =head1 DESCRIPTION
 
 This module allows the easy translation of the name of postcodes (postal codes/ zip codes).
@@ -255,13 +269,16 @@ For example, when handling the various names for postcodes across Europe.
 This module does not parse or handle postcodes themselves; it simply provides a programmatic
 way of getting the correct name for postcodes for nations.
 
+Reference for if/what a postcode is called in mainly referencing:
+ https://en.wikipedia.org/wiki/List_of_postal_codes
+
 =head1 NAME
 
 Lingua::Postcodes - Provide names for postcodes/zipcodes
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 AUTHOR
 

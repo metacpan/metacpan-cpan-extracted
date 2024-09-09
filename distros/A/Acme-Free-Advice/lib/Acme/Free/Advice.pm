@@ -1,4 +1,4 @@
-package Acme::Free::Advice 1.0 {
+package Acme::Free::Advice 1.1 {
     use v5.38;
     use parent 'Exporter';
     use Module::Load;
@@ -34,7 +34,7 @@ Acme::Free::Advice - Wise words. Dumb code.
 
 =head1 DESCRIPTION
 
-Acme::Free::Advice spits out advice. Good advice. Bad advice. Advice. It's a forture cookie.
+Acme::Free::Advice spits out advice. Good advice. Bad advice. Advice. It's a fortune cookie.
 
 =head1 METHODS
 

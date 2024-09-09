@@ -1,13 +1,23 @@
 Changes for CryptX
 
+0.081   2024-09-08
+        - fix #107 Drop -msse4.1 -maes for libtomcrypt
+        - fix #105 Several functions in CryptX::AuthEnc deal weirdly with non-simple-string plaintext
+        - fix #104 Add ethereum format signature
+        - fix #103 Use standard __asm__ blocks instead of asm
+        - fix #99 ltc: fix aesni flag handling
+        - fix #87 Add possibility to use different hash algorithms in RSAES-OAEP
+        - BIG CHANGE switch to PEM/SSH key loading via libtomcrypt
+        - bundled libtomcrypt update branch:develop (commit:ce904c86 2024-09-02)
+
 0.080   2023-10-04
         - fix #95 AES-NI troubles on MS Windows (gcc compiler)
         - fix #96 Tests failure with Math::BigInt >= 1.999840
         - Enabled AES-NI for platforms with gcc/clang/llvm
 
 0.079   2023-10-01
-         - fix #92 update libtomcrypt
-         - bundled libtomcrypt update branch:develop (commit:1e629e6f 2023-06-22)
+        - fix #92 update libtomcrypt
+        - bundled libtomcrypt update branch:develop (commit:1e629e6f 2023-06-22)
 
 0.078   2023-04-28
         - fix #89 Crypt::Mac::HMAC b64mac and b64umac object methods do not work

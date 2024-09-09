@@ -8,6 +8,7 @@ use Params::Validate qw/:all/;
 use B qw/svref_2object/;
 use Exporter 'import';
 use Acme::AsciiEmoji;
+use Switch::Again qw/switch/;
 
 our @EMO = @Acme::AsciiEmoji::EXPORT_OK;
 our @EXPORT = qw/render_me moon_test moon_test_one sunrise/;
@@ -18,8 +19,6 @@ our %EXPORT_TAGS = (
     emo     => [@EMO],
 );
 
-use feature qw/switch/;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 =head1 NAME
 
@@ -27,11 +26,11 @@ Moonshine::Test - Test!
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 
@@ -242,12 +241,12 @@ sub moon_test_one {
         return;
     }
 
-    given ( $instruction{test} ) {
-        when ('ref') {
+   switch( $instruction{test},
+        'ref' => sub {
             return is_deeply( $test[0], $expected[0],
                 "$test_name is ref - is_deeply" );
-        }
-        when ('ref_key_scalar') {
+        },
+        'ref_key_scalar' => sub {
             return exists $instruction{key}
               ? is(
                 $test[0]->{ $instruction{key} },
@@ -258,8 +257,8 @@ sub moon_test_one {
                 0,
                 "No key passed to test - ref_key_scalar - testing - $test_name"
               );
-        }
-        when ('ref_key_like') {
+        },
+        'ref_key_like' => sub {
             return exists $instruction{key}
               ? like(
                 $test[0]->{ $instruction{key} },
@@ -268,8 +267,8 @@ sub moon_test_one {
               )
               : ok( 0,
                 "No key passed to test - ref_key_like - testing - $test_name" );
-        }
-        when ('ref_key_ref') {
+        },
+        'ref_key_ref' => sub {
             return exists $instruction{key}
               ? is_deeply(
                 $test[0]->{ $instruction{key} },
@@ -278,8 +277,8 @@ sub moon_test_one {
               )
               : ok( 0,
                 "No key passed to test - ref_key_ref - testing - $test_name" );
-        }
-        when ('ref_index_scalar') {
+        },
+        'ref_index_scalar' => sub {
             return exists $instruction{index}
               ? is(
                 $test[0]->[ $instruction{index} ],
@@ -290,8 +289,8 @@ sub moon_test_one {
                 0,
 "No index passed to test - ref_index_scalar - testing - $test_name"
               );
-        }
-        when ('ref_index_ref') {
+        },
+        'ref_index_ref' => sub {
             return exists $instruction{index}
               ? is_deeply(
                 $test[0]->[ $instruction{index} ],
@@ -302,8 +301,8 @@ sub moon_test_one {
                 0,
                 "No index passed to test - ref_index_ref - testing - $test_name"
               );
-        }
-        when ('ref_index_like') {
+        },
+        'ref_index_like' => sub {
             return exists $instruction{index}
               ? like(
                 $test[0]->[ $instruction{index} ],
@@ -314,8 +313,8 @@ sub moon_test_one {
                 0,
 "No index passed to test - ref_index_like - testing - $test_name"
               );
-        }
-        when ('ref_index_obj') {
+        },
+        'ref_index_obj' => sub {
             return exists $instruction{index}
               ? isa_ok(
                 $test[0]->[ $instruction{index} ],
@@ -326,8 +325,8 @@ sub moon_test_one {
                 0,
 "No index passed to test - ref_index_obj - testing - $test_name"
               );
-        }
-        when ('list_index_scalar') {
+        },
+        'list_index_scalar' => sub {
             return exists $instruction{index}
               ? is(
                 $test[ $instruction{index} ],
@@ -338,8 +337,8 @@ sub moon_test_one {
                 0,
 "No index passed to test - list_index_scalar - testing - $test_name"
               );
-        }
-        when ('list_index_ref') {
+        },
+        'list_index_ref' => sub {
             return exists $instruction{index}
               ? is_deeply(
                 $test[ $instruction{index} ],
@@ -350,8 +349,8 @@ sub moon_test_one {
                 0,
 "No index passed to test - list_index_ref - testing - $test_name"
               );
-        }
-        when ('list_index_like') {
+        },
+        'list_index_like' => sub {
             return exists $instruction{index}
               ? like(
                 $test[ $instruction{index} ],
@@ -362,8 +361,8 @@ sub moon_test_one {
                 0,
 "No index passed to test - list_index_like - testing - $test_name"
               );
-        }
-        when ('list_index_obj') {
+        },
+        'list_index_obj' => sub {
              return exists $instruction{index}
               ? isa_ok(
                 $test[ $instruction{index} ],
@@ -374,8 +373,8 @@ sub moon_test_one {
                 0,
 "No index passed to test - list_index_obj - testing - $test_name"
               );
-        }
-        when ('list_key_scalar') {
+        },
+        'list_key_scalar' => sub {
             return exists $instruction{key}
               ? is(
                 {@test}->{ $instruction{key} },
@@ -386,8 +385,8 @@ sub moon_test_one {
                 0,
                 "No key passed to test - list_key_scalar - testing - $test_name"
               );
-        }
-        when ('list_key_ref') {
+        },
+        'list_key_ref' => sub {
             return exists $instruction{key}
               ? is_deeply(
                 {@test}->{ $instruction{key} },
@@ -396,8 +395,8 @@ sub moon_test_one {
               )
               : ok( 0,
                 "No key passed to test - list_key_ref - testing - $test_name" );
-        }
-        when ('list_key_like') {
+        },
+        'list_key_like' => sub {
             return exists $instruction{key}
               ? like(
                 {@test}->{ $instruction{key} },
@@ -408,68 +407,68 @@ sub moon_test_one {
                 0,
                 "No key passed to test - list_key_like - testing - $test_name"
               );
-        }
-        when ('count') {
+        },
+        'count' => sub {
              return is(
                 scalar @test,
                 $expected[0],
 "$test_name is list - count - is - $expected[0]"
               );
-        }
-        when ('count_ref') {
+        },
+        'count_ref' => sub {
              return is(
                 scalar @{ $test[0] },
                 $expected[0],
 "$test_name is ref - count - is - $expected[0]"
               );
-        }
-        when ('scalar') {
+        },
+        'scalar' => sub {
             return is( $test[0], $expected[0], sprintf "%s is scalar - is - %s",
                 $test_name, defined $expected[0] ? $expected[0] : 'undef' );
-        }
-        when ('hash') {
+        },
+        'hash' => sub {
             return is_deeply( {@test}, $expected[0],
                 "$test_name is hash - reference - is_deeply" );
-        }
-        when ('array') {
+        },
+        'array' => sub {
             return is_deeply( \@test, $expected[0],
                 "$test_name is array - reference - is_deeply" );
-        }
-        when ('obj') {
+        },
+        'obj' => sub {
             return isa_ok( $test[0], $expected[0],
                 "$test_name is Object - blessed - is - $expected[0]" );
-        }
-        when ('like') {
+        },
+        'like' => sub {
             return like( $test[0], qr/$expected[0]/,
                 "$test_name is like - $expected[0]" );
-        }
-        when ('true') {
+        },
+        'true' => sub {
             return is( $test[0], 1, "$test_name is true - 1" );
-        }
-        when ('false') {
+        },
+        'false' => sub {
             return is( $test[0], 0, "$test_name is false - 0" );
-        }
-        when ('undef') {
+        },
+        'undef' => sub {
             return is( $test[0], undef, "$test_name is undef" );
-        }
-        when ('render') {
+        },
+        'render' => sub {
             return render_me(
                 instance => $test[0],
                 expected => $expected[0],
             );
-        }
-        when ('ok') {
+        },
+        'ok' => sub {
             return ok(@test, "$test_name is ok");
-        }
-        when ('skip') {
+        },
+        'skip' => sub {
             return ok(1, "$test_name - skip");
-        }
-        default {
+        },
+        default => sub {
             ok(0);
             diag "Unknown instruction{test}: $_ passed to moon_test_one";
             return;
         }
-    }
+    );
 }
 
 =head2 moon_test

@@ -1,5 +1,9 @@
 Revision history for Perl extension Acme-Free-Advice-Unsolicited
 
+1.1 2024-09-08T12:30:29Z
+
+    - fix meta
+
 1.0 2024-09-03T16:56:29Z
 
     - original version

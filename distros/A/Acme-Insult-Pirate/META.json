@@ -5,7 +5,7 @@
       "Sanko Robinson <sanko@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "artistic_2"
    ],
@@ -92,8 +92,8 @@
    },
    "provides" : {
       "Acme::Insult::Pirate" : {
-         "file" : "lib/Acme\\Insult\\Pirate.pm",
-         "version" : "1.0"
+         "file" : "lib/Acme/Insult/Pirate.pm",
+         "version" : "1.1"
       }
    },
    "release_status" : "stable",
@@ -108,7 +108,7 @@
          "web" : "https://github.com/sanko/Acme-Insult-Pirate"
       }
    },
-   "version" : "1.0",
+   "version" : "1.1",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

@@ -1,5 +1,13 @@
 -----
 
+10.3.4   2024-09-08
+    [Fixed]
+        * Use Log::Any->$log instead of 'say'
+    [Added]
+        * Documentation addition, including some hints as to
+          that the module can be used with async/await style
+          coding, e.g. using Future::AsyncAwait.
+
 10.3.3   2024-09-06
     [Breaking]
         * Change signature on 'receive()' method in Transport to

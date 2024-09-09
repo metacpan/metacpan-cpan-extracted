@@ -1,5 +1,5 @@
 package Sys::Info::Driver::OSX;
-$Sys::Info::Driver::OSX::VERSION = '0.7961';
+$Sys::Info::Driver::OSX::VERSION = '0.7962';
 use strict;
 use warnings;
 use parent qw( Exporter Sys::Info::Base );
@@ -240,10 +240,37 @@ sub powermetrics {
 
     my @info = split m{ [\n]+ }xms, $out;
     my %info;
+
     for my $i ( @info ) {
         next if $i =~ m{ \A [*] }xms;
         my($k, $v) = split m{[:]}xms, $i, 2;
-        $info{$k} = $v;
+
+        $_ = __PACKAGE__->trim( $_ ) for $k, $v;
+
+        if ( $v =~ m{ \[ }xms ) {
+            my($subk, $subv) = split m{\s+}xms, $v, 2;
+            my @subv = map {
+                            s{ [\[\]] }{}xms;
+                            split m{ [:] \s+ }xms, $_
+                        }
+                        split m{ \] \s+ \[ }xms, $subv
+                    ;
+            $info{ $subk } = { @subv };
+        }
+        elsif ( $k =~ m{ \QC-state residency\E }xms ) {
+            my($subk, @subv) = split m{ [()] }xms, $v;
+            @subv = map { split m{ [\s] }xms, $_ } @subv;
+            $info{ $k } = {
+                value => __PACKAGE__->trim( $subk ),
+                map {
+                    s{ [:] \s? }{}xms;
+                    __PACKAGE__->trim( $_ )
+                } @subv,
+            };
+        }
+        else {
+            $info{ $k } = $v;
+        }
     }
 
     return %info;
@@ -263,7 +290,7 @@ Sys::Info::Driver::OSX
 
 =head1 VERSION
 
-version 0.7961
+version 0.7962
 
 =head1 SYNOPSIS
 

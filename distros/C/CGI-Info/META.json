@@ -36,7 +36,7 @@
             "Class::Autouse" : "0",
             "Cwd" : "0",
             "File::Basename" : "0",
-            "File::Spec" : "0",
+            "File::Spec" : "3.4",
             "HTTP::BrowserDetect" : "3.1",
             "JSON::MaybeXS" : "0",
             "List::MoreUtils" : "0",
@@ -55,6 +55,7 @@
             "IPC::System::Simple" : "0",
             "JSON::PP" : "4.02",
             "LWP::UserAgent" : "0",
+            "Taint::Runtime" : "0",
             "Test::Carp" : "0",
             "Test::CleanNamespaces" : "0",
             "Test::Compile" : "0",
@@ -84,6 +85,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "0.82",
+   "version" : "0.83",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

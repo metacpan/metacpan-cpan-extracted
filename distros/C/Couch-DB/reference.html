@@ -1,4 +1,3 @@
-Loading new routing table from couchdb.org
 <!DOCTYPE html>
 <html lang="en-EN">
 <head>
@@ -32,13 +31,13 @@ Loading new routing table from couchdb.org
   complete.  Below, you find the follow conditions.
   <table id="status-explain">
   <tr><td>DONE</td>
-      <td class="count">40</td>
+      <td class="count">43</td>
       <td>Minimally tested: visual inspection only.</td></tr>
   <tr><td>PARTIAL</td>
       <td class="count">4</td>
       <td>Minimally tested, not completely implemented.</td></tr>
   <tr><td>UNTESTED</td>
-      <td class="count">80</td>
+      <td class="count">77</td>
       <td>Implemented but never tried.</td></tr>
   <tr><td>TODO</td>
       <td class="count">2</td>
@@ -95,7 +94,7 @@ Loading new routing table from couchdb.org
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_db_updates">GET /_db_updates</a></td>
       <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3EdbUpdates%28%29">$client-&gt;dbUpdates()</a></td></tr>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3EdbUpdates%28%5C%25feed%2C-%25options%29">$client-&gt;dbUpdates(\%feed, %options)</a></td></tr>
   <tr><td class="descr"><p>Return the server changes of databases</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
@@ -333,7 +332,7 @@ Loading new routing table from couchdb.org
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_up">GET /_up</a></td>
       <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3EserverStatus%28%29">$client-&gt;serverStatus()</a></td></tr>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3EserverStatus%28%25options%29">$client-&gt;serverStatus(%options)</a></td></tr>
   <tr><td class="descr"><p>Health check endpoint</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
@@ -402,29 +401,29 @@ Loading new routing table from couchdb.org
       <td>&nbsp;</td></tr>
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#get--db-_all_docs">GET /{db}/_all_docs</a></td>
-      <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Edocs%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;docs([\%search|\@%search, %options])</a></td></tr>
+      <td class="status">DONE</td>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Esearch%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;search([\%search|\@%search, %options])</a></td></tr>
   <tr><td class="descr"><p>Returns a built-in view of all documents in this database</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_all_docs">POST /{db}/_all_docs</a></td>
-      <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Edocs%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;docs([\%search|\@%search, %options])</a></td></tr>
+      <td class="status">DONE</td>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Esearch%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;search([\%search|\@%search, %options])</a></td></tr>
   <tr><td class="descr"><p>Returns a built-in view of all documents in this database</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_all_docs-queries">POST /{db}/_all_docs/queries</a></td>
       <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Edocs%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;docs([\%search|\@%search, %options])</a></td></tr>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Esearch%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;search([\%search|\@%search, %options])</a></td></tr>
   <tr><td class="descr"><p>Returns results for the specified queries</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_bulk_docs">POST /{db}/_bulk_docs</a></td>
-      <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3EupdateDocs%28%5C%40docs%2C-%25options%29">$db-&gt;updateDocs(\@docs, %options)</a></td></tr>
+      <td class="status">DONE</td>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3EsaveBulk%28%5C%40docs%2C-%25options%29">$db-&gt;saveBulk(\@docs, %options)</a></td></tr>
   <tr><td class="descr"><p>Inserts or updates multiple documents in to the database in a single request</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
@@ -598,22 +597,22 @@ Loading new routing table from couchdb.org
       <td>&nbsp;</td></tr>
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/views.html#get--db-_design-ddoc-_view-view">GET /{db}/_design/{ddoc}/_view/{view}</a></td>
-      <td class="status">DONE</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Design.pod#%24obj-%3EviewFind%28%24view%2C-%5B%5C%25search%7C%5C%40%25search%29%2C-%25options%5D%29">$ddoc-&gt;viewFind($view, [\%search|\@%search), %options])</a></td></tr>
+      <td class="status">UNTESTED</td>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Design.pod#%24obj-%3EviewSearch%28%24view%2C-%5B%5C%25search%7C%5C%40%25search%29%2C-%25options%5D%29">$ddoc-&gt;viewSearch($view, [\%search|\@%search), %options])</a></td></tr>
   <tr><td class="descr"><p>Returns results for the specified stored view</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/views.html#post--db-_design-ddoc-_view-view">POST /{db}/_design/{ddoc}/_view/{view}</a></td>
       <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Design.pod#%24obj-%3EviewFind%28%24view%2C-%5B%5C%25search%7C%5C%40%25search%29%2C-%25options%5D%29">$ddoc-&gt;viewFind($view, [\%search|\@%search), %options])</a></td></tr>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Design.pod#%24obj-%3EviewSearch%28%24view%2C-%5B%5C%25search%7C%5C%40%25search%29%2C-%25options%5D%29">$ddoc-&gt;viewSearch($view, [\%search|\@%search), %options])</a></td></tr>
   <tr><td class="descr"><p>Returns results for the specified view</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/views.html#post--db-_design-ddoc-_view-view-queries">POST /{db}/_design/{ddoc}/_view/{view}/queries</a></td>
       <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Design.pod#%24obj-%3EviewFind%28%24view%2C-%5B%5C%25search%7C%5C%40%25search%29%2C-%25options%5D%29">$ddoc-&gt;viewFind($view, [\%search|\@%search), %options])</a></td></tr>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Design.pod#%24obj-%3EviewSearch%28%24view%2C-%5B%5C%25search%7C%5C%40%25search%29%2C-%25options%5D%29">$ddoc-&gt;viewSearch($view, [\%search|\@%search), %options])</a></td></tr>
   <tr><td class="descr"><p>Returns results for the specified queries</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
@@ -675,7 +674,7 @@ Loading new routing table from couchdb.org
       <td>&nbsp;</td></tr>
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/find.html#post--db-_explain">POST /{db}/_explain</a></td>
-      <td class="status">UNTESTED</td>
+      <td class="status">DONE</td>
       <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3EfindExplain%28%5C%25search%2C-%25options%29">$db-&gt;findExplain(\%search, %options)</a></td></tr>
   <tr><td class="descr"><p>Identify which index is being used by a particular query.</p></td>
       <td>&nbsp;</td>
@@ -739,21 +738,21 @@ Loading new routing table from couchdb.org
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#get--db-_local_docs">GET /{db}/_local_docs</a></td>
       <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Edocs%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;docs([\%search|\@%search, %options])</a></td></tr>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Esearch%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;search([\%search|\@%search, %options])</a></td></tr>
   <tr><td class="descr"><p>Returns a built-in view of all local (non-replicating) documents in this database</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#post--db-_local_docs">POST /{db}/_local_docs</a></td>
       <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Edocs%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;docs([\%search|\@%search, %options])</a></td></tr>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Esearch%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;search([\%search|\@%search, %options])</a></td></tr>
   <tr><td class="descr"><p>Returns a built-in view of all local (non-replicating) documents in this database</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_all_docs-queries">POST /{db}/_local_docs/queries</a></td>
       <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Edocs%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;docs([\%search|\@%search, %options])</a></td></tr>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Esearch%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;search([\%search|\@%search, %options])</a></td></tr>
   <tr><td class="descr"><p></p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
@@ -788,14 +787,14 @@ Loading new routing table from couchdb.org
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/partitioned-dbs.html#get--db-_partition-partition-_all_docs">GET /{db}/_partition/{partition}/_all_docs</a></td>
       <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Edocs%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;docs([\%search|\@%search, %options])</a></td></tr>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Esearch%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;search([\%search|\@%search, %options])</a></td></tr>
   <tr><td class="descr"><p>Return all docs in the specified partition</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
   <tr class="first">
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/partitioned-dbs.html#get--db-_partition-partition-_design-ddoc-_view-view">GET /{db}/_partition/{partition}/_design/{ddoc}/_view/{view}</a></td>
       <td class="status">UNTESTED</td>
-      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Design.pod#%24obj-%3EviewFind%28%24view%2C-%5B%5C%25search%7C%5C%40%25search%29%2C-%25options%5D%29">$ddoc-&gt;viewFind($view, [\%search|\@%search), %options])</a></td></tr>
+      <td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Design.pod#%24obj-%3EviewSearch%28%24view%2C-%5B%5C%25search%7C%5C%40%25search%29%2C-%25options%5D%29">$ddoc-&gt;viewSearch($view, [\%search|\@%search), %options])</a></td></tr>
   <tr><td class="descr"><p>Execute a partitioned query</p></td>
       <td>&nbsp;</td>
       <td>&nbsp;</td></tr>
@@ -978,7 +977,7 @@ Loading new routing table from couchdb.org
   <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3EdatabaseNames%28%25options%29">$client-&gt;databaseNames(%options)</a></td>
       <td class="status">DONE</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_all_dbs">GET /_all_dbs</a></td></tr>
-  <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3EdbUpdates%28%29">$client-&gt;dbUpdates()</a></td>
+  <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3EdbUpdates%28%5C%25feed%2C-%25options%29">$client-&gt;dbUpdates(\%feed, %options)</a></td>
       <td class="status">UNTESTED</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_db_updates">GET /_db_updates</a></td></tr>
   <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3Elogin%28%25options%29">$client-&gt;login(%options)</a></td>
@@ -1008,7 +1007,7 @@ Loading new routing table from couchdb.org
   <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3EserverInfo%28%25options%29">$client-&gt;serverInfo(%options)</a></td>
       <td class="status">DONE</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--">GET /</a></td></tr>
-  <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3EserverStatus%28%29">$client-&gt;serverStatus()</a></td>
+  <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3EserverStatus%28%25options%29">$client-&gt;serverStatus(%options)</a></td>
       <td class="status">UNTESTED</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_up">GET /_up</a></td></tr>
   <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Client.pod#%24obj-%3Esession%28%25options%29">$client-&gt;session(%options)</a></td>
@@ -1089,27 +1088,6 @@ Loading new routing table from couchdb.org
   <tr><td>&nbsp;</td>
       <td class="status">UNTESTED</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/partitioned-dbs.html#get--db-_partition-partition">GET /{db}/_partition/{partition}</a></td></tr>
-  <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Edocs%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;docs([\%search|\@%search, %options])</a></td>
-      <td class="status">UNTESTED</td>
-      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#get--db-_all_docs">GET /{db}/_all_docs</a></td></tr>
-  <tr><td>&nbsp;</td>
-      <td class="status">UNTESTED</td>
-      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#get--db-_local_docs">GET /{db}/_local_docs</a></td></tr>
-  <tr><td>&nbsp;</td>
-      <td class="status">UNTESTED</td>
-      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/partitioned-dbs.html#get--db-_partition-partition-_all_docs">GET /{db}/_partition/{partition}/_all_docs</a></td></tr>
-  <tr><td>&nbsp;</td>
-      <td class="status">UNTESTED</td>
-      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_all_docs">POST /{db}/_all_docs</a></td></tr>
-  <tr><td>&nbsp;</td>
-      <td class="status">UNTESTED</td>
-      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_all_docs-queries">POST /{db}/_all_docs/queries</a></td></tr>
-  <tr><td>&nbsp;</td>
-      <td class="status">UNTESTED</td>
-      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#post--db-_local_docs">POST /{db}/_local_docs</a></td></tr>
-  <tr><td>&nbsp;</td>
-      <td class="status">UNTESTED</td>
-      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_all_docs-queries">POST /{db}/_local_docs/queries</a></td></tr>
   <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3EensureFullCommit%28%25options%29">$db-&gt;ensureFullCommit(%options)</a></td>
       <td class="status">DONE</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/compact.html#post--db-_ensure_full_commit">POST /{db}/_ensure_full_commit</a></td></tr>
@@ -1120,7 +1098,7 @@ Loading new routing table from couchdb.org
       <td class="status">UNTESTED</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/partitioned-dbs.html#post--db-_partition-partition_id-_find">POST /{db}/_partition/{partition_id}/_find</a></td></tr>
   <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3EfindExplain%28%5C%25search%2C-%25options%29">$db-&gt;findExplain(\%search, %options)</a></td>
-      <td class="status">UNTESTED</td>
+      <td class="status">DONE</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/find.html#post--db-_explain">POST /{db}/_explain</a></td></tr>
   <tr><td>&nbsp;</td>
       <td class="status">UNTESTED</td>
@@ -1161,9 +1139,30 @@ Loading new routing table from couchdb.org
   <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3ErevisionsMissing%28%5C%25plan%2C-%25options%29">$db-&gt;revisionsMissing(\%plan, %options)</a></td>
       <td class="status">UNTESTED</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/misc.html#post--db-_missing_revs">POST /{db}/_missing_revs</a></td></tr>
-  <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3EupdateDocs%28%5C%40docs%2C-%25options%29">$db-&gt;updateDocs(\@docs, %options)</a></td>
-      <td class="status">UNTESTED</td>
+  <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3EsaveBulk%28%5C%40docs%2C-%25options%29">$db-&gt;saveBulk(\@docs, %options)</a></td>
+      <td class="status">DONE</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_bulk_docs">POST /{db}/_bulk_docs</a></td></tr>
+  <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3Esearch%28%5B%5C%25search%7C%5C%40%25search%2C-%25options%5D%29">$db-&gt;search([\%search|\@%search, %options])</a></td>
+      <td class="status">DONE</td>
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#get--db-_all_docs">GET /{db}/_all_docs</a></td></tr>
+  <tr><td>&nbsp;</td>
+      <td class="status">UNTESTED</td>
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#get--db-_local_docs">GET /{db}/_local_docs</a></td></tr>
+  <tr><td>&nbsp;</td>
+      <td class="status">UNTESTED</td>
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/partitioned-dbs.html#get--db-_partition-partition-_all_docs">GET /{db}/_partition/{partition}/_all_docs</a></td></tr>
+  <tr><td>&nbsp;</td>
+      <td class="status">DONE</td>
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_all_docs">POST /{db}/_all_docs</a></td></tr>
+  <tr><td>&nbsp;</td>
+      <td class="status">UNTESTED</td>
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_all_docs-queries">POST /{db}/_all_docs/queries</a></td></tr>
+  <tr><td>&nbsp;</td>
+      <td class="status">UNTESTED</td>
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#post--db-_local_docs">POST /{db}/_local_docs</a></td></tr>
+  <tr><td>&nbsp;</td>
+      <td class="status">UNTESTED</td>
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_all_docs-queries">POST /{db}/_local_docs/queries</a></td></tr>
   <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Database.pod#%24obj-%3EuserRoles%28%25options%29">$db-&gt;userRoles(%options)</a></td>
       <td class="status">DONE</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/security.html#get--db-_security">GET /{db}/_security</a></td></tr>
@@ -1245,8 +1244,8 @@ Loading new routing table from couchdb.org
   <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Design.pod#%24obj-%3Eupdate%28%5C%25data%2C-%25options%29">$ddoc-&gt;update(\%data, %options)</a></td>
       <td class="status">DONE</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/common.html#put--db-_design-ddoc">PUT /{db}/_design/{ddoc}</a></td></tr>
-  <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Design.pod#%24obj-%3EviewFind%28%24view%2C-%5B%5C%25search%7C%5C%40%25search%29%2C-%25options%5D%29">$ddoc-&gt;viewFind($view, [\%search|\@%search), %options])</a></td>
-      <td class="status">DONE</td>
+  <tr><td class="use"><a href="https://metacpan.org/dist/Couch-DB/view/lib/Couch/DB/Design.pod#%24obj-%3EviewSearch%28%24view%2C-%5B%5C%25search%7C%5C%40%25search%29%2C-%25options%5D%29">$ddoc-&gt;viewSearch($view, [\%search|\@%search), %options])</a></td>
+      <td class="status">UNTESTED</td>
       <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/views.html#get--db-_design-ddoc-_view-view">GET /{db}/_design/{ddoc}/_view/{view}</a></td></tr>
   <tr><td>&nbsp;</td>
       <td class="status">UNTESTED</td>

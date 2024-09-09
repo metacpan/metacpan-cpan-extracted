@@ -13,7 +13,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Transport v10.3.3;
+package Protocol::Sys::Virt::Transport v10.3.4;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -333,7 +333,7 @@ Protocol::Sys::Virt::Transport - Low level Libvirt connection protocol
 
 =head1 VERSION
 
-v10.3.3
+v10.3.4
 
 Based on LibVirt tag v10.3.0
 
@@ -345,7 +345,7 @@ Based on LibVirt tag v10.3.0
   open my $fh, 'rw', '/run/libvirt/libvirt.sock';
   my $transport = Protocol::Sys::Virt::Transport->new(
        role => 'client',
-       on_send => sub { syswrite( $fh, $_ ) for @_ }
+       on_send => sub { my $opaque = shift; syswrite( $fh, $_ ) for @_; $opaque }
   );
 
   my $remote = Protocol::Sys::Virt::Remote->new;
@@ -392,8 +392,13 @@ The C<on_send> event is triggered with data to be transmitted.  It may
 be called with multiple arguments:
 
   sub _transmitter {
+     my $opaque = shift;
      syswrite( $fh, $_ ) for (@_);
+     return $opaque;
   }
+
+The first argument must be returned when the routine finishes transmitting
+its data.
 
 =head1 METHODS
 
@@ -440,6 +445,10 @@ specific type of input is received.
 In case where C<$type> is C<CALL> or C<CALL_WITH_FDS>, the C<$serial> returned
 by the sender function must be used to link messages passed to C<on_reply> or
 C<on_stream> to the call that triggered the replies.
+
+B<Note:> the C<on_send> function may be marked C<async> (as in
+L<Future::AsyncAwait>), in which case the C<$sender> function returns a L<Future>
+which eventually resolves to the C<$serial>.
 
 The callbacks are called as follows, with any return values collected and returned
 by the C<receive> function:

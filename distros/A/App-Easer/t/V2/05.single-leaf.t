@@ -29,11 +29,11 @@ my $app = {
    execute => sub ($self, @rest) {
       LocalTester::command_execute($self, @rest);
       if ($self->config('help')) {
-         $self->auto_help->run('MAIN');
+         $self->auto_help->run('help');
          return 0;
       }
       if ($self->config('commands')) {
-         $self->auto_commands->run('MAIN');
+         $self->auto_commands->run('commands');
          return 15;
       }
       print {*STDOUT} 'galook!';

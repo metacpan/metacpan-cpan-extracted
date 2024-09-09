@@ -1,7 +1,7 @@
 This is stow.info, produced by makeinfo version 7.0.3 from stow.texi.
 
-This manual describes GNU Stow version 2.4.0 (7 April 2024), a program
-for managing farms of symbolic links.
+This manual describes GNU Stow version 2.4.1 (8 September 2024), a
+program for managing farms of symbolic links.
 
    Software and documentation is copyrighted by the following:
 
@@ -36,7 +36,7 @@ File: stow.info,  Node: Top,  Next: Introduction,  Up: (dir)
 Stow
 ****
 
-This manual describes GNU Stow 2.4.0 (7 April 2024), a symlink farm
+This manual describes GNU Stow 2.4.1 (8 September 2024), a symlink farm
 manager which takes distinct sets of software and/or data located in
 separate directories on the filesystem, and makes them appear to be
 installed in a single directory tree.
@@ -356,6 +356,14 @@ The following options are supported:
      ‘stow/dot-bashrc’ and from ‘.emacs.d/init.el’ to
      ‘stow/dot-emacs.d/init.el’.  Any other files, whose name does not
      begin with ‘dot-’, will be processed as usual.
+
+     Note that when this option is enabled, any package file or
+     directory prefixed with ‘dot-’ is assumed to be named deliberately
+     to be stowed with a ‘.’ prefix, and therefore will only be ignored
+     if there is an entry in the ignore list (*Note Ignore Lists::)
+     which matches this prefix.  So for example, by default
+     ‘dot-gitignore’ would not be ignored even though ‘\.gitignore’ is
+     in the default ignore list.
 
 ‘--no-folding’
 
@@ -922,7 +930,10 @@ options and resource options are appended together.
    For options that take a file path, environment variables and the
 tilde character (‘~’) are expanded.  An environment variable can be
 given in either the ‘$VAR’ or ‘${VAR}’ form.  To prevent expansion,
-escape the ‘$’ or ‘~’ with a backslash.
+escape the ‘$’ or ‘~’ with a backslash.  Since these values are first
+subject to standard shell quoting rules, if you want special characters
+such as ‘\b’ or ‘$’ to be treated as regular expression assertions then
+they will need extra escaping, i.e.  ‘\\b’ and ‘\\\$’ respectively.
 
    The options ‘-D’, ‘-S’, and ‘-R’ are ignored in resource files.  This
 is also true of any package names given in the resource file.
@@ -1993,7 +2004,7 @@ Index
 * Menu:
 
 * absolute symlink:                      Terminology.         (line  50)
-* adopting existing files:               Invoking Stow.       (line 115)
+* adopting existing files:               Invoking Stow.       (line 123)
 * configuration files:                   Resource Files.      (line   6)
 * conflicts:                             Installing Packages. (line  85)
 * conflicts <1>:                         Conflicts.           (line   6)
@@ -2002,7 +2013,7 @@ Index
 * deletion:                              Deleting Packages.   (line   6)
 * directory folding:                     Installing Packages. (line  16)
 * dotfiles:                              Invoking Stow.       (line  87)
-* dry run:                               Invoking Stow.       (line 137)
+* dry run:                               Invoking Stow.       (line 145)
 * folding trees:                         Installing Packages. (line  16)
 * ignore lists:                          Ignore Lists.        (line   6)
 * ignore lists <1>:                      Motivation For Ignore Lists.
@@ -2020,7 +2031,7 @@ Index
 * refolding trees:                       Deleting Packages.   (line  25)
 * relative symlink:                      Terminology.         (line  50)
 * resource files:                        Resource Files.      (line   6)
-* simulated run:                         Invoking Stow.       (line 137)
+* simulated run:                         Invoking Stow.       (line 145)
 * splitting open folded trees:           Installing Packages. (line  51)
 * stow directory:                        Terminology.         (line  19)
 * symlink:                               Terminology.         (line  50)
@@ -2032,49 +2043,49 @@ Index
 * tree unfolding:                        Installing Packages. (line  51)
 * tree unsplitting:                      Installing Packages. (line  51)
 * unfolding trees:                       Installing Packages. (line  51)
-* verbosity levels:                      Invoking Stow.       (line 143)
+* verbosity levels:                      Invoking Stow.       (line 151)
 
 
 
 Tag Table:
-Node: Top1418
-Node: Introduction3075
-Ref: Introduction-Footnote-16579
-Ref: Introduction-Footnote-26688
-Ref: Introduction-Footnote-36786
-Node: Terminology6863
-Ref: symlink9365
-Node: Invoking Stow11207
-Node: Ignore Lists19328
-Node: Motivation For Ignore Lists19592
-Node: Types And Syntax Of Ignore Lists21125
-Ref: Types And Syntax Of Ignore Lists-Footnote-124442
-Ref: Types And Syntax Of Ignore Lists-Footnote-224608
-Ref: Types And Syntax Of Ignore Lists-Footnote-324856
-Node: Justification For Yet Another Set Of Ignore Files25009
-Node: Installing Packages26628
-Ref: tree folding27190
-Ref: Tree unfolding29194
-Node: Deleting Packages31351
-Ref: tree refolding32420
-Ref: Deleting Packages-Footnote-132980
-Node: Conflicts33576
-Ref: Deferred Operation34566
-Node: Mixing Operations35166
-Node: Multiple Stow Directories36155
-Node: Target Maintenance37245
-Node: Resource Files38528
-Node: Compile-time vs. Install-time41124
-Node: GNU Emacs44649
-Ref: GNU Emacs-Footnote-145642
-Node: Other FSF Software45706
-Node: Cygnus Software46492
-Node: Perl and Perl 5 Modules48012
-Node: Bootstrapping51666
-Node: Reporting Bugs52480
-Node: Known Bugs54252
-Node: GNU General Public License54758
-Node: Index92515
+Node: Top1422
+Node: Introduction3083
+Ref: Introduction-Footnote-16587
+Ref: Introduction-Footnote-26696
+Ref: Introduction-Footnote-36794
+Node: Terminology6871
+Ref: symlink9373
+Node: Invoking Stow11215
+Node: Ignore Lists19793
+Node: Motivation For Ignore Lists20057
+Node: Types And Syntax Of Ignore Lists21590
+Ref: Types And Syntax Of Ignore Lists-Footnote-124907
+Ref: Types And Syntax Of Ignore Lists-Footnote-225073
+Ref: Types And Syntax Of Ignore Lists-Footnote-325321
+Node: Justification For Yet Another Set Of Ignore Files25474
+Node: Installing Packages27093
+Ref: tree folding27655
+Ref: Tree unfolding29659
+Node: Deleting Packages31816
+Ref: tree refolding32885
+Ref: Deleting Packages-Footnote-133445
+Node: Conflicts34041
+Ref: Deferred Operation35031
+Node: Mixing Operations35631
+Node: Multiple Stow Directories36620
+Node: Target Maintenance37710
+Node: Resource Files38993
+Node: Compile-time vs. Install-time41847
+Node: GNU Emacs45372
+Ref: GNU Emacs-Footnote-146365
+Node: Other FSF Software46429
+Node: Cygnus Software47215
+Node: Perl and Perl 5 Modules48735
+Node: Bootstrapping52389
+Node: Reporting Bugs53203
+Node: Known Bugs54975
+Node: GNU General Public License55481
+Node: Index93238
 
 End Tag Table
 

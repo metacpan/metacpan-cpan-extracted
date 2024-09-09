@@ -7,7 +7,7 @@
 
 package Couch::DB::Client;
 use vars '$VERSION';
-$VERSION = '0.005';
+$VERSION = '0.006';
 
 
 use Couch::DB::Util   qw(flat);

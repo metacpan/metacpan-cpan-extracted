@@ -3,8 +3,8 @@
 <!-- Created by GNU Texinfo 7.0.3, https://www.gnu.org/software/texinfo/ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!-- This manual describes GNU Stow version 2.4.0
-(7 April 2024), a program for managing farms of symbolic links.
+<!-- This manual describes GNU Stow version 2.4.1
+(8 September 2024), a program for managing farms of symbolic links.
 
 Software and documentation is copyrighted by the following:
 
@@ -82,7 +82,7 @@ ul.toc-numbered-mark {list-style: none}
 Next: <a href="#Introduction" accesskey="n" rel="next">Introduction</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <a class="top" id="SEC_Top"></a>
-<p>This manual describes GNU Stow 2.4.0 (7 April 2024), a
+<p>This manual describes GNU Stow 2.4.1 (8 September 2024), a
 symlink farm manager which takes distinct sets of software and/or data
 located in separate directories on the filesystem, and makes them
 appear to be installed in a single directory tree.
@@ -451,6 +451,13 @@ option, Stow will create symlinks from <samp class="file">.bashrc</samp> to
 <samp class="file">stow/dot-bashrc</samp> and from <samp class="file">.emacs.d/init.el</samp> to
 <samp class="file">stow/dot-emacs.d/init.el</samp>. Any other files, whose name does not
 begin with &lsquo;<samp class="samp">dot-</samp>&rsquo;, will be processed as usual.
+</p>
+<p>Note that when this option is enabled, any package file or directory
+prefixed with &lsquo;<samp class="samp">dot-</samp>&rsquo; is assumed to be named deliberately to be
+stowed with a &lsquo;<samp class="samp">.</samp>&rsquo; prefix, and therefore will only be ignored if
+there is an entry in the ignore list (See <a class="xref" href="#Ignore-Lists">Ignore Lists</a>) which matches
+this prefix.  So for example, by default <samp class="file">dot-gitignore</samp> would not
+be ignored even though &lsquo;<samp class="samp">\.gitignore</samp>&rsquo; is in the default ignore list.
 </p>
 </dd>
 <dt>&lsquo;<samp class="samp">--no-folding</samp>&rsquo;</dt>
@@ -1117,7 +1124,11 @@ options and resource options are appended together.
 character (<code class="command">~</code>) are expanded. An environment variable can be
 given in either the <code class="command">$VAR</code> or <code class="command">${VAR}</code> form. To
 prevent expansion, escape the <code class="command">$</code> or <code class="command">~</code> with a
-backslash.
+backslash.  Since these values are first subject to standard shell
+quoting rules, if you want special characters such as <code class="command">\b</code> or
+<code class="command">$</code> to be treated as regular expression assertions then they
+will need extra escaping, i.e. <code class="command">\\b</code> and <code class="command">\\\$</code>
+respectively.
 </p>
 <p>The options <code class="command">-D</code>, <code class="command">-S</code>, and <code class="command">-R</code> are ignored in
 resource files. This is also true of any package names given in the

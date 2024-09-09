@@ -1,3 +1,204 @@
+Sun Sep 8 19:17:26 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Dockerfile: fix whitespace inconsistencies We don't use hard tabs.
+
+
+      M docker/Dockerfile
+
+Sun Sep 8 19:05:42 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #116 from aspiers/fix-dot-ignore
+
+Sun Sep 8 13:05:16 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * ignore based on package dirent name prior to dot- adjustment If
+    `--dotfiles` was enabled, files in the package such as
+    `dot-gitignore` would be translated to `.gitignore` and then
+    ignored by the default ignore list.  However any file named
+    `dot-*` in a package is obviously intended to be stowed as a dot
+    file, so should not be ignored.
+
+    To fix this, ignore based on the name in the package, not the 
+    potentially translated name used for stowing.
+
+
+      M NEWS
+      M doc/stow.texi
+      M lib/Stow.pm.in
+      M t/dotfiles.t
+
+Sun Sep 8 12:47:54 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * extract setup_package_ignore() into testutil.pm
+
+      M t/ignore.t
+      M t/testutil.pm
+
+Sun Sep 8 12:43:46 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * extract setup_global_ignore() into testutil.pm
+
+      M t/ignore.t
+      M t/testutil.pm
+
+Sun Sep 8 18:56:03 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #117 from aspiers/optional-pdf-build
+
+Sun Sep 8 14:51:58 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * make build of PDF optional to avoid LaTeX dependency Fixes #95.
+
+
+      M INSTALL.md
+      M Makefile.am
+      M NEWS
+      M doc/HOWTO-RELEASE
+
+Sun Sep 8 15:09:30 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * INSTALL.md: move clean-up to a separate section It's not part of the
+    install process.
+
+
+      M INSTALL.md
+
+Sun Sep 8 14:52:49 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * update to autoconf 2.72
+
+      M aclocal.m4
+
+Sun Sep 8 16:23:35 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * NEWS: add other items since v2.4.0
+
+      M NEWS
+
+Sun Sep 8 13:28:45 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * NEWS: add entry for ternary precedence fix for Perl 5.40 This is the
+    NEWS entry for #113.
+
+
+      M NEWS
+
+Sat Jul 13 17:07:02 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #114 from aspiers/perl-5.40
+
+Sat Jul 13 17:04:03 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * ci: add Perl 5.40 to GitHub CI test matrix
+
+      M .github/workflows/test.yml
+
+Fri Jul 12 00:02:23 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #113 from wfrisch/2024-07-avoid_precedence_warning 
+    avoid precedence warning
+
+Thu Jul 11 09:48:46 2024 +0200  Wolfgang Frisch <wolfgang.frisch@suse.com>
+
+    * avoid precedence warning Perl 5.40.0 extended the scope of the
+    precedence warning to include ternary operators.
+
+    <https://perldoc.perl.org/5.40.0/perldelta>
+
+    Reported-By: Peter Sütterlin <P.Suetterlin@royac.iac.es>
+
+
+      M bin/stow.in
+
+Tue Jun 18 18:46:45 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #111 from jeremy-code/master
+
+Sat Jun 15 13:03:07 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Fix parsing of regexp options like --override=bin|man Previously the
+    \A and \z anchoring for --ignore / --override / --defer was being
+    applied without wrapping the user-specified regexp in parentheses,
+    so if it was something like bin|man then the anchor would only
+    apply to one half of those two paths.  So add parentheses, and 
+    also change from qr() to qr{} syntax to visually differentiate
+    between regexp boundaries and parentheses inside the regexp.
+
+
+      M bin/stow.in
+      M t/cli_options.t
+      M t/rc_options.t
+
+Fri Jun 14 16:20:41 2024 -0700  Jeremy Nguyen <nguyen.jeremyt@gmail.com>
+
+    * Use `shellwords` for `.stowrc` parsing
+    - Use `shellwords` to parse `.stowrc` files from
+    `Text::ParseWords`
+    - Add test for `.stowrc` parsing with quotes
+     - Add `stow directory` to `tmp-testing-trees` for testing
+
+    This change allows `.stowrc` arguments to be parsed similar to
+    shell arguments, where quotes can be used to group an argument
+    with spaces.
+
+    However, this change affects the behavior in --ignore, --defer,
+    --override.
+
+    (?^:$HOME\z)
+    (?^:\A$HOME)
+    (?^:\A$HOME)
+
+
+      M bin/stow.in
+      M doc/stow.texi
+      M t/rc_options.t
+      M t/testutil.pm
+
+Mon Apr 8 00:40:23 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #99 from gutierri/patch/fixs-yes-apt
+
+Sun Sep 18 03:13:56 2022 -0300  Gutierri Barboza <me@gutierri.me>
+
+    * fix dockerfile apt-get without force-yes
+
+      M docker/Dockerfile
+
+Mon Apr 8 00:16:02 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Bump version to 2.4.1 for development of next release
+
+      M META.json
+      M META.yml
+      M configure.ac
+
+Mon Apr 8 00:13:57 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: fix previously missed rename from distclean 3aae830e
+    changed the procedure from distclean to maintainer-clean, but
+    missed changing this final detail.
+
+
+      M doc/HOWTO-RELEASE
+
+Sun Apr 7 23:10:08 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: add reminder to add/remove manual files in CVS
+
+      M doc/HOWTO-RELEASE
+
+Sun Apr 7 22:37:22 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: suggest using gnupload --dry-run first
+
+      M doc/HOWTO-RELEASE
+
+Sun Apr 7 20:09:43 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: add link to gnupload docs
+
+      M doc/HOWTO-RELEASE
+
 Sun Apr 7 18:55:18 2024 +0100  Adam Spiers <stow@adamspiers.org>
 
     * Merge pull request #108 from aspiers/release-v2.4.0

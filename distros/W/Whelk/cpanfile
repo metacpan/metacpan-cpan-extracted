@@ -3,7 +3,11 @@ requires 'Kelp::Module::YAML' => '2.00';
 requires 'Role::Tiny' => 0;
 
 # needed for multiple boolean types and 'perl' booleans
-requires 'YAML::PP' => '0.034';
+# (fails on older perls before v0.38.0)
+requires 'YAML::PP' => '0.038';
+
+# needed for deep cloning without errors on sub references
+requires 'Clone' => 0;
 
 # needed for uniq on old perls
 requires 'List::Util' => '1.44';

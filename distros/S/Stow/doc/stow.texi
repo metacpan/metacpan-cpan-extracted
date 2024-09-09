@@ -437,6 +437,13 @@ option, Stow will create symlinks from @file{.bashrc} to
 @file{stow/dot-emacs.d/init.el}. Any other files, whose name does not
 begin with @samp{dot-}, will be processed as usual.
 
+Note that when this option is enabled, any package file or directory
+prefixed with @samp{dot-} is assumed to be named deliberately to be
+stowed with a @samp{.} prefix, and therefore will only be ignored if
+there is an entry in the ignore list (@xref{Ignore Lists}) which matches
+this prefix.  So for example, by default @file{dot-gitignore} would not
+be ignored even though @samp{\.gitignore} is in the default ignore list.
+
 @item --no-folding
 
 This disables any further tree folding (@pxref{tree folding}) or
@@ -1016,7 +1023,11 @@ For options that take a file path, environment variables and the tilde
 character (@command{~}) are expanded. An environment variable can be
 given in either the @command{$VAR} or @command{$@{VAR@}} form. To
 prevent expansion, escape the @command{$} or @command{~} with a
-backslash.
+backslash.  Since these values are first subject to standard shell
+quoting rules, if you want special characters such as @command{\b} or
+@command{$} to be treated as regular expression assertions then they
+will need extra escaping, i.e. @command{\\b} and @command{\\\$}
+respectively.
 
 The options @command{-D}, @command{-S}, and @command{-R} are ignored in
 resource files. This is also true of any package names given in the

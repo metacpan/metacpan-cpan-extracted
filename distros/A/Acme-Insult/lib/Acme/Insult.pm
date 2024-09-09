@@ -1,4 +1,4 @@
-package Acme::Insult 1.0 {
+package Acme::Insult 1.1 {
     use v5.38;
     use parent 'Exporter';
     use Module::Load;

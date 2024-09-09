@@ -1,4 +1,4 @@
-#!perl -Tw
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ PATHS: {
 	my $i = new_ok('CGI::Info');
 	ok(File::Spec->file_name_is_absolute($i->script_path()));
 	ok($i->script_path() =~ /.+script\.t$/);
-	ok($i->script_name() eq 'script.t');
+	cmp_ok($i->script_name(), 'eq', 'script.t', 'script_name() works');
 	ok($i->script_path() eq File::Spec->catfile($i->script_dir(), $i->script_name()));
 	ok($i->script_path() eq File::Spec->catfile(CGI::Info::script_dir(), $i->script_name()));
 	# Check calling twice return path
@@ -193,14 +193,17 @@ PATHS: {
 	delete $ENV{'DOCUMENT_ROOT'};
 	$i = new_ok('CGI::Info');
 	ok($i->script_name() eq 'bar.pl');
+	my $dir = Cwd::getcwd();
 	if($^O eq 'MSWin32') {
 		TODO: {
 			local $TODO = 'Script_dir test needs to be done on Windows';
-			ok($i->script_dir() =~ /\\CGI-Info$/i);
+			# like($i->script_dir(), qr/$dir/, 'Check script_dir looks right');
+			cmp_ok($i->script_dir(), 'eq', $dir, 'Check script_dir looks right');
 			ok($i->script_path() =~ /\\.+bar\.pl$/);
 		}
 	} else {
-		ok($i->script_dir() =~ /\/CGI-Info/i);
+		# like($i->script_dir(), qr/$dir/, 'Check script_dir looks right');
+		cmp_ok($i->script_dir(), 'eq', $dir, 'Check script_dir looks right');
 		ok($i->script_path() =~ /\/.+bar\.pl$/);
 	}
 

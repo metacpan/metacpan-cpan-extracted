@@ -1,10 +1,12 @@
 
-# distribution Couch-DB
+# Distribution Couch-DB
 
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Couch-DB>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
   * Indexed from CPAN: <https://metacpan.org/release/Couch-DB>
+
+  * Implementation status: <https://perl.overmeer.net/couch-db/reference.html>
 
 ## About this module
 

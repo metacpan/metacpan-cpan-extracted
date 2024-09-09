@@ -226,6 +226,13 @@ alternatives.
 
 Returns the domain of the first translatable string in the structure.
 
+=item $obj-E<gt>B<errno>( [$errno] )
+
+[1.38] Returns the value of the C<_errno> key, to indicate the error
+number (to be returned from your script).  Usually, this method will
+return undef.  For FAILURE, FAULT, and ALERT, the errno is by default
+taken from C<$!> and C<$?>.
+
 =item $obj-E<gt>B<msgctxt>()
 
 The message context for the translation table lookup.
@@ -553,8 +560,8 @@ Implemented as L<toString()|Log::Report::Message/"Processing">.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.37,
-built on June 28, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report distribution version 1.38,
+built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

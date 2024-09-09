@@ -7,7 +7,7 @@
 
 package Couch::DB::Database;
 use vars '$VERSION';
-$VERSION = '0.005';
+$VERSION = '0.006';
 
 
 use Log::Report 'couch-db';
@@ -462,6 +462,8 @@ sub search(;$%)
 	my $ddoc   = delete $args{design};
 	my $ddocid = blessed $ddoc ? $ddoc->id : $ddoc;
 
+	#XXX The API shows some difference in the parameter combinations, which do not
+	#XXX need to be there.  For now, we produce an error for these cases.
 	!$view  || $ddoc  or panic "docs(view) requires design document.";
 	!$local || !$part or panic "docs(local) cannot be combined with partition.";
 	!$local || !$view or panic "docs(local) cannot be combined with a view.";
@@ -502,8 +504,8 @@ sub search(;$%)
 
 my @search_bools = qw/
 	conflicts descending group include_docs attachments att_encoding_info
-	inclusive_end reducs sorted stable update_seq
-	/;
+	inclusive_end reduce sorted stable update_seq
+/;
 
 # Handles standard view/_all_docs/_local_docs queries.
 sub _viewPrepare($$$)

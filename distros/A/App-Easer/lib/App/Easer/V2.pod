@@ -809,6 +809,37 @@ need. Used by C<fallback>.
 
 See L</Application High Level View>.
 
+=item C<final_collect>
+
+   $self->final_collect($callback_sub);
+   $self->final_collect;
+
+Can be set either as a callback or as a method override. Not supposed to
+be called directly.
+
+See L<< /Sources as hash reference >>. Available after version
+C<2.007001> (not included).
+
+=item C<final_commit>
+
+   $self->final_commit($callback_sub);
+   $self->final_commit;
+
+Can be set either as a callback or as a method override. Not supposed to
+be called directly.
+
+See L<< /New commit finalization: C<final_commit> >>. Available after
+version C<2.007001> (not included).
+
+=item C<final_commit_stack>
+
+   my @sequence = $self->final_commit_stack;
+
+Sequence of command objects during the C<final_commit> phase.
+
+See L<< /New commit finalization: C<final_commit> >>. Available after
+version C<2.007001> (not included).
+
 =item C<find_child>
 
    my ($child_instance, @child_args) = $self->find_child;
@@ -877,9 +908,14 @@ See L</Application High Level View>.
 
 =item C<full_help_text>
 
-   my $text = $self->full_help_text;
+   my $full_help = $self->full_help_text;
+   my $usage_help = $self->full_help_text('usage');
 
 Get the full auto-generated help text for the command, e.g. to print it.
+
+It can be passed an additional string paramter, which can be C<help> or
+C<usage>. The former generates the help including the C<Description>
+section, the latter does not include it.
 
 =item C<getopt_config>
 
@@ -945,6 +981,20 @@ to achieve this goal.
 This method is not meant to be called directly and is subject to become
 a private method, so its usage is discouraged and not future-proof.
 
+=item C<inject_config>
+
+   $self->inject_configs($hash_of_configurations);
+   $self->inject_configs($hash_of_configurations, $priority);
+
+Add an additional hash reference of configurations to the ones collected
+via sources. This is most useful within a C<commit> callback/method,
+where options have been collected for the specific command level and
+allows applying custom ways of setting default values without the need
+to code an ad-hoc source.
+
+Default priority is set to 1000 (which is normally "very later", i.e.
+considered only as a fallback after everything else).
+
 =item C<instantiate>
 
    my $instance = $self_or_package->instantiate($class, @args);
@@ -954,6 +1004,13 @@ This method loads class C<$class> via C<load_module> and returns:
    $class->new(@args);
 
 This is a class method.
+
+=item C<is_root>
+
+   say 'root command!' if $self->is_root;
+
+Return I<true> if the command is the I<root>, i.e. if it has no parent.
+Available after version C<2.007001>.
 
 =item C<list_children>
 
@@ -1016,6 +1073,20 @@ package variable C<$class . '::app_easer_spec'>, if set.
 See L</Application High Level View> and L</OPTIONS>. The returned list
 if passed through C<resolve_options> anyway, e.g. to inherit options.
 
+=item C<options_help>
+
+   my $options_help = $self->options_help;
+   $self->options_help($new_help);
+
+Set text to be printed for the options.
+
+If set to a plain string, that string is all that will be printed, i.e.
+no automatic help text from C<options> will be generated.
+
+If set to a hash reference, two keys are supported: C<preamble> and
+C<postamble>. When present, they will be printed respectively before and
+after the help text generated automatically from C<options>.
+
 =item C<params_validate>
 
    my $href_or_undef = $self->params_validate;
@@ -1058,7 +1129,7 @@ class of C<$self>.
 =item C<residual_args>
 
    my @residual_args = $self->residual_args;
-   $self->residual_args(@new_args);
+   $self->residual_args(\@new_args);
 
 Access the list of I<residual> (i.e. unparsed) arguments from the
 command line.
@@ -1072,6 +1143,13 @@ optiosn specifications are hash references, but they might be strings
 like C<+parent> (for inheriting all that is I<transmitted> from a parent
 command) or regular expressions to bulk import options based on their
 names.
+
+=item C<root>
+
+   my $root_command = $self->root;
+
+Generalization of L</parent> to go all the way up to the topmost command
+of the chain. Available after version C<2.007001>.
 
 =item C<run>
 
@@ -1089,6 +1167,7 @@ returns.
 =item C<run_help>
 
    $self->run_help;
+   $self->run_help('usage');
 
 Run the C<auto_help> command, which should print out the help for the
 command itself. This is not usually needed, but comes handy to implement
@@ -1100,12 +1179,34 @@ option, like this:
       ...
    }
 
+It is possible to pass the string C<help> (default) or the string
+C<usage>; the latter prints a shorter message, i.e. it does not print
+the C<Description> section.
+
 =item C<set_config>
 
    $self->set_config(foo => 'bar');
 
 Set a new value for a configuration, overriding what has been found out
 from the several input sources.
+
+=item C<set_config_hash>
+
+   $self->set_config_hash($new_merged_config);
+   $self->set_config_hash($new_overall, 1);
+
+Set a new value for the whole configuration hash.
+
+In the first form (no second parameter, or second parameter set to a
+false value), only the I<merged> configuration hash is set, i.e. what is
+returned by a call like C<< $instance->configuration_hash >>. In
+practical terms, it replaces what can be taken when setting
+L</config_hash_key> to either C<merged> (the default value) or
+C<override>.
+
+The second form allows setting the whole underlying data structure that
+can be taken by a call like C<< $instance->configuration_hash(1) >>.
+This allows messing up with the whole process.
 
 =item C<slot>
 
@@ -1214,13 +1315,22 @@ inherited (no inheritance via a regular expression).
 
 =back
 
-=head2 Option Values Collection
+=head2 Option Values Collection (C<sources>)
 
 The collection is performed thanks to I<sources>, which can be set with
 the corresponding C<sources> key or method (depending on the style).
 C<App::Easer> comes with several sources for getting configurations from
 a variety of places, but still leaves the door open to add more
 customized ones.
+
+Up to version C<2.007001> included, the C<sources> key could only point
+to an I<array reference> holding a list of sources. After that release,
+it has been expanded to I<also> accept a I<hash reference>, allowing for
+a new and more sophisticated handling of option values collection. In
+either case, anyway, processing arrives at a point where there is a
+I<list of sources> to be processed as described below; using the I<array
+ref> keeps backwards compatibility with the old behaviour. See
+L</Sources as hash reference> for additional details on the new way.
 
 Sources are I<considered> with respect to two different ordering
 methods: their place in the array pointed by key C<sources> and their
@@ -1260,6 +1370,39 @@ C<priority>. This means that the following examples are equivalent:
    # priority in meta-options first-arguments hash reference
    [ '+FromTrail', {priority => 90}, qw< defaults foo baz > ],
 
+After the C<$locator> has been resolved to a sub reference
+C<$located_sub>, and the first item in C<@args> has been analyzed and
+possibly removed (because it contains I<meta-options> as described
+above), the sub reference is invoked like follows:
+
+   $located_sub->($command, $args_arrayref, $inputs_arrayref);
+
+where:
+
+=over
+
+=item *
+
+C<$command> is the instance of the (sub-)command under analysis
+
+=item *
+
+C<$args_arrayref> is a reference to an array containing the remaining
+arguments provided via C<@args> in the source definition (when the array
+reference format C<[ $locator @args ]> form has been used). This array
+reference does I<not> contain the I<meta-options>.
+
+=item *
+
+C<$inputs_arrayref> is a reference to an array holding the input
+command-line parameters (at least what's left of them after processing
+by previous sources).
+
+=back
+
+Unless the source is supposed to process command-line arguments, it
+should just ignore the third parameter and focus on the first two.
+
 It's not necessary to set the C<sources> explicitly, as by default the
 following configuration is assumed:
 
@@ -1278,6 +1421,17 @@ using the C<getopt> key, according to the rules explained in
 C<GetOpt::Long>. The first alias of an option is also set as the
 option's name in case key C<name> is missing.
 
+=item * C<+LastCmdLine>
+
+(After version C<2.007001>, excluded)
+
+This source returns the same configuration hash as that determined by
+the last C<+CmdLine> that was executed within a specific command level.
+
+This source is supposed to be used only in relation to the new
+I<hash-based> way of setting sources (see L</Sources as hash
+reference>).
+
 =item * C<+Environment>
 
 This source gets values from environment variables. It is set using the
@@ -1285,6 +1439,19 @@ C<environment> key, which can be set to either the name of the
 environment variable (this is case sensitive) or automatically from
 higher-level configuration C<environment_prefix> and the option's name
 in case it is set to value C<1> exactly.
+
+This source expliticly ignores I<inherited> options, to prevent
+overwriting previously set options. It is possible to override this:
+
+   [ '+Environment', include_inherited => 1 ]
+
+Another alternative to do this is use C<+FinalEnvironment>.
+
+=item * C<+FinalEnvironment>
+
+This source works the same as C<+Environment>, except that it works also
+for options that have been inherited. This is particularly useful when
+using L<Sources as hash reference>.
 
 =item * C<+Parent>
 
@@ -1294,6 +1461,19 @@ sub-commands).
 =item * C<+Default>
 
 Get a default value from the C<default> sub-key of the option.
+
+This source expliticly ignores I<inherited> options, to prevent
+overwriting previously set options. It is possible to override this:
+
+   [ '+Default', include_inherited => 1 ]
+
+Another alternative to do this is use C<+FinalDefault>.
+
+=item * C<+FinalDefault>
+
+This source works the same as C<+Default>, except that it works also for
+options that have been inherited. This is particularly useful when using
+L<Sources as hash reference>.
 
 =item * C<+JsonFileFromConfig>
 
@@ -1334,6 +1514,258 @@ values read from there take precedence over the defaults:
 
 This is the main reason why the I<priority> has been detached from order
 of appearance.
+
+=head3 Sources as hash reference
+
+Up to version C<2.007001>, the C<sources> key can only be set to an
+array reference holding a list of sources. Each command level can have
+its own list, or rely on the default one provided by C<App::Easer>.
+
+This setup works in many situation but becomes too rigid when dealing
+with inherited options. As an example, suppose that we define an option
+C<loglevel> allowing to set the log level (e.g. info, debug, trace, ...)
+for our suite of commands. At this point, either we limit the option at
+the highest level only (then setting the logger configuration in the
+topmost command's C<commit>), or we have to wait until the leaf command
+is determined, which implies that every leaf command must repeat the
+code to set the logger's configuration.
+
+Additionally, this setup might not play well with options that load
+configurations from files, because some files might be loaded based on
+command line configurations that appear in upper commands but might
+eventually be overridden in lower commands. So, in the following
+example, we want to be able to only load C<second.json> and disregard
+C<first.json>:
+
+   myprg --config first.json foo --config second.json
+
+For this reason, release past C<2.007001> (which is not included) also
+support an alternative way of configuring C<sources>, namely through a
+hash reference that supports three keys:
+
+
+=over
+
+=item C<current>
+
+(mandatory) this is the equivalent of the I<old> behaviour, i.e. a list
+of sources that is used to figure out the order and precedence of
+collecting options.
+
+=item C<next>
+
+(optional) this allows setting the list of sources for the children
+sub-commands (unless the sub-command has one already configured), i.e.
+its C<current> when it will be called. It can be a straight list or a
+sub reference, in which case it will be called to determine the list.
+
+When absent, by default the children inherits the same C<current> list
+as the parent command.
+
+=item C<final>
+
+(optional) this allows setting a list of sources that is used at the
+very end of the child determination process, i.e. when the program
+determines the descendant sub-command for which the C<execute>
+method/callback will be called, in a new sub-phase aptly named
+C<final_collect>.
+
+=back
+
+With the new hash-based configuration, the determination of the right
+sub-command proceeds like before, using the C<current> list of sources
+at each step (the C<current> for a sub-command might have been set using
+the C<next> of the parent command). During this phase, the C<commit>
+method/callback is called at every level just like before.
+
+After the search for the right command to C<execute> is finished, method
+C<final_collect> is called, using the C<final> list of the hash
+reference. This allows deferring the collection of data from
+non-commmand-line sources at the very end.
+
+The default configuration when adopting the new hash-based C<sources> is
+the following:
+
+   {
+      current => [ qw< +CmdLine +Parent > ],
+      final =>
+         [ qw< +LastCmdLine +Parent +FinalEnvironment +FinalDefault > ],
+   }
+
+In this configuration, all command levels share the same I<forward>
+configuration, only gathering command-line parameters, with later
+sub-commands taking precedence (C<+CmdLine> has higher priority than
+C<+Parent>).
+
+After the right sub-command to execute is determined, then the latest
+command line is taken (it is not parsed again), then the parent (like
+before, it only contains command-line parameters from upper commands),
+then the environment, then the defaults.
+
+In summary: all command-line parameters with precedence from right to
+left, then the environment, then defaults.
+
+It is easy to also add the C<+JsonFileFromConfig> source, like in the
+following example:
+
+
+   {
+      current => [ qw< +CmdLine +Parent > ],
+      final =>
+         [
+            qw<
+               +LastCmdLine=10
+               +Parent=20
+               +FinalEnvironment=30
+               +FinalDefault=100
+               +JsonFileFromConfig=40
+            >
+         ],
+   }
+
+Priorities for the first three sources in C<final> are set explicitly
+but would take the same values implicitly, they have been put in the
+example only for clarity.
+
+As before, we put the C<+FinalDefault> option I<before> the
+C<+JsonFileFromConfig> so that we can read the default value for the
+C<config> option (if present), while still giving stuff from the file
+precendence over the defaults.
+
+After this information gathering phase, method/callback C<final_commit>
+is called (much like C<commit> is called after C<collect>).
+
+It is possible to set key C<final_collect> or override it as a method,
+for maximum flexibility. Doing this is a liability.
+
+
+=head3 New commit finalization: C<final_commit>
+
+in the new L</Sources as hash reference> way of setting C<sources>,
+after the final roundup of options done by C<final_collect>, the
+C<final_commit> method/callback is executed.
+
+By default, this triggers calling it all up the commands ladder, i.e.
+from the leaf command that will be executed up to the root command. This
+allows setting "final configurations" (like a logger) in the
+C<final_commit> method of the topmost command, once and for all.
+
+It is anyway possible to set callbacks or override the method at each
+intermediate or at the leaf level, of course. In this case, the return
+value of the method/callback will be used to determine whether to
+continue up the ladder or not; I<true> values will continue the call
+chain, I<false> values will interrupt it.
+
+It's also possible to break the chain of calls by setting the key to a
+I<false> value.
+
+It MUST be considered that the method is specific to each command, which
+usually does not have an I<updated> view of the whole configuration,
+because that is only known to the leaf command's object. For this
+reason, method/callback C<final_commit> can also call method
+C<final_commit_stack>, which provides a list of all command objects that
+are involved in the chain, starting from the leaf command down towards
+the root.
+
+For this reason, the way to get the I<full> configuration in the topmost
+command is the following:
+
+   sub final_commit ($self) {
+      my ($leaf) = $self->final_commit_stack;
+      my $final_config = $leaf->config_hash;
+      ...
+   }
+
+Method C<final_commit_stack> is only available (predictably) inside
+method/callback C<final_commit>; its availability elsewhere is not
+guaranteed.
+
+=head2 Specification Inheritance vs. Value Acquisition
+
+C<App::Easer> provides two different ways of I<sharing> options between
+parents and children.
+
+One way of doing this is by means of source C<+Parent>
+(L<< /Option Values Collection (C<sources>) >>: this allows I<absorbing>
+configurations from a parent inside a child. Every options that has been
+set in the parent command is copied into the child, subject to
+priorities etc.
+
+Another way of doing this is by I<inheriting> options specifications by
+a child from its parent. This makes the parent's option appear also as a
+child's option, which might ease the life of users because they would
+not need to set options exactly in the I<first> command that supports
+it.
+
+The latter behaviour has two halves: one in the parent and the other in
+the child command.
+
+Parent commands can declare which option specifications can be inherited
+by children by setting C<transmit> to a true value in the option's
+speficiation. By default, options are I<not> set as inheritable.
+
+Children can then inherit options by using string or regular expressions
+instead of hash references. In this way, a child can cherry-pick which
+options from the parent make sense and ignore the other ones.
+
+Consider the following example:
+
+   my $app = {
+      aliases => [ 'main' ],
+      options => [
+         {
+            getopt => 'transmittable',
+            help => 'option available in parent, transmit => 1',
+            transmit => 1,
+         },
+         {
+            getopt => 'parent-only',
+            help => 'option available in parent only',
+            transmit => 0,
+         },
+      ],
+      children => [
+         {
+            aliases => [ 'foo' ],
+            options => [ '+parent',
+               {
+                  getopt => 'child-only',
+                  help => 'option available in child only',
+               },
+            ],
+            execute => sub ($self) {
+               say "foo says: ",
+                  $self->config('transmittable') ? 'transmit' : 'no way';
+            },
+         },
+      ],
+   };
+
+Option C<transmittable> in the parent command can be inherited, while
+C<parent-only> can not. Child command C<foo> does indeed inherit the
+option, thanks to the C<+parent> option that allows inheriting
+everything that the parent sets with a true C<transmit>.
+
+An example run of the application above makes it clear that the option
+can be set both in the parent and in the child command:
+
+   $ perl prova.pl foo
+   foo says: no way
+
+   # command-line option is set in parent command
+   $ perl prova.pl --transmittable foo
+   foo says: transmit
+
+   # command-line option is set in child command
+   $ perl prova.pl foo --transmittable
+   foo says: transmit
+
+Option string C<+parent> inherits everything; it's also possible to set
+exact strings or regular expressions (also as strings). In case of
+regular expressions, it's furthermore possible for the I<parent> to
+restrict inheritance of an option only when the name is provided exactly
+(i.e. not as a regular expression); this is done setting
+C<transmit_exact> in the option's specification in the parent.
 
 =head2 Accessing Collected Option Values
 
@@ -1376,6 +1808,38 @@ I<left> for a sub-command or just unparsed).
 
 =back
 
+The I<merged> configuration returned by C<config_hash> is regulated by
+option C<config_hash_key>. As of release C<2.008>, it's possible to set
+it to one of the following:
+
+=over
+
+=item * C<merged>
+
+the default value, providing whatever is coded as default. As of version
+C<v2.008> this corresponds to C<merged_legacy> below.
+
+=item * C<merged_legacy>
+
+provide a backwards-compatible behaviour (pre-C<v2.008>).
+
+=item * C<v2.008>
+
+use a different way of coalescing values across different
+commands/sub-commands. The configuration is collected taking into
+account the priority of each source; for same-priority sources,
+sub-commands take precedence over ancestors.
+
+=item * C<override>
+
+use whatever has been set explicity via L</set_config_hash>. Note that
+setting a configuration explicitly means that the value pointed at by
+key C<merged> is changed too.
+
+=back
+
+See also L</set_config> and L</set_config_hash>.
+
 
 =head1 MIXED STUFF
 
@@ -1384,6 +1848,13 @@ I<left> for a sub-command or just unparsed).
 To get C<help> about a command, App::Easer::V2 provides a C<help>
 sub-command out of the box I<most of the times>. The exception is for
 I<leaf> commands, which do not have sub-commands.
+
+After version C<2.007001> (not included), in addition to the C<help>
+command there is also a C<usage> command, which provides the same output
+as C<help> but without the C<Description> section. The C<usage>
+sub-command is managed as an alias of C<help>; it is possible to remove
+this alias by setting C<@App::Easer::V2::Command::Help::aliases> to the
+string C<help> alone.
 
 This is not a big deal with hierarchical applications, because it's
 possible to invoke the C<help> sub-command of the parent command and
@@ -1420,6 +1891,9 @@ sub-command explicitly:
       # ...
    }
 
+As of versions after C<2.007001> (not included) it is possible to pass
+an additional parameter to C<run_help> with string C<usage>, to get a
+shorter help which does not include the C<Description> section.
 
 =head1 BUGS AND LIMITATIONS
 

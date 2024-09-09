@@ -1,3 +1,50 @@
+2.007004  2024-09-08 17:45:35 CEST
+   - Final touches to the new behaviour for release 2.008, this should
+     be the last trial release hopefully
+
+2.007003  2024-09-01 23:26:30 CEST
+   - Add "matrix merge" for collecting options along the way
+
+2.007002  2024-08-29 18:40:59 CEST
+   - Add default help message for commands, addresses GH #6
+     https://github.com/polettix/App-Easer/issues/6
+   - Fix exception when asking for help on builtin commands, addresses GH #7
+     https://github.com/polettix/App-Easer/issues/7
+   - Fix documentation for using residual_args, addresses GH #8
+     https://github.com/polettix/App-Easer/issues/8
+   - Fix automatic truncation of options with hyphens, addresses GH #9
+     https://github.com/polettix/App-Easer/issues/9
+   - Remove bug in using Params::Validate, addresses GH #11
+     https://github.com/polettix/App-Easer/issues/11, still no test.
+   - Allow for shorter help message via "usage", addresses GH #12
+     https://github.com/polettix/App-Easer/issues/12
+   - Improve documentation and user interface for options with transmit=>1,
+     addresses GH #13 https://github.com/polettix/App-Easer/issues/13
+   - Add documentation for "sources" callbacks, addresses GH #14
+     https://github.com/polettix/App-Easer/issues/14
+   - Fix using the right name when specified and different from getopt,
+     addresses GH #15 https://github.com/polettix/App-Easer/issues/15
+   - Fix help message for multi-valued defaults
+   - Fix detecting sub-commands with registered stuff (used in bundling)
+
+2.007001  2023-03-11 15:20:07 CET
+   - Ensure consistent listing of sub-commands when they are auto-loaded from
+     modules in @INC via prefixes.
+
+2.007  2023-03-10 21:54:07 CET
+   - Fix https://github.com/polettix/App-Easer/issues/6 "Unspecified help for
+     main command results in an "unitialized value" error" (thanks DJERIUS for
+     reporting)
+   - Fix https://github.com/polettix/App-Easer/issues/7 "Calling help on a
+     builtin command dies verbosely." (thanks DJERIUS for reporting)
+   - Fix https://github.com/polettix/App-Easer/issues/8 "incorrect
+     documentation for residual_args' argument" (thanks DJERIUS for reporting)
+   - Fix https://github.com/polettix/App-Easer/issues/9 "options with hypens
+     are truncated" (thanks DJERIUS for reporting)
+   - Fix https://github.com/polettix/App-Easer/issues/10 "Cannot pass dash as a
+     residual argument"
+   - Make error on unexpected residual args less confusing
+
 2.006  2023-01-05 08:03:54 CET
    - Release after 84 PASSes on CPAN Testers (thanks!)
 

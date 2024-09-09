@@ -13,13 +13,13 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Remote v10.3.3;
+package Protocol::Sys::Virt::Remote v10.3.4;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v10.3.3;
-use Protocol::Sys::Virt::Transport::XDR v10.3.3;
+use Protocol::Sys::Virt::Remote::XDR v10.3.4;
+use Protocol::Sys::Virt::Transport::XDR v10.3.4;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 my $transport = 'Protocol::Sys::Virt::Transport::XDR';
 
@@ -2788,24 +2788,24 @@ sub configure {
 
 sub _dispatch_call {
     my ($self, %args) = @_;
-    my $proc = $args{header}->{proc};
-    say "Dispatching call to $proc";
-    $self->{on_call}->(%args,
-                       data => $args_decoders[$proc]->($args{data}));
+    my $proc   = $args{header}->{proc};
+    my $serial = $args{header}->{serial};
+    $log->trace( "Dispatching call to $proc (serial: $serial)" );
+    return $self->{on_call}->(%args,
+                              data => $args_decoders[$proc]->($args{data}));
 }
 
 sub _dispatch_reply {
     my ($self, %args) = @_;
-    my $proc = $args{header}->{proc};
-    say "Dispatching reply to $proc";
+    my $proc   = $args{header}->{proc};
+    my $serial = $args{header}->{serial};
+    $log->trace( "Dispatching reply to $proc (serial: $serial)" );
     if (defined $args{error}) {
-        $self->{on_reply}->(%args);
-        return;
+        return $self->{on_reply}->(%args);
     }
     else {
-        $self->{on_reply}->(%args,
-                            data => $ret_decoders[$proc]->($args{data}));
-        return;
+        return $self->{on_reply}->(%args,
+                                   data => $ret_decoders[$proc]->($args{data}));
     }
 }
 
@@ -2813,9 +2813,8 @@ sub _dispatch_message {
     my ($self, %args) = @_;
     my $proc = $args{header}->{proc};
     $log->trace("Dispatching message $proc");
-    $self->{on_message}->(%args,
-                          data => $msg_decoders[$proc]->($args{data}));
-    return;
+    return $self->{on_message}->(%args,
+                                 data => $msg_decoders[$proc]->($args{data}));
 }
 
 sub register {
@@ -2985,7 +2984,7 @@ Protocol::Sys::Virt::Remote - Connect to remote libvirt daemon
 
 =head1 VERSION
 
-v10.3.3
+v10.3.4
 
 Based on LibVirt tag v10.3.0
 
@@ -2999,7 +2998,7 @@ Based on LibVirt tag v10.3.0
   open my $fh, 'rw', '/run/libvirt/libvirt.sock';
   my $transport = Protocol::Sys::Virt::Transport->new(
        role => 'client',
-       on_send => sub { syswrite( $fh, $_ ) for @_ }
+       on_send => sub { my $opaque = shift; syswrite( $fh, $_ ) for @_; $opaque }
   );
 
   my $remote = Protocol::Sys::Virt::Remote->new(
@@ -3118,6 +3117,10 @@ is one of the values in the enum C<procedure> as defined in
 C<Protocol::Sys::Virt::Remote::XDR>.  Reply and stream messages in response to this
 call are identified by C<$serial>.
 
+B<Note>: If the C< on_send > callback of the associated transport is declared C<async>
+(as in L<Future::AsyncAwait>), a L<Future> is returned which (eventually) resolves
+to the C<$serial>.
+
 =head2 reply
 
   $remote->reply( $proc, $serial, $status, $data );
@@ -3125,11 +3128,19 @@ call are identified by C<$serial>.
 Sends a reply to a remote call C<$proc> using C<$serial>.  If C<$status> is C<ERROR>,
 C<$data> is expected to provide an C<error> (C<remote_error>) structure.
 
+B<Note>: If the C< on_send > callback of the associated transport is declared C<async>
+(as in L<Future::AsyncAwait>), a L<Future> is returned which resolves when the reply
+has been sent.
+
 =head2 message
 
   $remote->message( $proc, $data );
 
 Sends a notification message C<$data> to the remote procedure C<$proc>.
+
+B<Note>: If the C< on_send > callback of the associated transport is declared C<async>
+(as in L<Future::AsyncAwait>), a L<Future> is returned which resolves when the message
+has been sent.
 
 =head2 stream
 

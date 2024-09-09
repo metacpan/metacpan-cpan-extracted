@@ -1,5 +1,9 @@
 Revision history for Perl extension Acme::Insult::Pirate
 
+1.1 2024-09-08T12:58:50Z
+
+    - fix meta
+
 1.0 2024-09-03T15:20:17Z
 
     - original version

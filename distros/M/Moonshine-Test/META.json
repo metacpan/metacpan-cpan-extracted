@@ -4,7 +4,7 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -41,8 +41,9 @@
             "Exporter" : "0",
             "Params::Validate" : "0",
             "Scalar::Util" : "0",
+            "Switch::Again" : "1.01",
             "Test::More" : "0",
-            "perl" : "5.01",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -51,7 +52,7 @@
    "provides" : {
       "Moonshine::Test" : {
          "file" : "lib/Moonshine/Test.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Test"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

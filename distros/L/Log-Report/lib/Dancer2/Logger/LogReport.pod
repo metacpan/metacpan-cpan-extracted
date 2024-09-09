@@ -71,8 +71,8 @@ See L<Dancer2::Plugin::LogReport/"DETAILS"> for examples.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.37,
-built on June 28, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report distribution version 1.38,
+built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

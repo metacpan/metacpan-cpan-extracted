@@ -1,0 +1,2163 @@
+#
+#===============================================================================
+#
+#         FILE:  V2_008.pod
+#
+#  DESCRIPTION:  Tutorial for version v2.008
+#
+#       AUTHOR:  Flavio Poletti <poletti@cpan.org>
+#      CREATED:  09/07/2024 09:37:10 AM UTC
+#===============================================================================
+
+
+=head1 App::Easer::V2 Tutorial For 2.008
+
+Version C<2.008> introduced some new features in the general C<V2> track,
+while still being backwards compatible. Reference documentation is becoming
+dense, so here we go with a tutorial focused on a real-world usage case.
+
+It can be argued that there are too many ways to use L<App::Easer>. This is
+a true statement: an application can range from a single file with multiple
+commands up to a whole tree of modules, each encapsulating one; even in
+this latter case, there are multiple ways to use the module, depending on
+whether you consider some of the I<stuff> pure data or need some more logic
+to control it.
+
+Some of the concepts are common to all different ways, so this document
+will mostly focus on them; other documents will address usage in one way
+or another.
+
+The point of L<App::Easer> is to facilitate development of command-line
+interfaces, with some common features that I've come to desire over and
+over in time:
+
+=over
+
+=item *
+
+Collect command options from multiple sources, like command-line
+arguments, environment variables, files, possibly other sources like
+e.g. databases or remote stuff accessible through a HTTP call. Oh, and
+set a I<default> value as a last resort, of course.
+
+=item *
+
+Automate generation of documentation for options, based on their
+declaration.
+
+=item *
+
+Structure the application as a I<tree> of commands, instead of
+cramming wildly different behaviours through the usage of command-line
+options.
+
+=item *
+
+Ease provision and access to a command's documentation (including
+options as described above).
+
+=item *
+
+Allow for L<fatpacking|App::FatPacker> the module, so that it's possible
+to produce a standalone program that can be easily carried around.
+
+=back
+
+It might be I<slightly> overkill for a one-off program, but it can be
+good to include it from the beginning if you anticipate the need to pack
+multiple related commands in a single suite down the road.
+
+This tutorial is focused on providing concrete examples of using
+L<App::Easer>, in increasing I<passes> where we leverage more and more
+functionality.
+
+=head2 Pass 1: Basic Program
+
+We want to code a multi-level command-line interface that manages
+key-value data in a JSON file:
+
+=over
+
+=item *
+
+The file name is provided through command-line option
+C<< --db | --json-db | -d >>, which can also be provided through
+environment variable C<CRUD_DB>
+
+=item *
+
+CRUDS operations are provided through sub-commands C<create>,
+C<retrieve>, C<update>, C<delete>, and C<list>. Each has its own
+specific options.
+
+=back
+
+
+Our initial program is the following:
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+   use autodie qw< open readline close >;
+   use JSON::PP ();
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< crud >],
+      help    => 'A command for CRUD operations over a JSON file',
+      description => 'To be written...',
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      options => [
+         {
+            getopt      => 'db|json-db|d=s',
+            environment => 'CRUD_DB',
+            help        => 'path to the JSON file for CRUD operations',
+         }
+      ],
+      children => [
+         {
+            aliases => [qw< create >],
+            help    => 'create a name/value pair',
+            description => 'Need to provide a name, complains if exists already',
+            options => [
+               {
+                  getopt => 'name|n=s',
+                  help   => 'name of key to create',
+               },
+               {
+                  getopt => 'value|v=s',
+                  help   => 'value to set for the key',
+               }
+            ],
+            execute => sub ($self) {
+               my $name = $self->config('name') // die "no name provided\n";
+               my $dbpath = $self->config('db') // die "no db provided\n";
+               my $data;
+               eval { $data = load_json($dbpath) };
+               die "entry for <$name> already exists\n"
+                  if exists($data->{$name});
+               $data->{$name} = $self->config('value') // '';
+               save_json($dbpath, $data);
+               return 0;
+            },
+         },
+         {
+            aliases => [qw< retrieve >],
+            help    => 'get the value associated to a name',
+            description => 'Need to provide a name',
+            options => [
+               {
+                  getopt => 'name|n=s',
+                  help   => 'name of key to retrieve',
+               },
+            ],
+            execute => sub ($self) {
+               my $name = $self->config('name') // die "no name provided\n";
+               my $dbpath = $self->config('db') // die "no db provided\n";
+               my $data = load_json($dbpath);
+               die "entry for <$name> does not exists\n"
+                  unless exists($data->{$name});
+               print {*STDOUT} $data->{$name} // '';
+               return 0;
+            },
+         },
+         {
+            aliases => [qw< update >],
+            help    => 'update value for a name',
+            description => 'Need to provide a name, complains if not present',
+            options => [
+               {
+                  getopt => 'name|n=s',
+                  help   => 'name of key to update',
+               },
+               {
+                  getopt => 'value|v=s',
+                  help   => 'value to set for the key',
+               }
+            ],
+            execute => sub ($self) {
+               my $name = $self->config('name') // die "no name provided\n";
+               my $dbpath = $self->config('db') // die "no db provided\n";
+               my $data = load_json($dbpath);
+               die "entry for <$name> does not exists\n"
+                  unless exists($data->{$name});
+               $data->{$name} = $self->config('value') // '';
+               save_json($dbpath, $data);
+               return 0;
+            },
+         },
+         {
+            aliases => [qw< delete >],
+            help    => 'delete name or names (based on regex)',
+            description => 'Need to provide name or name regular expression',
+            options => [
+               {
+                  getopt => 'name|n=s',
+                  help   => 'name of key to delete',
+               },
+               {
+                  getopt => 'name-rx|r=s',
+                  help   => 'regular expression for name(s) to delete',
+               },
+            ],
+            execute => sub ($self) {
+               my $dbpath = $self->config('db') // die "no db provided\n";
+               my $data = load_json($dbpath);
+               
+               if (defined(my $name = $self->config('name'))) {
+                  delete($data->{$name});
+               }
+               elsif (defined(my $rx = $self->config('name-rx'))) {
+                  for my $name (keys($data->%*)) {
+                     delete($data->{$name}) if $name =~ m{$rx};
+                  }
+               }
+               else {
+                  die "no clue what should be deleted\n";
+               }
+
+               save_json($dbpath, $data);
+               return 0;
+            },
+         },
+         {
+            aliases => [qw< list >],
+            help    => 'list names of available name/value pairs',
+            description => '',
+            options => [ ],
+            execute => sub ($self) {
+               my $dbpath = $self->config('db') // die "no db provided\n";
+               my $data = load_json($dbpath);
+               say {*STDOUT} $_ for sort { $a cmp $b } keys($data->%*);
+               exit 0;
+            },
+         },
+      ],
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+   sub load_json ($path) {
+      open my $fh, '<:raw', $path;
+      local $/;
+      return JSON::PP::decode_json(<$fh>);
+   }
+
+   sub save_json ($path, $data) {
+      state $encoder = JSON::PP->new->ascii->canonical->pretty;
+      open my $fh, '>:raw', $path;
+      print {$fh} $encoder->encode($data);
+   }
+
+
+The structure is the following:
+
+   #!/usr/bin/env perl
+
+   # usual preamble with use-s and so on
+   use strict;
+   use warnings;
+   # ...
+
+   # what's needed to use App::Easer::V2
+   use App::Easer::V2 qw< run >;
+   my $app = {  ... }; # the whole application specification
+   exit(run($app, $0, @ARGV) // 0);
+   
+   # ... other supporting functions etc.
+
+The structure of command/subcommands is provided by means of the
+C<children> key at the topmost level. You don't see them but three
+commands are always added by default, i.e. C<help> (with an alias
+C<usage>), C<commands>, and C<tree>.
+
+=head3 Automatic commands C<help>, C<usage>, C<commands>, and C<tree>
+
+Let's run the program without any option:
+
+   $ ./crud
+   A command for CRUD operations over a JSON file
+   
+   Options:
+                db: path to the JSON file for CRUD operations
+                    command-line: string, value is required
+                                  --db <value>
+                                  --json-db <value>
+                                  -d <value>
+                     environment: CRUD_DB
+   
+   Sub-commands:
+            create: create a name/value pair
+          retrieve: get the value associated to a name
+            update: update value for a name
+            delete: delete name or names (based on regex)
+              list: list names of available name/value pairs
+              help: print a help command
+                    (also as: usage)
+          commands: list sub-commands
+              tree: print sub-commands in a tree
+
+By default, any command with children is assumed to just I<facilitate>
+calling them, so it makes sense that its default behaviour is to call
+its own C<usage> sub-command. The output would be the same by calling
+C<usage> directly as a sub-command:
+
+   $ ./crud usage
+   # ... same output as above
+
+The C<usage> command is actually an alias for the C<help>. Altough they
+are coalesced together, they actually behave slightly differently, with
+C<help> being more verbose and also printing out whatever is provided in
+the C<description>:
+
+   # ./crud help
+   A command for CRUD operations over a JSON file
+   
+   Description:
+       To be written...
+   
+   Options:
+                db: path to the JSON file for CRUD operations
+   ... same as usage from here...
+
+Child commands don't get automatic sub-commands by default, although
+it's possible by means of option C<force_auto_children> in the command's
+specification hash.
+
+
+=head3 Options
+
+Let's look at relevant keys for options collection:
+
+   my $app = {
+      # ...
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      options => [
+         {
+            getopt      => 'db|json-db|d=s',
+            environment => 'CRUD_DB',
+            help        => 'path to the JSON file for CRUD operations',
+         }
+      ],
+      children => [
+         {
+            # child 'create'
+            options => [
+               {
+                  getopt => 'name|n=s',
+                  help   => 'name of key to create',
+               },
+               {
+                  getopt => 'value|v=s',
+                  help   => 'value to set for the key',
+               }
+            ],
+            # ...
+         },
+         {
+            # child 'retrieve'
+            options => [
+               {
+                  getopt => 'name|n=s',
+                  help   => 'name of key to retrieve',
+               },
+            ],
+            # ...
+         },
+         # other children are pretty much the same...
+      ],
+   };
+
+Key C<sources> allows setting how options are collected. There are
+multiple ways of providing them; using string C<v2.008> is a shorthand
+to adopt the new basic behaviour introduced in version C<2.008> and is
+equivalent to this:
+
+   sources => {
+      current => [qw< +CmdLine +Environment +Default +ParentSlices >],
+      final   => [],
+   }
+
+This means that, at any command's level, command-line options take
+precedence over anything else, followed environment variables and
+defaults. Source C<+ParentSlices> is a bit special, in that it gathers
+options collected by the parent command, preserving whatever priority
+they had I<but> introducing them after whatever has been collected so
+far.
+ 
+This is actually I<not> much of a problem in this initial program,
+because the option in the parent command (i.e. C<< --db >>) is not
+replicated elsewhere, so there is no need to manage any priority
+between parent and child commands. This will change later in this tutorial.
+
+To get the options collected in the new way, it's also necessary to set
+key C<config_hash_key> to C<2.008>. This is necessary because version
+C<2.8> is backwards compatible with previous versions and this way of
+collecting options is new.
+
+Options are specified in an array reference provided via key C<options>.
+This allows setting different ways of collecting the option, like this:
+
+   {
+      name        => 'Foo',
+      getopt      => 'foo|f=s',
+      environment => 'MYAPP_FOO',
+      default     => 'bar or baz, folks!',
+      help        => 'something to print in the help',
+   }
+
+Providing a C<name> is optional; it is extracted automatically from
+C<getopt> or C<environment> if not provided. C<getopt> is used with
+C<Getopt::Long>; C<environment> allows setting the environment variable
+to get the value, if present. C<default> provides a default value.
+
+Each key is used by one of the C<sources>, respectively C<+CmdLine>,
+C<+Environment>, and C<+Default>.
+
+=head3 Execution
+
+In each command, key C<execute> allows setting a callback for actually
+I<running> the command. After L<App::Easer> determines which command
+should be run, it calls its C<execute> callback; each run of the program
+only calls the C<execute> for a single command.
+
+Let's look at sub-command C<delete> as an example:
+
+   {
+      # ... sub-command delete...
+      options => [
+         {
+            getopt => 'name|n=s',
+            help   => 'name of key to delete',
+         },
+         {
+            getopt => 'name-rx|r=s',
+            help   => 'regular expression for name(s) to delete',
+         },
+      ],
+      execute => sub ($self) {
+         my $dbpath = $self->config('db') // die "no db provided\n";
+         my $data = load_json($dbpath);
+         
+         if (defined(my $name = $self->config('name'))) {
+            delete($data->{$name});
+         }
+         elsif (defined(my $rx = $self->config('name-rx'))) {
+            for my $name (keys($data->%*)) {
+               delete($data->{$name}) if $name =~ m{$rx};
+            }
+         }
+         else {
+            die "no clue what should be deleted\n";
+         }
+
+         save_json($dbpath, $data);
+         return 0;
+      },
+   },
+
+The callback is provided a reference to the command, which can be used
+to retrieve collected option. Whatever option is available from the
+command itself or from the parent can be accessed via method C<config>:
+
+
+   my $dbpath = $self->config('db') // die "no db provided\n";
+
+   if (defined(my $name = $self->config('name'))) { ...
+
+It is also possible to get all options as a hash reference through
+method C<config_hash>:
+
+   my $all_configs_hash = $self->config_hash;
+
+This method uses whatever is set for C<config_hash_key> to provide you
+the right data. To get the new way of collecting options, you must set
+it to string C<v2.008> as explained in the previous section.
+
+Before closing, you might ask: where are non-option command line
+arguments? You get them calling C<residual_args>, which returns a
+I<list>:
+
+   my @non_option_arguments = $self->residual_args;
+
+
+=head2 Pass 2: Inherited options
+
+L<App::Easer> supports two concepts of I<inheriting> options in a child
+command from a parent command:
+
+=over
+
+=item *
+
+I<value> inheritance: values for options collected in the parent are
+also available in the children. This behaviour is available I<by
+default> (see previous section and souce C<+ParentSlices>) because it
+seems I<just right>, although it's possible to disable it;
+
+=item *
+
+I<definition> inheritance: options definitions in the parent might be
+duplicated in the child.
+
+=back
+
+The second kind of inheritance allows making your command-line more
+flexible for your users. As an example, let's see how we should call our
+program in the previous section to add a key/value pair in the managed
+file:
+
+   $ crud --file /path/to/file.db create --name foo --data bar
+
+The user must remember to provide the C<< --file >> option in the
+parent, then other options in the child. It would be easier to support
+this syntax too:
+
+   $ crud create --file /path/to/file.db --name foo --data bar
+
+This makes the program I<do the right thing>.
+
+It is of course possible to just replicate the option's definition in
+the child command, but there's a better way that avoids repetition and
+increses modularity, like in the following second iteration of the whole
+program.
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+   use autodie qw< open readline close >;
+   use JSON::PP ();
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< crud >],
+      help    => 'A command for CRUD operations over a JSON file',
+      description => 'To be written...',
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      options => [
+         {
+            getopt      => 'db|json-db|d=s',
+            environment => 'CRUD_DB',
+            help        => 'path to the JSON file for CRUD operations',
+
+            # Set the option as "inheritable" by children
+            transmit    => 1,
+         }
+      ],
+      children => [
+         {
+            aliases => [qw< create >],
+            help    => 'create a name/value pair',
+            description => 'Need to provide a name, complains if exists already',
+            options => [
+               'db',  # <-- inherit option definition from parent
+
+               {
+                  getopt => 'name|n=s',
+                  help   => 'name of key to create',
+               },
+               {
+                  getopt => 'value|v=s',
+                  help   => 'value to set for the key',
+               }
+            ],
+            execute => sub ($self) {
+               my $name = $self->config('name') // die "no name provided\n";
+               my $dbpath = $self->config('db') // die "no db provided\n";
+               my $data;
+               eval { $data = load_json($dbpath) };
+               die "entry for <$name> already exists\n"
+                  if exists($data->{$name});
+               $data->{$name} = $self->config('value') // '';
+               save_json($dbpath, $data);
+               return 0;
+            },
+         },
+         {
+            aliases => [qw< retrieve >],
+            help    => 'get the value associated to a name',
+            description => 'Need to provide a name',
+            options => [
+               'db',
+               {
+                  getopt => 'name|n=s',
+                  help   => 'name of key to retrieve',
+               },
+            ],
+            execute => sub ($self) {
+               my $name = $self->config('name') // die "no name provided\n";
+               my $dbpath = $self->config('db') // die "no db provided\n";
+               my $data = load_json($dbpath);
+               die "entry for <$name> does not exists\n"
+                  unless exists($data->{$name});
+               print {*STDOUT} $data->{$name} // '';
+               return 0;
+            },
+         },
+         {
+            aliases => [qw< update >],
+            help    => 'update value for a name',
+            description => 'Need to provide a name, complains if not present',
+            options => [
+               'db',
+               {
+                  getopt => 'name|n=s',
+                  help   => 'name of key to update',
+               },
+               {
+                  getopt => 'value|v=s',
+                  help   => 'value to set for the key',
+               }
+            ],
+            execute => sub ($self) {
+               my $name = $self->config('name') // die "no name provided\n";
+               my $dbpath = $self->config('db') // die "no db provided\n";
+               my $data = load_json($dbpath);
+               die "entry for <$name> does not exists\n"
+                  unless exists($data->{$name});
+               $data->{$name} = $self->config('value') // '';
+               save_json($dbpath, $data);
+               return 0;
+            },
+         },
+         {
+            aliases => [qw< delete >],
+            help    => 'delete name or names (based on regex)',
+            description => 'Need to provide name or name regular expression',
+            options => [
+               'db',
+               {
+                  getopt => 'name|n=s',
+                  help   => 'name of key to delete',
+               },
+               {
+                  getopt => 'name-rx|r=s',
+                  help   => 'regular expression for name(s) to delete',
+               },
+            ],
+            execute => sub ($self) {
+               my $dbpath = $self->config('db') // die "no db provided\n";
+               my $data = load_json($dbpath);
+               
+               if (defined(my $name = $self->config('name'))) {
+                  delete($data->{$name});
+               }
+               elsif (defined(my $rx = $self->config('name-rx'))) {
+                  for my $name (keys($data->%*)) {
+                     delete($data->{$name}) if $name =~ m{$rx};
+                  }
+               }
+               else {
+                  die "no clue what should be deleted\n";
+               }
+
+               save_json($dbpath, $data);
+               return 0;
+            },
+         },
+         {
+            aliases => [qw< list >],
+            help    => 'list names of available name/value pairs',
+            description => '',
+            options => [ 'db' ],
+            execute => sub ($self) {
+               my $dbpath = $self->config('db') // die "no db provided\n";
+               my $data = load_json($dbpath);
+               say {*STDOUT} $_ for sort { $a cmp $b } keys($data->%*);
+               exit 0;
+            },
+         },
+      ],
+   };
+
+   sub load_json ($path) {
+      open my $fh, '<:raw', $path;
+      local $/;
+      return JSON::PP::decode_json(<$fh>);
+   }
+
+   sub save_json ($path, $data) {
+      state $encoder = JSON::PP->new->ascii->canonical->pretty;
+      open my $fh, '>:raw', $path;
+      print {$fh} $encoder->encode($data);
+   }
+
+   exit(run($app, $0, @ARGV) // 0);
+
+=head3 Where's the inheritance?
+
+The are very little changes with respect to the previous iteration, so
+let's look at them in more detail:
+
+   my $app = {
+      ...
+      options => [
+         {
+            ...
+            # Set the option as "inheritable" by children
+            transmit    => 1,
+         }
+      ],
+      children => [
+         {
+            ...
+            options => [
+               'db',  # <-- inherit option definition from parent
+               ...
+
+
+There are two halves to options definition inheritance: the parent marks
+an option as available for inheritance setting a true value for key
+C<transmit>, and the child gets it by putting its name in the list of
+options (as opposed to a full hash-based definition).
+
+
+=head3 Why C<transmit>? Because C<+parent>.
+
+You might be wondering why setting options explicitly as C<transmit>
+instead of providing them all and let the child command decide. This has
+to do with dealing with inheritance of I<many> options all at a time.
+
+If a child's C<options> array has this:
+
+
+         {
+            ...
+            options => [
+               '+parent',
+               ...
+
+it will inherit I<all> options that are marked as C<transmit> in the
+parent.
+
+Inheritance might also be more fine-tuned by means of regular
+expressions in the child. Suppose that your program supports a list of
+options for connecting to a HTTP server and another list of options for
+connecting to a database:
+
+   # in the root command
+   ...
+   options => [
+      { getopt => 'http_url=s',  transmit => 1 },
+      { getopt => 'http_user=s', transmit => 1 },
+      { getopt => 'http_pass=s', transmit => 1 },
+
+      { getopt => 'db_url=s',  transmit => 1 },
+      { getopt => 'db_user=s', transmit => 1 },
+      { getopt => 'db_pass=s', transmit => 1 },
+   ]
+
+You might then want to provide sub-commands that focus on the HTTP or
+the database portions only, like e.g. a sub-command to check whether
+connectivity is available. In this case, it would be great to just
+inherit the relevant options from the parent, instead of all of them, in
+order to avoid cluttering the C<help>/C<usage> commands with options
+that make no sense:
+
+   # children of the root command
+   children => [
+      {
+         aliases => [ qw< check-db-connectivity > ],
+         options => [ '(?mxs: \A db_ )' ]
+         ...
+      },
+      {
+         aliases => [ qw< check-http-connectivity > ],
+         options => [ '(?mxs: \A http_ )' ]
+         ...
+      },
+      ...
+
+=head2 Pass 3: C<commit> options along the way
+
+Sometimes it can be hard to pre-determine a default value for an option
+because its value might depend on multiple other values.
+
+In a single command this is rarely a problem, because the specific
+computation for the default value might be done at the beginning of the
+C<execute> callback.
+
+What if the value must be set in the root or an intermediate command
+instead? As we saw, C<execute> is only called for the I<leaf> command,
+not for other ones along the way. This is where C<commit> comes handy,
+together with method C<inject_configs>.
+
+Let's take an example program that supports an option C<seed> and a
+sub-command to print it (which also inherits the option):
+
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      help    => 'An example',
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      options => [
+         {
+            getopt => 'seed|randmo-seed=s',
+            help   => 'a random seed for no reason!',
+            transmit => 1,
+         }
+      ],
+      commit => sub ($self) {
+         return if defined($self->config('seed'));
+         my $seed = join '-',
+            grep { defined }
+            @ENV{qw< THIS THAT AND_ALSO_THAT >};
+         $seed = rand(1234) unless length($seed // '');
+         $self->inject_configs({ seed => $seed });
+         warn "WARNING: parent set seed<$seed>\n";
+         return;
+      },
+      children => [
+         {
+            aliases => [qw< seeker >],
+            help    => 'some add-on to look at the seed!',
+            description => '',
+            options => [ '+parent' ],
+            execute => sub ($self) {
+               my $seed = $self->config('seed') // '**undef**';
+               say "seed is $seed";
+               return 0;
+            },
+         },
+      ],
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+The new key C<commit> in the parent command sets a callback that is
+called immediately after the options gathering process for the specific
+level (in this case, the parent command).
+
+If option C<seed> is not set, a custom logic assembles it or falls back
+to a random number. This is just a toy example to represent a custom
+logic that is difficult to express as a single default value directly
+inside the option's definition.
+
+Example runs (assuming the program is called C<seeder>):
+
+   # parents sets the custom default, which is used in the child
+   $ seeder seeker
+   WARNING: parent set seed<1024.55957658367>
+   seed is 1024.55957658367
+
+   # set option in the parent, no custom default is set (no WARNING line)
+   $ seeder --seed abc seeker
+   seed is abc
+
+   # parent sets custom default, but option is set in the child too and
+   # the parent's default is ignored
+   $ seeder seeker --seed def
+   WARNING: parent set seed<909.487976275958>
+   seed is def
+
+=head2 Pass 4: C<final_commit>
+
+The C<commit> mechanism is useful for setting values along the way, but
+sometimes we might need to perform some common actions just before a
+command is executed (at whatever level).
+
+As an example, suppose that your program uses a custom logger like
+L<Log::Log4perl::Tiny> and that you want to provide a command-line
+option to set the log level. We might leverage C<commit> to set the log
+level after options have been collected, like in the following example:
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+   use Log::Log4perl::Tiny qw< :easy LOGLEVEL >;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      help    => 'An example',
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      options => [
+         {
+            getopt => 'loglevel|l=s',
+            help   => 'logging level for Log::Log4perl::Tiny',
+            default => 'info',
+         },
+      ],
+      commit => sub ($self) {
+         LOGLEVEL(uc($self->config('loglevel')));
+         return;
+      },
+      children => [
+         {
+            aliases => [qw< seeker >],
+            help    => 'some add-on to look at the seed!',
+            description => '',
+            options => [ '+parent' ],
+            execute => sub ($self) {
+               WARN 'this is WARN';
+               INFO 'this is INFO';
+               DEBUG 'this is DEBUG';
+               return 0;
+            },
+         },
+      ],
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+The first example runs seem promising:
+
+   $ logger-example seeker
+   [2024/09/07 16:34:49] [ WARN] this is WARN
+   [2024/09/07 16:34:49] [ INFO] this is INFO
+
+   $ logger-example --loglevel debug seeker
+   [2024/09/07 16:36:15] [ WARN] this is WARN
+   [2024/09/07 16:36:15] [ INFO] this is INFO
+   [2024/09/07 16:36:15] [DEBUG] this is DEBUG
+
+   $ logger-example --loglevel warn seeker
+   [2024/09/07 16:36:20] [ WARN] this is WARN
+
+This program, though, suffers from the problem we addressed earlier in
+L<Pass 2|/Pass 2: Inherited options>, i.e. we can
+only set the option in the parent command.
+
+Well, we might set C<transmit> and then inherit it, but it would I<not>
+work:
+
+   # WARNING: THIS DOES NOT WORK AS INTENDED (YET)
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+   use Log::Log4perl::Tiny qw< :easy LOGLEVEL >;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      help    => 'An example',
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      options => [
+         {
+            getopt => 'loglevel|l=s',
+            help   => 'logging level for Log::Log4perl::Tiny',
+            default => 'info',
+
+            # TRANSMIT OPTION, BUT IT WILL NOT WORK OUT OF THE BOX!
+            transmit => 1,
+         },
+      ],
+      commit => sub ($self) {
+         LOGLEVEL(uc($self->config('loglevel')));
+         return;
+      },
+      children => [
+         {
+            aliases => [qw< seeker >],
+            help    => 'some add-on to look at the seed!',
+            description => '',
+            options => [ '+parent' ],
+            execute => sub ($self) {
+               WARN 'this is WARN';
+               INFO 'this is INFO';
+               DEBUG 'this is DEBUG';
+               return 0;
+            },
+         },
+      ],
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+Example run after this change:
+
+   $ logger-example seeker --loglevel warn
+   [2024/09/07 16:34:49] [ WARN] this is WARN
+   [2024/09/07 16:34:49] [ INFO] this is INFO
+
+What's happening?
+
+The C<commit> callback set in the parent is run immediately after
+options collections is completed I<in the parent>. At this stage, the
+program has not seen the option's value in the child yet. As a result,
+it uses whatever it has at that stage, i.e. the default C<info> value.
+
+To address this specific issue, C<final_commit> comes to the rescue. In
+the default arrangement, I<all> C<final_commit> callbacks are called in
+reverse order from the chosen leaf command up to the command root,
+immediately after the leaf command has completed collecting options.
+Let's try it out:
+
+   # THIS PROGRAM DOES NOT WORK AS INTENDED TOO (YET)
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+   use Log::Log4perl::Tiny qw< :easy LOGLEVEL >;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      help    => 'An example',
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      options => [
+         {
+            getopt => 'loglevel|l=s',
+            help   => 'logging level for Log::Log4perl::Tiny',
+            default => 'info',
+            transmit => 1,
+         },
+      ],
+
+      ##################################################################
+      # WE USE final_commit TO SET THE LOGLEVEL
+      final_commit => sub ($self) {
+         LOGLEVEL(uc($self->config('loglevel')));
+         return;
+      },
+
+      children => [
+         {
+            aliases => [qw< seeker >],
+            help    => 'some add-on to look at the seed!',
+            description => '',
+            options => [ '+parent' ],
+            execute => sub ($self) {
+               WARN 'this is WARN';
+               INFO 'this is INFO';
+               DEBUG 'this is DEBUG';
+               return 0;
+            },
+         },
+      ],
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+Alas, this does not work yet! Example run after this change:
+
+   $ logger-example seeker --loglevel warn
+   [2024/09/07 16:34:49] [ WARN] this is WARN
+   [2024/09/07 16:34:49] [ INFO] this is INFO
+
+What is happening now?
+
+Each command level in L<App::Easer> is tracked as an object instance by
+itself, representing the specific root/intermediate/leaf command. For
+this reason, methods called on the specific object provide a I<view>
+from that object's perspective.
+
+The C<final_commit> is set inside the root command, so when we call the
+C<config> method it only looks at the options collected in the root
+command. Which means... no C<loglevel> value set in the selected leaf
+command.
+
+For this reason, method C<leaf> allows getting the final I<leaf> command
+object that resulted from the search done by L<App::Easer>. Calling it
+is meaningful only inside C<final_commit>, but it's exactly where we
+need it:
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+   use Log::Log4perl::Tiny qw< :easy LOGLEVEL >;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      help    => 'An example',
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      options => [
+         {
+            getopt => 'loglevel|l=s',
+            help   => 'logging level for Log::Log4perl::Tiny',
+            default => 'info',
+            transmit => 1,
+         },
+      ],
+      final_commit => sub ($self) {
+
+         ###############################################################
+         # We get the config from $self->leaf insted of $self
+         LOGLEVEL(uc($self->leaf->config('loglevel')));
+
+         return;
+      },
+      children => [
+         {
+            aliases => [qw< seeker >],
+            help    => 'some add-on to look at the seed!',
+            description => '',
+            options => [ '+parent' ],
+            execute => sub ($self) {
+               WARN 'this is WARN';
+               INFO 'this is INFO';
+               DEBUG 'this is DEBUG';
+               return 0;
+            },
+         },
+      ],
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+We're there at last:
+
+   $ logger-example seeker --loglevel warn
+   [2024/09/07 16:34:49] [ WARN] this is WARN
+
+   $ logger-example seeker --loglevel debug
+   [2024/09/07 16:36:15] [ WARN] this is WARN
+   [2024/09/07 16:36:15] [ INFO] this is INFO
+   [2024/09/07 16:36:15] [DEBUG] this is DEBUG
+
+=head2 Pass 5: Custom source
+
+As anticipated, sometimes we might want to load additional configuration
+options from a I<custom source>. Let's see how to do it.
+
+=head3 Setting a custom callback
+
+Up to now, we used the stock configuration for C<sources> that come with
+version C<2.008>, but we can set our own. Consider the following
+I<starting> example (it will need some tweaking as we will see):
+
+   # THIS WORKS BUT CAN BE ENHANCED!
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+   use Mojo::UserAgent;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      help    => 'An example',
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      options => [
+         {
+            getopt => 'foo=s',
+            help   => 'an example command-line option',
+            transmit => 1,
+         },
+         {
+            getopt => 'bar=s',
+            help   => 'another example command-line option, with env',
+            environment => 'BAR',
+            transmit => 1,
+         },
+         {
+            help        => 'URL for additional configurations',
+            environment => 'CONFIG_URL',
+            default     => 'https://dummyjson.com/c/12ec-1af6-4270-8dc3',
+         },
+      ],
+      sources => {
+         current => [ qw< +CmdLine +Environment +Default +ParentSlices >, \&get_from_url ],
+         #next    => [ qw< +CmdLine +Environment +Default +ParentSlices >],
+         final   => [],
+      },
+      children => [
+         {
+            aliases => [qw< seeker >],
+            help    => 'some add-on to look at the seed!',
+            description => '',
+            options => [ '+parent' ],
+            execute => sub ($self) {
+               say App::Easer::V2::dd(config => $self->config_hash);
+               return 0;
+            },
+         },
+      ],
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+   sub get_from_url ($cmd, $opts, $args) {
+      my $url = $cmd->config('config_url');
+      warn "getting stuff from $url...\n";
+      my $ua = Mojo::UserAgent->new;
+      return $ua->get($url)->result->json;
+   }
+
+This example command loads additional configuration from a URL that
+serves a JSON file (I hope the default value continues to work for some
+time, but you get the idea anyway). Option C<config_url> holds this URL,
+and it can only be set from the environment variable C<CONFIG_URL>
+(which, by the way, also gives the option its name as a lowercase
+representation) or from the default value.
+
+Key C<sources> is set like this:
+
+   sources => {
+      current => [ qw< +CmdLine +Environment +Default +ParentSlices >,
+         \&get_from_url ],
+   },
+
+The string sources are the default ones: command-line, then environment,
+then defaults, then parent. The usual stuff.
+
+The final source, though, is a reference to a sub that, when called,
+provides back the desired configuration, getting it dynamically from the
+URL:
+
+   sub get_from_url ($cmd, $opts, $args) {
+      my $url = $cmd->config('config_url');
+      warn "getting stuff from $url...\n";
+      my $ua = Mojo::UserAgent->new;
+      return $ua->get($url)->result->json;
+   }
+
+This I<custom source> must adhere to the above signature, i.e.
+receiving:
+
+=over
+
+=item *
+
+a reference to the command object (it's the one invoking the source);
+
+=item *
+
+a reference to an array of options for the source. In this case we just
+provided the source as a I<bare> sub reference, so this is an empty
+array;
+
+=item *
+
+a reference to the array of command-line arguments that have not been
+processed so far.
+
+=back
+
+Let's run the sub-command:
+
+   $ remote-config-example --bar whatever seeker --foo BARBARBAR
+   getting stuff from https://dummyjson.com/c/12ec-1af6-4270-8dc3...
+   getting stuff from https://dummyjson.com/c/12ec-1af6-4270-8dc3...
+   $VAR1 = {
+     'config' => {
+        'bar' => 'whatever',
+        'baz' => 'galook',
+        'config_url' => 'https://dummyjson.com/c/12ec-1af6-4270-8dc3',
+        'foo' => 'BARBARBAR'
+     }
+   };
+
+It's working, although I<a bit too much>. As you can see, the source
+callback is invoked I<twice>, i.e. once in the parent and once in the
+child command. Most probably this is I<not> what we want.
+
+Why is that? By default, children get the same C<sources> as the parent
+(unless, of course, specific I<sources> are set in the child itself).
+This means that our custom source is set in both commands and it is
+invoked twice.
+
+To cope with this problem, we might work this around in the callback,
+avoiding the double download if we detect that we're not in the root
+command:
+
+   sub get_from_url ($cmd, $opts, $args) {
+
+      #################################################################
+      # don't do anything if we're not the root command!
+      return unless $cmd->is_root;
+
+      my $url = $cmd->config('config_url');
+      warn "getting stuff from $url...\n";
+      my $ua = Mojo::UserAgent->new;
+      return $ua->get($url)->result->json;
+   }
+
+There's a cleaner way, as we will see shortly.
+
+=head3 Setting C<sources> for children
+
+To cope with these situation in which I<one is enough>, the C<2.008>
+hash-based interface for C<sources> supports setting a C<next> key too,
+providing the C<sources> to be set for each child that has not its own
+yet. Let's see how to set it:
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+   use Mojo::UserAgent;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      help    => 'An example',
+      config_hash_key => 'v2.008',
+      options => [
+         {
+            getopt => 'foo=s',
+            help   => 'an example command-line option',
+            transmit => 1,
+         },
+         {
+            getopt => 'bar=s',
+            help   => 'another example command-line option, with env',
+            environment => 'BAR',
+            transmit => 1,
+         },
+         {
+            help        => 'URL for additional configurations',
+            environment => 'CONFIG_URL',
+            default     => 'https://dummyjson.com/c/12ec-1af6-4270-8dc3',
+         },
+      ],
+      sources => {
+         current => [ qw< +CmdLine +Environment +Default +ParentSlices >,
+            \&get_from_url ],
+
+         #################################################################
+         # (default) sources for the children
+         next => [ qw< +CmdLine +Environment +Default +ParentSlices >],
+
+      },
+      children => [
+         {
+            aliases => [qw< seeker >],
+            help    => 'some add-on to look at the seed!',
+            description => '',
+            options => [ '+parent' ],
+            execute => sub ($self) {
+               say App::Easer::V2::dd(config => $self->config_hash);
+               return 0;
+            },
+         },
+      ],
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+   sub get_from_url ($cmd, $opts, $args) {
+      my $url = $cmd->config('config_url');
+      warn "getting stuff from $url...\n";
+      my $ua = Mojo::UserAgent->new;
+      return $ua->get($url)->result->json;
+   }
+
+It usage is easy: whatever is put, it's also used as the default
+list of C<sources> in the children. In this way we can get rid of the
+custom source as soon as we exit from the parent command:
+
+   # Now "getting stuff from https://..." is invoked only once
+   $ remote-config-example --bar whatever seeker --foo BARBARBAR
+   getting stuff from https://dummyjson.com/c/12ec-1af6-4270-8dc3...
+   $VAR1 = {
+     'config' => {
+        'bar' => 'whatever',
+        'baz' => 'galook',
+        'config_url' => 'https://dummyjson.com/c/12ec-1af6-4270-8dc3',
+        'foo' => 'BARBARBAR'
+     }
+   };
+
+=head2 Pass 6: C<final> in C<sources>
+
+As we saw before in L<< Pass 4|/Pass 4: C<final_commit> >>, there are
+times where we need to go down the line up to the collection of all
+options in order to figure out possible additional actions (in that
+case, it was setting the right logging level).
+
+What if we need this for custom sources too? In the previous section
+example, we astutely get our configuration URL from the environment, but
+what if we want to support it as a command-line option and moreover we
+want also to propagate (via I<inheritance>) that option in children?
+
+In this case, our previous setup would I<not> work. Whatever we set as
+C<current> in the root command will be run when the root command is
+analyzed, which happens before the child command.
+
+There are a couple of solutions here. One is to leverage C<final_commit>
+as in L<< Pass 4|/Pass 4: C<final_commit> >>, i.e. moving the code for
+dynamic loading of the URL inside C<final_commit> and use
+C<inject_config> (like in L<< Pass 3|/Pass 3: C<commit> options along
+the way >>) to add the newly downloaded configurations.
+
+There is a cleaner approach, though, which consists in using key
+C<final> inside the C<sources> hash, like in the following example:
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+   use Mojo::UserAgent;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      help    => 'An example',
+      config_hash_key => 'v2.008',
+      options => [
+         {
+            getopt => 'foo=s',
+            help   => 'an example command-line option',
+            transmit => 1,
+         },
+         {
+            getopt => 'bar=s',
+            help   => 'another example command-line option, with env',
+            environment => 'BAR',
+            transmit => 1,
+         },
+         {
+            ###############################################################
+            # Option is promoted to the command-line and made available to
+            # children too
+            getopt      => 'config_url=s',
+            transmit    => 1,
+            # try https://dummyjson.com/c/b318-383e-43df-acd6 from cmd line
+
+            help        => 'URL for additional configurations',
+            environment => 'CONFIG_URL',
+            default     => 'https://dummyjson.com/c/12ec-1af6-4270-8dc3',
+         },
+      ],
+      sources => {
+
+         ##################################################################
+         # current is restored to its original, default setting for v2.008
+         current => [ qw< +CmdLine +Environment +Default +ParentSlices > ],
+
+         ##################################################################
+         # the custom source is moved into final
+         final   => [ \&get_from_url ],
+      },
+      children => [
+         {
+            aliases => [qw< seeker >],
+            help    => 'some add-on to look at the seed!',
+            description => '',
+            options => [ '+parent' ],
+            execute => sub ($self) {
+               say App::Easer::V2::dd(config => $self->config_hash);
+               return 0;
+            },
+         },
+      ],
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+   sub get_from_url ($cmd, $opts, $args) {
+      my $url = $cmd->config('config_url');
+      warn "getting stuff from $url...\n";
+      my $ua = Mojo::UserAgent->new;
+      return $ua->get($url)->result->json;
+   }
+
+Sample calls;
+
+   # set config_url in the root command
+   $ remote-example \
+      --config_url https://dummyjson.com/c/b318-383e-43df-acd6 --bar whatever \
+      seeker --foo BARBARBAR
+   getting stuff from https://dummyjson.com/c/b318-383e-43df-acd6...
+   $VAR1 = {
+     'config' => {
+       'bar' => 'whatever',
+       'baz' => 'Galook for the win!',
+       'config_url' => 'https://dummyjson.com/c/b318-383e-43df-acd6',
+       'foo' => 'BARBARBAR'
+     }
+   };
+   
+   # ditto, remove "--bar" from command line. Only the "new" remote JSON
+   # config has key "bar" set to the displayed value, so we know it's it
+   $ remote-example --config_url https://dummyjson.com/c/b318-383e-43df-acd6 \
+      seeker --foo BARBARBAR
+   getting stuff from https://dummyjson.com/c/b318-383e-43df-acd6...
+   $VAR1 = {
+     'config' => {
+       'bar' => 'whateeeeever!',
+       'baz' => 'Galook for the win!',
+       'config_url' => 'https://dummyjson.com/c/b318-383e-43df-acd6',
+       'foo' => 'BARBARBAR'
+     }
+   };
+   
+   # set config_url in the child command. Again, that value for "bar" comes
+   # from the JSON provided on the command line
+   $ remote-example \
+      seeker \
+         --foo BARBARBAR \
+         --config_url https://dummyjson.com/c/b318-383e-43df-acd6
+   getting stuff from https://dummyjson.com/c/b318-383e-43df-acd6...
+   $VAR1 = {
+     'config' => {
+       'bar' => 'whateeeeever!',
+       'baz' => 'Galook for the win!',
+       'config_url' => 'https://dummyjson.com/c/b318-383e-43df-acd6',
+       'foo' => 'BARBARBAR'
+     }
+   };
+
+
+=head2 Pass 7: Getting intermediates to work
+
+So far in these tutorial passes we assumed that root/intermediate
+commands are only a way to structure our tree, while the real execution
+is performed by the leaves of our commands tree. This is basically why
+you get the C<help>/C<usage>/C<commands>/C<tree> sub-commands out of the
+box for gree for all non-leaf commands, as well as a default to the
+C<usage> sub-command in case no sub-command is provided on the command
+line.
+
+Well, you might beg to differ.
+
+The first step is, of course, defining an C<execute> callback for
+actually I<doing> something when we determine that the non-leaf command
+should be run. And yet this is not enough, as the default is to call
+C<usage> in case no sub-command can be found.
+
+=head2 Setting a C<default_child> different fro C<usage>
+
+It turns out this behaviour is not hardcoded, but the effect of the
+default on the C<default_child> key in the applications' definition. As
+an example:
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      children => [
+         {
+            aliases => [qw< foo >],
+            execute => sub ($self) {
+               say 'foo here!';
+               return 0;
+            },
+         },
+         {
+            aliases => [qw< bar >],
+            execute => sub ($self) {
+               say 'bar here!';
+               return 0;
+            },
+         },
+      ],
+
+      #####################################################################
+      # this sets what's done *by* the root command
+      execute => sub ($self) {
+         say 'MAIN (root) here!';
+         return 0;
+      },
+
+      #####################################################################
+      # this makes the command itself the default command to call when
+      # nothing more is provided on the command line. The default value
+      # is 'usage'.
+      default_child => '-self',
+
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+Sample calls:
+
+   $ root-exec foo
+   foo here!
+
+   $ root-exec bar
+   bar here!
+
+   $ root-exec
+   MAIN (root) here!
+
+
+=head3 You might also want to set C<fallback_to>...
+
+While the example in the previous section works, it's still a bit
+fragile, because it makes the upper command able to run with regular
+options but not with non-option command-line arguments (i.e. those that
+end up populating C<residual_args>):
+
+   $ root-exec galook
+   cannot find sub-command 'galook'
+
+This happens because L<App::Easer> defaults to looking for a child
+command and complains under the assumption that the user I<might> have
+mistyped a sub-command's name.
+
+Again, this is not hardcoded but the effect of a configuration option,
+namely C<fallback_to>. By setting it to C<-self> you can ask for using
+the command itself as the fallback in case no sub-command can be found:
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      children => [
+         {
+            aliases => [qw< foo >],
+            execute => sub ($self) {
+               say 'foo here!';
+               return 0;
+            },
+         },
+         {
+            aliases => [qw< bar >],
+            execute => sub ($self) {
+               say 'bar here!';
+               return 0;
+            },
+         },
+      ],
+      execute => sub ($self) {
+         my @args = $self->residual_args;
+         say "MAIN (root) here! Also got (@args)";
+         return 0;
+      },
+      default_child => '-self',
+
+      #####################################################################
+      # this sets the MAIN command as the default command to run if no
+      # child is found when additional residual-args are provided on the
+      # command line
+      fallback_to   => '-self',
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+This works now:
+
+   $ root-exec-with-fallback galook burp
+   MAIN (root) here! Also got (galook burp)
+
+It's also possible to set C<fallback_to> to string C<-default> to just
+replicate whatever is set for C<default_child> (should you ever change
+your mind and want the two mirror each other).
+
+If you need more flexibility, take a look at key C<fallback> in the main
+documentation.
+
+
+=head3 Why was this executed?
+
+L<App::Easer> does its best to figure out which command/sub-command
+should be executed. As we saw in the previous sub-sections, it might
+have different reasons for running a specific command, be it because
+it's the default or a fallback. If you need it, you can call
+C<execution_reason> to figure out why, receiving back a string among
+C<-leaf>, C<-default>, or C<-fallback>.
+
+
+=head2 Pass 8: C<aliases> and C<call_name>
+
+Each command in L<App::Easer> supports a C<name> to set the command's
+name. Many times, though, it's useful to also support I<aliases> for a
+command, e.g. if you want your users to call sub-command C<list> with a
+shorter version C<ls>.
+
+Key C<aliases> in the command's specification allows setting these
+aliases. As a matter of fact, you might just set it and forget about
+C<name>, which will be set to the first alias in case. You decide what's
+best for you:
+
+   my $app1 = {
+      name => 'foo',
+      aliases => [qw< bar baz >],
+      ...
+   };
+
+   my $same_as_app1 = {
+      aliases => [qw< foo bar baz >],
+      ...
+   };
+
+Sometimes you might want to provide different behaviours for different
+aliases, but the underlying implementation is basically the same
+(including e.g. command-line options) and you don't want to fire up two
+different sub-commands. In this case, you can call method C<call_name>
+on the command provided in the callback to figure out how the
+sub-command was actually invoked.
+
+Example:
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      children => [
+         {
+            aliases => [qw< foo bar >],
+            execute => sub ($self) {
+               my $name = $self->call_name;
+               say "$name here!";
+               return 0;
+            },
+         },
+      ],
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+Sample calls:
+
+   $ check-name foo
+   foo here!
+
+   $ check-name bar
+   bar here!
+
+   # let's double check that it does not syphon up everything!
+   $ check-name baz
+   cannot find sub-command 'baz'
+
+The C<call_name> method also works at the top level, allowing to create
+top-level (root) commands that have their own behaviour (see previous
+Pass) as well as the possibility to change it depending on how they were
+called. The only caveat in this case is that you will get the I<full
+path> to the executable (or a link to it), so you might want to account
+for it:
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      children => [
+         {
+            aliases => [qw< foo bar >],
+            execute => sub ($self) {
+               my $name = $self->call_name;
+               say "$name here!";
+               return 0;
+            },
+         },
+      ],
+      execute => sub ($self) {
+         my $path = $self->call_name;
+         my $name = $path =~ s{\A.*/}{}rmxs;
+         my @args = $self->residual_args;
+         say "$name (root) here! Also got (@args)";
+         return 0;
+      },
+      default_child => '-self',
+      fallback_to   => '-self',
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+
+Let's see it in action:
+
+   # let's first create some aliases for our toy example
+   $ ln -s example-command main-x 
+   $ ln -s example-command main-y
+
+   $ main-x galook
+   main-x (root) here! Also got (galook)
+
+   $ main-y burp
+   main-y (root) here! Also got (burp)
+
+
+=head2 Pass 9: More about help
+
+L<App::Easer> comes with a pre-defined help system that makes it
+possible to set a short and a long help description, while leaving to
+L<App:Easer> the burden to document all options and possibly expose
+available sub-commands. There are some defaults and assumptions that you
+might want to change, though.
+
+=head3 Invoking the help
+
+The basic assumption in L<App::Easer> is that intermediate commands
+(i.e. commands with children) also get three more sub-commands for free,
+namely C<usage>, C<help>, C<commands>, and C<tree>. I'd argue that
+C<usage> and C<help> are the most interesting of the lot.
+
+This means that your interface might expose a I<slight> inconsistency in
+how help is obtained. Assuming our application has the main entry point
+with child C<foo>, which in turn has a child C<bar>, we would get the
+following out of the box:
+
+   $ main-executable
+   # prints out the usage for main-executable
+
+   $ main-executable help
+   # prints out the help for main-executable, i.e. the same as usage but
+   # with the Description section included
+
+   $ main-executable help foo
+   # prints out the help for sub-command foo
+
+   $ main-executable foo help
+   # same as above
+
+   $ main-executable foo help bar
+   # prints out the help for sub-sub-command bar
+
+You see? There is no C<main-executable foo bar help> like we have for
+upper-level commands, because we're assuming that leaf commands should
+just do their job.
+
+At this point, we might just accept this and move on. There are probably
+better things to do. Otherwise, read on.
+
+Assuming that the literal string C<help> cannot possibly be a
+non-command-line option argument, it's still possible to inject this
+behaviour easily in the C<execute> callback of the leaf command, like
+this:
+
+   # this is the execute in sub-sub-command bar
+   execute => sub ($self) {
+      my @args = $self->residual_args;
+
+      # look for standalone 'help' or 'usage' in residual arguments
+      return $self->run_help if @args == 1 && ($args[0] // '') eq 'help';
+      return $self->run_help('usage')
+         if @args == 1 && ($args[0] // '') eq 'usage';
+      ...
+   },
+
+On the other hand, if you need to accept any string as residual
+arguments for your program/sub-command, you might instead opt for
+supporting options like C<--help>/C<--usage> and use the same trick as
+above:
+
+   # this happens in sub-sub-command bar
+   options => [
+      { getopt => 'help' },
+      { getopt => 'usage' },
+      ...
+   ],
+   execute => sub ($self) {
+      return $self->run_help          if $self->config('help');
+      return $self->run_help('usage') if $self->config('usage');
+      ...
+   },
+
+At this point, you might introduce these two options in the root
+command, set their C<transmit> to a true value, and inherit it at every
+level below. This gives you options C<--help>/C<--usage> consistently at
+every level, at the cost of some code repetition at the beginning of
+each execution.
+
+If you're interested in help, there's more. You can get the help text by
+calling method C<full_help_text> (optionally passing C<usage> to get the
+I<shorter> version, i.e. without the I<Description> section).
+
+=head3 Documenting options
+
+L<App::Easer> does its best to generate documentation for options, based
+on their definition.
+
+You might want to tweak things, though, and this is where key
+C<options_help> comes to the rescue.
+
+If set to a string, it's used as the entire text for the options' help,
+no questions asked.
+
+If you find this a bit too I<extreme>, you can set it to a hash
+reference supporting two (optional) keys C<preamble> and C<postamble>,
+each pointing to a string value. In this case, the options' help is
+still generated automatically as in the default case, but the text in
+the C<preamble> is pre-pended and the text in the C<postable> is
+appended to this auto-generated string. This might e.g. come handy in
+case you also want to add documentation related to non-option
+command-line arguments, e.g. to indicate that they are files, urls,
+whatever.
+
+
+=head2 Pass 10: Shared Behaviour
+
+As your application grows, you will almost inevitably face the dilemma
+of where to put and how to handle I<shared behaviour>, i.e. all those
+activities that are common to most if not all sub-commands.
+
+It might be anything, like using a specific logging library, coping with
+the need to access a shared model object, etc.
+
+There are a few strategies that you can adopt, discussed below.
+
+=head3 Leverage the root command
+
+Each L<App::Easer> application has one single I<root command> and you
+can be sure that there will I<always> be an instance of that command's
+class.
+
+One strategy for storing common behaviour, then, would be to put it in
+the root command implementation and then use method C<root> to retrieve
+the command's object instance and consume the behaviour from there.
+
+The I<downside> of this approach is that you need to implement your main
+command as a I<class> instead of a hash definition like every example
+seen so far. So while definitely possible, you might not know (yet) how
+to do it.
+
+=head3 Use a common base via C<hashy_class>
+
+Although every command/sub-command definition seen in the example so far
+has been provided as a simple hash reference full of keys and callbacks,
+we've already seen that each command in a command chain is eventually
+instantiated as a class object.
+
+Each of these objects are normally instances of class
+C<App::Easer::V2::Command>, but they need not be. By setting key
+C<hashy_class> in the command's definition to a different class...
+that's what will be used eventually.
+
+This means that you might define a class derived from
+C<App::Easer::V2::Command> and add the shared behaviour there; each
+command will inherit it. This includes the root command too, of course.
+
+=head3 Use the configuration
+
+One of the main features of L<App::Easer> is about managing
+configuration options; they can be taken from the outside or generated
+dynamically and recorded in multiple ways (think about C<commit> and
+C<final_commit> for example).
+
+So one alternative is to encapsulate common behaviours in one or more
+object instances, then save them as configuration options that are set
+in the leaf configuration using method C<leaf> to retrieve it (e.g. from
+the root command) and method C<set_config> to set the object.
+
+=head4 Use shared state
+
+If your application is small(ish) and defined in a single hash as all
+eexamples so far, it's still possible to use global variables or lexical
+variables accessible from all callbacks, like this:
+
+   my $shared_object = My::Class->new(...);
+   my $app = {
+      ...
+      execute => sub ($self) {
+         $shared_object->do_this;
+         ...
+   };
+
+
+=head2 Pass 11: Class-based commands
+
+If your application is composed of a few commands, managing it through a
+single hash definition is handy and allows you to keep an overall
+control.
+
+As the application grows, your definition hash grows too and it can
+become too big for easy management. At this point, you might want to
+consider splitting the whole application and manage each (sub-)command
+on its own.
+
+L<App::Easer> allows transferring application features from the
+hash-based declaration to class methods, while not requiring a full
+transfer. Let's start from the fictional application in
+L<< Pass 7|/Pass 7: Getting intermediates to work >>, containing one
+root-level command and two sub-commands:
+
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+
+   use App::Easer::V2 qw< run >;
+
+   my $app = {
+      aliases => [qw< MAIN >],
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      children => [
+         {
+            aliases => [qw< foo >],
+            execute => sub ($self) {
+               say 'foo here!';
+               return 0;
+            },
+         },
+         {
+            aliases => [qw< bar >],
+            execute => sub ($self) {
+               say 'bar here!';
+               return 0;
+            },
+         },
+      ],
+      execute => sub ($self) {
+         my @args = $self->residual_args;
+         say "MAIN (root) here! Also got (@args)";
+         return 0;
+      },
+      default_child => '-self',
+
+      #####################################################################
+      # this sets the MAIN command as the default command to run if no
+      # child is found when additional residual-args are provided on the
+      # command line
+      fallback_to   => '-self',
+   };
+
+   exit(run($app, $0, @ARGV) // 0);
+
+
+The equivalent class-based implementation is based on 4 different parts,
+i.e. an entry point program and three classes. They can still be kept
+inside the same file, although you might want to split them into each
+own file:
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use warnings;
+   use English;
+   use experimental qw< signatures >;
+
+   exit(MyApp->new->run($0, @ARGV) // 0);
+
+   # class for the root command
+   package MyApp;
+   use App::Easer::V2 -command => -spec => {
+      aliases => [qw< MAIN >],
+      sources => 'v2.008',
+      config_hash_key => 'v2.008',
+      default_child => '-self',
+      fallback_to   => '-self',
+   };
+
+   sub execute ($self) {
+      my @args = $self->residual_args;
+      say "MAIN (root) here! Also got (@args)";
+      return 0;
+   };
+
+
+   package MyApp::CmdFoo;
+   use App::Easer::V2 -command => -spec => {
+      aliases => [qw< foo >],
+   };
+
+   sub execute ($self) {
+      say 'foo here!';
+      return 0;
+   };
+
+
+   package MyApp::CmdBar;
+   use App::Easer::V2 -command => -spec => {
+      aliases => [qw< bar >],
+   };
+
+   sub execute ($self) {
+      say 'bar here!';
+      return 0;
+   };
+
+This setup allows a seamless transition of features from the hash-based
+approach to the method-based one. As long as your application traits are
+plain data (like C<aliases>, C<help>, etc.) it's possible to treat them
+as such and keep them inside the hash provided as argument for C<use>;
+everything different can be treated through a method.
+
+As an example, you might want to keep help as POD in the file, and use
+some POD-handling code to get it. In this case you might want to move
+either C<help> or C<description> (or both) into their own methods.
+
+Sub-command classes must adhere to a naming convention; by default,
+their last-part name must start with string C<Cmd> but this can be set
+via key C<children_prefixes> (see the main reference documentation for
+the details). This allows having command and non-command classes inside
+the same directory (i.e. at the same package level) without
+intereference.
+
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2024 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+
+=cut
+
+
+

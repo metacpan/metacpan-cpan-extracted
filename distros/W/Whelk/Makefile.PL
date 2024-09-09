@@ -17,17 +17,18 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Whelk",
   "PREREQ_PM" => {
+    "Clone" => 0,
     "Kelp" => "2.16",
     "Kelp::Module::YAML" => "2.00",
     "List::Util" => "1.44",
     "Role::Tiny" => 0,
     "Text::Levenshtein" => 0,
-    "YAML::PP" => "0.034"
+    "YAML::PP" => "0.038"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "1.00",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,13 +36,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Clone" => 0,
   "Kelp" => "2.16",
   "Kelp::Module::YAML" => "2.00",
   "List::Util" => "1.44",
   "Role::Tiny" => 0,
   "Test::Exception" => 0,
   "Text::Levenshtein" => 0,
-  "YAML::PP" => "0.034"
+  "YAML::PP" => "0.038"
 );
 
 

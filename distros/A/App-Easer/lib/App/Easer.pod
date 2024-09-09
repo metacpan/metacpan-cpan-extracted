@@ -12,7 +12,7 @@ App::Easer - Simplify writing (hierarchical) CLI applications
 
 =head1 VERSION
 
-This document describes App::Easer version 2.006.
+This document describes App::Easer version 2.007004.
 
 =begin html
 

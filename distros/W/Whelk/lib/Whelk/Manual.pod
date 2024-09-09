@@ -259,16 +259,21 @@ A string or hash containing OpenAPI data, with the following keys:
 
 =item * path
 
-B<Mandatory>. A path under which OpenAPI endpoint will be mounted.
+A path under which OpenAPI endpoint will be mounted. If not passed, the
+endpoint will not be installed, but you will be able to get OpenAPI document
+data through L<Whelk::OpenAPI/generate>. This is useful if you would like to
+install your own endpoint which may use something like Swagger UI to visualize
+the document.
 
 =item * formatter
 
-Same as L</formatter>, but specialized for OpenAPI endpont only.
+Same as L</formatter>, but specialized for OpenAPI endpont only. Does nothing
+if C<path> was not passed.
 
 =item * class
 
 Class to be used to generate OpenAPI data. This is not prefixed with
-anything. C<Whelk::OpenAPI> by default.
+anything. L<Whelk::OpenAPI> by default.
 
 =item * info
 
@@ -279,7 +284,7 @@ include keys C<title> and C<version>.
 =item * extra
 
 Any extra keys to be added to the root of the OpenAPI document. They will not
-take precedence over other keys.
+take precedence over regular keys.
 
 =back
 

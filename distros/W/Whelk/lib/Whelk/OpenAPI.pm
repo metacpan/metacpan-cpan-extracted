@@ -1,5 +1,5 @@
 package Whelk::OpenAPI;
-$Whelk::OpenAPI::VERSION = '0.06';
+$Whelk::OpenAPI::VERSION = '1.00';
 use Kelp::Base;
 use List::Util qw(uniq);
 
