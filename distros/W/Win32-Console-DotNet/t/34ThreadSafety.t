@@ -10,6 +10,7 @@ use Test::Exception;
 use Devel::StrictMode;
 use threads;
 use threads::shared;
+use Scalar::Util qw( openhandle );
 
 BEGIN {
   use_ok 'Win32::Console::DotNet';
@@ -24,14 +25,18 @@ subtest 'OpenStandardXXXCanBeCalledConcurrently' => sub {
   plan tests => 3;
 
   Parallel: {
-    diag $msg;
+    note $msg;
     my @threads;
     for (1..NumberOfIterations) {
       push @threads, async {
         my $s = Console->OpenStandardInput();
-        return defined $s;
+        return openhandle $s;
       };
     }
+    # Several processes access or close at the same time. Surpress warnings:
+    # - Warning: unable to close filehandle %s properly: Bad file descriptor ...
+    # - Unbalanced saves: %d more saves than restores
+    no if Console->IsInputRedirected(), 'warnings', qw( io internal );
     my $defined = grep { $_->join() } @threads;
     is $defined, NumberOfIterations, "NotNull";
   }
@@ -42,9 +47,10 @@ subtest 'OpenStandardXXXCanBeCalledConcurrently' => sub {
     for (1..NumberOfIterations) {
       push @threads, async {
         my $s = Console->OpenStandardOutput();
-        return defined $s;
+        return openhandle $s;
       };
     }
+    no if Console->IsOutputRedirected(), 'warnings', qw( io internal );
     my $defined = grep { $_->join() } @threads;
     is $defined, NumberOfIterations, "NotNull";
   }
@@ -55,9 +61,10 @@ subtest 'OpenStandardXXXCanBeCalledConcurrently' => sub {
     for (1..NumberOfIterations) {
       push @threads, async {
         my $s = Console->OpenStandardError();
-        return defined $s;
+        return openhandle $s;
       };
     }
+    no if Console->IsErrorRedirected(), 'warnings', qw( io );
     my $defined = grep { $_->join() } @threads;
     is $defined, NumberOfIterations, "NotNull";
   }

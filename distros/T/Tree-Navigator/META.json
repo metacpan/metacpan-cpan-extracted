@@ -1,0 +1,125 @@
+{
+   "abstract" : "Generic navigation in various kinds of trees",
+   "author" : [
+      "Laurent Dami <dami AT cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tree-Navigator",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::GvaScript" : "0",
+            "DBI" : "0",
+            "DBIx::DataModel" : "0",
+            "Devel::StackTrace::AsHTML" : "0",
+            "Devel::StackTrace::WithLexicals" : "0",
+            "Devel::Symdump" : "0",
+            "HTTP::Date" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "MooseX::NonMoose" : "0",
+            "MooseX::Params::Validate" : "0",
+            "Params::Validate" : "0",
+            "Plack" : "1.0004",
+            "Plack::Component" : "0",
+            "Plack::MIME" : "0",
+            "Plack::Request" : "0",
+            "Plack::Util" : "0",
+            "Scalar::Util" : "0",
+            "Template" : "0",
+            "URI::Escape" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Tree::Navigator" : {
+         "file" : "lib/Tree/Navigator.pm",
+         "version" : "0.07"
+      },
+      "Tree::Navigator::App::PerlDebug" : {
+         "file" : "lib/Tree/Navigator/App/PerlDebug.pm"
+      },
+      "Tree::Navigator::Node" : {
+         "file" : "lib/Tree/Navigator/Node.pm"
+      },
+      "Tree::Navigator::Node::DBI" : {
+         "file" : "lib/Tree/Navigator/Node/DBI.pm"
+      },
+      "Tree::Navigator::Node::DBI::Column" : {
+         "file" : "lib/Tree/Navigator/Node/DBI.pm"
+      },
+      "Tree::Navigator::Node::DBI::Rows" : {
+         "file" : "lib/Tree/Navigator/Node/DBI.pm"
+      },
+      "Tree::Navigator::Node::DBI::Table" : {
+         "file" : "lib/Tree/Navigator/Node/DBI.pm"
+      },
+      "Tree::Navigator::Node::DBI::Tables" : {
+         "file" : "lib/Tree/Navigator/Node/DBI.pm"
+      },
+      "Tree::Navigator::Node::DBIDM" : {
+         "file" : "lib/Tree/Navigator/Node/DBIDM.pm"
+      },
+      "Tree::Navigator::Node::DBIDM::Table" : {
+         "file" : "lib/Tree/Navigator/Node/DBIDM.pm"
+      },
+      "Tree::Navigator::Node::DBIDM::Tables" : {
+         "file" : "lib/Tree/Navigator/Node/DBIDM.pm"
+      },
+      "Tree::Navigator::Node::Filesys" : {
+         "file" : "lib/Tree/Navigator/Node/Filesys.pm"
+      },
+      "Tree::Navigator::Node::Perl::Ref" : {
+         "file" : "lib/Tree/Navigator/Node/Perl/Ref.pm"
+      },
+      "Tree::Navigator::Node::Perl::StackTrace" : {
+         "file" : "lib/Tree/Navigator/Node/Perl/StackTrace.pm"
+      },
+      "Tree::Navigator::Node::Perl::StackTrace::Frame" : {
+         "file" : "lib/Tree/Navigator/Node/Perl/StackTrace.pm"
+      },
+      "Tree::Navigator::Node::Perl::Symdump" : {
+         "file" : "lib/Tree/Navigator/Node/Perl/Symdump.pm"
+      },
+      "Tree::Navigator::Node::Win32::Registry" : {
+         "file" : "lib/Tree/Navigator/Node/Win32/Registry.pm"
+      },
+      "Tree::Navigator::View" : {
+         "file" : "lib/Tree/Navigator/View.pm"
+      },
+      "Tree::Navigator::View::TT2" : {
+         "file" : "lib/Tree/Navigator/View/TT2.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/Tree-Navigator"
+      }
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

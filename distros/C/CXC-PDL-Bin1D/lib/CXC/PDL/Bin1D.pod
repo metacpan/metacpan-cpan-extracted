@@ -1,0 +1,725 @@
+# PODNAME: CXC::PDL::Bin1D
+# ABSTRACT: One Dimensional Binning Utilities
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory merchantability
+Adaptively ACM Bevington Commun Golub Higham Kahan LeVeque McGraw superset
+
+=head1 NAME
+
+CXC::PDL::Bin1D - One Dimensional Binning Utilities
+
+=head1 VERSION
+
+version 0.27
+
+=head1 SYNOPSIS
+
+  use PDL;
+  use CXC::PDL::Bin1D;
+
+=head1 DESCRIPTION
+
+One dimensional binning functions, 
+
+=over
+
+=item *
+
+binning up to a given S/N
+
+=item *
+
+optimized one-pass robust statistics
+
+=back
+
+All functions are made available in the B<CXC::PDL::Bin1D> namespace.
+
+=head1 INTERNALS
+
+=head1 SUBROUTINES
+
+=head2 bin_adaptive_snr
+
+=begin usage
+
+
+
+
+=end usage
+
+  %hash = bin_adaptive_snr( %options  );
+
+=begin ref
+
+
+
+
+=end ref
+
+Adaptively bin a data set to achieve a minimum signal to noise ratio
+in each bin.
+
+This routine ignores data with bad values or with errors that have
+bad values.
+
+B<bin_adaptive_snr> groups data into bins such that each bin meets
+one or more conditions:
+
+=over
+
+=item *
+
+a minimum signal to noise ratio (S/N).
+
+=item *
+
+A minimum number of data elements (optional).
+
+=item *
+
+A maximum number of data elements (optional).
+
+=item *
+
+A maximum data I<width> (see below) (optional).
+
+=item *
+
+A minimum data I<width> (see below) (optional).
+
+=back
+
+The data are typically dependent values (e.g. flux as a function of
+energy or counts as a function of radius).  The data should be sorted
+by the independent variable (e.g. energy or radius).
+
+Calculation of the S/N requires an estimate of the error associated
+with each datum.  The error may be provided or may be estimated from
+the population using either the number of data elements in a bin
+(e.g. Poisson errors) or the standard deviation of the signal in a bin.
+If errors are provided, they may be used to weight the population standard
+deviation or may be added in quadrature.
+
+Binning begins at the start of the signal vector.  Data are accumulated
+into a bin until one or more of the possible criteria is met. If the
+final bin does not meet the required criteria, it may optionally be
+successively folded into preceding bins until the final bin passes the
+criteria or there are no bins left.
+
+Each datum may be assigned an extra parameter, its I<width>,
+which is summed for each bin, and can be used as an additional constraint
+on bin membership.
+
+=head3 Parameters
+
+B<bin_adaptive_snr> is passed a hash or a reference to a hash containing
+its parameters.  The available parameters are:
+
+=over
+
+=item C<signal>
+
+A piddle containing the signal data.  This is required.
+
+=item C<error>
+
+A piddle with the error for signal datum. Optional.
+
+=item C<width>
+
+A piddle with the I<width> of each element of the signal. Optional.
+
+=item C<error_algo>
+
+A string indicating how the error is to be handled or calculated.  It
+may be have one of the following values:
+
+=over
+
+=item * C<poisson>
+
+Poisson errors will be calculated based upon the number of elements in a bin,
+
+  error**2 = N
+
+Any input errors are ignored.
+
+=item * C<sdev>
+
+The error is the population standard deviation of the signal in a bin.
+
+  error**2 = Sum [ ( signal - mean ) **2 ] / ( N - 1 )
+
+If errors are provided, they are used to calculated the weighted population
+standard deviation.
+
+  error**2 = ( Sum [ (signal/error)**2 ] / Sum [ 1/error**2 ] - mean**2 )
+             * N / ( N - 1 )
+
+=item * C<rss>
+
+Errors must be provided; the errors of elements in a bin are added in
+quadrature.
+
+=back
+
+=item C<min_snr>
+
+The minimum signal to noise ratio to be achieved in each bin.  Required.
+
+=item C<min_nelem>
+
+=item C<max_nelem>
+
+The minimum and/or maximum number of elements to be achieved in each bin. Optional
+
+=item C<min_width>
+
+=item C<max_width>
+
+The minimum and/or maximum width of the elements to be achieved in each bin. Optional.
+
+=item C<fold> I<boolean>
+
+If true, the last bin may be folded into the preceding bin in order to
+ensure that the last bin meets one or more of the criteria. It defaults to false.
+
+=back
+
+=head3 Results
+
+B<bin_adaptive_snr> returns a hashref with the following entries:
+
+=over
+
+=item C<index>
+
+A piddle containing the bin indices for the elements in the input
+data piddle.  Data which were skipped because of bad values will have
+their index set to the bad value.
+
+=item C<nbins>
+
+A piddle containing the number of bins which spanned the range of the
+input data.
+
+=item C<signal>
+
+A piddle containing the sum of the data values in each bin.  Only
+indices C<0> through C<nbins -1> are valid.
+
+=item C<nelem>
+
+A piddle containing the number of data elements in each bin. Only
+indices C<0> through C<nbins -1> are valid.
+
+=item C<error>
+
+A piddle containing the errors in each bin, calculated using the
+algorithm specified via C<error_algo>. Only indices C<0> through
+C<nbins -1> are valid.
+
+=item C<mean>
+
+A piddle containing the weighted mean of the signal in each bin. Only
+indices C<0> through C<nbins -1 > are valid.
+
+=item C<ifirst>
+
+A piddle containing the index into the input data piddle of the first
+data value in a bin. Only indices C<0> through C<nbins -1 > are valid.
+
+=item C<ilast>
+
+A piddle containing the index into the input data piddle of the last
+data value in a bin. Only indices C<0> through C<nbins -1 > are valid.
+
+=item C<rc>
+
+A piddle containing a results code for each output bin.  Only indices
+C<0> through C<nbins -1 > are valid.  The code is the bitwise "or" of
+the following constants (available in the C<CXC::PDL::Bin1D>
+namespace)
+
+=over
+
+=item BIN_RC_OK
+
+The bin met the minimum S/N, data element count and weight requirements
+
+=item BIN_RC_GEWMAX
+
+The bin weight was greater or equal to that requested.
+
+=item BIN_RC_GENMAX
+
+The number of data elements was greater or equal to that requested.
+
+=item BIN_RC_FOLDED
+
+The bin is the result of folding bins at the end of the bin vector to
+achieve a minimum S/N.
+
+=item BIN_RC_GTMINSN
+
+The bin accumulated more data elements than was necessary to meet the
+S/N requirements.  This results from constraints on the minimum number
+of data elements or bin weight.
+
+=back
+
+=back
+
+=head2 bin_on_index
+
+=begin usage
+
+
+
+
+=end usage
+
+  $hashref = bin_on_index( %pars  );
+
+=begin ref
+
+
+
+
+=end ref
+
+Calculate basic statistics on optionally weighted, binned data using a
+provided index.  The input data are assumed to be one-dimensional; extra
+dimensions are threaded over.
+
+This routine ignores data with bad values or with weights that have bad values.
+
+=head3 Description
+
+When generating statistics for multiple-component data binned on a
+common component, it's more efficient to calculate a bin index for the
+common component and then use it to generate statistics for each component.
+
+For example, if a time dependent stream of events is binned into time
+intervals, statistics of the events' properties (such as position or
+energy) must be evaluated on data binned on the intervals.
+
+Some statistics (such as the summed squared deviation from the mean)
+may be calculated in two passes over the data, but may suffer from
+numerical inaccuracies depending upon the magnitude of the
+intermediate values.
+
+C<bin_on_index> uses numerically stable algorithms to calculate
+various statistics on binned data in a single pass.  It uses an index
+piddle to assign data to bins and calculates basic statistics on the
+data in those bins.  Data may have associated weights, and the index
+piddle need not be sorted.  It by default ignores out-of-bounds data, but
+can be directed to operate on them.
+
+The statistics which are returned for each bin are:
+
+=over
+
+=item *
+
+The number of elements, I<N>
+
+=item *
+
+The (weighted) sum of the data,
+I<< Sum(x_i) >>,
+I<< Sum(w_i * x_i) >>.
+
+=item *
+
+The (weighted) mean of the data,
+I<< Sum(x_i) / N >>,
+I<< Sum(w_i * x_i) / Sum(w_i) >>
+
+=item *
+
+The sum of the weights, I<< Sum(w_i) >>
+
+=item *
+
+The sum of the square of the weights, I<< Sum(w_i^2) >>
+
+=item *
+
+The sum of the (weighted) squared deviation of the data from mean,
+ I<< Sum( (x_i-u)^2 ) >>,
+ I<< Sum( w_i(x_i-u)^2 ) >>.  These are I<not> normalized!.
+
+=item *
+
+The minimum and maximum data values
+
+=back
+
+The sum of the squared deviations are I<not> normalized, to allow the
+user to handle it according to their needs.
+
+For unweighted data, the typical normalization factor is I<N-1>,
+while for weighted data, the normalization factor varies depending
+upon whether the weights represent errors or quality weights.  In the
+former case, where I<< w_i = 1 / sigma^2 >>, the normalization factor
+is typically I<< N / (N - 1) / Sum(w_i) >>, while for the latter the
+normalization is typically I<< Sum(w_i) / ( Sum(w_i)^2 - Sum(w_i^2) ) >>.
+See L</[Robinson]> and L</[Bevington]>.
+
+The algorithms used are chosen for their numerical stability.  Sums
+are computed using Kahan summation and the mean and squared deviations are
+calculated with stable updating algorithms.  See L</[Chan83]>, L</[West79]>, L</[Higham]>.
+
+=head4 Threading
+
+The parameters L</data>, L</index>, L</weight>, L</imin>, L</imax>, and
+L</nbins> are threaded over.  This keeps things quite flexible, as one
+can specialize things for complex datasets or keep them simple by
+specifying the minimum information for a given parameter to have it
+remain constant over the threaded dimensions. (Note that C<data>
+must have the same shape or be a superset of the other parameters).
+
+Unless otherwise specified, the term I<extents> refers to those of the
+core (non-threaded) one-dimensional slices of the input and output
+piddles.
+
+For some parameters there is value in applying an algorithm to
+either the entire dataset (including threaded dimensions) or just
+the core one-dimensional data.  For example, the L</range>
+option can indicate that the in-bounds bins are defined by the range
+in each one-dimensional slice of L</index> or in L</index> as a whole.
+
+=head4 Minimum Bin Index, Number of Bins, Out-Of-Bounds Data
+
+By default, the minimum bin index and the number of bins are
+determined from the values in the L</index> piddle, treating it as if
+it were one-dimensional.  Statistics for data with the minimum index
+are stored in the results piddles at index I<0>.
+
+The caller may use the options L</imin>, L</imax>, and
+L</nbins>, and L</range> to change how the index range is mapped onto
+the results piddles, and whether the range should be specific to each
+one-dimensional slice of L</index>. If none of these are specified,
+the default is equivalent to setting L</range> to C<flat,minmax>.
+To most efficiently store the statistics, set L</range> to C<slice,minmax>.
+
+Data with indices outside of the range C<[$imin, $imin + $nbins - 1]>
+are treated as I<out-of-bounds> data, and by default are ignored.  If the
+user wishes to accumulate statistics on these data, the L</oob> option
+may be used to indicate where in the results piddles the statistics
+should be stored.
+
+=head3 Parameters
+
+B<bin_on_index> is passed a hash or a reference to a hash containing
+its parameters.  The possible parameters are:
+
+=over
+
+=item C<data> I<piddle>
+
+The data.
+I<Required>
+
+=item C<index> I<piddle>
+
+The bin index. It should be of type C<indx>, but will be converted to that if not.
+It must be thread compatible with L</data>.
+I<Required>
+
+=item C<weight> I<piddle>
+
+Data weight.
+It must be thread compatible with L</data>.
+I<Optional>
+
+=item C<nbins>  I<integer> | I<piddle>
+
+The number of bins.
+It must be thread compatible with L</data>.
+
+If C<nbins> is set and neither of C<imin> or C<imax> are set, C<imin> is set to C<0>.
+
+Use L</range> for more control over automatic determination of the range.
+
+=item C<imin> I<integer> | I<piddle>
+
+The index value associated with the first in-bounds index in the
+result piddle.
+It must be thread compatible with L</data>.
+
+If C<imin> is set and neither of C<nbins> or C<imax> are set, C<imax> is set to C<< $index->max >>.
+
+Use L</range> for more control over automatic determination of the range.
+
+=item C<imax> I<integer> | I<piddle>
+
+The index value associated with the last in-bounds index in the
+result piddle. It must be thread compatible with L</data>.
+
+If C<imax> is set and neither of C<nbins> or C<imin> are set, C<imin> is set to C<< 0 >>.
+
+Use L</range> for more control over automatic determination of the range.
+
+=item C<range> I<"spec,spec,...">
+
+Determine the in-bounds range of indices from L</index>.  The value is
+a string containing a list of comma separated specifications.
+
+The first element must be one of the following values:
+
+=over
+
+=item C<flat>
+
+Treat L</index> as one-dimensional, and determine a single range which
+covers it.
+
+=item C<slice>
+
+Determine a separate range for each one-dimensional slice of L</index>.
+
+=back
+
+It may optionally be followed by one of the following
+
+=over
+
+=item C<minmax>
+
+Determine the full range (i.e. both minimum and maximum) from
+L</index>.  This is the default.  Do not specify L</nbins>,
+L</imax>, or L</imin>.
+
+=item C<min>
+
+Determine the minimum of the range from L</index>.  Specify only one of L</nbins>
+or L</imax>.
+
+=item C<max>
+
+Determine the maximum of the range from L</index>.  Specify only one of L</nbins>
+or L</imin>.
+
+=back
+
+=item C<oob>
+
+An index is out-of-bounds if it is not within the range
+
+  [ $imin, $imin + $nbins )
+
+By default, it will be ignored.
+
+This option specifies where in the results piddles the out-of-bound
+data statistics should be stored.  It may be one of:
+
+=over
+
+=item C<start-end>
+
+The extent of the results piddle is increased by two, and out-of-bound
+statistics are written as follows:
+
+  $index - $imin < 0          ==> $result->at(0)
+  $index - $imin >= $nbins    ==> $result->at(-1)
+
+=item C<start-nbins>
+
+The extent of the results piddle is increased by two, and out-of-bound
+statistics are written as follows:
+
+  $index - $imin < 0          ==> $result->at(0)
+  $index - $imin >= $nbins    ==> $result->at($nbins)
+
+This differs from C<start-end> if C<$nbins> is different for each
+one-dimensional slice.
+
+=item C<end>
+
+The extent of the results piddle is increased by two, and out-of-bound
+statistics are written as follows:
+
+  $index - $imin < 0          ==> $result->at(-2)
+  $index - $imin >=  $nbins   ==> $result->at(-1)
+
+=item C<nbins>
+
+The extent of the results piddle is increased by two, and out-of-bound
+statistics are written as follows:
+
+  $index - $imin < 0          ==> $result->at($nbins-1)
+  $index - $imin >=  $nbins   ==> $result->at($nbins)
+
+This differs from C<end> if C<$nbins> is different for each
+one-dimensional slice.
+
+=item I<boolean>
+
+If false (the default) out-of-bounds data are ignored.  If true, it is
+equivalent to specifying L</start-end>
+
+=back
+
+=item C<want_sum_weight> I<boolean> I<[false]>
+
+if true, the sum of the bins' weights are calculated.
+
+=item C<want_sum_weight2> I<boolean> I<[false]>
+
+if true, the sum of square of the bins' weights are calculated.
+
+=back
+
+=head3 Results
+
+B<bin_on_index> returns a reference which may be used either a hash
+or object reference.
+
+The keys (or methods) and their values are as follows:
+
+=over
+
+=item C<data>
+
+A piddle containing the (possibly weighted) sum of the data in each bin.
+
+=item C<count>
+
+A piddle containing the number of data elements in each bin.
+
+=item C<weight>
+
+A piddle containing the sum of the weights in each bin (only if
+L</weight> was provided and L</want_sum_weight> specified).
+
+=item C<weight2>
+
+A piddle containing the sum of the square of the weights in each bin
+(only if L</weight> was provided and L</want_sum_weight2> specified).
+
+=item C<mean>
+
+A piddle containing the (possibly weighted) mean of the data in each bin.
+
+=item C<dmin>
+
+=item C<dmax>
+
+Piddles containing the minimum and maximum values of the data in each bin.
+
+=item C<imin>
+
+=item C<nbins>
+
+The index value associated with the first in-bounds index
+in the statistics piddles, and the number of in-bounds bins.
+
+=back
+
+=head3 References
+
+=over
+
+=item [Chan83]
+
+Chan, Tony F., Golub, Gene H., and LeVeque, Randall J., Algorithms for
+Computing the Sample Variance: Analysis and Recommendations, The
+American Statistician, August 1983, Vol. 37, No.3, p 242.
+
+=item [West79]
+
+D. H. D. West. 1979. Updating mean and variance estimates: an improved
+method. Commun. ACM 22, 9 (September 1979), 532-535.
+
+=item [Higham]
+
+Higham, N. (1996). Accuracy and stability of numerical
+algorithms. Philadelphia: Society for Industrial and Applied
+Mathematics.
+
+=item [Robinson]
+
+Robinson, E.L., Data Analysis for Scientists and Engineers, 2016,
+Princeton University Press. ISBN 978-0-691-16992-7.
+
+=item [Bevington]
+
+Bevington, P.R., Robinson, D.K., Data Reduction and Error Analysis for
+the Physical Sciences, Second Edition, 1992, McGraw-Hill, ISBN
+0-07-91243-9.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+=head1 AUTHOR
+
+Diab Jerius, E<lt>djerius@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2008 Smithsonian Astrophysical Observatory
+
+CXC::PDL::Bin1D is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-cxc-pdl-bin1d@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-PDL-Bin1D>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/cxc-pdl-bin1d
+
+and may be cloned from
+
+  https://gitlab.com/djerius/cxc-pdl-bin1d.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<CXC::PDL::Bin1D.pd|CXC::PDL::Bin1D.pd>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

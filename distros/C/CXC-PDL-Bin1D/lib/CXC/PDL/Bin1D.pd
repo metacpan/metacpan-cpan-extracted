@@ -1,0 +1,447 @@
+#!perl
+
+# --8<--8<--8<--8<--
+#
+# Copyright (C) 2014 Smithsonian Astrophysical Observatory
+#
+# This file is part of CXC::PDL::Bin1D
+#
+# CXC::PDL::Bin1D is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# -->8-->8-->8-->8--
+
+use v5.10;
+
+use strict;
+use warnings;
+use version;
+
+use IO::File;
+use File::Spec::Functions qw[ catfile ];
+
+use lib 'lib';
+
+use CXC::PDL::Bin1D::Utils '_bitflags';
+use PDL::Bad;
+
+use File::Basename qw[ fileparse ];
+
+# this file is executed directly by Perl, so $0 will be our filename,
+# which allows us to find the parent directory.
+use constant LIBDIR => ( fileparse( $0 ) )[1];
+
+use PDL::Types qw[ typefld ];
+
+
+# later versions of PDL define index types:
+#  'PDL_Indx' (as a C typedef) and 'indx' for signatures
+# for backwards compatibility, support long as well as the others
+
+my ( $IndexParsType, $IndexCType ) = do {
+
+    my $type = eval { typefld( 'PDL_IND', 'ctype' ); 1 } ? 'PDL_IND' : 'PDL_L';
+
+    map { typefld( $type, $_ ) } qw( ppforcetype ctype );
+};
+
+our $VERSION = '0.27';
+pp_setversion( $VERSION );
+
+{
+    package CXC::PDL::Bin1D;
+
+    use Text::Template::LocalVars;
+    use File::Spec::Functions qw[ catfile ];
+
+    use Exporter 'import';
+    ## no critic (Modules::ProhibitAutomaticExportation)
+    our @EXPORT = qw< fill_in fill_in_string >;
+
+    # this code must be compiled in the template variable package
+    sub init_fill_package {
+
+        Text::Template::LocalVars->new(
+            type       => 'string',
+            delimiters => [qw( <% %>  )],
+            source     => <<'EOS',
+             *fill_in             = \&<% $PACKAGE %>::fill_in;
+             *fill_in_string      = \&<% $PACKAGE %>::fill_in_string;
+EOS
+        )->fill_in( hash => { PACKAGE => __PACKAGE__ } );
+
+    }
+
+    # fill in templates using Text::Template::LocalVars.  This routine
+    # is also imported into all of the template fragments.
+    sub fill_in {
+
+        my ( $type, $src ) = ( shift, shift );
+
+        $src = catfile( ::LIBDIR, $src )
+          if lc $type eq 'file' && $src !~ m{^[./]}s;
+
+        my $tpl = Text::Template::LocalVars->new(
+            type       => $type,
+            source     => $src,
+            delimiters => [qw( <% %>  )],
+            broken     => sub { my %args = @_; die $args{error}; },
+            prepend    => init_fill_package(),
+        );
+
+        die $Text::Template::ERROR unless defined $tpl;
+
+        # by default, localize the variable packages, and insert the last one
+        # in the call chain if not explicitly specified.
+        my %args = ( localize => 1, trackpkgvars => 1, @_ );
+
+        my $hash = $args{hash} ||= {};
+        $hash->{PDL_Indx} = $IndexCType;
+
+        my $txt;
+        eval {
+            $txt = $tpl->fill_in( %args );
+            die unless defined $txt;
+            1;
+        }
+          or die defined $Text::Template::LocalVars::ERROR
+          ? $Text::Template::LocalVars::ERROR
+          : $@;
+
+        return $txt;
+    }
+
+    sub fill_in_string {
+
+        unshift @_, 'string';
+        goto \&fill_in;
+
+    }
+
+}
+
+CXC::PDL::Bin1D->import;
+
+
+my %CONSTANTS = (
+    BIN_ARG => {
+        _bitflags( qw[
+              BIN_ARG_HAVE_ERROR
+              BIN_ARG_HAVE_WEIGHT
+              BIN_ARG_SET_BAD
+              BIN_ARG_FOLD
+              BIN_ARG_HAVE_WIDTH
+              BIN_ARG_ERROR_SDEV
+              BIN_ARG_ERROR_POISSON
+              BIN_ARG_ERROR_RSS
+              BIN_ARG_HAVE_SIGNAL
+              BIN_ARG_SAVE_OOB_START_END
+              BIN_ARG_SAVE_OOB_START_NBINS
+              BIN_ARG_SAVE_OOB_END
+              BIN_ARG_SAVE_OOB_NBINS
+              BIN_ARG_WANT_EXTREMA
+              BIN_ARG_WANT_SUM_WEIGHT
+              BIN_ARG_WANT_SUM_WEIGHT2
+            ],
+        ),
+    },
+    BIN_RC => {
+        _bitflags( qw[
+              BIN_RC_OK
+              BIN_RC_GEWMAX
+              BIN_RC_GENMAX
+              BIN_RC_FOLDED
+              BIN_RC_GTMINSN
+            ],
+        ),
+
+    },
+);
+
+{
+    $CONSTANTS{BIN_ARG}{BIN_ARG_SAVE_OOB} = 0;
+    $CONSTANTS{BIN_ARG}{BIN_ARG_SAVE_OOB} |= $CONSTANTS{BIN_ARG}{$_}
+      for grep { /BIN_ARG_SAVE_OOB/ } keys %{ $CONSTANTS{BIN_ARG} };
+
+    $CONSTANTS{BIN_ARG}{BIN_ARG_SHIFT_IMIN} = $CONSTANTS{BIN_ARG}{BIN_ARG_SAVE_OOB_START_END}
+      | $CONSTANTS{BIN_ARG}{BIN_ARG_SAVE_OOB_START_NBINS};
+}
+
+
+# convert hash into [key => value] tuples, sorted by group, then value in group
+## no critic (BuiltinFunctions::ProhibitComplexMappings)
+my @CONSTANTS = map {
+    my $h = $_;
+    map { [ $_, $h->{$_} ] } sort { $h->{$a} <=> $h->{$b} } keys %$h;
+} values %CONSTANTS;
+
+my @CONSTANT_NAMES = ( map { keys %$_ } values %CONSTANTS );
+my @EXPORT_OK;
+
+sub slurp {
+    my $file = catfile( LIBDIR, shift );
+    local $/ = undef;
+    ( IO::File->new( $file, 'r' ) or die( "can't slurp $file" ) )->getline;
+}
+
+
+pp_core_importList( '()' );
+
+pp_bless( 'CXC::PDL::Bin1D' );
+
+pp_addpm( { At => 'Top' }, <<'EOD' );
+use v5.10;
+use strict;
+use warnings;
+no namespace::clean;
+use CXC::PDL::Bin1D::Utils;
+use namespace::clean;
+
+EOD
+
+if ( version->parse( $PDL::VERSION ) < version->parse( '2.030' ) ) {
+    pp_addpm( { At => 'Top' }, <<'EOD' );
+our @EXPORT_OK;
+our %EXPORT_TAGS;
+EOD
+}
+
+pp_addpm(
+    { At => 'Top' },
+    join( "\n", 'use constant {', ( map { "$_->[0] => $_->[1]," } @CONSTANTS ), '};', q{} ),
+);
+
+pp_addpm(
+    { At => 'Top' },
+    join( "\n", '=for Pod::Coverage', ( map { "$_->[0]" } @CONSTANTS ), q{}, '=cut', q{} ),
+);
+
+pp_addpm( { At => 'Top' }, <<'EOD' );
+my %MapErrorAlgo = (
+
+    sdev    => BIN_ARG_ERROR_SDEV,
+    rss     => BIN_ARG_ERROR_RSS,
+    poisson => BIN_ARG_ERROR_POISSON,
+);
+EOD
+
+pp_addpm( { At => 'Top' }, <<'EOD' );
+=for Pod::Coverage
+set_boundscheck
+set_debugging
+
+=for stopwords
+merchantability
+
+=cut
+
+=head1 NAME
+
+CXC::PDL::Bin1D - one dimensional binning functions
+
+=head1 SYNOPSIS
+
+  use PDL;
+  use CXC::PDL::Bin1D;
+
+=head1 DESCRIPTION
+
+One dimensional binning functions, 
+
+=over
+
+=item *
+
+binning up to a given S/N
+
+=item *
+
+optimized one-pass robust statistics
+
+=back
+
+All functions are made available in the B<CXC::PDL::Bin1D> namespace.
+
+=head1 SUBROUTINES
+
+=cut
+EOD
+
+pp_addhdr(
+    join( "\n",
+        '#include <float.h>',
+        '#include <limits.h>',
+        map { "#define $_->[0] $_->[1]" } @CONSTANTS )
+      . "\n",
+);
+
+
+push @EXPORT_OK, 'bin_adaptive_snr';
+pp_def(
+    'bin_adaptive_snr',
+    Pars => join(
+        q{;},
+        'signal(n)',                      # piddle containing signal to bin
+        'error(n)',                       # error piddle if flags && HAVE_ERROR or HAVE_ERROR2
+        'width(n)',                       # optional width for each signal datum
+        "$IndexParsType [o] index(n)",    # output index
+        "$IndexParsType [o] nbins()",
+        "$IndexParsType [o] nelem(n)",
+        'double [o] b_signal(n)',
+        'double [o] b_error(n)',
+        'double [o] b_mean(n)',
+        'double [o] b_snr(n)',
+        'double [o] b_width(nwidth)',
+        "$IndexParsType [o] ifirst(n)",
+        "$IndexParsType [o] ilast(n)",
+        'int [o] rc(n)',
+        'double [t] b_error2(nrss)',
+        'double [t] b_signal2(nsdev)',
+        'double [t] b_m2(nsdev)',
+        'double [t] b_weight(nweight)',    # use only for SDEV (with or without errors) & RSS
+        'double [t] b_weight_sig(nwsdev)',
+        'double [t] b_weight_sig2(nwsdev)',
+    ),
+    RedoDimsCode => fill_in_string(
+        <<'EOS'
+    PDL_Indx  n = $PDL(signal)->dims[0];
+    $SIZE(nrss)   = $COMP(optflags) & BIN_ARG_ERROR_RSS  ? n : 0 ;
+    $SIZE(nwidth) = $COMP(optflags) & BIN_ARG_HAVE_WIDTH ? n : 0 ;
+    $SIZE(nsdev)  = $COMP(optflags) & BIN_ARG_ERROR_SDEV ? n : 0 ;
+    $SIZE(nwsdev) = $COMP(optflags) & (BIN_ARG_ERROR_SDEV | BIN_ARG_HAVE_ERROR )
+                                      == (BIN_ARG_ERROR_SDEV | BIN_ARG_HAVE_ERROR ) ? n : 0 ;
+    $SIZE(nweight) = $COMP(optflags) & (BIN_ARG_ERROR_SDEV | BIN_ARG_ERROR_RSS) ? n : 0 ;
+EOS
+    ),
+    OtherPars => fill_in_string(
+        join(
+            q{;},
+            'unsigned long optflags'
+            ,    # can't call it flags; clashes with PDL internals
+            'double min_snr',
+            'PDL_Indx min_nelem',
+            'PDL_Indx max_nelem',
+            'double min_width',
+            'double max_width',
+        ),
+    ),
+    Code => fill_in(
+        file    => 'bin_adaptive_snr.c',
+        package => 'bin_adaptive_snr',
+    ),
+    HandleBad => 1,
+    BadCode   => fill_in(
+        file    => 'bin_adaptive_snr.c',
+        package => 'bin_adaptive_snr_bad',
+        hash    => { PDL_BAD_CODE => 1 },
+    ),
+    PMCode => slurp( 'bin_adaptive_snr.pl' ),
+    PMFunc => q{},
+    Doc    => undef,
+);
+
+push @EXPORT_OK, 'bin_on_index';
+pp_def(
+    'bin_on_index',
+    Pars => join(
+        q{;},
+
+        # inputs
+        'data(n)',                     # piddle containing data to bin
+        "$IndexParsType index(n)",     # input index
+        'weight(n)',                   # populated if flags && HAVE_WEIGHT
+        "$IndexParsType imin(nt)",     # minimum index value to consider
+        "$IndexParsType nbins(nt)",    # number of bins
+
+        # outputs
+        "$IndexParsType [o] b_count(nb)",    # number of data values
+        'double [o] b_data(nb)',             # sum of the data
+        'double [o] b_weight(nb)',
+        'double [o] b_weight2(nb)',
+        'double [o] b_mean(nb)',
+        'double [o] b_dmin(nb)',
+        'double [o] b_dmax(nb)',
+        'double [o] b_dev2(nb)',
+
+        # temporaries
+        'double [t] b_data_error(nb)',
+        'double [t] b_weight_error(nb)',
+        'double [t] b_weight2_error(nb)',
+    ),
+    OtherPars => fill_in_string(
+        join(
+            q{;},
+            'unsigned long optflags',    # can't call it flags; clashes with PDL internals
+            'PDL_Indx nbins_max',        #  maximum number of bins
+        ),
+    ),
+    RedoDimsCode =>
+      q/ $SIZE(nb)   = $COMP(nbins_max) + ($COMP(optflags) & BIN_ARG_SAVE_OOB ? 2 : 0 ); /,
+    Code => fill_in(
+        file    => 'bin_on_index.c',
+        package => 'bin_on_index',
+    ),
+    HandleBad => 1,
+    BadCode   => fill_in(
+        file    => 'bin_on_index.c',
+        package => 'bin_on_index_bad',
+        hash    => { PDL_BAD_CODE => 1 },
+    ),
+    PMCode => slurp( 'bin_on_index.pl' ),
+    PMFunc => q{},
+    Doc    => undef,
+);
+
+
+
+pp_addpm( { At => 'Bot' }, <<'EOD' );
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+=head1 AUTHOR
+
+Diab Jerius, E<lt>djerius@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2008 Smithsonian Astrophysical Observatory
+
+CXC::PDL::Bin1D is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut
+EOD
+
+
+pp_export_nothing();
+
+pp_addpm( { At => 'Top' },
+    qq[\$EXPORT_TAGS{constants} = [ qw(\n@{[ join "\n", @CONSTANT_NAMES  ]}\n)];\n] );
+pp_addpm( { At => 'Top' }, qq[\$EXPORT_TAGS{Func} = [ qw(\n@{[ join "\n", @EXPORT_OK  ]}\n)];\n] );
+pp_addpm( { At => 'Top' }, q[@EXPORT_OK = map { @{$_} } values %EXPORT_TAGS] . ";\n" );
+
+pp_done();
+
+1;

@@ -1,4 +1,5 @@
 package Tree::Navigator::Node::Win32::Registry;
+use utf8;
 use Moose;
 use namespace::autoclean;
 extends 'Tree::Navigator::Node';
@@ -106,6 +107,7 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=encoding utf8
 
 =head1 NAME
 

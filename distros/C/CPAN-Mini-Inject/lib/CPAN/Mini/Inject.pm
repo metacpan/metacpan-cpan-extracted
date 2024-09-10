@@ -1,9 +1,10 @@
+use v5.16; # from dependencies, so go for it.
 package CPAN::Mini::Inject;
 
 use strict;
 use warnings;
 
-use CPAN::Checksums 2.13 qw( updatedir );
+use CPAN::Checksums 2.13;
 use CPAN::Mini;
 use CPAN::Mini::Inject::Config;
 use Carp;
@@ -12,8 +13,47 @@ use File::Basename;
 use File::Copy;
 use File::Path qw( make_path );
 use File::Spec;
+use File::Spec::Functions;
 use LWP::Simple;
 use Dist::Metadata ();
+
+BEGIN {
+  use version 0.9915;
+  use CPAN::Meta::Converter;
+
+  # This is here because the CPAN::Meta package has not been updated
+  # since 2016 and it's unlikely that they'd accept a patch for this.
+  # see https://github.com/briandfoy/cpan-mini-inject/issues/11
+  # and https://github.com/Perl-Toolchain-Gang/CPAN-Meta#138
+  package CPAN::Meta::Converter;
+
+  no warnings qw(redefine);
+
+  # lifted from CPAN::Meta::Converter
+  # https://fastapi.metacpan.org/source/DAGOLDEN/CPAN-Meta-2.150010/lib/CPAN/Meta/Converter.pm
+  sub _clean_version {
+    my ($element) = @_;
+    return 0 if ! defined $element;
+
+    $element =~ s{^\s*}{};
+    $element =~ s{\s*$}{};
+    $element =~ s{^\.}{0.};
+
+    return 0 if ! length $element;
+    return 0 if ( $element eq 'undef' || $element eq '<undef>' );
+    my $v = eval { version->parse($element) };
+    # XXX check defined $v and not just $v because version objects leak memory
+    # in boolean context -- dagolden, 2012-02-03
+    if ( defined $v ) {
+    return _is_qv($v) ? $v->stringify : $element;
+    }
+    else {
+    return 0;
+    }
+  }
+}
+
+=encoding utf8
 
 =head1 NAME
 
@@ -21,7 +61,7 @@ CPAN::Mini::Inject - Inject modules into a CPAN::Mini mirror.
 
 =cut
 
-our $VERSION = '1.003';
+our $VERSION = '1.005';
 our @ISA     = qw( CPAN::Mini );
 
 =head1 SYNOPSIS
@@ -34,10 +74,12 @@ probably want to look at the L<mcpani> command instead.
     $mcpi=CPAN::Mini::Inject->new;
     $mcpi->parsecfg('t/.mcpani/config');
 
-    $mcpi->add( module   => 'CPAN::Mini::Inject',
-                authorid => 'SSORICHE',
-                version  => ' 0.01',
-                file     => 'mymodules/CPAN-Mini-Inject-0.01.tar.gz' )
+    $mcpi->add(
+      module   => 'CPAN::Mini::Inject',
+    authorid => 'SSORICHE',
+    version  => ' 0.01',
+    file     => 'mymodules/CPAN-Mini-Inject-0.01.tar.gz'
+  );
 
     $mcpi->writelist;
     $mcpi->update_mirror;
@@ -78,43 +120,57 @@ Create a new CPAN::Mini::Inject object.
 =cut
 
 sub new {
-  return bless
-   { config_class => 'CPAN::Mini::Inject::Config' },
-   $_[0];
+  my( $class, %args ) = @_;
+  my %defaults = (
+    config_class => $class->default_config_class,
+  );
+  my %allowed = map {
+    $_, 1
+  } qw(config_class);
+
+  my %filtered =
+    map { ($_, $args{$_}) }
+    grep { exists $allowed{$_} }
+    keys %args;
+
+
+  my %obj = ( %defaults, %filtered );
+  return bless \%obj, $class;
 }
 
 =item C<< config_class( [CLASS] ) >>
 
-Returns the name of the class handling the configuration.
-
-With an argument, it sets the name of the class to handle
-the config. To use that, you'll have to call it before you
-load the configuration.
+Returns the name of the class used to handle the configuration. Also
+see C<default_config_class>.
 
 =cut
 
 sub config_class {
   my $self = shift;
-
   if ( @_ ) { $self->{config_class} = shift }
-
   $self->{config_class};
 }
 
-=item C<< config >>
+=item C<< config( [HASHREF] ) >>
 
-Returns the configuration object. This object should be from
-the class returned by C<config_class> unless you've done something
-weird.
+With a hashref argument, sets the config data.
+
+Returns the current configuration hash.
 
 =cut
 
 sub config {
   my $self = shift;
-
   if ( @_ ) { $self->{config} = shift }
-
   $self->{config};
+}
+
+=item C<< default_config_class >>
+
+=cut
+
+sub default_config_class {
+  'CPAN::Mini::Inject::Config'
 }
 
 =item C<< loadcfg( [FILENAME] ) >>
@@ -157,8 +213,9 @@ sub parsecfg {
 
 =item C<< site( [SITE] ) >>
 
-Returns the CPAN site that CPAN::Mini::Inject chose from the
-list specified in the C<remote> directive.
+With an argument, set the site to use to contact CPAN. Returns the
+site setting, or, if the site has not be set (or was set to undef),
+returns the empty string.
 
 =cut
 
@@ -168,14 +225,15 @@ sub site {
 
   if ( @_ ) { $self->{site} = shift }
 
-  $self->{site} || '';
+  $self->{site} // '';
 }
 
 =item C<testremote>
 
-Test each site listed in the remote parameter of the config file by performing
-a get on each site in order for authors/01mailrc.txt.gz. The first site to
-respond successfully is set as the instance variable site.
+Test each site listed in the remote parameter of the config file by
+performing a get on each site in order for authors/01mailrc.txt.gz.
+The first site to respond successfully is set as the instance variable
+site.
 
  print "$mcpi->{site}\n"; # ftp://ftp.cpan.org/pub/CPAN
 
@@ -242,48 +300,53 @@ sub update_mirror {
 
 =item C<add>
 
-Add a new module to the repository. The add method copies the module
-file into the repository with the same structure as a CPAN site. For
-example CPAN-Mini-Inject-0.01.tar.gz is copied to
-MYCPAN/authors/id/S/SS/SSORICHE. add creates the required directory
-structure below the repository.
+Add a new distribution to the repository. The C<add> method copies the
+distribution file into the repository with the same structure as a
+CPAN site. For example, F<CPAN-Mini-Inject-0.01.tar.gz> with author
+C<SSORICHE> is copied to F<MYCPAN/authors/id/S/SS/SSORICHE>. add
+creates the required directory structure below the repository.
 
 Packages found in the distribution will be added to the module list
-(for example both C<CPAN::Mini::Inject> and C<CPAN::Mini::Inject::Config>
-will be added to the F<modules/02packages.details.txt.gz> file).
+(for example both C<CPAN::Mini::Inject> and
+C<CPAN::Mini::Inject::Config> will be added to the
+F<modules/02packages.details.txt.gz> file).
 
-Packages will be looked for in the C<provides> key of the META file if present,
-otherwise the files in the dist will be searched.
-See L<Dist::Metadata> for more information.
+Packages will be looked for in the C<provides> key of the META file if
+present, otherwise the files in the dist will be searched. See
+L<Dist::Metadata> for more information.
 
 =over 4
 
 =item * module
 
-The name of the module to add.
-The distribution file will be searched for modules
-but you can specify the main one explicitly.
+(optional) The package name of the module to add. The distribution
+file will be searched for modules but you can specify the main one
+explicitly.
 
 =item * authorid
 
-CPAN author id. This does not have to be a real author id.
+(required) The CPAN ID of the module's author. Since this isn't
+actually CPAN, the ID does not need to exist on CPAN. Typically, this
+ID uses C<[A-Z]> and is three to ten letters. This is not enforced,
+but other CPAN tools may not like other sorts of names.
 
 =item * version
 
-The modules version number.
-Module names and versions will be determined,
-but you can specify one explicitly.
+(optional) The module's version number. If you don't specify this.
+C<add> will try to extract it from the distribution.
 
 =item * file
 
-The tar.gz of the module.
+(required) The path to the distribution file.
 
 =back
 
-  add( module => 'Module::Name',
-       authorid => 'AUTHOR',
-       version => 0.01,
-       file => './Module-Name-0.01.tar.gz' );
+  $mcpani->add(
+    module   => 'Module::Name',
+  authorid => 'SOMEAUTHOR',
+  version  => 0.01,
+  file     => './Module-Name-0.01.tar.gz'
+  );
 
 =cut
 
@@ -306,10 +369,10 @@ sub add {
 
   # attempt to guess module and version
   my $distmeta = Dist::Metadata->new( file => $options{file} );
-  my $packages = $distmeta->package_versions;
 
-  # include passed in module and version (prefer discovered version)
-  if ( $options{module} ) {
+  my $packages = $distmeta->package_versions;
+  # include passed in module and version (prefer the declared version)
+  if ( $options{module} and $options{version} ) {
     $packages->{ $options{module} } ||= $options{version};
   }
 
@@ -443,11 +506,11 @@ sub inject {
   }
 
   for my $dir ( keys( %updatedir ) ) {
-    my $root    = $self->config->get( 'local' ) . "/authors/id";
-    my $authdir = "$root/$dir";
+    my $root    = catfile( $self->config->get( 'local' ), qw(authors id) );
+    my $authdir = catfile( $root, $dir );
 
-    updatedir( $authdir, $root );
-    $self->_updperms( "$authdir/CHECKSUMS" );
+    CPAN::Checksums::updatedir( $authdir, $root );
+    $self->_updperms( catfile($authdir, 'CHECKSUMS') );
   }
 
   $self->updpackages;
@@ -501,10 +564,7 @@ sub updauthors {
   AUTHOR:
   for my $modline ( @{ $self->{modulelist} } ) {
     my ( $module, $version, $file ) = split( /\s+/, $modline );
-
-    # extract the author from the path
-    my @dirs = File::Spec->splitdir( $file );
-    my $author = $dirs[2];
+    my $author = (File::Spec->splitdir( $file ))[2];
 
     next AUTHOR if defined $author_ids_in_repo{$author};
     next AUTHOR if defined $authors_added{$author};
@@ -750,7 +810,7 @@ Thanks to Jozef Kutej <jozef@kutej.net> for numerous patches.
 
 Report issues to the GitHub queue at
 
-	https://github.com/briandfoy/cpan-mini-inject/issues
+  https://github.com/briandfoy/cpan-mini-inject/issues
 
 =head1 COPYRIGHT AND LICENSE
 

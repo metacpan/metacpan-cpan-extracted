@@ -81,6 +81,17 @@ package main;
 createapp;
 $delay = 1000;
 
+my @coltests1 = ();
+for (0 .. 9) {
+	push @coltests1, "-color1_$_", ['color', "Color1 $_"],
+}
+
+my @coltests2 = ();
+for (0 .. 9) {
+	push @coltests2, "-color2_$_", ['color', "Color2 $_"],
+}
+
+
 my %values = ();
 my $form;
 if (defined $app) {
@@ -152,6 +163,12 @@ if (defined $app) {
 			'*expand',
 			-set_ext2 => ['ext2', 'MyExternal',	-height => 8, -width => 40],
 			'*end',
+			'*page' => 'Colors',
+			'*section' => 'Color tests',
+			@coltests1,
+			'*column',
+			@coltests2,
+			'*end'
 		],
 	)->pack(-side => 'left', -expand => 1, -fill => 'both');
 	$form->createForm;
@@ -189,6 +206,15 @@ if (defined $app) {
 			}
 		},
 		-text => '>',
+	)->pack(-side => 'left', -padx => 2, -pady => 2);
+	$rbut = $bframe->Button(
+		-command => sub {
+			my %hash = $form->get;
+			for (keys %hash) {
+				print "key $_, value ", $hash{$_}, "\n";
+			}
+		},
+		-text => 'Get',
 	)->pack(-side => 'left', -padx => 2, -pady => 2);
 }
 

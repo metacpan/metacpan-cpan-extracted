@@ -1,4 +1,5 @@
 package Tree::Navigator::Node::Perl::StackTrace;
+use utf8;
 use Moose;
 extends 'Tree::Navigator::Node';
 
@@ -120,10 +121,11 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=encoding utf8
 
 =head1 NAME
 
-Tree::Navigator::Node::Perl::StackTrace
+Tree::Navigator::Node::Perl::StackTrace - navigating in a perl stacktrace
 
 =cut
 

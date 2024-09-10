@@ -10,4 +10,4 @@ BEGIN {
     use_ok( 'Data::LnArray::XS' ) || print "Bail out!\n";
 }
 
-diag( "Testing Data::LnArray::XS $Data::LnArray::VERSION, Perl $], $^X" );
+diag( "Testing Data::LnArray::XS $Data::LnArray::XS::VERSION, Perl $], $^X" );

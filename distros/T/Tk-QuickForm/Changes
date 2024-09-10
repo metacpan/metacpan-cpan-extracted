@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::QuickForm.
 
+0.05  Tue Sep 10 2024
+	All color types now use one popcolor widget
+
 0.04  Sun Aug 20 2023
 	Updated dependancies.
 	Made method createForm return the notebook, if any;

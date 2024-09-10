@@ -70,3 +70,4 @@
 t/local/WRITEREPO/modulelist
 ^t/local/CPAN/authors
 ^t/local/MYCPAN
+^t/local/mymodules/App-runscript-v1.0.0_02/

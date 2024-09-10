@@ -1,7 +1,7 @@
 cpanfile
-lib/DBIx/Tracer.pm
 lib/Mojolicious/Plugin/SlapbirdAPM.pm
 lib/SlapbirdAPM/Agent/Mojo.pm
+lib/SlapbirdAPM/DBIx/Tracer.pm
 lib/SlapbirdAPM/Trace.pm
 LICENSE
 Makefile.PL

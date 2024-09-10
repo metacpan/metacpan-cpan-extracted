@@ -283,8 +283,6 @@ subtest 'remote problems' => sub {
 
 		my ($lookup_error, @result) = getaddrinfo $unreachable_host, 'http';
 
-diag( Dumper(\@result) ); use Data::Dumper;
-
 		SKIP: {
 			plan skip_all => 'bad host resolves, so cannot test that'
 				unless $lookup_error;

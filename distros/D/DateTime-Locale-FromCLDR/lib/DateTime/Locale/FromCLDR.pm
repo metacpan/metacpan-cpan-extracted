@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/DateTime/Locale/FromCLDR.pm
-## Version v0.1.1
+## Version v0.2.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/07
-## Modified 2024/08/02
+## Modified 2024/09/10
 ## All rights reserved
 ## 
 ## 
@@ -18,18 +18,23 @@ BEGIN
     use warnings;
     use warnings::register;
     use vars qw(
-        $ERROR $VERSION $DEBUG
+        $ERROR $VERSION $DEBUG $EMPTY_SET
+        $TZ_DST_CACHE
     );
     use overload (
         '""'    => 'as_string',
         bool    => sub{ $_[0] },
         fallback => 1,
     );
+    use utf8;
     use Locale::Unicode;
     use Locale::Unicode::Data;
     use Scalar::Util ();
     use Want;
-    our $VERSION = 'v0.1.1';
+    # "If a given short metazone form is known NOT to be understood in a given locale and the parent locale has this value such that it would normally be inherited, the inheritance of this value can be explicitly disabled by use of the 'no inheritance marker' as the value, which is 3 simultaneous empty set characters (U+2205)."
+    # <https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
+    our $EMPTY_SET = "∅∅∅";
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -89,42 +94,37 @@ sub new
     return( $self );
 }
 
-sub am_pm_abbreviated
-{
-    my $self = shift( @_ );
-    my $ampm;
-    unless( defined( $ampm = $self->{am_pm_abbreviated} ) )
-    {
-        my $locale = $self->{locale} || die( "Locale value is gone!" );
-        my $cldr = $self->{_cldr} || die( "The Locale::Unicode::Data object is gone!" );
-        my $tree = $cldr->make_inheritance_tree( $locale ) ||
-            return( $self->pass_error( $cldr->error ) );
-        my $calendar = $self->{calendar} || 'gregorian';
-        $ampm = [];
-        foreach my $loc ( @$tree )
-        {
-            my $all = $cldr->calendar_term(
-                locale          => $loc,
-                calendar        => $calendar,
-                term_context    => 'format',
-                term_width      => 'abbreviated',
-                term_name       => [qw( am pm )],
-            );
-            return( $self->pass_error ) if( !defined( $all ) );
-            if( scalar( @$all ) )
-            {
-                if( scalar( @$all ) != 2 )
-                {
-                    return( $self->error( "Data seems to be corrupted for locale ${loc} in Locale::Unicode::Data. I received ", scalar( @$all ), " sets of data when I expected 2." ) );
-                }
-                @$ampm = map( $_->{term_value}, @$all );
-                last;
-            }
-        }
-        return( $self->{am_pm_abbreviated} = $ampm );
-    }
-    return( $ampm );
-}
+sub am_pm_abbreviated { return( shift->am_pm_format_abbreviated( @_ ) ); }
+
+sub am_pm_format_abbreviated { return( shift->_am_pm(
+    context => [qw( format stand-alone )],
+    width   => [qw( abbreviated wide )],
+) ); }
+
+sub am_pm_format_narrow { return( shift->_am_pm(
+    context => [qw( format stand-alone )],
+    width   => [qw( narrow abbreviated wide )],
+) ); }
+
+sub am_pm_format_wide { return( shift->_am_pm(
+    context => [qw( format stand-alone )],
+    width   => [qw( wide abbreviated )],
+) ); }
+
+sub am_pm_standalone_abbreviated { return( shift->_am_pm(
+    context => [qw( stand-alone format )],
+    width   => [qw( abbreviated wide )],
+) ); }
+
+sub am_pm_standalone_narrow { return( shift->_am_pm(
+    context => [qw( stand-alone format )],
+    width   => [qw( narrow abbreviated wide )],
+) ); }
+
+sub am_pm_standalone_wide { return( shift->_am_pm(
+    context => [qw( stand-alone format )],
+    width   => [qw( wide abbreviated )],
+) ); }
 
 sub as_string
 {
@@ -284,29 +284,29 @@ sub datetime_format_short { return( shift->_datetime_format(
 sub day_format_abbreviated { return( shift->_calendar_terms(
     id      => 'day_format_abbreviated',
     type    => 'day',
-    context => 'format',
+    context => [qw( format stand-alone )],
     width   => [qw( abbreviated wide )],
 ) ); }
 
 sub day_format_narrow { return( shift->_calendar_terms(
     id      => 'day_format_narrow',
     type    => 'day',
-    context => 'format',
-    width   => [qw( narrow wide )],
+    context => [qw( format stand-alone )],
+    width   => [qw( narrow short abbreviated wide )],
 ) ); }
 
 # NOTE: day short exists in CLDR, but is left out in DateTime::Locale::FromData
 sub day_format_short { return( shift->_calendar_terms(
     id      => 'day_format_short',
     type    => 'day',
-    context => 'format',
-    width   => 'short',
+    context => [qw( format stand-alone )],
+    width   => [qw( short narrow abbreviated )],
 ) ); }
 
 sub day_format_wide { return( shift->_calendar_terms(
     id      => 'day_format_wide',
     type    => 'day',
-    context => 'format',
+    context => [qw( format stand-alone )],
     width   => 'wide',
 ) ); }
 
@@ -374,14 +374,14 @@ sub day_periods
 sub day_stand_alone_abbreviated { return( shift->_calendar_terms(
     id      => 'day_stand_alone_abbreviated',
     type    => 'day',
-    context => 'stand-alone',
+    context => [qw( stand-alone format )],
     width   => [qw( abbreviated wide )],
 ) ); }
 
 sub day_stand_alone_narrow { return( shift->_calendar_terms(
     id      => 'day_stand_alone_narrow',
     type    => 'day',
-    context => 'stand-alone',
+    context => [qw( stand-alone format )],
     width   => [qw( narrow wide )],
 ) ); }
 
@@ -389,14 +389,14 @@ sub day_stand_alone_narrow { return( shift->_calendar_terms(
 sub day_stand_alone_short { return( shift->_calendar_terms(
     id      => 'day_stand_alone_short',
     type    => 'day',
-    context => 'stand-alone',
-    width   => 'short',
+    context => [qw( stand-alone format )],
+    width   => [qw( short abbreviated )],
 ) ); }
 
 sub day_stand_alone_wide { return( shift->_calendar_terms(
     id      => 'day_stand_alone_wide',
     type    => 'day',
-    context => 'stand-alone',
+    context => [qw( stand-alone format )],
     width   => 'wide',
 ) ); }
 
@@ -412,13 +412,13 @@ sub era_abbreviated { return( shift->_calendar_eras(
 
 sub era_narrow { return( shift->_calendar_eras(
     id      => 'era_narrow',
-    width   => [qw( narrow wide )],
+    width   => [qw( narrow abbreviated wide )],
     alt     => undef,
 ) ); }
 
 sub era_wide { return( shift->_calendar_eras(
     id      => 'era_wide',
-    width   => 'wide',
+    width   => [qw( wide abbreviated )],
     alt     => undef,
 ) ); }
 
@@ -433,7 +433,14 @@ sub error
             message => $msg,
         });
         warn( $msg ) if( warnings::enabled() );
-        rreturn( DateTime::Locale::FromCLDR::NullObject->new ) if( Want::want( 'OBJECT' ) );
+        if( Want::want( 'ARRAY' ) )
+        {
+            rreturn( [] );
+        }
+        elsif( Want::want( 'OBJECT' ) )
+        {
+            rreturn( DateTime::Locale::FromCLDR::NullObject->new );
+        }
         return;
     }
     return( ref( $self ) ? $self->{error} : $ERROR );
@@ -477,6 +484,505 @@ sub format_for
     return( $self->_available_formats( %$opts ) );
 }
 
+sub format_gmt
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $offset = $opts->{offset};
+    $opts->{width} //= 'long';
+    if( !defined( $offset ) )
+    {
+        return( $self->error( "No time offset was provided." ) );
+    }
+    elsif( $offset !~ /^(?:\-|\+)?\d+$/ )
+    {
+        return( $self->error( "Invalid offset value '${offset}'" ) );
+    }
+    elsif( $offset < -359999 ||
+           $offset > 359999 )
+    {
+        return( $self->error( "Out of bound offset value provided: '${offset}'" ) );
+    }
+    elsif( $opts->{width} !~ /^(?:long|short)$/ )
+    {
+        return( $self->error( "Bad width used. It must be one of 'long' or 'short'" ) );
+    }
+
+    # my $sign = $offset < 0 ? '-' : '+';
+    # <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
+    my $fmt;
+    # "Otherwise (when the offset from GMT is zero, referring to GMT itself) the style specified by the <gmtZeroFormat> element is used"
+    # Example: "GMT" or "UTC" or "Гринуич"
+    if( !$offset )
+    {
+        $fmt = $self->timezone_format_gmt_zero;
+    }
+    else
+    {
+        $fmt = $self->timezone_format_gmt;
+        # Example: ["+HH:mm", "-HH:mm"]
+        my $ref = $self->timezone_format_hour || [];
+        $offset = abs( $offset );
+        my $map =
+        {
+            hour => 'H',
+            minute => 'm',
+            second => 's',
+        };
+        my $def = {};
+        $def->{hour} = int( $offset / 3600 );
+        $offset %= 3600;
+        $def->{minute} = int( $offset / 60 );
+        $offset %= 60;
+        $def->{second} = int( $offset );
+        # We localise the numerals
+        # "The digits should be whatever are appropriate for the locale used to format the time zone, not necessarily from the western digits, 0..9. For example, they might be from ०..९."
+        # <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
+        my $num_sys = $self->locale_number_system ||
+            return( $self->pass_error );
+        # No need to bother if the numbering system is 'latn', since we are using it by default.
+        unless( $num_sys->[0] eq 'latn' )
+        {
+            # Now, the specifications say that all languages, including those with rtl layout write their numerals left-to-right
+            # In Hebrew, it is traditionally rtl, but there is no agreemennt
+            foreach my $k ( qw( hour minute second ) )
+            {
+                next unless( length( $def->{ $k } // '' ) );
+                my @digits = split( //, $def->{ $k } );
+                for( my $i = 0; $i < scalar( @digits ); $i++ )
+                {
+                    $digits[$i] = $num_sys->[1]->[ $digits[$i] ];
+                }
+                $def->{ $k } = join( '', @digits );
+            }
+        }
+        # "The digits should be whatever are appropriate for the locale used to format the time zone, not necessarily from the western digits, 0..9. For example, they might be from ०..९."
+        # <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
+        my $time_fmt;
+        # Example: "GMT+3" or "UTC-3"
+        if( $opts->{width} eq 'short' && 
+            !$def->{minute} &&
+            !$def->{second} )
+        {
+            $time_fmt = ( $offset < 0 ? '-' : '+' ) . int( $def->{hour} );
+        }
+        # Example: "GMT+03:30" (long) or "GMT+3:30" (short) or localised like "Гринуич+03:30" (long)
+        else
+        {
+            $time_fmt = $ref->[ $offset < 0 ? 1 : 0 ];
+            if( defined( $time_fmt ) )
+            {
+                foreach my $type ( qw( hour minute second ) )
+                {
+                    my $token = $map->{ $type };
+                    $def->{ $type } //= 0;
+                    $time_fmt =~ s{
+                        (${token}{1,2})
+                    }
+                    {
+                        my $val = $def->{ $type };
+                        my $len = $opts->{width} eq 'short' ? 1 : length( $1 );
+                        sprintf( "%0*d", $len, $val );
+                    }gexs;
+                }
+            }
+            else
+            {
+                $time_fmt //= '';
+            }
+        }
+        $fmt =~ s/\{0\}/$time_fmt/g;
+    }
+    return( $fmt );
+}
+
+# "5. For the generic location format"
+sub format_timezone_location
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $timezone = $opts->{timezone} ||
+        return( $self->error( "No timezone was provided." ) );
+    $timezone = $self->timezone_canonical( $timezone );
+    return( $self->pass_error ) if( !defined( $timezone ) );
+    return( "Unknown time zone '${timezone}'" ) if( !$timezone );
+    my $meth_id = 'format_timezone_location_tz=' . $timezone;
+    my $str;
+    unless( defined( $str = $self->{ $meth_id } ) )
+    {
+        my $locale = $self->{locale} ||
+            return( $self->error( "No locale is set!" ) );
+        $locale = $self->_locale_object( $locale ) ||
+            return( $self->pass_error );
+        my $cldr = $self->{_cldr} ||
+            return( $self->error( "Unable to get the Locale::Unicode::Data object!" ) );
+        my $tree = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        my $tz_info = $cldr->timezone( timezone => $timezone ) ||
+            return( $self->pass_error( $cldr->error ) );
+        if( $tz_info->{territory} eq '001' &&
+            warnings::enabled() )
+        {
+            warn( "The timezone territory is 001, which is abnormal. Something is wrong with the Locale::Unicode::Data." );
+        }
+        # "5.1 From the TZDB get the country code for the zone, and determine whether there is only one timezone in the country. If there is only one timezone or if the zone id is in the <primaryZones> list, format the country name with the regionFormat, and return it."
+        my $all = $tz_info->{territory} eq '001' ? [] : $cldr->timezones( territory => $tz_info->{territory} );
+        return( $self->pass_error( $cldr->error ) ) if( !defined( $all ) && $cldr->error );
+        if( scalar( @$all ) == 1 ||
+            $tz_info->{is_primary} )
+        {
+            my $fmt = $self->timezone_format_region;
+            return( $self->pass_error ) if( !defined( $fmt ) );
+            # Get the localised territory name
+            my $territory_name;
+            foreach my $loc ( @$tree )
+            {
+                my $name_ref = $cldr->territory_l10n(
+                    locale => $loc,
+                    territory => $tz_info->{territory},
+                );
+                return( $self->pass_error( $cldr->error ) ) if( !defined( $name_ref ) && $cldr->error );
+                if( $name_ref && $name_ref->{locale_name} )
+                {
+                    $territory_name = $name_ref->{locale_name};
+                    last;
+                }
+            }
+            # Fallback to the country code
+            $territory_name //= $tz_info->{territory};
+            $fmt =~ s/\{0\}/$territory_name/g;
+            $str = $fmt;
+        }
+        # "5.2 Otherwise format the exemplar city with the regionFormat, and return it."
+        else
+        {
+            my $fmt = $self->timezone_format_region;
+            return( $self->pass_error ) if( !defined( $fmt ) );
+            my $city = $self->timezone_city( timezone => $timezone );
+            return( $self->pass_error ) if( !defined( $city ) );
+            # "Composition 3: If the localized exemplar city is not available, use as the exemplar city the last field of the raw TZID, stripping off the prefix and turning _ into space."
+            # America/Los_Angeles → "Los Angeles"
+            if( !length( $city // '' ) )
+            {
+                $city = join( ' ', split( '_', [split( '/', $timezone )]->[-1] ) );
+            }
+            $fmt =~ s/\{0\}/$city/g;
+            $str = $fmt;
+        }
+        $self->{ $meth_id } = $str;
+    }
+    return( $str );
+}
+
+# See for more details:
+# <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
+sub format_timezone_non_location
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $timezone = $opts->{timezone} ||
+        return( $self->error( "No timezone was provided." ) );
+    my $type = $opts->{type} ||
+        return( $self->error( "No timezone type was provided. It must be one of: generic, standard, or daylight" ) );
+    if( $type ne 'generic' &&
+        $type ne 'standard' &&
+        $type ne 'daylight' )
+    {
+        return( $self->error( "Invalid timezone type provided (${type}). It must be one of: generic, standard or daylight" ) );
+    }
+    my $width = $opts->{width} || 'long';
+    if( $width ne 'long' &&
+        $width ne 'short' )
+    {
+        return( $self->error( "Invalid timezone width provided (${width}). It must be one of: long or short" ) );
+    }
+    $timezone = $self->timezone_canonical( $timezone );
+    return( $self->pass_error ) if( !defined( $timezone ) );
+    return( "Unknown time zone '${timezone}'" ) if( !$timezone );
+    my $meth_id = 'format_timezone_non_location_tz=' . $timezone . '_type_' . $type . '_width_' . $width;
+    my $str;
+    unless( defined( $str = $self->{ $meth_id } ) )
+    {
+        my $locale = $self->{locale} ||
+            return( $self->error( "No locale is set!" ) );
+        $locale = $self->_locale_object( $locale ) ||
+            return( $self->pass_error );
+        my $cldr = $self->{_cldr} ||
+            return( $self->error( "Unable to get the Locale::Unicode::Data object!" ) );
+        my $tz_info = $cldr->timezone( timezone => $timezone ) ||
+            return( $self->pass_error( $cldr->error ) );
+        my $need_dst = $self->has_dst( $timezone );
+        my $meta_need_dst = $need_dst;
+        my $tree = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        my @types = qw( generic standard daylight );
+        my $meta_name_cache = {};
+        my $get_meta_names = sub
+        {
+            return( $meta_name_cache->{ $tz_info->{metazone} }->{ $width } ) if( exists( $meta_name_cache->{ $tz_info->{metazone} }->{ $width } ) && ref( $meta_name_cache->{ $tz_info->{metazone} }->{ $width } ) eq 'HASH' );
+            foreach my $loc ( @$tree )
+            {
+                my $ref = $cldr->metazone_names(
+                    locale => $loc,
+                    metazone => $tz_info->{metazone},
+                    # NOTE: Should we ignore the requested width and use 'long', since there are not many 'short' data?
+                    width => $width,
+                );
+                return( $self->error( $cldr->pass_error ) ) if( !defined( $ref ) && $cldr->error );
+                if( $ref )
+                {
+                    $meta_name_cache->{ $tz_info->{metazone} } //= {};
+                    return( $meta_name_cache->{ $tz_info->{metazone} }->{ $width } = $ref );
+                }
+            }
+            return;
+        };
+        my $get_meta_info = sub
+        {
+            my $metazone = shift( @_ );
+            return( $cldr->metazone( metazone => $metazone ) );
+        };
+        my $type_fallback;
+        my $get_type_fallback = sub
+        {
+            my $meta_names = shift( @_ );
+            # Cached, because this may be called more than once.
+            return( $type_fallback ) if( defined( $type_fallback ) );
+            unless( defined( $meta_names ) &&
+                    ref( $meta_names ) eq 'HASH' )
+            {
+                $meta_names = $get_meta_names->();
+                if( !defined( $meta_names ) )
+                {
+                    return( $self->error( "Unable to find the metazone information for metazone '$tz_info->{metazone}'." ) );
+                }
+            }
+    
+            if( $meta_need_dst )
+            {
+                if( length( $meta_names->{daylight} // '' ) )
+                {
+                    return( $type_fallback = $meta_names->{daylight} );
+                }
+                # "If the daylight type does not exist, then the metazone doesn't require daylight support."
+                else
+                {
+                    $meta_need_dst = 0;
+                }
+                # "If the generic type exists, use it."
+                if( $meta_names->{generic} )
+                {
+                    return( $type_fallback = $meta_names->{generic} );
+                }
+                # "Otherwise if the standard type exists, use it."
+                elsif( $meta_names->{standard} )
+                {
+                    return( $type_fallback = $meta_names->{standard} );
+                }
+            }
+            # "Otherwise if the generic type is needed, but not available, and the offset and daylight offset do not change within 184 day +/- interval around the exact formatted time, use the standard type."
+            elsif( $type eq 'generic' && 
+                   !$meta_names->{generic} &&
+                   !$self->has_dst )
+            {
+                return( $type_fallback = $meta_names->{standard} );
+            }
+            return( $type_fallback = '' );
+        };
+        LOCALES: foreach my $loc ( @$tree )
+        {
+            my $ref = $cldr->timezone_names(
+                locale => $loc,
+                timezone => $timezone,
+                # 'long' or 'short'
+                width => $width,
+            );
+            return( $self->error( $cldr->pass_error ) ) if( !defined( $ref ) && $cldr->error );
+            if( $ref )
+            {
+                # "4.1. if there is an explicit translation for the TZID in <timeZoneNames> according to type (generic, standard, or daylight) in the resolved locale, return it"
+                if( length( $ref->{ $type } // '' ) )
+                {
+                    $str = $ref->{ $type };
+                    last LOCALES;
+                }
+                # "4.1.1 If the requested type is not available, but another type is, and there is a Type Fallback then return that other type."
+                my @other_types = grep( length( $ref->{ $_ } // '' ), grep( $_ ne $type, @types ) );
+                if( scalar( @other_types ) && 
+                    $get_type_fallback->() )
+                {
+                    foreach my $t ( @other_types )
+                    {
+                        if( $ref->{ $t } )
+                        {
+                            $str = $ref->{ $t };
+                            last LOCALES;
+                        }
+                    }
+                }
+            }
+        }
+    
+        # "4.2. Otherwise, get the requested metazone format according to type (generic, standard, daylight)."
+        if( !defined( $str ) && $tz_info->{metazone} )
+        {
+            my $ref = $get_meta_names->();
+            return( $self->error( $cldr->pass_error ) ) if( !defined( $ref ) && $cldr->error );
+            if( $ref )
+            {
+                if( length( $ref->{ $type } // '' ) )
+                {
+                    $str = $ref->{ $type };
+                }
+                else
+                {
+                    # "4.2.1 If the requested type is not available, but another type is, get the format according to Type Fallback."
+                    my @other_types = grep( length( $ref->{ $_ } // '' ), grep( $_ ne $type, @types ) );
+                    if( scalar( @other_types ) )
+                    {
+                        my $fallback = $get_type_fallback->( $ref );
+                        return( $self->pass_error ) if( !defined( $fallback ) );
+                        if( length( $fallback // '' ) )
+                        {
+                            $str = $fallback;
+                        }
+                    }
+                }
+            }
+            # "4.2.2 If there is no format for the type, fall back."
+        }
+    
+        # "4.3. Otherwise do the following:"
+        if( !defined( $str ) )
+        {
+            # "4.3.1 Get the country for the current locale. If there is none, use the most likely country based on the likelySubtags data."
+            my $cc = $locale->country_code;
+            unless( $cc )
+            {
+                foreach my $loc ( @$tree )
+                {
+                    my $ref = $cldr->likely_subtag( locale => $loc );
+                    if( $ref && $ref->{target} )
+                    {
+                        my $target = Locale::Unicode->new( $ref->{target} ) ||
+                            return( $self->pass_error( Locale::Unicode->error ) );
+                        $cc = $target->country_code;
+                    }
+                }
+                # "4.3.1 If there is none, use "OOI""
+                $cc ||= '001';
+            }
+            # "4.3.2 Get the preferred zone for the metazone for the country; if there is none for the country, use the preferred zone for the metazone for "001"."
+            my @territories = ( $cc ? $cc : () );
+            push( @territories, '001' ) unless( $cc && $cc eq '001' );
+            my $ref = $cldr->metazone( metazone => $tz_info->{metazone} );
+            return( $self->pass_error( $cldr->error ) ) if( !defined( $ref ) );
+            my $preferred_timezone;
+            foreach my $territory ( @territories )
+            {
+                if( $ref->{territories} &&
+                    ref( $ref->{territories} ) eq 'ARRAY' &&
+                    $ref->{timezones} &&
+                    ref( $ref->{timezones} ) eq 'ARRAY' &&
+                    scalar( @{$ref->{timezones}} ) &&
+                    scalar( grep( $_ eq $territory, @{$ref->{territories}} ) ) )
+                {
+                    # The "preferred" zone means the first one in the array as per the LDML specifications.
+                    $preferred_timezone = $ref->{timezones}->[0];
+                    last;
+                }
+            }
+            # "4.3.3 If that preferred zone is the same as the requested zone, use the metazone format. For example, "Pacific Time" for Vancouver if the locale is en_CA, or for Los Angeles if locale is en_US."
+            if( defined( $preferred_timezone ) &&
+                $preferred_timezone eq $timezone )
+            {
+                my $name_ref = $get_meta_names->();
+                return( $self->pass_error( $cldr->error ) ) if( !defined( $name_ref ) && $cldr->error );
+                if( $name_ref && $name_ref->{ $type } )
+                {
+                    $str = $name_ref->{ $type };
+                }
+            }
+            # "4.3.4 Otherwise, if the zone is the preferred zone for its country but not for the country of the locale, use the metazone format + country in the fallbackFormat."
+            if( !defined( $str ) &&
+                $tz_info->{is_preferred} &&
+                $tz_info->{territory} ne $cc )
+            {
+                # Get the fallback format
+                # Something like {1} ({0})
+                my $fmt = $self->timezone_format_fallback;
+                return( $self->pass_error ) if( !defined( $fmt ) );
+                return( $self->error( "Unable to find the time zone fallback format for locale ${locale} or any of its ancestors in its inheritance tree. This should not happen. Maybe something is wrong with the Locale::Unicode::Data database?" ) ) if( !length( $fmt // '' ) );
+                # Get the localised territory name
+                my $territory_name;
+                foreach my $loc ( @$tree )
+                {
+                    my $name_ref = $cldr->territory_l10n(
+                        locale => $loc,
+                        territory => $cc,
+                    );
+                    return( $self->pass_error( $cldr->error ) ) if( !defined( $name_ref ) && $cldr->error );
+                    if( $name_ref && $name_ref->{locale_name} )
+                    {
+                        $territory_name = $name_ref->{locale_name};
+                        last;
+                    }
+                }
+                # return( $self->error( "Unable to get the localised territory name for '${cc}' for locale '${locale}' or any of its ancestors in its inheritance tree. This should not happen. Maybe something is wrong with the Locale::Unicode::Data database?" ) ) if( !defined( $territory_name ) );
+                # "Composition 2. If the localized country name is not available, use the code"
+                $territory_name //= $cc;
+                # Get the localised generic metazone name
+                my $metazone_name;
+                my $name_ref = $get_meta_names->();
+                return( $self->error( $cldr->pass_error ) ) if( !defined( $name_ref ) && $cldr->error );
+                if( $name_ref && ( $name_ref->{generic} || $name_ref->{standard} ) )
+                {
+                    $metazone_name = ( $name_ref->{generic} // $name_ref->{standard} );
+                }
+                # If the 'generic' format is not available, the 'standard' one should, if not in the initial locale, then in one of its ancestors, otherwise something is wrong with the data
+                # The 'standard' format is more often available than the 'generic' one.
+                return( $self->error( "Unable to get the localised metazone name for metazone '$tz_info->{metazone}' for locale '${locale}' or any of its ancestors in its inheritance tree. This should not happen. Maybe something is wrong with the Locale::Unicode::Data database?" ) ) if( !defined( $metazone_name ) );
+                $fmt =~ s/\{1\}/$metazone_name/;
+                $fmt =~ s/\{0\}/$territory_name/;
+                $str = $fmt;
+            }
+            # "4.3.5 Otherwise, use the metazone format + city in the fallbackFormat."
+            if( !defined( $str ) )
+            {
+                my $fmt = $self->timezone_format_fallback;
+                return( $self->pass_error ) if( !defined( $fmt ) );
+                return( $self->error( "Unable to find the time zone fallback format for locale ${locale} or any of its ancestors in its inheritance tree. This should not happen. Maybe something is wrong with the Locale::Unicode::Data database?" ) ) if( !length( $fmt // '' ) );
+                my $city = $self->timezone_city( timezone => $timezone );
+                return( $self->pass_error ) if( !defined( $city ) );
+                # "Composition 3: If the localized exemplar city is not available, use as the exemplar city the last field of the raw TZID, stripping off the prefix and turning _ into space."
+                # America/Los_Angeles → "Los Angeles"
+                if( !length( $city // '' ) )
+                {
+                    $city = join( ' ', split( '_', [split( '/', $timezone )]->[-1] ) );
+                }
+    
+                # my $metazone_name;
+                # my $name_ref = $get_meta_names->();
+                # return( $self->error( $cldr->pass_error ) ) if( !defined( $name_ref ) && $cldr->error );
+                # if( $name_ref && ( $name_ref->{generic} || $name_ref->{standard} ) )
+                # {
+                #     $metazone_name = ( $name_ref->{generic} // $name_ref->{standard} );
+                # }
+                # If the 'generic' format is not available, the 'standard' one should, if not in the initial locale, then in one of its ancestors, otherwise something is wrong with the data
+                # The 'standard' format is more often available than the 'generic' one.
+                # return( $self->error( "Unable to get the localised metazone name for metazone '$tz_info->{metazone}' for locale '${locale}' or any of its ancestors in its inheritance tree. This should not happen. Maybe something is wrong with the Locale::Unicode::Data database?" ) ) if( !defined( $metazone_name ) );
+                # $fmt =~ s/\{1\}/$metazone_name/;
+                $fmt =~ s/\{1\}/$tz_info->{metazone}/;
+                $fmt =~ s/\{0\}/$city/;
+                $str = $fmt;
+            }
+        }
+        $str //= '';
+        $self->{ $meth_id } = $str;
+    }
+    return( $str );
+}
+
 # NOTE method glibc_date_1_format is not implemented, because we deal only with CLDR format
 
 # NOTE method glibc_date_format is not implemented, because we deal only with CLDR format
@@ -486,6 +992,51 @@ sub format_for
 # NOTE method glibc_time_12_format is not implemented, because we deal only with CLDR format
 
 # NOTE method glibc_time_format is not implemented, because we deal only with CLDR format
+
+# <https://en.wikipedia.org/wiki/Daylight_saving_time_by_country>
+sub has_dst
+{
+    my $self = shift( @_ );
+    my $timezone = shift( @_ ) ||
+        return( $self->error( "No time zone was provided." ) );
+    $TZ_DST_CACHE //= {};
+    $timezone = $self->timezone_canonical( $timezone );
+    return( $self->pass_error ) if( !defined( $timezone ) );
+    return( "Unknown time zone '${timezone}'" ) if( !$timezone );
+    return( $TZ_DST_CACHE->{ lc( $timezone ) } ) if( exists( $TZ_DST_CACHE->{ lc( $timezone ) } ) );
+    local $@;
+    # try-catch
+    eval
+    {
+        require DateTime;
+    };
+    if( $@ )
+    {
+        return( $self->error( "Unable to load the DateTime object: $@" ) );
+    }
+    my $dt = eval
+    {
+        DateTime->now( time_zone => $timezone );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Unable to instantiate a DateTime object with time zone '${timezone}': $@" ) );
+    }
+    my $year = $dt->year;
+    my $jan = eval
+    {
+        DateTime->new( year => $year, month => 1, day => 1, time_zone => $dt->time_zone )->offset;
+    };
+    return( $self->error( "Unable to get the time zone offset for '${timezone}' at ${year}/1/1: $@" ) ) if( $@ );
+    my $jul = eval
+    {
+        DateTime->new( year => $year, month => 7, day => 1, time_zone => $dt->time_zone )->offset;
+    };
+    return( $self->error( "Unable to get the time zone offset for '${timezone}' at ${year}/7/1: $@" ) ) if( $@ );
+    my $bool = ( $jan != $jul ? 1 : 0 );
+    $TZ_DST_CACHE->{ lc( $timezone ) } = $bool;
+    return( $bool );
+}
 
 sub interval_format
 {
@@ -763,6 +1314,91 @@ sub interval_greatest_diff
     return( $greatest_diff );
 }
 
+# <https://en.wikipedia.org/wiki/Daylight_saving_time_by_country>
+sub is_dst
+{
+    my $self = shift( @_ );
+    my $dt = shift( @_ ) ||
+        return( $self->error( "No DateTime object was provided." ) );
+    if( !Scalar::Util::blessed( $dt // '' ) ||
+        !$dt->isa( 'DateTime' ) )
+    {
+        return( $self->error( "Object provided (", overload::StrVal( $dt ), " is not a DateTime object." ) )
+    }
+    my $timezone = eval
+    {
+        $dt->time_zone->name;
+    };
+    $timezone = $self->timezone_canonical( $timezone );
+    return( $self->pass_error ) if( !defined( $timezone ) );
+    return( "Unknown time zone '${timezone}'" ) if( !$timezone );
+    local $@;
+    # try-catch
+    eval
+    {
+        require DateTime;
+    };
+    if( $@ )
+    {
+        return( $self->error( "Unable to load the DateTime object: $@" ) );
+    }
+    my $year = $dt->year;
+    my $jan = eval
+    {
+        DateTime->new( year => $year, month => 1, day => 1, time_zone => $dt->time_zone )->offset;
+    };
+    return( $self->error( "Unable to get the time zone offset for '${timezone}' at ${year}/1/1: $@" ) ) if( $@ );
+    my $jul = eval
+    {
+        DateTime->new( year => $year, month => 7, day => 1, time_zone => $dt->time_zone )->offset;
+    };
+    return( $self->error( "Unable to get the time zone offset for '${timezone}' at ${year}/7/1: $@" ) ) if( $@ );
+    my $offset = eval
+    {
+        $dt->offset;
+    };
+    return( $self->error( "Error getting the offset to GMT for time zone ${timezone} at ${year}/1/1: $@" ) ) if( $@ );
+    my $bool = ( ( ( $jan != $jul ) && ( $jul == $offset ) ) ? 1 : 0 );
+    return( $bool );
+}
+
+# Is the locale left-to-right writing?
+sub is_ltr
+{
+    my $self = shift( @_ );
+    my $bool;
+    unless( defined( $bool = $self->{is_ltr} ) )
+    {
+        my $locale = $self->{locale} ||
+            return( $self->error( "No locale is set!" ) );
+        $locale = $self->_locale_object( $locale ) ||
+            return( $self->pass_error );
+        my $cldr = $self->{_cldr} ||
+            return( $self->error( "Unable to get the Locale::Unicode::Data object!" ) );
+        my $tree = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        foreach my $loc ( @$tree )
+        {
+            my $ref = $cldr->locales_info(
+                locale => $loc,
+                property => 'char_orientation',
+            );
+            return( $self->pass_error( $cldr->error ) ) if( !defined( $ref ) && $cldr->error );
+            if( $ref && $ref->{value} )
+            {
+                $bool = ( $ref->{value} eq 'right-to-left' ? 1 : 0 );
+                last;
+            }
+        }
+        # Nothing was found, so by default this is false
+        $bool //= 0;
+        $self->{is_ltr} = $bool;
+    }
+    return( $bool );
+}
+
+sub is_rtl { return( !shift->is_ltr ); }
+
 {
     no warnings 'once';
     # NOTE: sub id -> code
@@ -835,6 +1471,88 @@ sub language_code
 }
 
 sub locale { return( shift->{locale} ); }
+
+sub locale_number_system
+{
+    my $self = shift( @_ );
+    my $ref;
+    unless( defined( $ref = $self->{locale_number_system} ) )
+    {
+        my $locale = $self->{locale} ||
+            die( "No locale is set!" );
+        my $cldr = $self->{_cldr} || die( "The Locale::Unicode::Data object is gone!" );
+        my $tree = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        my $str;
+        foreach my $loc ( @$tree )
+        {
+            my $ref = $cldr->locale_number_system(
+                locale => $loc,
+            );
+            return( $self->pass_error( $cldr->error ) ) if( !defined( $ref ) && $cldr->error );
+            if( $ref && $ref->{number_system} )
+            {
+                $str = $ref->{number_system};
+                last;
+            }
+            # "In locales where the native numbering system is the default, it is assumed that the numbering system "latn" (Western digits 0-9) is always acceptable"
+            # <https://unicode.org/reports/tr35/tr35-numbers.html#otherNumberingSystems>
+            elsif( $ref->{native} )
+            {
+                $str = 'latn';
+                last;
+            }
+        }
+        if( defined( $str ) )
+        {
+            my $this = $cldr->number_system( number_system => $str );
+            return( $self->pass_error( $cldr->error ) ) if( !defined( $this ) && $cldr->error );
+            if( $this )
+            {
+                $ref = [ $str, $this->{digits} ];
+            }
+            else
+            {
+                die( "No digits data found numbering system '${str}' for locale '${locale}' !" );
+            }
+        }
+        $ref //= [];
+        $self->{locale_number_system} = $ref;
+    }
+    return( $ref );
+}
+
+sub metazone_daylight_long { return( shift->_metazone_name({
+    type        => 'daylight',
+    width       => 'long',
+}, @_ ) ); }
+
+sub metazone_daylight_short { return( shift->_metazone_name({
+    type        => 'daylight',
+    width       => 'short',
+}, @_ ) ); }
+
+sub metazone_generic_long { return( shift->_metazone_name({
+    type        => 'generic',
+    width       => 'long',
+    location    => 1,
+}, @_ ) ); }
+
+sub metazone_generic_short { return( shift->_metazone_name({
+    type        => 'generic',
+    width       => 'short',
+    location    => 1,
+}, @_ ) ); }
+
+sub metazone_standard_long { return( shift->_metazone_name({
+    type        => 'standard',
+    width       => 'long',
+}, @_ ) ); }
+
+sub metazone_standard_short { return( shift->_metazone_name({
+    type        => 'standard',
+    width       => 'short',
+}, @_ ) ); }
 
 # NOTE: "if the abbreviated format data for Gregorian does not exist in a language X (in the chain up to root), then it inherits from the wide format data in that same language X."
 # <https://unicode.org/reports/tr35/tr35-dates.html#months_days_quarters_eras>
@@ -1181,14 +1899,14 @@ sub prefers_24_hour_time
 sub quarter_format_abbreviated { return( shift->_calendar_terms(
     id      => 'quarter_format_abbreviated',
     type    => 'quarter',
-    context => 'format',
+    context => [qw( format stand-alone )],
     width   => [qw( abbreviated wide )],
 ) ); }
 
 sub quarter_format_narrow { return( shift->_calendar_terms(
     id      => 'quarter_format_narrow',
     type    => 'quarter',
-    context => 'format',
+    context => [qw( format stand-alone )],
     width   => [qw( narrow wide )],
 ) ); }
 
@@ -1197,22 +1915,22 @@ sub quarter_format_narrow { return( shift->_calendar_terms(
 sub quarter_format_wide { return( shift->_calendar_terms(
     id      => 'quarter_format_wide',
     type    => 'quarter',
-    context => 'format',
+    context => [qw( format stand-alone )],
     width   => 'wide',
 ) ); }
 
 sub quarter_stand_alone_abbreviated { return( shift->_calendar_terms(
     id      => 'quarter_stand_alone_abbreviated',
     type    => 'quarter',
-    context => 'stand-alone',
+    context => [qw( stand-alone format )],
     width   => [qw( abbreviated wide )],
 ) ); }
 
 sub quarter_stand_alone_narrow { return( shift->_calendar_terms(
     id      => 'quarter_stand_alone_narrow',
     type    => 'quarter',
-    context => 'stand-alone',
-    width   => [qw( narrow wide )],
+    context => [qw( stand-alone format )],
+    width   => [qw( narrow abbreviated wide )],
 ) ); }
 
 # NOTE: There is no 'short' stand-alone for quarter, but there is for 'day'
@@ -1220,7 +1938,7 @@ sub quarter_stand_alone_narrow { return( shift->_calendar_terms(
 sub quarter_stand_alone_wide { return( shift->_calendar_terms(
     id      => 'quarter_stand_alone_narrow',
     type    => 'quarter',
-    context => 'stand-alone',
+    context => [qw( stand-alone format )],
     width   => 'wide',
 ) ); }
 
@@ -1325,6 +2043,8 @@ sub territory_code
     return( $str );
 }
 
+sub time_format_allowed { return( shift->_time_formats( 'allowed', @_ ) ); }
+
 sub time_format_default { return( shift->time_format_medium ); }
 
 sub time_format_full { return( shift->_date_time_format(
@@ -1344,6 +2064,8 @@ sub time_format_medium { return( shift->_date_time_format(
     type        => 'time',
     width       => 'medium',
 ) ); }
+
+sub time_format_preferred { return( shift->_time_formats( 'preferred', @_ ) ); }
 
 sub time_format_short { return( shift->_date_time_format(
     calendar    => 'gregorian',
@@ -1366,6 +2088,141 @@ sub time_formats
     }
     return( $formats );
 }
+
+sub timezone_canonical
+{
+    my $self = shift( @_ );
+    my $tz = shift( @_ ) ||
+        return( $self->error( "No timezone was provided." ) );
+    my $cldr = $self->{_cldr} || die( "Locale::Unicode::Data object is gone!" );
+    my $str = $cldr->timezone_canonical( $tz );
+    return( $self->pass_error( $cldr->error ) ) if( !defined( $str ) && $cldr->error );
+    return( $str );
+}
+
+sub timezone_city
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $timezone = $opts->{timezone} ||
+        return( $self->error( "No timezone was provided to get the examplar city." ) );
+    my $meth_id = 'timezone_city_for_tz_' . $timezone;
+    my $name;
+    unless( defined( $name = $self->{ $meth_id } ) )
+    {
+        my $locale = $self->{locale} || die( "Locale value is gone!" );
+        my $cldr = $self->{_cldr} || die( "Locale::Unicode::Data object is gone!" );
+        my $locales = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        my $ref;
+        LOCALE: foreach my $loc ( @$locales )
+        {
+            $ref = $cldr->timezone_city(
+                timezone    => $timezone,
+                locale      => $loc,
+            );
+            return( $self->pass_error ) if( !defined( $ref ) && $cldr->error );
+            if( $ref )
+            {
+                $name = $ref->{city};
+                last LOCALE;
+            }
+        }
+        # Failed to find a suitable match
+        $name //= '';
+        $self->{ $meth_id } = $name;
+    }
+    return( $self->{ $meth_id } );
+}
+
+sub timezone_daylight_long { return( shift->_timezone_name({
+    type        => 'daylight',
+    width       => 'long',
+}, @_ ) ); }
+
+sub timezone_daylight_short { return( shift->_timezone_name({
+    type        => 'daylight',
+    width       => 'short',
+}, @_ ) ); }
+
+sub timezone_format_fallback { return( shift->_timezone_formats(
+    type => 'fallback',
+) ); }
+
+sub timezone_format_gmt { return( shift->_timezone_formats(
+    type => 'gmt',
+) ); }
+
+sub timezone_format_gmt_zero { return( shift->_timezone_formats(
+    type => 'gmt_zero',
+) ); }
+
+sub timezone_format_hour { return( shift->_timezone_formats(
+    type => 'hour',
+) ); }
+
+sub timezone_format_region { return( shift->_timezone_formats(
+    type => 'region',
+) ); }
+
+sub timezone_format_region_daylight { return( shift->_timezone_formats(
+    type => 'region',
+    subtype => 'daylight',
+) ); }
+
+sub timezone_format_region_standard { return( shift->_timezone_formats(
+    type => 'region',
+    subtype => 'standard',
+) ); }
+
+sub timezone_generic_long { return( shift->_timezone_name({
+    type        => 'generic',
+    width       => 'long',
+    location    => 1,
+}, @_ ) ); }
+
+sub timezone_generic_short { return( shift->_timezone_name({
+    type        => 'generic',
+    width       => 'short',
+    location    => 1,
+}, @_ ) ); }
+
+# Returns the BCP47 short ID
+sub timezone_id
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $tz   = $opts->{timezone} ||
+        return( $self->error( "No time zone was provided to get its short ID." ) );
+    $tz = $self->timezone_canonical( $tz );
+    return( $self->pass_error ) if( !defined( $tz ) && $self->error );
+    return( $self->error( "Unable to get the canonical time zone for '$opts->{timezone}'" ) ) if( !length( $tz // '' ) );
+    my $cldr = $self->{_cldr} || die( "The Locale::Unicode::Data object is gone!" );
+#     my $locale = $self->{locale} || die( "Locale is not set!" );
+#     $locale = $self->_locale_object( $locale ) ||
+#         return( $self->pass_error );
+    my $ref = $cldr->timezone( timezone => $tz );
+    return( $self->pass_error( $cldr->error ) ) if( !defined( $ref ) && $cldr->error );
+    return( $self->error( "No time zone '${tz}' exists." ) ) if( !$ref );
+    if( $ref && $ref->{tz_bcpid} )
+    {
+        return( $ref->{tz_bcpid} );
+    }
+    else
+    {
+        return( $self->error( "Time zone '${tz}' could be found, but not its ID. This should not happen. Maybe there is an issue with the Locale::Unicode::Data database?" ) );
+    }
+}
+
+sub timezone_standard_long { return( shift->_timezone_name({
+    type        => 'standard',
+    width       => 'long',
+}, @_ ) ); }
+
+sub timezone_standard_short { return( shift->_timezone_name({
+    type        => 'standard',
+    width       => 'short',
+}, @_ ) ); }
 
 sub variant
 {
@@ -1440,6 +2297,63 @@ sub version
         $vers = $cldr->cldr_version;
     }
     return( $vers );
+}
+
+sub _am_pm
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    if( !$opts->{context} )
+    {
+        die( "No context was provided to retrieve AM/PN localised terms." );
+    }
+    elsif( !$opts->{width} )
+    {
+        die( "No width was provided to retrieve AM/PN localised terms." );
+    }
+    my $calendar = $opts->{calendar} || $self->{calendar} || 'gregorian';
+    my $meth_id = 'am_pm_' . $calendar . '_' . $opts->{width} . '_' . $opts->{context};
+    my $ampm;
+    unless( defined( $ampm = $self->{ $meth_id } ) )
+    {
+        my $locale = $self->{locale} || die( "Locale value is gone!" );
+        my $cldr = $self->{_cldr} || die( "The Locale::Unicode::Data object is gone!" );
+        my $tree = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        # We do not want to fallback to the 'und' locale on this.
+        pop( @$tree );
+        my $widths = ref( $opts->{width} ) eq 'ARRAY' ? $opts->{width} : [$opts->{width}];
+        my $contexts = ref( $opts->{context} ) eq 'ARRAY' ? $opts->{context} : [$opts->{context}];
+        $ampm = [];
+        LOCALES: foreach my $loc ( @$tree )
+        {
+            foreach my $context ( @$contexts )
+            {
+                foreach my $width ( @$widths )
+                {
+                    my $all = $cldr->calendar_term(
+                        locale          => $loc,
+                        calendar        => $calendar,
+                        term_context    => $context,
+                        term_width      => $width,
+                        term_name       => [qw( am pm )],
+                    );
+                    return( $self->pass_error ) if( !defined( $all ) );
+                    if( scalar( @$all ) )
+                    {
+                        if( scalar( @$all ) != 2 )
+                        {
+                            return( $self->error( "Data seems to be corrupted for locale ${loc} in Locale::Unicode::Data. I received ", scalar( @$all ), " sets of data when I expected 2." ) );
+                        }
+                        @$ampm = map( $_->{term_value}, @$all );
+                        last LOCALES;
+                    }
+                }
+            }
+        }
+        return( $self->{ $meth_id } = $ampm );
+    }
+    return( $ampm );
 }
 
 sub _available_formats
@@ -1532,6 +2446,8 @@ sub _calendar_terms
     die( "Missing context" ) if( !$opts->{context} );
     die( "Missing width" ) if( !$opts->{width} );
     $opts->{width} = [$opts->{width}] unless( ref( $opts->{width} ) eq 'ARRAY' );
+    # If some type (e.g. short, narrow, etc) are missing in 'format', we can try to look for it in 'stand-alone'
+    $opts->{context} = [$opts->{context}] unless( ref( $opts->{context} ) eq 'ARRAY' );
     my $terms;
     unless( defined( $terms = $self->{ "${id}_${calendar}" } ) )
     {
@@ -1547,26 +2463,29 @@ sub _calendar_terms
         };
         LOCALE: foreach my $loc ( @$locales )
         {
-            foreach my $width ( @{$opts->{width}} )
+            foreach my $ctx ( @{$opts->{context}} )
             {
-                my $all = $cldr->calendar_terms(
-                    locale          => $loc,
-                    calendar        => $calendar,
-                    term_type       => $opts->{type},
-                    term_context    => $opts->{context},
-                    term_width      => $width,
-                    ( $opts->{type} eq 'day' ? ( order_by_value => [term_name => [qw( mon tue wed thu fri sat sun )]] ) : () ),
-                    ( ( $opts->{type} eq 'month' || $opts->{type} eq 'quarter' ) ? ( order => [term_name => 'integer'] ) : () ),
-                );
-                return( $self->pass_error ) if( !defined( $all ) && $cldr->error );
-                if( $all && scalar( @$all ) >= $expects->{ $opts->{type} } )
+                foreach my $width ( @{$opts->{width}} )
                 {
-                    $terms = [];
-                    for( @$all )
+                    my $all = $cldr->calendar_terms(
+                        locale          => $loc,
+                        calendar        => $calendar,
+                        term_type       => $opts->{type},
+                        term_context    => $ctx,
+                        term_width      => $width,
+                        ( $opts->{type} eq 'day' ? ( order_by_value => [term_name => [qw( mon tue wed thu fri sat sun )]] ) : () ),
+                        ( ( $opts->{type} eq 'month' || $opts->{type} eq 'quarter' ) ? ( order => [term_name => 'integer'] ) : () ),
+                    );
+                    return( $self->pass_error ) if( !defined( $all ) && $cldr->error );
+                    if( $all && scalar( @$all ) >= $expects->{ $opts->{type} } )
                     {
-                        push( @$terms, $_->{term_value} );
+                        $terms = [];
+                        for( @$all )
+                        {
+                            push( @$terms, $_->{term_value} );
+                        }
+                        last LOCALE;
                     }
-                    last LOCALE;
                 }
             }
         }
@@ -1740,6 +2659,25 @@ sub _day_period
             {
                 $name = $ref->{term_value};
                 last LOCALE;
+            }
+        }
+    }
+    # LDML: "If the locale doesn't have the notion of a unique "noon" = 12:00, then the PM form may be substituted. Similarly for "midnight" = 00:00 and the AM form"
+    if( !defined( $name ) &&
+        ( $period eq 'noon' || $period eq 'midnight' ) )
+    {
+        my $ampm = $self->am_pm_format_abbreviated;
+        if( defined( $ampm ) && 
+            ref( $ampm ) eq 'ARRAY' && 
+            scalar( @$ampm ) )
+        {
+            if( $period eq 'midnight' )
+            {
+                $name = $ampm->[0];
+            }
+            elsif( $period eq 'noon' )
+            {
+                $name = $ampm->[1];
             }
         }
     }
@@ -2016,6 +2954,74 @@ sub _locale_object
     return( $locale );
 }
 
+sub _metazone_name
+{
+    my $self = shift( @_ );
+    # Our internal arguments
+    my $def  = shift( @_ );
+    # User's arguments
+    my $opts = $self->_get_args_as_hash( @_ );
+    if( !$def->{type} )
+    {
+        die( "No 'type' option provided." );
+    }
+    elsif( !$def->{width} )
+    {
+        die( "No 'width' option provided." );
+    }
+    elsif( $def->{type} !~ /^(?:generic|standard|daylight)$/ )
+    {
+        die( "Bad type provided. It must be one of: generic, generic or daylight" );
+    }
+    elsif( $def->{width} !~ /^(?:short|long)$/ )
+    {
+        die( "Bad width provided. It must be one of: short or long" );
+    }
+    elsif( !$opts->{metazone} )
+    {
+        return( $self->error( "No metazone was provided." ) );
+    }
+    my $meth_id = "metazone_name_" . $def->{type} . '_' . $def->{width} . '_meta_tz=' . $opts->{metazone};
+    my $name;
+    unless( defined( $name = $self->{ $meth_id } ) )
+    {
+        my $locale = $self->{locale} || die( "Locale value is gone!" );
+        my $cldr = $self->{_cldr} || die( "Locale::Unicode::Data object is gone!" );
+        my $locales = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        my $metazone = $opts->{metazone};
+        my $type     = $def->{type};
+        my $width    = $def->{width};
+        my $location = $def->{location};
+        my $ref;
+        my $metatz_info = $cldr->metazone(
+            metazone => $metazone,
+        );
+        return( $self->pass_error ) if( !defined( $metatz_info ) && $cldr->error );
+        return( $self->error( "No metazone ${metazone} found." ) ) if( !$metatz_info );
+        LOCALE: foreach my $loc ( @$locales )
+        {
+            $ref = $cldr->metazone_names(
+                metazone    => $metazone,
+                locale      => $loc,
+                width       => $width,
+            );
+            return( $self->pass_error ) if( !defined( $ref ) && $cldr->error );
+            if( $ref && $ref->{ $type } )
+            {
+                if( $ref->{ $type } ne $EMPTY_SET )
+                {                
+                    $name = $ref->{ $type };
+                }
+                last LOCALE;
+            }
+        }
+        # Failed to find a suitable match
+        $name //= '';
+        $self->{ $meth_id } = $name;
+    }
+    return( $name );
+}
 
 # This resembles the one in Locale::Unicode::Data, except, it does not look up real parents.
 # This only creates a tree of subtags in the order prescribed by LDML
@@ -2109,6 +3115,198 @@ sub _territory_info
         }
     }
     return( $info );
+}
+
+sub _time_formats
+{
+    my $self = shift( @_ );
+    my $type = shift( @_ ) ||
+        die( "Time format type was not provided." );
+    die( "Unsupported type '${type}'. Use one of 'preferred' or 'allowed'." ) if( $type ne 'preferred' && $type ne 'allowed' );
+    my $code;
+    my $meth_id = "time_formats_${type}";
+    my $pattern;
+    if( ( !scalar( @_ ) && !defined( $pattern = $self->{ $meth_id } ) ) ||
+        @_ )
+    {
+        my $map =
+        {
+            allowed => 'time_allowed',
+            preferred => 'time_format',
+        };
+        $type = $map->{ $type };
+        my $has_arg = 0;
+        my $locale = $self->{locale} || die( "Locale value is gone!" );
+        my $cldr = $self->{_cldr} || die( "Locale::Unicode::Data object is gone!" );
+        if( @_ )
+        {
+            $code = shift( @_ );
+            $has_arg++;
+        }
+        else
+        {
+            if( my $this = $locale->country_code )
+            {
+                $code = $this;
+            }
+            else
+            {
+                my $locales = $cldr->make_inheritance_tree( $locale ) ||
+                    return( $self->pass_error( $cldr->error ) );
+                my $target;
+                LOCALES: foreach my $loc ( @$locales )
+                {
+                    my $ref = $cldr->likely_subtag(
+                        locale => $loc,
+                    );
+                    if( $ref && $ref->{target} )
+                    {
+                        $target = $ref->{target};
+                        last;
+                    }
+                }
+                if( defined( $target ) )
+                {
+                    my $new = Locale::Unicode->new( $target ) ||
+                        return( $self->pass_error( Locale::Unicode->error ) );
+                    if( my $this = $new->country_code )
+                    {
+                        $code = $this;
+                    }
+                }
+            }
+            # By default
+            $code //= '001';
+        }
+        my $territories = [$code];
+        push( @$territories, '001' ) unless( $territories->[-1] eq '001' );
+        foreach my $territory ( @$territories )
+        {
+            my $all = $cldr->time_formats(
+                territory => $territory,
+            );
+            if( $all && 
+                scalar( @$all ) && 
+                defined( $all->[0] ) && 
+                ref( $all->[0] ) eq 'HASH' && 
+                length( $all->[0]->{ $type } // '' ) )
+            {
+                $pattern = $all->[0]->{ $type };
+                last;
+            }
+        }
+        $pattern //= '';
+        # $pattern = [split( /[[:blank:]\h]+/, $pattern )] if( $type eq 'time_allowed' );
+        $self->{ $meth_id } = $pattern unless( $has_arg );
+    }
+    return( $pattern );
+}
+
+sub _timezone_formats
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    if( !$opts->{type} )
+    {
+        die( "No 'type' option provided." );
+    }
+    my $meth_id = "timezone_formats_" . $opts->{type} . '_' . ( $opts->{subtype} // 'no_subtype' );
+    my $pattern;
+    unless( defined( $pattern = $self->{ $meth_id } ) )
+    {
+        my $locale = $self->{locale} || die( "Locale value is gone!" );
+        my $cldr = $self->{_cldr} || die( "Locale::Unicode::Data object is gone!" );
+        my $locales = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        my $ref;
+        LOCALE: foreach my $loc ( @$locales )
+        {
+            $ref = $cldr->timezone_formats(
+                locale  => $loc,
+                type    => $opts->{type},
+                subtype => $opts->{subtype},
+            );
+            return( $self->pass_error ) if( !defined( $ref ) && $cldr->error );
+            if( $ref && $ref->{format_pattern} )
+            {
+                $pattern = $ref->{format_pattern};
+                last LOCALE;
+            }
+        }
+        if( $opts->{type} eq 'hour' )
+        {
+            $pattern = defined( $pattern ) ? [split( /\;/, $pattern, 2 )] : [];
+        }
+        $pattern //= '';
+        $self->{ $meth_id } = $pattern;
+    }
+    return( $pattern );
+}
+
+sub _timezone_name
+{
+    my $self = shift( @_ );
+    # Our internal arguments
+    my $def  = shift( @_ );
+    # User's arguments
+    my $opts = $self->_get_args_as_hash( @_ );
+    if( !$def->{type} )
+    {
+        die( "No 'type' option provided." );
+    }
+    elsif( !$def->{width} )
+    {
+        die( "No 'width' option provided." );
+    }
+    elsif( $def->{type} !~ /^(?:generic|standard|daylight)$/ )
+    {
+        die( "Bad type provided. It must be one of: generic, generic or daylight" );
+    }
+    elsif( $def->{width} !~ /^(?:short|long)$/ )
+    {
+        die( "Bad width provided. It must be one of: short or long" );
+    }
+    elsif( !$opts->{timezone} )
+    {
+        return( $self->error( "No timezone was provided." ) );
+    }
+    my $meth_id = "timezone_name_" . $def->{type} . '_' . $def->{width} . '_tz=' . $opts->{timezone};
+    my $name;
+    unless( defined( $name = $self->{ $meth_id } ) )
+    {
+        my $locale = $self->{locale} || die( "Locale value is gone!" );
+        my $cldr = $self->{_cldr} || die( "Locale::Unicode::Data object is gone!" );
+        my $locales = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        my $timezone = $opts->{timezone};
+        my $type     = $def->{type};
+        my $width    = $def->{width};
+        my $location = $def->{location};
+        my $ref;
+        my $tz_info = $cldr->timezone(
+            timezone => $timezone,
+        );
+        return( $self->pass_error ) if( !defined( $tz_info ) && $cldr->error );
+        return( $self->error( "No time zone ${timezone} found." ) ) if( !$tz_info );
+        LOCALE: foreach my $loc ( @$locales )
+        {
+            $ref = $cldr->timezone_names(
+                timezone    => $timezone,
+                locale      => $loc,
+                width       => $width,
+            );
+            return( $self->pass_error ) if( !defined( $ref ) && $cldr->error );
+            if( $ref && $ref->{ $type } )
+            {
+                $name = $ref->{ $type };
+                last LOCALE;
+            }
+        }
+        # Failed to find a suitable match
+        $name //= '';
+        $self->{ $meth_id } = $name;
+    }
+    return( $name );
 }
 
 sub FREEZE
@@ -2449,6 +3647,11 @@ DateTime::Locale::FromCLDR - DateTime Localised Data from Unicode CLDR
     my $str = $locale->era_wide;
     my $str = $locale->first_day_of_week;
     my $str = $locale->format_for( 'yMEd' );
+    my $str = $locale->gmt_format(0);
+    my $str = $locale->gmt_format(3600);
+    my $str = $locale->gmt_format(-3600);
+    my $str = $locale->gmt_format(-3600, width => 'short');
+    my $str = $locale->gmt_format(-3600, { width => 'short' });
     # Alias for method 'code'
     my $obj = $locale->id;
     my $array = $locale->interval_format( GyMEd => 'd' );
@@ -2463,6 +3666,12 @@ DateTime::Locale::FromCLDR - DateTime Localised Data from Unicode CLDR
     # Equivalent to $locale->locale->as_string
     my $str = $locale->locale_as_string;
     # As per standard, it falls back to 'wide' format if it is not available
+    my $str = $locale->metazone_daylight_long( metazone => 'Taipei' );
+    my $str = $locale->metazone_daylight_short( metazone => 'Taipei' );
+    my $str = $locale->metazone_generic_long( metazone => 'Taipei' );
+    my $str = $locale->metazone_generic_short( metazone => 'Taipei' );
+    my $str = $locale->metazone_standard_long( metazone => 'Taipei' );
+    my $str = $locale->metazone_standard_short( metazone => 'Taipei' );
     my $str = $locale->month_format_abbreviated;
     my $str = $locale->month_format_narrow;
     my $str = $locale->month_format_wide;
@@ -2509,6 +3718,20 @@ DateTime::Locale::FromCLDR - DateTime Localised Data from Unicode CLDR
     my $str = $locale->time_format_short;
     # Time patterns for 'full', 'long', 'medium', and 'short' formats
     my $array = $locale->time_formats;
+    my $str = $locale->timezone_city( timezone => 'Asia/Tokyo' );
+    my $str = $locale->timezone_format_fallback;
+    my $str = $locale->timezone_format_gmt;
+    my $str = $locale->timezone_format_gmt_zero;
+    my $str = $locale->timezone_format_hour;
+    my $str = $locale->timezone_format_region;
+    my $str = $locale->timezone_format_region_daylight;
+    my $str = $locale->timezone_format_region_standard;
+    my $str = $locale->timezone_daylight_long( timezone => 'Europe/London' );
+    my $str = $locale->timezone_daylight_short( timezone => 'Europe/London' );
+    my $str = $locale->timezone_generic_long( timezone => 'Europe/London' );
+    my $str = $locale->timezone_generic_short( timezone => 'Europe/London' );
+    my $str = $locale->timezone_standard_long( timezone => 'Europe/London' );
+    my $str = $locale->timezone_standard_short( timezone => 'Europe/London' );
     # The locale's variant name, if any, in English. Here undef, because there is none
     my $str = $locale->variant;
     # The locale's variant ID, if any. Here undef, since there is none
@@ -2526,7 +3749,7 @@ DateTime::Locale::FromCLDR - DateTime Localised Data from Unicode CLDR
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -2553,7 +3776,7 @@ Note that in C<CLDR> parlance, there are standard pattern formats. For example C
     # Japanese as spoken in Japan
     my $locale = DateTime::Locale::FromCLDR->new( 'ja-JP' ) ||
         die( DateTime::Locale::FromCLDR->error );
-    # Okinawan as spoken in the Japan Southern island
+    # Okinawan as spoken in Japan Southern islands
     my $locale = DateTime::Locale::FromCLDR->new( 'ryu-Kana-JP-t-de-t0-und-x0-medical' ) ||
         die( DateTime::Locale::FromCLDR->error );
 
@@ -2574,7 +3797,7 @@ or, using an hash reference:
 
 Instantiate a new L<DateTime::Locale::FromCLDR> object based on a C<locale> provided, and returns it. By default, it uses the calendar C<gregorian>, but you can specify a different one with the C<calendar> option.
 
-You can provide any C<locale>, even complex one as shown above, and only its core part will be retailed. So, for example:
+You can provide any C<locale>, even complex one as shown above, and only its core part will be retained. So, for example:
 
     my $locale = DateTime::Locale::FromCLDR->new( 'ryu-Kana-JP-t-de-t0-und-x0-medical' ) ||
         die( DateTime::Locale::FromCLDR->error );
@@ -2592,7 +3815,11 @@ All methods are read-only unless stated otherwise.
 
 =head2 am_pm_abbreviated
 
-    my $array = $locale->am_pm_abbreviated;
+This is an alias for L<am_pm_format_abbreviated|/am_pm_format_abbreviated>
+
+=head2 am_pm_format_abbreviated
+
+    my $array = $locale->am_pm_format_abbreviated;
 
 Returns an array reference of the terms used to represent C<am> and C<pm>
 
@@ -2613,6 +3840,41 @@ For example:
     say @$ampm; # Empty
 
 See L<Locale::Unicode::Data/calendar_term>
+
+=head2 am_pm_format_narrow
+
+Same as L<am_pm_format_abbreviated|/am_pm_format_abbreviated>, but returns the narrow format of the AM/PM terms.
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    say $locale->am_pm_format_narrow;
+
+=head2 am_pm_format_wide
+
+Same as L<am_pm_format_abbreviated|/am_pm_format_abbreviated>, but returns the wide format of the AM/PM terms.
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    say $locale->am_pm_format_wide;
+
+=head2 am_pm_standalone_abbreviated
+
+Same as L<am_pm_format_abbreviated|/am_pm_format_abbreviated>, but returns the abbreviated stand-alone format of the AM/PM terms.
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    say $locale->am_pm_standalone_abbreviated;
+
+=head2 am_pm_standalone_narrow
+
+Same as L<am_pm_format_abbreviated|/am_pm_format_abbreviated>, but returns the narrow stand-alone format of the AM/PM terms.
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    say $locale->am_pm_standalone_narrow;
+
+=head2 am_pm_standalone_wide
+
+Same as L<am_pm_format_abbreviated|/am_pm_format_abbreviated>, but returns the wide stand-alone format of the AM/PM terms.
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    say $locale->am_pm_standalone_wide;
 
 =for Pod::Coverage as_string
 
@@ -3098,6 +4360,223 @@ With Japanese:
 
 But, this should have yielded: C<夜9:54> instead.
 
+=head2 format_gmt
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    # Get the offset in seconds from the UTC
+    my $offset = $dt->offset;
+    my $str = $locale->gmt_format( $offset );
+    # The 'width' is 'long' by default
+    my $str = $locale->gmt_format( $offset, width => 'short' );
+
+This returns a localised and formatted GMT timezone given an offset in seconds of the datetime from UTC.
+
+For example:
+
+=over 4
+
+=item * C<GMT>
+
+=item * C<UTC>
+
+=item * C<Гринуич>
+
+=back
+
+Optionally, you can provide the C<width> option that may have the value C<long> (default), or C<short>
+
+If the offset is C<0>, meaning this is the GMT time, then the localised representation of C<GMT> is returned using L<timezone_format_gmt_zero|/timezone_format_gmt_zero>, otherwise it will use the GMT format provided by L<timezone_format_gmt|/timezone_format_gmt> and L<timezone_format_hour|/timezone_format_hour> for the formatting of the C<hours>, C<minutes> and possibly C<seconds>.
+
+Also, if the option C<width> is provided with a value C<short>, then the GMT hours, minutes, seconds formatting will not be zero padded.
+
+For example:
+
+=over 4
+
+=item * C<GMT+03:30>
+
+Long
+
+=item * C<GMT+3:30>
+
+Short
+
+=item * C<UTC-03.00>
+
+Long
+
+=item * C<UTC-3>
+
+Short
+
+=item * C<Гринуич+03:30>
+
+Long
+
+=back
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names> for more information.
+
+=head2 format_timezone_location
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->format_timezone_location( timezone => 'Europe/Rome' );
+    # "Italy Time"
+    my $str = $locale->format_timezone_location( timezone => 'America/Buenos_Aires' );
+    # "Buenos Aires Time"
+
+Returns a properly formatted C<timezone> based on the C<locale> and the given C<timezone> provided in an hash or hash reference.
+
+Note that, if the given C<timezone> is, what is called by the C<LDML> specifications, a "Golden Time Zone", then it represents a territory, and the localised territory name is used instead of the localised exemplar city for that C<timezone>. For example:
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->format_timezone_location( timezone => 'Asia/Taipei' );
+
+would yield C<Taiwan Time>, because C<Asia/Taipei> is the primary C<timezone> for Taiwan.
+
+=head2 format_timezone_non_location
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+    my $str = $locale->format_timezone_non_location(
+        timezone => 'America/Los_Angeles',
+        type => 'standard',
+    );
+    # アメリカ太平洋標準時
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->format_timezone_non_location(
+        timezone => 'America/Vancouver',
+        type => 'standard',
+    );
+    # Pacific Time (Canada)
+    my $str = $locale->format_timezone_non_location(
+        timezone => 'America/Phoenix',
+        type => 'standard',
+    );
+    # Mountain Time (Phoenix)
+    my $str = $locale->format_timezone_non_location(
+        timezone => 'America/Whitehorse',
+        type => 'standard',
+    );
+    # Pacific Time (Whitehorse)
+
+Returns a properly formatted C<timezone> based on the C<locale>, the given C<timezone> and the C<type> provided in an hash or hash reference.
+
+This is using a complexe algorithm defined by the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
+
+The C<type> can only be C<generic>, C<standard>, or C<daylight>:
+
+=over 4
+
+=item * C<generic>
+
+Quoting from the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Names>, "[t]he generic time is so-called wall-time; what clocks use when they are correctly switched from standard to daylight time at the mandated time of the year.". See L<here|https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names> too.
+
+Quoting from the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Format_Terminology>:
+
+=over 8
+
+=item * B<Generic non-location format>
+
+Reflects "wall time" (what is on a clock on the wall): used for recurring events, meetings, or anywhere people do not want to be overly specific. For example, C<10 am Pacific Time> will be GMT-8 in the winter, and GMT-7 in the summer.
+
+For example:
+
+=over 12
+
+=item * C<Pacific Time> (long)
+
+=item * C<PT> (short)
+
+=back
+
+=item * B<Generic partial location format>
+
+Reflects "wall time": used as a fallback format when the generic non-location format is not specific enough.
+
+For example:
+
+=over 12
+
+=item * C<Pacific Time (Canada)> (long)
+
+=item * C<PT (Whitehorse)> (short)
+
+=back
+
+=item * B<Generic location format>
+
+Reflects "wall time": a primary function of this format type is to represent a time zone in a list or menu for user selection of time zone. It is also a fallback format when there is no translation for the generic non-location format. Times can also be organized hierarchically by country for easier lookup.
+
+For example:
+
+=over 12
+
+=item * France Time
+
+=item * Italy Time
+
+=item * Japan Time
+
+=item * United States
+
+=over 16
+
+=item * Chicago Time
+
+=item * Denver Time
+
+=item * Los Angeles Time
+
+=item * New York Time
+
+=back
+
+=item * United Kingdom Time
+
+=back
+
+=back
+
+Note that "[a] generic location format is constructed by a part of time zone ID representing an exemplar city name or its country as the final fallback."
+
+See also the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Format_Terminology>
+
+=item * C<standard> or C<daylight>
+
+"Reflects a specific standard or daylight time, which may or may not be the wall time. For example, C<10 am Pacific Standard Time> will be GMT-8 in the winter and in the summer."
+
+For example:
+
+=over 4
+
+=item * C<Pacific Standard Time> (long)
+
+=item * C<PST> (short)
+
+=item * C<Pacific Daylight Time> (long)
+
+=item * C<PDT> (short)
+
+=back
+
+=back
+
+=head2 has_dst
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $bool = $locale->has_dst( 'Asia/Tokyo' );
+    # 0
+    my $bool = $locale->has_dst( 'America/Los_Angeles' );
+    # 1
+
+Returns true if the given C<timezone> is using daylight saving time, and false otherwise.
+
+The result is cached to ensure repeating calls for the same C<timezone> are returned even faster.
+
+If an error occurred, this will set an L<exception object|DateTime::Locale::FromCLDR::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
+
+How does it work? Very simply, this generates a L<DateTime> object based on the current year and given C<timezone> both for January 1st and July 1st, and get the C<timezone> offset for each. If they do not match, the C<timezone> has daylight saving time.
+
 =head2 id
 
 This is an alias for L<locale|/locale>
@@ -3232,6 +4711,50 @@ If both C<DateTime> objects are identical, this will return an empty string.
 
 If an error occurred, an L<exception object|DateTime::Locale::FromCLDR> is set and C<undef> is returned in scalar context, and an empty list in list context.
 
+=head2 is_dst
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $dt = DateTime->new( year => 2024, month => 7, day => 1, time_zone => 'Asia/Tokyo' );
+    my $bool = $locale->is_dst( $dt );
+    # 0
+    my $dt = DateTime->new( year => 2024, month => 7, day => 1, time_zone => 'America/Los_Angeles' );
+    my $bool = $locale->is_dst( $dt );
+    # 1
+
+Returns true if the given C<timezone> is using daylight saving time, and false otherwise.
+
+The result is cached to ensure repeating calls for the same C<timezone> are returned even faster.
+
+If an error occurred, this will set an L<exception object|DateTime::Locale::FromCLDR::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
+
+How does it work? Very simply, this generates a L<DateTime> object based on the current year and given C<timezone> both for January 1st and July 1st, and get the C<timezone> offset for each. If they do not match, the C<timezone> has daylight saving time.
+
+=head2 is_ltr
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $bool = $locale->is_ltr;
+    # 1
+
+    # Hebrew:
+    my $locale = DateTime::Locale::FromCLDR->new( 'he' );
+    my $bool = $locale->is_ltr;
+    # 0
+
+Returns true if the C<locale> is written left-to-right, or false otherwise.
+
+=head2 is_rtl
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $bool = $locale->is_ltr;
+    # 0
+
+    # Hebrew:
+    my $locale = DateTime::Locale::FromCLDR->new( 'he' );
+    my $bool = $locale->is_ltr;
+    # 1
+
+Returns true if the C<locale> is written right-to-left, or false otherwise.
+
 =head2 language
 
     my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
@@ -3258,6 +4781,126 @@ This is an alias for L<language_code|/language_code>
 =head2 locale
 
 Returns the current L<Locale::Unicode> object used in the current object.
+
+=head2 locale_number_system
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $array = $locale->locale_number_system;
+    # ["latn", ["0","1","2","3","4","5","6","7","8","9"]]
+    my $locale = DateTime::Locale::FromCLDR->new( 'ar' );
+    my $array = $locale->locale_number_system;
+    # ["arab", ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"]]
+
+This returns array reference containing 2 elements for the C<locale>, crawling along the inheritance tree until it finds a proper match:
+
+=over 4
+
+=item 0. the numbering system
+
+For example: C<latn>
+
+=item 1. an array reference of digits, starting from 0, in the C<locale>'s own writing.
+
+For example: C<["0","1","2","3","4","5","6","7","8","9"]>
+
+=back
+
+=head2 metazone_daylight_long
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->metazone_daylight_long( metazone => 'Atlantic' );
+    # Atlantic Daylight Time
+    # America/Guadeloupe
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+    my $str = $locale->metazone_daylight_long( metazone => 'Atlantic' );
+    # heure d’été de l’Atlantique
+
+This returns the localised metazone name for the C<daylight> saving time mode and C<long> format for the given C<metazone> ID.
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+=head2 metazone_daylight_short
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->metazone_daylight_short( metazone => 'Atlantic' );
+    # ADT
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+    my $str = $locale->metazone_daylight_short( metazone => 'Atlantic' );
+    # HEA
+
+This returns the localised metazone name for the C<daylight> saving time mode and C<short> format for the given C<metazone> ID.
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+=head2 metazone_generic_long
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->metazone_generic_long( metazone => 'Atlantic' );
+    # Atlantic Time
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+    my $str = $locale->metazone_generic_long( metazone => 'Atlantic' );
+    # heure de l’Atlantique
+
+This returns the localised metazone name for the C<generic> time and C<long> format for the given C<metazone> ID.
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+=head2 metazone_generic_short
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->metazone_generic_short( metazone => 'Atlantic' );
+    # AT
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+    my $str = $locale->metazone_generic_short( metazone => 'Atlantic' );
+    # HA
+
+This returns the localised metazone name for the C<generic> time and C<short> format for the given C<metazone> ID.
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+=head2 metazone_standard_long
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->metazone_standard_long( metazone => 'Atlantic' );
+    # Atlantic Standard Time
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+    my $str = $locale->metazone_standard_long( metazone => 'Atlantic' );
+    # heure normale de l’Atlantique
+
+This returns the localised metazone name for the C<standard> time and C<long> format for the given C<metazone> ID.
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+=head2 metazone_standard_short
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->metazone_standard_short( metazone => 'Atlantic' );
+    # AST
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+    my $str = $locale->metazone_standard_short( metazone => 'Atlantic' );
+    # HNA
+
+This returns the localised metazone name for the C<standard> time and C<short> format for the given C<metazone> ID.
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
 
 =head2 month_format_abbreviated
 
@@ -3555,6 +5198,13 @@ Returns the C<locale>'s C<territory> ID, or C<undef> if there is none.
 
 This is an alias for L<territory_code|/territory_code>
 
+=head2 time_format_allowed
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $array = $locale->time_format_allowed;
+
+Returns an array reference of L<allowed time patterns|https://unicode.org/reports/tr35/tr35-dates.html#Time_Data> for the C<locale>'s associated territory. If the locale has no C<territory> associated with, it will check the L<likely subtag|Locale::Unicode::Data/likely_subtags> to derive the C<territory> for that C<locale>
+
 =head2 time_format_default
 
 This is an alias for L<time_format_medium|/time_format_medium>
@@ -3587,6 +5237,13 @@ Same as L<time_format_full|/time_format_full>, but returns the medium format pat
     say $locale->time_format_medium;
     # h:mm:ss a
     # 10:44:07 PM
+
+=head2 time_format_preferred
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->time_format_preferred;
+
+Returns a string representing the L<time preferred pattern|https://unicode.org/reports/tr35/tr35-dates.html#Time_Data> for the C<locale>'s associated territory. If the locale has no C<territory> associated with, it will check the L<likely subtag|Locale::Unicode::Data/likely_subtags> to derive the C<territory> for that C<locale>
 
 =head2 time_format_short
 
@@ -3627,6 +5284,282 @@ Would produce:
     10:44 PM
 
 Returns an hash reference with the keys being: C<full>, C<long>, C<medium>, C<short> and their value the result of their associated time format methods.
+
+=head2 timezone_canonical
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_canonical( timezone => 'America/Atka' );
+    # America/Adak
+
+Returns the canonical version of the given C<timezone>.
+
+The C<CLDR> keeps all timezones, even outdated ones for reliability and consistency, so this method helps switch a given C<timezone> for its canonical counterpart.
+
+If the given C<timezone> is already the canonical one, then it is simply returned.
+
+If none could be found somehow, an empty string would be returned.
+
+=head2 timezone_city
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_city( timezone => 'America/St_Barthelemy' );
+    # St. Barthélemy
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+    my $str = $locale->timezone_city( timezone => 'America/St_Barthelemy' );
+    # Saint-Barthélemy
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+    my $str = $locale->timezone_city( timezone => 'America/St_Barthelemy' );
+    # サン・バルテルミー
+
+Returns a string representing the localised version of the exemplar city for a given C<timezone>
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+=head2 timezone_format_fallback
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_format_fallback;
+    # {1} ({0})
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+    my $str = $locale->timezone_format_fallback;
+    # {1}（{0}）
+
+Returns the L<fallback|https://unicode.org/reports/tr35/tr35-dates.html#fallbackFormat> C<timezone> localised format "where {1} is the metazone, and {0} is the country or city." (quoting from the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#fallbackFormat>)
+
+Do not assume you can simply use parenthesis to format it yourself, since the format would change depending on the C<locale> used, and even the parenthesis itself varies as shown in the example above with the Japanese language (here a double byte parenthesis).
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#timeZoneNames_Elements_Used_for_Fallback> for more information.
+
+=head2 timezone_format_gmt
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_format_gmt;
+    # GMT{0}
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+    my $str = $locale->timezone_format_gmt;
+    # UTC{0}
+
+Returns the GMT localised format.
+
+This needs to be used in conjonction with the L<timezone_format_hour|/timezone_format_hour> to form a complete localised GMt formatted C<timezone>.
+
+For example:
+
+=over 4
+
+=item * C<GMT+03:30>
+
+Long
+
+=item * C<GMT+3:30>
+
+Short
+
+=item * C<UTC-03.00>
+
+Long
+
+=item * C<UTC-3>
+
+Short
+
+=item * C<Гринуич+03:30>
+
+Long
+
+=back
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names> for more information.
+
+=head2 timezone_format_gmt_zero
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_format_gmt_zero;
+    # GMT
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+    my $str = $locale->timezone_format_gmt_zero;
+    # UTC
+
+Returns the GMT localised format for when the offset is C<0>, i.e. when this is a GMT time.
+
+For example:
+
+=over 4
+
+=item * C<GMT>
+
+=item * C<UTC>
+
+=item * C<Гринуич>
+
+=back
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names> for more information.
+
+=head2 timezone_format_hour
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_format_hour;
+    # ["+HH:mm", "-HH:mm"]
+
+Returns the GMT format for hour, minute and possibly seconds, as an array reference containing 2 elements:
+
+=over 4
+
+=item 0. format for positive offset; and
+
+=item 1. format for negative offset.
+
+=back
+
+If nothing can be found, an empty array reference is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#timeZoneNames_Elements_Used_for_Fallback> for more information.
+
+=head2 timezone_format_region
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_format_region;
+    # {0} Time
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+    my $str = $locale->timezone_format_region;
+    # {0}時間
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'es' );
+    my $str = $locale->timezone_format_region;
+    # hora de {0}
+
+Returns a string representing the C<timezone> localised regional format, "where {0} is the country or city." (quoting from the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>)
+
+For example, once formatted, this would yield:
+
+=over 4
+
+=item * C<Japan Time>
+
+=item * C<日本時間>
+
+=item * C<Hora de Japón>
+
+=back
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+=head2 timezone_format_region_daylight
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_format_region_daylight;
+    # {0} Daylight Time
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+    my $str = $locale->timezone_format_region_daylight;
+    # {0}夏時間
+
+Same as L<timezone_format_region|/timezone_format_region>, but uses the C<daylight> saving time format.
+
+=head2 timezone_format_region_standard
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_format_region_standard;
+    # {0} Standard Time
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+    my $str = $locale->timezone_format_region_standard;
+    # {0}標準時
+
+Same as L<timezone_format_region|/timezone_format_region>, but uses the C<daylight> saving time format.
+
+=head2 timezone_daylight_long
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_daylight_long( timezone => 'Europe/London' );
+    # British Summer Time
+
+Returns a string of a localised representation of a given C<timezone>, for the C<daylight> saving time in C<long> format.
+
+If none exists for the given C<timezone>, which may often be the case, you need to use the C<timezone> format methods instead (L<timezone_format_fallback|/timezone_format_fallback>, L<timezone_format_gmt|/timezone_format_gmt>, L<timezone_format_gmt_zero|/timezone_format_gmt_zero>, L<timezone_format_hour|/timezone_format_hour>, L<timezone_format_hour|/timezone_format_hour>, L<timezone_format_region|/timezone_format_region>, L<timezone_format_region_daylight|/timezone_format_region_daylight>, and L<timezone_format_region_standard|/timezone_format_region_standard>)
+
+If nothing can be found, an empty string is returned.
+
+If an error occurred, an L<exception object|DateTime::Format::FromCLDR::Exception> is set, and C<undef> is returned in scalar context, or an empty list in list context.
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names> for more information.
+
+=head2 timezone_daylight_short
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_daylight_short( timezone => 'Europe/London' );
+    # ""
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_daylight_short( timezone => 'Pacific/Honolulu' );
+    # HDT
+
+Same as L<timezone_daylight_long|/timezone_daylight_long>, but for the C<daylight> saving time C<short> format.
+
+=head2 timezone_generic_long
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_generic_long( timezone => 'Europe/London' );
+    # ""
+
+Same as L<timezone_daylight_long|/timezone_daylight_long>, but for the C<generic> C<long> format.
+
+=head2 timezone_generic_short
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_generic_short( timezone => 'Europe/London' );
+    # ""
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_generic_short( timezone => 'Pacific/Honolulu' );
+    # HST
+
+Same as L<timezone_daylight_long|/timezone_daylight_long>, but for the C<generic> C<short> format.
+
+=head2 timezone_standard_long
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_standard_long( timezone => 'Europe/London' );
+    # ""
+
+Same as L<timezone_daylight_long|/timezone_daylight_long>, but for the C<standard> C<long> format.
+
+=head2 timezone_standard_short
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_standard_short( timezone => 'Europe/London' );
+    # ""
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $str = $locale->timezone_standard_short( timezone => 'Pacific/Honolulu' );
+    # HST
+
+Same as L<timezone_daylight_long|/timezone_daylight_long>, but for the C<standard> C<short> format.
 
 =head2 variant
 

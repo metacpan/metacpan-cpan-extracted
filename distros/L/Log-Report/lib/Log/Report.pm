@@ -8,7 +8,7 @@
 
 package Log::Report;
 use vars '$VERSION';
-$VERSION = '1.38';
+$VERSION = '1.39';
 
 use base 'Exporter';
 

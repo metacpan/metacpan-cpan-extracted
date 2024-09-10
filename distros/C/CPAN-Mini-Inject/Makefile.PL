@@ -49,8 +49,8 @@ my %WriteMakefile = (
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
-	'LICENSE'		=> 'artistic_2',
-	'AUTHOR'		=> 'brian d foy <briandfoy@pobox.com>',
+	'LICENSE'		=> 'perl',
+	'AUTHOR'		=> 'Shawn Sorichetti <ssoriche@cpan.org>',
 
   	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker' => '6.64',
@@ -67,6 +67,7 @@ my %WriteMakefile = (
 		'Carp'                      => '0',
 		'Compress::Zlib'            => '0',
 		'CPAN::Checksums'           => '2.13',
+		'CPAN::Meta'                => '2.150010',
 		'CPAN::Mini'                => '0.32',
 		'Dist::Metadata'            => '0.921',
 		'File::Basename'            => '0',
@@ -83,6 +84,7 @@ my %WriteMakefile = (
 		'Net::EmptyPort'            => '0',
 		'Pod::Usage'                => '0',
 		'YAML'                      => '0',
+		'version'                   => '0.9915', # see briandfoy/cpan-mini-inject#11
 		},
 
 	'EXE_FILES' => [qw(bin/mcpani)],

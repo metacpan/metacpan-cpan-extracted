@@ -1,12 +1,5 @@
-=pod
-
-TODO
- - default file view : frameset (title+attributes, file content)
- - dir view : distinct subnodes for directories and files
-
-=cut
-
 package Tree::Navigator::Node::Filesys;
+use utf8;
 use Moose;
 extends 'Tree::Navigator::Node';
 
@@ -138,11 +131,16 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=encoding utf8
 
 =head1 NAME
 
-Tree::Navigator::Node::Filesys - The great new Tree::Navigator::Node::Filesys!
+Tree::Navigator::Node::Filesys - navigating in a filesystem
 
-=cut
+=head1 TODO
+
+   - default file view : frameset (title+attributes, file content)
+   - dir view : distinct subnodes for directories and files
+
 
 

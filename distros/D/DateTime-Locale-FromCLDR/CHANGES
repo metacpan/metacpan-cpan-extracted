@@ -1,5 +1,14 @@
 Revision history for Perl module DateTime::Locale::FromCLDR
 
+v0.2.1 2024-09-10T13:50:59+0900
+    - Correction of debugging function not removed in prior release
+
+v0.2.0 2024-09-09T18:49:35+0900
+    - Added more am_pm methods for several formats width and associated documentation
+    - Improved the day_period methods to allow fallback to AM/PM if day period is midnight or noon and there is no data, as per the LDML specifications
+    - Modified method error() to return an array reference when caller is expecting one
+    - Added complex timezone formatting methods 'format_timezone_non_location' and 'format_timezone_location'
+
 v0.1.1 2024-08-02T08:37:29+0900
     - Documentation update
 

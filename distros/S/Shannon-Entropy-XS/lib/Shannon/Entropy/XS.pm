@@ -6,7 +6,7 @@ use warnings;
 
 use base qw/Import::Export/;
  
-our $VERSION = '0.03';
+our $VERSION = '1.00';
  
 our %EX = (
         entropy => [qw/all/]
@@ -25,7 +25,7 @@ Shannon::Entropy::XS - Calculate the Shannon entropy H of a given input string f
  
 =head1 VERSION
  
-Version 0.03
+Version 1.00
  
 =cut
  

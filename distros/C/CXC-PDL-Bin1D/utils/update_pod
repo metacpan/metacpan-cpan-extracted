@@ -1,0 +1,18 @@
+#!
+root=$1
+build=$2
+
+(
+  cd "$build"
+  perl Makefile.PL
+  make Bin1D.pm
+)
+
+echo "# PODNAME: CXC::PDL::Bin1D" > "$root"/lib/CXC/PDL/Bin1D.pod
+echo "# ABSTRACT: One Dimensional Binning Utilities" >> "$root"/lib/CXC/PDL/Bin1D.pod
+podselect -section '!NAME' "$build"/Bin1D.pm >> "$root"/lib/CXC/PDL/Bin1D.pod
+
+(
+  cd "$build"
+  make distclean
+)

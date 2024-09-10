@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use base 'Import::Export';
 
@@ -13,7 +13,7 @@ our %EX = (
 );
 
 require XSLoader;
-XSLoader::load();
+XSLoader::load('Data::LnArray::XS', $VERSION);
 
 sub splice {
 	splice @{$_[0]}, $_[1], $_[2], ($_[3] ? $_[3] : ());
@@ -30,7 +30,7 @@ Data::LnArray::XS - Arrays
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

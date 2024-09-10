@@ -248,10 +248,11 @@ sub process
     my $anno_dir = $basedir->child( 'annotations' );
     my $bcp47_dir = $basedir->child( 'bcp47' );
     my $casings_dir = $basedir->child( 'casing' );
+    my $collation_dir = $basedir->child( 'collation' );
     my $main_dir = $basedir->child( 'main' );
     my $rbnf_dir = $basedir->child( 'rbnf' );
     my $subdivisions_l10n_dir = $basedir->child( 'subdivisions' );
-    for( $anno_dir, $bcp47_dir, $casings_dir, $main_dir, $rbnf_dir, $subdivisions_l10n_dir )
+    for( $anno_dir, $bcp47_dir, $casings_dir, $collation_dir, $main_dir, $rbnf_dir, $subdivisions_l10n_dir )
     {
         die( "No diectory ${_} found." ) if( !$_->exists );
     }
@@ -302,7 +303,7 @@ sub process
         languages => "INSERT OR IGNORE INTO languages (language, scripts, territories, parent, alt, status) VALUES(?, ?, ?, ?, ?, ?)",
         languages_match => "INSERT INTO languages_match (desired, supported, distance, is_symetric, is_regexp, sequence) VALUES(?, ?, ?, ?, ?, ?)",
         likely_subtags => "INSERT INTO likely_subtags (locale, target) VALUES(?, ?)",
-        locales => "INSERT INTO locales (locale, parent, status) VALUES(?, ?, ?)",
+        locales => "INSERT INTO locales (locale, parent, collations, status) VALUES(?, ?, ?, ?)",
         locales_info => "INSERT INTO locales_info (locale, property, value) VALUES(?, ?, ?)",
         locales_l10n => "INSERT INTO locales_l10n (locale, locale_id, locale_name, alt) VALUES(?, ?, ?, ?)",
         locale_number_systems => "INSERT INTO locale_number_systems (locale, number_system, native, traditional, finance) VALUES(?, ?, ?, ?, ?)",
@@ -326,6 +327,8 @@ sub process
         time_formats => "INSERT INTO time_formats (region, territory, locale, time_format, time_allowed) VALUES(?, ?, ?, ?, ?)",
         timezones => "INSERT INTO timezones (timezone, territory, region, tzid, metazone, tz_bcpid, is_golden, is_primary, is_preferred, is_canonical,  alias) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         timezones_cities => "INSERT INTO timezones_cities (locale, timezone, city, alt) VALUES(?, ?, ?, ?)",
+        # This is defined in the extend_timezones_cities() function
+        timezones_cities_supplemental => undef,
         timezones_formats => "INSERT INTO timezones_formats (locale, type, subtype, format_pattern) VALUES(?, ?, ?, ?)",
         timezones_info => "INSERT INTO timezones_info (timezone, metazone, start, until) VALUES(?, ?, ?, ?)",
         timezones_names => "INSERT INTO timezones_names (locale, timezone, width, generic, standard, daylight) VALUES(?, ?, ?, ?, ?, ?)",
@@ -347,7 +350,13 @@ sub process
         my $id = $queries->[$i];
         $out->print( "[${id}] " ) if( $DEBUG );
         my $sql = $queries->[$i + 1];
-        if( exists( $sths->{ $id } ) )
+        # It is listed, but we skip it to make the 'tables_to_query_check' happy
+        if( !defined( $sql ) )
+        {
+            delete( $tables_to_query_check->{ $id } );
+            next;
+        }
+        elsif( exists( $sths->{ $id } ) )
         {
             die( "There is already a statement object for ID '${id}' with SQL: ", $sths->{ $id }->{Statement} );
         }
@@ -1741,24 +1750,100 @@ sub process
         }
         $out->print( "ok\n" ) if( $DEBUG );
     }
-    
+
+    # NOTE: Adding collations information to locales
+    &log( "Adding collations information to locales." );
+    $n = 0;
+    $collation_dir->open || die( $collation_dir->error );
+    # while( my $f = $main_dir->read( as_object => 1, exclude_invisible => 1 ) )
+    @files = $collation_dir->read( as_object => 1, exclude_invisible => 1, 'sort' => 1 );
+    foreach my $f ( @files )
+    {
+        next unless( $f->extension eq 'xml' );
+        my $basename = $f->basename;
+        my $collationDoc = load_xml( $f );
+        my $locale = identity_to_locale( $collationDoc );
+        ( my $locale2 = $f->basename( '.xml' ) ) =~ tr/_/-/;
+        if( lc( $locale ) ne lc( $locale2 ) &&
+            $locale2 ne 'root' )
+        {
+            warn( "XML identity says the locale is '${locale}', but the file basename says it should be '${locale2}', and I think the file basename is correct for file $f" );
+            $locale = $locale2;
+        }
+        if( index( $locale, 'root' ) != -1 )
+        {
+            if( length( $locale ) > 4 )
+            {
+                my $loc = Locale::Unicode->new( $locale );
+                $loc->language( 'und' );
+                $locale = $loc->as_string;
+            }
+            else
+            {
+                $locale = 'und';
+            }
+        }
+        $out->print( "[${basename}] -> ${locale} " ) if( $DEBUG );
+        my $collationTypesRes = $collationDoc->findnodes( '/ldml/collations/collation[@type]' );
+        if( !$collationTypesRes->size )
+        {
+            $out->print( "\tnothing found. This locale inherits collation from root (und)\n" ) if( $DEBUG );
+            next;
+        }
+        my @collations = ();
+        while( my $el = $collationTypesRes->shift )
+        {
+            my $name = $el->getAttribute( 'type' );
+            if( !length( $name // '' ) )
+            {
+                warn( "The locale ${locale} is missing the 'type' attribute for collation in file ${f}." );
+                next;
+            }
+            push( @collations, $name );
+        }
+        if( !exists( $known_locales->{ $locale } ) )
+        {
+            $known_locales->{ $locale } = { locale => $locale };
+        }
+        if( scalar( @collations ) )
+        {
+            @collations = uniq( @collations );
+            $known_locales->{ $locale }->{collations} = \@collations;
+            $out->print( "ok" );
+            $n++;
+        }
+        else
+        {
+            $out->print( "nothing found" );
+        }
+        $out->print( "\n" ) if( $DEBUG );
+    }
+    &log( "${n} locales were added collation information." );
+    $collation_dir->close;
+
     $n = 0;
     $sth = $sths->{locales} || die( "No SQL statement object for locales" );
     foreach my $locale ( sort( keys( %$known_locales ) ) )
     {
         my $def =
         {
-            locale      => $locale,
+            locale => $locale,
         };
         if( ref( $known_locales->{ $locale } ) eq 'HASH' )
         {
             $def->{parent} = $known_locales->{ $locale }->{parent};
             $def->{status} = $known_locales->{ $locale }->{status};
         }
+        if( exists( $known_locales->{ $locale }->{collations} ) &&
+            defined( $known_locales->{ $locale }->{collations} ) &&
+            ref( $known_locales->{ $locale }->{collations} ) eq 'ARRAY' )
+        {
+            $def->{collations} = to_array( $known_locales->{ $locale }->{collations} );
+        }
         $out->print( "[${locale}] " ) if( $DEBUG );
         eval
         {
-            $sth->execute( @$def{qw( locale parent status )} );
+            $sth->execute( @$def{qw( locale parent collations status )} );
         } || die( "Error adding locale '${locale}' to table 'locales': ", ( $@ || $sth->errstr ), "\nfor SQL query $sth->{Statement}", "\n", dump( $def ) );
         $out->print( "ok\n" ) if( $DEBUG );
         $n++;
@@ -5322,6 +5407,18 @@ sub process
                     } || die( "Error executing SQL query to add locale's numbering systems used for locale ${locale} in file ${f}: ", ( $@ || $sth_locale_num_sys->errstr ), "\nSQL Query: ", $sth_locale_num_sys->{Statement}, "\n", dump( $def ) );
                 }
             }
+            elsif( defined( $default_num_system ) )
+            {
+                my $def =
+                {
+                    locale => $locale,
+                    number_system => $default_num_system,
+                };
+                eval
+                {
+                    $sth_locale_num_sys->execute( @$def{qw( locale number_system native traditional finance )} );
+                } || die( "Error executing SQL query to add locale's numbering systems used for locale ${locale} in file ${f}: ", ( $@ || $sth_locale_num_sys->errstr ), "\nSQL Query: ", $sth_locale_num_sys->{Statement}, "\n", dump( $def ) );
+            }
 
             foreach my $n_type ( sort( keys( %$number_format_map ) ) )
             {
@@ -6390,6 +6487,11 @@ sub process
     if( $opts->{apply_patch} )
     {
         &patch_territories_languages;
+    }
+
+    if( $opts->{extended_timezones_cities} )
+    {
+        &extend;
     }
     
     # NOTE: Done !

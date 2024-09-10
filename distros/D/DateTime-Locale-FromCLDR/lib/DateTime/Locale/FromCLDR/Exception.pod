@@ -20,22 +20,13 @@ or, providing a list of string that will be concatenated:
 
     my $ex = DateTime::Locale::FromCLDR::Exception->new( "Some error", "has occurred:", $details );
 
-or, re-using an exception object:
-
-    my $ex = DateTime::Locale::FromCLDR::Exception->new( $other_exception_object );
-
-    $object->customer_orders ||
-        die( "Error in file ", $object->error->file, " at line ", $object->error->line, "\n" );
-    # or simply:
-    $object->customer_orders || die( "Error: ", $object->error, "\n" );
-
 =head1 VERSION
 
     v0.1.0
 
 =head1 DESCRIPTION
 
-This is an exception class for L<Locale::Unicode>
+This is an exception class for L<Locale::Unicode::FromCLDR>
 
 When stringified, it provides the error message along with precise information about where the error occurred.
 
@@ -48,11 +39,6 @@ L<DateTime::Locale::FromCLDR::Exception> objects are created by L<Locale::Unicod
 It takes either an L<DateTime::Locale::FromCLDR::Exception> object or an hash reference of properties, or a list of arguments that will be concatanated to form the error message. The list of arguments can contain code reference such as reference to sub routines, who will be called and their returned value added to the error message string. For example :
 
     my $ex = DateTime::Locale::FromCLDR::Exception->new( "Invalid property. Value recieved are: ", sub{ Dumper( $hash ) } );
-
-    # or
-
-    my $ex = DateTime::Locale::FromCLDR::Exception->new( $other_exception_object_for_reuse );
-    # This will the object property
 
     # or
 

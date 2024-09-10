@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use Util::H2O::More qw/ddd/;
 use Acme::Free::API::Stonks qw//;
 
 my $stonk = Acme::Free::API::Stonks->new;

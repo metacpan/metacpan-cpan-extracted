@@ -1,4 +1,5 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
+use v5.16;
 
 use strict;
 use Pod::Usage 1.12;
@@ -9,7 +10,7 @@ use Env;
 use File::Slurp 'write_file';
 use File::Temp;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 our %options = ();
 
 sub print_version {
@@ -142,7 +143,7 @@ Commands:
           --module      Name of the module to add
           --authorid    Author ID of the module
           --modversion  Version number of the module
-          --file        tar.gz file of the module
+          --file        distribution module
 
     --update            Update local CPAN mirror and inject modules
     --mirror            Update local CPAN mirror from remote
@@ -162,130 +163,12 @@ Options:
 
 =head1 DESCRIPTION
 
-mcpani uses CPAN::Mini to build or update a I<local> CPAN mirror from a
-I<remote> one.  It adds two extra features:
+B<mcpani> uses L<CPAN::Mini> to build or update a local CPAN mirror from a
+remote one, while also adding private or third-party distributions.
 
-1. an additional I<repository> of distribution files and related information
-(author and module versions), separate from the local and remote mirrors, to
-which you can add your own distribution files.
+=head2 Configuration file
 
-2. the ability to I<inject> the distribution files from your I<repository>
-into a I<local> CPAN mirror.
-
-=head1 COMMAND LINE OPTIONS
-
-=head2 --add
-
-Add a module to the repository for later inclusion in a CPAN Mini
-mirror. The add command requires the following parameters:
-
-=over 4
-
-=item --module
-
-This is the name of the module (ie CPAN::Mini::Inject).
-
-=item --authorid
-
-A CPAN 'like' author ID for the module. The author ID does not need to
-exist on CPAN.
-
-=item --modversion
-
-Version number of the module. This must match the version number in the
-file name.
-
-=item --all-in-meta
-
-=item --discover-packages
-
-L<CPAN::Mini::Inject/add> adds all modules found in the file.
-These options remain for backward compatibility and do nothing.
-
-=item --file
-
-File name and path of the module. The file name must follow the
-standard CPAN naming convention (the resulting file from a
-C<make tardist>).
-
-=back
-
-  Example:
-
-  mcpani --add --module CPAN::Mini::Inject --authorid SSORICHE
-         --modversion 0.01 --file ./CPAN-Mini-Inject-0.01.tar.gz
-
-
-=head2 --update
-
-Update your local CPAN Mini mirror from a CPAN site. Once completed
-add the modules contained in the repository to it. This is the same
-as running C<mcpani --mirror> followed by C<mcpani --inject>
-
-=head2 --mirror
-
-Update the local CPAN Mini mirror from CPAN.
-
-=head2 --inject
-
-Add the repository modules into the CPAN Mini mirror.
-
-=head2 -l, --local
-
-A local directory to store the CPAN Mini mirror in. Specifying this
-option overrides the value in the config file.
-
-=head2 -r, --remote
-
-A CPAN site to create the local CPAN Mini mirror from.
-
-=head2 -v, --verbose
-
-Display verbose processing information
-
-=head2 -V, --version
-
-Display version information.
-
-=head1 CONFIGURATION FILE
-
-F<mcpani> uses a simple configuration file in the following format:
-
- local: /www/CPAN
- remote: ftp://ftp.cpan.org/pub/CPAN ftp://ftp.kernel.org/pub/CPAN
- repository: /work/mymodules
- passive: yes
- dirmode: 0755
-
-Description of options:
-
-=over 4
-
-=item * local
-
-location to store local CPAN::Mini mirror (*REQUIRED*)
-
-=item * remote
-
-CPAN site(s) to mirror from. Multiple sites can be listed, with spaces
-between them. (*REQUIRED*)
-
-=item * repository
-
-Location to store modules to add to the local CPAN::Mini mirror.
-
-=item * passive
-
-Enable passive FTP.
-
-=item * dirmode
-
-Set the permissions of created directories to the specified mode
-(octal value). The default value is based on the umask (if supported).
-
-=back
-
-F<mcpani> will search the following four places in order:
+B<mcpani> will search the following four places in order:
 
 =over 4
 
@@ -299,22 +182,113 @@ F<mcpani> will search the following four places in order:
 
 =back
 
-=head1 CURRENT MAINTAINER
+By default, B<mcpani> uses a simple configuration file in the following format:
 
-Christian Walde C<< <walde.christian@googlemail.com> >>
+ local: /www/CPAN
+ remote: ftp://ftp.cpan.org/pub/CPAN ftp://ftp.kernel.org/pub/CPAN
+ repository: /work/mymodules
+ passive: yes
+ dirmode: 0755
+
+=head2 Configuration options
+
+=over 4
+
+=item C<local> (required)
+
+location to store local CPAN::Mini mirror
+
+=item C<remote> (required)
+
+CPAN site(s) to mirror from. Multiple sites can be listed, with spaces
+between them.
+
+=item C<repository>
+
+Location to store modules to add to the local CPAN::Mini mirror.
+
+=item C<passive>
+
+Enable passive FTP.
+
+=item C<dirmode>
+
+Set the permissions of created directories to the specified mode
+(octal value). The default value is based on the umask (if supported).
+
+=back
+
+=head2 Command-line options
+
+=over 4
+
+=item C<--add>
+
+=over 4
+
+=item C<--authorid> the CPAN ID
+
+=item C<--file> the distribution file
+
+=item C<--module> the package name of the main module
+
+=item C<-v>, C<--verbose>
+
+=item C<--version> the version of the distribution
+
+=back
+
+=item C<-h>, C<-H>, C<--help>, C<--man>, C<-?>
+
+Output a help message and exit.
+
+=item C<--inject>
+
+Inject the local distributions into the local repository.
+
+=over 4
+
+=item C<-v>, C<--verbose>
+
+=back
+
+=item C<--mirror>
+
+Update the local MiniCPAN by downloading the latest modules from the
+public CPAN (or the CPAN-like repo specified in the C<remote> config.
+C<--mirror> uses
+
+=over 4
+
+=item C<-l>, C<--local>
+
+=item C<-r>, C<--remote>
+
+=item C<-v>, C<--verbose>
+
+=back
+
+=item C<--update>
+
+This runs C<--mirror> then C<--inject>.
+
+=item  C<-V>, C<--version>
+
+Output the version of B<mcpani> and exit.
+
+=back
 
 =head1 AUTHOR
 
 Shawn Sorichetti C<< <ssoriche@coloredblocks.net> >>
 
-=head1 BUGS
+=head1 ISSUES
 
-Please report any bugs or feature requests to
-C<bug-cpan-mini-inject@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
-be notified of progress on your bug as I make changes.
+Report issues to the GitHub queue:
 
-=head1 Copyright & License
+	https://github.com/briandfoy/cpan-mini-inject/issues
+
+=head1 COPYRIGHT & LICENSE
 
 Copyright 2004 Shawn Sorichetti, All Rights Reserved.
 

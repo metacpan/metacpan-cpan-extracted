@@ -1,3 +1,8 @@
-0.9.8   Tue Sep 3 04:13:30 PM UTC 2024
+0.9.8   Tue Sep  3 04:13:30 PM UTC 2024
         - Initial release of API client for https://dog.ceo/dog-api
         - Updates to POD and minor bug fixes are expected before 1.0.0
+
+0.9.9	Mon Sep  9 05:39:16 PM UTC 2024
+	- Maintenance release, fixed dist.ini and generated files
+	  to include Dispatch::Fu needed for the "fletch" client
+	  (included).

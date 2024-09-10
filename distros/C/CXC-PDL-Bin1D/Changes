@@ -1,0 +1,96 @@
+Revision history for CXC-PDL-Bin1D
+
+0.27      2024-09-09 15:38:34-04:00 America/New_York
+
+  [BUILD]
+
+   * CXC/PDL/Bin1D.pm is created during the build process, so is not
+     available for indexing by CPAN; add explicit entry for it.
+
+0.26      2024-09-09 13:56:26-04:00 America/New_York
+
+  [FIX]
+
+    * make compatible with Hash::Wrap v.1.00
+
+0.25      2024-01-20 15:47:52-05:00 America/New_York (TRIAL RELEASE)
+
+  [RENAME]
+
+    * Rename back to CXC::PDL::Bin1D from interim PDLx::Bin1D name.
+
+  [BUG FIX]
+
+    * fix segvs for non-weighted and rss algorithms under PDL > 2.017.
+    * temp piddles are no longer passed in for PDL >= 2.073.
+
+  [TEST]
+
+    * tests failed because they did not handle BIN_RC_GTMINSN result flag.
+    * fix 'unitialized value in subroutine entry warnings'
+
+0.24      2021-05-16 22:19:30-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD / TESTS]
+
+   * PDL >= 2.017 is required for newer API for PDL::Slices::rle
+
+0.23      2021-05-12 14:11:12-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+   * remove C99'ism from code.
+
+0.22      2021-05-07 14:17:26-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+   * clean up warnings for PDL > 2.030
+   * specify minimum version of Type::Params
+
+
+0.21      2021-05-07 14:13:34-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+    * clean up for CPAN release
+    * switch to Dist::Zilla from Module::Install
+
+0.20	2016-07-19T15:42:01-0400
+
+  [MAJOR CHANGES]
+
+    * essentially, this is a whole new module built on the
+      functionality of CXC::PDL::Bin1D.  Nothing is the same.
+
+0.12	2009-04-27T14:06:54-04:00
+       - bin_err bin folding is now optional
+
+0.11	2009-04-24T15:58:31-04:00
+       - bin_err widths constraints were handled incorrectly
+
+0.10	2009-04-23T16:31:27-04:00
+       - bin_err can now use width constraints
+       - bin_err returns per-bin status code
+
+0.06	2008-04-25T17:26:54-04:00
+       - bin_err & bin_sdev now handle bad values
+
+0.05	2008-04-25T13:28:00-04:00
+       - new bin_err routine
+       - refactored bin_sdev interface; not backwards compatible
+
+0.04	2008-04-23T16:00:07-04:00
+       - bin_sdev folding of last bin sometimes led to S/N falling below
+         the threshold.
+
+0.03	2008-04-23T14:47:19-04:00
+       - massive bug fixes. last version was quite broken
+       - changed name from hist* to bin* as it's really a binning thing.
+
+0.02	2008-04-23T10:38:32-04:00
+       - hist_sdev now returns indices to the minimum and maximum bin values
+
+0.01	2008-04-23T09:50:53-04:00
+       Initial release.
+

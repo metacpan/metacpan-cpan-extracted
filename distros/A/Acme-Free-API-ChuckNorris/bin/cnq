@@ -57,7 +57,7 @@ sub do_search {
 }
 
 sub do_help {
-    warn "warning cnq: subcommand may be one of the following: 'random', 'categories', 'search'\n";
+    warn "warning cnq: subcommand may be one of the following: 'random', 'categories', 'search', or 'help' (prints this!)\n";
 }
 
 __END__

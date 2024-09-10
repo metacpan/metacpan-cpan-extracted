@@ -1,14 +1,14 @@
 cpanfile
 lib/Dancer2/Plugin/SlapbirdAPM.pm
-lib/DBIx/Tracer.pm
 lib/SlapbirdAPM/Agent/Dancer2.pm
+lib/SlapbirdAPM/DBIx/Tracer.pm
 lib/SlapbirdAPM/Trace.pm
 lib/SlapbirdAPM/Trace/Tracer.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
-SlapbirdAPM-Agent-Dancer2-0.002.tar.gz
+SlapbirdAPM-Agent-Dancer2-0.005.tar.gz
 t/basic.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

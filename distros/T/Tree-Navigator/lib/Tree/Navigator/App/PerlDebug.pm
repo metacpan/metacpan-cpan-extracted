@@ -1,3 +1,5 @@
+=encoding utf8
+
 =pod
 
 TODO
@@ -8,6 +10,7 @@ TODO
 
 
 package Tree::Navigator::App::PerlDebug;
+use utf8;
 use strict;
 use warnings;
 use Tree::Navigator;

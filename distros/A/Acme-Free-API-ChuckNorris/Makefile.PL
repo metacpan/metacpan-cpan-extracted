@@ -19,17 +19,19 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Acme::Free::API::ChuckNorris",
   "PREREQ_PM" => {
+    "Dispatch::Fu" => "1.06",
     "HTTP::Tiny" => 0,
     "JSON" => 0,
-    "Util::H2O::More" => 0
+    "Util::H2O::More" => "0.4.0"
   },
   "TEST_REQUIRES" => {
+    "Dispatch::Fu" => "1.06",
     "HTTP::Tiny" => 0,
     "JSON" => 0,
     "Test::More" => 0,
-    "Util::H2O::More" => 0
+    "Util::H2O::More" => "0.4.0"
   },
-  "VERSION" => "0.9.10",
+  "VERSION" => "1.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,10 +39,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Dispatch::Fu" => "1.06",
   "HTTP::Tiny" => 0,
   "JSON" => 0,
   "Test::More" => 0,
-  "Util::H2O::More" => 0
+  "Util::H2O::More" => "0.4.0"
 );
 
 

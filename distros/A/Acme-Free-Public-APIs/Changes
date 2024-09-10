@@ -2,3 +2,9 @@
 	- Initial upload
         - client for the main site's API - yes,
           the API to rule all APIs :-)
+0.9.9	Mon Sep  9 03:30:43 PM UTC 2024
+	- fix GH #1, missing dependency in build
+	  stuff (dist.ini, et al.) specifying a
+	  dependency on Dispatch::Fu (jwrightecs)
+	- minor POD update, code clean up
+	- maintenance release (dist.ini)

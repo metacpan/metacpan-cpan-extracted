@@ -1,5 +1,8 @@
 Revision history for Perl module Mac::PropertyList
 
+1.602 2024-09-09T10:19:03Z
+	* remove stray debugging statement (from joz-k, #28)
+
 1.601 2024-07-27T00:58:50Z
 	* changed default DTD header to use "Apple" instead of "Apple Computer"
 	to match what XCode has been doing (Apple changed it's name in 2007).

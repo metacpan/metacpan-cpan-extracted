@@ -1,5 +1,27 @@
 Revision history for CPAN-Mini-Inject
 
+1.005 2024-09-09T13:18:08Z
+	* temporary fix for CPAN::Meta until upstream is released. See
+	https://github.com/Perl-Toolchain-Gang/CPAN-Meta/issues/138 .
+	(#31, from XSven).
+
+1.004_05 2024-09-01T21:53:16Z
+	* try to nail down a couple of CPAN Testers holdouts that seem to have
+	weird setups
+
+1.004_04 2024-08-18T07:16:41Z
+	* if we can't start the remote server for testing, bypass the tests
+	without failing.
+
+1.004_03 2024-07-31T12:57:36Z
+	* some small refactorings and doc improvements
+
+1.004_02 2024-07-30T10:51:40Z
+	* override some of CPAN::Meta::Converter so it doesn't change the 
+	version string. This was exposed by an edge case like v1.2.3_4 where
+	the numified and string versions are different. CPAN::Mini::Inject will
+	use the original string version that the distribution declared. (GitHub #11)
+
 1.003 2024-06-10T08:56:12Z
 	* left mcpani out of EXE_FILES (#3)
 

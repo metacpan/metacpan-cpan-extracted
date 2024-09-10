@@ -1,5 +1,9 @@
 Revision history for Tree-Navigator
 
+0.07 08.09.2024
+  - removed given/when
+  - use Module::Build
+
 0.06 08.11.2015
   - RT108070 removing MYMETA files from the distribution (Chorny++)
 

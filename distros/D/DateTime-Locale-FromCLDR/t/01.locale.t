@@ -32,6 +32,12 @@ isa_ok( $locale, 'DateTime::Locale::FromCLDR' );
 # To generate this list:
 # perl -lnE '/^sub (?!new|[A-Z]|_)/ and say "can_ok( \$locale, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/DateTime/Locale/FromCLDR.pm
 can_ok( $locale, 'am_pm_abbreviated' );
+can_ok( $locale, 'am_pm_format_abbreviated' );
+can_ok( $locale, 'am_pm_format_narrow' );
+can_ok( $locale, 'am_pm_format_wide' );
+can_ok( $locale, 'am_pm_standalone_abbreviated' );
+can_ok( $locale, 'am_pm_standalone_narrow' );
+can_ok( $locale, 'am_pm_standalone_wide' );
 can_ok( $locale, 'as_string' );
 can_ok( $locale, 'available_formats' );
 can_ok( $locale, 'calendar' );
@@ -56,6 +62,13 @@ can_ok( $locale, 'day_format_abbreviated' );
 can_ok( $locale, 'day_format_narrow' );
 can_ok( $locale, 'day_format_short' );
 can_ok( $locale, 'day_format_wide' );
+can_ok( $locale, 'day_period_format_abbreviated' );
+can_ok( $locale, 'day_period_format_narrow' );
+can_ok( $locale, 'day_period_format_wide' );
+can_ok( $locale, 'day_period_stand_alone_abbreviated' );
+can_ok( $locale, 'day_period_stand_alone_narrow' );
+can_ok( $locale, 'day_period_stand_alone_wide' );
+can_ok( $locale, 'day_periods' );
 can_ok( $locale, 'day_stand_alone_abbreviated' );
 can_ok( $locale, 'day_stand_alone_narrow' );
 can_ok( $locale, 'day_stand_alone_short' );
@@ -65,14 +78,29 @@ can_ok( $locale, 'default_time_format_length' );
 can_ok( $locale, 'era_abbreviated' );
 can_ok( $locale, 'era_narrow' );
 can_ok( $locale, 'era_wide' );
+can_ok( $locale, 'error' );
 can_ok( $locale, 'first_day_of_week' );
 can_ok( $locale, 'format_for' );
+can_ok( $locale, 'format_gmt' );
+can_ok( $locale, 'format_timezone_location' );
+can_ok( $locale, 'format_timezone_non_location' );
+can_ok( $locale, 'has_dst' );
 can_ok( $locale, 'interval_format' );
 can_ok( $locale, 'interval_formats' );
 can_ok( $locale, 'interval_greatest_diff' );
+can_ok( $locale, 'is_dst' );
+can_ok( $locale, 'is_ltr' );
+can_ok( $locale, 'is_rtl' );
 can_ok( $locale, 'language' );
 can_ok( $locale, 'language_code' );
 can_ok( $locale, 'locale' );
+can_ok( $locale, 'locale_number_system' );
+can_ok( $locale, 'metazone_daylight_long' );
+can_ok( $locale, 'metazone_daylight_short' );
+can_ok( $locale, 'metazone_generic_long' );
+can_ok( $locale, 'metazone_generic_short' );
+can_ok( $locale, 'metazone_standard_long' );
+can_ok( $locale, 'metazone_standard_short' );
 can_ok( $locale, 'month_format_abbreviated' );
 can_ok( $locale, 'month_format_narrow' );
 can_ok( $locale, 'month_format_wide' );
@@ -86,6 +114,7 @@ can_ok( $locale, 'native_script' );
 can_ok( $locale, 'native_territory' );
 can_ok( $locale, 'native_variant' );
 can_ok( $locale, 'native_variants' );
+can_ok( $locale, 'pass_error' );
 can_ok( $locale, 'prefers_24_hour_time' );
 can_ok( $locale, 'quarter_format_abbreviated' );
 can_ok( $locale, 'quarter_format_narrow' );
@@ -97,12 +126,30 @@ can_ok( $locale, 'script' );
 can_ok( $locale, 'script_code' );
 can_ok( $locale, 'territory' );
 can_ok( $locale, 'territory_code' );
+can_ok( $locale, 'time_format_allowed' );
 can_ok( $locale, 'time_format_default' );
 can_ok( $locale, 'time_format_full' );
 can_ok( $locale, 'time_format_long' );
 can_ok( $locale, 'time_format_medium' );
+can_ok( $locale, 'time_format_preferred' );
 can_ok( $locale, 'time_format_short' );
 can_ok( $locale, 'time_formats' );
+can_ok( $locale, 'timezone_canonical' );
+can_ok( $locale, 'timezone_city' );
+can_ok( $locale, 'timezone_daylight_long' );
+can_ok( $locale, 'timezone_daylight_short' );
+can_ok( $locale, 'timezone_format_fallback' );
+can_ok( $locale, 'timezone_format_gmt' );
+can_ok( $locale, 'timezone_format_gmt_zero' );
+can_ok( $locale, 'timezone_format_hour' );
+can_ok( $locale, 'timezone_format_region' );
+can_ok( $locale, 'timezone_format_region_daylight' );
+can_ok( $locale, 'timezone_format_region_standard' );
+can_ok( $locale, 'timezone_generic_long' );
+can_ok( $locale, 'timezone_generic_short' );
+can_ok( $locale, 'timezone_id' );
+can_ok( $locale, 'timezone_standard_long' );
+can_ok( $locale, 'timezone_standard_short' );
 can_ok( $locale, 'variant' );
 can_ok( $locale, 'variant_code' );
 can_ok( $locale, 'variants' );
@@ -303,17 +350,17 @@ my $tests = [
         datetime_format_medium => q{d MMM y, H:mm:ss},
         datetime_format_short => q{d/M/yy, H:mm},
         day_format_abbreviated => ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"],
-        day_format_narrow => ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"],
+        day_format_narrow => ["LU", "MA", "MI", "JU", "VI", "SA", "DO"],
         day_format_short => ["LU", "MA", "MI", "JU", "VI", "SA", "DO"],
         day_format_wide => ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"],
-        day_stand_alone_abbreviated => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_stand_alone_abbreviated => ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"],
         day_stand_alone_narrow => ["L", "M", "X", "J", "V", "S", "D"],
-        day_stand_alone_short => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-        day_stand_alone_wide => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_stand_alone_short => ["LU", "MA", "MI", "JU", "VI", "SA", "DO"],
+        day_stand_alone_wide => ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"],
         default_date_format_length => q{medium},
         default_time_format_length => q{medium},
         era_abbreviated => ["a. C.", "d. C."],
-        era_narrow => ["antes de Cristo", "después de Cristo"],
+        era_narrow => ["a. C.", "d. C."],
         era_wide => ["antes de Cristo", "después de Cristo"],
         first_day_of_week => q{1},
         language => q{Spanish},
@@ -336,9 +383,9 @@ my $tests = [
         quarter_format_abbreviated => ["T1", "T2", "T3", "T4"],
         quarter_format_narrow => ["1.er trimestre", "2.º trimestre", "3.er trimestre", "4.º trimestre"],
         quarter_format_wide => ["1.er trimestre", "2.º trimestre", "3.er trimestre", "4.º trimestre"],
-        quarter_stand_alone_abbreviated => ["Q1", "Q2", "Q3", "Q4"],
-        quarter_stand_alone_narrow => ["1", "2", "3", "4"],
-        quarter_stand_alone_wide => ["Q1", "Q2", "Q3", "Q4"],
+        quarter_stand_alone_abbreviated => ["T1", "T2", "T3", "T4"],
+        quarter_stand_alone_narrow => ["T1", "T2", "T3", "T4"],
+        quarter_stand_alone_wide => ["1.er trimestre 2.º", "trimestre 3.er", "trimestre 4.º", "trimestre"],
         script => undef,
         script_code => undef,
         territory => q{South America},
@@ -385,18 +432,18 @@ my $tests = [
         datetime_format_medium => q{y/MM/dd H:mm:ss},
         datetime_format_short => q{y/MM/dd H:mm},
         day_format_abbreviated => ["月", "火", "水", "木", "金", "土", "日"],
-        day_format_narrow => ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"],
-        day_format_short => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_format_narrow => ["月", "火", "水", "木", "金", "土", "日"],
+        day_format_short => ["月", "火", "水", "木", "金", "土", "日"],
         day_format_wide => ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"],
-        day_stand_alone_abbreviated => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_stand_alone_abbreviated => ["月", "火", "水", "木", "金", "土", "日"],
         day_stand_alone_narrow => ["月", "火", "水", "木", "金", "土", "日"],
-        day_stand_alone_short => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-        day_stand_alone_wide => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_stand_alone_short => ["月", "火", "水", "木", "金", "土", "日"],
+        day_stand_alone_wide => ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"],
         default_date_format_length => q{medium},
         default_time_format_length => q{medium},
         era_abbreviated => ["紀元前", "西暦"],
         era_narrow => ["BC", "AD"],
-        era_wide => ["BCE", "CE"],
+        era_wide => ["紀元前", "西暦"],
         first_day_of_week => q{7},
         language => q{Japanese},
         language_code => q{ja},
@@ -419,8 +466,8 @@ my $tests = [
         quarter_format_narrow => ["第1四半期", "第2四半期", "第3四半期", "第4四半期"],
         quarter_format_wide => ["第1四半期", "第2四半期", "第3四半期", "第4四半期"],
         quarter_stand_alone_abbreviated => ["Q1", "Q2", "Q3", "Q4"],
-        quarter_stand_alone_narrow => ["1", "2", "3", "4"],
-        quarter_stand_alone_wide => ["Q1", "Q2", "Q3", "Q4"],
+        quarter_stand_alone_narrow => ["Q1", "Q2", "Q3", "Q4"],
+        quarter_stand_alone_wide => ["第1四半期", "第2四半期", "第3四半期", "第4四半期"],
         script => q{Latin},
         script_code => q{Latn},
         territory => undef,

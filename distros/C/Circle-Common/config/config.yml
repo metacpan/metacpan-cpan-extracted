@@ -65,3 +65,9 @@ assets:
   path: ## assets apis
     upload: /assets/v1/node/upload
     download: /assets/v1/node/download
+node:
+  path:
+    subscribe: /server/v1/node/subscribe
+    serverFeatures: /server/v1/node/server-features
+    broadcastTransaction: /server/v1/node/broadcast-transaction
+

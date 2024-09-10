@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use base 'Import::Export';
 
@@ -14,6 +14,11 @@ our %EX = (
 
 require XSLoader;
 XSLoader::load("Term::ANSI::Sprintf", $VERSION);
+
+sub _sprintf {
+	my ($str, @params) = @_;
+	return CORE::sprintf($str, @params);
+}
 
 1;
 
@@ -25,7 +30,7 @@ Term::ANSI::Sprintf - sprintf with ANSI colors
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

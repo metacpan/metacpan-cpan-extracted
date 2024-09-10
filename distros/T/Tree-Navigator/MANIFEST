@@ -1,16 +1,5 @@
+Build.PL
 Changes
-ignore.txt
-inc/Module/AutoInstall.pm
-inc/Module/Install.pm
-inc/Module/Install/AutoInstall.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Include.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/Tree/Navigator.pm
 lib/Tree/Navigator/App/PerlDebug.pm
 lib/Tree/Navigator/Node.pm
@@ -23,12 +12,11 @@ lib/Tree/Navigator/Node/Perl/Symdump.pm
 lib/Tree/Navigator/Node/Win32/Registry.pm
 lib/Tree/Navigator/View.pm
 lib/Tree/Navigator/View/TT2.pm
-Makefile
-Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
 META.yml
-README
 README.md
 t/00-load.t
-t/pod.t
+xt/pod.t
+

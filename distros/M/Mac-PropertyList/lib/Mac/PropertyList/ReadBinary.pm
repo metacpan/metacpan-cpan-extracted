@@ -11,7 +11,7 @@ use Mac::PropertyList;
 use Math::BigInt;
 use POSIX             qw(SEEK_END SEEK_SET);
 
-our $VERSION = '1.505';
+our $VERSION = '1.506';
 
 my $Debug = $ENV{PLIST_DEBUG} || 0;
 
@@ -137,8 +137,6 @@ sub _read_plist_trailer {
 
 	@hash{ qw( offset_size ref_size object_count top_object table_offset ) }
 		= unpack "x6 C C (x4 N)3", $buffer;
-
-	print Dumper( \%hash );
 
 	$self->{trailer} = \%hash;
 	}

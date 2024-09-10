@@ -8,7 +8,7 @@
 
 package Log::Report::DBIC::Profiler;
 use vars '$VERSION';
-$VERSION = '1.38';
+$VERSION = '1.39';
 
 use base 'DBIx::Class::Storage::Statistics';
 

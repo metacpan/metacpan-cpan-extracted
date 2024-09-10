@@ -1,4 +1,5 @@
 package Tree::Navigator::Node::DBI;
+use utf8;
 use Moose;
 use namespace::autoclean;
 extends 'Tree::Navigator::Node';
@@ -142,16 +143,17 @@ sub _children {
 }
 
 
-1; # End of Tree::Navigator::Node::Filesys
+1; # End of Tree::Navigator::Node::DBI
 
 
 
 __END__
 
+=encoding utf8
 
 =head1 NAME
 
-Tree::Navigator::Node::Filesys - The great new Tree::Navigator::Node::Filesys!
+Tree::Navigator::Node::DBI - navigating in a DBI database
 
 =cut
 

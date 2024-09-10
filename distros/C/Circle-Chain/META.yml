@@ -19,13 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  JSON: '4.10'
-  LWP::Protocol::https: '6.14'
-  LWP::UserAgent: '6.67'
-  Slurp: '0.4'
-  Try::Tiny: '0.31'
-  URL::Encode: '0.03'
-  YAML: '1.30'
+  Circle::Block: '0.02'
+  Circle::Node: '0.02'
+  Circle::User: '0.02'
+  Circle::Wallet: '0.02'
   perl: '5.006'
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

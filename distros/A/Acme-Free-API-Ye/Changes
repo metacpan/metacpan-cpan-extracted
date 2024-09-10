@@ -3,3 +3,7 @@
         - demo project for Perl API clients, using Util::H2O::More
         - found via, https://www.freepublicapis.com/ - this will
           be a lot of fun ...
+1.0.1	Mon Sep  9 05:58:50 PM UTC 2024
+	- Maintenance release, updated dist.ini
+	- added some POD regarding the FreePublicPerlAPIs project
+	- https://github.com/oodler577/FreePublicPerlAPIs

@@ -1,5 +1,10 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.0.1 2024-09-09T18:22:29+0900
+    - Corrected bug in the timezones_cities_extended view
+    - Added column 'collations' in table 'locales' to contain the possible collations for a locale
+    - Corrected minor oversight when loading locale default numbering systems into the database
+
 v1.0.0 2024-09-05T15:03:16+0900
     - Added column is_primary to table timezones and associated documentation
     - Enabled array field search with the advanced search option 'has'

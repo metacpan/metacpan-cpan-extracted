@@ -1,4 +1,5 @@
 package Tree::Navigator::Node::DBIDM;
+use utf8;
 use Moose;
 
 use DBI;
@@ -75,6 +76,7 @@ use warnings;
 
 __END__
 
+=encoding utf8
 
 =head1 NAME
 

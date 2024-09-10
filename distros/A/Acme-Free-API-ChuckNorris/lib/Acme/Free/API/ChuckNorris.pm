@@ -4,11 +4,11 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.9.10';
+our $VERSION = '1.0.0';
 
 use HTTP::Tiny;
 use JSON            qw/decode_json/;
-use Util::H2O::More qw/baptise ddd d2o h2o/;
+use Util::H2O::More qw/baptise d2o h2o/;
 
 use constant {
     BASEURL => "https://api.chucknorris.io/jokes",
@@ -18,11 +18,6 @@ sub new {
     my $pkg  = shift;
     my $self = baptise { ua => HTTP::Tiny->new }, $pkg;
     return $self;
-}
-
-# Util::H2O::More::d2o needs a "find_json_string_and_decode_it" option ...
-sub get {
-    my ( $self, $endpoint ) = @_;
 }
 
 sub categories {
@@ -87,6 +82,9 @@ and you will get a random quote.
   shell>
 
 =head1 DESCRIPTION
+
+Contributed as part of the B<FreePublicPerlAPIs> Project described at,
+L<https://github.com/oodler577/FreePublicPerlAPIs>.
 
 This fun module is to demonstrate how to use L<Util::H2O::More> and
 L<Dispatch::Fu> to make creating easily make API SaaS modules and

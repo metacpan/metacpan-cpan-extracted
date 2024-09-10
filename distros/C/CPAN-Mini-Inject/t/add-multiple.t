@@ -97,6 +97,10 @@ sub get_module_details {
 		authorid => 'RWSTAUNER',
 		file     => 't/local/mymodules/Dist-Metadata-Test-MetaFile-Only.tar.gz'
 		},
+		{
+		authorid => 'BRIANDFOY',
+		file     => 't/local/mymodules/App-runscript-v1.0.0_02.tgz',
+		},
 		);
 	}
 
@@ -153,6 +157,8 @@ subtest 'add modules' => sub {
 			  modules => { 'Dist::Metadata::Test::MetaFile::PM' => '2.0', 'Dist::Metadata::Test::MetaFile' => '2.1' } },
 			{ file => 'Dist-Metadata-Test-MetaFile-Only.tar.gz', authorid => 'RWSTAUNER',
 			  modules => {'Dist::Metadata::Test::MetaFile::DiffName' => '0.02'} },
+			{ file => 'App-runscript-v1.0.0_02.tgz', authorid => 'BRIANDFOY',
+			  modules => {'App::runscript' => 'v1.0.0_02'} },
 		],
 		'added_modules returns expected data'
 		);
@@ -179,3 +185,4 @@ CPAN::Mini::Inject                 0.01  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar
 Dist::Metadata::Test::MetaFile::PM  2.0  R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-2.2.tar.gz
 Dist::Metadata::Test::MetaFile      2.1  R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-2.2.tar.gz
 Dist::Metadata::Test::MetaFile::DiffName 0.02  R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-Only.tar.gz
+App::runscript                v1.0.0_02  B/BR/BRIANDFOY/App-runscript-v1.0.0_02.tgz

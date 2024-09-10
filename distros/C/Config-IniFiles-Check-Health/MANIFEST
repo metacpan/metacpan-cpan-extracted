@@ -1,0 +1,19 @@
+Build.PL
+Changes
+documentation/create_new_version_for_cpan.md
+lib/Config/IniFiles/Check/Health.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-external-modules-needed.t
+t/05-own-modules-compile.t
+t/10-new.t
+t/20-doubleval.t
+t/30-values-exist-in-section.t
+t/40-not-enough-sections.t
+t/testdata/10-new.ini
+t/testdata/20-doubleval.ini
+t/testdata/30-values-exist-in-section.ini
+t/testdata/40-not-enough-sections.ini

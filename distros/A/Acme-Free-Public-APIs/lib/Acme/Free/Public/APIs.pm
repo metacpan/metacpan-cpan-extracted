@@ -3,11 +3,11 @@ package Acme::Free::Public::APIs;
 use strict;
 use warnings;
 
-our $VERSION = '0.9.8';
+our $VERSION = '0.9.9';
 
 use HTTP::Tiny;
 use JSON            qw/decode_json/;
-use Util::H2O::More qw/baptise d2o ddd HTTPTiny2h2o/;
+use Util::H2O::More qw/baptise d2o HTTPTiny2h2o/;
 
 use constant {
     BASEURL => "https://www.freepublicapis.com/api/",
@@ -43,6 +43,7 @@ sub apis {
 
 
 # https://www.freepublicapis.com/api/random
+
 sub random {
     my $self = shift;
     my $URL  = sprintf "%s/random", BASEURL;
@@ -57,7 +58,8 @@ __END__
 
 =head1 NAME
 
-Acme::Free::Public::APIs - Perl API client for ...
+Acme::Free::Public::APIs - Perl API client for FreePublicAPI.com's API for
+for listing APIs.
 
 This module provides the client, "freeapis", that is available via C<PATH>
 after install.
@@ -65,10 +67,10 @@ after install.
 =head1 SYNOPSIS
 
   #!/usr/bin/env perl
-    
+
   use strict;
   use warnings;
-  
+
   use Acme::Free::Public::APIs qw//;
 
   my $api     = Acme::Free::Public::APIs->new->random;
@@ -76,8 +78,8 @@ after install.
   id:            %d
   title:         %s%s
   site URL:      %s
-  methods:       %s 
-  health:        %d 
+  methods:       %s
+  health:        %d
   documentation: %s
   description:   %s
   EOAPI
@@ -94,15 +96,15 @@ to some in the Perl community, the L<https://world.openfoodfacts.org/> Project.
   id:            174
   title:         (🍲) OpenFoodFacts
   site URL:      https://freepublicapis.com/openfoodfacts
-  methods:       1 
-  health:        84 
+  methods:       1
+  health:        84
   documentation: https://world.openfoodfacts.org/data
   description:   Open Food Facts is a food products database made by everyone, for everyone. You can use it to make better food choices, and as it is open data, anyone can re-use it for any purpose.
   shell>
 
 =head1 DESCRIPTION
 
-This is the Perl API for the Dog API, profiled at L<https://www.freepublicapis.com/api>. 
+This is the Perl API for the Dog API, profiled at L<https://www.freepublicapis.com/api>.
 
 Contributed as part of the B<FreePublicPerlAPIs> Project described at,
 L<https://github.com/oodler577/FreePublicPerlAPIs>.
@@ -217,8 +219,8 @@ When C<--details> is added, it shows the full amount of information:
   id:            321
   title:         (📅) Church Calendar API
   site URL:      https://freepublicapis.com/church-calendar-api
-  methods:       2 
-  health:        100 
+  methods:       2
+  health:        100
   documentation: http://calapi.inadiutorium.cz/api-doc
   description:   The Church Calendar API provides access to calendar data for any day, allowing users to retrieve various liturgical celebrations and details. It supports multiple languages and enables specific queries for feast names and calendar descriptions based on the selected calendar system.
   Found 1 API
@@ -232,8 +234,8 @@ the information provided for it.
   id:            320
   title:         (🌍) World Wonders
   site URL:      https://freepublicapis.com/world-wonders
-  methods:       2 
-  health:        95 
+  methods:       2
+  health:        95
   documentation: https://www.world-wonders-api.org/v0/docs
   description:   Free and open source API providing information about world wonders
   shell>

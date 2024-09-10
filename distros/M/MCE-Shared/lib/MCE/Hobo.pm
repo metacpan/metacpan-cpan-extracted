@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.892';
+our $VERSION = '1.893';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -344,7 +344,7 @@ sub exit {
 
    return $self if $self->{REAPED};
 
-   if ( exists $_DATA->{$pkg} ) {
+   if ( defined $_DATA->{$pkg} ) {
       sleep $_yield_secs until $_DATA->{$pkg}->exists('S'.$wrk_id);
    } else {
       sleep 0.030;
@@ -487,7 +487,7 @@ sub kill {
    }
    if ( $self->{MGR_ID} eq "$$.$_tid" ) {
       return $self if $self->{REAPED};
-      if ( exists $_DATA->{$pkg} ) {
+      if ( defined $_DATA->{$pkg} ) {
          sleep $_yield_secs until $_DATA->{$pkg}->exists('S'.$wrk_id);
       } else {
          sleep 0.030;
@@ -720,11 +720,12 @@ sub _exit {
    $SIG{__WARN__} = sub {};
 
    threads->exit($exit_status) if ( $INC{'threads.pm'} && $_is_MSWin32 );
+   CORE::kill('KILL', $$) if ( $_SELF->{SIGNALED} && !$_is_MSWin32 );
 
    my $posix_exit = ( exists $_SELF->{posix_exit} )
       ? $_SELF->{posix_exit} : $_MNGD->{ $_SELF->{PKG} }{posix_exit};
 
-   if ( $posix_exit && !$_SELF->{SIGNALED} && !$_is_MSWin32 ) {
+   if ( $posix_exit && !$_is_MSWin32 ) {
       eval { MCE::Mutex::Channel::_destroy() };
       POSIX::_exit($exit_status) if $INC{'POSIX.pm'};
       CORE::kill('KILL', $$);
@@ -774,7 +775,7 @@ sub _quit {
 
 sub _reap_hobo {
    my ( $hobo, $wait_flag ) = @_;
-   return unless $hobo;
+   return if ( !$hobo || !defined $hobo->{PKG} );
 
    local @_ = $_DATA->{ $hobo->{PKG} }->get($hobo->{WRK_ID}, $wait_flag);
 
@@ -1010,7 +1011,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.892
+This document describes MCE::Hobo version 1.893
 
 =head1 SYNOPSIS
 

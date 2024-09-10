@@ -1,5 +1,5 @@
 package Tree::Navigator::Node::Perl::Ref;
-use 5.010;
+use utf8;
 use Moose;
 extends 'Tree::Navigator::Node';
 
@@ -24,17 +24,23 @@ sub _find_ref {
   my $self  = shift;
   my $path = $self->path || "" ;
   my $ref = $self->mount_point->{ref};
-
+  
   foreach my $fragment (split m[/], $path) {
-    for (reftype $ref) {
-      when ('ARRAY') {$ref = $ref->[$fragment]}
-      when ('HASH')  {$ref = $ref->{$fragment}}
-#      when ($_ eq 'SCALAR' && $fragment eq '$')
-      when (['SCALAR', 'REF'])
-                     {$ref = $$ref}
-      default        {die "no such path in data : '$path'"}
+    my $reftype = reftype $ref;
+    if ($reftype eq 'ARRAY') {
+      $ref = $ref->[$fragment];
+    }
+    elsif ($reftype eq 'HASH') {
+      $ref = $ref->{$fragment};
+    }
+    elsif ($reftype eq 'SCALAR' || $reftype eq 'REF') {
+      $ref = $$ref;
+    }
+    else {
+      die "no such path in data : '$path'";
     }
   }
+
   return $ref;
 }
 
@@ -66,37 +72,34 @@ sub _find_children_and_attrs {
   my @children;
   my %attrs;
 
-  for (reftype $ref) {
-    when ('ARRAY') { 
-      my @indices = 0 .. min($#$ref, MAX_CHILDREN);
-      for my $i (@indices) {
-        my $val = $ref->[$i];
-        if (_ref_is_child($val)) {
-          push @children, $i
-        }
-        else {
-          $attrs{$i} = $val;
-        }
+  my $reftype = reftype $ref;
+  if ($reftype eq 'ARRAY') { 
+    my @indices = 0 .. min($#$ref, MAX_CHILDREN);
+    for my $i (@indices) {
+      my $val = $ref->[$i];
+      if (_ref_is_child($val)) {
+        push @children, $i
+      } else {
+        $attrs{$i} = $val;
       }
     }
-    when ('HASH')  {
-      my @keys = keys %$ref;
-      my $regex = $self->mount_point->{exclude};
-      @keys = grep {$_ !~ $regex} @keys if $regex;
-      for my $k (@keys) {
-        my $val = $ref->{$k};
-        if (_ref_is_child($val)) {
-          push @children, $k
-        } 
-        else {
-          $attrs{$k} = $val;
-        }
+  }
+  elsif ($reftype eq 'HASH')  {
+    my @keys = keys %$ref;
+    my $regex = $self->mount_point->{exclude};
+    @keys = grep {$_ !~ $regex} @keys if $regex;
+    for my $k (@keys) {
+      my $val = $ref->{$k};
+      if (_ref_is_child($val)) {
+        push @children, $k
+      } else {
+        $attrs{$k} = $val;
       }
-      @children = sort {lc($a) cmp lc($b)} @children;
     }
-    when (['SCALAR', 'REF'])  {
-      @children = '$';
-    }
+    @children = sort {lc($a) cmp lc($b)} @children;
+  }
+  elsif ($reftype eq 'SCALAR' || $reftype eq 'REF')  {
+    @children = '$';
   }
   my $blessed = blessed $ref;
   $attrs{isa} //= $blessed if $blessed;
@@ -109,16 +112,15 @@ sub _child {
   my ($self, $child_path) = @_;
   my $class = ref $self;
 
-  $DB::single = 1;
-
   # check if child exists
   my $ref = $self->_find_ref;
   my $child_ok;
-  for (reftype $ref) {
-    when ('ARRAY')           { $child_ok = exists $ref->[$child_path] }
-    when ('HASH')            { $child_ok = exists $ref->{$child_path} }
-    when (['SCALAR', 'REF']) { $child_ok = $child_path eq '$'         }
-  }
+  my $reftype = reftype $ref;
+
+  if    ($reftype eq 'ARRAY')                       { $child_ok = exists $ref->[$child_path] }
+  elsif ($reftype eq'HASH')                         { $child_ok = exists $ref->{$child_path} }
+  elsif ($reftype eq 'SCALAR' || $reftype eq 'REF') { $child_ok = $child_path eq '$'         }
+
   $child_ok or die "no child '$child_path' in " . $self->full_path;
 
   return $class->new(
@@ -126,9 +128,6 @@ sub _child {
     path        => $self->_join_path($self->path, $child_path),
    );
 }
-
-
-
 
 
 __PACKAGE__->meta->make_immutable;
@@ -139,10 +138,11 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=encoding utf8
 
 =head1 NAME
 
-Tree::Navigator::Node::Perl::Ref - 
+Tree::Navigator::Node::Perl::Ref - navigating in a perl datastructure
 
 =cut
 

@@ -29,8 +29,8 @@ my %WriteMakefileArgs = (
         'vars'                  => 0,
         'warnings'              => 0,
         'warnings::register'    => 0,
-        'Locale::Unicode'       => 'v0.3.5',
-        'Locale::Unicode::Data' => 'v0.1.0',
+        'Locale::Unicode'       => 'v0.3.6',
+        'Locale::Unicode::Data' => 'v1.0.0',
         'Scalar::Util'          => 0,
         # Version compatible with perl v5.10
         'Want'                  => '0.17',

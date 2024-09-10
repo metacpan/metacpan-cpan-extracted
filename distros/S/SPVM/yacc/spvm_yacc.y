@@ -21,13 +21,13 @@
   #include "spvm_string.h"
 %}
 
-%token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW CURRENT_CLASS MUTABLE
+%token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW OUTMOST_CLASS MUTABLE
 %token <opval> ATTRIBUTE MAKE_READ_ONLY INTERFACE EVAL_ERROR_ID ARGS_WIDTH VERSION_DECL
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
 %token <opval> SYMBOL_NAME VAR_NAME CONSTANT EXCEPTION_VAR
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
 %token <opval> FATCAMMA RW RO WO INIT NEW OF BASIC_TYPE_ID EXTENDS SUPER
-%token <opval> RETURN WEAKEN DIE WARN PRINT SAY CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
+%token <opval> RETURN WEAKEN DIE WARN PRINT SAY OUTMOST_CLASS_NAME UNWEAKEN '[' '{' '('
 
 %type <opval> grammar
 %type <opval> field_name method_name class_name
@@ -386,7 +386,7 @@ allow
 interface
   : INTERFACE basic_type ';'
     {
-      $$ = SPVM_OP_build_implement(compiler, $1, $2);
+      $$ = SPVM_OP_build_interface_statement(compiler, $1, $2);
     }
 
 enumeration
@@ -577,6 +577,12 @@ has_for_anon
       SPVM_OP* op_field = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_FIELD, $1->file, $1->line);
       
       $$ = SPVM_OP_build_anon_method_field_definition(compiler, op_field, NULL, $3, $4, $1);
+    }
+  | var ':' opt_attributes qualified_type opt_type_comment ASSIGN operator
+    {
+      SPVM_OP* op_field = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_FIELD, $1->file, $1->line);
+      
+      $$ = SPVM_OP_build_anon_method_field_definition(compiler, op_field, $1, $3, $4, $7);
     }
     
 opt_attributes
@@ -951,7 +957,7 @@ operator
     {
       $$ = SPVM_OP_new_op_false(compiler, $1);
     }
-  | CURRENT_CLASS_NAME
+  | OUTMOST_CLASS_NAME
   | unary_operator
   | binary_operator
   | assign
@@ -1346,12 +1352,12 @@ array_init
     }
 
 call_method
-  : CURRENT_CLASS SYMBOL_NAME '(' opt_operators  ')'
+  : OUTMOST_CLASS SYMBOL_NAME '(' opt_operators  ')'
     {
       SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->current_file, compiler->current_line);
       $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $2, $4);
     }
-  | CURRENT_CLASS SYMBOL_NAME
+  | OUTMOST_CLASS SYMBOL_NAME
     {
       SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->current_file, compiler->current_line);
       SPVM_OP* op_operators = SPVM_OP_new_op_list(compiler, $1->file, $2->line);

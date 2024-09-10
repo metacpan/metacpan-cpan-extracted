@@ -777,6 +777,35 @@ class TestCase::Module::Native::MethodCall {
       }
     }
     
+    # Exceptions
+    {
+      {
+        my $class_method_call = Native::MethodCall->new_class_method("TestCase::Module::Native::MethodCall", "add_byte");
+        
+        {
+          eval { $class_method_call->call([(object)(byte)Fn->BYTE_MIN]); }
+          
+          unless (Fn->contains($@, "TestCase::Module::Native::MethodCall#add_byte method")) {
+            return 0;
+          }
+        }
+      }
+      
+      {
+        my $class_method_call = Native::MethodCall->new_class_method("TestCase::Module::Native::MethodCall", "add_byte");
+        
+        {
+          eval { $class_method_call->call([(object)(byte)Fn->BYTE_MIN, 1, 2]); }
+          
+          unless (Fn->contains($@, "TestCase::Module::Native::MethodCall#add_byte method")) {
+            return 0;
+          }
+        }
+      }
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
   
@@ -1049,6 +1078,41 @@ class TestCase::Module::Native::MethodCall {
       
       TestCase::Module::Native::MethodCall->SET_CALL_CLASS_METHOD_VALUE(0);
     }
+    
+    return 1;
+  }
+  
+  static method new_proto : int () {
+    
+    {
+      my $point = Point->new(1, 2);
+      
+      my $ret = (Point)Native::MethodCall->new_proto($point, [(object)2, 3]);
+      
+      unless ($ret is_type Point) {
+        return 0;
+      }
+      
+      unless ($ret->x == 2) {
+        return 0;
+      }
+      
+      unless ($ret->y == 3) {
+        return 0;
+      }
+      
+    }
+    
+    # Exceptions
+    {
+      eval { Native::MethodCall->new_proto(undef, [(object)2, 3]); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
     
     return 1;
   }

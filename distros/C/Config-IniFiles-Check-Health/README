@@ -1,0 +1,45 @@
+Config-IniFiles-Check-Health
+
+Working with Config::IniFiles needs to check the ini-files
+for 
+
+* checking for existing, needed values in the sections
+* double-vars in a single section
+* do all needed  sections exist
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Config::IniFiles::Check::Health
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-IniFiles-Check-Health
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Config-IniFiles-Check-Health
+
+    Search CPAN
+        https://metacpan.org/release/Config-IniFiles-Check-Health
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2024 by Richard Lippmann.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

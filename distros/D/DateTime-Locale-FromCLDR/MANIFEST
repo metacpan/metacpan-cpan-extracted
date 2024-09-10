@@ -12,6 +12,11 @@ t/00.load.t
 t/01.locale.t
 t/02.interval_diff.t
 t/03.day_period.t
+t/04.am_pm.t
+t/05.timezone.t
+t/06.locale_numbering_system.t
+t/07.ltr.t
+t/08.dst.t
 t/90.pod.t
 t/91.coverage.t
 t/92.signature.t

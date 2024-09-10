@@ -4,7 +4,7 @@
       "Hans Jeuken <hanje at cpan dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
             "Scalar::Util::Numeric" : "0",
             "Test::Tk" : "3.02",
             "Tk" : "804.033",
-            "Tk::ColorEntry" : "0.05",
+            "Tk::ColorEntry" : "0.08",
             "Tk::FontDialog" : "0",
             "Tk::ListEntry" : "0.01"
          }
@@ -49,6 +49,6 @@
          "web" : "https://github.com/haje61/Tk-QuickForm"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

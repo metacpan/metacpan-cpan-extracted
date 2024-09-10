@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.9.8';
+our $VERSION = '0.9.9';
 
 use HTTP::Tiny;
 use JSON            qw/decode_json/;

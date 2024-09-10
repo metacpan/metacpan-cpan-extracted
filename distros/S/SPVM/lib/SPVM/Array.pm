@@ -311,13 +311,13 @@ Same as the following code using the L<dump operator|SPVM::Document::Language/"d
 
 C<static method equals_byte : int ($array1 : byte[], $array2 : byte[]);>
 
-If $array1 is not defined and $array2 is not defined, return 1.
+If $array1 is not defined and $array2 is not defined, returns 1.
 
-If $array1 is defined and $array2 is not defined, return 0.
+If $array1 is defined and $array2 is not defined, returns 0.
 
-If $array1 is not defined, $array2 is defined, return 0.
+If $array1 is not defined, $array2 is defined, returns 0.
 
-If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
+If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, returns 1.
 
 Otherwise return 0.
 
@@ -325,13 +325,13 @@ Otherwise return 0.
 
 C<static method equals_double : int ($array1 : double[], $array2 : double[]);>
 
-If $array1 is not defined and $array2 is not defined, return 1.
+If $array1 is not defined and $array2 is not defined, returns 1.
 
-If $array1 is defined and $array2 is not defined, return 0.
+If $array1 is defined and $array2 is not defined, returns 0.
 
-If $array1 is not defined, $array2 is defined, return 0.
+If $array1 is not defined, $array2 is defined, returns 0.
 
-If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
+If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, returns 1.
 
 Otherwise return 0.
 
@@ -339,13 +339,13 @@ Otherwise return 0.
 
 C<static method equals_float : int ($array1 : float[], $array2 : float[]);>
 
-If $array1 is not defined and $array2 is not defined, return 1.
+If $array1 is not defined and $array2 is not defined, returns 1.
 
-If $array1 is defined and $array2 is not defined, return 0.
+If $array1 is defined and $array2 is not defined, returns 0.
 
-If $array1 is not defined, $array2 is defined, return 0.
+If $array1 is not defined, $array2 is defined, returns 0.
 
-If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
+If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, returns 1.
 
 Otherwise return 0.
 
@@ -353,13 +353,13 @@ Otherwise return 0.
 
 C<static method equals_int : int ($array1 : int[], $array2 : int[]);>
 
-If $array1 is not defined and $array2 is not defined, return 1.
+If $array1 is not defined and $array2 is not defined, returns 1.
 
-If $array1 is defined and $array2 is not defined, return 0.
+If $array1 is defined and $array2 is not defined, returns 0.
 
-If $array1 is not defined, $array2 is defined, return 0.
+If $array1 is not defined, $array2 is defined, returns 0.
 
-If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
+If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, returns 1.
 
 Otherwise return 0.
 
@@ -367,13 +367,13 @@ Otherwise return 0.
 
 C<static method equals_long : int ($array1 : long[], $array2 : long[]);>
 
-If $array1 is not defined and $array2 is not defined, return 1.
+If $array1 is not defined and $array2 is not defined, returns 1.
 
-If $array1 is defined and $array2 is not defined, return 0.
+If $array1 is defined and $array2 is not defined, returns 0.
 
-If $array1 is not defined, $array2 is defined, return 0.
+If $array1 is not defined, $array2 is defined, returns 0.
 
-If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
+If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, returns 1.
 
 Otherwise return 0.
 
@@ -381,13 +381,13 @@ Otherwise return 0.
 
 C<static method static method equals_object : int ($array1 : object[], $array2 : object[], $equality_checker : L<EqualityChecker|SPVM::EqualityChecker>);>
 
-If $array1 is not defined and $array2 is not defined, return 1.
+If $array1 is not defined and $array2 is not defined, returns 1.
 
-If $array1 is defined and $array2 is not defined, return 0.
+If $array1 is defined and $array2 is not defined, returns 0.
 
-If $array1 is not defined, $array2 is defined, return 0.
+If $array1 is not defined, $array2 is defined, returns 0.
 
-If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2 using the equality checker, return 1.
+If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2 using the equality checker, returns 1.
 
 The equality checker is not defined, the address is used to check the equality.
 
@@ -405,13 +405,13 @@ The alias for the following code using L</"equals_object">.
 
 C<static method equals_short : int ($array1 : short[], $array2 : short[]);>
 
-If $array1 is not defined and $array2 is not defined, return 1.
+If $array1 is not defined and $array2 is not defined, returns 1.
 
-If $array1 is defined and $array2 is not defined, return 0.
+If $array1 is defined and $array2 is not defined, returns 0.
 
-If $array1 is not defined, $array2 is defined, return 0.
+If $array1 is not defined, $array2 is defined, returns 0.
 
-If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
+If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2, returns 1.
 
 Otherwise return 0.
 
@@ -419,13 +419,13 @@ Otherwise return 0.
 
 C<static method equals_string : int ($array1 : string[], $array2 : string[]);>
 
-If $array1 is not defined and $array2 is not defined, return 1.
+If $array1 is not defined and $array2 is not defined, returns 1.
 
-If $array1 is defined and $array2 is not defined, return 0.
+If $array1 is defined and $array2 is not defined, returns 0.
 
-If $array1 is not defined, $array2 is defined, return 0.
+If $array1 is not defined, $array2 is defined, returns 0.
 
-If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2 using the C<eq> operator, return 1.
+If $array1 is defined and $array2 is defined and the all elements of $array1 are equal to all elements of $array2 using the C<eq> operator, returns 1.
 
 Otherwise return 0.
 
@@ -1094,6 +1094,36 @@ Exceptions:
 The prototype element $proto_element must be defined. Otherwise an exception is thrown.
 
 The length $length must be greater than or equal to 0. Otherwise an exception is thrown.
+
+=head2 equals
+
+C<static method equals : int ($array1 : object, $array2 : object);>
+
+Checks if the array $array1 and the array $array2 are equal.
+
+The type of $array1 and $array2 must be a numeric array type, a multi-numeric array type, or string array type.
+
+Implementation:
+
+If $array1 is not defined and $array2 is not defined, returns 1.
+
+If $array1 is defined and $array2 is not defined, returns 0.
+
+If $array1 is not defined, $array2 is defined, returns 0.
+
+If the type of $array1 is not equal to the type of $array2, returns 0.
+
+If the type of $array1 is a numeric type or a muti-numeric type and every element of $array1 are equal to the corresponding index of element of $array2, returns 1, otherwise returns 0.
+
+If the type of $array1 is string type, returns the return value of L</"equals_string"> method.
+
+Exceptions:
+
+The type of the array $array1 must be an array type. Otherwise, an exception is thrown.
+
+The type of the array $array2 must be an array type. Otherwise, an exception is thrown.
+
+The type of the $array must be a numeric array type, a multi-numeric array type, or string array type. Otherwise, an exception is thrown.
 
 =head1 Copyright & License
 

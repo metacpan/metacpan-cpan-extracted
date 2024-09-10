@@ -112,6 +112,7 @@ sub WriteLineCore {
   # We just want to ensure none of these throw exceptions, we don't actually 
   # validate what was written.
 
+  no if $] >= 5.022, 'warnings', qw( redundant );
   Console->WriteLine("%d", 32);
   Console->WriteLine("%s", undef);
   Console->WriteLine("%d %s", 32, "Hello");

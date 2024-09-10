@@ -1,65 +1,5 @@
-=pod
-
-TODO
-  - maybe this class should be split into a Role + a Base class
-
-
-
-  REST API
-    /path/to/node
-    /path/to/node?v=view_name
-    /path/to/node/child_name
-    /path/to/node.attributes
-    /path/to/node.content
-    /path/to/node.children
-       ex: /path/to/file.doc
-           /path/to/file.doc?v=frame
-           /_toc/path/to/file.doc
-           /path/to/file.doc?v=title
-           /path/to/file.doc.attributes+content
-
-     # OTHER POSSIBILITY
-     /path/to/node.$view_name (pratique pour .xml, .yaml, : auto MIME detection)
-     /path/to/node;subitem.$view_name
-     /path/to/node/@subitem.$view_name
-     /path/to/node?search=query
-
-     Q : diff between 
-           /path/to/node/ : full data (attributes, children % content)
-           /path/to/node 
-  ?v=view
-   p=part1,part2
-   s=search_string
-
-
-
-  METHODS
-
-    my $data                = $node->data(@parts);
-    my $view = $node->view($name, $view_args) || $tn->view()
-    my $resp = $view->render($data, $node, $tn);
-
-    $node->retrieve($parts) # subnodes, leaves, attributes, content
-    $node->render($tn, $parts, $view, $view_args);
-    my $view = $node->view($name, $view_args) || $tn->view()
-    $node->present($tn, $parts, $view)
-    $view->present($node)
-
-Decide
-  - $node->child($wrong_path) : should die or return undef ?
-
-
-  ->mount(path       => 'foo',
-          node_class => 'Filesys',
-          mount_point => )
-
-=cut
-
-
-
-
-
 package Tree::Navigator::Node;
+use utf8;
 use strict;
 use warnings;
 
@@ -80,24 +20,20 @@ has 'mount_point' => (
   isa      => 'HashRef',
   required => 1,
  );
+
 has 'path' => (    # cumulated path from the mount point
   is      => 'ro',
   isa     => 'Str',
   default => '',
  );
-# has 'children' => (
-#   is         => 'ro',
-#   isa        => 'ArrayRef[Str]',
-#   lazy       => 1,
-#   builder    => '_children_and_mounted',
-#   auto_deref => 1,
-#  );
+
 has 'attributes' => (
   is      => 'ro',
   isa     => 'HashRef',
   lazy    => 1,
   builder => '_attributes',
  );
+
 has 'content' => (
   # "is  => 'ro'" but don't generate the accessor, it's coded below
   isa       => 'FileHandle',
@@ -197,12 +133,6 @@ sub _child {
 }
 
 
-# sub _children_and_mounted {
-#   my $self = shift;
-#   my $mounted  = $self->mounted;
-#   my $children = $self->_children;
-#   return [ @$mounted, @$children ];
-# }
 sub children {
   my $self = shift;
   my $mounted  = $self->mounted;
@@ -341,15 +271,17 @@ __PACKAGE__->meta->make_immutable;
 
 1; # End of Tree::Navigator::Node
 
+=encoding utf8
+
 =head1 NAME
 
-Tree::Navigator::Node - The great new Tree::Navigator::Node!
+Tree::Navigator::Node - a node to be displayed in a Tree::Navigator
 
 =cut
 
 =head1 SYNOPSIS
 
-    ...
+See L<Tree::Navigator>
 
 =head1 SPECIFICATION
 
@@ -359,47 +291,25 @@ A B<node> is an object that may contain
 
 =over
 
-=item *
+=item attributes
 
 An B<attribute value> is either C<undef> or a Perl string.
-
-=item *
-
 An B<attribute name> is a non-empty Perl string.
-
-=item *
-
-For a given node, the list of B<published attributes> is an ordered
-list of distinct attribute names (possibly empty).
+An B<attribute list> is an ordered list of pairs (name, value).
 
 
-=item *
+=item content
 
-An B<attribute> is a scalar value (possibily undefined)
-stored under an attribute name. Some attributes may be hidden,
-i.e. not published in the list of attribute names, but 
-nevertheless 
-
-=item *
-
-The list of B<children names> is an ordered list of distinct,
-non-empty scalar values.
-
-=item *
-
-A B<child> is a node stored under a child name.
+A filehandle to some opaque content stored within the node.
 
 
+=item children
 
-
-a collection of scalar values
-pairs I<(name, value)>
-
-
-
+A B<child> is another node stored under the current node.
+A B<child name> is a non-empty Perl string.
+The B<children> of a node is an ordered list of pairs (name, child).
 
 =back
-
 
 
 =head1 METHODS
@@ -478,16 +388,67 @@ below.
 =head2 is_parent
 
 
-
-
-
 =head1 AUTHOR, BUGS, SUPPORT, COPYRIGHT
 
 See L<Tree::Navigator>.
 
+
+=head1 TODO
+
+  - maybe this class should be split into a Role + a Base class
+
+  REST API
+    /path/to/node
+    /path/to/node?v=view_name
+    /path/to/node/child_name
+    /path/to/node.attributes
+    /path/to/node.content
+    /path/to/node.children
+       ex: /path/to/file.doc
+           /path/to/file.doc?v=frame
+           /_toc/path/to/file.doc
+           /path/to/file.doc?v=title
+           /path/to/file.doc.attributes+content
+
+     # OTHER POSSIBILITY
+     /path/to/node.$view_name (handy for  .xml, .yaml, : auto MIME detection)
+     /path/to/node;subitem.$view_name
+     /path/to/node/@subitem.$view_name
+     /path/to/node?search=query
+
+     Q : diff between 
+           /path/to/node/ : full data (attributes, children % content)
+           /path/to/node 
+  ?v=view
+   p=part1,part2
+   s=search_string
+
+
+
+  METHODS
+
+    my $data = $node->data(@parts);
+    my $view = $node->view($name, $view_args) || $tn->view()
+    my $resp = $view->render($data, $node, $tn);
+
+    $node->retrieve($parts) # subnodes, leaves, attributes, content
+    $node->render($tn, $parts, $view, $view_args);
+    my $view = $node->view($name, $view_args) || $tn->view()
+    $node->present($tn, $parts, $view)
+    $view->present($node)
+
+Decide
+  - $node->child($wrong_path) : should die or return undef ?
+
+
+  ->mount(path       => 'foo',
+          node_class => 'Filesys',
+          mount_point => )
+
 =cut
 
-__DATA__
+
+
 
 
 

@@ -1,4 +1,5 @@
 package Tree::Navigator::View;
+use utf8;
 use strict;
 use warnings;
 

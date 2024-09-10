@@ -1,5 +1,8 @@
 Revision history for RT-Extension-MergeUsers
 
+1.10 2024-09-03
+ - Handle merged users in group HasMember searches
+
 1.09 2024-03-20
  - Do not try to load user from an empty email address
  - Fix uninitialized warnings cased by undefined FIELD

@@ -1,4 +1,5 @@
 package Tree::Navigator::View::TT2;
+use utf8;
 use strict;
 use warnings;
 
@@ -6,30 +7,6 @@ use Moose;
 use namespace::autoclean;
 use Template;
 
-=pod
-
-TODO : supply INCLUDE_PATH=> [$self]
-
-sub paths {
-}
-
-sub error {
-
-}
-
-Q: inherit from Template::Base ??
-
-Probl: each node type should have a way to "register" some share dirs
-
-paths : join @INC, mro_linear_isa(ref $self);
-
-=cut
-
-
-
-my %template_common_args = (
-  TRIM => 1,
- );
 
 extends 'Tree::Navigator::View';
 has 'tt'    => ( is => 'ro', isa => 'Template' );
@@ -68,3 +45,16 @@ sub render {
 1; # end of package Tree::Navigator::View::TT2
 
 __END__
+
+=encoding utf8
+
+=head1 NAME
+
+Tree::Navigator::View::TT2 -- 
+
+
+
+TODO : supply INCLUDE_PATH=> [$self]
+
+
+Tree::Navigator::View::TT2 - HTML representation of a node through the Template Toolkit

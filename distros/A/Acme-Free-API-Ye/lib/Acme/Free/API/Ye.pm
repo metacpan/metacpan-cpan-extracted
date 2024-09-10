@@ -3,11 +3,11 @@ package Acme::Free::API::Ye;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 use HTTP::Tiny;
 use JSON            qw/decode_json/;
-use Util::H2O::More qw/baptise ddd d2o/;
+use Util::H2O::More qw/baptise d2o/;
 
 use constant {
     BASEURL => "https://api.kanye.rest",
@@ -65,6 +65,9 @@ a random Kanye Rest quote to C<STDOUT>.
   shell>
 
 =head1 DESCRIPTION
+
+Contributed as part of the B<FreePublicPerlAPIs> Project described at,
+L<https://github.com/oodler577/FreePublicPerlAPIs>.
 
 This fun module is to demonstrate how to use L<Util::H2O::More> to make
 creating easily make API SaaS modules and clients in a clean and idiomatic

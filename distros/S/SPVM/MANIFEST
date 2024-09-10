@@ -1,5 +1,3 @@
-assign
-assign_object
 benchmark/benchmark-synopsys.pl
 benchmark/lib/SPVM/MyMath.spvm
 benchmark/lib/SPVM/MyMathNative.c
@@ -218,6 +216,8 @@ lib/SPVM/Cloneable.spvm
 lib/SPVM/Cloner.pm
 lib/SPVM/Cloner.spvm
 lib/SPVM/CommandInfo.pm
+lib/SPVM/Comparable.pm
+lib/SPVM/Comparable.spvm
 lib/SPVM/Comparator.pm
 lib/SPVM/Comparator.spvm
 lib/SPVM/Comparator/Double.pm
@@ -473,6 +473,7 @@ t/01_syntax/extra_operator.t
 t/01_syntax/extra_others.t
 t/01_syntax/extra_statement.t
 t/01_syntax/extra_type.t
+t/01_syntax/issues/522.pl
 t/01_syntax/lib/MyTest.pm
 t/01_syntax/lib/SPVM/CompileError/Assign/ConstToNoConst.spvm
 t/01_syntax/lib/SPVM/CompileError/Assign/DifferentObject.spvm
@@ -487,6 +488,7 @@ t/01_syntax/lib/SPVM/CompileError/Bool/NotNumericObject.spvm
 t/01_syntax/lib/SPVM/CompileError/CallMethod/ClassNotFound.spvm
 t/01_syntax/lib/SPVM/CompileError/CallMethod/NotFound.spvm
 t/01_syntax/lib/SPVM/CompileError/Class/ClassNameDifferntFromClassFileName.spvm
+t/01_syntax/lib/SPVM/CompileError/Class/ClassNameDifferntFromClassFileNameWithAnonField.spvm
 t/01_syntax/lib/SPVM/CompileError/Class/classPartNameStartWithLowerCase.spvm
 t/01_syntax/lib/SPVM/CompileError/Class/NotClosed.spvm
 t/01_syntax/lib/SPVM/CompileError/ClassVar/OurClassVarNameColon2Twice.spvm

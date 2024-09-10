@@ -114,17 +114,15 @@ done_testing;
 
 __DATA__
 
+Class::Accessor
 Class::Method::Modifiers
-Class::Tiny
-Class::Tiny::Antlers
+namespace::sweep
 
+Devel::Assert
 Devel::StrictMode
 IO::Handle/IO::Null
-namespace::sweep
-PerlX::Assert
-
-Type::API/Type::Nano
 Type::Tiny/Types::Standard
+
 Win32
 Win32::API
 Win32::Console

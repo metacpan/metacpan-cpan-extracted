@@ -2,3 +2,11 @@
         - Initial release of API client for https://tradestie.com/apps/reddit/api/
         - demo project for Perl API clients, using Util::H2O::More
         - found via, https://www.freepublicapis.com/
+
+1.0.1   Thu Aug 30 05:13:30 PM UTC 2024
+        - Initial release of API client for https://tradestie.com/apps/reddit/api/
+        - demo project for Perl API clients, using Util::H2O::More
+        - found via, https://www.freepublicapis.com/
+        - cleaned up SYNOPSIS and client (don't need Util::H2O::More there)
+	- update dist.ini with required module versions
+

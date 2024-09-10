@@ -62,11 +62,11 @@ static const char* SPVM_IMPLEMENT_STRING_LITERALS[] = {
   "A value of an integer type cannnot be divided by 0.",
   "The left operand of . operator must be defined.",
   "The right operand of . operator must be defined.",
-  "A new operator failed. The memory allocation failed.",
-  "A new operator to create an array failed. The memory allocation failed.",
+  "A new operator failed. Memory allocation failed.",
+  "A new operator to create an array failed. Memory allocation failed.",
   "A new operator to create an array failed. The length must be a non-negative integer.",
-  "A string creation failed. The memory allocation failed.",
-  "The new_string_len operator failed. The memory allocation failed.",
+  "A string creation failed. Memory allocation failed.",
+  "The new_string_len operator failed. Memory allocation failed.",
   "The new_string_len operator failed. The length of the string must be a non-negative integer.",
   "An array access failed. The array must be defined.",
   "An array access failed. The index must be a non-negative integer.",
@@ -384,9 +384,10 @@ static inline void SPVM_IMPLEMENT_MOVE_OBJECT_WITH_TYPE_CHECK(SPVM_ENV* env, SPV
   }
 }
 
-static inline void SPVM_IMPLEMENT_MOVE_OBJECT_CHECK_READ_ONLY(SPVM_ENV* env, SPVM_VALUE* stack, void** out, void* in, int32_t* error_id) {
+static inline void SPVM_IMPLEMENT_MOVE_OBJECT_CHECK_READ_ONLY_STRING(SPVM_ENV* env, SPVM_VALUE* stack, void** out, void* in, int32_t* error_id) {
+  
   void* string = in;
-  if (env->is_read_only(env, stack, string)) {
+  if (env->is_string(env, stack, string) && env->is_read_only(env, stack, string)) {
     void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_ASSIGN_READ_ONLY_STRING_TO_MUTABLE_TYPE]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
@@ -478,102 +479,15 @@ static inline void SPVM_IMPLEMENT_STRING_COMPARISON(SPVM_ENV* env, SPVM_VALUE* s
   void* object1 = in1;
   void* object2 = in2;
   
-  int32_t flag = 0;
+  int32_t cmp = 0;
   if (object1 == NULL && object2 == NULL) {
-   switch (comparison_op_id) {
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_EQ: {
-        flag = 1;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_NE: {
-        flag = 0;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GT: {
-        flag = 0;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GE: {
-        flag = 1;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LT: {
-        flag = 0;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LE: {
-        flag = 1;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP: {
-        flag = 0;
-        break;
-      }
-    }
+    cmp = 0;
   }
   else if (object1 != NULL && object2 == NULL) {
-    switch (comparison_op_id) {
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_EQ: {
-        flag = 0;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_NE: {
-        flag = 1;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GT: {
-        flag = 1;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GE: {
-        flag = 1;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LT: {
-        flag = 0;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LE: {
-        flag = 0;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP: {
-        flag = 1;
-        break;
-      }
-    }
+    cmp = 1;
   }
   else if (object1 == NULL && object2 != NULL) {
-    switch (comparison_op_id) {
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_EQ: {
-        flag = 0;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_NE: {
-        flag = 1;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GT: {
-        flag = 0;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GE: {
-        flag = 0;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LT: {
-        flag = 1;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LE: {
-        flag = 1;
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP: {
-        flag = -1;
-        break;
-      }
-    }
+    cmp = -1;
   }
   else {
     int32_t length1 = *(int32_t*)((intptr_t)object1 + object_length_offset);
@@ -584,44 +498,46 @@ static inline void SPVM_IMPLEMENT_STRING_COMPARISON(SPVM_ENV* env, SPVM_VALUE* s
     
     int32_t short_string_length = length1 < length2 ? length1 : length2;
     int32_t retval = memcmp(bytes1, bytes2, short_string_length);
-    int32_t cmp;
     if (retval) {
       cmp = retval < 0 ? -1 : 1;
-    } else if (length1 == length2) {
+    }
+    else if (length1 == length2) {
       cmp = 0;
-    } else {
+    }
+    else {
       cmp = length1 < length2 ? -1 : 1;
     }
-    
-    switch (comparison_op_id) {
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_EQ: {
-        flag = (cmp == 0);
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_NE: {
-        flag = (cmp != 0);
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GT: {
-        flag = (cmp == 1);
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GE: {
-        flag = (cmp >= 0);
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LT: {
-        flag = (cmp == -1);
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LE: {
-        flag = (cmp <= 0);
-        break;
-      }
-      case SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP: {
-        flag = cmp;
-        break;
-      }
+  }
+  
+  int32_t flag;
+  switch (comparison_op_id) {
+    case SPVM_IMPLEMENT_C_STRING_COMPARISON_EQ: {
+      flag = cmp == 0;
+      break;
+    }
+    case SPVM_IMPLEMENT_C_STRING_COMPARISON_NE: {
+      flag = cmp != 0;
+      break;
+    }
+    case SPVM_IMPLEMENT_C_STRING_COMPARISON_GT: {
+      flag = cmp > 0;
+      break;
+    }
+    case SPVM_IMPLEMENT_C_STRING_COMPARISON_GE: {
+      flag = cmp >= 0;
+      break;
+    }
+    case SPVM_IMPLEMENT_C_STRING_COMPARISON_LT: {
+      flag = cmp < 0;
+      break;
+    }
+    case SPVM_IMPLEMENT_C_STRING_COMPARISON_LE: {
+      flag = cmp <= 0;
+      break;
+    }
+    case SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP: {
+      flag = cmp;
+      break;
     }
   }
   

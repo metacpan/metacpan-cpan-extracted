@@ -26,7 +26,7 @@ package ConsoleManualTests {
   use warnings;
 
   require bytes;
-  use PerlX::Assert -check;
+  use Devel::Assert 'on';
   use Test::More;
   use Time::HiRes;
   use Win32;
@@ -84,7 +84,7 @@ package ConsoleManualTests {
     my $result = $consoleIn 
       ? System::Console->In->getline() 
       : System::Console->ReadLine();
-    assert 'Equal' { index($result, $expectedLine) == 0 };
+    assert ( index($result, $expectedLine) == 0 or ~- warn 'Equal' );
     AssertUserExpectedResults("the characters you typed properly echoed as ". 
       "you typed");
     return;
@@ -97,7 +97,7 @@ package ConsoleManualTests {
     System::Console->WriteLine("Please type 'a' 3 times, press 'Backspace' ".
       " to erase 1, then type a single 'b' and press 'Enter'.");
     my $result = System::Console->ReadLine();
-    assert 'Equal' { index($result, $expectedLine) == 0 };
+    assert ( index($result, $expectedLine) == 0 or ~- warn 'Equal' );
     AssertUserExpectedResults("the characters you typed properly echoed as ". 
       "you typed");
 
@@ -106,7 +106,7 @@ package ConsoleManualTests {
       "to erase 1, then type a single 'b' and press 'Enter'.");
     my $reader = System::Console->OpenStandardInput();
     $result = $reader->getline();
-    assert 'Equal' { index($result, $expectedLine) == 0 };
+    assert ( index($result, $expectedLine) == 0 or ~- warn 'Equal' );
     AssertUserExpectedResults("the characters you typed properly echoed as ". 
       "you typed");
   }
@@ -116,15 +116,15 @@ package ConsoleManualTests {
     # want this builder to use multiple chunks. So the expectedLine is longer 
     # than 16 characters (StringBuilder.DefaultCapacity).
     my $expectedLine = "This is a test for ReadFromOpenStandardInput.";
-    assert 'True' { length($expectedLine) > 16 };
+    assert ( length($expectedLine) > 16 or ~- warn 'True' );
     System::Console->WriteLine("Please type the sentence ". 
       "(without the quotes): \"$expectedLine\"");
     my $inputStream = System::Console->OpenStandardInput();
     for (my $i = 0; $i < length($expectedLine); $i++) {
-      assert 'Equal' { bytes::substr($expectedLine, $i, 1) 
-        eq ($inputStream->sysread($_, 1) ? $_ : '') };
+      assert ( bytes::substr($expectedLine, $i, 1) 
+        eq ($inputStream->sysread($_, 1) ? $_ : '') or ~- warn 'Equal' );
     }
-    assert 'Equal' { "\n" eq ($inputStream->read($_, 1) ? $_ : '') };
+    assert ( "\n" eq ($inputStream->read($_, 1) ? $_ : '') or ~- warn 'Equal' );
     AssertUserExpectedResults("the characters you typed properly echoed as ". 
       "you typed");
   }
@@ -136,7 +136,7 @@ package ConsoleManualTests {
       "to erase 1, then type a single 'b' and press 'Enter'.");
     foreach my $c ( split //, $expectedLine ) {
       my $ch = System::Console->Read();
-      assert 'Equal' { $c eq chr $ch };
+      assert ( $c eq chr $ch or ~- warn 'Equal' );
     }
     AssertUserExpectedResults("the characters you typed properly echoed as ". 
       "you typed");
@@ -150,7 +150,7 @@ package ConsoleManualTests {
     System::Console->Out->flush();
 
     my $result = System::Console->ReadLine();
-    assert 'Equal' { "a" eq $result };
+    assert ( "a" eq $result or ~- warn 'Equal' );
     AssertUserExpectedResults("the previous line is 'Input: a'");
   }
 
@@ -158,9 +158,9 @@ package ConsoleManualTests {
     System::Console->WriteLine("Please type \"peek\" (without the quotes). ". 
       "You should see it as you type:");
     foreach my $c ( 'p', 'e', 'e', 'k' ) {
-      assert 'Equal' { $c eq System::Console->In->Peek() };
-      assert 'Equal' { $c eq System::Console->In->Peek() };
-      assert 'Equal' { $c eq System::Console->In->Peek() };
+      assert ( $c eq System::Console->In->Peek() or ~- warn 'Equal' );
+      assert ( $c eq System::Console->In->Peek() or ~- warn 'Equal' );
+      assert ( $c eq System::Console->In->Peek() or ~- warn 'Equal' );
     }
     System::Console->In->getline(); # enter
     AssertUserExpectedResults("the characters you typed properly echoed as ". 
@@ -176,7 +176,9 @@ package ConsoleManualTests {
     System::Console->WriteLine("Please type \"console\" ". 
       "(without the quotes). You shouldn't see it as you type:");
     foreach my $k ( qw{ C O N S O L E } ) {
-      assert 'Equal' { $k eq chr System::Console->ReadKey(TRUE())->Key };
+      assert ( $k eq chr System::Console->ReadKey(TRUE())->Key 
+        or ~- warn 'Equal' 
+      );
     }
     AssertUserExpectedResults("\"console\" correctly not echoed as you ". 
       "typed it");
@@ -186,7 +188,9 @@ package ConsoleManualTests {
     System::Console->WriteLine("Please type \"console\" ". 
       "(without the quotes). You should see it as you type:");
     foreach my $k ( qw{ C O N S O L E } ) {
-      assert 'Equal' { $k eq chr System::Console->ReadKey(FALSE())->Key };
+      assert ( $k eq chr System::Console->ReadKey(FALSE())->Key 
+        or ~- warn 'Equal' 
+      );
     }
     AssertUserExpectedResults("\"console\" correctly echoed as you typed it");
   }
@@ -198,13 +202,13 @@ package ConsoleManualTests {
     while ($keysRead < 50) {
       if (System::Console->KeyAvailable) {
         my $keyInfo = System::Console->ReadKey(FALSE);
-        assert 'Equal' { ConsoleKey->Enter == $keyInfo->Key };
+        assert ( ConsoleKey->Enter == $keyInfo->Key or ~- warn 'Equal' );
         $keysRead++;
       }
     }
     while (System::Console->KeyAvailable) {
       my $keyInfo = System::Console->ReadKey(TRUE);
-      assert 'Equal' { ConsoleKey->Enter == $keyInfo->Key };
+      assert ( ConsoleKey->Enter == $keyInfo->Key or ~- warn 'Equal' );
     }
     AssertUserExpectedResults("no empty newlines appear");
   }
@@ -215,9 +219,11 @@ package ConsoleManualTests {
     my $actual = System::Console->ReadKey(TRUE);
     System::Console->WriteLine();
 
-    assert 'Equal' { $expected->Key == $actual->Key };
-    assert 'Equal' { $expected->{Modifiers} == $actual->{Modifiers} };
-    assert 'Equal' { $expected->{KeyChar} eq $actual->{KeyChar} };
+    assert ( $expected->Key == $actual->Key or ~- warn 'Equal' );
+    assert ( $expected->{Modifiers} == $actual->{Modifiers} 
+      or ~- warn 'Equal' 
+    );
+    assert ( $expected->{KeyChar} eq $actual->{KeyChar} or ~- warn 'Equal' );
   }
 
   sub GetKeyChords { # \@ ()
@@ -358,7 +364,7 @@ package ConsoleManualTests {
     my $widthBefore = System::Console->WindowWidth;
     my $heightBefore = System::Console->WindowHeight;
 
-    assert 'False' { !$wasResized };
+    assert ( !$wasResized or ~- warn 'False' );
 
     System::Console->SetWindowSize(int($widthBefore / 2), 
       int($heightBefore / 2));
@@ -366,20 +372,24 @@ package ConsoleManualTests {
     my $manualResetEvent = eval {
       Time::HiRes::sleep(50/1000);
       my $hConsoleOutput = Win32::Console::_GetStdHandle(STD_OUTPUT_HANDLE)//-1;
-      assert { $hConsoleOutput > 0 };
+      assert ( $hConsoleOutput > 0 );
       my $uFileType = Win32API::File::GetFileType($hConsoleOutput) // 0;
-      assert { $uFileType == Win32API::File::FILE_TYPE_CHAR };
+      assert ( $uFileType == Win32API::File::FILE_TYPE_CHAR );
       my @ir = Win32::Console::_GetConsoleScreenBufferInfo($hConsoleOutput);
-      assert { @ir > 1 };
+      assert ( @ir > 1 );
       my $width = $ir[7] - $ir[5] + 1;
       my $height = $ir[8] - $ir[6] + 1;
       $wasResized = $widthBefore != $width || $heightBefore != $height;
       1;
     };
-    assert 'True' { $manualResetEvent };
-    assert 'True' { $wasResized };
-    assert 'Equal' { int($widthBefore / 2) == System::Console->WindowWidth };
-    assert 'Equal' { int($heightBefore / 2) == System::Console->WindowHeight };
+    assert ( $manualResetEvent or ~- warn 'True' );
+    assert ( $wasResized or ~- warn 'True' );
+    assert ( int($widthBefore / 2) == System::Console->WindowWidth 
+      or ~- warn 'Equal' 
+    );
+    assert ( int($heightBefore / 2) == System::Console->WindowHeight 
+      or ~- warn 'Equal' 
+    );
 
     System::Console->SetWindowSize($widthBefore, $heightBefore);
     return;
@@ -393,7 +403,7 @@ package ConsoleManualTests {
   
     switch: for (chr $info->Key) {
       case: /^[YN]$/ and do {
-        assert 'Equal' { 'Y' eq chr $info->Key };
+        assert ( 'Y' eq chr $info->Key or ~- warn 'Equal' );
         last
       };
       default: {

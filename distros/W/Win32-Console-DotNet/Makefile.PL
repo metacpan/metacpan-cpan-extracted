@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;
 
+die "OS unsupported\n" if $^O ne 'MSWin32';
+
 WriteMakefile(
   NAME              => 'Win32::Console::DotNet',
   VERSION_FROM      => 'lib/Win32/Console/DotNet.pm',
@@ -17,15 +19,12 @@ WriteMakefile(
   },
 
   PREREQ_PM => {
+    'Class::Accessor'           => 0.34,
     'Class::Method::Modifiers'  => 2.11,
-    'Class::Tiny'               => "1.000",
-    'Class::Tiny::Antlers'      => 0.024,
+    'Devel::Assert'             => 1.06,
     'Devel::StrictMode'         => 0.003,
     'IO::Null'                  => 1.01,
     'namespace::sweep'          => 0.006,
-    'PerlX::Assert'             => 0.905,
-    'Platform::Windows'         => 0.002,
-    'Type::Nano'                => 0.014,
     'Win32'                     => 0.54,
     'Win32::API'                => 0.79,
     'Win32::Console'            => "0.10",
@@ -56,6 +55,8 @@ WriteMakefile(
     prereqs => {
       runtime => {
         requires => { # v5.14 builtin modules
+          'B'                 => 0,
+          'Carp'              => 0,
           'Config'            => 0,
           'constant'          => 0,
           'Encode'            => 0,
@@ -69,6 +70,7 @@ WriteMakefile(
           'IO::Handle'        => 0,
           'List::Util'        => 0,
           'strict'            => 0,
+          'Scalar::Util'      => 0,
           'Symbol'            => 0,
           'threads'           => 0,
           'threads::shared'   => 0,
@@ -91,7 +93,6 @@ WriteMakefile(
           'FindBin'           => 0,
           'IPC::Open3'        => 0,
           'POSIX'             => 0,
-          'Scalar::Util'      => 0,
           'Time::HiRes'       => 0,
         },
       },

@@ -6,7 +6,7 @@ use warnings;
 
 use Dispatch::Fu;
 use Acme::Free::Public::APIs qw//;
-use Util::H2O::More          qw/d2o ddd Getopt2h2o o2d/;
+use Util::H2O::More          qw/d2o Getopt2h2o o2d/;
 use open qw(:std :utf8);     # Ensures input/output are treated as UTF-8
 use Encode;
 

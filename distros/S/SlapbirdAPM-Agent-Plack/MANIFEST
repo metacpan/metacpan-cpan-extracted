@@ -1,6 +1,7 @@
 cpanfile
 lib/Plack/Middleware/SlapbirdAPM.pm
 lib/SlapbirdAPM/Agent/Plack.pm
+lib/SlapbirdAPM/DBIx/Tracer.pm
 lib/SlapbirdAPM/Trace.pm
 LICENSE
 Makefile.PL

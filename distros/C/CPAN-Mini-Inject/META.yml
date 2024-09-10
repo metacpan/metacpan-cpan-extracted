@@ -1,14 +1,14 @@
 ---
 abstract: 'Inject modules into a CPAN::Mini mirror.'
 author:
-  - 'brian d foy <briandfoy@pobox.com>'
+  - 'Shawn Sorichetti <ssoriche@cpan.org>'
 build_requires:
   Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
-license: artistic_2
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,6 +19,7 @@ no_index:
     - inc
 requires:
   CPAN::Checksums: '2.13'
+  CPAN::Meta: '2.150010'
   CPAN::Mini: '0.32'
   Carp: '0'
   Compress::Zlib: '0'
@@ -38,9 +39,10 @@ requires:
   Pod::Usage: '0'
   YAML: '0'
   perl: '5.016'
+  version: '0.9915'
 resources:
   bugtracker: https://github.com/briandfoy/cpan-mini-inject/issues
   homepage: https://github.com/briandfoy/cpan-mini-inject
   repository: https://github.com/briandfoy/cpan-mini-inject
-version: '1.003'
+version: '1.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

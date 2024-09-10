@@ -55,7 +55,7 @@ use RT::Shredder;
 
 package RT::Extension::MergeUsers;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 =head1 NAME
 
@@ -554,6 +554,67 @@ sub Ids {
         return $orig_delete_member->( $self, $member_id, @_ );
     };
 
+    my $orig_has_member = \&RT::Group::HasMember;
+    *HasMember = sub {
+        my $self      = shift;
+        my $member_id = shift;
+
+        my $principal;
+        if ( ref $member_id eq 'RT::Principal' ) {
+            $principal = $member_id;
+        }
+        else {
+            $principal = RT::Principal->new( $self->CurrentUser );
+            $principal->Load($member_id);
+        }
+
+        if ( $principal->IsUser ) {
+
+            # Not call GetMergedUsers as we don't want to create the attribute here
+            my $merged_users = $principal->Object->FirstAttribute('MergedUsers');
+            if ( $merged_users && @{ $merged_users->Content } ) {
+                my $members = $self->MembersObj;
+                $members->Limit(
+                    FIELD    => 'MemberId',
+                    VALUE    => [ $principal->Id, @{ $merged_users->Content } ],
+                    OPERATOR => 'IN',
+                );
+                return $members->First;
+            }
+        }
+        return $orig_has_member->( $self, $member_id, @_ );
+    };
+
+    my $orig_has_member_recursively = \&RT::Group::HasMemberRecursively;
+    *HasMemberRecursively = sub {
+        my $self      = shift;
+        my $member_id = shift;
+
+        my $principal;
+        if ( ref $member_id eq 'RT::Principal' ) {
+            $principal = $member_id;
+        }
+        else {
+            $principal = RT::Principal->new( $self->CurrentUser );
+            $principal->Load($member_id);
+        }
+
+        if ( $principal->IsUser ) {
+
+            # Not call GetMergedUsers as we don't want to create the attribute here
+            my $merged_users = $principal->Object->FirstAttribute('MergedUsers');
+            if ( $merged_users && @{ $merged_users->Content } ) {
+                # Recursive check is a bit complicated, here we call orig method to avoid code duplicates.
+                for my $id ( $member_id, @{ $merged_users->Content } ) {
+                    if ( my $ret = $orig_has_member_recursively->( $self, $id ) ) {
+                        return $ret;
+                    }
+                }
+                return undef;
+            }
+        }
+        return $orig_has_member_recursively->( $self, $member_id, @_ );
+    };
 }
 
 {

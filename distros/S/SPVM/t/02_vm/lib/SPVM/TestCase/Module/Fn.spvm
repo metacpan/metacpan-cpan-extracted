@@ -1430,16 +1430,16 @@ class TestCase::Module::Fn {
         return 0;
       }
     }
-
+    
     return 1;
   }
-
+  
   static method is_blank : int () {
-
+    
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
-
+      
       if ($char >= ' ' ||  $char <= '\t') {
         my $ret = Fn->is_blank($char);
         unless ($ret == 1) {
@@ -5312,6 +5312,515 @@ class TestCase::Module::Fn {
     }
     
     $@ = undef;
+    
+    return 1;
+  }
+  
+  static method memcmp : int () {
+    
+    {
+      # Numeric array
+      {
+        # byte
+        {
+          {
+            my $data1 = [(byte)1, 2, 3, 5];
+            my $data2 = [(byte)1, 2, 3, 4];
+            
+            my $ret = Fn->memcmp($data1, 0, $data2, 0, 4);
+            
+            unless ($ret > 0) {
+              return 0;
+            }
+          }
+          
+          {
+            my $data1 = [(byte)1, 2, 3, 4];
+            my $data2 = [(byte)1, 2, 3, 4];
+            
+            my $ret = Fn->memcmp($data1, 0, $data2, 0, 4);
+            
+            unless ($ret == 0) {
+              return 0;
+            }
+          }
+          
+          {
+            my $data1 = [(byte)1, 2, 3, 3];
+            my $data2 = [(byte)1, 2, 3, 4];
+            
+            my $ret = Fn->memcmp($data1, 0, $data2, 0, 4);
+            
+            unless ($ret < 0) {
+              return 0;
+            }
+          }
+          
+          {
+            my $data1 = [(byte)5];
+            my $data2 = [(byte)4];
+            
+            my $ret = Fn->memcmp($data1, 0, $data2, 0, 0);
+            
+            unless ($ret == 0) {
+              return 0;
+            }
+          }
+          
+        }
+        
+        # double
+        {
+          {
+            my $data1 = [(double)1, 2, 3, 5];
+            my $data2 = [(double)1, 2, 3, 4];
+            
+            my $ret = Fn->memcmp($data1, 0, $data2, 0, 8 * 4);
+            
+            unless ($ret > 0) {
+              return 0;
+            }
+          }
+          
+          {
+            my $data1 = [(double)1, 2, 3, 4];
+            my $data2 = [(double)1, 2, 3, 4];
+            
+            my $ret = Fn->memcmp($data1, 0, $data2, 0, 8 * 4);
+            
+            unless ($ret == 0) {
+              return 0;
+            }
+          }
+          
+          {
+            my $data1 = [(double)1, 2, 3, 3];
+            my $data2 = [(double)1, 2, 3, 4];
+            
+            my $ret = Fn->memcmp($data1, 0, $data2, 0, 8 * 4);
+            
+            unless ($ret < 0) {
+              return 0;
+            }
+          }
+          
+        }
+      }
+
+      # string
+      {
+        {
+          my $data1 = (string)[(byte)1, 2, 3, 5];
+          my $data2 = (string)[(byte)1, 2, 3, 4];
+          
+          my $ret = Fn->memcmp($data1, 0, $data2, 0, 4);
+          
+          unless ($ret > 0) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data1 = (string)[(byte)1, 2, 3, 4];
+          my $data2 = (string)[(byte)1, 2, 3, 4];
+          
+          my $ret = Fn->memcmp($data1, 0, $data2, 0, 4);
+          
+          unless ($ret == 0) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data1 = (string)[(byte)1, 2, 3, 3];
+          my $data2 = (string)[(byte)1, 2, 3, 4];
+          
+          my $ret = Fn->memcmp($data1, 0, $data2, 0, 4);
+          
+          unless ($ret < 0) {
+            return 0;
+          }
+        }
+        
+      }
+      
+      # Multi numeric array
+      {
+        {
+          my $data1 = new Complex_2d[4];
+          $data1->[0]{re} = 1;
+          $data1->[0]{im} = 2;
+          $data1->[2]{re} = 3;
+          $data1->[2]{im} = 5;
+          
+          my $data2 = new Complex_2d[4];
+          $data2->[0]{re} = 1;
+          $data2->[0]{im} = 2;
+          $data2->[2]{re} = 3;
+          $data2->[2]{im} = 4;
+          
+          my $ret = Fn->memcmp($data1, 0, $data2, 0, 2 * 8 * 4);
+          
+          unless ($ret > 0) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data1 = new Complex_2d[4];
+          $data1->[0]{re} = 1;
+          $data1->[0]{im} = 2;
+          $data1->[2]{re} = 3;
+          $data1->[2]{im} = 4;
+          
+          my $data2 = new Complex_2d[4];
+          $data2->[0]{re} = 1;
+          $data2->[0]{im} = 2;
+          $data2->[2]{re} = 3;
+          $data2->[2]{im} = 4;
+          
+          my $ret = Fn->memcmp($data1, 0, $data2, 0, 2 * 8 * 4);
+          
+          unless ($ret == 0) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data1 = new Complex_2d[4];
+          $data1->[0]{re} = 1;
+          $data1->[0]{im} = 2;
+          $data1->[2]{re} = 3;
+          $data1->[2]{im} = 4;
+          
+          my $data2 = new Complex_2d[4];
+          $data2->[0]{re} = 1;
+          $data2->[0]{im} = 2;
+          $data2->[2]{re} = 3;
+          $data2->[2]{im} = 5;
+          
+          my $ret = Fn->memcmp($data1, 0, $data2, 0, 2 * 8 * 4);
+          
+          unless ($ret < 0) {
+            return 0;
+          }
+        }
+        
+      }
+    }
+    
+    # Copy offset + length
+    {
+      # int
+      {
+        {
+          my $data1 = [(int)0, 1, 2, 4, 4];
+          my $data2 = [(int)0, -1, 1, 2, 3, 4];
+          
+          my $ret = Fn->memcmp($data1, 1 * 4, $data2, 2 * 4, 3 * 4);
+          
+          unless ($ret > 0) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data1 = [(int)0, 1, 2, 3, 4];
+          my $data2 = [(int)0, -1, 1, 2, 3, 5];
+          
+          my $ret = Fn->memcmp($data1, 1 * 4, $data2, 2 * 4, 3 * 4);
+          
+          unless ($ret == 0) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data1 = [(int)0, 1, 2, 3, 3];
+          my $data2 = [(int)0, -1, 1, 2, 4, 4];
+          
+          my $ret = Fn->memcmp($data1, 1 * 4, $data2, 2 * 4, 3 * 4);
+          
+          unless ($ret < 0) {
+            return 0;
+          }
+        }
+      }
+    }
+    
+    # Exception
+    {
+      # Exception - Destnation must be defined
+      {
+        my $data2 = [(byte)1, 3, 5];
+        eval { my $ret = Fn->memcmp(undef, 0, $data2, 0, 3); };
+        unless ($@) {
+          return 0;
+        }
+      }
+
+      # Exception - Source must be defined
+      {
+        my $data1 = new byte[4];
+        eval { my $ret = Fn->memcmp($data1, 0, undef, 0, 3); };
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      # Exception - Length must be more than or equals to 0
+      {
+        my $data1 = new byte[4];
+        my $data2 = [(byte)1, 3, 5];
+        eval { my $ret = Fn->memcmp($data1, 0, $data2, 0, -1); };
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      # Exception - Destnation offset + length must be within the range of the destination array
+      {
+        my $data1 = new byte[4];
+        my $data2 = [(byte)1, 3, 5];
+        eval { my $ret = Fn->memcmp($data1, 2, $data2, 0, 3); };
+        unless ($@) {
+          return 0;
+        }
+      }
+
+      # Exception - Source offset + length must be within the range of the source array
+      {
+        my $data1 = new byte[4];
+        my $data2 = [(byte)1, 3, 5];
+        eval { my $ret = Fn->memcmp($data1, 0, $data2, 1, 3); };
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method reverse_inplace : int () {
+    
+    # Numeric array
+    {
+      {
+        my $array = [1, 3, 2];
+        
+        Fn->reverse_inplace($array);
+        
+        unless (Array->equals_int($array, [2, 3, 1])) {
+          return 0;
+        }
+        
+      }
+      
+      {
+        my $array = [1, 3, 2, 4];
+        
+        Fn->reverse_inplace($array);
+        
+        unless (Array->equals_int($array, [4, 2, 3, 1])) {
+          return 0;
+        }
+        
+      }
+    }
+    
+    # Multi-numeric array
+    {
+      {
+        my $array = new Complex_2d[3];
+        
+        $array->[0]{re} = 1;
+        $array->[0]{im} = 11;
+        $array->[1]{re} = 3;
+        $array->[1]{im} = 33;
+        $array->[2]{re} = 2;
+        $array->[2]{im} = 22;
+        
+        Fn->reverse_inplace($array);
+        
+        unless ($array->[0]{re} == 2) {
+          return 0;
+        }
+        
+        unless ($array->[0]{im} == 22) {
+          return 0;
+        }
+        unless ($array->[1]{re} == 3) {
+          return 0;
+        }
+        unless ($array->[1]{im} == 33) {
+          return 0;
+        }
+        unless ($array->[2]{re} == 1) {
+          return 0;
+        }
+        unless ($array->[2]{im} == 11) {
+          return 0;
+        }
+        
+      }
+    }
+    
+    # String
+    {
+      {
+        my $string = (mutable string)copy "abc";
+        
+        Fn->reverse_inplace($string);
+        
+        unless ($string eq "cba") {
+          return 0;
+        }
+        
+      }
+      
+      {
+        my $string = (mutable string)copy "abcd";
+        
+        Fn->reverse_inplace($string);
+        
+        unless ($string eq "dcba") {
+          return 0;
+        }
+        
+      }
+      
+    }
+    
+    # Object array
+    {
+      {
+        my $array = [(string)1, 3, 2];
+        
+        Fn->reverse_inplace($array);
+        
+        unless (Array->equals_string($array, [(string)2, 3, 1])) {
+          return 0;
+        }
+        
+      }
+      
+      {
+        my $array = [(string)1, 3, 2, 4];
+        
+        Fn->reverse_inplace($array);
+        
+        unless (Array->equals_string($array, [(string)4, 2, 3, 1])) {
+          return 0;
+        }
+        
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $array = [(string)1, 3, 2];
+        
+        eval { Fn->reverse_inplace(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+        
+      }
+      
+      {
+        my $array = Int->new(1);
+        
+        eval { Fn->reverse_inplace($array); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $array = "abc";
+        
+        eval { Fn->reverse_inplace($array); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method is_string_array : int () {
+    
+    # Array
+    {
+      my $array = new byte[3];
+      
+      if (Fn->is_string_array($array)) {
+        return 0;
+      }
+    }
+    
+    # string
+    {
+      my $string = "abc";
+      
+      if (Fn->is_string_array($string)) {
+        return 0;
+      }
+    }
+    
+    # string[]
+    {
+      my $string = ["abc"];
+      
+      unless (Fn->is_string_array($string)) {
+        return 0;
+      }
+    }
+    
+    # string[]. Cast to object[]
+    {
+      my $string = (object[])["abc"];
+      
+      unless (Fn->is_string_array($string)) {
+        return 0;
+      }
+    }
+    
+    # object[]
+    {
+      my $string = [(object)"abc"];
+      
+      if (Fn->is_string_array($string)) {
+        return 0;
+      }
+    }
+    
+    # Object
+    {
+      my $minimal = TestCase::Minimal->new;
+      
+      if (Fn->is_string_array($minimal)) {
+        return 0;
+      }
+    }
+    
+    # undef
+    {
+      if (Fn->is_string_array(undef)) {
+        return 0;
+      }
+    }
     
     return 1;
   }

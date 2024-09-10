@@ -4,6 +4,7 @@ Changes
 README
 Makefile.PL
 lib/Net/Waiter.pm
-
+demo/MyWaiter.pm
+demo/try_my_waiter.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

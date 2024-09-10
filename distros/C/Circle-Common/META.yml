@@ -29,5 +29,5 @@ requires:
   URL::Encode: '0.03'
   YAML: '1.30'
   perl: '5.006'
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

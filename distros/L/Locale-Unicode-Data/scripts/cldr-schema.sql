@@ -136,6 +136,8 @@ CREATE TABLE locales (
     -- Sourced from common/supplemental/supplementalData.xml/supplementalData/parentLocales/parentLocale
     -- See <https://unicode.org/reports/tr35/tr35.html#Parent_Locales>
     ,parent             VARCHAR(20) COLLATE NOCASE
+    -- Sourced from common/collation/*.xml/ldml/collations/collation[@type]
+    ,collations         TEXT[]
     -- regular, deprecated, special, reserved, private_use, unknown
     ,status             VARCHAR(20)
     ,PRIMARY KEY(locale_id)
@@ -636,7 +638,7 @@ CREATE TABLE timezones_cities (
 );
 CREATE UNIQUE INDEX idx_timezones_cities_unique ON timezones_cities(locale, timezone, IFNULL(alt, ''));
 
--- This table contains the localised city data from GeoNames open data
+-- This table contains the localised city data from GeoNames open data, and from time spent getting each time zones main location localised.
 -- <http://www.geonames.org>
 -- GeoNames is a project of Unxos GmbH, Tutilostrasse 17d, 9011 St. Gallen, Switzerland. 
 -- Its data is licensed under a Creative Commons Attribution 4.0 License.
@@ -666,21 +668,17 @@ SELECT
 FROM 
     timezones_cities c
     LEFT JOIN timezones_cities_supplemental e ON c.tz_city_id = e.tz_city_id
-WHERE 
-    c.tz_city_id IS NOT NULL OR e.tz_city_id IS NOT NULL
 UNION
 SELECT
-    COALESCE(c.rowid, e.rowid) AS rowid,
-    COALESCE(c.tz_city_id, e.tz_city_id) AS tz_city_id,
-    COALESCE(c.locale, e.locale) AS locale,
-    COALESCE(c.timezone, e.timezone) AS timezone,
-    COALESCE(c.city, e.city) AS city,
-    COALESCE(c.alt, e.alt) AS alt
+    COALESCE(e.rowid, c.rowid) AS rowid,
+    COALESCE(e.tz_city_id, c.tz_city_id) AS tz_city_id,
+    COALESCE(e.locale, c.locale) AS locale,
+    COALESCE(e.timezone, c.timezone) AS timezone,
+    COALESCE(e.city, c.city) AS city,
+    COALESCE(e.alt, c.alt) AS alt
 FROM 
     timezones_cities_supplemental e
-    LEFT JOIN timezones_cities c ON c.tz_city_id = e.tz_city_id
-WHERE 
-    e.tz_city_id IS NOT NULL OR c.tz_city_id IS NOT NULL;
+    LEFT JOIN timezones_cities c ON e.tz_city_id = c.tz_city_id;
 
 -- NOTE: Source: main/*.xml->/ldml/dates/timeZoneNames/zone[@type]
 CREATE TABLE timezones_formats (

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,10 +21,10 @@ requires:
   Scalar::Util::Numeric: '0'
   Test::Tk: '3.02'
   Tk: '804.033'
-  Tk::ColorEntry: '0.05'
+  Tk::ColorEntry: '0.08'
   Tk::FontDialog: '0'
   Tk::ListEntry: '0.01'
 resources:
   repository: git://github.com/haje61/Tk-QuickForm.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

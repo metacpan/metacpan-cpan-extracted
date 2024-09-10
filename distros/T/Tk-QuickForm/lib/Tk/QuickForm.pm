@@ -9,7 +9,7 @@ Tk::QuickForm - Quickly set up a form.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 use Tk;
 use base qw(Tk::Frame);
@@ -17,6 +17,7 @@ Construct Tk::Widget 'QuickForm';
 
 require Tk::LabFrame;
 require Tk::NoteBook;
+require Tk::PopColor;
 use Tk::PNG;
 
 
@@ -407,6 +408,7 @@ sub createForm {
 	my @padding = (-padx => 2, -pady => 2);
 
 	@options = @$structure;
+	my $popcolor;
 	while (@options) {
 		my $key = shift @options;
 
@@ -493,6 +495,10 @@ sub createForm {
 			my $row = $holderstack[0]->{row};
 			my $holder = $holderstack[0]->{holder};
 			my $offset = $holderstack[0]->{offset};
+			if ($type eq 'color') {
+				$popcolor = $self->PopColor(-widget => '') unless defined $popcolor;
+				push @opt, -popcolor => $popcolor;
+			}
 
 
 			if ($type eq 'ext1') {

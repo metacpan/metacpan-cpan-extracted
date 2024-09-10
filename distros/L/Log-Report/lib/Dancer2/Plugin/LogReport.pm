@@ -8,7 +8,7 @@
 
 package Dancer2::Plugin::LogReport;
 use vars '$VERSION';
-$VERSION = '1.38';
+$VERSION = '1.39';
 
 
 use warnings;

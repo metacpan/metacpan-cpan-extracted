@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Perl API client for ...",
+  "ABSTRACT" => "Perl API client for FreePublicAPI.com's API for for listing APIs.",
   "AUTHOR" => "oodler <oodler\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -19,17 +19,19 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Acme::Free::Public::APIs",
   "PREREQ_PM" => {
+    "Dispatch::Fu" => "1.06",
     "HTTP::Tiny" => 0,
     "JSON" => 0,
     "Util::H2O::More" => "0.4.0"
   },
   "TEST_REQUIRES" => {
+    "Dispatch::Fu" => "1.06",
     "HTTP::Tiny" => 0,
     "JSON" => 0,
     "Test::More" => 0,
     "Util::H2O::More" => "0.4.0"
   },
-  "VERSION" => "0.9.8",
+  "VERSION" => "0.9.9",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +39,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Dispatch::Fu" => "1.06",
   "HTTP::Tiny" => 0,
   "JSON" => 0,
   "Test::More" => 0,

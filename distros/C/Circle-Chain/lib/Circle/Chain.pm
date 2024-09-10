@@ -8,6 +8,7 @@ use Carp;
 use Circle::User;
 use Circle::Wallet;
 use Circle::Block;
+use Circle::Node;
 
 our @EXPORT_OK = qw([
   send_register_verify_code register send_verify_code login
@@ -26,6 +27,8 @@ our @EXPORT_OK = qw([
   get_block_hashlist get_block get_block_header_list get_block_data
   get_blocktails_hashlist get_blocktails_po get_tx_by_txid search_tx_by_txid
   search_tx_by_address search_utxos
+
+  subscribe serverFeatures broadcastTransaction
 );
 our %EXPORT_TAGS = (
     user => [
@@ -79,6 +82,13 @@ our %EXPORT_TAGS = (
           search_utxos
         )
     ],
+    node => [
+        qw(
+          subscribe
+          serverFeatures
+          broadcastTransaction
+        )
+    ],
 );
 
 =head1 NAME
@@ -87,15 +97,15 @@ Circle::Chain - The Circle::Chain SDks.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
-    use Circle::Chain qw(:user :wallet :block);
+    use Circle::Chain qw(:user :wallet :block :node);
     # 1. first register or login
     my $response = send_register_verify_code(
         {
@@ -273,9 +283,25 @@ for wallet module, the exported subroutines:
 
 =back
 
+If you want to use node module:
+
+    use Circle::Chain ':node';
+
+for wallet module, the exported subroutines:
+
+=over
+
+=item 1. subscribe
+
+=item 2. serverFeatures
+
+=item 3. broadcastTransaction
+
+=back
+
 =head1 SUBROUTINES/METHODS
 
-please refer to L<Circle::User>, L<Circle::Wallet>, L<Circle::Block> modules.
+please refer to L<Circle::User>, L<Circle::Wallet>, L<Circle::Block>, L<Circle::Node> modules.
 
 =cut
 
@@ -294,7 +320,7 @@ automatically be notified of progress on your bug as I make changes.
 
 See L<Circle::Common> for circle common module.
 
-See L <Circle::User> for circle user module .
+See L<Circle::User> for circle user module .
 
 See L<Circle::Wallet> for circle wallet module.
 

@@ -411,6 +411,8 @@ Locale::Unicode::Data - Unicode CLDR SQL Data
     );
     my $ref = $cldr->locales_info( property => 'quotation_start', locale => 'ja' );
     my $all = $cldr->locales_infos;
+    my $ref = $cldr->metazone( metazone => 'Japan' );
+    my $all = $cldr->metazones;
     my $ref = $cldr->number_format_l10n(
         locale          => 'en',
         number_system   => 'latn',
@@ -516,6 +518,13 @@ Locale::Unicode::Data - Unicode CLDR SQL Data
     my $all = $cldr->timezones( metazone => 'Singapore' );
     my $all = $cldr->timezones( is_golden => undef );
     my $all = $cldr->timezones( is_golden => 1 );
+    my $all = $cldr->timezones( is_primary => 1 );
+    my $all = $cldr->timezones( is_canonical => 1 );
+    my $ref = $cldr->timezone_city(
+        locale => 'fr',
+        timezone => 'Asia/Tokyo',
+    );
+    my $all = $cldr->timezones_cities;
     my $ref = $cldr->timezone_info(
         timezone    => 'Asia/Tokyo',
         start       => undef,
@@ -594,9 +603,44 @@ With advanced search:
         region => qr/^U.*/,
     );
 
+Enabling fatal exceptions:
+
+    use v5.34;
+    use experimental 'try';
+    no warnings 'experimental';
+    try
+    {
+        my $locale = Locale::Unicode::Data->new( fatal => 1 );
+        # Missing the 'width' argument
+        my $str = $cldr->timezone_names( timezone => 'Asia/Tokyo', locale => 'en' );
+        # More code
+    }
+    catch( $e )
+    {
+        say "Oops: ", $e->message;
+    }
+
+Or, you could set the global variable `$FATAL_EXCEPTIONS` instead:
+
+    use v5.34;
+    use experimental 'try';
+    no warnings 'experimental';
+    $Locale::Unicode::Data::FATAL_EXCEPTIONS = 1;
+    try
+    {
+        my $locale = Locale::Unicode::Data->new;
+        # Missing the 'width' argument
+        my $str = $cldr->timezone_names( timezone => 'Asia/Tokyo', locale => 'en' );
+        # More code
+    }
+    catch( $e )
+    {
+        say "Oops: ", $e->message;
+    }
+
 # VERSION
 
-    v0.1.0
+    v1.0.1
 
 # DESCRIPTION
 
@@ -802,7 +846,7 @@ The data available from the `CLDR` via this module includes:
 
     Value used for each locale for `approximately`, `currency_decimal`, `currency_group`, `decimal`, `exponential`, `group`, `infinity`, `list`, `minus`, `nan`, `per_mille`, `percent`, `plus`, `superscript`, and `time_separator`
 
-    Not every `locale` has a value for each of those property though.
+    Not every `locale` has a value for each of those properties though.
 
 - [Locale number formatting](#table-number_formats_l10n)
 
@@ -1452,7 +1496,9 @@ See also the method [l10n](#l10n)
         format_pattern  => 'zi',
     }
 
-Returns an hash reference of a `script` localised information from the table [scripts\_l10n](#table-scripts_l10n) for a given format ID `format_id`, ID a `locale` ID, a `calendar` ID, a format set `format_set`, a format type `format_type` and a format length `format_length`.
+Returns an hash reference of a `calendar` cyclic localised information from the table [calendar\_cyclics\_l10n](#table-calendar_cyclics_l10n) for a given format ID `format_id`, ID a `locale` ID, a `calendar` ID, a format set `format_set`, a format type `format_type` and a format length `format_length`.
+
+This is typical of calendars such as: `chinese` and `dangi`
 
 The meaning of the fields are as follows:
 
@@ -2821,6 +2867,22 @@ Sets or gets the boolean value used to specify whether you want this API to auto
 
 This is set to true by default, upon object instantiation.
 
+## extend\_timezones\_cities
+
+    my $bool = $cldr->extend_timezones_cities;
+    $cldr->extend_timezones_cities(0); # off
+    $cldr->extend_timezones_cities(1); # on
+
+Sets or gets the boolean value used to specify whether you want to use the time zones cities extended data, if any were added, or not.
+
+To add the time zones cities extended data, see the Unicode CLDR SQLite database script option `--extended-timezones-cities`
+
+Normally, this SQLite database comes by default with an extended set of time zones cities data for 421 time zones and their main city across 88 locales, courtesy of the GeoNames database, and online work the author of this distribution has performed.
+
+See also the method [timezone\_city](#timezone_city) and [timezones\_cities](#timezones_cities)
+
+This is set to true by default, upon object instantiation.
+
 ## error
 
 Used as a mutator, this sets and [exception object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AException) and returns an `Locale::Unicode::NullObject` in object context (such as when chaining), or `undef` in scalar context, or an empty list in list context.
@@ -2834,6 +2896,29 @@ For example:
         die( $locale->error );
 
 In this example, `jptyo` will never be set, because `transform_locale` triggered an exception that returned an `Locale::Unicode::NullObject` object catching all further method calls, but eventually we get the error and die.
+
+## fatal
+
+    $cldr->fatal(1); # Enable fatal exceptions
+    $cldr->fatal(0); # Disable fatal exceptions
+    my $bool = $cldr->fatal;
+
+Sets or get the boolean value, whether to die upon exception, or not. If set to true, then instead of setting an [exception object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException), this module will die with an [exception object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException). You can catch the exception object then after using `try`. For example:
+
+    use v.5.34; # to be able to use try-catch blocks in perl
+    use experimental 'try';
+    no warnings 'experimental';
+    try
+    {
+        my $cldr = Locale::Unicode::Data->new( fatal => 1 );
+        # Forgot the 'width':
+        my $str = $cldr->timezone_names( timezone => 'Asia/Tokyo', locale => 'en' );
+    }
+    catch( $e )
+    {
+        say "Error occurred: ", $e->message;
+        # Error occurred: No value for width was provided.
+    }
 
 ## interval\_formats
 
@@ -3292,6 +3377,8 @@ No additional parameter is needed.
     {
         locale_id   => 3985,
         locale      => 'ja',
+        parent      => undef,
+        collations  => ["private-kana", "standard", "unihan"],
         status      => 'regular',
     }
 
@@ -3306,6 +3393,14 @@ The meaning of the fields are as follows:
 - `locale`
 
     A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `parent`
+
+    The parent `locale`, if any.
+
+- `collations`
+
+    An array of `collation` ID, such as one can find from the table [collations](#table-collations)
 
 - `status`
 
@@ -3446,6 +3541,77 @@ Returns all locale properties information from [table locales\_info](#table-loca
 
 No additional parameter is needed.
 
+## locale\_number\_system
+
+    my $ref = $cldr->locale_number_system( locale => 'ja' );
+    # Returns an hash reference like this:
+    {
+        locale_num_sys_id => 26,
+        locale => 'ja',
+        number_system => undef,
+        native => undef,
+        traditional => 'jpan',
+        finance => 'jpanfin',
+    }
+
+As a reminder, the numbering system can be explicitly specified with the Unicode BCP47 extension `nu`. For example:
+
+- `hi-IN-u-nu-native`
+
+    Explicitly specifying the native digits for numeric formatting in Hindi language.
+
+- `zh-u-nu-finance`
+
+    Explicitly specifying the appropriate financial numerals in Chinese language.
+
+- `ta-u-nu-traditio`
+
+    Explicitly specifying the traditional Tamil numerals in Tamil language.
+
+- `ar-u-nu-latn`
+
+    Explicitly specifying the western digits 0-9 in Arabic language.
+
+Returns an hash reference of a given `locale` number systems available from the table [locale\_number\_systems](#table-locale_number_systems).
+
+TLDR; if `number_system` and `native` are the same, then it is ok to also use `latn` as numbering system. When `traditional` is not available, use `native`. When `finance` is not available, use the default `number_system`
+
+The meaning of the fields are as follows:
+
+- `locale_num_sys_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `number_system`
+
+    A string representing a number system as can be found in the table [number\_systems](#table-number_systems), and "used for presentation of numeric quantities in the given locale" ([LDML specifications](https://unicode.org/reports/tr35/tr35-numbers.html#defaultNumberingSystem))
+
+    In [LDML specifications](https://unicode.org/reports/tr35/tr35-numbers.html#defaultNumberingSystem), this is named `default`, but `default` is a reserved keyword in SQL terminology.
+
+- `native`
+
+    Quoting from the [LDML specifications](https://unicode.org/reports/tr35/tr35-numbers.html#otherNumberingSystems): "Defines the [numbering system](#number_system) used for the native digits, usually defined as a part of the [script](#script) used to write the language. The `native` [numbering system](#number_system) can only be a numeric positional decimal-digit [numbering system](#number_system), using digits with General\_Category=Decimal\_Number. Note: In locales where the `native` [numbering system](#number_system) is the default, it is assumed that the [numbering system](#number_system) `latn` (Western digits 0-9) is always acceptable, and can be selected using the `-nu` keyword as part of a [Unicode locale identifier](#locale)."
+
+- `traditional`
+
+    Quoting from the [LDML specifications](https://unicode.org/reports/tr35/tr35-numbers.html#otherNumberingSystems): "Defines the `traditional` numerals for a [locale](#locale). This [numbering system](#number_system) may be numeric or algorithmic. If the `traditional` [numbering system](#number_system) is not defined, applications should use the `native` numbering system as a fallback."
+
+- `finance`
+
+    Quoting from the [LDML specifications](https://unicode.org/reports/tr35/tr35-numbers.html#otherNumberingSystems): "Defines the [numbering system](#number_system) used for financial quantities. This [numbering system](#number_system) may be numeric or algorithmic. This is often used for ideographic languages such as Chinese, where it would be easy to alter an amount represented in the default numbering system simply by adding additional strokes. If the financial [numbering system](#number_system) is not specified, applications should use the default [numbering system](#number_system) as a fallback."
+
+## locale\_number\_systems
+
+    my $all = $cldr->locale_number_systems;
+
+Returns all locales [numbering systems](#number_system) information from [table locale\_number\_systems](#table-locale_number_systems) as an array reference of hash reference.
+
+No additional parameter is needed.
+
 ## make\_inheritance\_tree
 
 This takes a `locale`, such as `ja` or `ja-JP`, or `es-ES-valencia` and it will return an array reference of [inheritance tree of locales](https://unicode.org/reports/tr35/tr35.html#Locale_Inheritance). This means the provided `locale`'s parent, its grand-parent, etc until it reaches the `root`, which, under the `LDML` specifications is defined by `und`
@@ -3484,6 +3650,131 @@ Normally, this parent would be `yue`, which would lead to simplified Chinese, wh
 If an error occurred, it will set an [error object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException) and return `undef` in scalar context and an empty list in list context.
 
 See the [LDML specifications about inheritance](https://unicode.org/reports/tr35/tr35.html#Inheritance_and_Validity) and about [locale inheritance and matching](https://unicode.org/reports/tr35/tr35.html#Locale_Inheritance) for more information.
+
+## metazone
+
+    my $ref = $cldr->metazone( metazone => 'Japan' ); # Japan Standard Time
+    # Returns an hash reference like this:
+    {
+        metazone_id => 98,
+        metazone    => 'Japan',
+        territories => ["001"],
+        timezones   => ["Asia/Tokyo"],
+    }
+
+Returns an hash reference of a `metazone` information from the table [metazones](#table-metazones) for a given `metazone` ID.
+
+Quoting from the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names): "A metazone is a grouping of one or more internal TZIDs that share a common display name in current customary usage, or that have shared a common display name during some particular time period. For example, the zones Europe/Paris, Europe/Andorra, Europe/Tirane, Europe/Vienna, Europe/Sarajevo, Europe/Brussels, Europe/Zurich, Europe/Prague, Europe/Berlin, and so on are often simply designated Central European Time (or translated equivalent)."
+
+Also: "Metazones are used with the 'z', 'zzzz', 'v', and 'vvvv' date time pattern characters, and not with the 'Z', 'ZZZZ', 'VVVV' and other pattern characters for time zone formatting."
+
+The meaning of the fields are as follows:
+
+- `metazone_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `metazone`
+
+    A `metazone` ID as defined by the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names)
+
+- `territory`
+
+    An array of `territory` IDs as can be found in the [table territories](#table-territories), and that are associated with this `metazone`.
+
+- `timezones`
+
+    An array of `timezone` IDs as can be found in the [table timezones](#table-timezones), and that are associated with this `metazone`.
+
+## metazones
+
+    my $all = $cldr->metazones;
+
+Returns all metazones information from [table metazones](#table-metazones) as an array reference of hash reference.
+
+No additional parameter is needed.
+
+## metazone\_names
+
+    my $ref = $cldr->metazone_names(
+        locale      => 'en',
+        metazone    => 'Japan',
+        width       => 'long',
+    );
+    # Returns an hash reference like this:
+    {
+        metatz_name_id  => 4822,
+        locale          => 'ja',
+        metazone        => 'Japan',
+        width           => 'long',
+        generic         => 'Japan Time',
+        standard        => 'Japan Standard Time',
+        daylight        => 'Japan Daylight Time',
+    }
+
+Returns an hash reference of a `metazone` names localised information from the table [metazones\_names](#table-metazones_names) for a given `locale` ID, `metazone` and `width` value.
+
+The meaning of the fields are as follows:
+
+- `metatz_name_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `metazone`
+
+    A `metazone` such as can be found in table [metazones](#table-metazones)
+
+- `width`
+
+    A `metazone` localised name `width`, which can be either `long` or `short`
+
+    Note that not all metazones names have both `width` defined.
+
+- `generic`
+
+    The `metazone` `generic` name.
+
+- `standard`
+
+    The `metazone` `standard` name.
+
+- `standard`
+
+    The `metazone` `daylight` name defined if the `metazone` use daylight saving time system.
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names) for more information.
+
+## metazones\_names
+
+    my $all = $cldr->metazones_names;
+    my $all = $cldr->metazones_names( locale => 'ja' );
+    my $all = $cldr->metazones_names( width => 'long' );
+    my $all = $cldr->metazones_names(
+        locale  => 'ja',
+        width   => 'long',
+    );
+
+Returns all `metazone` localised formats from [table metazones\_names](#table-metazones_names) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `metazone`
+
+    A `metazone` such as can be found in table [metazones](#table-metazones)
+
+- `width`
+
+    A `metazone` localised name `width`, which can be either `long` or `short`
+
+    Note that not all timezones names have both `width` defined.
 
 ## normalise
 
@@ -3709,7 +4000,7 @@ A combination of the following fields may be provided to filter the information 
         alt                 => undef,
     }
 
-Returns an hash reference of a `script` localised information from the table [scripts\_l10n](#table-scripts_l10n) for a given `locale` ID, `number_system`, `property` value and `alt` value. If no `alt` value is provided, it will default to `undef`
+Returns an hash reference of a number symbol localised information from the table [number\_symbols\_l10n](#table-number_symbols_l10n) for a given `locale` ID, `number_system`, `property` value and `alt` value. If no `alt` value is provided, it will default to `undef`
 
 The meaning of the fields are as follows:
 
@@ -4344,7 +4635,7 @@ No additional parameter is needed.
         status          => 'regular',
     }
 
-Returns an hash reference of a script information from the table [scripts](#table-scripts) for a given `script` ID.
+Returns an hash reference of a `script` information from the table [scripts](#table-scripts) for a given `script` ID.
 
 The meaning of the fields are as follows:
 
@@ -4443,7 +4734,7 @@ A combination of the following fields may be provided to filter the information 
 
     my $ref = $cldr->script_l10n(
         locale  => 'en',
-        script   => 'Latn',
+        script  => 'Latn',
         alt     => undef,
     );
     # Returns an hash reference like this:
@@ -4611,7 +4902,7 @@ A combination of the following fields may be provided to filter the information 
         locale_name     => 'Texas',
     }
 
-Returns an hash reference of a `script` localised information from the table [scripts\_l10n](#table-scripts_l10n) for a given `subdivision` ID and a `locale` ID.
+Returns an hash reference of a `subdivision` localised information from the table [subdivisions\_l10n](#table-subdivisions_l10n) for a given `subdivision` ID and a `locale` ID.
 
 The meaning of the fields are as follows:
 
@@ -4893,6 +5184,9 @@ A combination of the following fields may be provided to filter the information 
         metazone    => 'Japan',
         tz_bcpid    => 'jptyo',
         is_golden   => 1,
+        is_primary  => 0,
+        is_preferred => 0,
+        is_canonical => 0,
     }
 
 Returns an hash reference of a time zone information from the table [timezones](#table-timezones) based on the `timezone` ID provided.
@@ -4933,6 +5227,24 @@ The meaning of the fields are as follows:
 
     A boolean specifying whether this timezone is a golden timezone.
 
+    A `timezone` is deemed `golden` if it is specified in the `CLDR` as part of the [primaryZones](https://unicode.org/reports/tr35/tr35-dates.html#Primary_Zones) or if the `timezone` territory is `001` (World).
+
+    As explained in the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names), "\[t\]he golden zones are those in mapZone supplemental data under the territory `001`."
+
+- `is_primary`
+
+    A boolean specifying whether this timezone is a primary timezone.
+
+    As explained in the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Primary_Zones), this "specifies the dominant zone for a region; this zone should use the region name for its generic location name even though there are other canonical zones available in the same region. For example, `Asia/Shanghai` is displayed as `China Time`, instead of `Shanghai Time`"
+
+- `is_preferred`
+
+    A boolean specifying whether this timezone is the preferred timezone for this `metazone`
+
+- `is_canonical`
+
+    A boolean specifying whether this timezone is the canonical timezone, since it can have multiple aliases.
+
 ## timezones
 
     my $array_ref = $cldr->timezones;
@@ -4949,6 +5261,8 @@ The meaning of the fields are as follows:
     my $array_ref = $cldr->timezones( metazone => 'Japan' );
     # Returns all the timezones that are 'golden' timezones
     my $array_ref = $cldr->timezones( is_golden => 1 );
+    my $array_ref = $cldr->timezones( is_primary => 1 );
+    my $array_ref = $cldr->timezones( is_canonical => 1 );
 
 Returns all the `timezone` information as an array reference of hash reference from the [table timezones](#table-timezones)
 
@@ -4977,6 +5291,217 @@ You can adjust the data return by using a combination of the following filtering
 - `is_golden`
 
     A boolean expressing whether this time zone is `golden` (in Unicode parlance), or not. `1` for true, and `0` for false.
+
+- `is_primary`
+
+    A boolean specifying whether this timezone is a primary timezone.
+
+- `is_canonical`
+
+    A boolean specifying whether this timezone is the canonical timezone, since it can have multiple aliases.
+
+## timezone\_canonical
+
+    my $str = $cldr->timezone_canonical( 'Europe/Paris' );
+    # Europe/Paris
+    my $str = $cldr->timezone_canonical( 'America/Atka' );
+    # America/Adak
+    my $str = $cldr->timezone_canonical( 'US/Aleutian' );
+    # America/Adak
+
+Provided with a `timezone`, and this returns the canonical timezone corresponding.
+
+If no matching `timezone` could be found, an empty string is returned.
+
+If an error occurred, this sets an [exception object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException), and returns `undef` in scalar context, and an empty list in list context.
+
+## timezone\_city
+
+    my $ref = $cldr->timezone_city(
+        locale   => 'de',
+        timezone => 'Asia/Tokyo',
+    );
+    # Returns an hash reference like this:
+    {
+        tz_city_id  => 7486,
+        locale      => 'de',
+        timezone    => 'Asia/Tokyo',
+        city        => 'Tokio',
+        alt         => undef,
+    }
+
+Returns an hash reference of a `timezone` localised exemplar city from the table [timezones\_cities](#table-timezones_cities) for a given `locale` ID, `timezone` and `alt` value. If no `alt` value is provided, it will default to `undef`
+
+The behaviour of this method is altered depending on whether [extend\_timezones\_cities](#extend_timezones_cities) is set to a true boolean value or not. If set to true, this will retrieve the data from the table `timezones_cities_extended` instead of the `timezones_cities`
+
+By default, [extend\_timezones\_cities](#extend_timezones_cities) is set to true, and the [Locale::Unicode::Data](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData) distribution comes with an extended set of time zones cities. The default Unicode CLDR data comes only with a minimal set.
+
+This method is especially used to format the pattern characters `v` and `V`. See the section on [Format Patterns](#format-patterns) for more about this.
+
+The meaning of the fields are as follows:
+
+- `tz_city_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `timezone`
+
+    A `timezone` ID as can be found in the [table timezones](#table-timezones)
+
+- `city`
+
+    A localised version of a representative city for this given `timezone`.
+
+    Note that not all locales have a localised city for all timezones.
+
+- `alt`
+
+    A string specified to provide for an alternative city value for the same city name.
+
+    Known values are: `undef` and `secondary`
+
+## timezones\_cities
+
+    my $all = $cldr->timezones_cities;
+    my $all = $cldr->timezones_cities( locale => 'ja' );
+    my $all = $cldr->timezones_cities(
+        locale  => 'ja',
+        alt     => undef,
+    );
+
+Returns all timezone localised representative city name from [table timezones\_cities](#table-timezones_cities) as an array reference of hash reference.
+
+The behaviour of this method is altered depending on whether [extend\_timezones\_cities](#extend_timezones_cities) is set to a true boolean value or not. If set to true, this will retrieve the data from the table `timezones_cities_extended` instead of the `timezones_cities`
+
+By default, [extend\_timezones\_cities](#extend_timezones_cities) is set to true, and the [Locale::Unicode::Data](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData) distribution comes with an extended set of time zones cities. The default Unicode CLDR data comes only with a minimal set.
+
+This method is especially used to format the pattern characters `v` and `V`. See the section on [Format Patterns](#format-patterns) for more about this.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `alt`
+
+    A string used to differentiate two version of a localised city name.
+
+    Known values are: `undef` and `secondary`
+
+## timezone\_formats
+
+    my $ref = $cldr->timezone_formats(
+        locale  => 'en',
+        type    => 'region',
+        subtype => 'standard',
+    );
+    # Returns an hash reference like this:
+    {
+        tz_fmt_id       => 145,
+        locale          => 'en',
+        type            => 'region',
+        subtype         => 'standard',
+        format_pattern  => '{0} Standard Time',
+    }
+
+Returns an hash reference of a `timezone` formats localised information from the table [timezones\_formats](#table-timezones_formats) for a given `locale` ID, `type` and optional `subtype` value. If no `subtype` value is provided, it will default to `undef`
+
+The meaning of the fields are as follows:
+
+- `tz_fmt_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `type`
+
+    A format type. This can be either: `fallback`, `gmt`, `gmt_zero`, `hour` and `region`
+
+    - `fallback`
+
+        Quoting the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#fallbackFormat): "a formatting string such as `{1} ({0})`, where `{1}` is the metazone, and `{0}` is the country or city."
+
+        For example: `{1} ({0})`, which would yield in English: `Pacific Time (Canada)`
+
+    - `gmt`
+
+        A formatting string, such as `GMT{0}`, where `{0}` is the GMT offset in hour, minute, and possibly seconds, using the `hour` formatting.
+
+        For example: `GMT{0}`, which would yield in English: `GMT-0800`
+
+    - `hour`
+
+        2 formatting strings separated by a semicolon; one for the positive offset formatting and the other for the negative offset formatting.
+
+        See the section on [formatting patterns](#format-patterns) for the significance of the letters used in formatting.
+
+        For example: `+HHmm;-HHmm`, which would yield in English: `+1200`
+
+    - `gmt_zero`
+
+        For example: `GMT`
+
+        This specifies how GMT/UTC with no explicit offset (implied 0 offset) should be represented.
+
+    - `region`
+
+        Quoting the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Format_Terminology): "a formatting string such as `{0} Time`, where `{0}` is the country or city."
+
+        For example: `{0} Daylight Time`, which would yield in English: `France Daylight Time`, or in Spanish, the pattern `horario de verano de {0}`, which would yield `horario de verano de Francia`
+
+- `subtype`
+
+    A `timezone` format subtype, such as `daylight`, `standard`
+
+    Note that not all timezones and locales have a localised `daylight` or `standard` format
+
+- `format_pattern`
+
+    A string representing the format pattern.
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names) and [specifications about fallback formats](https://unicode.org/reports/tr35/tr35-dates.html#timeZoneNames_Elements_Used_for_Fallback) for more information.
+
+## timezones\_formats
+
+    my $all = $cldr->timezones_formats;
+    my $all = $cldr->timezones_formats( locale => 'ja' );
+    my $all = $cldr->timezones_formats(
+        locale  => 'ja',
+        type    => 'region',
+    );
+    my $all = $cldr->timezones_formats(
+        locale  => 'ja',
+        subtype => 'standard',
+    );
+    my $all = $cldr->timezones_formats(
+        format_pattern  => '{0} Daylight Time',
+    );
+
+Returns all `timezone` localised formats from [table timezones\_formats](#table-timezones_formats) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `type`
+
+    A format type. This can be either: `fallback`, `gmt`, `gmt_zero`, `hour` and `region`
+
+- `subtype`
+
+    A `timezone` format subtype, such as `daylight`, `standard`
+
+    Note that not all timezones and locales have a localised `daylight` or `standard` format
 
 ## timezone\_info
 
@@ -5059,6 +5584,88 @@ You can adjust the data return by using a combination of the following filtering
 - `until`
 
     An ISO8601 date and time until which to find data. For example: `2016-03-26T18:00:00`
+
+## timezone\_names
+
+    my $ref = $cldr->timezone_names(
+        locale      => 'ja',
+        timezone    => 'Europe/London',
+        width       => 'long',
+    );
+    # Returns an hash reference like this:
+    {
+        tz_name_id      => 85,
+        locale          => 'ja',
+        timezone        => 'Europe/London',
+        width           => 'long',
+        generic         => undef,
+        standard        => undef,
+        daylight        => '英国夏時間',
+    }
+
+Returns an hash reference of a `timezone` names localised information from the table [timezones\_names](#table-timezones_names) for a given `locale` ID, `timezone` and `width` value.
+
+The meaning of the fields are as follows:
+
+- `tz_name_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `timezone`
+
+    A `timezone` such as can be found in table [timezones](#table-timezones)
+
+- `width`
+
+    A `timezone` localised name `width`, which can be either `long` or `short`
+
+    Note that not all timezones names have both `width` defined.
+
+- `generic`
+
+    The `timezone` `generic` name.
+
+- `standard`
+
+    The `timezone` `standard` name.
+
+- `standard`
+
+    The `timezone` `daylight` name defined if the `timezone` use daylight saving time system.
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Names) for more information.
+
+## timezones\_names
+
+    my $all = $cldr->timezones_names;
+    my $all = $cldr->timezones_names( locale => 'ja' );
+    my $all = $cldr->timezones_names( width => 'long' );
+    my $all = $cldr->timezones_names(
+        locale  => 'ja',
+        width   => 'long',
+    );
+
+Returns all `timezone` localised formats from [table timezones\_names](#table-timezones_names) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `timezone`
+
+    A `timezone` such as can be found in table [timezones](#table-timezones)
+
+- `width`
+
+    A `timezone` localised name `width`, which can be either `long` or `short`
+
+    Note that not all timezones names have both `width` defined.
 
 ## unit\_alias
 
@@ -5739,1576 +6346,6 @@ See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#W
 
 Returns all the week preferences information as an array reference of hash reference from the [table week\_preferences](#table-week_preferences)
 
-# SQL Schema
-
-The SQLite SQL schema is available in the file `scripts/cldr-schema.sql`
-
-The data are populated into the SQLite database using the script located in `scripts/create_database.pl` and the data accessible from [https://github.com/unicode-org/cldr](https://github.com/unicode-org/cldr) or from [https://cldr.unicode.org/index/downloads/](https://cldr.unicode.org/index/downloads/)
-
-# Tables
-
-The SQL schema used to create the SQLite database is available in the `scripts` directory of this distribution in the file `cldr-schema.sql`
-
-The tables used are as follows, in alphabetical order:
-
-## Table aliases
-
-- `alias_id`
-
-    A integer field.
-
-- `alias`
-
-    A string field.
-
-- `replacement`
-
-    A string array field.
-
-- `reason`
-
-    A string field.
-
-- `type`
-
-    A string field.
-
-- `comment`
-
-    A string field.
-
-## Table annotations
-
-- `annotation_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `annotation`
-
-    A string field.
-
-- `defaults`
-
-    A string array field.
-
-- `tts`
-
-    A string field.
-
-## Table bcp47\_currencies
-
-- `bcp47_curr_id`
-
-    A integer field.
-
-- `currid`
-
-    A string field.
-
-- `code`
-
-    A string field.
-
-- `description`
-
-    A string field.
-
-- `is_obsolete`
-
-    A boolean field.
-
-## Table bcp47\_extensions
-
-- `bcp47_ext_id`
-
-    A integer field.
-
-- `category`
-
-    A string field.
-
-- `extension`
-
-    A string field.
-
-- `alias`
-
-    A string field.
-
-- `value_type`
-
-    A string field.
-
-- `description`
-
-    A string field.
-
-- `deprecated`
-
-    A boolean field.
-
-## Table bcp47\_timezones
-
-- `bcp47_tz_id`
-
-    A integer field.
-
-- `tzid`
-
-    A string field.
-
-- `alias`
-
-    A string array field.
-
-- `preferred`
-
-    A string field.
-
-- `description`
-
-    A string field.
-
-- `deprecated`
-
-    A boolean field.
-
-## Table bcp47\_values
-
-- `bcp47_value_id`
-
-    A integer field.
-
-- `category`
-
-    A string field.
-
-- `extension`
-
-    A string field.
-
-- `value`
-
-    A string field.
-
-- `description`
-
-    A string field.
-
-## Table calendar\_append\_formats
-
-- `cal_append_fmt_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `calendar`
-
-    A string field.
-
-- `format_id`
-
-    A string field.
-
-- `format_pattern`
-
-    A string field.
-
-## Table calendar\_available\_formats
-
-- `cal_avail_fmt_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `calendar`
-
-    A string field.
-
-- `format_id`
-
-    A string field.
-
-- `format_pattern`
-
-    A string field.
-
-- `count`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-## Table calendar\_cyclics\_l10n
-
-- `cal_int_fmt_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `calendar`
-
-    A string field.
-
-- `format_set`
-
-    A string field.
-
-- `format_type`
-
-    A string field.
-
-- `format_length`
-
-    A string field.
-
-- `format_id`
-
-    A integer field.
-
-- `format_pattern`
-
-    A string field.
-
-## Table calendar\_datetime\_formats
-
-- `cal_dt_fmt_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `calendar`
-
-    A string field.
-
-- `format_length`
-
-    A string field.
-
-- `format_type`
-
-    A string field.
-
-- `format_pattern`
-
-    A string field.
-
-## Table calendar\_eras
-
-- `calendar_era_id`
-
-    A integer field.
-
-- `calendar`
-
-    A string field.
-
-- `sequence`
-
-    A integer field.
-
-- `code`
-
-    A string field.
-
-- `aliases`
-
-    A string array field.
-
-- `start`
-
-    A date field.
-
-- `until`
-
-    A date field.
-
-## Table calendar\_eras\_l10n
-
-- `cal_era_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `calendar`
-
-    A string field.
-
-- `era_width`
-
-    A string field.
-
-- `era_id`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-- `locale_name`
-
-    A string field.
-
-## Table calendar\_formats\_l10n
-
-- `cal_fmt_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `calendar`
-
-    A string field.
-
-- `format_type`
-
-    A string field.
-
-- `format_length`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-- `format_id`
-
-    A string field.
-
-- `format_pattern`
-
-    A string field.
-
-## Table calendar\_interval\_formats
-
-- `cal_int_fmt_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `calendar`
-
-    A string field.
-
-- `format_id`
-
-    A string field.
-
-- `greatest_diff_id`
-
-    A string field.
-
-- `format_pattern`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-- `part1`
-
-    A string field.
-
-- `separator`
-
-    A string field.
-
-- `part2`
-
-    A string field.
-
-- `repeating_field`
-
-    A string field.
-
-## Table calendar\_terms
-
-- `cal_term_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `calendar`
-
-    A string field.
-
-- `term_type`
-
-    A string field.
-
-- `term_context`
-
-    A string field.
-
-- `term_width`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-- `yeartype`
-
-    A string field.
-
-- `term_name`
-
-    A string field.
-
-- `term_value`
-
-    A string field.
-
-## Table calendars
-
-- `calendar_id`
-
-    A integer field.
-
-- `calendar`
-
-    A string field.
-
-- `system`
-
-    A string field.
-
-- `inherits`
-
-    A string field.
-
-- `description`
-
-    A string field.
-
-## Table calendars\_l10n
-
-- `calendar_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `calendar`
-
-    A string field.
-
-- `locale_name`
-
-    A string field.
-
-## Table casings
-
-- `casing_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `token`
-
-    A string field.
-
-- `value`
-
-    A string field.
-
-## Table code\_mappings
-
-- `code_mapping_id`
-
-    A integer field.
-
-- `code`
-
-    A string field.
-
-- `alpha3`
-
-    A string field.
-
-- `numeric`
-
-    A integer field.
-
-- `fips10`
-
-    A string field.
-
-- `type`
-
-    A string field.
-
-## Table collations\_l10n
-
-- `collation_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `collation`
-
-    A string field.
-
-- `locale_name`
-
-    A string field.
-
-## Table currencies
-
-- `currency_id`
-
-    A integer field.
-
-- `currency`
-
-    A string field.
-
-- `digits`
-
-    A integer field.
-
-- `rounding`
-
-    A integer field.
-
-- `cash_digits`
-
-    A integer field.
-
-- `cash_rounding`
-
-    A integer field.
-
-- `is_obsolete`
-
-    A boolean field.
-
-- `status`
-
-    A string field.
-
-## Table currencies\_info
-
-- `currency_info_id`
-
-    A integer field.
-
-- `territory`
-
-    A string field.
-
-- `currency`
-
-    A string field.
-
-- `start`
-
-    A date field.
-
-- `until`
-
-    A date field.
-
-- `is_tender`
-
-    A boolean field.
-
-- `hist_sequence`
-
-    A integer field.
-
-- `is_obsolete`
-
-    A boolean field.
-
-## Table currencies\_l10n
-
-- `curr_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `currency`
-
-    A string field.
-
-- `count`
-
-    A string field.
-
-- `locale_name`
-
-    A string field.
-
-- `symbol`
-
-    A string field.
-
-## Table date\_fields\_l10n
-
-- `date_field_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `field_type`
-
-    A string field.
-
-- `field_length`
-
-    A string field.
-
-- `relative`
-
-    A integer field.
-
-- `locale_name`
-
-    A string field.
-
-## Table day\_periods
-
-- `day_period_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `day_period`
-
-    A string field.
-
-- `start`
-
-    A string field.
-
-- `until`
-
-    A string field.
-
-## Table language\_population
-
-- `language_pop_id`
-
-    A integer field.
-
-- `territory`
-
-    A string field.
-
-- `locale`
-
-    A string field.
-
-- `population_percent`
-
-    A decimal field.
-
-- `literacy_percent`
-
-    A decimal field.
-
-- `writing_percent`
-
-    A decimal field.
-
-- `official_status`
-
-    A string field.
-
-## Table languages
-
-- `language_id`
-
-    A integer field.
-
-- `language`
-
-    A string field.
-
-- `scripts`
-
-    A string array field.
-
-- `territories`
-
-    A string array field.
-
-- `parent`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-- `status`
-
-    A string field.
-
-## Table languages\_match
-
-- `lang_match_id`
-
-    A integer field.
-
-- `desired`
-
-    A string field.
-
-- `supported`
-
-    A string field.
-
-- `distance`
-
-    A integer field.
-
-- `is_symetric`
-
-    A boolean field.
-
-- `is_regexp`
-
-    A boolean field.
-
-- `sequence`
-
-    A integer field.
-
-## Table likely\_subtags
-
-- `likely_subtag_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `target`
-
-    A string field.
-
-## Table locales
-
-- `locale_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `parent`
-
-    A string field.
-
-- `status`
-
-    A string field.
-
-## Table locales\_info
-
-- `locales_info_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `property`
-
-    A string field.
-
-- `value`
-
-    A string field.
-
-## Table locales\_l10n
-
-- `locales_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `locale_id`
-
-    A string field.
-
-- `locale_name`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-## Table metainfos
-
-- `meta_id`
-
-    A integer field.
-
-- `property`
-
-    A string field.
-
-- `value`
-
-    A string field.
-
-## Table number\_formats\_l10n
-
-- `number_format_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `number_system`
-
-    A string field.
-
-- `number_type`
-
-    A string field.
-
-- `format_length`
-
-    A string field.
-
-- `format_type`
-
-    A string field.
-
-- `format_id`
-
-    A string field.
-
-- `format_pattern`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-- `count`
-
-    A string field.
-
-## Table number\_symbols\_l10n
-
-- `number_symbol_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `number_system`
-
-    A string field.
-
-- `property`
-
-    A string field.
-
-- `value`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-## Table number\_systems
-
-- `numsys_id`
-
-    A integer field.
-
-- `number_system`
-
-    A string field.
-
-- `digits`
-
-    A string array field.
-
-- `type`
-
-    A string field.
-
-## Table number\_systems\_l10n
-
-- `num_sys_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `number_system`
-
-    A string field.
-
-- `locale_name`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-## Table person\_name\_defaults
-
-- `pers_name_def_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `value`
-
-    A string field.
-
-## Table rbnf
-
-- `rbnf_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `grouping`
-
-    A string field.
-
-- `ruleset`
-
-    A string field.
-
-- `rule_id`
-
-    A string field.
-
-- `rule_value`
-
-    A string field.
-
-## Table refs
-
-- `ref_id`
-
-    A integer field.
-
-- `code`
-
-    A string field.
-
-- `uri`
-
-    A string field.
-
-- `description`
-
-    A string field.
-
-## Table scripts
-
-- `script_id`
-
-    A integer field.
-
-- `script`
-
-    A string field.
-
-- `rank`
-
-    A integer field.
-
-- `sample_char`
-
-    A string field.
-
-- `id_usage`
-
-    A string field.
-
-- `rtl`
-
-    A boolean field.
-
-- `lb_letters`
-
-    A boolean field.
-
-- `has_case`
-
-    A boolean field.
-
-- `shaping_req`
-
-    A boolean field.
-
-- `ime`
-
-    A boolean field.
-
-- `density`
-
-    A integer field.
-
-- `origin_country`
-
-    A string field.
-
-- `likely_language`
-
-    A string field.
-
-- `status`
-
-    A string field.
-
-## Table scripts\_l10n
-
-- `scripts_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `script`
-
-    A string field.
-
-- `locale_name`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-## Table subdivisions
-
-- `subdivision_id`
-
-    A integer field.
-
-- `territory`
-
-    A string field.
-
-- `subdivision`
-
-    A string field.
-
-- `parent`
-
-    A string field.
-
-- `is_top_level`
-
-    A boolean field.
-
-- `status`
-
-    A string field.
-
-## Table subdivisions\_l10n
-
-- `subdiv_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `subdivision`
-
-    A string field.
-
-- `locale_name`
-
-    A string field.
-
-## Table territories
-
-- `territory_id`
-
-    A integer field.
-
-- `territory`
-
-    A string field.
-
-- `parent`
-
-    A string field.
-
-- `gdp`
-
-    A integer field.
-
-- `literacy_percent`
-
-    A decimal field.
-
-- `population`
-
-    A integer field.
-
-- `languages`
-
-    A string array field.
-
-- `contains`
-
-    A string array field.
-
-- `currency`
-
-    A string field.
-
-- `calendars`
-
-    A string array field.
-
-- `min_days`
-
-    A integer field.
-
-- `first_day`
-
-    A integer field.
-
-- `weekend`
-
-    A integer array field.
-
-- `status`
-
-    A string field.
-
-## Table territories\_l10n
-
-- `terr_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `territory`
-
-    A string field.
-
-- `locale_name`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-## Table time\_formats
-
-- `time_format_id`
-
-    A integer field.
-
-- `region`
-
-    A string field.
-
-- `territory`
-
-    A string field.
-
-- `locale`
-
-    A string field.
-
-- `time_format`
-
-    A string field.
-
-- `time_allowed`
-
-    A string array field.
-
-## Table timezones
-
-- `timezone_id`
-
-    A integer field.
-
-- `timezone`
-
-    A string field.
-
-- `territory`
-
-    A string field.
-
-- `region`
-
-    A string field.
-
-- `tzid`
-
-    A string field.
-
-- `metazone`
-
-    A string field.
-
-- `tz_bcpid`
-
-    A string field.
-
-- `is_golden`
-
-    A boolean field.
-
-## Table timezones\_info
-
-- `tzinfo_id`
-
-    A integer field.
-
-- `timezone`
-
-    A string field.
-
-- `metazone`
-
-    A string field.
-
-- `start`
-
-    A datetime field.
-
-- `until`
-
-    A datetime field.
-
-## Table unit\_aliases
-
-- `unit_alias_id`
-
-    A integer field.
-
-- `alias`
-
-    A string field.
-
-- `target`
-
-    A string field.
-
-- `reason`
-
-    A string field.
-
-## Table unit\_constants
-
-- `unit_constant_id`
-
-    A integer field.
-
-- `constant`
-
-    A string field.
-
-- `expression`
-
-    A string field.
-
-- `value`
-
-    A decimal field.
-
-- `description`
-
-    A string field.
-
-- `status`
-
-    A string field.
-
-## Table unit\_conversions
-
-- `unit_conversion_id`
-
-    A integer field.
-
-- `source`
-
-    A string field.
-
-- `base_unit`
-
-    A string field.
-
-- `expression`
-
-    A string field.
-
-- `factor`
-
-    A decimal field.
-
-- `systems`
-
-    A string array field.
-
-- `category`
-
-    A string field.
-
-## Table unit\_prefixes
-
-- `unit_prefix_id`
-
-    A integer field.
-
-- `unit_id`
-
-    A string field.
-
-- `symbol`
-
-    A string field.
-
-- `power`
-
-    A integer field.
-
-- `factor`
-
-    A integer field.
-
-## Table unit\_prefs
-
-- `unit_pref_id`
-
-    A integer field.
-
-- `unit_id`
-
-    A string field.
-
-- `territory`
-
-    A string field.
-
-- `category`
-
-    A string field.
-
-- `usage`
-
-    A string field.
-
-- `geq`
-
-    A decimal field.
-
-- `skeleton`
-
-    A string field.
-
-## Table unit\_quantities
-
-- `unit_quantity_id`
-
-    A integer field.
-
-- `base_unit`
-
-    A string field.
-
-- `quantity`
-
-    A string field.
-
-- `status`
-
-    A string field.
-
-- `comment`
-
-    A string field.
-
-## Table units\_l10n
-
-- `units_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `format_length`
-
-    A string field.
-
-- `unit_type`
-
-    A string field.
-
-- `unit_id`
-
-    A string field.
-
-- `unit_pattern`
-
-    A string field.
-
-- `pattern_type`
-
-    A string field.
-
-- `locale_name`
-
-    A string field.
-
-- `count`
-
-    A string field.
-
-- `gender`
-
-    A string field.
-
-- `gram_case`
-
-    A string field.
-
-## Table variants
-
-- `variant_id`
-
-    A integer field.
-
-- `variant`
-
-    A string field.
-
-- `status`
-
-    A string field.
-
-## Table variants\_l10n
-
-- `var_l10n_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `variant`
-
-    A string field.
-
-- `locale_name`
-
-    A string field.
-
-- `alt`
-
-    A string field.
-
-## Table week\_preferences
-
-- `week_pref_id`
-
-    A integer field.
-
-- `locale`
-
-    A string field.
-
-- `ordering`
-
-    A string array field.
-
 # Format Patterns
 
 The following is taken directly from the [Unicode LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#table-date-field-symbol-table) and placed here for your convenience.
@@ -7503,7 +6540,7 @@ See the [date field symbols table](https://unicode.org/reports/tr35/tr35-dates.h
 
         Numeric hour (2 digits, zero pad if needed), narrow dayPeriod if used
 
-- `d` day
+- `d` day of month
 
     Day of month (numeric).
 
@@ -7521,7 +6558,7 @@ See the [date field symbols table](https://unicode.org/reports/tr35/tr35-dates.h
 
         Numeric: 2 digits, zero pad if needed
 
-- `D` day
+- `D` day of year
 
     The field length specifies the minimum number of digits, with zero-padding as necessary.
 
@@ -8311,11 +7348,11 @@ See the [LDML specifications](https://unicode.org/reports/tr35/tr35.html#Parent_
 
 # Errors
 
-This module does not die upon errors. Instead it sets an [error object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException) that can be retrieved.
+This module does not die upon errors, unless you have set [fatal](#fatal) to a true value. Instead it sets an [error object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException) that can be retrieved.
 
 When an error occurred, an [error object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException) will be set and the method will return `undef` in scalar context and an empty list in list context.
 
-The only occasions when this module will die is when there is an internal design error, which would be my fault.
+Otherwise, the only occasions when this module will die is when there is an internal design error, which would be my fault.
 
 # Advanced Search
 
@@ -8460,6 +7497,43 @@ or, querying the [calendar terms](#calendar_term):
 
 Of course, instead of returning an hash reference, as it normally would, it will return an array reference of hash reference.
 
+You can check if a table field containing an array has a certain value. For example:
+
+    my $all = $cldr->metazones(
+        has => [territories => 'CA'],
+    );
+
+This will return all metazone entries that have the array value `CA` in the field `territories`.
+
+You can specify more than one field:
+
+    my $all = $cldr->metazones(
+        has => [territories => 'CA', timezones => 'America/Chicago'],
+    );
+
+You can also use an hash reference instead of an array reference:
+
+    my $all = $cldr->metazones(
+        has => {
+            territories => 'CA',
+            timezones => 'America/Chicago',
+        },
+    );
+
+And if the table contains only one array field, then you do not have tp specify the field name:
+
+    my $all = $cldr->aliases(
+        has => 'America/Toronto',
+    );
+
+This will implicitly use the field `replacement`. However, if there are more than one array field, and you do not specify which one, then an error will be triggered. For example:
+
+    my $all = $cldr->metazones(
+        has => 'CA',
+    );
+    say $cldr->error->message;
+    # "There are 2 fields with array. You need to specify which one you want to check for value 'CA'"
+
 You can also ensure a certain order based on a field value. For example, you want to retrieve the `day` terms using [calendar\_term](#calendar_term), but the `term_name` are string, and we want to ensure the results are sorted in this order: `mon`, `tue`, `wed`, `thu`, `fri`, `sat` and `sun`
 
     my $terms = $cldr->calendar_terms(
@@ -8509,6 +7583,1794 @@ or, alternatively, using an hash reference with a single key:
     );
     my @month_names = map( $_->{term_name}, @$months );
     # January, February, March, April, May, June, July, August, September, October, November, December
+
+# SQL Schema
+
+The SQLite SQL schema is available in the file `scripts/cldr-schema.sql`
+
+The data are populated into the SQLite database using the script located in `scripts/create_database.pl` and the data accessible from [https://github.com/unicode-org/cldr](https://github.com/unicode-org/cldr) or from [https://cldr.unicode.org/index/downloads/](https://cldr.unicode.org/index/downloads/)
+
+# Tables
+
+The SQL schema used to create the SQLite database is available in the `scripts` directory of this distribution in the file `cldr-schema.sql`
+
+The tables used are as follows, in alphabetical order:
+
+## Table aliases
+
+- `alias_id`
+
+    An integer field.
+
+- `alias`
+
+    A string field.
+
+- `replacement`
+
+    A string array field.
+
+- `reason`
+
+    A string field.
+
+- `type`
+
+    A string field.
+
+- `comment`
+
+    A string field.
+
+## Table annotations
+
+- `annotation_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `annotation`
+
+    A string field.
+
+- `defaults`
+
+    A string array field.
+
+- `tts`
+
+    A string field.
+
+## Table bcp47\_currencies
+
+- `bcp47_curr_id`
+
+    An integer field.
+
+- `currid`
+
+    A string field.
+
+- `code`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+- `is_obsolete`
+
+    A boolean field.
+
+## Table bcp47\_extensions
+
+- `bcp47_ext_id`
+
+    An integer field.
+
+- `category`
+
+    A string field.
+
+- `extension`
+
+    A string field.
+
+- `alias`
+
+    A string field.
+
+- `value_type`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+- `deprecated`
+
+    A boolean field.
+
+## Table bcp47\_timezones
+
+- `bcp47_tz_id`
+
+    An integer field.
+
+- `tzid`
+
+    A string field.
+
+- `alias`
+
+    A string array field.
+
+- `preferred`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+- `deprecated`
+
+    A boolean field.
+
+## Table bcp47\_values
+
+- `bcp47_value_id`
+
+    An integer field.
+
+- `category`
+
+    A string field.
+
+- `extension`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+## Table calendar\_append\_formats
+
+- `cal_append_fmt_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_id`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+## Table calendar\_available\_formats
+
+- `cal_avail_fmt_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_id`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+- `count`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table calendar\_cyclics\_l10n
+
+- `cal_int_fmt_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_set`
+
+    A string field.
+
+- `format_type`
+
+    A string field.
+
+- `format_length`
+
+    A string field.
+
+- `format_id`
+
+    An integer field.
+
+- `format_pattern`
+
+    A string field.
+
+## Table calendar\_datetime\_formats
+
+- `cal_dt_fmt_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_length`
+
+    A string field.
+
+- `format_type`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+## Table calendar\_eras
+
+- `calendar_era_id`
+
+    An integer field.
+
+- `calendar`
+
+    A string field.
+
+- `sequence`
+
+    An integer field.
+
+- `code`
+
+    A string field.
+
+- `aliases`
+
+    A string array field.
+
+- `start`
+
+    A date field.
+
+- `until`
+
+    A date field.
+
+## Table calendar\_eras\_l10n
+
+- `cal_era_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `era_width`
+
+    A string field.
+
+- `era_id`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+## Table calendar\_formats\_l10n
+
+- `cal_fmt_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_type`
+
+    A string field.
+
+- `format_length`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `format_id`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+## Table calendar\_interval\_formats
+
+- `cal_int_fmt_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_id`
+
+    A string field.
+
+- `greatest_diff_id`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `part1`
+
+    A string field.
+
+- `separator`
+
+    A string field.
+
+- `part2`
+
+    A string field.
+
+- `repeating_field`
+
+    A string field.
+
+## Table calendar\_terms
+
+- `cal_term_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `term_type`
+
+    A string field.
+
+- `term_context`
+
+    A string field.
+
+- `term_width`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `yeartype`
+
+    A string field.
+
+- `term_name`
+
+    A string field.
+
+- `term_value`
+
+    A string field.
+
+## Table calendars
+
+- `calendar_id`
+
+    An integer field.
+
+- `calendar`
+
+    A string field.
+
+- `system`
+
+    A string field.
+
+- `inherits`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+## Table calendars\_l10n
+
+- `calendar_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+## Table casings
+
+- `casing_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `token`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+## Table code\_mappings
+
+- `code_mapping_id`
+
+    An integer field.
+
+- `code`
+
+    A string field.
+
+- `alpha3`
+
+    A string field.
+
+- `numeric`
+
+    An integer field.
+
+- `fips10`
+
+    A string field.
+
+- `type`
+
+    A string field.
+
+## Table collations
+
+- `collation`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+## Table collations\_l10n
+
+- `collation_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `collation`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+## Table currencies
+
+- `currency_id`
+
+    An integer field.
+
+- `currency`
+
+    A string field.
+
+- `digits`
+
+    An integer field.
+
+- `rounding`
+
+    An integer field.
+
+- `cash_digits`
+
+    An integer field.
+
+- `cash_rounding`
+
+    An integer field.
+
+- `is_obsolete`
+
+    A boolean field.
+
+- `status`
+
+    A string field.
+
+## Table currencies\_info
+
+- `currency_info_id`
+
+    An integer field.
+
+- `territory`
+
+    A string field.
+
+- `currency`
+
+    A string field.
+
+- `start`
+
+    A date field.
+
+- `until`
+
+    A date field.
+
+- `is_tender`
+
+    A boolean field.
+
+- `hist_sequence`
+
+    An integer field.
+
+- `is_obsolete`
+
+    A boolean field.
+
+## Table currencies\_l10n
+
+- `curr_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `currency`
+
+    A string field.
+
+- `count`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `symbol`
+
+    A string field.
+
+## Table date\_fields\_l10n
+
+- `date_field_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `field_type`
+
+    A string field.
+
+- `field_length`
+
+    A string field.
+
+- `relative`
+
+    An integer field.
+
+- `locale_name`
+
+    A string field.
+
+## Table day\_periods
+
+- `day_period_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `day_period`
+
+    A string field.
+
+- `start`
+
+    A string field.
+
+- `until`
+
+    A string field.
+
+## Table language\_population
+
+- `language_pop_id`
+
+    An integer field.
+
+- `territory`
+
+    A string field.
+
+- `locale`
+
+    A string field.
+
+- `population_percent`
+
+    A decimal field.
+
+- `literacy_percent`
+
+    A decimal field.
+
+- `writing_percent`
+
+    A decimal field.
+
+- `official_status`
+
+    A string field.
+
+## Table languages
+
+- `language_id`
+
+    An integer field.
+
+- `language`
+
+    A string field.
+
+- `scripts`
+
+    A string array field.
+
+- `territories`
+
+    A string array field.
+
+- `parent`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+## Table languages\_match
+
+- `lang_match_id`
+
+    An integer field.
+
+- `desired`
+
+    A string field.
+
+- `supported`
+
+    A string field.
+
+- `distance`
+
+    An integer field.
+
+- `is_symetric`
+
+    A boolean field.
+
+- `is_regexp`
+
+    A boolean field.
+
+- `sequence`
+
+    An integer field.
+
+## Table likely\_subtags
+
+- `likely_subtag_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `target`
+
+    A string field.
+
+## Table locale\_number\_systems
+
+- `locale_num_sys_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `number_system`
+
+    A string field.
+
+- `native`
+
+    A string field.
+
+- `traditional`
+
+    A string field.
+
+- `finance`
+
+    A string field.
+
+## Table locales
+
+- `locale_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `parent`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+## Table locales\_info
+
+- `locales_info_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `property`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+## Table locales\_l10n
+
+- `locales_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `locale_id`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table metainfos
+
+- `meta_id`
+
+    An integer field.
+
+- `property`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+## Table metazones
+
+- `metazone_id`
+
+    An integer field.
+
+- `metazone`
+
+    A string field.
+
+- `territories`
+
+    A string array field.
+
+- `timezones`
+
+    A string array field.
+
+## Table metazones\_names
+
+- `metatz_name_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `metazone`
+
+    A string field.
+
+- `width`
+
+    A string field.
+
+- `generic`
+
+    A string field.
+
+- `standard`
+
+    A string field.
+
+- `daylight`
+
+    A string field.
+
+## Table number\_formats\_l10n
+
+- `number_format_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `number_system`
+
+    A string field.
+
+- `number_type`
+
+    A string field.
+
+- `format_length`
+
+    A string field.
+
+- `format_type`
+
+    A string field.
+
+- `format_id`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `count`
+
+    A string field.
+
+## Table number\_symbols\_l10n
+
+- `number_symbol_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `number_system`
+
+    A string field.
+
+- `property`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table number\_systems
+
+- `numsys_id`
+
+    An integer field.
+
+- `number_system`
+
+    A string field.
+
+- `digits`
+
+    A string array field.
+
+- `type`
+
+    A string field.
+
+## Table number\_systems\_l10n
+
+- `num_sys_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `number_system`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table person\_name\_defaults
+
+- `pers_name_def_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+## Table rbnf
+
+- `rbnf_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `grouping`
+
+    A string field.
+
+- `ruleset`
+
+    A string field.
+
+- `rule_id`
+
+    A string field.
+
+- `rule_value`
+
+    A string field.
+
+## Table refs
+
+- `ref_id`
+
+    An integer field.
+
+- `code`
+
+    A string field.
+
+- `uri`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+## Table scripts
+
+- `script_id`
+
+    An integer field.
+
+- `script`
+
+    A string field.
+
+- `rank`
+
+    An integer field.
+
+- `sample_char`
+
+    A string field.
+
+- `id_usage`
+
+    A string field.
+
+- `rtl`
+
+    A boolean field.
+
+- `lb_letters`
+
+    A boolean field.
+
+- `has_case`
+
+    A boolean field.
+
+- `shaping_req`
+
+    A boolean field.
+
+- `ime`
+
+    A boolean field.
+
+- `density`
+
+    An integer field.
+
+- `origin_country`
+
+    A string field.
+
+- `likely_language`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+## Table scripts\_l10n
+
+- `scripts_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `script`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table subdivisions
+
+- `subdivision_id`
+
+    An integer field.
+
+- `territory`
+
+    A string field.
+
+- `subdivision`
+
+    A string field.
+
+- `parent`
+
+    A string field.
+
+- `is_top_level`
+
+    A boolean field.
+
+- `status`
+
+    A string field.
+
+## Table subdivisions\_l10n
+
+- `subdiv_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `subdivision`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+## Table territories
+
+- `territory_id`
+
+    An integer field.
+
+- `territory`
+
+    A string field.
+
+- `parent`
+
+    A string field.
+
+- `gdp`
+
+    An integer field.
+
+- `literacy_percent`
+
+    A decimal field.
+
+- `population`
+
+    An integer field.
+
+- `languages`
+
+    A string array field.
+
+- `contains`
+
+    A string array field.
+
+- `currency`
+
+    A string field.
+
+- `calendars`
+
+    A string array field.
+
+- `min_days`
+
+    An integer field.
+
+- `first_day`
+
+    An integer field.
+
+- `weekend`
+
+    An integer array field.
+
+- `status`
+
+    A string field.
+
+## Table territories\_l10n
+
+- `terr_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `territory`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table time\_formats
+
+- `time_format_id`
+
+    An integer field.
+
+- `region`
+
+    A string field.
+
+- `territory`
+
+    A string field.
+
+- `locale`
+
+    A string field.
+
+- `time_format`
+
+    A string field.
+
+- `time_allowed`
+
+    A string array field.
+
+## Table timezones
+
+- `timezone_id`
+
+    An integer field.
+
+- `timezone`
+
+    A string field.
+
+- `territory`
+
+    A string field.
+
+- `region`
+
+    A string field.
+
+- `tzid`
+
+    A string field.
+
+- `metazone`
+
+    A string field.
+
+- `tz_bcpid`
+
+    A string field.
+
+- `is_golden`
+
+    A boolean field.
+
+- `is_primary`
+
+    A boolean field.
+
+- `is_preferred`
+
+    A boolean field.
+
+- `is_canonical`
+
+    A boolean field.
+
+- `alias`
+
+    A string array field.
+
+## Table timezones\_cities
+
+- `tz_city_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `timezone`
+
+    A string field.
+
+- `city`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table timezones\_cities\_extended
+
+- `tz_city_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `timezone`
+
+    A string field.
+
+- `city`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table timezones\_cities\_supplemental
+
+- `tz_city_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `timezone`
+
+    A string field.
+
+- `city`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table timezones\_formats
+
+- `tz_fmt_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `type`
+
+    A string field.
+
+- `subtype`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+## Table timezones\_info
+
+- `tzinfo_id`
+
+    An integer field.
+
+- `timezone`
+
+    A string field.
+
+- `metazone`
+
+    A string field.
+
+- `start`
+
+    A datetime field.
+
+- `until`
+
+    A datetime field.
+
+## Table timezones\_names
+
+- `tz_name_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `timezone`
+
+    A string field.
+
+- `width`
+
+    A string field.
+
+- `generic`
+
+    A string field.
+
+- `standard`
+
+    A string field.
+
+- `daylight`
+
+    A string field.
+
+## Table unit\_aliases
+
+- `unit_alias_id`
+
+    An integer field.
+
+- `alias`
+
+    A string field.
+
+- `target`
+
+    A string field.
+
+- `reason`
+
+    A string field.
+
+## Table unit\_constants
+
+- `unit_constant_id`
+
+    An integer field.
+
+- `constant`
+
+    A string field.
+
+- `expression`
+
+    A string field.
+
+- `value`
+
+    A decimal field.
+
+- `description`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+## Table unit\_conversions
+
+- `unit_conversion_id`
+
+    An integer field.
+
+- `source`
+
+    A string field.
+
+- `base_unit`
+
+    A string field.
+
+- `expression`
+
+    A string field.
+
+- `factor`
+
+    A decimal field.
+
+- `systems`
+
+    A string array field.
+
+- `category`
+
+    A string field.
+
+## Table unit\_prefixes
+
+- `unit_prefix_id`
+
+    An integer field.
+
+- `unit_id`
+
+    A string field.
+
+- `symbol`
+
+    A string field.
+
+- `power`
+
+    An integer field.
+
+- `factor`
+
+    An integer field.
+
+## Table unit\_prefs
+
+- `unit_pref_id`
+
+    An integer field.
+
+- `unit_id`
+
+    A string field.
+
+- `territory`
+
+    A string field.
+
+- `category`
+
+    A string field.
+
+- `usage`
+
+    A string field.
+
+- `geq`
+
+    A decimal field.
+
+- `skeleton`
+
+    A string field.
+
+## Table unit\_quantities
+
+- `unit_quantity_id`
+
+    An integer field.
+
+- `base_unit`
+
+    A string field.
+
+- `quantity`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+- `comment`
+
+    A string field.
+
+## Table units\_l10n
+
+- `units_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `format_length`
+
+    A string field.
+
+- `unit_type`
+
+    A string field.
+
+- `unit_id`
+
+    A string field.
+
+- `unit_pattern`
+
+    A string field.
+
+- `pattern_type`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `count`
+
+    A string field.
+
+- `gender`
+
+    A string field.
+
+- `gram_case`
+
+    A string field.
+
+## Table variants
+
+- `variant_id`
+
+    An integer field.
+
+- `variant`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+## Table variants\_l10n
+
+- `var_l10n_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `variant`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table week\_preferences
+
+- `week_pref_id`
+
+    An integer field.
+
+- `locale`
+
+    A string field.
+
+- `ordering`
+
+    A string array field.
 
 # AUTHOR
 

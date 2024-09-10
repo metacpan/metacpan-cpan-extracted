@@ -30,11 +30,13 @@ t/lib/Local/utils.pm
 t/loadcfg.t
 t/local/01mailrc.txt.gz.original
 t/local/CPAN/modules/02packages.details.txt.gz.original
+t/local/mymodules/App-runscript-v1.0.0_02.tgz
 t/local/mymodules/CPAN-Mini-0.17.tar.gz
 t/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz
 t/local/mymodules/Dist-Metadata-Test-MetaFile-2.2.tar.gz
 t/local/mymodules/Dist-Metadata-Test-MetaFile-Only.tar.gz
 t/local/mymodules/not-discoverable.tar.gz
+t/new.t
 t/parsecfg.t
 t/pod-coverage.t
 t/pod.t

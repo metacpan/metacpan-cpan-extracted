@@ -2154,24 +2154,51 @@ class TestCase::Operator::TypeCast {
 
   static method to_string : int () {
     
-    my $byte_array = ['a', 'b', 'c'];
-    unless ($byte_array isa byte[]) {
-      return 0;
+    {
+      my $byte_array = ['a', 'b', 'c'];
+      unless ($byte_array isa byte[]) {
+        return 0;
+      }
+      
+      my $string = (string)$byte_array;
+      
+      unless ($string isa string) {
+        return 0;
+      }
+      
+      unless ($string eq "abc") {
+        return 0;
+      }
+      
+      if ($byte_array == $string) {
+        return 0;
+      }
     }
     
-    my $string = (string)$byte_array;
-    
-    unless ($string isa string) {
-      return 0;
+    {
+      my $string = (object)"abc";
+      
+      eval { (mutable string)$string; }
+      
+      unless (Fn->contains($@, "A read-only string cannnot be cast to mutable string type.")) {
+        return 0;
+      }
+      
     }
     
-    unless ($string eq "abc") {
-      return 0;
+    {
+      my $string = (object)"abc";
+      
+      my $string2 = (string)$string;
     }
     
-    if ($byte_array == $string) {
-      return 0;
+    {
+      my $string = (object)copy "abc";
+      
+      my $string2 = (mutable string)$string;
     }
+    
+    $@ = undef;
     
     return 1;
   }

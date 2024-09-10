@@ -317,7 +317,7 @@ sprintf(...)
 		SAVETMPS;
 		char * sprint = preprocess(SvPV_nolen(ST(0)));
 		ST(0) = newSVpv(sprint, strlen(sprint));
-		perl_call_method("CORE::sprintf", 3);
+		perl_call_method("Term::ANSI::Sprintf::_sprintf", 3);
 		SPAGAIN;
 		RETVAL = newSVsv(POPs);
 		PUTBACK;

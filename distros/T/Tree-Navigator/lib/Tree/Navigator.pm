@@ -1,12 +1,9 @@
 package Tree::Navigator;
+use utf8;
 use Moose;
 use MooseX::NonMoose;
 use namespace::autoclean;
 extends 'Plack::Component';
-
-
-# TODO : check Path::Resolver
-
 
 use Alien::GvaScript;
 use Plack::MIME;
@@ -15,7 +12,7 @@ use Plack::Util;
 use Scalar::Util qw/weaken/;
 use Tree::Navigator::Node;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 has root  => (
   is      => 'ro',
@@ -406,6 +403,8 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Tree::Navigator - Generic navigation in various kinds of trees
@@ -455,12 +454,6 @@ and use your favorite web browser to navigate through your data.
 
 =head1 DESCRIPTION
 
-=head2 Disclaimer
-
-This distribution is still in an early stage, with incomplete
-documentation and tests, and an unstabilized API. Use for experiments,
-not yet for production code.
-
 
 =head2 Introduction
 
@@ -482,32 +475,72 @@ concrete classes for some of the examples just mentioned above
 =item *
 
 a server application for exposing the tree structure to
-web clients or command-line clients (the present module).
+web clients 
 
 =item *
 
-a shell client [TODO]
-
-=item *
-
-an L<application|Tree::Navigator::App::PerlDebug>
+a L<debugging application|Tree::Navigator::App::PerlDebug>
 that uses the Tree Navigator to navigate into the
 memory of a running Perl program.
 
 =back
 
-=head2 Definitions
+=head2 Status
 
-  - node
-  - subnode
-  - leaf
-  - attribute
-  - content
+This application was built as a proof-of-concept in 2012 and hasn't been much reworked
+since. It is functional and actually is being used in production for some minor tasks,
+but is not polished into a fully documented product. A minor modernization was performed
+in 2024 to remove deprecated features no longer supported by recent versions of perl.
+
+
+=head2 Implemented nodes
+
+The following kinds of nodes come with the distribution and therefore can readily be mounted
+into a tree navigator :
+
+=over
+
+=item L<Tree::Navigator::Node::DBI>
+
+Displays the metadata (tables and columns) of a database.
+Navigation within the data rows is not implemented yet.
+
+=item L<Tree::Navigator::Node::DBIDM>
+
+Meant to navigate in a database through a L<DBIx::DataModel> schema.
+Not fully implemented.
+
+=item L<Tree::Navigator::Node::Filesys>
+
+Navigation in a filesystem, displaying file attributes and providing a download facility.
+
+=item L<Tree::Navigator::Node::Perl::Ref>
+
+Navigation in a perl datastructure.
+
+=item L<Tree::Navigator::Node::Perl::StackTrace>
+
+Navigation in a perl stacktrace.
+
+=item L<Tree::Navigator::Node::Perl::Symdump>
+
+Navigation in a perl symbol table.
+
+=item L<Tree::Navigator::Node::Win32::Registry>
+
+Navigation in Windows registry.
+
+=back
+
+Other kinds of nodes can be integrated into the framework by subclassing
+L<Tree::Navigator::Node> with methods for accessing the node's content, attributes and children.
 
 
 =head1 METHODS
 
-TODO
+=head2 call
+
+Main request dispatcher (see L<Plack/Component>).
 
 
 =head1 DEPENDENCIES
@@ -519,124 +552,19 @@ This application uses L<Plack> and L<Moose>.
 
 Laurent Dami, C<< <dami at cpan.org> >>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-tree-navigator at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tree-Navigator>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
 
 =head1 SEE ALSO
 
 L<Tree::Simple>
 
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Tree::Navigator
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tree-Navigator>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Tree-Navigator>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Tree-Navigator>
-
-=item * Search CPAN
-
-L<https://metacpan.org/dist/Tree-Navigator/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Laurent Dami.
+Copyright 2012, 2024 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
-
-=head1 TODO
-
-- check proper handling of SCRIPT_NAME
-- display node, show attrs & use IFRAME for content
-- option to toogle leaves in treeNav
-- export dir data as JSON/yaml
-- menu of actions on nodes
-
-- Node types: 
-    - HTML viewer, build tree from H1, h2, etc. nodes; href links are leaves
-    - Obj in memory
-    - Process tree
-    - LDAP
-    - POM
-    - Catalyst Actions
-    - WWW mechanize
-    - XML Schema
-    - Smb Client, FTP, FTPS, SVN, GIT
-
-- Shell : use Plack::Client
-
-- Operation:
-    - ls
-    - cat
-    - grep / ack
-    - search / find (from attributes)
-
-- fix utf8 bug in content
-
-
-- apps
-   - doc avec MsWordHTML
-   - doc avec Latex
-
-
-API
-  app/_frameset              => basic layout (frameset)
-  app/_tn/             => tree TOC
-  app/_tn/path/to/node => subtree TOC
-
-  app/path/to/node?children
-  app/path/to/node?subnodes
-  app/path/to/node?content&view=html
-    accept: text/html
-  app/path/to/node?content&view=
-     accept: binary
-  app/path/to/node?html
-
-     => right panel
-  app/path/to/node?source (PPW, )
-
-
-
-Cli
-===
-  cd
-  ls
-  cat
-  pwd
-  find
-  grep/ack
-  
-
 
 

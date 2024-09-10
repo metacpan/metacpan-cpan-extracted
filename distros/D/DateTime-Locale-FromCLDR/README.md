@@ -130,7 +130,7 @@ DateTime::Locale::FromCLDR - DateTime Localised Data from Unicode CLDR
 
 # VERSION
 
-    v0.1.1
+    v0.2.0
 
 # DESCRIPTION
 
@@ -157,7 +157,7 @@ Note that in `CLDR` parlance, there are standard pattern formats. For example `f
     # Japanese as spoken in Japan
     my $locale = DateTime::Locale::FromCLDR->new( 'ja-JP' ) ||
         die( DateTime::Locale::FromCLDR->error );
-    # Okinawan as spoken in the Japan Southern island
+    # Okinawan as spoken in Japan Southern islands
     my $locale = DateTime::Locale::FromCLDR->new( 'ryu-Kana-JP-t-de-t0-und-x0-medical' ) ||
         die( DateTime::Locale::FromCLDR->error );
 
@@ -178,7 +178,7 @@ or, using an hash reference:
 
 Instantiate a new [DateTime::Locale::FromCLDR](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromCLDR) object based on a `locale` provided, and returns it. By default, it uses the calendar `gregorian`, but you can specify a different one with the `calendar` option.
 
-You can provide any `locale`, even complex one as shown above, and only its core part will be retailed. So, for example:
+You can provide any `locale`, even complex one as shown above, and only its core part will be retained. So, for example:
 
     my $locale = DateTime::Locale::FromCLDR->new( 'ryu-Kana-JP-t-de-t0-und-x0-medical' ) ||
         die( DateTime::Locale::FromCLDR->error );
@@ -196,7 +196,11 @@ All methods are read-only unless stated otherwise.
 
 ## am\_pm\_abbreviated
 
-    my $array = $locale->am_pm_abbreviated;
+This is an alias for [am\_pm\_format\_abbreviated](#am_pm_format_abbreviated)
+
+## am\_pm\_format\_abbreviated
+
+    my $array = $locale->am_pm_format_abbreviated;
 
 Returns an array reference of the terms used to represent `am` and `pm`
 
@@ -217,6 +221,41 @@ For example:
     say @$ampm; # Empty
 
 See ["calendar\_term" in Locale::Unicode::Data](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData#calendar_term)
+
+## am\_pm\_format\_narrow
+
+Same as [am\_pm\_format\_abbreviated](#am_pm_format_abbreviated), but returns the narrow format of the AM/PM terms.
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    say $locale->am_pm_format_narrow;
+
+## am\_pm\_format\_wide
+
+Same as [am\_pm\_format\_abbreviated](#am_pm_format_abbreviated), but returns the wide format of the AM/PM terms.
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    say $locale->am_pm_format_wide;
+
+## am\_pm\_standalone\_abbreviated
+
+Same as [am\_pm\_format\_abbreviated](#am_pm_format_abbreviated), but returns the abbreviated stand-alone format of the AM/PM terms.
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    say $locale->am_pm_standalone_abbreviated;
+
+## am\_pm\_standalone\_narrow
+
+Same as [am\_pm\_format\_abbreviated](#am_pm_format_abbreviated), but returns the narrow stand-alone format of the AM/PM terms.
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    say $locale->am_pm_standalone_narrow;
+
+## am\_pm\_standalone\_wide
+
+Same as [am\_pm\_format\_abbreviated](#am_pm_format_abbreviated), but returns the wide stand-alone format of the AM/PM terms.
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    say $locale->am_pm_standalone_wide;
 
 ## available\_formats
 
