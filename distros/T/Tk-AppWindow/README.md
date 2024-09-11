@@ -36,7 +36,7 @@ Following Perl modules must be installed:
     * Tk
     * Tk::DocumentTree
     * Tk::FontDialog
-    * Tk::Pod
+    * Tk::PodViewer
     * Tk::QuickForm
     * Tk::YADialog
     * Tk::YANoteBook
@@ -61,7 +61,8 @@ librsvg-2 and its development files to be installed.
 
 ## Tk::DynaMouseWheelBind
 
-For mouse wheel scrolling of all kinds of Panes and Canvasses.
+For mouse wheel scrolling of all kinds of Panes and Canvasses. We do not want to make it a prerequisite
+because it is failing a lot of tests on CPAN currently. The module seems fine though.
 
 ## On Windows
 

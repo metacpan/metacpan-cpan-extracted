@@ -21,28 +21,24 @@ no_index:
 provides:
   Data::URIID:
     file: lib/Data/URIID.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::URIID::Colour:
     file: lib/Data/URIID/Colour.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::URIID::Digest:
     file: lib/Data/URIID/Digest.pm
-    version: v0.5.0
-  Data::URIID::Future:
-    file: lib/Data/URIID/Future.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::URIID::Result:
     file: lib/Data/URIID/Result.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::URIID::Service:
     file: lib/Data/URIID/Service.pm
-    version: v0.5.0
+    version: v0.6.0
 requires:
   Carp: '1.35'
   DateTime::Format::ISO8601: '0.08'
   Digest::base: '1.16'
   Encode: '3.19'
-  Future: '0.47'
   I18N::LangTags: '0.45'
   I18N::LangTags::Detect: '1.08'
   JSON: '4.10'
@@ -55,7 +51,7 @@ requires:
   perl: v5.10.0
 resources:
   repository: git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/Data-URIID.git
-version: v0.05
+version: v0.06
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

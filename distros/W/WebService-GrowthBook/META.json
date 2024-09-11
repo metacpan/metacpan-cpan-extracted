@@ -33,7 +33,6 @@
             "Devel::Cover" : "1.23",
             "Devel::Cover::Report::Codecov" : "0.14",
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::PerlTidy" : "0",
             "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
             "Dist::Zilla::PluginBundle::Author::DERIV" : "0",
             "Software::License::Perl_5" : "0",
@@ -52,14 +51,20 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Compare" : "0",
+            "Data::Dumper" : "0",
             "Digest::MD5" : "0",
+            "Exporter" : "0",
             "HTTP::Tiny" : "0",
             "JSON::MaybeUTF8" : "0",
             "JSON::MaybeXS" : "0",
+            "List::Util" : "0",
             "Log::Any" : "0",
             "Object::Pad" : "0.805",
             "Scalar::Util" : "0",
+            "String::CamelCase" : "0",
             "Syntax::Keyword::Try" : "0",
+            "URI" : "0",
             "feature" : "0",
             "indirect" : "0.37",
             "strict" : "0",
@@ -83,6 +88,7 @@
             "Test::MockModule" : "0",
             "Test::MockTime" : "0",
             "Test::More" : "0.98",
+            "Test::Warnings" : "0",
             "perl" : "5.006"
          }
       }
@@ -90,51 +96,71 @@
    "provides" : {
       "WebService::GrowthBook" : {
          "file" : "lib/WebService/GrowthBook.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "WebService::GrowthBook::AbstractFeatureCache" : {
          "file" : "lib/WebService/GrowthBook/AbstractFeatureCache.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "WebService::GrowthBook::CacheEntry" : {
          "file" : "lib/WebService/GrowthBook/CacheEntry.pm",
-         "version" : "0.002"
+         "version" : "0.003"
+      },
+      "WebService::GrowthBook::Eval" : {
+         "file" : "lib/WebService/GrowthBook/Eval.pm",
+         "version" : "0.003"
+      },
+      "WebService::GrowthBook::Experiment" : {
+         "file" : "lib/WebService/GrowthBook/Experiment.pm",
+         "version" : "0.003"
       },
       "WebService::GrowthBook::Feature" : {
          "file" : "lib/WebService/GrowthBook/Feature.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "WebService::GrowthBook::FeatureRepository" : {
          "file" : "lib/WebService/GrowthBook/FeatureRepository.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "WebService::GrowthBook::FeatureResult" : {
          "file" : "lib/WebService/GrowthBook/FeatureResult.pm",
-         "version" : "0.002"
+         "version" : "0.003"
+      },
+      "WebService::GrowthBook::FeatureRule" : {
+         "file" : "lib/WebService/GrowthBook/FeatureRule.pm",
+         "version" : "0.003"
       },
       "WebService::GrowthBook::InMemoryFeatureCache" : {
          "file" : "lib/WebService/GrowthBook/InMemoryFeatureCache.pm",
-         "version" : "0.002"
+         "version" : "0.003"
+      },
+      "WebService::GrowthBook::Result" : {
+         "file" : "lib/WebService/GrowthBook/Result.pm",
+         "version" : "0.003"
+      },
+      "WebService::GrowthBook::Util" : {
+         "file" : "lib/WebService/GrowthBook/Util.pm",
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/deriv-com/perl-WebService-GrowthBook/issues"
+         "web" : "https://github.com/chylli-deriv/perl-WebService-GrowthBook/issues"
       },
-      "homepage" : "https://github.com/deriv-com/perl-WebService-GrowthBook",
+      "homepage" : "https://github.com/chylli-deriv/perl-WebService-GrowthBook",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/deriv-com/perl-WebService-GrowthBook.git",
-         "web" : "https://github.com/deriv-com/perl-WebService-GrowthBook"
+         "url" : "https://github.com/chylli-deriv/perl-WebService-GrowthBook.git",
+         "web" : "https://github.com/chylli-deriv/perl-WebService-GrowthBook"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "chylli-deriv <chylli@deriv.com>",
-      "mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>",
-      "chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>"
+      "chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>",
+      "mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>"
    ],
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",

@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::YANoteBook.
 
+0.07  Tue Sep 10 2024
+	fixed occasional error in method UpdateTabs
+
 0.06  Sat Apr 20 2024
 	fixed relief of tab widget
 	beautified appearance of selected page.

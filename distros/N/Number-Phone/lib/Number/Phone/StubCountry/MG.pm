@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240607153921;
+our $VERSION = 1.20240910191016;
 
 my $formatters = [
                 {
@@ -66,26 +66,26 @@ my $validators = {
                 'voip' => '22\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"2612092", "Taolañaro",
-"2612062", "Mahajanga",
+$areanames{en} = {"26120722", "Manakara",
 "2612044", "Antsirabe",
-"2612075", "Fianarantsoa",
-"2612069", "Maintirano",
-"2612057", "Maroantsetra\/Sainte\ Marie",
-"2612082", "Antsiranana",
-"26120722", "Manakara",
-"2612073", "Farafangana",
-"2612094", "Toliary",
-"2612095", "Morondava",
-"2612086", "Nosy\ Be",
-"2612054", "Ambatondrazaka",
-"26120729", "Mananjary",
-"2612022", "Antananarivo",
-"2612056", "Moramanga",
-"2612047", "Ambositra",
-"2612088", "Sambava",
 "2612067", "Antsohihy",
-"2612053", "Toamasina",};
+"2612094", "Toliary",
+"2612088", "Sambava",
+"2612062", "Mahajanga",
+"2612092", "Taolañaro",
+"2612047", "Ambositra",
+"2612053", "Toamasina",
+"2612054", "Ambatondrazaka",
+"2612022", "Antananarivo",
+"2612095", "Morondava",
+"2612056", "Moramanga",
+"2612057", "Maroantsetra\/Sainte\ Marie",
+"26120729", "Mananjary",
+"2612069", "Maintirano",
+"2612073", "Farafangana",
+"2612075", "Fianarantsoa",
+"2612082", "Antsiranana",
+"2612086", "Nosy\ Be",};
 my $timezones = {
                '' => [
                        'Indian/Antananarivo'

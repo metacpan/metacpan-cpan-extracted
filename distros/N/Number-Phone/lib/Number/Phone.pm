@@ -9,7 +9,7 @@ use Cwd qw(abs_path);
 
 use Scalar::Util 'blessed';
 
-use Number::Phone::Country qw(noexport);
+use Number::Phone::Country;
 use Number::Phone::Data;
 use Number::Phone::StubCountry;
 
@@ -19,7 +19,7 @@ use Devel::Deprecations::Environmental
     OldPerl => { unsupported_from => '2024-03-09', older_than => '5.14.0' };
 
 # MUST be in format N.NNNN, see https://github.com/DrHyde/perl-modules-Number-Phone/issues/58
-our $VERSION = '4.0003';
+our $VERSION = '4.0004';
 
 my $NOSTUBS = 0;
 sub import {

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 use Tk;
 require Tk::YANoteBook::NameTab;
@@ -780,7 +780,8 @@ sub UpdateTabs {
 	my $ud = $self->{UNDISPLAYED};
 	my $dp = $self->{DISPLAYED};
 	my $notempty = @$dp;
-	$self->update;
+	# TODO find out why 'if Exists $self' is necessary
+	$self->update if Exists $self;
 	while ($self->IsFull) {
 		my $last = pop @$dp;
 		my $tab = $self->getTab($last);

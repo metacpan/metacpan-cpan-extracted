@@ -9,6 +9,10 @@ BEGIN
     use utf8;
     use version;
     use Test::More;
+    # I am getting weird error like:
+    # perl(74608) in free(): bogus pointer (double free?) 0xfcc0f72e800
+    # that are most likely coming from DateTime, so I am switching for testing to its pure-perl equivalent
+    $ENV{PERL_DATETIME_PP} = 1;
     use DateTime;
     use DBD::SQLite;
     if( version->parse( $DBD::SQLite::sqlite_version ) < version->parse( '3.6.19' ) )

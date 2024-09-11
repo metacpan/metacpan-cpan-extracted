@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Tangence::Property 0.32;
+package Tangence::Property 0.33;
 
 use warnings;
 use base qw( Tangence::Meta::Property );

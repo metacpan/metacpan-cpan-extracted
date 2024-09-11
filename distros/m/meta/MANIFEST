@@ -16,5 +16,6 @@ t/10variables.t
 t/11subroutines.t
 t/20add.t
 t/21remove.t
-t/80warnings.t
+t/80subname+Sub-Util.t
+t/94warnings.t
 t/99pod.t

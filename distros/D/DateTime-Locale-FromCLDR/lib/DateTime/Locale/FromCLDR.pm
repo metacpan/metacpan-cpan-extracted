@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/DateTime/Locale/FromCLDR.pm
-## Version v0.2.1
+## Version v0.2.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/07
@@ -18,7 +18,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use vars qw(
-        $ERROR $VERSION $DEBUG $EMPTY_SET
+        $ERROR $VERSION $DEBUG $EMPTY_SET $FATAL_EXCEPTIONS
         $TZ_DST_CACHE
     );
     use overload (
@@ -34,7 +34,7 @@ BEGIN
     # "If a given short metazone form is known NOT to be understood in a given locale and the parent locale has this value such that it would normally be inherited, the inheritance of this value can be explicitly disabled by use of the 'no inheritance marker' as the value, which is 3 simultaneous empty set characters (U+2205)."
     # <https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
     our $EMPTY_SET = "∅∅∅";
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.3';
 };
 
 use strict;
@@ -56,6 +56,7 @@ sub new
     }
     $self->{default_date_format_length} = 'medium';
     $self->{default_time_format_length} = 'medium';
+    $self->{fatal} = ( $FATAL_EXCEPTIONS // 0 );
     my @args = @_;
     if( scalar( @args ) == 1 &&
         defined( $args[0] ) &&
@@ -67,6 +68,15 @@ sub new
     elsif( ( scalar( @args ) % 2 ) )
     {
         return( $self->error( sprintf( "Uneven number of parameters provided (%d). Should receive key => value pairs. Parameters provided are: %s", scalar( @args ), join( ', ', @args ) ) ) );
+    }
+
+    for( my $i = 0; $i < scalar( @args ); $i += 2 )
+    {
+        if( $args[$i] eq 'fatal' )
+        {
+            $self->{fatal} = $args[$i + 1];
+            last;
+        }
     }
 
     # Then, if the user provided with an hash or hash reference of options, we apply them
@@ -432,19 +442,28 @@ sub error
             skip_frames => 1,
             message => $msg,
         });
-        warn( $msg ) if( warnings::enabled() );
-        if( Want::want( 'ARRAY' ) )
+        if( $self->fatal )
         {
-            rreturn( [] );
+            die( $self->{error} );
         }
-        elsif( Want::want( 'OBJECT' ) )
+        else
         {
-            rreturn( DateTime::Locale::FromCLDR::NullObject->new );
+            warn( $msg ) if( warnings::enabled() );
+            if( Want::want( 'ARRAY' ) )
+            {
+                rreturn( [] );
+            }
+            elsif( Want::want( 'OBJECT' ) )
+            {
+                rreturn( DateTime::Locale::FromCLDR::NullObject->new );
+            }
+            return;
         }
-        return;
     }
     return( ref( $self ) ? $self->{error} : $ERROR );
 }
+
+sub fatal { return( shift->_set_get_prop( 'fatal', @_ ) ); }
 
 sub first_day_of_week
 {
@@ -3023,6 +3042,89 @@ sub _metazone_name
     return( $name );
 }
 
+sub _set_get_prop
+{
+    my $self = shift( @_ );
+    my $field = shift( @_ ) ||
+        return( $self->error( "No field was provided." ) );
+    my( $re, $type, $isa );
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field} || die( "No 'field' property was provided in the field dictionary hash reference." );
+        if( exists( $def->{regexp} ) &&
+            defined( $def->{regexp} ) &&
+            ref( $def->{regexp} ) eq 'Regexp' )
+        {
+            $re = $def->{regexp};
+        }
+        elsif( exists( $def->{type} ) &&
+               defined( $def->{type} ) &&
+               length( $def->{type} ) )
+        {
+            $type = $def->{type};
+        }
+        if( exists( $def->{isa} ) &&
+            defined( $def->{isa} ) &&
+            length( $def->{isa} ) )
+        {
+            $isa = $def->{isa};
+        }
+    }
+    if( @_ )
+    {
+        my $val = shift( @_ );
+        if( defined( $val ) &&
+            length( $val ) )
+        {
+            if( defined( $re ) &&
+                $val !~ /^$re$/ )
+            {
+                return( $self->error( "Invalid value provided for \"${field}\": ${val}" ) );
+            }
+            elsif( defined( $type ) &&
+                   $type eq 'boolean' )
+            {
+                $val = lc( $val );
+                if( $val =~ /^(?:yes|no)$/i )
+                {
+                    $self->{_bool_types}->{ $field } = 'literal';
+                    $val = ( $val eq 'yes' ? $self->true : $self->false );
+                }
+                elsif( $val =~ /^(?:true|false)$/i )
+                {
+                    $self->{_bool_types}->{ $field } = 'logic';
+                    $val = ( $val eq 'true' ? $self->true : $self->false );
+                }
+                elsif( $val =~ /^(?:1|0)$/ )
+                {
+                    $self->{_bool_types}->{ $field } = 'logic';
+                    $val = ( $val ? $self->true : $self->false );
+                }
+                else
+                {
+                    warn( "Unexpected value used as boolean for attribute \"${field}\": ${val}" ) if( warnings::enabled() );
+                    $val = ( $val ? $self->true : $self->false );
+                }
+            }
+            elsif( defined( $isa ) )
+            {
+                if( !Scalar::Util::blessed( $val ) ||
+                    ( Scalar::Util::blessed( $val ) && !$val->isa( $isa ) ) )
+                {
+                    return( $self->error( "Value provided is not an ${isa} object." ) );
+                }
+            }
+        }
+        $self->{ $field } = $val
+    }
+    # So chaining works
+    rreturn( $self ) if( Want::want( 'OBJECT' ) );
+    # Returns undef in scalar context and an empty list in list context
+    return if( !defined( $self->{ $field } ) );
+    return( $self->{ $field } );
+}
+
 # This resembles the one in Locale::Unicode::Data, except, it does not look up real parents.
 # This only creates a tree of subtags in the order prescribed by LDML
 # <https://unicode.org/reports/tr35/tr35.html#Inheritance_and_Validity>
@@ -3314,12 +3416,14 @@ sub FREEZE
     my $self = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
     my $class = CORE::ref( $self );
-    my $locale = "$self->{locale}";
+    my @keys = qw( locale calendar default_date_format_length default_time_format_length fatal );
+    my %hash = ();
+    @hash{ @keys } = @$self{ @keys };
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, $locale] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    CORE::return( [$class, %hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
-    CORE::return( $class, $locale );
+    CORE::return( $class, \%hash );
 }
 
 sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
@@ -3333,20 +3437,24 @@ sub THAW
     my( $self, undef, @args ) = @_;
     my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
     my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
-    my $locale = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : '';
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $locale = Locale::Unicode->new( CORE::delete( $hash->{locale} ) // 'en' );
     my $new;
     # Storable pattern requires to modify the object it created rather than returning a new one
     if( CORE::ref( $self ) )
     {
-        $locale = Locale::Unicode->new( $locale );
-        $self->{locale} = $locale;
-        $self->{_cldr} = Locale::Unicode::Data->new;
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
         $new = $self;
     }
     else
     {
-        $new = $class->new( $locale );
+        $new = CORE::bless( $hash => $class );
     }
+    $new->{locale} = $locale;
+    $new->{_cldr} = Locale::Unicode::Data->new;
     CORE::return( $new );
 }
 
@@ -3747,9 +3855,44 @@ DateTime::Locale::FromCLDR - DateTime Localised Data from Unicode CLDR
         locale => DateTime::Locale::FromCLDR->new( 'en' ),
     );
 
+Enabling fatal exceptions:
+
+    use v5.34;
+    use experimental 'try';
+    no warnings 'experimental';
+    try
+    {
+        my $locale = DateTime::Locale::FromCLDR->new( 'en', fatal => 1 );
+        # Missing the 'offset' argument
+        my $str = $locale->format_gmt;
+        # More code
+    }
+    catch( $e )
+    {
+        say "Oops: ", $e->message;
+    }
+
+Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
+
+    use v5.34;
+    use experimental 'try';
+    no warnings 'experimental';
+    $DateTime::Locale::FromCLDR::FATAL_EXCEPTIONS = 1;
+    try
+    {
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        # Missing the 'offset' argument
+        my $str = $locale->format_gmt;
+        # More code
+    }
+    catch( $e )
+    {
+        say "Oops: ", $e->message;
+    }
+
 =head1 VERSION
 
-    v0.2.1
+    v0.2.3
 
 =head1 DESCRIPTION
 
@@ -4299,6 +4442,29 @@ Same as L<era_abbreviated|/era_abbreviated>, but returns the wide format eras.
 Used as a mutator, this sets an L<exception object|DateTime::Locale::FromCLDR::Exception> and returns an C<DateTime::Locale::FromCLDR::NullObject> in object context (such as when chaining), or C<undef> in scalar context, or an empty list in list context.
 
 The C<DateTime::Locale::FromCLDR::NullObject> class prevents the perl error of C<Can't call method "%s" on an undefined value> (see L<perldiag>). Upon the last method chained, C<undef> is returned in scalar context or an empty list in list context.
+
+=head2 fatal
+
+    $cldr->fatal(1); # Enable fatal exceptions
+    $cldr->fatal(0); # Disable fatal exceptions
+    my $bool = $cldr->fatal;
+
+Sets or get the boolean value, whether to die upon exception, or not. If set to true, then instead of setting an L<exception object|DateTime::Locale::FromCLDR::Exception>, this module will die with an L<exception object|DateTime::Locale::FromCLDR::Exception>. You can catch the exception object then after using C<try>. For example:
+
+    use v.5.34; # to be able to use try-catch blocks in perl
+    use experimental 'try';
+    no warnings 'experimental';
+    try
+    {
+        my $cldr = DateTime::Locale::FromCLDR->new( 'en', fatal => 1 );
+        # Forgot the 'offset':
+        my $str = $locale->format_gmt;
+    }
+    catch( $e )
+    {
+        say "Error occurred: ", $e->message;
+        # Error occurred: No value for width was provided.
+    }
 
 =head2 first_day_of_week
 
@@ -5649,7 +5815,7 @@ L<DateTime::Locale>
 
 Copyright(c) 2024 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -1,5 +1,14 @@
 Revision history for meta
 
+0.007   2024-09-10
+        [CHANGES]
+         * Added `meta::for_reference()`
+         * Added `$metasub->set_subname` and `->set_prototype`, which can be
+           used to replace `Sub::Util`.
+         * Account for refcount retention of referred items when creating meta
+           wrappers, now that the `for_reference()` constructor can wrap
+           anonymous things too
+
 0.006   2024-09-06
         [CHANGES]
          * Added `$metapkg->list_symbols` and `$metapkg->list_subpackages`

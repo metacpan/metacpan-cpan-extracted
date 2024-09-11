@@ -2854,6 +2854,24 @@
     },
 {
         class   => 'Number::Phone::Lib',
+        args    => ['BO','+59150123456'],
+        methods => ['is_ipphone'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['BO','50123456'],
+        methods => ['is_ipphone'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+59150123456'],
+        methods => ['is_ipphone'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
         args    => ['BQ','+5997151234'],
         methods => ['is_fixed_line'],
         test_country => 1,
@@ -14836,19 +14854,19 @@
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['NG','+23418040123'],
+        args    => ['NG','+2342033123456'],
         methods => ['is_fixed_line'],
         test_country => 1,
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['NG','18040123'],
+        args    => ['NG','2033123456'],
         methods => ['is_fixed_line'],
         test_country => 1,
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['+23418040123'],
+        args    => ['+2342033123456'],
         methods => ['is_fixed_line'],
         test_country => 1,
     },
@@ -17568,6 +17586,24 @@
         class   => 'Number::Phone::Lib',
         args    => ['+2488000000'],
         methods => ['is_tollfree'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['SC','+2488512345'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['SC','8512345'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+2488512345'],
+        methods => ['is_specialrate'],
         test_country => 1,
     },
 {

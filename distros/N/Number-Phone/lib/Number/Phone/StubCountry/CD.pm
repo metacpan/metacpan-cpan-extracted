@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240607153918;
+our $VERSION = 1.20240910191014;
 
 my $formatters = [
                 {
@@ -39,6 +39,12 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '2',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{4})'
+                },
+                {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '1',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
@@ -48,16 +54,34 @@ my $formatters = [
                   'leading_digits' => '[89]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+                },
+                {
+                  'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '5',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
                 'fixed_line' => '
-          12\\d{7}|
+          (?:
+            (?:
+              12|
+              573
+            )\\d\\d|
+            276
+          )\\d{5}|
           [1-6]\\d{6}
         ',
                 'geographic' => '
-          12\\d{7}|
+          (?:
+            (?:
+              12|
+              573
+            )\\d\\d|
+            276
+          )\\d{5}|
           [1-6]\\d{6}
         ',
                 'mobile' => '
@@ -74,14 +98,15 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2431", "Kinshasa",
-"2436", "North\ Kivu\/South\ Kivu\/Maniema",
-"2433", "Bas\-Congo\/Bandundu",
+$areanames{fr} = {"2436", "Nord\-Kivu\/Sud\-Kivu\/Maniema",
+"243573", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
+"2435", "Province\ Orientale\ \(Kisanga\/Mbandaka\)",};
+$areanames{en} = {"2436", "North\ Kivu\/South\ Kivu\/Maniema",
 "2434", "Kasai\-Oriental\/Kasai\-Occidental",
 "2435", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
-"2432", "Katanga",};
-$areanames{fr} = {"2436", "Nord\-Kivu\/Sud\-Kivu\/Maniema",
-"2435", "Province\ Orientale\ \(Kisanga\/Mbandaka\)",};
+"2433", "Bas\-Congo\/Bandundu",
+"2432", "Katanga",
+"2431", "Kinshasa",};
 my $timezones = {
                '' => [
                        'Africa/Kinshasa',

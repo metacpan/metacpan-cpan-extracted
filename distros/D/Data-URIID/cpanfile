@@ -5,7 +5,6 @@ requires "Carp" => "1.35";
 requires "DateTime::Format::ISO8601" => "0.08";
 requires "Digest::base" => "1.16";
 requires "Encode" => "3.19";
-requires "Future" => "0.47";
 requires "I18N::LangTags" => "0.45";
 requires "I18N::LangTags::Detect" => "1.08";
 requires "JSON" => "4.10";

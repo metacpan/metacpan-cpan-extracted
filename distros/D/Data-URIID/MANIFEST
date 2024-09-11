@@ -10,7 +10,6 @@ dist.ini
 lib/Data/URIID.pm
 lib/Data/URIID/Colour.pm
 lib/Data/URIID/Digest.pm
-lib/Data/URIID/Future.pm
 lib/Data/URIID/Result.pm
 lib/Data/URIID/Service.pm
 t/01_load.t

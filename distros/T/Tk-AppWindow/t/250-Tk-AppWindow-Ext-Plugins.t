@@ -4,8 +4,12 @@ use warnings;
 use lib './t/lib';
 use Test::More tests => 21;
 use Test::Tk;
+use Config;
+my $mswin = $Config{'osname'} eq 'MSWin32';
+
 $mwclass = 'Alternative::NameSpace';
 $delay = 1500;
+$delay = 4000 if $mswin;
 
 BEGIN { 
 	use_ok('Tk::AppWindow::Ext::Plugins');

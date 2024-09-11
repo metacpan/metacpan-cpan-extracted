@@ -1,5 +1,11 @@
 Revision history for Perl module DateTime::Locale::FromCLDR
 
+v0.2.3 2024-09-10T20:13:59+0900
+    - Improved documentation
+
+v0.2.2 2024-09-10T19:40:28+0900
+    - Added option for fatal exception
+
 v0.2.1 2024-09-10T13:50:59+0900
     - Correction of debugging function not removed in prior release
 

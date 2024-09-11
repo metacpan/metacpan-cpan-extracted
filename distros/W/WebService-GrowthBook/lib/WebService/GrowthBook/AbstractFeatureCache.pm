@@ -4,16 +4,16 @@ use warnings;
 no indirect;
 use Object::Pad;
 
-our $VERSION = '0.002';    ## VERSION
+our $VERSION = '0.003'; ## VERSION
 
 class WebService::GrowthBook::AbstractFeatureCache {
-    method get($key) {
+    method get($key){
         die "get not implemented";
     }
-    method set($key, $value, $ttl) {
+    method set($key, $value, $ttl){
         die "set not implemented";
     }
-    method clear() {
+    method clear(){
         die "clear not implemented";
     }
 };

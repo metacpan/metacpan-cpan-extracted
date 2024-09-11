@@ -15,6 +15,13 @@ no warnings qw( meta::experimental );
 
    is( $metaglob->basename, "get_package",
       '$metaglob->basename' );
+
+   $metaglob = meta::for_reference( \*meta );
+
+   ok( $metaglob->is_glob, '$metaglob for reference ->is_glob' );
+
+   is( $metaglob->basename, "meta",
+      '$metaglob from for_reference' );
 }
 
 # missing

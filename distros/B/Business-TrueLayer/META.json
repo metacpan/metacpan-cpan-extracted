@@ -67,6 +67,6 @@
          "url" : "https://github.com/payprop/business-truelayer"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

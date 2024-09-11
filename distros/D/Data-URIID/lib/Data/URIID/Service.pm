@@ -23,9 +23,8 @@ use DateTime::Format::ISO8601;
 
 use Data::URIID::Result;
 use Data::URIID::Colour;
-use Data::URIID::Future;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my @musicbrainz_wikidata_relations = qw(P434 P435 P436 P966 P982 P1004 P1330 P1407 P4404 P5813 P6423 P8052);
 
@@ -367,6 +366,116 @@ sub _own_well_known {
                 video/webm
                 )),
         },
+        'small-identifier' => {
+            map {$_->{sid} => {
+                    ids => {
+                        uuid => $_->{uuid},
+                    },
+                    attributes => {
+                        displayname => {'*' => $_->{name}},
+                    },
+                }} (
+                {uuid => 'ddd60c5c-2934-404f-8f2d-fcb4da88b633', sid => 1, name => 'also-shares-identifier'},
+                {uuid => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', sid => 2, name => 'uuid'},
+                {uuid => 'bfae7574-3dae-425d-89b1-9c087c140c23', sid => 3, name => 'tagname'},
+                {uuid => '7f265548-81dc-4280-9550-1bd0aa4bf748', sid => 4, name => 'has-type'},
+                {uuid => 'a8d1637d-af19-49e9-9ef8-6bc1fbcf6439', sid => 5, name => 'uri'},
+                {uuid => 'd08dc905-bbf6-4183-b219-67723c3c8374', sid => 6, name => 'oid'},
+                {uuid => 'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1', sid => 8, name => 'language-tag-identifier'},
+                {uuid => 'ce7aae1e-a210-4214-926a-0ebca56d77e3', sid => 9, name => 'wikidata-identifier'},
+                {uuid => '923b43ae-a50e-4db3-8655-ed931d0dd6d4', sid => 10, name => 'specialises'},
+                {uuid => 'eacbf914-52cf-4192-a42c-8ecd27c85ee1', sid => 11, name => 'unicode-string'},
+                {uuid => '928d02b0-7143-4ec9-b5ac-9554f02d3fb1', sid => 12, name => 'integer'},
+                {uuid => 'dea3782c-6bcb-4ce9-8a39-f8dab399d75d', sid => 13, name => 'unsigned-integer'},
+                {uuid => '6ba648c2-3657-47c2-8541-9b73c3a9b2b4', sid => 16, name => 'default-context'},
+                {uuid => '52a516d0-25d8-47c7-a6ba-80983e576c54', sid => 17, name => 'proto-file'},
+                {uuid => '1cd4a6c6-0d7c-48d1-81e7-4e8d41fdb45d', sid => 18, name => 'final-file-size'},
+                {uuid => '6085f87e-4797-4bb2-b23d-85ff7edc1da0', sid => 19, name => 'text-fragment'},
+                {uuid => '4c9656eb-c130-42b7-9348-a1fee3f42050', sid => 20, name => 'also-list-contains-also'},
+                {uuid => '298ef373-9731-491d-824d-b2836250e865', sid => 21, name => 'proto-message'},
+                {uuid => '7be4d8c7-6a75-44cc-94f7-c87433307b26', sid => 22, name => 'proto-entity'},
+                {uuid => '65bb36f2-b558-48af-8512-bca9150cca85', sid => 23, name => 'proxy-type'},
+                {uuid => 'a1c478b5-0a85-4b5b-96da-d250db14a67c', sid => 24, name => 'flagged-as'},
+                {uuid => '59cfe520-ba32-48cc-b654-74f7a05779db', sid => 25, name => 'marked-as'},
+                {uuid => '2bffc55d-7380-454e-bd53-c5acd525d692', sid => 26, name => 'roaraudio-error-number'},
+                {uuid => 'f87a38cb-fd13-4e15-866c-e49901adbec5', sid => 27, name => 'small-identifier'},
+                {uuid => '448c50a8-c847-4bc7-856e-0db5fea8f23b', sid => 32, name => 'final-file-encoding'},
+                {uuid => '79385945-0963-44aa-880a-bca4a42e9002', sid => 33, name => 'final-file-hash'},
+                {uuid => '3fde5688-6e34-45e9-8f33-68f079b152c8', sid => 34, name => 'SEEK_SET'},
+                {uuid => 'bc598c52-642e-465b-b079-e9253cd6f190', sid => 35, name => 'SEEK_CUR'},
+                {uuid => '06aff30f-70e8-48b4-8b20-9194d22fc460', sid => 36, name => 'SEEK_END'},
+                {uuid => '59a5691a-6a19-4051-bc26-8db82c019df3', sid => 37, name => 'inode'},
+                {uuid => 'ae8ec1de-38ec-4c58-bbd7-7ff43e1100fc', sid => 38, name => 'in-reply-to'},
+                {uuid => '8a31868b-0a26-42e0-ac54-819a9ed9dcab', sid => 39, name => 'in-response-to'},
+                {uuid => 'ffa893a2-9a0e-4013-96b4-307e2bca15b9', sid => 40, name => 'has-message-body'},
+                {uuid => 'dd8e13d3-4b0f-5698-9afa-acf037584b20', sid => 48, name => 'zero'},
+                {uuid => 'bd27669b-201e-51ed-9eb8-774ba7fef7ad', sid => 49, name => 'one'},
+                {uuid => '73415b5a-31fb-5b5a-bb82-8ea5eb3b12f7', sid => 50, name => 'two'},
+                {uuid => 'e425be57-58cb-43fb-ba85-c1a55a6a2ebd', sid => 52, name => 'ancestor-of'},
+                {uuid => 'cdee05f4-91ec-4809-a157-8c58dcb23715', sid => 53, name => 'descendant-of'},
+                {uuid => '26bda7b1-4069-4003-925c-2dbf47833a01', sid => 54, name => 'sibling-of'},
+                {uuid => 'a75f9010-9db3-4d78-bd78-0dd528d6b55d', sid => 55, name => 'see-also'},
+                {uuid => 'd1963bfc-0f79-4b1a-a95a-b05c07a63c2a', sid => 56, name => 'also-at'},
+                {uuid => 'c6e83600-fd96-4b71-b216-21f0c4d73ca6', sid => 57, name => 'also-shares-colour'},
+                {uuid => 'a942ba41-20e6-475e-a2c1-ce891f4ac920', sid => 58, name => 'also-identifies-as'},
+                {uuid => 'ac14b422-e7eb-4e5b-bccd-ad5a65aeab96', sid => 59, name => 'also-is-identified-as'},
+                {uuid => '3c2c155f-a4a0-49f3-bdaf-7f61d25c6b8c', sid => 60, name => 'Earth'},
+                {uuid => 'fade296d-c34f-4ded-abd5-d9adaf37c284', sid => 61, name => 'black'},
+                {uuid => '1a2c23fa-2321-47ce-bf4f-5f08934502de', sid => 62, name => 'white'},
+                {uuid => 'f9bb5cd8-d8e6-4f29-805f-cc6f2b74802d', sid => 63, name => 'grey'},
+                {uuid => '838eede5-3f93-46a9-8e10-75165d10caa1', sid => 80, name => 'cat'},
+                {uuid => '252314f9-1467-48bf-80fd-f8b74036189f', sid => 81, name => 'dog'},
+                {uuid => '571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1', sid => 82, name => 'lion'},
+                {uuid => '36297a27-0673-44ad-b2d8-0e4e97a9022d', sid => 83, name => 'tiger'},
+                {uuid => '5d006ca0-c27b-4529-b051-ac39c784d5ee', sid => 84, name => 'fox'},
+                {uuid => '914b3a09-4e01-4afc-a065-513c199b6c24', sid => 85, name => 'squirrel'},
+                {uuid => '95f1b56e-c576-4f32-ac9b-bfdd397c36a6', sid => 86, name => 'wolf'},
+                {uuid => 'dcf8f4f0-c15e-44bd-ad76-0d483079db16', sid => 87, name => 'human'},
+                {uuid => 'f901e5e0-e217-41c8-b752-f7287af6e6c3', sid => 89, name => 'mammal'},
+                {uuid => '7ed4160e-06d6-44a2-afe8-457e2228304d', sid => 90, name => 'vertebrate'},
+                {uuid => '0510390c-9604-4362-b603-ea09e48de7b7', sid => 91, name => 'animal'},
+                {uuid => 'bccdaf71-0c82-422e-af44-bb8396bf90ed', sid => 92, name => 'plant'},
+                {uuid => 'a0b8122e-d11b-4b78-a266-0bb90d1c1cbe', sid => 93, name => 'fungus'},
+                {uuid => '3e92ac2d-f8fe-48bf-acd7-8505d23d07ab', sid => 94, name => 'organism'},
+                {uuid => '115c1bcf-02cd-4a57-bd02-1d9f1ea8dd01', sid => 95, name => 'any-taxon'},
+                {uuid => 'd2526d8b-25fa-4584-806b-67277c01c0db', sid => 96, name => 'inode-number'},
+                {uuid => 'cd5bfb11-620b-4cce-92bd-85b7d010f070', sid => 97, name => 'also-on-filesystem'},
+                {uuid => '63c1da19-0dd6-4181-b3fa-742b9ceb2903', sid => 98, name => 'filesystem'},
+                {uuid => '5ecb4562-dad7-431d-94a6-d301dcea8d37', sid => 99, name => 'parent'},
+                {uuid => '1a9215b2-ad06-4f4f-a1e7-4cbb908f7c7c', sid => 100, name => 'child'},
+                {uuid => 'a7cfbcb0-45e2-46b9-8f60-646ab2c18b0b', sid => 101, name => 'displaycolour'},
+                {uuid => 'd926eb95-6984-415f-8892-233c13491931', sid => 103, name => 'tag-links'},
+                {uuid => '2c07ddc1-bdb8-435a-9614-4e6782a5101f', sid => 104, name => 'tag-linked-by'},
+                {uuid => '4efce01d-411e-5e9c-9ed9-640ecde31d1d', sid => 105, name => 'parallel'},
+                {uuid => '9aad6c99-67cd-45fd-a8a6-760d863ce9b5', sid => 106, name => 'also-where'},
+                {uuid => '8efbc13b-47e5-4d92-a960-bd9a2efa9ccb', sid => 107, name => 'generated-by'},
+                {uuid => '83e3acbb-eb8d-4dfb-8f2f-ae81cc436d4b', sid => 109, name => 'batch'},
+                {uuid => 'b17f36c6-c397-4e84-bd32-1eccb3f00671', sid => 110, name => 'set'},
+                {uuid => 'aa9d311a-89b7-44cc-a356-c3fc93dfa951', sid => 111, name => 'category'},
+                {uuid => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a', sid => 112, name => 'chat-0-word-identifier'},
+                {uuid => 'c9ec3bea-558e-4992-9b76-91f128b6cf29', sid => 119, name => 'red'},
+                {uuid => 'c0e957d0-b5cf-4e53-8e8a-ff0f5f2f3f03', sid => 120, name => 'green'},
+                {uuid => '3dcef9a3-2ecc-482d-a98b-afffbc2f64b9', sid => 121, name => 'blue'},
+                {uuid => 'abcbf48d-c302-4be1-8c5c-a8de4471bcbb', sid => 122, name => 'cyan'},
+                {uuid => 'a30d070d-9909-40d4-a33a-474c89e5cd45', sid => 123, name => 'magenta'},
+                {uuid => '2892c143-2ae7-48f1-95f4-279e059e7fc3', sid => 124, name => 'yellow'},
+                {uuid => '5c41829f-5062-4868-9c31-2ec98414c53d', sid => 125, name => 'orange'},
+                {uuid => 'c90acb33-b8ea-4f55-bd86-beb7fa5cf80a', sid => 126, name => 'savannah'},
+                {uuid => 'caf11e36-d401-4521-8f10-f6b36125415c', sid => 132, name => 'icon'},
+                {uuid => 'e7330249-53b8-4dab-aa43-b5bfa331a8e5', sid => 133, name => 'thumbnail'},
+                {uuid => '2ec4a6b0-e6bf-40cd-96a2-490cbc8d6c4b', sid => 134, name => 'empty-set'},
+                {uuid => 'be6d8e00-a6c1-5c44-8ffc-f7393e14aa23', sid => 144, name => 'three'},
+                {uuid => '79422b2c-b6f6-547f-949f-0cba44fa69b7', sid => 145, name => 'four'},
+                {uuid => '7cb67873-33bc-4a93-b53f-072ce96c6f1a', sid => 159, name => 'hrair'},
+                {uuid => '82d529be-0f00-4b4f-a43f-4a22de5f5312', sid => 160, name => 'gtin'},
+                {uuid => 'e8c156be-4fe7-4b13-b4fa-e207213caef8', sid => 161, name => 'subject-type'},
+                {uuid => 'c44ee482-0fb7-421b-9aad-a6c8f099a4b6', sid => 176, name => 'Universe'},
+                {uuid => '0ac40a25-d20f-42ed-ae1c-64e62a56d673', sid => 177, name => 'Observable universe'},
+                {uuid => '8a1cb2d6-df2f-46db-89c3-a75168adebf6', sid => 189, name => 'generator'},
+                {uuid => '3c9f40b4-2b98-44ce-b4dc-97649eb528ae', sid => 190, name => 'using-namespace'},
+                {uuid => 'bc2d2e7c-8aa4-420e-ac07-59c422034de9', sid => 191, name => 'for-type'},
+            ),
+        },
     );
 
     foreach my $id (keys %{$own_well_known{'wikidata-identifier'}}) {
@@ -374,13 +483,79 @@ sub _own_well_known {
         $own_well_known{uuid}{$uuid} = $own_well_known{'wikidata-identifier'}{$id};
     }
 
-    {
-        my $uuids = $own_well_known{uuid} //= {};
-        foreach my $id_type (keys %own_well_known) {
-            foreach my $entry (values %{$own_well_known{$id_type}}) {
-                next unless defined $entry->{ids};
-                next unless defined $entry->{ids}{uuid};
-                $uuids->{$entry->{ids}{uuid}} //= $entry;
+    my @colours = (
+        # Abstract colours:
+        [black    => 'fade296d-c34f-4ded-abd5-d9adaf37c284' => '#000000'],
+        [white    => '1a2c23fa-2321-47ce-bf4f-5f08934502de' => '#ffffff'],
+        [red      => 'c9ec3bea-558e-4992-9b76-91f128b6cf29' => '#ff0000'],
+        [green    => 'c0e957d0-b5cf-4e53-8e8a-ff0f5f2f3f03' => '#008000'],
+        [blue     => '3dcef9a3-2ecc-482d-a98b-afffbc2f64b9' => '#0000ff'],
+        [cyan     => 'abcbf48d-c302-4be1-8c5c-a8de4471bcbb' => '#00ffff'],
+        [magenta  => 'a30d070d-9909-40d4-a33a-474c89e5cd45' => '#ff00ff'],
+        [yellow   => '2892c143-2ae7-48f1-95f4-279e059e7fc3' => '#ffff00'],
+        [grey     => 'f9bb5cd8-d8e6-4f29-805f-cc6f2b74802d' => '#808080'],
+        [orange   => '5c41829f-5062-4868-9c31-2ec98414c53d' => '#ff8000'],
+        [savannah => 'c90acb33-b8ea-4f55-bd86-beb7fa5cf80a' => '#decc9c'],
+
+        # VGA colours:
+        [black    => '32f5e924-0ddb-4427-ad81-2d099b590c68' => '#000000'],
+        [maroon   => '2aeedebd-2814-41b3-9cfd-f992e9a60827' => '#800000'],
+        [green    => 'd045d86c-3437-4b42-aa77-2d7ac6ff1656' => '#008000'],
+        [olive    => 'a64b447b-3eb3-4a71-92fe-f4399e845892' => '#808000'],
+        [navy     => 'f8ace5ee-45a9-4e46-8324-095b6ab452b5' => '#000080'],
+        [purple   => '7cd1228f-b55b-4b86-a057-f620e7934f7f' => '#800080'],
+        [teal     => 'c7d4cc0e-dd3b-465c-b1ed-6fea3d424b9f' => '#008080'],
+        [gray     => 'aa82b49e-12c2-41a4-9fd8-800957be9161' => '#808080'],
+        [silver   => 'cdb01cbf-0eca-4aad-b732-caf55abc7566' => '#C0C0C0'],
+        [red      => '6d62509a-aac5-412b-953b-e002867090ef' => '#FF0000'],
+        [lime     => '18b0ad77-95a1-4ddc-8a3e-52fb1fca2ead' => '#00FF00'],
+        [yellow   => 'b85fca40-ab8e-4ab3-b582-43cb0979b994' => '#FFFF00'],
+        [blue     => '7f2e2d6a-ec70-417b-8418-a5d67c05b7e0' => '#0000FF'],
+        [fuchsia  => '465087e0-a8d0-4a42-8f05-a1aea0d53385' => '#FF00FF'],
+        [aqua     => '4feff8a2-dbe4-447b-b052-db333b9ebee3' => '#00FFFF'],
+        [white    => 'a671d5f4-5a1d-498d-b3ec-52b92f15218e' => '#FFFFFF'],
+    );
+
+    foreach my $colour (@colours) {
+        my ($name, $uuid, $displaycolour) = @{$colour};
+        my $e = ($own_well_known{uuid}{$uuid} //= {})->{attributes} //= {};
+        $e->{displayname} //= {};
+        $e->{displayname}{'*'} //= $name;
+        $e->{displaycolour} //= {};
+        $e->{displaycolour}{'*'} //= Data::URIID::Colour->new(rgb => $displaycolour);
+    }
+
+    # Add an entry for each colour used.
+    foreach my $type (keys %own_well_known) {
+        foreach my $entry (values %{$own_well_known{$type}}) {
+            my $dpca = $entry->{attributes}{displaycolour} // next;
+            my $displaycolour = $dpca->{'*'} // next;
+            my $e = ($own_well_known{uuid}{$displaycolour->ise} //= {})->{attributes} //= {};
+            $e->{displaycolour} //= {};
+            $e->{displaycolour}{'*'} //= $displaycolour;
+        }
+    }
+
+    # Mix and match entries by identifiers to speed up lookups.
+    # This step must always be the last one.
+    foreach my $id_type_outer (keys %own_well_known) {
+        foreach my $src_id (keys %{$own_well_known{$id_type_outer}}) {
+            my $src     = $own_well_known{$id_type_outer}{$src_id};
+            my $s_ids   = $src->{ids} //= {};
+            my $s_attrs = $src->{attributes} //= {};
+
+            $s_ids->{$id_type_outer} = $src_id;
+
+            foreach my $id_type_inner (keys %{$s_ids}) {
+                my $dst = ($own_well_known{$id_type_inner} //= {})->{$s_ids->{$id_type_inner}} //= {};
+                if ($src != $dst) {
+                    my $d_ids   = $dst->{ids} //= {};
+                    my $d_attrs = $dst->{attributes} //= {};
+
+                    $s_ids->{$_}   //= $d_ids->{$_}   foreach keys %{$d_ids};
+                    $s_attrs->{$_} //= $d_attrs->{$_} foreach keys %{$d_attrs};
+                    $own_well_known{$id_type_inner}{$s_ids->{$id_type_inner}} = $src;
+                }
             }
         }
     }
@@ -492,48 +667,41 @@ sub _extra_lookup_services {
 
 # Private helper:
 sub _get_json {
-    my ($self, %opts) = @_;
+    my ($self, $url, %opts) = @_;
     my Data::URIID $extractor = $self->extractor;
-    my $f = $opts{options_provider} // Data::URIID::Future->done(\%opts);
 
-    $f = $f->then(sub {
-            %opts = (%opts, %{$_[0]});
+    if ( $self->setting('network_deny') ) {
+        return undef;
+    }
 
-            if ($opts{bail_out}) {
-                return undef;
+    if (defined(my $local_override = $opts{local_override})) {
+        if (defined(my $local_override_dir = $self->setting('local_override_dir'))) {
+            my ($path, @args) = @{$local_override};
+
+            if (all { defined } @args) {
+                my $data;
+
+                $path =~ s/%s/uri_escape_utf8(shift(@args))/ge;
+                $path = $local_override_dir.'/'.$path;
+
+                $data = $self->_get_json_file($path);
+                return $data if defined $data;
             }
+        }
+    }
 
-            if (defined(my $local_override = $opts{local_override})) {
-                if (defined(my $local_override_dir = $self->setting('local_override_dir'))) {
-                    my ($path, @args) = @{$local_override};
+    if (defined(my $query = $opts{query})) {
+        $url = ref($url) ? $url->clone : URI->new($url);
+        $url->query_form($url->query_form, %{$query});
+    }
 
-                    if (all { defined } @args) {
-                        my $data;
-
-                        $path =~ s/%s/uri_escape_utf8(shift(@args))/ge;
-                        $path = $local_override_dir.'/'.$path;
-
-                        $data = $self->_get_json_file($path);
-                        return $data if defined $data;
-                    }
-                }
-            }
-            return undef;
-        });
-
-    return Data::URIID::Future->get_json(elder => $f, extractor => $extractor, uri => sub {
-            if ($opts{bail_out}) {
-                return undef;
-            }
-
-            my $url = $opts{url};
-            if (defined(my $query = $opts{query})) {
-                $url = ref($url) ? $url->clone : URI->new($url);
-                $url->query_form($url->query_form, %{$query});
-            }
-
-            return $url;
-        });
+    # We cannot use decoded_content()'s charset decoding here as it's buggy for JSON response (at least in v6.18).
+    return eval {
+        my $msg = $extractor->_ua->get($url, 'Accept' => 'application/json');
+        return undef unless $msg->is_success;
+        my $val = $msg->decoded_content(ref => 1, charset => 'none');
+        from_json(decode($msg->content_charset, $$val));
+    };
 }
 
 # Private helper:
@@ -557,6 +725,8 @@ sub _get_uriid_decompiled_types_json {
             'uri'                   => {alias_for => 'a8d1637d-af19-49e9-9ef8-6bc1fbcf6439'},
             'uuid'                  => {alias_for => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31'},
             'wikidata-identifier'   => {alias_for => 'ce7aae1e-a210-4214-926a-0ebca56d77e3'},
+            'gtin'                  => {alias_for => '82d529be-0f00-4b4f-a43f-4a22de5f5312'},
+            'sid'                   => {alias_for => 'f87a38cb-fd13-4e15-866c-e49901adbec5'},
         }};
     return state $decompiled = do {{
             forward => $json,
@@ -615,7 +785,7 @@ sub _offline_lookup__Data__URIID {
         my %res;
         $res{id} = \%ids if scalar keys %ids;
         $res{attributes} = \%attr if scalar keys %attr;
-        return Data::URIID::Future->done(\%res);
+        return \%res;
     }
 }
 
@@ -632,15 +802,14 @@ sub _online_lookup__factgrid {
 sub _online_lookup__wikibase {
     my ($self, $result, $config) = @_;
     my $id = eval {$result->id($config->{type})};
-    my $f;
 
-    if (defined $id) {
-        $f = Data::URIID::Future->done($id);
-    } else {
-        $f = $self->_online_lookup__wikibase__stage_0($result, $config);
+    unless (defined $id) {
+        $id = $self->_online_lookup__wikibase__stage_0($result, $config);
     }
 
-    return $self->_online_lookup__wikibase__stage_1($result, $f, $config);
+    if (defined $id) {
+        return $self->_online_lookup__wikibase__stage_1($result, $id, $config);
+    }
 
     return undef;
 }
@@ -679,71 +848,59 @@ sub _online_lookup__wikibase__stage_0 {
 
     {
         my $q = sprintf('SELECT * WHERE { { %s } } LIMIT 1', join('} UNION {', @ids));
-        return $self->_get_json(url => $config->{endpoint}{sparql}, query => {format => 'json', query => $q})->then(sub {
-                my ($res) = @_;
-                my $item = eval {$res->{results}{bindings}[0]{item}};
-                return undef unless $item;
-                return undef unless ($item->{type} // '') eq 'uri';
-                if (($item->{value} // '') =~ m#^\Q$config->{prefix}\E([QP][1-9][0-9]*)$#) {
-                    return $1;
-                }
-                die 'No ID';
-            });
+        my $res = $self->_get_json($config->{endpoint}{sparql}, query => {format => 'json', query => $q});
+        my $item = eval {$res->{results}{bindings}[0]{item}};
+        return undef unless $item;
+        return undef unless ($item->{type} // '') eq 'uri';
+        if (($item->{value} // '') =~ m#^\Q$config->{prefix}\E([QP][1-9][0-9]*)$#) {
+            return $1;
+        }
     }
+
+    return undef;
 }
 
 sub _online_lookup__wikibase__stage_1 {
-    my ($self, $result, $f, $config) = @_;
-    my $id;
-    $f = $f->then(sub {
-            ($id) = @_;
-            return {bail_out => 1} unless defined($id) && length($id);
-            return {
-                url => sprintf($config->{endpoint}{entitydata}, $id),
-                local_override => ['%s.json', $id],
-            };
-        });
-    return $self->_get_json(options_provider => $f)->then(sub {
-            my ($data) = @_;
-            my %ids = ($config->{type} => $id);
-            my %attr;
-            my %res = (id => \%ids, attributes => \%attr);
+    my ($self, $result, $id, $config) = @_;
+    my %ids = ($config->{type} => $id);
+    my %attr;
+    my %res = (id => \%ids, attributes => \%attr);
+    my $data = $self->_get_json(sprintf($config->{endpoint}{entitydata}, $id), local_override => ['%s.json', $id]);
 
-            $data = $data->{entities}{$id};
+    $data = $data->{entities}{$id};
 
-            $attr{displayname} = {map {$_ => $data->{labels}{$_}{value}}       keys %{$data->{labels}}};
-            $attr{description} = {map {$_ => $data->{descriptions}{$_}{value}} keys %{$data->{descriptions}}};
+    $attr{displayname} = {map {$_ => $data->{labels}{$_}{value}}       keys %{$data->{labels}}};
+    $attr{description} = {map {$_ => $data->{descriptions}{$_}{value}} keys %{$data->{descriptions}}};
 
-            $res{wikidata_sitelinks} = $data->{sitelinks};
-            foreach my $property (keys %{$config->{idmap}}) {
-                foreach my $entry (@{$data->{claims}{$property} // []}) {
-                    $ids{$config->{idmap}{$property}} = $entry->{mainsnak}{datavalue}{value};
+    $res{wikidata_sitelinks} = $data->{sitelinks};
+    foreach my $property (keys %{$config->{idmap}}) {
+        foreach my $entry (@{$data->{claims}{$property} // []}) {
+            $ids{$config->{idmap}{$property}} = $entry->{mainsnak}{datavalue}{value};
+        }
+    }
+
+    foreach my $special (@{$config->{special_ids}}) {
+        foreach my $entry (@{$data->{claims}{$special->{property}} // []}) {
+            $ids{$special->{type}} //= $special->{from_service}->($entry->{mainsnak}{datavalue}{value});
+        }
+    }
+
+    foreach my $attribute (@{$config->{attributes}}) {
+        foreach my $entry (@{$data->{claims}{$attribute->{property}} // []}) {
+            if (defined $attribute->{from_service}) {
+                my %res = $attribute->{from_service}->($entry->{mainsnak}{datavalue}{value}, $config);
+                $attr{$_} //= $res{$_} foreach keys %res;
+            } elsif (defined $attribute->{list_value}) {
+                my %res = $attribute->{list_value}->($entry->{mainsnak}{datavalue}{value}, $config);
+                foreach my $key (keys %res) {
+                    $attr{$key} //= [];
+                    push(@{$attr{$key}}, @{$res{$key}});
                 }
             }
+        }
+    }
 
-            foreach my $special (@{$config->{special_ids}}) {
-                foreach my $entry (@{$data->{claims}{$special->{property}} // []}) {
-                    $ids{$special->{type}} //= $special->{from_service}->($entry->{mainsnak}{datavalue}{value});
-                }
-            }
-
-            foreach my $attribute (@{$config->{attributes}}) {
-                foreach my $entry (@{$data->{claims}{$attribute->{property}} // []}) {
-                    if (defined $attribute->{from_service}) {
-                        my %res = $attribute->{from_service}->($entry->{mainsnak}{datavalue}{value}, $config);
-                        $attr{$_} //= $res{$_} foreach keys %res;
-                    } elsif (defined $attribute->{list_value}) {
-                        my %res = $attribute->{list_value}->($entry->{mainsnak}{datavalue}{value}, $config);
-                        foreach my $key (keys %res) {
-                            $attr{$key} //= [];
-                            push(@{$attr{$key}}, @{$res{$key}});
-                        }
-                    }
-                }
-            }
-
-            return \%res;
-        });
+    return \%res;
 }
 
 sub _online_lookup__wikibase__from_service__datetime {
@@ -784,9 +941,11 @@ sub _online_lookup__wikibase__from_service__coordinate {
 
 sub _online_lookup__wikimedia_commons {
     my ($self, $result) = @_;
-
-    return $self->_get_json(
-        url => 'https://commons.wikimedia.org/w/api.php',
+    my $res = {
+        'attributes' => {},
+    };
+    my $json = $self->_get_json(
+        'https://commons.wikimedia.org/w/api.php',
         query => {
             action      => 'query',
             titles      => $result->id,
@@ -794,82 +953,67 @@ sub _online_lookup__wikimedia_commons {
             iiprop      => 'url|mime|size|sha1|canonicaltitle',
             iiurlwidth  => 240, # get thumbnail
             format      => 'json'
-        }
-    )->then( sub {
-        my ($json) = @_;
-        my $res = {
-            'attributes' => {},
-        };
+        });
 
-        foreach my $page_id ( keys(%{ $json->{query}->{pages} }) ) { # only one item
-            my $page = $json->{query}->{pages}->{$page_id};
-            my $imageinfo = $page->{imageinfo}->[0];
+    foreach my $page_id ( keys(%{ $json->{query}->{pages} }) ) { # only one item
+        my $page = $json->{query}->{pages}->{$page_id};
+        my $imageinfo = $page->{imageinfo}->[0];
 
-            $res->{attributes}->{displayname}       = { '*' => $imageinfo->{canonicaltitle} };
-            $res->{attributes}->{thumbnail}         = { '*' => URI->new($imageinfo->{thumburl}) };
-            $res->{attributes}->{final_file_size}   = { '*' => int($imageinfo->{size}) };
-            $res->{attributes}->{media_subtype}     = { '*' => $imageinfo->{mime} };
-            $res->{digest}                          = { 'sha-1-160' => $imageinfo->{sha1} };
-        }
+        $res->{attributes}->{displayname}       = { '*' => $imageinfo->{canonicaltitle} };
+        $res->{attributes}->{thumbnail}         = { '*' => URI->new($imageinfo->{thumburl}) };
+        $res->{attributes}->{final_file_size}   = { '*' => int($imageinfo->{size}) };
+        $res->{attributes}->{media_subtype}     = { '*' => $imageinfo->{mime} };
+        $res->{digest}                          = { 'sha-1-160' => $imageinfo->{sha1} };
+    }
 
-        return $res;
-    });
+    return $res;
 }
 
 sub _online_lookup__fellig {
     my ($self, $result) = @_;
     my Data::URIID $extractor = $self->extractor;
-    my $f = Data::URIID::Future->new;
-    my $h = $f;
 
     foreach my $type (@fellig_types) {
         my $id = eval {$result->id($type, _no_convert => 1)} // next;
+        my $json = $self->_get_json(sprintf('https://api.fellig.org/v0/overview/%s/%s', $type, uri_escape($id)), local_override => ['overview/%s/%s.json', $type, $id]) // next;
 
-        $h = $h->else(sub {
-                $self->_get_json(url => sprintf('https://api.fellig.org/v0/overview/%s/%s', $type, uri_escape($id)), local_override => ['overview/%s/%s.json', $type, $id])->get // die
-            });
-    }
+        foreach my $idx (@{$json->{main_result}}) {
+            my $tag = $json->{tags}[$idx];
+            my %ids;
+            my %attr;
+            my %res = (id => \%ids, attributes => \%attr, digest => $tag->{unvaried}{'final-file-hash'});
 
-    $h = $h->then(sub {
-            my ($json) = @_;
-            foreach my $idx (@{$json->{main_result}}) {
-                my $tag = $json->{tags}[$idx];
-                my %ids;
-                my %attr;
-                my %res = (id => \%ids, attributes => \%attr, digest => $tag->{unvaried}{'final-file-hash'});
-
-                foreach my $class (qw(unvaried varied)) {
-                    # This is a trusted service, so we only check for the id types to be valid ISE
-                    # but accept them all.
-                    foreach my $relation ('ids', 'tag-linked-by') {
-                        foreach my $idtype (keys %{$tag->{$class}{$relation}//{}}) {
-                            if ($extractor->is_ise($idtype)) {
-                                $ids{$idtype} //= $tag->{$class}{$relation}{$idtype}[0];
-                            }
-                        }
-                    }
-
-                    $attr{displayname}    = {'*' => $tag->{$class}{displayname}} if defined $tag->{$class}{displayname};
-                    $attr{icon_text}      = {'*' => $tag->{$class}{icontext}} if defined $tag->{$class}{icontext};
-                    $attr{displaycolour}  = {'*' => Data::URIID::Colour->new(rgb => $tag->{$class}{displaycolour})} if defined $tag->{$class}{displaycolour};
-                    $attr{final_file_size}= {'*' => $tag->{$class}{'final-file-size'}} if defined $tag->{$class}{'final-file-size'};
-                    $attr{icon}           = {'*' => URI->new($tag->{$class}{icon})} if defined $tag->{$class}{icon};
-
-                    if (defined $tag->{$class}{'final-file-encoding'}) {
-                        if (defined(my $wk = _own_well_known()->{uuid}{$tag->{$class}{'final-file-encoding'}})) {
-                            if (defined(my $media_subtype = $wk->{ids}{'media-subtype-identifier'})) {
-                                $attr{media_subtype} = $media_subtype;
-                            }
+            foreach my $class (qw(unvaried varied)) {
+                # This is a trusted service, so we only check for the id types to be valid ISE
+                # but accept them all.
+                foreach my $relation ('ids', 'tag-linked-by') {
+                    foreach my $idtype (keys %{$tag->{$class}{$relation}//{}}) {
+                        if ($extractor->is_ise($idtype)) {
+                            $ids{$idtype} //= $tag->{$class}{$relation}{$idtype}[0];
                         }
                     }
                 }
 
-                return \%res;
-            }
-        });
+                $attr{displayname}    = {'*' => $tag->{$class}{displayname}} if defined $tag->{$class}{displayname};
+                $attr{icon_text}      = {'*' => $tag->{$class}{icontext}} if defined $tag->{$class}{icontext};
+                $attr{displaycolour}  = {'*' => Data::URIID::Colour->new(rgb => $tag->{$class}{displaycolour})} if defined $tag->{$class}{displaycolour};
+                $attr{final_file_size}= {'*' => $tag->{$class}{'final-file-size'}} if defined $tag->{$class}{'final-file-size'};
+                $attr{icon}           = {'*' => URI->new($tag->{$class}{icon})} if defined $tag->{$class}{icon};
 
-    $f->die('rock it!');
-    return $h;
+                if (defined $tag->{$class}{'final-file-encoding'}) {
+                    if (defined(my $wk = _own_well_known()->{uuid}{$tag->{$class}{'final-file-encoding'}})) {
+                        if (defined(my $media_subtype = $wk->{ids}{'media-subtype-identifier'})) {
+                            $attr{media_subtype} = $media_subtype;
+                        }
+                    }
+                }
+            }
+
+            return \%res;
+        }
+    }
+
+    return undef;
 }
 
 sub _online_lookup__noembed_com {
@@ -877,16 +1021,14 @@ sub _online_lookup__noembed_com {
 
     foreach my $service (qw(youtube)) {
         my $url = eval {$result->url(service => $service, action => 'render')} // eval {$result->url($service, action => 'embed')} // next;
-        return $self->_get_json(url => 'https://noembed.com/embed', query => {url => $url})->then(sub {
-                my ($json) = @_;
-                my %attr;
-                my %res = (attributes => \%attr);
+        my $json = $self->_get_json('https://noembed.com/embed', query => {url => $url}) // next;
+        my %attr;
+        my %res = (attributes => \%attr);
 
-                $attr{displayname} = {'*' => $json->{title}} if defined $json->{title};
-                $attr{thumbnail}   = {'*' => URI->new($json->{thumbnail_url})} if defined $json->{thumbnail_url};
+        $attr{displayname} = {'*' => $json->{title}} if defined $json->{title};
+        $attr{thumbnail}   = {'*' => URI->new($json->{thumbnail_url})} if defined $json->{thumbnail_url};
 
-                return \%res;
-            });
+        return \%res;
     }
 
     return undef;
@@ -926,92 +1068,81 @@ sub _online_lookup__osm__handle {
 
 sub _online_lookup__osm {
     my ($self, $result) = @_;
-    my @list;
 
     foreach my $type (qw(node way relation)) {
         my $id = eval {$result->id('osm-'.$type)} // next;
-        push(@list, $self->_get_json(url => sprintf('https://api.openstreetmap.org/api/0.6/%s/%s.json', $type, $id), local_override => ['%s/%s.json', $type, $id])->then(sub {
-                    my ($json) = @_;
-                    my $element = eval {$json->{elements}[0]} // return undef;
-                    return $self->_online_lookup__osm__handle($element);
-                }));
+        my $json = $self->_get_json(sprintf('https://api.openstreetmap.org/api/0.6/%s/%s.json', $type, $id), local_override => ['%s/%s.json', $type, $id]) // next;
+        my $element = eval {$json->{elements}[0]} // return undef;
+        return $self->_online_lookup__osm__handle($element);
     }
 
-    return Data::URIID::Future->combine(@list);
+    return undef;
 }
 
 sub _online_lookup__overpass {
     my ($self, $result) = @_;
     my $id = $result->id('wikidata-identifier');
-    return $self->_get_json(url => 'https://overpass-api.de/api/interpreter', query => {
+    my $json = $self->_get_json('https://overpass-api.de/api/interpreter', query => {
             data => sprintf("[out:json][timeout:25];\n(node[\"wikidata\"=\"%s\"];\nway[\"wikidata\"=\"%s\"];\nrelation[\"wikidata\"=\"%s\"];\n);\nout;",
                 $id, $id, $id,
             ),
-        })->then(sub {
-            my ($json) = @_;
-            my $element = eval {$json->{elements}[0]} // return undef;
-            my $res = $self->_online_lookup__osm__handle($element);
-            my $type = $element->{type} // '';
-            my $id_new = $element->{id} // '';
+        }) // return undef;
+    my $element = eval {$json->{elements}[0]} // return undef;
+    my $res = $self->_online_lookup__osm__handle($element);
+    my $type = $element->{type} // '';
+    my $id_new = $element->{id} // '';
 
-            if ($type eq 'node' || $type eq 'way' || $type eq 'relation') {
-                if ($id_new =~ Data::URIID::Result->RE_UINT) {
-                    $res->{id}->{'osm-'.$type} = $id_new;
-                }
-            }
+    if ($type eq 'node' || $type eq 'way' || $type eq 'relation') {
+        if ($id_new =~ Data::URIID::Result->RE_UINT) {
+            $res->{id}->{'osm-'.$type} = $id_new;
+        }
+    }
 
-            return $res;
-        });
+    return $res;
 }
 
 sub _online_lookup__xkcd {
     my ($self, $result, %opts) = @_;
     my $id = eval {$result->id('xkcd-num')};
-    return $self->_get_json(url => $opts{metadata_url} // $result->url(service => 'xkcd', action => 'metadata'), local_override => ['%s.json', $id])->then(sub {
-            my ($json) = @_;
-            my %ids;
-            my %attr;
-            my %res = (id => \%ids, attributes => \%attr);
+    my $json = $self->_get_json($opts{metadata_url} // $result->url(service => 'xkcd', action => 'metadata'), local_override => ['%s.json', $id]) // return undef;
+    my %ids;
+    my %attr;
+    my %res = (id => \%ids, attributes => \%attr);
 
-            $ids{'xkcd-num'} = int($json->{num}) if defined($json->{num}) && $json->{num} =~ Data::URIID::Result->RE_UINT;
-            $attr{displayname} = {'*' => $json->{title}} if defined($json->{title}) && length($json->{title});
+    $ids{'xkcd-num'} = int($json->{num}) if defined($json->{num}) && $json->{num} =~ Data::URIID::Result->RE_UINT;
+    $attr{displayname} = {'*' => $json->{title}} if defined($json->{title}) && length($json->{title});
 
-            return \%res;
-        });
+    return \%res;
 }
 
 sub _online_lookup__doi {
     my ($self, $result, %opts) = @_;
-    return $self->_get_json(url => $result->url(service => 'doi', action => 'metadata'))->then(sub {
-            my ($json) = @_;
-            my %attr;
-            my %res = (attributes => \%attr);
+    my $json = $self->_get_json($result->url(service => 'doi', action => 'metadata')) // return undef;
+    my %attr;
+    my %res = (attributes => \%attr);
 
-            $attr{displayname} = {'*' => $json->{title}} if defined($json->{title}) && length($json->{title});
+    $attr{displayname} = {'*' => $json->{title}} if defined($json->{title}) && length($json->{title});
 
-            return \%res;
-        });
+    return \%res;
 }
 
 sub _online_lookup__iconclass {
     my ($self, $result, %opts) = @_;
     my $id = $result->id('iconclass-identifier');
-    return $self->_get_json(url => $result->url(service => 'iconclass', action => 'metadata'), local_override => ['%s.jsonld', $id])->then(sub {
-            my ($json) = @_;
-            my $item = $json->{graph}[0] // return undef;
-            my %displayname;
-            my %res = (attributes => {displayname => \%displayname});
+    my $json = $self->_get_json($result->url(service => 'iconclass', action => 'metadata'), local_override => ['%s.jsonld', $id]) // return undef;
+    my $item = $json->{graph}[0] // return undef;
+    my %displayname;
+    my %res = (attributes => {displayname => \%displayname});
 
-            foreach my $key ('prefLabel', 'dc:subject') {
-                foreach my $entry (@{$item->{$key}}) {
-                    $displayname{$entry->{lang}} //= $entry->{value};
-                }
-            }
+    foreach my $key ('prefLabel', 'dc:subject') {
+        foreach my $entry (@{$item->{$key}}) {
+            $displayname{$entry->{lang}} //= $entry->{value};
+        }
+    }
 
-            $displayname{'*'} = $displayname{en} // $displayname{de};
+    $displayname{'*'} = $displayname{en} // $displayname{de};
 
-            return \%res;
-        });
+    return \%res;
 }
 
 1;
@@ -1028,7 +1159,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
@@ -1081,6 +1212,14 @@ The available settings depend on the service. This method may or may not die
 when an invalid setting or an invalid value is provided.
 
 Setting an invalid value may result in failures when this service is being used.
+
+=head3 Universally available settings
+
+=over
+
+=item C<network_deny>: Denies network access (i.e. online lookups) for this service.
+
+=back
 
 =head1 KNOWN/SUPPORTED SERVICES
 

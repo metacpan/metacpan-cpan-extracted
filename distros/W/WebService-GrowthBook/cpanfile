@@ -6,6 +6,8 @@ requires 'HTTP::Tiny';
 requires 'Log::Any';
 requires 'Syntax::Keyword::Try';
 requires 'Digest::MD5';
+requires 'Data::Compare';
+requires 'String::CamelCase';
 
 
 on test => sub {

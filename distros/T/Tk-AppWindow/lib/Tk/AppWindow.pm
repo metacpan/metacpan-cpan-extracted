@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.11";
+$VERSION="0.12";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -95,6 +95,14 @@ Specifies the list of extensions to be loaded.
 
 The following order matters for the buildup of menus and bars.
 Only available at create time.
+
+=item Name  : B<linkColor>
+
+=item Class : B<LinkColor>
+
+=item Switch: B<-linkcolor>
+
+Foreground color for links. Default value '#3030DF'.
 
 =item Switch: B<-logo>
 
@@ -208,6 +216,7 @@ sub Populate {
 	$self->bind('<Configure>', [$self, 'OnConfigure']);
 	$self->ConfigSpecs(
 		-initpaneldelay => ['PASSIVE', undef, undef, 500],
+		-linkcolor => ['PASSIVE', 'linkColor', 'LinkColor', '#3030DF'],
 		-logcall => ['CALLBACK', undef, undef, $logcall], 
 		-logerrorcall => ['CALLBACK', undef, undef, $logcall], 
 		-logwarningcall => ['CALLBACK', undef, undef, $logcall], 
@@ -747,12 +756,19 @@ sub geoCalls {
 	delete $self->{'cfid'};
 }
 
+sub geoDeleteCall {
+	my ($self, $panel) = @_;
+	delete $self->{GEOCALLS}->{$panel};
+}
+
 sub geoExclusive {
 	my $self = shift;
 	$self->{GEOEXCLUSIVE} = shift if @_;
 	return $self->{GEOEXCLUSIVE};
 }
 
+sub geoRemoveCall {
+}
 sub GetArgsRef { return $_[0]->{ARGS} }
 
 =item B<getArt>I<($icon, $size)>

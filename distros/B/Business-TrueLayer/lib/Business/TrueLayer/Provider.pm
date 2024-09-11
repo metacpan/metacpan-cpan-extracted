@@ -24,6 +24,8 @@ no warnings qw/ experimental::signatures experimental::postderef /;
 use Business::TrueLayer::Provider::Filter;
 use Business::TrueLayer::Provider::Scheme;
 
+with 'Business::TrueLayer::Types::Remitter';
+
 use namespace::autoclean;
 
 =head1 ATTRIBUTES

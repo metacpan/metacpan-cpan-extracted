@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Navigator - Navigate opened documents and files
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.08";
+$VERSION="0.12";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -38,7 +38,7 @@ multiple docoment interface that B<Navigator> communicates with.
 
 =item B<-treeiconsize>
 
-By default undefined. Sets and returns the icon size of icons
+By default undefined. Sets and returns the size of icons
 in the document tree.
 
 =back
@@ -78,7 +78,7 @@ sub Add {
 
 sub CreateDocumentList {
 	my $self = shift;
-	my $page = $self->extGet('NavigatorPanel')->addPage('Documents', 'document-open', undef, 'Document list');
+	my $page = $self->extGet('NavigatorPanel')->addPage('Documents', 'document-open', undef, 'Document list', 250);
 
 	my $dt = $page->DocumentTree(
 		-entryselect => ['SelectDocument', $self],

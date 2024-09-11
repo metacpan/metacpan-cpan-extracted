@@ -1,5 +1,13 @@
 Revision history for Tangence
 
+0.33    2024-09-10
+        [CHANGES]
+         * Updates for `meta` v0.007:
+            * use ->try_get_symbol instead of ->can_symbol
+            * use new ->set_subname on returned symbols, avoids awkward
+              Sub::Util hackery
+         * Requires `Struct::Dumb` v0.14 otherwise tests fail
+
 0.32    2024-01-06
         [CHANGES]
          * Quiet the meta::experimental warnings of meta 0.003_002

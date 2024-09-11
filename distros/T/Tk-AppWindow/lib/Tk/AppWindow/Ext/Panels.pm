@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Panels - manage the layout of your application
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.12";
 use Tk;
 require Tk::Adjuster;
 require Tk::Pane;
@@ -196,10 +196,6 @@ sub adjusterActive {
 	return $active; 
 }
 
-=item adjusterAssign
-
-=cut
-
 sub adjusterAssign {
 	my ($self , $name, $panel, $adjuster) = @_;
 	$self->{ADJUSTINFO}->{$name} = {
@@ -303,8 +299,20 @@ sub panelDelete {
 	delete $self->{PANELS}->{$name};
 	delete $self->{VISIBLE}->{$name};
 	my $opt = $self->panelOptName($name);
-	$self->configDelete($opt);
+	$self->configRemove($opt);
 	$self->menuRefresh;
+}
+
+
+=item B<panelGet>I<($name)>
+
+Returns the name of the assigned panel to $name
+
+=cut
+
+sub panelGet {
+	my ($self, $name) = @_;
+	return $self->{PANELS}->{$name};
 }
 
 =item B<panelHide>I<($panel)>

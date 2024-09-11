@@ -24,7 +24,15 @@ my $Payment = Business::TrueLayer::Payment->new(
                 "scheme_selection" => {
                     "type"               => "instant_only",
                     "allow_remitter_fee" => 0,
-                }
+                },
+                "remitter" => {
+                    "account_holder_name" => "John Sandbridge",
+                    "account_identifier" => {
+                        "type" => "sort_code_account_number",
+                        "sort_code" => "500000",
+                        "account_number" => "12345601"
+                    },
+                },
             },
             "beneficiary" => {
                 "type"                => "merchant_account",
@@ -67,6 +75,16 @@ isa_ok( $Payment->payment_method,'Business::TrueLayer::Payment::Method' );
 isa_ok(
     $Payment->payment_method->beneficiary,
     'Business::TrueLayer::Beneficiary'
+);
+
+isa_ok(
+    $Payment->payment_method->provider,
+    'Business::TrueLayer::Provider'
+);
+
+isa_ok(
+    $Payment->payment_method->provider->remitter,
+    'Business::TrueLayer::Remitter'
 );
 
 ok( ! $Payment->authorization_required,'! ->authorization_required' );

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Node;
-$ExtUtils::Builder::Node::VERSION = '0.011';
+$ExtUtils::Builder::Node::VERSION = '0.012';
 use strict;
 use warnings;
 
@@ -12,6 +12,7 @@ sub new {
 	croak('Attribute target is not defined') if not $args{target};
 	$args{actions} = [ map { $_->flatten } @{ $args{actions} || [] } ];
 	$args{dependencies} ||= [];
+	$args{type} ||= delete $args{phony} ? 'phony' : 'file';
 	return $class->SUPER::new(%args);
 }
 
@@ -30,14 +31,25 @@ sub dependencies {
 	return @{ $self->{dependencies} };
 }
 
+sub type {
+	my $self = shift;
+	return $self->{type};
+}
+
 sub phony {
 	my $self = shift;
-	return !!$self->{phony};
+	return $self->{type} eq 'phony';
 }
 
 sub mergeable {
 	my $self = shift;
-	return $self->{phony} && !@{ $self->{actions} };
+	return $self->{type} eq 'phony' && !@{ $self->{actions} };
+}
+
+sub newer_than {
+	my ($self, $mtime) = @_;
+	return 1 if $self->{type} eq 'phony';
+	return -d $self->{target} || (-e _ && $mtime <= -M _);
 }
 
 1;
@@ -56,13 +68,13 @@ ExtUtils::Builder::Node - An ExtUtils::Builder Node
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
  ExtUtils::Builder::Node->new(
      target       => $target_name,
-     dependencies => \@dependencies
+     dependencies => \@dependencies,
      actions      => \@actions,
  );
 
@@ -84,9 +96,15 @@ The (file)names of the dependencies of this node.
 
 A list of L<actions|ExtUtils::Builder::Action> for this node.
 
+=head2 type
+
+This must be one of C<file> or C<phony>. In the latter case the target will not be represented on the filesystem.
+
 =head2 phony
 
-If true this node is phony, meaning that it will not produce a file and therefore will be run unconditionally.
+B<Deprecated>.
+
+Instead, pass C<< type => 'phony' >>
 
 =head1 METHODS
 
@@ -98,6 +116,7 @@ This returns true if a node is mergeable, i.e. it's phony and has no actions.
 execute
 to_command
 to_code
+newer_than
 
 =head1 AUTHOR
 

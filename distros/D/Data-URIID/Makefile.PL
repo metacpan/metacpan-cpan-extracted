@@ -21,7 +21,6 @@ my %WriteMakefileArgs = (
     "DateTime::Format::ISO8601" => "0.08",
     "Digest::base" => "1.16",
     "Encode" => "3.19",
-    "Future" => "0.47",
     "I18N::LangTags" => "0.45",
     "I18N::LangTags::Detect" => "1.08",
     "JSON" => "4.10",
@@ -37,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.05",
+  "VERSION" => "v0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +48,6 @@ my %FallbackPrereqs = (
   "DateTime::Format::ISO8601" => "0.08",
   "Digest::base" => "1.16",
   "Encode" => "3.19",
-  "Future" => "0.47",
   "I18N::LangTags" => "0.45",
   "I18N::LangTags::Detect" => "1.08",
   "JSON" => "4.10",

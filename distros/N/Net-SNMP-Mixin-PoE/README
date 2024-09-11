@@ -1,0 +1,146 @@
+NAME
+
+    Net::SNMP::Mixin::PoE - mixin class for power over ethernet related
+    infos from the POWER-ETHERNET-MIB (RFC-3621)
+
+SYNOPSIS
+
+      use Net::SNMP;
+      use Net::SNMP::Mixin;
+    
+      my $session = Net::SNMP->session( -hostname => 'foo.bar.com' );
+    
+      $session->mixer('Net::SNMP::Mixin::PoE');
+      $session->init_mixins;
+      snmp_dispatcher();
+      $session->init_ok();
+      die $session->errors if $session->errors;
+    
+      my $poe_main_tbl = $session->get_poe_main_table;
+      foreach my $group (sort { $a <=> $b } keys %$poe_main_tbl) {
+        printf "PoE Group:   %d\n",          $group;
+        printf "OperStatus:  %d\n",          $poe_main_tbl->{$group}{operStatus};
+        printf "Power:       %-4d [Watt]\n", $poe_main_tbl->{$group}{power};
+        printf "Consumption: %-4d [Watt]\n", $poe_main_tbl->{$group}{consumption};
+        printf "Threshold:   %-4d [%%]\n",   $poe_main_tbl->{$group}{threshold};
+      }
+    
+      my $poe_port_tbl = $session->get_poe_port_table;
+      foreach my $group (sort { $a <=> $b } keys %$poe_port_tbl) {
+        foreach my $port (sort { $a <=> $b } keys %{$poe_port_tbl->{$group}}) {
+          my $adminEnable      = $poe_port_tbl->{$group}{$port}{adminEnable};
+          my $powerPairsCtrl   = $poe_port_tbl->{$group}{$port}{powerPairsCtrl};
+          my $powerPairs       = $poe_port_tbl->{$group}{$port}{powerPairs};
+          my $detectionStatus  = $poe_port_tbl->{$group}{$port}{detectionStatus};
+          my $priority         = $poe_port_tbl->{$group}{$port}{priority};
+          my $mpsAbsent        = $poe_port_tbl->{$group}{$port}{mpsAbsent};
+          my $type             = $poe_port_tbl->{$group}{$port}{type};
+          my $powerClass       = $poe_port_tbl->{$group}{$port}{powerClass};
+          my $invalidSignature = $poe_port_tbl->{$group}{$port}{invalidSignature};
+          my $powerDenied      = $poe_port_tbl->{$group}{$port}{powerDenied};
+          my $overload         = $poe_port_tbl->{$group}{$port}{overload};
+          my $short            = $poe_port_tbl->{$group}{$port}{short};
+    
+          printf "%d %d %d %d %d %d %d %d %s %d %d %d %d %d\n",                                               #
+            $group,     $port, $adminEnable, $powerPairsCtrl,   $powerPairs,  $detectionStatus, $priority,    #
+            $mpsAbsent, $type, $powerClass,  $invalidSignature, $powerDenied, $overload,        $short;
+        }
+      }
+
+DESCRIPTION
+
+    A mixin class for power over ethernet related infos from the
+    POWER-ETHERNET-MIB.
+
+MIXIN METHODS
+
+ OBJ->get_poe_port_table
+
+    Returns the PoE pethPsePortTable as a hash reference. The table is
+    indexed by the PoE pethMainPseGroupIndex and the portIdx within the
+    group:
+
+      {
+        group => INTEGER {
+          port => INTEGER {
+            adminEnable      => 1|2,
+            powerPairsCtrl   => 1|2,
+            powerPairs       => 1|2,
+            detectionStatus  => 0|1|2|3|4|5|6,
+            priority         => 1|2|3,
+            mpsAbsent        => COUNTER,
+            type             => STRING,
+            powerClass       => 0|1|2|3|4|5,
+            invalidSignature => COUNTER,
+            powerDenied      => COUNTER,
+            overload         => COUNTER,
+            short            => COUNTER,
+          }
+        }
+      }
+
+ OBJ->get_poe_main_table
+
+    Returns the PoE pethMainPseTable as a hash reference. The table is
+    indexed by the pethMainPseGroupIndex:
+
+      {
+        group => INTEGER {
+          power       => GAUGE,
+          operStatus  => INTEGER,
+          consumption => GAUGE,
+          threshold   => INTEGER
+        }
+      }
+
+INITIALIZATION
+
+ OBJ->_init($reload)
+
+    Fetch basic interface related snmp values from the host. Don't call
+    this method direct!
+
+PRIVATE METHODS
+
+    Only for developers or maintainers.
+
+ _fetch_poe_port_tbl($session)
+
+    Get selected MIB values from the poe_port_table
+
+ _poe_port_tbl_cb($session)
+
+    The callback for _poe_port_tbl_cb
+
+ _fetch_poe_main_tbl($session)
+
+    Get selected MIB values from the poe_main_table
+
+ _poe_main_tbl_cb($session)
+
+    The callback for _poe_main_tbl_cb
+
+REQUIREMENTS
+
+    Net::SNMP, Net::SNMP::Mixin
+
+BUGS, PATCHES & FIXES
+
+    There are no known bugs at the time of this release. However, if you
+    spot a bug or are experiencing difficulties that are not explained
+    within the POD documentation, please submit a bug. Fixes are dependant
+    upon their severity and my availablity. Should a fix not be
+    forthcoming, please feel free to (politely) remind me by sending an
+    email.
+
+AUTHOR
+
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+
+    Copyright 2021-2024 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

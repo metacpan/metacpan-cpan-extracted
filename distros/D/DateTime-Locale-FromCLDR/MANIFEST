@@ -17,6 +17,7 @@ t/05.timezone.t
 t/06.locale_numbering_system.t
 t/07.ltr.t
 t/08.dst.t
+t/09.fatal.t
 t/90.pod.t
 t/91.coverage.t
 t/92.signature.t

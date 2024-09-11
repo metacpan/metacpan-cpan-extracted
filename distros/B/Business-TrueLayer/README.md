@@ -5,7 +5,7 @@ Business::TrueLayer - Perl library for interacting with the TrueLayer v3 API
 
 # VERSION
 
-v0.04
+v0.05
 
 # SYNOPSIS
 

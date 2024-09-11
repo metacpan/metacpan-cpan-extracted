@@ -42,5 +42,5 @@ resources:
   homepage: https://metacpan.org/module/Business::TrueLayer
   license: http://dev.perl.org/licenses/
   repository: https://github.com/payprop/business-truelayer
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

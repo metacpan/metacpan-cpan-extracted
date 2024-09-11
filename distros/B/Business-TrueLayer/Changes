@@ -1,5 +1,8 @@
 Revision history for Business-TrueLayer
 
+0.05     2024-09-10
+        - Add remitter details to payment object
+
 0.04     2024-09-02
         - Support converting webhook data into objects
 

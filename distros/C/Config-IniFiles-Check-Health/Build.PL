@@ -21,6 +21,7 @@ my $builder = Module::Build->new(
         'Log::Log4perl'    => 0,
         'Moo'              => '2.004000',
         'Params::Validate' => '1.30',
+        'strictures'       => '2.000006',
     },
     add_to_cleanup => ['Config-IniFiles-Check-Health-*'],
 );

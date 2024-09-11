@@ -5,22 +5,19 @@ use Number::Phone::Country::Data;
 
 # *_codes are global so we can mock in some tests
 use vars qw($VERSION %idd_codes %prefix_codes);
-$VERSION = 1.98;
+$VERSION = '2.00';
 my $use_uk = 0;
 
 sub import {
     shift;
-    my $export = 1;
     foreach my $param (@_) {
-        if(lc($param) eq 'noexport') { $export = 0; }
-         elsif(lc($param) eq 'uk') { $use_uk = 1; }
-         else { warn("Unknown param to ".__PACKAGE__." '$param' at ".join(' line ', (caller())[1,2])."\n"); }
-    }
-    if($export) {
-        my $callpkg = caller(1);
-        no strict 'refs';
-        warn("Exporting from Number::Phone::Country is deprecated at ".join(' line ', (caller())[1,2])."\n");
-        *{"$callpkg\::phone2country"} = \&{__PACKAGE__."\::phone2country"};
+        if(lc($param) eq 'uk') {
+            $use_uk = 1;
+        } elsif($param eq 'noexport') {
+            warn("'noexport' param to ".__PACKAGE__." is deprecated at ".join(' line ', (caller())[1,2])."\n");
+        } else {
+             warn("Deprecated, will become fatal: Unknown param to ".__PACKAGE__." '$param' at ".join(' line ', (caller())[1,2])."\n");
+        }
     }
 }
 
@@ -32,8 +29,8 @@ sub phone2country {
 our %NANP_areas = (
     CA => do {
         # see http://www.cnac.ca/co_codes/co_code_status.htm
-        # checked on 2024-03-05
-        # next check due 2024-09-01 (semi-annually)
+        # checked on 2024-09-10
+        # next check due 2025-03-01 (semi-annually)
         my $canada = join('|', qw(
             204 226 236 249 250 257 263 289
             306 343 354 365 367 368 382
@@ -46,8 +43,8 @@ our %NANP_areas = (
         ));
         # handful of non-geographic country-specific codes ...
         # see https://en.wikipedia.org/wiki/Area_code_600
-        # checked on 2023-09-02
-        # next check due 2024-09-01 (annually)
+        # checked on 2024-09-10
+        # next check due 2025-03-01 (annually)
         $canada = join('|', $canada, 600, 622, 633, 644, 655, 677, 688);
     },
     US => do {
@@ -56,15 +53,15 @@ our %NANP_areas = (
         #   but the latter doesn't contain some overlays that are about to come into service
         # NB for Hyder, Alaska, it shares three COs with Stewart, BC, and we can't tell which number is in which country,
         #   so those prefixes aren't listed here
-        # checked on 2024-03-05
-        # next check due 2024-09-01 (semi-annually)
+        # checked on 2024-09-10
+        # next check due 2025-03-01 (annually)
         my $usa = join('|', qw(
-            205 251 256 334 659 938
+            205 251 256 334 483 659 938
             907
             480 520 602 623 928
             327 479 501 870
-            209 213 279 310 323 341 350 369 408 415 424 442 510 530 559 562 619 626 628 650 657 661 669 707 714 738 747 760 805 818 820 831 840 858 909 916 925 949 951
-            303 719 720 970 983
+            209 213 279 310 323 341 350 357 369 408 415 424 442 510 530 559 562 619 626 628 650 657 661 669 707 714 738 747 760 805 818 820 831 837 840 858 909 916 925 949 951
+            303 719 720 748 970 983
             203 475 860 959
             302
             202 771
@@ -83,7 +80,7 @@ our %NANP_areas = (
             339 351 413 508 617 774 781 857 978
             231 248 269 313 517 586 616 679 734 810 906 947 989
             218 320 507 612 651 763 924 952
-            228 601 662 769
+            228 471 601 662 769
             235 314 417 557 573 636 660 816 975
             406
             308 402 531
@@ -102,7 +99,7 @@ our %NANP_areas = (
             803 821 839 843 854 864
             605
             423 615 629 731 865 901 931
-            210 214 254 281 325 346 361 409 430 432 469 512 682 713 726 737 806 817 830 832 903 915 936 940 945 956 972 979
+            210 214 254 281 325 346 361 409 430 432 469 512 621 682 713 726 737 806 817 830 832 903 915 936 940 945 956 972 979
             385 435 801
             802
             276 434 540 571 686 703 757 804 826 948
@@ -252,13 +249,23 @@ Number::Phone::Country - Lookup country of phone number
 
 or
 
-  use Number::Phone::Country qw(noexport uk);
+  use Number::Phone::Country qw(uk);
 
   my $iso_country_code = Number::Phone::Country::phone2country(...);
 
 or
 
   my ($iso_country_code, $idd) = Number::Phone::Country::phone2country_and_idd(...);
+
+=head1 INCOMPATIBLE CHANGES
+
+=head2 from version 2.00 onwards
+
+As of version 2.00 the C<phone2country> function is no longer exported. It has
+been deprecated since version 0.5, which was released in 2004. Use of the
+C<noexport> flag will now result in warnings. The first release after August
+2026 will upgrade those to be fatal errors. At the same time warnings about
+any other unknown params will also be upgraded to be fatal.
 
 =head1 DESCRIPTION
 
@@ -270,12 +277,8 @@ country, tell you the country code, and the prefixes you need to dial
 when in that country to call outside your local area or to call another
 country.
 
-Note that by default, phone2country is exported into your namespace.  This
-is deprecated and may be removed in a future version.  You can turn that
-off by passing the 'noexport' constant when you use the module.
-
-Also be aware that the ISO code for the United Kingdom is GB, not UK.  If
-you would prefer UK, pass the 'uk' constant.
+Be aware that the ISO code for the United Kingdom is GB, not UK.  If
+you would prefer UK, pass the C<uk> flag as demonstrated in the L</SYNOPSIS>.
 
 I have put in number ranges for Kosovo, which does not yet have an ISO country
 code.  I have used XK, as that is the de facto standard as used by numerous

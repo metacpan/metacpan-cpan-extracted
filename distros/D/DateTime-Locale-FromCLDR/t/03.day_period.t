@@ -14,6 +14,10 @@ BEGIN
     {
         plan skip_all => 'SQLite driver version 3.6.19 or higher is required. You have version ' . $DBD::SQLite::sqlite_version;
     }
+    # I am getting weird error like:
+    # perl(74608) in free(): bogus pointer (double free?) 0xfcc0f72e800
+    # that are most likely coming from DateTime, so I am switching for testing to its pure-perl equivalent
+    $ENV{PERL_DATETIME_PP} = 1;
     use DateTime;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };

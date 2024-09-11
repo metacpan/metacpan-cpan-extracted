@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Help - about box and help facilities
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.11";
+$VERSION="0.12";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -17,7 +17,7 @@ use Tk;
 use File::Basename;
 require Tk::HList;
 require Tk::NoteBook;
-require Tk::Pod::Text;
+require Tk::PodViewer::Full;
 require Tk::ROText;
 require Tk::YADialog;
 
@@ -303,10 +303,36 @@ sub CmdHelp {
 				-buttons => ['Close'],
 				-title => 'Help',
 			);
-			my $pod = $db->PodText( 
-				-file => $file,
-				-scrollbars => 'oe',
+			my @podopt = ();
+			my $art = $self->extGet('Art');
+			@podopt = (
+				-nextimage => $art->createCompound(
+					-image => $art->getIcon('go-next', 22),
+					-text => 'Next',
+				),
+				-previmage => $art->createCompound(
+					-image => $art->getIcon('go-previous', 22),
+					-text => 'Previous',
+				),
+				-zoominimage => $art->createCompound(
+					-image => $art->getIcon('zoom-in', 22),
+					-text => 'Zoom in',
+				),
+				-zoomoutimage => $art->createCompound(
+					-image => $art->getIcon('zoom-out', 22),
+					-text => 'Zoom out',
+				),
+				-zoomresetimage => $art->createCompound(
+					-image => $art->getIcon('zoom-original', 22),
+					-text => 'Zoom reset',
+				),
+			) if defined $art;
+			
+			my $pod = $db->PodViewerFull(@podopt,
+				-width => 80,
+				-height => 20,
 			)->pack(-expand => 1, -fill => 'both');
+			$self->after(100, sub { $pod->load($file) });
 			$db->Show(-popover => $self->GetAppWindow);
 			$db->destroy;
 		} else {
@@ -376,11 +402,15 @@ sub CmdUpdates {
 sub ConnectURL {
 	my ($self, $widget, $url) = @_;
 	$widget->configure(-cursor => 'hand2');
-	$widget->bind('<Enter>', sub { $widget->configure(-foreground => 'blue') });
-	$widget->bind('<Leave>', sub { $widget->configure(
-		-foreground => $self->configGet('-foreground')
-	) });
-	$widget->bind('<Button-1>', sub { $self->openURL($url) });
+	$widget->bind('<Enter>', sub { 
+		$widget->configure(-foreground => $self->configGet('-linkcolor'))
+	});
+	$widget->bind('<Leave>', sub { 
+		$widget->configure(-foreground => $self->configGet('-foreground'))
+	});
+	$widget->bind('<Button-1>', sub { 
+		$self->openURL($url) 
+	});
 }
 
 sub MenuItems {

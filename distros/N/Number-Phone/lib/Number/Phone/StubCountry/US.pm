@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240607153922;
+our $VERSION = 1.20240910191017;
 
 my $formatters = [
                 {
@@ -53,6 +53,10 @@ my $formatters = [
 my $validators = {
                 'geographic' => '(
           (?:
+            3052(?:
+              0[0-8]|
+              [1-9]\\d
+            )|
             5056(?:
               [0-35-9]\\d|
               4[468]
@@ -60,6 +64,7 @@ my $validators = {
             7302[0-4]\\d
           )\\d{4}|
           (?:
+            305[3-9]|
             472[24]|
             505[2-57-9]|
             7306|
@@ -78,7 +83,7 @@ my $validators = {
               8[13]
             )|
             3(?:
-              0[1-57-9]|
+              0[1-47-9]|
               1[02-9]|
               2[013569]|
               3[0-24679]|
@@ -154,6 +159,10 @@ my $validators = {
           )[2-9]\\d{6}
         |
           (?:
+            3052(?:
+              0[0-8]|
+              [1-9]\\d
+            )|
             5056(?:
               [0-35-9]\\d|
               4[468]
@@ -161,6 +170,7 @@ my $validators = {
             7302[0-4]\\d
           )\\d{4}|
           (?:
+            305[3-9]|
             472[24]|
             505[2-57-9]|
             7306|
@@ -179,7 +189,7 @@ my $validators = {
               8[13]
             )|
             3(?:
-              0[1-57-9]|
+              0[1-47-9]|
               1[02-9]|
               2[013569]|
               3[0-24679]|
@@ -305,7 +315,7 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
-                'voip' => ''
+                'voip' => '305209\\d{4}'
               };
 use Number::Phone::NANP::Data;
 sub areaname {
@@ -6434,9 +6444,184 @@ my $timezones = {
                           'America/Los_Angeles'
                         ],
                '928' => [
-                          'America/Denver',
                           'America/Phoenix'
                         ],
+               '928206' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928209' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928212' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '92826' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '928280' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928283' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '92830' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '928319' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928349' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '92835' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '928360' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '92838' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '92840' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '92841' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '928429' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928461' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '92848' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '928545' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928608' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '92861' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '928640' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928645' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '92865' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '928660' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928663' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928672' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928673' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928674' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928675' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928686' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928691' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928693' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928697' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928698' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928724' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928725' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928755' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928781' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '928787' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '92879' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '92881' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '928871' => [
+                             'America/Denver',
+                             'America/Phoenix'
+                           ],
+               '92890' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
+               '92896' => [
+                            'America/Denver',
+                            'America/Phoenix'
+                          ],
                '929' => [
                           'America/New_York'
                         ],

@@ -7,7 +7,7 @@ Business::TrueLayer - Perl library for interacting with the TrueLayer v3 API
 
 =head1 VERSION
 
-v0.04
+v0.05
 
 =head1 SYNOPSIS
 
@@ -83,7 +83,7 @@ use Business::TrueLayer::Signer;
 use Business::TrueLayer::Types;
 use Business::TrueLayer::User;
 
-$Business::TrueLayer::VERSION = '0.04';
+$Business::TrueLayer::VERSION = '0.05';
 
 =head1 METHODS
 

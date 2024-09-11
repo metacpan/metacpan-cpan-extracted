@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Tangence::Meta::Struct 0.32;
+package Tangence::Meta::Struct 0.33;
 class Tangence::Meta::Struct :strict(params);
 
 use Carp;

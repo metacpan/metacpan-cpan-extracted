@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240607153920;
+our $VERSION = 1.20240910191015;
 
 my $formatters = [
                 {
@@ -87,12 +87,15 @@ my $validators = {
           )\\d{6}
         ',
                 'mobile' => '
-          55410\\d{4}|
+          55(?:
+            410|
+            57[0-289]
+          )\\d{4}|
           5(?:
             (?:
-              [02][02-9]|
-              [149][2-9]|
+              [0-2][02-9]|
               [36]\\d|
+              [49][2-9]|
               8[3-7]
             )\\d|
             5(?:
@@ -130,7 +133,7 @@ my $validators = {
           7(?:
             38(?:
               0\\d|
-              5[0-29]|
+              5[0-2569]|
               88
             )|
             8(?:
@@ -153,16 +156,16 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{iw} = {"9722", "ירושלים",
-"9724", "חיפה\ והצפון",
-"9728", "השפלה\ והדרום",
-"9729", "השרון",
-"9723", "תל\ אביב\-יפו\ והמרכז",};
-$areanames{en} = {"9722", "Jerusalem",
-"9724", "Haifa\ and\ North\ Regions",
+$areanames{en} = {"9729", "Hasharon",
 "9728", "Hashfela\ and\ South\ Regions",
-"9723", "Tel\ Aviv",
-"9729", "Hasharon",};
+"9724", "Haifa\ and\ North\ Regions",
+"9722", "Jerusalem",
+"9723", "Tel\ Aviv",};
+$areanames{iw} = {"9722", "ירושלים",
+"9729", "השרון",
+"9728", "השפלה\ והדרום",
+"9724", "חיפה\ והצפון",
+"9723", "תל\ אביב\-יפו\ והמרכז",};
 my $timezones = {
                '' => [
                        'Asia/Jerusalem'

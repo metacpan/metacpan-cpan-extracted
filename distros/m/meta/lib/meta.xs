@@ -27,6 +27,8 @@
 
 #  define gv_init_sv(gv, stash, sv, flags)  \
                             gv_init(gv, stash, SvPV_nolen(sv), SvCUR(sv), SvUTF8(sv) | flags)
+#  define gv_init_pvn(gv, stash, pv, len, flags)  \
+                            gv_init(gv, stash, pv, len, flags)
 #endif
 
 #ifndef av_count
@@ -62,7 +64,7 @@ SV *S_wrap_sv_refsv(pTHX_ SV *sv)
     case SVt_PVCV: metaclass = "meta::subroutine"; break;
     default:       metaclass = "meta::variable";   break;
   }
-  return sv_setref_uv(newSV(0), metaclass, PTR2UV(sv));
+  return sv_setref_uv(newSV(0), metaclass, PTR2UV(SvREFCNT_inc(sv)));
 }
 
 #define wrap_stash(stash)  S_wrap_stash(aTHX_ stash)
@@ -213,6 +215,34 @@ static SV *S_get_metaglob_slot(pTHX_ SV *metaglob, U8 svt, const char *slotname,
   }
 }
 
+static void split_fqname(const char *namepv, STRLEN namelen,
+  const char **pkgnamepvp, STRLEN *pkgnamelenp, const char **basenamepvp, STRLEN *basenamelenp)
+{
+  STRLEN pkgnamelen = 0;
+  const char *pkgnamepv = NULL;
+  STRLEN basenamelen = namelen;
+  const char *basenamepv = namepv;
+
+  const char *s = namepv + namelen - 2;
+  for(/**/; s > namepv; s--) {
+    if(s[0] != ':' || s[1] != ':')
+      continue;
+
+    /* s now points at the final occurence of '::' in the name
+     * pkgname is namepv up to s, basename is s+2 up to its original end */
+    pkgnamepv   = namepv;
+    pkgnamelen  = s - namepv;
+    basenamepv  = s + 2;
+    basenamelen = namelen - (basenamepv - namepv);
+    break;
+  }
+
+  if(pkgnamepvp)   *pkgnamepvp   = pkgnamepv;
+  if(pkgnamelenp)  *pkgnamelenp  = pkgnamelen;
+  if(basenamepvp)  *basenamepvp  = basenamepv;
+  if(basenamelenp) *basenamelenp = basenamelen;
+}
+
 MODULE = meta    PACKAGE = meta
 
 SV *
@@ -228,6 +258,17 @@ get_this_package()
   CODE:
     warn_experimental("meta::get_this_package");
     RETVAL = wrap_stash(CopSTASH(PL_curcop));
+  OUTPUT:
+    RETVAL
+
+SV *
+for_reference(SV *ref)
+  CODE:
+    warn_experimental("meta::for_reference");
+    if(!SvROK(ref))
+      croak("meta::for_reference requires a reference value");
+    /* TODO: maybe there's some kinds of SV we'll forbid here? */
+    RETVAL = wrap_sv_refsv(SvRV(ref));
   OUTPUT:
     RETVAL
 
@@ -601,6 +642,14 @@ list_subpackages(SV *metapkg)
 
 MODULE = meta    PACKAGE = meta::symbol
 
+void
+DESTROY(SV *metasym)
+  CODE:
+  {
+    SV *sv = SV_FROM_REFSV(metasym);
+    SvREFCNT_dec(sv);
+  }
+
 bool
 is_scalar(SV *metasym)
   CODE:
@@ -807,6 +856,43 @@ subname(SV *metasub)
     RETVAL
 
 SV *
+set_subname(SV *metasub, SV *name)
+  CODE:
+  {
+    CV *cv = MUST_CV_FROM_REFSV(metasub);
+
+    STRLEN namelen;
+    const char *namepv = SvPV(name, namelen);
+
+    const char *pkgnamepv, *basenamepv;
+    STRLEN pkgnamelen, basenamelen;
+    split_fqname(namepv, namelen,
+      &pkgnamepv, &pkgnamelen, &basenamepv, &basenamelen);
+
+    HV *stash;
+    if(pkgnamelen)
+      stash = gv_stashpvn(pkgnamepv, pkgnamelen, GV_ADD | SvUTF8(name));
+    else
+      stash = CopSTASH(PL_curcop);
+
+    /* We can't just change the name in the sub's GV because that might be
+     * shared and break all kinds of things. We'll have to make a new GV.
+     */
+    GV *newgv = (GV *)newSV(0);
+    gv_init_pvn(newgv, stash, basenamepv, basenamelen, SvUTF8(name));
+
+    CvANON_off(cv);
+    CvGV_set(cv, newgv);
+
+    /* CvGV_set claimed a reference to newgv; we can drop it now */
+    SvREFCNT_dec(newgv);
+
+    RETVAL = SvREFCNT_inc(metasub);
+  }
+  OUTPUT:
+    RETVAL
+
+SV *
 prototype(SV *metasub)
   CODE:
   {
@@ -816,6 +902,22 @@ prototype(SV *metasub)
       RETVAL = &PL_sv_undef;
     else
       RETVAL = newSVpvn_flags(CvPROTO(cv), CvPROTOLEN(cv), SvUTF8(cv));
+  }
+  OUTPUT:
+    RETVAL
+
+SV *
+set_prototype(SV *metasub, SV *proto)
+  CODE:
+  {
+    CV *cv = MUST_CV_FROM_REFSV(metasub);
+
+    if(SvOK(proto))
+      sv_copypv((SV *)cv, proto);
+    else
+      SvPOK_off((SV *)cv);
+
+    RETVAL = SvREFCNT_inc(metasub);
   }
   OUTPUT:
     RETVAL

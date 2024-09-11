@@ -12,7 +12,8 @@ use_ok('Test::More');
 use_ok( 'Config::IniFiles' => "3.000003" );
 use_ok( 'Log::Log4perl'    => '1.54' );
 use_ok( 'Moo'              => '2.004000' );
-use_ok( 'Params::Validate' => '1.30' );
+use_ok( 'Params::Validate' => '1.29' );
+use_ok( 'strictures'       => '2.000006' );
 
 done_testing();
 

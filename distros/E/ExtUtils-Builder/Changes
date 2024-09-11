@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Builder
 
+0.012     2024-09-10 23:03:26+02:00 Europe/Brussels
+          - Allow for phony dependencies of file targets
+          - Add type attribute to nodes
+
 0.011     2024-08-04 20:37:12+02:00 Europe/Brussels
           - Fix CRLF translation for Windows further
 

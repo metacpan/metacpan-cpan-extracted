@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Plan;
-$ExtUtils::Builder::Plan::VERSION = '0.011';
+$ExtUtils::Builder::Plan::VERSION = '0.012';
 use strict;
 use warnings;
 
@@ -49,11 +49,25 @@ sub run {
 	my (%seen, %loop);
 	my $run_node = sub {
 		my ($name, $node) = @_;
-		return if not $node->phony and -e $name and sub { -d or -M $name <= -M or return 0 for sort $node->dependencies; 1 }->();
+		return if $self->_up_to_date($node);
 		$node->execute(%options);
 	};
 	$self->_node_sorter($_, $run_node, \%seen, \%loop) for @targets;
 	return;
+}
+
+sub _up_to_date {
+	my ($self, $node) = @_;
+	return 0 if $node->type eq 'phony' or not -e $node->target;
+	my $mtime = -M _;
+	for my $dep_name (sort $node->dependencies) {
+		if (my $dep = $self->{nodes}{$dep_name}) {
+			return 0 unless $dep->newer_than($mtime);
+		} else {
+			return 0 unless -e $dep_name && $mtime <= -M _;
+		}
+	}
+	return 1;
 }
 
 sub merge {
@@ -86,7 +100,7 @@ ExtUtils::Builder::Plan - An ExtUtils::Builder Plan
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

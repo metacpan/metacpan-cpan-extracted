@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Tangence::Class 0.32;
+package Tangence::Class 0.33;
 class Tangence::Class :isa(Tangence::Meta::Class);
 
 use Tangence::Constants;
@@ -20,9 +20,8 @@ use Tangence::Meta::Argument;
 
 use Carp;
 
-use meta 0.003_002;
+use meta 0.007;  # set_subname
 no warnings 'meta::experimental';
-use Sub::Util 1.40 qw( set_subname );
 
 =head1 NAME
 
@@ -125,12 +124,10 @@ method define
    }
 
    foreach my $name ( keys %subs ) {
-      next if $classmeta->can_symbol( '&' . $name );
+      next if $classmeta->try_get_symbol( '&' . $name );
       $classmeta->add_symbol(
-         # TODO: It'd be great if meta did the set_subname, or at least,
-         # offered an accessor method to do so
-         '&' . $name => set_subname "${class}::${name}" => $subs{$name}
-      );
+         '&' . $name => $subs{$name}
+      )->set_subname( "${class}::${name}" );
    }
 }
 

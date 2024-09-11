@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Tangence::Meta::Event 0.32;
+package Tangence::Meta::Event 0.33;
 class Tangence::Meta::Event :strict(params);
 
 =head1 NAME

@@ -1,4 +1,6 @@
 Revision history for Webservice::InternetDB::API
+1.002 Thur Sept 10 20:00:00 2024
+     - added feature compatability for older perls
 1.001 Sun Sept 8 14:00:00 2024
      - corrected POD
 1.000 Sun Sept 8 15:00:00 2024

@@ -22,7 +22,6 @@ use MIME::Base64;
 
 use Data::URIID::Service;
 use Data::URIID::Digest;
-use Data::URIID::Future;
 
 use constant {
     ISEORDER_UOR => ['uuid', 'oid', 'uri'],
@@ -32,7 +31,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my %digest_name_converter = (
     fc('md5')   => 'md-5-128',
@@ -274,6 +273,48 @@ my %url_parser = (
             path => qr/^oid:([1-3](?:\.(?:0|[1-9][0-9]*))+)$/,
             type => 'oid',
             id => \1,
+        },
+        {
+            path => qr/^isbn:([0-9]{13})$/,
+            type => 'gtin',
+            id => \1,
+        },
+        {
+            path => qr/^isbn:([0-9]{9}[0-9Xx])$/,
+            type => 'gtin',
+            id => sub {
+                my ($self, $uri, $rule, $res) = @_;
+                my $isbn = $res->[0];
+
+                {
+                    my @digits = split(//, $isbn);
+                    my $check = pop(@digits);
+                    my $sum = 0;
+
+                    for (my $i = 0; length(my $c = shift @digits); $i++) {
+                        $sum += (ord($c) - ord('0')) * (10 - $i);
+                    }
+
+                    if ($check eq 'X' || $check eq 'x') {
+                        $check = 11;
+                    }
+
+                    die 'Bad check' unless $check == (11 - ($sum % 11));
+                }
+
+                {
+                    $isbn =~ s/^([0-9]{9}).$/978$1/;
+
+                    my @digits = split(//, $isbn);
+                    my $sum = 0;
+
+                    for (my $i = 0; length(my $c = shift @digits); $i++) {
+                        $sum += (ord($c) - ord('0')) * ($i & 1 ? 3 : 1);
+                    }
+
+                    return sprintf('%u%u', $isbn, 10 - ($sum % 10));
+                }
+            },
         },
     ],
     https => [
@@ -575,8 +616,9 @@ my %syntax = (
     'isni'                          => qr/^[0]{4} [0-9]{4} [0-9]{4} [0-9]{3}[0-9X]$/,
     'aev-identifier'                => qr/^[\w\/\d]+$/,
     'unesco-thesaurus-identifier'   => qr/^concept[0-9]+$/,
+    'gtin'                          => qr/^[0-9]{8}(?:[0-9]{4,6})?$/,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
-    (map {$_        => RE_UINT} qw(e621-post-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier)),
+    (map {$_        => RE_UINT} qw(e621-post-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier)),
 );
 
 my %fellig_tables = (
@@ -666,7 +708,13 @@ sub _lookup {
         }
 
         foreach my $value (values %found) {
-            $value = uri_unescape($res[${$value} - 1]) if ref($value) eq 'SCALAR';
+            if (my $ref = ref $value) {
+                if ($ref eq 'SCALAR') {
+                    $value = uri_unescape($res[${$value} - 1]);
+                } elsif ($ref eq 'CODE') {
+                    $value = $value->($self, $uri, $rule, \@res);
+                }
+            }
         }
 
         $self->_set(@found{qw(source type id ise_order action)});
@@ -687,28 +735,22 @@ sub _lookup_one {
     my Data::URIID $extractor = $self->extractor;
     my $mode = $opts{mode} // 'online';
     my $have = $self->{$mode.'_results'} //= {};
-    my $f;
+    my $res;
 
-    return undef if defined $have->{$service};
+    return $have->{$service} if $have->{$service};
 
-    $f = eval {
+    $res = eval {
         my $_service = $extractor->service($service);
         my $_func = $_service->can(sprintf('_%s_lookup', $mode));
         $_service->$_func($self, %opts)
-    } // Data::URIID::Future->die($@ // 'No data');
-    $f = $f->then(sub {
-            my ($res) = @_;
-            $have->{$service} = $res;
-            foreach my $id_type (keys %{$res->{id} // {}}) {
-                my $ise = $extractor->name_to_ise(type => $id_type);
-                $self->{id}{$ise} //= $res->{id}{$id_type};
-            }
-            return $res;
-        })->else(sub {
-            return $have->{$service} = {};
-        });
+    } // {};
+    $have->{$service} = $res;
+    foreach my $id_type (keys %{$res->{id} // {}}) {
+        my $ise = $extractor->name_to_ise(type => $id_type);
+        $self->{id}{$ise} //= $res->{id}{$id_type};
+    }
 
-    return $f;
+    return $res;
 }
 
 sub _lookup_with_mode {
@@ -721,12 +763,9 @@ sub _lookup_with_mode {
     foreach my $pass (0..2) {
         foreach my $id_type_ise (keys %{$self->{id}}) {
             my $id_type = eval {$extractor->ise_to_name(type => $id_type_ise)} // next;
-            my $f = Data::URIID::Future->combine(
-                grep {defined}
-                map {$self->_lookup_one($_, %opts)}
-                @{$lookup_services{$id_type}}
-            );
-            $f->await if defined $f;
+            foreach my $service (@{$lookup_services{$id_type}}) {
+                $self->_lookup_one($service, %opts);
+            }
         }
     }
 }
@@ -746,7 +785,7 @@ sub _lookup__https {
             # We need to do this very early as we cannot store it as an ID before we did an online lookup.
             my Data::URIID::Service $service = $self->extractor->service('wikipedia');
             if ($service->_is_online) {
-                my $json = $service->_get_json(url => sprintf('https://%s/w/api.php', $host),
+                my $json = $service->_get_json(sprintf('https://%s/w/api.php', $host),
                     query => {
                         action      => 'query',
                         format      => 'json',
@@ -754,7 +793,7 @@ sub _lookup__https {
                         prop        => 'pageprops',
                         ppprop      => 'wikibase_item',
                         titles      => $page,
-                    })->get;
+                    });
                 if (defined $json) {
                     my $wikidata_identifier = eval {$json->{query}{pages}{(keys %{$json->{query}{pages}})[0]}{pageprops}{wikibase_item}};
                     if (defined $wikidata_identifier) {
@@ -769,10 +808,10 @@ sub _lookup__https {
         # We need to do this very early as we cannot store it as an ID before we did an online lookup.
         my Data::URIID::Service $service = $self->extractor->service('xkcd');
         if ($service->_is_online) {
-            my $res = $self->_lookup_one($service->name, metadata_url => 'https://xkcd.com/info.0.json')->get || {};
+            my $res = $self->_lookup_one($service->name, metadata_url => 'https://xkcd.com/info.0.json');
             $self->_set(xkcd => 'xkcd-num' => $res->{id}{'xkcd-num'}, undef, $path eq '/' ? 'render' : 'metadata') if defined $res->{id}{'xkcd-num'};
         }
-    } elsif ($host eq 'uriid.org' && $path =~ m#^/(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[a-z]+|[a-zA-Z])/.+$#) {
+    } elsif ($host eq 'uriid.org' && $path =~ m#^/(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[a-z-]+|[a-zA-Z])/.+$#) {
         my ($prefix, $type, $id) = $uri->path_segments;
         if ($prefix eq '') {
             my Data::URIID::Service $uriid = $self->extractor->service('uriid');
@@ -1217,6 +1256,11 @@ sub _id_conv__uuid__wikidata_identifier {
     $self->{id}{$type_want} = create_uuid_as_string(UUID_SHA1, '9e10aca7-4a99-43ac-9368-6cbfa43636df', lc $id);
 }
 
+sub _id_conv__uuid__gtin {
+    my ($self, $type_want, $type_name_have, $id) = @_;
+    $self->{id}{$type_want} = create_uuid_as_string(UUID_SHA1, 'd95d8b1f-5091-4642-a6b0-a585313915f1', lc $id);
+}
+
 sub _id_conv__uuid__media_subtype_identifier {
     my ($self, $type_want, $type_name_have, $id) = @_;
     $self->{id}{$type_want} = $self->_media_subtype_to_uuid($id);
@@ -1276,7 +1320,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

@@ -6,16 +6,21 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'WebService/GrowthBook.pm',
     'WebService/GrowthBook/AbstractFeatureCache.pm',
     'WebService/GrowthBook/CacheEntry.pm',
+    'WebService/GrowthBook/Eval.pm',
+    'WebService/GrowthBook/Experiment.pm',
     'WebService/GrowthBook/Feature.pm',
     'WebService/GrowthBook/FeatureRepository.pm',
     'WebService/GrowthBook/FeatureResult.pm',
-    'WebService/GrowthBook/InMemoryFeatureCache.pm'
+    'WebService/GrowthBook/FeatureRule.pm',
+    'WebService/GrowthBook/InMemoryFeatureCache.pm',
+    'WebService/GrowthBook/Result.pm',
+    'WebService/GrowthBook/Util.pm'
 );
 
 

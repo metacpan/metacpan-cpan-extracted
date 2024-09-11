@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
 
-package Tangence::Types 0.32;
+package Tangence::Types 0.33;
 
 use v5.26;
 use warnings;

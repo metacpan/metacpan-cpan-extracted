@@ -24,7 +24,8 @@
             "Config::IniFiles" : "3.000003",
             "Log::Log4perl" : "0",
             "Moo" : "2.004000",
-            "Params::Validate" : "1.30"
+            "Params::Validate" : "1.30",
+            "strictures" : "2.000006"
          }
       },
       "test" : {
@@ -36,7 +37,7 @@
    "provides" : {
       "Config::IniFiles::Check::Health" : {
          "file" : "lib/Config/IniFiles/Check/Health.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -45,6 +46,6 @@
          "http://www.perlfoundation.org/artistic_license_2_0"
       ]
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

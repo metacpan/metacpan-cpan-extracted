@@ -73,7 +73,7 @@ FUNCTIONS
 
        $metapkg = meta::get_this_package;
 
-    Since version 0.02.
+    Since version 0.002.
 
     Returns a metapackage reference representing the package of the code
     that called the function.
@@ -83,6 +83,19 @@ FUNCTIONS
     the following:
 
        meta::get_package(__PACKAGE__)
+
+ for_reference
+
+       $metasym = meta::for_reference( $ref );
+
+    Since version 0.007.
+
+    Returns a metasymbol reference representing the glob, variable or
+    subroutine that is pointed to by the given reference.
+
+    Note that passing in a reference to a symbol table hash ("stash") does
+    not result in a metapackage. For that you will have to call
+    "get_package" or similar.
 
 METHODS ON meta::package
 
@@ -330,16 +343,35 @@ METHODS ON METASUBROUTINES
 
     Returns the (fully-qualified) name of the subroutine.
 
+ set_subname
+
+       $metasub = $metasub->set_subname( $name );
+
+    Since version 0.007.
+
+    Sets a new name for the subroutine.
+
+    If $name is not fully-qualified (i.e. does not contain a :: sequence),
+    then the package name of the caller is used to create the
+    fully-qualified name to be stored.
+
  prototype
 
        $proto = $metasub->prototype;
 
     Returns the prototype of the subroutine.
 
-TODO
+ set_prototype
 
-      * Setting the subname or prototype of a subroutine, inspired by the
-      Sub::Util functions of the same.
+       $metasub = $metasub->set_prototype( $proto );
+
+    Since version 0.007.
+
+    Sets a new prototype for the subroutine.
+
+    Returns the $metasub instance itself to allow for easy chaining.
+
+TODO
 
       * Some kind of access around the signature of a signatured sub.
 

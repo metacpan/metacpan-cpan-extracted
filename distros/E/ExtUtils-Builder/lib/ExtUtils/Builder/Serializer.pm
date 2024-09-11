@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Serializer;
-$ExtUtils::Builder::Serializer::VERSION = '0.011';
+$ExtUtils::Builder::Serializer::VERSION = '0.012';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ sub serialize_node {
 	return {
 		dependencies => [ $node->dependencies ],
 		actions      => \@actions,
-		phony        => $node->phony,
+		type         => $node->type,
 	}
 }
 
@@ -73,7 +73,7 @@ sub deserialize_node {
 		target       => $name,
 		dependencies => [ @{ $serialized->{dependencies} } ],
 		actions      => \@actions,
-		phony        => $serialized->{phony},
+		type         => $serialized->{type},
 	);
 }
 
@@ -106,7 +106,7 @@ ExtUtils::Builder::Serializer -
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 DESCRIPTION
 

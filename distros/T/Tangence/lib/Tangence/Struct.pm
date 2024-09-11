@@ -7,12 +7,12 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Tangence::Struct 0.32;
+package Tangence::Struct 0.33;
 class Tangence::Struct :isa(Tangence::Meta::Struct);
 
 use Carp;
 
-use meta 0.003_002;
+use meta 0.004;
 no warnings 'meta::experimental';
 
 use Tangence::Type;
@@ -93,7 +93,7 @@ sub define
    $subs{$fieldnames[$_]} = do { my $i = $_; sub { shift->[$i] } } for 0 .. $#fieldnames;
 
    foreach my $name ( keys %subs ) {
-      next if $classmeta->can_symbol( '&' . $name );
+      next if $classmeta->try_get_symbol( '&' . $name );
       $classmeta->add_symbol( '&' . $name => $subs{$name} );
    }
 }

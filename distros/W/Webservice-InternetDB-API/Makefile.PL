@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.040000;
+use 5.026000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,13 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Webservice-InternetDB-API",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.040000",
+  "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "Webservice::InternetDB::API",
   "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "1.001",
+  "VERSION" => "1.002",
   "test" => {
     "TESTS" => "t/*.t"
   }

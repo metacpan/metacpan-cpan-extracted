@@ -13,6 +13,7 @@ use warnings;
 
 use Carp;
 use URI;
+use LWP::UserAgent;
 use Scalar::Util qw(blessed);
 use I18N::LangTags;
 use I18N::LangTags::Detect;
@@ -20,7 +21,7 @@ use I18N::LangTags::Detect;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my %names = (
     service => {
@@ -101,6 +102,8 @@ my %names = (
         'doi'                           => '931f155e-5a24-499b-9fbb-ed4efefe27fe', # P356
         'iconclass-identifier'          => '241348a8-c5d0-4473-9ec1-de7c2ba00fbb', # P1256
         'media-subtype-identifier'      => 'c1166bf7-c4ab-40ad-9a92-a55103bec509', # P1163, commonly also called media-type or mime-type.
+        'gtin'                          => '82d529be-0f00-4b4f-a43f-4a22de5f5312',
+        'small-identifier'              => 'f87a38cb-fd13-4e15-866c-e49901adbec5',
     },
     action => {
         #What about: search/lookup? list? content?
@@ -238,24 +241,14 @@ sub _get_language_tags {
 # Private method:
 sub _ua {
     my ($self) = @_;
-    unless (defined($self->{ua_error}) || defined($self->{ua})) {
-        unless (LWP::UserAgent->can('new')) {
-            eval { require LWP::UserAgent; };
-        }
+    return $self->{ua} //= do {
+        my $ua = LWP::UserAgent->new(agent => $self->{agent});
+        my $x = 1001; # we use 1001 and --$x here instead of 1000 and $x-- as that confuses parsers.
 
-        $self->{ua} //= eval {
-            my $ua = LWP::UserAgent->new(agent => $self->{agent});
-            my $x = 1001; # we use 1001 and --$x here instead of 1000 and $x-- as that confuses parsers.
+        $ua->default_header('Accept-Language' => join(', ', map {sprintf('%s; q=%.3f', $_, --$x/1000)} $self->language_tags));
 
-            $ua->default_header('Accept-Language' => join(', ', map {sprintf('%s; q=%.3f', $_, --$x/1000)} $self->language_tags));
-
-            $ua;
-        };
-        $self->{ua_error} = 'No user agent found' unless defined $self->{ua};
-    }
-
-    die $self->{ua_error} if defined $self->{ua_error};
-    return $self->{ua} // die 'BUG';
+        $ua;
+    };
 }
 
 
@@ -288,7 +281,6 @@ sub is_ise {
 }
 
 
-#@returns Data::URIID::Service
 sub service {
     my ($self, $service) = @_;
     my $cache = $self->{service_cache} //= {};
@@ -318,7 +310,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

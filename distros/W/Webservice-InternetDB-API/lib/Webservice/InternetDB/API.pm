@@ -1,9 +1,17 @@
-use v5.40;
-use feature "class";
-use warnings -experimental;
+package Webservice::InternetDB::API;
 
 
-class Webservice::InternetDB::API 1.001;
+use strict;
+use warnings;
+
+use Feature::Compat::Class;
+use Feature::Compat::Try;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+our $VERSION = '1.002';
+
+class Webservice::InternetDB::API;
 
 use HTTP::Tiny;
 use JSON::PP;
@@ -41,7 +49,7 @@ method get ($address //= ""){
 
     return $response->{content};
 }
-
+1;
 =pod
 
 =head1 NAME

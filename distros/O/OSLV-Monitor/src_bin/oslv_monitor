@@ -1,0 +1,169 @@
+#!perl
+
+use JSON;
+use strict;
+use warnings;
+use Getopt::Long;
+use JSON;
+use OSLV::Monitor;
+use MIME::Base64;
+use IO::Compress::Gzip qw(gzip $GzipError);
+use File::Slurp;
+use Pod::Usage;
+
+=head1 NAME
+
+oslv_monitor - LibreNMS style JSON SNMP extend for OS level virtualization monitoring
+
+=head1 VERSION
+
+0.0.1
+
+=cut
+
+our $VERSION = '0.0.1';
+
+=head1 SYNOPSIS
+
+oslv_monitor [B<-c>] [B<-f> <config file>] [B<-f> <config json>] [B<-q>]
+
+=head1 DESCRIPTION
+
+For cron...
+
+    */5 * * * * /usr/local/bin/oslv_monitor -q
+
+For snmpd...
+
+    extend oslv_monitor /bin/cat /var/cache/oslv_monitor/snmp
+
+=head1 FLAGS
+
+=head2 -c
+
+Compress the output using gzip and base64 encoded so it
+can be transmitted via SNMP with out issue.
+
+/var/cache/oslv_monitor/snmp will always be available and compressed.
+
+=head2 -f <file>
+
+The config file to use.
+
+Default :: /usr/local/etc/oslv_monitor.json
+
+=head2 -q
+
+Do not print the results.
+
+=head1 CONFIG FILE
+
+The following keys are used in the JSON config file.
+
+    - include :: A array of regular expressions to include.
+        Default :: ["^.*$"]
+
+    - exlcude :: A array of regular expressions to exlclude.
+        Default :: undef
+
+    - backend :: Override the the backend and automatically choose it.
+
+By Defaults the backends are as below.
+
+    FreeBSD: FreeBSD
+    Linux: cgroups
+
+Default would be like this.
+
+    {
+        "include": ["^.*$"]
+    }
+
+=cut
+
+sub main::VERSION_MESSAGE {
+	print "oslv_monitor v. $VERSION\n";
+}
+
+sub main::HELP_MESSAGE {
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
+}
+
+# get the commandline options
+my $help     = 0;
+my $version  = 0;
+my $base_dir = '/var/cache/oslv_monitor';
+my $quiet;
+my $backend;
+my $exclude;
+my $include;
+my $config_file = '/usr/local/etc/oslv_monitor.json';
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'version' => \$version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	'q'       => \$quiet,
+	'f=s'     => \$config_file,
+);
+
+if ($version) {
+	&main::VERSION_MESSAGE;
+	exit 1;
+}
+
+if ($help) {
+	&main::HELP_MESSAGE;
+	exit 1;
+}
+
+if ( -f $config_file ) {
+	eval {
+		my $raw_config    = read_file($config_file);
+		my $parsed_config = decode_json($raw_config);
+		if ( !defined($backend) && defined( $parsed_config->{backend} ) && ref( $parsed_config->{backend} ) eq '' )
+		{
+			$backend = $parsed_config->{backend};
+		}
+		if ( defined( $parsed_config->{include} ) && ref( $parsed_config->{include} ) eq 'ARRAY' ) {
+			$include = $parsed_config->{include};
+		}
+		if ( defined( $parsed_config->{exclude} ) && ref( $parsed_config->{exclude} ) eq 'ARRAY' ) {
+			$exclude = $parsed_config->{exclude};
+		}
+	};
+	if ($@) {
+		die( 'Failed to read the config "' . $config_file . '" ... ' . $@ );
+	}
+} ## end if ( -f $config_file )
+
+my $monitor
+	= OSLV::Monitor->new( backend => $backend, base_dir => $base_dir, include => $include, exclude => $exclude );
+
+if ( !-d $base_dir ) {
+	mkdir($base_dir) || die( 'Unable to mkdir "' . $base_dir . '"' );
+}
+
+eval { $monitor->load; };
+if ($@) {
+	print encode_json( { version => 1, data => {}, error => 1, errorString => 'load failed... ' . $@ } ) . "\n";
+	exit 1;
+}
+
+my $data = encode_json( $monitor->run );
+
+if ( !$quiet ) {
+	print $data. "\n";
+}
+
+write_file( $base_dir . '/json', $data . "\n" );
+
+my $toReturnCompressed;
+gzip \$data => \$toReturnCompressed;
+my $compressed = encode_base64($toReturnCompressed);
+$compressed =~ s/\n//g;
+$compressed = $compressed . "\n";
+
+write_file( $base_dir . '/snmp', $compressed );

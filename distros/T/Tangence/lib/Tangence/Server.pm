@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Server 0.32;
+package Tangence::Server 0.33;
 
 use v5.26;
 use warnings;
@@ -14,6 +14,8 @@ use base qw( Tangence::Stream );
 use Carp;
 
 use Scalar::Util qw( weaken );
+# TODO: since we're using meta 0.007 we could use set_subname from there but
+# it's more awkward to use it this way
 use Sub::Util 1.40 qw( set_subname );
 use Feature::Compat::Try;
 

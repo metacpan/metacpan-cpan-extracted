@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Tangence::Registry 0.32;
+package Tangence::Registry 0.33;
 class Tangence::Registry :isa(Tangence::Object);
 
 use Carp;

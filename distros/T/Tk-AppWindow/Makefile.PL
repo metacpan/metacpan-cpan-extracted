@@ -20,12 +20,11 @@ my %prereq = (
 	'Test::More'            => '1.3',
 	'Tk'                   	=> '804.023',
 	'Tk::DocumentTree'      => '0.08',
-#	'Tk::DynaMouseWheelBind'=> '0.02',
 	'Tk::FontDialog'	   				=> '0.18',
-	'Tk::Pod'               => '5.41',
-	'Tk::QuickForm'         => '0.04',
+	'Tk::PodViewer'         => '0.03',
+	'Tk::QuickForm'         => '0.05',
 	'Tk::YADialog'          => '0.04',
-	'Tk::YANoteBook'        => '0.06',
+	'Tk::YANoteBook'        => '0.07',
 );
 
 WriteMakefile(

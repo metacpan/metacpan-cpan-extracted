@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240607153920;
+our $VERSION = 1.20240910191015;
 
 my $formatters = [
                 {
@@ -54,47 +54,47 @@ my $validators = {
                 'voip' => '40\\d{5}'
               };
 my %areanames = ();
-$areanames{pt} = {"245322", "Sta\.\ Luzia",
-"245331", "Mansôa",
+$areanames{pt} = {"245370", "Buba",
+"245321", "Bissau",
+"245342", "Bambadinca",
 "245393", "S\.\ Domingos",
+"245325", "Brá",
 "245354", "Pitche",
 "245341", "Bafatá",
-"245396", "Ingoré",
+"245322", "Sta\.\ Luzia",
 "245391", "Canchungo",
-"245394", "Bula",
-"245351", "Gabú",
-"245325", "Brá",
-"245320", "Bissau",
-"245334", "Mansaba",
-"245353", "Pirada",
 "245392", "Cacheu",
-"245342", "Bambadinca",
-"245332", "Bigene\/Bissorã",
-"245321", "Bissau",
-"245370", "Buba",
+"245320", "Bissau",
+"245351", "Gabú",
+"245396", "Ingoré",
 "245352", "Sonaco",
+"245353", "Pirada",
+"245394", "Bula",
+"245334", "Mansaba",
+"245331", "Mansôa",
+"245332", "Bigene\/Bissorã",
 "245335", "Farim",};
-$areanames{en} = {"24544394", "Bula",
-"24544331", "Mansôa",
-"24544321", "Bissau",
-"24544353", "Pirada",
-"24544391", "Canchungo",
-"24544334", "Mansaba",
-"24544354", "Pitche",
-"24544393", "S\.\ Domingos",
-"24544370", "Buba",
-"24544341", "Bafatá",
+$areanames{en} = {"24544352", "Sonaco",
 "24544351", "Gabu",
+"24544394", "Bula",
+"24544325", "Brá",
+"24544335", "Farim",
+"24544393", "S\.\ Domingos",
 "24544397", "Bigene",
-"24544396", "Ingoré",
-"24544332", "Bissora",
 "24544322", "St\.\ Luzia",
+"24544321", "Bissau",
+"24544342", "Bambadinca",
+"24544332", "Bissora",
+"24544341", "Bafatá",
+"24544331", "Mansôa",
+"24544334", "Mansaba",
+"24544353", "Pirada",
+"24544396", "Ingoré",
+"24544370", "Buba",
+"24544391", "Canchungo",
 "24544392", "Cacheu",
 "24544320", "Bissau",
-"24544335", "Farim",
-"24544325", "Brá",
-"24544352", "Sonaco",
-"24544342", "Bambadinca",};
+"24544354", "Pitche",};
 my $timezones = {
                '' => [
                        'Atlantic/Reykjavik'

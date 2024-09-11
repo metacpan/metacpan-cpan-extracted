@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240607153921;
+our $VERSION = 1.20240910191017;
 
 my $formatters = [
                 {
@@ -132,32 +132,32 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"42135", "Nove\ Zamky",
-"42151", "Presov",
-"42136", "Levice",
-"42147", "Lucenec",
-"42134", "Senica",
-"42143", "Martin",
-"42148", "Banska\ Bystrica",
-"42155", "Kosice",
-"42131", "Dunajska\ Streda",
+$areanames{en} = {"42134", "Senica",
 "42154", "Bardejov",
-"42142", "Povazska\ Bystrica",
-"42156", "Michalovce",
-"42158", "Roznava",
-"4212", "Bratislava",
-"42145", "Zvolen",
 "42144", "Liptovsky\ Mikulas",
-"42152", "Poprad",
-"42133", "Trnava",
-"421601", "Roznava",
-"42146", "Prievidza",
-"42137", "Nitra",
+"42131", "Dunajska\ Streda",
+"42151", "Presov",
 "42141", "Zilina",
-"42138", "Topolcany",
-"42157", "Humenne",
 "42153", "Spisska\ Nova\ Ves",
-"42132", "Trencin",};
+"42133", "Trnava",
+"42143", "Martin",
+"421601", "Roznava",
+"42156", "Michalovce",
+"42152", "Poprad",
+"4212", "Bratislava",
+"42132", "Trencin",
+"42136", "Levice",
+"42142", "Povazska\ Bystrica",
+"42146", "Prievidza",
+"42158", "Roznava",
+"42157", "Humenne",
+"42155", "Kosice",
+"42135", "Nove\ Zamky",
+"42138", "Topolcany",
+"42137", "Nitra",
+"42147", "Lucenec",
+"42148", "Banska\ Bystrica",
+"42145", "Zvolen",};
 my $timezones = {
                '' => [
                        'Europe/Bratislava'

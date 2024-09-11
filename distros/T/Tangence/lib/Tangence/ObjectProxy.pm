@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Tangence::ObjectProxy 0.32;
+package Tangence::ObjectProxy 0.33;
 class Tangence::ObjectProxy;
 
 use Carp;

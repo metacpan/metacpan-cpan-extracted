@@ -1,0 +1,29 @@
+---
+abstract: 'mixin class for power over ethernet related infos from'
+author:
+  - 'Karl Gaissmaier <karl.gaissmaier (at) uni-ulm.de>'
+build_requires:
+  Module::Build: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SNMP-Mixin-PoE
+provides:
+  Net::SNMP::Mixin::PoE:
+    file: lib/Net/SNMP/Mixin/PoE.pm
+    version: '0.01'
+requires:
+  Net::SNMP: '0'
+  Net::SNMP::Mixin: '0.14'
+  Sub::Exporter: '0.978'
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

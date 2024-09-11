@@ -18,6 +18,7 @@ lib/Business/TrueLayer/Role/Status.pm
 lib/Business/TrueLayer/Signer.pm
 lib/Business/TrueLayer/Types.pm
 lib/Business/TrueLayer/Types/Beneficiary.pm
+lib/Business/TrueLayer/Types/Remitter.pm
 lib/Business/TrueLayer/Types/User.pm
 lib/Business/TrueLayer/User.pm
 lib/Business/TrueLayer/Webhook.pm

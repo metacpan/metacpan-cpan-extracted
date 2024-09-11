@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Tangence::Meta::Method 0.32;
+package Tangence::Meta::Method 0.33;
 class Tangence::Meta::Method :strict(params);
 
 =head1 NAME

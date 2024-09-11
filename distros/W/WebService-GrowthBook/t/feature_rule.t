@@ -1,0 +1,15 @@
+use strict;
+use warnings;
+use Test::More;
+use_ok('WebService::GrowthBook::FeatureRule');
+my $rule = WebService::GrowthBook::FeatureRule->new;
+isa_ok($rule, 'WebService::GrowthBook::FeatureRule');
+$rule = WebService::GrowthBook::FeatureRule->new(disable_sticky_bucketing => 1, fallback_attribute => 'id');
+is($rule->fallback_attribute, undef, 'fall_back_attribute is undef since disabled sticky_bucketing');
+$rule = WebService::GrowthBook::FeatureRule->new(condition => {id => 123});
+my $hash = $rule->to_hash;
+my $rule2 = WebService::GrowthBook::FeatureRule->new(%$hash);
+is($rule2->condition->{id}, 123, 'condition id is 123');
+my $hash2 = $rule2->to_hash;
+is_deeply($hash, $hash2, "two hash are same");
+done_testing;

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::MakeMaker;
-$ExtUtils::Builder::MakeMaker::VERSION = '0.011';
+$ExtUtils::Builder::MakeMaker::VERSION = '0.012';
 use strict;
 use warnings;
 
@@ -91,7 +91,7 @@ ExtUtils::Builder::MakeMaker - A MakeMaker consumer for ExtUtils::Builder Plan o
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

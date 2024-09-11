@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::SideBars - Basic functionality for side bars.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.11";
+$VERSION="0.12";
 use Tk;
 require Tk::YANoteBook;
 
@@ -48,8 +48,11 @@ sub new {
 	$self->{ICONSIZE} = 32;
 	$self->{INITIALSIZES} = {};
 	$self->{LASTSIZE} = {};
-	$self->{TABSIDES} = {};
+	$self->{PAGES} = {};
 	$self->{PANELS} = {};
+	$self->{SELECTCALLS} = {};
+	$self->{TABSIDES} = {};
+	$self->{TEXTSIDES} = {};
 
 	$self->configInit(
 		'-sidebariconsize' => ['IconSize', $self, 32]
@@ -109,8 +112,21 @@ Destroys notebook I<$name>.
 
 sub nbDelete {
 	my ($self, $name) = @_;
+	my $pn = $self->extGet('Panels');
+	my $panel = $pn->panelGet($name);
+	$self->geoDeleteCall($panel);
+	$pn->panelDelete($name);
+	delete $self->textsides->{$name};
 	$name = $name . 'NB';
 	$self->Subwidget($name)->destroy;
+}
+
+sub nbExists {
+	my ($self, $name) = @_;
+	$name = $name . 'NB';
+	my $book = $self->Subwidget($name);
+	return Exists $book if defined $book;
+	return undef
 }
 
 =item B<nbGet>I($name)>
@@ -190,6 +206,16 @@ sub nbOffset {
 	return (($tf->cget('-borderwidth') + $nb->cget('-borderwidth')) * 2) +1
 }
 
+=item B<nbTextSide>I($name, ?$side?)>
+
+=cut
+
+sub nbTextSide {
+	my ($self, $name, $side) = @_;
+	$self->textsides->{$name} = $side if defined $side;
+	return $self->textsides->{$name}
+}
+
 sub OnResize {
 	my ($self, $notebook) = @_;
 	my $nb = $self->nbGet($notebook);
@@ -223,14 +249,11 @@ sub pageAdd {
 
 	my @opt = ();
 	my $art = $self->extGet('Art');
-	my $icon;
-	if (defined $art) {
-		$icon = $art->getIcon($image, $self->IconSize);
-		
-	}
-	@opt = (-titleimg => $icon) if defined $icon;
+	my $icon = $self->pageImage($notebook, $image, $text);
 	@opt = (-title => $text) unless defined $icon;
+	@opt = (-titleimg => $icon) if defined $icon;
 	my $page = $nb->addPage($name, @opt);
+	$self->pages->{$name} = [$notebook, $image, $text];
 
 	my $l = $nb->getTab($name)->Subwidget('Label');
 	$self->StatusAttach($l, $statustext) if defined $statustext;
@@ -238,6 +261,18 @@ sub pageAdd {
 	$self->after(500, sub { $nb->UpdateTabs });
 
 	return $page;
+}
+
+=item B<pageCount>I<($notebook)>
+
+Returns the number of pages in $notebook.
+
+=cut
+
+sub pageCount {
+	my ($self, $notebook) = @_;
+	my $book = $self->nbGet($notebook);
+	return $book->pageCount
 }
 
 =item B<pageDelete>I<($notebook, $name)>
@@ -250,7 +285,49 @@ sub pageDelete {
 	my ($self, $notebook, $name) = @_;
 	$self->nbGet($notebook)->deletePage($name);
 	delete $self->{INITIALSIZES}->{$name};
-	delete $self->{LASTSIZE}->{$name}
+	delete $self->{LASTSIZE}->{$name};
+	delete $self->{SELECTCALLS}->{$name};
+	delete $self->pages->{$name}
+}
+
+=item B<pageExists>I<($notebook, $name)>
+
+Returns true if I<$name> exists in I<$notebook>.
+
+=cut
+
+sub pageExists {
+	my ($self, $notebook, $name) = @_;
+	my $book = $self->nbGet($notebook);
+	return $book->pageExists($name);
+}
+
+sub pageImage {
+	my ($self, $nb, $icon, $text) = @_;
+	my $art = $self->extGet('Art');
+	return undef unless defined $icon;
+	my $img;
+	if (defined $art) {
+		my $side = $self->textsides->{$nb};
+		if (defined $side) {
+			$img = $art->createCompound(
+				-textside => $side,
+				-image => $art->getIcon($icon, $self->IconSize),
+				-text => $text,
+			);
+		} else {
+			$img = $art->getIcon($icon, $self->IconSize);
+		}
+	}
+	return $img;
+}
+
+sub pages { return $_[0]->{PAGES} }
+
+sub pageSelectCall {
+	my $self = shift;
+	my $page = shift;
+	$self->{SELECTCALLS}->{$page} = $self->CreateCallback(@_);
 }
 
 sub panelOffset {
@@ -264,16 +341,33 @@ sub panelOffset {
 	return ($border + $pad) * 2;
 }
 
+sub ReConfigure {
+	my $self = shift;
+	my $pgs = $self->pages;
+	for (keys %$pgs) {
+		my $page = $_;
+		my $val = $pgs->{$page};
+		my ($nb, $img, $text) = @$val;
+		my $book = $self->nbGet($nb);
+		my $tab = $book->getTab($page);
+
+		my $icon = $self->pageImage($nb, $img, $text);
+		$tab->configure(-titleimg => $icon) if defined $icon
+	}
+}
+
 sub TabSelect {
 	my ($self, $notebook, $tab) = @_;
 	return if $self->configMode;
 	$self->geoBlock(1);
-	my $pn = $self->extGet('Panels');
+	my $pn = $self->panels;
 	$self->after(1, sub {
 		$self->nbMaximize($notebook, $tab);
 		my $p = $pn->panelAssign($notebook);
 		$pn->adjusterSet($p);
 		$pn->adjusterActive($p, 1);
+		my $call = $self->{SELECTCALLS}->{$tab};
+		$call->execute if defined $call;
 	});
 	$self->after(200, ['geoBlock', $self, 0]);
 }
@@ -289,6 +383,8 @@ sub TabUnselect {
 	$self->nbMinimize($notebook, $tab);
 	$self->after(400, ['geoBlock', $self, 0]);
 }
+
+sub textsides { return $_[0]->{TEXTSIDES} }
 
 =back
 

@@ -1,3 +1,6 @@
+
+=pod
+
 =head1 This is a sample help file
 
 There is nothing to be learned here.

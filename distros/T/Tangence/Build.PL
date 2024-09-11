@@ -8,7 +8,7 @@ my $build = Module::Build->new(
    module_name => 'Tangence',
    requires => {
       'perl' => '5.026',
-      'meta' => '0.003_002',
+      'meta' => '0.007',
       'Feature::Compat::Try' => 0,
       'Future::AsyncAwait' => '0.47',
       'Object::Pad' => '0.800',
@@ -21,7 +21,7 @@ my $build = Module::Build->new(
       'Future' => '0.36',
       'List::Util' => '1.29',
       'Parser::MGC' => '0.04',
-      'Struct::Dumb' => 0,
+      'Struct::Dumb' => '0.14', # tests fail on 0.13 or earlier
       'Sub::Util' => '1.40',
    },
    test_requires => {

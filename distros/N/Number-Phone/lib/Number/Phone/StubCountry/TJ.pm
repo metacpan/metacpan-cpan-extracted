@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240607153922;
+our $VERSION = 1.20240910191017;
 
 my $formatters = [
                 {
@@ -40,7 +40,12 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '3[1-5]',
+                  'leading_digits' => '
+            3(?:
+              [1245]|
+              3[12]
+            )
+          ',
                   'pattern' => '(\\d{4})(\\d)(\\d{4})'
                 },
                 {
@@ -87,6 +92,7 @@ my $validators = {
         ',
                 'mobile' => '
           (?:
+            33[03-9]|
             4(?:
               1[18]|
               4[02-479]
@@ -94,14 +100,13 @@ my $validators = {
             81[1-9]
           )\\d{6}|
           (?:
-            0[0-57-9]|
+            [09]\\d|
             1[017]|
             2[02]|
             [34]0|
             5[05]|
             7[01578]|
-            8[078]|
-            9\\d
+            8[078]
           )\\d{7}
         ',
                 'pager' => '',
@@ -111,66 +116,66 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9923156", "Tavildara",
-"9923465", "Taboshar",
-"9923443", "Kayrakum",
-"9923442", "Gafurov",
-"9923316", "Parkhar",
-"9923315", "M\.\ Khamadoni",
-"9923155", "Shakhrinav",
-"9923153", "Varzob",
-"9923312", "Dangara",
-"9923462", "Isfara",
-"9923445", "Matchinskiy",
-"9923555", "Roshtkala",
-"9923452", "Zafarabad",
-"9923453", "Asht",
-"9923131", "Rasht",
-"9923556", "Rushan",
-"9923456", "Shakhristan",
+$areanames{en} = {"9923556", "Rushan",
 "9923455", "Jabarrasulov",
-"9923553", "Ishkashim",
-"9923552", "Darvaz",
-"9923252", "Panj",
-"9923137", "Rudaki",
-"9923138", "Nurek",
-"9923242", "Khuroson",
-"9923243", "Abdurakhmana\ Jami",
-"9923249", "Kumsangir",
-"9923246", "Vakhsh",
-"9923130", "Tursun\-Zade",
-"9923245", "Bokhtar",
-"9923134", "Rogun",
-"9923441", "Spitamen",
-"9923479", "Ayni",
-"9923247", "Kolkhozabad",
-"9923475", "Pendjikent",
-"9923248", "Djilikul",
-"9923250", "Sarband",
-"9923311", "Vose",
-"9923132", "Jirgital",
-"9923133", "Nurobod",
+"9923462", "Isfara",
 "99237", "Dushanbe",
-"9923522", "Khorog",
-"9923139", "Hissar",
-"9923451", "Chkalovsk",
-"9923422", "Khujand",
-"9923551", "Vanj",
-"9923136", "Vakhdat",
-"9923135", "Fayzabad",
-"9923141", "Yavan",
-"9923240", "Shaartuz",
-"9923464", "Ganchi",
-"9923154", "Tadjikabad",
-"9923251", "Kabodion",
-"9923314", "Temurmalik",
-"9923222", "Kurgan\-Tube",
-"9923554", "Murgab",
 "9923467", "Kanibadam",
-"9923318", "Muminobod",
+"9923442", "Gafurov",
+"9923243", "Abdurakhmana\ Jami",
+"9923240", "Shaartuz",
 "9923454", "Istravshan",
+"9923155", "Shakhrinav",
+"9923314", "Temurmalik",
+"9923322", "Kulyab",
+"9923135", "Fayzabad",
+"9923134", "Rogun",
+"9923315", "M\.\ Khamadoni",
+"9923154", "Tadjikabad",
+"9923479", "Ayni",
+"9923250", "Sarband",
+"9923464", "Ganchi",
+"9923246", "Vakhsh",
+"9923138", "Nurek",
+"9923522", "Khorog",
+"9923553", "Ishkashim",
+"9923251", "Kabodion",
+"9923318", "Muminobod",
+"9923445", "Matchinskiy",
+"9923222", "Kurgan\-Tube",
+"9923551", "Vanj",
+"9923465", "Taboshar",
+"9923452", "Zafarabad",
+"9923249", "Kumsangir",
+"9923312", "Dangara",
+"9923132", "Jirgital",
+"9923137", "Rudaki",
+"9923552", "Darvaz",
+"9923451", "Chkalovsk",
+"9923245", "Bokhtar",
+"9923252", "Panj",
+"9923453", "Asht",
+"9923422", "Khujand",
+"9923131", "Rasht",
+"9923130", "Tursun\-Zade",
+"9923133", "Nurobod",
+"9923475", "Pendjikent",
+"9923311", "Vose",
+"9923153", "Varzob",
+"9923247", "Kolkhozabad",
+"9923443", "Kayrakum",
+"9923242", "Khuroson",
+"9923554", "Murgab",
+"9923456", "Shakhristan",
+"9923555", "Roshtkala",
+"9923139", "Hissar",
+"9923441", "Spitamen",
+"9923316", "Parkhar",
 "992331700", "Khovaling",
-"9923322", "Kulyab",};
+"9923156", "Tavildara",
+"9923248", "Djilikul",
+"9923136", "Vakhdat",
+"9923141", "Yavan",};
 my $timezones = {
                '' => [
                        'Asia/Dushanbe'

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package meta 0.006;
+package meta 0.007;
 
 use v5.14;
 use warnings;
@@ -95,7 +95,7 @@ An alternative to C<< meta::package->get >> in a plain function style.
 
    $metapkg = meta::get_this_package;
 
-I<Since version 0.02.>
+I<Since version 0.002.>
 
 Returns a metapackage reference representing the package of the code that
 called the function.
@@ -104,6 +104,19 @@ Useful for performing meta-programming on the contents of a module during its
 C<BEGIN> or loading time. Equivalent to but more efficient than the following:
 
    meta::get_package(__PACKAGE__)
+
+=head2 for_reference
+
+   $metasym = meta::for_reference( $ref );
+
+I<Since version 0.007.>
+
+Returns a metasymbol reference representing the glob, variable or subroutine
+that is pointed to by the given reference.
+
+Note that passing in a reference to a symbol table hash ("stash") does not
+result in a metapackage. For that you will have to call L</get_package> or
+similar.
 
 =cut
 
@@ -377,22 +390,39 @@ code.
 
 Returns the (fully-qualified) name of the subroutine.
 
+=head2 set_subname
+
+   $metasub = $metasub->set_subname( $name );
+
+I<Since version 0.007.>
+
+Sets a new name for the subroutine.
+
+If C<$name> is not fully-qualified (i.e. does not contain a C<::> sequence),
+then the package name of the caller is used to create the fully-qualified name
+to be stored.
+
 =head2 prototype
 
    $proto = $metasub->prototype;
 
 Returns the prototype of the subroutine.
 
+=head2 set_prototype
+
+   $metasub = $metasub->set_prototype( $proto );
+
+I<Since version 0.007.>
+
+Sets a new prototype for the subroutine.
+
+Returns the C<$metasub> instance itself to allow for easy chaining.
+
 =cut
 
 =head1 TODO
 
 =over 4
-
-=item
-
-Setting the subname or prototype of a subroutine, inspired by the
-C<Sub::Util> functions of the same.
 
 =item
 

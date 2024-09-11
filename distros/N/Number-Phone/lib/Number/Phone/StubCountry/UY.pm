@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240607153922;
+our $VERSION = 1.20240910191017;
 
 my $formatters = [
                 {
@@ -66,7 +66,7 @@ my $validators = {
               770|
               9(?:
                 20|
-                87
+                [89]7
               )
             )|
             (?:
@@ -81,7 +81,7 @@ my $validators = {
               770|
               9(?:
                 20|
-                87
+                [89]7
               )
             )|
             (?:
@@ -104,25 +104,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"598452", "Colonia\ del\ Scaramento",
-"598435", "Florida",
-"598445", "Treinta\ y\ Tres",
-"5984364", "Trinidad\/Flores",
-"598462", "Rivera",
-"59842", "San\ Carlos",
-"598472", "Paysandu",
+$areanames{en} = {"598435", "Florida",
+"598447", "Rocha",
+"598433", "Canelones",
 "598434", "San\ Jose\ de\ Mayo",
-"598453", "Mercedes\/Soriano",
-"598464", "Melo\/Cerro\ Largo",
+"59842", "San\ Carlos",
 "598477", "Artigas",
 "5982", "Montevideo",
-"598444", "Minas\/Lavalleja",
-"598456", "Fray\ Bentos\/Rio\ Negro",
-"598447", "Rocha",
-"598463", "Tacuarembo",
-"598433", "Canelones",
 "598436", "Durazno",
-"598473", "Salto",};
+"598444", "Minas\/Lavalleja",
+"598452", "Colonia\ del\ Scaramento",
+"598472", "Paysandu",
+"598464", "Melo\/Cerro\ Largo",
+"598473", "Salto",
+"598453", "Mercedes\/Soriano",
+"598445", "Treinta\ y\ Tres",
+"598462", "Rivera",
+"5984364", "Trinidad\/Flores",
+"598463", "Tacuarembo",
+"598456", "Fray\ Bentos\/Rio\ Negro",};
 my $timezones = {
                '' => [
                        'America/Montevideo'

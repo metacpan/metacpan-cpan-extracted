@@ -26,8 +26,8 @@ use Moose::Util::TypeConstraints;
 no warnings qw/ experimental::signatures experimental::postderef /;
 
 with 'Business::TrueLayer::Types::Beneficiary';
+with 'Business::TrueLayer::Types::Remitter';
 with 'Business::TrueLayer::Types::User';
-use Business::TrueLayer::Remitter;
 
 use namespace::autoclean;
 
@@ -85,13 +85,6 @@ has [ qw/ currency / ] => (
     isa      => 'Str',
     required => 1,
 );
-
-coerce 'Business::TrueLayer::Remitter'
-    => from 'HashRef'
-    => via {
-        Business::TrueLayer::Remitter->new( %{ $_ } );
-    }
-;
 
 has remitter => (
     is       => 'ro',
