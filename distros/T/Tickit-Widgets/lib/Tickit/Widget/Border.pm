@@ -7,7 +7,7 @@ use v5.20;
 use warnings;
 use Object::Pad 0.807;
 
-package Tickit::Widget::Border 0.41;
+package Tickit::Widget::Border 0.42;
 class Tickit::Widget::Border :strict(params);
 
 inherit Tickit::ContainerWidget;

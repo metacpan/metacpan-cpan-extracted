@@ -4,11 +4,11 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   IO::Async::OS: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,16 +17,16 @@ name: Net-Async-WebSocket
 provides:
   Net::Async::WebSocket:
     file: lib/Net/Async/WebSocket.pm
-    version: '0.13'
+    version: '0.14'
   Net::Async::WebSocket::Client:
     file: lib/Net/Async/WebSocket/Client.pm
-    version: '0.13'
+    version: '0.14'
   Net::Async::WebSocket::Protocol:
     file: lib/Net/Async/WebSocket/Protocol.pm
-    version: '0.13'
+    version: '0.14'
   Net::Async::WebSocket::Server:
     file: lib/Net/Async/WebSocket/Server.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   IO::Async::Listener: '0.61'
   IO::Async::Notifier: '0.63'
@@ -35,10 +35,11 @@ requires:
   Protocol::WebSocket::Frame: '0'
   Protocol::WebSocket::Handshake::Client: '0'
   Protocol::WebSocket::Handshake::Server: '0'
-  Sub::Util: '1.40'
   URI: '0'
-  perl: '5.010'
+  URI::wss: '0'
+  meta: '0.008'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

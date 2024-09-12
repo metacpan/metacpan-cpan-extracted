@@ -7,7 +7,7 @@ use v5.20;
 use warnings;
 use Object::Pad 0.807 ':experimental(inherit_field)';
 
-package Tickit::Widget::VSplit 0.41;
+package Tickit::Widget::VSplit 0.42;
 class Tickit::Widget::VSplit :strict(params);
 
 inherit Tickit::Widget::LinearSplit qw( $_split_at $_split_len );

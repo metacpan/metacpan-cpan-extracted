@@ -1,5 +1,12 @@
 Revision history for meta
 
+0.008   2024-09-11
+        [CHANGES]
+         * Added `$metapkg->add_named_sub` for efficiently adding subroutines
+           and setting the subname of them at the same time
+         * Complain if the `->get` method is called on a metapackage instance,
+           and remind users they probably wanted a `->get_*` method instead
+
 0.007   2024-09-10
         [CHANGES]
          * Added `meta::for_reference()`

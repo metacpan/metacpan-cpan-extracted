@@ -1,5 +1,10 @@
 Revision history for PDL-DSP-Windows
 
+0.101     2024-09-11 20:13:59 BST
+
+Fixes:
+  * Make window and init fail if undefined or zero N given.
+
 0.100     2021-11-01 20:51:14 GMT
 
 No changes since last release

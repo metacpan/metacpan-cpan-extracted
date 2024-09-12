@@ -37,13 +37,13 @@ L<bookmark-feed> documents the details of how the Markdown pages are processed.
 
 =head1 REFERENCES
 
-RSS 2.0 Specification, U<https://cyber.harvard.edu/rss/rss.html>
+L<RSS 2.0 Specification|https://cyber.harvard.edu/rss/rss.html>
 
 =cut
 
 package App::BookmarkFeed;
 
-our $VERSION = 1.00;
+our $VERSION = 1.01;
 
 use v5.36;
 use File::Basename;

@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/echo-server.pl
@@ -6,13 +7,13 @@ lib/Net/Async/WebSocket.pm
 lib/Net/Async/WebSocket/Client.pm
 lib/Net/Async/WebSocket/Protocol.pm
 lib/Net/Async/WebSocket/Server.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01client.t
 t/02server.t
 t/03cross.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

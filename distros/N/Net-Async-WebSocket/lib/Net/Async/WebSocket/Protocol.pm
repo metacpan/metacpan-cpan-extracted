@@ -1,20 +1,20 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::WebSocket::Protocol;
+package Net::Async::WebSocket::Protocol 0.14;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Stream );
 
 use Carp;
 
-our $VERSION = '0.13';
-
 use Protocol::WebSocket::Frame;
-use Sub::Util 1.40 qw( set_subname );
+
+use meta 0.008;
+no warnings 'meta::experimental';
 
 my %FRAMETYPES = (
    1 => "text",
@@ -51,16 +51,16 @@ references in parameters:
 
 =head2 on_text_frame
 
-   $self->on_text_frame( $text )
-   $on_text_frame->( $self, $text )
+   $self->on_text_frame( $text );
+   $on_text_frame->( $self, $text );
 
 Invoked when a text frame is received. It is passed a Unicode character string
 formed by decoding the received UTF-8 bytes.
 
 =head2 on_frame
 
-   $self->on_frame( $text )
-   $on_frame->( $self, $text )
+   $self->on_frame( $text );
+   $on_frame->( $self, $text );
 
 A synonym for C<on_text_frame>, provided for backward compatibility.
 
@@ -68,16 +68,16 @@ This may be removed in a later version.
 
 =head2 on_binary_frame, on_ping_frame, on_pong_frame, on_close_frame
 
-   $self->on_..._frame( $bytes )
-   $on_..._frame->( $self, $bytes )
+   $self->on_..._frame( $bytes );
+   $on_..._frame->( $self, $bytes );
 
 Invoked when other types of frame are received. These will be passed plain
 byte strings.
 
 =head2 on_raw_frame
 
-   $self->on_raw_frame( $frame, $bytes )
-   $on_raw_frame->( $self, $frame, $bytes )
+   $self->on_raw_frame( $frame, $bytes );
+   $on_raw_frame->( $self, $frame, $bytes );
 
 Invoked when a frame is received that does not have a specific handler defined
 of one of the above types. C<$frame> will be an instance of
@@ -155,14 +155,14 @@ sub on_read
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 send_frame
 
-   $self->send_frame( @args )->get
+   await $self->send_frame( @args );
 
 Sends a frame to the peer containing containing the given string. The
 arguments are passed to L<Protocol::WebSocket::Frame>'s C<new> method.
@@ -182,7 +182,7 @@ sub send_frame
 
 =head2 send_text_frame
 
-   $self->send_text_frame( $text, %params )->get
+   await $self->send_text_frame( $text, %params );
 
 Sends a text frame to the peer. The given string will be treated as a Unicode
 character string, and sent as UTF-8 encoded bytes.
@@ -192,13 +192,13 @@ L<IO::Async::Stream/write> call.
 
 =head2 send_I<TYPE>_frame
 
-   $self->send_binary_frame( $bytes, %params )->get
+   await $self->send_binary_frame( $bytes, %params );
 
-   $self->send_ping_frame( $bytes, %params )->get
+   await $self->send_ping_frame( $bytes, %params );
 
-   $self->send_pong_frame( $bytes, %params )->get
+   await $self->send_pong_frame( $bytes, %params );
 
-   $self->send_close_frame( $bytes, %params )->get
+   await $self->send_close_frame( $bytes, %params );
 
 Sends a frame of the given type to the peer.
 
@@ -223,6 +223,8 @@ sub send_text_frame
    );
 }
 
+my $metapkg = meta::get_this_package;
+
 foreach my $type ( values %FRAMETYPES ) {
    next if $type eq "text";
    my $method = "send_${type}_frame";
@@ -240,8 +242,7 @@ foreach my $type ( values %FRAMETYPES ) {
       );
    };
 
-   no strict 'refs';
-   *$method = set_subname $method => $code;
+   $metapkg->add_named_sub( $method => $code );
 }
 
 =head1 AUTHOR

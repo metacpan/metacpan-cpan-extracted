@@ -19,5 +19,5 @@ no_index:
     - inc
 resources:
   repository: https://github.com/cade-vs/perl-net-waiter.git
-version: '1.14'
+version: '1.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

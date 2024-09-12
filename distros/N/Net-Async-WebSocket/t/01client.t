@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 use IO::Async::OS;
@@ -30,7 +30,7 @@ my $client = Net::Async::WebSocket::Client->new(
 );
 
 ok( defined $client, '$client defined' );
-isa_ok( $client, "Net::Async::WebSocket::Client", '$client' );
+isa_ok( $client, [ "Net::Async::WebSocket::Client" ], '$client' );
 
 $loop->add( $client );
 
@@ -55,7 +55,7 @@ $f->get;
 
    wait_for { @frames };
 
-   is_deeply( \@frames, [ "Here is my message" ], 'received @frames' );
+   is( \@frames, [ "Here is my message" ], 'received @frames' );
 
    undef @frames;
 }
@@ -78,7 +78,7 @@ $f->get;
 
    wait_for { @frames };
 
-   is_deeply( \@frames, [ "" ], 'received frame with false value' );
+   is( \@frames, [ "" ], 'received frame with false value' );
 }
 
 # U+2010 = HYPHEN = 0xe2 0x80 0x90

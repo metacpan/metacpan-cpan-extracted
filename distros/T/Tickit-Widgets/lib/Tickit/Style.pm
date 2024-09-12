@@ -7,12 +7,12 @@ use v5.20;
 use warnings;
 use Object::Pad 0.805;
 
-package Tickit::Style 0.59;
+package Tickit::Style 0.60;
 
 use warnings;
 use experimental 'postderef';
 
-use meta 0.003_002;
+use meta 0.008;
 no warnings 'meta::experimental';
 
 use Carp;
@@ -250,11 +250,11 @@ sub import
       $meta->add_method( _widget_style_type => sub () { $type } );
    }
    else {
-      carp "Using legacy Tickit::Style exporter using no strict 'refs'";
+      carp "Using legacy Tickit::Style exporter for non-class";
 
-      no strict 'refs';
-      *{"${pkg}::$_"} = \&{"Tickit::Style::$_"} for @EXPORTS;
-      *{"${pkg}::_widget_style_type"} = sub () { $type };
+      my $metapkg = meta::package->get( $pkg );
+      $metapkg->add_named_sub( $_ => \&{"Tickit::Style::$_"} ) for @EXPORTS;
+      $metapkg->add_named_sub( _widget_style_type => sub () { $type } );
    }
 
    $TAGSETS_BY_TYPE_CLASS{$type} ||= {};

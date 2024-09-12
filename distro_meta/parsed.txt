@@ -94008,3 +94008,17 @@ H/HA/HANJE/Tk-YANoteBook-0.07.tar.gz
 D/DE/DERIV/WebService-GrowthBook-0.003.tar.gz
 H/HA/HAX/Webservice-InternetDB-API-1.002.tar.gz
 H/HA/HAX/Webservice-Ipify-API-1.002.tar.gz
+S/SC/SCHROEDER/App-BookmarkFeed-1.01.tar.gz
+U/UT/UTASHIRO/App-optex-scroll-0.9901.tar.gz
+D/DO/DOMM/App-TimeTracker-Gtk3StatusIcon-1.000.tar.gz
+P/PE/PEVANS/Convert-Color-0.18.tar.gz
+A/AA/AAR/DBIx-Lite-0.34.tar.gz
+J/JB/JBAIER/Device-Yeelight-0.14.tar.gz
+P/PE/PEVANS/meta-0.008.tar.gz
+P/PE/PEVANS/Net-Async-WebSocket-0.14.tar.gz
+D/DJ/DJERIUS/Net-FTP-Path-Iter-0.07.tar.gz
+C/CA/CADE/Net-Waiter-1.15.tar.gz
+E/ET/ETJ/PDL-DSP-Windows-0.101.tar.gz
+L/LN/LNATION/Term-ANSI-Sprintf-0.04.tar.gz
+U/UT/UTASHIRO/Term-ANSIColor-Concise-2.07.tar.gz
+P/PE/PEVANS/Tickit-Widgets-0.42.tar.gz

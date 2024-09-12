@@ -1,0 +1,10 @@
+Revision history for Perl extension App-optex-scroll
+
+0.9901 2024-09-12T02:20:50Z
+
+    - use Term::ANSIColor::Concise@2.07 and csi_report()
+
+0.99 2024-09-11T12:39:12Z
+
+    - original version
+

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::RGB 0.17;
+package Convert::Color::RGB 0.18;
 
 use v5.14;
 use warnings;
@@ -50,13 +50,13 @@ and L<Convert::Color::RGB16>.
 
 =head2 new
 
-   $color = Convert::Color::RGB->new( $red, $green, $blue )
+   $color = Convert::Color::RGB->new( $red, $green, $blue );
 
 Returns a new object to represent the set of values given. These values should
 be floating-point numbers between 0 and 1. Values outside of this range will
 be clamped.
 
-   $color = Convert::Color::RGB->new( $string )
+   $color = Convert::Color::RGB->new( $string );
 
 Parses C<$string> for values, and construct a new object similar to the above
 three-argument form. The string should be in the form
@@ -104,15 +104,15 @@ sub new
 
 =head2 red
 
-   $r = $color->red
+   $r = $color->red;
 
 =head2 green
 
-   $g = $color->green
+   $g = $color->green;
 
 =head2 blue
 
-   $b = $color->blue
+   $b = $color->blue;
 
 Accessors for the three components of the color.
 
@@ -125,7 +125,7 @@ sub blue  { shift->[2] }
 
 =head2 rgb
 
-   ( $red, $green, $blue ) = $color->rgb
+   ( $red, $green, $blue ) = $color->rgb;
 
 Returns the individual red, green and blue color components of the color
 value.
@@ -146,7 +146,7 @@ sub new_rgb
 
 =head2 alpha_blend
 
-   $mix = $color->alpha_blend( $other, [ $alpha ] )
+   $mix = $color->alpha_blend( $other, [ $alpha ] );
 
 Return a new color which is a blended combination of the two passed into it.
 The optional C<$alpha> parameter defines the mix ratio between the two colors,
@@ -179,7 +179,7 @@ sub alpha_blend
 
 =head2 dst_rgb
 
-   $measure = $color->dst_rgb( $other )
+   $measure = $color->dst_rgb( $other );
 
 Return a measure of the distance between the two colors. This is the
 unweighted Euclidean distance of the three color components. Two identical
@@ -198,7 +198,7 @@ sub dst_rgb
 
 =head2 dst_rgb_cheap
 
-   $measure = $color->dst_rgb_cheap( $other )
+   $measure = $color->dst_rgb_cheap( $other );
 
 Return a measure of the distance between the two colors. This is the sum of
 the squares of the differences of each of the color components. This is part

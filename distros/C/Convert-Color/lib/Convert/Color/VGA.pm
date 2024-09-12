@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::VGA 0.17;
+package Convert::Color::VGA 0.18;
 
 use v5.14;
 use warnings;
@@ -81,11 +81,11 @@ __PACKAGE__->register_palette(
 
 =head2 new
 
-   $color = Convert::Color::VGA->new( $name )
+   $color = Convert::Color::VGA->new( $name );
 
 Returns a new object to represent the named color.
 
-   $color = Convert::Color::VGA->new( $index )
+   $color = Convert::Color::VGA->new( $index );
 
 Returns a new object to represent the color at the given index.
 
@@ -128,7 +128,7 @@ sub new
 
 =head2 index
 
-   $index = $color->index
+   $index = $color->index;
 
 The index of the VGA color.
 
@@ -142,7 +142,7 @@ sub index
 
 =head2 name
 
-   $name = $color->name
+   $name = $color->name;
 
 The name of the VGA color.
 

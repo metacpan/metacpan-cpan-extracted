@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Net::FTP;
 use File::Spec::Functions qw[ splitpath ];
@@ -47,9 +47,9 @@ sub new {
     my $class = shift;
 
     my %attr;
-    if (@_ % 2) {
+    if ( @_ % 2 ) {
         my $host = shift;
-        %attr  = @_;
+        %attr = @_;
         $attr{Host} = $host;
     }
     else {
@@ -67,11 +67,11 @@ sub new {
     defined( my $password = delete $attr{password} )
       or croak( "missing password attribute\n" );
 
-    $self->{server} = Net::FTP->new($host, %attr)
-      or croak("unable to connect to server $host\n");
+    $self->{server} = Net::FTP->new( $host, %attr )
+      or croak( "unable to connect to server $host\n" );
 
     $self->{server}->login( $user, $password )
-      or croak("unable to log in to $host\n");
+      or croak( "unable to log in to $host\n" );
 
     return $self;
 }
@@ -83,7 +83,7 @@ sub _defaults {
         depthfirst      => 0,
         sorted          => 1,
         loop_safe       => 1,
-        error_handler   => sub { die sprintf( "%s: %s", @_ ) },
+        error_handler   => sub { die sprintf( '%s: %s', @_ ) },
         visitor         => undef,
     );
 }
@@ -105,14 +105,14 @@ sub _objectify {
 
     my ( $self, $path ) = @_;
 
-    my ( $volume, $directories, $name ) = splitpath($path);
+    my ( undef, $directories, $name ) = splitpath( $path );
 
     $directories =~ s{(.+)/$}{$1};
 
     my %attr = (
-        parent  => $directories,
-        name => $name,
-        path => $path,
+        parent => $directories,
+        name   => $name,
+        path   => $path,
     );
 
     return Net::FTP::Path::Iter::Dir->new( server => $self->{server}, %attr );
@@ -120,7 +120,7 @@ sub _objectify {
 
 sub _children {
 
-    my ( $self, $path ) = @_;
+    my ( undef, $path ) = @_;
 
     return map { [ $_->{name}, $_ ] } $path->_children;
 }
@@ -160,7 +160,7 @@ Net::FTP::Path::Iter - Iterative, recursive, FTP file finder
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -235,7 +235,7 @@ The B<Net::FTP> object representing the connection to the FTP server.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter
+Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter>
 
 =head2 Source
 

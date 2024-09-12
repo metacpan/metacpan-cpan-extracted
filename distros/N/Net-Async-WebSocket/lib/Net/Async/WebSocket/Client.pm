@@ -1,38 +1,32 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::WebSocket::Client;
+package Net::Async::WebSocket::Client 0.14;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Net::Async::WebSocket::Protocol );
-use 5.010;  # //
 
 IO::Async::Notifier->VERSION( '0.63' ); # ->adopt_future
 
 use Carp;
 
-use Scalar::Util qw( blessed );
+BEGIN {
+   if( $^V ge v5.40 ) {
+      *blessed = \&builtin::blessed;
+   }
+   else {
+      require Scalar::Util;
+      *blessed = \&Scalar::Util::blessed;
+   }
+}
 
 use URI;
+use URI::wss;
 
 BEGIN {
-   eval {
-      require URI::wss;
-   } or do {
-      # In case URI doesn't know that ws:// and wss:// URIs use host/port
-      require URI::_server;
-
-      @URI::ws::ISA = qw( URI::_server );
-      *URI::ws::default_port = sub { 80 };
-
-      @URI::wss::ISA = qw( URI::_server );
-      *URI::wss::default_port = sub { 443 };
-      *URI::wss::secure = sub { 1 };
-   };
-
    # We also need to support ->resource_name, which the CPAN module does not
    # understand as of 2017-01-01
    no warnings 'once';
@@ -40,8 +34,6 @@ BEGIN {
       shift->path_query
    } unless URI::wss->can( "resource_name" );
 }
-
-our $VERSION = '0.13';
 
 use Protocol::WebSocket::Handshake::Client;
 
@@ -52,26 +44,26 @@ C<IO::Async>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop;
- use Net::Async::WebSocket::Client;
+   use Future::AsyncAwait;
 
- my $client = Net::Async::WebSocket::Client->new(
-    on_text_frame => sub {
-       my ( $self, $frame ) = @_;
-       print $frame;
-    },
- );
+   use IO::Async::Loop;
+   use Net::Async::WebSocket::Client;
 
- my $loop = IO::Async::Loop->new;
- $loop->add( $client );
+   my $client = Net::Async::WebSocket::Client->new(
+      on_text_frame => sub {
+         my ( $self, $frame ) = @_;
+         print $frame;
+      },
+   );
 
- $client->connect(
-    url => "ws://$HOST:$PORT/",
- )->then( sub {
-    $client->send_text_frame( "Hello, world!\n" );
- })->get;
+   my $loop = IO::Async::Loop->new;
+   $loop->add( $client );
 
- $loop->run;
+   await $client->connect( url => "ws://$HOST:$PORT/" );
+
+   await $client->send_text_frame( "Hello, world!\n" );
+
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -91,8 +83,8 @@ sub new
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
@@ -130,7 +122,7 @@ sub _do_handshake
 
 =head2 connect
 
-   $self->connect( %params )->get
+   await $self->connect( %params );
 
 Connect to a WebSocket server. Takes the following named parameters:
 
@@ -153,7 +145,7 @@ in chaining constructors.
 
 =head2 connect (void)
 
-   $self->connect( %params )
+   $self->connect( %params );
 
 When not returning a C<Future>, the following additional parameters provide
 continuations:
@@ -203,7 +195,7 @@ sub connect
 
 =head2 connect_handle
 
-   $client->connect_handle( $handle, %params )->get
+   await $client->connect_handle( $handle, %params );
 
 Sets the read and write handles to the IO reference given, then performs the
 initial handshake using the parameters given. These are as for C<connect>.

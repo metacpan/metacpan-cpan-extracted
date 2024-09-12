@@ -14,11 +14,9 @@ use POSIX ":sys_wait_h";
 use IO::Socket::INET;
 use Sys::SigAction qw( set_sig_handler );
 use IPC::Shareable;
-use Time::HiRes qw( sleep );
 use Data::Dumper;
-use Errno;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 $Data::Dumper::Terse = 1;
  
@@ -177,20 +175,18 @@ sub run
     $self->{ 'STAT' }{ 'BUSY_COUNT' } = $self->{ 'SHA' }{ 'STAT' }{ 'BUSY_COUNT' };
 
     $self->__sha_unlock( 'MASTER STATS UPDATE' );
-
-    if( $self->{ 'DEBUG' } )
-      {
-      require Data::Dumper;  
-      $Data::Dumper::Sortkeys++;
-      my $tf = $self->{ 'FORKS' };
-      my $kk = $self->{ 'KIDS'  };
-      my $bk = $self->{ 'KIDS_BUSY' };
-      }
-
     }
 
   $self->propagate_signal( 'TERM' );
 
+  # wait kids before removing shared memory, limit to 16 secods...
+  my $wait_time = time();
+  while( $self->{ 'KIDS' } and ( time() - $wait_time < 16 ) )
+    {
+    $self->log( "status: about to exit, waiting kids: " . $self->{ 'KIDS' } );
+    sleep(1);
+    }
+  
   tied( %{ $self->{ 'SHA' } } )->remove();
   delete $self->{ 'SHA' };
 
@@ -293,7 +289,7 @@ sub __run_forking
   # ------- child exits here -------
 }
 
-my $next_stat = time() + 4;
+my $__prefork_next_stat = time() + 4;
 sub __run_prefork
 {
   my $self          = shift;
@@ -312,26 +308,14 @@ sub __run_prefork
   my $mf = $self->{ 'MAXFORK' };
   $tk = $mf if $mf > 0 and $tk > $mf; # MAXFORK cap
 
-  if( time() > $next_stat )
+  if( time() > $__prefork_next_stat )
     {
-    $self->__sha_lock_ro( 'MASTER SHARED STATE' );
-    $self->log_debug( "debug: shared memory state:\n" . Dumper( $self->{ 'SHA' } ) );
-    $self->__sha_unlock( 'MASTER SHARED STATE' );
-
-    $self->log_debug( "debug: stats:\n" . Dumper( $self->{ 'STAT' } ) );
     $self->{ 'STAT' }{ 'IDLE_FREQ' }{ int( $ik / 5 ) * 5 }++ if $bk > 0;
-
-    my $_c = 10;
-    for my $k ( sort { $self->{ 'STAT' }{ 'IDLE_FREQ' }{ $b } <=> $self->{ 'STAT' }{ 'IDLE_FREQ' }{ $a } } keys %{ $self->{ 'STAT' }{ 'IDLE_FREQ' } } )
-      {
-      my $v = $self->{ 'STAT' }{ 'IDLE_FREQ' }{ $k };
-      $self->log_debug( sprintf( "debug: %3d idle(s) => %3d time(s)", $k, $v ) );
-      last unless $_c--;
-      }
-
-    $next_stat = time() + 4;
+    $self->__prefork_print_stat() if $self->{ 'DEBUG' };
+    $__prefork_next_stat = time() + 4;
     }
-  $self->log_debug( "debug: kids: $kk   busy: $bk   idle: $ik   to_fork: $tk   will_fork?: $kk < $tk" );
+  my $tbk = $self->{ 'STAT' }{ 'BUSY_COUNT' };
+  $self->log_debug( "debug: kids: $kk   busy: $bk   idle: $ik   to_fork: $tk   will_fork?: $kk < $tk  total busy count: $tbk" );
 
   while( $self->{ 'KIDS' } < $tk )
     {
@@ -389,7 +373,6 @@ sub __run_prefork
       # ------- child exits here -------
       }  
     }
-    
 }
 
 sub __run_preforked_child
@@ -430,6 +413,25 @@ sub __run_preforked_child
   return $res;
 }
 
+sub __prefork_print_stat
+{
+  my $self = shift;
+
+  $self->__sha_lock_ro( 'MASTER SHARED STATE' );
+  $self->log_debug( "debug: shared memory state:\n" . Dumper( $self->{ 'SHA' } ) );
+  $self->__sha_unlock( 'MASTER SHARED STATE' );
+
+  $self->log_debug( "debug: stats:\n" . Dumper( $self->{ 'STAT' } ) );
+
+  my $_c = 10;
+  for my $k ( sort { $self->{ 'STAT' }{ 'IDLE_FREQ' }{ $b } <=> $self->{ 'STAT' }{ 'IDLE_FREQ' }{ $a } } keys %{ $self->{ 'STAT' }{ 'IDLE_FREQ' } } )
+    {
+    my $v = $self->{ 'STAT' }{ 'IDLE_FREQ' }{ $k };
+    $self->log_debug( sprintf( "debug: %3d idle(s) => %3d time(s)", $k, $v ) );
+    last unless $_c--;
+    }
+}
+
 ##############################################################################
 
 #use Data::Tools;
@@ -458,6 +460,7 @@ sub __sha_obtain_lock
   my $op   = shift;
   my $str  = shift;
   
+  my $limit = 16;
   my $rc;
   while( ! $rc )
     {
@@ -465,9 +468,13 @@ sub __sha_obtain_lock
     return $rc if $rc;
     next if $!{EINTR} or $!{EAGAIN};
     $self->log( "error: cannot obtain $str lock for SHA! [$rc] $! retry in 1 second" );  
+    last if $self->{ 'BREAK_MAIN_LOOP' };
+    last unless $limit--;
     sleep(1);
     }
   $self->log( "error: cannot obtain $str lock for SHA! $!" );  
+  my $ppid = $self->get_parent_pid();
+  die "error: [$ppid/$$] cannot obtain $str lock for SHA! $!, will exit\n";
   return undef;  
 }
 
@@ -1029,10 +1036,14 @@ whoever forks further here, should reinstall signal handler if needed.
 
 =head1 REQUIRED MODULES
 
-Net::Waiter is designed to be compact and self sufficient. 
-However it uses some 3rd party modules:
-
+Net::Waiter tries to use as little modules as possible. Currenlty only those
+core modules are in use:
   * IO::Socket::INET
+  * POSIX ":sys_wait_h";
+  * IO::Socket::INET;
+  * Sys::SigAction qw( set_sig_handler );
+  * IPC::Shareable;
+  * Data::Dumper;
 
 =head1 DEMO
 

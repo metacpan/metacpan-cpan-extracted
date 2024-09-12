@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -9,6 +10,9 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004',
    },
    requires => {
+      'perl' => '5.014',
+      'meta' => '0.008',
+
       'IO::Async::Listener' => '0.61', # handle_class
       'IO::Async::Notifier' => '0.63', # ->adopt_future
       'IO::Async::Stream' => '0.34',
@@ -16,13 +20,12 @@ my $build = Module::Build->new(
       'Protocol::WebSocket::Frame' => 0,
       'Protocol::WebSocket::Handshake::Client' => 0,
       'Protocol::WebSocket::Handshake::Server' => 0,
-      'Sub::Util' => '1.40', # set_subname
       'URI' => 0,
-      'perl' => '5.010', # //
+      'URI::wss' => 0,
    },
    test_requires => {
       'IO::Async::OS' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    license => 'perl',
    create_license => 1,

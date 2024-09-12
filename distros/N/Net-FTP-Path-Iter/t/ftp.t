@@ -95,13 +95,13 @@ my @got;
 ok(
     lives {
         $ftp->all(
-            '.',
+            q{.},
             {
                 visitor => sub {
-                    push @got, $_ . ' ' . $_->{type};
+                    push @got, $_ . q{ } . $_->{type};
                 },
             }
-          ),
+        ),
     },
     'traverse',
 ) or die $@;

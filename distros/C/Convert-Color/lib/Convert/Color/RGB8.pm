@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::RGB8 0.17;
+package Convert::Color::RGB8 0.18;
 
 use v5.14;
 use warnings;
@@ -54,12 +54,12 @@ For representations using 16-bit integers, see L<Convert::Color::RGB16>.
 
 =head2 new
 
-   $color = Convert::Color::RGB8->new( $red, $green, $blue )
+   $color = Convert::Color::RGB8->new( $red, $green, $blue );
 
 Returns a new object to represent the set of values given. These values should
 be integers between 0 and 255. Values outside of this range will be clamped.
 
-   $color = Convert::Color::RGB8->new( $string )
+   $color = Convert::Color::RGB8->new( $string );
 
 Parses C<$string> for values, and construct a new object similar to the above
 three-argument form. The string should be in the form
@@ -114,15 +114,15 @@ sub new
 
 =head2 red
 
-   $r = $color->red
+   $r = $color->red;
 
 =head2 green
 
-   $g = $color->green
+   $g = $color->green;
 
 =head2 blue
 
-   $b = $color->blue
+   $b = $color->blue;
 
 Accessors for the three components of the color.
 
@@ -150,7 +150,7 @@ sub new_rgb
 
 =head2 rgb8
 
-   ( $red, $green, $blue ) = $color->rgb8
+   ( $red, $green, $blue ) = $color->rgb8;
 
 Returns the individual red, green and blue color components of the color
 value in RGB8 space.
@@ -165,7 +165,7 @@ sub rgb8
 
 =head2 hex
 
-   $str = $color->hex
+   $str = $color->hex;
 
 Returns a string representation of the color components in the RGB8 space, in
 a convenient C<RRGGBB> hex string, likely to be useful HTML, or other similar
@@ -181,7 +181,7 @@ sub hex :method
 
 =head2 alpha_blend
 
-   $mix = $color->alpha_blend( $other, [ $alpha ] )
+   $mix = $color->alpha_blend( $other, [ $alpha ] );
 
 Return a new color which is a blended combination of the two passed into it.
 The optional C<$alpha> parameter defines the mix ratio between the two colors,
@@ -215,7 +215,7 @@ sub alpha_blend
 
 =head2 alpha8_blend
 
-   $mix = $color->alpha8_blend( $other, [ $alpha ] )
+   $mix = $color->alpha8_blend( $other, [ $alpha ] );
 
 Similar to C<alpha_blend> but works with integer arithmetic. C<$alpha> should
 be an integer in the range 0 to 255.
@@ -247,7 +247,7 @@ sub alpha8_blend
 
 =head2 dst_rgb8
 
-   $measure = $color->dst_rgb8( $other )
+   $measure = $color->dst_rgb8( $other );
 
 Return a measure of the distance between the two colors. This is the
 unweighted Euclidean distance of the three color components. Two identical
@@ -266,7 +266,7 @@ sub dst_rgb8
 
 =head2 dst_rgb8_cheap
 
-   $measure = $color->dst_rgb8_cheap( $other )
+   $measure = $color->dst_rgb8_cheap( $other );
 
 Return a measure of the distance between the two colors. This is the sum of
 the squares of the differences of each of the color components. This is part

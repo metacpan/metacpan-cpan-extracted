@@ -1,0 +1,8 @@
+Revision history for App::TimeTracker::Gtk3StatusIcon
+
+1.000     2024-09-11 21:35:42+02:00
+    - port from App::TimeTracker::Gtk2TrayIcon to GTK3
+    - Use IO::Async instead of AnyEvent
+    - Watch the current tracker file directly instead of polling every 5 seconds
+    - Add a lockfile so only on instance of the script is running
+

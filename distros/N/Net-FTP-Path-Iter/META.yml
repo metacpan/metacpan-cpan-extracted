@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,16 +30,16 @@ no_index:
 provides:
   Net::FTP::Path::Iter:
     file: lib/Net/FTP/Path/Iter.pm
-    version: '0.06'
+    version: '0.07'
   Net::FTP::Path::Iter::Dir:
     file: lib/Net/FTP/Path/Iter/Dir.pm
-    version: '0.06'
+    version: '0.07'
   Net::FTP::Path::Iter::Entry:
     file: lib/Net/FTP/Path/Iter/Entry.pm
-    version: '0.06'
+    version: '0.07'
   Net::FTP::Path::Iter::File:
     file: lib/Net/FTP/Path/Iter/File.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Class::Tiny: '0'
   File::Listing: '0'
@@ -47,11 +47,11 @@ requires:
   Path::Iterator::Rule: '1.012'
   experimental: '0'
   namespace::clean: '0'
-  perl: '5.010'
+  perl: '5.012'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter
   repository: https://gitlab.com/djerius/net-ftp-path-iter.git
-version: '0.06'
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.07'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: GPL-3.0-only

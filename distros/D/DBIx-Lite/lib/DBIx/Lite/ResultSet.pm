@@ -1,5 +1,5 @@
 package DBIx::Lite::ResultSet;
-$DBIx::Lite::ResultSet::VERSION = '0.33';
+$DBIx::Lite::ResultSet::VERSION = '0.34';
 use strict;
 use warnings;
 
@@ -56,6 +56,14 @@ for my $methname (qw(group_by having order_by limit offset rows_per_page page fr
         # return object
         $new_self;
     };
+}
+
+sub distinct {
+    my ($self, $value) = @_;
+    
+    my $new_self = $self->_clone;
+    $new_self->{distinct} = !defined($value) || $value;
+    $new_self;
 }
 
 sub for_update {
@@ -246,7 +254,7 @@ sub select_sql {
     }
     
     my ($sql, @bind) = $self->{dbix_lite}->{abstract}->select(
-        -columns    => [ uniq @cols ],
+        -columns    => [ ($self->{distinct} ? '-distinct' : ()), uniq @cols ],
         -from       => [ @from ],
         -where      => { -and => $self->{where} },
         $self->{group_by}   ? (-group_by    => $self->{group_by})   : (),
@@ -717,7 +725,7 @@ DBIx::Lite::ResultSet
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 OVERVIEW
 
@@ -824,6 +832,13 @@ See the L<page> method too if you want an easier interface for pagination.
 It returns a L<DBIx::Lite::ResultSet> object to allow for further method chaining.
 
     my $rs = $books_rs->limit(5)->offset(10);
+
+=head2 distinct
+
+This method sets the DISTINCT flag in the SQL query. To turn if off again, pass a false
+value.
+
+    my $authors = $dbix->table('authors')->select('name')->distinct;
 
 =head2 for_update
 
@@ -1160,7 +1175,7 @@ Alessandro Ranellucci <aar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Alessandro Ranellucci.
+This software is copyright (c) 2024 by Alessandro Ranellucci.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

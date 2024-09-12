@@ -22,7 +22,7 @@ provides:
     version: '0.59'
   Tickit::Style:
     file: lib/Tickit/Style.pm
-    version: '0.59'
+    version: '0.60'
   Tickit::Style::Parser:
     file: lib/Tickit/Style/Parser.pm
     version: '0.56'
@@ -31,52 +31,54 @@ provides:
     version: '0.58'
   Tickit::Widget::Border:
     file: lib/Tickit/Widget/Border.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::Box:
     file: lib/Tickit/Widget/Box.pm
     version: '0.60'
   Tickit::Widget::Button:
     file: lib/Tickit/Widget/Button.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::CheckButton:
     file: lib/Tickit/Widget/CheckButton.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::Entry:
     file: lib/Tickit/Widget/Entry.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::Fill:
     file: lib/Tickit/Widget/Fill.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::Frame:
     file: lib/Tickit/Widget/Frame.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::GridBox:
     file: lib/Tickit/Widget/GridBox.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::HBox:
     file: lib/Tickit/Widget/HBox.pm
     version: '0.53'
   Tickit::Widget::HLine:
     file: lib/Tickit/Widget/HLine.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::HSplit:
     file: lib/Tickit/Widget/HSplit.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::LinearBox:
     file: lib/Tickit/Widget/LinearBox.pm
     version: '0.55'
   Tickit::Widget::LinearSplit:
     file: lib/Tickit/Widget/LinearSplit.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::Placegrid:
     file: lib/Tickit/Widget/Placegrid.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::RadioButton:
     file: lib/Tickit/Widget/RadioButton.pm
-    version: '0.41'
+    version: '0.42'
+  Tickit::Widget::RadioButton::Group:
+    file: lib/Tickit/Widget/RadioButton.pm
   Tickit::Widget::Spinner:
     file: lib/Tickit/Widget/Spinner.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::Static:
     file: lib/Tickit/Widget/Static.pm
     version: '0.58'
@@ -85,22 +87,22 @@ provides:
     version: '0.53'
   Tickit::Widget::VLine:
     file: lib/Tickit/Widget/VLine.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widget::VSplit:
     file: lib/Tickit/Widget/VSplit.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::WidgetRole:
     file: lib/Tickit/WidgetRole.pm
-    version: '0.53'
+    version: '0.54'
   Tickit::WidgetRole::Alignable:
     file: lib/Tickit/WidgetRole/Alignable.pm
     version: '0.52'
   Tickit::WidgetRole::SingleChildContainer:
     file: lib/Tickit/WidgetRole/SingleChildContainer.pm
-    version: '0.41'
+    version: '0.42'
   Tickit::Widgets:
     file: lib/Tickit/Widgets.pm
-    version: '0.41'
+    version: '0.42'
 requires:
   List::Util: '1.33'
   Object::Pad: '0.808'
@@ -110,9 +112,9 @@ requires:
   Tickit::RenderBuffer: '0'
   Tickit::Utils: '0.29'
   Tickit::Window: '0.57'
-  meta: 0.003_002
+  meta: '0.008'
   perl: '5.020'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.41'
+version: '0.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 
@@ -65,12 +65,12 @@ $client->send_text_frame( "Here is my message" );
 
 wait_for { @serverframes };
 
-is_deeply( \@serverframes, [ "Here is my message" ], 'received @serverframes' );
+is( \@serverframes, [ "Here is my message" ], 'received @serverframes' );
 
 $acceptedclient->send_text_frame( "Here is my response" );
 
 wait_for { @clientframes };
 
-is_deeply( \@clientframes, [ "Here is my response" ], 'received @clientframes' );
+is( \@clientframes, [ "Here is my response" ], 'received @clientframes' );
 
 done_testing;

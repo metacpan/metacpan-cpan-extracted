@@ -1,5 +1,12 @@
 Revision history for Perl extension Net::Waiter
 
+1.15  2024-09-11
+
+    1. removed Time::HiRes dependency
+    2. wait for child processes to finish before removing shared memory
+    3. some debug messages removed
+    4. bring back rtmin rtmax busy idle signals
+
 1.14  2024-09-08
 
     1. fixed bug with shared memory locking logic

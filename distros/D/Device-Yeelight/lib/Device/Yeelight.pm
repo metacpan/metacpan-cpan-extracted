@@ -17,11 +17,11 @@ Device::Yeelight - Controller for Yeelight smart devices
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ EOQ
 
     my @ready;
     while ( @ready = $sel->can_read( $self->{timeout} ) ) {
-        break unless @ready;
+        last unless @ready;
         foreach my $fh (@ready) {
             my $data;
             $fh->recv( $data, 4096 );

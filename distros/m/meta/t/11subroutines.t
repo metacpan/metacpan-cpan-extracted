@@ -47,4 +47,18 @@ sub to_be_modified { }
       '$metasub->prototype after ->set_prototype' );
 }
 
+{
+   my $metapkg = meta::package->get( "main" );
+
+   my $metasub = $metapkg->add_named_sub(
+      newly_added_sub => sub { "the result" }
+   );
+   ok( $metasub->is_subroutine, '->add_named_sub returned a metasub' );
+
+   is( main->newly_added_sub(), "the result",
+      'Result of calling sub added by ->add_named_sub' );
+   is( $metapkg->get_symbol( '&newly_added_sub' )->subname, "main::newly_added_sub",
+      'Newly added sub has correct subname' );
+}
+
 done_testing;

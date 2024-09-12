@@ -46,6 +46,10 @@ sub postamble {
   push @ret, <<'EOT';
 README.md: script/bookmark-feed
 	pod2markdown --utf8 $< $@
+
+# Check for syntax and documentation formatting errors
+check:
+	find lib -name '*.pm' -exec perl -Ilib -c '{}' ';' -exec podchecker '{}' ';'
 EOT
   return join "\n", @ret;
 }

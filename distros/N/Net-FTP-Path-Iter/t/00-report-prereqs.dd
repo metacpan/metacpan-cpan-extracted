@@ -44,13 +44,11 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Test::PodSpelling' => '0',
                                       'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0',
                                       'Dist::Zilla::Plugin::Test::TrailingSpace' => '0',
-                                      'Dist::Zilla::Plugin::Test::UnusedVars' => '0',
                                       'Dist::Zilla::Plugin::Test::Version' => '0',
                                       'Dist::Zilla::PluginBundle::Basic' => '0',
                                       'Dist::Zilla::PluginBundle::Filter' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Weaver::Plugin::StopWords' => '0',
-                                      'Pod::Weaver::Section::BugsAndLimitations' => '0',
                                       'Pod::Weaver::Section::Contributors' => '0',
                                       'Pod::Weaver::Section::GenerateSection' => '0',
                                       'Pod::Weaver::Section::SeeAlso' => '0',
@@ -67,7 +65,6 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Spelling' => '0.12',
                                       'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0',
                                       'Test::Version' => '1'
                                     }
                     },
@@ -79,7 +76,7 @@ do { my $x = {
                                       'Path::Iterator::Rule' => '1.012',
                                       'experimental' => '0',
                                       'namespace::clean' => '0',
-                                      'perl' => '5.010'
+                                      'perl' => '5.012'
                                     }
                     },
        'test' => {

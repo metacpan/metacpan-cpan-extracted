@@ -312,17 +312,22 @@ PROTOTYPES: ENABLE
 SV *
 sprintf(...)
 	CODE:
+		AV * params = av_make(items, MARK+1);
+		SV * spr = av_shift(params);
+		char * sprint = preprocess(SvPV_nolen(spr));
+		int len = av_len(params);
 		dSP;
-		ENTER;
-		SAVETMPS;
-		char * sprint = preprocess(SvPV_nolen(ST(0)));
-		ST(0) = newSVpv(sprint, strlen(sprint));
-		perl_call_method("Term::ANSI::Sprintf::_sprintf", 3);
+		PUSHMARK(SP);
+		EXTEND(SP, len + 2);
+		PUSHs(sv_2mortal(newSVpv("Term::ANSI::Sprintf", 0)));
+		PUSHs(newSVpv(sprint, 0));
+		for (int i = 0; i <= len; i++) {
+			PUSHs(newSVsv(*av_fetch(params, i, 0)));
+		}
+		PUTBACK;
+		call_method("_sprintf", 3);
 		SPAGAIN;
 		RETVAL = newSVsv(POPs);
-		PUTBACK;
-		FREETMPS;
-		LEAVE;
 	OUTPUT:
 		RETVAL
 

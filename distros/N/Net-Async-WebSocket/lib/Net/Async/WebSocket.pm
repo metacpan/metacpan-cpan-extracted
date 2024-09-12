@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::WebSocket;
+package Net::Async::WebSocket 0.14;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.13';
 
 =head1 NAME
 

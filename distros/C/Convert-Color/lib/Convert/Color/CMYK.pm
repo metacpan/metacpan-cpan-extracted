@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::CMYK 0.17;
+package Convert::Color::CMYK 0.18;
 
 use v5.14;
 use warnings;
@@ -49,13 +49,13 @@ floating-point values in the range 0 to 1.
 
 =head2 new
 
-   $color = Convert::Color::CMYK->new( $cyan, $magenta, $yellow, $key )
+   $color = Convert::Color::CMYK->new( $cyan, $magenta, $yellow, $key );
 
 Returns a new object to represent the set of values given. These values should
 be floating-point numbers between 0 and 1. Values outside of this range will
 be clamped.
 
-   $color = Convert::Color::CMYK->new( $string )
+   $color = Convert::Color::CMYK->new( $string );
 
 Parses C<$string> for values, and construct a new object similar to the above
 three-argument form. The string should be in the form
@@ -103,19 +103,19 @@ sub new
 
 =head2 cyan
 
-   $c = $color->cyan
+   $c = $color->cyan;
 
 =head2 magenta
 
-   $m = $color->magenta
+   $m = $color->magenta;
 
 =head2 yellow
 
-   $y = $color->yellow
+   $y = $color->yellow;
 
 =head2 key
 
-   $k = $color->key
+   $k = $color->key;
 
 Accessors for the four components of the color.
 
@@ -129,7 +129,7 @@ sub key     { shift->[3] }
 
 =head2 black
 
-   $k = $color->black
+   $k = $color->black;
 
 An alias to C<key>
 
@@ -139,7 +139,7 @@ An alias to C<key>
 
 =head2 cmyk
 
-   ( $cyan, $magenta, $yellow, $key ) = $color->cmyk
+   ( $cyan, $magenta, $yellow, $key ) = $color->cmyk;
 
 Returns the individual cyan, magenta, yellow and key components of the color
 value.

@@ -1,0 +1,15 @@
+name           = "App-optex-scroll"
+badges         = [ 'github-actions/test', 'metacpan' ]
+module_maker   = "ModuleBuildTiny"
+static_install = "auto"
+
+[release]
+branch = "main"
+
+[unsupported]
+os = [
+    "MSWin32",
+]
+
+[FileGatherer]
+exclude_match = [ '^images/.*' ]

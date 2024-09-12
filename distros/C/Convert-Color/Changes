@@ -1,5 +1,10 @@
 Revision history for Convert-Color
 
+0.18    2024-09-11
+        [CHANGES]
+         * Use `meta` v0.008 instead of no strict 'refs' and Sub::Util hackery
+         * Minor style updates to Pod formatting
+
 0.17    2023-04-21
         [BUGFIXES]
          * Call `plan()` to skip tests in t/31x11.t if no rgb.txt is found

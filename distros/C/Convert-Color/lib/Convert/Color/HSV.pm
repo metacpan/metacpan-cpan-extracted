@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::HSV 0.17;
+package Convert::Color::HSV 0.18;
 
 use v5.14;
 use warnings;
@@ -62,13 +62,13 @@ than that used by CIE).
 
 =head2 new
 
-   $color = Convert::Color::HSV->new( $hue, $saturation, $value )
+   $color = Convert::Color::HSV->new( $hue, $saturation, $value );
 
 Returns a new object to represent the set of values given. The hue should be
 in the range 0 to 360 (exclusive), and saturation and value should be between
 0 and 1. Values outside of these ranges will be clamped.
 
-   $color = Convert::Color::HSV->new( $string )
+   $color = Convert::Color::HSV->new( $string );
 
 Parses C<$string> for values, and construct a new object similar to the above
 three-argument form. The string should be in the form
@@ -120,15 +120,15 @@ sub new
 
 =head2 hue
 
-   $h = $color->hue
+   $h = $color->hue;
 
 =head2 saturation
 
-   $s = $color->saturation
+   $s = $color->saturation;
 
 =head2 value
 
-   $v = $color->value
+   $v = $color->value;
 
 Accessors for the three components of the color.
 
@@ -141,7 +141,7 @@ sub value      { shift->[2] }
 
 =head2 chroma
 
-   $c = $color->chroma
+   $c = $color->chroma;
 
 Returns the derived property of "chroma", which maps the color space onto a
 cone instead of a cylinder. This more closely measures the intuitive concept
@@ -158,7 +158,7 @@ sub chroma
 
 =head2 hsv
 
-   ( $hue, $saturation, $value ) = $color->hsv
+   ( $hue, $saturation, $value ) = $color->hsv;
 
 Returns the individual hue, saturation and value components of the color
 value.
@@ -229,7 +229,7 @@ sub new_rgb
 
 =head2 dst_hsv
 
-   $measure = $color->dst_hsv( $other )
+   $measure = $color->dst_hsv( $other );
 
 Returns a measure of the distance between the two colors. This is the
 Euclidean distance between the two colors as points in the chroma-adjusted
@@ -248,7 +248,7 @@ sub dst_hsv
 
 =head2 dst_hsv_cheap
 
-   $measure = $color->dst_hsv_cheap( $other )
+   $measure = $color->dst_hsv_cheap( $other );
 
 Returns a measure of the distance between the two colors. This is used in the
 calculation of C<dst_hsv> but since it omits the final square-root and scaling

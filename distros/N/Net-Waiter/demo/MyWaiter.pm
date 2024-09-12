@@ -43,7 +43,7 @@ sub on_process
 
   my $body = "hello world\n";
   my $clen = length $body;
-  sleep 1;
+#  sleep 1;
   print $sock "HTTP/1.0 200 OK\ncontent-type: text/plain\ncontent-length: $clen\n\n$body";
   #return sleep rand 3;
 }

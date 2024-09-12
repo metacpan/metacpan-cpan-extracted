@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::CMY 0.17;
+package Convert::Color::CMY 0.18;
 
 use v5.14;
 use warnings;
@@ -47,13 +47,13 @@ floating-point values in the range 0 to 1.
 
 =head2 new
 
-   $color = Convert::Color::CMY->new( $cyan, $magenta, $yellow )
+   $color = Convert::Color::CMY->new( $cyan, $magenta, $yellow );
 
 Returns a new object to represent the set of values given. These values should
 be floating-point numbers between 0 and 1. Values outside of this range will
 be clamped.
 
-   $color = Convert::Color::CMY->new( $string )
+   $color = Convert::Color::CMY->new( $string );
 
 Parses C<$string> for values, and construct a new object similar to the above
 three-argument form. The string should be in the form
@@ -101,15 +101,15 @@ sub new
 
 =head2 cyan
 
-   $c = $color->cyan
+   $c = $color->cyan;
 
 =head2 magenta
 
-   $m = $color->magenta
+   $m = $color->magenta;
 
 =head2 yellow
 
-   $y = $color->yellow
+   $y = $color->yellow;
 
 Accessors for the three components of the color.
 
@@ -122,7 +122,7 @@ sub yellow  { shift->[2] }
 
 =head2 cmy
 
-   ( $cyan, $magenta, $yellow ) = $color->cmy
+   ( $cyan, $magenta, $yellow ) = $color->cmy;
 
 Returns the individual cyan, magenta and yellow color components of the color
 value.

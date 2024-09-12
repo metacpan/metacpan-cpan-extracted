@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
 
 use IO::Async::Loop;
 use Net::Async::WebSocket::Server;

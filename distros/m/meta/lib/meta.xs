@@ -39,6 +39,10 @@
 #  define G_LIST  G_ARRAY
 #endif
 
+#ifndef CvREFCNT_inc
+#  define CvREFCNT_inc(cv)  ((CV *)SvREFCNT_inc((SV *)(cv)))
+#endif
+
 #if defined (DEBUGGING) && defined(PERL_USE_GCC_BRACE_GROUPS)
 #  define _MUST_SVTYPE_FROM_REFSV(rsv, type, svt)  \
     ({ type sv = (type)(SvUV(SvRV(rsv))); assert(sv && SvTYPE(sv) == svt); sv; })
@@ -277,6 +281,9 @@ MODULE = meta    PACKAGE = meta::package
 SV *
 get(SV *cls, SV *pkgname)
   CODE:
+    if(SvROK(cls))
+      croak("meta::package->get(name) should not be invoked on an instance "
+          "(did you mean to call one of the ->get_... methods?)");
     warn_experimental("meta::package->get");
     RETVAL = wrap_stash(gv_stashsv(pkgname, GV_ADD));
   OUTPUT:
@@ -457,6 +464,41 @@ get_symbol(SV *metapkg, SV *name, SV *value = NULL)
         RETVAL = &PL_sv_undef;
         break;
     }
+  }
+  OUTPUT:
+    RETVAL
+
+SV *
+add_named_sub(SV *metapkg, SV *name, SV *value)
+  CODE:
+  {
+    HV *stash = MUST_STASH_FROM_REFSV(metapkg);
+
+    if(!SvROK(value) || SvTYPE(SvRV(value)) != SVt_PVCV)
+      croak("Expected a CODE reference for the new value to add_named_sub");
+    CV *cv = (CV *)SvRV(value);
+
+    HE *he = hv_fetch_ent(stash, name, GV_ADD, 0);
+    GV *gv;
+    {
+      assert(he);
+      SV *sv = HeVAL(he);
+      if(SvTYPE(sv) != SVt_PVGV) {
+        gv_init_sv((GV *)sv, stash, name, 0);
+        GvMULTI_on(sv);
+      }
+
+      gv = (GV *)sv;
+    }
+
+    if(GvCV(gv))
+      CROAK_QUOTED_PREFIX("Already have a symbol named &", SVfARG(name));
+
+    /* Set these in the right order so the name GV works properly */
+    GvCV_set(gv, CvREFCNT_inc(cv));
+    CvGV_set(cv, gv);
+
+    RETVAL = wrap_sv_refsv((SV *)cv);
   }
   OUTPUT:
     RETVAL

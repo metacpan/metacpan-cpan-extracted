@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use strict;
 use warnings;
@@ -29,16 +29,15 @@ sub _retrieve_attrs {
     my $self = shift;
     return if $self->_has_attrs;
 
-    my ( $entry ) = my @entries = grep $self->name eq $_->{name},
-      $self->get_entries( $self->parent );
+    my ( $entry ) = my @entries = grep $self->name eq $_->{name}, $self->get_entries( $self->parent );
 
-    croak( "multiple ftp entries for ", $self->path, "\n" )
+    croak( 'multiple ftp entries for ', $self->path )
       if @entries > 1;
 
-    croak( "unable to find attributes for ", $self->path, "\n" )
+    croak( 'unable to find attributes for ', $self->path )
       if @entries == 0;
 
-    croak( $self->{path}, ": expected file, got $entry->type\n" )
+    croak( $self->{path}, ': expected file, got ', $entry->{type} )
       unless $entry->{type} eq 'f';
 
     $self->$_( $entry->{$_} ) for keys %$entry;
@@ -70,7 +69,7 @@ Net::FTP::Path::Iter::File - Class representing a File
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -83,7 +82,7 @@ of L<Net::FTP::Path::Iter::Entry>; see it for all available methods.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter
+Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter>
 
 =head2 Source
 

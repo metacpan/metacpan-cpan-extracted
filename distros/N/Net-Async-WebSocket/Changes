@@ -1,5 +1,12 @@
 Revision history for Net-Async-WebSocket
 
+0.14    2024-09-11
+        [CHANGES]
+         * Use `meta` v0.008 rather than `no strict 'refs'` and `Sub::Util`
+           hackery
+         * Depend on `URI::wss` rather than locally reïmplementing it
+         * General minor style updates to module code and documentation
+
 0.13    2018-10-11 18:54:29
         [CHANGES]
          * Allow a custom request object at client handshake time (RT124118)

@@ -1,17 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::WebSocket::Server;
+package Net::Async::WebSocket::Server 0.14;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Listener );
 
 use Carp;
-
-our $VERSION = '0.13';
 
 use Net::Async::WebSocket::Protocol;
 
@@ -23,30 +21,32 @@ C<Net::Async::WebSocket::Server> - serve WebSocket clients using C<IO::Async>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop;
- use Net::Async::WebSocket::Server;
+   use Future::AsyncAwait;
 
- my $server = Net::Async::WebSocket::Server->new(
-    on_client => sub {
-       my ( undef, $client ) = @_;
+   use IO::Async::Loop;
+   use Net::Async::WebSocket::Server;
 
-       $client->configure(
-          on_text_frame => sub {
-             my ( $self, $frame ) = @_;
-             $self->send_text_frame( $frame );
-          },
-       );
-    }
- );
+   my $server = Net::Async::WebSocket::Server->new(
+      on_client => sub {
+         my ( undef, $client ) = @_;
 
- my $loop = IO::Async::Loop->new;
- $loop->add( $server );
+         $client->configure(
+            on_text_frame => sub {
+               my ( $self, $frame ) = @_;
+               $self->send_text_frame( $frame );
+            },
+         );
+      }
+   );
 
- $server->listen(
-    service => 3000,
- )->get;
+   my $loop = IO::Async::Loop->new;
+   $loop->add( $server );
 
- $loop->run;
+   await $server->listen(
+      service => 3000,
+   );
+
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -63,8 +63,8 @@ references in parameters:
 
 =head2 on_client
 
-   $self->on_client( $client )
-   $on_client->( $self, $client )
+   $self->on_client( $client );
+   $on_client->( $self, $client );
 
 Invoked when a new client connects and completes its initial handshake.
 
@@ -75,8 +75,8 @@ object, wrapping the client connection.
 
 Invoked when a handshake has been requested.
 
-   $self->on_handshake( $client, $hs, $continue )
-   $on_handshake->( $self, $client, $hs, $continue )
+   $self->on_handshake( $client, $hs, $continue );
+   $on_handshake->( $self, $client, $hs, $continue );
 
 Calling C<$continue> with a true value will complete the handshake, false will
 drop the connection.

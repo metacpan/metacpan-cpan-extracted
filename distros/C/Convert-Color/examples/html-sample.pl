@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.36;
 
 use Convert::Color;
 use Getopt::Long;

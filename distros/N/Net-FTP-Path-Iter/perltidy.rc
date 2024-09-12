@@ -12,4 +12,5 @@
 -nsbl
 -l=100
 -vmll
+-tso
 -xs

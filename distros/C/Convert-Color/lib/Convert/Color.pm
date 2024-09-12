@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2024 -- leonerd@leonerd.org.uk
 
-package Convert::Color 0.17;
+package Convert::Color 0.18;
 
 use v5.14;
 use warnings;
@@ -11,7 +11,9 @@ use warnings;
 use Carp;
 
 use List::UtilsBy qw( min_by );
-use Sub::Util 1.40 qw( set_subname );
+
+use meta 0.008;
+no warnings 'meta::experimental';
 
 # Maximum number of entries in a ->closest_to cache
 use constant MAX_CACHE_SIZE => 1000;
@@ -120,10 +122,10 @@ sub register_color_space
    $_space2class_cache{$space} = $class;
    $_class2space_cache{$class} = $space;
 
-   no strict 'refs';
-   *{"as_$space"} = set_subname "as_$space" => sub {
+   my $metapkg = meta::get_this_package;
+   $metapkg->add_named_sub( "as_${space}" => sub {
       shift->convert_to( $space )
-   };
+   } );
 }
 
 sub _space2class
@@ -151,7 +153,7 @@ sub _space2class
 
 =head2 new
 
-   $color = Convert::Color->new( STRING )
+   $color = Convert::Color->new( STRING );
 
 Return a new value to represent the color specified by the string. This string
 should be prefixed by the name of the color space to which it applies. For
@@ -193,7 +195,7 @@ sub new
 
 =head2 rgb
 
-   ( $red, $green, $blue ) = $color->rgb
+   ( $red, $green, $blue ) = $color->rgb;
 
 Returns the individual red, green and blue color components of the color
 value. For RGB values, this is done directly. For values in other spaces, this
@@ -245,15 +247,15 @@ If none of these operations worked, then throw an exception.
 
 These functions may be called in the following ways:
 
-   $other = $color->convert_to_DEST()
-   $other = Dest::Class->new_from_SRC( $color )
-   $other = Dest::Class->new_rgb( $color->rgb )
+   $other = $color->convert_to_DEST();
+   $other = Dest::Class->new_from_SRC( $color );
+   $other = Dest::Class->new_rgb( $color->rgb );
 
 =cut
 
 =head2 convert_to
 
-   $other = $color->convert_to( $space )
+   $other = $color->convert_to( $space );
 
 Attempt to convert the color into its representation in the given space. See
 above for the various ways this may be achieved.
@@ -262,7 +264,7 @@ If the relevant subclass has already been loaded (either explicitly, or
 implicitly by either the C<new> or C<convert_to> methods), then a specific
 conversion method will be installed in the class.
 
-   $other = $color->as_$space
+   $other = $color->as_$space;
 
 Methods of this form are currently C<AUTOLOAD>ed if they do not yet exist, but
 this feature should not be relied upon - see below.
@@ -313,8 +315,8 @@ sub convert_to_rgb
 This class provides C<AUTOLOAD> and C<can> behaviour which automatically
 constructs conversion methods. The following method calls are identical:
 
-   $color->convert_to('rgb')
-   $color->as_rgb
+   $color->convert_to('rgb');
+   $color->as_rgb;
 
 The generated method will be stored in the package, so that future calls will
 not have the AUTOLOAD overhead.
@@ -354,9 +356,9 @@ sub AUTOLOAD
    if( ref $_[0] and my $code = $_[0]->can( $method ) ) {
       # It's possible that the lazy loading by ->can has just created this method
       warnings::warn( deprecated => "Relying on AUTOLOAD to provide $method" );
-      no strict 'refs';
       unless( defined &{$method} ) {
-         *{$method} = $code;
+         my $metapkg = meta::get_this_package;
+         $metapkg->add_named_sub( $method => $code );
       }
       goto &$code;
    }
@@ -381,7 +383,7 @@ This base class is intended to be subclassed to provide more color spaces.
 
 =head2 register_color_space
 
-   $class->register_color_space( $space )
+   $class->register_color_space( $space );
 
 A subclass should call this method to register itself as a named color space.
 
@@ -389,7 +391,7 @@ A subclass should call this method to register itself as a named color space.
 
 =head2 register_palette
 
-   $class->register_palette( %args )
+   $class->register_palette( %args );
 
 A subclass that provides a fixed set of color values should call this method,
 to set up automatic conversions that look for the closest match within the
@@ -413,7 +415,7 @@ C<closest_to>.
 
 =head2 closest_to
 
-   $color = $pkg->closest_to( $orig, $space )
+   $color = $pkg->closest_to( $orig, $space );
 
 Returns the color in the space closest to the given value. The distance is
 measured in the named space; defaulting to C<rgb> if this is not provided.
@@ -445,10 +447,10 @@ sub register_palette
       croak "Require 'enumerate' or 'enumerate_once'";
    }
 
-   no strict 'refs';
+   my $metapkg = meta::package->get( $pkg );
 
    my %cache;
-   *{"${pkg}::closest_to"} = set_subname "${pkg}::closest_to" => sub {
+   $metapkg->add_named_sub( closest_to => sub {
       my $class = shift;
       my ( $orig, $space ) = @_;
 
@@ -464,20 +466,20 @@ sub register_palette
 
       return $cache{$key} //=
          min_by { $orig->$dst( $_->convert_to( $space ) ) } $class->$enumerate;
-   };
+   } );
 
    foreach my $space (qw( rgb hsv hsl )) {
-      *{"${pkg}::new_from_${space}"} = set_subname "${pkg}::new_from_${space}" => sub {
+      $metapkg->add_named_sub( "new_from_${space}" => sub {
          my $class = shift;
          my ( $rgb ) = @_;
          return $pkg->closest_to( $rgb, $space );
-      };
+      } );
    }
 
-   *{"${pkg}::new_rgb"} = set_subname "${pkg}::new_rgb" => sub {
+   $metapkg->add_named_sub( new_rgb => sub {
       my $class = shift;
       return $class->closest_to( Convert::Color::RGB->new( @_ ), "rgb" );
-   };
+   } );
 }
 
 =head1 AUTHOR

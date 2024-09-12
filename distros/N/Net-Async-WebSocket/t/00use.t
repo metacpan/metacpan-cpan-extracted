@@ -1,13 +1,14 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Net::Async::WebSocket" );
-use_ok( "Net::Async::WebSocket::Protocol" );
-use_ok( "Net::Async::WebSocket::Client" );
-use_ok( "Net::Async::WebSocket::Server" );
+require Net::Async::WebSocket;
+require Net::Async::WebSocket::Protocol;
+require Net::Async::WebSocket::Client;
+require Net::Async::WebSocket::Server;
 
+pass( 'Modules loaded' );
 done_testing;

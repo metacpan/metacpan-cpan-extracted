@@ -54,7 +54,7 @@ CONSTRUCTOR
 
  new
 
-       $color = Convert::Color->new( STRING )
+       $color = Convert::Color->new( STRING );
 
     Return a new value to represent the color specified by the string. This
     string should be prefixed by the name of the color space to which it
@@ -80,7 +80,7 @@ METHODS
 
  rgb
 
-       ( $red, $green, $blue ) = $color->rgb
+       ( $red, $green, $blue ) = $color->rgb;
 
     Returns the individual red, green and blue color components of the
     color value. For RGB values, this is done directly. For values in other
@@ -112,13 +112,13 @@ COLOR SPACE CONVERSIONS
 
     These functions may be called in the following ways:
 
-       $other = $color->convert_to_DEST()
-       $other = Dest::Class->new_from_SRC( $color )
-       $other = Dest::Class->new_rgb( $color->rgb )
+       $other = $color->convert_to_DEST();
+       $other = Dest::Class->new_from_SRC( $color );
+       $other = Dest::Class->new_rgb( $color->rgb );
 
  convert_to
 
-       $other = $color->convert_to( $space )
+       $other = $color->convert_to( $space );
 
     Attempt to convert the color into its representation in the given
     space. See above for the various ways this may be achieved.
@@ -127,7 +127,7 @@ COLOR SPACE CONVERSIONS
     implicitly by either the new or convert_to methods), then a specific
     conversion method will be installed in the class.
 
-       $other = $color->as_$space
+       $other = $color->as_$space;
 
     Methods of this form are currently AUTOLOADed if they do not yet exist,
     but this feature should not be relied upon - see below.
@@ -138,8 +138,8 @@ AUTOLOADED CONVERSION METHODS
     constructs conversion methods. The following method calls are
     identical:
 
-       $color->convert_to('rgb')
-       $color->as_rgb
+       $color->convert_to('rgb');
+       $color->as_rgb;
 
     The generated method will be stored in the package, so that future
     calls will not have the AUTOLOAD overhead.
@@ -161,14 +161,14 @@ SUBCLASS METHODS
 
  register_color_space
 
-       $class->register_color_space( $space )
+       $class->register_color_space( $space );
 
     A subclass should call this method to register itself as a named color
     space.
 
  register_palette
 
-       $class->register_palette( %args )
+       $class->register_palette( %args );
 
     A subclass that provides a fixed set of color values should call this
     method, to set up automatic conversions that look for the closest match
@@ -189,7 +189,7 @@ SUBCLASS METHODS
 
  closest_to
 
-       $color = $pkg->closest_to( $orig, $space )
+       $color = $pkg->closest_to( $orig, $space );
 
     Returns the color in the space closest to the given value. The distance
     is measured in the named space; defaulting to rgb if this is not

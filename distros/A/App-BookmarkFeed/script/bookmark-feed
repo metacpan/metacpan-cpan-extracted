@@ -134,7 +134,7 @@ filename: F<bookmarks.db>.
 
 =head1 REFERENCES
 
-RSS 2.0 Specification, U<https://cyber.harvard.edu/rss/rss.html>
+RSS 2.0 Specification, L<https://cyber.harvard.edu/rss/rss.html>
 
 L<App::BookmarkFeed>
 

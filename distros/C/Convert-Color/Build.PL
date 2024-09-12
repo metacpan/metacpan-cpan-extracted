@@ -8,10 +8,10 @@ my $build = Module::Build->new(
    module_name => 'Convert::Color',
    requires => {
       'perl' => '5.014',
+      'meta' => '0.008',
 
       'List::UtilsBy' => 0,
       'Module::Pluggable' => 0,
-      'Sub::Util' => '1.40',
    },
    test_requires => {
       'Test2::V0' => 0,

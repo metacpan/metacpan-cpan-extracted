@@ -7,7 +7,7 @@ use v5.20;
 use warnings;
 use Object::Pad 0.800;
 
-package Tickit::WidgetRole::SingleChildContainer 0.41;
+package Tickit::WidgetRole::SingleChildContainer 0.42;
 role Tickit::WidgetRole::SingleChildContainer;
 
 use Carp;

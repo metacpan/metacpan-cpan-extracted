@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 use Fcntl qw[ :mode ];
@@ -17,9 +17,10 @@ use File::Listing qw[ parse_dir ];
 use namespace::clean;
 
 use overload
-  '-X'   => '_statit',
-  'bool' => sub { 1 },
-  '""'   => sub { $_[0]->{path} },
+  '-X'     => '_statit',
+  'bool'   => sub { 1 },
+  '""'     => sub { $_[0]->{path} },
+  fallback => !!1,
   ;
 
 use Class::Tiny qw[
@@ -50,7 +51,8 @@ sub _statit {
     $self->_retrieve_attrs
       unless $self->_has_attrs;
 
-    if    ( $op eq 'd' ) { return $self->is_dir }
+    ## no critic ( ControlStructures::ProhibitCascadingIfElse )
+    if ( $op eq 'd' ) { return $self->is_dir }
 
     elsif ( $op eq 'f' ) { return $self->is_file }
 
@@ -64,7 +66,7 @@ sub _statit {
 
     elsif ( $op eq 'l' ) { return 0 }
 
-    else { croak( "unsupported file test: -$op\n" ) }
+    else { croak( "unsupported file test: -$op" ) }
 
 }
 
@@ -82,11 +84,12 @@ sub _get_entries {
     # get the listing, then restore the working directory
 
     my @entries;
+    my $err;
     eval {
         $server->cwd( $path )
-          or croak( "unable to chdir to ", $path, "\n" );
+          or croak( 'unable to chdir to ', $path );
 
-        my $listing = $server->dir( '.' )
+        my $listing = $server->dir( q{.} )
           or croak( "error listing $path" );
 
         for my $entry ( parse_dir( $listing ) ) {
@@ -99,18 +102,15 @@ sub _get_entries {
             push @entries, \%attr;
 
         }
-    };
-
-    my $err = $@;
+        1;
+    } // ( $err = $@ );
 
     $server->cwd( $pwd )
-      or croak( "unable to return to directory: $pwd\n" );
+      or croak( "unable to return to directory: $pwd" );
 
-    croak( $err ) if $err;
-
+    croak( $err ) if defined $err;
 
     return \@entries;
-
 }
 
 #
@@ -137,7 +137,7 @@ Net::FTP::Path::Iter::Entry - Class representing a Filesystem Entry
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -229,7 +229,7 @@ returns true if the entry is a file.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter
+Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter>
 
 =head2 Source
 

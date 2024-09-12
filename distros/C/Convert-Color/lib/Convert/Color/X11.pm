@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::X11 0.17;
+package Convert::Color::X11 0.18;
 
 use v5.14;
 use warnings;
@@ -83,12 +83,12 @@ sub _load_x11_colors
 
 =head2 colors
 
-   @colors = Convert::Color::X11->colors
+   @colors = Convert::Color::X11->colors;
 
 Returns a list of the defined color names, in the order they were found in the
 F<rgb.txt> file.
 
-   $num_colors = Convert::Color::X11->colors
+   $num_colors = Convert::Color::X11->colors;
 
 When called in scalar context, this method returns the count of the number of
 defined colors.
@@ -117,7 +117,7 @@ __PACKAGE__->register_palette(
 
 =head2 new
 
-   $color = Convert::Color::X11->new( $name )
+   $color = Convert::Color::X11->new( $name );
 
 Returns a new object to represent the named color.
 
@@ -152,7 +152,7 @@ sub new
 
 =head2 name
 
-   $name = $color->name
+   $name = $color->name;
 
 The name of the VGA color.
 

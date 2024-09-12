@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package meta 0.007;
+package meta 0.008;
 
 use v5.14;
 use warnings;
@@ -283,6 +283,22 @@ sub meta::package::list_symbols
       croak "Unrecognised named parameters to meta::package::list_symbols: " . join( ", ", sort keys %params );
    return meta::package::_list_symbols( $self, $sigils );
 }
+
+=head2 add_named_sub
+
+   $metasub = $metapkg->add_named_sub( $name, $code );
+
+I<Since version 0.008.>
+
+A convenient shortcut for adding a subroutine symbol and setting the subname
+of the newly-added sub. Equivalent to calling L</add_symbol> and then
+L</set_subname> on its result, but more efficient as it does not have to
+create a separate fake GV to store the subname in.
+
+Note that C<$name> should be given as a barename, without the leading C<&>
+sigil.
+
+=cut
 
 =head1 METHODS ON METASYMBOLS
 

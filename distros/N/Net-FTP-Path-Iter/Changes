@@ -1,5 +1,17 @@
 Revision history for Net-FTP-Path-Iter
 
+0.07      2024-09-11 11:53:25-04:00 America/New_York
+
+  [BUILD]
+
+    * Bump prereq to Perl 5.12, as dependency Path::Iterator::Rule
+      requires Test::Deep, which is supported on Perl 5.12+
+
+  [BUG FIX]
+
+    * fix use of removed "smartmatch" feature. ++ANDK
+
+
 0.06      2022-05-31 12:18:49-04:00 America/New_York
 
   [BUILD]

@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -69,13 +69,11 @@
             "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
-            "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
             "Dist::Zilla::Plugin::Test::Version" : "0",
             "Dist::Zilla::PluginBundle::Basic" : "0",
             "Dist::Zilla::PluginBundle::Filter" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Weaver::Plugin::StopWords" : "0",
-            "Pod::Weaver::Section::BugsAndLimitations" : "0",
             "Pod::Weaver::Section::Contributors" : "0",
             "Pod::Weaver::Section::GenerateSection" : "0",
             "Pod::Weaver::Section::SeeAlso" : "0",
@@ -92,7 +90,6 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0",
             "Test::Version" : "1"
          }
       },
@@ -104,7 +101,7 @@
             "Path::Iterator::Rule" : "1.012",
             "experimental" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.010"
+            "perl" : "5.012"
          }
       },
       "test" : {
@@ -125,19 +122,19 @@
    "provides" : {
       "Net::FTP::Path::Iter" : {
          "file" : "lib/Net/FTP/Path/Iter.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Net::FTP::Path::Iter::Dir" : {
          "file" : "lib/Net/FTP/Path/Iter/Dir.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Net::FTP::Path::Iter::Entry" : {
          "file" : "lib/Net/FTP/Path/Iter/Entry.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Net::FTP::Path::Iter::File" : {
          "file" : "lib/Net/FTP/Path/Iter/File.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -152,9 +149,9 @@
          "web" : "https://gitlab.com/djerius/net-ftp-path-iter"
       }
    },
-   "version" : "0.06",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "version" : "0.07",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

@@ -254,6 +254,20 @@ METHODS ON meta::package
     each sub-package must be unique, it is convenient to assign this list
     into a hash. The sub-packages are returned in no particular order.
 
+ add_named_sub
+
+       $metasub = $metapkg->add_named_sub( $name, $code );
+
+    Since version 0.008.
+
+    A convenient shortcut for adding a subroutine symbol and setting the
+    subname of the newly-added sub. Equivalent to calling "add_symbol" and
+    then "set_subname" on its result, but more efficient as it does not
+    have to create a separate fake GV to store the subname in.
+
+    Note that $name should be given as a barename, without the leading &
+    sigil.
+
 METHODS ON METASYMBOLS
 
  is_glob, is_scalar, ...

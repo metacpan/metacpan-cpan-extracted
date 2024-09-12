@@ -1,0 +1,81 @@
+{
+   "abstract" : "optex scroll region module",
+   "author" : [
+      "Kazumasa Utashiro"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.25",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-optex-scroll",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::optex" : "1.00",
+            "Term::ANSIColor::Concise" : "2.07",
+            "Term::ReadKey" : "0",
+            "perl" : "5.024"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::optex::scroll" : {
+         "file" : "lib/App/optex/scroll.pm",
+         "version" : "0.9901"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kaz-utashiro/optex-scroll/issues"
+      },
+      "homepage" : "https://github.com/kaz-utashiro/optex-scroll",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kaz-utashiro/optex-scroll.git",
+         "web" : "https://github.com/kaz-utashiro/optex-scroll"
+      }
+   },
+   "version" : "0.9901",
+   "x_contributors" : [
+      "Kazumasa Utashiro <kaz@utashiro.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.12",
+   "x_static_install" : 0
+}

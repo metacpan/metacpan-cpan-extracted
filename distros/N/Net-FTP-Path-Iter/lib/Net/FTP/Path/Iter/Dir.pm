@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'switch';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 use Fcntl qw[ :mode ];
@@ -37,25 +37,21 @@ sub _children {
 
         my $obj;
 
-        for ( $entry->{type} ) {
+        if ( $entry->{type} eq 'd' ) {
 
-            when ( 'd' ) {
+            $obj
+              = Net::FTP::Path::Iter::Dir->new( %$entry, %attr, path => catdir( $self->path, $entry->{name} ) );
+        }
 
-                $obj = Net::FTP::Path::Iter::Dir->new( %$entry, %attr,
-                    path => catdir( $self->path, $entry->{name} ) );
-            }
+        elsif ( $entry->{type} eq 'f' ) {
 
-            when ( 'f' ) {
+            $obj = Net::FTP::Path::Iter::File->new( %$entry, %attr,
+                path => catfile( $self->path, $entry->{name} ) );
+        }
 
-                $obj = Net::FTP::Path::Iter::File->new( %$entry, %attr,
-                    path => catfile( $self->path, $entry->{name} ) );
-            }
+        else {
 
-            default {
-
-                warn( "ignoring $entry->{name}; unknown type $_\n" );
-            }
-
+            warn( "ignoring $entry->{name}; unknown type $_\n" );
         }
 
         push @children, $obj;
@@ -81,11 +77,12 @@ sub _retrieve_attrs {
     my $entry = {};
 
     $server->cwd( $self->path )
-      or croak( "unable to chdir to ", $self->path, "\n" );
+      or croak( 'unable to chdir to ', $self->path );
 
     # File::Listing doesn't return . or .. (and some FTP servers
     # don't return that info anyway), so try to go up a dir and
     # look for the name
+    my $err;
     eval {
 
         # cdup sometimes returns ok even if it didn't work
@@ -93,14 +90,14 @@ sub _retrieve_attrs {
 
         if ( $pwd ne $server->pwd ) {
 
-            my $entries = $self->_get_entries( '.' );
+            my $entries = $self->_get_entries( q{.} );
 
             ( $entry ) = grep { $self->name eq $_->{name} } @$entries;
 
-            croak( "unable to find attributes for ", $self->path, "\n" )
+            croak( 'unable to find attributes for ', $self->path )
               if !$entry;
 
-            croak( $self->path, ": expected directory, got $entry->{type}\n" )
+            croak( $self->path, ": expected directory, got $entry->{type}" )
               unless $entry->{type} eq 'd';
 
         }
@@ -111,24 +108,21 @@ sub _retrieve_attrs {
             # fake it.
 
             $entry = {
-                size  => 0,
-                mtime => 0,
-                mode  => S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH
-                  | S_IXOTH,
-                type => 'd',
+                size       => 0,
+                mtime      => 0,
+                mode       => S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH,
+                type       => 'd',
                 _has_attrs => 1,
             };
 
         }
 
-    };
-
-    my $err = $@;
+    } // ( $err = $@ );
 
     $server->cwd( $pwd )
-      or croak( "unable to return to directory: $pwd\n" );
+      or croak( "unable to return to directory: $pwd" );
 
-    croak( $err ) if $err;
+    croak( $err ) if defined $err;
 
     $self->$_( $entry->{$_} ) for keys %$entry;
     return;
@@ -157,7 +151,7 @@ Net::FTP::Path::Iter::Dir - Class representing a Directory
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 INTERNALS
 
@@ -165,7 +159,7 @@ version 0.06
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter
+Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter>
 
 =head2 Source
 
