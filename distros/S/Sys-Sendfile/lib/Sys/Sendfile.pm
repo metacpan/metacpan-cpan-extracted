@@ -1,5 +1,5 @@
 package Sys::Sendfile;
-$Sys::Sendfile::VERSION = '0.17';
+$Sys::Sendfile::VERSION = '0.18';
 # This software is copyright (c) 2008, 2009 by Leon Timmermans <leont@cpan.org>.
 #
 # This is free software; you can redistribute it and/or modify it under
@@ -30,7 +30,7 @@ Sys::Sendfile - Zero-copy data transfer
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,47 @@
+{
+  "name" : "Mojolicious-Plugin-Debugbar",
+  "version" : "0.1.2",
+  "abstract" : "Debugbar plugin for Mojolicious",
+  "description" : "This is package that is going to provide a debugbar for Mojolicious.",
+  "author" : [
+    "Adrian Crisan <adrian.crisan88@gmail.com>"
+  ],
+  "license" : "MIT",
+  "meta-spec" : {
+    "version" : 2,
+    "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+  },
+  "resources" : {
+    "homepage" : "https://aurorasoftware.gitlab.io/mojolicious-plugin-debugbar",
+    "license": "https://opensource.org/license/mit",
+    "repository" : {
+      "type" : "git",
+      "url" : "https://gitlab.com/AuroraSoftware/mojolicious-plugin-debugbar.git",
+      "web" : "https://gitlab.com/AuroraSoftware/mojolicious-plugin-debugbar"
+    },
+    "bugtracker" : {
+      "web" : "https://gitlab.com/AuroraSoftware/mojolicious-plugin-debugbar/-/issues"
+    }
+  },
+  "no_index" : {
+    "directory" : [
+      "t",
+      "docs"
+    ]
+  },
+  "prereqs" : {
+    "runtime" : {
+      "requires" : {
+        "perl" : "5.006"
+      }
+    }
+  },
+  "provides" : {
+    "Mojolicious::Plugin::Debugbar" : {
+      "file" : "lib/Mojolicious/Plugin/Debugbar.pm",
+      "version" : "0.1.2"
+    }
+  },
+  "keywords" : ["mojolicious plugin debugbar"],
+  "release_status" : "stable"
+}

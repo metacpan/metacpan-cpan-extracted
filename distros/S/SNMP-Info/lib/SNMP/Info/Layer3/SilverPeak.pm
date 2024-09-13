@@ -39,7 +39,7 @@ use SNMP::Info::Layer3;
 
 our ($VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE);
 
-$VERSION = '3.971000';
+$VERSION = '3.972000';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -134,7 +134,9 @@ Abstraction subclass for SilverPeak devices.
 
 =head2 Required MIBs
 
-F<STEELHEAD-MIB>
+F<SILVERPEAK-MGMT-MIB>
+
+F<SILVERPEAK-PRODUCTS-MIB>
 
 =over
 

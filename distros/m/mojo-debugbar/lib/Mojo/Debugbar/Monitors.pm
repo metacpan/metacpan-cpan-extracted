@@ -15,6 +15,8 @@ has 'css' => <<'EOF'
     bottom: 0;
     left: 0;
 
+    z-index: 1005;
+
     background-color: #fff;
 }
 #debugbar .debugbar-header {
@@ -86,7 +88,9 @@ has 'started_at' => sub { time() };
 has 'ended_at' => sub { time() };
 
 =head2 duration
+
     Ended at - started at
+
 =cut
 
 sub duration {
@@ -95,8 +99,28 @@ sub duration {
     return sprintf("%.4f", $self->ended_at - $self->started_at);
 }
 
+=head2 inject
+
+    Inject as javascript
+
+=cut
+
+sub inject {
+    my $self = shift;
+
+    my $content = '';
+
+    foreach my $monitor (@{ $self->registered }) {
+        $content .= $monitor->inject;
+    }
+
+    return sprintf('<script type="text/javascript">%s</script>', $content);
+}
+
 =head2 render
+
     Loops through each monitor and renders the html
+
 =cut
 
 sub render {
@@ -112,9 +136,11 @@ sub render {
 
         my $id = md5_sum(ref($monitor));
 
-        $tabs .= sprintf('<li><a href="#%s" data-toggle="tab">%s %s (%s)</a></li>', $id, $monitor->icon, $monitor->name, $count);
-        
-        $content .= sprintf('<div class="tab-pane" id="%s">%s</div>', $id, $monitor->render);
+        $tabs .= sprintf('<li class="nav-item">' .
+            '<a href="#" class="nav-link" data-toggle="tab" data-target="#t-%s">%s %s (%s)</a>' .
+            '</li>', $id, $monitor->icon, $monitor->name, $count);
+
+        $content .= sprintf('<div class="tab-pane" id="t-%s">%s</div>', $id, $monitor->render);
     }
 
     return sprintf(
@@ -142,7 +168,9 @@ sub render {
 }
 
 =head2 stop
+
     Loops through each monitor and calls stop then stops the timer
+
 =cut
 
 sub stop {
@@ -154,7 +182,9 @@ sub stop {
 }
 
 =head2 start
+
     Starts the timer and loops through each monitor and calls start
+
 =cut
 
 sub start {

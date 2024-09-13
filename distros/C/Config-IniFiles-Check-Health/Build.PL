@@ -14,14 +14,18 @@ my $builder = Module::Build->new(
         'Module::Build' => '0.4004',
     },
     test_requires => {
-        'Test::More' => '0',
+        'Test::Simple'  => '1.302191',
+        'Test::More'    => '0',
+        'Test::Compile' => '3.3.3',
     },
     requires => {
+        'perl'             => '5.20.0',
         'Config::IniFiles' => "3.000003",
         'Log::Log4perl'    => 0,
         'Moo'              => '2.004000',
         'Params::Validate' => '1.30',
         'strictures'       => '2.000006',
+        'namespace::clean' => '0',
     },
     add_to_cleanup => ['Config-IniFiles-Check-Health-*'],
 );

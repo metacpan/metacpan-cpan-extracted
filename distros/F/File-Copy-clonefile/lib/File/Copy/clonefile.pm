@@ -1,4 +1,4 @@
-package File::Copy::clonefile v0.0.5;
+package File::Copy::clonefile v0.0.6;
 use v5.20;
 use warnings;
 

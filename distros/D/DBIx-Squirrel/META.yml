@@ -1,5 +1,5 @@
 ---
-abstract: 'A C<DBI> extension'
+abstract: 'The little Perl DBI extension that makes working with databases a lot easier.'
 author:
   - 'Iain Campbell <cpanic@cpan.org>'
 build_requires:
@@ -9,9 +9,9 @@ build_requires:
   FindBin: '0'
   Test::Compile: '0'
   Test::Exception: '0'
-  Test::MockModule: '0'
   Test::More: '0'
   Test::More::UTF8: '0'
+  Test::Simple: '1.302201'
   Test::Warn: '0'
   Test::Warnings: '0'
   lib: '0'
@@ -26,22 +26,30 @@ meta-spec:
 name: DBIx-Squirrel
 requires:
   Carp: '0'
+  Compress::Bzip2: '0'
+  Crypt::CBC: '0'
+  Crypt::Rijndael: '0'
   DBI: '0'
   Data::Dumper: '0'
   Devel::GlobalDestruction: '0'
   Digest::SHA: '0'
+  Dotenv: '0'
+  Encode: '0'
   Exporter: '0'
   JSON::Syck: '0'
+  MIME::Base64::URLSafe: '0'
   Memoize: '0'
   Scalar::Util: '0'
   Sub::Name: '0'
+  Try::Tiny: '0'
   YAML::Syck: '0'
+  bytes: '0'
   constant: '0'
   namespace::clean: '0'
   perl: 5.010_001
   strict: '0'
   warnings: '0'
-version: 1.4.2
+version: 1.5.3
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

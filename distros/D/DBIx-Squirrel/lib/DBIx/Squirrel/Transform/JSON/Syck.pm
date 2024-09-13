@@ -1,5 +1,5 @@
 package    # hide from PAUSE
-  DBIx::Squirrel::Transform::JSON::Syck;
+    DBIx::Squirrel::Transform::JSON::Syck;
 
 use strict;
 use warnings;
@@ -11,7 +11,8 @@ BEGIN {
     $DBIx::Squirrel::Transform::JSON::Syck::VERSION   = $DBIx::Squirrel::VERSION;
     @DBIx::Squirrel::Transform::JSON::Syck::ISA       = qw/Exporter/;
     @DBIx::Squirrel::Transform::JSON::Syck::EXPORT_OK = qw/as_json/;
-    @DBIx::Squirrel::Transform::JSON::Syck::EXPORT    = @DBIx::Squirrel::Transform::JSON::Syck::EXPORT_OK;
+    @DBIx::Squirrel::Transform::JSON::Syck::EXPORT
+        = @DBIx::Squirrel::Transform::JSON::Syck::EXPORT_OK;
 }
 
 sub as_json {

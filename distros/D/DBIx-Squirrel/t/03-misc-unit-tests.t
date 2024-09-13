@@ -2,12 +2,19 @@ use 5.010_001;
 use strict;
 use warnings;
 use Test::Exception;
-use Test::MockModule;
 use Test::Warnings qw/warning/;
 use FindBin        qw/$Bin/;
 use lib "$Bin/lib";
 
 use Test::More;
+#
+# We use Test::More::UTF8 to enable UTF-8 on Test::Builder
+# handles (failure_output, todo_output, and output) created
+# by Test::More. Requires Test::Simple 1.302210+, and seems
+# to eliminate the following error on some CPANTs builds:
+#
+# > Can't locate object method "e" via package "warnings"
+#
 use Test::More::UTF8;
 
 BEGIN {
@@ -166,12 +173,16 @@ diag("Testing DBIx::Squirrel $DBIx::Squirrel::VERSION, Perl $], $^X");
 
     throws_ok {statement_study(bless({}, 'NotAStatementHandle'))} qr/Expected a statement handle/, 'got expected exception';
 
-    my $db1              = DBIx::Squirrel->connect(@MOCK_DB_CONNECT_ARGS);
-    my $st1              = $db1->prepare('SELECT :foo, :bar');
-    my $db2              = DBI->connect(@MOCK_DB_CONNECT_ARGS);
-    my $st2              = $db2->prepare('SELECT ?, ?');
-    my $dbix_squirrel_st = Test::MockModule->new('DBIx::Squirrel::st');
-    $dbix_squirrel_st->mock(statement_digest => 'DETERMINISTIC');    # in case we use algo that isn't!
+    my $db1 = DBIx::Squirrel->connect(@MOCK_DB_CONNECT_ARGS);
+    my $st1 = $db1->prepare('SELECT :foo, :bar');
+    my $db2 = DBI->connect(@MOCK_DB_CONNECT_ARGS);
+    my $st2 = $db2->prepare('SELECT ?, ?');
+
+    # Test::MockModule gave me some issues on a ubuntu Perl-5.10.1 build
+    # in GitHub CI. Go old skool.
+    my $statement_digest = \&DBIx::Squirrel::st::statement_digest;
+    undef &DBIx::Squirrel::st::statement_digest;
+    *DBIx::Squirrel::st::statement_digest = sub {'DETERMINISTIC'};
 
     my @tests = (
         {line => __LINE__, got => [statement_study('')],         exp => []},
@@ -223,6 +234,11 @@ diag("Testing DBIx::Squirrel $DBIx::Squirrel::VERSION, Perl $], $^X");
     foreach my $t (@tests) {
         is_deeply($t->{got}, $t->{exp}, sprintf('line %d', $t->{line}));
     }
+
+    # Test::MockModule gave me some issues on a ubuntu Perl-5.10.1 build
+    # in GitHub CI. Go old skool.
+    undef &DBIx::Squirrel::st::statement_digest;
+    *DBIx::Squirrel::st::statement_digest = $statement_digest;
 
     $db2->disconnect;
     $db1->disconnect;

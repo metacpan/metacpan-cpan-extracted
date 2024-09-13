@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Debugbar;
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.1.2';
 
 =head2 register
 
@@ -29,12 +29,18 @@ sub register {
     $app->hook(after_render => sub {
         my ($c, $output, $format) = @_;
 
-        if (!$c->stash('mojo.static') && !$c->res->is_redirect && $$output =~ m/<\/body>/) {
+        return unless $format eq 'html';
+
+        # if there is a </body> tag, inject the debugbar
+        if ($$output =~ m/<\/body>/) {
             # Render the debugbar html
             my $html = $debugbar->render;
 
-            # Inject the debugbar html
-            $$output =~ s/<\/body>/$html\n<\/body>/ig;
+            # Append text before the closing </body> tag
+            $$output =~ s!(</body>)!$html$1!;
+        } else {
+            # Append text at the end of the output
+            $$output .= $debugbar->inject;
         }
     });
 }

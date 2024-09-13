@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -23,19 +23,21 @@
          "requires" : {
             "List::Util" : "1.39",
             "Metrics::Any::Adapter" : "0.06",
+            "Syntax::Keyword::Try" : "0.18",
+            "meta" : "0.008",
             "perl" : "5.024"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Metrics::Any::Adapter::Routable" : {
          "file" : "lib/Metrics/Any/Adapter/Routable.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -44,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

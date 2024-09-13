@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Conf;
-$ExtUtils::Builder::Conf::VERSION = '0.020';
+$ExtUtils::Builder::Conf::VERSION = '0.021';
 use strict;
 use warnings;
 
@@ -65,7 +65,7 @@ sub add_methods {
 	$planner->add_delegate(try_compile_run => sub {
 		my ($self, %args) = @_;
 
-		my $dir = tempdir(CLEANUP => 1);
+		my $dir = File::Temp->newdir;
 
 		my ($source_file, $c_file) = tempfile('try_compilerXXXX', DIR => $dir, SUFFIX => '.c');
 
@@ -83,7 +83,7 @@ sub add_methods {
 		);
 
 		my $basename = basename($c_file, '.c');
-		my $o_file = $inner->obj_file($basename);
+		my $o_file = $inner->obj_file($basename, $dir);
 		$inner->compile($c_file, $o_file, %compile_args);
 
 		my @libraries          = (@{ $args{libraries} || [] },          @{ $self->{libraries} || [] });
@@ -96,7 +96,7 @@ sub add_methods {
 			extra_args   => \@extra_linker_flags,
 		);
 
-		my $exe_file = $inner->exe_file($basename);
+		my $exe_file = $inner->exe_file($basename, $dir);
 		$inner->link([ $o_file ], $exe_file, %link_args);
 
 		my $run = $args{run} // 1;
@@ -107,7 +107,7 @@ sub add_methods {
 				target       => 'test',
 				dependencies => [ $exe_file ],
 				actions      => [
-					ExtUtils::Builder::Action::Command->new(command => [ catfile(curdir, $exe_file) ]),
+					ExtUtils::Builder::Action::Command->new(command => [ $exe_file ]),
 				],
 				phony        => 1,
 			);
@@ -117,7 +117,7 @@ sub add_methods {
 			$target = $exe_file;
 		}
 
-		my $result = eval { $inner->materialize->run($target); 1 };
+		my $result = eval { $inner->materialize->run($target, quiet => 1 || $args{quiet}); 1 };
 
 		return !!0 if not $result;
 
@@ -223,7 +223,7 @@ ExtUtils::Builder::Conf - Configure-time utilities for using C headers, librarie
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -270,6 +270,10 @@ Optional. If specified, pass extra flags to the compiler.
 =item extra_linker_flags => ARRAY
 
 Optional. If specified, pass extra flags to the linker.
+
+=item quiet => BOOL
+
+This makes C<try_compile_run> run quietly.
 
 =item define => STRING
 

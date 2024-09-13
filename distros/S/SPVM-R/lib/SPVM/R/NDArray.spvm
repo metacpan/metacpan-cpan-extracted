@@ -124,7 +124,7 @@ class R::NDArray {
     
     unless ($dim) {
       if ($data) {
-        my $data_length = R::Util->_get_array_length($data);
+        my $data_length = Fn->array_length($data);
         $dim = [$data_length];
       }
       else {
@@ -330,7 +330,7 @@ class R::NDArray {
     
     my $data = $self->{data};
     
-    my $elem_size = R::Util->_get_elem_size($data);
+    my $elem_size = Fn->get_elem_size($data);
     
     return $elem_size;
   }
@@ -339,7 +339,7 @@ class R::NDArray {
     
     my $data = $self->{data};
     
-    my $elem_type_name = R::Util->_get_elem_type_name($data);
+    my $elem_type_name = Fn->get_elem_type_name($data);
     
     return $elem_type_name;
   }
@@ -379,12 +379,12 @@ class R::NDArray {
     
     my $data = $self->{data};
     
-    my $is_mulnum = 0;
+    my $is_object_ndarray = 0;
     if (Fn->is_object_array($data)) {
-      $is_mulnum = 1;
+      $is_object_ndarray = 1;
     }
     
-    return $is_mulnum;
+    return $is_object_ndarray;
   }
   
   method clone : R::NDArray ($shallow : int = 0) {
@@ -408,7 +408,7 @@ class R::NDArray {
     
     my $clone_dim = $self->dim;
     
-    my $clone = (R::NDArray)R::Util->new_proto($self, {data => $clone_data, dim => $clone_dim});
+    my $clone = (R::NDArray)Native::MethodCall->new_proto($self, [(object){data => $clone_data, dim => $clone_dim}]);
     
     return $clone;
   }
@@ -425,7 +425,7 @@ class R::NDArray {
     
     my $ret_data = $self->slice_data($data_indexes);
     
-    my $ret_ndarray = (R::NDArray)R::Util->new_proto($self, {data => $ret_data, dim => $ret_dim});
+    my $ret_ndarray = (R::NDArray)Native::MethodCall->new_proto($self, [(object){data => $ret_data, dim => $ret_dim}]);
     
     return $ret_ndarray;
   }
@@ -768,7 +768,7 @@ class R::NDArray {
       die "The data indexes \$data_indexes must be defined.";
     }
     
-    my $data_length = R::Util->_get_array_length($data);
+    my $data_length = Fn->array_length($data);
     
     for (my $i = 0; $i < $data_length; $i++) {
       my $data_index = $data_indexes->[$i];

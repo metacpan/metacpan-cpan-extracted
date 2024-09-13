@@ -26,7 +26,7 @@ our
     ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
      $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.971000';
+$VERSION = '3.972000';
 
 =head1 NAME
 
@@ -34,7 +34,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.971000
+SNMP::Info - Version 3.972000
 
 =head1 AUTHOR
 
@@ -900,6 +900,12 @@ See documentation in L<SNMP::Info::Layer3::ERX> for details.
 Subclass for Extreme Networks switches.
 
 See documentation in L<SNMP::Info::Layer3::Extreme> for details.
+
+=item SNMP::Info::Layer3::ExtremeWing
+
+Subclass for Extreme WiNG APs.
+
+See documentation in L<SNMP::Info::Layer3::ExtremeWing> for details.
 
 =item SNMP::Info::Layer3::F5
 
@@ -1994,6 +2000,10 @@ sub device_type {
         #   This is for enterprises(1).cisco(9).otherEnterprises(6).ciscosb(1)
         $objtype = 'SNMP::Info::Layer2::CiscoSB'
             if ( $soid =~ /^\.?1\.3\.6\.1\.4\.1\.9\.6\.1/ );
+
+        # Extreme WiNG APs (formerly Motorola)
+        $objtype = 'SNMP::Info::Layer3::ExtremeWing'
+            if ( $soid =~ /^\.?1\.3\.6\.1\.4\.1\.388\.50/ );
 
         # Avaya Secure Router
         $objtype = 'SNMP::Info::Layer3::Tasman'

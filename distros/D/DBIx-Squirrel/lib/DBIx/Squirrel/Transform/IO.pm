@@ -1,5 +1,5 @@
 package    # hide from PAUSE
-  DBIx::Squirrel::Transform::IO;
+    DBIx::Squirrel::Transform::IO;
 
 use strict;
 use warnings;
@@ -11,7 +11,8 @@ BEGIN {
     $DBIx::Squirrel::Transform::IO::VERSION   = $DBIx::Squirrel::VERSION;
     @DBIx::Squirrel::Transform::IO::ISA       = qw/Exporter/;
     @DBIx::Squirrel::Transform::IO::EXPORT_OK = qw/stdout stderr/;
-    @DBIx::Squirrel::Transform::IO::EXPORT    = @DBIx::Squirrel::Transform::IO::EXPORT_OK;
+    @DBIx::Squirrel::Transform::IO::EXPORT
+        = @DBIx::Squirrel::Transform::IO::EXPORT_OK;
 }
 
 sub stdout {

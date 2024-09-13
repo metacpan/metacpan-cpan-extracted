@@ -1,13 +1,11 @@
 cpanfile
 lib/Plack/Middleware/SlapbirdAPM.pm
 lib/SlapbirdAPM/Agent/Plack.pm
-lib/SlapbirdAPM/DBIx/Tracer.pm
-lib/SlapbirdAPM/Trace.pm
+lib/SlapbirdAPM/Plack/DBIx/Tracer.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
-SlapbirdAPM-Agent-Plack-0.002.tar.gz
 t/basic.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

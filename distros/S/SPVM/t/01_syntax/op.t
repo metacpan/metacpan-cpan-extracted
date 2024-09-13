@@ -187,8 +187,12 @@ use Test::More;
     compile_not_ok($source, qr/Redeclaration of MyClass#foo method/);
   }
   {
-    my $source = 'class MyClass : mulnum_t { method foo : void () { } }';
-    compile_not_ok($source, qr/A multi-numeric type cannnot have methods/);
+    my $source = 'class MyClass_2d : mulnum_t { has re : double; has im : double; method foo : void () { } }';
+    compile_not_ok($source, qr/A multi-numeric type cannnot have instance methods/);
+  }
+  {
+    my $source = 'class MyClass_2d : mulnum_t { has re : double; has im : double; static method foo : void () { } }';
+    compile_ok($source);
   }
   {
     my $source = 'class MyClass : mulnum_t { our $FOO : int; }';
@@ -407,6 +411,12 @@ use Test::More;
   {
     my $source = 'class MyClass { interface }';
     compile_not_ok($source, qr|Unexpected token|);
+  }
+  
+  {
+    # https://github.com/yuki-kimoto/SPVM/issues/570
+    my $source = 'class TestCase::Operator::PACKAGE { static method PACKAGE : int () { $anon_result_ref = 0; return 1; }; }';
+    compile_not_ok($source);
   }
 }
 

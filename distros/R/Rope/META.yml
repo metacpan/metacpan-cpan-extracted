@@ -10,7 +10,7 @@ configure_requires:
   Type::Tiny: '0'
   Want: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,5 +28,5 @@ requires:
   Struct::Conditional: '1.01'
   Want: '0'
   perl: '5.018'
-version: '0.40'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.41'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

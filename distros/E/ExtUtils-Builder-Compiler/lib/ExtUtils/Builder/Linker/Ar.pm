@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::Ar;
-$ExtUtils::Builder::Linker::Ar::VERSION = '0.020';
+$ExtUtils::Builder::Linker::Ar::VERSION = '0.021';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ ExtUtils::Builder::Linker::Ar
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 AUTHOR
 

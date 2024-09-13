@@ -3,7 +3,7 @@
 use v5.14;  # package NAME {BLOCK}
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Metrics::Any '$metrics', strict => 0;
 
@@ -41,13 +41,13 @@ $metrics->make_counter( bluecounter =>
    category => "blue" );
 $metrics->inc_counter( bluecounter => );
 
-is_deeply( \%metricsred, { "main/redcounter" => 1 },
+is( \%metricsred, { "main/redcounter" => 1 },
    'Metrics routed to red adapter' );
 
-is_deeply( \%metricsblue, { "main/bluecounter" => 1 },
+is( \%metricsblue, { "main/bluecounter" => 1 },
    'Metrics routed to blue adapter' );
 
-is_deeply( \%metricsmagenta, { "main/redcounter" => 1, "main/bluecounter" => 1 },
+is( \%metricsmagenta, { "main/redcounter" => 1, "main/bluecounter" => 1 },
    'Metrics routed to magenta adapter' );
 
 done_testing;

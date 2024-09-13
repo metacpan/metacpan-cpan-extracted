@@ -84,6 +84,7 @@ $CONFIG->{log} = ($debug ? 'debug' : ($quiet ? 'error' : 'info'));
 $ENV{INFO_TRACE} ||= $infotrace;
 $ENV{SNMP_TRACE} ||= $snmptrace;
 $ENV{DBIC_TRACE} ||= $sqltrace;
+$ENV{ND2_DO_QUIET} ||= $quiet;
 $ENV{ND2_DB_ROLLBACK} ||= $rollback;
 
 # reconfigure logging to force console output
@@ -389,6 +390,9 @@ The "C<-e>" parameter C<specify> will show the used configuration for the
 specified device.
 
  ~/bin/netdisco-do show -d 192.0.2.1 -e specify
+
+Passing the "C< --quiet >" command line flag will cause C<show> to return
+data in a compact JSON format (suitable for piping to C<jq>, for example).
 
 This command works well with the "C<-I>" debug flag on L<SNMP::Info> (or
 "C<-II>").

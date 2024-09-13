@@ -1,5 +1,5 @@
 package    # hide from PAUSE
-  DBIx::Squirrel::Transform::Data::Dumper;
+    DBIx::Squirrel::Transform::Data::Dumper;
 
 use strict;
 use warnings;
@@ -11,7 +11,8 @@ BEGIN {
     $DBIx::Squirrel::Transform::Data::Dumper::VERSION   = $DBIx::Squirrel::VERSION;
     @DBIx::Squirrel::Transform::Data::Dumper::ISA       = qw/Exporter/;
     @DBIx::Squirrel::Transform::Data::Dumper::EXPORT_OK = qw/as_perl/;
-    @DBIx::Squirrel::Transform::Data::Dumper::EXPORT    = @DBIx::Squirrel::Transform::Data::Dumper::EXPORT_OK;
+    @DBIx::Squirrel::Transform::Data::Dumper::EXPORT
+        = @DBIx::Squirrel::Transform::Data::Dumper::EXPORT_OK;
 }
 
 sub as_perl {

@@ -8,3 +8,9 @@ Revision history for Mojolicious-Plugin-Debugbar
 
 0.1.0   2023-03-27
         Use after_render instead of after_dispatch
+
+0.1.1   2024-09-12
+        Inject monitors when there's not a body tag
+
+0.1.2   2024-09-12
+        Bump version

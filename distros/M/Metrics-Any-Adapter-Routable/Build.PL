@@ -7,13 +7,15 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Metrics::Any::Adapter::Routable',
    requires => {
+      'perl' => '5.024',
+      'meta' => '0.008',
+
       'List::Util' => '1.39',
       'Metrics::Any::Adapter' => '0.06',
-
-      'perl' => '5.024',
+      'Syntax::Keyword::Try' => '0.18',
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

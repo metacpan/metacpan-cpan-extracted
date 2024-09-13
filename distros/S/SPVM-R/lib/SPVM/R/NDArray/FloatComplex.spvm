@@ -37,7 +37,7 @@ class R::NDArray::FloatComplex extends R::NDArray {
     
     my $elem = $data->[$data_index];
     
-    my $string = R::Util->_float_complex_to_string($elem);
+    my $string = Complex_2f->to_string($elem);
     
     return $string;
   }

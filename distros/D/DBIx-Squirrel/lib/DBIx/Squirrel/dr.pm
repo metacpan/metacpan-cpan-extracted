@@ -1,5 +1,5 @@
 package    # hide from PAUSE
-  DBIx::Squirrel::dr;
+    DBIx::Squirrel::dr;
 
 use 5.010_001;
 use strict;
@@ -24,24 +24,26 @@ sub _clone_connection {
     my $invocant = shift;
     return unless UNIVERSAL::isa($_[0], 'DBI::db');
     my $connection = shift;
-    my $attributes = @_ && UNIVERSAL::isa($_[$#_], 'HASH') ? pop : {};
-    return $connection->clone({%{$attributes}, __PACKAGE__->_root_class});
+    my $attrs      = @_ && UNIVERSAL::isa($_[$#_], 'HASH') ? pop : {};
+    return $connection->clone({%{$attrs}, __PACKAGE__->_root_class});
 }
 
 sub connect {
     goto &_clone_connection if UNIVERSAL::isa($_[1], 'DBI::db');
-    my $invocant   = shift;
-    my $attributes = @_ && UNIVERSAL::isa($_[$#_], 'HASH') ? pop : {};
-    my $dbh        = DBI::connect($invocant, @_, {%{$attributes}, __PACKAGE__->_root_class})
-      or throw $DBI::errstr;
+    my $invocant = shift;
+    my $attrs    = @_ && UNIVERSAL::isa($_[$#_], 'HASH') ? pop : {};
+    my $dbh = DBI::connect($invocant, @_, {%{$attrs}, __PACKAGE__->_root_class})
+        or throw $DBI::errstr;
     return $dbh;
 }
 
 sub connect_cached {
     my $invocant   = shift;
     my $attributes = @_ && UNIVERSAL::isa($_[$#_], 'HASH') ? pop : {};
-    my $dbh        = DBI::connect_cached($invocant, @_, {%{$attributes}, __PACKAGE__->_root_class})
-      or throw $DBI::errstr;
+    my $dbh
+        = DBI::connect_cached($invocant, @_,
+                              {%{$attributes}, __PACKAGE__->_root_class},
+        ) or throw $DBI::errstr;
     return $dbh;
 }
 

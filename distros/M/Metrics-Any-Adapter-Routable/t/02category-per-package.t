@@ -3,7 +3,7 @@
 use v5.14;  # package NAME {BLOCK}
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 package Metrics::Any::Adapter::_ToHash {
    sub new {
@@ -52,13 +52,13 @@ Metrics::Any::Adapter->import( Routable =>
    $metrics->inc_counter( counter => );
 }
 
-is_deeply( \%metricsred, { "RedPackage/counter" => 1 },
+is( \%metricsred, { "RedPackage/counter" => 1 },
    'Metrics routed to red adapter' );
 
-is_deeply( \%metricsblue, { "BluePackage/counter" => 1 },
+is( \%metricsblue, { "BluePackage/counter" => 1 },
    'Metrics routed to blue adapter' );
 
-is_deeply( \%metricsmagenta, { "RedPackage/counter" => 1, "BluePackage/counter" => 1 },
+is( \%metricsmagenta, { "RedPackage/counter" => 1, "BluePackage/counter" => 1 },
    'Metrics routed to magenta adapter' );
 
 # Package wildcard tests

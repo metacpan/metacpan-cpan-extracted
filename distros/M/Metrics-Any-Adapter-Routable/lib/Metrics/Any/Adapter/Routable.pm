@@ -1,16 +1,20 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Routable 0.01;
+package Metrics::Any::Adapter::Routable 0.02;
 
 use v5.24;  # postfix deref
 use warnings;
 use experimental 'signatures';
 
+use meta 0.008;
+no warnings 'meta::experimental';
+
 use Carp;
 use List::Util 1.39 qw( any pairs );
+use Syntax::Keyword::Try 0.18;
 
 require Metrics::Any::Adapter; Metrics::Any::Adapter->VERSION( '0.06' );
 
@@ -19,6 +23,8 @@ require Metrics::Any::Adapter; Metrics::Any::Adapter->VERSION( '0.06' );
 C<Metrics::Any::Adapter::Routable> - configurable routing of reported metrics
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Metrics::Any::Adapter 'Routable',
       targets => [
@@ -131,6 +137,8 @@ sub set_category_for_package ( $self, $package, $category )
    $self->{package_category}{$package} = $category;
 }
 
+my $metapkg = meta::get_this_package;
+
 foreach my $method (qw( make_counter make_distribution make_gauge make_timer )) {
    my $code = sub ( $self, $handle, %args ) {
       my $collector = $args{collector};
@@ -140,18 +148,21 @@ foreach my $method (qw( make_counter make_distribution make_gauge make_timer )) 
          # TODO: a configurable default category
          "default";
 
-      my @e;
+      my @errs;
       foreach my $target ( $self->{targets}->@* ) {
          my ( undef, $adapter ) = @$target;
 
-         defined eval { $adapter->$method( $handle, %args ); 1 } or
-            push @e, $@;
+         try {
+            $adapter->$method( $handle, %args );
+         }
+         catch ( $e ) {
+            push @errs, $e;
+         }
       }
-      die $e[0] if @e;
+      die $errs[0] if @errs;
    };
 
-   no strict 'refs';
-   *$method = $code;
+   $metapkg->add_named_sub( $method => $code );
 }
 
 foreach my $method (qw( inc_counter_by report_distribution inc_gauge_by set_gauge report_timer )) {
@@ -159,20 +170,23 @@ foreach my $method (qw( inc_counter_by report_distribution inc_gauge_by set_gaug
       my $category = $self->{metric_category}{$handle} or
          croak "Unsure category for $handle";
 
-      my @e;
+      my @errs;
       foreach my $target ( $self->{targets}->@* ) {
          my ( $categories, $adapter ) = @$target;
 
          next unless any { $_ eq $category } @$categories;
 
-         defined eval { $adapter->$method( $handle, @args ); 1 } or
-            push @e, $@;
+         try {
+            $adapter->$method( $handle, @args );
+         }
+         catch ( $e ) {
+            push @errs, $e;
+         }
       }
-      die $e[0] if @e;
+      die $errs[0] if @errs;
    };
 
-   no strict 'refs';
-   *$method = $code;
+   $metapkg->add_named_sub( $method => $code );
 }
 
 =head1 AUTHOR

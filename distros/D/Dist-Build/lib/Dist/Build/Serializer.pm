@@ -1,5 +1,5 @@
 package Dist::Build::Serializer;
-$Dist::Build::Serializer::VERSION = '0.013';
+$Dist::Build::Serializer::VERSION = '0.014';
 use strict;
 use warnings;
 
@@ -13,11 +13,19 @@ use Dist::Build::Core;
 sub serialize_action {
 	my ($self, $action, %args) = @_;
 
-	if ($action->isa('ExtUtils::Builder::Action::Function') && $action->module eq 'Dist::Build::Core') {
-		return [ $action->function, $action->arguments ];
-	} else {
-		return $self->SUPER::serialize_action($action);
+	if ($action->isa('ExtUtils::Builder::Action::Function')) {
+		if ($action->module eq 'Dist::Build::Core') {
+			return [ $action->function, $action->arguments ];
+		} elsif ($action->module eq 'File::Path') {
+			if ($action->function eq 'make_path') {
+				return [ 'mkdir', $action->arguments ];
+			} elsif ($action->function eq 'remove_tree') {
+				return [ 'rm_r', $action->arguments ];
+			}
+		}
 	}
+
+	return $self->SUPER::serialize_action($action);
 }
 
 sub deserialize_action {
@@ -38,8 +46,22 @@ sub deserialize_action {
 	} elsif ($command eq 'mkdir') {
 		my ($destination, %args) = @args;
 		$args{verbose} = $options{verbose} if defined $options{verbose};
-		$message = "mkdir $destination";
-		return make_function('mkdir', "mkdir $destination", $destination, %args);
+		return ExtUtils::Builder::Action::Function->new(
+			function  => 'make_path',
+			module    => 'File::Path',
+			arguments => [ $destination, %args ],
+			exports   => 'explicit',
+			message   => "mkdir $destination",
+		);
+	} elsif ($command eq 'rm_r') {
+		my (@files) = @args;
+		return ExtUtils::Builder::Action::Function->new(
+			function  => 'remove_tree',
+			module    => 'File::Path',
+			arguments => \@files,
+			exports   => 'explicit',
+			message   => "rm_r @files",
+		);
 	} elsif ($command eq 'install') {
 		my %args = @args;
 		$args{verbose} = $options{verbose} if defined $options{verbose};
@@ -81,7 +103,7 @@ Dist::Build::Serializer - A Serializer for a Dist::Build plan
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 DESCRIPTION
 

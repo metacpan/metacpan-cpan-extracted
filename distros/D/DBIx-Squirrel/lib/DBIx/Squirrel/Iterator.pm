@@ -1,5 +1,5 @@
 package    # hide from PAUSE
-  DBIx::Squirrel::Iterator;
+    DBIx::Squirrel::Iterator;
 
 use 5.010_001;
 use strict;
@@ -15,28 +15,31 @@ BEGIN {
     $DBIx::Squirrel::Iterator::VERSION   = $DBIx::Squirrel::VERSION;
     @DBIx::Squirrel::Iterator::ISA       = qw/Exporter/;
     @DBIx::Squirrel::Iterator::EXPORT_OK = qw/
-      database
-      iterator
-      result
-      result_current
-      result_first
-      result_prev
-      result_previous
-      result_offset
-      result_original
-      result_transform
-      statement
-      /;
+        database
+        iterator
+        result
+        result_current
+        result_first
+        result_number
+        result_offset
+        result_original
+        result_prev
+        result_previous
+        result_transform
+        statement
+        /;
+    @DBIx::Squirrel::Iterator::EXPORT = @DBIx::Squirrel::Iterator::EXPORT_OK;
     $DBIx::Squirrel::Iterator::DEFAULT_SLICE      = [];    # Faster!
     $DBIx::Squirrel::Iterator::DEFAULT_CACHE_SIZE = 2;     # Initial buffer size and autoscaling increment
     $DBIx::Squirrel::Iterator::CACHE_SIZE_LIMIT   = 64;    # Absolute maximum buffersize
 }
 
-use constant E_BAD_STH        => 'Expected a statement handle object';
-use constant E_BAD_SLICE      => 'Slice must be a reference to an ARRAY or HASH';
-use constant E_BAD_CACHE_SIZE => 'Maximum row count must be an integer greater than zero';
-use constant W_MORE_ROWS      => 'Query would yield more than one result';
-use constant E_EXP_ARRAY_REF  => 'Expected an ARRAY-REF';
+use constant E_BAD_STH   => 'Expected a statement handle object';
+use constant E_BAD_SLICE => 'Slice must be a reference to an ARRAY or HASH';
+use constant E_BAD_CACHE_SIZE =>
+    'Maximum row count must be an integer greater than zero';
+use constant W_MORE_ROWS     => 'Query would yield more than one result';
+use constant E_EXP_ARRAY_REF => 'Expected an ARRAY-REF';
 
 sub DEFAULT_SLICE () {$DBIx::Squirrel::Iterator::DEFAULT_SLICE}
 
@@ -81,7 +84,8 @@ sub _cache_charge {
             $self->_cache_size_auto_adjust if @{$rows} >= $attr->{cache_size};
         }
     }
-    $attr->{buffer} = [defined($attr->{buffer}) ? (@{$attr->{buffer}}, @{$rows}) : @{$rows}];
+    $attr->{buffer}
+        = [defined($attr->{buffer}) ? (@{$attr->{buffer}}, @{$rows}) : @{$rows}];
     return scalar(@{$attr->{buffer}});
 }
 
@@ -100,7 +104,8 @@ sub _cache_init {
 sub _cache_size_auto_adjust {
     my($attr, $self) = shift->_private_state;
     $attr->{cache_size} *= 2;
-    $attr->{cache_size}  = CACHE_SIZE_LIMIT if $attr->{cache_size} > CACHE_SIZE_LIMIT;
+    $attr->{cache_size}  = CACHE_SIZE_LIMIT
+        if $attr->{cache_size} > CACHE_SIZE_LIMIT;
     return $self;
 }
 
@@ -152,13 +157,13 @@ sub _private_state_clear {
     local($_);
     my($attr, $self) = shift->_private_state;
     delete $attr->{$_} foreach grep {exists($attr->{$_})} qw/
-      buffer
-      execute_returned
-      results_pending
-      results_count
-      results_first
-      results_last
-      /;
+        buffer
+        execute_returned
+        results_pending
+        results_count
+        results_first
+        results_last
+        /;
     return $self;
 }
 
@@ -176,7 +181,17 @@ sub _private_state_reset {
     # scoping. Their current values can be inspected, within any stage of
     # a transformation pipeline, by importing and using the public
     # subroutines in this lexical block.
-    our($_DATABASE, $_ITERATOR, $_RESULT, $_RESULT_FIRST, $_RESULT_OFFSET, $_RESULT_ORIGINAL, $_RESULT_PREV, $_STATEMENT,);
+    our(
+        $_DATABASE,
+        $_ITERATOR,
+        $_RESULT,
+        $_RESULT_FIRST,
+        $_RESULT_NUMBER,
+        $_RESULT_OFFSET,
+        $_RESULT_ORIGINAL,
+        $_RESULT_PREV,
+        $_STATEMENT,
+    );
 
     sub database {$_DATABASE}
 
@@ -190,21 +205,26 @@ sub _private_state_reset {
 
     sub result_first {$_RESULT_FIRST}
 
+    sub result_number {$_RESULT_NUMBER}
+
+    sub result_offset {$_RESULT_OFFSET}
+
+    sub result_original {$_RESULT_ORIGINAL}
+
     sub result_prev {$_RESULT_PREV}
 
     BEGIN {
         *result_previous = subname(result_previous => \&result_prev);
     }
 
-    sub result_offset {$_RESULT_OFFSET}
-
-    sub result_original {$_RESULT_ORIGINAL}
-
     sub statement {$_STATEMENT}
 
     sub result_transform {    ## not a method
-        my @transforms = UNIVERSAL::isa($_[0], 'ARRAY') ? @{+shift} : UNIVERSAL::isa($_[0], 'CODE') ? shift : ();
-        my @results    = @_;
+        my @transforms
+            = UNIVERSAL::isa($_[0], 'ARRAY') ? @{+shift}
+            : UNIVERSAL::isa($_[0], 'CODE')  ? shift
+            :                                  ();
+        my @results = @_;
         if (@transforms && @_) {
             local($_RESULT_ORIGINAL) = @results;
             for my $transform (@transforms) {
@@ -261,10 +281,12 @@ sub _private_state_reset {
                 local($_DATABASE)      = $self->sth->{Database};
                 local($_ITERATOR)      = $self;
                 local($_RESULT_FIRST)  = $attr->{results_first};
+                local($_RESULT_NUMBER) = $attr->{results_count} + 1;
                 local($_RESULT_OFFSET) = $attr->{results_count};
                 local($_RESULT_PREV)   = $attr->{results_last};
                 local($_STATEMENT)     = $self->sth;
-                map {result_transform($attr->{transforms}, $self->_result_preprocess($_))} $result;
+                map {result_transform($attr->{transforms}, $self->_result_preprocess($_))}
+                    $result;
             }
             else {
                 $result;
@@ -304,7 +326,8 @@ sub cache_size {
     my($attr, $self) = shift->_private_state;
     if (@_) {
         throw E_BAD_CACHE_SIZE unless looks_like_number($_[0]);
-        throw E_BAD_CACHE_SIZE if $_[0] < DEFAULT_CACHE_SIZE || $_[0] > CACHE_SIZE_LIMIT;
+        throw E_BAD_CACHE_SIZE
+            if $_[0] < DEFAULT_CACHE_SIZE || $_[0] > CACHE_SIZE_LIMIT;
         $attr->{cache_size}       = shift;
         $attr->{cache_size_fixed} = !!1;
         return $self;
@@ -360,8 +383,15 @@ sub first {
     unless ($attr->{sth}->{Executed}) {
         return unless defined($self->start);
     }
-    return do {$_ = exists($attr->{results_first}) ? $attr->{results_first} : $self->_result_fetch};
+    return do {
+        $_
+            = exists($attr->{results_first})
+            ? $attr->{results_first}
+            : $self->_result_fetch;
+    };
 }
+
+sub is_active {!!$_[0]->_private_state->{sth}->{Active}}
 
 sub iterate {
     my $self = shift;
@@ -395,6 +425,8 @@ sub next {
     }
     return do {$_ = $self->_result_fetch};
 }
+
+sub not_active {!$_[0]->_private_state->{sth}->{Active}}
 
 sub remaining {
     my $self = shift;
@@ -485,18 +517,19 @@ sub start {
     }
     else {
         $attr->{transforms} = [@{$attr->{transforms_initial}}]
-          unless defined($attr->{transforms}) && @{$attr->{transforms}};
+            unless defined($attr->{transforms}) && @{$attr->{transforms}};
     }
     if (@bind_values) {
         $attr->{bind_values} = [@bind_values];
     }
     else {
         $attr->{bind_values} = [@{$attr->{bind_values_initial}}]
-          unless defined($attr->{bind_values}) && @{$attr->{bind_values}};
+            unless defined($attr->{bind_values}) && @{$attr->{bind_values}};
     }
     my $sth = $attr->{sth};
     $self->_private_state_reset;
-    return do {$_ = $attr->{execute_returned} = $sth->execute(@{$attr->{bind_values}})};
+    return
+        do {$_ = $attr->{execute_returned} = $sth->execute(@{$attr->{bind_values}})};
 }
 
 BEGIN {

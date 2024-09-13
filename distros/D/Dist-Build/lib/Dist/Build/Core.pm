@@ -1,12 +1,12 @@
 package Dist::Build::Core;
-$Dist::Build::Core::VERSION = '0.013';
+$Dist::Build::Core::VERSION = '0.014';
 use strict;
 use warnings;
 
 use parent 'ExtUtils::Builder::Planner::Extension';
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/copy mkdir rm_r make_executable manify tap_harness install/;
+our @EXPORT_OK = qw/copy make_executable manify tap_harness install/;
 
 use Carp qw/croak/;
 use ExtUtils::Helpers 0.028 qw/make_executable man1_pagename man3_pagename/;
@@ -82,9 +82,16 @@ sub add_methods {
 
 	$planner->add_delegate('mkdir', sub {
 		my (undef, $target, %options) = @_;
+		my $action = ExtUtils::Builder::Action::Function->new(
+			function  => 'make_path',
+			module    => 'File::Path',
+			arguments => [ $target, %options ],
+			exports   => 'explicit',
+			message   => "mkdir $target",
+		);
 		$planner->create_node(
 			target  => $target,
-			actions => [ new_action('mkdir', $target, %options) ],
+			actions => [ $action ],
 		);
 	});
 
@@ -214,21 +221,32 @@ sub add_methods {
 		my ($planner) = @_;
 		my @targets = grep { !/^blib\b/ } map { $_->target } grep { ! $_->phony } $planner->materialize->nodes;
 
+		my $clean_action = ExtUtils::Builder::Action::Function->new(
+			function  => 'remove_tree',
+			module    => 'File::Path',
+			arguments => [ 'blib', @targets ],
+			exports   => 'explicit',
+			message   => "rm_r @targets",
+		);
 		$planner->create_node(
 			target       => 'clean',
 			phony        => 1,
-			actions      => [
-				new_action('rm_r', 'blib', @targets),
-			],
+			actions      => [ $clean_action ],
 		);
 
+		my @real_targets = qw/Build _build MYMETA.json MYMETA.yml/;
+		my $realclean_action = ExtUtils::Builder::Action::Function->new(
+			function  => 'remove_tree',
+			module    => 'File::Path',
+			arguments => \@real_targets,
+			exports   => 'explicit',
+			message   => "rm_r @real_targets",
+		);
 		$planner->create_node(
 			target       => 'realclean',
 			phony        => 1,
 			dependencies => [ 'clean' ],
-			actions      => [
-				new_action('rm_r', 'Build', '_build', 'MYMETA.json', 'MYMETA.yml'),
-			],
+			actions      => [ $realclean_action ],
 		);
 	});
 }
@@ -243,18 +261,6 @@ sub copy {
 	utime $atime, $mtime, $target;
 	chmod 0444 & ~umask, $target;
 
-	return;
-}
-
-sub mkdir {
-	my ($source, %options) = @_;
-	make_path($source, \%options);
-	return;
-}
-
-sub rm_r {
-	my (@sources) = @_;
-	remove_tree(@sources);
 	return;
 }
 
@@ -332,7 +338,7 @@ Dist::Build::Core - core functions for Dist::Build
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 DESCRIPTION
 

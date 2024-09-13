@@ -34,7 +34,7 @@
          "requires" : {
             "Module::Load" : "0",
             "Rope" : "0.4",
-            "Rope::Cmd" : "0.02",
+            "Rope::Cmd" : "0.04",
             "Term::Size::ReadKey" : "0",
             "Type::Tiny" : "0",
             "perl" : "5.006"
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

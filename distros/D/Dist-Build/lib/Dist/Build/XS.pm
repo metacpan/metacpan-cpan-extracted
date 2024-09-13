@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.013';
+$Dist::Build::XS::VERSION = '0.014';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ sub add_methods {
 		my $xs_dir = dirname($xs_file);
 		my $c_file = $planner->c_file_for_xs($xs_file, $xs_dir);
 
-		$planner->parse_xs($xs_file, $c_file, %args);
+		$planner->parse_xs($xs_file, $c_file, %args, module => $module_name);
 
 		my $o_file = $planner->obj_file(basename($c_file, '.c'), $xs_dir);
 
@@ -117,7 +117,7 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

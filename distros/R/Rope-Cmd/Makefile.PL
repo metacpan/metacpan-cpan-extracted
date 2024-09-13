@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
         'Rope' => 0.26,
         'JSON' => 0,
         'Coerce::Types::Standard' => 0.000008,
+	'Term::ANSI::Sprintf' => 0.04,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Rope-Cmd-*' },

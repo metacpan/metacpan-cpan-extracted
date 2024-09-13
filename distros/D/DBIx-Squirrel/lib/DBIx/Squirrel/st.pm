@@ -1,5 +1,5 @@
 package    # hide from PAUSE
-  DBIx::Squirrel::st;
+    DBIx::Squirrel::st;
 
 use 5.010_001;
 use strict;
@@ -15,12 +15,18 @@ BEGIN {
     require Exporter;
     $DBIx::Squirrel::st::VERSION   = $DBIx::Squirrel::VERSION;
     @DBIx::Squirrel::st::ISA       = qw/DBI::st Exporter/;
-    @DBIx::Squirrel::st::EXPORT_OK = qw/statement_digest statement_normalise statement_study statement_trim/;
+    @DBIx::Squirrel::st::EXPORT_OK = qw/
+        statement_digest
+        statement_normalise
+        statement_study
+        statement_trim
+        /;
 }
 
 use constant E_EXP_STH             => 'Expected a statement handle';
 use constant E_INVALID_PLACEHOLDER => 'Cannot bind invalid placeholder (%s)';
-use constant W_ODD_NUMBER_OF_ARGS  => 'Check bind values match placeholder scheme';
+use constant W_ODD_NUMBER_OF_ARGS =>
+    'Check bind values match placeholder scheme';
 
 our $FINISH_ACTIVE_BEFORE_EXECUTE = !!1;
 

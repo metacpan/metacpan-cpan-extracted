@@ -1,5 +1,5 @@
 package    # hide from PAUSE
-  DBIx::Squirrel::ResultSet;
+    DBIx::Squirrel::ResultSet;
 
 use 5.010_001;
 use strict;

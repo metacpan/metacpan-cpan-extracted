@@ -37,7 +37,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
           return 0;
         }
         
-        unless (R::Util->_equals_double_complex($ret_ndarray->data, R::Util->_Complex_2d_new_array_from_pairs($data))) {
+        unless (Array->equals($ret_ndarray->data, Complex_2d->new_array_from_pairs($data))) {
           return 0;
         }
         
@@ -62,7 +62,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
         return 0;
       }
       
-      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 3, 5, 2, 4, 6])) {
+      unless (Array->equals_double(Complex_2d->to_re_array($ret_ndarray->data), [(double)1, 3, 5, 2, 4, 6])) {
         return 0;
       }
       
@@ -86,7 +86,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
         return 0;
       }
       
-      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16])) {
+      unless (Array->equals_double(Complex_2d->to_re_array($ret_ndarray->data), [(double)1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16])) {
         return 0;
       }
       
@@ -110,7 +110,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
         return 0;
       }
       
-      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 2, 11, 12, 3, 4, 13, 14, 5, 6, 15, 16])) {
+      unless (Array->equals_double(Complex_2d->to_re_array($ret_ndarray->data), [(double)1, 2, 11, 12, 3, 4, 13, 14, 5, 6, 15, 16])) {
         return 0;
       }
       
@@ -135,7 +135,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
         return 0;
       }
       
-      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 0, 0, 0, 2, 0, 0, 0, 3])) {
+      unless (Array->equals_double(Complex_2d->to_re_array($ret_ndarray->data), [(double)1, 0, 0, 0, 2, 0, 0, 0, 3])) {
         return 0;
       }
       
@@ -185,7 +185,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
         return 0;
       }
       
-      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 5, 9])) {
+      unless (Array->equals_double(Complex_2d->to_re_array($ret_ndarray->data), [(double)1, 5, 9])) {
         return 0;
       }
       
@@ -237,7 +237,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
         return 0;
       }
       
-      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 0, 0, 0, 1, 0, 0, 0, 1])) {
+      unless (Array->equals_double(Complex_2d->to_re_array($ret_ndarray->data), [(double)1, 0, 0, 0, 1, 0, 0, 0, 1])) {
         return 0;
       }
       
@@ -278,7 +278,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
         return 0;
       }
       
-      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)22, 28, 49, 64])) {
+      unless (Array->equals_double(Complex_2d->to_re_array($ret_ndarray->data), [(double)22, 28, 49, 64])) {
         return 0;
       }
       
@@ -299,7 +299,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
         return 0;
       }
       
-      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)22, 28])) {
+      unless (Array->equals_double(Complex_2d->to_re_array($ret_ndarray->data), [(double)22, 28])) {
         return 0;
       }
       
@@ -385,7 +385,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
         return 0;
       }
       
-      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 3, 5, 2, 4, 6])) {
+      unless (Array->equals_double(Complex_2d->to_re_array($ret_ndarray->data), [(double)1, 3, 5, 2, 4, 6])) {
         return 0;
       }
       
@@ -436,7 +436,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
         return 0;
       }
       
-      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)-2])) {
+      unless (Array->equals_double(Complex_2d->to_re_array($ret_ndarray->data), [(double)-2])) {
         return 0;
       }
       
@@ -476,7 +476,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
   static method solve : int () {
     
     {
-      my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)1, 2, 1, 3]), 2, 2);
+      my $x_ndarray = MDCOP->matrix(Complex_2d->new_array_from_re_array([(double)1, 2, 1, 3]), 2, 2);
       
       my $ret_ndarray = MDCOP->solve($x_ndarray);
       
@@ -484,7 +484,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
         return 0;
       }
       
-      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)3, -2, -1, 1])) {
+      unless (Array->equals_double(Complex_2d->to_re_array($ret_ndarray->data), [(double)3, -2, -1, 1])) {
         return 0;
       }
       
@@ -496,7 +496,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
     # Exceptions
     {
       {
-        my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)1, 2, 1, 3]), 2, 2);
+        my $x_ndarray = MDCOP->matrix(Complex_2d->new_array_from_re_array([(double)1, 2, 1, 3]), 2, 2);
         
         eval { MDCOP->solve(undef); }
         
@@ -506,7 +506,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
       }
       
       {
-        my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)1, 2]), 2, 1);
+        my $x_ndarray = MDCOP->matrix(Complex_2d->new_array_from_re_array([(double)1, 2]), 2, 1);
         
         eval { MDCOP->solve($x_ndarray); }
         
@@ -516,7 +516,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
       }
       
       {
-        my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)1, 2, 1, 2]), 2, 2);
+        my $x_ndarray = MDCOP->matrix(Complex_2d->new_array_from_re_array([(double)1, 2, 1, 2]), 2, 2);
         
         eval { MDCOP->solve($x_ndarray); }
         
@@ -535,7 +535,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
   static method eigen : int () {
     
     {
-      my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)3, 2, 1, 2]), 2, 2);
+      my $x_ndarray = MDCOP->matrix(Complex_2d->new_array_from_re_array([(double)3, 2, 1, 2]), 2, 2);
       
       my $ret_ndarray_h = MDCOP->eigen($x_ndarray);
       
@@ -656,7 +656,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
     # Exceptions
     {
       {
-        my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)3, 2, 1, 2]), 2, 2);
+        my $x_ndarray = MDCOP->matrix(Complex_2d->new_array_from_re_array([(double)3, 2, 1, 2]), 2, 2);
         
         eval { MDCOP->eigen(undef); }
         
@@ -666,7 +666,7 @@ class TestCase::R::OP::Matrix::DoubleComplex {
       }
       
       {
-        my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)3, 2]), 2, 1);
+        my $x_ndarray = MDCOP->matrix(Complex_2d->new_array_from_re_array([(double)3, 2]), 2, 1);
         
         eval { MDCOP->eigen($x_ndarray); }
         

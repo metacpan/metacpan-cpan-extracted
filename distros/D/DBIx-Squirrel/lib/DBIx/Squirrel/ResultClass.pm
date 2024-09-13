@@ -1,5 +1,5 @@
 package    # hide from PAUSE
-  DBIx::Squirrel::ResultClass;
+    DBIx::Squirrel::ResultClass;
 
 use 5.010_001;
 use strict;
@@ -13,8 +13,9 @@ BEGIN {
     $DBIx::Squirrel::ResultClass::VERSION = $DBIx::Squirrel::VERSION;
 }
 
-use constant E_BAD_OBJECT     => 'A reference to either an array or hash was expected';
-use constant E_STH_EXPIRED    => 'Result is no longer associated with a statement';
+use constant E_BAD_OBJECT =>
+    'A reference to either an array or hash was expected';
+use constant E_STH_EXPIRED => 'Result is no longer associated with a statement';
 use constant E_UNKNOWN_COLUMN => 'Unrecognised column (%s)';
 
 sub new {

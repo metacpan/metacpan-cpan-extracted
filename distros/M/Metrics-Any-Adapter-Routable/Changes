@@ -1,4 +1,11 @@
 Revision history for Metrics-Any-Adapter-Routable
 
+0.02    2024-09-12
+        [CHANGES]
+         * Use `Syntax::Keyword::Try` instead of direct `eval`
+         * Swap unit tests from `Test::More` to `Test2::V0`
+         * Use `meta` instead of `no strict 'refs'` hackery
+
 0.01    2020-07-04
         First version, released on an unsuspecting world.
+

@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'Rope' => 0.40,
-	'Rope::Cmd' => 0.02,
+	'Rope::Cmd' => 0.04,
 	'Type::Tiny' => 0,
 	'Term::Size::ReadKey' => 0,
 	'Module::Load' => 0

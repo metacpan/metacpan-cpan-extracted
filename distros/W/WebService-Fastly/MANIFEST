@@ -19,6 +19,7 @@ docs/AclEntryResponse.md
 docs/AclEntryResponseAllOf.md
 docs/AclResponse.md
 docs/AclResponseAllOf.md
+docs/AclsInComputeApi.md
 docs/ApexRedirect.md
 docs/ApexRedirectAllOf.md
 docs/ApexRedirectApi.md
@@ -78,6 +79,13 @@ docs/CacheSetting.md
 docs/CacheSettingResponse.md
 docs/CacheSettingsApi.md
 docs/ClientKey.md
+docs/ComputeAclCreateAclsRequest.md
+docs/ComputeAclCreateAclsResponse.md
+docs/ComputeAclListEntries.md
+docs/ComputeAclListEntriesItem.md
+docs/ComputeAclListEntriesMeta.md
+docs/ComputeAclLookup.md
+docs/ComputeAclUpdateEntry.md
 docs/Condition.md
 docs/ConditionApi.md
 docs/ConditionResponse.md
@@ -90,6 +98,10 @@ docs/ConfigStoreItemResponse.md
 docs/ConfigStoreItemResponseAllOf.md
 docs/ConfigStoreResponse.md
 docs/ConfigStoreResponseAllOf.md
+docs/ConfiguredProductResponse.md
+docs/ConfiguredProductResponseConfiguration.md
+docs/ConfiguredProductResponseLinks.md
+docs/ConfiguredProductResponseProduct.md
 docs/Contact.md
 docs/ContactApi.md
 docs/ContactResponse.md
@@ -99,6 +111,8 @@ docs/ContentApi.md
 docs/CreateDashboardRequest.md
 docs/CreateResponseObjectRequest.md
 docs/Customer.md
+docs/CustomerAddress.md
+docs/CustomerAddressesApi.md
 docs/CustomerApi.md
 docs/CustomerResponse.md
 docs/CustomerResponseAllOf.md
@@ -147,6 +161,8 @@ docs/EnabledProductResponseLinks.md
 docs/EnabledProductResponseProduct.md
 docs/EnabledProductResponseService.md
 docs/EnabledProductsApi.md
+docs/Environment.md
+docs/EnvironmentName.md
 docs/EomInvoiceResponse.md
 docs/Error.md
 docs/ErrorResponseData.md
@@ -232,6 +248,7 @@ docs/InlineResponse2004Meta.md
 docs/InlineResponse2005.md
 docs/InlineResponse2006.md
 docs/InlineResponse2007.md
+docs/InlineResponse201.md
 docs/InlineResponse400.md
 docs/Invitation.md
 docs/InvitationData.md
@@ -264,6 +281,7 @@ docs/LegacyWafTagApi.md
 docs/LegacyWafUpdateStatus.md
 docs/LegacyWafUpdateStatusApi.md
 docs/LineItemData.md
+docs/ListCustomerAddressesResponse.md
 docs/ListDashboardsResponse.md
 docs/ListEomInvoicesResponse.md
 docs/Listinvoices.md
@@ -395,8 +413,6 @@ docs/OriginInspectorHistoricalMetaFilters.md
 docs/OriginInspectorMeasurements.md
 docs/OriginInspectorRealtimeApi.md
 docs/OriginInspectorRealtimeEntry.md
-docs/OriginInspectorRealtimeEntryRecorded.md
-docs/OriginInspectorSubsequentRequestTimestamp.md
 docs/OriginInspectorValues.md
 docs/PackageApi.md
 docs/PackageMetadata.md
@@ -445,7 +461,6 @@ docs/RealtimeEntry.md
 docs/RealtimeEntryAggregated.md
 docs/RealtimeEntryRecorded.md
 docs/RealtimeMeasurements.md
-docs/RecordedTimestamp.md
 docs/RelationshipCommonName.md
 docs/RelationshipCustomer.md
 docs/RelationshipCustomerCustomer.md
@@ -616,6 +631,8 @@ docs/Serviceusagemetrics.md
 docs/ServiceusagemetricsData.md
 docs/Serviceusagetype.md
 docs/Serviceusagetypes.md
+docs/SetConfiguration.md
+docs/SetWorkspaceId.md
 docs/Settings.md
 docs/SettingsApi.md
 docs/SettingsResponse.md
@@ -639,7 +656,6 @@ docs/Stats.md
 docs/StatsApi.md
 docs/Store.md
 docs/StoreResponse.md
-docs/SubsequentRequestTimestamp.md
 docs/SudoApi.md
 docs/SudoGenericTokenError.md
 docs/SudoRequest.md
@@ -860,6 +876,7 @@ docs/WsMessageFormat.md
 lib/WebService/Fastly.pm
 lib/WebService/Fastly/AclApi.pm
 lib/WebService/Fastly/AclEntryApi.pm
+lib/WebService/Fastly/AclsInComputeApi.pm
 lib/WebService/Fastly/ApexRedirectApi.pm
 lib/WebService/Fastly/ApiClient.pm
 lib/WebService/Fastly/ApiFactory.pm
@@ -876,6 +893,7 @@ lib/WebService/Fastly/ConfigStoreItemApi.pm
 lib/WebService/Fastly/Configuration.pm
 lib/WebService/Fastly/ContactApi.pm
 lib/WebService/Fastly/ContentApi.pm
+lib/WebService/Fastly/CustomerAddressesApi.pm
 lib/WebService/Fastly/CustomerApi.pm
 lib/WebService/Fastly/DictionaryApi.pm
 lib/WebService/Fastly/DictionaryInfoApi.pm
@@ -1001,6 +1019,13 @@ lib/WebService/Fastly/Object/BulkWafActiveRules.pm
 lib/WebService/Fastly/Object/CacheSetting.pm
 lib/WebService/Fastly/Object/CacheSettingResponse.pm
 lib/WebService/Fastly/Object/ClientKey.pm
+lib/WebService/Fastly/Object/ComputeAclCreateAclsRequest.pm
+lib/WebService/Fastly/Object/ComputeAclCreateAclsResponse.pm
+lib/WebService/Fastly/Object/ComputeAclListEntries.pm
+lib/WebService/Fastly/Object/ComputeAclListEntriesItem.pm
+lib/WebService/Fastly/Object/ComputeAclListEntriesMeta.pm
+lib/WebService/Fastly/Object/ComputeAclLookup.pm
+lib/WebService/Fastly/Object/ComputeAclUpdateEntry.pm
 lib/WebService/Fastly/Object/Condition.pm
 lib/WebService/Fastly/Object/ConditionResponse.pm
 lib/WebService/Fastly/Object/ConfigStore.pm
@@ -1010,6 +1035,10 @@ lib/WebService/Fastly/Object/ConfigStoreItemResponse.pm
 lib/WebService/Fastly/Object/ConfigStoreItemResponseAllOf.pm
 lib/WebService/Fastly/Object/ConfigStoreResponse.pm
 lib/WebService/Fastly/Object/ConfigStoreResponseAllOf.pm
+lib/WebService/Fastly/Object/ConfiguredProductResponse.pm
+lib/WebService/Fastly/Object/ConfiguredProductResponseConfiguration.pm
+lib/WebService/Fastly/Object/ConfiguredProductResponseLinks.pm
+lib/WebService/Fastly/Object/ConfiguredProductResponseProduct.pm
 lib/WebService/Fastly/Object/Contact.pm
 lib/WebService/Fastly/Object/ContactResponse.pm
 lib/WebService/Fastly/Object/ContactResponseAllOf.pm
@@ -1017,6 +1046,7 @@ lib/WebService/Fastly/Object/Content.pm
 lib/WebService/Fastly/Object/CreateDashboardRequest.pm
 lib/WebService/Fastly/Object/CreateResponseObjectRequest.pm
 lib/WebService/Fastly/Object/Customer.pm
+lib/WebService/Fastly/Object/CustomerAddress.pm
 lib/WebService/Fastly/Object/CustomerResponse.pm
 lib/WebService/Fastly/Object/CustomerResponseAllOf.pm
 lib/WebService/Fastly/Object/Dashboard.pm
@@ -1057,6 +1087,8 @@ lib/WebService/Fastly/Object/EnabledProductResponse.pm
 lib/WebService/Fastly/Object/EnabledProductResponseLinks.pm
 lib/WebService/Fastly/Object/EnabledProductResponseProduct.pm
 lib/WebService/Fastly/Object/EnabledProductResponseService.pm
+lib/WebService/Fastly/Object/Environment.pm
+lib/WebService/Fastly/Object/EnvironmentName.pm
 lib/WebService/Fastly/Object/EomInvoiceResponse.pm
 lib/WebService/Fastly/Object/Error.pm
 lib/WebService/Fastly/Object/ErrorResponse.pm
@@ -1150,6 +1182,7 @@ lib/WebService/Fastly/Object/InlineResponse2004Meta.pm
 lib/WebService/Fastly/Object/InlineResponse2005.pm
 lib/WebService/Fastly/Object/InlineResponse2006.pm
 lib/WebService/Fastly/Object/InlineResponse2007.pm
+lib/WebService/Fastly/Object/InlineResponse201.pm
 lib/WebService/Fastly/Object/InlineResponse400.pm
 lib/WebService/Fastly/Object/Invitation.pm
 lib/WebService/Fastly/Object/InvitationData.pm
@@ -1173,6 +1206,7 @@ lib/WebService/Fastly/Object/LegacyWafTag.pm
 lib/WebService/Fastly/Object/LegacyWafUpdateStatus.pm
 lib/WebService/Fastly/Object/LineItemData.pm
 lib/WebService/Fastly/Object/LineItemDataReadOnlyInvoiceId.pm
+lib/WebService/Fastly/Object/ListCustomerAddressesResponse.pm
 lib/WebService/Fastly/Object/ListDashboardsResponse.pm
 lib/WebService/Fastly/Object/ListEomInvoicesResponse.pm
 lib/WebService/Fastly/Object/ListInvoicesResponse.pm
@@ -1543,6 +1577,8 @@ lib/WebService/Fastly/Object/Serviceusagemetrics.pm
 lib/WebService/Fastly/Object/ServiceusagemetricsData.pm
 lib/WebService/Fastly/Object/Serviceusagetype.pm
 lib/WebService/Fastly/Object/Serviceusagetypes.pm
+lib/WebService/Fastly/Object/SetConfiguration.pm
+lib/WebService/Fastly/Object/SetWorkspaceId.pm
 lib/WebService/Fastly/Object/Settings.pm
 lib/WebService/Fastly/Object/SettingsResponse.pm
 lib/WebService/Fastly/Object/SigningKey.pm

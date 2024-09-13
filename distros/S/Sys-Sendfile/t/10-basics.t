@@ -13,19 +13,28 @@ my $bound = IO::Socket::INET->new(Listen => 1, ReuseAddr => 1, LocalAddr => 'loc
 my $in = IO::Socket::INET->new(PeerHost => $bound->sockhost, PeerPort => $bound->sockport) or die "Couldn't make input socket: $!";
 my $out = $bound->accept;
 
-open my $self, '<', $0 or die "Couldn't open self: $!";
-my $slurped = do { local $/; <$self> };
-seek $self, 0, SEEK_SET or die "Could not seek: $!";
+my $slurped = do {
+	open my $self, '<', $0 or die "Couldn't open self: $!";
+	local $/;
+	<$self>;
+};
 
-my $size = -s $self;
-is(sendfile($out, $self, $size), $size, "Wrote $size bytes when asked to send the whole file") or diag "Error message: $!";
-defined recv $in, my $read, -s $self, 0 or die "Couldn't receive: $!";
+{
+	open my $self, '<', $0 or die "Couldn't open self: $!";
 
-is($read, $slurped, "Read the same as was written");
+	my $size = -s $self;
+	is(sendfile($out, $self, $size), $size, "Wrote $size bytes when asked to send the whole file") or diag "Error message: $!";
+	defined recv $in, my $read, -s $self, 0 or die "Couldn't receive: $!";
 
-seek $self, 0, SEEK_SET or die "Could not seek: $!";
+	is($read, $slurped, "Read the same as was written");
+}
 
-is(sendfile($out, $self), $size, "Wrote $size bytes when asked to send the whole file") or diag "Error message: $!";
-defined recv $in, $read, -s $self, 0 or die "Couldn't receive: $!";
+{
+	open my $self, '<', $0 or die "Couldn't open self: $!";
 
-is($read, $slurped, "Read the same as was written");
+	my $size = -s $self;
+	is(sendfile($out, $self), $size, "Wrote $size bytes when asked to send the whole file") or diag "Error message: $!";
+	defined recv $in, my $read, -s $self, 0 or die "Couldn't receive: $!";
+
+	is($read, $slurped, "Read the same as was written");
+}

@@ -45,7 +45,7 @@ Rope::Chain - Rope chained properties
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 

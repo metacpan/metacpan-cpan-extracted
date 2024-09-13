@@ -8,6 +8,10 @@
 #include "spvm_native.h"
 
 enum {
+  SPVM_API_C_STACK_LENGTH = 512,
+};
+
+enum {
   SPVM_API_C_STACK_INDEX_EXCEPTION = 511,
   SPVM_API_C_STACK_INDEX_MORTAL_STACK = 510,
   SPVM_API_C_STACK_INDEX_MORTAL_STACK_TOP = 509,
@@ -15,6 +19,11 @@ enum {
   SPVM_API_C_STACK_INDEX_ARGS_WIDTH = 507,
   SPVM_API_C_STACK_INDEX_CALL_DEPTH = 506,
   SPVM_API_C_STACK_INDEX_ENV = 503,
+  SPVM_API_C_STACK_INDEX_TMP_BUFFER = 256,
+};
+
+enum {
+  SPVM_API_C_TMP_BUFFER_SIZE = 512,
 };
 
 /*
@@ -362,5 +371,7 @@ SPVM_OBJECT* SPVM_API_new_array_proto_element_no_mortal(SPVM_ENV* env, SPVM_VALU
 SPVM_OBJECT* SPVM_API_new_array_proto_element(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* element, int32_t length);
 
 int32_t SPVM_API_is_binary_compatible_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object);
+
+char* SPVM_API_get_stack_tmp_buffer(SPVM_ENV* env, SPVM_VALUE* stack);
 
 #endif

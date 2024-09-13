@@ -111,6 +111,7 @@ t/lib/SPVM/TestCase/R/NDArray/String.spvm
 t/lib/SPVM/TestCase/R/NDArray/StringBuffer.spvm
 t/lib/SPVM/TestCase/R/NDArray/Time/Piece.spvm
 t/lib/SPVM/TestCase/R/OP.spvm
+t/lib/SPVM/TestCase/R/OP/AnyObject.spvm
 t/lib/SPVM/TestCase/R/OP/Byte.spvm
 t/lib/SPVM/TestCase/R/OP/DataFrame.spvm
 t/lib/SPVM/TestCase/R/OP/Double.spvm
@@ -144,6 +145,7 @@ t/R-NDArray-String.t
 t/R-NDArray-StringBuffer.t
 t/R-NDArray-Time-Piece.t
 t/R-NDArray.t
+t/R-OP-AnyObject.t
 t/R-OP-Byte.t
 t/R-OP-DataFrame.t
 t/R-OP-Double.t

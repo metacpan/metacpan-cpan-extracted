@@ -9,26 +9,73 @@ has 'css' => <<'EOF'
     display: none;
     font-style: italic;
 }
-.debugbar-queries tr:hover .source {
-    display: block;
-}
 </style>
 EOF
 ;
 has 'icon' => '<i class="icon-database"></i>';
+has 'javascript' => <<'EOF'
+<script>
+$('.debugbar-queries tbody tr').on('click', function() {
+    $(this).find('.source').toggle();
+});
+</script>
+EOF
+;
+
 has 'name' => 'Queries';
 has 'seen' => sub {{}};
 
 =head2 render
+
     Returns the html
+
 =cut
 
 sub render {
     my $self = shift;
 
-    my $rows = '';
-
     my $total_duration = 0;
+
+    foreach my $query (@{ $self->items }) {
+        $total_duration += $query->{ duration };
+    }
+
+    return sprintf ('%s
+        <table class="debugbar-queries table" data-debugbar-ref="%s">
+        <thead>
+            <tr>
+                <th>Query</th>
+                <th width="70px">Duration</th>
+            </tr>
+        </thead>
+        <tbody>
+            %s
+        </tbody>
+            <tfoot>
+                <tr>
+                    <th class="text align right">Total</th>
+                    <th>%ss</th>
+                </tr>
+            </tfoot>
+        </table>
+        %s',
+        $self->css, ref($self), $self->rows, $total_duration, $self->javascript
+    );
+}
+
+=head2 rows
+
+    Build the rows
+
+=cut
+
+sub rows {
+    my $self = shift;
+
+    my $time = time;
+    my ($sec, $min, $hour) = localtime($time);
+
+    my $rows = sprintf('<tr><td colspan="2">Queries at %s:%s:%s (%s)</td></tr>', $hour, $min, $sec, scalar @{ $self->items });
 
     foreach my $query (@{ $self->items }) {
         my $seen = $self->seen->{ $query->{ sql } };
@@ -45,37 +92,18 @@ sub render {
             '<tr>
                 <td>%s%s%s</td>
                 <td>%ss</td>
-            </tr>', 
+            </tr>',
             $query->{ sql }, $seen_icon, ($source ? '<br /><div class="source">' . $source . '</div>' : ''), $query->{ duration }
         );
-
-        $total_duration += $query->{ duration };
     }
 
-    return sprintf ('%s
-        <table class="debugbar-queries table">
-        <thead>
-            <tr>
-                <th>Query</th>
-                <th width="70px">Duration</th>
-            </tr>
-        </thead>
-        <tbody>
-            %s
-        </tbody>
-            <tfoot>
-                <tr>
-                    <th class="text align right">Total</th>
-                    <th>%ss</th>
-                </tr>
-            </tfoot>
-        </table>',
-        $self->css, $rows, $total_duration
-    );
+    return $rows;
 }
 
 =head2 stop
+
     Stop debugging and clear "seen" items
+
 =cut
 
 sub stop {
@@ -90,7 +118,9 @@ sub stop {
 }
 
 =head2 start
+
     Change the debugobj for DBIX storage and record queries
+
 =cut
 
 sub start {

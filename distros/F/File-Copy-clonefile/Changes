@@ -1,5 +1,9 @@
 Revision history for File-Copy-clonefile
 
+v0.0.6  2024-09-13 02:45:48 JST
+  - Update ppport.h
+  - Use ExtUtils::Builder::Conf
+
 v0.0.5  2024-07-17 21:36:28 JST
   - Use Dist::Build (#2)
 

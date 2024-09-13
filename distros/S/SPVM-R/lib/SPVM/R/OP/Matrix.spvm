@@ -42,7 +42,7 @@ class R::OP::Matrix {
     
     my $ret_ncol = $x_ncol + $y_ncol;
     
-    my $ret_ndarray = (R::NDArray)R::Util->new_proto($x_ndarray, {data => undef, dim => [$ret_nrow, $ret_ncol]});
+    my $ret_ndarray = (R::NDArray)Native::MethodCall->new_proto($x_ndarray, [(object){data => undef, dim => [$ret_nrow, $ret_ncol]}]);
     
     my $ret_data = $ret_ndarray->data;
     
@@ -103,7 +103,7 @@ class R::OP::Matrix {
     
     my $ret_ncol = $x_ncol;
     
-    my $ret_ndarray = (R::NDArray)R::Util->new_proto($x_ndarray, {data => undef, dim => [$ret_nrow, $ret_ncol]});
+    my $ret_ndarray = (R::NDArray)Native::MethodCall->new_proto($x_ndarray, [(object){data => undef, dim => [$ret_nrow, $ret_ncol]}]);
     
     my $ret_data = $ret_ndarray->data;
     

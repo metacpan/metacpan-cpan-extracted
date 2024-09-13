@@ -54,7 +54,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (R::Util->_equals_float_complex($default_data, new Complex_2f[0])) {
+      unless (Array->equals($default_data, new Complex_2f[0])) {
         return 0;
       }
     }
@@ -69,7 +69,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (R::Util->_equals_float_complex($default_data, new Complex_2f[0])) {
+      unless (Array->equals($default_data, new Complex_2f[0])) {
         return 0;
       }
     }
@@ -84,7 +84,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (R::Util->_equals_float_complex($default_data, [Math->complexf(0f, -0f), Math->complexf(0f, -0f)])) {
+      unless (Array->equals($default_data, [Math->complexf(0f, 0f), Math->complexf(0f, 0f)])) {
         return 0;
       }
     }
@@ -259,7 +259,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (R::Util->_equals_float_complex($ret_ndarray->data, $ndarray->data)) {
+      unless (Array->equals($ret_ndarray->data, $ndarray->data)) {
         return 0;
       }
       
@@ -284,7 +284,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (R::Util->_equals_float_complex($ret_ndarray->data, $ndarray->data)) {
+      unless (Array->equals($ret_ndarray->data, $ndarray->data)) {
         return 0;
       }
       
@@ -310,7 +310,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (R::Util->_equals_float_complex($ret_ndarray->data, [Math->complexf(3f, -3f), Math->complexf(4f, -4f)])) {
+      unless (Array->equals($ret_ndarray->data, [Math->complexf(3f, -3f), Math->complexf(4f, -4f)])) {
         return 0;
       }
       
@@ -339,7 +339,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(1f, -1f), Math->complex(2f, -2f), Math->complex(3f, -3f)])) {
+      unless (Array->equals($ret_ndarray->data, [Math->complex(1f, -1f), Math->complex(2f, -2f), Math->complex(3f, -3f)])) {
         return 0;
       }
       

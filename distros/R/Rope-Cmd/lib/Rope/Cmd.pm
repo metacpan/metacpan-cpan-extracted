@@ -3,8 +3,8 @@ package Rope::Cmd;
 use 5.006;
 use strict;
 use warnings;
-
-use 5.006; use strict; use warnings; use Rope;our $VERSION = '0.02';
+use Term::ANSI::Sprintf qw/sprintf/;
+use 5.006; use strict; use warnings; use Rope;our $VERSION = '0.04';
 our (%PRO, %OPTIONS);
 
 BEGIN {
@@ -22,7 +22,7 @@ sub import {
 
 	my $caller = caller();
 
-	@export = qw/option title abstract/ unless @export;
+	@export = qw/option title abstract colors/ unless @export;
 
 	$PRO{keyword}($caller, $_, \&{$_}) for @export;
 
@@ -52,10 +52,23 @@ sub abstract {
 	$OPTIONS{$pkg}{abstract} = $str;
 }
 
+sub colors {
+	my ($pkg, %colors) = @_;
+	$OPTIONS{$pkg}{colors} = \%colors;
+}
+
 sub run {
 	my ($pkg, @params) = @_;
-
-	my $self = Rope->new({ name => $pkg, use => [qw/Rope::Autoload/], properties => $OPTIONS{$pkg}{options} });
+	my $self = Rope->new({ name => $pkg, use => [qw/Rope::Autoload/], properties => {
+		%{ $OPTIONS{$pkg}{options} },
+		print_color => {
+			writeable => 1,
+			value => sub {
+				my ($self, $color, $text) = @_;
+				print sprintf('%' . $color, $text);
+			}
+		}
+	}});
 	my %map;
 	my ($options, $max) = ($OPTIONS{$pkg}{options}, 0);
 	for my $o (sort keys %{$options}) {
@@ -68,13 +81,15 @@ sub run {
 		$max = $cur if ($cur > $max);
 	}
 
+	my $colors = $self->_default_colors($OPTIONS{$pkg}{colors});
+
 	if (scalar @params == 1 && $params[0] =~ m/^(h|help)$/) {
-		print $OPTIONS{$pkg}{title} . "\n\n";
-		print $OPTIONS{$pkg}{abstract} . "\n\n";
-		print "Options" . "\n\n";
+		print sprintf('%' . $colors->{title}, $OPTIONS{$pkg}{title} . "\n\n");
+		print sprintf('%' . $colors->{abstract}, $OPTIONS{$pkg}{abstract} . "\n\n");
+		print sprintf('%' . $colors->{options_title}, "Options" . "\n\n");
 		for my $o (sort keys %{$options}) {
 			print sprintf(
-				"%s  %s\n",
+				"%$colors->{options}  %$colors->{options_description}\n",
 				pack("A${max}", ($options->{$o}{option_alias} ? sprintf("%s|", $options->{$o}{option_alias}) : "") . $o),
 				$options->{$o}{description}
 			);
@@ -92,6 +107,14 @@ sub run {
 	return $self;
 }
 
+sub _default_colors {
+	my ($self, $colors) = @_;
+	for (qw/title abstract options_title options options_description/) {
+		$colors->{$_} = 's' unless $colors->{$_};
+	}
+	return $colors;
+}
+
 1;
 
 __END__;
@@ -102,7 +125,7 @@ Rope::Cmd - Command Line Applications via Rope
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -112,6 +135,14 @@ Version 0.02
 
 	use Rope::Cmd;
 	use Coerce::Types::Standard qw/Int Bool JSON/;
+
+	colors (
+	        title => 'bright_green',
+		abstract => 'bright_red',
+		options_title => 'bright_magenta',
+		options => 'bright_cyan',
+		options_description => 'bright_yellow'
+	);
 
 	title '...';
 
@@ -138,6 +169,7 @@ Version 0.02
 	sub callback {
 		my ($self) = @_;
 		...
+		$self->print_color("red", "Hello World");
 	}
 
 

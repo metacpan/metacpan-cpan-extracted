@@ -15,7 +15,9 @@ has 'trace' => 1;
 has 'query';
 
 =head2 query_start
+
     When a query is started, store the query
+
 =cut
 
 sub query_start {
@@ -50,7 +52,9 @@ sub query_start {
 }
 
 =head2 query_end
+
     After a query was executed, update the query log
+
 =cut
 
 sub query_end {

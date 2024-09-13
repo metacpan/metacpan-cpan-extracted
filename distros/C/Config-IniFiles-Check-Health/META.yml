@@ -3,7 +3,9 @@ abstract: 'check ini-files for needed values'
 author:
   - 'Richard Lippmann <horshack@cpan.org>'
 build_requires:
+  Test::Compile: v3.3.3
   Test::More: '0'
+  Test::Simple: '1.302191'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -16,14 +18,16 @@ name: Config-IniFiles-Check-Health
 provides:
   Config::IniFiles::Check::Health:
     file: lib/Config/IniFiles/Check/Health.pm
-    version: '0.05'
+    version: '0.08'
 requires:
   Config::IniFiles: '3.000003'
   Log::Log4perl: '0'
   Moo: '2.004000'
   Params::Validate: '1.30'
+  namespace::clean: '0'
+  perl: v5.20.0
   strictures: '2.000006'
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: '0.05'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

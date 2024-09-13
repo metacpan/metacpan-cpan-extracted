@@ -5,7 +5,15 @@ use Types::Standard qw/Str Int Bool Enum/;
 use Ascii::Text;
 use Module::Load;
 
-title(Ascii::Text->new( font => 'Poison', align => 'center', color => 'green')->stringify('Ascii Text', 1));
+colors (
+	title => 'bright_green',
+	abstract => 'bright_red',
+	options_title => 'bright_magenta',
+	options => 'bright_cyan',
+	options_description => 'bright_yellow'
+);
+
+title(Ascii::Text->new( font => 'Poison', align => 'center')->stringify('Ascii Text', 1));
 
 abstract 'script for generating ASCII text in various fonts and styles';
  

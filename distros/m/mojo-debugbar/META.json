@@ -1,0 +1,83 @@
+{
+  "name" : "Mojo-Debugbar",
+  "version" : "0.1.2",
+  "abstract" : "Debugbar for Mojolicious",
+  "description" : "This is package that is going to provide a debugbar for Mojolicious.",
+  "author" : [
+    "Adrian Crisan <adrian.crisan88@gmail.com>"
+  ],
+  "license" : "MIT",
+  "meta-spec" : {
+    "version" : 2,
+    "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+  },
+  "resources" : {
+    "homepage" : "https://aurorasoftware.gitlab.io/mojo-debugbar",
+    "license": "https://opensource.org/license/mit",
+    "repository" : {
+      "type" : "git",
+      "url" : "https://gitlab.com/AuroraSoftware/mojo-debugbar.git",
+      "web" : "https://gitlab.com/AuroraSoftware/mojo-debugbar"
+    },
+    "bugtracker" : {
+      "web" : "https://gitlab.com/AuroraSoftware/mojo-debugbar/-/issues"
+    }
+  },
+  "no_index" : {
+    "directory" : [
+      "t",
+      "docs"
+    ]
+  },
+  "prereqs" : {
+    "runtime" : {
+      "requires" : {
+        "perl" : "5.006"
+      }
+    }
+  },
+  "provides" : {
+    "Mojo::Debugbar" : {
+      "file" : "lib/Mojo/Debugbar.pm",
+      "version" : "0.1.2"
+    },
+    "Mojo::Debugbar::Monitor" : {
+      "file" : "lib/Mojo/Debugbar/Monitor.pm",
+      "version" : "0.1.2"
+    },
+    "Mojo::Debugbar::Monitor::DBIx" : {
+      "file" : "lib/Mojo/Debugbar/Monitor/DBIx.pm",
+      "version" : "0.1.2"
+    },
+    "Mojo::Debugbar::Monitor::Git" : {
+      "file" : "lib/Mojo/Debugbar/Monitor/Git.pm",
+      "version" : "0.1.2"
+    },
+    "Mojo::Debugbar::Monitor::Request" : {
+      "file" : "lib/Mojo/Debugbar/Monitor/Request.pm",
+      "version" : "0.1.2"
+    },
+    "Mojo::Debugbar::Monitor::Session" : {
+      "file" : "lib/Mojo/Debugbar/Monitor/Session.pm",
+      "version" : "0.1.2"
+    },
+    "Mojo::Debugbar::Monitor::Template" : {
+      "file" : "lib/Mojo/Debugbar/Monitor/Template.pm",
+      "version" : "0.1.2"
+    },
+    "Mojo::Debugbar::Monitor::ValidationTiny" : {
+      "file" : "lib/Mojo/Debugbar/Monitor/ValidationTiny.pm",
+      "version" : "0.1.2"
+    },
+    "Mojo::Debugbar::Storage::DBIx" : {
+      "file" : "lib/Mojo/Debugbar/Storage/DBIx.pm",
+      "version" : "0.1.2"
+    },
+    "Mojo::Debugbar::Monitors" : {
+      "file" : "lib/Mojo/Debugbar/Monitors.pm",
+      "version" : "0.1.2"
+    }
+  },
+  "keywords" : ["mojo debugbar"],
+  "release_status" : "stable"
+}

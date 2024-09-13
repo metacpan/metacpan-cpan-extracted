@@ -8,7 +8,7 @@
 
 #if defined linux || defined solaris || (defined (__SVR4) && defined (__sun))
 #define OS_LINUX
-#elif defined __FreeBSD__ || defined __FreeBSD_kernel__
+#elif defined __FreeBSD__ || defined __FreeBSD_kernel__ || defined __DragonFly__
 #define OS_BSD
 #elif defined __APPLE__
 #define OS_X

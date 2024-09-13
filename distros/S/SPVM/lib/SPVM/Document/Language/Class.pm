@@ -709,21 +709,28 @@ A L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types"> is
 
   class CLASS_NAME : mulnum_t {
     
+    has FIELD_NAME1 : NUMERIC_TYPE;
+    has FIELD_NAME2 : NUMERIC_TYPE;
+    has FIELD_NAMEn : NUMERIC_TYPE;
   }
+
+A multi-numeric field must have at least one fields. The type of a field must be a numeric type. The types of all fields must be same.
+
+The length of fields must be less than or equal to 255.
+
+I<CLASS_NAME> must ends with a L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> corresponding to the type of fields. 
+
+I<FIELD_LENGTH> of L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> must be the same as the length of fields.
+
+I<TYPE_SUFFIX> of L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> must correspond to the type of fields.
+
+A multi-numeric type cannnot have instance methods.
+
+A multi-numeric type cannnot have class variables.
 
 Compilation Errors:
 
-The type of all fields must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Types">. Otherwise, a compilation error occurs.
-
-The types of all fields must be a same type. Otherwise, a compilation error occurs.
-
-The length of fields must be less than or equal to 255. Otherwise, a compilation error occurs.
-
-I<CLASS_NAME> must ends with a L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> corresponding to the type of fields. Otherwise, a compilation error occurs.
-
-I<FIELD_LENGTH> of L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> must be the same as the length of fields. Otherwise, a compilation error occurs.
-
-I<TYPE_SUFFIX> of L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> must correspond to the type of fields.
+If the difinition of multi-numeric type is invalid, a compilation error occurs.
 
 Examples:
   
@@ -1618,11 +1625,13 @@ An L<exception|SPVM::Document::Language::ExceptionHandling/"Exception Handling">
 
 The warning message is printed to L<SPVM's standard error|SPVM::Document::Language::System/"Standard Streams">.
 
-See L<Garbage Collection|SPVM::Document::Language::GarbageCollection/"Garbage Collection"> about garbage collection.
+If the reference count of an object is 0, the destructor method in the class of the object is called.
 
-A call to a destructor creates a new L<runtime stack|SPVM::Document::NativeClass/"Runtime Stack"> for the destructor.
+In this time, the return value and an exception variable in the current L<runtime stack|SPVM::Document::NativeClass/"Runtime Stack"> is saved before the call to the destructor method, and restore it after the call.
 
 So, the exception variable in the current runtime stack cannot be changed in a destructor.
+
+See L<Garbage Collection|SPVM::Document::Language::GarbageCollection/"Garbage Collection"> about garbage collection.
 
 Compilation Errors:
 

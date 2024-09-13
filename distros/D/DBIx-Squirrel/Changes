@@ -1,6 +1,48 @@
 Revision history for DBIx-Squirrel
 
-1.4.2 2024-08-28 23:21
+1.6.0 2024-09-?? ??:?? Next Stable Release
+
+1.5.4 2024-09-12 20:52 Developer Release (Work In Progress)
+
+-   GOALS 1.5.4
+    -   F1 Allow database entity helpers to be assigned values more than
+        once.
+    -   T2 Increase DBIx::Squirrel::st test coverage appreciably from
+        63.3 pc.
+    -   D3 Improve the SYNOPSIS, which is too long and wastes far too
+        much space covering activities that can be done with the DBI.
+    1.5.3
+    -   Added a new "slurp" exported function to DBIx::Squirrel::Utils
+        to read binary files, decrypt them, uncompress them, and parse
+        them as JSON data. This is used by the DBIx::Squirrel::db
+        "load_tuples" method for bulk populating/depopulating tables
+        using a callback for the work. I found that I urgently needed
+        the feature in another project, so I added it here to be used
+        there.
+    -   Minor documentation edits.
+-   1.5.2
+    -   IMPROVED the README page, which sucked. The POD page is still
+        there, but it is sulking in a separate document. 
+    -   IMPROVED the DESCRIPTION, which was too short and did a poor
+        job of marketing the package.
+    -   ADDED new iterator export "result_number", which is a 1-based
+        alternative to "result_offset".
+    -   ADDED new iterator predicate "is_active", which is true if the
+        underlying statement is still active. This plugs an oversight
+        in testing "next" for truthy values (which is not always a
+        guaranteed outcome with user land transformations).
+    -   ADDED new iterator predicate "not_active", to complement the
+        newly added "is_active" predicate.
+-   1.5.1
+    -   Fixed issue affecting Perl 5.10.1 build checks on GitHub runner
+        that wasn't able to install Test::MockModule due to two of its
+        own dependencies having build issues. Worked around by dropping
+        Test::MockModule as a build requirement and mock-patching the
+        required method manually.
+    -   Added comment to tests scripts explaining why we now have to use
+        the Test::More::UTF8 package.
+
+1.4.2 2024-08-28 23:21 (Stable Release)
 
 -   NEW
     -   Non-breaking changes the cache_size_slice and slice_cache_size
@@ -9,11 +51,11 @@ Revision history for DBIx-Squirrel
     -   Non-breaking change to the reset method, which may now be used
         to change cache size and/oor slicing strategy.
     -   The DBIx::Squirrel::Iterator package now has and exports new
-        functions that expose aspects of the iterator’s current context
+        functions that expose aspects of the iterator's current context
         to stages in a transformation pipeline.
 -   REFACTOR / FIX
     -   Removed redundant import (&List::Util::uniq). The function is
-        not implemented on a couple of CPANTs builds, and it’s absence
+        not implemented on a couple of CPANTs builds, and it's absence
         caused build failures. I stopped using it, but forgot to remove
         the import, in itself causing build failures on systems with an
         old List::Util.
@@ -21,16 +63,16 @@ Revision history for DBIx-Squirrel
         anything I once referred to as a “buffer” is now referred to as
         a cache, and this has resulted in the names of many things being
         changed. For now, there are no breaking changes in the public
-        interface due to the presence of now deprecated aliases. I’ll
+        interface due to the presence of now deprecated aliases. I'll
         remove these in 1.5.0. DOCUMENTATION
     -   POD reflects some of the mentioned name changes.
     -   New features documented.
 -   TESTS
     -   Some tests updated to reflect mentioned name changes.
     -   Got a steer from TWATA to look at TRWYANT PPIx::Regexp for a
-        possible solution to /Can’t locate object method “e” via package
+        possible solution to /Can't locate object method “e” via package
         “warnings”/ in some Strawberry Perl builds. Thanks, both!
-    -   Riffing-off the suggestion above, I’ve ended up using Mons
+    -   Riffing-off the suggestion above, I've ended up using Mons
         Andersons Test::More::UTF8 and preliminary results look good.
         One of the Win32 Strawberry Perl 5.14.4 build is now green
         (yay!)
@@ -70,11 +112,11 @@ Revision history for DBIx-Squirrel
         moved to namespaces that are more suitable.
 -   REFACTOR / FIX
     -   A lot of older code refactored to make it more efficient, more
-        clear, or more robust. I’m hoping this positively affects
+        clear, or more robust. I'm hoping this positively affects
         outcomes on a small number of CPANTs builds still having issues.
     -   Suspect some issues with database connection, but mainly with
         statement preparation, were being hidden by ignoring return
-        values. Now checking these in case we’re still having problems
+        values. Now checking these in case we're still having problems
         accessing statement attributes on a few CPANTs builds.
 -   DOCUMENTATION
     -   Minor changes; mostly how things are named.
@@ -82,10 +124,10 @@ Revision history for DBIx-Squirrel
     -   More unit tests added.
     -   Many tests broken by changes now fixed.
     -   All $sth->{ParamValues} fail on CPANTs builds using DBD::SQLite
-        versions older than 1.56 because that’s the first version to
+        versions older than 1.56 because that's the first version to
         have the feature added. Updated the test code to detect the
         version in use and SKIP those checks for systems using an older
-        DBD::SQLite. Since we don’t use it in the non-test code,
+        DBD::SQLite. Since we don't use it in the non-test code,
         skipping is those tests is more than sufficient.
 -   TEST COVERAGE
 
@@ -112,10 +154,10 @@ Revision history for DBIx-Squirrel
     -   Much of the shitty old code in DBIx::Squirrel::util has been
         reworked and, given its importance, covered by some new and
         comprehensive unit tests.
-    -   Made good on an earlier idea to rename the iterator’s execute
+    -   Made good on an earlier idea to rename the iterator's execute
         method to start. Within that context, it makes more sense since
         execute could reasonably be thought to require bind-params at
-        all call sites, but that isn’t always the case in the iterator
+        all call sites, but that isn't always the case in the iterator
         code. So a different name made sense, and execute has been
         demoted to alias so as not to break anything.
 -   DOCUMENTATION
@@ -131,7 +173,7 @@ Revision history for DBIx-Squirrel
 -   Fixed a problem recently introduced into how transformation
     pipelines and arguments are partitioned.
 -   Fixed the iterator execute method. It used the bleat about missing
-    bind- values, but that doesn’t make sense during construction when
+    bind- values, but that doesn't make sense during construction when
     there might legitimately be none. Now calling execute with none of
     the expected bind-values just effectively resets the iterator.
 -   Fixed the results code that was breaking due to a missing
@@ -154,15 +196,15 @@ Revision history for DBIx-Squirrel
 
 -   Fixed typos.
 -   General improvements and optimisations.
--   Strawberry Perl 5.10.1.1 on MSWin32-x86-multi-thread can’t seem to
-    import DBD::SQLite::Constants ‘:file_open’ because is isn’t
+-   Strawberry Perl 5.10.1.1 on MSWin32-x86-multi-thread can't seem to
+    import DBD::SQLite::Constants ‘:file_open' because is isn't
     exported. Hopefully, a conditionally workaround solves the issue.
--   Strawberry Perl 5.14.4.1 on MSWin32-x86-multi-thread gives /Can’t
+-   Strawberry Perl 5.14.4.1 on MSWin32-x86-multi-thread gives /Can't
     locate object method “e” via package “warnings”/ error. Added “use
     diagnostics” pragma to all test code in an attempt to coax more
     useful information out.
 -   Fixed broken iterator “buffer_size” code - manually set sizes
-    weren’t persistent.
+    weren't persistent.
 
 1.3.1 2024-08-24 14:10
 
@@ -185,7 +227,7 @@ Revision history for DBIx-Squirrel
         live without them, so have refactored the tests not to use them.
         Tests pass under Perl 5.10!
 -   The seemingly bottomless pit of joy that is documentation updates.
-    I’m pushing this out, knowing that there are gaps in the POD that
+    I'm pushing this out, knowing that there are gaps in the POD that
     must be filled. I want to get the remaining red issues on the CPANTS
     matrix to go green, hence the expedited release. POD gaps will be
     filled in future point releases.
@@ -194,7 +236,7 @@ Revision history for DBIx-Squirrel
 
 -   Ground-up rewrite of iterators and result-set code.
 -   Ground-up rewrite and simplification of test code.
--   More documentation added. This stuff is never finished, and I’ll be
+-   More documentation added. This stuff is never finished, and I'll be
     adding more in future!
 -   A lot of refactoring and tidying up completed.
 
@@ -208,7 +250,7 @@ Revision history for DBIx-Squirrel
     successfully on macOS under Perl 5.28.1. Action was prompted by CPAN
     Tester report confirming Wstat 139 SEGFAULT on BSD under Perl
     5.28.1; I have no way to replicate this build environment exactly,
-    so I’m hoping this fixes the issue. We shall see. Thanks to Chris
+    so I'm hoping this fixes the issue. We shall see. Thanks to Chris
     Williams (BINGOS) for the original report.
 
 1.2.10 2024-08-17 17:35

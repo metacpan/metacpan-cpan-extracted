@@ -4,12 +4,13 @@
 class R::OP::AnyObject {
   
   use R::OP;
+  use R::NDArray::AnyObject;
   
   # Class Methods
   static method c : R::NDArray::AnyObject ($data : object of object[]|R::NDArray::AnyObject, $dim : int[] = undef) {
     
     if ($data) {
-      if (Fn->is_object_array($data)) {
+      if ($data is_type object[]) {
         # Do nothing
       }
       elsif ($data is_type R::NDArray::AnyObject) {
@@ -20,7 +21,7 @@ class R::OP::AnyObject {
         $data = $data->(R::NDArray::AnyObject)->data;
       }
       else {
-        die "The type of the data \$data must be an object array or R::NDArray::AnyObject.";
+        die "The type of the data \$data must be object[] or R::NDArray::AnyObject.";
       }
     }
     

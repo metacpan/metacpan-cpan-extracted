@@ -1,6 +1,7 @@
 Changes
 lib/Mojo/Debugbar.pm
 lib/Mojo/Debugbar/Monitor/DBIx.pm
+lib/Mojo/Debugbar/Monitor/Git.pm
 lib/Mojo/Debugbar/Monitor/Request.pm
 lib/Mojo/Debugbar/Monitor/Template.pm
 lib/Mojo/Debugbar/Monitor/ValidationTiny.pm
@@ -14,3 +15,4 @@ t/00-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/git.t

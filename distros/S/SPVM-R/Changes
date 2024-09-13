@@ -1,3 +1,19 @@
+0.101001 2024-09-13
+  [Test Improvement]
+    * Add tests for R::NDArray::AnyObject.
+  [Bug Fix]
+    * Fix a bug that R::OP::AnyObject#c method was able to be receive an array object, not only object[].
+  [Requirement Changes]
+    * Require SPVM 0.990009.
+  [Internal Changes]
+    * Use Fn#array_length method.
+    * Use Fn#get_elem_size method.
+    * Use Fn#Fn->get_elem_type_name method.
+    * Use Native::MethodCall#new_proto method.
+    * Use methods in Complex_2f multi-numeric type.
+    * Use methods in Complex_2d multi-numeric type.
+    * Remove private methods in R::Util class.
+    
 0.101 2024-08-21
   [Document Improvement]
     * Add "Features" section.

@@ -11,11 +11,11 @@ Config::IniFiles::Check::Health - check ini-files for needed values
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
 =head1 VERSION
 
-Version 0.05
+Version 0.08
 
 =cut
 

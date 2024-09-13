@@ -1644,7 +1644,7 @@ Ascii::Text::Font::Poison - Poison font.
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 

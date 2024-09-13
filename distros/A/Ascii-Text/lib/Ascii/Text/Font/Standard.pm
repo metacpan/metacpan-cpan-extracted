@@ -816,7 +816,7 @@ Ascii::Text::Font::Standard - Standard Font
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 

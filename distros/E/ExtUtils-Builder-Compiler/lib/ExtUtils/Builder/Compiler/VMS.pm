@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler::VMS;
-$ExtUtils::Builder::Compiler::VMS::VERSION = '0.020';
+$ExtUtils::Builder::Compiler::VMS::VERSION = '0.021';
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ ExtUtils::Builder::Compiler::VMS - Class for compiling with a VMS compiler
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 AUTHOR
 

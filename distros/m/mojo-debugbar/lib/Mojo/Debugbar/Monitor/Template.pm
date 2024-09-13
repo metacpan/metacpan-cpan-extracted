@@ -4,6 +4,17 @@ use Mojo::Base "Mojo::Debugbar::Monitor";
 has 'icon' => '<i class="icon-file-code"></i>';
 has 'name' => 'Templates';
 
+sub inject {
+    my $self = shift;
+
+    my $rows = $self->rows;
+
+    # replace "`" with "'" $rows
+    $rows =~ s/`/'/g;
+
+    return sprintf('$(\'table[data-debugbar-ref="%s"] tbody\').prepend(`%s`);', ref($self), $rows);
+}
+
 =head2 render
     Returns the html
 =cut
@@ -11,14 +22,8 @@ has 'name' => 'Templates';
 sub render {
     my $self = shift;
 
-    my $rows = '';
-
-    foreach my $template (@{ $self->items }) {
-        $rows .= sprintf('<tr><td>templates/%s.html.ep</td></tr>', $template);
-    }
-
     return sprintf(
-        '<table class="debugbar-templates table">
+        '<table class="debugbar-templates table" data-debugbar-ref="%s">
             <thead>
                 <tr><th>Path</th></tr>
             </thead>
@@ -26,8 +31,22 @@ sub render {
                 %s
             </tbody>
         </table>',
-        $rows
+        ref($self), $self->rows
     );
+}
+
+sub rows {
+    my $self = shift;
+
+    my $time = time;
+    my ($sec, $min, $hour) = localtime($time);
+    my $rows = sprintf('<tr><td>Templates at %s:%s:%s (%s)</td></tr>', $hour, $min, $sec, scalar @{ $self->items });
+
+    foreach my $template (@{ $self->items }) {
+        $rows .= sprintf('<tr><td>templates/%s.html.ep</td></tr>', $template);
+    }
+
+    return $rows;
 }
 
 =head2 start

@@ -41,7 +41,7 @@ class R::NDArray::DoubleComplex extends R::NDArray {
     
     my $elem = $data->[$data_index];
     
-    my $string = R::Util->_double_complex_to_string($elem);
+    my $string = Complex_2d->to_string($elem);
     
     return $string;
   }

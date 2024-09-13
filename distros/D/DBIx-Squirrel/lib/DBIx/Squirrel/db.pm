@@ -1,5 +1,5 @@
 package    # hide from PAUSE
-  DBIx::Squirrel::db;
+    DBIx::Squirrel::db;
 
 use 5.010_001;
 use strict;
@@ -8,7 +8,8 @@ no strict 'subs';    ## no critic
 use DBI;
 use Sub::Name;
 use DBIx::Squirrel::st    qw/statement_study/;
-use DBIx::Squirrel::Utils qw/throw/;
+use DBIx::Squirrel::Utils qw/slurp throw/;
+use Try::Tiny;
 use namespace::clean;
 
 BEGIN {
@@ -56,10 +57,11 @@ sub _private_state {
 sub prepare {
     my $self      = shift;
     my $statement = shift;
-    my($placeholders, $normalised_statement, $original_statement, $digest) = statement_study($statement);
+    my($placeholders, $normalised_statement, $original_statement, $digest)
+        = statement_study($statement);
     throw E_EXP_STATEMENT unless defined($normalised_statement);
     my $sth = DBI::db::prepare($self, $normalised_statement, @_)
-      or throw $DBI::errstr;
+        or throw $DBI::errstr;
     $sth = bless($sth, $self->_root_class . '::st');
     $sth->_private_state({
         Placeholders        => $placeholders,
@@ -73,10 +75,11 @@ sub prepare {
 sub prepare_cached {
     my $self      = shift;
     my $statement = shift;
-    my($placeholders, $normalised_statement, $original_statement, $digest) = statement_study($statement);
+    my($placeholders, $normalised_statement, $original_statement, $digest)
+        = statement_study($statement);
     throw E_EXP_STATEMENT unless defined($normalised_statement);
     my $sth = DBI::db::prepare_cached($self, $normalised_statement, @_)
-      or throw $DBI::errstr;
+        or throw $DBI::errstr;
     $sth = bless($sth, $self->_root_class . '::st');
     $sth->_private_state({
         Placeholders        => $placeholders,
@@ -201,6 +204,50 @@ sub results {
         }
     };
     return $sth->results(@_);
+}
+
+sub load_tuples {
+    my $self     = shift;
+    my $filename = shift;
+    my $tuples   = slurp($filename)
+        or die "No data!";
+    return $tuples unless @_;
+    my $func       = shift;
+    my %options    = @_;
+    my $disconnect = exists($options{'disconnect'}) && !!$options{'disconnect'};
+    my $progress   = !exists($options{'progress'}) || !!$options{'progress'};
+    try {
+        my($before, $percent, $count, $length);
+        if ($progress) {
+            $before = $percent = $count = 0;
+            $length = scalar(@{$tuples});
+            printf STDERR 'Progress %3d%% ', $percent if $progress;
+        }
+        for my $tuple (@{$tuples}) {
+            $func->(@{$tuple});
+            if ($progress) {
+                $count   += 1;
+                $percent  = int($count / $length * 100);
+                if ($percent > $before) {
+                    $before = $percent;
+                    print STDERR "\b\b\b\b\b";
+                    printf STDERR '%3d%% ', $percent;
+                }
+            }
+        }
+        $self->commit() unless $self->{AutoCommit};
+    }
+    catch {
+        warn "$_\n";
+        unless ($self->{AutoCommit}) {
+            $self->rollback();
+            print STDERR "Database transaction was rolled back";
+        }
+    }
+    finally {
+        $self->disconnect() if $disconnect;
+        print STDERR "\n"   if $progress;
+    }
 }
 
 BEGIN {
