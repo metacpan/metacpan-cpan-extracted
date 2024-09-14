@@ -19,3 +19,4 @@ sub ::Y  { Dump(@_) }
 sub ::YY { require Carp; Carp::confess(::Y(@_)) }
 
 print ::Y($data);
+printf "YAML version: %s\n", Best->which('YAML::XS');

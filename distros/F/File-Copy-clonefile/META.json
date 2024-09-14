@@ -16,8 +16,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Dist::Build" : "0.013",
-            "ExtUtils::Builder::Compiler" : "0.020",
+            "Dist::Build" : "0.014",
+            "ExtUtils::Builder::Compiler" : "0.021",
             "ExtUtils::Constant" : "0"
          }
       },
@@ -35,7 +35,7 @@
    "provides" : {
       "File::Copy::clonefile" : {
          "file" : "lib/File/Copy/clonefile.pm",
-         "version" : "v0.0.6"
+         "version" : "v0.0.7"
       }
    },
    "release_status" : "stable",
@@ -50,7 +50,10 @@
          "web" : "https://github.com/skaji/perl-File-Copy-clonefile"
       }
    },
-   "version" : "v0.0.6",
+   "version" : "v0.0.7",
+   "x_contributors" : [
+      "Leon Timmermans <fawaka@gmail.com>"
+   ],
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

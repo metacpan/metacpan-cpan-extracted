@@ -40,8 +40,14 @@ no warnings qw( meta::experimental );
 
 # this file's main package
 {
-   is( meta::get_this_package()->name, "main",
+   my $metapkg = meta::get_this_package();
+   is( $metapkg->name, "main",
       'Name of the main package from get_this_package' );
+
+   # This method should always exist even on perls before feature 'class', and
+   # always return false on main.
+   ok( !$metapkg->is_class,
+      'The main package is not a class' );
 }
 
 # subpackages

@@ -11,7 +11,8 @@ cat-v [ 옵션 ] args ...
   OPTIONS
      -n   --reset         Disable all character conversion
      -c   --visible=#     Specify visualize characters
-          --repeat=#      Specify repeat characters
+     -r   --repeat=#      Specify repeat characters
+     -R   --replicate     Replicate original line as is
      -t   --expand[=#]    Expand tabs
      -T   --no-expand     Do not expand tabs
     --ts  --tabstyle=#    Set tab style
@@ -32,7 +33,7 @@ cat-v [ 옵션 ] args ...
 
 =head1 VERSION
 
-Version 0.9903
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -181,6 +182,10 @@ C<cat-v>를 사용하면 탭 문자가 디스플레이의 공백이 변하지 �
 I<이름>이 C<+>로 시작하는 경우 기존 구성에 해당 문자를 추가합니다.
 
     cat-v -c esc --repeat +esc
+
+=item B<-R>, B<--replicate>
+
+변환된 문자열을 인쇄하기 전에 먼저 원본 문자열을 출력합니다.
 
 =item B<-t>[I<n>], B<--expand>[=I<n>]
 

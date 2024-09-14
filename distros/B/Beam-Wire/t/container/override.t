@@ -35,4 +35,23 @@ subtest 'get() allows override with empty hashref' => sub {
     cmp_deeply $foo->got_args, [ foo => {} ];
 };
 
+subtest 'get() allows override with arrayref with single hashref argument' => sub {
+    my $wire = Beam::Wire->new(
+        config => {
+            foo => {
+                class => 'My::ArgsTest',
+                args => [
+                    {
+                        name => 'Hoban Washburne',
+                        rank => 'Pilot',
+                    },
+                ],
+            },
+        },
+    );
+    my $foo;
+    lives_ok { $foo = $wire->get( 'foo', args => [ { rank => 'Doctor' } ] ) };
+    cmp_deeply $foo->got_args, [{ name => 'Hoban Washburne', rank => 'Doctor' }];
+};
+
 done_testing;

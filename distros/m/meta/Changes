@@ -1,5 +1,14 @@
 Revision history for meta
 
+0.009   2024-09-14
+        [CHANGES]
+         * Added `$metapkg->is_class` and `$metasub->is_method` for querying
+           about elements created with Perl 5.38's `use feature 'class'`
+
+        [BUGFIXES]
+         * Use `GvCVu()` when looking at the CV slot of a GV so as not to get
+           confused about method caches
+
 0.008   2024-09-11
         [CHANGES]
          * Added `$metapkg->add_named_sub` for efficiently adding subroutines

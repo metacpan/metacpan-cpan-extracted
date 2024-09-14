@@ -11,7 +11,8 @@ cat-v [ 选项 ] args ...
   OPTIONS
      -n   --reset         Disable all character conversion
      -c   --visible=#     Specify visualize characters
-          --repeat=#      Specify repeat characters
+     -r   --repeat=#      Specify repeat characters
+     -R   --replicate     Replicate original line as is
      -t   --expand[=#]    Expand tabs
      -T   --no-expand     Do not expand tabs
     --ts  --tabstyle=#    Set tab style
@@ -32,7 +33,7 @@ cat-v [ 选项 ] args ...
 
 =head1 VERSION
 
-Version 0.9903
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -181,6 +182,10 @@ C<cat-v> 命令可将空白和控制字符可视化，同时保留显示可显�
 如果 I<name> 以 C<+> 开头，则在现有配置的基础上添加该字符。
 
     cat-v -c esc --repeat +esc
+
+=item B<-R>, B<--replicate>
+
+在打印转换后的字符串之前，首先输出原始字符串。
 
 =item B<-t>[I<n>], B<--expand>[=I<n>]
 

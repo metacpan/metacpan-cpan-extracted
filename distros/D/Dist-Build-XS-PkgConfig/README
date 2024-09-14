@@ -1,0 +1,50 @@
+NAME
+
+    Dist::Build::XS::PkgConfig - Dist::Build extension to use pkg-config.
+
+SYNOPSIS
+
+     load_module('Dist::Build::XS');
+     load_module('Dist::Build::XS::PkgConfig');
+    
+     add_xs(
+         module => 'Foo::Bar',
+         pkg_config => {
+             library     => 'tree-sitter',
+             min_version => '0.6.3',
+         },
+     );
+
+DESCRIPTION
+
+    This module is an extension of Dist::Build::XS, adding an additional
+    argument to the add_xs function: pkg_config, allowing you to add flags
+    to your build based on a pkg-config library file. This argument will
+    either contain a hash, or a list of hashes. The hashes will contain the
+    following entries:
+
+      * library
+
+      Mandatory. The name of the library you want to link to.
+
+      * min_version
+
+      The minimum version of the library.
+
+      * static
+
+      Also specify static libraries.
+
+    It will add the appropriate arguments for that pkgmodule to the build.
+
+AUTHOR
+
+    Leon Timmermans <fawaka@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2024 by Leon Timmermans.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

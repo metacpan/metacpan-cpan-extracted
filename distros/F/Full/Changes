@@ -1,0 +1,12 @@
+
+Revision history for Full
+
+1.001     2024-09-14 12:49:46+08:00 Asia/Singapore
+    [Documentation]
+
+    - removed duplicate section, thanks to RSAVAGE for spotting
+    - included top-level module for CPAN indexing
+
+1.000     2024-09-14 09:52:38+08:00 Asia/Singapore
+
+    Initial release

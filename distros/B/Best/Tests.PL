@@ -83,7 +83,7 @@ write_test(
     file  => 'exist-a',
     tests => 3,
     best  => <<'BEST', code => <<'CODE' );
-use Best [ [qw/Doesn't::Exist LastChance/], qw/moose elk/ ];
+use Best [ [qw/Doesn::t::Exist LastChance/], qw/moose elk/ ];
 BEST
 is "@attempted", q[Doesn::t::Exist LastChance];
 is "@loaded", 'LastChance';
@@ -91,7 +91,7 @@ is "@args",   'LastChance moose elk';
 CODE
 
 write_test( file => 'exist', tests => 3, best => <<'BEST', code => <<'CODE' );
-use Best qw/Doesn't::Exist LastChance/;
+use Best qw/Doesn::t::Exist LastChance/;
 BEST
 is "@attempted", q[Doesn::t::Exist LastChance];
 is "@loaded", 'LastChance';

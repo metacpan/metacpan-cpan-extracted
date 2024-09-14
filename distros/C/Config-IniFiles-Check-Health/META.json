@@ -4,7 +4,7 @@
       "Richard Lippmann <horshack@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
@@ -33,6 +33,7 @@
       "test" : {
          "requires" : {
             "Test::Compile" : "v3.3.3",
+            "Test::Exception" : "0.43",
             "Test::More" : "0",
             "Test::Simple" : "1.302191"
          }
@@ -41,15 +42,15 @@
    "provides" : {
       "Config::IniFiles::Check::Health" : {
          "file" : "lib/Config/IniFiles/Check/Health.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
+         "http://opensource.org/licenses/artistic-license-2.0.php"
       ]
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

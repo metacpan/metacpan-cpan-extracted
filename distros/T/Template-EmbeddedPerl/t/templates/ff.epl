@@ -1,0 +1,9 @@
+<% my ($f, $person) = @_ %>
+<%= $f->form_for($person, sub($view, $fb, $person) { %>
+  <div>
+    <%= $fb->label('first_name') %>
+    <%= $fb->input('first_name') %>
+    <%= $fb->label('last_name') %>
+    <%= $fb->input('last_name') %>
+  </div>
+<% }) %>

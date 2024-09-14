@@ -9,7 +9,8 @@ cat-v \[ 选项 \] args ...
     OPTIONS
        -n   --reset         Disable all character conversion
        -c   --visible=#     Specify visualize characters
-            --repeat=#      Specify repeat characters
+       -r   --repeat=#      Specify repeat characters
+       -R   --replicate     Replicate original line as is
        -t   --expand[=#]    Expand tabs
        -T   --no-expand     Do not expand tabs
       --ts  --tabstyle=#    Set tab style
@@ -30,7 +31,7 @@ cat-v \[ 选项 \] args ...
 
 # VERSION
 
-Version 0.9903
+Version 1.00
 
 # DESCRIPTION
 
@@ -171,6 +172,10 @@ Version 0.9903
     如果 _name_ 以 `+` 开头，则在现有配置的基础上添加该字符。
 
         cat-v -c esc --repeat +esc
+
+- **-R**, **--replicate**
+
+    在打印转换后的字符串之前，首先输出原始字符串。
 
 - **-t**\[_n_\], **--expand**\[=_n_\]
 - **-T**, **--no-expand**

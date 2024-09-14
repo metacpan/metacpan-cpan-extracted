@@ -11,7 +11,8 @@ cat-v [ オプション ] args ...
   OPTIONS
      -n   --reset         Disable all character conversion
      -c   --visible=#     Specify visualize characters
-          --repeat=#      Specify repeat characters
+     -r   --repeat=#      Specify repeat characters
+     -R   --replicate     Replicate original line as is
      -t   --expand[=#]    Expand tabs
      -T   --no-expand     Do not expand tabs
     --ts  --tabstyle=#    Set tab style
@@ -32,7 +33,7 @@ cat-v [ オプション ] args ...
 
 =head1 VERSION
 
-Version 0.9903
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -181,6 +182,10 @@ C<cat-v>を使うと、タブ文字は表示上のスペースが変わらない
 I<name> が C<+> で始まる場合は、既存の設定に加えてその文字を追加します。
 
     cat-v -c esc --repeat +esc
+
+=item B<-R>, B<--replicate>
+
+変換後の文字列を出力する前に、まず元の文字列を出力します。
 
 =item B<-t>[I<n>], B<--expand>[=I<n>]
 

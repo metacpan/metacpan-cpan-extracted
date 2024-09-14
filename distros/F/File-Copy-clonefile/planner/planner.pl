@@ -12,36 +12,19 @@ int main() {
 }
 EOF
 
-my $ok; {
-    open my $fh, ">", \my $null;
-    local *STDOUT = $fh;
-    $ok = try_compile_run(source => $source);
-    unlink $_ for glob "try_compile*";
-}
-if (!$ok) {
-    die "This module only supports platforms that have clonefile system call, such as macos.\n";
-}
+assert_compile_run(
+    source => $source,
+    quiet  => 1,
+    diag   => 'This module only supports platforms that have clonefile system call, such as macos.',
+);
 
 load_module('Dist::Build::XS');
+load_module('Dist::Build::XS::WriteConstants');
 
 add_xs(
+    write_constants => {
+        NAMES => [qw(CLONE_NOFOLLOW CLONE_NOOWNERCOPY CLONE_ACL)],
+        PROXYSUBS => { autoload => 1 },
+    },
     -d ".git" ? ( extra_compiler_flags => ['-Wall', '-Wextra', '-Werror'] ) : (),
-);
-
-my $write_constants = function(module => "MyFunc", function => "write_constants");
-
-create_node(
-    target => "lib/File/Copy/const-xs.inc",
-    actions => [ $write_constants ],
-);
-
-create_node(
-    target => "lib/File/Copy/const-c.inc",
-    actions => [ $write_constants ],
-);
-
-create_node(
-    target => "code",
-    dependencies => [ "lib/File/Copy/const-xs.inc", "lib/File/Copy/const-c.inc" ],
-    phony => 1,
 );

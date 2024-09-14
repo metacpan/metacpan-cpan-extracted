@@ -1,5 +1,9 @@
 Revision history for PGObject-Util-DBAdmin
 
+1.6.2   2024-09-13
+      * Fix port number not being propagated into the connection string
+      * Add logging statements for better problem detection
+
 1.6.1   2021-11-07
       * Fix syntax error
 

@@ -16,6 +16,10 @@ sub testfunc ($$@) { }
 
    ok( $metasub->is_subroutine, '$metasub->is_subroutine' );
 
+   # This method should always exist even on perls before feature 'class', and
+   # return false on plain sub.
+   ok( !$metasub->is_method, '$metasub->is_method is false' );
+
    is( $metasub->subname, "main::testfunc",
       '$metasub->subname' );
    is( $metasub->prototype, '$$@',
@@ -59,6 +63,28 @@ sub to_be_modified { }
       'Result of calling sub added by ->add_named_sub' );
    is( $metapkg->get_symbol( '&newly_added_sub' )->subname, "main::newly_added_sub",
       'Newly added sub has correct subname' );
+}
+
+# ->get_symbol and friends should not get confused by subclass method resolution
+{
+   package Class1 { sub a_method {} }
+   package Class2 { use base 'Class1'; }
+
+   my $metapkg1 = meta::package->get( "Class1" );
+   ok( $metapkg1->try_get_symbol( '&a_method' ),
+      'metapkg for Class1 sees a_method' );
+
+   # Force the method cache to exist
+   Class2->a_method();
+
+   my $metapkg2 = meta::package->get( "Class2" );
+   ok( !$metapkg2->try_get_symbol( '&a_method' ),
+      'metapkg for Class2 does not see a_method' );
+
+   $metapkg2->add_symbol( '&a_method' => sub {} );
+
+   ok( $metapkg2->try_get_symbol( '&a_method' ),
+      'metapkg for Class2 now sees overridden a_method' );
 }
 
 done_testing;

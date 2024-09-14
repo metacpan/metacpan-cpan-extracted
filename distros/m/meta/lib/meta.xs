@@ -186,6 +186,10 @@ static void S_warn_sub_deprecated(pTHX_ CV *cv)
       GvNAME(GvSTASH(gv)), GvNAME(gv));
 }
 
+#if HAVE_PERL_VERSION(5, 38, 0)
+#  define HAVE_FEATURE_CLASS
+#endif
+
 // Flags for get-alike methods
 enum {
   GET_OR_UNDEF,
@@ -201,10 +205,10 @@ static SV *S_get_metaglob_slot(pTHX_ SV *metaglob, U8 svt, const char *slotname,
   GV *gv = MUST_GV_FROM_REFSV(metaglob);
   SV *ret;
   switch(svt) {
-    case SVt_PVMG: ret =       GvSV(gv); break;
-    case SVt_PVAV: ret = (SV *)GvAV(gv); break;
-    case SVt_PVHV: ret = (SV *)GvHV(gv); break;
-    case SVt_PVCV: ret = (SV *)GvCV(gv); break;
+    case SVt_PVMG: ret =       GvSV (gv); break;
+    case SVt_PVAV: ret = (SV *)GvAV (gv); break;
+    case SVt_PVHV: ret = (SV *)GvHV (gv); break;
+    case SVt_PVCV: ret = (SV *)GvCVu(gv); break;
   }
 
   if(ret)
@@ -286,6 +290,20 @@ get(SV *cls, SV *pkgname)
           "(did you mean to call one of the ->get_... methods?)");
     warn_experimental("meta::package->get");
     RETVAL = wrap_stash(gv_stashsv(pkgname, GV_ADD));
+  OUTPUT:
+    RETVAL
+
+bool
+is_class(SV *metapkg)
+  CODE:
+  {
+    HV *stash = MUST_STASH_FROM_REFSV(metapkg);
+#ifdef HAVE_FEATURE_CLASS
+    RETVAL = HvSTASH_IS_CLASS(stash);
+#else
+    RETVAL = false;
+#endif
+  }
   OUTPUT:
     RETVAL
 
@@ -399,11 +417,11 @@ get_symbol(SV *metapkg, SV *name, SV *value = NULL)
     if(SvTYPE(sv) == SVt_PVGV) {
       GV *gv = (GV *)sv;
       switch(sigil) {
-        case '*': ret = (SV *)     gv;  break;
-        case '$': ret =       GvSV(gv); break;
-        case '@': ret = (SV *)GvAV(gv); break;
-        case '%': ret = (SV *)GvHV(gv); break;
-        case '&': ret = (SV *)GvCV(gv); break;
+        case '*': ret = (SV *)      gv;  break;
+        case '$': ret =       GvSV (gv); break;
+        case '@': ret = (SV *)GvAV (gv); break;
+        case '%': ret = (SV *)GvHV (gv); break;
+        case '&': ret = (SV *)GvCVu(gv); break;
       }
     }
     else if(SvROK(sv)) {
@@ -449,6 +467,7 @@ get_symbol(SV *metapkg, SV *name, SV *value = NULL)
           if(!ret)
             croak("Cannot create a subroutine by ->get_or_add_symbol");
           GvCV_set(gv, (CV *)SvREFCNT_inc(ret));
+          GvCVGEN(gv) = 0;
           break;
       }
     }
@@ -491,11 +510,12 @@ add_named_sub(SV *metapkg, SV *name, SV *value)
       gv = (GV *)sv;
     }
 
-    if(GvCV(gv))
+    if(GvCVu(gv))
       CROAK_QUOTED_PREFIX("Already have a symbol named &", SVfARG(name));
 
     /* Set these in the right order so the name GV works properly */
     GvCV_set(gv, CvREFCNT_inc(cv));
+    GvCVGEN(gv) = 0;
     CvGV_set(cv, gv);
 
     RETVAL = wrap_sv_refsv((SV *)cv);
@@ -532,7 +552,8 @@ remove_symbol(SV *metapkg, SV *name)
           sv = (SV *)GvHV(gv); GvHV(gv) = NULL;
           break;
         case '&':
-          sv = (SV *)GvCV(gv); GvCV_set(gv, NULL);
+          sv = (SV *)GvCVu(gv); GvCV_set(gv, NULL);
+          GvCVGEN(gv) = 0;
           break;
       }
 
@@ -628,10 +649,10 @@ _list_symbols(SV *metapkg, SV *sigils)
       if(SvTYPE(sv) == SVt_PVGV) {
         GV *gv = (GV *)sv;
 
-        PUSH_SVREF_IF(GvSV(gv), '$');
-        PUSH_SVREF_IF(GvAV(gv), '@');
-        PUSH_SVREF_IF(GvHV(gv), '%');
-        PUSH_SVREF_IF(GvCV(gv), '&');
+        PUSH_SVREF_IF(GvSV (gv), '$');
+        PUSH_SVREF_IF(GvAV (gv), '@');
+        PUSH_SVREF_IF(GvHV (gv), '%');
+        PUSH_SVREF_IF(GvCVu(gv), '&');
       }
       else if(SvROK(sv)) {
         // GV-less optimisation; this is an RV to one kind of element
@@ -881,6 +902,20 @@ value(SV *metavar)
   }
 
 MODULE = meta    PACKAGE = meta::subroutine
+
+bool
+is_method(SV *metasub)
+  CODE:
+  {
+    CV *cv = MUST_CV_FROM_REFSV(metasub);
+#ifdef HAVE_FEATURE_CLASS
+    RETVAL = CvIsMETHOD(cv);
+#else
+    RETVAL = false;
+#endif
+  }
+  OUTPUT:
+    RETVAL
 
 SV *
 subname(SV *metasub)

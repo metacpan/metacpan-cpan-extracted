@@ -110,6 +110,17 @@ METHODS ON meta::package
 
     An alternative to meta::get_package in an object constructor style.
 
+ is_class
+
+       $bool = $metapkg->is_class;
+
+    Since version 0.009.
+
+    Returns true if on a version of Perl that supports use feature 'class',
+    and the package being represented is a real class created by that
+    feature. False for regular packages, and always false on earlier
+    versions of Perl before that feature was introduced.
+
  name
 
        $name = $metapkg->name;
@@ -350,6 +361,17 @@ METHODS ON METAVARIABLES
     Perl code.
 
 METHODS ON METASUBROUTINES
+
+ is_method
+
+       $bool = $metasub->is_method;
+
+    Since version 0.009.
+
+    Returns true if on a version of Perl that supports use feature 'class',
+    and the subroutine being represented is a real method created by that
+    feature. False for regular sub-based subroutines, and always false on
+    earlier versions of Perl before that feature was introduced.
 
  subname
 

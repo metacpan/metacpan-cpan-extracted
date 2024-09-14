@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Conf;
-$ExtUtils::Builder::Conf::VERSION = '0.021';
+$ExtUtils::Builder::Conf::VERSION = '0.022';
 use strict;
 use warnings;
 
@@ -117,7 +117,7 @@ sub add_methods {
 			$target = $exe_file;
 		}
 
-		my $result = eval { $inner->materialize->run($target, quiet => 1 || $args{quiet}); 1 };
+		my $result = eval { $inner->materialize->run($target, quiet => $args{quiet}); 1 };
 
 		return !!0 if not $result;
 
@@ -223,7 +223,7 @@ ExtUtils::Builder::Conf - Configure-time utilities for using C headers, librarie
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -251,11 +251,9 @@ It may also be necessary to search for the correct library to link against, or f
 
  $success = try_compile_run(%args);
 
- $success = try_compile_run($source);
-
 Try to compile, link, and execute a C program whose source is given. Returns true if the program compiled and linked, and exited successfully. Returns false if any of these steps fail.
 
-Takes the following named arguments. If a single argument is given, that is taken as the source string.
+Takes the following named arguments:
 
 =over 4
 

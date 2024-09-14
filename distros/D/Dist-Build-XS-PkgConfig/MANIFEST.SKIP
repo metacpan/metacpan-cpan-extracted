@@ -1,0 +1,3 @@
+#!include_default
+Dist-Build-XS-PkgConfig-.*
+README.pod

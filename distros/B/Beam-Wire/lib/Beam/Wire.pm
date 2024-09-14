@@ -1,5 +1,5 @@
 package Beam::Wire;
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 # ABSTRACT: Lightweight Dependency Injection Container
 
 #pod =head1 SYNOPSIS
@@ -424,11 +424,17 @@ sub normalize_config {
 #pod
 #pod C<value> can not be used with C<class> or C<extends>.
 #pod
+#pod =item ref
+#pod
+#pod A reference to another service.  This may be paired with C<call> or C<path>.
+#pod
 #pod =item config
 #pod
 #pod The path to a configuration file, relative to L<the dir attribute|/dir>.
 #pod The file will be read with L<Config::Any>, and the resulting data
 #pod structure returned.
+#pod
+#pod C<value> can not be used with C<class> or C<extends>.
 #pod
 #pod =item extends
 #pod
@@ -484,20 +490,39 @@ sub create_service {
     # Compose the parent ref into the copy, in case the parent changes
     %service_info = $self->merge_config( %service_info );
 
-    # value and class/extends are mutually exclusive
+    # value | ref | config and class/extends are mutually exclusive
     # must check after merge_config in case parent config has class/value
-    if ( exists $service_info{value} && (
-            exists $service_info{class} || exists $service_info{extends}
-        )
-    ) {
+
+    my @classy = grep  { exists $service_info{$_} } qw( class extends );
+    my @other =  grep  { exists $service_info{$_} } qw( value ref config );
+
+    if ( @other > 1 ) {
         Beam::Wire::Exception::InvalidConfig->throw(
             name => $name,
             file => $self->file,
-            error => '"value" cannot be used with "class" or "extends"',
+            error => 'use only one of "value", "ref", or "config"',
         );
     }
+
+    if ( @classy && @other  ) {  # @other == 1
+        Beam::Wire::Exception::InvalidConfig->throw(
+            name => $name,
+            file => $self->file,
+            error => qq{"$other[0]" cannot be used with "class" or "extends"},
+        );
+    }
+
     if ( exists $service_info{value} ) {
         return $service_info{value};
+    }
+
+    if ( exists $service_info{ref} ){
+        # at this point the service info is normalized, so none of the
+        # meta keys have a prefix.  this will cause resolve_ref some angst,
+        # so de-normalize them
+        my %meta = $self->get_meta_names;
+        my %de_normalized = map { $meta{$_} // $_ => $service_info{$_} } keys %service_info;
+        return ( $self->resolve_ref( $name, \%de_normalized ) )[0];
     }
 
     if ( $service_info{config} ) {
@@ -512,7 +537,7 @@ sub create_service {
         Beam::Wire::Exception::InvalidConfig->throw(
             name => $name,
             file => $self->file,
-            error => 'Service configuration incomplete. Missing one of "class", "value", "config"',
+            error => 'Service configuration incomplete. Missing one of "class", "value", "config", "ref"',
         );
     }
 
@@ -602,7 +627,8 @@ sub create_service {
 #pod
 #pod When merging, hashes are combined, with the child configuration taking
 #pod precedence. The C<args> key is handled specially to allow a hash of
-#pod args to be merged.
+#pod args to be merged. A single element array of args is merged too, if the
+#pod element is a hash.
 #pod
 #pod The configuration returned is a safe copy and can be modified without
 #pod effecting the original config.
@@ -613,7 +639,7 @@ sub merge_config {
     my ( $self, %service_info ) = @_;
     if ( $service_info{ extends } ) {
         my $base_config_ref = $self->get_config( $service_info{extends} );
-        unless ( $base_config_ref ) { 
+        unless ( $base_config_ref ) {
             Beam::Wire::Exception::NotFound->throw(
                 name => $service_info{extends},
                 file => $self->file,
@@ -624,6 +650,9 @@ sub merge_config {
         my $args;
         if ( ref $service_info{args} eq 'HASH' && ref $base_config{args} eq 'HASH' ) {
             $args = { %{ delete $base_config{args} }, %{ delete $service_info{args} } };
+        } elsif ( ref $service_info{args} eq 'ARRAY' && @{ $service_info{args} } == 1 && ref $service_info{args}->[0] eq 'HASH' &&
+                  ref $base_config{args}  eq 'ARRAY' && @{ $base_config{args} }  == 1 && ref $base_config{args}->[0]  eq 'HASH' ) {
+            $args = [ { %{ delete($base_config{args})->[0] }, %{ delete($service_info{args})->[0] } } ];
         }
         %service_info = ( $self->merge_config( %base_config ), %service_info );
         if ( $args ) {
@@ -777,7 +806,6 @@ sub is_meta {
     return unless @keys;
 
     my %meta = $self->get_meta_names;
-    my %meta_names = map { $_ => 1 } values %meta;
 
     # A regular service does not need the prefix, but must consist
     # only of meta keys
@@ -1066,6 +1094,41 @@ sub validate {
         my %config = %{ $self->get_config($name) };
         %config = $self->merge_config(%config);
 
+        my @classy = grep  { exists $config{$_} } qw( class extends );
+        my @other =  grep  { exists $config{$_} } qw( value ref config );
+
+        if ( @other > 1 ) {
+            $error_count++;
+            my $error = 'use only one of "value", "ref", or "config"';
+
+            if ($show_all_errors) {
+                print qq(Invalid config for service '$name': $error\n);
+                next;
+            }
+
+            Beam::Wire::Exception::InvalidConfig->throw(
+                name => $name,
+                file => $self->file,
+                error => $error,
+            );
+        }
+
+        if ( @classy && @other  ) {  # @other == 1
+            $error_count++;
+            my $error = qq{"$other[0]" cannot be used with "class" or "extends"};
+
+            if ($show_all_errors) {
+                print qq(Invalid config for service '$name': $error\n);
+                next;
+            }
+
+            Beam::Wire::Exception::InvalidConfig->throw(
+                name => $name,
+                file => $self->file,
+                error => $error,
+            );
+        }
+
         if ( exists $config{value} && ( exists $config{class} || exists $config{extends})) {
             $error_count++;
             if ($show_all_errors) {
@@ -1088,7 +1151,7 @@ sub validate {
             %config = %{ $self->_load_config("$conf_path") };
         }
 
-        unless ( $config{value} || $config{class} || $config{extends} ) {
+        unless ( $config{value} || $config{class} || $config{extends} || $config{ref} ) {
             next;
         }
 
@@ -1284,7 +1347,7 @@ Beam::Wire - Lightweight Dependency Injection Container
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
@@ -1500,11 +1563,17 @@ mostly useful when using container files.
 
 C<value> can not be used with C<class> or C<extends>.
 
+=item ref
+
+A reference to another service.  This may be paired with C<call> or C<path>.
+
 =item config
 
 The path to a configuration file, relative to L<the dir attribute|/dir>.
 The file will be read with L<Config::Any>, and the resulting data
 structure returned.
+
+C<value> can not be used with C<class> or C<extends>.
 
 =item extends
 
@@ -1560,7 +1629,8 @@ so a service can extend a service that extends another service just fine.
 
 When merging, hashes are combined, with the child configuration taking
 precedence. The C<args> key is handled specially to allow a hash of
-args to be merged.
+args to be merged. A single element array of args is merged too, if the
+element is a hash.
 
 The configuration returned is a safe copy and can be modified without
 effecting the original config.
@@ -1787,7 +1857,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Al Tom Ben Moon Bruce Armstrong Diab Jerius Kent Fredric Mohammad S Anwar mohawk2
+=for stopwords Al Tom Ben Moon Bruce Armstrong Diab Jerius Kent Fredric mauke Mohammad S Anwar mohawk2 Sven Willenbuecher
 
 =over 4
 
@@ -1813,11 +1883,19 @@ Kent Fredric <kentnl@cpan.org>
 
 =item *
 
+mauke <lukasmai.403@gmail.com>
+
+=item *
+
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 
 mohawk2 <mohawk2@users.noreply.github.com>
+
+=item *
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
 
 =back
 

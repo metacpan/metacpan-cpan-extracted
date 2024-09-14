@@ -9,7 +9,8 @@ cat-v \[ 옵션 \] args ...
     OPTIONS
        -n   --reset         Disable all character conversion
        -c   --visible=#     Specify visualize characters
-            --repeat=#      Specify repeat characters
+       -r   --repeat=#      Specify repeat characters
+       -R   --replicate     Replicate original line as is
        -t   --expand[=#]    Expand tabs
        -T   --no-expand     Do not expand tabs
       --ts  --tabstyle=#    Set tab style
@@ -30,7 +31,7 @@ cat-v \[ 옵션 \] args ...
 
 # VERSION
 
-Version 0.9903
+Version 1.00
 
 # DESCRIPTION
 
@@ -171,6 +172,10 @@ Version 0.9903
     _이름_이 `+`로 시작하는 경우 기존 구성에 해당 문자를 추가합니다.
 
         cat-v -c esc --repeat +esc
+
+- **-R**, **--replicate**
+
+    변환된 문자열을 인쇄하기 전에 먼저 원본 문자열을 출력합니다.
 
 - **-t**\[_n_\], **--expand**\[=_n_\]
 - **-T**, **--no-expand**

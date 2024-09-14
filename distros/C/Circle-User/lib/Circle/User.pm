@@ -9,7 +9,7 @@ use File::Path qw(make_path);
 use File::Basename;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 our @EXPORT  = qw(
   send_register_verify_code
   register
@@ -156,11 +156,12 @@ Circle::User - the user module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =head1 SYNOPSIS
 
-    # 1. first register if you not signup.
+    # 1. first register and login or login with verify code
+    ## option1: register and login
     my $response = send_register_verify_code({
       email => 'circle-node@gmail.com'
     });
@@ -179,6 +180,14 @@ Version 0.02
     }
 
     # 2. then login
+    $response = login({
+      email => 'circle-node@gmail.com',
+      password => '<password>'
+    });
+    if ($response->{status} != 200) {
+      croak 'cannot login status' . $response->{status};
+    }
+    ## option2: login with verify code without register
     $response = send_verify_code({
       email => 'circle-node@gmail.com'
     });
@@ -186,14 +195,16 @@ Version 0.02
       croak 'cannot send login verify code:' . $response->{status};
     }
     # receive you verify code in email or your mobile phone.
+    # then login
     $response = login({
       email => 'circle-node@gmail.com',
-      verifyCode => '<verify_code>',
-      password => '<password>'
+      verifyCode => '<verifyCode>'
     });
     if ($response->{status} != 200) {
       croak 'cannot login status' . $response->{status};
     }
+    ## for you login, option1 and option2 are ok, you just select one.
+    # now your login in.
 
     # 3. set pay password.
     $response = send_pay_verify_code({

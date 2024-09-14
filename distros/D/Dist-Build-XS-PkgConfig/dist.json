@@ -1,0 +1,10 @@
+{
+   "auto_bump" : true,
+   "auto_git" : true,
+   "auto_repo" : true,
+   "auto_scan" : true,
+   "auto_tracker" : true,
+   "write_build" : true,
+   "write_license" : true,
+   "write_readme" : true
+}

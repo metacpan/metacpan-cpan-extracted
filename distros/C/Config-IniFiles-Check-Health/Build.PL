@@ -17,6 +17,7 @@ my $builder = Module::Build->new(
         'Test::Simple'  => '1.302191',
         'Test::More'    => '0',
         'Test::Compile' => '3.3.3',
+        'Test::Exception' => '0.43',
     },
     requires => {
         'perl'             => '5.20.0',

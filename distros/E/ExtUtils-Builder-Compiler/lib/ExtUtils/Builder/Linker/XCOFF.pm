@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::XCOFF;
-$ExtUtils::Builder::Linker::XCOFF::VERSION = '0.021';
+$ExtUtils::Builder::Linker::XCOFF::VERSION = '0.022';
 use strict;
 use warnings;
 
@@ -47,7 +47,7 @@ ExtUtils::Builder::Linker::XCOFF
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 AUTHOR
 

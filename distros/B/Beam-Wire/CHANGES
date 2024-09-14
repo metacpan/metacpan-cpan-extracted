@@ -1,5 +1,21 @@
 Changelog for Beam-Wire
 
+1.026     2024-09-13 09:28:36-05:00 America/Chicago
+
+  [Added]
+
+  - Added bare `$ref` services. Now a new service can be created as
+    a reference to (or a method $call or $path lookup from) another
+    service. Thanks @djerius for the patch! [Github #80]
+  - Added merging for single hash-ref arguments. This is a special case
+    for those constructors that don't just take a list of key-value
+    pairs. Thanks @XSven for the patch! [Github #83]
+
+  [Fixed]
+
+  - Fixed `beam-wire` command exit status to exit non-zero on a failure.
+    Thanks @mauke for the patch! [Github #78]
+
 1.025     2021-07-08 10:21:29-05:00 America/Chicago
 
     [Fixed]

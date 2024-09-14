@@ -1,6 +1,12 @@
 -----
 
 
+0.0.3   2024-09-14
+    [Fixed]
+        * Check existence of 'struct' member fields on input
+        * Don't check defined-ness of named types as pointer-types
+          may be undef
+
 0.0.2   2024-06-15
     [Fixed]
         * 'enum' allowed value validation during (de)serialization

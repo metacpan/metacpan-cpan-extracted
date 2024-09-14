@@ -1,0 +1,474 @@
+# NAME
+
+Template::EmbeddedPerl - A template processing engine using embedding Perl code
+
+# SYNOPSIS
+
+    use Template::EmbeddedPerl;
+
+Create a new template object:
+
+    my $template = Template::EmbeddedPerl->new(); # default open and close tags are '<%' and '%>'
+
+Compile a template from a string:
+
+    my $compiled = $template->from_string('Hello, <%= shift %>!');
+
+\#xecute the compiled template:
+
+    my $output = $compiled->render('John');
+
+`$output` is:
+
+    Hello, John!
+
+You can also use class methods to create compiled templates
+in one step if you don't need the reusable template object
+
+    my $compiled = Template::EmbeddedPerl->from_string('Hello, <%= shift %>!');
+    my $output = $compiled->render('John');
+
+Or you can render templates from strings directly:
+
+    my $template = Template::EmbeddedPerl->new(use_cache => 1); # cache compiled templates
+    my $output = $template->render('Hello, <%= shift %>!', 'John');
+
+Other class methods are available to create compiled templates from files, file handles, 
+and data sections.  See the rest of the docs for more information.
+
+# DESCRIPTION
+
+`Template::EmbeddedPerl` is a template engine that allows you to embed Perl code
+within template files or strings. It provides methods for creating templates
+from various sources, including strings, file handles, and data sections.
+
+The module also supports features like helper functions, automatic escaping, 
+and customizable sandbox environments.
+
+Its quite similar to [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) and other embedded Perl template engines
+but its got one trick the others can't do (see [EXCUSE](https://metacpan.org/pod/EXCUSE) below).
+
+**NOTE**: This is a very basic template engine, which doesn't have lots of things
+you probably need like template includes / partials and so forth.  That's by
+design since I plan to wrap this in a [Catalyst](https://metacpan.org/pod/Catalyst) view which will provide
+all those features.  If you want to use this stand alone you might need to add
+those features yourself (or ideally put something on CPAN that wraps this to 
+provide those features).  Or you can pay me to do it for you ;)
+
+# ACKNOWLEDGEMENTS
+
+I looked at [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) and I lifted some code and docs from there.  I also
+copied some of their test cases.   I was shooting for something reasonable similar
+and potentially compatible with [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) but with some additional features.
+[Template::EmbeddedPerl](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl) is similiar to how template engines in popular frameworks 
+like Ruby on Rails and also similar to EJS in the JavaScript world.  So nothing weird
+here, just something people would understand and be comfortable with.  A type of
+lowest common denominator.  If you know Perl, you will be able to use this after
+a few minutes of reading the docs (or if you've used [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) or [Mason](https://metacpan.org/pod/Mason)
+you might not even need that).
+
+# EXCUSE
+
+Why create yet another one of these embedded Perl template engines?  I wanted one
+that could properly handle block capture like following:
+
+    <% my @items = map { %>
+      <p><%= $_ %></p>
+    <% } @items %>
+
+Basically none of the existing ones I could find could handle this.  If I'm wrong
+and somehow there's a flag or approach in [Mason](https://metacpan.org/pod/Mason) or one of the other ones that
+can handle this please let me know.
+
+[Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) is close but you have to use `begin` and `end` tags to get a similar
+effect and it's not as flexible as I'd like plus I want to be able to use signatures in
+code like the following:
+
+    <%= $f->form_for($person, sub($view, $fb, $person) { %>
+      <div>
+        <%= $fb->label('first_name') %>
+        <%= $fb->input('first_name') %>
+        <%= $fb->label('last_name') %>
+        <%= $fb->input('last_name') %>
+      </div>
+    <% }) %>
+
+Again, I couldn't find anything that could do this.   Its actually tricky because of the way
+you need to localize capture of template output when inside a block.  I ended up using [PPI](https://metacpan.org/pod/PPI)
+to parse the template so I could properly find begin and end blocks and also distinguish between
+control blocks (like `if` an `unless`) blocks that have a return like `sub` or `map` blocks.
+In [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) you can do the following (its the same but not as pretty to my eye):
+
+    <% my $form = $f->form_for($person, begin %>
+      <% my ($view, $fb, $person) = @_; %>
+      <div>
+        <%= $fb->label('first_name') %>
+        <%= $fb->input('first_name') %>
+        <%= $fb->label('last_name') %>
+        <%= $fb->input('last_name') %>
+      </div>
+    <% end; %>
+
+On the other hand my system is pretty new and I'm sure there are bugs and issues I haven't
+thought of yet.  So you probably want to use one of the more mature systems like [Mason](https://metacpan.org/pod/Mason) or
+[Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) unless you really need the features I've added. Or your being forced to use
+it because you're working for me ;)
+
+# TEMPLATE SYNTAX
+
+The template syntax is similar to other embedded Perl template engines. You can embed Perl
+code within the template using opening and closing tags. The default tags are `'<%'` and
+`'%>'`, but you can customize them when creating a new template object.  You should pick
+open and closing tags that are not common in your template content.
+
+All templates get `strict`, `warnings` and `utf8` enabled by default.  Please note this
+is different than [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) which does not seem to have warnings enabled by default.
+Since I like very strict templates this default makes sense to me but if you tend to play
+fast and loose with your templates (for example you don't use `my` to declare variables) you
+might not like this.  Feel free to complain to me, I might change it.
+
+Basic Patterns:
+
+    <% Perl code %>
+    <%= Perl expression, replaced with result %>
+
+Examples:
+
+    <% my @items = qw(foo bar baz) %>
+    <% foreach my $item (@items) { %>
+      <p><%= $item %></p>
+    <% } %>
+
+Would output:
+
+    <p>foo</p>
+    <p>bar</p>
+    <p>baz</p>
+
+You can also use the 'line' version of the tags to make it easier to embed Perl code, or at
+least potentially easier to read.  For example:
+
+% my @items = qw(foo bar baz)
+% foreach my $item (@items) {
+    &lt;p><%= $item %>&lt;/p>
+% }
+
+You can add '=' to the closing tag to indicate that the expression should be trimmed of leading
+and trailing whitespace. This is useful when you want to include the expression in a block of text.
+where you don't want the whitespace to affect the output.
+
+    <% Perl code =%>
+    <%= Perl expression, replaced with result, trimmed =%>
+
+If you want to skip the newline after the closing tag you can use a backslash.
+
+    <% Perl code %>\
+    <%= Perl expression, replaced with result, trimmed %>\
+
+You probably don't care about this so much with HTML since it collapses whitespace but it can be
+useful for other types of output like plain text or if you need some embedded Perl inside
+your JavaScript.
+
+If you really need that backslash in your output you can escape it with another backslash.
+
+    <%= "This is a backslash: " %>\\
+
+If you really need to use the actual tags in your output you can escape them with a backslash.
+
+    \<%       => <%
+    \<%=      => <%=
+    \%>       => %>
+    \%=       => %=
+    \%        => %
+
+# METHODS
+
+## new
+
+    my $template = Template::EmbeddedPerl->new(%args);
+
+Creates a new `Template::EmbeddedPerl` object. Accepts the following arguments:
+
+- `open_tag`
+
+    The opening tag for template expressions. Default is `'<%'`. You should use
+    something that's not common in your template content.
+
+- `close_tag`
+
+    The closing tag for template expressions. Default is `'%>'`.
+
+- `expr_marker`
+
+    The marker indicating a template expression. Default is `'='`.
+
+- `sandbox_ns`
+
+    The namespace for the sandbox environment. Default is `'Template::EmbeddedPerl::Sandbox'`.
+    Basically the template is compiled into an anponymous subroutine and this is the namespace
+    that subroutine is executed in.  This is a security feature to prevent the template from
+    accessing the outside environment.
+
+- `directories`
+
+    An array reference of directories to search for templates. Default is an empty array.
+    A directory to search can be either a string or an array reference containing each part
+    of the path to the directory.  Directories will be searched in order listed.
+
+        my $template = Template::EmbeddedPerl->new(directories=>['/path/to/templates']);
+        my $template = Template::EmbeddedPerl->new(directories=>[['/path', 'to', 'templates']]);
+
+    I don't do anything smart to make sure you don't reference templates in dangerous places.
+    So be careful to make sure you don't let application users specify the template path.
+
+- `template_extension`
+
+    The file extension for template files. Default is `'epl'`. So for example:
+
+        my $template = Template::EmbeddedPerl->new(directories=>['/path/to/templates', 'path/to/other/templates']);
+        my $compiled = $template->from_file('hello');
+
+    Would look for a file named `hello.epl` in the directories specified.
+
+- `auto_escape`
+
+    Boolean indicating whether to automatically escape content. Default is `0`.
+    You probably want this enabled for web content to prevent XSS attacks.  If you have this
+    on and want to return actual HTML you can use the `raw` helper function. Example:
+
+        <%= raw '<a href="http://example.com">Example</a>' %>
+
+    Obviously you need to be careful with this.
+
+- `auto_flatten_expr`
+
+    Boolean indicating whether to automatically flatten expressions. Default is `1`.
+    What this means is that if you have an expression that returns an array we will join
+    the array into a string before outputting it.  Example:
+
+        <% my @items = qw(foo bar baz); %>
+        <%= map { "$_ " } @items %>
+
+    Would output:
+
+        foo bar baz
+
+- `prepend`
+
+    Perl code to prepend to the compiled template. Default is an empty string. For example
+    you can enable modern Perl features like signatures by setting this to `'use v5.40;'`.
+
+    Use this to setup any pragmas or modules you need to use in your template code.
+
+- `helpers`
+
+    A hash reference of helper functions available to the templates. Default is an empty hash.
+    You can add your own helper functions to this hash and they will be available to the templates.
+    Example:
+
+        my $template = Template::EmbeddedPerl->new(helpers => {
+          my_helper => sub { return 'Hello, World!' },
+        });
+
+- `use_cache`
+
+    Boolean indicating whether to cache compiled templates. Default is `0`.
+    If you set this to `1`, the module will cache compiled templates in memory. This is
+    only useful if you are throwing away the template object after compiling a template.
+    For example:
+
+        my $ep = Template::EmbeddedPerl->new(use_cache => 1);
+        my $output = $ep->render('Hello, <%= shift %>!', 'John');
+
+    In the case above since you are not capturing the compiled template object each time
+    you call `render` you are recompiling the template. which could get expensive.
+
+    On the other hand if you are keeping the template object around and reusing it you don't
+    need to enable this.  Example:
+
+        my $ep = Template::EmbeddedPerl->new(use_cache => 1);
+        my $compiled = $ep->from_string('Hello, <%= shift %>!');
+        my $output = $compiled->render('John');
+
+    In the valid above the compiled template is cached and reused each time you call `render`.
+
+    Obviously this only works usefully in a persistent environment like mod\_perl or a PSGI server.
+
+## from\_string
+
+    my $compiled = $template->from_string($template_string, %args);
+
+Creates a compiled template from a string. Accepts the template content as a
+string and optional arguments to modify behavior. Returns a
+`Template::EmbeddedPerl::Compiled` object.
+
+pass 'source => $path' to the arguments to specify the source of the template if you
+want neater error messages.
+
+This can be called as a class method as well::
+
+    my $compiled = Template::EmbeddedPerl->from_string($template_string, %args);
+
+Useful if you don't need to keep the template object around.  This works 
+for all the other methods as well (`from_file`, `from_fh`, `from_data`).
+
+## from\_file
+
+    my $compiled = $template->from_file($file_name, %args);
+
+Creates a compiled template from a file. Accepts the filename (without extension)
+and optional arguments. Searches for the file in the directories specified during
+object creation.
+
+## from\_fh
+
+    my $compiled = $template->from_fh($filehandle, %args);
+
+Creates a compiled template from a file handle. Reads the content from the
+provided file handle and processes it as a template.
+
+pass 'source => $path' to the arguments to specify the source of the template if you
+want neater error messages.
+
+## from\_data
+
+    my $compiled = $template->from_data($package, %args);
+
+Creates a compiled template from the \_\_DATA\_\_ section of a specified package.
+Returns a compiled template object or dies if the package cannot be loaded or
+no \_\_DATA\_\_ section is found.
+
+## trim
+
+    my $trimmed = $template->trim($string);
+
+Trims leading and trailing whitespace from the provided string. Returns the
+trimmed string.
+
+## default\_helpers
+
+    my %helpers = $template->default_helpers;
+
+Returns a hash of default helper functions available to the templates.
+
+## get\_helpers
+
+    my %helpers = $template->get_helpers($helper_name);
+
+Returns a specific helper function or all helper functions if no name is provided.
+
+## parse\_template
+
+    my @parsed = $template->parse_template($template);
+
+Parses the provided template content and returns an array of parsed blocks.
+
+## compile
+
+    my $code = $template->compile($template, @parsed);
+
+Compiles the provided template content into executable Perl code. Returns a
+code reference.
+
+## directory\_for\_package
+
+    my $directory = $template->directory_for_package($package);
+
+Returns the directory containing the package file.
+If you don't provide a package name it will use the current package for `$template`.
+
+Useful if you want to load templates from the same directory as your package.
+
+## render
+
+    my $output = $template->render($template, @args);
+
+Compiles and executes the provided template content with the given arguments. You might
+want to enable the cache if you are doing this.
+
+# HELPER FUNCTIONS
+
+The module provides a set of default helper functions that can be used in templates.
+
+- `raw`
+
+    Returns a string as a safe string object without escaping.   Useful if you
+    want to return actual HTML to your template but you better be 
+    sure that HTML is safe.
+
+        <%= raw '<a href="http://example.com">Example</a>' %>
+
+- `safe`
+
+    Returns a string as a safe html escaped string object that will not be 
+    escaped again.
+
+- `safe_concat`
+
+    Like `safe` but for multiple strings.  This will concatenate the strings into
+    a single string object that will not be escaped again.
+
+- `html_escape`
+
+    Escapes HTML entities in a string.  This differs for `safe` in that it will
+    just do the escaping and not wrap the string in a safe string object.
+
+- `url_encode`
+
+    Encodes a string for use in a URL.
+
+- `escape_javascript`
+
+    Escapes JavaScript entities in a string. Useful for making strings safe to use
+     in JavaScript.
+
+- `trim`
+
+    Trims leading and trailing whitespace from a string.
+
+# ERROR HANDLING
+
+If an error occurs during template compilation or rendering, the module will
+throw an exception with a detailed error message. The error message includes
+the source of the template, the line number, and the surrounding lines of the
+template to help with debugging.  Example:
+
+Can't locate object method "input" at /path/to/templates/hello.yat line 4.
+
+    3:     <%= label('first_name') %>
+    4:     <%= input('first_name') %>
+    5:     <%= errors('last_name') %>
+
+# ENVIRONMENT VARIABLES
+
+The module respects the following environment variables: 
+
+- `DEBUG_TEMPLATE_EMBEDDED_PERL`
+
+    Set this to a true value to print the compiled template code to the console. Useful
+    when trying to debug difficult compilation issues, especially given this is early
+    access code and you might run into bugs.
+
+# REPORTING BUGS & GETTING HELP
+
+If you find a bug, please report it on the GitHub issue tracker at
+[https://github.com/jjn1056/Template-EmbeddedPerl/issues](https://github.com/jjn1056/Template-EmbeddedPerl/issues).  The bug tracker is
+the easiest way to get help with this module from me but I'm also on irc.perl.org
+under `jnap`.
+
+# DEDICATION
+
+This module is dedicated to the memory of my dog Bear who passed away on 17 August 2024.
+He was a good companion and I miss him.
+
+If this module is useful to you please consider donating to your local animal shelter
+or rescue organization.
+
+# AUTHOR
+
+John Napiorkowski, `<jjnapiork@cpan.org>`
+
+# LICENSE AND COPYRIGHT
+
+This library is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.

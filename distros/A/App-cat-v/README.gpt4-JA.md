@@ -9,7 +9,8 @@ cat-v \[ オプション \] 引数 ...
     OPTIONS
        -n   --reset         Disable all character conversion
        -c   --visible=#     Specify visualize characters
-            --repeat=#      Specify repeat characters
+       -r   --repeat=#      Specify repeat characters
+       -R   --replicate     Replicate original line as is
        -t   --expand[=#]    Expand tabs
        -T   --no-expand     Do not expand tabs
       --ts  --tabstyle=#    Set tab style
@@ -30,7 +31,7 @@ cat-v \[ オプション \] 引数 ...
 
 # VERSION
 
-Version 0.9903
+Version 1.00
 
 # DESCRIPTION
 
@@ -171,6 +172,10 @@ Version 0.9903
     _name_が`+`で始まる場合、既存の設定にその文字を追加します。
 
         cat-v -c esc --repeat +esc
+
+- **-R**, **--replicate**
+
+    変換された文字列を印刷する前に、まず元の文字列を出力してください。
 
 - **-t**\[_n_\], **--expand**\[=_n_\]
 - **-T**, **--no-expand**

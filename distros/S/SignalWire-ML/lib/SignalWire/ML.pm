@@ -5,7 +5,7 @@ use warnings;
 use JSON;
 use YAML::PP qw( Dump );
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 
 sub new {
     my ($class, $args) = @_;
@@ -82,9 +82,13 @@ sub set_aiparams {
 sub add_aiparams {
     my ($self, $params) = @_;
     my @numeric_keys = qw(end_of_speech_timeout attention_timeout outbound_attention_timeout background_file_loops background_file_volume digit_timeout energy_level);
-    
+
     while (my ($k, $v) = each %$params) {
-        $self->{_params}{$k} = (grep { $_ eq $k } @numeric_keys) ? $v + 0 : $v;
+        if (grep { $_ eq $k } @numeric_keys) {
+            $self->{_params}{$k} = defined $v ? $v + 0 : 0;
+        } else {
+            $self->{_params}{$k} = $v;
+        }
     }
 }
 
@@ -145,18 +149,26 @@ sub add_ainativefunction {
 sub set_aipost_prompt {
     my ($self, $postprompt) = @_;
     my @numeric_keys = qw(confidence barge_confidence top_p temperature frequency_penalty presence_penalty);
-    
+
     while (my ($k, $v) = each %$postprompt) {
-        $self->{_post_prompt}{$k} = (grep { $_ eq $k } @numeric_keys) ? $v + 0 : $v;
+        if (grep { $_ eq $k } @numeric_keys) {
+            $self->{_post_prompt}{$k} = defined $v ? $v + 0 : 0;
+        } else {
+            $self->{_post_prompt}{$k} = $v;
+        }
     }
 }
 
 sub set_aiprompt {
     my ($self, $prompt) = @_;
     my @numeric_keys = qw(confidence barge_confidence top_p temperature frequency_penalty presence_penalty);
-    
+
     while (my ($k, $v) = each %$prompt) {
-        $self->{_prompt}{$k} = (grep { $_ eq $k } @numeric_keys) ? $v + 0 : $v;
+        if (grep { $_ eq $k } @numeric_keys) {
+            $self->{_prompt}{$k} = defined $v ? $v + 0 : 0;
+        } else {
+            $self->{_prompt}{$k} = $v;
+        }
     }
 }
 

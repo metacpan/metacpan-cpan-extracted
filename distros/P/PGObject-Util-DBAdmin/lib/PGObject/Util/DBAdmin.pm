@@ -21,11 +21,11 @@ PGObject
 
 =head1 VERSION
 
-version 1.6.1
+version 1.6.2
 
 =cut
 
-our $VERSION = '1.6.1';
+our $VERSION = '1.6.2';
 
 
 =head1 SYNOPSIS
@@ -96,6 +96,7 @@ C<sslmode> and isn't supported.
 #  PGSERVICEFILE: (because no connect string equiv)
 #  PGREQUIRESSL: deprecated
 my %connkey_env = qw(
+    port                     PGPORT
     host                     PGHOST
     hostaddr                 PGHOSTADDR
     dbname                   PGDATABASE
@@ -520,12 +521,14 @@ sub connect {
     my ($self, $options) = @_;
 
     my $connect = _connect_data_str($self->connect_data);
+    $self->logger->trace(qq|Connecting using connection string "dbi:Pg:$connect"|);
     my $dbh     = DBI->connect(
         'dbi:Pg:' . $connect,
         $self->connect_data->{user} // '',    # suppress use of DBI_USER
         $self->connect_data->{password} // '',# suppress use of DBI_PASS
         $options
-    ) or croak 'Could not connect to database: ' . $DBI::errstr;
+        )
+        or croak $self->logger->fatal('Could not connect to database: ' . $DBI::errstr);
 
     return $dbh;
 }

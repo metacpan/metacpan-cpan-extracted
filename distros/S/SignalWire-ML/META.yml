@@ -4,6 +4,7 @@ author:
   - 'Brian West <brian@signalwire.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -18,6 +19,8 @@ no_index:
     - t
     - inc
 requires:
+  JSON: '0'
+  Test::More: '0'
   YAML::PP: v0.38.0
-version: '1.21'
+version: '1.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

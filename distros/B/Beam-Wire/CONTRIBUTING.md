@@ -41,18 +41,6 @@ already exists in this project.
 This project uses Dist::Zilla for its releases, but you aren't required
 to use it for contributing.
 
-### Using Build.PL
-
-This is the easiest way that requires the fewest dependencies.
-
-Install the project's dependencies and run the tests by doing:
-
-```
-perl Build.PL
-./Build installdeps
-./Build test
-```
-
 ### Using Makefile.PL
 
 This is the older standard way. If you can install CPAN modules, you can

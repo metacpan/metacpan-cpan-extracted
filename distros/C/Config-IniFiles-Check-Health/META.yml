@@ -4,12 +4,13 @@ author:
   - 'Richard Lippmann <horshack@cpan.org>'
 build_requires:
   Test::Compile: v3.3.3
+  Test::Exception: '0.43'
   Test::More: '0'
   Test::Simple: '1.302191'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +19,7 @@ name: Config-IniFiles-Check-Health
 provides:
   Config::IniFiles::Check::Health:
     file: lib/Config/IniFiles/Check/Health.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Config::IniFiles: '3.000003'
   Log::Log4perl: '0'
@@ -28,6 +29,6 @@ requires:
   perl: v5.20.0
   strictures: '2.000006'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
-version: '0.08'
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

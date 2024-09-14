@@ -1,0 +1,77 @@
+---
+abstract: 'simplify common boilerplate for Perl scripts and modules'
+author:
+  - 'Tom Molesworth <TEAM@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Full
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Full:
+    file: lib/Full.pm
+    version: '1.001'
+  Full::Class:
+    file: lib/Full/Class.pm
+    version: '1.001'
+  Full::Pragmata:
+    file: lib/Full/Pragmata.pm
+    version: '1.001'
+  Full::Script:
+    file: lib/Full/Script.pm
+    version: '1.001'
+requires:
+  Data::Checks: '0.10'
+  Future::AsyncAwait: '0.68'
+  Future::AsyncAwait::Hooks: '0.02'
+  Future::Utils: '0.50'
+  JSON::MaybeUTF8: '2.000'
+  List::Keywords: '0.11'
+  Log::Any: '1.717'
+  Log::Any::Adapter: '1.717'
+  Metrics::Any: '0.10'
+  Object::Pad: '0.813'
+  Object::Pad::FieldAttr::Checked: '0.12'
+  Role::Tiny: '2.002004'
+  Signature::Attribute::Checked: '0.06'
+  Sublike::Extended: '0.23'
+  Syntax::Keyword::Defer: '0.11'
+  Syntax::Keyword::Dynamically: '0.14'
+  Syntax::Keyword::Match: '0.15'
+  Syntax::Keyword::Try: '0.30'
+  Syntax::Operator::Equ: '0.10'
+  Time::Moment: '0.44'
+  Time::Moment::Role::Strptime: '0.001'
+  Time::Moment::Role::TimeZone: '1.000'
+  Unicode::UTF8: '0.62'
+  curry: '2.000001'
+  meta: '0.008'
+resources:
+  bugtracker: https://github.com/team-at-cpan/Full/issues
+  homepage: https://github.com/team-at-cpan/Full
+  repository: https://github.com/team-at-cpan/Full.git
+version: '1.001'
+x_authority: cpan:TEAM
+x_contributors:
+  - 'Tom Molesworth <tom@audioboundary.com>'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

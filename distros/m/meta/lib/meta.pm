@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package meta 0.008;
+package meta 0.009;
 
 use v5.14;
 use warnings;
@@ -132,6 +132,17 @@ Returns a metapackage reference representing the given package name, creating
 it if it did not previously exist.
 
 An alternative to C<meta::get_package> in an object constructor style.
+
+=head2 is_class
+
+   $bool = $metapkg->is_class;
+
+I<Since version 0.009.>
+
+Returns true if on a version of Perl that supports C<use feature 'class'>, and
+the package being represented is a real C<class> created by that feature.
+False for regular packages, and always false on earlier versions of Perl
+before that feature was introduced.
 
 =head2 name
 
@@ -399,6 +410,17 @@ code.
 =cut
 
 @meta::subroutine::ISA = qw( meta::symbol );
+
+=head2 is_method
+
+   $bool = $metasub->is_method;
+
+I<Since version 0.009.>
+
+Returns true if on a version of Perl that supports C<use feature 'class'>, and
+the subroutine being represented is a real C<method> created by that feature.
+False for regular C<sub>-based subroutines, and always false on earlier
+versions of Perl before that feature was introduced.
 
 =head2 subname
 
