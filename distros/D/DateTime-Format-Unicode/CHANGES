@@ -1,5 +1,7 @@
 Revision history for Perl module DateTime::Format::Unicode
 
+v0.1.1 2024-09-15T13:30:04+0900
+    - Updated dependencies
+
 v0.1.0 2024-07-21T15:38:43+0900
 	- Initial version
-

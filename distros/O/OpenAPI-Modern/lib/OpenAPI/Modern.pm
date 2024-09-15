@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.066-14-gc3cb31a
+package OpenAPI::Modern; # git description: v0.067-26-g2c788d7
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.067';
+our $VERSION = '0.068';
 
 use 5.020;
 use utf8;
@@ -26,7 +26,7 @@ use Feature::Compat::Try;
 use Encode 2.89 ();
 use URI::Escape ();
 use JSON::Schema::Modern 0.560;
-use JSON::Schema::Modern::Utilities 0.531 qw(jsonp unjsonp canonical_uri E abort is_equal is_elements_unique);
+use JSON::Schema::Modern::Utilities 0.585 qw(jsonp unjsonp canonical_uri E abort is_equal is_elements_unique);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::TypeTiny 0.002002;
 use Types::Standard 'InstanceOf';
@@ -82,8 +82,10 @@ around BUILDARGS => sub ($orig, $class, @args) {
 };
 
 sub validate_request ($self, $request, $options = {}) {
+  croak 'missing request' if not $request;
+
   croak '$request and $options->{request} are inconsistent'
-    if $request and $options->{request} and $request != $options->{request};
+    if $options->{request} and $request != $options->{request};
 
   my $state = {}; # populated by find_path
 
@@ -202,7 +204,7 @@ sub validate_request ($self, $request, $options = {}) {
       push @{$state->{errors}}, $e;
     }
     else {
-      ()= E($state, 'EXCEPTION: '.$e);
+      ()= E({ %$state, exception => 1 }, 'EXCEPTION: '.$e);
     }
   }
 
@@ -210,6 +212,8 @@ sub validate_request ($self, $request, $options = {}) {
 }
 
 sub validate_response ($self, $response, $options = {}) {
+  croak 'missing response' if not $response;
+
   # handle the existence of HTTP::Response::request
   if (my $request = $response->$_call_if_can('request')) {
     croak '$response->request and $options->{request} are inconsistent'
@@ -260,11 +264,17 @@ sub validate_response ($self, $response, $options = {}) {
       if $response->body_size and not $response->headers->content_length
         and not $response->content->is_chunked;
 
+    if (not $response->code) {
+      ()= E($state, 'Failed to parse response: %s', $response->error->{message});
+      return $self->_result($state, 0, 1);
+    }
+
     my $response_name = first { exists $operation->{responses}{$_} }
       $response->code, substr(sprintf('%03s', $response->code), 0, -2).'XX', 'default';
 
     if (not $response_name) {
-      ()= E({ %$state, keyword => 'responses' }, 'no response object found for code %s', $response->code);
+      ()= E({ %$state, keyword => 'responses', data_path => jsonp($state->{data_path}, 'code') },
+        'no response object found for code %s', $response->code);
       return $self->_result($state, 0, 1);
     }
 
@@ -300,7 +310,7 @@ sub validate_response ($self, $response, $options = {}) {
       push @{$state->{errors}}, $e;
     }
     else {
-      ()= E($state, 'EXCEPTION: '.$e);
+      ()= E({ %$state, exception => 1 }, 'EXCEPTION: '.$e);
     }
   }
 
@@ -308,25 +318,27 @@ sub validate_response ($self, $response, $options = {}) {
 }
 
 sub find_path ($self, $options, $state = {}) {
-  # now guaranteed to be a Mojo::Message::Request
-  $options->{request} = _convert_request($options->{request}) if $options->{request};
-
   $state->{data_path} = '/request/uri/path';
   $state->{initial_schema_uri} = $self->openapi_uri;   # the canonical URI as of the start or last $id, or the last traversed $ref
   $state->{traversed_schema_path} = '';    # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
   $state->{schema_path} = '';              # the rest of the path, since the last $id or the last traversed $ref
   $state->{errors} = $options->{errors} //= [];
-  $state->{effective_base_uri} = Mojo::URL->new
-      ->scheme($options->{request}->url->to_abs->scheme // 'https')
-      ->host($options->{request}->headers->host)
-    if $options->{request};
   $state->{annotations} //= [];
   $state->{depth} = 0;
 
-  # requests don't have response codes, so if 'error' is set, it is some sort of parsing error
-  if ($options->{request} and my $error = $options->{request}->error) {
-    ()= E({ %$state, data_path => '/request' }, $error->{message});
-    return $self->_result($state);
+  # now guaranteed to be a Mojo::Message::Request
+  if ($options->{request}) {
+    $options->{request} = _convert_request($options->{request});
+
+    $state->{effective_base_uri} = Mojo::URL->new
+      ->scheme($options->{request}->url->to_abs->scheme)
+      ->host($options->{request}->headers->host);
+
+    # requests don't have response codes, so if 'error' is set, it is some sort of parsing error
+    if (my $error = $options->{request}->error) {
+      ()= E({ %$state, data_path => '/request' }, 'Failed to parse request: %s', $error->{message});
+      return $self->_result($state);
+    }
   }
 
   my ($method, $path_template, $path_item_path);
@@ -348,31 +360,37 @@ sub find_path ($self, $options, $state = {}) {
     my $operation_path = $self->openapi_document->get_operationId_path($options->{operation_id});
     return E({ %$state, keyword => 'paths' }, 'unknown operation_id "%s"', $options->{operation_id})
       if not $operation_path;
-    return E({ %$state, schema_path => $operation_path, keyword => 'operationId' },
-      'operation id does not have an associated path') if $operation_path !~ m{^/paths/};
+
     my @bits = unjsonp($operation_path);
     ($path_template, $method) = @bits[-2,-1];
-    pop @bits;
+
+    # path_template not found if path is not directly under /paths (FIXME: does not support $refs to
+    # path-items - in this case we will do a URI -> path_template lookup later on)
+    undef $path_template if $operation_path ne jsonp('/paths', $path_template, $method);
+
+    pop @bits;  # remove method from operation_path to get path-item path
     $path_item_path = jsonp(@bits);
 
-    # FIXME: the path_template is not correct if there was a $ref from the original /paths/ entry to
-    # get to this path-item and operation. We need to look up the path_template from the request as
-    # normal, below.
     return E({ %$state, schema_path => jsonp('/paths', $path_template) },
         'operation does not match provided path_template')
-      if exists $options->{path_template} and $options->{path_template} ne $path_template;
+      if $path_template and exists $options->{path_template} and $options->{path_template} ne $path_template;
 
-    return E({ %$state, data_path => '/request/method', schema_path => $operation_path },
-        'wrong HTTP method "%s"', $options->{method})
-      if $options->{method} and lc $options->{method} ne $method;
+    if ($options->{method} and lc $options->{method} ne $method) {
+      delete $options->{operation_id};
+      return E({ %$state, data_path => '/request/method', schema_path => $operation_path },
+        'wrong HTTP method "%s"', $options->{method});
+    }
 
     $options->{method} = lc $method;
+    $options->{_path_item} = $self->openapi_document->get($path_item_path);
+    $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment(jsonp($path_item_path, $method));
   }
 
   # TODO: support passing $options->{operation_uri}
 
-  croak 'at least one of $options->{request}, $options->{method} and $options->{operation_id} must be provided'
-    if not $method;
+  # by now we will have extracted method from request or operation_id
+  return E({ %$state, data_path => '', exception => 1 }, 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided')
+    if not $options->{request} and not ($options->{path_template} and $method) and not $options->{operation_id};
 
   # path_template from options
   if (exists $options->{path_template}) {
@@ -417,12 +435,18 @@ sub find_path ($self, $options, $state = {}) {
         Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
           Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#-;
 
-      $options->{path_template} = $path_template;
-
       # FIXME: follow $ref chain in path-item
-      $path_item_path = jsonp('/paths', $path_template);
-      $options->{_path_item} = $self->openapi_document->get($path_item_path);
-      $state->{schema_path} = $path_item_path;
+      $state->{schema_path} = $path_item_path = jsonp('/paths', $path_template);
+      $options->{path_template} = $path_template;
+      $options->{_path_item} = my $path_item = $self->openapi_document->get($path_item_path);
+
+      return E($state, 'templated operation does not match provided operation_id')
+        if $options->{operation_id} and ($path_item->{$method}{operationId}//'') ne $options->{operation_id};
+
+      return E({ %$state, data_path => '/request/method', keyword => $method,
+          recommended_response => [ 405, 'Method Not Allowed' ] },
+          'missing operation for HTTP method "%s"', $method)
+        if not exists $path_item->{$method};
 
       # { for the editor
       my @capture_names = ($path_template =~ m!\{([^}]+)\}!g);
@@ -435,11 +459,6 @@ sub find_path ($self, $options, $state = {}) {
       else {
         $options->{path_captures} = \%path_captures;
       }
-
-      return E({ %$state, data_path => '/request/method', keyword => $method,
-          recommended_response => [ 405, 'Method Not Allowed' ] },
-          'missing operation for HTTP method "%s"', $method)
-        if not exists $options->{_path_item}{$method};
 
       $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path.'/'.$method);
       $options->{operation_id} = $options->{_path_item}{$method}{operationId};
@@ -456,13 +475,15 @@ sub find_path ($self, $options, $state = {}) {
       $options->{request}->url->clone->query(undef)->fragment(undef));
   }
 
-  # FIXME: operation_id alone is insufficient to infer path_template, but we may not need it
-  croak 'at least one of $options->{request}, $options->{path_template} and $options->{operation_id} must be provided'
-    if not $path_template;
+  if (not $path_template) {
+    $state->{schema_path} = $path_item_path;
+    return 1;
+  }
 
   # FIXME: follow $ref chain in path-item
   $path_item_path = jsonp('/paths', $path_template);
   my $path_item = $self->openapi_document->get($path_item_path);
+  die 'path_item unexpectedly does not exist' if not $path_item;
 
   # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
   # { for the editor
@@ -492,9 +513,11 @@ sub find_path ($self, $options, $state = {}) {
     map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)), # { for the editor
     split /(\{[^}]+\})/, $path_template;
 
-  return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
-      'provided %s does not match request URI', exists $options->{path_template} ? 'path_template' : 'operation_id')
-    if $uri_path !~ m/^$path_pattern$/;
+  if ($uri_path !~ m/^$path_pattern$/) {
+    delete $options->@{qw(operation_id operation_uri _path_item)};
+    return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
+      'provided %s does not match request URI', exists $options->{path_template} ? 'path_template' : 'operation_id');
+  }
 
   # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
   my @capture_values = map
@@ -764,16 +787,17 @@ sub _validate_media_type ($self, $state, $content_obj, $media_type, $media_type_
 }
 
 # wrap a result object around the errors
-sub _result ($self, $state, $exception = 0, $response = 0) {
+sub _result ($self, $state, $is_exception = 0, $is_response = 0) {
+  croak 'no errors provided for exception' if $is_exception and not $state->{errors}->@*;
   return JSON::Schema::Modern::Result->new(
     output_format => $self->evaluator->output_format,
     formatted_annotations => 0,
     valid => !$state->{errors}->@*,
-    $exception ? ( exception => 1 ) : (), # -> recommended_response: [ 500, 'Internal Server Error' ]
+    $is_exception ? ( exception => 1 ) : (), # -> recommended_response: [ 500, 'Internal Server Error' ]
     !$state->{errors}->@*
       ? (annotations => $state->{annotations}//[])
       : (errors => $state->{errors}),
-    $response ? ( recommended_response => undef ) : (),
+    $is_response ? ( recommended_response => undef ) : (),
   );
 }
 
@@ -866,7 +890,7 @@ sub _convert_request ($request) {
     $req->url(Mojo::URL->new($request->env->{REQUEST_URI})) if exists $request->env->{REQUEST_URI};
   }
   else {
-    croak 'unknown type '.ref($request);
+    return $req->error({ message => 'unknown type '.ref($request) });
   }
 
   # we could call $req->fix_headers here to add a missing Content-Length, but proper requests from
@@ -899,7 +923,7 @@ sub _convert_response ($response) {
     $res->body($body) if length $body;
   }
   else {
-    croak 'unknown type '.ref($response);
+    return $res->error({ message => 'unknown type '.ref($response) });
   }
 
   # we could call $res->fix_headers here to add a missing Content-Length, but proper responses from
@@ -931,7 +955,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.067
+version 0.068
 
 =head1 SYNOPSIS
 

@@ -20,8 +20,8 @@ DESCRIPTION
     This module is an extension of Dist::Build::XS, adding an additional
     argument to the add_xs function: pkg_config, allowing you to add flags
     to your build based on a pkg-config library file. This argument will
-    either contain a hash, or a list of hashes. The hashes will contain the
-    following entries:
+    either contain simply the name of a library, a hash or a list of
+    names/hashes. The hashes will contain the following entries:
 
       * library
 

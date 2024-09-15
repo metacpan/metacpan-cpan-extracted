@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean);
 use Tags::HTML::Image;
 use Tags::Output::Structure;
 use Test::MockObject;
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 
 # Test.
@@ -63,12 +63,24 @@ $tags = Tags::Output::Structure->new;
 $obj = Tags::HTML::Image->new(
 	'tags' => $tags,
 );
+eval {
+	$obj->init('bad');
+};
+is($EVAL_ERROR, "Image object must be a instance of 'Data::Image'.\n",
+	"Image object must be a instance of 'Data::Image'. (scalar)");
+clean();
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::Image->new(
+	'tags' => $tags,
+);
 my $mock = Test::MockObject->new;
 eval {
 	$obj->init($mock);
 };
 is($EVAL_ERROR, "Image object must be a instance of 'Data::Image'.\n",
-	"Image object must be a instance of 'Data::Image'.");
+	"Image object must be a instance of 'Data::Image'. (different object)");
 clean();
 
 # Test.

@@ -9,13 +9,14 @@ use Log::Mini::Logger::FILE;
 
 
 subtest 'creates correct object' => sub {
-    isa_ok(Log::Mini::Logger::FILE->new, 'Log::Mini::Logger::FILE');
+    my $file = _build_temp_file();
+    isa_ok(Log::Mini::Logger::FILE->new(file => $file->filename), 'Log::Mini::Logger::FILE');
 };
 
 subtest 'prints to file' => sub {
     
     for my $level (qw/error warn info debug trace/) {
-        my $file = File::Temp->new;
+        my $file = _build_temp_file();
         my $log = _build_logger(file => $file->filename, level => $level);
 
         $log->$level('message');
@@ -28,7 +29,7 @@ subtest 'prints to file' => sub {
 };
 
 subtest 'prints to file synced' => sub {
-    my $file = File::Temp->new;
+    my $file = _build_temp_file();
     my $log = _build_logger(file => $file->filename, synced => 1);
 
     for my $level (qw/error warn info debug trace /) {
@@ -43,7 +44,7 @@ subtest 'prints to file synced' => sub {
 
 subtest 'prints to stderr with \n' => sub {
     for my $level (qw/error warn info debug trace/) {
-        my $file = File::Temp->new;
+        my $file = _build_temp_file();
         my $log = _build_logger(file => $file->filename, level => $level);
 
         $log->$level('message');
@@ -58,7 +59,7 @@ subtest 'prints to stderr with \n' => sub {
 
 subtest 'prints sprintf formatted line' => sub {
     for my $level (qw/error warn info debug trace/) {
-        my $file = File::Temp->new;
+        my $file = _build_temp_file();
         my $log = _build_logger(file => $file->filename, level => $level);
 
         $log->$level('message %s', 'formatted');
@@ -72,6 +73,23 @@ subtest 'prints sprintf formatted line' => sub {
     }
 };
 
+subtest 'recreate file if its gone' => sub {
+    
+    my $file = _build_temp_file();
+    my $log = _build_logger(file => $file->filename);
+
+    $log->error('message before gone');
+    unlink $file->filename;
+
+    $log->error('message after gone');
+    undef $log;
+
+    my $content = _slurp($file);
+
+    like $content,
+            qr/^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d{3} \[error\] message after gone$/;
+};
+
 sub _slurp {
     my $file = shift;
     my $content = do { local $/; open my $fh, '<', $file->filename or die $!; <$fh> };
@@ -82,6 +100,10 @@ sub _build_logger {
     my $logger = Log::Mini::Logger::FILE->new(@_);
 
     return $logger;
+}
+
+sub _build_temp_file {
+    return File::Temp->new();   
 }
 
 done_testing;

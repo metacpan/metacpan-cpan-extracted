@@ -44,8 +44,8 @@ DESCRIPTION
 
     Current features include:
 
-      * all commands <https://redis.io/commands> as of 7.2 (August 2023),
-      see https://redis.io/commands for the methods and parameters
+      * all commands <https://redis.io/commands> as of 7.4 (September
+      2024), see https://redis.io/commands for the methods and parameters
 
       * pub/sub support <https://redis.io/topics/pubsub>, see "METHODS -
       Subscriptions" including sharded pubsub
@@ -72,7 +72,7 @@ DESCRIPTION
 
       * see Net::Async::Redis::XS for a faster XS version (can be 40x
       faster than the pure Perl version, particularly when parsing large
-      "xreadgroup" responses)
+      "XREADGROUP" in Net::Async::Redis::Commands responses)
 
  Connecting
 

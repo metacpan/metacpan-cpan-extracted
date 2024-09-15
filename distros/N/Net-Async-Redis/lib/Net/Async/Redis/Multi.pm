@@ -3,7 +3,7 @@ package Net::Async::Redis::Multi;
 use strict;
 use warnings;
 
-our $VERSION = '6.000'; # VERSION
+our $VERSION = '6.001'; # VERSION
 
 =head1 NAME
 
@@ -82,7 +82,7 @@ sub AUTOLOAD {
     my ($method) = our $AUTOLOAD =~ m{::([^:]+)$};
 
     # We only need to check this once
-    die "Unknown method $method" unless Net::Async::Redis::Commands->can($method);
+    die "Unknown method $method" unless Net::Async::Redis::Commands->can($method) or Net::Async::Redis->can($method);
 
     my $code = async sub {
         my ($self, @args) = @_;

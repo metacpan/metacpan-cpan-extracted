@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/DateTime/Locale/FromCLDR.pm
-## Version v0.2.3
+## Version v0.3.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/07
-## Modified 2024/09/10
+## Modified 2024/09/13
 ## All rights reserved
 ## 
 ## 
@@ -23,7 +23,7 @@ BEGIN
     );
     use overload (
         '""'    => 'as_string',
-        bool    => sub{ $_[0] },
+        bool    => sub{1},
         fallback => 1,
     );
     use utf8;
@@ -34,7 +34,7 @@ BEGIN
     # "If a given short metazone form is known NOT to be understood in a given locale and the parent locale has this value such that it would normally be inherited, the inheritance of this value can be explicitly disabled by use of the 'no inheritance marker' as the value, which is 3 simultaneous empty set characters (U+2205)."
     # <https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
     our $EMPTY_SET = "∅∅∅";
-    our $VERSION = 'v0.2.3';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -144,7 +144,7 @@ sub as_string
     {
         my $locale = $self->{locale} ||
             die( "No locale is set!" );
-        $str = $self->{as_string} = "$locale";
+        $str = $self->{as_string} = $locale->as_string;
     }
     return( $str );
 }
@@ -184,6 +184,36 @@ sub available_formats
             }
         }
         $self->{available_formats} = $ref;
+    }
+    return( $ref );
+}
+
+sub available_format_patterns
+{
+    my $self = shift( @_ );
+    my $ref;
+    unless( defined( $ref = $self->{available_format_patterns} ) )
+    {
+        my $locale = $self->{locale} || die( "Locale value is gone!" );
+        my $cldr = $self->{_cldr} || die( "The Locale::Unicode::Data object is gone!" );
+        my $tree = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        my $calendar = $self->{calendar} || 'gregorian';
+        foreach my $loc ( @$tree )
+        {
+            my $all = $cldr->calendar_available_formats(
+                locale      => $loc,
+                calendar    => $calendar,
+                alt         => undef,
+                # count might contain some value
+            );
+            return( $self->pass_error ) if( !defined( $all ) && $cldr->error );
+            if( $all && scalar( @$all ) )
+            {
+                $ref = map{ $_->{format_id} => $_->{format_pattern} } @$all;
+            }
+        }
+        $self->{available_format_patterns} = $ref;
     }
     return( $ref );
 }
@@ -1890,6 +1920,42 @@ sub native_variants
         }
     }
     return( $names );
+}
+
+sub number_system
+{
+    my $self = shift( @_ );
+    my $str;
+    unless( defined( $str = $self->{number_system} ) )
+    {
+        my $locale = $self->{locale} ||
+            die( "No locale is set!" );
+        my $cldr = $self->{_cldr} || die( "The Locale::Unicode::Data object is gone!" );
+        my $tree = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        foreach my $loc ( @$tree )
+        {
+            my $ref = $cldr->locale_number_system(
+                locale => $loc,
+            );
+            return( $self->pass_error( $cldr->error ) ) if( !defined( $ref ) && $cldr->error );
+            if( $ref && $ref->{number_system} )
+            {
+                $str = $ref->{number_system};
+                last;
+            }
+            # "In locales where the native numbering system is the default, it is assumed that the numbering system "latn" (Western digits 0-9) is always acceptable"
+            # <https://unicode.org/reports/tr35/tr35-numbers.html#otherNumberingSystems>
+            elsif( $ref->{native} )
+            {
+                $str = 'latn';
+                last;
+            }
+        }
+        $str //= 'latn';
+        $self->{number_system} = $str;
+    }
+    return( $str );
 }
 
 sub pass_error
@@ -3892,7 +3958,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.2.3
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -4023,9 +4089,19 @@ Same as L<am_pm_format_abbreviated|/am_pm_format_abbreviated>, but returns the w
 
 =head2 available_formats
 
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
     my $array = $locale->available_formats;
 
 Returns an array reference of all the format ID available for this C<locale>
+
+See L<Locale::Unicode::Data/calendar_available_format>
+
+=head2 available_format_patterns
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $ref = $locale->available_format_patterns;
+
+Returns an hash reference of all the available format ID to their corresponding pattern for the C<locale>
 
 See L<Locale::Unicode::Data/calendar_available_format>
 
@@ -5229,6 +5305,18 @@ If there is no C<variant> specified in the C<locale>, it will return an empty ar
 If a C<variant> subtag cannot be found in the C<locale>'s own L<language tree|Locale::Unicode::Data/make_inheritance_tree>, then an empty string will be set in the array instead.
 
 Either way, the size of the array will always be equal to the number of variants in the C<locale>
+
+=head2 number_system
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'ar-EG' );
+    say $locale->number_system;
+    # arab
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+    say $locale->number_system;
+    # latn
+
+Returns a string representing the number system for the C<locale>
 
 =head2 prefers_24_hour_time
 

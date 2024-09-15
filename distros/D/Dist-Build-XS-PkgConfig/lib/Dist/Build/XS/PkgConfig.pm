@@ -3,7 +3,7 @@ package Dist::Build::XS::PkgConfig;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp 'croak';
 use ExtUtils::Helpers 'split_like_shell';
@@ -22,19 +22,44 @@ sub add_methods {
 			my @packages = ref($pkg_config) eq 'ARRAY' ? @{ $pkg_config } : $pkg_config;
 
 			for my $pkg_args (@packages) {
-				my $library = delete $pkg_args->{library};
+				my ($library, %pkg_args);
+				if (ref $pkg_args) {
+					$library  = delete $pkg_args->{library};
+					%pkg_args = %{$pkg_args};
+				} else {
+					$library = $pkg_args;
+				}
 
-				my $package = PkgConfig->find($library, %{$pkg_args});
+				my $package = PkgConfig->find($library, %pkg_args);
 
 				croak "No such library $library" unless $package && $package->pkg_exists;
 
-				if (my $min_version = $pkg_args->{min_version}) {
+				if (my $min_version = $pkg_args{min_version}) {
 					my $pkg_version = version->new($package->pkg_version);
 					croak "Library $library version $pkg_version smaller than $min_version" if $pkg_version < version->new($min_version);
 				}
 
-				unshift @{ $args{extra_compiler_flags} }, split_like_shell($package->get_cflags);
-				unshift @{ $args{extra_linker_flags}   }, split_like_shell($package->get_ldflags);
+				for my $compiler_flag (split_like_shell($package->get_cflags)) {
+					if ($compiler_flag =~ s/^-I//) {
+						unshift @{ $args{include_dirs} }, $compiler_flag;
+					} elsif ($compiler_flag =~ /^-D(\w+)=(.*)/) {
+						$args{defines}{$1} //= $2;
+					} elsif ($compiler_flag =~ /^-D(\w+)/) {
+						$args{defines}{$1} //= '';
+					} else {
+						unshift @{ $args{extra_compiler_flags} }, $compiler_flag;
+					}
+				}
+
+				for my $linker_flag (split_like_shell($package->get_ldflags)) {
+					if ($linker_flag =~ s/^-l//) {
+						unshift @{ $args{libraries} }, $linker_flag;
+					} elsif ($linker_flag =~ s/^-L//) {
+						unshift @{ $args{library_dirs} }, $linker_flag;
+					} else {
+						unshift @{ $args{extra_linker_flags} }, $linker_flag;
+					}
+				}
 			}
 		}
 
@@ -69,7 +94,7 @@ Dist::Build::XS::PkgConfig - Dist::Build extension to use pkg-config.
 
 =head1 DESCRIPTION
 
-This module is an extension of L<Dist::Build::XS|Dist::Build::XS>, adding an additional argument to the C<add_xs> function: C<pkg_config>, allowing you to add flags to your build based on a pkg-config library file. This argument will either contain a hash, or a list of hashes. The hashes will contain the following entries:
+This module is an extension of L<Dist::Build::XS|Dist::Build::XS>, adding an additional argument to the C<add_xs> function: C<pkg_config>, allowing you to add flags to your build based on a pkg-config library file. This argument will either contain simply the name of a library, a hash or a list of names/hashes. The hashes will contain the following entries:
 
 =over 4
 

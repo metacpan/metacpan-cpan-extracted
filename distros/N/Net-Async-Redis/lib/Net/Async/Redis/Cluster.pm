@@ -11,7 +11,7 @@ use utf8;
 
 use parent qw(Net::Async::Redis::Commands);
 
-our $VERSION = '6.000'; # VERSION
+our $VERSION = '6.001'; # VERSION
 
 =encoding utf8
 

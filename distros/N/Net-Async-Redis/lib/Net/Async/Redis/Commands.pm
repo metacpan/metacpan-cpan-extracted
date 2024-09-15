@@ -1,9 +1,8 @@
 package Net::Async::Redis::Commands;
 
-use strict;
-use warnings;
+use Full::Role qw(:v1);
 
-our $VERSION = '6.000'; # VERSION
+our $VERSION = '6.001'; # VERSION
 
 =head1 NAME
 
@@ -241,8 +240,7 @@ L<https://redis.io/commands/bitcount>
 
 =cut
 
-sub bitcount : method {
-    my ($self, @args) = @_;
+method bitcount (@args) {
     $self->execute_command(qw(BITCOUNT) => @args)
 }
 
@@ -268,8 +266,7 @@ L<https://redis.io/commands/bitfield>
 
 =cut
 
-sub bitfield : method {
-    my ($self, @args) = @_;
+method bitfield (@args) {
     $self->execute_command(qw(BITFIELD) => @args)
 }
 
@@ -289,8 +286,7 @@ L<https://redis.io/commands/bitfield-ro>
 
 =cut
 
-sub bitfield_ro : method {
-    my ($self, @args) = @_;
+method bitfield_ro (@args) {
     $self->execute_command(qw(BITFIELD_RO) => @args)
 }
 
@@ -312,8 +308,7 @@ L<https://redis.io/commands/bitop>
 
 =cut
 
-sub bitop : method {
-    my ($self, @args) = @_;
+method bitop (@args) {
     $self->execute_command(qw(BITOP) => @args)
 }
 
@@ -335,8 +330,7 @@ L<https://redis.io/commands/bitpos>
 
 =cut
 
-sub bitpos : method {
-    my ($self, @args) = @_;
+method bitpos (@args) {
     $self->execute_command(qw(BITPOS) => @args)
 }
 
@@ -356,8 +350,7 @@ L<https://redis.io/commands/getbit>
 
 =cut
 
-sub getbit : method {
-    my ($self, @args) = @_;
+method getbit (@args) {
     $self->execute_command(qw(GETBIT) => @args)
 }
 
@@ -379,8 +372,7 @@ L<https://redis.io/commands/setbit>
 
 =cut
 
-sub setbit : method {
-    my ($self, @args) = @_;
+method setbit (@args) {
     $self->execute_command(qw(SETBIT) => @args)
 }
 
@@ -394,8 +386,7 @@ L<https://redis.io/commands/asking>
 
 =cut
 
-sub asking : method {
-    my ($self, @args) = @_;
+method asking (@args) {
     $self->execute_command(qw(ASKING) => @args)
 }
 
@@ -413,8 +404,7 @@ L<https://redis.io/commands/cluster-addslots>
 
 =cut
 
-sub cluster_addslots : method {
-    my ($self, @args) = @_;
+method cluster_addslots (@args) {
     $self->execute_command(qw(CLUSTER ADDSLOTS) => @args)
 }
 
@@ -432,8 +422,7 @@ L<https://redis.io/commands/cluster-addslotsrange>
 
 =cut
 
-sub cluster_addslotsrange : method {
-    my ($self, @args) = @_;
+method cluster_addslotsrange (@args) {
     $self->execute_command(qw(CLUSTER ADDSLOTSRANGE) => @args)
 }
 
@@ -445,8 +434,7 @@ L<https://redis.io/commands/cluster-bumpepoch>
 
 =cut
 
-sub cluster_bumpepoch : method {
-    my ($self, @args) = @_;
+method cluster_bumpepoch (@args) {
     $self->execute_command(qw(CLUSTER BUMPEPOCH) => @args)
 }
 
@@ -464,8 +452,7 @@ L<https://redis.io/commands/cluster-count-failure-reports>
 
 =cut
 
-sub cluster_count_failure_reports : method {
-    my ($self, @args) = @_;
+method cluster_count_failure_reports (@args) {
     $self->execute_command(qw(CLUSTER COUNT-FAILURE-REPORTS) => @args)
 }
 
@@ -483,8 +470,7 @@ L<https://redis.io/commands/cluster-countkeysinslot>
 
 =cut
 
-sub cluster_countkeysinslot : method {
-    my ($self, @args) = @_;
+method cluster_countkeysinslot (@args) {
     $self->execute_command(qw(CLUSTER COUNTKEYSINSLOT) => @args)
 }
 
@@ -502,8 +488,7 @@ L<https://redis.io/commands/cluster-delslots>
 
 =cut
 
-sub cluster_delslots : method {
-    my ($self, @args) = @_;
+method cluster_delslots (@args) {
     $self->execute_command(qw(CLUSTER DELSLOTS) => @args)
 }
 
@@ -521,8 +506,7 @@ L<https://redis.io/commands/cluster-delslotsrange>
 
 =cut
 
-sub cluster_delslotsrange : method {
-    my ($self, @args) = @_;
+method cluster_delslotsrange (@args) {
     $self->execute_command(qw(CLUSTER DELSLOTSRANGE) => @args)
 }
 
@@ -540,8 +524,7 @@ L<https://redis.io/commands/cluster-failover>
 
 =cut
 
-sub cluster_failover : method {
-    my ($self, @args) = @_;
+method cluster_failover (@args) {
     $self->execute_command(qw(CLUSTER FAILOVER) => @args)
 }
 
@@ -553,8 +536,7 @@ L<https://redis.io/commands/cluster-flushslots>
 
 =cut
 
-sub cluster_flushslots : method {
-    my ($self, @args) = @_;
+method cluster_flushslots (@args) {
     $self->execute_command(qw(CLUSTER FLUSHSLOTS) => @args)
 }
 
@@ -572,8 +554,7 @@ L<https://redis.io/commands/cluster-forget>
 
 =cut
 
-sub cluster_forget : method {
-    my ($self, @args) = @_;
+method cluster_forget (@args) {
     $self->execute_command(qw(CLUSTER FORGET) => @args)
 }
 
@@ -593,8 +574,7 @@ L<https://redis.io/commands/cluster-getkeysinslot>
 
 =cut
 
-sub cluster_getkeysinslot : method {
-    my ($self, @args) = @_;
+method cluster_getkeysinslot (@args) {
     $self->execute_command(qw(CLUSTER GETKEYSINSLOT) => @args)
 }
 
@@ -606,8 +586,7 @@ L<https://redis.io/commands/cluster-info>
 
 =cut
 
-sub cluster_info : method {
-    my ($self, @args) = @_;
+method cluster_info (@args) {
     $self->execute_command(qw(CLUSTER INFO) => @args)
 }
 
@@ -625,8 +604,7 @@ L<https://redis.io/commands/cluster-keyslot>
 
 =cut
 
-sub cluster_keyslot : method {
-    my ($self, @args) = @_;
+method cluster_keyslot (@args) {
     $self->execute_command(qw(CLUSTER KEYSLOT) => @args)
 }
 
@@ -638,8 +616,7 @@ L<https://redis.io/commands/cluster-links>
 
 =cut
 
-sub cluster_links : method {
-    my ($self, @args) = @_;
+method cluster_links (@args) {
     $self->execute_command(qw(CLUSTER LINKS) => @args)
 }
 
@@ -659,8 +636,7 @@ L<https://redis.io/commands/cluster-meet>
 
 =cut
 
-sub cluster_meet : method {
-    my ($self, @args) = @_;
+method cluster_meet (@args) {
     $self->execute_command(qw(CLUSTER MEET) => @args)
 }
 
@@ -672,8 +648,7 @@ L<https://redis.io/commands/cluster-myid>
 
 =cut
 
-sub cluster_myid : method {
-    my ($self, @args) = @_;
+method cluster_myid (@args) {
     $self->execute_command(qw(CLUSTER MYID) => @args)
 }
 
@@ -685,8 +660,7 @@ L<https://redis.io/commands/cluster-nodes>
 
 =cut
 
-sub cluster_nodes : method {
-    my ($self, @args) = @_;
+method cluster_nodes (@args) {
     $self->execute_command(qw(CLUSTER NODES) => @args)
 }
 
@@ -704,8 +678,7 @@ L<https://redis.io/commands/cluster-replicas>
 
 =cut
 
-sub cluster_replicas : method {
-    my ($self, @args) = @_;
+method cluster_replicas (@args) {
     $self->execute_command(qw(CLUSTER REPLICAS) => @args)
 }
 
@@ -723,8 +696,7 @@ L<https://redis.io/commands/cluster-replicate>
 
 =cut
 
-sub cluster_replicate : method {
-    my ($self, @args) = @_;
+method cluster_replicate (@args) {
     $self->execute_command(qw(CLUSTER REPLICATE) => @args)
 }
 
@@ -742,8 +714,7 @@ L<https://redis.io/commands/cluster-reset>
 
 =cut
 
-sub cluster_reset : method {
-    my ($self, @args) = @_;
+method cluster_reset (@args) {
     $self->execute_command(qw(CLUSTER RESET) => @args)
 }
 
@@ -755,8 +726,7 @@ L<https://redis.io/commands/cluster-saveconfig>
 
 =cut
 
-sub cluster_saveconfig : method {
-    my ($self, @args) = @_;
+method cluster_saveconfig (@args) {
     $self->execute_command(qw(CLUSTER SAVECONFIG) => @args)
 }
 
@@ -774,8 +744,7 @@ L<https://redis.io/commands/cluster-set-config-epoch>
 
 =cut
 
-sub cluster_set_config_epoch : method {
-    my ($self, @args) = @_;
+method cluster_set_config_epoch (@args) {
     $self->execute_command(qw(CLUSTER SET-CONFIG-EPOCH) => @args)
 }
 
@@ -795,8 +764,7 @@ L<https://redis.io/commands/cluster-setslot>
 
 =cut
 
-sub cluster_setslot : method {
-    my ($self, @args) = @_;
+method cluster_setslot (@args) {
     $self->execute_command(qw(CLUSTER SETSLOT) => @args)
 }
 
@@ -814,8 +782,7 @@ L<https://redis.io/commands/cluster-slaves>
 
 =cut
 
-sub cluster_slaves : method {
-    my ($self, @args) = @_;
+method cluster_slaves (@args) {
     $self->execute_command(qw(CLUSTER SLAVES) => @args)
 }
 
@@ -827,8 +794,7 @@ L<https://redis.io/commands/cluster-slots>
 
 =cut
 
-sub cluster_slots : method {
-    my ($self, @args) = @_;
+method cluster_slots (@args) {
     $self->execute_command(qw(CLUSTER SLOTS) => @args)
 }
 
@@ -840,8 +806,7 @@ L<https://redis.io/commands/readonly>
 
 =cut
 
-sub readonly : method {
-    my ($self, @args) = @_;
+method readonly (@args) {
     $self->execute_command(qw(READONLY) => @args)
 }
 
@@ -853,8 +818,7 @@ L<https://redis.io/commands/readwrite>
 
 =cut
 
-sub readwrite : method {
-    my ($self, @args) = @_;
+method readwrite (@args) {
     $self->execute_command(qw(READWRITE) => @args)
 }
 
@@ -876,8 +840,7 @@ L<https://redis.io/commands/auth>
 
 =cut
 
-sub auth : method {
-    my ($self, @args) = @_;
+method auth (@args) {
     $self->execute_command(qw(AUTH) => @args)
 }
 
@@ -895,8 +858,7 @@ L<https://redis.io/commands/client-caching>
 
 =cut
 
-sub client_caching : method {
-    my ($self, @args) = @_;
+method client_caching (@args) {
     $self->execute_command(qw(CLIENT CACHING) => @args)
 }
 
@@ -908,8 +870,7 @@ L<https://redis.io/commands/client-getname>
 
 =cut
 
-sub client_getname : method {
-    my ($self, @args) = @_;
+method client_getname (@args) {
     $self->execute_command(qw(CLIENT GETNAME) => @args)
 }
 
@@ -921,8 +882,7 @@ L<https://redis.io/commands/client-getredir>
 
 =cut
 
-sub client_getredir : method {
-    my ($self, @args) = @_;
+method client_getredir (@args) {
     $self->execute_command(qw(CLIENT GETREDIR) => @args)
 }
 
@@ -934,8 +894,7 @@ L<https://redis.io/commands/client-id>
 
 =cut
 
-sub client_id : method {
-    my ($self, @args) = @_;
+method client_id (@args) {
     $self->execute_command(qw(CLIENT ID) => @args)
 }
 
@@ -947,8 +906,7 @@ L<https://redis.io/commands/client-info>
 
 =cut
 
-sub client_info : method {
-    my ($self, @args) = @_;
+method client_info (@args) {
     $self->execute_command(qw(CLIENT INFO) => @args)
 }
 
@@ -978,8 +936,7 @@ L<https://redis.io/commands/client-kill>
 
 =cut
 
-sub client_kill : method {
-    my ($self, @args) = @_;
+method client_kill (@args) {
     $self->execute_command(qw(CLIENT KILL) => @args)
 }
 
@@ -999,8 +956,7 @@ L<https://redis.io/commands/client-list>
 
 =cut
 
-sub client_list : method {
-    my ($self, @args) = @_;
+method client_list (@args) {
     $self->execute_command(qw(CLIENT LIST) => @args)
 }
 
@@ -1018,8 +974,7 @@ L<https://redis.io/commands/client-no-evict>
 
 =cut
 
-sub client_no_evict : method {
-    my ($self, @args) = @_;
+method client_no_evict (@args) {
     $self->execute_command(qw(CLIENT NO-EVICT) => @args)
 }
 
@@ -1039,8 +994,7 @@ L<https://redis.io/commands/client-pause>
 
 =cut
 
-sub client_pause : method {
-    my ($self, @args) = @_;
+method client_pause (@args) {
     $self->execute_command(qw(CLIENT PAUSE) => @args)
 }
 
@@ -1058,8 +1012,7 @@ L<https://redis.io/commands/client-reply>
 
 =cut
 
-sub client_reply : method {
-    my ($self, @args) = @_;
+method client_reply (@args) {
     $self->execute_command(qw(CLIENT REPLY) => @args)
 }
 
@@ -1077,8 +1030,7 @@ L<https://redis.io/commands/client-setname>
 
 =cut
 
-sub client_setname : method {
-    my ($self, @args) = @_;
+method client_setname (@args) {
     $self->execute_command(qw(CLIENT SETNAME) => @args)
 }
 
@@ -1108,8 +1060,7 @@ L<https://redis.io/commands/client-tracking>
 
 =cut
 
-sub client_tracking : method {
-    my ($self, @args) = @_;
+method client_tracking (@args) {
     $self->execute_command(qw(CLIENT TRACKING) => @args)
 }
 
@@ -1121,8 +1072,7 @@ L<https://redis.io/commands/client-trackinginfo>
 
 =cut
 
-sub client_trackinginfo : method {
-    my ($self, @args) = @_;
+method client_trackinginfo (@args) {
     $self->execute_command(qw(CLIENT TRACKINGINFO) => @args)
 }
 
@@ -1142,8 +1092,7 @@ L<https://redis.io/commands/client-unblock>
 
 =cut
 
-sub client_unblock : method {
-    my ($self, @args) = @_;
+method client_unblock (@args) {
     $self->execute_command(qw(CLIENT UNBLOCK) => @args)
 }
 
@@ -1155,8 +1104,7 @@ L<https://redis.io/commands/client-unpause>
 
 =cut
 
-sub client_unpause : method {
-    my ($self, @args) = @_;
+method client_unpause (@args) {
     $self->execute_command(qw(CLIENT UNPAUSE) => @args)
 }
 
@@ -1174,8 +1122,7 @@ L<https://redis.io/commands/echo>
 
 =cut
 
-sub echo : method {
-    my ($self, @args) = @_;
+method echo (@args) {
     $self->execute_command(qw(ECHO) => @args)
 }
 
@@ -1193,8 +1140,7 @@ L<https://redis.io/commands/hello>
 
 =cut
 
-sub hello : method {
-    my ($self, @args) = @_;
+method hello (@args) {
     $self->execute_command(qw(HELLO) => @args)
 }
 
@@ -1212,8 +1158,7 @@ L<https://redis.io/commands/ping>
 
 =cut
 
-sub ping : method {
-    my ($self, @args) = @_;
+method ping (@args) {
     $self->execute_command(qw(PING) => @args)
 }
 
@@ -1225,8 +1170,7 @@ L<https://redis.io/commands/quit>
 
 =cut
 
-sub quit : method {
-    my ($self, @args) = @_;
+method quit (@args) {
     $self->execute_command(qw(QUIT) => @args)
 }
 
@@ -1238,8 +1182,7 @@ L<https://redis.io/commands/reset>
 
 =cut
 
-sub reset : method {
-    my ($self, @args) = @_;
+method reset (@args) {
     $self->execute_command(qw(RESET) => @args)
 }
 
@@ -1257,8 +1200,7 @@ L<https://redis.io/commands/select>
 
 =cut
 
-sub select : method {
-    my ($self, @args) = @_;
+method select (@args) {
     $self->execute_command(qw(SELECT) => @args)
 }
 
@@ -1284,8 +1226,7 @@ L<https://redis.io/commands/copy>
 
 =cut
 
-sub copy : method {
-    my ($self, @args) = @_;
+method copy (@args) {
     $self->execute_command(qw(COPY) => @args)
 }
 
@@ -1303,8 +1244,7 @@ L<https://redis.io/commands/del>
 
 =cut
 
-sub del : method {
-    my ($self, @args) = @_;
+method del (@args) {
     $self->execute_command(qw(DEL) => @args)
 }
 
@@ -1322,8 +1262,7 @@ L<https://redis.io/commands/dump>
 
 =cut
 
-sub dump : method {
-    my ($self, @args) = @_;
+method dump (@args) {
     $self->execute_command(qw(DUMP) => @args)
 }
 
@@ -1341,8 +1280,7 @@ L<https://redis.io/commands/exists>
 
 =cut
 
-sub exists : method {
-    my ($self, @args) = @_;
+method exists (@args) {
     $self->execute_command(qw(EXISTS) => @args)
 }
 
@@ -1364,8 +1302,7 @@ L<https://redis.io/commands/expire>
 
 =cut
 
-sub expire : method {
-    my ($self, @args) = @_;
+method expire (@args) {
     $self->execute_command(qw(EXPIRE) => @args)
 }
 
@@ -1387,8 +1324,7 @@ L<https://redis.io/commands/expireat>
 
 =cut
 
-sub expireat : method {
-    my ($self, @args) = @_;
+method expireat (@args) {
     $self->execute_command(qw(EXPIREAT) => @args)
 }
 
@@ -1406,8 +1342,7 @@ L<https://redis.io/commands/expiretime>
 
 =cut
 
-sub expiretime : method {
-    my ($self, @args) = @_;
+method expiretime (@args) {
     $self->execute_command(qw(EXPIRETIME) => @args)
 }
 
@@ -1425,10 +1360,9 @@ L<https://redis.io/commands/keys>
 
 =cut
 
-sub keys : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(KEYS) => @args)
-}
+# method keys (@args) {
+#     $self->execute_command(qw(KEYS) => @args)
+# }
 
 =head2 migrate
 
@@ -1462,8 +1396,7 @@ L<https://redis.io/commands/migrate>
 
 =cut
 
-sub migrate : method {
-    my ($self, @args) = @_;
+method migrate (@args) {
     $self->execute_command(qw(MIGRATE) => @args)
 }
 
@@ -1483,8 +1416,7 @@ L<https://redis.io/commands/move>
 
 =cut
 
-sub move : method {
-    my ($self, @args) = @_;
+method move (@args) {
     $self->execute_command(qw(MOVE) => @args)
 }
 
@@ -1502,8 +1434,7 @@ L<https://redis.io/commands/object-encoding>
 
 =cut
 
-sub object_encoding : method {
-    my ($self, @args) = @_;
+method object_encoding (@args) {
     $self->execute_command(qw(OBJECT ENCODING) => @args)
 }
 
@@ -1521,8 +1452,7 @@ L<https://redis.io/commands/object-freq>
 
 =cut
 
-sub object_freq : method {
-    my ($self, @args) = @_;
+method object_freq (@args) {
     $self->execute_command(qw(OBJECT FREQ) => @args)
 }
 
@@ -1540,8 +1470,7 @@ L<https://redis.io/commands/object-idletime>
 
 =cut
 
-sub object_idletime : method {
-    my ($self, @args) = @_;
+method object_idletime (@args) {
     $self->execute_command(qw(OBJECT IDLETIME) => @args)
 }
 
@@ -1559,8 +1488,7 @@ L<https://redis.io/commands/object-refcount>
 
 =cut
 
-sub object_refcount : method {
-    my ($self, @args) = @_;
+method object_refcount (@args) {
     $self->execute_command(qw(OBJECT REFCOUNT) => @args)
 }
 
@@ -1578,8 +1506,7 @@ L<https://redis.io/commands/persist>
 
 =cut
 
-sub persist : method {
-    my ($self, @args) = @_;
+method persist (@args) {
     $self->execute_command(qw(PERSIST) => @args)
 }
 
@@ -1601,8 +1528,7 @@ L<https://redis.io/commands/pexpire>
 
 =cut
 
-sub pexpire : method {
-    my ($self, @args) = @_;
+method pexpire (@args) {
     $self->execute_command(qw(PEXPIRE) => @args)
 }
 
@@ -1624,8 +1550,7 @@ L<https://redis.io/commands/pexpireat>
 
 =cut
 
-sub pexpireat : method {
-    my ($self, @args) = @_;
+method pexpireat (@args) {
     $self->execute_command(qw(PEXPIREAT) => @args)
 }
 
@@ -1643,8 +1568,7 @@ L<https://redis.io/commands/pexpiretime>
 
 =cut
 
-sub pexpiretime : method {
-    my ($self, @args) = @_;
+method pexpiretime (@args) {
     $self->execute_command(qw(PEXPIRETIME) => @args)
 }
 
@@ -1662,8 +1586,7 @@ L<https://redis.io/commands/pttl>
 
 =cut
 
-sub pttl : method {
-    my ($self, @args) = @_;
+method pttl (@args) {
     $self->execute_command(qw(PTTL) => @args)
 }
 
@@ -1675,8 +1598,7 @@ L<https://redis.io/commands/randomkey>
 
 =cut
 
-sub randomkey : method {
-    my ($self, @args) = @_;
+method randomkey (@args) {
     $self->execute_command(qw(RANDOMKEY) => @args)
 }
 
@@ -1696,8 +1618,7 @@ L<https://redis.io/commands/rename>
 
 =cut
 
-sub rename : method {
-    my ($self, @args) = @_;
+method rename (@args) {
     $self->execute_command(qw(RENAME) => @args)
 }
 
@@ -1717,8 +1638,7 @@ L<https://redis.io/commands/renamenx>
 
 =cut
 
-sub renamenx : method {
-    my ($self, @args) = @_;
+method renamenx (@args) {
     $self->execute_command(qw(RENAMENX) => @args)
 }
 
@@ -1748,8 +1668,7 @@ L<https://redis.io/commands/restore>
 
 =cut
 
-sub restore : method {
-    my ($self, @args) = @_;
+method restore (@args) {
     $self->execute_command(qw(RESTORE) => @args)
 }
 
@@ -1773,8 +1692,7 @@ L<https://redis.io/commands/scan>
 
 =cut
 
-sub scan : method {
-    my ($self, @args) = @_;
+method scan (@args) {
     $self->execute_command(qw(SCAN) => @args)
 }
 
@@ -1804,8 +1722,7 @@ L<https://redis.io/commands/sort>
 
 =cut
 
-sub sort : method {
-    my ($self, @args) = @_;
+method sort (@args) {
     $self->execute_command(qw(SORT) => @args)
 }
 
@@ -1833,8 +1750,7 @@ L<https://redis.io/commands/sort-ro>
 
 =cut
 
-sub sort_ro : method {
-    my ($self, @args) = @_;
+method sort_ro (@args) {
     $self->execute_command(qw(SORT_RO) => @args)
 }
 
@@ -1852,8 +1768,7 @@ L<https://redis.io/commands/touch>
 
 =cut
 
-sub touch : method {
-    my ($self, @args) = @_;
+method touch (@args) {
     $self->execute_command(qw(TOUCH) => @args)
 }
 
@@ -1871,8 +1786,7 @@ L<https://redis.io/commands/ttl>
 
 =cut
 
-sub ttl : method {
-    my ($self, @args) = @_;
+method ttl (@args) {
     $self->execute_command(qw(TTL) => @args)
 }
 
@@ -1890,8 +1804,7 @@ L<https://redis.io/commands/type>
 
 =cut
 
-sub type : method {
-    my ($self, @args) = @_;
+method type (@args) {
     $self->execute_command(qw(TYPE) => @args)
 }
 
@@ -1909,8 +1822,7 @@ L<https://redis.io/commands/unlink>
 
 =cut
 
-sub unlink : method {
-    my ($self, @args) = @_;
+method unlink (@args) {
     $self->execute_command(qw(UNLINK) => @args)
 }
 
@@ -1930,8 +1842,7 @@ L<https://redis.io/commands/wait>
 
 =cut
 
-sub wait : method {
-    my ($self, @args) = @_;
+method wait (@args) {
     $self->execute_command(qw(WAIT) => @args)
 }
 
@@ -1957,8 +1868,7 @@ L<https://redis.io/commands/geoadd>
 
 =cut
 
-sub geoadd : method {
-    my ($self, @args) = @_;
+method geoadd (@args) {
     $self->execute_command(qw(GEOADD) => @args)
 }
 
@@ -1982,8 +1892,7 @@ L<https://redis.io/commands/geodist>
 
 =cut
 
-sub geodist : method {
-    my ($self, @args) = @_;
+method geodist (@args) {
     $self->execute_command(qw(GEODIST) => @args)
 }
 
@@ -2003,8 +1912,7 @@ L<https://redis.io/commands/geohash>
 
 =cut
 
-sub geohash : method {
-    my ($self, @args) = @_;
+method geohash (@args) {
     $self->execute_command(qw(GEOHASH) => @args)
 }
 
@@ -2024,8 +1932,7 @@ L<https://redis.io/commands/geopos>
 
 =cut
 
-sub geopos : method {
-    my ($self, @args) = @_;
+method geopos (@args) {
     $self->execute_command(qw(GEOPOS) => @args)
 }
 
@@ -2065,8 +1972,7 @@ L<https://redis.io/commands/georadius>
 
 =cut
 
-sub georadius : method {
-    my ($self, @args) = @_;
+method georadius (@args) {
     $self->execute_command(qw(GEORADIUS) => @args)
 }
 
@@ -2102,8 +2008,7 @@ L<https://redis.io/commands/georadius-ro>
 
 =cut
 
-sub georadius_ro : method {
-    my ($self, @args) = @_;
+method georadius_ro (@args) {
     $self->execute_command(qw(GEORADIUS_RO) => @args)
 }
 
@@ -2141,8 +2046,7 @@ L<https://redis.io/commands/georadiusbymember>
 
 =cut
 
-sub georadiusbymember : method {
-    my ($self, @args) = @_;
+method georadiusbymember (@args) {
     $self->execute_command(qw(GEORADIUSBYMEMBER) => @args)
 }
 
@@ -2176,8 +2080,7 @@ L<https://redis.io/commands/georadiusbymember-ro>
 
 =cut
 
-sub georadiusbymember_ro : method {
-    my ($self, @args) = @_;
+method georadiusbymember_ro (@args) {
     $self->execute_command(qw(GEORADIUSBYMEMBER_RO) => @args)
 }
 
@@ -2213,8 +2116,7 @@ L<https://redis.io/commands/geosearch>
 
 =cut
 
-sub geosearch : method {
-    my ($self, @args) = @_;
+method geosearch (@args) {
     $self->execute_command(qw(GEOSEARCH) => @args)
 }
 
@@ -2248,8 +2150,7 @@ L<https://redis.io/commands/geosearchstore>
 
 =cut
 
-sub geosearchstore : method {
-    my ($self, @args) = @_;
+method geosearchstore (@args) {
     $self->execute_command(qw(GEOSEARCHSTORE) => @args)
 }
 
@@ -2271,8 +2172,7 @@ L<https://redis.io/commands/hdel>
 
 =cut
 
-sub hdel : method {
-    my ($self, @args) = @_;
+method hdel (@args) {
     $self->execute_command(qw(HDEL) => @args)
 }
 
@@ -2292,8 +2192,7 @@ L<https://redis.io/commands/hexists>
 
 =cut
 
-sub hexists : method {
-    my ($self, @args) = @_;
+method hexists (@args) {
     $self->execute_command(qw(HEXISTS) => @args)
 }
 
@@ -2313,8 +2212,7 @@ L<https://redis.io/commands/hget>
 
 =cut
 
-sub hget : method {
-    my ($self, @args) = @_;
+method hget (@args) {
     $self->execute_command(qw(HGET) => @args)
 }
 
@@ -2332,8 +2230,7 @@ L<https://redis.io/commands/hgetall>
 
 =cut
 
-sub hgetall : method {
-    my ($self, @args) = @_;
+method hgetall (@args) {
     $self->execute_command(qw(HGETALL) => @args)
 }
 
@@ -2355,8 +2252,7 @@ L<https://redis.io/commands/hincrby>
 
 =cut
 
-sub hincrby : method {
-    my ($self, @args) = @_;
+method hincrby (@args) {
     $self->execute_command(qw(HINCRBY) => @args)
 }
 
@@ -2378,8 +2274,7 @@ L<https://redis.io/commands/hincrbyfloat>
 
 =cut
 
-sub hincrbyfloat : method {
-    my ($self, @args) = @_;
+method hincrbyfloat (@args) {
     $self->execute_command(qw(HINCRBYFLOAT) => @args)
 }
 
@@ -2397,8 +2292,7 @@ L<https://redis.io/commands/hkeys>
 
 =cut
 
-sub hkeys : method {
-    my ($self, @args) = @_;
+method hkeys (@args) {
     $self->execute_command(qw(HKEYS) => @args)
 }
 
@@ -2416,8 +2310,7 @@ L<https://redis.io/commands/hlen>
 
 =cut
 
-sub hlen : method {
-    my ($self, @args) = @_;
+method hlen (@args) {
     $self->execute_command(qw(HLEN) => @args)
 }
 
@@ -2437,8 +2330,7 @@ L<https://redis.io/commands/hmget>
 
 =cut
 
-sub hmget : method {
-    my ($self, @args) = @_;
+method hmget (@args) {
     $self->execute_command(qw(HMGET) => @args)
 }
 
@@ -2458,8 +2350,7 @@ L<https://redis.io/commands/hmset>
 
 =cut
 
-sub hmset : method {
-    my ($self, @args) = @_;
+method hmset (@args) {
     $self->execute_command(qw(HMSET) => @args)
 }
 
@@ -2479,8 +2370,7 @@ L<https://redis.io/commands/hrandfield>
 
 =cut
 
-sub hrandfield : method {
-    my ($self, @args) = @_;
+method hrandfield (@args) {
     $self->execute_command(qw(HRANDFIELD) => @args)
 }
 
@@ -2504,8 +2394,7 @@ L<https://redis.io/commands/hscan>
 
 =cut
 
-sub hscan : method {
-    my ($self, @args) = @_;
+method hscan (@args) {
     $self->execute_command(qw(HSCAN) => @args)
 }
 
@@ -2525,8 +2414,7 @@ L<https://redis.io/commands/hset>
 
 =cut
 
-sub hset : method {
-    my ($self, @args) = @_;
+method hset (@args) {
     $self->execute_command(qw(HSET) => @args)
 }
 
@@ -2548,8 +2436,7 @@ L<https://redis.io/commands/hsetnx>
 
 =cut
 
-sub hsetnx : method {
-    my ($self, @args) = @_;
+method hsetnx (@args) {
     $self->execute_command(qw(HSETNX) => @args)
 }
 
@@ -2569,8 +2456,7 @@ L<https://redis.io/commands/hstrlen>
 
 =cut
 
-sub hstrlen : method {
-    my ($self, @args) = @_;
+method hstrlen (@args) {
     $self->execute_command(qw(HSTRLEN) => @args)
 }
 
@@ -2588,8 +2474,7 @@ L<https://redis.io/commands/hvals>
 
 =cut
 
-sub hvals : method {
-    my ($self, @args) = @_;
+method hvals (@args) {
     $self->execute_command(qw(HVALS) => @args)
 }
 
@@ -2611,8 +2496,7 @@ L<https://redis.io/commands/pfadd>
 
 =cut
 
-sub pfadd : method {
-    my ($self, @args) = @_;
+method pfadd (@args) {
     $self->execute_command(qw(PFADD) => @args)
 }
 
@@ -2630,8 +2514,7 @@ L<https://redis.io/commands/pfcount>
 
 =cut
 
-sub pfcount : method {
-    my ($self, @args) = @_;
+method pfcount (@args) {
     $self->execute_command(qw(PFCOUNT) => @args)
 }
 
@@ -2643,8 +2526,7 @@ L<https://redis.io/commands/pfdebug>
 
 =cut
 
-sub pfdebug : method {
-    my ($self, @args) = @_;
+method pfdebug (@args) {
     $self->execute_command(qw(PFDEBUG) => @args)
 }
 
@@ -2664,8 +2546,7 @@ L<https://redis.io/commands/pfmerge>
 
 =cut
 
-sub pfmerge : method {
-    my ($self, @args) = @_;
+method pfmerge (@args) {
     $self->execute_command(qw(PFMERGE) => @args)
 }
 
@@ -2677,8 +2558,7 @@ L<https://redis.io/commands/pfselftest>
 
 =cut
 
-sub pfselftest : method {
-    my ($self, @args) = @_;
+method pfselftest (@args) {
     $self->execute_command(qw(PFSELFTEST) => @args)
 }
 
@@ -2706,8 +2586,7 @@ L<https://redis.io/commands/blmove>
 
 =cut
 
-sub blmove : method {
-    my ($self, @args) = @_;
+method blmove (@args) {
     $self->execute_command(qw(BLMOVE) => @args)
 }
 
@@ -2733,8 +2612,7 @@ L<https://redis.io/commands/blmpop>
 
 =cut
 
-sub blmpop : method {
-    my ($self, @args) = @_;
+method blmpop (@args) {
     $self->execute_command(qw(BLMPOP) => @args)
 }
 
@@ -2754,8 +2632,7 @@ L<https://redis.io/commands/blpop>
 
 =cut
 
-sub blpop : method {
-    my ($self, @args) = @_;
+method blpop (@args) {
     $self->execute_command(qw(BLPOP) => @args)
 }
 
@@ -2775,8 +2652,7 @@ L<https://redis.io/commands/brpop>
 
 =cut
 
-sub brpop : method {
-    my ($self, @args) = @_;
+method brpop (@args) {
     $self->execute_command(qw(BRPOP) => @args)
 }
 
@@ -2798,8 +2674,7 @@ L<https://redis.io/commands/brpoplpush>
 
 =cut
 
-sub brpoplpush : method {
-    my ($self, @args) = @_;
+method brpoplpush (@args) {
     $self->execute_command(qw(BRPOPLPUSH) => @args)
 }
 
@@ -2819,8 +2694,7 @@ L<https://redis.io/commands/lindex>
 
 =cut
 
-sub lindex : method {
-    my ($self, @args) = @_;
+method lindex (@args) {
     $self->execute_command(qw(LINDEX) => @args)
 }
 
@@ -2844,8 +2718,7 @@ L<https://redis.io/commands/linsert>
 
 =cut
 
-sub linsert : method {
-    my ($self, @args) = @_;
+method linsert (@args) {
     $self->execute_command(qw(LINSERT) => @args)
 }
 
@@ -2863,8 +2736,7 @@ L<https://redis.io/commands/llen>
 
 =cut
 
-sub llen : method {
-    my ($self, @args) = @_;
+method llen (@args) {
     $self->execute_command(qw(LLEN) => @args)
 }
 
@@ -2888,8 +2760,7 @@ L<https://redis.io/commands/lmove>
 
 =cut
 
-sub lmove : method {
-    my ($self, @args) = @_;
+method lmove (@args) {
     $self->execute_command(qw(LMOVE) => @args)
 }
 
@@ -2913,8 +2784,7 @@ L<https://redis.io/commands/lmpop>
 
 =cut
 
-sub lmpop : method {
-    my ($self, @args) = @_;
+method lmpop (@args) {
     $self->execute_command(qw(LMPOP) => @args)
 }
 
@@ -2934,8 +2804,7 @@ L<https://redis.io/commands/lpop>
 
 =cut
 
-sub lpop : method {
-    my ($self, @args) = @_;
+method lpop (@args) {
     $self->execute_command(qw(LPOP) => @args)
 }
 
@@ -2961,8 +2830,7 @@ L<https://redis.io/commands/lpos>
 
 =cut
 
-sub lpos : method {
-    my ($self, @args) = @_;
+method lpos (@args) {
     $self->execute_command(qw(LPOS) => @args)
 }
 
@@ -2982,8 +2850,7 @@ L<https://redis.io/commands/lpush>
 
 =cut
 
-sub lpush : method {
-    my ($self, @args) = @_;
+method lpush (@args) {
     $self->execute_command(qw(LPUSH) => @args)
 }
 
@@ -3003,8 +2870,7 @@ L<https://redis.io/commands/lpushx>
 
 =cut
 
-sub lpushx : method {
-    my ($self, @args) = @_;
+method lpushx (@args) {
     $self->execute_command(qw(LPUSHX) => @args)
 }
 
@@ -3026,8 +2892,7 @@ L<https://redis.io/commands/lrange>
 
 =cut
 
-sub lrange : method {
-    my ($self, @args) = @_;
+method lrange (@args) {
     $self->execute_command(qw(LRANGE) => @args)
 }
 
@@ -3049,8 +2914,7 @@ L<https://redis.io/commands/lrem>
 
 =cut
 
-sub lrem : method {
-    my ($self, @args) = @_;
+method lrem (@args) {
     $self->execute_command(qw(LREM) => @args)
 }
 
@@ -3072,8 +2936,7 @@ L<https://redis.io/commands/lset>
 
 =cut
 
-sub lset : method {
-    my ($self, @args) = @_;
+method lset (@args) {
     $self->execute_command(qw(LSET) => @args)
 }
 
@@ -3095,8 +2958,7 @@ L<https://redis.io/commands/ltrim>
 
 =cut
 
-sub ltrim : method {
-    my ($self, @args) = @_;
+method ltrim (@args) {
     $self->execute_command(qw(LTRIM) => @args)
 }
 
@@ -3116,8 +2978,7 @@ L<https://redis.io/commands/rpop>
 
 =cut
 
-sub rpop : method {
-    my ($self, @args) = @_;
+method rpop (@args) {
     $self->execute_command(qw(RPOP) => @args)
 }
 
@@ -3137,8 +2998,7 @@ L<https://redis.io/commands/rpoplpush>
 
 =cut
 
-sub rpoplpush : method {
-    my ($self, @args) = @_;
+method rpoplpush (@args) {
     $self->execute_command(qw(RPOPLPUSH) => @args)
 }
 
@@ -3158,8 +3018,7 @@ L<https://redis.io/commands/rpush>
 
 =cut
 
-sub rpush : method {
-    my ($self, @args) = @_;
+method rpush (@args) {
     $self->execute_command(qw(RPUSH) => @args)
 }
 
@@ -3179,8 +3038,7 @@ L<https://redis.io/commands/rpushx>
 
 =cut
 
-sub rpushx : method {
-    my ($self, @args) = @_;
+method rpushx (@args) {
     $self->execute_command(qw(RPUSHX) => @args)
 }
 
@@ -3200,10 +3058,10 @@ L<https://redis.io/commands/psubscribe>
 
 =cut
 
-sub psubscribe : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(PSUBSCRIBE) => @args)
-}
+# Currently left out until Object::Pad rôles have support for overriding methods
+# method psubscribe (@args) {
+#     $self->execute_command(qw(PSUBSCRIBE) => @args)
+# }
 
 =head2 publish
 
@@ -3221,8 +3079,7 @@ L<https://redis.io/commands/publish>
 
 =cut
 
-sub publish : method {
-    my ($self, @args) = @_;
+method publish (@args) {
     $self->execute_command(qw(PUBLISH) => @args)
 }
 
@@ -3240,8 +3097,7 @@ L<https://redis.io/commands/pubsub-channels>
 
 =cut
 
-sub pubsub_channels : method {
-    my ($self, @args) = @_;
+method pubsub_channels (@args) {
     $self->execute_command(qw(PUBSUB CHANNELS) => @args)
 }
 
@@ -3253,8 +3109,7 @@ L<https://redis.io/commands/pubsub-numpat>
 
 =cut
 
-sub pubsub_numpat : method {
-    my ($self, @args) = @_;
+method pubsub_numpat (@args) {
     $self->execute_command(qw(PUBSUB NUMPAT) => @args)
 }
 
@@ -3272,8 +3127,7 @@ L<https://redis.io/commands/pubsub-numsub>
 
 =cut
 
-sub pubsub_numsub : method {
-    my ($self, @args) = @_;
+method pubsub_numsub (@args) {
     $self->execute_command(qw(PUBSUB NUMSUB) => @args)
 }
 
@@ -3291,8 +3145,7 @@ L<https://redis.io/commands/pubsub-shardchannels>
 
 =cut
 
-sub pubsub_shardchannels : method {
-    my ($self, @args) = @_;
+method pubsub_shardchannels (@args) {
     $self->execute_command(qw(PUBSUB SHARDCHANNELS) => @args)
 }
 
@@ -3310,8 +3163,7 @@ L<https://redis.io/commands/pubsub-shardnumsub>
 
 =cut
 
-sub pubsub_shardnumsub : method {
-    my ($self, @args) = @_;
+method pubsub_shardnumsub (@args) {
     $self->execute_command(qw(PUBSUB SHARDNUMSUB) => @args)
 }
 
@@ -3329,8 +3181,7 @@ L<https://redis.io/commands/punsubscribe>
 
 =cut
 
-sub punsubscribe : method {
-    my ($self, @args) = @_;
+method punsubscribe (@args) {
     $self->execute_command(qw(PUNSUBSCRIBE) => @args)
 }
 
@@ -3350,8 +3201,7 @@ L<https://redis.io/commands/spublish>
 
 =cut
 
-sub spublish : method {
-    my ($self, @args) = @_;
+method spublish (@args) {
     $self->execute_command(qw(SPUBLISH) => @args)
 }
 
@@ -3369,10 +3219,9 @@ L<https://redis.io/commands/ssubscribe>
 
 =cut
 
-sub ssubscribe : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(SSUBSCRIBE) => @args)
-}
+# method ssubscribe (@args) {
+#     $self->execute_command(qw(SSUBSCRIBE) => @args)
+# }
 
 =head2 subscribe
 
@@ -3388,10 +3237,9 @@ L<https://redis.io/commands/subscribe>
 
 =cut
 
-sub subscribe : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(SUBSCRIBE) => @args)
-}
+# method subscribe (@args) {
+#     $self->execute_command(qw(SUBSCRIBE) => @args)
+# }
 
 =head2 sunsubscribe
 
@@ -3407,8 +3255,7 @@ L<https://redis.io/commands/sunsubscribe>
 
 =cut
 
-sub sunsubscribe : method {
-    my ($self, @args) = @_;
+method sunsubscribe (@args) {
     $self->execute_command(qw(SUNSUBSCRIBE) => @args)
 }
 
@@ -3426,8 +3273,7 @@ L<https://redis.io/commands/unsubscribe>
 
 =cut
 
-sub unsubscribe : method {
-    my ($self, @args) = @_;
+method unsubscribe (@args) {
     $self->execute_command(qw(UNSUBSCRIBE) => @args)
 }
 
@@ -3453,8 +3299,7 @@ L<https://redis.io/commands/eval>
 
 =cut
 
-sub eval : method {
-    my ($self, @args) = @_;
+method eval (@args) {
     $self->execute_command(qw(EVAL) => @args)
 }
 
@@ -3478,8 +3323,7 @@ L<https://redis.io/commands/eval-ro>
 
 =cut
 
-sub eval_ro : method {
-    my ($self, @args) = @_;
+method eval_ro (@args) {
     $self->execute_command(qw(EVAL_RO) => @args)
 }
 
@@ -3503,8 +3347,7 @@ L<https://redis.io/commands/evalsha>
 
 =cut
 
-sub evalsha : method {
-    my ($self, @args) = @_;
+method evalsha (@args) {
     $self->execute_command(qw(EVALSHA) => @args)
 }
 
@@ -3528,8 +3371,7 @@ L<https://redis.io/commands/evalsha-ro>
 
 =cut
 
-sub evalsha_ro : method {
-    my ($self, @args) = @_;
+method evalsha_ro (@args) {
     $self->execute_command(qw(EVALSHA_RO) => @args)
 }
 
@@ -3553,8 +3395,7 @@ L<https://redis.io/commands/fcall>
 
 =cut
 
-sub fcall : method {
-    my ($self, @args) = @_;
+method fcall (@args) {
     $self->execute_command(qw(FCALL) => @args)
 }
 
@@ -3578,8 +3419,7 @@ L<https://redis.io/commands/fcall-ro>
 
 =cut
 
-sub fcall_ro : method {
-    my ($self, @args) = @_;
+method fcall_ro (@args) {
     $self->execute_command(qw(FCALL_RO) => @args)
 }
 
@@ -3597,8 +3437,7 @@ L<https://redis.io/commands/function-delete>
 
 =cut
 
-sub function_delete : method {
-    my ($self, @args) = @_;
+method function_delete (@args) {
     $self->execute_command(qw(FUNCTION DELETE) => @args)
 }
 
@@ -3610,8 +3449,7 @@ L<https://redis.io/commands/function-dump>
 
 =cut
 
-sub function_dump : method {
-    my ($self, @args) = @_;
+method function_dump (@args) {
     $self->execute_command(qw(FUNCTION DUMP) => @args)
 }
 
@@ -3629,8 +3467,7 @@ L<https://redis.io/commands/function-flush>
 
 =cut
 
-sub function_flush : method {
-    my ($self, @args) = @_;
+method function_flush (@args) {
     $self->execute_command(qw(FUNCTION FLUSH) => @args)
 }
 
@@ -3642,8 +3479,7 @@ L<https://redis.io/commands/function-kill>
 
 =cut
 
-sub function_kill : method {
-    my ($self, @args) = @_;
+method function_kill (@args) {
     $self->execute_command(qw(FUNCTION KILL) => @args)
 }
 
@@ -3663,8 +3499,7 @@ L<https://redis.io/commands/function-list>
 
 =cut
 
-sub function_list : method {
-    my ($self, @args) = @_;
+method function_list (@args) {
     $self->execute_command(qw(FUNCTION LIST) => @args)
 }
 
@@ -3690,8 +3525,7 @@ L<https://redis.io/commands/function-load>
 
 =cut
 
-sub function_load : method {
-    my ($self, @args) = @_;
+method function_load (@args) {
     $self->execute_command(qw(FUNCTION LOAD) => @args)
 }
 
@@ -3711,8 +3545,7 @@ L<https://redis.io/commands/function-restore>
 
 =cut
 
-sub function_restore : method {
-    my ($self, @args) = @_;
+method function_restore (@args) {
     $self->execute_command(qw(FUNCTION RESTORE) => @args)
 }
 
@@ -3724,8 +3557,7 @@ L<https://redis.io/commands/function-stats>
 
 =cut
 
-sub function_stats : method {
-    my ($self, @args) = @_;
+method function_stats (@args) {
     $self->execute_command(qw(FUNCTION STATS) => @args)
 }
 
@@ -3743,8 +3575,7 @@ L<https://redis.io/commands/script-debug>
 
 =cut
 
-sub script_debug : method {
-    my ($self, @args) = @_;
+method script_debug (@args) {
     $self->execute_command(qw(SCRIPT DEBUG) => @args)
 }
 
@@ -3762,8 +3593,7 @@ L<https://redis.io/commands/script-exists>
 
 =cut
 
-sub script_exists : method {
-    my ($self, @args) = @_;
+method script_exists (@args) {
     $self->execute_command(qw(SCRIPT EXISTS) => @args)
 }
 
@@ -3781,8 +3611,7 @@ L<https://redis.io/commands/script-flush>
 
 =cut
 
-sub script_flush : method {
-    my ($self, @args) = @_;
+method script_flush (@args) {
     $self->execute_command(qw(SCRIPT FLUSH) => @args)
 }
 
@@ -3794,8 +3623,7 @@ L<https://redis.io/commands/script-kill>
 
 =cut
 
-sub script_kill : method {
-    my ($self, @args) = @_;
+method script_kill (@args) {
     $self->execute_command(qw(SCRIPT KILL) => @args)
 }
 
@@ -3813,8 +3641,7 @@ L<https://redis.io/commands/script-load>
 
 =cut
 
-sub script_load : method {
-    my ($self, @args) = @_;
+method script_load (@args) {
     $self->execute_command(qw(SCRIPT LOAD) => @args)
 }
 
@@ -3834,8 +3661,7 @@ L<https://redis.io/commands/acl-cat>
 
 =cut
 
-sub acl_cat : method {
-    my ($self, @args) = @_;
+method acl_cat (@args) {
     $self->execute_command(qw(ACL CAT) => @args)
 }
 
@@ -3853,8 +3679,7 @@ L<https://redis.io/commands/acl-deluser>
 
 =cut
 
-sub acl_deluser : method {
-    my ($self, @args) = @_;
+method acl_deluser (@args) {
     $self->execute_command(qw(ACL DELUSER) => @args)
 }
 
@@ -3876,8 +3701,7 @@ L<https://redis.io/commands/acl-dryrun>
 
 =cut
 
-sub acl_dryrun : method {
-    my ($self, @args) = @_;
+method acl_dryrun (@args) {
     $self->execute_command(qw(ACL DRYRUN) => @args)
 }
 
@@ -3895,8 +3719,7 @@ L<https://redis.io/commands/acl-genpass>
 
 =cut
 
-sub acl_genpass : method {
-    my ($self, @args) = @_;
+method acl_genpass (@args) {
     $self->execute_command(qw(ACL GENPASS) => @args)
 }
 
@@ -3914,8 +3737,7 @@ L<https://redis.io/commands/acl-getuser>
 
 =cut
 
-sub acl_getuser : method {
-    my ($self, @args) = @_;
+method acl_getuser (@args) {
     $self->execute_command(qw(ACL GETUSER) => @args)
 }
 
@@ -3927,8 +3749,7 @@ L<https://redis.io/commands/acl-list>
 
 =cut
 
-sub acl_list : method {
-    my ($self, @args) = @_;
+method acl_list (@args) {
     $self->execute_command(qw(ACL LIST) => @args)
 }
 
@@ -3940,8 +3761,7 @@ L<https://redis.io/commands/acl-load>
 
 =cut
 
-sub acl_load : method {
-    my ($self, @args) = @_;
+method acl_load (@args) {
     $self->execute_command(qw(ACL LOAD) => @args)
 }
 
@@ -3959,8 +3779,7 @@ L<https://redis.io/commands/acl-log>
 
 =cut
 
-sub acl_log : method {
-    my ($self, @args) = @_;
+method acl_log (@args) {
     $self->execute_command(qw(ACL LOG) => @args)
 }
 
@@ -3972,8 +3791,7 @@ L<https://redis.io/commands/acl-save>
 
 =cut
 
-sub acl_save : method {
-    my ($self, @args) = @_;
+method acl_save (@args) {
     $self->execute_command(qw(ACL SAVE) => @args)
 }
 
@@ -3993,8 +3811,7 @@ L<https://redis.io/commands/acl-setuser>
 
 =cut
 
-sub acl_setuser : method {
-    my ($self, @args) = @_;
+method acl_setuser (@args) {
     $self->execute_command(qw(ACL SETUSER) => @args)
 }
 
@@ -4006,8 +3823,7 @@ L<https://redis.io/commands/acl-users>
 
 =cut
 
-sub acl_users : method {
-    my ($self, @args) = @_;
+method acl_users (@args) {
     $self->execute_command(qw(ACL USERS) => @args)
 }
 
@@ -4019,8 +3835,7 @@ L<https://redis.io/commands/acl-whoami>
 
 =cut
 
-sub acl_whoami : method {
-    my ($self, @args) = @_;
+method acl_whoami (@args) {
     $self->execute_command(qw(ACL WHOAMI) => @args)
 }
 
@@ -4032,8 +3847,7 @@ L<https://redis.io/commands/bgrewriteaof>
 
 =cut
 
-sub bgrewriteaof : method {
-    my ($self, @args) = @_;
+method bgrewriteaof (@args) {
     $self->execute_command(qw(BGREWRITEAOF) => @args)
 }
 
@@ -4051,8 +3865,7 @@ L<https://redis.io/commands/bgsave>
 
 =cut
 
-sub bgsave : method {
-    my ($self, @args) = @_;
+method bgsave (@args) {
     $self->execute_command(qw(BGSAVE) => @args)
 }
 
@@ -4064,8 +3877,7 @@ L<https://redis.io/commands/command>
 
 =cut
 
-sub command : method {
-    my ($self, @args) = @_;
+method command (@args) {
     $self->execute_command(qw(COMMAND) => @args)
 }
 
@@ -4077,8 +3889,7 @@ L<https://redis.io/commands/command-count>
 
 =cut
 
-sub command_count : method {
-    my ($self, @args) = @_;
+method command_count (@args) {
     $self->execute_command(qw(COMMAND COUNT) => @args)
 }
 
@@ -4096,8 +3907,7 @@ L<https://redis.io/commands/command-docs>
 
 =cut
 
-sub command_docs : method {
-    my ($self, @args) = @_;
+method command_docs (@args) {
     $self->execute_command(qw(COMMAND DOCS) => @args)
 }
 
@@ -4109,8 +3919,7 @@ L<https://redis.io/commands/command-getkeys>
 
 =cut
 
-sub command_getkeys : method {
-    my ($self, @args) = @_;
+method command_getkeys (@args) {
     $self->execute_command(qw(COMMAND GETKEYS) => @args)
 }
 
@@ -4122,8 +3931,7 @@ L<https://redis.io/commands/command-getkeysandflags>
 
 =cut
 
-sub command_getkeysandflags : method {
-    my ($self, @args) = @_;
+method command_getkeysandflags (@args) {
     $self->execute_command(qw(COMMAND GETKEYSANDFLAGS) => @args)
 }
 
@@ -4141,8 +3949,7 @@ L<https://redis.io/commands/command-info>
 
 =cut
 
-sub command_info : method {
-    my ($self, @args) = @_;
+method command_info (@args) {
     $self->execute_command(qw(COMMAND INFO) => @args)
 }
 
@@ -4160,8 +3967,7 @@ L<https://redis.io/commands/command-list>
 
 =cut
 
-sub command_list : method {
-    my ($self, @args) = @_;
+method command_list (@args) {
     $self->execute_command(qw(COMMAND LIST) => @args)
 }
 
@@ -4179,8 +3985,7 @@ L<https://redis.io/commands/config-get>
 
 =cut
 
-sub config_get : method {
-    my ($self, @args) = @_;
+method config_get (@args) {
     $self->execute_command(qw(CONFIG GET) => @args)
 }
 
@@ -4192,8 +3997,7 @@ L<https://redis.io/commands/config-resetstat>
 
 =cut
 
-sub config_resetstat : method {
-    my ($self, @args) = @_;
+method config_resetstat (@args) {
     $self->execute_command(qw(CONFIG RESETSTAT) => @args)
 }
 
@@ -4205,8 +4009,7 @@ L<https://redis.io/commands/config-rewrite>
 
 =cut
 
-sub config_rewrite : method {
-    my ($self, @args) = @_;
+method config_rewrite (@args) {
     $self->execute_command(qw(CONFIG REWRITE) => @args)
 }
 
@@ -4224,8 +4027,7 @@ L<https://redis.io/commands/config-set>
 
 =cut
 
-sub config_set : method {
-    my ($self, @args) = @_;
+method config_set (@args) {
     $self->execute_command(qw(CONFIG SET) => @args)
 }
 
@@ -4237,8 +4039,7 @@ L<https://redis.io/commands/dbsize>
 
 =cut
 
-sub dbsize : method {
-    my ($self, @args) = @_;
+method dbsize (@args) {
     $self->execute_command(qw(DBSIZE) => @args)
 }
 
@@ -4260,8 +4061,7 @@ L<https://redis.io/commands/failover>
 
 =cut
 
-sub failover : method {
-    my ($self, @args) = @_;
+method failover (@args) {
     $self->execute_command(qw(FAILOVER) => @args)
 }
 
@@ -4279,8 +4079,7 @@ L<https://redis.io/commands/flushall>
 
 =cut
 
-sub flushall : method {
-    my ($self, @args) = @_;
+method flushall (@args) {
     $self->execute_command(qw(FLUSHALL) => @args)
 }
 
@@ -4298,8 +4097,7 @@ L<https://redis.io/commands/flushdb>
 
 =cut
 
-sub flushdb : method {
-    my ($self, @args) = @_;
+method flushdb (@args) {
     $self->execute_command(qw(FLUSHDB) => @args)
 }
 
@@ -4317,8 +4115,7 @@ L<https://redis.io/commands/info>
 
 =cut
 
-sub info : method {
-    my ($self, @args) = @_;
+method info (@args) {
     $self->execute_command(qw(INFO) => @args)
 }
 
@@ -4330,8 +4127,7 @@ L<https://redis.io/commands/lastsave>
 
 =cut
 
-sub lastsave : method {
-    my ($self, @args) = @_;
+method lastsave (@args) {
     $self->execute_command(qw(LASTSAVE) => @args)
 }
 
@@ -4343,8 +4139,7 @@ L<https://redis.io/commands/latency-doctor>
 
 =cut
 
-sub latency_doctor : method {
-    my ($self, @args) = @_;
+method latency_doctor (@args) {
     $self->execute_command(qw(LATENCY DOCTOR) => @args)
 }
 
@@ -4362,8 +4157,7 @@ L<https://redis.io/commands/latency-graph>
 
 =cut
 
-sub latency_graph : method {
-    my ($self, @args) = @_;
+method latency_graph (@args) {
     $self->execute_command(qw(LATENCY GRAPH) => @args)
 }
 
@@ -4381,8 +4175,7 @@ L<https://redis.io/commands/latency-histogram>
 
 =cut
 
-sub latency_histogram : method {
-    my ($self, @args) = @_;
+method latency_histogram (@args) {
     $self->execute_command(qw(LATENCY HISTOGRAM) => @args)
 }
 
@@ -4400,8 +4193,7 @@ L<https://redis.io/commands/latency-history>
 
 =cut
 
-sub latency_history : method {
-    my ($self, @args) = @_;
+method latency_history (@args) {
     $self->execute_command(qw(LATENCY HISTORY) => @args)
 }
 
@@ -4413,8 +4205,7 @@ L<https://redis.io/commands/latency-latest>
 
 =cut
 
-sub latency_latest : method {
-    my ($self, @args) = @_;
+method latency_latest (@args) {
     $self->execute_command(qw(LATENCY LATEST) => @args)
 }
 
@@ -4432,8 +4223,7 @@ L<https://redis.io/commands/latency-reset>
 
 =cut
 
-sub latency_reset : method {
-    my ($self, @args) = @_;
+method latency_reset (@args) {
     $self->execute_command(qw(LATENCY RESET) => @args)
 }
 
@@ -4451,8 +4241,7 @@ L<https://redis.io/commands/lolwut>
 
 =cut
 
-sub lolwut : method {
-    my ($self, @args) = @_;
+method lolwut (@args) {
     $self->execute_command(qw(LOLWUT) => @args)
 }
 
@@ -4464,8 +4253,7 @@ L<https://redis.io/commands/memory-doctor>
 
 =cut
 
-sub memory_doctor : method {
-    my ($self, @args) = @_;
+method memory_doctor (@args) {
     $self->execute_command(qw(MEMORY DOCTOR) => @args)
 }
 
@@ -4477,8 +4265,7 @@ L<https://redis.io/commands/memory-malloc-stats>
 
 =cut
 
-sub memory_malloc_stats : method {
-    my ($self, @args) = @_;
+method memory_malloc_stats (@args) {
     $self->execute_command(qw(MEMORY MALLOC-STATS) => @args)
 }
 
@@ -4490,8 +4277,7 @@ L<https://redis.io/commands/memory-purge>
 
 =cut
 
-sub memory_purge : method {
-    my ($self, @args) = @_;
+method memory_purge (@args) {
     $self->execute_command(qw(MEMORY PURGE) => @args)
 }
 
@@ -4503,8 +4289,7 @@ L<https://redis.io/commands/memory-stats>
 
 =cut
 
-sub memory_stats : method {
-    my ($self, @args) = @_;
+method memory_stats (@args) {
     $self->execute_command(qw(MEMORY STATS) => @args)
 }
 
@@ -4524,8 +4309,7 @@ L<https://redis.io/commands/memory-usage>
 
 =cut
 
-sub memory_usage : method {
-    my ($self, @args) = @_;
+method memory_usage (@args) {
     $self->execute_command(qw(MEMORY USAGE) => @args)
 }
 
@@ -4537,8 +4321,7 @@ L<https://redis.io/commands/module-list>
 
 =cut
 
-sub module_list : method {
-    my ($self, @args) = @_;
+method module_list (@args) {
     $self->execute_command(qw(MODULE LIST) => @args)
 }
 
@@ -4558,8 +4341,7 @@ L<https://redis.io/commands/module-load>
 
 =cut
 
-sub module_load : method {
-    my ($self, @args) = @_;
+method module_load (@args) {
     $self->execute_command(qw(MODULE LOAD) => @args)
 }
 
@@ -4577,8 +4359,7 @@ L<https://redis.io/commands/module-unload>
 
 =cut
 
-sub module_unload : method {
-    my ($self, @args) = @_;
+method module_unload (@args) {
     $self->execute_command(qw(MODULE UNLOAD) => @args)
 }
 
@@ -4590,8 +4371,7 @@ L<https://redis.io/commands/monitor>
 
 =cut
 
-sub monitor : method {
-    my ($self, @args) = @_;
+method monitor (@args) {
     $self->execute_command(qw(MONITOR) => @args)
 }
 
@@ -4611,8 +4391,7 @@ L<https://redis.io/commands/psync>
 
 =cut
 
-sub psync : method {
-    my ($self, @args) = @_;
+method psync (@args) {
     $self->execute_command(qw(PSYNC) => @args)
 }
 
@@ -4624,8 +4403,7 @@ L<https://redis.io/commands/replconf>
 
 =cut
 
-sub replconf : method {
-    my ($self, @args) = @_;
+method replconf (@args) {
     $self->execute_command(qw(REPLCONF) => @args)
 }
 
@@ -4645,8 +4423,7 @@ L<https://redis.io/commands/replicaof>
 
 =cut
 
-sub replicaof : method {
-    my ($self, @args) = @_;
+method replicaof (@args) {
     $self->execute_command(qw(REPLICAOF) => @args)
 }
 
@@ -4658,8 +4435,7 @@ L<https://redis.io/commands/restore-asking>
 
 =cut
 
-sub restore_asking : method {
-    my ($self, @args) = @_;
+method restore_asking (@args) {
     $self->execute_command(qw(RESTORE-ASKING) => @args)
 }
 
@@ -4671,8 +4447,7 @@ L<https://redis.io/commands/role>
 
 =cut
 
-sub role : method {
-    my ($self, @args) = @_;
+method role (@args) {
     $self->execute_command(qw(ROLE) => @args)
 }
 
@@ -4684,8 +4459,7 @@ L<https://redis.io/commands/save>
 
 =cut
 
-sub save : method {
-    my ($self, @args) = @_;
+method save (@args) {
     $self->execute_command(qw(SAVE) => @args)
 }
 
@@ -4709,8 +4483,7 @@ L<https://redis.io/commands/shutdown>
 
 =cut
 
-sub shutdown : method {
-    my ($self, @args) = @_;
+method shutdown (@args) {
     $self->execute_command(qw(SHUTDOWN) => @args)
 }
 
@@ -4730,8 +4503,7 @@ L<https://redis.io/commands/slaveof>
 
 =cut
 
-sub slaveof : method {
-    my ($self, @args) = @_;
+method slaveof (@args) {
     $self->execute_command(qw(SLAVEOF) => @args)
 }
 
@@ -4749,8 +4521,7 @@ L<https://redis.io/commands/slowlog-get>
 
 =cut
 
-sub slowlog_get : method {
-    my ($self, @args) = @_;
+method slowlog_get (@args) {
     $self->execute_command(qw(SLOWLOG GET) => @args)
 }
 
@@ -4762,8 +4533,7 @@ L<https://redis.io/commands/slowlog-len>
 
 =cut
 
-sub slowlog_len : method {
-    my ($self, @args) = @_;
+method slowlog_len (@args) {
     $self->execute_command(qw(SLOWLOG LEN) => @args)
 }
 
@@ -4775,8 +4545,7 @@ L<https://redis.io/commands/slowlog-reset>
 
 =cut
 
-sub slowlog_reset : method {
-    my ($self, @args) = @_;
+method slowlog_reset (@args) {
     $self->execute_command(qw(SLOWLOG RESET) => @args)
 }
 
@@ -4796,8 +4565,7 @@ L<https://redis.io/commands/swapdb>
 
 =cut
 
-sub swapdb : method {
-    my ($self, @args) = @_;
+method swapdb (@args) {
     $self->execute_command(qw(SWAPDB) => @args)
 }
 
@@ -4809,8 +4577,7 @@ L<https://redis.io/commands/sync>
 
 =cut
 
-sub sync : method {
-    my ($self, @args) = @_;
+method sync (@args) {
     $self->execute_command(qw(SYNC) => @args)
 }
 
@@ -4822,8 +4589,7 @@ L<https://redis.io/commands/time>
 
 =cut
 
-sub time : method {
-    my ($self, @args) = @_;
+method time (@args) {
     $self->execute_command(qw(TIME) => @args)
 }
 
@@ -4845,8 +4611,7 @@ L<https://redis.io/commands/sadd>
 
 =cut
 
-sub sadd : method {
-    my ($self, @args) = @_;
+method sadd (@args) {
     $self->execute_command(qw(SADD) => @args)
 }
 
@@ -4864,8 +4629,7 @@ L<https://redis.io/commands/scard>
 
 =cut
 
-sub scard : method {
-    my ($self, @args) = @_;
+method scard (@args) {
     $self->execute_command(qw(SCARD) => @args)
 }
 
@@ -4883,8 +4647,7 @@ L<https://redis.io/commands/sdiff>
 
 =cut
 
-sub sdiff : method {
-    my ($self, @args) = @_;
+method sdiff (@args) {
     $self->execute_command(qw(SDIFF) => @args)
 }
 
@@ -4904,8 +4667,7 @@ L<https://redis.io/commands/sdiffstore>
 
 =cut
 
-sub sdiffstore : method {
-    my ($self, @args) = @_;
+method sdiffstore (@args) {
     $self->execute_command(qw(SDIFFSTORE) => @args)
 }
 
@@ -4923,8 +4685,7 @@ L<https://redis.io/commands/sinter>
 
 =cut
 
-sub sinter : method {
-    my ($self, @args) = @_;
+method sinter (@args) {
     $self->execute_command(qw(SINTER) => @args)
 }
 
@@ -4946,8 +4707,7 @@ L<https://redis.io/commands/sintercard>
 
 =cut
 
-sub sintercard : method {
-    my ($self, @args) = @_;
+method sintercard (@args) {
     $self->execute_command(qw(SINTERCARD) => @args)
 }
 
@@ -4967,8 +4727,7 @@ L<https://redis.io/commands/sinterstore>
 
 =cut
 
-sub sinterstore : method {
-    my ($self, @args) = @_;
+method sinterstore (@args) {
     $self->execute_command(qw(SINTERSTORE) => @args)
 }
 
@@ -4988,8 +4747,7 @@ L<https://redis.io/commands/sismember>
 
 =cut
 
-sub sismember : method {
-    my ($self, @args) = @_;
+method sismember (@args) {
     $self->execute_command(qw(SISMEMBER) => @args)
 }
 
@@ -5007,8 +4765,7 @@ L<https://redis.io/commands/smembers>
 
 =cut
 
-sub smembers : method {
-    my ($self, @args) = @_;
+method smembers (@args) {
     $self->execute_command(qw(SMEMBERS) => @args)
 }
 
@@ -5028,8 +4785,7 @@ L<https://redis.io/commands/smismember>
 
 =cut
 
-sub smismember : method {
-    my ($self, @args) = @_;
+method smismember (@args) {
     $self->execute_command(qw(SMISMEMBER) => @args)
 }
 
@@ -5051,8 +4807,7 @@ L<https://redis.io/commands/smove>
 
 =cut
 
-sub smove : method {
-    my ($self, @args) = @_;
+method smove (@args) {
     $self->execute_command(qw(SMOVE) => @args)
 }
 
@@ -5072,8 +4827,7 @@ L<https://redis.io/commands/spop>
 
 =cut
 
-sub spop : method {
-    my ($self, @args) = @_;
+method spop (@args) {
     $self->execute_command(qw(SPOP) => @args)
 }
 
@@ -5093,8 +4847,7 @@ L<https://redis.io/commands/srandmember>
 
 =cut
 
-sub srandmember : method {
-    my ($self, @args) = @_;
+method srandmember (@args) {
     $self->execute_command(qw(SRANDMEMBER) => @args)
 }
 
@@ -5114,8 +4867,7 @@ L<https://redis.io/commands/srem>
 
 =cut
 
-sub srem : method {
-    my ($self, @args) = @_;
+method srem (@args) {
     $self->execute_command(qw(SREM) => @args)
 }
 
@@ -5139,8 +4891,7 @@ L<https://redis.io/commands/sscan>
 
 =cut
 
-sub sscan : method {
-    my ($self, @args) = @_;
+method sscan (@args) {
     $self->execute_command(qw(SSCAN) => @args)
 }
 
@@ -5158,8 +4909,7 @@ L<https://redis.io/commands/sunion>
 
 =cut
 
-sub sunion : method {
-    my ($self, @args) = @_;
+method sunion (@args) {
     $self->execute_command(qw(SUNION) => @args)
 }
 
@@ -5179,8 +4929,7 @@ L<https://redis.io/commands/sunionstore>
 
 =cut
 
-sub sunionstore : method {
-    my ($self, @args) = @_;
+method sunionstore (@args) {
     $self->execute_command(qw(SUNIONSTORE) => @args)
 }
 
@@ -5208,8 +4957,7 @@ L<https://redis.io/commands/bzmpop>
 
 =cut
 
-sub bzmpop : method {
-    my ($self, @args) = @_;
+method bzmpop (@args) {
     $self->execute_command(qw(BZMPOP) => @args)
 }
 
@@ -5229,8 +4977,7 @@ L<https://redis.io/commands/bzpopmax>
 
 =cut
 
-sub bzpopmax : method {
-    my ($self, @args) = @_;
+method bzpopmax (@args) {
     $self->execute_command(qw(BZPOPMAX) => @args)
 }
 
@@ -5250,8 +4997,7 @@ L<https://redis.io/commands/bzpopmin>
 
 =cut
 
-sub bzpopmin : method {
-    my ($self, @args) = @_;
+method bzpopmin (@args) {
     $self->execute_command(qw(BZPOPMIN) => @args)
 }
 
@@ -5279,8 +5025,7 @@ L<https://redis.io/commands/zadd>
 
 =cut
 
-sub zadd : method {
-    my ($self, @args) = @_;
+method zadd (@args) {
     $self->execute_command(qw(ZADD) => @args)
 }
 
@@ -5298,8 +5043,7 @@ L<https://redis.io/commands/zcard>
 
 =cut
 
-sub zcard : method {
-    my ($self, @args) = @_;
+method zcard (@args) {
     $self->execute_command(qw(ZCARD) => @args)
 }
 
@@ -5321,8 +5065,7 @@ L<https://redis.io/commands/zcount>
 
 =cut
 
-sub zcount : method {
-    my ($self, @args) = @_;
+method zcount (@args) {
     $self->execute_command(qw(ZCOUNT) => @args)
 }
 
@@ -5344,8 +5087,7 @@ L<https://redis.io/commands/zdiff>
 
 =cut
 
-sub zdiff : method {
-    my ($self, @args) = @_;
+method zdiff (@args) {
     $self->execute_command(qw(ZDIFF) => @args)
 }
 
@@ -5367,8 +5109,7 @@ L<https://redis.io/commands/zdiffstore>
 
 =cut
 
-sub zdiffstore : method {
-    my ($self, @args) = @_;
+method zdiffstore (@args) {
     $self->execute_command(qw(ZDIFFSTORE) => @args)
 }
 
@@ -5390,8 +5131,7 @@ L<https://redis.io/commands/zincrby>
 
 =cut
 
-sub zincrby : method {
-    my ($self, @args) = @_;
+method zincrby (@args) {
     $self->execute_command(qw(ZINCRBY) => @args)
 }
 
@@ -5417,8 +5157,7 @@ L<https://redis.io/commands/zinter>
 
 =cut
 
-sub zinter : method {
-    my ($self, @args) = @_;
+method zinter (@args) {
     $self->execute_command(qw(ZINTER) => @args)
 }
 
@@ -5440,8 +5179,7 @@ L<https://redis.io/commands/zintercard>
 
 =cut
 
-sub zintercard : method {
-    my ($self, @args) = @_;
+method zintercard (@args) {
     $self->execute_command(qw(ZINTERCARD) => @args)
 }
 
@@ -5467,8 +5205,7 @@ L<https://redis.io/commands/zinterstore>
 
 =cut
 
-sub zinterstore : method {
-    my ($self, @args) = @_;
+method zinterstore (@args) {
     $self->execute_command(qw(ZINTERSTORE) => @args)
 }
 
@@ -5490,8 +5227,7 @@ L<https://redis.io/commands/zlexcount>
 
 =cut
 
-sub zlexcount : method {
-    my ($self, @args) = @_;
+method zlexcount (@args) {
     $self->execute_command(qw(ZLEXCOUNT) => @args)
 }
 
@@ -5515,8 +5251,7 @@ L<https://redis.io/commands/zmpop>
 
 =cut
 
-sub zmpop : method {
-    my ($self, @args) = @_;
+method zmpop (@args) {
     $self->execute_command(qw(ZMPOP) => @args)
 }
 
@@ -5536,8 +5271,7 @@ L<https://redis.io/commands/zmscore>
 
 =cut
 
-sub zmscore : method {
-    my ($self, @args) = @_;
+method zmscore (@args) {
     $self->execute_command(qw(ZMSCORE) => @args)
 }
 
@@ -5557,8 +5291,7 @@ L<https://redis.io/commands/zpopmax>
 
 =cut
 
-sub zpopmax : method {
-    my ($self, @args) = @_;
+method zpopmax (@args) {
     $self->execute_command(qw(ZPOPMAX) => @args)
 }
 
@@ -5578,8 +5311,7 @@ L<https://redis.io/commands/zpopmin>
 
 =cut
 
-sub zpopmin : method {
-    my ($self, @args) = @_;
+method zpopmin (@args) {
     $self->execute_command(qw(ZPOPMIN) => @args)
 }
 
@@ -5599,8 +5331,7 @@ L<https://redis.io/commands/zrandmember>
 
 =cut
 
-sub zrandmember : method {
-    my ($self, @args) = @_;
+method zrandmember (@args) {
     $self->execute_command(qw(ZRANDMEMBER) => @args)
 }
 
@@ -5630,8 +5361,7 @@ L<https://redis.io/commands/zrange>
 
 =cut
 
-sub zrange : method {
-    my ($self, @args) = @_;
+method zrange (@args) {
     $self->execute_command(qw(ZRANGE) => @args)
 }
 
@@ -5655,8 +5385,7 @@ L<https://redis.io/commands/zrangebylex>
 
 =cut
 
-sub zrangebylex : method {
-    my ($self, @args) = @_;
+method zrangebylex (@args) {
     $self->execute_command(qw(ZRANGEBYLEX) => @args)
 }
 
@@ -5682,8 +5411,7 @@ L<https://redis.io/commands/zrangebyscore>
 
 =cut
 
-sub zrangebyscore : method {
-    my ($self, @args) = @_;
+method zrangebyscore (@args) {
     $self->execute_command(qw(ZRANGEBYSCORE) => @args)
 }
 
@@ -5713,8 +5441,7 @@ L<https://redis.io/commands/zrangestore>
 
 =cut
 
-sub zrangestore : method {
-    my ($self, @args) = @_;
+method zrangestore (@args) {
     $self->execute_command(qw(ZRANGESTORE) => @args)
 }
 
@@ -5734,8 +5461,7 @@ L<https://redis.io/commands/zrank>
 
 =cut
 
-sub zrank : method {
-    my ($self, @args) = @_;
+method zrank (@args) {
     $self->execute_command(qw(ZRANK) => @args)
 }
 
@@ -5755,8 +5481,7 @@ L<https://redis.io/commands/zrem>
 
 =cut
 
-sub zrem : method {
-    my ($self, @args) = @_;
+method zrem (@args) {
     $self->execute_command(qw(ZREM) => @args)
 }
 
@@ -5778,8 +5503,7 @@ L<https://redis.io/commands/zremrangebylex>
 
 =cut
 
-sub zremrangebylex : method {
-    my ($self, @args) = @_;
+method zremrangebylex (@args) {
     $self->execute_command(qw(ZREMRANGEBYLEX) => @args)
 }
 
@@ -5801,8 +5525,7 @@ L<https://redis.io/commands/zremrangebyrank>
 
 =cut
 
-sub zremrangebyrank : method {
-    my ($self, @args) = @_;
+method zremrangebyrank (@args) {
     $self->execute_command(qw(ZREMRANGEBYRANK) => @args)
 }
 
@@ -5824,8 +5547,7 @@ L<https://redis.io/commands/zremrangebyscore>
 
 =cut
 
-sub zremrangebyscore : method {
-    my ($self, @args) = @_;
+method zremrangebyscore (@args) {
     $self->execute_command(qw(ZREMRANGEBYSCORE) => @args)
 }
 
@@ -5849,8 +5571,7 @@ L<https://redis.io/commands/zrevrange>
 
 =cut
 
-sub zrevrange : method {
-    my ($self, @args) = @_;
+method zrevrange (@args) {
     $self->execute_command(qw(ZREVRANGE) => @args)
 }
 
@@ -5874,8 +5595,7 @@ L<https://redis.io/commands/zrevrangebylex>
 
 =cut
 
-sub zrevrangebylex : method {
-    my ($self, @args) = @_;
+method zrevrangebylex (@args) {
     $self->execute_command(qw(ZREVRANGEBYLEX) => @args)
 }
 
@@ -5901,8 +5621,7 @@ L<https://redis.io/commands/zrevrangebyscore>
 
 =cut
 
-sub zrevrangebyscore : method {
-    my ($self, @args) = @_;
+method zrevrangebyscore (@args) {
     $self->execute_command(qw(ZREVRANGEBYSCORE) => @args)
 }
 
@@ -5922,8 +5641,7 @@ L<https://redis.io/commands/zrevrank>
 
 =cut
 
-sub zrevrank : method {
-    my ($self, @args) = @_;
+method zrevrank (@args) {
     $self->execute_command(qw(ZREVRANK) => @args)
 }
 
@@ -5947,8 +5665,7 @@ L<https://redis.io/commands/zscan>
 
 =cut
 
-sub zscan : method {
-    my ($self, @args) = @_;
+method zscan (@args) {
     $self->execute_command(qw(ZSCAN) => @args)
 }
 
@@ -5968,8 +5685,7 @@ L<https://redis.io/commands/zscore>
 
 =cut
 
-sub zscore : method {
-    my ($self, @args) = @_;
+method zscore (@args) {
     $self->execute_command(qw(ZSCORE) => @args)
 }
 
@@ -5995,8 +5711,7 @@ L<https://redis.io/commands/zunion>
 
 =cut
 
-sub zunion : method {
-    my ($self, @args) = @_;
+method zunion (@args) {
     $self->execute_command(qw(ZUNION) => @args)
 }
 
@@ -6022,8 +5737,7 @@ L<https://redis.io/commands/zunionstore>
 
 =cut
 
-sub zunionstore : method {
-    my ($self, @args) = @_;
+method zunionstore (@args) {
     $self->execute_command(qw(ZUNIONSTORE) => @args)
 }
 
@@ -6047,8 +5761,7 @@ L<https://redis.io/commands/xack>
 
 =cut
 
-sub xack : method {
-    my ($self, @args) = @_;
+method xack (@args) {
     $self->execute_command(qw(XACK) => @args)
 }
 
@@ -6074,8 +5787,7 @@ L<https://redis.io/commands/xadd>
 
 =cut
 
-sub xadd : method {
-    my ($self, @args) = @_;
+method xadd (@args) {
     $self->execute_command(qw(XADD) => @args)
 }
 
@@ -6105,8 +5817,7 @@ L<https://redis.io/commands/xautoclaim>
 
 =cut
 
-sub xautoclaim : method {
-    my ($self, @args) = @_;
+method xautoclaim (@args) {
     $self->execute_command(qw(XAUTOCLAIM) => @args)
 }
 
@@ -6142,8 +5853,7 @@ L<https://redis.io/commands/xclaim>
 
 =cut
 
-sub xclaim : method {
-    my ($self, @args) = @_;
+method xclaim (@args) {
     $self->execute_command(qw(XCLAIM) => @args)
 }
 
@@ -6163,8 +5873,7 @@ L<https://redis.io/commands/xdel>
 
 =cut
 
-sub xdel : method {
-    my ($self, @args) = @_;
+method xdel (@args) {
     $self->execute_command(qw(XDEL) => @args)
 }
 
@@ -6190,8 +5899,7 @@ L<https://redis.io/commands/xgroup-create>
 
 =cut
 
-sub xgroup_create : method {
-    my ($self, @args) = @_;
+method xgroup_create (@args) {
     $self->execute_command(qw(XGROUP CREATE) => @args)
 }
 
@@ -6213,8 +5921,7 @@ L<https://redis.io/commands/xgroup-createconsumer>
 
 =cut
 
-sub xgroup_createconsumer : method {
-    my ($self, @args) = @_;
+method xgroup_createconsumer (@args) {
     $self->execute_command(qw(XGROUP CREATECONSUMER) => @args)
 }
 
@@ -6236,8 +5943,7 @@ L<https://redis.io/commands/xgroup-delconsumer>
 
 =cut
 
-sub xgroup_delconsumer : method {
-    my ($self, @args) = @_;
+method xgroup_delconsumer (@args) {
     $self->execute_command(qw(XGROUP DELCONSUMER) => @args)
 }
 
@@ -6257,8 +5963,7 @@ L<https://redis.io/commands/xgroup-destroy>
 
 =cut
 
-sub xgroup_destroy : method {
-    my ($self, @args) = @_;
+method xgroup_destroy (@args) {
     $self->execute_command(qw(XGROUP DESTROY) => @args)
 }
 
@@ -6282,8 +5987,7 @@ L<https://redis.io/commands/xgroup-setid>
 
 =cut
 
-sub xgroup_setid : method {
-    my ($self, @args) = @_;
+method xgroup_setid (@args) {
     $self->execute_command(qw(XGROUP SETID) => @args)
 }
 
@@ -6303,8 +6007,7 @@ L<https://redis.io/commands/xinfo-consumers>
 
 =cut
 
-sub xinfo_consumers : method {
-    my ($self, @args) = @_;
+method xinfo_consumers (@args) {
     $self->execute_command(qw(XINFO CONSUMERS) => @args)
 }
 
@@ -6322,8 +6025,7 @@ L<https://redis.io/commands/xinfo-groups>
 
 =cut
 
-sub xinfo_groups : method {
-    my ($self, @args) = @_;
+method xinfo_groups (@args) {
     $self->execute_command(qw(XINFO GROUPS) => @args)
 }
 
@@ -6343,8 +6045,7 @@ L<https://redis.io/commands/xinfo-stream>
 
 =cut
 
-sub xinfo_stream : method {
-    my ($self, @args) = @_;
+method xinfo_stream (@args) {
     $self->execute_command(qw(XINFO STREAM) => @args)
 }
 
@@ -6362,8 +6063,7 @@ L<https://redis.io/commands/xlen>
 
 =cut
 
-sub xlen : method {
-    my ($self, @args) = @_;
+method xlen (@args) {
     $self->execute_command(qw(XLEN) => @args)
 }
 
@@ -6385,8 +6085,7 @@ L<https://redis.io/commands/xpending>
 
 =cut
 
-sub xpending : method {
-    my ($self, @args) = @_;
+method xpending (@args) {
     $self->execute_command(qw(XPENDING) => @args)
 }
 
@@ -6410,8 +6109,7 @@ L<https://redis.io/commands/xrange>
 
 =cut
 
-sub xrange : method {
-    my ($self, @args) = @_;
+method xrange (@args) {
     $self->execute_command(qw(XRANGE) => @args)
 }
 
@@ -6433,10 +6131,9 @@ L<https://redis.io/commands/xread>
 
 =cut
 
-sub xread : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(XREAD) => @args)
-}
+# method xread (@args) {
+#     $self->execute_command(qw(XREAD) => @args)
+# }
 
 =head2 xreadgroup
 
@@ -6460,10 +6157,9 @@ L<https://redis.io/commands/xreadgroup>
 
 =cut
 
-sub xreadgroup : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(XREADGROUP) => @args)
-}
+# method xreadgroup (@args) {
+#     $self->execute_command(qw(XREADGROUP) => @args)
+# }
 
 =head2 xrevrange
 
@@ -6485,8 +6181,7 @@ L<https://redis.io/commands/xrevrange>
 
 =cut
 
-sub xrevrange : method {
-    my ($self, @args) = @_;
+method xrevrange (@args) {
     $self->execute_command(qw(XREVRANGE) => @args)
 }
 
@@ -6510,8 +6205,7 @@ L<https://redis.io/commands/xsetid>
 
 =cut
 
-sub xsetid : method {
-    my ($self, @args) = @_;
+method xsetid (@args) {
     $self->execute_command(qw(XSETID) => @args)
 }
 
@@ -6531,8 +6225,7 @@ L<https://redis.io/commands/xtrim>
 
 =cut
 
-sub xtrim : method {
-    my ($self, @args) = @_;
+method xtrim (@args) {
     $self->execute_command(qw(XTRIM) => @args)
 }
 
@@ -6554,8 +6247,7 @@ L<https://redis.io/commands/append>
 
 =cut
 
-sub append : method {
-    my ($self, @args) = @_;
+method append (@args) {
     $self->execute_command(qw(APPEND) => @args)
 }
 
@@ -6573,8 +6265,7 @@ L<https://redis.io/commands/decr>
 
 =cut
 
-sub decr : method {
-    my ($self, @args) = @_;
+method decr (@args) {
     $self->execute_command(qw(DECR) => @args)
 }
 
@@ -6594,8 +6285,7 @@ L<https://redis.io/commands/decrby>
 
 =cut
 
-sub decrby : method {
-    my ($self, @args) = @_;
+method decrby (@args) {
     $self->execute_command(qw(DECRBY) => @args)
 }
 
@@ -6613,10 +6303,9 @@ L<https://redis.io/commands/get>
 
 =cut
 
-sub get : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(GET) => @args)
-}
+# method get (@args) {
+#     $self->execute_command(qw(GET) => @args)
+# }
 
 =head2 getdel
 
@@ -6632,8 +6321,7 @@ L<https://redis.io/commands/getdel>
 
 =cut
 
-sub getdel : method {
-    my ($self, @args) = @_;
+method getdel (@args) {
     $self->execute_command(qw(GETDEL) => @args)
 }
 
@@ -6653,8 +6341,7 @@ L<https://redis.io/commands/getex>
 
 =cut
 
-sub getex : method {
-    my ($self, @args) = @_;
+method getex (@args) {
     $self->execute_command(qw(GETEX) => @args)
 }
 
@@ -6676,8 +6363,7 @@ L<https://redis.io/commands/getrange>
 
 =cut
 
-sub getrange : method {
-    my ($self, @args) = @_;
+method getrange (@args) {
     $self->execute_command(qw(GETRANGE) => @args)
 }
 
@@ -6697,8 +6383,7 @@ L<https://redis.io/commands/getset>
 
 =cut
 
-sub getset : method {
-    my ($self, @args) = @_;
+method getset (@args) {
     $self->execute_command(qw(GETSET) => @args)
 }
 
@@ -6716,8 +6401,7 @@ L<https://redis.io/commands/incr>
 
 =cut
 
-sub incr : method {
-    my ($self, @args) = @_;
+method incr (@args) {
     $self->execute_command(qw(INCR) => @args)
 }
 
@@ -6737,8 +6421,7 @@ L<https://redis.io/commands/incrby>
 
 =cut
 
-sub incrby : method {
-    my ($self, @args) = @_;
+method incrby (@args) {
     $self->execute_command(qw(INCRBY) => @args)
 }
 
@@ -6758,8 +6441,7 @@ L<https://redis.io/commands/incrbyfloat>
 
 =cut
 
-sub incrbyfloat : method {
-    my ($self, @args) = @_;
+method incrbyfloat (@args) {
     $self->execute_command(qw(INCRBYFLOAT) => @args)
 }
 
@@ -6787,8 +6469,7 @@ L<https://redis.io/commands/lcs>
 
 =cut
 
-sub lcs : method {
-    my ($self, @args) = @_;
+method lcs (@args) {
     $self->execute_command(qw(LCS) => @args)
 }
 
@@ -6806,8 +6487,7 @@ L<https://redis.io/commands/mget>
 
 =cut
 
-sub mget : method {
-    my ($self, @args) = @_;
+method mget (@args) {
     $self->execute_command(qw(MGET) => @args)
 }
 
@@ -6825,8 +6505,7 @@ L<https://redis.io/commands/mset>
 
 =cut
 
-sub mset : method {
-    my ($self, @args) = @_;
+method mset (@args) {
     $self->execute_command(qw(MSET) => @args)
 }
 
@@ -6844,8 +6523,7 @@ L<https://redis.io/commands/msetnx>
 
 =cut
 
-sub msetnx : method {
-    my ($self, @args) = @_;
+method msetnx (@args) {
     $self->execute_command(qw(MSETNX) => @args)
 }
 
@@ -6867,8 +6545,7 @@ L<https://redis.io/commands/psetex>
 
 =cut
 
-sub psetex : method {
-    my ($self, @args) = @_;
+method psetex (@args) {
     $self->execute_command(qw(PSETEX) => @args)
 }
 
@@ -6894,8 +6571,7 @@ L<https://redis.io/commands/set>
 
 =cut
 
-sub set : method {
-    my ($self, @args) = @_;
+method set (@args) {
     $self->execute_command(qw(SET) => @args)
 }
 
@@ -6917,8 +6593,7 @@ L<https://redis.io/commands/setex>
 
 =cut
 
-sub setex : method {
-    my ($self, @args) = @_;
+method setex (@args) {
     $self->execute_command(qw(SETEX) => @args)
 }
 
@@ -6938,8 +6613,7 @@ L<https://redis.io/commands/setnx>
 
 =cut
 
-sub setnx : method {
-    my ($self, @args) = @_;
+method setnx (@args) {
     $self->execute_command(qw(SETNX) => @args)
 }
 
@@ -6961,8 +6635,7 @@ L<https://redis.io/commands/setrange>
 
 =cut
 
-sub setrange : method {
-    my ($self, @args) = @_;
+method setrange (@args) {
     $self->execute_command(qw(SETRANGE) => @args)
 }
 
@@ -6980,8 +6653,7 @@ L<https://redis.io/commands/strlen>
 
 =cut
 
-sub strlen : method {
-    my ($self, @args) = @_;
+method strlen (@args) {
     $self->execute_command(qw(STRLEN) => @args)
 }
 
@@ -7003,8 +6675,7 @@ L<https://redis.io/commands/substr>
 
 =cut
 
-sub substr : method {
-    my ($self, @args) = @_;
+method substr (@args) {
     $self->execute_command(qw(SUBSTR) => @args)
 }
 
@@ -7018,8 +6689,7 @@ L<https://redis.io/commands/discard>
 
 =cut
 
-sub discard : method {
-    my ($self, @args) = @_;
+method discard (@args) {
     $self->execute_command(qw(DISCARD) => @args)
 }
 
@@ -7031,8 +6701,7 @@ L<https://redis.io/commands/exec>
 
 =cut
 
-sub exec : method {
-    my ($self, @args) = @_;
+method exec (@args) {
     $self->execute_command(qw(EXEC) => @args)
 }
 
@@ -7044,10 +6713,9 @@ L<https://redis.io/commands/multi>
 
 =cut
 
-sub multi : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(MULTI) => @args)
-}
+# method multi (@args) {
+#     $self->execute_command(qw(MULTI) => @args)
+# }
 
 =head2 unwatch
 
@@ -7057,8 +6725,7 @@ L<https://redis.io/commands/unwatch>
 
 =cut
 
-sub unwatch : method {
-    my ($self, @args) = @_;
+method unwatch (@args) {
     $self->execute_command(qw(UNWATCH) => @args)
 }
 
@@ -7076,8 +6743,7 @@ L<https://redis.io/commands/watch>
 
 =cut
 
-sub watch : method {
-    my ($self, @args) = @_;
+method watch (@args) {
     $self->execute_command(qw(WATCH) => @args)
 }
 
@@ -7094,8 +6760,7 @@ would call C<< ->xgroup_create >>.
 
 =cut
 
-sub acl : method {
-    my ($self, $cmd, @args) = @_;
+method acl ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "acl_" . lc($cmd);
     return $self->$method(@args);
@@ -7105,8 +6770,7 @@ sub acl : method {
 
 =cut
 
-sub client : method {
-    my ($self, $cmd, @args) = @_;
+method client ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "client_" . lc($cmd);
     return $self->$method(@args);
@@ -7116,8 +6780,7 @@ sub client : method {
 
 =cut
 
-sub client_no : method {
-    my ($self, $cmd, @args) = @_;
+method client_no ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "client_no_" . lc($cmd);
     return $self->$method(@args);
@@ -7127,8 +6790,7 @@ sub client_no : method {
 
 =cut
 
-sub cluster : method {
-    my ($self, $cmd, @args) = @_;
+method cluster ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "cluster_" . lc($cmd);
     return $self->$method(@args);
@@ -7138,8 +6800,7 @@ sub cluster : method {
 
 =cut
 
-sub cluster_count : method {
-    my ($self, $cmd, @args) = @_;
+method cluster_count ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "cluster_count_" . lc($cmd);
     return $self->$method(@args);
@@ -7149,8 +6810,7 @@ sub cluster_count : method {
 
 =cut
 
-sub cluster_count_failure : method {
-    my ($self, $cmd, @args) = @_;
+method cluster_count_failure ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "cluster_count_failure_" . lc($cmd);
     return $self->$method(@args);
@@ -7160,8 +6820,7 @@ sub cluster_count_failure : method {
 
 =cut
 
-sub cluster_set : method {
-    my ($self, $cmd, @args) = @_;
+method cluster_set ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "cluster_set_" . lc($cmd);
     return $self->$method(@args);
@@ -7171,8 +6830,7 @@ sub cluster_set : method {
 
 =cut
 
-sub cluster_set_config : method {
-    my ($self, $cmd, @args) = @_;
+method cluster_set_config ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "cluster_set_config_" . lc($cmd);
     return $self->$method(@args);
@@ -7182,8 +6840,7 @@ sub cluster_set_config : method {
 
 =cut
 
-sub config : method {
-    my ($self, $cmd, @args) = @_;
+method config ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "config_" . lc($cmd);
     return $self->$method(@args);
@@ -7193,8 +6850,7 @@ sub config : method {
 
 =cut
 
-sub function : method {
-    my ($self, $cmd, @args) = @_;
+method function ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "function_" . lc($cmd);
     return $self->$method(@args);
@@ -7204,8 +6860,7 @@ sub function : method {
 
 =cut
 
-sub latency : method {
-    my ($self, $cmd, @args) = @_;
+method latency ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "latency_" . lc($cmd);
     return $self->$method(@args);
@@ -7215,8 +6870,7 @@ sub latency : method {
 
 =cut
 
-sub memory : method {
-    my ($self, $cmd, @args) = @_;
+method memory ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "memory_" . lc($cmd);
     return $self->$method(@args);
@@ -7226,8 +6880,7 @@ sub memory : method {
 
 =cut
 
-sub memory_malloc : method {
-    my ($self, $cmd, @args) = @_;
+method memory_malloc ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "memory_malloc_" . lc($cmd);
     return $self->$method(@args);
@@ -7237,8 +6890,7 @@ sub memory_malloc : method {
 
 =cut
 
-sub module : method {
-    my ($self, $cmd, @args) = @_;
+method module ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "module_" . lc($cmd);
     return $self->$method(@args);
@@ -7248,8 +6900,7 @@ sub module : method {
 
 =cut
 
-sub object : method {
-    my ($self, $cmd, @args) = @_;
+method object ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "object_" . lc($cmd);
     return $self->$method(@args);
@@ -7259,8 +6910,7 @@ sub object : method {
 
 =cut
 
-sub pubsub : method {
-    my ($self, $cmd, @args) = @_;
+method pubsub ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "pubsub_" . lc($cmd);
     return $self->$method(@args);
@@ -7270,8 +6920,7 @@ sub pubsub : method {
 
 =cut
 
-sub script : method {
-    my ($self, $cmd, @args) = @_;
+method script ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "script_" . lc($cmd);
     return $self->$method(@args);
@@ -7281,8 +6930,7 @@ sub script : method {
 
 =cut
 
-sub slowlog : method {
-    my ($self, $cmd, @args) = @_;
+method slowlog ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "slowlog_" . lc($cmd);
     return $self->$method(@args);
@@ -7292,8 +6940,7 @@ sub slowlog : method {
 
 =cut
 
-sub xgroup : method {
-    my ($self, $cmd, @args) = @_;
+method xgroup ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "xgroup_" . lc($cmd);
     return $self->$method(@args);
@@ -7303,8 +6950,7 @@ sub xgroup : method {
 
 =cut
 
-sub xinfo : method {
-    my ($self, $cmd, @args) = @_;
+method xinfo ($cmd, @args) {
     $cmd =~ tr/ /_/;
     my $method = "xinfo_" . lc($cmd);
     return $self->$method(@args);

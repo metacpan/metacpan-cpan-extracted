@@ -54,13 +54,13 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.067'
+    version: '0.068'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.067'
+    version: '0.068'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.067'
+    version: '0.068'
 requires:
   Carp: '0'
   Encode: '2.89'
@@ -68,7 +68,7 @@ requires:
   File::ShareDir: '0'
   JSON::Schema::Modern: '0.578'
   JSON::Schema::Modern::Document: '0'
-  JSON::Schema::Modern::Utilities: '0.583'
+  JSON::Schema::Modern::Utilities: '0.585'
   JSON::Schema::Modern::Vocabulary: '0'
   List::Util: '0'
   Math::BigInt: '1.999701'
@@ -96,10 +96,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/OpenAPI-Modern
   repository: https://github.com/karenetheridge/OpenAPI-Modern.git
-version: '0.067'
+version: '0.068'
 x_Dist_Zilla:
   perl:
-    version: '5.041002'
+    version: '5.041003'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -256,8 +256,9 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Test::CPAN::Changes:
           changelog: Changes
+          filename: xt/release/cpan-changes.t
       name: '@Author::ETHER/Test::CPAN::Changes'
-      version: '0.012'
+      version: '0.013'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@Author::ETHER/Test::ChangesHasContent'
@@ -602,7 +603,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20240720'
+          Module::CoreList: '5.20240829'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -766,7 +767,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.067
+          tag: v0.068
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -952,7 +953,7 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.032'
 x_authority: cpan:ETHER
-x_generated_by_perl: v5.41.2
+x_generated_by_perl: v5.41.3
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

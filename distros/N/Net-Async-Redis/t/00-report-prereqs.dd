@@ -37,6 +37,7 @@ do { my $x = {
                                       'Dir::Self' => '0',
                                       'File::ShareDir' => '0',
                                       'File::ShareDir::Install' => '0',
+                                      'Full::Class' => '1.000',
                                       'Future' => '0.47',
                                       'Future::AsyncAwait' => '0.48',
                                       'Future::Queue' => '0.50',

@@ -34,7 +34,7 @@
          "requires" : {
             "Circle::Block" : "0.02",
             "Circle::Node" : "0.02",
-            "Circle::User" : "0.02",
+            "Circle::User" : "0.05",
             "Circle::Wallet" : "0.02",
             "perl" : "5.006"
          }
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

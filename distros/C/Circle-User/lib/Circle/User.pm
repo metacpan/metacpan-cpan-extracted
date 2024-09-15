@@ -9,7 +9,7 @@ use File::Path qw(make_path);
 use File::Basename;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our @EXPORT  = qw(
   send_register_verify_code
   register
@@ -84,7 +84,8 @@ userId=$user_id
 $user_key=$user_value
 sessionKey=$session_key
 );
-    open my $fd, ":>encoding(utf8)", $full_path;
+    open my $fd, ">:encoding(utf8)", $full_path;
+
     print $fd $content;
     close($fd);
     chmod 0600, $full_path;
@@ -156,7 +157,7 @@ Circle::User - the user module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

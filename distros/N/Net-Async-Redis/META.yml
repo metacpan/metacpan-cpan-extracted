@@ -18,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,40 +34,40 @@ no_index:
 provides:
   Net::Async::Redis:
     file: lib/Net/Async/Redis.pm
-    version: '6.000'
+    version: '6.001'
   Net::Async::Redis::Cluster:
     file: lib/Net/Async/Redis/Cluster.pm
-    version: '6.000'
+    version: '6.001'
   Net::Async::Redis::Cluster::Multi:
     file: lib/Net/Async/Redis/Cluster/Multi.pm
-    version: '6.000'
+    version: '6.001'
   Net::Async::Redis::Cluster::Node:
     file: lib/Net/Async/Redis/Cluster/Node.pm
-    version: '6.000'
+    version: '6.001'
   Net::Async::Redis::Commands:
     file: lib/Net/Async/Redis/Commands.pm
-    version: '6.000'
+    version: '6.001'
   Net::Async::Redis::Multi:
     file: lib/Net/Async/Redis/Multi.pm
-    version: '6.000'
+    version: '6.001'
   Net::Async::Redis::Protocol:
     file: lib/Net/Async/Redis/Protocol.pm
-    version: '6.000'
+    version: '6.001'
   Net::Async::Redis::Server:
     file: lib/Net/Async/Redis/Server.pm
-    version: '6.000'
+    version: '6.001'
   Net::Async::Redis::Server::Connection:
     file: lib/Net/Async/Redis/Server/Connection.pm
-    version: '6.000'
+    version: '6.001'
   Net::Async::Redis::Server::Database:
     file: lib/Net/Async/Redis/Server/Database.pm
-    version: '6.000'
+    version: '6.001'
   Net::Async::Redis::Subscription:
     file: lib/Net/Async/Redis/Subscription.pm
-    version: '6.000'
+    version: '6.001'
   Net::Async::Redis::Subscription::Message:
     file: lib/Net/Async/Redis/Subscription/Message.pm
-    version: '6.000'
+    version: '6.001'
 recommends:
   OpenTelemetry: '0.018'
   OpenTelemetry::SDK: '0.020'
@@ -78,6 +78,7 @@ requires:
   Dir::Self: '0'
   File::ShareDir: '0'
   File::ShareDir::Install: '0'
+  Full::Class: '1.000'
   Future: '0.47'
   Future::AsyncAwait: '0.48'
   Future::Queue: '0.50'
@@ -103,7 +104,7 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: https://github.com/team-at-cpan/Net-Async-Redis
   repository: https://github.com/team-at-cpan/Net-Async-Redis.git
-version: '6.000'
+version: '6.001'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Eyad Arnabeh <eyadof@gmail.com>'
@@ -115,6 +116,6 @@ x_contributors:
   - 'Michael Mueller <michael.mueller@binary.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'shaydo-deriv <129739908+shaydo-deriv@users.noreply.github.com>'
-x_generated_by_perl: v5.38.0
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

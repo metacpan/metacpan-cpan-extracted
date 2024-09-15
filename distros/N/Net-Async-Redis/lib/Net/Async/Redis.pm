@@ -1,15 +1,11 @@
 package Net::Async::Redis;
 # ABSTRACT: Redis support for IO::Async
 
-use Object::Pad;
-class Net::Async::Redis :isa(IO::Async::Notifier);
-use strict;
-use warnings;
-use experimental qw(signatures);
+use Full::Class qw(:v1), extends => 'IO::Async::Notifier', does => [
+    'Net::Async::Redis::Commands'
+];
 
-use parent qw(Net::Async::Redis::Commands);
-
-our $VERSION = '6.000';
+our $VERSION = '6.001';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -59,7 +55,7 @@ Current features include:
 
 =over 4
 
-=item * L<all commands|https://redis.io/commands> as of 7.2 (August 2023), see L<https://redis.io/commands> for the methods and parameters
+=item * L<all commands|https://redis.io/commands> as of 7.4 (September 2024), see L<https://redis.io/commands> for the methods and parameters
 
 =item * L<pub/sub support|https://redis.io/topics/pubsub>, see L</METHODS - Subscriptions> including sharded pubsub
 
@@ -76,7 +72,7 @@ Current features include:
 =item * cluster support via L<Net::Async::Redis::Cluster>, including key specifications from L<https://redis.io/docs/reference/key-specs/> to route commands to
 the correct node(s)
 
-=item * see L<Net::Async::Redis::XS> for a faster XS version (can be 40x faster than the pure Perl version, particularly when parsing large L</xreadgroup> responses)
+=item * see L<Net::Async::Redis::XS> for a faster XS version (can be 40x faster than the pure Perl version, particularly when parsing large L<Net::Async::Redis::Commands/XREADGROUP> responses)
 
 =back
 
@@ -163,12 +159,6 @@ Note that this module uses L<Future::AsyncAwait> internally.
 
 =cut
 
-use mro;
-use Syntax::Keyword::Try;
-use Syntax::Keyword::Dynamically;
-use Syntax::Keyword::Match;
-use curry::weak;
-use Future::AsyncAwait;
 use Future::Queue;
 use IO::Async::Stream;
 use Ryu::Async;
@@ -180,7 +170,6 @@ use Path::Tiny;
 use Dir::Self;
 use File::ShareDir ();
 
-use Log::Any qw($log);
 use Metrics::Any qw($metrics), strict => 0;
 
 use List::Util qw(pairmap);
@@ -658,10 +647,9 @@ Returns a L<Future> which resolves to a L<Net::Async::Redis::Subscription> insta
 
 =cut
 
-async sub psubscribe {
-    my ($self, $pattern) = @_;
+async method psubscribe ($pattern) {
     $self->{pending_subscription_pattern_channel}{$pattern} //= $self->future('pattern_subscription[' . $pattern . ']');
-    await $self->next::method($pattern);
+    await $self->execute_command(qw(PSUBSCRIBE), $pattern);
     $self->{pubsub} //= 0;
     return $self->{subscription_pattern_channel}{$pattern} //= Net::Async::Redis::Subscription->new(
         redis   => $self,
@@ -693,12 +681,11 @@ Example:
 
 =cut
 
-async sub subscribe {
-    my ($self, @channels) = @_;
+async method subscribe (@channels) {
     my @pending = map {
         $self->{pending_subscription_channel}{$_} //= $self->future('subscription[' . $_ . ']')
     } @channels;
-    await $self->next::method(@channels);
+    await $self->execute_command(qw(SUBSCRIBE), @channels);
     $self->{pubsub} //= 0;
     await Future->wait_all(@pending);
     $log->tracef('Subscriptions established, we are go');
@@ -735,12 +722,11 @@ Example:
 
 =cut
 
-async sub ssubscribe {
-    my ($self, @channels) = @_;
+async method ssubscribe (@channels) {
     my @pending = map {
         $self->{pending_subscription_channel}{$_} //= $self->future('subscription[' . $_ . ']')
     } @channels;
-    await $self->next::method(@channels);
+    await $self->execute_command(qw(SSUBSCRIBE), @channels);
     $self->{pubsub} //= 0;
     await Future->wait_all(@pending);
     $log->tracef('Subscriptions established, we are go');
@@ -784,7 +770,7 @@ async method multi ($code) {
     my $multi = Net::Async::Redis::Multi->new(
         redis => $self,
     );
-    await $self->next::method;
+    await $self->execute_command(qw(MULTI));
     return await $multi->exec($code);
 }
 
@@ -877,7 +863,7 @@ method client_side_cache_size { $self->{client_side_cache_size} }
 # support in the Redis server covers other commands, though: eventually
 # we'll be extending this for all read commands.
 async method get ($k) {
-    return await $self->next::method($k) unless $self->is_client_side_cache_enabled;
+    return await $self->execute_command(qw(GET), $k) unless $self->is_client_side_cache_enabled;
 
     my $cache = $self->client_side_cache;
     $log->tracef('Check cache for [%s]', $k);
@@ -891,7 +877,7 @@ async method get ($k) {
     }
 
     $log->tracef('Key [%s] was not cached', $k);
-    my $f = $self->next::method($k);
+    my $f = $self->execute_command(qw(GET), $k);
     # Set our cache entry regardless of whether it completes
     # immediately or not...
     $cache->set(
@@ -922,7 +908,7 @@ async method get ($k) {
 
 method keys ($match) {
     $match //= '*';
-    return $self->next::method($match);
+    return $self->execute_command(qw(KEYS), $match);
 }
 
 =head2 watch_keyspace
@@ -944,8 +930,7 @@ Resolves to a L<Ryu::Source> instance.
 
 =cut
 
-async sub watch_keyspace {
-    my ($self, $pattern, $code) = @_;
+async method watch_keyspace ($pattern, $code) {
     $pattern //= '*';
     my $sub_name = '__keyspace@*__:' . $pattern;
     $self->{have_notify} ||= await $self->config_set(
@@ -1033,7 +1018,6 @@ method on_message ($data) {
 method complete_message ($data) {
     my $next = shift @{$self->{pending}} or die "No pending handler";
     $self->next_in_pipeline if @{$self->{awaiting_pipeline}};
-    return if $next->[1]->is_cancelled;
 
     # This shouldn't happen, preferably
     $log->errorf("our [%s] entry is ready, original was [%s]??", $data, $next->[0]) if $next->[1]->is_ready;
@@ -1256,9 +1240,7 @@ Queues the given command for execution.
 
 =cut
 
-sub execute_command {
-    my ($self, @cmd) = @_;
-
+method execute_command (@cmd) {
     # This represents the completion of the command
     my $f = $self->loop->new_future->set_label(
         $self->command_label(@cmd)
@@ -1280,8 +1262,10 @@ sub execute_command {
     }
     my $queue = $self->{_is_multi} // $self->command_queue;
     # We register this as a command we want to run - it'll be
-    # send to the server once nothing else is in the way
-    return $queue->push($item)->then(sub { $f })->retain;
+    # sent to the server once nothing else is in the way.
+    # We currently don't support cancellation - any attempt to
+    # do so will be ignored, the command will still be executed.
+    return $queue->push($item)->then(sub { $f })->retain->without_cancel;
 }
 
 method command_queue {
@@ -1294,31 +1278,42 @@ method command_queue {
         ),
         prototype => $self->future
     );
-    $self->{command_processing} = $self->command_processing->on_ready(sub { delete $self->{command_processing} });
+    $self->{command_processing} ||= $self->command_processing->on_ready(sub { delete $self->{command_processing} });
     return $queue;
 }
 
 async method command_processing {
-    my $queue = $self->{command_queue};
-    await $self->connected;
     while(1) {
+        await $self->connected;
+
         # An active MULTI always takes priority over regular commands
         if(my $queue = $self->{multi_queue}) {
-            while(my $next = await $queue->shift) {
-                $self->handle_command($next);
+            try {
+                while(my $next = await $queue->shift) {
+                    $self->handle_command($next);
+                }
+            } catch ($e) {
+                $log->errorf('Failed processing MULTI commands - %s', $e);
+                delete $self->{multi_queue};
+                die $e;
             }
             delete $self->{multi_queue};
+        } else {
+            my $queue = $self->{command_queue};
+            my $next = await $queue->shift
+                or last;
+            $self->handle_command($next);
         }
-        my $queue = $self->{command_queue};
-        my $next = await $queue->shift
-            or last;
-        $self->handle_command($next);
     }
 }
 
 method handle_command ($details) {
     my @cmd = $details->[0]->@*;
     my $f = $details->[1];
+    if($f->is_ready) {
+        $log->tracef('Ignoring command %s since it is marked as ', \@cmd, $f->state);
+        return $f;
+    }
 
     # First, the rules: pubsub or plain
     my $is_sub_command = (
@@ -1341,6 +1336,7 @@ method handle_command ($details) {
     # Void-context write allows IaStream to combine multiple writes on the same connection.
     $self->stream->write($data);
     if(lc($cmd[0]) eq 'multi') {
+        die 'Already processing MULTI, cannot start a new one' if $self->{multi_queue};
         $self->{multi_queue} = Future::Queue->new(
             (
                 $self->pipeline_depth
@@ -1354,7 +1350,7 @@ method handle_command ($details) {
 }
 
 async method xread (@args) {
-    my $response = await $self->next::method(@args);
+    my $response = await $self->execute_command(qw(XREAD), @args);
     return [] unless ref $response;
 
     # protocol_level is detected while connecting checking before this point is wrong.
@@ -1367,7 +1363,7 @@ async method xread (@args) {
 }
 
 async method xreadgroup (@args) {
-    my $response = await $self->next::method(@args);
+    my $response = await $self->execute_command(qw(XREADGROUP), @args);
     return [] unless ref $response;
 
     # protocol_level is detected while connecting checking before this point is wrong.
@@ -1422,8 +1418,8 @@ Factory method for creating new L<Future> instances.
 
 =cut
 
-method future {
-    return $self->loop->new_future(@_);
+method future (@args) {
+    return $self->loop->new_future(@args);
 }
 
 =head2 wire_protocol
@@ -1522,8 +1518,7 @@ are a restructured form of L<https://redis.io/commands/command>.
 
 =cut
 
-async sub retrieve_full_command_list {
-    my ($self) = @_;
+async method retrieve_full_command_list {
     my %data;
     my $commands = await $self->command_list;
     for my $command_name ($commands->@*) {

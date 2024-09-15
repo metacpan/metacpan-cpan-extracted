@@ -1,6 +1,11 @@
 
 Revision history for Full
 
+1.002     2024-09-15 13:01:09+08:00 Asia/Singapore
+    [New features]
+
+    - rôle support via Object::Pad
+
 1.001     2024-09-14 12:49:46+08:00 Asia/Singapore
     [Documentation]
 

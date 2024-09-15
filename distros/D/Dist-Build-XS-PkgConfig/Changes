@@ -1,5 +1,9 @@
 Revision history for Dist-Build-XS-PkgConfig
 
+0.002     2024-09-14 19:08:16+0200
+          - Allow library name as sole pkg_config argument
+          - Split out arguments into the different categories
+
 0.001     2024-09-13 22:10:16+0200
           - Initial release to an unsuspecting world
 

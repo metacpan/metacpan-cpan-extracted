@@ -1,5 +1,9 @@
 Revision history for Perl extension Log-Mini
 
+0.5.0 2024-09-14T18:27:59Z
+    - Allow logrotate even if app doesn't supports
+    - Support logging with context
+
 0.4.1 2024-04-03T21:58:26Z
     - Tidy
     - List::Util dependency was removed

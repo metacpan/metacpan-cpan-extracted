@@ -25,6 +25,9 @@ sub new
 
     $self->{'level'} = $params{'level'} || 'error';
 
+    $self->{_context} = [];
+    $self->{_context_string} = '';
+
     return $self;
 }
 
@@ -45,7 +48,7 @@ sub level
 {
     my $self = shift;
 
-    return $self->{level} || 'error';
+    return $self->{level};
 }
 
 sub log   { return shift->_log(@_) }
@@ -55,6 +58,55 @@ sub warn  { return shift->_log('warn',  @_) }
 sub debug { return shift->_log('debug', @_) }
 sub trace { return shift->_log('trace', @_) }
 
+sub push_context {
+    my $self = shift;
+    my ($context_string) = @_;
+
+    return unless $context_string;
+    
+    push @{$self->{_context}}, $context_string;
+
+    $self->{_context_string} = $self->_build_context_string();
+
+    return 1;
+}
+
+sub pop_context {
+    my $self = shift;
+
+    return unless scalar @{$self->{_context}};
+
+    pop @{$self->{_context}};
+
+    if (scalar @{$self->{_context}}) {
+        $self->{_context_string} = $self->_build_context_string();
+    }
+    else {
+        $self->{_context_string} = '';
+    }
+
+    return 1;
+}
+
+sub clear_context {
+    my $self = shift;
+
+    $self->{_context}        = [];
+    $self->{_context_string} = '';
+
+    return 1;
+}
+
+sub _build_context_string {
+    my $self = shift;
+
+
+    my $context_string = ' '.join ' ', @{$self->{_context}};
+    $context_string .= ':';
+
+    return $context_string;
+}
+
 sub _log
 {
     my $self    = shift;
@@ -63,7 +115,7 @@ sub _log
 
     return if $LEVELS->{$level} > $LEVELS->{$self->{'level'}};
     
-    my $text = sprintf("%s [%s] %s\n", $self->_getCurrentTime(), $level, $message);
+    my $text = sprintf("%s [%s]%s %s\n", $self->_getCurrentTime(), $level, $self->{_context_string}, $message);
     $text = sprintf($text, @_) if (@_);
 
     $self->_print($text);

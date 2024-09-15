@@ -8,6 +8,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
+
 use Safe::Isa;
 use List::Util 'pairs';
 use Mojo::Message::Request;
@@ -52,6 +54,8 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
 
     if ($TYPE eq 'plack' or $TYPE eq 'catalyst') {
       test_needs('Plack::Request', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
+      eval { +require HTTP::Headers::Fast::XS };
+
       $req = Plack::Request->new($req->to_psgi);
 
       # Plack is unable to distinguish between %2F and /, so the raw (undecoded) uri can be passed
@@ -62,6 +66,7 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
 
     if ($TYPE eq 'catalyst') {
       test_needs('Catalyst::Request', 'Catalyst::Log');
+
       $req = Catalyst::Request->new(
         _log => Catalyst::Log->new,
         method => $method,
@@ -109,6 +114,8 @@ sub response ($code, $headers = [], $body_content = undef) {
   }
   elsif ($TYPE eq 'plack') {
     test_needs('Plack::Response', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
+    eval { +require HTTP::Headers::Fast::XS };
+
     $res = Plack::Response->new($code, $headers, $body_content);
     $res->headers->header('Content-Length' => length $body_content)
       if defined $body_content and not defined $res->headers->header('Content-Length')
@@ -116,6 +123,7 @@ sub response ($code, $headers = [], $body_content = undef) {
   }
   elsif ($TYPE eq 'catalyst') {
     test_needs('Catalyst::Response');
+
     $res = Catalyst::Response->new(status => $code, body => $body_content);
     $res->headers->push_header(@$_) foreach pairs @$headers;
     $res->headers->header('Content-Length' => length $body_content)
@@ -134,6 +142,7 @@ sub uri ($uri_string, @path_parts) {
 
   my $uri;
   if ($TYPE eq 'lwp' or $TYPE eq 'plack' or $TYPE eq 'catalyst') {
+    test_needs('URI');
     $uri = URI->new($uri_string);
     $uri->path_segments(@path_parts) if @path_parts;
   }
@@ -234,6 +243,12 @@ sub cmp_result ($got, $expected, $test_name) {
   context_do {
     my $ctx = shift;
     my ($got, $expected, $test_name) = @_;
+
+    # dirty hack to check we always set operation_uri on success
+    $ctx->fail('missing operation_uri on successful call')
+      if $expected->{errors} and $expected->{method} and not $expected->{errors}->@*
+      and not exists $expected->{operation_uri};
+
     my ($equal, $stack) = Test::Deep::cmp_details($got, $expected);
     if ($equal) {
       $ctx->pass($test_name);

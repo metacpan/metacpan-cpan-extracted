@@ -23,6 +23,7 @@ cmp_deeply([sort keys %URN::OASIS::SAML2::EXPORT_TAGS], \@export_tags,          
 cmp_deeply($URN::OASIS::SAML2::EXPORT_TAGS{all},        [@URN::OASIS::SAML2::EXPORT_OK], "All exports everything");
 
 my $saml2   = 'urn:oasis:names:tc:SAML:2.0:';
+my $saml1_1 = 'urn:oasis:names:tc:SAML:1.1:';
 
 my %exports = (
     BINDING_HTTP_POST     => $saml2 . 'bindings:HTTP-POST',
@@ -56,12 +57,16 @@ my %exports = (
     URN_PROTOCOL_RESPONSE          => $saml2 . 'protocol' . ':Response',
 
     NAMEID_FORMAT        => $saml2 . 'nameid-format',
+
+    NAMEID_EMAIL                         => $saml1_1 . 'nameid-format:emailAddress',
+    NAMEID_UNSPECIFIED                   => $saml1_1 . 'nameid-format:unspecified',
+    NAMEID_X509_SUBJECT_NAME             => $saml1_1 . 'nameid-format:X509SubjectName',
+    NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME => $saml1_1 . 'nameid-format:WindowsDomainQualifiedName',
+
     NAMEID_FORMAT_ENTITY => $saml2 . 'nameid-format-entity',
-    NAMEID_EMAIL         => $saml2 . 'nameid-format:emailAddress',
     NAMEID_TRANSIENT     => $saml2 . 'nameid-format:transient',
     NAMEID_PERSISTENT    => $saml2 . 'nameid-format:persistent',
-    NAMEID_DEFAULT       => $saml2 . 'nameid-format:unspecified',
-    NAMEID_UNSPECIFIED   => $saml2 . 'nameid-format:unspecified',
+    NAMEID_DEFAULT       => $saml1_1 . 'nameid-format:unspecified',
 
     STATUS_AUTH_FAILED    => $saml2 . 'status:AuthnFailed',
     STATUS_REQUESTER      => $saml2 . 'status:Requester',

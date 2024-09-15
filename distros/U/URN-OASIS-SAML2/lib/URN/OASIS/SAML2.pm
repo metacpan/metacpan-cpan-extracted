@@ -1,6 +1,6 @@
 # vim: tw=120
 package URN::OASIS::SAML2;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use warnings;
 use strict;
 
@@ -34,6 +34,8 @@ my @nameid = qw(
     NAMEID_PERSISTENT
     NAMEID_UNSPECIFIED
     NAMEID_DEFAULT
+    NAMEID_X509_SUBJECT_NAME
+    NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME
 );
 
 my @urn = qw(
@@ -80,6 +82,7 @@ our %EXPORT_TAGS = (
 
 use constant base    => 'urn:oasis:names:tc:SAML:';
 use constant saml2   => base . '2.0:';
+use constant saml1_1 => base . '1.1:';
 
 use constant URN_ASSERTION => saml2 . 'assertion';
 use constant NS_ASSERTION  => 'saml';
@@ -115,11 +118,15 @@ use constant CLASS_SMARTCARD          => saml2 . 'ac:classes:Smartcard';
 use constant CLASS_SMARTCARD_PKI      => saml2 . 'ac:classes:SmartcardPKI';
 
 use constant NAMEID_FORMAT        => saml2 . 'nameid-format';
+
+use constant NAMEID_EMAIL                         => saml1_1 . 'nameid-format:emailAddress';
+use constant NAMEID_UNSPECIFIED                   => saml1_1 . 'nameid-format:unspecified';
+use constant NAMEID_X509_SUBJECT_NAME             => saml1_1 . 'nameid-format:X509SubjectName';
+use constant NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME => saml1_1 . 'nameid-format:WindowsDomainQualifiedName';
+
 use constant NAMEID_FORMAT_ENTITY => saml2 . 'nameid-format-entity';
-use constant NAMEID_EMAIL         => saml2 . 'nameid-format:emailAddress';
 use constant NAMEID_TRANSIENT     => saml2 . 'nameid-format:transient';
 use constant NAMEID_PERSISTENT    => saml2 . 'nameid-format:persistent';
-use constant NAMEID_UNSPECIFIED   => saml2 . 'nameid-format:unspecified';
 use constant NAMEID_DEFAULT       => NAMEID_UNSPECIFIED;
 
 
@@ -144,7 +151,7 @@ URN::OASIS::SAML2 - Constants for urn:oasis SAML2 implementations
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -211,6 +218,9 @@ This module provides constants which are in use by the SAML2 implementation.
         NAMEID_EMAIL
         NAMEID_TRANSIENT
         NAMEID_PERSISTENT
+        NAMEID_UNSPECIFIED
+        NAMEID_X509_SUBJECT_NAME
+        NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME
     );
 
 =head2 status

@@ -5,6 +5,7 @@ use warnings;
 
 use base 'Log::Mini::Logger::Base';
 
+
 sub _print
 {
     print STDOUT $_[1];

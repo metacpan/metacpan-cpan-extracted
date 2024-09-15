@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.068     2024-09-14 23:35:47Z
+          - path-item+operation lookup can now be performed by operation_id
+            alone (a valid usecase for response validation)
+
 0.067     2024-07-27 23:55:46Z
           - fix path template regex to allow for [/?#] characters in capture
             names

@@ -1,3 +1,10 @@
+0.04 2024-09-14T11:55:31+02:00
+ - Add return to process() and process_css() in case that class is not
+   initialized.
+ - Add test for init() and improve test messages.
+ - Fix test message.
+ - Remove nonsense test in process() testing.
+
 0.03 2024-06-24T20:42:51+02:00
  - Add test for cleanup() method.
  - Rewrite own implementation of callback code to Mo::utils.

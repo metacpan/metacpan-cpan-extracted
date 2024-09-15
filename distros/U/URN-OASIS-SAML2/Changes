@@ -1,5 +1,11 @@
 Revision history for URN-OASIS-SAML2
 
+0.006     2024-09-15 03:49:10Z
+
+    * Undo NAMEID_FORMAT changes from v0.004 as they are described in
+      https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf, p 76
+      They are indeed correctly in the 1.1 namespace
+
 0.005     2024-04-19 15:37:46Z
 
     * Add NAMEID_UNSPECIFIED and NAMEID_DEFAULT to the module.

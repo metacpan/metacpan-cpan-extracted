@@ -12,6 +12,7 @@ use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use JSON::Schema::Modern::Utilities 'jsonp';
+use Test::Fatal;
 use Test::Warnings 0.033 qw(:no_end_test allow_patterns);
 
 use lib 't/lib';
@@ -29,7 +30,7 @@ my $doc_uri_rel = Mojo::URL->new('/api');
 my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
-subtest 'bad conversion to Mojo::Message::Request or ::Response' => sub {
+subtest 'missing or invalid arguments' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(<<YAML));
@@ -37,10 +38,78 @@ $openapi_preamble
 paths:
   /:
     get:
+      operationId: my_op
       responses:
         default:
           description: foo
 YAML
+
+  like(
+    exception { $openapi->validate_response(undef) },
+    qr/^missing response/,
+    'response must be passed',
+  );
+
+  package Bespoke::Response {
+    sub request { shift->{request} }
+  }
+
+  cmp_result(
+    $openapi->validate_response(bless({}, 'Bespoke::Response'), { operation_id => 'my_op' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response',
+          keywordLocation => jsonp(qw(/paths / get)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths / get)))->to_string,
+          error => 'Failed to parse response: unknown type Bespoke::Response',
+        },
+      ],
+    },
+    'response must be a recognized type',
+  );
+
+  cmp_result(
+    $openapi->validate_response(bless({ request => bless({}, 'Bespoke::Request') }, 'Bespoke::Response'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request',
+          keywordLocation => '',
+          absoluteKeywordLocation => $doc_uri_rel->to_string,
+          error => 'Failed to parse request: unknown type Bespoke::Request',
+        },
+      ],
+    },
+    'request on response object, if passed, must be a recognized type',
+  );
+
+  cmp_deeply(
+    $openapi->validate_response(bless({}, 'Bespoke::Response'), { request => bless({}, 'Bespoke::Request') })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request',
+          keywordLocation => '',
+          absoluteKeywordLocation => $doc_uri_rel->to_string,
+          error => 'Failed to parse request: unknown type Bespoke::Request',
+        },
+      ],
+    },
+    'request in options, if passed, must be a recognized type',
+  );
+
+  like(
+    exception {
+      $openapi->validate_response(bless({ request => bless({}, 'Bespoke::Request') }, 'Bespoke::Response'), { request => bless({}, 'Bespoke::Request') })
+    },
+    qr/^\$response->request and \$options->\{request\} are inconsistent/,
+    'if request is passed twice, it must be the same object (not just the same values)',
+  );
+
 
   test_needs 'HTTP::Request', 'HTTP::Response';
   cmp_result(
@@ -53,7 +122,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => '',
           absoluteKeywordLocation => $doc_uri->to_string,
-          error => 'Bad request start-line',
+          error => 'Failed to parse request: Bad request start-line',
         },
       ],
     },
@@ -72,13 +141,215 @@ YAML
           instanceLocation => '/response',
           keywordLocation => jsonp(qw(/paths / get)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths / get)))->to_string,
-          error => re(qr/EXCEPTION/),
+          error => 'Failed to parse response: Bad response start-line',
         },
       ],
     },
-    # we can't do much about this because there is no reliable flag on the response object telling
-    # us that parsing failed
-    'sadly, invalid response object is not detected gracefully',
+    # checking definedness of $response->code is only a proxy to detecting errors, since
+    # $response->error is overloaded with the long form of the HTTP response code
+    'invalid response object is detected',
+  );
+};
+
+subtest 'subset of options provided for operation lookup' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+components:
+  pathItems:
+    my_path_item:
+      description: good luck finding a path_template
+      post:
+        operationId: my_components_pathItem_operation
+        callbacks:
+          my_callback:
+            '{\$request.query.queryUrl}': # note this is a path-item
+              post:
+                operationId: my_components_pathItem_callback_operation
+                responses:
+                  200:
+                    description: success
+        responses:
+          200:
+            description: success
+    my_path_item2:
+      description: this should be useable, as it is \$ref'd by a /paths/<template> path item
+      post:
+        operationId: my_reffed_component_operation
+        responses:
+          200:
+            description: success
+paths:
+  /foo: {}  # TODO: \$ref to #/components/pathItems/my_path_item2
+  /foo/bar:
+    post:
+      callbacks:
+        my_callback:
+          '{\$request.query.queryUrl}': # note this is a path-item
+            post:
+              operationId: my_paths_pathItem_callback_operation
+              responses:
+                200:
+                  description: success
+webhooks:
+  my_hook:  # note this is a path-item
+    description: good luck here too
+    post:
+      operationId: my_webhook_operation
+      responses:
+        200:
+          description: success
+YAML
+
+  my $res = Mojo::Message::Response->new->code(400);
+
+  cmp_result(
+    $openapi->validate_response($res, { path_template => '/' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '',
+          absoluteKeywordLocation => $doc_uri_rel->to_string,
+          error => 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided',
+        },
+      ],
+    },
+    'no request information was passed: need operation_id or path_template AND method',
+  );
+
+  cmp_result(
+    $openapi->validate_response($res, { method => 'get' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '',
+          absoluteKeywordLocation => $doc_uri_rel->to_string,
+          error => 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided',
+        },
+      ],
+    },
+    'no request information was passed: need operation_id or path_template AND method',
+  );
+
+  cmp_result(
+    $openapi->validate_response($res)->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '',
+          absoluteKeywordLocation => $doc_uri_rel->to_string,
+          error => 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided',
+        },
+      ],
+    },
+    'no request information was passed: need operation_id or path_template AND method',
+  );
+
+  cmp_result(
+    $openapi->validate_response($res, my $options = { operation_id => 'my_components_pathItem_operation' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/code',
+          keywordLocation => '/components/pathItems/my_path_item/post/responses',
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment('/components/pathItems/my_path_item/post/responses')->to_string,
+          error => 'no response object found for code 400',
+        },
+      ],
+    },
+    'response is processed',
+  );
+  cmp_result(
+    $options,
+    {
+      method => 'post',
+      operation_id => 'my_components_pathItem_operation',
+      operation_uri => str($doc_uri_rel->clone->fragment('/components/pathItems/my_path_item/post')),
+    },
+    'operation is not under a path-item with a path template, but still exists',
+  );
+
+  cmp_result(
+    $openapi->validate_response($res, $options = { operation_id => 'my_webhook_operation' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/code',
+          keywordLocation => '/webhooks/my_hook/post/responses',
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment('/webhooks/my_hook/post/responses')->to_string,
+          error => 'no response object found for code 400',
+        },
+      ],
+    },
+    'response is processed',
+  );
+  cmp_result(
+    $options,
+    {
+      method => 'post',
+      operation_id => 'my_webhook_operation',
+      operation_uri => str($doc_uri_rel->clone->fragment('/webhooks/my_hook/post')),
+    },
+    'operation is not under a path-item with a path template, but still exists',
+  );
+
+  cmp_result(
+    $openapi->validate_response($res, $options = { operation_id => 'my_paths_pathItem_callback_operation' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/code',
+          keywordLocation => jsonp(qw(/paths /foo/bar post callbacks my_callback {$request.query.queryUrl} post responses)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo/bar post callbacks my_callback {$request.query.queryUrl} post responses)))->to_string,
+          error => 'no response object found for code 400',
+        },
+      ],
+    },
+    'response is processed',
+  );
+  cmp_result(
+    $options,
+    {
+      method => 'post',
+      operation_id => 'my_paths_pathItem_callback_operation',
+      operation_uri => str($doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo/bar post callbacks my_callback {$request.query.queryUrl} post)))),
+    },
+    'operation is not directly under a path-item with a path template, but still exists',
+  );
+
+  cmp_result(
+    $openapi->validate_response($res, $options = { operation_id => 'my_components_pathItem_callback_operation' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/code',
+          keywordLocation => '/components/pathItems/my_path_item/post/callbacks/my_callback/{$request.query.queryUrl}/post/responses',
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment('/components/pathItems/my_path_item/post/callbacks/my_callback/{$request.query.queryUrl}/post/responses')->to_string,
+          error => 'no response object found for code 400',
+        },
+      ],
+    },
+    'response is processed',
+  );
+  cmp_result(
+    $options,
+    {
+      method => 'post',
+      operation_id => 'my_components_pathItem_callback_operation',
+      operation_uri => str($doc_uri_rel->clone->fragment('/components/pathItems/my_path_item/post/callbacks/my_callback/{$request.query.queryUrl}/post')),
+    },
+    'operation is not under a path-item with a path template, but still exists',
   );
 };
 
@@ -183,7 +454,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response',
+          instanceLocation => '/response/code',
           keywordLocation => jsonp(qw(/paths /foo post responses)),
           absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses)))->to_string,
           error => 'no response object found for code 404',

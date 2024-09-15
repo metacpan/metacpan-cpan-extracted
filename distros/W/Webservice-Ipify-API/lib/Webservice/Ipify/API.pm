@@ -10,7 +10,7 @@ use Feature::Compat::Try;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 
 class Webservice::Ipify::API;

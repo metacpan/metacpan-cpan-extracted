@@ -3,7 +3,7 @@ package Full::Pragmata;
 use strict;
 use warnings;
 
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.002'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use utf8;

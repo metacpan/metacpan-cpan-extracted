@@ -91,19 +91,23 @@
    "provides" : {
       "Full" : {
          "file" : "lib/Full.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Full::Class" : {
          "file" : "lib/Full/Class.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Full::Pragmata" : {
          "file" : "lib/Full/Pragmata.pm",
-         "version" : "1.001"
+         "version" : "1.002"
+      },
+      "Full::Role" : {
+         "file" : "lib/Full/Role.pm",
+         "version" : "1.002"
       },
       "Full::Script" : {
          "file" : "lib/Full/Script.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       }
    },
    "release_status" : "stable",
@@ -118,7 +122,7 @@
          "web" : "https://github.com/team-at-cpan/Full"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Tom Molesworth <tom@audioboundary.com>"

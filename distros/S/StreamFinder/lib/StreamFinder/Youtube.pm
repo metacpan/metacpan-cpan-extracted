@@ -91,7 +91,7 @@ file.
 =head1 DESCRIPTION
 
 StreamFinder::Youtube accepts a valid full YouTube video ID, or page URL on 
-youtube, et. al. that the "youtube-dl" program supports, 
+youtube, et. al. that the "yt-dlp" program supports, 
 and returns the actual stream URL, title, and cover art icon for that video.  
 The purpose is that one needs this URL in order to have the option to 
 stream the video in one's own choice of media player software rather 
@@ -110,11 +110,14 @@ required).  See the I<-noiframes> and I<-youtubeonly> flags below for limiting
 this feature.  Also note:  these videos, etc. are handled here and not 
 by L<StreamFinder::Anystream>.
 
+NOTE:  Streamfinder now strongly recommends using yt-dlp over youtube-dl for 
+extracting streams, and it is now the default app. used.
+
 Depends:  
 
 L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
-and the separate application program:  youtube-dl, or a compatable program 
-such as yt-dlp.
+and the separate application program:  yt-dlp, or a compatable program 
+such as youtube-dl.
 
 =head1 SUBROUTINES/METHODS
 
@@ -133,9 +136,9 @@ such as yt-dlp.
 [, I<-youtube-dl-args> => "youtube-dl arguments"] 
 [, I<-youtube-dl-add-args> => "youtube-dl additional arguments"])
 
-Accepts a youtube.com video ID, or any full URL that youtube-dl supports 
-and creates and returns a new video object, or I<undef> if the URL is 
-not a youtube-supported video URL or no streams are found.  The URL can 
+Accepts a youtube.com video ID, or any full URL that yt-dlp (youtube-dl) 
+supports and creates and returns a new video object, or I<undef> if the URL 
+is not a youtube-supported video URL or no streams are found.  The URL can 
 be the full URL, 
 ie. https://www.youtube.com/watch?v=B<video-id>, a user or channel URL, 
 ie. https://www.youtube.com/channel/B<channel-id> or 
@@ -156,15 +159,16 @@ string (see the youtube-dl manpage for details).  Examples:
 Default is "B<best>", but if no streams are found, it then tries all, 
 unless I<-formatonly> is specified.
 
-If I<-format-fallback> is specified, it should be a valid "I<youtube-dl -f>" format 
-string (see the youtube-dl manpage for details), and will be used if no 
-streams matching the I<-format> are found.  Default is "B<bestaudio>".
+If I<-format-fallback> is specified, it should be a valid 
+"I<youtube-dl -f>" format string (see the yt-dlp manpage for details), and 
+will be used if no streams matching the I<-format> are found.  
+Default is "B<bestaudio>".
 
 If I<-formatonly> is specified (set to 1 (true)), then if no streams match 
 the specified I<-format> argument (default "I<best>"), then if 
 I<-format-fallback> is specified, that will be tried, otherwise, no streams 
 will be returned.  Otherwise (if I<-formatonly> is unspecified or false, 
-youtube-dl is called again with either the -F I<-format-fallback> 
+yt-dlp is called again with either the -F I<-format-fallback> 
 (if specified) or else, no format (I<-f>) argument (match any stream we 
 can find).  Default is 0 (false / unset).
 
@@ -206,12 +210,12 @@ If 1 then only secure ("https://") streams will be returned.  Default for
 I<-secure> is 0 (false) - return all streams (http and https).
 
 The optional I<-user-agent> argument can specify a specific user-agent string 
-to send to youtube-dl's optional "I<--user-agent>" argument.  NOTE:  This is 
+to send to yt-dlp's optional "I<--user-agent>" argument.  NOTE:  This is 
 completely separate from the I<-agent> option used by some other StreamFinder 
 modules for fetching pages and streams from their respective sites, as that 
 argument is used by LWP::UserAgent (along with some other options), and is NOT 
-passed to youtube-dl, though they represent the same kind of user-agent string! 
-Default is I<-none-> (youtube-dl or the alternate program may use it's 
+passed to yt-dlp, though they represent the same kind of user-agent string! 
+Default is I<-none-> (yt-dlp or the alternate program may use it's 
 own default).
 
 The optional I<-userid> and I<-userpw> arguments allow specifying a Youtube 
@@ -219,12 +223,15 @@ login (for fetching videos, ie. paid ones that require one).
 Defaults are I<-none-> (no userid or password specified).
 
 The optional I<-youtube-dl> argument allows specifying an alternate stream-
-parser program in lieu of "youtube-dl" (Default:  "I<youtube-dl>").  A current 
-such alternate program is "yt-dlp".  If the program is not in the user's 
+parser program in lieu of "yt-dlp", such as "youtube-dl" 
+(Default:  "I<yt-dlp>").  Note:  StreamFinder recommends sticking with yt-dlp, 
+as it has been known to work when youtube-dl fails, and is known for quicker 
+fixing of issues, as Youtube continues to throw up additional roadblocks to 
+alternate viewing methods.  If the program is not in the user's 
 executable I<PATH>, the full path can be included with the program name here.
 
 The optional I<-youtube-dl-args> argument allows you to change the arguments 
-to be passed to the external youtube-dl (or yt-dlp, etc.) program.  NOTE:  
+to be passed to the external yt-dlp (youtube-dl or , etc.) program.  NOTE:  
 Unless this program changes it's valid arguments or you select an alternate 
 program that requires slightly different arguments, you should NOT use this 
 argument, as the DEFAULT is:  
@@ -236,9 +243,9 @@ see below:  Also note that the I<-f format> argument should NOT be specified
 either here or below as the I<-format> option provides this argument!
 
 The optional I<-youtube-dl-add-args> argument allows you to add additional 
-arguments to be passed to the external youtube-dl (or yt-dlp, etc.) program.  
+arguments to be passed to the external yt-dlp (youtube-dl or , etc.) program.  
 See both the I<-youtube-dl-args> argument description and the manpage for 
-youtube-dl or whatever alternative external program you use to extract 
+yt-dlp, youtube-dl or whatever alternative external program you use to extract 
 video streams for valid arguments for possible inclusion here.  
 
 DEFAULT I<-none-> (no additional arguments).
@@ -297,7 +304,7 @@ Returns the number of streams found for the video.
 
 =item $video->B<getID>()
 
-Returns the video's YouTube ID (numeric).
+Returns the video's YouTube ID (alphanumeric+some special characters).
 
 =item $video->B<getTitle>(['desc'])
 
@@ -385,13 +392,13 @@ youtube
 
 =head1 DEPENDENCIES
 
-youtube-dl (or yt-dlp, or other compatable program)
+yt-dlp (or youtube-dl, or other compatable program)
 
 L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, youtube-dl
 
 =head1 RECCOMENDS
 
-wget
+yt-dlp, wget
 
 =head1 BUGS
 
@@ -550,7 +557,7 @@ sub new
 	}
 	$self->{'youtubeonly'} = 1  if ($self->{'noiframes'});  #NO EMBEDDED RUMBLE-SEARCH IF NO IFRAMES ALLOWED!
 
-	$self->{'youtube-dl'} = 'youtube-dl'  unless (defined $self->{'youtube-dl'});
+	$self->{'youtube-dl'} = 'yt-dlp'  unless (defined $self->{'youtube-dl'});
 
 	print STDERR "-0(Youtube): URL=$url=\n"  if ($DEBUG);
 	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.

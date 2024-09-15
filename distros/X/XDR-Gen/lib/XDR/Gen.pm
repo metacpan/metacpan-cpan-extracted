@@ -3,7 +3,7 @@ use warnings;
 
 
 package XDR::Gen;
-$XDR::Gen::VERSION = '0.0.3';
+$XDR::Gen::VERSION = '0.0.5';
 use Carp qw(croak confess);
 use IO::Handle;
 use List::Util qw(max);
@@ -777,9 +777,9 @@ sub _serializer_struct {
     for my $member (@{ $decl->{members} }) {
         my $name = $member->{name}->{content};
         push @fragments, "# Serializing field: '$name'";
-        push @fragments, qq|croak "Missing required input value '$name'|;
+        push @fragments, qq|croak "Missing required input value '$name'"|;
         # existance check, not definedness: "pointer"-type values may be 'undef'
-        push @fragments, qq|    unless exists ${value}->{$name}|;
+        push @fragments, qq|    unless exists ${value}->{$name};|;
         push @fragments, _serializer_declaration(
             $member->{declaration},
             $name ? $value . "->{$name}" : undef,
@@ -1249,7 +1249,7 @@ XDR::Gen - Generator for XDR (de)serializers
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.5
 
 =head1 SYNOPSIS
 

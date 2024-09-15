@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Circle::User'   => '0.02',
+        'Circle::User'   => '0.05',
         'Circle::Wallet' => '0.02',
         'Circle::Block'  => '0.02',
         'Circle::Node'   => '0.02',

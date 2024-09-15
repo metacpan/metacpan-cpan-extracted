@@ -42,7 +42,7 @@ do { my $x = {
                                       'File::ShareDir' => '0',
                                       'JSON::Schema::Modern' => '0.578',
                                       'JSON::Schema::Modern::Document' => '0',
-                                      'JSON::Schema::Modern::Utilities' => '0.583',
+                                      'JSON::Schema::Modern::Utilities' => '0.585',
                                       'JSON::Schema::Modern::Vocabulary' => '0',
                                       'List::Util' => '0',
                                       'Math::BigInt' => '1.999701',
@@ -81,6 +81,7 @@ do { my $x = {
                                       'Plack::Request' => '0',
                                       'Plack::Response' => '0',
                                       'Ref::Util::XS' => '0',
+                                      'Type::Tiny' => '0.045_03',
                                       'Type::Tiny::XS' => '0',
                                       'URI' => '0'
                                     }

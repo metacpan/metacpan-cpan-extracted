@@ -30,7 +30,20 @@ is_deeply(
 		['e', 'img'],
 		['e', 'figure'],
 	],
-	'Input HTML code (image).',
+	'Image HTML code (image).',
+);
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::Image->new(
+	'tags' => $tags,
+);
+$obj->process;
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[],
+	'Image HTML code (no init).',
 );
 
 # Test.
@@ -40,16 +53,4 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'tags' isn't defined.\n",
 	"Parameter 'tags' isn't defined.");
-clean();
-
-# Test.
-$tags = Tags::Output::Structure->new;
-$obj = Tags::HTML::Image->new(
-	'tags' => $tags,
-);
-eval {
-	$obj->init('bad');
-};
-is($EVAL_ERROR, "Image object must be a instance of 'Data::Image'.\n",
-	"Image object must be a instance of 'Data::Image'.");
 clean();

@@ -4,7 +4,7 @@ use warnings;
 use CSS::Struct::Output::Structure;
 use Data::Image;
 use Tags::HTML::Image;
-use Test::More 'tests' => 2;
+use Test::More 'tests' => 3;
 use Test::NoWarnings;
 
 # Test.
@@ -33,4 +33,17 @@ is_deeply(
 		['e'],
 	],
 	'CSS struct code (image).',
+);
+
+# Test.
+$css = CSS::Struct::Output::Structure->new;
+$obj = Tags::HTML::Image->new(
+	'css' => $css,
+);
+$obj->process_css;
+$ret_ar = $css->flush(1);
+is_deeply(
+	$ret_ar,
+	[],
+	'CSS struct code (no init).',
 );

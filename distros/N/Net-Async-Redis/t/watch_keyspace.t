@@ -50,10 +50,7 @@ $redis->set('testprefix-xyz' => 'test')->get;
 is($redis->get('testprefix-xyz')->get, 'test');
 is($redis->del('testprefix-xyz')->get, 1, 'deleted a single key');
 $loop->delay_future(after => 0.75)->get;
-{
-    local $TODO = 'needs further PSUBSCRIBE testing';
-    is(@notifications, 2);
-}
+is(@notifications, 2);
 done_testing;
 
 

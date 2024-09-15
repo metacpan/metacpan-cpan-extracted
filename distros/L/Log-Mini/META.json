@@ -4,7 +4,7 @@
       "Denis Fedoseev <denis.fedoseev@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.21",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "Log::Mini" : {
          "file" : "lib/Log/Mini.pm",
-         "version" : "v0.4.1"
+         "version" : "v0.5.0"
       },
       "Log::Mini::Logger::Base" : {
          "file" : "lib/Log/Mini/Logger/Base.pm"
@@ -87,11 +87,11 @@
          "web" : "https://github.com/alpha6/Log-Mini"
       }
    },
-   "version" : "0.4.1",
+   "version" : "0.5.0",
    "x_contributors" : [
       "Denis Fedoseev <denis@fedoseev.work>",
       "medvedych <medvedych@whataco.de>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

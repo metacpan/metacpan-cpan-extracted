@@ -1,5 +1,28 @@
 -----
 
+10.3.7   2024-09-14
+    [Changed]
+        * Regenerated with XDR::Gen v0.0.5,
+          including generator fixes
+
+10.3.6   2024-09-14
+    [Changed]
+        * Regenerated with XDR::Gen v0.0.4,
+          including generator fixes
+    [Fixed]
+        * Added missing item to 10.3.5 CHANGES entry
+
+10.3.5   2024-09-14
+    [Added]
+        * Reference to the protocol stability guarantees from
+          the LibVirt project
+    [Changed]
+        * Regenerated with XDR::Gen v0.0.3,
+          including generator fixes
+    [Fixed]
+        * Message (de)serializer names now correctly stripped of
+          'remote_' prefix
+
 10.3.4   2024-09-08
     [Fixed]
         * Use Log::Any->$log instead of 'say'

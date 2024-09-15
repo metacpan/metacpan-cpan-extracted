@@ -1,6 +1,14 @@
 -----
 
 
+0.0.5   2024-09-14
+    [Fixed]
+        * Fix missing semi-colon in generated output
+
+0.0.4   2024-09-14
+    [Fixed]
+        * Fix missing closing double quote in generated output
+
 0.0.3   2024-09-14
     [Fixed]
         * Check existence of 'struct' member fields on input

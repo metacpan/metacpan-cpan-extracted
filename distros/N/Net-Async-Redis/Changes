@@ -1,5 +1,19 @@
 Revision history for Net-Async-Redis
 
+6.001     2024-09-15 09:27:56+08:00 Asia/Singapore
+    [New features]
+
+    - should handle reconnect more gracefully when commands are queued and
+    the current connection drops
+
+    [Bugs fixed]
+
+    - some potential cases where protocol may go out of sync when there's an error during MULTI
+
+    [Internal]
+
+    - refactored to use an Object::Pad rôle for the command list
+
 6.000     2024-01-28 05:00:01+08:00 Asia/Singapore
     [New features]
 

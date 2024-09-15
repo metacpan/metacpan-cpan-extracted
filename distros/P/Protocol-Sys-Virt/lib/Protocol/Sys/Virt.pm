@@ -2,7 +2,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt v10.3.4;
+package Protocol::Sys::Virt v10.3.7;
 
 1;
 
@@ -12,7 +12,7 @@ Protocol::Sys::Virt - Abstract LibVirt protocol implementation
 
 =head1 VERSION
 
-v10.3.4
+v10.3.7
 
 Based on LibVirt tag v10.3.0
 
@@ -43,6 +43,11 @@ using Perl threads is highly discouraged, but more so because each thread create
 its own Perl interpreter with its own copies of all variables -- a clear
 difference with Python, where a single interpreter is used for all threads,
 sharing variables and values.
+
+=head1 API Guarantees
+
+The LibVirt project describes the stability guarantees of the protocol
+at L<https://libvirt.org/support.html#rpc-protocol>.
 
 =head1 TODO
 

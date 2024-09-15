@@ -1,4 +1,6 @@
 Revision history for Webservice::Ipify::API
+1.003 Tues Sept 10 20:14:00 2024
+     - bugfixes for installers
 1.002 Tues Sept 10 20:14:00 2024
      - improved compatability for older perls
 1.000 Sun Sept 8 16:00:00 2024

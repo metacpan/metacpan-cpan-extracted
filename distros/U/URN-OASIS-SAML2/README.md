@@ -63,6 +63,9 @@ This module provides constants which are in use by the SAML2 implementation.
         NAMEID_EMAIL
         NAMEID_TRANSIENT
         NAMEID_PERSISTENT
+        NAMEID_UNSPECIFIED
+        NAMEID_X509_SUBJECT_NAME
+        NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME
     );
 
 ## status

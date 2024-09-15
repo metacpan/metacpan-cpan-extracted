@@ -63,4 +63,14 @@ $response = set_pay_password(
 carp 'set pay password status: ' . $response->{status} . ' ' . $response->{message};
 ok( $response->{status} != 200 );
 
+Circle::User::_save_session_data(
+    {
+        email => 'test@gmail.com'
+    },
+    {
+        userId     => 'mock-user-id',
+        sessionKey => 'test-session-key',
+    }
+);
+
 done_testing();

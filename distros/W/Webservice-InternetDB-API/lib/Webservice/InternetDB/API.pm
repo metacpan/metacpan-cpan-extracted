@@ -9,7 +9,7 @@ use Feature::Compat::Try;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 class Webservice::InternetDB::API;
 
@@ -20,9 +20,6 @@ use Carp;
 field $ua = HTTP::Tiny->new(timeout => 7);
 field $base = "https://internetdb.shodan.io/";
 
-ADJUST {;
-
-}
 
 method get ($address //= ""){
     my $response = $ua->get("$base$address");

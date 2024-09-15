@@ -10,7 +10,7 @@ use Mo::utils 0.12 qw(check_code);
 use Mo::utils::CSS 0.02 qw(check_css_class);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -169,6 +169,10 @@ sub _init {
 sub _process {
 	my $self = shift;
 
+	if (! exists $self->{'_image'}) {
+		return;
+	}
+
 	# Begin of figure.
 	$self->{'tags'}->put(
 		['b', 'figure'],
@@ -231,6 +235,10 @@ sub _process {
 
 sub _process_css {
 	my $self = shift;
+
+	if (! exists $self->{'_image'}) {
+		return;
+	}
 
 	my $calc;
 	if (! defined $self->{'img_width'}) {
@@ -641,6 +649,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

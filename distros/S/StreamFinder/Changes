@@ -672,3 +672,22 @@ Revision history for StreamFinder
         users are strongly encouraged to upgrade to the latest version 
         2024.07.25 to avoid likely just getting audio streams, as the internet 
         continues to get crapped up and locked down every day. :(
+2.41    2024/09/14
+        - StreamFinder::AnyStream - Intercept & handle all .m3u8 (HLS) urls 
+        in order to apply any "hls_bitrate" option limits and select the 
+        highest one from the stream list if the HLS url is a master list.  
+        This seems to be necessary as ffmpeg, used in Fauxdacious for HLS 
+        streams always seems to select the highest bitrate stream and provided 
+        no known argument for limiting stream selection by bitrate.
+        - StreamFinder::SermonAudio - Massive redo due to them completely 
+        overhauling their site, which now only offers a single video stream 
+        in HLS format in place of multiple bitrate choices, obsoleting the 
+        "high" and "low" "quality" options.  The choices are now:  "audio" or 
+        "any".  Users should now use the "hls_bitrate" option to limit 
+        bandwidth for slower internet connections.
+        Also add new "nowebp" option to download icon images in their native 
+        formats instead of webp (needed by Fauxdacious GTK versions and 
+        perhaps others).
+        - StreamFinder::Youtube - Change default external Youtube-fetching 
+        program from "youtube-dl" to "yt-dlp", as the former may no longer 
+        properly handle many youtube streams.

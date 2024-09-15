@@ -6,7 +6,7 @@ use Module::Load qw/load/;
 
 require Carp;
 
-our $VERSION = "0.4.1";
+our $VERSION = "0.5.0";
 
 sub new
 {

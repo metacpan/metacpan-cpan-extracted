@@ -5,6 +5,7 @@ use warnings;
 
 use base 'Log::Mini::Logger::Base';
 
+
 sub _log {
     return;
 }

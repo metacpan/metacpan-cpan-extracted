@@ -551,7 +551,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.40';
+our $VERSION = '2.41';
 our $DEBUG = 0;
 
 require Exporter;
@@ -666,7 +666,10 @@ sub new
 	} elsif ($url =~ m#\btheepochtimes\.# && $useit{'EpochTV'}) {
 		eval { require 'StreamFinder/EpochTV.pm'; $haveit = 1; };
 		return new StreamFinder::EpochTV($url, @args)  if ($haveit);
-	} elsif ($useit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+	} elsif ($url !~ /\.m3u8$/i && $useit{'Youtube'}) {
+		#DEFAULT TO youtube-dl (EXCEPT HLS URLS) SINCE SO MANY URLS ARE HANDLED THERE NOW.
+		#(WE NOW PASS HLS URLS ON TO Anystream WHICH CHECKS THEM AGAINST ANY BANDWIDTH
+		#LIMITS AND, IF A MASTER PLAYLIST, LIMITS TO STREAMS WITHIN THE LIMITS):
 		eval { require 'StreamFinder/Youtube.pm'; $haveit = 1; };
 		if ($haveit) {
 			my $yt = new StreamFinder::Youtube($url, @args);

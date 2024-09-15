@@ -93,6 +93,42 @@ subtest 'not logs when level is lower' => sub {
     }
 };
 
+subtest 'log with context' => sub {
+    my $output = [];
+    my $log    = _build_logger(output => $output);
+
+    ok $log->push_context('test context'), 'push context';
+    ok $log->push_context('second level'), 'push more context';
+
+    $log->error('message');
+    like $output->[-1], qr/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d{3} \[error\] test context second level: message/;
+
+    ok $log->pop_context(), 'remove one part from context';
+
+    $log->error('message');
+    like $output->[-1], qr/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d{3} \[error\] test context: message/;
+
+    ok $log->pop_context(), 'remove last part of the {{$NEXT}}context';
+
+    $log->error('message');
+    like $output->[-1], qr/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d{3} \[error\] message/;
+
+    is $log->pop_context(), undef, 'return 0 on pop on empty context';
+
+    is $log->push_context(''), undef, 'not push empty string to context';
+
+    $log->error('empty cntx message ');
+    like $output->[-1], qr/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d{3} \[error\] empty cntx message/;
+
+    $log->push_context('level one');
+    $log->push_context('level two');
+
+    $log->clear_context();
+    
+    $log->error('message');
+    like $output->[-1], qr/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d{3} \[error\] message/;
+};
+
 sub _build_logger
 {
     my $logger = LoggerTest->new(@_);

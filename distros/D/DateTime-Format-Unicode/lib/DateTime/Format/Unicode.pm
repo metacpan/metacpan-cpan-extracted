@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
-## Module Generic - ~/lib/DateTime/Format/Unicode.pm
-## Version v0.1.0
+## DateTime::Format::Unicode - ~/lib/DateTime/Format/Unicode.pm
+## Version v0.1.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/21
-## Modified 2024/07/21
+## Modified 2024/09/15
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -24,7 +25,7 @@ BEGIN
     use POSIX ();
     use Scalar::Util;
     use Want;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -258,7 +259,6 @@ sub format_datetime
     return( $pat );
 }
 
-# TODO: format_interval
 sub format_interval
 {
     my $self = shift( @_ );
@@ -1819,7 +1819,7 @@ which, will default to C<locale> C<en> with date medium-size format pattern C<MM
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

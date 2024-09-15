@@ -16,6 +16,8 @@ my $loop = IO::Async::Loop->new;
 
 $loop->add(
     my $redis = Net::Async::Redis->new(
+        host => $ENV{NET_ASYNC_REDIS_HOST} // 'localhost',
+        port => $ENV{NET_ASYNC_REDIS_PORT} // '6379',
         client_side_cache_size => 100,
     )
 );

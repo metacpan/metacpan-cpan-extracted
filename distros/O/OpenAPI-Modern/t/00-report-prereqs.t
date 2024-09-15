@@ -71,8 +71,10 @@ my @include = qw(
   JSON::PP
   Cpanel::JSON::XS
   JSON::XS
-  Mojolicious
   JSON::MaybeXS
+  Mojolicious
+  Plack
+  Catalyst
 );
 
 my @exclude = qw(

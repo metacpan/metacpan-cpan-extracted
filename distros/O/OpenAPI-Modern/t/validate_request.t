@@ -12,6 +12,7 @@ use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use JSON::Schema::Modern::Utilities qw(jsonp get_type);
+use Test::Fatal;
 use Test::Warnings 0.033 qw(:no_end_test allow_patterns);
 
 use lib 't/lib';
@@ -34,6 +35,187 @@ START:
 $::TYPE = $::TYPES[$type_index];
 note 'REQUEST/RESPONSE TYPE: '.$::TYPE;
 
+subtest 'missing or invalid arguments' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+paths: {}
+YAML
+
+  like(
+    exception { $openapi->validate_request(undef) },
+    qr/^missing request/,
+    'request must be passed',
+  );
+
+  cmp_result(
+    $openapi->validate_request(bless({}, 'Bespoke::Request'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request',
+          keywordLocation => '',
+          absoluteKeywordLocation => '/api',
+          error => 'Failed to parse request: unknown type Bespoke::Request',
+        },
+      ],
+    },
+    'request must be a recognized type',
+  );
+
+  like(
+    exception {
+      $openapi->validate_request(
+        request('GET', 'http://example.com/foo'), { request => request('GET', 'http://example.com/foo') })
+    },
+    qr/^\$request and \$options->\{request\} are inconsistent/,
+    'if request is passed twice, it must be the same object (not just the same values)',
+  );
+};
+
+subtest 'path lookup' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+components:
+  pathItems:
+    my_path_item:
+      description: good luck finding a path_template
+      post:
+        operationId: my_components_pathItem_operation
+        callbacks:
+          my_callback:
+            '{\$request.query.queryUrl}': # note this is a path-item
+              post:
+                operationId: my_components_pathItem_callback_operation
+    my_path_item2:
+      description: this should be useable, as it is \$ref'd by a /paths/<template> path item
+      post:
+        operationId: my_reffed_component_operation
+paths:
+  /foo: {}  # TODO: \$ref to #/components/pathItems/my_path_item2
+  /foo/bar:
+    post:
+      callbacks:
+        my_callback:
+          '{\$request.query.queryUrl}': # note this is a path-item
+            post:
+              operationId: my_paths_pathItem_callback_operation
+webhooks:
+  my_hook:  # note this is a path-item
+    description: good luck here too
+    post:
+      operationId: my_webhook_operation
+YAML
+
+  my $request = request('POST', 'http://example.com/foo/bar');
+
+  cmp_result(
+    $openapi->validate_request($request, { operation_id => 'my_components_pathItem_operation' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/path',
+          keywordLocation => jsonp(qw(/paths /foo/bar)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
+          error => 'templated operation does not match provided operation_id',
+        },
+      ],
+    },
+    'operation is not under a path-item with a path template',
+  );
+
+  cmp_result(
+    $openapi->validate_request($request, { operation_id => 'my_webhook_operation' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/path',
+          keywordLocation => jsonp(qw(/paths /foo/bar)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
+          error => 'templated operation does not match provided operation_id',
+        },
+      ],
+    },
+    'operation is not under a path-item with a path template',
+  );
+
+  cmp_result(
+    $openapi->validate_request($request, { operation_id => 'my_paths_pathItem_callback_operation' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/path',
+          keywordLocation => jsonp(qw(/paths /foo/bar)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
+          error => 'templated operation does not match provided operation_id',
+        },
+      ],
+    },
+    'operation is not directly under a path-item with a path template',
+  );
+
+  cmp_result(
+    $openapi->validate_request($request, { operation_id => 'my_components_pathItem_callback_operation' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/path',
+          keywordLocation => jsonp(qw(/paths /foo/bar)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
+          error => 'templated operation does not match provided operation_id',
+        },
+      ],
+    },
+    'operation is not under a path-item with a path template',
+  );
+
+  # TODO test: path-item exists, under paths with a template, but a $ref is followed before finding
+  # the actual definition: should be usable.
+  # we need to make sure that the URI matches the path_template above all the $refs.
+  # the destination path-item could be under /components/pathItems or /webhooks or in a callback,
+  # or shared by a path-item in another /path/<path_template>.
+
+  cmp_result(
+    $openapi->validate_request(request('GET', 'http://example.com/bloop/blah'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/path',
+          keywordLocation => '/paths',
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
+          error => 'no match found for URI "http://example.com/bloop/blah"',
+        },
+      ],
+    },
+    'no matching entry under /paths for URI',
+  );
+
+  cmp_result(
+    $openapi->validate_request($request, { path_template => '/foo/baz' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/path',
+          keywordLocation => '/paths',
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
+          error => 'missing path-item "/foo/baz"',
+        },
+      ],
+    },
+    'provided path_template does not exist in /paths',
+  );
+};
+
 subtest 'validation errors, request uri paths' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
@@ -51,22 +233,6 @@ paths:
 YAML
 
   cmp_result(
-    $openapi->validate_request(request('GET', 'http://example.com/foo/bar'), { path_template => '/foo/baz' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/uri/path',
-          keywordLocation => '/paths',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-          error => 'missing path-item "/foo/baz"',
-        },
-      ],
-    },
-    'error in find_path',
-  );
-
-  cmp_result(
     $openapi->validate_request(request('GET', 'http://example.com/foo'))->TO_JSON,
     {
       valid => false,
@@ -80,6 +246,22 @@ YAML
       ],
     },
     'path parameter is missing',
+  );
+
+  cmp_result(
+    $openapi->validate_request(request('GET', 'http://example.com/foo'), { path_captures => { foo_id => 1 } })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/path',
+          keywordLocation => jsonp(qw(/paths /foo)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo)))->to_string,
+          error => 'provided path_captures values do not match request URI',
+        },
+      ],
+    },
+    'extra path_capture value provided',
   );
 
   $openapi = OpenAPI::Modern->new(

@@ -5,7 +5,7 @@ use 5.006;
 use warnings;
 use strict;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 our %WHICH;
 
@@ -390,8 +390,6 @@ is a string containing the name of the loaded module.
   use Best qw/YAML::Syck YAML/;
 
   print "Fallback" if Best->which('YAML::Syck') eq 'YAML';
-
-=back
 
 =cut
 

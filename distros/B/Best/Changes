@@ -1,5 +1,8 @@
 Revision history for Best
 
+0.17    2024-09-15
+        POD fix. 
+
 0.16    2024-09-14
         Don't use an apostrophe in a package name in a test.
         Those have been deprecated, and removed from the language

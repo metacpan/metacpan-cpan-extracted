@@ -10,6 +10,7 @@ my @files = (
     'lib/Full.pm',
     'lib/Full/Class.pm',
     'lib/Full/Pragmata.pm',
+    'lib/Full/Role.pm',
     'lib/Full/Script.pm',
     't/00-check-deps.t',
     't/00-compile.t',

@@ -3,7 +3,7 @@ package Full::Class;
 use Full::Pragmata qw(:v1);
 use parent qw(Full::Pragmata);
 
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.002'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
@@ -15,7 +15,7 @@ Full::Class - common pragmata for modules which provide an OO class
 =head1 SYNOPSIS
 
  package Example::Class;
- use Full::Class;
+ use Full::Class qw(:v1);
 
  async method startup {
   $log->infof('Starting %s', __PACKAGE__);
@@ -29,7 +29,7 @@ These use L<Signature::Attribute::Checked> to provide method parameter checks.
 Note that the C<extended> keyword is required, see L<Sublike::Extended> for more information.
 
  package Example;
- use Full::Class qw(:v2);
+ use Full::Class qw(:v1);
  extended method example ($v :Checked(Num)) { }
 
 =head2 Class features
@@ -42,14 +42,12 @@ and for L<OpenTelemetry> support you get C<$tracer> as an L<OpenTelemetry>
 instance.
 
 It's very likely that future versions will bring in new functionality or
-enable/disable a different featureset. This behaviour will be controlled through
-version tags:
+enable/disable a different featureset. This behaviour is controlled through
+mandatory version tags:
 
  use Full::Class qw(:v1);
 
-with the default being C<:v1>.
-
-The latest available version is C<:v2>.
+The latest available version is C<:v1>.
 
 =cut
 
