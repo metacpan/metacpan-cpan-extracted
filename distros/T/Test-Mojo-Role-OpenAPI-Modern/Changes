@@ -1,5 +1,12 @@
 Revision history for Test-Mojo-Role-OpenAPI-Modern
 
+0.006     2024-09-15 17:40:23Z
+          - new interfaces dump_request_validation_result,
+            dump_request_validation_result which dump validation results, and
+            a setter test_openapi_verbose to do so automatically on validation
+            failures
+          - adjust tests for changes in OpenAPI::Modern 0.068
+
 0.005     2023-12-20 21:26:03Z
           - request_invalid, response_invalid may now take error strings to
             search for

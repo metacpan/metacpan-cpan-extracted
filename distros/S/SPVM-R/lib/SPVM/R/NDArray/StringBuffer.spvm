@@ -6,6 +6,11 @@ class R::NDArray::StringBuffer extends R::NDArray {
   use Fn;
   use Array;
   use StringBuffer;
+  use Comparable;
+  
+  # Fields
+  
+  has _comparable : Comparable;
   
   # Class Mehtods
   static method new : R::NDArray::StringBuffer ($options : object[] = undef) {
@@ -13,6 +18,8 @@ class R::NDArray::StringBuffer extends R::NDArray {
     my $self = new R::NDArray::StringBuffer;
     
     $self->init($options);
+    
+    $self->{_comparable} = StringBuffer->new;
     
     return $self;
   }
@@ -60,17 +67,13 @@ class R::NDArray::StringBuffer extends R::NDArray {
   
   method elem_cmp : int ($a_data : StringBuffer[], $a_data_index : int, $b_data : StringBuffer[], $b_data_index : int) {
     
-    my $a_string = (string)undef;
-    if ($a_data->[$a_data_index]) {
-      $a_string = $a_data->[$a_data_index]->to_string;
-    }
+    my $comparable = $self->{_comparable};
     
-    my $b_string = (string)undef;
-    if ($b_data->[$b_data_index]) {
-      $b_string = $b_data->[$b_data_index]->to_string;
-    }
+    my $a_buffer = $a_data->[$a_data_index];
     
-    my $cmp = $a_string cmp $b_string;
+    my $b_buffer = $b_data->[$b_data_index];
+    
+    my $cmp = $comparable->cmp($a_buffer, $b_buffer);
     
     return $cmp;
   }

@@ -70,8 +70,11 @@
             "Time::Moment::Role::Strptime" : "0.001",
             "Time::Moment::Role::TimeZone" : "1.000",
             "Unicode::UTF8" : "0.62",
+            "bareword::filehandles" : "0.007",
             "curry" : "2.000001",
-            "meta" : "0.008"
+            "indirect" : "0.39",
+            "meta" : "0.008",
+            "multidimensional" : "0.014"
          }
       },
       "test" : {
@@ -84,30 +87,32 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::CheckDeps" : "0.010",
-            "Test::More" : "0.94"
+            "Test::Deep" : "1.124",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98"
          }
       }
    },
    "provides" : {
       "Full" : {
          "file" : "lib/Full.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "Full::Class" : {
          "file" : "lib/Full/Class.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "Full::Pragmata" : {
          "file" : "lib/Full/Pragmata.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "Full::Role" : {
          "file" : "lib/Full/Role.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "Full::Script" : {
          "file" : "lib/Full/Script.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       }
    },
    "release_status" : "stable",
@@ -122,7 +127,7 @@
          "web" : "https://github.com/team-at-cpan/Full"
       }
    },
-   "version" : "1.002",
+   "version" : "1.003",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Tom Molesworth <tom@audioboundary.com>"

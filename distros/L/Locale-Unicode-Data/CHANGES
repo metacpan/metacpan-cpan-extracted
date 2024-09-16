@@ -1,5 +1,10 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.0.2 2024-09-16T18:20:54+0900
+    - Removed test dependency
+    - Updated method calendars to allow search by 'calendar'
+    - Added missing 'calendars' field as containing array for methods territory() and territories()
+
 v1.0.1 2024-09-09T18:22:29+0900
     - Corrected bug in the timezones_cities_extended view
     - Added column 'collations' in table 'locales' to contain the possible collations for a locale

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2022 by Dominique Dumont.
+# This software is Copyright (c) 2008-2024 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -149,7 +149,9 @@ C<vsock:x:y>, it is read as CID
 x on a port y address in the
 C<AF_VSOCK> family.  The CID is a unique 32-bit integer identifier in
 C<AF_VSOCK> analogous to an IP address.  Specifying the CID is optional, and may be
-set to the empty string.
+set to the empty string. C<vsock> may be replaced with
+C<vsock-stream>, C<vsock-dgram> or C<vsock-seqpacket>
+to force usage of the corresponding socket type.
 
 Note that C<SOCK_SEQPACKET> (i.e.
 C<ListenSequentialPacket>) is only available
@@ -231,7 +233,9 @@ C<vsock:x:y>, it is read as CID
 x on a port y address in the
 C<AF_VSOCK> family.  The CID is a unique 32-bit integer identifier in
 C<AF_VSOCK> analogous to an IP address.  Specifying the CID is optional, and may be
-set to the empty string.
+set to the empty string. C<vsock> may be replaced with
+C<vsock-stream>, C<vsock-dgram> or C<vsock-seqpacket>
+to force usage of the corresponding socket type.
 
 Note that C<SOCK_SEQPACKET> (i.e.
 C<ListenSequentialPacket>) is only available
@@ -313,7 +317,9 @@ C<vsock:x:y>, it is read as CID
 x on a port y address in the
 C<AF_VSOCK> family.  The CID is a unique 32-bit integer identifier in
 C<AF_VSOCK> analogous to an IP address.  Specifying the CID is optional, and may be
-set to the empty string.
+set to the empty string. C<vsock> may be replaced with
+C<vsock-stream>, C<vsock-dgram> or C<vsock-seqpacket>
+to force usage of the corresponding socket type.
 
 Note that C<SOCK_SEQPACKET> (i.e.
 C<ListenSequentialPacket>) is only available
@@ -463,9 +469,9 @@ C<both>.',
 queue that have not been accepted yet. This setting matters only for stream and sequential packet
 sockets. See
 L<listen(2)> for
-details. Note that this value is silently capped by the C<net.core.somaxconn> sysctl,
-which typically defaults to 4096. By default this is set to 4294967295, so that the sysctl takes full
-effect.',
+details. Defaults to 4294967295. Note that this value is silently capped by the
+C<net.core.somaxconn> sysctl, which typically defaults to 4096, so typically
+the sysctl is the setting that actually matters.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -592,22 +598,19 @@ Defaults to C<no>.
       },
       'MaxConnections',
       {
-        'description' => 'The maximum number of connections to
-simultaneously run services instances for, when
-C<Accept=yes> is set. If more concurrent
-connections are coming in, they will be refused until at least
-one existing connection is terminated. This setting has no
-effect on sockets configured with
-C<Accept=no> or datagram sockets. Defaults to
-64.',
+        'description' => 'The maximum number of connections to simultaneously run services instances for, when
+C<Accept=yes> is set. If more concurrent connections are coming in, they will be refused
+until at least one existing connection is terminated. This setting has no effect on sockets configured
+with C<Accept=no> or datagram sockets. Defaults to 64.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'MaxConnectionsPerSource',
       {
-        'description' => 'The maximum number of connections for a service per source IP address.
-This is very similar to the C<MaxConnections> directive
-above. Disabled by default.',
+        'description' => 'The maximum number of connections for a service per source IP address (in case of
+IPv4/IPv6), per source CID (in case of C<AF_VSOCK>), or source UID (in case of
+C<AF_UNIX>). This is very similar to the C<MaxConnections>
+directive above. Defaults to 0, i.e. disabled.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -962,7 +965,7 @@ carry timestamping metadata. Defaults to C<off>.",
       'TCPCongestion',
       {
         'description' => 'Takes a string value. Controls the TCP congestion algorithm used by this
-socket. Should be one of C<westwood>, C<veno>,
+socket. Should be one of C<westwood>, C<reno>,
 C<cubic>, C<lp> or any other available algorithm supported by the IP
 stack. This setting applies only to stream sockets.',
         'type' => 'leaf',
@@ -1112,38 +1115,120 @@ suffix.',
       },
       'TriggerLimitIntervalSec',
       {
-        'description' => "Configures a limit on how often this socket unit may be activated within a specific time
-interval. The C<TriggerLimitIntervalSec> may be used to configure the length of the time
-interval in the usual time units C<us>, C<ms>, C<s>,
-C<min>, C<h>, \x{2026} and defaults to 2s (See
-L<systemd.time(7)> for details on
-the various time units understood). The C<TriggerLimitBurst> setting takes a positive integer
-value and specifies the number of permitted activations per time interval, and defaults to 200 for
-C<Accept=yes> sockets (thus by default permitting 200 activations per 2s), and 20 otherwise (20
-activations per 2s). Set either to 0 to disable any form of trigger rate limiting. If the limit is hit, the
-socket unit is placed into a failure mode, and will not be connectible anymore until restarted. Note that this
-limit is enforced before the service activation is enqueued.",
+        'description' => "Configures a limit on how often this socket unit may be activated within a specific
+time interval. The C<TriggerLimitIntervalSec> setting may be used to configure the
+length of the time interval in the usual time units C<us>, C<ms>,
+C<s>, C<min>, C<h>, \x{2026} and defaults to 2s (See
+L<systemd.time(7)> for
+details on the various time units understood). The C<TriggerLimitBurst> setting
+takes a positive integer value and specifies the number of permitted activations per time interval,
+and defaults to 200 for C<Accept=yes> sockets (thus by default permitting 200
+activations per 2s), and 20 otherwise (20 activations per 2s). Set either to 0 to disable any form of
+trigger rate limiting.
+
+If the limit is hit, the socket unit is placed into a failure mode, and will not be connectible
+anymore until restarted. Note that this limit is enforced before the service activation is
+enqueued.
+
+Compare with C<PollLimitIntervalSec>/C<PollLimitBurst>
+described below, which implements a temporary slowdown if a socket unit is flooded with incoming
+traffic, as opposed to the permanent failure state
+C<TriggerLimitIntervalSec>/C<TriggerLimitBurst> results in.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'TriggerLimitBurst',
       {
-        'description' => "Configures a limit on how often this socket unit may be activated within a specific time
-interval. The C<TriggerLimitIntervalSec> may be used to configure the length of the time
-interval in the usual time units C<us>, C<ms>, C<s>,
-C<min>, C<h>, \x{2026} and defaults to 2s (See
-L<systemd.time(7)> for details on
-the various time units understood). The C<TriggerLimitBurst> setting takes a positive integer
-value and specifies the number of permitted activations per time interval, and defaults to 200 for
-C<Accept=yes> sockets (thus by default permitting 200 activations per 2s), and 20 otherwise (20
-activations per 2s). Set either to 0 to disable any form of trigger rate limiting. If the limit is hit, the
-socket unit is placed into a failure mode, and will not be connectible anymore until restarted. Note that this
-limit is enforced before the service activation is enqueued.",
+        'description' => "Configures a limit on how often this socket unit may be activated within a specific
+time interval. The C<TriggerLimitIntervalSec> setting may be used to configure the
+length of the time interval in the usual time units C<us>, C<ms>,
+C<s>, C<min>, C<h>, \x{2026} and defaults to 2s (See
+L<systemd.time(7)> for
+details on the various time units understood). The C<TriggerLimitBurst> setting
+takes a positive integer value and specifies the number of permitted activations per time interval,
+and defaults to 200 for C<Accept=yes> sockets (thus by default permitting 200
+activations per 2s), and 20 otherwise (20 activations per 2s). Set either to 0 to disable any form of
+trigger rate limiting.
+
+If the limit is hit, the socket unit is placed into a failure mode, and will not be connectible
+anymore until restarted. Note that this limit is enforced before the service activation is
+enqueued.
+
+Compare with C<PollLimitIntervalSec>/C<PollLimitBurst>
+described below, which implements a temporary slowdown if a socket unit is flooded with incoming
+traffic, as opposed to the permanent failure state
+C<TriggerLimitIntervalSec>/C<TriggerLimitBurst> results in.",
         'type' => 'leaf',
         'value_type' => 'uniline'
+      },
+      'PollLimitIntervalSec',
+      {
+        'description' => 'Configures a limit on how often polling events on the file descriptors backing this
+socket unit will be considered. This pair of settings is similar to
+C<TriggerLimitIntervalSec>/C<TriggerLimitBurst> but instead of
+putting a (fatal) limit on the activation frequency puts a (transient) limit on the polling
+frequency. The expected parameter syntax and range are identical to that of the aforementioned
+options, and can be disabled the same way.
+
+If the polling limit is hit polling is temporarily disabled on it until the specified time
+window passes. The polling limit hence slows down connection attempts if hit, but unlike the trigger
+limit won\'t cause permanent failures. It\'s the recommended mechanism to deal with DoS attempts
+through packet flooding.
+
+The polling limit is enforced per file descriptor to listen on, as opposed to the trigger limit
+which is enforced for the entire socket unit. This distinction matters for socket units that listen
+on multiple file descriptors (i.e. have multiple C<ListenXYZ> stanzas).
+
+These setting defaults to 150 (in case of C<Accept=yes>) and 15 (otherwise)
+polling events per 2s. This is considerably lower than the default values for the trigger limit (see
+above) and means that the polling limit should typically ensure the trigger limit is never hit,
+unless one of them is reconfigured or disabled.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'PollLimitBurst',
+      {
+        'description' => 'Configures a limit on how often polling events on the file descriptors backing this
+socket unit will be considered. This pair of settings is similar to
+C<TriggerLimitIntervalSec>/C<TriggerLimitBurst> but instead of
+putting a (fatal) limit on the activation frequency puts a (transient) limit on the polling
+frequency. The expected parameter syntax and range are identical to that of the aforementioned
+options, and can be disabled the same way.
+
+If the polling limit is hit polling is temporarily disabled on it until the specified time
+window passes. The polling limit hence slows down connection attempts if hit, but unlike the trigger
+limit won\'t cause permanent failures. It\'s the recommended mechanism to deal with DoS attempts
+through packet flooding.
+
+The polling limit is enforced per file descriptor to listen on, as opposed to the trigger limit
+which is enforced for the entire socket unit. This distinction matters for socket units that listen
+on multiple file descriptors (i.e. have multiple C<ListenXYZ> stanzas).
+
+These setting defaults to 150 (in case of C<Accept=yes>) and 15 (otherwise)
+polling events per 2s. This is considerably lower than the default values for the trigger limit (see
+above) and means that the polling limit should typically ensure the trigger limit is never hit,
+unless one of them is reconfigured or disabled.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'PassFileDescriptorsToExec',
+      {
+        'description' => 'Takes a boolean argument. Defaults to off. If enabled, file descriptors created by
+the socket unit are passed to C<ExecStartPost>, C<ExecStopPre>, and
+C<ExecStopPost> commands from the socket unit. The passed file descriptors can be
+accessed with
+L<sd_listen_fds(3)> as
+if the commands were invoked from the associated service units.  Note that
+C<ExecStartPre> command cannot access socket file descriptors.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 254 doc',
+    'generated_by' => 'parse-man.pl from systemd 256 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Socket'
   }

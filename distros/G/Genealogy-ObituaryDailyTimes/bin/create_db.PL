@@ -48,7 +48,7 @@ my $dir = 'lib/Genealogy/ObituaryDailyTimes/data';
 if(defined($ARGV[0]) && ($ARGV[0] eq '-f')) {
 	$force_flag++;
 } elsif($ENV{'AUTOMATED_TESTING'}) {
-	exit;
+	exit(0);
 }
 
 if(!-d $dir) {

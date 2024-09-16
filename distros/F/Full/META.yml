@@ -8,7 +8,9 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
-  Test::More: '0.94'
+  Test::Deep: '1.124'
+  Test::Fatal: '0.010'
+  Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -28,19 +30,19 @@ no_index:
 provides:
   Full:
     file: lib/Full.pm
-    version: '1.002'
+    version: '1.003'
   Full::Class:
     file: lib/Full/Class.pm
-    version: '1.002'
+    version: '1.003'
   Full::Pragmata:
     file: lib/Full/Pragmata.pm
-    version: '1.002'
+    version: '1.003'
   Full::Role:
     file: lib/Full/Role.pm
-    version: '1.002'
+    version: '1.003'
   Full::Script:
     file: lib/Full/Script.pm
-    version: '1.002'
+    version: '1.003'
 requires:
   Data::Checks: '0.10'
   Future::AsyncAwait: '0.68'
@@ -65,13 +67,16 @@ requires:
   Time::Moment::Role::Strptime: '0.001'
   Time::Moment::Role::TimeZone: '1.000'
   Unicode::UTF8: '0.62'
+  bareword::filehandles: '0.007'
   curry: '2.000001'
+  indirect: '0.39'
   meta: '0.008'
+  multidimensional: '0.014'
 resources:
   bugtracker: https://github.com/team-at-cpan/Full/issues
   homepage: https://github.com/team-at-cpan/Full
   repository: https://github.com/team-at-cpan/Full.git
-version: '1.002'
+version: '1.003'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Tom Molesworth <tom@audioboundary.com>'

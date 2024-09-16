@@ -38,7 +38,8 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(new_user_amazon run_aws_cmd get_aws_security_id
                  launch_server $configure_aws $pem_file $credpath
                  $aws_configure $aws connect_shell cmd_raw
-		 fullauto_builddir setup_aws_security is_host_aws);
+		 fullauto_builddir setup_aws_security is_host_aws
+		 choose_aws_instances);
 our $pem_file='';
 our $credpath='.';
 our $aws={};
@@ -451,6 +452,7 @@ our $aws_configure=sub {
    my $homedir='.';
    my $handle_homedir='';
    my $handle_username='';
+   my $sudo=($^O eq 'cygwin')?'':'sudo ';
    print "\n";
    if ($handle) {
       $handle->cwd('~');
@@ -462,85 +464,103 @@ our $aws_configure=sub {
       $tdir=$handle->cmd($shell_cmd,'__delay__=200');
       unless ($tdir eq 'NODIR') {
          $handle->cmd("rm -rvf $handle_homedir/.aws",'__display__');
-         $handle->cmd('sudo rm -rvf /root/.aws','__display__');
+         $handle->cmd($sudo.'rm -rvf /root/.aws','__display__')
+	    unless $^O eq 'cygwin';
       }
       $handle_username=$handle->cmd('id -un');
-   }
-   if (can_load(modules => { "File::HomeDir" => 0 })) {
-      $homedir=File::HomeDir->my_home;
-   } elsif (-r "/home/$username") {
-      $homedir="/home/$username";
-   }
-   if (-e "/home/$username/.aws") {
-      eval {
-         `rm -rf /home/$username/.aws`;
-         `sudo rm -rf /root/.aws`;
-      };
-   }
-   {
-      $SIG{CHLD}="DEFAULT";
-      my $cmd="aws configure";
-      use IO::Pty;
-      my $pty = IO::Pty->new;
-      my $slave = $pty->slave;
-      $pty->slave->set_raw();
-      $pty->set_raw();
-      my $pid = fork(); die "bad fork: $!\n" unless defined $pid;
-      if (!$pid) {
-         $pty->close();
-         $pty->make_slave_controlling_terminal();
-         open( STDIN,  ">&", $slave ) or die "Couldn't dup stdin:  $!";
-         open( STDOUT, ">&", $slave ) or die "Couldn't dup stdout: $!";
-         open( STDERR, ">&", $slave ) or die "Couldn't dup stderr: $!";
-         exec $cmd;
-      } else {
-         $pty->close_slave();
-         my $line='';
-         while ( !$pty->eof ) {
-            while (defined($_ = $pty->getc)) {
-               $line.=$_;
-               if ($line=~/Access Key ID \[None\]:\s*$/) {
-                  for (1..length $line) {
-                     $pty->ungetc(ord);
+   } else {
+      if (can_load(modules => { "File::HomeDir" => 0 })) {
+         $homedir=File::HomeDir->my_home;
+      } elsif (-r "/home/$username") {
+         $homedir="/home/$username";
+      }
+      if (-e "/home/$username/.aws") {
+         eval {
+            `rm -rf /home/$username/.aws`;
+            `${sudo}rm -rf /root/.aws`
+	       unless $^O eq 'cygwin';
+         };
+      }
+      {
+         $SIG{CHLD}="DEFAULT";
+         my $cmd="aws configure";
+         use IO::Pty;
+         my $pty = IO::Pty->new;
+         my $slave = $pty->slave;
+         $pty->slave->set_raw();
+         $pty->set_raw();
+         my $pid = fork(); die "bad fork: $!\n" unless defined $pid;
+         if (!$pid) {
+            $pty->close();
+            $pty->make_slave_controlling_terminal();
+            open( STDIN,  ">&", $slave ) or die "Couldn't dup stdin:  $!";
+            open( STDOUT, ">&", $slave ) or die "Couldn't dup stdout: $!";
+            open( STDERR, ">&", $slave ) or die "Couldn't dup stderr: $!";
+            exec $cmd;
+         } else {
+            $pty->close_slave();
+            my $line='';
+            while ( !$pty->eof ) {
+               while (defined($_ = $pty->getc)) {
+                  $line.=$_;
+                  if ($line=~/Access Key ID \[None\]:\s*$/) {
+                     for (1..length $line) {
+                        $pty->ungetc(ord);
+                     }
+                     $line='';
+                     $pty->print("$main::aws->{access_id}\n");
+                  } elsif ($line=~/Secret Access Key \[None\]:\s*$/) {
+                     for (1..length $line) {
+                        $pty->ungetc(ord);
+                     }
+                     $line='';
+                     $pty->print("$main::aws->{secret_key}\n");
+                  } elsif ($line=~/Default region name \[None\]:\s*$/) {
+                     for (1..length $line) {
+                        $pty->ungetc(ord);
+                     }
+                     $line='';
+                     $pty->print("$region\n");
+                  } elsif ($line=~/Default output format \[None\]:\s*$/) {
+                     for (1..length $line) {
+                         $pty->ungetc(ord);
+                     }
+                     $pty->print("\n");
                   }
-                  $line='';
-                  $pty->print("$main::aws->{access_id}\n");
-               } elsif ($line=~/Secret Access Key \[None\]:\s*$/) {
-                  for (1..length $line) {
-                     $pty->ungetc(ord);
-                  }
-                  $line='';
-                  $pty->print("$main::aws->{secret_key}\n");
-               } elsif ($line=~/Default region name \[None\]:\s*$/) {
-                  for (1..length $line) {
-                     $pty->ungetc(ord);
-                  }
-                  $line='';
-                  $pty->print("$region\n");
-               } elsif ($line=~/Default output format \[None\]:\s*$/) {
-                  for (1..length $line) {
-                     $pty->ungetc(ord);
-                  }
-                  $pty->print("\n");
                }
             }
+            wait();
          }
-         wait();
-      }
 
-      #cleanup pty for next run
-      $pty->close();
-      my $sudo=($^O eq 'cygwin')?'':'sudo ';
-      system("${sudo}cp -R $homedir/.aws /home/$username")
-         unless $homedir eq "/home/$username";
-      my $group=$username;
-      $group='Administrators' if $username eq 'Administrator';
-      system("${sudo}chown -R $username:$group /home/$username/.aws");
-      system("${sudo}chmod 755 /home/$username/.aws");
+         #cleanup pty for next run
+         $pty->close();
+         system("${sudo}cp -R $homedir/.aws /home/$username")
+            unless $homedir eq "/home/$username";
+         my $group=$username;
+         $group='Administrators' if $username eq 'Administrator';
+         system("${sudo}chown -R $username:$group /home/$username/.aws");
+         system("${sudo}chmod 755 /home/$username/.aws");
+      }
       if ($handle) {
-	 $group=$handle_username;
+         $handle->print('aws configure');
+         my $prompt=$handle->prompt();
+         while (1) {
+            my $output=fetch($handle);
+            last if $output=~/$prompt/;
+            print $output;
+            if ($output=~/Access Key ID \[None\]:\s*$/) {
+               $handle->print("$main::aws->{access_id}\n");
+            } elsif ($output=~/Secret Access Key \[None\]:\s*$/) {
+               $handle->print("$main::aws->{secret_key}\n");
+            } elsif ($output=~/Default region name \[None\]:\s*$/) {
+               $handle->print("$region\n");
+            } elsif ($output=~/Default output format \[None\]:\s*$/) {
+               $handle->print("\n");
+	    }
+         }
+	 my $group=$handle_username;
          $handle->cmd($sudo.
-            "cp -R $homedir/.aws /home/$handle_username");
+            "cp -Rv $homedir/.aws /home/$handle_username",'__display__');
          $handle->cmd($sudo.
             "chown -Rv $handle_username:$group /home/$handle_username/.aws",
             '__display__');
@@ -800,7 +820,7 @@ END
 
 };
 
-my $choose_aws_instances=sub {
+our $choose_aws_instances=sub {
 
    my $instruction_set_choice=']S[';
    my $fa_tag=0;

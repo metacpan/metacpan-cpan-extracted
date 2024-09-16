@@ -19,7 +19,8 @@ subtest 'openapi object on the test itself' => sub {
   my $t = Test::Mojo
     ->with_roles('+OpenAPI::Modern')
     ->new($::app)
-    ->openapi($::openapi);
+    ->openapi($::openapi)
+    ->test_openapi_verbose(1);
 
   $t->post_ok('/foo/123', json => {})
     ->status_is(200)
@@ -59,7 +60,8 @@ subtest 'openapi object is constructed using provided configs' => sub {
       openapi => {
         schema => $schema,
       }
-    });
+    })
+    ->test_openapi_verbose(1);
 
   is($t->openapi->document_get('/info/title'), 'Test API using overridden configs',
     'test role constructs its own OpenAPI::Modern object');

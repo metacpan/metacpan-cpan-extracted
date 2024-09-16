@@ -1,0 +1,32 @@
+---
+abstract: unknown
+author:
+  - 'Erik Huelsmann <ehuels@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sys-Async-Virt
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Feature::Compat::Try: '0'
+  Future::AsyncAwait: '0'
+  Future::Queue: '0'
+  IO::Async::Loop: '0'
+  Log::Any: '0'
+  Protocol::Sys::Virt: v10.3.7
+  perl: v5.20.0
+resources:
+  repository: git://github.com/ehuelsmann/perl-sys-async-virt.git
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

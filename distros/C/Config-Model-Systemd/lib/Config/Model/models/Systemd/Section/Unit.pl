@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2022 by Dominique Dumont.
+# This software is Copyright (c) 2008-2024 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -100,20 +100,20 @@ C<alias\@bar.service>) are not aliased. Those rules preserve the requirement tha
 instance (if any) is always uniquely defined for a given unit and all its aliases. The target of alias
 symlink must point to a valid unit file location, i.e. the symlink target name must match the symlink
 source name as described, and the destination path must be in one of the unit search paths, see UNIT FILE
-LOAD PATH section below for more details. Note that the target file may not exist, i.e. the symlink may
+LOAD PATH section below for more details. Note that the target file might not exist, i.e. the symlink may
 be dangling.
 
 Unit files may specify aliases through the C<Alias> directive in the [Install]
 section. When the unit is enabled, symlinks will be created for those names, and removed when the unit is
 disabled. For example, C<reboot.target> specifies
 C<Alias=ctrl-alt-del.target>, so when enabled, the symlink
-C</etc/systemd/system/ctrl-alt-del.service> pointing to the
+C</etc/systemd/system/ctrl-alt-del.target> pointing to the
 C<reboot.target> file will be created, and when
 CtrlAltDel is invoked,
-systemd will look for the C<ctrl-alt-del.service> and execute
-C<reboot.service>. systemd does not look at the [Install] section at
-all during normal operation, so any directives in that section only have an effect through the symlinks
-created during enablement.
+systemd will look for C<ctrl-alt-del.target>, follow the symlink to
+C<reboot.target>, and execute C<reboot.service> as part of that target.
+systemd does not look at the [Install] section at all during normal operation, so any
+directives in that section only have an effect through the symlinks created during enablement.
 
 Along with a unit file C<foo.service>, the directory
 C<foo.service.wants/> may exist. All unit files symlinked from such a directory are
@@ -132,7 +132,7 @@ source unit is a template, the target can also be a template, in which case the 
 C<.wants/> or C<.requires/> must thus point to a valid unit file
 location, i.e. the symlink target name must satisfy the described requirements, and the destination path
 must be in one of the unit search paths, see UNIT FILE LOAD PATH section below for more details. Note
-that the target file may not exist, i.e. the symlink may be dangling.
+that the target file might not exist, i.e. the symlink may be dangling.
 
 Along with a unit file C<foo.service>, a \"drop-in\" directory
 C<foo.service.d/> may exist. All files with the suffix
@@ -539,7 +539,7 @@ they are shut down or started up simultaneously, and no ordering takes place. It
 type when precisely a unit has finished starting up. Most importantly, for service units start-up is
 considered completed for the purpose of C<Before>/C<After> when all
 its configured start-up commands have been invoked and they either failed or reported start-up
-success. Note that this does includes C<ExecStartPost> (or
+success. Note that this includes C<ExecStartPost> (or
 C<ExecStopPost> for the shutdown case).
 
 Note that those settings are independent of and orthogonal to the requirement dependencies as
@@ -582,7 +582,7 @@ they are shut down or started up simultaneously, and no ordering takes place. It
 type when precisely a unit has finished starting up. Most importantly, for service units start-up is
 considered completed for the purpose of C<Before>/C<After> when all
 its configured start-up commands have been invoked and they either failed or reported start-up
-success. Note that this does includes C<ExecStartPost> (or
+success. Note that this includes C<ExecStartPost> (or
 C<ExecStopPost> for the shutdown case).
 
 Note that those settings are independent of and orthogonal to the requirement dependencies as
@@ -649,12 +649,12 @@ units that are linked to it using these two settings.',
       'JoinsNamespaceOf',
       {
         'description' => 'For units that start processes (such as service units), lists one or more other units
-whose network and/or temporary file namespace to join. If this is specified on a unit (say, a.service
-has C<JoinsNamespaceOf=b.service>), then this the inverse dependency
-(C<JoinsNamespaceOf=a.service> for b.service) is implied. This only applies to unit
-types which support the C<PrivateNetwork>, C<NetworkNamespacePath>,
-C<PrivateIPC>, C<IPCNamespacePath>, and
-C<PrivateTmp> directives (see
+whose network and/or temporary file namespace to join. If this is specified on a unit (say,
+C<a.service> has C<JoinsNamespaceOf=b.service>), then the inverse
+dependency (C<JoinsNamespaceOf=a.service> for b.service) is implied. This only
+applies to unit types which support the C<PrivateNetwork>,
+C<NetworkNamespacePath>, C<PrivateIPC>,
+C<IPCNamespacePath>, and C<PrivateTmp> directives (see
 L<systemd.exec(5)> for
 details). If a unit that has this setting set is started, its processes will see the same
 C</tmp/>, C</var/tmp/>, IPC namespace and network namespace as
@@ -678,6 +678,14 @@ Mount points marked with C<noauto> are not
 mounted automatically through C<local-fs.target>,
 but are still honored for the purposes of this option, i.e. they
 will be pulled in by this unit.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'WantsMountsFor',
+      {
+        'description' => 'Same as C<RequiresMountsFor>,
+but adds dependencies of type C<Wants> instead
+of C<Requires>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -837,6 +845,22 @@ ones.',
           'yes'
         ]
       },
+      'SurviveFinalKillSignal',
+      {
+        'description' => 'Takes a boolean argument. Defaults to C<no>. If C<yes>,
+processes belonging to this unit will not be sent the final C<SIGTERM> and
+C<SIGKILL> signals during the final phase of the system shutdown process.
+This functionality replaces the older mechanism that allowed a program to set
+C<argv[0][0] = \'@\'> as described at
+L<systemd and Storage Daemons for the Root File
+System|https://systemd.io/ROOT_STORAGE_DAEMONS>, which however continues to be supported.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
       'CollectMode',
       {
         'choice' => [
@@ -926,7 +950,8 @@ the unit state to change.',
         'description' => 'C<JobTimeoutAction> optionally configures an additional action to
 take when the timeout is hit, see description of C<JobTimeoutSec> and
 C<JobRunningTimeoutSec> above. It takes the same values as
-C<StartLimitAction>. Defaults to C<none>.
+C<FailureAction>/C<SuccessAction>. Defaults to
+C<none>.
 
 C<JobTimeoutRebootArgument> configures an optional reboot string to pass to
 the L<reboot(2)> system
@@ -939,7 +964,8 @@ call.',
         'description' => 'C<JobTimeoutAction> optionally configures an additional action to
 take when the timeout is hit, see description of C<JobTimeoutSec> and
 C<JobRunningTimeoutSec> above. It takes the same values as
-C<StartLimitAction>. Defaults to C<none>.
+C<FailureAction>/C<SuccessAction>. Defaults to
+C<none>.
 
 C<JobTimeoutRebootArgument> configures an optional reboot string to pass to
 the L<reboot(2)> system
@@ -1055,6 +1081,10 @@ C<cris>,
 C<arc>,
 C<arc-be>, or
 C<native>.
+
+Use
+L<systemd-analyze(1)>
+for the complete list of known architectures.
 
 The architecture is determined from the information returned by
 L<uname(2)>
@@ -1217,10 +1247,8 @@ check for variables passed in by the enclosing container manager or PAM.",
           'value_type' => 'uniline'
         },
         'description' => 'C<ConditionSecurity> may be used to check whether the given
-security technology is enabled on the system. Currently, the recognized values are
-C<selinux>, C<apparmor>, C<tomoyo>,
-C<ima>, C<smack>, C<audit>,
-C<uefi-secureboot>, C<tpm2> and C<cvm>.
+security technology is enabled on the system. Currently, the following values are recognized:
+
 The test may be negated by prepending an exclamation mark.',
         'type' => 'list'
       },
@@ -1276,7 +1304,7 @@ L<systemd-update-done.service(8)>,
 to make sure they run before the stamp file\'s modification time gets reset indicating a completed
 update.
 
-If the C<systemd.condition-needs-update=> option is specified on the kernel
+If the C<systemd.condition_needs_update=> option is specified on the kernel
 command line (taking a boolean), it will override the result of this condition check, taking
 precedence over any file modification time checks. If the kernel command line option is used,
 C<systemd-update-done.service> will not have immediate effect on any following
@@ -1311,18 +1339,26 @@ happen.',
 whether the system is booting up for the first time. This roughly means that C</etc/>
 was unpopulated when the system started booting (for details, see "First Boot Semantics" in
 L<machine-id(5)>).
-First boot is considered finished (this condition will evaluate as false) after the manager
+First Boot is considered finished (this condition will evaluate as false) after the manager
 has finished the startup phase.
 
 This condition may be used to populate C</etc/> on the first boot after
 factory reset, or when a new system instance boots up for the first time.
+
+Note that the service manager itself will perform setup steps during First Boot: it will
+initialize
+L<machine-id(5)> and
+preset all units, enabling or disabling them according to the
+L<systemd.preset(5)>
+settings. Additional setup may be performed via units with
+C<ConditionFirstBoot=yes>.
 
 For robustness, units with C<ConditionFirstBoot=yes> should order themselves
 before C<first-boot-complete.target> and pull in this passive target with
 C<Wants>. This ensures that in a case of an aborted first boot, these units will
 be re-run during the next system startup.
 
-If the C<systemd.condition-first-boot=> option is specified on the kernel
+If the C<systemd.condition_first_boot=> option is specified on the kernel
 command line (taking a boolean), it will override the result of this condition check, taking
 precedence over C</etc/machine-id> existence checks.',
         'type' => 'list'
@@ -1620,8 +1656,8 @@ Alternatively, the average timespan can also be specified using C</> as a separa
 example: C<10%/1min>. The supported timespans match what the kernel provides, and are
 limited to C<10sec>, C<1min> and C<5min>. The
 C<full> PSI will be checked first, and if not found C<some> will be
-checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
-|https://docs.kernel.org/accounting/psi.html>.
+checked. For more details, see the documentation on L<PSI (Pressure Stall
+Information)|https://docs.kernel.org/accounting/psi.html>.
 
 Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
 followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
@@ -1642,8 +1678,8 @@ Alternatively, the average timespan can also be specified using C</> as a separa
 example: C<10%/1min>. The supported timespans match what the kernel provides, and are
 limited to C<10sec>, C<1min> and C<5min>. The
 C<full> PSI will be checked first, and if not found C<some> will be
-checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
-|https://docs.kernel.org/accounting/psi.html>.
+checked. For more details, see the documentation on L<PSI (Pressure Stall
+Information)|https://docs.kernel.org/accounting/psi.html>.
 
 Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
 followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
@@ -1664,8 +1700,8 @@ Alternatively, the average timespan can also be specified using C</> as a separa
 example: C<10%/1min>. The supported timespans match what the kernel provides, and are
 limited to C<10sec>, C<1min> and C<5min>. The
 C<full> PSI will be checked first, and if not found C<some> will be
-checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
-|https://docs.kernel.org/accounting/psi.html>.
+checked. For more details, see the documentation on L<PSI (Pressure Stall
+Information)|https://docs.kernel.org/accounting/psi.html>.
 
 Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
 followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
@@ -2135,7 +2171,7 @@ into.",
         'warn' => 'OnFailureIsolate is now OnFailureJobMode.'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 254 doc',
+    'generated_by' => 'parse-man.pl from systemd 256 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Unit'
   }

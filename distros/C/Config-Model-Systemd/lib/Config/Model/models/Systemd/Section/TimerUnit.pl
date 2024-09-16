@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2022 by Dominique Dumont.
+# This software is Copyright (c) 2008-2024 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -48,9 +48,8 @@ C<poweroff-force>, C<poweroff-immediate>, C<exit>,
 C<exit-force>, C<soft-reboot>, C<soft-reboot-force>,
 C<kexec>, C<kexec-force>, C<halt>,
 C<halt-force> and C<halt-immediate>. In system mode, all options are
-allowed. In user mode, only C<none>, C<exit>,
-C<exit-force>, C<soft-reboot> and C<soft-reboot-force> are
-allowed. Both options default to C<none>.
+allowed. In user mode, only C<none>, C<exit>, and
+C<exit-force> are allowed. Both options default to C<none>.
 
 If C<none> is set, no action will be triggered. C<reboot> causes a
 reboot following the normal shutdown procedure (i.e. equivalent to systemctl
@@ -103,9 +102,8 @@ C<poweroff-force>, C<poweroff-immediate>, C<exit>,
 C<exit-force>, C<soft-reboot>, C<soft-reboot-force>,
 C<kexec>, C<kexec-force>, C<halt>,
 C<halt-force> and C<halt-immediate>. In system mode, all options are
-allowed. In user mode, only C<none>, C<exit>,
-C<exit-force>, C<soft-reboot> and C<soft-reboot-force> are
-allowed. Both options default to C<none>.
+allowed. In user mode, only C<none>, C<exit>, and
+C<exit-force> are allowed. Both options default to C<none>.
 
 If C<none> is set, no action will be triggered. C<reboot> causes a
 reboot following the normal shutdown procedure (i.e. equivalent to systemctl
@@ -142,6 +140,8 @@ are allowed.
 interval is a time span with the default unit of seconds, but other
 units may be specified, see
 L<systemd.time(5)>.
+The special value C<infinity> can be used to limit the total number of start
+attempts, even if they happen at large time intervals.
 Defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, and may
 be set to 0 to disable any kind of rate limiting. burst is a number and
 defaults to C<DefaultStartLimitBurst> in manager configuration file.
@@ -181,6 +181,8 @@ are allowed.
 interval is a time span with the default unit of seconds, but other
 units may be specified, see
 L<systemd.time(5)>.
+The special value C<infinity> can be used to limit the total number of start
+attempts, even if they happen at large time intervals.
 Defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, and may
 be set to 0 to disable any kind of rate limiting. burst is a number and
 defaults to C<DefaultStartLimitBurst> in manager configuration file.

@@ -1,0 +1,46 @@
+{
+   "abstract" : "Fast Vulnerability lookups using CVE_ID and CPE23",
+   "author" : [
+      "Joshua S. Day <hax@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Webservice-CVEDB-API",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::PP" : "0",
+            "Test::More" : "0",
+            "perl" : "5.040"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/haxmeister/perl-CVEDB",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haxmeister/perl-CVEDB.git",
+         "web" : "https://github.com/haxmeister/perl-CVEDB"
+      }
+   },
+   "version" : "1.000",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

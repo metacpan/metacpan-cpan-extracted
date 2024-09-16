@@ -14,7 +14,7 @@ BEGIN {
 SKIP: {
 	skip 'Database not installed', 13 if(!-r 'lib/Genealogy/ObituaryDailyTimes/data/obituaries.sql');
 
-	Database::Abstraction::init('directory' => 'lib/Genealgy/ObituaryDailyTimes/data');
+	Database::Abstraction::init('directory' => 'lib/Genealogy/ObituaryDailyTimes/data');
 
 	my $search;
 	if($ENV{'TEST_VERBOSE'}) {
@@ -23,28 +23,32 @@ SKIP: {
 		$search = new_ok('Genealogy::ObituaryDailyTimes');
 	}
 
-	my @smiths = $search->search(last => 'Smith');
+	my @smiths = $search->search('Smith');
 
 	if($ENV{'TEST_VERBOSE'}) {
 		diag(Data::Dumper->new([\@smiths])->Dump());
 	}
 
-	ok(scalar(@smiths) >= 1);
+	cmp_ok(scalar(@smiths), '>=', 1, 'At least one Smith is found');
 
 	# FIXME, test either last == Smith or maiden == Smith
 	is($smiths[0]->{'last'}, 'Smith', 'Returned Smiths');
 
-	unless($ENV{'MLARCHIVEDIR'} || ($ENV{'MLARCHIVE_DIR'})) {
-		diag('The next test may fail since Rootsweb was partially archived on Wayback Machine');
-	}
-	my $baal = $search->search({ first => 'Eric', last => 'Baal' });
-	ok(defined($baal));
+	if($ENV{'MLARCHIVEDIR'} || ($ENV{'MLARCHIVE_DIR'})) {
+		my $baal = $search->search({ first => 'Eric', last => 'Baal' });
+		ok(defined($baal));
 
-	if($ENV{'TEST_VERBOSE'}) {
-		diag(Data::Dumper->new([$baal])->Dump());
+		if($ENV{'TEST_VERBOSE'}) {
+			diag(Data::Dumper->new([$baal])->Dump());
+		}
+		# cmp_ok($baal->{'url'}, 'eq', 'https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check Baal URL');
+		cmp_ok($baal->{'url'}, 'eq', 'https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check Baal URL');
+	} else {
+		SKIP: {
+			diag('Removed test since Rootsweb was partially archived on Wayback Machine');
+			skip('MLARCHIVEDIR or MLARCHIVE_DIR not set', 2);
+		}
 	}
-	# cmp_ok($baal->{'url'}, 'eq', 'https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check Baal URL');
-	cmp_ok($baal->{'url'}, 'eq', 'https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check Baal URL');
 
 	my @coppage = $search->search({ first => 'John', middle => 'W', last => 'Coppage' });
 

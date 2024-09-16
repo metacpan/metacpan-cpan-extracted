@@ -1,5 +1,8 @@
 Release history for lib::with::preamble
 
+0.001004 - 2024-09-16
+  - Update tests to avoid experimental/deprecated smartmatch feature
+
 0.001003 - 2014-10-04
   - minor fixes for metadata and kwalitee metrics
 

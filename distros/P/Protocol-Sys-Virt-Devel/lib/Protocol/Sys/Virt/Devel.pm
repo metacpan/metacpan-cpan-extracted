@@ -3,7 +3,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures';
 
-package Protocol::Sys::Virt::Devel v0.0.4;
+package Protocol::Sys::Virt::Devel v0.0.5;
 
 use parent 'Exporter';
 our @EXPORT_OK = qw( extract_all );
@@ -121,6 +121,18 @@ my %headers = (
 
 my $parser = XDR::Parse->new;
 
+sub _find_toplevel_definition {
+    my ($ast, $name) = @_;
+    for my $def (@{ $ast } ) {
+        next if $def->{def} eq 'passthrough';
+        next if $def->{def} eq 'preprocessor';
+
+        return $def
+            if $def->{name}->{content} eq $name;
+    }
+    return;
+}
+
 sub _ast($filename) {
     open my $fh, '<:encoding(UTF-8)', $filename
         or die "Error opening '$filename': $!";
@@ -159,7 +171,7 @@ sub _trim {
     $v;
 }
 
-sub _header_extractor($libvirt, $header) {
+sub _header_constant_extractor($libvirt, $header) {
     my @syms;
 
     open my $fh, '<:encoding(UTF-8)', File::Spec->catfile($libvirt, $header)
@@ -214,12 +226,66 @@ sub _header_extractor($libvirt, $header) {
     return @syms;
 }
 
+sub _estimate_entrypoint($proc_name) {
+    $proc_name = (lc($proc_name) =~ s/remote_proc_/vir_/ir);
+    return $proc_name =~ s/_//igr;
+}
+
+sub _header_entrypoint_extractor($libvirt, $ast) {
+    # find toplevel definition 'remote_procedure' and extract the enum members
+    my $procs = _find_toplevel_definition( $ast, 'remote_procedure' );
+    my %ep_map = (
+        map {
+            _estimate_entrypoint($_->{name}->{content}) => $_->{name}->{content}
+        } @{ $procs->{definition}->{type}->{declaration}->{elements} } );
+
+    my $entrypoints = join('|', keys %ep_map);
+    my $ep_regex = qr/(?i)\b($entrypoints)\b/;
+
+    my %actual;
+    for my $header (sort keys %headers) {
+        open my $fh, '<:encoding(UTF-8)', File::Spec->catfile($libvirt, $header)
+            or die "Error opening '$header': $!";
+
+        my $in_comment = 0;
+        my $lineno = 0;
+        while (my $line = <$fh>) {
+            $lineno++;
+            if ($in_comment) {
+                # strip out everything up to the closing '*/'
+                if ($line =~ s|.*?\*/||) {
+                    # stipped; continue regular processing
+                    $in_comment = 0;
+                }
+                else {
+                    # the entire line is part of the comment
+                    # don't process it any further
+                    next;
+                }
+            }
+            $line =~ s|#.*$||; # remove trailing comments
+            $line =~ s|/\*.*?\*/||g; # remove inline comments
+            if ($line =~ s|/\*.*$||) {
+                $in_comment = 1;
+            }
+            if ($line =~ m/$ep_regex/) {
+                my $proc = $ep_map{lc($1)};
+                $actual{$proc} = {
+                    name => $1,
+                    header => $header,
+                    lineno => $lineno,
+                };
+            }
+        }
+    }
+    return \%actual;
+}
 
 sub extract_all($libvirt) {
     my @h_syms;
     for my $header (sort keys %headers) {
         push @h_syms,
-            _header_extractor( $libvirt, $header );
+            _header_constant_extractor( $libvirt, $header );
     }
     my %h_sym_values;
     for my $h_sym (@h_syms) {
@@ -237,15 +303,18 @@ sub extract_all($libvirt) {
     for my $h_sym (@h_syms) {
         $h_sym->{resolved} = $h_sym_values{$h_sym->{orig}};
     }
+    my $ast = {
+        map {
+            $_->{name} =>
+                _ast(File::Spec->catfile($libvirt, $_->{definitions}))
+        } @modules
+    };
+    my $ep_map = _header_entrypoint_extractor($libvirt, $ast->{remote});
 
     return {
-        ast => {
-            map {
-                $_->{name} =>
-                    _ast(File::Spec->catfile($libvirt, $_->{definitions}))
-            } @modules
-        },
+        ast => $ast,
         header_syms => \@h_syms,
+        proc_entrypoints => $ep_map,
         xdr_parse_version => $XDR::Parse::VERSION,
     };
 }
@@ -317,6 +386,29 @@ the public C<libvirt> headers (and an internal header hiding some of the
 protocol constants).
 
 Each array element is a hashref with the following keys:
+
+=item * proc_entrypoints
+
+A hashref with the keys being the identifiers from the C<remote_protocol>
+enum in the protocol definition with the values being hashes with the
+following keys:
+
+=over 8
+
+=item * header
+
+The C API header file where the entrypoint was found
+
+=item * name
+
+The C API entrypoint name matching the protocol procedure name
+
+=item * lineno
+
+The line number in the header file at which the entrypoint is defined
+
+=back
+
 
 =item * xdr_parse_version
 

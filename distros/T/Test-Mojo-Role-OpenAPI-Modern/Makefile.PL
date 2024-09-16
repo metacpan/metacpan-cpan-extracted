@@ -87,7 +87,7 @@ my %WriteMakefileArgs = (
     "List::Util" => 0,
     "Mojo::Base" => 0,
     "Mojolicious" => "9.0",
-    "OpenAPI::Modern" => "0.054",
+    "OpenAPI::Modern" => "0.068",
     "Role::Tiny" => "2.000001",
     "if" => 0,
     "namespace::clean" => 0,
@@ -113,7 +113,7 @@ my %WriteMakefileArgs = (
     "stable" => "0.031",
     "utf8" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -127,7 +127,7 @@ my %FallbackPrereqs = (
   "Mojo::Base" => 0,
   "Mojo::URL" => 0,
   "Mojolicious" => "9.0",
-  "OpenAPI::Modern" => "0.054",
+  "OpenAPI::Modern" => "0.068",
   "Role::Tiny" => "2.000001",
   "Scalar::Util" => 0,
   "Storable" => 0,

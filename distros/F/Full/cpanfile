@@ -23,3 +23,13 @@ requires 'Time::Moment::Role::TimeZone', '>= 1.000';
 requires 'Unicode::UTF8', '>= 0.62';
 requires 'curry', '>= 2.000001';
 requires 'meta', '>= 0.008';
+requires 'multidimensional', '>= 0.014';
+requires 'indirect', '>= 0.39';
+requires 'bareword::filehandles', '>= 0.007';
+
+on 'test' => sub {
+	requires 'Test::More', '>= 0.98';
+	requires 'Test::Deep', '>= 1.124';
+	requires 'Test::Fatal', '>= 0.010';
+	requires 'Test::CheckDeps', '>= 0.010';
+};

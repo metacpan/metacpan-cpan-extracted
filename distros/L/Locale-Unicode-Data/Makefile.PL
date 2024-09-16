@@ -52,7 +52,6 @@ my %WriteMakefileArgs = (
         'lib'           => '0.63',
         'open'          => 0,
         'utf8'          => 0,
-        'DateTime::Locale' => 0,
         'File::Find'    => 0,
         # Released 2017-11-30
         'Test::More'    => '1.302120',
@@ -62,7 +61,7 @@ my %WriteMakefileArgs = (
     # 2007-12-18
     MIN_PERL_VERSION    => 'v5.10',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp', PREOP => './dev/cleanup.pl' },
     clean               => { FILES => 'Locale-Unicode-Data-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },

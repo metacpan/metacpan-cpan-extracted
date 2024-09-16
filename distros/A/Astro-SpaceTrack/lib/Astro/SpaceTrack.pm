@@ -82,11 +82,11 @@ C<url_iridium_status_mccants> is fatal.
 
 As of version 0.164 support for Iridium Classic satellites is being
 deprecated and removed. All testing of the iridium_status() method is
-halted as of version 0.164. Six months after that release, the first use
-of the iridium_status() method will produce a warning. After a further
-six months all uses will warn, and after a further six months use of
-this method will be fatal. Related attributes and manifest constants
-will be deprecated on the same schedule.
+halted as of version 0.164. As of version 0.167, the first use of the
+iridium_status() method will produce a warning. After a further six
+months all uses will warn, and after a further six months use of this
+method will be fatal. Related attributes and manifest constants will be
+deprecated on the same schedule.
 
 The Celestrak Iridium catalog is B<not> being deprecated because it
 still exists, and there are still non-functioning Iridium Classic
@@ -131,7 +131,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.166';
+our $VERSION = '0.167';
 our @EXPORT_OK = qw{
     shell
 
@@ -333,6 +333,7 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	},
 	# Removed 2022-05-12
 	# '2019-006'	=> { name => 'Indian ASAT Test Debris' },
+	eutelsat	=> { name => 'Eutelsat' },
     },
     celestrak_supplemental => {
 	gps		=> {
@@ -5146,12 +5147,12 @@ sub _check_cookie_generic {
 	    '--start_epoch'	=> 3,
 	},
 	attribute	=> {
-	    direct		=> 1,
+	    direct		=> 2,
 	    url_iridium_status_kelso	=> 0,
 	    url_iridium_status_mccants	=> 3,
 	    url_iridium_status_sladen	=> 0,
 	},
-	iridium_status	=> 0,
+	iridium_status	=> 1,
 	iridium_status_format	=> {
 	    kelso	=> 0,
 	    mccants	=> 3,
@@ -6741,7 +6742,9 @@ the name of the session cookie you can use this to get you going again.
 
 This attribute specifies that orbital elements should be fetched
 directly from the redistributer This attribute is deprecated, and as of
-version 0.150 its value is ignored.
+version 0.150 its value is ignored. As of version 0.167, use of this
+attribute will produce a warning, After a further 6 months, use of it
+will be fatal.
 
 The default is true (i.e. 1).
 

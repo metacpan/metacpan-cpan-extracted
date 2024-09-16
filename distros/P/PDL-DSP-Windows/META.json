@@ -49,7 +49,7 @@
          "prereqs" : {
             "runtime" : {
                "recommends" : {
-                  "PDL::Graphics::Gnuplot" : "0"
+                  "PDL::Graphics::Simple" : "0"
                }
             }
          }
@@ -73,7 +73,7 @@
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "0",
+            "PDL" : "2.055",
             "perl" : "5.010"
          }
       },
@@ -82,11 +82,9 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "Test::More" : "0.96",
-            "Try::Tiny" : "0",
             "perl" : "5.010"
          }
       }
@@ -94,22 +92,21 @@
    "provides" : {
       "PDL::DSP::Windows" : {
          "file" : "lib/PDL/DSP/Windows.pm",
-         "version" : "0.101"
+         "version" : "0.102"
+      },
+      "PDL::Demos::DSPWindows" : {
+         "file" : "lib/PDL/Demos/DSPWindows.pm",
+         "version" : "0.102"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "jjatria at cpan.org",
-         "web" : "https://github.com/jjatria/PDL-DSP-Windows/issues"
-      },
-      "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/jjatria/PDL-DSP-Windows.git",
-         "web" : "https://github.com/jjatria/PDL-DSP-Windows"
+         "web" : "https://github.com/PDLPorters/PDL-DSP-Windows/issues"
       }
    },
-   "version" : "0.101",
+   "version" : "0.102",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032000"
@@ -338,7 +335,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release/0.101",
+                  "tag" : "release/0.102",
                   "tag_format" : "release/%v",
                   "tag_message" : ""
                },

@@ -1,11 +1,7 @@
 package my_given_example;
 
 sub example_sub {
-  given ($_[0]) {
-    when ($_ > 0) { return 'positive' }
-    when ($_ < 0) { return 'negative' }
-    return 'zero'
-  }
+  state $foo = $_[0];
 }
 
 sub my_file { __FILE__ }

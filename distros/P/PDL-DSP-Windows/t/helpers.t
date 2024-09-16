@@ -16,7 +16,7 @@ use MyTest::Helper qw( dies is_approx );
 subtest 'chebpoly.' => sub {
     is_approx chebpoly( 3, pdl( [ 0.5, 1, 1.2 ] ) ),
         [ -1, 1, 3.312 ],
-        'chebpoly takes piddle';
+        'chebpoly takes ndarray';
 
     is_approx chebpoly( 3, [ 0.5, 1, 1.2 ] ),
         [ -1, 1, 3.312 ],
@@ -48,10 +48,10 @@ subtest 'relation between periodic and symmetric.' => sub {
         is_deeply \@mult, $in, "Roundtrip: [ @$in ]" or diag "[ @mult ]";
     }
 
-    dies { cos_pow_to_mult( 0 .. 7 ) } qr/number of args not less than 8/,
+    dies { cos_pow_to_mult( 0 .. 7 ) } qr/\A[^\n]*must be less than 8/,
         'cos_pow_to_mult dies with too many args';
 
-    dies { cos_mult_to_pow( 0 .. 7 ) } qr/number of args not less than 8/,
+    dies { cos_mult_to_pow( 0 .. 7 ) } qr/\A[^\n]*must be less than 8/,
         'cos_mult_to_pow dies with too many args';
 };
 

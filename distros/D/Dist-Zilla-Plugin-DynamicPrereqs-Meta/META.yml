@@ -17,7 +17,7 @@ configure_requires:
   Module::Build::Tiny: '0.034'
   perl: '5.020'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ name: Dist-Zilla-Plugin-DynamicPrereqs-Meta
 provides:
   Dist::Zilla::Plugin::DynamicPrereqs::Meta:
     file: lib/Dist/Zilla/Plugin/DynamicPrereqs/Meta.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
   Cpanel::JSON::XS: '0'
@@ -41,7 +41,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/dist-zilla-plugin-dynamicprereqs-meta/issues
   repository: git://github.com/Leont/dist-zilla-plugin-dynamicprereqs-meta.git
-version: '0.003'
+version: '0.004'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

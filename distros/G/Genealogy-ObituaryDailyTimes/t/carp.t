@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 5;
+use Test::Most tests => 6;
 use Test::Needs 'Test::Carp';
 
 BEGIN {
@@ -10,9 +10,11 @@ BEGIN {
 }
 
 SKIP: {
-	skip 'Database not installed', 4 if(!-r 'lib/Genealogy/ObituaryDailyTimes/data/obituaries.sql');
-
 	Test::Carp->import();
+
+	does_carp_that_matches(sub { my $o = Genealogy::ObituaryDailyTimes->new({ directory => '/not_there' }); }, qr/ is not a directory$/);
+
+	skip('Database not installed', 4) if(!-r 'lib/Genealogy/ObituaryDailyTimes/data/obituaries.sql');
 
 	my $search = new_ok('Genealogy::ObituaryDailyTimes' => [ directory => 'lib/Genealogy/ObituaryDailyTimes/data' ]);
 

@@ -88,7 +88,7 @@ foreach my $key (sort keys %expect) {
 }
 
 ok ( ! keys %got, 'The above is all there is' ) or do {
-    diag( 'The following have been added:' );
+    diag( 'The following primary data sets have been added:' );
     foreach (sort keys %got) {
 	diag( "    $_ => '$got{$_}{name}'" );
     }
@@ -116,7 +116,9 @@ foreach my $key ( keys %got ) {
 %{ $_ } = ( %{ $_ }, ignore => 0 ) for values %expect;
 
 foreach my $key ( keys %got ) {
-    if ( $got{$key}{name} =~ m/ \b ( pre-launch | post-deployment ) \b /smxi ) {
+    if ( $got{$key}{name} =~ m/ \b (
+	pre-launch | post-deployment | backup \s+ launch \s+ opportunity
+	) \b /smxi ) {
 	$expect{$key}{note} = "\u$1 data sets are temporary";
 	$expect{$key}{name} ||= $got{$key}{name};
 	$expect{$key}{ignore} = 1;
@@ -139,7 +141,7 @@ foreach my $key (sort keys %expect) {
 }
 
 ok ( ! keys %got, 'The above is all there is' ) or do {
-    diag( 'The following have been added:' );
+    diag( 'The following supplemental data sets have been added:' );
     foreach (sort keys %got) {
 	diag( "    $got{$_}{source} $_ => '$got{$_}{name}'" );
     }
@@ -160,7 +162,10 @@ sub parse_string {
 	my $parent = $anchor->parent();
 	my @sibs = $parent->content_list();
 	not ref $sibs[0]
-	    and $sibs[0] =~ m/ \b (?: pre-launch | post-deployment ) \b /smxi
+	    and $sibs[0] =~ m/ \b (?:
+		pre-launch | post-deployment |
+		backup \s+ launch \s+ opportunity
+		) \b /smxi
 	    and next;
 
 	if ( $href =~ m/ \b (?: sup- )? gp\.php \b /smx ) {
@@ -177,8 +182,12 @@ sub parse_string {
 	    $href =~ m{ / }smx
 		and next;
 	}
+	my $name = $anchor->as_trimmed_text();
+	$name eq ''
+	    and not ref $sibs[0]
+	    and $name = $sibs[0];
 	$data{$href} = {
-	    name	=> $anchor->as_trimmed_text(),
+	    name	=> $name,
 	    @extra,
 	};
 

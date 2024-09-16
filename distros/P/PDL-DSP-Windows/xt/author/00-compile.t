@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2;
+plan tests => 3;
 
 my @module_files = (
-    'PDL/DSP/Windows.pm'
+    'PDL/DSP/Windows.pm',
+    'PDL/Demos/DSPWindows.pm'
 );
 
 

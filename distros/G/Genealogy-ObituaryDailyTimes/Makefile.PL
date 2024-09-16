@@ -4,9 +4,16 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
-my @dirs = (
-	'lib/Genealogy/ObituaryDailyTimes/data'
-);
+my @dirs;
+
+if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'CIRCLECI'}) || defined($ENV{'TRAVIS_PERL_VERSION'}) || defined($ENV{'APPVEYOR'})) {
+	# Prevent downloading and installing stuff
+	warn 'AUTOMATED_TESTING added for you' if(!defined($ENV{'AUTOMATED_TESTING'}));
+	$ENV{'AUTOMATED_TESTING'} = 1;
+	$ENV{'NO_NETWORK_TESTING'} = 1;
+} elsif(!$ENV{'NO_NETWORK_TESTING'}) {
+	push @dirs, 'lib/Genealogy/ObituaryDailyTimes/data';
+}
 
 # FIXME: AUTOMATED_TESTING - create the empty directory in blib
 foreach my $dir(@dirs) {
@@ -36,7 +43,7 @@ my $prereqs = {
 	'Text::CSV' => 0
 };
 
-unless(defined($ENV{'AUTOMATED_TESTING'})) {
+unless(defined($ENV{'NO_NETWORK_TESTING'})) {
 	$prereqs->{'DBI'} = 0;
 	$prereqs->{'File::HomeDir'} = 0;
 	$prereqs->{'HTML::Entities'} = 0;

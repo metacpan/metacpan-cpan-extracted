@@ -11,6 +11,7 @@ class R::NDArray {
   use R::OP;
   use Sort;
   use R::NDArray::String;
+  use Comparable;
   
   # Fields
   has data : protected ro object;

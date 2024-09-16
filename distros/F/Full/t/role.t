@@ -1,28 +1,20 @@
-use strict;
-use warnings;
-
-use utf8;
-
-BEGIN {
-    # at the time of writing the Test2 'UTF8' plugin still uses :utf8 if left to its own devices
-    binmode STDOUT, ':encoding(UTF-8)';
-    binmode STDERR, ':encoding(UTF-8)';
-}
+use Full::Script qw(:v1);
 
 use Test::More;
 use Test::Fatal;
-use Test::Deep;
-use Object::Pad qw(:experimental(mop));
+use Test::Deep qw(cmp_deeply bag); # full import list pulls in blessed() as well
+
+use Object::Pad qw(:experimental(mop)); # MOP access is still marked as experimental
 
 is(exception {
     eval <<'EOS' or die $@;
     package Example::Role {
-        use Myriad::Role;
+        use Full::Role qw(:v1);
         method example;
     }
 
     package Example::Class {
-        use Myriad::Class does => 'Example::Role';
+        use Full::Class qw(:v1), does => 'Example::Role';
         field $something;
         method example { $self }
     }

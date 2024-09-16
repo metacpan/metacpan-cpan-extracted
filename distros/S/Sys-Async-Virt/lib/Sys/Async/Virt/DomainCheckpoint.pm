@@ -1,0 +1,168 @@
+####################################################################
+#
+#     This file was generated using XDR::Parse version v0.3.1
+#                   and LibVirt version v10.3.0
+#
+#      Don't edit this file, use the source template instead
+#
+#                 ANY CHANGES HERE WILL BE LOST !
+#
+####################################################################
+
+
+use v5.20;
+use warnings;
+use experimental 'signatures';
+use Future::AsyncAwait;
+
+package Sys::Async::Virt::DomainCheckpoint v0.0.1;
+
+use Carp qw(croak);
+use Log::Any qw($log);
+
+use Protocol::Sys::Virt::Remote::XDR v0.0.1;
+my $remote = 'Protocol::Sys::Virt::Remote::XDR';
+
+use constant {
+    XML_SECURE           => (1 << 0),
+    XML_NO_DOMAIN        => (1 << 1),
+    XML_SIZE             => (1 << 2),
+    LIST_ROOTS           => (1 << 0),
+    LIST_DESCENDANTS     => (1 << 0),
+    LIST_TOPOLOGICAL     => (1 << 1),
+    LIST_LEAVES          => (1 << 2),
+    LIST_NO_LEAVES       => (1 << 3),
+    DELETE_CHILDREN      => (1 << 0),
+    DELETE_METADATA_ONLY => (1 << 1),
+    DELETE_CHILDREN_ONLY => (1 << 2),
+};
+
+
+sub new {
+    my ($class, %args) = @_;
+    return bless {
+        id => $args{id},
+        client => $args{client},
+    }, $class;
+}
+
+sub delete($self, $flags = 0) {
+    return $self->{client}->_call(
+        $remote->PROC_DOMAIN_CHECKPOINT_DELETE,
+        { checkpoint => $self->{id}, flags => $flags // 0 } );
+}
+
+sub get_parent($self, $flags = 0) {
+    return $self->{client}->_call(
+        $remote->PROC_DOMAIN_CHECKPOINT_GET_PARENT,
+        { checkpoint => $self->{id}, flags => $flags // 0 } );
+}
+
+sub get_xml_desc($self, $flags = 0) {
+    return $self->{client}->_call(
+        $remote->PROC_DOMAIN_CHECKPOINT_GET_XML_DESC,
+        { checkpoint => $self->{id}, flags => $flags // 0 } );
+}
+
+sub list_all_children($self, $need_results, $flags = 0) {
+    return $self->{client}->_call(
+        $remote->PROC_DOMAIN_CHECKPOINT_LIST_ALL_CHILDREN,
+        { checkpoint => $self->{id}, need_results => $need_results, flags => $flags // 0 } );
+}
+
+
+
+1;
+
+
+__END__
+
+=head1 NAME
+
+Sys::Async::Virt::DomainCheckpoint - Client side proxy to remote LibVirt domain checkpoint
+
+=head1 VERSION
+
+v0.0.1
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 EVENTS
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+=head1 METHODS
+
+=head2 delete
+
+  await $checkpoint->delete( $flags = 0 );
+  # -> (* no data *)
+
+See documentation of L<virDomainCheckpointDelete|https://libvirt.org/html/libvirt-libvirt-domain-checkpoint.html#virDomainCheckpointDelete>.
+
+
+=head2 get_parent
+
+  $parent = await $checkpoint->get_parent( $flags = 0 );
+
+See documentation of L<virDomainCheckpointGetParent|https://libvirt.org/html/libvirt-libvirt-domain-checkpoint.html#virDomainCheckpointGetParent>.
+
+
+=head2 get_xml_desc
+
+  $xml = await $checkpoint->get_xml_desc( $flags = 0 );
+
+See documentation of L<virDomainCheckpointGetXMLDesc|https://libvirt.org/html/libvirt-libvirt-domain-checkpoint.html#virDomainCheckpointGetXMLDesc>.
+
+
+=head2 list_all_children
+
+  $checkpoints = await $checkpoint->list_all_children( $need_results, $flags = 0 );
+
+See documentation of L<virDomainCheckpointListAllChildren|https://libvirt.org/html/libvirt-libvirt-domain-checkpoint.html#virDomainCheckpointListAllChildren>.
+
+
+
+=head1 CONSTANTS
+
+=over 8
+
+=item XML_SECURE
+
+=item XML_NO_DOMAIN
+
+=item XML_SIZE
+
+=item LIST_ROOTS
+
+=item LIST_DESCENDANTS
+
+=item LIST_TOPOLOGICAL
+
+=item LIST_LEAVES
+
+=item LIST_NO_LEAVES
+
+=item DELETE_CHILDREN
+
+=item DELETE_METADATA_ONLY
+
+=item DELETE_CHILDREN_ONLY
+
+=back
+
+=head1 SEE ALSO
+
+L<LibVirt|https://libvirt.org>, L<Sys::Virt>
+
+=head1 LICENSE AND COPYRIGHT
+
+
+  Copyright (C) 2024 Erik Huelsmann
+
+All rights reserved. This program is free software;
+you can redistribute it and/or modify it under the same terms as Perl itself.

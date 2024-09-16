@@ -1,3 +1,8 @@
+0.167		2024-09-15	T. R. Wyant
+    Add celestrak catalog 'eutelsat'.
+
+    Further deprecate Iridium status, 'direct' attribute.
+
 0.166		2024-06-16	T. R. Wyant
     Correct celestrak_supplemental() status when an unknown catalog is
     specified. The previous was the oxymoronic '400 OK'. The intended

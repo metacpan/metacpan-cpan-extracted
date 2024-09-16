@@ -1,3 +1,6 @@
+0.101002 2024-09-16
+  [Internal Changes]
+    * Use StringBuffer#cmp method to compares two elements in R::NDArray::StringBuffer#elem_cmp method.
 0.101001 2024-09-13
   [Test Improvement]
     * Add tests for R::NDArray::AnyObject.

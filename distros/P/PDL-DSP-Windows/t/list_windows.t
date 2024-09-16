@@ -3,7 +3,6 @@ use Test::More;
 use strict;
 use warnings;
 
-use Capture::Tiny 'capture';
 use PDL::DSP::Windows qw( list_windows );
 
 my @windows = qw(
@@ -47,7 +46,13 @@ my @windows = qw(
     welch
 );
 
-sub do_test (@);
+sub do_test (@) {
+    my $expected = shift;
+    my @args = @_;
+    my @got = list_windows(@args);
+    my $message = @args ? join( ', ', @args ) : 'defaults';
+    is_deeply \@got, $expected, "list_windows using $message";
+}
 
 note 'Can filter windows';
 do_test [ grep { /blackman/ } @windows ] => 'blackman';
@@ -65,19 +70,5 @@ do_test ['tukey'] => qw( tukey nothing else matters welch );
 
 note 'Matches on window aliases';
 do_test ['tukey (alias tapered cosine)'] => 'tapered cosine';
-
-sub do_test (@) {
-    my $expected = shift;
-    my @args = @_;
-
-    my ($stdout) = capture { list_windows(@args) };
-
-    chomp $stdout;
-
-    my $message = @args ? join( ', ', @args ) : 'defaults';
-
-    is $stdout, join( ', ' => @{$expected} ),
-        "list_windows using $message";
-}
 
 done_testing;

@@ -4,27 +4,23 @@
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "lib-with-preamble",
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "xt"
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -36,6 +32,11 @@
             "PerlIO::via::dynamic" : "0.02",
             "perl" : "5.008001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
@@ -44,11 +45,15 @@
          "mailto" : "bug-lib-with-preamble@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=lib-with-preamble"
       },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://git.shadowcat.co.uk/p5sagit/lib-with-preamble.git",
-         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/lib-with-preamble.git"
+         "url" : "https://github.com/p5sagit/lib-with-preamble.git",
+         "web" : "https://github.com/p5sagit/lib-with-preamble"
       }
    },
-   "version" : "0.001003"
+   "version" : "0.001004",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

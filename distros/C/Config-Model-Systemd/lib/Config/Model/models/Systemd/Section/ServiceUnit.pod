@@ -208,7 +208,7 @@ they are shut down or started up simultaneously, and no ordering takes place. It
 type when precisely a unit has finished starting up. Most importantly, for service units start-up is
 considered completed for the purpose of C<Before>/C<After> when all
 its configured start-up commands have been invoked and they either failed or reported start-up
-success. Note that this does includes C<ExecStartPost> (or
+success. Note that this includes C<ExecStartPost> (or
 C<ExecStopPost> for the shutdown case).
 
 Note that those settings are independent of and orthogonal to the requirement dependencies as
@@ -246,7 +246,7 @@ they are shut down or started up simultaneously, and no ordering takes place. It
 type when precisely a unit has finished starting up. Most importantly, for service units start-up is
 considered completed for the purpose of C<Before>/C<After> when all
 its configured start-up commands have been invoked and they either failed or reported start-up
-success. Note that this does includes C<ExecStartPost> (or
+success. Note that this includes C<ExecStartPost> (or
 C<ExecStopPost> for the shutdown case).
 
 Note that those settings are independent of and orthogonal to the requirement dependencies as
@@ -300,12 +300,12 @@ units that are linked to it using these two settings. I< Optional. Type uniline.
 =head2 JoinsNamespaceOf
 
 For units that start processes (such as service units), lists one or more other units
-whose network and/or temporary file namespace to join. If this is specified on a unit (say, a.service
-has C<JoinsNamespaceOf=b.service>), then this the inverse dependency
-(C<JoinsNamespaceOf=a.service> for b.service) is implied. This only applies to unit
-types which support the C<PrivateNetwork>, C<NetworkNamespacePath>,
-C<PrivateIPC>, C<IPCNamespacePath>, and
-C<PrivateTmp> directives (see
+whose network and/or temporary file namespace to join. If this is specified on a unit (say,
+C<a.service> has C<JoinsNamespaceOf=b.service>), then the inverse
+dependency (C<JoinsNamespaceOf=a.service> for b.service) is implied. This only
+applies to unit types which support the C<PrivateNetwork>,
+C<NetworkNamespacePath>, C<PrivateIPC>,
+C<IPCNamespacePath>, and C<PrivateTmp> directives (see
 L<systemd.exec(5)> for
 details). If a unit that has this setting set is started, its processes will see the same
 C</tmp/>, C</var/tmp/>, IPC namespace and network namespace as
@@ -327,6 +327,12 @@ Mount points marked with C<noauto> are not
 mounted automatically through C<local-fs.target>,
 but are still honored for the purposes of this option, i.e. they
 will be pulled in by this unit. I< Optional. Type uniline.  > 
+
+=head2 WantsMountsFor
+
+Same as C<RequiresMountsFor>,
+but adds dependencies of type C<Wants> instead
+of C<Requires>. I< Optional. Type uniline.  > 
 
 =head2 OnSuccessJobMode
 
@@ -450,6 +456,16 @@ set to C<no>, this option does not disable
 all implicit dependencies, just non-essential
 ones. I< Optional. Type boolean.  > 
 
+=head2 SurviveFinalKillSignal
+
+Takes a boolean argument. Defaults to C<no>. If C<yes>,
+processes belonging to this unit will not be sent the final C<SIGTERM> and
+C<SIGKILL> signals during the final phase of the system shutdown process.
+This functionality replaces the older mechanism that allowed a program to set
+C<argv[0][0] = '@'> as described at
+L<systemd and Storage Daemons for the Root File
+System|https://systemd.io/ROOT_STORAGE_DAEMONS>, which however continues to be supported. I< Optional. Type boolean.  > 
+
 =head2 CollectMode
 
 Tweaks the "garbage collection" algorithm for this unit. Takes one of C<inactive>
@@ -525,7 +541,8 @@ the unit state to change. I< Optional. Type uniline.  >
 C<JobTimeoutAction> optionally configures an additional action to
 take when the timeout is hit, see description of C<JobTimeoutSec> and
 C<JobRunningTimeoutSec> above. It takes the same values as
-C<StartLimitAction>. Defaults to C<none>.
+C<FailureAction>/C<SuccessAction>. Defaults to
+C<none>.
 
 C<JobTimeoutRebootArgument> configures an optional reboot string to pass to
 the L<reboot(2)> system
@@ -536,7 +553,8 @@ call. I< Optional. Type uniline.  >
 C<JobTimeoutAction> optionally configures an additional action to
 take when the timeout is hit, see description of C<JobTimeoutSec> and
 C<JobRunningTimeoutSec> above. It takes the same values as
-C<StartLimitAction>. Defaults to C<none>.
+C<FailureAction>/C<SuccessAction>. Defaults to
+C<none>.
 
 C<JobTimeoutRebootArgument> configures an optional reboot string to pass to
 the L<reboot(2)> system
@@ -592,6 +610,10 @@ C<cris>,
 C<arc>,
 C<arc-be>, or
 C<native>.
+
+Use
+L<systemd-analyze(1)>
+for the complete list of known architectures.
 
 The architecture is determined from the information returned by
 L<uname(2)>
@@ -714,10 +736,8 @@ check for variables passed in by the enclosing container manager or PAM. I< Opti
 =head2 ConditionSecurity
 
 C<ConditionSecurity> may be used to check whether the given
-security technology is enabled on the system. Currently, the recognized values are
-C<selinux>, C<apparmor>, C<tomoyo>,
-C<ima>, C<smack>, C<audit>,
-C<uefi-secureboot>, C<tpm2> and C<cvm>.
+security technology is enabled on the system. Currently, the following values are recognized:
+
 The test may be negated by prepending an exclamation mark. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionCapability
@@ -752,7 +772,7 @@ L<systemd-update-done.service(8)>,
 to make sure they run before the stamp file's modification time gets reset indicating a completed
 update.
 
-If the C<systemd.condition-needs-update=> option is specified on the kernel
+If the C<systemd.condition_needs_update=> option is specified on the kernel
 command line (taking a boolean), it will override the result of this condition check, taking
 precedence over any file modification time checks. If the kernel command line option is used,
 C<systemd-update-done.service> will not have immediate effect on any following
@@ -778,18 +798,26 @@ Takes a boolean argument. This condition may be used to conditionalize units on
 whether the system is booting up for the first time. This roughly means that C</etc/>
 was unpopulated when the system started booting (for details, see "First Boot Semantics" in
 L<machine-id(5)>).
-First boot is considered finished (this condition will evaluate as false) after the manager
+First Boot is considered finished (this condition will evaluate as false) after the manager
 has finished the startup phase.
 
 This condition may be used to populate C</etc/> on the first boot after
 factory reset, or when a new system instance boots up for the first time.
+
+Note that the service manager itself will perform setup steps during First Boot: it will
+initialize
+L<machine-id(5)> and
+preset all units, enabling or disabling them according to the
+L<systemd.preset(5)>
+settings. Additional setup may be performed via units with
+C<ConditionFirstBoot=yes>.
 
 For robustness, units with C<ConditionFirstBoot=yes> should order themselves
 before C<first-boot-complete.target> and pull in this passive target with
 C<Wants>. This ensures that in a case of an aborted first boot, these units will
 be re-run during the next system startup.
 
-If the C<systemd.condition-first-boot=> option is specified on the kernel
+If the C<systemd.condition_first_boot=> option is specified on the kernel
 command line (taking a boolean), it will override the result of this condition check, taking
 precedence over C</etc/machine-id> existence checks. I< Optional. Type list of boolean.  > 
 
@@ -997,8 +1025,8 @@ Alternatively, the average timespan can also be specified using C</> as a separa
 example: C<10%/1min>. The supported timespans match what the kernel provides, and are
 limited to C<10sec>, C<1min> and C<5min>. The
 C<full> PSI will be checked first, and if not found C<some> will be
-checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
-|https://docs.kernel.org/accounting/psi.html>.
+checked. For more details, see the documentation on L<PSI (Pressure Stall
+Information)|https://docs.kernel.org/accounting/psi.html>.
 
 Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
 followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
@@ -1014,8 +1042,8 @@ Alternatively, the average timespan can also be specified using C</> as a separa
 example: C<10%/1min>. The supported timespans match what the kernel provides, and are
 limited to C<10sec>, C<1min> and C<5min>. The
 C<full> PSI will be checked first, and if not found C<some> will be
-checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
-|https://docs.kernel.org/accounting/psi.html>.
+checked. For more details, see the documentation on L<PSI (Pressure Stall
+Information)|https://docs.kernel.org/accounting/psi.html>.
 
 Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
 followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
@@ -1031,8 +1059,8 @@ Alternatively, the average timespan can also be specified using C</> as a separa
 example: C<10%/1min>. The supported timespans match what the kernel provides, and are
 limited to C<10sec>, C<1min> and C<5min>. The
 C<full> PSI will be checked first, and if not found C<some> will be
-checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
-|https://docs.kernel.org/accounting/psi.html>.
+checked. For more details, see the documentation on L<PSI (Pressure Stall
+Information)|https://docs.kernel.org/accounting/psi.html>.
 
 Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
 followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
@@ -1439,9 +1467,8 @@ C<poweroff-force>, C<poweroff-immediate>, C<exit>,
 C<exit-force>, C<soft-reboot>, C<soft-reboot-force>,
 C<kexec>, C<kexec-force>, C<halt>,
 C<halt-force> and C<halt-immediate>. In system mode, all options are
-allowed. In user mode, only C<none>, C<exit>,
-C<exit-force>, C<soft-reboot> and C<soft-reboot-force> are
-allowed. Both options default to C<none>.
+allowed. In user mode, only C<none>, C<exit>, and
+C<exit-force> are allowed. Both options default to C<none>.
 
 If C<none> is set, no action will be triggered. C<reboot> causes a
 reboot following the normal shutdown procedure (i.e. equivalent to systemctl
@@ -1486,9 +1513,8 @@ C<poweroff-force>, C<poweroff-immediate>, C<exit>,
 C<exit-force>, C<soft-reboot>, C<soft-reboot-force>,
 C<kexec>, C<kexec-force>, C<halt>,
 C<halt-force> and C<halt-immediate>. In system mode, all options are
-allowed. In user mode, only C<none>, C<exit>,
-C<exit-force>, C<soft-reboot> and C<soft-reboot-force> are
-allowed. Both options default to C<none>.
+allowed. In user mode, only C<none>, C<exit>, and
+C<exit-force> are allowed. Both options default to C<none>.
 
 If C<none> is set, no action will be triggered. C<reboot> causes a
 reboot following the normal shutdown procedure (i.e. equivalent to systemctl
@@ -1535,6 +1561,8 @@ are allowed.
 interval is a time span with the default unit of seconds, but other
 units may be specified, see
 L<systemd.time(5)>.
+The special value C<infinity> can be used to limit the total number of start
+attempts, even if they happen at large time intervals.
 Defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, and may
 be set to 0 to disable any kind of rate limiting. burst is a number and
 defaults to C<DefaultStartLimitBurst> in manager configuration file.
@@ -1584,6 +1612,8 @@ are allowed.
 interval is a time span with the default unit of seconds, but other
 units may be specified, see
 L<systemd.time(5)>.
+The special value C<infinity> can be used to limit the total number of start
+attempts, even if they happen at large time intervals.
 Defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, and may
 be set to 0 to disable any kind of rate limiting. burst is a number and
 defaults to C<DefaultStartLimitBurst> in manager configuration file.

@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::DynamicPrereqs::Meta;
-$Dist::Zilla::Plugin::DynamicPrereqs::Meta::VERSION = '0.003';
+$Dist::Zilla::Plugin::DynamicPrereqs::Meta::VERSION = '0.004';
 use 5.020;
 
 use Moose;
@@ -132,7 +132,7 @@ Dist::Zilla::Plugin::DynamicPrereqs::Meta - Add dynamic prereqs to to the metada
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ version 0.003
 
 =head1 DESCRIPTION
 
-This module adds L<dynamic prerequisites|CPAN::Requires::Dynamic> to the metafile of a dist.
+This module adds L<dynamic prerequisites|CPAN::Requirements::Dynamic> to the metafile of a dist.
 
 =head1 AUTHOR
 

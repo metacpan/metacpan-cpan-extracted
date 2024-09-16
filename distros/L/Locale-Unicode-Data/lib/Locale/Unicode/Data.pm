@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.0.1
+## Version v1.0.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2024/09/06
+## Modified 2024/09/11
 ## All rights reserved
 ## 
 ## 
@@ -39,7 +39,7 @@ BEGIN
     our $CLDR_VERSION = '45.0';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.0.1';
+    our $VERSION = 'v1.0.2';
 };
 
 sub INIT
@@ -200,7 +200,7 @@ sub calendar { return( shift->_fetch_one({
 sub calendars { return( shift->_fetch_all({
     id      => 'calendars',
     table   => 'calendars',
-    by      => [qw( system inherits )],
+    by      => [qw( calendar system inherits )],
 }, @_ ) ); }
 
 sub calendar_append_format { return( shift->_fetch_one({
@@ -1573,7 +1573,7 @@ sub territory { return( shift->_fetch_one({
     id          => 'get_territory',
     field       => 'territory',
     table       => 'territories',
-    has_array   => [qw( languages contains weekend )],
+    has_array   => [qw( languages contains calendars weekend )],
 }, @_ ) ); }
 
 sub territories { return( shift->_fetch_all({
@@ -1581,7 +1581,7 @@ sub territories { return( shift->_fetch_all({
     table       => 'territories',
     by          => [qw( parent alt )],
     has_status  => 1,
-    has_array   => [qw( languages contains weekend )],
+    has_array   => [qw( languages contains calendars weekend )],
 }, @_ ) ); }
 
 sub territory_l10n { return( shift->_fetch_one({
@@ -3722,7 +3722,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.0.1
+    v1.0.2
 
 =head1 DESCRIPTION
 
@@ -11052,8 +11052,6 @@ C<0002>, C<0020>, C<0201>, C<2017>, C<20173>
 
 =item * C<z> zone
 
-The short specific non-location format. Where that is unavailable, falls back to the short localized GMT format ("O").
-
 Examples:
 
 =over 8
@@ -11061,6 +11059,8 @@ Examples:
 =item * C<z..zzz>
 
 C<PDT>
+
+The short specific non-location format. Where that is unavailable, falls back to the short localized GMT format ("O").
 
 =item * C<zzzz>
 
@@ -11072,8 +11072,6 @@ The long specific non-location format. Where that is unavailable, falls back to 
 
 =item * C<Z>
 
-The ISO8601 basic format with hours, minutes and optional seconds fields. The format is equivalent to RFC 822 zone format (when optional seconds field is absent). This is equivalent to the "xxxx" specifier.
-
 Examples:
 
 =over 8
@@ -11081,6 +11079,8 @@ Examples:
 =item * C<Z..ZZZ>
 
 C<-0800>
+
+The ISO8601 basic format with hours, minutes and optional seconds fields. The format is equivalent to RFC 822 zone format (when optional seconds field is absent). This is equivalent to the "xxxx" specifier.
 
 =item * C<ZZZZ>
 

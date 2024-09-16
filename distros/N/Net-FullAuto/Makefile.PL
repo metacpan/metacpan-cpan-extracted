@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000806';
+our $VERSION='1.0000807';
 
 #print `env`,"\n\n\n";
 
@@ -248,7 +248,7 @@ END
 
   You are attempting to install Net::FullAuto on an Amazon AWS EC2
   $amazon{instance_type} instance. The cpan utility requires more
-  memory to function successfully than ths instance provides. To
+  memory to function successfully than this instance provides. To
   install Net::FullAuto, use the "Complete" installer that bundles
   all dependencies. This installer has much lower resource demands
   than the cpan commandline utility. Download the installer bundle
@@ -1882,8 +1882,8 @@ sub fa_install_mod {
       } elsif ($version && $p eq 'Term::RawInput') {
          $p="REEDFISH/Term-RawInput-$version.tar.gz";
       }
-      print "==> $p required."
-      and print "*** Installing $p via CPAN\n"
+      print "\n\n==> $p required."
+      and print "\n\n*** Installing $p via CPAN\n"
       and
       eval {
          local $SIG{__DIE__}; # No sigdie handler;
@@ -2313,7 +2313,7 @@ END
 
    cpan[3]> exit    ( <== type 'exit' at prompt *first*, then restart cpan )
    
-   \$ <sudo> cpan    ( <== restart 'cpan' [if sudo was used, use it again])
+   \$ <sudo> cpan    ( <== restart 'cpan' [if sudo was used, use it again] )
 
    cpan[1]> install Net::FullAuto  <==
 

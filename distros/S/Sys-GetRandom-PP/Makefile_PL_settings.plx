@@ -11,7 +11,9 @@ return {
     AUTHOR => q{Lukas Mai <l.mai@web.de>},
 
     CONFIGURE_REQUIRES => {},
-    BUILD_REQUIRES => {},
+    BUILD_REQUIRES => {
+        'File::Temp' => 0,
+    },
     TEST_REQUIRES => {
         'Test2::V0' => 0,
     },

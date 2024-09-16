@@ -1,9 +1,15 @@
 use strict;
 use warnings;
+use File::Temp qw(tempdir);
 
-my $version = '0.01';
+my $version = '0.02';
 
 my $target = $ARGV[0] or die "Usage: $0 OUTFILE\n";
+
+my $phdir = tempdir(CLEANUP => 1);
+
+system "cd /usr/include && h2ph -eal -d \Q$phdir\E syscall.h sys/random.h";
+unshift @INC, $phdir;
 
 {
     package #
@@ -45,7 +51,7 @@ package Sys::GetRandom::PP::_Bits;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant {
     GRND_RANDOM    => %[[GRND_RANDOM]],

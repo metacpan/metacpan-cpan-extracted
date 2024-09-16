@@ -3,6 +3,7 @@ abstract: 'pure Perl interface to getrandom(2)'
 author:
   - 'Lukas Mai <l.mai@web.de>'
 build_requires:
+  File::Temp: '0'
   Test2::V0: '0'
 configure_requires:
   ExtUtils::MakeMaker: '7.0'
@@ -30,5 +31,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/mauke/Sys-GetRandom-PP
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

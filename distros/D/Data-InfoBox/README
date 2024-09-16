@@ -1,0 +1,84 @@
+NAME
+    Data::InfoBox - Data object for info box.
+
+SYNOPSIS
+     use Data::InfoBox;
+
+     my $obj = Data::InfoBox->new(%params);
+     my $items_ar = $obj->items;
+
+METHODS
+  "new"
+     my $obj = Data::InfoBox->new(%params);
+
+    Constructor.
+
+    *       "items"
+
+            List of Data::InfoBox::Item items. Must be as reference to
+            array.
+
+            It's required.
+
+    Returns instance of object.
+
+  "items"
+     my $items_ar = $obj->items;
+
+    Get list of items in info box.
+
+    Returns reference to array with Data::InfoBox::Item objects.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::InfoBox;
+     use Data::InfoBox::Item;
+     use Data::Text::Simple;
+
+     my $obj = Data::InfoBox->new(
+             'items' => [
+                    Data::InfoBox::Item->new(
+                            'text' => Data::Text::Simple->new(
+                                    'text' => 'First item',
+                            ),
+                    ),
+                    Data::InfoBox::Item->new(
+                            'text' => Data::Text::Simple->new(
+                                    'text' => 'Second item',
+                            ),
+                    ),
+             ],
+     );
+
+     # Print out.
+     my $num = 0;
+     foreach my $item (@{$obj->items}) {
+             $num++;
+             print "Item $num: ".$item->text->text."\n";
+     }
+
+     # Output:
+     # Item 1: First item
+     # Item 2: Second item
+
+DEPENDENCIES
+    Mo, Mo::utils.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-InfoBox>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

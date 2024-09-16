@@ -1,2 +1,7 @@
+0.02  2024-09-15
+    - Try to generate the required *.ph files automatically at build time. This
+      should work fine as long as C system headers are available under
+      /usr/include.
+
 0.01  2024-06-15
     - initial release

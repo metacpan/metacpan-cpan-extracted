@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2022 by Dominique Dumont.
+# This software is Copyright (c) 2008-2024 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -467,7 +467,12 @@ C<TimeoutStartSec>, the service manager will allow the service to continue to st
 provided the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified
 until the service startup status is finished by C<READY=1>. (see
 L<sd_notify(3)>).
-",
+
+Note that the start timeout is also applied to service reloads, regardless if implemented
+through C<ExecReload> or via the reload logic enabled via C<Type=notify-reload>.
+If the reload does not complete within the configured time, the reload will be considered failed and
+the service will continue running with the old configuration. This will not affect the running service,
+but will be logged and will cause e.g. systemctl reload to fail.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -596,8 +601,8 @@ shutdown of failing services.
         'description' => "Configures a maximum time for the service to run. If this is used and the service has been
 active for longer than the specified time it is terminated and put into a failure state. Note that this setting
 does not have any effect on C<Type=oneshot> services, as they terminate immediately after
-activation completed. Pass C<infinity> (the default) to configure no runtime
-limit.
+activation completed (use C<TimeoutStartSec> to limit their activation).
+Pass C<infinity> (the default) to configure no runtime limit.
 
 If a service of C<Type=notify>/C<Type=notify-reload> sends
 C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause the runtime to be extended beyond
@@ -666,58 +671,37 @@ may be used to enable automatic watchdog notification support.
           'on-success',
           'on-watchdog'
         ],
-        'description' => 'Configures whether the service shall be
-restarted when the service process exits, is killed, or a
-timeout is reached. The service process may be the main
-service process, but it may also be one of the processes
-specified with C<ExecStartPre>,
-C<ExecStartPost>,
-C<ExecStop>,
-C<ExecStopPost>, or
-C<ExecReload>. When the death of the process
-is a result of systemd operation (e.g. service stop or
-restart), the service will not be restarted. Timeouts include
-missing the watchdog "keep-alive ping" deadline and a service
-start, reload, and stop operation timeouts.
+        'description' => 'Configures whether the service shall be restarted when the service process exits,
+is killed, or a timeout is reached. The service process may be the main service process, but it may
+also be one of the processes specified with C<ExecStartPre>,
+C<ExecStartPost>, C<ExecStop>, C<ExecStopPost>,
+or C<ExecReload>. When the death of the process is a result of systemd operation
+(e.g. service stop or restart), the service will not be restarted. Timeouts include missing the watchdog
+"keep-alive ping" deadline and a service start, reload, and stop operation timeouts.
 
-Takes one of
-C<no>,
-C<on-success>,
-C<on-failure>,
-C<on-abnormal>,
-C<on-watchdog>,
-C<on-abort>, or
-C<always>.
-If set to C<no> (the default), the service will
-not be restarted. If set to C<on-success>, it
-will be restarted only when the service process exits cleanly.
+Takes one of C<no>, C<on-success>, C<on-failure>,
+C<on-abnormal>, C<on-watchdog>, C<on-abort>, or
+C<always>. If set to C<no> (the default), the service will not be restarted.
+If set to C<on-success>, it will be restarted only when the service process exits cleanly.
 In this context, a clean exit means any of the following:
-exit code of 0;for types other than
-C<Type=oneshot>, one of the signals
-C<SIGHUP>,
-C<SIGINT>,
-C<SIGTERM>, or
-C<SIGPIPE>;exit statuses and signals specified in
+exit code of 0;for types other than C<Type=oneshot>, one of the signals
+C<SIGHUP>, C<SIGINT>,
+C<SIGTERM>, or C<SIGPIPE>;
+exit statuses and signals specified in
 C<SuccessExitStatus>.
-If set to
-C<on-failure>, the service will be restarted
-when the process exits with a non-zero exit code, is
-terminated by a signal (including on core dump, but excluding
-the aforementioned four signals), when an operation (such as
-service reload) times out, and when the configured watchdog
-timeout is triggered. If set to C<on-abnormal>,
-the service will be restarted when the process is terminated
-by a signal (including on core dump, excluding the
-aforementioned four signals), when an operation times out, or
-when the watchdog timeout is triggered. If set to
-C<on-abort>, the service will be restarted only
-if the service process exits due to an uncaught signal not
-specified as a clean exit status. If set to
-C<on-watchdog>, the service will be restarted
-only if the watchdog timeout for the service expires. If set
-to C<always>, the service will be restarted
-regardless of whether it exited cleanly or not, got terminated
-abnormally by a signal, or hit a timeout.
+If set to C<on-failure>, the service will be restarted when the process exits with
+a non-zero exit code, is terminated by a signal (including on core dump, but excluding the aforementioned
+four signals), when an operation (such as service reload) times out, and when the configured watchdog
+timeout is triggered. If set to C<on-abnormal>, the service will be restarted when
+the process is terminated by a signal (including on core dump, excluding the aforementioned four signals),
+when an operation times out, or when the watchdog timeout is triggered. If set to C<on-abort>,
+the service will be restarted only if the service process exits due to an uncaught signal not specified
+as a clean exit status. If set to C<on-watchdog>, the service will be restarted
+only if the watchdog timeout for the service expires. If set to C<always>, the service
+will be restarted regardless of whether it exited cleanly or not, got terminated abnormally by
+a signal, or hit a timeout. Note that C<Type=oneshot> services will never be restarted
+on a clean exit status, i.e. C<always> and C<on-success> are rejected
+for them.
 
 As exceptions to the setting above, the service will not
 be restarted if the exit code or signal is specified in
@@ -790,16 +774,16 @@ translate between numerical status values and names.',
       {
         'description' => "Takes a list of exit status definitions that, when returned by the main service
 process, will prevent automatic service restarts, regardless of the restart setting configured with
-C<Restart>. Exit status definitions can either be numeric exit codes or termination
-signal names, and are separated by spaces. Defaults to the empty list, so that, by default, no exit
-status is excluded from the configured restart logic. For example:
-
-    RestartPreventExitStatus=1 6 SIGABRT
-
-ensures that exit codes 1 and 6 and the termination signal C<SIGABRT> will not
-result in automatic service restarting. This option may appear more than once, in which case the list
-of restart-preventing statuses is merged. If the empty string is assigned to this option, the list is
-reset and all prior assignments of this option will have no effect.
+C<Restart>. Exit status definitions can be numeric termination statuses, termination
+status names, or termination signal names, separated by spaces. Defaults to the empty list, so that,
+by default, no exit status is excluded from the configured restart logic.
+A service with the C<RestartPreventExitStatus> setting
+    RestartPreventExitStatus=TEMPFAIL 250 SIGKILL
+Exit status 75 (C<TEMPFAIL>), 250, and the termination signal
+C<SIGKILL> will not result in automatic service restarting.
+This option may appear more than once, in which case the list of restart-preventing statuses is merged.
+If the empty string is assigned to this option, the list is reset and all prior assignments of this
+option will have no effect.
 
 Note that this setting has no effect on processes configured via
 C<ExecStartPre>, C<ExecStartPost>, C<ExecStop>,
@@ -812,12 +796,13 @@ process.",
       },
       'RestartForceExitStatus',
       {
-        'description' => 'Takes a list of exit status definitions that,
-when returned by the main service process, will force automatic
-service restarts, regardless of the restart setting configured
-with C<Restart>. The argument format is
-similar to
-C<RestartPreventExitStatus>.',
+        'description' => 'Takes a list of exit status definitions that, when returned by the main service
+process, will force automatic service restarts, regardless of the restart setting configured with
+C<Restart>. The argument format is similar to C<RestartPreventExitStatus>.
+
+Note that for C<Type=oneshot> services, a success exit status will prevent
+them from auto-restarting, no matter whether the corresponding exit statuses are listed in this
+option or not.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -844,14 +829,25 @@ Defaults to false.',
       },
       'NonBlocking',
       {
-        'description' => 'Set the C<O_NONBLOCK> flag for all file descriptors passed via socket-based
-activation. If true, all file descriptors >= 3 (i.e. all except stdin, stdout, stderr), excluding those passed
-in via the file descriptor storage logic (see C<FileDescriptorStoreMax> for details), will
-have the C<O_NONBLOCK> flag set and hence are in non-blocking mode. This option is only
+        'description' => 'Set the C<O_NONBLOCK> flag for all file descriptors passed via
+socket-based activation. If true, all file descriptors >= 3 (i.e. all except stdin, stdout, stderr),
+excluding those passed in via the file descriptor storage logic (see
+C<FileDescriptorStoreMax> for details), will have the
+C<O_NONBLOCK> flag set and hence are in non-blocking mode. This option is only
 useful in conjunction with a socket unit, as described in
-L<systemd.socket(5)> and has no
-effect on file descriptors which were previously saved in the file-descriptor store for example.  Defaults to
-false.',
+L<systemd.socket(5)>
+and has no effect on file descriptors which were previously saved in the file-descriptor store for
+example.  Defaults to false.
+
+Note that if the same socket unit is configured to be passed to multiple service units (via the
+C<Sockets> setting, see below), and these services have different
+C<NonBlocking> configurations, the precise state of C<O_NONBLOCK>
+depends on the order in which these services are invoked, and will possibly change after service code
+already took possession of the socket file descriptor, simply because the
+C<O_NONBLOCK> state of a socket is shared by all file descriptors referencing
+it. Hence it is essential that all services sharing the same socket use the same
+C<NonBlocking> configuration, and do not change the flag in service code
+either.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1027,8 +1023,8 @@ killed by the OOM killer, this is logged but the unit continues running. If set 
 C<stop> the event is logged but the unit is terminated cleanly by the service
 manager. If set to C<kill> and one of the unit\'s processes is killed by the OOM
 killer the kernel is instructed to kill all remaining processes of the unit too, by setting the
-C<memory.oom.group> attribute to C<1>; also see L<kernel
-documentation|https://docs.kernel.org/admin-guide/cgroup-v2.html>.
+C<memory.oom.group> attribute to C<1>; also see kernel
+page L<Control Group v2|https://docs.kernel.org/admin-guide/cgroup-v2.html>.
 
 Defaults to the setting C<DefaultOOMPolicy> in
 L<systemd-system.conf(5)>

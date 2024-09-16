@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-DynamicPrereqs-Meta
 
+0.004     2024-09-15 14:27:47+02:00 Europe/Brussels
+          - Fix link to CPAN::Requirements::Dynamic
+
 0.003     2024-07-31 15:42:07+02:00 Europe/Brussels
           - Fix usage of singular "prereq" argument
 

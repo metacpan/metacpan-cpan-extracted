@@ -50,7 +50,6 @@
       },
       "test" : {
          "requires" : {
-            "DateTime::Locale" : "0",
             "File::Find" : "0",
             "Test::More" : "1.302120",
             "Test::Pod" : "1.52",
@@ -70,6 +69,6 @@
          "web" : "https://gitlab.com/jackdeguest/Locale-Unicode-Data"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.0.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -39,8 +39,11 @@ my %WriteMakefileArgs = (
     "Time::Moment::Role::Strptime" => "0.001",
     "Time::Moment::Role::TimeZone" => "1.000",
     "Unicode::UTF8" => "0.62",
+    "bareword::filehandles" => "0.007",
     "curry" => "2.000001",
-    "meta" => "0.008"
+    "indirect" => "0.39",
+    "meta" => "0.008",
+    "multidimensional" => "0.014"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -48,9 +51,11 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::CheckDeps" => "0.010",
-    "Test::More" => "0.94"
+    "Test::Deep" => "1.124",
+    "Test::Fatal" => "0.010",
+    "Test::More" => "0.98"
   },
-  "VERSION" => "1.002",
+  "VERSION" => "1.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -82,13 +87,18 @@ my %FallbackPrereqs = (
   "Syntax::Keyword::Try" => "0.30",
   "Syntax::Operator::Equ" => "0.10",
   "Test::CheckDeps" => "0.010",
-  "Test::More" => "0.94",
+  "Test::Deep" => "1.124",
+  "Test::Fatal" => "0.010",
+  "Test::More" => "0.98",
   "Time::Moment" => "0.44",
   "Time::Moment::Role::Strptime" => "0.001",
   "Time::Moment::Role::TimeZone" => "1.000",
   "Unicode::UTF8" => "0.62",
+  "bareword::filehandles" => "0.007",
   "curry" => "2.000001",
-  "meta" => "0.008"
+  "indirect" => "0.39",
+  "meta" => "0.008",
+  "multidimensional" => "0.014"
 );
 
 

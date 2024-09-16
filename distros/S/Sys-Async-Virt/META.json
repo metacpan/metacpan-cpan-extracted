@@ -1,0 +1,60 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Erik Huelsmann <ehuels@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Sys-Async-Virt",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Feature::Compat::Try" : "0",
+            "Future::AsyncAwait" : "0",
+            "Future::Queue" : "0",
+            "IO::Async::Loop" : "0",
+            "Log::Any" : "0",
+            "Protocol::Sys::Virt" : "v10.3.7",
+            "perl" : "v5.20.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ehuelsmann/perl-sys-async-virt.git",
+         "web" : "https://github.com/ehuelsmann/perl-sys-async-virt"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

@@ -18,7 +18,8 @@ subtest 'request or response not valid' => sub {
   my $t = Test::Mojo
     ->with_roles('+OpenAPI::Modern')
     ->new($::app)
-    ->openapi($::openapi);
+    ->openapi($::openapi)
+    ->test_openapi_verbose(1);
 
   $t->post_ok('/foo/123', form => { salutation => 'hi' })
     ->status_is(400)
@@ -27,7 +28,7 @@ subtest 'request or response not valid' => sub {
     ->response_not_valid
     ->request_not_valid('Unsupported Media Type')
     ->request_not_valid(q{'/request/body': incorrect Content-Type "application/x-www-form-urlencoded"})
-    ->response_not_valid(q{'/response': no response object found for code 400});
+    ->response_not_valid(q{'/response/code': no response object found for code 400}, 'test2');
 
   cmp_deeply(
     $t->request_validation_result->recommended_response,

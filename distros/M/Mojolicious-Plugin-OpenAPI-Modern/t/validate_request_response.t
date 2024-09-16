@@ -163,7 +163,6 @@ YAML
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,
     $expected_stash = superhashof({
       path_template => '/foo/{foo_id}',
-      path_captures => { foo_id => 'hi' },
       method => 'get',
       request => isa('Mojo::Message::Request'),
     }),
@@ -207,7 +206,6 @@ YAML
       method => 'post',
       operation_id => 'operation_foo',
       path_template => '/foo/{foo_id}',
-      path_captures => { foo_id => '123' },
       request => isa('Mojo::Message::Request'),
     }),
     'stash is set in validate_request',

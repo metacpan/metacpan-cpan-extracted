@@ -1,6 +1,18 @@
 
 Revision history for Full
 
+1.003     2024-09-15 18:50:14+08:00 Asia/Singapore
+    [Tests fixed]
+
+    - `t/role.t` was trying to apply Log::Any::Adapter::TAP, which
+    should be optional, and was still referring to the original
+    distribution name (thanks to SREZIC for reporting)
+
+    [Dependencies]
+
+    - included modules that we unimport as well (`no indirect`,
+    `no multidimensional`, `no bareword::filehandles`)
+
 1.002     2024-09-15 13:01:09+08:00 Asia/Singapore
     [New features]
 

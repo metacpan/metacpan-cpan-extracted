@@ -1,7 +1,10 @@
 -----
 
+0.0.5   2024-09-15
+    * Add mapping from protocol identifiers to C API headers and identifiers
+
 0.0.4   2024-09-01
-    * Add XDR::Parse version number as part of "extract_all" returned data.
+    * Add XDR::Parse version number as part of "extract_all" returned data
     * Add README.pod
 
 0.0.3   2024-09-01

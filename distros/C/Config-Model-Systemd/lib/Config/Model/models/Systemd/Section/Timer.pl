@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2022 by Dominique Dumont.
+# This software is Copyright (c) 2008-2024 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -43,9 +43,11 @@ controlled by C<Unit> (see below).
 
 Note that in case the unit to activate is already active at the time the timer elapses it is not restarted,
 but simply left running. There is no concept of spawning new service instances in this case. Due to this, services
-with C<RemainAfterExit> set (which stay around continuously even after the service\'s main process
-exited) are usually not suitable for activation via repetitive timers, as they will only be activated once, and
-then stay around forever.
+with C<RemainAfterExit=yes> set (which stay around continuously even after the service\'s main
+process exited) are usually not suitable for activation via repetitive timers, as they will only be activated
+once, and then stay around forever. Target units, which by default do not deactivate on their own, can be
+activated repeatedly by timers by setting C<StopWhenUnneeded=yes> on them. This will cause a
+target unit to be stopped immediately after its activation, if it is not a dependency of another running unit.
 This configuration class was generated from systemd documentation.
 by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>
 ',
@@ -482,7 +484,7 @@ C<true>.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 254 doc',
+    'generated_by' => 'parse-man.pl from systemd 256 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Timer'
   }

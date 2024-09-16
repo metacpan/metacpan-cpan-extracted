@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use PDL::DSP::Windows;
-use Try::Tiny;
 
 use lib 't/lib';
 use MyTest::Helper qw( dies );
@@ -13,7 +12,7 @@ dies { PDL::DSP::Windows->new( 10, 'foobar' ) }
     qr/^window: unknown .* window 'foobar'/i,
     'Dies if window is unknown';
 
-is ref PDL::DSP::Windows->new, 'PDL::DSP::Windows', 'Has constructor';
+isa_ok +PDL::DSP::Windows->new, 'PDL::DSP::Windows', 'Has constructor';
 
 subtest 'Default window' => sub {
     my $window = PDL::DSP::Windows->new(10);
@@ -32,34 +31,16 @@ subtest 'Empty constructor' => sub {
     is +PDL::DSP::Windows->new(100)->new(10)->samples->nelem, 10,
         'Constructor called from instance creates new instance';
 
-    try {
-        PDL::DSP::Windows->new->samples;
-        fail 'Did not die';
-    }
-    catch {
-        like $_, qr/(?:undefined value|string .*) as a subroutine ref(?:erence)?/,
+    dies { PDL::DSP::Windows->new->samples }
+        qr/(?:undefined value|string .*) as a subroutine ref(?:erence)?/,
             'Calling ->samples on uninitialised window dies';
-    };
-
-    try {
-        PDL::DSP::Windows->new->init;
-        fail 'Did not die';
-    }
-    catch {
-        like $_, qr/undefined value/,
+    dies { PDL::DSP::Windows->new->init } qr/undefined value/,
             "Can't construct incomplete window";
-    };
-    try {
-        PDL::DSP::Windows->new->init(0);
-        fail 'Did not die';
-    }
-    catch {
-        like $_, qr/zero/,
+    dies { PDL::DSP::Windows->new->init(0) } qr/zero/,
             "Can't construct 0-sized window";
-    };
 };
 
-subtest 'Simple accesors' => sub {
+subtest 'Simple accessors' => sub {
     is +PDL::DSP::Windows->new(10)->get_N, 10,
         '->get_N returns number of elements';
 
@@ -112,85 +93,85 @@ subtest 'Simple accesors' => sub {
         '->process_gain is inverse of enbw';
 };
 
-subtest 'Samples accesors' => sub {
+subtest 'Samples accessors' => sub {
     my $window = PDL::DSP::Windows->new(10);
 
     is $window->{samples}, undef,
         'Samples begins as undef';
 
     delete $window->{samples};
-    is ref $window->get_samples, 'PDL',
+    isa_ok $window->get_samples, 'PDL',
         '->get_samples defines value';
 
     delete $window->{samples};
-    is ref $window->get('samples'), 'PDL',
+    isa_ok $window->get('samples'), 'PDL',
         '->get("samples") defines value';
 
     delete $window->{samples};
-    is ref $window->samples, 'PDL',
+    isa_ok $window->samples, 'PDL',
         '->samples defines value';
 
     $window->{samples} = [];
 
-    is ref $window->get_samples, 'ARRAY',
+    isa_ok $window->get_samples, 'ARRAY',
         '->get_samples does not redefine value';
 
-    is ref $window->get('samples'), 'ARRAY',
+    isa_ok $window->get('samples'), 'ARRAY',
         '->get("samples") does not redefine value';
 
-    is ref $window->samples, 'PDL',
+    isa_ok $window->samples, 'PDL',
         '->samples redefines value';
 
-    is ref $window->get_samples, 'PDL',
-        '->get_samples does not die if samples is already a piddle';
+    isa_ok $window->get_samples, 'PDL',
+        '->get_samples does not die if samples is already an ndarray';
 };
 
-subtest 'Modfreqs accesors' => sub {
+subtest 'Modfreqs accessors' => sub {
     my $window = PDL::DSP::Windows->new(10);
 
     is $window->{modfreqs}, undef,
         'Modfreqs begins as undef';
 
     delete $window->{modfreqs};
-    is ref $window->get_modfreqs, 'PDL',
+    isa_ok $window->get_modfreqs, 'PDL',
         '->get_modfreqs defines value';
 
     delete $window->{modfreqs};
-    is ref $window->get('modfreqs'), 'PDL',
+    isa_ok $window->get('modfreqs'), 'PDL',
         '->get("modfreqs") defines value';
 
     delete $window->{modfreqs};
-    is ref $window->modfreqs, 'PDL',
+    isa_ok $window->modfreqs, 'PDL',
         '->modfreqs defines value';
 
     $window->{modfreqs} = [];
 
-    is ref $window->get_modfreqs, 'ARRAY',
+    isa_ok $window->get_modfreqs, 'ARRAY',
         '->get_modfreqs does not redefine value';
 
-    is ref $window->get('modfreqs'), 'ARRAY',
+    isa_ok $window->get('modfreqs'), 'ARRAY',
         '->get("modfreqs") does not redefine value';
 
-    is ref $window->modfreqs, 'PDL',
+    isa_ok $window->modfreqs, 'PDL',
         '->modfreqs redefines value';
 
     {
         $window->{modfreqs} = [];
         my $freq = $window->get_modfreqs( min_bins => 10_000 );
-        is ref $freq, 'PDL',
+        isa_ok $freq, 'PDL',
             '->get_modfreqs redefines values if given parameters';
         # TODO Should this have warned?
         is $freq->nelem, 1_000,
             '->get_modfreqs ignores parameters if not in hashref';
     }
 
-    is ref $window->get_modfreqs, 'PDL',
-        '->get_modfreqs does not die if modfreqs is already a piddle';
+    isa_ok $window->get_modfreqs, 'PDL',
+        '->get_modfreqs does not die if modfreqs is already an ndarray';
 
     {
         $window->{modfreqs} = [];
         my $freq = $window->get_modfreqs({ min_bins => 10_000 });
-        is ref $freq, 'PDL',
+        isa_ok $freq, 'PDL',
             '->get_modfreqs redefines values if given parameters';
         is $freq->nelem, 10_000,
             '->get_modfreqs accepts parameters if in hashref';

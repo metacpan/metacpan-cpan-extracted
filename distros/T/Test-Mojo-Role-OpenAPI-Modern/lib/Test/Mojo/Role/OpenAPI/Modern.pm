@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.004-7-g1a03221
+package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.005-4-gf41234f
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Test::Mojo role providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use 5.020;  # for fc, unicode_strings features
 use strictures 2;
@@ -42,6 +42,8 @@ has 'openapi' => sub ($self) {
   die 'openapi object or configs required';
 };
 
+has test_openapi_verbose => 0;
+
 # keys being tracked here:
 # - request_result
 # - response_result
@@ -53,11 +55,15 @@ after _request_ok => sub ($self, @args) {
 };
 
 sub request_valid ($self, $desc = 'request is valid') {
-  return $self->test('ok', $self->request_validation_result, $desc);
+  $self->test('ok', $self->request_validation_result, $desc);
+  $self->dump_request_validation_result if not $self->success and $self->test_openapi_verbose;
+  return $self;
 }
 
 sub response_valid ($self, $desc = 'response is valid') {
-  return $self->test('ok', $self->response_validation_result, $desc);
+  $self->test('ok', $self->response_validation_result, $desc);
+  $self->dump_response_validation_result if not $self->success and $self->test_openapi_verbose;
+  return $self;
 }
 
 # expected_error can either be the 'recommended_response' or any error string in the result.
@@ -65,22 +71,34 @@ sub request_not_valid ($self, $expected_error = undef, $desc = undef) {
   my $result = $self->request_validation_result;
   if ($expected_error and not $result) {
     $desc //= 'request validation error matches';
-    return $self->test('pass', $desc) if $expected_error eq $result->recommended_response->[1];
-    return $self->test('ok', (any { $expected_error eq $_ } $result->errors), $desc);
+    if ($expected_error eq $result->recommended_response->[1]) {
+      $self->test('pass', $desc);
+    }
+    else {
+      $self->test('ok', (any { $expected_error eq $_ } $result->errors), $desc);
+    }
+  }
+  else {
+    $self->test('ok', !$self->request_validation_result, $desc // 'request is not valid');
   }
 
-  return $self->test('ok', !$self->request_validation_result, $desc // 'request is not valid');
+  $self->dump_request_validation_result if not $self->success and $self->test_openapi_verbose;
+  return $self;
 }
 
 # expected_error must match an error string in the result.
 sub response_not_valid ($self, $expected_error = undef, $desc = undef) {
   my $result = $self->response_validation_result;
   if ($expected_error and not $result) {
-    return $self->test('ok', (any { $expected_error eq $_ } $result->errors),
+    $self->test('ok', (any { $expected_error eq $_ } $result->errors),
       $desc // 'response validation error matches');
   }
+  else {
+    $self->test('ok', !$self->response_validation_result, $desc // 'response is not valid');
+  }
 
-  return $self->test('ok', !$self->response_validation_result, $desc // 'response is not valid');
+  $self->dump_response_validation_result if not $self->success and $self->test_openapi_verbose;
+  return $self;
 }
 
 # I'm not sure yet which names are best, why not go for both?
@@ -117,6 +135,25 @@ sub operation_id_is ($self, $operation_id, $desc = undef) {
   $self->test('is', $validation_options->{operation_id}, $operation_id, $desc // 'operation_id is '.$operation_id);
 }
 
+my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
+  ->allow_nonref(1)
+  ->utf8(0)
+  ->canonical(1)
+  ->pretty(1)
+  ->indent_length(2);
+
+sub dump_request_validation_result ($self, $style = 'data_only') {
+  my $result = $self->request_validation_result;
+  my $method = $ENV{AUTOMATED_TESTING} ? 'diag' : 'note';
+  $self->handler->($method, "got request validation result:\n".$encoder->encode($result->format($style)));
+}
+
+sub dump_response_validation_result ($self, $style = 'data_only') {
+  my $result = $self->response_validation_result;
+  my $method = $ENV{AUTOMATED_TESTING} ? 'diag' : 'note';
+  $self->handler->($method, "got response validation result:\n".$encoder->encode($result->format($style)));
+}
+
 1;
 
 __END__
@@ -131,7 +168,7 @@ Test::Mojo::Role::OpenAPI::Modern - Test::Mojo role providing access to an OpenA
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -180,8 +217,12 @@ version 0.005
     ->status_is(200)
     ->json_is('/status', 'ok')
     ->request_valid
+    ->or->dump_validation_request_result('basic')
     ->response_valid
+    ->or->dump_validation_response_result('basic')
     ->operation_id_is('my_foo_request');
+
+  $t->test_openapi_verbose(1);  # automatically dump validation errors on test failure
 
   $t->post_ok('/foo/123', form => { salutation => 'hi' })
     ->status_is(400)
@@ -211,6 +252,13 @@ information on how to customize your validation and provide the specification do
 If not provided, the object is constructed using configuration values passed to the application
 under the C<openapi> key (see L<Test::Mojo/new>), as for L<Mojolicious::Plugin::OpenAPI::Modern>,
 or re-uses the object from the application itself if that plugin is applied.
+
+=head2 test_openapi_verbose
+
+When true, failing request and response validation tests will dump the actual validation result via
+L</dump_request_validation_result> or L</dump_response_validation_result>.
+
+Defaults to false.
 
 =head2 request_valid
 
@@ -249,10 +297,32 @@ or calculates it if not already available.
 
 Does not emit a test result.
 
+=head2 dump_request_validation_result
+
+Prints the L<JSON::Schema::Modern::Result> object for the validation result for the last request
+(calculates it if not already available) to the test output stream.
+
+Takes an optional argument indicating the result format, see
+L<JSON::Schema::Modern::Result/output_format>. Defaults to C<data_only>, which is the format used
+for comparing error responses in L</request_not_valid>.
+
+Does not emit a test result.
+
 =head2 response_validation_result
 
 Returns the L<JSON::Schema::Modern::Result> object for the validation result for the last response,
 or calculates it if not already available.
+
+Does not emit a test result.
+
+=head2 dump_response_validation_result
+
+Prints the L<JSON::Schema::Modern::Result> object for the validation result for the last response
+(calculates it if not already available) to the test output stream.
+
+Takes an optional argument indicating the result format, see
+L<JSON::Schema::Modern::Result/output_format>. Defaults to C<data_only>, which is the format used
+for comparing error responses in L</response_not_valid>.
 
 Does not emit a test result.
 

@@ -2,7 +2,7 @@ package Full::Script;
 use Full::Pragmata qw(:v1);
 use parent qw(Full::Pragmata);
 
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.003'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use utf8;

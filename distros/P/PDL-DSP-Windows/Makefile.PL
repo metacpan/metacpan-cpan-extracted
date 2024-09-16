@@ -17,16 +17,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "PDL::DSP::Windows",
   "PREREQ_PM" => {
-    "PDL" => 0
+    "PDL" => "2.055"
   },
   "TEST_REQUIRES" => {
-    "Capture::Tiny" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::More" => "0.96",
-    "Try::Tiny" => 0
+    "Test::More" => "0.96"
   },
-  "VERSION" => "0.101",
+  "VERSION" => "0.102",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,12 +32,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Capture::Tiny" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "PDL" => 0,
-  "Test::More" => "0.96",
-  "Try::Tiny" => 0
+  "PDL" => "2.055",
+  "Test::More" => "0.96"
 );
 
 

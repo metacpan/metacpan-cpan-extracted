@@ -3,11 +3,9 @@ abstract: 'Window functions for signal processing'
 author:
   - 'John Lapeyre <jlapeyre@cpan.org>'
 build_requires:
-  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Test::More: '0.96'
-  Try::Tiny: '0'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -39,18 +37,20 @@ optional_features:
   plot:
     description: 'Plot windows'
     recommends:
-      PDL::Graphics::Gnuplot: '0'
+      PDL::Graphics::Simple: '0'
 provides:
   PDL::DSP::Windows:
     file: lib/PDL/DSP/Windows.pm
-    version: '0.101'
+    version: '0.102'
+  PDL::Demos::DSPWindows:
+    file: lib/PDL/Demos/DSPWindows.pm
+    version: '0.102'
 requires:
-  PDL: '0'
+  PDL: '2.055'
   perl: '5.010'
 resources:
-  bugtracker: https://github.com/jjatria/PDL-DSP-Windows/issues
-  repository: git://github.com/jjatria/PDL-DSP-Windows.git
-version: '0.101'
+  bugtracker: https://github.com/PDLPorters/PDL-DSP-Windows/issues
+version: '0.102'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -226,7 +226,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release/0.101
+          tag: release/0.102
           tag_format: release/%v
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:

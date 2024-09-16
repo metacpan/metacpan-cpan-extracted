@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2022 by Dominique Dumont.
+# This software is Copyright (c) 2008-2024 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Systemd;
-$Config::Model::Systemd::VERSION = '0.254.1';
+$Config::Model::Systemd::VERSION = '0.256.1';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ Config::Model::Systemd - Editor and validator for systemd configuration files
 
 =head1 VERSION
 
-version 0.254.1
+version 0.256.1
 
 =head1 SYNOPSIS
 
@@ -278,7 +278,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2008-2022 by Dominique Dumont.
+This software is Copyright (c) 2008-2024 by Dominique Dumont.
 
 This is free software, licensed under:
 

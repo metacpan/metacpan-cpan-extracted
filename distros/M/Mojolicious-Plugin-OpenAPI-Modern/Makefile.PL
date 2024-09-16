@@ -88,7 +88,7 @@ my %WriteMakefileArgs = (
     "JSON::Schema::Modern::Document::OpenAPI" => "0.024",
     "Mojo::Base" => 0,
     "Mojo::JSON" => 0,
-    "OpenAPI::Modern" => "0.067",
+    "OpenAPI::Modern" => "0.068",
     "Path::Tiny" => 0,
     "Safe::Isa" => 0,
     "YAML::PP" => 0,
@@ -113,7 +113,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -128,7 +128,7 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Mojo::Base" => 0,
   "Mojo::JSON" => 0,
-  "OpenAPI::Modern" => "0.067",
+  "OpenAPI::Modern" => "0.068",
   "Path::Tiny" => 0,
   "Safe::Isa" => 0,
   "Test::Deep" => 0,

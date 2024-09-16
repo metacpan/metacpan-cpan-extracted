@@ -3,19 +3,13 @@ package MyTest::Helper;
 use Test::More;
 use PDL;
 use Exporter 'import';
-use Try::Tiny;
 
 our @EXPORT_OK = qw( is_approx dies );
 
 sub dies (&$$) {
     my ( $code, $check, $message ) = @_;
-
-    my $error;
-    try { $code->() } catch { chomp( $error = $_ ) }
-    finally {
-        $error //= '';
-        like $error, $check, $message;
-    };
+    eval { $code->() };
+    like $@, $check, $message;
 }
 
 sub is_approx ($$;$$) {

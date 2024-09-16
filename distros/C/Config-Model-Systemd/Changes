@@ -1,3 +1,14 @@
+0.256.1 2024-09-15
+
+  Model update:
+    * generate model from systemd 256 doc
+
+  Model generator (parse-man.pl) changes:
+    * parse-man: sanitize L<> links
+
+  Other Changes:
+    * dist.ini: update copyright year
+
 0.254.1 2023-11-24
 
   Model update:

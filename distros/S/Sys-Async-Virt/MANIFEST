@@ -1,0 +1,26 @@
+CHANGES
+CONTRIBUTING.md
+cpanfile
+eg/client.pl
+lib/Sys/Async/Virt.pm
+lib/Sys/Async/Virt/Callback.pm
+lib/Sys/Async/Virt/Domain.pm
+lib/Sys/Async/Virt/DomainCheckpoint.pm
+lib/Sys/Async/Virt/DomainSnapshot.pm
+lib/Sys/Async/Virt/Interface.pm
+lib/Sys/Async/Virt/Network.pm
+lib/Sys/Async/Virt/NetworkPort.pm
+lib/Sys/Async/Virt/NodeDevice.pm
+lib/Sys/Async/Virt/NwFilter.pm
+lib/Sys/Async/Virt/NwFilterBinding.pm
+lib/Sys/Async/Virt/Secret.pm
+lib/Sys/Async/Virt/StoragePool.pm
+lib/Sys/Async/Virt/StorageVol.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/02-pod.t
+t/03-pod-coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -9,9 +9,9 @@ ok(eval { require my_given_example; 1 }, 'Loaded module');
 
 sub result_for { eval { my_given_example::example_sub($_[0]) } }
 
-is(result_for(1), 'positive');
-is(result_for(-1), 'negative');
-is(result_for(0), 'zero');
+is(result_for(42), 42);
+is(result_for(-1), 42);
+is(result_for(0), 42);
 
 is(my_given_example::my_file(), File::Spec->catfile(qw(t lib my_given_example.pm)));
-is(my_given_example::my_line(), 12);
+is(my_given_example::my_line(), 8);

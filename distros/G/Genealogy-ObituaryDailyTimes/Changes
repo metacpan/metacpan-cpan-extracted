@@ -1,5 +1,12 @@
 Revision history for Genealogy::ObituaryDailyTimes
 
+0.13	Sun Sep 15 14:52:02 EDT 2024
+	search() can now just take one parameter which is the last name
+	Added CircleCI, Coveralls and Codecov
+	Fix test for init() value
+	t/obituaries.t: fix test on systems without MLARCHIVE_DIR
+		http://www.cpantesters.org/report/4d79ae70-3e18-11ef-ac77-928c3be27139
+
 0.12	Wed Jun 19 21:01:56 EDT 2024
 	t/carp.t could sometimes fail
 	Added t/version.t

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2022 by Dominique Dumont.
+# This software is Copyright (c) 2008-2024 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -45,10 +45,6 @@ In addition, options which control resources available to programs
 executed by systemd are listed in
 L<systemd.exec(5)>.
 Those options complement options listed here.
-
-See the L<New
-Control Group Interfaces|https://www.freedesktop.org/wiki/Software/systemd/ControlGroupInterface> for an introduction on how to make
-use of resource control APIs from programs.
 This configuration class was generated from systemd documentation.
 by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>
 ',
@@ -312,6 +308,8 @@ system. If assigned the
 special value C<infinity>, no memory throttling is applied. This controls the
 C<memory.high> control group attribute. For details about this control group attribute, see
 L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+The effective configuration is reported as C<EffectiveMemoryHigh>
+(see also C<EffectiveMemoryMax>).
 
 While C<StartupMemoryHigh> applies to the startup and shutdown phases of the system,
 C<MemoryHigh> applies to normal runtime of the system, and if the former is not set also to
@@ -335,6 +333,8 @@ system. If assigned the
 special value C<infinity>, no memory throttling is applied. This controls the
 C<memory.high> control group attribute. For details about this control group attribute, see
 L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+The effective configuration is reported as C<EffectiveMemoryHigh>
+(see also C<EffectiveMemoryMax>).
 
 While C<StartupMemoryHigh> applies to the startup and shutdown phases of the system,
 C<MemoryHigh> applies to normal runtime of the system, and if the former is not set also to
@@ -358,6 +358,8 @@ percentage value may be specified, which is taken relative to the installed phys
 assigned the special value C<infinity>, no memory limit is applied. This controls the
 C<memory.max> control group attribute. For details about this control group attribute, see
 L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+The effective configuration is reported as C<EffectiveMemoryMax> (the value is
+the most stringent limit of the unit and parent slices and it is capped by physical memory).
 
 While C<StartupMemoryMax> applies to the startup and shutdown phases of the system,
 C<MemoryMax> applies to normal runtime of the system, and if the former is not set also to
@@ -381,6 +383,8 @@ percentage value may be specified, which is taken relative to the installed phys
 assigned the special value C<infinity>, no memory limit is applied. This controls the
 C<memory.max> control group attribute. For details about this control group attribute, see
 L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+The effective configuration is reported as C<EffectiveMemoryMax> (the value is
+the most stringent limit of the unit and parent slices and it is capped by physical memory).
 
 While C<StartupMemoryMax> applies to the startup and shutdown phases of the system,
 C<MemoryMax> applies to normal runtime of the system, and if the former is not set also to
@@ -396,7 +400,8 @@ boot-up and shutdown differently than during normal runtime.',
 Specify the absolute limit on swap usage of the executed processes in this unit.
 
 Takes a swap size in bytes. If the value is suffixed with K, M, G or T, the specified swap size is
-parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
+percentage value may be specified, which is taken relative to the specified swap size on the system. If assigned the
 special value C<infinity>, no swap limit is applied. These settings control the
 C<memory.swap.max> control group attribute. For details about this control group attribute,
 see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
@@ -415,7 +420,8 @@ boot-up and shutdown differently than during normal runtime.',
 Specify the absolute limit on swap usage of the executed processes in this unit.
 
 Takes a swap size in bytes. If the value is suffixed with K, M, G or T, the specified swap size is
-parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
+percentage value may be specified, which is taken relative to the specified swap size on the system. If assigned the
 special value C<infinity>, no swap limit is applied. These settings control the
 C<memory.swap.max> control group attribute. For details about this control group attribute,
 see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
@@ -435,7 +441,7 @@ Specify the absolute limit on zswap usage of the processes in this unit. Zswap i
 cache for swap pages. It takes pages that are in the process of being swapped out and attempts to compress them into a
 dynamically allocated RAM-based memory pool. If the limit specified is hit, no entries from this unit will be
 stored in the pool until existing entries are faulted back or written out to disk. See the kernel\'s
-L<Zswap|https://www.kernel.org/doc/html/latest/admin-guide/mm/zswap.html> documentation for more details.
+L<Zswap|https://docs.kernel.org/admin-guide/mm/zswap.html> documentation for more details.
 
 Takes a size in bytes. If the value is suffixed with K, M, G or T, the specified size is
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
@@ -458,7 +464,7 @@ Specify the absolute limit on zswap usage of the processes in this unit. Zswap i
 cache for swap pages. It takes pages that are in the process of being swapped out and attempts to compress them into a
 dynamically allocated RAM-based memory pool. If the limit specified is hit, no entries from this unit will be
 stored in the pool until existing entries are faulted back or written out to disk. See the kernel\'s
-L<Zswap|https://www.kernel.org/doc/html/latest/admin-guide/mm/zswap.html> documentation for more details.
+L<Zswap|https://docs.kernel.org/admin-guide/mm/zswap.html> documentation for more details.
 
 Takes a size in bytes. If the value is suffixed with K, M, G or T, the specified size is
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
@@ -472,6 +478,23 @@ the startup and shutdown phases. Using C<StartupMemoryZSwapMax> allows prioritiz
 boot-up and shutdown differently than during normal runtime.',
         'type' => 'leaf',
         'value_type' => 'uniline'
+      },
+      'MemoryZSwapWriteback',
+      {
+        'description' => 'This setting controls the C<memory> controller in the unified hierarchy.
+
+Takes a boolean argument. When true, pages stored in the Zswap cache are permitted to be
+written to the backing storage, false otherwise. Defaults to true. This allows disabling
+writeback of swap pages for IO-intensive applications, while retaining the ability to store
+compressed pages in Zswap. See the kernel\'s
+L<Zswap|https://docs.kernel.org/admin-guide/mm/zswap.html> documentation
+for more details.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'AllowedMemoryNodes',
       {
@@ -543,8 +566,8 @@ an absolute number of tasks or a percentage value that is taken relative to the 
 number of tasks on the system. If assigned the special value C<infinity>, no tasks
 limit is applied. This controls the C<pids.max> control group attribute. For
 details about this control group attribute, the
-L<pids controller
-|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#pid>.
+L<pids controller|https://docs.kernel.org/admin-guide/cgroup-v2.html#pid>.
+The effective configuration is reported as C<EffectiveTasksMax>.
 
 The system default for this setting may be controlled with
 C<DefaultTasksMax> in
@@ -752,7 +775,10 @@ sockets is accounted to the socket unit \x{2014} and never to the service unit i
 socket is used by it.
 
 The system default for this setting may be controlled with C<DefaultIPAccounting> in
-L<systemd-system.conf(5)>.",
+L<systemd-system.conf(5)>.
+
+Note that this functionality is currently only available for system services, not for
+per-user services.",
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -854,8 +880,9 @@ them for IP security.",
       },
       'SocketBindAllow',
       {
-        'description' => "Allow or deny binding a socket address to a socket by matching it with the bind-rule and
-applying a corresponding action if there is a match.
+        'description' => "Configures restrictions on the ability of unit processes to invoke L<bind(2)> on a
+socket. Both allow and deny rules may defined that restrict which addresses a socket may be bound
+to.
 
 bind-rule describes socket properties such as address-family,
 transport-protocol and ip-ports.
@@ -894,6 +921,11 @@ For each of C<SocketBindAllow> and C<SocketBindDeny>, maximum allowed number of 
 C<128>.
 
 The feature is implemented with C<cgroup/bind4> and C<cgroup/bind6> cgroup-bpf hooks.
+
+Note that these settings apply to any L<bind(2)>
+system call invocation by the unit processes, regardless in which network namespace they are
+placed. Or in other words: changing the network namespace is not a suitable mechanism for escaping
+these restrictions on bind().
 
 Examples:
     \x{2026}
@@ -937,8 +969,9 @@ Examples:
       },
       'SocketBindDeny',
       {
-        'description' => "Allow or deny binding a socket address to a socket by matching it with the bind-rule and
-applying a corresponding action if there is a match.
+        'description' => "Configures restrictions on the ability of unit processes to invoke L<bind(2)> on a
+socket. Both allow and deny rules may defined that restrict which addresses a socket may be bound
+to.
 
 bind-rule describes socket properties such as address-family,
 transport-protocol and ip-ports.
@@ -977,6 +1010,11 @@ For each of C<SocketBindAllow> and C<SocketBindDeny>, maximum allowed number of 
 C<128>.
 
 The feature is implemented with C<cgroup/bind4> and C<cgroup/bind6> cgroup-bpf hooks.
+
+Note that these settings apply to any L<bind(2)>
+system call invocation by the unit processes, regardless in which network namespace they are
+placed. Or in other words: changing the network namespace is not a suitable mechanism for escaping
+these restrictions on bind().
 
 Examples:
     \x{2026}
@@ -1063,6 +1101,60 @@ Programs in the unit will be only able to use the eth2 network interface.
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'NFTSet',
+      {
+        'description' => 'This setting provides a method for integrating dynamic cgroup, user and group IDs into
+firewall rules with L<NFT|https://netfilter.org/projects/nftables/index.html>
+sets. The benefit of using this setting is to be able to use the IDs as selectors in firewall rules
+easily and this in turn allows more fine grained filtering. NFT rules for cgroup matching use
+numeric cgroup IDs, which change every time a service is restarted, making them hard to use in
+systemd environment otherwise. Dynamic and random IDs used by C<DynamicUser> can
+be also integrated with this setting.
+
+This option expects a whitespace separated list of NFT set definitions. Each definition
+consists of a colon-separated tuple of source type (one of C<cgroup>,
+C<user> or C<group>), NFT address family (one of
+C<arp>, C<bridge>, C<inet>, C<ip>,
+C<ip6>, or C<netdev>), table name and set name. The names of tables
+and sets must conform to lexical restrictions of NFT table names. The type of the element used in
+the NFT filter must match the type implied by the directive (C<cgroup>,
+C<user> or C<group>) as shown in the table below. When a control
+group or a unit is realized, the corresponding ID will be appended to the NFT sets and it will be
+be removed when the control group or unit is removed. systemd only inserts
+elements to (or removes from) the sets, so the related NFT rules, tables and sets must be prepared
+elsewhere in advance. Failures to manage the sets will be ignored.
+
+If the firewall rules are reinstalled so that the contents of NFT sets are destroyed, command
+systemctl daemon-reload can be used to refill the sets.
+
+Example:
+
+    [Unit]
+    NFTSet=cgroup:inet:filter:my_service user:inet:filter:serviceuser
+
+
+Corresponding NFT rules:
+
+    table inet filter {
+    set my_service {
+    type cgroupsv2
+    }
+    set serviceuser {
+    typeof meta skuid
+    }
+    chain x {
+    socket cgroupv2 level 2 @my_service accept
+    drop
+    }
+    chain y {
+    meta skuid @serviceuser accept
+    drop
+    }
+    }
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'IPIngressFilterPath',
       {
         'description' => 'Add custom network traffic filters implemented as BPF programs, applying to all IP packets
@@ -1137,7 +1229,7 @@ that case. If compatibility with such systems is desired it is hence recommended
       {
         'description' => 'C<BPFProgram> allows attaching custom BPF programs to the cgroup of a
 unit. (This generalizes the functionality exposed via C<IPEgressFilterPath> and
-and C<IPIngressFilterPath> for other hooks.)  Cgroup-bpf hooks in the form of BPF
+C<IPIngressFilterPath> for other hooks.)  Cgroup-bpf hooks in the form of BPF
 programs loaded to the BPF filesystem are attached with cgroup-bpf attach flags determined by the
 unit. For details about attachment types and flags see
 L<C<bpf.h>|https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/include/uapi/linux/bpf.h>. Also
@@ -1148,13 +1240,26 @@ the file system, with C<:> as the separator:
 type:program-path.
 
 The BPF program type is equivalent to the BPF attach type used in
-bpftool. It may be one of C<egress>,
-C<ingress>, C<sock_create>, C<sock_ops>,
-C<device>, C<bind4>, C<bind6>,
-C<connect4>, C<connect6>, C<post_bind4>,
-C<post_bind6>, C<sendmsg4>, C<sendmsg6>,
-C<sysctl>, C<recvmsg4>, C<recvmsg6>,
-C<getsockopt>, C<setsockopt>.
+L<bpftool(8)>
+It may be one of
+C<egress>,
+C<ingress>,
+C<sock_create>,
+C<sock_ops>,
+C<device>,
+C<bind4>,
+C<bind6>,
+C<connect4>,
+C<connect6>,
+C<post_bind4>,
+C<post_bind6>,
+C<sendmsg4>,
+C<sendmsg6>,
+C<sysctl>,
+C<recvmsg4>,
+C<recvmsg6>,
+C<getsockopt>,
+or C<setsockopt>.
 
 The specified program path must be an absolute path referencing a BPF program inode in the
 bpffs file system (which generally means it must begin with C</sys/fs/bpf/>). If
@@ -1487,7 +1592,7 @@ C<off> tells the service not to watch for memory pressure events, by setting the
 C<$MEMORY_PRESSURE_WATCH> environment variable to the literal string
 C</dev/null>. If C<on> tells the service to watch for memory
 pressure events. This enables memory accounting for the service, and ensures the
-C<memory.pressure> cgroup attribute files is accessible for read and write to the
+C<memory.pressure> cgroup attribute file is accessible for reading and writing by the
 service\'s user. It then sets the C<$MEMORY_PRESSURE_WATCH> environment variable for
 processes invoked by the unit to the file system path to this file. The threshold information
 configured with C<MemoryPressureThresholdSec> is encoded in the
@@ -1525,9 +1630,26 @@ L<systemd.time(7)> for
 details on the permitted syntax.",
         'type' => 'leaf',
         'value_type' => 'uniline'
+      },
+      'CoredumpReceive',
+      {
+        'description' => 'Takes a boolean argument. This setting is used to enable coredump forwarding for containers
+that belong to this unit\'s cgroup. Units with C<CoredumpReceive=yes> must also be configured
+with C<Delegate=yes>. Defaults to false.
+
+When systemd-coredump is handling a coredump for a process from a container,
+if the container\'s leader process is a descendant of a cgroup with C<CoredumpReceive=yes>
+and C<Delegate=yes>, then systemd-coredump will attempt to forward
+the coredump to systemd-coredump within the container.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 254 doc',
+    'generated_by' => 'parse-man.pl from systemd 256 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::ResourceControl'
   }

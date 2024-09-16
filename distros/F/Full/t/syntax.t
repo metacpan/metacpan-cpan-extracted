@@ -4,8 +4,13 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Log::Any::Adapter qw(TAP);
 use Log::Any qw($log);
+
+# If we have ::TAP, use it - but no need to list it as a dependency
+eval {
+    require Log::Any::Adapter;
+    Log::Any::Adapter->import(qw(TAP));
+};
 
 $log->infof('starting');
 

@@ -1,5 +1,5 @@
 package Freecell::Deal::MS;
-$Freecell::Deal::MS::VERSION = '0.4.1';
+$Freecell::Deal::MS::VERSION = '0.6.0';
 use strict;
 use warnings;
 
@@ -17,20 +17,38 @@ my @INITIAL_CARDS = (
     } ( 'A', ( 2 .. 9 ), 'T', 'J', 'Q', 'K' )
 );
 
-sub as_str
+sub _string_arrays
 {
     my ($self) = @_;
 
     my @cards = @INITIAL_CARDS;
     Math::RNG::Microsoft::FCPro->new( seed => scalar( $self->deal ) )
         ->shuffle( \@cards );
-    my @lines = ( map { [ ':', ] } 0 .. 7 );
+    my @lines = ( map { [] } 0 .. 7 );
     my $i     = -1;
     while (@cards)
     {
         push @{ $lines[ ( ( ++$i ) & 7 ) ] }, pop(@cards);
     }
-    my $str = join "", map { "@$_\n" } @lines;
+    return \@lines;
+}
+
+sub as_columns_array
+{
+    my ($self) = @_;
+
+    my $rec =
+        { array_of_arrays_of_strings => scalar( $self->_string_arrays() ), };
+
+    return $rec;
+}
+
+sub as_str
+{
+    my ($self) = @_;
+
+    my $lines = scalar( $self->_string_arrays() );
+    my $str   = join "", map { ": @$_\n" } @$lines;
     return $str;
 }
 
@@ -48,7 +66,7 @@ Freecell::Deal::MS - deal Windows FreeCell / FC Pro layouts
 
 =head1 VERSION
 
-version 0.4.1
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -91,6 +109,13 @@ Constructor.
 =head2 $obj->as_str()
 
 Returns the deal layout as a string.
+
+=head2 $obj->as_columns_array()
+
+Returns the deal layout as hash reference with a key 'array_of_arrays_of_strings'
+which points to an array of 8 columns.
+
+( Available since version 0.6.0 .  )
 
 =head2 $obj->deal()
 

@@ -1,6 +1,6 @@
 package PDL::DSP::Windows;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use strict;
 use warnings;
@@ -8,7 +8,6 @@ use warnings;
 use PDL::Bad ();
 use PDL::Basic ();
 use PDL::Core ();
-use PDL::FFT ();
 use PDL::Math ();
 use PDL::MatrixOps ();
 use PDL::Ops ();
@@ -18,14 +17,7 @@ use PDL::Ufunc ();
 
 # These constants are deleted at the end of this package
 use constant {
-    HAVE_LinearAlgebra => eval { require PDL::LinearAlgebra::Special } || 0,
-    HAVE_BESSEL        => eval { require PDL::GSLSF::BESSEL }          || 0,
-    HAVE_GNUPLOT       => eval { require PDL::Graphics::Gnuplot }      || 0,
-    USE_FFTW_DIRECTION => version->parse($PDL::VERSION) <= v2.007,
-    I => version->parse($PDL::VERSION) > v2.054 ? PDL::Core::pdl('i') : do {
-        require PDL::Complex; # Deprecated in 2.055
-        PDL::Complex::i();
-    },
+    I => PDL::Core::pdl('i'),
 };
 
 # These constants are left in our namespace for historical reasons
@@ -198,7 +190,7 @@ PDL::DSP::Windows - Window functions for signal processing
     use PDL;
     use PDL::DSP::Windows 'window';
 
-    # Get a piddle with a window's samples with the helper
+    # Get an ndarray with a window's samples with the helper
     my $samples = window( 10, tukey => { params => .5 });
 
     # Or construct a window object with the same parameters
@@ -210,7 +202,7 @@ PDL::DSP::Windows - Window functions for signal processing
     # The window object gives access to additional methods
     print $window->coherent_gain, "\n";
 
-    $window->plot; # Requires PDL::Graphics::Gnuplot
+    $window->plot; # Requires PDL::Graphics::Simple
 
 =head1 DESCRIPTION
 
@@ -308,7 +300,7 @@ number. For example C<3> or C<[3]>.
 =item B<N>
 
 number of points in window function (the same as the order of the filter).
-As of 0.102, throws exception if the value for C<N> is undefined or zero.
+As of 0.101, throws exception if the value for C<N> is undefined or zero.
 
 =item B<periodic>
 
@@ -323,35 +315,29 @@ sub window { PDL::DSP::Windows->new(@_)->samples }
 
 =head2 list_windows
 
-    list_windows
-    list_windows STR
+    print join ", ", list_windows(), "\n"
+    print join ", ", list_windows(STR), "\n"
 
-C<list_windows> prints the names all of the available windows.
-C<list_windows STR> prints only the names of windows matching the string C<STR>.
+C<list_windows> returns the names all of the available windows.
+C<list_windows STR> returns only the names of windows matching the
+regular expression C<STR>.
 
 =cut
 
 sub list_windows {
     my ($expr) = @_;
-
+    return sort keys %symmetric_windows if !$expr;
     my @match;
-    if ($expr) {
-        for my $name ( sort keys %symmetric_windows ) {
-            if ( $name =~ /$expr/ ) {
-                push @match, $name;
-                next;
-            }
-
-            push @match,
-                map "$name (alias $_)",
-                grep /$expr/i, @{ $window_aliases{$name} // [] };
+    for my $name ( sort keys %symmetric_windows ) {
+        if ( $name =~ /$expr/ ) {
+            push @match, $name;
+            next;
         }
+        push @match,
+            map "$name (alias $_)",
+            grep /$expr/i, @{ $window_aliases{$name} // [] };
     }
-    else {
-        @match = sort keys %symmetric_windows;
-    }
-
-    print join( ', ', @match ), "\n";
+    @match;
 }
 
 =head1 METHODS
@@ -394,7 +380,7 @@ sub new {
 
 Initialize (or reinitialize) a window object. C<ARGS> are interpreted in
 exactly the same way as arguments for the L</window> subroutine.
-As of 0.102, throws exception if the value for C<N> is undefined or zero.
+As of 0.101, throws exception if the value for C<N> is undefined or zero.
 
 =for example
 
@@ -456,7 +442,7 @@ sub init {
 
 =for ref
 
-Generate and return a reference to the piddle of C<$N> samples for the window
+Generate and return a reference to the ndarray of C<$N> samples for the window
 C<$win>. This is the real-space representation of the window.
 
 The samples are stored in the object C<$win>, but are regenerated every time
@@ -485,7 +471,7 @@ sub samples {
 
 =for ref
 
-Generate and return a reference to the piddle of the modulus of the fourier
+Generate and return a reference to the ndarray of the modulus of the fourier
 transform of the samples for the window C<$win>.
 
 These values are stored in the object C<$win>, but are regenerated every time
@@ -498,7 +484,7 @@ C<modfreqs> is invoked. See the method L</get_modfreqs> below.
 =item min_bins => MIN
 
 This sets the minimum number of frequency bins. Defaults to 1000. If necessary,
-the piddle of window samples are padded with zeroes before the fourier transform
+the ndarray of window samples are padded with zeroes before the fourier transform
 is performed.
 
 =back
@@ -506,6 +492,7 @@ is performed.
 =cut
 
 sub modfreqs {
+    require PDL::FFT;
     my $self = shift;
     my %opts = PDL::Options::iparse( { min_bins => 1000 }, PDL::Options::ifhref(shift) );
 
@@ -711,25 +698,27 @@ sub format_plot_param_vals {
 =for usage
 
     $win->plot;
+    $win->plot($pgswin); # can supply e.g. for multi-plotting
 
 =for ref
 
-Plot the samples. Currently, only L<PDL::Graphics::Gnuplot> is supported. The
+Plot the samples. Uses L<PDL::Graphics::Simple>. The
 default display type is used.
 
 =cut
 
 sub plot {
+    PDL::Core::barf 'PDL::DSP::Windows::plot PDL::Graphics::Simple not available!' unless eval { require PDL::Graphics::Simple };
     my $self = shift;
-    PDL::Core::barf 'PDL::DSP::Windows::plot Gnuplot not available!' unless HAVE_GNUPLOT;
-
-    PDL::Graphics::Gnuplot::plot(
-        title  => $self->get_name . $self->format_plot_param_vals,
-        xlabel => 'Time (samples)',
-        ylabel => 'amplitude',
+    my $pgsw = UNIVERSAL::isa($_[0], 'PDL::Graphics::Simple') ? shift : undef;
+    my @args = (
+        with => 'lines',
         $self->get_samples,
+        { title  => $self->get_name . $self->format_plot_param_vals,
+          xlabel => 'Time (samples)',
+          ylabel => 'amplitude' },
     );
-
+    $pgsw ? $pgsw->plot(@args) : PDL::Graphics::Simple::plot(@args);
     return $self;
 }
 
@@ -744,12 +733,13 @@ Can be called like this
 Or this
 
     $win->plot_freq({ ordinate => ORDINATE });
+    $win->plot_freq($pgswin, { ordinate => ORDINATE }); # can supply e.g. for multi-plotting
 
 =for ref
 
 Plot the frequency response (magnitude of the DFT of the window samples).
 The response is plotted in dB, and the frequency (by default) as a fraction of
-the Nyquist frequency. Currently, only L<PDL::Graphics::Gnuplot> is supported.
+the Nyquist frequency. Uses L<PDL::Graphics::Simple>.
 The default display type is used.
 
 =head3 options
@@ -773,57 +763,42 @@ Defaults to 1000.
 
 =cut
 
+my %coord2xlab = (
+  nyquist=>'Fraction of Nyquist frequency',
+  sample=>'Fraction of sampling frequency',
+  bin=>'bin',
+);
 sub plot_freq {
+    PDL::Core::barf 'PDL::DSP::Windows::plot PDL::Graphics::Simple not available!' unless eval { require PDL::Graphics::Simple };
     my $self = shift;
-
-    PDL::Core::barf 'PDL::DSP::Windows::plot Gnuplot not available!' unless HAVE_GNUPLOT;
-
+    my $pgsw = UNIVERSAL::isa($_[0], 'PDL::Graphics::Simple') ? shift : undef;
     my $opts = new PDL::Options({
         coord    => 'nyquist',
         min_bins => 1000
     })->options( @_ ? shift : {} );
-
     my $mf = $self->get_modfreqs({ min_bins => $opts->{min_bins} });
     $mf /= $mf->max;
-
     my $title = $self->get_name . $self->format_plot_param_vals
         . ', frequency response. ENBW=' . sprintf( '%2.3f', $self->enbw );
-
     my $coord = $opts->{coord};
-
-    my ( $coordinate_range, $xlab );
-
-    if ($coord eq 'nyquist') {
-        $coordinate_range = 1;
-        $xlab = 'Fraction of Nyquist frequency';
-    }
-    elsif ($coord eq 'sample') {
-        $coordinate_range = 0.5;
-        $xlab = 'Fraction of sampling frequency';
-    }
-    elsif ($coord eq 'bin') {
-        $coordinate_range = $self->{N} / 2;
-        $xlab = 'bin';
-    }
-    else {
-        PDL::Core::barf "plot_freq: Unknown ordinate unit specification $coord";
-    }
-
+    my $xlab = $coord2xlab{$coord} //
+      PDL::Core::barf "plot_freq: Unknown ordinate unit specification $coord";
     my $ylab = 'frequency response (dB)';
+    my $coordinate_range = $coord eq 'nyquist' ? 1 :
+      $coord eq 'sample' ? 0.5 :
+      $self->{N} / 2;
     my $coordinates = PDL::Core::zeroes($mf)
         ->xlinvals( -$coordinate_range, $coordinate_range );
-
-    PDL::Graphics::Gnuplot::plot(
-        title  => $title,
-        xmin   => -$coordinate_range,
-        xmax   => $coordinate_range,
-        xlabel => $xlab,
-        ylabel => $ylab,
-        with => 'line',
+    my @args = (
+        with => 'lines',
         $coordinates,
         20 * PDL::Ops::log10($mf),
+        { title  => $title,
+          xrange => [-$coordinate_range,$coordinate_range],
+          xlabel => $xlab,
+          ylabel => $ylab },
     );
-
+    $pgsw ? $pgsw->plot(@args) : PDL::Graphics::Simple::plot(@args);
     return $self;
 }
 
@@ -898,7 +873,7 @@ sub scallop_loss {
     my $w = shift->samples;
 
     # Adapted from https://stackoverflow.com/a/40912607
-    my $num = $w * exp( -( I()->im * PDL::sequence($w) * PI / $w->nelem ) );
+    my $num = $w * exp( -( I() * PDL::sequence($w) * PI / $w->nelem ) );
 
     20 * PDL::Ops::log10( abs( $num->sum ) / abs($w)->sum );
 }
@@ -1118,6 +1093,7 @@ sub cauchy_per {
 }
 
 sub chebyshev {
+    require PDL::FFT;
     PDL::Core::barf 'chebyshev: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $at ) = @_;
 
@@ -1141,12 +1117,7 @@ sub chebyshev {
         my $cw_im = $cw * sin($arg);
         $cw *= cos($arg);
 
-        if (USE_FFTW_DIRECTION) {
-            PDL::FFT::fftnd( $cw, $cw_im );
-        }
-        else {
-            PDL::FFT::ifftnd( $cw, $cw_im );
-        }
+        PDL::FFT::ifftnd( $cw, $cw_im );
 
         $M1   = $N / 2;
         $M    = $M1 - 1;
@@ -1193,7 +1164,7 @@ sub dpss {
     PDL::Core::barf 'dpss: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $beta ) = @_;
 
-    PDL::Core::barf 'dpss: PDL::LinearAlgebra not installed.' unless HAVE_LinearAlgebra;
+    PDL::Core::barf 'dpss: PDL::LinearAlgebra not installed.' unless eval { require PDL::LinearAlgebra::Special };
     PDL::Core::barf "dpss: $beta not between 0 and $N." unless $beta >= 0 and $beta <= $N;
 
     $beta /= $N / 2;
@@ -1214,7 +1185,7 @@ sub dpss_per {
     my ( $N, $beta ) = @_;
     $N++;
 
-    PDL::Core::barf 'dpss: PDL::LinearAlgebra not installed.' unless HAVE_LinearAlgebra;
+    PDL::Core::barf 'dpss: PDL::LinearAlgebra not installed.' unless eval { require PDL::LinearAlgebra::Special };
     PDL::Core::barf "dpss: $beta not between 0 and $N." unless $beta >= 0 and $beta <= $N;
 
     $beta /= $N / 2;
@@ -1341,7 +1312,7 @@ sub kaiser {
     PDL::Core::barf 'kaiser: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $beta ) = @_;
 
-    PDL::Core::barf 'kaiser: PDL::GSLSF not installed' unless HAVE_BESSEL;
+    PDL::Core::barf 'kaiser: PDL::GSLSF not installed' unless eval { require PDL::GSLSF::BESSEL };
 
     $beta *= PI;
 
@@ -1357,7 +1328,7 @@ sub kaiser_per {
     PDL::Core::barf 'kaiser: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ($N,$beta) = @_;
 
-    PDL::Core::barf 'kaiser: PDL::GSLSF not installed' unless HAVE_BESSEL;
+    PDL::Core::barf 'kaiser: PDL::GSLSF not installed' unless eval { require PDL::GSLSF::BESSEL };
 
     $beta *= PI;
 
@@ -1674,7 +1645,8 @@ Blackman-Harris family, with coefficients
 
     a0 = 0.35875
     a1 = 0.48829
-    a2 = 0.14128a3 = 0.01168
+    a2 = 0.14128
+    a3 = 0.01168
 
 Another name for this window is the Blackman-Harris window.
 
@@ -1959,12 +1931,9 @@ To the cofficients of this
 
 sub cos_pow_to_mult {
     my @cin = @_;
-    PDL::Core::barf 'cos_pow_to_mult: number of args not less than 8.' if @cin > 7;
-
+    PDL::Core::barf 'cos_pow_to_mult: must be less than 8 args .' if @cin > 7;
     my $ex = 7 - @cin;
-
     my @c = ( @cin, (0) x $ex );
-
     my @as = (
         10 * $c[6] + 12 * $c[4] + 16 * $c[2] + 32 * $c[0],
         20 * $c[5] + 24 * $c[3] + 32 * $c[1],
@@ -1974,16 +1943,12 @@ sub cos_pow_to_mult {
          2 * $c[5],
         $c[6],
     );
-
-    pop @as for 1 .. $ex;
-
+    splice @as, -$ex if $ex;
     my $sign = -1;
-
     foreach (@as) {
         $_ /= -$sign * 32;
         $sign *= -1;
     }
-
     @as;
 }
 
@@ -2031,13 +1996,10 @@ sub chebpoly {
 
 sub cos_mult_to_pow {
     my( @ain )  = @_;
-    PDL::Core::barf 'cos_mult_to_pow: number of args not less than 8.' if @ain > 7;
-
+    PDL::Core::barf 'cos_mult_to_pow: must be less than 8 args .' if @ain > 7;
     my $ex = 7 - @ain;
-
     my @a = ( @ain, (0) x $ex );
-
-    my (@cs) = (
+    my @cs = (
         -$a[6] + $a[4] - $a[2] + $a[0],
          -5 * $a[5] +  3 * $a[3] - $a[1],
          18 * $a[6] -  8 * $a[4] + 2 * $a[2],
@@ -2046,18 +2008,12 @@ sub cos_mult_to_pow {
         -16 * $a[5],
          32 * $a[6]
     );
-
-    pop @cs for 1 .. $ex;
-
+    splice @cs, -$ex if $ex;
     @cs;
 }
 
 # Delete internal constants from namespace
 delete @PDL::DSP::Windows::{qw(
-    HAVE_LinearAlgebra
-    HAVE_BESSEL
-    HAVE_GNUPLOT
-    USE_FFTW_DIRECTION
     I
 )};
 

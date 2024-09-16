@@ -101,19 +101,7 @@ The clone is created by the following code.
 
 C<method elem_cmp : int ($a_data : L<StringBuffer|SPVM::StringBuffer>[], $a_data_index : int, $b_data : L<StringBuffer|SPVM::StringBuffer>[], $b_data_index : int);>
 
-Compares the element $a_data at index $a_data_index and the element $b_data at index $b_data_index using the following comparison code and returns the result.
-
-  my $a_string = (string)undef;
-  if ($a_data->[$a_data_index]) {
-    $a_string = $a_data->[$a_data_index]->to_string;
-  }
-  
-  my $b_string = (string)undef;
-  if ($b_data->[$b_data_index]) {
-    $b_string = $b_data->[$b_data_index]->to_string;
-  }
-  
-  my $cmp = $a_string cmp $b_string;
+Compares the element $a_data at index $a_data_index and the element $b_data at index $b_data_index using L<StringBuffer#cmp|SPVM::StringBuffer/"cmp"> method, and returns its return value.
 
 =head2 elem_is_na
 
