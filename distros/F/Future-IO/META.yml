@@ -18,13 +18,13 @@ name: Future-IO
 provides:
   Future::IO:
     file: lib/Future/IO.pm
-    version: '0.15'
+    version: '0.16'
   Future::IO::ImplBase:
     file: lib/Future/IO/ImplBase.pm
-    version: '0.15'
+    version: '0.16'
   Future::IO::System:
     file: lib/Future/IO/System.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   Future: '0'
   Struct::Dumb: '0'
@@ -32,5 +32,5 @@ requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

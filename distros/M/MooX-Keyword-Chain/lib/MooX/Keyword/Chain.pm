@@ -1,6 +1,6 @@
 package MooX::Keyword::Chain;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 use Moo; our %CHAINS;
 use MooX::Keyword {
 	chain => {
@@ -31,7 +31,7 @@ MooX::Keyword::Chain - Subroutine chains
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =cut
 
@@ -46,21 +46,21 @@ Perhaps a little code snippet.
 	use Moo;
 	use MooX::Keyword extends => '+Chain';
 
-	has boat => (
+	has items => (
 		is => 'ro',
 		default => sub { [ ] }
 	);
 
-	chain add => 'politicians' => sub {
-		push @{ $_[0]->boat }, 'leadership';
+	chain add => 'one' => sub {
+		push @{ $_[0]->items }, 211;
 	};
 
-	chain add => 'reporters' => sub {
-		push @{ $_[0]->boat }, 'propaganda';
+	chain add => 'two' => sub {
+		push @{ $_[0]->items }, 19;
 	};
 
-	chain add => 'bankers' => sub {
-		push @{ $_[0]->boat }, 'finance';
+	chain add => 'three' => sub {
+		push @{ $_[0]->items }, 696;
 	};
 
 	1;
@@ -69,7 +69,7 @@ Perhaps a little code snippet.
 
 	my $chains = Chains->new();
 
-	$chains->add(); # [ 'leadership', 'propaganda', 'finance' ];
+	$chains->add(); # [ 211, 19, 696 ];
 
 =head1 DESCRIPTION
 

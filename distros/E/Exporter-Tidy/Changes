@@ -1,5 +1,10 @@
 Revision history for Perl extension Exporter::Tidy.
 
+0.09  Mon Sep 16 22:02 2024
+        - Remove bundled test modules (RT #154930), provided by JKEENAN
+        - Add more tests, provided by JKEENAN
+        - Update any-OSI license text to Debian-approved version
+
 0.08  Thu Jan 6 12:23 2014
         - README updated to reflect license change.
 

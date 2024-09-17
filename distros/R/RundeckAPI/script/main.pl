@@ -50,10 +50,11 @@ my $api = RundeckAPI->new(
 		'login'		=> "admin",
 		'token'		=> '<Token from GUI, as admin>',
 		'debug'		=> 1,
+		'apivers'	=> '42',
  		'proxy'		=> "http://proxy.your.company:3128",
 );
 
-my $hashRef = $api->get("/api/27/system/info");
+my $hashRef = $api->get("system/info");
 
 print Dumper($hashRef);
 

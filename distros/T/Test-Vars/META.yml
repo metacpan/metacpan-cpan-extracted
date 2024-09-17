@@ -1,16 +1,18 @@
 ---
 abstract: 'Detects unused variables in perl modules'
 author:
-  - 'Goro Fuji (gfx) <gfuji(at)cpan.org>'
+  - 'Goru Fuji (gfuji@cpan.org)'
 build_requires:
-  ExtUtils::MakeMaker: '6.59'
+  ExtUtils::MakeMaker: '6.17'
+  File::Spec::Functions: '0'
+  Moose::Role: '0'
   Test::More: '0.88'
   Test::Output: '0'
   Test::Tester: '0'
 configure_requires:
-  Module::Build::Tiny: '0.035'
-dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,27 +21,29 @@ name: Test-Vars
 no_index:
   directory:
     - t
-    - xt
     - inc
-    - share
-    - eg
-    - examples
-    - author
-    - builder
+    - example
+    - t
+    - xt
 provides:
   Test::Vars:
     file: lib/Test/Vars.pm
-    version: '0.015'
+    version: '0.017'
+recommends: {}
 requires:
   B: '0'
+  ExtUtils::Manifest: '0'
+  IO::Pipe: '0'
   List::Util: '1.33'
+  Storable: '0'
+  Symbol: '0'
   parent: '0'
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/houseabsolute/p5-Test-Vars/issues
   homepage: https://github.com/houseabsolute/p5-Test-Vars
   repository: git://github.com/houseabsolute/p5-Test-Vars.git
-version: '0.015'
+version: '0.017'
 x_contributors:
   - 'Dave Rolsky <autarch@urth.org>'
   - 'Dmitry Matrosov <amidos@amidos.ru>'
@@ -48,10 +52,11 @@ x_contributors:
   - 'FUJI Goro <goro.fuji@ebookjapan.co.jp>'
   - 'Fuji, Goro <g.psy.va@gmail.com>'
   - 'Gregory Oschwald <goschwald@maxmind.com>'
+  - 'James E Keenan <jkeenan@cpan.org>'
   - 'Michael G. Schwern <schwern@pobox.com>'
   - 'Nicholas Clark <nick@ccl4.org>'
-  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Olivier MenguÃ© <dolmen@cpan.org>'
   - 'Ran Eilam <ran.eilam@gmail.com>'
+  - 'Richard Leach <richardleach@users.noreply.github.com>'
   - 'cpansprout <cpansprout@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1

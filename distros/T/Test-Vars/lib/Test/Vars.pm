@@ -3,7 +3,7 @@ use 5.010_000;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.017';
 
 our @EXPORT = qw(all_vars_ok test_vars vars_ok);
 
@@ -260,6 +260,8 @@ my $op_enteriter;
 my $op_entereval; # string eval
 my $op_null;
 my @op_svusers;
+my $padsv_store;
+my $aelemfastlex_store;
 BEGIN{
     foreach my $op(qw(padsv padav padhv padcv match multideref subst)){
         $padops[B::opnumber($op)]++;
@@ -268,6 +270,18 @@ BEGIN{
     # Prior to that, 'aelemfast' handled lexicals too.
     my $aelemfast = B::opnumber('aelemfast_lex');
     $padops[$aelemfast == -1 ? B::opnumber('aelemfast') : $aelemfast]++;
+
+    # The 5.37 development cycle introduced two new ops to account for.
+    $padsv_store = B::opnumber('padsv_store');
+    if ($padsv_store != -1) {
+        $padops[$padsv_store]++;
+        $op_svusers[$padsv_store]++;
+    }
+    $aelemfastlex_store = B::opnumber('aelemfastlex_store');
+    if ($aelemfastlex_store != -1) {
+        $padops[$aelemfastlex_store]++;
+        $op_svusers[$aelemfastlex_store]++;
+    }
 
     $op_anoncode = B::opnumber('anoncode');
     $padops[$op_anoncode]++;
@@ -433,7 +447,8 @@ sub _make_scan_subs {
                     unless $o->type == $op_null;
             }
 
-            if (all {$op_svusers[$_->type] && ($_->flags & B::OPf_WANT) == B::OPf_WANT_VOID} @ops){
+            if (all {$op_svusers[$_->type] && (($_->flags & B::OPf_WANT) == B::OPf_WANT_VOID)
+                && ($_->type != $padsv_store) && ($_->type != $aelemfastlex_store) } @ops){
                 if(_ckwarn_once($cop)){
                     $p->{context} = sprintf 'at %s line %d',
                         $cop->file, $cop->line;
@@ -471,7 +486,7 @@ Test::Vars - Detects unused variables in perl modules
 
 =head1 VERSION
 
-This document describes Test::Vars version 0.015.
+This document describes Test::Vars version 0.017.
 
 =head1 SYNOPSIS
 
@@ -488,7 +503,9 @@ This document describes Test::Vars version 0.015.
 
 =head1 DESCRIPTION
 
-Test::Vars provides test functions to report unused variables either in an entire distribution or in some files of your choice in order to keep your source code tidy.
+Test::Vars provides test functions to report unused variables either in an
+entire distribution or in some files of your choice in order to keep your
+source code tidy.
 
 =head1 INTERFACE
 
@@ -567,9 +584,10 @@ C<TEST_VERBOSE = 1 | 2 > shows the way this module works.
 
 =head1 CAVEATS
 
-https://rt.cpan.org/Ticket/Display.html?id=60018
-
-https://rt.cpan.org/Ticket/Display.html?id=82411
+Over time there have been reported a number of cases where Test-Vars fails to
+report unused variables.  You can review most of these cases by going to our
+issue tracker on GitHub and selecting issues with the C<Bug> label:
+L<https://github.com/houseabsolute/p5-Test-Vars/issues?q=is%3Aopen+is%3Aissue+label%3ABug>
 
 =head1 DEPENDENCIES
 
@@ -577,9 +595,9 @@ Perl 5.10.0 or later.
 
 =head1 BUGS
 
-All complex software has bugs lurking in it, and this module is no
-exception. If you find a bug please either email me, or add the bug
-to cpan-RT.
+Please report new issues at our issue tracker on GitHub:
+L<https://github.com/houseabsolute/p5-Test-Vars/issues>.  We no longer use
+rt.cpan.org for bug reports.
 
 =head1 SEE ALSO
 

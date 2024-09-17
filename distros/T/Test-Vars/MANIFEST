@@ -1,14 +1,15 @@
-Build.PL
-Changes
-LICENSE
-META.json
-README.md
+.gitignore
 appveyor.yml
-cpanfile
+Changes
 example/cpan.t
 example/math-bigint.t
 example/test_more.t
 lib/Test/Vars.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
 t/00_load.t
 t/01_all_vars_ok_self.t
 t/02_no_warnings.t
@@ -27,9 +28,9 @@ t/lib/CompileError.pm
 t/lib/Foreach.pm
 t/lib/ImplicitTopic.pm
 t/lib/MySub.pm
+t/lib/NotWarned.pm
 t/lib/NoWarnings.pm
 t/lib/NoWarningsOnce.pm
-t/lib/NotWarned.pm
 t/lib/OptimizedAway.pm
 t/lib/OurVars.pm
 t/lib/Regex.pm
@@ -48,5 +49,6 @@ xt/01_pod-spell.t
 xt/02_pod.t
 xt/03_pod-coverage.t
 xt/04_synopsis.t
-META.yml
-MANIFEST
+xt/05_test-meta.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

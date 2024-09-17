@@ -1,5 +1,11 @@
 Revision history for WWW::Mechanize
 
+2.19      2024-09-16 15:25:45Z
+    [DOCUMENTATION]
+    - Fix minor typo in SYNOPSIS example code comment (GH#379) (Paul Cochrane)
+    [ENHANCEMENTS]
+    - Replace "base" with "parent" (GH#381) (James Raspass)
+
 2.18      2024-01-30 14:29:44Z
     [FIXED]
     - Fix click_button non exclusive attributes (GH#371) (Andreas  Huber)

@@ -1,5 +1,15 @@
 Revision history for Perl extension Test::Vars
 
+0.017 2024-09-16T12:15:00Z
+
+    - Support new opcodes introduced in 5.37 development cycle: PADSV_STORE
+      and AELEMFASTLEX_STORE (#52)
+    - Return build system to ExtUtils::MakeMaker (#54)
+
+0.016 2024-09-16T11:30:00Z
+
+    - [CPAN indexing failure]
+
 0.015 2021-04-20T13:52:33Z
 
     - Support use of lexical subroutines (#41)

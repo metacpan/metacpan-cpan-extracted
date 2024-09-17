@@ -205,6 +205,30 @@ METHODS
     it as soon as possible on program startup, before any of the main
     Future::IO methods may have been called.
 
+ load_impl
+
+       Future::IO->load_impl( @names );
+
+    Since version 0.16.
+
+    Given a list of possible implementation module names, iterates through
+    them attempting to load each one until a suitable module is found. Any
+    errors encountered while loading each are ignored. If no module is
+    found to be suitable, an exception is thrown that likely aborts the
+    program.
+
+    @names should contain a list of Perl module names (which likely live in
+    the Future::IO::Impl::* prefix). If any name does not contain a ::
+    separator, it will have that prefix applied to it. This allows a
+    conveniently short list; e.g.
+
+       Future::IO->load_impl( qw( UV Glib IOAsync ) );
+
+    This method is intended to be called once, at startup, by the main
+    containing program. Since it sets the implementation, it would
+    generally be considered inappropriate to invoke this method from some
+    additional module that might be loaded by a containing program.
+
  HAVE_MULTIPLE_FILEHANDLES
 
        $has = Future::IO->HAVE_MULTIPLE_FILEHANDLES;

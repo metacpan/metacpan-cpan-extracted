@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-08-19'; # DATE
+our $DATE = '2024-09-15'; # DATE
 our $DIST = 'App-HeightUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/HeightUtils/calc_child_height_potential",
@@ -38,7 +38,7 @@ calc-child-height-potential - Calculate child potential height based on mother's
 
 =head1 VERSION
 
-This document describes version 0.001 of calc-child-height-potential (from Perl distribution App-HeightUtils), released on 2024-08-19.
+This document describes version 0.002 of calc-child-height-potential (from Perl distribution App-HeightUtils), released on 2024-09-15.
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ C<*> marks required options.
 
 =item B<--boy*>
 
-Alias for --gender.
+Shortcut for `--gender=M`.
 
 See C<--gender>.
 
@@ -82,7 +82,7 @@ Can also be specified as the 1st command-line argument.
 
 =item B<--girl*>
 
-Alias for --gender.
+Shortcut for `--gender=F`.
 
 See C<--gender>.
 

@@ -29,7 +29,7 @@ t/Data-InfoBox-Item/03-new.t
 t/Data-InfoBox-Item/04-icon_url.t
 t/Data-InfoBox-Item/05-icon_char.t
 t/Data-InfoBox-Item/06-text.t
-t/Data-InfoBox-Item/07-url.t
+t/Data-InfoBox-Item/07-uri.t
 t/Data-InfoBox/01-use.t
 t/Data-InfoBox/02-version.t
 t/Data-InfoBox/03-new.t

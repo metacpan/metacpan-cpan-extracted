@@ -11,15 +11,15 @@ my $obj = Data::InfoBox::Item->new(
         'text' => Data::Text::Simple->new(
                 'text' => 'Funny item'
         ),
-        'url' => 'https://skim.cz',
+        'uri' => 'https://skim.cz',
 );
 
 # Print out.
 print "Icon URL: ".$obj->icon_url."\n";
 print "Text: ".$obj->text->text."\n";
-print "URL: ".$obj->url."\n";
+print "URI: ".$obj->uri."\n";
 
 # Output:
 # Icon URL: https://example.com/foo.png
 # Text: Funny item
-# URL: https://skim.cz
+# URI: https://skim.cz

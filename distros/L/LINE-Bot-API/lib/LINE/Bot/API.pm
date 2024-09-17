@@ -1,7 +1,7 @@
 package LINE::Bot::API;
 use strict;
 use warnings;
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 use LINE::Bot::API::Builder::SendMessage;
 use LINE::Bot::API::Client;
@@ -27,6 +27,7 @@ use LINE::Bot::API::Response::UserInteractionStatistics;
 use LINE::Bot::API::Response::BotInfo;
 use LINE::Bot::API::Response::WebhookInformation;
 use LINE::Bot::API::Response::WebhookTest;
+use LINE::Bot::API::Response::Followers;
 
 use constant {
     DEFAULT_MESSAGING_API_ENDPOINT => 'https://api.line.me/v2/bot/',
@@ -36,7 +37,9 @@ use constant {
 };
 use Furl;
 use Carp 'croak';
+use URI;
 use URI::Escape;
+use URI::QueryParam;
 
 sub new {
     my($class, %args) = @_;
@@ -376,6 +379,12 @@ sub download_rich_menu_image {
     );
 }
 
+sub validate_rich_menu_object {
+    my ($self, $rich_menu) = @_;
+    my $res = $self->request(post => "richmenu/validate", $rich_menu);
+    LINE::Bot::API::Response::Common->new(%{ $res });
+}
+
 sub issue_channel_access_token {
     my ($self, $opts) = @_;
 
@@ -511,6 +520,83 @@ sub test_webhook_endpoint {
     LINE::Bot::API::Response::WebhookTest->new(%{ $res });
 }
 
+sub validate_reply_message_objects {
+    my($self, $messages) = @_;
+
+    my $res = $self->request(
+        post => 'message/validate/reply',
+        +{
+            messages   => $messages,
+        }
+    );
+
+    LINE::Bot::API::Response::Common->new(%{ $res });
+}
+
+sub validate_push_message_objects {
+    my($self, $messages) = @_;
+
+    my $res = $self->request(
+        post => 'message/validate/push',
+        +{
+            messages   => $messages,
+        }
+    );
+
+    LINE::Bot::API::Response::Common->new(%{ $res });
+}
+
+sub validate_multicast_message_objects {
+    my($self, $messages) = @_;
+
+    my $res = $self->request(
+        post => 'message/validate/multicast',
+        +{
+            messages   => $messages,
+        }
+    );
+
+    LINE::Bot::API::Response::Common->new(%{ $res });
+}
+
+sub validate_narrowcast_message_objects {
+    my($self, $messages) = @_;
+
+    my $res = $self->request(
+        post => 'message/validate/narrowcast',
+        +{
+            messages   => $messages,
+        }
+    );
+
+    LINE::Bot::API::Response::Common->new(%{ $res });
+}
+
+sub validate_broadcast_message_objects {
+    my($self, $messages) = @_;
+
+    my $res = $self->request(
+        post => 'message/validate/broadcast',
+        +{
+            messages   => $messages,
+        }
+    );
+
+    LINE::Bot::API::Response::Common->new(%{ $res });
+}
+
+sub get_followers {
+    my ($self, $opts) = @_;
+    my $uri = URI->new('followers/ids');
+
+    exists $opts->{'limit'} and $uri->query_param(limit => $opts->{'limit'});
+    exists $opts->{'start'} and $uri->query_param(start => $opts->{'start'});
+
+    my $res = $self->request(get => $uri->as_string);
+
+    LINE::Bot::API::Response::Followers->new(%{ $res });
+}
+
 1;
 
 __END__
@@ -520,6 +606,17 @@ __END__
 LINE::Bot::API - SDK of the LINE Messaging API for Perl
 
 =for html <a href="https://travis-ci.org/line/line-bot-sdk-perl"><img src="https://travis-ci.org/line/line-bot-sdk-perl.svg?branch=master"></a>
+
+=head1 Maintenance Mode
+
+As of May 13, 2024, the project L<line-bot-sdk-perl|https://github.com/line/line-bot-sdk-perl/> project will enter maintenance mode. During this period, we will continue to provide critical bug fixes and security updates; however, new features will not be added. We encourage the community to submit patches and improvements, which we will gladly review and merge as appropriate.
+
+=head1 Archiving
+
+On December 2, 2024, the repository L<line-bot-sdk-perl|https://github.com/line/line-bot-sdk-perl/> will be archived. This means the codebase will become read-only. While the repository will still be available for cloning and viewing, no further contributions or changes will be accepted. We recommend users and developers fork the repository if they wish to continue development independently.
+
+We appreciate the support and contributions from our community throughout the project's lifecycle. Thank you for being a part of our journey.
+
 
 =head1 SYNOPSIS
 
@@ -983,6 +1080,12 @@ This method corresponds to the API of L<Unlink rich menu from multiple users|htt
 
 The mandatory argument C<$user_ids> is an ArrayRef of user ids. The return value is an empty object.
 
+=head2 C<< validate_rich_menu_object( $rich_menu_object ) >>
+
+This method corresponds to the API of L<Validate rich menu object|https://developers.line.biz/en/reference/messaging-api/#validate-rich-menu-object>
+
+One argument is needed: C<$rich_menu_object>, which is a plain HashRef representing L<rich menu object|https://developers.line.biz/en/reference/messaging-api/#rich-menu-object>
+
 =head2 C<< issue_channel_access_token({ client_id => '...', client_secret => '...' }) >>
 
 This method corresponds to the API of: L<Issue Channel access token|https://developers.line.biz/en/reference/messaging-api/#issue-channel-access-token>
@@ -1096,6 +1199,42 @@ See also the LINE Developer API reference of this method: L<https://developers.l
 Checks if the configured webhook endpoint can receive a test webhook event.
 
 See also the LINE Developer API reference of this method: L<https://developers.line.biz/en/reference/messaging-api/#get-webhook-endpoint-information>
+
+=head2 C<< validate_reply_message_objects([ $message, ... ] ) >>
+
+Validates that an array of message objects is valid as a value for the messages property of the request body for the Send reply message endpoint.
+
+See also the LINE Developer API reference of this method: L<https://developers.line.biz/en/reference/messaging-api/#validate-message-objects-of-reply-message>
+
+=head2 C<< validate_push_message_objects([ $message, ... ] ) >>
+
+Validates that an array of message objects is valid as a value for the messages property of the request body for the Send push message endpoint.
+
+See also the LINE Developer API reference of this method: L<https://developers.line.biz/en/reference/messaging-api/#validate-message-objects-of-push-message>
+
+=head2 C<< validate_multicast_message_objects([ $message, ... ] ) >>
+
+Validates that an array of message objects is valid as a value for the messages property of the request body for the Send multicast message endpoint.
+
+See also the LINE Developer API reference of this method: L<https://developers.line.biz/en/reference/messaging-api/#validate-message-objects-of-multicast-message>
+
+=head2 C<< validate_narrowcast_message_objects([ $message, ... ] ) >>
+
+Validates that an array of message objects is valid as a value for the messages property of the request body for the Send narrowcast message endpoint.
+
+See also the LINE Developer API reference of this method: L<https://developers.line.biz/en/reference/messaging-api/#validate-message-objects-of-narrowcast-message>
+
+=head2 C<< validate_broadcast_message_objects([ $message, ... ] ) >>
+
+Validates that an array of message objects is valid as a value for the messages property of the request body for the Send broadcast message endpoint.
+
+See also the LINE Developer API reference of this method: L<https://developers.line.biz/en/reference/messaging-api/#validate-message-objects-of-broadcast-message>
+
+=head2 C<< get_followers({ 'limit' => 100, 'start' => "..." }) >>
+
+Gets the list of User IDs of users who have added LINE Official Account as a friend.
+
+See also the LINE Developer API reference of this method: L<https://developers.line.biz/en/reference/messaging-api/#get-follower-ids>
 
 =head1 How to build a send message object
 

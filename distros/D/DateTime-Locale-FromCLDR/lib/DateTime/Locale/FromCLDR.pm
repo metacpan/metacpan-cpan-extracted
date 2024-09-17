@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/DateTime/Locale/FromCLDR.pm
-## Version v0.3.0
+## Version v0.4.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/07
-## Modified 2024/09/13
+## Modified 2024/09/16
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     # "If a given short metazone form is known NOT to be understood in a given locale and the parent locale has this value such that it would normally be inherited, the inheritance of this value can be explicitly disabled by use of the 'no inheritance marker' as the value, which is 3 simultaneous empty set characters (U+2205)."
     # <https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
     our $EMPTY_SET = "∅∅∅";
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.4.0';
 };
 
 use strict;
@@ -210,7 +210,7 @@ sub available_format_patterns
             return( $self->pass_error ) if( !defined( $all ) && $cldr->error );
             if( $all && scalar( @$all ) )
             {
-                $ref = map{ $_->{format_id} => $_->{format_pattern} } @$all;
+                $ref = +{ map{ $_->{format_id} => $_->{format_pattern} } @$all };
             }
         }
         $self->{available_format_patterns} = $ref;
@@ -2128,6 +2128,13 @@ sub territory_code
     return( $str );
 }
 
+sub territory_info
+{
+    my $self = shift( @_ );
+    my $locale = $self->{locale} || die( "Locale is not set!" );
+    return( $self->_territory_info( locale => $locale ) );
+}
+
 sub time_format_allowed { return( shift->_time_formats( 'allowed', @_ ) ); }
 
 sub time_format_default { return( shift->time_format_medium ); }
@@ -3958,7 +3965,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.3.0
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -5452,6 +5459,62 @@ Returns the C<locale>'s C<territory> ID, or C<undef> if there is none.
 
 This is an alias for L<territory_code|/territory_code>
 
+=head2 territory_info
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $ref = $locale->territory_info;
+
+which would yield:
+
+    {
+        calendars => undef,
+        contains => undef,
+        currency => "USD",
+        first_day => 7,
+        gdp => 19490000000000,
+        languages => [qw(
+            en es zh-Hant fr de fil it vi ko ru nv yi pdc hnj haw
+            frc chr esu dak cho lkt ik mus io cic cad jbo osa zh
+        )],
+        literacy_percent => 99,
+        min_days => 1,
+        parent => "021",
+        population => 332639000,
+        status => "regular",
+        territory => "US",
+        territory_id => 297,
+        weekend => undef,
+    }
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en-GB' );
+    my $ref = $locale->territory_info;
+
+which would yield:
+
+    {
+        calendars => undef,
+        contains => undef,
+        currency => "GBP",
+        first_day => 1,
+        gdp => 2925000000000,
+        languages => [qw(
+            en fr de es pl pa ur ta gu sco cy bn ar zh-Hant it lt pt
+            so tr ga gd kw en-Shaw
+        )],
+        literacy_percent => 99,
+        min_days => 4,
+        parent => 154,
+        population => 65761100,
+        status => "regular",
+        territory => "GB",
+        territory_id => 121,
+        weekend => undef,
+    }
+
+Returns an hash reference of information related to the ISO3166 country code associated with the C<locale>. If the C<locale> has no country code associated, it will expand it using the Unicode LDML rule with L<Locale::Unicode::Data/likely_subtag>
+
+Keep in mind that the default or fallback data are stored in the special territory code C<001> (World). Thus, for example, if the C<calendars> field is empty, the default value would be in C<001>, and would be C<["gregorian"]>
+
 =head2 time_format_allowed
 
     my $locale = DateTime::Locale::FromCLDR->new( 'en' );
@@ -5794,6 +5857,14 @@ Same as L<timezone_daylight_long|/timezone_daylight_long>, but for the C<generic
     # HST
 
 Same as L<timezone_daylight_long|/timezone_daylight_long>, but for the C<generic> C<short> format.
+
+=head2 timezone_id
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $bcp47_id = $locale->timezone_id( timezone => 'America/Los_Angeles' );
+    # uslax
+
+Provided with a C<timezone>, and this returns its BCP47 time zone ID equivalent.
 
 =head2 timezone_standard_long
 

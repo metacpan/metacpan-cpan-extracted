@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Future::IO 0.15;
+package Future::IO 0.16;
 
 use v5.14;
 use warnings;
@@ -25,6 +25,8 @@ our $MAX_WRITELEN = 8192;
 C<Future::IO> - Future-returning IO methods
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Future::IO;
 
@@ -410,6 +412,48 @@ sub override_impl
       if @alarms or @readers;
 
    ( $IMPL ) = @_;
+}
+
+=head2 load_impl
+
+   Future::IO->load_impl( @names );
+
+I<Since version 0.16.>
+
+Given a list of possible implementation module names, iterates through them
+attempting to load each one until a suitable module is found. Any errors
+encountered while loading each are ignored. If no module is found to be
+suitable, an exception is thrown that likely aborts the program.
+
+C<@names> should contain a list of Perl module names (which likely live in the
+C<Future::IO::Impl::*> prefix). If any name does not contain a C<::>
+separator, it will have that prefix applied to it. This allows a conveniently
+short list; e.g.
+
+   Future::IO->load_impl( qw( UV Glib IOAsync ) );
+
+This method is intended to be called once, at startup, by the main containing
+program. Since it sets the implementation, it would generally be considered
+inappropriate to invoke this method from some additional module that might be
+loaded by a containing program.
+
+=cut
+
+sub load_impl
+{
+   shift;
+   my $loaded;
+
+   foreach ( @_ ) {
+      my $name = $_;
+      $name =~ m/::/ or $name = "Future::IO::Impl::$name";
+      my $module = "$name.pm" =~ s{::}{/}gr;
+
+      eval { require $module } or next;
+      $loaded = 1;
+      last;
+   }
+   $loaded or die "Unable to find a usable Future::IO::Impl subclass\n";
 }
 
 =head2 HAVE_MULTIPLE_FILEHANDLES

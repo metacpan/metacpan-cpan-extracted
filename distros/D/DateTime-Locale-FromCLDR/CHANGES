@@ -1,5 +1,10 @@
 Revision history for Perl module DateTime::Locale::FromCLDR
 
+v0.4.0 2024-09-17T14:23:48+0900
+    - Added method territory_info()
+    - Added method timezone_id()
+    - Correcting an error in method available_format_patterns()
+
 v0.3.0 2024-09-13T18:24:27+0900
     - Added method number_system()
     - Added method available_format_patterns()

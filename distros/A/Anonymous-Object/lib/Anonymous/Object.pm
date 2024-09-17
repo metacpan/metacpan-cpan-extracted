@@ -2,7 +2,7 @@ package Anonymous::Object;
 use strict;
 use warnings;
 use Data::Dumper;
-our $VERSION = 0.07;
+our $VERSION = 1.00;
 
 our $UNIQUE;
 BEGIN {
@@ -413,7 +413,7 @@ Anonymous::Object - Generate Anonymous Objects
 
 =head1 VERSION
 
-Version 0.07
+Version 1.00
 
 =cut
 
@@ -826,10 +826,6 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Anonymous-Object>
 
 L<http://annocpan.org/dist/Anonymous-Object>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Anonymous-Object>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Anonymous-Object>
@@ -840,7 +836,7 @@ L<https://metacpan.org/release/Anonymous-Object>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2024 by LNATION.
 
 This is free software, licensed under:
 

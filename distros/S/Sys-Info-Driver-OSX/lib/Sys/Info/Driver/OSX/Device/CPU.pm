@@ -1,5 +1,5 @@
 package Sys::Info::Driver::OSX::Device::CPU;
-$Sys::Info::Driver::OSX::Device::CPU::VERSION = '0.7962';
+$Sys::Info::Driver::OSX::Device::CPU::VERSION = '0.7963';
 use 5.010;
 use strict;
 use warnings;
@@ -168,7 +168,7 @@ Sys::Info::Driver::OSX::Device::CPU
 
 =head1 VERSION
 
-version 0.7962
+version 0.7963
 
 =head1 SYNOPSIS
 

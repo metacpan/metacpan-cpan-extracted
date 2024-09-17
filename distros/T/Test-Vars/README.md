@@ -4,7 +4,7 @@ Test::Vars - Detects unused variables in perl modules
 
 # VERSION
 
-This document describes Test::Vars version 0.015.
+This document describes Test::Vars version 0.017.
 
 # SYNOPSIS
 
@@ -90,9 +90,9 @@ tree) using the `B` module. See also `B` and its submodules.
 
 # CAVEATS
 
-https://rt.cpan.org/Ticket/Display.html?id=60018
-
-https://rt.cpan.org/Ticket/Display.html?id=82411
+Over time there have been reported a number of cases where Test-Vars fails to
+report unused variables.  You can review most of these cases by going to our
+[issue tracker on GitHub](https://github.com/houseabsolute/p5-Test-Vars/issues?q=is%3Aopen+is%3Aissue+label%3ABug) and selecting issues with the `Bug` label.
 
 # DEPENDENCIES
 
@@ -103,6 +103,10 @@ Perl 5.10.0 or later.
 All complex software has bugs lurking in it, and this module is no
 exception. If you find a bug please either email me, or add the bug
 to cpan-RT.
+
+Please report new issues at our [issue tracker on
+GitHub](https://github.com/houseabsolute/p5-Test-Vars/issues).  We no longer
+use rt.cpan.org for bug reports.
 
 # SEE ALSO
 

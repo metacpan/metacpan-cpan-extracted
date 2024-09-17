@@ -1,2 +1,6 @@
+0.02 2024-09-16T21:57:04+02:00
+ - API Change: Rename 'url' parameter to 'uri' and fix validity.
+ - Add SEE ALSO sections to doc.
+
 0.01 2024-09-15T13:35:56+02:00
  - First version.

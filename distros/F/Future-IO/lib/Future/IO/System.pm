@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Future::IO::System 0.15;
+package Future::IO::System 0.16;
 
 use v5.14;
 use warnings;
@@ -17,6 +17,8 @@ use Future::IO;
 C<Future::IO::System> - C<system()>-like methods for L<Future::IO>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Future::IO;
    use Future::IO::System;

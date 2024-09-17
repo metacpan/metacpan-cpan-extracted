@@ -11,13 +11,6 @@ use Test::Script qw(
     script_stderr_like
 );
 
-# For perl version 5.37.3 there was a change in the Perl internals such that
-# some variables are no longer considered unused by Test::Vars. This is a known issue, see
-# https://github.com/houseabsolute/p5-Test-Vars/issues/47
-# Until this is resolved, we need to adjust the expected number of errors depending on
-# the Perl version.
-my $perl_old = $] <= 5.037002;
-
 script_compiles('script/perlvars');
 
 subtest 'file not found' => sub {
@@ -46,40 +39,30 @@ subtest 'arg is a dir' => sub {
 };
 
 subtest 'ignore file is used' => sub {
-    my @script = (
-        'script/perlvars',       '--ignore-file',
-        'test-data/ignore-file', 'test-data/lib/Local/Unused.pm',
+    script_runs(
+        [
+            'script/perlvars',
+            '--ignore-file', 'test-data/ignore-file',
+            'test-data/lib/Local/Unused.pm'
+        ]
     );
-    if ($perl_old) {
-        script_runs( \@script );
-    }
-    else {
-        script_fails( \@script, { exit => 255 } );
-    }
 };
 
 subtest 'file has no errors' => sub {
-    my @script = ( 'script/perlvars', 'test-data/lib/Local/NoUnused.pm', );
-    if ($perl_old) {
-        script_runs( \@script );
-    }
-    else {
-        script_fails( \@script, { exit => 255 } );
-    }
+    script_runs(
+        [ 'script/perlvars', 'test-data/lib/Local/NoUnused.pm' ],
+    );
 };
 
 subtest 'multiple files are checked' => sub {
-    my @script = (
-        'script/perlvars',       '--ignore-file',
-        'test-data/ignore-file', 'test-data/lib/Local/Unused.pm',
-        'test-data/lib/Local/NoUnused.pm',
+    script_runs(
+        [
+            'script/perlvars',
+            '--ignore-file', 'test-data/ignore-file',
+            'test-data/lib/Local/Unused.pm',
+            'test-data/lib/Local/NoUnused.pm',
+        ]
     );
-    if ($perl_old) {
-        script_runs( \@script );
-    }
-    else {
-        script_fails( \@script, { exit => 255 } );
-    }
 };
 
 done_testing();

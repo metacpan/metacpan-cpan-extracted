@@ -1,5 +1,5 @@
 package MooX::Keyword;
-use 5.006; use strict; use warnings; our $VERSION = '0.08'; 
+use 5.006; use strict; use warnings; our $VERSION = '1.00'; 
 use MooX::ReturnModifiers; use Anonymous::Object;
 
 sub import {
@@ -44,11 +44,11 @@ __END__
 
 =head1 NAME
 
-MooX::Keyword - The great new MooX::Keyword!
+MooX::Keyword - define custom keywords in Moo.
 
 =head1 VERSION
 
-Version 0.08
+Version 1.00
 
 =cut
 
@@ -89,17 +89,37 @@ Quick summary of what the module does.
 
 	...
 
+
+=head1 Declaring a keyword
+
+You can declare one or more keywords on import of MooX::Keyword by providing a hash where the keys are the keyword and values are an hashref of options that must contain a builder subroutine and may contain aliases for that keyword.
+
+	package Sunset;
+
+	use MooX::Keyword {
+		sunset => {
+			builder => sub {
+				my ($moo, $class) = @_;
+				$moo->extends($class);
+			}
+		},
+		...
+	};
+
+=head1 Extending a package with keywords
+
+You cannot use the traditional inheritance if you want to use keywords declared in another package, instead you need to pass extends when importing MooX::Keyword.
+
 	package Night 
 
 	use Moo;
-	use MooX::Keyword extends => "Moon";
+	use MooX::Keyword extends => ["Moon", "Sunset"];
+
+	sunset 'Day';
 
 	star polaris  => (
 		is => 'ro'
 	);
-
-
-beta.
 
 =head1 AUTHOR
 

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-08-19'; # DATE
+our $DATE = '2024-09-15'; # DATE
 our $DIST = 'App-HeightUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -24,8 +24,8 @@ MARKDOWN
             req => 1,
             pos => 0,
             cmdline_aliases => {
-                boy  => { is_flag=>1, code=>sub { $_[0]{gender} = 'M' } },
-                girl => { is_flag=>1, code=>sub { $_[0]{gender} = 'F' } },
+                boy  => { is_flag=>1, summary=>'Shortcut for `--gender=M`', code=>sub { $_[0]{gender} = 'M' } },
+                girl => { is_flag=>1, summary=>'Shortcut for `--gender=F`', code=>sub { $_[0]{gender} = 'F' } },
             },
         },
         father_height => {
@@ -64,7 +64,7 @@ App::HeightUtils - Utilities related to body height
 
 =head1 VERSION
 
-This document describes version 0.001 of App::HeightUtils (from Perl distribution App-HeightUtils), released on 2024-08-19.
+This document describes version 0.002 of App::HeightUtils (from Perl distribution App-HeightUtils), released on 2024-09-15.
 
 =head1 DESCRIPTION
 

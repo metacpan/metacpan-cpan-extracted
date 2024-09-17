@@ -1,20 +1,48 @@
 use strict;
 use warnings;
 use File::Temp qw(tempdir);
+use Config qw(%Config);
 
-my $version = '0.02';
+my $version = '0.04';
 
 my $target = $ARGV[0] or die "Usage: $0 OUTFILE\n";
 
 my $phdir = tempdir(CLEANUP => 1);
 
-system "cd /usr/include && h2ph -eal -d \Q$phdir\E syscall.h sys/random.h";
+{
+    my $h2ph = 'h2ph';
+    for my $key (qw(installscript scriptdirexp)) {
+        my $candidate = "$Config{$key}/h2ph";
+        if (-x $candidate) {
+            $h2ph = $candidate;
+            last;
+        }
+    }
+    my $cmd = "cd /usr/include && \Q$h2ph\E -eal -d \Q$phdir\E sys/syscall.h sys/random.h";
+    print $cmd, "\n";
+    system $cmd;
+}
 unshift @INC, $phdir;
 
 {
     package #
         Sys_Macro;
-    require 'syscall.ph';
+    {
+        # Hack. Shouldn't be necessary, but apparently _h2ph_pre.ph is missing
+        # some important bits on FreeBSD.
+        require '_h2ph_pre.ph';
+        unless (defined &__SIZEOF_LONG__) {
+            my $sizeof_long = $::Config{longsize};
+            *__SIZEOF_LONG__ = sub () { $sizeof_long };
+        }
+        *__ORDER_BIG_ENDIAN__ = sub () { 4321 } unless defined &__ORDER_BIG_ENDIAN__;
+        *__ORDER_LITTLE_ENDIAN__ = sub () { 1234 } unless defined &__ORDER_LITTLE_ENDIAN__;
+        unless (defined &__BYTE_ORDER__) {
+            my $byte_order = $::Config{byteorder} =~ /^1/ ? __ORDER_LITTLE_ENDIAN__() : __ORDER_BIG_ENDIAN__();
+            *__BYTE_ORDER__ = sub () { $byte_order };
+        }
+    }
+    require 'sys/syscall.ph';
     require 'sys/random.ph';
 }
 
@@ -51,7 +79,7 @@ package Sys::GetRandom::PP::_Bits;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use constant {
     GRND_RANDOM    => %[[GRND_RANDOM]],

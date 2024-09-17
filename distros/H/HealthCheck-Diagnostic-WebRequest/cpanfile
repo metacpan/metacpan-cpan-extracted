@@ -11,6 +11,7 @@ requires 'Scalar::Util';
 
 on test => sub {
     requires 'Test::MockModule';
+    requires 'Test::Mock::Time';
     requires 'Test::More';
 };
 

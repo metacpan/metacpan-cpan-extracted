@@ -2,8 +2,8 @@ NAME
     App::HeightUtils - Utilities related to body height
 
 VERSION
-    This document describes version 0.001 of App::HeightUtils (from Perl
-    distribution App-HeightUtils), released on 2024-08-19.
+    This document describes version 0.002 of App::HeightUtils (from Perl
+    distribution App-HeightUtils), released on 2024-09-15.
 
 DESCRIPTION
     This distributions provides the following command-line utilities related

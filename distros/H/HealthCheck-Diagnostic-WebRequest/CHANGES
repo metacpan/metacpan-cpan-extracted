@@ -1,6 +1,56 @@
 Changelog for HealthCheck-Diagnostic-WebRequest
 
-v1.4.2 2021-07-19T17:43:44
+v1.4.3 2024-09-16T16:12:18
+ - Update README / LICENSE (Brendan Byrd)
+ - Pull request #9: SM-5089 (Samuel Ng)
+ - SM-5089 Set default value for ref checks in string comparisons to
+   prevent warnings (Samuel Ng)
+ - SM-5089 Ensured the ua parameter is left untouched, and cleaned up more
+   potentially real URLs in tests (Samuel Ng)
+ - SM-5089 Ensured default params are applied first, so they don't override
+   individual check args (Samuel Ng)
+ - SM-5089 Indicated internal helpers are private with leading underscores
+   for POD tests. Fixed nested L<> (Samuel Ng)
+ - SM-5089 Ran make update for latest Makefile with disttest target (Samuel
+   Ng)
+ - SM-5089 Simplified check validation in register by only supporting
+   hashrefs and HealthCheck::Diagnostic::WebRequest instances (Samuel Ng)
+ - SM-5089 Moved requests_redirectable configuration closer to ua
+   instantiation in constructor (Samuel Ng)
+ - SM-5089 Moved validation of checks into register method in case it gets
+   called directly with modified checks (Samuel Ng)
+ - SM-5089 Replaced real URLs in documentation and tests with .example
+   URLs. Improved redundancy and clarity in POD (Samuel Ng)
+ - SM-5089 Improved readability of constructor validation and made
+   no_follow_redirects a no-op when ua is provided. Also, turned all dies
+   into croaks for easier debugging (Samuel Ng)
+ - SM-5089 Modified HealthCheck::Diagnostic::WebRequests wrapper to
+   subclass HealthCheck to take advantage of the checks field for grouping
+   multiple HealthCheck::Diagnostic::WebRequest instances. Renamed classes
+   accordingly (Samuel Ng)
+ - SM-5089 Refactored the ua_action attribute to an overridable method on
+   the class (Samuel Ng)
+ - SM-5089 Added validation of ua_action, since it's not intended to be
+   used with the url, request, or ua parameters (Samuel Ng)
+ - SM-5089 Modified response_time_threshold check to verify definedness for
+   the 0 threshold case (Samuel Ng)
+ - SM-5089 Made healthcheck always include response time regardless of
+   whether threshold argument was passed. Reordered the results so the
+   status is always first (Samuel Ng)
+ - SM-5089 Replaced actual sleeps in tests with Test::Mock::Time (Samuel
+   Ng)
+ - SM-5089 Renamed occurrences of diags to diagnostics (Samuel Ng)
+ - SM-5089 Accounted for singular elapsed time in info (Samuel Ng)
+ - SM-5089 Replaced fake.site.us with fake.site.test to not conflict with
+   any real domains that may be owned by a third party (Samuel Ng)
+ - SM-5089 Added a new class to allow grouping of multiple web request
+   diagnostics (Samuel Ng)
+ - SM-5089 Allowed ua and ua_action as optional constructor args for
+   overriding the default user agent and the coderef that returns the HTTP
+   response (Samuel Ng)
+ - SM-5089 Added support for response time check (Samuel Ng)
+
+v1.4.2 2021-07-19T17:36:53
  - Pull request #8: run make update (Mark Flickinger)
  - run make update (Mark Flickinger)
  - Pull request #7: Patch - SM-3125 (Matthew Ito)
@@ -37,51 +87,16 @@ v1.3.1 2019-10-24T21:14:21
  - Convert to Bitbucket workflow (Andrew Hewus Fresh)
 
 v1.3.0.0 2019-10-24T14:49:06
- - Merge remote-tracking branch 'origin/stage' into prod (Randy Sofia)
- - Merge remote-tracking branch 'origin/test' into stage (Randy Sofia)
- - Merge remote-tracking branch 'origin/master' into test (Randy Sofia)
- - Use http not https in tests (Andrew Hewus Fresh)
- - use $class->VERSION not global $VERSION (Andrew Hewus Fresh)
- - PEX-13827: Combine status_code/operator and expand into multiple codes
-   (Brendan Byrd)
- - PEX-13827 Better proxy error and failed status for squid errors (Randy
-   Sofia)
- - PEX-13827 Additional operators and more descriptive errors (Randy Sofia)
-
-v1.2.0 2019-10-24T14:48:37
- - Merge remote-tracking branch 'origin/test' into stage (Randy Sofia)
+ - No changes found
 
 v1.2.0.0 2019-07-15T18:27:47
  - Merge remote-tracking branch 'origin/stage' into prod (Randy Sofia)
- - Merge remote-tracking branch 'origin/test' into stage (Randy Sofia)
- - Merge remote-tracking branch 'origin/master' into test (Jenkins)
- - PEX-11292: Tweaks to LWP agent string/option (Brendan Byrd)
- - PEX-11292: Small tweaks to 'request' option processing and docs (Brendan
-   Byrd)
- - Fix options reference and agent string (Randy Sofia)
- - Add HTTP::Request to cpanfile (Randy Sofia)
- - Updated documentation to reflect HTTP::Request option (Randy Sofia)
- - Update test to override request object (Randy Sofia)
- - Provide support for raw HTTP::Request (Randy Sofia)
- - Add HEAD/POST request methods and ability to send form data (Randy
-   Sofia)
-
-v1.1.1 2019-07-09T15:00:53
- - Merge remote-tracking branch 'origin/test' into stage (Randy Sofia)
 
 v1.1.1.0 2019-05-23T13:33:19
  - Merge remote-tracking branch 'origin/stage' into prod (Brandon Messineo)
- - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
- - Merge remote-tracking branch 'origin/master' into test (Brandon
-   Messineo)
- - Slightly shorten info message (Andrew Fresh)
- - Fix info message to be more readable (Brandon Messineo)
-
-v1.1.0 2019-05-23T13:32:57
- - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
 
 v1.1.0.0 2018-08-29T16:31:22
- - No changes found
+ - Merge remote-tracking branch 'origin/stage' into prod (Brandon Messineo)
 
 v1.0.0 2018-08-29T16:30:54
  - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)

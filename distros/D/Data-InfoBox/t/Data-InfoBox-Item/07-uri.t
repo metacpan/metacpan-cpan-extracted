@@ -11,8 +11,8 @@ my $obj = Data::InfoBox::Item->new(
 	'text' => Data::Text::Simple->new(
 		'text' => 'Text',
 	),
-	'url' => 'https://example.com',
+	'uri' => 'https://example.com',
 );
-my $ret = $obj->url;
+my $ret = $obj->uri;
 is($ret, 'https://example.com',
-	'Get URL (https://example.com).');
+	'Get URI (https://example.com).');

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-package Future::IO::ImplBase 0.15;
+package Future::IO::ImplBase 0.16;
 
 use v5.14;
 use warnings;
@@ -34,7 +34,7 @@ are not required to use it.
 
 =head2 APPLY
 
-   __PACKAGE__->APPLY
+   __PACKAGE__->APPLY;
 
 Attempts to set the value of the C<$Future::IO::IMPL> variable to the name of
 the calling package.
@@ -136,7 +136,7 @@ sub connect
 
 Requires a lower-level method
 
-   $f = $class->ready_for_read( $fh )
+   $f = $class->ready_for_read( $fh );
 
 which should return a Future that completes when the given filehandle may be
 ready for reading.
@@ -183,7 +183,7 @@ sub sysread
 
 Requires a lower-level method
 
-   $f = $class->ready_for_write( $fh )
+   $f = $class->ready_for_write( $fh );
 
 which should return a Future that completes when the given filehandle may be
 ready for writing.

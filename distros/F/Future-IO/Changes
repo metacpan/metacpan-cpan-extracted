@@ -1,5 +1,10 @@
 Revision history for Future-IO
 
+0.16    2024-09-16
+        [CHANGES]
+         * Added `Future::IO->load_impl` convenience method for toplevel
+           applications
+
 0.15    2023-10-18
         [BUGFIXES]
          * Avoid creating a long `->then` chain of Futures when handling

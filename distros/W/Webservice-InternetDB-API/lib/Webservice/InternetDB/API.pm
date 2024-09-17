@@ -9,7 +9,7 @@ use Feature::Compat::Try;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 class Webservice::InternetDB::API;
 
@@ -47,6 +47,9 @@ method get ($address //= ""){
     return $response->{content};
 }
 1;
+
+__END__
+
 =pod
 
 =head1 NAME

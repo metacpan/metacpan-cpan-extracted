@@ -5,9 +5,9 @@ use warnings;
 
 use Mo qw(build is);
 use Mo::utils 0.08 qw(check_isa check_length check_required);
-use Mo::utils::URI 0.02 qw(check_location);
+use Mo::utils::URI 0.02 qw(check_location check_uri);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has icon_url => (
 	is => 'ro',
@@ -21,7 +21,7 @@ has text => (
 	is => 'ro',
 );
 
-has url => (
+has uri => (
 	is => 'ro',
 );
 
@@ -39,8 +39,8 @@ sub BUILD {
 	check_required($self, 'text');
 	check_isa($self, 'text', 'Data::Text::Simple');
 
-	# Check url.
-	check_location($self, 'url');
+	# Check URI.
+	check_uri($self, 'uri');
 
 	return;
 }
@@ -65,7 +65,7 @@ Data::InfoBox::Item - Data object for info box item.
  my $icon_url = $obj->icon_url;
  my $icon_char = $obj->icon_char;
  my $text = $obj->text;
- my $url = $obj->url;
+ my $uri = $obj->uri;
 
 =head1 METHODS
 
@@ -95,9 +95,9 @@ Item text. Must me a L<Data::Text::Simple> object.
 
 It's required.
 
-=item * C<url>
+=item * C<uri>
 
-URL of item.
+URI of item.
 
 It's optional.
 
@@ -129,11 +129,11 @@ Get text of item.
 
 Returns L<Data::Text::Simple> object.
 
-=head2 C<url>
+=head2 C<uri>
 
- my $url = $obj->url;
+ my $uri = $obj->uri;
 
-Get URL of item.
+Get URI of item.
 
 Returns string.
 
@@ -147,11 +147,11 @@ Returns string.
                  Parameter 'text' must be a 'Data::Text::Simple' object.
                          Value: %s
                          Reference: %s
-                 
-         From Mo::utils::URI:
+         From Mo::utils::URI::check_location():
                  Parameter 'icon_url' doesn't contain valid location.
                          Value: %s
-                 Parameter 'url' doesn't contain valid location.
+         From Mo::utils::URI::check_uri():
+                 Parameter 'uri' doesn't contain valid URI.
                          Value: %s
 
 =head1 EXAMPLE
@@ -169,24 +169,38 @@ Returns string.
          'text' => Data::Text::Simple->new(
                  'text' => 'Funny item'
          ),
-         'url' => 'https://skim.cz',
+         'uri' => 'https://skim.cz',
  );
 
  # Print out.
  print "Icon URL: ".$obj->icon_url."\n";
  print "Text: ".$obj->text->text."\n";
- print "URL: ".$obj->url."\n";
+ print "URI: ".$obj->uri."\n";
 
  # Output:
  # Icon URL: https://example.com/foo.png
  # Text: Funny item
- # URL: https://skim.cz
+ # URI: https://skim.cz
 
 =head1 DEPENDENCIES
 
 L<Mo>,
 L<Mo::utils>,
 L<Mo::utils::URI>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Data::InfoBox>
+
+Data object for info box.
+
+=item L<Test::Shared::Fixture::Data::InfoBox::Street>
+
+Street info box fixture.
+
+=back
 
 =head1 REPOSITORY
 
@@ -206,6 +220,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

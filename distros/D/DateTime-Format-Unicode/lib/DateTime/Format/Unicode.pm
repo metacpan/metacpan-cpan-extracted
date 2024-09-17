@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime::Format::Unicode - ~/lib/DateTime/Format/Unicode.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/21
-## Modified 2024/09/15
+## Modified 2024/09/17
 ## All rights reserved
 ## 
 ## 
@@ -25,7 +25,7 @@ BEGIN
     use POSIX ();
     use Scalar::Util;
     use Want;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -861,6 +861,33 @@ sub _format_month
     }
 }
 
+sub _format_offset
+{
+    my $self = shift( @_ );
+    my $offset = shift( @_ );
+    my $sep = shift( @_ ) || '';
+    return( $self->error( "No offset was provided." ) ) unless( defined( $offset ) );
+    return( $self->error( "Offset provided (${offset}) is out of bound." ) ) unless( $offset >= -359999 && $offset <= 359999 );
+
+    my $sign = $offset < 0 ? '-' : '+';
+
+    $offset = abs( $offset );
+
+    my $hours = int( $offset / 3600 );
+    $offset %= 3600;
+    my $mins = int( $offset / 60 );
+    $offset %= 60;
+    my $secs = int($offset);
+
+    return(
+        $secs
+        ? sprintf(
+            '%s%02d%s%02d%s%02d', $sign, $hours, $sep, $mins, $sep, $secs
+            )
+        : sprintf( '%s%02d%s%02d', $sign, $hours, $sep, $mins )
+    );
+}
+
 # NOTE: pattern L
 # Stand-Alone month number/name
 sub _format_month_standalone
@@ -1201,8 +1228,7 @@ sub _format_timezone_gmt_offset
     }
     elsif( $len == 4 )
     {
-        require DateTime::TimeZone;
-        return( 'GMT' . DateTime::TimeZone->offset_as_string( $dt->offset, q{:} ) );
+        return( 'GMT' . $self->_format_offset( $dt->offset, ':' ) );
     }
     else
     {
@@ -1221,8 +1247,7 @@ sub _format_timezone_offset
     # Example: +0900
     if( $len >= 1 && $len <= 3 )
     {
-        require DateTime::TimeZone;
-        return( DateTime::TimeZone->offset_as_string( $offset ) );
+        return( $self->_format_offset( $offset ) );
     }
     # Example: GMT+0900
     elsif( $len == 4 )
@@ -1243,8 +1268,7 @@ sub _format_timezone_offset
         }
         else
         {
-            require DateTime::TimeZone;
-            return( DateTime::TimeZone->offset_as_string( $offset, ':' ) );
+            return( $self->_format_offset( $offset, ':' ) );
         }
     }
     else
@@ -1405,7 +1429,7 @@ sub _format_zone_offset
     $offset %= 3600;
     my $mins = int( $offset / 60 );
     $offset %= 60;
-    my $secs = int($offset);
+    my $secs = int( $offset );
     # ISO8601 basic format.
     # Hours and optional minutes value.
     # Same as X, but without the Z
@@ -1819,7 +1843,7 @@ which, will default to C<locale> C<en> with date medium-size format pattern C<MM
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

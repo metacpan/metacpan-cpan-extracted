@@ -129,6 +129,7 @@ can_ok( $locale, 'script' );
 can_ok( $locale, 'script_code' );
 can_ok( $locale, 'territory' );
 can_ok( $locale, 'territory_code' );
+can_ok( $locale, 'territory_info' );
 can_ok( $locale, 'time_format_allowed' );
 can_ok( $locale, 'time_format_default' );
 can_ok( $locale, 'time_format_full' );

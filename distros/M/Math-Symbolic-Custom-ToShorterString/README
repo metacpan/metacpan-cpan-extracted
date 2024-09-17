@@ -1,0 +1,57 @@
+Math::Symbolic::Custom::ToShorterString
+=======================================
+
+Provides "to_shorter_infix_string()" through the Math::Symbolic module extension class. "to_shorter_infix_string()" attempts to provide a string representation of a Math::Symbolic tree that is shorter than the existing (infix) "to_string()" method. 
+
+The "to_string()" method wraps every branch in parentheses/brackets, which makes larger expressions difficult to read. "to_shorter_infix_string()" tries to determine whether parentheses are required and omits them. One of the goals of this module is that the output string should parse to a Math::Symbolic tree that is (at least numerically) equivalent to the original expression - even if the resulting Math::Symbolic tree might not be completely identical to the original (for that, use "to_string()"). Where appropriate, it produces strings containing the Math::Symbolic parser aliases "sqrt()" and "exp()".
+
+The "to_shorter_infix_string()" does not replace the "to_string()" method, it has to be called explicitly. E.g.:-
+
+use Math::Symbolic qw(:all);
+use Math::Symbolic::Custom::ToShorterString;
+
+my $f = parse_from_string("1*2+3*4+5*sqrt(x+y+z)");
+print "to_string():\t", $f->to_string(), "\n";
+# to_string():	((1 * 2) + (3 * 4)) + (5 * (((x + y) + z) ^ 0.5))
+print "to_shorter_infix_string():\t", $f->to_shorter_infix_string(), "\n";
+# to_shorter_infix_string():	(1*2 + 3*4) + (5*sqrt(x + y + z))
+
+TODO
+
+Still very early, needs more work on detecting if the brackets are necessary for the sub-expression.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Symbolic::Custom::ToShorterString
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Symbolic-Custom-ToShorterString
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Math-Symbolic-Custom-ToShorterString
+
+    Search CPAN
+        https://metacpan.org/release/Math-Symbolic-Custom-ToShorterString
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2024 by Matt Johnson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

@@ -1,6 +1,6 @@
 package MooX::Keyword::Random;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use Moo;
 use MooX::Keyword {
 	random => {
@@ -26,7 +26,7 @@ MooX::Keyword::Random - return a random result!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -36,24 +36,26 @@ Quick summary of what the module does.
 
 Perhaps a little code snippet.
 
-	package Holiday::Hospital;
+	package Random;
 
 	use Moo;
 	use MooX::Keyword extends => '+Random';
 
-	random bed => 21;
+	random number => 21;
 
-	random doctorse => ['a' .. 'z'];
+	random character => ['a' .. 'z'];
 
-	random food => [ 'pizza', 'burger', 'kebab', 'fruit', 'toast' ];
+	random item => [ 'pizza', 'burger', 'kebab', 'fruit', 'toast' ];
 
 	1;
 
 	... 
 
-	my $h = Holiday::Hospital->new();
+	my $rand = Random->new();
 
-	my $room = $h->bed(); # a random number between 0 and 21.
+	my $num = $rand->number(); # a random number between 0 and 21.
+	my $char = $rand->character(); # a random character between a and z.
+	my $item = $rand->item(); # a random item in the provided list
 
 =head1 AUTHOR
 
@@ -79,23 +81,17 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Keyword-Random>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/MooX-Keyword-Random>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/MooX-Keyword-Random>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023 by LNATION.
+This software is Copyright (c) 2023->2024 by LNATION.
 
 This is free software, licensed under:
 

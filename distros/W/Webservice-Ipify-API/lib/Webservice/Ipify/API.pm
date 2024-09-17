@@ -10,10 +10,10 @@ use Feature::Compat::Try;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 
-class Webservice::Ipify::API;
+class Webservice::Ipify::API 1.004;
 
 use HTTP::Tiny;
 use JSON::PP;
@@ -44,6 +44,7 @@ sub fetch($url){
     return $response->{content};
 }
 
+1;
 
 __END__
 

@@ -1,3 +1,11 @@
+0.04  2024-09-17
+    - Work around missing _h2ph_pre.ph definitions on FreeBSD.
+
+0.03  2024-09-16
+    - Improve build-time h2ph detection.
+    - Load sys/syscall.ph directly (instead of syscall.ph); hopefully this'll
+      be more portable.
+
 0.02  2024-09-15
     - Try to generate the required *.ph files automatically at build time. This
       should work fine as long as C system headers are available under

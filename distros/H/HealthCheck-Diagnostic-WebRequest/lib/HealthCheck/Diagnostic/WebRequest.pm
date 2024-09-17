@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: Make HTTP/HTTPS requests to web servers to check connectivity
 use version;
-our $VERSION = 'v1.4.2'; # VERSION
+our $VERSION = 'v1.4.3'; # VERSION
 
 use strict;
 use warnings;
@@ -12,6 +12,7 @@ use Carp;
 use LWP::UserAgent;
 use HTTP::Request;
 use Scalar::Util 'blessed';
+use Time::HiRes  'gettimeofday';
 
 sub new {
     my ($class, @params) = @_;
@@ -26,21 +27,35 @@ sub new {
             | no_follow_redirects
             | options
             | request
+            | response_time_threshold
             | status_code
             | status_code_eval
             | tags
             | timeout
+            | ua
             | url
         )$/x
     } keys %params;
 
     carp("Invalid parameter: " . join(", ", @bad_params)) if @bad_params;
 
-    die "No url or HTTP::Request specified!" unless ($params{url} ||
-        ($params{request} && blessed $params{request} &&
-            $params{request}->isa('HTTP::Request')));
-    die "The 'request' and 'url' options are mutually exclusive!"
+    croak "The 'request' and 'url' parameters are mutually exclusive!"
         if $params{url} && $params{request};
+    if ($params{url}) {
+        # Validation for url can be added here
+        $params{request} = HTTP::Request->new('GET', $params{url});
+    }
+    elsif ($params{request}) {
+        croak "request must be an HTTP::Request" unless blessed $params{request} && $params{request}->isa('HTTP::Request');
+    }
+    else{
+        croak "Either url or request is required";
+    }
+
+    if ($params{ua}) {
+        croak "The 'ua' parameter must be of type LWP::UserAgent if provided" unless blessed $params{ua} && $params{ua}->isa('LWP::UserAgent');
+        carp "no_follow_redirects does not do anything when 'ua' is provided" if $params{no_follow_redirects};
+    }
 
     # Process and serialize the status code checker
     $params{status_code} ||= '200';
@@ -49,7 +64,7 @@ sub new {
         # Strict validation of each part, since we're throwing these into an eval
         my ($op, $code) = $part =~ m{\A\s*(>=|>|<=|<|!=|!)?\s*(\d{3})\z};
 
-        die "The 'status_code' condition '$part' is not in the correct format!"
+        croak "The 'status_code' condition '$part' is not in the correct format!"
             unless defined $code;
         $op = '!=' if defined $op && $op eq '!';
 
@@ -59,11 +74,14 @@ sub new {
     push @or, '('.join(' && ', @and).')' if @and;  # merge @and as one big condition into @or
     $params{status_code_eval} = join ' || ', @or;
 
-    $params{request}        //= HTTP::Request->new('GET', $params{url});
     $params{options}        //= {};
     $params{options}{agent} //= LWP::UserAgent->_agent .
         " HealthCheck-Diagnostic-WebRequest/" . ( $class->VERSION || '0' );
     $params{options}{timeout} //= 7;    # Decided by committee
+    unless ($params{ua}) {
+        $params{ua} //= LWP::UserAgent->new( %{$params{options}} );
+        $params{ua}->requests_redirectable([]) if $params{'no_follow_redirects'};
+    }
 
     return $class->SUPER::new(
         label => 'web_request',
@@ -81,14 +99,18 @@ sub check {
 
 sub run {
     my ( $self, %params ) = @_;
-    my $ua = LWP::UserAgent->new( %{$self->{options}} );
 
-    $ua->requests_redirectable([]) if $self->{'no_follow_redirects'};
+    my ($response, $elapsed_time);
+    {
+        my $t1        = gettimeofday;
+        $response     = $self->send_request;
+        $elapsed_time = gettimeofday - $t1;
+    }
 
-    my $response = $ua->request( $self->{request} );
-
-    my @results = $self->check_status( $response );
-    push @results, $self->check_content( $response )
+    my @results;
+    push @results, $self->_check_status( $response );
+    push @results, $self->_check_response_time( $elapsed_time );
+    push @results, $self->_check_content( $response )
         if $results[0]->{status} eq 'OK';
 
     my $info = join '; ', grep { length } map { $_->{info} } @results;
@@ -96,7 +118,7 @@ sub run {
     return { info => $info, results => \@results };
 }
 
-sub check_status {
+sub _check_status {
     my ( $self, $response ) = @_;
     my $status;
 
@@ -135,7 +157,7 @@ sub check_status {
     return { status => $status, info => $info };
 }
 
-sub check_content {
+sub _check_content {
     my ( $self, $response ) = @_;
 
     return unless $self->{content_regex};
@@ -149,6 +171,25 @@ sub check_content {
         status => $status,
         info   => "Response content $successful /$regex/",
     };
+}
+
+sub _check_response_time {
+    my ( $self, $elapsed_time ) = @_;
+
+    my $response_time_threshold = $self->{response_time_threshold};
+    my $status = 'OK';
+    $status = 'WARNING' if defined $response_time_threshold && $elapsed_time > $response_time_threshold;
+
+    return {
+        status => $status,
+        info   => "Request took $elapsed_time second" . ( $elapsed_time == 1 ? '' : 's' ),
+    };
+}
+
+sub send_request {
+    my ( $self ) = @_;
+
+    return $self->{ua}->request( $self->{request} );
 }
 
 1;
@@ -165,25 +206,33 @@ HealthCheck::Diagnostic::WebRequest - Make HTTP/HTTPS requests to web servers to
 
 =head1 VERSION
 
-version v1.4.2
+version v1.4.3
 
 =head1 SYNOPSIS
 
-    # site:    https://foo.com
+    # site:    https://foo.example
     # content: <html><head></head><body>This is my content</body></html>
 
     use HealthCheck::Diagnostic::WebRequest;
 
     # Look for a 200 status code and pass.
     my $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-        url => 'https://foo.com',
+        url => 'https://foo.example',
     );
     my $result = $diagnostic->check;
     print $result->{status}; # OK
 
+    # Look for a 200 status code and verify request takes no more than 10 seconds.
+    my $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
+        url => 'https://foo.example',
+        response_time_threshold => 10,
+    );
+    my $result = $diagnostic->check;
+    print $result->{status}; # OK if no more than 10, WARNING if more than 10
+
     # Look for a 401 status code and fail.
     $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-        url         => 'https://foo.com',
+        url         => 'https://foo.example',
         status_code => 401,
     );
     $result = $diagnostic->check;
@@ -191,7 +240,7 @@ version v1.4.2
 
     # Look for any status code less than 500.
     $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-        url         => 'https://foo.com',
+        url         => 'https://foo.example',
         status_code => '<500',
     );
     $result = $diagnostic->check;
@@ -199,7 +248,7 @@ version v1.4.2
 
     # Look for any 403, 405, or any 2xx range code
     $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-        url         => 'https://foo.com',
+        url         => 'https://foo.example',
         status_code => '403, 405, >=200, <300',
     );
     $result = $diagnostic->check;
@@ -207,7 +256,7 @@ version v1.4.2
 
     # Look for a 200 status code and content matching the string regex.
     $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-        url           => 'https://foo.com',
+        url           => 'https://foo.example',
         content_regex => 'is my',
     );
     $result = $diagnostic->check;
@@ -215,7 +264,7 @@ version v1.4.2
 
     # Use a regex as the content_regex.
     $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-        url           => 'https://foo.com',
+        url           => 'https://foo.example',
         content_regex => qr/is my/,
     );
     $result = $diagnostic->check;
@@ -284,6 +333,12 @@ Some examples:
 
 The default value for this is '200', which means that we expect a successful request.
 
+=head2 response_time_threshold
+
+An optional number of seconds to compare the response time to. If it takes no more
+than this threshold to receive the response or if the threshold is not provided,
+the status is C<OK>. If the time exceeds this threshold, the status is C<WARNING>.
+
 =head2 content_regex
 
 The content regex to test for in the HTTP response.
@@ -295,6 +350,10 @@ This can either be a I<string> or a I<regex>.
 
 Setting this variable prevents the healthcheck from following redirects.
 
+=head2 ua
+
+An optional attribute to override the default user agent. This must be of type L<LWP::UserAgent>.
+
 =head2 options
 
 See L<LWP::UserAgent> for available options. Takes a hash reference of key/value
@@ -303,6 +362,16 @@ pairs in order to configure things like ssl_opts, timeout, etc.
 It is optional.
 
 By default provides a custom C<agent> string and a default C<timeout> of 7.
+
+=head1 METHODS
+
+=head2 send_request
+
+    my $response = $self->send_request;
+
+This is the method called internally to receive a response for the healthcheck. Defaults to calling
+the C<request> method on the user agent and provided C<request> attribute, but this can be overridden in
+a subclass.
 
 =head1 DEPENDENCIES
 
@@ -319,7 +388,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2021 by Grant Street Group.
+This software is Copyright (c) 2018 - 2024 by Grant Street Group.
 
 This is free software, licensed under:
 

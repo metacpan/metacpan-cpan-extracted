@@ -1,5 +1,5 @@
 package Sys::Info::Driver::OSX::OS;
-$Sys::Info::Driver::OSX::OS::VERSION = '0.7962';
+$Sys::Info::Driver::OSX::OS::VERSION = '0.7963';
 use strict;
 use warnings;
 
@@ -36,6 +36,7 @@ my %OSVERSION;
 
 my %FILE = (
     install_history => '/Library/Receipts/InstallHistory.plist',
+    license         => '/System/Library/CoreServices/Setup Assistant.app/Contents/Resources/en.lproj/OSXSoftwareLicense.html',
     server_version  => '/System/Library/CoreServices/ServerVersion.plist',
     cdis            => '/var/log/CDIS.custom',
 );
@@ -295,6 +296,27 @@ sub _file_has_substr {
 
 sub _probe_edition {
     my($self, $major, $minor, $patc) = @_;
+
+    my $license = $FILE{license};
+    my $from_file;
+    PARSE_FROM_FILE: {
+        if ( -e $license && open my $FH, '<', $license ) {
+            my $version_string = 'SOFTWARE LICENSE AGREEMENT FOR macOS';
+            while ( defined( my $line = readline $FH ) ) {
+                next if ! $line;
+                chomp $line;
+                next if $line !~ m{ \Q$version_string\E \s+ (.+?) [<]}xms;
+                $from_file = $1;
+                last;
+            }
+            close $FH;
+            return $from_file if $from_file;
+        }
+        else {
+            warn sprintf 'Failed to read the license file %s at %s', $license, $!;
+        }
+    }
+
     my $name = $major == 10 ? $XEDITION->{ $minor }
                             : $MACOS->{ $major };
     return $name || 'Unknown macOS';
@@ -357,7 +379,7 @@ Sys::Info::Driver::OSX::OS
 
 =head1 VERSION
 
-version 0.7962
+version 0.7963
 
 =head1 SYNOPSIS
 

@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More;
 use Test::MockModule;
+use Test::Mock::Time;
 use HealthCheck::Diagnostic::WebRequest;
 
 # Mock the HTTP response so that we don't actually end up making any
@@ -24,6 +25,8 @@ sub mock_http_response {
         $response->protocol("HTTP/1.1");
         $response->push_header( @{ $params{headers} } );
         $response->request($request);
+
+        sleep $params{sleep} if $params{sleep};
 
         return $response;
     });
@@ -67,33 +70,33 @@ is_deeply(
 # Check that we get the right code responses.
 my $mock = mock_http_response();
 my $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-    url => 'http://foo.com',
+    url => 'http://foo.example',
 );
 is_deeply( get_info_and_status( $diagnostic ), {
-    info   => 'Requested http://foo.com and got expected status code 200',
+    info   => 'Requested http://foo.example and got expected status code 200; Request took 0 seconds',
     status => 'OK',
 }, 'Pass diagnostic check on status.' );
 
 $mock = mock_http_response( code => 401 );
 is_deeply( get_info_and_status( $diagnostic ), {
-    info   => 'Requested http://foo.com and got status code 401, expected 200',
+    info   => 'Requested http://foo.example and got status code 401, expected 200; Request took 0 seconds',
     status => 'CRITICAL',
 }, 'Fail diagnostic check on status.' );
 
 # Check that we get the right content responses.
 $mock = mock_http_response( content => 'content_doesnt_exist' );
 $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-    url => 'http://bar.com',
+    url => 'http://bar.example',
     content_regex => 'content_exists',
 );
 is_deeply( get_info_and_status( $diagnostic ), {
-    info   => 'Requested http://bar.com and got expected status code 200'
+    info   => 'Requested http://bar.example and got expected status code 200; Request took 0 seconds'
             . '; Response content does not match /content_exists/',
     status => 'CRITICAL',
 }, 'Fail diagnostic check on content.' );
 $mock = mock_http_response( content => 'content_exists' );
 is_deeply( get_info_and_status( $diagnostic ), {
-    info   => 'Requested http://bar.com and got expected status code 200'
+    info   => 'Requested http://bar.example and got expected status code 200; Request took 0 seconds'
             . '; Response content matches /content_exists/',
     status => 'OK',
 }, 'Pass diagnostic check on content.' );
@@ -101,12 +104,11 @@ is_deeply( get_info_and_status( $diagnostic ), {
 # Check that we skip the content match on status code failures.
 $mock = mock_http_response( code => 300 );
 $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-    url => 'http://cyprus.co',
+    url => 'http://baz.example',
     content_regex => 'match_check_should_not_happen',
 );
 is_deeply( get_info_and_status( $diagnostic ), {
-    info   => 'Requested http://cyprus.co and got status code 300,'
-            . ' expected 200',
+    info   => 'Requested http://baz.example and got status code 300, expected 200; Request took 0 seconds',
     status => 'CRITICAL',
 }, 'Do not look for content with failed status code check.' );
 
@@ -126,7 +128,7 @@ like $results->{info},
 # Check content failure for appropriate message
 $mock = mock_http_response( content => 'This is Disney World\'s site' );
 $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-    url => 'http://fake.site.us',
+    url => 'http://fake.site.test',
     content_regex => qr/fail_on_this/,
 );
 $results = $diagnostic->check;
@@ -137,9 +139,9 @@ like $results->{info},
     'Info message is correct.';
 
 # Check timeout failure for appropriate message
-$mock = mock_http_response( die => "Can't connect to fake.site.us" );
+$mock = mock_http_response( die => "Can't connect to fake.site.test" );
 $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-    url => 'http://fake.site.us',
+    url => 'http://fake.site.test',
 );
 $results = $diagnostic->check;
 is $results->{status}, 'CRITICAL', 'Timeout check';
@@ -149,7 +151,7 @@ like $results->{info}, qr/Can't connect to/, 'Internal timeout check';
 $mock = mock_http_response( code => 403,
     headers => ["X-Squid-Error" => "ERR_ACCESS_DENIED 0"]);
 $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-    url => 'http://fake.site.us',
+    url => 'http://fake.site.test',
     status_code => '<500',
 );
 $results = $diagnostic->check;
@@ -157,10 +159,40 @@ is $results->{status}, 'CRITICAL', 'Proxy status check';
 like $results->{info}, qr/got status code 403 from proxy with error/,
     'Proxy info message';
 
+# Check not exceeding the response_time_threshold when provided results in appropriate message
+$mock = mock_http_response;
+$diagnostic = HealthCheck::Diagnostic::WebRequest->new(
+    url                     => 'http://fake.site.test',
+    response_time_threshold => 100,
+);
+$results = $diagnostic->check;
+is $results->{status}, 'OK', 'Got OK status when response time does not exceed response_time_threshold';
+like $results->{info}, qr/Request took [\d.e\-]+ seconds?/;
+
+# Check the 0 reponse_time_threshold case
+$mock = mock_http_response( sleep => 1 );
+$diagnostic = HealthCheck::Diagnostic::WebRequest->new(
+    url                     => 'http://fake.site.test',
+    response_time_threshold => 0,
+);
+$results = $diagnostic->check;
+is $results->{status}, 'WARNING', 'Got WARNING status when response time exceeds response_time_threshold';
+like $results->{info}, qr/Request took [\d.e\-]+ seconds?/;
+
+# Check delayed response results in a warning status
+$mock = mock_http_response( sleep => 3 );
+$diagnostic = HealthCheck::Diagnostic::WebRequest->new(
+    url                     => 'http://fake.site.test',
+    response_time_threshold => 2,
+);
+$results = $diagnostic->check;
+is $results->{status}, 'WARNING', 'Got WARNING status when response time exceeds response_time_threshold';
+like $results->{info}, qr/Request took [\d.e\-]+ seconds?/;
+
 # Check < operator
 $mock = mock_http_response( code => 401 );
 $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-    url => 'http://fake.site.us',
+    url => 'http://fake.site.test',
     status_code => '<500',
 );
 $results = $diagnostic->check;
@@ -169,9 +201,9 @@ like $results->{info}, qr/and got expected status code 401/,
     'Valid less than message';
 
 # Failed < operator with timeout
-$mock = mock_http_response( die => "Can't connect to fake.site.us" );
+$mock = mock_http_response( die => "Can't connect to fake.site.test" );
 $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-    url => 'http://fake.site.us',
+    url => 'http://fake.site.test',
     status_code => '<500',
 );
 $results = $diagnostic->check;
@@ -182,7 +214,7 @@ like $results->{info}, qr/User Agent returned: Can't connect to/,
 # Check valid ! operator
 $mock = mock_http_response( code => 401 );
 $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-    url => 'http://fake.site.us',
+    url => 'http://fake.site.test',
     status_code => '!500'
 );
 
@@ -194,7 +226,7 @@ like $results->{info}, qr/and got expected status code 401/,
 # Check failed ! operator
 $mock = mock_http_response( code => 500 );
 $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-    url => 'http://fake.site.us',
+    url => 'http://fake.site.test',
     status_code => '!500',
 );
 
@@ -205,7 +237,7 @@ like $results->{info}, qr/got status code 500, expected !500/,
 
 # Complex status code string
 $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-    url => 'http://fake.site.us',
+    url => 'http://fake.site.test',
     status_code => '<400, 405, !202',
 );
 

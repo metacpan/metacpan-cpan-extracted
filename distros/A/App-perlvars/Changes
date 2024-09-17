@@ -1,5 +1,8 @@
 Revision history for App-perlvars
 
+0.000006  2024-09-16 16:33:54Z
+    - Revert obviated portions of PR #12 (GH#18) (Håkon Hægland)
+
 0.000005  2024-04-30 23:26:40Z
     - Temporarily fix test failures for perl > 5.37.3 (GH#12) (Håkon Hægland)
 

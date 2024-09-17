@@ -1,6 +1,6 @@
 package MooX::Keyword::Factory;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.03';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 use Factory::Sub; use Moo;
 
 our %FACTORY;
@@ -32,7 +32,7 @@ MooX::Keyword::Factory - Moo attribute factories
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =cut
 
@@ -46,7 +46,7 @@ Perhaps a little code snippet.
 
 	use Moo;
 	use MooX::Keyword extends => '+Factory';
-	use My::Type::Library qw/Name, Email Phone PostCode/
+	use My::Type::Library qw/Name Email Phone PostCode/
 
 	factory worker => Name, Email, sub {
 		...

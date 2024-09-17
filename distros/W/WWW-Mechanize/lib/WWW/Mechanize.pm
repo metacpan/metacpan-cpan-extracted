@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.18';
+our $VERSION = '2.19';
 
 use Tie::RefHash       ();
 use HTTP::Request 1.30 ();
@@ -14,7 +14,7 @@ use HTML::Form 1.00    ();
 use HTML::TokeParser   ();
 use Scalar::Util       qw( tainted );
 
-use base 'LWP::UserAgent';
+use parent 'LWP::UserAgent';
 
 our $HAS_ZLIB;
 
@@ -753,9 +753,10 @@ sub form_action {
     my ( $self, $action ) = @_;
 
     my $temp;
-    my @matches
-        = grep { defined( $temp = $_->action ) and ( $temp =~ m/$action/msx ) }
-        $self->forms;
+    my @matches = grep {
+        defined( $temp = $_->action )
+            and ( $temp =~ m/$action/msx )
+    } $self->forms;
 
     my $nmatches = @matches;
     if ( $nmatches > 0 ) {
@@ -2019,7 +2020,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 SYNOPSIS
 
@@ -2053,7 +2054,7 @@ be queried and revisited.
         button    => 'Search Now'
     );
 
-    # Enable strict form processing to catch typos and non-existant form fields.
+    # Enable strict form processing to catch typos and non-existent form fields.
     my $strict_mech = WWW::Mechanize->new( strict_forms => 1);
 
     $strict_mech->get( $url );
@@ -3622,7 +3623,7 @@ like to I<systematically> perform the above HTML substitution, you
 would overload C<update_html> in a subclass thusly:
 
    package MyMech;
-   use base 'WWW::Mechanize';
+   use parent 'WWW::Mechanize';
 
    sub update_html {
        my ($self, $html) = @_;

@@ -12,6 +12,7 @@ return {
 
     CONFIGURE_REQUIRES => {},
     BUILD_REQUIRES => {
+        'Config'     => 0,
         'File::Temp' => 0,
     },
     TEST_REQUIRES => {

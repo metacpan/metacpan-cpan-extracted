@@ -1,5 +1,5 @@
 package Sys::Info::Driver::OSX;
-$Sys::Info::Driver::OSX::VERSION = '0.7962';
+$Sys::Info::Driver::OSX::VERSION = '0.7963';
 use strict;
 use warnings;
 use parent qw( Exporter Sys::Info::Base );
@@ -290,7 +290,7 @@ Sys::Info::Driver::OSX
 
 =head1 VERSION
 
-version 0.7962
+version 0.7963
 
 =head1 SYNOPSIS
 

@@ -23,7 +23,7 @@ $obj = Data::InfoBox::Item->new(
 	'text' => Data::Text::Simple->new(
 		'text' => 'Text',
 	),
-	'url' => 'https://example.com',
+	'uri' => 'https://example.com',
 );
 isa_ok($obj, 'Data::InfoBox::Item');
 
@@ -33,7 +33,7 @@ $obj = Data::InfoBox::Item->new(
 	'text' => Data::Text::Simple->new(
 		'text' => 'Text',
 	),
-	'url' => 'https://example.com',
+	'uri' => 'https://example.com',
 );
 isa_ok($obj, 'Data::InfoBox::Item');
 
@@ -43,7 +43,16 @@ $obj = Data::InfoBox::Item->new(
 	'text' => Data::Text::Simple->new(
 		'text' => 'Text',
 	),
-	'url' => 'https://example.com',
+	'uri' => 'https://example.com',
+);
+isa_ok($obj, 'Data::InfoBox::Item');
+
+# Test.
+$obj = Data::InfoBox::Item->new(
+	'text' => Data::Text::Simple->new(
+		'text' => 'john@example.com',
+	),
+	'uri' => 'mailto:john@example.com',
 );
 isa_ok($obj, 'Data::InfoBox::Item');
 
@@ -89,17 +98,4 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'text' must be a 'Data::Text::Simple' object.\n",
 	"Parameter 'text' must be a 'Data::Text::Simple' object (bad).");
-clean();
-
-# Test.
-eval {
-	Data::InfoBox::Item->new(
-		'text' => Data::Text::Simple->new(
-			'text' => 'Text',
-		),
-		'url' => 'urn:isbn:0451450523',
-	);
-};
-is($EVAL_ERROR, "Parameter 'url' doesn't contain valid location.\n",
-	"Parameter 'url' doesn't contain valid location (urn:isbn:0451450523).");
 clean();

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.038;
 
 use ExtUtils::MakeMaker;
 
@@ -14,21 +14,18 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Webservice-Ipify-API",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.038",
   "NAME" => "Webservice::Ipify::API",
-  "PREREQ_PM" => {
+  "PREREQ_PM" => {},
+  "TEST_REQUIRES" => {
     "Carp" => 0,
     "Feature::Compat::Class" => 0,
     "Feature::Compat::Try" => 0,
     "HTTP::Tiny" => 0,
     "JSON::PP" => 0,
-    "feature" => 0,
-    "strict" => 0,
-    "warnings" => 0
-  },
-  "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "1.003",
+  "VERSION" => "1.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,10 +38,7 @@ my %FallbackPrereqs = (
   "Feature::Compat::Try" => 0,
   "HTTP::Tiny" => 0,
   "JSON::PP" => 0,
-  "Test::More" => 0,
-  "feature" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "Test::More" => 0
 );
 
 

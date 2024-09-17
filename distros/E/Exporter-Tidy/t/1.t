@@ -1,5 +1,4 @@
-use lib 't/lib';
-use Test::More tests => 36;
+use Test::More tests => 44;
 BEGIN { require_ok('Exporter::Tidy') };
 
 can_ok 'Exporter::Tidy', 'import';
@@ -105,6 +104,27 @@ ok($bar_bar eq 'foo',           '_prefix GLOB/SCALAR');
 ok($bar_bar[0] eq 'foo',        '_prefix GLOB/ARRAY');
 ok($bar_bar{foo},               '_prefix GLOB/HASH');
 
-# TODO
-# Test failures
+BEGIN {
+    package ET_Test5;
+    $INC{'ET_Test5.pm'} = 'dummy';
+    use Exporter::Tidy all => [ qw(foo1 $foo1 %foo1 @foo1 *bar1) ];
+    *foo1 = sub { 42 };
+    *foo1 = \ 'forty-two';
+    *foo1 = [ 1 .. 42 ];
+    *foo1 = { 42 => 'forty-two' };
+    *bar1 = sub { 'foo' };
+    *bar1 = \ 'foo';
+    *bar1 = [ 'foo' ];
+    *bar1 = { foo => 1 };
+}
+use ET_Test5;
+ok(foo1() == 42,             ':default CODE');
+ok($foo1 eq 'forty-two',     ':default SCALAR');
+ok(@foo1 == 42,              ':default ARRAY');
+ok($foo1{42} eq 'forty-two', ':default HASH');
+ok(bar1() eq 'foo',          ':default GLOB/CODE');
+ok($bar1 eq 'foo',           ':default GLOB/SCALAR');
+ok($bar1[0] eq 'foo',        ':default GLOB/ARRAY');
+ok($bar1{foo},               ':default GLOB/HASH');
+
 

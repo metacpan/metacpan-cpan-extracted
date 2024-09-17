@@ -49,7 +49,9 @@ our @EXPORT_OK = qw(get post put delete postData putData);
 ## CONSTANTS
 #####
 our $TIMEOUT = 10;
-our $VERSION = "1.3.7.0";
+our $VERSION = "1.3.8.0";
+our $APIVERSION = '37';
+
 #####
 ## VARIABLES
 #####
@@ -61,7 +63,7 @@ our $VERSION = "1.3.7.0";
 #** @method public new (parameters)
 # @ creates a connection
 #
-# @params value required %options
+# @param value  %options
 # @retval value the created class
 #*
 
@@ -74,10 +76,11 @@ sub new {
 		'login'		=> $args{'login'},
 		'password'	=> $args{'password'},
 		'token'		=> $args{'token'},
-		'debug'		=> $args{'debug'} || 0,
-		'verbose'	=> $args{'verbose'} || 0,
+		'debug'		=> $args{'debug'} //= 0,
+		'verbose'	=> $args{'verbose'} //= 0,
 		'result'	=> undef,
-		'timeout'	=> $args{'timeout'} || $TIMEOUT,
+		'apivers'	=> $args{'apivers'} //= $APIVERSION,
+		'timeout'	=> $args{'timeout'} //= $TIMEOUT,
 	};
 # create and store a cookie jar
 	my $cookie_jar = HTTP::Cookies->new(
@@ -112,7 +115,7 @@ sub new {
 # if we have a token, use it
 	if (defined $self->{'token'}) {
 		$client->addHeader ("X-Rundeck-Auth-Token", $self->{'token'});
-		$client->GET("/api/21/tokens/$self->{'login'}");
+		$client->GET("/api/$self->{'apivers'}/tokens/$self->{'login'}");
 		$rc = $client->responseCode ();
 		if (($rc-$rc%100 == 200) && (index($client->{'_res'}{'_content'}, 'alert alert-danger') == -1)) {
 			$rc = 200;
@@ -148,22 +151,30 @@ sub new {
 #** @method public get (parameters)
 # @ sends a GET query
 #
-# @params required endpoint
+# @param  endpoint
 # @retval the response
 #*
 
 sub get (){		# endpoint
 	my $self = shift;
-	my $endpoint = shift;
+	my $endpt = shift;
+	my $endpoint = "";
+
+	if ($endpt =~ /^\/api\/[0-9]+\/(.*)$/) {
+		$endpoint = "/api/$self->{'apivers'}/$1";
+	} else {
+		$endpoint = "/api/$self->{'apivers'}/$endpt";
+	}
 
 	my $responsehash = ();
 	my $rc = 0;
 
 	# Handle secial case where endpoint is /api/XX/job, returns YAML
-	if ($endpoint =~ /api\/[0-9]+\/job/) {
-		$endpoint .= '?format=yaml';
-	}
-
+	# Obsolete
+	#~ if ($endpoint =~ /api\/[0-9]+\/job/) {
+		#~ $endpoint .= '?format=yaml';
+	#~ }
+	$self->_logV2("endpoint = $endpoint");
 	$self->{'client'}->GET($endpoint);
 	$rc = $self->{'client'}->responseCode ();
 	$responsehash->{'httpstatus'} = $rc;
@@ -183,19 +194,28 @@ sub get (){		# endpoint
 #** @method public post (parameters)
 # @ sends a POST request
 #
-# @params required endpoint, the JSON to POST
+# @param  endpoint, the JSON to POST
 # @retval the response
 #*
 
 sub post(){		# endpoint, json
 	my $self = shift;
-	my $endpoint = shift;
+	my $endpt = shift;
 	my $json = shift;
+
+	my $endpoint = "";
+
+	if ($endpt =~ /^\/api\/[0-9]+\/(.*)$/) {
+		$endpoint = "/api/$self->{'apivers'}/$1";
+	} else {
+		$endpoint = "/api/$self->{'apivers'}/$endpt";
+	}
 
 	my $responsehash = ();
 	my $rc = 0;
 
 	$self->{'client'}->addHeader ("Content-Type", 'application/json');
+	$self->_logV2("endpoint = $endpoint");
 	$self->{'client'}->POST($endpoint, $json);
 	$rc = $self->{'client'}->responseCode ();
 	$self->{'result'}->{'httpstatus'} = $rc;
@@ -214,19 +234,28 @@ sub post(){		# endpoint, json
 #** @method public put (parameters)
 # @ sends a PUT query
 #
-# @params required endpoint, the JSON to PUT
+# @param  endpoint, the JSON to PUT
 # @retval the response
 #*
 
 sub put(){		# endpoint, json
 	my $self = shift;
-	my $endpoint = shift;
+	my $endpt = shift;
 	my $json = shift;
+
+	my $endpoint = "";
+
+	if ($endpt =~ /^\/api\/[0-9]+\/(.*)$/) {
+		$endpoint = "/api/$self->{'apivers'}/$1";
+	} else {
+		$endpoint = "/api/$self->{'apivers'}/$endpt";
+	}
 
 	my $responsehash = ();
 	my $rc = 0;
 
 	$self->{'client'}->addHeader ("Content-Type", 'application/json');
+	$self->_logV2("endpoint = $endpoint");
 	$self->{'client'}->PUT($endpoint, $json);
 	$rc = $self->{'client'}->responseCode ();
 	$self->{'result'}->{'httpstatus'} = $rc;
@@ -245,17 +274,26 @@ sub put(){		# endpoint, json
 #** @method public delete (parameters)
 # @ sends a DELETE query
 #
-# @params required endpoint
+# @param  endpoint
 # @retval the response
 #*
 
 sub delete () {		# endpoint
 	my $self = shift;
-	my $endpoint = shift;
+	my $endpt = shift;
+
+	my $endpoint = "";
+
+	if ($endpt =~ /^\/api\/[0-9]+\/(.*)$/) {
+		$endpoint = "/api/$self->{'apivers'}/$1";
+	} else {
+		$endpoint = "/api/$self->{'apivers'}/$endpt";
+	}
 
 	my $responsehash = ();
 	my $rc = 0;
 
+	$self->_logV2("endpoint = $endpoint");
 	$self->{'client'}->DELETE($endpoint);
 	$rc = $self->{'client'}->responseCode ();
 	$responsehash->{'httpstatus'} = $rc;
@@ -274,20 +312,29 @@ sub delete () {		# endpoint
 #** @method public postData (parameters)
 # @ sends a POST query
 #
-# @params required endpoint, mimetype, data
+# @param  endpoint, mimetype, data
 # @retval the response
 #*
 
 sub postData() {		# endpoint, mimetype, data
 	my $self = shift;
-	my $endpoint = shift;
+	my $endpt = shift;
 	my $mimetype = shift;
 	my $data = shift;
+
+	my $endpoint = "";
+
+	if ($endpt =~ /^\/api\/[0-9]+\/(.*)$/) {
+		$endpoint = "/api/$self->{'apivers'}/$1";
+	} else {
+		$endpoint = "/api/$self->{'apivers'}/$endpt";
+	}
 
 	my $responsehash = ();
 	my $rc = 0;
 
 	$self->{'client'}->addHeader ("Content-Type", $mimetype);
+	$self->_logV2("endpoint = $endpoint");
 	$self->{'client'}->POST($endpoint, $data);
 	$rc = $self->{'client'}->responseCode ();
 	$self->{'result'}->{'httpstatus'} = $rc;
@@ -306,20 +353,29 @@ sub postData() {		# endpoint, mimetype, data
 #** @method public putData (parameters)
 # @ sends a PUT query
 #
-# @params required endpoint, mimetype, data
+# @param  endpoint, mimetype, data
 # @retval the response
 #*
 
 sub putData() {		# endpoint, mimetype, data
 	my $self = shift;
-	my $endpoint = shift;
+	my $endpt = shift;
 	my $mimetype = shift;
 	my $data = shift;
+
+	my $endpoint = "";
+
+	if ($endpt =~ /^\/api\/[0-9]+\/(.*)$/) {
+		$endpoint = "/api/$self->{'apivers'}/$1";
+	} else {
+		$endpoint = "/api/$self->{'apivers'}/$endpt";
+	}
 
 	my $responsehash = ();
 	my $rc = 0;
 
 	$self->{'client'}->addHeader ("Content-Type", $mimetype);
+	$self->_logV2("endpoint = $endpoint");
 	$self->{'client'}->PUT($endpoint, $data);
 	$rc = $self->{'client'}->responseCode ();
 	$self->{'result'}->{'httpstatus'} = $rc;
@@ -338,7 +394,7 @@ sub putData() {		# endpoint, mimetype, data
 #** @method private _handleResponse (parameters)
 # @ manage with the various responses, build a hash with the data received
 #
-# @params required rc, responseType, responseContent
+# @param  rc, responseType, responseContent
 # @retval the response
 #*
 
@@ -354,31 +410,35 @@ sub _handleResponse () {
 	$responsehash->{'httpstatus'} = $rc;
 
 	# is data JSON ?
-	if ($responseType =~ /^application\/json.*/) {
-		$self->_logV2($responseContent);
-		$responseJSON = decode_json($responseContent) if $responseContent ne '';
-		my $reftype = reftype($responseJSON);
-		if (not defined $reftype) {
-			$responsehash->{'reqstatus'} = 'CRIT';
-			$responsehash->{'httpstatus'} = 415;
-		} elsif ($reftype eq 'ARRAY') {
-			$self->_logV2("copying array");
-			$responsehash->{'content'}{'arraycount'} = $#$responseJSON+1;
-			for (my $i = 0; $i <= $#$responseJSON; $i++) {
-				$responsehash->{'content'}{$i} = $responseJSON->[$i];
+
+	if (defined $responseType) {
+		$self->_logV2($responseType);
+		if ($responseType =~ /^application\/json.*/) {
+			$self->_logV2($responseContent);
+			$responseJSON = decode_json($responseContent) if $responseContent ne '';
+			my $reftype = reftype($responseJSON);
+			if (not defined $reftype) {
+				$responsehash->{'reqstatus'} = 'CRIT';
+				$responsehash->{'httpstatus'} = 415;
+			} elsif ($reftype eq 'ARRAY') {
+				$self->_logV2("copying array");
+				$responsehash->{'content'}{'arraycount'} = $#$responseJSON+1;
+				for (my $i = 0; $i <= $#$responseJSON; $i++) {
+					$responsehash->{'content'}{$i} = $responseJSON->[$i];
+				}
+			} elsif ($reftype eq 'SCALAR') {
+				$responsehash->{'reqstatus'} = 'CRIT';
+				$responsehash->{'httpstatus'} = 415;
+			} elsif ($reftype eq 'HASH') {
+				$self->_logV2("copying hash");
+				$responsehash->{'content'} = $responseJSON;
 			}
-		} elsif ($reftype eq 'SCALAR') {
-			$responsehash->{'reqstatus'} = 'CRIT';
-			$responsehash->{'httpstatus'} = 415;
-		} elsif ($reftype eq 'HASH') {
-			$self->_logV2("copying hash");
-			$responsehash->{'content'} = $responseJSON;
+		} elsif ($responseType =~ /text\/plain.*/) {
+			$self->_logV2($responseContent);
+			$responsehash->{'content'} = $responseContent;
+		} else { # assume binary, like text, but do not log
+			$responsehash->{'content'} = $responseContent;
 		}
-	} elsif ($responseType =~ /text\/plain.*/) {
-		$self->_logV2($responseContent);
-		$responsehash->{'content'} = $responseContent;
-	} else { # assume binary, like text, but do not log
-		$responsehash->{'content'} = $responseContent;
 	}
 	return $responsehash;
 }
@@ -386,7 +446,7 @@ sub _handleResponse () {
 #** @method private _logV1
 # @ print a message if verbose > 1
 #
-# @params required message
+# @param  message
 #*
 
 sub _logV1() {
@@ -405,7 +465,7 @@ sub _logV1() {
 #** @method private _logV2 (parameters)
 # @ dumps an object if verbose > 2
 #
-# @params required message
+# @param  message
 #*
 
 sub _logV2() {
@@ -416,7 +476,7 @@ sub _logV2() {
 		if (defined $obj) {
 			print Dumper ($obj);
 		} else {
-			print "unknown objetc $!";
+			print "unknown object $!";
 		}
 	}
 }
@@ -424,7 +484,7 @@ sub _logV2() {
 #** @method private _logD (parameters)
 # @ dumps an object if debug enabled
 #
-# @params required object
+# @param  object
 #*
 
 sub _logD() {
@@ -451,11 +511,12 @@ RundeckAPI - simplifies authenticate, connect, queries to a Rundeck instance via
 		'login'		=> "admin",
 		'token'		=> <token as generated with GUI, as an admin>
 		'debug'		=> 1,
+		'apivers'	=> '42',
  		'proxy'		=> "http://proxy.mycompany.com/",
 	);
-	my $hashRef = $api->get("/api/27/system/info");
+	my $hashRef = $api->get("system/info");
 	my $json = '{some: value}';
-	$hashRef = $api->put(/api/27/endpoint_for_put, $json);
+	$hashRef = $api->put(endpoint_for_put, $json);
 
 =head1 METHODS
 

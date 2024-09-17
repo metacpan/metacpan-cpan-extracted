@@ -19,7 +19,7 @@ name: App-HeightUtils
 provides:
   App::HeightUtils:
     file: lib/App/HeightUtils.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Data::Sah::Compiler::perl::TH::int: '0.914'
   Data::Sah::Compiler::perl::TH::str: '0.914'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-HeightUtils
   homepage: https://metacpan.org/release/App-HeightUtils
   repository: git://github.com/perlancar/perl-App-HeightUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

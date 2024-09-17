@@ -5,25 +5,33 @@ NAME
 
 VERSION
 
-    version v1.4.2
+    version v1.4.3
 
 SYNOPSIS
 
-        # site:    https://foo.com
+        # site:    https://foo.example
         # content: <html><head></head><body>This is my content</body></html>
     
         use HealthCheck::Diagnostic::WebRequest;
     
         # Look for a 200 status code and pass.
         my $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-            url => 'https://foo.com',
+            url => 'https://foo.example',
         );
         my $result = $diagnostic->check;
         print $result->{status}; # OK
     
+        # Look for a 200 status code and verify request takes no more than 10 seconds.
+        my $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
+            url => 'https://foo.example',
+            response_time_threshold => 10,
+        );
+        my $result = $diagnostic->check;
+        print $result->{status}; # OK if no more than 10, WARNING if more than 10
+    
         # Look for a 401 status code and fail.
         $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-            url         => 'https://foo.com',
+            url         => 'https://foo.example',
             status_code => 401,
         );
         $result = $diagnostic->check;
@@ -31,7 +39,7 @@ SYNOPSIS
     
         # Look for any status code less than 500.
         $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-            url         => 'https://foo.com',
+            url         => 'https://foo.example',
             status_code => '<500',
         );
         $result = $diagnostic->check;
@@ -39,7 +47,7 @@ SYNOPSIS
     
         # Look for any 403, 405, or any 2xx range code
         $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-            url         => 'https://foo.com',
+            url         => 'https://foo.example',
             status_code => '403, 405, >=200, <300',
         );
         $result = $diagnostic->check;
@@ -47,7 +55,7 @@ SYNOPSIS
     
         # Look for a 200 status code and content matching the string regex.
         $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-            url           => 'https://foo.com',
+            url           => 'https://foo.example',
             content_regex => 'is my',
         );
         $result = $diagnostic->check;
@@ -55,7 +63,7 @@ SYNOPSIS
     
         # Use a regex as the content_regex.
         $diagnostic = HealthCheck::Diagnostic::WebRequest->new(
-            url           => 'https://foo.com',
+            url           => 'https://foo.example',
             content_regex => qr/is my/,
         );
         $result = $diagnostic->check;
@@ -127,6 +135,13 @@ ATTRIBUTES
     The default value for this is '200', which means that we expect a
     successful request.
 
+ response_time_threshold
+
+    An optional number of seconds to compare the response time to. If it
+    takes no more than this threshold to receive the response or if the
+    threshold is not provided, the status is OK. If the time exceeds this
+    threshold, the status is WARNING.
+
  content_regex
 
     The content regex to test for in the HTTP response. This is an optional
@@ -138,6 +153,11 @@ ATTRIBUTES
     Setting this variable prevents the healthcheck from following
     redirects.
 
+ ua
+
+    An optional attribute to override the default user agent. This must be
+    of type LWP::UserAgent.
+
  options
 
     See LWP::UserAgent for available options. Takes a hash reference of
@@ -147,6 +167,17 @@ ATTRIBUTES
     It is optional.
 
     By default provides a custom agent string and a default timeout of 7.
+
+METHODS
+
+ send_request
+
+        my $response = $self->send_request;
+
+    This is the method called internally to receive a response for the
+    healthcheck. Defaults to calling the request method on the user agent
+    and provided request attribute, but this can be overridden in a
+    subclass.
 
 DEPENDENCIES
 
@@ -162,7 +193,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2018 - 2021 by Grant Street Group.
+    This software is Copyright (c) 2018 - 2024 by Grant Street Group.
 
     This is free software, licensed under:
 
