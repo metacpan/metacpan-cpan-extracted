@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.12";
+$VERSION="0.14";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -42,7 +42,7 @@ $mswin = 1 if $Config{'osname'} eq 'MSWin32';
 An extendable application framework written in perl/Tk. The aim is maximum user configurability
 and ease of application building.
 
-To get started read L<Tk::AppWindow::OverView>.
+To get started read L<Tk::AppWindow::OverView> and L<Tk::AppWindow::CookBook>.
 
 This document is a reference manual.
 
@@ -590,6 +590,13 @@ sub configPut {
 	}
 }
 
+=item B<configRemove>I<('-option')>
+
+Removes '-option from the config hash. Usefull when unloading a plugin
+that configures an option with configInit.
+
+=cut
+
 sub configRemove {
 	my ($self, $option) = @_;
 	delete $self->{CONFIGTABLE}->{$option};
@@ -1097,14 +1104,13 @@ Unknown. Probably plenty. If you find any, please contact the author.
 
 =item L<Tk::AppWindow::OverView>
 
+=item L<Tk::AppWindow::CookBook>
+
 =item L<Tk::AppWindow::BaseClasses::Extension>
 
 =back
 
 =cut
-
-
-
 
 1;
 __END__

@@ -32,6 +32,27 @@ C<required method : object ($object : object);>
 
 The implementation must receive an object and return the cloned object.
 
+=head1 Class Methods
+
+C<static method default_cloner : L<Cloner|SPVM::Cloner> ();>
+
+Returns a default cloner.
+
+The implementation of the default cloner is
+
+  method : object ($object : Cloneable) {
+  
+    my $clone = (object)undef;
+    
+    if ($object) {
+      $clone = $object->clone;
+    }
+    
+    return $clone;
+  };
+
+If the object $object is undef, returns undef, ohterwise calls L<Cloneable#clone|SPVM::Cloneable/"clone"> method and its return value.
+
 =head1 Copyright & License
 
 Copyright (c) 2023 Yuki Kimoto

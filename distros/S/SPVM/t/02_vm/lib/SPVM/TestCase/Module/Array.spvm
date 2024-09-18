@@ -4471,7 +4471,7 @@ class TestCase::Module::Array {
       {
         my $source = [(string)1, 3, 5];
         eval { my $new_object = Array->new_proto(undef, 2); };
-        unless (Fn->contains($@, "The prototype array \$prototype must be defined")) {
+        unless (Fn->contains($@, "The prototype array \$proto_array must be defined")) {
           return 0;
         }
       }
@@ -4484,6 +4484,81 @@ class TestCase::Module::Array {
           return 0;
         }
       }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method new_proto_any : int () {
+    
+    {
+      my $minimals = new TestCase::Minimal[1];
+      my $new_object = Array->new_proto_any($minimals, 2);
+      unless ($new_object isa TestCase::Minimal[]) {
+        return 0;
+      }
+      my $new_minimals = (TestCase::Minimal[])$new_object;
+      unless (@$new_minimals == 2) {
+        return 0;
+      }
+    }
+    
+    # Zero length
+    {
+      my $minimals = new TestCase::Minimal[0];
+      my $new_object = Array->new_proto_any($minimals, 0);
+      unless ($new_object isa TestCase::Minimal[]) {
+        return 0;
+      }
+      my $new_minimals = (TestCase::Minimal[])$new_object;
+      unless (@$new_minimals == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new int[3];
+      my $ret = Array->new_proto_any($array, 2);
+      unless ($ret is_compile_type object) {
+        return 0;
+      }
+      unless ($ret is_type int[]) {
+        return 0;
+      }
+      my $new_array = (int[])$ret;
+      unless (@$new_array == 2) {
+        return 0;
+      }
+    }
+    
+    # Exception
+    {
+      {
+        my $source = [(string)1, 3, 5];
+        eval { my $new_object = Array->new_proto_any(undef, 2); };
+        unless (Fn->contains($@, "The prototype array \$proto_array must be defined")) {
+          return 0;
+        }
+      }
+      
+      {
+        my $dest = new string[4];
+        my $source = [(string)1, 3, 5];
+        eval { my $new_object = Array->new_proto_any(new TestCase::Minimal[0], -1); };
+        unless (Fn->contains($@, "The length \$length must be greater than or equal to 0")) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { my $new_object = Array->new_proto_any(Point->new, 2); };
+        unless ($@) {
+          return 0;
+        }
+      }
+      
     }
     
     $@ = undef;
@@ -5868,9 +5943,9 @@ class TestCase::Module::Array {
     # String array
     {
       {
-        my $array1 = [(string)1, 3, 2];
+        my $array1 = [(string)1, 3, 2, undef];
         
-        my $array2 = [(string)1, 3, 2];
+        my $array2 = [(string)1, 3, 2, undef];
         
         my $ret = Array->equals($array1, $array2);
         
@@ -5885,6 +5960,154 @@ class TestCase::Module::Array {
         my $array2 = [(string)1, 3, 3];
         
         my $ret = Array->equals($array1, $array2);
+        
+        unless ($ret == 0) {
+          return 0;
+        }
+      }
+      
+      {
+        my $array1 = [(string)1, 3, undef];
+        
+        my $array2 = [(string)1, 3, 3];
+        
+        my $ret = Array->equals($array1, $array2);
+        
+        unless ($ret == 0) {
+          return 0;
+        }
+      }
+      
+      {
+        my $array1 = [(string)1, 3, 3];
+        
+        my $array2 = [(string)1, 3, undef];
+        
+        my $ret = Array->equals($array1, $array2);
+        
+        unless ($ret == 0) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    # String array - shallow
+    {
+      {
+        my $string1 = "a";
+        
+        my $string2 = "a";
+        
+        my $string3 = "a";
+        
+        my $array1 = [$string1, $string2, undef];
+        
+        my $array2 = [$string1, $string2, undef];
+        
+        my $shallow = 1;
+        my $ret = Array->equals($array1, $array2, $shallow);
+        
+        unless ($ret == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $string1 = "a";
+        
+        my $string2 = "a";
+        
+        my $string3 = "a";
+        
+        my $array1 = [$string1, $string2];
+        
+        my $array2 = [$string1, $string3];
+        
+        my $shallow = 1;
+        my $ret = Array->equals($array1, $array2, $shallow);
+        
+        unless ($ret == 0) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    # Object array
+    {
+      {
+        my $string1 = StringBuffer->new("a");
+        
+        my $string2 = StringBuffer->new("a");
+        
+        my $string3 = StringBuffer->new("b");
+        
+        my $array1 = [$string1, $string1, undef];
+        
+        my $array2 = [$string2, $string2, undef];
+        
+        my $ret = Array->equals($array1, $array2);
+        
+        unless ($ret == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $string1 = StringBuffer->new("a");
+        
+        my $string2 = StringBuffer->new("a");
+        
+        my $string3 = StringBuffer->new("b");
+        
+        my $array1 = [$string1, $string1, undef];
+        
+        my $array2 = [$string2, $string3, undef];
+        
+        my $ret = Array->equals($array1, $array2);
+        
+        unless ($ret == 0) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    # Object array - shallow
+    {
+      {
+        my $string1 = StringBuffer->new("a");
+        
+        my $string2 = StringBuffer->new("a");
+        
+        my $string3 = StringBuffer->new("a");
+        
+        my $array1 = [$string1, $string2, undef];
+        
+        my $array2 = [$string1, $string2, undef];
+        
+        my $shallow = 1;
+        my $ret = Array->equals($array1, $array2, $shallow);
+        
+        unless ($ret == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $string1 = "a";
+        
+        my $string2 = "a";
+        
+        my $string3 = "a";
+        
+        my $array1 = [$string1, $string2];
+        
+        my $array2 = [$string1, $string3];
+        
+        my $shallow = 1;
+        my $ret = Array->equals($array1, $array2, $shallow);
         
         unless ($ret == 0) {
           return 0;
@@ -6043,4 +6266,125 @@ class TestCase::Module::Array {
     
     return 1;
   }
+  
+  static method copy_any_numeric : int () {
+    
+    # Copy array
+    {
+      my $array = [(int)1, 2, Fn->INT_MIN];
+      my $array_out = (int[])Array->copy_any_numeric($array);
+      
+      unless ($array_out isa int[]) {
+        return 0;
+      }
+      
+      unless ($array_out->[0] == 1) {
+        return 0;
+      }
+      
+      unless ($array_out->[1] == 2) {
+        return 0;
+      }
+      
+      unless ($array_out->[2] == Fn->INT_MIN) {
+        return 0;
+      }
+      
+      unless (@$array_out == 3) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = [(int)5, -7, 9, Fn->INT_MIN, 127, 15, 19];
+      my $range = (int[])Array->copy_any_numeric($array, 0, 7);
+      unless (Array->equals_int($range, [(int)5, -7, 9, Fn->INT_MIN, 127, 15, 19])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = [(int)5, -7, 9, Fn->INT_MIN, 127, 15, 19];
+      my $range = (int[])Array->copy_any_numeric($array, 1, 3);
+      
+      unless (Array->equals_int($range, [(int)-7, 9, Fn->INT_MIN])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $range = (int[])Array->copy_any_numeric([(int)5, -7, 9], 1, -1);
+      unless (Array->equals_int($range, [(int)-7, 9])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $range = (int[])Array->copy_any_numeric([(int)5, -7, 9], 1);
+      unless (Array->equals_int($range, [(int)-7, 9])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = Complex_2d->new_array_from_pairs([(double)1,2, 3,4]);
+      my $array_out = (Complex_2d[])Array->copy_any_numeric($array);
+      
+      unless ($array_out isa Complex_2d[]) {
+        return 0;
+      }
+      
+      unless (Array->equals($array_out, $array)) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = Complex_2d->new_array_from_pairs([(double)1,2, 3,4]);
+      my $array_out = (Complex_2d[])Array->copy_any_numeric($array, 1, 1);
+      
+      unless ($array_out isa Complex_2d[]) {
+        return 0;
+      }
+      
+      unless (Array->equals($array_out, Complex_2d->new_array_from_pairs([(double)3,4]))) {
+        return 0;
+      }
+    }
+    
+    # Exception
+    {
+      {
+        eval { Array->copy_any_numeric(undef, 0, 7); };
+        unless (Fn->contains($@, "The array \$array must be defined")) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { Array->copy_any_numeric([(int)5, -7, 9], -1, 1); };
+        unless (Fn->contains($@, "The offset \$offset must be greater than or equal to 0")) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { Array->copy_any_numeric([(int)5, -7, 9], 2, 2); };
+        unless (Fn->contains($@, "The offset \$offset + the length \$length must be less than or equal to the length of the array \$array")) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { Array->copy_any_numeric([(Point)undef]); };
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    return 1;
+  }
+  
 }

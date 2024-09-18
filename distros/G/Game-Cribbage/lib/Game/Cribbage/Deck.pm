@@ -62,7 +62,13 @@ function force_draw => sub {
 		}
 	}
 
-	return splice @{$self->deck}, $i, 1;
+	my $force = splice @{$self->deck}, $i, 1;
+
+	#if ($card->{used}) {
+	#	$force->used = 1;
+	#}
+
+	return $force;
 };
 
 function get => sub {

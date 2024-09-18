@@ -15,6 +15,7 @@ class Fn {
   use Callback::Grep;
   use Callback::Map;
   use Callback::MapExpand;
+  use Cloneable;
   
   static method BYTE_MAX : int () { return 127; }
   static method BYTE_MIN : int () { return -128; }
@@ -1485,6 +1486,82 @@ class Fn {
     }
     
     return $is_string_array;
+  }
+  
+  static method length : int ($array_or_string : object) {
+    
+    unless ($array_or_string) {
+      die "\$array_or_string must be defined.";
+    }
+    
+    my $length = -1;
+    if (&is_array($array_or_string)) {
+      $length = &array_length($array_or_string);
+    }
+    elsif ($array_or_string is_type string) {
+      $length = length (string)$array_or_string;
+    }
+    else {
+      die "The type of \$array_or_string must be an array type or string type.";
+    }
+    
+    return $length;
+  }
+  
+  static method get_elem_or_char_size : int ($array_or_string : object) {
+    
+    unless ($array_or_string) {
+      die "\$array_or_string must be defined.";
+    }
+    
+    my $size = -1;
+    if (&is_array($array_or_string)) {
+      $size = &get_elem_size($array_or_string);
+    }
+    elsif ($array_or_string is_type string) {
+      $size = 1;
+    }
+    else {
+      die "The type of \$array_or_string must be an array type or string type.";
+    }
+    
+    return $size;
+  }
+  
+  static method copy : object ($array_or_string : object, $shallow : int = 0) {
+    
+    unless ($array_or_string) {
+      return undef;
+    }
+    
+    my $copy = (object)undef;
+    if (&is_string_array($array_or_string)) {
+      if ($shallow) {
+        $copy = Array->copy_string_address((string[])$array_or_string);
+      }
+      else {
+        $copy = Array->copy_string((string[])$array_or_string);
+      }
+    }
+    elsif (&is_object_array($array_or_string)) {
+      if ($shallow) {
+        $copy = Array->copy_object_address((object[])$array_or_string);
+      }
+      else {
+        $copy = Array->copy_object((object[])$array_or_string, Cloner->default_cloner);
+      }
+    }
+    elsif (&is_any_numeric_array($array_or_string)) {
+      $copy = Array->copy_any_numeric($array_or_string);
+    }
+    elsif ($array_or_string is_type string) {
+      $copy = copy (string)$array_or_string;
+    }
+    else {
+      die "The type of \$array_or_string must be an array type or string type.";
+    }
+    
+    return $copy;
   }
   
 }

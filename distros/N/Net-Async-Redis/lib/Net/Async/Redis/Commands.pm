@@ -1,8 +1,8 @@
 package Net::Async::Redis::Commands;
 
-use Full::Role qw(:v1);
+use Full::Class qw(:v1), extends => 'IO::Async::Notifier';
 
-our $VERSION = '6.001'; # VERSION
+our $VERSION = '6.002'; # VERSION
 
 =head1 NAME
 
@@ -1360,9 +1360,9 @@ L<https://redis.io/commands/keys>
 
 =cut
 
-# method keys (@args) {
-#     $self->execute_command(qw(KEYS) => @args)
-# }
+method keys (@args) {
+    $self->execute_command(qw(KEYS) => @args)
+}
 
 =head2 migrate
 
@@ -3058,10 +3058,9 @@ L<https://redis.io/commands/psubscribe>
 
 =cut
 
-# Currently left out until Object::Pad rôles have support for overriding methods
-# method psubscribe (@args) {
-#     $self->execute_command(qw(PSUBSCRIBE) => @args)
-# }
+method psubscribe (@args) {
+    $self->execute_command(qw(PSUBSCRIBE) => @args)
+}
 
 =head2 publish
 
@@ -3219,9 +3218,9 @@ L<https://redis.io/commands/ssubscribe>
 
 =cut
 
-# method ssubscribe (@args) {
-#     $self->execute_command(qw(SSUBSCRIBE) => @args)
-# }
+method ssubscribe (@args) {
+    $self->execute_command(qw(SSUBSCRIBE) => @args)
+}
 
 =head2 subscribe
 
@@ -3237,9 +3236,9 @@ L<https://redis.io/commands/subscribe>
 
 =cut
 
-# method subscribe (@args) {
-#     $self->execute_command(qw(SUBSCRIBE) => @args)
-# }
+method subscribe (@args) {
+    $self->execute_command(qw(SUBSCRIBE) => @args)
+}
 
 =head2 sunsubscribe
 
@@ -6131,9 +6130,9 @@ L<https://redis.io/commands/xread>
 
 =cut
 
-# method xread (@args) {
-#     $self->execute_command(qw(XREAD) => @args)
-# }
+method xread (@args) {
+    $self->execute_command(qw(XREAD) => @args)
+}
 
 =head2 xreadgroup
 
@@ -6157,9 +6156,9 @@ L<https://redis.io/commands/xreadgroup>
 
 =cut
 
-# method xreadgroup (@args) {
-#     $self->execute_command(qw(XREADGROUP) => @args)
-# }
+method xreadgroup (@args) {
+    $self->execute_command(qw(XREADGROUP) => @args)
+}
 
 =head2 xrevrange
 
@@ -6303,9 +6302,9 @@ L<https://redis.io/commands/get>
 
 =cut
 
-# method get (@args) {
-#     $self->execute_command(qw(GET) => @args)
-# }
+method get (@args) {
+    $self->execute_command(qw(GET) => @args)
+}
 
 =head2 getdel
 
@@ -6713,9 +6712,9 @@ L<https://redis.io/commands/multi>
 
 =cut
 
-# method multi (@args) {
-#     $self->execute_command(qw(MULTI) => @args)
-# }
+method multi (@args) {
+    $self->execute_command(qw(MULTI) => @args)
+}
 
 =head2 unwatch
 

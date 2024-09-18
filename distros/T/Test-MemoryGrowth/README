@@ -134,7 +134,7 @@ FUNCTIONS
 
  no_growth
 
-       no_growth { CODE } %opts, $name
+       no_growth { CODE } %opts, $name;
 
     Assert that the code block does not consume extra memory.
 
@@ -151,13 +151,15 @@ FUNCTIONS
 
 TODO
 
-      * Don't be Linux Specific
+      * More OS portability
 
-      Currently, this module uses a very Linux-specific method of
-      determining process memory usage (namely, by inspecting
-      /proc/self/status). This should really be fixed to some OS-neutral
-      abstraction. Currently I am unaware of a simple portable mechanism to
-      query this. Patches very much welcome. :)
+      Currently, this module uses OS-specific methods of determining
+      process memory usage (namely, by inspecting /proc/self/status on
+      Linux or calling procstat on FreeBSD). It would be nice to support
+      more OSes, and potentially find a better abstraction for doing so.
+
+      Currently I am unaware of a simple portable mechanism to query this.
+      Patches very much welcome. :)
 
 AUTHOR
 

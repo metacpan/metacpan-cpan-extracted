@@ -123,7 +123,7 @@ C<static method copy_byte : byte[] ($array : byte[], $offset : int = 0, $length 
 
 Create a new C<byte> array with $length, and copy the elements from $offset to the position proceeded by $length to the created array.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -139,7 +139,7 @@ C<static method copy_double : double[] ($array : double[], $offset : int = 0, $l
 
 Create a new C<double> array with $length, and copy the elements from $offset to the position proceeded by $length to the created array.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 If the array is not defined, return undef.
 
@@ -157,7 +157,7 @@ C<static method copy_float : float[] ($array : float[], $offset : int = 0, $leng
 
 Create a new C<float> array with $length, and copy the elements from $offset to the position proceeded by $length to the created array.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -173,7 +173,7 @@ C<static method copy_int : int[] ($array : int[], $offset : int = 0, $length : i
 
 Create a new C<int> array with $length, and copy the elements from $offset to the position proceeded by $length to the created array.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -182,14 +182,14 @@ $array must be defined. Otherwise an exception is thrown.
 $offset must be greater than or equal to 0. Otherwise an exception is thrown.
 
 $offset + $length must be less than or equal to the length of $array. Otherwise an exception is thrown.
-  
+
 =head2 copy_long
 
 C<static method copy_long : long[] ($array : long[], $offset : int = 0, $length : int = -1);>
 
 Create a new C<long> array with $length, and copy the elements from $offset to the position proceeded by $length to the created array.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -209,7 +209,7 @@ Each element is cloned by L<Cloner|SPVM::Cloner>.
 
 If the cloner is not defined, the address of each element is copied.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -233,7 +233,7 @@ C<static method copy_short : short[] ($array : short[], $offset : int = 0, $leng
 
 Create a new C<short> array with $length, and copy the elements from $offset to the position proceeded by $length to the created array.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -249,7 +249,7 @@ C<static method copy_string : string[] ($array : string[], $offset : int = 0, $l
 
 Create a new C<string> array with $length, and copy the elements of the C<string> array using C<copy> operator from $offset to the position proceeded by $length to the created array.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -265,7 +265,7 @@ C<static method copy_string_address : string[] ($array : string[], $offset : int
 
 Create a new C<string> array with $length, and copy the addresses of the elements of the C<string> array from $offset to the position proceeded by $length to the created array.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -699,7 +699,7 @@ Set the range of the elements of the C<byte> array to $element.
 
 The range of the elements of $array is from $offset to the position proceeded by $length.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -717,7 +717,7 @@ Set the range of the elements of the C<double> array to $element.
 
 The range of the elements of $array is from $offset to the position proceeded by $length.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -735,7 +735,7 @@ Set the range of the elements of the C<float> array to $element.
 
 The range of the elements of $array is from $offset to the position proceeded by $length.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -753,7 +753,7 @@ Set the range of the elements of the C<int> array to $element.
 
 The range of the elements of $array is from $offset to the position proceeded by $length.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -771,7 +771,7 @@ Set the range of the elements of the C<long> array to $element.
 
 The range of the elements of $array is from $offset to the position proceeded by $length.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -789,7 +789,7 @@ Set the range of the elements of the object $array to $element.
 
 The range of the elements of $array is from $offset to the position proceeded by $length.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -807,7 +807,7 @@ Set the range of the elements of the C<short> $array to $element.
 
 The range of the elements of $array is from $offset to the position proceeded by $length.
 
-If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+If $length is less than 0, it is the length of $array minus $offset.
 
 Exceptions:
 
@@ -932,6 +932,12 @@ Exceptions:
 $prototype array must be defined. Otherwise an exception is thrown.
 
 $length must be greater than or equal to 0. Otherwise an exception is thrown.
+
+=head2 new_proto_any
+
+C<static method new_proto_any : object ($proto_array : object, $length : int);>
+
+Same as L</"new_proto"> method, but can give $proto_array of the type of a numeric array or a multi-numeric array and the return type is different.
 
 =head2 shuffle_object
 
@@ -1097,11 +1103,11 @@ The length $length must be greater than or equal to 0. Otherwise an exception is
 
 =head2 equals
 
-C<static method equals : int ($array1 : object, $array2 : object);>
+C<static method equals : int ($array1 : object, $array2 : object, $shallow : int = 0);>
 
 Checks if the array $array1 and the array $array2 are equal.
 
-The type of $array1 and $array2 must be a numeric array type, a multi-numeric array type, or string array type.
+The type of $array1 and $array2 must be a numeric array type, a multi-numeric array type, string array type, or an object array type.
 
 Implementation:
 
@@ -1113,9 +1119,15 @@ If $array1 is not defined, $array2 is defined, returns 0.
 
 If the type of $array1 is not equal to the type of $array2, returns 0.
 
-If the type of $array1 is a numeric type or a muti-numeric type and every element of $array1 are equal to the corresponding index of element of $array2, returns 1, otherwise returns 0.
+If the type of $array1 is a numeric array type or a muti-numeric type and every element of $array1 are equal to the corresponding index of element of $array2, returns 1, otherwise returns 0.
 
-If the type of $array1 is string type, returns the return value of L</"equals_string"> method.
+If the type of $array1 is string array type and $shallow is a false value, returns the return value of L</"equals_string"> method.
+
+If the type of $array1 is string array type and $shallow is a true value, returns the return value of L</"equals_string_address"> method.
+
+If the type of $array1 is an object array type and $shallow is a false value, returns the return value of L</"equals_object"> method given L<EqualityChecker#default_equality_checker|SPVM::EqualityChecker#/"default_equality_checker">.
+
+If the type of $array1 is an object array type and $shallow is a true value, returns the return value of L</"equals_object_address"> method.
 
 Exceptions:
 
@@ -1123,7 +1135,25 @@ The type of the array $array1 must be an array type. Otherwise, an exception is 
 
 The type of the array $array2 must be an array type. Otherwise, an exception is thrown.
 
-The type of the $array must be a numeric array type, a multi-numeric array type, or string array type. Otherwise, an exception is thrown.
+The type of the $array must be a numeric array type, a multi-numeric array type, string array type, or an object array type. Otherwise, an exception is thrown.
+
+=head2 copy_any_numeric
+
+C<static method copy_any_numeric : object ($array : object, $offset : int = 0, $length : int = -1);>
+
+Create a new array of the same type of $array with $length, and copy the elements from $offset to the position proceeded by $length to the created array.
+
+If $length is less than 0, it is the length of $array minus $offset.
+
+Exceptions:
+
+$array must be defined. Otherwise an exception is thrown.
+
+The type of the array $array must be a numeric array type or a multi-numeric type.
+
+$offset must be greater than or equal to 0. Otherwise an exception is thrown.
+
+$offset + $length must be less than or equal to the length of $array. Otherwise an exception is thrown.
 
 =head1 Copyright & License
 

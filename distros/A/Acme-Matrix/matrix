@@ -1,6 +1,6 @@
 #!usr/bin/perl;
-use Acme::Matrix;
-Acme::Matrix->start();
+use Acme::Matrix::Cmd;
+Acme::Matrix::Cmd->run(@ARGV);
 __END__ 
 
 =head1 NAME
@@ -9,6 +9,10 @@ matrix - Heavenly digital rain.
   
 =head1 USAGE
   
-        lnation:High lnation$ matrix
+	lnation$ matrix
+
+	lnation$ matrix help
+
+	lnation$ matrix d=50 c='["X","Y","Z"]' w='["Hello", "World"]' s=1
  
 =cut

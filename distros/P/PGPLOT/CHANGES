@@ -1,3 +1,6 @@
+2.33 2024-09-17
+- fix ramp and rgb LUTs (and neg to be compatible) to always increase values (#16) - thanks @d-lamb
+
 2.32 2024-08-18
 - if PDL installed, force 2.089+
 

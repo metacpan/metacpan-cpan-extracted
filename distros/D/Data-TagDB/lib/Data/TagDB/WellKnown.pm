@@ -15,7 +15,7 @@ use Carp;
 
 use parent 'Data::TagDB::WeakBaseObject';
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my %wk_ise = (
     # Hints as taken from tagdb-cgi-import;
@@ -76,8 +76,25 @@ my %wk_ise = (
     also_list_contains_also     => '4c9656eb-c130-42b7-9348-a1fee3f42050',
     encoding_file_name_extension   => '3d737a5c-9389-4ae7-80ff-5f64c6b3b7f1',
     x11_colour_name             => '135032f7-cc60-46ee-8f64-1724c2a56fa2',
+    also_has_comment            => '11d8962c-0a71-4d00-95ed-fa69182788a8',
+    also_has_description        => '30710bdb-6418-42fb-96db-2278f3bfa17f',
+    also_has_proto_title        => 'a845bfb7-130f-4f55-8a6d-ea3e5b1c2a09',
     also_has_title              => 'f7fd59e6-6727-4128-a0a7-cbc702dc09b8',
+    also_has_subtitle           => 'df70343f-0c5f-4d76-93b6-4376f680f567',
     gamebook_has_title          => '1357f4c9-0419-4493-8d2c-97c6a40a9bc9',
+    ascii_code_point            => 'f4b073ff-0b53-4034-b4e4-4affe5caf72c',
+    unicode_code_point          => '5f167223-cc9c-4b2f-9928-9fe1b253b560',
+
+
+    # Number related:
+    has_prime_factor            => '7f55c943-06a4-42e4-9c02-f8d2d00479a0',
+    zero                        => 'dd8e13d3-4b0f-5698-9afa-acf037584b20',
+    one                         => 'bd27669b-201e-51ed-9eb8-774ba7fef7ad',
+    two                         => '73415b5a-31fb-5b5a-bb82-8ea5eb3b12f7',
+    three                       => 'be6d8e00-a6c1-5c44-8ffc-f7393e14aa23',
+    four                        => '79422b2c-b6f6-547f-949f-0cba44fa69b7',
+    hrair                       => '7cb67873-33bc-4a93-b53f-072ce96c6f1a',
+
 
     # Wikidata:
     wd_unicode_character        => '615351ce-3254-5684-a1ab-93f7c852e626', # P487
@@ -226,7 +243,7 @@ Data::TagDB::WellKnown - Work with Tag databases
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

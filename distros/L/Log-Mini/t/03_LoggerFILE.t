@@ -80,6 +80,7 @@ subtest 'recreate file if its gone' => sub {
 
     $log->error('message before gone');
     unlink $file->filename;
+    sleep 1;
 
     $log->error('message after gone');
     undef $log;

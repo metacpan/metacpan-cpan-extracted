@@ -1377,6 +1377,60 @@ C<static method is_string_array : int ($object : object)>
 
 If $object is defined and the type of $object is string array type C<string[]>, returns 1, otherwise returns 0.
 
+=head2 length
+
+C<static method length : int ($array_or_string : object);>
+
+Returns the array length of $array_or_string if the type of $array_or_sring is an array type.
+
+Returns the string length of $array_or_string if the type of $array_or_sring is string type.
+
+Exceptions:
+
+$array_or_string must be defined. Otherwise an exception is thrown.
+
+The type of $array_or_string must be an array type or string type. Otherwise an exception is thrown.
+
+=head2 get_elem_or_char_size
+
+C<static method get_elem_or_char_size : int ($array_or_string : object);>
+
+Returns the element byte size of the array $array if the type of $array_or_sring is an array type.
+
+Returns 1, the byte size of C<byte> type if the type of $array_or_sring is string type.
+
+Exceptions:
+
+The array $array_or_string must be defined. Otherwise, an exception is thrown.
+
+The type of the array $array_or_string must be an array type. Otherwise, an exception is thrown.
+
+=head2 copy
+
+C<static method copy : object ($array_or_string : object, $shallow : int = 0);>
+
+Copies $array_or_string and returns it.
+
+Implementation:
+
+If $array_or_string is undef, returns undef.
+
+If the type of $array_or_string is an string array type and $shallow is a false value, the copy is performed by L<Array#copy_string|SPVM::Array/"copy_string"> method.
+
+If the type of $array_or_string is an string array type and $shallow is a true value, the copy is performed by L<Array#copy_string_address|SPVM::Array/"copy_string_address"> method.
+
+If the type of $array_or_string is an object array type and $shallow is a false value, the copy is performed by L<Array#copy_object|SPVM::Array/"copy_object"> method given L<Cloner#default_cloner|SPVM::Cloner/"default_cloner"> method.
+
+If the type of $array_or_string is an object array type and $shallow is a true value, the copy is performed by L<Array#copy_object_address|SPVM::Array/"copy_object_address"> method.
+
+If the type of $array_or_string is a numeric array type or a multi-numeric array type, the copy is performed by L<Array#copy_any_numeric|SPVM::Array/"copy_any_numeric"> method.
+
+If the type of $array_or_string is string type, the copy is performed by C<copy> operator.
+
+Exceptions:
+
+The type of $array_or_string must be an array type or string type.
+
 =head1 See Also
 
 =over 2

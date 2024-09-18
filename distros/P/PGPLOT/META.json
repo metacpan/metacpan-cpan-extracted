@@ -59,7 +59,7 @@
          "web" : "https://github.com/PDLPorters/perl5-PGPLOT"
       }
    },
-   "version" : "2.32",
+   "version" : "2.33",
    "x_IRC" : "irc://irc.perl.org/#pdl",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

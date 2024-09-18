@@ -19,6 +19,8 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'Term::ReadKey' => 0,
+	'Rope::Cmd' => 0,
+	'Ascii::Text' => 0
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Acme-Matrix-*' },

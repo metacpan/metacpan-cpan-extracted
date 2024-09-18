@@ -1036,7 +1036,11 @@ class Array {
     return $merged_array;
   }
   
-  native static method new_proto : object[] ($proto_array : object[], $length : int);
+  static method new_proto : object[] ($proto_array : object[], $length : int) {
+    return (object[])&new_proto_any($proto_array, $length);
+  }
+  
+  native static method new_proto_any : object ($proto_array : object, $length : int);
   
   static method shuffle_object : void ($array : object[], $seed_ref : int*) {
     
@@ -1328,7 +1332,7 @@ class Array {
   
   native static method new_array_proto_element : object[] ($proto_element : object, $length : int);
   
-  static method equals : int ($array1 : object, $array2 : object) {
+  static method equals : int ($array1 : object, $array2 : object, $shallow : int = 0) {
     
     if ($array1 == undef && $array2 == undef) {
       return 1;
@@ -1355,9 +1359,21 @@ class Array {
     my $elem_type_name = Fn->get_elem_type_name($array1);
     
     my $equals = 0;
-    if ($elem_type_name eq "string") {
-      
-      $equals = &equals_string((string[])$array1, (string[])$array2);
+    if (Fn->is_string_array($array1)) {
+      if ($shallow) {
+        $equals = &equals_string_address((string[])$array1, (string[])$array2);
+      }
+      else {
+        $equals = &equals_string((string[])$array1, (string[])$array2);
+      }
+    }
+    elsif (Fn->is_object_array($array1)) {
+      if ($shallow) {
+        $equals = &equals_object_address((object[])$array1, (object[])$array2);
+      }
+      else {
+        $equals = &equals_object((object[])$array1, (object[])$array2, EqualityChecker->default_equality_checker);
+      }
     }
     elsif (Fn->is_any_numeric_array($array1)) {
       
@@ -1375,9 +1391,42 @@ class Array {
       }
     }
     else {
-      die "The type of the \$array must be a numeric array type, a multi-numeric array type, or string array type";
+      die "The type of the \$array must be a numeric array type, a multi-numeric array type, string array type, or an object array type";
     }
     
     return $equals;
   }
+  
+  static method copy_any_numeric : object ($array : object, $offset : int = 0, $length : int = -1) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    unless (Fn->is_any_numeric_array($array)) {
+      die "The type of the array \$array must be a numeric array type or a multi-numeric type.";
+    }
+    
+    unless ($offset >= 0) {
+      die "The offset \$offset must be greater than or equal to 0.";
+    }
+    
+    my $array_length = Fn->array_length($array);
+    if ($length < 0) {
+      $length = $array_length - $offset;
+    }
+    
+    unless ($offset + $length <= $array_length) {
+      die "The offset \$offset + the length \$length must be less than or equal to the length of the array \$array.";
+    }
+    
+    my $elem_size = Fn->get_elem_size($array);
+    
+    my $new_array = Array->new_proto_any($array, $length);
+    
+    Fn->memcpy($new_array, 0, $array, $elem_size * $offset, $elem_size * $length);
+    
+    return $new_array;
+  }
+  
 }

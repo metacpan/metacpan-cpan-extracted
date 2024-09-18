@@ -24,7 +24,7 @@ use Data::TagDB::MultiIterator;
 use Data::TagDB::WellKnown;
 use Data::URIID::Colour;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 
 
@@ -330,6 +330,7 @@ sub _register_basic_decoders {
     $self->register_decoder($wk->colour_value,          $wk->hex_rgb_encoding,                  $decode_colour);
 
     $self->_register_backup_type($wk->wd_unicode_character, $wk->unicode_string);
+    $self->_register_backup_type($wk->also_has_description, $wk->unicode_string);
 
     return $decoders;
 }
@@ -485,7 +486,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

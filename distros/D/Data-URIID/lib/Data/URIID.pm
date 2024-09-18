@@ -21,7 +21,7 @@ use I18N::LangTags::Detect;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my %names = (
     service => {
@@ -104,6 +104,8 @@ my %names = (
         'media-subtype-identifier'      => 'c1166bf7-c4ab-40ad-9a92-a55103bec509', # P1163, commonly also called media-type or mime-type.
         'gtin'                          => '82d529be-0f00-4b4f-a43f-4a22de5f5312',
         'small-identifier'              => 'f87a38cb-fd13-4e15-866c-e49901adbec5',
+        'language-tag-identifier'       => 'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1',
+        'chat-0-word-identifier'        => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a',
     },
     action => {
         #What about: search/lookup? list? content?
@@ -167,21 +169,39 @@ sub lookup {
     }
 
     unless (blessed $uri) {
-        if ($type eq 'qrcode') {
-            # Bit more relaxed URLs...
-            $uri =~ s#^www\.#https://www.#; # Try to add missing protocol.
-            $type = 'auto';
-        }
+        if (ref $type) {
+            my URI $u;
 
-        if ($type eq 'auto' || $type eq 'ise') {
-            if ($uri =~ /^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/) {
-                $uri = 'urn:uuid:'.$uri;
-            } elsif ($uri =~ /^[1-3](?:\.(?:0|[1-9][0-9]*))+$/) {
-                $uri = 'urn:oid:'.$uri;
+            if ($type->isa('URI')) {
+                $type = $self->lookup($type);
             }
-        }
 
-        $uri = URI->new($uri);
+            $type = $type->ise;
+            $u = URI->new('https://uriid.org/');
+            $u->path_segments('', $type, $uri);
+            $uri = $u;
+        } else {
+
+            if ($type eq 'qrcode') {
+                # Bit more relaxed URLs...
+                $uri =~ s#^www\.#https://www.#; # Try to add missing protocol.
+                $type = 'auto';
+            }
+
+            if ($type eq 'auto' || $type eq 'ise') {
+                if ($uri =~ /^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/) {
+                    $uri = 'urn:uuid:'.$uri;
+                } elsif ($uri =~ /^[1-3](?:\.(?:0|[1-9][0-9]*))+$/) {
+                    $uri = 'urn:oid:'.$uri;
+                }
+            } elsif ($type =~ /^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/) {
+                my $u = URI->new('https://uriid.org/');
+                $u->path_segments('', $type, $uri);
+                $uri = $u;
+            }
+
+            $uri = URI->new($uri);
+        }
     }
 
     croak 'Passed a non-URI object' unless $uri->isa('URI');
@@ -310,7 +330,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -381,7 +401,8 @@ Takes an L<URI> object (preferred) or a plain string as argument.
 Alternatively can internally also convert from
 L<Mojo::URL>, L<Data::URIID::Service>, L<Data::URIID::Result>, and L<Data::URIID::Colour>.
 
-C<$type> is one of C<uri>, C<ise>, or C<qrcode>. Defaults to C<uri>.
+C<$type> is one of C<uri>, C<ise>, or C<qrcode>, an UUID, or an object of type L<URI> or L<Data::URIID::Result>.
+Defaults to C<uri>.
 When C<ise> an UUID or OID can be provided instead of an URI.
 When C<qrcode> the text content from an QR code can be provided.
 

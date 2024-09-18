@@ -25,6 +25,7 @@ examples/job-worker.pl
 examples/lrange.pl
 examples/moving-sum.pl
 examples/multi.pl
+examples/mutex.pl
 examples/ping.pl
 examples/pub.pl
 examples/redis-cli
@@ -37,6 +38,7 @@ lib/Net/Async/Redis/Cluster/Multi.pm
 lib/Net/Async/Redis/Cluster/Node.pm
 lib/Net/Async/Redis/Cluster/Node.pod
 lib/Net/Async/Redis/Commands.pm
+lib/Net/Async/Redis/Commands.pod
 lib/Net/Async/Redis/Multi.pm
 lib/Net/Async/Redis/Protocol.pm
 lib/Net/Async/Redis/Server.pm

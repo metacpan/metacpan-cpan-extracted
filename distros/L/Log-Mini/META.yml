@@ -28,7 +28,7 @@ no_index:
 provides:
   Log::Mini:
     file: lib/Log/Mini.pm
-    version: v0.5.0
+    version: v0.5.1
   Log::Mini::Logger::Base:
     file: lib/Log/Mini/Logger/Base.pm
   Log::Mini::Logger::FILE:
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/alpha6/Log-Mini/issues
   homepage: https://github.com/alpha6/Log-Mini
   repository: https://github.com/alpha6/Log-Mini.git
-version: 0.5.0
+version: 0.5.1
 x_contributors:
   - 'Denis Fedoseev <denis@fedoseev.work>'
   - 'medvedych <medvedych@whataco.de>'

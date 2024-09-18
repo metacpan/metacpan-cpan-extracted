@@ -31,7 +31,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my %digest_name_converter = (
     fc('md5')   => 'md-5-128',
@@ -617,8 +617,9 @@ my %syntax = (
     'aev-identifier'                => qr/^[\w\/\d]+$/,
     'unesco-thesaurus-identifier'   => qr/^concept[0-9]+$/,
     'gtin'                          => qr/^[0-9]{8}(?:[0-9]{4,6})?$/,
+    'language-tag-identifier'       => qr/^[0-9a-zA-Z-]+$/,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
-    (map {$_        => RE_UINT} qw(e621-post-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier)),
+    (map {$_        => RE_UINT} qw(e621-post-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier)),
 );
 
 my %fellig_tables = (
@@ -1266,6 +1267,11 @@ sub _id_conv__uuid__media_subtype_identifier {
     $self->{id}{$type_want} = $self->_media_subtype_to_uuid($id);
 }
 
+sub _id_conv__uuid__language_tag_identifier {
+    my ($self, $type_want, $type_name_have, $id) = @_;
+    $self->{id}{$type_want} = create_uuid_as_string(UUID_SHA1, '47dd950c-9089-4956-87c1-54c122533219', lc $id);
+}
+
 sub _id_conv__uuid__fellig_identifier {
     my ($self, $type_want, $type_name_have, $id) = @_;
     my ($table, $num) = $id =~ /^([A-Z]+)([1-9][0-9]*)$/;
@@ -1320,7 +1326,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

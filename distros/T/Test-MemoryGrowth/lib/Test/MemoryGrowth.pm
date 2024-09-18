@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package Test::MemoryGrowth;
+package Test::MemoryGrowth 0.05;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Test::Builder::Module );
-
-our $VERSION = '0.04';
 
 our @EXPORT = qw(
    no_growth
@@ -24,6 +22,8 @@ use constant HAVE_DEVEL_MAT_DUMPER => defined eval { require Devel::MAT::Dumper 
 C<Test::MemoryGrowth> - assert that code does not cause growth in memory usage
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Test::More;
    use Test::MemoryGrowth;
@@ -129,6 +129,8 @@ object types that have increased by at least one per call are reported.
 For example, the output might contain the following extra lines of diagnostic
 output:
 
+=for highlighter
+
    # Growths in arena object counts:
    #   ARRAY 1735 -> 11735 (1.00 per call)
    #   HASH 459 -> 10459 (1.00 per call)
@@ -151,6 +153,8 @@ This pair of files may be useful for differential analysis.
 
 =head1 FUNCTIONS
 
+=for highlighter language=perl
+
 =cut
 
 sub get_heapcounts
@@ -162,19 +166,61 @@ sub get_heapcounts
    return $counts;
 }
 
-sub get_memusage
+sub get_memusage_linux
 {
    # TODO: This implementation sucks piggie. Write a proper one
    open( my $statush, "<", "/proc/self/status" ) or die "Cannot open status - $!";
 
    m/^VmSize:\s+([0-9]+) kB/ and return $1 for <$statush>;
+}
 
-   die "Unable to determine VmSize\n";
+sub get_memusage_freebsd
+{
+   open( my $procstath, "-|", "procstat -v $$" ) or die "Cannot open procstat - $!";
+   # Sample command output (some parts of it at least):
+   # PID              START                END PRT  RES PRES REF SHD FLAG  TP PATH
+   # 18607           0x200000           0x3e5000 r--  353  729   8   4 CN--- vn /root/perl5/perlbrew/perls/perl-5.40.0/bin/perl
+   # 18607           0x3e5000           0x55c000 r-x  375  729   8   4 CN--- vn /root/perl5/perlbrew/perls/perl-5.40.0/bin/perl
+   # 18607           0x55c000           0x55d000 r--    1    0   1   0 CN--- vn /root/perl5/perlbrew/perls/perl-5.40.0/bin/perl
+   # 18607           0x55d000           0x55f000 rw-    2    0   1   0 CN--- vn /root/perl5/perlbrew/perls/perl-5.40.0/bin/perl
+   # 18607           0x55f000           0x567000 rw-    8    8   1   0 C---- sw
+   # 18607        0x801148000        0x821128000 ---    0    0   0   0 ----- gd
+   # 18607        0x821128000        0x821148000 rw-    8    8   1   0 C--D- sw
+   # 18607        0x821a0d000        0x821a0e000 r-x    1    1 115   0 ----- ph
+   # 18607        0x82293f000        0x82294c000 r--   13   32  34  14 CN--- vn /lib/libthr.so.3
+   # 18607        0x82294c000        0x82295e000 r-x   18   32  34  14 CN--- vn /lib/libthr.so.3
+   # 18607        0x82794b000        0x82794f000 r-x    4    5   4   2 CN--- vn /root/perl5/perlbrew/perls/perl-5.40.0/lib/5.40.0/amd64-freebsd/auto/mro/mro.so
+   # 18607        0x82794f000        0x827950000 r--    1    0   1   0 CN--- vn /root/perl5/perlbrew/perls/perl-5.40.0/lib/5.40.0/amd64-freebsd/auto/mro/mro.so
+   # 18607        0x827950000        0x827951000 rw-    1    0   1   0 CN--- vn /root/perl5/perlbrew/perls/perl-5.40.0/lib/5.40.0/amd64-freebsd/auto/mro/mro.so
+   # 18607        0x828599000        0x82859a000 r--    1    2   4   2 CN--- vn /root/perl5/perlbrew/perls/perl-5.40.0/lib/site_perl/5.40.0/amd64-freebsd/auto/Devel/Gladiator/Gladiator.so
+   # 18607        0x82859a000        0x82859c000 r-x    2    2   4   2 CN--- vn /root/perl5/perlbrew/perls/perl-5.40.0/lib/site_perl/5.40.0/amd64-freebsd/auto/Devel/Gladiator/Gladiator.so
+
+   my $head = <$procstath>;
+   my @columns = split /\s+/, $head;
+   my ($res_column) = grep { $columns[$_] eq 'RES' } 0 .. $#columns;
+   my ($pres_column) = grep { $columns[$_] eq 'PRES' } 0 .. $#columns;
+
+   my $pages = 0;
+   while (my $line = <$procstath>) {
+      @columns = split /\s+/, $line;
+      $pages += $columns[$res_column] + $columns[$pres_column];
+   }
+
+   # NOTE: FreeBSD wiki states that page size is 4KB *on most platforms*.
+   # I don't know how to query the system for its page size
+   return 4 * $pages if $pages > 0;
+}
+
+BEGIN {
+   my $get_memusage = __PACKAGE__->can( "get_memusage_$^O" )
+      or die "Unable to find an implementation of get_memusage for OS=$^O";
+
+   *get_memusage = $get_memusage;
 }
 
 =head2 no_growth
 
-   no_growth { CODE } %opts, $name
+   no_growth { CODE } %opts, $name;
 
 Assert that the code block does not consume extra memory.
 
@@ -291,12 +337,15 @@ sub no_growth(&@)
 
 =over 8
 
-=item * Don't be Linux Specific
+=item * More OS portability
 
-Currently, this module uses a very Linux-specific method of determining
-process memory usage (namely, by inspecting F</proc/self/status>). This should
-really be fixed to some OS-neutral abstraction. Currently I am unaware of a
-simple portable mechanism to query this. Patches very much welcome. :)
+Currently, this module uses OS-specific methods of determining process memory
+usage (namely, by inspecting F</proc/self/status> on Linux or calling
+F<procstat> on FreeBSD). It would be nice to support more OSes, and
+potentially find a better abstraction for doing so.
+
+Currently I am unaware of a simple portable mechanism to query this. Patches
+very much welcome. :)
 
 =back
 

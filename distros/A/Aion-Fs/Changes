@@ -1,5 +1,12 @@
 Revision history for Perl extension Aion::Fs
 
+0.0.7 2024-09-17T22:22:33Z
+
+    - add subroutines path and sta. sta while on ro
+    - find optimize by memory
+    - find safe use $_ in filters, noenter and errorenter
+    - find may be stop with find_stop
+
 0.0.6 2023-11-15T09:59:00Z
 
     - add unsupported os

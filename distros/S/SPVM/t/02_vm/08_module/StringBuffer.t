@@ -9,7 +9,8 @@ use Test::More;
 use SPVM 'TestCase::Module::StringBuffer';
 
 # Start objects count
-my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
+my $api = SPVM::api();
+my $start_memory_blocks_count = $api->get_memory_blocks_count();
 
 # SPVM::StringBuffer
 {
@@ -42,12 +43,14 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   
   ok(SPVM::TestCase::Module::StringBuffer->cmp);
   
+  ok(SPVM::TestCase::Module::StringBuffer->eq);
   # Extra
   ok(SPVM::TestCase::Module::StringBuffer->extra);
 }
 
 # All object is freed
-my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
+$api->set_exception(undef);
+my $end_memory_blocks_count = $api->get_memory_blocks_count();
 is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

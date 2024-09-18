@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use URI;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 
 
@@ -195,6 +195,30 @@ sub icontext {
     }
 }
 
+
+sub description {
+    my ($self) = @_;
+    if (exists $self->{description}) {
+        return $self->{description};
+    } else {
+        my $db = $self->db;
+        my $wk = $db->wk;
+
+        $self->{description} = undef; # set to undef as a default.
+
+        foreach my $relation (
+            [qw(also_has_description)],
+            [qw(tagpool_description)],
+        ) {
+            $relation = [grep {defined} map {eval{$wk->_call($_)}} @{$relation}];
+            ($self->{description}) = $db->metadata(tag => $self, relation => $relation)->collect('data', skip_died => 1);
+            last if defined $self->{description};
+        }
+
+        return $self->{description};
+    }
+}
+
 # ---- Private helpers ----
 
 sub _new {
@@ -337,7 +361,7 @@ Data::TagDB::Tag - Work with Tag databases
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -404,6 +428,12 @@ This can be used as a visual aid for the user.
 It is not well defined what single character means in this case. A single character may map
 to multiple unicode code points (such as a base and modifiers). If the application requies a
 specific definition of single character it must validate the value.
+
+=head2 description
+
+    my $description = $tag->description;
+
+Returns a description that can be used to display to the user or C<undef>.
 
 =head1 AUTHOR
 

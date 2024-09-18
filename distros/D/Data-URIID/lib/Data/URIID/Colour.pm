@@ -15,7 +15,7 @@ use overload '""' => \&rgb;
 use Carp;
 use UUID::Tiny ':std';
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 
 
@@ -69,7 +69,7 @@ Data::URIID::Colour - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

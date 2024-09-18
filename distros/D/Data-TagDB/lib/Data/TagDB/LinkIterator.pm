@@ -15,7 +15,7 @@ use parent 'Data::TagDB::Iterator';
 
 use Carp;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 
 sub new {
@@ -72,7 +72,7 @@ Data::TagDB::LinkIterator - Work with Tag databases
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

@@ -5825,4 +5825,404 @@ class TestCase::Module::Fn {
     return 1;
   }
   
+  static method length : int () {
+    
+    {
+      my $array = new int[3];
+      
+      my $ret = Fn->length($array);
+      
+      unless ($ret == 3) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = (object)new int[3];
+      
+      my $ret = Fn->length($array);
+      
+      unless ($ret == 3) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new object[3];
+      
+      my $ret = Fn->length($array);
+      
+      unless ($ret == 3) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new Point[3];
+      
+      my $ret = Fn->length($array);
+      
+      unless ($ret == 3) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new Complex_2d[3];
+      
+      my $ret = Fn->length($array);
+      
+      unless ($ret == 3) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "abc";;
+      
+      my $ret = Fn->length($string);
+      
+      unless ($ret == 3) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $array = new int[3];
+        
+        eval { Fn->length(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $array = Point->new;
+        
+        eval { Fn->length($array); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method get_elem_or_char_size : int () {
+    
+    {
+      my $array = new byte[3];
+      
+      my $ret = Fn->get_elem_or_char_size($array);
+      
+      unless ($ret == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new short[3];
+      
+      my $ret = Fn->get_elem_or_char_size($array);
+      
+      unless ($ret == 2) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new int[3];
+      
+      my $ret = Fn->get_elem_or_char_size($array);
+      
+      unless ($ret == 4) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new long[3];
+      
+      my $ret = Fn->get_elem_or_char_size($array);
+      
+      unless ($ret == 8) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new float[3];
+      
+      my $ret = Fn->get_elem_or_char_size($array);
+      
+      unless ($ret == 4) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new double[3];
+      
+      my $ret = Fn->get_elem_or_char_size($array);
+      
+      unless ($ret == 8) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = (object)new int[3];
+      
+      my $ret = Fn->get_elem_or_char_size($array);
+      
+      unless ($ret == 4) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new object[3];
+      
+      my $ret = Fn->get_elem_or_char_size($array);
+      
+      unless ($ret == Fn->sizeof_native_pointer) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new Point[3];
+      
+      my $ret = Fn->get_elem_or_char_size($array);
+      
+      unless ($ret == Fn->sizeof_native_pointer) {
+        return 0;
+      }
+    }
+    
+    {
+      my $array = new Complex_2d[3];
+      
+      my $ret = Fn->get_elem_or_char_size($array);
+      
+      unless ($ret == 16) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "abc";
+      
+      my $ret = Fn->get_elem_or_char_size($string);
+      
+      unless ($ret == 1) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $array = new int[3];
+        
+        eval { Fn->get_elem_or_char_size(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $array = Point->new;
+        
+        eval { Fn->get_elem_or_char_size($array); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method copy : int () {
+    
+    {
+      my $array = [1, 2, 3];
+      my $array_out = Fn->copy($array);
+      
+      unless ($array_out is_compile_type object) {
+        return 0;
+      }
+    }
+    
+    # copy numeric array
+    {
+      my $array = [1, 2, 3];
+      my $array_out = (int[])Fn->copy($array);
+      
+      unless (Array->equals($array_out, $array)) {
+        return 0;
+      }
+      
+      if ($array == $array_out) {
+        return 0;
+      }
+    }
+    
+    # copy numeric array
+    {
+      my $array = [1, 2, 3];
+      my $array_out = (int[])Fn->copy($array);
+      
+      unless (Array->equals($array_out, $array)) {
+        return 0;
+      }
+      
+      if ($array == $array_out) {
+        return 0;
+      }
+    }
+    
+    # copy multi numeric array
+    {
+      my $array = Complex_2d->new_array_from_pairs([(double)1,2,  3,4]);
+      my $array_out = (Complex_2d[])Fn->copy($array);
+      
+      unless (Array->equals($array_out, $array)) {
+        return 0;
+      }
+      
+      if ($array == $array_out) {
+        return 0;
+      }
+    }
+    
+    # copy object array
+    {
+      my $array = [Point->new(1, 2), Point->new(3, 4), undef];
+      my $array_out = (Point[])Fn->copy($array);
+      
+      unless ($array_out->[0]->x == $array->[0]->x) {
+        return 0;
+      }
+      
+      unless ($array_out->[0]->y == $array->[0]->y) {
+        return 0;
+      }
+      
+      if ($array_out->[0] == $array->[0]) {
+        return 0;
+      }
+      
+      unless ($array_out->[1]->x == $array->[1]->x) {
+        return 0;
+      }
+      
+      unless ($array_out->[1]->y == $array->[1]->y) {
+        return 0;
+      }
+      
+      if ($array_out->[1] == $array->[1]) {
+        return 0;
+      }
+      
+      unless ($array_out->[2] == undef) {
+        return 0;
+      }
+      
+      if ($array == $array_out) {
+        return 0;
+      }
+    }
+    
+    # copy object array
+    {
+      my $array = [Point->new, Point->new, Point->new];
+      my $shallow = 1;
+      my $array_out = (Point[])Fn->copy($array, $shallow);
+      
+      unless (Array->equals_object_address($array_out, $array)) {
+        return 0;
+      }
+      
+      if ($array == $array_out) {
+        return 0;
+      }
+    }
+    
+    # copy string array
+    {
+      my $array = ["a", "b", "c"];
+      my $array_out = (string[])Fn->copy($array);
+      
+      unless (Array->equals_string($array_out, $array)) {
+        return 0;
+      }
+      
+      if (Array->equals_string_address($array_out, $array)) {
+        return 0;
+      }
+      
+      if ($array == $array_out) {
+        return 0;
+      }
+    }
+    
+    # copy string array - shallow
+    {
+      my $array = ["a", "b", "c"];
+      my $shallow = 1;
+      my $array_out = (string[])Fn->copy($array, $shallow);
+      
+      unless (Array->equals_string_address($array_out, $array)) {
+        return 0;
+      }
+      
+      if ($array == $array_out) {
+        return 0;
+      }
+    }
+    
+    # copy string
+    {
+      my $string = "abc";
+      my $string_out = (string)Fn->copy($string);
+      
+      # Equals the value
+      unless ($string_out eq "abc") {
+        return 0;
+      }
+      
+      # Not equals address
+      if ($string == $string_out) {
+        return 0;
+      }
+    }
+    
+    # undef
+    {
+      my $string_out = Fn->copy(undef);
+      
+      # Equals the value
+      unless ($string_out == undef) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }

@@ -1,12 +1,13 @@
+.editorconfig
 Build.PL
 Changes
 lib/Test/MemoryGrowth.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01leak.t
 t/02counts.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

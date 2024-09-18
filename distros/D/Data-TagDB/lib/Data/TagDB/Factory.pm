@@ -20,7 +20,7 @@ use parent 'Data::TagDB::WeakBaseObject';
 use constant NS_DATE => 'fc43fbba-b959-4882-b4c8-90a288b7d416';
 use constant RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 
 
@@ -135,6 +135,160 @@ sub create_wikidata {
     }
 
     return $self->generate(%opts, ns => $ns, style => 'id-based', request => $qid);
+}
+
+
+sub create_integer {
+    my ($self, $int) = @_;
+    my Data::TagDB $db = $self->db;
+    my Data::TagDB::WellKnown $wk = $self->wk;
+    my Data::TagDB::Tag $ns = $self->create_namespace('5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99' => 'integer-namespace');
+    my %opts;
+
+    croak 'Invalid integer: '.$int unless $int =~ /^[\+\-]?[0-9]+$/;
+    $int = int($int);
+
+    if ($int > 0) {
+        $opts{generator} = $self->create_generator(
+            uuid        => '53863a15-68d4-448d-bd69-a9b19289a191',
+            tagname     => 'unsigned-integer-generator',
+            ns          => $ns,
+            for_type    => $db->create_tag([$wk->uuid => 'dea3782c-6bcb-4ce9-8a39-f8dab399d75d'], [$wk->tagname => 'unsigned-integer']),
+            style       => 'integer-based',
+        );
+    } else {
+        $opts{generator} = $self->create_generator(
+            uuid        => 'e8aa9e01-8d37-4b4b-8899-42ca0a2a906f',
+            tagname     => 'signed-integer-generator',
+            ns          => $ns,
+            for_type    => $db->create_tag([$wk->uuid => 'd191954d-b30d-4d3b-94ea-babadb2f2901'], [$wk->tagname => 'signed-integer']),
+            style       => 'integer-based',
+        );
+    }
+
+    {
+        my Data::TagDB::Tag $tag = $self->generate(%opts, ns => $ns, style => 'integer-based', request => $int);
+
+        unless ($int & 1) {
+            $db->create_relation(tag => $tag, relation => $wk->has_prime_factor(1), related => $wk->two(1));
+        }
+
+        return $tag;
+    }
+}
+
+
+sub create_character {
+    my $self;
+    my %data;
+    my $unicode_cp;
+    my $unicode_cp_str;
+
+    if (scalar(@_) == 2) {
+        ($self, $data{unicode}) = @_;
+    } else {
+        ($self, %data) = @_;
+    }
+
+    if (defined $data{unicode}) {
+        if ($data{unicode} =~ /^[Uu]\+([0-9a-fA-F]+)$/) {
+            $unicode_cp = hex($1);
+        } else {
+            $unicode_cp = int($data{unicode});
+        }
+    } elsif (defined $data{ascii}) {
+        $unicode_cp = int($data{ascii});
+        croak 'US-ASCII character out of range: '.$unicode_cp if $unicode_cp > 0x7F;
+    } elsif (defined $data{raw}) {
+        croak 'Raw value is not exactly one character long' unless length($data{raw}) == 1;
+        $unicode_cp = ord($data{raw});
+    }
+
+    croak 'Unicode character out of range: '.$unicode_cp if $unicode_cp < 0 || $unicode_cp > 0x10FFFF;
+
+    $unicode_cp_str = sprintf('U+%04X', $unicode_cp);
+
+    {
+        my Data::TagDB $db = $self->db;
+        my Data::TagDB::WellKnown $wk = $self->wk;
+        my Data::TagDB::Tag $asi = $wk->also_shares_identifier;
+        my Data::TagDB::Tag $ns = $self->create_namespace('132aa723-a373-48bf-a88d-69f1e00f00cf' => 'unicode-character-namespace');
+        my Data::TagDB::Tag $tag;
+        my %opts;
+
+        require charnames;
+
+        $opts{generator} = $self->create_generator(
+            uuid        => 'd74f8c35-bcb8-465c-9a77-01010e8ed25c',
+            tagname     => 'unicode-character-generator',
+            ns          => $ns,
+            for_type    => $db->create_tag([$wk->uuid => '5ee5f216-5e7a-443b-a234-db5c032d4710'], [$wk->tagname => 'unicode-character']),
+            style       => 'id-based',
+        );
+
+        $tag = $self->generate(%opts, ns => $ns, style => 'id-based', request => $unicode_cp_str);
+
+        $db->create_metadata(tag => $tag, relation => $asi, type => $wk->unicode_code_point(1), data_raw => $unicode_cp_str);
+        if ($unicode_cp <= 0x7F) {
+            $db->create_metadata(tag => $tag, relation => $asi, type => $wk->ascii_code_point(1), data_raw => $unicode_cp);
+        }
+        if ($unicode_cp > 0x20 && $unicode_cp < 0x7F) {
+            $db->create_metadata(tag => $tag, relation => $asi, type => $wk->tagname(1), data_raw => chr($unicode_cp));
+        }
+        $db->create_metadata(tag => $tag, relation => $asi, type => $wk->tagname(1), data_raw => charnames::viacode($unicode_cp));
+
+        return $tag;
+    }
+}
+
+
+sub create_colour {
+    my ($self, $colour) = @_;
+    my Data::TagDB $db = $self->db;
+    my Data::TagDB::WellKnown $wk = $self->wk;
+    my Data::TagDB::Tag $ns = $self->create_namespace('88d3944f-a13b-4e35-89eb-e3c1fbe53e76');
+    my Data::TagDB::Tag $tag;
+    my $rgb;
+    my %opts;
+
+    if (ref $colour) {
+        # If it's a ref but not blessed we don't care if it fails
+        if ($colour->isa('Data::URIID::Colour')) {
+            $colour = $colour->rgb;
+        } elsif ($colour->isa('Color::Library::Color')) {
+            $colour = $colour->css;
+        } elsif ($colour->isa('Graphics::Color::RGB')) {
+            $colour = $colour->as_css_hex;
+        } else {
+            croak 'Unsupported type';
+        }
+    }
+
+    # Check basic format first, then normalise
+    croak 'Colour is in invalid format' unless $colour =~ /^#[0-9a-fA-F]+$/;
+
+    # Normalise
+    $colour = lc($colour);
+    $colour = "#$1$1$2$2$3$3" if $colour =~ /^#([0-9a-f])([0-9a-f])([0-9a-f])$/;
+    $rgb    = uc($colour) if $colour =~ /^#[0-9a-f]{6}$/;
+    $colour = sprintf('#%s%s%s', $1 x 6, $2 x 6, $3 x 6) if $colour =~ /^#([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/;
+
+    # And do a funal check
+    croak 'Invalid colour value' unless $colour =~ /^#[0-9a-f]{36}$/;
+
+    $opts{generator} = $self->create_generator(
+        uuid        => '55febcc4-6655-4397-ae3d-2353b5856b34',
+        tagname     => 'rgb-colour-generator',
+        ns          => $ns,
+        for_type    => $db->create_tag([$wk->uuid => '5f281982-f9b8-4203-8c62-fb951a5989cc'], [$wk->tagname => 'rgb-colour']),
+        style       => 'id-based',
+    );
+
+    $tag = $self->generate(%opts, ns => $ns, style => 'id-based', input => $colour);
+
+    $db->create_metadata(tag => $tag, relation => $wk->has_colour_value(1), data_raw => $rgb) if defined $rgb;
+
+    return $tag;
 }
 
 
@@ -266,9 +420,9 @@ sub generate {
         } elsif ($style eq 'id-based') {
             my $name;
 
-            if (($input, $name) = $request =~ /^([a-zA-Z0-9\-\.]+) (.+)$/) {
+            if (($input, $name) = $request =~ /^(#?[a-zA-Z0-9\-\.\+]+) (.+)$/) {
                 # noop
-            } elsif (($input) = $request =~ /^([a-zA-Z0-9\-\.]+)$/) {
+            } elsif (($input) = $request =~ /^(#?[a-zA-Z0-9\-\.\+]+)$/) {
                 $name = undef;
             } else {
                 croak 'Invalid format, expected: "id name", or "id", got: '.$request;
@@ -276,7 +430,7 @@ sub generate {
 
             $input = lc($input);
         } elsif ($style eq 'integer-based') {
-            croak 'Invalid integer' unless $request =~ /^[0-9]+$/;
+            croak 'Invalid integer' unless $request =~ /^-?[0-9]+$/;
             $input = int($request);
         } elsif ($style eq 'tag-based') {
             unless (ref $request) {
@@ -355,7 +509,7 @@ Data::TagDB::Factory - Work with Tag databases
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -430,6 +584,64 @@ The type this generator is generating tags of.
     my Data::TagDB::Tag $tag = $factory->create_wikidata('Q2');
 
 Generates a tag for Wikidata item (Q), property (P), or lexeme (L).
+
+=head2 create_integer
+
+    my Data::TagDB::Tag $tag = $factory->create_integer($int);
+    # e.g.:
+    my Data::TagDB::Tag $tag = $factory->create_integer(5);
+
+Generates a tag for an integer (positive or negative).
+
+=head2 create_character
+
+    my Data::TagDB::Tag $tag = $factory->create_character($unicode_code_point);
+    # or:
+    my Data::TagDB::Tag $tag = $factory->create_character($type => $value);
+    # e.g.:
+    my Data::TagDB::Tag $tag = $factory->create_integer('U+1F981');
+    # or:
+    my Data::TagDB::Tag $tag = $factory->create_integer(0x1F981);
+    # or:
+    my Data::TagDB::Tag $tag = $factory->create_integer(raw => 'A');
+
+Creates a tag for a character.
+
+The code point may be passed in different ways.
+If no type is given C<unicode> is assumed. The following types are supported:
+
+=over
+
+=item C<unicode>
+
+The Unicode code point either in standard C<U+xxxx> notation or as a numerical value.
+
+=item C<ascii>
+
+The value as an US-ASCII code. The code is checked to be within the limits of US-ASCII.
+
+=item C<raw>
+
+The value as a raw string. Note that this requires the passed value to be a Perl unicode string.
+This may also result in unexpected behaviour if the passed value is composed of multiple unicode code points.
+This can for example be the case when modifiers are used with some code points.
+
+=back
+
+=head2 create_colour
+
+    my Data::TagDB::Tag $tag = $factory->create_colour($colour);
+    # e.g.:
+    my Data::TagDB::Tag $tag = $factory->create_colour('#c0c0c0');
+    # or:
+    my Data::URIID::Colour $colour = ...;
+    my Data::TagDB::Tag $tag = $factory->create_colour($colour);
+
+Creates a tag for a colour.
+The passed colour must be in hash-and-hex format or a valid colour object
+from one of the supported modules.
+
+Currently L<Data::URIID::Colour>, L<Color::Library::Color>, and L<Graphics::Color::RGB> are supported.
 
 =head2 create_date
 

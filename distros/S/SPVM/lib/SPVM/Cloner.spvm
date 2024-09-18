@@ -2,5 +2,27 @@
 # MIT License
 
 class Cloner : interface_t {
+  
+  use Cloneable;
+  
+  # Interface Methods
   required method : object ($object : object);
+  
+  # Class Methods
+  static method default_cloner : Cloner () {
+    
+    my $default_cloner = method : object ($object : Cloneable) {
+    
+      my $clone = (object)undef;
+      
+      if ($object) {
+        $clone = $object->clone;
+      }
+      
+      return $clone;
+    };
+    
+    return $default_cloner;
+  }
+  
 }

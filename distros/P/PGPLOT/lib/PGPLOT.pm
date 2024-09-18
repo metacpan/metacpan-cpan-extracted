@@ -5,7 +5,7 @@ use warnings;
 use Exporter;
 use DynaLoader;
 
-our $VERSION="2.32";
+our $VERSION="2.33";
 
 our @ISA = qw(Exporter DynaLoader);
 our @EXPORT = qw( pgarro pgask pgaxis pgband pgbbuf pgbeg pgbegin pgbin pgbox

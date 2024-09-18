@@ -43,7 +43,7 @@ if (defined $app) {
 		-text => 'Add page',
 		-command => sub {
 			unless ($ext->pageExists('BOTTOM', 'BOTTOM')) {
-				my $page = $ext->pageAdd('BOTTOM', 'BOTTOM', 'edit-paste', 'BOTTOM');
+				my $page = $ext->pageAdd('BOTTOM', 'BOTTOM', 'edit-cut', 'BOTTOM');
 				$page->Label(-width => 12, -height => 8, -text => 'bottom')->pack(-expand => 1, -fill, 'both');
 				if ($ext->pageCount('BOTTOM')) {				
 					$panels->panelShow('BOTTOM');

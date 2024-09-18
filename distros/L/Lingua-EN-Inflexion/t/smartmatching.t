@@ -2,11 +2,11 @@ use Test::More;
 use Lingua::EN::Inflexion;
 
 # Smartmatching is on the way out...
-no  if $] >= 5.018, warnings => "experimental::smartmatch";   # Grrrrrrr!!!
-no  if $] >= 5.038, warnings => "deprecated::smartmatch";     # Grrrrrrrrrrrrrrr!!!
-use if $] >= 5.042, 'Test::More', skip_all => 'No smartmatch in Perl 5.42+';
+no  if $] >= 5.017, warnings => "experimental::smartmatch";   # Grrrrrrr!!!
+no  if $] >= 5.037, warnings => "deprecated::smartmatch";     # Grrrrrrrrrrrrrrr!!!
+use if $] >= 5.041, 'Test::More', skip_all => 'No smartmatch in Perl 5.42+';
 
-BEGIN { exit if $] >= 5.042; }
+BEGIN { exit if $] >= 5.041; }
 
 sub should_pass {
     my ($test, $desc) = @_;

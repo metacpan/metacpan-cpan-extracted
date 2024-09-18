@@ -246,10 +246,8 @@ function next_play => sub {
 	}
 
 	$self->cannot_play = {};
-	
 	# now we know cards can't be played confirm we have cards left to Play another 'play'.
 	return $game->end_hands() if !$available_cards;
-
 	my $scored;
 
 	if (!$self->play->scored->[-1] || !$self->play->scored->[-1]->go) {

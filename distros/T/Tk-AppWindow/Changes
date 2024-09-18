@@ -1,8 +1,16 @@
 Revision history for Perl extension Tk::AppWindow.
 
-0.12 Wed Jul 10 2024
+0.14 Tue Sep 17 2024
+	- Fixed bug with selecting page in extension SideBars.
+
+0.13 Tue Sep 17 2024
+	- Fixed crashes with extension SideBars.
+	- Updated documentation.
+
+0.12 Tue Sep 10 2024
 	- Added ReConfigure method to extension SideBars.
 	- Fixed some issues in exenstion SideBars and Panels
+	- Extension help now uses Tk::PodViewer instead of Tk::Pod
 
 0.11 Wed Jul 10 2024
 	- Extension Help: components tab in About box is now a HList widget.

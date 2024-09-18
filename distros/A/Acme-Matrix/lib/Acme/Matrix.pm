@@ -1,5 +1,5 @@
 package Acme::Matrix;
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 use 5.006; use strict; use warnings;
 use Term::ReadKey; 
 
@@ -53,8 +53,10 @@ sub start {
 	my ($pkg, %args) = @_;
 	@WORDS = @{$args{words}} if ($args{words});
 	@CHARS = @{$args{chars}} if ($args{chars});
+	my $delay = $args{delay} ? $args{delay} / 1000 : 0.01;
+	my $space = " " x ($args{spacing} || 2);
 	my ($wchar, $hchar) = GetTerminalSize();
-	$wchar = $wchar * ($args{offset} || 0.49);
+	$wchar = $wchar * (0.99 / ($args{spacing} || 2));
 	my %word_lines = (
 		map { $_ => [] } 0 .. $wchar 
 	);
@@ -66,12 +68,12 @@ sub start {
 				my $i = 0;
 				push @{$word_lines{$_}}, (int(rand(1) + 0.5)) 
 					? sprintf("\033[38;5;%sm%s", $COLOURS[int(rand(scalar @COLOURS))], $CHARS[int(rand(scalar @CHARS))])
-					: map { sprintf("\033[38;5;%sm%s", $COLOURS[$i++], $_) } @{ $WORDS[int(rand(scalar @WORDS))] }, "  ";
+					: map { sprintf("\033[38;5;%sm%s", $COLOURS[$i++], $_) } @{ $WORDS[int(rand(scalar @WORDS))] }, $space;
 			}
-			print shift(@{$word_lines{$_}}) || "  ";
+			print shift(@{$word_lines{$_}}) || $space;
 		}
 		print "\n";
-		select(undef, undef, undef, 0.01);
+		select(undef, undef, undef, $delay);
 	}
 }
 
@@ -91,7 +93,7 @@ Acme::Matrix - Heavenly digital rain
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
@@ -127,7 +129,6 @@ Perhaps a little code snippet.
 	す  う      み  ー  し        る  カか        み味  くた  る            ド      たつン                を  ョ    い      ン
 	る  ん      こ  シ  ゅ              み  ム    をが    い  め                    な  ダ      ビ        抱  ン      フ    ド
 
-Because of the bottom up nature It's difficult to actually make it rain inside a terminal efficiently. Thus my rain is heavenly.
 
 =head1 AUTHOR
 

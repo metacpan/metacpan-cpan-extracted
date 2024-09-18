@@ -1,6 +1,6 @@
 package Game::Cribbage;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 use Rope;
 use Rope::Autoload;
@@ -653,13 +653,13 @@ Game::Cribbage - Cribbage game engine
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
 =head1 SYNOPSIS
 
-	lnation:High lnation$ cribbage
+	lnation$ cribbage
 	
 =for html <img style="width:500px" src="https://raw.githubusercontent.com/ThisUsedToBeAnEmail/Game-Cribbage/main/test.png" title="img-tag, local-dist" alt="Inlineimage" />
 

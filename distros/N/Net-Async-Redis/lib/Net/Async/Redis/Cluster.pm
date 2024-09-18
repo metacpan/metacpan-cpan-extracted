@@ -1,17 +1,9 @@
 package Net::Async::Redis::Cluster;
 
-use Object::Pad;
-class Net::Async::Redis::Cluster :isa(IO::Async::Notifier);
+use Full::Class qw(:v1), extends => qw(Net::Async::Redis::Commands);
 
-use strict;
-use warnings;
-use experimental qw(signatures);
-
-use utf8;
-
-use parent qw(Net::Async::Redis::Commands);
-
-our $VERSION = '6.001'; # VERSION
+our $VERSION = '6.002'; # VERSION
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
 
@@ -55,11 +47,6 @@ proxy routing dæmon, or a service mesh such as L<https://istio.io/|istio>.
 
 =cut
 
-no indirect;
-use Class::Method::Modifiers;
-use Syntax::Keyword::Try;
-use Syntax::Keyword::Dynamically;
-use Future::AsyncAwait;
 use Future::Utils qw(fmap_void fmap_concat);
 use List::BinarySearch::XS qw(binsearch);
 use List::UtilsBy qw(nsort_by);
@@ -67,8 +54,6 @@ use List::Util qw(first);
 use Scalar::Util qw(reftype);
 use Digest::CRC qw(crc);
 use Cache::LRU;
-
-use Log::Any qw($log);
 
 use Net::Async::Redis;
 use Net::Async::Redis::Cluster::Node;
@@ -718,8 +703,7 @@ A L<Ryu::Async> instance for source/sink creation.
 
 =cut
 
-sub ryu {
-    my ($self) = @_;
+method ryu {
     $self->{ryu} ||= do {
         $self->add_child(
             my $ryu = Ryu::Async->new

@@ -6,7 +6,7 @@ use Module::Load qw/load/;
 
 require Carp;
 
-our $VERSION = "0.5.0";
+our $VERSION = "0.5.1";
 
 sub new
 {
@@ -62,7 +62,7 @@ Log::Mini - It's a very simple logger which can log your messages to a file or S
     $file_logger->info('message to log file');
 
     #prevent buffered output. May slow down your application!
-    my $synced_file_logger = Log::Mini->get_logger(file => 'log_file.log', synced => 1);
+    my $synced_file_logger = Log::Mini->new(file => 'log_file.log', synced => 1);
 
     #format message with sprintf
     $logger->info('Message with %s %s', 'some', 'additional info');
@@ -73,6 +73,12 @@ Log::Mini - It's a very simple logger which can log your messages to a file or S
     #Null logger - drops all messages to /dev/null
     my $logger = Log::Mini->new('null);
     $logger->error('Error message'); #Message will be dropped
+
+    #Logging with context
+    $logger->push_context('order_id=1234');
+    $logger->error('something happened');
+
+    # 2024-08-14 21:53:52.267 [error] order_id=1234: something happenned
 
 
 =head1 DESCRIPTION

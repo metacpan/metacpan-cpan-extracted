@@ -1,5 +1,11 @@
 Revision history for Test-MemoryGrowth
 
+0.05    2024-09-17
+        [CHANGES]
+         * Support FreeBSD as well as Linux (other OSes still
+           "Patches Welcome")
+         * General style updates/refresh
+
 0.04    2020-06-17
         [CHANGES]
          * Optional integration with Devel::Gladiator to provide a per-type

@@ -8,9 +8,10 @@ use Test::More;
 
 use SPVM 'TestCase::Module::Native::Runtime';
 
-my $api = SPVM::api;
+
 
 # Start objects count
+my $api = SPVM::api();
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
 {
@@ -22,6 +23,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count;
 }
 
 # All object is freed
+$api->set_exception(undef);
 my $end_memory_blocks_count = $api->get_memory_blocks_count;
 is($end_memory_blocks_count, $start_memory_blocks_count);
 

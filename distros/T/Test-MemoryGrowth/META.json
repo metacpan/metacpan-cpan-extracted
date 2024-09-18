@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -25,20 +25,21 @@
             "Devel::MAT" : "0.04"
          },
          "requires" : {
-            "Test::Builder" : "0"
+            "Test::Builder" : "0",
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Builder::Tester" : "0",
-            "Test::More" : "0"
+            "Test2::V0" : "0",
+            "Test::Builder::Tester" : "0"
          }
       }
    },
    "provides" : {
       "Test::MemoryGrowth" : {
          "file" : "lib/Test/MemoryGrowth.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -47,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

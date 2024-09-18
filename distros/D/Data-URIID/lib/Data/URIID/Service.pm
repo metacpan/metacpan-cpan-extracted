@@ -24,7 +24,7 @@ use DateTime::Format::ISO8601;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my @musicbrainz_wikidata_relations = qw(P434 P435 P436 P966 P982 P1004 P1330 P1407 P4404 P5813 P6423 P8052);
 
@@ -366,6 +366,10 @@ sub _own_well_known {
                 video/webm
                 )),
         },
+        'language-tag-identifier' => {
+            en => {attributes => {displayname => {'*' => 'English'}}},
+            de => {attributes => {displayname => {'*' => 'German'}}},
+        },
         'small-identifier' => {
             map {$_->{sid} => {
                     ids => {
@@ -423,6 +427,8 @@ sub _own_well_known {
                 {uuid => 'fade296d-c34f-4ded-abd5-d9adaf37c284', sid => 61, name => 'black'},
                 {uuid => '1a2c23fa-2321-47ce-bf4f-5f08934502de', sid => 62, name => 'white'},
                 {uuid => 'f9bb5cd8-d8e6-4f29-805f-cc6f2b74802d', sid => 63, name => 'grey'},
+                {uuid => 'dd708015-0fdd-4543-9751-7da42d19bc6a', sid => 64, name => 'Sun'},
+                {uuid => '23026974-b92f-4820-80f6-c12f4dd22fca', sid => 65, name => 'Luna'},
                 {uuid => '838eede5-3f93-46a9-8e10-75165d10caa1', sid => 80, name => 'cat'},
                 {uuid => '252314f9-1467-48bf-80fd-f8b74036189f', sid => 81, name => 'dog'},
                 {uuid => '571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1', sid => 82, name => 'lion'},
@@ -536,6 +542,10 @@ sub _own_well_known {
         }
     }
 
+    foreach my $language (keys %{$own_well_known{'language-tag-identifier'}}) {
+        my $uuid = create_uuid_as_string(UUID_SHA1, '47dd950c-9089-4956-87c1-54c122533219', lc $language);
+        $own_well_known{uuid}{$uuid} = $own_well_known{'language-tag-identifier'}{$language};
+    }
     # Mix and match entries by identifiers to speed up lookups.
     # This step must always be the last one.
     foreach my $id_type_outer (keys %own_well_known) {
@@ -1159,7 +1169,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

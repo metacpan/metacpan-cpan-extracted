@@ -1,5 +1,12 @@
 Revision history for Net-Async-Redis
 
+6.002     2024-09-18 07:44:19+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - switch back to plain inheritance, since Object::Pad rôles do not yet allow
+    method overrides - this was causing issues with Net::Async::Redis::Cluster methods
+    not being available
+
 6.001     2024-09-15 09:27:56+08:00 Asia/Singapore
     [New features]
 

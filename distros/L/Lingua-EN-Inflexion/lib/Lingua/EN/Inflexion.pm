@@ -2,7 +2,7 @@ package Lingua::EN::Inflexion;
 use 5.010; use warnings;
 use Carp;
 
-our $VERSION = '0.002008';
+our $VERSION = '0.002009';
 
 # Import noun, verb, and adj classes...
 use Lingua::EN::Inflexion::Term;
@@ -213,7 +213,7 @@ Lingua::EN::Inflexion - Inflect English nouns, verbs, adjectives, and articles
 
 =head1 VERSION
 
-This document describes Lingua::EN::Inflexion version 0.002008
+This document describes Lingua::EN::Inflexion version 0.002009
 
 
 =head1 SYNOPSIS
