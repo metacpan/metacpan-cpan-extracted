@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '4.000'; # VERSION
+our $VERSION = '4.001'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -56,8 +56,7 @@ sub from {
     $self = $self->new unless ref $self;
     $self->drain_from($src);
     $src->completed->on_ready(sub {
-        my $f = $self->source->completed;
-        shift->on_ready($f) unless $f->is_ready;
+        $self->finish;
     });
     return $self
 }
@@ -97,8 +96,11 @@ sub start_drain {
 
     $log->tracef('Draining from source %s', $src->describe);
     $self->{active_source} = $src;
-    $src->completed->on_ready(sub {
+    my $original_parent = delete $self->{parent};
+    $self->{parent} = $src;
+    $src->_completed->on_ready(sub {
         undef $self->{active_source};
+        $self->{parent} = $original_parent;
         $self->start_drain;
     });
     $src->each_while_source(sub {

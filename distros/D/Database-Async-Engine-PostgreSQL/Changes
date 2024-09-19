@@ -1,5 +1,15 @@
 Revision history for Database-Async-Engine-PostgreSQL
 
+1.005     2024-09-18 19:53:46+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - after an error, the active query was left in place which caused further query attempts
+    to stall (also raised by @ngeojiajun-deriv with a test case :+1:)
+    - flow control is now applied immediately, to avoid a race condition where the first flow
+    control event could be missed
+    - flow control is also cleaned up properly, in some cases we could end up with the previous
+    source still attached on the next query
+
 1.004     2024-01-08 14:22:35+08:00 Asia/Singapore
     [Bugs fixed]
 

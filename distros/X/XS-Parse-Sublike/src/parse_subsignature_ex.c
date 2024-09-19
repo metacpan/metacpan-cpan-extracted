@@ -22,10 +22,17 @@
 
 #include "lexer-additions.c.inc"
 
-#include "LOGOP_ANY.c.inc"
 #include "croak_from_caller.c.inc"
 #include "make_argcheck_aux.c.inc"
 #include "newSV_with_free.c.inc"
+
+#ifdef XOPf_xop_dump
+#  define HAVE_XOP_DUMP
+#endif
+
+#ifndef av_count
+#  define av_count(av)  (1 + AvFILL(av))
+#endif
 
 #define newSVpvx(ptr)  S_newSVpvx(aTHX_ ptr)
 static SV *S_newSVpvx(pTHX_ void *ptr)
@@ -124,80 +131,295 @@ S_find_runcv_name(pTHX)
   return sv;
 }
 
+/*****************************
+ * Named arguments extension *
+ *****************************
+
+Signature handling of named arguments proceeds initially as with regular perl,
+with the addition of one big op that handles all the named arguments at once.
+
+The generated optree will have additional steps after the OP_ARGCHECK +
+OP_ARGELEM ops of positional parameters. Any CV with named parameters will
+have a single OP_CUSTOM/pp_argelems_named that stands in place of any
+OP_ARGELEM that would have been used for a final slurpy element, if present.
+This stores details of all the named arguments in an array in its ->op_aux,
+and processes all of the named arguments and the slurpy element all at once.
+Following this will be a small optree per optional named parameter, consisting
+of an OP_CUSTOM/pp_namedargexists, OP_CUSTOM/pp_namedargassign and the
+defaulting expression.
+
+Temporarily during processing we make use of the SvPADSTALE flag on every pad
+variable used to store a named parameter, to remember that no value has yet
+been assigned into it. This is how we can detect required but missing named
+parameters once argument processing is finished, and how the optional
+parameters can have default expressions assigned into them.
+
+*/
+
 enum {
   OPp_NAMEDARGDEFELEM_IF_UNDEF = 1,
   OPp_NAMEDARGDEFELEM_IF_FALSE = 2,
 };
 
-static OP *pp_namedargdefelem(pTHX)
+static XOP xop_namedargexists;
+static OP *pp_namedargexists(pTHX)
 {
   dSP;
-  ANY *op_any = cLOGOP_ANY->op_any;
-  SV *keysv = op_any[0].any_sv;
-  HV *slurpy_hv = (HV *)PAD_SVl(op_any[1].any_iv);
-
-  assert(slurpy_hv && SvTYPE(slurpy_hv) == SVt_PVHV);
-
-  /* TODO: we could precompute the hash and store it in the ANY vector */
-  SV *value = hv_delete_ent(slurpy_hv, keysv, 0, 0);
+  dTARGET;
 
   bool ok = false;
   switch(PL_op->op_private & 3) {
     case 0:
-      ok = !!value;
+      ok = TARG && !SvPADSTALE(TARG);
       break;
 
     case OPp_NAMEDARGDEFELEM_IF_UNDEF:
-      ok = value && SvOK(value);
+      ok = TARG && SvOK(TARG);
       break;
 
     case OPp_NAMEDARGDEFELEM_IF_FALSE:
-      ok = value && SvTRUE(value);
+      ok = TARG && SvTRUE(TARG);
       break;
   }
 
-  if(ok) {
-    EXTEND(SP, 1);
-    PUSHs(value);
-    RETURN;
-  }
-
-  if(cLOGOP->op_other)
+  if(!ok)
     return cLOGOP->op_other;
 
-  croak_from_caller("Missing argument '%" SVf "' for subroutine %" SVf,
-    SVfARG(keysv), SVfARG(S_find_runcv_name(aTHX)));
+  RETURN;
 }
 
-static OP *pp_checknomorenamed(pTHX)
+static XOP xop_namedargassign;
+static OP *pp_namedargassign(pTHX)
 {
-  HV *slurpy_hv = (HV *)PAD_SVl(PL_op->op_targ);
+  dSP;
+  dTARGET;
+  SV *value = POPs;
 
-  if(!hv_iterinit(slurpy_hv))
-    return NORMAL;
+  SvPADSTALE_off(TARG);
+  SvSetMagicSV(TARG, value);
 
-  /* There are remaining named arguments; concat their names into a message */
-
-  HE *he = hv_iternext(slurpy_hv);
-
-  SV *keynames = newSVpvn("", 0);
-  SAVEFREESV(keynames);
-
-  sv_catpvf(keynames, "'%" SVf "'", SVfARG(HeSVKEY_force(he)));
-
-  IV nkeys = 1;
-
-  while((he = hv_iternext(slurpy_hv)))
-    sv_catpvf(keynames, ", '%" SVf "'", SVfARG(HeSVKEY_force(he))), nkeys++;
-
-  croak_from_caller("Unrecognised %s %" SVf " for subroutine %" SVf,
-    nkeys > 1 ? "arguments" : "argument",
-    SVfARG(keynames), SVfARG(S_find_runcv_name(aTHX)));
+  RETURN;
 }
 
-#define OP_IS_NAMED_PARAM(o)  (o->op_type == OP_ARGELEM && cUNOPx(o)->op_first && \
-                                cUNOPx(o)->op_first->op_type == OP_CUSTOM && \
-                                cUNOPx(o)->op_first->op_ppaddr == &pp_namedargdefelem)
+struct ArgElemsNamedParam {
+  U32 flags;
+  PADOFFSET padix;
+  U32 namehash;
+  Size_t namelen;
+  const char *namepv;
+};
+enum {
+  NAMEDPARAMf_REQUIRED = (1<<0),
+  NAMEDPARAMf_UTF8     = (1<<1),
+};
+
+static int cmp_argelemsnamedparam(const void *_a, const void *_b)
+{
+  const struct ArgElemsNamedParam *a = _a, *b = _b;
+  if(a->namehash < b->namehash)
+    return -1;
+  if(a->namehash > b->namehash)
+    return 1;
+  return 0;
+}
+
+struct ArgElemsNamedAux {
+  UV start_argix;
+  Size_t n_params;
+  struct ArgElemsNamedParam params[0];
+};
+
+static XOP xop_argelems_named;
+static OP *pp_argelems_named(pTHX)
+{
+  struct ArgElemsNamedAux *aux = (struct ArgElemsNamedAux *)cUNOP_AUX->op_aux;
+  AV *defav = GvAV(PL_defgv);
+
+  HV *slurpy_hv = NULL;
+  AV *slurpy_av = NULL;
+
+  if(PL_op->op_targ) {
+    /* We have a slurpy of some kind */
+    save_clearsv(&PAD_SVl(PL_op->op_targ));
+
+    if(PL_op->op_private & OPpARGELEM_HV) {
+      slurpy_hv = (HV *)PAD_SVl(PL_op->op_targ);
+      assert(SvTYPE(slurpy_hv) == SVt_PVHV);
+      assert(HvKEYS(slurpy_hv) == 0);
+    }
+    else if(PL_op->op_private & OPpARGELEM_AV) {
+      slurpy_av = (AV *)PAD_SVl(PL_op->op_targ);
+      assert(SvTYPE(slurpy_av) == SVt_PVAV);
+      assert(av_count(slurpy_av) == 0);
+    }
+  }
+
+  UV argix = aux->start_argix;
+  UV argc  = av_count(defav);
+
+  U32 parami;
+  UV n_params = aux->n_params;
+
+  /* Before we process the incoming args we need to prepare *all* the param
+   * variable pad slots.
+   */
+  for(parami = 0; parami < n_params; parami++) {
+    struct ArgElemsNamedParam *param = &aux->params[parami];
+
+    SV **padentry = &PAD_SVl(param->padix);
+    assert(padentry);
+    save_clearsv(padentry);
+
+    /* A slight abuse of the PADSTALE flag so we can detect which parameters
+     * not been assigned to afterwards
+     */
+    SvPADSTALE_on(*padentry);
+  }
+
+  SV *unrecognised_keynames = NULL;
+  UV n_unrecognised = 0;
+
+  while(argix < argc) {
+    /* TODO: do we need av_fetch or can we cheat around it? */
+    SV *name = *av_fetch(defav, argix, 0);
+    argix++;
+    SV *val  = argix < argc ? *av_fetch(defav, argix, 0) : &PL_sv_undef;
+    argix++;
+
+    STRLEN namelen;
+    const char *namepv = SvPV(name, namelen);
+
+    U32 namehash;
+    PERL_HASH(namehash, namepv, namelen);
+
+    PADOFFSET param_padix = 0;
+
+    /* In theory we would get better performance at runtime by binary
+     * searching for a good starting index. In practice only actually starts
+     * saving measurable time once we start to get to literally hundreds of
+     * named parameters. This simple linear search is actually very quick per
+     * rejected element.
+     * If your perl function wants to declare hundreds of different named
+     * parameters you probably want to rethink your strategy. ;)
+     */
+    for(parami = 0; parami < n_params; parami++) {
+      struct ArgElemsNamedParam *param = &aux->params[parami];
+
+      /* Since the params are stored in hash key order, if we are already
+       * past it then we know we are done
+       */
+      if(param->namehash > namehash)
+        break;
+      if(param->namehash != namehash)
+        continue;
+
+      /* TODO: This will be wrong for UTF-8 comparisons */
+      if(namelen != param->namelen)
+        continue;
+      if(!strnEQ(namepv, param->namepv, namelen))
+        continue;
+
+      param_padix = param->padix;
+      break;
+    }
+
+    if(param_padix) {
+      SV *targ = PAD_SVl(param_padix);
+
+      /* This has to do all the work normally done by pp_argelem */
+      assert(TAINTING_get || !TAINT_get);
+      if(UNLIKELY(TAINT_get) && !SvTAINTED(val))
+        TAINT_NOT;
+      SvPADSTALE_off(targ);
+      SvSetMagicSV(targ, val);
+    }
+    else if(slurpy_hv) {
+      hv_store_ent(slurpy_hv, name, newSVsv(val), 0);
+    }
+    else if(slurpy_av) {
+      av_push(slurpy_av, newSVsv(name));
+      if(argix <= argc)
+        av_push(slurpy_av, newSVsv(val));
+    }
+    else {
+      if(!unrecognised_keynames) {
+        unrecognised_keynames = newSVpvn("", 0);
+        SAVEFREESV(unrecognised_keynames);
+      }
+
+      if(SvCUR(unrecognised_keynames))
+        sv_catpvs(unrecognised_keynames, ", ");
+      sv_catpvf(unrecognised_keynames, "'%" SVf "'", SVfARG(name));
+      n_unrecognised++;
+    }
+  }
+
+  if(n_unrecognised) {
+    croak_from_caller("Unrecognised %s %" SVf " for subroutine %" SVf,
+      n_unrecognised > 1 ? "arguments" : "argument",
+      SVfARG(unrecognised_keynames), SVfARG(S_find_runcv_name(aTHX)));
+  }
+
+  SV *missing_keynames = NULL;
+  UV n_missing = 0;
+
+  for(parami = 0; parami < n_params; parami++) {
+    struct ArgElemsNamedParam *param = &aux->params[parami];
+    SV *targ = PAD_SVl(param->padix);
+
+    if(!SvPADSTALE(targ))
+      continue;
+    if(!(param->flags & NAMEDPARAMf_REQUIRED))
+      continue;
+
+    if(!missing_keynames) {
+      missing_keynames = newSVpvn("", 0);
+      SAVEFREESV(missing_keynames);
+    }
+
+    if(SvCUR(missing_keynames))
+      sv_catpvs(missing_keynames, ", ");
+    sv_catpvf(missing_keynames, "'%s'", param->namepv);
+    n_missing++;
+  }
+
+  if(n_missing) {
+    croak_from_caller("Missing %s %" SVf " for subroutine %" SVf,
+      n_missing > 1 ? "arguments" : "argument",
+      SVfARG(missing_keynames), SVfARG(S_find_runcv_name(aTHX)));
+  }
+
+  return NORMAL;
+}
+
+#ifdef HAVE_XOP_DUMP
+static void opdump_argelems_named(pTHX_ const OP *o, struct Perl_OpDumpContext *ctx)
+{
+  struct ArgElemsNamedAux *aux = (struct ArgElemsNamedAux *)cUNOP_AUXo->op_aux;
+
+  opdump_printf(ctx, "START_ARGIX = %" UVuf "\n", aux->start_argix);
+  opdump_printf(ctx, "PARAMS = (%" UVuf ")\n", aux->n_params);
+
+  U32 parami;
+  for(parami = 0; parami < aux->n_params; parami++) {
+    struct ArgElemsNamedParam *param = &aux->params[parami];
+
+    opdump_printf(ctx, "  [%d] = {.name=\"%s\", .namehash=%u .padix=%u, .flags=(",
+        parami,
+        param->namepv,
+        param->namehash,
+        (unsigned int)param->padix);
+
+    bool need_comma = false;
+    if(param->flags & NAMEDPARAMf_UTF8)
+      opdump_printf(ctx, "%sUTF8", need_comma?",":""), need_comma = true;
+    if(param->flags & NAMEDPARAMf_REQUIRED)
+      opdump_printf(ctx, "%sREQUIRED", need_comma?",":""), need_comma = true;
+
+    opdump_printf(ctx, ")}\n");
+  }
+}
+#endif
 
 /* Parameter attribute extensions */
 typedef struct SignatureAttributeRegistration SignatureAttributeRegistration;
@@ -252,21 +474,27 @@ static void pending_free(pTHX_ SV *sv)
 
 #define NEW_SV_PENDING()  newSV_with_free(sizeof(struct PendingSignatureFunc), &pending_free)
 
+struct NamedParamDetails {
+  PADOFFSET padix;
+  bool is_required;
+};
 struct SignatureParsingContext {
-  AV *named_varops; /* SV ptrs to the varop of every named parameter */
-
-  OP *last_varop; /* the most recently-constructed varop */
+  OP *positional_elems;  /* OP_LINESEQ of every positional element, in order */
+  OP *named_elem_defops; /* OP_LINESEQ of those named elements that have defaulting expressions */
+  HV *named_details;     /* SV ptrs to NamedParamDetails of every named parameter */
+  OP *slurpy_elem;
 };
 
 static void free_parsing_ctx(pTHX_ void *_ctx)
 {
   struct SignatureParsingContext *ctx = _ctx;
-  if(ctx->named_varops)
-    SvREFCNT_dec((SV *)ctx->named_varops);
+  /* TODO the rest */
+  if(ctx->named_details)
+    SvREFCNT_dec((SV *)ctx->named_details);
 }
 
 #define parse_sigelem(ctx, flags)  S_parse_sigelem(aTHX_ ctx, flags)
-static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
+static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
 {
   bool permit_attributes = flags & PARSE_SUBSIGNATURE_PARAM_ATTRIBUTES;
 
@@ -274,7 +502,7 @@ static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
 
   int c = lex_peek_unichar(0);
   int private;
-  struct XPSSignatureParamContext paramctx = {};
+  struct XPSSignatureParamContext paramctx = { 0 };
 
   AV *pending = NULL;
 
@@ -286,10 +514,13 @@ static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
     c = lex_peek_unichar(0);
   }
 
-  switch(c) {
+  char sigil = c;
+  switch(sigil) {
     case '$': private = OPpARGELEM_SV; break;
     case '@': private = OPpARGELEM_AV; break;
     case '%': private = OPpARGELEM_HV; break;
+    case ':':
+      croak("Named signature elements are not permitted");
     default:
       croak("Expected a signature element at <%s>\n", parser->bufptr);
   }
@@ -299,32 +530,38 @@ static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
   /* Consume sigil */
   lex_read_unichar(0);
 
-  char *lexname_end = NULL;
+  STRLEN lexname_len = 0;
+  struct NamedParamDetails *details = NULL;
 
   if(isIDFIRST_uni(lex_peek_unichar(0))) {
     lex_read_unichar(0);
     while(isALNUM_uni(lex_peek_unichar(0)))
       lex_read_unichar(0);
 
-    paramctx.varop = newUNOP_AUX(OP_ARGELEM, 0, NULL, INT2PTR(UNOP_AUX_item *, (parser->sig_elems)));
-    paramctx.varop->op_private |= private;
-
-    if(paramctx.is_named) {
-      if(!ctx->named_varops)
-        ctx->named_varops = newAV();
-
-      av_push(ctx->named_varops, newSVpvx(paramctx.varop));
-    }
-
-    ctx->last_varop = paramctx.varop;
-
     ENTER;
     SAVEI16(PL_parser->in_my);
     PL_parser->in_my = KEY_sigvar;
 
-    lexname_end = PL_parser->bufptr;
-    paramctx.padix = paramctx.varop->op_targ =
-      pad_add_name_pvn(lexname, lexname_end - lexname, 0, NULL, NULL);
+    lexname_len = PL_parser->bufptr - lexname;
+    paramctx.padix = pad_add_name_pvn(lexname, lexname_len, 0, NULL, NULL);
+
+    if(paramctx.is_named) {
+      if(!ctx->named_details)
+        ctx->named_details = newHV();
+
+      Newx(details, 1, struct NamedParamDetails);
+      *details = (struct NamedParamDetails){
+        .padix       = paramctx.padix,
+        .is_required = true,
+      };
+
+      hv_store(ctx->named_details, lexname + 1, lexname_len - 1, newSVpvx(details), 0);
+    }
+    else {
+      paramctx.varop = newUNOP_AUX(OP_ARGELEM, 0, NULL, INT2PTR(UNOP_AUX_item *, (parser->sig_elems)));
+      paramctx.varop->op_private |= private;
+      paramctx.varop->op_targ = paramctx.padix;
+    }
 
     LEAVE;
 
@@ -367,12 +604,8 @@ static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
     }
   }
 
-  if(c == '$') {
-    SV *argname = NULL;
-
+  if(sigil == '$') {
     if(paramctx.is_named) {
-      parser->sig_slurpy = '+';
-      argname = newSVpvn(lexname + 1, lexname_end - lexname - 1);
     }
     else {
       if(parser->sig_slurpy)
@@ -391,12 +624,28 @@ static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
       OP *defexpr = parse_termexpr(0);
 
       if(paramctx.is_named) {
-        paramctx.defop = (OP *)alloc_LOGOP_ANY(OP_CUSTOM, defexpr, LINKLIST(defexpr));
-        paramctx.defop->op_private =
+        OP *assignop = newUNOP(OP_CUSTOM, 0, defexpr);
+        assignop->op_ppaddr = &pp_namedargassign;
+        assignop->op_targ = paramctx.padix;
+
+        OP *existsop = (OP *)alloc_LOGOP(OP_CUSTOM, assignop, LINKLIST(assignop));
+        existsop->op_ppaddr = &pp_namedargexists;
+        existsop->op_targ = paramctx.padix;
+        existsop->op_private =
           default_if_undef ? OPp_NAMEDARGDEFELEM_IF_UNDEF :
           default_if_false ? OPp_NAMEDARGDEFELEM_IF_FALSE :
                             0;
-        paramctx.defop->op_ppaddr = &pp_namedargdefelem;
+
+        OP *defop = newUNOP(OP_NULL, 0, existsop);
+
+        LINKLIST(defop);
+
+        defop->op_next = existsop; /* start of this fragment */
+        assignop->op_next = defop; /* after assign, stop this fragment */
+
+        details->is_required = false;
+        ctx->named_elem_defops = op_append_elem(OP_LINESEQ, ctx->named_elem_defops,
+            defop);
       }
       else {
         U8 private = 0;
@@ -411,61 +660,46 @@ static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
           yyerror("This Perl version cannot handle if_undef/if_false defaulting expressions on positional parameters");
 #endif
 
-        paramctx.defop = (OP *)alloc_LOGOP(OP_ARGDEFELEM, defexpr, LINKLIST(defexpr));
-        paramctx.defop->op_targ = (PADOFFSET)(parser->sig_elems - 1);
-        paramctx.defop->op_private = private;
+        OP *defop = (OP *)alloc_LOGOP(OP_ARGDEFELEM, defexpr, LINKLIST(defexpr));
+        defop->op_targ = (PADOFFSET)(parser->sig_elems - 1);
+        defop->op_private = private;
+
+        paramctx.varop->op_flags |= OPf_STACKED;
+        op_sibling_splice(paramctx.varop, NULL, 0, defop);
+        defop = op_contextualize(defop, G_SCALAR);
+
+        LINKLIST(paramctx.varop);
+
+        paramctx.varop->op_next = defop;
+        defexpr->op_next = paramctx.varop;
       }
-
-      paramctx.varop->op_flags |= OPf_STACKED;
-      op_sibling_splice(paramctx.varop, NULL, 0, paramctx.defop);
-      paramctx.defop = op_contextualize(paramctx.defop, G_SCALAR);
-
-      LINKLIST(paramctx.varop);
-
-      paramctx.varop->op_next = paramctx.defop;
-      defexpr->op_next = paramctx.varop;
     }
     else {
       if(parser->sig_optelems)
         yyerror("Mandatory parameter follows optional parameter");
     }
 
-    if(paramctx.is_named) {
-      OP *defop = paramctx.defop;
-      if(!defop) {
-        defop = (OP *)alloc_LOGOP_ANY(OP_CUSTOM, NULL, NULL);
-        defop->op_ppaddr = &pp_namedargdefelem;
-
-        paramctx.varop->op_flags |= OPf_STACKED;
-        op_sibling_splice(paramctx.varop, NULL, 0, defop);
-
-        LINKLIST(paramctx.varop);
-
-        paramctx.varop->op_next = defop;
-      }
-
-      ANY *op_any;
-      Newx(op_any, 2, ANY);
-
-      op_any[0].any_sv = argname;
-      /* [1] is filled in later */
-
-      cLOGOP_ANYx(defop)->op_any = op_any;
-    }
+    if(!paramctx.is_named)
+      /* This call to newSTATEOP() must come AFTER parsing the defaulting
+       * expression because it involves an implicit intro_my() and so we must
+       * not introduce the new parameter variable beforehand (RT155630)
+       */
+      ctx->positional_elems = op_append_list(OP_LINESEQ, ctx->positional_elems,
+          newSTATEOP(0, NULL, paramctx.varop));
   }
   else {
     if(paramctx.is_named)
       yyerror("Slurpy parameters may not be named");
-    if(parser->sig_slurpy && parser->sig_slurpy != '+')
+    if(parser->sig_slurpy)
       yyerror("Multiple slurpy parameters not allowed");
 
-    parser->sig_slurpy = c;
+    ctx->slurpy_elem = newSTATEOP(0, NULL, paramctx.varop);
+
+    parser->sig_slurpy = sigil;
 
     if(lex_peek_unichar(0) == '=')
       yyerror("A slurpy parameter may not have a default value");
   }
-
-  paramctx.op = paramctx.varop;
 
   if(pending) {
     for(int i = 0; i <= AvFILL(pending); i++) {
@@ -475,8 +709,6 @@ static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
         (*p->funcs->post_defop)(aTHX_ &paramctx, p->attrdata, p->funcdata);
     }
   }
-
-  return paramctx.op ? newSTATEOP(0, NULL, paramctx.op) : NULL;
 }
 
 OP *XPS_parse_subsignature_ex(pTHX_ int flags)
@@ -484,7 +716,7 @@ OP *XPS_parse_subsignature_ex(pTHX_ int flags)
   /* Mostly reconstructed logic from perl 5.28.0's toke.c and perly.y
    */
   yy_parser *parser = PL_parser;
-  struct SignatureParsingContext ctx = {};
+  struct SignatureParsingContext ctx = { 0 };
 
   assert((flags & ~(PARSE_SUBSIGNATURE_NAMED_PARAMS|PARSE_SUBSIGNATURE_PARAM_ATTRIBUTES)) == 0);
 
@@ -499,28 +731,9 @@ OP *XPS_parse_subsignature_ex(pTHX_ int flags)
   parser->sig_optelems = 0;
   parser->sig_slurpy = 0;
 
-  OP *elems = NULL;
-  OP *namedelems = NULL;
-  OP *final_elem = NULL;
-
   while(lex_peek_unichar(0) != ')') {
     lex_read_space(0);
-    OP *elem = parse_sigelem(&ctx, flags);
-
-    /* placeholder anonymous elems are NULL */
-    if(elem) {
-      /* elem should be an OP_LINESEQ[ OP_NEXTSTATE. actual elem ] */
-      assert(elem->op_type == OP_LINESEQ);
-      assert(cLISTOPx(elem)->op_first);
-      assert(OpSIBLING(cLISTOPx(elem)->op_first));
-
-      final_elem = OpSIBLING(cLISTOPx(elem)->op_first);
-
-      if(OP_IS_NAMED_PARAM(ctx.last_varop))
-        namedelems = op_append_list(OP_LIST, namedelems, elem);
-      else
-        elems = op_append_list(OP_LINESEQ, elems, elem);
-    }
+    parse_sigelem(&ctx, flags);
 
     if(PL_parser->error_count) {
       LEAVE;
@@ -551,70 +764,86 @@ endofelems:
     "The signatures feature is experimental");
 #endif
 
-  bool allow_extras_after_named = true;
-  if(ctx.named_varops) {
-    switch(PL_parser->sig_slurpy) {
-      case 0:
-      case '@':
-        NOT_REACHED;
-      case '+':
-        {
-          /* Pretend we have a new, unnamed slurpy hash */
-          OP *varop = newUNOP_AUX(OP_ARGELEM, 0, NULL, INT2PTR(UNOP_AUX_item *, (parser->sig_elems)));
-          varop->op_private |= OPpARGELEM_HV;
-          varop->op_targ = pad_add_name_pvs("%(params)", 0, NULL, NULL);
-
-          final_elem = varop;
-
-          OP *elem = newSTATEOP(0, NULL, varop);
-          elems = op_append_list(OP_LINESEQ, elems, elem);
-
-          PL_parser->sig_slurpy = '%';
-          allow_extras_after_named = false;
-        }
-        break;
-      case '%':
-        break;
-    }
-  }
+  char sig_slurpy = parser->sig_slurpy;
+  if(!sig_slurpy && ctx.named_details)
+    sig_slurpy = '%';
 
   UNOP_AUX_item *aux = make_argcheck_aux(
-    parser->sig_elems, parser->sig_optelems, parser->sig_slurpy);
+    parser->sig_elems,
+    parser->sig_optelems,
+    sig_slurpy);
 
   OP *checkop = newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux);
 
   OP *ops = op_prepend_elem(OP_LINESEQ, newSTATEOP(0, NULL, NULL),
-      op_prepend_elem(OP_LINESEQ, checkop, elems));
+      op_prepend_elem(OP_LINESEQ, checkop, ctx.positional_elems));
 
-  if(ctx.named_varops) {
-    assert(final_elem->op_type == OP_ARGELEM);
-    assert(final_elem->op_private == OPpARGELEM_HV);
+  if(ctx.named_details) {
+    UV n_params = HvKEYS(ctx.named_details);
 
-    PADOFFSET slurpy_padix = final_elem->op_targ;
+    struct ArgElemsNamedAux *aux = safemalloc(
+      sizeof(struct ArgElemsNamedAux) + n_params * sizeof(struct ArgElemsNamedParam)
+    );
 
-    /* Tell all the pp_namedargdefelem()s where to find the slurpy hash */
-    for(int i = 0; i <= AvFILL(ctx.named_varops); i++) {
-      OP *elemop = (OP *)(SvPVX(AvARRAY(ctx.named_varops)[i]));
-      assert(elemop);
-      assert(OP_IS_NAMED_PARAM(elemop));
+    aux->start_argix = parser->sig_elems;
+    aux->n_params    = n_params;
 
-      OP *defelemop = cUNOPx(elemop)->op_first;
-      assert(defelemop);
-      assert(defelemop->op_type == OP_CUSTOM &&
-          defelemop->op_ppaddr == &pp_namedargdefelem);
-      ANY *op_any = cLOGOP_ANYx(defelemop)->op_any;
-      op_any[1].any_iv = slurpy_padix;
+    struct ArgElemsNamedParam *param = &aux->params[0];
+
+    hv_iterinit(ctx.named_details);
+    HE *iter;
+    while((iter = hv_iternext(ctx.named_details))) {
+      STRLEN namelen;
+      const char *namepv = HePV(iter, namelen);
+      struct NamedParamDetails *details = (struct NamedParamDetails *)SvPVX(HeVAL(iter));
+
+      *param = (struct ArgElemsNamedParam){
+        .flags =
+          (HeUTF8(iter)         ? NAMEDPARAMf_UTF8     : 0) |
+          (details->is_required ? NAMEDPARAMf_REQUIRED : 0),
+        .padix = details->padix,
+        .namehash = HeHASH(iter),
+        .namepv = savepvn(namepv, namelen),
+        .namelen = namelen,
+      };
+      param++;
+    }
+
+    if(aux->n_params > 1) {
+      /* Sort the params by hash value */
+      qsort(&aux->params, aux->n_params, sizeof(aux->params[0]),
+          &cmp_argelemsnamedparam);
+    }
+
+    OP *argelems_named_op = newUNOP_AUX(OP_CUSTOM, 0, NULL, (UNOP_AUX_item *)aux);
+    argelems_named_op->op_ppaddr = &pp_argelems_named;
+    if(PL_parser->sig_slurpy) {
+      assert(ctx.slurpy_elem);
+      assert(ctx.slurpy_elem->op_type == OP_LINESEQ);
+      OP *o = OpSIBLING(cLISTOPx(ctx.slurpy_elem)->op_first);
+      assert(o);
+      assert(o->op_type == OP_ARGELEM);
+
+      /* Steal the slurpy's targ and private flags */
+      argelems_named_op->op_targ    = o->op_targ;
+      argelems_named_op->op_private |= o->op_private & OPpARGELEM_MASK;
+
+      op_free(ctx.slurpy_elem);
+      ctx.slurpy_elem = NULL;
     }
 
     ops = op_append_list(OP_LINESEQ, ops,
-      namedelems);
+        newSTATEOP(0, NULL, NULL));
+    ops = op_append_list(OP_LINESEQ, ops,
+        argelems_named_op);
 
-    if(!allow_extras_after_named) {
+    if(ctx.named_elem_defops)
+      /* TODO: append each elem individually */
       ops = op_append_list(OP_LINESEQ, ops,
-        newSTATEOP(0, NULL, checkop = newOP(OP_CUSTOM, 0)));
-      checkop->op_ppaddr = &pp_checknomorenamed;
-      checkop->op_targ = slurpy_padix;
-    }
+          ctx.named_elem_defops);
+  }
+  else if(ctx.slurpy_elem) {
+    ops = op_append_list(OP_LINESEQ, ops, ctx.slurpy_elem);
   }
 
   /* a nextstate at the end handles context correctly for an empty
@@ -644,6 +873,27 @@ void XPS_register_subsignature_attribute(pTHX_ const char *name, const struct XP
   sigattrs = reg;
 }
 
+void XPS_boot_parse_subsignature_ex(pTHX)
+{
+  XopENTRY_set(&xop_namedargexists, xop_name, "namedargexists");
+  XopENTRY_set(&xop_namedargexists, xop_desc, "named argument element exists test");
+  XopENTRY_set(&xop_namedargexists, xop_class, OA_LOGOP);
+  Perl_custom_op_register(aTHX_ &pp_namedargexists, &xop_namedargexists);
+
+  XopENTRY_set(&xop_namedargassign, xop_name, "namedargassign");
+  XopENTRY_set(&xop_namedargassign, xop_desc, "named argument element assignment");
+  XopENTRY_set(&xop_namedargassign, xop_class, OA_UNOP);
+  Perl_custom_op_register(aTHX_ &pp_namedargassign, &xop_namedargassign);
+
+  XopENTRY_set(&xop_argelems_named, xop_name, "argelems_named");
+  XopENTRY_set(&xop_argelems_named, xop_desc, "named parameter elements");
+  XopENTRY_set(&xop_argelems_named, xop_class, OA_UNOP_AUX);
+#ifdef HAVE_XOP_DUMP
+  XopENTRY_set(&xop_argelems_named, xop_dump, &opdump_argelems_named);
+#endif
+  Perl_custom_op_register(aTHX_ &pp_argelems_named, &xop_argelems_named);
+}
+
 #else /* !HAVE_PERL_VERSION(5, 26, 0) */
 
 void XPS_register_subsignature_attribute(pTHX_ const char *name, const struct XPSSignatureAttributeFuncs *funcs, void *funcdata)
@@ -651,4 +901,7 @@ void XPS_register_subsignature_attribute(pTHX_ const char *name, const struct XP
   croak("Custom subroutine signature attributes are not supported on this verison of Perl");
 }
 
+void XPS_boot_parse_subsignature_ex(pTHX)
+{
+}
 #endif

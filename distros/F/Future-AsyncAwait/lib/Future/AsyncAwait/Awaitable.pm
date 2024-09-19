@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait::Awaitable 0.68;
+package Future::AsyncAwait::Awaitable 0.69;
 
 use v5.14;
 use warnings;
@@ -13,6 +13,8 @@ use warnings;
 C<Future::AsyncAwait::Awaitable> - the interface required by C<Future::AsyncAwait>
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This module documents the method interface required by C<Future::AsyncAwait>
 to operate on future instances returned by expressions invoked by the C<await>

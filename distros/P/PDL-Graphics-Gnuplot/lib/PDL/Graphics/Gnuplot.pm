@@ -2061,7 +2061,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.027';
+our $VERSION = '2.028';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -3704,7 +3704,7 @@ sub matchDims
           $data_dims[$i] = $ddims[$i];
         }
         elsif( ( $ddims[$i]>1) && ($ddims[$i] != $data_dims[$i] )) {
-          barf "plot(): mismatched arguments in tuple (position $i)\n";
+          barf "plot(): mismatched arguments in tuple; dims of data item $i=(@ddims), but data_dims=(@data_dims)";
         }
       }
     }
@@ -4265,7 +4265,7 @@ EOC
 	$string = _checkpoint($this, "main", {notimeout=>1});
 
 	$string =~ m/Key: (\-?\d+)( +at xy:([^\s\,]+)\,([^\s\,]+)? button:(\d+)? shift:(\d+) alt:(\d+) ctrl:(\d+))?\s*$/
-	    || barf "read_mouse: string $string doesn't look right - doesn't match parse regexp.\n";
+	    || barf "read_mouse: string '$string' doesn't look right - doesn't match parse regexp.\n";
 
 	($ch,$x,$y,$b,$sft,$alt,$ctl) = map $_//"", ($1,$3,$4,$5,$6,$7,$8);
 
@@ -4284,8 +4284,8 @@ EOC
 	$string = _checkpoint($this, "main", {notimeout=>1});
 	$string =~ s/[\r\n]/ /sg;
 
-	$string =~ m/Key:(\-?\d+)( +at xy:([^\s\,]+)\,([^\s\,]+) shift:(\d+) alt:(\d+) ctrl:(\d+))?/
-	    || barf "read_mouse: string $string doesn't look right - doesn't match parse regexp.\n";
+	$string =~ m/Key:\s*(\-?\d+)( +at xy:\s*([^\s\,]+)\s*\,\s*([^\s\,]+) shift:\s*(\d+) alt:\s*(\d+) ctrl:\s*(\d+))?/
+	    || barf "read_mouse: string '$string' doesn't look right - doesn't match parse regexp.\n";
 
 	($ch,$x,$y,$sft,$alt,$ctl) = map $_ // "", ($1,$3,$4,$5,$6,$7);
 
@@ -7272,7 +7272,7 @@ sub _killGnuplot {
 	    $z = waitpid($goner,0);
 
 	} else {
-	    _printGnuplotPipe($this,$suffix,"set term qt 0 close\n") if $this->{terminal} eq 'qt';
+	    _printGnuplotPipe($this,$suffix,"set term qt 0 close\n") if ($this->{terminal}//'') eq 'qt';
 	    _printGnuplotPipe($this,$suffix,"exit\n");
 
 	    # Give it 2 seconds to quit, then interrupt it again.
@@ -7470,6 +7470,7 @@ sub _printGnuplotPipe
 # are explicitly stripped out
 our $cp_serial = 0;
 
+my $qt_re = qr/^qt.qpa.plugin: Could not find the Qt platform plugin.*/m;
 sub _checkpoint {
     my $this   = shift;
     my $suffix = shift || "main";
@@ -7602,16 +7603,18 @@ EOM
     # that some warnings come with a line specifier and others don't.
 
   WARN: while( $fromerr =~ m/^(\s*(line \d+\:\s*)?[wW]arning\:.*)$/m or
+	       $fromerr =~ m/$qt_re/ or
 	       $fromerr =~ m/^Populating font family aliases took/m     # CED - Quicktime on MacOS Catalina throws a warning marked as an error.  Stupid.
 	) {
-      if($2){
+      if ($2) {
 	  # it's a warning with a line specifier. Break off two more lines before it.
 	  last WARN unless($fromerr =~ s/^((gnu|multi)plot\>.*\n\s*\^\s*\n\s*(line \d+\:\s*)?[wW]arning\:.*(\n|$))//m);
 	  my $a = $1;
 	  $a =~ s/^\s*line \d+\:/Gnuplot:/m;
 	  carp $a if($printwarnings);
       } else {
-	  last WARN unless($fromerr =~ s/^(\s*(line \d+\:\s*)?[wW](arning\:.*(\n|$)))//m);
+	  $fromerr =~ s/$qt_re//;
+	  last WARN unless $fromerr =~ s/^(\s*(line \d+\:\s*)?[wW](arning\:.*(\n|$)))//m;
 	  carp "Gnuplot w$3\n" if($printwarnings);
       }
 

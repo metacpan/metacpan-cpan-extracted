@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike 0.23;
+package XS::Parse::Sublike 0.25;
 
 use v5.14;
 use warnings;
@@ -158,6 +158,14 @@ If set, the newly-constructed CV will be installed into the symbol table at
 its given name. Note that it is not possible to enable this flag without also
 enabling C<XS_PARSE_SUBLIKE_ACTION_SET_CVNAME>. This is set by default if a
 name was found.
+
+=item XS_PARSE_SUBLIKE_ACTION_INSTALL_LEXICAL
+
+If set, the newly-constructed CV will be installed into the currently
+compiling lexical pad as its given name. This is only available on Perl
+version 5.18 or above, and conflicts with the alternative of
+C<XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL>. This is set by default if a name
+was found I<and> the C<my> keyword appeared before the construction.
 
 =item XS_PARSE_SUBLIKE_ACTION_REFGEN_ANONCODE
 

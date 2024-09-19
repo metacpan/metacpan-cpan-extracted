@@ -1,5 +1,11 @@
 Revision history for Ryu
 
+4.001     2024-09-18 19:50:07+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - ->drain_from now propagates flow control correctly to the currently-attached source
+    - using ->finish instead of ->completed->on_ready to avoid complaints about internal state not matching
+
 4.000     2024-08-19 00:54:18+08:00 Asia/Singapore
     [New features]
 

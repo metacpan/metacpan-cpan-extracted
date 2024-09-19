@@ -88,10 +88,14 @@ use Data::Dumper;
 try {
     my $es = await $virt->domain_event_register_any(
         $virt->DOMAIN_EVENT_ID_LIFECYCLE);
-    my $rv = await $virt->list_all_domains();
-    #say Dumper($rv);
+    my $rv = await $virt->node_get_cpu_stats($virt->CPU_STATS_ALL_CPUS);
+    say Dumper($rv);
     #$log->trace( 'Listed' );
+    $rv = await $virt->list_all_domains;
     say scalar $rv->@*;
+
+    my $p = await $rv->[0]->get_scheduler_parameters;
+    say Dumper($p);
 
     while ( ( my $event ) = await $es->next_event ) {
         say 'event: ' . Dumper($event);

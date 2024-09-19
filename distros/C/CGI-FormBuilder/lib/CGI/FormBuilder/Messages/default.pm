@@ -12,7 +12,7 @@ use utf8;
 use CGI::FormBuilder::Messages::base;
 use base 'CGI::FormBuilder::Messages::base';
 
-our $VERSION = '3.10';
+our $VERSION = '3.20';
 
 # Default messages (US English)
 __PACKAGE__->define_messages({
@@ -36,6 +36,8 @@ __PACKAGE__->define_messages({
     js_invalid_email      => '- Invalid email for the "%s" field',
     js_invalid_time       => '- Invalid time for the "%s" field',
    'js_invalid_datetime-local'    => '- Invalid date for the "%s" field',
+    js_invalid_datetime_local   => '- Invalid date for the "%s" field',
+    js_invalid_datetime   => '- Invalid date for the "%s" field',
     js_invalid_default    => '- Invalid entry for the "%s" field',
 
     js_noscript           => 'Please enable Javascript or use a newer browser.',

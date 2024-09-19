@@ -12,6 +12,9 @@ use Test::Output;
 # Data dir.
 my $data = File::Object->new->up->dir('data');
 
+# Set environment.
+$ENV{'NO_COLOR'} = 1;
+
 # Test.
 @ARGV = (
 	'-h',

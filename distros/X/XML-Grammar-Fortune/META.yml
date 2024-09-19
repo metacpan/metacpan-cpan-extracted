@@ -40,10 +40,10 @@ name: XML-Grammar-Fortune
 provides:
   XML::Grammar::Fortune:
     file: lib/XML/Grammar/Fortune.pm
-    version: '0.1000'
+    version: '0.1001'
   XML::Grammar::Fortune::ToText:
     file: lib/XML/Grammar/Fortune/ToText.pm
-    version: '0.1000'
+    version: '0.1001'
 requires:
   Carp: '0'
   Fatal: '0'
@@ -59,7 +59,7 @@ resources:
   bugtracker: https://github.com/shlomif/fortune-xml/issues
   homepage: http://metacpan.org/release/XML-Grammar-Fortune
   repository: git://github.com/shlomif/fortune-xml.git
-version: '0.1000'
+version: '0.1001'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -56,13 +56,14 @@
             "Database::Async" : "0.019",
             "Encode" : "0",
             "File::HomeDir" : "0",
+            "Full::Script" : "1.003",
             "Future" : "0.46",
             "Future::AsyncAwait" : "0.28",
             "Log::Any" : "1.050",
             "MIME::Base64" : "0",
             "Path::Tiny" : "0",
             "Protocol::Database::PostgreSQL" : "2.000",
-            "Ryu" : "3.004",
+            "Ryu" : "4.001",
             "Ryu::Async" : "0.017",
             "Syntax::Keyword::Try" : "0.25",
             "Template" : "2.28",
@@ -97,11 +98,11 @@
    "provides" : {
       "Database::Async::Engine::PostgreSQL" : {
          "file" : "lib/Database/Async/Engine/PostgreSQL.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Database::Async::Engine::PostgreSQL::DDL" : {
          "file" : "lib/Database/Async/Engine/PostgreSQL/DDL.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       }
    },
    "release_status" : "stable",
@@ -116,16 +117,16 @@
          "web" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL"
       }
    },
-   "version" : "1.004",
+   "version" : "1.005",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
+      "Tom Molesworth <tom@audioboundary.com>",
       "Torsten Foertsch <torsten@binary.com>",
       "Arash <arashThr@outlook.com>",
-      "maryam-deriv <71321691+maryam-deriv@users.noreply.github.com>",
-      "Tom M <tom@audioboundary.com>"
+      "maryam-deriv <71321691+maryam-deriv@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

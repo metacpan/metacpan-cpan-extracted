@@ -1,5 +1,5 @@
 package DBIx::Lite::ResultSet;
-$DBIx::Lite::ResultSet::VERSION = '0.34';
+$DBIx::Lite::ResultSet::VERSION = '0.35';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ sub _new {
     
     # optional arguments
     for (grep exists($params{$_}), qw(joins where select group_by having order_by
-        limit offset for rows_per_page page cur_table with from)) {
+        limit offset for rows_per_page page cur_table with from distinct)) {
         $self->{$_} = delete $params{$_};
     }
     $self->{cur_table} //= $self->{table};
@@ -41,7 +41,7 @@ sub _new {
 }
 
 # create setters
-for my $methname (qw(group_by having order_by limit offset rows_per_page page from)) {
+for my $methname (qw(group_by having order_by limit offset rows_per_page page from distinct)) {
     no strict 'refs';
     *$methname = sub {
         my $self = shift;
@@ -50,20 +50,12 @@ for my $methname (qw(group_by having order_by limit offset rows_per_page page fr
         my $new_self = $self->_clone;
         
         # set new values
-        $new_self->{$methname} = $methname =~ /^(group_by|order_by|from)$/ ? [@_] : $_[0];
+        $new_self->{$methname} = $methname =~ /^(group_by|order_by|from|distinct)$/ ? [@_] : $_[0];
         $new_self->{pager}->current_page($_[0]) if $methname eq 'page' && $new_self->{pager};
         
         # return object
         $new_self;
     };
-}
-
-sub distinct {
-    my ($self, $value) = @_;
-    
-    my $new_self = $self->_clone;
-    $new_self->{distinct} = !defined($value) || $value;
-    $new_self;
 }
 
 sub for_update {
@@ -254,7 +246,7 @@ sub select_sql {
     }
     
     my ($sql, @bind) = $self->{dbix_lite}->{abstract}->select(
-        -columns    => [ ($self->{distinct} ? '-distinct' : ()), uniq @cols ],
+        -columns    => [ uniq @cols ],
         -from       => [ @from ],
         -where      => { -and => $self->{where} },
         $self->{group_by}   ? (-group_by    => $self->{group_by})   : (),
@@ -264,6 +256,17 @@ sub select_sql {
         $self->{offset}     ? (-offset      => $self->{offset})     : (),
         $self->{for}        ? (-for         => $self->{for})     : (),
     );
+
+    if ($self->{distinct}) {
+        my $distinct_sql;
+        if (@{$self->{distinct}} > 0) {
+            my @cols = map { ref($_) ? $$_ : $self->{dbix_lite}->_quote($_) } @{$self->{distinct}};
+            $distinct_sql = sprintf "DISTINCT ON (%s)", join ', ', @cols;
+        } else {
+            $distinct_sql = "DISTINCT";
+        }
+        $sql =~ s/^SELECT /SELECT $distinct_sql /i;
+    }
     
     if ($self->{with}) {
         my @with_sql = ();
@@ -725,7 +728,7 @@ DBIx::Lite::ResultSet
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 OVERVIEW
 
@@ -835,10 +838,13 @@ It returns a L<DBIx::Lite::ResultSet> object to allow for further method chainin
 
 =head2 distinct
 
-This method sets the DISTINCT flag in the SQL query. To turn if off again, pass a false
-value.
+This method sets the DISTINCT flag in the SQL query. If one or more columns (as
+plain strings) or expressions (as scalar refs) are passed to the method, they will
+be used as part of a C<DISTINCT ON> clause (PostgreSQL only).
 
     my $authors = $dbix->table('authors')->select('name')->distinct;
+    my $authors = $dbix->table('authors')->select('name')->distinct('name');
+    my $authors = $dbix->table('authors')->select('name')->distinct(\'lower(name)');
 
 =head2 for_update
 

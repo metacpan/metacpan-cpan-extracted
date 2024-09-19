@@ -147,6 +147,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'protect_all_sheets' => {
+     	datatype => 'Protection',
+     	base_name => 'ProtectAllSheets',
+     	description => 'Represents the various types of protection options available for all worksheets.            ',
+     	format => '',
+     	read_only => '',
+     		},
      'protect_workbook_structure' => {
      	datatype => 'string',
      	base_name => 'ProtectWorkbookStructure',
@@ -174,6 +181,7 @@ __PACKAGE__->swagger_types( {
     'aways_open_read_only' => 'boolean',
     'encrypt_with_password' => 'string',
     'protect_current_sheet' => 'Protection',
+    'protect_all_sheets' => 'Protection',
     'protect_workbook_structure' => 'string',
     'digital_signature' => 'DigitalSignature',
     'mark_as_final' => 'boolean' 
@@ -183,6 +191,7 @@ __PACKAGE__->attribute_map( {
     'aways_open_read_only' => 'AwaysOpenReadOnly',
     'encrypt_with_password' => 'EncryptWithPassword',
     'protect_current_sheet' => 'ProtectCurrentSheet',
+    'protect_all_sheets' => 'ProtectAllSheets',
     'protect_workbook_structure' => 'ProtectWorkbookStructure',
     'digital_signature' => 'DigitalSignature',
     'mark_as_final' => 'MarkAsFinal' 

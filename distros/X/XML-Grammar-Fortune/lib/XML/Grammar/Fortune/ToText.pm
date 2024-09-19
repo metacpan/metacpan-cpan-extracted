@@ -1,5 +1,5 @@
 package XML::Grammar::Fortune::ToText;
-$XML::Grammar::Fortune::ToText::VERSION = '0.1000';
+$XML::Grammar::Fortune::ToText::VERSION = '0.1001';
 use warnings;
 use strict;
 
@@ -62,6 +62,33 @@ sub _render_single_fortune_cookie
 
     $self->_render_info_if_exists($fortune_node);
 
+    $self->_iterate_on_child_elems(
+        $fortune_node,
+        "seealso",
+        {
+            process => sub {
+                my $seealso = shift;
+
+                my $s = "See Also:";
+                $self->_out( "\n${s}\n" . ( "=" x ( length($s) ) . "\n" ) );
+
+                $self->_iterate_on_child_elems(
+                    $seealso, "ol|ul",
+                    {
+                        process => sub {
+                            my $para = shift;
+
+                            return $self->_render_generalized_para($para);
+                        },
+                    },
+                );
+
+                $self->_out("\n");
+
+                return;
+            },
+        }
+    );
     return;
 }
 
@@ -762,7 +789,7 @@ XML::Grammar::Fortune::ToText - convert the FortunesXML grammar to plaintext.
 
 =head1 VERSION
 
-version 0.1000
+version 0.1001
 
 =head1 SYNOPSIS
 

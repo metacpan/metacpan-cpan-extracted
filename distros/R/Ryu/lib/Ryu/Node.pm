@@ -3,7 +3,7 @@ package Ryu::Node;
 use strict;
 use warnings;
 
-our $VERSION = '4.000'; # VERSION
+our $VERSION = '4.001'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -43,7 +43,7 @@ like C<< from->combine_latest->count >>.
 # It'd be nice if L<Future> already provided a method for this, maybe I should suggest it
 sub describe {
     my ($self) = @_;
-    my $completed = $self->completed;
+    my $completed = $self->_completed;
     ($self->parent ? $self->parent->describe . '=>' : '') . '[' . ($self->label // 'unknown') . '](' . ($completed ? $completed->state : 'inactive') . ')';
 }
 
@@ -88,11 +88,13 @@ Does nothing useful.
 
 sub pause {
     my ($self, $src) = @_;
-    my $k = refaddr($src) // 0;
+    my $k = (defined $src and ref $src)
+        ? refaddr($src // $self) // 0
+        : $src // 0;
 
     my $was_paused = $self->{is_paused} && keys %{$self->{is_paused}};
-    unless($was_paused) {
-        delete @{$self}{qw(unblocked unblocked_without_cancel)} if $self->{unblocked} and $self->{unblocked}->is_ready;
+    if($self->{unblocked} and $self->{unblocked}->is_ready) {
+        delete $self->{unblocked};
     }
     ++$self->{is_paused}{$k};
     if(my $parent = $self->parent) {
@@ -112,17 +114,20 @@ Is about as much use as L</pause>.
 
 sub resume {
     my ($self, $src) = @_;
-    my $k = refaddr($src) // 0;
+    my $k = (defined $src and ref $src)
+        ? refaddr($src // $self) // 0
+        : $src // 0;
     delete $self->{is_paused}{$k} unless --$self->{is_paused}{$k} > 0;
-    unless($self->{is_paused} and keys %{$self->{is_paused}}) {
-        my $f = $self->_unblocked;
+    return $self if $self->{is_paused} and keys %{$self->{is_paused}};
+
+    if(my $f = $self->{unblocked}) {
         $f->done unless $f->is_ready;
-        if(my $parent = $self->parent) {
-            $parent->resume($self) if $self->{pause_propagation};
-        }
-        if(my $flow_control = $self->{flow_control}) {
-            $flow_control->emit(1);
-        }
+    }
+    if(my $parent = $self->parent) {
+        $parent->resume($self) if $self->{pause_propagation};
+    }
+    if(my $flow_control = $self->{flow_control}) {
+        $flow_control->emit(1);
     }
     $self
 }
@@ -140,7 +145,7 @@ sub unblocked {
     # Since we don't want stray callers to affect our internal state, we always return
     # a non-cancellable version of our internal Future.
     my $self = shift;
-    return $self->{unblocked_without_cancel} //= $self->_unblocked->without_cancel
+    return $self->_unblocked->without_cancel
 }
 
 sub _unblocked {
@@ -161,9 +166,11 @@ Might return 1 or 0, but is generally meaningless.
 =cut
 
 sub is_paused {
-    my ($self, $obj) = @_;
-    return keys %{ $self->{is_paused} } ? 1 : 0 unless defined $obj;
-    my $k = refaddr($obj);
+    my ($self, $src) = @_;
+    return keys(%{ $self->{is_paused} }) ? 1 : 0 unless defined $src;
+    my $k = (defined $src and ref $src)
+        ? refaddr($src // $self) // 0
+        : $src // 0;
     return exists $self->{is_paused}{$k}
     ? 0 + $self->{is_paused}{$k}
     : 0;

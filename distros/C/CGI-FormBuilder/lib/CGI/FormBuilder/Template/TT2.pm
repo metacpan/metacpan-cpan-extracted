@@ -32,7 +32,7 @@ use CGI::FormBuilder::Util;
 use Template;
 
 
-our $VERSION = '3.10';
+our $VERSION = '3.20';
 
 sub new {
     my $self  = shift;
@@ -212,7 +212,7 @@ If you want to customise any of the Template Toolkit options, you can
 set the C<engine> option to contain a reference to an existing
 C<Template> object or hash reference of options which are passed to
 the C<Template> constructor.  You can also set the C<data> item to
-define any additional variables you want accesible when the template
+define any additional variables you want accessible when the template
 is processed.
 
     my $form = CGI::FormBuilder->new(

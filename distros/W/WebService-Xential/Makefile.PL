@@ -34,11 +34,12 @@ my %WriteMakefileArgs = (
     "Mojo::Transaction::HTTP" => 0,
     "Sub::Override" => 0,
     "Test::Deep" => 0,
+    "Test::Exception" => 0,
     "Test::Mock::One" => 0,
     "Test::More" => "0.96",
     "Test::Most" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,6 +60,7 @@ my %FallbackPrereqs = (
   "OpenAPI::Client" => 0,
   "Sub::Override" => 0,
   "Test::Deep" => 0,
+  "Test::Exception" => 0,
   "Test::Mock::One" => 0,
   "Test::More" => "0.96",
   "Test::Most" => 0,

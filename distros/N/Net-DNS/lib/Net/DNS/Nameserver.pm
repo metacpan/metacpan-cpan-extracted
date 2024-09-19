@@ -3,7 +3,7 @@ package Net::DNS::Nameserver;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Nameserver.pm 1963 2024-01-26 14:47:47Z willem $)[2];
+our $VERSION = (qw$Id: Nameserver.pm 1990 2024-09-18 13:16:07Z willem $)[2];
 
 
 =head1 NAME
@@ -857,10 +857,6 @@ DEALINGS IN THE SOFTWARE.
 L<perl> L<Net::DNS> L<Net::DNS::Resolver> L<Net::DNS::Packet>
 L<Net::DNS::Update> L<Net::DNS::Header> L<Net::DNS::Question>
 L<Net::DNS::RR>
-
-L<RFC1035|https://tools.ietf.org/html/rfc1035>
-
-L<IANA DNS parameters|http://www.iana.org/assignments/dns-parameters>
 
 =cut
 

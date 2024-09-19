@@ -28,9 +28,10 @@ no  warnings 'uninitialized';
 
 use 5.006; # or later
 use CGI::FormBuilder::Util;
+use utf8;
 
 
-our $VERSION = '3.10';
+our $VERSION = '3.20';
 
 # Begin "real" code
 sub new {
@@ -78,7 +79,7 @@ sub parse {
         chomp;
         my($term, $line) = split /\s*:\s*/, $_, 2;
         $utf8 = 1 if $term eq 'charset' && $line =~ /^utf/;  # key off charset to decode value
-        $line = Encode::decode('utf-8', $line) if $utf8;
+        $line = utf8::decode($line) if $utf8;
 
         # here string term-inator (har)
         if ($here) {

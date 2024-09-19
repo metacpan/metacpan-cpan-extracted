@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>00757nam a2200241   4500</leader>
+  <controlfield tag="001">ck8406647</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20030114075147.0</controlfield>
+  <controlfield tag="007">tu</controlfield>
+  <controlfield tag="008">840309s1983    xr           u0|0   cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000024035</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="q">(Brož.)</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)39570564</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">74</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">943.7</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Terezín v kresbách vězňů 1941-1945 :</subfield>
+    <subfield code="b">katalog výstavy, Praha, duben-říjen 1983 /</subfield>
+    <subfield code="c">úv. text Markéta Petrášová ; reprodukce kreseb Ivana Babušková</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">St. židovské muzeum,</subfield>
+    <subfield code="c">1983</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">[52] s. :</subfield>
+    <subfield code="b">fot. ;</subfield>
+    <subfield code="c">24 cm</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Petrášová, Markéta</subfield>
+    <subfield code="4">aui</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Babušková, Ivana</subfield>
+    <subfield code="7">xx0016518</subfield>
+    <subfield code="4">ill</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000024035</subfield>
+  </datafield>
+</record>
+
+</collection>

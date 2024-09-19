@@ -24,6 +24,10 @@
 #  define HAVE_FEATURE_CLASS
 #endif
 
+#if HAVE_PERL_VERSION(5, 18, 0)
+#  define HAVE_LEXICAL_SUB
+#endif
+
 /* We always need this included to get the struct and function definitions
  * visible, even though we won't be calling it
  */
@@ -141,8 +145,25 @@ static int parse(pTHX_
     subparse_flags |= CVf_IsMETHOD;
 #endif
 
+  /* TODO: We should find a way to put this in the main ctx structure, but we
+   * can't easily change that without breaking ABI compat.
+   */
+  PADOFFSET lexname_padix = 0;
+
+  if(ctx.name && (ctx.actions & XS_PARSE_SUBLIKE_ACTION_INSTALL_LEXICAL)) {
+    SV *ampname = newSVpvf("&%" SVf, SVfARG(ctx.name));
+    SAVEFREESV(ampname);
+    lexname_padix = pad_add_name_sv(ampname, 0, NULL, NULL);
+  }
+
   I32 floor_ix = start_subparse(FALSE, subparse_flags);
   SAVEFREESV(PL_compcv);
+
+#ifdef HAVE_LEXICAL_SUB
+  if(ctx.actions & XS_PARSE_SUBLIKE_ACTION_INSTALL_LEXICAL)
+    /* Lexical subs always have CVf_CLONE */
+    CvCLONE_on(PL_compcv);
+#endif
 
   if(!(skip_parts & XS_PARSE_SUBLIKE_PART_ATTRS) && (lex_peek_unichar(0) == ':')) {
     lex_read_unichar(0);
@@ -349,8 +370,11 @@ static int parse(pTHX_
     ctx.body = block_end(save_ix, ctx.body);
 
     if(!have_dynamic_actions) {
-      if(ctx.name)
-        ctx.actions |= XS_PARSE_SUBLIKE_ACTION_SET_CVNAME|XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL;
+      if(ctx.name) {
+        ctx.actions |= XS_PARSE_SUBLIKE_ACTION_SET_CVNAME;
+        if(!(ctx.actions & XS_PARSE_SUBLIKE_ACTION_INSTALL_LEXICAL))
+          ctx.actions |= XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL;
+      }
       else
         ctx.actions &= ~(XS_PARSE_SUBLIKE_ACTION_SET_CVNAME|XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL);
     }
@@ -358,8 +382,12 @@ static int parse(pTHX_
     /* If we want both SET_CVNAME and INSTALL_SYMBOL actions we might as well
      * let newATTRSUB() do it. If we only wanted one we need to be more subtle
      */
-    bool action_set_cvname     = ctx.actions & XS_PARSE_SUBLIKE_ACTION_SET_CVNAME;
-    bool action_install_symbol = ctx.actions & XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL;
+    bool action_set_cvname      = ctx.actions & XS_PARSE_SUBLIKE_ACTION_SET_CVNAME;
+    bool action_install_symbol  = ctx.actions & XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL;
+    bool action_install_lexical = ctx.actions & XS_PARSE_SUBLIKE_ACTION_INSTALL_LEXICAL;
+    if(action_install_symbol && action_install_lexical)
+      croak("Cannot both ACTION_INSTALL_SYMBOL and ACTION_INSTALL_LEXICAL");
+
     OP *nameop = NULL;
     if(ctx.name && action_set_cvname && action_install_symbol)
       nameop = newSVOP(OP_CONST, 0, SvREFCNT_inc(ctx.name));
@@ -367,7 +395,19 @@ static int parse(pTHX_
     if(!nameop && action_install_symbol)
       warn("Setting XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL without _ACTION_SET_CVNAME is nonsensical");
 
-    ctx.cv = newATTRSUB(floor_ix, nameop, NULL, ctx.attrs, ctx.body);
+    if(action_install_lexical) {
+#ifdef HAVE_LEXICAL_SUB
+      assert(lexname_padix);
+      nameop = newOP(OP_PADANY, 0);
+      nameop->op_targ = lexname_padix;
+
+      ctx.cv = newMYSUB(floor_ix, nameop, NULL, ctx.attrs, ctx.body);
+#else
+      croak("XS_PARSE_SUBLIKE_ACTION_INSTALL_LEXICAL is not supported on this version of Perl");
+#endif
+    }
+    else
+      ctx.cv = newATTRSUB(floor_ix, nameop, NULL, ctx.attrs, ctx.body);
 
     if(!nameop && action_set_cvname) {
 #if HAVE_PERL_VERSION(5,22,0)
@@ -503,7 +543,7 @@ static const struct Registration *find_permitted(pTHX_ const char *kw, STRLEN kw
   HV *hints = GvHV(PL_hintgv);
 
   for(reg = registrations; reg; reg = reg->next) {
-    if(reg->kwlen != kwlen || !strEQ(reg->kw, kw))
+    if(reg->kwlen != kwlen || !strnEQ(reg->kw, kw, kwlen))
       continue;
 
     if(reg->hooks->permit_hintkey &&
@@ -592,14 +632,58 @@ static const struct XSParseSublikeHooks hooks_core_method = {
 };
 #endif
 
+#ifdef HAVE_LEXICAL_SUB
+static void pre_subparse_lexical_sub(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
+{
+  ctx->actions &= ~XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL;
+  ctx->actions |=  XS_PARSE_SUBLIKE_ACTION_INSTALL_LEXICAL;
+}
+
+static const struct XSParseSublikeHooks hooks_lexical_sub = {
+  .ver = XSPARSESUBLIKE_ABI_VERSION,
+  /* no permit needed */
+  .pre_subparse = &pre_subparse_lexical_sub,
+};
+#endif
+
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
 
 static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 {
+#ifdef HAVE_LEXICAL_SUB
+  char *was_parser_bufptr = PL_parser->bufptr;
+
+  bool is_lexical_sub = false;
+
+  if(kwlen == 2 && strEQ(kw, "my")) {
+    lex_read_space(0);
+
+    I32 c = lex_peek_unichar(0);
+    if(!isIDFIRST_uni(c))
+      goto next_keyword;
+
+    kw = PL_parser->bufptr;
+
+    lex_read_unichar(0);
+    while((c = lex_peek_unichar(0)) && isALNUM_uni(c))
+      lex_read_unichar(0);
+
+    kwlen = PL_parser->bufptr - kw;
+
+    is_lexical_sub = true;
+  }
+#endif
+
   const struct Registration *reg = find_permitted(aTHX_ kw, kwlen);
 
-  if(!reg)
+  if(!reg) {
+#ifdef HAVE_LEXICAL_SUB
+    if(PL_parser->bufptr > was_parser_bufptr)
+      PL_parser->bufptr = was_parser_bufptr;
+#endif
+next_keyword:
     return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
+  }
 
   lex_read_space(0);
 
@@ -609,11 +693,21 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
   SV *hdlsv = newSV(4 * sizeof(struct HooksAndData));
   SAVEFREESV(hdlsv);
   struct HooksAndData *hd = (struct HooksAndData *)SvPVX(hdlsv);
-  size_t nhooks = 1;
+  size_t nhooks = 0;
+
+#ifdef HAVE_LEXICAL_SUB
+  if(is_lexical_sub) {
+    hd[nhooks].hooks = &hooks_lexical_sub;
+    hd[nhooks].data  = NULL;
+    nhooks++;
+  }
+#endif
 
   struct XSParseSublikeHooks *hooks = (struct XSParseSublikeHooks *)reg->hooks;
-  hd[0].hooks = hooks;
-  hd[0].data  = reg->hookdata;
+
+  hd[nhooks].hooks = hooks;
+  hd[nhooks].data  = reg->hookdata;
+  nhooks++;
 
   while(hooks->flags & XS_PARSE_SUBLIKE_FLAG_PREFIX) {
     /* After a prefixing keyword, expect another one */
@@ -751,3 +845,5 @@ BOOT:
 #endif
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
+
+  boot_parse_subsignature_ex();

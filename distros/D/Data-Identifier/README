@@ -1,0 +1,17 @@
+Data::Identifier
+----------------
+
+This is a generic module for working with identifiers.
+
+
+Pre-Requirements
+----------------
+
+On Debian:
+$ apt-get install libdist-zilla-plugins-cjm-perl libdist-zilla-plugin-git-per libdist-zilla-plugin-repository-perl libdist-zilla-plugin-podweaver-perl
+
+
+Building
+--------
+$ dzil build
+$ dzil install

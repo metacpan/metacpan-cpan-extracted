@@ -1,10 +1,44 @@
 ==================================================
-Changes from 2023-09-13 00:00:00 +0000 to present.
+Changes from 2023-09-19 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.34 at 2024-09-12 00:38:59 +0000
+version 0.35 at 2024-09-18 21:42:39 +0000
 -----------------------------------------
+
+  Change: 15de2fbefbab13d28189a70ed243e4761a108fad
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2024-09-18 23:42:29 +0000
+
+    Remove debugging line 
+
+  Change: 814fbcbf3733837bcdc9a74dbabf6dd1481a5962
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2024-09-18 23:41:41 +0000
+
+    Fix distinct 
+
+  Change: cacf263fcd30470787f21ebb5b57e9372843999f
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2024-09-18 23:35:16 +0000
+
+    Fix disconnected mode. #11 
+
+  Change: aff4aba8fbaf3d1f170a2f37c7f64bc196cae62f
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2024-09-18 23:18:41 +0000
+
+    Support DISTINCT ON () 
+
+-----------------------------------------
+version 0.34 at 2024-09-12 00:39:25 +0000
+-----------------------------------------
+
+  Change: 4195bbbc82ad63b28266b2edd7e96de5b42c1ab8
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2024-09-12 02:39:25 +0000
+
+    v0.34 
 
   Change: 3a0146df7488b287e74f75a7b972c9c05837033b
   Author: Alessandro Ranellucci <alessandro@pintle.it>
@@ -13,5 +47,5 @@ version 0.34 at 2024-09-12 00:38:59 +0000
     Add a ->distinct method 
 
 =================================================
-Plus 24 releases after 2023-09-13 00:00:00 +0000.
+Plus 24 releases after 2023-09-19 00:00:00 +0000.
 =================================================

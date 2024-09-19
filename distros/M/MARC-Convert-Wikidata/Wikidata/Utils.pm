@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_edition_number
 	clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.14;
+our $VERSION = 0.16;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -245,6 +245,8 @@ sub clean_number_of_pages {
 	my $ret_number_of_pages = $number_of_pages;
 	$ret_number_of_pages =~ s/^\[(\d+)\]/$1/ms;
 	$ret_number_of_pages =~ s/^(\d+)\s*(s\.|stran).*$/$1/ms;
+	# XXX First number.
+	$ret_number_of_pages =~ s/^(\d+)\s*,\s*.*/$1/ms;
 
 	if ($ret_number_of_pages !~ m/^\d+$/ms) {
 		if ($DEBUG) {
@@ -790,6 +792,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.16
 
 =cut

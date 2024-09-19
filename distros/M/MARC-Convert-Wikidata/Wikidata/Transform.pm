@@ -37,7 +37,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.14;
+our $VERSION = 0.16;
 
 # Constructor.
 sub new {
@@ -384,12 +384,14 @@ sub _process_people {
 			MARC::Convert::Wikidata::Object::People->new(
 				'date_of_birth' => $date_of_birth,
 				'date_of_death' => $date_of_death,
-				'external_ids' => [
-					MARC::Convert::Wikidata::Object::ExternalId->new(
-						'name' => 'nkcr_aut',
-						'value' => $nkcr_aut,
-					),
-				],
+				defined $nkcr_aut ? (
+					'external_ids' => [
+						MARC::Convert::Wikidata::Object::ExternalId->new(
+							'name' => 'nkcr_aut',
+							'value' => $nkcr_aut,
+						),
+					],
+				) : (),
 				'work_period_start' => $work_period_start,
 				'work_period_end' => $work_period_end,
 				'name' => $name,

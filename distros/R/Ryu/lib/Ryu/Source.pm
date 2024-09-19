@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '4.000'; # VERSION
+our $VERSION = '4.001'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -828,7 +828,7 @@ sub buffer {
                 while @pending
                 and not($src->is_paused)
                 and @{$self->{children}};
-            $self->resume($src) if @pending < $args{low} and $self->is_paused($src);
+            $self->resume($src) if @pending <= $args{low} and $self->is_paused($src);
 
             return if @pending;
 
@@ -839,6 +839,9 @@ sub buffer {
                 if $self->_completed->is_ready and not $src->_completed->is_ready;
         }
     };
+    $src->_completed->on_ready(sub {
+        $self->resume($src) if $self and $self->is_paused($src);
+    });
     $fc->each($item_handler)->retain;
     $self->each(my $code = sub {
         push @pending, $_;
@@ -1316,8 +1319,8 @@ This method is also available as L</resolve>.
 
 sub ordered_futures {
     my ($self, %args) = @_;
-    my $low = delete $args{low};
     my $high = delete $args{high};
+    my $low = (delete $args{low}) // $high // 0;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my %pending;
     my $src_completed = $src->_completed;
@@ -1335,6 +1338,7 @@ sub ordered_futures {
             $_->cancel if $_ and not $_->is_ready;
         }
     });
+    my $paused = 0;
     $self->each(sub {
         my $f = $_;
         my $k = Scalar::Util::refaddr $f;
@@ -1342,7 +1346,10 @@ sub ordered_futures {
         # ->is_ready callback removes it
         $pending{$k} = $f;
         $log->tracef('Ordered futures has %d pending', 0 + keys %pending);
-        $src->pause if $high and keys(%pending) >= $high and not $src->is_paused;
+        if(!$paused and $high and keys(%pending) >= $high) {
+            $src->pause;
+            ++$paused;
+        }
         $f->on_done(sub {
             my @pending = @_;
             while(@pending and not $src_completed->is_ready) {
@@ -1352,7 +1359,10 @@ sub ordered_futures {
           ->on_fail(sub { $src->fail(@_) unless $src_completed->is_ready; })
           ->on_ready(sub {
               delete $pending{$k};
-              $src->resume if $low and keys(%pending) <= $low and $src->is_paused;
+              if($paused and keys(%pending) <= $low) {
+                  $src->resume;
+                  --$paused;
+              }
               $log->tracef('Ordered futures now has %d pending after completion, upstream finish status is %d', 0 + keys(%pending), $all_finished);
               return if %pending;
               $all_finished->on_ready($src_completed) if $all_finished and not $src_completed->is_ready;

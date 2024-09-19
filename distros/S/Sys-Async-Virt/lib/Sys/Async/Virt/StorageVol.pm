@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::StorageVol v0.0.1;
+package Sys::Async::Virt::StorageVol v0.0.2;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.1;
+use Protocol::Sys::Virt::Remote::XDR v0.0.2;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -62,51 +62,51 @@ sub new {
 }
 
 sub delete($self, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_STORAGE_VOL_DELETE,
-        { vol => $self->{id}, flags => $flags // 0 } );
+        { vol => $self->{id}, flags => $flags // 0 } ));
 }
 
 sub get_info($self) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_STORAGE_VOL_GET_INFO,
-        { vol => $self->{id},  } );
+        { vol => $self->{id},  } ));
 }
 
-sub get_path($self) {
-    return $self->{client}->_call(
+async sub get_path($self) {
+    return (await $self->{client}->_call(
         $remote->PROC_STORAGE_VOL_GET_PATH,
-        { vol => $self->{id},  } );
+        { vol => $self->{id},  } ))->{name};
 }
 
-sub get_xml_desc($self, $flags = 0) {
-    return $self->{client}->_call(
+async sub get_xml_desc($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_STORAGE_VOL_GET_XML_DESC,
-        { vol => $self->{id}, flags => $flags // 0 } );
+        { vol => $self->{id}, flags => $flags // 0 } ))->{xml};
 }
 
-sub pool_lookup_by_volume($self) {
-    return $self->{client}->_call(
+async sub pool_lookup_by_volume($self) {
+    return (await $self->{client}->_call(
         $remote->PROC_STORAGE_POOL_LOOKUP_BY_VOLUME,
-        { vol => $self->{id},  } );
+        { vol => $self->{id},  } ))->{pool};
 }
 
 sub resize($self, $capacity, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_STORAGE_VOL_RESIZE,
-        { vol => $self->{id}, capacity => $capacity, flags => $flags // 0 } );
+        { vol => $self->{id}, capacity => $capacity, flags => $flags // 0 } ));
 }
 
 sub wipe($self, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_STORAGE_VOL_WIPE,
-        { vol => $self->{id}, flags => $flags // 0 } );
+        { vol => $self->{id}, flags => $flags // 0 } ));
 }
 
 sub wipe_pattern($self, $algorithm, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_STORAGE_VOL_WIPE_PATTERN,
-        { vol => $self->{id}, algorithm => $algorithm, flags => $flags // 0 } );
+        { vol => $self->{id}, algorithm => $algorithm, flags => $flags // 0 } ));
 }
 
 
@@ -122,7 +122,7 @@ Sys::Async::Virt::StorageVol - Client side proxy to remote LibVirt storage volum
 
 =head1 VERSION
 
-v0.0.1
+v0.0.2
 
 =head1 SYNOPSIS
 

@@ -17,7 +17,7 @@ use experimental 'signatures';
 use Feature::Compat::Try;
 use Future::AsyncAwait;
 
-package Sys::Async::Virt v0.0.1;
+package Sys::Async::Virt v0.0.2;
 
 use parent qw(IO::Async::Notifier);
 
@@ -29,20 +29,20 @@ use Scalar::Util qw(reftype weaken);
 use Protocol::Sys::Virt::Remote::XDR v10.3.7;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Sys::Async::Virt::Domain v0.0.1;
-use Sys::Async::Virt::DomainCheckpoint v0.0.1;
-use Sys::Async::Virt::DomainSnapshot v0.0.1;
-use Sys::Async::Virt::Network v0.0.1;
-use Sys::Async::Virt::NetworkPort v0.0.1;
-use Sys::Async::Virt::NwFilter v0.0.1;
-use Sys::Async::Virt::NwFilterBinding v0.0.1;
-use Sys::Async::Virt::Interface v0.0.1;
-use Sys::Async::Virt::StoragePool v0.0.1;
-use Sys::Async::Virt::StorageVol v0.0.1;
-use Sys::Async::Virt::NodeDevice v0.0.1;
-use Sys::Async::Virt::Secret v0.0.1;
+use Sys::Async::Virt::Domain v0.0.2;
+use Sys::Async::Virt::DomainCheckpoint v0.0.2;
+use Sys::Async::Virt::DomainSnapshot v0.0.2;
+use Sys::Async::Virt::Network v0.0.2;
+use Sys::Async::Virt::NetworkPort v0.0.2;
+use Sys::Async::Virt::NwFilter v0.0.2;
+use Sys::Async::Virt::NwFilterBinding v0.0.2;
+use Sys::Async::Virt::Interface v0.0.2;
+use Sys::Async::Virt::StoragePool v0.0.2;
+use Sys::Async::Virt::StorageVol v0.0.2;
+use Sys::Async::Virt::NodeDevice v0.0.2;
+use Sys::Async::Virt::Secret v0.0.2;
 
-use Sys::Async::Virt::Callback v0.0.1;
+use Sys::Async::Virt::Callback v0.0.2;
 
 use constant {
     CLOSE_REASON_ERROR                                 => 0,
@@ -335,30 +335,28 @@ my @reply_translators = (
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    sub { 4; my $client = shift; _translated($client, 'hv_ver', {  }, @_) },
-    sub { 5; my $client = shift; _translated($client, 'max_vcpus', {  }, @_) },
+    sub { 4; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 5; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
-    sub { 7; my $client = shift; _translated($client, 'capabilities', {  }, @_) },
-    \&_no_translation,
-    \&_no_translation,
-    sub { 10; my $client = shift; _translated($client, 'dom', { dom => \&_translate_remote_nonnull_domain }, @_) },
-    sub { 11; my $client = shift; _translated($client, 'dom', { dom => \&_translate_remote_nonnull_domain }, @_) },
+    sub { 7; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
-    sub { 14; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    sub { 15; my $client = shift; _translated($client, 'autostart', {  }, @_) },
-    \&_no_translation,
-    sub { 17; my $client = shift; _translated($client, 'memory', {  }, @_) },
-    sub { 18; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 19; my $client = shift; _translated($client, 'type', {  }, @_) },
-    \&_no_translation,
-    sub { 21; my $client = shift; _translated($client, 'names', {  }, @_) },
-    sub { 22; my $client = shift; _translated($client, 'dom', { dom => \&_translate_remote_nonnull_domain }, @_) },
-    sub { 23; my $client = shift; _translated($client, 'dom', { dom => \&_translate_remote_nonnull_domain }, @_) },
-    sub { 24; my $client = shift; _translated($client, 'dom', { dom => \&_translate_remote_nonnull_domain }, @_) },
-    sub { 25; my $client = shift; _translated($client, 'num', {  }, @_) },
+    sub { 10; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
+    sub { 11; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
     \&_no_translation,
+    sub { 14; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 15; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 17; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 18; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 19; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 21; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 22; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
+    sub { 23; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
+    sub { 24; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
+    sub { 25; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
@@ -367,133 +365,135 @@ my @reply_translators = (
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    sub { 36; my $client = shift; _translated($client, 'names', {  }, @_) },
-    \&_no_translation,
-    sub { 38; my $client = shift; _translated($client, 'names', {  }, @_) },
-    \&_no_translation,
-    sub { 40; my $client = shift; _translated($client, 'net', { net => \&_translate_remote_nonnull_network }, @_) },
-    sub { 41; my $client = shift; _translated($client, 'net', { net => \&_translate_remote_nonnull_network }, @_) },
-    \&_no_translation,
-    sub { 43; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    sub { 44; my $client = shift; _translated($client, 'autostart', {  }, @_) },
-    sub { 45; my $client = shift; _translated($client, 'name', {  }, @_) },
-    sub { 46; my $client = shift; _translated($client, 'net', { net => \&_translate_remote_nonnull_network }, @_) },
-    sub { 47; my $client = shift; _translated($client, 'net', { net => \&_translate_remote_nonnull_network }, @_) },
     \&_no_translation,
     \&_no_translation,
-    sub { 50; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 51; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 52; my $client = shift; _translated($client, 'num', {  }, @_) },
+    sub { 36; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 38; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 40; my $client = shift; _translated($client, undef, { net => \&_translate_remote_nonnull_network }, @_) },
+    sub { 41; my $client = shift; _translated($client, undef, { net => \&_translate_remote_nonnull_network }, @_) },
+    \&_no_translation,
+    sub { 43; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 44; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 45; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 46; my $client = shift; _translated($client, undef, { net => \&_translate_remote_nonnull_network }, @_) },
+    sub { 47; my $client = shift; _translated($client, undef, { net => \&_translate_remote_nonnull_network }, @_) },
     \&_no_translation,
     \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    sub { 57; my $client = shift; _translated($client, 'params', {  }, @_) },
-    \&_no_translation,
-    sub { 59; my $client = shift; _translated($client, 'hostname', {  }, @_) },
-    sub { 60; my $client = shift; _translated($client, 'supported', {  }, @_) },
-    \&_no_translation,
-    \&_no_translation,
-    sub { 63; my $client = shift; _translated($client, 'ddom', { ddom => \&_translate_remote_nonnull_domain }, @_) },
+    sub { 50; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 51; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 52; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
+    sub { 57; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 59; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 60; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
-    \&_no_translation,
-    sub { 71; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 72; my $client = shift; _translated($client, 'names', {  }, @_) },
-    sub { 73; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 74; my $client = shift; _translated($client, 'names', {  }, @_) },
-    \&_no_translation,
-    sub { 76; my $client = shift; _translated($client, 'pool', { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
-    sub { 77; my $client = shift; _translated($client, 'pool', { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
+    sub { 63; my $client = shift; _translated($client, undef, { ddom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    sub { 84; my $client = shift; _translated($client, 'pool', { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
-    sub { 85; my $client = shift; _translated($client, 'pool', { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
-    sub { 86; my $client = shift; _translated($client, 'pool', { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
     \&_no_translation,
-    sub { 88; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    sub { 89; my $client = shift; _translated($client, 'autostart', {  }, @_) },
+    sub { 71; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 72; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 73; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 74; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
-    sub { 91; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 92; my $client = shift; _translated($client, 'names', {  }, @_) },
-    sub { 93; my $client = shift; _translated($client, 'vol', { vol => \&_translate_remote_nonnull_storage_vol }, @_) },
+    sub { 76; my $client = shift; _translated($client, undef, { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
+    sub { 77; my $client = shift; _translated($client, undef, { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
     \&_no_translation,
-    sub { 95; my $client = shift; _translated($client, 'vol', { vol => \&_translate_remote_nonnull_storage_vol }, @_) },
-    sub { 96; my $client = shift; _translated($client, 'vol', { vol => \&_translate_remote_nonnull_storage_vol }, @_) },
-    sub { 97; my $client = shift; _translated($client, 'vol', { vol => \&_translate_remote_nonnull_storage_vol }, @_) },
     \&_no_translation,
-    sub { 99; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    sub { 100; my $client = shift; _translated($client, 'name', {  }, @_) },
     \&_no_translation,
-    sub { 102; my $client = shift; _translated($client, 'freeMem', {  }, @_) },
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    sub { 84; my $client = shift; _translated($client, undef, { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
+    sub { 85; my $client = shift; _translated($client, undef, { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
+    sub { 86; my $client = shift; _translated($client, undef, { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
+    \&_no_translation,
+    sub { 88; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 89; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 91; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 92; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 93; my $client = shift; _translated($client, undef, { vol => \&_translate_remote_nonnull_storage_vol }, @_) },
+    \&_no_translation,
+    sub { 95; my $client = shift; _translated($client, undef, { vol => \&_translate_remote_nonnull_storage_vol }, @_) },
+    sub { 96; my $client = shift; _translated($client, undef, { vol => \&_translate_remote_nonnull_storage_vol }, @_) },
+    sub { 97; my $client = shift; _translated($client, undef, { vol => \&_translate_remote_nonnull_storage_vol }, @_) },
+    \&_no_translation,
+    sub { 99; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 100; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 102; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
     sub { 107; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
-    sub { 109; my $client = shift; _translated($client, 'ddom', { ddom => \&_translate_remote_nonnull_domain }, @_) },
+    sub { 109; my $client = shift; _translated($client, undef, { ddom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
-    sub { 111; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 112; my $client = shift; _translated($client, 'names', {  }, @_) },
-    sub { 113; my $client = shift; _translated($client, 'dev', { dev => \&_translate_remote_nonnull_node_device }, @_) },
-    sub { 114; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    sub { 115; my $client = shift; _translated($client, 'parentName', {  }, @_) },
-    sub { 116; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 117; my $client = shift; _translated($client, 'names', {  }, @_) },
-    \&_no_translation,
-    \&_no_translation,
+    sub { 111; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 112; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 113; my $client = shift; _translated($client, undef, { dev => \&_translate_remote_nonnull_node_device }, @_) },
+    sub { 114; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 115; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 116; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 117; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    sub { 123; my $client = shift; _translated($client, 'dev', { dev => \&_translate_remote_nonnull_node_device }, @_) },
-    \&_no_translation,
-    sub { 125; my $client = shift; _translated($client, 'vol', { vol => \&_translate_remote_nonnull_storage_vol }, @_) },
-    sub { 126; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 127; my $client = shift; _translated($client, 'names', {  }, @_) },
-    sub { 128; my $client = shift; _translated($client, 'iface', { iface => \&_translate_remote_nonnull_interface }, @_) },
-    sub { 129; my $client = shift; _translated($client, 'iface', { iface => \&_translate_remote_nonnull_interface }, @_) },
-    sub { 130; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    sub { 131; my $client = shift; _translated($client, 'iface', { iface => \&_translate_remote_nonnull_interface }, @_) },
     \&_no_translation,
     \&_no_translation,
+    sub { 123; my $client = shift; _translated($client, undef, { dev => \&_translate_remote_nonnull_node_device }, @_) },
     \&_no_translation,
-    sub { 135; my $client = shift; _translated($client, 'domainXml', {  }, @_) },
-    sub { 136; my $client = shift; _translated($client, 'nativeConfig', {  }, @_) },
-    sub { 137; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 138; my $client = shift; _translated($client, 'names', {  }, @_) },
-    sub { 139; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 140; my $client = shift; _translated($client, 'uuids', {  }, @_) },
-    sub { 141; my $client = shift; _translated($client, 'secret', { secret => \&_translate_remote_nonnull_secret }, @_) },
-    sub { 142; my $client = shift; _translated($client, 'secret', { secret => \&_translate_remote_nonnull_secret }, @_) },
-    sub { 143; my $client = shift; _translated($client, 'xml', {  }, @_) },
+    sub { 125; my $client = shift; _translated($client, undef, { vol => \&_translate_remote_nonnull_storage_vol }, @_) },
+    sub { 126; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 127; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 128; my $client = shift; _translated($client, undef, { iface => \&_translate_remote_nonnull_interface }, @_) },
+    sub { 129; my $client = shift; _translated($client, undef, { iface => \&_translate_remote_nonnull_interface }, @_) },
+    sub { 130; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 131; my $client = shift; _translated($client, undef, { iface => \&_translate_remote_nonnull_interface }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    sub { 147; my $client = shift; _translated($client, 'secret', { secret => \&_translate_remote_nonnull_secret }, @_) },
-    \&_no_translation,
-    \&_no_translation,
-    sub { 150; my $client = shift; _translated($client, 'active', {  }, @_) },
-    sub { 151; my $client = shift; _translated($client, 'persistent', {  }, @_) },
-    sub { 152; my $client = shift; _translated($client, 'active', {  }, @_) },
-    sub { 153; my $client = shift; _translated($client, 'persistent', {  }, @_) },
-    sub { 154; my $client = shift; _translated($client, 'active', {  }, @_) },
-    sub { 155; my $client = shift; _translated($client, 'persistent', {  }, @_) },
-    sub { 156; my $client = shift; _translated($client, 'active', {  }, @_) },
-    sub { 157; my $client = shift; _translated($client, 'lib_ver', {  }, @_) },
-    sub { 158; my $client = shift; _translated($client, 'result', {  }, @_) },
+    sub { 135; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 136; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 137; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 138; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 139; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 140; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 141; my $client = shift; _translated($client, undef, { secret => \&_translate_remote_nonnull_secret }, @_) },
+    sub { 142; my $client = shift; _translated($client, undef, { secret => \&_translate_remote_nonnull_secret }, @_) },
+    sub { 143; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    sub { 162; my $client = shift; _translated($client, 'cpu', {  }, @_) },
+    sub { 147; my $client = shift; _translated($client, undef, { secret => \&_translate_remote_nonnull_secret }, @_) },
+    \&_no_translation,
+    \&_no_translation,
+    sub { 150; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 151; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 152; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 153; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 154; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 155; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 156; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 157; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 158; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    sub { 162; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
@@ -506,42 +506,38 @@ my @reply_translators = (
     sub { 172; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     sub { 173; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
-    sub { 175; my $client = shift; _translated($client, 'nwfilter', { nwfilter => \&_translate_remote_nonnull_nwfilter }, @_) },
-    sub { 176; my $client = shift; _translated($client, 'nwfilter', { nwfilter => \&_translate_remote_nonnull_nwfilter }, @_) },
-    sub { 177; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    sub { 178; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 179; my $client = shift; _translated($client, 'names', {  }, @_) },
-    sub { 180; my $client = shift; _translated($client, 'nwfilter', { nwfilter => \&_translate_remote_nonnull_nwfilter }, @_) },
+    sub { 175; my $client = shift; _translated($client, undef, { nwfilter => \&_translate_remote_nonnull_nwfilter }, @_) },
+    sub { 176; my $client = shift; _translated($client, undef, { nwfilter => \&_translate_remote_nonnull_nwfilter }, @_) },
+    sub { 177; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 178; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 179; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 180; my $client = shift; _translated($client, undef, { nwfilter => \&_translate_remote_nonnull_nwfilter }, @_) },
     \&_no_translation,
     \&_no_translation,
-    sub { 183; my $client = shift; _translated($client, 'result', {  }, @_) },
+    sub { 183; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
-    sub { 185; my $client = shift; _translated($client, 'snap', { snap => \&_translate_remote_nonnull_domain_snapshot }, @_) },
-    sub { 186; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    sub { 187; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 188; my $client = shift; _translated($client, 'names', {  }, @_) },
-    sub { 189; my $client = shift; _translated($client, 'snap', { snap => \&_translate_remote_nonnull_domain_snapshot }, @_) },
-    sub { 190; my $client = shift; _translated($client, 'result', {  }, @_) },
-    sub { 191; my $client = shift; _translated($client, 'snap', { snap => \&_translate_remote_nonnull_domain_snapshot }, @_) },
+    sub { 185; my $client = shift; _translated($client, undef, { snap => \&_translate_remote_nonnull_domain_snapshot }, @_) },
+    sub { 186; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 187; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 188; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 189; my $client = shift; _translated($client, undef, { snap => \&_translate_remote_nonnull_domain_snapshot }, @_) },
+    sub { 190; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 191; my $client = shift; _translated($client, undef, { snap => \&_translate_remote_nonnull_domain_snapshot }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
     sub { 195; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
-    sub { 196; my $client = shift; _translated($client, 'dom', { dom => \&_translate_remote_nonnull_domain }, @_) },
+    sub { 196; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
+    \&_no_translation,
+    sub { 198; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 200; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 202; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 203; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
-    \&_no_translation,
-    sub { 200; my $client = shift; _translated($client, 'num', {  }, @_) },
-    \&_no_translation,
-    sub { 202; my $client = shift; _translated($client, 'updated', {  }, @_) },
-    sub { 203; my $client = shift; _translated($client, 'sysinfo', {  }, @_) },
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
+    sub { 206; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
@@ -554,73 +550,77 @@ my @reply_translators = (
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    sub { 223; my $client = shift; _translated($client, 'params', {  }, @_) },
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    sub { 223; my $client = shift; _translated($client, undef, {  }, @_) },
+    undef,
+    \&_no_translation,
+    \&_no_translation,
+    sub { 227; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 228; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    sub { 235; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    undef,
+    sub { 242; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 243; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 244; my $client = shift; _translated($client, undef, { snap => \&_translate_remote_nonnull_domain_snapshot }, @_) },
+    \&_no_translation,
+    sub { 246; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 247; my $client = shift; _translated($client, undef, {  }, @_) },
     undef,
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
+    sub { 253; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 255; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 257; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
+    sub { 262; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
-    sub { 235; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    undef,
-    sub { 242; my $client = shift; _translated($client, 'bandwidth', {  }, @_) },
-    \&_no_translation,
-    sub { 244; my $client = shift; _translated($client, 'snap', { snap => \&_translate_remote_nonnull_domain_snapshot }, @_) },
-    \&_no_translation,
-    sub { 246; my $client = shift; _translated($client, 'num', {  }, @_) },
-    sub { 247; my $client = shift; _translated($client, 'names', {  }, @_) },
-    undef,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    sub { 265; my $client = shift; _translated($client, 'metadata', {  }, @_) },
+    sub { 265; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     sub { 268; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     sub { 269; my $client = shift; _translated($client, 'dom', { dom => \&_translate_remote_nonnull_domain }, @_) },
     sub { 270; my $client = shift; _translated($client, 'dom', { dom => \&_translate_remote_nonnull_domain }, @_) },
-    sub { 271; my $client = shift; _translated($client, 'current', {  }, @_) },
-    sub { 272; my $client = shift; _translated($client, 'metadata', {  }, @_) },
-    sub { 273; my $client = shift; _translated($client, 'domains', { domains => \&_translate_remote_nonnull_domain }, @_) },
-    sub { 274; my $client = shift; _translated($client, 'snapshots', { snapshots => \&_translate_remote_nonnull_domain_snapshot }, @_) },
-    sub { 275; my $client = shift; _translated($client, 'snapshots', { snapshots => \&_translate_remote_nonnull_domain_snapshot }, @_) },
+    sub { 271; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 272; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 273; my $client = shift; _translated($client, undef, { domains => \&_translate_remote_nonnull_domain }, @_) },
+    sub { 274; my $client = shift; _translated($client, undef, { snapshots => \&_translate_remote_nonnull_domain_snapshot }, @_) },
+    sub { 275; my $client = shift; _translated($client, undef, { snapshots => \&_translate_remote_nonnull_domain_snapshot }, @_) },
     sub { 276; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
-    sub { 277; my $client = shift; _translated($client, 'hostname', {  }, @_) },
+    sub { 277; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    sub { 281; my $client = shift; _translated($client, 'pools', { pools => \&_translate_remote_nonnull_storage_pool }, @_) },
-    sub { 282; my $client = shift; _translated($client, 'vols', { vols => \&_translate_remote_nonnull_storage_vol }, @_) },
-    sub { 283; my $client = shift; _translated($client, 'nets', { nets => \&_translate_remote_nonnull_network }, @_) },
-    sub { 284; my $client = shift; _translated($client, 'ifaces', { ifaces => \&_translate_remote_nonnull_interface }, @_) },
-    sub { 285; my $client = shift; _translated($client, 'devices', { devices => \&_translate_remote_nonnull_node_device }, @_) },
-    sub { 286; my $client = shift; _translated($client, 'filters', { filters => \&_translate_remote_nonnull_nwfilter }, @_) },
-    sub { 287; my $client = shift; _translated($client, 'secrets', { secrets => \&_translate_remote_nonnull_secret }, @_) },
+    sub { 281; my $client = shift; _translated($client, undef, { pools => \&_translate_remote_nonnull_storage_pool }, @_) },
+    sub { 282; my $client = shift; _translated($client, undef, { vols => \&_translate_remote_nonnull_storage_vol }, @_) },
+    sub { 283; my $client = shift; _translated($client, undef, { nets => \&_translate_remote_nonnull_network }, @_) },
+    sub { 284; my $client = shift; _translated($client, undef, { ifaces => \&_translate_remote_nonnull_interface }, @_) },
+    sub { 285; my $client = shift; _translated($client, undef, { devices => \&_translate_remote_nonnull_node_device }, @_) },
+    sub { 286; my $client = shift; _translated($client, undef, { filters => \&_translate_remote_nonnull_nwfilter }, @_) },
+    sub { 287; my $client = shift; _translated($client, undef, { secrets => \&_translate_remote_nonnull_secret }, @_) },
     \&_no_translation,
-    \&_no_translation,
+    sub { 289; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     sub { 292; my $client = shift; _translated($client, 'dom', { dom => \&_translate_remote_nonnull_domain }, @_) },
@@ -628,9 +628,9 @@ my @reply_translators = (
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    sub { 297; my $client = shift; _translated($client, 'dev', { dev => \&_translate_remote_nonnull_node_device }, @_) },
+    sub { 297; my $client = shift; _translated($client, undef, { dev => \&_translate_remote_nonnull_node_device }, @_) },
     \&_no_translation,
-    sub { 299; my $client = shift; _translated($client, 'cacheSize', {  }, @_) },
+    sub { 299; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
@@ -643,7 +643,7 @@ my @reply_translators = (
     \&_no_translation,
     \&_no_translation,
     sub { 311; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
-    \&_no_translation,
+    sub { 312; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     sub { 315; my $client = shift; _translated($client, undef, { net => \&_translate_remote_nonnull_network }, @_) },
@@ -666,14 +666,14 @@ my @reply_translators = (
     sub { 332; my $client = shift; _translated($client, undef, { msg => { dom => \&_translate_remote_nonnull_domain } }, @_) },
     sub { 333; my $client = shift; _translated($client, undef, { msg => { dom => \&_translate_remote_nonnull_domain } }, @_) },
     \&_no_translation,
-    sub { 335; my $client = shift; _translated($client, 'filesystems', {  }, @_) },
-    sub { 336; my $client = shift; _translated($client, 'filesystems', {  }, @_) },
+    sub { 335; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 336; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     undef,
     \&_no_translation,
-    \&_no_translation,
-    sub { 342; my $client = shift; _translated($client, 'capabilities', {  }, @_) },
+    sub { 341; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 342; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
@@ -681,7 +681,7 @@ my @reply_translators = (
     \&_no_translation,
     sub { 348; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
-    sub { 350; my $client = shift; _translated($client, 'dom', { dom => \&_translate_remote_nonnull_domain }, @_) },
+    sub { 350; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
@@ -702,7 +702,7 @@ my @reply_translators = (
     \&_no_translation,
     \&_no_translation,
     sub { 370; my $client = shift; _translated($client, undef, { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
-    sub { 371; my $client = shift; _translated($client, 'params', {  }, @_) },
+    sub { 371; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     sub { 373; my $client = shift; _translated($client, undef, { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
     \&_no_translation,
@@ -718,57 +718,57 @@ my @reply_translators = (
     \&_no_translation,
     sub { 385; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
-    sub { 387; my $client = shift; _translated($client, 'downtime', {  }, @_) },
-    sub { 388; my $client = shift; _translated($client, 'xml', {  }, @_) },
+    sub { 387; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 388; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
-    sub { 391; my $client = shift; _translated($client, 'pool', { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
+    sub { 391; my $client = shift; _translated($client, undef, { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
     \&_no_translation,
-    sub { 393; my $client = shift; _translated($client, 'result', {  }, @_) },
-    sub { 394; my $client = shift; _translated($client, 'cpu', {  }, @_) },
+    sub { 393; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 394; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 395; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 397; my $client = shift; _translated($client, undef, { nwfilter => \&_translate_remote_nonnull_nwfilter_binding }, @_) },
+    sub { 398; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 399; my $client = shift; _translated($client, undef, { nwfilter => \&_translate_remote_nonnull_nwfilter_binding }, @_) },
+    \&_no_translation,
+    sub { 401; my $client = shift; _translated($client, undef, { bindings => \&_translate_remote_nonnull_nwfilter_binding }, @_) },
+    \&_no_translation,
+    sub { 403; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 404; my $client = shift; _translated($client, undef, { ports => \&_translate_remote_nonnull_network_port }, @_) },
+    sub { 405; my $client = shift; _translated($client, undef, { port => \&_translate_remote_nonnull_network_port }, @_) },
+    sub { 406; my $client = shift; _translated($client, undef, { port => \&_translate_remote_nonnull_network_port }, @_) },
+    sub { 407; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 409; my $client = shift; _translated($client, undef, {  }, @_) },
+    \&_no_translation,
+    sub { 411; my $client = shift; _translated($client, undef, { checkpoint => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
+    sub { 412; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 413; my $client = shift; _translated($client, undef, { checkpoints => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
+    sub { 414; my $client = shift; _translated($client, undef, { checkpoints => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
+    sub { 415; my $client = shift; _translated($client, undef, { checkpoint => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
+    sub { 416; my $client = shift; _translated($client, undef, { parent => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
     \&_no_translation,
     \&_no_translation,
-    sub { 397; my $client = shift; _translated($client, 'nwfilter', { nwfilter => \&_translate_remote_nonnull_nwfilter_binding }, @_) },
-    sub { 398; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    sub { 399; my $client = shift; _translated($client, 'nwfilter', { nwfilter => \&_translate_remote_nonnull_nwfilter_binding }, @_) },
     \&_no_translation,
-    sub { 401; my $client = shift; _translated($client, 'bindings', { bindings => \&_translate_remote_nonnull_nwfilter_binding }, @_) },
+    sub { 420; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
-    sub { 403; my $client = shift; _translated($client, 'capabilities', {  }, @_) },
-    sub { 404; my $client = shift; _translated($client, 'ports', { ports => \&_translate_remote_nonnull_network_port }, @_) },
-    sub { 405; my $client = shift; _translated($client, 'port', { port => \&_translate_remote_nonnull_network_port }, @_) },
-    sub { 406; my $client = shift; _translated($client, 'port', { port => \&_translate_remote_nonnull_network_port }, @_) },
-    \&_no_translation,
-    \&_no_translation,
-    sub { 409; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    \&_no_translation,
-    sub { 411; my $client = shift; _translated($client, 'checkpoint', { checkpoint => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
-    sub { 412; my $client = shift; _translated($client, 'xml', {  }, @_) },
-    sub { 413; my $client = shift; _translated($client, 'checkpoints', { checkpoints => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
-    sub { 414; my $client = shift; _translated($client, 'checkpoints', { checkpoints => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
-    sub { 415; my $client = shift; _translated($client, 'checkpoint', { checkpoint => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
-    sub { 416; my $client = shift; _translated($client, 'parent', { parent => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
-    \&_no_translation,
-    \&_no_translation,
-    \&_no_translation,
-    sub { 420; my $client = shift; _translated($client, 'result', {  }, @_) },
-    \&_no_translation,
-    sub { 422; my $client = shift; _translated($client, 'xml', {  }, @_) },
+    sub { 422; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 423; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    sub { 428; my $client = shift; _translated($client, 'dev', { dev => \&_translate_remote_nonnull_node_device }, @_) },
+    sub { 428; my $client = shift; _translated($client, undef, { dev => \&_translate_remote_nonnull_node_device }, @_) },
     \&_no_translation,
     \&_no_translation,
-    sub { 431; my $client = shift; _translated($client, 'nwfilter', { nwfilter => \&_translate_remote_nonnull_nwfilter }, @_) },
-    sub { 432; my $client = shift; _translated($client, 'net', { net => \&_translate_remote_nonnull_network }, @_) },
-    sub { 433; my $client = shift; _translated($client, 'autostart', {  }, @_) },
+    sub { 431; my $client = shift; _translated($client, undef, { nwfilter => \&_translate_remote_nonnull_nwfilter }, @_) },
+    sub { 432; my $client = shift; _translated($client, undef, { net => \&_translate_remote_nonnull_network }, @_) },
+    sub { 433; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
-    sub { 435; my $client = shift; _translated($client, 'persistent', {  }, @_) },
-    sub { 436; my $client = shift; _translated($client, 'active', {  }, @_) },
-    sub { 437; my $client = shift; _translated($client, 'net', { net => \&_translate_remote_nonnull_network }, @_) },
+    sub { 435; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 436; my $client = shift; _translated($client, undef, {  }, @_) },
+    sub { 437; my $client = shift; _translated($client, undef, { net => \&_translate_remote_nonnull_network }, @_) },
     sub { 438; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
     \&_no_translation,
@@ -776,7 +776,7 @@ my @reply_translators = (
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    sub { 445; my $client = shift; _translated($client, 'metadata', {  }, @_) },
+    sub { 445; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 446; my $client = shift; _translated($client, undef, { net => \&_translate_remote_nonnull_network }, @_) },
     \&_no_translation,
     \&_no_translation
@@ -1095,6 +1095,8 @@ sub register {
     $self->{remote} = $r;
 }
 
+# ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_CALLBACK_REGISTER_ANY
+# ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_CALLBACK_DEREGISTER_ANY
 async sub domain_event_register_any($self, $eventID, $domain = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_DOMAIN_EVENT_CALLBACK_REGISTER_ANY,
@@ -1111,6 +1113,8 @@ async sub domain_event_register_any($self, $eventID, $domain = undef) {
     return $cb;
 }
 
+# ENTRYPOINT: REMOTE_PROC_CONNECT_NETWORK_EVENT_REGISTER_ANY
+# ENTRYPOINT: REMOTE_PROC_CONNECT_NETWORK_EVENT_DEREGISTER_ANY
 async sub network_event_register_any($self, $eventID, $network = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_NETWORK_EVENT_REGISTER_ANY,
@@ -1127,6 +1131,8 @@ async sub network_event_register_any($self, $eventID, $network = undef) {
     return $cb;
 }
 
+# ENTRYPOINT: REMOTE_PROC_CONNECT_STORAGE_POOL_EVENT_REGISTER_ANY
+# ENTRYPOINT: REMOTE_PROC_CONNECT_STORAGE_POOL_EVENT_DEREGISTER_ANY
 async sub storage_pool_event_register_any($self, $eventID, $pool = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_STORAGE_POOL_EVENT_REGISTER_ANY,
@@ -1143,6 +1149,8 @@ async sub storage_pool_event_register_any($self, $eventID, $pool = undef) {
     return $cb;
 }
 
+# ENTRYPOINT: REMOTE_PROC_CONNECT_NODE_DEVICE_EVENT_REGISTER_ANY
+# ENTRYPOINT: REMOTE_PROC_CONNECT_NODE_DEVICE_EVENT_DEREGISTER_ANY
 async sub node_device_event_register_any($self, $eventID, $dev = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_NODE_DEVICE_EVENT_REGISTER_ANY,
@@ -1159,6 +1167,8 @@ async sub node_device_event_register_any($self, $eventID, $dev = undef) {
     return $cb;
 }
 
+# ENTRYPOINT: REMOTE_PROC_CONNECT_SECRET_EVENT_REGISTER_ANY
+# ENTRYPOINT: REMOTE_PROC_CONNECT_SECRET_EVENT_DEREGISTER_ANY
 async sub secret_event_register_any($self, $eventID, $secret = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_SECRET_EVENT_REGISTER_ANY,
@@ -1187,6 +1197,9 @@ sub unregister_stream {
     delete $self->{_streams}->{$serial};
 }
 
+# ENTRYPOINT: REMOTE_PROC_AUTH_LIST
+# ENTRYPOINT: REMOTE_PROC_AUTH_POLKIT
+# ENTRYPOINT: REMOTE_PROC_AUTH_SASL_INIT
 async sub auth {
     my ($self, $auth_type) = @_;
 
@@ -1214,6 +1227,8 @@ async sub auth {
 }
 
 
+# ENTRYPOINT: REMOTE_PROC_CONNECT_OPEN
+# ENTRYPOINT: REMOTE_PROC_CONNECT_REGISTER_CLOSE_CALLBACK
 async sub open {
     my ($self, $url, $flags) = @_;
     await $self->_call( $remote->PROC_CONNECT_OPEN,
@@ -1228,553 +1243,600 @@ async sub open {
     }
 }
 
-sub close {
+# ENTRYPOINT: REMOTE_PROC_CONNECT_CLOSE
+# ENTRYPOINT: REMOTE_PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK
+async sub close {
     my ($self) = @_;
-    $self->_call( $remote->PROC_CONNECT_CLOSE, {} );
+    await $self->_call( $remote->PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK );
+    await $self->_call( $remote->PROC_CONNECT_CLOSE, {} );
 }
 
 
-sub baseline_cpu($self, $xmlCPUs, $flags = 0) {
-    return $self->_call(
+async sub baseline_cpu($self, $xmlCPUs, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_BASELINE_CPU,
-        { xmlCPUs => $xmlCPUs, flags => $flags // 0 } );
+        { xmlCPUs => $xmlCPUs, flags => $flags // 0 } ))->{cpu};
 }
 
-sub baseline_hypervisor_cpu($self, $emulator, $arch, $machine, $virttype, $xmlCPUs, $flags = 0) {
-    return $self->_call(
+async sub baseline_hypervisor_cpu($self, $emulator, $arch, $machine, $virttype, $xmlCPUs, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_BASELINE_HYPERVISOR_CPU,
-        { emulator => $emulator, arch => $arch, machine => $machine, virttype => $virttype, xmlCPUs => $xmlCPUs, flags => $flags // 0 } );
+        { emulator => $emulator, arch => $arch, machine => $machine, virttype => $virttype, xmlCPUs => $xmlCPUs, flags => $flags // 0 } ))->{cpu};
 }
 
-sub compare_cpu($self, $xml, $flags = 0) {
-    return $self->_call(
+async sub compare_cpu($self, $xml, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_COMPARE_CPU,
-        { xml => $xml, flags => $flags // 0 } );
+        { xml => $xml, flags => $flags // 0 } ))->{result};
 }
 
-sub compare_hypervisor_cpu($self, $emulator, $arch, $machine, $virttype, $xmlCPU, $flags = 0) {
-    return $self->_call(
+async sub compare_hypervisor_cpu($self, $emulator, $arch, $machine, $virttype, $xmlCPU, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_COMPARE_HYPERVISOR_CPU,
-        { emulator => $emulator, arch => $arch, machine => $machine, virttype => $virttype, xmlCPU => $xmlCPU, flags => $flags // 0 } );
+        { emulator => $emulator, arch => $arch, machine => $machine, virttype => $virttype, xmlCPU => $xmlCPU, flags => $flags // 0 } ))->{result};
 }
 
-sub domain_create_xml($self, $xml_desc, $flags = 0) {
-    return $self->_call(
+async sub domain_create_xml($self, $xml_desc, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_DOMAIN_CREATE_XML,
-        { xml_desc => $xml_desc, flags => $flags // 0 } );
+        { xml_desc => $xml_desc, flags => $flags // 0 } ))->{dom};
 }
 
-sub domain_define_xml($self, $xml) {
-    return $self->_call(
+async sub domain_define_xml($self, $xml) {
+    return (await $self->_call(
         $remote->PROC_DOMAIN_DEFINE_XML,
-        { xml => $xml } );
+        { xml => $xml } ))->{dom};
 }
 
-sub domain_define_xml_flags($self, $xml, $flags = 0) {
-    return $self->_call(
+async sub domain_define_xml_flags($self, $xml, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_DOMAIN_DEFINE_XML_FLAGS,
-        { xml => $xml, flags => $flags // 0 } );
+        { xml => $xml, flags => $flags // 0 } ))->{dom};
 }
 
-sub domain_lookup_by_id($self, $id) {
-    return $self->_call(
+async sub domain_lookup_by_id($self, $id) {
+    return (await $self->_call(
         $remote->PROC_DOMAIN_LOOKUP_BY_ID,
-        { id => $id } );
+        { id => $id } ))->{dom};
 }
 
-sub domain_lookup_by_name($self, $name) {
-    return $self->_call(
+async sub domain_lookup_by_name($self, $name) {
+    return (await $self->_call(
         $remote->PROC_DOMAIN_LOOKUP_BY_NAME,
-        { name => $name } );
+        { name => $name } ))->{dom};
 }
 
-sub domain_lookup_by_uuid($self, $uuid) {
-    return $self->_call(
+async sub domain_lookup_by_uuid($self, $uuid) {
+    return (await $self->_call(
         $remote->PROC_DOMAIN_LOOKUP_BY_UUID,
-        { uuid => $uuid } );
+        { uuid => $uuid } ))->{dom};
 }
 
-sub domain_migrate_finish($self, $dname, $cookie, $uri, $flags = 0) {
-    return $self->_call(
+async sub domain_migrate_finish($self, $dname, $cookie, $uri, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_DOMAIN_MIGRATE_FINISH,
-        { dname => $dname, cookie => $cookie, uri => $uri, flags => $flags // 0 } );
+        { dname => $dname, cookie => $cookie, uri => $uri, flags => $flags // 0 } ))->{ddom};
 }
 
-sub domain_migrate_finish2($self, $dname, $cookie, $uri, $flags, $retcode) {
-    return $self->_call(
+async sub domain_migrate_finish2($self, $dname, $cookie, $uri, $flags, $retcode) {
+    return (await $self->_call(
         $remote->PROC_DOMAIN_MIGRATE_FINISH2,
-        { dname => $dname, cookie => $cookie, uri => $uri, flags => $flags // 0, retcode => $retcode } );
+        { dname => $dname, cookie => $cookie, uri => $uri, flags => $flags // 0, retcode => $retcode } ))->{ddom};
 }
 
 sub domain_restore($self, $from) {
-    return $self->_call(
+    return ($self->_call(
         $remote->PROC_DOMAIN_RESTORE,
-        { from => $from } );
+        { from => $from } ));
 }
 
 sub domain_restore_flags($self, $from, $dxml, $flags = 0) {
-    return $self->_call(
+    return ($self->_call(
         $remote->PROC_DOMAIN_RESTORE_FLAGS,
-        { from => $from, dxml => $dxml, flags => $flags // 0 } );
+        { from => $from, dxml => $dxml, flags => $flags // 0 } ));
 }
 
 async sub domain_restore_params($self, $params, $flags = 0) {
     $params = await $self->_filter_typed_param_string( $params );
-    return await $self->_call(
+    return (await $self->_call(
         $remote->PROC_DOMAIN_RESTORE_PARAMS,
-        { params => $params, flags => $flags // 0 } );
+        { params => $params, flags => $flags // 0 } ));
 }
 
 sub domain_save_image_define_xml($self, $file, $dxml, $flags = 0) {
-    return $self->_call(
+    return ($self->_call(
         $remote->PROC_DOMAIN_SAVE_IMAGE_DEFINE_XML,
-        { file => $file, dxml => $dxml, flags => $flags // 0 } );
+        { file => $file, dxml => $dxml, flags => $flags // 0 } ));
 }
 
-sub domain_save_image_get_xml_desc($self, $file, $flags = 0) {
-    return $self->_call(
+async sub domain_save_image_get_xml_desc($self, $file, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_DOMAIN_SAVE_IMAGE_GET_XML_DESC,
-        { file => $file, flags => $flags // 0 } );
+        { file => $file, flags => $flags // 0 } ))->{xml};
 }
 
-sub domain_xml_from_native($self, $nativeFormat, $nativeConfig, $flags = 0) {
-    return $self->_call(
+async sub domain_xml_from_native($self, $nativeFormat, $nativeConfig, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_DOMAIN_XML_FROM_NATIVE,
-        { nativeFormat => $nativeFormat, nativeConfig => $nativeConfig, flags => $flags // 0 } );
+        { nativeFormat => $nativeFormat, nativeConfig => $nativeConfig, flags => $flags // 0 } ))->{domainXml};
 }
 
-sub domain_xml_to_native($self, $nativeFormat, $domainXml, $flags = 0) {
-    return $self->_call(
+async sub domain_xml_to_native($self, $nativeFormat, $domainXml, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_DOMAIN_XML_TO_NATIVE,
-        { nativeFormat => $nativeFormat, domainXml => $domainXml, flags => $flags // 0 } );
+        { nativeFormat => $nativeFormat, domainXml => $domainXml, flags => $flags // 0 } ))->{nativeConfig};
 }
 
-sub get_capabilities($self) {
-    return $self->_call(
+async sub get_capabilities($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_GET_CAPABILITIES,
-        {  } );
+        {  } ))->{capabilities};
 }
 
-sub get_domain_capabilities($self, $emulatorbin, $arch, $machine, $virttype, $flags = 0) {
-    return $self->_call(
+async sub get_cpu_model_names($self, $arch, $flags = 0) {
+    return (await $self->_call(
+        $remote->PROC_CONNECT_GET_CPU_MODEL_NAMES,
+        { arch => $arch, need_results => $remote->CPU_MODELS_MAX, flags => $flags // 0 } ))->{models};
+}
+
+async sub get_domain_capabilities($self, $emulatorbin, $arch, $machine, $virttype, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_GET_DOMAIN_CAPABILITIES,
-        { emulatorbin => $emulatorbin, arch => $arch, machine => $machine, virttype => $virttype, flags => $flags // 0 } );
+        { emulatorbin => $emulatorbin, arch => $arch, machine => $machine, virttype => $virttype, flags => $flags // 0 } ))->{capabilities};
 }
 
-sub get_hostname($self) {
-    return $self->_call(
+async sub get_hostname($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_GET_HOSTNAME,
-        {  } );
+        {  } ))->{hostname};
 }
 
-sub get_lib_version($self) {
-    return $self->_call(
+async sub get_lib_version($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_GET_LIB_VERSION,
-        {  } );
+        {  } ))->{lib_ver};
 }
 
-sub get_max_vcpus($self, $type) {
-    return $self->_call(
+async sub get_max_vcpus($self, $type) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_GET_MAX_VCPUS,
-        { type => $type } );
+        { type => $type } ))->{max_vcpus};
 }
 
-sub get_storage_pool_capabilities($self, $flags = 0) {
-    return $self->_call(
+async sub get_storage_pool_capabilities($self, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_GET_STORAGE_POOL_CAPABILITIES,
-        { flags => $flags // 0 } );
+        { flags => $flags // 0 } ))->{capabilities};
 }
 
-sub get_sysinfo($self, $flags = 0) {
-    return $self->_call(
+async sub get_sysinfo($self, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_GET_SYSINFO,
-        { flags => $flags // 0 } );
+        { flags => $flags // 0 } ))->{sysinfo};
 }
 
-sub get_version($self) {
-    return $self->_call(
+async sub get_version($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_GET_VERSION,
-        {  } );
+        {  } ))->{hv_ver};
 }
 
 sub interface_change_begin($self, $flags = 0) {
-    return $self->_call(
+    return ($self->_call(
         $remote->PROC_INTERFACE_CHANGE_BEGIN,
-        { flags => $flags // 0 } );
+        { flags => $flags // 0 } ));
 }
 
 sub interface_change_commit($self, $flags = 0) {
-    return $self->_call(
+    return ($self->_call(
         $remote->PROC_INTERFACE_CHANGE_COMMIT,
-        { flags => $flags // 0 } );
+        { flags => $flags // 0 } ));
 }
 
 sub interface_change_rollback($self, $flags = 0) {
-    return $self->_call(
+    return ($self->_call(
         $remote->PROC_INTERFACE_CHANGE_ROLLBACK,
-        { flags => $flags // 0 } );
+        { flags => $flags // 0 } ));
 }
 
-sub interface_define_xml($self, $xml, $flags = 0) {
-    return $self->_call(
+async sub interface_define_xml($self, $xml, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_INTERFACE_DEFINE_XML,
-        { xml => $xml, flags => $flags // 0 } );
+        { xml => $xml, flags => $flags // 0 } ))->{iface};
 }
 
-sub interface_lookup_by_mac_string($self, $mac) {
-    return $self->_call(
+async sub interface_lookup_by_mac_string($self, $mac) {
+    return (await $self->_call(
         $remote->PROC_INTERFACE_LOOKUP_BY_MAC_STRING,
-        { mac => $mac } );
+        { mac => $mac } ))->{iface};
 }
 
-sub interface_lookup_by_name($self, $name) {
-    return $self->_call(
+async sub interface_lookup_by_name($self, $name) {
+    return (await $self->_call(
         $remote->PROC_INTERFACE_LOOKUP_BY_NAME,
-        { name => $name } );
+        { name => $name } ))->{iface};
 }
 
-sub list_all_domains($self, $flags = 0) {
-    return $self->_call(
+async sub list_all_domains($self, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_DOMAINS,
-        { need_results => $remote->DOMAIN_LIST_MAX, flags => $flags // 0 } );
+        { need_results => $remote->DOMAIN_LIST_MAX, flags => $flags // 0 } ))->{domains};
 }
 
-sub list_all_interfaces($self, $flags = 0) {
-    return $self->_call(
+async sub list_all_interfaces($self, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_INTERFACES,
-        { need_results => $remote->INTERFACE_LIST_MAX, flags => $flags // 0 } );
+        { need_results => $remote->INTERFACE_LIST_MAX, flags => $flags // 0 } ))->{ifaces};
 }
 
-sub list_all_networks($self, $flags = 0) {
-    return $self->_call(
+async sub list_all_networks($self, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_NETWORKS,
-        { need_results => $remote->NETWORK_LIST_MAX, flags => $flags // 0 } );
+        { need_results => $remote->NETWORK_LIST_MAX, flags => $flags // 0 } ))->{nets};
 }
 
-sub list_all_node_devices($self, $flags = 0) {
-    return $self->_call(
+async sub list_all_node_devices($self, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_NODE_DEVICES,
-        { need_results => $remote->NODE_DEVICE_LIST_MAX, flags => $flags // 0 } );
+        { need_results => $remote->NODE_DEVICE_LIST_MAX, flags => $flags // 0 } ))->{devices};
 }
 
-sub list_all_nwfilter_bindings($self, $flags = 0) {
-    return $self->_call(
+async sub list_all_nwfilter_bindings($self, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_NWFILTER_BINDINGS,
-        { need_results => $remote->NWFILTER_BINGING_LIST_MAX, flags => $flags // 0 } );
+        { need_results => $remote->NWFILTER_BINGING_LIST_MAX, flags => $flags // 0 } ))->{bindings};
 }
 
-sub list_all_nwfilters($self, $flags = 0) {
-    return $self->_call(
+async sub list_all_nwfilters($self, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_NWFILTERS,
-        { need_results => $remote->NWFILTER_LIST_MAX, flags => $flags // 0 } );
+        { need_results => $remote->NWFILTER_LIST_MAX, flags => $flags // 0 } ))->{filters};
 }
 
-sub list_all_secrets($self, $flags = 0) {
-    return $self->_call(
+async sub list_all_secrets($self, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_SECRETS,
-        { need_results => $remote->SECRET_LIST_MAX, flags => $flags // 0 } );
+        { need_results => $remote->SECRET_LIST_MAX, flags => $flags // 0 } ))->{secrets};
 }
 
-sub list_all_storage_pools($self, $flags = 0) {
-    return $self->_call(
+async sub list_all_storage_pools($self, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_STORAGE_POOLS,
-        { need_results => $remote->STORAGE_POOL_LIST_MAX, flags => $flags // 0 } );
+        { need_results => $remote->STORAGE_POOL_LIST_MAX, flags => $flags // 0 } ))->{pools};
 }
 
-sub list_defined_domains($self) {
-    return $self->_call(
+async sub list_defined_domains($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_DEFINED_DOMAINS,
-        { maxnames => $remote->DOMAIN_LIST_MAX } );
+        { maxnames => $remote->DOMAIN_LIST_MAX } ))->{names};
 }
 
-sub list_defined_interfaces($self) {
-    return $self->_call(
+async sub list_defined_interfaces($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_DEFINED_INTERFACES,
-        { maxnames => $remote->INTERFACE_LIST_MAX } );
+        { maxnames => $remote->INTERFACE_LIST_MAX } ))->{names};
 }
 
-sub list_defined_networks($self) {
-    return $self->_call(
+async sub list_defined_networks($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_DEFINED_NETWORKS,
-        { maxnames => $remote->NETWORK_LIST_MAX } );
+        { maxnames => $remote->NETWORK_LIST_MAX } ))->{names};
 }
 
-sub list_defined_storage_pools($self) {
-    return $self->_call(
+async sub list_defined_storage_pools($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_DEFINED_STORAGE_POOLS,
-        { maxnames => $remote->STORAGE_POOL_LIST_MAX } );
+        { maxnames => $remote->STORAGE_POOL_LIST_MAX } ))->{names};
 }
 
-sub list_interfaces($self) {
-    return $self->_call(
+async sub list_interfaces($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_INTERFACES,
-        { maxnames => $remote->INTERFACE_LIST_MAX } );
+        { maxnames => $remote->INTERFACE_LIST_MAX } ))->{names};
 }
 
-sub list_networks($self) {
-    return $self->_call(
+async sub list_networks($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_NETWORKS,
-        { maxnames => $remote->NETWORK_LIST_MAX } );
+        { maxnames => $remote->NETWORK_LIST_MAX } ))->{names};
 }
 
-sub list_nwfilters($self) {
-    return $self->_call(
+async sub list_nwfilters($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_NWFILTERS,
-        { maxnames => $remote->NWFILTER_LIST_MAX } );
+        { maxnames => $remote->NWFILTER_LIST_MAX } ))->{names};
 }
 
-sub list_secrets($self) {
-    return $self->_call(
+async sub list_secrets($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_SECRETS,
-        { maxuuids => $remote->SECRET_LIST_MAX } );
+        { maxuuids => $remote->SECRET_LIST_MAX } ))->{uuids};
 }
 
-sub list_storage_pools($self) {
-    return $self->_call(
+async sub list_storage_pools($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_LIST_STORAGE_POOLS,
-        { maxnames => $remote->STORAGE_POOL_LIST_MAX } );
+        { maxnames => $remote->STORAGE_POOL_LIST_MAX } ))->{names};
 }
 
-sub network_create_xml($self, $xml) {
-    return $self->_call(
+async sub network_create_xml($self, $xml) {
+    return (await $self->_call(
         $remote->PROC_NETWORK_CREATE_XML,
-        { xml => $xml } );
+        { xml => $xml } ))->{net};
 }
 
-sub network_create_xml_flags($self, $xml, $flags = 0) {
-    return $self->_call(
+async sub network_create_xml_flags($self, $xml, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_NETWORK_CREATE_XML_FLAGS,
-        { xml => $xml, flags => $flags // 0 } );
+        { xml => $xml, flags => $flags // 0 } ))->{net};
 }
 
-sub network_define_xml($self, $xml) {
-    return $self->_call(
+async sub network_define_xml($self, $xml) {
+    return (await $self->_call(
         $remote->PROC_NETWORK_DEFINE_XML,
-        { xml => $xml } );
+        { xml => $xml } ))->{net};
 }
 
-sub network_define_xml_flags($self, $xml, $flags = 0) {
-    return $self->_call(
+async sub network_define_xml_flags($self, $xml, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_NETWORK_DEFINE_XML_FLAGS,
-        { xml => $xml, flags => $flags // 0 } );
+        { xml => $xml, flags => $flags // 0 } ))->{net};
 }
 
-sub network_lookup_by_name($self, $name) {
-    return $self->_call(
+async sub network_lookup_by_name($self, $name) {
+    return (await $self->_call(
         $remote->PROC_NETWORK_LOOKUP_BY_NAME,
-        { name => $name } );
+        { name => $name } ))->{net};
 }
 
-sub network_lookup_by_uuid($self, $uuid) {
-    return $self->_call(
+async sub network_lookup_by_uuid($self, $uuid) {
+    return (await $self->_call(
         $remote->PROC_NETWORK_LOOKUP_BY_UUID,
-        { uuid => $uuid } );
+        { uuid => $uuid } ))->{net};
 }
 
-sub node_get_free_memory($self) {
-    return $self->_call(
+async sub node_get_cpu_stats($self, $cpuNum, $flags = 0) {
+    my $nparams = (await $self->_call(
+        $remote->PROC_NODE_GET_CPU_STATS,
+        { cpuNum => $cpuNum, nparams => 0, flags => $flags // 0 } ))->{nparams};
+    return (await $self->_call(
+        $remote->PROC_NODE_GET_CPU_STATS,
+        { cpuNum => $cpuNum, nparams => $nparams, flags => $flags // 0 } ))->{params};
+}
+
+async sub node_get_free_memory($self) {
+    return (await $self->_call(
         $remote->PROC_NODE_GET_FREE_MEMORY,
-        {  } );
+        {  } ))->{freeMem};
 }
 
 sub node_get_info($self) {
-    return $self->_call(
+    return ($self->_call(
         $remote->PROC_NODE_GET_INFO,
-        {  } );
+        {  } ));
 }
 
-sub node_list_devices($self, $cap, $flags = 0) {
-    return $self->_call(
+async sub node_get_memory_parameters($self, $flags = 0) {
+    $flags |= await $self->_typed_param_string_okay();
+    my $nparams = (await $self->_call(
+        $remote->PROC_NODE_GET_MEMORY_PARAMETERS,
+        { nparams => 0, flags => $flags // 0 } ))->{nparams};
+    return (await $self->_call(
+        $remote->PROC_NODE_GET_MEMORY_PARAMETERS,
+        { nparams => $nparams, flags => $flags // 0 } ))->{params};
+}
+
+async sub node_get_memory_stats($self, $cellNum, $flags = 0) {
+    my $nparams = (await $self->_call(
+        $remote->PROC_NODE_GET_MEMORY_STATS,
+        { nparams => 0, cellNum => $cellNum, flags => $flags // 0 } ))->{nparams};
+    return (await $self->_call(
+        $remote->PROC_NODE_GET_MEMORY_STATS,
+        { nparams => $nparams, cellNum => $cellNum, flags => $flags // 0 } ))->{params};
+}
+
+async sub node_get_sev_info($self, $flags = 0) {
+    $flags |= await $self->_typed_param_string_okay();
+    my $nparams = (await $self->_call(
+        $remote->PROC_NODE_GET_SEV_INFO,
+        { nparams => 0, flags => $flags // 0 } ))->{nparams};
+    return (await $self->_call(
+        $remote->PROC_NODE_GET_SEV_INFO,
+        { nparams => $nparams, flags => $flags // 0 } ))->{params};
+}
+
+async sub node_list_devices($self, $cap, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_NODE_LIST_DEVICES,
-        { cap => $cap, maxnames => $remote->NODE_DEVICE_LIST_MAX, flags => $flags // 0 } );
+        { cap => $cap, maxnames => $remote->NODE_DEVICE_LIST_MAX, flags => $flags // 0 } ))->{names};
 }
 
-sub node_num_of_devices($self, $cap, $flags = 0) {
-    return $self->_call(
+async sub node_num_of_devices($self, $cap, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_NODE_NUM_OF_DEVICES,
-        { cap => $cap, flags => $flags // 0 } );
+        { cap => $cap, flags => $flags // 0 } ))->{num};
 }
 
 async sub node_set_memory_parameters($self, $params, $flags = 0) {
     $params = await $self->_filter_typed_param_string( $params );
-    return await $self->_call(
+    return (await $self->_call(
         $remote->PROC_NODE_SET_MEMORY_PARAMETERS,
-        { params => $params, flags => $flags // 0 } );
+        { params => $params, flags => $flags // 0 } ));
 }
 
 sub node_suspend_for_duration($self, $target, $duration, $flags = 0) {
-    return $self->_call(
+    return ($self->_call(
         $remote->PROC_NODE_SUSPEND_FOR_DURATION,
-        { target => $target, duration => $duration, flags => $flags // 0 } );
+        { target => $target, duration => $duration, flags => $flags // 0 } ));
 }
 
-sub num_of_defined_domains($self) {
-    return $self->_call(
+async sub num_of_defined_domains($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_DEFINED_DOMAINS,
-        {  } );
+        {  } ))->{num};
 }
 
-sub num_of_defined_interfaces($self) {
-    return $self->_call(
+async sub num_of_defined_interfaces($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_DEFINED_INTERFACES,
-        {  } );
+        {  } ))->{num};
 }
 
-sub num_of_defined_networks($self) {
-    return $self->_call(
+async sub num_of_defined_networks($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_DEFINED_NETWORKS,
-        {  } );
+        {  } ))->{num};
 }
 
-sub num_of_defined_storage_pools($self) {
-    return $self->_call(
+async sub num_of_defined_storage_pools($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_DEFINED_STORAGE_POOLS,
-        {  } );
+        {  } ))->{num};
 }
 
-sub num_of_domains($self) {
-    return $self->_call(
+async sub num_of_domains($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_DOMAINS,
-        {  } );
+        {  } ))->{num};
 }
 
-sub num_of_interfaces($self) {
-    return $self->_call(
+async sub num_of_interfaces($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_INTERFACES,
-        {  } );
+        {  } ))->{num};
 }
 
-sub num_of_networks($self) {
-    return $self->_call(
+async sub num_of_networks($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_NETWORKS,
-        {  } );
+        {  } ))->{num};
 }
 
-sub num_of_nwfilters($self) {
-    return $self->_call(
+async sub num_of_nwfilters($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_NWFILTERS,
-        {  } );
+        {  } ))->{num};
 }
 
-sub num_of_secrets($self) {
-    return $self->_call(
+async sub num_of_secrets($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_SECRETS,
-        {  } );
+        {  } ))->{num};
 }
 
-sub num_of_storage_pools($self) {
-    return $self->_call(
+async sub num_of_storage_pools($self) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_STORAGE_POOLS,
-        {  } );
+        {  } ))->{num};
 }
 
-sub nwfilter_binding_create_xml($self, $xml, $flags = 0) {
-    return $self->_call(
+async sub nwfilter_binding_create_xml($self, $xml, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_NWFILTER_BINDING_CREATE_XML,
-        { xml => $xml, flags => $flags // 0 } );
+        { xml => $xml, flags => $flags // 0 } ))->{nwfilter};
 }
 
-sub nwfilter_binding_lookup_by_port_dev($self, $name) {
-    return $self->_call(
+async sub nwfilter_binding_lookup_by_port_dev($self, $name) {
+    return (await $self->_call(
         $remote->PROC_NWFILTER_BINDING_LOOKUP_BY_PORT_DEV,
-        { name => $name } );
+        { name => $name } ))->{nwfilter};
 }
 
-sub nwfilter_define_xml($self, $xml) {
-    return $self->_call(
+async sub nwfilter_define_xml($self, $xml) {
+    return (await $self->_call(
         $remote->PROC_NWFILTER_DEFINE_XML,
-        { xml => $xml } );
+        { xml => $xml } ))->{nwfilter};
 }
 
-sub nwfilter_define_xml_flags($self, $xml, $flags = 0) {
-    return $self->_call(
+async sub nwfilter_define_xml_flags($self, $xml, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_NWFILTER_DEFINE_XML_FLAGS,
-        { xml => $xml, flags => $flags // 0 } );
+        { xml => $xml, flags => $flags // 0 } ))->{nwfilter};
 }
 
-sub nwfilter_lookup_by_name($self, $name) {
-    return $self->_call(
+async sub nwfilter_lookup_by_name($self, $name) {
+    return (await $self->_call(
         $remote->PROC_NWFILTER_LOOKUP_BY_NAME,
-        { name => $name } );
+        { name => $name } ))->{nwfilter};
 }
 
-sub nwfilter_lookup_by_uuid($self, $uuid) {
-    return $self->_call(
+async sub nwfilter_lookup_by_uuid($self, $uuid) {
+    return (await $self->_call(
         $remote->PROC_NWFILTER_LOOKUP_BY_UUID,
-        { uuid => $uuid } );
+        { uuid => $uuid } ))->{nwfilter};
 }
 
-sub secret_define_xml($self, $xml, $flags = 0) {
-    return $self->_call(
+async sub secret_define_xml($self, $xml, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_SECRET_DEFINE_XML,
-        { xml => $xml, flags => $flags // 0 } );
+        { xml => $xml, flags => $flags // 0 } ))->{secret};
 }
 
-sub secret_lookup_by_usage($self, $usageType, $usageID) {
-    return $self->_call(
+async sub secret_lookup_by_usage($self, $usageType, $usageID) {
+    return (await $self->_call(
         $remote->PROC_SECRET_LOOKUP_BY_USAGE,
-        { usageType => $usageType, usageID => $usageID } );
+        { usageType => $usageType, usageID => $usageID } ))->{secret};
 }
 
-sub secret_lookup_by_uuid($self, $uuid) {
-    return $self->_call(
+async sub secret_lookup_by_uuid($self, $uuid) {
+    return (await $self->_call(
         $remote->PROC_SECRET_LOOKUP_BY_UUID,
-        { uuid => $uuid } );
+        { uuid => $uuid } ))->{secret};
 }
 
 async sub set_identity($self, $params, $flags = 0) {
     $params = await $self->_filter_typed_param_string( $params );
-    return await $self->_call(
+    return (await $self->_call(
         $remote->PROC_CONNECT_SET_IDENTITY,
-        { params => $params, flags => $flags // 0 } );
+        { params => $params, flags => $flags // 0 } ));
 }
 
-sub storage_pool_create_xml($self, $xml, $flags = 0) {
-    return $self->_call(
+async sub storage_pool_create_xml($self, $xml, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_STORAGE_POOL_CREATE_XML,
-        { xml => $xml, flags => $flags // 0 } );
+        { xml => $xml, flags => $flags // 0 } ))->{pool};
 }
 
-sub storage_pool_define_xml($self, $xml, $flags = 0) {
-    return $self->_call(
+async sub storage_pool_define_xml($self, $xml, $flags = 0) {
+    return (await $self->_call(
         $remote->PROC_STORAGE_POOL_DEFINE_XML,
-        { xml => $xml, flags => $flags // 0 } );
+        { xml => $xml, flags => $flags // 0 } ))->{pool};
 }
 
-sub storage_pool_lookup_by_name($self, $name) {
-    return $self->_call(
+async sub storage_pool_lookup_by_name($self, $name) {
+    return (await $self->_call(
         $remote->PROC_STORAGE_POOL_LOOKUP_BY_NAME,
-        { name => $name } );
+        { name => $name } ))->{pool};
 }
 
-sub storage_pool_lookup_by_target_path($self, $path) {
-    return $self->_call(
+async sub storage_pool_lookup_by_target_path($self, $path) {
+    return (await $self->_call(
         $remote->PROC_STORAGE_POOL_LOOKUP_BY_TARGET_PATH,
-        { path => $path } );
+        { path => $path } ))->{pool};
 }
 
-sub storage_pool_lookup_by_uuid($self, $uuid) {
-    return $self->_call(
+async sub storage_pool_lookup_by_uuid($self, $uuid) {
+    return (await $self->_call(
         $remote->PROC_STORAGE_POOL_LOOKUP_BY_UUID,
-        { uuid => $uuid } );
+        { uuid => $uuid } ))->{pool};
 }
 
-sub storage_vol_lookup_by_key($self, $key) {
-    return $self->_call(
+async sub storage_vol_lookup_by_key($self, $key) {
+    return (await $self->_call(
         $remote->PROC_STORAGE_VOL_LOOKUP_BY_KEY,
-        { key => $key } );
+        { key => $key } ))->{vol};
 }
 
-sub storage_vol_lookup_by_path($self, $path) {
-    return $self->_call(
+async sub storage_vol_lookup_by_path($self, $path) {
+    return (await $self->_call(
         $remote->PROC_STORAGE_VOL_LOOKUP_BY_PATH,
-        { path => $path } );
+        { path => $path } ))->{vol};
 }
 
-sub supports_feature($self, $feature) {
-    return $self->_call(
+async sub supports_feature($self, $feature) {
+    return (await $self->_call(
         $remote->PROC_CONNECT_SUPPORTS_FEATURE,
-        { feature => $feature } );
+        { feature => $feature } ))->{supported};
 }
 
 
@@ -1788,7 +1850,7 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.1
+v0.0.2
 
 Based on LibVirt tag v10.3.0
 
@@ -2114,6 +2176,13 @@ See documentation of L<virConnectDomainXMLToNative|https://libvirt.org/html/libv
 See documentation of L<virConnectGetCapabilities|https://libvirt.org/html/libvirt-libvirt-host.html#virConnectGetCapabilities>.
 
 
+=head2 get_cpu_model_names
+
+  $models = await $client->get_cpu_model_names( $arch, $flags = 0 );
+
+See documentation of L<virConnectGetCPUModelNames|https://libvirt.org/html/libvirt-libvirt-host.html#virConnectGetCPUModelNames>.
+
+
 =head2 get_domain_capabilities
 
   $capabilities = await $client->get_domain_capabilities( $emulatorbin, $arch, $machine, $virttype, $flags = 0 );
@@ -2369,6 +2438,13 @@ See documentation of L<virNetworkLookupByName|https://libvirt.org/html/libvirt-l
 See documentation of L<virNetworkLookupByUUID|https://libvirt.org/html/libvirt-libvirt-network.html#virNetworkLookupByUUID>.
 
 
+=head2 node_get_cpu_stats
+
+  $params = await $client->node_get_cpu_stats( $cpuNum, $flags = 0 );
+
+See documentation of L<virNodeGetCPUStats|https://libvirt.org/html/libvirt-libvirt-host.html#virNodeGetCPUStats>.
+
+
 =head2 node_get_free_memory
 
   $freeMem = await $client->node_get_free_memory;
@@ -2389,6 +2465,27 @@ See documentation of L<virNodeGetFreeMemory|https://libvirt.org/html/libvirt-lib
   #      threads => $threads }
 
 See documentation of L<virNodeGetInfo|https://libvirt.org/html/libvirt-libvirt-host.html#virNodeGetInfo>.
+
+
+=head2 node_get_memory_parameters
+
+  $params = await $client->node_get_memory_parameters( $flags = 0 );
+
+See documentation of L<virNodeGetMemoryParameters|https://libvirt.org/html/libvirt-libvirt-host.html#virNodeGetMemoryParameters>.
+
+
+=head2 node_get_memory_stats
+
+  $params = await $client->node_get_memory_stats( $cellNum, $flags = 0 );
+
+See documentation of L<virNodeGetMemoryStats|https://libvirt.org/html/libvirt-libvirt-host.html#virNodeGetMemoryStats>.
+
+
+=head2 node_get_sev_info
+
+  $params = await $client->node_get_sev_info( $flags = 0 );
+
+See documentation of L<virNodeGetSEVInfo|https://libvirt.org/html/libvirt-libvirt-host.html#virNodeGetSEVInfo>.
 
 
 =head2 node_list_devices
@@ -3118,9 +3215,9 @@ wrapper allows for tracking all calls allowing to set up handling of the replies
 Findings so far:
 
   entrypoints with "nparams" have this flagging
-    -> it seems these can be generated without problem; our approach would be
-       to simply fill out the '_MAX' constant and return the actual parameters
-       in an array
+    -> it seems these can be generated without problem;
+       the call needs to be executed with nparams==0 in order to retrieve
+       the supported maximum value.
 
 =item * C<@generate: server> entrypoints review (and implement relevant ones)
 
@@ -3137,139 +3234,115 @@ towards implementation are greatly appreciated.
 
 =item * @generate: none
 
-=over 8=item * REMOTE_PROC_CONNECT_OPEN
+=over 8
 
-=item * REMOTE_PROC_CONNECT_CLOSE
+=item * REMOTE_PROC_AUTH_SASL_START
 
-=item * REMOTE_PROC_DOMAIN_GET_VCPUS
+=item * REMOTE_PROC_AUTH_SASL_STEP
 
-=item * REMOTE_PROC_DOMAIN_GET_SCHEDULER_TYPE
+=item * REMOTE_PROC_CONNECT_DOMAIN_EVENT_DEREGISTER
 
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE
+=item * REMOTE_PROC_CONNECT_DOMAIN_EVENT_DEREGISTER_ANY
 
-=item * REMOTE_PROC_DOMAIN_BLOCK_PEEK
+=item * REMOTE_PROC_CONNECT_DOMAIN_EVENT_REGISTER
 
-=item * REMOTE_PROC_DOMAIN_MEMORY_PEEK
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE2
-
-=item * REMOTE_PROC_DOMAIN_GET_SECURITY_LABEL
-
-=item * REMOTE_PROC_NODE_GET_SECURITY_MODEL
-
-=item * REMOTE_PROC_SECRET_GET_VALUE
-
-=item * REMOTE_PROC_DOMAIN_MEMORY_STATS
-
-=item * REMOTE_PROC_DOMAIN_GET_STATE
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_BEGIN3
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE3
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_FINISH3
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM3
-
-=item * REMOTE_PROC_DOMAIN_GET_VCPU_PIN_INFO
-
-=item * REMOTE_PROC_DOMAIN_GET_BLOCK_JOB_INFO
-
-=item * REMOTE_PROC_DOMAIN_OPEN_GRAPHICS
-
-=item * REMOTE_PROC_DOMAIN_GET_DISK_ERRORS
-
-=item * REMOTE_PROC_DOMAIN_GET_SECURITY_LABEL_LIST
-
-=item * REMOTE_PROC_DOMAIN_PIN_EMULATOR
-
-=item * REMOTE_PROC_DOMAIN_GET_EMULATOR_PIN_INFO
-
-=item * REMOTE_PROC_NODE_GET_CPU_MAP
-
-=item * REMOTE_PROC_DOMAIN_GET_JOB_STATS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_BEGIN3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_FINISH3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_CREATE_XML_WITH_FILES
-
-=item * REMOTE_PROC_DOMAIN_CREATE_WITH_FILES
-
-=item * REMOTE_PROC_CONNECT_GET_CPU_MODEL_NAMES
-
-=item * REMOTE_PROC_DOMAIN_GET_TIME
-
-=item * REMOTE_PROC_NODE_GET_FREE_PAGES
-
-=item * REMOTE_PROC_NETWORK_GET_DHCP_LEASES
-
-=item * REMOTE_PROC_DOMAIN_OPEN_GRAPHICS_FD
+=item * REMOTE_PROC_CONNECT_DOMAIN_EVENT_REGISTER_ANY
 
 =item * REMOTE_PROC_CONNECT_GET_ALL_DOMAIN_STATS
-
-=item * REMOTE_PROC_NODE_ALLOC_PAGES
-
-=item * REMOTE_PROC_DOMAIN_GET_FSINFO
-
-=item * REMOTE_PROC_DOMAIN_GET_IOTHREAD_INFO
-
-=item * REMOTE_PROC_DOMAIN_INTERFACE_ADDRESSES
-
-=item * REMOTE_PROC_DOMAIN_GET_PERF_EVENTS
-
-=item * REMOTE_PROC_DOMAIN_GET_LAUNCH_SECURITY_INFO
-
-=item * REMOTE_PROC_DOMAIN_GET_GUEST_INFO
 
 =item * REMOTE_PROC_DOMAIN_AUTHORIZED_SSH_KEYS_GET
 
 =item * REMOTE_PROC_DOMAIN_AUTHORIZED_SSH_KEYS_SET
 
-=item * REMOTE_PROC_DOMAIN_GET_MESSAGES
+=item * REMOTE_PROC_DOMAIN_BLOCK_PEEK
+
+=item * REMOTE_PROC_DOMAIN_CREATE_WITH_FILES
+
+=item * REMOTE_PROC_DOMAIN_CREATE_XML_WITH_FILES
 
 =item * REMOTE_PROC_DOMAIN_FD_ASSOCIATE
 
-=back
+=item * REMOTE_PROC_DOMAIN_GET_BLOCK_JOB_INFO
 
+=item * REMOTE_PROC_DOMAIN_GET_DISK_ERRORS
 
+=item * REMOTE_PROC_DOMAIN_GET_EMULATOR_PIN_INFO
 
-=item * @generate: none/nparams
+=item * REMOTE_PROC_DOMAIN_GET_FSINFO
 
-=over 8=item * REMOTE_PROC_DOMAIN_GET_MEMORY_PARAMETERS
+=item * REMOTE_PROC_DOMAIN_GET_GUEST_INFO
 
-=item * REMOTE_PROC_DOMAIN_GET_BLKIO_PARAMETERS
+=item * REMOTE_PROC_DOMAIN_GET_IOTHREAD_INFO
 
-=item * REMOTE_PROC_NODE_GET_CPU_STATS
+=item * REMOTE_PROC_DOMAIN_GET_JOB_STATS
 
-=item * REMOTE_PROC_NODE_GET_MEMORY_STATS
+=item * REMOTE_PROC_DOMAIN_GET_LAUNCH_SECURITY_INFO
 
-=item * REMOTE_PROC_DOMAIN_BLOCK_STATS_FLAGS
+=item * REMOTE_PROC_DOMAIN_GET_MESSAGES
 
-=item * REMOTE_PROC_DOMAIN_GET_BLOCK_IO_TUNE
+=item * REMOTE_PROC_DOMAIN_GET_PERF_EVENTS
 
-=item * REMOTE_PROC_DOMAIN_GET_NUMA_PARAMETERS
+=item * REMOTE_PROC_DOMAIN_GET_SCHEDULER_TYPE
 
-=item * REMOTE_PROC_DOMAIN_GET_INTERFACE_PARAMETERS
+=item * REMOTE_PROC_DOMAIN_GET_SECURITY_LABEL
 
-=item * REMOTE_PROC_DOMAIN_GET_CPU_STATS
+=item * REMOTE_PROC_DOMAIN_GET_SECURITY_LABEL_LIST
 
-=item * REMOTE_PROC_NODE_GET_MEMORY_PARAMETERS
+=item * REMOTE_PROC_DOMAIN_GET_STATE
 
-=item * REMOTE_PROC_NODE_GET_SEV_INFO
+=item * REMOTE_PROC_DOMAIN_GET_TIME
 
-=item * REMOTE_PROC_NETWORK_PORT_GET_PARAMETERS
+=item * REMOTE_PROC_DOMAIN_GET_VCPUS
+
+=item * REMOTE_PROC_DOMAIN_GET_VCPU_PIN_INFO
+
+=item * REMOTE_PROC_DOMAIN_INTERFACE_ADDRESSES
+
+=item * REMOTE_PROC_DOMAIN_MEMORY_PEEK
+
+=item * REMOTE_PROC_DOMAIN_MEMORY_STATS
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_BEGIN3
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_BEGIN3_PARAMS
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM3
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM3_PARAMS
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_FINISH3
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_FINISH3_PARAMS
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3_PARAMS
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE2
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE3
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE3_PARAMS
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL3_PARAMS
+
+=item * REMOTE_PROC_DOMAIN_OPEN_GRAPHICS
+
+=item * REMOTE_PROC_DOMAIN_OPEN_GRAPHICS_FD
+
+=item * REMOTE_PROC_DOMAIN_PIN_EMULATOR
+
+=item * REMOTE_PROC_NODE_ALLOC_PAGES
+
+=item * REMOTE_PROC_NODE_GET_CPU_MAP
+
+=item * REMOTE_PROC_NODE_GET_FREE_PAGES
+
+=item * REMOTE_PROC_NODE_GET_SECURITY_MODEL
+
+=item * REMOTE_PROC_SECRET_GET_VALUE
 
 =back
 
@@ -3277,31 +3350,33 @@ towards implementation are greatly appreciated.
 
 =item * @generate: server
 
-=over 8=item * REMOTE_PROC_CONNECT_GET_TYPE
-
-=item * REMOTE_PROC_DOMAIN_CREATE
-
-=item * REMOTE_PROC_CONNECT_LIST_DOMAINS
+=over 8
 
 =item * REMOTE_PROC_CONNECT_FIND_STORAGE_POOL_SOURCES
 
-=item * REMOTE_PROC_NODE_GET_CELLS_FREE_MEMORY
+=item * REMOTE_PROC_CONNECT_GET_TYPE
 
 =item * REMOTE_PROC_CONNECT_GET_URI
 
-=item * REMOTE_PROC_NODE_DEVICE_DETTACH
-
-=item * REMOTE_PROC_NODE_DEVICE_RE_ATTACH
-
-=item * REMOTE_PROC_NODE_DEVICE_RESET
-
 =item * REMOTE_PROC_CONNECT_IS_SECURE
+
+=item * REMOTE_PROC_CONNECT_LIST_DOMAINS
+
+=item * REMOTE_PROC_DOMAIN_CREATE
 
 =item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL3
 
+=item * REMOTE_PROC_DOMAIN_RENAME
+
 =item * REMOTE_PROC_NODE_DEVICE_DETACH_FLAGS
 
-=item * REMOTE_PROC_DOMAIN_RENAME
+=item * REMOTE_PROC_NODE_DEVICE_DETTACH
+
+=item * REMOTE_PROC_NODE_DEVICE_RESET
+
+=item * REMOTE_PROC_NODE_DEVICE_RE_ATTACH
+
+=item * REMOTE_PROC_NODE_GET_CELLS_FREE_MEMORY
 
 =item * REMOTE_PROC_STORAGE_VOL_GET_INFO_FLAGS
 
@@ -3311,13 +3386,15 @@ towards implementation are greatly appreciated.
 
 =item * @readstream
 
-=over 8=item * REMOTE_PROC_DOMAIN_OPEN_CONSOLE
+=over 8
 
-=item * REMOTE_PROC_STORAGE_VOL_DOWNLOAD
+=item * REMOTE_PROC_DOMAIN_OPEN_CHANNEL
+
+=item * REMOTE_PROC_DOMAIN_OPEN_CONSOLE
 
 =item * REMOTE_PROC_DOMAIN_SCREENSHOT
 
-=item * REMOTE_PROC_DOMAIN_OPEN_CHANNEL
+=item * REMOTE_PROC_STORAGE_VOL_DOWNLOAD
 
 =back
 
@@ -3325,7 +3402,9 @@ towards implementation are greatly appreciated.
 
 =item * @writestream
 
-=over 8=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL
+=over 8
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL
 
 =item * REMOTE_PROC_STORAGE_VOL_UPLOAD
 

@@ -25,7 +25,7 @@ no  warnings 'uninitialized';
 use CGI::FormBuilder::Util;
 
 
-our $VERSION = '3.10';
+our $VERSION = '3.20';
 
 sub new {
     my $self  = shift;

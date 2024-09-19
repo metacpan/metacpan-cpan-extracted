@@ -1,3 +1,7 @@
+0.50.2 2024-09-18 16:42:18 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix regression with missing defaults for app and log in user object
+
 0.50.1 2024-08-30 12:27:22 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - show a popup before reloading the page

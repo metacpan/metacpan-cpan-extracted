@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::DomainCheckpoint v0.0.1;
+package Sys::Async::Virt::DomainCheckpoint v0.0.2;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.1;
+use Protocol::Sys::Virt::Remote::XDR v0.0.2;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -47,27 +47,27 @@ sub new {
 }
 
 sub delete($self, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_DELETE,
-        { checkpoint => $self->{id}, flags => $flags // 0 } );
+        { checkpoint => $self->{id}, flags => $flags // 0 } ));
 }
 
-sub get_parent($self, $flags = 0) {
-    return $self->{client}->_call(
+async sub get_parent($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_GET_PARENT,
-        { checkpoint => $self->{id}, flags => $flags // 0 } );
+        { checkpoint => $self->{id}, flags => $flags // 0 } ))->{parent};
 }
 
-sub get_xml_desc($self, $flags = 0) {
-    return $self->{client}->_call(
+async sub get_xml_desc($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_GET_XML_DESC,
-        { checkpoint => $self->{id}, flags => $flags // 0 } );
+        { checkpoint => $self->{id}, flags => $flags // 0 } ))->{xml};
 }
 
-sub list_all_children($self, $need_results, $flags = 0) {
-    return $self->{client}->_call(
+async sub list_all_children($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_LIST_ALL_CHILDREN,
-        { checkpoint => $self->{id}, need_results => $need_results, flags => $flags // 0 } );
+        { checkpoint => $self->{id}, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 } ))->{checkpoints};
 }
 
 
@@ -83,7 +83,7 @@ Sys::Async::Virt::DomainCheckpoint - Client side proxy to remote LibVirt domain 
 
 =head1 VERSION
 
-v0.0.1
+v0.0.2
 
 =head1 SYNOPSIS
 
@@ -121,7 +121,7 @@ See documentation of L<virDomainCheckpointGetXMLDesc|https://libvirt.org/html/li
 
 =head2 list_all_children
 
-  $checkpoints = await $checkpoint->list_all_children( $need_results, $flags = 0 );
+  $checkpoints = await $checkpoint->list_all_children( $flags = 0 );
 
 See documentation of L<virDomainCheckpointListAllChildren|https://libvirt.org/html/libvirt-libvirt-domain-checkpoint.html#virDomainCheckpointListAllChildren>.
 

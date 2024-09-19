@@ -28,6 +28,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/buffer.t',
     't/observable.t',
+    't/pause-resume.t',
     't/ryu.t',
     't/sink/drain.t',
     't/source/as_buffer.t',

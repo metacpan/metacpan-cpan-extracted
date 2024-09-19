@@ -1,0 +1,33 @@
+      -->  mofino has joined #perlcafe
+ <mofino>  I'm not an asshole. I just play one on T.V.
+      <--  mofino has left #perlcafe
+
+    -- Discussing the Subversion Build System
+    -- #perlcafe, Freenode
+
+See Also:
+=========
+
+* “I’m not a doctor, but I play one on T.V.”
+%
+  <rindolf>  This reminds me of a fun discussion I had with my co-worker.
+  <rindolf>  He had a Firefox window open with an ActiveState page and I
+             read "Perl, PHP, Python, Tcl, XSLT".
+  <rindolf>  So he said: "Heresy! C is the only language."
+  <rindolf>  So I thought for a moment and said "Intercal is the only
+             language."
+ <nanonyme>  lol
+  <rindolf>  And then "Real men write in Intercal."
+  <rindolf>  "COME FROM" anyone?
+
+    -- Shlomi Fish ("rindolf")
+    -- #perl, Freenode
+%
+ <rindolf>  Let me wikipedia it.
+ <f00li5h>  so now wikipedia is a verb?
+ <rindolf>  f00li5h: it's gonna enter the OED.
+ <rindolf>  f00li5h: in English every verb can be nounified and every noun
+            can be verbed
+
+    -- (Human) Language Fun
+    -- #perl, Freenode

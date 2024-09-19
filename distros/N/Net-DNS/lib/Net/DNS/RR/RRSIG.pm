@@ -2,7 +2,7 @@ package Net::DNS::RR::RRSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: RRSIG.pm 1987 2024-08-12 09:41:27Z willem $)[2];
+our $VERSION = (qw$Id: RRSIG.pm 1990 2024-09-18 13:16:07Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -842,6 +842,6 @@ L<RFC4034(3)|https://iana.org/go/rfc4034#section-3>
 
 L<Algorithm Numbers|https://iana.org/assignments/dns-sec-alg-numbers>
 
-L<BIND Administrator Reference Manual|https://bind.isc.org/>
+L<BIND Administrator Reference Manual|https://bind9.readthedocs.io/en/latest/>
 
 =cut

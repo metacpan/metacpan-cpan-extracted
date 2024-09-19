@@ -3,7 +3,7 @@ package Net::DNS::Mailbox;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Mailbox.pm 1910 2023-03-30 19:16:30Z willem $)[2];
+our $VERSION = (qw$Id: Mailbox.pm 1990 2024-09-18 13:16:07Z willem $)[2];
 
 
 =head1 NAME
@@ -144,8 +144,8 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::DomainName>
-L<RFC1035|https://tools.ietf.org/html/rfc1035>
-L<RFC5322|https://tools.ietf.org/html/rfc5322>
+L<RFC1035|https://iana.org/go/rfc1035>
+L<RFC5322|https://iana.org/go/rfc5322>
 
 =cut
 

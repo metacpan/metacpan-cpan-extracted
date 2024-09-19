@@ -146,6 +146,14 @@ PARSE CONTEXT
       flag without also enabling XS_PARSE_SUBLIKE_ACTION_SET_CVNAME. This
       is set by default if a name was found.
 
+    XS_PARSE_SUBLIKE_ACTION_INSTALL_LEXICAL
+
+      If set, the newly-constructed CV will be installed into the currently
+      compiling lexical pad as its given name. This is only available on
+      Perl version 5.18 or above, and conflicts with the alternative of
+      XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL. This is set by default if a
+      name was found and the my keyword appeared before the construction.
+
     XS_PARSE_SUBLIKE_ACTION_REFGEN_ANONCODE
 
       If set, the syntax will yield the OP_REFGEN / OP_ANONCODE optree

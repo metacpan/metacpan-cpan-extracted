@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package Sublike::Extended 0.23;
+package Sublike::Extended 0.25;
 
 use v5.14;
 use warnings;
@@ -56,10 +56,16 @@ unpacked into regular lexical variables.
    # argument order at the caller site is not important
    colour(green => 1, blue => 2, red => 3);
 
+Positional parameters I<can> be placed after optional positional ones, but in
+order to make use of them the caller would have to pass a value for every
+positional parameter including the optional ones first. This is unlikely to be
+very useful; if you want to have optional parameters and named parameters, use
+named optional ones after any I<mandatory> positional parameters.
+
 As with positional parameters, they are normally mandatory, but can be made
 optional by supplying a defaulting expression. If the caller fails to pass a
-value corresponding to the parameter, the default expression is evaluated and
-used instead.
+value corresponding to an optional parameter, the default expression is
+evaluated and used instead.
 
    extended sub f (:$x0, :$x1, :$x2 = 0) { ... }
    # The caller must provide x0 and x1, but x2 is optional
@@ -71,11 +77,18 @@ caller passed a present-but-undef, or present-but-false value.
    extended sub f (:$x0, :$x1, :$x2 //= 0) { ... }
    # $x2 will be set to 0 even if the caller passes  x2 => undef
 
-An optional slurpy hash is also permitted after all of these. It will contain
-the values of any other name-value pairs given by the caller, after those
-corresponding to named parameters have already been extracted.
+An optional slurpy hash or (I<since version 0.24>) slurpy array is also
+permitted after all of these. It will contain the values of any other
+name-value pairs given by the caller, after those corresponding to named
+parameters have already been extracted.
 
    extended sub g (:$alpha, :$beta, %rest) { ... }
+
+   extended sub g (:$alpha, :$beta, @rest) { ... }
+
+In the case of a slurpy array, it will contain every argument value that was
+not consumed as a named parameter pair, in the original order passed by the
+caller, including any duplicates.
 
 =head2 Parameter Attributes
 

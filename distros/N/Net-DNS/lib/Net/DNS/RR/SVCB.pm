@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1970 2024-03-22 01:51:29Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 1990 2024-09-18 13:16:07Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -93,14 +93,16 @@ sub _format_rdata {			## format rdata portion of RR string.
 		my $key = shift @params;
 		my $val = shift @params;
 		push @rdata, "\n", unpack 'H4H4', pack( 'n2', $key, length $val );
-		my ( $hex, @hex ) = grep {length} split /(\S{32})/, unpack 'H*', $val;
-		push @rdata, $hex, $key < 16 ? () : "\t; key$key\n", @hex;
+		my @hex = grep {length} split /(\S{32})/, unpack 'H*', $val;
+		push @rdata, shift @hex if @hex;
+		push @rdata, "\t; key$key\n" unless $key < 16;
+		push @rdata, @hex;
 		$length += 4 + length $val;
 	}
 	if ( $self->{rdata} ) {
 		if ( my $corrupt = substr $self->{rdata}, $length ) {
 			my ( $hex, @hex ) = grep {length} split /(\S{32})/, unpack 'H*', $corrupt;
-			push @rdata, "\n", $hex, "\t; corrupt RDATA\n", @hex;
+			push @rdata, "\n$hex\t; corrupt RDATA\n", @hex;
 			$length += length $corrupt;
 		}
 	}
@@ -407,8 +409,8 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC9460|https://www.iana.org/go/rfc9460>
+L<RFC9460(2)|https://iana.org/go/rfc9460#section-2>
 
-L<Service Parameter Keys|https://www.iana.org/assignments/dns-svcb>
+L<Service Parameter Keys|https://iana.org/assignments/dns-svcb>
 
 =cut

@@ -10,6 +10,7 @@ build_requires:
   Mojo::Transaction::HTTP: '0'
   Sub::Override: '0'
   Test::Deep: '0'
+  Test::Exception: '0'
   Test::Mock::One: '0'
   Test::More: '0.96'
   Test::Most: '0'
@@ -27,7 +28,7 @@ name: WebService-Xential
 provides:
   WebService::Xential:
     file: lib/WebService/Xential.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   JSON::XS: '0'
@@ -40,7 +41,7 @@ requires:
   perl: v5.26.0
 resources:
   repository: git://gitlab.com/waterkip/webservice-xential.git
-version: '0.001'
+version: '0.002'
 x_contributors:
   - 'Wesley Schwengle <waterkip@cpan.org>'
 x_generated_by_perl: v5.38.2

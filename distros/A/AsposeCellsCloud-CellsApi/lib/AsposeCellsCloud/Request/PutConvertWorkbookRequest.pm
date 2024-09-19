@@ -68,7 +68,9 @@ sub new {
 # PutConvertWorkbookRequest.streamFormat : The format of the input file stream.   ,
 # PutConvertWorkbookRequest.region : The regional settings for workbook.  ,
 # PutConvertWorkbookRequest.pageWideFitOnPerSheet : The page wide fit on worksheet.  ,
-# PutConvertWorkbookRequest.pageTallFitOnPerSheet : The page tall fit on worksheet.   
+# PutConvertWorkbookRequest.pageTallFitOnPerSheet : The page tall fit on worksheet.  ,
+# PutConvertWorkbookRequest.sheetName :   ,
+# PutConvertWorkbookRequest.pageIndex :    
 
 {
     my $params = {
@@ -139,6 +141,14 @@ sub run_http_request {
 
     if(defined $self->page_tall_fit_on_per_sheet){
         $query_params->{'pageTallFitOnPerSheet'} = $client->to_query_value($self->page_tall_fit_on_per_sheet);      
+    }
+
+    if(defined $self->sheet_name){
+        $query_params->{'sheetName'} = $client->to_query_value($self->sheet_name);      
+    }
+
+    if(defined $self->page_index){
+        $query_params->{'pageIndex'} = $client->to_query_value($self->page_index);      
     } 
     my $_body_data;
  
@@ -229,6 +239,20 @@ __PACKAGE__->method_documentation({
      	description => 'The page tall fit on worksheet.',
      	format => '',
      	read_only => '',
+     		},
+     'sheet_name' => {
+     	datatype => 'string',
+     	base_name => 'sheetName',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'page_index' => {
+     	datatype => 'int',
+     	base_name => 'pageIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
@@ -243,7 +267,9 @@ __PACKAGE__->attribute_map( {
     'stream_format' => 'streamFormat',
     'region' => 'region',
     'page_wide_fit_on_per_sheet' => 'pageWideFitOnPerSheet',
-    'page_tall_fit_on_per_sheet' => 'pageTallFitOnPerSheet' 
+    'page_tall_fit_on_per_sheet' => 'pageTallFitOnPerSheet',
+    'sheet_name' => 'sheetName',
+    'page_index' => 'pageIndex' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

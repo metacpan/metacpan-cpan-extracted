@@ -12,6 +12,7 @@ my @files = (
     't/00-compile.t',
     't/data/text-results/irc-conversation-1.txt',
     't/data/text-results/irc-conversation-3-with-join-unjoin.txt',
+    't/data/text-results/irc-conversation-5-with-see-also.txt',
     't/data/text-results/quote-fort-sample-10-with-hyperlink.txt',
     't/data/text-results/quote-fort-sample-11-with-work-elem-spanning-several-lines.txt',
     't/data/text-results/quote-fort-sample-2-with-brs.txt',

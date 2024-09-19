@@ -1,4 +1,20 @@
 -----
 
+0.0.2    2024-09-18
+    [Fixed]
+       * POD errors
+       * Some 'return value count' (maxnames, maxuuids, etc) parameters
+         not correctly hard-coded
+    [Added]
+       * Query 'nparams' parameter from the server
+         before requesting 'params', for those APIs that don't accept
+         an 'nparams' value of *_MAX
+       * Mapping of the last two entry points which use a (hard-coded)
+         'need_results' argument
+    [Changed]
+       * Alphabetic sorting of list of entrypoints not yet implemented
+       * Function signatures dropped 'nparams' argument, instead hard-coding
+         or dynamically querying the value from the server
+
 0.0.1    2024-09-15
     Initial release

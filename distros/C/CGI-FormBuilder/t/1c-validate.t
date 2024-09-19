@@ -10,7 +10,7 @@ our $TESTING = 1;
 our $DEBUG = $ENV{DEBUG} || 0;
 our $LOGNAME = $ENV{LOGNAME} || '';
 our $VERSION;
-BEGIN { $VERSION = '3.10'; }
+BEGIN { $VERSION = '3.20'; }
 
 use Test;
 use FindBin;
@@ -33,7 +33,7 @@ BEGIN {
 $ENV{REQUEST_METHOD} = 'GET';
 $ENV{QUERY_STRING} = '_submitted=1&submit=ClickMe&blank=&hiphop=Early+East+Coast';
 
-use CGI::FormBuilder 3.10;
+use CGI::FormBuilder 3.20;
 
 sub is_number {
     my $v = shift;
@@ -174,11 +174,11 @@ my @test = (
 for my $t (@test) {
 
     my $form = CGI::FormBuilder->new( %{ $t->{opt} }, debug => $DEBUG );
-    while(my($f,$o) = each %{$t->{mod} || {}}) {
-        $o->{name} = $f;
-        $form->field(%$o);
+    for my $field ( sort keys %{ $t->{mod} || {} } ) {
+        my $object = $t->{mod}->{$field};
+        $object->{name} = $field;
+        $form->field( %{ $object } );
     }
-
     # just try to validate
     ok($form->validate, $t->{pass} || 0);
 }

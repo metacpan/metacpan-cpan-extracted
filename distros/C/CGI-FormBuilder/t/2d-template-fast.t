@@ -10,7 +10,7 @@ our $TESTING = 1;
 our $DEBUG = $ENV{DEBUG} || 0;
 our $LOGNAME = $ENV{LOGNAME} || '';
 our $VERSION;
-BEGIN { $VERSION = '3.10'; }
+BEGIN { $VERSION = '3.20'; }
 
 use Test;
 use FindBin;
@@ -40,7 +40,7 @@ BEGIN {
 $ENV{REQUEST_METHOD} = 'GET';
 $ENV{QUERY_STRING}   = 'ticket=111&user=pete&replacement=TRUE';
 
-use CGI::FormBuilder 3.10;
+use CGI::FormBuilder 3.20;
 use CGI::FormBuilder::Test;
 
 # Create our template and store it in a scalarref
@@ -135,18 +135,19 @@ my @test = (
 my $seq = $ARGV[0] || 1;
 
 # Cycle thru and try it out
-for (@test) {
+for my $test_item (@test) {
     my $form = CGI::FormBuilder->new(
                     debug => $DEBUG,
                     action => 'TEST',
                     title  => 'TEST',
-                    %{ $_->{opt} },
+                    %{ $test_item->{opt} },
                );
 
     # the ${mod} key twiddles fields
-    while(my($f,$o) = each %{$_->{mod} || {}}) {
-        $o->{name} = $f;
-        $form->field(%$o);
+    for my $field ( sort keys %{ $test_item->{mod} || {} } ) {
+        my $object = $test_item->{mod}->{$field};
+        $object->{name} = $field;
+        $form->field( %{ $object } );
     }
 
     #

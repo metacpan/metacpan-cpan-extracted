@@ -17,7 +17,7 @@ use CGI::FormBuilder::Field::text;
 use base 'CGI::FormBuilder::Field::text';
 
 
-our $VERSION = '3.10';
+our $VERSION = '3.20';
 
 sub script {
     return '';  # hidden fields are never checked

@@ -16,6 +16,9 @@ enum {
    */
 };
 
+#define boot_parse_subsignature_ex()  XPS_boot_parse_subsignature_ex(aTHX)
+void XPS_boot_parse_subsignature_ex(pTHX);
+
 #define parse_subsignature_ex(flags)  XPS_parse_subsignature_ex(aTHX_ flags)
 OP *XPS_parse_subsignature_ex(pTHX_ int flags);
 

@@ -70,6 +70,7 @@
             "Mojo::Transaction::HTTP" : "0",
             "Sub::Override" : "0",
             "Test::Deep" : "0",
+            "Test::Exception" : "0",
             "Test::Mock::One" : "0",
             "Test::More" : "0.96",
             "Test::Most" : "0",
@@ -80,7 +81,7 @@
    "provides" : {
       "WebService::Xential" : {
          "file" : "lib/WebService/Xential.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -91,7 +92,7 @@
          "web" : "https://gitlab.com/waterkip/webservice-xential"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_contributors" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],

@@ -80,6 +80,16 @@ DESCRIPTION
           return await otherfunc();
        }
 
+    Since version 0.69 this module also supports the async keyword on
+    lexical subroutine declarations when running on Perl version 5.18 or
+    later. Note that the my keyword has to come first:
+
+       use v5.18;
+    
+       my async sub lexfunc { ... }
+    
+       my $f = lexfunc(@args);
+
  await
 
     The await keyword forms an expression which takes a Future instance as

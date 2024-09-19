@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::DomainSnapshot v0.0.1;
+package Sys::Async::Virt::DomainSnapshot v0.0.2;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.1;
+use Protocol::Sys::Virt::Remote::XDR v0.0.2;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -56,57 +56,57 @@ sub new {
 }
 
 sub delete($self, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_DELETE,
-        { snap => $self->{id}, flags => $flags // 0 } );
+        { snap => $self->{id}, flags => $flags // 0 } ));
 }
 
-sub get_parent($self, $flags = 0) {
-    return $self->{client}->_call(
+async sub get_parent($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_GET_PARENT,
-        { snap => $self->{id}, flags => $flags // 0 } );
+        { snap => $self->{id}, flags => $flags // 0 } ))->{snap};
 }
 
-sub get_xml_desc($self, $flags = 0) {
-    return $self->{client}->_call(
+async sub get_xml_desc($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_GET_XML_DESC,
-        { snap => $self->{id}, flags => $flags // 0 } );
+        { snap => $self->{id}, flags => $flags // 0 } ))->{xml};
 }
 
-sub has_metadata($self, $flags = 0) {
-    return $self->{client}->_call(
+async sub has_metadata($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_HAS_METADATA,
-        { snap => $self->{id}, flags => $flags // 0 } );
+        { snap => $self->{id}, flags => $flags // 0 } ))->{metadata};
 }
 
-sub is_current($self, $flags = 0) {
-    return $self->{client}->_call(
+async sub is_current($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_IS_CURRENT,
-        { snap => $self->{id}, flags => $flags // 0 } );
+        { snap => $self->{id}, flags => $flags // 0 } ))->{current};
 }
 
-sub list_all_children($self, $need_results, $flags = 0) {
-    return $self->{client}->_call(
+async sub list_all_children($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_LIST_ALL_CHILDREN,
-        { snapshot => $self->{id}, need_results => $need_results, flags => $flags // 0 } );
+        { snapshot => $self->{id}, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 } ))->{snapshots};
 }
 
-sub list_children_names($self, $maxnames, $flags = 0) {
-    return $self->{client}->_call(
+async sub list_children_names($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_LIST_CHILDREN_NAMES,
-        { snap => $self->{id}, maxnames => $maxnames, flags => $flags // 0 } );
+        { snap => $self->{id}, maxnames => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 } ))->{names};
 }
 
-sub num_children($self, $flags = 0) {
-    return $self->{client}->_call(
+async sub num_children($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_NUM_CHILDREN,
-        { snap => $self->{id}, flags => $flags // 0 } );
+        { snap => $self->{id}, flags => $flags // 0 } ))->{num};
 }
 
 sub revert_to_snapshot($self, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_DOMAIN_REVERT_TO_SNAPSHOT,
-        { snap => $self->{id}, flags => $flags // 0 } );
+        { snap => $self->{id}, flags => $flags // 0 } ));
 }
 
 
@@ -122,7 +122,7 @@ Sys::Async::Virt::DomainSnapshot - Client side proxy to remote LibVirt domain sn
 
 =head1 VERSION
 
-v0.0.1
+v0.0.2
 
 =head1 SYNOPSIS
 
@@ -174,14 +174,14 @@ See documentation of L<virDomainSnapshotIsCurrent|https://libvirt.org/html/libvi
 
 =head2 list_all_children
 
-  $snapshots = await $snapshot->list_all_children( $need_results, $flags = 0 );
+  $snapshots = await $snapshot->list_all_children( $flags = 0 );
 
 See documentation of L<virDomainSnapshotListAllChildren|https://libvirt.org/html/libvirt-libvirt-domain-snapshot.html#virDomainSnapshotListAllChildren>.
 
 
 =head2 list_children_names
 
-  $names = await $snapshot->list_children_names( $maxnames, $flags = 0 );
+  $names = await $snapshot->list_children_names( $flags = 0 );
 
 See documentation of L<virDomainSnapshotListChildrenNames|https://libvirt.org/html/libvirt-libvirt-domain-snapshot.html#virDomainSnapshotListChildrenNames>.
 

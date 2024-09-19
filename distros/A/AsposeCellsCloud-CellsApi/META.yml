@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 24.8
+    version: 24.9
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -671,6 +671,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/ScopeOptions.pm
   AsposeCellsCloud::Object::TrimContentOptions:
     file: lib/AsposeCellsCloud/Object/TrimContentOptions.pm
+  AsposeCellsCloud::Object::WordCaseOptions:
+    file: lib/AsposeCellsCloud/Object/WordCaseOptions.pm
   AsposeCellsCloud::Object::CellValue:
     file: lib/AsposeCellsCloud/Object/CellValue.pm
   AsposeCellsCloud::Object::CustomParserConfig:
@@ -1367,6 +1369,8 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostAddTextContentRequest.pm
   AsposeCellsCloud::Request::PostTrimContentRequest:
     file: lib/AsposeCellsCloud/Request/PostTrimContentRequest.pm
+  AsposeCellsCloud::Request::PostUpdateWordCaseRequest:
+    file: lib/AsposeCellsCloud/Request/PostUpdateWordCaseRequest.pm
   AsposeCellsCloud::Request::GetWorkbookDefaultStyleRequest:
     file: lib/AsposeCellsCloud/Request/GetWorkbookDefaultStyleRequest.pm
   AsposeCellsCloud::Request::GetWorkbookTextItemsRequest:
@@ -1558,5 +1562,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 24.8
+version: 24.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

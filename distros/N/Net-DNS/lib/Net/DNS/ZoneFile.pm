@@ -3,7 +3,7 @@ package Net::DNS::ZoneFile;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: ZoneFile.pm 1957 2024-01-10 14:54:10Z willem $)[2];
+our $VERSION = (qw$Id: ZoneFile.pm 1990 2024-09-18 13:16:07Z willem $)[2];
 
 
 =head1 NAME
@@ -437,8 +437,8 @@ sub _generate {				## expand $GENERATE into input stream
 
 	my $handle = Net::DNS::ZoneFile::Generator->new( $range, $template, $self->line );
 
-	delete $self->{latest};					# forget previous owner
 	$self->{parent} = bless {%$self}, ref($self);		# save state, create link
+	delete $self->{latest};					# forget current domain name
 	return $self->{filehandle} = $handle;
 }
 
@@ -560,8 +560,8 @@ sub _include {				## open $INCLUDE file
 	my $discipline = join( ':', '<', PerlIO::get_layers $self->{filehandle} );
 	my $filehandle = IO::File->new( $filename, $discipline ) or die qq(\$INCLUDE $filename: $!);
 
-	delete $self->{latest};					# forget previous owner
 	$self->{parent} = bless {%$self}, ref($self);		# save state, create link
+	delete $self->{latest};					# forget current domain name
 	$self->_origin($origin) if $origin;
 	$self->{filename} = $filename;
 	return $self->{filehandle} = $filehandle;
@@ -625,10 +625,10 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC1035(5.1)|https://tools.ietf.org/html/rfc1035>
-L<RFC2308(4)|https://tools.ietf.org/html/rfc2308>
+L<RFC1035(5.1)|https://iana.org/go/rfc1035/section-5.1>
+L<RFC2308(4)|https://iana.org/go/rfc2308/section-4>
 
-L<BIND Administrator Reference Manual|http://bind.isc.org/>
+L<BIND Administrator Reference Manual|https://bind9.readthedocs.io/en/latest/>
 
 =cut
 

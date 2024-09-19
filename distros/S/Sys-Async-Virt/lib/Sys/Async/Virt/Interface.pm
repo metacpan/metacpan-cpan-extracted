@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Interface v0.0.1;
+package Sys::Async::Virt::Interface v0.0.2;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.1;
+use Protocol::Sys::Virt::Remote::XDR v0.0.2;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -37,33 +37,33 @@ sub new {
 }
 
 sub create($self, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_INTERFACE_CREATE,
-        { iface => $self->{id}, flags => $flags // 0 } );
+        { iface => $self->{id}, flags => $flags // 0 } ));
 }
 
 sub destroy($self, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_INTERFACE_DESTROY,
-        { iface => $self->{id}, flags => $flags // 0 } );
+        { iface => $self->{id}, flags => $flags // 0 } ));
 }
 
-sub get_xml_desc($self, $flags = 0) {
-    return $self->{client}->_call(
+async sub get_xml_desc($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_INTERFACE_GET_XML_DESC,
-        { iface => $self->{id}, flags => $flags // 0 } );
+        { iface => $self->{id}, flags => $flags // 0 } ))->{xml};
 }
 
-sub is_active($self) {
-    return $self->{client}->_call(
+async sub is_active($self) {
+    return (await $self->{client}->_call(
         $remote->PROC_INTERFACE_IS_ACTIVE,
-        { iface => $self->{id},  } );
+        { iface => $self->{id},  } ))->{active};
 }
 
 sub undefine($self) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_INTERFACE_UNDEFINE,
-        { iface => $self->{id},  } );
+        { iface => $self->{id},  } ));
 }
 
 
@@ -79,7 +79,7 @@ Sys::Async::Virt::Interface - Client side proxy to remote LibVirt (network) inte
 
 =head1 VERSION
 
-v0.0.1
+v0.0.2
 
 =head1 SYNOPSIS
 

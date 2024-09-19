@@ -1,5 +1,22 @@
 Revision history for XS-Parse-Sublike
 
+0.25    2024-09-19
+        [BUGFIXES]
+         * Make sure not to introduce signature parameter variables until
+           after their own defaulting expression is parsed (RT155630)
+
+0.24    2024-09-18
+        [CHANGES]
+         * Support lexical subs when prefixed with `my`
+         * Rewritten implementation of named parameters to avoid indirection
+           via a slurpy HV for much performance improvement
+         * Support also slurpy AVs along with named parameters
+         * Docs updates for clarity about named params
+
+        [BUGFIXES]
+         * Avoid some more C99 `for()` loop variable declarations and struct
+           initialisers as they upset some C compilers
+
 0.23    2024-08-15
         [CHANGES]
          * New ABI version 6

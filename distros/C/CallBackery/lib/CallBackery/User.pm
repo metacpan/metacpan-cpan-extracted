@@ -35,8 +35,14 @@ the controller
 =cut
 
 has controller => undef, weak => 1;
-has app => undef, weak => 1;
-has log => undef, weak => 1;
+
+has app => sub ($self) {
+    $self->controller->app;
+}, weak => 1;
+
+has log => sub ($self) {
+    $self->controller ? $self->controller->log : $self->app->log;
+}, weak => 1;
 
 =head2 $self->userId
 

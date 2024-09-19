@@ -3,7 +3,7 @@ package Net::DNS::Text;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Text.pm 1894 2023-01-12 10:59:08Z willem $)[2];
+our $VERSION = (qw$Id: Text.pm 1990 2024-09-18 13:16:07Z willem $)[2];
 
 
 =head1 NAME
@@ -323,8 +323,8 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS>
-L<RFC1035|https://tools.ietf.org/html/rfc1035>
-L<RFC3629|https://tools.ietf.org/html/rfc3629>
+L<RFC1035|https://iana.org/go/rfc1035>
+L<RFC3629|https://iana.org/go/rfc3629>
 
 =cut
 

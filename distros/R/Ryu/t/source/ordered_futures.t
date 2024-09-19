@@ -46,7 +46,7 @@ subtest 'handle failed Future in source' => sub {
 subtest 'backpressure for Futures' => sub {
     my $src = Ryu::Source->new;
     my $ordered = $src->ordered_futures(
-        low => 2,
+        low  => 2,
         high => 5
     );
     my @f = map { my $f = Future->new; $src->emit($f); $f } 0..2;

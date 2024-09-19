@@ -3,7 +3,7 @@ package Net::DNS::Question;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Question.pm 1895 2023-01-16 13:38:08Z willem $)[2];
+our $VERSION = (qw$Id: Question.pm 1990 2024-09-18 13:16:07Z willem $)[2];
 
 
 =head1 NAME
@@ -329,7 +329,7 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::DomainName> L<Net::DNS::Packet>
-L<RFC1035(4.1.2)|https://tools.ietf.org/html/rfc1035>
+L<RFC1035(4.1.2)|https://iana.org/go/rfc1035#section-4.1.2>
 
 =cut
 

@@ -6,7 +6,7 @@ use MARC::Convert::Wikidata::Transform;
 use MARC::File::XML;
 use MARC::Record;
 use Perl6::Slurp qw(slurp);
-use Test::More 'tests' => 109;
+use Test::More 'tests' => 111;
 use Test::NoWarnings;
 use Test::Warn;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
@@ -186,3 +186,13 @@ is($external_ids_ar->[2]->name, 'lccn', 'Sněženka: Get external value name (lc
 is($external_ids_ar->[2]->value, '85710900', 'Sněženka: Get LCCN number (85710900).');
 is($external_ids_ar->[3]->name, 'lccn', 'Sněženka: Get external value name (lccn).');
 is($external_ids_ar->[3]->value, '85018016', 'Sněženka: Get LCCN number (85018016).');
+
+# Test.
+$marc_data = slurp($data->file('cnb000024035.xml')->s);
+$obj = MARC::Convert::Wikidata::Transform->new(
+	'marc_record' => MARC::Record->new_from_xml($marc_data, 'UTF-8'),
+);
+$ret = $obj->object;
+my $authors_of_introduction = $ret->authors_of_introduction->[0];
+is($authors_of_introduction->name, decode_utf8('Markéta'), 'Terezín v kresbách vězňů: Get author of introduction name.');
+is($authors_of_introduction->surname, decode_utf8('Petrášová'), 'Terezín v kresbách vězňů: Get author of introduction surname.');

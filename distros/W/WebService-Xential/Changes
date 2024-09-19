@@ -1,5 +1,12 @@
 Revision history for Webservice-Xential
 
+0.002     2024-09-19 04:54:29Z
+
+    * Update POD
+    * Add api_path to constructor options
+    * Add api_user to constructor options
+    * Don't send auth headers when xsessionid headers are being send
+
 0.001     2024-09-18 01:24:51Z
 
     * Initial release

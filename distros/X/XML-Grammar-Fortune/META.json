@@ -85,11 +85,11 @@
    "provides" : {
       "XML::Grammar::Fortune" : {
          "file" : "lib/XML/Grammar/Fortune.pm",
-         "version" : "0.1000"
+         "version" : "0.1001"
       },
       "XML::Grammar::Fortune::ToText" : {
          "file" : "lib/XML/Grammar/Fortune/ToText.pm",
-         "version" : "0.1000"
+         "version" : "0.1001"
       }
    },
    "release_status" : "stable",
@@ -104,7 +104,7 @@
          "web" : "https://github.com/shlomif/fortune-xml"
       }
    },
-   "version" : "0.1000",
+   "version" : "0.1001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

@@ -102,35 +102,35 @@
    "provides" : {
       "Ryu" : {
          "file" : "lib/Ryu.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Ryu::Buffer" : {
          "file" : "lib/Ryu/Buffer.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Ryu::Exception" : {
          "file" : "lib/Ryu/Exception.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Ryu::Node" : {
          "file" : "lib/Ryu/Node.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Ryu::Observable" : {
          "file" : "lib/Ryu/Observable.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Ryu::Sink" : {
          "file" : "lib/Ryu/Sink.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Ryu::Source" : {
          "file" : "lib/Ryu/Source.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Ryu::Stream" : {
          "file" : "lib/Ryu/Stream.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       }
    },
    "release_status" : "stable",
@@ -145,9 +145,10 @@
          "web" : "https://github.com/team-at-cpan/Ryu"
       }
    },
-   "version" : "4.000",
+   "version" : "4.001",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
+      "Tom Molesworth <tom@audioboundary.com>",
       "Binary-Mohanad <mohanad@binary.com>",
       "Amin Marashi <marashi.s.amin@gmail.com>",
       "tm604 <tom@perlsite.co.uk>",

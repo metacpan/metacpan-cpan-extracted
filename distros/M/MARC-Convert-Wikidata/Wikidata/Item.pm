@@ -26,7 +26,7 @@ Readonly::Hash our %EXT_ID_MAPPING => (
 	'lccn' => 'P243',
 );
 
-our $VERSION = 0.14;
+our $VERSION = 0.16;
 
 # Constructor.
 sub new {
@@ -558,7 +558,7 @@ sub wikidata_place_of_publication {
 				$place_qid = $self->{'callback_publisher_place'}->($publisher);
 			}
 			my $publisher_qid = $self->{'callback_publisher_name'}->($publisher, $publication_date);
-			if ($place_qid) {
+			if (defined $publisher_qid && $place_qid) {
 				push @places, [$publisher_qid, $place_qid];
 			}
 		}
@@ -569,13 +569,14 @@ sub wikidata_place_of_publication {
 	}
 
 	my $multiple = @places > 1 ? 1 : 0;
-	return map {
-		Wikibase::Datatype::Statement->new(
+	my @ret;
+	foreach my $place (@places) {
+		push @ret, Wikibase::Datatype::Statement->new(
 			'references' => [$self->wikidata_reference],
 			'snak' => Wikibase::Datatype::Snak->new(
 				'datatype' => 'wikibase-item',
 				'datavalue' => Wikibase::Datatype::Value::Item->new(
-					'value' => $_->[1],
+					'value' => $place->[1],
 				),
 				'property' => 'P291',
 			),
@@ -584,14 +585,16 @@ sub wikidata_place_of_publication {
 					Wikibase::Datatype::Snak->new(
 						'datatype' => 'wikibase-item',
 						'datavalue' => Wikibase::Datatype::Value::Item->new(
-							'value' => $_->[0],
+							'value' => $place->[0],
 						),
 						'property' => 'P123',
 					),
 				],
 			) : (),
 		);
-	} @places;
+	}
+
+	return @ret;
 }
 
 sub wikidata_publication_date {
@@ -699,14 +702,17 @@ sub wikidata_series {
 	if (! defined $self->{'callback_series'}) {
 		return;
 	} else {
+		# No warn flag for use case when we found series.
+		my $found = 0;
 		foreach my $series (@{$self->{'transform_object'}->series}) {
-			my $series_qid = $self->{'callback_series'}->($series);
+			my $series_qid = $self->{'callback_series'}->($series, $found);
 			if ($series_qid) {
 				push @series_qids, [
 					$series_qid,
 					$series->name,
 					$series->series_ordinal,
 				];
+				$found = 1;
 			}
 		}
 	}

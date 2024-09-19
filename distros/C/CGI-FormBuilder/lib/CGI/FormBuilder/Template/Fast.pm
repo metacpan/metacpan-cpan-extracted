@@ -44,7 +44,7 @@ use CGI::FastTemplate;
 use base 'CGI::FastTemplate';
 
 
-our $VERSION = '3.10';
+our $VERSION = '3.20';
 
 sub new {
     my $self  = shift;
@@ -193,7 +193,7 @@ C<form> template, you also have access to these variables:
     $JS_HEAD      # validation JavaScript
 
 Note that since C<CGI::FastTemplate> doesn't use anything other than 
-simple scalar variables, there are no variables corrosponding to 
+simple scalar variables, there are no variables corresponding to
 the lists that other engines have (e.g. C<fields> or C<options> 
 lists in C<TT2> or C<Text::Template>).
 

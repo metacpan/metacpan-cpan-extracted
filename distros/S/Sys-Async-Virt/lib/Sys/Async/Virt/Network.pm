@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Network v0.0.1;
+package Sys::Async::Virt::Network v0.0.2;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.1;
+use Protocol::Sys::Virt::Remote::XDR v0.0.2;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -67,93 +67,99 @@ sub new {
 }
 
 sub create($self) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_NETWORK_CREATE,
-        { net => $self->{id},  } );
+        { net => $self->{id},  } ));
 }
 
 sub destroy($self) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_NETWORK_DESTROY,
-        { net => $self->{id},  } );
+        { net => $self->{id},  } ));
 }
 
-sub get_autostart($self) {
-    return $self->{client}->_call(
+async sub get_autostart($self) {
+    return (await $self->{client}->_call(
         $remote->PROC_NETWORK_GET_AUTOSTART,
-        { net => $self->{id},  } );
+        { net => $self->{id},  } ))->{autostart};
 }
 
-sub get_bridge_name($self) {
-    return $self->{client}->_call(
+async sub get_bridge_name($self) {
+    return (await $self->{client}->_call(
         $remote->PROC_NETWORK_GET_BRIDGE_NAME,
-        { net => $self->{id},  } );
+        { net => $self->{id},  } ))->{name};
 }
 
-sub get_metadata($self, $type, $uri, $flags = 0) {
-    return $self->{client}->_call(
+async sub get_dhcp_leases($self, $mac, $flags = 0) {
+    return (await $self->{client}->_call(
+        $remote->PROC_NETWORK_GET_DHCP_LEASES,
+        { net => $self->{id}, mac => $mac, need_results => $remote->NETWORK_DHCP_LEASES_MAX, flags => $flags // 0 } ))->{leases};
+}
+
+async sub get_metadata($self, $type, $uri, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_NETWORK_GET_METADATA,
-        { network => $self->{id}, type => $type, uri => $uri, flags => $flags // 0 } );
+        { network => $self->{id}, type => $type, uri => $uri, flags => $flags // 0 } ))->{metadata};
 }
 
-sub get_xml_desc($self, $flags = 0) {
-    return $self->{client}->_call(
+async sub get_xml_desc($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_NETWORK_GET_XML_DESC,
-        { net => $self->{id}, flags => $flags // 0 } );
+        { net => $self->{id}, flags => $flags // 0 } ))->{xml};
 }
 
-sub is_active($self) {
-    return $self->{client}->_call(
+async sub is_active($self) {
+    return (await $self->{client}->_call(
         $remote->PROC_NETWORK_IS_ACTIVE,
-        { net => $self->{id},  } );
+        { net => $self->{id},  } ))->{active};
 }
 
-sub is_persistent($self) {
-    return $self->{client}->_call(
+async sub is_persistent($self) {
+    return (await $self->{client}->_call(
         $remote->PROC_NETWORK_IS_PERSISTENT,
-        { net => $self->{id},  } );
+        { net => $self->{id},  } ))->{persistent};
 }
 
-sub list_all_ports($self, $need_results, $flags = 0) {
-    return $self->{client}->_call(
+async sub list_all_ports($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_NETWORK_LIST_ALL_PORTS,
-        { network => $self->{id}, need_results => $need_results, flags => $flags // 0 } );
+        { network => $self->{id}, need_results => $remote->NETWORK_PORT_LIST_MAX, flags => $flags // 0 } ))->{ports};
 }
 
-sub port_create_xml($self, $xml, $flags = 0) {
-    return $self->{client}->_call(
+async sub port_create_xml($self, $xml, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_NETWORK_PORT_CREATE_XML,
-        { network => $self->{id}, xml => $xml, flags => $flags // 0 } );
+        { network => $self->{id}, xml => $xml, flags => $flags // 0 } ))->{port};
 }
 
-sub port_lookup_by_uuid($self, $uuid) {
-    return $self->{client}->_call(
+async sub port_lookup_by_uuid($self, $uuid) {
+    return (await $self->{client}->_call(
         $remote->PROC_NETWORK_PORT_LOOKUP_BY_UUID,
-        { network => $self->{id}, uuid => $uuid } );
+        { network => $self->{id}, uuid => $uuid } ))->{port};
 }
 
 sub set_autostart($self, $autostart) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_NETWORK_SET_AUTOSTART,
-        { net => $self->{id}, autostart => $autostart } );
+        { net => $self->{id}, autostart => $autostart } ));
 }
 
 sub set_metadata($self, $type, $metadata, $key, $uri, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_NETWORK_SET_METADATA,
-        { network => $self->{id}, type => $type, metadata => $metadata, key => $key, uri => $uri, flags => $flags // 0 } );
+        { network => $self->{id}, type => $type, metadata => $metadata, key => $key, uri => $uri, flags => $flags // 0 } ));
 }
 
 sub undefine($self) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_NETWORK_UNDEFINE,
-        { net => $self->{id},  } );
+        { net => $self->{id},  } ));
 }
 
 sub update($self, $command, $section, $parentIndex, $xml, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_NETWORK_UPDATE,
-        { net => $self->{id}, command => $command, section => $section, parentIndex => $parentIndex, xml => $xml, flags => $flags // 0 } );
+        { net => $self->{id}, command => $command, section => $section, parentIndex => $parentIndex, xml => $xml, flags => $flags // 0 } ));
 }
 
 
@@ -170,7 +176,7 @@ Sys::Async::Virt::Network - Client side proxy to remote LibVirt network
 
 =head1 VERSION
 
-v0.0.1
+v0.0.2
 
 =head1 SYNOPSIS
 
@@ -214,6 +220,13 @@ See documentation of L<virNetworkGetAutostart|https://libvirt.org/html/libvirt-l
 See documentation of L<virNetworkGetBridgeName|https://libvirt.org/html/libvirt-libvirt-network.html#virNetworkGetBridgeName>.
 
 
+=head2 get_dhcp_leases
+
+  $leases = await $net->get_dhcp_leases( $mac, $flags = 0 );
+
+See documentation of L<virNetworkGetDHCPLeases|https://libvirt.org/html/libvirt-libvirt-network.html#virNetworkGetDHCPLeases>.
+
+
 =head2 get_metadata
 
   $metadata = await $net->get_metadata( $type, $uri, $flags = 0 );
@@ -244,7 +257,7 @@ See documentation of L<virNetworkIsPersistent|https://libvirt.org/html/libvirt-l
 
 =head2 list_all_ports
 
-  $ports = await $net->list_all_ports( $need_results, $flags = 0 );
+  $ports = await $net->list_all_ports( $flags = 0 );
 
 See documentation of L<virNetworkListAllPorts|https://libvirt.org/html/libvirt-libvirt-network.html#virNetworkListAllPorts>.
 

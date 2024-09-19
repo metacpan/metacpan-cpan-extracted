@@ -17,6 +17,7 @@ my @files = (
     't/basic.t',
     't/connection.t',
     't/encoding.t',
+    't/flow_control.t',
     't/password.t',
     't/service.t',
     'xt/author/distmeta.t',

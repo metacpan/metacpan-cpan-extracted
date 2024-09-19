@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package Test::Future::AsyncAwait::Awaitable 0.68;
+package Test::Future::AsyncAwait::Awaitable 0.69;
 
 use v5.14;
 use warnings;
@@ -20,6 +20,8 @@ our @EXPORT_OK = qw(
 C<Test::Future::AsyncAwait::Awaitable> - conformance tests for awaitable role API
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Test::More;
    use Test::Future::AsyncAwait::Awaitable;

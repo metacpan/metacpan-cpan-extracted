@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::NetworkPort v0.0.1;
+package Sys::Async::Virt::NetworkPort v0.0.2;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.1;
+use Protocol::Sys::Virt::Remote::XDR v0.0.2;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -43,22 +43,32 @@ sub new {
 }
 
 sub delete($self, $flags = 0) {
-    return $self->{client}->_call(
+    return ($self->{client}->_call(
         $remote->PROC_NETWORK_PORT_DELETE,
-        { port => $self->{id}, flags => $flags // 0 } );
+        { port => $self->{id}, flags => $flags // 0 } ));
 }
 
-sub get_xml_desc($self, $flags = 0) {
-    return $self->{client}->_call(
+async sub get_parameters($self, $flags = 0) {
+    $flags |= await $self->{client}->_typed_param_string_okay();
+    my $nparams = (await $self->{client}->_call(
+        $remote->PROC_NETWORK_PORT_GET_PARAMETERS,
+        { port => $self->{id}, nparams => 0, flags => $flags // 0 } ))->{nparams};
+    return (await $self->{client}->_call(
+        $remote->PROC_NETWORK_PORT_GET_PARAMETERS,
+        { port => $self->{id}, nparams => $nparams, flags => $flags // 0 } ))->{params};
+}
+
+async sub get_xml_desc($self, $flags = 0) {
+    return (await $self->{client}->_call(
         $remote->PROC_NETWORK_PORT_GET_XML_DESC,
-        { port => $self->{id}, flags => $flags // 0 } );
+        { port => $self->{id}, flags => $flags // 0 } ))->{xml};
 }
 
 async sub set_parameters($self, $params, $flags = 0) {
-    $params = await $self->_filter_typed_param_string( $params );
-    return await $self->{client}->_call(
+    $params = await $self->{client}->_filter_typed_param_string( $params );
+    return (await $self->{client}->_call(
         $remote->PROC_NETWORK_PORT_SET_PARAMETERS,
-        { port => $self->{id}, params => $params, flags => $flags // 0 } );
+        { port => $self->{id}, params => $params, flags => $flags // 0 } ));
 }
 
 
@@ -74,7 +84,7 @@ Sys::Async::Virt::NetworkPort - Client side proxy to remote LibVirt network port
 
 =head1 VERSION
 
-v0.0.1
+v0.0.2
 
 =head1 SYNOPSIS
 
@@ -94,6 +104,13 @@ v0.0.1
   # -> (* no data *)
 
 See documentation of L<virNetworkPortDelete|https://libvirt.org/html/libvirt-libvirt-network.html#virNetworkPortDelete>.
+
+
+=head2 get_parameters
+
+  $params = await $port->get_parameters( $flags = 0 );
+
+See documentation of L<virNetworkPortGetParameters|https://libvirt.org/html/libvirt-libvirt-network.html#virNetworkPortGetParameters>.
 
 
 =head2 get_xml_desc

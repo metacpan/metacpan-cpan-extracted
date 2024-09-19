@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 72-TSIG-verify.t 1980 2024-06-02 10:16:33Z willem $	-*-perl-*-
+# $Id: 72-TSIG-verify.t 1990 2024-09-18 13:16:07Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -30,7 +30,7 @@ my $tsig  = Net::DNS::RR->new( type => 'TSIG' );
 my $class = ref($tsig);
 
 
-my $tsigkey = 'tsigkey.txt';
+my $tsigkey = 'tsigkey72.txt';
 END { unlink($tsigkey) if defined $tsigkey; }
 
 my $fh_tsigkey = IO::File->new( $tsigkey, '>' ) || die "$tsigkey $!";

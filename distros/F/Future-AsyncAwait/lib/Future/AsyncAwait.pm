@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.68;
+package Future::AsyncAwait 0.69;
 
 use v5.14;
 use warnings;
@@ -20,6 +20,8 @@ require Future; Future->VERSION( '0.49' );
 C<Future::AsyncAwait> - deferred subroutine syntax for futures
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use v5.14;
    use Future::AsyncAwait;
@@ -93,6 +95,16 @@ wanted.
       ...
       return await otherfunc();
    }
+
+I<Since version 0.69> this module also supports the C<async> keyword on
+lexical subroutine declarations when running on Perl version 5.18 or later.
+Note that the C<my> keyword has to come first:
+
+   use v5.18;
+
+   my async sub lexfunc { ... }
+
+   my $f = lexfunc(@args);
 
 =head2 C<await>
 

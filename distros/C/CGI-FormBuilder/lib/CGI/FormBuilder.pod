@@ -2056,7 +2056,7 @@ up a couple basic form features:
         font-style: italic;
     }
 
-Of course, if you're familiar with CSS, you know alot more is possible.
+Of course, if you're familiar with CSS, you know a lot more is possible.
 Also, you can mess with all the id's (if you name your forms) to
 manipulate fields more exactly.
 
@@ -2724,13 +2724,12 @@ L<CGI::FormBuilder::Field>, L<CGI::FormBuilder::Util>,
 L<CGI::FormBuilder::Util>, L<HTML::Template>, L<Text::Template>
 L<CGI::FastTemplate>
 
-=head1 REVISION
-
-$Id: FormBuilder.pm 65 2006-09-07 18:11:43Z nwiger $
-
 =head1 AUTHOR
 
 Copyright (c) L<Nate Wiger|http://nateware.com>. All Rights Reserved.
+
+Nate Wiger is the original author; he kindly passed maintainership over
+to David Precious (C<BIGPRESH>) in 2016.
 
 This module is free software; you may copy this under the terms of
 the GNU General Public License, or the Artistic License, copies of

@@ -13,7 +13,7 @@ our @ISA = qw(DynaLoader);
 # SQL_DRIVER_VER is formatted as dd.dd.dddd
 # for version 5.x please switch to 5.00(_00) version numbering
 # keep $VERSION in Bundle/DBD/mysql.pm in sync
-our $VERSION = '5.008';
+our $VERSION = '5.009';
 
 bootstrap DBD::mysql $VERSION;
 
@@ -404,7 +404,7 @@ sub column_info {
 
   local $dbh->{FetchHashKeyName} = 'NAME_lc';
   # only ignore ER_NO_SUCH_TABLE in internal_execute if issued from here
-  my $desc_sth = $dbh->prepare("DESCRIBE $table_id " . $dbh->quote($column));
+  my $desc_sth = $dbh->prepare("SHOW COLUMNS FROM $table_id LIKE " . $dbh->quote($column));
   my $desc = $dbh->selectall_arrayref($desc_sth, { Columns=>{} });
 
   #return $desc_sth if $desc_sth->err();
@@ -753,6 +753,11 @@ EOF
     if (defined $table) {
         push @where, 'TABLE_NAME = ?';
         push @bind, $table;
+    }
+
+    if ($unique_only) {
+        push @where, 'NON_UNIQUE = ?';
+        push @bind, 0;
     }
 
     if (@where) {

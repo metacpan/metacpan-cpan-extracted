@@ -16,7 +16,7 @@ our $TESTING = 1;
 our $DEBUG = $ENV{DEBUG} || 0;
 our $LOGNAME = $ENV{LOGNAME} || '';
 our $VERSION;
-BEGIN { $VERSION = '3.10'; }
+BEGIN { $VERSION = '3.20'; }
 
 use Test;
 use FindBin;
@@ -40,7 +40,7 @@ BEGIN {
 $ENV{REQUEST_METHOD} = 'GET';
 $ENV{QUERY_STRING}   = 'ticket=111&user=pete&replacement=TRUE&action=Unsubscribe&name=Pete+Peteson&email=pete%40peteson.com&extra=junk&_submitted=1&blank=&two=&two=&_page=2&_submitted_p2=2';
 
-use CGI::FormBuilder 3.10;
+use CGI::FormBuilder 3.20;
 use CGI::FormBuilder::Multi;
 use CGI::FormBuilder::Test;
 

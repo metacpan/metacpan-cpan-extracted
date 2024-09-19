@@ -14,6 +14,7 @@ use WebService::Xential;
 
 my $xential = WebService::Xential->new(
     api_key => 'foo',
+    api_user => 'bar',
     api_host => '127.0.0.1',
 );
 
@@ -51,12 +52,6 @@ cmp_deeply($args, { 'XSessionID', 'session_id'}, "... and seen the XSessionID");
 
 
 my $client = $xential->client;
-
-# Local testing, disable
-#$client->base_url->port(9001);
-#$client->base_url->scheme("http");
-#my $res = $xential->create_ticket('<xml>here</xml>', { options => 'here' }, 'sessionid');
-#diag explain $res;
 
 # Here we test the local transactor from Mojo. This allows you to insert custom
 # requests into Mojo and this is used for create_ticket
@@ -102,5 +97,28 @@ cmp_deeply(
   "... and with close = false"
 );
 
+# Local testing, disabled by default
+if ($ENV{XENTIAL_LOCALTESTING}) {
+    use Test::Exception;
+    $override = undef;
+    $client->base_url->port(9001);
+    $client->base_url->scheme("http");
+
+    lives_ok(sub {
+        my $who = $xential->whoami();
+        diag explain $who;
+    }, "whoami call");
+
+    lives_ok(
+      sub {
+        my $res
+          = $xential->create_ticket('<xml>here</xml>', { options => 'here' },
+          'sessionid');
+        diag explain $res;
+      },
+      "create_ticket call"
+    );
+
+}
 
 done_testing;

@@ -71,4 +71,19 @@ BEGIN { $^H{"t::func/func"}++ }
       'func with attr and signture does not collide' );
 }
 
+# RT155630
+{
+   my $var = "outside";
+   func defaultfromoutside($var = $var) { return $var; }
+
+   is( defaultfromoutside(), "outside",
+      'variable in defaulting expression is not shadowed by its own parameter' );
+
+   # Not directly related to this bug but we might as well test this too
+   func defaultfromfirst($x, $y = $x) { return $y; }
+
+   is( defaultfromfirst( "first" ), "first",
+      'variable in later defaulting expression can see earlier params' );
+}
+
 done_testing;

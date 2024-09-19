@@ -2505,7 +2505,7 @@ BOOT:
   Perl_custom_op_register(aTHX_ &pp_pushcancel, &xop_pushcancel);
 
   boot_xs_parse_keyword(0.13);
-  boot_xs_parse_sublike(0.23);
+  boot_xs_parse_sublike(0.24);
 
   register_xs_parse_sublike("async", &hooks_async, NULL);
 

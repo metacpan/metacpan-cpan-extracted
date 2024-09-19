@@ -40,7 +40,7 @@ use Carp;
 # Don't "use" or it collides with our basename()
 require File::Basename;
 
-our $VERSION = '3.10';
+our $VERSION = '3.20';
 
 # Place functions you want to export by default in the
 # @EXPORT array. Any other functions can be requested
@@ -255,7 +255,7 @@ sub htmlattr ($;@) {
         $html{$key} = $val;
     }
     # "double-name" fields with an id for easier DOM scripting
-    # do not override explictly set id attributes
+    # do not override explicitly set id attributes
     $html{id} = tovar($html{name}) if exists $html{name} and not exists $html{id};
 
     return wantarray ? %html : \%html; 

@@ -1,10 +1,11 @@
+requires 'Full::Script', '>= 1.003';
 requires 'parent', 0;
 requires 'indirect', 0;
 requires 'curry', '>= 1.001';
 requires 'Future', '>= 0.46';
 requires 'Syntax::Keyword::Try', '>= 0.25';
 requires 'Log::Any', '>= 1.050';
-requires 'Ryu', '>= 3.004';
+requires 'Ryu', '>= 4.001';
 requires 'Ryu::Async', '>= 0.017';
 requires 'Database::Async', '>= 0.019';
 requires 'URI::postgres', 0;

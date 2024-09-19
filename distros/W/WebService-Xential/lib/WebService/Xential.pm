@@ -1,5 +1,5 @@
 package WebService::Xential;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use v5.26;
 use Object::Pad;
 
@@ -15,9 +15,12 @@ use JSON::XS qw(encode_json);
 use Types::Serialiser qw();
 
 field $api_key :param;
+field $api_user :param;
 field $api_host :param :accessor;
 field $api_port :param = undef;
+field $api_path :param = '/xential/modpages/next.oas/api';
 field $client :accessor;
+
 
 ADJUST {
 
@@ -27,17 +30,25 @@ ADJUST {
 
     my $host = Mojo::URL->new();
     $host->scheme('https');
-    $host->host($self->api_host);
+    $host->host($api_host);
+    $host->path($api_path);
+
     $client->base_url($host);
 
-    $client->ua->on(start => sub ($ua, $tx) {
-      $tx->req->headers->header('X-API-Key' => $api_key);
-    });
+    $client->ua->on(
+      start => sub ($ua, $tx) {
 
+        $tx->req->headers->add("Accept" => "application/json");
 
-    my $t = $client->ua->transactor;
-    $t->add_generator('createData' => \&create_ticket_data);
-    $client->ua->transactor($t);
+        unless ($tx->req->headers->header('XSessionID')) {
+          $tx->req->headers->header(
+            "Authorization" => "Basic $api_user:$api_key");
+        }
+      }
+    );
+
+    $client->ua->transactor->add_generator(
+      'createData' => \&create_ticket_data);
 }
 
 sub create_ticket_data {
@@ -75,19 +86,24 @@ sub create_ticket_data {
   );
 }
 
+
 method has_api_host {
     return $api_host ? 1 : 0;
 }
+
+
 
 method whoami($session_id = undef) {
     return $self->api_call('op_auth_whoami',
       { $session_id ? (XSessionID => $session_id) : () });
 }
 
+
 method logout($session_id = undef) {
     return $self->api_call('op_auth_logout',
       { $session_id ? (XSessionID => $session_id) : () });
 }
+
 
 method impersonate($username = undef, $uuid = undef, $session_id = undef) {
   return $self->api_call(
@@ -99,6 +115,7 @@ method impersonate($username = undef, $uuid = undef, $session_id = undef) {
     }
   );
 }
+
 
 method create_ticket($xml, $options, $session_id = undef) {
 
@@ -116,6 +133,7 @@ method create_ticket($xml, $options, $session_id = undef) {
   );
 }
 
+
 method start_document($url = undef, $uuid = undef, $session_id = undef) {
   return $self->api_call(
     'op_document_startDocument',
@@ -127,6 +145,7 @@ method start_document($url = undef, $uuid = undef, $session_id = undef) {
   );
 }
 
+
 method build_document($close, $uuid, $session_id = undef) {
   return $self->api_call(
     'op_document_buildDocument',
@@ -137,6 +156,7 @@ method build_document($close, $uuid, $session_id = undef) {
     }
   );
 }
+
 
 method api_call($operation, $query, $content = {}) {
 
@@ -178,11 +198,54 @@ WebService::Xential - A Xential REST API module
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
+
+=head1 methods
+
+=head2 new()
+
+    my $xential = WebService::Xential->new(
+      api_user => 'foo',
+      api_key => 'foo',
+      api_host => '127.0.0.1',
+    );
+
+=head2 has_api_host()
+
+Tells you if you have a custom API host defined
+
+=head2 whoami($session_id)
+
+Implements the whoami call from Xential
+
+=head2 logout($session_id)
+
+Implements the logout call from Xential
+
+=head2 impersonate($username, $user_uuid, $session_id)
+
+Implements the impersonate call from Xential
+
+=head2 create_ticket($xml, $options, $session_id)
+
+Implements the create_ticket call from Xential
+
+=head2 start_document($username, $user_uuid, $session_id)
+
+Implements the start_document call from Xential
+
+=head2 build_document($username, $user_uuid, $session_id)
+
+Implements the build_document call from Xential
+
+=head2 api_call($operation, $query, $content)
+
+A wrapper around the L<OpenAPI::Client::call> function. Returns the JSON from
+the endpoint.
 
 =head1 ATTRIBUTES
 

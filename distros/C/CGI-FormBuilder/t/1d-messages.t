@@ -10,7 +10,7 @@ our $TESTING = 1;
 our $DEBUG = $ENV{DEBUG} || 0;
 our $LOGNAME = $ENV{LOGNAME} || '';
 our $VERSION;
-BEGIN { $VERSION = '3.10'; }
+BEGIN { $VERSION = '3.20'; }
 
 use Test;
 use FindBin;
@@ -70,8 +70,9 @@ BEGIN {
 my $locale = "fb_FAKE";
 my $messages = "messages.$locale";
 open(M, ">$messages") || warn "Can't write $messages: $!";
-while (my($k,$v) = each %messages) {
-    print M join(' ', $k, ref($v) ? @$v : $v), "\n";
+for my $k ( sort keys %messages ) {
+  my $v = $messages{$k};
+  print M join(' ', $k, ref($v) ? @$v : $v), "\n";
 }
 close(M);
 
@@ -79,7 +80,7 @@ close(M);
 $ENV{REQUEST_METHOD} = 'GET';
 $ENV{QUERY_STRING}   = 'ticket=111&user=pete&replacement=TRUE&action=Unsubscribe&name=Pete+Peteson&email=pete%40peteson.com&extra=junk&_submitted=1&blank=&two=&two=';
 
-use CGI::FormBuilder 3.10;
+use CGI::FormBuilder 3.20;
 
 # Now manually try a whole bunch of things
 my $hash = CGI::FormBuilder->new(
@@ -123,7 +124,7 @@ EOD
 # Final test set is to just make sure we have all the keys for all modules
 require CGI::FormBuilder::Messages::default;
 my %need = CGI::FormBuilder::Messages::default->messages;
-my @keys = keys %need;
+my @keys = sort keys %need;
 for my $pm (@pm) {
     my($lang) = $pm =~ /([a-z]+_[A-Z]+)/;
     my $skip = $lang ? undef : "skip: Can't get language from $pm";

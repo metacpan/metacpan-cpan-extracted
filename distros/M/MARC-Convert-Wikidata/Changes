@@ -1,3 +1,11 @@
+0.16 2024-09-19T10:23:56+02:00
+ - Add support for new use case of number of pages.
+ - Fix error in case of not detected publishing house.
+ - Improve callback to series to add argument with no_warn flag.
+
+0.15 2024-09-18T21:40:20+02:00
+ - Fix of not-defined NKCR AUT ID in people.
+
 0.14 2024-08-10T23:13:54+02:00
  - Add deprecated rank to deprecated values.
  - Fix deprecated value.

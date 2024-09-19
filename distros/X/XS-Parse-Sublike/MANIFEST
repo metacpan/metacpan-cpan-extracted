@@ -6,7 +6,6 @@ hax/block_start.c.inc
 hax/COP_SEQ_RANGE_HIGH_set.c.inc
 hax/croak_from_caller.c.inc
 hax/lexer-additions.c.inc
-hax/LOGOP_ANY.c.inc
 hax/make_argcheck_aux.c.inc
 hax/newSV_with_free.c.inc
 hax/pad_block_start.c.inc
@@ -26,6 +25,7 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+scripts/compare-pp-extsub-named-params.pl
 share/include/XSParseSublike.h
 src/parse_subsignature_ex.c
 t/00use.t
@@ -35,6 +35,7 @@ t/03func-deparse.t
 t/04func-named-params.t
 t/05func-sig-attributes.t
 t/06func-conditional-default.t
+t/07func-lexical.t
 t/10stages-permit.t
 t/11stages-pre_subparse.t
 t/12stages-post_blockstart.t

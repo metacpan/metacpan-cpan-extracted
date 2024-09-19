@@ -3,7 +3,7 @@ package Net::DNS::RR;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RR.pm 1965 2024-02-14 09:19:32Z willem $)[2];
+our $VERSION = (qw$Id: RR.pm 1990 2024-09-18 13:16:07Z willem $)[2];
 
 
 =head1 NAME
@@ -843,8 +843,8 @@ DEALINGS IN THE SOFTWARE.
 
 L<perl> L<Net::DNS>
 L<Net::DNS::Question> L<Net::DNS::Packet> L<Net::DNS::Update>
-L<RFC1035(4.1.3)|https://tools.ietf.org/html/rfc1035>
-L<RFC3597|https://tools.ietf.org/html/rfc3597>
+L<RFC1035(4.1.3)|https://iana.org/go/rfc1035#section-4.1.3>
+L<RFC3597|https://iana.org/go/rfc3597>
 
 =cut
 

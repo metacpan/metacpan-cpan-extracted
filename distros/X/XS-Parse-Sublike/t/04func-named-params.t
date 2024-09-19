@@ -35,6 +35,11 @@ BEGIN { $^H{"t::func/nfunc"}++ }
    nfunc with2x(:$x1, :$x2) { return "x1=$x1 x2=$x2"; }
    is( with2x( x1 => 10, x2 => 20 ), "x1=10 x2=20",
       'supports multiple named params' );
+
+   like( dies { with2x() },
+      # Order here is not reliable
+      qr/^Missing arguments 'x[12]', 'x[21]' for subroutine main::with2x at /,
+      'complaint from missing two named params includes both' );
 }
 
 # named params can still have defaults
@@ -78,6 +83,29 @@ BEGIN { $^H{"t::func/nfunc"}++ }
       'supports mixed positional + named' );
    is( withboth(1), "x=1 y=def",
       'mixed still applies defaults' );
+
+   nfunc withlots($p1, $p2, $p3, :$n1, :$n2, :$n3) {
+      return "($p1, $p2, $p3) + (1=$n1, 2=$n2, 3=$n3)";
+   }
+
+   is( withlots("a", "b", "c", n1 => "d", n3 => "f", n2 => "e"),
+      "(a, b, c) + (1=d, 2=e, 3=f)",
+      'supports multiple positional + named');
+}
+
+# named params can support a slurpy array
+{
+   nfunc withslurpyarray(:$alpha = undef, :$beta = undef, @rest) {
+      return @rest;
+   }
+
+   is( [ withslurpyarray( x => 123, alpha => "no", beta => "no", y => 456, x => 789 ) ],
+      [ x => 123, y => 456, x => 789 ],
+      'supports slurpy array that preserves duplicates/order' );
+
+   is( [ withslurpyarray( 'single' ) ],
+      [ 'single' ],
+      'slurpy array does not gain phantom undef' );
 }
 
 # diagnostics on duplicates

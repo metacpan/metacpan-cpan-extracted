@@ -47,6 +47,7 @@ enum {
   XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL  = (1<<2),  /* do we install the new CV into the symbol table? */
   XS_PARSE_SUBLIKE_ACTION_REFGEN_ANONCODE = (1<<3),  /* do we emit OP_REFGEN of OP_ANONCODE, or simply OP_NULL ? */
   XS_PARSE_SUBLIKE_ACTION_RET_EXPR        = (1<<4),  /* do we return KEYWORD_PLUGIN_EXPR, or KEYWORD_PLUGIN_STMT ? */
+  XS_PARSE_SUBLIKE_ACTION_INSTALL_LEXICAL = (1<<5),  /* do we install the new CV into the current lexical pad? (Perl 5.18+) */
 };
 
 struct XSParseSublikeHooks {

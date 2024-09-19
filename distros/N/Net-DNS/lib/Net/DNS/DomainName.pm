@@ -3,7 +3,7 @@ package Net::DNS::DomainName;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: DomainName.pm 1898 2023-02-15 14:27:22Z willem $)[2];
+our $VERSION = (qw$Id: DomainName.pm 1990 2024-09-18 13:16:07Z willem $)[2];
 
 
 =head1 NAME
@@ -280,10 +280,10 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::Domain>
-L<RFC1035|https://tools.ietf.org/html/rfc1035>
-L<RFC2535|https://tools.ietf.org/html/rfc2535>
-L<RFC3597|https://tools.ietf.org/html/rfc3597>
-L<RFC4034|https://tools.ietf.org/html/rfc4034>
+L<RFC1035|https://iana.org/go/rfc1035>
+L<RFC2535|https://iana.org/go/rfc2535>
+L<RFC3597|https://iana.org/go/rfc3597>
+L<RFC4034|https://iana.org/go/rfc4034>
 
 =cut
 

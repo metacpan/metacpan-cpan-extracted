@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 1965 2024-02-14 09:19:32Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 1990 2024-09-18 13:16:07Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -69,9 +69,9 @@ for my $rr ( Net::DNS::RR->new(". $type") ) {
 
 
 for my $corruption ( pack 'H*', '00004000010000000000070001000bad0001' ) {
-	$SIG{__WARN__} = sub { };
+	local $SIG{__WARN__} = sub { };
 	my $rr = Net::DNS::RR->decode( \$corruption );
-	like( $rr->string, '/RDATA/', 'string() includes corrupt RDATA' );
+	like( $rr->string, '/corrupt/i', 'string() includes corrupt RDATA' );
 }
 
 

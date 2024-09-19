@@ -50,7 +50,7 @@ no  warnings 'uninitialized';
 
 use CGI::FormBuilder::Util;
 
-our $VERSION = '3.10';
+our $VERSION = '3.20';
 our $AUTOLOAD;
 
 # what to generate for tag
@@ -509,8 +509,9 @@ sub message {
         my $type = shift || $self->type;
         my $et = 'form_invalid_' . ($type eq 'text' ? 'input' : $type);
         $et    = 'form_invalid_input' if $self->other;     # other fields assume text
-        $mess  = sprintf(($self->{_form}{messages}->$et
-                    || $self->{_form}{messages}->form_invalid_default), $self->label);
+        $mess  = $self->{_form}{messages}->$et
+                 || $self->{_form}{messages}->form_invalid_default;
+        $mess  = sprintf($mess, $self->label) if $mess =~ /%/;
     }
     return $self->{_form}{stylesheet}
            ? qq(<span class="$self->{_form}{styleclass}_message">$mess</span>)
@@ -611,17 +612,22 @@ sub jsfield {
                      ? qq[$jsfield == null ||]                     # must have or error
                      : qq[$jsfield != null && $jsfield != "" &&];  # only care if filled in
 
-    if ($pattern =~ m#^m?(\S)(.*)\1$#) {
+    if ($pattern =~ m#^m?(\S)(.*)\1([gimsu]+)?$#) {
         # JavaScript regexp
         ($pattern = $2) =~ s/\\\//\//g;
         $pattern =~ s/\//\\\//g;
-        $jsfunc .= qq[${in}if ($notnull ! $jsfield.match(/$pattern/)) {\n];
+        $jsfunc .= qq[${in}if ($notnull ! $jsfield.match(/$pattern/$3)) {\n];
     }
     elsif (ref $pattern eq 'ARRAY') {
         # Must be w/i this set of values
-        # Can you figure out how this piece of Perl works? No, seriously, I forgot.
+        # escape single-quotes in option values
+        my @options = @{$pattern};  # clone values, don't modify original
+        s{'}{\\'}g for @options;
+        # the third argument to jsfield,
+        # then check it is not null or empty string,
+        # then make sure it is one of the provided options
         $jsfunc .= qq[${in}if ($notnull ($jsfield != ']
-                 . join("' && $jsfield != '", @{$pattern}) . "')) {\n";
+                 . join("' && $jsfield != '", @options) . "')) {\n";
     }
     elsif (ref $pattern eq 'CODE' || $pattern eq 'VALUE' || ($self->required && ! $pattern)) {
         # Not null (for required sub refs, just check for a value)

@@ -21,6 +21,7 @@ MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
+t/data/cnb000024035.xml
 t/data/cnb000036403.mrc
 t/data/cnb000040543.mrc
 t/data/cnb000087983.mrc

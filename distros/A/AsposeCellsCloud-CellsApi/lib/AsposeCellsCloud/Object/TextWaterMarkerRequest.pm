@@ -159,6 +159,13 @@ __PACKAGE__->method_documentation({
      	description => 'Indicates image width.',
      	format => '',
      	read_only => '',
+     		},
+     'image_adapt_option' => {
+     	datatype => 'string',
+     	base_name => 'ImageAdaptOption',
+     	description => '',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
@@ -167,7 +174,8 @@ __PACKAGE__->swagger_types( {
     'font_name' => 'string',
     'font_size' => 'int',
     'height' => 'int',
-    'width' => 'int' 
+    'width' => 'int',
+    'image_adapt_option' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
@@ -175,7 +183,8 @@ __PACKAGE__->attribute_map( {
     'font_name' => 'FontName',
     'font_size' => 'FontSize',
     'height' => 'Height',
-    'width' => 'Width' 
+    'width' => 'Width',
+    'image_adapt_option' => 'ImageAdaptOption' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -1,5 +1,9 @@
 Revision history for Future-AsyncAwait
 
+0.69    2024-09-18
+        [CHANGES]
+         * Support asynchonous lexical subs declared with `my async sub`
+
 0.68    2024-08-29
         [BUGFIXES]
          * Updated to latest hax/ support files: #ifdef around SAVEt_LONG for

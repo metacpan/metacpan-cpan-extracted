@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait::ExtensionBuilder 0.68;
+package Future::AsyncAwait::ExtensionBuilder 0.69;
 
 use v5.14;
 use warnings;
@@ -13,6 +13,8 @@ use warnings;
 C<Future::AsyncAwait::ExtensionBuilder> - build-time support for extensions to C<Future::AsyncAwait>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 In F<Build.PL>:
 

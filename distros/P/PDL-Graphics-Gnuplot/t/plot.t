@@ -549,9 +549,11 @@ SKIP: {
 	skip "Skipping interactive tests - set env. variable GNUPLOT_INTERACTIVE to enable.",29;
     }
 
-    eval { $w = gpwin('wxt') };
-    eval { $w = gpwin('x11') } if $@;
-    is($@, '', "created a wxt or x11 plot object");
+    for (qw(qt wxt x11)) {
+      eval { $w = gpwin($_) };
+      last if !$@;
+    }
+    is($@, '', "created a plot object");
 
     isa_ok $PDL::Graphics::Gnuplot::termTab->{$w->{terminal}}, 'HASH', "Terminal is a known type";
 

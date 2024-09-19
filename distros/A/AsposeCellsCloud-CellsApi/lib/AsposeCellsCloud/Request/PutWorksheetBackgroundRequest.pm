@@ -62,6 +62,7 @@ sub new {
 # PutWorksheetBackgroundRequest.name : The file name.  ,
 # PutWorksheetBackgroundRequest.sheetName : The worksheet name.  ,
 # PutWorksheetBackgroundRequest.picPath : picture full filename.  ,
+# PutWorksheetBackgroundRequest.imageAdaptOption :   ,
 # PutWorksheetBackgroundRequest.folder : The folder where the file is situated.  ,
 # PutWorksheetBackgroundRequest.storageName : The storage name where the file is situated.  ,
 # PutWorksheetBackgroundRequest.File : File to upload   
@@ -115,6 +116,10 @@ sub run_http_request {
         $query_params->{'picPath'} = $client->to_query_value($self->pic_path);      
     }
 
+    if(defined $self->image_adapt_option){
+        $query_params->{'imageAdaptOption'} = $client->to_query_value($self->image_adapt_option);      
+    }
+
     if(defined $self->folder){
         $query_params->{'folder'} = $client->to_query_value($self->folder);      
     }
@@ -163,6 +168,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'image_adapt_option' => {
+     	datatype => 'string',
+     	base_name => 'imageAdaptOption',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
@@ -191,6 +203,7 @@ __PACKAGE__->attribute_map( {
     'name' => 'name',
     'sheet_name' => 'sheetName',
     'pic_path' => 'picPath',
+    'image_adapt_option' => 'imageAdaptOption',
     'folder' => 'folder',
     'storage_name' => 'storageName',
     'file' => 'File' 

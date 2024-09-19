@@ -1,3 +1,6 @@
+2.028 2024-09-18
+- Gnuplot 6: handle warnings about Qt plugins, fix read_mouse
+
 2.027 2024-07-31
 - add "resample" curve option for with=>'fits'
 - with=>'fits' error if no FITS header

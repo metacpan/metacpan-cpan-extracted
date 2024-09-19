@@ -2,7 +2,7 @@ package Net::DNS::RR::SIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SIG.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: SIG.pm 1990 2024-09-18 13:16:07Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -416,7 +416,7 @@ sub _CreateSigData {
 			my @part = qw(question answer authority additional);
 			my @size = map { scalar @{$message->{$_}} } @part;
 			my $rref = delete $self->{rawref};
-			my $data = $rref ? $$rref : $message->data;
+			my $data = $rref ? $$rref : $message->encode;
 			my ( $id, $status ) = unpack 'n2', $data;
 			my $hbin = pack 'n6 a*', $id, $status, @size;
 			$message = $hbin . substr $data, length $hbin;
@@ -786,6 +786,6 @@ L<RFC4034|https://iana.org/go/rfc4034>
 
 L<Algorithm Numbers|https://iana.org/assignments/dns-sec-alg-numbers>
 
-L<BIND Administrator Reference Manual|https://bind.isc.org/>
+L<BIND Administrator Reference Manual|https://bind9.readthedocs.io/en/latest/>
 
 =cut

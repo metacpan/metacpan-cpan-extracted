@@ -4126,7 +4126,9 @@ sub get_workbook{
 # @streamFormat  string   The format of the input file stream.   
 # @region  string   The regional settings for workbook.  
 # @pageWideFitOnPerSheet  boolean   The page wide fit on worksheet.  
-# @pageTallFitOnPerSheet  boolean   The page tall fit on worksheet.   
+# @pageTallFitOnPerSheet  boolean   The page tall fit on worksheet.  
+# @sheetName  string     
+# @pageIndex  int      
 #
 {
     my $params = {
@@ -10224,6 +10226,41 @@ sub post_trim_content{
 }
 
 #
+# PostUpdateWordCaseRequest
+#
+# 
+# 
+# @wordCaseOptions  WordCaseOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostUpdateWordCaseRequest',
+            description => 'PostUpdateWordCase Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_update_word_case' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_update_word_case{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
 # GetWorkbookDefaultStyleRequest
 #
 # Retrieve the description of the default style for the workbook .
@@ -11004,6 +11041,7 @@ sub post_workbook_settings{
 # 
 # @name  string (required)  The file name.  
 # @picPath  string   The picture full path.  
+# @imageAdaptOption  string     
 # @folder  string   The folder where the file is situated.  
 # @storageName  string   The storage name where the file is situated.  
 # @File  string   File to upload   
@@ -12256,6 +12294,7 @@ sub post_autofit_worksheet_columns{
 # @name  string (required)  The file name.  
 # @sheetName  string (required)  The worksheet name.  
 # @picPath  string   picture full filename.  
+# @imageAdaptOption  string     
 # @folder  string   The folder where the file is situated.  
 # @storageName  string   The storage name where the file is situated.  
 # @File  string   File to upload   

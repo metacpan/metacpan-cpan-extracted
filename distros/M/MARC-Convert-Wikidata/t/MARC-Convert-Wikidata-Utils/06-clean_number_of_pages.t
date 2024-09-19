@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use MARC::Convert::Wikidata::Utils qw(clean_number_of_pages);
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 
 # Test.
@@ -34,6 +34,11 @@ is($ret, 39, "Number of pages '$input_number_of_pages' after cleanup.");
 $input_number_of_pages = '85 s., [6] l. barev. obr. příl. :';
 $ret = clean_number_of_pages($input_number_of_pages);
 is($ret, 85, "Number of pages '$input_number_of_pages' after cleanup.");
+
+# Test.
+$input_number_of_pages = '72, [8] s. :';
+$ret = clean_number_of_pages($input_number_of_pages);
+is($ret, 72, "Number of pages '$input_number_of_pages' after cleanup.");
 
 # Test.
 # TODO Implement

@@ -12,7 +12,7 @@ use utf8;
 use CGI::FormBuilder::Messages::default;
 use base 'CGI::FormBuilder::Messages::default';
 
-our $VERSION = '3.10';
+our $VERSION = '3.20';
 
 # Simply create a hash of messages for this language
 __PACKAGE__->define_messages({
@@ -36,6 +36,8 @@ __PACKAGE__->define_messages({
     js_invalid_email      => '- Ungültige Email-Adresse in "%s"',
     js_invalid_time       => '- Ungültige Zeit in "%s"',
    'js_invalid_datetime-local'    => '- Datum-Uhrzeit in "%s" ist ungültig',
+    js_invalid_datetime_local     => '- Datum-Uhrzeit in "%s" ist ungültig',
+    js_invalid_datetime   => '- Datum-Uhrzeit in "%s" ist ungültig',
     js_invalid_default    => '- Sie müssen einen gültigen Wert für das Feld "%s" angeben',
 
     js_noscript           => 'Bitte aktivieren Sie JavaScript '
