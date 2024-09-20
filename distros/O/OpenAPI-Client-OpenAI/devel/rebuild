@@ -67,7 +67,7 @@ else
     fi
 fi
 
-if [ "$update" = true]; then
+if [ "$update" = true ]; then
     echo "Updating OpenAI OpenAPI spec from github"
     if command -v curl &> /dev/null; then
         curl -o $target_dir $openai_url

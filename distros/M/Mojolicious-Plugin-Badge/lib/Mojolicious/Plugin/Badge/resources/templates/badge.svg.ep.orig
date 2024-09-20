@@ -1,0 +1,133 @@
+% my $center_color      = stash('center_color');
+% my $center_image      = stash('center_image');
+% my $center_link       = stash('center_link');
+% my $center_title      = stash('center_title');
+% my $id_suffix         = stash('id_suffix') || '';
+% my $left_color        = stash('left_color') || '#555';
+% my $left_link         = stash('left_link');
+% my $left_text         = stash('left_text');
+% my $left_text_color   = stash('left_text_color') || '#FFF';
+% my $left_text_width   = stash('left_text_width') || 0;
+% my $left_title        = stash('left_title');
+% my $logo              = stash('logo');
+% my $right_color       = stash('right_color') || '#007ec6';
+% my $right_image       = stash('right_image');
+% my $right_link        = stash('right_link');
+% my $right_text        = stash('right_text');
+% my $right_text_width  = stash('right_text_width') || 0;
+% my $right_title       = stash('right_title');
+% my $whole_link        = stash('whole_link');
+% my $whole_title       = stash('whole_title');
+
+% my $logo_width   = ($logo) ? 14 : 0;
+% my $logo_padding = ($logo && $left_text) ? 3 : 0;
+% my $image_width  = ($center_image) ? 107 : 0;
+% my $left_width   = $left_text_width + 10 + $logo_width + $logo_padding;
+% my $center_width = ($center_image) ? $image_width + 10 : 0;
+% my $right_width  = ($right_text) ? $center_width + $right_text_width + 10 : 0;
+% my $id_smooth    = 'smooth' . $id_suffix;
+% my $id_round     = 'round' . $id_suffix;
+
+% my %COLORS = (
+%   brightgreen     => '#4c1',
+%   green           => '#97CA00',
+%   yellow          => '#dfb317',
+%   yellowgreen     => '#a4a61d',
+%   orange          => '#fe7d37',
+%   red             => '#e05d44',
+%   blue            => '#007ec6',
+%   grey            => '#555',
+%   gray            => '#555',
+%   lightgrey       => '#9f9f9f',
+%   lightgray       => '#9f9f9f',
+%   critical        => '#e05d44',
+%   important       => '#fe7d37',
+%   success         => '#4c1',
+%   informational   => '#007ec6',
+%   inactive        => '#9f9f9f',
+% );
+
+% $left_color  = $COLORS{$left_color}  if (defined $COLORS{$left_color});
+% $right_color = $COLORS{$right_color} if (defined $COLORS{$right_color});
+
+% $left_color  = "#$left_color"  if (! $left_color =~ /^(?:[0-9a-fA-F]{3}){1,2}$/);
+% $right_color = "#$right_color" if (! $right_color =~ /^(?:[0-9a-fA-F]{3}){1,2}$/);
+
+% $left_text_color = '#333' if ($left_color =~ /white/i || $left_color =~ /#FFFFFF/i);
+
+% my $aria_label = $whole_title;
+%    $aria_label = "$left_title: $right_title" if ($left_title && $right_title);
+%    $aria_label = "$left_text: $right_text"   if ($left_text && $right_text);
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="<%= $left_width + $right_width %>" height="20" role="img" aria-label="<%= $aria_label %>">
+  % if ($whole_title) {
+    <title><%= $whole_title %></title>
+  % }
+  <linearGradient id="<%= $id_smooth %>" x2="0" y2="100%">
+      <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+    <stop offset="1" stop-opacity=".1"/>
+  </linearGradient>
+
+  <clipPath id="<%= $id_round %>">
+    <rect width="<%= $left_width + $right_width %>" height="20" rx="3" fill="#fff"/>
+  </clipPath>
+
+  <g clip-path="url(#<%= $id_round %>)">
+
+    <rect width="<%= $left_width %>" height="20" fill="<%= $left_color %>">
+      % if ($left_title) {
+        <title><%= $left_title %></title>
+      % }
+    </rect>
+
+    % if ($center_image) {
+    <rect x="<%= $left_width %>" width="<%= $center_width %>" height="20" fill="<%= $center_color %>">
+      % if ($center_title) {
+        <title><%= $center_title %></title>
+      % }
+    </rect>
+    % }
+
+    <rect x="<%= $left_width + $center_width %>" width="<%= $right_width %>" height="20" fill="<%= $right_color %>">
+      % if ($right_title) {
+        <title><%= $right_title %></title>
+      % }
+    </rect>
+
+    <rect width="<%= $left_width + $right_width %>" height="20" fill="url(#<%= $id_smooth %>)"/>
+  </g>
+
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
+    % if ($logo) {
+      <image x="5" y="3" width="<%= $logo_width %>" height="14" xlink:href="<%= $logo%>"/>
+    % }
+    <text aria-hidden="true" x="<%= ((($left_width + $logo_width + $logo_padding) / 2) + 1) * 10 %>" y="150" fill="#010101" fill-opacity=".3" transform="scale(0.1)" textLength="<%= ($left_width - (10 + $logo_width + $logo_padding)) * 10 %>"><%= $left_text %></text>
+    <text x="<%= ((($left_width + $logo_width + $logo_padding) / 2) + 1) * 10 %>" y="140" transform="scale(0.1)" fill="<%= $left_text_color %>" textLength="<%= ($left_width - (10 + $logo_width + $logo_padding)) * 10 %>"><%= $left_text %></text>
+    % if ($center_image) {
+      <image x="<%= $left_width %>" y="3" width="<%= $center_width %>" height="14" xlink:href="<%= $center_image %>"/>
+    % }
+    % if ($right_image) {
+      <image x="<%= $left_width + $center_width %>" y="3" width="<%= $right_width %>" height="14" xlink:href="<%= $right_image %>"/>
+    % }
+    % if ($right_text) {
+        <text aria-hidden="true" x="<%= ($left_width + $center_width / 2 + $right_width / 2 - 1) * 10 %>" y="150" fill="#010101" fill-opacity=".3" transform="scale(0.1)" textLength="<%= ($right_width - $center_width - 10) * 10 %>"><%= $right_text %></text>
+        <text x="<%= ($left_width + $center_width / 2 + $right_width / 2 - 1) * 10 %>" y="140" transform="scale(0.1)" textLength="<%= ($right_width - $center_width - 10) * 10 %>"><%= $right_text %></text>
+    % }
+
+  % if ($left_link || $whole_link) {
+    <a xlink:href="<%= $left_link || $whole_link %>">
+      <rect width="<%= $left_width %>" height="20" fill="rgba(0,0,0,0)"/>
+    </a>
+  % }
+  % if ($center_image && ($center_width || $whole_link)) {
+    <a xlink:href="<%= $center_link || $whole_link %>">
+      <rect x="<%= $left_width %>" width="<%= $center_width %>" height="20" fill="rgba(0,0,0,0)"/>
+    </a>
+  % }
+  % if ($right_link || $whole_link) {
+    <a xlink:href="<%= $right_link || $whole_link %>">
+      <rect x="<%= $left_width + $center_width %>" width="<%= $right_width %>" height="20" fill="rgba(0,0,0,0)"/>
+    </a>
+  % }
+  </g>
+</svg>

@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.3202";
+our $VERSION = "0.3401";
 
 =encoding utf-8
 
@@ -16,14 +16,14 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.3202
+Version 0.3401
 
 =head1 DESCRIPTION
 
 B<Greple> B<xlate> module find desired text blocks and replace them by
 the translated text.  Currently DeepL (F<deepl.pm>) and ChatGPT
 (F<gpt3.pm>) module are implemented as a back-end engine.
-Experimental support for gpt-4 is also included.
+Experimental support for gpt-4 and gpt-4o are also included.
 
 If you want to translate normal text blocks in a document written in
 the Perl's pod style, use B<greple> command with C<xlate::deepl> and
@@ -83,6 +83,11 @@ Remove white space at the beginning and end of each line.
 
 =item *
 
+If a line ends with a full-width punctuation character, concatenate
+with next line.
+
+=item *
+
 If a line ends with a full-width character and the next line begins
 with a full-width character, concatenate the lines.
 
@@ -110,6 +115,23 @@ combining multiple lines into a single line, and use the second
 pattern for pre-formatted text.  If there is no text to match in the
 first pattern, then a pattern that does not match anything, such as
 C<(?!)>.
+
+=head1 MASKING
+
+Occasionally, there are parts of text that you do not want translated.
+For example, tags in markdown files. DeepL suggests that in such
+cases, the part of the text to be excluded be converted to XML tags,
+translated, and then restored after the translation is complete.  To
+support this, it is possible to specify the parts to be masked from
+translation.
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+This will interpret each line of the file `MASKPATTERN` as a regular
+expression, translate strings matching it, and revert after
+processing.  Lines beginning with C<#> are ignored.
+
+This interface is experimental and subject to change in the future.
 
 =head1 OPTIONS
 
@@ -146,6 +168,23 @@ Specifies the translation engine to be used. If you specify the engine
 module directly, such as C<-Mxlate::deepl>, you do not need to use
 this option.
 
+At this time, the following engines are available
+
+=over 2
+
+=item * B<deepl>: DeepL API
+
+=item * B<gpt3>: gpt-3.5-turbo
+
+=item * B<gpt4>: gpt-4-turbo
+
+=item * B<gpt4o>: gpt-4o-mini
+
+B<gpt-4o>'s interface is unstable and cannot be guaranteed to work
+correctly at the moment.
+
+=back
+
 =item B<--xlate-labor>
 
 =item B<--xlabor>
@@ -163,6 +202,11 @@ C<deepl languages> command when using B<DeepL> engine.
 =item B<--xlate-format>=I<format> (Default: C<conflict>)
 
 Specify the output format for original and translated text.
+
+The following formats other than C<xtxt> assume that the part to be
+translated is a collection of lines.  In fact, it is possible to
+translate only a portion of a line, and specifying a format other than
+C<xtxt> will not produce meaningful results.
 
 =over 4
 
@@ -216,6 +260,13 @@ Default value is set as for free DeepL account service: 128K for the
 API (B<--xlate>) and 5000 for the clipboard interface
 (B<--xlate-labor>).  You may be able to change these value if you are
 using Pro service.
+
+=item B<--xlate-maxline>=I<n> (Default: 0)
+
+Specify the maximum lines of text to be sent to the API at once.
+
+Set this value to 1 if you want to translate one line at a time.  This
+option takes precedence over the C<--xlate-maxlen> option.
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -471,7 +522,11 @@ our %opt = (
     method   => \(our $cache_method //= $ENV{GREPLE_XLATE_CACHE} || 'auto'),
     dryrun   => \(our $dryrun = 0),
     maxlen   => \(our $max_length = 0),
+    maxline  => \(our $max_line = 0),
     prompt   => \(our $prompt),
+    mask     => \(our $mask),
+    maskfile => \(our $maskfile),
+    glossary => \(our $glossary),
 );
 lock_keys %opt;
 sub opt :lvalue { ${$opt{+shift}} }
@@ -511,6 +566,9 @@ for (keys %formatter) {
 
 my %cache;
 
+use App::Greple::xlate::Mask;
+my $maskobj;
+
 sub setup {
     return if state $once_called++;
     if (defined $cache_method) {
@@ -536,6 +594,12 @@ sub setup {
 	    die "No \"xlate\" function in $mod.\n";
 	}
     }
+    if (my $pat = opt('mask')) {
+	$maskobj = App::Greple::xlate::Mask->new(pattern => $pat);
+    }
+    if (my $patfile = opt('maskfile')) {
+	$maskobj = App::Greple::xlate::Mask->new(file => $patfile);
+    }
 }
 
 sub normalize {
@@ -552,6 +616,8 @@ sub normalize {
 	${^MATCH}
 	# remove leading/trailing spaces
 	    =~ s/\A\s+|\s+\z//gr
+	# remove newline after Japanese Punct char
+	    =~ s/(?<=\p{InFullwidth})(?<=\pP)\n//gr
 	# join Japanese lines without space
 	    =~ s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//gr
 	# join ASCII lines with single space
@@ -585,6 +651,7 @@ sub _progress {
 	my @m = ($i == 1 ? '╶' : '│') x $i ;
 	@m[0,-1] = qw(┌ └) if $i > 1;
 	s/^/sprintf "%7s ", shift(@m)/mge;
+	s/(?<!\n)\z/\n/;
 	print STDERR $_;
     }
 }
@@ -596,11 +663,15 @@ sub cache_update {
     _progress({label => "From"}, @from);
     return @from if $dryrun;
 
+    $maskobj->mask(@from) if $maskobj;
+    my @chop = grep { $from[$_] =~ s/(?<!\n)\z/\n/ } keys @from;
     my @to = &XLATE(@from);
+    chop @to[@chop];
+    $maskobj->unmask(@to) if $maskobj;
 
     _progress({label => "To"}, @to);
     die "Unmatched response:\n@to" if @from != @to;
-    @cache{@from} = @to;
+    @cache{@_} = @to;
 }
 
 sub fold_lines {
@@ -710,7 +781,7 @@ sub end {
 #    }
 }
 
-sub setopt {
+sub set {
     while (my($key, $val) = splice @_, 0, 2) {
 	next if $key eq &::FILELABEL;
 	die "$key: Invalid option.\n" if not exists $opt{$key};
@@ -733,14 +804,16 @@ builtin xlate-cache:s      $cache_method
 builtin xlate-engine=s     $xlate_engine
 builtin xlate-dryrun       $dryrun
 builtin xlate-maxlen=i     $max_length
+builtin xlate-maxline=i    $max_line
 builtin xlate-prompt=s     $prompt
+builtin xlate-glossary=s   $glossary
 
 builtin deepl-auth-key=s   $App::Greple::xlate::deepl::auth_key
 builtin deepl-method=s     $App::Greple::xlate::deepl::method
 
 option default --need=1 --no-regioncolor --cm=/544E,/454E,/533E,/353E
 
-option --xlate-setopt --prologue &__PACKAGE__::setopt($<shift>)
+option --xlate-setopt --prologue &__PACKAGE__::set($<shift>)
 
 option --xlate-color \
 	--postgrep &__PACKAGE__::postgrep \

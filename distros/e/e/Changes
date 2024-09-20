@@ -1,6 +1,20 @@
 Revision history for e
 
 =================
+1.29 - 2024-09-20
+=================
+
+repl: Fixed bug with having an empty history file.
+
+=================
+1.28 - 2024-09-20
+=================
+
+Added commands: max, min (from List::Util).
+Added limit to number of processes with runf (currently set to 20).
+Updated pod.
+
+=================
 1.27 - 2024-08-08
 =================
 

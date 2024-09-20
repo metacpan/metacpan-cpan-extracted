@@ -10,11 +10,11 @@ App::Greple::xlate - greple的翻译支持模块
 
 # VERSION
 
-Version 0.3202
+Version 0.3401
 
 # DESCRIPTION
 
-**Greple** **xlate** 模块查找所需的文本块，并用翻译文本替换它们。目前，DeepL (`deepl.pm`) 和 ChatGPT (`gpt3.pm`) 模块被用作后端引擎。还包括对 gpt-4 的实验性支持。
+**Greple** **xlate** 模块查找所需的文本块，并用翻译文本替换它们。目前，DeepL (`deepl.pm`) 和 ChatGPT (`gpt3.pm`) 模块被用作后端引擎。此外，还包括对 gpt-4 和 gpt-4o 的实验性支持。
 
 如果要翻译以 Perl 的 pod 风格编写的文档中的普通文本块，请使用 **greple** 命令，并像这样使用 `xlate::deepl` 和 `perl` 模块：
 
@@ -55,6 +55,7 @@ Version 0.3202
 处理是以指定单位进行的，但如果是多行非空文本序列，则会一起转换为单行。具体操作如下
 
 - 删除每行开头和结尾的空白。
+- 如果一行以全角标点符号结束，则与下一行连接。
 - 如果一行以全角字符结束，而下一行以全角字符开始，则将这两行连接起来。
 - 如果一行的末尾或开头不是全宽字符，则通过插入空格字符将它们连接起来。
 
@@ -65,6 +66,16 @@ Version 0.3202
     greple -Mxlate -E normalized -E not-normalized
 
 因此，对于要将多行合并为一行进行处理的文本，请使用第一个模式，而对于预格式化文本，请使用第二个模式。如果第一种模式中没有要匹配的文本，那么就使用不匹配任何内容的模式，如 `(?!)`。
+
+# MASKING
+
+有时，您不希望翻译文本中的某些部分。例如，markdown 文件中的标记。DeepL 建议在这种情况下，将不需要翻译的文本部分转换为 XML 标记，然后进行翻译，翻译完成后再还原。为了支持这一点，可以指定要屏蔽翻译的部分。
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+这将把文件 \`MASKPATTERN\` 的每一行都解释为正则表达式，翻译与之匹配的字符串，并在处理后还原。以 `#` 开头的行将被忽略。
+
+此接口为试验性接口，将来可能会更改。
 
 # OPTIONS
 
@@ -87,6 +98,15 @@ Version 0.3202
 
     指定要使用的翻译引擎。如果直接指定引擎模块，如 `-Mxlate::deepl`，则无需使用此选项。
 
+    目前有以下引擎
+
+    - **deepl**: DeepL API
+    - **gpt3**: gpt-3.5-turbo
+    - **gpt4**: gpt-4-turbo
+    - **gpt4o**: gpt-4o-mini
+
+        **gpt-4o** 的接口不稳定，目前无法保证正常工作。
+
 - **--xlate-labor**
 - **--xlabor**
 
@@ -99,6 +119,8 @@ Version 0.3202
 - **--xlate-format**=_format_ (Default: `conflict`)
 
     指定原始和翻译文本的输出格式。
+
+    除 `xtxt` 以外的下列格式假定要翻译的部分是行的集合。事实上，有可能只翻译一行的一部分，因此指定 `xtxt` 以外的格式不会产生有意义的结果。
 
     - **conflict**, **cm**
 
@@ -140,6 +162,12 @@ Version 0.3202
 - **--xlate-maxlen**=_chars_ (Default: 0)
 
     指定一次发送到 API 的最大文本长度。默认值与 DeepL 免费账户服务一样：API (**--xlate**) 为 128K，剪贴板界面 (**--xlate-labor**) 为 5000。如果使用专业版服务，您可以更改这些值。
+
+- **--xlate-maxline**=_n_ (Default: 0)
+
+    指定一次发送到 API 的最大文本行数。
+
+    如果想一次翻译一行，则将该值设为 1。该选项优先于 `--xlate-maxlen` 选项。
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

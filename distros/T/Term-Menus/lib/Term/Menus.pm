@@ -18,7 +18,7 @@ BEGIN {
   *NEW_PERL = ($] >= 5.010) ? sub(){1} : sub(){0};
 }
 
-our $VERSION = '3.039';
+our $VERSION = '3.040';
 
 
 use 5.006;
@@ -2341,7 +2341,7 @@ sub transform_mbii
                my $box_top_line='';
                my $box_mid_line='';
                my $box_bot_line='';
-               my $length_of_front_and_macro=$frlen+$length_of_macro;
+	       my $length_of_front_and_macro=$frlen+$instructions[2]+2;
                if ($#newtext==-1 || $#newtext==0) {
                   $box_top_line=sprintf "%-${frlen}s",'';
 		  $box_top_line=~s/^.(.*).$/.$1./;

@@ -9,5 +9,10 @@ Rofi-Script.code-workspace
 bin/example.pl
 dist.ini
 lib/Rofi/Script.pm
+lib/Rofi/Script.pm.bak
+lib/Rofi/Script/Simple.pm
 lib/Rofi/Script/TestHelpers.pm
+lib/Rofi/Script/TestHelpers.pm.bak
+t/rofi-script-simple.t
 t/rofi-script.t
+t/rofi-script.t.bak

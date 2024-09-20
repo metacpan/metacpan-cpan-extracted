@@ -10,11 +10,11 @@ App::Greple::xlate - greple的翻译支持模块
 
 # VERSION
 
-Version 0.3202
+Version 0.3401
 
 # DESCRIPTION
 
-**Greple** **xlate** 模块可以找到所需的文本块并用翻译后的文本替换它们。目前已实现了 DeepL (`deepl.pm`) 和 ChatGPT (`gpt3.pm`) 模块作为后端引擎。还包括对 gpt-4 的实验性支持。
+**Greple** **xlate** 模块查找所需的文本块，并用翻译后的文本替换它们。目前作为后端引擎实现的有 DeepL（`deepl.pm`）和 ChatGPT（`gpt3.pm`）模块。还包括对 gpt-4 和 gpt-4o 的实验性支持。
 
 如果您想要将Perl的pod样式文档中的普通文本块翻译成中文，请使用以下命令：**greple**，并结合`xlate::deepl`和`perl`模块，如下所示：
 
@@ -55,6 +55,7 @@ Version 0.3202
 处理是按指定单位进行的，但在多行非空文本序列的情况下，它们会一起转换为单行。此操作执行如下：
 
 - 去除每行开头和结尾的空格。
+- 如果一行以全角标点符号结尾，请与下一行连接。
 - 如果一行以全角字符结尾，下一行以全角字符开始，则连接这两行。
 - 如果一行的结尾或开头不是全角字符，则通过插入空格字符将它们连接起来。
 
@@ -65,6 +66,16 @@ Version 0.3202
     greple -Mxlate -E normalized -E not-normalized
 
 因此，使用第一个模式来处理将多行合并为单行的文本，并使用第二个模式来处理预格式化文本。如果第一个模式中没有要匹配的文本，则使用不匹配任何内容的模式，如`(?!)`。
+
+# MASKING
+
+偶尔，有些文本部分您不希望被翻译。例如，在 markdown 文件中的标签。DeepL 建议在这种情况下，要排除的文本部分应转换为 XML 标签，进行翻译，然后在翻译完成后恢复。为了支持这一点，可以指定要屏蔽翻译的部分。
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+这将把文件 \`MASKPATTERN\` 的每一行解释为一个正则表达式，翻译匹配的字符串，并在处理后恢复。以 `#` 开头的行将被忽略。
+
+此界面是实验性的，未来可能会发生变化。
 
 # OPTIONS
 
@@ -87,6 +98,15 @@ Version 0.3202
 
     指定要使用的翻译引擎。如果直接指定引擎模块，如`-Mxlate::deepl`，则不需要使用此选项。
 
+    目前，可用的引擎如下：
+
+    - **deepl**: DeepL API
+    - **gpt3**: gpt-3.5-turbo
+    - **gpt4**: gpt-4-turbo
+    - **gpt4o**: gpt-4o-mini
+
+        **gpt-4o** 的接口不稳定，目前无法保证能正常工作。
+
 - **--xlate-labor**
 - **--xlabor**
 
@@ -99,6 +119,8 @@ Version 0.3202
 - **--xlate-format**=_format_ (Default: `conflict`)
 
     指定原始和翻译文本的输出格式。
+
+    除了`xtxt`之外的以下格式假定要翻译的部分是一系列行。实际上，可以只翻译一行的一部分，并且指定除`xtxt`之外的格式不会产生有意义的结果。
 
     - **conflict**, **cm**
 
@@ -140,6 +162,12 @@ Version 0.3202
 - **--xlate-maxlen**=_chars_ (Default: 0)
 
     将以下文本逐行翻译成中文。
+
+- **--xlate-maxline**=_n_ (Default: 0)
+
+    指定一次发送到API的最大文本行数。
+
+    如果要逐行翻译，请将此值设置为1。此选项优先于`--xlate-maxlen`选项。
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

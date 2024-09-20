@@ -1,5 +1,8 @@
 Revision history for Shell-Var-Reader
 
+0.10.0   2024-09-19/14:00
+		 - add --no_toml
+
 0.9.0   2024-02-21/14:30
 		 - cmdb_shell_var_reader can now take specified groups or systems to regen
 

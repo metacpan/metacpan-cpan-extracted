@@ -21,6 +21,7 @@ WriteMakefile(
 		'FindBin' => 0,
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
+		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::NoWarnings' => 0,

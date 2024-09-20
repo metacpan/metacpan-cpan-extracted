@@ -22,7 +22,7 @@
       "runtime" : {
          "requires" : {
             "Attribute::Storage" : "0",
-            "Commandable::Finder::MethodAttributes" : "0",
+            "Commandable::Finder::MethodAttributes" : "0.13",
             "Commandable::Invocation" : "0",
             "Config::Tiny" : "0",
             "Convert::Color::XTerm" : "0.06",
@@ -45,7 +45,7 @@
    "provides" : {
       "App::eachperl" : {
          "file" : "lib/App/eachperl.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,401 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::xlate - vertaalondersteuningsmodule voor greple
+
+=head1 SYNOPSIS
+
+    greple -Mxlate -e ENGINE --xlate pattern target-file
+
+    greple -Mxlate::deepl --xlate pattern target-file
+
+=head1 VERSION
+
+Version 0.3401
+
+=head1 DESCRIPTION
+
+De module B<Greple> B<xlate> vindt de gewenste tekstblokken en vervangt ze door de vertaalde tekst. Momenteel zijn DeepL (F<deepl.pm>) en ChatGPT (F<gpt3.pm>) module geïmplementeerd als een back-end engine. Experimentele ondersteuning voor gpt-4 en gpt-4o zijn ook inbegrepen.
+
+Als je normale tekstblokken wilt vertalen in een document dat geschreven is in de pod-stijl van Perl, gebruik dan het commando B<greple> met de module C<xlate::deepl> en C<perl> als volgt:
+
+    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+
+In dit commando betekent pattern string C<^(\w.*\n)+> opeenvolgende regels die beginnen met een alfa-numerieke letter. Deze opdracht toont het te vertalen gebied gemarkeerd. Optie B<--all> wordt gebruikt om de hele tekst te produceren.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
+</p>
+
+Voeg dan de optie C<--xlate> toe om het geselecteerde gebied te vertalen. Vervolgens worden de gewenste secties gevonden en vervangen door de uitvoer van de opdracht B<deepl>.
+
+Standaard wordt originele en vertaalde tekst afgedrukt in het "conflict marker" formaat dat compatibel is met L<git(1)>. Door C<ifdef> formaat te gebruiken, kun je gemakkelijk het gewenste deel krijgen met L<unifdef(1)> commando. Uitvoerformaat kan gespecificeerd worden met B<--xlate-format> optie.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png">
+</p>
+
+Als je de hele tekst wilt vertalen, gebruik dan de optie B<--match-all>. Dit is een snelkoppeling om het patroon C<(?s).+> op te geven dat overeenkomt met de hele tekst.
+
+Gegevens in conflictmarkerformaat kunnen naast elkaar worden bekeken met het commando C<sdif> met de optie C<-V>. Aangezien het geen zin heeft om per string te vergelijken, wordt de optie C<--no-cdif> aangeraden. Als je de tekst niet hoeft te kleuren, geef dan C<--no-textcolor> (of C<--no-tc>).
+
+    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
+</p>
+
+=head1 NORMALIZATION
+
+De verwerking wordt gedaan in gespecificeerde eenheden, maar in het geval van een opeenvolging van meerdere regels niet-lege tekst, worden ze samen omgezet in een enkele regel. Deze bewerking wordt als volgt uitgevoerd:
+
+=over 2
+
+=item *
+
+Verwijder witruimte aan het begin en einde van elke regel.
+
+=item *
+
+Als een regel eindigt met een leesteken over de hele breedte, aaneenschakelen met de volgende regel.
+
+=item *
+
+Als een regel eindigt met een teken van volledige breedte en de volgende regel begint met een teken van volledige breedte, worden de regels aan elkaar gekoppeld.
+
+=item *
+
+Als het einde of het begin van een regel geen teken voor de volledige breedte is, voeg ze dan samen door een spatieteken in te voegen.
+
+=back
+
+Cachegegevens worden beheerd op basis van de genormaliseerde tekst, dus zelfs als er wijzigingen worden aangebracht die geen invloed hebben op de normalisatieresultaten, zullen de vertaalgegevens in de cache nog steeds effectief zijn.
+
+Dit normalisatieproces wordt alleen uitgevoerd voor het eerste (0e) en even genummerde patroon. Dus als twee patronen als volgt worden gespecificeerd, wordt de tekst die overeenkomt met het eerste patroon verwerkt na normalisatie en wordt er geen normalisatieproces uitgevoerd op de tekst die overeenkomt met het tweede patroon.
+
+    greple -Mxlate -E normalized -E not-normalized
+
+Gebruik daarom het eerste patroon voor tekst die verwerkt moet worden door meerdere regels samen te voegen tot een enkele regel, en gebruik het tweede patroon voor voorgeformatteerde tekst. Als er geen overeenkomende tekst is in het eerste patroon, gebruik dan een patroon dat nergens mee overeenkomt, zoals C<(?!)>.
+
+=head1 MASKING
+
+Soms zijn er delen van tekst die je niet vertaald wilt hebben. Bijvoorbeeld tags in markdown-bestanden. DeepL stelt voor dat in dergelijke gevallen het deel van de tekst dat moet worden uitgesloten, wordt geconverteerd naar XML-tags, wordt vertaald en vervolgens wordt hersteld nadat de vertaling is voltooid. Om dit te ondersteunen, is het mogelijk om de delen te specificeren die moeten worden gemaskeerd van vertaling.
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+Dit zal elke lijn van het bestand `MASKPATTERN` interpreteren als een reguliere expressie, strings vertalen die hiermee overeenstemmen en na verwerking terugzetten. Regels die beginnen met C<#> worden genegeerd.
+
+Deze interface is experimenteel en kan in de toekomst veranderen.
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--xlate>
+
+=item B<--xlate-color>
+
+=item B<--xlate-fold>
+
+=item B<--xlate-fold-width>=I<n> (Default: 70)
+
+Roep het vertaalproces op voor elk gematcht gebied.
+
+Zonder deze optie gedraagt B<greple> zich als een normaal zoekcommando. U kunt dus controleren welk deel van het bestand zal worden vertaald voordat u het eigenlijke werk uitvoert.
+
+Commandoresultaat gaat naar standaard out, dus redirect naar bestand indien nodig, of overweeg L<App::Greple::update> module te gebruiken.
+
+Optie B<--xlate> roept B<--xlate-kleur> aan met B<--color=never> optie.
+
+Met de optie B<--xlate-fold> wordt geconverteerde tekst gevouwen met de opgegeven breedte. De standaardbreedte is 70 en kan worden ingesteld met de optie B<--xlate-fold-width>. Vier kolommen zijn gereserveerd voor inloopoperaties, zodat elke regel maximaal 74 tekens kan bevatten.
+
+=item B<--xlate-engine>=I<engine>
+
+Specificeert de te gebruiken vertaalmachine. Als u de engine module rechtstreeks specificeert, zoals C<-Mxlate::deepl>, hoeft u deze optie niet te gebruiken.
+
+Op dit moment zijn de volgende engines beschikbaar
+
+=over 2
+
+=item * B<deepl>: DeepL API
+
+=item * B<gpt3>: gpt-3.5-turbo
+
+=item * B<gpt4>: gpt-4-turbo
+
+=item * B<gpt4o>: gpt-4o-mini
+
+De interface van B<gpt-4o> is instabiel en er kan op dit moment niet gegarandeerd worden dat deze correct werkt.
+
+=back
+
+=item B<--xlate-labor>
+
+=item B<--xlabor>
+
+In plaats van de vertaalmachine op te roepen, wordt er van je verwacht dat je zelf aan de slag gaat. Na het voorbereiden van tekst die vertaald moet worden, worden ze gekopieerd naar het klembord. Er wordt van je verwacht dat je ze op het formulier plakt, het resultaat naar het klembord kopieert en op return drukt.
+
+=item B<--xlate-to> (Default: C<EN-US>)
+
+Geef de doeltaal op. U kunt de beschikbare talen krijgen met het commando C<deepl languages> wanneer u de engine B<DeepL> gebruikt.
+
+=item B<--xlate-format>=I<format> (Default: C<conflict>)
+
+Specificeer het uitvoerformaat voor originele en vertaalde tekst.
+
+De volgende indelingen anders dan C<xtxt> gaan ervan uit dat het te vertalen deel een verzameling regels is. In feite is het mogelijk om slechts een deel van een regel te vertalen, en het specificeren van een ander formaat dan C<xtxt> zal geen zinvolle resultaten opleveren.
+
+=over 4
+
+=item B<conflict>, B<cm>
+
+Originele en geconverteerde tekst worden afgedrukt in L<git(1)> conflictmarkeerder formaat.
+
+    <<<<<<< ORIGINAL
+    original text
+    =======
+    translated Japanese text
+    >>>>>>> JA
+
+U kunt het originele bestand herstellen met de volgende L<sed(1)> opdracht.
+
+    sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
+
+=item B<ifdef>
+
+Originele en geconverteerde tekst worden afgedrukt in L<cpp(1)> C<#ifdef> formaat.
+
+    #ifdef ORIGINAL
+    original text
+    #endif
+    #ifdef JA
+    translated Japanese text
+    #endif
+
+U kunt alleen Japanse tekst terughalen met het commando B<unifdef>:
+
+    unifdef -UORIGINAL -DJA foo.ja.pm
+
+=item B<space>
+
+Originele en geconverteerde tekst worden gescheiden door een enkele lege regel afgedrukt.
+
+=item B<xtxt>
+
+Als het formaat C<xtxt> (vertaalde tekst) of onbekend is, wordt alleen vertaalde tekst afgedrukt.
+
+=back
+
+=item B<--xlate-maxlen>=I<chars> (Default: 0)
+
+Geef de maximale lengte van de tekst op die in één keer naar de API moet worden gestuurd. De standaardwaarde is ingesteld zoals voor de gratis DeepL account service: 128K voor de API (B<--xlate>) en 5000 voor de klembordinterface (B<--xlate-labor>). U kunt deze waarden wijzigen als u Pro-service gebruikt.
+
+=item B<--xlate-maxline>=I<n> (Default: 0)
+
+Geef het maximum aantal regels tekst op dat in één keer naar de API moet worden gestuurd.
+
+Stel deze waarde in op 1 als je één regel per keer wilt vertalen. Deze optie heeft voorrang op de C<--xlate-maxlen> optie.
+
+=item B<-->[B<no->]B<xlate-progress> (Default: True)
+
+Zie het resultaat van de vertaling in real time in de STDERR uitvoer.
+
+=item B<--match-all>
+
+Stel de hele tekst van het bestand in als doelgebied.
+
+=back
+
+=head1 CACHE OPTIONS
+
+De module B<xlate> kan de tekst van de vertaling voor elk bestand in de cache opslaan en lezen vóór de uitvoering om de overhead van het vragen aan de server te elimineren. Met de standaard cache strategie C<auto>, onderhoudt het alleen cache gegevens wanneer het cache bestand bestaat voor het doelbestand.
+
+=over 7
+
+=item --cache-clear
+
+De optie B<--cache-clear> kan worden gebruikt om het beheer van de cache te starten of om alle bestaande cache-gegevens te vernieuwen. Eenmaal uitgevoerd met deze optie, wordt een nieuw cachebestand aangemaakt als er geen bestaat en daarna automatisch onderhouden.
+
+=item --xlate-cache=I<strategy>
+
+=over 4
+
+=item C<auto> (Default)
+
+Onderhoud het cachebestand als het bestaat.
+
+=item C<create>
+
+Maak een leeg cache bestand en sluit af.
+
+=item C<always>, C<yes>, C<1>
+
+Cache-bestand toch behouden voor zover het doelbestand een normaal bestand is.
+
+=item C<clear>
+
+Wis eerst de cachegegevens.
+
+=item C<never>, C<no>, C<0>
+
+Cache-bestand nooit gebruiken, zelfs niet als het bestaat.
+
+=item C<accumulate>
+
+Standaard worden ongebruikte gegevens uit het cachebestand verwijderd. Als u ze niet wilt verwijderen en in het bestand wilt houden, gebruik dan C<accumuleren>.
+
+=back
+
+=back
+
+=head1 COMMAND LINE INTERFACE
+
+Je kunt deze module eenvoudig vanaf de commandoregel gebruiken met het commando C<xlate> dat bij de distributie zit. Zie de C<xlate> helpinformatie voor gebruik.
+
+Het C<xlate> commando werkt samen met de Docker omgeving, dus zelfs als je niets geïnstalleerd hebt, kun je het gebruiken zolang Docker beschikbaar is. Gebruik de optie C<-D> of C<-C>.
+
+Omdat er makefiles voor verschillende documentstijlen worden meegeleverd, is vertaling naar andere talen mogelijk zonder speciale specificaties. Gebruik de optie C<-M>.
+
+Je kunt ook de Docker en make opties combineren zodat je make in een Docker omgeving kunt draaien.
+
+Door te draaien als C<xlate -GC> wordt een shell gestart met de huidige werkende git repository aangekoppeld.
+
+Lees het Japanse artikel in de L</SEE ALSO> sectie voor meer informatie.
+
+    xlate [ options ] -t lang file [ greple options ]
+	-h   help
+	-v   show version
+	-d   debug
+	-n   dry-run
+	-a   use API
+	-c   just check translation area
+	-r   refresh cache
+	-s   silent mode
+	-e # translation engine (default "deepl")
+	-p # pattern to determine translation area
+	-w # wrap line by # width
+	-o # output format (default "xtxt", or "cm", "ifdef")
+	-f # from lang (ignored)
+	-t # to lang (required, no default)
+	-m # max length per API call
+	-l # show library files (XLATE.mk, xlate.el)
+        --   terminate option parsing
+    Make options
+	-M   run make
+	-n   dry-run
+    Docker options
+	-G   mount git top-level directory
+	-B   run in non-interactive (batch) mode
+	-R   mount read-only
+	-E * specify environment variable to be inherited
+	-I * specify altanative docker image (default: tecolicom/xlate:version)
+	-D * run xlate on the container with the rest parameters
+	-C * run following command on the container, or run shell
+
+    Control Files:
+	*.LANG    translation languates
+	*.FORMAT  translation foramt (xtxt, cm, ifdef)
+	*.ENGINE  translation engine (deepl or gpt3)
+
+
+=head1 EMACS
+
+Laad het F<xlate.el> bestand in het archief om het C<xlate> commando te gebruiken vanuit de Emacs editor. C<xlate-region> functie vertaalt de gegeven regio. De standaardtaal is C<EN-US> en u kunt de taal specificeren met het prefix argument.
+
+=head1 ENVIRONMENT
+
+=over 7
+
+=item DEEPL_AUTH_KEY
+
+Stel uw authenticatiesleutel in voor DeepL service.
+
+=item OPENAI_API_KEY
+
+OpenAI authenticatiesleutel.
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
+=head2 TOOLS
+
+Je moet commandoregeltools installeren voor DeepL en ChatGPT.
+
+L<https://github.com/DeepLcom/deepl-python>
+
+L<https://github.com/tecolicom/App-gpty>
+
+=head1 SEE ALSO
+
+L<App::Greple::xlate>
+
+L<App::Greple::xlate::deepl>
+
+L<App::Greple::xlate::gpt3>
+
+L<https://hub.docker.com/r/tecolicom/xlate>
+
+=over 7
+
+=item L<https://github.com/DeepLcom/deepl-python>
+
+DeepL Python bibliotheek en CLI commando.
+
+=item L<https://github.com/openai/openai-python>
+
+OpenAI Python Bibliotheek
+
+=item L<https://github.com/tecolicom/App-gpty>
+
+OpenAI opdrachtregelinterface
+
+=item L<App::Greple>
+
+Zie de B<greple> handleiding voor de details over het doeltekstpatroon. Gebruik B<--inside>, B<--outside>, B<--include>, B<--exclude> opties om het overeenkomende gebied te beperken.
+
+=item L<App::Greple::update>
+
+U kunt de module C<-Mupdate> gebruiken om bestanden te wijzigen door het resultaat van het commando B<greple>.
+
+=item L<App::sdif>
+
+Gebruik B<sdif> om het formaat van de conflictmarkering naast de optie B<-V> te tonen.
+
+=back
+
+=head2 ARTICLES
+
+=over 2
+
+=item * L<https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250>
+
+Greple module om alleen de benodigde onderdelen te vertalen en te vervangen met DeepL API (in het Japans)
+
+=item * L<https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6>
+
+Documenten genereren in 15 talen met DeepL API-module (in het Japans)
+
+=item * L<https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd>
+
+Automatisch vertaalde Docker-omgeving met DeepL API (in het Japans)
+
+=back
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright © 2023-2024 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

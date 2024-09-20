@@ -16,6 +16,7 @@ my @test_cases = (
         expected_response => {
             role    => 'assistant',
             content => re('\b(?:Hello|Hi|Hey)\b'),
+            refusal => undef,
         },
     },
     {
@@ -31,6 +32,7 @@ my @test_cases = (
         expected_response => {
             role    => 'assistant',
             content => re('^\s*$'),
+            refusal => undef,
         },
     },
 );

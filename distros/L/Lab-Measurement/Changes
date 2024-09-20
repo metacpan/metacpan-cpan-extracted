@@ -4,6 +4,10 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.910 2024-09-19
+  * AMI430 magnet supply: Add persistent mode features
+  * KeysightB2901A: Check source range in set_level
+
 3.904 2024-08-27
   * Fix problem with time() on Windows in linear step sweep
 

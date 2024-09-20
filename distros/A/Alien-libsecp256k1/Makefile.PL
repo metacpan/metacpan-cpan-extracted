@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "Alien::Build" => "1.19",
     "Alien::Build::MM" => "0.32",
+    "Alien::Build::Plugin::Build::CMake" => "0.99",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "DISTNAME" => "Alien-libsecp256k1",
@@ -24,12 +25,12 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Alien::libsecp256k1",
   "PREREQ_PM" => {
-    "Alien::Autotools" => 0
+    "Alien::cmake3" => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "0.050100",
+  "VERSION" => "0.050102",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,9 +38,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Alien::Autotools" => 0,
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
+  "Alien::cmake3" => 0,
   "ExtUtils::MakeMaker" => "6.52",
   "Test2::V0" => 0
 );

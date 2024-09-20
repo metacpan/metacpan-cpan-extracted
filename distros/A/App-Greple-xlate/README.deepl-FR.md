@@ -10,11 +10,11 @@ App::Greple::xlate - module d'aide à la traduction pour greple
 
 # VERSION
 
-Version 0.3202
+Version 0.3401
 
 # DESCRIPTION
 
-Le module **Greple** **xlate** recherche les blocs de texte souhaités et les remplace par le texte traduit. Actuellement, les modules DeepL (`deepl.pm`) et ChatGPT (`gpt3.pm`) sont mis en œuvre en tant que moteur dorsal. Un support expérimental pour gpt-4 est également inclus.
+Le module **Greple** **xlate** recherche les blocs de texte souhaités et les remplace par le texte traduit. Actuellement, les modules DeepL (`deepl.pm`) et ChatGPT (`gpt3.pm`) sont mis en œuvre en tant que moteur dorsal. Un support expérimental pour gpt-4 et gpt-4o est également inclus.
 
 Si vous souhaitez traduire des blocs de texte normaux dans un document écrit dans le style Perl's pod, utilisez la commande **greple** avec les modules `xlate::deepl` et `perl` comme suit :
 
@@ -55,6 +55,7 @@ Les données du format de marqueur de conflit peuvent être visualisées côte �
 Le traitement se fait par unités spécifiées, mais dans le cas d'une séquence de plusieurs lignes de texte non vide, elles sont converties ensemble en une seule ligne. Cette opération s'effectue comme suit :
 
 - Supprimer les espaces blancs au début et à la fin de chaque ligne.
+- Si une ligne se termine par un caractère de ponctuation de pleine largeur, concaténer avec la ligne suivante.
 - Si une ligne se termine par un caractère de pleine largeur et que la ligne suivante commence par un caractère de pleine largeur, concaténer les lignes.
 - Si la fin ou le début d'une ligne n'est pas un caractère de pleine largeur, concaténer les lignes en insérant un caractère d'espacement.
 
@@ -65,6 +66,16 @@ Ce processus de normalisation n'est effectué que pour le premier (0e) motif et 
     greple -Mxlate -E normalized -E not-normalized
 
 Par conséquent, il convient d'utiliser le premier motif pour le texte qui doit être traité en combinant plusieurs lignes en une seule et d'utiliser le second motif pour le texte préformaté. S'il n'y a pas de texte à faire correspondre au premier motif, alors un motif qui ne correspond à rien, tel que `( ?!)`.
+
+# MASKING
+
+Il arrive que des parties de texte ne soient pas traduites. Par exemple, les balises dans les fichiers markdown. DeepL suggère que dans de tels cas, la partie du texte à exclure soit convertie en balises XML, traduite, puis restaurée une fois la traduction terminée. Pour ce faire, il est possible de spécifier les parties à masquer de la traduction.
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+Chaque ligne du fichier \`MASKPATTERN\` sera interprétée comme une expression régulière, traduira les chaînes de caractères qui y correspondent et reviendra en arrière après le traitement. Les lignes commençant par `#` sont ignorées.
+
+Cette interface est expérimentale et peut être modifiée à l'avenir.
 
 # OPTIONS
 
@@ -87,6 +98,15 @@ Par conséquent, il convient d'utiliser le premier motif pour le texte qui doit 
 
     Spécifie le moteur de traduction à utiliser. Si vous spécifiez directement le module du moteur, tel que `-Mxlate::deepl`, vous n'avez pas besoin d'utiliser cette option.
 
+    À l'heure actuelle, les moteurs suivants sont disponibles
+
+    - **deepl**: DeepL API
+    - **gpt3**: gpt-3.5-turbo
+    - **gpt4**: gpt-4-turbo
+    - **gpt4o**: gpt-4o-mini
+
+        L'interface de **gpt-4o** est instable et son bon fonctionnement ne peut être garanti pour le moment.
+
 - **--xlate-labor**
 - **--xlabor**
 
@@ -99,6 +119,8 @@ Par conséquent, il convient d'utiliser le premier motif pour le texte qui doit 
 - **--xlate-format**=_format_ (Default: `conflict`)
 
     Spécifiez le format de sortie pour le texte original et le texte traduit.
+
+    Les formats suivants, autres que `xtxt`, supposent que la partie à traduire est une collection de lignes. En fait, il est possible de ne traduire qu'une partie d'une ligne, et la spécification d'un format autre que `xtxt` ne produira pas de résultats significatifs.
 
     - **conflict**, **cm**
 
@@ -140,6 +162,12 @@ Par conséquent, il convient d'utiliser le premier motif pour le texte qui doit 
 - **--xlate-maxlen**=_chars_ (Default: 0)
 
     Spécifiez la longueur maximale du texte à envoyer à l'API en une seule fois. La valeur par défaut est la même que pour le service de compte gratuit DeepL : 128K pour l'API (**--xlate**) et 5000 pour l'interface du presse-papiers (**--xlate-labor**). Vous pouvez modifier ces valeurs si vous utilisez le service Pro.
+
+- **--xlate-maxline**=_n_ (Default: 0)
+
+    Indiquez le nombre maximal de lignes de texte à envoyer à l'API en une seule fois.
+
+    Définissez cette valeur sur 1 si vous souhaitez traduire une ligne à la fois. Cette option est prioritaire sur l'option `--xlate-maxlen`.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

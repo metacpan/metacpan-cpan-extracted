@@ -1,5 +1,11 @@
 Revision history for Database-Abstraction
 
+0.10	Thu Sep 19 08:17:55 EDT 2024
+	Added t/init.t
+	The constructor now honours 'sep_char'
+	Test no_entry files
+	Added CircleCI and Codecov
+
 0.09	Mon Jun 24 20:42:48 EDT 2024
 	Added t/chi.t
 	selectall_hash: speed up slurp mode when 'entry' is one of the parameters

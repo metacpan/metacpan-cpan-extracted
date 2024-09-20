@@ -1,0 +1,401 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::xlate - module d'aide à la traduction pour greple
+
+=head1 SYNOPSIS
+
+    greple -Mxlate -e ENGINE --xlate pattern target-file
+
+    greple -Mxlate::deepl --xlate pattern target-file
+
+=head1 VERSION
+
+Version 0.3401
+
+=head1 DESCRIPTION
+
+Le module B<Greple> B<xlate> recherche les blocs de texte souhaités et les remplace par le texte traduit. Actuellement, les modules DeepL (F<deepl.pm>) et ChatGPT (F<gpt3.pm>) sont mis en œuvre en tant que moteur dorsal. Un support expérimental pour gpt-4 et gpt-4o est également inclus.
+
+Si vous souhaitez traduire des blocs de texte normaux dans un document écrit dans le style Perl's pod, utilisez la commande B<greple> avec les modules C<xlate::deepl> et C<perl> comme suit :
+
+    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+
+Dans cette commande, la chaîne de caractères C<^(\w.*\n)+> signifie des lignes consécutives commençant par une lettre alphanumérique. Cette commande met en évidence la zone à traduire. L'option B<--tout> est utilisée pour produire le texte entier.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
+</p>
+
+Ajoutez ensuite l'option C<--xlate> pour traduire la zone sélectionnée. Ensuite, les sections souhaitées seront trouvées et remplacées par la sortie de la commande B<deepl>.
+
+Par défaut, les textes originaux et traduits sont imprimés dans le format "marqueur de conflit" compatible avec L<git(1)>. En utilisant le format C<ifdef>, vous pouvez facilement obtenir la partie souhaitée par la commande L<unifdef(1)>. Le format de sortie peut être spécifié par l'option B<--xlate-format>.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png">
+</p>
+
+Si vous souhaitez traduire un texte entier, utilisez l'option B<--match-all>. Il s'agit d'un raccourci pour spécifier le modèle C<(?s).+> qui correspond à un texte entier.
+
+Les données du format de marqueur de conflit peuvent être visualisées côte à côte par la commande C<sdif> avec l'option C<-V>. Étant donné qu'il est absurde de comparer les données par chaîne, il est recommandé d'utiliser l'option C<--no-cdif>. Si vous n'avez pas besoin de colorer le texte, spécifiez C<--no-textcolor> (ou C<--no-tc>).
+
+    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
+</p>
+
+=head1 NORMALIZATION
+
+Le traitement se fait par unités spécifiées, mais dans le cas d'une séquence de plusieurs lignes de texte non vide, elles sont converties ensemble en une seule ligne. Cette opération s'effectue comme suit :
+
+=over 2
+
+=item *
+
+Supprimer les espaces blancs au début et à la fin de chaque ligne.
+
+=item *
+
+Si une ligne se termine par un caractère de ponctuation de pleine largeur, concaténer avec la ligne suivante.
+
+=item *
+
+Si une ligne se termine par un caractère de pleine largeur et que la ligne suivante commence par un caractère de pleine largeur, concaténer les lignes.
+
+=item *
+
+Si la fin ou le début d'une ligne n'est pas un caractère de pleine largeur, concaténer les lignes en insérant un caractère d'espacement.
+
+=back
+
+Les données mises en cache sont gérées sur la base du texte normalisé, de sorte que même si des modifications sont apportées sans affecter les résultats de la normalisation, les données de traduction mises en cache resteront effectives.
+
+Ce processus de normalisation n'est effectué que pour le premier (0e) motif et les motifs pairs. Ainsi, si deux motifs sont spécifiés comme suit, le texte correspondant au premier motif sera traité après normalisation, et aucun processus de normalisation ne sera effectué sur le texte correspondant au second motif.
+
+    greple -Mxlate -E normalized -E not-normalized
+
+Par conséquent, il convient d'utiliser le premier motif pour le texte qui doit être traité en combinant plusieurs lignes en une seule et d'utiliser le second motif pour le texte préformaté. S'il n'y a pas de texte à faire correspondre au premier motif, alors un motif qui ne correspond à rien, tel que C<( ?!)>.
+
+=head1 MASKING
+
+Il arrive que des parties de texte ne soient pas traduites. Par exemple, les balises dans les fichiers markdown. DeepL suggère que dans de tels cas, la partie du texte à exclure soit convertie en balises XML, traduite, puis restaurée une fois la traduction terminée. Pour ce faire, il est possible de spécifier les parties à masquer de la traduction.
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+Chaque ligne du fichier `MASKPATTERN` sera interprétée comme une expression régulière, traduira les chaînes de caractères qui y correspondent et reviendra en arrière après le traitement. Les lignes commençant par C<#> sont ignorées.
+
+Cette interface est expérimentale et peut être modifiée à l'avenir.
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--xlate>
+
+=item B<--xlate-color>
+
+=item B<--xlate-fold>
+
+=item B<--xlate-fold-width>=I<n> (Default: 70)
+
+Invoquez le processus de traduction pour chaque zone appariée.
+
+Sans cette option, B<greple> se comporte comme une commande de recherche normale. Vous pouvez donc vérifier quelle partie du fichier fera l'objet de la traduction avant d'invoquer le travail réel.
+
+Le résultat de la commande va vers la sortie standard, donc redirigez vers le fichier si nécessaire, ou envisagez d'utiliser le module L<App::Greple::update>.
+
+L'option B<--xlate> appelle l'option B<--xlate-color> avec l'option B<--color=never>.
+
+Avec l'option B<--xlate-fold>, le texte converti est plié selon la largeur spécifiée. La largeur par défaut est de 70 et peut être définie par l'option B<--xlate-fold-width>. Quatre colonnes sont réservées à l'opération de rodage, de sorte que chaque ligne peut contenir 74 caractères au maximum.
+
+=item B<--xlate-engine>=I<engine>
+
+Spécifie le moteur de traduction à utiliser. Si vous spécifiez directement le module du moteur, tel que C<-Mxlate::deepl>, vous n'avez pas besoin d'utiliser cette option.
+
+À l'heure actuelle, les moteurs suivants sont disponibles
+
+=over 2
+
+=item * B<deepl>: DeepL API
+
+=item * B<gpt3>: gpt-3.5-turbo
+
+=item * B<gpt4>: gpt-4-turbo
+
+=item * B<gpt4o>: gpt-4o-mini
+
+L'interface de B<gpt-4o> est instable et son bon fonctionnement ne peut être garanti pour le moment.
+
+=back
+
+=item B<--xlate-labor>
+
+=item B<--xlabor>
+
+Au lieu d'appeler le moteur de traduction, vous êtes censé travailler pour lui. Après avoir préparé le texte à traduire, il est copié dans le presse-papiers. Vous devez les coller dans le formulaire, copier le résultat dans le presse-papiers et appuyer sur la touche retour.
+
+=item B<--xlate-to> (Default: C<EN-US>)
+
+Spécifiez la langue cible. Vous pouvez obtenir les langues disponibles par la commande C<deepl languages> lorsque vous utilisez le moteur B<DeepL>.
+
+=item B<--xlate-format>=I<format> (Default: C<conflict>)
+
+Spécifiez le format de sortie pour le texte original et le texte traduit.
+
+Les formats suivants, autres que C<xtxt>, supposent que la partie à traduire est une collection de lignes. En fait, il est possible de ne traduire qu'une partie d'une ligne, et la spécification d'un format autre que C<xtxt> ne produira pas de résultats significatifs.
+
+=over 4
+
+=item B<conflict>, B<cm>
+
+Le texte original et le texte converti sont imprimés au format L<git(1)> marqueur de conflit.
+
+    <<<<<<< ORIGINAL
+    original text
+    =======
+    translated Japanese text
+    >>>>>>> JA
+
+Vous pouvez récupérer le fichier original par la commande L<sed(1)> suivante.
+
+    sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
+
+=item B<ifdef>
+
+Le texte original et le texte converti sont imprimés au format L<cpp(1)> C<#ifdef>.
+
+    #ifdef ORIGINAL
+    original text
+    #endif
+    #ifdef JA
+    translated Japanese text
+    #endif
+
+Vous pouvez récupérer uniquement le texte japonais par la commande B<unifdef> :
+
+    unifdef -UORIGINAL -DJA foo.ja.pm
+
+=item B<space>
+
+Le texte original et le texte converti sont imprimés séparés par une seule ligne blanche.
+
+=item B<xtxt>
+
+Si le format est C<xtxt> (texte traduit) ou inconnu, seul le texte traduit est imprimé.
+
+=back
+
+=item B<--xlate-maxlen>=I<chars> (Default: 0)
+
+Spécifiez la longueur maximale du texte à envoyer à l'API en une seule fois. La valeur par défaut est la même que pour le service de compte gratuit DeepL : 128K pour l'API (B<--xlate>) et 5000 pour l'interface du presse-papiers (B<--xlate-labor>). Vous pouvez modifier ces valeurs si vous utilisez le service Pro.
+
+=item B<--xlate-maxline>=I<n> (Default: 0)
+
+Indiquez le nombre maximal de lignes de texte à envoyer à l'API en une seule fois.
+
+Définissez cette valeur sur 1 si vous souhaitez traduire une ligne à la fois. Cette option est prioritaire sur l'option C<--xlate-maxlen>.
+
+=item B<-->[B<no->]B<xlate-progress> (Default: True)
+
+Voir le résultat de la traduction en temps réel dans la sortie STDERR.
+
+=item B<--match-all>
+
+Définissez l'ensemble du texte du fichier comme zone cible.
+
+=back
+
+=head1 CACHE OPTIONS
+
+Le module B<xlate> peut stocker le texte de la traduction en cache pour chaque fichier et le lire avant l'exécution pour éliminer les frais généraux de demande au serveur. Avec la stratégie de cache par défaut C<auto>, il maintient les données de cache uniquement lorsque le fichier de cache existe pour le fichier cible.
+
+=over 7
+
+=item --cache-clear
+
+L'option B<--cache-clear> peut être utilisée pour initier la gestion du cache ou pour rafraîchir toutes les données du cache existant. Une fois exécutée avec cette option, un nouveau fichier de cache sera créé s'il n'en existe pas, puis automatiquement maintenu par la suite.
+
+=item --xlate-cache=I<strategy>
+
+=over 4
+
+=item C<auto> (Default)
+
+Maintenir le fichier de cache s'il existe.
+
+=item C<create>
+
+Créer un fichier cache vide et quitter.
+
+=item C<always>, C<yes>, C<1>
+
+Maintenir le cache de toute façon tant que la cible est un fichier normal.
+
+=item C<clear>
+
+Effacer d'abord les données du cache.
+
+=item C<never>, C<no>, C<0>
+
+Ne jamais utiliser le fichier cache même s'il existe.
+
+=item C<accumulate>
+
+Par défaut, les données inutilisées sont supprimées du fichier cache. Si vous ne voulez pas les supprimer et les conserver dans le fichier, utilisez C<accumulate>.
+
+=back
+
+=back
+
+=head1 COMMAND LINE INTERFACE
+
+Vous pouvez facilement utiliser ce module à partir de la ligne de commande en utilisant la commande C<xlate> incluse dans la distribution. Voir l'aide de C<xlate> pour l'utilisation.
+
+La commande C<xlate> fonctionne de concert avec l'environnement Docker, donc même si vous n'avez rien d'installé, vous pouvez l'utiliser tant que Docker est disponible. Utilisez l'option C<-D> ou C<-C>.
+
+De plus, comme des makefiles pour différents styles de documents sont fournis, la traduction dans d'autres langues est possible sans spécification particulière. Utilisez l'option C<-M>.
+
+Vous pouvez également combiner les options Docker et make afin de pouvoir exécuter make dans un environnement Docker.
+
+L'exécution de C<xlate -GC> lancera un shell avec le dépôt git actuel monté.
+
+Lire l'article japonais dans la section L</SEE ALSO> pour plus de détails.
+
+    xlate [ options ] -t lang file [ greple options ]
+	-h   help
+	-v   show version
+	-d   debug
+	-n   dry-run
+	-a   use API
+	-c   just check translation area
+	-r   refresh cache
+	-s   silent mode
+	-e # translation engine (default "deepl")
+	-p # pattern to determine translation area
+	-w # wrap line by # width
+	-o # output format (default "xtxt", or "cm", "ifdef")
+	-f # from lang (ignored)
+	-t # to lang (required, no default)
+	-m # max length per API call
+	-l # show library files (XLATE.mk, xlate.el)
+        --   terminate option parsing
+    Make options
+	-M   run make
+	-n   dry-run
+    Docker options
+	-G   mount git top-level directory
+	-B   run in non-interactive (batch) mode
+	-R   mount read-only
+	-E * specify environment variable to be inherited
+	-I * specify altanative docker image (default: tecolicom/xlate:version)
+	-D * run xlate on the container with the rest parameters
+	-C * run following command on the container, or run shell
+
+    Control Files:
+	*.LANG    translation languates
+	*.FORMAT  translation foramt (xtxt, cm, ifdef)
+	*.ENGINE  translation engine (deepl or gpt3)
+
+
+=head1 EMACS
+
+Chargez le fichier F<xlate.el> inclus dans le dépôt pour utiliser la commande C<xlate> à partir de l'éditeur Emacs. La fonction C<xlate-region> traduit la région donnée. La langue par défaut est C<EN-US> et vous pouvez spécifier la langue en l'invoquant avec l'argument prefix.
+
+=head1 ENVIRONMENT
+
+=over 7
+
+=item DEEPL_AUTH_KEY
+
+Définissez votre clé d'authentification pour le service DeepL.
+
+=item OPENAI_API_KEY
+
+Clé d'authentification OpenAI.
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
+=head2 TOOLS
+
+Vous devez installer les outils de ligne de commande pour DeepL et ChatGPT.
+
+L<https://github.com/DeepLcom/deepl-python>
+
+L<https://github.com/tecolicom/App-gpty>
+
+=head1 SEE ALSO
+
+L<App::Greple::xlate>
+
+L<App::Greple::xlate::deepl>
+
+L<App::Greple::xlate::gpt3>
+
+L<https://hub.docker.com/r/tecolicom/xlate>
+
+=over 7
+
+=item L<https://github.com/DeepLcom/deepl-python>
+
+DeepL Bibliothèque Python et commande CLI.
+
+=item L<https://github.com/openai/openai-python>
+
+Bibliothèque Python OpenAI
+
+=item L<https://github.com/tecolicom/App-gpty>
+
+Interface de ligne de commande OpenAI
+
+=item L<App::Greple>
+
+Voir le manuel B<greple> pour les détails sur le modèle de texte cible. Utilisez les options B<--inside>, B<--outside>, B<--include>, B<--exclude> pour limiter la zone de correspondance.
+
+=item L<App::Greple::update>
+
+Vous pouvez utiliser le module C<-Mupdate> pour modifier les fichiers par le résultat de la commande B<greple>.
+
+=item L<App::sdif>
+
+Utilisez B<sdif> pour afficher le format des marqueurs de conflit côte à côte avec l'option B<-V>.
+
+=back
+
+=head2 ARTICLES
+
+=over 2
+
+=item * L<https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250>
+
+Module Greple pour traduire et remplacer uniquement les parties nécessaires avec DeepL API (en japonais)
+
+=item * L<https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6>
+
+Génération de documents en 15 langues avec le module DeepL API (en japonais)
+
+=item * L<https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd>
+
+Traduction automatique de l'environnement Docker avec DeepL API (en japonais)
+
+=back
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright © 2023-2024 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

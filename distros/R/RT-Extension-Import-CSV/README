@@ -131,14 +131,15 @@ CONFIGURATION
     for you, provided there isn't a column in the source data already mapped
     to it. Other date fields must be provided in the source data.
 
-    The importer expects incoming date values to conform to ISO
-    <https://en.wikipedia.org/wiki/ISO_8601> datetime format (yyyy-mm-dd
-    hh:mm::ss and other accepted variants). If your source data can't
-    produce this formatting, Perl can help you out.
+    The importer does a fairly good job at guessing the source datetime
+    format; if the source datetime format can't be parsed, Perl can help you
+    out.
 
-    For example, if the source data has dates in YYYY-MM-DD format, we can
-    write a function to append a default time to produce an ISO-formatted
-    result:
+    If you have to munge dates, we recommend converting them to the ISO
+    <https://en.wikipedia.org/wiki/ISO_8601> datetime format (yyyy-mm-dd
+    hh:mm::ss and other accepted variants). For example, if the source data
+    has dates in YYYY-MM-DD format, we can write a function to append a
+    default time to produce an ISO-formatted result:
 
         Set( %TicketsImportFieldMapping,
             'id'               => 'Ticket No',
@@ -184,8 +185,7 @@ CONFIGURATION
             escape_char => '`',
         ) );
 
-    Available options are described in the documentation for
-    Text::CSV_XS/"new".
+    Available options are described in the documentation for Text::CSV_XS.
 
   Special Columns
     Roles and Custom Roles
@@ -205,7 +205,7 @@ CONFIGURATION
         (--insert) you can use either one and the content will be added to
         the Create transaction.
 
-        For more information, see the section for /"IMPORTING TRANSACTIONS".
+        For more information, see the section for importing transations.
 
   TicketsImportTicketIdField
     If the CSV data contains the ids of existing RT tickets, you can set
@@ -436,40 +436,119 @@ EXAMPLES
             --insert \
             users.csv
 
-    Importing articles
-        An example knowledge management system contains articles your
-        organization would like to include on RT tickets. The export is
-        delivered as such:
+  Importing articles
+    An example knowledge management system contains articles your
+    organization would like to include on RT tickets. The export is
+    delivered as such:
 
-            Title,Synopsis,Content
-            "Reset Password,"How to Reset a Password","This article explains how to reset a password in detail"
-            "Create User","How to Create a New User","Instructions on how to create a new user, in excruciating detail"
+        Title,Synopsis,Content
+        "Reset Password,"How to Reset a Password","This article explains how to reset a password in detail"
+        "Create User","How to Create a New User","Instructions on how to create a new user, in excruciating detail"
 
-        Since there are commas in the content, fields in this CSV need to be
-        quoted, so this needs to be accounted for in the import
-        configuration. Create ArticleImport.pm with the following:
+    Since there are commas in the content, fields in this CSV need to be
+    quoted, so this needs to be accounted for in the import configuration.
+    Create ArticleImport.pm with the following:
 
-            Set( %ArticlesImportFieldMapping,
-                'Name'    => 'Title',
-                'Summary' => 'Synopsis',
-                'Content' => 'Content',
-            );
+        Set( %ArticlesImportFieldMapping,
+            'Name'    => 'Title',
+            'Summary' => 'Synopsis',
+            'Content' => 'Content',
+        );
 
-            Set( %CSVOptions, (
-                binary      => 1,
-                sep_char    => ',',
-                quote_char  => '"',
-                escape_char => '',
-            ) );
+        Set( %CSVOptions, (
+            binary      => 1,
+            sep_char    => ',',
+            quote_char  => '"',
+            escape_char => '',
+        ) );
 
-        You need to add --article-class when running the import:
+    You need to add --article-class when running the import:
 
-            /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
-                --type article \
-                --article-class General \
-                --config ArticleImport.pm \
-                --insert \
-                articles.csv
+        /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+            --type article \
+            --article-class General \
+            --config ArticleImport.pm \
+            --insert \
+            articles.csv
+
+  Putting it all together: migrating from Zendesk
+    It's possible to migrate from Zendesk to Request Tracker using multiple
+    imports defined above. Starting with a Zendesk trial site as a basis,
+    the following steps are necessary before a migration can begin:
+
+    Users must be exported via API
+        Unfortunately, Zendesk only provides an export for what RT considers
+        to be privileged users. To get all users, you'll need to access
+        Zendesk's API. See this forum post
+        <https://support.zendesk.com/hc/en-us/articles/4408882924570/comment
+        s/6460643115162> for more information.
+
+    Tickets must be exported to CSV
+        Any of the default lists of tickets in Zendesk can be exported to
+        CSV. See the Zendesk documentation for more information.
+
+    Exporting user information via the Zendesk API includes a bunch of
+    unnecessary values. For this import, the only columns that matter are
+    name and email.
+
+    Create a new file called ZendeskUsers.pm:
+
+        Set( %UsersImportFieldMapping,
+            'Name'            => 'name',
+            'RealName'        => 'name',
+            'EmailAddress'    => 'email',
+        );
+
+        Set( %CSVOptions, (
+           sep_char    => ',',
+           quote_char  => '"',
+           escape_char => '',
+        ) );
+
+    Assuming the user export above produced a file named zendesk_users.csv,
+    run the import:
+
+        /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+            --type user \
+            --config ZendeskUsers.pm \
+            --insert \
+            zendesk_users.csv
+
+    For tickets, create ZendeskTickets.pm using the following configuration:
+
+        Set($TicketsImportTicketIdField, 'ID');
+
+        Set( %TicketsImportFieldMapping,
+            'Queue'          => \'General',
+            'Status'         => 'Status',
+            'Subject'        => 'Subject',
+            'Requestor'      => 'Requester',
+            'Created'        => 'Requested',
+            'LastUpdated'    => 'Updated',
+            'CF.Ticket Type' => 'Topic',
+            'CF.Channel'     => 'Channel',
+        );
+
+        Set( %CSVOptions, (
+           sep_char    => ',',
+           quote_char  => '"',
+           escape_char => '',
+        ) );
+
+    (you'll need to create two ticket custom fields: Ticket Type and
+    Channel)
+
+    If tickets were exported to a file named zendesk_tickets.csv, the
+    following command will import tickets into your RT instance:
+
+        /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+            --type ticket \
+            --config ZendeskTickets.pm \
+            --insert-update \
+            zendesk_tickets.csv
+
+    For a production instance of Zendesk, you'll need to adjust the columns
+    in the ticket import configuration to match your configuration.
 
 AUTHOR
     Best Practical Solutions, LLC <modules@bestpractical.com>
@@ -484,21 +563,4 @@ LICENSE AND COPYRIGHT
     This is free software, licensed under:
 
       The GNU General Public License, Version 2, June 1991
-
-POD ERRORS
-    Hey! The above document had some coding errors, which are explained
-    below:
-
-    Around line 1494:
-        alternative text 'Text::CSV_XS/"new"' contains non-escaped | or /
-
-    Around line 1518:
-        alternative text '/"IMPORTING TRANSACTIONS"' contains non-escaped |
-        or /
-
-    Around line 1760:
-        '=item' outside of any '=over'
-
-    Around line 1795:
-        You forgot a '=back' before '=head1'
 

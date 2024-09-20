@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::AMI_430;
+$Lab::Moose::Instrument::AMI_430::VERSION = '3.910';
 #ABSTRACT: American Magnetics magnet power supply
-$Lab::Moose::Instrument::AMI_430::VERSION = '3.904';
 use v5.20;
 
 use Moose;
@@ -34,6 +34,24 @@ has verbose => (
     default => 1
 );
 
+has persistent_mode => ( 
+    is => 'ro', 
+    isa => 'Bool', 
+    builder => '_persistent_builder',
+    lazy => 1,
+);
+
+#subroutines needed: heater_off, in_persistent_mode, get_persistent_field, heater_on
+
+#heater off: turns off the switch heater
+#heater on: turns on the switch heater 
+#get_persistent_field: gives back the applied persistent field - done
+#in_persistent_mode: gives back whether the magnet is in the persistent mode or not - done
+
+sub _persistent_builder {
+    my $self = shift;
+    return $self -> query( command => " PSwitch:INSTalled?");
+}
 
 sub BUILD {
   my $self = shift;
@@ -57,6 +75,7 @@ sub cls {
     my ( $self, %args ) = validated_getter( \@_ );
     return $self->query( command => "*CLS", %args );
 }
+
 
 sub idn {
     my ( $self, %args ) = validated_getter( \@_ );
@@ -90,6 +109,69 @@ sub get_field {
     return $self->query( command => "FIELD:MAGNET?", %args );
 }
 
+sub get_voltage {
+    my ( $self, %args ) = validated_getter(
+        \@_
+    );
+    return $self->query( command => "VOLTage:SUPPly?", %args );
+}
+
+sub get_persistent_field {
+    my ( $self, %args ) = validated_getter( \@_ );
+ 
+    return $self->query( command => "FIELD:MAGnet?");
+}
+
+sub in_persistent_mode {
+    my ( $self, %args ) = validated_getter( \@_ );
+    my $status = $self->query( command => "PERSistent?");
+    if ( $status == 0) {
+        return 0;
+    }
+    else {
+        return 1;
+    }
+}
+
+sub set_switch_heater {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => {isa => enum( [ 0,1 ] ) },
+    );
+    if ($value == 0) {
+        return $self->query( command => "PSwitch 0" );
+    }
+    else {
+        return $self->query( command => "PSwitch 1" );
+    }
+}
+
+sub heater_on {
+   my ( $self, $value, %args ) = validated_setter(
+        \@_,
+   );
+   $self ->query( command => "PSwitch?");
+   if ($self == 0) {
+        return $self->set_switch_heater(value => 1);
+   }
+   else {
+    croak ( "The switch heater is already turned on." );
+   }
+}
+
+sub heater_off {
+   my ( $self, $value, %args ) = validated_setter(
+        \@_,
+   );
+   $self ->query( command => "PSwitch?");
+   if ($self == 1) {
+        return $self->set_switch_heater(value => 0);
+   }
+   else {
+    croak("The switch heater is already turned off.");
+   }
+}
+
 sub get_value {
     my ( $self, %args ) = validated_getter(
         \@_
@@ -115,6 +197,7 @@ sub set_target_field {
     }
     return $self->write( command => "CONFIGURE:FIELD:TARGET $value", %args );
 }
+
 
 sub sweep_to_field {
     my ( $self, %args ) = validated_getter(
@@ -143,6 +226,7 @@ sub ramp {
     }
     return $ret_val;
 }
+
 
 sub to_zero {
     my ( $self, %args ) = validated_getter(
@@ -260,7 +344,7 @@ Lab::Moose::Instrument::AMI_430 - American Magnetics magnet power supply
 
 =head1 VERSION
 
-version 3.904
+version 3.910
 
 =head1 SYNOPSIS
 
@@ -282,9 +366,11 @@ version 3.904
  )
 
  Setting the maximum allowed field strength and the maximum rate are mandatory.
- This model allows to change the units for field strength (kG/T) and time (min/s).
+ This model allows to change the units for field strength (kG/T) and time
+(min/s).
  You can check this in the menu on the front panel.
- For security purposes this driver does not allow changing those critical settings.
+ For security purposes this driver does not allow changing those critical
+settings.
 
 =head1 METHODS
 
@@ -314,6 +400,7 @@ This function waits for the device to finish.
 This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2023       Mia Schambeck
+            2024       Andreas K. Huettel, Simon Feyrer
 
 
 This is free software; you can redistribute it and/or modify it under

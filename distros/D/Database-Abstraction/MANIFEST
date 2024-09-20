@@ -2,6 +2,7 @@ Changes
 data/test1.csv
 data/test2.psv
 data/test3.xml
+data/test4.csv
 lib/Database/Abstraction.pm
 LICENSE
 Makefile.PL
@@ -17,11 +18,14 @@ t/csv.t
 t/eof.t
 t/eol.t
 t/error.t
+t/init.t
 t/lib/Database/test1.pm
 t/lib/Database/test2.pm
 t/lib/Database/test3.pm
+t/lib/Database/test4.pm
 t/lib/MyLogger.pm
 t/logger.t
+t/no_entry.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-links.t

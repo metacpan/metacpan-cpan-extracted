@@ -75,7 +75,7 @@ INSTALLATION
 SUPPORT/MAILING LISTS/MORE INFO
 
        Please report any problems:
-	  http://bugzilla.gnome.org/browse.cgi?product=gimp-perl
+	  https://gitlab.gnome.org/GNOME/gimp-perl/-/issues/
 	  https://rt.cpan.org/Dist/Display.html?Name=Gimp
 
        Homepages: https://git.gnome.org/browse/gimp-perl/

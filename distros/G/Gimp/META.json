@@ -72,6 +72,6 @@
       },
       "x_IRC" : "irc://irc.gnome.org/#gimp"
    },
-   "version" : "2.37",
+   "version" : "2.38",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

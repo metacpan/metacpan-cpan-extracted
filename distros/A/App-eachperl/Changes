@@ -1,5 +1,10 @@
 Revision history for App-eachperl
 
+0.11    2024-09-19
+        [CHANGES]
+         * Use the new global options handling support from Commandable,
+           allowing the `help` command to show details
+
 0.10    2024-08-29
         [CHANGES]
          * Added `install_no_system` config option

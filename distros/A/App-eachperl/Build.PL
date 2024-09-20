@@ -13,7 +13,7 @@ my $build = Module::Build->new(
       'Data::Checks' => '0.08',
 
       'Attribute::Storage' => 0,
-      'Commandable::Finder::MethodAttributes' => 0,
+      'Commandable::Finder::MethodAttributes' => '0.13',
       'Commandable::Invocation' => 0,
       'Config::Tiny' => 0,
       'Convert::Color::XTerm' => '0.06',

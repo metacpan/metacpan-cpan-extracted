@@ -37,6 +37,7 @@ my $munger_file;
 my $cmdb_env;
 my $env_vars   = 'SYSTEM_ENV';
 my $output_dir = '.';
+my $no_toml;
 GetOptions(
 	'r=s'         => \$to_read,
 	'd=s'         => \$output_dir,
@@ -55,6 +56,7 @@ GetOptions(
 	'cmdb_env=s'  => \$cmdb_env,
 	'env_vars=s'  => \$env_vars,
 	'm=s'         => \$munger_file,
+	'no_toml'     => \$no_toml,
 );
 
 if ($version_flag) {
@@ -81,7 +83,12 @@ if (   $format ne 'json'
 }
 
 if ( $format eq 'multi' ) {
-	my @types = ( 'yaml', 'json', 'toml', 'shell' );
+	my @types;
+	if ($no_toml) {
+		@types = ( 'yaml', 'json', 'shell' );
+	} else {
+		@types = ( 'yaml', 'json', 'toml', 'shell' );
+	}
 	foreach my $type (@types) {
 		my $dir_to_create = $output_dir . '/' . $type . '_confs';
 		if ( -e $dir_to_create && !-d $dir_to_create ) {
@@ -324,12 +331,12 @@ if ( $format eq 'toml' ) {
 } elsif ( $format eq 'multi' ) {
 	my $output_file = $output_dir . '/json_confs/' . $cmdb_host . '.json';
 	eval {
-		write_file(
-			$output_file, JSON->new->canonical(1)->pretty(1)->encode($found_vars)
-		);
+		write_file( $output_file, JSON->new->canonical(1)->pretty(1)->encode($found_vars) );
 
-		$output_file = $output_dir . '/toml_confs/' . $cmdb_host . '.toml';
-		write_file( $output_file, to_toml($found_vars) );
+		if ( !$no_toml ) {
+			$output_file = $output_dir . '/toml_confs/' . $cmdb_host . '.toml';
+			write_file( $output_file, to_toml($found_vars) );
+		}
 
 		$output_file = $output_dir . '/yaml_confs/' . $cmdb_host . '.yaml';
 		write_file( $output_file, Dump($found_vars) );

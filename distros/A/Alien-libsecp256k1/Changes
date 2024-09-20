@@ -1,5 +1,11 @@
 Revision history for Alien-libsecp256k1
 
+0.050102 - 2024-09-19
+	- The module now tries to build dynamic libsecp256k1 on windows
+
+0.050101 - 2024-09-19
+	- Switch building method to cmake
+
 0.050100 - 2024-09-12
 	- First version
 

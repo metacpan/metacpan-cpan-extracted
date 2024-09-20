@@ -1,4 +1,9 @@
 Revision history for RT-Extension-Import-CSV
 
+0.02 2024-09-19
+- Improve handling of date/time values
+- Improve log messages
+- Document migration from Zendesk to RT
+
 0.01 2024-04-25
 - Initial version

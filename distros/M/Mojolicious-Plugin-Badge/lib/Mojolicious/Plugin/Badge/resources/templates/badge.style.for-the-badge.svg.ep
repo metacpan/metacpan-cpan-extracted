@@ -1,0 +1,46 @@
+% my $id_smooth    = 'smooth' . ($id_suffix || '');
+% my $id_round     = 'round' .  ($id_suffix || '');
+% my $padding      = 20;
+% my $logo_width   = ($logo) ? 14 : 0;
+% my $logo_padding = ($logo && $label) ? 3 : 0;
+% my $left_width   = $label_text_width + $padding + $logo_width + $logo_padding + 1.75;
+% my $right_width  = ($message) ? $message_text_width + $padding + 1.75 : 0;
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="<%= $left_width + $right_width %>" height="28" role="img" aria-label="<%= $aria_label %>">
+
+    % if ($title) {
+        <title><%= $title %></title>
+    % }
+
+    <g shape-rendering="crispEdges">
+        <rect width="<%= $left_width %>" height="28" fill="<%= $label_color %>" />
+        <rect x="<%= $left_width %>" width="<%= $right_width %>" height="28" fill="<%= $color %>" />
+    </g>
+
+    <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="100">
+
+        % if ($logo) {
+            <image x="9" y="7" width="<%= $logo_width %>" height="14" xlink:href="<%= $logo%>"/>
+        % }
+
+        <text transform="scale(.1)" x="<%= ((($left_width + $logo_width + $logo_padding) / 2) + 1) * 10 %>" y="175" textLength="<%= ($left_width - ($padding + $logo_width + $logo_padding)) * 10 %>" fill="<%= $label_text_color %>"><%= $label %></text>
+
+        % if ($message) {
+            <text transform="scale(.1)" x="<%= ($left_width + $right_width / 2 - 1) * 10 %>" y="175" textLength="<%= ($right_width - $padding) * 10 %>" fill="<%= $message_text_color %>" font-weight="bold"><%= $message %></text>
+        % }
+
+        % if ($label_link || $link) {
+            <a xlink:href="<%= $label_link || $link %>">
+                <rect width="<%= $left_width %>" height="20" fill="rgba(0,0,0,0)"/>
+            </a>
+        % }
+
+        % if ($message_link || $link) {
+            <a xlink:href="<%= $message_link || $link %>">
+                <rect x="<%= $left_width %>" width="<%= $right_width %>" height="28" fill="rgba(0,0,0,0)"/>
+            </a>
+        % }
+
+    </g>
+
+</svg>

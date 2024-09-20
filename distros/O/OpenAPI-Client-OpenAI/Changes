@@ -1,6 +1,9 @@
 Revision history for OpenAPI-Client-OpenAI
 
-0.07
+0.08    2024-09-19 12:24 (CEST)
+        - Bump OpenAI spec to version 2.3.0
+
+0.07    2024-07-07 00:00 (CEST)
         - Added a missing dependencies in Makefile.PL
         - Add documentation to explain the deprecated methods.
 

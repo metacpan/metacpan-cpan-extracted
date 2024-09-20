@@ -1,0 +1,68 @@
+% my $id_smooth    = 'smooth' . ($id_suffix || '');
+% my $id_round     = 'round' .  ($id_suffix || '');
+% my $logo_width   = ($logo) ? 14 : 0;
+% my $logo_padding = ($logo && $label) ? 3 : 0;
+% my $left_width   = $label_text_width + 10 + $logo_width + $logo_padding;
+% my $right_width  = ($message) ? $message_text_width + 10 : 0;
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="<%= $left_width + $right_width %>" height="20" role="img" aria-label="<%= $aria_label %>">
+
+    % if ($title) {
+        <title><%= $title %></title>
+    % }
+
+    <linearGradient id="<%= $id_smooth %>" x2="0" y2="100%">
+        <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+        <stop offset="1" stop-opacity=".1"/>
+    </linearGradient>
+
+    <clipPath id="<%= $id_round %>">
+        <rect width="<%= $left_width + $right_width %>" height="20" rx="3" fill="#fff"/>
+    </clipPath>
+
+    <g clip-path="url(#<%= $id_round %>)">
+
+        <rect width="<%= $left_width %>" height="20" fill="<%= $label_color %>">
+            % if ($label_title) {
+                <title><%= $label_title %></title>
+            % }
+        </rect>
+
+        <rect x="<%= $left_width %>" width="<%= $right_width %>" height="20" fill="<%= $color %>">
+            % if ($message_title) {
+                <title><%= $message_title %></title>
+            % }
+        </rect>
+
+        <rect width="<%= $left_width + $right_width %>" height="20" fill="url(#<%= $id_smooth %>)"/>
+
+    </g>
+
+    <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
+
+        % if ($logo) {
+            <image x="5" y="3" width="<%= $logo_width %>" height="14" xlink:href="<%= $logo%>"/>
+        % }
+
+        <text aria-hidden="true" x="<%= ((($left_width + $logo_width + $logo_padding) / 2) + 1) * 10 %>" y="150" fill="#010101" fill-opacity=".3" transform="scale(0.1)" textLength="<%= ($left_width - (10 + $logo_width + $logo_padding)) * 10 %>"><%= $label %></text>
+        <text x="<%= ((($left_width + $logo_width + $logo_padding) / 2) + 1) * 10 %>" y="140" transform="scale(0.1)" fill="<%= $label_text_color %>" textLength="<%= ($left_width - (10 + $logo_width + $logo_padding)) * 10 %>"><%= $label %></text>
+
+        % if ($message) {
+            <text aria-hidden="true" x="<%= ($left_width + $right_width / 2 - 1) * 10 %>" y="150" fill="#010101" fill-opacity=".3" transform="scale(0.1)" textLength="<%= ($right_width - 10) * 10 %>"><%= $message %></text>
+            <text x="<%= ($left_width + $right_width / 2 - 1) * 10 %>" y="140" transform="scale(0.1)" fill="<%= $message_text_color %>" textLength="<%= ($right_width - 10) * 10 %>"><%= $message %></text>
+        % }
+
+        % if ($label_link || $link) {
+            <a xlink:href="<%= $label_link || $link %>">
+                <rect width="<%= $left_width %>" height="20" fill="rgba(0,0,0,0)"/>
+            </a>
+        % }
+
+        % if ($message_link || $link) {
+            <a xlink:href="<%= $message_link || $link %>">
+                <rect x="<%= $left_width %>" width="<%= $right_width %>" height="20" fill="rgba(0,0,0,0)"/>
+            </a>
+        % }
+
+  </g>
+</svg>

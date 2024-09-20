@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore340::Helium3;
-$Lab::Moose::Instrument::Lakeshore340::Helium3::VERSION = '3.904';
+$Lab::Moose::Instrument::Lakeshore340::Helium3::VERSION = '3.910';
 #ABSTRACT: Lakeshore Model 340 Temperature Controller for Helium3 operation
 
 use v5.20;
@@ -145,7 +145,7 @@ Lab::Moose::Instrument::Lakeshore340::Helium3 - Lakeshore Model 340 Temperature 
 
 =head1 VERSION
 
-version 3.904
+version 3.910
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,7 @@
+0.50.3 2024-09-19 16:02:07 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+  - filter menuButtonProperties to make card view work again
+
 0.50.2 2024-09-18 16:42:18 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix regression with missing defaults for app and log in user object

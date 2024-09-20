@@ -1,6 +1,6 @@
 package App::Greple::xlate::deepl;
 
-our $VERSION = "0.3202";
+our $VERSION = "0.3401";
 
 use v5.14;
 use warnings;
@@ -25,9 +25,15 @@ my %param = (
 
 sub deepl {
     state $deepl = App::cdif::Command->new;
-    state $command = [ 'deepl', 'text',
-		       '--to' => $lang_to,
-		       $auth_key ? ('--auth-key' => $auth_key) : () ];
+    state $command = do {
+	my $glossary = $App::Greple::xlate::glossary;
+	my   @c = ('deepl', 'text');
+	push @c,  ('--to', $lang_to);
+	push @c,  ('--from', $lang_from) if $lang_from ne 'ORIGINAL';
+	push @c,  ('--auth-key', $auth_key) if $auth_key;
+	push @c,  ('--glossary-id', $glossary) if $glossary;
+	\@c;
+    };
     $deepl->command([@$command, +shift])->update->data;
 }
 
@@ -66,7 +72,7 @@ sub xlate_each {
 }
 
 sub xlate {
-    my @from = map { /\n\z/ ? $_ : "$_\n" } @_;
+    my @from = @_;
     my @to;
     my $max = $App::Greple::xlate::max_length || $param{$method}->{max} // die;
     while (@from) {

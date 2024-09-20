@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Agilent33210A;
-$Lab::Moose::Instrument::Agilent33210A::VERSION = '3.904';
+$Lab::Moose::Instrument::Agilent33210A::VERSION = '3.910';
 #ABSTRACT: Agilent 33210A Arbitrary Waveform Generator, also as voltage source
 
 use v5.20;
@@ -209,7 +209,7 @@ Lab::Moose::Instrument::Agilent33210A - Agilent 33210A Arbitrary Waveform Genera
 
 =head1 VERSION
 
-version 3.904
+version 3.910
 
 =head1 SYNOPSIS
 

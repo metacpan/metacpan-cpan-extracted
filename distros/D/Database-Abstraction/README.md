@@ -4,7 +4,7 @@ Database::Abstraction - database abstraction layer
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
 
@@ -12,7 +12,7 @@ Abstract class giving read-only access to CSV, XML and SQLite databases via Perl
 Look for databases in $directory in this order:
 1) SQLite (file ends with .sql)
 2) PSV (pipe separated file, file ends with .psv)
-3) CSV (file ends with .csv or .db, can be gzipped)
+3) CSV (file ends with .csv or .db, can be gzipped) (note the default sep\_char is '!' not ',')
 4) XML (file ends with .xml)
 
 For example, you can access the files in /var/db/foo.csv via this class:
@@ -34,6 +34,15 @@ If the table has a column called "entry",
 entries are keyed on that and sorts are based on it.
 To turn that off, pass 'no\_entry' to the constructor, for legacy
 reasons it's enabled by default.
+
+    # Regular CSV: There is no entry column and the separators are commas
+    sub new
+    {
+        my $class = shift;
+        my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+        return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
+    }
 
 CSV files that are not no\_entry can have empty lines or comment lines starting with '#',
 to make them more readable.

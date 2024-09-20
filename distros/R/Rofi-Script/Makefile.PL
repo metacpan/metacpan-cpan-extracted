@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "Test2::API" => 0,
     "base" => 0,
     "namespace::autoclean" => 0,
+    "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "autodie" => 0
   },
-  "VERSION" => "1.221970",
+  "VERSION" => "1.242630",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "autodie" => 0,
   "base" => 0,
   "namespace::autoclean" => 0,
+  "parent" => 0,
   "strict" => 0,
   "warnings" => 0
 );

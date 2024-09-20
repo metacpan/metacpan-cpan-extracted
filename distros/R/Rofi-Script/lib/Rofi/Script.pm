@@ -1,5 +1,6 @@
 package Rofi::Script;
-our $VERSION = '1.221970'; # VERSION
+
+our $VERSION = '1.242630'; # VERSION
 
 use strict;
 use warnings;
@@ -51,6 +52,10 @@ exposed via:
 
 There are also some options that can be set by printing specially formatted
 strings to STDOUT.
+
+If you're just writing a simple script with a set of options and code that
+should run when one of those options is selected, consider
+L<Rofi::Script::Simple>.
 
 =head1 SYNOPSIS
 

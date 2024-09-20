@@ -9,6 +9,7 @@ README.md
 t/00-load.t
 t/01-readline.t
 t/02-apply-peeks.t
+t/03-empty-history.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

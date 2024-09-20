@@ -1,5 +1,5 @@
 Items as of 2018-05-31 (by Ed J)
-* make compatible with GIMP 2.10 - possibly reintroduce Gimp::Feature
+* possibly reintroduce Gimp::Feature with GIMP 3 real release coming
 * gimp-plugins-refresh: load is
   app/plug-in/gimppluginmanager.c:gimp_plug_in_manager_query_new, closedown
   is ./app/plug-in/gimppluginmanager.c:gimp_plug_in_manager_exit
@@ -15,9 +15,7 @@ Items as of 2018-05-31 (by Ed J)
   GimpParam counterpart - Gimp::Lib::Data?
   - maybe use FFI, which would help on Win32
 * use Glib array for above
-* unify typemaps and C INCs, for more accurate EU::D support
 * Net.xs should implement own PDL serialise/deser. Use Lib.xs new_pdl?
-* Restructure dirs so all libs under lib/ using ExtUtils::MakeMaker::BigHelper
 * http://search.cpan.org/dist/Glib-Object-Introspection/
 * Add Browse to console - plug-ins/script-fu/script-fu-console.c
 * interactive collab image-editing:

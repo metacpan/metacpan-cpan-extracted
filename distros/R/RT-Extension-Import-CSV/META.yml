@@ -24,7 +24,7 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-import-csv
-version: '0.01'
+version: '0.02'
 x_module_install_rtx_version: '0.43'
 x_requires_rt: 5.0.0
 x_rt_too_new: 5.2.0

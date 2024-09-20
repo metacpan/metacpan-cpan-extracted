@@ -1,0 +1,401 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::xlate - greple için çeviri desteği modülü
+
+=head1 SYNOPSIS
+
+    greple -Mxlate -e ENGINE --xlate pattern target-file
+
+    greple -Mxlate::deepl --xlate pattern target-file
+
+=head1 VERSION
+
+Version 0.3401
+
+=head1 DESCRIPTION
+
+B<Greple> B<xlate> modülü istenilen metin bloklarını bulur ve bunları çevrilmiş metinle değiştirir. Şu anda DeepL (F<deepl.pm>) ve ChatGPT (F<gpt3.pm>) modülleri arka uç motor olarak uygulanmıştır. Ayrıca gpt-4 ve gpt-4o için deneysel destek de bulunmaktadır.
+
+Eğer Perl'in pod stiliyle yazılmış bir belgedeki normal metin bloklarını çevirmek istiyorsanız, şu şekilde B<greple> komutunu C<xlate::deepl> ve C<perl> modülü ile kullanın:
+
+    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+
+Bu komutta, desen dizesi C<^(\w.*\n)+>, alfanümerik harfle başlayan ardışık satırları ifade eder. Bu komut, çevrilecek alanı vurgular. Bütün metni üretmek için B<--all> seçeneği kullanılır.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
+</p>
+
+Ardından seçilen alanı çevirmek için C<--xlate> seçeneğini ekleyin. Ardından, istenen bölümleri bulacak ve bunları B<deepl> komutunun çıktısıyla değiştirecektir.
+
+Varsayılan olarak, orijinal ve çevrilmiş metin L<git(1)> ile uyumlu "çatışma işaretçisi" formatında yazdırılır. C<ifdef> formatını kullanarak, istediğiniz bölümü L<unifdef(1)> komutuyla kolayca alabilirsiniz. Çıktı formatı B<--xlate-format> seçeneğiyle belirtilebilir.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png">
+</p>
+
+Tüm metni çevirmek isterseniz, B<--match-all> seçeneğini kullanın. Bu, tüm metni eşleştiren C<(?s).+> desenini belirtmek için bir kısayoldur.
+
+Çatışma işaretçisi biçim veri, C<-V> seçeneği ile C<sdif> komutuyla yan yana stilinde görüntülenebilir. Satır bazında karşılaştırma yapmanın anlamsız olduğu için C<--no-cdif> seçeneği önerilir. Metni renklendirmeniz gerekmiyorsa, C<--no-textcolor> (veya C<--no-tc>) belirtin.
+
+    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
+</p>
+
+=head1 NORMALIZATION
+
+İşleme belirtilen birimlerde yapılır, ancak birden fazla satırın ardışık olarak işlenmesi durumunda, bunlar birlikte tek bir satıra dönüştürülür. Bu işlem şu şekilde gerçekleştirilir:
+
+=over 2
+
+=item *
+
+Her satırın başında ve sonundaki boşlukları kaldırın.
+
+=item *
+
+Eğer bir satır tam genişlikte bir noktalama işareti karakteri ile biterse, bir sonraki satırla birleştirin.
+
+=item *
+
+Bir satır tam genişlikli bir karakterle biterse ve bir sonraki satır tam genişlikli bir karakterle başlarsa, satırları birleştirin.
+
+=item *
+
+Bir satırın sonu veya başı tam genişlikli bir karakter değilse, aralarına bir boşluk karakteri ekleyerek birleştirin.
+
+=back
+
+Önbellek verileri, normalize edilmiş metne dayalı olarak yönetilir, bu nedenle normalleştirme sonuçlarını etkilemeyen değişiklikler yapılsa bile, önbelleğe alınan çeviri verileri hala etkilidir.
+
+Bu normalleştirme işlemi sadece ilk (0'ıncı) ve çift numaralı desen için gerçekleştirilir. Dolayısıyla, iki desen şu şekilde belirlenmişse, ilk desene uyan metin normalleştirmenin ardından işlenecek ve ikinci desene uyan metin üzerinde herhangi bir normalleştirme işlemi gerçekleştirilmeyecektir.
+
+    greple -Mxlate -E normalized -E not-normalized
+
+Bu nedenle, birden fazla satırı tek bir satıra birleştirerek işlenmesi gereken metinler için ilk deseni kullanın ve önceden biçimlendirilmiş metinler için ikinci deseni kullanın. Eğer ilk desene uyan bir metin yoksa, o zaman hiçbir şeyi eşleştirmeyen bir desen kullanın, örneğin C<(?!)> desenini.
+
+=head1 MASKING
+
+Ara sıra, çevrilmesini istemediğiniz metin parçaları olabilir. Örneğin, markdown dosyalarındaki etiketler. DeepL, bu tür durumlarda çevrilmemesi gereken metin parçasının dışlanacak kısmının XML etiketlerine dönüştürülmesini, çevirilmesini ve ardından çeviri işlemi tamamlandıktan sonra geri yüklenmesini önerir. Bunu desteklemek için çeviriden saklanacak kısımların belirtilebilmesi mümkündür.
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+Bu, `MASKPATTERN` dosyasının her satırını bir düzenli ifade olarak yorumlayacak, eşleşen dizeleri çevirecek ve işlem sonrasında geri dönecektir. C<#> ile başlayan satırlar görmezden gelinir.
+
+Bu arayüz deneyseldir ve gelecekte değişebilir.
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--xlate>
+
+=item B<--xlate-color>
+
+=item B<--xlate-fold>
+
+=item B<--xlate-fold-width>=I<n> (Default: 70)
+
+Her eşleşen alan için çeviri sürecini başlatın.
+
+Bu seçenek olmadan, B<greple> normal bir arama komutu gibi davranır. Bu nedenle, gerçek çalışmayı başlatmadan önce dosyanın hangi bölümünün çeviri konusu olacağını kontrol edebilirsiniz.
+
+Komut sonucu standart çıktıya gider, bu nedenle gerekiyorsa dosyaya yönlendirin veya L<App::Greple::update> modülünü kullanmayı düşünün.
+
+B<--xlate> seçeneği B<--xlate-color> seçeneğini B<--color=never> seçeneğiyle çağırır.
+
+B<--xlate-fold> seçeneğiyle dönüştürülen metin belirtilen genişlikte katlanır. Varsayılan genişlik 70'tir ve B<--xlate-fold-width> seçeneğiyle ayarlanabilir. Dört sütun, çalıştırma işlemi için ayrılmıştır, bu nedenle her satır en fazla 74 karakter tutabilir.
+
+=item B<--xlate-engine>=I<engine>
+
+Kullanılacak çeviri motorunu belirtir. C<-Mxlate::deepl> gibi doğrudan motor modülünü belirtirseniz, bu seçeneği kullanmanıza gerek yoktur.
+
+Şu anda, aşağıdaki motorlar mevcuttur
+
+=over 2
+
+=item * B<deepl>: DeepL API
+
+=item * B<gpt3>: gpt-3.5-turbo
+
+=item * B<gpt4>: gpt-4-turbo
+
+=item * B<gpt4o>: gpt-4o-mini
+
+B<gpt-4o>'nun arayüzü şu anda kararlı değildir ve doğru çalışacağı garanti edilemez.
+
+=back
+
+=item B<--xlate-labor>
+
+=item B<--xlabor>
+
+Çeviri motorunu çağırmak yerine, sizin çalışmanız beklenmektedir. Çevrilecek metni hazırladıktan sonra, metin panosuna kopyalanır. Metni forma yapıştırmanız, sonucu metin panosuna kopyalamanız ve enter tuşuna basmanız beklenmektedir.
+
+=item B<--xlate-to> (Default: C<EN-US>)
+
+Hedef dilini belirtin. B<DeepL> motorunu kullanırken C<deepl languages> komutuyla mevcut dilleri alabilirsiniz.
+
+=item B<--xlate-format>=I<format> (Default: C<conflict>)
+
+Orijinal ve çevrilmiş metin için çıktı formatını belirtin.
+
+C<xtxt> dışındaki aşağıdaki formatlar, çevrilecek kısmın bir dizi satır olduğunu varsayar. Aslında, bir satırın sadece bir kısmını çevirmek mümkündür ve C<xtxt> dışındaki bir format belirtmek anlamlı sonuçlar üretmeyecektir.
+
+=over 4
+
+=item B<conflict>, B<cm>
+
+Orjinal ve çevrilmiş metin L<git(1)> çakışma işaretçisi formatında yazdırılır.
+
+    <<<<<<< ORIGINAL
+    original text
+    =======
+    translated Japanese text
+    >>>>>>> JA
+
+Orijinal dosyayı aşağıdaki L<sed(1)> komutuyla geri alabilirsiniz.
+
+    sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
+
+=item B<ifdef>
+
+Orjinal ve çevrilmiş metin L<cpp(1)> C<#ifdef> formatında yazdırılır.
+
+    #ifdef ORIGINAL
+    original text
+    #endif
+    #ifdef JA
+    translated Japanese text
+    #endif
+
+B<unifdef> komutuyla yalnızca Japonca metni alabilirsiniz:
+
+    unifdef -UORIGINAL -DJA foo.ja.pm
+
+=item B<space>
+
+Orjinal ve çevrilmiş metin tek boş satır ile ayrılmış olarak yazdırılır.
+
+=item B<xtxt>
+
+Format C<xtxt> (çevrilmiş metin) veya bilinmeyen ise, yalnızca çevrilmiş metin yazdırılır.
+
+=back
+
+=item B<--xlate-maxlen>=I<chars> (Default: 0)
+
+Aşağıdaki metni Türkçe'ye satır satır çevirin.
+
+=item B<--xlate-maxline>=I<n> (Default: 0)
+
+API'ye aynı anda gönderilecek maksimum satır sayısını belirtin.
+
+Eğer bir seferde sadece bir satır çevirmek istiyorsanız, bu değeri 1 olarak ayarlayın. Bu seçenek, C<--xlate-maxlen> seçeneğinden önceliklidir.
+
+=item B<-->[B<no->]B<xlate-progress> (Default: True)
+
+STDERR çıktısında gerçek zamanlı çeviri sonucunu görün.
+
+=item B<--match-all>
+
+Dosyanın tüm metnini hedef alan olarak ayarlayın.
+
+=back
+
+=head1 CACHE OPTIONS
+
+B<xlate> modülü, her dosyanın çeviri önbelleğini saklayabilir ve sunucuya sorma işleminin üstesinden gelmek için yürütmeden önce onu okuyabilir. Varsayılan önbellek stratejisi C<auto> ile, hedef dosya için önbellek verisi yalnızca önbellek dosyası varsa tutulur.
+
+=over 7
+
+=item --cache-clear
+
+B<--cache-clear> seçeneği, önbellek yönetimini başlatmak veya mevcut tüm önbellek verilerini yenilemek için kullanılabilir. Bu seçenekle çalıştırıldığında, bir önbellek dosyası yoksa yeni bir önbellek dosyası oluşturulur ve ardından otomatik olarak sürdürülür.
+
+=item --xlate-cache=I<strategy>
+
+=over 4
+
+=item C<auto> (Default)
+
+Önbellek dosyasını varsa koruyun.
+
+=item C<create>
+
+Boş önbellek dosyası oluşturun ve çıkın.
+
+=item C<always>, C<yes>, C<1>
+
+Hedef normal dosya olduğu sürece her durumda önbelleği sürdürün.
+
+=item C<clear>
+
+Öncelikle önbellek verilerini temizleyin.
+
+=item C<never>, C<no>, C<0>
+
+Önbellek dosyasını varsa kullanmayın.
+
+=item C<accumulate>
+
+Varsayılan davranışa göre, kullanılmayan veriler önbellek dosyasından kaldırılır. Onları kaldırmak istemezseniz ve dosyada tutmak isterseniz, C<accumulate> kullanın.
+
+=back
+
+=back
+
+=head1 COMMAND LINE INTERFACE
+
+Dağıtımda bulunan C<xlate> komutunu kullanarak bu modülü kolayca komut satırından kullanabilirsiniz. Kullanım için C<xlate> yardım bilgilerine bakın.
+
+C<xlate> komutu Docker ortamı ile birlikte çalışır, bu yüzden elinizde herhangi bir şey yüklü olmasa bile Docker mevcut olduğu sürece kullanabilirsiniz. C<-D> veya C<-C> seçeneğini kullanın.
+
+Ayrıca, çeşitli belge stilleri için makefile'lar sağlandığından, özel bir belirtim olmadan diğer dillere çeviri yapmak mümkündür. C<-M> seçeneğini kullanın.
+
+Docker ve make seçeneklerini birleştirerek make'i Docker ortamında çalıştırabilirsiniz.
+
+C<xlate -GC> gibi çalıştırırsanız, mevcut çalışma dizinine bağlı olan bir kabuk başlatılır.
+
+Ayrıntılar için L</DAHA FAZLASI> bölümündeki Japonca makaleyi okuyun.
+
+    xlate [ options ] -t lang file [ greple options ]
+	-h   help
+	-v   show version
+	-d   debug
+	-n   dry-run
+	-a   use API
+	-c   just check translation area
+	-r   refresh cache
+	-s   silent mode
+	-e # translation engine (default "deepl")
+	-p # pattern to determine translation area
+	-w # wrap line by # width
+	-o # output format (default "xtxt", or "cm", "ifdef")
+	-f # from lang (ignored)
+	-t # to lang (required, no default)
+	-m # max length per API call
+	-l # show library files (XLATE.mk, xlate.el)
+        --   terminate option parsing
+    Make options
+	-M   run make
+	-n   dry-run
+    Docker options
+	-G   mount git top-level directory
+	-B   run in non-interactive (batch) mode
+	-R   mount read-only
+	-E * specify environment variable to be inherited
+	-I * specify altanative docker image (default: tecolicom/xlate:version)
+	-D * run xlate on the container with the rest parameters
+	-C * run following command on the container, or run shell
+
+    Control Files:
+	*.LANG    translation languates
+	*.FORMAT  translation foramt (xtxt, cm, ifdef)
+	*.ENGINE  translation engine (deepl or gpt3)
+
+
+=head1 EMACS
+
+Emacs düzenleyicisinden C<xlate> komutunu kullanmak için depoda bulunan F<xlate.el> dosyasını yükleyin. C<xlate-region> işlevi verilen bölgeyi çevirir. Varsayılan dil C<EN-US>'dir ve dil belirtmek için ön ek argümanını kullanabilirsiniz.
+
+=head1 ENVIRONMENT
+
+=over 7
+
+=item DEEPL_AUTH_KEY
+
+DeepL hizmeti için kimlik doğrulama anahtarınızı ayarlayın.
+
+=item OPENAI_API_KEY
+
+OpenAI kimlik doğrulama anahtarı.
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
+=head2 TOOLS
+
+DeepL ve ChatGPT için komut satırı araçlarını yüklemeniz gerekmektedir.
+
+L<https://github.com/DeepLcom/deepl-python>
+
+L<https://github.com/tecolicom/App-gpty>
+
+=head1 SEE ALSO
+
+L<App::Greple::xlate>
+
+L<App::Greple::xlate::deepl>
+
+L<App::Greple::xlate::gpt3>
+
+L<https://hub.docker.com/r/tecolicom/xlate>
+
+=over 7
+
+=item L<https://github.com/DeepLcom/deepl-python>
+
+DeepL Python kütüphanesi ve CLI komutu.
+
+=item L<https://github.com/openai/openai-python>
+
+OpenAI Python Kütüphanesi
+
+=item L<https://github.com/tecolicom/App-gpty>
+
+OpenAI komut satırı arabirimi
+
+=item L<App::Greple>
+
+Hedef metin deseni hakkında ayrıntılar için B<greple> kılavuzuna bakın. Eşleşme alanını sınırlamak için B<--inside>, B<--outside>, B<--include>, B<--exclude> seçeneklerini kullanın.
+
+=item L<App::Greple::update>
+
+Dosyaları B<greple> komutunun sonucuna göre değiştirmek için C<-Mupdate> modülünü kullanabilirsiniz.
+
+=item L<App::sdif>
+
+B<-V> seçeneğiyle çakışma işaretçi formatını yan yana göstermek için B<sdif> kullanın.
+
+=back
+
+=head2 ARTICLES
+
+=over 2
+
+=item * L<https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250>
+
+DeepL API ile sadece gerekli kısımları çevirmek ve değiştirmek için Greple modülü (Japonca olarak)
+
+=item * L<https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6>
+
+DeepL API modülü ile 15 dilde belge oluşturma (Japonca olarak)
+
+=item * L<https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd>
+
+DeepL API ile otomatik çeviri Docker ortamı (Japonca olarak)
+
+=back
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright © 2023-2024 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -4,34 +4,10 @@ use strict;
 use warnings;
 
 use App::eachperl;
-use Getopt::Long qw( :config no_ignore_case pass_through );
 
 STDOUT->autoflush;
 
-my $SINCE_VERSION;
-my $UNTIL_VERSION;
-GetOptions(
-   'no-system-perl' => \( my $NO_SYSTEM_PERL ),
-   'no-test'        => \( my $NO_TEST ),
-   'since=s'        => \(    $SINCE_VERSION ),
-   'until=s'        => \(    $UNTIL_VERSION ),
-   'ver=s'          => sub { $SINCE_VERSION = $UNTIL_VERSION = $_[1] },
-   'only-if=s'      => \( my $ONLY_IF ),
-   'devel!'         => \( my $USE_DEVEL ),
-   'reverse|r'      => \( my $REVERSE ),
-   'stop-on-fail|s' => \( my $STOP_ON_FAIL ),
-) or exit 1;
-
-exit App::eachperl->new(
-   no_system_perl => $NO_SYSTEM_PERL || $ENV{NO_SYSTEM_PERL},
-   no_test        => $NO_TEST,
-   since_version  => $SINCE_VERSION,
-   until_version  => $UNTIL_VERSION,
-   only_if        => $ONLY_IF,
-   use_devel      => $USE_DEVEL,
-   reverse        => $REVERSE,
-   stop_on_fail   => $STOP_ON_FAIL,
-)->run( @ARGV );
+exit App::eachperl->new->run( @ARGV );
 
 __END__
 

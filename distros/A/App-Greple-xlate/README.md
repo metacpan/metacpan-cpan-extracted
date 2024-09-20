@@ -11,14 +11,14 @@ App::Greple::xlate - translation support module for greple
 
 # VERSION
 
-Version 0.3202
+Version 0.3401
 
 # DESCRIPTION
 
 **Greple** **xlate** module find desired text blocks and replace them by
 the translated text.  Currently DeepL (`deepl.pm`) and ChatGPT
 (`gpt3.pm`) module are implemented as a back-end engine.
-Experimental support for gpt-4 is also included.
+Experimental support for gpt-4 and gpt-4o are also included.
 
 If you want to translate normal text blocks in a document written in
 the Perl's pod style, use **greple** command with `xlate::deepl` and
@@ -77,6 +77,8 @@ of multiple lines of non-empty text, they are converted together into
 a single line.  This operation is performed as follows:
 
 - Remove white space at the beginning and end of each line.
+- If a line ends with a full-width punctuation character, concatenate
+with next line.
 - If a line ends with a full-width character and the next line begins
 with a full-width character, concatenate the lines.
 - If either the end or the beginning of a line is not a full-width
@@ -99,6 +101,23 @@ combining multiple lines into a single line, and use the second
 pattern for pre-formatted text.  If there is no text to match in the
 first pattern, then a pattern that does not match anything, such as
 `(?!)`.
+
+# MASKING
+
+Occasionally, there are parts of text that you do not want translated.
+For example, tags in markdown files. DeepL suggests that in such
+cases, the part of the text to be excluded be converted to XML tags,
+translated, and then restored after the translation is complete.  To
+support this, it is possible to specify the parts to be masked from
+translation.
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+This will interpret each line of the file \`MASKPATTERN\` as a regular
+expression, translate strings matching it, and revert after
+processing.  Lines beginning with `#` are ignored.
+
+This interface is experimental and subject to change in the future.
 
 # OPTIONS
 
@@ -130,6 +149,16 @@ first pattern, then a pattern that does not match anything, such as
     module directly, such as `-Mxlate::deepl`, you do not need to use
     this option.
 
+    At this time, the following engines are available
+
+    - **deepl**: DeepL API
+    - **gpt3**: gpt-3.5-turbo
+    - **gpt4**: gpt-4-turbo
+    - **gpt4o**: gpt-4o-mini
+
+        **gpt-4o**'s interface is unstable and cannot be guaranteed to work
+        correctly at the moment.
+
 - **--xlate-labor**
 - **--xlabor**
 
@@ -146,6 +175,11 @@ first pattern, then a pattern that does not match anything, such as
 - **--xlate-format**=_format_ (Default: `conflict`)
 
     Specify the output format for original and translated text.
+
+    The following formats other than `xtxt` assume that the part to be
+    translated is a collection of lines.  In fact, it is possible to
+    translate only a portion of a line, and specifying a format other than
+    `xtxt` will not produce meaningful results.
 
     - **conflict**, **cm**
 
@@ -195,6 +229,13 @@ first pattern, then a pattern that does not match anything, such as
     API (**--xlate**) and 5000 for the clipboard interface
     (**--xlate-labor**).  You may be able to change these value if you are
     using Pro service.
+
+- **--xlate-maxline**=_n_ (Default: 0)
+
+    Specify the maximum lines of text to be sent to the API at once.
+
+    Set this value to 1 if you want to translate one line at a time.  This
+    option takes precedence over the `--xlate-maxlen` option.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

@@ -26,7 +26,7 @@
               ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
                 ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                    ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.27
+                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.29
                       ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                       ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                             ⠈    ⠈⠓  ⠈
@@ -153,7 +153,18 @@ Simple debugger on the command line:
 
 Show a stack trace.
 
-    trace( $depth=1 )
+    trace( OPTIONS )
+
+OPTIONS:
+
+    -levels  => NUM,           # How many scope levels to show.
+    NUM,                       # Same.
+
+    -raw => 1,                 # Include internal calls.
+    -NUM,                      # Same.
+
+    -message => STR,           # Message to display.
+    STR,                       # Same.
 
 ### watch
 
@@ -202,6 +213,13 @@ Benchmark and compare different pieces of code.
         slow => sub{ ... },
         fast => sub{ ... },
     }, 10000;
+
+    $ perl -Me -e '$v = 333; n { concat => sub { 111 . $v }, interp => sub { "111$v" }, list => sub { 111,$v } }, 100000000'
+
+              Rate interp concat   list
+    interp  55248619/s     --    -6%   -62%
+    concat  58479532/s     6%     --   -60%
+    list   144927536/s   162%   148%     --
 
 ## Format Conversions
 
@@ -399,6 +417,22 @@ Turn string into a [Mojo::File](https://metacpan.org/pod/Mojo%3A%3AFile) object.
 
     $ perl -Me -e 'say r j f("hello.json")->slurp'
 
+## Math Help
+
+### max
+
+Get the biggest number in a list.
+
+    $ perl -Me -e 'say max 2,4,1,3'
+    4
+
+### min
+
+Get the smallest number in a list.
+
+    $ perl -Me -e 'say max 2,4,1,3'
+    1
+
 ## Output
 
 ### say
@@ -517,9 +551,13 @@ Turn a string into a [Mojo::URL](https://metacpan.org/pod/Mojo%3A%3AURL) object.
 This sector includes commands to run asynchronous
 (or pseudo-async) operations.
 
-It is not exturely clear with method to always use.
+It is not entirely clear which method to always use.
 
-Typically using threads (with `runt`) is the fastest.
+`runf` limits to number of action or 20 (whichever is smaller).
+
+`runt` and `runio` have no such limits.
+
+Typically using threads (with `runt`) seems to be fastest.
 
 Some statistics using different run commands:
 
@@ -568,6 +606,8 @@ Returns the results.
     }
 
 Takes much overhead to start up!
+
+Will use up to 20 processes.
 
 ### runio
 

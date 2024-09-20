@@ -10,11 +10,11 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für greple
 
 # VERSION
 
-Version 0.3202
+Version 0.3401
 
 # DESCRIPTION
 
-Das **Greple** **xlate** Modul findet gewünschte Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind die DeepL (`deepl.pm`) und ChatGPT (`gpt3.pm`) Module als Backend-Engine implementiert. Experimentelle Unterstützung für gpt-4 ist ebenfalls enthalten.
+Das **Greple** **xlate** Modul findet gewünschte Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind die DeepL (`deepl.pm`) und ChatGPT (`gpt3.pm`) Module als Backend-Engine implementiert. Experimentelle Unterstützung für gpt-4 und gpt-4o ist ebenfalls enthalten.
 
 Wenn Sie normale Textblöcke in einem Dokument übersetzen möchten, das im Perl-Pod-Stil geschrieben ist, verwenden Sie den **greple**-Befehl mit dem `xlate::deepl`- und `perl`-Modul wie folgt:
 
@@ -55,6 +55,7 @@ Konfliktmarker-Formatdaten können im Seit-an-Seit-Stil mit dem Befehl `sdif` un
 Die Verarbeitung erfolgt in festgelegten Einheiten, aber im Fall einer Sequenz von mehreren Zeilen mit nicht-leerem Text werden sie zusammen in eine einzige Zeile umgewandelt. Diese Operation wird wie folgt durchgeführt:
 
 - Entfernen Sie Leerzeichen am Anfang und Ende jeder Zeile.
+- Wenn eine Zeile mit einem Vollbreiten-Satzzeichen endet, verknüpfen Sie sie mit der nächsten Zeile.
 - Wenn eine Zeile mit einem Vollbreitenzeichen endet und die nächste Zeile mit einem Vollbreitenzeichen beginnt, werden die Zeilen zusammengefügt.
 - Wenn entweder das Ende oder der Anfang einer Zeile kein Vollbreitenzeichen ist, werden sie durch Einfügen eines Leerzeichens zusammengefügt.
 
@@ -65,6 +66,16 @@ Dieser Normalisierungsprozess wird nur für das erste (0.) und für gerade numme
     greple -Mxlate -E normalized -E not-normalized
 
 Verwenden Sie daher das erste Muster für Text, der verarbeitet werden soll, indem mehrere Zeilen zu einer einzigen Zeile kombiniert werden, und verwenden Sie das zweite Muster für vorformatierten Text. Wenn es keinen Text gibt, der dem ersten Muster entspricht, dann ein Muster, das nichts entspricht, wie z.B. `(?!)`.
+
+# MASKING
+
+Gelegentlich gibt es Teile von Text, die nicht übersetzt werden sollen. Zum Beispiel Tags in Markdown-Dateien. DeepL schlägt vor, dass in solchen Fällen der nicht zu übersetzende Teil in XML-Tags umgewandelt, übersetzt und dann nach Abschluss der Übersetzung wiederhergestellt wird. Um dies zu unterstützen, ist es möglich, die zu maskierenden Teile der Übersetzung anzugeben.
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+Dies wird jede Zeile der Datei \`MASKPATTERN\` als regulären Ausdruck interpretieren, Zeichenfolgen übersetzen, die ihm entsprechen, und nach der Verarbeitung zurücksetzen. Zeilen, die mit `#` beginnen, werden ignoriert.
+
+Diese Schnittstelle ist experimentell und kann sich in Zukunft ändern.
 
 # OPTIONS
 
@@ -87,6 +98,15 @@ Verwenden Sie daher das erste Muster für Text, der verarbeitet werden soll, ind
 
     Spezifiziert die zu verwendende Übersetzungs-Engine. Wenn Sie das Engine-Modul direkt angeben, z.B. `-Mxlate::deepl`, müssen Sie diese Option nicht verwenden.
 
+    Zu diesem Zeitpunkt stehen folgende Engines zur Verfügung:
+
+    - **deepl**: DeepL API
+    - **gpt3**: gpt-3.5-turbo
+    - **gpt4**: gpt-4-turbo
+    - **gpt4o**: gpt-4o-mini
+
+        Die Schnittstelle von **gpt-4o** ist instabil und kann momentan nicht garantiert korrekt funktionieren.
+
 - **--xlate-labor**
 - **--xlabor**
 
@@ -99,6 +119,8 @@ Verwenden Sie daher das erste Muster für Text, der verarbeitet werden soll, ind
 - **--xlate-format**=_format_ (Default: `conflict`)
 
     Geben Sie das Ausgabeformat für den ursprünglichen und übersetzten Text an.
+
+    Die folgenden Formate außer `xtxt` gehen davon aus, dass der zu übersetzende Teil eine Sammlung von Zeilen ist. Tatsächlich ist es möglich, nur einen Teil einer Zeile zu übersetzen, und die Angabe eines Formats außer `xtxt` wird keine sinnvollen Ergebnisse liefern.
 
     - **conflict**, **cm**
 
@@ -140,6 +162,12 @@ Verwenden Sie daher das erste Muster für Text, der verarbeitet werden soll, ind
 - **--xlate-maxlen**=_chars_ (Default: 0)
 
     Übersetzen Sie den folgenden Text Zeile für Zeile ins Deutsche.
+
+- **--xlate-maxline**=_n_ (Default: 0)
+
+    Legen Sie die maximale Anzahl von Textzeilen fest, die gleichzeitig an die API gesendet werden sollen.
+
+    Setzen Sie diesen Wert auf 1, wenn Sie jeweils eine Zeile übersetzen möchten. Diese Option hat Vorrang vor der Option `--xlate-maxlen`.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

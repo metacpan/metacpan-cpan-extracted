@@ -21,15 +21,16 @@ define pod <<"=cut"
 	-c   just check translation area
 	-r   refresh cache
 	-s   silent mode
-	-e # translation engine (default "deepl")
+	-e # translation engine (*deepl, gpt3, gpt4, gpt4o)
 	-p # pattern to determine translation area
 	-w # wrap line by # width
-	-o # output format (default "xtxt", or "cm", "ifdef")
+	-o # output format (*xtxt, cm, ifdef)
 	-f # from lang (ignored)
 	-t # to lang (required, no default)
 	-m # max length per API call
 	-l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
+        N.B. default is maked as *
 
     Make options
 	-M   run make
@@ -52,13 +53,13 @@ define pod <<"=cut"
     Control Files:
 	*.LANG    translation languates
 	*.FORMAT  translation foramt (xtxt, cm, ifdef)
-	*.ENGINE  translation engine (deepl or gpt3)
+	*.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 #	marked as # options are experimental
 
 =head1 VERSION
 
-    Version 0.3202
+    Version 0.3401
 
 =cut
 

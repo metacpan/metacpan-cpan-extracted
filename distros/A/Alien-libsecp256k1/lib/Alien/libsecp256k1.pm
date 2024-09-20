@@ -1,5 +1,5 @@
 package Alien::libsecp256k1;
-$Alien::libsecp256k1::VERSION = '0.050100';
+$Alien::libsecp256k1::VERSION = '0.050102';
 use v5.10;
 use strict;
 use warnings;
@@ -25,6 +25,13 @@ L<libsecp256k1|https://github.com/bitcoin-core/secp256k1>.
 
 The module installs the library version C<0.5.1>. It may be updated to install
 new versions when they become available.
+
+=head2 Testing
+
+This alien skips building or running libsecp256k1 tests by default because it
+requires much more time than building the library alone. To run them manually,
+environmental variable C<ALIEN_LIBSECP256K1_RUN_TESTS> must be set to true
+value during module install.
 
 =head1 SEE ALSO
 

@@ -5,7 +5,7 @@ package RT::Extension::Import::CSV;
 use Text::CSV_XS;
 use Test::MockTime 'restore_time';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our( $CurrentRow, $CurrentLine, $UniqueFields );
 
@@ -250,7 +250,7 @@ sub _run_transactions {
             elsif ($fieldname =~ /^(Created)$/) {
                 my $date = RT::Date->new( RT->SystemUser );
                 my $value = $class->get_value( $field2csv->{'Created'}, $item );
-                $date->Set( Format => 'iso', Value => $value );
+                $date->Set( Format => 'unknown', Value => $value );
 
                 ( my $ok, $msg ) = $txn_object->__Set( Field => 'Created', Value => $date->ISO );
                 $RT::Logger->error( "Failed to set Created on transaction: $msg" ) unless $ok;
@@ -410,7 +410,7 @@ sub _run_tickets {
         local $CurrentLine = $item->{_line};
         $RT::Logger->debug( "Start processing" );
         next unless grep { defined $_ && /\S/ } values %{ { %$item, _line => undef } };
-    
+
         my $tickets = RT::Tickets->new( $args{CurrentUser} );
 
         # Exclude statuses configured within ExcludeStatusesOnSearch from the loaded tickets
@@ -421,7 +421,7 @@ sub _run_tickets {
         if ( scalar @excluded_statuses ) {
             foreach my $status ( @excluded_statuses ) {
                 unless ( $default_queue->LifecycleObj->IsValid( lc($status) ) ) {
-                    $RT::Logger->warning( "Status '$status' is not valid. Tickets match will not exclude '$status'" );
+                    $RT::Logger->warning( "Status '$status' is not valid. Tickets matching '$status' will not be excluded" );
                     next;
                 }
 
@@ -496,10 +496,10 @@ sub _run_tickets {
                 $ticket = $tickets->First;
                 my $ticket_id = $ticket->Id;
                 if ( RT->Config->Get('TicketsImportTicketIdField') ) {
-                    $RT::Logger->debug( "Found existing ticket($ticket_id)" );
+                    $RT::Logger->debug( "Found existing ticket ($ticket_id)" );
                 }
                 else {
-                    $RT::Logger->debug( "Found existing ticket($ticket_id) for CFs. $unique_fields" );
+                    $RT::Logger->debug( "Found existing ticket ($ticket_id) for CFs. $unique_fields" );
                 }
             }
 
@@ -892,7 +892,7 @@ sub _run_tickets {
             my $created_date = delete $args{Created};
             if ( $created_date ) {
                 my $date = RT::Date->new( RT->SystemUser );
-                $date->Set( Format => 'iso', Value => $created_date );
+                $date->Set( Format => 'unknown', Value => $created_date );
                 if ( !$date->Unix ) {
                     if ($force) {
                         RT->Logger->error("Created date '$created_date' is not valid, creating without it");
@@ -928,7 +928,7 @@ sub _run_tickets {
 
             if ( $created_date ) {
                 my $date = RT::Date->new( RT->SystemUser );
-                $date->Set( Format => 'iso', Value => $created_date );
+                $date->Set( Format => 'unknown', Value => $created_date );
                 ( $ok, $msg ) = $ticket->__Set( Field => 'Created', Value => $date->ISO );
                 $RT::Logger->error("Failed to set Created on ticket: $msg") unless $ok;
 
@@ -1037,7 +1037,7 @@ sub set_fixed_time {
     my $class = shift;
     my $value = shift;
     my $date  = RT::Date->new( RT->SystemUser );
-    $date->Set( Format => 'iso', Value => $value );
+    $date->Set( Format => 'unknown', Value => $value );
     if ( $date->Unix > 0 ) {
         Test::MockTime::set_fixed_time( $date->Unix );
     }
@@ -1437,12 +1437,15 @@ When importing tickets, the importer will automatically populate Created
 for you, provided there isn't a column in the source data already
 mapped to it. Other date fields must be provided in the source data.
 
-The importer expects incoming date values to conform to L<ISO|https://en.wikipedia.org/wiki/ISO_8601>
-datetime format (yyyy-mm-dd hh:mm::ss and other accepted variants). If
-your source data can't produce this formatting, Perl can help you out.
+The importer does a fairly good job at guessing the source datetime
+format; if the source datetime format can't be parsed, Perl can help you
+out.
 
-For example, if the source data has dates in C<YYYY-MM-DD> format, we
-can write a function to append a default time to produce an ISO-formatted
+If you have to munge dates, we recommend converting them to the
+L<ISO|https://en.wikipedia.org/wiki/ISO_8601> datetime format
+(yyyy-mm-dd hh:mm::ss and other accepted variants). For example,
+if the source data has dates in C<YYYY-MM-DD> format, we can write
+a function to append a default time to produce an ISO-formatted
 result:
 
     Set( %TicketsImportFieldMapping,
@@ -1491,7 +1494,7 @@ etc. To pass custom options to the parser, use the following config:
         escape_char => '`',
     ) );
 
-Available options are described in the documentation for L<Text::CSV_XS/"new"|Text::CSV_XS>.
+Available options are described in the documentation for L<Text::CSV_XS|Text::CSV_XS/"new">.
 
 =head2 Special Columns
 
@@ -1515,7 +1518,7 @@ To add a comment or correspond (reply) to a ticket, you can map a CSV column
 to "Comment" or "Correspond". When creating a ticket (--insert) you can use
 either one and the content will be added to the Create transaction.
 
-For more information, see the section for L</"IMPORTING TRANSACTIONS"|importing transations>.
+For more information, see the section for L<importing transations|/"IMPORTING TRANSACTIONS">.
 
 =back
 
@@ -1757,7 +1760,7 @@ Then run the following:
         --insert \
         users.csv
 
-=item Importing articles
+=head2 Importing articles
 
 An example knowledge management system contains articles your organization
 would like to include on RT tickets. The export is delivered as such:
@@ -1791,6 +1794,90 @@ You need to add C<--article-class> when running the import:
         --config ArticleImport.pm \
         --insert \
         articles.csv
+
+=head2 Putting it all together: migrating from Zendesk
+
+It's possible to migrate from Zendesk to Request Tracker using multiple
+imports defined above. Starting with a Zendesk trial site as a basis, the
+following steps are necessary before a migration can begin:
+
+=over
+
+=item Users must be exported via API
+
+Unfortunately, Zendesk only provides an export for what RT considers to
+be privileged users. To get all users, you'll need to access Zendesk's
+API. See L<this forum post|https://support.zendesk.com/hc/en-us/articles/4408882924570/comments/6460643115162> for more information.
+
+=item Tickets must be exported to CSV
+
+Any of the default lists of tickets in Zendesk can be exported to CSV.
+See the Zendesk documentation for more information.
+
+=back
+
+Exporting user information via the Zendesk API includes a bunch of
+unnecessary values. For this import, the only columns that matter are
+C<name> and C<email>.
+
+Create a new file called F<ZendeskUsers.pm>:
+
+    Set( %UsersImportFieldMapping,
+        'Name'            => 'name',
+        'RealName'        => 'name',
+        'EmailAddress'    => 'email',
+    );
+
+    Set( %CSVOptions, (
+       sep_char    => ',',
+       quote_char  => '"',
+       escape_char => '',
+    ) );
+
+Assuming the user export above produced a file named F<zendesk_users.csv>,
+run the import:
+
+    /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+        --type user \
+        --config ZendeskUsers.pm \
+        --insert \
+        zendesk_users.csv
+
+For tickets, create F<ZendeskTickets.pm> using the following
+configuration:
+
+    Set($TicketsImportTicketIdField, 'ID');
+
+    Set( %TicketsImportFieldMapping,
+        'Queue'          => \'General',
+        'Status'         => 'Status',
+        'Subject'        => 'Subject',
+        'Requestor'      => 'Requester',
+        'Created'        => 'Requested',
+        'LastUpdated'    => 'Updated',
+        'CF.Ticket Type' => 'Topic',
+        'CF.Channel'     => 'Channel',
+    );
+
+    Set( %CSVOptions, (
+       sep_char    => ',',
+       quote_char  => '"',
+       escape_char => '',
+    ) );
+
+(you'll need to create two ticket custom fields: Ticket Type and Channel)
+
+If tickets were exported to a file named F<zendesk_tickets.csv>, the
+following command will import tickets into your RT instance:
+
+    /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+        --type ticket \
+        --config ZendeskTickets.pm \
+        --insert-update \
+        zendesk_tickets.csv
+
+For a production instance of Zendesk, you'll need to adjust the columns
+in the ticket import configuration to match your configuration.
 
 =head1 AUTHOR
 

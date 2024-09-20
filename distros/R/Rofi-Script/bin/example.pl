@@ -33,7 +33,9 @@ SWITCH: for (rofi->shift_arg) {
     /Show row options example/ && do {
       rofi
         ->set_prompt("row options")
-        ->set_message('The first row is nonselectable. The second has invisible search terms. Type "foobar" and it will be selected')
+        ->set_message(
+          'The first row is nonselectable. The second has invisible search terms. Type "foobar" and it will be selected'
+        )
         ->add_option(
           "This is nonselectable", (
             nonselectable => 1,

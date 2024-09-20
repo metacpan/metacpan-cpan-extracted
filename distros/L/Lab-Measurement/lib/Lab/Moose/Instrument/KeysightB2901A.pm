@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::KeysightB2901A;
-$Lab::Moose::Instrument::KeysightB2901A::VERSION = '3.904';
+$Lab::Moose::Instrument::KeysightB2901A::VERSION = '3.910';
 #ABSTRACT: Agilent/Keysight B2901A voltage/current sourcemeter.
 
 use v5.20;
@@ -82,6 +82,14 @@ sub set_level {
         value => { isa => 'Num' },
     );
 
+
+    # Make sure that source is not out of range
+    # The instrument does not complain in any way the value is outside the range
+    my $range = $self->cached_source_range();
+    if (abs($value) > $range * 1.00001) {
+        croak "Source level $value is beyond the current source range $range";
+    }
+    
     return $self->linear_step_sweep(
         to => $value, verbose => $self->verbose,
         %args
@@ -158,7 +166,7 @@ Lab::Moose::Instrument::KeysightB2901A - Agilent/Keysight B2901A voltage/current
 
 =head1 VERSION
 
-version 3.904
+version 3.910
 
 =head1 SYNOPSIS
 
@@ -279,6 +287,7 @@ For XPRESS voltage sweep. Equivalent to C<< set_level(value => $value) >>.
 This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2018-2019  Simon Reinhardt
+            2024       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -33,7 +33,7 @@ use feature qw( say );
 use parent  qw( Exporter );
 use subs    qw( uniq );
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 our @EXPORT  = qw( run repl d dd np p );
 our %PEEKS;
 
@@ -1382,7 +1382,9 @@ sub _restore_history {
             warn "$@\n";
             return;
         }
-        @history = @{$all->{history}};
+        $all //= {};
+        say $self->{history_file};
+        @history = @{$all->{history} //= [] };
     }
 
     @history = ( "q" ) if not @history;    # avoid blank history.

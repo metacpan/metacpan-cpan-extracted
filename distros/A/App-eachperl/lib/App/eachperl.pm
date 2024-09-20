@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package App::eachperl 0.10;
+package App::eachperl 0.11;
 class App::eachperl;
 
 use Object::Pad::FieldAttr::Checked 0.04;
@@ -16,7 +16,7 @@ use Data::Checks 0.08 qw( Str Maybe );
 use Config::Tiny;
 use Syntax::Keyword::Dynamically;
 
-use Commandable::Finder::MethodAttributes ':attrs';
+use Commandable::Finder::MethodAttributes 0.13 ':attrs';
 use Commandable::Invocation;
 
 use IO::Term::Status;
@@ -60,21 +60,25 @@ For more detail see the manpage for the eachperl(1) script.
 
 =cut
 
+my $VersionString_re;
 my $VersionString;
 BEGIN {
-   $VersionString = Data::Checks::StrMatch qr/^v?\d+(?:\.\d+)*$/;
+   $VersionString = Data::Checks::StrMatch
+      $VersionString_re = qr/^v?\d+(?:\.\d+)*$/;
 }
+
+field $_finder;
 
 field $_perls;
 field $_install_no_system :param                                = undef;
-field $_no_system_perl    :param;
-field $_no_test           :param;
-field $_since_version     :param :Checked(Maybe $VersionString);
-field $_until_version     :param :Checked(Maybe $VersionString);
-field $_use_devel         :param;
-field $_only_if           :param :Checked(Maybe Str);
-field $_reverse           :param;
-field $_stop_on_fail      :param;
+field $_no_system_perl = !!$ENV{NO_SYSTEM_PERL};
+field $_no_test;
+field $_since_version;
+field $_until_version;
+field $_use_devel;
+field $_only_if;
+field $_reverse;
+field $_stop_on_fail;
 
 field $_io_term = IO::Term::Status->new_for_stdout;
 
@@ -92,9 +96,34 @@ field @_perlobjs;
 
 ADJUST
 {
+   $_finder = Commandable::Finder::MethodAttributes->new( object => $self );
+
+   $_finder->add_global_options(
+      { name => "no-system-perl", into => \$_no_system_perl,
+         description => "Deselects the system perl version" },
+      { name => "no-test", into => \$_no_test,
+         description => "Skips the 'test' step when building a local distribution" },
+      { name => "since=", into => \$_since_version,
+         matches => $VersionString_re, match_msg => "a version string",
+         description => "Selects only perl versions that are at least as new as the requested version" },
+      { name => "until=", into => \$_until_version,
+         matches => $VersionString_re, match_msg => "a version string",
+         description => "Selects only perl versions that are at least as old as the requested version" },
+      { name => "version|v=", into => sub { $_since_version = $_until_version = $_[1] },
+         matches => $VersionString_re, match_msg => "a version string",
+         description => "Selects only the given perl version" },
+      { name => "devel", into => \$_use_devel, mode => "bool",
+         description => "Select only perl versions that are (or are not) development versions" },
+      { name => "only-if=", into => \$_only_if,
+         description => "Select only perl versions where this expression returns true" },
+      { name => "reverse|r", into => \$_reverse,
+         description => "Reverses the order in which perl versions are invoked" },
+      { name => "stop-on-fail|s", into => \$_stop_on_fail,
+         description => "Stops running after the first failure" },
+   );
+
    $self->maybe_apply_config( "./.eachperlrc" );
    $self->maybe_apply_config( "$ENV{HOME}/.eachperlrc" );
-   $self->postprocess_config;
 }
 
 method maybe_apply_config ( $path )
@@ -177,12 +206,17 @@ method perls ()
 
 method run ( @argv )
 {
-   if( $argv[0] =~ m/^-/ ) {
-      unshift @argv, "exec";
+   my $cinv = Commandable::Invocation->new_from_tokens( @argv );
+
+   $_finder->handle_global_options( $cinv );
+
+   $self->postprocess_config;
+
+   if( $cinv->peek_remaining =~ m/^-/ ) {
+      $cinv->putback_tokens( "exec" );
    }
 
-   return Commandable::Finder::MethodAttributes->new( object => $self )
-      ->find_and_invoke( Commandable::Invocation->new_from_tokens( @argv ) );
+   return $_finder->find_and_invoke( $cinv );
 }
 
 method command_list

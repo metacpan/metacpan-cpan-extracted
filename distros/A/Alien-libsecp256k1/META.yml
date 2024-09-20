@@ -10,6 +10,7 @@ build_requires:
 configure_requires:
   Alien::Build: '1.19'
   Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Build::CMake: '0.99'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
@@ -19,18 +20,18 @@ meta-spec:
   version: '1.4'
 name: Alien-libsecp256k1
 requires:
-  Alien::Autotools: '0'
+  Alien::cmake3: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/Perl-Bitcoin/Alien-libsecp256k1/issues
   repository: git://github.com/Perl-Bitcoin/Alien-libsecp256k1.git
-version: '0.050100'
+version: '0.050102'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
-      Alien::Autotools: '0'
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      Alien::cmake3: '0.02'
       Archive::Tar: '0'
       Config: '0'
       HTTP::Tiny: '0.044'

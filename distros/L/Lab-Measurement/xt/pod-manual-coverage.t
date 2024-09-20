@@ -39,10 +39,11 @@ my %source_files = map {
     ( $file => $_ );
 } @source_files;
 
-# The following legacy modules are not required in the manual
+# The following modules are not required in the manual
 my @whitelist = qw/
     Lab::Measurement::Manual
     Lab::Moose::Connection::VISA_GPIB
+    Lab::Moose::Instrument::AttoCube_AMC
     Lab::Moose::Instrument::OI_IPS::Strunk_3He
     Lab::Moose::Sweep::DataFile
     /;

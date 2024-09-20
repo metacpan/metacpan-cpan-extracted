@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.27
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.29
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.27';
+our $VERSION = '1.29';
 
 =head1 SYNOPSIS
 
@@ -171,7 +171,18 @@ Simple debugger on the command line:
 
 Show a stack trace.
 
-    trace( $depth=1 )
+    trace( OPTIONS )
+
+OPTIONS:
+
+    -levels  => NUM,           # How many scope levels to show.
+    NUM,                       # Same.
+
+    -raw => 1,                 # Include internal calls.
+    -NUM,                      # Same.
+
+    -message => STR,           # Message to display.
+    STR,                       # Same.
 
 =head3 watch
 
@@ -220,6 +231,13 @@ Benchmark and compare different pieces of code.
         slow => sub{ ... },
         fast => sub{ ... },
     }, 10000;
+
+    $ perl -Me -e '$v = 333; n { concat => sub { 111 . $v }, interp => sub { "111$v" }, list => sub { 111,$v } }, 100000000'
+
+              Rate interp concat   list
+    interp  55248619/s     --    -6%   -62%
+    concat  58479532/s     6%     --   -60%
+    list   144927536/s   162%   148%     --
 
 =cut
 
@@ -427,6 +445,24 @@ Turn string into a L<Mojo::File> object.
 
 =cut
 
+=head2 Math Help
+
+=head3 max
+
+Get the biggest number in a list.
+
+    $ perl -Me -e 'say max 2,4,1,3'
+    4
+
+=head3 min
+
+Get the smallest number in a list.
+
+    $ perl -Me -e 'say max 2,4,1,3'
+    1
+
+=cut
+
 =head2 Output
 
 =head3 say
@@ -549,9 +585,13 @@ Turn a string into a L<Mojo::URL> object.
 This sector includes commands to run asynchronous
 (or pseudo-async) operations.
 
-It is not exturely clear with method to always use.
+It is not entirely clear which method to always use.
 
-Typically using threads (with C<runt>) is the fastest.
+C<runf> limits to number of action or 20 (whichever is smaller).
+
+C<runt> and C<runio> have no such limits.
+
+Typically using threads (with C<runt>) seems to be fastest.
 
 Some statistics using different run commands:
 
@@ -600,6 +640,8 @@ Returns the results.
     }
 
 Takes much overhead to start up!
+
+Will use up to 20 processes.
 
 =head3 runio
 
@@ -914,6 +956,26 @@ sub import {
         },
 
         ######################################
+        #            Math Help
+        ######################################
+
+        max => sub {
+            if ( !$imported{$caller}{"List::Util"}++ ) {
+                require List::Util;
+            }
+
+            List::Util::max( @_ );
+        },
+
+        min => sub {
+            if ( !$imported{$caller}{"List::Util"}++ ) {
+                require List::Util;
+            }
+
+            List::Util::min( @_ );
+        },
+
+        ######################################
         #             Output
         ######################################
 
@@ -1072,7 +1134,9 @@ sub import {
                 require Parallel::ForkManager;
             }
 
-            my $pm = Parallel::ForkManager->new( ~~ @_ );
+            my $MAX_PROCESSES = 20;
+            my $processes     = ( @_ > $MAX_PROCESSES ) ? $MAX_PROCESSES : @_;
+            my $pm            = Parallel::ForkManager->new( $processes );
             my @res;
 
             $pm->run_on_finish(

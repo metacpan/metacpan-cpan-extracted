@@ -58,6 +58,7 @@ sub gather_method_data ($paths) {
             my $method_name = $operation->{operationId};
             my $summary     = $operation->{summary} || 'No summary provided';
             $summary = format_string($summary);
+            chomp($summary);
             my $parameters = $operation->{parameters} // [];
             foreach my $parameter ( $parameters->@* ) {
                 $parameter->{description} = format_string( $parameter->{description} );
@@ -235,8 +236,16 @@ sub format_string ($string) {
     # though the docs are on a different domain
     my $root_url = 'https://platform.openai.com';
     $string =~ s{\((/docs[^)]+)\)}{($root_url$1)}g;
-    my $m2p = Markdown::Pod->new;
-    return wrap( '', '', $m2p->markdown_to_pod( markdown => $string ) );
+
+    my $result = eval {
+        my $m2p = Markdown::Pod->new;
+        $string = wrap( '', '', $m2p->markdown_to_pod( markdown => $string ) );
+        1;
+    } or do {
+        my $error = $@ || 'Zombie error';
+        warn "Error converting markdown to POD: $error";
+    };
+    return $string;
 }
 
 sub preprocess_openapi ($openapi) {

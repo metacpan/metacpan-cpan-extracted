@@ -1,6 +1,12 @@
 Revision history for Runtime-Debugger
 
 =================
+1.04 - 2024-09-20
+=================
+
+Fixed bug with having an empty history file.
+
+=================
 1.03 - 2024-06-11
 =================
 

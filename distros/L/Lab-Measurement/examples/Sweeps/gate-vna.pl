@@ -96,7 +96,7 @@ gate-vna.pl - Gate voltage sweep with VNA spectrum at each point
 
 =head1 VERSION
 
-version 3.904
+version 3.910
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -10,7 +10,7 @@ use Alien::libsecp256k1;
 alien_ok 'Alien::libsecp256k1';
 
 xs_ok do { local $/; <DATA> }, with_subtest {
-	Secp256k1Test::secp256k1_selftest();
+	Secp256k1Test::do_selftest();
 	pass;    # selftest should abort the program if it fails
 };
 
@@ -24,5 +24,8 @@ __DATA__
 
 MODULE = Secp256k1Test PACKAGE = Secp256k1Test
 
-void secp256k1_selftest()
+void
+do_selftest()
+	CODE:
+		secp256k1_selftest();
 

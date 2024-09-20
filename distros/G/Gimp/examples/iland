@@ -1,10 +1,7 @@
 #!/usr/bin/perl -w
 
-# 02/06/2001
-# V1.0
-#        -The stuff works but it's still slow.
-#	  Problem resides in the brutal m/slice.
-#	  I hope to find out some artifact to use PDL more efficiently for this "non-matrix" algorithm.
+# 11/09/2024
+# V1.01
 
 use Gimp;
 use Gimp::Fu;
@@ -31,47 +28,35 @@ podregister {
   my $dest = Gimp::PixelRgn->new($newdrawable, 0, 0, $width, $height, 1, 1);
   my $srcdata = $src->get_rect($drawable->bounds);
   my $destdata = $srcdata->zeroes;
+  $destdata->slice(3) .= 255 if $alpha;
+  my $quant = ($srcdata->slice("($component)")->max / $delta)->floor->sclr;
+  goto FINISH if $quant <= 0; # nothing to do
+  my $destmv = $destdata->mv(0,-1); # x y rgb
   Gimp::Progress->init("Rendering...");
   my $relord = $width / 255;
   $newdrawable->fill(FILL_FOREGROUND);
   $delta = 1 if $delta < 1;
-  for (my $y = 0; $y < $height; $y++){
-    my $row = $srcdata->slice('', '', "($y)");
-    my $drow = $destdata->slice('', '', "($y)");
-    my $red = $row->slice("($component)");
-    my $dred = $drow->slice("(0)");
-    my $dgreen = $drow->slice("(1)");
-    my $dblue = $drow->slice("(2)");
-    $drow->slice(3) .= 255 if $alpha;
-    for (my $x = 0; $x < $width; $x++) {
-      my $r = at($red, $x);
-      next if $r <= $floor;
-      my $remain = $r;
-      my $currentx = $width - $r * $relord + ($x / $elevation);
-      #Apply elevation following the x offset in original picture
-      while ($remain > 0 && $currentx < $width) {
-	if ($remain > 150) {
-	  set ($dred, $currentx, 0);
-	  set ($dgreen, $currentx, $remain);
-	  set ($dblue, $currentx, $remain);
-	}
-	if ($remain < 150 && $remain > 50) {
-	  set ($dred, $currentx, 0);
-	  set ($dgreen, $currentx, $remain + 55);
-	  set ($dblue, $currentx, 0);
-	}
-	if ($remain < 50) {
-	  set ($dred, $currentx, 0);
-	  set ($dgreen, $currentx, 0);
-	  set ($dblue, $currentx, $remain + 200);
-	}
-	$remain -= $delta;
-	$currentx++;
-      }
-    }
-    Gimp::Progress->update($y / $height);
+  for my $x (0..$width-1) {
+    my $col = $srcdata->slice("($component),($x)");
+    my $exceed_floor = ($col > $floor);
+    my $r = $col->where($exceed_floor); # nvals
+    my $destx = ($width - $r * $relord + ($x / $elevation))->long; # nvals
+    #Apply elevation following the x offset in original picture
+    my $remain_s = zeroes(long, 3, $quant, $r->dim(0)); # xyr quant nvals
+    my $yslice = $remain_s->slice("(1)") .= $exceed_floor->which->dummy(0); # quant nvals
+    my $xslice = $remain_s->slice("(0)") .= $yslice->xvals + $destx->dummy(0); # quant nvals
+    my $rslice = $remain_s->slice("(2)") .= $yslice->xlinvals(0,-1) * $quant*$delta + $r->dummy(0); # quant nvals
+    $rslice->whereND($xslice >= $width) .= -1;
+    my $gt150_ind = whichND($rslice > 150);
+    my $btwn_ind = whichND(($rslice <= 150) & ($rslice >= 50));
+    my $lt50_ind = whichND(($rslice < 50) & ($rslice > 0));
+    $destmv->slice(',,1:2')->indexND(cat(map $_->indexND($gt150_ind), $xslice, $yslice)->mv(-1,0)) .= $rslice->indexND($gt150_ind) if $gt150_ind->nelem;
+    $destmv->slice(',,1')->indexND(cat(map $_->indexND($btwn_ind), $xslice, $yslice)->mv(-1,0)) .= $rslice->indexND($btwn_ind) + 55 if $btwn_ind->nelem;
+    $destmv->slice(',,2')->indexND(cat(map $_->indexND($lt50_ind), $xslice, $yslice)->mv(-1,0)) .= $rslice->indexND($lt50_ind) + 200 if $lt50_ind->nelem;
+    Gimp::Progress->update($x / $width);
   }
   Gimp::Progress->update(1);
+FINISH:
   $dest->set_rect($destdata, 0, 0);
 #  die "merge_shadow failed for $newdrawable\n" unless
     $newdrawable->merge_shadow(TRUE); # returns false but works and is needed
