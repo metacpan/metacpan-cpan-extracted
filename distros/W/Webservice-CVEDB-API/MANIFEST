@@ -8,5 +8,6 @@ README
 changes
 dist.ini
 lib/Webservice/CVEDB/API.pm
+readme.md
 t/01-basic.t
 t/release-kwalitee.t

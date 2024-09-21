@@ -4,7 +4,7 @@ use GraphViz;
 use IO::File;
 
 package Class::Prototyped::Mirror;
-$Class::Prototyped::Mirror::VERSION = '1.13';
+$Class::Prototyped::Mirror::VERSION = '1.15';
 
 my %graphOpts = (
 	R => 1,        # H or V orientation

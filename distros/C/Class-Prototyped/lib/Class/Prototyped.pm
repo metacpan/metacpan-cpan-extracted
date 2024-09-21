@@ -4,7 +4,7 @@
 #
 # Author: Ned Konz and Toby Ovod-Everett
 #############################################################################
-# Copyright 2001-2004 Ned Konz and Toby Ovod-Everett.  All rights reserved.
+# Copyright 2001-2024 Ned Konz and Toby Ovod-Everett.  All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
@@ -24,7 +24,7 @@ package Class::Prototyped;
 use strict;
 use Carp();
 
-$Class::Prototyped::VERSION = '1.13';
+$Class::Prototyped::VERSION = '1.15';
 
 sub import {
 	while (my $symbol = shift) {
@@ -245,7 +245,7 @@ $Class::Prototyped::Mirror::ending = 0;
 sub END { $Class::Prototyped::Mirror::ending = 1 }
 
 package Class::Prototyped::Tied;
-$Class::Prototyped::Tied::VERSION = '1.13';
+$Class::Prototyped::Tied::VERSION = '1.15';
 @Class::Prototyped::Tied::DONT_LIE_FOR = qw(Data::Dumper);
 
 sub TIEHASH {
@@ -311,7 +311,7 @@ sub package {
 
 #### Default Tied implementation
 package Class::Prototyped::Tied::Default;
-$Class::Prototyped::Tied::Default::VERSION = '1.13';
+$Class::Prototyped::Tied::Default::VERSION = '1.15';
 @Class::Prototyped::Tied::Default::ISA = qw(Class::Prototyped::Tied);
 
 sub STORE {
@@ -361,7 +361,7 @@ sub DELETE {
 
 #### AutoVivifying Tied implementation
 package Class::Prototyped::Tied::AutoVivify;
-$Class::Prototyped::Tied::AutoVivify::VERSION = '1.13';
+$Class::Prototyped::Tied::AutoVivify::VERSION = '1.15';
 @Class::Prototyped::Tied::AutoVivify::ISA = qw(Class::Prototyped::Tied);
 
 sub STORE {
@@ -458,9 +458,9 @@ sub DELETE {
 # of an object is done through a reflector.
 
 package Class::Prototyped::Mirror;
-$Class::Prototyped::Mirror::VERSION = '1.13';
-$Class::Prototyped::Mirror::PROFILE::VERSION = '1.13';
-$Class::Prototyped::Mirror::SUPER::VERSION = '1.13';
+$Class::Prototyped::Mirror::VERSION = '1.15';
+$Class::Prototyped::Mirror::PROFILE::VERSION = '1.15';
+$Class::Prototyped::Mirror::SUPER::VERSION = '1.15';
 
 sub new {
 	my $class = shift;
@@ -518,7 +518,7 @@ sub new {
 #is blessed into a C::P class.
 
 package Class::Prototyped::Mirror::Normal;
-$Class::Prototyped::Mirror::Normal::VERSION = '1.13';
+$Class::Prototyped::Mirror::Normal::VERSION = '1.15';
 @Class::Prototyped::Mirror::Normal::ISA = qw(Class::Prototyped::Mirror);
 
 sub new {
@@ -2321,7 +2321,7 @@ slots. The slot definition is the same as in B<new()>.
       sub1 => sub { print "this is sub1 in p2" },
   );
 
-It calls C<newCore> to create the new object*, so if you have overriden C<new>, 
+It calls C<newCore> to create the new object*, so if you have overridden C<new>, 
 you should contemplate overriding C<clone> in order to ensure that behavioral 
 changes made to C<new> that would be applicable to C<clone> are implemented.  Or 
 simply override C<newCore>.

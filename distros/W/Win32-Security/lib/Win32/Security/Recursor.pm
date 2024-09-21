@@ -5,7 +5,7 @@
 # Author: Toby Ovod-Everett
 #
 #############################################################################
-# Copyright 2003, 2004 Toby Ovod-Everett.  All rights reserved
+# Copyright 2003-2024 Toby Ovod-Everett.  All rights reserved
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
@@ -105,7 +105,7 @@ determining whether a node is a container, etc.
 
 =cut
 
-use Class::Prototyped '0.98';
+use Class::Prototyped 0.98;
 use Win32::File;
 use Win32::Security::NamedObject;
 
@@ -117,6 +117,7 @@ BEGIN {
 	package Win32::Security::Recursor; #Added to ensure presence in META.yml
 }
 
+$Win32::Security::Recursor::VERSION = '0.60';
 
 =head1 Method Reference
 
@@ -327,12 +328,27 @@ Win32::Security::Recursor->reflect->addSlots(
 		my(@retval, $rootnode);
 		while (@requests) {
 			my($node, $infobj) = splice(@requests, 0, 2);
+
 			unless (ref($node) eq 'HASH') {
 				$rootnode ||= $self->nodes()->[-1];
 				$node = $node eq 'node' ? $rootnode :
 								$node eq 'parent' ? $rootnode->{parent} :
 								die "node_getinfo can't get data for '$node'";
 			}
+
+			my $SecurityInfo =
+				join('|', map {
+							$_ eq 'dacl' ? 'DACL_SECURITY_INFORMATION' :
+							$_ =~ /^owner(?:Sid|Trustee)$/ ? 'OWNER_SECURITY_INFORMATION' :
+							()
+						}
+						(ref($infobj) eq 'ARRAY' ? @$infobj : $infobj)
+					);
+
+			if ($SecurityInfo) {
+				$self->node_getSecurityInfo($node, $SecurityInfo);
+			}
+
 			foreach my $info (ref($infobj) eq 'ARRAY' ? @$infobj : $infobj) {
 				if (defined $node) {
 					if (exists $node->{$info}) {
@@ -400,6 +416,27 @@ Win32::Security::Recursor->reflect->addSlots(
 			$node->{namedobject} = "Win32::Security::NamedObject::$objectType"->new($node->{name});
 		}
 		return $node->{namedobject};
+	}
+);
+
+Win32::Security::Recursor->reflect->addSlots(
+	node_getSecurityInfo => sub {
+		my $self = shift;
+		my($node, $SecurityInfo) = @_;
+
+		defined $node or return;
+		unless (ref($node) eq 'HASH') {
+				$node = $node eq 'node' ? $self->nodes()->[-1] :
+								$node eq 'parent' ? $self->nodes()->[-1]->{parent} :
+								die "node_getinfo can't get data for '$node'";
+		}
+		unless (exists $node->{getSecurityInfo}) {
+			my $namedobject = exists $node->{namedobject} ? $node->{namedobject} : $self->node_namedobject($node);
+			eval {
+				$namedobject->getSecurityInfo($SecurityInfo);
+				$node->{getSecurityInfo} = undef;
+			};
+		}
 	}
 );
 
@@ -839,9 +876,32 @@ sub Win32::Security::Recursor::SE_FILE_OBJECT::PermDump::new {
 			return exists $child->{iscontainer} ? $child->{iscontainer} : $self->node_iscontainer($child);
 		},
 
+		file_handle => sub {
+			my $self = shift;
+
+			my $file_handle;
+			if ($options->{file}) {
+				open($file_handle, ">", $options->{file}) or die "Unable to open '$options->{file}' for writing.\n";
+			}
+			else {
+				$file_handle = \*STDOUT;
+			}
+
+			$self->reflect->addSlot('file_handle', $file_handle);
+			return $file_handle;
+		},
+
+		close_file_handle => sub {
+			my $self = shift;
+
+			if ($options->{file}) {
+				close($self->file_handle());
+			}
+		},
+
 		print => sub {
 			my $self = shift;
-			print @_;
+			print {$self->file_handle()} @_;
 		},
 
 		print_header => sub {

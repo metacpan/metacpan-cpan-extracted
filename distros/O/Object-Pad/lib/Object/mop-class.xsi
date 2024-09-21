@@ -239,9 +239,10 @@ get_direct_method(ClassMeta *self, methodname)
   PPCODE:
   {
     bool recurse = !!ix;
+    ClassMeta *class = self;
 
     do {
-      AV *methods = self->direct_methods;
+      AV *methods = class->direct_methods;
       U32 nmethods = av_count(methods);
 
       U32 i;
@@ -256,14 +257,14 @@ get_direct_method(ClassMeta *self, methodname)
         XSRETURN(1);
       }
 
-      if(self->type == METATYPE_CLASS)
-        self = self->cls.supermeta;
+      if(class->type == METATYPE_CLASS)
+        class = class->cls.supermeta;
       else
-        self = NULL;
-    } while(recurse && self);
+        class = NULL;
+    } while(recurse && class);
 
     croak("Class %" SVf " does not have a method called '%" SVf "'",
-      self->name, methodname);
+      SVfARG(self->name), SVfARG(methodname));
   }
 
 void

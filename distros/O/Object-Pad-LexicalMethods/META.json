@@ -1,0 +1,56 @@
+{
+   "abstract" : "operator for lexical method call syntax",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Object-Pad-LexicalMethods",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "XS::Parse::Infix::Builder" : "0.44"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XS::Parse::Infix::Builder" : "0.44",
+            "perl" : "5.038"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Object::Pad" : "0.814",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Object::Pad::LexicalMethods" : {
+         "file" : "lib/Object/Pad/LexicalMethods.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_IRC" : "irc://irc.perl.org/#io-async"
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

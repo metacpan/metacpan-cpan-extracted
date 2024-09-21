@@ -8,5 +8,6 @@ Makefile.PL
 README
 dist.ini
 lib/Webservice/InternetDB/API.pm
+readme.md
 t/01-basic.t
 t/release-kwalitee.t

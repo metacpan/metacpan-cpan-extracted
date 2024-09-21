@@ -23,11 +23,9 @@ FOO
     return $text;
 }
 
-my %prereq = ( 'PDL'         => 0,
+my %prereq = ( 'PDL'         => '2.089', # contour_polylines
 	       'File::Temp'  => 0,
 	       'Time::HiRes' => 0);
-
-$prereq{'Win32::Process'} = 0.14 if $^O =~ /MSWin32/i;
 
 WriteMakefile(
     NAME                => 'PDL::Graphics::Simple',

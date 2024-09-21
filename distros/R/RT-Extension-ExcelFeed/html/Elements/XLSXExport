@@ -140,7 +140,7 @@ while (my $row = $Collection->Next) {
 $workbook->close();
 
 binmode $fh;
-$r->content_type('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+$r->content_type('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') unless defined wantarray;
 
 $m->print($xlsx_file);
 $fh->close;

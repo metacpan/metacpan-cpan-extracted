@@ -17,7 +17,7 @@ use experimental 'signatures';
 use Feature::Compat::Try;
 use Future::AsyncAwait;
 
-package Sys::Async::Virt v0.0.2;
+package Sys::Async::Virt v0.0.3;
 
 use parent qw(IO::Async::Notifier);
 
@@ -29,20 +29,20 @@ use Scalar::Util qw(reftype weaken);
 use Protocol::Sys::Virt::Remote::XDR v10.3.7;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Sys::Async::Virt::Domain v0.0.2;
-use Sys::Async::Virt::DomainCheckpoint v0.0.2;
-use Sys::Async::Virt::DomainSnapshot v0.0.2;
-use Sys::Async::Virt::Network v0.0.2;
-use Sys::Async::Virt::NetworkPort v0.0.2;
-use Sys::Async::Virt::NwFilter v0.0.2;
-use Sys::Async::Virt::NwFilterBinding v0.0.2;
-use Sys::Async::Virt::Interface v0.0.2;
-use Sys::Async::Virt::StoragePool v0.0.2;
-use Sys::Async::Virt::StorageVol v0.0.2;
-use Sys::Async::Virt::NodeDevice v0.0.2;
-use Sys::Async::Virt::Secret v0.0.2;
+use Sys::Async::Virt::Domain v0.0.3;
+use Sys::Async::Virt::DomainCheckpoint v0.0.3;
+use Sys::Async::Virt::DomainSnapshot v0.0.3;
+use Sys::Async::Virt::Network v0.0.3;
+use Sys::Async::Virt::NetworkPort v0.0.3;
+use Sys::Async::Virt::NwFilter v0.0.3;
+use Sys::Async::Virt::NwFilterBinding v0.0.3;
+use Sys::Async::Virt::Interface v0.0.3;
+use Sys::Async::Virt::StoragePool v0.0.3;
+use Sys::Async::Virt::StorageVol v0.0.3;
+use Sys::Async::Virt::NodeDevice v0.0.3;
+use Sys::Async::Virt::Secret v0.0.3;
 
-use Sys::Async::Virt::Callback v0.0.2;
+use Sys::Async::Virt::Callback v0.0.3;
 
 use constant {
     CLOSE_REASON_ERROR                                 => 0,
@@ -334,7 +334,7 @@ my @reply_translators = (
     undef,
     \&_no_translation,
     \&_no_translation,
-    \&_no_translation,
+    sub { 3; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 4; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 5; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
@@ -368,7 +368,7 @@ my @reply_translators = (
     \&_no_translation,
     \&_no_translation,
     sub { 36; my $client = shift; _translated($client, undef, {  }, @_) },
-    \&_no_translation,
+    sub { 37; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 38; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     sub { 40; my $client = shift; _translated($client, undef, { net => \&_translate_remote_nonnull_network }, @_) },
@@ -387,7 +387,7 @@ my @reply_translators = (
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    \&_no_translation,
+    sub { 56; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 57; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     sub { 59; my $client = shift; _translated($client, undef, {  }, @_) },
@@ -441,7 +441,7 @@ my @reply_translators = (
     sub { 107; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
     sub { 109; my $client = shift; _translated($client, undef, { ddom => \&_translate_remote_nonnull_domain }, @_) },
-    \&_no_translation,
+    sub { 110; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 111; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 112; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 113; my $client = shift; _translated($client, undef, { dev => \&_translate_remote_nonnull_node_device }, @_) },
@@ -675,21 +675,21 @@ my @reply_translators = (
     sub { 341; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 342; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
-    \&_no_translation,
+    sub { 344; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     sub { 346; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
     sub { 348; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
-    \&_no_translation,
+    sub { 349; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 350; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
     \&_no_translation,
-    \&_no_translation,
+    sub { 353; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 354; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
-    \&_no_translation,
+    sub { 358; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 359; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
     \&_no_translation,
@@ -749,13 +749,13 @@ my @reply_translators = (
     sub { 415; my $client = shift; _translated($client, undef, { checkpoint => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
     sub { 416; my $client = shift; _translated($client, undef, { parent => \&_translate_remote_nonnull_domain_checkpoint }, @_) },
     \&_no_translation,
-    \&_no_translation,
+    sub { 418; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     sub { 420; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     sub { 422; my $client = shift; _translated($client, undef, {  }, @_) },
     sub { 423; my $client = shift; _translated($client, undef, { dom => \&_translate_remote_nonnull_domain }, @_) },
-    \&_no_translation,
+    sub { 424; my $client = shift; _translated($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     \&_no_translation,
@@ -1009,7 +1009,7 @@ async sub _call($self, $proc, $args = {}) {
 
 async sub _typed_param_string_okay($self) {
     return $self->{_typed_param_string_okay} //=
-        ((await $self->supports_feature(
+        ((await $self->_supports_feature(
               $self->{remote}->DRV_FEATURE_TYPED_PARAM_STRING ))
          ? $self->TYPED_PARAM_STRING_OKAY : 0);
 }
@@ -1233,11 +1233,11 @@ async sub open {
     my ($self, $url, $flags) = @_;
     await $self->_call( $remote->PROC_CONNECT_OPEN,
                         { name => $url, flags => $flags // 0 } );
-    if (await $self->supports_feature(
+    if (await $self->_supports_feature(
             $self->{remote}->DRV_FEATURE_REMOTE_CLOSE_CALLBACK )) {
         await $self->_call( $remote->PROC_CONNECT_REGISTER_CLOSE_CALLBACK );
     }
-    if (not await $self->supports_feature(
+    if (not await $self->_supports_feature(
             $self->{remote}->DRV_FEATURE_REMOTE_EVENT_CALLBACK )) {
         die "Remote not supported: REMOTE_EVENT_CALLBACK feature not available";
     }
@@ -1251,6 +1251,24 @@ async sub close {
     await $self->_call( $remote->PROC_CONNECT_CLOSE, {} );
 }
 
+
+async sub _domain_migrate_finish($self, $dname, $cookie, $uri, $flags = 0) {
+    return (await $self->_call(
+        $remote->PROC_DOMAIN_MIGRATE_FINISH,
+        { dname => $dname, cookie => $cookie, uri => $uri, flags => $flags // 0 } ))->{ddom};
+}
+
+async sub _domain_migrate_finish2($self, $dname, $cookie, $uri, $flags, $retcode) {
+    return (await $self->_call(
+        $remote->PROC_DOMAIN_MIGRATE_FINISH2,
+        { dname => $dname, cookie => $cookie, uri => $uri, flags => $flags // 0, retcode => $retcode } ))->{ddom};
+}
+
+async sub _supports_feature($self, $feature) {
+    return (await $self->_call(
+        $remote->PROC_CONNECT_SUPPORTS_FEATURE,
+        { feature => $feature } ))->{supported};
+}
 
 async sub baseline_cpu($self, $xmlCPUs, $flags = 0) {
     return (await $self->_call(
@@ -1312,18 +1330,6 @@ async sub domain_lookup_by_uuid($self, $uuid) {
         { uuid => $uuid } ))->{dom};
 }
 
-async sub domain_migrate_finish($self, $dname, $cookie, $uri, $flags = 0) {
-    return (await $self->_call(
-        $remote->PROC_DOMAIN_MIGRATE_FINISH,
-        { dname => $dname, cookie => $cookie, uri => $uri, flags => $flags // 0 } ))->{ddom};
-}
-
-async sub domain_migrate_finish2($self, $dname, $cookie, $uri, $flags, $retcode) {
-    return (await $self->_call(
-        $remote->PROC_DOMAIN_MIGRATE_FINISH2,
-        { dname => $dname, cookie => $cookie, uri => $uri, flags => $flags // 0, retcode => $retcode } ))->{ddom};
-}
-
 sub domain_restore($self, $from) {
     return ($self->_call(
         $remote->PROC_DOMAIN_RESTORE,
@@ -1365,6 +1371,12 @@ async sub domain_xml_to_native($self, $nativeFormat, $domainXml, $flags = 0) {
     return (await $self->_call(
         $remote->PROC_CONNECT_DOMAIN_XML_TO_NATIVE,
         { nativeFormat => $nativeFormat, domainXml => $domainXml, flags => $flags // 0 } ))->{nativeConfig};
+}
+
+async sub get_all_domain_stats($self, $doms, $stats, $flags = 0) {
+    return (await $self->_call(
+        $remote->PROC_CONNECT_GET_ALL_DOMAIN_STATS,
+        { doms => $doms, stats => $stats, flags => $flags // 0 } ))->{retStats};
 }
 
 async sub get_capabilities($self) {
@@ -1413,6 +1425,18 @@ async sub get_sysinfo($self, $flags = 0) {
     return (await $self->_call(
         $remote->PROC_CONNECT_GET_SYSINFO,
         { flags => $flags // 0 } ))->{sysinfo};
+}
+
+async sub get_type($self) {
+    return (await $self->_call(
+        $remote->PROC_CONNECT_GET_TYPE,
+        {  } ))->{type};
+}
+
+async sub get_uri($self) {
+    return (await $self->_call(
+        $remote->PROC_CONNECT_GET_URI,
+        {  } ))->{uri};
 }
 
 async sub get_version($self) {
@@ -1527,6 +1551,12 @@ async sub list_defined_storage_pools($self) {
     return (await $self->_call(
         $remote->PROC_CONNECT_LIST_DEFINED_STORAGE_POOLS,
         { maxnames => $remote->STORAGE_POOL_LIST_MAX } ))->{names};
+}
+
+async sub list_domains($self) {
+    return (await $self->_call(
+        $remote->PROC_CONNECT_LIST_DOMAINS,
+        { maxids => $remote->DOMAIN_LIST_MAX } ))->{ids};
 }
 
 async sub list_interfaces($self) {
@@ -1833,12 +1863,6 @@ async sub storage_vol_lookup_by_path($self, $path) {
         { path => $path } ))->{vol};
 }
 
-async sub supports_feature($self, $feature) {
-    return (await $self->_call(
-        $remote->PROC_CONNECT_SUPPORTS_FEATURE,
-        { feature => $feature } ))->{supported};
-}
-
 
 1;
 
@@ -1850,7 +1874,7 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.2
+v0.0.3
 
 Based on LibVirt tag v10.3.0
 
@@ -2102,20 +2126,6 @@ See documentation of L<virDomainLookupByName|https://libvirt.org/html/libvirt-li
 See documentation of L<virDomainLookupByUUID|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainLookupByUUID>.
 
 
-=head2 domain_migrate_finish
-
-  $ddom = await $client->domain_migrate_finish( $dname, $cookie, $uri, $flags = 0 );
-
-See documentation of L<virDomainMigrateFinish|https://libvirt.org/html/libvirt-libvirt_internal.html#virDomainMigrateFinish>.
-
-
-=head2 domain_migrate_finish2
-
-  $ddom = await $client->domain_migrate_finish2( $dname, $cookie, $uri, $flags, $retcode );
-
-See documentation of L<virDomainMigrateFinish2|https://libvirt.org/html/libvirt-libvirt_internal.html#virDomainMigrateFinish2>.
-
-
 =head2 domain_restore
 
   await $client->domain_restore( $from );
@@ -2167,6 +2177,13 @@ See documentation of L<virConnectDomainXMLFromNative|https://libvirt.org/html/li
   $nativeConfig = await $client->domain_xml_to_native( $nativeFormat, $domainXml, $flags = 0 );
 
 See documentation of L<virConnectDomainXMLToNative|https://libvirt.org/html/libvirt-libvirt-domain.html#virConnectDomainXMLToNative>.
+
+
+=head2 get_all_domain_stats
+
+  $retStats = await $client->get_all_domain_stats( $doms, $stats, $flags = 0 );
+
+See documentation of L<virConnectGetAllDomainStats|https://libvirt.org/html/libvirt-libvirt-domain.html#virConnectGetAllDomainStats>.
 
 
 =head2 get_capabilities
@@ -2223,6 +2240,20 @@ See documentation of L<virConnectGetStoragePoolCapabilities|https://libvirt.org/
   $sysinfo = await $client->get_sysinfo( $flags = 0 );
 
 See documentation of L<virConnectGetSysinfo|https://libvirt.org/html/libvirt-libvirt-host.html#virConnectGetSysinfo>.
+
+
+=head2 get_type
+
+  $type = await $client->get_type;
+
+See documentation of L<virConnectGetType|https://libvirt.org/html/libvirt-libvirt-host.html#virConnectGetType>.
+
+
+=head2 get_uri
+
+  $uri = await $client->get_uri;
+
+See documentation of L<virConnectGetURI|https://libvirt.org/html/libvirt-libvirt-host.html#virConnectGetURI>.
 
 
 =head2 get_version
@@ -2359,6 +2390,13 @@ See documentation of L<virConnectListDefinedNetworks|https://libvirt.org/html/li
   $names = await $client->list_defined_storage_pools;
 
 See documentation of L<virConnectListDefinedStoragePools|https://libvirt.org/html/libvirt-libvirt-storage.html#virConnectListDefinedStoragePools>.
+
+
+=head2 list_domains
+
+  $ids = await $client->list_domains;
+
+See documentation of L<virConnectListDomains|https://libvirt.org/html/libvirt-libvirt-domain.html#virConnectListDomains>.
 
 
 =head2 list_interfaces
@@ -2706,13 +2744,6 @@ See documentation of L<virStorageVolLookupByKey|https://libvirt.org/html/libvirt
   $vol = await $client->storage_vol_lookup_by_path( $path );
 
 See documentation of L<virStorageVolLookupByPath|https://libvirt.org/html/libvirt-libvirt-storage.html#virStorageVolLookupByPath>.
-
-
-=head2 supports_feature
-
-  $supported = await $client->supports_feature( $feature );
-
-See documentation of L<virConnectSupportsFeature|https://libvirt.org/html/libvirt-libvirt_internal.html#virConnectSupportsFeature>.
 
 
 
@@ -3191,6 +3222,14 @@ wrapper allows for tracking all calls allowing to set up handling of the replies
 
 =head2 _dispatch_stream
 
+=head2 _domain_migrate_finish
+
+=head2 _domain_migrate_finish2
+
+=head2 _supports_feature
+
+
+
 =head1 BUGS AND LIMITATIONS
 
 =over 8
@@ -3240,6 +3279,14 @@ towards implementation are greatly appreciated.
 
 =item * REMOTE_PROC_AUTH_SASL_STEP
 
+=back
+
+
+
+=item * @generate: none (include/libvirt/libvirt-domain.h)
+
+=over 8
+
 =item * REMOTE_PROC_CONNECT_DOMAIN_EVENT_DEREGISTER
 
 =item * REMOTE_PROC_CONNECT_DOMAIN_EVENT_DEREGISTER_ANY
@@ -3247,12 +3294,6 @@ towards implementation are greatly appreciated.
 =item * REMOTE_PROC_CONNECT_DOMAIN_EVENT_REGISTER
 
 =item * REMOTE_PROC_CONNECT_DOMAIN_EVENT_REGISTER_ANY
-
-=item * REMOTE_PROC_CONNECT_GET_ALL_DOMAIN_STATS
-
-=item * REMOTE_PROC_DOMAIN_AUTHORIZED_SSH_KEYS_GET
-
-=item * REMOTE_PROC_DOMAIN_AUTHORIZED_SSH_KEYS_SET
 
 =item * REMOTE_PROC_DOMAIN_BLOCK_PEEK
 
@@ -3268,10 +3309,6 @@ towards implementation are greatly appreciated.
 
 =item * REMOTE_PROC_DOMAIN_GET_EMULATOR_PIN_INFO
 
-=item * REMOTE_PROC_DOMAIN_GET_FSINFO
-
-=item * REMOTE_PROC_DOMAIN_GET_GUEST_INFO
-
 =item * REMOTE_PROC_DOMAIN_GET_IOTHREAD_INFO
 
 =item * REMOTE_PROC_DOMAIN_GET_JOB_STATS
@@ -3282,13 +3319,9 @@ towards implementation are greatly appreciated.
 
 =item * REMOTE_PROC_DOMAIN_GET_PERF_EVENTS
 
-=item * REMOTE_PROC_DOMAIN_GET_SCHEDULER_TYPE
-
 =item * REMOTE_PROC_DOMAIN_GET_SECURITY_LABEL
 
 =item * REMOTE_PROC_DOMAIN_GET_SECURITY_LABEL_LIST
-
-=item * REMOTE_PROC_DOMAIN_GET_STATE
 
 =item * REMOTE_PROC_DOMAIN_GET_TIME
 
@@ -3296,11 +3329,49 @@ towards implementation are greatly appreciated.
 
 =item * REMOTE_PROC_DOMAIN_GET_VCPU_PIN_INFO
 
-=item * REMOTE_PROC_DOMAIN_INTERFACE_ADDRESSES
-
 =item * REMOTE_PROC_DOMAIN_MEMORY_PEEK
 
 =item * REMOTE_PROC_DOMAIN_MEMORY_STATS
+
+=item * REMOTE_PROC_DOMAIN_OPEN_GRAPHICS
+
+=item * REMOTE_PROC_DOMAIN_OPEN_GRAPHICS_FD
+
+=item * REMOTE_PROC_DOMAIN_PIN_EMULATOR
+
+=back
+
+
+
+=item * @generate: none (include/libvirt/libvirt-host.h)
+
+=over 8
+
+=item * REMOTE_PROC_NODE_ALLOC_PAGES
+
+=item * REMOTE_PROC_NODE_GET_CPU_MAP
+
+=item * REMOTE_PROC_NODE_GET_FREE_PAGES
+
+=item * REMOTE_PROC_NODE_GET_SECURITY_MODEL
+
+=back
+
+
+
+=item * @generate: none (include/libvirt/libvirt-secret.h)
+
+=over 8
+
+=item * REMOTE_PROC_SECRET_GET_VALUE
+
+=back
+
+
+
+=item * @generate: none (src/libvirt_internal.h)
+
+=over 8
 
 =item * REMOTE_PROC_DOMAIN_MIGRATE_BEGIN3
 
@@ -3328,45 +3399,25 @@ towards implementation are greatly appreciated.
 
 =item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL3_PARAMS
 
-=item * REMOTE_PROC_DOMAIN_OPEN_GRAPHICS
+=back
 
-=item * REMOTE_PROC_DOMAIN_OPEN_GRAPHICS_FD
 
-=item * REMOTE_PROC_DOMAIN_PIN_EMULATOR
 
-=item * REMOTE_PROC_NODE_ALLOC_PAGES
+=item * @generate: server (include/libvirt/libvirt-host.h)
 
-=item * REMOTE_PROC_NODE_GET_CPU_MAP
+=over 8
 
-=item * REMOTE_PROC_NODE_GET_FREE_PAGES
+=item * REMOTE_PROC_CONNECT_IS_SECURE
 
-=item * REMOTE_PROC_NODE_GET_SECURITY_MODEL
-
-=item * REMOTE_PROC_SECRET_GET_VALUE
+=item * REMOTE_PROC_NODE_GET_CELLS_FREE_MEMORY
 
 =back
 
 
 
-=item * @generate: server
+=item * @generate: server (include/libvirt/libvirt-nodedev.h)
 
 =over 8
-
-=item * REMOTE_PROC_CONNECT_FIND_STORAGE_POOL_SOURCES
-
-=item * REMOTE_PROC_CONNECT_GET_TYPE
-
-=item * REMOTE_PROC_CONNECT_GET_URI
-
-=item * REMOTE_PROC_CONNECT_IS_SECURE
-
-=item * REMOTE_PROC_CONNECT_LIST_DOMAINS
-
-=item * REMOTE_PROC_DOMAIN_CREATE
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL3
-
-=item * REMOTE_PROC_DOMAIN_RENAME
 
 =item * REMOTE_PROC_NODE_DEVICE_DETACH_FLAGS
 
@@ -3376,9 +3427,27 @@ towards implementation are greatly appreciated.
 
 =item * REMOTE_PROC_NODE_DEVICE_RE_ATTACH
 
-=item * REMOTE_PROC_NODE_GET_CELLS_FREE_MEMORY
+=back
+
+
+
+=item * @generate: server (include/libvirt/libvirt-storage.h)
+
+=over 8
+
+=item * REMOTE_PROC_CONNECT_FIND_STORAGE_POOL_SOURCES
 
 =item * REMOTE_PROC_STORAGE_VOL_GET_INFO_FLAGS
+
+=back
+
+
+
+=item * @generate: server (src/libvirt_internal.h)
+
+=over 8
+
+=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL3
 
 =back
 

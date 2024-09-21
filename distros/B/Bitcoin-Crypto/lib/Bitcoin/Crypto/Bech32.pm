@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Bech32;
-$Bitcoin::Crypto::Bech32::VERSION = '2.007';
+$Bitcoin::Crypto::Bech32::VERSION = '3.000';
 use v5.10;
 use strict;
 use warnings;

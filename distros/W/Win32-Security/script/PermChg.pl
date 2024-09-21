@@ -268,7 +268,6 @@ sub parse_options {
 					ownerSid       => &Win32::Security::SID::ConvertNameToSid($options->{owner}),
 				};
 			delete $options->{owner};
-			delete $options->{propagateowner};
 		}
 
 		my(@filelist) = map {/[*?]/ ? glob($_) : $_ } @ARGV;
@@ -482,8 +481,22 @@ sub ownerset_chg {
 			$owner_recursor->recurse($parent);
 		}
 	} else {
-		print STDERR "ERROR: Owner changing without propgateowner unsupported right now.\n";
 		foreach my $name (sort keys %{$options->{ownerset}}) {
+			my $ownerset = $options->{ownerset}->{$name};
+
+			my $namedobject = Win32::Security::NamedObject::SE_FILE_OBJECT->new($ownerset->{name});
+			my($ownerSid, $ownerTrustee);
+			eval {
+				$ownerSid = $namedobject->ownerSid();
+				$ownerTrustee = $namedobject->ownerTrustee();
+			};
+
+			if ($ownerSid ne $ownerset->{ownerSid}) {
+				eval {
+					$namedobject->ownerSid($ownerset->{ownerSid});
+				};
+				$@ and die "Unable to set ownership on '$ownerset->{name}' to '$ownerset->{owner}'.\n$@";
+			}
 		}
 	}
 

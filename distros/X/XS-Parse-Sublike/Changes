@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Sublike
 
+0.26    2024-09-20
+        [BUGFIXES]
+         * Don't segfault on attempts to use unnamed slurpy variables with
+           named parameters (RT155654)
+
 0.25    2024-09-19
         [BUGFIXES]
          * Make sure not to introduce signature parameter variables until

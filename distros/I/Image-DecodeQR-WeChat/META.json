@@ -73,6 +73,6 @@
          "web" : "https://github.com/hadjiprocopis/perl-image-decodeqr-wechat"
       }
    },
-   "version" : "2.1",
+   "version" : "2.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -237,20 +237,31 @@ static OP *pp_argelems_named(pTHX)
 
   HV *slurpy_hv = NULL;
   AV *slurpy_av = NULL;
+  bool slurpy_ignore = false;
 
   if(PL_op->op_targ) {
     /* We have a slurpy of some kind */
     save_clearsv(&PAD_SVl(PL_op->op_targ));
+  }
 
-    if(PL_op->op_private & OPpARGELEM_HV) {
+  if(PL_op->op_private & OPpARGELEM_HV) {
+    if(PL_op->op_targ) {
       slurpy_hv = (HV *)PAD_SVl(PL_op->op_targ);
       assert(SvTYPE(slurpy_hv) == SVt_PVHV);
       assert(HvKEYS(slurpy_hv) == 0);
     }
-    else if(PL_op->op_private & OPpARGELEM_AV) {
+    else {
+      slurpy_ignore = true;
+    }
+  }
+  else if(PL_op->op_private & OPpARGELEM_AV) {
+    if(PL_op->op_targ) {
       slurpy_av = (AV *)PAD_SVl(PL_op->op_targ);
       assert(SvTYPE(slurpy_av) == SVt_PVAV);
       assert(av_count(slurpy_av) == 0);
+    }
+    else {
+      slurpy_ignore = true;
     }
   }
 
@@ -341,7 +352,7 @@ static OP *pp_argelems_named(pTHX)
       if(argix <= argc)
         av_push(slurpy_av, newSVsv(val));
     }
-    else {
+    else if(!slurpy_ignore) {
       if(!unrecognised_keynames) {
         unrecognised_keynames = newSVpvn("", 0);
         SAVEFREESV(unrecognised_keynames);
@@ -819,14 +830,25 @@ endofelems:
     argelems_named_op->op_ppaddr = &pp_argelems_named;
     if(PL_parser->sig_slurpy) {
       assert(ctx.slurpy_elem);
-      assert(ctx.slurpy_elem->op_type == OP_LINESEQ);
-      OP *o = OpSIBLING(cLISTOPx(ctx.slurpy_elem)->op_first);
-      assert(o);
-      assert(o->op_type == OP_ARGELEM);
+      if(ctx.slurpy_elem->op_type == OP_LINESEQ) {
+        /* A real named slurpy variable */
+        OP *o = OpSIBLING(cLISTOPx(ctx.slurpy_elem)->op_first);
+        assert(o);
+        assert(o->op_type == OP_ARGELEM);
 
-      /* Steal the slurpy's targ and private flags */
-      argelems_named_op->op_targ    = o->op_targ;
-      argelems_named_op->op_private |= o->op_private & OPpARGELEM_MASK;
+        /* Steal the slurpy's targ and private flags */
+        argelems_named_op->op_targ    = o->op_targ;
+        argelems_named_op->op_private |= o->op_private & OPpARGELEM_MASK;
+      }
+      else {
+        /* The slurpy is unnamed. Don't steal its targ but still set the
+         * private flags
+         */
+        argelems_named_op->op_targ    = 0;
+        argelems_named_op->op_private = (PL_parser->sig_slurpy == '%') ? OPpARGELEM_HV :
+                                        (PL_parser->sig_slurpy == '@') ? OPpARGELEM_AV :
+                                                                         0;
+      }
 
       op_free(ctx.slurpy_elem);
       ctx.slurpy_elem = NULL;

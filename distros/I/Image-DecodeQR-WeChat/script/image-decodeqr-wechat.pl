@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 use Image::DecodeQR::WeChat qw/:all/;
 use Getopt::Long;

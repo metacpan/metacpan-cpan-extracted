@@ -46,6 +46,10 @@ if ($has_compiler) {
 		#include "foo.h"
 		#include "bar.h"
 
+		#ifndef FOO
+		#error Did not import compiler flags
+		#endif
+
 		MODULE = Foo::Bar                PACKAGE = Foo::Bar
 
 		const char*
@@ -61,6 +65,9 @@ if ($has_compiler) {
 	$dist->add_file('inc/auto/share/module/TestLib/include/bar.h', undent(<<'		---'));
 		#define BAR 1
 		---
+	$dist->add_file('inc/auto/share/module/TestLib/compile.json', undent(<<'		---'));
+		{ "defines": { "FOO": "ABC" } }
+		---
 	$dist->add_file('src/foo.c', undent(<<'		---'));
 		char* foo() {
 			return "Hello World!\n";
@@ -73,6 +80,8 @@ if ($has_compiler) {
 		load_module("Dist::Build::XS::Import");
 
 		export_headers(dir => 'include');
+		export_flags(extra_compiler_flags => [ '-Wall' ]);
+
 		add_xs(
 			include_dirs  => [ 'include' ],
 			extra_sources => [ glob 'src/*.c' ],
@@ -178,6 +187,7 @@ sub _slurp { do { local (@ARGV,$/)=$_[0]; <> } }
         DynaLoader::dl_unload_file($libref);
     }
     ok( -f module_file('Foo::Bar', 'include/foo.h'), 'header file has been exported');
+    ok( -f module_file('Foo::Bar', 'compile.json'), 'compilation flag file has been exported');
   }
 
   require CPAN::Meta;

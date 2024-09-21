@@ -124,7 +124,7 @@ $resp = webhook_post(
         user        => { name => 'Test User' },
         project     => { name => 'test-rep', },
         object_attributes =>
-            { id => 43, status => 'failed' },
+            { id => 44, status => 'failed' },
     }
 );
 
@@ -135,11 +135,58 @@ TestBot->expect(
         'dummy/#test test-rep',
         'pipeline',
         'Test User',
-        '43',
+        '44',
         '* failed',
     )
 );
 
+$resp = webhook_post(
+    {   object_kind => 'pipeline',
+        user        => { name => 'Test User' },
+        project     => { name => 'test-rep', namespace => 'TestBot' },
+        object_attributes =>
+            { id => 45, status => 'failed', duration => 3666, },
+        builds => [
+            { name => 'pad',                     status => 'success' },
+            { name => 'staging',                 status => 'created' },
+            { name => 'build-image',             status => 'success' },
+            { name => 'flake8',                  status => 'success' },
+            { name => 'check-salsaci-overrides', status => 'success' },
+            { name => 'extract-source',          status => 'success' },
+            { name => 'nosetests',               status => 'success' },
+            { name => 'piuparts',                status => 'skipped' },
+            { name => 'blhc',                    status => 'skipped' },
+            { name => 'black',                   status => 'success' },
+            { name => 'mypy',                    status => 'failed' },
+            { name => 'test-build-any',          status => 'skipped' },
+            { name => 'build source',            status => 'success' },
+            { name => 'build i386',              status => 'failed' },
+            { name => 'test-build-all',          status => 'skipped' },
+            { name => 'reprotest',               status => 'skipped' },
+            { name => 'lintian',                 status => 'skipped' },
+            { name => 'autopkgtest',             status => 'skipped' },
+            { name => 'build',                   status => 'failed' },
+        ],
+    }
+);
+
+is( $resp->code, 202, 'pipeline event response status is 202' ) or diag $resp->as_string;
+
+TestBot->expect(
+    join( ' ',
+        'dummy/#test test-rep',
+        'pipeline',
+        'Test User',
+        '45',
+        '* [1 hour, 1 minute and 6 seconds] failed (pad: success; staging: created; build-image: success; flake8: success; check-salsaci-overrides: success; extract-source: success; nosetests: success; piuparts: skipped; blhc: skipped; black: success; mypy: failed; test-build-any: skipped; build source: success; build i386: failed; test-build-all: skipped; reprot'
+    )
+);
+TestBot->expect(
+    join( ' ',
+        'dummy/#test',
+        'est: skipped; lintian: skipped; autopkgtest: skipped; build: failed)',
+    )
+);
 
 diag `cat t/bot/kgb-bot.log`;
 

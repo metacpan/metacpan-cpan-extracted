@@ -9,7 +9,7 @@ use warnings;
 
 use utf8; # allow for utf8 in code (we have strings in utf8, filenames)
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 use Test::More;
 use Test2::Plugin::UTF8;
@@ -19,12 +19,14 @@ use File::Temp qw/tempdir cleanup/;
 use FindBin;
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
-use Image::DecodeQR::WeChat qw/:all/;
+use Image::DecodeQR::WeChat qw/
+	:all
+/;
 
 # 0: nothing,
 # > 9: add also XS verbose
 my $VERBOSITY = 10;
-my $GRAPHICAL_OUTPUT = 1;
+my $GRAPHICAL_OUTPUT = 0;
 
 # use this for keeping all tempfiles while CLEANUP=>1
 # which is needed for deleting them all at the end
@@ -35,14 +37,87 @@ ok(-d $tmpdir, "tmpdir exists $tmpdir") or BAIL_OUT;
 
 my @testdata = (
 	{
-		'test-in-file' => File::Spec->catdir($FindBin::Bin, '..', 't', 'testimages', 'complex_test.png'),
-		'outbase' => File::Spec->catdir($FindBin::Bin, 'tmp', 'complex_test.out'),
+		# this is an empty one we expect nothing back but an empty arrayref
+		'test-in-file' => File::Spec->catdir($FindBin::Bin, 'testimages', 'empty.jpg'),
+		'outbase' => File::Spec->catdir($tmpdir, 'empty.out'),
+		'expected-payloads' => [
+		]
+	},
+	{
+		'test-in-file' => File::Spec->catdir($FindBin::Bin, 'testimages', 'test.jpg'),
+		'outbase' => File::Spec->catdir($tmpdir, 'test.out'),
+		'expected-payloads' => [
+			'http://m.livedoor.com/'
+		]
+	},
+	{
+		'test-in-file' => File::Spec->catdir($FindBin::Bin, 'testimages', 'test_rotated.jpg'),
+		'outbase' => File::Spec->catdir($tmpdir, 'test_rotated.out'),
+		'expected-payloads' => [
+			'http://m.livedoor.com/'
+		]
+	},
+	{
+		'test-in-file' => File::Spec->catdir($FindBin::Bin, 'testimages', 'japh.png'),
+		'outbase' => File::Spec->catdir($tmpdir, 'japh.out'),
+		'expected-payloads' => [
+			'Just another Perl hacker'
+		]
+	},
+	{
+		'test-in-file' => File::Spec->catdir($FindBin::Bin, 'testimages', 'τεστ.png'),
+		'outbase' => File::Spec->catdir($tmpdir, 'τεστ.out'),
+		'expected-payloads' => [
+			"γειά σας είμαι ο Ανδρέας\n" # yes it has a newline
+		]
+	},
+	{
+		'test-in-file' => File::Spec->catdir($FindBin::Bin, 'testimages', 'τεστ_rotated.png'),
+		'outbase' => File::Spec->catdir($tmpdir, 'τεστ_rotated.out'),
+		'expected-payloads' => [
+			"γειά σας είμαι ο Ανδρέας\n" # yes it has a newline
+		]
+	},
+	{
+		'test-in-file' => File::Spec->catdir($FindBin::Bin, 'testimages', 'complex_test.png'),
+		'outbase' => File::Spec->catdir($tmpdir, 'complex_test.out'),
 		'expected-payloads' => [
 			# a collage of 4 QR codes as PNG
 			"γειά σας είμαι ο Ανδρέας\n", # yes it has a newline
 			"γειά σας είμαι ο Ανδρέας\n", # yes it has a newline
 			'http://m.livedoor.com/',
 			'http://m.livedoor.com/',
+		]
+	},
+	{
+		'test-in-file' => File::Spec->catdir($FindBin::Bin, 'testimages', 'complex_test_lowquality.png'),
+		'outbase' => File::Spec->catdir($tmpdir, 'complex_test_lowquality.out'),
+		'expected-payloads' => [
+			# a collage of 4 QR codes of lower quality as JPG
+			"γειά σας είμαι ο Ανδρέας\n", # yes it has a newline
+			'http://m.livedoor.com/',
+			"γειά σας είμαι ο Ανδρέας\n", # yes it has a newline
+			'http://m.livedoor.com/',
+		]
+	},
+	{
+		'test-in-file' => File::Spec->catdir($FindBin::Bin, 'testimages', 'complex_test_rotated.png'),
+		'outbase' => File::Spec->catdir($tmpdir, 'complex_test_rotated.out'),
+		'expected-payloads' => [
+			# a collage of 4 QR codes as PNG
+			'http://m.livedoor.com/',
+			'http://m.livedoor.com/',
+			"γειά σας είμαι ο Ανδρέας\n", # yes it has a newline
+		]
+	},
+	{
+		'test-in-file' => File::Spec->catdir($FindBin::Bin, 'testimages', 'complex_test_rotated_lowquality.jpg'),
+		'outbase' => File::Spec->catdir($tmpdir, 'complex_test_rotated_lowquality.out'),
+		'expected-payloads' => [
+			# a collage of 4 QR codes of lower quality as JPG
+			'http://m.livedoor.com/',
+			'http://m.livedoor.com/',
+			"γειά σας είμαι ο Ανδρέας\n", # yes it has a newline
 		]
 	},
 );
@@ -70,8 +145,7 @@ for my $testdata (@testdata){
 		# run it with minimal arguments to see if defaults kick in
 		'input' => $testimg,
 		'outbase' => $outbase,
-		'verbosity' => $VERBOSITY,
-		'graphicaldisplayresult' => $GRAPHICAL_OUTPUT,
+		# don't test this now, we have another test for this
 		'dumpqrimagestofile' => 0,
 	});
 	ok(defined($ret), "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$testimg' and result is defined.");

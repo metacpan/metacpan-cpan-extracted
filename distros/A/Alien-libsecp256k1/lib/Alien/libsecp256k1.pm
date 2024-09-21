@@ -1,5 +1,5 @@
 package Alien::libsecp256k1;
-$Alien::libsecp256k1::VERSION = '0.050102';
+$Alien::libsecp256k1::VERSION = '0.050103';
 use v5.10;
 use strict;
 use warnings;

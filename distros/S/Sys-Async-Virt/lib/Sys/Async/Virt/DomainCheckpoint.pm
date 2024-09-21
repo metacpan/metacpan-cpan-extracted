@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::DomainCheckpoint v0.0.2;
+package Sys::Async::Virt::DomainCheckpoint v0.0.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.2;
+use Protocol::Sys::Virt::Remote::XDR v0.0.3;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -83,7 +83,7 @@ Sys::Async::Virt::DomainCheckpoint - Client side proxy to remote LibVirt domain 
 
 =head1 VERSION
 
-v0.0.2
+v0.0.3
 
 =head1 SYNOPSIS
 
@@ -124,6 +124,10 @@ See documentation of L<virDomainCheckpointGetXMLDesc|https://libvirt.org/html/li
   $checkpoints = await $checkpoint->list_all_children( $flags = 0 );
 
 See documentation of L<virDomainCheckpointListAllChildren|https://libvirt.org/html/libvirt-libvirt-domain-checkpoint.html#virDomainCheckpointListAllChildren>.
+
+
+
+=head1 INTERNAL METHODS
 
 
 

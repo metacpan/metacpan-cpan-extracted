@@ -1,4 +1,7 @@
 Revision history for Webservice::Ipify::API
+1.005 Sat Sept 21 00:39:00 2024
+     - updated Readme.md
+     - updated dist.ini
 1.004 Mon Sept 19 19:55:00 2024
      - fixed non true return value in module
      - set minimum perl to 5.38

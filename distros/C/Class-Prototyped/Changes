@@ -1,5 +1,12 @@
 Revision history for Perl extension Class::Prototyped
 
+1.15  Fri Sep 20 2024
+ - ARGH!  Missed updating version numbers on sub-packages
+
+1.14  Fri Sep 20 2024
+ - Updated test file include.t to use static include_xxx.pl file for
+   included module contents, fixing test issues on readonly file system
+
 1.13  Wed Aug 28 2013
  - Added version numbers to sub-packages to eliminate PAUSE indexer issues.
 

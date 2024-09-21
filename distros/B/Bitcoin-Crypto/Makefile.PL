@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Bitcoin::Crypto",
   "PREREQ_PM" => {
     "Bitcoin::BIP39" => "0.002",
+    "Bitcoin::Secp256k1" => 0,
     "CryptX" => "0.074",
     "List::Util" => "1.33",
     "Math::BigInt" => "1.999831",
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "2.007",
+  "VERSION" => "3.000",
   "test" => {
     "TESTS" => "t/*.t t/Key/*.t t/PSBT/*.t t/Script/*.t t/Transaction/*.t"
   }
@@ -39,6 +40,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Bitcoin::BIP39" => "0.002",
+  "Bitcoin::Secp256k1" => 0,
   "CryptX" => "0.074",
   "List::Util" => "1.33",
   "Math::BigInt" => "1.999831",

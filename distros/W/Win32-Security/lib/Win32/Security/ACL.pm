@@ -5,7 +5,7 @@
 # Author: Toby Ovod-Everett
 #
 #############################################################################
-# Copyright 2003, 2004 Toby Ovod-Everett.  All rights reserved
+# Copyright 2003-2024 Toby Ovod-Everett.  All rights reserved
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
@@ -124,7 +124,7 @@ there.
 =cut
 
 use Carp qw();
-use Class::Prototyped '0.98';
+use Class::Prototyped 0.98;
 use Data::Dumper;
 use Win32::Security::ACE;
 
@@ -146,6 +146,8 @@ BEGIN {
 		);
 	}
 }
+
+$Win32::Security::ACL::VERSION = '0.60';
 
 =head1 Method Reference
 
@@ -492,14 +494,15 @@ Win32::Security::ACL->reflect->addSlot(
 
 			foreach my $ace (map {$_->$call()} $self->aces()) {
 				my $sid = $ace->sid();
+				my $aceType = $ace->aceType();
 				my $rawAccessMask = $ace->rawAccessMask();
 				my $aceFlags = $ace->aceFlags();
 
 				my $possibleFlags;
-				if (exists $sidHash->{$sid}) {
-					foreach my $hashRawAccessMask (keys %{$sidHash->{$sid}}) {
+				if (exists $sidHash->{$aceType}->{$sid}) {
+					foreach my $hashRawAccessMask (keys %{$sidHash->{$aceType}->{$sid}}) {
 						($hashRawAccessMask & $rawAccessMask) == $rawAccessMask or next;
-						my $hashFlags = $sidHash->{$sid}->{$hashRawAccessMask};
+						my $hashFlags = $sidHash->{$aceType}->{$sid}->{$hashRawAccessMask};
 						if (!defined $possibleFlags) {
 							$possibleFlags = $hashFlags;
 						} else {
@@ -522,14 +525,14 @@ Win32::Security::ACL->reflect->addSlot(
 						$aceFlags->{INHERIT_ONLY_ACE} = 1;
 						$ace->aceFlags($aceFlags);
 					}
-					if (exists $sidHash->{$sid}->{$rawAccessMask}) {
-						my $hashFlags = $sidHash->{$sid}->{$rawAccessMask};
+					if (exists $sidHash->{$aceType}->{$sid}->{$rawAccessMask}) {
+						my $hashFlags = $sidHash->{$aceType}->{$sid}->{$rawAccessMask};
 						$hashFlags->{OBJECT_INHERIT_ACE} = $hashFlags->{OBJECT_INHERIT_ACE} || $aceFlags->{OBJECT_INHERIT_ACE} ? 1 : 0;
 						$hashFlags->{CONTAINER_INHERIT_ACE} = $hashFlags->{CONTAINER_INHERIT_ACE} || $aceFlags->{CONTAINER_INHERIT_ACE} ? 1 : 0;
 						$hashFlags->{NO_PROPAGATE_ACE} = $hashFlags->{NO_PROPAGATE_ACE} && $aceFlags->{NO_PROPAGATE_ACE} ? 1 : 0;
 						$hashFlags->{INHERIT_ONLY_ACE} = $hashFlags->{INHERIT_ONLY_ACE} && $aceFlags->{INHERIT_ONLY_ACE} ? 1 : 0;
 					} else {
-						$sidHash->{$sid}->{$rawAccessMask} = $aceFlags;
+						$sidHash->{$aceType}->{$sid}->{$rawAccessMask} = $aceFlags;
 					}
 					push(@newAces, $ace);
 				}

@@ -110,7 +110,7 @@ QuadTreeNode* create_nodes(int count, QuadTreeNode *parent)
 	return node;
 }
 
-// NOTE: does not actually free the node, but frees its children nodes
+/* NOTE: does not actually free the node, but frees its children nodes */
 void destroy_node(QuadTreeNode *node)
 {
 	if (node->values != NULL) {
@@ -155,7 +155,7 @@ void store_backref(QuadTreeRootNode *root, QuadTreeNode* node, SV *value)
 	DynArr *list;
 	if (!hv_exists_ent(root->backref, value, 0)) {
 		list = create_array();
-		hv_store_ent(root->backref, value, newSViv((unsigned long) list), 0);
+		hv_store_ent(root->backref, value, newSViv((uintptr_t) list), 0);
 	}
 	else {
 		list = (DynArr*) SvIV(HeVAL(hv_fetch_ent(root->backref, value, 0, 0)));
@@ -263,7 +263,7 @@ void fill_nodes(QuadTreeRootNode *root, QuadTreeNode *node, SV *value, Shape *pa
 	}
 }
 
-// XS helpers
+/* XS helpers */
 
 SV* get_hash_key (HV* hash, const char* key)
 {
@@ -303,7 +303,7 @@ void clear_tree(QuadTreeRootNode *root)
 		hv_clear(root->backref);
 }
 
-// proper XS Code starts here
+/* proper XS Code starts here */
 
 MODULE = Algorithm::QuadTree::XS		PACKAGE = Algorithm::QuadTree::XS
 
@@ -325,7 +325,7 @@ _AQT_init(obj)
 			SvIV(get_hash_key(params, "DEPTH"))
 		);
 
-		SV *root_sv = newSViv((unsigned long) root);
+		SV *root_sv = newSViv((uintptr_t) root);
 		SvREADONLY_on(root_sv);
 		hv_stores(params, "ROOT", root_sv);
 

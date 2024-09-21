@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 use utf8; # allow for utf8 in code (we have strings in utf8, filenames)
 
@@ -25,7 +25,7 @@ use Image::DecodeQR::WeChat qw/
 	detect_and_decode_qr
 /;
 
-# This checks calling decode_xs with 6 scalars (correct)
+# This checks calling 'detect_and_decode_qr_xs()' with 6 scalars (correct)
 # array of 6 scalars (should be correct),
 # 7 scalars (wrong, must be caught)
 # array of 7 scalars (wrong, must be caught)

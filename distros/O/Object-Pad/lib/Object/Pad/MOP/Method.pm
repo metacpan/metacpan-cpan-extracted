@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Method 0.813;
+package Object::Pad::MOP::Method 0.814;
 
-use v5.14;
+use v5.18;
 use warnings;
 
 # This is an XS-implemented object type provided by Object::Pad itself

@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::NetworkPort v0.0.2;
+package Sys::Async::Virt::NetworkPort v0.0.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.2;
+use Protocol::Sys::Virt::Remote::XDR v0.0.3;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -84,7 +84,7 @@ Sys::Async::Virt::NetworkPort - Client side proxy to remote LibVirt network port
 
 =head1 VERSION
 
-v0.0.2
+v0.0.3
 
 =head1 SYNOPSIS
 
@@ -126,6 +126,10 @@ See documentation of L<virNetworkPortGetXMLDesc|https://libvirt.org/html/libvirt
   # -> (* no data *)
 
 See documentation of L<virNetworkPortSetParameters|https://libvirt.org/html/libvirt-libvirt-network.html#virNetworkPortSetParameters>.
+
+
+
+=head1 INTERNAL METHODS
 
 
 

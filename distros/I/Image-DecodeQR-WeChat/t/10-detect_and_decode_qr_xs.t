@@ -7,9 +7,9 @@
 use strict;
 use warnings;
 
-use utf8; # allow for utf8 in code (we have strings in utf8, filenames)
+our $VERSION = '2.2';
 
-our $VERSION = '2.1';
+use utf8; # allow for utf8 in code (we have strings in utf8, filenames)
 
 use Test::More;
 use Test2::Plugin::UTF8;
@@ -26,20 +26,18 @@ use Image::DecodeQR::WeChat qw/
 	detect_and_decode_qr
 /;
 
-#binmode(STDOUT, ':encoding(UTF-8)');
-#binmode(STDERR, ':encoding(UTF-8)');
-
 # 0: nothing,
 # > 9: add also XS verbose
 my $VERBOSITY = 10;
 my $GRAPHICAL_OUTPUT = 0;
+my $DUMP_IMAGES_AND_DATA_TO_FILES = 1;
 
 # use this for keeping all tempfiles while CLEANUP=>1
 # which is needed for deleting them all at the end
 $File::Temp::KEEP_ALL = 1;
 # if for debug you change this make sure that it has path in it e.g. ./xyz
 my $tmpdir = File::Temp::tempdir(CLEANUP=>1); # will not be erased if env var is set
-ok(-d $tmpdir, "output dir exists");
+ok(-d $tmpdir, "tmpdir exists $tmpdir") or BAIL_OUT;
 
 my @testdata = (
 	{
@@ -132,7 +130,8 @@ my @testdata = (
 my $modelsdir = Image::DecodeQR::WeChat::modelsdir();
 ok(-d $modelsdir, "models dir exists in '$modelsdir'") or BAIL_OUT("can not continue!");
 
-my ($payloads, $bboxes, $ret);
+my ($ret, $payloads, $bboxes);
+
 for my $testdata (@testdata){
 	my $testimg = $testdata->{'test-in-file'};
 	my $expected = $testdata->{'expected-payloads'};
@@ -147,12 +146,14 @@ for my $testdata (@testdata){
 
 	ok(-f $testimg, "test image exists in '$testimg'.") or BAIL_OUT("can not continue!");
 
-	$ret = Image::DecodeQR::WeChat::detect_and_decode_qr({
-		# run it with minimal arguments to see if defaults kick in
-		'input' => $testimg,
-		'outbase' => $outbase,
-		'dumpqrimagestofile' => 1,
-	});
+	$ret = Image::DecodeQR::WeChat::detect_and_decode_qr_xs(
+		$testimg,
+		$modelsdir,
+		$outbase,
+		$VERBOSITY,
+		$GRAPHICAL_OUTPUT,
+		$DUMP_IMAGES_AND_DATA_TO_FILES
+	);
 	ok(defined($ret), "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$testimg' and result is defined.");
 	ok(ref($ret)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$testimg' and result is of type ".ref($ret)." (expected: ARRAYref).");
 	is(scalar(@$ret), 2, "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$testimg' and result contains ".scalar(@$ret)." item exactly (expected: 2).\n");
@@ -172,20 +173,30 @@ for my $testdata (@testdata){
 		for my $idx (0..$#expe){
 			if( $ap eq $expe[$idx] ){ $found = 1; splice(@expe, $idx, 1); last }
 		}
-		is($found, 1, "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$testimg' and result payload '$ap' matches one of the expected: '".join("','", @$expected)."'.");
+		is($found, 1, "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$testimg' and result payload '$ap' matches one of the expected: '".join("','", @$expected)."'.");
 	}
-	is(scalar(@expe), 0, "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$testimg' and all result payloads were verified, nothing more nothing less (unseen payloads: ".scalar(@expe).").");
-
-	if( $outbase && ($num_expected>0) ){
-		ok(  -f $_, "Output file exists '$_'.") for @produced_files1;
+	is(scalar(@expe), 0, "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$testimg' and all result payloads were verified, nothing more nothing less (unseen payloads: ".scalar(@expe).").");
+	if( $outbase && ($num_expected > 0) ){
+		# check if any output files were produced depends on whether outbase was specified etc.
+		if( $DUMP_IMAGES_AND_DATA_TO_FILES > 0 ){
+			ok(-f $_, "Output file exists '$_'.") for @produced_files1;
+			if( ! $VERBOSITY ){ unlink @produced_files1; }
+		}
 		ok(-f $_, "Output file exists '$_'.") for @produced_files2;
 		if( ! $VERBOSITY ){ unlink @produced_files2; }
 	}
 }
 
 # make this to fail
-$ret = Image::DecodeQR::WeChat::detect_and_decode_qr({});
-ok(!defined($ret), "Image::DecodeQR::WeChat::detect_and_decode_qr() : called and result is not defined because parameters were wrong deliberately (return was: ".(defined($payloads)?perl2dump($payloads):"<undef>").").");
+$ret = Image::DecodeQR::WeChat::detect_and_decode_qr_xs(
+	'non-existent-image.chchchch',
+	'non-existent-dir.agagagha',
+	'non-existent-dir.chchchch',
+	$VERBOSITY,
+	$GRAPHICAL_OUTPUT,
+	$DUMP_IMAGES_AND_DATA_TO_FILES
+);
+ok(!defined($ret), "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called and result is not defined because parameters were wrong deliberately (return was: ".(defined($payloads)?perl2dump($payloads):"<undef>").").");
 
 # if you set env var TEMP_DIRS_KEEP=1 when running
 # the temp files WILL NOT BE DELETED otherwise
@@ -197,6 +208,5 @@ do {
 	File::Temp::cleanup;
 	diag "temp files cleaned!";
 } unless exists($ENV{'TEMP_DIRS_KEEP'}) && $ENV{'TEMP_DIRS_KEEP'}>0;
-
 
 done_testing;

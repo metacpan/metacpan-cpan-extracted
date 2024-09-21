@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Alien::libsecp256k1" : "0",
+            "Alien::libsecp256k1" : "0.050103",
             "ExtUtils::MakeMaker" : "0"
          }
       },
@@ -48,7 +48,7 @@
          "web" : "https://github.com/Perl-Bitcoin/Bitcoin-Secp256k1"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

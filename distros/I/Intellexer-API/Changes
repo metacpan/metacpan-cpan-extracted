@@ -1,4 +1,7 @@
 Revision history for Intellexer::API
+0.92 Sat Sept 21 02:41:00 2024
+     - corrected dist.ini
+     - updated README.md
 0.91 Sun Mar 17 17:00:00 2024
      - updated POD
 0.9  Wed Feb 28 11:05:09 2024

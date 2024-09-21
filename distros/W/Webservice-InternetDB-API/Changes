@@ -1,4 +1,7 @@
 Revision history for Webservice::InternetDB::API
+1.005 Sat Sept 21 02:05:00 2024
+     - updated dist.ini
+     - updated readme
 1.004 Mon Sept 19 19:55:00 2024
      - set minimum perl version to 5.38
      - adjust dist.ini prereq loading

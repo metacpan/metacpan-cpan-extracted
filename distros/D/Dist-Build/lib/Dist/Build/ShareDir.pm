@@ -1,5 +1,5 @@
 package Dist::Build::ShareDir;
-$Dist::Build::ShareDir::VERSION = '0.014';
+$Dist::Build::ShareDir::VERSION = '0.015';
 use strict;
 use warnings;
 
@@ -13,7 +13,7 @@ sub add_methods {
 
 	$self->add_delegate($planner, 'dist_sharedir', sub {
 		my ($dir, $dist_name) = @_;
-		$dist_name ||= $planner->dist_name;
+		$dist_name //= $planner->dist_name;
 
 		my @outputs;
 		find(sub {
@@ -66,7 +66,7 @@ Dist::Build::ShareDir - Sharedir support for Dist::Build
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,14 @@
 Revision history for Object-Pad
 
+0.814   2024-09-20
+        [CHANGES]
+         * Depend on `XS::Parse::Sublike` v0.25 because of RT155630 bugfix
+         * Document and test the operation of `my method`
+
+        [BUGFIXES]
+         * Don't segfault when `->get_direct_method` fails to find the
+           requested method
+
 0.813   2024-09-03
         [CHANGES]
          * Removed the `has` keyword; it now immediately throws a compiletime

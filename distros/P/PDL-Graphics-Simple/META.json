@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "File::Temp" : "0",
-            "PDL" : "0",
+            "PDL" : "2.089",
             "Time::HiRes" : "0"
          }
       },
@@ -54,6 +54,6 @@
          "url" : "git://github.com/PDLPorters/PDL-Graphics-Simple.git"
       }
    },
-   "version" : "1.011",
+   "version" : "1.012",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

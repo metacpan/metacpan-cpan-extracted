@@ -2,7 +2,7 @@
 
 This is Perl module `say`.
 
-<a href="https://github.com/bayashi/say/blob/master/lib/say.pm"><img src="https://img.shields.io/badge/Version-0.03-green?style=flat"></a> <a href="https://github.com/bayashi/say/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/say/actions"><img src="https://github.com/bayashi/say/workflows/main/badge.svg?_t=1725680061"/></a> <a href="https://coveralls.io/r/bayashi/say"><img src="https://coveralls.io/repos/bayashi/say/badge.png?_t=1725680061&branch=master"/></a>
+<a href="https://github.com/bayashi/say/blob/master/lib/say.pm"><img src="https://img.shields.io/badge/Version-0.04-green?style=flat"></a> <a href="https://github.com/bayashi/say/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/say/actions"><img src="https://github.com/bayashi/say/workflows/main/badge.svg?_t=1726880958"/></a> <a href="https://coveralls.io/r/bayashi/say"><img src="https://coveralls.io/repos/bayashi/say/badge.png?_t=1726880958&branch=master"/></a>
 
 
 

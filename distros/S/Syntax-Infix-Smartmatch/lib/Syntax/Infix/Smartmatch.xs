@@ -69,7 +69,49 @@ STATIC bool S_do_smartmatch(pTHX_ SV* d, SV* e) {
 	else if (SvROK(e)) {
 		/* First of all, handle overload magic of the rightmost argument */
 		if (SvAMAGIC(e)) {
-			SV* sv = amagic_call(d, e, smart_amg, AMGf_noleft);
+			SV* sv = NULL;
+#if PERL_VERSION_LT(5,41,3)
+			sv = amagic_call(d, e, smart_amg, AMGf_noleft);
+#else
+			HV* stash = SvSTASH(SvRV(e));
+			GV* gv = gv_fetchmeth_pvn(stash, "(~~", 3, -1, 0);
+
+			if (gv) {
+				UNOP myop = {
+					.op_flags   = OPf_STACKED | OPf_WANT_SCALAR,
+					.op_ppaddr  = PL_ppaddr[OP_ENTERSUB],
+					.op_type    = OP_ENTERSUB,
+					.op_private = PERLDB_SUB && PL_curstash != PL_debstash ? OPpENTERSUB_DB : 0,
+				};
+
+				const bool oldcatch = CATCH_GET;
+				CATCH_SET(TRUE);
+
+				dSP;
+				PUSHSTACKi(PERLSI_OVERLOAD);
+				ENTER;
+				SAVEOP();
+				PL_op = (OP *) &myop;
+
+				PUSHMARK(SP);
+				EXTEND(SP, 4);
+				PUSHs(e);
+				PUSHs(d);
+				PUSHs(&PL_sv_yes);
+				PUSHs(MUTABLE_SV(GvCV(gv)));
+				PUTBACK;
+
+				CALLRUNOPS(aTHX);
+				SPAGAIN;
+				LEAVE;
+
+				sv = POPs;
+
+				PUTBACK;
+				POPSTACK;
+				CATCH_SET(oldcatch);
+			}
+#endif
 			if (sv)
 				return SvTRUEx(sv);
 		}
@@ -165,6 +207,7 @@ MODULE = Syntax::Infix::Smartmatch				PACKAGE = Syntax::Infix::Smartmatch
 PROTOTYPES: DISABLED
 
 BOOT:
+#if PERL_VERSION_LT(5, 41, 3)
 	OP_CHECK_MUTEX_LOCK;
 	if (!initialized) {
 		initialized = 1;
@@ -172,6 +215,7 @@ BOOT:
 		PL_ppaddr[OP_SMARTMATCH] = pp_smartermatch_switch;
 	}
 	OP_CHECK_MUTEX_UNLOCK;
+#endif
 #	if PERL_VERSION_GE(5, 38, 0)
 	boot_xs_parse_infix(0.26);
 	register_xs_parse_infix("~~", &hooks_smarter, NULL);

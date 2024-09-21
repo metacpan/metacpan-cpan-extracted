@@ -1430,10 +1430,11 @@ sub json_request {
         );
         1;
     };
+    my $error = $@;
 
     unless ($ok) {
-        KGB->out($@);
-        json_error( $json, $resp, "[$repo_id] Internal server error" );
+        KGB->out($error);
+        json_error( $json, $resp, "[$repo_id] Internal server error: $error" );
         $_[KERNEL]->post( $_[SENDER], DONE => $resp );
         return;
     }
@@ -1798,9 +1799,7 @@ sub trim_lines(\@$@) {
     while ( $_ = shift @strings ) {
         if ( length($_) > $MAGIC_MAX_LINE ) {
             push @tmp, substr( $_, 0, $MAGIC_MAX_LINE );
-            unshift @strings,
-                colorize( repository => $repoid )
-                . substr( $_, $MAGIC_MAX_LINE );
+            unshift @strings, substr( $_, $MAGIC_MAX_LINE );
         }
         else {
             push @tmp, $_;

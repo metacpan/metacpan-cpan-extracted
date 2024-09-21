@@ -9,7 +9,7 @@ use Feature::Compat::Try;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 class Webservice::InternetDB::API;
 

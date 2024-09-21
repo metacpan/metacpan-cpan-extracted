@@ -16,10 +16,10 @@ our @ISA = qw(Exporter);
 # see https://perlmonks.org/?node_id=11115288
 our (@EXPORT_OK, %EXPORT_TAGS);
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 BEGIN {
-	$VERSION = '2.1';
+	$VERSION = '2.2';
 	if ($] > 5.006) {
 		require XSLoader;
 		XSLoader::load(__PACKAGE__, $VERSION);
@@ -121,7 +121,7 @@ Image::DecodeQR::WeChat - Decode QR code(s) from images using the OpenCV/WeChat 
 
 =head1 VERSION
 
-Version 2.1
+Version 2.2
 
 =head1 SYNOPSIS
 

@@ -95,5 +95,13 @@ if ( $Class eq 'RT::Assets' && !$Format ) {
     $Format .= "'__CF.{$_}__/TITLE:$_', " for map {$_ = $_->Name; s/['\\]/\\$1/g; $_} @{$CFs->ItemsArrayRef};
 }
 
+$m->callback(
+    CallbackName     => 'BeforeExport',
+    ARGSRef          => \%ARGS,
+    Collection       => $collection,
+    Format           => $Format,
+    PreserveNewLines => $PreserveNewLines,
+    %ARGS,
+);
 $m->comp( "/Elements/XLSXExport", Collection => $collection, Format => $Format, PreserveNewLines => $PreserveNewLines );
 </%INIT>

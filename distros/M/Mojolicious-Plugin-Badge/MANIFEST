@@ -1,3 +1,4 @@
+Changes
 examples/color-blue.png
 examples/color-brightgreen.png
 examples/color-green.png
@@ -12,6 +13,8 @@ examples/style-flat-square.png
 examples/style-flat.png
 examples/style-for-the-badge.png
 examples/style-plastic.png
+INSTALL.md
+lib/Mojolicious/Command/badge.pm
 lib/Mojolicious/Plugin/Badge.pm
 lib/Mojolicious/Plugin/Badge/resources/templates/badge.style.flat-square.svg.ep
 lib/Mojolicious/Plugin/Badge/resources/templates/badge.style.flat.svg.ep
@@ -19,8 +22,10 @@ lib/Mojolicious/Plugin/Badge/resources/templates/badge.style.for-the-badge.svg.e
 lib/Mojolicious/Plugin/Badge/resources/templates/badge.style.plastic.svg.ep
 lib/Mojolicious/Plugin/Badge/resources/templates/badge.svg.ep
 lib/Mojolicious/Plugin/Badge/resources/templates/badge.svg.ep.orig
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
+README.md
 t/00-load.t
 t/basic.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

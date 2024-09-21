@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.18;
 use warnings;
 
 use Test2::V0 0.000148; # is_refcount

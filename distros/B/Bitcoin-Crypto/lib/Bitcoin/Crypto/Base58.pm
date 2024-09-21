@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Base58;
-$Bitcoin::Crypto::Base58::VERSION = '2.007';
+$Bitcoin::Crypto::Base58::VERSION = '3.000';
 use v5.10;
 use strict;
 use warnings;

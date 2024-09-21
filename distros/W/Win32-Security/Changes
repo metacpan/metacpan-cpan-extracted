@@ -1,5 +1,41 @@
 Revision history for Perl extension Win32::Security
 
+?.??  FUTURE Development Goals
+  - Add support for Unicode characters in Win32::Security::NamedObject
+    and Win32::Security::Recursor, and trustees (usernames/groups).
+  - Improve test suite coverage for DENY vs ALLOW ACEs
+  - Expand test suite to explicitly cover:
+    - Win32::Security::ACL
+    - Win32::Security::NamedObject
+    - Win32::Security::SID
+  - Significantly expanded testing for PermChg.pl
+  - PermChg.pl -f is not really trustworthy or fully defined
+
+0.60  Fri Sep 20 2024
+  - First release in 20.5 years!
+  - Fixes to test scripts to support updates in Windows since 2004!
+  - Added support for Strawberry Perl 5.40 x64 Perl while retaining
+    x86 support at least as far back as ActivePerl 5.16!
+  - Fixed inheritance validation bug related to DENY and ALLOW ACEs being
+    treated as identical ACEs for permission occlusion.
+  - Significant changes/bug fixes to AdjustTokenPrivileges and use thereof.
+  - Attempt privilege escalation to enable reading/manipulating security
+    information when elevated privileges are available
+  - Bug fix for setting ownerTrustee/SID on recent versions of Windows.
+  - Bug fix for remote registry access (thanks nobull67@gmail.com)
+  - Added support for -file option to PermDump.pl.
+  - Extensive changes to NamedObject and Recursor to improve performance,
+    especially when dumping both owner and dacl information.
+  - Significant performance improvements were made to Data::BitMask, which
+    are available in Data::BitMask 1.00.  PermDump.pl saw a ~20% speed up.
+  - Adding support for x64 (while retaining x86 support) required extensive
+    changes in Raw.pm, along with some in NamedObject.pm.
+  - Added test suite for Win32::Security::Raw.
+  - Fixes in t/scripts.t to support newer versions of cacls.exe that return
+    "(ID)" (Inherited from Directory) for inherited permissions.
+  - Added version numbers to all module files (and updated copyright dates)
+  - Enabled extended tests (computers got faster over the past 20 years).
+
 0.50  Sat Mar 20 2004
   - Moved to using Build.PL (i.e. Module::Build).
   - Moved utility scripts into script dir so they will install to Perl/bin

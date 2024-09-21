@@ -13,7 +13,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Perl interface to libsecp256k1",
   "AUTHOR" => "Bartosz Jarzyna <bbrtj.pro\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
-    "Alien::libsecp256k1" => 0,
+    "Alien::libsecp256k1" => "0.050103",
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Bitcoin-Secp256k1",
@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }

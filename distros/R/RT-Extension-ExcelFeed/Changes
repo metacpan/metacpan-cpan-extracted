@@ -1,3 +1,7 @@
+0.11 2024-09-20
+ - Add BeforeExport callback to pre-process results
+ - Add ability to return the generated workbook, rather than send to browser
+
 0.10 2024-01-16
  - Support to download search results for more collections(transactions and assets)
  - Support transaction and asset charts

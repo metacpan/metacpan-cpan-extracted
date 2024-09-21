@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::UTXO;
-$Bitcoin::Crypto::Transaction::UTXO::VERSION = '2.007';
+$Bitcoin::Crypto::Transaction::UTXO::VERSION = '3.000';
 use v5.10;
 use strict;
 use warnings;

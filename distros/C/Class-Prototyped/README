@@ -694,7 +694,7 @@ specific package.
           sub1 => sub { print "this is sub1 in p2" },
       );
 
-    It calls "newCore" to create the new object*, so if you have overriden
+    It calls "newCore" to create the new object*, so if you have overridden
     "new", you should contemplate overriding "clone" in order to ensure that
     behavioral changes made to "new" that would be applicable to "clone" are
     implemented. Or simply override "newCore".
@@ -794,8 +794,8 @@ specific package.
 
   autoloadCall()
     If you add an "AUTOLOAD" slot to an object, you will need to get the
-    name of the subroutine being called. "autoloadCall()" returns the name
-    of the subroutine, with the package name stripped off.
+    name of the subroutine being called. autoloadCall() returns the name of
+    the subroutine, with the package name stripped off.
 
   package() - Returns the name of the package for the object
   object() - Returns the object itself
@@ -883,7 +883,7 @@ specific package.
             When true, this defines the field slot as constant, disabling
             the ability to modify it using the "$object->field($newValue)"
             syntax. The value may still be modified using the hash syntax
-            (i.e. "$object->{field} = $newValue"). This is mostly useful if
+            (i.e. $object->{field} = $newValue). This is mostly useful if
             you have an object method call that takes parameters, but you
             wish to replace it on a given object with a hard-coded value by
             using a field (which makes inspecting the value of the slot
@@ -1124,7 +1124,7 @@ defined for the entire inheritance hierarchy
 
   include() - include a package or external file
     You can "require" an arbitrary file in the namespace of an object or
-    class without adding to the parents using "include()" :
+    class without adding to the parents using include() :
 
       $foo->include( 'xx.pl' );
 
@@ -1157,7 +1157,7 @@ defined for the entire inheritance hierarchy
         $mirror->include('File.pl', 'thisObject');
 
     Then the "addSlots" will work fine, but if sub "c" is called, it won't
-    find "thisObject()".
+    find thisObject().
 
 AUTHOR
     Written by Ned Konz, perl@bike-nomad.com and Toby Ovod-Everett,

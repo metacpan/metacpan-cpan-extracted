@@ -1,5 +1,18 @@
 -----
 
+0.0.3    2024-09-20
+    [Added]
+       * Mention related C header file in list of unimplemented entry points
+       * Whitelist some entry points for generation, despite being marked
+         'server' or 'none'
+       * List intentionally unimplemented entry points (in Domain.pm
+         only for now)
+    [Changed]
+       * Methods linked to functions in the C header 'src/libvirt_internal.h'
+         prefixed with '_', making them internal by convention
+    [Fixed]
+       * POD tests should not run on CPANtesters (AUTHOR_TESTING)
+
 0.0.2    2024-09-18
     [Fixed]
        * POD errors

@@ -1,5 +1,7 @@
 <%INIT>
 return unless $Object && $Object->isa('RT::Transaction');
+return unless $Object->Object && $Object->Object->isa('RT::Ticket') && $Object->Object->CurrentUserCanSeeTime;
+
 if ( !$Object->FirstCustomFieldValue('Worked Date') ) {
     $CustomFields->Limit( FIELD => 'Name', VALUE => 'Worked Date', OPERATOR => '!=', CASESENSITIVE => 0 );
 }

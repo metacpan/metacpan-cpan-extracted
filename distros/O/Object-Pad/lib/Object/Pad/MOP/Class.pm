@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.813;
+package Object::Pad::MOP::Class 0.814;
 
-use v5.14;
+use v5.18;
 use warnings;
 use Carp;
 

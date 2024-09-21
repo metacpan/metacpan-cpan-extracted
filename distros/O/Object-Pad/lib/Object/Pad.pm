@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.813;
+package Object::Pad 0.814;
 
-use v5.14;
+use v5.18;
 use warnings;
 
 use Carp;
@@ -900,6 +900,27 @@ scopes are independent, even if they share the same name. This is particularly
 useful in roles, to create internal helper methods without letting those
 methods be visible to callers, or risking their names colliding with other
 named methods defined on the consuming class.
+
+=head2 my method
+
+   my method NAME { ... }
+
+I<Since version 0.814> lexical method declarations are supported using the
+C<my> keyword prefix. These become available as lexical functions, rather than
+being stored in the class package. As a result, they are not available by
+named method resolution, package C<< ->can >> lookup, or via the MOP. These
+are a convenient alternative to the syntax given above, where the method is
+stored anonymously via a lexical variable.
+
+Since lexical methods are not visible to named method resolution, they must be
+invoked by function-call syntax, remembering to pass in the invocant as the
+first argument:
+
+   my method inner { ... }
+
+   method outer {
+      inner($self, @args);
+   }
 
 =head2 BUILD
 

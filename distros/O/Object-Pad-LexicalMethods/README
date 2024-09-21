@@ -1,0 +1,69 @@
+NAME
+
+    Object::Pad::LexicalMethods - operator for lexical method call syntax
+
+SYNOPSIS
+
+       use v5.38;
+       use Object::Pad;
+       use Object::Pad::LexicalMethods;
+    
+       class WithPrivate {
+          field $var;
+    
+          my method inc_var { $var++ }
+          my method dec_var { $var-- }
+    
+          method bump {
+             $self->&inc_var;
+             say "In the middle";
+             $self->&dec_var;
+          }
+       }
+
+DESCRIPTION
+
+    Perl version 5.18 added lexical subroutines, which are located in the
+    lexical scope (much like variables declared with my). Object::Pad
+    version 0.814 supports methods being declared lexically as well,
+    meaning they do not appear in the package namespace of the class, and
+    are not accessible from other scopes. However, Perl does not currently
+    provide a method call syntax for invoking these from the lexical scope
+    while looking like method calls.
+
+    This module provides an infix operator for making the syntax of calls
+    to lexical subroutines as if they were methods defined on an object
+    instance look more like named method dispatch syntax.
+
+    Support for custom infix operators was added in the Perl 5.37.x
+    development cycle and is available from development release v5.37.7
+    onwards, and therefore in Perl v5.38 onwards. The documentation of
+    XS::Parse::Infix describes the situation in more detail.
+
+OPERATORS
+
+ ->&
+
+       @result = $instance->&lexmethod( @args );
+       @result = $instance->&lexmethod;
+
+    Invokes a lexical subroutine (that must be visible in the current
+    scope) as if it were a method on instance given by the LHS operand.
+    Arguments may be passed; if so they must be surrounded by parentheses.
+
+    This is exactly equivalent to simply invoking the subroutine as a plain
+    function and passing in the instance as the first argument. However,
+    the syntax looks more like regular name-based dispatch method
+    invocation, and is perhaps less surprising to readers as a result.
+    Also, this operator will only accept lexical subroutines as methods; it
+    will reject package-named ones that would otherwise be visible here.
+
+    Note that as this is implemented as a single infix operator named ->&
+    whitespace is not permitted after the arrow but before the ampersand,
+    whereas other arrow-like operators in Perl (such as ->[ ... ]) do
+    permit this.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

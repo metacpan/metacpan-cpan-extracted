@@ -5,7 +5,7 @@
 # Author: Toby Ovod-Everett
 #
 #############################################################################
-# Copyright 2003, 2004 Toby Ovod-Everett.  All rights reserved
+# Copyright 2003-2024 Toby Ovod-Everett.  All rights reserved
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
@@ -33,13 +33,14 @@ use vars qw($counter $starttime);
 $starttime = Win32::GetTickCount();
 
 my $options = {};
-GetOptions($options, qw(csv! dirsonly! inherited! owner! recurse|s! help performance!)) or die "Invalid option.\n";
+GetOptions($options, qw(csv! dirsonly! file=s inherited! owner! recurse|s! help performance!)) or die "Invalid option.\n";
 
 if (defined($options->{help})) {
 	print <<ENDHELP;
 PermDump.pl options:
   -c[sv]         Output in CSV format
   -d[irsonly]    Check directories only
+  -f[ile]=file   Use passed filename for output in CSV or TDF format
   -i[nherited]   Display properly inherited permissions/ownership
   -o[wner]       Display ownership
   -r[ecurse]     Recurse into subdirectories
@@ -84,6 +85,8 @@ foreach my $name (@ARGV) {
 	$recursor->recurse($name);
 }
 
+$recursor->close_file_handle();
+
 if ($options->{performance}) {
 	my $elapsed = Win32::GetTickCount()-$starttime;
 	print STDERR sprintf("%i in %0.2f seconds (%i/s, %0.2f ms)\n", $recursor->{payload_count},
@@ -95,12 +98,20 @@ if ($options->{performance}) {
 			scalar(keys %{Win32::Security::ACL::SE_FILE_OBJECT->_rawAclCache()}) );
 }
 
-#my $payload_count = $recursor->{payload_count};
-#foreach my $package (sort keys %{$Class::Prototyped::Mirror::PROFILE::counts}) {
-#	foreach my $slotName (sort keys %{$Class::Prototyped::Mirror::PROFILE::counts->{$package}}) {
-#		foreach my $caller (sort keys %{$Class::Prototyped::Mirror::PROFILE::counts->{$package}->{$slotName}}) {
-#			my $call_count = $Class::Prototyped::Mirror::PROFILE::counts->{$package}->{$slotName}->{$caller};
-#			print STDERR "$package\t$slotName\t$caller\t$call_count\t".sprintf("%0.3f", $call_count/$payload_count)."\n";
-#		}
-#	}
-#}
+# my $payload_count = $recursor->{payload_count};
+# foreach my $package (sort keys %{$Class::Prototyped::Mirror::PROFILE::counts}) {
+	# my $slots = $Class::Prototyped::Mirror::PROFILE::counts->{$package};
+	# foreach my $slotName (sort keys %{$slots}) {
+		# my $slotData = $slots->{$slotName};
+		# if (ref($slotData) eq 'HASH') {
+			# foreach my $caller (sort keys %{$slotData}) {
+				# my $call_count = $slotData->{$caller};
+				# print STDERR "$package\t$slotName\t$caller\t$call_count\t".sprintf("%0.3f", $call_count/$payload_count)."\n";
+			# }
+		# }
+		# else {
+			# my $call_count = $slotData;
+			# print STDERR "$package\t$slotName\t$call_count\t".sprintf("%0.3f", $call_count/$payload_count)."\n";
+		# }
+	# }
+# }

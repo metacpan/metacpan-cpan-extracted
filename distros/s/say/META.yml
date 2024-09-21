@@ -28,5 +28,5 @@ resources:
   bugtracker: http://github.com/bayashi/say/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/bayashi/say
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

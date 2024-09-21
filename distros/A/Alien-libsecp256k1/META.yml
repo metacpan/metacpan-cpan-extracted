@@ -25,7 +25,7 @@ requires:
 resources:
   bugtracker: https://github.com/Perl-Bitcoin/Alien-libsecp256k1/issues
   repository: git://github.com/Perl-Bitcoin/Alien-libsecp256k1.git
-version: '0.050102'
+version: '0.050103'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.014';
+$Dist::Build::XS::VERSION = '0.015';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ sub add_methods {
 		my $pureperl_only = $args{pureperl_only} // $planner->pureperl_only;
 		die "Can't build xs files under --pureperl-only\n" if $pureperl_only;
 
-		my $xs_base = $args{xs_base} || 'lib';
+		my $xs_base = $args{xs_base} // 'lib';
 		my ($module_name, $xs_file);
 		if (defined $args{module}) {
 			$module_name = $args{module};
@@ -40,8 +40,10 @@ sub add_methods {
 
 		$planner = $planner->new_scope;
 
-		$planner->load_module('ExtUtils::Builder::ParseXS',       0.016, config => $args{config}) unless $planner->can('parse_xs');
-		$planner->load_module('ExtUtils::Builder::AutoDetect::C', 0.016, config => $args{config}) unless $planner->can('compile');
+		my $config = $args{config} // $planner->config;
+
+		$planner->load_module('ExtUtils::Builder::ParseXS',       0.016, config => $config) unless $planner->can('parse_xs');
+		$planner->load_module('ExtUtils::Builder::AutoDetect::C', 0.016, config => $config) unless $planner->can('compile');
 
 		my $xs_dir = dirname($xs_file);
 		my $c_file = $planner->c_file_for_xs($xs_file, $xs_dir);
@@ -51,7 +53,7 @@ sub add_methods {
 		my $o_file = $planner->obj_file(basename($c_file, '.c'), $xs_dir);
 
 		my %defines = (
-			%{ $args{defines} || {} },
+			%{ $args{defines} // {} },
 			VERSION    => qq/"$module_version"/,
 			XS_VERSION => qq/"$module_version"/,
 		);
@@ -61,8 +63,9 @@ sub add_methods {
 			type         => 'loadable-object',
 			profile      => '@Perl',
 			defines      => \%defines,
-			include_dirs => [ dirname($xs_file), @{ $args{include_dirs} || [] } ],
+			include_dirs => [ dirname($xs_file), @{ $args{include_dirs} // [] } ],
 			extra_args   => $compiler_flags,
+			config       => $config,
 		);
 
 		my @objects = $o_file;
@@ -70,16 +73,17 @@ sub add_methods {
 		for my $source (@{ $args{extra_sources} }) {
 			my %options = ref $source ? %{ $source } : (source => $source);
 			my $dirname = dirname($options{source});
-			my $object  = $options{object} || $planner->obj_file(basename($options{source}, '.c'), $dirname);
-			my %defines = (%{ $args{defines} || {} }, %{ $options{defines} || {} });
-			my @include_dirs = (@{ $args{include_dirs} || [] }, @{ $options{include_dirs} || [] });
-			my @compiler_flags = (@{ $compiler_flags || [] }, @{ $options{flags} || [] });
+			my $object  = $options{object} // $planner->obj_file(basename($options{source}, '.c'), $dirname);
+			my %defines = (%{ $args{defines} // {} }, %{ $options{defines} // {} });
+			my @include_dirs = (@{ $args{include_dirs} // [] }, @{ $options{include_dirs} // [] });
+			my @compiler_flags = (@{ $compiler_flags // [] }, @{ $options{flags} // [] });
 			$planner->compile($options{source}, $object,
 				type         => 'loadable-object',
 				profile      => '@Perl',
 				defines      => \%defines,
 				include_dirs => \@include_dirs,
 				extra_args   => \@compiler_flags,
+				config       => $config,
 			);
 			push @objects, $object;
 		}
@@ -95,6 +99,7 @@ sub add_methods {
 			extra_args   => get_flags($args{extra_linker_flags}),
 			library_dirs => $args{library_dirs},
 			libraries    => $args{libraries},
+			config       => $config,
 		);
 
 		$planner->create_phony('dynamic', $lib_file);
@@ -117,7 +122,7 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -213,6 +218,30 @@ Libraries to link to.
 =item * extra_linker_flags
 
 Additional flags to feed to the compiler. This can either be an array or a (shell-quoted) string.
+
+=back
+
+=head1 EXTENSIONS
+
+Various extensions exist that modify the behavior of C<add_xs>. Among these are:
+
+=over 4
+
+=item * L<Dist::Build::XS::Import|Dist::Build::XS::Import>
+
+This adds an C<import> argument to imports include directories and compilation flags exported by other modules using L<Dist::Build::XS::Export|Dist::Build::XS::Export>.
+
+=item * L<Dist::Build::XS::WriteConstants|Dist::Build::XS::WriteConstants>
+
+This adds a C<write_constants> argument, integrating L<ExtUtils::Constant|ExtUtils::Constant>.
+
+=item * L<Dist::Build::XS::Alien|Dist::Build::XS::Alien>
+
+This adds an C<alien> argument to link to libraries using L<Alien::Base|Alien::Base>.
+
+=item * L<Dist::Build::XS::PkgConfig|Dist::Build::XS::PkgConfig>
+
+This adds a C<pkg_config> argument to link to libraries using C<pkg-config> files.
 
 =back
 

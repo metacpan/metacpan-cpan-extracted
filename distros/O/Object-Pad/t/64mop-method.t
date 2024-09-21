@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.18;
 use warnings;
 
 use Test2::V0;
@@ -26,6 +26,11 @@ is( [ $classmeta->direct_methods ], [ $methodmeta ],
 
 is( [ $classmeta->all_methods ], [ $methodmeta ],
    '$classmeta->all_methods' );
+
+# should croak and not segfault
+like( dies { $classmeta->get_direct_method( 'ZZZ' ) },
+   qr/^Class Example does not have a method called 'ZZZ' at /,
+   'Failure message for ->get_direct_method missing' );
 
 class SubClass { inherit Example; }
 
@@ -57,6 +62,18 @@ ok( defined Object::Pad::MOP::Class->for_class( "SubClass" )->get_method( 'm' ),
    is( $methodmeta->name, "cm", '$methodmeta->name for :common' );
    is( $methodmeta->class->name, "BClass", '$methodmeta->class gives class for :common' );
    ok( $methodmeta->is_common, '$methodmeta->is_common for :common' );
+}
+
+# lexical methods should not appear in the MOP
+{
+   class CClass {
+      my method lexmeth { return "OK" }
+   }
+
+   my $classmeta = Object::Pad::MOP::Class->for_class( "CClass" );
+
+   ok( dies { $classmeta->get_direct_method( 'lexmeth' ) },
+      'lexical method is not visible via MOP' );
 }
 
 done_testing;

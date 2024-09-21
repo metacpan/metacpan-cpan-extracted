@@ -1,5 +1,8 @@
 Revision history for Syntax-Infix-Smartmatch
 
+0.010     2024-09-20 14:46:37+02:00 Europe/Brussels
+          - Adapt to the removal of smartmatch in core
+
 0.009     2024-09-09 19:32:22+02:00 Europe/Brussels
           - Restore XS::Parse::Infix as a configure time dependency
 

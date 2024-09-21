@@ -1,3 +1,6 @@
+1.012 2024-09-21
+- add "contours", "fits", "polylines" plot types
+
 1.011 2024-04-22
 - P{GPLOT,Lplot} to read devices using proper API not subprocesses
 - if PDL_SIMPLE_ENGINE in ENV, use ONLY that if engine unspecified

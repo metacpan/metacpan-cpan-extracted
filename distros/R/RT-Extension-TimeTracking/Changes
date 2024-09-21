@@ -1,5 +1,8 @@
 Revision history for RT-Extension-TimeTracking
 
+0.24 2024-09-09
+ - Avoid loading time related cfs for unprivileged users
+
 0.23 2022-07-13
  - Add RTIR support
 

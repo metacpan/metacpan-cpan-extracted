@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::Input;
-$Bitcoin::Crypto::Transaction::Input::VERSION = '2.007';
+$Bitcoin::Crypto::Transaction::Input::VERSION = '3.000';
 use v5.10;
 use strict;
 use warnings;

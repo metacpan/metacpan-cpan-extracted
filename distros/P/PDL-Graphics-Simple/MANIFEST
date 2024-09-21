@@ -7,6 +7,7 @@ lib/PDL/Graphics/Simple/Prima.pm
 Makefile.PL
 MANIFEST			This list of files
 README.pod
+t/europe.fits
 t/simple.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

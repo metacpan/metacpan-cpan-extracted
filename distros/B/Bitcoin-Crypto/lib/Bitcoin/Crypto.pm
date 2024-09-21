@@ -1,5 +1,5 @@
 package Bitcoin::Crypto;
-$Bitcoin::Crypto::VERSION = '2.007';
+$Bitcoin::Crypto::VERSION = '3.000';
 use v5.10;
 use strict;
 use warnings;

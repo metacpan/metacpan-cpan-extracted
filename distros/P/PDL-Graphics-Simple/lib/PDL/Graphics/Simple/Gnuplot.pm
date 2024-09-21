@@ -16,6 +16,7 @@ use warnings;
 use File::Temp qw/tempfile/;
 use PDL::Options q/iparse/;
 use PDL;
+use PDL::ImageND; # for polylines
 our $required_PGG_version = 1.5;
 
 our $mod = {
@@ -23,7 +24,7 @@ our $mod = {
     module=>'PDL::Graphics::Simple::Gnuplot',
     engine => 'PDL::Graphics::Gnuplot',
     synopsis=> 'Gnuplot 2D/3D (versatile; beautiful output)',
-    pgs_api_version=> '1.011',
+    pgs_api_version=> '1.012',
 };
 PDL::Graphics::Simple::register( $mod );
 
@@ -46,7 +47,6 @@ our $disp_opts = {
     windows=>{persist=>0}
 };
 
-
 ##########
 # PDL::Graphics::Simple::Gnuplot::check
 # Checker
@@ -65,7 +65,7 @@ sub check {
 	$mod->{msg} = $@;
 	return 0;
     }
-    if($PDL::Graphics::Gnuplot::VERSION < $required_PGG_version) {
+    if ($PDL::Graphics::Gnuplot::VERSION < $required_PGG_version) {
 	$mod->{msg} = sprintf("PDL::Graphics::Gnuplot was found, but is too old (v%s < v%s).  Ignoring it.\n",
 			      $PDL::Graphics::Gnuplot::VERSION,
 			      $required_PGG_version
@@ -138,7 +138,7 @@ sub new {
     my $conv_tempfile = '';
 
     # Do different things for interactive and file types
-    if($opt->{type} =~ m/^i/i) {
+    if ($opt->{type} =~ m/^i/i) {
 	push(@params, title=>$opt->{output}) if defined $opt->{output};
 	# Interactive - try known terminals unless PDL_SIMPLE_DEVICE given
 	push @params, font=>"=16", dashed=>1;
@@ -146,8 +146,6 @@ sub new {
 	    $gpw = gpwin($mod->{itype}, @params,
 		($disp_opts->{$try} // {})->{persist} ? (persist=>0) : ()
 	    );
-            no warnings 'once';
-	    print $PDL::Graphics::Gnuplot::last_plotcmd;
 	} else {
 	    if (my $try = $ENV{PDL_SIMPLE_DEVICE}) {
 		$gpw = gpwin($try, @params,
@@ -158,7 +156,7 @@ sub new {
 		    eval { $gpw = gpwin($try, @params,
 			($disp_opts->{$try} // {})->{persist} ? (persist=>0) : ()
 		    ); };
-		    last attempt if($gpw);
+		    last attempt if $gpw;
 		}
 	    }
 	    die "Couldn't start a gnuplot interactive window" unless($gpw);
@@ -170,7 +168,7 @@ sub new {
 
 	# Filename extension -- 2-4 characters
 	my $ext;
-	if($opt->{output} =~ m/\.(\w{2,4})$/) {
+	if ($opt->{output} =~ m/\.(\w{2,4})$/) {
 	    $ext = $1;
 	} else {
 	    $ext = '.png';
@@ -186,7 +184,7 @@ sub new {
 	my $ft = $filetypes->{$ext};
 	if (ref $ft eq 'ARRAY') {
 	  try:for my $try (@$ft) {
-	      if($mod->{valid_terms}->{$try}) {
+	      if ($mod->{valid_terms}{$try}) {
 		  $ft = $try;
 		  last try;
 	      }
@@ -194,14 +192,14 @@ sub new {
 	    if (ref($ft)) {
 		$ft = undef;
 	    }
-	} elsif (!defined($mod->{valid_terms}->{$ft})) {
+	} elsif (!defined($mod->{valid_terms}{$ft})) {
 	    $ft = undef;
 	}
 
 	# Now $ext has the file type - check if its a supported type.  If not, make a
 	# tempfilename to hold gnuplot's output.
 	unless ( defined($ft) ) {
-	    unless ($mod->{valid_terms}->{'pscairo'}  or  $mod->{valid_terms}->{'postscript'}) {
+	    unless ($mod->{valid_terms}{pscairo}  or  $mod->{valid_terms}{postscript}) {
 		die "PDL::Graphics::Simple: $ext isn't a valid output file type for your gnuplot,\n\tand it doesn't support .ps either.  Sorry, I give up.\n";
 	    }
 
@@ -211,11 +209,11 @@ sub new {
 	    close $fh;
 	    unlink($conv_tempfile); # just to be sure;
 	    $conv_tempfile .= ".ps";
-	    $ft = $mod->{valid_terms}->{'pscairo'} ? 'pscairo' : 'postscript';
+	    $ft = $mod->{valid_terms}{pscairo} ? 'pscairo' : 'postscript';
 	}
-	push(@params, "output" => ($conv_tempfile || $opt->{output}) );
-	push(@params, "color"  => 1 )  if( $PDL::Graphics::Gnuplot::termTab->{$ft}->{'color'} );
-	push(@params, "dashed" => 1 )  if( $PDL::Graphics::Gnuplot::termTab->{$ft}->{'dashed'} );
+	push @params, output => ($conv_tempfile || $opt->{output});
+	push @params, color  => 1 if $PDL::Graphics::Gnuplot::termTab->{$ft}{color};
+	push @params, dashed => 1 if $PDL::Graphics::Gnuplot::termTab->{$ft}{dashed};
 	$gpw = gpwin( $ft,  @params );
     }
 
@@ -223,8 +221,8 @@ sub new {
     my $me = { opt => $opt, conv_fn => $conv_tempfile, obj=>$gpw };
 
     # Deal with multiplot setup...
-    if(defined($opt->{multi})) {
-	$me->{nplots} = $opt->{multi}->[0] * $opt->{multi}->[1];
+    if (defined($opt->{multi})) {
+	$me->{nplots} = $opt->{multi}[0] * $opt->{multi}[1];
 	$me->{plot_no} = 0;
     } else {
 	$me->{nplots} = 0;
@@ -260,28 +258,45 @@ our $curve_types = {
 	$co->{with} = "lines";
 	return [ $co, $dx, $dy ];
     },
+    contours => sub {
+      my ($me, $po, $co, $vals, $cvals) = @_;
+      $co->{with} = "lines";
+      $co->{style} //= 6; # so all contour parts have same style, blue somewhat visible against sepia
+      my @out;
+      for my $thresh ($cvals->list) {
+        my ($pi, $p) = contour_polylines($thresh, $vals, $vals->ndcoords);
+        next if $pi->at(0) < 0;
+        push @out, map [ $co, $_->dog ], path_segs($pi, $p->mv(0,-1));
+      }
+      @out;
+    },
+    polylines => sub {
+      my ($me, $po, $co, $xy, $pen) = @_;
+      $co->{with} = "lines";
+      $co->{style} //= 6; # so all polylines have same style, blue somewhat visible against sepia
+      my $pi = $pen->eq(0)->which;
+      map [ $co, $_->dog ], path_segs($pi, $xy->mv(0,-1));
+    },
+    fits => 'fits',
     labels => sub {
 	my($me, $po, $co, @data) = @_;
 	my $label_list = ($po->{label} or []);
-
 	for my $i(0..$data[0]->dim(0)-1) {
 	    my $j = "";
 	    my $s = $data[2]->[$i];
-	    if( $s =~ s/^([\<\>\| ])// ) {
+	    if ( $s =~ s/^([\<\>\| ])// ) {
 		$j = $1;
 	    }
-
 	    my @spec = ("$s", at=>[$data[0]->at($i), $data[1]->at($i)]);
-	    push(@spec,"left") if($j eq '<');
-	    push(@spec,"center") if($j eq '|');
-	    push(@spec,"right") if($j eq '>');
-	    push( @{$label_list}, \@spec );
+	    push @spec,"left" if $j eq '<';
+	    push @spec,"center" if $j eq '|';
+	    push @spec,"right" if $j eq '>';
+	    push @{$label_list}, \@spec;
 	}
 	$po->{label} = $label_list;
 	$co->{with} = "labels";
-	return [ $co, [$po->{xrange}->[0]], [$po->{yrange}->[0]], [""] ];
-    }
-
+	return [ $co, [$po->{xrange}[0]], [$po->{yrange}[0]], [""] ];
+    },
 };
 
 sub plot {
@@ -301,18 +316,18 @@ sub plot {
 	clut   => 'sepia',
     };
 
-    if( defined($ipo->{legend}) ) {
+    if ( defined($ipo->{legend}) ) {
 	my $legend = "";
-	if( $ipo->{legend} =~ m/l/i ) {
+	if ( $ipo->{legend} =~ m/l/i ) {
 	    $legend .= ' left ';
-	} elsif($ipo->{legend} =~ m/r/i) {
+	} elsif ($ipo->{legend} =~ m/r/i) {
 	    $legend .= ' right ';
 	} else {
 	    $legend .= ' center ';
 	}
-	if( $ipo->{legend} =~ m/t/i) {
+	if ( $ipo->{legend} =~ m/t/i) {
 	    $legend .= ' top ';
-	} elsif( $ipo->{legend} =~ m/b/i) {
+	} elsif ( $ipo->{legend} =~ m/b/i) {
 	    $legend .= ' bottom ';
 	} else {
 	    $legend .= ' center ';
@@ -320,89 +335,63 @@ sub plot {
 	$po->{key} = $legend;
     }
 
-    $po->{logscale} = [$ipo->{logaxis}] if($ipo->{logaxis});
+    $po->{logscale} = [$ipo->{logaxis}] if $ipo->{logaxis};
 
     unless($ipo->{oplot}) {
 	$me->{curvestyle} = 0;
     }
 
-    my @arglist = ($po);
-
-    for my $block(@_) {
-	my $ct = $curve_types->{  $block->[0]->{with}  };
-
-	unless(defined($ct)) {
-	    die "PDL::Graphics::Simple::Gnuplot: undefined curve type $ct";
-	}
-	if(ref($ct) eq 'CODE') {
-	    $block = &$ct($me, $po, @$block);
-	} else {
-	    $block->[0]->{with} = $ct;
-	}
-
-	# Now parse out curve options and deal with line styles...
-	my $co = shift @$block;
-	my $gco = {};
-	$gco->{with} = $co->{with};
-
-	unless($co->{with} eq 'labels') {
-
-	    if(defined($co->{style})  and  $co->{style}) {
-		$me->{curvestyle} = $co->{style};
-	    } else {
-		$me->{curvestyle}++;
-	    }
-
-	    $gco->{linetype} = $me->{curvestyle};
-	}
-
-	if( defined($co->{width}) and $co->{width} and $co->{with} !~ m/^label/ ) {
-	    my $s;
-	    if($co->{with} =~ m/^points/) {
-		$gco->{pointsize} = $co->{width};
-	    }
-	    $gco->{linewidth} = $co->{width};
-	}
-	$gco->{legend} = $co->{key} if(defined($co->{key}));
-
-	push(@arglist, ($gco, @$block));
+    my @arglist = $po;
+    for my $block (@_) {
+      die "PDL::Graphics::Simple::Gnuplot: undefined curve type $block->[0]{with}"
+        unless my $ct = $curve_types->{ $block->[0]{with} };
+      my @blocks = ref($ct) eq 'CODE' ? $ct->($me, $po, @$block) : [{%{$block->[0]}, with=>$ct}, @$block[1..$#$block]];
+      # Now parse out curve options and deal with line styles...
+      for my $b (@blocks) {
+        my $co = shift @$b;
+        my $gco = { with => $co->{with} };
+        unless($co->{with} eq 'labels') {
+          $me->{curvestyle} = $co->{style} // ($me->{curvestyle}//0)+1;
+          $gco->{dashtype} = $gco->{linetype} = $me->{curvestyle};
+          if ( $co->{width} ) {
+            $gco->{pointsize} = $co->{width} if $co->{with} =~ m/^points/;
+            $gco->{linewidth} = $co->{width};
+          }
+        }
+        $gco->{legend} = $co->{key} if defined $co->{key};
+        push @arglist, $gco, @$b;
+      }
     }
 
-    if($me->{nplots}) {
+    if ($me->{nplots}) {
 	unless($me->{plot_no}) {
-	    $me->{obj}->multiplot( layout=>[$me->{opt}->{multi}->[0], $me->{opt}->{multi}->[1]] );
+	    $me->{obj}->multiplot( layout=>[@{$me->{opt}{multi}}[0,1]] );
 	}
     }
 
-    if($ipo->{oplot}) {
-	delete $po->{logaxis};
-	delete $po->{xrange};
-	delete $po->{yrange};
-	delete $po->{cbrange};
-	delete $po->{justify};
+    if ($ipo->{oplot}) {
+	delete @$po{qw(logaxis xrange yrange cbrange justify)};
 	$me->{obj}->replot(@arglist);
     } else {
 	$me->{obj}->plot(@arglist);
     }
 
 
-    if($me->{nplots}) {
+    if ($me->{nplots}) {
 	$me->{plot_no}++;
-	if($me->{plot_no} >= $me->{nplots}) {
-	    $me->{obj}->end_multi();
+	if ($me->{plot_no} >= $me->{nplots}) {
+	    $me->{obj}->end_multi;
 	    $me->{plot_no} = 0;
-
-	    $me->{obj}->close()    if($me->{opt}->{type} =~ m/^f/i);
-
+	    $me->{obj}->close    if $me->{opt}{type} =~ m/^f/i;
 	}
     } else {
-	$me->{obj}->close() if($me->{opt}->{type} =~ m/^f/i);
+	$me->{obj}->close if $me->{opt}{type} =~ m/^f/i;
     }
 
-    if($me->{opt}->{type} =~ m/^f/i  and  $me->{conv_fn}) {
-	print "converting $me->{conv_fn} to $me->{opt}->{output}...";
+    if ($me->{opt}{type} =~ m/^f/i  and  $me->{conv_fn}) {
+	print "converting $me->{conv_fn} to $me->{opt}{output}...";
 	$a = rim($me->{conv_fn});
-	wim($a->slice('-1:0:-1')->mv(1,0), $me->{opt}->{output});
+	wim($a->slice('-1:0:-1')->mv(1,0), $me->{opt}{output});
 	unlink($me->{conv_fn});
     }
 }

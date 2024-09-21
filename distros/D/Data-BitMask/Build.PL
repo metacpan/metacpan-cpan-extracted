@@ -1,4 +1,4 @@
-use Module::Build '0.24';
+use Module::Build 0.42;
 
 my $class = Module::Build->subclass(
 		class => 'Module::Build::DataBitMask',
@@ -32,16 +32,17 @@ my $class = Module::Build->subclass(
 				$self->add_to_cleanup($self->ppm_name);
 				$self->make_tarball($self->blib, $self->ppm_name);
 			}
-
 		},
 	);
-
 
 my $build = $class->new(
 		module_name => 'Data::BitMask',
 		license => 'perl',
+		configure_requires => {
+			'Module::Build' => 0.42
+		},
 		requires => {
-			},
+		},
 		create_makefile_pl => 'traditional',
 		create_readme => 1,
 	);

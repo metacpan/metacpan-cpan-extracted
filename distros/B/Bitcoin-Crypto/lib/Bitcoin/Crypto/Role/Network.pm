@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Role::Network;
-$Bitcoin::Crypto::Role::Network::VERSION = '2.007';
+$Bitcoin::Crypto::Role::Network::VERSION = '3.000';
 use v5.10;
 use strict;
 use warnings;

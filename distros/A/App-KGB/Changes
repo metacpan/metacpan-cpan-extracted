@@ -1,4 +1,26 @@
-1.59 (2023-10-30)
+1.61 2024-09-20
+  [ Martina Ferrari ]
+  * trim_lines: Remove prefix from continuation lines.
+
+  [ gregor herrmann ]
+  * t/76-webhook-pipeline.t: add a test for a multi-line pipeline message.
+
+  [ Martina Ferrari ]
+  * t/76-webhook-pipeline.t: ensure line is cut mid-word.
+  * t/76-webhook-pipeline.t: ensure multi-line test fails without the fix.
+
+1.60 2024-01-01
+  [ Damyan Ivanov ]
+  * Changes: drop round brackets around release dates (Closes: #1057932)
+
+  [ Antoine Beaupré ]
+  * trickle up error messages in JSON RPC calls.
+
+  [ gregor herrmann ]
+  * debian/copyright: update copyright holders/years.
+  * Declare compliance with Debian Policy 4.6.2.
+
+1.59 2023-10-30
   [ gregor herrmann ]
   * t/76-webhook-pipeline.t: use status=failed instead of failure
     to match Gitlab pipeline status (no functional change).
@@ -12,14 +34,14 @@
   * systemd: add Restart=on-failure
     helps providing the service even after a crash
 
-1.58 (2020-11-03)
+1.58 2020-11-03
   * fix tests to not hard-code merge commit messages
 
-1.57 (2020-07-24)
+1.57 2020-07-24
   * Update tests to changed output in merge messages for Git 2.28.0+.
     Thanks to Jonathan Nieder for the bug report. (Closes: #965350)
 
-1.56 (2020-03-22)
+1.56 2020-03-22
   [ Iain Lane ]
   * kgb-bot: Support globs in only_branches.
     This will allow derivatives to maintain their packages on Salsa, but not
@@ -33,14 +55,14 @@
   * Update copyright notices.
   * Add new requirements to Build.PL.
 
-1.55 (2019-06-13)
+1.55 2019-06-13
   [ gregor herrmann ]
   * fix typo in test diag()
 
   [ Damyan Ivanov ]
   * fix coloring of failed pipelines (Closes: #930450)
 
-1.54 (2019-01-03)
+1.54 2019-01-03
   [ Damyan Ivanov ]
   * comment out the test client config example of message-template
   * use_ssl: 0 in the example test server configs
@@ -54,7 +76,7 @@
   * kgb-bot: convert ::ffff:a.b.c.d to a.b.c.d before looking up client ip in
     the white list
 
-1.53 (2018-10-13)
+1.53 2018-10-13
   [ Damyan Ivanov ]
   * drop port: option from default config
   * add port to the test server IRC config now that 6697 us the default
@@ -75,7 +97,7 @@
     two time parts. Thanks to Mattia Rizzolo for the bug report on IRC.
   * Declare compliance with Debian Policy 4.2.1.
 
-1.52 (2018-09-13)
+1.52 2018-09-13
  [ gregor herrmann ]
  * Add some documentation about the webhook configuration to kgb.conf(5).
 
@@ -84,12 +106,12 @@
  * kgb-bot: add support to use_ssl configuration parameter (per network)
    (defaults to 1)
 
-1.51 (2018-06-04)
+1.51 2018-06-04
   [ Damyan Ivanov ]
   * kgb-ci-report: avoid boolean evaluation of Dpkg::Version object where a
     simple existence test is enough (Closes: #900699)
 
-1.50 (2018-05-23)
+1.50 2018-05-23
   [ Martina Ferrari ]
   * Add merge request title to merge request notifications.
   * Stop using channel as a unique identifier.
@@ -107,17 +129,17 @@
   * when complaining of a repo without channels, suggest adding them to
     the request parameters
 
-1.49 (2018-04-29)
+1.49 2018-04-29
   [ Damyan Ivanov ]
   *  add 'always_squash_outside_dir' webhook option (multiple values)
 
-1.48 (2018-04-21)
+1.48 2018-04-21
   [ Damyan Ivanov ]
   * add only_branch webhook option
   * webhook: add (via ...) only when *both* user name and email differs
     between author and pusher
 
-1.47 (2018-04-10)
+1.47 2018-04-10
   [ Damyan Ivanov ]
   * webhook/merge request: drop "revision" output and put the action in square
     brackets
@@ -138,7 +160,7 @@
   * Git client: Support an "author-via" placeholder in the message template,
     which shows the author and committer name if both are different.
 
-1.46 (2018-03-08)
+1.46 2018-03-08
   [ Damyan Ivanov ]
   * webhook/push: add always_squash_branch parameter, 
     defaults to [ 'upstream', 'upstream/master' ]
@@ -153,7 +175,7 @@
   [ gregor herrmann ]
   * bot: rename "signed-tags" to "signed tags", as in the client.
 
-1.45 (2018-03-06)
+1.45 2018-03-06
   [ Damyan Ivanov ]
   * point output of '/ctcp source' to salsa
   * fix short url code after 97033851da793b345f5283fb96897d5f9b55b810
@@ -162,7 +184,7 @@
   * update HOWTO.release
   * shorten compare URLs
 
-1.44 (2018-03-03)
+1.44 2018-03-03
   [ Damyan Ivanov ]
   * bot/webhook: shorten git hashes in URLs
     (as a fallback when URL shortening has problems or is not configured)
@@ -172,12 +194,12 @@
     (Closes: #891870)
   * webhook: colorize pipeline success/failure in reverse green/red
 
-1.43 (2018-03-02)
+1.43 2018-03-02
   [ Damyan Ivanov ]
   * improve pipeline notifications
   * improve commit squash handling
 
-1.42 (2018-02-26)
+1.42 2018-02-26
   [ Martina Ferrari ]
   * Speed-up KGB joining of channels and setup.
     Monkey-patch the delayed command dispatcher in PoCO::IRC to ignore
@@ -187,7 +209,7 @@
   [ Damyan Ivanov ]
   * webhooks: make use_irc_notices=1 the default, as advertised
 
-1.41 (2018-02-24)
+1.41 2018-02-24
   [ Damyan Ivanov ]
   * mark not released versions as 'Not Released' to make Test::CPAN::Changes
     happy
@@ -197,32 +219,32 @@
   [ gregor herrmann ]
   * fix a typo in POD
 
-1.40 (2018-02-20)
+1.40 2018-02-20
   [ Damyan Ivanov ]
   * webhook/push:
     + fix the compare URL when squashing branch updates
     + change the default for squash_threshold from 4 to 20
 
-1.39 (2018-02-19)
+1.39 2018-02-19
   [ Damyan Ivanov ]
   * webhook/push: handle the case when the author is not the person pushing the
     branch
 
-1.38 (2018-02-17)
+1.38 2018-02-17
   [ Damyan Ivanov ]
   * webhok/tag_push:
     + add tag URL
     + recognize signed tags
 
-1.37 (2018-02-16)
+1.37 2018-02-16
   [ Damyan Ivanov ]
   * webhooks: support squashing of branch updates
 
-1.36 (2018-02-12)
+1.36 2018-02-12
   [ Damyan Ivanov ]
   * Fix typo missing tag_push webhook events
 
-1.35 (2018-02-12)
+1.35 2018-02-12
   [ gregor herrmann ]
   * WWW::Shorten::Debli: use https for deb.li URLs.
     Thanks to pabs for the pointer.
@@ -254,7 +276,7 @@
     + allow running without --kgb-config
   * tests: allow overriding of bot/client location
 
-1.34 (2016-09-26)
+1.34 2016-09-26
   [ Damyan Ivanov ]
   * add patch fixing tests in build environments where the current user has no
     full name (Closes: #769239 -- FTBFS)
@@ -315,11 +337,11 @@
     Pass the parameter conditionally.
 
 
-1.33 (2014-08-06)
+1.33 2014-08-06
   * TestBot: set $ENV{USER} to getpwnam($>) to fix discrepancy when running
     under sudo (as in pbuilder)
 
-1.32 (2014-08-04)
+1.32 2014-08-04
   [ Damyan Ivanov ]
   * bot: store real path to the pid directory
   * bot: remove PID file on exit
@@ -359,7 +381,7 @@
   * die when the reflog is empty
   * fix typo in changelog (wheter -> whether), thanks lintian
 
-1.31 (2013-08-17)
+1.31 2013-08-17
   * client: default to using json
   * remove author-login from default message templates
   * import dirname in Client.pm
@@ -370,14 +392,14 @@
   * client: decode arguments given to --relay-msg
   * require JSON::XS instead of plain JSON
 
-1.30 (2013-08-09)
+1.30 2013-08-09
   * bot: fix colorize_change_wrapper
 
-1.29 (2013-08-08)
+1.29 2013-08-08
   * add versions to all modules
   * ensure strict and warnings are used everywhere
 
-1.28 (2013-08-08)
+1.28 2013-08-08
   [ gregor herrmann ]
   * client: Fix failure with Safe-2.35.
     Thanks to Petr Písař <ppisar@redhat.com> for the patch.
@@ -405,7 +427,7 @@
     C_TYPE is known to use UTF-8. RT#80664
   * adapt to newer JSON-RPC which renamed the client module (RT#80666)
 
-1.27 (2013-05-29)
+1.27 2013-05-29
  * client:
    + --repository option is no longer required
    + add support for entirely client-constructed notifications
@@ -429,7 +451,7 @@
    + Add Time::Piece and IPC::Run to Build.PL.
    + Build.PL: create LICENSE file during `make dist'.
 
-1.26 (2013-03-28)
+1.26 2013-03-28
 
   * update kgb-client.conf manual with the new options
   * rework Git branch walking
@@ -439,7 +461,7 @@
     no notification at all
     (Closes Debian bug #691183)
 
-1.25 (2012-12-27)
+1.25 2012-12-27
  * Documentation
    + client/CVS: mention that CVSROOT is a module
    + add HOWTO.release to MANIFEST
@@ -453,7 +475,7 @@
    + fix --password option definition
    + rework configuration to make priority explicit
 
-1.24 (2012-11-22)
+1.24 2012-11-22
   * Documentation:
     + Document KGB protocol (currently v4 JSON only).
     + kgb-client.conf(5): add single-line-commit option.
@@ -475,7 +497,7 @@
     + Put back SVN in requirements now that Module::Build is fixed. See
       https://rt.cpan.org/Public/Bug/Display.html?id=59593
 
-1.23 (2012-10-20)
+1.23 2012-10-20
   * t/compile*: use Test::Compile::Internal in order to show verbose errors
   * Server:
     + add --debug command line switch
@@ -494,7 +516,7 @@
     + introduce module-and-branch-re setting and deprecate
       branch-and-module-re-swap
 
-1.22 (2012-10-14)
+1.22 2012-10-14
   * kgb-add-project: document the new --dir option
   * Add API documentation (JSON-RPC only)
   * Server:
@@ -507,13 +529,13 @@
     + refuse to load world-readable configuration files
   * fix a bug in determining the longest common directory in a change set
 
-1.21 (2012-10-11)
+1.21 2012-10-11
  * Server:
   + fix exception handling
   + better error messages
  * Debli: prepend 'http://deb.li/' to the returned key
 
-1.20 (2012-10-11)
+1.20 2012-10-11
  * kgb-add-project: avoid using 'keys($hashref)' which requires too recent perl
  * Client:
    + add --reposotory to synopsis
@@ -539,7 +561,7 @@
 
  * some spellchecking
 
-1.19 (2012-10-05)
+1.19 2012-10-05
 
  * Bot:
    + add timestamp to log messages
@@ -550,10 +572,10 @@
  * kgb-add-project: sort the channel hashes to make sure "name" is the first
    key.
 
-1.18 (2012-10-05)
+1.18 2012-10-05
   * bot: fix channel-must-have-a-repository check for broadcast channels
 
-1.17 (2012-10-05)
+1.17 2012-10-05
   * improve wording of web-link description
   * 50-client.t: support keeping temporary directory
   * declare POD encoding
@@ -571,7 +593,7 @@
   * typo/doc fixes
   * kgb-add-project: add option to save config back to file
 
-1.16 (2012-10-03)
+1.16 2012-10-03
  * Misc
    + Typos in documentation fixed
  * Server
@@ -595,7 +617,7 @@
    + Add CVS support (Closes: #689288) (Mostly in the client, but server needed
      some changes to drop assumptions that commits always have IDs)
 
-1.15 (2011-09-14)
+1.15 2011-09-14
  * Client:
    + make File::Touch usage optional, used only when status_dir is present
    + use single line note for annotated tags
@@ -617,7 +639,7 @@
    + tags are single line too
    + add tests for decect_common_dir
    + more extensive tests for debian/patches series some.patch (still passing)
-1.14 (2011-08-24)
+1.14 2011-08-24
   * Client:
    + pass the client instance to the server ref
    + add an option to keep the last used server in a directory
@@ -633,39 +655,39 @@
    + provide examples for running two test bots
    + provide test client configuration
    + use sample test client config in tests
-1.13 (2011-08-13)
+1.13 2011-08-13
   * bot: add --simulate option
   * remove dead code
   * run-test-bot passes arguments to kgb-bot
   * change the port of the test bot
   * silence more git jabber during tests
   * add tests for simulated IRC output
-1.12 (2011-08-13)
+1.12 2011-08-13
   * Updated META.*
-1.11 (Not Released)
+1.11 Not Released
   * test creation of brand new, orphan branch
   * fix: no warnings when commits have no author
   * bot: log repository on authentication failure
   * put tag name in changes for plain tags too
   * bot: always decode parameters
-1.10 (2011-08-11)
+1.10 2011-08-11
   [ Daman Ivanov ]
   * disable indexing of privinc/
   * fix a couple of cases of conrdirtional declaration
   * add a Perl::Critic test for conditional declarations
   * bot: do not answer back if no answers are configured
   * rate-lmit autoresponses
-1.09 (Not Released)
+1.09 Not Released
   [ Damyan Ivanov ]
   * Skip some tests when required SVN::* or Git modules are unavailable
   * Fix dist_name from App::KGB to App-KGB
-1.08 (2011-08-05)
+1.08 2011-08-05
   [ Damyan Ivanov ]
   * Fix version disparity between App::KGB and kgb-bot
-1.07 (2011-07-26)
+1.07 2011-07-26
   [ Damyan Ivanov ]
   * Client::Git: use --format=raw when describing annotated tags
-1.06 (2010-12-04)
+1.06 2010-12-04
   [ gregor herrmann ]
   * kgb-bot:
     - fix typo when accessing global config
@@ -680,7 +702,7 @@
   * MANIFEST.SKIP: add MYMETA.yml
   * fix typo in Client::Subversion POD
 
-1.05 (2010-09-10)
+1.05 2010-09-10
   * kgb-bot: use File::Which to find polygen binary; split out the
     polygen-finding function; closes: #593631
   * kgb-bot: check existence of polygen binary before using it;
@@ -690,35 +712,35 @@
   * any problems in finding polygen binary are logged only when debug is
     enabled as a counter-measure against remotely-assisted log abuse
 
-1.04 (2010-08-03)
+1.04 2010-08-03
   * use Digest::SHA from core instead of ::SHA1
   * remove references to Svn::* from Build.PL
     Closes: #582739 (by working around #589812)
 
-1.03 (2010-04-28)
+1.03 2010-04-28
   * Synchronized versions of kgb-bot and KGB
 
-1.02 (Not Released)
+1.02 Not Released
   * Protocol v2
     + Adds a new parameter, revision prefix, which is printed plain before the
       bold commit ID
     + The default revision prefix is empty ('')
     + Subversion revision prefix is 'r'
 
-1.01 (2009-12-05)
+1.01 2009-12-05
   * Client: drop branch/module detection if not all changed paths are in the
     same branch/module
 
-1.00 (2009-12-02)
+1.00 2009-12-02
   * ServerRef: send commit_id as a string
   * Commit: decode UTF-8 log messages
   * ServerRef: encode all strings before sending
 
-0.16 (2009-11-24)
+0.16 2009-11-24
   * bot:
     + print the path information part along the author and revision
 
-0.15 (2009-11-07)
+0.15 2009-11-07
   * bot:
     + bump years of copyright
     + make manual page speak about 'kgb-bot', not 'KGB'
@@ -733,17 +755,17 @@
     + support sending test commits to a live running bot when
       TEST_KGB_BOT_RUNNING is in the environment
 
-0.14 (2009-11-02)
+0.14 2009-11-02
   * Git: fix describing merge commits
   * bot: replace change flags (A+)... with colors
   * bot: avoid sending changed files list for commits that don't
     contain changed files
   * bot: always detect common changes directory
 
-0.13 (2009-11-01)
+0.13 2009-11-01
   * kgb-bot: fix the code detecting common root for all changes
 
-0.12 (2009-10-31)
+0.12 2009-10-31
   * add a test ensuring that App::KGB and kgb-bot are the same version
   * client
     + honor branch and module supplied by commit
@@ -756,15 +778,15 @@
       - special handling of signed/annotated tags
       - use raw commit logs to detect file additions/removals
 
-0.11 (2009-10-26)
+0.11 2009-10-26
   * move generation of a smart answers to a subroutine
   * make the autoresponder use polygen
   * fix typo in an error message
 
-0.10 (2009-10-25)
+0.10 2009-10-25
   * kgb-bot has its own version. no longer pulls the client via App::KGB
 
-0.09 (2009-10-24)
+0.09 2009-10-24
   * print unhandled IRC stuff only when debugging is enabled
   * implement logging
   * drop auto-rejoin TODO item (sort of done)

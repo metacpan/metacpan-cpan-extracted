@@ -1,13 +1,43 @@
---- #YAML:1.0
-name: Win32-Security
-version: 0.50
+---
+abstract: 'Security manipulation for named objects'
 author:
-  - Toby Ovod-Everett, toby@ovod-everett.org
-abstract: Security manipulation for named objects
+  - 'Toby Ovod-Everett, toby@ovod-everett.org'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.4'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-Security
+provides:
+  Win32::Security:
+    file: lib/Win32/Security/Raw.pm
+  Win32::Security::ACE:
+    file: lib/Win32/Security/ACE.pm
+    version: '0.60'
+  Win32::Security::ACL:
+    file: lib/Win32/Security/ACL.pm
+    version: '0.60'
+  Win32::Security::NamedObject:
+    file: lib/Win32/Security/NamedObject.pm
+    version: '0.60'
+  Win32::Security::Raw:
+    file: lib/Win32/Security/Raw.pm
+    version: '0.60'
+  Win32::Security::Recursor:
+    file: lib/Win32/Security/Recursor.pm
+    version: '0.60'
+  Win32::Security::SID:
+    file: lib/Win32/Security/SID.pm
+    version: '0.60'
 requires:
-  Class::Prototyped: 0.98
-  Data::BitMask: 0.13
-  Win32::API: 0
-provides: {}
-generated_by: Module::Build version 0.24
+  Class::Prototyped: '0.98'
+  Data::BitMask: '0.13'
+  Win32::API: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.60'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

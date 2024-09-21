@@ -5,7 +5,7 @@
 # Author: Toby Ovod-Everett
 #
 #############################################################################
-# Copyright 2003, 2004 Toby Ovod-Everett.  All rights reserved
+# Copyright 2003-2024 Toby Ovod-Everett.  All rights reserved
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
@@ -203,8 +203,8 @@ not cloned, however, so be careful there.
 =cut
 
 use Carp qw();
-use Class::Prototyped '0.98';
-use Data::BitMask '0.13';
+use Class::Prototyped 0.98;
+use Data::BitMask 0.13;
 use Data::Dumper;
 use Win32::Security::Raw;
 use Win32::Security::SID;
@@ -255,6 +255,8 @@ BEGIN {
 		}
 	}
 }
+
+$Win32::Security::ACE::VERSION = '0.60';
 
 =head1 Method Reference
 

@@ -208,8 +208,9 @@ Method Reference
 
     The various calling forms are:
 
-    * "Win32::Security::NamedObject->new($objectType, $objectName)"
-    * ""Win32::Security::NamedObject::$objectType"->new($objectName)"
+    *   "Win32::Security::NamedObject->new($objectType, $objectName)"
+
+    *   ""Win32::Security::NamedObject::$objectType"->new($objectName)"
 
     Note that when using $objectType in the package name, the value needs to
     be canonicalized (i.e. "SE_FILE_OBJECT", not the shortcut "FILE"). If
@@ -330,6 +331,44 @@ Method Reference
   "fixDacl"
     Fixes the inherited ACEs in the DACL. See the caveats concerning setting
     DACLS using "dacl" for further information.
+
+  "getSecurityInfo"
+    Internal method for retrieving one or more types of SecurityInfo with a
+    single call to "GetNamedSecurityInfo". Used internally to retrieve info
+    for "dacl", "ownerSid" (and by extension "ownerTrustee"), and "control".
+
+    Can be used by external code (and is used by
+    "Win32::Security::Recursor") to improve performance by specifying the
+    complete set of information needed in a single call.
+
+    Mandatory parameter $SecurityInfo takes a "SECURITY_INFORMATION" mask
+    (i.e. 'DACL_SECURITY_INFORMATION|OWNER_SECURITY_INFORMATION').
+
+  "enablePrivileges"
+    Internal method for attempting to enable elevated privileges that make
+    it possible to read files to which access is denied, set ownership to
+    another user, etc.
+
+    "enablePrivileges" returns the number of privileges that were
+    successfully enabled for the current process.
+
+    The attempt to enable will only be carried out once, no matter how many
+    calls to this method are made. Subsequent calls will return the number
+    of privileges enabled during the original call. To determine whether a
+    call has already been made, use "enablePrivilegesAttempted".
+
+    The privileges it attempts to enable are:
+
+    *   SeBackupPrivilege
+
+    *   SeChangeNotifyPrivilege
+
+    *   SeRestorePrivilege
+
+    *   SeTakeOwnershipPrivilege
+
+  "enablePrivilegesAttempted"
+    Returns 1 if "enablePrivileges" has been previously attempted.
 
 AUTHOR
     Toby Ovod-Everett, toby@ovod-everett.org

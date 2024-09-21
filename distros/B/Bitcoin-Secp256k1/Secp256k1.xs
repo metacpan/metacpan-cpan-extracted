@@ -1,8 +1,8 @@
-#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
+#define SECP256K1_STATIC
 #include <secp256k1.h>
 
 #define CURVE_SIZE 32
@@ -85,14 +85,16 @@ unsigned char* size_bytestr_from_sv(SV *perlval, size_t wanted_size, char *argna
 
 void copy_bytestr(unsigned char *to, unsigned char *from, size_t size)
 {
-	for (int i = 0; i < size; ++i) {
+	int i;
+	for (i = 0; i < size; ++i) {
 		to[i] = from[i];
 	}
 }
 
 void clean_secret(unsigned char *secret)
 {
-	for (int i = 0; i < CURVE_SIZE; ++i) {
+	int i;
+	for (i = 0; i < CURVE_SIZE; ++i) {
 		secret[i] = 0;
 	}
 }
@@ -145,7 +147,7 @@ new(classname)
 
 		/* Blessing the object */
 		SV *secp_sv = newSViv(0);
-		RETVAL = sv_setref_iv(secp_sv, SvPVbyte_nolen(classname), (unsigned long) ctx);
+		RETVAL = sv_setref_iv(secp_sv, SvPVbyte_nolen(classname), (uintptr_t) ctx);
 		SvREADONLY_on(secp_sv);
 	OUTPUT:
 		RETVAL

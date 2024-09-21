@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 use Test::More;
 use Test2::Plugin::UTF8;

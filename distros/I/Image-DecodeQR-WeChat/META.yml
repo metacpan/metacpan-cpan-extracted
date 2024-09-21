@@ -46,5 +46,5 @@ requires:
 resources:
   homepage: https://metacpan.org/module/Image::DecodeQR::WeChat
   repository: https://github.com/hadjiprocopis/perl-image-decodeqr-wechat
-version: '2.1'
+version: '2.2'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

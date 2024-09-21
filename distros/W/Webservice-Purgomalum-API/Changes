@@ -1,0 +1,6 @@
+Revision history for Webservice::Purgomalum::API
+1.001 Sat Sept 21 00:40:00 2024
+     - updated Readme.md
+     - updated dist.ini
+1.000 Fri Sept 20 17:34:00 2024
+     - initial release to CPAN

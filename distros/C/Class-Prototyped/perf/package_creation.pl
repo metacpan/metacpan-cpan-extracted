@@ -7,7 +7,7 @@ my $alliter = 5000;
 	sub a {"hi";} sub b {"hi";} sub c {"hi";} sub d {"hi";} sub e {"hi";}
 ');
 
-=head
+=pod
 
 &remote_exec($alliter, '
 	package Pack_%i%;
@@ -35,7 +35,7 @@ my $alliter = 5000;
 	Pack_%i%->reflect();
 ');
 
-=head
+=pod
 
 &remote_exec($alliter, '
 	Class::Prototyped->newPackage("Pack_%i%");
@@ -79,7 +79,7 @@ my $alliter = 5000;
 	Pack_%i%->reflect();
 ');
 
-=head
+=pod
 
 &remote_exec($alliter,'
 @main::stuff = ( a => sub {"hi";}, b => sub {"hi";}, c => sub {"hi";},
@@ -144,7 +144,7 @@ my $alliter = 5000;
 	$Pack_%i% = $p->clone;
 ');
 
-=head
+=pod
 &remote_exec($alliter,'
 	Class::Prototyped->newPackage("Pack_%i%");
 	Pack_%i%->reflect->addSlots( [qw(a METHOD)] => sub {"hi";},

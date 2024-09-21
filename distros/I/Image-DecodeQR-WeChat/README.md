@@ -4,7 +4,7 @@ Image::DecodeQR::WeChat - Decode QR code(s) from images using the OpenCV/WeChat 
 
 # VERSION
 
-Version 2.1
+Version 2.2
 
 # SYNOPSIS
 

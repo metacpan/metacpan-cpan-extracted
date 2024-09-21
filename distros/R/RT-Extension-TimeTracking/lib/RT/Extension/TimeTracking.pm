@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::TimeTracking;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 RT->AddStyleSheets("time_tracking.css");
 RT->AddJavaScript("time_tracking.js");
@@ -302,7 +302,7 @@ Or via the web at: L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Nam
 
 =head1 COPYRIGHT
 
-This extension is Copyright (C) 2013-2022 Best Practical Solutions, LLC.
+This extension is Copyright (C) 2013-2024 Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

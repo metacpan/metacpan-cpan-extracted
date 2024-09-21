@@ -1998,7 +1998,7 @@ BOOT:
 
   register_xs_parse_keyword("requires", &kwhooks_requires, NULL);
 
-  boot_xs_parse_sublike(0.15); /* dynamic actions */
+  boot_xs_parse_sublike(0.25); /* bugfix RT155630 */
 
   register_xs_parse_sublike("method", &parse_method_hooks, (void *)PHASER_NONE);
 

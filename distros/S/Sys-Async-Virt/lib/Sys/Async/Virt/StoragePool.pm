@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::StoragePool v0.0.2;
+package Sys::Async::Virt::StoragePool v0.0.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.2;
+use Protocol::Sys::Virt::Remote::XDR v0.0.3;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -175,7 +175,7 @@ Sys::Async::Virt::StoragePool - Client side proxy to remote LibVirt storage pool
 
 =head1 VERSION
 
-v0.0.2
+v0.0.3
 
 =head1 SYNOPSIS
 
@@ -324,6 +324,10 @@ See documentation of L<virStorageVolCreateXMLFrom|https://libvirt.org/html/libvi
   $vol = await $pool->vol_lookup_by_name( $name );
 
 See documentation of L<virStorageVolLookupByName|https://libvirt.org/html/libvirt-libvirt-storage.html#virStorageVolLookupByName>.
+
+
+
+=head1 INTERNAL METHODS
 
 
 

@@ -18,7 +18,7 @@ SYNOPSIS
           $FileMask->explain_mask($mask),
           $FileMask->break_mask($mask)
         ]);
-  
+
       my $mask2 = $FileMask->build_mask({FULL => 1, WRITE => 0});
 
 DESCRIPTION
@@ -37,18 +37,34 @@ DESCRIPTION
     The module expends a modest amount of overhead in creating the
     "Data::BitMask" object so as to speed up future mask manipulations.
 
+    Calls to "build_mask", "break_mask", and "explain_mask" are memoized to
+    speed up repeated calls with the same parameters.
+
   Installation instructions
-    This module requires "Module::Build 0.24" to use the automated
-    installation procedures. With "Module::Build" installed:
+    There are four options for installing this module:
 
-      Build.PL
-      perl build test
-      perl build install
+    *   Using "Module::Build 0.24" or later:
 
-    It can also be installed manually by copying "lib/Data/Bitmask.pm" to
-    "perl/site/lib/Data/Bitmask.pm".
+          Build.PL
+          perl build test
+          perl build install
 
-Suggest Module Implementation
+    *   Using "ExtUtils::MakeMaker" (part of the Perl core):
+
+          Makefile.PL
+          make test
+          make install
+
+    *   Using the PPM (the file has the extension ".ppm.zip") on CPAN and
+        installing under ActivePerl for Win32 by unzipping the ".ppm.zip"
+        file and then:
+
+          ppm install Data-BitMask.ppd
+
+    *   Installing manually by copying "lib/Data/Bitmask.pm" to
+        "perl/site/lib/Data/Bitmask.pm".
+
+Suggested Module Implementation
     Here is one suggested approach to using bitmask manipulators in a
     module.
 
@@ -90,7 +106,7 @@ Method Reference
     Creates a new bitmask manipulator. Pass a list of constant and value
     pairs. The constants do not have to be disjoint, but order does matter.
     When executing "explain_mask" or "explain_const", constants that are
-    earlier in the list take precendence over those later in the list.
+    earlier in the list take precedence over those later in the list.
     Constant names are not allowed to have space or pipes in them, and
     constant values have to be integers. Constant names are case insensitive
     but preserving.

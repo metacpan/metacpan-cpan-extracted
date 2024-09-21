@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # specifically *don't*
-#   use v5.14;
+#   use v5.18;
 #   use warnings;
 
 use Test2::V0 -no_strict => 1, -no_warnings => 1;

@@ -20,6 +20,8 @@ __DATA__
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+
+#define SECP256K1_STATIC
 #include <secp256k1.h>
 
 MODULE = Secp256k1Test PACKAGE = Secp256k1Test

@@ -3,7 +3,6 @@ use alienfile;
 plugin 'PkgConfig' => 'libsecp256k1';
 
 share {
-	my $is_win = $^O eq 'MSWin32';
 	my $run_tests = $ENV{ALIEN_LIBSECP256K1_RUN_TESTS};
 
 	start_url 'https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.5.1.tar.gz';
@@ -13,14 +12,13 @@ share {
 	plugin Extract => 'tar.gz';
 
 	plugin 'Build::CMake';
-	plugin 'Gather::IsolateDynamic'
-		unless $is_win;
+	plugin 'Gather::IsolateDynamic';
 
 	build [
 		[
 			'%{cmake}',
 			@{meta->prop->{plugin_build_cmake}->{args}},
-			'-DSECP256K1_DISABLE_SHARED=' . ($is_win ? 'OFF' : 'ON'),
+			'-DBUILD_SHARED_LIBS=OFF',
 			'-DSECP256K1_VALGRIND=' . ($run_tests ? 'ON' : 'OFF'),
 			'-DSECP256K1_BUILD_TESTS=' . ($run_tests ? 'ON' : 'OFF'),
 			'-DSECP256K1_BUILD_EXHAUSTIVE_TESTS=' . ($run_tests ? 'ON' : 'OFF'),

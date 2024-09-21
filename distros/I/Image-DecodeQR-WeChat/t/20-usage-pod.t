@@ -9,7 +9,7 @@ use warnings;
 
 use utf8; # allow for utf8 in code (we have strings in utf8, filenames)
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 use Test::More;
 use Test2::Plugin::UTF8;
@@ -51,16 +51,16 @@ $ret = Image::DecodeQR::WeChat::detect_and_decode_qr({
 	'input' => $input_image_filename,
 	'outbase' => $outbase,
 });
-ok(defined($ret), "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and result is defined.");
-ok(ref($ret)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and result is of type ".ref($ret)." (expected: ARRAYref).");
-is(scalar(@$ret), 2, "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and result contains ".scalar(@$ret)." item exactly (expected: 2).\n");
+ok(defined($ret), "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and result is defined.");
+ok(ref($ret)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and result is of type ".ref($ret)." (expected: ARRAYref).");
+is(scalar(@$ret), 2, "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and result contains ".scalar(@$ret)." item exactly (expected: 2).\n");
 my ($payloads, $bboxes) = @$ret;
 
-ok(defined($payloads), "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and payloads is defined.");
-ok(ref($payloads)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and payloads is ARRAYref.");
+ok(defined($payloads), "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and payloads is defined.");
+ok(ref($payloads)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and payloads is ARRAYref.");
 
-ok(defined($bboxes), "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and bboxes is defined.");
-ok(ref($bboxes)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and bboxes is ARRAYref.");
+ok(defined($bboxes), "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and bboxes is defined.");
+ok(ref($bboxes)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and bboxes is ARRAYref.");
 
 my $num_qr_codes_detected = scalar @$payloads;
 is($num_qr_codes_detected, 0, "zero QR codes detected as expected for empty image.");
@@ -82,16 +82,16 @@ $ret = Image::DecodeQR::WeChat::detect_and_decode_qr({
 	'input' => $input_image_filename,
 	'outbase' => $outbase,
 });
-ok(defined($ret), "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and result is defined.");
-ok(ref($ret)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and result is of type ".ref($ret)." (expected: ARRAYref).");
-is(scalar(@$ret), 2, "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and result contains ".scalar(@$ret)." item exactly (expected: 2).\n");
+ok(defined($ret), "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and result is defined.");
+ok(ref($ret)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and result is of type ".ref($ret)." (expected: ARRAYref).");
+is(scalar(@$ret), 2, "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and result contains ".scalar(@$ret)." item exactly (expected: 2).\n");
 ($payloads, $bboxes) = @$ret;
 
-ok(defined($payloads), "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and payloads is defined.");
-ok(ref($payloads)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and payloads is ARRAYref.");
+ok(defined($payloads), "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and payloads is defined.");
+ok(ref($payloads)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and payloads is ARRAYref.");
 
-ok(defined($bboxes), "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and bboxes is defined.");
-ok(ref($bboxes)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr_xs() : called on '$input_image_filename' and bboxes is ARRAYref.");
+ok(defined($bboxes), "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and bboxes is defined.");
+ok(ref($bboxes)eq'ARRAY', "Image::DecodeQR::WeChat::detect_and_decode_qr() : called on '$input_image_filename' and bboxes is ARRAYref.");
 
 $num_qr_codes_detected = scalar @$payloads;
 is($num_qr_codes_detected, 4, "zero QR codes detected 4 QR codes.");

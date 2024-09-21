@@ -12,15 +12,12 @@
 ##
 #
 
-# Still to do:
-#	- file output
-
-
 package PDL::Graphics::Simple::Prima;
 
 use strict;
 use warnings;
 use PDL;
+use PDL::ImageND; # for polylines
 use PDL::Options q/iparse/;
 use File::Temp qw/tempfile/;
 
@@ -29,7 +26,7 @@ our $mod = {
     module => 'PDL::Graphics::Simple::Prima',
     engine => 'PDL::Graphics::Prima',
     synopsis => 'Prima (interactive, fast, PDL-specific)',
-    pgs_api_version=> '1.011',
+    pgs_api_version=> '1.012',
 };
 PDL::Graphics::Simple::register( $mod );
 
@@ -123,8 +120,6 @@ sub new {
     my $opt_in = shift;
     $opt_in = {} unless(defined($opt_in));
     my $opt = { iparse($new_defaults, $opt_in) };
-
-
     unless( check() ) {
 	die "$mod->{shortname} appears nonfunctional: $mod->{msg}\n" unless(check(1));
     }
@@ -246,8 +241,8 @@ sub DESTROY {
 }
 
 ##############################
-# Fake-o apply method makes sepiatone values for input data.
-# We have to mock up an object method to match the style of PDL::Graphics::Prima::Palette,
+# apply method makes sepiatone values for input data,
+# to match the style of PDL::Graphics::Prima::Palette,
 # in order to make the Matrix plot type happy (for 'with=>image').
 @PDL::Graphics::Simple::Prima::Sepia_Palette::ISA = 'PDL::Graphics::Prima::Palette';
 sub PDL::Graphics::Simple::Prima::Sepia_Palette::apply {
@@ -269,20 +264,42 @@ sub PDL::Graphics::Simple::Prima::Sepia_Palette::apply {
 # the plot type in terms of others.
 sub _load_types {
   $types = {
-    lines => [ppair::Lines()],
+    lines => 'Lines',
 
     points => [ map ppair->can($_)->(), qw/Blobs Triangles Squares Crosses Xs Asterisks/ ],
 
     bins => sub {
       my ($me, $plot, $block, $cprops) = @_;
-      my $x = $block->[0];
+      my ($x, $y) = @$block;
       my $x1 = $x->range( [[0],[-1]], [$x->dim(0)], 'e' )->average;
       my $x2 = $x->range( [[1],[0]],  [$x->dim(0)], 'e' )->average;
       my $newx = pdl($x1, $x2)->mv(-1,0)->clump(2)->sever;
-      my $y = $block->[1];
       my $newy = $y->dummy(0,2)->clump(2)->sever;
       $plot->dataSets()->{ 1+keys(%{$plot->dataSets()}) } =
           ds::Pair($newx,$newy,plotType=>ppair::Lines(), @$cprops);
+    },
+
+    # as of 1.012, known to not draw all its lines(!) overplotting an image
+    # draws them all without an image in same plot() call, or separate plot()
+    contours => sub {
+      my ($me, $plot, $block, $cprops) = @_;
+      my ($vals, $cvals) = @$block;
+      for my $thresh ($cvals->list) {
+        my ($pi, $p) = contour_polylines($thresh, $vals, $vals->ndcoords);
+        next if $pi->at(0) < 0;
+        $plot->dataSets()->{ 1+keys(%{$plot->dataSets()}) } =
+          ds::Pair($_->dog, plotType=>ppair::Lines(), @$cprops)
+            for path_segs($pi, $p->mv(0,-1));
+      }
+    },
+
+    polylines => sub {
+      my ($me, $plot, $block, $cprops) = @_;
+      my ($xy, $pen) = @$block;
+      my $pi = $pen->eq(0)->which;
+      $plot->dataSets()->{ 1+keys(%{$plot->dataSets()}) } =
+        ds::Pair($_->dog, plotType=>ppair::Lines(), @$cprops)
+          for path_segs($pi, $xy->mv(0,-1));
     },
 
     image => sub {
@@ -335,7 +352,7 @@ sub _load_types {
 
     labels => sub {
       my ($me,$plot,$block,$cprops,$co,$ipo) = @_;
-      my ($x, $y) = map $_->flat->sever, @$block[0,1];
+      my ($x, $y) = map $_->flat->copy, @$block[0,1]; # copy as mutate below
       my @labels = @{$block->[2]};
       my @lrc = ();
       for my $i(0..$x->dim(0)-1) {
@@ -392,7 +409,6 @@ sub _load_types {
   };
 }
 
-
 ##############################
 # Plot subroutine
 #
@@ -432,20 +448,31 @@ sub plot {
 					   rely      => 1.0 - (1 + int($pno / $me->{multi}->[0]))/$me->{multi}->[1],
 					   relheight => 1.0/$me->{multi}->[1],
 					   anchor    => 'sw'});
+	    $plot->titleFont(size => 12);
+
 	    $me->{next_plotno}++;
 	} else {
 	    # No multiplot - just instantiate a plot (and destroy any widgets from earlier)
-	    map { $_->destroy } @{$me->{widgets}};
+	    $_->destroy for @{$me->{widgets}};
 	    $me->{widgets} = [];
 	    $plot = $me->{obj}->insert('Plot',
 				       pack=>{fill=>'both',expand=>1}
 		);
+	    $plot->titleFont(size => 14);
 	}
-
     }
 
     push(@{$me->{widgets}}, $plot);
     $me->{last_plot} = $plot;
+
+    for my $block (@_) {
+      my $co = $block->[0];
+      if ($co->{with} eq 'fits') {
+	($co->{with}, my $new_opts, my $new_img, my @coords) = PDL::Graphics::Simple::_fits_convert($block->[1], $ipo);
+	$block = [ $co, @coords, $new_img ];
+	@$ipo{keys %$new_opts} = values %$new_opts;
+      }
+    }
 
     ## Set global plot options: titles, axis labels, and ranges.
     $plot->hide;
@@ -457,10 +484,10 @@ sub plot {
     $plot->x->scaling(sc::Log()) if($ipo->{logaxis}=~ m/x/i);
     $plot->y->scaling(sc::Log()) if($ipo->{logaxis}=~ m/y/i);
 
-    $plot->x->min($ipo->{xrange}->[0]) if(defined($ipo->{xrange}) and defined($ipo->{xrange}->[0]));
-    $plot->x->max($ipo->{xrange}->[1]) if(defined($ipo->{xrange}) and defined($ipo->{xrange}->[1]));
-    $plot->y->min($ipo->{yrange}->[0]) if(defined($ipo->{yrange}) and defined($ipo->{yrange}->[0]));
-    $plot->y->max($ipo->{yrange}->[1]) if(defined($ipo->{yrange}) and defined($ipo->{yrange}->[1]));
+    $plot->x->min($ipo->{xrange}[0]) if(defined($ipo->{xrange}) and defined($ipo->{xrange}[0]));
+    $plot->x->max($ipo->{xrange}[1]) if(defined($ipo->{xrange}) and defined($ipo->{xrange}[1]));
+    $plot->y->min($ipo->{yrange}[0]) if(defined($ipo->{yrange}) and defined($ipo->{yrange}[0]));
+    $plot->y->max($ipo->{yrange}[1]) if(defined($ipo->{yrange}) and defined($ipo->{yrange}[1]));
 
     ##############################
     # I couldn't find a way to scale the plot to make the plot area justified, so
@@ -502,11 +529,11 @@ sub plot {
     ##############################
     # Rubber meets the road -- loop over data blocks and
     # ship out each curve to the appropriate dispatcher in the $types table
-    for my $block(@_) {
+    for my $block (@_) {
 	my $co = shift @$block;
 
 	# Parse out curve style (for points type selection)
-	if(defined($co->{style}) and $co->{style}) {
+	if (defined $co->{style}) {
 	    $me->{curvestyle} = $co->{style};
 	} else {
 	    $me->{curvestyle}++;
@@ -518,18 +545,19 @@ sub plot {
 	    lineWidth    => $co->{width} || 1
 	    ];
 
-	my $type = $types->{$co->{with}};
-	die "$co->{with} is not yet implemented in PDL::Graphics::Simple for Prima.\n"
+	my $with = $co->{with};
+	my $type = $types->{$with};
+	die "$with is not yet implemented in PDL::Graphics::Simple for Prima.\n"
 	    if !defined $type;
-	if( ref($type) eq 'CODE' ) {
+	if ( ref($type) eq 'CODE' ) {
 	    $type->($me, $plot, $block, $cprops, $co, $ipo);
 	} else {
-	    my $pt = ref($type) eq 'ARRAY' ? $type->[ ($me->{curvestyle}-1) % (0+@{$type}) ] : eval $type;
+	    my $pt = ref($type) eq 'ARRAY' ? $type->[ ($me->{curvestyle}-1) % (0+@{$type}) ] : ppair->can($type)->();
 	    $plot->dataSets()->{ 1+keys(%{$plot->dataSets()}) } = ds::Pair(@$block, plotType => $pt, @$cprops);
 	}
     }
 
-    if($me->{type} !~ m/f/i) {
+    if ($me->{type} !~ m/f/i) {
 	$plot->show;
 	$plot->unlock;
     } else {

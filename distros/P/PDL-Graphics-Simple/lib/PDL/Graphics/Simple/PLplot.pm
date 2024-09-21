@@ -25,7 +25,7 @@ our $mod = {
     module=>'PDL::Graphics::Simple::PLplot',
     engine => 'PDL::Graphics::PLplot',
     synopsis=> 'PLplot (nice plotting, sloooow images)',
-    pgs_api_version=> '1.011',
+    pgs_api_version=> '1.012',
 };
 PDL::Graphics::Simple::register( $mod );
 
@@ -146,14 +146,14 @@ sub new {
     push @params, DEV=>$dev;
 
     my $size = PDL::Graphics::Simple::_regularize_size($opt->{size},'px');
-    push(@params, PAGESIZE => [ $size->[0], $size->[1] ]);
+    push(@params, PAGESIZE => [ @$size[0,1] ]);
 
     my $me = { opt=>$opt, conv_fn=>$conv_tempfile };
 
     if ( defined($opt->{multi}) ) {
-	push(@params, SUBPAGES => [$opt->{multi}->[0], $opt->{multi}->[1]] );
+	push @params, SUBPAGES => [@{$opt->{multi}}[0,1]];
 	$me->{multi_cur} = 0;
-	$me->{multi_n} = $opt->{multi}->[0] * $opt->{multi}->[1];
+	$me->{multi_n} = $opt->{multi}[0] * $opt->{multi}[1];
     }
 
     $me->{obj} = my $w = PDL::Graphics::PLplot->new( @params );
@@ -174,32 +174,45 @@ sub DESTROY {
 # if the value is a string, it's a PLOTTYPE parameter sent to xplot.  Otherwise
 # it's a plotting sub...
 our $plplot_methods = {
-    'lines'  => 'LINE',
-    'bins'   => sub {
+    lines => 'LINE',
+    bins => sub {
 	my ($me, $ipo, $data, $ppo) = @_;
 	my $x = $data->[0];
 	my $x1 = $x->range(  [[0],[-1]], [$x->dim(0)],  'e'  )->average;
 	my $x2 = $x->range(  [[1],[0]],  [$x->dim(0)],  'e'  )->average;
 	my $newx = pdl($x1,$x2)->mv(-1,0)->clump(2)->sever;
-
 	my $y = $data->[1];
 	my $newy = $y->dummy(0,2)->clump(2)->sever;
-
 	$me->{obj}->xyplot($newx, $newy, PLOTTYPE=>'LINE', %{$ppo});
     },
-    'points' => 'POINTS',
-    'errorbars' => sub {
+    points => 'POINTS',
+    errorbars => sub {
 	my ($me, $ipo, $data, $ppo) = @_;
-	$me->{obj}->xyplot($data->[0], $data->[1], %{$ppo}, YERRORBAR=>$data->[2]*2);
+	$me->{obj}->xyplot(@$data[0,1], %$ppo, YERRORBAR=>$data->[2]*2);
     },
-    'limitbars'=> sub {
+    limitbars => sub {
 	my ($me, $ipo, $data, $ppo) = @_;
-	$me->{obj}->xyplot($data->[0], 0.5*($data->[2]+$data->[3]), %{$ppo},
+	$me->{obj}->xyplot($data->[0], 0.5*($data->[2]+$data->[3]), %$ppo,
 			   YERRORBAR=>($data->[3]-$data->[2])->abs,
 			   PLOTTYPE=>'POINTS', SYMBOLSIZE=>0.0001, %$ppo);
 	$me->{obj}->xyplot($data->[0], $data->[1], PLOTTYPE=>'LINE', %$ppo);
     },
-    'image'  => sub {
+    contours => sub {
+	my ($me,$ipo,$data,$ppo) = @_;
+	my ($vals, $cvals) = @$data;
+	my $obj = $me->{obj};
+	plsstrm($obj->{STREAMNUMBER});
+	$obj->setparm(%$ppo);
+	pllsty($ppo->{LINESTYLE});
+	plwidth($ppo->{LINEWIDTH}) if $ppo->{LINEWIDTH};
+	my ($nx,$ny) = $vals->dims;
+	$obj->_setwindow;
+	$obj->_drawlabels;
+	my $grid = plAlloc2dGrid($vals->xvals, $vals->yvals);
+	plcont($vals, 1, $nx, 1, $ny, $cvals, \&pltr2, $grid);
+	plFree2dGrid($grid);
+    },
+    image => sub {
 	my ($me,$ipo,$data,$ppo) = @_;
 
 	# Hammer RGB into greyscale
@@ -243,7 +256,6 @@ our $plplot_methods = {
 	my ($fill_width, $cont_color, $cont_width) = (2, 0, 0);
 	my $clevel = ((PDL->sequence($nsteps)*(($max - $min)/($nsteps-1))) + $min);
 	my $grid = plAlloc2dGrid($data->[0], $data->[1]);
-	
 	plshades( $data->[2], $xmin, $xmax, $ymin, $ymax, $clevel, $fill_width, $cont_color, $cont_width, 0, 0, \&pltr2, $grid );
 	plFree2dGrid($grid);
 
@@ -253,7 +265,7 @@ our $plplot_methods = {
 	    $obj->colorkey($data->[2], 'v', VIEWPORT=>[0.93,0.96,0.15,0.85], TITLE=>"");
 	}
     },
-    'circles'=> sub {
+    circles => sub {
 	my ($me,$ipo,$data,$ppo) = @_;
 	my $ang = PDL->xvals(362)*3.14159/180;
 	my $c = $ang->cos;
@@ -264,7 +276,15 @@ our $plplot_methods = {
 	my $dy = ($data->[1]->flat->slice("*1") + $dr->slice("*1") * $s)->flat;
 	$me->{obj}->xyplot( $dx, $dy, PLOTTYPE=>'LINE',%{$ppo});
     },
-    'labels'=>sub {
+    polylines => sub {
+      require PDL::ImageND;
+      my ($me,$ipo,$data,$ppo) = @_;
+      my ($xy, $pen) = @$data;
+      my $pi = $pen->eq(0)->which;
+      $me->{obj}->xyplot($_->dog, PLOTTYPE=>'LINE', %$ppo)
+        for PDL::ImageND::path_segs($pi, $xy->mv(0,-1));
+    },
+    labels => sub {
 	my ($me, $ipo, $data, $ppo) = @_;
 
 	# Call xyplot to make sure the axes get set up.
@@ -286,7 +306,7 @@ our $plplot_methods = {
     }
 };
 
-our @colors = qw/BLACK RED GREEN BLUE MAGENTA CYAN YELLOW TURQUOISE PINK AQUAMARINE LIGHTSEAGREEN GOLD2 BROWN VIOLET FORESTGREEN LIGHTGOLDENROD/;
+our @colors = qw/BLACK RED GREEN BLUE MAGENTA CYAN YELLOW TURQUOISE PINK AQUAMARINE LIGHTSEAGREEN GOLD2 BROWN/;
 
 ##############################
 # PDL::Graphics::Simple::PLplot::plot
@@ -297,50 +317,35 @@ sub plot {
     my $ppo = {};
 
     $ppo->{TITLE}  = $ipo->{title}   if(defined($ipo->{title}));
-    $ppo->{XLAB}   = $ipo->{xtitle}  if(defined($ipo->{xtitle}));
-    $ppo->{YLAB}   = $ipo->{ytitle}  if(defined($ipo->{ytitle}));
+    $ppo->{XLAB}   = $ipo->{xlabel}  if(defined($ipo->{xlabel}));
+    $ppo->{YLAB}   = $ipo->{ylabel}  if(defined($ipo->{ylabel}));
     $ppo->{ZRANGE} = $ipo->{crange}  if(defined($ipo->{crange}));
 
     unless( $ipo->{oplot} ) {
 	$me->{style} = 0;
-
 	$me->{logaxis} = $ipo->{logaxis};
-
-	if($me->{opt}->{multi}) {
-	    $me->{multi_cur}++;
-	}
-
-	plsstrm($me->{obj}->{STREAMNUMBER});
-	pladv($me->{multi_cur} or 1);
-
-
-	if(!defined($me->{multi_n}) or  !($me->{multi_n})   or  $me->{multi_n}==1 ) {
-
-	    if($me->{opt}->{type}=~ m/^i/) {
-		plsstrm($me->{obj}->{STREAMNUMBER});
+	plsstrm($me->{obj}{STREAMNUMBER});
+	$me->{multi_cur} %= $me->{multi_n}, $me->{multi_cur}++
+	  if $me->{opt}{multi};
+	pladv($me->{multi_cur} || 1);
+	if (!$me->{multi_n} or $me->{multi_cur}==1) {
+	    if ($me->{opt}->{type}=~ m/^i/) {
 		pleop();
 		plclear();
 		plbop();
 	    }
 	}
-
 	if($ipo->{logaxis} =~ m/x/i) {
-	    $me->{obj}->{XBOX} = 'bcnstl';
-	    $ipo->{xrange} = [ log10($ipo->{xrange}->[0]), log10($ipo->{xrange}->[1]) ];
+	    $me->{obj}{XBOX} = 'bcnstl';
+	    $ipo->{xrange} = [ map log10($_), @{$ipo->{xrange}}[0,1] ];
 	}
-
-
 	if($ipo->{logaxis} =~ m/y/i) {
-	    $me->{obj}->{YBOX} = 'bcnstl';
-	    $ipo->{yrange} = [ log10($ipo->{yrange}->[0]), log10($ipo->{yrange}->[1]) ];
+	    $me->{obj}{YBOX} = 'bcnstl';
+	    $ipo->{yrange} = [ map log10($_), @{$ipo->{yrange}}[0,1] ];
 	}
-
-#	plenv( $ipo->{xrange}->[0], $ipo->{xrange}->[1], $ipo->{yrange}->[0],$ipo->{yrange}->[1], $ipo->{justify},  1);
-	$me->{obj}->{BOX} = [ $ipo->{xrange}->[0], $ipo->{xrange}->[1], $ipo->{yrange}->[0],$ipo->{yrange}->[1]  ];
-	$me->{obj}->{VIEWPORT} = [0.1,0.87,0.13,0.82]; # copied from defaults in PLplot.pm.  Blech.
-	$me->{obj}->{JUST} = !!$ipo->{justify};
-
-
+	$me->{obj}{BOX} = [ @{$ipo->{xrange}}[0,1], @{$ipo->{yrange}}[0,1] ];
+	$me->{obj}{VIEWPORT} = [0.1,0.87,0.13,0.82]; # copied from defaults in PLplot.pm.  Blech.
+	$me->{obj}{JUST} = !!$ipo->{justify};
     }
 
     warn "P::G::S::PLplot: legends not implemented yet for PLplot" if($ipo->{legend});
@@ -348,63 +353,42 @@ sub plot {
     while (@_) {
 	my ($co, @data) = @{shift()};
 	my @extra_opts = ();
-
-	if ( defined($co->{style}) and $co->{style}) {
+	if (defined $co->{style}) {
 	    $me->{style} = $co->{style};
 	} else {
 	    $me->{style}++;
 	}
-
 	$ppo->{COLOR}     = $colors[$me->{style}%(@colors)];
 	$ppo->{LINESTYLE} = (($me->{style}-1) % 8) + 1;
-
-	if ( defined($co->{width}) and $co->{width} ) {
-	    $ppo->{LINEWIDTH} = $co->{width};
+	$ppo->{LINEWIDTH} = $co->{width} if $co->{width};
+	my $with = $co->{with};
+	if ($with eq 'fits') {
+	  ($with, my $new_opts, my $new_img, my @coords) = PDL::Graphics::Simple::_fits_convert($data[0], $ipo);
+	  $data[-1] = $new_img;
+	  unshift @data, @coords;
+	  $ppo->{XLAB} = delete $new_opts->{xlabel};
+	  $ppo->{YLAB} = delete $new_opts->{ylabel};
+	  $me->{obj}{BOX} = [ @{$new_opts->{xrange}}[0,1], @{$new_opts->{yrange}}[0,1] ];
 	}
-
-	my $plpm = $plplot_methods->{$co->{with}};
-	die "Unknown curve option 'with $co->{with}'!" unless($plpm);
-
-	my %plplot_opts = (%$ppo);
-	my $plplot_opts = \%plplot_opts;
-
-	if ($me->{logaxis} =~ m/x/i) {
-	    $data[0] = $data[0]->log10;
-	}
-
-	if ($me->{logaxis} =~ m/y/i) {
-	    $data[1] = $data[1]->log10;
-	}
-
+	die "Unknown curve option 'with $with'!"
+	  unless my $plpm = $plplot_methods->{$with};
+	$data[0] = $data[0]->log10 if $me->{logaxis} =~ m/x/i;
+	$data[1] = $data[1]->log10 if $me->{logaxis} =~ m/y/i;
 	if (ref($plpm) eq 'CODE') {
-	    $plpm->($me, $ipo, \@data, $plplot_opts);
+	    $plpm->($me, $ipo, \@data, $ppo);
 	} else {
-	    $me->{obj}->xyplot(@data,PLOTTYPE=>$plpm,%plplot_opts);
+	    $me->{obj}->xyplot(@data,PLOTTYPE=>$plpm,%$ppo);
 	}
 	plflush();
     }
 
-    $me->{obj}->close if $me->{opt}->{type} =~ m/^f/i and !defined($me->{opt}->{multi});
+    $me->{obj}->close if $me->{opt}{type} =~ m/^f/i and !defined $me->{opt}{multi};
 
     if ($me->{conv_fn}) {
-	$a = rim($me->{conv_fn});
-	wim($a->mv(1,0)->slice(':,-1:0:-1'), $me->{opt}->{output});
+	my $im = rim($me->{conv_fn});
+	wim($im->mv(1,0)->slice(':,-1:0:-1'), $me->{opt}{output});
 	unlink($me->{conv_fn});
     }
-}
-
-sub ErrorReport{
-  print Win32::FormatMessage( Win32::GetLastError() );
-}
-
-sub cmd_location {
-  use File::Spec;
-  my @path = File::Spec->path();
-
-  for my $p(@path) {
-    if (-e "${p}\\cmd.exe") {return "${p}\\cmd.exe"}
-  }
-  die "Can't locate cmd.exe";
 }
 
 1;

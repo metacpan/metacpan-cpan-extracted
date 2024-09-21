@@ -10,11 +10,6 @@ if( $] < 5.010 ) {
 
 eval <<'_EVAL_';
     state $foo = 1;
-
-    given ($foo) {
-        when (1) { ok 1 }
-        default  { say "default" }
-    }
 _EVAL_
 
 ok !$@;

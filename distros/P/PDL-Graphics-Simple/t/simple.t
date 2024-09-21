@@ -4,6 +4,7 @@ use PDL::Graphics::Simple;
 use Test::More;
 use PDL;
 use PDL::Constants qw(PI);
+use File::Spec::Functions;
 
 my $tests_per_engine = 17;
 my @engines = $ENV{PDL_SIMPLE_ENGINE} || qw/plplot gnuplot pgplot prima/;
@@ -18,22 +19,61 @@ sub ask_yn {
     unlike($a, qr/n/i, $label);
 }
 
-##############################
-# Try the simple engine and convenience interfaces...
-
+# first so no "bad plan" if skip_all
 {
-my @new = PDL::Graphics::Simple::_translate_new();
+my @new = eval {PDL::Graphics::Simple::_translate_new()};
+diag(join '',explain $PDL::Graphics::Simple::mods), plan skip_all => 'No plotting engines installed' if $@ =~ /Sorry, all known/;
 # ignore $engine
 is_deeply $new[1], {
   'multi' => undef, 'output' => '', 'size' => [ 8, 6, 'in' ], 'type' => 'i'
 } or diag explain \@new;
 }
 
+# error handling
+eval {
+  PDL::Graphics::Simple::_translate_plot(undef, undef, with=>'line', undef);
+};
+like $@, qr/Undefined value/i;
+eval {
+  PDL::Graphics::Simple::_translate_plot(undef, undef, with=>'NEVER_USED');
+};
+like $@, qr/unknown.*NEVER_USED/i;
+eval {
+  PDL::Graphics::Simple::_translate_plot(undef, undef, with=>'image', xvals(8));
+};
+like $@, qr/at least 2/i;
+eval { PDL::Graphics::Simple::_translate_plot(undef, undef) };
+like $@, qr/at least one argument/;
+eval { PDL::Graphics::Simple::_translate_plot(undef, undef, {}) };
+like $@, qr/at least one argument/;
+for my $bounds (5, {}, [1..3]) {
+  eval { PDL::Graphics::Simple::_translate_plot(undef, undef, pdl(1), {bounds => $bounds}) };
+  like $@, qr/must be a 2-element ARRAY/;
+}
+for my $bounds (5, {}, [1..3], [1,1]) {
+  eval { PDL::Graphics::Simple::_translate_plot(undef, undef, pdl(1), {xrange => $bounds}) };
+  like $@, qr/must be a 2-element ARRAY/;
+  eval { PDL::Graphics::Simple::_translate_plot(undef, undef, pdl(1), {yrange => $bounds}) };
+  like $@, qr/must be a 2-element ARRAY/;
+}
+{ my @w; local $SIG{__WARN__} = sub {push @w, @_};
+eval { PDL::Graphics::Simple::_translate_plot(undef, undef, with=>'lines', pdl(1), pdl(1), pdl(1)) };
+like $@, qr/requires 1 or 2 columns/;
+eval { PDL::Graphics::Simple::_translate_plot(undef, undef, with=>'fits', pdl(1), pdl(1)) };
+like $@, qr/requires 1 columns/;
+eval { PDL::Graphics::Simple::_translate_plot(undef, undef, with=>'polylines', pdl(1)) };
+like $@, qr/Single-arg/;
+is "@w", "", "no warnings";
+}
+
+##############################
+# Try the simple engine and convenience interfaces...
+
 {
 my $a = xvals(50); my $sin = sin($a/3);
 my $type = 'line';
 my $me = PDL::Graphics::Simple::_invocant_or_global();
-my @args = PDL::Graphics::Simple::_translate_plot(@$me{qw(held keys)}, PDL::Graphics::Simple::_translate_convenience($type, $a, $sin));
+my @args = PDL::Graphics::Simple::_translate_plot(@$me{qw(held keys)}, PDL::Graphics::Simple::_translate_convenience($type, $a, $sin, {xlabel=>"Abscissa", ylabel=>"Ordinate"}));
 delete $args[1]{yrange}; # so different sin can't cause spurious fails
 is_deeply \@args, [
   [ 'line 1' ],
@@ -42,7 +82,7 @@ is_deeply \@args, [
     'justify' => 0, 'legend' => undef,
     'logaxis' => '', 'oplot' => 0,
     'title' => undef, 'wedge' => '',
-    'xlabel' => undef, 'ylabel' => undef,
+    xlabel=>"Abscissa", ylabel=>"Ordinate",
     'xrange' => [ 0, 49 ],
   },
   [
@@ -51,12 +91,12 @@ is_deeply \@args, [
   ]
 ];
 }
-eval { $a = xvals(50); lines $a sin($a/3) };
+eval { $a = xvals(50); lines $a sin($a/3), {xlabel=>"Abscissa", ylabel=>"Ordinate"} };
 plan skip_all => 'No plotting engines installed' if $@ =~ /Sorry, all known/;
 is($@, '', "simple lines plot succeeded");
 ok( defined($PDL::Graphics::Simple::global_object), "Global convenience object got spontaneously set" );
 ask_yn q{  test>  $a = xvals(50); lines $a sin($a/3);
-You should see a sine wave...}, "convenience plot OK";
+You should see a sine wave, X and Y axes labelled: }, "convenience plot OK";
 
 eval { erase };
 is($@, '', 'erase worked');
@@ -72,6 +112,7 @@ ok( (  defined($mods) and ref $mods eq 'HASH'  ) ,
 # line & bin
 my $x10 = xvals(10);
 my $x10sqrt = $x10->sqrt * sqrt(10);
+my $x10_12 = $x10 * 0.5;
 my $sin10 = sin($x10)*10;
 # errorbars
 my $x37 = xvals(37);
@@ -121,79 +162,19 @@ for my $engine (@engines) {
       }
       $pgplot_ran ||= $engine eq 'pgplot';
 
-      eval { $w = PDL::Graphics::Simple->new(engine=>$engine, multi=>[3,2]) };
+      eval { $w = PDL::Graphics::Simple->new(engine=>$engine, multi=>[2,2], size=>[6,6]) };
       is($@, '', "constructor for $engine worked OK");
       isa_ok($w, 'PDL::Graphics::Simple', "constructor for $engine worked OK");
 
 ##############################
-# Simple line & bin plot
-{
-my @args = PDL::Graphics::Simple::_translate_plot(@$w{qw(held keys)},
-  with=>'line', $x10, $x10sqrt,
-  with=>'bins', $x10, $sin10,
-  {title=>"PDL: $engine engine, line & bin plots"}
-);
-delete $args[1]{yrange}; # so different sin can't cause spurious fails
-is_deeply \@args, [
-  [ 'line 1', 'bin 2' ],
-  {
-    'bounds' => undef, 'crange' => undef,
-    'justify' => 0, 'legend' => undef,
-    'logaxis' => '', 'oplot' => 0,
-    'title' => "PDL: $engine engine, line & bin plots", 'wedge' => '',
-    'xlabel' => undef, 'ylabel' => undef,
-    'xrange' => [ 0, 9 ],
-  },
-  [
-    { 'key' => undef, 'style' => undef, 'width' => undef, 'with' => 'lines' },
-    $x10, $x10sqrt,
-  ],
-  [
-    { 'key' => undef, 'style' => undef, 'width' => undef, 'with' => 'bins' },
-    $x10, $sin10,
-  ]
-];
-}
-      eval { $w->plot(with=>'line', $x10, $x10sqrt,
-		      with=>'bins', $sin10,
-		 {title=>"PDL: $engine engine, line & bin plots"}),
-      };
-      is($@, '', "plot succeeded\n");
-
-##############################
-# Error bars plot
-{
-my @args = PDL::Graphics::Simple::_translate_plot(@$w{qw(held keys)},
-  with=>'errorbars', $x37_2, $x37sqrd, $x37,
-  with=>'limitbars', $x90, $sin90, $x90_2, $ones_90,
-  {title=>"PDL: $engine engine, error (rel.) & limit (abs.) bars"},
-);
-is_deeply \@args, [
-  [ 'errorbar 1', 'limitbar 2' ],
-  {
-    'bounds' => undef, 'crange' => undef,
-    'justify' => 0, 'legend' => undef,
-    'logaxis' => '', 'oplot' => 0,
-    'title' => "PDL: $engine engine, error (rel.) & limit (abs.) bars",
-    'wedge' => '',
-    'xlabel' => undef, 'ylabel' => undef,
-    'xrange' => [ 0, 89 ], 'yrange' => [ 0, 144 ]
-  },
-  [
-    { 'key' => undef, 'style' => undef, 'width' => undef, 'with' => 'errorbars' },
-    $x37_2, $x37sqrd, $x37,
-  ],
-  [
-    { 'key' => undef, 'style' => undef, 'width' => undef, 'with' => 'limitbars' },
-    $x90, $sin90, $x90_2, $ones_90,
-  ]
-];
-}
-      eval { $w->plot( with=>'errorbars', $x37_2, $x37sqrd, $x37,
-		       with=>'limitbars', $sin90, $x90_2, $ones_90,
-		       {title=>"PDL: $engine engine, error (rel.) & limit (abs.) bars"}
-		 ); };
-      is($@, '', "errorbar plot succeeded");
+# FITS plot of Europe
+my $europe = rfits(catfile(qw(t europe.fits)));
+      eval { $w->plot( with=>'image', $europe,
+        {title=>"PDL: $engine engine, Europe image"}) };
+      is($@, '', "image plot succeeded");
+      eval { $w->plot( with=>'fits', $europe,
+        {xrange=>[-20,20], yrange=>[40,80], title=>"Europe FITS", J=>0}) };
+      is($@, '', "FITS plot succeeded");
 
 ##############################
 # Image & circles plot
@@ -267,6 +248,93 @@ is_deeply \@args, [
       };
       is($@, '', "justified image and circles plot succeeded");
 
+      ask_yn qq{
+Testing $engine engine: You should see in a 2x2 grid:
+1) an image of Europe rotated by 30 degrees clockwise
+2) the same image, but rectified for scientific coordinates so upright again
+3) a radial 11x11 "target" image and some superimposed "circles".
+Since the plot is not justified, the pixels in the target image should
+be oblong and the "circles" should be ellipses.
+4) the same plot as (2), but justified.  superimposed "circles".
+Since the plot is justified, the pixels in the target image should be
+square and the "circles" should really be circles.}, "plots look OK";
+
+##############################
+# Error bars plot
+{
+my @args = PDL::Graphics::Simple::_translate_plot(@$w{qw(held keys)},
+  with=>'errorbars', $x37_2, $x37sqrd, $x37,
+  with=>'limitbars', $x90, $sin90, $x90_2, $ones_90,
+  {title=>"PDL: $engine engine, error (rel.) & limit (abs.) bars"},
+);
+is_deeply \@args, [
+  [ 'errorbar 1', 'limitbar 2' ],
+  {
+    'bounds' => undef, 'crange' => undef,
+    'justify' => 0, 'legend' => undef,
+    'logaxis' => '', 'oplot' => 0,
+    'title' => "PDL: $engine engine, error (rel.) & limit (abs.) bars",
+    'wedge' => '',
+    'xlabel' => undef, 'ylabel' => undef,
+    'xrange' => [ 0, 89 ], 'yrange' => [ 0, 144 ]
+  },
+  [
+    { 'key' => undef, 'style' => undef, 'width' => undef, 'with' => 'errorbars' },
+    $x37_2, $x37sqrd, $x37,
+  ],
+  [
+    { 'key' => undef, 'style' => undef, 'width' => undef, 'with' => 'limitbars' },
+    $x90, $sin90, $x90_2, $ones_90,
+  ]
+];
+}
+      eval { $w->plot( with=>'errorbars', $x37_2, $x37sqrd, $x37,
+		       with=>'limitbars', $sin90, $x90_2, $ones_90,
+		       {title=>"PDL: $engine engine, error (rel.) & limit (abs.) bars"}
+		 ); };
+      is($@, '', "errorbar plot succeeded");
+
+##############################
+# Simple line & bin plot
+{
+my @args = PDL::Graphics::Simple::_translate_plot(@$w{qw(held keys)},
+  with=>'line', style=>0, $x10, $x10sqrt,
+  with=>'line', style=>0, $x10, $x10_12,
+  with=>'bins', $x10, $sin10,
+  {title=>"PDL: $engine engine, line & bin plots"}
+);
+delete $args[1]{yrange}; # so different sin can't cause spurious fails
+is_deeply \@args, [
+  [ 'line 1', 'line 2', 'bin 3' ],
+  {
+    'bounds' => undef, 'crange' => undef,
+    'justify' => 0, 'legend' => undef,
+    'logaxis' => '', 'oplot' => 0,
+    'title' => "PDL: $engine engine, line & bin plots", 'wedge' => '',
+    'xlabel' => undef, 'ylabel' => undef,
+    'xrange' => [ 0, 9 ],
+  },
+  [
+    { 'key' => undef, 'style' => 0, 'width' => undef, 'with' => 'lines' },
+    $x10, $x10sqrt,
+  ],
+  [
+    { 'key' => undef, 'style' => 0, 'width' => undef, 'with' => 'lines' },
+    $x10, $x10_12,
+  ],
+  [
+    { 'key' => undef, 'style' => undef, 'width' => undef, 'with' => 'bins' },
+    $x10, $sin10,
+  ]
+];
+}
+      eval { $w->plot(with=>'line', style=>0, $x10, $x10sqrt,
+		      with=>'line', style=>0, $x10, $x10_12,
+		      with=>'bins', style=>3, $sin10,
+		 {title=>"PDL: $engine engine, line & bin plots"}),
+      };
+      is($@, '', "plot succeeded\n");
+
 ##############################
 # Text
 {
@@ -330,21 +398,15 @@ is_deeply \@args, [
       is($@, '', "log scaling succeeded");
 
       ask_yn qq{
-Testing $engine engine: You should see in a 3x2 grid:
-1) a superposed line plot and bin plot, with x range from 0 to 9 and
-yrange from 0 to 9. The two plots should have different line styles.
-2) error bars (symmetric relative to each plotted point) and limit bars
+Testing $engine engine: You should see in a 2x2 grid:
+1) error bars (symmetric relative to each plotted point) and limit bars
 (asymmetric about each plotted point).
-3) a radial 11x11 "target" image and some superimposed "circles".
-Since the plot is not justified, the pixels in the target image should
-be oblong and the "circles" should be ellipses.
-4) the same plot as (3), but justified.  superimposed "circles".
-Since the plot is justified, the pixels in the target image should be
-square and the "circles" should really be circles.
-5) "left-justified" text left aligned on x=0, "left-with-spaces" just
+2) 2 superposed line plots with same style and a bin plot with different,
+with x range from 0 to 9 and yrange from 0 to 9.
+3) "left-justified" text left aligned on x=0, "left-with-spaces" just
 right of x=1, "centered" centered on x=2, ">start with '>'" centered on
 x=3, and "right-justified" right-aligned on x=4.
-6) a simple logarithmically scaled plot, with appropriate title.}, "plots look OK";
+4) a simple logarithmically scaled plot, with appropriate title.}, "plots look OK";
 
 ##############################
 # Multiplot
@@ -358,11 +420,13 @@ is_deeply $new[1], {
       eval { $w=PDL::Graphics::Simple->new(engine=>$engine, multi=>[2,2]); };
       is($@, '', "Multiplot declaration was OK");
       $w->image( $r9,{wedge=>1} ); $w->image( $r9minus,{wedge=>1} );
-      $w->image( $s9 );            $w->image( $xyr9 );
+      $w->plot(with=>'image', $r9, with=>'contours', $r9, {j=>1});
+      $w->image( $xyr9 );
       ask_yn qq{Testing $engine engine: You should see two bullseyes across the top (one in
-negative print), a gradient at bottom left, and an RGB blur (if supported
-by the engine - otherwise a modified gradient) at bottom right.  The top two
-panels should have colorbar wedges to the right of the image.}, "multiplot OK";
+negative print), a bullseye with contours at bottom left, and an RGB
+blur (if supported by the engine - otherwise a modified gradient) at
+bottom right.  The top two panels should have colorbar wedges to the
+right of the image.}, "multiplot OK";
     }
 }
 

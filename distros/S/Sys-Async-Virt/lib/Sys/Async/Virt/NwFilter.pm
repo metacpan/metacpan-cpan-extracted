@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::NwFilter v0.0.2;
+package Sys::Async::Virt::NwFilter v0.0.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.2;
+use Protocol::Sys::Virt::Remote::XDR v0.0.3;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 
@@ -57,7 +57,7 @@ Sys::Async::Virt::NwFilter - Client side proxy to remote LibVirt network filter
 
 =head1 VERSION
 
-v0.0.2
+v0.0.3
 
 =head1 SYNOPSIS
 
@@ -84,6 +84,10 @@ See documentation of L<virNWFilterGetXMLDesc|https://libvirt.org/html/libvirt-li
   # -> (* no data *)
 
 See documentation of L<virNWFilterUndefine|https://libvirt.org/html/libvirt-libvirt-nwfilter.html#virNWFilterUndefine>.
+
+
+
+=head1 INTERNAL METHODS
 
 
 

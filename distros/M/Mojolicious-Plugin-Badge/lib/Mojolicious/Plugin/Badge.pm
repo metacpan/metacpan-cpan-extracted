@@ -10,7 +10,7 @@ use Mojo::UserAgent;
 use Mojo::Util qw(b64_encode);
 use Mojolicious::Types;
 
-our $VERSION = '1.00';
+our $VERSION = '1.10';
 
 use constant DEBUG => $ENV{BADGE_PLUGIN_DEBUG} || 0;
 
@@ -93,13 +93,20 @@ sub _build_options {
 
     my $id_suffix = $options{id_suffix};
 
-    my $logo  = $options{logo};
-    my $color = _decode_color($options{color} || 'informational');
-    my $link  = $options{link};
-    my $title = $options{title};
-    my $style = $options{style} || 'flat';
-
+    my $logo         = $options{logo};
+    my $color        = _decode_color($options{color} || 'informational');
+    my $link         = $options{link};
+    my $title        = $options{title};
+    my $style        = $options{style}        || 'flat';
     my $badge_format = $options{badge_format} || 'svg';
+
+    if ($style !~ /^(flat|flat-square|plastic|for-the-badge)$/) {
+        Carp::croak 'Unknown badge style';
+    }
+
+    if ($badge_format !~ /^(png|svg)$/) {
+        Carp::croak 'Unknown badge format';
+    }
 
     my $label            = $options{label} || Carp::croak 'Missing label';
     my $label_color      = _decode_color($options{label_color} || 'gray');
@@ -383,9 +390,13 @@ Mojolicious::Plugin::Badge - Badge Plugin for Mojolicious
 L<Mojolicious::Plugin::Badge> is a L<Mojolicious> plugin that generate "Shields.io"
 like badge from L</badge> helper or via API URL (e.g. C</badge/Hello-Mojo!-orange>).
 
+=begin html
+
 <p>
   <img alt="Hello Mojo!" src="https://raw.github.com/giterlizzi/perl-Mojolicious-Plugin-Badge/main/examples/hello-mojo.png?raw=true">
 </p>
+
+=end html
 
 =head1 OPTIONS
 
@@ -634,6 +645,6 @@ C<STDERR>.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
+L<Mojolicious::Command::badge>, L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

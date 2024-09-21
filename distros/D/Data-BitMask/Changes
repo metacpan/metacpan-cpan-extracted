@@ -1,5 +1,12 @@
 Revision history for Perl extension Data::BitMask
 
+1.00  Fri Sep 20 2024
+ - First release in over 20 years!
+ - Updated the POD to reflect the current options for installation
+ - Update MANIFEST.SKIP file
+ - Added memoization for build_mask, break_mask, and explain_mask
+   This provides significant performance enhancements.
+
 0.91  Sat Mar 20 2004
  - Now using create_makefile_pl => 'traditional' because passthrough
    doesn't seem to work with subclassing (Thanks merlyn for reporting this)

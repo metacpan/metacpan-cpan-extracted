@@ -1,11 +1,11 @@
 package Webservice::CVEDB::API;
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 
-class Webservice::CVEDB::API 1.000;
+class Webservice::CVEDB::API 1.001;
 
 use HTTP::Tiny;
 use JSON::PP;

@@ -1,5 +1,5 @@
 package Dist::Build::XS::Export;
-$Dist::Build::XS::Export::VERSION = '0.014';
+$Dist::Build::XS::Export::VERSION = '0.015';
 use strict;
 use warnings;
 
@@ -8,6 +8,13 @@ use parent 'ExtUtils::Builder::Planner::Extension';
 use Carp 'croak';
 use File::Find 'find';
 use File::Spec::Functions qw/abs2rel catfile/;
+use Parse::CPAN::Meta;
+
+my $json_backend = Parse::CPAN::Meta->json_backend;
+my $json = $json_backend->new->canonical->pretty->utf8;
+
+my @allowed_flags = qw/include_dirs defines library_dirs libraries extra_compiler_flags extra_linker_flags/;
+my %allowed_flag = map { $_ => 1 } @allowed_flags;
 
 sub copy_header {
 	my ($planner, $module_dir, $filename, $target) = @_;
@@ -41,6 +48,19 @@ sub add_methods {
 
 		$planner->create_phony('code', @outputs);
 	});
+
+	$planner->add_delegate('export_flags', sub {
+		my ($self, %args) = @_;
+		my %flags = map { $_ => $args{$_} } grep { $allowed_flag{$_} } keys %args;
+
+		my $module_name = $args{module} // $planner->main_module_name;
+		(my $module_dir = $module_name) =~ s/::/-/g;
+		my $filename = catfile(qw/blib lib auto share module/, $module_dir, 'compile.json');
+
+		$planner->dump_json($filename, \%flags);
+
+		return $planner->create_phony('code', $filename);
+	});
 }
 
 1;
@@ -59,11 +79,11 @@ Dist::Build::XS::Export - Dist::Build extension to export headers for other XS m
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
- load_module('Dist::Build::Export');
+ load_module('Dist::Build::XS::Export');
  export_headers(
      module => 'Foo::Bar',
      dir    => 'include',
@@ -96,6 +116,10 @@ A file (or a list of files) to export (e.g. C<'foo.h'>).
 =back
 
 At least one of C<dir> and C<file> must be defined. Note that this function can be called multiple times (e.g. for multiple modules).
+
+=head2 export_flags
+
+This stores the given flags for the module in the appropriate sharedir. The module can be set using the C<module> named argument but will default to the main module of the dist. The C<include_dirs>, C<defines>, C<extra_compiler_flags>, C<libraries>, C<library_dirs>, C<extra_linker_flags> arguments are all stored as-is.
 
 =head1 AUTHOR
 

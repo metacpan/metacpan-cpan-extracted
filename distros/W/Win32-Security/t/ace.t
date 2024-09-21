@@ -1,13 +1,26 @@
 use strict;
 $^W++;
+# Modules under test
 use Win32::Security::ACE;
+
+# Modules to support specific tests
+use Win32; # Supports IsAdminUser
+
+# Modules to support test harness
 use Data::Dumper;
 use Test;
 
+use vars qw($enabled);
 BEGIN {
 	$|++;
-	plan tests => 74,
+	$enabled = 1; #Change this to 0 to disable tests
+	plan tests => $enabled ? 74 : 1,
 }
+if (!$enabled) {
+	ok(1);
+	exit;
+}
+
 
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Sortkeys = 1; #Repeated to avoid warnings

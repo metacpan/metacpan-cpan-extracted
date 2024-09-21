@@ -467,7 +467,7 @@ number supported by the backend.  The styles are generally defined by
 a mix of color and dash pattern, but the particular color and dash
 pattern depend on the engine in use. The first 30 styles are
 guaranteed to be distinguishable. This is useful to produce, e.g.,
-multiple traces with the same style.
+multiple traces with the same style. C<0> is a valid value.
 
 =back
 
@@ -528,6 +528,41 @@ as they are interpreted as 8 bits per plane colour values. E.g.:
   $image_data = rpic( 'my-image.png' )->mv(0,-1); # need RGB 3-dim last
   $w->image( $image_data );
 
+If you have a 2-D field of values that you would like to see with a heatmap:
+
+  use PDL::Graphics::ColorSpace;
+  sub as_heatmap {
+    my ($d) = @_;
+    my $max = $d->max;
+    die "as_heatmap: can't work if max == 0" if $max == 0;
+    $d /= $max; # negative OK
+    my $hue   = (1 - $d)*240;
+    $d = cat($hue, pdl(1), pdl(1));
+    (hsv_to_rgb($d->mv(-1,0)) * 255)->byte->mv(0,-1);
+  }
+  $w->image( as_heatmap(rvals 300,300) );
+
+=item contours
+
+As of 1.012. Draws contours. Takes a 2-D array of values, as (width x
+height), and optionally a 1-D vector of contour values.
+
+=item fits
+
+As of 1.012. Displays an image from an ndarray with a FITS header.
+Uses C<CUNIT[12]> etc to make X & Y axes including labels.
+
+=item polylines
+
+As of 1.012. Draws polylines, with 2 arguments (C<$xy>, C<$pen>).
+The "pen" has value 0 for the last point in that polyline.
+
+  use PDL::Transform::Cartography;
+  use PDL::Graphics::Simple qw(pgswin);
+  $coast = earth_coast()->glue( 1, scalar graticule(15,1) );
+  $w = pgswin();
+  $w->plot(with => 'polylines', $coast->clean_lines);
+
 =item labels
 
 This places text annotations on the plot.  It requires three input
@@ -555,7 +590,7 @@ equivalent to C<plot> except it sets the plot option C<oplot>,
 so that the plot will be overlain on the previous one.
 
 =cut
-=head2 line, points, image, imag
+=head2 line, points, image, imag, cont
 
 =for usage
 
@@ -581,6 +616,8 @@ C<imag> is even more DWIMMy for PGPLOT users or PDL Book readers:
 it accepts up to three non-hash arguments at the start of the
 argument list.  The second and third are taken to be values for
 the C<crange> plot option.
+
+C<cont> resembles the PGPLOT function.
 
 =cut
 =head2 erase
@@ -685,11 +722,11 @@ translated and passed through to that working plotting module.
 PDL::Graphics::Simple calls are dispatched in a two-step process. The
 main module curries the arguments, parsing them into a regularized
 form and carrying out DWIM optimizations. The regularized arguments
-are passed to subclasses that translate them into the APIs of their
-respective plot engines.  The subclasses are very simple and implement
+are passed to implementation classes that translate them into the APIs of their
+respective plot engines.  The classes are very simple and implement
 only a few methods, outlined below.  They are intended only to be
 called by the PDL::Graphics::Simple driver, which limits the need for
-argument processing, currying, and parsing. The subclasses are thus
+argument processing, currying, and parsing. The classes are thus
 responsible only for converting the regularized parameters to plot
 calls in the form expected by their corresponding plot modules.
 
@@ -701,7 +738,7 @@ non-object-oriented interface easier to implement since the main
 interface modules are in one place and can access the global object
 easily.
 
-=head2 Interface subclass methods
+=head2 Interface class methods
 
 Each interface module supports the following methods:
 
@@ -768,9 +805,7 @@ The hash in the curve block contains the curve options for that
 particular curve.  They are all set to have reasonable default values.
 The values passed in are C<with> and C<key>.  If the C<legend>
 option is undefined, then the curve should not be placed into a plot
-legend (if present).  The C<with> option will be one of C<points>,
-C<lines>, C<bins>, C<errorbars>, C<limitbars>, C<circles>
-C<image>, or C<labels>.
+legend (if present).
 
 =head1 ENVIRONMENT
 

@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Interface v0.0.2;
+package Sys::Async::Virt::Interface v0.0.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.2;
+use Protocol::Sys::Virt::Remote::XDR v0.0.3;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -79,7 +79,7 @@ Sys::Async::Virt::Interface - Client side proxy to remote LibVirt (network) inte
 
 =head1 VERSION
 
-v0.0.2
+v0.0.3
 
 =head1 SYNOPSIS
 
@@ -129,6 +129,10 @@ See documentation of L<virInterfaceIsActive|https://libvirt.org/html/libvirt-lib
   # -> (* no data *)
 
 See documentation of L<virInterfaceUndefine|https://libvirt.org/html/libvirt-libvirt-interface.html#virInterfaceUndefine>.
+
+
+
+=head1 INTERNAL METHODS
 
 
 

@@ -5,7 +5,7 @@
 # Author: Toby Ovod-Everett
 #
 #############################################################################
-# Copyright 2000, 2003, 2004 Toby Ovod-Everett.  All rights reserved
+# Copyright 2000-2024 Toby Ovod-Everett.  All rights reserved
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
@@ -69,6 +69,8 @@ BEGIN {
 }
 
 package Win32::Security::SID;
+
+$Win32::Security::SID::VERSION = '0.60';
 
 =head2 ConvertSidToStringSid
 

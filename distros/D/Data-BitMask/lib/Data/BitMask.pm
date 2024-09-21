@@ -4,7 +4,7 @@
 #
 # Author: Toby Ovod-Everett
 #############################################################################
-# Copyright 2003, 2004 Toby Ovod-Everett.  All rights reserved
+# Copyright 2003-2024 Toby Ovod-Everett.  All rights reserved
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
@@ -35,38 +35,66 @@ Data::BitMask - bitmask manipulation
       $FileMask->explain_mask($mask),
       $FileMask->break_mask($mask)
     ]);
-  
+
   my $mask2 = $FileMask->build_mask({FULL => 1, WRITE => 0});
 
 =head1 DESCRIPTION
 
-This module allows one to create bitmask manipulator objects that can be used to 
-create bitmask values based on a list of constants, as well as to break apart 
-masks using those constants.  The advantages are that you don't have to pollute 
-namespaces to use constants, you can ensure that only appropriate constants are 
-used for specific masks, you can easily break apart and explain masks, and in 
+This module allows one to create bitmask manipulator objects that can be used to
+create bitmask values based on a list of constants, as well as to break apart
+masks using those constants.  The advantages are that you don't have to pollute
+namespaces to use constants, you can ensure that only appropriate constants are
+used for specific masks, you can easily break apart and explain masks, and in
 general it is much easier for the user to interact with masks.
 
-The module only interacts with masks that fit in Perl integers.  In some places, 
-it presumes that you are using 32 bit integers (i.e. canonicalizing negative 
+The module only interacts with masks that fit in Perl integers.  In some places,
+it presumes that you are using 32 bit integers (i.e. canonicalizing negative
 values).
 
-The module expends a modest amount of overhead in creating the C<Data::BitMask> 
+The module expends a modest amount of overhead in creating the C<Data::BitMask>
 object so as to speed up future mask manipulations.
+
+Calls to C<build_mask>, C<break_mask>, and C<explain_mask> are memoized to
+speed up repeated calls with the same parameters.
 
 =head2 Installation instructions
 
-This module requires C<Module::Build 0.24> to use the automated installation 
-procedures.  With C<Module::Build> installed:
+There are four options for installing this module:
+
+=over 4
+
+=item *
+
+Using C<Module::Build 0.24> or later:
 
   Build.PL
   perl build test
   perl build install
 
-It can also be installed manually by copying C<lib/Data/Bitmask.pm> to 
+=item *
+
+Using C<ExtUtils::MakeMaker> (part of the Perl core):
+
+  Makefile.PL
+  make test
+  make install
+
+=item *
+
+Using the PPM (the file has the extension C<.ppm.zip>) on CPAN and installing 
+under ActivePerl for Win32 by unzipping the C<.ppm.zip> file and then:
+
+  ppm install Data-BitMask.ppd
+
+=item *
+
+Installing manually by copying C<lib/Data/Bitmask.pm> to 
 C<perl/site/lib/Data/Bitmask.pm>.
 
-=head1 Suggest Module Implementation
+=back
+
+
+=head1 Suggested Module Implementation
 
 Here is one suggested approach to using bitmask manipulators in a module.
 
@@ -96,19 +124,19 @@ This has several advantages:
 
 =item *
 
-Demand creation of the C<Data::Bitmask> object.  Creating objects with huge 
-numbers of constants (i.e. hundreds or thousands) can be a bit time consuming, 
-so this delays creation until the object actually gets used.  At the same time, 
+Demand creation of the C<Data::Bitmask> object.  Creating objects with huge
+numbers of constants (i.e. hundreds or thousands) can be a bit time consuming,
+so this delays creation until the object actually gets used.  At the same time,
 the created object is cached.
 
 =item *
 
-Easy access from within in the module, reasonably easy access from outside the 
+Easy access from within in the module, reasonably easy access from outside the
 module.
 
 =item *
 
-If the user wants even easier access from outside the module, you can support 
+If the user wants even easier access from outside the module, you can support
 Exporter and let the sub be exported.
 
 =back
@@ -123,24 +151,24 @@ package Data::BitMask;
 
 use vars qw($VERSION $masks);
 
-$VERSION = '0.91';
+$VERSION = '1.00';
 
 $masks = {};
 
 =head2 new
 
-Creates a new bitmask manipulator.  Pass a list of constant and value pairs. The 
-constants do not have to be disjoint, but order does matter.  When executing 
-C<explain_mask> or C<explain_const>, constants that are earlier in the list take 
-precendence over those later in the list.  Constant names are not allowed to 
-have space or pipes in them, and constant values have to be integers. Constant 
+Creates a new bitmask manipulator.  Pass a list of constant and value pairs. The
+constants do not have to be disjoint, but order does matter.  When executing
+C<explain_mask> or C<explain_const>, constants that are earlier in the list take
+precedence over those later in the list.  Constant names are not allowed to
+have space or pipes in them, and constant values have to be integers. Constant
 names are case insensitive but preserving.
 
-If the passed value for the constant name is an anonymous array, then it is 
-presumed that the name is the first value and that the remainder consists of 
-name-value pairs of parameters.  The only currently supported parameter is 
-C<full_match>, which implies that the constant should only be returned from 
-C<break_mask> or C<explain_mask> if it perfectly matches the mask being 
+If the passed value for the constant name is an anonymous array, then it is
+presumed that the name is the first value and that the remainder consists of
+name-value pairs of parameters.  The only currently supported parameter is
+C<full_match>, which implies that the constant should only be returned from
+C<break_mask> or C<explain_mask> if it perfectly matches the mask being
 explained.  For example:
 
       [qw(FILES_ONLY_NO_INHERIT full_match 1)] =>    1,
@@ -171,7 +199,7 @@ Adds constants to an existing bitmask manipulator.  Pass a list of constant and
 value pairs as for C<new>.  Constants will be added to the end of the list (see
 C<new> for an explanation of ordering concerns).
 
-The main use for C<add_constants> is adding aggregate constants created by using 
+The main use for C<add_constants> is adding aggregate constants created by using
 C<build_mask>.
 
 =cut
@@ -217,6 +245,9 @@ sub _check_constants {
 	$self->_build_reverse_cache;
 	$self->_build_occlusion_cache;
 
+	$self->{build_mask_cache} = {};
+	$self->{break_mask_cache} = {};
+	$self->{explain_mask_cache} = {};
 }
 
 sub _build_forward_cache {
@@ -277,7 +308,7 @@ This takes one of three things as a parameter:
 
 =item *
 
-scalar - string is split on 'C<|>' and/or whitespace to generate a list of 
+scalar - string is split on 'C<|>' and/or whitespace to generate a list of
 constants
 
 =item *
@@ -286,12 +317,12 @@ ARRAY ref - elements are the list of constants
 
 =item *
 
-HASH ref - keys with true values are the list of constants; keys with false 
+HASH ref - keys with true values are the list of constants; keys with false
 values are subtracted from the resultant mask
 
 =back
 
-In all situations, integers are legal in place of constant names and are treated 
+In all situations, integers are legal in place of constant names and are treated
 as the value, after adding 2**32 to any negative integers.
 
 =cut
@@ -304,14 +335,27 @@ sub build_mask {
 
 	local $^W = 0;
 
+	my $build_mask_cache_key;
 	if (ref($struct) eq 'ARRAY') {
 		@add = map {uc($_)} @{$struct};
+		$build_mask_cache_key = 'ARRAY:' . join('|', @add);
+		if (exists $self->{build_mask_cache}->{$build_mask_cache_key}) {
+			return $self->{build_mask_cache}->{$build_mask_cache_key};
+		}
 	} elsif (ref($struct) eq 'HASH') {
+		$build_mask_cache_key = 'HASH:' . join('|', map {uc($_)} %$struct);
+		if (exists $self->{build_mask_cache}->{$build_mask_cache_key}) {
+			return $self->{build_mask_cache}->{$build_mask_cache_key};
+		}
 		@add = map {uc($_)} grep {$struct->{$_}} keys %$struct;
 		@sub = map {uc($_)} grep {!$struct->{$_}} keys %$struct;
 	} elsif (int($struct) eq $struct) {
 		return int($struct) < 0 ? int($struct) + 2**31 + 2**31 : int($struct);
 	} else {
+		$build_mask_cache_key = 'STRING:' . uc($struct);
+		if (exists $self->{build_mask_cache}->{$build_mask_cache_key}) {
+			return $self->{build_mask_cache}->{$build_mask_cache_key};
+		}
 		@add = map {uc($_)} split(/\s*\|\s*|\s+/, $struct);
 	}
 
@@ -334,6 +378,7 @@ sub build_mask {
 		}
 	}
 
+	$self->{build_mask_cache}->{$build_mask_cache_key} = $mask;
 	return $mask;
 }
 
@@ -347,9 +392,9 @@ Commonly used for operations like:
 
 	if ($MaskManipulator->break_mask($my_mask_value)->{CONSTANT}) {
 
-Note that C<break_mask> accepts 
+Note that C<break_mask> accepts
 
-To eliminate a constant from explain_mask or break_mask unless it perfectly 
+To eliminate a constant from explain_mask or break_mask unless it perfectly
 matches, use C<full_match> constants.
 
 =cut
@@ -364,6 +409,10 @@ sub break_mask {
 		$mask = int($mask) < 0 ? int($mask) + 2**31 + 2**31 : int($mask);
 	} else {
 		$mask = $self->build_mask($mask);
+	}
+
+	if (exists $self->{break_mask_cache}->{$mask}) {
+		return { %{$self->{break_mask_cache}->{$mask}} };
 	}
 
 	my($struct) = {};
@@ -381,27 +430,28 @@ sub break_mask {
 
 	$testmask == $mask or &croak("Unable to break down mask $mask completely.  Found $testmask.");
 
-	return $struct;
+	$self->{break_mask_cache}->{$mask} = $struct;
+	return { %$struct };
 }
 
 =head2 explain_mask
 
-Explains a mask in terms of a relatively minimal set of constants.  Pass either 
-a mask value as an integer or any valid parameter for C<build_mask>.  Returns a 
-hash of constants that will recreate the mask. Many times, this will be the 
-minimum number of constants necessary to describe the mask.  Note that creating 
-the true minimum set of constants is somewhat painful (see Knapsack problem).  
+Explains a mask in terms of a relatively minimal set of constants.  Pass either
+a mask value as an integer or any valid parameter for C<build_mask>.  Returns a
+hash of constants that will recreate the mask. Many times, this will be the
+minimum number of constants necessary to describe the mask.  Note that creating
+the true minimum set of constants is somewhat painful (see Knapsack problem).
 
-The algorithm used by C<explain_mask> is to first test for a constant that 
-perfectly matches the mask.  If one is found, this is the obvious answer.  In 
-the absence of a perfect match, C<break_mask> is used to generate a maximal 
-solution.  All simply occluded constants are then eliminated (that is to say, 
-all constants in the list whose values are subsets of another single constant). 
-This means, for instance, that if you had only three constants, AB => 3, BC => 
-6, and AC => 5, C<explain_mask> would return all three when passed the value 7 
+The algorithm used by C<explain_mask> is to first test for a constant that
+perfectly matches the mask.  If one is found, this is the obvious answer.  In
+the absence of a perfect match, C<break_mask> is used to generate a maximal
+solution.  All simply occluded constants are then eliminated (that is to say,
+all constants in the list whose values are subsets of another single constant).
+This means, for instance, that if you had only three constants, AB => 3, BC =>
+6, and AC => 5, C<explain_mask> would return all three when passed the value 7
 because no one constant is a subset of any single one of the others.
 
-To eliminate a constant from explain_mask or break_mask unless it perfectly 
+To eliminate a constant from explain_mask or break_mask unless it perfectly
 matches, use C<full_match> constants.
 
 =cut
@@ -418,7 +468,13 @@ sub explain_mask {
 		$mask = $self->build_mask($mask);
 	}
 
-	return {$self->{reverse_cache}->{$mask}->[0] => 1} if exists $self->{reverse_cache}->{$mask};
+	if (exists $self->{reverse_cache}->{$mask}) {
+		return { $self->{reverse_cache}->{$mask}->[0] => 1 };
+	}
+
+	if (exists $self->{explain_mask_cache}->{$mask}) {
+		return { %{ $self->{explain_mask_cache}->{$mask} } };
+	}
 
 	my $struct = $self->break_mask($mask);
 	my(@temp) = keys(%$struct);
@@ -430,7 +486,8 @@ sub explain_mask {
 		}
 	}
 
-	return $struct;
+	$self->{explain_mask_cache}->{$mask} = $struct;
+	return { %$struct };
 }
 
 
@@ -442,7 +499,7 @@ This takes one of two things as a parameter:
 
 =item *
 
-scalar integer - if a scalar integer is passed, then the value is simply 
+scalar integer - if a scalar integer is passed, then the value is simply
 returned, after adding 2**32 to any negative integers
 
 =item *
@@ -469,8 +526,8 @@ sub build_const {
 
 =head2 explain_const
 
-Looks for a perfect match for the passed mask value.  Pass either a mask value 
-as an integer or any valid parameter for C<build_mask>.  If one is not found, it 
+Looks for a perfect match for the passed mask value.  Pass either a mask value
+as an integer or any valid parameter for C<build_mask>.  If one is not found, it
 croaks.
 
 =cut

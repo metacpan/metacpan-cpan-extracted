@@ -7,16 +7,11 @@ use URI;
 use Carp;
 use JSON;
 
-our $VERSION = q{0.91}; # update this for each release, dzil gets the version from here
+
+our $VERSION = q{0.92};
 
 my $json = JSON->new()->pretty(1);
 my $ua   = LWP::UserAgent->new();
-# $ua->default_header(
-#     "cache-control" => "no-cache" );
-# sample request:
-# http://api.intellexer.com/[GET/POST method]?apikey={YourAPIKey}&options={options}
-# api docs:
-# https://esapi.intellexer.com/Home/Help
 
 sub new($package, $api_key){
     my $self = {

@@ -25,7 +25,7 @@ our $mod = {
     module=>'PDL::Graphics::Simple::PGPLOT',
     engine => 'PDL::Graphics::PGPLOT::Window',
     synopsis=> 'PGPLOT (venerable but trusted)',
-    pgs_api_version=> '1.011',
+    pgs_api_version=> '1.012',
 };
 PDL::Graphics::Simple::register( $mod );
 print $@;
@@ -151,6 +151,7 @@ sub new {
 }
 
 our $pgplot_methods = {
+    polylines => 'lines',
     'lines'  => 'line',
     'bins'   => 'bin',
     'points' => 'points',
@@ -167,6 +168,8 @@ our $pgplot_methods = {
 	$me->{obj}->errb($data->[0],$data->[1], $z, $z, -($data->[2]-$data->[1]), $data->[3]-$data->[1], $ppo);
     },
     'image'  => 'imag',
+    'contours' => 'cont',
+    fits => 'fits_imag',
     'circles'=> sub { 
 	my ($me,$ipo,$data,$ppo) = @_;
 	$ppo->{filltype}='outline';
@@ -192,8 +195,8 @@ sub plot {
     my $ipo = shift;
     my $po = {};
     $po->{title} =  $ipo->{title}    if(defined($ipo->{title}));
-    $po->{xtitle}=  $ipo->{xtitle}   if(defined($ipo->{xtitle}));
-    $po->{ytitle}=  $ipo->{ytitle}   if(defined($ipo->{ytitle}));
+    $po->{xtitle}=  $ipo->{xlabel}   if(defined($ipo->{xlabel}));
+    $po->{ytitle}=  $ipo->{ylabel}   if(defined($ipo->{ylabel}));
     $po->{justify}= $ipo->{justify}  if(defined($ipo->{justify})); 
 
     my %color_opts;
@@ -221,35 +224,36 @@ sub plot {
 	    $ipo->{yrange} = [ map log10($_), @{$ipo->{yrange}}[0,1] ];
 	}
 	$me->{obj}->release;
-	$me->{obj}->env(@{$ipo->{xrange}}, @{$ipo->{yrange}}, $po);
+	my @range_vals = (@{$ipo->{xrange}}, @{$ipo->{yrange}});
+	$me->{obj}->env(@range_vals, $po) if grep defined, @range_vals;
     }
-    $me->{obj}->hold;
 
     # ppo is "post-plot options", which are really a mix of plot and curve options.  
     # Currently we don't parse any plot options into it (they're handled by the "env"
     # call) but if we end up doing so, it should go here.  The linestyle and color
     # are curve options that are autoincremented each curve.
     my %ppo = ();
-    my $ppo = \%ppo;
     while (@_) {
 	my ($co, @data) = @{shift()};
 	my @extra_opts = ();
-	if ( defined($co->{style}) and $co->{style} ) {
-	    $me->{curvestyle} = int($co->{style});
+	if ( defined $co->{style} ) {
+	    $me->{curvestyle} = int($co->{style}) + 1;
 	} else {
 	    $me->{curvestyle}++;
 	}
-	$ppo->{ color } = $me->{curvestyle}-1 % 7 + 1;
-	$ppo->{ linestyle } = ($me->{curvestyle}-1) % 5 + 1;
-	$ppo->{ linewidth } = int($co->{width}) if $co->{width};
+	$ppo{ color } = $me->{curvestyle}-1 % 7 + 1;
+	$ppo{ linestyle } = ($me->{curvestyle}-1) % 5 + 1;
+	$ppo{ linewidth } = int($co->{width}) if $co->{width};
 	our $pgplot_methods;
 	my $pgpm = $pgplot_methods->{$co->{with}};
 	die "Unknown curve option 'with $co->{with}'!" unless($pgpm);
+	my @ppo_added;
+	if ($pgpm eq 'fits_imag') {
+	  $ppo{$_} = $po->{$_} for @ppo_added = grep defined $po->{$_}, qw(justify title);
+	}
 	if($pgpm eq 'imag') {
-	    for my $k(keys %color_opts) {
-		$ppo->{$k} = $color_opts{$k};
-	    }
-	    $ppo->{ drawwedge } = ($ipo->{wedge} != 0);
+	    @ppo{keys %color_opts} = values %color_opts;
+	    $ppo{ drawwedge } = ($ipo->{wedge} != 0);
 	    # Extract transform parameters from the corners of the image...
 	    my $xcoords = shift(@data);
 	    my $ycoords = shift(@data);
@@ -257,7 +261,6 @@ sub plot {
 	    my $datum_sci = [$xcoords->at(0,0), $ycoords->at(0,0)];
 	    my $t1 = ($xcoords->slice("(-1),(0)") - $xcoords->slice("(0),(0)")) / ($xcoords->dim(0)-1);
 	    my $t2 = ($xcoords->slice("(0),(-1)") - $xcoords->slice("(0),(0)")) / ($xcoords->dim(1)-1);
-	    
 	    my $t4 = ($ycoords->slice("(-1),(0)") - $ycoords->slice("(0),(0)")) / ($ycoords->dim(0)-1);
 	    my $t5 = ($ycoords->slice("(0),(-1)") - $ycoords->slice("(0),(0)")) / ($ycoords->dim(1)-1);
 	    my $transform = pdl(
@@ -276,14 +279,11 @@ sub plot {
 	$data[0] = $data[0]->log10 if $me->{logaxis} =~ m/x/i;
 	$data[1] = $data[1]->log10 if $me->{logaxis} =~ m/y/i;
 	if (ref $pgpm eq 'CODE') {
-	    $pgpm->($me, $ipo, \@data, $ppo);
+	  $pgpm->($me, $ipo, \@data, \%ppo);
 	} else {
-	    $me->{obj}->$pgpm(@data,$ppo);
+	  $me->{obj}->$pgpm(@data,\%ppo);
 	}
-	unless($pgpm eq 'imag') {
-	    $ppo->{linestyle}++;
-	    $ppo->{color}++;
-	}
+	delete @ppo{@ppo_added} if @ppo_added;
 	$me->{obj}->hold;
     }
 

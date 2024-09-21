@@ -271,16 +271,16 @@ use PDL::Options q/iparse/;
 use File::Temp qw/tempfile tempdir/;
 use Scalar::Util q/looks_like_number/;
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 $VERSION =~ s/_//g;
 
 ##############################
 # Exporting
 use base 'Exporter';
-our @EXPORT = qw(pgswin line points imag hold release erase);
+our @EXPORT = qw(pgswin line points imag cont hold release erase);
 our @EXPORT_OK = (@EXPORT, qw(image plot));
 
-our $API_VERSION = '1.011'; # PGS version where that API started
+our $API_VERSION = '1.012'; # PGS version where that API started
 
 ##############################
 # Configuration
@@ -457,7 +457,7 @@ sub _translate_new {
           last attempt;
         }
       }
-      barf "Sorry, all known plotting engines failed.  Install one and try again.\n"
+      barf "Sorry, all known plotting engines failed. Install one and try again"
         unless $last_successful_type;
     }
     $opt->{engine} = $last_successful_type;
@@ -465,7 +465,7 @@ sub _translate_new {
 
   my $engine = $mod_abbrevs->{lc($opt->{engine})};
   unless(defined($engine) and defined($mods->{$engine})) {
-      barf "$opt->{engine} is not a known plotting engine. Use PDL::Graphics::Simple::show() for a list. ";
+      barf "$opt->{engine} is not a known plotting engine. Use PDL::Graphics::Simple::show() for a list";
   }
   $last_successful_type = $opt->{engine};
 
@@ -478,7 +478,7 @@ sub _translate_new {
       $type = (  ($output =~ m/\.(\w{2,4})$/) ? 'f' : 'i'  );
   }
   unless ($type =~ m/^[fi]/i) {
-      barf "$type is not a known output type (must be 'file' or 'interactive')\n";
+      barf "$type is not a known output type (must be 'file' or 'interactive')";
   }
 
   # Default to 'plot.png'  if no output is specified.
@@ -492,7 +492,7 @@ sub _translate_new {
   # Error-check multi
   if( defined($opt->{multi}) ) {
       if(  ref($opt->{multi}) ne 'ARRAY'  or  @{$opt->{multi}} != 2  ) {
-          barf "PDL::Graphics::Simple::new: 'multi' option requires a 2-element ARRAY ref\n";
+          barf "PDL::Graphics::Simple::new: 'multi' option requires a 2-element ARRAY ref";
       }
       $opt->{multi}[0] ||= 1;
       $opt->{multi}[1] ||= 1;
@@ -628,7 +628,7 @@ number supported by the backend.  The styles are generally defined by
 a mix of color and dash pattern, but the particular color and dash
 pattern depend on the engine in use. The first 30 styles are
 guaranteed to be distinguishable. This is useful to produce, e.g.,
-multiple traces with the same style.
+multiple traces with the same style. C<0> is a valid value.
 
 =back
 
@@ -689,6 +689,41 @@ as they are interpreted as 8 bits per plane colour values. E.g.:
   $image_data = rpic( 'my-image.png' )->mv(0,-1); # need RGB 3-dim last
   $w->image( $image_data );
 
+If you have a 2-D field of values that you would like to see with a heatmap:
+
+  use PDL::Graphics::ColorSpace;
+  sub as_heatmap {
+    my ($d) = @_;
+    my $max = $d->max;
+    die "as_heatmap: can't work if max == 0" if $max == 0;
+    $d /= $max; # negative OK
+    my $hue   = (1 - $d)*240;
+    $d = cat($hue, pdl(1), pdl(1));
+    (hsv_to_rgb($d->mv(-1,0)) * 255)->byte->mv(0,-1);
+  }
+  $w->image( as_heatmap(rvals 300,300) );
+
+=item contours
+
+As of 1.012. Draws contours. Takes a 2-D array of values, as (width x
+height), and optionally a 1-D vector of contour values.
+
+=item fits
+
+As of 1.012. Displays an image from an ndarray with a FITS header.
+Uses C<CUNIT[12]> etc to make X & Y axes including labels.
+
+=item polylines
+
+As of 1.012. Draws polylines, with 2 arguments (C<$xy>, C<$pen>).
+The "pen" has value 0 for the last point in that polyline.
+
+  use PDL::Transform::Cartography;
+  use PDL::Graphics::Simple qw(pgswin);
+  $coast = earth_coast()->glue( 1, scalar graticule(15,1) );
+  $w = pgswin();
+  $w->plot(with => 'polylines', $coast->clean_lines);
+
 =item labels
 
 This places text annotations on the plot.  It requires three input
@@ -733,12 +768,15 @@ $plot_options->synonyms( {
 });
 our $plot_types = {
   points    => { args=>[1,2], ndims=>[1]   },
+  polylines => { args=>[1,2], ndims=>[1,2] },
   lines     => { args=>[1,2], ndims=>[1]   },
   bins      => { args=>[1,2], ndims=>[1]   },
   circles   => { args=>[2,3], ndims=>[1]   },
   errorbars => { args=>[2,3], ndims=>[1]   },
   limitbars => { args=>[3,4], ndims=>[1]   },
   image     => { args=>[1,3], ndims=>[2,3] },
+  fits      => { args=>[1],   ndims=>[2,3] },
+  contours  => { args=>[1,2], ndims=>[2]   },
   labels    => { args=>[3],   ndims=>[1]   },
 };
 our $plot_type_abbrevs = _make_abbrevs($plot_types);
@@ -755,17 +793,43 @@ $curve_options->synonyms( {
 });
 $curve_options->incremental(0);
 
+sub _fits_convert {
+  my ($data, $opts) = @_;
+  eval "use PDL::Transform";
+  barf "PDL::Graphics::Simple: couldn't load PDL::Transform for 'with fits' option: $@" if $@;
+  barf "PDL::Graphics::Simple: 'with fits' needs an image, RGB triplet, or RGBA quad" unless $data->ndims==2 || ($data->ndims==3 && ($data->dim(2)==4 || $data->dim(2)==3 || $data->dim(2)==1));
+  my $h = $data->gethdr;
+  barf "PDL::Graphics::Simple: 'with fits' expected a FITS header"
+    unless $h && ref $h eq 'HASH' && !grep !$h->{$_}, qw(NAXIS NAXIS1 NAXIS2);
+  # Now update plot options to set the axis labels, if they haven't been updated already...
+  my %new_opts = %$opts;
+  for ([qw(xlabel CTYPE1 X CUNIT1 (pixels))],
+    [qw(ylabel CTYPE2 Y CUNIT2 (pixels))],
+  ) {
+    my ($label, $type, $typel, $unit, $unitdef) = @$_;
+    next if defined $new_opts{$label};
+    $new_opts{$label} = join(" ",
+      $h->{$type} || $typel,
+      $h->{$unit} ? "($h->{$unit})" : $unitdef
+    );
+  }
+  my @dims01 = map $data->dim($_), 0,1;
+  $data = $data->map(t_identity(), \@dims01, $h); # resample removing rotation etc
+  my ($xcoords, $ycoords) = ndcoords(@dims01)->apply(t_fits($data->hdr, {ignore_rgb=>1}))->mv(0,-1)->dog;
+  $new_opts{xrange} = [$xcoords->minmax] if !grep defined, @{$new_opts{xrange}};
+  $new_opts{yrange} = [$ycoords->minmax] if !grep defined, @{$new_opts{yrange}};
+  ('image', \%new_opts, $data, $xcoords, $ycoords);
+}
+
 sub _translate_plot {
   my ($held, $keys) = (shift, shift);
 
   ##############################
   # Trap some simple errors
-  if($#_ == 0) {
-      barf "plot: requires at least one argument to plot!\n";
-  }
-  if($#_ == 1  and  ref($_[0]) eq 'HASH') {
-      barf "plot: requires at least one argument to plot, in addition to plot options\n";
-  }
+  barf "plot: requires at least one argument to plot!" if !@_;
+  barf "plot: requires at least one argument to plot, in addition to plot options"
+    if @_ == 1 and ref($_[0]) eq 'HASH';
+  barf "Undefined value given in plot args" if grep !defined(), @_;
 
   ##############################
   # Collect plot options.  These can be in a leading or trailing
@@ -780,11 +844,9 @@ sub _translate_plot {
       @$po{keys %$h} = values %$h;
   }
 
-  if(ref($_[0]) eq 'HASH'   and    ref($_[1]) eq 'HASH') {
-      for my $k(keys %{$_[0]}) {
-          $po->{$k} = $_[0]->{$k};
-      }
-      shift;
+  if (ref($_[0]) eq 'HASH'   and    ref($_[1]) eq 'HASH') {
+      my $h = shift;
+      @$po{keys %$h} = values %$h;
   }
 
   my $called_from_imag = $po->{called_from_imag};
@@ -798,41 +860,22 @@ sub _translate_plot {
 
   ### bounds is a synonym for xrange/yrange together.
   ### (dcm likes it)
-  if(defined($po->{bounds})) {
-      if( !ref($po->{bounds})  or
-          ref($po->{bounds}) ne 'ARRAY'  or
-          @{$po->{bounds}} != 2
-          ) {
-          barf "Bounds option must be a 2-element ARRAY ref containing (xrange, yrange)\n";
-      }
-
-      if( defined($po->{bounds}->[0]) ) {
-          print STDERR "WARNING: bounds overriding xrange since both were specified\n"  if(defined($po->{xrange}));
-          $po->{xrange} = $po->{bounds}->[0];
-      }
-
-      if( defined($po->{bounds}->[1]) ) {
-          print STDERR "WARNING: bounds overriding yrange since both were specified\n"  if(defined($po->{yrange}));
-          $po->{yrange} = $po->{bounds}->[1];
-      }
+  if (defined($po->{bounds})) {
+    barf "Bounds option must be a 2-element ARRAY ref containing (xrange, yrange)"
+      if !ref($po->{bounds}) or ref($po->{bounds}) ne 'ARRAY' or @{$po->{bounds}} != 2;
+    for my $t ([0,'xrange'], [1, 'yrange']) {
+      my ($i, $r) = @$t;
+      next if !defined $po->{bounds}[$i];
+      warn "WARNING: bounds overriding $r since both were specified\n"
+        if defined $po->{$r};
+      $po->{$r} = $po->{bounds}[$i];
+    }
   }
 
-  if( defined($po->{xrange}) and (
-          !ref($po->{xrange}) or
-          ref($po->{xrange}) ne 'ARRAY' or
-          @{$po->{xrange}} != 2 or
-          $po->{xrange}->[0] == $po->{xrange}->[1])
-      ) {
-      barf "Invalid X range (must be a 2-element ARRAY ref with differing values)\n";
-  }
-
-  if( defined($po->{yrange}) and (
-          !ref($po->{yrange}) or
-          ref($po->{yrange}) ne 'ARRAY' or
-          @{$po->{yrange}} != 2 or
-          $po->{yrange}->[0] == $po->{yrange}->[1])
-      ) {
-      barf "Invalid Y range (must be a 2-element ARRAY ref with differing values)\n";
+  for my $r (grep defined($po->{$_}), qw(xrange yrange)) {
+    barf "Invalid ".(uc substr $r, 0, 1)." range (must be a 2-element ARRAY ref with differing values)"
+      if !ref($po->{$r}) or ref($po->{$r}) ne 'ARRAY' or @{$po->{$r}} != 2
+        or $po->{$r}[0] == $po->{$r}[1];
   }
 
   if( defined($po->{wedge}) ) {
@@ -841,7 +884,7 @@ sub _translate_plot {
 
   if( length($po->{logaxis}) ) {
       if($po->{logaxis} =~ m/[^xyXY]/) {
-          barf "logaxis must be X, Y, or XY (case insensitive)\n";
+          barf "logaxis must be X, Y, or XY (case insensitive)";
       }
       $po->{logaxis} =~ tr/XY/xy/;
       $po->{logaxis} =~ s/yx/xy/;
@@ -851,9 +894,7 @@ sub _translate_plot {
       $keys = [];
   }
 
-  if(!defined($po->{justify})) {
-      $po->{justify} = ($called_from_imag ? 1 : 0);
-  }
+  $po->{justify} //= ($called_from_imag ? 1 : 0);
 
   ##############################
   # Parse out curve blocks and check each one for existence.
@@ -862,187 +903,174 @@ sub _translate_plot {
   my $yminmax = [undef,undef];
 
   while( @_ ) {
-      my $co = {};
-      my @args = ();
+    my $co = {};
+    my @args = ();
 
-      if (ref $_[0] eq 'HASH') {
-          $co = shift;
-      } else {
-          # Attempt to parse out curve option hash entries from an inline hash.
-          # Keys must exists and not be refs and contain at least one letter.
-          while( @_  and  !ref($_[0]) and $_[0] =~ m/[a-zA-Z]/ ) {
-              my $a = shift;
-              my $b = shift;
-              $co->{$a} = $b;
-          }
+    if (ref $_[0] eq 'HASH') {
+      $co = shift;
+    } else {
+      # Attempt to parse out curve option hash entries from an inline hash.
+      # Keys must exist and not be refs and contain at least one letter.
+      while( @_  and  !ref($_[0]) and $_[0] =~ m/[a-zA-Z]/ ) {
+        my $a = shift;
+        my $b = shift;
+        $co->{$a} = $b;
       }
+    }
 
-      ##############################
-      # Parse curve options and expand into standard form so we can find "with".
-      $curve_options->options({key=>undef});
-      my %co2 = %{$curve_options->options( $co )};
-      my $co2 = \%co2;
+    ##############################
+    # Parse curve options and expand into standard form so we can find "with".
+    $curve_options->options({key=>undef});
+    my %co2 = %{$curve_options->options( $co )};
 
-      my $ptn = $plot_type_abbrevs->{ $co2->{with} };
-      unless( defined($ptn) and defined($plot_types->{$ptn}) ) {
-          barf "Unknown plot type $ptn\n";
+    my $ptn = $plot_type_abbrevs->{ $co2{with} };
+    barf "Unknown plot type $co2{with}"
+      unless defined($ptn) and defined($plot_types->{$ptn});
+
+    if($co2{key} and !defined($po->{legend})) {
+        $po->{legend} = 'tl';
+    }
+
+    unless( $ptn eq 'labels' ) {
+        my $ptns = $ptn;
+        $ptns=~s/s$//;
+        push @$keys, $co2{key} // sprintf "%s %d",$ptns,1+@$keys;
+    }
+
+    my $pt = $plot_types->{$co2{with} = $ptn};
+
+    ##############################
+    # Snarf up the other arguments.
+
+    while( @_ and  (  UNIVERSAL::isa($_[0], 'PDL') or
+                      looks_like_number($_[0])  or
+                      ref $_[0] eq 'ARRAY'
+                      )
+        )  {
+        push @args, shift;
+    }
+
+
+    ##############################
+    # Most array refs get immediately converted to
+    # PDLs.  But the last argument to a "with=labels" curve
+    # needs to be left as an array ref. If it's a PDL we throw
+    # an error, since that's a common mistake case.
+    if ( $ptn eq 'labels' ) {
+      barf "Last argument to 'labels' plot type must be an array ref!"
+        if ref($args[-1]) ne 'ARRAY';
+      $_ = PDL->pdl($_) for grep !UNIVERSAL::isa($_,'PDL'), @args[0..$#args-1];
+    } else {
+      $_ = PDL->pdl($_) for grep !UNIVERSAL::isa($_,'PDL'), @args;
+    }
+
+    ##############################
+    # Now check options
+    barf "plot style $ptn requires ".join(" or ", @{$pt->{args}})." columns; you gave ".(0+@args)
+      if !grep @args == $_, @{$pt->{args}};
+
+    if ($ptn eq 'contours' and @args == 1) {
+      my $cntr_cnt = 9;
+      push @args, zeroes($cntr_cnt)->xlinvals($args[-1]->minmax);
+    } elsif ($ptn eq 'polylines' and @args == 1) {
+      barf "Single-arg form of '$ptn' must have dim 0 of 3"
+        if $args[0]->dim(0) != 3;
+      @args = ($args[0]->slice('0:1'), $args[0]->slice('(2)'));
+    } elsif (defined($pt->{args}[1])) { # Add an index variable if needed
+      barf "First arg to '$ptn' must have at least $pt->{ndims}[0] dims"
+        if $args[0]->ndims < $pt->{ndims}[0];
+      if ( $pt->{args}[1] - @args == 2 ) {
+        my @dims = ($args[0]->dims)[0,1];
+        unshift @args, xvals(@dims), yvals(@dims);
       }
-
-      if($co2->{key} and !defined($po->{legend})) {
-          $po->{legend} = 'tl';
+      if ( $pt->{args}[1] - @args == 1 ) {
+        unshift @args, xvals($args[0]);
       }
+    }
 
-      unless( $ptn eq 'labels' ) {
-          my $ptns = $ptn;
-          $ptns=~s/s$//;
-          push( @$keys, ( defined($co2->{key}) ? $co2->{key} : sprintf("%s %d",$ptns,1+@$keys)));
-      }
-
-      my $pt = $plot_types->{$ptn};
-      $co2->{with} = $ptn;
-
-      ##############################
-      # Snarf up the other arguments.
-
-      while( @_ and  (  UNIVERSAL::isa($_[0], 'PDL') or
-                        looks_like_number($_[0])  or
-                        ref $_[0] eq 'ARRAY'
-                        )
-          )  {
-          push(@args, shift );
-      }
-
-
-      ##############################
-      # Most array refs get immediately converted to
-      # PDLs.  But the last argument to a "with=labels" curve
-      # needs to be left as an array ref. If it's a PDL we throw
-      # an error, since that's a common mistake case.
-      if( $ptn eq 'labels' ) {
-          for my $i(0..$#args-1) {
-              $args[$i] = pdl($args[$i]) unless(UNIVERSAL::isa($args[$i],'PDL'));
-          }
-          if( ref($args[$#args]) ne 'ARRAY' ) {
-              barf "Last argument to 'labels' plot type must be an array ref!";
-          }
-      } else {
-          for my $i(0..$#args) {
-              $args[$i] = pdl($args[$i]) unless(UNIVERSAL::isa($args[$i],'PDL'));
-          }
-      }
-
-      ##############################
-      # Now check options
-      unless(@args == $pt->{args}->[0]  or  @args == $pt->{args}->[1]) {
-          barf sprintf("plot style %s requires %d or %d columns; you gave %d\n",$ptn,$pt->{args}->[0],$pt->{args}->[1],0+@args);
-      }
-
-      # Add an index variable if needed
-      if(defined($pt->{args}->[1])) {
-          if( $pt->{args}->[1] - @args == 2 ) {
-              my @dims = ($args[0]->slice(":,:")->dims)[0,1];
-              unshift(@args, xvals(@dims), yvals(@dims));
-          }
-          if( $pt->{args}->[1] - @args == 1 ) {
-              unshift(@args, xvals($args[0]) );
-          }
-      }
-
+    if ($ptn eq 'contours') { # not supposed to be compatible
+      barf "Wrong dims for contours: need 2-D values, 1-D contour values"
+        unless $args[0]->ndims == 2 and $args[1]->ndims == 1;
+      ($xminmax, $yminmax) = ([0, $args[0]->dim(0)-1], [0, $args[0]->dim(1)-1]);
+    } elsif ($ptn eq 'polylines') { # not supposed to be compatible
+      barf "Wrong dims for contours: need 2-D values, 1-D contour values"
+        unless $args[0]->ndims == 2 and $args[1]->ndims == 1;
+      ($xminmax, $yminmax) = map [$_->minmax], $args[0]->using(0,1);
+    } else {
       # Check that the PDL arguments all agree in a threading sense.
       # Since at least one type of args has an array ref in there, we have to
       # consider that case as a pseudo-PDL.
-      my @dims = map { ref($_) eq 'ARRAY' ? [ 0+@{$_} ] : [$_->dims] } @args;
-      my $dims;
-      {
-          local $PDL::undefval = 1;
-          $dims = pdl(@dims);
-      }
+      my $dims = do {
+        local $PDL::undefval = 1;
+        pdl([map [ ref($_) eq 'ARRAY' ? 0+@{$_} : $_->dims ], @args]);
+      };
       my $dmax = $dims->mv(1,0)->maximum;
-      unless( ( ($dims==1)  | ($dims==$dmax) )->all ) {
-          barf "Data dimensions do not agree in plot.\n";
-      }
+      barf "Data dimensions do not agree in plot: $dims vs max=$dmax"
+        unless ( ($dims==1) | ($dims==$dmax) )->all;
 
       # Check that the number of dimensions is correct...
-      if($dims->dim(0) != $pt->{ndims}->[0]  and
-         ((!defined($pt->{ndims}->[1])) or ($dims->dim(0) != $pt->{ndims}->[1]))) {
-          barf "Data dimension (".$dims->dim(0)."-D PDLs) is not correct for plot type $ptn";
-      }
+      barf "Data dimension (".$dims->dim(0)."-D PDLs) is not correct for plot type $ptn (all dims=$dims)"
+        if $dims->dim(0) != $pt->{ndims}[0] and
+          (!defined($pt->{ndims}[1]) or $dims->dim(0) != $pt->{ndims}[1]);
 
-      # Accumulate x and y ranges...
-      my @minmax;
-      my $dcorner = pdl(0,0);
-
-      # Deal with half-pixel offset at edges of images
-      if($args[0]->dims > 1) {
-          my $xymat = pdl( [ ($args[0]->slice("(1),(0)")-$args[0]->slice("(0),(0)")),
-                             ($args[0]->slice("(0),(1)")-$args[0]->slice("(0),(0)")) ],
-                           [ ($args[1]->slice("(1),(0)")-$args[1]->slice("(0),(0)")),
-                             ($args[1]->slice("(0),(1)")-$args[1]->slice("(0),(0)")) ]
-              );
+      if (@args > 1) {
+        # Accumulate x and y ranges...
+        my $dcorner = pdl(0,0);
+        # Deal with half-pixel offset at edges of images
+        if ($args[0]->dims > 1) {
+          my $xymat = pdl(
+            [ ($args[0]->slice("(1),(0)")-$args[0]->slice("(0),(0)")),
+              ($args[0]->slice("(0),(1)")-$args[0]->slice("(0),(0)")) ],
+            [ ($args[1]->slice("(1),(0)")-$args[1]->slice("(0),(0)")),
+              ($args[1]->slice("(0),(1)")-$args[1]->slice("(0),(0)")) ]
+          );
           $dcorner = ($xymat x pdl(0.5,0.5)->slice("*1"))->slice("(0)")->abs;
-      }
-
-      @minmax = $args[0]->minmax;
-      $minmax[0] -= $dcorner->at(0);
-      $minmax[1] += $dcorner->at(0);
-
-      if($po->{logaxis} =~ m/x/) {
-          if($minmax[1] > 0) {
-              if($minmax[0] <= 0) {
-                  $minmax[0] = $args[0]->where( ($args[0]>0) )->min;
-              }
-          } else {
+        }
+        for my $t ([0, qr/x/, $xminmax], [1, qr/y/, $yminmax]) {
+          my ($i, $re, $var) = @$t;
+          my @minmax = $args[$i]->minmax;
+          $minmax[0] -= $dcorner->at($i);
+          $minmax[1] += $dcorner->at($i);
+          if ($po->{logaxis} =~ $re) {
+            if ($minmax[1] > 0) {
+              $minmax[0] = $args[0]->where( ($args[0]>0) )->min if $minmax[0] <= 0;
+            } else {
               $minmax[0] = $minmax[1] = undef;
+            }
           }
+          $var->[0] = $minmax[0] if defined($minmax[0])
+            and ( !defined($var->[0]) or $minmax[0] < $var->[0] );
+          $var->[1] = $minmax[1] if defined($minmax[1])
+            and ( !defined($var->[1]) or $minmax[1] > $var->[1] );
+        }
       }
+    }
 
-      $xminmax->[0] = $minmax[0] if( defined($minmax[0])   and   ( !defined($xminmax->[0])  or  $minmax[0] < $xminmax->[0] ));
-      $xminmax->[1] = $minmax[1] if( defined($minmax[1])   and   ( !defined($xminmax->[1])  or  $minmax[1] > $xminmax->[1] ));
-
-      @minmax = $args[1]->minmax;
-      $minmax[0] -= $dcorner->at(1);
-      $minmax[1] += $dcorner->at(1);
-
-      if($po->{logaxis} =~ m/y/) {
-          if($minmax[1] > 0) {
-              if($minmax[0] <= 0) {
-                  $minmax[0] = $args[0]->where( ($args[0]>0) )->min;
-              }
-          } else {
-              $minmax[0] = $minmax[1] = undef;
-          }
-      }
-
-      $yminmax->[0] = $minmax[0] if( !defined($yminmax->[0])  or  $minmax[0] < $yminmax->[0] );
-      $yminmax->[1] = $minmax[1] if( !defined($yminmax->[1])  or  $minmax[1] > $yminmax->[1] );
-
-      # Push the curve block to the list.
-      push(@blocks, [$co2, @args] );
+    # Push the curve block to the list.
+    unshift @args, \%co2;
+    push @blocks, \@args;
   }
 
   ##############################
   # Deal with context-dependent defaults.
 
-  $po->{xrange}[0] //= $xminmax->[0];
-  $po->{xrange}[1] //= $xminmax->[1];
-  $po->{yrange}[0] //= $yminmax->[0];
-  $po->{yrange}[1] //= $yminmax->[1];
-
-  if($po->{xrange}[0] == $po->{xrange}[1]) {
-      $po->{xrange}[0] -= 0.5;
-      $po->{xrange}[1] += 0.5;
+  for my $t (['xrange',$xminmax], ['yrange',$yminmax]) {
+    my ($r, $var) = @$t;
+    $po->{$r}[0] //= $var->[0];
+    $po->{$r}[1] //= $var->[1];
+    my $defined_range_vals = grep defined, @{$po->{$r}}[0,1];
+    next if !$defined_range_vals;
+    barf "got 1 defined value for '$r'" if $defined_range_vals < 2;
+    if ($po->{$r}[0] == $po->{$r}[1]) {
+      $po->{$r}[0] -= 0.5;
+      $po->{$r}[1] += 0.5;
+    }
   }
 
-  if($po->{yrange}[0] == $po->{yrange}[1]) {
-      $po->{yrange}[0] -= 0.5;
-      $po->{yrange}[1] += 0.5;
-  }
-
-  if($po->{logaxis} =~ m/x/  and  ($po->{xrange}->[0] <= 0   or  $po->{xrange}->[1] <= 0) ) {
-      barf "logarithmic X axis requires positive limits (xrange is [$po->{xrange}->[0],$po->{xrange}->[1]])";
-  }
-  if($po->{logaxis} =~ m/y/  and  ($po->{yrange}->[0] <= 0   or  $po->{yrange}->[1] <= 0) ) {
-      barf "logarithmic Y axis requires positive limits";
+  for my $t (grep $po->{logaxis} =~ $_->[1], ['xrange', qr/x/], ['yrange', qr/y/]) {
+    my ($r) = @$t;
+    barf "logarithmic ".(uc substr $r, 0, 1)." axis requires positive limits ($r is [$po->{$r}[0],$po->{$r}[1]])"
+      if $po->{$r}[0] <= 0 or $po->{$r}[1] <= 0;
   }
   ($keys, $po, @blocks);
 }
@@ -1077,14 +1105,14 @@ sub oplot {
 	$h = $_[$#_];
     } else {
 	$h = {};
-	push(@_, $h);
+	push @_, $h;
     }
     $h->{replot} = 1;
 
     plot(@_);
 }
 
-=head2 line, points, image, imag
+=head2 line, points, image, imag, cont
 
 =for usage
 
@@ -1111,12 +1139,14 @@ it accepts up to three non-hash arguments at the start of the
 argument list.  The second and third are taken to be values for
 the C<crange> plot option.
 
+C<cont> resembles the PGPLOT function.
+
 =cut
 
 sub _translate_convenience {
   my $type = shift;
   my @args = @_;
-  barf "Not enough args to PDL::Graphics::Simple::$type()\n" if( @args < 1 );
+  barf "Not enough args to PDL::Graphics::Simple::$type()" if( @args < 1 );
   if( ref($args[0]) eq 'HASH' ) {
     if( ref($args[1]) eq 'HASH' ) {
       $args[1]->{with} = $type;
@@ -1137,17 +1167,19 @@ sub _convenience_plot {
   $me->{obj}->plot(@args);
 }
 
-sub line    { _convenience_plot( 'line',   @_ ); }
+sub line { _convenience_plot( 'line',   @_ ); }
 *PDL::lines  = *lines = *PDL::line   = \&line;
 
-sub bins    { _convenience_plot( 'bins',   @_ ); }
+sub bins { _convenience_plot( 'bins',   @_ ); }
 *PDL::bins   = \&bins;
 
-sub points  { _convenience_plot( 'points', @_ ); }
+sub points { _convenience_plot( 'points', @_ ); }
 *PDL::points = \&points;
 
-sub image   { _convenience_plot( 'image',  @_, {called_from_imag=>1}); }
+sub image { _convenience_plot( 'image',  @_, {called_from_imag=>1}); }
 # Don't PDL-namespace image since it's so different from imag.
+
+sub cont { _convenience_plot( 'contours', @_ ); }
 
 sub _translate_imag {
   my $me = &_invocant_or_global;
@@ -1161,13 +1193,13 @@ sub _translate_imag {
   }
   # Try to put the crange into the plot options, if they are present
   unless( ref($_[$#_]) eq 'HASH' ) {
-    push(@_, {} );
+    push @_, {};
   }
   $_[$#_]->{crange} = $crange;
   ($me, $data, @_, {called_from_imag=>1});
 }
 
-sub imag    { _convenience_plot( 'image',  &_translate_imag ); }
+sub imag { _convenience_plot( 'image',  &_translate_imag ); }
 *PDL::imag = \&imag;
 
 =head2 erase
@@ -1191,7 +1223,7 @@ our $global_object;
 sub erase {
     my $me = shift;
     if(defined($me)) {
-	barf "PDL::Graphics::Simple::erase: no arguments, please.";
+	barf "PDL::Graphics::Simple::erase: no arguments, please";
     }
     if(defined($global_object)) {
 	undef $global_object;
@@ -1222,7 +1254,7 @@ sub hold {
     } elsif(defined($global_object)) {
 	$global_object->{held}=1;
     } else {
-	barf "Can't hold a nonexistent window!\n";
+	barf "Can't hold a nonexistent window!";
     }
 }
 
@@ -1250,7 +1282,7 @@ sub release {
     } elsif(defined($global_object)) {
 	$global_object->{held} = 0;
     } else {
-	barf "Can't release a nonexistent window!\n";
+	barf "Can't release a nonexistent window!";
     }
 }
 
@@ -1298,19 +1330,19 @@ sub _regularize_size {
     my $unit = shift;
 
     $unit =~ tr/A-Z/a-z/;
-    barf "size specifier unit '$unit' is unrecognized\n" unless($units->{$unit});
+    barf "size specifier unit '$unit' is unrecognized" unless($units->{$unit});
 
     unless(ref($size)) {
 	$size = [ $size, $size, 'in' ];
     } elsif(ref($size) ne 'ARRAY') {
-	barf "size option requires an ARRAY ref or scalar\n";
+	barf "size option requires an ARRAY ref or scalar";
     }
-    barf "size array must have at least one element\n" unless(@{$size});
+    barf "size array must have at least one element" unless(@{$size});
     $size->[1] = $size->[0]     if(@{$size}==1);
     $size->[2] = 'in'           if(@{$size}==2);
-    barf "size array can have at most three elements\n" if(@{$size}>3);
-    barf "size array unit '$unit' is unrecognized\n" unless($units->{$unit});
-    barf "new: size must be nonnegative\n" unless( $size->[0] > 0   and   $size->[1] > 0 );
+    barf "size array can have at most three elements" if(@{$size}>3);
+    barf "size array unit '$unit' is unrecognized" unless($units->{$unit});
+    barf "new: size must be nonnegative" unless( $size->[0] > 0   and   $size->[1] > 0 );
 
     my $ret = [];
     $ret->[0] = $size->[0] / $units->{$size->[2]} * $units->{$unit};
@@ -1328,7 +1360,7 @@ sub _make_abbrevs {
     for my $k(keys %$hash) {
 	my $s = $k;
 	while(length($s)) {
-	    push(@{$ab{$s}},$k);
+	    push @{$ab{$s}},$k;
 	    chop $s;
 	}
     }
@@ -1386,9 +1418,9 @@ PDL::Graphics::Simple as up to 1.010.
 sub register {
     my $mod = shift;
     my $module = $mod->{module};
-    barf __PACKAGE__."::register: \\%description from ".caller()." looks fishy, no 'module' key found; I give up\n" unless defined $module;
+    barf __PACKAGE__."::register: \\%description from ".caller()." looks fishy, no 'module' key found; I give up" unless defined $module;
     for (qw/shortname engine synopsis pgs_api_version/) {
-	barf __PACKAGE__."::register: \\%description from $module looks fishy, no '$_' key found; I give up\n"
+	barf __PACKAGE__."::register: \\%description from $module looks fishy, no '$_' key found; I give up"
 	    unless defined $mod->{$_};
     }
     warn __PACKAGE__."::register: $module is out of date (mod='$mod->{pgs_api_version}' PGS='$API_VERSION') - winging it"
@@ -1408,11 +1440,11 @@ translated and passed through to that working plotting module.
 PDL::Graphics::Simple calls are dispatched in a two-step process. The
 main module curries the arguments, parsing them into a regularized
 form and carrying out DWIM optimizations. The regularized arguments
-are passed to subclasses that translate them into the APIs of their
-respective plot engines.  The subclasses are very simple and implement
+are passed to implementation classes that translate them into the APIs of their
+respective plot engines.  The classes are very simple and implement
 only a few methods, outlined below.  They are intended only to be
 called by the PDL::Graphics::Simple driver, which limits the need for
-argument processing, currying, and parsing. The subclasses are thus
+argument processing, currying, and parsing. The classes are thus
 responsible only for converting the regularized parameters to plot
 calls in the form expected by their corresponding plot modules.
 
@@ -1424,7 +1456,7 @@ non-object-oriented interface easier to implement since the main
 interface modules are in one place and can access the global object
 easily.
 
-=head2 Interface subclass methods
+=head2 Interface class methods
 
 Each interface module supports the following methods:
 
@@ -1495,9 +1527,7 @@ The hash in the curve block contains the curve options for that
 particular curve.  They are all set to have reasonable default values.
 The values passed in are C<with> and C<key>.  If the C<legend>
 option is undefined, then the curve should not be placed into a plot
-legend (if present).  The C<with> option will be one of C<points>,
-C<lines>, C<bins>, C<errorbars>, C<limitbars>, C<circles>
-C<image>, or C<labels>.
+legend (if present).
 
 =head1 ENVIRONMENT
 

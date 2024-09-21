@@ -16,7 +16,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.038",
   "NAME" => "Webservice::InternetDB::API",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Feature::Compat::Class" => 0,
+    "Feature::Compat::Try" => 0,
+    "HTTP::Tiny" => 0,
+    "JSON::PP" => 0
+  },
   "TEST_REQUIRES" => {
     "Carp" => 0,
     "Feature::Compat::Class" => 0,
@@ -25,7 +31,7 @@ my %WriteMakefileArgs = (
     "JSON::PP" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.004",
+  "VERSION" => "1.005",
   "test" => {
     "TESTS" => "t/*.t"
   }

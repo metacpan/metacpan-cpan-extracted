@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Object/Pad/LexicalMethods.pm
+lib/Object/Pad/LexicalMethods.xs
+MANIFEST			This list of files
+t/00use.t
+t/01lexmeth.t
+t/20errors.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

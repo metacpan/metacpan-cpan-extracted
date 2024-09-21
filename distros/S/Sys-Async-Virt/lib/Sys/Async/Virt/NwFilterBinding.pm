@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::NwFilterBinding v0.0.2;
+package Sys::Async::Virt::NwFilterBinding v0.0.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.2;
+use Protocol::Sys::Virt::Remote::XDR v0.0.3;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 
@@ -57,7 +57,7 @@ Sys::Async::Virt::NwFilterBinding - Client side proxy to remote LibVirt network 
 
 =head1 VERSION
 
-v0.0.2
+v0.0.3
 
 =head1 SYNOPSIS
 
@@ -84,6 +84,10 @@ See documentation of L<virNWFilterBindingDelete|https://libvirt.org/html/libvirt
   $xml = await $binding->get_xml_desc( $flags = 0 );
 
 See documentation of L<virNWFilterBindingGetXMLDesc|https://libvirt.org/html/libvirt-libvirt-nwfilter.html#virNWFilterBindingGetXMLDesc>.
+
+
+
+=head1 INTERNAL METHODS
 
 
 

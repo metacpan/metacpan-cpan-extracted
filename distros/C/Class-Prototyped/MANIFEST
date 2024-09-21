@@ -7,6 +7,7 @@ lib/Class/Prototyped/Graph.pm
 lib/Class/Prototyped/why.pod
 Makefile.PL
 MANIFEST			This list of files
+META.json
 META.yml
 perf/package_creation.pl
 perf/references.pl
@@ -19,9 +20,9 @@ t/delegate.t
 t/destroy.t
 t/extendedSyntax.t
 t/include.t
+t/include_xxx.pl
 t/reflectAny.t
 t/super.t
 t/test.t
 t/tied.t
 t/wrap.t
-META.json

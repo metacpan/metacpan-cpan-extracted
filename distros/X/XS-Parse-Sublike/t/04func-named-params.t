@@ -122,4 +122,19 @@ BEGIN { $^H{"t::func/nfunc"}++ }
       'warning from duplicated parameter name' );
 }
 
+# RT155654
+{
+   nfunc unnamedslurpyarray($x, :$y, @) { return "x=$x y=$y"; }
+
+   nfunc unnamedslurpyhash ($x, :$y, %) { return "x=$x y=$y"; }
+
+   pass( 'code with unnamed slurpies compiles OK' );
+
+   is( unnamedslurpyarray( "X", y => "Y", more => "here" ), "x=X y=Y",
+      'result of invoking function with unnamed slurpy array' );
+
+   is( unnamedslurpyhash ( "X", y => "Y", more => "here" ), "x=X y=Y",
+      'result of invoking function with unnamed slurpy hash' );
+}
+
 done_testing;

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Script::Opcode;
-$Bitcoin::Crypto::Script::Opcode::VERSION = '2.007';
+$Bitcoin::Crypto::Script::Opcode::VERSION = '3.000';
 use v5.10;
 use strict;
 use warnings;

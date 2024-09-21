@@ -1,5 +1,5 @@
 package Dist::Build::XS::Conf;
-$Dist::Build::XS::Conf::VERSION = '0.014';
+$Dist::Build::XS::Conf::VERSION = '0.015';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ Dist::Build::XS::Conf - Configure-time utilities for Dist::Build for using C hea
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

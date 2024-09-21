@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::ExtensionBuilder 0.813;
+package Object::Pad::ExtensionBuilder 0.814;
 
-use v5.14;
+use v5.18;
 use warnings;
 
 =head1 NAME

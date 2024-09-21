@@ -9,7 +9,7 @@ use warnings;
 
 use utf8; # allow for utf8 in code (we have strings in utf8, filenames)
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 use Test::More;
 use Test2::Plugin::UTF8;

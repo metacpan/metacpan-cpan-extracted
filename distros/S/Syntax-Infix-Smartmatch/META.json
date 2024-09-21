@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Dist::Build" : "0.013",
+            "Dist::Build" : "0.014",
             "Dist::Build::XS" : "0",
             "Dist::Build::XS::Import" : "0",
             "XS::Parse::Infix" : "0.43"
@@ -32,6 +32,8 @@
       "runtime" : {
          "requires" : {
             "XSLoader" : "0",
+            "constant" : "0",
+            "overload" : "0",
             "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
@@ -46,7 +48,7 @@
    "provides" : {
       "Syntax::Infix::Smartmatch" : {
          "file" : "lib/Syntax/Infix/Smartmatch.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -60,7 +62,7 @@
          "web" : "https://github.com/Leont/syntax-infix-smartmatch"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_contributors" : [
       "Leon Timmermans <fawaka@gmail.com>"
    ],
