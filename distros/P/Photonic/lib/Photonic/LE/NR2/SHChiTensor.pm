@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::SHChiTensor;
-$Photonic::LE::NR2::SHChiTensor::VERSION = '0.021';
+$Photonic::LE::NR2::SHChiTensor::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::SHChiTensor
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -77,7 +77,7 @@ $ff is a (maybe smooth) cutoff function in reciprocal space to smothen the geome
 $smallH and $smallE are the criteria of convergence (default 1e-7) for
 haydock coefficients and continued fraction.
 
-=item * evaluate([kind=>$kind,] [mask=>$mask] )
+=item * evaluate([kind=>$kind,] [mask=>$mask])
 
 Returns the macroscopic second Harmonic susceptibility function for a
 given value of the dielectric functions of the host $epsA and the
@@ -122,9 +122,13 @@ Maximum number of Haydock coefficients for field calculation
 
 Optional filter to multiply by in reciprocal space
 
--=item * epsA1, epsB1, epsA2, epsB2
+=item * epsA1, epsB1, epsA2, epsB2
 
 Dielectric functions of components A and B at fundamental and SH frequency
+
+=item * epsL
+
+Value of dielectric function
 
 =item * nrshp
 
@@ -148,6 +152,10 @@ Flags that the last calculation converged before using up all coefficients
 Criteria of convergence for Haydock coefficients and for fields. 0
 means don't check.
 
+=item * reorthogonalize
+
+Reorthogonalize haydock flag
+
 =back
 
 =head1 ACCESSORS (missing)
@@ -168,31 +176,26 @@ use PDL::NiceSlice;
 use PDL::MatrixOps;
 use PDL::IO::Storable;
 use Photonic::Utils qw(make_haydock tensor incarnate_as);
-use Photonic::Types;
+use Photonic::Types -all;
 use Photonic::LE::NR2::EpsTensor;
-use Moose;
+use Moo;
 
-has 'nh' =>(is=>'ro', isa=>'Num', required=>1,
+has 'nh' =>(is=>'ro', isa=>Num, required=>1,
 	    documentation=>'Desired no. of Haydock coefficients');
-has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
-    	    documentation=>'Convergence criterium for use of Haydock coeff.');
-has 'epsL'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
+has 'epsL'=>(is=>'ro', isa=>PDLComplex, init_arg=>undef,
 	     writer=>'_epsL',
 	     documentation=>'Value of dielectric function'  );
-has 'nhActual'=>(is=>'ro', isa=>'Num', init_arg=>undef,
-		 writer=>'_nhActual',
-		 documentation=>'Actual number of coefficients used' );
-has 'converged'=>(is=>'ro', isa=>'Num', init_arg=>undef,
+has 'converged'=>(is=>'ro', isa=>Num, init_arg=>undef,
 		  writer=>'_converged',
 		  documentation=>'The calculation did converge');
 
 #required parameters
-has 'geometry'=>(is=>'ro', isa => 'Photonic::Types::Geometry',
+has 'geometry'=>(is=>'ro', isa => Geometry,
     handles=>[qw(B dims r G GNorm L scale f ndims)],required=>1
 );
-has 'densityA'=>(is=>'ro', isa=>'Num', required=>1,
+has 'densityA'=>(is=>'ro', isa=>Num, required=>1,
          documentation=>'Normalized dipole entities density in medium A');
-has 'densityB'=>(is=>'ro', isa=>'Num', required=>1,
+has 'densityB'=>(is=>'ro', isa=>Num, required=>1,
          documentation=>'Normalized dipole entities density in medium B');
 has 'nhf'=>(is=>'ro', required=>1,
          documentation=>'Maximum number of desired Haydock
@@ -201,31 +204,30 @@ has 'reorthogonalize'=>(is=>'ro', required=>1, default=>0,
          documentation=>'Reorthogonalize haydock flag');
 
 #optional parameters
-has 'filter'=>(is=>'ro', isa=>'PDL', predicate=>'has_filter',
+has 'filter'=>(is=>'ro', isa=>PDLObj, predicate=>'has_filter',
                documentation=>'Optional reciprocal space filter');
 
 #accessors
-has 'epsA1'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required => 1,
+has 'epsA1'=>(is=>'ro', isa=>PDLComplex, required => 1,
     documentation=>'Dielectric function of host');
-has 'epsB1'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required => 1,
+has 'epsB1'=>(is=>'ro', isa=>PDLComplex, required => 1,
         documentation=>'Dielectric function of inclusions');
-has 'epsA2'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required=>1,
+has 'epsA2'=>(is=>'ro', isa=>PDLComplex, required=>1,
     documentation=>'Dielectric function of host at SH');
-has 'epsB2'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required=>1,
+has 'epsB2'=>(is=>'ro', isa=>PDLComplex, required=>1,
         documentation=>'Dielectric function of inclusions');
-has 'nrshp' =>(is=>'ro', isa=>'ArrayRef[Photonic::LE::NR2::SHP]',
-            init_arg=>undef, lazy=>1, builder=>'_build_nrshp',
+has 'nrshp' =>(is=>'lazy', isa=>ArrayRef[InstanceOf['Photonic::LE::NR2::SHP']],
+            init_arg=>undef,
             documentation=>'Array of Haydock SH polarization calculators');
-has 'epsTensor'=>(is=>'ro', isa=>'Photonic::LE::NR2::EpsTensor',
+has 'epsTensor'=>(is=>'lazy', isa=>InstanceOf['Photonic::LE::NR2::EpsTensor'],
          init_arg=>undef,
-         lazy=>1,  builder=>'_build_epsTensor',
          documentation=>'diel. tensor at 2w');
-has 'chiTensor'=>(is=>'ro', isa=>'PDL', init_arg=>undef, writer=>'_chiTensor',
+has 'chiTensor'=>(is=>'ro', isa=>PDLObj, init_arg=>undef, writer=>'_chiTensor',
              documentation=>'SH Susceptibility from last evaluation');
 
-has 'smallH'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
+has 'smallH'=>(is=>'ro', isa=>Num, required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for Haydock coefficients');
-has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
+has 'smallE'=>(is=>'ro', isa=>Num, required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for use of Haydock coeff.');
 
 with 'Photonic::Roles::KeepStates', 'Photonic::Roles::UseMask';
@@ -266,7 +268,7 @@ sub evaluate {
 	    ->clump(-2) #linear index, XorY
 	    ->sumover  #XorY
 	    /$self->geometry->npoints;
-	my $k=$_->nrf->haydock->geometry->Direction0;
+	my $k=$_->haydock->geometry->Direction0;
 	my $FPChi=$epsT-identity($nd); #four pi chi linear 2w
 	my $P2MLC=($k*$P2M)->sumover; #Longitudinal component
 	my $P2ML=$k*$P2MLC; #longitudinal projection
@@ -292,7 +294,7 @@ sub evaluate {
     my $P2Mp = PDL->pdl(@P2M);
     #Get cartesian indices out of the way, solve the system of
     #equations, and move the cartesian indices back
-    my $chiTensor=tensor($P2Mp->mv(0,-1), $self->geometry->unitDyadsLU, $nd, 3, sub { $_[0]->mv(-1,0) });
+    my $chiTensor=tensor($P2Mp, $self->geometry->unitDyadsLU, $nd, 3, 1);
     $self->_chiTensor($chiTensor);
     return $chiTensor;
 }
@@ -302,10 +304,10 @@ sub evaluate {
 sub _build_nrshp { # One Haydock coefficients calculator per direction0
     my $self=shift;
     my $haydock = make_haydock($self, 'Photonic::LE::NR2::Haydock', $self->geometry->unitPairs, 1, qw(reorthogonalize use_mask mask));
-    my @args=(nh=>$self->nhf, smallE=>$self->smallE);
+    my @args=(nh=>$self->nhf);
     push @args, filter=>$self->filter if $self->has_filter;
     [ map Photonic::LE::NR2::SHP->new(
-	    nrf=>Photonic::LE::NR2::Field->new(@args, haydock=>$_),
+	    @args, haydock=>$_,
 	    densityA=>$self->densityA, densityB=>$self->densityB,
     ), @$haydock ];
 }

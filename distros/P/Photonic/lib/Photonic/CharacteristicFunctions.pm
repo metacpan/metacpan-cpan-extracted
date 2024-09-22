@@ -1,5 +1,5 @@
 package Photonic::CharacteristicFunctions;
-$Photonic::CharacteristicFunctions::VERSION = '0.021';
+$Photonic::CharacteristicFunctions::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -33,19 +33,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 =cut
 
-
+use strict;
+use warnings;
 use Carp;
-BEGIN {
-    require Exporter;
-    @ISA=qw(Exporter);
-    @EXPORT_OK=qw(triangle isosceles ellipse );
-}
+use parent qw(Exporter);
 use PDL::Lite;
 use PDL::NiceSlice;
 use PDL::Constants qw(PI);
-use feature qw(say);
-use warnings;
-use strict;
+
+our @EXPORT_OK=qw(triangle isosceles ellipse ring);
 
 sub ellipse { #f y e determinan univocamente el problema  general de inclusion
               #eliptica con e=zeta_y/zeta_x en una celda cuadrada
@@ -94,6 +90,15 @@ sub isosceles { #smooth isoceles triangle for testing
     return $t;
 }
 
+sub ring {
+    my $N=shift;
+    my $ra=(shift)*(2*$N+1);
+    my $rb=(shift)*(2*$N+1);
+    my $z=PDL->zeroes(2*$N+1, 2*$N+1);
+    my $B=($z->rvals<=$rb) & ($z->rvals >= $ra);
+    return $B;
+}
+
 1;
 
 __END__
@@ -104,14 +109,15 @@ Photonic::CharacteristicFunctions
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
-   use Photonic::CharacteristicFuncions qw(triangle isosceles ellipse)
+   use Photonic::CharacteristicFuncions qw(triangle isosceles ellipse ring);
    my $e=ellipse($N, $ff, $e);
    my $t=triangle($N, $r0, $deltar, $theta0);
    my $i=isosceles($N, $r0, $delta2, $delta3, $theta0);
+   my $r=ring($N, $r0, $r1);
 
 =head1 DESCRIPTION
 
@@ -140,6 +146,11 @@ returns a smooth pear shaped triangle in a square lattice of side
 (2*$N+1)x(2*$N+1) with border
 =r(theta)=$r0+$delta2*cos(2*(theta-$theta0))+$delta3*cos(3*(theta-$theta0))
 in polar coordinates
+
+=item * ring($N, $r0, $r1)
+
+returns a hole ring with radius r such that $r0 < r < $r1 in a square
+cell with 2*$N+1 points per side.
 
 =back
 

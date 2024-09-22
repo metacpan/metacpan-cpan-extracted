@@ -1,5 +1,5 @@
 package Photonic::Types;
-$Photonic::Types::VERSION = '0.021';
+$Photonic::Types::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -33,45 +33,39 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 =cut
 
-
-use Moose::Util::TypeConstraints;
+use Type::Library -base, -declare =>
+  qw(Geometry GeometryG0 Haydock HaydockSave PDLObj PDLComplex
+  );
+use Type::Utils -all;
+BEGIN { extends 'Types::Standard' }
 use Photonic::Utils qw(any_complex);
 
-subtype 'Photonic::Types::OddInt' =>
-    as 'Int',
-    where { $_ % 2 == 1 },
-    message { "Number $_ must be odd" };
-
-subtype 'Photonic::Types::ArrayOfOddInts' =>
-    as 'ArrayRef[Photonic::Types::OddInt]',
-    message { "Numbers [".join(", ", @$_). "] must have been odd" };
-
-subtype 'Photonic::Types::Geometry' =>
-  as 'Ref',
-  where { $_->does('Photonic::Roles::Geometry')},
+declare Geometry =>
+  as ConsumerOf['Photonic::Roles::Geometry'],
   message { "Expected a Geometry" };
 
-subtype 'Photonic::Types::GeometryG0' =>
-  as 'Photonic::Types::Geometry',
+declare GeometryG0 =>
+  as Geometry,
   where { $_->has_Direction0 },
   message { "You should define a direction for G=0 reciprocal vector" };
 
-subtype 'Photonic::Types::Haydock' =>
-  as 'Ref',
-  where { $_->does('Photonic::Roles::Haydock')},
+declare Haydock =>
+  as ConsumerOf['Photonic::Roles::Haydock'],
   message { "Expected an AllH" };
 
-subtype 'Photonic::Types::HaydockSave' =>
-  as 'Photonic::Types::Haydock',
+declare HaydockSave =>
+  as Haydock,
   where { $_->keepStates == 1 },
     message { "Can't calculate fields if you don't keepStates" };
 
-subtype 'Photonic::Types::PDLComplex' =>
-  as 'PDL',
-  where { any_complex($_) },
+declare PDLObj =>
+  as InstanceOf['PDL'],
   ;
 
-no Moose::Util::TypeConstraints;
+declare PDLComplex =>
+  as PDLObj,
+  where { any_complex($_) },
+  ;
 
 __END__
 
@@ -85,10 +79,10 @@ version 0.008
 
 =head1 SYNOPSIS
 
-   use Photonic::Types;
+   use Photonic::Types -all;
    package MyPackage;
-   use Moose;
-   has 'n' => {is => 'ro', isa =>'Photonic::Types::OddInt'}
+   use Moo;
+   has 'n' => {is => 'ro', isa =>Geometry}
 
 =head1 DESCRIPTION
 
@@ -99,22 +93,25 @@ calculations.
 
 =over 4
 
-=item * Photonic::Types::OddInt
+=item * Geometry
 
-Odd integer
+L<Photonic::Roles::Geometry> object.
 
-=item * Photonic::Types::ArrayOfOddInts
+=item * GeometryG0
 
-Array of OddInts
+L</Geometry> with a direction for G=0 reciprocal vector
 
-=item * Photonic::Types::GeometryG0
+=item * Haydock
 
-Photonic::Geometry with a direction for G=0 reciprocal vector
+L<Photonic::Roles::Haydock> object.
 
-=item * Photonic::Types::NonRetarded::HaydockSave
+=item * HaydockSave
 
-Photonic::NonRetarded:AllH object where the keepStates flag has been
-turned on.
+L</Haydock> object where the keepStates flag has been turned on.
+
+=item * PDLComplex
+
+L<PDL> object with complex values.
 
 =back
 

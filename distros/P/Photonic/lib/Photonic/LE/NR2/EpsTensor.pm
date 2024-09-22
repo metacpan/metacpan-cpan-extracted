@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::EpsTensor;
-$Photonic::LE::NR2::EpsTensor::VERSION = '0.021';
+$Photonic::LE::NR2::EpsTensor::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::EpsTensor
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -75,18 +75,18 @@ Dielectric function of component B
 use namespace::autoclean;
 use Photonic::LE::NR2::Haydock;
 use Photonic::LE::NR2::EpsL;
-use Photonic::Types;
-use Moose;
-use MooseX::StrictConstructor;
+use Photonic::Types -all;
+use Moo;
+use MooX::StrictConstructor;
 
 has allh_class=>(is=>'ro', default=>'Photonic::LE::NR2::Haydock');
 has allh_attrs=>(is=>'ro', default=>sub{[qw(reorthogonalize use_mask mask)]});
 has epsl_class=>(is=>'ro', default=>'Photonic::LE::NR2::EpsL');
 has epsl_attrs=>(is=>'ro', default=>sub{[qw(nh smallE epsA epsB)]});
 
-has 'epsA'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required => 1,
+has 'epsA'=>(is=>'ro', isa=>PDLComplex, required => 1,
     documentation=>'Dielectric function of host');
-has 'epsB'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required => 1,
+has 'epsB'=>(is=>'ro', isa=>PDLComplex, required => 1,
         documentation=>'Dielectric function of inclusions');
 
 with 'Photonic::Roles::UseMask', 'Photonic::Roles::EpsTensor', 'Photonic::Roles::KeepStates';

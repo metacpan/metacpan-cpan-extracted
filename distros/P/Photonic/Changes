@@ -1,3 +1,14 @@
+0.022 2024-09-21
+- Fix mistake in Ph::WE::S::Haydock::applyMetric
+- Fix bug in macroscopic response from fields in Ph::LE::NR2::Field and Ph::LE::S::Field
+- Fix skip test in geometry.t when there is no image converter
+- separate storeAllFN from stateFN
+- Haydock states stored in memory-mapped files rather than using Storable
+- remove the state_iterator capability which is replaced by memory-mapping, allowing large threaded calculations
+- switch type system to Type::Tiny
+- switch OO system to Moo
+- make Photonic::Roles::Field
+
 0.021 2021-10-01
 - Add example of honeycomb lattice for LE::NR2
 - Admit 'haydock' as an optional parameter in P::Roles::EpsTensor

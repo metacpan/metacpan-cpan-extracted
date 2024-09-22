@@ -1,5 +1,5 @@
 package Photonic::Roles::Geometry;
-$Photonic::Roles::Geometry::VERSION = '0.021';
+$Photonic::Roles::Geometry::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -34,75 +34,62 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =cut
 
 
-use Moose::Role;
+use Moo::Role;
 
 use PDL::Lite;
 use PDL::NiceSlice;
-use Photonic::Types;
-use Photonic::Utils qw(any_complex lu_decomp make_dyads);
+use Photonic::Types -all;
+use Photonic::Utils qw(any_complex lu_decomp make_dyads triangle_coords);
 use PDL::MatrixOps qw();
 use Carp;
 use constant PI=>4*atan2(1,1);
 
 requires 'B'; #characteristic function
 
-has 'L' =>(is=>'ro', isa => 'PDL', lazy=>1, builder=>'_build_L',
+has 'L' =>(is=>'lazy', isa => PDLObj,
 	   documentation=>'array of unit cell size');
-has 'units'=>(is=>'ro', isa=>'PDL', lazy=>1,
-     builder=>'_build_units',
+has 'units'=>(is=>'lazy', isa=>PDLObj,
      documentation=>'Basis of unit vectors');
-has 'primitive'=>(is=>'ro', isa=>'PDL', required=>1, lazy=>1,
-		  builder=>'_build_primitive',
+has 'primitive'=>(is=>'lazy', isa=>PDLObj, required=>1,
 		  documentation=>'Primitive directions');
-has 'primitiveNorm'=>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-		  builder=>'_build_primitiveNorm',
+has 'primitiveNorm'=>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
 		  documentation=>'Normalized primitive vectors');
-has 'dualNorm'=>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-		 builder=>'_build_dualNorm',
+has 'dualNorm'=>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
 		 documentation=>'Normalized reciprocal primitive vectors');
-has 'dims' =>(is=>'ro', isa=>'ArrayRef[Int]',
-           init_arg=>undef, lazy=>1, builder=>'_build_dims',
+has 'dims' =>(is=>'lazy', isa=>ArrayRef[Int],
+           init_arg=>undef,
            documentation=>'list of dimensions of B');
-has 'ndims' =>(is=>'ro', isa=>'Int',
-           init_arg=>undef, lazy=>1, builder=>'_build_ndims',
+has 'ndims' =>(is=>'lazy', isa=>Int,
+           init_arg=>undef,
            documentation=>'number of dimensions of B');
-has 'npoints' =>(is=>'ro', isa=>'Int',
-           init_arg=>undef, lazy=>1, builder=>'_build_npoints',
+has 'npoints' =>(is=>'lazy', isa=>Int,
+           init_arg=>undef,
            documentation=>'number of points within B');
-has 'scale'=>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-              builder=>'_build_scale',
+has 'scale'=>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
 	      documentation=>'distances between pixels');
-has 'r' =>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-           builder=>'_build_r',
+has 'r' =>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
 	   documentation=>'array of positions x_or_y, nx, ny');
-has 'G' =>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1, builder=>'_build_G',
+has 'G' =>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
 	   documentation=>'array of reciprocal vectors xy,nx,ny...');
-has 'GNorm' =>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-     builder=>'_build_GNorm',
+has 'GNorm' =>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
      documentation=>'array of unit norm reciprocal vectors xy,nx,ny...');
-has 'mGNorm' =>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-     builder=>'_build_mGNorm',
+has 'mGNorm' =>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
      documentation=>
 	  'array of negated unit norm reciprocal vectors xy,nx,ny...');
-has 'pmGNorm' =>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-     builder=>'_build_pmGNorm',
+has 'pmGNorm' =>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
      documentation=>
        'array of spinors of +- unit norm reciprocal vectors xy,pm,nx,ny');
-has 'f'=>(is=>'ro', init_arg=>undef, lazy=>1, builder=>'_build_f',
+has 'f'=>(is=>'lazy', init_arg=>undef,
      documentation=>'filling fraction of B region');
-has 'unitPairs'=>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-     builder=>'_build_unitPairs',
+has 'unitPairs'=>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
      documentation=>'Normalized sum of pairs of basis vectors');
-has 'cUnitPairs'=>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-     builder=>'_build_cUnitPairs',
+has 'cUnitPairs'=>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
      documentation=>'Normalized complex sum of pairs of basis vectors');
-has 'unitDyads'=>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-     builder=>'_build_unitDyads',
+has 'unitDyads'=>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
      documentation=>'Matrix of dyads of unit vector pairs');
-has 'unitDyadsLU'=>(is=>'ro', isa=>'ArrayRef', lazy=>1,
-     builder=>'_build_unitDyadsLU',
+has 'unitDyadsLU'=>(is=>'lazy', isa=>ArrayRef,
      documentation=>'LU decomposition of unitDyads');
-has 'Direction0' =>(is => 'rw', isa => 'PDL', trigger=>\&_G0,
+has 'Direction0' =>(is => 'ro', isa => PDLObj,
      predicate=>'has_Direction0');
 
 sub _build_L {
@@ -188,15 +175,32 @@ sub _build_GNorm { #origin set to zero here.
 }
 
 sub _build_mGNorm { #normalized negated reciprocal lattice. Leave
-    #direction 0 invariant. See _G0.
+    #direction 0 invariant.
     my $self=shift;
     return -$self->GNorm;
 }
 sub _build_pmGNorm { #normalized +- reciprocal lattice. Leave
-    #direction 0 invariant. See _G0.
+    #direction 0 invariant.
     #xy,pm,nx,ny
     my $self=shift;
     return PDL->pdl($self->GNorm, $self->mGNorm)->mv(-1,1);
+}
+
+sub BUILD {
+  my ($self) = @_;
+  if ($self->has_Direction0) {
+    my $value = $self->Direction0;
+    confess "Direction0 must be length ".$self->ndims." vector" unless
+      $value->dim(0)==$self->ndims and $value->ndims==1;
+    confess "Direction must be non-null" unless $value->inner($value)>0;
+    my $arg=":". (",(0)" x $self->ndims); #:,(0),... dimension of space times
+    $value=$value->norm; #normalize
+    #Set element 0,0 for normalized arrays.
+    $self->GNorm->slice($arg).=$value; #Normalized 0.
+    $self->mGNorm->slice($arg).=$value; #Don't change sign for mGNorm!
+    $self->pmGNorm->mv(1,-1)->slice($arg).=$value;
+  }
+  1; # cover -test causes a boolean test on the return value so make not pdl
 }
 
 sub _build_f { #calculate filling fraction
@@ -209,13 +213,12 @@ sub _build_unitPairs {
     my $nd=$self->ndims;
     my $units=$self->units;
     my $pairs = PDL->zeroes($nd, $nd * ($nd + 1) / 2);
-    my $n = 0;
-    for my $i(0..$nd-1){ #build pairs of vectors
-	for my $j($i..$nd-1){
-	    $pairs->(:,($n)) .= ($units->(($i))+$units->(($j)))->norm;
-	    $n++;
-	}
-    }
+    my $pairs_slice = $pairs->mv(1, 0);
+    my $indexes = triangle_coords($nd, 1);
+    $pairs_slice .= (
+      $units->indexND($indexes(0))+
+      $units->indexND($indexes(1))
+    )->transpose->norm->transpose;
     $pairs;
 }
 
@@ -224,15 +227,13 @@ sub _build_cUnitPairs {
     my $nd=$self->ndims;
     my $units=$self->units;
     my $cpairs = PDL->zeroes($nd, $nd * ($nd - 1) / 2)->r2C;
-    my $n = 0;
-    for my $i(0..$nd-1){ #build pairs of vectors
-	for my $j($i+1..$nd-1){
-	    my $vc=PDL::czip($units->(($i)), $units->(($j)));
-	    my $vcn=sqrt($vc->abs2->sumover);
-	    $cpairs->(:,($n)) .= $vc*(1/$vcn);
-	    $n++;
-	}
-    }
+    my $cpairs_slice = $cpairs->mv(1, 0);
+    my $indexes = triangle_coords($nd);
+    $cpairs_slice .= PDL::czip(
+      $units->indexND($indexes(0)),
+      $units->indexND($indexes(1))
+    );
+    $cpairs_slice /= sqrt($cpairs_slice->abs2->transpose->sumover);
     $cpairs;
 }
 
@@ -244,20 +245,6 @@ sub _build_unitDyads {
 sub _build_unitDyadsLU {
     my $self=shift;
     [lu_decomp($self->unitDyads->r2C)];
-}
-
-sub _G0 {
-    my $self=shift;
-    my $value=shift;
-    confess "Direction0 must be ".$self->ndims."-dimensional vector" unless
-	$value->dim(0)==$self->ndims and $value->ndims==1;
-    confess "Direction must be non-null" unless $value->inner($value)>0;
-    my $arg=":". (",(0)" x $self->ndims); #:,(0),... dimension of space times
-    $value=$value->norm; #normalize
-    #Set element 0,0 for normalized arrays.
-    $self->GNorm->slice($arg).=$value; #Normalized 0.
-    $self->mGNorm->slice($arg).=$value; #Don't change sign for mGNorm!
-    $self->pmGNorm->mv(1,-1)->slice($arg).=$value;
 }
 
 sub Vec2LC_G { #longitudinal component of 'complex' vector field in
@@ -283,7 +270,7 @@ sub LC2Vec_G { #longitudinal vector field from its longitudinal
     $field->(*1)*$gnorm;
 }
 
-no Moose::Role;
+no Moo::Role;
 
 1;
 
@@ -294,7 +281,7 @@ Photonic::Roles::Geometry
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -308,10 +295,10 @@ version 0.021
 =item (for developers)
 
     package Photonic::Geometry::FromB;
-    $Photonic::Geometry::Geometry::VERSION = '0.021';
+    $Photonic::Geometry::Geometry::VERSION = '0.022';
     use namespace::autoclean;
-    use Moose;
-    has 'B' =>(is=>'ro', isa=>'PDL', required=>1,
+    use Moo;
+    has 'B' =>(is=>'ro', isa=>PDLObj, required=>1,
 	       documentation=>'characteristic function');
     with 'Photonic::Roles::Geometry';
 
@@ -435,6 +422,8 @@ Test if Direction0 has been set.
 =begin Pod::Coverage
 
 =head2 PI
+
+=head2 BUILD
 
 =end  Pod::Coverage
 

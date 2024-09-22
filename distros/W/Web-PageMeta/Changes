@@ -1,6 +1,9 @@
 Revision history for Web-PageMeta
 
-0.08    04.09.2021
+0.09    21.09.2024
+    - more relaxed timing for test run
+
+0.08    04.09.2024
     - add canonical_url accessor
     - fix importer warning started for Perl v5.40+
 

@@ -65,7 +65,7 @@
    "provides" : {
       "Web::PageMeta" : {
          "file" : "lib/Web/PageMeta.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -80,6 +80,6 @@
          "url" : "https://github.com/jozef/Web-PageMeta"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

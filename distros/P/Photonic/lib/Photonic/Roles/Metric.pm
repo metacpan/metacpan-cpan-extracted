@@ -1,5 +1,5 @@
 package Photonic::Roles::Metric;
-$Photonic::Roles::Metric::VERSION = '0.021';
+$Photonic::Roles::Metric::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::Metric
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -73,7 +73,7 @@ $k. $q and $k are real.
 
 =item * geometry
 
-The L<Photonic::Types::Geometry> object that describes the geometry of
+The L<Photonic::Types/Geometry> object that describes the geometry of
 the system.
 
 =item * epsilon
@@ -98,22 +98,22 @@ The actual metric tensor as a complex PDL. Provided by implementation.
 
 use namespace::autoclean;
 use PDL::Lite;
-use Moose::Role;
-use Photonic::Types;
+use Moo::Role;
+use Photonic::Types -all;
 
-has 'geometry'  => (is=>'ro', isa=>'Photonic::Types::Geometry', required=>1,
+has 'geometry'  => (is=>'ro', isa=>Geometry, required=>1,
                     handles=>[qw(B dims ndims r G GNorm L scale f)],
                     required=>1,
                     documentation=>'Geometry');
-has 'epsilon'   => (is=>'ro', isa=>'PDL', required=>1,
+has 'epsilon'   => (is=>'ro', isa=>PDLObj, required=>1,
 		    default=>sub{PDL->pdl(1)},
                    documentation=>'Real reference dielectric function');
-has 'wavenumber'=> (is=>'ro', isa=>'PDL', required=>1,
+has 'wavenumber'=> (is=>'ro', isa=>PDLObj, required=>1,
                    documentation=>'Vacuum wavenumber w/c');
-has 'wavevector'=> (is=>'ro', isa=>'PDL', required=>1,
+has 'wavevector'=> (is=>'ro', isa=>PDLObj, required=>1,
                    documentation=>'Wave vector');
 requires qw(value); #provided by metric instances
 
-no Moose::Role;
+no Moo::Role;
 
 1;

@@ -94202,3 +94202,11 @@ H/HA/HAX/Webservice-Ipify-API-1.005.tar.gz
 H/HA/HAX/Webservice-Purgomalum-API-1.001.tar.gz
 T/TE/TEVERETT/Win32-Security-0.60.tar.gz
 T/TI/TINITA/YAML-LibYAML-v0.902.0.tar.gz
+P/PE/PERLANCAR/App-pdfsize-0.001.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000808.tar.gz
+J/JD/JDEGUEST/DateTime-Locale-FromCLDR-v0.4.1.tar.gz
+B/BP/BPSCHUCK/Finance-Quote-1.63.tar.gz
+J/JD/JDEGUEST/Locale-Unicode-v0.3.7.tar.gz
+S/SR/SRI/Minion-10.31.tar.gz
+W/WL/WLMB/Photonic-0.022.tar.gz
+J/JK/JKUTEJ/Web-PageMeta-0.09.tar.gz

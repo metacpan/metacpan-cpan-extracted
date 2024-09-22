@@ -1,7 +1,8 @@
 # Photonic #
 
 This archive contains the distribution Photonic,
-version 0.016 to run electromagnetic calculations for photonics and
+version 0.022
+to run electromagnetic calculations for photonics and
 metamaterials.
 
 Read the file *INSTALL* for installation instructions.
@@ -33,6 +34,7 @@ doi:10.1088/1367-2630/15/4/043037
   - Bernardo S. Mendoza
   - Lucila Juárez-Reyes
   - José Samuel Pérez-Huerta
+  - Raksha Singla
   - Merlyn Jaqueline Juárez-Gutiérrez
 
 ## Acknowledgments ##

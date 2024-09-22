@@ -15,7 +15,6 @@ lib/Photonic/CharacteristicFunctions.pm
 lib/Photonic/Geometry/FromB.pm
 lib/Photonic/Geometry/FromEpsilon.pm
 lib/Photonic/Geometry/FromImage2D.pm
-lib/Photonic/Iterator.pm
 lib/Photonic/LE/NP/EpsL.pm
 lib/Photonic/LE/NP/EpsTensor.pm
 lib/Photonic/LE/NP/Haydock.pm
@@ -33,6 +32,7 @@ lib/Photonic/LE/S/Haydock.pm
 lib/Photonic/Roles/EpsFromGeometry.pm
 lib/Photonic/Roles/EpsL.pm
 lib/Photonic/Roles/EpsTensor.pm
+lib/Photonic/Roles/Field.pm
 lib/Photonic/Roles/Geometry.pm
 lib/Photonic/Roles/Haydock.pm
 lib/Photonic/Roles/KeepStates.pm
@@ -41,25 +41,16 @@ lib/Photonic/Roles/Reorthogonalize.pm
 lib/Photonic/Roles/UseMask.pm
 lib/Photonic/Types.pm
 lib/Photonic/Utils.pm
-lib/Photonic/WE/R2/EpsilonP.pm
-lib/Photonic/WE/R2/EpsilonTensor.pm
 lib/Photonic/WE/R2/Field.pm
 lib/Photonic/WE/R2/Green.pm
 lib/Photonic/WE/R2/GreenP.pm
-lib/Photonic/WE/R2/GreenS.pm
 lib/Photonic/WE/R2/Haydock.pm
 lib/Photonic/WE/R2/Metric.pm
-lib/Photonic/WE/R2/Wave.pm
-lib/Photonic/WE/R2/WaveP.pm
-lib/Photonic/WE/S/EpsilonP.pm
-lib/Photonic/WE/S/EpsilonTensor.pm
 lib/Photonic/WE/S/Field.pm
 lib/Photonic/WE/S/Green.pm
 lib/Photonic/WE/S/GreenP.pm
 lib/Photonic/WE/S/Haydock.pm
 lib/Photonic/WE/S/Metric.pm
-lib/Photonic/WE/S/Wave.pm
-lib/Photonic/WE/S/WaveP.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

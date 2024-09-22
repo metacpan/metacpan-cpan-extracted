@@ -6,6 +6,7 @@ author:
   - 'Bernardo S. Mendoza <bms@cio.mx>'
   - 'Jose Samuel Perez-Huerta <jsperez@fisica.uaz.edu.mx>'
   - 'Lucila Juarez Reyes <lucilajuarezreyes@gmail.com>'
+  - 'Raksha Singla  <raksharuia@gmail.com>'
   - 'Merlyn Jaqueline Juarez-Gutierrez <merlynj@icf.unam.mx>'
 build_requires:
   ExtUtils::MakeMaker: '0'
@@ -14,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,15 +30,14 @@ requires:
   IO::File: '0'
   List::Util: '0'
   Machine::Epsilon: '0'
-  Moose: '0'
-  Moose::Role: '0'
-  Moose::Util::TypeConstraints: '0'
-  MooseX::StrictConstructor: '0'
+  Moo: '0'
+  MooX::StrictConstructor: '0'
   PDL: '2.049'
   PDL::Constants: '0'
   PDL::Core: '0'
   PDL::Core::Dev: '0'
   PDL::FFTW3: '0.15'
+  PDL::IO::FastRaw: '0'
   PDL::IO::Pic: '0'
   PDL::IO::Storable: '0'
   PDL::LinearAlgebra: '0.20'
@@ -45,8 +45,10 @@ requires:
   PDL::MatrixOps: '0'
   PDL::NiceSlice: '0'
   Storable: '0'
+  Type::Tiny: '0'
+  namespace::autoclean: '0'
   perl: '5.014000'
 resources:
   repository: https://github.com/wlmb/Photonic
-version: '0.021'
+version: '0.022'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

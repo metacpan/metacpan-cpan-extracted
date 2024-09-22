@@ -1,5 +1,5 @@
 package Photonic::Roles::EpsFromGeometry;
-$Photonic::Roles::EpsFromGeometry::VERSION = '0.021';
+$Photonic::Roles::EpsFromGeometry::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -33,16 +33,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 =cut
 
-use Moose::Role;
+use Moo::Role;
+use Photonic::Types -all;
 
 requires 'geometry';
 
-has 'epsilon'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required=>1, lazy=>1,
-                builder=> '_epsilon');
+has 'epsilon'=>(is=>'lazy', isa=>PDLComplex, required=>1);
 
-sub _epsilon { shift->geometry->epsilon }
+sub _build_epsilon { shift->geometry->epsilon }
 
-no Moose::Role;
+no Moo::Role;
 
 1;
 
@@ -52,12 +52,12 @@ Photonic::Roles::EpsFromGeometry
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
     package Photonic::LE::NP::Haydock;
-    use Moose;
+    use Moo;
     with 'Photonic::Roles::EpsFromGeometry';
 
 =head1 DESCRIPTION

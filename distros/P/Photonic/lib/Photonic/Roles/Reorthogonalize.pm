@@ -1,5 +1,5 @@
 package Photonic::Roles::Reorthogonalize;
-$Photonic::Roles::Reorthogonalize::VERSION = '0.021';
+$Photonic::Roles::Reorthogonalize::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::ReorthogonalizeC
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -121,12 +121,11 @@ Only used with complex coefficients.
 
 =cut
 
-
-use Photonic::Iterator;
 use Machine::Epsilon;
 use PDL::Lite;
 use PDL::NiceSlice;
-use Moose::Role;
+use Photonic::Utils qw(top_slice);
+use Moo::Role;
 
 requires 'complexCoeffs';
 
@@ -168,54 +167,58 @@ sub _build_next_W {
 }
 
 sub _fullorthogonalize_indeed {
-    my $self=shift;
-    my $psi=shift; #state to orthogonalize
-    return $psi unless $self->fullorthogonalize_N;
-    $self->_fullorthogonalize_N($self->fullorthogonalize_N-1);
+    my ($self, $psi, $gs)=@_;
+    return $psi unless my $fo_N = $self->fullorthogonalize_N;
+    $self->_fullorthogonalize_N($fo_N-1);
     $self->_orthogonalizations($self->orthogonalizations+1);
     $self->_write_justorthogonalized(1);
-    my $it=$self->state_iterator;
-    for my $g($self->gs->dog){
-	#for every saved state
-	my $s=$it->nextval;
-	$psi=$psi-$g*$self->innerProduct($s, $psi)*$s;
+    my $it=$self->states;
+    $psi=$psi->copy; # no mutate inputs
+    for my $n (0..$gs->dim(-1)-1) {
+	my $s=top_slice($it, "($n)");
+	$psi-=top_slice($gs, "($n)")*$self->innerProduct($s, $psi)*$s;
     }
     return $psi;
 };
 
 # returns the number of states to unwind
 sub _checkorthogonalize {
-    my $self=shift;
-    return 0 unless defined $self->next_state;
+    my ($self, $n, $a, $b, $c, $b_np1, $g_n, $g_np1)=@_;
     return 0 if $self->fullorthogonalize_N; #already orthogonalizing
-    my $n=$self->iteration;
-    my $a=$self->as;
-    my $b=$self->bs;
-    my $c=$self->cs;
     if($self->_justorthogonalized){
 	$self->_write_justorthogonalized(0);
 	my $current_W=PDL->ones($n)*$self->noise;
 	my $next_W=PDL->ones($n+1)*$self->noise;
-	$current_W->(-1).=$self->current_g;
-	$next_W->(-1).=$self->next_g;
+	$current_W->(-1).=$g_n;
+	$next_W->(-1).=$g_np1;
 	$self->_current_W($current_W);
 	$self->_next_W($next_W);
 	return 0;
     }
     $self->_previous_W(my $previous_W=$self->current_W);
     $self->_current_W(my $current_W=$self->next_W);
-    my $next_W=PDL->pdl([]);
-    my $method = $self->complexCoeffs ? '_arg' : '_sign';
+    my $next_W=PDL->zeroes(
+        $self->complexCoeffs ? PDL::cdouble() : PDL::double(),
+        $n+1
+    );
     if($n>=2){
-	$next_W= $b->(1:-1)*$current_W->(1:-1)
+	$next_W->(0:-3) .= $b->(1:-1)*$current_W->(1:-1)
 	    + ($a->(0:-2)-$a->(($n-1)))*$current_W->(0:-2)
 	    - $c->(($n-1))*$previous_W;
-	$next_W->(1:-1)+=$c->(1:-2)*$current_W->(0:-3) if ($n>=3);
-	$next_W+=$self->$method($next_W)*2*$self->normOp*$self->noise;
-	$next_W=$next_W/$self->next_b;
+	$next_W->(1:-3)+=$c->(1:-2)*$current_W->(0:-3) if ($n>=3);
+	my $diff;
+	if ($self->complexCoeffs) {
+	    my $s=$next_W->(0:-3)->copy;
+	    $s->where(my $indexes=(my $a=$s->abs)==0).=1;
+	    $a->where($indexes).=1;
+	    $diff=$s/$a; # arg
+	} else {
+	    $diff=2*($next_W->(0:-3)>=0)-1; # sign
+	}
+	$next_W->(0:-3) .= ($next_W->(0:-3)+($diff*2*$self->normOp*$self->noise))/$b_np1;
     }
-    $next_W=$next_W->append($self->noise) if $n>=1;
-    $next_W=$next_W->append($self->next_g);
+    $next_W->((-2)) .= $self->noise;
+    $next_W->((-1)) .= $g_np1;
     $self->_next_W($next_W);
     return 0 unless $n>=2;
     my $max=$next_W->(0:-2)->abs->maximum;
@@ -226,19 +229,6 @@ sub _checkorthogonalize {
     $orthos;
 }
 
-sub _sign {
-    my (undef, $s)=@_;
-    2*($s>=0)-1;
-}
-
-sub _arg {
-    my $s=$_[1]->copy;
-    my $a=$s->abs;
-    $s->where($a==0).=1;
-    $a->where($a==0).=1;
-    $s/$a;
-}
-
-no Moose::Role;
+no Moo::Role;
 
 1;

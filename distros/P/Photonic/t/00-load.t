@@ -41,7 +41,6 @@ Photonic::CharacteristicFunctions
 Photonic::Geometry::FromB
 Photonic::Geometry::FromEpsilon
 Photonic::Geometry::FromImage2D
-Photonic::Iterator
 Photonic::LE::NP::EpsL
 Photonic::LE::NP::EpsTensor
 Photonic::LE::NP::Haydock
@@ -59,6 +58,7 @@ Photonic::LE::S::Haydock
 Photonic::Roles::EpsFromGeometry
 Photonic::Roles::EpsL
 Photonic::Roles::EpsTensor
+Photonic::Roles::Field
 Photonic::Roles::Geometry
 Photonic::Roles::Haydock
 Photonic::Roles::KeepStates
@@ -67,25 +67,16 @@ Photonic::Roles::Reorthogonalize
 Photonic::Roles::UseMask
 Photonic::Types
 Photonic::Utils
-Photonic::WE::R2::EpsilonP
-Photonic::WE::R2::EpsilonTensor
 Photonic::WE::R2::Field
 Photonic::WE::R2::Green
 Photonic::WE::R2::GreenP
-Photonic::WE::R2::GreenS
 Photonic::WE::R2::Haydock
 Photonic::WE::R2::Metric
-Photonic::WE::R2::Wave
-Photonic::WE::R2::WaveP
-Photonic::WE::S::EpsilonP
-Photonic::WE::S::EpsilonTensor
 Photonic::WE::S::Field
 Photonic::WE::S::Green
 Photonic::WE::S::GreenP
 Photonic::WE::S::Haydock
 Photonic::WE::S::Metric
-Photonic::WE::S::Wave
-Photonic::WE::S::WaveP
 	);
     foreach(@mods){
 	use_ok( $_ ) || print "Bail out!\n";

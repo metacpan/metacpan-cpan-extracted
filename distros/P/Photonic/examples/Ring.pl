@@ -43,7 +43,8 @@ use Photonic::LE::NR2::EpsL;
 use Photonic::LE::NR2::Haydock;
 use Photonic::WE::R2::Metric;
 use Photonic::WE::R2::Haydock;
-use Photonic::WE::R2::EpsilonP;
+use Photonic::WE::R2::GreenP;
+use Photonic::CharacteristicFuncions qw(ring);
 use PDL;
 use PDL::NiceSlice;
 
@@ -144,17 +145,17 @@ for(my $j=0;$j<$elem;$j++){
 
 
 #----------------------------------------------------------------------------------
-# Retarded calculation throw $e object of Photonic::WE::R2::EpsilonP
+# Retarded calculation throw $e object of Photonic::WE::R2::GreenP
 #----------------------------------------------------------------------------------
-# Photonic::WE::R2 perl-PDL module has implemented Metric, AllH, and EpsilonP modules
+# Photonic::WE::R2 perl-PDL module has implemented Metric, Haydock, and GreenP modules
 # for the Retarded approximation case.
     my $m=Photonic::WE::R2::Metric->new(geometry=>$gmtr, epsilon=>$epsA,
 					  wavenumber=>pdl($q),
 					  wavevector=>pdl([$k,0]));
     my $h=Photonic::WE::R2::Haydock->new(metric=>$m,
 					polarization=>pdl(0,1)->r2C, nh=>$nh);
-    my $e=Photonic::WE::R2::EpsilonP->new(haydock=>$h, nh=>$nh);
-    my $er=$e->evaluate($epsB);
+    my $e=Photonic::WE::R2::GreenP->new(haydock=>$h, nh=>$nh, epsB=>$epsB);
+    my $er=$e->epsilon;
 ##    say OUT join " ", $hnu, $enr->re, $enr->im, $er->re, $er->im;
     my $linea=pdl($hnu, $enr->re, $enr->im, $er->re, $er->im);
     push @out, $linea;
@@ -172,15 +173,6 @@ my $y=$o->(:,1:-1);
 my $wgp=gpwin('qt');
 $wgp->plot(xr=>[1.2,3],with=>'lines',lw=>2,$x,$y);
 #------------------------------------------------------------
-
-sub ring {
-    my $N=shift;
-    my $ra=(shift)*(2*$N+1);  #Note: it was $N
-    my $rb=(shift)*(2*$N+1);
-    my $z=zeroes(2*$N+1, 2*$N+1);
-    my $B=($z->rvals<=$rb) & ($z->rvals >= $ra);
-    return $B;
-}
 
 sub eps{
     my $epsi=shift;

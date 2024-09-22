@@ -47,27 +47,34 @@ my $eb=3+4*i;
 my $B=zeroes(11)->xvals<5; #1D system
 my $gl=Photonic::Geometry::FromB->new(B=>$B, Direction0=>pdl([1])); #long
 my $haydock=Photonic::LE::NR2::Haydock->new(geometry=>$gl, nh=>10, keepStates=>1);
-my $flo=Photonic::LE::NR2::Field->new(haydock=>$haydock, nh=>10);
-my $flv=$flo->evaluate($ea, $eb);
+my $flo=Photonic::LE::NR2::Field->new(haydock=>$haydock, nh=>10, epsA=>$ea, epsB=>$eb);
+my $flv=$flo->field;
+my $fle=$flo->epsL;
 my $fla=1/$ea;
 my $flb=1/$eb;
 my $fproml=$fla*(1-$gl->f)+$flb*($gl->f);
+my $flex=1/$fproml;
 ($fla, $flb)=map {$_/$fproml} ($fla, $flb);
-my $flx=pdl([$fla*(1-$B)+$flb*$B])->mv(0,-1);
+my $flx=($fla*(1-$B)+$flb*$B)->slice("*1");
 ok(Cagree($flv, $flx), "1D long field") or diag "got: $flv\nexpected: $flx";
-
+ok(Cagree($fle, $flex), "1D long response") or diag "got: $fle\nexpected: $flex";
 #View 2D from 1D superlattice.
 my $Bt=zeroes(1,11)->yvals<5; #2D flat system
 my $gt=Photonic::Geometry::FromB->new(B=>$Bt, Direction0=>pdl([1,0])); #trans
 my $nt=Photonic::LE::NR2::Haydock->new(geometry=>$gt, nh=>10, keepStates=>1);
-my $fto=Photonic::LE::NR2::Field->new(haydock=>$nt, nh=>10, filter=>ones(1));
-my $ftv=$fto->evaluate($ea, $eb);
-my $ftx=pdl(r2C(1), r2C(0));
-ok(Cagree($ftv, $ftx), "1D trans field");
+my $fto=Photonic::LE::NR2::Field->new(haydock=>$nt, nh=>10, filter=>ones(1), epsA=>$ea, epsB=>$eb);
+my $ftv=$fto->field;
+my $fte=$fto->epsL;
+my $ftx=pdl([1, 0])->r2C;
+ok(Cagree($ftv, $ftx), "1D trans field") or diag "got: $ftv\nexpected: $ftx";;
+my $fpromt=$ea*(1-$gt->f)+$eb*($gt->f);
+ok(Cagree($fte, $fpromt), "1D trans response") or diag "got: $fte\nexpected: $fpromt";
+
 
 my ($dA, $dB) = (0, 1); # vacuum, then anything as is normalised to dB
 my $nrshp=Photonic::LE::NR2::SHP->new(
-  nrf=>$fto, densityA=>$dA, densityB=>$dB,
+  haydock=>$nt, nh=>10, filter=>ones(1),
+  densityA=>$dA, densityB=>$dB,
 );
 my $nrsh=Photonic::LE::NR2::SH->new(
   shp=>$nrshp, epsA1=>$ea, epsB1=>$eb, epsA2=>$ea*$ea, epsB2=>$eb*$eb,
@@ -268,26 +275,38 @@ $expected = pdl(<<'EOF');
 ]
 EOF
 ok(Cagree($got, $expected), "alpha1") or diag "got: $got\nexpected: $expected";
-$got=$nrsh->alpha1;
+$got=$nrsh->alpha2;
 $expected = pdl(<<'EOF');
 [
- [ 0.15915494+0.31830989i ]
- [ 0.15915494+0.31830989i ]
- [ 0.15915494+0.31830989i ]
- [ 0.15915494+0.31830989i ]
- [ 0.15915494+0.31830989i ]
- [ 0.15915494+0.31830989i ]
- [ 0.15915494+0.31830989i ]
- [ 0.15915494+0.31830989i ]
- [ 0.15915494+0.31830989i ]
- [ 0.15915494+0.31830989i ]
- [ 0.15915494+0.31830989i ]
+ [-0.636619772367581+1.90985931710274i]
+ [-0.636619772367581+1.90985931710274i]
+ [-0.636619772367581+1.90985931710274i]
+ [-0.636619772367581+1.90985931710274i]
+ [-0.636619772367581+1.90985931710274i]
+ [-0.636619772367581+1.90985931710274i]
+ [-0.636619772367581+1.90985931710274i]
+ [-0.636619772367581+1.90985931710274i]
+ [-0.636619772367581+1.90985931710274i]
+ [-0.636619772367581+1.90985931710274i]
+ [-0.636619772367581+1.90985931710274i]
 ]
 EOF
 ok(Cagree($got, $expected), "alpha2") or diag "got: $got\nexpected: $expected";
 $got=$nrsh->field2;
 $expected = pdl(<<'EOF');
--0.6756993-0.10576923i
+[
+ [ [1-2.77555756156289e-17i                       0]]
+ [ [1-2.77555756156289e-17i                       0]]
+ [ [1-2.77555756156289e-17i                       0]]
+ [ [1-2.77555756156289e-17i                       0]]
+ [ [1-2.77555756156289e-17i                       0]]
+ [ [1-2.77555756156289e-17i                       0]]
+ [ [1-2.77555756156289e-17i                       0]]
+ [ [1-2.77555756156289e-17i                       0]]
+ [ [1-2.77555756156289e-17i                       0]]
+ [ [1-2.77555756156289e-17i                       0]]
+ [ [1-2.77555756156289e-17i                       0]]
+]
 EOF
 ok(Cagree($got, $expected), "field2") or diag "got: $got\nexpected: $expected";
 $got=$nrsh->P2;
@@ -309,7 +328,7 @@ EOF
 ok(Cagree($got, $expected), "P2") or diag "got: $got\nexpected: $expected";
 $got=$nrsh->u1;
 $expected = pdl(<<'EOF');
--0.22115385-0.10576923i
+-0.75-0.25i
 EOF
 ok(Cagree($got, $expected), "u1") or diag "got: $got\nexpected: $expected";
 $got=$nrsh->P2LMCalt;

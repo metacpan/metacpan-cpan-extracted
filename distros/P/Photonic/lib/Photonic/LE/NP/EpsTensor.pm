@@ -1,5 +1,5 @@
 package Photonic::LE::NP::EpsTensor;
-$Photonic::LE::NP::EpsTensor::VERSION = '0.021';
+$Photonic::LE::NP::EpsTensor::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -39,7 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -73,15 +73,16 @@ for each pixel of the system
 use namespace::autoclean;
 use Photonic::LE::NP::Haydock;
 use Photonic::LE::NP::EpsL;
-use Moose;
-use MooseX::StrictConstructor;
+use Photonic::Types -all;
+use Moo;
+use MooX::StrictConstructor;
 
 has allh_class=>(is=>'ro', default=>'Photonic::LE::NP::Haydock');
 has allh_attrs=>(is=>'ro', default=>sub{[qw(reorthogonalize epsilon)]});
 has epsl_class=>(is=>'ro', default=>'Photonic::LE::NP::EpsL');
 has epsl_attrs=>(is=>'ro', default=>sub{[qw(nh smallE)]});
 
-has 'epsilon'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required=>1);
+has 'epsilon'=>(is=>'ro', isa=>PDLComplex, required=>1);
 
 with 'Photonic::Roles::EpsTensor', 'Photonic::Roles::KeepStates';
 

@@ -31,22 +31,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 use strict;
 use warnings;
 use PDL;
-use Photonic::CharacteristicFunctions qw(triangle isosceles ellipse);
+use Photonic::CharacteristicFunctions qw(triangle isosceles ellipse ring);
 use Test::More;
 TRIANGLE: {
      my ($N, $r0, $deltar, $theta0)=(11, 0.5, 0.2, 0.1);
      my $b=triangle($N, $r0, $deltar, $theta0);
      ok(defined $b, "Triangle");
 }
- ELLIPSE: {
+ELLIPSE: {
      my ($N, $ff, $ecc) = (11, 0.25, 0.5);
      my $e=ellipse($N, $ff, $ecc);
      ok(defined $e, "Triangle");
 }
- ISOSCELES: {
+ISOSCELES: {
      my ($N, $r0, $delta2,$delta3, $theta0)=(11, 0.5, 0.1, 0.2, 0.1);
      my $i=isosceles($N, $r0, $delta2, $delta3, $theta0);
      ok(defined $i, "Isosceles");
+}
+{
+  my ($N, $r0, $r1)=(11, 0.5, 0.6);
+  my $i=ring($N, $r0, $r1);
+  ok(defined $i, "ring");
 }
 
 done_testing;

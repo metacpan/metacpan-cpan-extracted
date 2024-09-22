@@ -11,7 +11,7 @@ use Future;
 subtest 'wait_all' => sub {
 
     # fake urls indicating only milliseconds to delay response
-    my @pages = ('30', '10', '20');
+    my @pages = ('300', '100', '200');
     my (@execs, @execs_img);
     my @pms = map {Web::PageMeta->new(url => $_, _ua => Test::Mock::Future::HTTP->new,)} @pages;
     my @fts = map {
@@ -47,14 +47,14 @@ subtest 'wait_all' => sub {
         'all Futures done'
     );
 
-    eq_or_diff(\@execs,     ['10', '20', '30'], 'Future->wait_all()');
-    eq_or_diff(\@execs_img, ['10', '20', '30'], 'Future->wait_all()');
+    eq_or_diff(\@execs,     ['100', '200', '300'], 'Future->wait_all()');
+    eq_or_diff(\@execs_img, ['100', '200', '300'], 'Future->wait_all()');
 };
 
 subtest 'fmap_void' => sub {
 
     # fake urls indicating only milliseconds to delay response
-    my @pages = ('30', '10', '5');
+    my @pages = ('300', '100', '5');
     my @execs_img;
     my @pms = map {Web::PageMeta->new(url => $_, _ua => Test::Mock::Future::HTTP->new,)} @pages;
 
@@ -76,7 +76,7 @@ subtest 'fmap_void' => sub {
         concurrent => 2
     )->get;
 
-    eq_or_diff(\@execs_img, ['10', '5', '30'], 'fmap_void()->get()');
+    eq_or_diff(\@execs_img, ['100', '5', '300'], 'fmap_void()->get()');
 };
 
 subtest 'fail on non-200' => sub {

@@ -52,7 +52,7 @@ my $haydock=Photonic::WE::S::Haydock->new(
    metric=>$ml, nh=>10, keepStates=>1, polarization=>pdl([1])->r2C,
    epsilon=>$epsilon);
 my $flo=Photonic::WE::S::Field->new(haydock=>$haydock, nh=>10);
-my $flv=$flo->evaluate();
+my $flv=$flo->field;
 my $fla=1/$ea;
 my $flb=1/$eb;
 my $fproml=$fla*(1-$gl->f)+$flb*($gl->f);
@@ -70,6 +70,6 @@ my $nt=Photonic::WE::S::Haydock->new(
    metric=>$mt, nh=>10, keepStates=>1, polarization=>pdl([1,0])->r2C,
    epsilon=>$epsilont);
 my $fto=Photonic::WE::S::Field->new(haydock=>$nt, nh=>10);
-my $ftv=$fto->evaluate();
+my $ftv=$fto->field;
 my $ftx=r2C(pdl [1, 0]);
 ok(Cagree($ftv, $ftx), "1D trans field");

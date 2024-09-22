@@ -20,15 +20,6 @@ or, providing a list of string that will be concatenated:
 
     my $ex = Locale::Unicode::Exception->new( "Some error", "has occurred:", $details );
 
-or, re-using an exception object:
-
-    my $ex = Locale::Unicode::Exception->new( $other_exception_object );
-
-    $object->customer_orders ||
-        die( "Error in file ", $object->error->file, " at line ", $object->error->line, "\n" );
-    # or simply:
-    $object->customer_orders || die( "Error: ", $object->error, "\n" );
-
 =head1 VERSION
 
     v0.1.0
@@ -48,11 +39,6 @@ L<Locale::Unicode::Exception> objects are created by L<Locale::Unicode/"error"> 
 It takes either an L<Locale::Unicode::Exception> object or an hash reference of properties, or a list of arguments that will be concatanated to form the error message. The list of arguments can contain code reference such as reference to sub routines, who will be called and their returned value added to the error message string. For example :
 
     my $ex = Locale::Unicode::Exception->new( "Invalid property. Value recieved are: ", sub{ Dumper( $hash ) } );
-
-    # or
-
-    my $ex = Locale::Unicode::Exception->new( $other_exception_object_for_reuse );
-    # This will the object property
 
     # or
 

@@ -1,5 +1,5 @@
 package Photonic::WE::S::Haydock;
-$Photonic::WE::S::Haydock::VERSION = '0.021';
+$Photonic::WE::S::Haydock::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::Haydock
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -51,6 +51,10 @@ Accessors handled by metric (see L<Photonic::WE::S::Metric>)
 A non null vector defining the complex direction of the macroscopic
 field.
 
+=item * normalizedPolarization
+
+The polarisation, normalised
+
 =back
 
 =head1 METHODS
@@ -85,6 +89,10 @@ the magnitude of inner product of the state with itself.
 =item * changesign
 
 Returns 0, as there is no need to change sign.
+
+=item * complexCoeffs
+
+Haydock coefficients are complex
 
 =back
 
@@ -124,17 +132,17 @@ use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
 use Carp;
-use Photonic::Types;
+use Photonic::Types -all;
 use Photonic::Utils qw(VSProd any_complex GtoR RtoG);
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use MooX::StrictConstructor;
 
-has 'metric'=>(is=>'ro', isa => 'Photonic::WE::S::Metric',
+has 'metric'=>(is=>'ro', isa => InstanceOf['Photonic::WE::S::Metric'],
 	       handles=>{B=>'B', ndims=>'ndims', dims=>'dims',
 			 geometry=>'geometry', epsilonR=>'epsilon'},
 	       required=>1);
-has 'polarization' =>(is=>'ro', required=>1, isa=>'Photonic::Types::PDLComplex');
-has 'normalizedPolarization' =>(is=>'ro', isa=>'Photonic::Types::PDLComplex',
+has 'polarization' =>(is=>'ro', required=>1, isa=>PDLComplex);
+has 'normalizedPolarization' =>(is=>'ro', isa=>PDLComplex,
      init_arg=>undef, writer=>'_normalizedPolarization');
 has 'complexCoeffs'=>(is=>'ro', init_arg=>undef, default=>1,
 		      documentation=>'Haydock coefficients are complex');
@@ -166,7 +174,7 @@ sub applyMetric {
     my $g=$self->metric->value;
     #$g is xy:xy:pm:nx:ny
     #real or complex matrix times complex vector
-    my $gpsi=($g*$psi(*1)) #xy:xy:pm:nx:ny
+    my $gpsi=($g*$psi(:,*1)) #xy:xy:pm:nx:ny
 	->sumover; #xy:pm:nx:ny
     return $gpsi;
 }
@@ -189,7 +197,7 @@ sub changesign { #don't change sign
     return 0;
 }
 
-sub _firstState { #\delta_{G0}
+sub _build_firstState { #\delta_{G0}
     my $self=shift;
     my $v=PDL->zeroes(2,@{$self->dims})->r2C; #pm:nx:ny...
     my $arg=join ',', ':', ("(0)") x $self->ndims; #(0),(0),... ndims+1 times

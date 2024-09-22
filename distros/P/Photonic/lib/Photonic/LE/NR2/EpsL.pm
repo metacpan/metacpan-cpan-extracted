@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::EpsL;
-$Photonic::LE::NR2::EpsL::VERSION = '0.021';
+$Photonic::LE::NR2::EpsL::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::EpsL
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -45,7 +45,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
    use Photonic::LE::NR2::EpsL;
    my $eps=Photonic::LE::NR2::EpsL->new(haydock=>$haydock, nh=>$nh);
-   my $epsilonLongitudinal=$eps->evaluate($epsA, $epsB);
+   my $epsilonLongitudinal=$eps->epsL;
 
 =head1 DESCRIPTION
 
@@ -74,21 +74,21 @@ The spectral variable used in the last calculation
 =cut
 
 use namespace::autoclean;
-use Photonic::Types;
+use Photonic::Types -all;
 use Photonic::Utils qw(lentzCF);
 
 use List::Util qw(min);
 
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use MooX::StrictConstructor;
 
 with 'Photonic::Roles::EpsL';
 
-has 'epsA'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required => 1,
+has 'epsA'=>(is=>'ro', isa=>PDLComplex, required => 1,
     documentation=>'Dielectric function of host');
-has 'epsB'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required => 1,
+has 'epsB'=>(is=>'ro', isa=>PDLComplex, required => 1,
         documentation=>'Dielectric function of inclusions');
-has 'u'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', lazy => 1, builder => '_build_u',
+has 'u'=>(is=>'lazy', isa=>PDLComplex,
     documentation=>'Spectral variable');
 
 sub _build_u {

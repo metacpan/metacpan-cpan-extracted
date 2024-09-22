@@ -1,5 +1,10 @@
 Revision history for Perl module DateTime::Locale::FromCLDR
 
+v0.4.1 2024-09-22T08:32:25+0900
+    - Corrected method _time_formats
+    - Improved method territory_info
+    - Corrected the method prefers_24_hour_time to use the CLDR preferred time format
+
 v0.4.0 2024-09-17T14:23:48+0900
     - Added method territory_info()
     - Added method timezone_id()

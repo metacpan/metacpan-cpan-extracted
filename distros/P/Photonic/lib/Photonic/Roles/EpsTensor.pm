@@ -1,5 +1,5 @@
 package Photonic::Roles::EpsTensor;
-$Photonic::Roles::EpsTensor::VERSION = '0.021';
+$Photonic::Roles::EpsTensor::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::EpsTensor
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -53,9 +53,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =item (for developers)
 
     package Photonic::LE::S::EpsTensor;
-    $Photonic::LE::S::EpsTensor::VERSION= '0.021';
+    $Photonic::LE::S::EpsTensor::VERSION= '0.022';
     use namespace::autoclean;
-    use Moose;
+    use Moo;
     with 'Photonic::Roles::EpsTensor';
     has...
 
@@ -112,6 +112,10 @@ Array of L<Photonic::Role::Haydock> structures, one for each direction
 calculated you are encouraged to use the accessor to pass the value to
 construct other C<EpsTensor> with different epsilon.
 
+=item * reorthogonalize
+
+Reorthogonalize haydock flag
+
 =item * epsL
 
 Array of L<Photonic::Role::EpsL> structures, one for each direction
@@ -143,12 +147,12 @@ Flags that the last calculation converged before using up all coefficients
 
 =cut
 
-use Moose::Role;
+use Moo::Role;
 use namespace::autoclean;
 use PDL::Lite;
 use Photonic::Utils qw(tensor make_haydock incarnate_as);
+use Photonic::Types -all;
 use List::Util qw(all);
-use Photonic::Types;
 
 requires qw(allh_class allh_attrs epsl_class epsl_attrs);
 
@@ -156,27 +160,26 @@ sub dims; # Forward declarations to allow some role compositions
 sub ndims; # recommended by Moose::Manual::Roles
 sub geometry;
 
-has 'geometry'=>(is=>'ro', isa => 'Photonic::Types::Geometry',
+has 'geometry'=>(is=>'ro', isa => Geometry,
     handles=>[qw(B ndims dims r G GNorm L scale f)],required=>1
 );
 has 'reorthogonalize'=>(is=>'ro', required=>1, default=>0,
          documentation=>'Reorthogonalize haydock flag');
-has 'haydock' =>(is=>'ro', isa=>'ArrayRef[Photonic::Roles::Haydock]',
-            lazy=>1, builder=>'_build_haydock',
+has 'haydock' =>(is=>'lazy', isa=>ArrayRef[Haydock],
             documentation=>'Array of Haydock calculators');
-has 'epsL'=>(is=>'ro', isa=>'ArrayRef[Photonic::Roles::EpsL]',
-             init_arg=>undef, lazy=>1, builder=>'_build_epsL',
+has 'epsL'=>(is=>'lazy', isa=>ArrayRef[ConsumerOf['Photonic::Roles::EpsL']],
+             init_arg=>undef,
              documentation=>'Array of epsilon calculators');
-has 'epsTensor'=>(is=>'ro', isa=>'PDL', lazy=>1, builder=>'_build_epsTensor',
+has 'epsTensor'=>(is=>'lazy', isa=>PDLObj,
              documentation=>'Dielectric Tensor');
 has 'converged'=>(is=>'ro', init_arg=>undef, writer=>'_converged',
              documentation=>
                   'All EpsL evaluations converged in last evaluation');
-has 'nh' =>(is=>'ro', isa=>'Num', required=>1,
+has 'nh' =>(is=>'ro', isa=>Num, required=>1,
             documentation=>'Desired no. of Haydock coefficients');
-has 'smallH'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
+has 'smallH'=>(is=>'ro', isa=>Num, required=>1, default=>1e-7,
             documentation=>'Convergence criterium for Haydock coefficients');
-has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
+has 'smallE'=>(is=>'ro', isa=>Num, required=>1, default=>1e-7,
             documentation=>'Convergence criterium for use of Haydock coeff.');
 
 sub _build_epsTensor {
@@ -196,6 +199,6 @@ sub _build_epsL {
     [ map incarnate_as($self->epsl_class, $self, $self->epsl_attrs, haydock=>$_), @{$self->haydock} ];
 }
 
-no Moose::Role;
+no Moo::Role;
 
 1;

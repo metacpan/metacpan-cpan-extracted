@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::Haydock;
-$Photonic::LE::NR2::Haydock::VERSION = '0.021';
+$Photonic::LE::NR2::Haydock::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::Haydock;
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -67,7 +67,7 @@ Consumes L<Photonic::Roles::Haydock>, L<Photonic::Roles::UseMask>
 
 =item * geometry
 
-A Photonic::Types::GeometryG0 object defining the geometry of the system,
+A L<Photonic::Types/GeometryG0> object defining the geometry of the system,
 the characteristic function and the direction of the G=0 vector. Required.
 
 =item * B ndims dims r G GNorm L scale f
@@ -101,6 +101,10 @@ Returns the magnitude of a state as the square root of the inner
 
 Return 0, as there is no need to change sign.
 
+=item * complexCoeffs
+
+Haydock coefficients are real
+
 =back
 
 =cut
@@ -108,18 +112,18 @@ Return 0, as there is no need to change sign.
 use namespace::autoclean;
 use PDL::Lite;
 use Carp;
-use Photonic::Types;
+use Photonic::Types -all;
 use Photonic::Utils qw(HProd apply_longitudinal_projection);
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use MooX::StrictConstructor;
 
-has 'geometry'=>(is=>'ro', isa => 'Photonic::Types::GeometryG0',
+has 'geometry'=>(is=>'ro', isa => GeometryG0,
     handles=>[qw(B dims ndims r G GNorm L scale f)],required=>1);
 has 'complexCoeffs'=>(is=>'ro', init_arg=>undef, default=>0,
 		      documentation=>'Haydock coefficients are real');
 with 'Photonic::Roles::Haydock', 'Photonic::Roles::UseMask';
 
-sub _firstState { #\delta_{G0}
+sub _build_firstState { #\delta_{G0}
     my $self=shift;
     my $v=PDL->zeroes(@{$self->dims})->r2C; #nx, ny...
     my $arg=join ',', ("(0)") x ($self->ndims); #(0),(0),... ndims times
@@ -137,7 +141,7 @@ sub applyOperator {
 }
 
 sub innerProduct {
-    return HProd($_[1], $_[2]); #skip self, Hermitian product
+    return HProd(@_[1,2], $_[0]->ndims); #skip self, Hermitian product
 }
 
 sub magnitude { #magnitude of a state

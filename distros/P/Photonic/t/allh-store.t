@@ -34,15 +34,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 use strict;
 use warnings;
 use PDL;
-use Storable qw(fd_retrieve);
-use Photonic::Iterator;
-
 use Test::More;
 use lib 't/lib';
 use TestUtils;
 
+my @coeffs = qw(as bs b2s cs bcs gs);
+my @all_vars = (qw(iteration), @coeffs);
+
 my $fn = make_fn(); #output file name
 
+my ($all_stash, $states_stash) = {};
 {
     #Check haydock coefficients for simple 1D system
     my ($a) = make_store(
@@ -50,39 +51,18 @@ my $fn = make_fn(); #output file name
 	[1], 10,
 	{ keepStates=>1, storeAllFN=>$fn },
     );
-    my $fh=IO::File->new($fn, "r") or die "Couldn't open $fn: $!";
-    my $all=fd_retrieve($fh);
-    is($all->{iteration}, $a->iteration,
-       "Number of iterations 1D longitudinal");
-    foreach(qw(as bs b2s cs bcs gs)){
-	ok(agree(pdl($all->{$_}), pdl($a->$_)), "1D L $_");
-    }
-    my $si=$a->state_iterator;
-    my (@readstates, @savedstates);
-    foreach(0..$all->{iteration}-1){
-	push @readstates, fd_retrieve($fh);
-	push @savedstates, $si->nextval;
-    }
-    ok(Cagree(pdl(@readstates), pdl(@savedstates)), "1D L states");
+    $all_stash->{$_} = $a->$_ for @all_vars;
+    $states_stash = $a->states->copy;
 }
 
 {
     #full restore allh from previous calculation
     my ($a) = make_store(zeroes(11)->xvals<5, [1], 10, {loadAllFN=>$fn});
-    my $fh=IO::File->new($fn, "r") or die "Couldn't open $fn: $!";
-    my $all=fd_retrieve($fh);
-    is($all->{iteration}, $a->iteration,
+    is($all_stash->{iteration}, $a->iteration,
        "Number of iterations 1D longitudinal");
-    foreach(qw(as bs b2s cs bcs gs)){
-	ok(agree(pdl($all->{$_}), pdl($a->$_)), "1D L restored $_");
-    }
-    my $si=$a->state_iterator;
-    my (@readstates, @savedstates);
-    foreach(0..$all->{iteration}-1){
-	push @readstates, fd_retrieve($fh);
-	push @savedstates, $si->nextval;
-    }
-    ok(Cagree(pdl(@readstates), pdl(@savedstates)), "1D L restored states");
+    ok(agree(pdl($all_stash->{$_}), pdl($a->$_)), "1D L restored $_") for @coeffs;
+    my $readstates = $a->states;
+    ok(Cagree($readstates, $states_stash), "1D L restored states");
 }
 
 {
@@ -91,38 +71,12 @@ my $fn = make_fn(); #output file name
     is($a->iteration, 1, "Can stop before exhausting coefficients 1D L");
     my $a2=Photonic::LE::NR2::Haydock->new(geometry=>$g, nh=>10,
 					keepStates=>1, loadAllFN=>$fn);
-    $a2->run;
     my $a3=Photonic::LE::NR2::Haydock->new(geometry=>$g, nh=>10, keepStates=>1);
+    $a2->run;
     $a3->run;
-    foreach(qw(iteration as bs b2s cs bcs gs)){
-	ok(agree(pdl($a2->$_), pdl($a3->$_)), "1D L retarted $_");
-    }
-    my $si2=$a2->state_iterator;
-    my $si3=$a3->state_iterator;
-    my (@states2, @states3);
-    foreach(0..$a3->iteration-1){
-	push @states2, $si2->nextval;
-	push @states3, $si3->nextval;
-    }
-    ok(Cagree(pdl(@states2), pdl(@states3)), "1D L restored states");
-}
-
-{
-    #View 1D system as 2D. Transverse direction
-    my ($at) = make_default_store($fn);
-    my $fh=IO::File->new($fn, "r") or die "Couldn't open $fn: $!";
-    my $all=fd_retrieve($fh);
-    is($all->{iteration}, $at->iteration, "Number of iterations 1D transverse");
-    foreach(qw(as bs b2s cs bcs gs)){
-	ok(agree(pdl($all->{$_}), pdl($at->$_)), "1D T $_");
-    }
-    my $si=$at->state_iterator;
-    my (@readstates, @savedstates);
-    foreach(0..$all->{iteration}-1){
-	push @readstates, fd_retrieve($fh);
-	push @savedstates, $si->nextval;
-    }
-    ok(Cagree(pdl(@readstates), pdl(@savedstates)), "1D T states");
+    is $a2->iteration, $a3->iteration, 'same number of iterations';
+    ok(agree(pdl($a2->$_), pdl($a3->$_)), "1D L restarted $_") for @all_vars;
+    ok(Cagree($a2->states, $a3->states), "1D L restarted states");
 }
 
 done_testing;

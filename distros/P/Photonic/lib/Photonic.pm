@@ -12,12 +12,12 @@ Photonic - A perl package for calculations on photonics and metamaterials.
 
 =head1 VERSION
 
-Version 0.021
+Version 0.022
 
 =cut
 
 
-$Photonic::VERSION = '0.021';
+$Photonic::VERSION = '0.022';
 
 =head1 COPYRIGHT NOTICE
 
@@ -51,12 +51,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 =head1 SYNOPSIS
 
-  use Photonic::Geometry;
-  use Photonic::NonRetarded::EpsTensor;
-
-  my $g=Photonic::Geometry->new(B=>$b);
-  my $eps=Photonic::Nonretarded::EpsTensor->new(geometry=>$g, nh=>$N);
-  my $epsValue=$eps->evaluate($epsA, $epsB);
+  use Photonic::LE::NR2::EpsTensor;
+  use Photonic::Geometry::FromB;
+  my $g=Photonic::Geometry::FromB->new(B=>$B);
+  my $eps=Photonic::LE::NR2::EpsTensor->new(geometry=>$g, epsA=>$epsA, epsB=>$epsB, nh=>$N);
+  my $epsilonTensor=$eps->epsTensor;
 
 Calculates the dielectric tensor of a metamaterial made up of two
 materials with dielectric functions $epsA and $epsB with a geometry $g
@@ -102,11 +101,6 @@ Geometrical attributes, obtained from a 2D image.
 
 =back
 
-=item L<Photonic::Iterator>
-
-Facilitate the creation of iterators. Useful to iterate over large
-amounts of data, such as states, without keeping them in memory.
-
 =item L<Photonic::LE>
 
 Group of modules for non retarded calculations based on the
@@ -125,7 +119,7 @@ field of one Fourier component.
 
 =item L<Photonic::LE::NP::Haydock>
 
-Obtain all the Haydock coefficients.
+Obtain one, or all, Haydock coefficients.
 
 =item L<Photonic::LE::NP::EpsL>
 
@@ -134,10 +128,6 @@ Calculate the longitudinal dielectric response.
 =item L<Photonic::LE::NP::EpsTensor>
 
 Calculate the dielectric tensor.
-
-=item L<Photonic::LE::NP::Haydock>
-
-Calculator for one Haydock coefficient.
 
 =back
 
@@ -151,7 +141,7 @@ characteristic function.
 
 =item L<Photonic::LE::NR2::Haydock>
 
-Obtain all the Haydock coefficients.
+Obtain one, or all, Haydock coefficients.
 
 =item L<Photonic::LE::NR2::EpsL>
 
@@ -164,10 +154,6 @@ Calculate the dielectric tensor.
 =item L<Photonic::LE::NR2::Field>
 
 Calculate the microscopic field.
-
-=item L<Photonic::LE::NR2::Haydock>
-
-Calculator for one Haydock coefficient.
 
 =item L<Photonic::LE::NR2::SH>
 
@@ -194,7 +180,7 @@ arbitrary number of phases, using the spinor representation.
 
 =item L<Photonic::LE::S::Haydock>
 
-Obtain all the Haydock coefficients.
+Obtain one, or all, Haydock coefficients.
 
 =item L<Photonic::LE::S::EpsL>
 
@@ -208,10 +194,6 @@ Calculate the dielectric tensor.
 
 Calculate the microscopic field.
 
-=item L<Photonic::LE::S::Haydock>
-
-Calculator for one Haydock coefficient.
-
 =back
 
 =back
@@ -224,7 +206,7 @@ Group of roles to factor out related behavior.
 
 =item L<Photonic::Roles::Haydock>
 
-Obtain all the Haydock coefficients.
+Obtain one, or all, Haydock coefficients.
 
 =item L<Photonic::Roles::EpsL>
 
@@ -234,9 +216,13 @@ Calculate the longitudinal dielectric response.
 
 Some fields that have been factored our from the calculations of the response.
 
+=item L<Photonic::Roles::Field>
+
+Role consumed by all Field objects.
+
 =item L<Photonic::Roles::Geometry>
 
-Roles consumed by all Geometry objects.
+Role consumed by all Geometry objects.
 
 =item L<Photonic::Roles::KeepStates>
 
@@ -244,11 +230,7 @@ Flag to keepstates.
 
 =item L<Photonic::Roles::Metric>
 
-Roles factored out of the metric calculators.
-
-=item L<Photonic::Roles::Haydock>
-
-Roles factored out of the calculation of one Haydock coefficient.
+Role factored out of the metric calculators.
 
 =item L<Photonic::Roles::Reorthogonalize>
 
@@ -256,7 +238,7 @@ Role to keep Haydock states orthogonalized.
 
 =item L<Photonic::Roles::UseMask>
 
-Roles to manage masks in reciprocal space.
+Role to manage masks in reciprocal space.
 
 =back
 
@@ -285,15 +267,7 @@ characteristic function.
 
 =item L<Photonic::WE::R2::Haydock>
 
-Obtain all the Haydock coefficients.
-
-=item L<Photonic::WE::R2::EpsilonP>
-
-Calculate the dielectric function projected along some direction.
-
-=item L<Photonic::WE::R2::EpsilonTensor>
-
-Calculate the dielectric tensor.
+Obtain one, or all, Haydock coefficients.
 
 =item L<Photonic::WE::R2::Field>
 
@@ -301,32 +275,18 @@ Calculate the microscopic field.
 
 =item L<Photonic::WE::R2::Green>
 
-Calculate the macroscopic Green tensor.
+Calculate the macroscopic Green tensor, macroscopic wave tensor,
+or dielectric tensor.
 
 =item L<Photonic::WE::R2::GreenP>
 
-Calculate the macroscopic Green tensor projected onto some direction.
-
-=item L<Photonic::WE::R2::GreenS>
-
-Calculates the macroscopic Green tensor assuming it is symmetric.
+Calculate projected onto some direction the macroscopic Green tensor,
+or macroscopic wave operator, or dielectric function.
 
 =item L<Photonic::WE::R2::Metric>
 
 Retarded metric tensor of binary metamaterial with a non-dissipative
 host.
-
-=item L<Photonic::WE::R2::Haydock>
-
-Calculate one Haydock coefficient.
-
-=item L<Photonic::WE::R2::Wave>
-
-Macroscopic wave tensor.
-
-=item L<Photonic::WE::R2::WaveP>
-
-Macroscopic wave operator projected into some direction.
 
 =back
 
@@ -340,15 +300,7 @@ dielectric function, using the spinor representation.
 
 =item L<Photonic::WE::S::Haydock>
 
-Obtain all the Haydock coefficients.
-
-=item L<Photonic::WE::S::EpsilonP>
-
-Calculate the dielectric function projected along some direction.
-
-=item L<Photonic::WE::S::EpsilonTensor>
-
-Calculate the dielectric tensor.
+Obtain one, or all, Haydock coefficients.
 
 =item L<Photonic::WE::S::Field>
 
@@ -356,28 +308,18 @@ Calculate the microscopic field.
 
 =item L<Photonic::WE::S::Green>
 
-Calculate the macroscopic Green tensor.
+Calculate the macroscopic Green tensor, macroscopic wave tensor, or
+dielectric tensor.
 
 =item L<Photonic::WE::S::GreenP>
 
-Calculate the macroscopic Green tensor projected onto some direction.
+Calculate projected onto some direction the macroscopic Green tensor,
+macroscopic wave operator, or dielectric function.
 
 =item L<Photonic::WE::S::Metric>
 
 Retarded metric tensor of binary metamaterial with a non-dissipative
 host.
-
-=item L<Photonic::WE::S::Haydock>
-
-Calculate one Haydock coefficient.
-
-=item L<Photonic::WE::S::Wave>
-
-Macroscopic wave tensor.
-
-=item L<Photonic::WE::S::WaveP>
-
-Macroscopic wave operator projected into some direction.
 
 =back
 
@@ -405,7 +347,6 @@ Investigaciones en Óptica, México C<bms@cio.mx>
 =item * Lucila Juárez-Reyes, Centro de Investigaciones en Óptica ,
 México, C<lucilajr@icf.unam.mx>
 
-
 =item * José Samuel Pérez-Huerta, Unidad Académica de Física,
 Universidad Autónoma de Zacatecas, México  C<jsperez@fisica.uaz.edu.mx>
 
@@ -414,9 +355,7 @@ Físicas, Universidad Nacional Autónoma de México and Centro de
 Investigación en Ciencias, Universidad Autónoma del Estado de
 Morelos, México C<merlynj@icf.unam.mx>
 
-
 =back
-
 
 =head1 ACKNOWLEDGMENTS
 
@@ -743,8 +682,6 @@ MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 The End
 
-
 =cut
-
 
 1;

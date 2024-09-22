@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/DateTime/Locale/FromCLDR.pm
-## Version v0.4.0
+## Version v0.4.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/07
-## Modified 2024/09/16
+## Modified 2024/09/18
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     # "If a given short metazone form is known NOT to be understood in a given locale and the parent locale has this value such that it would normally be inherited, the inheritance of this value can be explicitly disabled by use of the 'no inheritance marker' as the value, which is 3 simultaneous empty set characters (U+2205)."
     # <https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
     our $EMPTY_SET = "∅∅∅";
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.4.1';
 };
 
 use strict;
@@ -211,6 +211,7 @@ sub available_format_patterns
             if( $all && scalar( @$all ) )
             {
                 $ref = +{ map{ $_->{format_id} => $_->{format_pattern} } @$all };
+                last;
             }
         }
         $self->{available_format_patterns} = $ref;
@@ -1968,17 +1969,29 @@ sub pass_error
     return;
 }
 
+# sub prefers_24_hour_time
+# {
+#     my $self = shift( @_ );
+#     my $bool;
+#     unless( defined( $bool = $self->{prefers_24_hour_time} ) )
+#     {
+#         my $pat = $self->time_format_short;
+#         my @parts = split( /(?:'(?:(?:[^']|'')*)')/, $pat );
+#         $bool = $self->{prefers_24_hour_time} = scalar( grep( /h|K/, @parts ) ) ? 0 : 1;
+#     }
+#     return( $bool );
+# }
+
 sub prefers_24_hour_time
 {
     my $self = shift( @_ );
-    my $bool;
-    unless( defined( $bool = $self->{prefers_24_hour_time} ) )
-    {
-        my $pat = $self->time_format_short;
-        my @parts = split( /(?:'(?:(?:[^']|'')*)')/, $pat );
-        $bool = $self->{prefers_24_hour_time} = scalar( grep( /h|K/, @parts ) ) ? 0 : 1;
-    }
-    return( $bool );
+    my $pref = $self->time_format_preferred;
+    return( $self->pass_error ) if( !defined( $pref ) );
+    # 'H': 0-23
+    # 'k': 1-24
+    # 'h': 1-12
+    # 'K': 0-11
+    return( ( $pref eq 'H' || $pref eq 'k' ) ? 1 : 0 );
 }
 
 sub quarter_format_abbreviated { return( shift->_calendar_terms(
@@ -2132,7 +2145,14 @@ sub territory_info
 {
     my $self = shift( @_ );
     my $locale = $self->{locale} || die( "Locale is not set!" );
-    return( $self->_territory_info( locale => $locale ) );
+    my $info;
+    unless( defined( $info = $self->{territory_info} ) )
+    {
+        $info = $self->_territory_info( locale => $locale );
+        return( $self->pass_error ) if( !defined( $info ) );
+        $self->{territory_info} = $info;
+    }
+    return( $info );
 }
 
 sub time_format_allowed { return( shift->_time_formats( 'allowed', @_ ) ); }
@@ -3298,11 +3318,11 @@ sub _time_formats
     my $type = shift( @_ ) ||
         die( "Time format type was not provided." );
     die( "Unsupported type '${type}'. Use one of 'preferred' or 'allowed'." ) if( $type ne 'preferred' && $type ne 'allowed' );
-    my $code;
-    my $meth_id = "time_formats_${type}";
+    # May be undefined
+    my $code = shift( @_ );
+    my $meth_id = "time_formats_${type}_code=" . ( $code // 'undef' );
     my $pattern;
-    if( ( !scalar( @_ ) && !defined( $pattern = $self->{ $meth_id } ) ) ||
-        @_ )
+    if( !defined( $pattern = $self->{ $meth_id } ) )
     {
         my $map =
         {
@@ -3313,10 +3333,9 @@ sub _time_formats
         my $has_arg = 0;
         my $locale = $self->{locale} || die( "Locale value is gone!" );
         my $cldr = $self->{_cldr} || die( "Locale::Unicode::Data object is gone!" );
-        if( @_ )
+        if( defined( $code ) )
         {
             $code = shift( @_ );
-            $has_arg++;
         }
         else
         {
@@ -3372,7 +3391,7 @@ sub _time_formats
         }
         $pattern //= '';
         # $pattern = [split( /[[:blank:]\h]+/, $pattern )] if( $type eq 'time_allowed' );
-        $self->{ $meth_id } = $pattern unless( $has_arg );
+        $self->{ $meth_id } = $pattern;
     }
     return( $pattern );
 }
@@ -3965,7 +3984,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.1
 
 =head1 DESCRIPTION
 
@@ -5328,6 +5347,8 @@ Returns a string representing the number system for the C<locale>
 =head2 prefers_24_hour_time
 
 This checks whether the C<locale> prefers the 24H format or the 12H one and returns true (C<1>) if it prefers the 24 hours format or false (C<0>) otherwise.
+
+How it finds out? It pulls the preferred time format from the CLDR data by calling L<time_format_preferred|/time_format_preferred>, and from there returns true (1) if the value is either C<H> or C<k>, or else false (0).
 
 =head2 quarter_format_abbreviated
 

@@ -1,5 +1,5 @@
 package Photonic::LE::NP::Haydock;
-$Photonic::LE::NP::Haydock::VERSION = '0.021';
+$Photonic::LE::NP::Haydock::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NP::Haydock
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -43,7 +43,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -63,6 +63,8 @@ the calculation of the non retarded dielectric function of arbitrary
 periodic many component systems in arbitrary number of dimentions. One
 Haydock coefficient at a time. The starting state is homogenous.
 
+Warning: this module is fragile and depends on a particular initial state.
+
 Consumes L<Photonic::Roles::Haydock>, L<Photonic::Roles::EpsFromGeometry>
 - please see those for attributes.
 
@@ -74,7 +76,7 @@ These are provided for roles:
 
 =item * geometry
 
-A Photonic::Types::GeometryG0 object defining the geometry of the system,
+A L<Photonic::Types/GeometryG0> object defining the geometry of the system,
 the characteristic function and the direction of the G=0 vector. Required.
 
 =item * B ndims dims r G GNorm L scale f
@@ -100,6 +102,10 @@ square root of the inner product of the state with itself.
 
 Returns zero, as there is no need to change sign.
 
+=item * complexCoeffs
+
+Haydock coefficients are complex
+
 =back
 
 =cut
@@ -107,24 +113,19 @@ Returns zero, as there is no need to change sign.
 use namespace::autoclean;
 use PDL::Lite;
 use Carp;
-use Photonic::Types;
+use Photonic::Types -all;
 use Photonic::Utils qw(EProd any_complex apply_longitudinal_projection);
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use MooX::StrictConstructor;
 
-has 'geometry'=>(is=>'ro', isa => 'Photonic::Types::GeometryG0',
+has 'geometry'=>(is=>'ro', isa => GeometryG0,
     handles=>[qw(B ndims dims r G GNorm L scale f)],required=>1
 );
 has 'complexCoeffs'=>(is=>'ro', init_arg=>undef, default=>1,
 		      documentation=>'Haydock coefficients are complex');
 with 'Photonic::Roles::Haydock', 'Photonic::Roles::EpsFromGeometry';
 
-#don't allow initialization of next state, as this module is fragile
-#and depends on a particular initial state. Otherwise, use the
-#Roles::Haydock attribute.
-has '+next_state' =>(init_arg=>undef);
-
-sub _firstState { #\delta_{G0}
+sub _build_firstState { #\delta_{G0}
     my $self=shift;
     my $v=PDL->zeroes(@{$self->dims})->r2C; #nx, ny...
     my $arg=join ',', ("(0)") x ($self->B->ndims); #(0),(0),... ndims+1 times

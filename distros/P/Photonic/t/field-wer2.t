@@ -49,8 +49,8 @@ my $ml=Photonic::WE::R2::Metric->new(geometry=>$gl, epsilon=>$ea->re,
    wavenumber=>pdl(1), wavevector=>pdl([0.01]));
 my $haydock=Photonic::WE::R2::Haydock->new(metric=>$ml, nh=>10, keepStates=>1,
 				   polarization=>pdl([1])->r2C);
-my $flo=Photonic::WE::R2::Field->new(haydock=>$haydock, nh=>10);
-my $flv=$flo->evaluate($eb);
+my $flo=Photonic::WE::R2::Field->new(haydock=>$haydock, nh=>10, epsB=>$eb);
+my $flv=$flo->field;
 my $fla=1/$ea;
 my $flb=1/$eb;
 my $fproml=$fla*(1-$gl->f)+$flb*($gl->f);
@@ -65,7 +65,7 @@ my $mt=Photonic::WE::R2::Metric->new(geometry=>$gt, epsilon=>pdl(1),
    wavenumber=>pdl(0.001), wavevector=>pdl([0,0.0001]));
 my $nt=Photonic::WE::R2::Haydock->new(metric=>$mt, nh=>10, keepStates=>1,
 				   polarization=>pdl([1,0])->r2C);
-my $fto=Photonic::WE::R2::Field->new(haydock=>$nt, nh=>10);
-my $ftv=$fto->evaluate($eb);
+my $fto=Photonic::WE::R2::Field->new(haydock=>$nt, nh=>10, epsB=>$eb);
+my $ftv=$fto->field;
 my $ftx=r2C(pdl [1, 0]);
 ok(Cagree($ftv, $ftx), "1D trans field");

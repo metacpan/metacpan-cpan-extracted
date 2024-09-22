@@ -35,8 +35,8 @@ use PDL::NiceSlice;
 use Photonic::Geometry::FromEpsilon;
 use Photonic::WE::S::Metric;
 use Photonic::WE::S::Haydock;
-use Photonic::WE::S::EpsilonP;
-use Photonic::WE::S::EpsilonTensor;
+use Photonic::WE::S::GreenP;
+use Photonic::WE::S::Green;
 
 use Test::More;
 use lib 't/lib';
@@ -52,7 +52,7 @@ my $g=Photonic::Geometry::FromEpsilon
 my $m=Photonic::WE::S::Metric->new(
     geometry=>$g, epsilon=>pdl(1), wavenumber=>pdl(2e-5),
     wavevector=>pdl([1,0])*2.1e-5);
-my $et=Photonic::WE::S::EpsilonTensor->new(nh=>10, metric=>$m);
+my $et=Photonic::WE::S::Green->new(nh=>10, metric=>$m);
 my $etv=$et->epsilonTensor;
 ok(Cagree($etv->((0),(0)), 1/((1-$f)/$ea+$f/$eb)),
 			     "Long. perp. non retarded");
@@ -64,7 +64,7 @@ ok(Cagree($etv->((1),(0)), 0), "yx k perp");
 $m=Photonic::WE::S::Metric->new(
     geometry=>$g, epsilon=>pdl(1), wavenumber=>pdl(2e-5),
     wavevector=>pdl([0,1])*2.1e-5);
-$et=Photonic::WE::S::EpsilonTensor->new(nh=>10, metric=>$m);
+$et=Photonic::WE::S::Green->new(nh=>10, metric=>$m);
 $etv=$et->epsilonTensor;
 ok(Cagree($etv->((0),(0)), 1/((1-$f)/$ea+$f/$eb)),
 			     "Trans. perp. non retarded");
@@ -97,7 +97,7 @@ my $epstm=($pd/$q)**2;
 $m=Photonic::WE::S::Metric->new(
     geometry=>$g, epsilon=>pdl(1), wavenumber=>pdl($q),
     wavevector=>pdl([$pd,0]));
-$et=Photonic::WE::S::EpsilonTensor->new(nh=>1000, metric=>$m,
+$et=Photonic::WE::S::Green->new(nh=>1000, metric=>$m,
 						  reorthogonalize=>1);
 $etv=$et->epsilonTensor->((1),(1));
 ok(Cagree($epstm, $etv), "Epsilon agrees with transfer matrix");
@@ -123,14 +123,14 @@ $epstm=($pd/$q)**2;
 $m=Photonic::WE::S::Metric->new(
     geometry=>$g, epsilon=>pdl(1), wavenumber=>pdl($q),
     wavevector=>pdl([$pd,0]));
-$et=Photonic::WE::S::EpsilonTensor->new(nh=>1000, metric=>$m,
+$et=Photonic::WE::S::Green->new(nh=>1000, metric=>$m,
 						  reorthogonalize=>1);
 $etv=$et->epsilonTensor->((1),(1));
 ok(Cagree($epstm, $etv, 1e-4), "Epsilon agrees with transfer matrix. Complex case.");
 
 my $h=Photonic::WE::S::Haydock->new(nh=>1000, metric=>$m,
    polarization=>r2C(pdl [0,1]), reorthogonalize=>1);
-$et=Photonic::WE::S::EpsilonP->new(nh=>1000, haydock=>$h);
+$et=Photonic::WE::S::GreenP->new(nh=>1000, haydock=>$h);
 $etv=$et->epsilon;
 ok(Cagree($epstm, $etv, 1e-4), "Projected eps agrees with trans mat. Complex case.");
 

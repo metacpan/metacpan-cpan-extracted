@@ -1,5 +1,5 @@
 package Photonic::WE::R2::Field;
-$Photonic::WE::R2::Field::VERSION = '0.021';
+$Photonic::WE::R2::Field::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::Field
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -44,8 +44,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =head1 SYNOPSIS
 
    use Photonic::WE::R2::Field;
-   my $nrf=Photonic::WE::R2::Field->new(...);
-   my $field=$nrf->evaluate($epsB);
+   my $nrf=Photonic::WE::R2::Field->new(epsB=>$epsB);
+   my $field=$nrf->field;
 
 =head1 DESCRIPTION
 
@@ -53,46 +53,12 @@ Calculates the retarded electric field for a given fixed
 Photonic::Geometry structure and given dielectric functions of
 the components.
 
-=head1 METHODS
+Consumes L<Photonic::Roles::Field>
+- please see for attributes.
+
+=head1 ATTRIBUTES
 
 =over 4
-
-=item * new(haydock=>$haydock, nh=>$nh, smallE=>$smallE)
-
-Initializes the structure.
-
-$haydock Photonic::WE::R2::Haydock is a Haydock calculator for the
-structure, *initialized* with the flag keepStates=>1
-(Photonic::Types::HaydockSave, as defined in Photonic::Types).
-
-$nh is the maximum number of Haydock coefficients to use.
-
-$smallE is the criteria of convergence (default 1e-7) for
-Field calculations
-
-=item * evaluate($epsB)
-
-Returns the microscopic electric field for given
-dielectric functions of the host (which it gets from the Haydock
-calculator's epsilon) and the particle $epsB.
-
-=back
-
-=head1 ACCESSORS (read only)
-
-=over 4
-
-=item * haydock
-
-Photonic::WE::R2::Haydock structure
-
-=item * nh
-
-Maximum number of Haydock coefficients to use.
-
-=item * smallE
-
-Criteria of convergence. 0 means don't check.
 
 =item * epsA
 
@@ -101,64 +67,32 @@ calculator's epsilon.
 
 =item * epsB
 
-Dielectric function of componente B
+Dielectric function of component B
 
 =item * u
 
 Spectral variable
 
-=item * Es
-
-Array of field coefficients
-
-=item * filter
-
-optional reciprocal space filter
-
-=item * field
-
-real space field in format cartesian, nx, ny,...
-
 =back
 
-=begin Pod::Coverage
-
-=head2 BUILD
-
-=end Pod::Coverage
-
 =cut
-
 
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
 use Photonic::WE::R2::Haydock;
-use Photonic::Utils qw(cgtsv GtoR);
-use Photonic::Types;
-use Photonic::Iterator;
-use Moose;
-use MooseX::StrictConstructor;
+use Photonic::Utils qw(cgtsv GtoR linearCombineIt);
+use Photonic::Types -all;
+use Moo;
+use MooX::StrictConstructor;
 
-has 'haydock'=>(is=>'ro', isa=>'Photonic::Types::HaydockSave', required=>1,
-           documentation=>'Haydock recursion calculator');
-has 'Es'=>(is=>'ro', isa=>'ArrayRef[Photonic::Types::PDLComplex]', init_arg=>undef,
-           writer=>'_Es', documentation=>'Field coefficients');
-has 'filter'=>(is=>'ro', isa=>'PDL', predicate=>'has_filter',
-               documentation=>'Optional reciprocal space filter');
-has 'field'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
-           writer=>'_field', documentation=>'Calculated real space field');
-has 'nh' =>(is=>'ro', isa=>'Num', required=>1,
-	    documentation=>'Desired no. of Haydock coefficients');
-has 'smallH'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
-    	    documentation=>'Convergence criterium for Haydock coefficients');
-has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
-    	    documentation=>'Convergence criterium for use of Haydock coeff.');
-has 'epsA'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsA',
+with 'Photonic::Roles::Field';
+
+has 'epsA'=>(is=>'lazy', isa=>PDLComplex, init_arg=>undef,
     documentation=>'Dielectric function of host');
-has 'epsB'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsB',
+has 'epsB'=>(is=>'ro', isa=>PDLComplex, required=>1,
         documentation=>'Dielectric function of inclusions');
-has 'u'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_u',
+has 'u'=>(is=>'lazy', isa=>PDLComplex, init_arg=>undef,
     documentation=>'Spectral variable');
 
 sub BUILD {
@@ -166,15 +100,25 @@ sub BUILD {
     $self->haydock->run unless $self->haydock->iteration;
 }
 
-sub evaluate {
+sub _build_epsA {
     my $self=shift;
-    $self->_epsB(my $epsB=shift);
-    $self->_epsA(my $epsA=$self->haydock->epsilon->r2C);
-    $self->_u(my $u=1/(1-$epsB/$epsA));
+    $self->haydock->epsilon->r2C;
+}
+sub _build_u {
+    my $self=shift;
+    my $epsA=$self->epsA;
+    my $epsB=$self->epsB;
+    1/(1-$epsB/$epsA);
+}
+
+sub _build_field {
+    my $self=shift;
+    my $epsA=$self->epsA;
+    my $epsB=$self->epsB;
+    my $u=$self->u;
     my $as=$self->haydock->as;
     my $bs=$self->haydock->bs;
     my $cs=$self->haydock->cs;
-    my $stateit=$self->haydock->state_iterator;
     my $nh=$self->nh; #desired number of Haydock terms
     #don't go beyond available values.
     $nh=$self->haydock->iteration if $nh>$self->haydock->iteration;
@@ -189,17 +133,11 @@ sub evaluate {
     #coefficients of g^{-1}E
     my $giEs = cgtsv($subdiag, $diag, $supradiag, $rhs);
     #states are xy,nx,ny...
+    my $stateit=$self->haydock->states;
     #field is xy,nx,ny...
-    my @dims=$self->haydock->B->dims; # actual dims of space
-    my $ndims=@dims; # num. of dims of space
-    my $field_G=PDL->zeroes($ndims, @dims)->r2C;
-    #print $field_G->info, "\n";
+    my $ndims=$self->haydock->B->ndims; # num. of dims of space
     #field is cartesian, nx, ny...
-    for(my $n=0; $n<$nh; ++$n){
-	my $giE_G=$giEs->($n)*$stateit->nextval; #En ^G|psi_n>
-	$field_G+=$giE_G;
-    }
-    #
+    my $field_G=linearCombineIt($giEs, $stateit); #En ^G|psi_n>
     my $Es=$self->haydock->applyMetric($field_G);
     my $e_0=1/($Es->slice(":" . ",(0)" x $ndims)
 	       *$self->haydock->polarization->conj)->sumover;
@@ -209,9 +147,7 @@ sub evaluate {
     ##get cartesian out of the way, fourier transform, put cartesian.
     my $field_R=GtoR($Es, $ndims, 1);
     $field_R*=$self->haydock->B->nelem; #scale to have unit macroscopic field
-    #result is cartesian, nx, ny,...
-    $self->_field($field_R);
-    return $field_R;
+    return $field_R; #result is cartesian, nx, ny,...
 }
 
 __PACKAGE__->meta->make_immutable;

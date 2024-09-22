@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromImage2D;
-$Photonic::Geometry::FromImage2D::VERSION = '0.021';
+$Photonic::Geometry::FromImage2D::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Geometry::FromImage2D
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -70,12 +70,9 @@ inverted. Its size must be odd along both directions.
 $L is the size of the unit cell along the cartesian axes. By
 default, it is the number of pixels.
 
-$i controls whether the characteristic function ought to be
-inverted: 1 means invert, 0 don't invert. Default: 0
-
 =back
 
-=head1 ACCESSORS (read only)
+=head1 ATTRIBUTES
 
 =over 4
 
@@ -83,15 +80,12 @@ inverted: 1 means invert, 0 don't invert. Default: 0
 
 The filename containing the image
 
-=item * For the other accessors, see Photonic::Geometry
+=item * inverted
+
+Controls whether the characteristic function ought to be
+inverted: 1 means invert, 0 don't invert. Default: 0
 
 =back
-
-=begin Pod::Coverage
-
-=head2 BUILD
-
-=end Pod::Coverage
 
 =head1 SEE ALSO
 
@@ -101,8 +95,8 @@ L<Photonic::Roles::Geometry>
 =cut
 
 use namespace::autoclean;
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use MooX::StrictConstructor;
 
 BEGIN {
 # Put inoffensive path. Or else, PDL::IO::Pic fails in taint mode.
@@ -115,7 +109,7 @@ use Carp;
 
 has 'path' => ( is => 'ro', required => 1,
 	       documentation => 'File name of 2D monochrome image' );
-has 'B' => (is=>'ro', init_arg=>undef, lazy=>1, builder=>'_build_B' );
+has 'B' => (is=>'lazy', init_arg=>undef);
 has 'inverted' => (is=>'ro', default=> 0,
                documentation=>'Flag to invert black/white');
 

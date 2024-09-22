@@ -1,5 +1,5 @@
 package Photonic::Utils;
-$Photonic::Utils::VERSION = '0.021';
+$Photonic::Utils::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -33,40 +33,52 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 =cut
 
-
-# Collection of subroutines. Thus, no Moose
+# Collection of subroutines. Thus, no Moo
 require Exporter;
 @ISA=qw(Exporter);
 @EXPORT_OK=qw(vectors2Dlist tile RtoG GtoR
     HProd MHProd EProd VSProd SProd
-    linearCombineIt lentzCF any_complex tensor
+    corner_rotate mvN top_slice linearCombineIt lentzCF any_complex tensor
     make_haydock make_greenp
-    incarnate_as
+    cartesian_product dummyN triangle_coords incarnate_as
     wave_operator apply_longitudinal_projection make_dyads
     cgtsv lu_decomp lu_solve
 );
 use PDL::LiteF;
 use PDL::FFTW3;
 require PDL::MatrixOps;
-use Photonic::Iterator qw(nextval);
 use Carp;
 use Storable qw(dclone);
 require PDL::LinearAlgebra::Real;
 require PDL::LinearAlgebra::Complex;
+require List::Util;
 use warnings;
 use strict;
 
-sub linearCombineIt { #complex linear combination of states from iterator
-    my $coefficients=shift; #arrayref of complex coefficients
-    my $stateit=shift; #iterator of complex states
-    my $numCoeff=$coefficients->dim(-1);
-    my $result=r2C(0);
-    foreach(0..$numCoeff-1){
-	my $s=nextval($stateit);
-	croak "More coefficients than states in basis" unless defined $s;
-	$result = $result + $coefficients->slice($_)*$s;
-    }
-    return $result;
+sub top_slice :lvalue {
+    my ($pdl, $index) = @_;
+    my $slice_arg = join ',', (map ':', 1..($pdl->ndims-1)), $index;
+    $pdl->slice($slice_arg);
+}
+
+sub dummyN {
+  my ($pdl, $how_many, $where, $dim_size) = @_;
+  return $pdl if $how_many <= 0;
+  my $ndims=$pdl->ndims;
+  $where //= 0;
+  local $_;
+  $_ = !$_ ? 0 : $_ > 0 ? $_ : $ndims + $_ + 1 for $where;
+  $dim_size //= 1;
+  my @before = (':') x $where;
+  my $slice_arg = join ',', @before, ("*$dim_size")x$how_many;
+  $pdl->slice($slice_arg);
+}
+
+sub linearCombineIt { #complex linear combination of states
+    my ($coefficients, $states, $thread_dims)=@_;
+    $thread_dims //= 0;
+    $coefficients=dummyN($coefficients, $states->ndims-$coefficients->ndims);
+    ($coefficients*$states)->mv(-$thread_dims-1,0)->sumover;
 }
 
 sub any_complex {
@@ -78,21 +90,39 @@ sub wave_operator {
     lu_solve([lu_decomp($green)], r2C(PDL::MatrixOps::identity($nd)));
 }
 
+sub cartesian_product {
+  my ($s1, $s2) = @_;
+  my $ndims_target = List::Util::max(2, map $_->ndims, $s1, $s2);
+  $_ = dummyN($_, $ndims_target-$_->ndims) for grep $_->ndims < $ndims_target, $s1, $s2;
+  my ($nd1, $nd2) = map $_->ndims, $s1, $s2;
+  my @dims = $s1->dims;
+  $dims[-2] += $s2->dim(-2); # X1+X2
+  $dims[-1] *= $s2->dim(-1); # m*n
+  my $res = zeroes(@dims);
+  my ($res_mv, $s1_mv, $s2_mv) = map mvN($_, 0, $nd1-3, -1), $res, $s1, $s2; # now work with first 2 dims
+  $res->slice('0:'.($s1_mv->dim(-2)-1)) .= $s1_mv->dummy(2, $s2_mv->dim(-1))->clump(1,2);
+  $res->slice($s1_mv->dim(-2).':-1') .= $s2_mv->dummy(1, $s1_mv->dim(-1))->clump(1,2);
+  $res;
+}
+
+sub triangle_coords {
+  my ($n, $inc_diag) = @_;
+  my $x = xvals($n, $n);
+  my $y = yvals($n, $n);
+  my $mask = $inc_diag ? $x >= $y : $x > $y;
+  $mask->whichND->slice('-1:0');
+}
+
 sub tensor {
-    my ($data, $decomp, $nd, $dims, $after_cb) = @_;
-    my $backsub = lu_solve($decomp, $data);
-    $backsub = $after_cb->($backsub) if $after_cb;
+    my ($data, $decomp, $nd, $dims, $skip) = @_;
+    $skip //= 0;
+    my $backsub = lu_solve($decomp, mvN($data, 0, $skip-1, -1));
+    $backsub = mvN($backsub, -$skip, -1, 0) if $skip;
     my $tensor = PDL->zeroes(($nd) x $dims)->r2C;
-    my $n = 0;
-    my $slice_prefix = ':,' x ($dims-2);
-    for my $i(0..$nd-1){
-        for my $j($i..$nd-1){
-            my $bslice = $backsub->slice("($n)");
-            $tensor->slice("$slice_prefix($i),($j)") .= $bslice;
-            $tensor->slice("$slice_prefix($j),($i)") .= $bslice;
-            ++$n;
-        }
-    }
+    my $tensor_mv = mvN($tensor, 0, $dims-3, -1);
+    my $indexes = triangle_coords($nd, 1);
+    $tensor_mv->indexND($indexes) .= $backsub;
+    $tensor_mv->indexND($indexes->slice('-1:0')) .= $backsub;
     $tensor;
 }
 
@@ -110,15 +140,15 @@ sub make_haydock {
 sub _haydock_extra {
   my ($self, $u, $add_geom) = @_;
   my $obj = dclone($add_geom ? $self->geometry : $self->metric);
-  $obj->Direction0($u) if $add_geom; #add G0 direction
+  $obj = $obj->new(%$obj, Direction0=>$u) if $add_geom; #add G0 direction
   $add_geom ? (geometry=>$obj) : (metric=>$obj, polarization=>$u->r2C);
 }
 
 my @GREENP_PARAMS = qw(nh smallE);
 sub make_greenp {
-  my ($self, $class, $method) = @_;
+  my ($self, $class, $method, @extra_attributes) = @_;
   $method ||= 'haydock';
-  [ map incarnate_as($class, $self, \@GREENP_PARAMS, haydock=>$_),
+  [ map incarnate_as($class, $self, [ @GREENP_PARAMS, @extra_attributes ], haydock=>$_),
       @{$self->$method}
   ];
 }
@@ -128,17 +158,29 @@ sub incarnate_as {
   $class->new((map +($_ => $self->$_), @$with), @extra);
 }
 
+sub mvN {
+  my ($pdl, $start, $end, $to) = @_;
+  return $pdl if $end < $start; # before negative-adjustment
+  my $ndims=$pdl->ndims;
+  local $_;
+  $_ = !$_ ? 0 : $_ > 0 ? $_ : $ndims + $_ for $start, $end, $to;
+  my $length = $end - $start + 1;
+  confess "mvN: destination $to past end of $ndims-D ndarray\n" if $to > $ndims-1;
+  return $pdl if $length <= 0 or ($start <= $to and $to <= $end);
+  my @indices = 0..$ndims-1;
+  my @move_indices = splice @indices, $start, $length;
+  $to -= $length-1 if $start <= $to; # -1 as after if move to right
+  splice @indices, $to, 0, @move_indices;
+  $pdl->reorder(@indices);
+}
+
 sub HProd { #Hermitean product between two fields. skip first 'skip' dims
-    my $first=shift;
-    my $second=shift;
-    my $skip=shift//0;
-    my $ndims=$first->ndims;
-    confess "Dimensions should be equal, instead: first=", $first->info, " second=", $second->info
-	unless $ndims == $second->ndims;
+    my ($first, $second, $dims, $skip)=@_;
+    $skip//=0;
     my $prod=$first->conj*$second;
-    # clump all except skip dimensions, protecto index and sum.
-    $prod->reorder($skip..$ndims-1,0..$skip-1)->clump(-$skip-1)
-	->sumover;
+    # clump $dims dimensions, protecto index and sum.
+    my $moved=mvN($prod, 0, $skip-1, $skip+$dims-1);
+    ($dims ? $moved->clump($dims) : $moved)->sumover;
 }
 
 sub MHProd { #Hermitean product between two fields with metric. skip
@@ -156,8 +198,13 @@ sub MHProd { #Hermitean product between two fields with metric. skip
     my $mprod=($metric*$sliced)->sumover;
     die "Dimensions should be equal" unless $ndims == $mprod->ndims;
     my $prod=$first->conj*$mprod;
-    $prod->reorder($skip..$ndims-1,0..$skip-1)->clump(-$skip-1)
-	->sumover;
+    mvN($prod, 0, $skip-1, -1)->clump(-$skip-1)->sumover;
+}
+
+sub corner_rotate {
+  my ($pdl, $start, $end) = @_;
+  $pdl = $pdl->mv($_,0)->rotate(1)->mv(0,$_) for $start..$end;
+  $pdl;
 }
 
 sub EProd { #Euclidean product between two fields in reciprocal
@@ -172,15 +219,10 @@ sub EProd { #Euclidean product between two fields in reciprocal
     my $sl=join ',',
 	((":") x $skip), #skip dimensions
 	(("-1:0") x ($ndims-$skip)); #and reverse the rest
-    my $first_mG=$first->slice($sl);
-    #Then rotate psi_{G=0} to opposite corner with coords. (0,0,...)
-    foreach($skip..$ndims-1){
-	$first_mG=$first_mG->mv($_,0)->rotate(1)->mv(0,$_);
-    }
-    my $prod=$first_mG*$second;
+    my $first_mG=corner_rotate($first->slice($sl), $skip, $ndims-1); #rotate psi_{G=0} to opposite corner with coords. (0,0,...)
+    my $prod=$first_mG*$second; #s1:s2:nx:ny
     # clump all except skip dimensions, protecto index and sum.
-    $prod #s1:s2:nx:ny
-	->reorder($skip..$ndims-1,0..$skip-1) #nx:ny:s1:s2
+    mvN($prod, 0, $skip-1, -1) #nx:ny:s1:s2
 	->clump(-$skip-1) #nx*ny:s1:s2
 	->sumover; #s1:s2
 }
@@ -200,14 +242,10 @@ sub SProd { #Spinor product between two fields in reciprocal
 	((":") x $skip), #keep skip dimensions
 	(("-1:0") x ($ndims-1-$skip)); #and reverse G indices
     my $first_mG=$first->slice($sl); #pmk,s1,s2,nx,ny
-    #Then rotate psi_{G=0} to opposite corner with coords. (0,0,...)
-    foreach($skip+1..$ndims-1){
-	$first_mG=$first_mG->mv($_,0)->rotate(1)->mv(0,$_);
-    }
+    $first_mG=corner_rotate($first_mG, $skip+1, $ndims-1); #rotate psi_{G=0} to opposite corner with coords. (0,0,...)
     my $prod=$first_mG*$second; #pmk,s1,s2,nx,ny
     # clump all except skip dimensions, protect sum.
-    $prod #pmk, s1,s2,nx,ny
-	->reorder($skip+1..$ndims-1,0..$skip) #nx,ny,pmk,s1,s2
+    mvN($prod, 0, $skip, -1) #nx,ny,pmk,s1,s2
 	->clump(-$skip-1)  #nx*ny*pmk, s1, s2
 	->sumover; #s1, s2
 }
@@ -225,14 +263,10 @@ sub VSProd { #Vector-Spinor product between two vector fields in reciprocal
 	"-1:0", #interchange spinor components +- to -+
 	(("-1:0") x ($ndims-2)); #and reverse G indices
     my $first_mG=$first->slice($sl); #xy:pm:nx:ny
-    #Then rotate psi_{G=0} to opposite corner with coords. (0,0,...)
-    foreach(2..$ndims-1){ # G indices start after xy:pm
-	$first_mG=$first_mG->mv($_,0)->rotate(1)->mv(0,$_);
-    }
+    $first_mG=corner_rotate($first_mG, 2, $ndims-1); #rotate psi_{G=0} to opposite corner with coords. (0,0,...)
     my $prod=$first_mG*$second; #xy:pm:nx:ny
     # clump all except xy.
-    $prod #xy:pm::nx:ny
-	->reorder(2..$ndims-1,0,1) #nx:ny:xy:pm
+    $prod->mv(0, -1) #nx:ny:xy:pm
 	->clump(-1)  #nx*ny*xy*pm
 	->sumover;
 }
@@ -242,12 +276,9 @@ sub RtoG { #transform a 'complex' scalar, vector or tensorial field
     my $field=shift; #field to fourier transform
     my $ndims=shift; #number of dimensions to transform
     my $skip=shift; #dimensions to skip
-    my $moved=$field;
-    $moved=$moved->mv(0,-1) foreach(0..$skip-1);
+    my $moved=mvN($field, 0, $skip-1, -1);
     my $transformed=fftn($moved, $ndims);
-    my $result=$transformed;
-    $result=$result->mv(-1,0) foreach(0..$skip-1);
-    return $result;
+    $skip ? mvN($transformed, -$skip, -1, 0) : $transformed;
 }
 
 sub GtoR { #transform a 'complex' scalar, vector or tensorial field from
@@ -255,12 +286,9 @@ sub GtoR { #transform a 'complex' scalar, vector or tensorial field from
     my $field=shift; #field to fourier transform
     my $ndims=shift; #number of dimensions to transform
     my $skip=shift; #dimensions to skip
-    my $moved=$field;
-    $moved=$moved->mv(0,-1) foreach(0..$skip-1);
+    my $moved=mvN($field, 0, $skip-1, -1);
     my $transformed=ifftn($moved, $ndims);
-    my $result=$transformed;
-    $result=$result->mv(-1,0) foreach(0..$skip-1);
-    return $result;
+    $skip ? mvN($transformed, -$skip, -1, 0) : $transformed;
 }
 
 sub lentzCF {
@@ -311,11 +339,11 @@ sub vectors2Dlist { #2D vector fields ready for gnuploting
     my $f=shift; #vector field
     my $s=shift; #scale
     my $d=shift; #decimation
-    my $f1=$s*$f->slice(":,0:-1:$d, 0:-1:$d"); #decimate two dimensions
-    my $coords=$d*PDL::ndcoords(@{[$f1->dims]}[1,2]);
+    my $f1=$s*$f->mv(0,-1)->slice("0:-1:$d, 0:-1:$d"); #decimate two dimensions
+    my $coords=$d*PDL::ndcoords(($f1->dims)[0,1])->mv(0,-1);
     ( #basex, basey, vectorx vectory
-	($coords-.5*$f1)->mv(0,-1)->clump(-2)->dog,
-	$f1->mv(0,-1)->clump(-2)->dog);
+	($coords-.5*$f1)->clump(-2)->dog,
+	$f1->clump(-2)->dog);
 }
 
 sub cgtsv {
@@ -383,22 +411,14 @@ sub make_dyads {
     my ($nd, $unitPairs) = @_;
     my $ne = $nd*($nd+1)/2; #number of symmetric matrix elements
     my $matrix = PDL->zeroes($ne, $ne);
-    my $n = 0; #run over vector pairs
-    for my $i (0..$nd-1) {
-        for my $j ($i..$nd-1) {
-            my $m = 0; #run over components of dyads
-            for my $k (0..$nd-1) {
-                for my $l ($k..$nd-1) {
-                    my $factor = $k == $l?1:2;
-                    $matrix->slice("($m),($n)") .= #pdl order!
-                        $factor*$unitPairs->slice("($k),($n)") *
-                        $unitPairs->slice("($l),($n)");
-                    ++$m;
-                }
-            }
-            ++$n;
-        }
-    }
+    my $indexes = triangle_coords($nd, 1); # col0,col1=x,y
+    my $i_plus_seq = cartesian_product($indexes, sequence($ne)); # col2=seq
+    $i_plus_seq = cartesian_product($i_plus_seq, ones(2, 1)); # col3,4=ones
+    $i_plus_seq->slice('(3)') .= sequence($ne)->dummy(1, $ne)->clump(-1); # col3=sequence of coords
+    $i_plus_seq->slice('(4)') += $i_plus_seq->slice('(0)') != $i_plus_seq->slice('(1)'); # col4=factor
+    $matrix->indexND($i_plus_seq->slice('3:2')) .=
+      $i_plus_seq->slice('(4)')*$unitPairs->indexND($i_plus_seq->dice([0,2])) *
+      $unitPairs->indexND($i_plus_seq->slice('1:2'));
     return $matrix;
 }
 
@@ -413,7 +433,7 @@ Photonic::Utils
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -428,15 +448,57 @@ Utility functions that may be useful.
 
 =over 4
 
-=item * $r=linearCombineIt($c, $it)
+=item * $slice=top_slice($pdl, $slice_arg)
 
-Complex linear combination of states from iterator. $c is a 'complex'
-ndarray and $it is an iterator for the corresponding states.
+Applies the given C<$slice_arg> to the highest dimension of the given
+ndarray.
 
-=item * $p=HProd($a, $b, $skip)
+=item * $pdl=dummyN($pdl, $how_many, $where, $dim_size)
+
+  dummyN(sequence(2, 3), 3, 0, 4) # dims: 4, 4, 4, 2, 3
+  dummyN(sequence(2, 3), 3, 1, 4) # dims: 2, 4, 4, 4, 3
+  dummyN(sequence(2, 3), 3, -1, 4) # dims: 2, 3, 4, 4, 4
+  dummyN(sequence(2, 3), 3, -2, 4) # dims: 2, 4, 4, 4, 3
+
+Adds C<$how_many> (no-op if <= 0) dummy dimensions of size C<$dim_size>
+(default 1) in the C<$which_dim> (default 0) position.
+
+=item * $r=linearCombineIt($c, $it, $thread_dims)
+
+Complex linear combination of states. $c is a 'complex'
+ndarray and $it is an ndarray of states from a L<Photonic::Roles::Haydock>.
+$thread_dims is the quantity of dimensions over which this is threaded.
+
+=item * $reordered=mvN($pdl, $start, $end, $to)
+
+  mvN(sequence(1,2,3,4,5,6), 1, 2, -1) # dims 1,4,5,6,2,3
+
+Reorder given ndarray's dimensions, moving dimensions starting C<$start>
+and ending C<$end> (no-op if less than C<$start> before
+negative-adjustment).
+
+They are moved to after the current C<$to> if C<$start> is less than
+C<$to> (i.e. moving dims to right), and before if greater. This is
+like L<PDL::Slices/mv>, and intuitive if superficially odd. If C<$to>
+is between C<$start> and C<$end> inclusive, it is a no-op.
+
+Negative-adjustment: like L<PDL::Slices/mv>, all parameters may be
+negative, which is treated relative to the end of the dimension-list.
+
+=item * $pdl=corner_rotate($pdl, $start, $end)
+
+Rotates each dimension from C<$start> to C<$end> by 1, to opposite corner.
+
+=item * $pdl=triangle_coords($n, $include_diag)
+
+Returns ndarray of coordinates of the lower triangle of a square $n*$n
+matrix, either with or without the diagonal. Ordered by column, then row.
+
+=item * $p=HProd($a, $b, $dims, $skip)
 
 Hermitean product <a|b> of two 'complex' multidimensional
-pdls $a and $b. If $skip is present, preserve the first $skip
+pdls $a and $b. Only sums over $dims dimensions, allowing threading.
+If $skip is present, preserve the first $skip
 dimensions before adding up.
 
 =item * $p=MHProd($a, $b, $m, $skip)
@@ -500,6 +562,13 @@ are centered on the decimated lattice points.
 =item * any_complex
 
 True if any of the args are a complex PDL.
+
+=item * cartesian_product
+
+Given two ndarrays a(Z,x1,m), b(Z,x2,n), return c(Z,x1+x2,m*n), with
+each row from C<b> appended to all rows from C<a>. C<Z> can be empty
+but must be compatible; the shorter one will be "dummied up" from the
+zero end as necessary.
 
 =item * tensor
 

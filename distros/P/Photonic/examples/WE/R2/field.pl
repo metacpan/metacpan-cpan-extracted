@@ -64,8 +64,8 @@ my $m=Photonic::WE::R2::Metric->new(geometry=>$circle, epsilon=>$epsA,
 my $nr=Photonic::WE::R2::Haydock->new(metric=>$m,keepStates=>1,
 					polarization=>$pdir->r2C, nh=>$nh);
 #my $nr=Photonic::WE::R2::Haydock->new(geometry=>$circle,nh=>$nh,keepStates=>1);
-my $nrf=Photonic::WE::R2::Field->new(haydock=>$nr, nh=>$nh, smallE=>$small);
-my $field=$nrf->evaluate($epsB);
+my $nrf=Photonic::WE::R2::Field->new(haydock=>$nr, nh=>$nh, epsB=>$epsB);
+my $field=$nrf->field;
 say $field->info;
 
 my $wf=gpwin('x11', size=>[8,8],persist=>1,wait=>60); #initialice windows

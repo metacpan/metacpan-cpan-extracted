@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromB;
-$Photonic::Geometry::FromB::VERSION = '0.021';
+$Photonic::Geometry::FromB::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -35,10 +35,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 
 use namespace::autoclean;
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use Photonic::Types -all;
 
-has 'B' =>(is=>'ro', isa=>'PDL', required=>1,
+has 'B' =>(is=>'ro', isa=>PDLObj, required=>1,
 	   documentation=>'Characteristic function');
 
 with 'Photonic::Roles::Geometry';
@@ -55,7 +55,7 @@ Photonic::Geometry::FromB
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -81,10 +81,6 @@ Consumes L<Photonic::Roles::Geometry>. Please see it for attributes.
 
 Creates a new Ph::G::FromB object
 
-$pdl is a boolean array with 1's and 0's representing the characteristic
-function within the unit cell. Its dimensions must be odd. Its number
-of dimensions is the dimension of space
-
 $L is the size of the unit cell along the cartesian axes. By
 default, it is the number of pixels.
 
@@ -93,6 +89,14 @@ lattice. $units(i,n) is the i-th coordinate of the n-th basis
 vector. By default, it is given by the cartesian directions.
 
 =back
+
+=head1 ATTRIBUTES
+
+=head2 B
+
+Characteristic function: a boolean array with 1's and 0's representing
+the characteristic function within the unit cell. Its dimensions must
+be odd. Its number of dimensions is the dimension of space
 
 =head1 SEE ALSO
 

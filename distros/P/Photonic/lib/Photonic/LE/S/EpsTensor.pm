@@ -1,5 +1,5 @@
 package Photonic::LE::S::EpsTensor;
-$Photonic::LE::S::EpsTensor::VERSION = '0.021';
+$Photonic::LE::S::EpsTensor::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::S::EpsTensor
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -63,8 +63,8 @@ L<Photonic::Roles::UseMask>, L<Photonic::Roles::EpsFromGeometry>
 use namespace::autoclean;
 use Photonic::LE::S::Haydock;
 use Photonic::LE::S::EpsL;
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use MooX::StrictConstructor;
 
 has allh_class=>(is=>'ro', default=>'Photonic::LE::S::Haydock');
 has allh_attrs=>(is=>'ro', default=>sub{[qw(reorthogonalize use_mask mask)]});

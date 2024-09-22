@@ -31,14 +31,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 use strict;
 use warnings;
 use PDL;
-use Photonic::Iterator;
 
 use Test::More;
 use lib 't/lib';
 use TestUtils;
 
 my $fn = make_fn();
-make_default_store($fn);
 
 {
     #Check haydock coefficients for simple 1D system
@@ -47,20 +45,11 @@ make_default_store($fn);
     my $ad=Photonic::LE::NR2::Haydock->new(
 	geometry=>$g, nh=>10, stateFN=>$fn, keepStates=>1);
     $ad->run;
-    my $itd=$ad->state_iterator;
-    is $itd->iterator, $itd;
+    my $itd=$ad->states;
     my $am=Photonic::LE::NR2::Haydock->new(geometry=>$g, nh=>10, keepStates=>1);
     $am->run;
-    my $itm=$am->state_iterator;
-    my $n=0;
-    while(defined(my $d=$itd->nextval)){
-	ok(defined(my $m=$itm->nextval),
-	   "State $n defined in memory and disk. 1D long.");
-	ok(Cagree($d, $m), "State $n in memory agree with disk. 1D long.");
-	++$n;
-    }
-    ok(!defined(my $m=$itm->nextval),
-	"Same num. of states in memory and disk. 1D long");
+    my $itm=$am->states;
+    ok(Cagree($itd, $itm), "States in memory agree with disk. 1D long.");
 }
 {
     #Check haydock coefficients for simple 1D system
@@ -69,18 +58,10 @@ make_default_store($fn);
     my $ad=Photonic::LE::NR2::Haydock->new(
 	geometry=>$g, nh=>10, stateFN=>$fn, keepStates=>1);
     $ad->run;
-    my $itd=$ad->state_iterator;
+    my $itd=$ad->states;
     my $am=Photonic::LE::NR2::Haydock->new(geometry=>$g, nh=>10, keepStates=>1);
     $am->run;
-    my $itm=$am->state_iterator;
-    my $n=0;
-    while(defined(my $d=$itd->nextval)){
-	ok(defined(my $m=$itm->nextval),
-	   "State $n defined in memory and disk. 1D trans.");
-	ok(Cagree($d, $m), "State $n in memory agree with disk. 1D trans.");
-	++$n;
-    }
-    ok(!defined(my $m=$itm->nextval),
-	"Same num. of states in memory and disk. 1D trans.");
+    my $itm=$am->states;
+    ok(Cagree($itd, $itm), "States in memory agree with disk. 1D trans.");
 }
 done_testing;

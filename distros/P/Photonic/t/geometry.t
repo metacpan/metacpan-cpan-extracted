@@ -64,7 +64,7 @@ ok(agree($g->G->(:,(6),(6)), pdl(-5*2*$pi/11,-5*2*$pi/11)),
 ok(agree($gl->G->(:,(6),(6)), pdl(-5*2*$pi,-5*2*$pi)),
    "Reciprocal vector beyond center");
 ok(!$g->has_Direction0, "False Direction0 predicate");
-$g->Direction0(pdl(1,0)); #set direction 0
+$g=Photonic::Geometry::FromB->new(B=>$B,Direction0=>pdl(1,0)); #set direction 0
 ok($g->has_Direction0, "True Direction0 predicate");
 ok(agree($g->GNorm->(:,(0),(0)),pdl(1,0)), "Normalized G=0 reciprocal vector");
 ok(agree($g->GNorm->(:,(5),(5)),pdl(1,1)/sqrt(2)),
@@ -94,20 +94,21 @@ ok(agree($g->Vec2LC_G(zeroes(11,11)->ndcoords->r2C)->re,
    "Vec2LC");
 ok(agree($g->LC2Vec_G(ones(11,11)->r2C)->re, $g->GNorm), "LC2Vec_G");
 
-skip "image converter not found", 5 unless rpiccan("PNG");
-my $gw=Photonic::Geometry::FromImage2D->new(path=>'data/white.png');
-ok(defined $gw, "Create geometry from Image");
-ok(all($gw->B==ones(11, 11)), "lazy-build B");
-ok($gw->npoints==11*11, "npoints");
-ok($gw->f==1, "filling fraction of white");
-my $gb=Photonic::Geometry::FromImage2D->new(path=>'data/black.png');
-ok($gb->f==0, "filling fraction of black");
-my $gbi=Photonic::Geometry::FromImage2D->new(
-path=>'data/black.png', inverted=>1);
-ok($gbi->f==1, "filling fraction of inverted black");
-my $gh=Photonic::Geometry::FromImage2D->new(path=>'data/half.png');
-ok($gh->f==0.5, "filling fraction of half/half");
-
+SKIP: {
+     skip "image converter not found", 7 unless rpiccan("PNG");
+     my $gw=Photonic::Geometry::FromImage2D->new(path=>'data/white.png');
+     ok(defined $gw, "Create geometry from Image");
+     ok(all($gw->B==ones(11, 11)), "lazy-build B");
+     ok($gw->npoints==11*11, "npoints");
+     ok($gw->f==1, "filling fraction of white");
+     my $gb=Photonic::Geometry::FromImage2D->new(path=>'data/black.png');
+     ok($gb->f==0, "filling fraction of black");
+     my $gbi=Photonic::Geometry::FromImage2D->new(
+     path=>'data/black.png', inverted=>1);
+     ok($gbi->f==1, "filling fraction of inverted black");
+     my $gh=Photonic::Geometry::FromImage2D->new(path=>'data/half.png');
+     ok($gh->f==0.5, "filling fraction of half/half");
+}
 my $eps=r2C(zeroes(11,11));
 my $ge=Photonic::Geometry::FromEpsilon->new(epsilon=>$eps);
 ok(defined $ge, "Create geometry from epsilon");

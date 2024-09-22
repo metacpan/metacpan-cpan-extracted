@@ -1,5 +1,5 @@
 package Photonic::WE::R2::GreenP;
-$Photonic::WE::R2::GreenP::VERSION = '0.021';
+$Photonic::WE::R2::GreenP::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::GreenP
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -44,71 +44,73 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =head1 SYNOPSIS
 
    use Photonic::WE::R2::GreenP;
-   my $green=Photonic::WE::R2::GreepP(haydock=>$h, nh=>$nh);
-   my $greenProjection=$green->evaluate($epsB);
+   my $green=Photonic::WE::R2::GreepP->new(haydock=>$h, nh=>$nh, epsB=>$epsB);
+   my $greenProjection=$green->Gpp;
+   my $WaveProjection=$green->waveOperator;
+   my $EpsP=$green->epsilon;
 
 =head1 DESCRIPTION
 
 Calculates the macroscopic Green's function projected along some direction.
 Based on the wave equation for a binary metamaterial, with a non-dissipative host.
 
-=head1 METHODS
-
-=over 4
-
-=item * new(haydock=>$h, nh=>$nh, smallE=>$smallE)
-
-Initializes the structure.
-
-$h is a Photonic::WE::R2::Haydock structure (required).
-
-$nh is the maximum number of Haydock coefficients to use (required).
-
-$smallE is the criteria of convergence (defaults to 1e-7)
-
-=item * evaluate($epsB)
-
-Returns the macroscopic projected green'S function for a given complex
-value of the  dielectric functions of the particle $epsB.
-
-=back
-
-=head1 ACCESSORS (read only)
+=head1 ATTRIBUTES
 
 =over 4
 
 =item * haydock
 
-The WE::R2::Haydock structure
-
-=item * epsA epsB
-
-The dielectric functions of component A and component B used in the
-last calculation.
-
-=item * u
-
-The spectral variable used in the last calculation
-
-=item * Gpp
-
-The projected Green's function of the last calculation.
+Photonic::WE::R2::Haydock structure (required).
 
 =item * nh
 
-The maximum number of Haydock coefficients to use.
+Maximum number of Haydock coefficients to use (required).
 
-=item * nhActual
+=item * epsB
 
-The actual number of Haydock coefficients used in the last calculation
-
-=item * converged
-
-Flags that the last calculation converged before using up all coefficients
+The dielectric functions of component B (required)
 
 =item * smallE
 
-Criteria of convergence. 0 means don't check.
+criteria of convergence (defaults to 1e-7)
+
+=item * epsA
+
+The dielectric functions of component A, got from the Haydock's epsilon
+
+=item * u
+
+The spectral variable from the calculation
+
+=item * Gpp
+
+Returns the macroscopic projected Green's function for a given complex
+value of the dielectric functions of the particle C<epsB>.
+
+=item * nhActual
+
+The actual number of Haydock coefficients used in the calculation
+
+=item * converged
+
+Flags that the calculation converged before using up all coefficients
+
+=item * waveOperator
+
+Returns the macroscopic wave operator for a given value of the
+dielectric functions of the particle C<epsB>. The host's
+response C<epsA> is taken from the metric.
+
+NOTE: Only works along principal directions, as it treats Green's
+function as scalar.
+
+=item * epsilon
+
+Returns the macroscopic dielectric component for a given value of the
+dielectric function of the particle C<epsB>. The host's
+response C<epsA> is taken from the Haydock structure.
+
+NOTE: Only works for polarizations along principal directions.
 
 =back
 
@@ -124,41 +126,43 @@ use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
 use Photonic::WE::R2::Haydock;
-use Photonic::Types;
+use Photonic::Types -all;
 use Photonic::Utils qw(lentzCF);
 use List::Util qw(min);
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use MooX::StrictConstructor;
 
-has 'nh' =>(is=>'ro', isa=>'Num', required=>1,
+has 'nh' =>(is=>'ro', isa=>Num, required=>1,
 	    documentation=>'Desired no. of Haydock coefficients');
-has 'smallH'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
-    	    documentation=>'Convergence criterium for Haydock coefficients');
-has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
+has 'smallE'=>(is=>'ro', isa=>Num, required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for use of Haydock coeff.');
-has 'epsA'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsA',
+has 'epsA'=>(is=>'ro', isa=>PDLComplex, init_arg=>undef, writer=>'_epsA',
     documentation=>'Dielectric function of host');
-has 'epsB'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsB',
+has 'epsB'=>(is=>'ro', isa=>PDLComplex, required=>1,
         documentation=>'Dielectric function of inclusions');
-has 'u'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_u',
+has 'u'=>(is=>'ro', isa=>PDLComplex, init_arg=>undef, writer=>'_u',
     documentation=>'Spectral variable');
 
-has 'haydock' =>(is=>'ro', isa=>'Photonic::WE::R2::Haydock', required=>1);
-has 'Gpp'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_Gpp');
-has 'nhActual'=>(is=>'ro', isa=>'Num', init_arg=>undef,
+has 'haydock' =>(is=>'ro', isa=>InstanceOf['Photonic::WE::R2::Haydock'], required=>1);
+has 'Gpp'=>(is=>'lazy', isa=>PDLComplex, init_arg=>undef);
+has 'nhActual'=>(is=>'ro', isa=>Num, init_arg=>undef,
                  writer=>'_nhActual');
-has 'converged'=>(is=>'ro', isa=>'Num', init_arg=>undef, writer=>'_converged');
+has 'converged'=>(is=>'ro', isa=>Bool, init_arg=>undef, writer=>'_converged');
+has 'waveOperator' =>  (is=>'lazy', isa=>PDLComplex, init_arg=>undef,
+             documentation=>'Wave operator from last evaluation');
+has 'epsilon' =>  (is=>'lazy', isa=>PDLComplex, init_arg=>undef,
+             documentation=>'Wave projection from evaluation');
 
 sub BUILD {
     my $self=shift;
     $self->haydock->run unless $self->haydock->iteration;
 }
 
-sub evaluate {
+sub _build_Gpp {
     my $self=shift;
     my $h = $self->haydock;
-    $self->_epsA(my $epsA=$h->epsilon->r2C);
-    $self->_epsB(my $epsB=shift);
+    my $epsA=$h->epsilon->r2C;
+    my $epsB=$self->epsB;
     $self->_u(my $u=1/(1-$epsB/$epsA));
     my $as=PDL::r2C($h->as);
     my $bcs=PDL::r2C($h->bcs);
@@ -173,8 +177,27 @@ sub evaluate {
     $self->_converged($n<$min || $h->iteration<=$self->nh);
     $self->_nhActual($n);
     my $g0b02=$h->gs->slice("(0)")*$h->b2s->slice("(0)");
-    $self->_Gpp($u*$g0b02/($epsA*$fn));
-    return $self->Gpp;
+    $u*$g0b02/($epsA*$fn);
+}
+
+sub _build_waveOperator {
+    1/shift->Gpp; #only works along principal directions!!
+};
+
+sub _build_epsilon {
+    my $self=shift;
+    my $wave=$self->waveOperator;
+    my $q=$self->haydock->metric->wavenumber;
+    my $q2=$q*$q;
+    my $k=$self->haydock->metric->wavevector;
+    my $k2=$k->inner($k);
+    #my $kk=$k->outer($k);
+    my $p=$self->haydock->normalizedPolarization;
+    #Note $p->inner($p) might be complex, so is not necessarily 1.
+    my $p2=($p*$p)->sumover;
+    my $pk=($p*$k)->sumover;
+    my $proj=$p2*$k2/$q2 - $pk*$pk/$q2;
+    $wave+$proj;
 }
 
 __PACKAGE__->meta->make_immutable;

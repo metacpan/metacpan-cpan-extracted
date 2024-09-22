@@ -1,5 +1,5 @@
 package Photonic::WE::S::Metric;
-$Photonic::WE::S::Metric::VERSION = '0.021';
+$Photonic::WE::S::Metric::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::Metric
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -86,19 +86,18 @@ use PDL::Lite;
 use PDL::MatrixOps;
 use PDL::NiceSlice;
 use Carp;
-use Photonic::Types;
+use Photonic::Types -all;
 use Photonic::Utils qw(any_complex);
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use MooX::StrictConstructor;
 
 # Later make it complex
-has 'value'     => (is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-                   builder=>'_value',
+has 'value'     => (is=>'lazy', isa=>PDLObj, init_arg=>undef,
                    documentation=>'Metric tensor');
 
 with 'Photonic::Roles::Metric';
 
-sub _value {
+sub _build_value {
     # Evaluate the metric tensor. Eq. MQ83.
     my $self = shift;
     my $G=$self->G; #reciprocal lattice;

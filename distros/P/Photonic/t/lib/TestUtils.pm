@@ -37,7 +37,9 @@ sub make_default_store {
 sub agree {
     my $a=shift;
     my $b=shift//0;
-    return (($a-$b)*($a-$b))->sum<=1e-7;
+    my $ret = (($a-$b)*($a-$b))->sum<=1e-7;
+    Test::More::diag("different a=$a, b=$b") if !$ret;
+    $ret;
 }
 
 sub Cagree {

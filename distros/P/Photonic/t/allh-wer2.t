@@ -39,7 +39,6 @@ use lib 't/lib';
 use TestUtils;
 
 my $fn = make_fn();
-make_default_store($fn);
 
 #Check haydock coefficients for simple 1D system
 my $B=zeroes(11)->xvals<5; #1D system

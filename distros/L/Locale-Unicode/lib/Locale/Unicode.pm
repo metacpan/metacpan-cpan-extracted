@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.3.6
+## Version v0.3.7
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/08/16
+## Modified 2024/09/22
 ## All rights reserved
 ## 
 ## 
@@ -29,7 +29,7 @@ BEGIN
     );
     use overload (
         '""'    => 'as_string',
-        bool    => sub{ $_[0] },
+        bool    => sub{1},
         fallback => 1,
     );
     use Scalar::Util ();
@@ -407,7 +407,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.3.6';
+    our $VERSION = 'v0.3.7';
 };
 
 use strict;
@@ -3910,6 +3910,22 @@ Locale::Unicode - Unicode Locale Identifier compliant with BCP47 and CLDR
         say "Oops: ", $e->message;
     }
 
+Or, you could set the global variable C<$FATAl_EXCEPTIONS> instead:
+
+    use v5.34;
+    use experimental 'try';
+    no warnings 'experimental';
+    $Locale::Unicode::FATAl_EXCEPTIONS = 1;
+    try
+    {
+        my $locale = Locale::Unicode->new( 'x' );
+        # More code
+    }
+    catch( $e )
+    {
+        say "Oops: ", $e->message;
+    }
+
 This API detects when methods are called in object context and return the current object:
 
     $locale->translation( 'my-software' )->tz( 'jptyo' )->ca( 'japanese' )
@@ -3921,7 +3937,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.3.6
+    v0.3.7
 
 =head1 DESCRIPTION
 

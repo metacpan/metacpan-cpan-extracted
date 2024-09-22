@@ -1,5 +1,5 @@
 package Photonic::WE::R2::Metric;
-$Photonic::WE::R2::Metric::VERSION = '0.021';
+$Photonic::WE::R2::Metric::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::Metric
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -86,16 +86,16 @@ use PDL::Lite;
 use PDL::MatrixOps;
 use PDL::NiceSlice;
 use Carp;
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use Photonic::Types -all;
+use MooX::StrictConstructor;
 
-has 'value'     => (is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
-                   builder=>'_value',
+has 'value'     => (is=>'lazy', isa=>PDLObj, init_arg=>undef,
                    documentation=>'Metric tensor');
 
 with 'Photonic::Roles::Metric';
 
-sub _value {
+sub _build_value {
     # Evaluate the metric tensor. Eq. 4.37 of Samuel.
     my $self = shift;
     my $G=$self->G; #reciprocal lattice;

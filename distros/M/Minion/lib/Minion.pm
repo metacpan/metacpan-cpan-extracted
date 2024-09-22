@@ -21,7 +21,7 @@ has missing_after                  => 1800;
 has [qw(remove_after stuck_after)] => 172800;
 has tasks                          => sub { {} };
 
-our $VERSION = '10.30';
+our $VERSION = '10.31';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -1165,6 +1165,8 @@ Andrii Nikitin
 Brian Medley
 
 Franz Skale
+
+Henrik Andersen
 
 Hubert "depesz" Lubaczewski
 

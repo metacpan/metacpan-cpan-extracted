@@ -1,5 +1,5 @@
 package Photonic::LE::S::Haydock;
-$Photonic::LE::S::Haydock::VERSION = '0.021';
+$Photonic::LE::S::Haydock::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::S::Haydock
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 COPYRIGHT NOTICE
 
@@ -69,9 +69,9 @@ These are provided for roles:
 
 =over 4
 
-=item * geometry Photonic::Types::GeometryG0
+=item * geometry GeometryG0
 
-A Photonic::Geometry object defining the geometry of the system,
+A L<Photonic::Types/GeometryG0> object defining the geometry of the system,
 the characteristic function and the direction of the G=0 vector. Required.
 
 =item * B ndims dims r G GNorm L scale f
@@ -98,6 +98,10 @@ inner product of the state with itself.
 
 Returns 0, as there is no need to change sign.
 
+=item * complexCoeffs
+
+Haydock coefficients are complex
+
 =back
 
 =cut
@@ -106,12 +110,12 @@ use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
 use Carp;
-use Photonic::Types;
+use Photonic::Types -all;
 use Photonic::Utils qw(SProd any_complex GtoR RtoG);
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use MooX::StrictConstructor;
 
-has 'geometry'=>(is=>'ro', isa => 'Photonic::Types::GeometryG0',
+has 'geometry'=>(is=>'ro', isa => GeometryG0,
     handles=>[qw(B ndims dims r G GNorm L scale f pmGNorm)],required=>1
     );
 has 'complexCoeffs'=>(is=>'ro', init_arg=>undef, default=>1,
@@ -120,7 +124,7 @@ with 'Photonic::Roles::Haydock', 'Photonic::Roles::UseMask', 'Photonic::Roles::E
 
 #Required by Photonic::Roles::Haydock
 
-sub _firstState { #\delta_{G0}
+sub _build_firstState { #\delta_{G0}
     my $self=shift;
     my $v=PDL->zeroes(2,@{$self->dims})->r2C; #pm:nx:ny
     my $arg=join ',', ':', ("(0)") x $self->ndims; #(0),(0),... ndims+1 times

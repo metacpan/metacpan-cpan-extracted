@@ -31,6 +31,7 @@ use strict;
 use warnings;
 use Data::Dump::Streamer;
 use JSON::XS;
+use Devel::StackTrace;
 use Module::Load::Conditional qw[can_load];
 
 require Exporter;
@@ -59,36 +60,45 @@ sub connect_shell {
 sub run_aws_cmd {
 
    my $c=$_[0];
+   my $handle=$_[1]||'';
+   my $aws_access_key_id=$_[2];
+   my $aws_secret_access_key=$_[3];
    my $json='';
    my $hash='';
+   my $stderr='';
    while (1) {
-      eval {
-         $SIG{CHLD}="DEFAULT";
-         open(AWS,"$c 2>&1|");
-         while (my $line=<AWS>) {
-            $json.=$line;
-         }
-         close AWS;
-         if (-1<index $json,'A client error') {
-            die $json;
-         } elsif ($json=~/^\s*[{]/) {
-            $hash=decode_json($json);
-         }
-      };
-      if (-1<index $json,'--key-name: expected one argument') {
+      if ($handle) {
+         ($json,$stderr)=$handle->cmd($c);
+         $hash=decode_json($json) if $json and $json=~/^\s*[{]/s;
+	 $hash||={};
+      } else {
+         eval {
+            $SIG{CHLD}="DEFAULT";
+            open(AWS,"$c 2>&1|");
+            while (my $line=<AWS>) {
+               $json.=$line;
+            }
+            close AWS;
+            if (-1<index $json,'A client error') {
+               die $json;
+            } elsif ($json=~/^\s*[{]/) {
+               $hash=decode_json($json);
+            }
+         };
+	 $stderr=$@;
+      }
+      if (!$json || (-1<index $json,'--key-name: expected one argument')) {
          my $user=&Net::FullAuto::FA_Core::username();
          if (can_load(modules => { "Term::Menus" => 0 })) {
             $json=~s/^\s*/      /mg;
-            my $pack=(caller(2))[0];
-            my $method=(caller(2))[3];
+	    my $trace = Devel::StackTrace->new();
             my $error_banner=<<END;
 
       ERROR! Cannot run Amazon EC2 API command because user $user
              lacks the necessary credentials:
 
 $json
-      From package: $pack
-      From method:  $method
+      Stack Trace:  $trace
 
       You can enter the credentials now, and they will be saved permanently
       on this system, or you can exit FullAuto and add the proper credential
@@ -125,24 +135,21 @@ END
             unless (-1<index $choice,'Add Permanent') {
                Net::FullAuto::FA_Core::cleanup();
             } else {
-              $Net::FullAuto::Cloud::fa_amazon::configure_aws->();
+              $Net::FullAuto::Cloud::fa_amazon::configure_aws->($aws_access_key_id,$aws_secret_access_key,$handle);
               next
             }
          }
       } else { last }
    }
-   return $hash,$json,$@;
+   return $hash,$json,$stderr;
 
 }
 
 sub is_host_aws {
 
-   my $test_aws='wget --timeout=5 --tries=1 -qO- '.
-                'http://169.254.169.254/latest/dynamic/instance-identity/';
-   $test_aws=`$test_aws`;
-   if (-1<index $test_aws,'signature') {
-      return 1;
-   } return 0;
+   my $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
+   $aws=(-1<index $aws,'yes')?1:0;
+   return $aws
 
 }
 
@@ -150,52 +157,56 @@ sub setup_aws_security {
 
    my $security_group=$_[0];
    my $group_description=$_[1]||'';
+   my $handle=$_[2]||'';
    if (is_host_aws) {
+      my ($stdout,$stderr)=$handle->cmd('ifconfig');
+      $stdout=~s/^.*?(?:inet|addr)[:| ](\d+\.\d+\.\d+\.\d+).*$/$1/s;
+      my $c='aws ec2 describe-instances '.
+            "--filters Name=private-ip-address,Values=$stdout";
       my ($hash,$output,$error)=('','','');
-      my $fullauto_inst=
-            Net::FullAuto::Cloud::fa_amazon::get_fullauto_instance();
-      my $i=$fullauto_inst->{InstanceId};
-      my $c="aws ec2 describe-instances --instance-ids $i";
-      ($hash,$output,$error)=run_aws_cmd($c);
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
+      my $instance_id=$hash->{Reservations}->[0]->{Instances}->[0]->{InstanceId};
+      my $region=$hash->{Reservations}->[0]->{Instances}->[0]->{Placement}->{AvailabilityZone};
+      my $subnet_id=$hash->{Reservations}->[0]->{Instances}->[0]->{NetworkInterfaces}->[0]->{SubnetId};
+      chop($region);
       my $sg=$hash->{Reservations}->[0]->{Instances}->[0]
                   ->{SecurityGroups}->[0]->{GroupName};
       if ($security_group eq $sg) {
          return "$security_group already set for this host",'';
       }
-      my $n=$main::aws->{fullauto}->
-            {SecurityGroups}->[0]->{GroupName}||'';
       $c='aws ec2 describe-security-groups '.
-            "--group-names $n";
-      ($hash,$output,$error)=run_aws_cmd($c);
+            "--group-names $sg";
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
       return '',$error if $error;
       my $cidr=$hash->{SecurityGroups}->[0]->{IpPermissions}
               ->[0]->{IpRanges}->[0]->{CidrIp};
       $c='aws ec2 create-security-group --group-name '.
          "$security_group --description ".
          "\"$group_description\" 2>&1";
-      ($hash,$output,$error)=run_aws_cmd($c);
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
       return '',$error if $error;
       $c='aws ec2 authorize-security-group-ingress '.
          "--group-name $security_group --protocol ".
          'tcp --port 22 --cidr '.$cidr." 2>&1";
-      ($hash,$output,$error)=run_aws_cmd($c);
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
       return '',$error if $error;
       $c='aws ec2 authorize-security-group-ingress '.
          "--group-name $security_group --protocol ".
          'tcp --port 80 --cidr '.$cidr." 2>&1";
-      ($hash,$output,$error)=run_aws_cmd($c);
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
       return '',$error if $error;
       $c='aws ec2 authorize-security-group-ingress '.
          "--group-name $security_group --protocol ".
          'tcp --port 443 --cidr '.$cidr." 2>&1";
-      ($hash,$output,$error)=run_aws_cmd($c);
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
       return '',$error if $error;
-      my $g=get_aws_security_id($security_group);
-      $c="aws ec2 modify-instance-attribute --instance-id $i ".
-         "--groups $g";
-      ($hash,$output,$error)=run_aws_cmd($c);
-      $c="aws ec2 describe-instances --instance-ids $i";
-      ($hash,$output,$error)=run_aws_cmd($c);
+      my $g=get_aws_security_id($security_group,$handle);
+      $c="aws ec2 modify-instance-attribute --instance-id ".
+         "$instance_id --groups $g;echo 'no output expected'";
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
+      $c="aws ec2 describe-instances --instance-ids ".
+         $instance_id;
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
       $sg=$hash->{Reservations}->[0]->{Instances}->[0]
                   ->{SecurityGroups}->[0]->{GroupName};
       print "\n   NEW SECURITY GROUP -> $sg\n\n";
@@ -207,8 +218,9 @@ sub get_aws_security_id {
 
    my $g='aws ec2 describe-security-groups --group-names '.
          $_[0];
+   my $handle=$_[1]||'';
    my ($hash,$output,$error)=('','','');
-   ($hash,$output,$error)=run_aws_cmd($g);
+   ($hash,$output,$error)=run_aws_cmd($g,$handle);
    &exit_on_error($error) if $error;
    return $hash->{SecurityGroups}->[0]->{GroupId};
 
@@ -445,9 +457,8 @@ our $aws_configure=sub {
       $main::aws->{access_id}="]I[{'configure_aws2',1}";
       $main::aws->{secret_key}="]I[{'configure_aws2',2}";
    }
-   my $region='wget -qO- http://instance-data/latest/meta-data'.
-              '/placement/availability-zone';
-   $region=`$region`;
+   my $region=`ec2-metadata --availability-zone`;
+   $region=~s/^placement: (.*).$/$1/;
    chop $region;
    my $homedir='.';
    my $handle_homedir='';
@@ -541,35 +552,33 @@ our $aws_configure=sub {
          system("${sudo}chown -R $username:$group /home/$username/.aws");
          system("${sudo}chmod 755 /home/$username/.aws");
       }
-      if ($handle) {
-         $handle->print('aws configure');
-         my $prompt=$handle->prompt();
-         while (1) {
-            my $output=fetch($handle);
-            last if $output=~/$prompt/;
-            print $output;
-            if ($output=~/Access Key ID \[None\]:\s*$/) {
-               $handle->print("$main::aws->{access_id}\n");
-            } elsif ($output=~/Secret Access Key \[None\]:\s*$/) {
-               $handle->print("$main::aws->{secret_key}\n");
-            } elsif ($output=~/Default region name \[None\]:\s*$/) {
-               $handle->print("$region\n");
-            } elsif ($output=~/Default output format \[None\]:\s*$/) {
-               $handle->print("\n");
-	    }
-         }
-	 my $group=$handle_username;
-         $handle->cmd($sudo.
-            "cp -Rv $homedir/.aws /home/$handle_username",'__display__');
-         $handle->cmd($sudo.
-            "chown -Rv $handle_username:$group /home/$handle_username/.aws",
-            '__display__');
-         $handle->cmd($sudo.
-            "chmod -v 755 /home/$handle_username/.aws",'__display__');
-      } 
-
    };
-
+   if ($handle) {
+      $handle->print('aws configure');
+      my $prompt=$handle->prompt();
+      while (1) {
+         my $output=Net::FullAuto::FA_Core::fetch($handle);
+         last if $output=~/$prompt/;
+         print $output;
+         if ($output=~/Access Key ID \[None\]:\s*$/) {
+            $handle->print($main::aws->{access_id});
+         } elsif ($output=~/Secret Access Key \[None\]:\s*$/) {
+            $handle->print($main::aws->{secret_key});
+         } elsif ($output=~/Default region name \[None\]:\s*$/) {
+            $handle->print($region);
+         } elsif ($output=~/Default output format \[None\]:\s*$/) {
+            $handle->print("\n");
+         } sleep 1;
+      }
+      my $group=$handle_username;
+      #$handle->cmd($sudo.
+      #   "cp -Rv $homedir/.aws /home/$handle_username",'__display__');
+      $handle->cmd($sudo.
+         "chown -Rv $handle_username:$group /home/$handle_username/.aws",
+         '__display__');
+      $handle->cmd($sudo.
+         "chmod -v 755 /home/$handle_username/.aws",'__display__');
+   }
 };
 
 my $configure_aws2=sub {

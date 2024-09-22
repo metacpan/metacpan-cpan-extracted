@@ -1,5 +1,5 @@
 package Photonic::WE::R2::Haydock;
-$Photonic::WE::R2::Haydock::VERSION = '0.021';
+$Photonic::WE::R2::Haydock::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -38,15 +38,15 @@ use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
 use Carp;
-use Moose;
-use MooseX::StrictConstructor;
+use Moo;
+use MooX::StrictConstructor;
 use Photonic::Utils qw(MHProd any_complex GtoR RtoG);
-use Photonic::Types;
+use Photonic::Types -all;
 
-has 'metric'=>(is=>'ro', isa => 'Photonic::WE::R2::Metric',
+has 'metric'=>(is=>'ro', isa => InstanceOf['Photonic::WE::R2::Metric'],
     handles=>[qw(B ndims dims epsilon)],required=>1);
-has 'polarization' =>(is=>'ro', required=>1, isa=>'Photonic::Types::PDLComplex');
-has 'normalizedPolarization' =>(is=>'ro', isa=>'Photonic::Types::PDLComplex',
+has 'polarization' =>(is=>'ro', required=>1, isa=>PDLComplex);
+has 'normalizedPolarization' =>(is=>'ro', isa=>PDLComplex,
      init_arg=>undef, writer=>'_normalizedPolarization');
 has 'complexCoeffs'=>(is=>'ro', init_arg=>undef, default=>0,
 		      documentation=>'Haydock coefficients are real');
@@ -102,7 +102,7 @@ sub changesign { #flag change sign required if b^2 negative
     return $_[1]->re < 0;
 }
 
-sub _firstState {
+sub _build_firstState {
     my $self=shift;
     my $d=$self->ndims;
     my $v=PDL->zeroes(@{$self->dims}); #build a nx ny nz pdl
@@ -132,7 +132,7 @@ Photonic::WE::R2::Haydock
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -173,6 +173,10 @@ Accessors handled by metric (see Photonic::Metric::R2)
 A non null vector defining the complex direction of the macroscopic
 field.
 
+=item * normalizedPolarization
+
+The polarisation, normalised
+
 =back
 
 =head1 METHODS
@@ -207,6 +211,10 @@ the inner product of the state with itself.
 =item * changesign
 
 Returns 1 if sign change is required to ensure b^2 is positive.
+
+=item * complexCoeffs
+
+Haydock coefficients are real
 
 =back
 

@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromEpsilon;
-$Photonic::Geometry::FromEpsilon::VERSION = '0.021';
+$Photonic::Geometry::FromEpsilon::VERSION = '0.022';
 
 =encoding UTF-8
 
@@ -36,14 +36,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 use namespace::autoclean;
 use Carp;
-use Moose;
-use MooseX::StrictConstructor;
-use Photonic::Types;
+use Moo;
+use Photonic::Types -all;
 
-has 'epsilon'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required=>1,
+has 'epsilon'=>(is=>'ro', isa=>PDLComplex, required=>1,
 		documentation=>'Dielectric function as function of position');
 
-has 'B' =>(is=>'ro', isa=>'PDL', init_arg=>undef, builder=>'_B', lazy=>1,
+has 'B' =>(is=>'lazy', isa=>PDLObj, init_arg=>undef,
 	   documentation=>'Characteristic function');
 
 with 'Photonic::Roles::Geometry';
@@ -56,7 +55,7 @@ before 'f' => sub {
 	. "Photonic::Geometry::FromEpsilon";
 };
 
-sub _B {
+sub _build_B {
     my $self=shift;
     return $self->epsilon->re; #value is irrelevant. Only
 				#shape of pdl counts.
@@ -76,7 +75,7 @@ Photonic::Geometry::FromEpsilon
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
