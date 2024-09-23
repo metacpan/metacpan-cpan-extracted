@@ -56,6 +56,7 @@
             "Exporter" : "0",
             "File::Spec" : "0",
             "Getopt::Long" : "0",
+            "IO::File" : "0",
             "Pod::Usage" : "0",
             "constant" : "0",
             "open" : "0",
@@ -70,7 +71,7 @@
             "File::Path" : "0",
             "File::Temp" : "0",
             "FileHandle" : "0",
-            "FindBin" : "1.51",
+            "FindBin" : "0",
             "Test2::Require" : "0",
             "Test2::V0" : "0",
             "Test::Script" : "1.28",
@@ -83,15 +84,15 @@
    "provides" : {
       "Env::Dot" : {
          "file" : "lib/Env/Dot.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Env::Dot::Functions" : {
          "file" : "lib/Env/Dot/Functions.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Env::Dot::ScriptFunctions" : {
          "file" : "lib/Env/Dot/ScriptFunctions.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -106,7 +107,7 @@
          "web" : "https://github.com/mikkoi/env-dot.git"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_contributors" : [
       "David Kaufman <david@gigawatt.org>"
    ],

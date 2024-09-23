@@ -7,7 +7,7 @@ use lib qw{ inc };
 
 use Astro::Coord::ECI;
 use Astro::Coord::ECI::Moon;
-use Astro::Coord::ECI::Utils qw{ :greg_time deg2rad PI TWOPI };
+use Astro::Coord::ECI::Utils qw{ :greg_time deg2rad rad2deg PI TWOPI };
 use My::Module::Test qw{ :tolerance format_time };
 use Test::More 0.88;
 
@@ -317,6 +317,20 @@ SKIP: {
 	    'Clone returns different object if $Singleton not set';
     }
 
+}
+
+{
+    my $moon = Astro::Coord::ECI::Moon->new();
+    my $time = greg_time_gm( 0, 0, 5, 1, 0, 2008 );	# Jan 1, 2008 in TZ -5
+
+    # Meeus does not give a worked example, but this is his calculation
+    $moon->universal( $time );
+    my $Delta = ( $moon->ecliptic() )[2];
+    my $s = 358_473_400 / $Delta;	# Arc seconds, to 0.0005.
+
+    my $got = rad2deg( $moon->angular_radius() ) * 60 * 60;	# Arc seconds
+    tolerance( $got, $s, 0.1, 'Angular radius of Moon',
+	sub { sprintf '%.5f', $_[0] } );
 }
 
 done_testing;

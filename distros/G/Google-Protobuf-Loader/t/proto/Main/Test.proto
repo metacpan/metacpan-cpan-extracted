@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package main;
+
+import "Foo/Bar.proto";
+
+message Test {
+  optional foo.Bar bar = 1;
+}

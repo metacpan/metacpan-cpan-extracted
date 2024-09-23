@@ -1,0 +1,14 @@
+^Makefile$
+blib
+pm_to_blib
+_build
+.swp$
+~$
+.tmp$
+.bak$
+.git/
+.gitignore$
+.shipit$
+^tags$
+^MYMETA
+^Test-CSV-Track

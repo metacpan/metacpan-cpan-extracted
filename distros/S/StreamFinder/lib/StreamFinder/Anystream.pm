@@ -4,7 +4,7 @@ StreamFinder::Anystream - Fetch any raw streamable URLs from an HTML page.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2023 by
+This module is Copyright (C) 2017-2024 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -301,7 +301,7 @@ L<http://search.cpan.org/dist/StreamFinder-Anystream/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2023 Jim Turner.
+Copyright 2017-2024 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -408,7 +408,7 @@ sub new
 	print STDERR "-0(Anystream): URL=$url2fetch=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 	$ua->timeout($self->{'timeout'});
-	$ua->max_size(1024);  #LIMIT FETCH-SIZE TO AVOID INFINITELY DOWNLOADING A STREAM!
+	$ua->max_size(2048);  #LIMIT FETCH-SIZE TO AVOID INFINITELY DOWNLOADING A STREAM!
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	my $response = $ua->get($url2fetch);
@@ -427,69 +427,74 @@ sub new
 	return undef  unless ($html =~ /\<\!DOCTYPE\s+(?:html|text)/i
 			|| ($isHLSpage && $streamExts =~ /(?:m3u8|any|all)/i));  #STEP 1 FAILED, INVALID STATION URL, PUNT!
 
-	print STDERR "-1: GOT SOME(<=1024 BYTES) HTML!\n"  if ($DEBUG);
-	if ($isHLSpage) {
-		$ua->requests_redirectable([]);
-	}
-	print STDERR "-1a: NOW RE-FETCH FULL PAGE!\n"  if ($DEBUG);
-	$ua->max_size(undef);  #(NOW OK TO FETCH THE WHOLE DOCUMENT)
-	$response = $ua->get($url2fetch);
-	if ($response->is_success) {
-		$html = $response->decoded_content;
-	} else {
-		print STDERR $response->status_line  if ($DEBUG);
-	}
-	unless ($html) {  #STEP 1 FAILED, INVALID URL, PUNT!
-		print STDERR "-!!!- COULD NOT FETCH URL=$url2fetch=\n"  if ($DEBUG);
-		return undef;
+	print STDERR "-1: GOT SOME(<=2048 BYTES) HTML!\n"  if ($DEBUG);
+	$ua->requests_redirectable([])  if ($isHLSpage);
+	unless ($isHLSpage) {
+		print STDERR "-1a: NOW RE-FETCH FULL PAGE!\n"  if ($DEBUG);
+		$ua->max_size(undef);  #(NOW OK TO FETCH THE WHOLE DOCUMENT)
+		$response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+		}
+		unless ($html) {  #STEP 1 FAILED, INVALID URL, PUNT!
+			print STDERR "-!!!- COULD NOT FETCH URL=$url2fetch=\n"  if ($DEBUG);
+			return undef;
+		}
 	}
 
 	$self->{'_havehls'} = 0;
-	if ($isHLSpage && $url2fetch =~ /\.m3u8$/) {  #JWT:NOTE:MAY END UP NEEDING TO REMOVE TRAILING "$"!:
-		my $location = $response->header('location');
-		($baseURL = $url2fetch) =~ s#\/[^\/]+$##;
-		print STDERR "-!!!- WE'RE AN HLS PAGE!: HLS BASE URL=$baseURL= locn=$location\n"  if ($DEBUG);
-		my @lines = split(/\r?\n/, $html);
-		my @plentries = ();
-		my $firstTitle = '';
-		my $plidx = ($arglist =~ /\b\-?random\b/) ? 1 : 0;
-		my $line = 1;
-		(my $urlpath = $firstStream) =~ s#[^\/]+$##;
-		my $highestBW = 0;
-		my %streamsByBandwidth;
-		while ($line <= $#lines) {   #FIND HIGHEST BANDWIDTH STREAM (WITHIN ANY USER-SET BANDWIDTH):
-			if ($lines[$line] =~ /\s*\#EXT\-X\-STREAM\-INF\:(?:.*?)BANDWIDTH\=(\d+)/o) {
-				my $bw = $1;
-				if ($lines[$line] =~ /\,\s*URI\=\"([^\"]+)/o) { #SOMETIMES THEY STICK IT ON THE END OF CURRENT LINE!:
-					$lines[$line] = $1;
-				} else {
-					$line++;
-				}
-				if ($line <= $#lines) {
-					$bw =~ s/^\d*x//o;
-					if ($lines[$line] =~ m#\.m3u8#o
-							&& ($self->{'hls_bandwidth'} <= 0	|| $bw <= $self->{'hls_bandwidth'})) {
-						my $url = $lines[$line];
-						if ($lines[$line] =~ m#^https?\:\/\/#o) {
-							$streamsByBandwidth{$bw} = $lines[$line];
-						} elsif ($lines[$line] =~ m#^\/\/#o) {
-							my $protocol = $1  if ($url2fetch =~ /^(https?)/);
-							$streamsByBandwidth{$bw} = $protocol . ':' . $lines[$line];
-						} elsif ($lines[$line] =~ m#^\/#) {
-							$streamsByBandwidth{$bw} = $baseURL . $lines[$line];
-						} else {
-							$streamsByBandwidth{$bw} = $baseURL . '/' . $lines[$line];
+	if ($isHLSpage) {  #JWT:NOTE:MAY END UP NEEDING TO REMOVE TRAILING "$"!:
+		$self->{'title'} = $self->{'id'} || $url;
+		$self->{'description'} = $url2fetch;
+		if ($self->{'hls_bandwidth'} > 0 && $url2fetch =~ /\.m3u8$/) {  #JWT:NOTE:MAY END UP NEEDING TO REMOVE TRAILING "$"!:
+			my $location = $response->header('location');
+			($baseURL = $url2fetch) =~ s#\/[^\/]+$##;
+			print STDERR "-!!!- WE'RE AN HLS PAGE!: HLS BASE URL=$baseURL= locn=$location\n"  if ($DEBUG);
+			my @lines = split(/\r?\n/, $html);
+			my @plentries = ();
+			my $firstTitle = '';
+			my $plidx = ($arglist =~ /\b\-?random\b/) ? 1 : 0;
+			my $line = 1;
+			(my $urlpath = $firstStream) =~ s#[^\/]+$##;
+			my $highestBW = 0;
+			my %streamsByBandwidth;
+			while ($line <= $#lines) {   #FIND HIGHEST BANDWIDTH STREAM (WITHIN ANY USER-SET BANDWIDTH):
+				if ($lines[$line] =~ /\s*\#EXT\-X\-STREAM\-INF\:(?:.*?)BANDWIDTH\=(\d+)/o) {
+					my $bw = $1;
+					if ($lines[$line] =~ /\,\s*URI\=\"([^\"]+)/o) { #SOMETIMES THEY STICK IT ON THE END OF CURRENT LINE!:
+						$lines[$line] = $1;
+					} else {
+						$line++;
+					}
+					if ($line <= $#lines) {
+						$bw =~ s/^\d*x//o;
+						if ($lines[$line] =~ m#\.m3u8#o && ($bw <= $self->{'hls_bandwidth'})) {
+							my $url = $lines[$line];
+							if ($lines[$line] =~ m#^https?\:\/\/#o) {
+								$streamsByBandwidth{$bw} = $lines[$line];
+							} elsif ($lines[$line] =~ m#^\/\/#o) {
+								my $protocol = $1  if ($url2fetch =~ /^(https?)/);
+								$streamsByBandwidth{$bw} = $protocol . ':' . $lines[$line];
+							} elsif ($lines[$line] =~ m#^\/#) {
+								$streamsByBandwidth{$bw} = $baseURL . $lines[$line];
+							} else {
+								$streamsByBandwidth{$bw} = $baseURL . '/' . $lines[$line];
+							}
+							$self->{'_havehls'} = 1;
+							print STDERR "----1($bw): found stream=$streamsByBandwidth{$bw}= bw=$bw=...\n"  if ($DEBUG);
 						}
-						$self->{'_havehls'} = 1;
-						print STDERR "----1($bw): found stream=$streamsByBandwidth{$bw}= bw=$bw=...\n"  if ($DEBUG);
 					}
 				}
+				$line++;
 			}
-			$line++;
-		}
-		foreach $bw (sort {$b <=> $a} keys %streamsByBandwidth) {
-			push (@{$self->{'streams'}}, $streamsByBandwidth{$bw})
-					if (!$self->{'secure'} || $streamURL =~ /^https/o);
+			foreach $bw (sort {$b <=> $a} keys %streamsByBandwidth) {
+				push (@{$self->{'streams'}}, $streamsByBandwidth{$bw})
+						if (!$self->{'secure'} || $streamURL =~ /^https/o);
+			}
+		} else {
+			push (@{$self->{'streams'}}, $url2fetch);
 		}
 	} else {
 		print STDERR "--WE'RE A PAGE THAT MIGHT CONTAIN HLS:\n"  if ($DEBUG);
@@ -582,7 +587,6 @@ sub new
 					. "\n" . ${$self->{'streams'}}[$i] . "\n";
 		}
 	}
-#	print STDERR "-9: title=".$self->{'title'}."=\n---id=".$self->{'id'}."=\n---desc=".$self->{'description'}."=\n---artist=".$self->{'artist'}."=\n---albumartist=".$self->{'albumartist'}."=\n"  if ($DEBUG);
 	if ($DEBUG) {
 		foreach my $i (sort keys %{$self}) {
 			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
@@ -596,14 +600,6 @@ sub new
 	return $self;
 }
 
-sub get
-{
-	my $self = shift;
-
-	return wantarray ? ($self->{'playlist'}) : $self->{'playlist'}  if (defined($_[0]) && $_[0] =~ /playlist/i);
-	return wantarray ? @{$self->{'streams'}} : ${$self->{'streams'}}[0];
-}
-
 sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELIABILITY:
 {
 	my $self = shift;
@@ -612,104 +608,9 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 	my $firstStream = ${$self->{'streams'}}[$idx];
 
 	return ''  unless (defined $firstStream);
-	return $firstStream  if ($self->{'_havehls'} == 1);
 
-	if (($arglist =~ /\b\-?nopls\b/ && $firstStream =~ /\.(pls|m3u)$/i)
-			|| (defined($self->{'hls_bandwidth'}) && $firstStream =~ /\.(m3u8)$/i)
-			|| ($arglist =~ /\b\-?noplaylists\b/ && $firstStream =~ /\.(pls|m3u8?)$/i)) {
-		my $plType = $1;
-		print STDERR "-getURL($idx): NOPLAYLISTS|BANDWIDTH and (".$firstStream.") TP=$plType=\n"  if ($DEBUG);
-		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
-		$ua->timeout($self->{'timeout'});
-		$ua->cookie_jar({});
-		$ua->env_proxy;
-		my $html = '';
-		my $response = $ua->get($firstStream);
-		if ($response->is_success) {
-			$html = $response->decoded_content;
-		} else {
-			print STDERR $response->status_line  if ($DEBUG);
-			my $no_wget = system('wget','-V');
-			unless ($no_wget) {
-				print STDERR "\n..trying wget...\n"  if ($DEBUG);
-				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$firstStream\" 2>/dev/null `;
-			}
-		}
-		my @lines = split(/\r?\n/, $html);
-		my @plentries = ();
-		my $firstTitle = '';
-		my $plidx = ($arglist =~ /\b\-?random\b/) ? 1 : 0;
-		if ($plType =~ /pls/i) {  #PLS:
-			foreach my $line (@lines) {
-				if ($line =~ m#^\s*File\d+\=(.+)$#o) {
-					push (@plentries, $1);
-				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#o) {
-					$firstTitle ||= $1;
-				}
-			}
-			$self->{'title'} ||= $firstTitle;
-			$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
-			$self->{'title'} = uri_unescape($self->{'title'});
-			print STDERR "-getURL(PLS): title=$firstTitle= pl_idx=$plidx=\n"  if ($DEBUG);
-			if ($plidx && $#plentries >= 0) {
-				$plidx = int rand scalar @plentries;
-			} else {
-				$plidx = 0;
-			}
-			$firstStream = $plentries[$plidx]
-					if (defined($plentries[$plidx]) && $plentries[$plidx]);
-		} elsif ($plType =~ /m3u8/i) {  #HLS?:
-			my $line = 1;
-			(my $urlpath = $firstStream) =~ s#[^\/]+$##;
-			my $highestBW = 0;
-			my $bestStream = '';
-			while ($line <= $#lines) {   #FIND HIGHEST BANDWIDTH STREAM (WITHIN ANY USER-SET BANDWIDTH):
-				if ($lines[$line] =~ /\s*\#EXT\-X\-STREAM\-INF\:(?:.*?)BANDWIDTH\=(\d+)/o) {
-					$line++;
-					if ($line <= $#lines) {
-						(my $bw = $1) =~ s/^\d*x//o;
-						if ($bw > $highestBW && $lines[$line] =~ m#\.m3u8#o
-								&& ($self->{'hls_bandwidth'} <= 0	|| $bw <= $self->{'hls_bandwidth'})) {
-							my $url = $lines[$line];
-							$highestBW = $bw;
-							if ($lines[$line] =~ m#^https?\:\/\/#o) {
-								$bestStream = $lines[$line];
-							} else {
-								$lines[$line] =~ s#^\/##o;
-								$bestStream = $urlpath . $lines[$line];
-							}
-							print STDERR "----2($bw): found stream=$bestStream= bw=$bw=...\n"  if ($DEBUG);
-						}
-					}
-				}
-				$line++;
-			}
-			$firstStream = $bestStream  if ($bestStream);
-			print STDERR "-getURL(m3u8/HLS) best=$bestStream=\n"  if ($DEBUG);
-		} else {  #m3u:
-			(my $urlpath = $firstStream) =~ s#[^\/]+$##;
-			foreach my $line (@lines) {
-				if ($line =~ m#^\s*([^\#].+)$#o) {
-					my $urlpart = $1;
-					$urlpart =~ s#^\s+##o;
-					$urlpart =~ s#^\/##o;
-					push (@plentries, ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . $urlpart));
-					last  unless ($plidx);
-				}
-			}
-			if ($plidx && $#plentries >= 0) {
-				$plidx = int rand scalar @plentries;
-			} else {
-				$plidx = 0;
-			}
-			$firstStream = $plentries[$plidx]
-					if (defined($plentries[$plidx]) && $plentries[$plidx]);
-			print STDERR "-getURL(m3u): pl_idx=$plidx=\n"  if ($DEBUG);
-		}
-	}
-
-	print STDERR "-getURL returning stream=$firstStream=\n"  if ($DEBUG);
-	return $firstStream;
+	return ($self->{'_havehls'} == 1) ? $firstStream
+			: $self->StreamFinder::_Class::getURL(@_);
 }
 
 1

@@ -5,7 +5,7 @@ pingu - optex make-everything-pingu filter
 
 # SYNOPSIS
 
-**optex** -Mpingu --pingu _command_
+**optex** -Mpingu \[ options -- \] _command_
 
 # DESCRIPTION
 
@@ -27,11 +27,11 @@ features.
 
 # OPTION
 
-- **--pingu**
+- **--**\[**no-**\]**pingu**
 
-    Make command pingu.
+    Produce images.  Enabled by default.
 
-- **--pingu-image**=_file_
+- **--image**=_file_
 
     Set image file.  File is searched at current directory and module
     directory.  Standard **pingu** image is stored as **pingu.asc**.  If
@@ -43,14 +43,15 @@ features.
         module-dir/pingu
         module-dir/pingu.asc
 
-- **--pingu-char**
+- **--char**=_c_
 
     Specify replacement character.  Default is Unicode `FULL BLOCK`
     (U+2588: █).
 
-- **--pingu-interval**=_sec_
+- **--interval**=_sec_
 
-    Set interval time between printing each lines.  Default is zero.
+    Specifies the interval time in seconds between outputting each line.
+    Default is 0.1 seconds.
 
 # IMAGE FILE FORMAT
 
@@ -163,7 +164,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2022 Kazumasa Utashiro.
+Copyright 2022-2024 Kazumasa Utashiro.
 
 You can redistribute it and/or modify it under the same terms
 as Perl itself.

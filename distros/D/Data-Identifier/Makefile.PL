@@ -17,14 +17,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Data::Identifier",
   "PREREQ_PM" => {
-    "Carp" => "1.35"
+    "Carp" => "1.35",
+    "Math::BigInt" => "1.999816",
+    "URI" => "1.5"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => "0.30",
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.01",
+  "VERSION" => "v0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,9 +35,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => "1.35",
+  "Math::BigInt" => "1.999816",
   "Test::Exception" => "0.30",
   "Test::More" => "1.3",
-  "Test::Warn" => "0.30"
+  "Test::Warn" => "0.30",
+  "URI" => "1.5"
 );
 
 

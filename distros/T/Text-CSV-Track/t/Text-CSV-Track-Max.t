@@ -8,7 +8,7 @@ BEGIN { plan tests => 12 };
 
 use Text::CSV::Track::Max;
 use File::Temp qw{tempfile};	#generate temp filename
-use File::Spec qw{tmpdir};		#get temp directory
+use File::Spec::Functions qw{tmpdir};		#get temp directory
 use English qw(-no_match_vars);
 use Fcntl ':flock'; # import LOCK_* constants
 

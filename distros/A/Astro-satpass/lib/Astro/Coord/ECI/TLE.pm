@@ -229,7 +229,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.131';
+our $VERSION = '0.132';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -8178,14 +8178,7 @@ sub _next_elevation_screen {
 #
 #   $ tools/heavens-above-mag --celestrak
 #
-# Last-Modified: Wed, 14 Feb 2024 17:56:43 GMT
-
-# The following constants are unsupported, and may be modified or
-# revoked at any time. They exist to support
-# xt/author/magnitude_status.t
-use constant _CELESTRAK_VISUAL => 'Wed, 14 Feb 2024 17:56:43 GMT';
-use constant _MCCANTS_VSNAMES  => undef;
-use constant _MCCANTS_QUICKSAT => undef;
+# Last-Modified: Thu, 12 Sep 2024 22:47:57 GMT
 
 %magnitude_table = (
   '00694' =>   2.7, # ATLAS CENTAUR 2 R/B
@@ -8196,7 +8189,6 @@ use constant _MCCANTS_QUICKSAT => undef;
   '03597' =>   5.7, # OAO 2
   '03669' =>   8.2, # ISIS 1
   '04327' =>   5.7, # SERT 2
-  '04814' =>   4.2, # SL-3 R/B
   '05118' =>   4.2, # SL-3 R/B
   '05560' =>   4.2, # ASTEX 1
   '05730' =>   4.2, # SL-8 R/B
@@ -8206,7 +8198,6 @@ use constant _MCCANTS_QUICKSAT => undef;
   '08459' =>   5.2, # SL-8 R/B
   '10114' =>   4.7, # SL-3 R/B
   '10967' =>   3.2, # SEASAT 1
-# '11251' => undef, # METEOR 1-29 has no recorded magnitude
   '11267' =>   4.7, # SL-14 R/B
   '11574' =>   4.2, # SL-8 R/B
   '11672' =>   4.2, # SL-14 R/B
@@ -8224,7 +8215,6 @@ use constant _MCCANTS_QUICKSAT => undef;
   '14208' =>   4.2, # SL-3 R/B
   '14372' =>   4.7, # COSMOS 1500
   '14699' =>   4.2, # COSMOS 1536
-  '14819' =>   4.7, # COSMOS 1544
   '14820' =>   4.7, # SL-14 R/B
   '15483' =>   4.7, # SL-8 R/B
   '15494' =>   3.7, # COSMOS 1626
@@ -8290,7 +8280,6 @@ use constant _MCCANTS_QUICKSAT => undef;
   '23088' =>   2.7, # SL-16 R/B
   '23343' =>   2.7, # SL-16 R/B
   '23405' =>   2.7, # SL-16 R/B
-# '23560' => undef, # ERS 2 has no recorded magnitude
   '23561' =>   3.7, # ARIANE 40+ R/B
   '23705' =>   2.7, # SL-16 R/B
   '24298' =>   2.7, # SL-16 R/B
@@ -8319,7 +8308,7 @@ use constant _MCCANTS_QUICKSAT => undef;
   '28353' =>   2.7, # SL-16 R/B
   '28415' =>   4.2, # CZ-4B R/B
   '28480' =>   3.7, # CZ-2C R/B
-# '28499' => undef, # ARIANE 5 R/B has no recorded magnitude
+  '28499' => undef, # ARIANE 5 R/B has no recorded magnitude
   '28738' =>   4.7, # CZ-2D R/B
   '28773' =>   4.2, # ASTRO E2
   '28931' =>   3.2, # ALOS
@@ -8333,28 +8322,27 @@ use constant _MCCANTS_QUICKSAT => undef;
   '31792' =>   3.2, # COSMOS 2428
   '31793' =>   2.7, # SL-16 R/B
   '33504' =>   5.3, # KORONAS-FOTON
-# '37731' => undef, # CZ-2C R/B has no recorded magnitude
+  '37731' => undef, # CZ-2C R/B has no recorded magnitude
   '38341' =>   3.2, # H-2A R/B
-# '39271' => undef, # CUSAT 2/FALCON 9 has no recorded magnitude
-# '39358' => undef, # SJ-16 has no recorded magnitude
-# '39364' => undef, # CZ-2C R/B has no recorded magnitude
+  '39271' => undef, # CUSAT 2/FALCON 9 has no recorded magnitude
+  '39358' => undef, # SJ-16 has no recorded magnitude
   '39679' =>   3.4, # SL-4 R/B
   '39766' =>   3.7, # ALOS 2
   '40354' =>   4.2, # SL-27 R/B
-# '41038' => undef, # YAOGAN 29 has no recorded magnitude
-# '41337' => undef, # ASTRO H has no recorded magnitude
-# '42758' => undef, # HXMT has no recorded magnitude
-# '43521' => undef, # CZ-2C R/B has no recorded magnitude
-# '43641' => undef, # SAOCOM 1-A has no recorded magnitude
-# '43682' => undef, # H-2A R/B has no recorded magnitude
-# '46265' => undef, # SAOCOM 1-B has no recorded magnitude
+  '41038' => undef, # YAOGAN 29 has no recorded magnitude
+  '41337' => undef, # ASTRO H has no recorded magnitude
+  '42758' => undef, # HXMT has no recorded magnitude
+  '43521' => undef, # CZ-2C R/B has no recorded magnitude
+  '43641' => undef, # SAOCOM 1-A has no recorded magnitude
+  '43682' => undef, # H-2A R/B has no recorded magnitude
+  '46265' => undef, # SAOCOM 1-B has no recorded magnitude
   '48274' =>   0.0, # CSS (TIANHE-1)
-# '48865' => undef, # COSMOS 2550 has no recorded magnitude
-# '51842' => undef, # OBJECT U has no recorded magnitude
-# '52794' => undef, # CZ-2C R/B has no recorded magnitude
-# '53131' => undef, # CZ-2C R/B has no recorded magnitude
+  '48865' => undef, # COSMOS 2550 has no recorded magnitude
+  '52794' => undef, # CZ-2C R/B has no recorded magnitude
   '53807' =>   3.5, # BLUEWALKER 3
-# '57800' => undef, # XRISM has no recorded magnitude
+  '57800' => undef, # XRISM has no recorded magnitude
+  '59588' =>   2.0, # ACS 3
+  '59624' => undef, # SZ-17 MODULE has no recorded magnitude
 );
 
 1;

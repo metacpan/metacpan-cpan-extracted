@@ -14,7 +14,7 @@ use Getopt::Long 2.32;
 use Pod::Usage;
 use Time::Local;
 
-our $VERSION = '0.131';
+our $VERSION = '0.132';
 
 # Map -want-events values to TLE event codes.
 my %wanted_event_map = (

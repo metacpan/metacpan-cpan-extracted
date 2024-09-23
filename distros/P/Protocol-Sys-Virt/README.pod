@@ -2,7 +2,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt v10.3.7;
+package Protocol::Sys::Virt v10.3.8;
 
 1;
 
@@ -12,15 +12,15 @@ Protocol::Sys::Virt - Abstract LibVirt protocol implementation
 
 =head1 VERSION
 
-v10.3.7
+v10.3.8
 
 Based on LibVirt tag v10.3.0
 
 =head2 Version numbering
 
-The first two numbers follow the L<LibVirt|https://libvirt.org> release numbering
-(and thus API version); the last digit indicates the sequence number of releases
-of this library.
+The first two numbers follow the L<LibVirt|https://libvirt.org> release
+numbering (and thus API version); the last digit indicates the sequence number
+of releases of this library.
 
 =head1 SYNOPSIS
 
@@ -39,10 +39,10 @@ development team explained this is by design.  The solution in e.g. Python is
 to use threading (the same solution as used with Python): the underlying
 protocol and handling on the server is asynchronous, but the API calls are not.
 Unfortunately, in Perl, threading isn't a viable option: first of all because
-using Perl threads is highly discouraged, but more so because each thread creates
-its own Perl interpreter with its own copies of all variables -- a clear
-difference with Python, where a single interpreter is used for all threads,
-sharing variables and values.
+using Perl threads is highly discouraged, but more so because each thread
+creates its own Perl interpreter with its own copies of all variables -- a
+clear difference with Python, where a single interpreter is used for all
+threads, sharing variables and values.
 
 =head1 API Guarantees
 
@@ -52,8 +52,6 @@ at L<https://libvirt.org/support.html#rpc-protocol>.
 =head1 TODO
 
 =over 8
-
-=item * Generate reply wrappers to unpack structures into function arguments
 
 =item * Write documentation
 

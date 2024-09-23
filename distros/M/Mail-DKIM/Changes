@@ -1,5 +1,8 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 
+1.20240923 2024-09-23 Australia/Melbourne
+  * Fix loading of ED25519 keys with CryptX-0.081
+
 1.20240827 2024-08-27 Australia/Melbourne
   * Add missing Author prerequisite
     Thanks to Giovanni <g.bechis@snb.it>

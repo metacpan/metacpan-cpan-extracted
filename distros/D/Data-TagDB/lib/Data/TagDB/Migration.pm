@@ -20,7 +20,7 @@ use parent 'Data::TagDB::WeakBaseObject';
 
 use constant RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %table_defs = (
     tag      => 'CREATE TABLE IF NOT EXISTS tag (id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT);',
@@ -134,6 +134,19 @@ sub include {
                         $db->create_tag([$uuid => $ise]);
                     }
                 }
+            }
+        } elsif ($source eq 'Data::Identifier') {
+            require Data::Identifier;
+            my Data::TagDB $db = $self->db;
+            my Data::TagDB::WellKnown $wk = $db->wk;
+            my Data::TagDB::Tag $uuid = $wk->uuid(1);
+            my Data::TagDB::Tag $sid = $wk->small_identifier(1);
+            foreach my $identifier (Data::Identifier->wellknown) {
+                my $identifier_sid = eval {$identifier->sid}; # sids in Data::Identifier are accurate (but may be undef).
+                $db->create_tag([
+                        $uuid => $identifier->uuid,
+                        defined($identifier_sid) ? ($sid => $identifier_sid) : (),
+                        ]);
             }
         } else {
             croak 'Invalid datasource: '.$source;
@@ -260,7 +273,7 @@ Data::TagDB::Migration - Work with Tag databases
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -309,6 +322,8 @@ Returns the current L<DBI> connection.
     $migration->include('Data::TagDB::WellKnown');
 
 Includes data from a given source.
+
+Currently supported sources: L<Data::TagDB::WellKnown>, L<Data::URIID>, and L<Data::Identifier>.
 
 =head1 AUTHOR
 

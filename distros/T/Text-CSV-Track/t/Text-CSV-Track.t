@@ -3,19 +3,21 @@
 
 #########################
 
-use Test::More;	# 'no_plan';
-BEGIN { plan tests => 91 };
+use Test::Most;
 
 use Text::CSV::Track;
 
 use File::Temp qw{tempfile};	#generate temp filename
-use File::Spec qw{tmpdir};		#get temp directory
+use File::Spec::Functions qw{tmpdir};		#get temp directory
 use File::Slurp qw{read_file write_file};		#reading whole file
 use English qw(-no_match_vars);
 use Fcntl ':flock'; # import LOCK_* constants
 
+binmode(Test::More->builder->$_ => q(encoding(:UTF-8))) for qw(output failure_output todo_output);
+
 use strict;
 use warnings;
+use utf8;
 
 #constants
 my $DEVELOPMENT = 0;
@@ -226,15 +228,16 @@ print "binary data\n";
 #test binary data
 $track_object = Text::CSV::Track->new({ file_name => $file_name });
 
-#add binary data
-my $binary_data = chr(196).chr(190).chr(197).chr(161).chr(196).chr(141).chr(197).chr(165).chr(197).chr(190).chr(195).chr(189).chr(195).chr(161).chr(195).chr(173).chr(195).chr(169);
+#add utf8 data
+my $binary_data = 'ščŽťľł';
 $track_object->value_of("xman4", $binary_data);
 $track_object->store();
 $track_object = undef;
 
 #check
-$track_object = Text::CSV::Track->new({ file_name => $file_name });
-is($track_object->value_of("xman4"), $binary_data,			'check binary data read');
+$track_object = Text::CSV::Track->new({file_name => $file_name});
+eq_or_diff($track_object->value_of("xman4"), $binary_data, 'check binary data read');
+#~ use Data::Dumper; Test::More::diag(Dumper(\$track_object));
 $track_object = undef;
 
 #save a copy for comparation
@@ -822,6 +825,7 @@ $track_object->store_as_xml();
 @file_lines_after = read_file($file_name);
 is_deeply(\@file_lines_after, \@file_lines,			'check file after store as xml');
 
+done_testing();
 
 ### CLEANUP
 

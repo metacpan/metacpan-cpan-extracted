@@ -21,7 +21,7 @@ use I18N::LangTags::Detect;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my %names = (
     service => {
@@ -60,6 +60,7 @@ my %names = (
         'iconclass'         => '75cbefbb-e622-4b72-9829-348f3986d709', # iconclass.org
         'iana'              => 'f11657cc-95da-4eae-95fc-62d16fecf473', # iana.org
         'uriid'             => '772aa1ed-9a3a-4806-94a1-42cbc0e9f962', # uriid.org
+        'oidref'            => 'b5a63482-f92c-4ed5-8ec3-49caa0bafa66', # oidref.com
     },
     type => {
         'uuid'                          => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
@@ -157,10 +158,13 @@ sub lookup {
     croak 'Passed undef as URI' unless defined $uri;
 
     if (blessed($uri) && !$uri->isa('URI')) {
-        if (index(blessed($uri), __PACKAGE__) == 0 && $uri->can('ise')) {
-            ($type, $uri) = (ise => $uri->ise);
-        } elsif ($uri->isa('Data::URIID::Result')) {
+        if ($uri->isa('Data::URIID::Result')) {
             $uri = $uri->url;
+        } elsif ($uri->isa('Data::Identifier')) {
+            $type = $uri->type->uuid;
+            $uri  = $uri->id;
+        } elsif (index(blessed($uri), __PACKAGE__) == 0 && $uri->can('ise')) {
+            ($type, $uri) = (ise => $uri->ise);
         } elsif ($uri->isa('Mojo::URL')) {
             $uri = URI->new("$uri"); # convert to URI as per documentation of Mojo::URL
         } else {
@@ -282,6 +286,13 @@ sub known {
 sub name_to_ise {
     my ($self, $class, $name) = @_;
     return $name if $self->is_ise($name); # return name if name is already an ISE
+    if (blessed($name)) {
+        if (index(blessed($name), __PACKAGE__) == 0 && $name->can('ise')) {
+            return $name->ise;
+        } elsif ($name->isa('Data::Identifier')) {
+            return $name->ise;
+        }
+    }
     return $names{$class // ''}{$name // ''} // croak sprintf('Invalid class or name: %s: %s', $class // '<undef>', $name // '<undef>');
 }
 
@@ -330,7 +341,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

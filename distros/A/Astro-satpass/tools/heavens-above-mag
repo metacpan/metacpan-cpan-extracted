@@ -13,8 +13,9 @@ use LWP::UserAgent;
 use Pod::Usage;
 use YAML 1.25 qw{ Dump Load };
 
-our $VERSION = '0.131';
+our $VERSION = '0.132';
 
+use constant CACHE_DIR	=> 'cache';
 use constant REF_CODE	=> sub {};
 use constant VISUAL_URL	=> 'https://celestrak.org/SpaceTrack/query/visual.txt';
 use constant VISUAL_YML	=> 'visual.yml';
@@ -25,9 +26,21 @@ my %opt = (
 
 unless ( caller ) {	# We're a modulino.
     GetOptions( \%opt,
-	qw{ age=i celestrak! open! verbose! },
-	help => sub { pod2usage( { -verbose => 2 } ) },
+	qw{ age=i celestrak! open! purge! verbose! },
+	help	=> sub { pod2usage( { -verbose => 2 } ) },
     ) or pod2usage( { -verbose => 0 } );
+
+    if ( $opt{purge} ) {
+	require File::Glob;
+	my $glob = join '/', CACHE_DIR, '*';
+	foreach ( File::Glob::bsd_glob( $glob ) ) {
+	    unlink
+		or warn "Failed to remove $_: $!\n";
+	}
+	@ARGV
+	    or $opt{celestrak}
+	    or exit;
+    }
 
     if ( $opt{celestrak} ) {
 	@ARGV and pod2usage( {
@@ -37,7 +50,7 @@ unless ( caller ) {	# We're a modulino.
 	process_celestrak();
     } else {
 	@ARGV or pod2usage( {
-		-message	=> 'Arguments required unless --celestrak specified',
+		-message	=> 'Arguments required unless --celestrak or --purge specified',
 		-verbose	=> 0,
 	    } );
 
@@ -85,10 +98,10 @@ sub find_span {
 sub get_cached {
     my ( $file, $uri ) = @_;
 
-    my $path = "cache/$file";
-    -d 'cache'
-	or mkdir 'cache'
-	or die "Failed to create directory cache/: $!\n";
+    my $path = join '/', CACHE_DIR, $file;
+    -d CACHE_DIR
+	or mkdir CACHE_DIR
+	or die "Failed to create directory @{[ CACHE_DIR ]}/: $!\n";
 
     {
 	my @stat;
@@ -150,7 +163,7 @@ sub print_perl {
 	# die "Debug - $oid ($name) '$mag'";
 	printf "  '%05d' => %5.1f, # %s\n", $oid, $mag, $name;
     } else {
-	printf "# '%05d' => undef, # %s has no recorded magnitude\n", $oid, $name;
+	printf "  '%05d' => undef, # %s has no recorded magnitude\n", $oid, $name;
     }
     return;
 }
@@ -166,38 +179,39 @@ sub process_celestrak {
 #
 # Last-Modified: @{[ $last_modified // 'unknown' ]}
 
-# The following constants are unsupported, and may be modified or
-# revoked at any time. They exist to support
-# xt/author/magnitude_status.t
-use constant _CELESTRAK_VISUAL => @{[ defined $last_modified ?
-"'$last_modified'" : 'undef' ]};
-use constant _MCCANTS_VSNAMES  => undef;
-use constant _MCCANTS_QUICKSAT => undef;
-
 %magnitude_table = (
 EOD
 
-    my %oid;
-    my $content = $visual->decoded_content();
-    open my $fh, '<', \$content;
+    my %oid = parse_visual( $visual );
+    process_perl( sort { $a <=> $b } keys %oid );
+    say ');';
+    return;
+}
+
+sub parse_visual {
+    my ( $resp ) = @_;
+    my $content = $resp->decoded_content();
     local $_ = undef;	# while (<>) ... does not localize $_.
+    my %oid;
+    open my $fh, '<', \$content;
+    local $_ = undef;  # while (<>) ... does not localize $_.
     while ( <$fh> ) {
-	$oid{ unpack 'A5' } = 1; # NOTE the presence of leading zeroes.
+	my ( $id, $name ) = unpack 'A5A*';
+	$oid{$id} = $name;
     }
-    foreach my $extra (
-	'53807',	# Bluewalker 3
+    close $fh;
+    foreach (
+	[ '53807', 'Bluewalker 3' ],
     ) {
+	my ( $extra, $name ) = @{ $_ };
 	if ( defined $oid{$extra} ) {
 	    warn "OID $extra is already in visual.txt\n";
 	} else {
 	    $opt{verbose} and warn "Adding OID $extra\n";
-	    $oid{$extra} = 1;
+	    $oid{$extra} = $name;
 	}
     }
-    close $fh;
-    process_perl( sort { $a <=> $b } keys %oid );
-    say ');';
-    return;
+    return %oid;
 }
 
 sub process_get {
@@ -297,6 +311,12 @@ exits.
 If this Boolean option is asserted, a web browser is spawned, displaying
 the Heavens-Above web page of the OIDs specified. You cannot specify
 file names if you specify this option.
+
+=head2 --purge
+
+This option causes the cache to be purged before any magnitudes are
+retrieved. The script will exit afterwards unless either arguments or
+L<--celestrak|/--celestrak> were specified.
 
 =head2 --verbose
 

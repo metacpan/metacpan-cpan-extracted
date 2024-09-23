@@ -671,7 +671,7 @@ Revision history for StreamFinder
         possible due to the Herculean efforts of the yt-dlp developers and 
         users are strongly encouraged to upgrade to the latest version 
         2024.07.25 to avoid likely just getting audio streams, as the internet 
-        continues to get crapped up and locked down every day. :(
+        continues to get more crapped up and locked down every day. :(
 2.41    2024/09/14
         - StreamFinder::AnyStream - Intercept & handle all .m3u8 (HLS) urls 
         in order to apply any "hls_bitrate" option limits and select the 
@@ -691,3 +691,19 @@ Revision history for StreamFinder
         - StreamFinder::Youtube - Change default external Youtube-fetching 
         program from "youtube-dl" to "yt-dlp", as the former may no longer 
         properly handle many youtube streams.
+2.42    2024/09/22
+        - StreamFinder::SermonAudio - Fix excess padding sometimes left on both 
+        sides of Genre text.  Also update copyright year & docs.
+        - StreamFinder::Podchaser - Fix failure to fetch failure to fetch 
+        episode icon, and sometimes other fields for the latest episode when 
+        given a podcast url due to slight changes in their site.
+        - StreamFinder - Fix some issues with handling HLS (.m3u8) streams, 
+        particularly in StreamFinder::Anystream, but effecting all modules, 
+        mostly for better handling by Fauxdacious Mediaplayer and the ffmpeg 
+        library when using internet connections with limited bandwidth.  The 
+        biggest change is we no longer attempt to parse out HLS master 
+        playlists when neither hls_bandwidth (limit) or -noplaylists parameters 
+        are set.  Instead, just return the master playlist stream as-is.  This 
+        allows for better control over selected streams within bandwidth limits 
+        within Fauxdacious itself.  To function the old way, simply specify 
+        an hls_bandwidth limit (in the config file) or "-noplaylists => 1".

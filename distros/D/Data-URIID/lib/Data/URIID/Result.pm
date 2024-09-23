@@ -31,7 +31,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my %digest_name_converter = (
     fc('md5')   => 'md-5-128',
@@ -142,6 +142,10 @@ my %best_services = (
     'doi'                           => 'doi',
     'iconclass-identifier'          => 'iconclass',
     'media-subtype-identifier'      => 'iana',
+    #'gtin'                          => '',
+    #'small-identifier'              => '',
+    #'language-tag-identifier'       => '',
+    #'chat-0-word-identifier'        => '',
 );
 
 # Load extra services:
@@ -257,6 +261,9 @@ my %url_templates = (
     ],
     'iana' => [
         ['media-subtype-identifier' => 'https://www.iana.org/assignments/media-types/%s', undef, [qw(info)], {no_escape => 1}],
+    ],
+    'oidref' => [
+        ['oid' => 'https://oidref.com/%s' => undef, [qw(info)]],
     ],
 );
 
@@ -585,6 +592,14 @@ my %url_parser = (
             id => \1,
             action => 'info',
         },
+        {
+            host => 'oidref.com',
+            path => qr#^/([0-2](?:\.[0-9]+)+)$#,
+            source => 'oidref',
+            type => 'oid',
+            id => \1,
+            action => 'info',
+        },
     ],
 );
 
@@ -861,23 +876,46 @@ sub extractor {
 }
 
 
+sub _cast_id {
+    my ($self, $src, $src_type, %opts) = @_;
+    my $as = $opts{as} // 'string';
+
+    if ($as eq 'string' || $as eq $src_type) {
+        return $src;
+    } elsif ($as eq 'Data::Identifier') {
+        require Data::Identifier;
+        return Data::Identifier->new($src_type => $src);
+    } elsif ($as eq __PACKAGE__) {
+        return $self->_as_lookup([$src_type => $src], %opts);
+    } else {
+        croak sprintf('Cannot convert identifier to type "%s"', $as);
+    }
+}
+
 sub id_type {
-    my ($self) = @_;
-    return $self->{primary}{type};
+    my ($self, %opts) = @_;
+    return $self->_cast_id($self->{primary}{type}, 'ise', %opts);
 }
 
 
 # %opts is currently private
 sub id {
-    my ($self, $type, %opts) = @_;
+    my ($self, $type, %opts);
 
-    return $self->{primary}{id} unless defined $type;
+    if (scalar(@_) % 2) {
+        ($self, %opts) = @_;
+        $type = $opts{type};
+    } else {
+        ($self, $type, %opts) = @_;
+    }
+
+    return $self->_cast_id($self->{primary}{id}, $self->{primary}{type}, %opts) unless defined $type;
 
     # We do a double convert of type here to ensure we have it the right way
     # independent of if we got name or ISE passed.
     $type = $self->extractor->name_to_ise(type => $type);
     if (defined $self->{id}{$type}) {
-        return $self->{id}{$type};
+        return $self->_cast_id($self->{id}{$type}, $type, %opts);
     } elsif (!$opts{_no_convert}) {
         my $primary_type_name =  $self->extractor->ise_to_name(type => $self->{primary}{type});
         my $type_name = $self->extractor->ise_to_name(type => $type);
@@ -893,7 +931,7 @@ sub id {
                     my $func = $self->can(sprintf('_id_conv__%s__%s', $type_name =~ tr/-/_/r, $from =~ tr/-/_/r));
                     $self->$func($type => $from => $id) if defined $func;
                 };
-                return $self->{id}{$type} if defined $self->{id}{$type};
+                return $self->_cast_id($self->{id}{$type}, $type, %opts) if defined $self->{id}{$type};
             }
         }
     }
@@ -903,18 +941,18 @@ sub id {
 
 
 sub ise {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
 
     {
         my $type_name = $self->extractor->ise_to_name(type => $self->id_type);
         if ($type_name eq 'uuid' || $type_name eq 'oid' || $type_name eq 'uri') {
-            return $self->id;
+            return $self->_cast_id($self->id, $type_name, %opts);
         }
     }
 
     foreach my $type (@{$self->{primary}{ise_order}}) {
         my $id = eval { $self->id($type) };
-        return $id if defined $id;
+        return $self->_cast_id($id, $type, %opts) if defined $id;
     }
 
     croak 'Identifier does not map to an ISE';
@@ -1326,7 +1364,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -1345,23 +1383,48 @@ Returns the L<Data::URIID> object used to create this object.
 
 =head2 id_type
 
-    my $id_type = $result->id_type;
+    my $id_type = $result->id_type( [%opts] );
 
 This method will return the ISE of the id's type if successful or C<die> otherwise.
+
+The following options are defined. All options are optional.
+
+=over
+
+=item C<as>
+
+Return the value as the given type.
+This is the package name of the type, C<string> for plain perl strings.
+If the given type is not supported for the given attribute the function C<die>s.
+
+=item C<online>
+
+Overrides the L<Data::URIID/"online"> flag used for the lookup if C<as> is set to L<Data::URIID::Result>.
+This is very useful to prevent network traffic for auxiliary lookups.
+
+=back
 
 =head2 id
 
     my $id = $result->id;
     # or:
     my $id = $result->id( $type );
+    # or:
+    my $id = $result->id( %opts );
 
 This method will return the id if successful or C<die> otherwise.
+
+This method supports the same options as L</id_type> plus C<type> which gives the type of identifier to be returned.
 
 =head2 ise
 
     my $ise = $result->ise;
+    # or:
+    my $ise = $result->ise( [%opts] );
 
 This method will return the ISE if successful or C<die> otherwise.
+
+This method supports the same options as L</id_type>. All options are optional.
 
 =head2 attribute
 

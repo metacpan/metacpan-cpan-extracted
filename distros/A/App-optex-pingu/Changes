@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-pingu
 
+0.99 2024-09-22T18:54:28Z
+
+    - implement private option handling
+
 0.03 2022-08-03T02:03:42Z
 
     - Require File::Share@0.27

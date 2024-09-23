@@ -1,5 +1,8 @@
 Revision history for Perl extension App-RemoteCommand
 
+0.992  2024-09-23 12:10:45 JST
+  - No functional change; re-packaging
+
 0.991  2024-07-17 22:20:52 JST
   - Use Dist::Build (#6)
 

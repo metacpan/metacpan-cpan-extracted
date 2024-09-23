@@ -663,9 +663,12 @@ TRYIT:
 				print STDERR "-----EPISODE: $epiTitles[$i] ($epiStreams[$i])\n";
 			}
 		}
-		if ($self->{'id'} && $tried < 1 && !$self->{'_complete'}) {   #EMPTY EP. LIST, BUT HAVE LATEST|FEATURED (INCOMPLETE DATA, MUST FETCH EP. PAGE)!:
+		if ($self->{'id'} && $tried < 1) {   #EMPTY EP. LIST, BUT HAVE LATEST|FEATURED (INCOMPLETE DATA, MUST FETCH EP. PAGE)!:
 			++$tried;
-			$url2fetch .= '/episodes/' . $self->{'id'};
+			$url2fetch =~ s#\/episodes\/recent.*$##;
+			$url2fetch .= '/episodes/' . $self->{'id'}
+					unless ($url2fetch =~ m#\/episodes\/#);
+
 			print STDERR "i:No episode list, but have featured episode($$self{'id'}), BUT INCOMPLETE DATA, SO FETCH URL=$url2fetch=\n"  if ($DEBUG);
 			goto TRYIT;
 		}

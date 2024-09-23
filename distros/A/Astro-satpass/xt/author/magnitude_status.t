@@ -1,110 +1,59 @@
 package main;
 
-use 5.008;
+use 5.006002;
 
 use strict;
 use warnings;
 
-use Astro::SpaceTrack 0.084;
 use Astro::Coord::ECI::TLE;
-use HTTP::Date;
-use LWP::UserAgent;
-use Test::More 0.88;	# Because of done_testing();
-use Time::Local;
+use List::Util 1.55 qw{ uniqint };
+use Test2::V0;
+
+use constant VISUAL_NAME	=> 'visual.txt';
+use constant VISUAL_URL		=> 
+    'http://celestrak.org/SpaceTrack/query/' . VISUAL_NAME;
 
 note <<'EOD';
 
 This test checks to see if the canned magnitude data may need updating.
-It checks the file dates of relevant files, and scrapes Heavens Above
-for current magnitudes.
+It scrapes Heavens Above for current magnitudes. NOTE that the Heavens
+Above data are cached for up to a day by default.
 
 EOD
 
-$ENV{TLE_DO_MAGNITUDE_STATUS}
-    or plan skip_all => 'TLE_DO_MAGNITUDE_STATUS not set';
-
-is_last_modified(
-    'http://celestrak.org/SpaceTrack/query/visual.txt',
-    Astro::Coord::ECI::TLE->_CELESTRAK_VISUAL(),
-    'Celestrak visual.txt',
-);
-
 do './tools/heavens-above-mag'
-    or die "Failed to execute ./tools/heavens-above-mag";
+    or plan skip_all => "Failed to execute ./tools/heavens-above-mag";
 
 my %canned = Astro::Coord::ECI::TLE->magnitude_table( 'show' );
-foreach my $oid ( sort keys %canned ) {
-    my $got = $canned{$oid};
-    my @rslt = heavens_above_mag::process_get( $oid );
-    my ( undef, $name, $want ) = @{ $rslt[0] };
-    if ( defined( $got ) && defined( $want ) ) {
-	cmp_ok $got, '==', $want, "Canned magnitude of $oid ($name)";
+
+my $resp = heavens_above_mag::get_cached( VISUAL_NAME, VISUAL_URL );
+
+my %visual = heavens_above_mag::parse_visual( $resp );
+
+foreach my $oid (
+    map { sprintf '%05d', $_ }
+    sort { $a <=> $b }
+    uniqint( keys %visual, keys %canned)
+) {
+    if ( ! exists $canned{$oid} ) {
+	fail "OID $oid is in canned magnitudes";
+    } elsif ( ! exists $visual{$oid} ) {
+	fail "OID $oid is in current @{[ VISUAL_NAME ]}";
     } else {
-	is $got, $want, "Canned magnitude of $oid ($name)";
+	my @rslt = heavens_above_mag::process_get( $oid );
+	my $want = format_mag( $rslt[0][2] );
+	my $got = format_mag( $canned{$oid} );
+	is $got, $want, "OID $oid canned magnitude";
     }
 }
 
-=begin comment
-
-is_last_modified( mccants => 'vsnames',
-    Astro::Coord::ECI::TLE->_MCCANTS_VSNAMES(),
-    'McCants vsnames.mag',
-);
-
-is_last_modified( mccants => 'mcnames',
-    'Thu, 25 May 2017 00:09:56 GMT',
-    'McCants mcnames.mag',
-);
-
-is_last_modified( mccants => 'quicksat',
-    Astro::Coord::ECI::TLE->_MCCANTS_QUICKSAT(),
-    'McCants qs.mag',
-);
-
-=end comment
-
-=cut
-
 done_testing;
 
-{
-    my $st;
-    my $ua;
-
-    sub is_last_modified {
-	my @arg = @_;
-	my $resp;
-
-	my ( $want, $name ) = splice @arg, -2, 2;
-
-	unless ( defined $want ) {
-	    my $builder = Test::More->builder();
-	    $builder->skip( "$name unused" );
-	    return;
-	}
-
-	if ( $arg[0] =~ m/ \A \w+ : /smx ) {
-	    $ua ||= LWP::UserAgent->new();
-	    $resp = $ua->head( shift @arg );
-	} else {
-	    $st ||= Astro::SpaceTrack->new();
-	    my ( $src, $catalog ) = splice @arg, 0, 2;
-	    $resp = $st->$src( $catalog );
-	}
-
-	unless ( $resp->is_success() ) {
-	    @_ = "$name: " . $resp->status_line();
-	    goto &fail;
-	}
-
-	if ( my ( $got ) = $resp->header( 'Last-Modified' ) ) {
-	    @_ = ( $got, $want, "$name Last-Modified: $want" );
-	    goto &is;
-	}
-
-	@_ = "$name: No Last-Modified header found";
-	goto &fail;
-    }
+sub format_mag {
+    my ( $mag, $dflt ) = @_;
+    defined $mag
+	or return $dflt;
+    return sprintf '%.1f', $mag;
 }
 
 1;

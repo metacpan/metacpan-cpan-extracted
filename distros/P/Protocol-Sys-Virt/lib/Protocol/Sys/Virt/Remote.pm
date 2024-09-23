@@ -13,13 +13,13 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Remote v10.3.7;
+package Protocol::Sys::Virt::Remote v10.3.8;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v10.3.7;
-use Protocol::Sys::Virt::Transport::XDR v10.3.7;
+use Protocol::Sys::Virt::Remote::XDR v10.3.8;
+use Protocol::Sys::Virt::Transport::XDR v10.3.8;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 my $transport = 'Protocol::Sys::Virt::Transport::XDR';
 
@@ -2817,6 +2817,16 @@ sub _dispatch_message {
                                  data => $msg_decoders[$proc]->($args{data}));
 }
 
+sub _dispatch_stream {
+    my ($self, %args) = @_;
+    my $proc = $args{header}->{proc};
+    my $serial = $args{header}->{serial};
+    my $final = $args{header}->{status} != $transport->CONTINUE;
+
+    return $self->{on_stream}->(%args,
+                                final => $final);
+}
+
 sub register {
     my ($self, $transport) = @_;
     $self->{sender} = $transport->register(
@@ -2826,7 +2836,7 @@ sub register {
             on_call    => sub { $self->_dispatch_call(@_) },
             on_reply   => sub { $self->_dispatch_reply(@_) },
             on_message => sub { $self->_dispatch_message(@_) },
-            on_stream  => $self->{on_stream},
+            on_stream  => sub { $self->_dispatch_stream(@_) },
         });
 }
 
@@ -2971,7 +2981,34 @@ sub message {
 }
 
 sub stream {
-    ...;
+    my ($self, $proc, $serial, %args) = @_;
+
+    if ($args{hole}) {
+        return $self->{sender}->(
+            $proc, $transport->STREAM_HOLE,
+            serial => $serial,
+            status => $transport->CONTINUE,
+            hole   => $args{hole});
+    }
+    else {
+        return $self->{sender}->(
+            $proc, $transport->STREAM,
+            serial => $serial,
+            status => $transport->CONTINUE,
+            data   => $args{data});
+    }
+}
+
+sub stream_end {
+    my ($self, $proc, $serial, $abort) = @_;
+
+    return $self->{sender}->(
+        $proc, $transport->STREAM,
+        serial => $serial,
+        status => $abort ? $transport->ERROR : $transport->OK,
+        data   => '',
+        error  => $abort
+        );
 }
 
 1;
@@ -2984,7 +3021,7 @@ Protocol::Sys::Virt::Remote - Connect to remote libvirt daemon
 
 =head1 VERSION
 
-v10.3.7
+v10.3.8
 
 Based on LibVirt tag v10.3.0
 
@@ -3060,8 +3097,15 @@ fact the C<data> has been decoded from XDR to the Perl representation.
   $on_stream->(header => $hdr, data => $data);
   $on_stream->(header => $hdr, hole => $hole);
   $on_stream->(header => $hdr, error => $err);
+  $on_stream->(header => $hdr, final => $final);
 
-Passthrough from the C<on_stream> event in C<Protocol::Sys::Virt::Transport>.
+Passthrough from the C<on_stream> event in C<Protocol::Sys::Virt::Transport>,
+with the exception of the C<final> argument which indicates a positive
+confirmation of the end of the stream.  This message comes after the last
+data message (which sends zero-length data); both ends send this message
+which serves as a synchronization point for the stream communication.
+
+Please note that if an error occurs, no C<final> message is sent.
 
 =head1 CONSTRUCTOR
 
@@ -3144,8 +3188,26 @@ has been sent.
 
 =head2 stream
 
-  # TODO
+  $remote->stream( $proc, $serial, data => $data );
+  $remote->stream( $proc, $serial, hole => $hole );
 
+Sends data or a stream hole to the server, relating to the stream opened with
+remote procedure C<$proc> through serial C<$serial>.
+
+Note that errors terminate the stream and should be transmitted using
+C<stream_end>.
+
+=head2 stream_end
+
+  $remote->stream_end( $proc, $serial );         # regular stream termination
+  $remote->stream_end( $proc, $serial, 1 );      # abort, on client
+  $remote->stream_end( $proc, $serial, $error ); # abort, on server
+
+Closes the stream, either through regular confirmation or through an error
+condition. The client does not send its error to the server, but the server
+sends its error information to the client -- which explains the difference in
+invocation between clients and servers. The C<role> attribute should be set
+to C<server> for servers to handle error conditions in streams correctly.
 
 =head1 CONSTANTS
 

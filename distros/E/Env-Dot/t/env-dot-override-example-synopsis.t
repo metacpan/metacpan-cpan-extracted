@@ -8,7 +8,7 @@ use Test2::V0;
 set_encoding('utf8');
 
 # Add t/lib to @INC
-use FindBin 1.51   qw( $RealBin );
+use FindBin        qw( $RealBin );
 use File::Basename qw( dirname );
 use File::Spec;
 my $lib_path;

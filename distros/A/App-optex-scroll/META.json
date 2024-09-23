@@ -42,7 +42,9 @@
       },
       "runtime" : {
          "requires" : {
-            "App::optex" : "1.00",
+            "App::optex" : "1.0101",
+            "List::Util" : "0",
+            "Scalar::Util" : "0",
             "Term::ANSIColor::Concise" : "2.07",
             "Term::ReadKey" : "0",
             "perl" : "5.024"
@@ -57,7 +59,7 @@
    "provides" : {
       "App::optex::scroll" : {
          "file" : "lib/App/optex/scroll.pm",
-         "version" : "0.9901"
+         "version" : "0.9902"
       }
    },
    "release_status" : "stable",
@@ -72,7 +74,7 @@
          "web" : "https://github.com/kaz-utashiro/optex-scroll"
       }
    },
-   "version" : "0.9901",
+   "version" : "0.9902",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

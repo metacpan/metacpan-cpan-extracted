@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,20 +28,20 @@ no_index:
 provides:
   Web::Async:
     file: lib/Web/Async.pm
-    version: '0.004'
+    version: '0.006'
   Web::Async::WebSocket::Frame:
     file: lib/Web/Async/WebSocket/Frame.pm
-    version: '0.004'
+    version: '0.006'
   Web::Async::WebSocket::Server:
     file: lib/Web/Async/WebSocket/Server.pm
-    version: '0.004'
+    version: '0.006'
   Web::Async::WebSocket::Server::Connection:
     file: lib/Web/Async/WebSocket/Server/Connection.pm
-    version: '0.004'
+    version: '0.006'
 requires:
   Compress::Zlib: '0'
+  Full::Class: '0'
   Log::Any: '0'
-  Myriad::Class: '0'
   POSIX: '0'
   Ryu::Async: '0'
   Time::Moment: '0'
@@ -52,10 +52,10 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Web-Async/issues
   homepage: https://github.com/team-at-cpan/Web-Async
   repository: https://github.com/team-at-cpan/Web-Async.git
-version: '0.004'
+version: '0.006'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Tom Molesworth <tom@audioboundary.com>'
-x_generated_by_perl: v5.38.0
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

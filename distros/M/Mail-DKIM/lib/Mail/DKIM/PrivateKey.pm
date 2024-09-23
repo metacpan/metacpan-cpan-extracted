@@ -1,7 +1,7 @@
 package Mail::DKIM::PrivateKey;
 use strict;
 use warnings;
-our $VERSION = '1.20240827'; # VERSION
+our $VERSION = '1.20240923'; # VERSION
 # ABSTRACT: a private key loaded in memory for DKIM signing
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -97,10 +97,10 @@ sub _convert_ed25519 {
         $cork = new Crypt::PK::Ed25519;
 
         # Prepend/append with PEM boilerplate
-        my $pem = "-----BEGIN ED25519 PRIVATE KEY-----\n";
+        my $pem = "-----BEGIN PRIVATE KEY-----\n";
         $pem .= $self->data;
         $pem .= "\n";
-        $pem .= "-----END ED25519 PRIVATE KEY-----\n";
+        $pem .= "-----END PRIVATE KEY-----\n";
 
         # Pass PEM text buffer
         $cork->import_key(\$pem)
@@ -195,7 +195,7 @@ Mail::DKIM::PrivateKey - a private key loaded in memory for DKIM signing
 
 =head1 VERSION
 
-version 1.20240827
+version 1.20240923
 
 =head1 SYNOPSIS
 

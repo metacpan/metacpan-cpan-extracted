@@ -4,7 +4,7 @@ StreamFinder::SermonAudio - Fetch actual raw streamable URLs on sermonaudio.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2021-2023 by
+This module is Copyright (C) 2021-2024 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -103,7 +103,7 @@ One or more stream URLs can be returned for each podcast.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, I<-quality> => high|low|audio|any ] 
+=item B<new>(I<ID>|I<url> [, I<-quality> => audio|any ] 
 [, I<-speakericon> [ => 0|1 ]] [, I<-secure> [ => 0|1 ]] 
 [, I<-nowebp> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
 
@@ -125,9 +125,11 @@ or "any".  "audio" means only accept audio streams, "any" or "all"
 (subject to the I<-secure> argument, if specified).  Unless "audio" is 
 specified, and any video stream is accepted (subject to the above limitations), 
 then the "best" stream returned will be video (video streams are by default 
-favored over audio).
+favored over audio).  Note:  "high" and "low" are no longer used in v2.41+, 
+as now only a single video stream is returned in HLS format (users should 
+use "hls_bitrate" config file option to limit video stream bandwidth.
 
-DEFAULT I<-quality> is "I<any>":  (accept all streams without resolution limit).
+DEFAULT I<-quality> is "I<any>":  (accept both video and audio streams).
 
 The optional I<-speakericon> argument can be set to reverse the artist 
 (channel) icon and artist image, usually resulting in the artist icon being a 
@@ -152,8 +154,9 @@ Additional options:
 
 I<-log> => "I<logfile>"
 
-Specify path to a log file.  If a valid and writable file is specified, A line will be 
-appended to this file every time one or more streams is successfully fetched for a url.
+Specify path to a log file.  If a valid and writable file is specified, A line 
+will be appended to this file every time one or more streams is successfully 
+fetched for a url.
 
 DEFAULT I<-none-> (no logging).
 
@@ -161,11 +164,11 @@ I<-logfmt> specifies a format string for lines written to the log file.
 
 DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
 
-The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
-[site]:  The site name (SermonAudio).  [url]:  The url searched for streams.  
-[time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
-[description], [year], [genre], [total], [albumartist]:  The corresponding field data 
-returned (or "I<-na->", if no value).
+The valid field I<[variables]> are:  [stream]: The url of the first/best stream 
+found.  [site]:  The site name (SermonAudio).  [url]:  The url searched for 
+streams.  [time]: Perl timestamp when the line was logged.  [title], [artist], 
+[album], [description], [year], [genre], [total], [albumartist]:  
+The corresponding field data returned (or "I<-na->", if no value).
 
 =item $podcast->B<get>()
 
@@ -182,8 +185,8 @@ Returns the number of streams found for the podcast.
 
 =item $podcast->B<getID>()
 
-Returns the podcast's SermonAudio ID (default).  For podcasts, the SermonAudio ID 
-is a single value.  For individual podcast episodes it's two values 
+Returns the podcast's SermonAudio ID (default).  For podcasts, the SermonAudio 
+ID is a single value.  For individual podcast episodes it's two values 
 separated by a slash ("/").
 
 =item $podcast->B<getTitle>(['desc'])
@@ -325,7 +328,7 @@ L<http://search.cpan.org/dist/StreamFinder-SermonAudio/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021-2023 Jim Turner.
+Copyright 2021-2024 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -513,6 +516,8 @@ TRYIT:
 		$self->{'description'}   = $1  if ($html =~ m#subtitle\:I\,moreInfoText\:\"([^\"]+)#s);
 		$self->{'description'} ||= $self->{'title'};
 		$self->{'genre'} = $1  if ($html =~ m#\>Category\<\/td\>\s*\<td[^\>]*\>(.+?)\<\/td\>#s);
+		$self->{'genre'} =~ s/^\s+//s;
+		$self->{'genre'} =~ s/\s+$//s;
 		if ($html =~ m#\>Date\<\/td\>\s*\<td[^\>]*\>(.+?)\<\/td\>#s) {
 			$self->{'created'} = $1;
 			$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/);

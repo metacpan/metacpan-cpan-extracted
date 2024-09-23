@@ -1,7 +1,7 @@
 package Web::Async::WebSocket::Server::Connection;
-use Myriad::Class extends => 'IO::Async::Notifier';
+use Full::Class qw(:v1), extends => 'IO::Async::Notifier';
 
-our $VERSION = '0.004'; ## VERSION
+our $VERSION = '0.006'; ## VERSION
 ## AUTHORITY
 
 use Web::Async::WebSocket::Frame;
@@ -104,6 +104,7 @@ method configure (%args) {
     $msg = delete $args{msg} if exists $args{msg};
     $ryu = delete $args{ryu} if exists $args{ryu};
     $stream = delete $args{stream} if exists $args{stream};
+    weaken($server = delete $args{server}) if exists $args{server};
     $server_name = delete $args{server_name} if exists $args{server_name};
     $maximum_payload_size = delete $args{maximum_payload_size} if exists $args{maximum_payload_size};
     $on_handshake_failure = delete $args{on_handshake_failure} if exists $args{on_handshake_failure};
@@ -481,6 +482,10 @@ async method close (%args) {
     # Can only close once
     return if $closed->is_ready;
 
+    if($server) {
+        $server->on_client_close($self, %args);
+    }
+
     # No point trying to write anything if the remote has closed the connection
     if($stream->is_read_eof) {
         $closed->done(%args);
@@ -494,9 +499,6 @@ async method close (%args) {
             'na*' => ($args{code} // 0), encode_utf8($args{reason} // '')
         ),
     );
-    if($server) {
-        $server->on_client_close($self, %args);
-    }
     $closed->done(%args);
     await $f;
     $stream->close;

@@ -1,26 +1,40 @@
 ---
-name:    Text-CSV-Track
-version: 0.7
+abstract: 'module to work with .csv file that stores some value(s) per identificator'
 author:
   - 'Jozef Kutej <jkutej@cpan.org>'
-abstract: module to work with .csv file that stores some value(s) per identificator
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Class::Accessor::Fast: 0
-  Text::CSV_XS:          0
-  Carp::Clan:            0
-  List::MoreUtils:       0
-  IO::Handle:            0
-  File::Slurp:           0
 build_requires:
-  Test::More: 0
-recommends:
-  Test::Pod: 1.14
-  Test::Pod::Coverage: 1.04
-distribution_type: module
-generated_by: hand
+  File::Temp: '0'
+configure_requires:
+  Module::Build: '0.3607'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - csv
+license: perl
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-CSV-Track
+provides:
+  Text::CSV::Track:
+    file: lib/Text/CSV/Track.pm
+    version: '0.9'
+  Text::CSV::Track::Max:
+    file: lib/Text/CSV/Track/Max.pm
+    version: '0.3'
+  Text::CSV::Track::Min:
+    file: lib/Text/CSV/Track/Min.pm
+    version: '0.3'
+requires:
+  Carp::Clan: '0'
+  Class::Accessor::Fast: '0'
+  File::Slurp: '0'
+  IO::Handle: '0'
+  List::MoreUtils: '0'
+  Text::CSV_XS: '0'
+resources:
+  bugtracker: https://github.com/jozef/perl-Text-CSV-Track/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jozef/perl-Text-CSV-Track
+version: '0.9'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

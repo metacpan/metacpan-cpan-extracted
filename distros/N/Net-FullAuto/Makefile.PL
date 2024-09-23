@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000808';
+our $VERSION='1.0000812';
 
 #print `env`,"\n\n\n";
 
@@ -993,8 +993,7 @@ if ($^O eq 'cygwin') {
                            'perl-libwww-perl','perl-LWP-Protocol-https',
                            'wget','git','figlet','autobuild','autoconf',
                            'automake','libtool','libxml2','libxml2-devel',
-                           'pkg-config','libisl15','libnsl-devel',
-                           #'pkg-config','libisl15','libcloog-isl4',
+                           'pkg-config','libisl15','libnsl-devel','cygrunsrv',
                            'sqlite3','rpm','cpio','curl') {
          unless (-1<index $cygcheck, "$package ") {
             $need_packages{$package}='';
@@ -1031,7 +1030,7 @@ if ($^O eq 'cygwin') {
               |_|
 
 END
-         my $message.=<<END;
+         $message.=<<END;
    The following Cygwin packages are missing from your
    installation:
 
@@ -1060,8 +1059,9 @@ END
             };
          }
       } print "\n\n   FullAuto install continues . . .\n\n";
-      my $cw='https://cygwin.com/setup-x86_64.exe';
-      fa_system("wget $cw");
+      fa_system(
+         "curl https://cygwin.com/setup-x86_64.exe -o setup-x86_64.exe");
+      fa_system("chmod -v 755 setup-x86_64.exe");
       foreach my $pck (split / /,$packs) {
          fa_system("./setup-x86_64.exe -q -P $pck");
       }
@@ -1074,9 +1074,12 @@ END
             push @required_cygwin_services, $cygwin_service;
             last SC;
          } elsif (-1==index $services,$cygwin_service) {
-            `net start cygserver`;
-             sleep 2;
-             next SC;
+            check_cygserver();
+            fa_system('/bin/cygserver-config --yes');
+            fa_system('net start cygserver');
+            #`net start cygserver`;
+            sleep 2;
+            next SC;
          } else { last SC }
       }
    } 
@@ -2353,6 +2356,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('HTTP::Cookies','install','Makefile');
    &fa_install_module('Test::RequiresInternet','install','Makefile');
    &fa_install_module('LWP','install','Makefile');
+   &fa_install_module('File::HomeDir','install','Makefile');
    &fa_install_module('CPAN::Mini','install','Makefile');
    &fa_install_module('ExtUtils::MakeMaker','install','Makefile');
    &fa_install_module('File::Which','install','Makefile');
@@ -2469,7 +2473,6 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('HTTP::Negotiate','install','Makefile');
    &fa_install_module('Net::HTTP','install','Makefile');
    &fa_install_module('Data::Dump','install','Makefile');
-   &fa_install_module('File::HomeDir','install','Makefile');
    &fa_install_module('Want','install','Makefile');
    &fa_install_module('Regexp::IPv6','install','Makefile');
    eval {
@@ -4861,15 +4864,9 @@ if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
    fa_system("mv -v MANIFEST_NEW MANIFEST");
 }
 
-#chdir $cwd;
-
 &fa_install_module('BerkeleyDB','install','Makefile')
    if $get_BerkeleyDB;
 
-#chdir $cwd;
-
-my $x=1;
-if ($x==0) {
 my $B_flag=1;
 while (1) {
    eval {
@@ -4923,7 +4920,6 @@ END
       fa_die($die);
    }
    last
-}
 }
 
 sub download_berkeleydb {

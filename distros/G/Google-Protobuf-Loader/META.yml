@@ -1,0 +1,41 @@
+---
+abstract: 'Automatically load .proto file using the standard "use" syntax.'
+author:
+  - 'Mathias Kende <mathias@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Readonly: '0'
+  Test2::V0: '0'
+  Test::CPANfile: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  perl: v5.26.0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - google
+  - protobuf
+  - protocol
+  - buffer
+  - loader
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-Protobuf-Loader
+no_index:
+  directory:
+    - t
+    - inc
+    - local
+    - vendor
+    - t
+requires:
+  Google::ProtocolBuffers::Dynamic: '0'
+  perl: '5.026'
+resources:
+  bugtracker: https://github.com/mkende/perl_google_protobuf_loader/issues
+  repository: https://github.com/mkende/perl_google_protobuf_loader
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

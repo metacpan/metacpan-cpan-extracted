@@ -7,7 +7,7 @@ build_requires:
   File::Path: '0'
   File::Temp: '0'
   FileHandle: '0'
-  FindBin: '1.51'
+  FindBin: '0'
   Test2::Require: '0'
   Test2::V0: '0'
   Test::Script: '1.28'
@@ -31,13 +31,13 @@ name: Env-Dot
 provides:
   Env::Dot:
     file: lib/Env/Dot.pm
-    version: '0.014'
+    version: '0.015'
   Env::Dot::Functions:
     file: lib/Env/Dot/Functions.pm
-    version: '0.014'
+    version: '0.015'
   Env::Dot::ScriptFunctions:
     file: lib/Env/Dot/ScriptFunctions.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -46,6 +46,7 @@ requires:
   Exporter: '0'
   File::Spec: '0'
   Getopt::Long: '0'
+  IO::File: '0'
   Pod::Usage: '0'
   constant: '0'
   open: '0'
@@ -56,7 +57,7 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Env-Dot
   homepage: https://metacpan.org/release/Env-Dot
   repository: https://github.com/mikkoi/env-dot.git
-version: '0.014'
+version: '0.015'
 x_contributors:
   - 'David Kaufman <david@gigawatt.org>'
 x_generated_by_perl: v5.34.1

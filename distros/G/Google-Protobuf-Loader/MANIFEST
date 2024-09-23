@@ -1,0 +1,16 @@
+Changes
+cpanfile
+lib/Google/Protobuf/Loader.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+t/000-load.t
+t/001-podsyntax.t
+t/100-test.t
+t/101-map_options.t
+t/102-use-in-package.t
+t/proto/Foo/Bar.proto
+t/proto/Main/Simple.proto
+t/proto/Main/Test.proto
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

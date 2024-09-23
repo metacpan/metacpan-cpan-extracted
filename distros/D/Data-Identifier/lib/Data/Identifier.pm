@@ -14,15 +14,18 @@ use strict;
 use warnings;
 
 use Carp;
+use Math::BigInt;
+use URI;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
-    RE_OID  => qr/^[0-2](\.(?:0|[1-9][0-9]*))+$/,
+    RE_OID  => qr/^[0-2](?:\.(?:0|[1-9][0-9]*))+$/,
     RE_URI  => qr/^[a-zA-Z][a-zA-Z0-9\+\.\-]+/,
     RE_UINT => qr/^(?:0|[1-9][0-9]*)$/,
     RE_WD   => qr/^[QPL][1-9][0-9]*$/,
+    RE_DOI  => qr/^10\.[1-9][0-9]+(?:\.[0-9]+)*\/./,
 };
 
 use constant {
@@ -32,9 +35,23 @@ use constant {
     WK_SID  => 'f87a38cb-fd13-4e15-866c-e49901adbec5', # small-identifier
     WK_WD   => 'ce7aae1e-a210-4214-926a-0ebca56d77e3', # wikidata-identifier
     WK_GTIN => '82d529be-0f00-4b4f-a43f-4a22de5f5312', # gtin
+    WK_IBAN => 'b1418262-6bc9-459c-b4b0-a054d77db0ea', # iban
+    WK_BIC  => 'c8a3a132-f160-473c-b5f3-26a748f37e62', # bic
+    WK_DOI  => '931f155e-5a24-499b-9fbb-ed4efefe27fe', # doi
 
     NS_WD   => '9e10aca7-4a99-43ac-9368-6cbfa43636df', # Wikidata-namespace
 };
+
+my %uuid_to_uriid_org = (
+    WK_UUID() => 'uuid',
+    WK_OID()  => 'oid',
+    WK_URI()  => 'uri',
+    WK_SID()  => 'sid',
+    WK_GTIN() => 'gtin',
+    WK_WD()   => 'wikidata-identifier',
+);
+
+my %uuid_org_to_uuid = map {$uuid_to_uriid_org{$_} => $_} keys %uuid_to_uriid_org;
 
 my $well_known_uuid = __PACKAGE__->new(ise => WK_UUID, validate => RE_UUID);
 
@@ -45,6 +62,9 @@ my %well_known = (
     sid  => __PACKAGE__->new($well_known_uuid => WK_SID,    validate => RE_UINT),
     wd   => __PACKAGE__->new($well_known_uuid => WK_WD,     validate => RE_WD,   namespace => NS_WD, generate => 'id-based'),
     gtin => __PACKAGE__->new($well_known_uuid => WK_GTIN,   validate => RE_UINT),
+    iban => __PACKAGE__->new($well_known_uuid => WK_IBAN),
+    bic  => __PACKAGE__->new($well_known_uuid => WK_BIC),
+    doi  => __PACKAGE__->new($well_known_uuid => WK_DOI,    validate => RE_DOI),
 );
 
 my %registered;
@@ -54,16 +74,18 @@ $_->register foreach values %well_known;
 # Refill with sids:
 {
     my %wk_sids = (
-        'ddd60c5c-2934-404f-8f2d-fcb4da88b633'  => 1, # also-shares-identifier
-        WK_UUID()                               => 2,
-        'bfae7574-3dae-425d-89b1-9c087c140c23'  => 3, # tagname
-        '7f265548-81dc-4280-9550-1bd0aa4bf748'  => 4, # has-type
-        WK_URI()                                => 5,
-        WK_OID()                                => 6,
+        'ddd60c5c-2934-404f-8f2d-fcb4da88b633'  =>   1, # also-shares-identifier
+        WK_UUID()                               =>   2,
+        'bfae7574-3dae-425d-89b1-9c087c140c23'  =>   3, # tagname
+        '7f265548-81dc-4280-9550-1bd0aa4bf748'  =>   4, # has-type
+        WK_URI()                                =>   5,
+        WK_OID()                                =>   6,
         # Unassigned: 7
-        'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1'  => 8, # language-tag-identifier
-        WK_WD()                                 => 9,
-        WK_SID()                                => 27,
+        'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1'  =>   8, # language-tag-identifier
+        WK_WD()                                 =>   9,
+        '2bffc55d-7380-454e-bd53-c5acd525d692'  =>  26, # roaraudio-error-number
+        WK_SID()                                =>  27,
+        '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 112, # chat-0-word-identifier
         WK_GTIN()                               => 160,
     );
 
@@ -79,6 +101,37 @@ $_->register foreach values %well_known;
 foreach my $ise (NS_WD) {
     my $identifier = __PACKAGE__->new(ise => $ise);
     $identifier->register; # re-register
+}
+
+# Refill with displaynames
+{
+    my %displaynames = (
+        WK_UUID()                               => 'uuid',
+        WK_OID()                                => 'oid',
+        WK_URI()                                => 'uri',
+        WK_SID()                                => 'small-identifier',
+        WK_WD()                                 => 'wikidata-identifier',
+        WK_GTIN()                               => 'gtin',
+        WK_IBAN()                               => 'iban',
+        WK_BIC()                                => 'bic',
+        WK_DOI()                                => 'doi',
+        NS_WD()                                 => 'Wikidata-namespace',
+
+        'ddd60c5c-2934-404f-8f2d-fcb4da88b633'  => 'also-shares-identifier',
+        'bfae7574-3dae-425d-89b1-9c087c140c23'  => 'tagname',
+        '7f265548-81dc-4280-9550-1bd0aa4bf748'  => 'has-type',
+        'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1'  => 'language-tag-identifier',
+        '2bffc55d-7380-454e-bd53-c5acd525d692'  => 'roaraudio-error-number',
+        '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 'chat-0-word-identifier',
+
+        '5f167223-cc9c-4b2f-9928-9fe1b253b560'  => 'unicode-code-point',
+    );
+
+    foreach my $ise (keys %displaynames) {
+        my $identifier = __PACKAGE__->new(ise => $ise);
+        $identifier->{displayname} //= $displaynames{$ise};
+        $identifier->register; # re-register
+    }
 }
 
 # Call this after after we loaded all our stuff and before anyone else will register stuff:
@@ -123,9 +176,46 @@ sub new {
 
     croak 'Not a valid type' unless $type->isa(__PACKAGE__);
 
+    # we normalise URIs first as they may then normalised again
+    if ($type == ($well_known{uri} // 0)) {
+        my $uri = $id.''; # force stringification
+
+        if ($uri =~ m#^urn:uuid:([0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})$#) {
+            $id = $1;
+            $type = $well_known_uuid;
+        } elsif ($uri =~ m#^urn:oid:([0-2](?:\.(?:0|[1-9][0-9]*))+)$#) {
+            $id = $1;
+            $type = $well_known{oid};
+        } elsif ($uri =~ m#^https?://www\.wikidata\.org/entity/([QPL][1-9][0-9]*)$#) {
+            $id = $1;
+            $type = $well_known{wd};
+        } elsif ($uri =~ m#^https?://doi\.org/(10\..+)$#) {
+            $id = $1;
+            $type = $well_known{doi};
+        } elsif ($uri =~ m#^https?://uriid\.org/([^/]+)/[^/]+#) {
+            my $ptype = $1;
+            if (defined($uuid_org_to_uuid{$ptype}) || $ptype =~ RE_UUID) {
+                my $u = URI->new($uri);
+                my @path_segments = $u->path_segments;
+                if (scalar(@path_segments) == 3 && $path_segments[0] eq '') {
+                    $type = $pkg->new(uuid => ($uuid_org_to_uuid{$path_segments[1]} // $path_segments[1]));
+                    $id = $path_segments[2];
+                }
+            }
+        }
+    }
+
     if ($type == ($well_known_uuid // 0)) {
         $id = lc($id); # normalise
-
+    } elsif ($type == ($well_known{oid} // 0)) {
+        if ($id =~ /^2\.25\.([1-9][0-9]*)$/) {
+            my $hex = Math::BigInt->new($1)->as_hex;
+            $hex =~ s/^0x//;
+            $hex = ('0' x (32 - length($hex))) . $hex;
+            $hex =~ s/^(.{8})(.{4})(.{4})(.{4})(.{12})$/$1-$2-$3-$4-$5/;
+            $type = $well_known_uuid;
+            $id = $hex;
+        }
     }
 
     if (defined(my $v = $registered{$type->uuid}{$id})) {
@@ -140,7 +230,7 @@ sub new {
     $self->{type} = $type;
     $self->{id} = $id;
 
-    foreach my $key (qw(validate namespace generate)) {
+    foreach my $key (qw(validate namespace generate displayname)) {
         next unless defined $opts{$key};
         $self->{$key} //= $opts{$key};
     }
@@ -200,6 +290,10 @@ sub oid {
         return $self->{id};
     }
 
+    if (defined(my $uuid = eval {$self->uuid})) {
+        return $self->{id_cache}{$type->ise} = sprintf('2.25.%s', Math::BigInt->new('0x'.$uuid =~ tr/-//dr));
+    }
+
     croak 'Identifier has no valid OID';
 }
 
@@ -209,6 +303,21 @@ sub uri {
     return $self->{id_cache}{$type->ise} if defined($self->{id_cache}) && defined($self->{id_cache}{$type->ise});
     if ($self->{type} == $type) {
         return $self->{id};
+    }
+
+    if ($self->{type} == $well_known{wd}) {
+        return $self->{id_cache}{$type->ise} = sprintf('http://www.wikidata.org/entity/%s', $self->{id});
+    } elsif ($self->{type} == $well_known{doi}) {
+        return $self->{id_cache}{$type->ise} = sprintf('https://doi.org/%s', $self->{id});
+    } elsif (defined(my $uuid = eval {$self->uuid})) {
+        return $self->{id_cache}{$type->ise} = sprintf('urn:uuid:%s', $uuid);
+    } elsif (defined(my $oid = eval {$self->oid})) {
+        return $self->{id_cache}{$type->ise} = sprintf('urn:oid:%s', $oid);
+    } else {
+        my $u = URI->new("https://uriid.org/");
+        my $type_uuid = $self->{type}->uuid;
+        $u->path_segments('', $uuid_to_uriid_org{$type_uuid} // $type_uuid, $self->{id});
+        return $self->{id_cache}{$type->ise} = $u;
     }
 
     croak 'Identifier has no valid URI';
@@ -261,6 +370,14 @@ sub userdata {
 
 sub displayname {
     my ($self) = @_;
+
+    if (defined(my $displayname = $self->{displayname})) {
+        $displayname = $self->$displayname() if ref $displayname;
+
+        # recheck and return as any of the above conversions could result in $displayname becoming invalid.
+        return $displayname if defined($displayname) && length($displayname);
+    }
+
     return $self->id.''; # force stringification.
 }
 
@@ -318,14 +435,33 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
     use Data::Identifier;
 
+    my Data::Identifier $id = Data::Identifier->new(uuid => 'ddd60c5c-2934-404f-8f2d-fcb4da88b633');
+    my Data::Identifier $id = Data::Identifier->new(oid => '2.1.0.1.0');
+
+    my Data::Identifier $custom_type = Data::Identifier->new(uuid => ...);
+    my Data::Identifier $id = Data::Identifier->new($custom_type => '123abc');
+
+    my Data::Identifier $type = $id->type;
+    my $raw = $id->id;
+
+    my $uuid = $id->uuid;
+    my $oid  = $id->oid;
+    my $uri  = $id->uri;
+    my $ise  = $id->ise;
+
 This module provides an common interface to identifiers of different types.
 Each identifier stores both it's raw value (called C<id>) and it's type (C<type>).
+
+B<Note:> Validation on the raw identifier value may or may not be performed depending on the type.
+The level of validation this module can do is limited by it's knowledge about the type as well
+as performance aspects. This module may therefore reject invalid values. But it is not safe to assume
+that it will reject all invalid values.
 
 B<Note:> This module performs basic deduplication and normalisation. This means that you
 might not always get back exactly the identifier you passed in but an equivalent one.
@@ -367,6 +503,18 @@ An wikidata identifier (Q, P, or L).
 
 An GTIN (or EAN).
 
+=item C<iban>
+
+An IBAN (International Bank Account Number).
+
+=item C<bic>
+
+A BIC (Business Identifier Code).
+
+=item C<doi>
+
+A doi (digital object identifier).
+
 =back
 
 The following options are supported:
@@ -380,6 +528,12 @@ A regex that should be used to validate identifiers if this identifier is used a
 =item C<namespace>
 
 The namespace used by a type. Must be a L<Data::Identifier> or an ISE. Must also resolve to an UUID.
+
+=item C<displayname>
+
+The name as to be returned by L</displayname>.
+Must be a scalar string value or a code reference that returns a scalar string.
+If it is a code reference the identifier object is passed as C<$_[0]>.
 
 =back
 

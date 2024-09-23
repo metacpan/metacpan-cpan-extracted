@@ -1,7 +1,7 @@
 package Mail::DKIM::ARC::Verifier;
 use strict;
 use warnings;
-our $VERSION = '1.20240827'; # VERSION
+our $VERSION = '1.20240923'; # VERSION
 # ABSTRACT: verifies an ARC-Sealed message
 
 # Copyright 2017 FastMail Pty Ltd.  All Rights Reserved.
@@ -626,7 +626,7 @@ Mail::DKIM::ARC::Verifier - verifies an ARC-Sealed message
 
 =head1 VERSION
 
-version 1.20240827
+version 1.20240923
 
 =head1 SYNOPSIS
 

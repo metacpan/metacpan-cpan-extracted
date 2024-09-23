@@ -1,8 +1,8 @@
 package App::optex::pingu;
 
-my $VERSION = '0.03';
+my $VERSION = '0.99';
 
-use v5.14;
+use v5.24;
 use warnings;
 use utf8;
 use Carp;
@@ -17,7 +17,7 @@ pingu - optex make-everything-pingu filter
 
 =head1 SYNOPSIS
 
-B<optex> -Mpingu --pingu I<command>
+B<optex> -Mpingu [ options -- ] I<command>
 
 =head1 DESCRIPTION
 
@@ -45,11 +45,11 @@ features.
 
 =over 7
 
-=item B<--pingu>
+=item B<-->[B<no->]B<pingu>
 
-Make command pingu.
+Produce images.  Enabled by default.
 
-=item B<--pingu-image>=I<file>
+=item B<--image>=I<file>
 
 Set image file.  File is searched at current directory and module
 directory.  Standard B<pingu> image is stored as B<pingu.asc>.  If
@@ -61,14 +61,15 @@ order.
     module-dir/pingu
     module-dir/pingu.asc
 
-=item B<--pingu-char>
+=item B<--char>=I<c>
 
 Specify replacement character.  Default is Unicode C<FULL BLOCK>
 (U+2588: █).
 
-=item B<--pingu-interval>=I<sec>
+=item B<--interval>=I<sec>
 
-Set interval time between printing each lines.  Default is zero.
+Specifies the interval time in seconds between outputting each line.
+Default is 0.1 seconds.
 
 =back
 
@@ -187,7 +188,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2022 Kazumasa Utashiro.
+Copyright 2022-2024 Kazumasa Utashiro.
 
 You can redistribute it and/or modify it under the same terms
 as Perl itself.
@@ -195,21 +196,54 @@ as Perl itself.
 =cut
 
 use File::Share qw(dist_dir);
-use List::Util qw(first);
+use List::Util qw(first pairmap);
 use Getopt::EX::Colormap qw(colorize);
 use Time::HiRes qw(usleep);
+use Scalar::Util;
+*is_number = \&Scalar::Util::looks_like_number;
 
 my $image_dir = $ENV{OPTEX_PINGU_IMAGEDIR} //= dist_dir 'App-optex-pingu';
 
-our %param = (
-    char => '█',
-    repeat => 1,
-    interval => 0,
+our %opt = (
+    pingu    => \(our $pingu = 1),
+    image    => 'pingu',
+    char     => '█',
+    repeat   => 1,
+    interval => 0.1,
     );
+
+sub hash_to_spec {
+    pairmap {
+	my $ref = ref $b;
+	if    (not defined $b)   { "$a!"  }
+	elsif ($ref eq 'SCALAR') { "$a!"  }
+	elsif (is_number($b))    { "$a=f" }
+	else                     { "$a=s" }
+    } shift->%*;
+}
 
 my %reader = (
     asc => \&read_asc,
     );
+
+use App::optex::util::filter qw(io_filter);
+
+sub finalize {
+    our($mod, $argv) = @_;
+    #
+    # private option handling
+    #
+    if (@$argv and $argv->[0] !~ /^-M/ and
+	defined(my $i = first { $argv->[$_] eq '--' } keys @$argv)) {
+	splice @$argv, $i, 1; # remove '--'
+	if (local @ARGV = splice @$argv, 0, $i) {
+	    use Getopt::Long qw(GetOptionsFromArray);
+	    Getopt::Long::Configure qw(bundling);
+	    GetOptions \%opt, hash_to_spec \%opt or die "Option parse error.\n";
+	}
+    }
+    io_filter(\&pingu, STDOUT => 1);
+}
 
 sub get_image {
     my $name = shift;
@@ -232,28 +266,28 @@ sub read_asc {
     local $_ = do { local $/; <$fh> };
     s/^#.*\n//mg;
     s{ (?<str>(?<col>[RGBCMYWK])\g{col}*) }{
-	colorize($+{col}, $param{char} x length($+{str}))
+	colorize($+{col}, $opt{char} x length($+{str}))
     }xgie;
     /.+/g;
 }
 
 sub pingu {
     @_ = map { utf8::is_utf8($_) ? $_ : decode('utf8', $_) } @_;
-    my %opt = @_;
-    my $name = $opt{name} || 'pingu';
-    my @image = get_image($name);
+    my %param = @_;
+    my @image = get_image($opt{image});
     my $i = 0;
-    my $sleep = $param{interval} > 0 ? $param{interval} * 1000000 : 0;
+    my $sleep = $opt{interval} > 0 ? $opt{interval} * 1000000 : 0;
     while (<>) {
-	print $image[$i++ % @image], $_;
+	print $image[$i++ % @image] if $pingu;
+	print $_;
 	usleep $sleep if $sleep > 0;
     }
 }
 
 sub set {
     while (my($k, $v) = splice(@_, 0, 2)) {
-	exists $param{$k} or next;
-	$param{$k} = $v;
+	exists $opt{$k} or next;
+	$opt{$k} = $v;
     }
     ();
 }
@@ -261,18 +295,6 @@ sub set {
 1;
 
 __DATA__
-
-mode function
-
-option --pingu-char &set(char=$<shift>)
-
-option --pingu-interval &set(interval=$<shift>)
-
-option --pingu-image -Mutil::filter --osub __PACKAGE__::pingu(name=$<shift>)
-
-option --pingu --pingu-image pingu
-
-option --pingu-original --pingu-char '#' --pingu
 
 #  LocalWords:  pingu optex asc Unicode Cyan cpanminus cpanm rc
 #  LocalWords:  localhost Kazumasa Utashiro

@@ -1,0 +1,24 @@
+conf/generate.conf
+conf/generate.ini
+lib/Daje/Generate.pm
+lib/Daje/Generate/Sql/Base/Common.pm
+lib/Daje/Generate/Sql/Table.pm
+lib/Daje/Generate/Sql/Table/Fields.pm
+lib/Daje/Generate/Sql/Table/ForeignKey.pm
+lib/Daje/Generate/Sql/Table/Index.pm
+lib/Daje/Generate/Sql/Table/Sql.pm
+lib/Daje/Generate/Templates/Sql.pm
+lib/Daje/Generate/Test/Datasections.pm
+lib/Daje/Generate/Test/TestData.pm
+lib/Daje/Generate/Tools/Datasections.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+script/generate.pl
+t/create_table.t
+t/fields_generate.t
+t/fk_generate.t
+t/index_generate.t
+t/load_templates.t
+t/table_generate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)

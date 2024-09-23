@@ -20,6 +20,30 @@
 #######################################################################
 
 
+2024-09-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000812 released
+
+        * More Updates for Cygwin install in Makefile.PL
+
+2024-09-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000811 released
+
+        * More Updates for Cygwin install in Makefile.PL
+
+2024-09-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000810 released
+
+        * More Updates for Cygwin install in Makefile.PL
+
+2024-09-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000809 released
+
+        * Updated Cygwin install in Makefile.PL
+
 2024-09-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000808 released

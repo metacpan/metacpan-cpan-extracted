@@ -1,0 +1,69 @@
+{
+   "abstract" : "module to work with .csv file that stores some value(s) per identificator",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "keywords" : [
+      "csv"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-CSV-Track",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3607"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp::Clan" : "0",
+            "Class::Accessor::Fast" : "0",
+            "File::Slurp" : "0",
+            "IO::Handle" : "0",
+            "List::MoreUtils" : "0",
+            "Text::CSV_XS" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::CSV::Track" : {
+         "file" : "lib/Text/CSV/Track.pm",
+         "version" : "0.9"
+      },
+      "Text::CSV::Track::Max" : {
+         "file" : "lib/Text/CSV/Track/Max.pm",
+         "version" : "0.3"
+      },
+      "Text::CSV::Track::Min" : {
+         "file" : "lib/Text/CSV/Track/Min.pm",
+         "version" : "0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jozef/perl-Text-CSV-Track/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jozef/perl-Text-CSV-Track"
+      }
+   },
+   "version" : "0.9",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

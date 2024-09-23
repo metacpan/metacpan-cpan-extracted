@@ -1,7 +1,7 @@
 package Mail::DKIM::PublicKey;
 use strict;
 use warnings;
-our $VERSION = '1.20240827'; # VERSION
+our $VERSION = '1.20240923'; # VERSION
 # ABSTRACT: Represents a DKIM key
 
 # Copyright 2005 Messiah College. All rights reserved.
@@ -522,7 +522,7 @@ Mail::DKIM::PublicKey - Represents a DKIM key
 
 =head1 VERSION
 
-version 1.20240827
+version 1.20240923
 
 =head1 CONSTRUCTOR
 

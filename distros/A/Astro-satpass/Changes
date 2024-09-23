@@ -1,3 +1,16 @@
+0.132		2024-09-22	T. R. Wyant
+    Update canned magnitudes.
+
+    Retract deprecation of date2epoch() and epoch2datetime(). When I
+    decided to retract them (they are unused internally) I neglected to
+    consider that these consume and generates dates in the Julian
+    calendar before October 15 1582 Gregorian -- or whatever
+    $JD_GREGORIAN is set to.
+
+    Add Astro::Coord::ECI::Utils::mod360().
+
+    Add Astro::Coord::ECI->angular_radius().
+
 0.131		2024-03-16	T. R. Wyant
     Deprecate Astro::Coord::ECI::Utils subroutines  date2epoch() and
     epoch2datetime().

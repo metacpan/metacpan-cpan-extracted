@@ -1,5 +1,10 @@
 Revision history for Perl extension App-optex-scroll
 
+0.9902 2024-09-22T18:24:04Z
+
+    - implement private option handling
+    - introduce --interval parameter
+
 0.9901 2024-09-12T02:20:50Z
 
     - use Term::ANSIColor::Concise@2.07 and csi_report()

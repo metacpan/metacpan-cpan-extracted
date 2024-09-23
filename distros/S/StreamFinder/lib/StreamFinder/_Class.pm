@@ -4,7 +4,7 @@ StreamFinder::_Class - Base module containing default methods common to all Stre
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2021 by
+This module is Copyright (C) 2017-2024 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -71,7 +71,6 @@ sub new
 	$self->{'timeout'} = 10  unless (defined $self->{'timeout'});
 	$self->{'secure'} = 0    unless (defined $self->{'secure'});
 	$self->{'hls_bandwidth'} = 0    unless (defined($self->{'hls_bandwidth'}) && $self->{'hls_bandwidth'} =~ /^\d+$/);
-	$self->{'hls_bandwidth'} ||= $self->{'bandwidth'}  if (defined($self->{'bandwidth'}) && $self->{'bandwidth'} =~ /^\d+$/);
 	$self->{'log'} = '';
 	$self->{'logfmt'} = '[time] [url] - [site]: [title] ([total])';
 
@@ -135,10 +134,10 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 	return ''  unless (defined $firstStream);
 
 	if (($arglist =~ /\b\-?nopls\b/ && $firstStream =~ /\.(pls|m3u)$/i)
-			|| (defined($self->{'hls_bandwidth'}) && $firstStream =~ /\.(m3u8)$/i)
+			|| ($self->{'hls_bandwidth'} > 0 && $firstStream =~ /\.(m3u8)$/i)
 			|| ($arglist =~ /\b\-?noplaylists\b/ && $firstStream =~ /\.(pls|m3u8?)$/i)) {
 		my $plType = $1;
-		print STDERR "-getURL($idx): NOPLAYLISTS|BANDWIDTH and (".$firstStream.") TP=$plType=\n"  if ($DEBUG);
+		print STDERR "-getURL($idx): -NOPLAYLISTS|BANDWIDTH SET: 1st=$firstStream= EXT=$plType=\n"  if ($DEBUG);
 		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 		$ua->timeout($self->{'timeout'});
 		$ua->cookie_jar({});
@@ -189,7 +188,7 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 					if ($line <= $#lines) {
 						(my $bw = $1) =~ s/^\d*x//o;
 						if ($bw > $highestBW && $lines[$line] =~ m#\.m3u8#o
-								&& ($self->{'hls_bandwidth'} <= 0	|| $bw <= $self->{'hls_bandwidth'})) {
+								&& ($self->{'hls_bandwidth'} <= 0 || $bw <= $self->{'hls_bandwidth'})) {
 							my $url = $lines[$line];
 							$highestBW = $bw;
 							if ($lines[$line] =~ m#^https?\:\/\/#o) {

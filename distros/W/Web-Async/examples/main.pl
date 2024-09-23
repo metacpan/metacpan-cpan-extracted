@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
-use Myriad::Class;
-use Log::Any::Adapter 'Stderr', log_level => 'debug';
+use Full::Script qw(:v1);
 use IO::Async::Loop;
 
 use Web::Async::WebSocket::Server;
@@ -53,6 +52,12 @@ HTML
         }
     )
 );
+$srv->closing_client->each(sub ($client, @) {
+    $log->infof('Client: %s closing', '' . $client->{client});
+});
+$srv->disconnecting_client->each(sub ($client, @) {
+    $log->infof('Client: %s disconnecting', '' . $client->{client});
+});
 $srv->incoming_client->each(sub ($client, @) {
     $log->infof('Client: %s', "$client");
     $client->incoming_frame->map(async sub ($frame, @) {
@@ -65,4 +70,32 @@ $srv->incoming_client->each(sub ($client, @) {
         }
     })->resolve->retain;
 });
+
+use Net::Async::WebSocket::Client;
+
+$log->infof('Connect');
+$loop->add(
+    my $ws = Net::Async::WebSocket::Client->new(
+        on_frame => sub {
+            my ($ws, $frame) = @_;
+            $log->infof('frame %s', $frame);
+        },
+    )
+);
+await $ws->connect(
+    url => "ws://localhost:9001",
+);
+await $ws->send_text_frame(
+    encode_json_utf8({
+        id => 1,
+        category => 'cs',
+        method => 'test',
+        data => {
+            xyz => 'abc',
+        },
+        subscribe => 0
+    })
+);
+$ws->close;
+
 $loop->run;

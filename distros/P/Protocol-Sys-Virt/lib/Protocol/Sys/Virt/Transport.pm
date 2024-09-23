@@ -13,7 +13,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Transport v10.3.7;
+package Protocol::Sys::Virt::Transport v10.3.8;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -293,8 +293,9 @@ sub _send {
     elsif ($status == $msgs->ERROR) {
         my $payload = '';
         unless ($type == $msgs->STREAM
-                and $self->{role} eq 'server') { # client message
-            # set up error payload
+                and $self->{role} eq 'client') { # client message
+            my $i = 0;
+            $msgs->serialize_Error( $args{error}, $i, $payload );
         }
 
         my $len = pack('L>', 4 + length($hdr) + length($payload));
@@ -306,7 +307,7 @@ sub _send {
         if ($type == $msgs->STREAM_HOLE) {
             $msgs->serialize_StreamHole( $args{hole}, $i, $payload );
         }
-        elsif ($status == $msgs->STREAM) {
+        elsif ($type == $msgs->STREAM) {
             $payload = $args{data};
         }
         else {
@@ -333,7 +334,7 @@ Protocol::Sys::Virt::Transport - Low level Libvirt connection protocol
 
 =head1 VERSION
 
-v10.3.7
+v10.3.8
 
 Based on LibVirt tag v10.3.0
 

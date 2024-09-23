@@ -35,6 +35,9 @@ note "Perl $]";
 require_ok 'Astro::Coord::ECI::Utils'
     or BAIL_OUT 'Can not continue without Astro::Coord::ECI::Utils';
 
+require_ok 'Astro::Coord::ECI::Mixin'
+    or BAIL_OUT 'Can not continue without Astro::Coord::ECI::Mixin';
+
 require_ok 'Astro::Coord::ECI'
     or BAIL_OUT 'Can not continue without Astro::Coord::ECI';
 
@@ -115,6 +118,8 @@ u_cmp_eql( jcent2000 => timegm( 0, 0, 0, 10, 3, 87 ), -.127296372348,
 
 u_cmp_eql( jcent2000 => timegm( 0, 21, 19, 10, 3, 87 ), -.12727430,
     '%.8f', 'jcent2000: 19:21 Nov 3 1987: Meeus ex 12.b pg 89' );
+
+u_cmp_eql( mod360 => -30, 330, '%.4f', 'mod360( -30 )' );
 
 u_cmp_eql( thetag => timegm( 0, 0, 0, 10, 3, 87 ), 3.450397,
     '%.6f', 'thetag: Midnight Nov 3 1987: Meeus ex 12.a pg 88' );

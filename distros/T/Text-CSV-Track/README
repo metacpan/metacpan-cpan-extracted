@@ -1,38 +1,229 @@
-Text-CSV-Track version 0.4
-==============================
+NAME
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+    Text::CSV::Track - module to work with .csv file that stores some
+    value(s) per identificator
 
-A README file is required for CPAN modules since CPAN extracts the
-README file from a module distribution so that people browsing the
-archive can use it get an idea of the modules uses. It is usually a
-good idea to provide version information here so that people can
-decide whether fixes for the module are worth downloading.
+SYNOPSIS
 
-INSTALLATION
+            use Text::CSV::Track;
+    
+            #create object
+            my $access_time = Text::CSV::Track->new({ file_name => $file_name, ignore_missing_file => 1 });
+    
+            #set single value
+            $access_time->value_of($login, $access_time);
+    
+            #fetch single value
+            print $access_time->value_of($login);
+    
+            #set multiple values
+            $access_time->value_of($login, $access_time);
+    
+            #fetch multiple values
+            my @fields = $access_time->value_of($login);
+    
+            #save changes
+            $access_time->store();
+    
+            #print out all the identificators we have
+            foreach my $login (sort $access_time->ident_list()) {
+                    print "$login\n";
+            }
+    
+            #getting muticolumn by hash
+            $track_object = Text::CSV::Track->new({
+                    file_name    => $file_name
+                    , hash_names => [ qw{ col coool } ]
+            });
+            my %hash = %{$track_object->hash_of('ident')};
+            print "second column is: ", $hash{'coool'}, "\n";
+    
+            #setting multicolumn by hash
+            $track_object->hash_of('ident2', { coool => 333 } );
+    
+            #header lines
+            $track_object = Text::CSV::Track->new({
+                    file_name           => $file_name,
+                    header_lines        => \@header_lines,
+                    ignore_missing_file => 1,
+            });
 
-To install this module type the following:
+DESCRIPTION
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+    The module manipulates csv file:
 
-DEPENDENCIES
+    "identificator","value1" ...
 
-This module requires these other modules and libraries:
+    It is designet to work when multiple processes access the same file at
+    the same time. It uses lazy initialization. That mean that the file is
+    read only when it is needed. There are three scenarios:
 
-  see Makefile.PL
+    1. Only reading of values is needed. In this case first ->value_of()
+    also activates the reading of file. File is read while holding shared
+    flock. Then the lock is released.
 
-COPYRIGHT AND LICENCE
+    2. Only setting of values is needed. In this case
+    ->value_of($ident,$val) calls just saves the values to the hash. Then
+    when ->store() is called it activates the reading of file. File is read
+    while holding exclusive flock. The identifications that were stored in
+    the hash are replaced, the rest is kept.
 
-Copyright (C) 2006 by Jozef Kutej
+    3. Both reading and setting values is needed. In this case
+    'full_time_lock' flag is needed. The exclusive lock will be held from
+    the first read until the object is destroied. While the lock is there
+    no other process that uses flock can read or write to this file.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.7 or,
-at your option, any later version of Perl 5 you may have available.
+    When setting and getting only single value value_of($ident) will return
+    scalar. If setting/getting multiple columns then an array.
 
+METHODS
+
+    new()
+
+              new({
+                      file_name                   => 'filename.csv',
+                      ignore_missing_file         => 1,
+                      full_time_lock              => 1,
+                      auto_store                  => 1,
+                      ignore_badly_formated       => 1,
+                      header_lines                => 3, #or [ '#heading1', '#heading2', '#heading3' ]
+                      footer_lines                => 3, #or [ '#footer1', '#footer2', '#footer3' ]
+                      hash_names                  => [ qw{ column1 column2 }  ],
+                      single_column               => 1,
+                      trunc                       => 1,
+                      replace_new_lines_with      => '|',
+                      identificator_column_number => 0,
+      
+                      #L<Text::CSV_XS> paramteres
+                      sep_char              => q{,},
+                      escape_char           => q{\\},
+                      quote_char            => q{"},
+                      always_quote          => 0,
+                      binary                => 0,
+              })
+
+      All flags are optional.
+
+      'file_name' is used to read old results and then store the updated
+      ones
+
+      If 'ignore_missing_file' is set then the lib will just warn that it
+      can not read the file. store() will use this name to store the
+      results.
+
+      If 'full_time_lock' is set the exclusive lock will be held until the
+      object is not destroyed. use it when you need both reading the values
+      and changing the values. If you need just read OR change then you
+      don't need to set this flag. See description about lazy
+      initialization.
+
+      If 'auto_store' is on then the store() is called when object is
+      destroied
+
+      If 'ignore_badly_formated_lines' in on badly formated lines from
+      input are ignored. Otherwise the modules calls croak.
+
+      'header_lines' specifies how many lines of csv are the header lines.
+      They will be skipped during the reading of the file and rewritten
+      during the storing to the file. After first read of value the
+      ->header_lines becomes array ref of header lines. Optionaly you can
+      set array ref and set the header lines.
+
+      'hash_names' specifies hash names fro hash_of() function.
+
+      'single_column' files that store just the identificator for line. In
+      this case during the read 1 is set as the second column. During store
+      that one is dropped so single column will be stored back.
+
+      'trunc' don't read previous file values. Header lines will persist.
+
+      'replace_new_lines_with' [\n\r]+ are replaced by this character if
+      defined. By default it is '|'. It is a good idea to replace new lines
+      because they are not handled by Text::CSV_XS on read.
+
+      'identificator_column_number'. If identificator is in different
+      column than the first one set this value. Column are numbered
+      starting with 0 like in an @array. ->value_of and ->hash_of are
+      indexed as it the identificator column was not there.
+
+      See Text::CSV_XS for 'sep_char', 'escape_char', 'quote_char',
+      'always_quote', 'binary'
+
+    value_of()
+
+      Is used to both store or retrieve the value. if called with one
+      argument then it is a read. if called with two arguments then it will
+      update the value. The update will be done ONLY if the supplied value
+      is bigger.
+
+    hash_of()
+
+      Returns hash of values. Names for the hash values are taken from
+      hash_names parameter.
+
+    store()
+
+      when this one is called it will write the changes back to file.
+
+    store_as_xml()
+
+      this will write to the file but the values will be excel xml
+      formated. Combined with proper header and footer lines this can
+      generate excel readable xml file.
+
+    ident_list()
+
+      will return the array of identificators
+
+    output_row_of($ident, $type)
+
+      $type is one of csv or xml.
+
+      Returns one row of data for given identificator.
+
+    csv_line_of($identificator)
+
+      Calls $self->output_row_of($identificator, 'csv').
+
+    header_lines()
+
+      Set or get header lines.
+
+    footer_lines()
+
+      Set or get footer lines.
+
+    finish()
+
+      Called by destructor to clean up thinks. Calls store() if auto_atore
+      is on and closes csv filehandle.
+
+TODO
+
+            - ident_list() should return number of non undef rows in scalar context
+            - strategy for Track ->new({ strategy => sub { $a > $b } })
+            - then rewrite max/min to use it this way
+            - constraints for columns
+            - shell executable to copy, dump csv file or extract data from it
+            - allow having extended csv with header names in every file key=value;key2=value2
+            - atomic writes
+            - allow extended csv lines, lines that look like:
+                key=value1,key5=value2,key2=value3
+
+SEE ALSO
+
+    Text::CSV::Track::Max, Text::CSV::Track::Min, Module Trac -
+    http://trac.cle.sk/Text-CSV-Track/
+
+AUTHOR
+
+    Jozef Kutej - <jozef@kutej.net>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2006 by Jozef Kutej
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.4 or, at
+    your option, any later version of Perl 5 you may have available.
 

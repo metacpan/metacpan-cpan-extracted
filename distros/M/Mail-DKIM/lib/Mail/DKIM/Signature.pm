@@ -1,7 +1,7 @@
 package Mail::DKIM::Signature;
 use strict;
 use warnings;
-our $VERSION = '1.20240827'; # VERSION
+our $VERSION = '1.20240923'; # VERSION
 # ABSTRACT: represents a DKIM-Signature header
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -620,7 +620,7 @@ Mail::DKIM::Signature - represents a DKIM-Signature header
 
 =head1 VERSION
 
-version 1.20240827
+version 1.20240923
 
 =head1 CONSTRUCTORS
 

@@ -3,7 +3,7 @@ requires 'Ryu::Async';
 requires 'Time::Moment';
 requires 'POSIX';
 requires 'Log::Any';
-requires 'Myriad::Class';
+requires 'Full::Class';
 requires 'Unicode::UTF8';
 requires 'URI';
 requires 'URI::ws';

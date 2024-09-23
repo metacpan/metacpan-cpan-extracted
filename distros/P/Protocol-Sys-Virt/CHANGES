@@ -1,5 +1,9 @@
 -----
 
+10.3.8   2024-09-22
+    [Added]
+        * Added handling of streams
+
 10.3.7   2024-09-14
     [Changed]
         * Regenerated with XDR::Gen v0.0.5,

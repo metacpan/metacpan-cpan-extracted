@@ -24,7 +24,7 @@ use DateTime::Format::ISO8601;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my @musicbrainz_wikidata_relations = qw(P434 P435 P436 P966 P982 P1004 P1330 P1407 P4404 P5813 P6423 P8052);
 
@@ -1169,7 +1169,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

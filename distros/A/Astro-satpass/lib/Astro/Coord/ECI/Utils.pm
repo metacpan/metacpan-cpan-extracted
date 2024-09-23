@@ -8,17 +8,18 @@ Astro::Coord::ECI::Utils - Utility routines for astronomical calculations
  my $now = time ();
  print "The current Julian day is ", julianday ($now);
 
-=head2 DEPRECATION NOTICE
+=head2 UN-DEPRECATION NOTICE
 
-As of version 0.131, subroutines C<date2epoch()> and C<epoch2datetime()>
-are deprecated. These are not used internally. Under Perl 5.12 and
-later, C<Time::Local::timegm_posix()> and core C<gmtime()> are
-recommended over these subroutines. For earlier Perls, you can try
-L<Time::y2038|Time::y2038>.
+In version 0.131, C<date2epoch()> and C<epoch2datetime()> were
+deprecated in favor of C<Time::Local::timegm_posix()> and
+C<CORE::gmtime()>.
 
-Six months after the release of version 0.131, these subroutines will
-warn on first use. Six months after that, they will warn on every use.
-After a further six months, use of them will be fatal.
+I later realized that this was wrong. The problem with it was that
+astronomical dates are often given in the Julian calendar before October
+15 1582, which the previously-recognized subroutines do not handle.
+
+As of version 0.132 the deprecation of these subroutines is retracted,
+and all reference to it (other than this notice) will be removed.
 
 =head1 DESCRIPTION
 
@@ -135,7 +136,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.131';
+our $VERSION = '0.132';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -294,7 +295,7 @@ my @all_external = ( qw{
 	format_space_track_json_time gm_strftime intensity_to_magnitude
 	jcent2000 jd2date jd2datetime jday2000 julianday
 	keplers_equation load_module local_strftime
-	looks_like_number max min mod2pi
+	looks_like_number max min mod2pi mod360
 	omega position_angle
 	rad2deg rad2dms rad2hms tan theta0 thetag vector_cross_product
 	vector_dot_product vector_magnitude vector_unitize __classisa
@@ -476,10 +477,6 @@ use constant JD_OF_EPOCH => date2jd (gmtime (0));
 
 =item $epoch = date2epoch ($sec, $min, $hr, $day, $mon, $yr)
 
-This subroutine is B<deprecated> as of version 0.131. It will be put
-through my usual deprecation cycle (warn on first use after six months,
-and so on) and removed.
-
 This is a convenience routine that converts the given date to seconds
 since the epoch, going through date2jd() to do so. The arguments are the
 same as those of date2jd().
@@ -487,11 +484,9 @@ same as those of date2jd().
 If less than 6 arguments are provided, zeroes will be prepended to the
 argument list as needed.
 
-The functionality is the same as B<Time::Local::timegm>, but this
-function lacks timegm's limited date range under Perls before 5.12.0. If
-you have Perl 5.12.0 or better, the core L<Time::Local|Time::Local>
-C<timegm()> will probably do what you want.  If you have an earlier
-Perl, L<Time::y2038|Time::y2038> C<timegm()> may do what you want.
+The functionality is similar to C<Time::Local::timegm()>, but the
+arguments will be interpreted according to the Julian calendar if the
+date is before L<$JD_GREGORIAN|/$JD_GREGORIAN>.
 
 =cut
 
@@ -633,10 +628,6 @@ sub embodies {
 
 =item ($sec, $min, $hr, $day, $mon, $yr, $wday, $yday, 0) = epoch2datetime ($epoch)
 
-This subroutine is B<deprecated> as of version 0.131. It will be put
-through my usual deprecation cycle (warn on first use after six months,
-and so on) and removed.
-
 This convenience subroutine converts the given time in seconds from the
 system epoch to the corresponding date and time. It is implemented in
 terms of jd2date (), with the year and month returned from that
@@ -649,11 +640,9 @@ time) indicator which is always 0 to be consistent with gmtime.
 If called in scalar context, it returns the date formatted by
 POSIX::strftime, using the format string in $DATETIMEFORMAT.
 
-The functionality is the same as the core C<gmtime()>, but this function
-lacks gmtime's limited date range under Perls before 5.12.0. If you have
-Perl 5.12.0 or better, the core C<gmtime()> will probably do what you
-want.  If you have an earlier Perl, L<Time::y2038|Time::y2038>
-C<gmtime()> may do what you want.
+The functionality is similar to C<CORE::gmtime()>, but the result will
+be in the Julian calendar if the date is before
+L<$JD_GREGORIAN|/$JD_GREGORIAN>.
 
 The input must convert to a non-negative Julian date. The exact lower
 limit depends on the system, but is computed by -(JD_OF_EPOCH * 86400).
@@ -1134,6 +1123,18 @@ $theta < TWOPI.
 =cut
 
 sub mod2pi {return $_[0] - floor ($_[0] / TWOPI) * TWOPI}
+
+=item $theta = mod360( $theta )
+
+This subroutine reduces the given angle in degrees to the range 0 <=
+$theta < 360. This is B<not> equivalent to C<$theta % 360> because the
+latter loses the fractional part of $theta. It is B<not> equivalent to
+C<fmod( $theta, 360 )> because the result of this subroutine is never
+negative.
+
+=cut
+
+sub mod360 { return $_[0] - floor( $_[0] / 360 ) * 360 }
 
 =item $radians = omega ($time);
 

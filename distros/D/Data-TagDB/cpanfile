@@ -8,6 +8,7 @@ requires "Encode" => "3.06";
 requires "URI" => "1.5";
 requires "UUID::Tiny" => "1.04";
 requires "perl" => "v5.10.0";
+recommends "Data::Identifier" => "0.01";
 
 on 'test' => sub {
   requires "Test::Exception" => "0.30";

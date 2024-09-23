@@ -1,7 +1,7 @@
 package Mail::DKIM::ARC::Seal;
 use strict;
 use warnings;
-our $VERSION = '1.20240827'; # VERSION
+our $VERSION = '1.20240923'; # VERSION
 # ABSTRACT: represents a ARC-Seal header
 
 # Copyright 2017 FastMail Pty Ltd. All Rights Reserved.
@@ -77,7 +77,7 @@ Mail::DKIM::ARC::Seal - represents a ARC-Seal header
 
 =head1 VERSION
 
-version 1.20240827
+version 1.20240923
 
 =head1 CONSTRUCTORS
 

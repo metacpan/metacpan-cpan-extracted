@@ -1,4 +1,4 @@
-requires 'perl', '5.014';
+requires 'perl', '5.024';
 requires 'List::Util';
 requires 'File::Share', '0.27';
 requires 'Time::HiRes';

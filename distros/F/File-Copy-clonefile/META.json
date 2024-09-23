@@ -16,9 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Dist::Build" : "0.014",
-            "ExtUtils::Builder::Compiler" : "0.021",
-            "ExtUtils::Constant" : "0"
+            "Dist::Build" : "0.015"
          }
       },
       "runtime" : {
@@ -35,7 +33,7 @@
    "provides" : {
       "File::Copy::clonefile" : {
          "file" : "lib/File/Copy/clonefile.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       }
    },
    "release_status" : "stable",
@@ -50,7 +48,7 @@
          "web" : "https://github.com/skaji/perl-File-Copy-clonefile"
       }
    },
-   "version" : "v0.0.7",
+   "version" : "v0.0.8",
    "x_contributors" : [
       "Leon Timmermans <fawaka@gmail.com>"
    ],

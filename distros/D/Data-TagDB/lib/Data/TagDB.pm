@@ -11,7 +11,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(weaken blessed);
 
 use Carp;
 use DBI;
@@ -24,7 +24,7 @@ use Data::TagDB::MultiIterator;
 use Data::TagDB::WellKnown;
 use Data::URIID::Colour;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 
 
@@ -74,6 +74,23 @@ sub disconnect {
 
 sub tag_by_id {
     my ($self, $type, $id, $autocreate) = @_;
+
+    # Shift arguments into correct order as needed:
+    if (blessed($type) && $type->isa('Data::Identifier')) {
+        ($self, $id, $autocreate) = @_;
+
+        $type = $id->type;
+
+        # Is $type === UUID?
+        # TODO: Make this a better check.
+        if ($type == $type->type && $type->id eq '8be115d2-dc2f-4a98-91e1-a6e3075cbc31') {
+            $type = $self->tag_by_hint('uuid');
+        } else {
+            $type = $self->tag_by_id($type);
+        }
+
+        $id = $id->id;
+    }
 
     $type = $self->tag_by_hint($type) unless eval { $type->isa('Data::TagDB::Tag') };
 
@@ -129,6 +146,14 @@ sub create_tag {
     my @bind;
     my $row;
     my $tag;
+
+    if (blessed($ids) && $ids->isa('Data::Identifier')) {
+        $ids = [$self->tag_by_id($ids->type) => $ids->id];
+    }
+
+    if (blessed($addional_ids) && $addional_ids->isa('Data::Identifier')) {
+        $addional_ids = [$self->tag_by_id($addional_ids->type) => $addional_ids->id];
+    }
 
     for (my $i = 0; $i < scalar(@{$ids}); $i += 2) {
         my $type  = $ids->[$i + 0];
@@ -486,7 +511,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -495,6 +520,20 @@ version v0.02
     my $db = Data::TagDB->new($dsn, ...);
     # or:
     my $db = Data::TagDB->new($dbh);
+
+    # Create new database:
+    use Data::TagDB::Migration;
+    my Data::TagDB $db = Data::TagDB::Migration->create(...);
+
+This module implements SQL based universal tag databases. Such databases can be used to store any kind of (semantic) data.
+
+This module and it's submodule implement creation of databases, migration (to most current scheme),
+adding data and reading data from the database.
+
+The instances of L<Data::TagDB::Tag> repesent any kind of object (may it be file, user account or a real life object like a tree).
+It provides some convenience functions such as to query objects for their name.
+
+L<Data::TagDB::Factory> (via L</factory>) is provided for easy creation of new tags.
 
 =head1 METHODS
 
@@ -525,11 +564,16 @@ This disconnects from the database backend. It also renders this object useless.
     my Data::TagDB::Tag $tag = $db->tag_by_hint($type => $id);
     # or:
     my Data::TagDB::Tag $tag = $db->tag_by_hint($hint => $id);
+    # or:
+    my Data::Identifier $id = ...;
+    my Data::TagDB::Tag $tag = $db->tag_by_hint($id);
     # e.g:
     my Data::TagDB::Tag $tag = $db->tag_by_hint(uuid => 'abc...');
 
 Gets a tag by an an identifier of the provided type. The type must be a C<Data::TagDB::Tag> or a
 a string that is a valid hint.
+
+If only argument is provided the argument must be an instance of L<Data::Identifier>.
 
 =head2 relation
 
@@ -563,7 +607,7 @@ Additionally C<data_raw> can be used to filter for a data value.
 
     my Data::TagDB::Iterator $iter = $db->link(...);
 
-This combines L<relation>, and L<metadata>. An iterator is returned that lists both metadata, and relations (in any order).
+This combines L</relation>, and L</metadata>. An iterator is returned that lists both metadata, and relations (in any order).
 The common subset of filters can be used. Namely:
 C<tag>,
 C<relation>, and
@@ -588,12 +632,18 @@ must be L<Data::TagDB::Tag>.
 =head2 create_tag
 
     my Data::TagDB::Tag $tag = $db->create_tag([$type => $value, ...], [$type => $value, ...]);
+    # or:
+    my Data::Identifier $id = ...;
+    my Data::Identifier $extra = ...;
+    my Data::TagDB::Tag $tag = $db->create_tag($id, [ $extra ]);
 
 Create a tag (or return it if it already exists). Takes two lists if type-identifier pairs.
 The first list is the list of identifiers that uniquely identify the tag (e.g. an UUID).
 The second list contains additional, non unique identifiers (e.g. tagnames) and is optional.
 
 If the tag does not exist it is created. Once it exists all identifiers added (for already existing tags missing identifiers are added).
+
+Each list can be replaced by a single instance of L<Data::Identifier>.
 
 =head2 create_metadata
 

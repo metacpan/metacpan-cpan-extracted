@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package main;
+
+message Simple {
+  optional string name = 1;
+}

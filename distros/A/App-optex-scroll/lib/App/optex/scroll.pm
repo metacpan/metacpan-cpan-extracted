@@ -8,27 +8,31 @@ use IO::Handle;
 use Term::ReadKey;
 use Term::ANSIColor::Concise qw(:all);
 use List::Util qw(first pairmap);
+use Scalar::Util;
+*is_number = \&Scalar::Util::looks_like_number;
 
-our $VERSION = "0.9901";
+our $VERSION = "0.9902";
+
+use App::optex::util::filter qw(interval);
 
 my %opt = (
-    line    => 10,
-    debug   => \ our $debug,
-    timeout => \(our $timeout = 0.1),
+    line     => 10,
+    wait     => \(our $wait = 1),
+    debug    => \(our $debug = undef),
+    timeout  => \(our $timeout = 0.1),
+    interval => 0,
 );
 
 sub hash_to_spec {
     pairmap {
 	$a = "$a|${\(uc(substr($a, 0, 1)))}";
 	my $ref = ref $b;
-	if    (not defined $b)   { "$a"   }
-	elsif ($ref eq 'SCALAR') { "$a"   }
-	elsif ($b =~ /^\d+$/)    { "$a=i" }
+	if    (not defined $b)   { "$a!"  }
+	elsif ($ref eq 'SCALAR') { "$a!"  }
+	elsif (is_number($b))    { "$a=i" }
 	else                     { "$a=s" }
     } shift->%*;
 }
-
-my($mod, $argv);
 
 sub flush {
     STDERR->printflush(@_);
@@ -42,16 +46,26 @@ sub set_region {
 }
 
 END {
+    close STDOUT if $wait;
     set_region();
 }
 
 sub finalize {
-    ($mod, $argv) = @_;
-
+    our($mod, $argv) = @_;
     #
     # private option handling
     #
-    if (my $i = (first { $argv->[$_] eq '--' } keys @$argv)) {
+    if (@$argv and $argv->[0] !~ /^-M/ and
+	defined(my $i = first { $argv->[$_] eq '--' } keys @$argv)) {
+	splice @$argv, $i, 1; # remove '--'
+	if (local @ARGV = splice @$argv, 0, $i) {
+	    use Getopt::Long qw(GetOptionsFromArray);
+	    Getopt::Long::Configure qw(bundling);
+	    GetOptions \%opt, hash_to_spec \%opt or die "Option parse error.\n";
+	}
+    }
+    my $i = first { $argv->[$_] eq '--' } keys @$argv;
+    if (defined $i and $argv->[0] !~ /^-M/) {
 	splice @$argv, $i, 1; # remove '--'
 	if (local @ARGV = splice @$argv, 0, $i) {
 	    use Getopt::Long qw(GetOptionsFromArray);
@@ -65,6 +79,10 @@ sub finalize {
     flush csi_code(CPL => $region); # CPL: Cursor Previous Line
     my($l, $c) = cursor_position() or return;
     set_region($l, $l + $region);
+
+    if (my $time = $opt{interval}) {
+	interval(time => $time);
+    }
 }
 
 sub cursor_position {
@@ -135,7 +153,7 @@ optex -Mscroll [ options -- ] command
 
 =head1 VERSION
 
-Version 0.9901
+Version 0.9902
 
 =head1 DESCRIPTION
 
@@ -155,6 +173,11 @@ position where it was executed.
 
 Set scroll region lines to I<n>.
 Default is 10.
+
+=item B<--interval>=I<sec>
+
+Specifies the interval time in seconds between outputting each line.
+Default is 0 seconds.
 
 =back
 
@@ -200,7 +223,7 @@ L<https://github.com/kaz-utashiro/optex-scroll/>
 L<App::optex::pingu>,
 L<https://github.com/kaz-utashiro/optex-pingu/>
 
-https://vt100.net/docs/vt100-ug/
+L<https://vt100.net/docs/vt100-ug/>
 
 =head1 LICENSE
 

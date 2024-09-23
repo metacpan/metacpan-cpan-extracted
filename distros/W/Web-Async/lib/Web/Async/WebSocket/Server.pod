@@ -16,8 +16,25 @@ Web::Async::WebSocket::Server - L<Future>-based web+HTTP handling
 
 =head1 DESCRIPTION
 
-Although other HTTP-adjacent protocols are planned, currently this only contains L<Web::Async::WebSocket::Server>,
-see documentation there for more details.
+Provides basic websocket server implementation.
+
+=head1 METHODS
+
+=head2 port
+
+Returns the current listening port.
+
+=head2 incoming_client
+
+A L<Ryu::Source> which emits an event every time a client connects.
+
+=head2 disconnecting_client
+
+A L<Ryu::Source> which emits an event every time a client disconnects.
+
+=head2 closing_client
+
+A L<Ryu::Source> which emits an event every time a client closes normally.
 
 =head1 INHERITED METHODS
 

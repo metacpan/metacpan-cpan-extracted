@@ -9,7 +9,7 @@ optex -Mscroll \[ options -- \] command
 
 # VERSION
 
-Version 0.9901
+Version 0.9902
 
 # DESCRIPTION
 
@@ -27,6 +27,11 @@ position where it was executed.
 
     Set scroll region lines to _n_.
     Default is 10.
+
+- **--interval**=_sec_
+
+    Specifies the interval time in seconds between outputting each line.
+    Default is 0 seconds.
 
 # EXAMPLES
 
@@ -66,7 +71,7 @@ Use [cpanminus(1)](http://man.he.net/man1/cpanminus) command:
 [App::optex::pingu](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Apingu),
 [https://github.com/kaz-utashiro/optex-pingu/](https://github.com/kaz-utashiro/optex-pingu/)
 
-https://vt100.net/docs/vt100-ug/
+[https://vt100.net/docs/vt100-ug/](https://vt100.net/docs/vt100-ug/)
 
 # LICENSE
 
