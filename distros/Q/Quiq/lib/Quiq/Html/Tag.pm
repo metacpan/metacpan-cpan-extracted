@@ -483,7 +483,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.219';
+our $VERSION = '1.220';
 
 use Quiq::Css;
 use Quiq::Template;
@@ -662,7 +662,8 @@ my %Attribute = (
     defer => 'bool',                # script
     dir => 'dir',                   # ENUM I18N
     disabled => 'bool',             # button,input,optgroup,option,select,
-                                  # textarea
+                                    # textarea
+    download => 'filename',         # a
     enctype => 'contentType',       # form
     frame => 'tframe',              # ENUM table
     frameborder => 'frameBorder',   # ENUM frame, iframe
@@ -682,7 +683,7 @@ my %Attribute = (
     method => 'method',             # ENUM form
     multiple => 'bool',             # select
     name => 'nmtoken',              # button,input,meta,param,select,textarea,
-                                  # object;form,frame,map(HTML)
+                                    # object;form,frame,map(HTML)
     nohref => 'bool',               # area
     noresize => 'bool',             # frame
     onblur => 'script',             # Focus,select
@@ -2246,7 +2247,7 @@ sub import {
 
 =head1 VERSION
 
-1.219
+1.220
 
 =head1 AUTHOR
 

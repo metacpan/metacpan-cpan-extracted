@@ -18,7 +18,9 @@ use WWW::Mechanize::Link;
 use IO::Socket::INET;
 use Time::HiRes qw(time sleep);
 
-our $VERSION= '0.24';
+use Carp 'croak';
+
+our $VERSION= '0.25';
 our @CARP_NOT=qw(Selenium::Remote::Driver);
 
 =head1 NAME
@@ -199,12 +201,12 @@ sub new {
             # We can do a proper pipe-open
             my $mode = shift @cmd;
             $options{ pid } = open $options{fh}, $mode, @cmd
-                or die "Couldn't launch [@cmd]: $! / $?";
+                or croak "Couldn't launch [@cmd]: $! / $?";
         } else {
             # We can't do a proper pipe-open, so do the single-arg open
             # in the hope that everything has been set up properly
             $options{ pid } = open $options{fh}, $cmd[0]
-                or die "Couldn't launch [$cmd[0]]: $! / $?";
+                or croak "Couldn't launch [$cmd[0]]: $! / $?";
         };
 
         # Just to give PhantomJS time to start up, make sure it accepts connections
@@ -1285,10 +1287,10 @@ our %xpath_quote = (
     #']' => '[\]]',
 );
 
-sub quote_xpath($) {
-    local $_ = $_[0];
+sub quote_xpath($line) {
+    local $_ = $line;
     s/(['"\[\]])/$xpath_quote{$1} || $1/ge;
-    $_
+    return $_
 };
 
 # Copied from WWW::Mechanize 1.97
@@ -1365,7 +1367,7 @@ sub find_link_dom {
     };
 
     if (my $p = delete $opts{ url }) {
-        push @spec, sprintf '@href = "%s" or @src="%s"', quote_xpath $p, quote_xpath $p;
+        push @spec, sprintf '@href = "%s" or @src="%s"', quote_xpath( $p ), quote_xpath( $p );
     }
     my @tags = (sort keys %link_spec);
     if (my $p = delete $opts{ tag }) {
@@ -2125,7 +2127,7 @@ are identical to those accepted by the L<< /$mech->xpath >> method.
 
 sub form_name {
     my ($self,$name,%options) = @_;
-    $name = quote_xpath $name;
+    $name = quote_xpath( $name );
     _default_limiter( single => \%options );
     $self->{current_form} = $self->selector("form[name='$name']",
         user_info => "form name '$name'",
@@ -3219,7 +3221,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2014-2020 by Max Maischein C<corion@cpan.org>.
+Copyright 2014-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

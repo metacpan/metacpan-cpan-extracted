@@ -50,6 +50,8 @@ C<static method concat : L<R::NDArray::String|SPVM::R::NDArray::String> ($x_ndar
 
 Creates a new L<R::NDArray::String|SPVM::R::NDArray::String> object of the same dimensions as the n-dimensional array $x_ndarray for a return value, performs concatnation C<.> operation on each element of the n-dimensional array $x_ndarray and $y_ndarray, and sets each element of the new n-dimensional array to the each operation result, and returns the new n-dimensional array.
 
+$y_ndarray allows to be a L<scalar|SPVM::R::NDArray/"Scalar">. In that case, each element used in the operation is the element at index 0.
+
 If concatnation C<.> operation throw an exceptions, the element is set to C<undef>.
 
 Exceptions:
@@ -58,7 +60,7 @@ The n-dimensional array $x_ndarray must be defined. Otherwise, an exception is t
 
 The n-dimensional array $y_ndarray must be defined. Otherwise, an exception is thrown.
 
-The dimensions of $x_ndarray must be equal to the dimensions of $y_ndarray. Otherwise, an exception is thrown.
+The dimensions of $x_ndarray must be equal to the dimensions of $y_ndarray if $y_ndarray is not a scalar. Otherwise, an exception is thrown.
 
 =head2 eq
 

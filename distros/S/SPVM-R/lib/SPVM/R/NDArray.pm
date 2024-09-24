@@ -129,6 +129,22 @@ The type of this array is a numeric types, a multi-numeric types, or an object t
 
 See also L</"Column Major Order">.
 
+C<method set_data : void ($data : object);>
+
+Copies the elements of the data $data to the elements of the data of this instance.
+
+Note that the data itself is not replaced.
+
+Exceptions:
+
+The $data must be defined. Otherwise an exception is thrown.
+
+The type of the $data must be an array type. Otherwise an exception is thrown.
+
+The type name of the $data must be same as the type name of the data of this instance. Otherwise an exception is thrown.
+
+The array lenght of the $data must be equal to the array legnth of the array length of the data of this instance. Otherwise an exception is thrown.
+
 =head2 dim
 
 C<has dim : int[];>

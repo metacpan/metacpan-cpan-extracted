@@ -1,6 +1,6 @@
 package SPVM::R;
 
-our $VERSION = "0.101002";
+our $VERSION = "0.101003";
 
 1;
 
@@ -51,7 +51,7 @@ R class in L<SPVM> is a port of the L<R language|https://www.r-project.org/> fea
   my $sub = DOP->sub($vec1, $vec2);
   
   # Scalar multiplication
-  my $scamul = DOP->scamul($sca1, $vec1);
+  my $scamul = DOP->mul($vec1, $sca1);
   
   # Absolute
   my $abs_vec1 = DOP->abs($vec1);

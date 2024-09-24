@@ -58,10 +58,12 @@ class R::OP::StringBuffer {
       die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
-    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
-    
-    unless ($equals_dim) {
-      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+    unless ($y_ndarray->is_scalar) {
+      my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+      
+      unless ($equals_dim) {
+        die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+      }
     }
     
     my $length = $x_ndarray->length;
@@ -71,8 +73,15 @@ class R::OP::StringBuffer {
     my $x_data = $x_ndarray->data;
     my $y_data = $y_ndarray->data;
     
-    for (my $i = 0; $i < $length; $i++) {
-      eval { $x_data->[$i]->push($y_data->[$i]); }
+    if ($y_ndarray->is_scalar) {
+      for (my $i = 0; $i < $length; $i++) {
+        eval { $x_data->[$i]->push($y_data->[0]); }
+      }
+    }
+    else {
+      for (my $i = 0; $i < $length; $i++) {
+        eval { $x_data->[$i]->push($y_data->[$i]); }
+      }
     }
   }
   

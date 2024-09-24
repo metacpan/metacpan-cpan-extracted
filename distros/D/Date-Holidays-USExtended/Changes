@@ -1,0 +1,40 @@
+Revision history for Date-Holidays-USExtended
+
+0.0300 2024-09-23 15:23:07
+    - Rename this module to Date::Holidays::USExtended.
+
+0.0208_1 2024-09-23 14:52:39
+    - Deprecate the Date::Holidays::USA module.
+
+0.0207 2024-06-07 19:32:38
+    - Fix documented examples.
+    - Improve tests.
+
+0.0206 2024-06-06 17:39:09
+    - Add " Day" to Veteran's too!
+
+0.0205 2024-05-21 18:46:27
+    - Add " Day" to holdays that traditionally have "Day" in the name!
+
+0.0204 2024-05-18 20:08:03
+    - Mother's Day is on a Sunday, not Monday!
+
+0.0203 2024-05-18 19:06:20
+    - Actually add Mother's Day to the list of holidays.
+
+0.0202 2024-04-05 09:19:34
+    - Add the missing Mother's Day item.
+
+0.0201 2024-03-20 21:16:45
+    - Drop circular dependents.
+
+0.0200 2024-03-19 15:51:00
+    - Fix docs.
+
+0.0101 2024-03-19 13:39:45
+    - Fix SYNOPSIS.
+    - Improve documentation.
+
+0.0100 2024-03-19 13:09:16
+    - Mint with Dist::Zilla.
+    - Modify heavily from Date::Holidays::* and Date::Holidays::Adapter::*.

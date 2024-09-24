@@ -1,5 +1,8 @@
 Revision history for File-Copy-clonefile
 
+v0.0.9  2024-09-23 18:53:10 JST
+  - Configure requires perl v5.20
+
 v0.0.8  2024-09-23 12:20:10 JST
   - No functional change; re-packaging
 

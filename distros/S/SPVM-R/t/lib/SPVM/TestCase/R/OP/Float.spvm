@@ -101,22 +101,44 @@ class TestCase::R::OP::Float {
   
   static method add : int () {
     
-    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
-    
-    my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
-    
-    my $ret_ndarray = FOP->add($x_ndarray, $y_ndarray);
-    
-    unless ($ret_ndarray is_type R::NDArray::Float) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+      
+      my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+      
+      my $ret_ndarray = FOP->add($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)4, 6])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
-    unless (Array->equals_float($ret_ndarray->data, [(float)4, 6])) {
-      return 0;
-    }
-    
-    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+      
+      my $y_ndarray = FOP->c((float)3);
+      
+      my $ret_ndarray = FOP->add($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)4, 5])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
     # Exceptions
@@ -166,22 +188,44 @@ class TestCase::R::OP::Float {
   
   static method sub : int () {
     
-    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
-    
-    my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
-    
-    my $ret_ndarray = FOP->sub($x_ndarray, $y_ndarray);
-    
-    unless ($ret_ndarray is_type R::NDArray::Float) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+      
+      my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+      
+      my $ret_ndarray = FOP->sub($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)-2, -2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
-    unless (Array->equals_float($ret_ndarray->data, [(float)-2, -2])) {
-      return 0;
-    }
-    
-    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+      
+      my $y_ndarray = FOP->c((float)3);
+      
+      my $ret_ndarray = FOP->sub($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)-2, -1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
     # Exceptions
@@ -231,22 +275,44 @@ class TestCase::R::OP::Float {
 
   static method mul : int () {
     
-    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
-    
-    my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
-    
-    my $ret_ndarray = FOP->mul($x_ndarray, $y_ndarray);
-    
-    unless ($ret_ndarray is_type R::NDArray::Float) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+      
+      my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+      
+      my $ret_ndarray = FOP->mul($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)3, 8])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
-    unless (Array->equals_float($ret_ndarray->data, [(float)3, 8])) {
-      return 0;
-    }
-    
-    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+      
+      my $y_ndarray = FOP->c((float)3);
+      
+      my $ret_ndarray = FOP->mul($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)3, 6])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
     # Exceptions
@@ -293,90 +359,47 @@ class TestCase::R::OP::Float {
     
     return 1;
   }
-
-  static method scamul : int () {
-    
-    my $x_ndarray = FOP->c([(float)3, 4], [1, 2]);
-    
-    my $scalar_ndarray = FOP->c((float)3);
-    
-    my $ret_ndarray = FOP->scamul($x_ndarray, $scalar_ndarray);
-    
-    unless ($ret_ndarray is_type R::NDArray::Float) {
-      return 0;
-    }
-    
-    unless (Array->equals_float($ret_ndarray->data, [(float)9, 12])) {
-      return 0;
-    }
-    
-    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
-      return 0;
-    }
-    
-    # Exceptions
-    {
-      {
-        my $x_ndarray = FOP->c([(float)3, 4], [1, 2]);
-        
-        my $scalar_ndarray = FOP->c((float)3);
-        
-        eval { FOP->scamul(undef, $scalar_ndarray); }
-        
-        unless ($@) {
-          return 0;
-        }
-      }
-      
-      {
-        my $x_ndarray = FOP->c([(float)3, 4], [1, 2]);
-        
-        my $scalar_ndarray = FOP->c((float)3);
-        
-        eval { FOP->scamul($x_ndarray, undef); }
-        
-        unless ($@) {
-          return 0;
-        }
-      }
-      
-      {
-        my $scalar_ndarray = FOP->c([(float)1, 2], [1, 2]);
-        
-        my $x_ndarray = FOP->c([(float)3, 4], [2, 1]);
-        
-        eval { FOP->scamul($x_ndarray, $scalar_ndarray); }
-        
-        unless ($@) {
-          return 0;
-        }
-      }
-      
-    }
-    
-    $@ = undef;
-    
-    return 1;
-  }
   
   static method div : int () {
     
-    my $x_ndarray = FOP->c([(float)1, 1], [1, 2]);
-    
-    my $y_ndarray = FOP->c([(float)2, 4], [1, 2]);
-    
-    my $ret_ndarray = FOP->div($x_ndarray, $y_ndarray);
-    
-    unless ($ret_ndarray is_type R::NDArray::Float) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 1], [1, 2]);
+      
+      my $y_ndarray = FOP->c([(float)2, 4], [1, 2]);
+      
+      my $ret_ndarray = FOP->div($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)0.5, 0.25])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
-    unless (Array->equals_float($ret_ndarray->data, [(float)0.5f, 0.25f])) {
-      return 0;
-    }
-    
-    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 1], [1, 2]);
+      
+      my $y_ndarray = FOP->c((float)2);
+      
+      my $ret_ndarray = FOP->div($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)0.5, 0.5])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
     # Exceptions
@@ -411,71 +434,6 @@ class TestCase::R::OP::Float {
         my $y_ndarray = FOP->c([(float)3, 4], [2, 1]);
         
         eval { FOP->div($x_ndarray, $y_ndarray); }
-        
-        unless ($@) {
-          return 0;
-        }
-      }
-      
-    }
-    
-    $@ = undef;
-    
-    return 1;
-  }
-  
-  static method scadiv : int () {
-    
-    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
-    
-    my $scalar_ndarray = FOP->c((float)2);
-    
-    my $ret_ndarray = FOP->scadiv($x_ndarray, $scalar_ndarray);
-    
-    unless ($ret_ndarray is_type R::NDArray::Float) {
-      return 0;
-    }
-    
-    unless (Array->equals_float($ret_ndarray->data, [(float)0.5f, 1])) {
-      return 0;
-    }
-    
-    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
-      return 0;
-    }
-    
-    # Exceptions
-    {
-      {
-        my $x_ndarray = FOP->c([(float)3, 4], [1, 2]);
-        
-        my $scalar_ndarray = FOP->c((float)3);
-        
-        eval { FOP->scadiv($x_ndarray, undef); }
-        
-        unless ($@) {
-          return 0;
-        }
-      }
-      
-      {
-        my $x_ndarray = FOP->c([(float)3, 4], [1, 2]);
-        
-        my $scalar_ndarray = FOP->c((float)3);
-        
-        eval { FOP->scadiv(undef, $scalar_ndarray); }
-        
-        unless ($@) {
-          return 0;
-        }
-      }
-      
-      {
-        my $x_ndarray = FOP->c([(float)3, 4], [2, 1]);
-        
-        my $scalar_ndarray = FOP->c([(float)1, 2], [1, 2]);
-        
-        eval { FOP->scadiv($x_ndarray, $scalar_ndarray); }
         
         unless ($@) {
           return 0;
@@ -1994,22 +1952,44 @@ class TestCase::R::OP::Float {
 
   static method pow : int () {
     
-    my $x_ndarray = FOP->c([(float)1, 0.5f], [1, 2]);
-    
-    my $y_ndarray = FOP->c([(float)0.5f, 0.25f], [1, 2]);
-    
-    my $ret_ndarray = FOP->pow($x_ndarray, $y_ndarray);
-    
-    unless ($ret_ndarray is_type R::NDArray::Float) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 0.5], [1, 2]);
+      
+      my $y_ndarray = FOP->c([(float)0.5, 0.25], [1, 2]);
+      
+      my $ret_ndarray = FOP->pow($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [Math->powf($x_ndarray->data->[0], $x_ndarray->data->[1]), Math->powf($y_ndarray->data->[0], $y_ndarray->data->[1])])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
-    unless (Array->equals_float($ret_ndarray->data, [Math->powf($x_ndarray->data->[0], $x_ndarray->data->[1]), Math->powf($y_ndarray->data->[0], $y_ndarray->data->[1])])) {
-      return 0;
-    }
-    
-    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 0.5], [1, 2]);
+      
+      my $y_ndarray = FOP->c((float)0.5);
+      
+      my $ret_ndarray = FOP->pow($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [Math->powf($x_ndarray->data->[0], $x_ndarray->data->[1]), Math->powf($y_ndarray->data->[0], $y_ndarray->data->[0])])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
     # Exceptions
@@ -2392,22 +2372,44 @@ class TestCase::R::OP::Float {
   
   static method remainder : int () {
     
-    my $x_ndarray = FOP->c([(float)1, 3], [1, 2]);
-    
-    my $y_ndarray = FOP->c([(float)2, 4], [1, 2]);
-    
-    my $ret_ndarray = FOP->remainder($x_ndarray, $y_ndarray);
-    
-    unless ($ret_ndarray is_type R::NDArray::Float) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 3], [1, 2]);
+      
+      my $y_ndarray = FOP->c([(float)2, 4], [1, 2]);
+      
+      my $ret_ndarray = FOP->remainder($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)Math->remainderf($x_ndarray->data->[0], $y_ndarray->data->[0]), Math->remainderf($x_ndarray->data->[1], $y_ndarray->data->[1])])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
-    unless (Array->equals_float($ret_ndarray->data, [(float)Math->remainderf($x_ndarray->data->[0], $y_ndarray->data->[0]), Math->remainderf($x_ndarray->data->[1], $y_ndarray->data->[1])])) {
-      return 0;
-    }
-    
-    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 3], [1, 2]);
+      
+      my $y_ndarray = FOP->c((float)2);
+      
+      my $ret_ndarray = FOP->remainder($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)Math->remainderf($x_ndarray->data->[0], $y_ndarray->data->[0]), Math->remainderf($x_ndarray->data->[1], $y_ndarray->data->[0])])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
     # Exceptions
@@ -2457,22 +2459,44 @@ class TestCase::R::OP::Float {
   
   static method fmod : int () {
     
-    my $x_ndarray = FOP->c([(float)1, 3], [1, 2]);
-    
-    my $y_ndarray = FOP->c([(float)2, 4], [1, 2]);
-    
-    my $ret_ndarray = FOP->fmod($x_ndarray, $y_ndarray);
-    
-    unless ($ret_ndarray is_type R::NDArray::Float) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 3], [1, 2]);
+      
+      my $y_ndarray = FOP->c([(float)2, 4], [1, 2]);
+      
+      my $ret_ndarray = FOP->fmod($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)Math->fmodf($x_ndarray->data->[0], $y_ndarray->data->[0]), Math->fmodf($x_ndarray->data->[1], $y_ndarray->data->[1])])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
-    unless (Array->equals_float($ret_ndarray->data, [(float)Math->fmodf($x_ndarray->data->[0], $y_ndarray->data->[0]), Math->fmodf($x_ndarray->data->[1], $y_ndarray->data->[1])])) {
-      return 0;
-    }
-    
-    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
-      return 0;
+    {
+      my $x_ndarray = FOP->c([(float)1, 3], [1, 2]);
+      
+      my $y_ndarray = FOP->c((float)2);
+      
+      my $ret_ndarray = FOP->fmod($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)Math->fmodf($x_ndarray->data->[0], $y_ndarray->data->[0]), Math->fmodf($x_ndarray->data->[1], $y_ndarray->data->[0])])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
     }
     
     # Exceptions

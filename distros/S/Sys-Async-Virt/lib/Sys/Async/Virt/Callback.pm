@@ -16,19 +16,18 @@ use experimental 'signatures';
 use Feature::Compat::Try;
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Callback v0.0.3;
+package Sys::Async::Virt::Callback v0.0.5;
 
 use Carp qw(croak);
 use Future::Queue;
 use Log::Any qw($log);
-use Scalar::Util qw(weaken);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.3;
+use Protocol::Sys::Virt::Remote::XDR v0.0.5;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 sub new {
     my ($class, %args) = @_;
-    my $self = bless {
+    return bless {
         id => $args{id},
         client => $args{client},
         deregister_call => $args{deregister_call},
@@ -37,10 +36,6 @@ sub new {
             prototype => $args{factory}
             ),
     }, $class;
-
-    weaken $self->{client};
-
-    return $self;
 }
 
 async sub next_event($self) {
@@ -51,10 +46,13 @@ async sub cancel($self) {
     return if $self->{cancelled};
 
     $self->{cancelled} = 1;
-    $self->{queue}->finish;
     await $self->{client}->_call(
         $self->{deregister_call},
         { callbackID => $self->{id} });
+
+    $self->{queue}->finish;
+    delete $self->{client}->{_callbacks}->{$self->{id}};
+    return;
 }
 
 sub _dispatch_event($self, $event) {
@@ -70,7 +68,7 @@ sub _dispatch_event($self, $event) {
 }
 
 sub DESTROY($self) {
-    $self->cancel unless $self->{cancelled};
+    $self->cancel->retain unless $self->{cancelled};
 }
 
 
@@ -84,7 +82,7 @@ Sys::Async::Virt::Callback - Client side proxy to remote LibVirt event source
 
 =head1 VERSION
 
-v0.0.3
+v0.0.5
 
 =head1 SYNOPSIS
 

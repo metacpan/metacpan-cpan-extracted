@@ -21,11 +21,14 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.219';
+our $VERSION = '1.220';
 
 use Quiq::Trash;
 use Quiq::Shell;
 use Quiq::Path;
+use Quiq::Terminal;
+use Quiq::DirHandle;
+use Quiq::Array;
 use Quiq::Eog;
 
 # -----------------------------------------------------------------------------
@@ -82,6 +85,110 @@ sub pickImages {
     my $fileA = $t->files;
 
     return wantarray? @$fileA: $fileA;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 show() - Zeige Bilddateien an
+
+=head4 Synopsis
+
+  $class->show($op, $dir,$tmpDir);
+
+=head4 Arguments
+
+=over 4
+
+=item $op
+
+Art der Reihenfolge: C<mtime>, C<random>, C<reverse>
+
+=item $dir
+
+Verzeichnis, in dem sich die Bilddateien befinden
+
+=item $tmpDir
+
+Verzeichnis, in dem die Bilddateien in mtime-Reihenfolge verlinkt sind
+
+=back
+
+=head4 Description
+
+Zeige mit C<eog> die Bilddateien in mtime-Reihenfolge aus
+dem Verzeichnis $tmpDir an.
+
+Ist $tmpDir bei Aufruf der Methode nicht leer, wird gefragt, ob
+die Dateien darin vorab gelöscht werden sollen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub show {
+    my ($class,$op,$dir,$tmpDir) = @_;
+
+    my $p = Quiq::Path->new;
+
+    if (!-d $dir) {
+        $class->throw(
+            'PARAM-00099: Directory does not exist',
+            Dir => $dir,
+        );
+    }
+    if (!-d $tmpDir) {
+        $class->throw(
+            'PARAM-00099: Directory does not exist',
+            Dir => $tmpDir,
+        );
+    }
+    if (!$p->isEmpty($tmpDir)) {
+        my $answ = Quiq::Terminal->askUser("Delete all files in $tmpDir?",
+            -values => 'y/n',
+            -default => 'y',
+        );
+        if ($answ ne 'y') {
+            return;
+        }
+        $p->deleteContent($tmpDir);
+    }
+
+    my @files;
+    my $dh = Quiq::DirHandle->new($dir);
+    while (my $e = $dh->next) {
+        if ($e =~ /\.jpg$/) {
+            push @files,"$dir/$e";
+        }
+    }
+    $dh->close;
+
+    my $i = 0;
+    if ($op eq 'mtime') {
+        @files = sort {$p->mtime($a) <=> $p->mtime($b)} @files;
+    }
+    elsif ($op eq 'random') {
+        Quiq::Array->shuffle(\@files);
+    }
+    elsif ($op eq 'reverse') {
+        @files = reverse sort @files
+    }
+    else {
+        $class->throw(
+            'PARAM-00099: Unknown operation',
+            Op => $op,
+        );
+    }
+
+    for my $srcFile (@files) {
+        my $filename = $p->filename($srcFile);
+        my $destFile = sprintf '%s/%06d-%s',$tmpDir,++$i,$filename;
+        # say "$destFile -> $srcFile";
+        $p->duplicate('symlink',$srcFile,$destFile);
+    }
+
+    Quiq::Shell->exec("eog $tmpDir");
+
+    return;
 }
 
 # -----------------------------------------------------------------------------
@@ -204,6 +311,7 @@ sub transferImages {
 
             say "$srcFile => $destFile";
             $p->rename($srcFile,$destFile);
+            $p->touch($destFile);
         }
     }
 
@@ -214,7 +322,7 @@ sub transferImages {
 
 =head1 VERSION
 
-1.219
+1.220
 
 =head1 AUTHOR
 

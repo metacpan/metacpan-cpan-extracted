@@ -17,6 +17,7 @@ my $api = SPVM::api();
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
 ok(SPVM::TestCase::R::NDArray->data);
+ok(SPVM::TestCase::R::NDArray->set_data);
 ok(SPVM::TestCase::R::NDArray->dim);
 ok(SPVM::TestCase::R::NDArray->set_dim);
 ok(SPVM::TestCase::R::NDArray->is_dim_read_only);

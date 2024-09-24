@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::StorageVol v0.0.3;
+package Sys::Async::Virt::StorageVol v0.0.5;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.3;
+use Protocol::Sys::Virt::Remote::XDR v0.0.5;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -62,51 +62,63 @@ sub new {
 }
 
 sub delete($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_STORAGE_VOL_DELETE,
-        { vol => $self->{id}, flags => $flags // 0 } ));
+        { vol => $self->{id}, flags => $flags // 0 }, empty => 1 );
+}
+
+sub download($self, $offset, $length, $flags = 0) {
+    return $self->{client}->_call(
+        $remote->PROC_STORAGE_VOL_DOWNLOAD,
+        { vol => $self->{id}, offset => $offset, length => $length, flags => $flags // 0 }, stream => 'read', empty => 1 );
 }
 
 sub get_info($self) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_STORAGE_VOL_GET_INFO,
-        { vol => $self->{id},  } ));
+        { vol => $self->{id} } );
 }
 
 async sub get_path($self) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_STORAGE_VOL_GET_PATH,
-        { vol => $self->{id},  } ))->{name};
+        { vol => $self->{id} }, unwrap => 'name' );
 }
 
 async sub get_xml_desc($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_STORAGE_VOL_GET_XML_DESC,
-        { vol => $self->{id}, flags => $flags // 0 } ))->{xml};
+        { vol => $self->{id}, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 async sub pool_lookup_by_volume($self) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_STORAGE_POOL_LOOKUP_BY_VOLUME,
-        { vol => $self->{id},  } ))->{pool};
+        { vol => $self->{id} }, unwrap => 'pool' );
 }
 
 sub resize($self, $capacity, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_STORAGE_VOL_RESIZE,
-        { vol => $self->{id}, capacity => $capacity, flags => $flags // 0 } ));
+        { vol => $self->{id}, capacity => $capacity, flags => $flags // 0 }, empty => 1 );
+}
+
+sub upload($self, $offset, $length, $flags = 0) {
+    return $self->{client}->_call(
+        $remote->PROC_STORAGE_VOL_UPLOAD,
+        { vol => $self->{id}, offset => $offset, length => $length, flags => $flags // 0 }, stream => 'write', empty => 1 );
 }
 
 sub wipe($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_STORAGE_VOL_WIPE,
-        { vol => $self->{id}, flags => $flags // 0 } ));
+        { vol => $self->{id}, flags => $flags // 0 }, empty => 1 );
 }
 
 sub wipe_pattern($self, $algorithm, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_STORAGE_VOL_WIPE_PATTERN,
-        { vol => $self->{id}, algorithm => $algorithm, flags => $flags // 0 } ));
+        { vol => $self->{id}, algorithm => $algorithm, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -122,7 +134,7 @@ Sys::Async::Virt::StorageVol - Client side proxy to remote LibVirt storage volum
 
 =head1 VERSION
 
-v0.0.3
+v0.0.5
 
 =head1 SYNOPSIS
 
@@ -142,6 +154,13 @@ v0.0.3
   # -> (* no data *)
 
 See documentation of L<virStorageVolDelete|https://libvirt.org/html/libvirt-libvirt-storage.html#virStorageVolDelete>.
+
+
+=head2 download
+
+  $stream = await $vol->download( $offset, $length, $flags = 0 );
+
+See documentation of L<virStorageVolDownload|https://libvirt.org/html/libvirt-libvirt-storage.html#virStorageVolDownload>.
 
 
 =head2 get_info
@@ -181,6 +200,13 @@ See documentation of L<virStoragePoolLookupByVolume|https://libvirt.org/html/lib
   # -> (* no data *)
 
 See documentation of L<virStorageVolResize|https://libvirt.org/html/libvirt-libvirt-storage.html#virStorageVolResize>.
+
+
+=head2 upload
+
+  $stream = await $vol->upload( $offset, $length, $flags = 0 );
+
+See documentation of L<virStorageVolUpload|https://libvirt.org/html/libvirt-libvirt-storage.html#virStorageVolUpload>.
 
 
 =head2 wipe

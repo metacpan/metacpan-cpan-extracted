@@ -16,6 +16,37 @@ class R::NDArray {
   # Fields
   has data : protected ro object;
   
+  method set_data : void ($data : object) {
+    
+    unless ($data) {
+      die "The \$data must be defined.";
+    }
+    
+    unless (Fn->is_array($data)) {
+      die "The type of the \$data must be an array type.";
+    }
+    
+    my $type_name = type_name $data;
+    
+    unless ($type_name eq type_name $self->{data}) {
+      die "The type name of the \$data must be same as the type name of the data of this instance.";
+    }
+    
+    my $array_length = Fn->array_length($data);
+    
+    unless ($array_length == Fn->array_length($self->{data})) {
+      die "The array lenght of the \$data must be equal to the array legnth of the array length of the data of this instance.";
+    }
+    
+    if (Fn->is_object_array($data)) {
+      Array->memcpy_object_address((object[])$self->{data}, 0, (object[])$data, 0, $array_length);
+    }
+    else {
+      my $elem_size = Fn->get_elem_size($data);
+      Fn->memcpy($self->{data}, 0, $data, 0, $elem_size * $array_length);
+    }
+  }
+  
   has dim : int[];
   
   method dim : int[] () {

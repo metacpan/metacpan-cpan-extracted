@@ -1,5 +1,28 @@
 -----
 
+0.0.5    2024-09-24
+    [Added]
+       * Documentation
+    [Fixed]
+       * Syntax error in Stream.pm
+    [Removed]
+       * Unused methods "register_stream" and "unregister_stream"
+
+0.0.4    2024-09-23
+    [Added]
+       * Methods returning streams ($volume->upload; $volume->download)
+       * Methods linking to protocol messages with '@generator: none'
+       * Dependency on Sublike::Extended for easier and faster named
+         argument processing
+    [Fixed]
+       * Weak callback references, allowing callbacks to be cleaned up
+         when references are dropped by user code
+       * Instantiation of StorageVol and Secret objects in API return values
+    [Changed]
+       * Lots of improvements in 'fill-templates' (entrypoint generator)
+    [Removed]
+       * Various debugging statements
+
 0.0.3    2024-09-20
     [Added]
        * Mention related C header file in list of unimplemented entry points

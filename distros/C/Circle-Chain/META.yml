@@ -19,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  Circle::Block: '0.02'
-  Circle::Node: '0.02'
-  Circle::User: '0.05'
-  Circle::Wallet: '0.02'
+  Circle::Block: '0.03'
+  Circle::Node: '0.03'
+  Circle::User: '0.06'
+  Circle::Wallet: '0.03'
   perl: '5.006'
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

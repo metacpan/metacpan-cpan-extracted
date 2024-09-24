@@ -9,7 +9,7 @@ use File::Path qw(make_path);
 use File::Basename;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our @EXPORT  = qw(
   send_register_verify_code
   register
@@ -35,25 +35,25 @@ sub _build_url_template {
 sub send_register_verify_code {
     my ($req) = @_;
     my $url = _build_url_template("sendRegisterVerifyCode");
-    return http_json_post( $url, $req );
+    return http_json_post( $url, $req, 0 );
 }
 
 sub register {
     my ($req) = @_;
     my $url = _build_url_template("register");
-    return http_json_post( $url, $req );
+    return http_json_post( $url, $req, 0 );
 }
 
 sub send_verify_code {
     my ($req) = @_;
     my $url = _build_url_template("sendVerifyCode");
-    return http_json_post( $url, $req );
+    return http_json_post( $url, $req, 0 );
 }
 
 sub login {
     my ($req)    = @_;
     my $url      = _build_url_template("login");
-    my $response = http_json_post( $url, $req );
+    my $response = http_json_post( $url, $req, 0 );
     if ( $response->{status} == 200 ) {
         my $login_data = $response->{data};
         _save_session_data( $req, $login_data );
@@ -116,13 +116,13 @@ sub have_pay_password {
 sub send_reset_password_verify_code {
     my ($req) = @_;
     my $url = _build_url_template("sendResetPasswordVerifyCode");
-    return http_json_post( $url, $req );
+    return http_json_post( $url, $req, 0 );
 }
 
 sub reset_password {
     my ($req) = @_;
     my $url = _build_url_template("resetPassword");
-    return http_json_post( $url, $req );
+    return http_json_post( $url, $req, 0);
 }
 
 sub add_contacts {
@@ -157,7 +157,7 @@ Circle::User - the user module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 

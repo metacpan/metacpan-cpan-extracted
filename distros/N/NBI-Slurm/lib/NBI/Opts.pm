@@ -253,7 +253,7 @@ sub _mem_parse_mb {
         } elsif (substr(uc($2), 0, 1) eq "M") {
             $mem = $1;
         } elsif (substr(uc($2), 0, 1) eq "K") {
-            continue;
+            $mem = int($1/1024);
         } else {
             # Consider MB
             $mem = $1;
@@ -265,34 +265,29 @@ sub _mem_parse_mb {
 }
 
 sub _time_to_hour {
-    # Get an integer (hours) or a string in the format \d+D \d+H \d+M
+    # Get an integer (hours) or a string in the format \d+D \d+H \d+M \d+S
     my $time = shift @_;
     $time = uc($time);
-    if ($time =~/^(\d+)$/) {
+    
+    if ($time =~ /^(\d+)$/) {
         # Got an integer
         return $1;
     } else {
         my $hours = 0;
-        while ($time =~/(\d+)([DHM])/g) {
+        while ($time =~ /(\d+)([DHMS])/g) {
             my $val = $1;
             my $unit = $2;
             if ($unit eq "D") {
-                
                 $hours += $val * 24;
-          
-            } elsif ($unit eq "M") {
-                $val /= 60;
-                $hours += $val;
-
             } elsif ($unit eq "H") {
                 $hours += $val;
-    
+            } elsif ($unit eq "M") {
+                $hours += $val / 60;
             } elsif ($unit eq "S") {
-                continue;
+                $hours += $val / 3600;
             } else {
-                confess "ERROR NBI::Opts: Cannot parse time value $time\n";
+                die "ERROR NBI::Opts: Cannot parse time value $time\n";
             }
-            
         }
         return $hours;
     }
@@ -313,7 +308,7 @@ NBI::Opts - A class for representing a the SLURM options for NBI::Slurm
 
 =head1 VERSION
 
-version 0.8.6
+version 0.8.7
 
 =head1 SYNOPSIS
 

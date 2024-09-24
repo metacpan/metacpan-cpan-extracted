@@ -72,6 +72,7 @@ t/49-mech-get-file-lc-ct.html
 t/49-mech-get-file.html
 t/49-mech-get-file.t
 t/49-mech-nav.t
+t/49-port-twice.t
 t/49-port.t
 t/50-click.html
 t/50-click.t
@@ -126,7 +127,6 @@ xt/99-changes.t
 xt/99-compile.t
 xt/99-examples.t
 xt/99-manifest.t
-xt/99-minimumversion.t
 xt/99-pod.t
 xt/99-synopsis.t
 xt/99-test-prerequisites.t

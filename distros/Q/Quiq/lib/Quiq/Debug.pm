@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.219';
+our $VERSION = '1.220';
 
 use Data::Printer color=>{string=>'black'};
 use Data::Printer ();
@@ -183,7 +183,7 @@ sub findSubroutine {
 
 =head1 VERSION
 
-1.219
+1.220
 
 =head1 AUTHOR
 

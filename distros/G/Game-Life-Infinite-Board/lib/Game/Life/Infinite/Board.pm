@@ -5,12 +5,12 @@ package Game::Life::Infinite::Board;
 use strict;  
 use warnings;  
 use Time::HiRes;
-require 5.10.1;
+require 5.010_001;
 
 BEGIN {
     use Exporter   ();
     use vars       qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = sprintf( "%d.%02d", q($Revision: 0.07 $) =~ /\s(\d+)\.(\d+)/ );
+    $VERSION     = sprintf( "%d.%02d", q($Revision: 0.08 $) =~ /\s(\d+)\.(\d+)/ );
     @ISA         = qw(Exporter);
     @EXPORT_OK   = qw(format_is);
     %EXPORT_TAGS = ( );
@@ -304,13 +304,13 @@ sub tickMainLoop {
 		my $rec = [$xx, $yy];
 		if (
 			($self->{'cells'}->{$xx, $yy}->{'state'} > 0) and 
-			(not $self->{'cells'}->{$xx, $yy}->{'neighbours'}->{'total'} ~~ $self->{'liveRules'})
+			(not (scalar(grep(/$self->{'cells'}->{$xx, $yy}->{'neighbours'}->{'total'}/, @{ $self->{'liveRules'} }))))
 		) {
 			# Die.
 			push @dieCells, $rec;
 		} elsif (
 			($self->{'cells'}->{$xx, $yy}->{'state'} == 0) and 
-			($self->{'cells'}->{$xx, $yy}->{'neighbours'}->{'total'} ~~ $self->{'breedRules'})
+			(scalar(grep(/$self->{'cells'}->{$xx, $yy}->{'neighbours'}->{'total'}/, @{ $self->{'breedRules'} })))
 		) {
 			# New.
 			if ($self->{'color'} == 0) {

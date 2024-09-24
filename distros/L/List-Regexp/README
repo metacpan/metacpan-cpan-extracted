@@ -30,7 +30,7 @@ Example of its usage:
 regexp-opt utility
 ==================
 
-This utilitiy offers a command line interface to the module.  It collects
+This utility offers a command line interface to the module.  It collects
 its arguments and prints out a regular expression that will match any of
 them.  E.g.:
 

@@ -15,7 +15,6 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
-    'lib/DBIx/Class/Helper/ResultSet/WindowFunctions.pm',
     'lib/DBIx/Class/Helper/WindowFunctions.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',

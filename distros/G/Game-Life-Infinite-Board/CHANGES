@@ -1,3 +1,7 @@
+0.08:
+
+- Removed smartmatch use.
+
 0.07:
 
 - Added tests for file formats.

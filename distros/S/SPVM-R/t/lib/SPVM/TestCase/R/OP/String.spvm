@@ -141,6 +141,26 @@ class TestCase::R::OP::String {
       }
     }
     
+    {
+      my $x_ndarray = STROP->c([(string)1, 1], [1, 2]);
+      
+      my $y_ndarray = STROP->c((string)1);
+      
+      my $ret_ndarray = STROP->concat($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::String) {
+        return 0;
+      }
+      
+      unless (Array->equals_string($ret_ndarray->data, ["11", "11"])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
+    }
+    
     # Exceptions
     {
       {

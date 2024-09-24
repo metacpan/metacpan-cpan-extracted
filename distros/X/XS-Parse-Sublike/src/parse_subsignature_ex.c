@@ -579,7 +579,10 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
     lex_read_space(0);
   }
 
-  if(permit_attributes && lex_peek_unichar(0) == ':') {
+  if(lex_peek_unichar(0) == ':') {
+    if(!permit_attributes)
+      croak("Attributes on signature parameters are not permitted");
+
     lex_read_unichar(0);
     lex_read_space(0);
 
@@ -655,8 +658,9 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
         assignop->op_next = defop; /* after assign, stop this fragment */
 
         details->is_required = false;
-        ctx->named_elem_defops = op_append_elem(OP_LINESEQ, ctx->named_elem_defops,
-            defop);
+
+        paramctx.op    = defop;
+        paramctx.defop = defop;
       }
       else {
         U8 private = 0;
@@ -683,20 +687,18 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
 
         paramctx.varop->op_next = defop;
         defexpr->op_next = paramctx.varop;
+
+        paramctx.op    = paramctx.varop;
+        paramctx.defop = defop;
       }
     }
     else {
       if(parser->sig_optelems)
         yyerror("Mandatory parameter follows optional parameter");
-    }
 
-    if(!paramctx.is_named)
-      /* This call to newSTATEOP() must come AFTER parsing the defaulting
-       * expression because it involves an implicit intro_my() and so we must
-       * not introduce the new parameter variable beforehand (RT155630)
-       */
-      ctx->positional_elems = op_append_list(OP_LINESEQ, ctx->positional_elems,
-          newSTATEOP(0, NULL, paramctx.varop));
+      if(!paramctx.is_named)
+        paramctx.op = paramctx.varop;
+    }
   }
   else {
     if(paramctx.is_named)
@@ -719,6 +721,22 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
       if(p->funcs->post_defop)
         (*p->funcs->post_defop)(aTHX_ &paramctx, p->attrdata, p->funcdata);
     }
+  }
+
+  /* Only after we've run the post_defop hooks can we actually consume the
+   * result in paramctx.op
+   */
+  if(paramctx.is_named) {
+    ctx->named_elem_defops = op_append_elem(OP_LINESEQ, ctx->named_elem_defops,
+        paramctx.op);
+  }
+  else {
+    /* This call to newSTATEOP() must come AFTER parsing the defaulting
+     * expression because it involves an implicit intro_my() and so we must
+     * not introduce the new parameter variable beforehand (RT155630)
+     */
+    ctx->positional_elems = op_append_list(OP_LINESEQ, ctx->positional_elems,
+        newSTATEOP(0, NULL, paramctx.op));
   }
 }
 

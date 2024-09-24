@@ -31,7 +31,8 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'namespace::clean' => '0',
                                       'parent' => '0',
-                                      'perl' => 'v5.14.0'
+                                      'perl' => 'v5.14.0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -50,7 +51,9 @@ do { my $x = {
                                    'SQL::Translator' => '0.11018',
                                    'Test::More' => '0',
                                    'Test::Roo::DataDriven' => '0',
-                                   'base' => '0'
+                                   'base' => '0',
+                                   'lib' => '0',
+                                   'strict' => '0'
                                  }
                  }
      };

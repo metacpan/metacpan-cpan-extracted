@@ -55,7 +55,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.219';
+our $VERSION = '1.220';
 
 use Quiq::String;
 
@@ -484,7 +484,7 @@ sub trimNl {
 
 =head1 VERSION
 
-1.219
+1.220
 
 =head1 AUTHOR
 

@@ -23,6 +23,97 @@ class TestCase::R::NDArray {
     return 1;
   }
   
+  static method set_data : int () {
+    
+    {
+      my $data = [1, 2];
+      my $ndarray = R::NDArray::Int->new({data => $data});
+      
+      my $set_data = [3, 4];
+      
+      $ndarray->set_data($set_data);
+      
+      unless (Array->equals($ndarray->data, [3, 4])) {
+        return 0;
+      }
+      
+      unless ($ndarray->data == $data) {
+        return 0;
+      }
+      
+      if ($ndarray->data == $set_data) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(string)1, 2];
+      my $ndarray = R::NDArray::String->new({data => $data});
+      
+      my $set_data = [(string)3, 4];
+      $ndarray->set_data($set_data);
+      
+      my $shallow = 1;
+      unless (Array->equals($ndarray->data, $set_data, $shallow)) {
+        return 0;
+      }
+      
+      unless ($ndarray->data == $data) {
+        return 0;
+      }
+    }
+    
+    # Excetpions
+    {
+      {
+        my $data = [1, 2];
+        my $ndarray = (R::NDArray)R::NDArray::Int->new({data => $data});
+        
+        eval { $ndarray->set_data(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data = [1, 2];
+        my $ndarray = (R::NDArray)R::NDArray::Int->new({data => $data});
+        
+        eval { $ndarray->set_data(Int->new(1)); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data = [1, 2];
+        my $ndarray = (R::NDArray)R::NDArray::Int->new({data => $data});
+        
+        eval { $ndarray->set_data([1]); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data = [1, 2];
+        my $ndarray = (R::NDArray)R::NDArray::Int->new({data => $data});
+        
+        eval { $ndarray->set_data([(double)1, 2]); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    return 1;
+  }
+  
   static method dim : int () {
     
     {

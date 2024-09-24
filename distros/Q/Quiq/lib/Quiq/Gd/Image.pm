@@ -130,7 +130,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.219';
+our $VERSION = '1.220';
 
 use GD ();
 use Quiq::Gd::Font;
@@ -775,7 +775,7 @@ sub rainbowColors {
 
 =head1 VERSION
 
-1.219
+1.220
 
 =head1 AUTHOR
 

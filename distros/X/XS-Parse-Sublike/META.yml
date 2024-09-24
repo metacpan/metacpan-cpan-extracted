@@ -18,17 +18,17 @@ name: XS-Parse-Sublike
 provides:
   Sublike::Extended:
     file: lib/Sublike/Extended.pm
-    version: '0.26'
+    version: '0.27'
   XS::Parse::Sublike:
     file: lib/XS/Parse/Sublike.pm
-    version: '0.26'
+    version: '0.27'
   XS::Parse::Sublike::Builder:
     file: lib/XS/Parse/Sublike/Builder.pm
-    version: '0.26'
+    version: '0.27'
 requires:
   File::ShareDir: '1.00'
   perl: '5.016'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.26'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

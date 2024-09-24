@@ -15,7 +15,7 @@ package WWW::Mechanize::PhantomJS::Examples;
 #
 
 use strict;
-our $VERSION= '0.24';
+our $VERSION= '0.25';
 
 1;
 
@@ -80,7 +80,7 @@ The following is a list of the 4 example programs that are included in the WWW::
     show_screen;
 
 
-Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-PhantomJS-0.24/examples/url-to-image.pl>
+Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-PhantomJS-0.25/examples/url-to-image.pl>
 
 =head2 Example: html-to-pdf.pl
 
@@ -103,7 +103,7 @@ Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Pha
         print "\nSaved $url as $fn\n";
     };
 
-Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-PhantomJS-0.24/examples/html-to-pdf.pl>
+Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-PhantomJS-0.25/examples/html-to-pdf.pl>
 
 =head2 Example: dump-links.pl
 
@@ -136,7 +136,7 @@ Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Pha
     
     =cut
 
-Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-PhantomJS-0.24/examples/dump-links.pl>
+Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-PhantomJS-0.25/examples/dump-links.pl>
 
 =head2 Example: javascript.pl
 
@@ -170,7 +170,7 @@ Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Pha
     
     =cut
 
-Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-PhantomJS-0.24/examples/javascript.pl>
+Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-PhantomJS-0.25/examples/javascript.pl>
 
 =head1 AUTHOR
 
@@ -180,7 +180,7 @@ Contributed examples contain the original author's name.
 
 =head1 COPYRIGHT
 
-Copyright 2009-2020 by Max Maischein C<corion@cpan.org>.
+Copyright 2009-2024 by Max Maischein C<corion@cpan.org>.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.
 

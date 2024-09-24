@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
     - t
     - xt
 requires:
-  Cookie::Baker: '0.10'
+  Cookie::Baker: '0.12'
   Digest::HMAC_SHA1: '1.03'
   Digest::SHA: '0'
   Plack: '0.9910'
@@ -35,9 +35,12 @@ resources:
   bugtracker: https://github.com/plack/Plack-Middleware-Session/issues
   homepage: https://github.com/plack/Plack-Middleware-Session
   repository: https://github.com/plack/Plack-Middleware-Session.git
-version: '0.33'
+version: '0.34'
 x_contributors:
+  - 'Alexander Kuehne <alexander.kuehne@contacting.de>'
   - 'Alex Vandiver <alex@chmrr.net>'
+  - 'cho45 <cho45@lowreal.net>'
+  - 'Christian Walde <walde.christian@googlemail.com>'
   - 'Florian Schlichting <fsfs@debian.org>'
   - 'franck cuny <franck@lumberjaph.net>'
   - 'Graham Knop <gknop@omniti.com>'
@@ -52,12 +55,15 @@ x_contributors:
   - 'Masahiro Nagano <kazeburo@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'rawleyfowler <rawleyfowler@proton.me>'
+  - 'Rick Myers <rick@jrmyers.net>'
   - 's-aska <s.aska.org@gmail.com>'
   - 'Stevan Little <stevan.little@iinteractive.com>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
   - 'vividsnow <vividsnow@gmail.com>'
-x_generated_by_perl: v5.20.1
+x_generated_by_perl: v5.34.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

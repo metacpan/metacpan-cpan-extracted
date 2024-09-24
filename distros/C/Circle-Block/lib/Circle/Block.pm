@@ -9,7 +9,7 @@ use Try::Tiny;
 use URL::Encode;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @EXPORT = qw(
   get_block_hashlist
@@ -38,7 +38,7 @@ sub get_block_hashlist {
         }
     );
     carp 'url: ' . $url;
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub get_block {
@@ -60,7 +60,7 @@ sub get_block_header_list {
             baseHeight => $base_height
         }
     );
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub get_block_data {
@@ -82,7 +82,7 @@ sub get_blocktails_hashlist {
             baseHeight => $base_height
         }
     );
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub get_blocktails_po {
@@ -93,7 +93,7 @@ sub get_blocktails_po {
             hash => $hash
         }
     );
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub get_tx_by_txid {
@@ -104,7 +104,7 @@ sub get_tx_by_txid {
             txId => $txid
         }
     );
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub search_tx_by_txid {
@@ -115,7 +115,7 @@ sub search_tx_by_txid {
             txId => $txid
         }
     );
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub search_tx_by_address {
@@ -130,7 +130,7 @@ sub search_tx_by_address {
             limit        => $limit
         }
     );
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub search_utxos {
@@ -145,7 +145,7 @@ sub search_utxos {
             limit        => $limit
         }
     );
-    return http_json_get($url);
+    return http_json_get($url, 0 );
 }
 
 1;
@@ -158,7 +158,7 @@ Circle::Block - the block module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

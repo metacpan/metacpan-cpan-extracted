@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,11 +22,11 @@ requires:
   Feature::Compat::Try: '0'
   Future::AsyncAwait: '0'
   Future::Queue: '0'
-  IO::Async::Loop: '0'
+  IO::Async::Notifier: '0'
   Log::Any: '0'
-  Protocol::Sys::Virt: v10.3.7
+  Protocol::Sys::Virt: v10.3.8
   perl: v5.20.0
 resources:
   repository: git://github.com/ehuelsmann/perl-sys-async-virt.git
-version: v0.0.3
+version: v0.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

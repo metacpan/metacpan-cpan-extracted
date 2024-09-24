@@ -50,7 +50,7 @@ class R::OP::Float {
     return $ndarray;
   }
   
-  static method add : R::NDArray::Float ($x_ndarray : R::NDArray::Float, $y_ndarray : R::NDArray::Float) {
+  precompile static method add : R::NDArray::Float ($x_ndarray : R::NDArray::Float, $y_ndarray : R::NDArray::Float) {
     
     unless ($x_ndarray) {
       die "The n-dimensional array \$x_ndarray must be defined.";
@@ -60,10 +60,12 @@ class R::OP::Float {
       die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
-    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
-    
-    unless ($equals_dim) {
-      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+    unless ($y_ndarray->is_scalar) {
+      my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+      
+      unless ($equals_dim) {
+        die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+      }
     }
     
     my $length = $x_ndarray->length;
@@ -76,8 +78,15 @@ class R::OP::Float {
     my $x_data = $x_ndarray->data;
     my $y_data = $y_ndarray->data;
     
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = $x_data->[$i] + $y_data->[$i];
+    if ($y_ndarray->is_scalar) {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = $x_data->[$i] + $y_data->[0];
+      }
+    }
+    else {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = $x_data->[$i] + $y_data->[$i];
+      }
     }
     
     return $ret_ndarray;
@@ -93,10 +102,12 @@ class R::OP::Float {
       die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
-    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
-    
-    unless ($equals_dim) {
-      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+    unless ($y_ndarray->is_scalar) {
+      my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+      
+      unless ($equals_dim) {
+        die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+      }
     }
     
     my $length = $x_ndarray->length;
@@ -109,8 +120,15 @@ class R::OP::Float {
     my $x_data = $x_ndarray->data;
     my $y_data = $y_ndarray->data;
     
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = $x_data->[$i] - $y_data->[$i];
+    if ($y_ndarray->is_scalar) {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = $x_data->[$i] - $y_data->[0];
+      }
+    }
+    else {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = $x_data->[$i] - $y_data->[$i];
+      }
     }
     
     return $ret_ndarray;
@@ -126,10 +144,12 @@ class R::OP::Float {
       die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
-    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
-    
-    unless ($equals_dim) {
-      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+    unless ($y_ndarray->is_scalar) {
+      my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+      
+      unless ($equals_dim) {
+        die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+      }
     }
     
     my $length = $x_ndarray->length;
@@ -142,40 +162,15 @@ class R::OP::Float {
     my $x_data = $x_ndarray->data;
     my $y_data = $y_ndarray->data;
     
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = $x_data->[$i] * $y_data->[$i];
+    if ($y_ndarray->is_scalar) {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = $x_data->[$i] * $y_data->[0];
+      }
     }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile static method scamul : R::NDArray::Float ($x_ndarray : R::NDArray::Float, $scalar_ndarray : R::NDArray::Float) {
-    
-    unless ($scalar_ndarray) {
-      die "The n-dimensional array \$scalar_ndarray must be defined.";
-    }
-    
-    unless ($scalar_ndarray->is_scalar) {
-      die "The n-dmension array \$scalar_ndarray must be a scalar.";
-    }
-    
-    unless ($x_ndarray) {
-      die "The n-dimensional array \$x_ndarray must be defined.";
-    }
-    
-    my $length = $x_ndarray->length;
-    
-    my $x_dim = $x_ndarray->dim;
-    
-    my $ret_ndarray = &c(undef, $x_dim);
-    my $ret_data = $ret_ndarray->data;
-    
-    my $scalar_data = $scalar_ndarray->data;
-    my $x_data = $x_ndarray->data;
-    
-    my $scalar = $scalar_data->[0];
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = $x_data->[$i] * $scalar;
+    else {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = $x_data->[$i] * $y_data->[$i];
+      }
     }
     
     return $ret_ndarray;
@@ -191,10 +186,12 @@ class R::OP::Float {
       die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
-    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
-    
-    unless ($equals_dim) {
-      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+    unless ($y_ndarray->is_scalar) {
+      my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+      
+      unless ($equals_dim) {
+        die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+      }
     }
     
     my $length = $x_ndarray->length;
@@ -207,40 +204,15 @@ class R::OP::Float {
     my $x_data = $x_ndarray->data;
     my $y_data = $y_ndarray->data;
     
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = $x_data->[$i] / $y_data->[$i];
+    if ($y_ndarray->is_scalar) {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = $x_data->[$i] / $y_data->[0];
+      }
     }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile static method scadiv : R::NDArray::Float ($x_ndarray : R::NDArray::Float, $scalar_ndarray : R::NDArray::Float) {
-    
-    unless ($scalar_ndarray) {
-      die "The n-dimensional array \$scalar_ndarray must be defined.";
-    }
-    
-    unless ($scalar_ndarray->is_scalar) {
-      die "The n-dmension array \$scalar_ndarray must be a scalar.";
-    }
-    
-    unless ($x_ndarray) {
-      die "The n-dimensional array \$x_ndarray must be defined.";
-    }
-    
-    my $length = $x_ndarray->length;
-    
-    my $x_dim = $x_ndarray->dim;
-    
-    my $ret_ndarray = &c(undef, $x_dim);
-    my $ret_data = $ret_ndarray->data;
-    
-    my $scalar_data = $scalar_ndarray->data;
-    my $x_data = $x_ndarray->data;
-    
-    my $scalar = $scalar_data->[0];
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = $x_data->[$i] / $scalar;
+    else {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = $x_data->[$i] / $y_data->[$i];
+      }
     }
     
     return $ret_ndarray;
@@ -1034,10 +1006,12 @@ class R::OP::Float {
       die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
-    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
-    
-    unless ($equals_dim) {
-      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+    unless ($y_ndarray->is_scalar) {
+      my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+      
+      unless ($equals_dim) {
+        die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+      }
     }
     
     my $length = $x_ndarray->length;
@@ -1050,8 +1024,15 @@ class R::OP::Float {
     my $x_data = $x_ndarray->data;
     my $y_data = $y_ndarray->data;
     
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = Math->powf($x_data->[$i], $y_data->[$i]);
+    if ($y_ndarray->is_scalar) {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = Math->powf($x_data->[$i], $y_data->[0]);
+      }
+    }
+    else {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = Math->powf($x_data->[$i], $y_data->[$i]);
+      }
     }
     
     return $ret_ndarray;
@@ -1067,7 +1048,6 @@ class R::OP::Float {
     unless ($y_ndarray) {
       die "The n-dimensional array \$y_ndarray must be defined.";
     }
-    
     
     unless ($equals_dim) {
       die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
@@ -1229,10 +1209,12 @@ class R::OP::Float {
       die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
-    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
-    
-    unless ($equals_dim) {
-      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+    unless ($y_ndarray->is_scalar) {
+      my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+      
+      unless ($equals_dim) {
+        die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+      }
     }
     
     my $length = $x_ndarray->length;
@@ -1245,8 +1227,15 @@ class R::OP::Float {
     my $x_data = $x_ndarray->data;
     my $y_data = $y_ndarray->data;
     
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = Math->remainderf($x_data->[$i], $y_data->[$i]);
+    if ($y_ndarray->is_scalar) {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = Math->remainderf($x_data->[$i], $y_data->[0]);
+      }
+    }
+    else {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = Math->remainderf($x_data->[$i], $y_data->[$i]);
+      }
     }
     
     return $ret_ndarray;
@@ -1262,10 +1251,12 @@ class R::OP::Float {
       die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
-    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
-    
-    unless ($equals_dim) {
-      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+    unless ($y_ndarray->is_scalar) {
+      my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+      
+      unless ($equals_dim) {
+        die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
+      }
     }
     
     my $length = $x_ndarray->length;
@@ -1278,8 +1269,15 @@ class R::OP::Float {
     my $x_data = $x_ndarray->data;
     my $y_data = $y_ndarray->data;
     
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = Math->fmodf($x_data->[$i], $y_data->[$i]);
+    if ($y_ndarray->is_scalar) {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = Math->fmodf($x_data->[$i], $y_data->[0]);
+      }
+    }
+    else {
+      for (my $i = 0; $i < $length; $i++) {
+        $ret_data->[$i] = Math->fmodf($x_data->[$i], $y_data->[$i]);
+      }
     }
     
     return $ret_ndarray;

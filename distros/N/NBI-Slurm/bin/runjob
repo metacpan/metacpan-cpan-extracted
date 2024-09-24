@@ -27,7 +27,7 @@ my $user_current_dir = getcwd();
 my $username = $ENV{USER};
 my $config = NBI::Slurm::load_config("$user_home_dir/.nbislurm.config");
 my $version = $NBI::Slurm::VERSION;
-my $queue = $config->{'queue'} // 'qib-short,nbi-short';
+my $queue = $config->{'queue'} // 'qib-short';
 my $threads = $config->{'threads'} // 1;
 my $memory = $config->{'memory'} // 8000;
 my $time = $config->{'time'} // "2h";
@@ -57,6 +57,8 @@ GetOptions(
 ) or usage(1);
 
 $debug = 1 if ($ENV{"DEBUG"});
+$verbose = 1 if ($debug);
+
 # Update queue based on time
 my $time_hours = NBI::Opts::_time_to_hour($time);
 $queue = update_queue($queue, $time_hours);
@@ -82,12 +84,21 @@ if (-d $time) {
 # Sanitize tempdir
 if (-d $tmpdir) {
     $tmpdir = File::Spec->rel2abs($tmpdir);
+    say STDERR "[DEBUG] Using $tmpdir as temporary directory" if ($debug);
 } else {
     # Check if it was meant to be a TIME instead
     if ($tmpdir =~/ / or $tmpdir =~/(\d+)[dh]/) {
         say STDERR RED, BOLD, "WARNING:", RESET, " $tmpdir looks like a time string, not a directory!";
     }
-    mkdir($tmpdir) or die "Cannot create $tmpdir: $!";
+    eval {
+        mkdir($tmpdir) or die "Cannot create $tmpdir: $!";
+    };
+    if ($@) {
+        say STDERR RED, BOLD, "ERROR:", RESET, " Cannot create $tmpdir: $@";
+        exit 1;
+    } elsif ($verbose or $debug) {
+        say STDERR "[INFO] Created $tmpdir";
+    }
 }
 
 # Sanitize memory
@@ -96,6 +107,7 @@ if ($memory =~/^(\d+)$/ and $1 < 200) {
     $memory = $1 * 1000;
 }
 $name = autoname($command) unless (defined $name);
+say STDERR "[DEBUG] Using $name as job name" if ($debug);
 
 my $afterok_string = defined $afterok[0] ? "-d afterok:" . join(":", @afterok) : undef;
 
@@ -276,7 +288,7 @@ runjob - Run a job in the cluster using NBI::Slurm
 
 =head1 VERSION
 
-version 0.8.6
+version 0.8.7
 
 =head1 SYNOPSIS
 

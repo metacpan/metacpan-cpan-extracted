@@ -9,7 +9,7 @@ use Try::Tiny;
 use URL::Encode;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @EXPORT = qw(
   subscribe
@@ -19,18 +19,18 @@ our @EXPORT = qw(
 
 sub subscribe {
     my $url = build_url_template( "node", "subscribe" );
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub serverFeatures {
     my $url = build_url_template( 'node', 'serverFeatures' );
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub broadcastTransaction {
     my ($req) = @_;
     my $url = build_url_template( 'node', 'broadcastTransaction' );
-    return http_json_post( $url, $req );
+    return http_json_post( $url, $req, 0 );
 }
 
 1;    # End of Circle::Node
@@ -44,7 +44,7 @@ Circle::Node - The Circle Chain's Node module.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

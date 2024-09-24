@@ -1,22 +1,6 @@
 Changes
 lib/List/Regexp.pm
 LICENSE
-List-Regexp-1.03/Changes
-List-Regexp-1.03/lib/List/Regexp.pm
-List-Regexp-1.03/LICENSE
-List-Regexp-1.03/Makefile.PL
-List-Regexp-1.03/MANIFEST
-List-Regexp-1.03/META.json
-List-Regexp-1.03/META.yml
-List-Regexp-1.03/README
-List-Regexp-1.03/regexp-opt
-List-Regexp-1.03/t/array.t
-List-Regexp-1.03/t/charset.t
-List-Regexp-1.03/t/prefix.t
-List-Regexp-1.03/t/single-w.t
-List-Regexp-1.03/t/single.t
-List-Regexp-1.03/t/suffix.t
-List-Regexp-1.03/t/TestRegexp.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

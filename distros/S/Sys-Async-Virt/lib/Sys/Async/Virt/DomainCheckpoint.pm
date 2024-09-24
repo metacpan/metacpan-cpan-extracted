@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::DomainCheckpoint v0.0.3;
+package Sys::Async::Virt::DomainCheckpoint v0.0.5;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.3;
+use Protocol::Sys::Virt::Remote::XDR v0.0.5;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -47,27 +47,27 @@ sub new {
 }
 
 sub delete($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_DELETE,
-        { checkpoint => $self->{id}, flags => $flags // 0 } ));
+        { checkpoint => $self->{id}, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub get_parent($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_GET_PARENT,
-        { checkpoint => $self->{id}, flags => $flags // 0 } ))->{parent};
+        { checkpoint => $self->{id}, flags => $flags // 0 }, unwrap => 'parent' );
 }
 
 async sub get_xml_desc($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_GET_XML_DESC,
-        { checkpoint => $self->{id}, flags => $flags // 0 } ))->{xml};
+        { checkpoint => $self->{id}, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 async sub list_all_children($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_LIST_ALL_CHILDREN,
-        { checkpoint => $self->{id}, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 } ))->{checkpoints};
+        { checkpoint => $self->{id}, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'checkpoints' );
 }
 
 
@@ -83,17 +83,29 @@ Sys::Async::Virt::DomainCheckpoint - Client side proxy to remote LibVirt domain 
 
 =head1 VERSION
 
-v0.0.3
+v0.0.5
 
 =head1 SYNOPSIS
 
+  use Future::AsyncAwait;
+
+  my $domain = await $virt->domain_lookup_by_name( 'domain' );
+  my $checkp = await $domain->checkpoint_lookup_by_name( 'checkpoint' );
+  my $children = await $checkp->list_all_children();
+
 =head1 DESCRIPTION
 
+Provides access to checkpoints.
+
 =head1 EVENTS
+
+No (LibVirt) events available for domain checkpoints.
 
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Not to be called directly. Various APIs return instances of this type.
 
 =head1 METHODS
 

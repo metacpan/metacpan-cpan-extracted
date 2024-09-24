@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Secret v0.0.3;
+package Sys::Async::Virt::Secret v0.0.5;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.3;
+use Protocol::Sys::Virt::Remote::XDR v0.0.5;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -38,21 +38,21 @@ sub new {
 }
 
 async sub get_xml_desc($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_SECRET_GET_XML_DESC,
-        { secret => $self->{id}, flags => $flags // 0 } ))->{xml};
+        { secret => $self->{id}, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 sub set_value($self, $value, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_SECRET_SET_VALUE,
-        { secret => $self->{id}, value => $value, flags => $flags // 0 } ));
+        { secret => $self->{id}, value => $value, flags => $flags // 0 }, empty => 1 );
 }
 
 sub undefine($self) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_SECRET_UNDEFINE,
-        { secret => $self->{id},  } ));
+        { secret => $self->{id} }, empty => 1 );
 }
 
 
@@ -68,7 +68,7 @@ Sys::Async::Virt::Secret - Client side proxy to remote LibVirt secret
 
 =head1 VERSION
 
-v0.0.3
+v0.0.5
 
 =head1 SYNOPSIS
 

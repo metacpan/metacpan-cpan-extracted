@@ -34,11 +34,11 @@ Circle::Wallet - the circle chain SDK in PERL
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -460,7 +460,7 @@ public api without user login, address of uid.
 sub public_address_of_uid {
     my ($uid) = @_;
     my $url = _build_public_address_uid($uid);
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub _build_public_address_uid {
@@ -487,7 +487,7 @@ public api without user login. balance_of_address
 sub public_balance_of_address {
     my ($address) = @_;
     my $url = _build_public_address_address($address);
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub _build_public_address_address {
@@ -514,7 +514,7 @@ public api without user login, assets of address
 sub public_assets_of_address {
     my ( $address, $type ) = @_;
     my $url = _build_public_assets_of_address( $address, $type );
-    return http_json_get($url);
+    return http_json_get($url, 0);
 }
 
 sub _build_public_assets_of_address {
@@ -549,7 +549,7 @@ public api without user login, search transaction
 sub public_search_transaction {
     my ($req) = @_;
     my $url = _build_public_search_transaction();
-    return http_json_post( $url, $req );
+    return http_json_post( $url, $req, 0 );
 }
 
 sub _build_public_search_transaction {
@@ -574,7 +574,7 @@ automatically be notified of progress on your bug as I make changes.
 
 See L<Circle::Common> for circle common module.
 
-See L <Circle::User> for circle user module .
+See L<Circle::User> for circle user module .
 
 See L<Circle::Wallet> for circle wallet module.
 

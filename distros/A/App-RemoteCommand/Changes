@@ -1,5 +1,8 @@
 Revision history for Perl extension App-RemoteCommand
 
+0.993  2024-09-23 18:52:52 JST
+  - Configure requires perl v5.16
+
 0.992  2024-09-23 12:10:45 JST
   - No functional change; re-packaging
 

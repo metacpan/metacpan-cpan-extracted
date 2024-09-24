@@ -1,5 +1,5 @@
 # -*- perl -*-
-# Copyright (C) 2015-2021 Sergey Poznyakoff <gray@gnu.org>
+# Copyright (C) 2015-2024 Sergey Poznyakoff <gray@gnu.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [ qw(regexp_opt) ] );
 our @EXPORT_OK = ( qw(regexp_opt) );
 our @EXPORT = qw(regexp_opt);
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 # Synopsis:
 #   my @res = find_prefix(AREF)
@@ -45,13 +45,13 @@ sub find_prefix {
     my ($n, $l);
 
     my $c = $aref->[0][0];
-    for ($n = 0; $n+1 <= $#{$aref} and $aref->[$n+1][0] eq $c; $n++) {};
+    for ($n = 0; $n+1 <= $#{$aref} && $aref->[$n+1][0] eq $c; $n++) {};
 	    
   OUTER:
     for ($l = 0; $l < $#{$aref->[0]}; $l++) {
 	$c = $aref->[0][$l+1];
 	for (my $i = 1; $i <= $n; $i++) {
-	    last OUTER if ($l+1 > $#{$aref->[$i]} or $aref->[$i][$l+1] ne $c);
+	    last OUTER if ($l+1 > $#{$aref->[$i]} || $aref->[$i][$l+1] ne $c);
 	}
     }
     return ($n,$l);
@@ -145,7 +145,7 @@ sub parse {
 #   posix [][\\<>.(){}?*+^\$]
 #   pcre  [][\\.(){}?*^+\$]
 #
-# group:   A reference to a list of two elements containig markers for
+# group:   A reference to a list of two elements containing markers for
 # parenthesized groups.  Non-capturing groups are used, if possible.
 #   posix [ '(', ')' ]
 #   pcre  [ '(?:', ')' ]
@@ -198,7 +198,7 @@ sub nodelist_to_regexp {
     }
 
     if ($#cclass == 0) {
-	push @alternations, $cclass[0];
+	push @alternations, escape_re_chars($conf, $cclass[0]);
     } elsif ($#cclass >= 0) {
 	$s = '[';
 	@cclass = sort {
@@ -271,7 +271,7 @@ sub nodelist_to_regexp {
 	$s = $conf->{group}[0]
 	     . join($conf->{branch},@alternations)
 	     . $conf->{group}[1];
-    } elsif (!$set and length($alternations[0]) > 1) {
+    } elsif (!$set && length($alternations[0]) > 1) {
 	# Add grouping if the resulting text is not a character set
 	# and is longer than one character
 	$s = $conf->{group}[0] . $alternations[0] . $conf->{group}[1];

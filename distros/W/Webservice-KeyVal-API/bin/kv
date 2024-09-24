@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use strict;
+use warnings;
+
+use Webservice::KeyVal::API qw//;
+
+use Dispatch::Fu;
+use Util::H2O::More         qw/ddd Getopt2h2o o2d/;
+
+use constant {
+    EXIT_SUCCESS => 0,
+    EXIT_ERROR   => 1,
+};
+
+my $subcommand = shift @ARGV;
+my $client     = Webservice::KeyVal::API->new; 
+
+#>>>
+dispatch {
+    xdefault shift, q{help};
+}
+$subcommand,
+  help      => sub { exit do_help()      },
+  set       => sub { exit do_set(\@ARGV) },
+  get       => sub { exit do_get(\@ARGV) },
+;
+#<<<
+
+# TODO:
+# 1.  accept value via STDIN with trailing '-' to indicated,
+#       $ process | kv -v -
+# 2.  check for max key or value length of 101 (determined empirically)
+# 3. ..?
+#
+
+sub do_set {
+   my ($ARGV) = @_;
+
+   my $o      = Getopt2h2o $ARGV, {}, qw/key|k=s val|v=s/;
+
+   if ($o->val eq "-") {
+     local $/;
+     my $input = <STDIN>;
+     chomp $input;
+     $o->val($input);
+   }
+
+   local $@;
+   my $resp = eval { $client->set($o->key => $o->val) } or undef;
+   die $@ if not $resp;
+
+   printf "%s %s\n", $resp->key, $resp->val;
+}
+
+sub do_get {
+   my ($ARGV) = @_;
+
+   my $o      = Getopt2h2o $ARGV, {}, qw/key|k=s/;
+
+   local $@;
+   my $resp = eval { $client->get($o->key) } or undef;
+   die $@ if not $resp;
+
+   printf "%s %s\n", $resp->key, $resp->val;
+}
+
+sub do_help {
+    warn "kv! subcommand may be one of the following: 'set', 'get', 'help' - (prints this!)\n";
+}
+
+__END__

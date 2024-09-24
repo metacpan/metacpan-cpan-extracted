@@ -1,3 +1,72 @@
+0.101003 2024-09-24
+  [New Features]
+    * Add R::OP::Int#left_shift method.
+    * Add R::OP::Int#arithmetic_right_shift method.
+    * Add R::OP::Int#logical_right_shift method.
+    * Add R::OP::Long#left_shift method.
+    * Add R::OP::Long#arithmetic_right_shift method.
+    * Add R::OP::Long#logical_right_shift method.
+    * Add R::OP::Long#bit_and method.
+    * Add R::OP::Long#bit_or method.
+    * Add R::OP::Long#bit_not method.
+    * Add R::OP::Int#bit_and method.
+    * Add R::OP::Int#bit_or method.
+    * Add R::OP::Int#bit_not method.
+    
+    * Add R::NDArray#set_data method.
+    * In the following methods, $y_ndarray allows to be a L<scalar|SPVM::R::NDArray/"Scalar">. In that case, each element used in the operation is the element at index 0.
+      
+      R::OP::Int#add
+      R::OP::Int#sub
+      R::OP::Int#mul
+      R::OP::Int#div
+      R::OP::Int#div_u
+      R::OP::Int#mod
+      R::OP::Int#mod_u
+      R::OP::Long#add
+      R::OP::Long#sub
+      R::OP::Long#mul
+      R::OP::Long#div
+      R::OP::Long#div_u
+      R::OP::Long#mod
+      R::OP::Long#mod_u
+      R::OP::Float#add
+      R::OP::Float#sub
+      R::OP::Float#mul
+      R::OP::Float#div
+      R::OP::Float#pow
+      R::OP::Float#reminder
+      R::OP::Float#fmod
+      R::OP::Double#add
+      R::OP::Double#sub
+      R::OP::Double#mul
+      R::OP::Double#div
+      R::OP::Double#pow
+      R::OP::Double#reminder
+      R::OP::Double#fmod
+      R::OP::FloatComplex#add
+      R::OP::FloatComplex#sub
+      R::OP::FloatComplex#mul
+      R::OP::FloatComplex#div
+      R::OP::FloatComplex#pow
+      R::OP::DoubleComplex#add
+      R::OP::DoubleComplex#sub
+      R::OP::DoubleComplex#mul
+      R::OP::DoubleComplex#div
+      R::OP::DoubleComplex#pow
+      R::OP::String#cancat
+      R::OP::StringBuffer#push
+  [Incompatible Changes]
+    * scamul and scadiv methods in the following classes are removed. Use mul and div method for scalar multiplication and scalar division.
+    
+      R::OP::Int
+      R::OP::Long
+      R::OP::Float
+      R::OP::Double
+      R::OP::Double
+      R::OP::FloatComplex
+      R::OP::DoubleComplex
+    
 0.101002 2024-09-16
   [Internal Changes]
     * Use StringBuffer#cmp method to compares two elements in R::NDArray::StringBuffer#elem_cmp method.

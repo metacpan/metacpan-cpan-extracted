@@ -1,0 +1,8 @@
+0.9.8   Mon Sep  23 04:13:30 PM UTC 2024
+        - Initial release of API client for https://dog.ceo/dog-api
+        - Updates to POD and minor bug fixes are expected before 1.0.0
+
+0.9.9   Mon Sep  23 04:14:30 PM UTC 2024
+        - Initial release of API client for https://keyval.org
+        - Updates to POD and minor bug fixes are expected before 1.0.0
+	- fixed some POD/Changelog oversights ...

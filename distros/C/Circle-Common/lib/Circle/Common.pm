@@ -21,7 +21,7 @@ our @EXPORT_OK = qw(
   http_json_get
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $config = undef;
 
@@ -30,7 +30,6 @@ sub load_config {
         return $config;
     }
 
-    my $config = {};
     my $config_path = dist_file('Circle-Common', 'config.yml');
     try {
         my $content = slurp($config_path);
@@ -48,12 +47,13 @@ sub get_session_key {
     my $home         = $ENV{HOME};
     my $session_path = $user->{sessionPath};
     my $file_path    = "${home}/${session_path}";
-    my $session_key;
+    my $session_key  = '';
+    # print "file_path: $file_path\n";
     try {
         my @lines        = slurp($file_path);
         my @session_keys = grep { chomp($_); $_ =~ /^sessionKey/; } @lines;
         if ( @session_keys > 0 ) {
-            my $session_key = $session_keys[0];
+            $session_key = $session_keys[0];
             $session_key =~ s/sessionKey=//;
         }
     }
@@ -65,14 +65,15 @@ sub get_session_key {
 }
 
 sub http_json_post {
-    my ( $url, $data ) = @_;
+    my ( $url, $data, $need_session_key ) = @_;
+    $need_session_key //= 1;
     my $config      = load_config();
     my $http        = $config->{http};
     my $session_key = get_session_key();
     my $ua          = LWP::UserAgent->new();
     $ua->timeout( $http->{timeoutWrite} );
     my $header;
-    if ($session_key) {
+    if ($need_session_key && $session_key) {
         $header = [
             'AuthorizationV2' => $session_key,
             'Content-Type'    => 'application/json; charset=UTF-8'
@@ -96,14 +97,16 @@ sub http_json_post {
 }
 
 sub http_json_get {
-    my ($url)       = @_;
+    my ($url, $need_session_key)       = @_;
+    $need_session_key //= 1;
     my $config      = load_config();
     my $http        = $config->{http};
     my $session_key = get_session_key();
     my $ua          = LWP::UserAgent->new();
     $ua->timeout( $http->{timeoutRead} );
     my $header;
-    if ($session_key) {
+    # print "need_session_key: $need_session_key, session_key: $session_key";
+    if ($need_session_key && $session_key) {
         $header = [
             'AuthorizationV2' => $session_key,
             'Content-Type'    => 'application/json; charset=UTF-8'
@@ -171,7 +174,7 @@ Circle::Common - the common module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

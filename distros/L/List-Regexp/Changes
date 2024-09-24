@@ -1,3 +1,7 @@
+1.05 2024-09-23
+
+* Bugfix: escape single characters not occurring within a class.
+
 1.04 2021-02-13
 
 * Change bugtracker address.

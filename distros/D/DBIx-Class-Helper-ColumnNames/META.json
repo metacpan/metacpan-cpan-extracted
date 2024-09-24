@@ -1,0 +1,101 @@
+{
+   "abstract" : "Retrieve column names from a resultset",
+   "author" : [
+      "Robert Rothenberg <rrwo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "DBIC",
+      "DBIx::Class",
+      "plugin"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Class-Helper-ColumnNames",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Ref::Util::XS" : "0"
+         },
+         "requires" : {
+            "DBIx::Class::ResultSet" : "0",
+            "Ref::Util" : "0",
+            "experimental" : "0",
+            "namespace::clean" : "0",
+            "parent" : "0",
+            "perl" : "v5.20.0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::Schema" : "0",
+            "File::Spec" : "0",
+            "Module::Metadata" : "0",
+            "SQL::Translator" : "0.11018",
+            "Test2::V0" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "lib" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::Helper::ColumnNames" : {
+         "file" : "lib/DBIx/Class/Helper/ColumnNames.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robrwo/DBIx-Class-Helper-ResultSet-ColumnNames/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/DBIx-Class-Helper-ResultSet-ColumnNames.git",
+         "web" : "https://github.com/robrwo/DBIx-Class-Helper-ResultSet-ColumnNames"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_authority" : "cpan:RRWO",
+   "x_generated_by_perl" : "v5.34.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

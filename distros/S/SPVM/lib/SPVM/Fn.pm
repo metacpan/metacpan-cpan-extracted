@@ -1431,6 +1431,36 @@ Exceptions:
 
 The type of $array_or_string must be an array type or string type.
 
+=head2 reverse
+
+C<static method reverse : object ($array_or_string : object);>
+
+Reterns a new array that reverses the elements in the array $array_or_string or the characters in the string $array_or_string.
+
+This method calls L</"copy"> method and L</"reverse_inplace"> method to create a new array and reverses elements.
+
+Exceptions:
+
+Exceptions thrown by L</"copy"> method and L</"reverse_inplace"> method could be thrown.
+
+=head2 slice
+
+C<static method slice : object ($array : object, $offset : int, $length :int);>
+
+Slices the array $array from the offset $offset to the length $length, and returns it.
+
+The type of $array must be an object array type, a numeric array type, or a multi-numeric array type.
+
+This method calls L<Array#memcpy_object|SPVM::Array/"memcpy_object"> method or L</"memcpy"> method to slice $array.
+
+Exceptions:
+
+The array $array must be defined. Otherwise an exception is thrown.
+
+The type of the array $array must be an object array type, a numeric array type or a multi-numeric array type. Otherwise an exception is thrown.
+
+Exceptions thrown by L<Array#memcpy_object|SPVM::Array/"memcpy_object"> method or L</"memcpy"> method could be thrown.
+
 =head1 See Also
 
 =over 2

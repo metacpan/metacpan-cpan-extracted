@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Domain v0.0.3;
+package Sys::Async::Virt::Domain v0.0.5;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.3;
+use Protocol::Sys::Virt::Remote::XDR v0.0.5;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -690,832 +690,874 @@ sub new {
 }
 
 sub _migrate_perform($self, $cookie, $uri, $flags, $dname, $resource) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_MIGRATE_PERFORM,
-        { dom => $self->{id}, cookie => $cookie, uri => $uri, flags => $flags // 0, dname => $dname, resource => $resource } ));
+        { dom => $self->{id}, cookie => $cookie, uri => $uri, flags => $flags // 0, dname => $dname, resource => $resource }, empty => 1 );
 }
 
 sub abort_job($self) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_ABORT_JOB,
-        { dom => $self->{id},  } ));
+        { dom => $self->{id} }, empty => 1 );
 }
 
 sub abort_job_flags($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_ABORT_JOB_FLAGS,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 }, empty => 1 );
 }
 
 sub add_iothread($self, $iothread_id, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_ADD_IOTHREAD,
-        { dom => $self->{id}, iothread_id => $iothread_id, flags => $flags // 0 } ));
+        { dom => $self->{id}, iothread_id => $iothread_id, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub agent_set_response_timeout($self, $timeout, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_AGENT_SET_RESPONSE_TIMEOUT,
-        { dom => $self->{id}, timeout => $timeout, flags => $flags // 0 } ))->{result};
+        { dom => $self->{id}, timeout => $timeout, flags => $flags // 0 }, unwrap => 'result' );
 }
 
 sub attach_device($self, $xml) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_ATTACH_DEVICE,
-        { dom => $self->{id}, xml => $xml } ));
+        { dom => $self->{id}, xml => $xml }, empty => 1 );
 }
 
 sub attach_device_flags($self, $xml, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_ATTACH_DEVICE_FLAGS,
-        { dom => $self->{id}, xml => $xml, flags => $flags // 0 } ));
+        { dom => $self->{id}, xml => $xml, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub authorized_ssh_keys_get($self, $user, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_AUTHORIZED_SSH_KEYS_GET,
-        { dom => $self->{id}, user => $user, flags => $flags // 0 } ))->{keys};
+        { dom => $self->{id}, user => $user, flags => $flags // 0 }, unwrap => 'keys' );
 }
 
 sub authorized_ssh_keys_set($self, $user, $keys, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_AUTHORIZED_SSH_KEYS_SET,
-        { dom => $self->{id}, user => $user, keys => $keys, flags => $flags // 0 } ));
+        { dom => $self->{id}, user => $user, keys => $keys, flags => $flags // 0 }, empty => 1 );
 }
 
 sub backup_begin($self, $backup_xml, $checkpoint_xml, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_BACKUP_BEGIN,
-        { dom => $self->{id}, backup_xml => $backup_xml, checkpoint_xml => $checkpoint_xml, flags => $flags // 0 } ));
+        { dom => $self->{id}, backup_xml => $backup_xml, checkpoint_xml => $checkpoint_xml, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub backup_get_xml_desc($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_BACKUP_GET_XML_DESC,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{xml};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 sub block_commit($self, $disk, $base, $top, $bandwidth, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_COMMIT,
-        { dom => $self->{id}, disk => $disk, base => $base, top => $top, bandwidth => $bandwidth, flags => $flags // 0 } ));
+        { dom => $self->{id}, disk => $disk, base => $base, top => $top, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub block_copy($self, $path, $destxml, $params, $flags = 0) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_COPY,
-        { dom => $self->{id}, path => $path, destxml => $destxml, params => $params, flags => $flags // 0 } ));
+        { dom => $self->{id}, path => $path, destxml => $destxml, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 sub block_job_abort($self, $path, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_JOB_ABORT,
-        { dom => $self->{id}, path => $path, flags => $flags // 0 } ));
+        { dom => $self->{id}, path => $path, flags => $flags // 0 }, empty => 1 );
 }
 
 sub block_job_set_speed($self, $path, $bandwidth, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_JOB_SET_SPEED,
-        { dom => $self->{id}, path => $path, bandwidth => $bandwidth, flags => $flags // 0 } ));
+        { dom => $self->{id}, path => $path, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
 }
 
 sub block_pull($self, $path, $bandwidth, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_PULL,
-        { dom => $self->{id}, path => $path, bandwidth => $bandwidth, flags => $flags // 0 } ));
+        { dom => $self->{id}, path => $path, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
 }
 
 sub block_rebase($self, $path, $base, $bandwidth, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_REBASE,
-        { dom => $self->{id}, path => $path, base => $base, bandwidth => $bandwidth, flags => $flags // 0 } ));
+        { dom => $self->{id}, path => $path, base => $base, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
 }
 
 sub block_resize($self, $disk, $size, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_RESIZE,
-        { dom => $self->{id}, disk => $disk, size => $size, flags => $flags // 0 } ));
+        { dom => $self->{id}, disk => $disk, size => $size, flags => $flags // 0 }, empty => 1 );
 }
 
 sub block_stats($self, $path) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_STATS,
-        { dom => $self->{id}, path => $path } ));
+        { dom => $self->{id}, path => $path } );
 }
 
 async sub block_stats_flags($self, $path, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
-    my $nparams = (await $self->{client}->_call(
+    my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_STATS_FLAGS,
-        { dom => $self->{id}, path => $path, nparams => 0, flags => $flags // 0 } ))->{nparams};
-    return (await $self->{client}->_call(
+        { dom => $self->{id}, path => $path, nparams => 0, flags => $flags // 0 }, 'nparams' );
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_STATS_FLAGS,
-        { dom => $self->{id}, path => $path, nparams => $nparams, flags => $flags // 0 } ))->{params};
+        { dom => $self->{id}, path => $path, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async sub checkpoint_create_xml($self, $xml_desc, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_CREATE_XML,
-        { dom => $self->{id}, xml_desc => $xml_desc, flags => $flags // 0 } ))->{checkpoint};
+        { dom => $self->{id}, xml_desc => $xml_desc, flags => $flags // 0 }, unwrap => 'checkpoint' );
 }
 
 async sub checkpoint_lookup_by_name($self, $name, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_LOOKUP_BY_NAME,
-        { dom => $self->{id}, name => $name, flags => $flags // 0 } ))->{checkpoint};
+        { dom => $self->{id}, name => $name, flags => $flags // 0 }, unwrap => 'checkpoint' );
 }
 
 sub core_dump($self, $to, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_CORE_DUMP,
-        { dom => $self->{id}, to => $to, flags => $flags // 0 } ));
+        { dom => $self->{id}, to => $to, flags => $flags // 0 }, empty => 1 );
 }
 
 sub core_dump_with_format($self, $to, $dumpformat, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_CORE_DUMP_WITH_FORMAT,
-        { dom => $self->{id}, to => $to, dumpformat => $dumpformat, flags => $flags // 0 } ));
+        { dom => $self->{id}, to => $to, dumpformat => $dumpformat, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub create_with_flags($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_CREATE_WITH_FLAGS,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{dom};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'dom' );
 }
 
 sub del_iothread($self, $iothread_id, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_DEL_IOTHREAD,
-        { dom => $self->{id}, iothread_id => $iothread_id, flags => $flags // 0 } ));
+        { dom => $self->{id}, iothread_id => $iothread_id, flags => $flags // 0 }, empty => 1 );
 }
 
 sub destroy($self) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_DESTROY,
-        { dom => $self->{id},  } ));
+        { dom => $self->{id} }, empty => 1 );
 }
 
 sub destroy_flags($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_DESTROY_FLAGS,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 }, empty => 1 );
 }
 
 sub detach_device($self, $xml) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_DETACH_DEVICE,
-        { dom => $self->{id}, xml => $xml } ));
+        { dom => $self->{id}, xml => $xml }, empty => 1 );
 }
 
 sub detach_device_alias($self, $alias, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_DETACH_DEVICE_ALIAS,
-        { dom => $self->{id}, alias => $alias, flags => $flags // 0 } ));
+        { dom => $self->{id}, alias => $alias, flags => $flags // 0 }, empty => 1 );
 }
 
 sub detach_device_flags($self, $xml, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_DETACH_DEVICE_FLAGS,
-        { dom => $self->{id}, xml => $xml, flags => $flags // 0 } ));
+        { dom => $self->{id}, xml => $xml, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub fsfreeze($self, $mountpoints, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_FSFREEZE,
-        { dom => $self->{id}, mountpoints => $mountpoints, flags => $flags // 0 } ))->{filesystems};
+        { dom => $self->{id}, mountpoints => $mountpoints, flags => $flags // 0 }, unwrap => 'filesystems' );
 }
 
 async sub fsthaw($self, $mountpoints, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_FSTHAW,
-        { dom => $self->{id}, mountpoints => $mountpoints, flags => $flags // 0 } ))->{filesystems};
+        { dom => $self->{id}, mountpoints => $mountpoints, flags => $flags // 0 }, unwrap => 'filesystems' );
 }
 
 sub fstrim($self, $mountPoint, $minimum, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_FSTRIM,
-        { dom => $self->{id}, mountPoint => $mountPoint, minimum => $minimum, flags => $flags // 0 } ));
+        { dom => $self->{id}, mountPoint => $mountPoint, minimum => $minimum, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub get_autostart($self) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_AUTOSTART,
-        { dom => $self->{id},  } ))->{autostart};
+        { dom => $self->{id} }, unwrap => 'autostart' );
 }
 
 async sub get_blkio_parameters($self, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
-    my $nparams = (await $self->{client}->_call(
+    my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_BLKIO_PARAMETERS,
-        { dom => $self->{id}, nparams => 0, flags => $flags // 0 } ))->{nparams};
-    return (await $self->{client}->_call(
+        { dom => $self->{id}, nparams => 0, flags => $flags // 0 }, 'nparams' );
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_BLKIO_PARAMETERS,
-        { dom => $self->{id}, nparams => $nparams, flags => $flags // 0 } ))->{params};
+        { dom => $self->{id}, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 sub get_block_info($self, $path, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_BLOCK_INFO,
-        { dom => $self->{id}, path => $path, flags => $flags // 0 } ));
+        { dom => $self->{id}, path => $path, flags => $flags // 0 } );
 }
 
 async sub get_block_io_tune($self, $disk, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
-    my $nparams = (await $self->{client}->_call(
+    my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_BLOCK_IO_TUNE,
-        { dom => $self->{id}, disk => $disk, nparams => 0, flags => $flags // 0 } ))->{nparams};
-    return (await $self->{client}->_call(
+        { dom => $self->{id}, disk => $disk, nparams => 0, flags => $flags // 0 }, 'nparams' );
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_BLOCK_IO_TUNE,
-        { dom => $self->{id}, disk => $disk, nparams => $nparams, flags => $flags // 0 } ))->{params};
+        { dom => $self->{id}, disk => $disk, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 sub get_control_info($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_CONTROL_INFO,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 } );
 }
 
 async sub get_cpu_stats($self, $start_cpu, $ncpus, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
-    my $nparams = (await $self->{client}->_call(
+    my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_CPU_STATS,
-        { dom => $self->{id}, nparams => 0, start_cpu => $start_cpu, ncpus => $ncpus, flags => $flags // 0 } ))->{nparams};
-    return (await $self->{client}->_call(
+        { dom => $self->{id}, nparams => 0, start_cpu => $start_cpu, ncpus => $ncpus, flags => $flags // 0 }, 'nparams' );
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_CPU_STATS,
-        { dom => $self->{id}, nparams => $nparams, start_cpu => $start_cpu, ncpus => $ncpus, flags => $flags // 0 } ))->{params};
+        { dom => $self->{id}, nparams => $nparams, start_cpu => $start_cpu, ncpus => $ncpus, flags => $flags // 0 }, unwrap => 'params' );
+}
+
+async sub get_disk_errors($self, $flags = 0) {
+    return await $self->{client}->_call(
+        $remote->PROC_DOMAIN_GET_DISK_ERRORS,
+        { dom => $self->{id}, maxerrors => $remote->DOMAIN_DISK_ERRORS_MAX, flags => $flags // 0 }, unwrap => 'errors' );
 }
 
 async sub get_fsinfo($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_FSINFO,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{info};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'info' );
 }
 
 async sub get_guest_info($self, $types, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_GUEST_INFO,
-        { dom => $self->{id}, types => $types, flags => $flags // 0 } ))->{params};
+        { dom => $self->{id}, types => $types, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async sub get_guest_vcpus($self, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_GUEST_VCPUS,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{params};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async sub get_hostname($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_HOSTNAME,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{hostname};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'hostname' );
 }
 
 sub get_info($self) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_INFO,
-        { dom => $self->{id},  } ));
+        { dom => $self->{id} } );
 }
 
 async sub get_interface_parameters($self, $device, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
-    my $nparams = (await $self->{client}->_call(
+    my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_INTERFACE_PARAMETERS,
-        { dom => $self->{id}, device => $device, nparams => 0, flags => $flags // 0 } ))->{nparams};
-    return (await $self->{client}->_call(
+        { dom => $self->{id}, device => $device, nparams => 0, flags => $flags // 0 }, 'nparams' );
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_INTERFACE_PARAMETERS,
-        { dom => $self->{id}, device => $device, nparams => $nparams, flags => $flags // 0 } ))->{params};
+        { dom => $self->{id}, device => $device, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 sub get_job_info($self) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_JOB_INFO,
-        { dom => $self->{id},  } ));
+        { dom => $self->{id} } );
+}
+
+sub get_job_stats($self, $flags = 0) {
+    return $self->{client}->_call(
+        $remote->PROC_DOMAIN_GET_JOB_STATS,
+        { dom => $self->{id}, flags => $flags // 0 } );
 }
 
 async sub get_max_memory($self) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_MAX_MEMORY,
-        { dom => $self->{id},  } ))->{memory};
+        { dom => $self->{id} }, unwrap => 'memory' );
 }
 
 async sub get_max_vcpus($self) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_MAX_VCPUS,
-        { dom => $self->{id},  } ))->{num};
+        { dom => $self->{id} }, unwrap => 'num' );
 }
 
 async sub get_memory_parameters($self, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
-    my $nparams = (await $self->{client}->_call(
+    my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_MEMORY_PARAMETERS,
-        { dom => $self->{id}, nparams => 0, flags => $flags // 0 } ))->{nparams};
-    return (await $self->{client}->_call(
+        { dom => $self->{id}, nparams => 0, flags => $flags // 0 }, 'nparams' );
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_MEMORY_PARAMETERS,
-        { dom => $self->{id}, nparams => $nparams, flags => $flags // 0 } ))->{params};
+        { dom => $self->{id}, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
+}
+
+async sub get_messages($self, $flags = 0) {
+    return await $self->{client}->_call(
+        $remote->PROC_DOMAIN_GET_MESSAGES,
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'msgs' );
 }
 
 async sub get_metadata($self, $type, $uri, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_METADATA,
-        { dom => $self->{id}, type => $type, uri => $uri, flags => $flags // 0 } ))->{metadata};
+        { dom => $self->{id}, type => $type, uri => $uri, flags => $flags // 0 }, unwrap => 'metadata' );
 }
 
 async sub get_numa_parameters($self, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
-    my $nparams = (await $self->{client}->_call(
+    my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_NUMA_PARAMETERS,
-        { dom => $self->{id}, nparams => 0, flags => $flags // 0 } ))->{nparams};
-    return (await $self->{client}->_call(
+        { dom => $self->{id}, nparams => 0, flags => $flags // 0 }, 'nparams' );
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_NUMA_PARAMETERS,
-        { dom => $self->{id}, nparams => $nparams, flags => $flags // 0 } ))->{params};
+        { dom => $self->{id}, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async sub get_os_type($self) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_OS_TYPE,
-        { dom => $self->{id},  } ))->{type};
+        { dom => $self->{id} }, unwrap => 'type' );
 }
 
 async sub get_scheduler_parameters($self) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_SCHEDULER_PARAMETERS,
-        { dom => $self->{id}, nparams => $remote->DOMAIN_SCHEDULER_PARAMETERS_MAX } ))->{params};
+        { dom => $self->{id}, nparams => $remote->DOMAIN_SCHEDULER_PARAMETERS_MAX }, unwrap => 'params' );
 }
 
 async sub get_scheduler_parameters_flags($self, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_SCHEDULER_PARAMETERS_FLAGS,
-        { dom => $self->{id}, nparams => $remote->DOMAIN_SCHEDULER_PARAMETERS_MAX, flags => $flags // 0 } ))->{params};
+        { dom => $self->{id}, nparams => $remote->DOMAIN_SCHEDULER_PARAMETERS_MAX, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async sub get_scheduler_type($self) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_SCHEDULER_TYPE,
-        { dom => $self->{id},  } ))->{type};
+        { dom => $self->{id} }, unwrap => 'type' );
 }
 
 sub get_state($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_STATE,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 } );
 }
 
 async sub get_vcpus_flags($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_VCPUS_FLAGS,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{num};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'num' );
 }
 
 async sub get_xml_desc($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_XML_DESC,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{xml};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 sub graphics_reload($self, $type, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_GRAPHICS_RELOAD,
-        { dom => $self->{id}, type => $type, flags => $flags // 0 } ));
+        { dom => $self->{id}, type => $type, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub has_current_snapshot($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_HAS_CURRENT_SNAPSHOT,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{result};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'result' );
 }
 
 async sub has_managed_save_image($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_HAS_MANAGED_SAVE_IMAGE,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{result};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'result' );
 }
 
 sub inject_nmi($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_INJECT_NMI,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub interface_addresses($self, $source, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_INTERFACE_ADDRESSES,
-        { dom => $self->{id}, source => $source, flags => $flags // 0 } ))->{ifaces};
+        { dom => $self->{id}, source => $source, flags => $flags // 0 }, unwrap => 'ifaces' );
 }
 
 sub interface_stats($self, $device) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_INTERFACE_STATS,
-        { dom => $self->{id}, device => $device } ));
+        { dom => $self->{id}, device => $device } );
 }
 
 async sub is_active($self) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_IS_ACTIVE,
-        { dom => $self->{id},  } ))->{active};
+        { dom => $self->{id} }, unwrap => 'active' );
 }
 
 async sub is_persistent($self) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_IS_PERSISTENT,
-        { dom => $self->{id},  } ))->{persistent};
+        { dom => $self->{id} }, unwrap => 'persistent' );
 }
 
 async sub is_updated($self) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_IS_UPDATED,
-        { dom => $self->{id},  } ))->{updated};
+        { dom => $self->{id} }, unwrap => 'updated' );
 }
 
 async sub list_all_checkpoints($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_LIST_ALL_CHECKPOINTS,
-        { dom => $self->{id}, need_results => $remote->DOMAIN_CHECKPOINT_LIST_MAX, flags => $flags // 0 } ))->{checkpoints};
+        { dom => $self->{id}, need_results => $remote->DOMAIN_CHECKPOINT_LIST_MAX, flags => $flags // 0 }, unwrap => 'checkpoints' );
 }
 
 async sub list_all_snapshots($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_LIST_ALL_SNAPSHOTS,
-        { dom => $self->{id}, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 } ))->{snapshots};
+        { dom => $self->{id}, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'snapshots' );
 }
 
 sub managed_save($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_MANAGED_SAVE,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 }, empty => 1 );
 }
 
 sub managed_save_define_xml($self, $dxml, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_MANAGED_SAVE_DEFINE_XML,
-        { dom => $self->{id}, dxml => $dxml, flags => $flags // 0 } ));
+        { dom => $self->{id}, dxml => $dxml, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub managed_save_get_xml_desc($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_MANAGED_SAVE_GET_XML_DESC,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{xml};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 sub managed_save_remove($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_MANAGED_SAVE_REMOVE,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 }, empty => 1 );
+}
+
+async sub memory_stats($self, $flags = 0) {
+    return await $self->{client}->_call(
+        $remote->PROC_DOMAIN_MEMORY_STATS,
+        { dom => $self->{id}, maxStats => $remote->DOMAIN_MEMORY_STATS_MAX, flags => $flags // 0 }, unwrap => 'stats' );
 }
 
 async sub migrate_get_compression_cache($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_MIGRATE_GET_COMPRESSION_CACHE,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{cacheSize};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'cacheSize' );
 }
 
 async sub migrate_get_max_downtime($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_MIGRATE_GET_MAX_DOWNTIME,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{downtime};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'downtime' );
 }
 
 async sub migrate_get_max_speed($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_MIGRATE_GET_MAX_SPEED,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{bandwidth};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'bandwidth' );
 }
 
 sub migrate_set_compression_cache($self, $cacheSize, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_MIGRATE_SET_COMPRESSION_CACHE,
-        { dom => $self->{id}, cacheSize => $cacheSize, flags => $flags // 0 } ));
+        { dom => $self->{id}, cacheSize => $cacheSize, flags => $flags // 0 }, empty => 1 );
 }
 
 sub migrate_set_max_downtime($self, $downtime, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_MIGRATE_SET_MAX_DOWNTIME,
-        { dom => $self->{id}, downtime => $downtime, flags => $flags // 0 } ));
+        { dom => $self->{id}, downtime => $downtime, flags => $flags // 0 }, empty => 1 );
 }
 
 sub migrate_set_max_speed($self, $bandwidth, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_MIGRATE_SET_MAX_SPEED,
-        { dom => $self->{id}, bandwidth => $bandwidth, flags => $flags // 0 } ));
+        { dom => $self->{id}, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
 }
 
 sub migrate_start_post_copy($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_MIGRATE_START_POST_COPY,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 }, empty => 1 );
+}
+
+sub open_channel($self, $name, $flags = 0) {
+    return $self->{client}->_call(
+        $remote->PROC_DOMAIN_OPEN_CHANNEL,
+        { dom => $self->{id}, name => $name, flags => $flags // 0 }, stream => 'read', empty => 1 );
+}
+
+sub open_console($self, $dev_name, $flags = 0) {
+    return $self->{client}->_call(
+        $remote->PROC_DOMAIN_OPEN_CONSOLE,
+        { dom => $self->{id}, dev_name => $dev_name, flags => $flags // 0 }, stream => 'read', empty => 1 );
 }
 
 sub pin_iothread($self, $iothreads_id, $cpumap, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_PIN_IOTHREAD,
-        { dom => $self->{id}, iothreads_id => $iothreads_id, cpumap => $cpumap, flags => $flags // 0 } ));
+        { dom => $self->{id}, iothreads_id => $iothreads_id, cpumap => $cpumap, flags => $flags // 0 }, empty => 1 );
 }
 
 sub pin_vcpu($self, $vcpu, $cpumap) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_PIN_VCPU,
-        { dom => $self->{id}, vcpu => $vcpu, cpumap => $cpumap } ));
+        { dom => $self->{id}, vcpu => $vcpu, cpumap => $cpumap }, empty => 1 );
 }
 
 sub pin_vcpu_flags($self, $vcpu, $cpumap, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_PIN_VCPU_FLAGS,
-        { dom => $self->{id}, vcpu => $vcpu, cpumap => $cpumap, flags => $flags // 0 } ));
+        { dom => $self->{id}, vcpu => $vcpu, cpumap => $cpumap, flags => $flags // 0 }, empty => 1 );
 }
 
 sub pm_suspend_for_duration($self, $target, $duration, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_PM_SUSPEND_FOR_DURATION,
-        { dom => $self->{id}, target => $target, duration => $duration, flags => $flags // 0 } ));
+        { dom => $self->{id}, target => $target, duration => $duration, flags => $flags // 0 }, empty => 1 );
 }
 
 sub pm_wakeup($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_PM_WAKEUP,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 }, empty => 1 );
 }
 
 sub reboot($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_REBOOT,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub rename($self, $new_name, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_RENAME,
-        { dom => $self->{id}, new_name => $new_name, flags => $flags // 0 } ))->{retcode};
+        { dom => $self->{id}, new_name => $new_name, flags => $flags // 0 }, unwrap => 'retcode' );
 }
 
 sub reset($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_RESET,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 }, empty => 1 );
 }
 
 sub resume($self) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_RESUME,
-        { dom => $self->{id},  } ));
+        { dom => $self->{id} }, empty => 1 );
 }
 
 sub save($self, $to) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SAVE,
-        { dom => $self->{id}, to => $to } ));
+        { dom => $self->{id}, to => $to }, empty => 1 );
 }
 
 sub save_flags($self, $to, $dxml, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SAVE_FLAGS,
-        { dom => $self->{id}, to => $to, dxml => $dxml, flags => $flags // 0 } ));
+        { dom => $self->{id}, to => $to, dxml => $dxml, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub save_params($self, $params, $flags = 0) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SAVE_PARAMS,
-        { dom => $self->{id}, params => $params, flags => $flags // 0 } ));
+        { dom => $self->{id}, params => $params, flags => $flags // 0 }, empty => 1 );
+}
+
+async sub screenshot($self, $screen, $flags = 0) {
+    return await $self->{client}->_call(
+        $remote->PROC_DOMAIN_SCREENSHOT,
+        { dom => $self->{id}, screen => $screen, flags => $flags // 0 }, unwrap => 'mime', stream => 'read' );
 }
 
 sub send_key($self, $codeset, $holdtime, $keycodes, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SEND_KEY,
-        { dom => $self->{id}, codeset => $codeset, holdtime => $holdtime, keycodes => $keycodes, flags => $flags // 0 } ));
+        { dom => $self->{id}, codeset => $codeset, holdtime => $holdtime, keycodes => $keycodes, flags => $flags // 0 }, empty => 1 );
 }
 
 sub send_process_signal($self, $pid_value, $signum, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SEND_PROCESS_SIGNAL,
-        { dom => $self->{id}, pid_value => $pid_value, signum => $signum, flags => $flags // 0 } ));
+        { dom => $self->{id}, pid_value => $pid_value, signum => $signum, flags => $flags // 0 }, empty => 1 );
 }
 
 sub set_autostart($self, $autostart) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_AUTOSTART,
-        { dom => $self->{id}, autostart => $autostart } ));
+        { dom => $self->{id}, autostart => $autostart }, empty => 1 );
 }
 
 async sub set_blkio_parameters($self, $params, $flags = 0) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_BLKIO_PARAMETERS,
-        { dom => $self->{id}, params => $params, flags => $flags // 0 } ));
+        { dom => $self->{id}, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub set_block_io_tune($self, $disk, $params, $flags = 0) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_BLOCK_IO_TUNE,
-        { dom => $self->{id}, disk => $disk, params => $params, flags => $flags // 0 } ));
+        { dom => $self->{id}, disk => $disk, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 sub set_block_threshold($self, $dev, $threshold, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_BLOCK_THRESHOLD,
-        { dom => $self->{id}, dev => $dev, threshold => $threshold, flags => $flags // 0 } ));
+        { dom => $self->{id}, dev => $dev, threshold => $threshold, flags => $flags // 0 }, empty => 1 );
 }
 
 sub set_guest_vcpus($self, $cpumap, $state, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_GUEST_VCPUS,
-        { dom => $self->{id}, cpumap => $cpumap, state => $state, flags => $flags // 0 } ));
+        { dom => $self->{id}, cpumap => $cpumap, state => $state, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub set_interface_parameters($self, $device, $params, $flags = 0) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_INTERFACE_PARAMETERS,
-        { dom => $self->{id}, device => $device, params => $params, flags => $flags // 0 } ));
+        { dom => $self->{id}, device => $device, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub set_iothread_params($self, $iothread_id, $params, $flags = 0) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_IOTHREAD_PARAMS,
-        { dom => $self->{id}, iothread_id => $iothread_id, params => $params, flags => $flags // 0 } ));
+        { dom => $self->{id}, iothread_id => $iothread_id, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub set_launch_security_state($self, $params, $flags = 0) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_LAUNCH_SECURITY_STATE,
-        { dom => $self->{id}, params => $params, flags => $flags // 0 } ));
+        { dom => $self->{id}, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 sub set_lifecycle_action($self, $type, $action, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_LIFECYCLE_ACTION,
-        { dom => $self->{id}, type => $type, action => $action, flags => $flags // 0 } ));
+        { dom => $self->{id}, type => $type, action => $action, flags => $flags // 0 }, empty => 1 );
 }
 
 sub set_max_memory($self, $memory) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_MAX_MEMORY,
-        { dom => $self->{id}, memory => $memory } ));
+        { dom => $self->{id}, memory => $memory }, empty => 1 );
 }
 
 sub set_memory($self, $memory) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_MEMORY,
-        { dom => $self->{id}, memory => $memory } ));
+        { dom => $self->{id}, memory => $memory }, empty => 1 );
 }
 
 sub set_memory_flags($self, $memory, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_MEMORY_FLAGS,
-        { dom => $self->{id}, memory => $memory, flags => $flags // 0 } ));
+        { dom => $self->{id}, memory => $memory, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub set_memory_parameters($self, $params, $flags = 0) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_MEMORY_PARAMETERS,
-        { dom => $self->{id}, params => $params, flags => $flags // 0 } ));
+        { dom => $self->{id}, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 sub set_memory_stats_period($self, $period, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_MEMORY_STATS_PERIOD,
-        { dom => $self->{id}, period => $period, flags => $flags // 0 } ));
+        { dom => $self->{id}, period => $period, flags => $flags // 0 }, empty => 1 );
 }
 
 sub set_metadata($self, $type, $metadata, $key, $uri, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_METADATA,
-        { dom => $self->{id}, type => $type, metadata => $metadata, key => $key, uri => $uri, flags => $flags // 0 } ));
+        { dom => $self->{id}, type => $type, metadata => $metadata, key => $key, uri => $uri, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub set_numa_parameters($self, $params, $flags = 0) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_NUMA_PARAMETERS,
-        { dom => $self->{id}, params => $params, flags => $flags // 0 } ));
+        { dom => $self->{id}, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub set_perf_events($self, $params, $flags = 0) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_PERF_EVENTS,
-        { dom => $self->{id}, params => $params, flags => $flags // 0 } ));
+        { dom => $self->{id}, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub set_scheduler_parameters($self, $params) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_SCHEDULER_PARAMETERS,
-        { dom => $self->{id}, params => $params } ));
+        { dom => $self->{id}, params => $params }, empty => 1 );
 }
 
 async sub set_scheduler_parameters_flags($self, $params, $flags = 0) {
     $params = await $self->{client}->_filter_typed_param_string( $params );
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_SCHEDULER_PARAMETERS_FLAGS,
-        { dom => $self->{id}, params => $params, flags => $flags // 0 } ));
+        { dom => $self->{id}, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 sub set_time($self, $seconds, $nseconds, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_TIME,
-        { dom => $self->{id}, seconds => $seconds, nseconds => $nseconds, flags => $flags // 0 } ));
+        { dom => $self->{id}, seconds => $seconds, nseconds => $nseconds, flags => $flags // 0 }, empty => 1 );
 }
 
 sub set_user_password($self, $user, $password, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_USER_PASSWORD,
-        { dom => $self->{id}, user => $user, password => $password, flags => $flags // 0 } ));
+        { dom => $self->{id}, user => $user, password => $password, flags => $flags // 0 }, empty => 1 );
 }
 
 sub set_vcpu($self, $cpumap, $state, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_VCPU,
-        { dom => $self->{id}, cpumap => $cpumap, state => $state, flags => $flags // 0 } ));
+        { dom => $self->{id}, cpumap => $cpumap, state => $state, flags => $flags // 0 }, empty => 1 );
 }
 
 sub set_vcpus($self, $nvcpus) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_VCPUS,
-        { dom => $self->{id}, nvcpus => $nvcpus } ));
+        { dom => $self->{id}, nvcpus => $nvcpus }, empty => 1 );
 }
 
 sub set_vcpus_flags($self, $nvcpus, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SET_VCPUS_FLAGS,
-        { dom => $self->{id}, nvcpus => $nvcpus, flags => $flags // 0 } ));
+        { dom => $self->{id}, nvcpus => $nvcpus, flags => $flags // 0 }, empty => 1 );
 }
 
 sub shutdown($self) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SHUTDOWN,
-        { dom => $self->{id},  } ));
+        { dom => $self->{id} }, empty => 1 );
 }
 
 sub shutdown_flags($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SHUTDOWN_FLAGS,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 }, empty => 1 );
 }
 
 async sub snapshot_create_xml($self, $xml_desc, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_CREATE_XML,
-        { dom => $self->{id}, xml_desc => $xml_desc, flags => $flags // 0 } ))->{snap};
+        { dom => $self->{id}, xml_desc => $xml_desc, flags => $flags // 0 }, unwrap => 'snap' );
 }
 
 async sub snapshot_current($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_CURRENT,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{snap};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'snap' );
 }
 
 async sub snapshot_list_names($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_LIST_NAMES,
-        { dom => $self->{id}, maxnames => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 } ))->{names};
+        { dom => $self->{id}, maxnames => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'names' );
 }
 
 async sub snapshot_lookup_by_name($self, $name, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_LOOKUP_BY_NAME,
-        { dom => $self->{id}, name => $name, flags => $flags // 0 } ))->{snap};
+        { dom => $self->{id}, name => $name, flags => $flags // 0 }, unwrap => 'snap' );
 }
 
 async sub snapshot_num($self, $flags = 0) {
-    return (await $self->{client}->_call(
+    return await $self->{client}->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_NUM,
-        { dom => $self->{id}, flags => $flags // 0 } ))->{num};
+        { dom => $self->{id}, flags => $flags // 0 }, unwrap => 'num' );
 }
 
 sub start_dirty_rate_calc($self, $seconds, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_START_DIRTY_RATE_CALC,
-        { dom => $self->{id}, seconds => $seconds, flags => $flags // 0 } ));
+        { dom => $self->{id}, seconds => $seconds, flags => $flags // 0 }, empty => 1 );
 }
 
 sub suspend($self) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_SUSPEND,
-        { dom => $self->{id},  } ));
+        { dom => $self->{id} }, empty => 1 );
 }
 
 sub undefine($self) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_UNDEFINE,
-        { dom => $self->{id},  } ));
+        { dom => $self->{id} }, empty => 1 );
 }
 
 sub undefine_flags($self, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_UNDEFINE_FLAGS,
-        { dom => $self->{id}, flags => $flags // 0 } ));
+        { dom => $self->{id}, flags => $flags // 0 }, empty => 1 );
 }
 
 sub update_device_flags($self, $xml, $flags = 0) {
-    return ($self->{client}->_call(
+    return $self->{client}->_call(
         $remote->PROC_DOMAIN_UPDATE_DEVICE_FLAGS,
-        { dom => $self->{id}, xml => $xml, flags => $flags // 0 } ));
+        { dom => $self->{id}, xml => $xml, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -1531,17 +1573,34 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.0.3
+v0.0.5
 
 =head1 SYNOPSIS
 
+  use Future::AsyncAwait;
+
+  my $dom = await $virt->lookup_domain_by_name( 'domain' );
+  await $dom->create;        # -> start domain
+  say await $dom->get_state; # "1" ("running")
+  await $dom->shutdown;      # -> gracefully shut down domain
+  say await $dom->get_state; # "4" ("shutting down")
+
 =head1 DESCRIPTION
 
+Provides access to a domain and its related resources on the server.
+The domain may or may not be running.
+
 =head1 EVENTS
+
+Event callbacks can be acquired through
+L<Sys::Async::Virt/domain_event_register_any>.
 
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Not to be called directly. Instances are returned from calls
+in L<Sys::Async::Virt>.
 
 =head1 METHODS
 
@@ -1852,6 +1911,13 @@ See documentation of L<virDomainGetControlInfo|https://libvirt.org/html/libvirt-
 See documentation of L<virDomainGetCPUStats|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainGetCPUStats>.
 
 
+=head2 get_disk_errors
+
+  $errors = await $dom->get_disk_errors( $flags = 0 );
+
+See documentation of L<virDomainGetDiskErrors|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainGetDiskErrors>.
+
+
 =head2 get_fsinfo
 
   $info = await $dom->get_fsinfo( $flags = 0 );
@@ -1918,6 +1984,14 @@ See documentation of L<virDomainGetInterfaceParameters|https://libvirt.org/html/
 See documentation of L<virDomainGetJobInfo|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainGetJobInfo>.
 
 
+=head2 get_job_stats
+
+  await $dom->get_job_stats( $flags = 0 );
+  # -> { params => $params, type => $type }
+
+See documentation of L<virDomainGetJobStats|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainGetJobStats>.
+
+
 =head2 get_max_memory
 
   $memory = await $dom->get_max_memory;
@@ -1937,6 +2011,13 @@ See documentation of L<virDomainGetMaxVcpus|https://libvirt.org/html/libvirt-lib
   $params = await $dom->get_memory_parameters( $flags = 0 );
 
 See documentation of L<virDomainGetMemoryParameters|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainGetMemoryParameters>.
+
+
+=head2 get_messages
+
+  $msgs = await $dom->get_messages( $flags = 0 );
+
+See documentation of L<virDomainGetMessages|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainGetMessages>.
 
 
 =head2 get_metadata
@@ -2121,6 +2202,13 @@ See documentation of L<virDomainManagedSaveGetXMLDesc|https://libvirt.org/html/l
 See documentation of L<virDomainManagedSaveRemove|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainManagedSaveRemove>.
 
 
+=head2 memory_stats
+
+  $stats = await $dom->memory_stats( $flags = 0 );
+
+See documentation of L<virDomainMemoryStats|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainMemoryStats>.
+
+
 =head2 migrate_get_compression_cache
 
   $cacheSize = await $dom->migrate_get_compression_cache( $flags = 0 );
@@ -2172,6 +2260,20 @@ See documentation of L<virDomainMigrateSetMaxSpeed|https://libvirt.org/html/libv
   # -> (* no data *)
 
 See documentation of L<virDomainMigrateStartPostCopy|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainMigrateStartPostCopy>.
+
+
+=head2 open_channel
+
+  $stream = await $dom->open_channel( $name, $flags = 0 );
+
+See documentation of L<virDomainOpenChannel|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainOpenChannel>.
+
+
+=head2 open_console
+
+  $stream = await $dom->open_console( $dev_name, $flags = 0 );
+
+See documentation of L<virDomainOpenConsole|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainOpenConsole>.
 
 
 =head2 pin_iothread
@@ -2267,6 +2369,13 @@ See documentation of L<virDomainSaveFlags|https://libvirt.org/html/libvirt-libvi
   # -> (* no data *)
 
 See documentation of L<virDomainSaveParams|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainSaveParams>.
+
+
+=head2 screenshot
+
+  ( $mime, $stream ) = await $dom->screenshot( $screen, $flags = 0 );
+
+See documentation of L<virDomainScreenshot|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainScreenshot>.
 
 
 =head2 send_key

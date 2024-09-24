@@ -1,6 +1,7 @@
 .cvsignore$
 .git/
 ^.lwpcookies
+^.github/
 ^.releaserc
 ^.travis.yml
 ^.prove

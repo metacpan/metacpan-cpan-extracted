@@ -4,6 +4,7 @@ use v5.14;
 use warnings;
 
 use Test::More;
+use SQL::Translator 0.11018;
 
 use lib 't/lib';
 use Test::WindowFunctions;

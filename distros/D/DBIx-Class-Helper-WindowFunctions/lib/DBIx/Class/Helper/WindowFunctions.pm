@@ -13,7 +13,7 @@ use Ref::Util qw/ is_plain_arrayref is_plain_hashref /;
 
 use namespace::clean;
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.5.0';
 
 
 sub _resolved_attrs {
@@ -83,7 +83,7 @@ DBIx::Class::Helper::WindowFunctions - Add support for window functions to DBIx:
 
 =head1 VERSION
 
-version v0.4.0
+version v0.5.0
 
 =head1 SYNOPSIS
 
@@ -164,7 +164,7 @@ Peter Rabbitson <ribasushi@leporine.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 
