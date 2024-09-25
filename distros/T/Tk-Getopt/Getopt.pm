@@ -25,7 +25,7 @@ use constant OPTEXTRA => 3;
 
 use Carp qw();
 
-$VERSION = '0.51';
+$VERSION = '0.52';
 $VERSION =~ s{_}{};
 
 $DEBUG = 0;

@@ -30,7 +30,7 @@ sub runtest($$$$$$;@) {
     }
     $first_time = 0;
   }
-  
+
   my $show_output = $debug || ($exp_err eq "" && $exp_out eq "");
 
   unshift @extraargs, "--output-encoding", "UTF-8";
@@ -44,28 +44,42 @@ sub runtest($$$$$$;@) {
   # Translate *nix /path to Windows \path
   $in1 = path($in1)->canonpath;
   $in2 = path($in2)->canonpath;
-  
+
   my ($out, $err, $wstat);
   if ($show_output) {
-    ($out, $err, $wstat) = Capture::Tiny::tee { 
+    ($out, $err, $wstat) = Capture::Tiny::tee {
       run_perlscript $progpath, @extraargs, $in1, $in2;
     };
   } else {
-    ($out, $err, $wstat) = Capture::Tiny::capture { 
+    ($out, $err, $wstat) = Capture::Tiny::capture {
       run_perlscript $progpath, @extraargs, $in1, $in2;
     };
   }
 
   # We can only use the 'goto &somewhere' trick for one check; so other
-  # check(s) must be done here and will unhelpfully report the file/linenum 
+  # check(s) must be done here and will unhelpfully report the file/linenum
   # in here; so include the caller's file/lno in the description.
   my ($file, $lno) = (caller(0))[1,2];
   $file = basename($file);
   my $diag = "COMMAND: ".qshlist($progpath, @extraargs, $in1, $in2)."\n"
              .($show_output ? "" : "OUT:<<$out>>\nERR:<<$err>>\n");
-  is($wstat, 
-     ($exp_exit << 8), 
-     sprintf("(WSTAT=0x%x)",$wstat)." ${file}:$lno $desc", $diag);
+
+  # If $exp_exit > 0xFF then assume an abort from signal is expected
+  # and compare $exp_exit directly with $wstat.
+  #
+  # Otherwise assume a normal exit (not abort) is expected and compare
+  # $exp_exit with the exit value in the upper 8 bits of $wstat; but
+  # if the process aborted, fail with a special message.
+  if ($exp_exit > 0xFF) {
+    is(sprintf("0x%x",$wstat), sprintf("0x%x",$exp_exit),
+       "[wait status, abort expected] $desc", $diag);
+  } {
+    if (($wstat & 0xFF) == 0) {
+      is($wstat>>8, $exp_exit, "[exit status] $desc", $diag);
+    } else {
+      fail(sprintf("[**unexpected abort: WSTAT=0x%x] %s:%s %s",$wstat,$file,$lno,$desc), $diag);
+    }
+  }
 
   # Don't check STDERR if 'debug' is enabled, as it may be full of tracing
   if (!$debug) {
@@ -76,7 +90,7 @@ sub runtest($$$$$$;@) {
   }
 
   @_ = ($out, $exp_out, "(STDOUT) $desc", $diag);
-  goto &Test2::V0::like; 
+  goto &Test2::V0::like;
 }
 
 1;

@@ -1,5 +1,5 @@
 package Sys::Sendfile;
-$Sys::Sendfile::VERSION = '0.18';
+$Sys::Sendfile::VERSION = '0.19';
 # This software is copyright (c) 2008, 2009 by Leon Timmermans <leont@cpan.org>.
 #
 # This is free software; you can redistribute it and/or modify it under
@@ -30,7 +30,7 @@ Sys::Sendfile - Zero-copy data transfer
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -63,7 +63,7 @@ L<Sys::Sendfile::FreeBSD> - A module implementing the FreeBSD variant of sendfil
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 CONTRIBUTORS
 

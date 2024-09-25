@@ -25,10 +25,10 @@
 #include <sys/socket.h>
 #include <sys/uio.h>
 #elif defined OS_WIN32
-#include <windows.h>
 #ifndef _MSC_VER
 #include <mswsock.h>
 #endif
+#include <windows.h>
 #else
 #include <sys/mman.h>
 #endif
@@ -75,7 +75,11 @@ sendfile(out, in, count = undef, offset = undef)
 		XSRETURN_IV(0);
 #else
 	if (!SvOK(count)) {
+#if defined OS_WIN32
+		struct w32_stat info;
+#else
 		struct stat info;
+#endif
 		if (fstat(in, &info) == -1)
 			XSRETURN_EMPTY;
 		real_count = info.st_size - real_offset;
@@ -104,7 +108,7 @@ sendfile(out, in, count = undef, offset = undef)
 	else
 		XSRETURN_IV(bytes);
 #elif defined OS_WIN32
-	HANDLE hFile = TO_SOCKET(in);
+	HANDLE hFile = (HANDLE)TO_SOCKET(in);
 	int ret;
 	if (SvOK(offset))
 		SetFilePointer(hFile, real_offset, NULL, FILE_BEGIN);

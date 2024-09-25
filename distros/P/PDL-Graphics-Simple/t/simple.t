@@ -19,16 +19,6 @@ sub ask_yn {
     unlike($a, qr/n/i, $label);
 }
 
-# first so no "bad plan" if skip_all
-{
-my @new = eval {PDL::Graphics::Simple::_translate_new()};
-diag(join '',explain $PDL::Graphics::Simple::mods), plan skip_all => 'No plotting engines installed' if $@ =~ /Sorry, all known/;
-# ignore $engine
-is_deeply $new[1], {
-  'multi' => undef, 'output' => '', 'size' => [ 8, 6, 'in' ], 'type' => 'i'
-} or diag explain \@new;
-}
-
 # error handling
 eval {
   PDL::Graphics::Simple::_translate_plot(undef, undef, with=>'line', undef);
@@ -64,6 +54,20 @@ like $@, qr/requires 1 columns/;
 eval { PDL::Graphics::Simple::_translate_plot(undef, undef, with=>'polylines', pdl(1)) };
 like $@, qr/Single-arg/;
 is "@w", "", "no warnings";
+}
+
+{
+my @new = eval {PDL::Graphics::Simple::_translate_new()};
+if ($@ =~ /Sorry, all known/) {
+  diag(join '',explain $PDL::Graphics::Simple::mods);
+  ok 1, 'No plotting engines installed, stopping';
+  done_testing;
+  exit 0;
+}
+# ignore $engine
+is_deeply $new[1], {
+  'multi' => undef, 'output' => '', 'size' => [ 8, 6, 'in' ], 'type' => 'i'
+} or diag explain \@new;
 }
 
 ##############################

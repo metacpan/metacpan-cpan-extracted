@@ -1,5 +1,8 @@
 Revision history for Synth-Config
 
+0.0063 2024-09-24 12:50:51
+    - Fix syntax error in the visualizer script.
+
 0.0062 2024-06-13 21:36:53
     - Fix synopsis.
 

@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "JSON::XS" => 0,
+    "MIME::Base64" => 0,
     "Mojo::Asset::Memory" => 0,
     "Mojo::Content::Single" => 0,
     "Object::Pad" => 0,
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Most" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +54,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Import::Into" => "1.002003",
   "JSON::XS" => 0,
+  "MIME::Base64" => 0,
   "Mojo::Asset::Memory" => 0,
   "Mojo::Content::Single" => 0,
   "Mojo::Transaction::HTTP" => 0,

@@ -70,10 +70,28 @@ runtest("$tlib/Addrlist.xlsx",
         "-m", "native"
        );
 
+runtest("$tlib/Multisheet.xlsx[EmptySheet]",
+        "$tlib/Multisheet.xlsx[EmptySheet]",
+        "", "", 0,
+        "Identical empty sheets (not even titles)",
+        "-m", "native"  # explictly specify method
+       );
+
+runtest("$tlib/Multisheet.xlsx[EmptySheet]",
+        "$tlib/Multisheet2.xlsx[OneCellOnly]",
+        qr{^[\s\n]*\
+---+ Changed row 1 ---+
+ +\(col A\): '' →  'xyzzx'
+[\s\n]*$},
+        "", 1,
+        "Completely empty sheet vs. Title-only",
+        "-m", "native"  # explictly specify method
+       );
+
 runtest("$tlib/Multisheet.xlsx",
         "$tlib/Multisheet2.xlsx",
-        qr/.* \*\*\*\ *Sheet.*OtherSheetA.*exists\ ONLY\ in.*Multisheet.xlsx
-           .* \*\*\*\ *Sheet.*OtherSheetB.*exists\ ONLY\ in.*Multisheet2.xlsx
+        qr/.* \*\*\*\ *Sheet.*EmptySheet.*exists\ ONLY\ in.*Multisheet.xlsx
+           .* \*\*\*\ *Sheet.*OneCellOnly.*exists\ ONLY\ in.*Multisheet2.xlsx
            .* \*\*\*\ *SHEET\ "?AddrListSheet"?\ *\*\*\*
            .* ----*\ Changed\ +row\ +3\ .*
            .* CITY.*:.*'bogon'

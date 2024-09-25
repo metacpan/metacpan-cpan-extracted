@@ -2061,7 +2061,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.028';
+our $VERSION = '2.029';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -7470,7 +7470,7 @@ sub _printGnuplotPipe
 # are explicitly stripped out
 our $cp_serial = 0;
 
-my $qt_re = qr/^qt.qpa.plugin: Could not find the Qt platform plugin.*/m;
+my $qt_re = qr/^qt\..*/m;
 sub _checkpoint {
     my $this   = shift;
     my $suffix = shift || "main";

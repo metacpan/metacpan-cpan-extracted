@@ -79,9 +79,9 @@ runtest("$tlib/Addrlist.xlsx",
 
 runtest("$tlib/Multisheet.xlsx",
         "$tlib/Multisheet2.xlsx",
-        qr/\A\*\*\*\ sheet\ 'OtherSheetA'\ exists\ ONLY.*Multisheet.xlsx\n
+        qr/\A\*\*\*\ sheet\ 'EmptySheet'\ exists\ ONLY.*Multisheet.xlsx\n
            .*
-           \*\*\*\ sheet\ 'OtherSheetB'\ exists\ ONLY.*Multisheet2.xlsx\n
+           \*\*\*\ sheet\ 'OneCellOnly'\ exists\ ONLY.*Multisheet2.xlsx\n
            .*
            ---\ Multisheet.xlsx\[AddrListSheet\].*\n
            \+\+\+\ Multisheet2.xlsx\[AddrListSheet\].*\n

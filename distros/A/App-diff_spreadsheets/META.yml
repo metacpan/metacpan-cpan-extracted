@@ -52,7 +52,7 @@ requires:
   PerlIO: '0'
   Pod::Usage: '0'
   Scalar::Util: '0'
-  Spreadsheet::Edit: '1000.006'
+  Spreadsheet::Edit: '1000.016'
   Spreadsheet::Edit::IO: '1000.001'
   Spreadsheet::Edit::Log: '0'
   Term::ReadKey: '0'
@@ -66,7 +66,7 @@ resources:
   bugtracker: https://github.com/jimav/App-diff_spreadsheets/issues
   homepage: https://github.com/jimav/App-diff_spreadsheets
   repository: https://github.com/jimav/App-diff_spreadsheets.git
-version: '1.025'
+version: '1.026'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: CC0-1.0

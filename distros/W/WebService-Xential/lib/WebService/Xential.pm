@@ -1,5 +1,5 @@
 package WebService::Xential;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use v5.26;
 use Object::Pad;
 
@@ -13,6 +13,7 @@ use Mojo::Content::Single;
 use Mojo::Asset::Memory;
 use JSON::XS qw(encode_json);
 use Types::Serialiser qw();
+use MIME::Base64 qw(encode_base64url);
 
 field $api_key :param;
 field $api_user :param;
@@ -42,7 +43,9 @@ ADJUST {
 
         unless ($tx->req->headers->header('XSessionID')) {
           $tx->req->headers->header(
-            "Authorization" => "Basic $api_user:$api_key");
+            "Authorization" =>
+              join(" ", "Basic", encode_base64url("$api_user:$api_key")),
+          );
         }
       }
     );
@@ -109,7 +112,7 @@ method impersonate($username = undef, $uuid = undef, $session_id = undef) {
   return $self->api_call(
     'op_auth_impersonate',
     {
-      $username   ? (username   => $username)   : (),
+      $username   ? (userName   => $username)   : (),
       $uuid       ? (userUuid   => $uuid)       : (),
       $session_id ? (XSessionID => $session_id) : (),
     }
@@ -198,7 +201,7 @@ WebService::Xential - A Xential REST API module
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

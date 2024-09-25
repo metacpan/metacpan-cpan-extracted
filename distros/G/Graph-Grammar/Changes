@@ -1,3 +1,7 @@
+0.2.0 2024-09-25
+
+    - Implement support for edge conditions.
+
 0.1.1 2024-04-02
 
     - Add NAME section so MetaCPAN recognises module (GH#1).

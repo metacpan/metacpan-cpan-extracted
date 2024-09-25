@@ -1,4 +1,39 @@
 -*-text-*-
+1.4.1:
+Fixed https://rt.cpan.org/Ticket/Display.html?id=155578:
+
+Feeding  a  new entry  into  note  from  STDIN didn't  work  correctly
+anymore. Using the default builtin config and no config file it didn't
+work at all.  Now it works as  one would expect. A bare  - as argument
+ALWAYS reads a new  entry from STDIN. The same happens  if one uses -n
+-.  In addition note now prints a  message if it attempts to read from
+STDIN to avoid confusion.
+
+The parameter -n has been added to be able to force note to create a
+new entry directly from commandline, regardless of any configuration.
+
+Fixed regex to check if a note has been specified as argument. Now it
+does not match a bare - anymore.
+
+Reorganized a little code.
+
+
+1.4.1:
+Fixed https://github.com/TLINDEN/note/issues/11:
+
+Every  backend now  uses a  different default  file extension  and the
+default config file has it configured the same way.
+
+The  error  message   about  an  encrypted  file   when  expecting  an
+unencrypted one  has been  adjusted to be  more understandable  by new
+users.
+
+Documentation updates.
+
+Deprecation Warning: binary  and text backend support  will be removed
+in the upcoming version 1.5.0.
+
+
 
 1.4.0:
 Added support for JSON encoded export files instead of YAML.

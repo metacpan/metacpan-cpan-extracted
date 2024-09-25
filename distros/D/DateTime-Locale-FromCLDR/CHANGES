@@ -1,5 +1,8 @@
 Revision history for Perl module DateTime::Locale::FromCLDR
 
+v0.4.2 2024-09-24T18:57:03+0900
+    - Added method split_interval()
+
 v0.4.1 2024-09-22T08:32:25+0900
     - Corrected method _time_formats
     - Improved method territory_info

@@ -1,7 +1,7 @@
 package Graph::Grammar;
 
 # ABSTRACT: Grammar for graphs
-our $VERSION = '0.1.1'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
 
 =head1 NAME
 
@@ -34,11 +34,11 @@ A rule generally looks like this:
 
 Where:
 
-C<$vertex_condition> is a subroutine reference evaluating the center node.
+C<$vertex_condition> is a subroutine reference evaluating the center vertex.
 The subroutine is called with the graph in C<$_[0]> and the vertex in <$_[1]>.
 Subroutine should evaluate to true if condition is fulfilled.
 
-C<@neighbour_conditions> is an array of subroutine references for the neighbours of the center node.
+C<@neighbour_conditions> is an array of subroutine references for the neighbours of the center vertex.
 Inputs and outputs of each subroutine reference are the same as defined for C<$vertex_condition>.
 Every condition has to match at least one of the neighbours (without overlaps).
 Thus the rule will automatically fail if the number of neighbours is less than C<@neighbour_conditions>.
@@ -47,7 +47,7 @@ C<@neighbour_conditions> can be empty.
 
 C<$action> can be either a subroutine reference, or anything else.
 If C<$action> is a subroutine reference, then in the case of a match it is called with the graph in C<$_[0]> and remaining C<@_> members being graph vertices corresponding to rule conditions.
-That is, C<$_[1]> is the center node, C<$_[2]> is a vertice matching the first neighbour condition and so on.
+That is, C<$_[1]> is the center vertex, C<$_[2]> is a vertex matching the first neighbour condition and so on.
 If C<$action> is not a subroutine reference, then it is cloned by L<Clone> and inserted instead of the center vertex.
 
 There are two ways to request a particular number of neighbours for the central vertex.
@@ -56,18 +56,28 @@ Second is to put C<NO_MORE_VERTICES> as the last element of C<@neighbour_conditi
 
     [ sub { 1 }, ( sub { 1 } ) x 2, NO_MORE_VERTICES, sub { [ @_[1..3] ] } ]
 
+Edge conditions are also supported and they always act on the center vertex and its neighbours matching their individual conditions, i.e.:
+
+    [ $vertex_condition,
+        EDGE { $edge_condition1->( @_ ) }, $vertex_condition1,
+        EDGE { $edge_condition2->( @_ ) }, $vertex_condition2,
+        # ...
+        $action ]
+
 =cut
 
 use strict;
 use warnings;
 
 use parent Exporter::;
-our @EXPORT = qw( NO_MORE_VERTICES parse_graph );
+our @EXPORT = qw( EDGE NO_MORE_VERTICES parse_graph );
 
 use Clone qw( clone );
+use Graph::Grammar::Rule::Edge;
 use Graph::Grammar::Rule::NoMoreVertices;
 use Graph::MoreUtils qw( graph_replace );
 use List::Util qw( first );
+use Scalar::Util qw( blessed );
 use Set::Object qw( set );
 
 our $DEBUG = 0;
@@ -94,31 +104,68 @@ sub parse_graph
         for my $i (0..$#rules) {
             my $rule = $rules[$i];
             my @rule = @$rule;
+            my $rule_name;
             my $self_rule = shift @rule;
+
+            # First element in the rule could be a rule name
+            if( !ref $self_rule ) {
+                $rule_name = $self_rule;
+                $self_rule = shift @rule;
+            }
+
             my $action = pop @rule;
+            my $no_more_vertices;
+            if( @rule && blessed $rule[-1] && $rule[-1]->isa( Graph::Grammar::Rule::NoMoreVertices:: ) ) {
+                $no_more_vertices = 1;
+                pop @rule;
+            }
+
+            my $neighbours = grep { ref $_ eq 'CODE' } @rule;
+
+            my $affected_vertices = set();
 
             VERTEX:
             for my $vertex ($graph->vertices) {
                 next unless $self_rule->( $graph, $vertex );
+                next unless defined $graph->degree( $vertex );
+                next if $graph->degree( $vertex ) < $neighbours;
+                next if $no_more_vertices && $graph->degree( $vertex ) > $neighbours;
 
                 my @matching_neighbours;
                 my $matching_neighbours = set();
                 for my $i (0..$#rule) {
                     my $neighbour_rule = $rule[$i];
-                    
-                    if( ref $neighbour_rule eq 'CODE' ) {
-                        my $match = first { !$matching_neighbours->has( $_ ) &&
-                                            $neighbour_rule->( $graph, $_ ) }
-                                          $graph->neighbours( $vertex );
-                        next VERTEX unless $match;
-                        push @matching_neighbours, $match;
-                        $matching_neighbours->insert( $match );
-                    } else { # FIXME: Check for Graph::Grammar::NoMoreVertices
-                        next VERTEX unless $graph->degree( $vertex ) == @matching_neighbours;
+                    next if blessed $neighbour_rule && $neighbour_rule->isa( Graph::Grammar::Rule::Edge:: ); # Edge rules are evaluated separately
+
+                    my $match;
+                    if( $i && blessed $rule[$i-1] && $rule[$i-1]->isa( Graph::Grammar::Rule::Edge:: ) ) {
+                        # With edge condition
+                        $match = first { !$matching_neighbours->has( $_ ) &&
+                                         $neighbour_rule->( $graph, $_ ) &&
+                                         $rule[$i-1]->matches( $graph, $vertex, $_ ) }
+                                       $graph->neighbours( $vertex );
+                    } else {
+                        # Without edge condition
+                        $match = first { !$matching_neighbours->has( $_ ) &&
+                                         $neighbour_rule->( $graph, $_ ) }
+                                       $graph->neighbours( $vertex );
                     }
+                    next VERTEX unless $match;
+
+                    push @matching_neighbours, $match;
+                    $matching_neighbours->insert( $match );
                 }
 
-                print STDERR "apply rule $i\n" if $DEBUG;
+                if( $DEBUG ) {
+                    print STDERR defined $rule_name ? "apply rule $i: $rule_name\n" : "apply rule $i\n";
+                }
+
+                my $overlaps = ($affected_vertices * $matching_neighbours)->size +
+                                $affected_vertices->has( $vertex );
+                if( $DEBUG && $overlaps ) {
+                    print STDERR "$overlaps overlapping vertices\n";
+                }
+                $affected_vertices->insert( $vertex, @matching_neighbours );
 
                 if( ref $action eq 'CODE' ) {
                     $action->( $graph, $vertex, @matching_neighbours );
@@ -133,13 +180,27 @@ sub parse_graph
     return $graph;
 }
 
+=head2 C<EDGE>
+
+When used before a neighbour condition, places a condition on edge connecting the center vertex with a neighbour matched by the following rule.
+Accepts a block or sub {}, i.e.:
+
+    EDGE { $_[0]->get_edge_attribute( $_[1], $_[2], 'color' ) eq 'red' }
+
+Subroutine is evaluated with three parameters: graph, center vertex and its neighbour matching the following neighbour condition.
+Subroutine should evaluate to true if condition is fulfilled.
+
+=cut
+
+sub EDGE(&) { Graph::Grammar::Rule::Edge->new( $_[0] ) }
+
 =head2 C<NO_MORE_VERTICES>
 
 When used before the rule action in a rule, restricts the number of center vertex neighbours to vertex conditions.
 
 =cut
 
-sub NO_MORE_VERTICES { return Graph::Grammar::Rule::NoMoreVertices->new }
+sub NO_MORE_VERTICES { Graph::Grammar::Rule::NoMoreVertices->new }
 
 =head1 AUTHORS
 

@@ -124,7 +124,7 @@ Executing this symbolic link, optex will call system installed
 call [ping(1)](http://man.he.net/man1/ping) command instead:
 
     [alias]
-        pingu = "ping -Mpingu --pingu"
+        pingu = "ping -Mpingu"
 
 # MAKING NEW PING OPTION
 
@@ -136,17 +136,17 @@ directory:
 
 And create an rc file `~/.optex.d/ping.rc` for **ping**:
 
-    option --with-pingu -Mpingu --pingu
+    option --pingu -Mpingu
 
 Then pingu will show up when you use **--with-pingu** option to execute
 [ping(1)](http://man.he.net/man1/ping) command:
 
-    $ ping --with-pingu localhost -c15
+    $ ping --pingu localhost -c15
 
 If you want to enable this option always (really?), put next line in
 your `~/.optex.d/ping.rc`:
 
-    option default --with-pingu
+    option default --pingu
 
 # SEE ALSO
 

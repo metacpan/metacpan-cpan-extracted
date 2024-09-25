@@ -27,12 +27,12 @@ suricata_extract_submit - Submits files extracted by Suricata to mojo_cape_submi
 
 =head1 VERSION
 
-0.2.0
+1.0.0
 
 =cut
 
 sub version {
-	print "suricata_extract_submit v. 0.2.0\n";
+	print "suricata_extract_submit v. 1.0.0\n";
 }
 
 =head1 SYNOPSIS
@@ -104,6 +104,9 @@ The config file used is '/usr/local/etc/suricata_extract_submit.ini'.
 
     # a file of regex to use for checking path chunks of the URL to ignore
     #ignorePaths=
+
+    # a file of regex to use for checking path chunks of the URL to ignore
+    ignoreMaxSize=52428800
 
     # a JSON file to use for using with Web::ACL for checking for ignores
     #ignoreWebACL=/usr/local/etc/suricata_extract_submit_webacl.json
@@ -236,6 +239,12 @@ if ( !defined($stats_file) ) {
 	$stats_file = '/var/cache/suricata_extract_submit_stats.json';
 }
 
+# get the ignoreMaxSize
+my $max_size = $config->{_}->{ignoreMaxSize};
+if ( !defined($max_size) ) {
+	$max_size = '52428800';
+}
+
 # get the stats dir
 my $stats_dir = $config->{_}->{stats_dir};
 if ( !defined($stats_dir) ) {
@@ -271,6 +280,7 @@ my $stats_default = {
 	ignored_ua            => 0,
 	ignored_webacl        => 0,
 	ignored_path          => 0,
+	ignored_size_max      => 0,
 	truncated             => 0,
 	truncated_delta       => 0,
 	sub_size              => 0,
@@ -282,7 +292,7 @@ my $stats;
 my @to_delta = (
 	'sub',       'sub_fail', 'zero_sized',   'sub_2xx',      'sub_3xx',        'sub_4xx',
 	'sub_5xx',   'errors',   'ignored_host', 'ignored_ip',   'ignored_ip_src', 'ignored_ip_dest',
-	'truncated', 'sub_size', 'ignored_ua',   'ignored_path', 'ignored_webacl',
+	'truncated', 'sub_size', 'ignored_ua',   'ignored_path', 'ignored_webacl', 'ignored_size_max',
 );
 
 # handle the stats file if it exists and is readable
@@ -537,7 +547,13 @@ foreach my $file (@files) {
 		}
 
 		my $add_it = 1;
-		if ( $ip_ignore->( $file_json->{src_ip} ) ) {
+		if ($data_size > $max_size) {
+			log_something( 'info',
+						   'Ignored Max Size: '.$data_size. ' > '.$max_size);
+			$new_stats->{ignored_size_max}++;
+			$add_it=0;
+		}
+		if ( $add_it && $ip_ignore->( $file_json->{src_ip} ) ) {
 			my $file_hostname = '';
 			if ( defined( $file_json->{http} ) && defined( $file_json->{http}{hostname} ) ) {
 				$file_hostname = $file_json->{http}{hostname};

@@ -1,7 +1,7 @@
 package Graph::Grammar::Rule::NoMoreVertices;
 
 # ABSTRACT: Marker for rules where no more vertices are allowed
-our $VERSION = '0.1.1'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
 
 use strict;
 use warnings;

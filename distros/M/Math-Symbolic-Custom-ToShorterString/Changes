@@ -1,5 +1,8 @@
 Revision history for Math-Symbolic-Custom-ToShorterString
 
+0.02    Tue Sep 24 15:00 2024
+        Fixed bug in is_expanded()
+
 0.01    Mon Sep 16 09:30 2024
         First version
 

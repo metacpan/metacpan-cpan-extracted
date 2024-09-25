@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::ExtPrivate;
-$Bitcoin::Crypto::Key::ExtPrivate::VERSION = '3.000';
+$Bitcoin::Crypto::Key::ExtPrivate::VERSION = '3.001';
 use v5.10;
 use strict;
 use warnings;

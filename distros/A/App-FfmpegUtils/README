@@ -2,10 +2,99 @@ NAME
     App::FfmpegUtils - Utilities related to ffmpeg
 
 VERSION
-    This document describes version 0.013 of App::FfmpegUtils (from Perl
-    distribution App-FfmpegUtils), released on 2023-12-13.
+    This document describes version 0.014 of App::FfmpegUtils (from Perl
+    distribution App-FfmpegUtils), released on 2024-09-22.
 
 FUNCTIONS
+  cut_duration_from_video
+    Usage:
+
+     cut_duration_from_video(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Cut (censor out) a duration out of a video.
+
+    Examples:
+
+    *   Specify start & end only (using h:m:s notation), the result is
+        100s.cut_50_to_63.mp4:
+
+         cut_duration_from_video(files => ["100s.mp4"], end => "00:01:03", start => "00:00:50");
+
+    *   Specify start & duration only (using seconds), the result is
+        100s.cut_50_to_63.mp4:
+
+         cut_duration_from_video(files => ["100s.mp4"], duration => 13, start => 50);
+
+    *   Specify end & duration only (using human & ISO 8601 notation), the
+        result is 100s.cut_50_to_63.mp4:
+
+         cut_duration_from_video(files => ["100s.mp4"], duration => "13s", end => "PT63S");
+
+    This utility uses *ffmpeg* (particularly the "-t" and "-ss") option to
+    cut a portion (time range) out of a video. It can be used to remove an
+    unwanted scene from a video.
+
+    Compared to using "ffmpeg" directly, this wrapper offers convenience of
+    more flexibility in specifying times and duration (e.g. '15s' as well as
+    '00:10' as well as 'PT1M30S'), specifying only 'end' and 'duration',
+    handling multiple files, automatically choosing output filename, and tab
+    completion.
+
+    Alternatives:
+
+    1. If you just want to play a video and censor out certain parts, you
+    can use create a playlist of segments called an EDL file. See for
+    example:
+
+    <https://github.com/mpv-player/mpv/blob/master/DOCS/edl-mpv.rst>
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   copy => *bool*
+
+        Whether to use the "copy" codec (fast but produces inaccurate
+        timings).
+
+    *   duration => *duration|percent_str*
+
+        (No description)
+
+    *   end => *duration|percent_str*
+
+        (No description)
+
+    *   files* => *array[filename]*
+
+        (No description)
+
+    *   start => *duration|percent_str*
+
+        (No description)
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   cut_video_by_duration
     Usage:
 
@@ -73,6 +162,10 @@ FUNCTIONS
         (No description)
 
     *   files* => *array[filename]*
+
+        (No description)
+
+    *   overwrite => *bool*
 
         (No description)
 
@@ -169,6 +262,10 @@ FUNCTIONS
 
         Set frame rate, in fps.
 
+    *   overwrite => *bool*
+
+        (No description)
+
     *   preset => *str* (default: "veryslow")
 
         (No description)
@@ -242,6 +339,10 @@ FUNCTIONS
 
         (No description)
 
+    *   overwrite => *bool*
+
+        (No description)
+
     *   parts => *posint*
 
         (No description)
@@ -277,6 +378,9 @@ SOURCE
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
     requests on GitHub.
@@ -294,7 +398,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2020 by perlancar
+    This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

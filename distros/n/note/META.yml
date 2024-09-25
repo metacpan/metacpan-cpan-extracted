@@ -26,5 +26,5 @@ requires:
   IO::File: '0'
   IO::Seekable: '0'
   YAML: '0'
-version: v1.4.1
+version: v1.4.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

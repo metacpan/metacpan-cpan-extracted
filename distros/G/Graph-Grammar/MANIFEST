@@ -8,4 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/Graph/Grammar.pm
+lib/Graph/Grammar/Rule/Edge.pm
 lib/Graph/Grammar/Rule/NoMoreVertices.pm
+t/01_delete_pendants.t
+t/02_delete_red_edges.t

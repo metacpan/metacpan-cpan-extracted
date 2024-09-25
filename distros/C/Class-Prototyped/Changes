@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::Prototyped
 
+1.16  Tue Sep 24 2024
+ - Fixed t/include.t test failure when PERL_USE_UNSAFE_INC=0
+
 1.15  Fri Sep 20 2024
  - ARGH!  Missed updating version numbers on sub-packages
 

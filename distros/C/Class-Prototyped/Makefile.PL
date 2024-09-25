@@ -2,11 +2,11 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'INSTALLDIRS' => 'site',
   'PL_FILES' => {},
   'EXE_FILES' => [],
+  'INSTALLDIRS' => 'site',
   'NAME' => 'Class::Prototyped',
-  'PREREQ_PM' => {},
-  'VERSION_FROM' => 'lib/Class/Prototyped.pm'
+  'VERSION_FROM' => 'lib/Class/Prototyped.pm',
+  'PREREQ_PM' => {}
 )
 ;

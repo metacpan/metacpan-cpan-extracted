@@ -3,7 +3,7 @@ use warnings;
 use File::Temp qw(tempdir);
 use Config qw(%Config);
 
-my $version = '0.04';
+my $version = '0.06';
 
 my $target = $ARGV[0] or die "Usage: $0 OUTFILE\n";
 
@@ -31,16 +31,20 @@ unshift @INC, $phdir;
         # Hack. Shouldn't be necessary, but apparently _h2ph_pre.ph is missing
         # some important bits on FreeBSD.
         require '_h2ph_pre.ph';
-        unless (defined &__SIZEOF_LONG__) {
-            my $sizeof_long = $::Config{longsize};
-            *__SIZEOF_LONG__ = sub () { $sizeof_long };
-        }
-        *__ORDER_BIG_ENDIAN__ = sub () { 4321 } unless defined &__ORDER_BIG_ENDIAN__;
-        *__ORDER_LITTLE_ENDIAN__ = sub () { 1234 } unless defined &__ORDER_LITTLE_ENDIAN__;
-        unless (defined &__BYTE_ORDER__) {
-            my $byte_order = $::Config{byteorder} =~ /^1/ ? __ORDER_LITTLE_ENDIAN__() : __ORDER_BIG_ENDIAN__();
-            *__BYTE_ORDER__ = sub () { $byte_order };
-        }
+        my $default_to = sub {
+            my ($symref, $value) = @_;
+            unless (defined *$symref{CODE}) {
+                *$symref = sub () { $value };
+            }
+        };
+        $default_to->(\*__SIZEOF_LONG__, $::Config{longsize});
+        $default_to->(\*__ORDER_BIG_ENDIAN__, 4321);
+        $default_to->(\*__ORDER_LITTLE_ENDIAN__, 1234);
+        $default_to->(\*__BYTE_ORDER__, $::Config{byteorder} =~ /^1/ ? __ORDER_LITTLE_ENDIAN__() : __ORDER_BIG_ENDIAN__());
+        $default_to->(\*__SIZEOF_POINTER__, $::Config{ptrsize});
+        # These two are technically wrong, but I don't know how to get the correct sizes from Perl.
+        $default_to->(\*__SIZEOF_SIZE_T__, $::Config{ptrsize});
+        $default_to->(\*__SIZEOF_PTRDIFF_T__, $::Config{ptrsize});
     }
     require 'sys/syscall.ph';
     require 'sys/random.ph';
@@ -79,7 +83,7 @@ package Sys::GetRandom::PP::_Bits;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use constant {
     GRND_RANDOM    => %[[GRND_RANDOM]],

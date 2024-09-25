@@ -1,10 +1,10 @@
 # NAME
 
-DBIx::Class::Helper::WindowFunctions - Add support for window functions to DBIx::Class
+DBIx::Class::Helper::WindowFunctions - Add support for window functions and aggregate filters to DBIx::Class
 
 # VERSION
 
-version v0.5.0
+version v0.6.0
 
 # SYNOPSIS
 
@@ -27,8 +27,9 @@ my $rs = $schema->resultset('Wobbles')->search_rs(
   undef,
   {
     '+select' => {
-        avg   => 'fingers',
-        -over => {
+        avg     => 'fingers',
+        -filter => { hats => { '>', 1 } },
+        -over   => {
             partition_by => 'hats',
             order_by     => 'age',
         },
@@ -40,8 +41,70 @@ my $rs = $schema->resultset('Wobbles')->search_rs(
 
 # DESCRIPTION
 
-This helper adds rudimentary support for window functions to
+This helper adds rudimentary support for window functions and aggregate filters to
 [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) resultsets.
+
+It adds the following keys to the resultset attributes:
+
+## -over
+
+This is used for window functions, e.g. the following adds a row number columns
+
+```perl
+'+select' => {
+    row_number => [],
+    -over => {
+       partition_by => 'class',
+       order_by     => 'score',
+    },
+},
+```
+
+which is equivalent to the SQL
+
+```
+ROW_NUMBER() OVER ( PARTITION BY class ORDER BY score )
+```
+
+You can omit either the `partition_by` or `order_by` clauses.
+
+## -filter
+
+This is used for filtering aggregate functions or window functions, e.g. the following clause
+
+```perl
+'+select' => {
+    count     => \ 1,
+    -filter => { kittens => { '<', 10 } },
+},
+```
+
+is equivalent to the SQL
+
+```
+COUNT(1) FILTER ( WHERE kittens < 10 )
+```
+
+You can apply filters to window functions, e.g.
+
+```perl
+'+select' => {
+    row_number => [],
+    -filter => { class => { -like => 'A%' } },
+    -over => {
+       partition_by => 'class',
+       order_by     => 'score',
+    },
+},
+```
+
+which is equivalent to the SQL
+
+```
+ROW_NUMBER() FILTER ( WHERE class like 'A%' ) OVER ( PARTITION BY class ORDER BY score )
+```
+
+The `-filter` feature was added v0.6.0.
 
 # CAVEATS
 

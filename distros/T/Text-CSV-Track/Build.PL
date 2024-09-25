@@ -18,6 +18,7 @@ my $builder = Module::Build->new(
     },
     build_requires => {
         'File::Temp'       => 0,
+        'Test::Most'       => 0,
     },
     add_to_cleanup => ['Text-CSV-Track-*'],
     create_readme  => 1,

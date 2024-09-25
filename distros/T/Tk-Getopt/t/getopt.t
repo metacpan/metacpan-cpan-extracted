@@ -2,6 +2,8 @@
 print "1..14\n";
 
 use Tk::Getopt;
+use File::Temp qw(tempdir);
+use File::Spec ();
 
 $bla  = 1;
 $bla2 = 1;
@@ -57,8 +59,8 @@ print "ok 4\n";
 print "not " unless "@ARGV" eq "file";
 print "ok 5\n";
 
-my $tstfile = "getopt.tst";
-unlink $tstfile;
+my $tstdir = tempdir(CLEANUP => 1);
+my $tstfile = File::Spec->catfile($tstdir, "getopt.tst");
 $opt->save_options($tstfile);
 print "not " if !-f $tstfile;
 print "ok 6\n";
@@ -93,5 +95,3 @@ print "ok 13\n";
 
 print "not " unless ($bla4 == 0);
 print "ok 14\n";
-
-unlink $tstfile;

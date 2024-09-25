@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Validation Library and more",
+  "ABSTRACT" => "Embedded Perl Template Engine",
   "AUTHOR" => "John Napiorkowski <jjnapiork\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -16,20 +16,19 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Template::EmbeddedPerl",
   "PREREQ_PM" => {
-    "Carp" => 0,
-    "Digest::MD5" => 0,
-    "Exporter" => 0,
-    "HTML::Escape" => 0,
-    "PPI" => 0,
-    "PathTools" => 0,
-    "Scalar::Util" => 0,
-    "URI::Escape" => 0
+    "Carp" => "1.54",
+    "Digest::MD5" => "2.58_01",
+    "Exporter" => "5.78",
+    "File::Spec" => "3.90",
+    "HTML::Escape" => "1.11",
+    "PPI" => "1.279",
+    "Scalar::Util" => "1.63",
+    "URI::Escape" => "5.28"
   },
   "TEST_REQUIRES" => {
-    "PathTools" => 0,
     "Test::Most" => "0.34"
   },
-  "VERSION" => "0.001001",
+  "VERSION" => "0.001004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,15 +36,15 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
-  "Digest::MD5" => 0,
-  "Exporter" => 0,
-  "HTML::Escape" => 0,
-  "PPI" => 0,
-  "PathTools" => 0,
-  "Scalar::Util" => 0,
+  "Carp" => "1.54",
+  "Digest::MD5" => "2.58_01",
+  "Exporter" => "5.78",
+  "File::Spec" => "3.90",
+  "HTML::Escape" => "1.11",
+  "PPI" => "1.279",
+  "Scalar::Util" => "1.63",
   "Test::Most" => "0.34",
-  "URI::Escape" => 0
+  "URI::Escape" => "5.28"
 );
 
 

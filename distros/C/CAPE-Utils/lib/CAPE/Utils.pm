@@ -23,11 +23,11 @@ CAPE::Utils - A helpful library for with CAPE.
 
 =head1 VERSION
 
-Version 2.9.0
+Version 3.0.0
 
 =cut
 
-our $VERSION = '2.9.0';
+our $VERSION = '3.0.0';
 
 =head1 SYNOPSIS
 

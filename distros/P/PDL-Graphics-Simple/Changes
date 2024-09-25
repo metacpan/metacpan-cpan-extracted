@@ -1,3 +1,6 @@
+1.013 2024-09-24
+- adjust tests to avoid spurious "UNKNOWN" results
+
 1.012 2024-09-21
 - add "contours", "fits", "polylines" plot types
 

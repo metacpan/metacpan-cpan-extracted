@@ -67,6 +67,6 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR"
       }
    },
-   "version" : "v0.4.1",
+   "version" : "v0.4.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

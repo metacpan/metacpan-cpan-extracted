@@ -15,11 +15,11 @@ Math::Symbolic::Custom::ToShorterString - Shorter string representations of Math
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Custom::Base;
@@ -214,7 +214,7 @@ sub is_expanded {
         return 0;
     }
 
-    if ( $t->type() == B_PRODUCT ) {
+    if ( ($t->type() == B_PRODUCT) || ($t->type() == B_DIFFERENCE) ) {
         $flag = 1;
     }
 

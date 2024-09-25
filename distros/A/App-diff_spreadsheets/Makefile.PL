@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "PerlIO" => 0,
     "Pod::Usage" => 0,
     "Scalar::Util" => 0,
-    "Spreadsheet::Edit" => "1000.006",
+    "Spreadsheet::Edit" => "1000.016",
     "Spreadsheet::Edit::IO" => "1000.001",
     "Spreadsheet::Edit::Log" => 0,
     "Term::ReadKey" => 0,
@@ -71,7 +71,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "parent" => 0
   },
-  "VERSION" => "1.025",
+  "VERSION" => "1.026",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -108,7 +108,7 @@ my %FallbackPrereqs = (
   "PerlIO" => 0,
   "Pod::Usage" => 0,
   "Scalar::Util" => 0,
-  "Spreadsheet::Edit" => "1000.006",
+  "Spreadsheet::Edit" => "1000.016",
   "Spreadsheet::Edit::IO" => "1000.001",
   "Spreadsheet::Edit::Log" => 0,
   "Term::ReadKey" => 0,

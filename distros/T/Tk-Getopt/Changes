@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::Getopt.
 
+0.52	2024-09-25
+	- various CI and test related improvements
+
 0.51    2017-04-23
 	- stable release with all changes in 0.50_50
 

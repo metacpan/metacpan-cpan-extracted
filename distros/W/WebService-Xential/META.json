@@ -52,6 +52,7 @@
          "requires" : {
             "Carp" : "0",
             "JSON::XS" : "0",
+            "MIME::Base64" : "0",
             "Mojo::Asset::Memory" : "0",
             "Mojo::Content::Single" : "0",
             "Object::Pad" : "0",
@@ -81,7 +82,7 @@
    "provides" : {
       "WebService::Xential" : {
          "file" : "lib/WebService/Xential.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -92,7 +93,7 @@
          "web" : "https://gitlab.com/waterkip/webservice-xential"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_contributors" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],

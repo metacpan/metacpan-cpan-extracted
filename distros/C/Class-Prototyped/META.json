@@ -23,35 +23,35 @@
    "provides" : {
       "Class::Prototyped" : {
          "file" : "lib/Class/Prototyped.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       },
       "Class::Prototyped::Mirror" : {
          "file" : "lib/Class/Prototyped.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       },
       "Class::Prototyped::Mirror::Normal" : {
          "file" : "lib/Class/Prototyped.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       },
       "Class::Prototyped::Mirror::PROFILE" : {
          "file" : "lib/Class/Prototyped.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       },
       "Class::Prototyped::Mirror::SUPER" : {
          "file" : "lib/Class/Prototyped.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       },
       "Class::Prototyped::Tied" : {
          "file" : "lib/Class/Prototyped.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       },
       "Class::Prototyped::Tied::AutoVivify" : {
          "file" : "lib/Class/Prototyped.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       },
       "Class::Prototyped::Tied::Default" : {
          "file" : "lib/Class/Prototyped.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.15",
+   "version" : "1.16",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -4,6 +4,7 @@ author:
   - 'Jozef Kutej <jkutej@cpan.org>'
 build_requires:
   File::Temp: '0'
+  Test::Most: '0'
 configure_requires:
   Module::Build: '0.3607'
 dynamic_config: 1
@@ -18,7 +19,7 @@ name: Text-CSV-Track
 provides:
   Text::CSV::Track:
     file: lib/Text/CSV/Track.pm
-    version: '0.9'
+    version: '1.00'
   Text::CSV::Track::Max:
     file: lib/Text/CSV/Track/Max.pm
     version: '0.3'
@@ -36,5 +37,5 @@ resources:
   bugtracker: https://github.com/jozef/perl-Text-CSV-Track/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/jozef/perl-Text-CSV-Track
-version: '0.9'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

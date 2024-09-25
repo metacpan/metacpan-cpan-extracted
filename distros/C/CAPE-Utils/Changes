@@ -1,5 +1,8 @@
 Revision history for CAPE-Utils
 
+3.0.0   2024-09-24/16:30
+		 - Add ignoreMaxSize with a default value of 52428800 for skipping large extracts.
+
 2.9.0   2024-08-01/16:20
 		 - Remove unused depend on YAML. Thanks @perlpunk in issues/2.
 		 - Add support for ignoring stuff using Web::ACL.

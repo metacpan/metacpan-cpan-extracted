@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Helpers;
-$Bitcoin::Crypto::Helpers::VERSION = '3.000';
+$Bitcoin::Crypto::Helpers::VERSION = '3.001';
 use v5.10;
 use strict;
 use warnings;
@@ -97,17 +97,17 @@ sub parse_formatdesc
 sub ecc
 {
 	state $secp;
-	state $used_times = 'inf';
+	state $used_times = 0;
 
 	# define an arbitrary number of times a single secp256k1 context can be
 	# used. Create a new context after that. This gives an increased security
 	# according to libsecp256k1 documentation.
 	if ($used_times++ > 20) {
-		$secp = Bitcoin::Secp256k1->new;
+		$secp = undef;
 		$used_times = 0;
 	}
 
-	return $secp;
+	return $secp //= Bitcoin::Secp256k1->new;
 }
 
 1;

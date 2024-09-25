@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-13'; # DATE
+our $DATE = '2024-09-22'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FfmpegUtils/reencode_video_with_libx264",
@@ -39,7 +39,7 @@ reencode-video-with-libx264 - Re-encode video (using ffmpeg and libx264)
 
 =head1 VERSION
 
-This document describes version 0.013 of reencode-video-with-libx264 (from Perl distribution App-FfmpegUtils), released on 2023-12-13.
+This document describes version 0.014 of reencode-video-with-libx264 (from Perl distribution App-FfmpegUtils), released on 2024-09-22.
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ B<reencode-video-with-libx264> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--hel
 
 B<reencode-video-with-libx264> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<reencode-video-with-libx264> [B<L<--audio-sample-rate|/"--audio-sample-rate=s, --sample-rate">>=I<L<uint|Sah::Schema::uint>>|B<L<--sample-rate|/"--audio-sample-rate=s, --sample-rate">>=I<L<uint|Sah::Schema::uint>>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--crf|/"--crf=s">>=I<int>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dry-run|/"--dry-run, -n">>|B<L<-n|/"--dry-run, -n">>] [B<L<--ffmpeg-path|/"--ffmpeg-path=s">>=I<L<filename|Sah::Schema::filename>>] [(B<L<--file|/"--files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--files-json|/"--files-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--frame-rate|/"--frame-rate=s, -r">>=I<L<ufloat|Sah::Schema::ufloat>>|B<L<-r|/"--frame-rate=s, -r">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--preset|/"--veryslow">>=I<str>|B<L<--fast|/"--veryslow">>|B<L<--faster|/"--veryslow">>|B<L<--medium|/"--veryslow">>|B<L<--slow|/"--veryslow">>|B<L<--slower|/"--veryslow">>|B<L<--superfast|/"--veryslow">>|B<L<--ultrafast|/"--veryslow">>|B<L<--veryfast|/"--veryslow">>|B<L<--veryslow|/"--veryslow">>] [B<L<--scale|/"--scale=s">>=I<str>|B<L<--dont-scale|/"--scale=s">>|B<L<--no-scale|/"--scale=s">>] -- E<lt>I<L<file|/"--files-json=s">>E<gt> ...
+B<reencode-video-with-libx264> [B<L<--audio-sample-rate|/"--audio-sample-rate=s, --sample-rate">>=I<L<uint|Sah::Schema::uint>>|B<L<--sample-rate|/"--audio-sample-rate=s, --sample-rate">>=I<L<uint|Sah::Schema::uint>>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--crf|/"--crf=s">>=I<int>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dry-run|/"--dry-run, -n">>|B<L<-n|/"--dry-run, -n">>] [B<L<--ffmpeg-path|/"--ffmpeg-path=s">>=I<L<filename|Sah::Schema::filename>>] [(B<L<--file|/"--files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--files-json|/"--files-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--frame-rate|/"--frame-rate=s, -r">>=I<L<ufloat|Sah::Schema::ufloat>>|B<L<-r|/"--frame-rate=s, -r">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--preset|/"--veryslow">>=I<str>|B<L<--fast|/"--veryslow">>|B<L<--faster|/"--veryslow">>|B<L<--medium|/"--veryslow">>|B<L<--slow|/"--veryslow">>|B<L<--slower|/"--veryslow">>|B<L<--superfast|/"--veryslow">>|B<L<--ultrafast|/"--veryslow">>|B<L<--veryfast|/"--veryslow">>|B<L<--veryslow|/"--veryslow">>] [B<L<--scale|/"--scale=s">>=I<str>|B<L<--dont-scale|/"--scale=s">>|B<L<--no-scale|/"--scale=s">>] -- E<lt>I<L<file|/"--files-json=s">>E<gt> ...
 
 
 
@@ -159,6 +159,11 @@ See C<--preset>.
 Alias for --scale ''.
 
 See C<--scale>.
+
+=item B<--overwrite>, B<-O>
+
+(No description)
+
 
 =item B<--preset>=I<s>
 
@@ -473,6 +478,7 @@ List of available configuration parameters:
  frame_rate (see --frame-rate)
  log_level (see --log-level)
  naked_res (see --naked-res)
+ overwrite (see --overwrite)
  preset (see --preset)
  scale (see --scale)
 
@@ -536,7 +542,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

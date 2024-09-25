@@ -17,12 +17,12 @@ suricata_extract_submit_extend - Provides a LibreNMS style SNMP extend for suric
 
 =head1 VERSION
 
-0.1.0
+1.0.0
 
 =cut
 
 sub version {
-	print "suricata_extract_submit_extend v. 0.1.0\n";
+	print "suricata_extract_submit_extend v. 1.0.0\n";
 	exit 255;
 }
 
@@ -89,6 +89,8 @@ Stat Keys...
     - ignored_ip_src :: Files skipped as either the src IP/subnet is set to be ignored.
 
     - ignored_path :: Files skipped as the path is set to be ignored.
+
+    - ignored_size_max :: Files skipped as they are larger than the max size to submit.
 
     - ignored_ua :: Files skipped as the useragent is set to be ignored.
 
@@ -157,7 +159,7 @@ my $to_return = {
 my @to_delta = (
 	'sub',       'sub_fail', 'zero_sized',   'sub_2xx',      'sub_3xx',        'sub_4xx',
 	'sub_5xx',   'errors',   'ignored_host', 'ignored_ip',   'ignored_ip_src', 'ignored_ip_dest',
-	'truncated', 'sub_size', 'ignored_ua',   'ignored_path', 'ignored_webacl'
+	'truncated', 'sub_size', 'ignored_ua',   'ignored_path', 'ignored_webacl', 'ignored_size_max'
 );
 
 # if todays file exists or not

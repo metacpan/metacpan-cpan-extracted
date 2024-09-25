@@ -1,5 +1,5 @@
 {
-   "abstract" : "Add support for window functions to DBIx::Class",
+   "abstract" : "Add support for window functions and aggregate filters to DBIx::Class",
    "author" : [
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
@@ -88,7 +88,7 @@
    "provides" : {
       "DBIx::Class::Helper::WindowFunctions" : {
          "file" : "lib/DBIx/Class/Helper/WindowFunctions.pm",
-         "version" : "v0.5.0"
+         "version" : "v0.6.0"
       }
    },
    "release_status" : "stable",
@@ -103,7 +103,7 @@
          "web" : "https://github.com/robrwo/DBIx-Class-Helper-ResultSet-WindowFunctions"
       }
    },
-   "version" : "v0.5.0",
+   "version" : "v0.6.0",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Peter Rabbitson <ribasushi@leporine.io>"

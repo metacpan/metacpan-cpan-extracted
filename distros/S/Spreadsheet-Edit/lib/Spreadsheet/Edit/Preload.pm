@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Preload;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 998.999; }
-our $VERSION = '1000.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-07-06'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.016'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-09-24'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Import::Into;

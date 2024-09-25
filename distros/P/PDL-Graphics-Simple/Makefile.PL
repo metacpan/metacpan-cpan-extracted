@@ -26,6 +26,15 @@ FOO
 my %prereq = ( 'PDL'         => '2.089', # contour_polylines
 	       'File::Temp'  => 0,
 	       'Time::HiRes' => 0);
+my %min_version = (
+  'PDL::Graphics::Gnuplot' => '2.029', # Gnuplot 6 warnings fixes
+);
+for my $opt_dep (sort keys %min_version) {
+  (my $file = $opt_dep) =~ s#::#/#g;
+  next if !eval { require "$file.pm"; 1 }; # not installed, fine
+  next if eval { $opt_dep->VERSION($min_version{$opt_dep}); 1 };
+  $prereq{$opt_dep} = $min_version{$opt_dep};
+}
 
 WriteMakefile(
     NAME                => 'PDL::Graphics::Simple',

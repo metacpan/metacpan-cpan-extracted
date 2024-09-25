@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/DateTime/Locale/FromCLDR.pm
-## Version v0.4.1
+## Version v0.4.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/07
-## Modified 2024/09/18
+## Modified 2024/09/24
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     # "If a given short metazone form is known NOT to be understood in a given locale and the parent locale has this value such that it would normally be inherited, the inheritance of this value can be explicitly disabled by use of the 'no inheritance marker' as the value, which is 3 simultaneous empty set characters (U+2205)."
     # <https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
     our $EMPTY_SET = "∅∅∅";
-    our $VERSION = 'v0.4.1';
+    our $VERSION = 'v0.4.2';
 };
 
 use strict;
@@ -1220,34 +1220,34 @@ sub interval_greatest_diff
     }
     my $period2val =
     {
-    # 00:00  00:00
-    midnight => 1,
-    # 06:00  12:00
-    # or
-    # 05:00  10:00
-    morning1 => 2,
-    # 10:00  12:00
-    morning2 => 3,
-    # 12:00  12:00
-    noon => 4,
-    # 12:00  18:00
-    # or
-    # 12:00  13:00
-    afternoon1 => 5,
-    # 13:00  18:00
-    afternoon2 => 6,
-    # 18:00  21:00
-    # or
-    # 16:00  18:00
-    evening1 => 7,
-    # 18:00  21:00
-    evening2 => 8,
-    # 21:00  06:00
-    # or
-    # 19:00  23:00
-    night1 => 9,
-    # 23:00  04:00
-    night2 => 10,
+        # 00:00  00:00
+        midnight => 1,
+        # 06:00  12:00
+        # or
+        # 05:00  10:00
+        morning1 => 2,
+        # 10:00  12:00
+        morning2 => 3,
+        # 12:00  12:00
+        noon => 4,
+        # 12:00  18:00
+        # or
+        # 12:00  13:00
+        afternoon1 => 5,
+        # 13:00  18:00
+        afternoon2 => 6,
+        # 18:00  21:00
+        # or
+        # 16:00  18:00
+        evening1 => 7,
+        # 18:00  21:00
+        evening2 => 8,
+        # 21:00  06:00
+        # or
+        # 19:00  23:00
+        night1 => 9,
+        # 23:00  04:00
+        night2 => 10,
     };
     my $greatest_diff;
     my $tokens = {};
@@ -2088,6 +2088,15 @@ sub script_code
         $str = $self->{script_code} = $locale->script;
     }
     return( $str );
+}
+
+sub split_interval
+{
+    my $self = shift( @_ );
+    my $cldr = $self->{_cldr} || die( "The Locale::Unicode::Data object is gone!" );
+    my $ref = $cldr->split_interval( @_ ) ||
+        return( $self->pass_error( $cldr->error ) );
+    return( $ref );
 }
 
 sub territory
@@ -3984,7 +3993,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.4.1
+    v0.4.2
 
 =head1 DESCRIPTION
 
@@ -5439,6 +5448,18 @@ Returns the C<locale>'s C<script> ID, or C<undef> if there is none.
 =head2 script_id
 
 This is an alias for L<script_code|/script_code>
+
+=head2 split_interval
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $ref = $locale->split_interval(
+        pattern => $string,
+        greatest_diff => 'd',
+    ) || die( $locale->error );
+
+This method actually calls L<Locale::Unicode::Data/split_interval> and passes it all the arguments it received, so please check its documentation.
+
+It returns the array reference it received from L<Locale::Unicode::Data/split_interval>, or upon error, its sets an exception object, and returns C<undef> in scalar context or an empty list in list context.
 
 =head2 territory
 

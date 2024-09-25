@@ -11,7 +11,6 @@ use Pod::Usage qw(pod2usage);
 use IO::Prompt::Tiny qw(prompt);
 use Term::Choose ();
 
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Synth-Config);
 use Synth::Config ();
 
 pod2usage(1) unless @ARGV;

@@ -1,3 +1,6 @@
+2.029 2024-09-24
+- Gnuplot 6: handle all Qt warnings
+
 2.028 2024-09-18
 - Gnuplot 6: handle warnings about Qt plugins, fix read_mouse
 

@@ -1,5 +1,23 @@
 The following logs changes for the CPAN distribution Template-EmbeddedPerl
 
+0.001004  24 September 2024
+          - Fix issue with dependency listings
+
+0.001003  24 September 2024
+          - Permit adding a comment to the template
+
+0.001002  24 September 2024
+          - Documentation fixes
+          - new 'mtrim' helper
+          - fixed issue where we were not properly trimming strings.
+          - trim and mtrim properly trim and restore safe strings.
+          - fix for order issue with line start type tags
+          - Move 'prepend' to inside the generated template subroutined
+          - Added 'preamble' that replaces what the old 'prepend'did.
+          - Note: Above could be pontentially a breaking change;if it gives
+            you trouble you will need to just change 'prepend' to 'preamble'
+            in your code.
+
 0.001001  13 September 2024
           - First version, released on an unsuspecting world.
           - Happy Birthday to Christina Laberge!

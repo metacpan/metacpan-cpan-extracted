@@ -9,7 +9,6 @@ use Mojo::JSON qw(to_json);
 use Mojo::File ();
 use Mojo::Util qw(trim);
 
-use lib map { "$ENV{HOME}/repos/gene-at-github/$_/lib" } qw(Synth-Config); # local author library
 use Synth::Config ();
 
 use constant SETTINGS => './eg/public/settings/';

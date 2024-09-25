@@ -1,5 +1,11 @@
 Revision history for Acme-Both-MakefilePL-And-BuildPL
 
+0.03    Date/time
+        Third version, with Module::Build as configure prerequisite
+
+0.02    Date/time
+        Second version, with Build.PL
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

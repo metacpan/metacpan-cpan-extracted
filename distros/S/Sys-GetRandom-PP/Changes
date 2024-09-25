@@ -1,3 +1,7 @@
+0.05  2024-09-25
+    - More ad-hoc hackery in the build step to support more recent versions of
+      FreeBSD.
+
 0.04  2024-09-17
     - Work around missing _h2ph_pre.ph definitions on FreeBSD.
 

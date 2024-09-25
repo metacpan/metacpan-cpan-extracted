@@ -1,6 +1,6 @@
 package DBIx::Class::Helper::WindowFunctions;
 
-# ABSTRACT: Add support for window functions to DBIx::Class
+# ABSTRACT: Add support for window functions and aggregate filters to DBIx::Class
 
 use v5.14;
 use warnings;
@@ -13,7 +13,7 @@ use Ref::Util qw/ is_plain_arrayref is_plain_hashref /;
 
 use namespace::clean;
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.6.0';
 
 
 sub _resolved_attrs {
@@ -34,28 +34,57 @@ sub _resolved_attrs {
             next unless is_plain_hashref($col);
 
             my $as = delete $col->{'-as'};
-            my $over = delete $col->{'-over'} or next;
+            my $over = delete $col->{'-over'};
+            my $filter = delete $col->{'-filter'};
 
-            $rs->throw_exception('-over must be a hashref')
-              unless is_plain_hashref($over);
+            next unless $over || $filter;
 
             my ( $sql, @bind ) = $sqla->_recurse_fields($col);
 
-            my ( $part_sql, @part_bind ) =
-              $sqla->_recurse_fields( $over->{partition_by} );
-            if ($part_sql) {
-                $part_sql = $sqla->_sqlcase('partition by ') . $part_sql;
+            if ($over) {
+
+                $rs->throw_exception('-over must be a hashref')
+                  unless is_plain_hashref($over);
+
+                my ( $part_sql, @part_bind ) =
+                  $sqla->_recurse_fields( $over->{partition_by} );
+                if ($part_sql) {
+                    $part_sql = $sqla->_sqlcase('partition by ') . $part_sql;
+                }
+
+                my @filter_bind;
+                if ( defined $filter ) {
+                    $rs->throw_exception('-filter must be an arrayref or hashref')
+                      unless is_plain_arrayref($filter)
+                      or is_plain_hashref($filter);
+                    @filter_bind = $sqla->_recurse_where($filter);
+                    my $clause = shift @filter_bind;
+                    $sql .= $sqla->_sqlcase(' filter (where ') . $clause . ')';
+                }
+
+                my ( $order_sql, @order_bind ) =
+                  $sqla->_order_by( $over->{order_by} );
+
+                $sql .= $sqla->_sqlcase(' over (') . $part_sql . $order_sql . ')';
+                if ($as) {
+                    $sql .= $sqla->_sqlcase(' as ') . $sqla->_quote($as);
+                }
+
+                push @bind, @part_bind, @filter_bind, @order_bind;
+
             }
+            else {
 
-            my ( $order_sql, @order_bind ) =
-              $sqla->_order_by( $over->{order_by} );
+                $rs->throw_exception('-filter must be an arrayref or hashref')
+                  unless is_plain_arrayref($filter)
+                  or is_plain_hashref($filter);
+                my @filter_bind = $sqla->_recurse_where($filter);
+                my $clause      = shift @filter_bind;
+                $sql .= $sqla->_sqlcase(' filter (where ') . $clause . ')';
 
-            $sql .= $sqla->_sqlcase(' over (') . $part_sql . $order_sql . ')';
-            if ($as) {
-                $sql .= $sqla->_sqlcase(' as ') . $sqla->_quote($as);
+                push @bind, @filter_bind;
+
             }
-
-            push @bind, @part_bind, @order_bind;
 
             $sel[-1] = \[ $sql, @bind ];
 
@@ -79,11 +108,11 @@ __END__
 
 =head1 NAME
 
-DBIx::Class::Helper::WindowFunctions - Add support for window functions to DBIx::Class
+DBIx::Class::Helper::WindowFunctions - Add support for window functions and aggregate filters to DBIx::Class
 
 =head1 VERSION
 
-version v0.5.0
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -103,8 +132,9 @@ Using the resultset:
     undef,
     {
       '+select' => {
-          avg   => 'fingers',
-          -over => {
+          avg     => 'fingers',
+          -filter => { hats => { '>', 1 } },
+          -over   => {
               partition_by => 'hats',
               order_by     => 'age',
           },
@@ -115,8 +145,58 @@ Using the resultset:
 
 =head1 DESCRIPTION
 
-This helper adds rudimentary support for window functions to
+This helper adds rudimentary support for window functions and aggregate filters to
 L<DBIx::Class> resultsets.
+
+It adds the following keys to the resultset attributes:
+
+=head2 -over
+
+This is used for window functions, e.g. the following adds a row number columns
+
+  '+select' => {
+      row_number => [],
+      -over => {
+         partition_by => 'class',
+         order_by     => 'score',
+      },
+  },
+
+which is equivalent to the SQL
+
+  ROW_NUMBER() OVER ( PARTITION BY class ORDER BY score )
+
+You can omit either the C<partition_by> or C<order_by> clauses.
+
+=head2 -filter
+
+This is used for filtering aggregate functions or window functions, e.g. the following clause
+
+  '+select' => {
+      count     => \ 1,
+      -filter => { kittens => { '<', 10 } },
+  },
+
+is equivalent to the SQL
+
+  COUNT(1) FILTER ( WHERE kittens < 10 )
+
+You can apply filters to window functions, e.g.
+
+  '+select' => {
+      row_number => [],
+      -filter => { class => { -like => 'A%' } },
+      -over => {
+         partition_by => 'class',
+         order_by     => 'score',
+      },
+  },
+
+which is equivalent to the SQL
+
+  ROW_NUMBER() FILTER ( WHERE class like 'A%' ) OVER ( PARTITION BY class ORDER BY score )
+
+The C<-filter> feature was added v0.6.0.
 
 =head1 CAVEATS
 

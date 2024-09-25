@@ -1,9 +1,8 @@
 ---
-abstract: 'Validation Library and more'
+abstract: 'Embedded Perl Template Engine'
 author:
   - 'John Napiorkowski <jjnapiork@cpan.org>'
 build_requires:
-  PathTools: '0'
   Test::Most: '0.34'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -15,19 +14,19 @@ meta-spec:
   version: '1.4'
 name: Template-EmbeddedPerl
 requires:
-  Carp: '0'
-  Digest::MD5: '0'
-  Exporter: '0'
-  HTML::Escape: '0'
-  PPI: '0'
-  PathTools: '0'
-  Scalar::Util: '0'
-  URI::Escape: '0'
+  Carp: '1.54'
+  Digest::MD5: 2.58_01
+  Exporter: '5.78'
+  File::Spec: '3.90'
+  HTML::Escape: '1.11'
+  PPI: '1.279'
+  Scalar::Util: '1.63'
+  URI::Escape: '5.28'
 resources:
   bugtracker: https://github.com/jjn1056/Template-EmbeddedPerl/issues
   homepage: https://github.com/jjn1056/Template-EmbeddedPerl
   repository: https://github.com/jjn1056/Template-EmbeddedPerl
-version: '0.001001'
+version: '0.001004'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -4,7 +4,6 @@ use Mojo::File qw(curfile);
 use Test::Mojo;
 use Test::More;
 
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Synth-Config); # local author library
 use Synth::Config ();
 
 use constant SETTINGS => './eg/public/settings/';

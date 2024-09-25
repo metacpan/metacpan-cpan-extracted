@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::DerivationPath;
-$Bitcoin::Crypto::DerivationPath::VERSION = '3.000';
+$Bitcoin::Crypto::DerivationPath::VERSION = '3.001';
 use v5.10;
 use strict;
 use warnings;

@@ -73,12 +73,12 @@ my (
     $opt_, $opt_i, $opt_r, $opt_e, $opt_d, $opt_enc,
     $opt_s, $opt_t, $opt_T, $opt_l, $opt_L, $opt_c,
     $opt_D, $opt_I, $opt_o, $opt_h, $opt_n, $opt_v,
-    $opt_j,
+    $opt_j, $opt_new,
 
     #
     # set from commandline (or interactive)
     #
-    $number, $searchstring, $dump_file, $ImportType, $NewType, $Raw, $TOPIC,
+    $number, $searchstring, $dump_file, $ImportType, $StdinMode, $Raw, $TOPIC,
 
     #
     # configuration options
@@ -145,7 +145,7 @@ $hardparams = "(readonly|maxlen|dbdriver|useencryption|cryptmethod)";
 $CONF       = File::Spec->catfile($ENV{HOME}, ".noterc");
 $USER       = getlogin || getpwuid($<); chomp $USER;
 $TOPIC      = 1;
-$VERSION    = "1.4.1";
+$VERSION    = "1.4.2";
 $CurDepth   = 1;        # the current depth inside the topic "directory" structure...
 $maxlen     = "auto";
 $timelen    = 22;
@@ -200,7 +200,7 @@ if ($ARGV[0] eq "") {
 }
 elsif ($#ARGV == 0 && $ARGV[0] eq "-") {
   $mode = "new";
-  $NewType = 1;            # read from STDIN until EOF
+  $StdinMode = 1;            # read from STDIN until EOF
   shift;
   undef $has_nothing;
 }
@@ -210,6 +210,7 @@ else {
               "interactive|i!"    => \$opt_i, # no arg
               "config|c=s"        => \$opt_c, # string,  required
               "raw|r!"            => \$opt_r, # no arg
+              "new|n:s"           => \$opt_new, # no arg or optional string
               "edit|e=i"          => \$opt_e, # integer, required
               "delete|d=s"        => \$opt_d, # integer, required
               "search|s=s"        => \$opt_s, # string,  required
@@ -224,15 +225,22 @@ else {
               "help|h|?!"         => \$opt_h, # no arg
               "version|v!"        => \$opt_v, # no arg
               "encrypt=s"         => \$opt_enc, # string, required
-             );
-  $opt_n = shift;        # after that @ARGV contains eventually
-  # a note-number
-  # $opt_ is a single dash, in case of existence!
+      );
+
+  # after that @ARGV contains eventually a note-number or a single dash
+  $opt_n = shift;       
+
   #
   # determine mode
   #
   if ($opt_i) {
     $mode = "interactive";
+  }
+  elsif (defined $opt_new) {
+      $mode = "new";
+      if ($opt_new eq "-") {
+          $StdinMode = 1; # read from STDIN
+      }
   }
   elsif (defined $opt_l || defined $opt_L) {
     $mode = "list";
@@ -302,7 +310,7 @@ else {
     }
   }
   elsif ($opt_v) {
-    print "This is note $VERSION by Thomas Linden <tom at linden dot at>.\n";
+    print "This is note $VERSION by Thomas von Dein <tom at vondein dot org>.\n";
     exit(0);
   }
   elsif ($opt_h) {
@@ -319,18 +327,23 @@ else {
       $has_nothing = 1;
     }
   }
+
   ### determine generic options
-  if ($opt_n =~ /^[\d+\-?\,*]+$/) {
-    # first arg is a digit!
-    if ($mode eq "") {
-      $number = $opt_n;
-      $mode = "display";
-      undef $has_nothing;
-    }
-    else {
-      print "mode <$mode> does not take a numerical argument!\n";
-      exit(1);
-    }
+  if ($opt_n =~ /^\d[\d\-?\,]*$/) {
+      # first arg is a digit!
+      if ($mode eq "") {
+          $number = $opt_n;
+          $mode = "display";
+          undef $has_nothing;
+      }
+      else {
+          print "mode <$mode> does not take a numerical argument!\n";
+          exit(1);
+      }
+  }
+  elsif ($opt_n eq "-") {
+      $StdinMode = 1; # read from STDIN
+      $mode = "new";
   }
   elsif ($opt_n ne "") {
     print "Unknown option: $opt_n\n";
@@ -352,7 +365,6 @@ if ($has_nothing && $mode eq "") {
   &usage;
 }
 
-
 # read the configfile.
 $CONF = $opt_c if($opt_c);    # if given by commandline, use this.
 if (-e $CONF) {
@@ -371,8 +383,8 @@ if ($mode eq "encrypt_passwd") {
   exit;
 }
 
-# Always interactive?
-if ($conf{alwaysinteractive} && $mode ne "dump" && $mode ne "import") {
+# Always interactive? with the exception if stdin was requested
+if ($conf{alwaysinteractive} && $mode ne "dump" && $mode ne "import" && !$StdinMode && !defined $opt_new) {
   $mode = "interactive";
 }
 
@@ -715,69 +727,75 @@ sub list {
 sub new {
     my($TEMP,$editor, $date, $note, $WARN, $c, $line, $num, @topic);
     if ($conf{readonly}) {
-    print "readonly\n";
-    return;
-    }
-    $date = &getdate;
-    return if $db->lock();
-    if ($conf{alwayseditor}) {
-      $TEMP = &gettemp;
-      # security!
-      unlink $TEMP;
-      # let the user edit it...
-      $editor = &find_editor;
-      if ($editor) {
-        # create the temp file
-        open NEW, "> $TEMP" or die "Could not write $TEMP: $!\n";
-        close NEW;
-        system "chattr", "+s", $TEMP; # ignore errors, since only on ext2 supported!
-        system $editor, $TEMP;
-      }
-      else {
-        print "Could not find an editor to use!\n";
-        $db->unlock();
-        exit(0);
-      }
-      # read it in ($note)
-      $note = "";
-      open E, "<$TEMP" or $WARN = 1;
-      if ($WARN) {
-        print "...edit process interupted! No note has been saved.\n";
-        undef $WARN;
-        $db->unlock();
+        print "readonly\n";
         return;
-      }
-      $c = 0;
-      while (<E>) {
-        $note = $note . $_;
-      }
-      chomp $note;
-      close E;
-      # privacy!
-      unlink $TEMP;
+    }
+
+    $date = &getdate;
+    $note = "";
+    $line = "";
+
+    return if $db->lock();
+
+    if ($StdinMode) {
+        # create a new note from STDIN
+        print STDERR "Reading from STDIN ...\n";
+        while (<STDIN>) {
+            $note .= $_;
+        }
+    }
+    elsif ($conf{alwayseditor} && &is_interactive()) {
+        # read a new note interactively or by using the editor
+        $TEMP = &gettemp;
+        # security!
+        unlink $TEMP;
+
+        # let the user edit it...
+        $editor = &find_editor;
+        if ($editor) {
+            # create the temp file
+            open NEW, "> $TEMP" or die "Could not write $TEMP: $!\n";
+            close NEW;
+            system "chattr", "+s", $TEMP; # ignore errors, since only on ext2 supported!
+            system $editor, $TEMP;
+        }
+        else {
+            print "Could not find an editor to use!\n";
+            $db->unlock();
+            exit(0);
+        }
+
+        # read it in ($note)
+        $note = "";
+        open E, "<$TEMP" or $WARN = 1;
+        if ($WARN) {
+            print "...edit process interupted! No note has been saved.\n";
+            undef $WARN;
+            $db->unlock();
+            return;
+        }
+
+        $c = 0;
+        while (<E>) {
+            $note = $note . $_;
+        }
+        chomp $note;
+        close E;
+
+        # privacy!
+        unlink $TEMP;
     }
     else {
-      $note = "";
-      $line = "";
-      # create a new note
-      if ($NewType) {
-        # be silent! read from STDIN until EOF.
-        while (<STDIN>) {
-          $note .= $_;
-        }
-      }
-      else {
         print "enter the text of the note, end with a single .\n";
-        do
-          {
+        do {
             $line = <STDIN>;
             $note = $note . $line;
-          } until $line eq ".\n";
+        } until $line eq ".\n";
         # remove the . !
         chop $note;
         chop $note;
-      }
     }
+
     # look if the note was empty, so don't store it!
     if ($note =~ /^\s*$/) {
       print "...your note was empty and will not be saved.\n";
@@ -1341,6 +1359,9 @@ Options:
        -c, --config file
            Use another config file than the default \$HOME/.noterc.
 
+       -n, --new
+           Create a new note entry.
+
        -l, --list [topic]
            Lists all existing notes. If no topic were specified, it will
            display a list of all existing topics.  See the section TOPICS for
@@ -1886,4 +1907,9 @@ sub load_driver {
 sub ticket {
   return join "", (map { $randomlist[int(rand($#randomlist))] } (0 .. 10) );
 }
+
+sub is_interactive {
+    return -t STDIN && -t STDOUT;
+}
+
 __END__

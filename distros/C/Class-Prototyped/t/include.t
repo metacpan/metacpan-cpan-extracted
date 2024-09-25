@@ -5,6 +5,8 @@ use Data::Dumper;
 use Test;
 use IO::File;
 
+use lib '.';
+
 BEGIN {
 	$|++;
 	plan tests => 18;

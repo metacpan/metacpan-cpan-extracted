@@ -1,0 +1,18 @@
+#!perl
+
++{
+    table_class => 'Artist',
+    attr        => {
+        columns   => [qw/ name /],
+        '+select' => {
+            count     => [qw/fingers/],
+            -filter => { hats => { '>', 1 } },
+        },
+        group_by => 'name',
+    },
+    sql => q{ SELECT me.name,
+              COUNT(fingers) FILTER (WHERE hats > ?)
+              FROM artist me GROUP BY name
+    },
+    bind => [ [ { dbic_colname => "hats" }, 1 ], ],
+};

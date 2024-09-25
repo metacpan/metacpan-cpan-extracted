@@ -5,13 +5,14 @@ use strict;
 use warnings;
 use Log::ger;
 
+use File::chdir;
 use Perinci::Exporter;
 use Perinci::Object;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-13'; # DATE
+our $DATE = '2024-09-22'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our %SPEC;
 
@@ -52,6 +53,21 @@ our %argspecopt_copy = (
     },
 );
 
+our %argspecsopt_duration = (
+    start => {
+        schema => ['any*', of=>['duration*', 'percent_str*']],
+        cmdline_aliases => {s=>{}},
+        },
+    end => {
+        schema => ['any*', of=>['duration*', 'percent_str*']],
+        cmdline_aliases => {e=>{}},
+    },
+    duration => {
+        schema => ['any*', of=>['duration*', 'percent_str*']],
+        cmdline_aliases => {d=>{}},
+    },
+);
+
 my @presets = qw/ultrafast superfast veryfast faster fast medium slow slower veryslow/;
 
 sub _nearest {
@@ -70,7 +86,7 @@ sub _convert_pct {
 $SPEC{reencode_video_with_libx264} = {
     v => 1.1,
     summary => 'Re-encode video (using ffmpeg and libx264)',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This utility runs *ffmpeg* to re-encode your video files using the libx264
 codec. It is a wrapper to simplify invocation of ffmpeg. It selects the
@@ -106,7 +122,7 @@ or (if downsizing is done):
 
     ORIGINAL_NAME.480p-crf28.mp4
 
-_
+MARKDOWN
     args => {
         %argspec0_files,
         %argspecopt_ffmpeg_path,
@@ -116,7 +132,7 @@ _
         scale => {
             schema => 'str*',
             default => '1080^>',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Scale video to specified size. See <pm:Math::Image::CalcResized> or
 <prog:calc-image-resized-size> for more details on scale specification. Some
@@ -128,7 +144,7 @@ than 1080p.
 To disable scaling, set `--scale` to '' (empty string), or specify
 `--dont-scale` on the CLI.
 
-_
+MARKDOWN
             cmdline_aliases => {
                 dont_scale => {summary=>"Alias for --scale ''", is_flag=>1, code=>sub {$_[0]{scale} = ''}},
                 no_scale   => {summary=>"Alias for --scale ''", is_flag=>1, code=>sub {$_[0]{scale} = ''}},
@@ -150,6 +166,10 @@ _
             summary => 'Set audio sample rate, in Hz',
             schema => 'uint*',
             cmdline_aliases => {sample_rate=>{}},
+        },
+        overwrite => {
+            schema => 'bool*',
+            cmdline_aliases => {O=>{}},
         },
     },
     features => {
@@ -213,6 +233,7 @@ sub reencode_video_with_libx264 {
         my $crf = $args{crf} // 28;
         my @ffmpeg_args = (
             "-i", $file,
+            ($args{overwrite} ? "-y":"-n"),
         );
 
         my $scale_suffix;
@@ -276,7 +297,7 @@ sub reencode_video_with_libx264 {
 $SPEC{split_video_by_duration} = {
     v => 1.1,
     summary => 'Split video by duration into parts',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This utility uses **ffmpeg** (particularly the `-t` and `-ss`) option to split a
 longer video into shorter videos. For example, if you have `long.mp4` with
@@ -289,7 +310,7 @@ Compared to using `ffmpeg` directly, this wrapper offers convenience of
 calculating the times (`-ss`) option for you, handling multiple files,
 automatically choosing output filename, and tab completion.
 
-_
+MARKDOWN
     args => {
         %argspec0_files,
         # XXX start => {},
@@ -302,6 +323,10 @@ _
         %argspecopt_copy,
         # XXX merge_if_last_part_is_shorter_than => {},
         # XXX output_filename_pattern
+        overwrite => {
+            schema => 'bool*',
+            cmdline_aliases => {O=>{}},
+        },
     },
     args_rels => {
         req_one => [qw/every parts/],
@@ -406,7 +431,7 @@ sub split_video_by_duration {
             my $time_start = ($i-1)*$part_dur;
             IPC::System::Options::system(
                 {log=>1, dry_run=>$args{-dry_run}},
-                "ffmpeg", "-i", $file, ($args{copy} ? ("-c", "copy") : ()), "-ss", $time_start, "-t", $part_dur, $ofile);
+                "ffmpeg", ($args{overwrite} ? "-y":"-n"), "-i", $file, ($args{copy} ? ("-c", "copy") : ()), "-ss", $time_start, "-t", $part_dur, $ofile);
             my ($exit_code, $signal, $core_dump) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
             if ($exit_code) {
                 $envres->add_result(500, "ffmpeg exited $exit_code (sig $signal) for video $file: $!", {item_id=>$j});
@@ -423,7 +448,7 @@ sub split_video_by_duration {
 $SPEC{cut_video_by_duration} = {
     v => 1.1,
     summary => 'Get a portion (time range) of a video',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This utility uses *ffmpeg* (particularly the `-t` and `-ss`) option to get a
 portion (time range) of a video.
@@ -433,22 +458,15 @@ flexibility in specifying times and duration (e.g. '15s' as well as '00:10' as
 well as 'PT1M30S'), specifying only 'end' and 'duration', handling multiple
 files, automatically choosing output filename, and tab completion.
 
-_
+MARKDOWN
     args => {
         %argspec0_files,
-        start => {
-            schema => ['any*', of=>['duration*', 'percent_str*']],
-            cmdline_aliases => {s=>{}},
-        },
-        end => {
-            schema => ['any*', of=>['duration*', 'percent_str*']],
-            cmdline_aliases => {e=>{}},
-        },
-        duration => {
-            schema => ['any*', of=>['duration*', 'percent_str*']],
-            cmdline_aliases => {d=>{}},
-        },
+        %argspecsopt_duration,
         %argspecopt_copy,
+        overwrite => {
+            schema => 'bool*',
+            cmdline_aliases => {O=>{}},
+        },
     },
     args_rels => {
         req_one => [qw/start duration/],
@@ -581,7 +599,7 @@ sub cut_video_by_duration {
         if ($ofile =~ /\.\w+\z/) { $ofile =~ s/(\.\w+)\z/.$label$1/ } else { $ofile .= ".$label" }
         IPC::System::Options::system(
             {log=>1, dry_run=>$args{-dry_run}},
-            "ffmpeg", "-i", $file, ($args{copy} ? ("-c", "copy") : ()), "-ss", $start, "-t", $duration, $ofile);
+            "ffmpeg", ($args{overwrite} ? "-y":"-n"), "-i", $file, ($args{copy} ? ("-c", "copy") : ()), "-ss", $start, "-t", $duration, $ofile);
         my ($exit_code, $signal, $core_dump) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
         if ($exit_code) {
             $envres->add_result(500, "ffmpeg exited $exit_code (sig $signal) for video $file: $!", {item_id=>$j});
@@ -589,6 +607,197 @@ sub cut_video_by_duration {
             $envres->add_result(200, "Video '$file' successfully cut", {item_id=>$j});
         }
 
+    } # for $file
+
+    $envres->as_struct;
+}
+
+$SPEC{cut_duration_from_video} = {
+    v => 1.1,
+    summary => 'Cut (censor out) a duration out of a video',
+    description => <<'MARKDOWN',
+
+This utility uses *ffmpeg* (particularly the `-t` and `-ss`) option to cut a
+portion (time range) out of a video. It can be used to remove an unwanted scene
+from a video.
+
+Compared to using `ffmpeg` directly, this wrapper offers convenience of more
+flexibility in specifying times and duration (e.g. '15s' as well as '00:10' as
+well as 'PT1M30S'), specifying only 'end' and 'duration', handling multiple
+files, automatically choosing output filename, and tab completion.
+
+Alternatives:
+
+1. If you just want to play a video and censor out certain parts, you can use
+create a playlist of segments called an EDL file. See for example:
+
+<https://github.com/mpv-player/mpv/blob/master/DOCS/edl-mpv.rst>
+
+MARKDOWN
+    args => {
+        %argspec0_files,
+        %argspecsopt_duration,
+        %argspecopt_copy,
+    },
+    args_rels => {
+        req_one => [qw/start duration/],
+    },
+    examples => [
+        {
+            summary => 'Specify start & end only (using h:m:s notation), the result is 100s.cut_50_to_63.mp4',
+            argv => ['100s.mp4', '-s', '00:00:50', '-e', '00:01:03'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Specify start & duration only (using seconds), the result is 100s.cut_50_to_63.mp4',
+            argv => ['100s.mp4', '-s', '50', '-d', '13'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Specify end & duration only (using human & ISO 8601 notation), the result is 100s.cut_50_to_63.mp4',
+            argv => ['100s.mp4', '-e', 'PT63S', '-d', '13s'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
+    features => {
+        dry_run => 1,
+    },
+    deps => {
+        prog => "ffmpeg", # XXX allow FFMPEG_PATH
+    },
+    links => [
+    ],
+};
+sub cut_duration_from_video {
+    require File::Temp;
+    require POSIX;
+
+    my %args = @_;
+    my $files = $args{files};
+    my $start0    = $args{start};
+    my $end0      = $args{end};
+    my $duration0 = $args{duration};
+
+    # TODO: factour out common code with cut_video_by_duration
+    my $envres = envresmulti();
+    my $j = -1;
+  FILE:
+    for my $file (@$files) {
+        $j++;
+        require Media::Info;
+        my $res = Media::Info::get_media_info(media => $file);
+        unless ($res->[0] == 200) {
+            $envres->add_result($res->[0], "Can't get media info for video '$file': $res->[1], skipped", {item_id=>$j});
+            next;
+        }
+
+        my $total_dur = $res->[2]{duration}
+            or do {
+                $envres->add_result(412, "Duration of video '$file' is zero, skipped", {item_id=>$j});
+                next;
+            };
+
+        my ($start, $end, $duration);
+        if (defined $start0 && !defined $end0 && !defined $duration0) {
+            $start    = _convert_pct($start0, $total_dur);
+            $end      = $total_dur;
+            $duration = $end - $start;
+        } elsif (!defined $start0 && defined $end0 && !defined $duration0) {
+            $start    = 0;
+            $end      = _convert_pct($end0, $total_dur);
+            $duration = $end - $start;
+        } elsif (!defined $start0 && !defined $end0 && defined $duration0) {
+            $start    = 0;
+            $end      = _convert_pct($duration0, $total_dur);
+            $duration = $duration0;
+        } elsif (defined $start0 && defined $end0 && !defined $duration0) {
+            $start    = _convert_pct($start0, $total_dur);
+            $end      = _convert_pct($end0, $total_dur);
+            $duration = $end - $start;
+        } elsif (defined $start0 && !defined $end0 && defined $duration0) {
+            $start    = _convert_pct($start0, $total_dur);
+            $duration = _convert_pct($duration0, $total_dur);
+            $end      = $start + $duration;
+        } elsif (!defined $start0 && defined $end0 && defined $duration0) {
+            $end      = _convert_pct($end0, $total_dur);
+            $duration = _convert_pct($duration0, $total_dur);
+            $start    = $end - $duration;
+        } elsif (defined $start0 && defined $end0 && !defined $duration0) {
+            $start    = _convert_pct($start0, $total_dur);
+            $end      = _convert_pct($end0, $total_dur);
+            $duration = $end - $start;
+        } elsif (defined $start0 && defined $end0 && defined $duration0) {
+            return [409, "Please only specify 'start' & 'end', 'start' & 'duration', or 'end' & 'duration', not all three"];
+        } else {
+            return [500, "Internal bug"];
+        }
+
+        do { $envres->add_result(400, "Start time ($start) for video '$file' is negative, skipped", {item_id=>$j}); next }   if $start < 0;
+        do { $envres->add_result(400, "End time ($end) for video '$file' is negative, skipped", {item_id=>$j}); next }       if $end < 0;
+        do { $envres->add_result(400, "Non-positive duration ($duration) for video '$file', skipped", {item_id=>$j}); next } if $duration <= 0;
+        do { $envres->add_result(400, "Start time ($start) is larger than end time ($end) for video '$file', skipped", {item_id=>$j}); next } if $end < $start;
+        do { $envres->add_result(400, "Start time ($start) exceeds the total duration of video for video '$file', skipped", {item_id=>$j}); next }  if $start > $total_dur;
+        do { $envres->add_result(400, "End time ($end) exceeds the total duration of video for video '$file', skipped", {item_id=>$j}); next }      if $start > $total_dur;
+        do { $envres->add_result(400, "Duration ($duration) exceeds the total duration of video for video '$file', skipped", {item_id=>$j}); next } if $duration > $total_dur;
+
+        if ($start == 0 && $end == $total_dur) {
+            $envres->add_result(409, "Can't cut out the whole video duration", {item_id=>$j});
+            next;
+        }
+
+        log_trace "Video %s, start=%s, duration=%s, end=%s", $file, $start, $duration, $end;
+        require IPC::System::Options;
+
+        my $label1 = sprintf 'cut_out_%s_to_%s_left', $start, $end;
+        my $ofile1 = $file;
+        if ($ofile1 =~ /\.\w+\z/) { $ofile1 =~ s/(\.\w+)\z/.$label1$1/ } else { $ofile1 .= ".$label1" }
+        IPC::System::Options::system(
+            {log=>1, dry_run=>$args{-dry_run}},
+            "ffmpeg", "-i", $file, ($args{copy} ? ("-c", "copy") : ()), "-ss", 0, "-t", $start, $ofile1);
+        my ($exit_code1, $signal1, $core_dump1) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
+        if ($exit_code1) {
+            $envres->add_result(500, "ffmpeg exited $exit_code1 (sig $signal1) for video $file (left part): $!", {item_id=>$j});
+            next FILE;
+        }
+
+        my $label2 = sprintf 'cut_out_%s_to_%s_right', $start, $end;
+        my $ofile2 = $file;
+        if ($ofile2 =~ /\.\w+\z/) { $ofile2 =~ s/(\.\w+)\z/.$label2$1/ } else { $ofile2 .= ".$label2" }
+        IPC::System::Options::system(
+            {log=>1, dry_run=>$args{-dry_run}},
+            "ffmpeg", "-i", $file, ($args{copy} ? ("-c", "copy") : ()), "-ss", $start+$duration, "-t", $total_dur-$duration, $ofile2);
+        my ($exit_code2, $signal2, $core_dump2) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
+        if ($exit_code2) {
+            $envres->add_result(500, "ffmpeg exited $exit_code2 (sig $signal2) for video $file (right part): $!", {item_id=>$j});
+            next FILE;
+        }
+
+        my ($tempfh, $tempname) = File::Temp::tempfile(DIR => $CWD);
+        print $tempfh "file $ofile1\n";
+        print $tempfh "file $ofile2\n";
+        close $tempfh;
+
+        my $label3 = sprintf 'cut_out_%s_to_%s', $start, $end;
+        my $ofile3 = $file;
+        if ($ofile3 =~ /\.\w+\z/) { $ofile3 =~ s/(\.\w+)\z/.$label3$1/ } else { $ofile3 .= ".$label2" }
+        IPC::System::Options::system(
+            {log=>1, dry_run=>$args{-dry_run}},
+            "ffmpeg", "-f", "concat", "-i", $tempname, "-c", "copy", $ofile3,
+        );
+        my ($exit_code3, $signal3, $core_dump3) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
+            if ($exit_code3) {
+            $envres->add_result(500, "ffmpeg exited $exit_code3 (sig $signal3) for video $file (merging): $!", {item_id=>$j});
+            next FILE;
+        }
+
+        unlink $ofile1;
+        unlink $ofile2;
+        unlink $tempname;
+
+        $envres->add_result(200, "Video $file successfully censored", {item_id=>$j});
     } # for $file
 
     $envres->as_struct;
@@ -609,9 +818,110 @@ App::FfmpegUtils - Utilities related to ffmpeg
 
 =head1 VERSION
 
-This document describes version 0.013 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2023-12-13.
+This document describes version 0.014 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2024-09-22.
 
 =head1 FUNCTIONS
+
+
+=head2 cut_duration_from_video
+
+Usage:
+
+ cut_duration_from_video(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Cut (censor out) a duration out of a video.
+
+Examples:
+
+=over
+
+=item * Specify start & end only (using h:m:s notation), the result is 100s.cut_50_to_63.mp4:
+
+ cut_duration_from_video(files => ["100s.mp4"], end => "00:01:03", start => "00:00:50");
+
+=item * Specify start & duration only (using seconds), the result is 100s.cut_50_to_63.mp4:
+
+ cut_duration_from_video(files => ["100s.mp4"], duration => 13, start => 50);
+
+=item * Specify end & duration only (using human & ISO 8601 notation), the result is 100s.cut_50_to_63.mp4:
+
+ cut_duration_from_video(files => ["100s.mp4"], duration => "13s", end => "PT63S");
+
+=back
+
+This utility uses I<ffmpeg> (particularly the C<-t> and C<-ss>) option to cut a
+portion (time range) out of a video. It can be used to remove an unwanted scene
+from a video.
+
+Compared to using C<ffmpeg> directly, this wrapper offers convenience of more
+flexibility in specifying times and duration (e.g. '15s' as well as '00:10' as
+well as 'PT1M30S'), specifying only 'end' and 'duration', handling multiple
+files, automatically choosing output filename, and tab completion.
+
+Alternatives:
+
+=over
+
+=item 1. If you just want to play a video and censor out certain parts, you can use
+create a playlist of segments called an EDL file. See for example:
+
+=back
+
+L<https://github.com/mpv-player/mpv/blob/master/DOCS/edl-mpv.rst>
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<copy> => I<bool>
+
+Whether to use the "copy" codec (fast but produces inaccurate timings).
+
+=item * B<duration> => I<duration|percent_str>
+
+(No description)
+
+=item * B<end> => I<duration|percent_str>
+
+(No description)
+
+=item * B<files>* => I<array[filename]>
+
+(No description)
+
+=item * B<start> => I<duration|percent_str>
+
+(No description)
+
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=E<gt>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
 
 
 =head2 cut_video_by_duration
@@ -682,6 +992,10 @@ Whether to use the "copy" codec (fast but produces inaccurate timings).
 (No description)
 
 =item * B<files>* => I<array[filename]>
+
+(No description)
+
+=item * B<overwrite> => I<bool>
 
 (No description)
 
@@ -786,6 +1100,10 @@ Set audio sample rate, in Hz.
 
 Set frame rate, in fps.
 
+=item * B<overwrite> => I<bool>
+
+(No description)
+
 =item * B<preset> => I<str> (default: "veryslow")
 
 (No description)
@@ -868,6 +1186,10 @@ Whether to use the "copy" codec (fast but produces inaccurate timings).
 
 (No description)
 
+=item * B<overwrite> => I<bool>
+
+(No description)
+
 =item * B<parts> => I<posint>
 
 (No description)
@@ -908,6 +1230,12 @@ Source repository is at L<https://github.com/perlancar/perl-App-FfmpegUtils>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
 =head1 CONTRIBUTING
 
 
@@ -928,7 +1256,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

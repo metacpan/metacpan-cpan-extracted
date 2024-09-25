@@ -5,8 +5,8 @@
 # related or neighboring rights.  Attribution is requested but is not required.
 use strict; use warnings FATAL => 'all';
 
-our $VERSION = '1.025'; # VERSION
-our $DATE = '2024-09-02'; # DATE
+our $VERSION = '1.026'; # VERSION
+our $DATE = '2024-09-24'; # DATE
 
 #use 5.12; # for unicode_strings
 use v5.18; # for lexical_subs
@@ -33,7 +33,7 @@ use List::Util qw/min max any first/;
 use List::MoreUtils qw/indexes/;
 use Scalar::Util qw/openhandle/;
 use Pod::Usage qw/pod2usage/;
-use Spreadsheet::Edit 1000.006 qw(title2ident);
+use Spreadsheet::Edit 1000.016 qw(title2ident);
 use Spreadsheet::Edit::IO qw/convert_spreadsheet
              sheetname_from_spec filepath_from_spec form_spec_with_sheetname/;
 use Spreadsheet::Edit::Log ':btw=DS ${lno}:';
@@ -149,7 +149,7 @@ my %opts = (
   quote_char      => '"',
   sep_char        => ',',
   encoding        => 'UTF-8',
-  trunc_title_width => $maxwidth > 60 ? int($maxwidth/3) : 20,
+  trunc_title_width => max(20, int($maxwidth/3)),
 );
 my $method = "native";
 my $help;
@@ -329,15 +329,18 @@ foreach my $N (1,2) {
 
 my $onlyone = @{ $opts{"csvpaths1"} } == 1 && @{ $opts{"csvpaths2"} } == 1;
 
-# If --sheets arg(s) were given, diff only pairs of so-named sheets.
+# If --sheets arg(s) were given, diff only pairs of so-named sheets;
+#
 # Otherwise if each file contains only one sheet then diff them regardless
-# of their names, but with a multi-sheet file diff all (and only) pairs of
-# same-named sheets.
+# of their names;
+#
+# But with a multi-sheet file diff only pairs of same-named sheets
+# and warn about any sheet names which exist only in one file.
 
 my $status = 0;
 $opts{sheetname_str} = "";
 my @pairs;  # { n1 n2 label1 label2 sheetname_str }
-if (@{$opts{sheet_names}//[]}) {
+if (@{$opts{sheet_names}//[]} > 0) {
   # Sheet names were specified; corresponding sheets might have different
   # names if the user specified a regex.
   foreach (@{$opts{sheet_names}}) {
@@ -408,7 +411,9 @@ foreach my $h (@pairs) {
   $opts{label1} = $label1;
   $opts{label2} = $label2;
   $opts{sheetname_str} = $sheetname_str // "";
-  $status = max($status, &process_pair); # *THE WORK HAPPENS HERE*
+  $status = max($status,
+                &process_pair # *THE WORK HAPPENS HERE*
+               );
 }
 
 exit $status;
@@ -416,7 +421,7 @@ exit $status;
 sub process_pair {
   # N.B. %opts includes "origpathN" and "pathN" (the latter refers to a csv),
   # "sheetnameN", and "labelN".
-  # "sheetname_str" is "" or "title...\n" to print before the first diff.
+  # "sheetname_str" is "" or "sheet-pair description" to print before diffs.
   #
   # ---- Read data into memory, delete ignored columns, etc. ----
   my $obj = main::Differ->new( %opts );
@@ -629,11 +634,13 @@ sub new {
     }
   }
   ##my @sheet_new_opts = ($hash{debug} ? (verbose => 1) : (silent => 1)); # no alias warns
-  my @sheet_new_opts = (silent => 1); # no alias warns
+  ##my @sheet_new_opts = (silent => 1); # no alias warns
+  ##my @sheet_new_opts = (silent => 1); # no alias warns
   for my $N (1, 2) {
     # Read into memory
     my $path = $hash{"path$N"} // confess "'path$N' option is required";
-    my $sh = Spreadsheet::Edit->new(@sheet_new_opts);
+    ##my $sh = Spreadsheet::Edit->new(@sheet_new_opts);
+    my $sh = Spreadsheet::Edit->new();
     $sh->options(silent  => $hash{silent},
                  verbose => $hash{debug},
                  debug   => $hash{debug});
@@ -645,17 +652,34 @@ sub new {
                            quote_char   => $hash{quote_char},
                            sep_char     => $hash{sep_char},
                            encoding     => $hash{encoding},
-                           (defined($title_row_spec)
-                             ? $title_row_spec == 0
-                               ? (title_rx => undef)
-                               : (title_rx => ($title_row_spec-1),
-                                  required => [compile_if_regex
-                                   @$always_show_columns,@$id_columns,@columns],
-                                 )
-                             : () # allow auto-detect if not specified
-                           ),
+                           data_source  => $hash{"label$N"}, # "path.xls[sheet]"
+                           title_rx     => undef, # don't detect titles yet
                           }, $path
                          );
+
+    if (defined($title_row_spec) && $title_row_spec == 0) {
+      # User explicitly specified no titles
+    }
+    elsif (defined $title_row_spec) {
+      # A title row was specified; use it and allow croaking on error
+      $sh->title_rx($title_row_spec-1);  # 0-based row index
+    } else {
+      # Try to auto-detect a title row, requiring any specified columns,
+      # but assume there are no titles if an error occurred (which allows
+      # identical sheets to compare successfully, and otherwise diffs
+      # will be shown using absolute column letters only).
+      eval {
+        $sh->title_rx( { required => [compile_if_regex
+                                 @$always_show_columns,@$id_columns,@columns],
+                       },
+                       "auto"
+                     );
+      };
+      if ($@) {
+        oops "error but left title_rx defined!\n$@" if defined $sh->title_rx();
+        oops $@ if $@ !~ /failed because/; # internal error?
+      }
+    }
 
     $hash{"sheet$N"} = $sh;
     $sh->attributes->{ORIG_PATH} = $path;
@@ -759,7 +783,8 @@ sub new {
     if (defined(my $title_row = $sh->title_row)) {
       if (__truncate($title_row, $hash{trunc_title_width})) {
         # Is this necessary (or wise) ???
-        $sh->title_rx($sh->title_rx); # re-compute %colx
+        $sh->title_rx({silent=>1}, # don't show column-alias warnings
+                      $sh->title_rx); # re-compute %colx
       }
     }
   }

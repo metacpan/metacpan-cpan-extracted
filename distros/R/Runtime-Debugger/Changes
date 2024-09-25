@@ -1,6 +1,12 @@
 Revision history for Runtime-Debugger
 
 =================
+1.05 - 2024-09-24
+=================
+
+Removed debug code on loading.
+
+=================
 1.04 - 2024-09-20
 =================
 

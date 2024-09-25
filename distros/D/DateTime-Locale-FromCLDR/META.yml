@@ -39,5 +39,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR/issues
   repository: https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR
-version: v0.4.1
+version: v0.4.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

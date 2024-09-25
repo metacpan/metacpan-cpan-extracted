@@ -65,9 +65,15 @@ BEGIN{
   STDERR->autoflush(1);
   STDOUT->autoflush(1);
 
-  # Assume a fixed terminal width for testing, and avoid probing the terminal
-  # (there may be no terminal in some test setups).
-  $ENV{COLUMNS} = 80;
+  # NO!  Momentarily I thought it would be a Good Thing to set a standard
+  # terminal width in COLUMNS ignoring the actual terminal.  But some
+  # modules test term width autodetect by unsetting COLUMNS and would
+  # then get a (possibly) different result.
+  #
+  # So it is necessary for *every* package which probes for terminal width
+  # use robust code which won't fail even if there is no terminal
+  # (which is gross -- see Data::Dumper::Interp::_get_terminal_width)
+  ##$ENV{COLUMNS} = 80;
 }
 use POSIX ();
 use utf8;

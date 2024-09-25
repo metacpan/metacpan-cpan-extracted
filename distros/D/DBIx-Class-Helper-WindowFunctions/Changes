@@ -1,5 +1,14 @@
 Revision history for DBIx-Class-Helper-WindowFunctions:
 
+v0.6.0    2024-09-24 16:32:13+01:00 Europe/London
+  [Enhancements]
+  - Add support for filter clauses GH #1.
+
+  - Add support for aggregate function filters without a window.
+
+  [Documentation]
+  - Updated documentation with more details.
+
 v0.5.0    2024-09-23 23:29:02+01:00 Europe/London
   [Incompatible Changes]
   - Removed deprecated DBIx::Class::Helper::ResultSet::WindowFunctions.

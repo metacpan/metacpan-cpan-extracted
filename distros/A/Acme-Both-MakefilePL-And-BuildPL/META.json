@@ -4,7 +4,7 @@
       "Thibault Duponchelle <thibault.duponchelle@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
@@ -13,26 +13,10 @@
       "version" : 2
    },
    "name" : "Acme-Both-MakefilePL-And-BuildPL",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "perl" : "5.006"
+            "Module::Build" : "0.4004"
          }
       },
       "test" : {
@@ -41,7 +25,18 @@
          }
       }
    },
+   "provides" : {
+      "Acme::Both::MakefilePL::And::BuildPL" : {
+         "file" : "lib/Acme/Both/MakefilePL/And/BuildPL.pm",
+         "version" : "0.03"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.01",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

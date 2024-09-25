@@ -1,4 +1,6 @@
-v1.025 - Avoid tester issues with terminal size when there is no tty
+v1.026 - Un-do 1.025 changes and use robust term width detector code.
+         Default to "no titles" if auto-detect fails.
+v1.025 - Set fixed COLUMNS to avoid tester issues with no terminal
 v1.024 - Remove deprecated "use feature 'switch'"
 v1.023 - Remove multiple 'use version' statements (deprecated in Perl 5.39)
 v1.022 - Fix bug where files were considered identical if they differed

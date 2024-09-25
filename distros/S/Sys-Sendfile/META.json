@@ -1,7 +1,7 @@
 {
    "abstract" : "Zero-copy data transfer",
    "author" : [
-      "Leon Timmermans <leont@cpan.org>"
+      "Leon Timmermans <fawaka@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
@@ -51,22 +51,22 @@
    "provides" : {
       "Sys::Sendfile" : {
          "file" : "lib/Sys/Sendfile.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-sys-sendfile at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Sys-Sendfile"
+         "web" : "https://github.com/Leont/sys-sendfile/issues"
       },
+      "homepage" : "http://search.cpan.org/~leont/Sys-Sendfile/",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/Leont/sys-sendfile.git",
          "web" : "https://github.com/Leont/sys-sendfile"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

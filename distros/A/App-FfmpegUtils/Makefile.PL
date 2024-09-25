@@ -14,9 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-FfmpegUtils",
   "EXE_FILES" => [
+    "script/cut-duration-from-video",
     "script/cut-video-by-duration",
     "script/reencode-video-with-libx264",
     "script/split-video-by-duration",
+    "script/vcensor",
     "script/vcut",
     "script/vreencode",
     "script/vsplit"
@@ -40,7 +42,9 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
+    "File::Temp" => "0.2310",
     "File::Which" => 0,
+    "File::chdir" => 0,
     "IPC::System::Options" => "0.339",
     "Log::ger" => "0.038",
     "Math::Image::CalcResized" => "0.004",
@@ -65,7 +69,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -89,7 +93,9 @@ my %FallbackPrereqs = (
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
   "File::Spec" => 0,
+  "File::Temp" => "0.2310",
   "File::Which" => 0,
+  "File::chdir" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "IPC::System::Options" => "0.339",

@@ -1,0 +1,22 @@
+#!perl
+
++{
+    table_class => 'Artist',
+    attr        => {
+        columns   => [qw/ name /],
+        '+select' => {
+            sum     => [qw/fingers/],
+            -filter => { hats => { '>=', 2 }, fingers => 10 },
+            -over   => {
+                partition_by => [qw/ name hats /],
+                order_by     => [ 'name', { -desc => 'id' } ],
+            },
+        },
+    },
+    sql => q{ SELECT me.name,
+              SUM(fingers) FILTER (WHERE (fingers = ? AND hats >= ?)) OVER
+                (PARTITION BY name, hats ORDER BY name, id DESC)
+              FROM artist me
+    },
+    bind => [ [ { dbic_colname => "fingers" }, 10 ], [ { dbic_colname => "hats" }, 2 ], ],
+};

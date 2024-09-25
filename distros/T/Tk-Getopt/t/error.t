@@ -2,7 +2,6 @@
 # -*- perl -*-
 
 #
-# $Id: error.t,v 1.2 2008/02/08 22:30:43 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -18,12 +17,11 @@ BEGIN {
 	print "1..0 # skip: no Tk, File::Temp and/or Test::More module\n";
 	exit;
     }
-
-    if ($^O eq 'MSWin32') {
-	print "1..0 # skip: Does not work under MSWin32, probably\n";
-	exit;
-    }
 }
+
+plan skip_all => "Does not work under MSWin32, probably" if $^O eq 'MSWin32';
+
+plan skip_all => "Error case cannot be reproduced when running as root" if $> == 0;
 
 use Tk::Getopt;
 

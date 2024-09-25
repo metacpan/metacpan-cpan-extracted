@@ -3,22 +3,21 @@ abstract: 'The great new Acme::Both::MakefilePL::And::BuildPL!'
 author:
   - 'Thibault Duponchelle <thibault.duponchelle@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Acme-Both-MakefilePL-And-BuildPL
-no_index:
-  directory:
-    - t
-    - inc
-requires:
-  perl: '5.006'
-version: '0.01'
+provides:
+  Acme::Both::MakefilePL::And::BuildPL:
+    file: lib/Acme/Both/MakefilePL/And/BuildPL.pm
+    version: '0.03'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

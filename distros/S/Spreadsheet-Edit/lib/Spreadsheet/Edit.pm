@@ -15,8 +15,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-07-06'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.016'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-09-24'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -1432,7 +1432,7 @@ sub fmt_sheet($) {
   return "undef" unless defined($sheet);
   #oops unless ref($sheet) ne "" && $sheet->isa(__PACKAGE__);
   local $$sheet->{verbose} = 0;
-  my $desc = $$sheet->{sheetname} || $$sheet->{data_source} || "no data_source";
+  my $desc = $$sheet->{data_source} || $$sheet->{sheetname} || "no data_source";
   if (length($desc) > $trunclen) { $desc = substr($desc,($trunclen-3))."..." }
   my $r = addrvis($sheet)."($desc)";
   $r
@@ -2650,14 +2650,14 @@ sub read_spreadsheet($;@) {
 
   __validate_opthash( $opthash,
                       [
-      qw/title_rx/,
+      qw/data_source title_rx/,
       qw/iolayers encoding verbose silent debug/,
       qw/tempdir use_gnumeric raw_values sheetname/, # for OpenAsCsv
       qw/required min_rx max_rx first_cx last_cx/, # for title_rx
                       ],
       desc => "read_spreadsheet option",
-      undef_ok_only => [qw/title_rx iolayers encoding verbose silent debug
-                           use_gnumeric/] );
+      undef_ok_only => [qw/data_source title_rx iolayers encoding
+                           verbose silent debug use_gnumeric/] );
 
   # convert {encoding} to {iolayers}
   if (my $enc = delete $opthash->{encoding}) {
@@ -2722,7 +2722,7 @@ sub read_spreadsheet($;@) {
   }
   close $fh || croak "Error reading $hash->{csvpath}: $!\n";
 
-  $$self->{data_source} =
+  $$self->{data_source} = $opthash->{data_source} ||
     form_spec_with_sheetname($hash->{inpath}, $hash->{sheetname});
   $$self->{sheetname} = $hash->{sheetname}; # possibly undef
 
@@ -2734,7 +2734,6 @@ sub read_spreadsheet($;@) {
   foreach (qw/required min_rx max_rx first_cx last_cx/) {
     $autodetect_opts{$_} = $opthash->{$_} if exists($opthash->{$_});
   }
-
   my $arg = exists($opthash->{title_rx}) ? $opthash->{title_rx} : 'auto';
   { local $$self->{cmd_nesting} = $$self->{cmd_nesting} + 1;
     $autodetect_opts{verbose} = 0; # suppress logging

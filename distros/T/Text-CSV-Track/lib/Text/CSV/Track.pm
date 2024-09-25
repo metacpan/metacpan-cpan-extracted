@@ -1,6 +1,6 @@
 package Text::CSV::Track;
 
-our $VERSION = '0.9';
+our $VERSION = '1.00';
 use 5.006;
 
 use strict;

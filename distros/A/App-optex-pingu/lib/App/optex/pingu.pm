@@ -1,6 +1,6 @@
 package App::optex::pingu;
 
-my $VERSION = '0.99';
+my $VERSION = '0.9901';
 
 use v5.24;
 use warnings;
@@ -148,7 +148,7 @@ B<pingu> command.  So make an alias in F<~/.optex.d/config.toml> to
 call L<ping(1)> command instead:
 
     [alias]
-        pingu = "ping -Mpingu --pingu"
+        pingu = "ping -Mpingu"
 
 =head1 MAKING NEW PING OPTION
 
@@ -160,17 +160,17 @@ directory:
 
 And create an rc file F<~/.optex.d/ping.rc> for B<ping>:
 
-    option --with-pingu -Mpingu --pingu
+    option --pingu -Mpingu
 
 Then pingu will show up when you use B<--with-pingu> option to execute
 L<ping(1)> command:
 
-    $ ping --with-pingu localhost -c15
+    $ ping --pingu localhost -c15
 
 If you want to enable this option always (really?), put next line in
 your F<~/.optex.d/ping.rc>:
 
-    option default --with-pingu
+    option default --pingu
 
 =head1 SEE ALSO
 
@@ -200,6 +200,7 @@ use List::Util qw(first pairmap);
 use Getopt::EX::Colormap qw(colorize);
 use Time::HiRes qw(usleep);
 use Scalar::Util;
+use Hash::Util qw(lock_keys);
 *is_number = \&Scalar::Util::looks_like_number;
 
 my $image_dir = $ENV{OPTEX_PINGU_IMAGEDIR} //= dist_dir 'App-optex-pingu';
@@ -211,6 +212,7 @@ our %opt = (
     repeat   => 1,
     interval => 0.1,
     );
+lock_keys %opt;
 
 sub hash_to_spec {
     pairmap {
@@ -286,7 +288,7 @@ sub pingu {
 
 sub set {
     while (my($k, $v) = splice(@_, 0, 2)) {
-	exists $opt{$k} or next;
+	exists $opt{$k} or die "$k: invaid paraeter.\n";
 	$opt{$k} = $v;
     }
     ();
@@ -295,6 +297,9 @@ sub set {
 1;
 
 __DATA__
+
+# define --pingu for backward compatibility
+option --pingu $<ignore>
 
 #  LocalWords:  pingu optex asc Unicode Cyan cpanminus cpanm rc
 #  LocalWords:  localhost Kazumasa Utashiro

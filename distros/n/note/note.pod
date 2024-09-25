@@ -32,6 +32,9 @@ by the pwsafe3 backend, which is encrypted by default.
 
 Use another config file than the default ~/.noterc.
 
+=item I<-n, --new>
+
+Create a new note entry.
 
 =item I<-l, --list [topic]>
 

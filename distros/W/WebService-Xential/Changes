@@ -1,5 +1,10 @@
 Revision history for Webservice-Xential
 
+0.003     2024-09-24 22:21:09Z
+
+    * Use correct param name for userName
+    * Use correct Basic auth
+
 0.002     2024-09-19 04:54:29Z
 
     * Update POD
