@@ -1,6 +1,7 @@
-Data::Show version 0.002004
+Data::Show version 0.004000
 
-    Wrapper around Data::Dump to provide better context information
+    Wrapper around Data::Dump (or other dumper modules)
+    to provide better context information
 
 
 INSTALLATION

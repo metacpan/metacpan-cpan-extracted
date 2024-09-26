@@ -1,0 +1,331 @@
+# The Change Log for Fred::Fish::DBUG
+#                and Fred::Fish::DBUG::ON
+#                and Fred::Fish::DBUG::OFF
+
+# The basic algorighm is in the public domain and this implementation has been
+# customized to support Perl features while remaining faithful to the original
+# intent.
+
+# ------------------------------------------------------------------------
+# Developer's Note:
+#   Remember to run "full_developer_test.pl" for the deepest possible
+#   testing of this module.  Everyone else only needs to do "make test".
+# ------------------------------------------------------------------------
+
+# TODO:
+#  1) Need test case of forked processes using threads.  Skip test
+#     if threads/forks are not supported!
+#  2) Need test case of threads forking processes!  (reverse of
+#     previous test!)
+#  3) Need test case with multiple packages in one file which use different
+#     on/off settings.
+
+
+Version - YYYY/MM/DD
+---------------------
+2.03 2024-08-05 08:30:00
+  - Split Signal logging from ON.pm to Signal.pm, required an update to most
+    test scripts as well.
+  - Split TIE logging from ON.pm to TIE.pm, required an update to
+    t/62-tie_test.t as well.
+  - Updated copyright in all *.pm files to 2024.
+  - Added DBUG_SPECIAL_LAST option to DBUG_RETURN_SPECIAL().
+  - Added new test case t/25-return_special_last.t
+  - Added DBUG_ARRAY_RETURN ().
+  - Added new test case t/26-return_array.t
+  - Cleaned up some POD text.
+
+2.02 2021-04-16 08:30:00
+  - Updated the copyright to 2021 in all files.
+  - Major updates to the POD in all *.pm files dealing with changes made
+    in the previous release.
+  - Promoted a lot of ok() calls to is() calls in the t/*.t programs.
+  - Added is2() to helper1234.pm, which writes output of is() to fish.
+
+2.01 2020-09-23 08:30:00
+  - Major refactoring to make swapping between ON/OFF modules more intuitive
+    without requiring the end user to use non-standard loading of this module.
+    It now uses "use Fred::Fish::DBUG qw / mode /;"  instead of using special
+    logic in your program's BEGIN block.  But the old 1.xx style still works,
+    it now just looks very strange & creepy.
+  - Redid all the t/*.t test programs to take advantage of the new logic.
+  - Added a few new t/*.t test programs to deal with dual inheritance issues
+    to verify having ON in one file is compatible with having OFF in another.
+
+1.10 2020-03-03 08:30:00
+  - More minor speed enhancements.
+  - Fixed DBUG_PUSH() typo for chmod option detection.
+  - Now if fish is turned off for a masked arg/return value it will set
+    the masking count to -1 instead of 0.  Making the validation done by
+    t/off/helper1234.pm more accurate. (-1 means unknown count.)
+  - Fixed DBUG_RETURN() filtering issue.  Where DBUG_FILTER_LEVEL_FUNC
+    is off & DBUG_FILTER_LEVEL_ARGS is on with arguments to print.
+  - Fixed bug in test funcs using undefined hints.
+  Never Released this version.
+
+1.09 2020-02-20 08:30:00
+  - Updated the copyright to 2020 on all files.
+  - Fixed keep/kill_end_trace combination where the keep flag wasn't being
+    honored at all.
+  - Fixed issue with "kill_end_trace" wasn't being honored if exit() instead of
+    DBUG_LEAVE() was called. (or even if neither was called)  In this case at
+    least some END blocks will still write to fish since we were never given a
+    chance to prevent it.  But now the DBUG END block won't print out anything.
+  - Changed DBUG_LEAVE() in OFF.pm from a stub to have it call
+    _dbug_leave_cleanup() so that other modules using DBUG will terminate
+    cleanly afterwards so we won't hit one of the above bugs.
+  - Fixed some POD text in DBUG.pm
+  - Fixed some POD text in Tutorial.pm
+  - Fixed issue with PAUSE on & didn't call DBUG_LEAVE.
+  - Fixing so many END issues I broke down and had END call DBUG_LEAVE if it
+    hadn't already been called.  Had to tweak DBUG_LEAVE to allow this.  But
+    at least it centralized a lot of code.
+  - Fixed so sub-package Fred::Fish::DBUG::TIE is hidden from PAUSE per same
+    fix in Try::Tiny.
+  - Modified _indent_multi() to 1st check if option multi was used instead of
+    just falling through.
+  - t/25-eval_auto_balance.t - Added test cases demonstrating when DBUG_CATCH
+    must be used to avoid looking like your code is recursive when it isn't.
+  - Added option allow_utf8 to allow writing utf8/wide chars to a fish file.
+    Added test case t/80-foreign_language.t to test out, using Date::Language
+    for a source of foreign language text that uses UTF8.
+  - Speed enhancements, speeded up by changing most calls to _filter_on() to
+    calls to DBUG_EXECUTE() & other optimizations for when fish is turned off.
+  Never Released this version.
+
+1.08 2019-10-31 08:30:00
+  - Reordered the order the private methods appeared in DBUG, no logic changes,
+    so that all the Signal related methods were together at the end of the
+    module.
+  - Removed the unused _diff_ test function. No longer needed.
+  - Removed a depreciated Signal related BEGIN block as no longer needed since
+    it prevented the code reordering.
+  - Fixed bugs in _dbug_called_by() as new test cases came up.  Now will never
+    return a Fred::Fish::DBUG location.  It's one of the reasons why internal
+    calls to print from this module never honor the option who_called.
+  - Reorganized the parameters to DBUG_TIE_... functions.
+  - Fixed t/52-tie_test.t to use the new order.
+  - Module DBUG::TIE now uses _dbug_hack to control the fish printing.
+  - Replaced DBUG_REGISTER() with DBUG_MODULE_LIST().
+  - Merged Fred::Fish::DBUG::TIE back into the main module now that its working.
+    No real reason for keeping it separated any more.  Especially when the
+    previous release was never made public.  Also did quite a number of bug
+    fixes.  Mostly to break infinite recursion situations.
+  - Changed when the callback is called against a tied file handle.  It's now:
+       1) Write to fish.
+       2) "Chain the tie" or "write to STDOUT/STDERR" if no tie.  It assumes the
+          chained tie will handle the write to STDOUT/STDERR.
+       3) Call the callback function.
+  - Made the same changes to t/52-tie_test.t's tie test.
+  - Fixed full_developer_test.pl.src to allow it to run individual test progs
+    in the "t" sub-directory.  "prove" always reports failure if the prog is
+    located someplace else.  So in those cases it uses "perl" instead.
+  - full_developer_test.pl.src now makes sure the make variant selected actually
+    works before returning it.  (dmake vs gmake issue in Strawberry Perl)
+    Makes it easier to add new make variants in the future.
+  - No longer allows you to make the TIE chain to itself.
+  - More fixes to Tutorial.pm to clarify some of the examples.
+  - Fixed so option "kill_end_trace" works for all signals when die itself
+    wasn't being trapped.  Still a hole if trapped by eval and die is rethrown.
+    Or if trap die via module & later manually reset it.
+  - Fixed duplicate Ha Ha messages when trapping DIE & just trying to log it.
+  - Added simulate_windows_signal() to helper1234.pm to better simulate
+    generating signals on non-unix platforms.  Then updated the t/*.t programs
+    to use it.
+  - Added Fred::Fish::DBUG:SignalKiller as a helper module.  Not recommended
+    for general use.  Just written to prove why you don't want to do this.
+  - Added new test case t/27-SignalKiller.t
+  - Added new option "no_addresses" for DBUG_PUSH().  Allows for easier
+    comparison of fish logs using utilities like Unix's diff command.
+  Never Released this version.
+
+1.07 2019-06-26 08:30:00
+  - Added Fred::Fish::DBUG::TIE to the package.  So we can now trap messages
+    written to STDERR and STDOUT and log them to fish as well.
+  - Added test cases t/05-basic-tie.t and t/52-tie_test.t
+  - If the exit status didn't get printed in DBUG_LEAVE, it now gets printed
+    in the END block using a different filter level.
+  - Added DBUG_FILTER_LEVEL_STD as a new filter level to allow filtering
+    these trapped messages from STDOUT & STDERR.
+  - Added DBUG_CUSTOM_FILTER & it's inverse DBUG_CUSTOM_FILTER_OFF to allow
+    users to define their own customized filtering.
+  - Fixed _filter_lvl() to fully allow the DBUG_FILTER_LEVEL_... constants
+    when setting the filter level in all cases.
+  - Now calls _filter_on() all over the place internally instead of using
+    equivalent tests.  Required so custom filtering would work.
+  - Added Fred::Fish::DBUG::Tutorial to the package.  Gives a lot of
+    examples to make learning to use this module easier.
+  - Added t/06-basic-tutorial.t to verify no syntax issues.
+  - Fixed DBUG_EXECUTE to return -1 if writing to the screen like DBUG_ACTIVE
+    does.
+  - Added helper function _dbug_print_pkg_tag() for internal prints and then
+    modified the code to use it.
+  - Added _dbug_hack() so my test cases and helper modules can reset internal
+    configuration data before running commands depending on dynamic config
+    changes.  Also rewrote _dbug_forward_trapped_signal() to use it to make
+    it more reliable.
+  - Fixed so signals at least print out something even when pause was turned on.
+    But filtering can still suppress messages.  Mostly a consistency fix.  Before
+    some signals did and others didn't.
+  Never Released this version.
+
+1.06 2019-06-03 08:30:00
+  - More POD changes & typo fixes in DBUG.pm & OFF.pm.
+  - Fixes to examples in README.
+  - Fixes to trap signal logic.
+  - Added 5th flag to DBUG_DIE_CONTEXT.
+  - Retired DBUG_EVAL in favor of DBUG_CATCH.
+    *** Makes module Incompatible with the previous releases! ***
+  - Fixed to auto-balance the function/return values after an eval/try event
+    was trapped without the need to call DBUG_CATCH() yourself.  Making this
+    call optional.
+  - Added t/25-eval_auto_balance.t to test this logic out!
+  - Fixed bug in DBUG_PUSH() handling the "keep" option.
+  Never Released this version.
+
+1.05 2019-04-12 08:30:00
+  - Added POD to DBUG.pm describing issues with using goto.
+  - Clarified some masking POD text.
+  - Fixed _dbug_log_signal() to prevent circular DBUG signal handlers.
+  - DBUG_ENTER_BLOCK() now supports arguments the same way DBUG_ENTER_FUNC()
+    does.
+  - Updated all t/*.t programs to add the arguments to DBUG_ENTER_BLOCK if
+    appropriate.  (Used to simulate it in the tests if needed.)
+  - Renamed test t/47-*.t since it's so slow when fish is turned on.
+  - Added t/29-AUTOLOAD-test.t to help demonstrate fish logging issues
+    caused by the use of goto's.  And using AUTOLOAD was the easiest way
+    to demonstrate the problems and solutions.
+  - Added test module t/off/helper1234.pm to centralize common tasks and make
+    it easier to make significant changes to the module.  Also centralized
+    the hooks into the module for gathering validation results.
+  - Updated all test progs to use t/off/helper1234.pm to standardize any
+    initialization and reporting on results.
+  - Modified DBUG.pm to no longer trap DIE & WARN by default and updated
+    the pod to say so.  Also no longer allows undef for selecting default
+    actions.  There are no longer any valid defaults, just recommendations.
+  - Now allows DIE & WARN to perform all the same actions as the other
+    signals.  Required a significant rewrite of the signal handling funcs.
+  - Changed how DBUG_DIE_CONTEXT worked.  Also removed all it's old
+    constants since no longer used.
+  - Added new test case using Tiny::Try to verify it works same as eval
+    as far as the fish logs are concerned!  Required a hack in DBUG to
+    report the who_called info with DBUG_ENTER_FUNC() to report entry
+    was in the try/catch/finally blocks instead of Tiny/Try.pm.  It may
+    not work this way with all the other Try modules.
+  - Implemented option "keep".
+  - Added test_object.pm to allow testing of special object functions
+    with who_called turned on for t/30-func_who_called_trace.t.
+
+1.04 2019-03-05 08:30:00
+  - Fixed which_make() windows bug in "full_developer_test.pl.src".
+    Then modified it to tell which 'make' variant was selected.
+    Next made it more modular and easier to support.
+  - Added color support to DBUG.pm via DBUG_SET_FILTER_COLOR().
+    Accepts both the color names in strings & the color macros.
+  - Added color testing to t/40-filter-tests.t
+  - Also created t/45-filter-macro-tests.t so could test using the color macros.
+  - Did away with DBUG_BEGIN() & replaced with DBUG_RETURN_SPECIAL() once
+    it became obvious that not all methods in a module would want to always
+    use the same mapping logic.  Greatly simplified DBUG_RETURN().
+  - Modified the test cases to follow this new logic with DBUG_RETURN_SPECIAL().
+  - Merged DBUG_MASK_HASH() into DBUG_MASK() and then removed DBUG_MASK_HASH().
+  - Modified the test cases to follow the new logic for DBUG_MASK().
+  - Allowed DBUG_FILTER_LEVEL_... constants to be used as tags in DBUG_PRINT().
+    Requested but not really recommended.  Using text tags makes it a more
+    readable fish log file.
+  - Fixed bug in _dbug_called_by() in DBUG.pm & put into OFF.pm as well
+    so can be used by test programs.  Also changed what arguments to expect.
+  - Added direct test for _dbug_called_by() to t/30-func_who_called_trace.t
+    to help with debugging the "who_called" option.
+  - Fixed all test cases to correctly reference non-exposed functions using
+    "can".  Since the module name is a variable.
+  - Added "limit" option to DBUG_PUSH() method in DBUG.pm.
+  - Added "strip" option to DBUG_PUSH() method in DBUG.pm.
+  - Added "delay" option to DBUG_PUSH() method in DBUG.pm.
+  - Added "elapsed" option to DBUG_PUSH() method in DBUG.pm.
+  - Fixed "detach" threads issue in the test scripts.  They now wait until all
+    threads complete so don't leave behind scratch files owned by threads killed
+    when the main thread terminates.  Forked process don't have this problem.
+  - Now uses DBUG_ACTIVE() & DBUG_EXECUTE() internally instead of hard coding
+    the equivalent tests all over the place.
+  - DBUG_ENTER_FUNC() & DBUG_RETURN() now convert any CODE references into
+    their function names before printing out the argument/return list.  Or
+    \&__ANON__ for anonymous functions.
+  - DBUG_PRINT() now does this CODE reference conversion as well for individual
+    arguments.  But not if buried inside a string.
+  - DBUG_ENTER_BLOCK() now uses ">>${name}" instead of ">${name}" to distinguish
+    it from DBUG_ENTER_FUNC().  And the return now uses "<<${name}".
+  - Fixed bug in DBUG_FIND_CURRENT_TRAPS() where it returned unusable info for
+    anonymous functions.  Now always returns CODE references instead of strings
+    containing the name of the function(s) called.
+  - Fixed t/20-signal_traps.t to test new results from DBUG_FIND_CURRENT_TRAPS()
+    correctly.
+  - Fixed bugs in README variable load examples.
+
+1.03 2019-01-10 08:30:00
+  - More POD clean up.
+  - Updated copyright to say 2019.
+  - Improved detection if program is run via "make test" in BEGIN.
+  - Made DBUG_FIND_CURRENT_TRAPS() plural to avoid confusion.
+    *** Makes it Incompatible with previous releases! ***
+  - Fixed _dbug_log_signal to convert CODE references back into their function
+    names for use by DBUG_FIND_CURENT_TRAPS().
+  - When trapping warnings, always makes sure the file/line is written to fish
+    even when the caller specifically suppressed it.
+  - Added new function DBUG_MASK_NEXT_FUNC_CALL() & modified
+    DBUG_ENTER_FUNC() to use the results.  Also put in OFF.pm
+  - To help with auto testing of module, also wrote test helper method
+    dbug_mask_argument_counts() in both *.pm files.
+  - Changed DBUG_PUSH() option from "pid" to "multi" to make it more obvious
+    what it's for.  (Multi-Thread and/or Multi-Process tracing.)
+  - Fixed DBUG_PUSH() initialization to allow for it to be called outside of
+    the "main" function of your program!
+  - Fixed DBUG_PRINT() to prepend the thread info on all lines when "multi"
+    option is in use.  Otherwise leaves blank as before.  Allows us to break
+    up a fish file trace by thread when multiple threads write to it.
+  - Fixed bug in DBUG_TRAP_SIGNAL() handling option DBUG_SIG_ACTION_REMOVE.
+  - Stopped polluting Perl's namespace by no longer exporting the test functions
+    used by the t/*.t programs.  Then fixed all the t/*.t programs to explicitly
+    reference them as non-exposed functions.
+
+  - Added test case dependencies to Makefile.PL & added PL_FILES option.
+  - Wrote full_developer_test.pl.src to help with running the test cases in
+    all three modes.  Running 'make' creates the full_developer_test.pl prog
+    itself.  Had to do indirectly so that 'make install' wouldn't try to
+    install it under the perl bin tree.
+  - Fixed all 4 basic scripts to use BAIL_OUT() if module fails to load.
+    Catches compile issues early & aborts "make test"!
+  - Fixed all t/*.t test programs to put their fish files in t/fish/*.fish.txt
+  - Added new test t/35-func_masking.t
+  - Added t/60-multi_thread_test.t for thread testing with a common shared
+    fish log.  Must use a 'grep' like tool to make this fish log readable!
+    Ex:  grep ^[0-9]*-10: t/fish/60-multi_thread_test.fish.txt
+    Strips out the trace of thread 10.
+    Ex:  grep ^[0-9]*-0: t/fish/60-multi_thread_test.fish.txt
+    Shows just the trace of the main thread!
+  - Added t/65-multi_thread_sep_logs_test.t to test out threads having their
+    own log files.
+  - Added t/67-multi_thread_buggy_usage.t to show incorrect usage of threads.
+  - Fixed all t/*.t test progs to treat any unexpected warnings as a failed test
+    case or a reason to call BAIL_OUT() in the 4 basic tests!  There were still
+    many cases where a warning was expected!
+  - Added t/70-fork_test.t as a new test case.
+  - Fixed issues with the test cases run while using Fred::Fish::DBUG::OFF.
+  - Fixed some README typos/changes.
+  - Added the new test progs to the MANIFEST.
+
+1.02 2018-08-06 08:30:00
+  - Some code clean up
+  - Some POD clean up
+  - Some polishing of the t/*.t test progs!
+  - Converted Fred::Fish::DBUG::OFF to inherit from Fred::Fish::DBUG to avoid
+    compatibility issues in the future.  Most of the functions are still
+    overridden as stubs though.
+  Never Released this version.
+
+1.01 2017-08-31 08:30:00
+  - Started logging my changes in a change file as I started packaging it
+    with the eventual goal of uploading it to CPAN.
+  - Started keeping track of the VERSION.
+  Never Released this version.
+

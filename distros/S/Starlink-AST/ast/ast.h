@@ -45,7 +45,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     18-APR-2023 (makeh):
+*     25-SEP-2024 (makeh):
 *        Original version, generated automatically from the internal header
 *        files by the "makeh" script.
 *     {enter_changes_here}
@@ -556,11 +556,11 @@ void astFandl_( const char *, size_t, size_t, size_t *, size_t *, int * );
 /* ===== */
 #define AST__VMAJOR 9
 #define AST__VMINOR 2
-#define AST__RELEASE 10
+#define AST__RELEASE 12
 
 #define AST_MAJOR_VERS 9
 #define AST_MINOR_VERS 2
-#define AST_RELEASE 10
+#define AST_RELEASE 12
 
 #include <stdarg.h>
 #include <float.h>
@@ -1653,6 +1653,7 @@ int astHasParameter_( AstTable *, const char *, int * );
 #define AST__LOGICAL 6
 #define AST__CONTINUE 7
 #define AST__UNDEF 8
+#define AST__KINT 9
 #define AST_TABEXTNAME "WCS-TAB"
 struct AstFitsChan;
 typedef struct AstFitsChan {
@@ -1663,6 +1664,7 @@ typedef struct AstFitsChan {
    int defb1950;
    int tabok;
    int forcetab;
+   int ignorebadalt;
    int cdmatrix;
    int polytan;
    int sipok;
@@ -1713,6 +1715,7 @@ AstFitsChan *astFitsChanForId_( const char *(*)( void ),
    int astGetFitsCN_( AstFitsChan *, const char *, char **, int * );
    int astGetFitsF_( AstFitsChan *, const char *, double *, int * );
    int astGetFitsI_( AstFitsChan *, const char *, int *, int * );
+   int astGetFitsK_( AstFitsChan *, const char *, int64_t *, int * );
    int astGetFitsL_( AstFitsChan *, const char *, int *, int * );
    int astGetFitsS_( AstFitsChan *, const char *, char **, int * );
    int astTestFits_( AstFitsChan *, const char *, int *, int * );
@@ -1734,6 +1737,7 @@ AstFitsChan *astFitsChanForId_( const char *(*)( void ),
    void astSetFitsCN_( AstFitsChan *, const char *, const char *, const char *, int, int * );
    void astSetFitsF_( AstFitsChan *, const char *, double, const char *, int, int * );
    void astSetFitsI_( AstFitsChan *, const char *, int, const char *, int, int * );
+   void astSetFitsK_( AstFitsChan *, const char *, int64_t, const char *, int, int * );
    void astSetFitsL_( AstFitsChan *, const char *, int, const char *, int, int * );
    void astSetFitsS_( AstFitsChan *, const char *, const char *, const char *, int, int * );
    void astSetFitsU_( AstFitsChan *, const char *, const char *, int, int * );
@@ -1771,6 +1775,8 @@ AstFitsChan *astFitsChanForId_( const char *(*)( void ),
 
 #define astSetFitsI(this,name,value,comment,overwrite) astINVOKE(V,astSetFitsI_(astCheckFitsChan(this),name,value,comment,overwrite,STATUS_PTR))
 
+#define astSetFitsK(this,name,value,comment,overwrite) astINVOKE(V,astSetFitsK_(astCheckFitsChan(this),name,value,comment,overwrite,STATUS_PTR))
+
 #define astSetFitsF(this,name,value,comment,overwrite) astINVOKE(V,astSetFitsF_(astCheckFitsChan(this),name,value,comment,overwrite,STATUS_PTR))
 
 #define astSetFitsS(this,name,value,comment,overwrite) astINVOKE(V,astSetFitsS_(astCheckFitsChan(this),name,value,comment,overwrite,STATUS_PTR))
@@ -1794,6 +1800,8 @@ AstFitsChan *astFitsChanForId_( const char *(*)( void ),
 #define astGetFitsF(this,name,value) astINVOKE(V,astGetFitsF_(astCheckFitsChan(this),name,value,STATUS_PTR))
 
 #define astGetFitsI(this,name,value) astINVOKE(V,astGetFitsI_(astCheckFitsChan(this),name,value,STATUS_PTR))
+
+#define astGetFitsK(this,name,value) astINVOKE(V,astGetFitsK_(astCheckFitsChan(this),name,value,STATUS_PTR))
 
 #define astGetFitsL(this,name,value) astINVOKE(V,astGetFitsL_(astCheckFitsChan(this),name,value,STATUS_PTR))
 
@@ -1825,6 +1833,7 @@ AstFitsTable *astFitsTableId_( void *, const char *, ... )__attribute__((format(
 AstFitsChan *astGetTableHeader_( AstFitsTable *, int * );
 void astPutTableHeader_( AstFitsTable *, AstFitsChan *, int * );
 int astColumnNull_( AstFitsTable *, const char *, int, int, int *, int *, int * );
+int64_t astColumnNullK_( AstFitsTable *, const char *, int, int64_t, int *, int *, int * );
 size_t astColumnSize_( AstFitsTable *, const char *, int * );
 void astGetColumnData_( AstFitsTable *, const char *, float, double, size_t, void *, int *, int * );
 void astPutColumnData_( AstFitsTable *, const char *, int, size_t, void *, int * );
@@ -1837,6 +1846,7 @@ void astPutColumnData_( AstFitsTable *, const char *, int, size_t, void *, int *
 #define astGetTableHeader(this) astINVOKE(O,astGetTableHeader_(astCheckFitsTable(this),STATUS_PTR))
 #define astPutTableHeader(this,header) astINVOKE(V,astPutTableHeader_(astCheckFitsTable(this),astCheckFitsChan(header),STATUS_PTR))
 #define astColumnNull(this,column,set,newval,wasset,hasnull) astINVOKE(V,astColumnNull_(astCheckFitsTable(this),column,set,newval,wasset,hasnull,STATUS_PTR))
+#define astColumnNullK(this,column,set,newval,wasset,hasnull) astINVOKE(V,astColumnNullK_(astCheckFitsTable(this),column,set,newval,wasset,hasnull,STATUS_PTR))
 #define astColumnSize(this,column) astINVOKE(V,astColumnSize_(astCheckFitsTable(this),column,STATUS_PTR))
 #define astGetColumnData(this,column,fnull,dnull,mxsize,coldata,nelem) astINVOKE(V,astGetColumnData_(astCheckFitsTable(this),column,fnull,dnull,mxsize,coldata,nelem,STATUS_PTR))
 #define astPutColumnData(this,column,clen,size,coldata) astINVOKE(V,astPutColumnData_(astCheckFitsTable(this),column,clen,size,coldata,STATUS_PTR))

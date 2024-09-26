@@ -1,5 +1,6 @@
+use 5.010;
 use Data::Show;
-use Test::More 'no_plan';
+use Test::More eval{require Data::Pretty} ? 'no_plan' : (skip_all => 'This test requires Data::Pretty');
 my $STDERR;
 close STDERR;
 open *STDERR, '>', \$STDERR or die $!;
@@ -33,16 +34,11 @@ my $str = 'foo';
 $str =~ m/(?<bar>\w+)/;
 show $+{bar};
 
-my @expected = <DATA>;
-my @got      = split "(?<=\n)", $STDERR;
+my @expected = <DATA>;                    chomp @expected;
+my @got      = split "[ \t]*\n", $STDERR;    chomp @got;
 
 for my $n (0..$#expected) {
-    if ($expected[$n] =~ m{\A \s* \{ }xms) {
-        is_deeply(eval($got[$n]), eval($expected[$n]) => ": $expected[$n]");
-    }
-    else {
-        is $got[$n], $expected[$n] => ": $expected[$n]";
-    }
+    is $got[$n], $expected[$n] => ": $expected[$n]";
 }
 
 sub sq {
@@ -51,72 +47,48 @@ sub sq {
 }
 
 __DATA__
-======(  %foo  )=============================[ 'show.t', line 13 ]======
+t/show.t
+14   show(%foo);
+( foo => 1, food => 2, fool => 3, foon => [5 .. 10], foop => 4 )
 
-    { foo => 1, food => 2, fool => 3, foon => [5 .. 10], foop => 4 }
+15   show $/;
+"\n"
 
+16   show @bar;
+(qw( b a r ))
 
-======(  $/  )===============================[ 'show.t', line 14 ]======
+17   show (
+18       @bar,
+19       $baz,
+20   );
+(qw( b a r baz ))
 
-    "\n"
+21   show $baz;
+"baz"
 
+22   show $ref;
+[qw( b a r )]
 
-======(  @bar  )=============================[ 'show.t', line 15 ]======
+23   show @bar[do{1..2;}];
+(qw( a r ))
 
-    ["b", "a", "r"]
+24   show 2*3;
+6
 
+25   show 'a+b';
+"a+b"
 
-======(  @bar, $baz,  )======================[ 'show.t', line 16 ]======
+26   show 100 * sq length $baz;
+900
 
-    ("b", "a", "r", "baz")
+27   show $foo{q[;{{{]};
+undef
 
+29   show 'foo' =~ m/;\{\/\{/
+()
 
-======(  $baz  )=============================[ 'show.t', line 20 ]======
+31   show $/{Answer};
+undef
 
-    "baz"
-
-
-======(  $ref  )=============================[ 'show.t', line 21 ]======
-
-    ["b", "a", "r"]
-
-
-======(  @bar[do{1..2;}]  )==================[ 'show.t', line 22 ]======
-
-    ("a", "r")
-
-
-======(  2*3  )==============================[ 'show.t', line 23 ]======
-
-    6
-
-
-======(  'a+b'  )============================[ 'show.t', line 24 ]======
-
-    "a+b"
-
-
-======(  100 * sq length $baz  )=============[ 'show.t', line 25 ]======
-
-    900
-
-
-======(  $foo{q[;{{{]}  )====================[ 'show.t', line 26 ]======
-
-    undef
-
-
-======(  'foo' =~ m/;\{\/\{/  )==============[ 'show.t', line 28 ]======
-
-    ()
-
-
-======(  $/{Answer}  )=======================[ 'show.t', line 30 ]======
-
-    undef
-
-
-======(  $+{bar}  )==========================[ 'show.t', line 34 ]======
-
-    "foo"
-
+35   show $+{bar};
+"foo"

@@ -47,6 +47,13 @@ An arrayref of [DateTime](https://metacpan.org/pod/DateTime)s. These days are ex
 
 # METHODS
 
+## is\_day\_scheduled($datetime)
+
+Given a [DateTime](https://metacpan.org/pod/DateTime), returns true/false to indicate whether that day is 
+scheduled or not. 
+
+Should be overridden by subclasses.
+
 ## days\_in\_range($start, $end)
 
 Given start/end [DateTime](https://metacpan.org/pod/DateTime)s, returns a [DateTime::Set](https://metacpan.org/pod/DateTime%3A%3ASet) of all the days which

@@ -4,7 +4,7 @@ DBIx::Class::Helper::ColumnNames - Retrieve column names from a resultset
 
 # VERSION
 
-version v0.1.0
+version v0.1.1
 
 # SYNOPSIS
 
@@ -30,6 +30,10 @@ HTML table or to export as a spreadsheet, for example.
 # METHODS
 
 ## get\_column\_names
+
+```perl
+my @header = $rs->get_column_names;
+```
 
 This method attempts to return the column names of the resultset.
 

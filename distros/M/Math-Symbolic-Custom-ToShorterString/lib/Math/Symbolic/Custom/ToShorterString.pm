@@ -15,11 +15,11 @@ Math::Symbolic::Custom::ToShorterString - Shorter string representations of Math
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Custom::Base;
@@ -67,7 +67,7 @@ sub to_shorter_infix_string {
     if ( $brackets_on ) {
         
         # check if we can turn brackets off for the tree below
-        if ( is_all_operator($t, B_PRODUCT) || is_all_operator($t, [B_SUM, B_DIFFERENCE]) ) {
+        if ( is_all_operator($t, B_PRODUCT) || is_all_operator($t, B_SUM) ) {
             $brackets_on = 0;
         }
         # "expanded" for a simple expression essentially defined as no +/- below a * in the tree
@@ -122,19 +122,16 @@ sub to_shorter_infix_string {
                         if ( !defined($Math::Symbolic::Operator::Op_Types[$op->type()]->{infix_string}) ) {
                             $brackets[$i] = 0;
                         }
-                        # it's going to turn into a prefix operator (sqrt)
-                        elsif ( ($op->type() == B_EXP) && ($op->op2()->term_type() == T_CONSTANT) && ($op->op2()->value() == 0.5) ) {
-                            $brackets[$i] = 0;
-                        }
-                        # it's going to turn into a prefix operator (exp)
-                        elsif ( ($op->type() == B_EXP) && ($op->op1()->term_type() == T_CONSTANT) && ($op->op1()->{special} eq 'euler') ) {
+                        # remove brackets around exponentiation operator ^
+                        elsif ( $op->type() == B_EXP ) {
                             $brackets[$i] = 0;
                         }
                     }
                 }
             }
 
-            $op_str = " $op_str " unless ($op_str eq '*') || ($op_str eq '^');
+            # keep the spaces around * for readability when removing brackets around exponents
+            $op_str = " $op_str " unless ($op_str eq '^') || ( ($op_str eq '*') && !(($t->op1()->term_type() == T_OPERATOR) && ($t->op1()->type() == B_EXP)) );
             
             $string .=
                 ( $brackets[0] ? '(' : '' )

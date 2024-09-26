@@ -1,5 +1,5 @@
 package WebService::Xential;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.26;
 use Object::Pad;
 
@@ -13,7 +13,6 @@ use Mojo::Content::Single;
 use Mojo::Asset::Memory;
 use JSON::XS qw(encode_json);
 use Types::Serialiser qw();
-use MIME::Base64 qw(encode_base64url);
 
 field $api_key :param;
 field $api_user :param;
@@ -42,10 +41,7 @@ ADJUST {
         $tx->req->headers->add("Accept" => "application/json");
 
         unless ($tx->req->headers->header('XSessionID')) {
-          $tx->req->headers->header(
-            "Authorization" =>
-              join(" ", "Basic", encode_base64url("$api_user:$api_key")),
-          );
+          $tx->req->url->userinfo("$api_user:$api_key");
         }
       }
     );
@@ -201,13 +197,67 @@ WebService::Xential - A Xential REST API module
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
+    my $xential = WebService::Xential->new(
+      api_user => 'foo',
+      api_key => 'foo',
+      api_host => '127.0.0.1',
+    );
+
+    my $who   = $xential->whoami();
+    my $other = $xential->impersonate(..., $who->{XSessionId});
+    my $session_id = $other{XSessionID};
+
+    my $ticket = $xential->create_ticket($xml, \%options, $session_id);
+    my $start = $xential->start_document(
+        $ticket->{startDocumentUrl},
+        $ticket->{ticketUuid},
+        $session_id
+    );
+
+    # Status is either INVALID or VALID
+
+    if ($start->{status} eq 'VALID') {
+        my $build = $xential->build_document(
+            1,
+            $start->{documentUuid},
+            $session_id
+        );
+
+        if ($build->{status} eq 'done') {
+            # build succeeded
+        }
+        else {
+            # build failed
+        }
+    }
+    else {
+        use URI;
+        $uri = URI->new($start{resumeUrl});
+        $uri->scheme('https');
+        $uri->query_form($uri->query_form, afterOpenAction => 'close');
+        $uri->host($xential->api_host);
+        # redirect user to $uri
+    }
+
 =head1 DESCRIPTION
 
-=head1 methods
+This module implements the REST API of Xential.
+
+=head1 ATTRIBUTES
+
+=head2 api_host
+
+The API host of the Xential WebService
+
+=head2 client
+
+The L<OpenAPI::Client>
+
+=head1 METHODS
 
 =head2 new()
 
@@ -249,10 +299,6 @@ Implements the build_document call from Xential
 
 A wrapper around the L<OpenAPI::Client::call> function. Returns the JSON from
 the endpoint.
-
-=head1 ATTRIBUTES
-
-=head1 METHODS
 
 =head1 AUTHOR
 

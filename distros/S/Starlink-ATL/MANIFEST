@@ -2,6 +2,7 @@ bin/astmoctool
 Build.PL
 Changes
 lib/Starlink/ATL.pm
+lib/Starlink/ATL/MOC.pm
 lib/Starlink/ATL/Region.pm
 MANIFEST
 MANIFEST.SKIP
@@ -9,4 +10,5 @@ META.json
 META.yml
 README
 t/atl.t
+t/moc.t
 t/region-merge.t

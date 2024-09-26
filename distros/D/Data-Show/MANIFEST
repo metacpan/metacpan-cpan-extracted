@@ -3,9 +3,19 @@ Changes
 MANIFEST
 Makefile.PL
 README
+sample.datashow
 lib/Data/Show.pm
 t/00.load.t
+t/as.t
+t/dumper.t
+t/dumpvalue.t
+t/fallback.t
+t/grid_ascii.t
+t/grid_unicode.t
+t/no_show.t
+t/no_show_lexical.t
 t/pod.t
 t/show.t
+t/show_legacy.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

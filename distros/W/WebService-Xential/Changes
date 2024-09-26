@@ -1,5 +1,10 @@
 Revision history for Webservice-Xential
 
+0.004     2024-09-25 16:47:12Z
+
+    * Use Mojo for basic auth
+    * Update POD
+
 0.003     2024-09-24 22:21:09Z
 
     * Use correct param name for userName

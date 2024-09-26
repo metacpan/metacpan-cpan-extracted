@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.3604'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,217 +20,217 @@ name: Starlink-AST
 provides:
   Starlink::AST:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Axis:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Box:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Channel:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::ChebyMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Circle:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::CmpFrame:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::CmpMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::CmpRegion:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::DSBSpecFrame:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::DssMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Ellipse:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::FitsChan:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::FitsTable:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::FluxFrame:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Frame:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::FrameSet:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::GrismMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Interval:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::IntraMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::KeyMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::KeyMap::Tie:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::LutMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Mapping:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::MathMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::MatrixMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Moc:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::MocChan:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::NormMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::NullRegion:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::PGPLOT:
     file: lib/Starlink/AST/PGPLOT.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::PLplot:
     file: lib/Starlink/AST/PLplot.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::PcdMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::PermMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Plot:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Plot3D:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::PointList:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::PolyMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Polygon:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Prism:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::RateMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Region:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::SelectorMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::ShiftMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::SkyAxis:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::SkyFrame:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::SlaMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::SpecFluxFrame:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::SpecFrame:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::SpecMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::SphMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Stc:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::StcCatalogEntryLocation:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::StcObsDataLocation:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::StcResourceProfile:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::StcSearchLocation:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::StcsChan:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::SwitchMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Table:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::TimeFrame:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::TimeMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::Tk:
     file: lib/Starlink/AST/Tk.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::TranMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::UnitMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::UnitNormMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::WcsMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::WinMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::XmlChan:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::XphMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::YamlChan:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
   Starlink::AST::ZoomMap:
     file: lib/Starlink/AST.pm
-    version: '3.03'
+    version: '3.04'
 recommends:
   Astro::FITS::CFITSIO: '0'
   Astro::FITS::Header: '0'
@@ -239,5 +239,5 @@ recommends:
 resources:
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/Starlink/perl-Starlink-AST.git
-version: '3.03'
+version: '3.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

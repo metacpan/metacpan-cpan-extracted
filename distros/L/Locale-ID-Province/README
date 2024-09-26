@@ -2,8 +2,8 @@ NAME
     Locale::ID::Province - List of provinces in Indonesia
 
 VERSION
-    This document describes version 0.111 of Locale::ID::Province (from Perl
-    distribution Locale-ID-Province), released on 2024-08-05.
+    This document describes version 0.112 of Locale::ID::Province (from Perl
+    distribution Locale-ID-Province), released on 2024-09-26.
 
 SYNOPSIS
      use Locale::ID::Province qw(list_idn_provinces);

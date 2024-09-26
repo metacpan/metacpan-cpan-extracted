@@ -27,5 +27,5 @@ requires:
   List::Util: '0'
   MIME::Base64: '0'
   perl: '5.006'
-version: v0.0.1
+version: v0.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

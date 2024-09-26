@@ -128,6 +128,7 @@ f     encodings), then write operations using AST_WRITE will
 *     - FitsDigits: Digits of precision for floating-point FITS values
 *     - FitsRounding: Controls rounding of floating-point FITS values
 *     - ForceTab: Force use of the FITS "-TAB" algorithm?
+*     - IgnoreBadAlt: Ignore unreadable alternate axis descriptions?
 *     - Iwc: Add a Frame describing Intermediate World Coords?
 *     - Ncard: Number of FITS header cards in a FitsChan
 *     - Nkey: Number of unique keywords in a FitsChan
@@ -1265,6 +1266,11 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        - Increase some buffer sizes to avoid compilation warnings.
 *     6-JUN-2022 (DSB):
 *        Avoid copying overlapping strings in RoundFString.
+*     25-SEP-2024 (DSB):
+*        - Added IgnoreBadAlt attribute.
+*        - Added warning "BadAlt"
+*        - Correct access to AltAxes attribute
+*        - Add support for 64 bit integer keyword values
 *class--
 */
 
@@ -1372,7 +1378,7 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 #define LATAX              1
 #define NDESC              9
 #define MXCTYPELEN        81
-#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype badpv badkeyname badkeyvalue "
+#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype badpv badkeyname badkeyvalue badalt "
 #define NPFIT             10
 #define SPD               86400.0
 #define FL  1.0/298.257  /*  Reference spheroid flattening factor */
@@ -1812,6 +1818,10 @@ static void ClearForceTab( AstFitsChan *, int * );
 static int GetForceTab( AstFitsChan *, int * );
 static int TestForceTab( AstFitsChan *, int * );
 static void SetForceTab( AstFitsChan *, int, int * );
+static void ClearIgnoreBadAlt( AstFitsChan *, int * );
+static int GetIgnoreBadAlt( AstFitsChan *, int * );
+static int TestIgnoreBadAlt( AstFitsChan *, int * );
+static void SetIgnoreBadAlt( AstFitsChan *, int, int * );
 static void ClearCarLin( AstFitsChan *, int * );
 static int GetCarLin( AstFitsChan *, int * );
 static int TestCarLin( AstFitsChan *, int * );
@@ -1943,6 +1953,7 @@ static int GetFitsCI( AstFitsChan *, const char *, int *, int * );
 static int GetFitsCN( AstFitsChan *, const char *, char **, int * );
 static int GetFitsF( AstFitsChan *, const char *, double *, int * );
 static int GetFitsI( AstFitsChan *, const char *, int *, int * );
+static int GetFitsK( AstFitsChan *, const char *, int64_t *, int * );
 static int GetFitsL( AstFitsChan *, const char *, int *, int * );
 static int GetFitsS( AstFitsChan *, const char *, char **, int * );
 static int GetFull( AstChannel *, int * );
@@ -1992,7 +2003,7 @@ static int WorldAxes( AstFitsChan *this, AstMapping *, double *, int *, int * );
 static int Write( AstChannel *, AstObject *, int * );
 static void *CardData( AstFitsChan *, size_t *, int * );
 static void AdaptLut( AstMapping *, int, double, double, double, double, double, double **, double **, int *, int * );
-static void AddFrame( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, char, const char *, const char *, int * );
+static void AddFrame( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, int, char, const char *, const char *, int * );
 static void ChangePermSplit( AstMapping *, int * );
 static void CheckZero( char *, double, int, int, int * );
 static void Chpc1( double *, double *, int, int *, int *, int * );
@@ -2044,6 +2055,7 @@ static void SetFitsCN( AstFitsChan *, const char *, const char *, const char *, 
 static void SetFitsCom( AstFitsChan *, const char *, const char *, int, int * );
 static void SetFitsF( AstFitsChan *, const char *, double, const char *, int, int * );
 static void SetFitsI( AstFitsChan *, const char *, int, const char *, int, int * );
+static void SetFitsK( AstFitsChan *, const char *, int64_t, const char *, int, int * );
 static void SetFitsL( AstFitsChan *, const char *, int, const char *, int, int * );
 static void SetFitsS( AstFitsChan *, const char *, const char *, const char *, int, int * );
 static void SetFitsU( AstFitsChan *, const char *, const char *, int, int * );
@@ -2432,8 +2444,8 @@ static int AddEncodingFrame( AstFitsChan *this, AstFrameSet *fs, int encoding,
 }
 
 static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
-                      int npix, FitsStore *store, char s, const char *method,
-                      const char *class, int *status ){
+                      int npix, FitsStore *store, int ignorebad, char s,
+                      const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     AddFrame
@@ -2448,8 +2460,8 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
 *  Synopsis:
 *     #include "fitschan.h"
 *     void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
-*                    int npix, FitsStore *store, char s, const char *method,
-*                    const char *class, int *status )
+*                    int npix, FitsStore *store, int ignorebad, char s,
+*                    const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -2475,6 +2487,11 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
 *     store
 *        The FitsStore containing the required information extracted from
 *        the FitsChan.
+*     ignorebad
+*        If non-zero, return the supplied FrameSet unchanged if no Frame
+*        can be created from the specified axes (no error is reported). If
+*        zero, return a NULL FrameSet pointer if no Frame can be created
+*        from the specified axes and report an error.
 *     s
 *        The co-ordinate version character. A space means the primary
 *        axis descriptions. Otherwise the supplied character should be
@@ -2494,20 +2511,42 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
    AstMapping *mapping;        /* Mapping from pixel to requested Frame */
    AstMapping *tmap;           /* Temporary Mapping pointer */
    AstPermMap *pmap;           /* PermMap pointer to add or remove axes */
+   char buf[60];               /* Buffer for error text */
    double con;                 /* Value to be assigned to missing axes */
    int *inperm;                /* Pointer to input axis permutation array */
    int *outperm;               /* Pointer to output axis permutation array */
    int i;                      /* Axis index */
    int nf;                     /* Number of Frames originally in fset */
    int nwcs;                   /* Number of wcs axes */
+   int rep;                    /* Original error reporting flag */
 
 /* Check the inherited status. */
    if( !astOK ) return;
+
+/* Temporarily supress error reporting. */
+   rep = astReporting( 0 );
 
 /* Get a Mapping between pixel coordinates and physical coordinates, using
    the requested axis descriptions. Also returns a Frame describing the
    physical coordinate system. */
    mapping = WcsMapFrm( this, store, s, &frame, method, class, status );
+
+/* If an error occurred reading the axis descriptions, clear it if we
+   are ignoring unreadable axis descriptions and ensure mapping and frame
+   are null. */
+   if( !astOK && ignorebad ) {
+      astClearStatus;
+      if( mapping ) mapping = astAnnul( mapping );
+      if( frame ) frame = astAnnul( frame );
+
+/* Adding a warning to the FitsChan and the parent Channel indicating
+   that the alternate axis description has been ignored. */
+      sprintf( buf, "Ignoring unusable FITS-WCS alternate axes label \'%c\'.", s );
+      Warn( this, "badalt", buf, method, class, status );
+   }
+
+/* Re-instate the original error reporting condition. */
+   astReporting( rep );
 
 /* Add the Frame into the FrameSet, and annul the mapping and frame. If
    the mapping has more inputs than there are axes in the pixel Frame,
@@ -2553,7 +2592,7 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
 /* Annul temporary resources. */
       mapping = astAnnul( mapping );
    }
-   frame = astAnnul( frame );
+   if( frame ) frame = astAnnul( frame );
 }
 
 static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
@@ -6671,6 +6710,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else if ( !strcmp( attrib, "forcetab" ) ) {
       astClearForceTab( this );
 
+/* IgnoreBadAlt */
+/* ------------ */
+   } else if ( !strcmp( attrib, "ignorebadalt" ) ) {
+      astClearIgnoreBadAlt( this );
+
 /* CarLin */
 /* ------ */
    } else if ( !strcmp( attrib, "carlin" ) ) {
@@ -6982,6 +7026,7 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
    const char *ostring;     /* String data value */
    double odouble;          /* Double data value */
    int oint;                /* Integer data value */
+   int64_t okint;           /* 64 bit integer data value */
    int ival;                /* Integer value read from string */
    int len;                 /* Length of character string */
    int nc;                  /* No. of characetsr used */
@@ -7041,6 +7086,8 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
             *( (char **) buff ) = cnvtype_text;
          } else if( type == AST__INT      ){
             *( (int *) buff ) = (int) odouble;
+         } else if( type == AST__KINT     ){
+            *( (int64_t *) buff ) = (int64_t) odouble;
          } else if( type == AST__LOGICAL  ){
             *( (int *) buff ) = ( odouble == 0.0 ) ? 0 : 1;
          } else if( type == AST__COMPLEXF ){
@@ -7075,6 +7122,12 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
          } else if( type == AST__INT      ){
             if( nc = 0,
                      ( 1 != astSscanf( ostring, "%d %n", (int *) buff, &nc ) )
+                  || (nc < len ) ){
+               ret = 0;
+            }
+         } else if( type == AST__KINT     ){
+            if( nc = 0,
+                     ( 1 != astSscanf( ostring, "%" PRId64 " %n", (int64_t *) buff, &nc ) )
                   || (nc < len ) ){
                ret = 0;
             }
@@ -7139,6 +7192,8 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
             *( (char **) buff ) = cnvtype_text;
          } else if( type == AST__INT      ){
             (void) memcpy( buff, odata, osize );
+         } else if( type == AST__KINT     ){
+            *( (int64_t *) buff ) = oint;
          } else if( type == AST__LOGICAL  ){
             *( (int *) buff ) = oint ? 1 : 0;
          } else if( type == AST__COMPLEXF ){
@@ -7146,6 +7201,32 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
             ( (double *) buff )[ 1 ] = 0.0;
          } else if( type == AST__COMPLEXI ){
             ( (int *) buff )[ 0 ] = oint;
+            ( (int *) buff )[ 1 ] = 0;
+         } else if( astOK ){
+            ret = 0;
+            astError( AST__INTER, "CnvType: AST internal programming error - "
+                      "FITS data-type no. %d not yet supported.", status, type );
+         }
+
+/* Convert an AST__KINT data value to ... */
+      } else if( otype == AST__KINT     ){
+         okint = *( (int64_t *) odata );
+         if( type == AST__FLOAT ){
+            *( (double *) buff ) = (double) okint;
+         } else if( type == AST__STRING || type == AST__CONTINUE  ){
+            (void) sprintf( cnvtype_text, "%" PRId64, okint );
+            *( (char **) buff ) = cnvtype_text;
+         } else if( type == AST__KINT      ){
+            (void) memcpy( buff, odata, osize );
+         } else if( type == AST__INT     ){
+            *( (int *) buff ) = okint;
+         } else if( type == AST__LOGICAL  ){
+            *( (int *) buff ) = okint ? 1 : 0;
+         } else if( type == AST__COMPLEXF ){
+            ( (double *) buff )[ 0 ] = (double) okint;
+            ( (double *) buff )[ 1 ] = 0.0;
+         } else if( type == AST__COMPLEXI ){
+            ( (int *) buff )[ 0 ] = okint;
             ( (int *) buff )[ 1 ] = 0;
          } else if( astOK ){
             ret = 0;
@@ -7167,6 +7248,8 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
             *( (char **) buff ) = cnvtype_text;
          } else if( type == AST__INT      ){
             *( (int *) buff ) = oint;
+         } else if( type == AST__KINT      ){
+            *( (int64_t *) buff ) = oint;
          } else if( type == AST__LOGICAL  ){
             (void) memcpy( buff, odata, osize );
          } else if( type == AST__COMPLEXF ){
@@ -7195,6 +7278,8 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
             *( (char **) buff ) = cnvtype_text;
          } else if( type == AST__INT      ){
             *( (int *) buff ) = (int) odouble;
+         } else if( type == AST__KINT      ){
+            *( (int64_t *) buff ) = (int64_t) odouble;
          } else if( type == AST__LOGICAL  ){
             *( (int *) buff ) = ( odouble == 0.0 ) ? 0 : 1;
          } else if( type == AST__COMPLEXF ){
@@ -7219,6 +7304,8 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
             *( (char **) buff ) = cnvtype_text;
          } else if( type == AST__INT      ){
             *( (int *) buff ) = oint;
+         } else if( type == AST__KINT      ){
+            *( (int64_t *) buff ) = oint;
          } else if( type == AST__LOGICAL  ){
             *( (int *) buff ) = oint ? 1 : 0;
          } else if( type == AST__COMPLEXF ){
@@ -9467,6 +9554,17 @@ static int EncodeValue( AstFitsChan *this, char *buf, int col, int digits,
                       *( (int *) data ), name );
          }
 
+/* 64 bit INTEGER - stored internally in a variable of type "int". Right justified
+   to column 30 in the header card. */
+      } else if( type == AST__KINT ){
+         len = sprintf(  buf, "%*" PRId64, FITSRLCOL - col + 1,
+                         *( (int64_t *) data ) );
+         if( len < 0 || len > AST__FITSCHAN_FITSCARDLEN - col ) {
+            astError( AST__BDFTS, "%s(%s): Cannot encode integer value %" PRId64 " into a "
+                      "FITS header card for keyword '%s'.", status, method, astGetClass( this ),
+                      *( (int64_t *) data ), name );
+         }
+
 /* LOGICAL - stored internally in a variable of type "int". Represented by
    a "T" or "F" in column 30 of the FITS header card. */
       } else if( type == AST__LOGICAL ){
@@ -11301,6 +11399,7 @@ static AstObject *FsetFromStore( AstFitsChan *this, FitsStore *store,
    char buff[ 40 ];   /* Buffer for axis label */
    char s;            /* Co-ordinate version character */
    int i;             /* Pixel axis index */
+   int ignoreBadAlt;  /* Ignore unreadable alternate axes? */
    int physical;      /* Index of primary physical co-ordinate Frame */
    int pixel;         /* Index of pixel Frame in returned FrameSet */
    int use;           /* Has this co-ordinate version been used? */
@@ -11340,11 +11439,16 @@ static AstObject *FsetFromStore( AstFitsChan *this, FitsStore *store,
    into the FrameSet. Only do this if there are some primary axis
    descriptions. */
       if( GetMaxJM( &(store->crpix), ' ', status ) >= 0 ) {
-         AddFrame( this, ret, pixel, store->naxis, store, ' ', method, class, status );
+         AddFrame( this, ret, pixel, store->naxis, store, 0, ' ', method,
+                   class, status );
       }
 
 /* Get the index of the primary physical co-ordinate Frame in the FrameSet. */
       physical = astGetCurrent( ret );
+
+/* See if failure to read a secondary axis frame should be fatal. If not,
+   the secondary axis Frame will simply be ignored. */
+      ignoreBadAlt = astGetIgnoreBadAlt( this );
 
 /* Loop, producing secondary axis Frames for each of the co-ordinate
    versions stored in the FitsStore. */
@@ -11364,7 +11468,8 @@ static AstObject *FsetFromStore( AstFitsChan *this, FitsStore *store,
 
 /* If this co-ordinate version has been used, add a Frame to the returned
    FrameSet holding this co-ordinate version. */
-         if( use ) AddFrame( this, ret, pixel, store->naxis, store, s, method, class, status );
+         if( use ) AddFrame( this, ret, pixel, store->naxis, store,
+                             ignoreBadAlt, s, method, class, status );
       }
 
 /* Ensure the pixel Frame is the Base Frame and the primary physical
@@ -14590,6 +14695,7 @@ f     RESULT = AST_GETFITS<X>( THIS, NAME, VALUE, STATUS )
 *     - CI - Complex integer values.
 *     - F  - Floating point values.
 *     - I  - Integer values.
+*     - K  - 64 bit integer values.
 *     - L  - Logical (i.e. boolean) values.
 *     - S  - String values.
 *     - CN - A "CONTINUE" value, these are treated like string values, but
@@ -14607,6 +14713,7 @@ c     - CI - "int *" (a pointer to a 2 element array to hold the real and
 c            imaginary parts of the complex value).
 c     - F  - "double *".
 c     - I  - "int *".
+c     - K  - "int64_t *".
 c     - L  - "int *".
 c     - S  - "char **" (a pointer to a static "char" array is returned at the
 c            location given by the "value" parameter, Note, the stored string
@@ -14619,6 +14726,7 @@ f     - CI - INTEGER(2) (a 2 element array to hold the real and imaginary
 f            parts of the complex value).
 f     - F  - DOUBLE PRECISION.
 f     - I  - INTEGER
+f     - K  - INTEGER*8
 f     - L  - LOGICAL
 f     - S  - CHARACTER
 f     - CN - CHARACTER
@@ -14789,6 +14897,7 @@ MAKE_FGET(CF,double *,AST__COMPLEXF)
 MAKE_FGET(CI,int *,AST__COMPLEXI)
 MAKE_FGET(F,double *,AST__FLOAT)
 MAKE_FGET(I,int *,AST__INT)
+MAKE_FGET(K,int64_t *,AST__KINT)
 MAKE_FGET(L,int *,AST__LOGICAL)
 MAKE_FGET(S,char **,AST__STRING)
 MAKE_FGET(CN,char **,AST__CONTINUE)
@@ -14929,7 +15038,6 @@ static int FitsGetCom( AstFitsChan *this, const char *name,
 
 static int SetFits( AstFitsChan *this, const char *keyname, void *value,
                     int type, const char *comment, int overwrite, int *status ){
-
 /*
 *  Name:
 *     SetFits
@@ -14942,7 +15050,6 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     int SetFits( AstFitsChan *this, const char *keyname, void *value,
 *                  int type, const char *comment, int overwrite, int *status )
 
@@ -15004,6 +15111,8 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
    int eival;
    int ival;
    int ret;
+   int64_t ekval;
+   int64_t kval;
 
 /* Check the global status, and the supplied pointer. */
    if( !astOK || !value ) return 0;
@@ -15055,6 +15164,7 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
       }
    } else if( type == AST__COMMENT ){
       astSetFitsCom( this, keyname, comment, overwrite );
+
    } else if( type == AST__INT ){
       ival = *( (int *) value );
 
@@ -15065,6 +15175,17 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
          if( eival == ival ) comment = NULL;
       }
       astSetFitsI( this, keyname, ival, comment, overwrite );
+
+   } else if( type == AST__KINT ){
+      kval = *( (int64_t *) value );
+
+/* If the data value has not changed, retain the original comment. */
+      if( overwrite && CnvValue( this, type, 0, &ekval, "SetFits",
+                                 status ) &&
+         CardComm( this, status ) ) {
+         if( ekval == kval ) comment = NULL;
+      }
+      astSetFitsK( this, keyname, kval, comment, overwrite );
    } else if( type == AST__COMPLEXF ){
       if( ( (double *) value )[0] != AST__BAD &&
           ( (double *) value )[1] != AST__BAD ) {
@@ -15148,6 +15269,7 @@ f     The keyword data type is selected by replacing <X> in the routine name
 *     - CI - Complex integer values.
 *     - F  - Floating point values.
 *     - I  - Integer values.
+*     - K  - 64 bit integer values.
 *     - L  - Logical (i.e. boolean) values.
 *     - S  - String values.
 *     - CN - A "CONTINUE" value, these are treated like string values, but
@@ -15162,6 +15284,7 @@ c     - CI - "int *" (a pointer to a 2 element array holding the real and
 c            imaginary parts of the complex value).
 c     - F  - "double".
 c     - I  - "int".
+c     - K  - "int64_t".
 c     - L  - "int".
 c     - S  - "const char *".
 c     - CN - "const char *".
@@ -15172,6 +15295,7 @@ f     - CI - INTEGER(2) (a 2 element array holding the real and imaginary
 f            parts of the complex value).
 f     - F  - DOUBLE PRECISION.
 f     - I  - INTEGER
+f     - K  - INTEGER*8
 f     - L  - LOGICAL
 f     - S  - CHARACTER
 f     - CN - CHARACTER
@@ -15307,6 +15431,7 @@ static void SetFits##code( AstFitsChan *this, const char *name, ctype value, con
 /* Use the above macro to give defintions for the astSetFits<X> method
    for each FITS data type. */
 MAKE_FSET(I,int,AST__INT,(void *)&value)
+MAKE_FSET(K,int64_t,AST__KINT,(void *)&value)
 MAKE_FSET(F,double,AST__FLOAT,(void *)&value)
 MAKE_FSET(S,const char *,AST__STRING,(void *)value)
 MAKE_FSET(CN,const char *,AST__CONTINUE,(void *)value)
@@ -16349,6 +16474,15 @@ const char *GetAttrib( AstObject *this_object, const char *attrib, int *status )
          result = getattrib_buff;
       }
 
+/* IgnoreBadAlt */
+/* ------------ */
+   } else if ( !strcmp( attrib, "ignorebadalt" ) ) {
+      ival = astGetIgnoreBadAlt( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
 /* CarLin */
 /* ------ */
    } else if ( !strcmp( attrib, "carlin" ) ) {
@@ -17285,6 +17419,7 @@ static void GetNextData( AstChannel *this_channel, int skip, char **name,
          } else if ( !skip &&
                      ( ( type == AST__STRING ) ||
                        ( type == AST__INT ) ||
+                       ( type == AST__KINT ) ||
                        ( type == AST__FLOAT ) ) &&
                      ( len > 2 ) &&
                      strchr( SEQ_CHARS, keyword[ len - 1 ] ) &&
@@ -17380,6 +17515,13 @@ static void GetNextData( AstChannel *this_channel, int skip, char **name,
    dynamically allocated string. */
             case AST__INT:
                (void) sprintf( buff, "%d", *( (int *) data ) );
+               *val = astString( buff, (int) strlen( buff ) );
+               break;
+
+/* If the value is a 64 bit int, format it and store the result in a
+   dynamically allocated string. */
+            case AST__KINT:
+               (void) sprintf( buff, "%" PRId64, *( (int64_t *) data ) );
                *val = astString( buff, (int) strlen( buff ) );
                break;
 
@@ -17910,6 +18052,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->GetFitsCI = GetFitsCI;
    vtab->GetFitsF = GetFitsF;
    vtab->GetFitsI = GetFitsI;
+   vtab->GetFitsK = GetFitsK;
    vtab->GetFitsL = GetFitsL;
    vtab->TestFits = TestFits;
    vtab->GetFitsS = GetFitsS;
@@ -17920,6 +18063,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->SetFitsCI = SetFitsCI;
    vtab->SetFitsF = SetFitsF;
    vtab->SetFitsI = SetFitsI;
+   vtab->SetFitsK = SetFitsK;
    vtab->SetFitsL = SetFitsL;
    vtab->SetFitsU = SetFitsU;
    vtab->SetFitsS = SetFitsS;
@@ -17957,6 +18101,10 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->TestForceTab = TestForceTab;
    vtab->SetForceTab = SetForceTab;
    vtab->GetForceTab = GetForceTab;
+   vtab->ClearIgnoreBadAlt = ClearIgnoreBadAlt;
+   vtab->TestIgnoreBadAlt = TestIgnoreBadAlt;
+   vtab->SetIgnoreBadAlt = SetIgnoreBadAlt;
+   vtab->GetIgnoreBadAlt = GetIgnoreBadAlt;
    vtab->ClearCarLin = ClearCarLin;
    vtab->TestCarLin = TestCarLin;
    vtab->SetCarLin = SetCarLin;
@@ -22731,6 +22879,9 @@ static void NewCard( AstFitsChan *this, const char *name, int type,
          } else if( type == AST__INT ){
             new->size = sizeof( int );
             new->data = astStore( NULL, (void *) data, sizeof( int ) );
+         } else if( type == AST__KINT ){
+            new->size = sizeof( int64_t );
+            new->data = astStore( NULL, (void *) data, sizeof( int64_t ) );
          } else if( type == AST__FLOAT ){
             new->size = sizeof( double );
             new->data = astStore( NULL, (void *) data, sizeof( double ) );
@@ -24641,6 +24792,7 @@ f        The global status.
    double fval;           /* floating point keyword value */
    int cival[2];          /* Complex integer keyword value */
    int ival;              /* Integer keyword value */
+   int64_t kval;          /* 64 bit integer keyword value */
    int len;               /* No. of characters to read from the value string */
    int nc;                /* No. of characters read from value string */
    int type;              /* Keyword data type */
@@ -24700,6 +24852,15 @@ f        The global status.
             astSetFitsI( this, name, ival, comment, overwrite );
          } else {
             astError( AST__BDFTS, "%s(%s): Unable to read an integer FITS "
+                      "keyword value.", status, method, class );
+         }
+
+/* Read and store 64 bit integer values from the value string. */
+      } else if( type == AST__KINT ){
+         if( 1 == astSscanf( value, " %" PRId64 " %n", &kval, &nc ) && nc >= len ){
+            astSetFitsK( this, name, kval, comment, overwrite );
+         } else {
+            astError( AST__BDFTS, "%s(%s): Unable to read a 64 bit integer FITS "
                       "keyword value.", status, method, class );
          }
 
@@ -26514,6 +26675,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         ( 1 == astSscanf( setting, "forcetab= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetForceTab( this, ival );
+
+/* IgnoreBadAlt */
+/* ------------ */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "ignorebadalt= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetIgnoreBadAlt( this, ival );
 
 /* CarLin */
 /* ------ */
@@ -31220,7 +31388,7 @@ int Split( AstFitsChan *this, const char *card, char **name, char **value,
 
 *  Returned value:
 *     -  An integer identifying the data type of the keyword value. This
-*     will be one of the values AST__UNDEF, AST__COMMENT, AST__INT,
+*     will be one of the values AST__UNDEF, AST__COMMENT, AST__INT, AST__KINT,
 *     AST__STRING, AST__CONTINUE, AST__FLOAT, AST__COMPLEXI or AST__COMPLEXF
 *     defined in fitschan.h.
 
@@ -31251,6 +31419,7 @@ int Split( AstFitsChan *this, const char *card, char **name, char **value,
    int cont;                  /* Is this a continuation card? */
    int i;                     /* Character index */
    int ii, ir;                /* Values read from value string */
+   int64_t kr;                /* Values read from value string */
    int iopt;                  /* Index of option within list */
    int len;                   /* Used length of value string */
    int lq;                    /* Was previous character an escaping quote? */
@@ -31478,11 +31647,17 @@ int Split( AstFitsChan *this, const char *card, char **name, char **value,
                          ( nch >= len ) ) {
                         type = AST__COMPLEXI;
 
-/* If that failed, attempt to read a single integer from the string. */
+/* If that failed, attempt to read a single 64 bit integer from the string. */
                      } else if( nch = 0,
-                         ( 1 == astSscanf( v, " %d%n", &ir, &nch ) ) &&
+                         ( 1 == astSscanf( v, " %" PRId64 "%n", &kr, &nch ) ) &&
                          ( nch >= len ) ) {
-                        type = AST__INT;
+
+/* See if the value is small enough to fit in a 32 bit integer. */
+                        if( kr <= INT_MAX && kr >= INT_MIN ) {
+                           type = AST__INT;
+                        } else {
+                           type = AST__KINT;
+                        }
                      }
 
 /* If there are dots (decimal points) in the value... */
@@ -31585,14 +31760,14 @@ int Split( AstFitsChan *this, const char *card, char **name, char **value,
 /* If the value is deemed to be integer, check that the number of digits
    in the formatted value does not exceed the capacity of an int. This may
    be the case if there are too many digits in the integer for an "int" to
-   hold. In this case, change the data type to float. */
+   hold. In this case, change the data type to 64 bit integer. */
    if( *value && type == AST__INT ) {
       ndig = 0;
       c = *value;
       while( *c ) {
          if( isdigit( *(c++) ) ) ndig++;
       }
-      if( ndig >= int_dig ) type = AST__FLOAT;
+      if( ndig >= int_dig ) type = AST__KINT;
    }
 
 /* If an error occurred, free the returned strings and issue a context message. */
@@ -33122,6 +33297,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* --------- */
    } else if ( !strcmp( attrib, "forcetab" ) ) {
       result = astTestForceTab( this );
+
+/* IgnoreBadAlt. */
+/* ------------- */
+   } else if ( !strcmp( attrib, "ignorebadalt" ) ) {
+      result = astTestIgnoreBadAlt( this );
 
 /* CDMatrix. */
 /* --------- */
@@ -41462,6 +41642,46 @@ astMAKE_GET(FitsChan,ForceTab,int,0,(this->forcetab == -INT_MAX ? 0 : this->forc
 astMAKE_SET(FitsChan,ForceTab,int,forcetab,value)
 astMAKE_TEST(FitsChan,ForceTab,( this->forcetab != -INT_MAX ))
 
+/* IgnoreBadAlt */
+/* ============ */
+
+/*
+*att++
+*  Name:
+*     IgnoreBadAlt
+
+*  Purpose:
+*     Ignore unreadable alternate axis descriptions?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute is a  boolean value which indicates what the astRead
+*     method should do if it encounters a set of alternate FITS-WCS axis
+*     descriptions that cannot be read. This may occur, for instance, if the
+*     alternate axis descriptions use a feature of FITS-WCS that is not
+*     supported by AST or are malformed in some way.
+*
+*     If IgnoreBadAlt is zero (the default), then the astRead method will
+*     report an error and abort, returning a null FrameSet pointer. If
+*     IgnoreBadAlt is non-zero, then the astRead method will simply ignore
+*     the unreadable alternate axis descriptions, returning a FrameSet
+*     containing any other axes read successfully from the FITS-WCS header.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+astMAKE_CLEAR(FitsChan,IgnoreBadAlt,ignorebadalt,-INT_MAX)
+astMAKE_GET(FitsChan,IgnoreBadAlt,int,0,(this->ignorebadalt == -INT_MAX ? 0 : this->ignorebadalt))
+astMAKE_SET(FitsChan,IgnoreBadAlt,int,ignorebadalt,value)
+astMAKE_TEST(FitsChan,IgnoreBadAlt,( this->ignorebadalt != -INT_MAX ))
+
 /* CarLin */
 /* ====== */
 
@@ -42025,7 +42245,7 @@ f     to AST_WRITE
 *att--
 */
 astMAKE_CLEAR(FitsChan,AltAxes,altaxes,INT_MAX)
-astMAKE_GET(FitsChan,AltAxes,int,INT_MAX,this->altaxes)
+astMAKE_GET(FitsChan,AltAxes,int,0,(this->altaxes == INT_MAX ? 0 : this->altaxes))
 astMAKE_SET(FitsChan,AltAxes,int,altaxes,value)
 astMAKE_TEST(FitsChan,AltAxes,( this->altaxes != INT_MAX ))
 
@@ -42103,8 +42323,8 @@ astMAKE_TEST(FitsChan,AltAxes,( this->altaxes != INT_MAX ))
 *  Description:
 *     This attribute gives the data type of the keyword value for the
 *     current card of the FitsChan. It will be one of the following
-*     integer constants: AST__NOTYPE, AST__COMMENT, AST__INT, AST__FLOAT,
-*     AST__STRING, AST__COMPLEXF, AST__COMPLEXI, AST__LOGICAL,
+*     integer constants: AST__NOTYPE, AST__COMMENT, AST__INT, AST__KINT,
+*     AST__FLOAT, AST__STRING, AST__COMPLEXF, AST__COMPLEXI, AST__LOGICAL,
 *     AST__CONTINUE, AST__UNDEF.
 
 *  Applicability:
@@ -42271,6 +42491,12 @@ astMAKE_TEST(FitsChan,Warnings,( this->warnings != NULL ))
 *  Conditions:
 *     The following conditions are currently recognised (all are
 *     case-insensitive):
+*
+*     - "BadAlt": This condition arises when reading a FrameSet from a
+*     non-Native encoded FitsChan if an alternate axis description is
+*     ignored because it cannot be read and attribute IgnoreBadAlt is
+*     non-zero. This condition never arises if IgnoreBadAlt is zero
+*     (instead an error is reported and astRead aborts).
 *
 *     - "BadCel": This condition arises when reading a FrameSet from a
 *     non-Native encoded FitsChan if an unknown celestial co-ordinate
@@ -42658,6 +42884,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    ival = set ? GetForceTab( this, status ) : astGetForceTab( this );
    astWriteInt( channel, "FrcTab", set, 1, ival, ( ival != 0 ? "Force use of -TAB": "Only use -TAB if necessary") );
 
+/* IgnoreBadAlt */
+/* ------------ */
+   set = TestIgnoreBadAlt( this, status );
+   ival = set ? GetIgnoreBadAlt( this, status ) : astGetIgnoreBadAlt( this );
+   astWriteInt( channel, "IgBdAl", set, 1, ival,  ( ival != 0 ? "Skip unreadable alternate axes": "Abort on unreadable alternate axes") );
+
 /* CDMatrix */
 /* -------- */
    set = TestCDMatrix( this, status );
@@ -42761,6 +42993,10 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
          } else if( cardtype == AST__INT ){
             (void) sprintf( buff, "Dt%d", ncard );
             astWriteInt( channel, buff, 1, 1, *( (int *) data ),
+                         "FITS keyword value" );
+         } else if( cardtype == AST__KINT ){
+            (void) sprintf( buff, "Dt%d", ncard );
+            astWriteInt( channel, buff, 1, 1, *( (int64_t *) data ),
                          "FITS keyword value" );
          } else if( cardtype == AST__LOGICAL ){
             (void) sprintf( buff, "Dt%d", ncard );
@@ -43531,6 +43767,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
       new->defb1950 = -1;
       new->tabok = -INT_MAX;
       new->forcetab = -INT_MAX;
+      new->ignorebadalt = -INT_MAX;
       new->cdmatrix = -1;
       new->carlin = -1;
       new->sipreplace = -1;
@@ -43656,6 +43893,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
    int flags;                   /* Keyword flags */
    int free_data;               /* Should data memory be freed? */
    int ival[2];                 /* Integer data values */
+   int kval[2];                 /* 64 bit integer data values */
    int ncard;                   /* No. of FitsCards read so far */
    int type;                    /* Keyword type */
    void *data;                  /* Pointer to keyword data value */
@@ -43773,6 +44011,11 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
       new->forcetab = astReadInt( channel, "frctab", -INT_MAX );
       if ( TestForceTab( new, status ) ) SetForceTab( new, new->forcetab, status );
 
+/* IgnoreBadAlt */
+/* ------------ */
+      new->ignorebadalt = astReadInt( channel, "igbdal", -INT_MAX );
+      if ( TestIgnoreBadAlt( new, status ) ) SetIgnoreBadAlt( new, new->ignorebadalt, status );
+
 /* CDMatrix */
 /* -------- */
       new->cdmatrix = astReadInt( channel, "cdmat", -1 );
@@ -43863,6 +44106,10 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
                (void) sprintf( buff, "dt%d", ncard );
                ival[ 0 ] = astReadInt( channel, buff, 0 );
                data = (void *) ival;
+            } else if( type == AST__KINT ){
+               (void) sprintf( buff, "dt%d", ncard );
+               kval[ 0 ] = astReadInt64( channel, buff, 0 );
+               data = (void *) kval;
             } else if( type == AST__LOGICAL ){
                (void) sprintf( buff, "dt%d", ncard );
                ival[ 0 ] = astReadInt( channel, buff, 0 );
@@ -44021,6 +44268,12 @@ void astSetFitsI_( AstFitsChan *this, const char *name, int value,
    (**astMEMBER(this,FitsChan,SetFitsI))( this, name, value, comment, overwrite, status );
 }
 
+void astSetFitsK_( AstFitsChan *this, const char *name, int64_t value,
+                   const char *comment, int overwrite, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,FitsChan,SetFitsK))( this, name, value, comment, overwrite, status );
+}
+
 void astSetFitsF_( AstFitsChan *this, const char *name, double value,
                        const char *comment, int overwrite, int *status ) {
    if ( !astOK ) return;
@@ -44141,6 +44394,11 @@ int astGetFitsF_( AstFitsChan *this, const char *name, double *value, int *statu
 int astGetFitsI_( AstFitsChan *this, const char *name, int *value, int *status ){
    if( !astOK ) return 0;
    return (**astMEMBER(this,FitsChan,GetFitsI))( this, name, value, status );
+}
+
+int astGetFitsK_( AstFitsChan *this, const char *name, int64_t *value, int *status ){
+   if( !astOK ) return 0;
+   return (**astMEMBER(this,FitsChan,GetFitsK))( this, name, value, status );
 }
 
 int astGetFitsL_( AstFitsChan *this, const char *name, int *value, int *status ){

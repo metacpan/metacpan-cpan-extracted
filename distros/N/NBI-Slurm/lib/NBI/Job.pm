@@ -83,6 +83,23 @@ sub new {
     }
 
     $self->{script_path} = undef;
+
+    # Check here if there is opts->placeholder in the commands.
+    # If there is then replace /placeholder/ with ${selected_file}
+
+    if ($self->opts->is_array()) {
+        my $placeholder = $self->opts->placeholder;
+        # Double escape the backslash for regex
+        my $regex_placeholder = $placeholder;
+        $regex_placeholder =~ s/\\/\\\\/g;
+        my $count = 0;
+        for my $cmd (@{$self->{commands}}) {
+            if ($cmd =~ $self->opts->placeholder) {
+                $count++;
+            }
+            $cmd =~ s/\Q$regex_placeholder\E/\${selected_file}/g;
+        }
+    }
     return $self;
  
 }
@@ -171,11 +188,19 @@ sub errorfile : lvalue {
 }
 sub append_command {
     my ($self, $new_command) = @_;
+    if ($self->opts->is_array()) {
+        my $placeholder = $self->opts->placeholder;
+        $new_command =~ s/\Q$placeholder\E/\${selected_file}/g;
+    }
     push @{$self->{commands}}, $new_command;
 }
 
 sub prepend_command {
     my ($self, $new_command) = @_;
+    if ($self->opts->is_array()) {
+        my $placeholder = $self->opts->placeholder;
+        $new_command =~ s/\Q$placeholder\E/\${selected_file}/g;
+    }
     unshift @{$self->{commands}}, $new_command;
 }
 
@@ -212,34 +237,65 @@ sub opts {
 }
 
 ## Run job
-
 sub script {
-    # Generate the sbatch script
     my ($self) = @_;
-    
     my $template = [
-    '#SBATCH -J NBI_SLURM_JOBNAME',
-    '#SBATCH -o NBI_SLURM_OUT',
-    '#SBATCH -e NBI_SLURM_ERR',
-    ''
+        '#SBATCH -J NBI_SLURM_JOBNAME',
+        '#SBATCH -o NBI_SLURM_OUT',
+        '#SBATCH -e NBI_SLURM_ERR',
+        ''
     ];
     my $header = $self->opts->header();
+    
     # Replace the template
     my $script = join("\n", @{$template});
-    # Replace the values
     
+    # Replace the values
     my $name = $self->name;
     my $file_out = $self->outputfile;
     my $file_err = $self->errorfile;
     $script =~ s/NBI_SLURM_JOBNAME/$name/g;
     $script =~ s/NBI_SLURM_OUT/$file_out/g;
     $script =~ s/NBI_SLURM_ERR/$file_err/g;
+    
+    my $replacements = 0;
+    my $placeholder = $self->opts->placeholder;
+    
+    if ($self->opts->is_array()) {
+  
+        # Prepend strings to array $self->{commands}
+        # Escape spaces in each file
+        my @prepend = ();
+        my $self_files = $self->opts->files;
+        for my $file (@{$self_files}) {
+            $file =~ s/ /\\ /g;
+        }
+        my $files_list = join(" ", @{$self_files});
+        my $list = "self_files=($files_list)";
+        push(@prepend, "# Job array list", "$list", "selected_file=\${self_files[\$SLURM_ARRAY_TASK_ID]}");
+        
+        # Prepend the array to the commands
+        unshift @{$self->{commands}}, @prepend;
 
-    # Add the commands
+ 
+        
+    }
+    if ($self->opts->is_array()) {
+        # check if at least one command containts ${selected_file}
+        my $selected_file = 0;
+        for my $cmd (@{$self->{commands}}) {
+            if ($cmd =~ /\$\{selected_file\}/) {
+                $selected_file = 1;
+                last;
+            }
+        }
+        if ($selected_file == 0) {
+            confess "ERROR NBI::Job: No command contains the placeholder:" . $self->opts->placeholder . "\n";
+        }
+    }    
+
     $script .= join("\n", @{$self->{commands}});
-
     return $header . $script . "\n";
-
 }
 
 sub run {
@@ -275,6 +331,7 @@ sub run {
             $i++;
         }
     }
+
     $self->{"script_path"} = $script_file;
     open(my $fh, ">", $script_file) or confess "ERROR NBI::Job: Cannot open file $script_file for writing\n";
     print $fh $script;
@@ -352,57 +409,78 @@ NBI::Job - A class for representing a job for NBI::Slurm
 
 =head1 VERSION
 
-version 0.8.7
-
-=head1 SYNOPSIS
-
-  use NBI::Job;
-  my $job = NBI::Job->new(
-    -name => "job-name",
-    -command => "ls -l",
-  );
-
-Multiple commands can be encoded as a list:
-
-  my $job = NBI::Job->new(
-    -name => "job-name",
-    -commands => ["ls -l", "echo done"]
-  );
+version 0.9.0
 
 =head1 DESCRIPTION
 
 The C<NBI::Job> module provides a class for representing a job to be submitted to SLURM for High-Performance Computing (HPC). 
-It allows you to define the name of the job, the commands to be executed, and various options related to the job.
+It allows you to define the name of the job, the commands to be executed, and various options related to the job execution.
+
+=head1 EXAMPLES
+
+  use NBI::Job;
+  use NBI::Opts;
+
+  # Create a simple job
+  my $job = NBI::Job->new(
+    -name => "simple-job",
+    -command => "echo 'Hello, World!'"
+  );
+
+  # Create a job with multiple commands
+  my $multi_job = NBI::Job->new(
+    -name => "multi-command-job",
+    -commands => ["echo 'Step 1'", "sleep 5", "echo 'Step 2'"]
+  );
+
+  # Create a job with custom options: first define $opts and then $custom_job
+  my $opts = NBI::Opts->new(
+    -queue => "long",
+    -memory => "4GB",
+    -threads => 2,
+    -time => "1h"
+  );
+
+  my $custom_job = NBI::Job->new(
+    -name => "custom-job",
+    -command => "run_analysis.pl",
+    -opts => $opts
+  );
+
+  # Submit the job
+  my $job_id = $custom_job->run;
+  print "Job submitted with ID: $job_id\n";
 
 =head1 METHODS
 
 =head2 new()
 
-Create a new instance of C<NBI::Job>. Note that the options must be made as C<NBI::Opts> class.
+Create a new instance of C<NBI::Job>.
 
   my $job = NBI::Job->new(
-     -name => "job-name",
-     -command => "ls -l",
-     -opts => $options
+    -name => "job-name",
+    -command => "ls -l",
+    -opts => $options
   );
 
-# Multi commands
-my $job = NBI::Job->new(
-    -name => "job-name",
-    -commands => ["ls -l", "echo done"]
-);
+  # Or with multiple commands
+  my $job = NBI::Job->new(
+    -name => "multi-step-job",
+    -commands => ["step1.pl", "step2.pl", "step3.pl"],
+    -opts => $options
+  );
 
-This method creates a new CNBI::Job object with the specified parameters. The following parameters are supported:
+Parameters:
 
 =over 4
 
-=item * B<-name> (string, optional): The name of the job. If not provided, a default name will be assigned.
+=item * B<-name> (string, optional): The name of the job. If not provided, a random name will be generated.
 
-=item * B<-command> (string, optional): The command to be executed by the job. Only one command can be specified using this parameter.
+=item * B<-command> (string, optional): A single command to be executed by the job.
 
-=item * B<-commands> (arrayref, optional): An array reference containing multiple commands to be executed by the job. If both C<-command> and C<-commands> are provided, the C<-command> will be appended to the C<-commands> array.
+=item * B<-commands> (arrayref, optional): An array reference containing multiple commands to be executed by the job.
 
-=item * B<-opts> (C<NBI::Opts> object, optional): An instance of the C<NBI::Opts> class representing the options for the job. If not provided, a default instance with the "nbi-short" queue will be used.
+=item * B<-opts> (C<NBI::Opts> object, optional): An instance of the C<NBI::Opts> class representing the options for the job. If not provided, default options will be used.
 
 =back
 
@@ -410,124 +488,112 @@ This method creates a new CNBI::Job object with the specified parameters. The fo
 
 Accessor method for the job name.
 
-  $job->name = "new-name";
+  $job->name = "new-job-name";
   my $name = $job->name;
-
-This method allows you to get or set the name of the job. 
-If called with an argument, it sets the name of the job to the specified value. 
-If called without an argument, it returns the current name of the job.
 
 =head2 jobid
 
 Accessor method for the job ID.
 
-  $job->jobid = 12345;
+  $job->jobid = 12345;  # Usually set internally after job submission
   my $jobid = $job->jobid;
-
-This method allows you to get or set the ID of the job. If called with an argument, it sets the ID of the job to the specified value. If called without an argument, it returns the current ID of the job. 
-It's currently B<a public method> but it's meant to be updated by the module itself.
 
 =head2 outputfile
 
-Accessor method for the output file path, where the output of the job will be written. Add C<%j> in the name to use the JobID.
+Accessor method for the output file path. Use C<%j> in the filename to include the job ID.
 
-  $job->outputfile = "/path/to/output.txt";
+  $job->outputfile = "job_output_%j.txt";
   my $outputfile = $job->outputfile;
-
-This method allows you to get or set the path of the output file generated by the job. If called with an argument, it sets the output file path to the specified value. If called without an argument, it returns the current output file path.
+  my $interpolated_outputfile = $job->outputfile('-interpolate');
 
 =head2 errorfile
 
-Accessor method for the error file path.
+Accessor method for the error file path. Use C<%j> in the filename to include the job ID.
 
-  $job->errorfile = "/path/to/error.txt";
+  $job->errorfile = "job_error_%j.txt";
   my $errorfile = $job->errorfile;
-
-This method allows you to get or set the path of the error file generated by the job. If called with an argument, it sets the error file path to the specified value. If called without an argument, it returns the current error file path.
+  my $interpolated_errorfile = $job->errorfile('-interpolate');
 
 =head2 script_path
 
-Accessor method for the actual script path. This is the path of the script file generated by the job.
-invoking C<run()> will generate a script path if it was not set.
+Accessor method for the generated script path.
+
+  my $script_path = $job->script_path;
 
 =head2 append_command
 
 Append a command to the job.
 
-  $job->append_command("echo done");
-
-This method allows you to append a command to the list of commands executed by the job.
+  $job->append_command("echo 'Job finished'");
 
 =head2 prepend_command
 
 Prepend a command to the job.
 
-  $job->prepend_command("echo start");
-
-This method allows you to prepend a command to the list of commands executed by the job.
+  $job->prepend_command("echo 'Job starting'");
 
 =head2 commands
 
 Get the list of commands for the job.
 
   my $commands = $job->commands;
-
-This method returns an array reference containing the commands to be executed by the job.
+  foreach my $cmd (@$commands) {
+    print "Command: $cmd\n";
+  }
 
 =head2 commands_count
 
 Get the number of commands for the job.
 
   my $count = $job->commands_count;
-
-This method returns the number of commands defined for the job.
+  print "This job has $count commands.\n";
 
 =head2 set_opts
 
 Set the options for the job.
 
-  $job->set_opts($opts);
-
-This method allows you to set the options for the job using an instance of the C<NBI::Opts> class.
+  my $new_opts = NBI::Opts->new(-queue => "short", -memory => "2GB");
+  $job->set_opts($new_opts);
 
 =head2 get_opts
 
 Get the options for the job.
 
   my $opts = $job->get_opts;
-
-This method returns the options for the job as an instance of the CNBI::Opts class.
+  print "Job queue: " . $opts->queue . "\n";
 
 =head2 opts
 
-Accessor method for the options of the job.
+Alias for get_opts.
 
   my $opts = $job->opts;
-
-This method returns the options for the job as an instance of the CNBI::Opts class.
 
 =head2 script
 
 Generate the sbatch script for the job.
 
-  my $script = $job->script;
-
-This method generates the sbatch script for the job based on the current settings and returns it as a string.
+  my $script_content = $job->script;
+  print "Generated script:\n$script_content\n";
 
 =head2 run
 
 Submit the job to SLURM.
 
-  my $jobid = $job->run;
-
-This method submits the job to SLURM for execution. 
-It generates the sbatch script, writes it to a file, and uses the "sbatch" command to submit the job. If the submission is successful, it returns the job ID assigned by SLURM. Otherwise, it throws an exception.
+  my $submitted_job_id = $job->run;
+  if ($submitted_job_id) {
+    print "Job submitted successfully with ID: $submitted_job_id\n";
+  } else {
+    print "Job submission failed.\n";
+  }
 
 =head2 view
 
-Return a string representation of the object.
+Return a string representation of the job object.
 
-  my $str = $job->view;
+  my $job_info = $job->view;
+  print $job_info;
+
+=cut
 
 =head1 AUTHOR
 

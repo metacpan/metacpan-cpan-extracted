@@ -19,7 +19,7 @@ name: Locale-ID-Province
 provides:
   Locale::ID::Province:
     file: lib/Locale/ID/Province.pm
-    version: '0.111'
+    version: '0.112'
 requires:
   Exporter: '5.57'
   Perinci::Sub::Gen::AccessTable: '0.592'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Locale-ID-Province
   homepage: https://metacpan.org/release/Locale-ID-Province
   repository: git://github.com/perlancar/perl-Locale-ID-Province.git
-version: '0.111'
+version: '0.112'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

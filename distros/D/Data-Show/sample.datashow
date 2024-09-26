@@ -1,0 +1,63 @@
+##### THIS IS A SAMPLE .datashow FILE
+##### IT SPECIFIES THE DEFAULTS FOR THE COMPLETE SET OF AVAILABLE CONFIGURATION OPTIONS
+
+
+# BY DEFAULT THE DUMPER IS EXPORTED AS show()...
+#
+as: show
+
+
+# BY DEFAULT, THE FOLLOWING PLUGIN IS USED TO DUMP DATA
+# (WITH FALLBACK TO THE LISTED ALTERNATIVES)...
+#
+with:      Data::Pretty
+fallback:  Data::Dump,  Data::Dumper,  Dumpvalue
+
+
+# WHERE TO SEND THE FINAL OUTPUT...
+# (IF THE VALUE STARTS WITH *, IT'S TREATED AS A NAMED FILEHANDLE, NOT A FILENAME)
+#
+to:  *STDERR
+
+
+# SHOULD THE MODULE ISSUE COMPILE-TIME WARNINGS WHEN PLUGINS ARE MISSING?
+# (WARNINGS ARE ISSUED IF THE VALUE IS ANYTHING EXCEPT off)
+#
+warnings:  off
+
+
+# SHOULD THE OUTPUT BE STYLED?
+#   auto       ---> USE STYLES IF AVAILABLE
+#   context    ---> ONLY STYLE THE CONTEXT HEADER (IF AVAILABLE)
+#   off        ---> NEVER USE STYLING
+#
+style:  auto
+
+
+# HOW SHOULD THE OUTPUT BE STYLED?
+# IF TWO COMMA-SEPARATED STYLES SPECIFIED: FIRST IS FOR DARK BACKGROUNDS, SECOND IS FOR LIGHT
+# IF ONLY ONE STYLE SPECIFIED: IT IS USED FOR ALL BACKGROUNDS
+#
+#           DARK BACKGROUND     LIGHT BACKGROUND
+#           =================   ================
+#
+showstyle:  bold bright_cyan  , bold bright_blue
+datastyle:  bold white        , bold black
+gridstyle:  blue              , red
+filestyle:  blue              , red
+linestyle:  blue              , red
+codestyle:  cyan              , blue
+
+
+# SHOULD THE OUTPUT BE PRESENTED IN A GRID/TABLE?
+# on  ---> PUT IT IN A GRID
+# off ---> DON'T PUT IT IN A GRID
+#
+grid: off
+
+
+# SPECIFY HOW WIDE THE TERMINAL IS...
+#
+termwidth: 78
+
+

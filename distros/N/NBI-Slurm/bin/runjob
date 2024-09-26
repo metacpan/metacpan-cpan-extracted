@@ -10,6 +10,8 @@ use Data::Dumper;
 use File::Basename;
 use File::Spec;
 use Term::ANSIColor qw(:constants);
+use Cwd qw(abs_path getcwd);
+
 my $BIN = basename($0);
 $Data::Dumper::Sortkeys = 1;
 
@@ -35,6 +37,7 @@ my $tmpdir = $config->{'tmpdir'} // "/tmp";
 my $name;
 my $email_address = $config->{'email'} // undef;
 my $mail_type = $config->{'email_type'} // "none";
+my $opt_placeholder = $config->{'placeholder'} // "#FILE#";
 my $command;
 my $verbose;
 my $debug;
@@ -50,6 +53,8 @@ GetOptions(
     'a|email-address=s' => \$email_address,
     'e|mail-type=s' => \$mail_type, # 'BEGIN,END,FAIL,REQUEUE,ALL'
     'after=s'       => \@afterok,
+    'f|files=s'       => \my @files,
+    'placeholder=s' => \$opt_placeholder,
     'verbose'       => \$verbose,
     'version'       => sub { say "runjob v", $NBI::Slurm::VERSION; exit },
     'debug'         => \$debug,
@@ -64,6 +69,9 @@ my $time_hours = NBI::Opts::_time_to_hour($time);
 $queue = update_queue($queue, $time_hours);
 $command = join(" ", @ARGV);
 usage(1) unless ($command);
+ 
+my @abs_files = get_abs_files(@files);
+
 
 if ($verbose) {
     say STDERR YELLOW, BOLD, "PARAMETERS:",RESET;
@@ -138,6 +146,8 @@ my $opts = NBI::Opts->new(
     -email_address => $email_address,
     -email_type => $mail_type,
     -opts => [$afterok_string],
+    -files => \@abs_files,
+    -placeholder => $opt_placeholder,
 );
 
 
@@ -169,7 +179,7 @@ sub xdump {
 my $job = NBI::Job->new(
     -name => $name,
     -command =>  "cd \"$user_current_dir\"",
-    -opts => $opts
+    -opts => $opts,
 );
 if ($debug) {
     say STDERR YELLOW, "JOB:\n", RESET, Dumper($job);
@@ -223,6 +233,9 @@ sub usage {
     --after  INT     Job ID to wait for [can be used multiple times]
     -w, --tmpdir     Temporary directory [default: /tmp]
     -r, --run        Run the job (otherwise, just print the script)
+    -f, --files      Input files for array (either specify -f as many times as needed or
+                     use a _quoted_ pattern like "*.fasta" to include multiple files)
+    --placeholder    Placeholder for array input files [default: #FILE#]
     --verbose        Verbose output
     --help           This help message
  ----------------------------------------------------------
@@ -276,6 +289,44 @@ sub update_queue {
     return $queue;
 }
 
+
+sub expand_pattern_to_abs_paths {
+    my ($pattern) = @_;
+    
+    # Get the current working directory
+    my $current_dir = getcwd();
+
+    # Expand the pattern
+    my @files = glob($pattern);
+
+    # Convert to absolute paths
+    my @abs_paths = map { File::Spec->rel2abs($_, $current_dir) } @files;
+
+    return @abs_paths;
+}
+
+sub get_abs_files {
+    my @files = @_;
+    for my $file (@files) {
+ 
+        if (-e $file) {
+            push @abs_files, abs_path($file);
+            next;
+        } else {
+            my @tmpfiles = ();
+            push @tmpfiles, expand_pattern_to_abs_paths($file);
+            if (scalar @tmpfiles) {
+                push @abs_files, @tmpfiles;
+            } else {
+                say STDERR RED, BOLD, "ERROR:", RESET, " $file does not exist!";
+                exit 1;
+            }
+        }
+    
+    }
+    return @abs_files;
+}
+
 __END__
 
 =pod
@@ -288,7 +339,7 @@ runjob - Run a job in the cluster using NBI::Slurm
 
 =head1 VERSION
 
-version 0.8.7
+version 0.9.0
 
 =head1 SYNOPSIS
 
@@ -298,7 +349,7 @@ version 0.8.7
 
 The C<runjob> script allows you to submit a job to the cluster using the NBI::Slurm module. 
 
-It provides a command-line interface for setting the job parameters, including the queue, memory, threads, and execution time.
+It provides a command-line interface for setting job parameters, including queue, memory, threads, execution time, and input files.
 
 =head1 OPTIONS
 
@@ -310,22 +361,23 @@ Specifies the name of the job (optional). If not provided, an automatic name wil
 
 =item B<-q, --queue> STR
 
-Specifies the queue name for the job. The default value is "nbi-short".
-Note that if you put a "*", it will be replaced by 'short', 'medium', or 'long' depending on the time specified with '--time'.
+Specifies the queue name for the job. The default value is "qib-short".
+Note that if you include a "*", it will be replaced by 'short', 'medium', or 'long' depending on the time specified with '--time'.
 
-=item B<-m, --memory> INT (Mb)
+=item B<-m, --memory> INT[SUFFIX]
 
-Specifies the amount of memory to use for the job. The default value is 8Gb. You can add a suffix like "900Mb" or "12Gb" (floats are not supported).
+Specifies the amount of memory to use for the job. The default value is 8000 (8GB). 
+You can add a suffix like "900Mb" or "12Gb" (floats are not supported).
 An integer is interpreted as Mb if > 200, otherwise it is interpreted as Gb.
 
 =item B<-c, --cores, --threads> INT
 
 Specifies the number of threads (cores) to use for the job. The default value is 1.
 
-=item B<-t, --time> STR
+=item B<-T, -t, --time> STR
 
-Specifies the B<time string> for the job. The default value is "C<0d 8h>". 
-The format should be in the format of "C<Xd Xh Xm>" where X represents the number of days (d), hours (h), and minutes (m) respectively.
+Specifies the B<time string> for the job. The default value is "2h". 
+The format should be in the form of "C<Xd Xh Xm>" where X represents the number of days (d), hours (h), and minutes (m) respectively.
 
 =item B<--after> INT
 
@@ -335,6 +387,24 @@ Specifies the job ID to wait for before running the job. This option can be used
 
 Specifies the temporary (working) directory for the job. The default value is "/tmp".
 
+=item B<-f, --files> STR
+
+Specifies input files or file patterns for the job. This option can be used multiple times.
+You can use quoted patterns like "*.fasta" to include multiple files matching the pattern.
+
+=item B<--placeholder> STR [default: C<#FILE#>]
+
+Specifies a placeholder string to be used in the command for input files. 
+If not provided, the default placeholder is "#FILE#".
+
+=item B<-a, --email-address> STR
+
+Specifies the email address for job notifications.
+
+=item B<-e, --mail-type> STR
+
+Specifies the type of email notifications to receive. Options include 'BEGIN', 'END', 'FAIL', 'REQUEUE', 'ALL'.
+
 =item B<-r, --run>
 
 Runs the job immediately after submitting. If not specified, the script will only print the job script without running it.
@@ -342,6 +412,14 @@ Runs the job immediately after submitting. If not specified, the script will onl
 =item B<--verbose>
 
 Enables verbose output, displaying additional information about the job and its options.
+
+=item B<--debug>
+
+Enables debug mode, providing even more detailed information about the job setup and execution.
+
+=item B<--version>
+
+Displays the version of the runjob script.
 
 =item B<--help>
 
@@ -352,6 +430,8 @@ Displays the help message for the script.
 =head1 CONFIGURATION
 
 The script will look for a configuration file in the user's home directory at C<~/.nbislurm.config>.
+
+Example configuration:
 
   queue=qib-*,nbi-*
   email=my@address
@@ -371,8 +451,18 @@ Submitting a job with a custom name, 2 threads, and running a Python script:
 
 Chaining jobs together:
 
-    JOB1=$(runjob "echo 'Hello, world!'")
-    runjob --after $JOB1 "echo 'Goodbye, world!'"
+    JOB1=$(runjob -r "echo 'Hello, world!'")
+    runjob --after $JOB1 -r "echo 'Goodbye, world!'"
+
+Running a job with multiple input files (use placeholder #FILE#):
+
+    runjob -f "*.fasta" -f "data.txt" -r "process_files #FILE#"
+
+Using a custom placeholder for input files:
+
+    runjob -f "*.fastq" --placeholder "FASTQ" -r "fastqc FASTQ"
+
+=cut
 
 =head1 AUTHOR
 

@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Storable" => 0,
     "Text::ASCIITable" => "0.22"
   },
-  "VERSION" => "0.8.7",
+  "VERSION" => "0.9.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

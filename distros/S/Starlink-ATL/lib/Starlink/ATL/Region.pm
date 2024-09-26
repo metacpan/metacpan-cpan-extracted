@@ -4,9 +4,9 @@ Starlink::ATL::Region - Tools for AST regions.
 
 =head1 SYNOPSIS
 
-  use Starlink::ATL::Region qw/merge_regions/;
+    use Starlink::ATL::Region qw/merge_regions/;
 
-  my $cmp = merge_regions(\@regions);
+    my $cmp = merge_regions(\@regions);
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,7 @@ use strict;
 use Exporter;
 use Starlink::AST;
 
-our $VERSION = 0.05;
+our $VERSION = '0.06';
 our @ISA = qw/Exporter/;
 our @EXPORT_OK = qw/merge_regions/;
 
@@ -39,33 +39,33 @@ than linearly to minimize the depth of the structure.
 =cut
 
 sub merge_regions {
-  my $ref = shift;
-  my @regions = @$ref;
+    my $ref = shift;
+    my @regions = @$ref;
 
-  return unless @regions;
+    return unless @regions;
 
-  # While we have more than one region in our list, keep
-  # merging them.
-  while (1 < scalar @regions) {
-    my @tmp = ();
+    # While we have more than one region in our list, keep
+    # merging them.
+    while (1 < scalar @regions) {
+        my @tmp = ();
 
-    # Step over the list, 2 spots at a time, taking the two
-    # regions and making them into a CmpRegion.
-    for (my $i = 0; $i <= $#regions; $i += 2) {
-      # Odd number of regions? Allow the last through unmerged.
-      if ($i == $#regions) {
-        push @tmp, $regions[$i];
-      }
-      else {
-        push @tmp, $regions[$i]->CmpRegion($regions[$i + 1],
-                 Starlink::AST::Region::AST__OR(), '');
-      }
+        # Step over the list, 2 spots at a time, taking the two
+        # regions and making them into a CmpRegion.
+        for (my $i = 0; $i <= $#regions; $i += 2) {
+            # Odd number of regions? Allow the last through unmerged.
+            if ($i == $#regions) {
+                push @tmp, $regions[$i];
+            }
+            else {
+                push @tmp, $regions[$i]->CmpRegion($regions[$i + 1],
+                        Starlink::AST::Region::AST__OR(), '');
+            }
+        }
+
+        @regions = @tmp;
     }
 
-    @regions = @tmp;
-  }
-
-  return $regions[0];
+    return $regions[0];
 }
 
 1;

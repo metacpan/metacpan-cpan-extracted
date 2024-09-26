@@ -1,4 +1,4 @@
-package DateTime::Schedule 0.02;
+package DateTime::Schedule 0.03;
 use v5.26;
 
 # ABSTRACT: Determine scheduled days in range based on inclusions/exclusions
@@ -16,10 +16,11 @@ class DateTime::Schedule {
   ADJUST {
     $portion = 0 if ($portion < 0);
     $portion = 1 if ($portion > 1);
-    $exclude = DateTime::Set->from_datetimes(dates => [map {$_->clone->truncate(to => 'day')} $exclude->@*]);
+
+    $exclude = {map {$_->strftime('%F') => 1} ($exclude // [])->@*};
   }
 
-  my sub day_frac($datetime) {
+  method day_frac($datetime) {
     my $this_day = $datetime->clone->truncate(to => 'day');
     my $next_day = $this_day->clone->add(days => 1);
     my $total    = $next_day->epoch - $this_day->epoch;       #total number of seconds in "this" day
@@ -27,32 +28,25 @@ class DateTime::Schedule {
     return $diff / $total;
   }
 
-  method calc_recurrence() {
-    return sub ($prev) {
-      return $prev if ($prev->is_infinite);
-      my $next = $prev;
-      while (1) {
-        $next = $next->add(days => 1);
-        next if ($self->exclude->contains($next));
-        return $next;
-      }
-      return $next;
-    }
+  method is_day_scheduled($d) {
+    my $str = $d->strftime('%F');
+    return !$self->exclude->{$str};
   }
 
   method days_in_range($start, $end) {
     $start = $start->clone;
     $end   = $end->clone;
-    $start = $start->subtract(days => 1) if (day_frac($start) < $portion);
-    $end   = $end->add(days => 1)        if (day_frac($end) > $portion);
+    $end   = $end->add(days => 1) if ($self->day_frac($end) > $self->portion);
     $start->truncate(to => 'day');
     $end->truncate(to => 'day');
 
-    DateTime::Set->from_recurrence(
-      after      => $start,
-      before     => $end,
-      recurrence => $self->calc_recurrence()
-    );
+    my $dates = [];
+    my $d     = $start->clone;
+    while ($d < $end) {
+      push($dates->@*, $d->clone) if ($self->is_day_scheduled($d));
+      $d->add(days => 1);
+    }
+    DateTime::Set->from_datetimes(dates => $dates);
   }
 
 }
@@ -105,6 +99,13 @@ An arrayref of L<DateTime>s. These days are exclusions to the normal schedule
 (e.g., holidays). Any time-portion of the DateTimes is ignored.
 
 =head1 METHODS
+
+=head2 is_day_scheduled($datetime)
+
+Given a L<DateTime>, returns true/false to indicate whether that day is 
+scheduled or not. 
+
+Should be overridden by subclasses.
 
 =head2 days_in_range($start, $end)
 

@@ -3,7 +3,6 @@
 
 requires "Carp" => "0";
 requires "JSON::XS" => "0";
-requires "MIME::Base64" => "0";
 requires "Mojo::Asset::Memory" => "0";
 requires "Mojo::Content::Single" => "0";
 requires "Object::Pad" => "0";

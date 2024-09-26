@@ -1,5 +1,8 @@
 Revision history for Starlink::AST
 
+3.04 2024-09-25
+    - Update to AST version 9.2.12
+
 3.03 2023-04-18
     - Update to AST version 9.2.10
 

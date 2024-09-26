@@ -22,7 +22,7 @@ sub _yell {
 }
 sub new {
     my $class = shift @_;
-    my ($queue, $memory, $threads, $opts_array, $tmpdir, $hours, $email_address, $email_when) = (undef, undef, undef, undef, undef, undef, undef);
+    my ($queue, $memory, $threads, $opts_array, $tmpdir, $hours, $email_address, $email_when, $files, $placeholder) = (undef, undef, undef, undef, undef, undef, undef, undef, undef);
     
     # Descriptive instantiation with parameters -param => value
     if (substr($_[0], 0, 1) eq '-') {
@@ -85,6 +85,26 @@ sub new {
             } elsif ($i =~ /^-time/) {
                 $hours = _time_to_hour($data{$i});
                 
+            # PLACEHOLDER
+            } elsif ($i =~ /^-placeholder/) {
+                # check if placeholder contains special regex characters
+                if (not defined $data{$i}) {
+                    confess "ERROR NBI::Seq: Placeholder cannot be empty\n";
+                }
+                if ($data{$i} =~ /[\*\+\?]/) {
+                    confess "ERROR NBI::Seq: Placeholder cannot contain special regex characters\n";
+                }
+                $placeholder = $data{$i};
+                
+            # ARRAY
+            } elsif ($i =~ /^-files/) {
+                # expects ref to array
+                if (ref($data{$i}) ne "ARRAY") {
+                    confess "ERROR NBI::Seq: -files expects an array\n";
+                } else {
+                    $files = $data{$i};
+                }
+                
             } else {
                 confess "ERROR NBI::Seq: Unknown parameter $i\n";
             }
@@ -101,6 +121,8 @@ sub new {
     $self->tmpdir = defined $tmpdir ? $tmpdir : $SYSTEM_TEMPDIR;
     $self->email_address = defined $email_address ? $email_address : undef;
     $self->email_type = defined $email_when ? $email_when : "none";
+    $self->files = defined $files ? $files : [];
+    $self->placeholder = defined $placeholder ?  $placeholder : "#FILE#";
     # Set options
     $self->opts = defined $$opts_array[0] ? $opts_array : [];
     
@@ -148,6 +170,25 @@ sub email_type : lvalue {
     return $self->{email_type};
 }
 
+# property files (list of files)
+sub files : lvalue {
+    # Update files
+    my ($self, $new_val) = @_;
+    $self->{files} = $new_val if (defined $new_val);
+    return $self->{files};
+}
+
+sub placeholder : lvalue {
+    # Update placeholder
+    my ($self, $new_val) = @_;
+    $self->{placeholder} = $new_val if (defined $new_val);
+    return $self->{placeholder};
+}
+sub is_array {
+    # Check if the job is an array
+    my $self = shift @_;
+    return scalar @{$self->{files}} > 0;
+}
 sub hours : lvalue {
     # Update memory
     my ($self, $new_val) = @_;
@@ -222,11 +263,18 @@ sub header {
         $str .= "#SBATCH --mail-user=" . $self->{email_address} . "\n";
         $str .= "#SBATCH --mail-type=" . $self->{email_type} . "\n";
     }
+
     # Custom options
     for my $o (@{$self->{opts}}) {
         next if not defined $o;
         $str .= "#SBATCH $o\n";
     }
+
+    # Job array
+    if ($self->is_array()) {
+        my $len = scalar @{$self->{files}} - 1;
+        $str .= "#SBATCH --array=0-$len\n";
+    }  
     return $str;
 }
 
@@ -308,7 +356,7 @@ NBI::Opts - A class for representing a the SLURM options for NBI::Slurm
 
 =head1 VERSION
 
-version 0.8.7
+version 0.9.0
 
 =head1 SYNOPSIS
 
@@ -318,26 +366,33 @@ SLURM Options for L<NBI::Slurm>, to be passed to a L<NBI::Job> object.
   my $opts = NBI::Opts->new(
    -queue => "short",
    -threads => 4,
-   -memory => 8,
-   -opts => []
+   -memory => "8GB",
+   -time => "2h",
+   -opts => [],
   );
 
 =head1 DESCRIPTION
 
 The C<NBI::Opts> module provides a class for representing the SLURM options used by L<NBI::Slurm> for job submission. 
-It allows you to set various options such as the queue, number of threads, allocated memory, execution time, and more.
+It allows you to set various options such as the queue, number of threads, allocated memory, execution time, input files, and more.
 
 =head1 METHODS
 
 =head2 new()
 
-Create a new instance of CNBI::Opts.
+Create a new instance of C<NBI::Opts>. In this case this will imply using a job array over a list of files
 
   my $opts = NBI::Opts->new(
     -queue => "short",
     -threads => 4,
-    -memory => 8,
-    -opts  => ["--option=Value"],
+    -memory => "8GB",
+    -time => "2h",
+    -opts => ["--option=Value"],
+    -tmpdir => "/path/to/tmp",
+    -email_address => "user@example.com",
+    -email_type => "ALL",
+    -files => ["file1.txt", "file2.txt"],
+    -placeholder => "#FILE#"
   );
 
 This method creates a new C<NBI::Opts> object with the specified options. The following parameters are supported:
@@ -346,21 +401,43 @@ This method creates a new C<NBI::Opts> object with the specified options. The fo
 
 =item * B<-queue> (string, optional)
 
-The SLURM queue to submit the job to. If not provided, the default queue will be used.
+The SLURM queue to submit the job to. Default is "nbi-short".
 
 =item * B<-threads> (integer, optional)
 
-The number of threads to allocate for the job. If not provided, the default value is 1.
+The number of threads to allocate for the job. Default is 1.
 
-=item * B<-memory> (string or integer (Mb), optional)
+=item * B<-memory> (string or integer, optional)
 
-The allocated memory for the job. It can be specified as a bare number representing megabytes (e.g., 1024), or with a unit suffix (e.g., 1GB). If not provided, the default value is 100 megabytes.
+The allocated memory for the job. It can be specified as a bare number representing megabytes (e.g., 1024), or with a unit suffix (e.g., "8GB"). Default is 100 megabytes.
+
+=item * B<-time> (string or integer, optional)
+
+The time limit for the job. It can be specified as hours (e.g., 2) or as a string with time units (e.g., "2h", "1d 12h"). Default is 1 hour.
 
 =item * B<-opts> (arrayref, optional)
 
-An array reference containing additional SLURM options to be passed to the job script. Each option should be specified as a string. For example, ["--output=TestJob.out", "--mail-user user@nmsu.edu"]. If not provided, no additional options will be added.
+An array reference containing additional SLURM options to be passed to the job script.
 
-B<NOTE> that some options are set by other methods (like C<output_file> and C<email_address>): do not specify them manually.
+=item * B<-tmpdir> (string, optional)
+
+The temporary directory to use for job execution. Default is the system's temporary directory.
+
+=item * B<-email_address> (string, optional)
+
+The email address for job notifications.
+
+=item * B<-email_type> (string, optional)
+
+The type of email notifications to receive (e.g., "NONE", "BEGIN", "END", "FAIL", "ALL"). Default is "NONE".
+
+=item * B<-files> (arrayref, optional)
+
+An array reference containing input files or file patterns for the job.
+
+=item * B<-placeholder> (string, optional)
+
+A placeholder string to be used in the command for input files. Default is "#FILE#".
 
 =back
 
@@ -371,8 +448,6 @@ Accessor method for the SLURM queue.
   $opts->queue = "long";
   my $queue = $opts->queue;
 
-This method allows you to get or set the SLURM queue for the job. If called with an argument, it sets the queue to the specified value. If called without an argument, it returns the current queue value.
-
 =head2 threads
 
 Accessor method for the number of threads.
@@ -380,16 +455,12 @@ Accessor method for the number of threads.
   $opts->threads = 8;
   my $threads = $opts->threads;
 
-This method allows you to get or set the number of threads allocated for the job. If called with an argument, it sets the number of threads to the specified value. If called without an argument, it returns the current number of threads.
-
 =head2 memory
 
 Accessor method for the allocated memory.
 
-  $opts->memory = 16;
+  $opts->memory = "16GB";
   my $memory = $opts->memory;
-
-This method allows you to get or set the allocated memory for the job. If called with an argument, it sets the memory to the specified value. If called without an argument, it returns the current allocated memory.
 
 =head2 email_address
 
@@ -398,16 +469,12 @@ Accessor method for the email address.
   $opts->email_address = "user@example.com";
   my $email_address = $opts->email_address;
 
-This method allows you to get or set the email address to which job notifications will be sent. If called with an argument, it sets the email address to the specified value. If called without an argument, it returns the current email address.
-
 =head2 email_type
 
-Accessor method for the email type.
+Accessor method for the email notification type.
 
-  $opts->email_type = "end";
+  $opts->email_type = "ALL";
   my $email_type = $opts->email_type;
-
-This method allows you to get or set the type of email notifications to receive. Possible values are "none" (no email notifications), "begin" (send email at the start of the job), "end" (send email at the end of the job), or "all" (send email for all job events). If called with an argument, it sets the email type to the specified value. If called without an argument, it returns the current email type.
 
 =head2 hours
 
@@ -416,8 +483,6 @@ Accessor method for the execution time in hours.
   $opts->hours = 24;
   my $hours = $opts->hours;
 
-This method allows you to get or set the execution time for the job in hours. If called with an argument, it sets the execution time to the specified value. If called without an argument, it returns the current execution time.
-
 =head2 tmpdir
 
 Accessor method for the temporary directory.
@@ -425,16 +490,26 @@ Accessor method for the temporary directory.
   $opts->tmpdir = "/path/to/tmpdir";
   my $tmpdir = $opts->tmpdir;
 
-This method allows you to get or set the temporary directory path where temporary files for the job will be stored. If called with an argument, it sets the temporary directory to the specified value. If called without an argument, it returns the current temporary directory.
-
 =head2 opts
 
 Accessor method for the additional SLURM options.
 
-  $opts->opts = ["--output=TestJob.out", "--mail-user user@nmsu.edu"];
+  $opts->opts = ["--output=TestJob.out", "--mail-user user@example.com"];
   my $opts_array = $opts->opts;
 
-This method allows you to get or set the additional SLURM options for the job. The options should be specified as an array reference, where each element is a string representing a single option. If called with an argument, it sets the additional options to the specified array reference. If called without an argument, it returns the current additional options.
+=head2 files
+
+Accessor method for the input files or file patterns.
+
+  $opts->files = ["file1.txt", "*.fasta"];
+  my $files = $opts->files;
+
+=head2 placeholder
+
+Accessor method for the input file placeholder.
+
+  $opts->placeholder = "{INPUT}";
+  my $placeholder = $opts->placeholder;
 
 =head2 add_option
 
@@ -442,15 +517,17 @@ Add an additional SLURM option.
 
   $opts->add_option("--output=TestJob.out");
 
-This method allows you to add an additional SLURM option to the options list.
-
 =head2 opts_count
 
 Get the number of additional SLURM options.
 
   my $count = $opts->opts_count;
 
-This method returns the number of additional SLURM options specified for the job.
+=head2 is_array
+
+Check if the job is an array job (has multiple input files).
+
+  my $is_array = $opts->is_array;
 
 =head2 view
 
@@ -458,15 +535,11 @@ Get a string representation of the options.
 
   my $str = $opts->view;
 
-This method returns a string representation of the CNBI::Opts object, including all the options and their values.
-
 =head2 header
 
 Generate the SLURM header for the job script.
 
   my $header = $opts->header;
-
-This method generates the SLURM header for the job script based on the current options and returns it as a string.
 
 =head2 timestring
 
@@ -474,7 +547,19 @@ Get the execution time as a formatted string.
 
   my $timestring = $opts->timestring;
 
-This method returns the execution time as a formatted string in the format "DD-HH:MM:SS", where "DD" is the number of days, "HH" is the number of hours (in 2 digits), "MM" is the number of minutes, and "SS" is the number of seconds.
+Returns the execution time in the format "DD-HH:MM:SS".
+
+=head1 INTERNAL METHODS
+
+=head2 _mem_parse_mb
+
+Parse memory input and convert to megabytes.
+
+=head2 _time_to_hour
+
+Convert time input to hours.
+
+=cut
 
 =head1 AUTHOR
 

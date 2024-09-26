@@ -1,0 +1,7 @@
+The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl
+
+0.001002  15 September 2024
+          - Fix issues with distribution metadata.
+
+0.001001  15 September 2024
+          - First version, released on an unsuspecting world.

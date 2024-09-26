@@ -45,23 +45,23 @@
    "provides" : {
       "NBI::Job" : {
          "file" : "lib/NBI/Job.pm",
-         "version" : "v0.8.7"
+         "version" : "v0.9.0"
       },
       "NBI::Opts" : {
          "file" : "lib/NBI/Opts.pm",
-         "version" : "v0.8.7"
+         "version" : "v0.9.0"
       },
       "NBI::Queue" : {
          "file" : "lib/NBI/Queue.pm",
-         "version" : "v0.8.7"
+         "version" : "v0.9.0"
       },
       "NBI::QueuedJob" : {
          "file" : "lib/NBI/QueuedJob.pm",
-         "version" : "v0.8.7"
+         "version" : "v0.9.0"
       },
       "NBI::Slurm" : {
          "file" : "lib/NBI/Slurm.pm",
-         "version" : "v0.8.7"
+         "version" : "v0.9.0"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/quadram-institute-bioscience/NBI-Slurm/"
       }
    },
-   "version" : "0.8.7",
+   "version" : "0.9.0",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "MIT"

@@ -1,0 +1,34 @@
+---
+abstract: 'Perl implementation of the Fred Fish C/C++ macros for Perl.'
+author:
+  - 'Curtis Leach <cleach at cpan dot com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.3'
+  File::Copy: '0'
+  File::Spec: '0'
+  Test::Builder::Module: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Fred-Fish-DBUG
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  FileHandle: '0'
+  Perl::AtEndOfScope: '0'
+  Perl::OSType: '0'
+  Sub::Identify: '0'
+  perl: '5.008008'
+version: '2.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

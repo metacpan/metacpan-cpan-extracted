@@ -3,16 +3,32 @@ NAME
     some variants of traditional Unix commands
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::UnixCommandVariants (from Perl distribution
-    Acme-CPANModules-UnixCommandVariants), released on 2024-08-13.
+    Acme-CPANModules-UnixCommandVariants), released on 2024-09-19.
 
 DESCRIPTION
 ACME::CPANMODULES ENTRIES
     App::prefixcat
+        A `cat` variant that print filename at the start of each output line
+        (can also print other prefix).
+
         Script: prefixcat
 
+    App::findsort
+        A `find` variant (actually wrapper) that can sort its output.
+
+        Script: findsort
+
+    App::rsynccolor
+        An `rsync` variant (actually wrapper) that colors its output for
+        visual hints.
+
+        Script: rsynccolor
+
     App::nauniq
+        A `uniq` variant that can remember non-adjacent duplicate lines.
+
         Script: nauniq
 
 FAQ

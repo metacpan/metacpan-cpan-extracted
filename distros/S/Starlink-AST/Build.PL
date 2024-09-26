@@ -3,6 +3,8 @@ use warnings;
 use Module::Build;
 use Config;
 
+my $VERSION = '3.04';
+
 # On OSX we need to restrict the exported symbols in the bundle
 # to prevent NDF linking against libast clashing with NDF loading
 # Starlink::AST
@@ -83,6 +85,7 @@ EOF
 my $build = $class->new
   (
    module_name => "Starlink::AST",
+   dist_version => $VERSION,
    license => "gpl2",
    author => [
               'Tim Jenness <tjenness@cpan.org>',
@@ -114,6 +117,7 @@ my $build = $class->new
                              "-DSIZEOF_LONG_LONG=". $Config{longlongsize},
                              '-DHAVE_INT64_T=1',
                              '-DHAVE_UINT64_T=1',
+                             "-DPACKAGE_STRING=\"Starlink::AST $VERSION\"",
                              @defines,
                            ],
    extra_linker_flags => $linkflags,

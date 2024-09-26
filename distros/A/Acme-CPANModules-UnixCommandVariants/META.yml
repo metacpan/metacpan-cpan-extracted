@@ -19,14 +19,14 @@ name: Acme-CPANModules-UnixCommandVariants
 provides:
   Acme::CPANModules::UnixCommandVariants:
     file: lib/Acme/CPANModules/UnixCommandVariants.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-UnixCommandVariants
   homepage: https://metacpan.org/release/Acme-CPANModules-UnixCommandVariants
   repository: git://github.com/perlancar/perl-Acme-CPANModules-UnixCommandVariants.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

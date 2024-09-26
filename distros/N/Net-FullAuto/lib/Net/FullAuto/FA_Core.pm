@@ -3682,7 +3682,7 @@ my %calendar_years=(
 my $select_time_result_sub = sub {
   
    package select_time_result_sub;
-   use Net::FullAuto::FA_Core qw/%month timelocal/;
+   use Net::FullAuto::FA_Core;
    my $selection="]S[{select_minutes|select_hours|".
                      "select_days|select_weeks|select_months}";
    $selection=~s/^["]//;
@@ -3968,7 +3968,7 @@ my %ask_exp=(
 my $get_expiration_sub=sub {
 
    package get_expiration_sub;
-   use Net::FullAuto::FA_Core qw/%days @month/;
+   use Net::FullAuto::FA_Core;
    my $arg=']!P[{existing_plans}';
    $arg=~s/^["](.*)["]$/$1/s;
    my $plan=&Net::FullAuto::FA_Core::getplan($arg);
@@ -7730,6 +7730,7 @@ print $Net::FullAuto::FA_Core::LOG "WHAT IS USE?=$use\n"
 
 sub pty_do_cmd
 {
+
    my @topcaller=caller;
    print "\nINFO: FA_Core::pty_do_cmd() (((((((CALLER))))))):\n       ",
       (join ' ',@topcaller),"\n\n"
@@ -13828,7 +13829,6 @@ sub fa_login
                 'dashboard'             => \$dashboard,
                 'scrub'                 => \$scrub,
                 'help|?'                => \$help,
-                'h|?'                   => \$help,
                 'i=s'                   => \$identityfile,
                 'identity_file=s'       => \$identityfile,
                 'identity-file=s'       => \$identityfile,
@@ -30433,10 +30433,13 @@ sub cmd
                               my $lsac=(length $stripang_live_command)+1;
                               if ($lsac==$lslc) {
                                  $output=unpack("x$ltso a*",$output);
+                                 my $qmop=quotemeta($output);
                                  if ($output=~s/^\s*(stdout.*
                                        \n$cmd_prompt)$/$1/sx) {
                                     $growoutput.=$output;
                                     $first=0;
+                                 } elsif ($live_command=~/$qmop$/) {
+                                    $command_stripped_from_output=1;
                                  } else {
                                     $growoutput=$output;
                                     $command_stripped_from_output=1;
@@ -30685,6 +30688,13 @@ sub cmd
 		  $test_growoutput_for_cmd_prompt||=0;
 		  $test_growoutput_for_cmd_prompt=
 		     ($test_growoutput_for_cmd_prompt)?'true':'false';
+                  if ($test_growoutput_for_cmd_prompt) {
+                     if ($growoutput=~/$cmd_prompt[[]A(?:[[]C)+$/) {
+                        $growoutput=$cmd_prompt;
+                     } elsif ($growoutput=~/(?:[[]C)+[[]K1.*$cmd_prompt/s) {
+                        $growoutput=$cmd_prompt;
+                     }
+                  }
                   print "\nTEST FOR CMD-OUTPUT-ENDING CMD_PROMPT:\n",
 		     "Is ",$cmd_prompt," at the end of GROWOUTPUT?: ",
 		     $test_growoutput_for_cmd_prompt."\nand GROWOUTPUT=",
@@ -31056,6 +31066,8 @@ print "GOING TO INT EIGHTZZZ\n";
             $stderr=$lastline if $lastline=~/Connection to.*closed/s;
 print $Net::FullAuto::FA_Core::LOG "cmd() STDERRBOTTOM=$stderr<== and LASTLINE=$lastline<==\n"
    if $Net::FullAuto::FA_Core::log && !$no_log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+print "cmd() STDERRBOTTOM=$stderr<== and STDOUTBOTTOM=$stdout and LASTLINE=$lastline<== and WANTARRAY=$wantarray<==\n"
+   if !$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug);
             if ($stderr!~s/^\s*$//s && $stderr!~/^\s*_funkyPrompt_\s*$/s) {
                chomp($stderr);
                &Net::FullAuto::FA_Core::handle_error($stderr) if !$wantarray;
@@ -31247,8 +31259,10 @@ print $Net::FullAuto::FA_Core::LOG "LOGINRETRY2=$login_retry and ",
          if ($wantarray) {
 print $Net::FullAuto::FA_Core::LOG "WE ARE RETURNING ERROR=$eval_error\n"
    if $Net::FullAuto::FA_Core::log && !$no_log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-            if ($stdout=~/^.*\n\d+$/s) {
-               $stdout=~s/^(.*)\n(\d+)$/$1\n$2/s;
+print "WE ARE RETURNING ERROR=$eval_error<== and STDOUT=$stdout<==\n"
+   if !$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug);
+            if ($stdout=~/^(.*)(0|1|2|123|126|127|128|130|137|255)$/) {
+               return $1,$eval_error,$2;
             }
             my @stdout_contents=split "\n",$stdout;
             my $exitcode=pop(@stdout_contents);
@@ -31267,7 +31281,7 @@ print $Net::FullAuto::FA_Core::LOG "WE ARE RETURNING ERROR=$eval_error\n"
          my $exit_code=pop(@stdout_contents);
          $exit_code=pop(@stdout_contents) if $exit_code=~/^\s*$/s;
          if (!defined $exit_code || $exit_code!~/^\d+$/s) {
-            if ($exit_code=~/^(.*)(0|1|2|123|126|127|130|137|255)\s*$/s) {
+            if ($exit_code=~/^(.*)(0|1|2|123|126|127|128|130|137|255)\s*$/s) {
                $stdout_contents[$#stdout_contents]=$1;$exitcode=$2;
             }
          } else {
@@ -31276,7 +31290,7 @@ print $Net::FullAuto::FA_Core::LOG "WE ARE RETURNING ERROR=$eval_error\n"
          $stdout=join ":${$}FA:", @stdout_contents;
          $stdout=~s/:${$}FA:/\n/sg;
       } elsif ($stdout=~/\d+$/s) {
-         if ($stdout=~/^(.*)(0|1|2|123|126|127|130|137|255)$/s) {
+         if ($stdout=~/^(.*)(0|1|2|123|126|127|128|130|137|255)$/s) {
             $stdout=$1;$exitcode=$2;
          }
       }

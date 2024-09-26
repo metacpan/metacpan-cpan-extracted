@@ -135,6 +135,46 @@ END
             unless (-1<index $choice,'Add Permanent') {
                Net::FullAuto::FA_Core::cleanup();
             } else {
+              my ($stdout,$stderr)=$handle->cmd('aws','__display__');
+              if ($stderr=~/aws: command not found/) {
+                 if ($^O eq 'cygwin') {
+                   ($stdout,$stderr)=$handle->cmd('python --version'); 
+                   unless ($stderr=~/python: command not found/) {
+                      ($stdout,$stderr)=$handle->cmd( 
+                         'echo Y | pip uninstall awscli','__display__');
+                      # https://stackoverflow.com/questions/30809822/how-to-get-aws-command-line-interface-to-work-in-cygwin
+                      ($stdout,$stderr)=$handle->cmd(
+                         'wget --random-wait --progress=dot '.
+                         'rawgit.com/transcode-open/apt-cyg/master/apt-cyg',
+                         '__display__');
+                      ($stdout,$stderr)=$handle->cmd(
+                         'install apt-cyg /bin','__display__');
+                      ($stdout,$stderr)=$handle->cmd(
+                         'apt-cyg install python','__display__');
+                   }
+                   ($stdout,$stderr)=$handle->cmd('pip --version','__display__');
+                   unless ($stderr=~/pip: command not found/) {
+                      ($stdout,$stderr)=$handle->cmd(
+                         'wget --random-wait --progress=dot '.
+                         'https://bootstrap.pypa.io/get-pip.py',
+                         '__display__');
+                      ($stdout,$stderr)=$handle->cmd(
+                         'python get-pip.py','__display__');
+                   }
+                   ($stdout,$stderr)=$handle->cmd(
+                      'echo Y | pip install awscli','__display__');
+                 } else {
+                    #my $cmd='curl "https://awscli.amazonaws.com/'.
+                    #        'awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"';
+                    my $cmd='wget --output awscliv2.zip '.
+                            '--random-wait --progress=dot '.
+                            'https://awscli.amazonaws.com/'.
+                            'awscli-exe-linux-x86_64.zip';
+                    ($stdout,$stderr)=$handle->cmd($cmd); 
+                    ($stdout,$stderr)=$handle->cmd('unzip awscliv2.zip');
+                    ($stdout,$stderr)=$handle->cmd('./aws/install');
+                 }
+              }
               $Net::FullAuto::Cloud::fa_amazon::configure_aws->($aws_access_key_id,$aws_secret_access_key,$handle);
               next
             }
@@ -457,9 +497,18 @@ our $aws_configure=sub {
       $main::aws->{access_id}="]I[{'configure_aws2',1}";
       $main::aws->{secret_key}="]I[{'configure_aws2',2}";
    }
-   my $region=`ec2-metadata --availability-zone`;
-   $region=~s/^placement: (.*).$/$1/;
-   chop $region;
+   my ($stdout,$stderr)=$handle->cmd(
+      'curl -X PUT "http://169.254.169.254/latest/api/token" '.
+      '-H "X-aws-ec2-metadata-token-ttl-seconds: 21600"');
+   my $token=$stdout;
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -H \"X-aws-ec2-metadata-token: $token\" ".
+      'http://169.254.169.254/latest/meta-data/instance-id');
+   my $instance_id=$stdout;
+      ($stdout,$stderr)=$handle->cmd(
+      "curl -H \"X-aws-ec2-metadata-token: $token\" ".
+      'http://169.254.169.254/latest/meta-data/placement/region');
+   my $region=$stdout;
    my $homedir='.';
    my $handle_homedir='';
    my $handle_username='';
@@ -573,6 +622,7 @@ our $aws_configure=sub {
       my $group=$handle_username;
       #$handle->cmd($sudo.
       #   "cp -Rv $homedir/.aws /home/$handle_username",'__display__');
+      $group='Administrators' if $handle_username eq 'Administrator';
       $handle->cmd($sudo.
          "chown -Rv $handle_username:$group /home/$handle_username/.aws",
          '__display__');

@@ -45,21 +45,25 @@
       },
       "x_lists" : {
          "x_lists" : {
+            "App::findsort" : "0",
             "App::nauniq" : "0",
-            "App::prefixcat" : "0"
+            "App::prefixcat" : "0",
+            "App::rsynccolor" : "0"
          }
       },
       "x_mentions" : {
          "x_mentions" : {
+            "App::findsort" : "0",
             "App::nauniq" : "0",
-            "App::prefixcat" : "0"
+            "App::prefixcat" : "0",
+            "App::rsynccolor" : "0"
          }
       }
    },
    "provides" : {
       "Acme::CPANModules::UnixCommandVariants" : {
          "file" : "lib/Acme/CPANModules/UnixCommandVariants.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -74,7 +78,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-UnixCommandVariants"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

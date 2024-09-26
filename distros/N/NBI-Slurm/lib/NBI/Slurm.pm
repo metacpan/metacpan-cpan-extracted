@@ -8,7 +8,7 @@ use NBI::Opts;
 use base qw(Exporter);
 our @ISA = qw(Exporter);
 our @EXPORT = qw(Job Opts load_config has_queue %FORMAT_STRINGS);
-$NBI::Slurm::VERSION = '0.8.7';
+$NBI::Slurm::VERSION = '0.9.0';
 
 
 
@@ -71,8 +71,12 @@ sub has_squeue {
 sub queues {
   my $can_fail = shift;
   # Retrieve queues from SLURM
-  my $has_sinfo = `sinfo --version`;
-  chomp($has_sinfo);
+  my $has_sinfo = undef;
+  eval {
+    $has_sinfo = `sinfo --version > /dev/null 2>&1`;
+  };
+  
+  chomp($has_sinfo) if defined $has_sinfo;
   if (not defined $has_sinfo and ! $can_fail) {
     Carp::croak "ERROR NBI::Slurm: sinfo failed. Are you in a SLURM cluster?\n";
   }
@@ -149,7 +153,7 @@ NBI::Slurm - NBI Slurm module
 
 =head1 VERSION
 
-version 0.8.7
+version 0.9.0
 
 =head1 SYNOPSIS
 

@@ -216,6 +216,27 @@ my $seed = time();
     
     ok(SPVM::TestCase::Module::Fn->slice);
     
+    # system_is_little_endian
+    {
+      my $system_is_little_endian_expected;
+      if ($Config{byteorder} =~ /^1234/) {
+        $system_is_little_endian_expected = 1;
+      }
+      
+      is(SPVM::Fn->system_is_little_endian, $system_is_little_endian_expected);
+    }
+    
+    ok(SPVM::TestCase::Module::Fn->sprintf);
+    
+    ok(SPVM::TestCase::Module::Fn->sort_asc);
+    
+    ok(SPVM::TestCase::Module::Fn->sort_desc);
+    
+    ok(SPVM::TestCase::Module::Fn->sort);
+    
+    ok(SPVM::TestCase::Module::Fn->change_endian);
+    ok(SPVM::TestCase::Module::Fn->big_endian_to_system_endian);
+    ok(SPVM::TestCase::Module::Fn->system_endian_to_big_endian);
   }
   
   # Extra

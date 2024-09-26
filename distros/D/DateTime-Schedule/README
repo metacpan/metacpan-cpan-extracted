@@ -41,6 +41,12 @@ CONSTRUCTORS
     schedule (e.g., holidays). Any time-portion of the DateTimes is ignored.
 
 METHODS
+  is_day_scheduled($datetime)
+    Given a DateTime, returns true/false to indicate whether that day is
+    scheduled or not.
+
+    Should be overridden by subclasses.
+
   days_in_range($start, $end)
     Given start/end DateTimes, returns a DateTime::Set of all the days which
     are scheduled (i.e., not excluded)

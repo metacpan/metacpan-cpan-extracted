@@ -53,7 +53,7 @@ use Starlink::AST;
 use Carp;
 use Data::Dumper;
 
-$VERSION = '3.03';
+$VERSION = '3.04';
 
 # Constants describing locations in the external array
 use constant EXT_ATTR => 9;

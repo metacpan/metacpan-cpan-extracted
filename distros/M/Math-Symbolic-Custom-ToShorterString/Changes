@@ -1,5 +1,9 @@
 Revision history for Math-Symbolic-Custom-ToShorterString
 
+0.03    Thu Sep 26 09:30 2024
+        Fixed a bug in re-parsing output strings
+        Parentheses now removed from around exponential expressions
+
 0.02    Tue Sep 24 15:00 2024
         Fixed bug in is_expanded()
 

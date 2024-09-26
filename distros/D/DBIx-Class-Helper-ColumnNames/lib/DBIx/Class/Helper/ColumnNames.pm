@@ -15,14 +15,13 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::clean;
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 
 
 sub get_column_names ($self) {
     my @columns;
 
-    state sub _get_name {
-        my ($col) = @_;
+    state sub _get_name ($col) {
         if ( is_plain_hashref($col) ) {
             my ($name) = keys $col->%*;
             return $name;
@@ -60,7 +59,7 @@ DBIx::Class::Helper::ColumnNames - Retrieve column names from a resultset
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.1
 
 =head1 SYNOPSIS
 
@@ -84,6 +83,8 @@ HTML table or to export as a spreadsheet, for example.
 =head1 METHODS
 
 =head2 get_column_names
+
+  my @header = $rs->get_column_names;
 
 This method attempts to return the column names of the resultset.
 

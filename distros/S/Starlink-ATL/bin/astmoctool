@@ -14,17 +14,17 @@ perform.  For example to load a file and then display information:
 
 Note: AST performs all MOC operations at a particular "MaxOrder" value.
 This will be determined by the first loaded MOC or can be specified
-via the "--max-order" option.  Cells smaller than this order are ignored.
+via the "--max-order" option.
 
 =head1 OPTIONS
 
 =over 4
 
-=item B<--info>
+=item B<--info, -i>
 
 Display information about the current MOC.
 
-=item B<--output> FILENAME
+=item B<--output, -o> FILENAME
 
 Write the current MOC to the given file.
 
@@ -53,8 +53,8 @@ use strict;
 use IO::File;
 use Pod::Usage;
 
-use Astro::FITS::CFITSIO;
 use Starlink::AST;
+use Starlink::ATL::MOC qw/read_moc_fits write_moc_fits/;
 
 moc_tool(@ARGV);
 
@@ -64,7 +64,7 @@ sub moc_tool {
     my $moc = undef;
     my $initialize_moc = sub {
         my $options = shift // '';
-        $moc = new Starlink::AST::Moc($options);
+        $moc = Starlink::AST::Moc->new($options);
     };
 
 
@@ -72,7 +72,6 @@ sub moc_tool {
         [[qw/--info -i/], sub {
             die 'A MOC has not yet been defined' unless defined $moc;
             printf "Max. order: %i (%f\")\n", $moc->GetI('MaxOrder'), $moc->GetD('MaxRes');
-            printf "Min. order: %i (%f\")\n", $moc->GetI('MinOrder'), $moc->GetD('MinRes');
             printf "Area: %f sq. deg.\n", $moc->GetD('MocArea') / 3600.0;
             printf "Cells: %i\n", $moc->GetI('MocLength');
             printf "Type: %i-byte\n", $moc->GetI('MocType');
@@ -134,44 +133,7 @@ sub write_moc {
     my ($moc, $filename) = @_;
 
     if ($filename =~ /\.fits?$/i) {
-        # MOC FITS writing routine based on "atl_mocft.f".
-
-        my $data = $moc->GetMocData();
-        my $fc = $moc->GetMocHeader();
-        my $status = 0;
-        my $fptr = Astro::FITS::CFITSIO::create_file($filename, $status);
-        die 'Error opening FITS file' if $status;
-
-        $fptr->insert_key_log('SIMPLE', 1, '', $status);
-        $fptr->insert_key_lng('BITPIX', 8, '', $status);
-        $fptr->insert_key_lng('NAXIS', 0, '', $status);
-        $fptr->insert_key_log('EXTEND', 1, '', $status);
-        die 'Error writing primary headers' if $status;
-
-        $fptr->create_hdu($status);
-        die 'Error creating HDU' if $status;
-
-        $fc->Clear('Card');
-        for (;;) {
-            last unless $fc->FindFits('%f', my $card, 1);
-            $fptr->write_record($card, $status);
-        }
-        die 'Error writing MOC headers' if $status;
-
-        my $type = $moc->GetI('MocType');
-        if ($type == 4) {
-            $fptr->write_col_lng(1, 1, 1, (scalar @$data), $data, $status);
-        }
-        elsif ($type == 8) {
-            $fptr->write_col_lnglng(1, 1, 1, (scalar @$data), $data, $status);
-        }
-        else {
-            die 'MOC type not recognized';
-        }
-        die 'Error writing MOC data' if $status;
-
-        $fptr->close_file($status);
-        die 'Error closing FITS file' if $status;
+        write_moc_fits($moc, $filename);
     }
     elsif ($filename eq '-') {
         print $moc->GetMocString(0), "\n";
@@ -179,68 +141,22 @@ sub write_moc {
     else {
         my $json = $filename =~ /\.json$/i;
 
-        my $fh = new IO::File($filename, 'w');
+        my $fh = IO::File->new($filename, 'w');
         die "Could not open file '$filename' for writing" unless defined $fh;
         print $fh $moc->GetMocString($json ? 1 : 0);
         close $fh;
     }
 }
 
-sub read_moc{
+sub read_moc {
     my ($moc, $filename, $mode, $negate) = @_;
 
     if ($filename =~ /\.fits?$/i) {
-        # MOC FITS reading routine based on similar code in GAIA.
-
-        my $status = 0;
-        my $fptr = Astro::FITS::CFITSIO::open_file(
-            $filename, Astro::FITS::CFITSIO::READONLY(), $status);
-        die 'Error opening FITS file' if $status;
-
-        $fptr->get_num_hdus(my $nhdu, $status);
-        die 'Error getting number of HDUs' if $status;
-
-        # Assume simple MOC file: only one extension which is the MOC.
-        die 'Unexpected number of HDUs' unless $nhdu = 2;
-        my $ihdu = 2;
-
-        $fptr->movabs_hdu($ihdu, my $hdutype, $status);
-        die 'Error selecting HDU' if $status;
-        die 'HDU is not a binary table'
-            unless $hdutype == Astro::FITS::CFITSIO::BINARY_TBL();
-
-        $fptr->read_key(Astro::FITS::CFITSIO::TINT(),
-            'MOCORDER', my $mocorder, my $mocorder_comment, $status);
-        die 'Error reading MOCORDER' if $status;
-
-        $fptr->read_key(Astro::FITS::CFITSIO::TINT(),
-            'NAXIS2', my $moclen, my $moclen_comment, $status);
-        die 'Error reading NAXIS2' if $status;
-
-        $fptr->read_key(Astro::FITS::CFITSIO::TSTRING(),
-            'TFORM1', my $tform1, my $tform1_comment, $status);
-        die 'Error reading TFORM1' if $status;
-
-        my @data;
-        if ($tform1 =~ /^1?J$/) {
-            $fptr->read_col_lng(1, 1, 1, $moclen, 0, \@data, my $anynull, $status);
-        }
-        elsif ($tform1 =~ /^1?K$/) {
-            $fptr->read_col_lnglng(1, 1, 1, $moclen, 0, \@data, my $anynull, $status);
-        }
-        else {
-            die 'Unrecognized TFORM1';
-        }
-        die 'Error reading MOC data' if $status;
-
-        $moc->AddMocData($mode, $negate, $mocorder, \@data);
-
-        $fptr->close_file($status);
-        die 'Error closing FITS file' if $status;
+        read_moc_fits($filename, moc => $moc, mode => $mode, negate => $negate);
     }
     else {
         local $/;
-        my $fh = new IO::File($filename);
+        my $fh = IO::File->new($filename);
         die "Could not open file '$filename' for reading" unless defined $fh;
         my $buff = <$fh>;
         close $fh;
@@ -253,7 +169,7 @@ __END__
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019-2021 East Asian Observatory
+Copyright (C) 2019-2022 East Asian Observatory
 All Rights Reserved.
 
 This program is free software: you can redistribute it and/or modify

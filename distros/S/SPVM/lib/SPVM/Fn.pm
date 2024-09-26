@@ -1461,6 +1461,104 @@ The type of the array $array must be an object array type, a numeric array type 
 
 Exceptions thrown by L<Array#memcpy_object|SPVM::Array/"memcpy_object"> method or L</"memcpy"> method could be thrown.
 
+=head2 system_is_little_endian 
+
+C<static method system_is_little_endian ();>
+
+If the system is little-endian, returns 1, otherwise returns 0.
+
+=head2 sprintf
+
+C<static method sprintf : string ($format : string, $args : object[]);>
+
+Calls L<Format#sprintf|SPVM::Format/"sprintf"> method and returns its return value.
+
+Exceptions:
+
+Exceptions thrown by thrown L<Format#sprintf|SPVM::Format/"sprintf"> method could be thrown.
+
+=head2 sort_asc
+
+C<static method sort_asc : object ($array : object);>
+
+Copies the array $array using L</"copy"> method, sorts the copied array by ascendant order, and returns it.
+
+The type of $array must be a numeric array type.
+
+Thie method calls a corresponding method in L<Sort|SPVM::Sort> class.
+
+Exceptions:
+
+The array $array must be defined. Otherwise an exception is thrown.
+
+The type of the array $array must be a numeric array type. Otherwise an exception is thrown.
+
+=head2 sort_desc
+
+C<static method sort_desc : object ($array : object);>
+
+Copies the array $array using L</"copy"> method, sorts the copied array by descendant order, and returns it.
+
+The type of $array must be a numeric array type.
+
+Thie method calls a corresponding method in L<Sort|SPVM::Sort> class.
+
+Exceptions:
+
+The array $array must be defined. Otherwise an exception is thrown.
+
+The type of the array $array must be a numeric array type. Otherwise an exception is thrown.
+
+=head2 sort
+
+C<static method sort : object[] ($array : object[], $comparator : Comparator);>
+
+Copies the array $array using L</"copy"> method, sorts the copied array by the order specified by the comparator $comparator, and returns it.
+
+This method calls L<Sort#sort_object|SPVM::Sort/"sort_object"> method to sort the copied array.
+
+Exceptions:
+
+Exceptions thrown by thrown L<Sort#sort_object|SPVM::Sort/"sort_object"> method could be thrown.
+
+=head2 change_endian
+
+C<static method change_endian : void ($binary : mutable string, $size : int);>
+
+The byte order of the first $size bytes of the binary data $binary are reversed in-plcae.
+
+Exceptions:
+
+The binary data $binary must be defined. Otherwise an exception is thrown.
+
+The byte size $size must be greater than 0. Otherwise an exception is thrown.
+
+The byte size $size must be less than or equal to the length of the binary data \$binary.
+
+=head2 big_endian_to_system_endian
+
+C<static method big_endian_to_system_endian : void ($binary : mutable string, $size : int);>
+
+The byte order of the first $size bytes of the binary data $binary are changed from big endian to system endian.
+
+This method calls L</"change_endian"> method to change endian.
+
+Exceptions:
+
+Exceptions thrown by L</"change_endian"> method could be thrown.
+
+=head2 system_endian_to_big_endian
+
+C<static method system_endian_to_big_endian : void ($binary : mutable string, $size : int);>
+
+The byte order of the first $size bytes of the binary data $binary are changed from system endian to big endian.
+
+This method calls L</"change_endian"> method to change endian.
+
+Exceptions:
+
+Exceptions thrown by L</"change_endian"> method could be thrown.
+
 =head1 See Also
 
 =over 2

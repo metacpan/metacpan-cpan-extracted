@@ -1,6 +1,16 @@
-0.111   2024-08-05  Released-By: PERLANCAR; Urgency: medium
+0.112   2024-09-26  Released-By: PERLANCAR; Urgency: high
+
+        - Update data (add missing records due to typo, fix Papua Selatan
+          record).
+
+
+0.111   2024-08-05  Released-By: PERLANCAR; Urgency: medium; Broken: yes
 
         - Update data (33 -> 38 provinces), add ind_abbrev column.
+
+        - Remove alias module Locale::ID::SubCountry.
+
+        - UPDATE 2024-09-26: this release is broken due to typos in source data.
 
 
 0.110   2021-05-07  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes

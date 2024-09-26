@@ -1,5 +1,8 @@
 Revision history for perl distribution DateTime::Schedule
 
+0.03      2024-09-25T09:27:39-05:00
+  - improved performance
+
 0.02      2024-06-12T12:34:15-05:00
   - corrected missing dependency
 

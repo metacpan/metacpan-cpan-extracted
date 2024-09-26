@@ -1,0 +1,3 @@
+%= $self->wrap(sub {\
+  <p><%= $self->name %></p>\
+% })

@@ -1,0 +1,323 @@
+# Developer's notes for Fred::Fish::DBUG ...
+
+# The DBUG module was originally written in C/C++ and the algorithm had been
+# placed in the public domain by it's author, Fred Fish. You can easily find
+# the source code for various implementations of it by Googling
+# "fred fish dbug download" from multiple sources.
+
+# It was originally written as a suite of C/C++ macros so that compiling things
+# with fish turned off would result in improved performance.  But since we can't
+# do that in Perl, we don't get as good a performance boost with fish turned
+# off.  But we do get some by bypassing all writes to the fish file.
+
+# I took a liberal interpretation of the macro library and geared the
+# implementation toward a Perl environment.
+# I didn't implement all the functions in the same way done in C/C++ or
+# even use the same names, but the implementations will be close and obvious.
+# There will also be some new functionality since we are dealing with Perl and
+# not C/C++.
+
+# So read the POD text for more details on the implementation.
+
+# This file just contains the high level notes I used as a starting point and
+# may not be 100% correct anymore.
+
+# -----------------------------------------------------------------------------
+# The modules that make up this release.
+# -----------------------------------------------------------------------------
+# Fred::Fish::DBUG      - The main fish module. (Turn fish on & off dynamically)
+#                         This is the module you should be using.
+# Fred::Fish::DBUG::ON  - The fish module is active.  (fish can be on or off)
+# Fred::Fish::DBUG::OFF - The fish module as stubs.   (fish always off)
+# Fred::Fish::DBUG::Signal - A module that traps & logs signals to fish.
+# Fred::Fish::DBUG::TIE - A module that traps & logs STDOUT & STDERR to fish.
+# Fred::Fish::DBUG::Tutorial - A POD only module.  Use "perldoc" to read it.
+#                              Provides a brief tutorial on how to use this
+#                              module.
+# Fred::Fish::DBUG::SignalKiller - A dangerous module that redefines how die
+#                                  works with these modules.  Your code
+#                                  probably won't work if you use it.
+# -----------------------------------------------------------------------------
+
+INSTALLATION
+=====================================================================
+
+To install this module in the default location type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install this module in an alternate location do:
+
+   location=<install-location>
+   perl Makefile.PL INSTALL_BASE=${location}
+   make
+   make test
+   make install
+
+Then set PERL5LIB to "${location}/lib/perl5".
+
+===============================================================================
+Using this module:
+===============================================================================
+ 1) use Fred::Fish::DBUG  qw / on /;
+    This enables fish to be dynamically turned on & off in you program.
+    Excessive use of fish/DBUG calls can slow down your program.
+
+ 2) use Fred::Fish::DBUG  qw / off /;
+    This turns the vast majority of the fish/DBUG calls into stubs.  This
+    eliminates the slowdowns experienced with the "ON" option.
+
+ 3) use Fred::Fish::DBUG  qw / on_if_set  some_env_var /;
+    If $ENV{some_env_var} evaluates to TRUE, then it's the same as qw /on/,
+    else it's the same as qw /off/.
+    This mode is recommended if you plan to upload your module to CPAN or any
+    other repository.  This way fish can be enabled during testing, but then
+    disabled in normal use without the need to physically modify your program.
+    Just use an environment variable of your choice to trigger it.
+
+ 4) use Fred::Fish::DBUG  qw / off_if_set  some_env_var /;
+    If $ENV{some_env_var} evaluates to TRUE, then it's the same as qw /off/,
+    else it's the same as qw /on/.  Just the reverse of on_if_set.
+
+For options 3 & 4, here's how you'd set the environment variables on the
+command line before your program is called:
+     "export some_env_var=1"   (unix example)
+     "set some_env_var=1"      (windows example)
+
+A good standard for naming the environment variable is to name the variable
+after your module.  But you may use any name you wish that isn't likely to
+be used unexpectedly
+   ex: One::More::Module::Name would use _one_more_module_name_.
+
+===============================================================================
+Using "require" instead of "use"
+===============================================================================
+There are some limitations doing:
+    require Fred::Fish::DBUG;
+
+No functions are available until you call import().  Since it's this call that
+establishes the inheritance to either the ON or OFF module.
+
+ 1) require Fred::Fish::DBUG;
+    Fred::Fish::DBUG->import ("on");
+
+ 2) require Fred::Fish::DBUG;
+    Fred::Fish::DBUG->import ("off");
+
+ 3) require Fred::Fish::DBUG;
+    Fred::Fish::DBUG->import ( qw / on_if_set  some_env_var / );
+
+ 3) require Fred::Fish::DBUG;
+    Fred::Fish::DBUG->import ( qw / off_if_set  some_env_var / );
+
+===============================================================================
+But what if you want to set that environment variable in your test programs
+rather than remembering to set it before you run "make test", it's a bit more
+complex.
+===============================================================================
+
+In your t/*.t code, you need to do the following:
+
+use Test::More;
+
+BEGIN
+{
+   $ENV{some_special_variable} = 1;
+   unless (use_ok ("your_module_that_uses_fish")) {
+      BAIL_OUT ("Can't load module: your_module_that_uses_fish");
+      exit (0);
+   }
+}
+
+# -----------------------------------------------------------------------------
+But what if you don't want to use the test function from Test::More?
+
+In that case it's still fairly simple and still requires code in your BEGIN
+block.  The requirement is that you must defer loading your module until after
+the %ENV value has been set!  In that case you have three options.
+
+Option 1:
+BEGIN
+{
+   $ENV{some_special_variable} = 1;
+   eval "use your_module_that_uses_fish";
+   if ( $@ ) {
+      die ("Can't load module: your_module_that_uses_fish\n");
+   }
+}
+
+Option 2:  -   Using require/import to do it.
+BEGIN
+{
+   $ENV{some_special_variable} = 1;
+   eval {
+      require your_module_that_uses_fish;
+      your_module_that_uses_fish::import ();
+   };
+   if ( $@ ) {
+      die ("Can't load module: your_module_that_uses_fish\n");
+   }
+}
+
+Option 3:  -   Adding a minimum version check.
+BEGIN
+{
+   $ENV{some_special_variable} = 1;
+   eval {
+      require your_module_that_uses_fish;
+      your_module_that_uses_fish->import ();
+      your_module_that_uses_fish->VERSION ( 2.03 );
+   };
+   if ( $@ ) {
+      die ("Can't load module: your_module_that_uses_fish\n");
+   }
+}
+
+# -----------------------------------------------------------------------------
+It's that simple!  You can now dynamically control using Fish differently
+between different modules in your code base.  Mix and match what's written to
+fish to your heart's content!
+
+
+# =============================================================================
+# DEVELOPER NOTE:  (So I don't forget this again)
+# =============================================================================
+While I attempted to write good test cases, they can all pass and still
+result in the module having issues.  Since what is important is what is actually
+written to the log file!  So it's important for the developer (me) to remember
+to actually look at the fish logs generated sometimes.
+
+End users of this module (you) do not have to do this.  You can assume if all
+the test cases pass it's good to use and install!
+
+
+# =============================================================================
+# C/C++ Macros vs Perl Functions
+# -----------------------------------------------------------------------------
+# C/C++ Macro Name | Perl Function Name   | Comments
+# -----------------+----------------------+------------------------------------
+DBUG_PUSH          | DBUG_PUSH            | Used to turn Fish on.
+DBUG_ENTER         | DBUG_ENTER_FUNC      | Tracks entering a function.
+  ---              | DBUG_EBTER_BLOCK     | Tracks entering a sub-block of code.
+DBUG_PRINT         | DBUG_PRINT           | Writes message to fish logs.
+DBUG_RETURN        | DBUG_RETURN          | Tracks one or more return values.
+  ---              | DBUG_ARRAY_RETURN    | Handles returns of lists to scalars.
+  ---              | DBUG_RETURN_SPECIAL  | Special case of DBUG_RETURN.
+DBUU_VOID_RETURN   | DBUG_VOID_RETURN     | Tracks func return with no value.
+DBUG_LEAVE         | DBUG_LEAVE           | Terminates your program.
+DBUG_EXECUTE       | DBUG_EXECUTE         | Returns TRUE if writing to fish.
+DBUG_FILE          | DBUG_FILE_HANDLE     | Return's the File Handle of fish.
+DBUG_IN_USE        | DBUG_ACTIVE          | Returns TRUE if writing to fish.
+DBUG_ASSERT        | DBUG_ASSERT          | If true & fish on, abort program.
+
+# -----------------------------------------------------------------------------
+# Not one of the C/C++ Macros, but added to support Perl functionality.
+# -----------------------+-----------------------------------------------------
+DBUG_CATCH               | Logs trapped exception.
+DBUG_PAUSE               | Temporarily turns off fish logs.
+DBUG_MASK                | Masks func return values written to fish.
+DBUG_MASK_NEXT_FUNC_CALL | Masks func argument written to fish.
+DBUG_FILTER              | Filter what's written to fish.
+DBUG_CUSTOM_FILTER       | Filter what's written to fish.
+DBUG_CUSTOM_FILTER_OFF   | Filter what's written to fish.
+DBUG_SET_FILTER_COLOR    | Use color it the fish logs.
+DBUG_FILE_NAME           | Returns the file name of the fish log.
+DBUG_MODULE_LIST         | Writes to fish all perl modules used by your prog.
+
+DBUG_TIE_STDERR          | Traps STDERR & writes it to fish.
+DBUG_TIE_STDOUT          | Traps STDOUT & writes it to fish.
+DBUG_UNTIE_STDERR        | Breaks the STDERR trap.
+DBUG_UNTIE_STDOUT        | Breaks the STDOUT trap.
+
+# -----------------------------------------------------------------------------
+# NOTE: Trap signals with care.  On some OS, such as Windows, trapping
+#       signals can be flakey!  But it's extremely useful on Unix.
+# ----------------------------------------------------------------------------
+DBUG_TRAP_SIGNAL         | Writes the tapped signal to fish.
+DBUG_FIND_CURRENT_TRAPS  | Tells if a signal is currently trappable.
+DBUG_DIE_CONTEXT         | Gives the context of the trapped signal.
+
+# -----------------------------------------------------------------------------
+# C/C++ Macro Name, but not relevant in Perl
+# -----------------------------------------------------------------------------
+DBUG_POP
+DBUG_PROCESS
+DBUG_SETJMP
+DBUG_LONGJMP
+DBUG_DUMP
+DEBUGGER_OFF
+DEBUGGER_ON
+DBUG_LOCK_FILE
+DBUG_UNLOCK_FILE
+DBUG_my_pthread_mutex_lock_FILE
+DBUG_my_pthread_mutex_unlock_FILE
+
+
+# ----------------------------------------------------------------------------
+# NOTE: The C/C++ macros implemented it's options via ugly flags in DBUG_PUSH.
+#       So for Perl I used more user friendly hash tags instead.  The list of
+#       options are Perl specific.
+# ----------------------------------------------------------------------------
+# Unless otherwise specified, the default is off! (0)
+# The DBUG_PUSH() options are:
+#    1)  append       - 1/0  Open fish log in append mode.
+#    2)  autoflush    - 1/0  (defaults to 1 if not present)
+#    3)  autoopen     - 1/0  Keeps opening & closing the fish file between
+#                            DBUG writes to fish.  Very, very, very slow!
+#    4)  off          - 1/0  Treat call to DBUG_PUSH() as a no-op, leaving
+#                            fish turned off.  Overrides all other options!
+#                            I usually set this flag's value via a command line
+#                            option to turn fish on and off, rather than making
+#                            the call do DBUG_PUSH() itself conditional.  But
+#                            both ways work.
+#    5)  filter       - Alternate way to implement DBUG_FILTER().
+#    6)  kill_end_trace - 1/0 Disable writing to fish for END blocks after a
+#                             call to DBUG_LEAVE or die or exit!
+#    7)  who_called   - 1/0  Prints out the caller info for each call to
+#                            DBUG_ENTER_FUNC() & DBUG_ENTER_BLOCK().
+#                            Does same for DBUG_PRINT().
+#    8)  multi        - 1/0  Use for all multi-threaded Perl programs and/or
+#                            forked processes.  For threads it will prefix
+#                            each line with $$-tid() to tell which line
+#                            goes with which thread.  But if the PID changes
+#                            it will do this by appending '/xx' where xx is
+#                            usually the last 2 digits of the PID.
+#    9)  limit        - 1/0/-1 Limit to child/parent thread. (parent/all/child)
+#    10) chmod        - (default 0644) File permissions to use on the fish file.
+#                       Overrides any UMASK settings.
+#    11) before       - 1/0  Set to true if you put your DBUT_ENTER_FUNC call
+#                            before your call to DBUG_PUSH & you still want
+#                            your func printed in fish afterwards.
+#    12) strip        - 1/0  Strip out the module name of functions written to
+#                            fish.
+#    13) delay        - xx   (Default 0) Implements a delay after each call
+#                            to DBUG_PRINT() that writes to the fish file.
+#                            Recommend having Time::HiRes installed to use.
+#                            This allows using fractions of a second.
+#    14) elapsed      - 1/0  Gives the amount of time spent inside a function
+#                            on return.  Installing Time::HiRes allows tracking
+#                            to fractions of a second.
+#    15) keep         - 1/0/code_ref  Only keep the fish logs when your program
+#                            terminates under certain conditions.  (1) if you
+#                            exit with a non-zero status code.  (0) always keep.
+#                            Call a function with the exit status as its param
+#                            and return TRUE if you wish to keep the fish log or
+#                            return FALSE to toss it.  Good for situations
+#                            where you'd normally fill up your disk with logs
+#                            if you always kept fish turned on.  This way you
+#                            only retain logs only on "rare" failures to help
+#                            with troubleshooting your code.
+#    16) no_addresses - 1/0  (default 0) Allows you to override printing out
+#                            reference addresses with constant values.  Great
+#                            when you want to be able to compare fish file
+#                            logs so that these references will use consistent
+#                            addresses between runs.  Gets rid of a lot of
+#                            false differences reported by tools like diff.
+#                            Off by default since in many cases tracking a
+#                            specific reference address can be critical.
+#    17) allow_utf8   - 1/0  Write to fish in UTF_8 mode.
+# ----------------------------------------------------------------------------
+

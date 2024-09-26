@@ -51,3 +51,35 @@ Revision history for Data-Show
 
     - Escaped regex braces to comply with Perl 5.25+
       (thanks Slaven!)
+
+
+0.004000  Thu Sep 26 09:59:55 2024
+
+    - Entire revamp of module with numerous new features
+      For backwards compatible output: use Data::Show with => 'Legacy'
+      (Thanks, Mike!)
+
+    - Added 'with' option to install different dumpers
+
+    - Added 'as' option to install show() under a different name
+
+    - Added 'fallback' option to control fallback when a dumper module is unavailable
+
+    - Added 'grid' option to put output in a box
+
+    - Added 'style' and '<specific>style' options to control output styling
+
+    - Added 'warnings' option to enable/disable warnings when dumper is missing
+
+    - Changed default output format to show context better
+
+    - Added coloured output to distinguish dumped output from normal output
+
+    - Redesigned show() so that it can be used "en passant" within an expression
+      (with warnings when that would change the behaviour of code due to list context)
+
+    - Added unimport() (i.e. no Data::Show) to facilitate iterative debugging
+      by turning off show() lexically, without actually needing to
+      remove show() from the source
+
+    - Allowed module to detect and correct for (some) #line directives in main file

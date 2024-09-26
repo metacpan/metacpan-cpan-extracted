@@ -60,8 +60,8 @@ f     AST_ADDMOCDATA method.
 *     Moc also has the following attributes:
 *     - MaxOrder: the highest HEALPix order used in the MOC
 *     - MaxRes: the best resolution of the MOC, in arc-seconds
-*     - MinOrder: the lowest HEALPix order used in the MOC
-*     - MinRes: the worst resolution of the MOC, in arc-seconds
+*     - MinOrder: the HEALPix order at which to search when converting to MOC
+*     - MinRes: the resolution at which to search, in arc-seconds
 *     - MocArea: the area of the MOC
 *     - MocLength: the table length used to describe a MOC in FITS
 *     - MocType: the data type used to describe a MOC in FITS
@@ -150,6 +150,13 @@ f     - AST_TESTCELL: Test if a single HEALPix cell is included in a Moc
 *     4-MAR-2020 (DSB):
 *        Changes to remove bugs that occur only when running on 32-bit
 *        systems.
+*     11-JUL-2024 (GSB)
+*        Update RegBaseMesh to track separately two possible "dist" values
+*        per corner, avoid tracing the same corner multiple times per path
+*        and backtrack if a dead end is found.
+*     19-JUL-2024 (GSB)
+*        Added option for MakeCorners to attempt to label isolated corners
+*        and cells so that RegBaseMesh can handle these separately.
 *class--
 */
 
@@ -189,9 +196,19 @@ f     - AST_TESTCELL: Test if a single HEALPix cell is included in a Moc
 /* A 64 bit literal integer value of 1 */
 #define ONE INT64_C(1)
 
+/* Absolute value (e.g. for path distance). */
+#define ABS(x) ( ((x) < 0) ? - (x) : (x) )
 
 /* Include files. */
 /* ============== */
+
+/* Configuration results */
+/* --------------------- */
+
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 /* Interface definitions. */
 /* ---------------------- */
 
@@ -268,6 +285,7 @@ typedef struct Cell {
    int ix;
    int iy;
    char interior;
+   char isolated;
    struct Cell *prev;
 } Cell;
 
@@ -278,7 +296,14 @@ typedef struct Corner {
    struct Cell *cells[4];
    int ncell;
    char interior;
+   char isolated;
+   int icorner;
    int dist;
+   int dist2;
+   int prev_dist_backtrack;
+   struct Corner *path_start;
+   struct Corner *path_backtrack;
+   struct Corner *path_wrong[4];
    struct Corner *prev;
 } Corner;
 
@@ -431,8 +456,8 @@ static void GetCell( AstMoc *, int, int *, int64_t *, int * );
 static void GetMocData( AstMoc *, size_t, void *, int * );
 static void GetMocString( AstMoc *, int, size_t, char *, size_t *, int * );
 static void GetNorm( AstMoc *, const char *, int * );
-static void IncorporateCells( AstMoc *, CellList *, int, int, const char *, int * );
-static void MakeCorners( AstMoc *, int, Cell *, Corner **, int, int * );
+static void IncorporateCells( AstMoc *, CellList *, int, int, int, const char *, int * );
+static void MakeCorners( AstMoc *, int, Cell *, Corner **, int, int, int * );
 static void MergeRanges( AstMoc *, int, int * );
 static void NegateRanges( AstMoc *, int, int, int * );
 static void NestedToXy( int64_t, int, int *, int * );
@@ -723,7 +748,7 @@ f     MAXORDER = INTEGER (Given)
 *        than
 c        "maxorder"
 f        MAXORDER
-*        are ignored.
+*        are degraded to that resolution.
 c     len
 f     LEN = INTEGER (Given)
 *        The length of the supplied array (i.e. the number of 4 or 8 byte
@@ -837,36 +862,42 @@ f     MAXORDER  is negative.
          astSetMaxOrder( this, maxorder );
       }
 
+/* Check no error has occurred (e.g. maxorder not given but
+   value in array greater than AST__MXORDHPX). */
+      if( astOK ) {
+
 /* Record the orginal number of ranges in the Moc. */
-      nold =this->nrange;
+         nold = this->nrange;
 
 /* Convert the supplied MOC data to a list of ranges of cells at
   "maxorder" and append to the end of the ranges currently in the Moc. */
-      if( nbyte == 4 ) {
-         pni = data;
-      } else {
-         pnk = data;
-      }
-      for( icell = 0; icell < len; icell++ ) {
+         if( nbyte == 4 ) {
+            pni = data;
+         } else {
+            pnk = data;
+         }
+         for( icell = 0; icell < len; icell++ ) {
 
 /* Decode the data value (a "nuniq" value) to get the order and npix, using
    a fast log2 function. */
-         if( nbyte == 4 ) {
-            order = log2_32( *pni / 4 ) / 2;
-            npix = *(pni++) - ( 1 << (2 + 2*order) );
-         } else {
-            order = log2_64( *pnk / 4 ) / 2;
-            npix = *(pnk++) - ( ONE << (2 + 2*order) );
-         }
-
-/* Ignore cells at orders higher than maxorder. */
-         if( order <= maxorder ) {
+            if( nbyte == 4 ) {
+               order = log2_32( *pni / 4 ) / 2;
+               npix = *(pni++) - ( 1 << (2 + 2*order) );
+            } else {
+               order = log2_64( *pnk / 4 ) / 2;
+               npix = *(pnk++) - ( ONE << (2 + 2*order) );
+            }
 
 /* Get the upper and lower bounds of the cells at maxorder contained
    within this cell at order. */
             shift = 2*( maxorder - order );
-            ilow = ( npix << shift );
-            ihigh = ( (npix + 1 ) << shift ) - 1;
+            if( shift > 0 ) {
+               ilow = ( npix << shift );
+               ihigh = ( (npix + 1 ) << shift ) - 1;
+            } else {
+               ilow = ( npix >> -shift );
+               ihigh = ( npix >> -shift );
+            }
 
 /* Append this as a new range to the Moc. */
             irange = this->nrange++;
@@ -879,10 +910,10 @@ f     MAXORDER  is negative.
                break;
             }
          }
-      }
 
 /* Normalise the Moc. */
-      astMocNorm( this, negate, cmode, nold, maxorder, "astAddMocData" );
+         astMocNorm( this, negate, cmode, nold, maxorder, "astAddMocData" );
+      }
    }
 }
 
@@ -1070,7 +1101,7 @@ void astAddMocText_( AstMoc *this, int maxorder,
 *        attribute in the Moc, then the attribute value is used in preference
 *        to the value supplied for this parameter. Any HEALPix cells in the
 *        supplied MOC that refer to an order greater than "maxorder" are
-*        ignored.
+*        degraded to that resolution.
 *     source
 *        A function that will be called to read in each section of the MOC's
 *        string representation. It should have the following synopsis:
@@ -1572,15 +1603,20 @@ void astAddMocText_( AstMoc *this, int maxorder,
    (except for any that have an order greater than 'maxorder', which are
    ignored), get the upper and lower bounds of the cells at maxorder
    contained within this cell, and append this as a new range to the Moc. */
-         for( order = 0; order <= maxorder; order++ ) {
+         for( order = 0; order <= astMAX( maxorder, mxord ); order++ ) {
             nval = orders[ order ].nval;
             values = orders[ order ].values;
             shift = 2*( maxorder - order );
 
             for( ipix = 0; ipix < nval; ipix++,values++ ){
 
-               ilow = ( *values << shift );
-               ihigh = ( (*values + 1 ) << shift ) - 1;
+               if( shift > 0 ) {
+                  ilow = ( *values << shift );
+                  ihigh = ( (*values + 1 ) << shift ) - 1;
+               } else {
+                  ilow = ( *values >> -shift );
+                  ihigh = ( *values >> -shift );
+               }
 
                irange = this->nrange++;
                this->range = astGrow( this->range, this->nrange, 2*sizeof(*(this->range)) );
@@ -1667,8 +1703,9 @@ f     CMODE parameter.
 *     function will automatically set it to the smallest value that results
 *     in the cells in the Moc being no larger than half the size of the pixels
 *     in the centre of the array. Note, if the value set for attribute
-*     MinOrder is greater than or equal to MaxOrder, a value of
-*     (MaxOrder-1) will be used in place of MinOrder.
+*     MinOrder is greater than or equal to MaxOrder, then the search will
+*     be performed at this order and smaller cells converted to the
+*     enclosing cells at MaxOrder.
 *
 *     You should use a function which matches the numerical type of the
 *     data you are processing by replacing <X> in the generic function
@@ -1893,6 +1930,7 @@ static void AddPixelMask##X( AstMoc *this, int cmode, AstFrameSet *wcs, \
    int iproj_min;           /* Identifier for best type of HEALPix projection */ \
    int maxorder;            /* MOC order for final grid */ \
    int minorder;            /* MOC order for initial grid */ \
+   int oversample;          /* Orders by which minorder exceeds maxorder */ \
    int ok;                  /* At least one selected pixel? */ \
 \
 /* Check the global error status. */ \
@@ -1941,7 +1979,12 @@ static void AddPixelMask##X( AstMoc *this, int cmode, AstFrameSet *wcs, \
    minorder = astGetMinOrder( this ); \
 \
 /* Ensure we do not start at a higher order than we can handle. */ \
-   if( minorder >= maxorder ) minorder = maxorder - 1; \
+   oversample = 0; \
+   if( minorder >= maxorder ) { \
+      oversample = minorder - maxorder; \
+      maxorder = minorder; \
+      minorder = maxorder - 1; \
+   } \
    if( minorder < 0 && astOK ) { \
       astError( AST__INVAR, "astAddPixelMask"#X"(%s): Invalid value " \
                 "(%d) supplied for parameter 'MinOrder'.", status,  \
@@ -2178,7 +2221,7 @@ static void AddPixelMask##X( AstMoc *this, int cmode, AstFrameSet *wcs, \
 /* Convert all the grid coords stored in "clist" into nested indices at \
    order "maxorder" and incorporate them into the current contents of the \
    Moc. */ \
-         IncorporateCells( this, &clist, 0, cmode, "astAddPixelMask"#X, \
+         IncorporateCells( this, &clist, oversample, 0, cmode, "astAddPixelMask"#X, \
                            status ); \
 \
 /* Free resources. */ \
@@ -2352,6 +2395,7 @@ f        The global status.
    int minorder;            /* Minimum HEALPix order */
    int negated;             /* Is the Region negated? */
    int nold;                /* Number of ranges originally in "this" */
+   int oversample;          /* Orders by which minorder exceeds maxorder */
    int shift;               /* No. of bits to shift from that_order to maxorder */
    int that_order;          /* Order of Moc being added to "this" */
    int64_t *pr2;            /* Point to next range in "this" */
@@ -2463,7 +2507,12 @@ f        The global status.
          minorder = astGetMinOrder( this );
 
 /* Ensure we do not start at a higher order than we can handle. */
-         if( minorder >= maxorder ) minorder = maxorder - 1;
+         oversample = 0;
+         if( minorder >= maxorder ) {
+            oversample = minorder - maxorder;
+            maxorder = minorder;
+            minorder = maxorder - 1;
+         }
 
 /* Get a pointer to the Frame in which the Region is defined. We use this
    with astConvert below, rather than the original Region, so that the
@@ -2650,7 +2699,7 @@ f        The global status.
 /* Convert all the grid coords stored in "clist" into nested indices at
    order "maxorder" and incorporate them into the current contents of the
    Moc. */
-         IncorporateCells( this, &clist, negated, cmode, "astAddRegion", status );
+         IncorporateCells( this, &clist, oversample, negated, cmode, "astAddRegion", status );
 
 /* Reinstate the original value of the Nagated flag for the Region. */
          astSetNegated( picked, negated );
@@ -2908,7 +2957,7 @@ static void ClearMaxOrder( AstMoc *this, int *status ){
 *     Moc member function
 
 *  Description:
-*     Clears the value of the MaxPlot attribute.
+*     Clears the value of the MaxOrder attribute.
 
 *  Parameters:
 *     this
@@ -4501,6 +4550,9 @@ f        The global status.
    astSetFitsS( result, "ORDERING", "NUNIQ", "NUNIQ coding method", 1 );
    astSetFitsS( result, "COORDSYS", "C", "ICRS coordinates", 1 );
    astSetFitsI( result, "MOCORDER", maxorder, "MOC resolution (best order)", 1 );
+#ifdef PACKAGE_STRING
+   astSetFitsS( result, "MOCTOOL", PACKAGE_STRING,  "Name of the MOC generator", 1 );
+#endif
 
 /* If an error occurred, annul the returned FitsChan. */
    if ( !astOK ) result = astAnnul( result );
@@ -5427,7 +5479,8 @@ MAKEALL_GETSELECTIONBOUNDS(F,float)
 #undef EXTEND_BOX
 
 
-static void IncorporateCells( AstMoc *this, CellList *clist, int negate,
+static void IncorporateCells( AstMoc *this, CellList *clist,
+                              int oversample, int negate,
                               int cmode, const char *method, int *status ){
 /*
 *  Name:
@@ -5441,7 +5494,8 @@ static void IncorporateCells( AstMoc *this, CellList *clist, int negate,
 
 *  Synopsis:
 *     #include "moc.h"
-*     void IncorporateCells( AstMoc *this, CellList *clist, int negate,
+*     void IncorporateCells( AstMoc *this, CellList *clist,
+*                            int oversample, int negate,
 *                            int cmode, const char *method, int *status )
 
 *  Class Membership:
@@ -5457,6 +5511,8 @@ static void IncorporateCells( AstMoc *this, CellList *clist, int negate,
 *     clist
 *        Structure holding information about the cells to be incorporated
 *        in the Moc.
+*     oversample
+*        Number of orders by which the given cells exceed the maximum order.
 *     negate
 *        If zero, the list of HEALPix cells to incorporate into the
 *        Moc are those included in "clist". If non-zero, the list of
@@ -5545,7 +5601,7 @@ static void IncorporateCells( AstMoc *this, CellList *clist, int negate,
                    Comp_int64 );
 
 /* Look for ranges within the sorted list of indices. */
-            shift = 2*( clist->maxorder - order );
+            shift = 2*( clist->maxorder - order - oversample );
             pn = nested;
             pend = nested + clist->len[ order ];
             while( pn < pend ) {
@@ -5559,8 +5615,13 @@ static void IncorporateCells( AstMoc *this, CellList *clist, int negate,
                this->range = astGrow( this->range, this->nrange, 2*sizeof(*(this->range)) );
                if( astOK ) {
                   pr = this->range + 2*irange;
-                  pr[ 0 ] = ( ilow << shift );
-                  pr[ 1 ] = ( ( ihigh + 1 ) << shift ) - 1;
+                  if( shift > 0 ) {
+                     pr[ 0 ] = ( ilow << shift );
+                     pr[ 1 ] = ( ( ihigh + 1 ) << shift ) - 1;
+                  } else {
+                     pr[ 0 ] = ( ilow >> -shift );
+                     pr[ 1 ] = ( ihigh >> -shift );
+                  }
                } else {
                   break;
                }
@@ -5845,7 +5906,7 @@ static Cell *MakeCell( int ix, int iy, int order, Cell **foot, int *status ){
 }
 
 static void MakeCorners( AstMoc *this, int order, Cell *cell_foot,
-                         Corner **corner_foot, int sort, int *status ){
+                         Corner **corner_foot, int sort, int isolated, int *status ){
 /*
 *  Name:
 *     MakeCorners
@@ -5860,7 +5921,7 @@ static void MakeCorners( AstMoc *this, int order, Cell *cell_foot,
 *  Synopsis:
 *     #include "moc.h"
 *     void MakeCorners( AstMoc *this, int order, Cell *cell_foot,
-*                       Corner **corner_foot, int sort, int *status )
+*                       Corner **corner_foot, int sort, int isolated, int *status )
 
 *  Class Membership:
 *     Moc member function
@@ -5892,6 +5953,13 @@ static void MakeCorners( AstMoc *this, int order, Cell *cell_foot,
 *     sort
 *        If non-zero, the created chain of Corner structures is sorted,
 *        first by Dec then by RA.
+*     isolated
+*        If non-zero, then attempt to label isolated cells and their
+*        corners, including cells which only neighbour other cells
+*        diagonally.  A corner is labelled isolated if it only
+*        belongs to one cell or if it belongs to two cells which
+*        do not share an edge.  A cell is labelled isolated if all of
+*        its corners are isolated.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -6231,13 +6299,39 @@ static void MakeCorners( AstMoc *this, int order, Cell *cell_foot,
          }
       }
 
+/* If requested, attempt to determine whether this is an isolated corner. */
+      if( isolated && !corner->interior ) {
+         if( corner->ncell < 2 ) {
+            corner->isolated = 1;
+         } else if( corner->ncell == 2 && ! (
+               ( corner->cells[0]->tl == corner->cells[1]->bl ) ||
+               ( corner->cells[0]->tr == corner->cells[1]->tl ) ||
+               ( corner->cells[0]->br == corner->cells[1]->tr ) ||
+               ( corner->cells[0]->bl == corner->cells[1]->br ) ) ) {
+            corner->isolated = 1;
+         }
+      }
 
 /* Initialise the distance of the corner around the perimeter to indicate
    no distance has yet been found. */
       corner->dist = INT_MAX;
+      corner->dist2 = INT_MAX;
+      corner->prev_dist_backtrack = INT_MAX;
 
 /* Move on to the next corner in the chain. */
       corner = corner->prev;
+   }
+
+/* If requested, mark isolated cells. */
+   if( isolated ) {
+      for( cell = cell_foot; cell; cell = cell->prev ) {
+          if( cell->bl->isolated &&
+                cell->tl->isolated &&
+                cell->tr->isolated &&
+                cell->br->isolated ) {
+             cell->isolated = 1;
+          }
+      }
    }
 
 /* Return a pointer to the corner that's now at the foot of the chain. */
@@ -7263,9 +7357,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
    AstMoc *this;
    AstPointSet *result;
    Cell **neb;
-   Cell *cell0;
-   Cell *cell1;
-   Cell *cell2;
+   Cell *cells[ 3 ];
    Cell *cell;
    Cell *cell_foot[ AST__MXORDHPX + 1 ];
    Cell *prev_cell;
@@ -7287,15 +7379,23 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
    int icell;
    int icorner;
    int i;
+   int i_pass;
+   int i_try;
+   int is_backtrack;
    int ix;
    int iy;
    int j;
    int maxorder;
    int minorder;
    int ndis;
+   int nisolated;
    int npoint;
-   int nused;
+   int npoint1;
+   int npoint2;
    int order;
+   int start_dist;
+   int prev_dist;
+   int new_dist;
    int64_t *pnk;
    int64_t npix;
 
@@ -7409,7 +7509,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
    interior does not depend on whether the adjacent cells are flagged
    as interior, it just depends on how many cells touch the corner. */
             MakeCorners( this, order, cell_foot[ order ],
-                         &corner_foot, 0, status );
+                         &corner_foot, 0, 0, status );
 
 /* Identify interior cells (cells for which all the corners are
    interior positions). Cells which are children of interior cells
@@ -7529,18 +7629,13 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
    removed (i.e. each remaining cell is either a boundary cell or
    adjacent to a boundary cell). Create the chain of Corners for the
    cells at this order.  Indicate that the chain should be sorted
-   (primary key is Dec, secondary key is RA). */
+   (primary key is Dec, secondary key is RA) and that isolated
+   corners and cells should be labelled. */
       MakeCorners( this, maxorder, cell_foot[ maxorder ], &corner_foot,
-                   1, status );
+                   1, 1, status );
 
 
 #ifdef MESH_DEBUG
-corner = corner_foot;
-while( corner ) {
-   dump_corner( corner, maxorder );
-   corner = corner->prev;
-}
-
 cell = cell_foot[ maxorder ];
 while( cell ) {
    dump_cell( this, cell, maxorder );
@@ -7548,7 +7643,7 @@ while( cell ) {
 }
 
 FILE *fd = fopen( "path.asc", "w" );
-fprintf( fd, "# corner dist\n" );
+fprintf( fd, "# corner dist ndist\n" );
 #endif
 
 
@@ -7565,9 +7660,9 @@ fprintf( fd, "# corner dist\n" );
       while( astOK ) {
 
 /* Find the first non-interior corner that has not yet been assigned a
-   perimeter distance. */
+   perimeter distance, leaving isolated corners for later. */
          corner = corner_foot;
-         while( corner && ( corner->interior || corner->dist != INT_MAX ) ) {
+         while( corner && ( corner->interior || corner->isolated || corner->dist != INT_MAX ) ) {
              corner = corner->prev;
          }
 
@@ -7579,73 +7674,110 @@ fprintf( fd, "# corner dist\n" );
    perimeter. Loop until we arrive back at the starting corner. */
          old_corner = NULL;
          start = corner;
+         start_dist = dist;
+         prev_dist = INT_MAX;
+         is_backtrack = 0;
          while( astOK  ) {
 
 /* Store the distance (as a number of corners) along the perimeter from the
    start to the current corner. If the corner already has a distance
    (i.e. because it is the touching point between two otherwise disjoint
    regions), leave the existing distance unchanged. */
-            if( corner->dist == INT_MAX ) {
-               corner->dist = dist++;
+            if( ! is_backtrack ) {
+               if( corner->dist == INT_MAX ) {
+                  corner->dist = dist++;
 
 /* The Moc may contain several disjoint regions. We mark the start of each such
    region with a negative "dist" value ( "dist" == 0 marks the start of
    the first disjoint region). */
-               if( !old_corner ) corner->dist = -corner->dist;
-            }
+                  if( !old_corner ) corner->dist = -corner->dist;
 
 #ifdef MESH_DEBUG
-fprintf( fd, "%p %d\n", corner, corner->dist );
+fprintf( fd, "%p %d 0\n", corner, corner->dist );
 #endif
+
+               } else if( corner->dist2 == INT_MAX ) {
+                  corner->dist2 = dist++;
+
+#ifdef MESH_DEBUG
+fprintf( fd, "%p %d 1\n", corner, corner->dist2 );
+#endif
+
+               } else {
+                  astError( AST__INTER, "astRegBaseMesh(%s): Corner found "
+                            "in more than 2 regions (internal programming error).",
+                            status, astGetClass( this ) );
+               }
+
+/* Record which disjoint region we are searching in the corner to avoid
+   entering a loop, except for the start point to which we must return. */
+               if( old_corner ) {
+                  corner->path_start = start;
+                  corner->path_backtrack = old_corner;
+                  corner->prev_dist_backtrack = prev_dist;
+               }
+               else {
+                  corner->path_backtrack = NULL;
+                  corner->prev_dist_backtrack = INT_MAX;
+               }
+
+               corner->path_wrong[0] = NULL;
+               corner->path_wrong[1] = NULL;
+               corner->path_wrong[2] = NULL;
+               corner->path_wrong[3] = NULL;
+            } else {
+              prev_dist = corner->prev_dist_backtrack;
+              is_backtrack = 0;
+            }
 
 /* Indicate we have not yet chosen the next corner on the path. */
             new_corner = NULL;
 
 /* Since the current corner is not interior it can be used by at most 3
    cells. Save convenience pointers to them. These pointers are checked
-   in the order "cell0", "cell1", "cell2" to see if an onward route can
+   in the order "cells[0]", "cells[1]", "cells[2]" to see if an onward route can
    be found to a corner of the cell. If the corner is used by only one
-   cell, it becomes "cell0". */
+   cell, it becomes "cells[0]". */
             if( corner->ncell == 1 ) {
-               cell0 = corner->cells[ 0 ];
-               cell1 = NULL;
-               cell2 = NULL;
+               cells[0] = corner->cells[ 0 ];
+               cells[1] = NULL;
+               cells[2] = NULL;
 
 /* If the corner is used by two cells, the cell that contains the old
-   corner as well as the current corner becomes "cell1", and the other
-   cell becomes "cell0". This gives priority to onward routes that go to
-   the new cell ("cell0") rather than going back to the old cell. If
+   corner as well as the current corner becomes "cells[1]", and the other
+   cell becomes "cells[0]". This gives priority to onward routes that go to
+   the new cell ("cells[0]") rather than going back to the old cell. If
    there is no old corner (i.e. this is the start of a new disjoint
    region), the choice is arbitrary. */
             } else if( corner->ncell == 2 ) {
-               cell1 = corner->cells[ 0 ];
-               if( cell1->bl == old_corner ||
-                   cell1->tl == old_corner ||
-                   cell1->tr == old_corner ||
-                   cell1->br == old_corner ) {
-                  cell0 = corner->cells[ 1 ];
+               cells[1] = corner->cells[ 0 ];
+               if( cells[1]->bl == old_corner ||
+                   cells[1]->tl == old_corner ||
+                   cells[1]->tr == old_corner ||
+                   cells[1]->br == old_corner ) {
+                  cells[0] = corner->cells[ 1 ];
                } else {
-                  cell0 = cell1;
-                  cell1 = corner->cells[ 1 ];
+                  cells[0] = cells[1];
+                  cells[1] = corner->cells[ 1 ];
                }
-               cell2 = NULL;
+               cells[2] = NULL;
 
 /* If the corner is used by three cells, the cell that contains the old
-   corner as well as the current corner becomes "cell2" (lowest priority),
-   and the other two cells become "cell0" and "cell1". This gives priority
+   corner as well as the current corner becomes "cells[2]" (lowest priority),
+   and the other two cells become "cells[0]" and "cells[1]". This gives priority
    to onward routes that do not go back to the old cell. If there is no
    old corner (i.e. this is the start of a new disjoint region), the choice
    is arbitrary. */
             } else if( corner->ncell == 3 ) {
                if( old_corner ) {
                   for( icell = 0; icell < 3; icell++ ) {
-                     cell2 = corner->cells[ icell ];
-                     if( cell2->bl == old_corner ||
-                         cell2->tl == old_corner ||
-                         cell2->tr == old_corner ||
-                         cell2->br == old_corner ) break;
+                     cells[2] = corner->cells[ icell ];
+                     if( cells[2]->bl == old_corner ||
+                         cells[2]->tl == old_corner ||
+                         cells[2]->tr == old_corner ||
+                         cells[2]->br == old_corner ) break;
                   }
-                  if( icell == 4 && old_corner ) {
+                  if( icell == 3 ) {
                      astError( AST__INTER, "astRegBaseMesh(%s): Old corner "
                                "not found (internal programming error).",
                                status, astGetClass( this ) );
@@ -7653,22 +7785,22 @@ fprintf( fd, "%p %d\n", corner, corner->dist );
                   }
                } else {
                   icell = 0;
-                  cell2 = corner->cells[ 0 ];
+                  cells[2] = corner->cells[ 0 ];
                }
 
 /* Of the other two cells, prefer routes that continue to the cell that
    is diagonally opposite the cell containing the old corner. Assign the
-   remaining two cells to "cell0" and "cell1", then swap them if cell1
-   is diagonally opposite "cell2". */
-               cell0 = corner->cells[ ( icell + 1 ) % 3 ];
-               cell1 = corner->cells[ ( icell + 2 ) % 3 ];
-               if( ( cell2->tr == corner && cell1->bl == corner ) ||
-                   ( cell2->br == corner && cell1->tl == corner ) ||
-                   ( cell2->bl == corner && cell1->tr == corner ) ||
-                   ( cell2->tl == corner && cell1->br == corner ) ) {
-                  cell = cell0;
-                  cell0 = cell1;
-                  cell1 = cell;
+   remaining two cells to "cells[0]" and "cells[1]", then swap them if cells[1]
+   is diagonally opposite "cells[2]". */
+               cells[0] = corner->cells[ ( icell + 1 ) % 3 ];
+               cells[1] = corner->cells[ ( icell + 2 ) % 3 ];
+               if( ( cells[2]->tr == corner && cells[1]->bl == corner ) ||
+                   ( cells[2]->br == corner && cells[1]->tl == corner ) ||
+                   ( cells[2]->bl == corner && cells[1]->tr == corner ) ||
+                   ( cells[2]->tl == corner && cells[1]->br == corner ) ) {
+                  cell = cells[0];
+                  cells[0] = cells[1];
+                  cells[1] = cell;
                }
 
 /* The corner should never be used by more than 3 cells. */
@@ -7679,199 +7811,136 @@ fprintf( fd, "%p %d\n", corner, corner->dist );
                break;
             }
 
-/* Find the corner in cell0 and see if the neighbouring corner in the
-   clockwise direction within cell0 is a boundary point that has not yet
-   been included in the path. If so, we use it as the next corner. */
+/* Find the corner in each cell, starting with cells[0],
+   and see if the neighbouring corner in the
+   clockwise direction within that cell is a boundary point that has not yet
+   been included in the path. If so, we use it as the next corner.
+
+   The above may fail to find a suitable new corner if two disjoint
+   regions touch at the new corner, since that corner will already
+   have a distance assigned to it when it comes to be checked as part of
+   tracing the second disjoint region. So perform two passes, on the
+   second pass allowing the new corner to have a pre-assigned distance (i.e.
+   to already have been used). This means we give priority to adjacent
+   corners that have not already been used, but allow used corners to be
+   re-used if necessary. */
             new_corner = NULL;
-            if( corner == cell0->bl && !cell0->tl->interior && cell0->tl->dist == INT_MAX ) {
-               new_corner = cell0->tl;
-            } else if( corner == cell0->tl && !cell0->tr->interior && cell0->tr->dist == INT_MAX ) {
-               new_corner = cell0->tr;
-            } else if( corner == cell0->tr && !cell0->br->interior && cell0->br->dist == INT_MAX ) {
-               new_corner = cell0->br;
-            } else if( corner == cell0->br && !cell0->bl->interior && cell0->bl->dist == INT_MAX ) {
-               new_corner = cell0->bl;
-            }
+            for( i_try = 0; (i_try < 4) && astOK && ! new_corner; i_try ++ ) {
+               for( i_pass = 0; (i_pass < 2) && ! new_corner; i_pass ++ ) {
+                  for( icell = 0; (icell < 3) && ! new_corner; icell ++ ) {
+                     cell = cells[icell];
+                     if( ! cell ) {
+                        continue;
+                     }
+
+                     if( corner == cell->bl && !cell->tl->interior ) {
+                        new_corner = cell->tl;
+                     } else if( corner == cell->tl && !cell->tr->interior ) {
+                        new_corner = cell->tr;
+                     } else if( corner == cell->tr && !cell->br->interior ) {
+                        new_corner = cell->br;
+                     } else if( corner == cell->br && !cell->bl->interior ) {
+                        new_corner = cell->bl;
+                     }
+
+                     if( new_corner && (
+                           ( new_corner->path_start == start ) ||
+                           ( i_pass
+                              ? ( new_corner->dist2 != INT_MAX )
+                              : ( new_corner->dist != INT_MAX ) ) ||
+                           ( new_corner == corner->path_wrong[0] ) ||
+                           ( new_corner == corner->path_wrong[1] ) ||
+                           ( new_corner == corner->path_wrong[2] ) ||
+                           ( new_corner == corner->path_wrong[3] ) ) ) {
+                        new_corner = NULL;
+                     }
 
 /* If both the original corner and the new corner are corners of one of the
    neighbouring cells, then the boundary cannot pass between them since the
    line between the two corners must be a border between the two cells. */
-            if( new_corner ) {
-               if( cell1 &&( new_corner == cell1->tl ||
-                             new_corner == cell1->tr ||
-                             new_corner == cell1->br ||
-                             new_corner == cell1->bl ) ){
-                  new_corner = NULL;
-               } else if( cell2 &&( new_corner == cell2->tl ||
-                             new_corner == cell2->tr ||
-                             new_corner == cell2->br ||
-                             new_corner == cell2->bl ) ){
-                  new_corner = NULL;
-               }
-            }
-
-/* If this failed to produce a new corner, then do the same using cell1
-   (if it exists). */
-            if( !new_corner && cell1 ) {
-               if( corner == cell1->bl && !cell1->tl->interior && cell1->tl->dist == INT_MAX ) {
-                  new_corner = cell1->tl;
-               } else if( corner == cell1->tl && !cell1->tr->interior && cell1->tr->dist == INT_MAX ) {
-                  new_corner = cell1->tr;
-               } else if( corner == cell1->tr && !cell1->br->interior && cell1->br->dist == INT_MAX ) {
-                  new_corner = cell1->br;
-               } else if( corner == cell1->br && !cell1->bl->interior && cell1->bl->dist == INT_MAX ) {
-                  new_corner = cell1->bl;
-               }
-
-               if( new_corner ) {
-                  if( cell0 &&( new_corner == cell0->tl ||
-                                new_corner == cell0->tr ||
-                                new_corner == cell0->br ||
-                                new_corner == cell0->bl ) ){
-                     new_corner = NULL;
-                  } else if( cell2 &&( new_corner == cell2->tl ||
-                                new_corner == cell2->tr ||
-                                new_corner == cell2->br ||
-                                new_corner == cell2->bl ) ){
-                     new_corner = NULL;
-                  }
-               }
-            }
-
-/* If this failed to produce a new corner, then do the same using cell2
-   (if it exists). */
-            if( !new_corner && cell2 ) {
-               if( corner == cell2->bl && !cell2->tl->interior && cell2->tl->dist == INT_MAX ) {
-                  new_corner = cell2->tl;
-               } else if( corner == cell2->tl && !cell2->tr->interior && cell2->tr->dist == INT_MAX ) {
-                  new_corner = cell2->tr;
-               } else if( corner == cell2->tr && !cell2->br->interior && cell2->br->dist == INT_MAX ) {
-                  new_corner = cell2->br;
-               } else if( corner == cell2->br && !cell2->bl->interior && cell2->bl->dist == INT_MAX ) {
-                  new_corner = cell2->bl;
-               }
-               if( new_corner ) {
-                  if( cell0 &&( new_corner == cell0->tl ||
-                                new_corner == cell0->tr ||
-                                new_corner == cell0->br ||
-                                new_corner == cell0->bl ) ){
-                     new_corner = NULL;
-                  } else if( cell1 &&( new_corner == cell1->tl ||
-                                new_corner == cell1->tr ||
-                                new_corner == cell1->br ||
-                                new_corner == cell1->bl ) ){
-                     new_corner = NULL;
-                  }
-               }
-            }
-
-/* The above may fail to find a suitable new corner if two disjoint
-   regions touch at the new corner, since that corner will already
-   have a distance assigned to it when it comes to be checked as part of
-   tracing the second disjoint region. So try the whole thing again, but
-   this time allowing the new corner to have a pre-assigned distance (i.e.
-   to already have been used). This means we give priority to adjacent
-   corners that have not already been used, but allow used corners to be
-   re-used if necessary. */
-            if( !new_corner ) {
-               if( corner == cell0->bl && !cell0->tl->interior ) {
-                  new_corner = cell0->tl;
-               } else if( corner == cell0->tl && !cell0->tr->interior ) {
-                  new_corner = cell0->tr;
-               } else if( corner == cell0->tr && !cell0->br->interior ) {
-                  new_corner = cell0->br;
-               } else if( corner == cell0->br && !cell0->bl->interior ) {
-                  new_corner = cell0->bl;
-               }
-
-               if( new_corner ) {
-                  if( cell1 &&( new_corner == cell1->tl ||
-                                new_corner == cell1->tr ||
-                                new_corner == cell1->br ||
-                                new_corner == cell1->bl ) ){
-                     new_corner = NULL;
-                  } else if( cell2 &&( new_corner == cell2->tl ||
-                                new_corner == cell2->tr ||
-                                new_corner == cell2->br ||
-                                new_corner == cell2->bl ) ){
-                     new_corner = NULL;
-                  }
-               }
-
-               if( !new_corner && cell1 ) {
-                  if( corner == cell1->bl && !cell1->tl->interior ) {
-                     new_corner = cell1->tl;
-                  } else if( corner == cell1->tl && !cell1->tr->interior ) {
-                     new_corner = cell1->tr;
-                  } else if( corner == cell1->tr && !cell1->br->interior ) {
-                     new_corner = cell1->br;
-                  } else if( corner == cell1->br && !cell1->bl->interior ) {
-                     new_corner = cell1->bl;
-                  }
-
-                  if( new_corner ) {
-                     if( cell0 &&( new_corner == cell0->tl ||
-                                   new_corner == cell0->tr ||
-                                   new_corner == cell0->br ||
-                                   new_corner == cell0->bl ) ){
-                        new_corner = NULL;
-                     } else if( cell2 &&( new_corner == cell2->tl ||
-                                   new_corner == cell2->tr ||
-                                   new_corner == cell2->br ||
-                                   new_corner == cell2->bl ) ){
-                        new_corner = NULL;
-                     }
-                  }
-
-                  if( !new_corner && cell2 ) {
-                     if( corner == cell2->bl && !cell2->tl->interior ) {
-                        new_corner = cell2->tl;
-                     } else if( corner == cell2->tl && !cell2->tr->interior ) {
-                        new_corner = cell2->tr;
-                     } else if( corner == cell2->tr && !cell2->br->interior ) {
-                        new_corner = cell2->br;
-                     } else if( corner == cell2->br && !cell2->bl->interior ) {
-                        new_corner = cell2->bl;
-                     }
-                     if( new_corner ) {
-                        if( cell0 &&( new_corner == cell0->tl ||
-                                      new_corner == cell0->tr ||
-                                      new_corner == cell0->br ||
-                                      new_corner == cell0->bl ) ){
+                     cell = cells[(icell + 1) % 3];
+                     if( new_corner && cell ) {
+                        if( new_corner == cell->tl ||
+                            new_corner == cell->tr ||
+                            new_corner == cell->br ||
+                            new_corner == cell->bl ){
                            new_corner = NULL;
-                        } else if( cell1 &&( new_corner == cell1->tl ||
-                                      new_corner == cell1->tr ||
-                                      new_corner == cell1->br ||
-                                      new_corner == cell1->bl ) ){
+                        }
+                     }
+                     cell = cells[(icell + 2) % 3];
+                     if( new_corner && cell ) {
+                        if( new_corner == cell->tl ||
+                            new_corner == cell->tr ||
+                            new_corner == cell->br ||
+                            new_corner == cell->bl ){
                            new_corner = NULL;
                         }
                      }
                   }
+/* Check if we are drawing over an existing path.  When this happens
+   the "dist" values at this corner and the previous one will
+   be consecutive numbers.  If this happens break out of the
+   i_pass loop to go to the next i_try. */
+                  if( new_corner ) {
+                     if( i_pass ) {
+                        new_dist = new_corner->dist;
+                        if( new_dist != INT_MAX ) {
+                           if( prev_dist != INT_MAX ) {
+                              if( (new_dist == ABS(prev_dist) + 1) || (prev_dist == ABS(new_dist) + 1) ) {
+                                 corner->path_wrong[i_try] = new_corner;
+                                 new_corner = NULL;
+                                 break;
+                              }
+                           }
+                        }
+                        prev_dist = new_dist;
+                     } else  {
+                        prev_dist = INT_MAX;
+                     }
+                  }
                }
-
-/* Count the number of consecutive corners that have already been used.
-   Abort if the last five corners were all re-used, since we have
-   probably got into a loop. */
-               if( new_corner && ++nused == 5 && astOK ) {
-                  astError( AST__INTER, "astRegBaseMesh(%s): Re-drawing "
-                            "previously drawn corners (internal "
-                            "programming error).", status, astGetClass( this ) );
-               }
-
-            } else {
-               nused = 0;
             }
 
 /* If we have arrived back at the first corner, break out of the loop. */
-            if( new_corner == start ) break;
+            if( new_corner == start ) {
+#ifdef MESH_DEBUG
+fprintf( fd, "%p %d 2\n", new_corner, - new_corner->dist );
+#endif
+               break;
+            }
 
 /* Sanity check. Check the next corner selected above is OK. */
-            if( ( !new_corner || new_corner->interior ) && astOK ) {
+            if( astOK ) {
                if( !new_corner ) {
+                  if( corner->path_backtrack ) {
+/* We reached a dead end.  Mark the current corner as not part of the
+   path from our start corner and begin again.  Need to clear the
+   "dist" and "path_start" attributes for the attempted path.
+
+   An example of a way in which this can happen is if we pass through
+   a 1-corner linkage between two holes, thereby getting stuck in the second. */
+
+#ifdef MESH_DEBUG
+fprintf( fd, "%p %d -1\n", corner, -1 );
+#endif
+
+                     if( corner->dist2 == -- dist ) {
+                        corner->dist2 = INT_MAX;
+                     } else if( corner->dist == dist ) {
+                        corner->dist = INT_MAX;
+                     }
+
+                     corner = corner->path_backtrack;
+                     old_corner = corner->path_backtrack;
+
+                     is_backtrack = 1;
+                     continue;
+                  }
+
                   astError( AST__INTER, "astRegBaseMesh(%s): Next perimeter "
                             "corner is undefined (internal programming error).",
                             status, astGetClass( this ) );
-               } else {
+               } else if( new_corner->interior ) {
                   astError( AST__INTER, "astRegBaseMesh(%s): Next perimeter "
                             "corner is interior (internal programming error).",
                             status, astGetClass( this ) );
@@ -7884,58 +7953,182 @@ fprintf( fd, "%p %d\n", corner, corner->dist );
          }
       }
 
+/* Count the isolated cells which have not been drawn.  First
+   clear the corner isolated marks so that we can mark only those
+   which have not been drawn. */
+      nisolated = 0;
+      for( corner = corner_foot; corner; corner = corner->prev ) {
+         if( !corner->interior ) {
+            corner->isolated = 0;
+         }
+      }
+#define CONSECUTIVE(a,b) ( \
+   (ABS(a->dist) == ABS(b->dist) + 1) || \
+   (ABS(b->dist) == ABS(a->dist) + 1) || \
+   ((a->dist2 != INT_MAX) && ( \
+      (a->dist2 == ABS(b->dist) + 1) || \
+      (ABS(b->dist) == a->dist2 + 1) \
+   )) || \
+   ((b->dist2 != INT_MAX) && ( \
+      (ABS(a->dist) == b->dist2 + 1) || \
+      (b->dist2 == ABS(a->dist) + 1) \
+   )) || \
+   ((a->dist2 != INT_MAX) && (b->dist2 != INT_MAX) && ( \
+      (a->dist2 == b->dist2 + 1) || \
+      (b->dist2 == a->dist2 + 1) \
+   )) )
+      for( cell = cell_foot[ maxorder ]; cell; cell = cell->prev ) {
+         if( cell->isolated ) {
+            if( ( cell->tl->dist != INT_MAX ) &&
+                  ( cell->tr->dist != INT_MAX ) &&
+                  ( cell->br->dist != INT_MAX ) &&
+                  ( cell->bl->dist != INT_MAX ) &&
+                  CONSECUTIVE(cell->tl, cell->tr) &&
+                  CONSECUTIVE(cell->tr, cell->br) &&
+                  CONSECUTIVE(cell->br, cell->bl) &&
+                  CONSECUTIVE(cell->bl, cell->tl) ) {
+               cell->isolated = 0;
+            } else {
+               nisolated += 1;
+               cell->tl->isolated = 1;
+               cell->tr->isolated = 1;
+               cell->br->isolated = 1;
+               cell->bl->isolated = 1;
+            }
+         }
+      }
+#undef CONSECUTIVE
+
 #ifdef MESH_DEBUG
-fclose( fd );
+corner = corner_foot;
+while( corner ) {
+   dump_corner( corner, maxorder );
+   corner = corner->prev;
+}
 #endif
 
 /* Create the returned PointSet and put the (ra,dec) values into it
    from each non-interior corner. First count the number of non-interior
-   corners. */
+   corners (npoint1) and the number of times a corner appears in a path
+   (i.e. has a "dist" or "dist2" value, as npoint2). */
       if( astOK ){
-         npoint = 0;
+         npoint1 = 0;
+         npoint2 = 0;
          corner = corner_foot;
          while( corner ) {
-            if( !(corner->interior) ) npoint++;
+            if( !(corner->interior) ) {
+               npoint1++;
+               if( corner->dist != INT_MAX ) {
+                  npoint2++;
+                  if( corner->dist2 != INT_MAX ) {
+                     npoint2++;
+                  }
+               }
+               else if( !corner->isolated ) {
+                  astError( AST__INTER, "astRegBaseMesh(%s): Non-isolated exterior "
+                            "cell was not assigned to a path (internal programming error).",
+                            status, astGetClass( this ) );
+                  break;
+               }
+            }
             corner = corner->prev;
          }
       }
 
+/* Create the PointSet, and get pointers to its data arrays. */
+      result = astPointSet( npoint1, 2, " ", status );
+      ptr = astGetPoints( result );
+
 /* Allocate an array to hold the indices within the returned PointSet in
-   order of increasing perimeter distance. */
+   order of increasing perimeter distance.  We now include the extra points
+   to allow for isolated corners which have not already been drawn. */
+      npoint = npoint2 + (4 * nisolated);
       this->meshdist = astCalloc( npoint, sizeof( *(this->meshdist ) ) );
 
-/* Create the PointSet, and get pointers to its data arrays. */
-      result = astPointSet( npoint, 2, " ", status );
-      ptr = astGetPoints( result );
       if( astOK ) {
          pra = ptr[ 0 ];
          pdec = ptr[ 1 ];
 
 /* Store the RA and Dec values at all non-interior corners, then delete
-   the corners. Also invert the "distance" values stored in the Corner
+   the corners, but not until we have dealt with isolated corners
+   as we well need to store the "icorner" numbers here temporarily.
+   Also invert the "distance" values stored in the Corner
    structures to get an array that indexes the mesh in order of distance
    around the perimeter. Negative values in this array indicate breaks
    in the perimeter between separate disjoint regions. Count the number
    of disjoint regions. */
          ndis = 1;
          icorner = 0;
-         corner = corner_foot;
+         for( corner = corner_foot; corner; corner = corner->prev ) {
+            if( !corner->interior ) {
+               *(pra++) = corner->ra;
+               *(pdec++) = corner->dec;
+               if( corner->dist != INT_MAX ) {
+
+                  if( corner->dist >= 0 ) {
+                     (this->meshdist)[ corner->dist ] = icorner;
+                  } else {
+                     (this->meshdist)[ -corner->dist ] = -(icorner);
+                     ndis++;
+                  }
+
+                  if( corner->dist2 != INT_MAX ) {
+                     (this->meshdist)[ corner->dist2 ] = icorner;
+                  }
+               }
+               corner->icorner = icorner;
+               icorner++;
+            }
+         }
+         for( cell = cell_foot[ maxorder ]; cell; cell = cell->prev ) {
+            if( cell->isolated ) {
+               ndis++;
+#ifdef MESH_DEBUG
+fprintf( fd, "%p %d 3\n", cell->tl, - dist );
+#endif
+               (this->meshdist)[ dist ++ ] = - cell->tl->icorner;
+#ifdef MESH_DEBUG
+fprintf( fd, "%p %d 3\n", cell->tr, dist );
+#endif
+               (this->meshdist)[ dist ++ ] = cell->tr->icorner;
+#ifdef MESH_DEBUG
+fprintf( fd, "%p %d 3\n", cell->br, dist );
+#endif
+               (this->meshdist)[ dist ++ ] = cell->br->icorner;
+#ifdef MESH_DEBUG
+fprintf( fd, "%p %d 3\n", cell->bl, dist );
+fprintf( fd, "%p %d 2\n", cell->tl, dist - 3 );
+#endif
+               (this->meshdist)[ dist ++ ] = cell->bl->icorner;
+            }
+         }
          while( corner ) {
-             if( !corner->interior ) {
-                *(pra++) = corner->ra;
-                *(pdec++) = corner->dec;
+            prev_corner = corner->prev;
+            (void) astFree( corner );
+            corner = prev_corner;
+         }
 
-                if( corner->dist >= 0 ) {
-                   (this->meshdist)[ corner->dist ] = icorner++;
-                } else {
-                   (this->meshdist)[ -corner->dist ] = -(icorner++);
-                   ndis++;
-                }
+#ifdef MESH_DEBUG
+fclose( fd );
 
-             }
-             prev_corner = corner->prev;
-             (void) astFree( corner );
-             corner = prev_corner;
+fd = fopen( "meshdist.asc", "w" );
+fprintf( fd, "# i icorner\n" );
+for( i = 0; i < npoint; i ++ ) {
+   fprintf( fd, "%d %d\n", i, (this->meshdist)[i] );
+}
+fclose( fd );
+#endif
+
+         if( icorner != npoint1 && astOK ) {
+            astError( AST__INTER, "astRegBaseMesh(%s): PointSet "
+                      "array has wrong length (internal programming error).",
+                      status, astGetClass( this ) );
+         }
+
+         if( dist != npoint && astOK ) {
+            astError( AST__INTER, "astRegBaseMesh(%s): Initial mesh distance "
+                      "array has wrong length (internal programming error).",
+                      status, astGetClass( this ) );
          }
 
 /* Store it in the parent Region structure for future use. */
@@ -8599,7 +8792,7 @@ static void SetMaxOrder( AstMoc *this, int value, int *status ){
 *     SetMaxOrder
 
 *  Purpose:
-*     Sety the value for the MaxOrder attribute
+*     Set the value for the MaxOrder attribute
 
 *  Type:
 *     Private function.
@@ -8612,7 +8805,7 @@ static void SetMaxOrder( AstMoc *this, int value, int *status ){
 *     Moc member function
 
 *  Description:
-*     Sets the value of the MaxPlot attribute.
+*     Sets the value of the MaxOrder attribute.
 
 *  Parameters:
 *     this
@@ -9593,7 +9786,7 @@ astMAKE_TEST(Moc,MaxOrder,( this->maxorder != -INT_MAX ))
 *     MinOrder
 
 *  Purpose:
-*     The lowest HEALPix order used in the MOC.
+*     The HEALPix order at which to search when converting to MOC.
 
 *  Type:
 *     Public attribute.
@@ -9622,9 +9815,8 @@ f     methods AST_ADDREGION or AST__ADDPIXELMASK.
 *     this value can be missed. Note, doing so will increase the time spent
 *     creating the Moc.
 *
-*     To ensure no pixels are missed, set MinOrder to some very large
-*     value (larger than 27). If MinOrder is set greater than MaxOrder, the
-*     value of MaxOrder will be used whenever MinOrder is required.
+*     To ensure no pixels are missed, set MinOrder equal to MaxOrder, or
+*     slightly higher to include features smaller than cells at MaxOrder.
 *
 *     The MinRes attribute is equivalent to MinOrder but expresses the
 *     resolution as a number of arc-seconds rather than as a HEALPix order.
@@ -9681,7 +9873,7 @@ astMAKE_TEST(Moc,MinOrder,( this->minorder != -INT_MAX ))
 *     MinRes
 
 *  Purpose:
-*     The worst resolution of the MOC.
+*     The resolution at which to search when converting to MOC.
 
 *  Type:
 *     Public attribute.
@@ -9690,7 +9882,8 @@ astMAKE_TEST(Moc,MinOrder,( this->minorder != -INT_MAX ))
 *     Floating point.
 
 *  Description:
-*     This attribute gives the poorest resolution of the MOC expressed as
+*     This attribute gives the size of the largest hole or island that could
+*     be missed when adding Regions or pixel masks into a Moc expressed as
 *     a number of arc-seconds. When a new value is set for MinRes, the
 *     MinOrder attribute will be set to the order that gives a resolution
 *     closest to the requested resolution. When the current value of
@@ -10761,15 +10954,26 @@ static void dump_corner( Corner *this, int order ) {
 
    if( !fd ) {
       fd = fopen( "corners.asc", "w" );
-      fprintf( fd, "# this ra dec alpha beta order int dist prev cell0 cell1 cell2 cell3\n");
+      fprintf( fd, "# this ra dec alpha beta order int dist dist2 prev cell0 cell1 cell2 cell3\n");
 
    }
 
    alpha = cos( this->dec )*cos( this->ra );
    beta = cos( this->dec )*sin( this->ra );
 
-   fprintf( fd, "%p %g %g %g %g %d %d %d %p ", this, this->ra, this->dec,
-            alpha, beta, order, this->interior, this->dist, this->prev );
+   fprintf( fd, "%p %.10g %.10g %g %g %d %d ", this, this->ra, this->dec,
+            alpha, beta, order, this->interior);
+   if( this->dist == INT_MAX ) {
+      fprintf(fd, "none " );
+   } else {
+      fprintf(fd, "%d ", this->dist );
+   }
+   if( this->dist2 == INT_MAX ) {
+      fprintf(fd, "none " );
+   } else {
+      fprintf(fd, "%d ", this->dist2 );
+   }
+   fprintf( fd, "%p ", this->prev );
    for( i = 0; i < this->ncell; i++ ) fprintf(fd, "%p ", this->cells[i] );
    for( ; i < 4; i++ ) fprintf( fd, "null " );
    fprintf(fd, "\n");
@@ -10789,7 +10993,7 @@ static void dump_cell( AstMoc *this, Cell *cell, int order ) {
 
    if( !fd ) {
       fd = fopen( "cells.asc", "w" );
-      fprintf( fd, "# this x18 y18 ix iy ra dec alpha beta order int prev bl tl tr br\n");
+      fprintf( fd, "# this x18 y18 ix iy ra dec alpha beta order int iso prev bl tl tr br\n");
 
    }
 
@@ -10806,8 +11010,10 @@ static void dump_cell( AstMoc *this, Cell *cell, int order ) {
    double x18 = ( ONE << (18 - order) )*( cell->ix - 0.5 ) + 0.5;
    double y18 = ( ONE << (18 - order) )*( cell->iy - 0.5 ) + 0.5;
 
-   fprintf( fd, "%p %g %g %d %d %g %g %g %g %d %d %p ", cell, x18, y18, cell->ix, cell->iy,
-            ra, dec, alpha, beta, order, cell->interior, cell->prev );
+   fprintf( fd, "%p %g %g %d %d %.10g %.10g %g %g %d %d %d %p ",
+            cell, x18, y18, cell->ix, cell->iy,
+            ra, dec, alpha, beta, order,
+            cell->interior, cell->isolated, cell->prev );
 
    if( cell->bl ) {
       fprintf(fd, "%p ", cell->bl );

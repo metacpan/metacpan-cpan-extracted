@@ -1,0 +1,379 @@
+# NAME
+
+Catalyst::View::EmbeddedPerl::PerRequest - Per-request embedded Perl view for Catalyst
+
+# SYNOPSIS
+
+Declare a view in your Catalyst application:
+
+    package Example::View::HelloName;
+
+    use Moose;
+    extends 'Catalyst::View::EmbeddedPerl::PerRequest';
+
+    has 'name' => (is => 'ro', isa => 'Str');
+
+    __PACKAGE__->meta->make_immutable;
+    __DATA__
+    <p>Hello <%= $self->name %></p>
+
+You can also use a standalone text file as a template.  This text file
+will be located in the same directory as the view module and will have
+a 'snake case' version of the view module name with a '.epl' extension.
+
+    # In hello_name.epl
+    <p>Hello <%= $self->name %>!</p>
+
+In your Catalyst controller:
+
+    sub some_action :Path('/some/path') ($self, $c) {
+      # Create the view and render it as a 200 OK response
+      $c->view('HelloName', name => 'Perl Hacker')->http_ok;
+    }
+
+Produces the following output:
+
+    <p>Hello Perl Hacker!</p>
+
+# DESCRIPTION
+
+`Catalyst::View::EmbeddedPerl::PerRequest` is a per-request view for the [Catalyst](https://metacpan.org/pod/Catalyst) 
+framework that uses [Template::EmbeddedPerl](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl) to process templates containing embedded 
+Perl code. It allows for dynamic content generation with embedded Perl expressions 
+within your templates.
+
+Since it uses 'just Perl' for the template language, it is very flexible and powerful
+(maybe too much so, if you lack self control...) and has the upside that any Perl
+programmer will be able to understand and work with it without learning a new language.
+Anyone that's worked with similar systems like [Mason](https://metacpan.org/pod/Mason) or [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) will with
+a bit of reorientation be quickly productive, but I suspect most Perl programmers will
+pick up the syntax quickly even if they've never seen it before.  These templates are
+not my favorite type of approach but they have the massive upside of not something you
+need to learn to use, so a type of least common denominator.  This is great for Perl
+only shops, for small projects where you don't want a complex stack and of course for
+demo applications and presentations to other Perl programmers.  That's not to say you
+can't use it for larger projects, but you should be aware of the tradeoffs here.  By
+exposing Perl in the template it's very easy to write code that is hard to maintain
+and a bit messy and also its easy to stick too much business logic in the template.
+You should exercise self control and have strong code review conventions.
+
+You should read the (short) documentation for [Template::EmbeddedPerl](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl) to understand
+the syntax and features of the template language.  These docs will focus on the how
+to use this view in a Catalyst application.
+
+This view is a subclass of [Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest) and is designed to be
+used in a per-request context. You may wish to read the documentation for that class
+to get a better understanding of what a 'per-request' view is and how it differs from
+views like [Catalyst::View::TT](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ATT) or [Catalyst::View::Mason](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3AMason) which you may already be
+familiar with.  The topic will be covered here in brief.
+
+# PER-REQUEST VIEWS
+
+A per-request view is a view that is created and destroyed for each request. This is
+in contrast to a 'per-application' view which is created once when the application is
+started and shared across all requests.  This means you can have a view that contains
+state that is specific to a single request, has access to the `$c` context for that
+request and you can write display logic methods that are specific to that request.  You 
+can also gave object attributes that define the view interface.  Unlike other commonly used
+view like [Catalyst::View::TT](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ATT) you can't use the stash to pass data to the view, you
+must pass it as arguments when you create the view.  This creates a strongly typed
+view, which has an explicit interface leading to fewer bug and easier to understand
+code.  It also means you can't use the stash to pass data to the view, which is a
+common pattern in Catalyst applications but is one I have found to be a source of
+confusion and bugs in many applications.  When using per request views you will write a
+view model for each template, which you might find strange at first, and of course its 
+extra work, but over time I think you will have a much more sustainable, maintainable
+application.  Review the documentation, test cases and example applications and decide
+for yourself.
+
+# HTML ESCAPING
+
+By default the view will escape all output to prevent cross site scripting attacks.
+If you want to output raw HTML you can use the `raw` helper.  For example:
+
+    <%= raw $self->html %>
+
+See [Template::EmbeddedPerl::SafeString](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl%3A%3ASafeString) for more information.
+
+You can disable this feature by setting the `auto_escape` option to false in the
+view configuration.  For example if you are not using this to generate HTML output
+you might not want it.
+
+# METHODS
+
+This class provides the following methods for public use:
+
+## render
+
+    $output = $view->render($c, @args);
+
+Renders the currently created template to a string, passing addional arguments if needed
+
+## view
+
+    $output = $self->view($view_name, @args);
+
+Renders another view and returns its content. Useful for including the output of one 
+template within another or using another template as a layout or wrapper.
+
+# INHERITED METHODS
+
+This class inherits all methods from [Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest) but the following
+are public and considered useful:
+
+## Content Block Helpers
+
+Used to capture blocks of template.  SEE:
+
+["content" in Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest#content), ["content\_for" in Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest#content_for),
+["content\_append" in Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest#content_append), ["content\_prepend" in Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest#content_prepend),
+["content\_replace" in Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest#content_replace).
+
+## Response Helpers
+
+Used to set up the response object.  SEE: ["RESPONSE-HELPERS" in Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest#RESPONSE-HELPERS)
+Example:
+
+    $c->view('HelloName', name => 'Perl Hacker')->http_ok;
+
+## process
+
+    $view->process($c, @args);
+
+Renders a view and sets up the response object. Generally this is called from a
+controller via the forward method and not directly:
+
+    $c->forward($view, @args);
+
+See ["process" in Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest#process) for more information.
+
+## respond
+
+    $view->respond($status, $headers, @args);
+
+See ["respond" in Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest#respond) for more information.
+
+## detach
+
+See ["detach" in Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest#detach) for more information.
+
+# METHODS PROXIED FROM [Template::EmbeddedPerl](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl)
+
+This class proxies the following methods from [Template::EmbeddedPerl](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl):
+
+    raw safe safe_concat html_escape url_encode
+    escape_javascript uri_escape trim mtrim
+
+See ["HELPER-FUNCTIONS" in Template::EmbeddedPerl](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl#HELPER-FUNCTIONS) (these are available as template
+helpers and as methods on the view object).
+
+# CONFIGURATION
+
+You can configure the view in your Catalyst application by passing options either in your
+application configuration or when setting up the view.
+
+Example configuration in your Catalyst application.   
+
+    # In MyApp.pm or myapp.conf
+    __PACKAGE__->config(
+        'View::EmbeddedPerl' => {
+            template_extension => 'epl',
+            open_tag           => '<%',
+            close_tag          => '%>',
+            expr_marker        => '=',
+            line_start         => '%',
+            auto_flatten_expr  => 1,
+            use_cache          => 1,
+            helpers            => {
+                helper_name => sub { ... },
+            },
+        },
+    );
+
+The following configuration options are passed thru to [Template::EmbeddedPerl](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl):
+
+    open_tag close_tag expr_marker line_start  
+    template_extension auto_flatten_expr prepend
+    use_cache auto_escape
+
+# HELPERS
+
+You can define custom helper functions that are available within your templates. 
+Helpers can be defined in the configuration under the `helpers` key.
+
+Example:
+
+    __PACKAGE__->config(
+        'View::EmbeddedPerl' => {
+            helpers => {
+                format_date => sub {
+                    my ($self, $c, $date) = @_;
+                    return $date->strftime('%Y-%m-%d');
+                },
+            },
+        },
+    );
+
+In your template:
+
+    <%== format_date($data->{date}) %>
+
+You can also define helpers in your view module by defining a `helpers` method 
+that returns a list of helper functions.  You may prefer this option
+if you are creating a single base class for all your views, with shared features.
+
+Example:
+
+    sub helpers {
+      my ($class) = @_;
+      return (
+        format_date => sub {
+          my ($self, $c, $date) = @_;
+          return $date->strftime('%Y-%m-%d');
+        },
+     );
+    }
+
+# DEFAULT HELPERS
+
+The following default helpers are available in all templates, in addition to
+helpers that are default in [Template::EmbeddedPerl](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl) itself (see 
+["HELPER-FUNCTIONS" in Template::EmbeddedPerl](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl#HELPER-FUNCTIONS) for more information):
+
+**Note:** Just to be clear, you don't have to write a helper for every method you
+want to call in your template.  You always get `$self` and `$c` in your template
+so you can call methods on the view object and the context object directly.  Personally
+my choice is to have helpers for things that are in my base view which are shared across
+all views and then call $self for things that are specific to the view.  This makes it
+easier for people to debug and understand the code IMHO.  
+
+- `view($view_name, @args)`
+
+    Renders another view and returns its content. Useful for including the output of one
+
+- `content($name, $content)`
+
+    Captures a block of content for later use.
+
+- `content_for($name, $content)`
+
+    Captures a block of content for later use, appending to any existing content.
+
+- `content_append($name, $content)`
+
+    Appends content to a previously captured block.
+
+- `content_prepend($name, $content)`
+
+    Prepends content to a previously captured block.
+
+- `content_replace($name, $content)`
+
+    Replaces a previously captured block with new content.
+
+# TEMPLATE LOCATIONS
+
+Templates are searched in the following order:
+
+- 1. `__DATA__` section of the view module.
+
+    If your view module has a `__DATA__` section, the template will be read from there.
+
+- 2. File system based on the view's class name.
+
+    If not found in `__DATA__`, the template file is looked up in the file system, 
+    following the view's class name path.  The file will be a 'snake case' version of
+    the view module name with a '.epl' extension.
+
+# COOKBOOK
+
+Some ideas about how to use this view well
+
+## Avoid complex logic in the view
+
+Instead of putting complex logic in the view, you can define a method on the
+view which accepts a callback to render the content.  This way you can keep
+the logic in the controller or model where it belongs.
+
+    package MyApp::View::MyView;
+
+    use Moose
+    extends 'Catalyst::View::EmbeddedPerl::PerRequest';
+
+    has 'person' => (is => 'ro', required => 1);
+
+    sub person_data {
+      my ($self, $content_cb) = @_;
+      my $content = $content_cb->($self->person->name, $self->person->age);
+      return "....@{[ $self->trim($content_cb->()) ]}....";
+    }
+
+    __PACKAGE__->meta->make_immutable;
+
+In your template:
+
+    %# Person info
+    <%= $self->person_data(sub($name, $age) {
+      <p>Name: <%= $name %></p>
+      <p>Age: <%= $age %></p>
+    }) %>
+
+## Use a base view class
+
+If you have a lot of views that share common features, you can create a base view
+class that contains those features.  This way you can avoid repeating yourself
+and keep your code DRY.
+
+    package MyApp::View;
+
+    use Moose;
+    extends 'Catalyst::View::EmbeddedPerl::PerRequest';
+
+    sub helpers {
+      my ($class) = @_;
+      return (
+        format_date => sub {
+          my ($self, $c, $date) = @_;
+          return $date->strftime('%Y-%m-%d');
+        },
+      );
+    }
+
+    # Other shared view features such as methods, attributes, etc.
+
+    __PACKAGE__->meta->make_immutable;
+
+In your view modules:
+
+    package MyApp::View::MyView;
+
+    use Moose;
+    extends 'MyApp::View';
+
+    __PACKAGE__->meta->make_immutable;
+
+# SEE ALSO
+
+- [Catalyst](https://metacpan.org/pod/Catalyst)
+
+    The Catalyst web framework.
+
+- [Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest)
+
+    The base class for per-request views in Catalyst.
+
+- [Template::EmbeddedPerl](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl)
+
+    Module used for processing embedded Perl templates.
+
+- [Moose](https://metacpan.org/pod/Moose)
+
+    A postmodern object system for Perl 5.
+
+# AUTHOR
+
+John Napiorkowski `<jjnapiork@cpan.org>`
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

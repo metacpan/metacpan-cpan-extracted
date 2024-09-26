@@ -53,7 +53,7 @@
    "provides" : {
       "Locale::ID::Province" : {
          "file" : "lib/Locale/ID/Province.pm",
-         "version" : "0.111"
+         "version" : "0.112"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/perlancar/perl-Locale-ID-Province"
       }
    },
-   "version" : "0.111",
+   "version" : "0.112",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

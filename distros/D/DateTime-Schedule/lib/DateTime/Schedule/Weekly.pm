@@ -1,4 +1,4 @@
-package DateTime::Schedule::Weekly 0.02;
+package DateTime::Schedule::Weekly 0.03;
 use v5.26;
 
 # ABSTRACT: Augment DateTime::Schedule with a weekly recurrrence pattern
@@ -34,7 +34,7 @@ class DateTime::Schedule::Weekly {
       || $self->friday
       || $self->saturday);
 
-    $include = DateTime::Set->from_datetimes(dates => [map {$_->clone->truncate(to => 'day')} $include->@*]);
+    $include = {map {$_->strftime('%F') => true} ($include // [])->@*};
   }
 
   sub weekdays($class, @params) {
@@ -45,17 +45,11 @@ class DateTime::Schedule::Weekly {
     __PACKAGE__->new(monday => false, tuesday => false, wednesday => false, thursday => false, friday => false, @params);
   }
 
-  method calc_recurrence : override () {
-    return sub ($prev) {
-      return $prev if ($prev->is_infinite);
-      my $next = $prev;
-      while (1) {
-        $next = $next->add(days => 1);
-        my $day_name = $DAY_NUMS[$next->day_of_week];
-        next         if ($self->exclude->contains($next));
-        return $next if ($self->include->contains($next) || $self->$day_name);
-      }
-    }
+  method is_day_scheduled($d) {
+    my $day_name = $DAY_NUMS[$d->day_of_week];
+    my $str      = $d->strftime('%F');
+    return false if ($self->exclude->{$str});
+    return $self->include->{$str} || $self->$day_name;
   }
 }
 
@@ -116,6 +110,12 @@ C<wednesday>, C<thursday>, and C<friday> are "off".
 =head1 METHODS
 
 Implements all methods from L<DateTime::Schedule>
+
+=head2 is_day_scheduled($datetime)
+
+Given a L<DateTime>, returns false if date is in the exclusion list. Otherwise
+returns true if date is in the inclusion list or if date is in a scheduled day
+of week. Returns false otherwise.
 
 =head1 AUTHOR
 

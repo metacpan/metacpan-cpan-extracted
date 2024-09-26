@@ -4,7 +4,7 @@
       "Graham Bell <g.bell@jach.hawaii.edu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "gpl_3"
    ],
@@ -34,11 +34,15 @@
    "provides" : {
       "Starlink::ATL" : {
          "file" : "lib/Starlink/ATL.pm",
-         "version" : "0.05"
+         "version" : "0.06"
+      },
+      "Starlink::ATL::MOC" : {
+         "file" : "lib/Starlink/ATL/MOC.pm",
+         "version" : "0.06"
       },
       "Starlink::ATL::Region" : {
          "file" : "lib/Starlink/ATL/Region.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -47,6 +51,6 @@
          "http://opensource.org/licenses/gpl-3.0.html"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -30,7 +30,7 @@ name: DBIx-Class-Helper-ColumnNames
 provides:
   DBIx::Class::Helper::ColumnNames:
     file: lib/DBIx/Class/Helper/ColumnNames.pm
-    version: v0.1.0
+    version: v0.1.1
 recommends:
   Ref::Util::XS: '0'
 requires:
@@ -44,7 +44,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/DBIx-Class-Helper-ResultSet-ColumnNames/issues
   repository: git://github.com/robrwo/DBIx-Class-Helper-ResultSet-ColumnNames.git
-version: v0.1.0
+version: v0.1.1
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.34.3
 x_serialization_backend: 'YAML::Tiny version 1.74'

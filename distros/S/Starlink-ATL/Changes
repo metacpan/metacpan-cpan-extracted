@@ -1,5 +1,10 @@
 Revision history for Starlink::ATL
 
+0.06 2024-09-25
+    - Moved MOC reading and writing functions from astmoctool
+      script to new module Starlink::ATL::MOC.
+    - Removed MinOrder from astmoctool --info output.
+
 0.05 2021-05-21
     - Add placeholder top level Starlink::ATL module.
     - Add astmoctool script.

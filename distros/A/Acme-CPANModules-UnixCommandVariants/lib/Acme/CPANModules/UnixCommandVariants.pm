@@ -3,9 +3,9 @@ package Acme::CPANModules::UnixCommandVariants;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-08-13'; # DATE
+our $DATE = '2024-09-19'; # DATE
 our $DIST = 'Acme-CPANModules-UnixCommandVariants'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
     summary => "List of various CLIs that are some variants of traditional Unix commands",
@@ -18,13 +18,33 @@ MARKDOWN
             module => 'App::prefixcat',
             script => 'prefixcat',
             'x.command' => 'cat',
+            summary => 'A `cat` variant that print filename at the start of each output line (can also print other prefix)',
         },
 
-        # cat
+        # find
+        {
+            module => 'App::findsort',
+            script => 'findsort',
+            'x.command' => 'find',
+            'x.is_wrapper' => 1,
+            summary => 'A `find` variant (actually wrapper) that can sort its output',
+        },
+
+        # rsync
+        {
+            module => 'App::rsynccolor',
+            script => 'rsynccolor',
+            'x.command' => 'rsync',
+            'x.is_wrapper' => 1,
+            summary => 'An `rsync` variant (actually wrapper) that colors its output for visual hints',
+        },
+
+        # uniq
         {
             module => 'App::nauniq',
             script => 'nauniq',
             'x.command' => 'uniq',
+            summary => 'A `uniq` variant that can remember non-adjacent duplicate lines',
         },
     ],
 };
@@ -44,7 +64,7 @@ Acme::CPANModules::UnixCommandVariants - List of various CLIs that are some vari
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::UnixCommandVariants (from Perl distribution Acme-CPANModules-UnixCommandVariants), released on 2024-08-13.
+This document describes version 0.002 of Acme::CPANModules::UnixCommandVariants (from Perl distribution Acme-CPANModules-UnixCommandVariants), released on 2024-09-19.
 
 =head1 DESCRIPTION
 
@@ -54,9 +74,25 @@ This document describes version 0.001 of Acme::CPANModules::UnixCommandVariants 
 
 =item L<App::prefixcat>
 
+A `cat` variant that print filename at the start of each output line (can also print other prefix).
+
 Script: L<prefixcat>
 
+=item L<App::findsort>
+
+A `find` variant (actually wrapper) that can sort its output.
+
+Script: L<findsort>
+
+=item L<App::rsynccolor>
+
+An `rsync` variant (actually wrapper) that colors its output for visual hints.
+
+Script: L<rsynccolor>
+
 =item L<App::nauniq>
+
+A `uniq` variant that can remember non-adjacent duplicate lines.
 
 Script: L<nauniq>
 
