@@ -8,7 +8,7 @@ use warnings;
 
 use base qw(Date::Holidays::Adapter);
 
-our $VERSION = '0.0200';
+our $VERSION = '0.0201';
 
 
 
@@ -51,7 +51,7 @@ Date::Holidays::Adapter::USExtended - Adapter for the USExtended module holidays
 
 =head1 VERSION
 
-version 0.0200
+version 0.0201
 
 =head1 DESCRIPTION
 

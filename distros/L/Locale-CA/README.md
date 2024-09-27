@@ -10,7 +10,7 @@ Locale::CA - two letter codes for province identification in Canada and vice ver
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -20,11 +20,11 @@ Version 0.05
 
     # Returns the French names of the provinces if $LANG starts with 'fr' or
     #   the lang parameter is set to 'fr'
-    my $province = $u->{code2province}{$code};
-    my $code  = $u->{province2code}{$province};
+    print $u->{code2province}{'ON'}, "\n";      # prints ONTARIO
+    print $u->{province2code}{'ONTARIO'}, "\n"; # prints ON
 
-    my @province = $u->all_province_names;
-    my @code  = $u->all_province_codes;
+    my @province = $u->all_province_names();
+    my @code = $u->all_province_codes();
 
 # SUBROUTINES/METHODS
 
@@ -75,10 +75,6 @@ You can also look for information at:
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Locale-CA](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Locale-CA)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Locale-CA](http://cpanratings.perl.org/d/Locale-CA)
-
 - Search CPAN
 
     [http://search.cpan.org/dist/Locale-CA/](http://search.cpan.org/dist/Locale-CA/)
@@ -89,6 +85,6 @@ Based on [Locale::US](https://metacpan.org/pod/Locale%3A%3AUS) - Copyright (c) 2
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2012-2023 Nigel Horne.
+Copyright 2012-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

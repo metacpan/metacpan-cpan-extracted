@@ -4,7 +4,12 @@ use strict;
 use warnings;
 
 # ABSTRACT: interface to Debian DEP 12 format
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
+
+# As DEP 12 is in draft state and the development is happening in its
+# wiki page (https://wiki.debian.org/UpstreamMetadata), this variable
+# holds the UTC timestamp of DEP 12 wiki page.
+our $DEP12_VERSION = '2021-02-21 11:52:54';
 
 use Data::Validate::Email qw( is_email_rfc822 );
 use Data::Validate::URI qw( is_uri );
@@ -13,6 +18,7 @@ use Encode qw( decode );
 use Scalar::Util qw( blessed );
 use Text::BibTeX::Validate qw( validate_BibTeX );
 use YAML::XS;
+use version;
 
 # Preventing YAML::XS from doing undesired things:
 $YAML::XS::DumpCode = 0;
@@ -50,6 +56,13 @@ my @list_fields = qw(
     Screenshots
 );
 
+my @reserved_fields = qw(
+    ping
+    YAML-ALL
+    YAML-URL
+    YAML-REFRESH-DATE
+);
+
 =head1 NAME
 
 Debian::DEP12 - interface to Debian DEP 12 format
@@ -68,7 +81,13 @@ Debian::DEP12 - interface to Debian DEP 12 format
 
 Debian::DEP12 is an object-oriented interface for Debian DEP 12 format,
 also known as debian/upstream/metadata. Primary focus of the initial
-development was validation and fixing of DEP 12 data.
+development is the validation and fixing of DEP 12 data.
+
+DEP 12 is in draft state and the development is happening in its wiki
+page (L<https://wiki.debian.org/UpstreamMetadata>). Thus Debian::DEP12
+attempts to keep up with the DEP 12 specification. To keep track, the
+UTC timestamp of DEP 12 wiki page is stored in C<$DEP12_VERSION> class
+variable.
 
 Contributions welcome!
 
@@ -124,7 +143,7 @@ sub new
         return $class->new( { Reference => \@references } );
     } elsif( ref $what eq '' ) {
         # Text in YAML format
-        if( $YAML::XS::VERSION < 0.69 ) {
+        if( version->parse($YAML::XS::VERSION) < version->parse('0.69') ) {
             die 'YAML::XS < 0.69 is insecure' . "\n";
         }
 
@@ -252,6 +271,11 @@ sub validate
                  _warn_value( 'unknown field', $key, $self->get( $key ) );
         }
 
+        if( grep { $_ eq $key } @reserved_fields ) {
+            push @warnings,
+                 _warn_value( 'reserved field', $key, $self->get( $key ) );
+        }
+
         if( ref $self->get( $key ) && !grep { $_ eq $key } @list_fields ) {
             push @warnings,
                  _warn_value( 'scalar value expected',
@@ -264,7 +288,12 @@ sub validate
                  'Documentation', 'Donation', 'FAQ', 'Gallery',
                  'Other-References', 'Registration', 'Repository',
                  'Repository-Browse', 'Screenshots', 'Webservice') {
-        next if !defined $self->get( $key );
+        next if !exists $self->{$key};
+
+        if( !defined $self->get( $key ) ) {
+            push @warnings, _warn_value( 'undefined value', $key );
+            next;
+        }
 
         my @values;
         if( ref $self->get( $key ) eq 'ARRAY' ) {
@@ -310,6 +339,64 @@ sub validate
                  _warn_value( 'value \'%(value)s\' does not look like valid URL',
                               $yamlpath,
                               $_ );
+        }
+    }
+
+    if( defined $self->get( 'Registry' ) &&
+        ref $self->get( 'Registry' ) eq 'ARRAY' ) {
+        # TODO: report non-arrays
+
+        my @registry = @{$self->get( 'Registry' )};
+        for my $i (0..$#registry) {
+            my @unknown_fields = grep { $_ !~ /^(Name|Entry)$/ }
+                                      sort keys %{$registry[$i]};
+            for (@unknown_fields) {
+                push @warnings,
+                     _warn_value( 'unknown field',
+                                  "Registry[$i].$_",
+                                  $registry[$i]->{$_} );
+            }
+
+            for ('Name', 'Entry') {
+                if( !exists $registry[$i]->{$_} ) {
+                    push @warnings,
+                         _warn_value( 'missing mandatory field',
+                                      "Registry[$i].$_" );
+                    next;
+                }
+
+                if( !defined $registry[$i]->{$_} ) {
+                    push @warnings,
+                         _warn_value( 'undefined value',
+                                      "Registry[$i].$_" );
+                    next;
+                }
+
+                if( ref $registry[$i]->{$_} ) {
+                    push @warnings,
+                         _warn_value( 'non-scalar value',
+                                      "Registry[$i].$_",
+                                      $registry[$i]->{$_} );
+                    next;
+                }
+
+                if( $_ eq 'Name' ) {
+                    if( $registry[$i]->{$_} !~
+                        /^(bio\.tools|biii|OMICtools|SciCrunch|conda:.+|opam|PyPI)$/ ) {
+                        push @warnings,
+                             _warn_value( 'unknown registry \'%(value)s\'',
+                                          "Registry[$i].$_",
+                                          $registry[$i]->{$_} );
+                    }
+                } else { # Entry
+                    if( defined is_uri $registry[$i]->{$_} ) {
+                        push @warnings,
+                             _warn_value( 'should not be URI',
+                                          "Registry[$i].$_",
+                                          $registry[$i]->{$_} );
+                    }
+                }
+            }
         }
     }
 

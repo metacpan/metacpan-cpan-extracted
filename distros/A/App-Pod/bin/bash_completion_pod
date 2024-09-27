@@ -3,136 +3,77 @@
 export MY_CACHE_DIR="$HOME/.cache"
 export MY_POD_CACHE="$MY_CACHE_DIR/my_pod_clases.cache"
 
-_tab__pod_make_class_cache(){
-   _tab__pod_get_modules_list  > "$MY_POD_CACHE"
-   pod --tool_options         >> "$MY_POD_CACHE"
+# Build list of all perl modules.
+_tab__pod_get_all_modules(){
+    perl -le 'print for @INC' |
+    xargs -I {} find {} -name '*.pm' -printf '%P\n' |
+    sort -u |
+    while read f; do
+        f="${f//\//::}"
+        f="${f%\.pm}"
+        echo $f
+    done
 }
 
 _my_clear_cache(){
-   rm -frv $MY_CACHE_DIR/my_*.cache
+    rm -frv $MY_CACHE_DIR/my_*.cache
 }
 
-# Build list of all perl modules which can be
-# 'require'd from the current @INC.
-_tab__pod_get_modules_list(){
-    perl -MFile::Find -E '
-        use strict;
-        use warnings;
+_tab__pod_filter(){
+    perl -lne '
+        INIT {
+            $cur = shift @ARGV;
+            $cnt =()= $cur =~ /::/g;
+            %matches;
+        }
+        # No match.
+        next if index($_, $cur) != 0;
 
-        my @pkgs;
-        my %seen;
-
-        local $/ = ""; # Paragraph mode.
-
-        for my $dir ( @INC ) {
-            find (
-                {
-                    wanted => sub{
-
-                        my $file = $File::Find::name;
-                        my $pkg  = $file;
-                        
-                        # Skip duplicates in different paths.
-                        return if $seen{$file}++;
-                        
-                        # Only pm files.
-                        return unless / \. pm $ /x;
-
-                        # Skip broken links;
-                        return if not -e $file;
-
-                        # Change to package.
-                        $pkg =~ s{ \. pm $ }{}x;
-                        $pkg =~ s{ ^ $dir / }{}x;
-                        $pkg =~ s{ / }{::}xg;
-                        
-                        # Valid perl package names.
-                        return if $pkg !~ / ^ [a-zA-Z_:0-9]+ $ /x;
-
-                        # Process first 2 blocks to
-                        # see if it has the expected
-                        # package name (if any).
-                        open my $fh, "<", $file or return;
-                        for ( 1..2 ) {
-                            my $block = <$fh>;
-                            next if not $block;
-                            if ( $block =~ / ^ \s* package \s+ $pkg; /xm ) {
-                                push @pkgs, $pkg;
-                            }
-
-                        }
-                        close $fh;
-                    },
-                    follow      => 1,
-                    follow_skip => 2,
-                },
-                $dir
-            );
+        # Do not show too much.
+        my $index = -1;
+        for my $c ( 0 .. $cnt ) {
+            $index = index($_, "::", $index+1);
+        }
+        if ($index != -1){
+            $_ = substr($_, 0, $index+2 );
         }
 
-        for ( sort @pkgs ) {
-            say;
-        }
-    ' 
-}
+        $matches{$_}++;
 
-# Build completions based on the number of arguments.
-_tab__pod_get_command(){
-    perl -le '
-        my $cnt   = 0;
-        my $class = "";
+        END {
+            for ( sort keys %matches ) {
 
-        $_ ||= " " for @ARGV;       # Empty input.
-        shift;                      # Skip script name.
+                # Check if there is a longer name and use it.
+                if ( substr($_, -2 ) ne "::" ) {
+                    next if $matches{ $_ . "::"};
+                }
 
-        while ($_ = shift) {
-            if ( / ^ - /x) {        # Skip options.
-                # Skip query value.
-                shift if / ^ -+ q(uery)? $ /x;
-                next;
+                print;
             }
-            $class = $_ if not $cnt++;
         }
 
-        if($cnt == 1) {
-          print q(cat $MY_POD_CACHE);
-          print join " ", " echo",
-                map { -d ? "$_/" : $_  }
-                glob qq("$class*");
-        }
-        elsif($cnt == 2){
-            print qq(pod $class --class_options --tool_options --no_error);
-        }
-        else{
-            print q(pod --tool_options);
-        }
-   ' -- "$@"
+    ' "$1" $MY_POD_CACHE
 }
 
 _tab__pod(){
+    if ! [ -e $MY_POD_CACHE ]; then
+        _tab__pod_get_all_modules > $MY_POD_CACHE
+    fi
+
     local cur prev words cword _possible
     _init_completion -n : || return
 
-    if [ ! -e "$MY_POD_CACHE" ]; then
-        _tab__pod_make_class_cache
-    fi
-
     if [[ $cur =~ ^- ]]; then                    # Option
         _possible=$(pod --tool_options)
+        COMPREPLY=($(compgen -W "$_possible" -- $cur))
     elif [[ "$prev" =~ ^-+q(uery)?$ ]]; then     # --query
         return                                   # Since it can be anything.
     else
-        # Filter out script name, options, and query value.
-        # Then count how many arguments remain.
-        local command=$(_tab__pod_get_command "${words[@]}")
-        _possible=$(eval "$command")
+        _possible=$(_tab__pod_filter "$cur" )
         compopt -o nospace                       # No space afterwards.
+        COMPREPLY=($(compgen -W "$_possible" -- $cur))
+        __ltrim_colon_completions "$cur"
     fi
-
-    COMPREPLY=($(compgen -W "$_possible" -- $cur))
-
-    # Remove colon contain prefix from COMPREPLY
-    __ltrim_colon_completions "$cur"
 }
 
 complete -F _tab__pod pod

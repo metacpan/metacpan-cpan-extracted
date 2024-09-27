@@ -1,0 +1,82 @@
+Math::Symbolic::Custom::Collect
+===============================
+
+Provides "to_collected()" through the Math::Symbolic module extension class. "to_collected" performs the following operations on the inputted Math::Symbolic tree:-
+
+* Folds constants
+* Converts decimal numbers to rational numbers
+* Combines fractions
+* Expands brackets
+* Collects like terms
+* Cancels down
+
+The result is often a more concise expression. However, because it does not (yet) factor the expression, the result is not always the simplest representation. Hence it is not offered as a simplify().
+
+E.g.:-
+
+use Math::Symbolic qw(:all);
+use Math::Symbolic::Custom::Collect;
+
+my $t1 = "0.125";
+print "Output: ", parse_from_string($t1)->to_collected()->to_string(), "\n";                
+# Output: 1 / 8
+
+my $t2 = "25/100";
+print "Output: ", parse_from_string($t2)->to_collected()->to_string(), "\n";                
+# Output: 1 / 4
+
+my $t3 = "((1/4)+(1/2))*3*x";
+print "Output: ", parse_from_string($t3)->to_collected()->to_string(), "\n";     
+# Output: (9 * x) / 4           
+
+my $t4 = "1/(1-(1/x))";
+print "Output: ", parse_from_string($t4)->to_collected()->to_string(), "\n";          
+# Output: x / (x - 1)
+
+my $t5 = "sin(x^2+y)*sin(y+x^2)";
+print "Output: ", parse_from_string($t5)->to_collected()->to_string(), "\n";    
+# Output: (sin((x ^ 2) + y)) ^ 2
+
+my $t6 = "x + x^2 + 3*x^3 + 2*x - x^2";
+print "Output: ", parse_from_string($t6)->to_collected()->to_string(), "\n";
+# Output: (3 * x) + (3 * (x ^ 3))
+
+my $t7 = "((1/(3*a))-(1/(3*b)))/((a/b)-(b/a))";
+print "Output: ", parse_from_string($t7)->to_collected()->to_string(), "\n";
+# Output: (b - a) / ((3 * (a ^ 2)) - (3 * (b ^ 2)))
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Symbolic::Custom::Collect
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Symbolic-Custom-Collect
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Math-Symbolic-Custom-Collect
+
+    Search CPAN
+        https://metacpan.org/release/Math-Symbolic-Custom-Collect
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2024 by Matt Johnson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

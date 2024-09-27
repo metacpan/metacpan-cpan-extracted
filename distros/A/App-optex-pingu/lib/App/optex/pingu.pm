@@ -1,6 +1,6 @@
 package App::optex::pingu;
 
-my $VERSION = '0.9901';
+my $VERSION = '1.00';
 
 use v5.24;
 use warnings;
@@ -28,13 +28,13 @@ to the original author.
 
 =begin html
 
-<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/main/images/pingu-black.png">
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-light.png">
 
 =end html
 
 =begin html
 
-<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/main/images/pingu-white.png">
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-dark.png">
 
 =end html
 
@@ -52,19 +52,25 @@ Produce images.  Enabled by default.
 =item B<--image>=I<file>
 
 Set image file.  File is searched at current directory and module
-directory.  Standard B<pingu> image is stored as B<pingu.asc>.  If
+directory.  Standard B<pingu> image is stored as F<pingu.asc2>.  If
 string C<pingu> is specified, module search the file in the following
 order.
 
     ./pingu
+    ./pingu.asc2
     ./pingu.asc
     module-dir/pingu
+    module-dir/pingu.asc2
     module-dir/pingu.asc
+
+=begin comment
 
 =item B<--char>=I<c>
 
 Specify replacement character.  Default is Unicode C<FULL BLOCK>
 (U+2588: █).
+
+=end comment
 
 =item B<--interval>=I<sec>
 
@@ -77,7 +83,7 @@ Default is 0.1 seconds.
 
 =over 4
 
-=item ASCII
+=item ASCII (C<.asc>)
 
 Each [C<RGBCMYWKrgbcmywk>] character is converted to specified letter
 with color which the character itself describe.  Upper-case character
@@ -94,7 +100,7 @@ represent normal ANSI color and lower-case means high-intensity color.
 
 Line start with C<#> is treated as a comment.
 
-Default pingu image:
+C<pingu.asc>:
 
      ...        .     ...   ..    ..     .........           
      ...     ....          ..  ..      ... .....  .. ..      
@@ -116,6 +122,67 @@ Default pingu image:
          kkkkkkkkkkkkkkkywwwwwwwwwwwwwwwwwww  ........       
       .kkkkkkkkkkkkkkkkywwwwwwwwwwwwwwwwwwww    .........    
      .kkkkkkkkkkkkkkkkywwwwwwwwwwwwwwwwwwwwww       .... . . 
+
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu-light.png">
+
+=end html
+
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu-dark.png">
+
+=end html
+
+=item ASCII2 (C<.asc2>)
+
+Each pixel is represented by two blocks, one in the upper half and one
+in the lower half, with each color represented by two lines of data.
+
+C<pingu.asc2>:
+
+     ...        .     ...   ..    ..     .........           
+     ...        .     ...   ..    ..     .........           
+     ...     ....          ..  ..      ... .....  .. ..      
+     ...     ....          ..  ..      ... .....  .. ..      
+     ...    .......      ...         ... . .....  kkkkk      
+     ...    .......      kkkkkkk     ... . ..... kkkkkkk     
+    .....  ........ . kkkkkkkkkkkkk .....  ...  kkkkkkkkk.  .
+    .....  ........ kkkkkkkkkkkkkkkkk....  ... kkkkkkkkkk.  .
+     .... ........ kkkkkkkkkkkkkkkkkkk .  ... kkkkkkkkkkkk   
+     .... ........kkkkkkkkkkkkkkkkkkkkk.  ... kkkkkkkkkkkk   
+          ....... kkkwwkkkkkkkkkkkkkkkkk.... kkkkkkkkkkkkk   
+          .......kkkwwwwkkkkkkkkkkkkkkkk.... kkkkkkkkkkkk    
+    .    .  .... kkwwKKwwkkkkkkkkkkkwwkkk...kkkkkkkkkkkkk    
+    .    .  ....kkkwwKKwwkkkkkkkkkkwwwwkk...kkkkkkkkkkkkk    
+       ..   ....kkkkwwwwkkkkkkkkkkwwKKwwkk. .kkkkkkkkkkkk    
+       ..   ....kkkkkwwkkkkrrrrkkkwwKKwwkk. .kkkkkkkkkkk     
+        .       kkkkkkkkkrrrrrrrrkkwwwwkkk   .kkkkkkkkkk     
+        .        kkkkkkkrrrrrrrrrrkkwwkkkk   . kkkkkkkkk     
+       ....     .kkkkkkkrrrrrrrrrrkkkkkkk.      kkkkkkkk     
+       ....     . kkkkkkkrrrrrrrrkkkkkkkk.      kkkkkkkk     
+      .....      . kkkkkkkkrrrrkkkkkkkkk.        kkkkkkk.    
+      .....      .  kkkkkkkkkkkkkkkkkkkk.        kkkkkkk.    
+    ......     .. .  kkkkkkkkkkkkkkkkkk. .      .kkkkkkk     
+    ......     .. . kkkkkkkkkkkkkkkkk  . .      .kkkkkk      
+    ......        kkkkkkkkkkkkkkkkkkkk  .      .kkkkkkk      
+    ......      kkkkkkkkkkkkkkkkkkkkkkk .      .kkkkkkk      
+    ......   . kkkkkkkkkkkkkkkkkyyykkkkk   ..  kkkkkkk       
+    ......   .kkkkkkkkkkkkkkkkyyyWWWWkkkk  .. kkkkkkkk       
+    ...    . kkkkkkkkkkkkkkkkyyWWWWWWWkkkkk  kkkkkkkk.       
+    ...    .kkkkkkkkkkkkkkkkyyWWWWWWWWWkkkkkkkkkkkkk .       
+           kkkkkkkkkkkkkkkkyyWWWWWWWWWWWkkkkkkkkkk .         
+           kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWkkkkkkkk  .         
+          kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWkkkkk .            
+         kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWkk   .            
+         kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWW   ........       
+        kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWW  ........       
+      .kkkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWWWW    .........    
+      .kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWWWW   .........    
+     .kkkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWWWWWW       .... . . 
+     .kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWWWWW       .... . . 
+
 
 =back
 
@@ -152,7 +219,7 @@ call L<ping(1)> command instead:
 
 =head1 MAKING NEW PING OPTION
 
-You can add, say, B<--with-pingu> option to the original L<ping(1)>
+You can add, say, B<--pingu> option to the original L<ping(1)>
 command.  Make a symbolic link C<< ping->optex >> in F<~/.optex.d/bin>
 directory:
 
@@ -162,7 +229,7 @@ And create an rc file F<~/.optex.d/ping.rc> for B<ping>:
 
     option --pingu -Mpingu
 
-Then pingu will show up when you use B<--with-pingu> option to execute
+Then pingu will show up when you use B<--pingu> option to execute
 L<ping(1)> command:
 
     $ ping --pingu localhost -c15
@@ -182,13 +249,17 @@ L<https://github.com/kaz-utashiro/optex/>
 L<App::optex::pingu>,
 L<https://github.com/kaz-utashiro/optex-pingu/>
 
+=head2 ARTICLES
+
+L<https://qiita.com/kaz-utashiro/items/abb436d7df349fe84e69>
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2022-2024 Kazumasa Utashiro.
+Copyright ©︎ 2022-2024 Kazumasa Utashiro.
 
 You can redistribute it and/or modify it under the same terms
 as Perl itself.
@@ -202,6 +273,8 @@ use Time::HiRes qw(usleep);
 use Scalar::Util;
 use Hash::Util qw(lock_keys);
 *is_number = \&Scalar::Util::looks_like_number;
+
+use App::optex::pingu::Picture;
 
 my $image_dir = $ENV{OPTEX_PINGU_IMAGEDIR} //= dist_dir 'App-optex-pingu';
 
@@ -223,10 +296,6 @@ sub hash_to_spec {
 	else                     { "$a=s" }
     } shift->%*;
 }
-
-my %reader = (
-    asc => \&read_asc,
-    );
 
 use App::optex::util::filter qw(io_filter);
 
@@ -253,24 +322,11 @@ sub get_image {
 	first { -s }
 	map {
 	    my $dir = $_;
-	    map { "${dir}${name}$_" } '', '.asc';
+	    map { "${dir}${name}$_" } '', '.asc2', '.asc';
 	} '', "$image_dir/";
     };
     die "$name: image file not found.\n" unless $file;
-    my $type = ($file =~ /\.(\w+$)/)[0] || 'asc';
-    my $reader = $reader{$type} // $reader{'asc'};
-    $reader->($file);
-}
-
-sub read_asc {
-    my $file = shift;
-    open my $fh, '<', $file or die "$file: $!\n";
-    local $_ = do { local $/; <$fh> };
-    s/^#.*\n//mg;
-    s{ (?<str>(?<col>[RGBCMYWK])\g{col}*) }{
-	colorize($+{col}, $opt{char} x length($+{str}))
-    }xgie;
-    /.+/g;
+    App::optex::pingu::Picture::load($file);
 }
 
 sub pingu {

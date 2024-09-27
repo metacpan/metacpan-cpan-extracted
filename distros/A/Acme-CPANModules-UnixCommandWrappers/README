@@ -3,9 +3,9 @@ NAME
     existing Unix commands
 
 VERSION
-    This document describes version 0.009 of
+    This document describes version 0.010 of
     Acme::CPANModules::UnixCommandWrappers (from Perl distribution
-    Acme-CPANModules-UnixCommandWrappers), released on 2024-08-13.
+    Acme-CPANModules-UnixCommandWrappers), released on 2024-09-19.
 
 DESCRIPTION
     These CLI's usually are meant to be called as the Unix commands they
@@ -59,6 +59,11 @@ ACME::CPANMODULES ENTRIES
         command and diff output).
 
         Scripts: sdif, cdif, watchdiff
+
+    App::findsort
+        Wraps find to add sorting.
+
+        Script: findsort
 
     App::gitwrap
         Wraps git to do additional stuff, e.g. set user+email automatically.
@@ -137,7 +142,9 @@ SOURCE
     .
 
 SEE ALSO
-    Other variants for "grep": Acme::CPANModules::GrepVariants
+    Acme::CPANModules::UnixCommandVariants
+
+    Acme::CPANModules::UnixCommandImplementations
 
     Acme::CPANModules - about the Acme::CPANModules namespace
 

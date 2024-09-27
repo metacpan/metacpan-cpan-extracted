@@ -1,9 +1,9 @@
 This archive contains the distribution Debian-DEP12,
-version 0.1.0:
+version 0.2.0:
 
   interface to Debian DEP 12 format
 
-This software is Copyright (c) 2021 by Andrius Merkys.
+This software is Copyright (c) 2021-2024 by Andrius Merkys.
 
 This is free software, licensed under:
 

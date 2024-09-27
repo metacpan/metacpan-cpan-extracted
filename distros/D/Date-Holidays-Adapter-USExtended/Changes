@@ -1,5 +1,8 @@
 Revision history for Date-Holidays-Adapter-USA
 
+0.0201 2024-09-26 09:25:23
+    - Fix incorrect dependency in dist.ini.
+
 0.0200 2024-09-23 15:21:56
     - Rename this module to Date-Holidays-Adapter-USExtended.
 

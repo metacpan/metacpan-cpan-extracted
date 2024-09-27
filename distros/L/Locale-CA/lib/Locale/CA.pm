@@ -11,11 +11,11 @@ Locale::CA - two letter codes for province identification in Canada and vice ver
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -25,11 +25,11 @@ our $VERSION = '0.05';
 
     # Returns the French names of the provinces if $LANG starts with 'fr' or
     #	the lang parameter is set to 'fr'
-    my $province = $u->{code2province}{$code};
-    my $code  = $u->{province2code}{$province};
+    print $u->{code2province}{'ON'}, "\n";	# prints ONTARIO
+    print $u->{province2code}{'ONTARIO'}, "\n";	# prints ON
 
-    my @province = $u->all_province_names;
-    my @code  = $u->all_province_codes;
+    my @province = $u->all_province_names();
+    my @code = $u->all_province_codes();
 
 =head1 SUBROUTINES/METHODS
 
@@ -72,10 +72,9 @@ sub new {
 		$data = Data::Section::Simple::get_data_section('provinces_en');
 	}
 
-	my @lines = split /\n/, $data;
 
 	my $self = {};
-	for (@lines) {
+	for(split /\n/, $data) {
 		my($code, $province) = split /:/;
 		$self->{code2province}{$code} = $province;
 		$self->{province2code}{$province} = $code;
@@ -176,10 +175,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Locale-CA>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Locale-CA>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Locale-CA/>
@@ -192,7 +187,7 @@ Based on L<Locale::US> - Copyright (c) 2002 - C<< $present >> Terrence Brannon.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2023 Nigel Horne.
+Copyright 2012-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
@@ -202,6 +197,7 @@ This program is released under the following licence: GPL2
 __DATA__
 @@ provinces_en
 AB:ALBERTA
+AB:ALBT.
 BC:BRITISH COLUMBIA
 MB:MANITOBA
 NB:NEW BRUNSWICK
@@ -215,6 +211,8 @@ SK:SASKATCHEWAN
 YT:YUKON
 @@ provinces_fr
 AB:ALBERTA
+AB:ALBT.
+AB:ALTA.
 BC:COLOMBIE-BRITANNIQUE
 MB:MANITOBA
 NB:NOUVEAU-BRUNSWICK

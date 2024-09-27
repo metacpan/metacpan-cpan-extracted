@@ -3,9 +3,9 @@ package Acme::CPANModules::UnixCommandWrappers;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-08-13'; # DATE
+our $DATE = '2024-09-19'; # DATE
 our $DIST = 'Acme-CPANModules-UnixCommandWrappers'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our $LIST = {
     summary => "List of various CLIs that wrap existing Unix commands",
@@ -69,6 +69,14 @@ MARKDOWN
             module => 'App::sdif',
             script => ['sdif', 'cdif', 'watchdiff'],
             'x.command' => ['diff', 'watch'],
+        },
+
+        # find
+        {
+            summary => 'Wraps find to add sorting',
+            module => 'App::findsort',
+            script => 'findsort',
+            'x.command' => 'find',
         },
 
         # git
@@ -135,7 +143,7 @@ Acme::CPANModules::UnixCommandWrappers - List of various CLIs that wrap existing
 
 =head1 VERSION
 
-This document describes version 0.009 of Acme::CPANModules::UnixCommandWrappers (from Perl distribution Acme-CPANModules-UnixCommandWrappers), released on 2024-08-13.
+This document describes version 0.010 of Acme::CPANModules::UnixCommandWrappers (from Perl distribution Acme-CPANModules-UnixCommandWrappers), released on 2024-09-19.
 
 =head1 DESCRIPTION
 
@@ -194,6 +202,12 @@ Script: L<diff-xls-text>
 Provides sdif (diff side-by-side with nice color theme), cdif (highlight words with nice color scheme), and watchdiff (watch command and diff output).
 
 Scripts: L<sdif>, L<cdif>, L<watchdiff>
+
+=item L<App::findsort>
+
+Wraps find to add sorting.
+
+Script: L<findsort>
 
 =item L<App::gitwrap>
 
@@ -278,7 +292,9 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Uni
 
 =head1 SEE ALSO
 
-Other variants for C<grep>: L<Acme::CPANModules::GrepVariants>
+L<Acme::CPANModules::UnixCommandVariants>
+
+L<Acme::CPANModules::UnixCommandImplementations>
 
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 

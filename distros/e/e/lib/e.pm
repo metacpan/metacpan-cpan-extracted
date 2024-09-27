@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.29
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.30
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,7 @@ Benchmark two snippets of code:
 
     $ perl -Me -e 'n { slow => sub{ ... }, fast => sub{ ... }}, 10000'
 
-Launch the Runtime::Debugger:
+Create a breakpoint in code:
 
     $ perl -Me -e 'repl'
 
@@ -129,6 +129,8 @@ Encode/decode UTF-8:
     $ perl -Me -e 'utf8; say dec "\xD7\x90"'
     א
 
+And much, much more ...
+
 =cut
 
 =head1 DESCRIPTION
@@ -140,6 +142,18 @@ It has been optimized for performance to not
 import all features right away:
 thereby making its startup cost quite low.
 
+=head2 How to Import
+
+This module will overwrite existing methods
+of the same name (which triggers a warning)!
+
+Should this happen and it is not desired,
+simply import this module first.
+
+Should you prefer the methods in this module,
+import this module last (if needed, at the end
+of the file).
+
 =cut
 
 =head1 SUBROUTINES
@@ -150,15 +164,26 @@ thereby making its startup cost quite low.
 
 =head3 repl
 
-Add a breakpoint to code.
+Add a breakpoint using L<Runtime::Debugger>.
 
 Basically inserts a Read Evaluate Print Loop.
+
+Version 0 was basically:
+
+    while ( 1 ) {
+        my $input = <STDIN>;
+        last if $input eq 'q';
+        eval "$input";
+    }
+
+(Much more powerful since then).
 
 Enable to analyze code in the process.
 
     CODE ...
 
     # Breakpoint
+    use e;
     repl
 
     CODE ...
@@ -703,44 +728,10 @@ Insert subroutines into the symbol table.
 
 Extracted from Mojo::Util for performance.
 
-Import methods into another package
+Imports method(s) into another package
 (as done in this module):
 
-    $ perl -e '
-        package A;
-        use e;
-        sub import {
-            my $c = caller();
-            monkey_patch
-                $c,
-                new => sub { say "Im new" };
-        }
-        package main;
-        A->import;
-        new();
-    '
-    Im new
-
-Import methods into the same package
-(probably not so useful):
-
-    $ perl -e '
-        package A;
-        use e;
-        sub import {
-            my $c = caller();
-            monkey_patch
-                $c,
-                new => sub { say "Im new" };
-        }
-        A->import;
-        A->new();
-    '
-    Im new
-
-Perhaps can be updated based on the outcome
-of this issue:
-L<https://github.com/mojolicious/mojo/pull/2173>
+Take a look at the import method for an example.
 
 =head3 pod
 
@@ -748,7 +739,7 @@ Work with perl pod.
 
 =head3 import
 
-[Internal] Imports the DSL into another package.
+Imports a DSL into another package.
 
 Can be used in a sub class to import this class
 plus its own commands like this:
@@ -757,11 +748,8 @@ plus its own commands like this:
     use parent qw( e );
 
     sub import {
-        my ( $class ) = @_;
-        my $class = caller;
-        $class->SUPER::import( $caller );
-        $class->can("monkey_patch")->(
-            $caller,
+        shift->SUPER::import(
+            scalar caller,
             my_command_1 => sub {},
             my_command_2 => sub {},
             my_command_3 => sub {},
@@ -786,7 +774,7 @@ sub monkey_patch {
 }
 
 sub import {
-    my ( $class, $caller ) = @_;
+    my ( $class, $caller, %extra ) = @_;
     my %imported;    # Require only once a package.
     $caller //= caller;
 
@@ -1185,6 +1173,13 @@ sub import {
             local @ARGV = @_;
             App::Pod->run;
         },
+
+        ######################################
+        #           Extra Methods
+        ######################################
+
+        # Make it easier to subclass.
+        %extra,
 
     );
 }

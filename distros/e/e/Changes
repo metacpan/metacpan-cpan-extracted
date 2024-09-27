@@ -1,6 +1,15 @@
 Revision history for e
 
 =================
+1.30 - 2024-09-27
+=================
+
+Made easier to subclass e.
+Cleaned up pod a bit.
+repl: Removed debug code on loading.
+pod: improved tab completion.
+
+=================
 1.29 - 2024-09-20
 =================
 

@@ -15,11 +15,11 @@ command, see ["SEE ALSO"](#see-also) section.  All honor for this idea should go
 to the original author.
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/main/images/pingu-black.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-light.png">
 </div>
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/main/images/pingu-white.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-dark.png">
 </div>
 
 This module is a quite good example to demonstrate [optex(1)](http://man.he.net/man1/optex) command
@@ -34,19 +34,16 @@ features.
 - **--image**=_file_
 
     Set image file.  File is searched at current directory and module
-    directory.  Standard **pingu** image is stored as **pingu.asc**.  If
+    directory.  Standard **pingu** image is stored as `pingu.asc2`.  If
     string `pingu` is specified, module search the file in the following
     order.
 
         ./pingu
+        ./pingu.asc2
         ./pingu.asc
         module-dir/pingu
+        module-dir/pingu.asc2
         module-dir/pingu.asc
-
-- **--char**=_c_
-
-    Specify replacement character.  Default is Unicode `FULL BLOCK`
-    (U+2588: █).
 
 - **--interval**=_sec_
 
@@ -55,7 +52,7 @@ features.
 
 # IMAGE FILE FORMAT
 
-- ASCII
+- ASCII (`.asc`)
 
     Each \[`RGBCMYWKrgbcmywk`\] character is converted to specified letter
     with color which the character itself describe.  Upper-case character
@@ -72,7 +69,7 @@ features.
 
     Line start with `#` is treated as a comment.
 
-    Default pingu image:
+    `pingu.asc`:
 
          ...        .     ...   ..    ..     .........           
          ...     ....          ..  ..      ... .....  .. ..      
@@ -94,6 +91,62 @@ features.
              kkkkkkkkkkkkkkkywwwwwwwwwwwwwwwwwww  ........       
           .kkkkkkkkkkkkkkkkywwwwwwwwwwwwwwwwwwww    .........    
          .kkkkkkkkkkkkkkkkywwwwwwwwwwwwwwwwwwwwww       .... . . 
+
+    <div>
+            <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu-light.png">
+    </div>
+
+    <div>
+            <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu-dark.png">
+    </div>
+
+- ASCII2 (`.asc2`)
+
+    Each pixel is represented by two blocks, one in the upper half and one
+    in the lower half, with each color represented by two lines of data.
+
+    `pingu.asc2`:
+
+         ...        .     ...   ..    ..     .........           
+         ...        .     ...   ..    ..     .........           
+         ...     ....          ..  ..      ... .....  .. ..      
+         ...     ....          ..  ..      ... .....  .. ..      
+         ...    .......      ...         ... . .....  kkkkk      
+         ...    .......      kkkkkkk     ... . ..... kkkkkkk     
+        .....  ........ . kkkkkkkkkkkkk .....  ...  kkkkkkkkk.  .
+        .....  ........ kkkkkkkkkkkkkkkkk....  ... kkkkkkkkkk.  .
+         .... ........ kkkkkkkkkkkkkkkkkkk .  ... kkkkkkkkkkkk   
+         .... ........kkkkkkkkkkkkkkkkkkkkk.  ... kkkkkkkkkkkk   
+              ....... kkkwwkkkkkkkkkkkkkkkkk.... kkkkkkkkkkkkk   
+              .......kkkwwwwkkkkkkkkkkkkkkkk.... kkkkkkkkkkkk    
+        .    .  .... kkwwKKwwkkkkkkkkkkkwwkkk...kkkkkkkkkkkkk    
+        .    .  ....kkkwwKKwwkkkkkkkkkkwwwwkk...kkkkkkkkkkkkk    
+           ..   ....kkkkwwwwkkkkkkkkkkwwKKwwkk. .kkkkkkkkkkkk    
+           ..   ....kkkkkwwkkkkrrrrkkkwwKKwwkk. .kkkkkkkkkkk     
+            .       kkkkkkkkkrrrrrrrrkkwwwwkkk   .kkkkkkkkkk     
+            .        kkkkkkkrrrrrrrrrrkkwwkkkk   . kkkkkkkkk     
+           ....     .kkkkkkkrrrrrrrrrrkkkkkkk.      kkkkkkkk     
+           ....     . kkkkkkkrrrrrrrrkkkkkkkk.      kkkkkkkk     
+          .....      . kkkkkkkkrrrrkkkkkkkkk.        kkkkkkk.    
+          .....      .  kkkkkkkkkkkkkkkkkkkk.        kkkkkkk.    
+        ......     .. .  kkkkkkkkkkkkkkkkkk. .      .kkkkkkk     
+        ......     .. . kkkkkkkkkkkkkkkkk  . .      .kkkkkk      
+        ......        kkkkkkkkkkkkkkkkkkkk  .      .kkkkkkk      
+        ......      kkkkkkkkkkkkkkkkkkkkkkk .      .kkkkkkk      
+        ......   . kkkkkkkkkkkkkkkkkyyykkkkk   ..  kkkkkkk       
+        ......   .kkkkkkkkkkkkkkkkyyyWWWWkkkk  .. kkkkkkkk       
+        ...    . kkkkkkkkkkkkkkkkyyWWWWWWWkkkkk  kkkkkkkk.       
+        ...    .kkkkkkkkkkkkkkkkyyWWWWWWWWWkkkkkkkkkkkkk .       
+               kkkkkkkkkkkkkkkkyyWWWWWWWWWWWkkkkkkkkkk .         
+               kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWkkkkkkkk  .         
+              kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWkkkkk .            
+             kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWkk   .            
+             kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWW   ........       
+            kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWW  ........       
+          .kkkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWWWW    .........    
+          .kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWWWW   .........    
+         .kkkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWWWWWW       .... . . 
+         .kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWWWWW       .... . . 
 
 Other file format is not supported yet.
 
@@ -128,7 +181,7 @@ call [ping(1)](http://man.he.net/man1/ping) command instead:
 
 # MAKING NEW PING OPTION
 
-You can add, say, **--with-pingu** option to the original [ping(1)](http://man.he.net/man1/ping)
+You can add, say, **--pingu** option to the original [ping(1)](http://man.he.net/man1/ping)
 command.  Make a symbolic link `ping->optex` in `~/.optex.d/bin`
 directory:
 
@@ -138,7 +191,7 @@ And create an rc file `~/.optex.d/ping.rc` for **ping**:
 
     option --pingu -Mpingu
 
-Then pingu will show up when you use **--with-pingu** option to execute
+Then pingu will show up when you use **--pingu** option to execute
 [ping(1)](http://man.he.net/man1/ping) command:
 
     $ ping --pingu localhost -c15
@@ -158,13 +211,17 @@ your `~/.optex.d/ping.rc`:
 [App::optex::pingu](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Apingu),
 [https://github.com/kaz-utashiro/optex-pingu/](https://github.com/kaz-utashiro/optex-pingu/)
 
+## ARTICLES
+
+[https://qiita.com/kaz-utashiro/items/abb436d7df349fe84e69](https://qiita.com/kaz-utashiro/items/abb436d7df349fe84e69)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2022-2024 Kazumasa Utashiro.
+Copyright ©︎ 2022-2024 Kazumasa Utashiro.
 
 You can redistribute it and/or modify it under the same terms
 as Perl itself.

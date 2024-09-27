@@ -1,0 +1,131 @@
+#!/usr/bin/env perl
+use v5.24;
+use warnings;
+use utf8;
+
+use Data::Dumper;
+use List::Util qw(pairs zip reduce);
+use Term::ANSIColor::Concise qw(ansi_color);
+$Term::ANSIColor::Concise::NO_RESET_EL = 1;
+
+use constant {
+    UHB => "\N{UPPER HALF BLOCK}",
+    LHB => "\N{LOWER HALF BLOCK}",
+};
+my $color_re = qr/[rgbcmykw]/i;
+
+sub squeeze {
+    map @$_, reduce {
+	my $x = $a->[-1];
+	if ($x && $x->[0] eq $b->[0] && $x->[1] eq $b->[1]) {
+	    $x->[2]++;
+	} else {
+	    $b->[2] = 1;
+	    push @$a, $b;
+	}
+	$a;
+    } [], @_;
+}
+
+sub stringify {
+    my($hi, $lo, $c) = @{+shift};
+    $c //= 1;
+    if ($hi =~ $color_re) {
+	my $color = $hi;
+	$color .= "/$lo" if $lo =~ $color_re;
+	ansi_color($color, UHB x $c);
+    }
+    elsif ($lo =~ $color_re) {
+	ansi_color("S$lo", UHB x $c);
+    }
+    else {
+	$hi x $c;
+    }
+}
+
+sub image {
+    my $data = shift;
+    my @data = grep !/^\s*#/, $data =~ /.+/g;
+    @data % 2 and die;
+    my @image;
+    for (pairs @data) {
+	my($hi, $lo) = @$_;
+	my @data = squeeze zip [ $hi =~ /\X/g ], [ $lo =~ /\X/g ];
+	my $line = join '', map stringify($_), @data;
+	push @image, "$line\n";
+    }
+    wantarray ? @image : join '', @image;
+}
+
+our $data = do { local $/; <DATA> };
+
+our $image = image($data);
+
+if (__PACKAGE__ eq 'main') {
+    use open IO => ':utf8', ':std';
+    print $image;
+}
+
+__DATA__
+# MIT License
+# 
+# Copyright (c) 2022 sheepla
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+ ...        .     ...   ..    ..     .........           
+ ...        .     ...   ..    ..     .........           
+ ...     ....          ..  ..      ... .....  .. ..      
+ ...     ....          ..  ..      ... .....  .. ..      
+ ...    .......      ...         ... . .....   kkkk      
+ ...    .......      kkkkkkk     ... . ..... kkkkkkk     
+.....  ........ . kkkkkkkkkkkkk .....  ...  kkkkkkkkk.  .
+.....  ........ kkkkkkkkkkkkkkkkk....  ... kkkkkkkkkk.  .
+ .... ........ kkkkkkkkkkkkkkkkkkk .  ... kkkkkkkkkkkk   
+ .... ........kkkkkkkkkkkkkkkkkkkkk.  ... kkkkkkkkkkkk   
+      ....... kkkwwkkkkkkkkkkkkkkkkk.... kkkkkkkkkkkkk   
+      .......kkkwwwwkkkkkkkkkkkkkkkk.... kkkkkkkkkkkk    
+.    .  .... kkwwKKwwkkkkkkkkkkkwwkkk...kkkkkkkkkkkkk    
+.    .  ....kkkwwKKwwkkkkkkkkkkwwwwkk...kkkkkkkkkkkkk    
+   ..   ....kkkkwwwwkkkkkkkkkkwwKKwwkk. .kkkkkkkkkkkk    
+   ..   ....kkkkkwwkkkkrrrrkkkwwKKwwkk. .kkkkkkkkkkk     
+    .       kkkkkkkkkrrrrrrrrkkwwwwkkk   .kkkkkkkkkk     
+    .        kkkkkkkrrrrrrrrrrkkwwkkkk   . kkkkkkkkk     
+   ....     .kkkkkkkrrrrrrrrrrkkkkkkk.      kkkkkkkk     
+   ....     . kkkkkkkrrrrrrrrkkkkkkkk.      kkkkkkkk     
+  .....      . kkkkkkkkrrrrkkkkkkkkk.        kkkkkkk.    
+  .....      .  kkkkkkkkkkkkkkkkkkkk.        kkkkkkk.    
+......     .. .  kkkkkkkkkkkkkkkkkk. .      .kkkkkkk     
+......     .. . kkkkkkkkkkkkkkkkk  . .      .kkkkkk      
+......        kkkkkkkkkkkkkkkkkkkk  .      .kkkkkkk      
+......      kkkkkkkkkkkkkkkkkkkkkkk .      .kkkkkkk      
+......   . kkkkkkkkkkkkkkkkkyyykkkkk   ..  kkkkkkk       
+......   .kkkkkkkkkkkkkkkkyyyWWWWkkkk  .. kkkkkkkk       
+...    . kkkkkkkkkkkkkkkkyyWWWWWWWkkkkk  kkkkkkkk.       
+...    .kkkkkkkkkkkkkkkkyyWWWWWWWWWkkkkkkkkkkkkk .       
+       kkkkkkkkkkkkkkkkyyWWWWWWWWWWWkkkkkkkkkk .         
+       kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWkkkkkkkk  .         
+      kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWkkkkk .            
+     kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWkk   .            
+     kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWW   ........       
+    kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWW  ........       
+  .kkkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWWWW    .........    
+  .kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWWWW   .........    
+ .kkkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWWWWWW       .... . . 
+ .kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWWWWW       .... . . 

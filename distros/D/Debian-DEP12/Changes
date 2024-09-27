@@ -1,3 +1,10 @@
+0.2.0 2024-09-26
+
+    - Warn about reserved keys.
+    - Validate Registry field.
+    - Suggest 'mailto:' prefix for email addresses.
+    - Adjust version comparison to newer YAML::XS. Thanks gregor herrmann.
+
 0.1.0 2021-02-18
 
     - Initial release.

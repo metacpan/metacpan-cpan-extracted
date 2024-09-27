@@ -52,6 +52,7 @@
             "App::GrepUtils" : "0",
             "App::ImageMagickUtils" : "0",
             "App::diffwc" : "0",
+            "App::findsort" : "0",
             "App::gitwrap" : "0",
             "App::manwrap::pm" : "0",
             "App::rsync::new2old" : "0",
@@ -69,6 +70,7 @@
             "App::GrepUtils" : "0",
             "App::ImageMagickUtils" : "0",
             "App::diffwc" : "0",
+            "App::findsort" : "0",
             "App::gitwrap" : "0",
             "App::manwrap::pm" : "0",
             "App::rsync::new2old" : "0",
@@ -81,7 +83,7 @@
    "provides" : {
       "Acme::CPANModules::UnixCommandWrappers" : {
          "file" : "lib/Acme/CPANModules/UnixCommandWrappers.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -96,7 +98,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-UnixCommandWrappers"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

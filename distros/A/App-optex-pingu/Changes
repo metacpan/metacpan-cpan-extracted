@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-pingu
 
+1.00 2024-09-27T09:26:20Z
+
+    - support high-resolution pingu image
+
 0.9901 2024-09-24T16:41:21Z
 
     - eliminate --pingu option

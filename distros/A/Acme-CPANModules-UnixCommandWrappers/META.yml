@@ -19,14 +19,14 @@ name: Acme-CPANModules-UnixCommandWrappers
 provides:
   Acme::CPANModules::UnixCommandWrappers:
     file: lib/Acme/CPANModules/UnixCommandWrappers.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-UnixCommandWrappers
   homepage: https://metacpan.org/release/Acme-CPANModules-UnixCommandWrappers
   repository: git://github.com/perlancar/perl-Acme-CPANModules-UnixCommandWrappers.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

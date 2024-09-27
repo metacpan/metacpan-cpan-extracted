@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Date::Holidays::Adapter" : "0",
-            "Date::Holidays::USA" : "0.0207",
+            "Date::Holidays::USExtended" : "0.0300",
             "base" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -60,7 +60,7 @@
          "web" : "https://github.com/ology/Date-Holidays-Adapter-USA"
       }
    },
-   "version" : "0.0200",
+   "version" : "0.0201",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

@@ -45,7 +45,7 @@
             "App::optex" : "v0.5.3",
             "File::Share" : "0.27",
             "Hash::Util" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.56",
             "Time::HiRes" : "0",
             "perl" : "v5.24.0"
          }
@@ -59,7 +59,10 @@
    "provides" : {
       "App::optex::pingu" : {
          "file" : "lib/App/optex/pingu.pm",
-         "version" : "0.9901"
+         "version" : "1.00"
+      },
+      "App::optex::pingu::Picture" : {
+         "file" : "lib/App/optex/pingu/Picture.pm"
       }
    },
    "release_status" : "stable",
@@ -74,7 +77,7 @@
          "web" : "https://github.com/kaz-utashiro/optex-pingu"
       }
    },
-   "version" : "0.9901",
+   "version" : "1.00",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

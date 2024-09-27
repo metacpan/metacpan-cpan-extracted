@@ -94297,3 +94297,13 @@ K/KI/KIMOTO/SPVM-0.990012.tar.gz
 G/GS/GSB/Starlink-AST-3.04.tar.gz
 G/GS/GSB/Starlink-ATL-0.06.tar.gz
 W/WA/WATERKIP/WebService-Xential-0.004.tar.gz
+P/PE/PERLANCAR/Acme-CPANModules-UnixCommandWrappers-0.010.tar.gz
+U/UT/UTASHIRO/App-Greple-xlate-0.35.tar.gz
+U/UT/UTASHIRO/App-optex-pingu-1.00.tar.gz
+T/TI/TIMKA/App-Pod-0.39.tar.gz
+P/PE/PERLANCAR/CLI-Meta-less-0.002.tar.gz
+G/GE/GENE/Date-Holidays-Adapter-USExtended-0.0201.tar.gz
+M/ME/MERKYS/Debian-DEP12-0.2.0.tar.gz
+T/TI/TIMKA/e-1.30.tar.gz
+N/NH/NHORNE/Locale-CA-0.06.tar.gz
+M/MJ/MJOHNSON/Math-Symbolic-Custom-Collect-0.01.tar.gz

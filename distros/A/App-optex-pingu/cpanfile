@@ -1,5 +1,5 @@
 requires 'perl', '5.024';
-requires 'List::Util';
+requires 'List::Util', '1.56';
 requires 'Hash::Util';
 requires 'File::Share', '0.27';
 requires 'Time::HiRes';

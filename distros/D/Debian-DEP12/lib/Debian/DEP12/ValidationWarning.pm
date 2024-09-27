@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: validaton warning class
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
 
 use parent 'Text::BibTeX::Validate::Warning';
 

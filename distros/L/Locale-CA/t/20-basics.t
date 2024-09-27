@@ -16,6 +16,7 @@ BASICS: {
 
 	delete $ENV{'LC_ALL'};
 	delete $ENV{'LANGUAGE'};
+	delete $ENV{'LC_MESSAGES'};	# http://www.cpantesters.org/cpan/report/147792c2-7b94-11ef-9c4f-aa1bc4b6c371
 	$ENV{'LANG'} = 'fr_FR';
 	my $u = new_ok('Locale::CA');
 

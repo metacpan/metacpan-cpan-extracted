@@ -20,10 +20,14 @@ is( scalar @warnings, 0 );
 
 $entry = Debian::DEP12->new( <<END );
 Bug-Database: github.com/merkys/Debian-DEP12/issues
+Bug-Submit:
 END
 
 @warnings = $entry->validate;
-is( "@warnings", 'Bug-Database: value \'github.com/merkys/Debian-DEP12/issues\' does not look like valid URL' );
+is( join( "\n", @warnings ) . "\n", <<'END' );
+Bug-Database: value 'github.com/merkys/Debian-DEP12/issues' does not look like valid URL
+Bug-Submit: undefined value
+END
 
 $entry = Debian::DEP12->new;
 $entry->set( 'Bug-Database', 'github.com/merkys/Debian-DEP12/issues' );

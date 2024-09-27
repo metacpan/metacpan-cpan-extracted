@@ -19,13 +19,14 @@ my %WriteMakefileArgs = (
     "Data::Validate::Email" => 0,
     "Data::Validate::URI" => 0,
     "Text::BibTeX::Validate" => "0.3.0",
-    "YAML::XS" => "0.69"
+    "YAML::XS" => "0.69",
+    "version" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0,
     "Text::BibTeX" => 0
   },
-  "VERSION" => "0.1.0",
+  "VERSION" => "0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +39,8 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Text::BibTeX" => 0,
   "Text::BibTeX::Validate" => "0.3.0",
-  "YAML::XS" => "0.69"
+  "YAML::XS" => "0.69",
+  "version" => 0
 );
 
 
