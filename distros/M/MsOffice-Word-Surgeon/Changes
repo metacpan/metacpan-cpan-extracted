@@ -1,5 +1,8 @@
 Revision history for MsOffice-Word-Surgeon
 
+2.08    28.098.2024
+  - unification of licensing terms
+
 2.07    28.06.2024
   - additional test for replace() with xml_before
   - unlink_fields : better algorithm for ASK fields

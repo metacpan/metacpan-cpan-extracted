@@ -1,5 +1,5 @@
 package Bio::DB::SeqFeature::Store::GFF2Loader;
-$Bio::DB::SeqFeature::Store::GFF2Loader::VERSION = '1.7.4';
+$Bio::DB::SeqFeature::Store::GFF2Loader::VERSION = '1.7.5';
 # $Id: GFF2Loader.pm 11755 2007-11-08 02:19:29Z cjfields $
 
 =head1 NAME

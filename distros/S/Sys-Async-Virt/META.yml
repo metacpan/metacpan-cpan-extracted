@@ -25,8 +25,9 @@ requires:
   IO::Async::Notifier: '0'
   Log::Any: '0'
   Protocol::Sys::Virt: v10.3.8
+  Sublike::Extended: '0'
   perl: v5.20.0
 resources:
   repository: git://github.com/ehuelsmann/perl-sys-async-virt.git
-version: v0.0.5
+version: v0.0.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

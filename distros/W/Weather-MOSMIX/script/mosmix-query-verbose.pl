@@ -8,7 +8,7 @@ use Weather::MOSMIX;
 use Time::Piece;
 use Getopt::Long;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 GetOptions(
     'latitude=s'  => \my $latitude,

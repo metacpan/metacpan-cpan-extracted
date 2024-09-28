@@ -1136,7 +1136,7 @@ Ascii::Text::Font::Block - Block font
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 

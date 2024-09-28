@@ -95,12 +95,28 @@ test 'tablesample method' => sub {
 
     my $frac = delete $opts->{fraction};
 
-    my $rs = $self->schema->resultset( $self->table_class )->search_rs( $self->where, \%attr )->tablesample( $frac, $opts );
+    {
+        my $rs = $self->schema->resultset( $self->table_class )->search_rs( $self->where, \%attr )->tablesample( $frac, $opts );
 
-    my $alias = $self->current_source_alias;
-    my $sql   = $self->sql =~ s/\bme\b/$alias/gr;
+        my $alias = $self->current_source_alias;
+        my $sql   = $self->sql =~ s/\bme\b/$alias/gr;
 
-    is_same_sql_bind( $rs->as_query, "(${sql})", $self->bind, 'expected sql and bind' );
+        is_same_sql_bind( $rs->as_query, "(${sql})", $self->bind, 'expected sql and bind' );
+    }
+
+  SKIP: {
+        my $method = delete $opts->{method};
+        skip "no method" unless $method;
+        skip "other options" if scalar( keys %$opts );
+
+        my $rs = $self->schema->resultset( $self->table_class )->search_rs( $self->where, \%attr )->tablesample( $frac, $method );
+
+        my $alias = $self->current_source_alias;
+        my $sql   = $self->sql =~ s/\bme\b/$alias/gr;
+
+        is_same_sql_bind( $rs->as_query, "(${sql})", $self->bind, 'expected sql and bind (method name instead of hashref)' );
+
+    }
 
 };
 

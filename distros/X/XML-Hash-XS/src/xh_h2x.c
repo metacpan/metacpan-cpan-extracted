@@ -19,7 +19,13 @@ xh_h2x(xh_h2x_ctx_t *ctx)
 
         switch (ctx->opts.method) {
             case XH_METHOD_NATIVE:
-                xh_h2x_native(ctx, ctx->opts.root, xh_strlen(ctx->opts.root), SvRV(ctx->hash));
+                if (ctx->opts.keep_root) {
+                    xh_h2x_native(ctx, ctx->opts.root, xh_strlen(ctx->opts.root), SvRV(ctx->hash));
+                }
+                else
+                {
+                    xh_h2x_native(ctx, NULL, 0, SvRV(ctx->hash));
+                }
                 break;
             case XH_METHOD_NATIVE_ATTR_MODE:
                 (void) xh_h2x_native_attr(ctx, ctx->opts.root, xh_strlen(ctx->opts.root), SvRV(ctx->hash), XH_H2X_F_COMPLEX);

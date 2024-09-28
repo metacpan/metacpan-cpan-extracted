@@ -1,7 +1,7 @@
 package Catalyst::Plugin::Session::Store::Redis;
 
 # ABSTRACT: Redis Session store for Catalyst
-our $VERSION = '0.900'; # VERSION
+our $VERSION = '0.901'; # VERSION
 
 use warnings;
 use strict;
@@ -93,9 +93,15 @@ sub _verify_redis_connection {
     } catch {
         $c->_session_redis_storage(
             Redis->new(
-                server    => $cfg->{redis_server}    || '127.0.0.1:6379',
-                debug     => $cfg->{redis_debug}     || 0,
-                reconnect => $cfg->{redis_reconnect} || 0
+                server                 => $cfg->{redis_server}                 || '127.0.0.1:6379',
+                debug                  => $cfg->{redis_debug}                  || 0,
+                reconnect              => $cfg->{redis_reconnect}              || 0,
+                conservative_reconnect => $cfg->{redis_conservative_reconnect} || 0,
+                ssl                    => $cfg->{redis_ssl}                    || 0,
+                ( ( $cfg->{redis_ssl_verify_mode} and $cfg->{redis_ssl} ) ? ( SSL_verify_mode => $cfg->{redis_ssl_verify_mode} ) : () ),
+                ( $cfg->{redis_name} ? ( name => $cfg->{redis_name} ) : () ),
+                ( $cfg->{redis_username} ? ( username => $cfg->{redis_username} ) : () ),
+                ( $cfg->{redis_password} ? ( password => $cfg->{redis_password} ) : () ),
             )
         );
         if ($c->_session_redis_storage && $cfg->{redis_db}) {
@@ -118,7 +124,7 @@ Catalyst::Plugin::Session::Store::Redis - Redis Session store for Catalyst
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 SYNOPSIS
 
@@ -134,6 +140,11 @@ version 0.900
         redis_debug => 0, # or 1!
         redis_reconnect => 0, # or 1
         redis_db => 5, # or 0 by default
+        redis_ssl => 1, # or 0
+        redis_name => 'name',
+        redis_username => 'username', # or default user
+        redis_password => 'password',
+        redis_ssl_verify_mode => SSL_VERIFY_PEER, # IO::Socket::SSL
     };
 
     # ... in an action:
@@ -170,6 +181,40 @@ server was restarted.
 I leave the default of setting at C<0> for now because changing it
 might break existing apps.
 
+Do not use this setting with authentication.
+
+=head3 redis_conservative_reconnect
+
+Boolean flag. Default: 0, i.e. off.
+
+Use this setting for reconnect with authentication.
+
+=head3 redis_ssl
+
+Boolean flag. Default: 0, i.e. off.
+
+You can connect to Redis over SSL/TLS by setting this flag if the
+target Redis server or cluster has been setup to support SSL/TLS.
+This requires L<IO::Socket::SSL> to be installed on the client. It's off by default.
+
+=head3 redis_ssl_verify_mode
+
+This parameter will be applied when C<redis_ssl> flag is set. It sets
+the verification mode for the peer certificate. It's compatible with
+the parameter with the same name in L<IO::Socket::SSL>.
+
+=head3 redis_name
+
+Setting a different name for the connection.
+
+=head3 redis_username
+
+The username for the authentication
+
+=head3 redis_password
+
+The password, if your Redis server requires authentication.
+
 =head1 NOTES
 
 =over 4
@@ -203,6 +248,8 @@ Thomas Klausner C<< domm@cpan.org >>
 =item * Andreas Granig L<https://github.com/agranig>
 
 =item * Mohammad S Anwar L<https://github.com/manwar>
+
+=item * Torsten Raudssus L<https://github.com/Getty>
 
 =back
 

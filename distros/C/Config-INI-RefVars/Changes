@@ -1,64 +1,89 @@
 Revision history for Config-INI-RefVars
 
+0.17    2024/09/27
+
+    - Added variable '=TO_CP_SEC'.
+    - POD: Better explanation for special cases in global mode.
+    - Added test for global mode.
+    - Adapted MANIFEST.
+    - Makefile.PL: changed LICENSE from 'perl_5' to 'perl'.
+    - Reformatted changelog.
+
 0.16    2024/04/10
-        Improved ans corrected POD.
+
+    - Improved and corrected POD.
 
 0.15    2024/01/06
-        Added assignment operator '??='.
+
+    - Added assignment operator '??='.
+
 
 0.14    2024/01/05
-        Added constructor argument 'varname_chk_re'.
-        Improved POD.
+    - Added constructor argument 'varname_chk_re'.
+    - Improved POD.
 
 0.13    2024/01/04
-        Renamed =srcdir, =srcfile to =INIdir, =INIfile.
-        Improved POD section.
+
+    - Renamed =srcdir, =srcfile to =INIdir, =INIfile.
+    - Improved POD section.
 
 0.12    2023/12/27
-        Fixed another bug in test script that caused test to fail on Windows.
+
+    - Fixed another bug in test script that caused test to fail on Windows.
 
 0.11    2023/12/26
-        Fixed bug in test script that caused test to fail on Windows.
-        Added the $(=CONFIG:...) to access entries of %Config::Config.
-        Fixed minor bug: evaluate sections in the order in which they appear.
-        Completed/improved POD.
+
+    - Fixed bug in test script that caused test to fail on Windows.
+    - Added the $(=CONFIG:...) to access entries of %Config::Config.
+    - Fixed minor bug: evaluate sections in the order in which they appear.
+    - Completed/improved POD.
 
 0.10    2023/12/25
-        Fixed bug in variable lookup.
-        Fixed dead links in POD section.
-        Completed POD section.
+
+    - Fixed bug in variable lookup.
+    - Fixed dead links in POD section.
+    - Completed POD section.
 
 0.09    2023/12/25
-        Corrected release date.
+
+    - Corrected release date.
 
 0.08    2023/12/25
-        Added global_mode.
+
+    - Added global_mode.
 
 0.07    2023/12/20
-        Operator ':=': allow assignments like a:=$(a).
+
+    - Operator ':=': allow assignments like a:=$(a).
 
 0.06    2023/12/17
-        Added variable '=VERSION'.
-        Added method current_tocopy_section().
-        Added method separator().
-        Added constructor argument 'cmnt_vl'.
-        Completed POD.
+
+    - Added variable '=VERSION'.
+    - Added method current_tocopy_section().
+    - Added method separator().
+    - Added constructor argument 'cmnt_vl'.
+    - Completed POD.
 
 0.05    2023/12/09
-        Fixed bug in test script.
-        Added variable '=::'.
-        Completed POD.
+
+    - Fixed bug in test script.
+    - Added variable '=::'.
+    - Completed POD.
 
 0.04    2023/12/08
-        Some corrections in the POD documentation.
+
+    - Some corrections in the POD documentation.
 
 0.03    2023/12/08
-        Fixed minor bug with src_name.
-        Some corrections in the POD section.
+
+    - Fixed minor bug with src_name.
+    - Some corrections in the POD section.
 
 0.02    2023/12/07
-        Fixed minor POD problem.
+
+    - Fixed minor POD problem.
 
 0.01    2023/12/07
-        First version, released on an unsuspecting world.
+
+    - First version, released on an unsuspecting world.
 

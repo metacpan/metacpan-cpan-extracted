@@ -7,7 +7,7 @@ requires 'Future::Queue';
 requires 'IO::Async::Notifier';
 requires 'Log::Any';
 requires 'Protocol::Sys::Virt' => '10.3.8';
-
+requires 'Sublike::Extended';
 
 on test => sub {
     requires 'Test2::V0';

@@ -990,7 +990,7 @@ Ascii::Text::Font::Stellar - Stellar Font
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 

@@ -1,3 +1,10 @@
+0.003   2024-09-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Fix Abstract & Description.
+
+
 0.002   2024-09-27  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Remove extraneous options.

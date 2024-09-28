@@ -20,6 +20,7 @@ my $VERSION = $Config::INI::RefVars::VERSION;
 my %Global = ('=:'        => $Dir_Sep,
               '=::'       => $Config{path_sep},
               '=VERSION'  => $VERSION,
+              '=TO_CP_SEC' => '__TOCOPY__',
              );
 
 subtest "use all args of new()" => sub {
@@ -172,6 +173,7 @@ subtest "use all args of new()" => sub {
                                    },
                     cleanup => 0
                    );
+    local $Global{'=TO_CP_SEC'} = 'TOCOPY!';
     is_deeply($obj->variables,
               {
                'TOCOPY!' => {

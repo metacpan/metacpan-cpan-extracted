@@ -1,5 +1,8 @@
 Revision history for Catalyst-Plugin-Session-Store-Redis
 
+0.901     2024-09-27 12:49:37+02:00
+    - Adding ssl, name, username, password and alternative reconnect parameter
+
 0.900     2021-01-08 23:07:36+01:00
     - dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
 

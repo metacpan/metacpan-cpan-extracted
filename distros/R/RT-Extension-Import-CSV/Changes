@@ -1,5 +1,10 @@
 Revision history for RT-Extension-Import-CSV
 
+0.03 2024-09-27
+- Allow migration of Told date field
+- Fix pod errors and documentation bugs
+- Additional configuration for Zendesk migration added
+
 0.02 2024-09-19
 - Improve handling of date/time values
 - Improve log messages

@@ -8,6 +8,7 @@ $Data::Dumper::Indent = 0;
 $Data::Dumper::Sortkeys = 1;
 
 use XML::Hash::XS 'xml2hash';
+$XML::Hash::XS::keep_root = 0;
 
 our $xml_decl_utf8 = qq{<?xml version="1.0" encoding="utf-8"?>};
 

@@ -8,8 +8,11 @@ build_requires:
   Perl::Critic: 0
   Test::Exception: 0
   Test::More: 0.88
+  Test::Pod: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+  Module::Install::ReadmeFromPod: 0
 distribution_type: module
 dynamic_config: 1
 generated_by: 'Module::Install version 1.19'
@@ -28,43 +31,49 @@ no_index:
 provides:
   Avro:
     file: lib/Avro.pm
-    version: 1.11.3
+    version: 1.12.0
   Avro::BinaryDecoder:
     file: lib/Avro/BinaryDecoder.pm
-    version: 1.11.3
+    version: 1.12.0
   Avro::BinaryEncoder:
     file: lib/Avro/BinaryEncoder.pm
-    version: 1.11.3
+    version: 1.12.0
   Avro::DataFile:
     file: lib/Avro/DataFile.pm
-    version: 1.11.3
+    version: 1.12.0
   Avro::DataFileReader:
     file: lib/Avro/DataFileReader.pm
-    version: 1.11.3
+    version: 1.12.0
   Avro::DataFileWriter:
     file: lib/Avro/DataFileWriter.pm
-    version: 1.11.3
+    version: 1.12.0
   Avro::Protocol:
     file: lib/Avro/Protocol.pm
-    version: 1.11.3
+    version: 1.12.0
   Avro::Protocol::Message:
     file: lib/Avro/Protocol/Message.pm
-    version: 1.11.3
+    version: 1.12.0
   Avro::Schema:
     file: lib/Avro/Schema.pm
-    version: 1.11.3
+    version: 1.12.0
 requires:
   Compress::Zlib: 0
   Compress::Zstd: 0
   Encode: 0
   Error::Simple: 0
-  IO::String: 0
-  JSON::XS: 0
+  JSON::MaybeXS: 0
   Object::Tiny: 0
   Regexp::Common: 0
   Try::Tiny: 0
   parent: 0
   perl: 5.10.1
 resources:
+  bugtracker:
+    web: http://issues.apache.org/jira/browse/AVRO/
+  homepage: http://avro.apache.org/
   license: http://apache.org/licenses/LICENSE-2.0
-version: 1.11.3
+  repository:
+    type: git
+    url: git://git.apache.org/avro.git
+    web: http://github.com/apache/avro
+version: 1.12.0

@@ -1,5 +1,18 @@
 Revision history for DBIx-Class-Helper-ColumnNames
 
+v0.1.2    2024-09-27 17:22:51+01:00 Europe/London
+  [Enhancements]
+  - Added support for hashref columns attributes.
+
+  [Bug Fixes]
+  - Fixed the parent class.
+
+  [Documentation]
+  - Added a note about column order.
+
+  [Toolchain]
+  - Updated keywords in the distribution metadata.
+
 v0.1.1    2024-09-25 16:44:41+01:00 Europe/London
   [Documentation]
   - Show an example to make it clear that get_column_names returns a list.

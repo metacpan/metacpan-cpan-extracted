@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "DBIx::Class::Helper::ColumnNames",
   "PREREQ_PM" => {
-    "DBIx::Class::ResultSet" => 0,
+    "DBIx::Class" => 0,
     "Ref::Util" => 0,
     "experimental" => 0,
     "namespace::clean" => 0,
@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "DBD::SQLite" => 0,
     "DBIx::Class::Core" => 0,
+    "DBIx::Class::ResultSet" => 0,
     "DBIx::Class::Schema" => 0,
     "File::Spec" => 0,
     "Module::Metadata" => 0,
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.1.1",
+  "VERSION" => "v0.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBD::SQLite" => 0,
+  "DBIx::Class" => 0,
   "DBIx::Class::Core" => 0,
   "DBIx::Class::ResultSet" => 0,
   "DBIx::Class::Schema" => 0,

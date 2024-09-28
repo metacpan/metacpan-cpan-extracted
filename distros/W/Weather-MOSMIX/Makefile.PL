@@ -46,8 +46,8 @@ my %module = (
     },
 
     PREREQ_PM => {
+        'experimental'       => '0.032',
         'Moo'                => 2,
-        'Filter::signatures' => '0.09',
 
         # For reading the MOSMIX KML file
         'PerlIO::gzip'       => 0.2,
@@ -58,6 +58,7 @@ my %module = (
         # For writing the stuff to a database
         'DBI'                => 0,
         'DBIx::RunSQL'       => 0,
+        'MooX::Role::DBIConnection'       => 0,
         'DBD::SQLite'        => 1.56,
         'MooX::Role::DBIConnection'        => 0,
         'File::ShareDir'     => 0, # for finding our SQL snippet

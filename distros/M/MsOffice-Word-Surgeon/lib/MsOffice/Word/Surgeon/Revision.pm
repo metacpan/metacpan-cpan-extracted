@@ -8,7 +8,7 @@ use MsOffice::Word::Surgeon::Carp;
 use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces encode_entities);
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.07';
+our $VERSION = '2.08';
 
 subtype 'Date_ISO',
   as      'Str',
@@ -103,3 +103,8 @@ This is inserted as C<w:id> attribute to the
 C<< <w:del> >> and C<< <w:ins> >> nodes -- but I don't really know why, 
 since it doesn't seem to be used for any purpose by MsWord.
 
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2019-2024 by Laurent Dami.
+
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.

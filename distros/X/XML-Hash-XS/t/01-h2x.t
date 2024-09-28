@@ -2,7 +2,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 25;
 use File::Temp qw(tempfile);
 
 use XML::Hash::XS 'hash2xml';
@@ -14,6 +14,14 @@ our $xml_decl = qq{<?xml version="1.0" encoding="utf-8"?>};
         hash2xml( { node1 => [ 'value1', { node2 => 'value2' } ] } ),
         qq{$xml_decl\n<root><node1>value1</node1><node1><node2>value2</node2></node1></root>},
         'default',
+    ;
+}
+
+{
+    is
+        hash2xml( { node1 => [ 'value1', { node2 => 'value2' } ] }, keep_root => 0, xml_decl => 0 ),
+        qq{<node1>value1</node1><node1><node2>value2</node2></node1>},
+        'rootless',
     ;
 }
 

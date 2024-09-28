@@ -1,13 +1,13 @@
 NAME
-    CLI::Meta::less - Metadata for 'cp' Unix commnd
+    CLI::Meta::less - Metadata for 'less' Unix commnd
 
 VERSION
-    This document describes version 0.002 of CLI::Meta::less (from Perl
+    This document describes version 0.003 of CLI::Meta::less (from Perl
     distribution CLI-Meta-less), released on 2024-09-27.
 
 SYNOPSIS
 DESCRIPTION
-    Based on cp from GNU coreutils 8.30.
+    Based on `less` version 551.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -18,8 +18,6 @@ SOURCE
     <https://github.com/perlancar/perl-CLI-Meta-less>.
 
 SEE ALSO
-    CLI::Meta::mv
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 

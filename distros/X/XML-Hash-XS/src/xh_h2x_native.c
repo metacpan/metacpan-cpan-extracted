@@ -31,7 +31,8 @@ xh_h2x_native(xh_h2x_ctx_t *ctx, xh_char_t *key, I32 key_len, SV *value)
         len = HvUSEDKEYS((HV *) value);
         if (len == 0) goto ADD_EMPTY_NODE;
 
-        xh_xml_write_start_node(&ctx->writer, key, key_len);
+        if (key != NULL)
+            xh_xml_write_start_node(&ctx->writer, key, key_len);
 
         if (len > 1 && ctx->opts.canonical) {
             sorted_hash = xh_sort_hash((HV *) value, len);
@@ -47,7 +48,8 @@ xh_h2x_native(xh_h2x_ctx_t *ctx, xh_char_t *key, I32 key_len, SV *value)
             }
         }
 
-        xh_xml_write_end_node(&ctx->writer, key, key_len);
+        if (key != NULL)
+            xh_xml_write_end_node(&ctx->writer, key, key_len);
     }
     else if (type & XH_H2X_T_ARRAY) {
         len = av_len((AV *) value) + 1;
@@ -57,7 +59,8 @@ xh_h2x_native(xh_h2x_ctx_t *ctx, xh_char_t *key, I32 key_len, SV *value)
     }
     else {
 ADD_EMPTY_NODE:
-        xh_xml_write_empty_node(&ctx->writer, key, key_len);
+        if (key != NULL)
+            xh_xml_write_empty_node(&ctx->writer, key, key_len);
     }
 
 FINISH:

@@ -6,7 +6,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-09-27'; # DATE
 our $DIST = 'CLI-Meta-less'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $META = {
     opts => {
@@ -110,7 +110,7 @@ our $META = {
 };
 
 1;
-# ABSTRACT: Metadata for 'cp' Unix commnd
+# ABSTRACT: Metadata for 'less' Unix commnd
 
 __END__
 
@@ -120,17 +120,17 @@ __END__
 
 =head1 NAME
 
-CLI::Meta::less - Metadata for 'cp' Unix commnd
+CLI::Meta::less - Metadata for 'less' Unix commnd
 
 =head1 VERSION
 
-This document describes version 0.002 of CLI::Meta::less (from Perl distribution CLI-Meta-less), released on 2024-09-27.
+This document describes version 0.003 of CLI::Meta::less (from Perl distribution CLI-Meta-less), released on 2024-09-27.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Based on cp from GNU coreutils 8.30.
+Based on `less` version 551.
 
 =head1 HOMEPAGE
 
@@ -141,8 +141,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/CLI-Meta-l
 Source repository is at L<https://github.com/perlancar/perl-CLI-Meta-less>.
 
 =head1 SEE ALSO
-
-L<CLI::Meta::mv>
 
 =head1 AUTHOR
 

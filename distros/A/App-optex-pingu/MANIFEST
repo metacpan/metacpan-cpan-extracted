@@ -9,6 +9,7 @@ lib/App/optex/pingu/Picture.pm
 minil.toml
 share/pingu.asc
 share/pingu.asc2
+share/pingu.asc4
 t/00_compile.t
 META.yml
 MANIFEST

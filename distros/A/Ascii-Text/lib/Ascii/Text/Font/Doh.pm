@@ -4636,7 +4636,7 @@ Ascii::Text::Font::Doh - Doh font
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 

@@ -1,6 +1,5 @@
 bin/ascii_text
 Changes
-ignore.txt
 lib/Ascii/Text.pm
 lib/Ascii/Text/Cmd.pm
 lib/Ascii/Text/Font.pm
@@ -19,6 +18,8 @@ lib/Ascii/Text/Font/Doh.pm
 lib/Ascii/Text/Font/Doom.pm
 lib/Ascii/Text/Font/Dotmatrix.pm
 lib/Ascii/Text/Font/Drpepper.pm
+lib/Ascii/Text/Font/Lean.pm
+lib/Ascii/Text/Font/Letters.pm
 lib/Ascii/Text/Font/Poison.pm
 lib/Ascii/Text/Font/Rev.pm
 lib/Ascii/Text/Font/Slsscript.pm

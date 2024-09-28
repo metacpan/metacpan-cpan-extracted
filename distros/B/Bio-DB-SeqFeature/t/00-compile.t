@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Bio/DB/SeqFeature.pm',
@@ -16,6 +16,7 @@ my @module_files = (
     'Bio/DB/SeqFeature/Segment.pm',
     'Bio/DB/SeqFeature/Store.pm',
     'Bio/DB/SeqFeature/Store/DBI/Iterator.pm',
+    'Bio/DB/SeqFeature/Store/DBI/MariaDB.pm',
     'Bio/DB/SeqFeature/Store/DBI/mysql.pm',
     'Bio/DB/SeqFeature/Store/FeatureFileLoader.pm',
     'Bio/DB/SeqFeature/Store/GFF2Loader.pm',

@@ -1,14 +1,12 @@
 package Weather::MOSMIX::Weathercodes;
 use strict;
-use Filter::signatures;
-use feature 'signatures';
-no warnings 'experimental::signatures';
+use experimental 'signatures';
 
 use Exporter 'import';
 
 our @EXPORT_OK = 'mosmix_weathercode';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our $as_emoji = "\x{fe0f}";
 

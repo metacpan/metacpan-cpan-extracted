@@ -11,7 +11,7 @@ use Log::Log4perl qw(:easy);
 use Mojo::Pg;
 use feature 'say';
 use feature 'signatures';
-use GenerateSQL;
+use Daje::GenerateSQL;
 use namespace::clean -except => [qw/_options_data _options_config/];
 
 

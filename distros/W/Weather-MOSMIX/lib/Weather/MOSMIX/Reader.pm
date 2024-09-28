@@ -3,9 +3,7 @@ use strict;
 use Moo 2;
 use Archive::Zip;
 
-use Filter::signatures;
-use feature 'signatures';
-no warnings 'experimental::signatures';
+use experimental 'signatures';
 
 use Scalar::Util 'weaken';
 use Time::Piece;
@@ -38,7 +36,7 @@ to an SQLite database:
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 METHODS
 

@@ -6,7 +6,7 @@ use MooseX::StrictConstructor;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.07';
+our $VERSION = '2.08';
 
 #======================================================================
 # ATTRIBUTES
@@ -93,5 +93,4 @@ Laurent Dami, E<lt>dami AT cpan DOT org<gt>
 
 Copyright 2024 by Laurent Dami.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.

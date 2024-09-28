@@ -1,9 +1,7 @@
 package Weather::MOSMIX::Writer;
 use strict;
 use Moo 2;
-use Filter::signatures;
-use feature 'signatures';
-no warnings 'experimental::signatures';
+use experimental 'signatures';
 use DBI;
 require POSIX;
 use JSON;
@@ -30,7 +28,7 @@ Weather::MOSMIX::Writer - Write MOSMIX weather forecast data to a DBI handle
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # This should be MooX::Role::DBConnection
 with 'MooX::Role::DBIConnection';

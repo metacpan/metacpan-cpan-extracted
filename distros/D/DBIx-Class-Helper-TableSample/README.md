@@ -4,7 +4,7 @@ DBIx::Class::Helper::TableSample - Add support for tablesample clauses
 
 # VERSION
 
-version v0.6.0
+version v0.7.0
 
 # SYNOPSIS
 
@@ -204,7 +204,11 @@ my $rs = $schema->resultset('Wobbles')->tablesample( 10, { method => 'system' } 
 
 This is a helper method.
 
-It was added in v0.4.1.
+It was added in v0.4.1, since v0.6.1 you can use a method name instead of an options hash reference:
+
+```perl
+my $rs = $schema->resultset('Wobbles')->tablesample( 10, 'system' );
+```
 
 # KNOWN ISSUES
 

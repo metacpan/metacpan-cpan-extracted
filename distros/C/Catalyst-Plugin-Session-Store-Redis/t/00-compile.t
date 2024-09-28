@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 1;
 
 my @module_files = (
     'Catalyst/Plugin/Session/Store/Redis.pm'
@@ -57,7 +57,6 @@ for my $lib (@module_files)
 
 
 
-is(scalar(@warnings), 0, 'no warnings found')
-    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) ) if $ENV{AUTHOR_TESTING};
+# no warning checks;
 
 

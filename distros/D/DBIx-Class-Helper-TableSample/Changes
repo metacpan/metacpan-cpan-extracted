@@ -1,10 +1,20 @@
 Revision history for DBIx-Class-Helper-TableSample:
 
+v0.7.0    2024-09-27 17:24:27+01:00 Europe/London
+  [Enhancements]
+  - The tablesample method will accept a method name instead of a hashreference with a method key.
+
+  [Bug Fixes]
+  - Fixed the parent class.
+
+  [Documentation]
+  - Fixed typos in Changes.
+
 v0.6.0    2024-04-13 14:22:13+01:00 Europe/London
   [Enhancements]
-  - Tablesame can be used when there are joins.
+  - Tablesample can be used when there are joins.
 
-  [Documented]
+  [Documentation]
   - Documented how to use this with the tsm_system_rows extension in PostgreSQL.
 
 v0.5.0    2023-11-21 17:19:41+00:00 Europe/London

@@ -405,6 +405,6 @@ my $f = $w->forecast(
     longitude => 74,
 );
 
-isn't $f, undef;
+isnt $f, undef;
 
 done_testing;

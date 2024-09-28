@@ -4,7 +4,7 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,7 +38,6 @@
             "DBI" : "0",
             "DBIx::RunSQL" : "0",
             "File::ShareDir" : "0",
-            "Filter::signatures" : "0.09",
             "HTTP::Tiny" : "0",
             "IO::Socket::SSL" : "1.42",
             "JSON" : "0",
@@ -51,6 +50,7 @@
             "Time::Piece" : "0",
             "URI" : "0",
             "XML::Twig" : "0",
+            "experimental" : "0.032",
             "perl" : "5.022"
          }
       },
@@ -69,7 +69,7 @@
          "web" : "https://github.com/Corion/Weather-MOSMIX"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.11",
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

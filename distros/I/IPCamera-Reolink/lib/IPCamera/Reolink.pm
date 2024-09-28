@@ -10,6 +10,7 @@ use IO::Socket::SSL;
 use JSON;
 use Data::Dump;
 use Time::HiRes;
+use String::Random;
 
 # IPCamera::Reolink channel values.
 use constant ChannelDefault => 0;
@@ -35,53 +36,96 @@ use constant PTZ_StartPatrol => 'StartPatrol'; # PTZ patrol in the specified spe
 use constant PTZ_StopPatrol => 'StopPatrol'; # PTZ stop patrol.
 use constant PTZ_ToPos => 'ToPos'; # PTZ turn to a specified preset in the specified speed.
 
+# IPCamera::Reolink::PtzCtrl() op values as list.
+our @PTZ_op_list = (PTZ_Auto, PTZ_Down, PTZ_Left, PTZ_LeftDown, PTZ_LeftUp, PTZ_Right, PTZ_RightDown, PTZ_RightUp, PTZ_Stop, PTZ_Up, PTZ_ZoomInc, PTZ_ZoomDec, PTZ_IrisDec, PTZ_IrisInc, PTZ_FocusDec, PTZ_FocusInc, PTZ_StartPatrol, PTZ_StopPatrol, PTZ_ToPos, );
+
 # IPCamera::Reolink::PtzCtrl() speed values.
 use constant PTZ_SpeedMin => 1;
 use constant PTZ_SpeedMax => 64;
 use constant PTZ_SpeedHalf => 32;
 
+# IPCamera::Reolink::PtzCtrl() speed values as list.
+our @PTZ_speed_list = (PTZ_SpeedMin ... PTZ_SpeedMax);
+
+# IPCamera::Reolink::PtzCtrl() preset values.
+use constant PTZ_PresetMin => 0;
+use constant PTZ_PresetMax => 63;
+
+# IPCamera::Reolink::PtzCtrl() preset values as list.
+our @PTZ_preset_list = (PTZ_PresetMin ... PTZ_PresetMax);
+
 # IPCamera::Reolink::StartZoomFocus() op values.
 use constant ZF_ZoomPos => 'ZoomPos'; # set camera zoom to specified value
 
-# IPCamera::Reolink::StartZoomFocus() op ZoomPos pos values.
+# IPCamera::Reolink::StartZoomFocus() op ZoomPos values.
 use constant ZF_ZoomPosMin => 0;
 use constant ZF_ZoomPosMax => 32;
+
+# IPCamera::Reolink::StartZoomFocus() op ZoomPos values as list.
+our @PTZ_ZoomPos_list = (ZF_ZoomPosMin ... ZF_ZoomPosMax);
 
 # IPCamera::Reolink::StartZoomFocus() FocusPos op values.
 use constant ZF_FocusPos => 'FocusPos'; # set camera focus to specified value
 
-# IPCamera::Reolink::StartZoomFocus() op FocusPos pos values.
+# IPCamera::Reolink::StartZoomFocus() op FocusPos values.
 use constant ZF_FocusPosMin => 0;
 use constant ZF_FocusPosMax => 248;
 
-# IPCamera::Reolink:SetOsd pos values
-use constant OSD_UpperLeft  => "Upper Left";
-use constant OSD_TopCenter  => "Top Center";
-use constant OSD_UpperRight  => "Upper Right";
-use constant OSD_LowerLeft  => "Lower Left";
-use constant OSD_BottomCenter  => "Bottom Center";
-use constant OSD_LowerRight  => "Lower Right";
-use constant OSD_OtherConfiguration  => "Other Configuration";
+# IPCamera::Reolink::StartZoomFocus() op FocusPos values as list.
+our @PTZ_FocusPos_list = (ZF_FocusPosMin ... ZF_FocusPosMax);
 
+# IPCamera::Reolink:SetOsd() pos values.
+use constant OSD_UpperLeft => "Upper Left";
+use constant OSD_TopCenter => "Top Center";
+use constant OSD_UpperRight => "Upper Right";
+use constant OSD_LowerLeft => "Lower Left";
+use constant OSD_BottomCenter => "Bottom Center";
+use constant OSD_LowerRight => "Lower Right";
+use constant OSD_OtherConfiguration => "Other Configuration";
 
-our $VERSION = '1.02';
+# IPCamera::Reolink:SetOsd() pos values as list.
+our @OSD_pos_list = (OSD_UpperLeft, OSD_TopCenter, OSD_UpperRight, OSD_LowerLeft, OSD_BottomCenter, OSD_LowerRight, OSD_OtherConfiguration, );
+
+# IPCamera::Reolink:AudioAlarmPlay() alarm_mode values.
+use constant AAP_AlarmModeTimes => "times"; # play # times specified by times
+use constant AAP_AlarmModeManual => "manu"; # play continuously until next AudioAlarmPlay command
+
+# IPCamera::Reolink:AudioAlarmPlay() alarm_mode values as list.
+our @AAP_AlarmMode_list = (AAP_AlarmModeTimes, AAP_AlarmModeManual, );
+
+our $VERSION = '1.03';
 
 our $DEBUG = 0; # > 0 for debug output to STDERR
 
 sub new {
     my $class = shift;
-    my $self = bless({}, $class);
-    my($camera_url, $camera_user_name, $camera_password, $camera_X509_certificate_file, $camera_X509_key_file, $camera_certificate_authority_file) = @_;
-    $self->{CAMERA_URL} = $camera_url;
-    $self->{CAMERA_USER_NAME} = $camera_user_name;
-    $self->{CAMERA_PASSWORD} = $camera_password;
-    $self->{CAMERA_X509_certificate_file} = $camera_X509_certificate_file;
-    $self->{CAMERA_X509_key_file} = $camera_X509_key_file;
-    $self->{CAMERA_certificate_authority_file} = $camera_certificate_authority_file;
+    my $hash_ref = $_[0];
+    my $self;
+    if(ref($hash_ref) eq ref({})){
+        # { camera_url => 'http://192.168.1.166', camera_user_name => 'api', camera_password => 'this-is-a-bad-password', camera_X509_certificate_file => 'camera.crt', camera_X509_key_file => 'camera.key', camera_certificate_authority_file => 'camera.ca', }}
+        $self = bless($hash_ref, $class);
+        $self->{_is_hash_ref} = 1;
+    }else{
+        $self = bless({}, $class);
+        my($camera_url, $camera_user_name, $camera_password, $camera_X509_certificate_file, $camera_X509_key_file, $camera_certificate_authority_file) = @_;
+        $self->{camera_url} = $camera_url;
+        $self->{camera_user_name} = $camera_user_name;
+        $self->{camera_password} = $camera_password;
+        $self->{camera_x509_certificate_file} = $camera_X509_certificate_file;
+        $self->{camera_x509_key_file} = $camera_X509_key_file;
+        $self->{camera_certificate_authority_file} = $camera_certificate_authority_file;
+        $self->{_is_hash_ref} = 0;
+    } # if
     $self->{_camera_rest_client} = undef; # defer REST connection to camera until first Login()
     $self->{_camera_login_token} = undef;  # pass to other API functions
     $self->{_camera_login_lease_time} = 0; # time in seconds that the login token is valid, force initial Login()
     $self->{_camera_login_lease_start_time} = time(); # time that the login token was acquired, force initial Login()
+    my $camera_url = $self->{camera_url};
+    if($camera_url =~ m/^https/i){
+        $self->{_is_https} = 1;
+    }else{
+        $self->{_is_https} = 0;
+    } # if
     return $self;
 } # new()
 
@@ -89,61 +133,104 @@ sub new {
 sub _sendCameraCommand($$$$){
     my($camera_rest_client, $camera_command, $request_r, $token) = @_;
 
-    my $t1 = Time::HiRes::time() if($DEBUG > 0);
-    print STDERR "$0: sendCameraCommand(): " . $t1 . ": enter: call JSON::encode_json()\n" if($DEBUG > 1);
+    print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): enter: camera_command '$camera_command' request_r '" . Data::Dump::quote($request_r) . "'\n" if($DEBUG > 2);
 
+    my $t1 = Time::HiRes::time() if($DEBUG > 1);
+    print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): " . $t1 . ": call JSON::encode_json()\n" if($DEBUG > 2);
     my $encoded_request = JSON::encode_json($request_r);
 
-    my $t2 = Time::HiRes::time() if($DEBUG > 1);
-    print STDERR "$0: sendCameraCommand(): " . $t2 . ": call POST()\n" if($DEBUG > 1);
+    my $t2 = Time::HiRes::time() if($DEBUG > 2);
 
     if(defined($token)){
-        $camera_rest_client->POST('api.cgi?cmd=' . $camera_command . '&token=' . $token, $encoded_request);
+        if($camera_command eq 'Snap'){
+            # Snap command returns JPG data not JSON, rs is a random string used to prevent browser caching of the image data.
+            my $url = 'api.cgi?cmd=' . $camera_command . '&token=' . $token . '&rs=' . @$request_r[0]->{param}->{rs};
+            print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): " . $t2 . ": call POST($url)\n" if($DEBUG > 2);
+            $camera_rest_client->POST($url, $encoded_request);
+        }else{
+            # Returns JSON data.
+            my $url = 'api.cgi?cmd=' . $camera_command . '&token=' . $token;
+            print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): " . $t2 . ": call POST($url)\n" if($DEBUG > 2);
+            $camera_rest_client->POST($url, $encoded_request);
+        } # if
     }else{
         # $token undefined for Login
-        $camera_rest_client->POST('api.cgi?cmd=' . $camera_command, $encoded_request);
+        my $url = 'api.cgi?cmd=' . $camera_command;
+        print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): " . $t2 . ": call POST($url)\n" if($DEBUG > 2);
+        $camera_rest_client->POST($url, $encoded_request);
     } # if
 
-    my $t3 = Time::HiRes::time() if($DEBUG > 1);
-    print STDERR "$0: sendCameraCommand(): " . $t3 . ": call responseCode()\n" if($DEBUG > 1);
-
+    my $t3 = Time::HiRes::time() if($DEBUG > 2);
+    print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): " . $t3 . ": call responseCode()\n" if($DEBUG > 2);
     my $response_code = $camera_rest_client->responseCode();
 
-    my $t4 = Time::HiRes::time() if($DEBUG > 1);
-    print STDERR "$0: sendCameraCommand(): " . $t4 . ": call responseContent()\n" if($DEBUG > 1);
-
+    my $t4 = Time::HiRes::time() if($DEBUG > 2);
+    print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): " . $t4 . ": call responseContent()\n" if($DEBUG > 2);
     my $response_content = $camera_rest_client->responseContent(); # JSON
 
-    my $t5 = Time::HiRes::time() if($DEBUG > 1);
-    print STDERR "$0: sendCameraCommand(): " . $t5 . ": call JSON::decode_json()\n" if($DEBUG > 1);
-
-    my $response_r;
-    eval{
-        $response_r = JSON::decode_json($response_content);
-    };
-    print STDERR "$0: sendCameraCommand(): JSON::decode_json() failed - '$@' - responseContent '$response_content'\n" if $@;
-    return undef if $@;
-
-    my $t6 = Time::HiRes::time() if($DEBUG > 0);
-    print STDERR "$0: sendCameraCommand(): JSON encode " . ($t2 - $t1) . " POST " . ($t3 - $t2) . " responseCode " . ($t4 - $t3) . " responseContent " . ($t5 - $t4) . " JSON decode " . ($t6 - $t5) . " TOTAL " . ($t6 - $t1) . "\n" if($DEBUG > 1);
-    if($DEBUG > 0){
+    if($camera_command eq 'Snap'){
+        # responseContent is not JSON but the actual JPG image data
+        #
+        # Content-Type: image/jpeg
+        # Content-Length: 171648
+        # Connection: keep-alive
+        # X-Frame-Options: SAMEORIGIN
+        # X-XSS-Protection: 1; mode=block
+        # X-Content-Type-Options: nosniff
+        # .............................(JPG data)
+        print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): " . $t4 . ": jpg responseContent() length " . length($response_content) . "\n" if($DEBUG > 2);
+        my $t6 = Time::HiRes::time() if($DEBUG > 1);
+        print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): " . ($t2 - $t1) . " POST " . ($t3 - $t2) . " responseCode " . ($t4 - $t3) . " responseContent " . ($t6 - $t4) . " TOTAL " . ($t6 - $t1) . "\n" if($DEBUG > 2);
         if($DEBUG > 1){
-            my @headers = $camera_rest_client->responseHeaders();
-            foreach my $header (@headers){
-                print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand(): header '" . $header . "' '" . $camera_rest_client->responseHeader($header) . "' \n";
-            } # for
+            if($DEBUG > 3){
+                my @headers = $camera_rest_client->responseHeaders();
+                foreach my $header (@headers){
+                    print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): header '" . $header . "' '" . $camera_rest_client->responseHeader($header) . "' \n";
+                } # for
+            } # if
+            my $save_linewidth = $Data::Dump::LINEWIDTH;
+            $Data::Dump::LINEWIDTH = 500; # no linebreak
+            print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): command '" . $camera_command . "' token '" . (defined($token) ? $token : 'undef') . "' request '" . Data::Dump::quote($request_r) . "' response length " . length($response_content) . " time " . ($t6 - $t1) . " seconds\n";
+            $Data::Dump::LINEWIDTH = $save_linewidth; 
         } # if
-        my $save_linewidth = $Data::Dump::LINEWIDTH;
-        $Data::Dump::LINEWIDTH = 500; # no linebreak
-        print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand(): command '" . $camera_command . "' token '" . (defined($token) ? $token : 'undef') . "' request '" . Data::Dump::dump($request_r) . "' response '" . Data::Dump::dump($response_r) . "' time " . ($t6 - $t1) . " seconds\n";
-        $Data::Dump::LINEWIDTH = $save_linewidth; 
-    } # if
-
-    my $code = @$response_r[0]->{code};
-    if($response_code ne '200' || $code != 0){
-        return undef;
+        print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): exit OK\n" if($DEBUG > 2);
+        return $response_content;
     }else{
-        return $response_r;
+        my $t5 = Time::HiRes::time() if($DEBUG > 2);
+        print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): " . $t5 . ": call JSON::decode_json()\n" if($DEBUG > 2);
+
+        my $response_r;
+        eval{
+            $response_r = JSON::decode_json($response_content);
+        };
+        if($@){
+            print STDERR scalar(localtime()) . ": error: IPCamera::Reolink::_sendCameraCommand($camera_command): JSON::decode_json() failed - '$@' - responseContent '$response_content'\n";
+            return undef;
+        } # if
+
+        my $t6 = Time::HiRes::time() if($DEBUG > 1);
+        print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): JSON encode " . ($t2 - $t1) . " POST " . ($t3 - $t2) . " responseCode " . ($t4 - $t3) . " responseContent " . ($t5 - $t4) . " JSON decode " . ($t6 - $t5) . " TOTAL " . ($t6 - $t1) . "\n" if($DEBUG > 2);
+        if($DEBUG > 1){
+            if($DEBUG > 3){
+                my @headers = $camera_rest_client->responseHeaders();
+                foreach my $header (@headers){
+                    print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): header '" . $header . "' '" . $camera_rest_client->responseHeader($header) . "' \n";
+                } # for
+            } # if
+            my $save_linewidth = $Data::Dump::LINEWIDTH;
+            $Data::Dump::LINEWIDTH = 500; # no linebreak
+            print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): command '" . $camera_command . "' token '" . (defined($token) ? $token : 'undef') . "' request '" . Data::Dump::quote($request_r) . "' response '" . Data::Dump::quote($response_r) . "' time " . ($t6 - $t1) . " seconds\n";
+            $Data::Dump::LINEWIDTH = $save_linewidth; 
+        } # if
+
+        my $code = @$response_r[0]->{code};
+        if($response_code ne '200' || $code != 0){
+            print STDERR scalar(localtime()) . ": error: IPCamera::Reolink::_sendCameraCommand($camera_command): exit ERROR: response_code '$response_code ' code '$code'\n" if($DEBUG > 2);
+            return undef;
+        }else{
+            print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): exit OK response_code '$response_code ' code '$code'\n" if($DEBUG > 2);
+            return $response_r;
+        } # if
     } # if
 } # _sendCameraCommand()
 
@@ -156,12 +243,10 @@ sub _checkLoginLeaseTime($){
         # Perhaps re-establish the REST connection as long intervals with no activity seem to make the camera "forget" the connection. @@@
         my($login_token, $login_lease_time) = Login();
         if(defined($login_token)){
-            print STDERR "$0: " . scalar(localtime()) . ": info: Camera Login for user '" . $self->{CAMERA_USER_NAME} . "' OK, token leaseTime '" . $login_lease_time . "' name '" . $login_token . "'\n" if($DEBUG > 0);
             $self->{_camera_login_lease_start_time} = $now; # New Login token lease time
             $self->{_camera_login_lease_time} = $login_lease_time; # New Login token 
             return 1; # new Login token
         }else{
-            print STDERR "$0: " . scalar(localtime()) . ": error: Camera Login for user '" . $self->{CAMERA_USER_NAME}  . "' failed\n" if($DEBUG > 0);
             return 0; # failed to acquire new Login token
         } # if
     }else{
@@ -172,7 +257,7 @@ sub _checkLoginLeaseTime($){
 # Login() - provides login credentials (username/password) to camera and returns API access token good for specified number of seconds
 sub Login(){
     my($self) = @_;
-    my($_camera_rest_client, $camera_url, $camera_user_name, $camera_password, $camera_X509_certificate_file, $camera_X509_key_file, $camera_certificate_authority_file) = ($self->{_camera_rest_client}, $self->{CAMERA_URL}, $self->{CAMERA_USER_NAME}, $self->{CAMERA_PASSWORD}, $self->{CAMERA_X509_certificate_file}, $self->{CAMERA_X509_key_file}, $self->{CAMERA_certificate_authority_file});
+    my($_camera_rest_client, $camera_url, $camera_user_name, $camera_password, $camera_X509_certificate_file, $camera_X509_key_file, $camera_certificate_authority_file, $_is_https) = ($self->{_camera_rest_client}, $self->{camera_url}, $self->{camera_user_name}, $self->{camera_password}, $self->{camera_x509_certificate_file}, $self->{camera_x509_key_file}, $self->{camera_certificate_authority_file}, $self->{_is_https}, );
     if(!defined($_camera_rest_client)){
         # disable check for valid certificate matching the expected hostname
         $_camera_rest_client = REST::Client->new(host => $camera_url, timeout => 10, cert => $camera_X509_certificate_file, key => $camera_X509_key_file, ca => $camera_certificate_authority_file);
@@ -186,8 +271,10 @@ sub Login(){
         $self->{_camera_login_token} =  @$response_r[0]->{value}->{Token}->{name};
         $self->{_camera_login_lease_time} = @$response_r[0]->{value}->{Token}->{leaseTime};
         $self->{_camera_login_lease_start_time} = time(); # detect lease expiry 
+        print STDERR scalar(localtime()) . ": info: Camera Login for user '" . $self->{camera_user_name} . "' OK, token leaseTime '" . $self->{_camera_login_lease_time} . "' name '" . $self->{_camera_login_token} . "'\n" if($DEBUG > 0);
         return ($self->{_camera_login_token}, $self->{_camera_login_lease_time}); 
     }else{
+        print STDERR scalar(localtime()) . ": error: Camera Login for user '" . $self->{camera_user_name}  . "' failed\n" if($DEBUG > 0);
         return (undef, undef);
     } # if
 } # Login()
@@ -206,7 +293,7 @@ sub Logout(){
     } # if
     my $logout_r = [ {cmd => "Logout", param => { }} ];
     my $response_r = _sendCameraCommand($_camera_rest_client, 'Logout', $logout_r, $_camera_login_token);
-    $self->{_camera_rest_client} = undef;
+    $self->{_camera_rest_client} = undef; # hopefully drops the REST connection
     if(defined($response_r)){
         return 1; 
     }else{
@@ -218,7 +305,7 @@ sub Logout(){
 sub GetChannelstatus($){
     my($self) = @_;
     if(!_checkLoginLeaseTime($self)){
-        return undef;
+        return (undef, undef);
     } # if
     my $get_channelstatus_r = [ {cmd => "GetChannelstatus", } ];
     my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
@@ -247,8 +334,8 @@ sub GetDevInfo($){
 } # GetDevInfo()
 
 # PtzCtrl() - implement camera API PtzCtrl interface, used to control the operation of PTZ (Pan/Tilt/Zoom).
-sub PtzCtrl($$$){
-    my($self, $channel, $op, $speed) = @_;
+sub PtzCtrl($$$$;$){
+    my($self, $channel, $op, $speed, $preset_id) = @_;
     if(!_checkLoginLeaseTime($self)){
         return 0;
     } # if
@@ -257,9 +344,12 @@ sub PtzCtrl($$$){
     my $ptzctrl_r;
 	if($op eq PTZ_Stop){
 		# No 'speed' field for op PTZ_Stop
-		$ptzctrl_r = [ {cmd => "PtzCtrl", action => 0, param => { channel => $channel, op => $op, }}];
+		$ptzctrl_r = [ {cmd => "PtzCtrl", action => 0, param => { channel => int($channel), op => $op, }}];
+    }elsif($op eq PTZ_ToPos){
+        # Preset id field for op PTZ_ToPos
+		$ptzctrl_r = [ {cmd => "PtzCtrl", action => 0, param => { channel => int($channel), speed => int($speed), op => $op, id => int($preset_id) }}]; # the int($speed) and int($preset_id) is important otherwise the field could be encoded as a real which will be rejected by the camera
 	}else{
-		$ptzctrl_r = [ {cmd => "PtzCtrl", action => 0, param => { channel => $channel, speed => int($speed), op => $op, }}]; # the int($speed) is important otherwise the field could be encoded as a real which will be rejected by the camera
+		$ptzctrl_r = [ {cmd => "PtzCtrl", action => 0, param => { channel => int($channel), speed => int($speed), op => $op, }}]; # the int($speed) is important otherwise the field could be encoded as a real which will be rejected by the camera
 	} # if
     my $response_r = _sendCameraCommand($_camera_rest_client, 'PtzCtrl', $ptzctrl_r, $_camera_login_token);
     if(defined($response_r)){
@@ -273,10 +363,10 @@ sub PtzCtrl($$$){
 sub GetZoomFocus($){
     my($self, $channel) = @_;
     if(!_checkLoginLeaseTime($self)){
-        return 0;
+        return undef;
     } # if
     my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
-    my $getzoomfocus_r = [ {cmd => "GetZoomFocus", action => 0, param => { channel => $channel, }} ];
+    my $getzoomfocus_r = [ {cmd => "GetZoomFocus", action => 0, param => { channel => int($channel), }} ];
     my $response_r = _sendCameraCommand($_camera_rest_client, 'GetZoomFocus', $getzoomfocus_r, $_camera_login_token);
     if(defined($response_r)){
         return @$response_r[0]->{value}->{ZoomFocus};
@@ -292,7 +382,7 @@ sub StartZoomFocus($$$){
         return 0;
     } # if
     my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
-    my $startzoomfocus_r = [ {cmd => "StartZoomFocus", action => 0, param => {"ZoomFocus" => { channel => $channel, pos => int($pos), op => $op, }}} ];
+    my $startzoomfocus_r = [ {cmd => "StartZoomFocus", action => 0, param => {"ZoomFocus" => { channel => int($channel), pos => int($pos), op => $op, }}} ];
     my $response_r = _sendCameraCommand($_camera_rest_client, 'StartZoomFocus', $startzoomfocus_r, $_camera_login_token);
     if(defined($response_r)){
         return 1;
@@ -305,15 +395,15 @@ sub StartZoomFocus($$$){
 sub GetOsd($){
     my($self, $channel) = @_;
     if(!_checkLoginLeaseTime($self)){
-        return 0;
+        return (undef, undef, undef);
     } # if
     my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
-    my $getosd_r = [ {cmd => "GetOsd", action => 1, param => { channel => $channel, }} ];
+    my $getosd_r = [ {cmd => "GetOsd", action => 1, param => { channel => int($channel), }} ];
     my $response_r = _sendCameraCommand($_camera_rest_client, 'GetOsd', $getosd_r, $_camera_login_token);
     if(defined($response_r)){
         return (@$response_r[0]->{value}, @$response_r[0]->{range}, @$response_r[0]->{initial}, );
     }else{
-        return undef;
+        return (undef, undef, undef);
     } # if
 } # GetOsd()
 
@@ -324,7 +414,7 @@ sub SetOsd($$$$$$){
         return 0;
     } # if
     my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
-    my $setosd_r = [ {cmd => "SetOsd", param => { Osd => { channel => $channel, osdChannel => { enable => int($enableChannel), name => $channelName, pos => $channelPos, }, osdTime => {enable => int($enableTime), pos => $timePos, }}}} ];
+    my $setosd_r = [ {cmd => "SetOsd", param => { Osd => { channel => int($channel), osdChannel => { enable => int($enableChannel), name => $channelName, pos => $channelPos, }, osdTime => {enable => int($enableTime), pos => $timePos, }}}} ];
     my $response_r = _sendCameraCommand($_camera_rest_client, 'SetOsd', $setosd_r, $_camera_login_token);
     if(defined($response_r)){
         return 1;
@@ -333,6 +423,74 @@ sub SetOsd($$$$$$){
     } # if
 } # SetOsd()
 
+# GetPtzPreset() - implement camera API GetPtzPreset iterface, used to get configuration of Ptz Preset.
+sub GetPtzPreset($){
+    my($self, $channel) = @_;
+    if(!_checkLoginLeaseTime($self)){
+        return (undef, undef, undef);
+    } # if
+    my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
+    my $getptzpreset_r = [ {cmd => "GetPtzPreset", action => 1, param => { channel => int($channel), }} ];
+    my $response_r = _sendCameraCommand($_camera_rest_client, 'GetPtzPreset', $getptzpreset_r, $_camera_login_token);
+    if(defined($response_r)){
+        return (@$response_r[0]->{value}, @$response_r[0]->{range}, @$response_r[0]->{initial}, );
+    }else{
+        return (undef, undef, undef);
+    } # if
+} # GetPtzPreset()
+
+# Snap() - It is used to capture an image.
+sub Snap($$){
+    my($self, $channel) = @_;
+    if(!_checkLoginLeaseTime($self)){
+        return undef;
+    } # if
+    my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
+
+    my $r = String::Random->new;
+    $r->{'A'} = [ 'A'..'Z', 'a'..'z', '0' .. '9', ];
+    my $rs = $r->randpattern('AAAAAAAAAAAAAAAA'); # Random character with fixed length. It’s used to prevent browser caching.
+
+    my $snap_r = [ {cmd => "Snap", action => 1, param => { channel => int($channel), rs => $rs, }} ];
+    my $response_r = _sendCameraCommand($_camera_rest_client, 'Snap', $snap_r, $_camera_login_token); # response is not JSON but binary JPG image data for the snapshot
+    if(defined($response_r)){
+        return $response_r;
+    }else{
+        return undef;
+    } # if
+} # Snap()
+
+# Reboot() - reboot the camera, on return must IPCamera::Reolink->new() to access the camera 
+sub Reboot($){
+    my($self) = @_;
+    if(!_checkLoginLeaseTime($self)){
+        return 0;
+    } # if
+    my $reboot_r = [ {cmd => "Reboot", } ];
+    my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
+    my $response_r = _sendCameraCommand($_camera_rest_client, 'Reboot', $reboot_r, $_camera_login_token);
+    if(defined($response_r)){
+        return 1;
+    }else{
+        return 0;
+    } # if
+} # Reboot()
+
+# AudioAlarmPlay() - play audio alarm
+sub AudioAlarmPlay($$$$$){
+    my($self, $channel, $manual_switch, $num_times, $alarm_mode) = @_;
+    if(!_checkLoginLeaseTime($self)){
+        return 0;
+    } # if
+    my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
+    my $audioalarmplay_r = [ {cmd => "AudioAlarmPlay", action => 0, param => { channel => int($channel), manual_switch => int($manual_switch), times => int($num_times), alarm_mode => $alarm_mode }} ];
+    my $response_r = _sendCameraCommand($_camera_rest_client, 'AudioAlarmPlay', $audioalarmplay_r, $_camera_login_token);
+    if(defined($response_r)){
+        return 1;
+    }else{
+        return 0;
+    } # if
+} # AudioAlarmPlay()
 =pod
 
 =encoding UTF-8
@@ -343,7 +501,7 @@ IPCamera::Reolink - Reolink API provides access to the System, Security, Network
 
 =head1 VERSION
 
-1.02
+1.03
 
 =head1 SYNOPSIS
 
@@ -354,6 +512,8 @@ IPCamera::Reolink - Reolink API provides access to the System, Security, Network
  my $camera_password = 'this-is-a-bad-password';
 
  my $camera = IPCamera::Reolink->new($camera_url, $camera_user_name, $camera_password);
+ # or
+ # my $camera = IPCamera::Reolink->new( {camera_url => $camera_url_http, camera_user_name => $camera_user_name, camera_password => $camera_password, camera_x509_certificate_file => undef, camera_x509_key_file => undef, camera_certificate_authority_file => undef, })
 
  # Optionally Login to the camera immmediately to validate the camera URL and credentials, otherwise a Login will be implicitly performed by the API on the first camera command.
 
@@ -365,6 +525,18 @@ IPCamera::Reolink - Reolink API provides access to the System, Security, Network
  print "Camera model : " . $devinfo_r->{model} . "\n";
  print "Camera name : " . $devinfo_r->{name} . "\n";
 
+ # Camera presets
+
+ my($ptzpreset_value_r, $ptzpreset_range_r, $ptzpreset_initial_r) = $camera->GetPtzPreset(IPCamera::Reolink::ChannelDefault);
+ my $ptzpresets_r = $ptzpreset_value_r->{PtzPreset};
+ foreach my $ptzpreset (@$ptzpresets_r){
+     my $enable = $ptzpreset->{enable};
+     if($enable){
+         my $preset_id = $ptzpreset->{id};
+         $camera->PtzCtrl(IPCamera::Reolink::ChannelDefault, IPCamera::Reolink::PTZ_ToPos, IPCamera::Reolink::PTZ_SpeedMax, $preset_id);
+     } # if
+ } # foreach
+
  # Start a camera pan to the left.
 
  $camera->PtzCtrl(IPCamera::Reolink::ChannelDefault, IPCamera::Reolink::PTZ_Left, IPCamera::Reolink::PTZ_SpeedMax);
@@ -372,6 +544,26 @@ IPCamera::Reolink - Reolink API provides access to the System, Security, Network
  # Times passes, stop the last camera PTZ function.
 
  $camera->PtzCtrl(IPCamera::Reolink::ChannelDefault, IPCamera::Reolink::PTZ_Stop, IPCamera::Reolink::PTZ_SpeedMin);
+
+ # Camera snapshot
+ 
+ my $jpg_image_data = $camera->Snap(IPCamera::Reolink::ChannelDefault);
+ die "IPCamera::Reolink::Snap() failed\n" if(!defined($jpg_image_data));
+
+ my $now = time();
+ my($sec, $min, $hour, $dd, $mon, $yr, $wday, $yday, $isdst) = localtime($now);
+ ($dd < 10) && ($dd = "0" . $dd);
+ my $mm = $mon + 1;
+ ($mm < 10) && ($mm = "0" . $mm);
+ ($hour < 10) && ($hour = "0" . $hour);
+ my $yyyy = $yr + 1900;
+
+ my $file_name = sprintf("%04d%02d%02d-%2s%02d%02d.jpg", $yyyy, $mm, $dd, $hour, $min, $sec);
+ my $fh;
+ open $fh, ">$file_name" || die("open($file_name) failed - $!");
+ my $l = length($jpg_image_data);
+ (syswrite($fh, $jpg_image_data, $l) == $l) || die("syswrite($file_name, $l) failed - $!\n");
+ close($fh);
 
  $camera->Logout();
 
@@ -397,11 +589,219 @@ Set I<$IPCamera::Reolink::DEBUG> to a value > 0 for increasingly detailed debug 
 
 default is 0 for no debug output.
 
+=over 4
+
+=item DEBUG = 0
+
+No debug output
+
+=item DEBUG = 1
+
+Log camera REST/JSON requests and responses.
+
+=item DEBUG = 2
+
+Log camera REST/JSON request and response times.
+
+=back
+
 =head2 VERSION
 
 I<$IPCamera::Reolink::VERSION> is the version of this module.
 
+=head2 IPCamera::Reolink::ChannelDefault
+
+I<IPCamera::Reolink::ChannelDefault> is the default Reolink channel (0).
+
+=head2 IPCamera::Reolink::PtzCtrl() op values.
+
+=over 4
+
+=item IPCamera::Reolink::PTZ_Stop 
+
+PTZ stop turning.
+
+=item IPCamera::Reolink::PTZ_Left 
+
+PTZ turn left at the specified speed.
+
+=item IPCamera::Reolink::PTZ_Right 
+
+PTZ turn right at the specified speed.
+
+=item IPCamera::Reolink::PTZ_Up 
+
+PTZ turn up in the specified speed.
+
+=item IPCamera::Reolink::PTZ_Down 
+
+PTZ turn down at the specified speed.
+
+=item IPCamera::Reolink::PTZ_LeftUp 
+
+PTZ turn left-up at the specified speed.
+
+=item IPCamera::Reolink::PTZ_LeftDown 
+
+PTZ turn left-down at the specified speed.
+
+=item IPCamera::Reolink::PTZ_RightUp 
+
+PTZ turn right-up at the specified speed.
+
+=item IPCamera::Reolink::PTZ_RightDown 
+
+PTZ turn right-down at the specified speed.
+
+=item IPCamera::Reolink::PTZ_IrisDec 
+
+Iris shrink at the specified speed.
+
+=item IPCamera::Reolink::PTZ_IrisInc 
+
+Iris enlarge at the specified speed.
+
+=item IPCamera::Reolink::PTZ_ZoomDec 
+
+Zoom in at the specified speed.
+
+=item IPCamera::Reolink::PTZ_ZoomInc 
+
+Zoom out at the specified speed.
+
+=item IPCamera::Reolink::PTZ_FocusDec 
+
+Focus backwards at the specified speed.
+
+=item IPCamera::Reolink::PTZ_FocusInc 
+
+Focus forwards at the specified speed.
+
+=item IPCamera::Reolink::PTZ_Auto 
+
+PTZ turn auto at the specified speed.
+
+=item IPCamera::Reolink::PTZ_StartPatrol 
+
+PTZ patrol at the specified speed.
+
+=item IPCamera::Reolink::PTZ_StopPatrol 
+
+PTZ stop patrol.
+
+=item IPCamera::Reolink::PTZ_ToPos 
+
+PTZ turn to the specified preset at the specified speed.
+
+=back
+
+=head2 IPCamera::Reolink::PtzCtrl() speed values.
+
+=over 4
+
+=item IPCamera::Reolink::PTZ_SpeedMin => 1;
+
+=item IPCamera::Reolink::PTZ_SpeedMax => 64;
+
+=item IPCamera::Reolink::PTZ_SpeedHalf => 32;
+
+=back
+
+=head2 IPCamera::Reolink::PtzCtrl() preset values.
+
+=over 4
+
+=item IPCamera::Reolink::PTZ_PresetMin => 0;
+
+=item IPCamera::Reolink::PTZ_PresetMax => 63;
+
+=back
+
+=head2 IPCamera::Reolink::StartZoomFocus() op ZoomPos values.
+
+=over 4
+
+=item IPCamera::Reolink::ZF_ZoomPosMin => 0;
+
+=item IPCamera::Reolink::ZF_ZoomPosMax => 32;
+
+=back
+
+=head2 IPCamera::Reolink::StartZoomFocus() op FocusPos values.
+
+=over 4
+
+=item IPCamera::Reolink::ZF_FocusPosMin => 0;
+
+=item IPCamera::Reolink::ZF_FocusPosMax => 248;
+
+=back
+
+=head2 IPCamera::Reolink:SetOsd() pos values.
+
+=over 4
+
+=item IPCamera::Reolink::OSD_UpperLeft => "Upper Left";
+
+=item IPCamera::Reolink::OSD_TopCenter => "Top Center";
+
+=item IPCamera::Reolink::OSD_UpperRight => "Upper Right";
+
+=item IPCamera::Reolink::OSD_LowerLeft => "Lower Left";
+
+=item IPCamera::Reolink::OSD_BottomCenter => "Bottom Center";
+
+=item IPCamera::Reolink::OSD_LowerRight => "Lower Right";
+
+=item IPCamera::Reolink::OSD_OtherConfiguration => "Other Configuration";
+
+=back
+
+=head2 IPCamera::Reolink:AudioAlarmPlay() alarm_mode values.
+
+=over 4
+
+=item AAP_AlarmModeTimes => "times"; 
+
+play # times specified by times
+
+=item AAP_AlarmModeManual => "manu"; 
+
+play continuously until next AudioAlarmPlay command
+
+=back
+
+=head2 PTZ_op_list 
+
+I<$IPCamera::Reolink::PTZ_op_list> is the IPCamera::Reolink::PtzCtrl() op values as list.
+
+=head2 PTZ_speed_list 
+
+I<$IPCamera::Reolink::PTZ_speed_list> is the IPCamera::Reolink::PtzCtrl() speed values as list.
+
+=head2 PTZ_preset_list 
+
+I<$IPCamera::Reolink::PTZ_preset_list> is the IPCamera::Reolink::PtzCtrl() preset values as list.
+
+=head2 PTZ_ZoomPos_list 
+
+I<$IPCamera::Reolink::PTZ_ZoomPos_list> is the IPCamera::Reolink::StartZoomFocus() zoom pos values as list.
+
+=head2 PTZ_FocusPos_list 
+
+I<$IPCamera::Reolink::PTZ_FocusPos_list> is the IPCamera::Reolink::StartZoomFocus() focus pos values as list.
+
+=head2 OSD_pos_list 
+
+I<$IPCamera::Reolink::OSD_pos_list> is the IPCamera::Reolink::SetOsd() pos values as list.
+
+=head2 AAP_AlarmMode_list
+
+I<IPCamera::Reolink::AAP_AlarmMode_list> is the IPCamera::Reolink::AudioAlarmPlay() alarm_mode values as list.
+
 =head1 METHODS
+
+=head2 new({camera_url => "http://192.168.1.99/", camera_user_name => "admin", camera_password => "password", camera_x509_certificate_file => undef, camera_x509_key_file => undef, camera_certificate_authority_file => undef, })
 
 =head2 new($camera_url, $camera_user_name, $camera_password)
 
@@ -411,7 +811,7 @@ Takes the following manditory parameters:
 
 =over 4
 
-=item $camera_host_url
+=item $camera_url
 
 The camera URL for access via HTTP(S), i.e. "http://192.168.1.123".
 
@@ -428,6 +828,18 @@ Reolink may fix this in the future.
 =item $camera_password
 
 The camera account password for access via HTTP(S), i.e. "this-is-a-bad-password". 
+
+=item $camera_x509_certificate_file
+
+TBD.
+
+=item $camera_x509_key_file
+
+TBD.
+
+=item $camera_x509_authority_file
+
+TBD.
 
 =back
 
@@ -447,7 +859,7 @@ This should all be invisible to the caller.
 
 =item return
 
-Returns (undef, udef) if the Login was rejected by the camera.
+Returns (undef, undef) if the Login was rejected by the camera.
 
 Returns ($camera_login_token, $camera_login_lease_time) if the Login is successful,
 where $camera_login_token is the token passed to other API methods and $camera_login_lease_time is the time in seconds for which the token is valid, after which a new token must be aquired.
@@ -610,13 +1022,21 @@ Device type.
 
 =back
 
-=head2 PtzCtrl($camera_channel, $camera_operation, $camera_operation_speed)
+=head2 PtzCtrl($camera_channel, $camera_operation, $camera_operation_speed, $camera_preset_id)
 
 Control camera PTZ functions.
 
 Upon successful return the camera asynchronously executes the requested operation until another operation is specified by PtzCtrl() or until the camera limit is reached for the specified operation, for example the camera has tilted as far Down as physically possible.
 
 Some operations like IPCamera::Reolink::PTZ_Left will execute forever until another PtzCtrl command is executed.
+
+=over 4
+
+=item return
+
+Returns 1 if PtzCtrl() succeeded else 0 (zero) on failure, typically due to using non-admin account for admin access operations.
+
+=back
 
 =over 4
 
@@ -740,6 +1160,12 @@ Maximum camera operation speed.
 
 =back
 
+=item $camera_preset_id 
+
+Move camera to specfied camera preset, >= IPCamera::Reolink::PTZ_PresetMin, <= IPCamera::Reolink::PTZ_PresetMax.
+
+Used only for IPCamera::Reolink::PTZ_ToPos camera operation.
+
 =back
 
 =head2 GetZoomFocus($camera_channel)
@@ -800,6 +1226,14 @@ If in doubt, set $DEBUG to 1 and if you see a log message of the form:
 Tue Dec 19 18:17:07 2023: debug: IPCamera::Reolink::_sendCameraCommand(): command 'StartZoomFocus' token '5b34aab0bb481ba' request '[{ action => 0, cmd => "StartZoomFocus", param => { ZoomFocus => { channel => 0, op => "ZoomPos", pos => 1 } } }]' response '[{ cmd => "StartZoomFocus", code => 1, error => { detail => "ability error", rspCode => -26 } }]' time 0.0480499267578125 seconds
 
 then you need to use admin credentials to use this function.
+
+=over 4
+
+=item return
+
+Returns 1 if StartZoomFocus() succeeded else 0 (zero) on failure.
+
+=back
 
 =over 4
 
@@ -1009,6 +1443,14 @@ using admin credentials to use this function.
 
 =over 4
 
+=item return
+
+Returns 1 if SetOsd() succeeded else 0 (zero) on failure.
+
+=back
+
+=over 4
+
 =item $camera_channel 
 
 Perform camera operation on specified camera channel.
@@ -1033,7 +1475,7 @@ If you are connected to an NVR then there is usually one channel per attached ca
 
 Channel OSD text to display
 
-=item $channelPos ("Lower Right") 
+=item $channelPos (IPCamera::Reolink::OSD_UpperLeft) 
 
 Channel OSD text position:
 
@@ -1101,7 +1543,179 @@ OSD position "Lower Right"
 
 =back
 
-=back 
+=back
+
+=head2 GetPtzPreset($camera_channel)
+
+Return camera Ptz Presets.
+
+=over 4
+
+=item $camera_channel 
+
+Perform camera operation on specified camera channel.
+
+=over 4
+
+=item IPCamera::Reolink::ChannelDefault 
+
+If you are connected to a camera then there is (usually) only 1 channel.
+
+=item integer >= 0
+
+If you are connected to an NVR then there is usually one channel per attached camera starting at integer value 0.
+
+=back
+
+=item return
+
+Returns (undef, undef, undef) if the GetPtzPreset() function failed or ($ptzpreset_value_r, $ptzpreset_range_r, $ptzpreset_initial_r) on success, hash references to PTZ Presets current value, range and initial values information if successful, fields most likely subject to change (typical values in parenthesis):
+
+=over 4
+
+=item $ptzpreset_value_r
+
+Hash reference to camera PTZ Preset current values.
+
+=over 4
+
+=item $ptzpreset_value_r->{PtzPreset}
+
+List/array of current presets.
+
+=over 4
+
+=item $ptzpreset_value_r->{PtzPreset}->{channel}
+
+The camera channel as passed into GetPtzPreset() via $camera_channel.
+
+=item $ptzpreset_value_r->{PtzPreset}->{enable}
+
+Boolean, true/1 if the preset is enabled, false/0 if disabled.
+
+=item $ptzpreset_value_r->{PtzPreset}->{id}
+
+Integer preset id, 0 <= id <= 63.
+
+Passed to PtzCtrl() via $preset_id.
+
+=item $ptzpreset_value_r->{PtzPreset}->{imgName}
+
+Preset image name.
+
+=item $ptzpreset_value_r->{PtzPreset}->{name}
+
+Preset name.
+
+=back
+
+=back
+
+=item $ptzpreset_range_r
+
+Hash reference to camera PTZ Preset ranges.
+
+=item $ptzpreset_initial_r
+
+Hash reference to camera PTZ Preset initial values.
+
+=back
+
+=back
+
+=head2 Snap($camera_channel)
+
+Return camera snapshot.
+
+=over 4
+
+=item $camera_channel 
+
+Perform camera operation on specified camera channel.
+
+=over 4
+
+=item IPCamera::Reolink::ChannelDefault 
+
+If you are connected to a camera then there is (usually) only 1 channel.
+
+=item integer >= 0
+
+If you are connected to an NVR then there is usually one channel per attached camera starting at integer value 0.
+
+=back
+
+=item return
+
+Returns raw/binary snapshot data in JPG format or undef if the Snap() function failed.
+
+=back
+
+=head2 Reboot() 
+
+Reboot the camera, on successful return must reestablish the IPCamera::Reolink session.
+
+=over 4
+
+=item return
+
+Returns 1 if the camera is rebooted else 0.
+
+Upon successful return the connection to the camera is lost and new session must be established.
+
+=back
+
+=head2 AudioAlarmPlay()
+
+Play audio alarm.
+
+=over 
+
+=item $camera_channel 
+
+Perform camera operation on specified camera channel.
+
+=over 4
+
+=item IPCamera::Reolink::ChannelDefault 
+
+If you are connected to a camera then there is (usually) only 1 channel.
+
+=item integer >= 0
+
+If you are connected to an NVR then there is usually one channel per attached camera starting at integer value 0.
+
+=back
+
+=item $manual_switch 
+
+if $alarm_mode is AAP_AlarmModeManual then set tp 1 to play alarm or 0 to stop alarm.
+
+=item $num_times 
+
+Number of times to play audio alarm, > 0.
+
+=item $alarm_mode
+
+IPCamera::Reolink::AudioAlarmPlay() alarm_mode values.
+
+=over 4
+
+=item AAP_AlarmModeTimes
+
+Play specified # of times.
+
+=item AAP_AlarmModeManual
+
+Play continuously until next AudioAlarmPlay command.
+
+=back
+
+=item return
+
+Returns 1 if audio alarm played else 0.
+
+=back
 
 =head1 TODO
 

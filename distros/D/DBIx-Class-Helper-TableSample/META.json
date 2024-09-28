@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "tablesample",
       "sampling",
@@ -51,7 +51,7 @@
             "Ref::Util::XS" : "0"
          },
          "requires" : {
-            "DBIx::Class::ResultSet" : "0",
+            "DBIx::Class" : "0",
             "Ref::Util" : "0",
             "namespace::clean" : "0",
             "perl" : "v5.14.0"
@@ -65,6 +65,7 @@
             "Class::Load" : "0",
             "DBD::SQLite" : "0",
             "DBIx::Class::Core" : "0",
+            "DBIx::Class::ResultSet" : "0",
             "DBIx::Class::Schema" : "0",
             "File::Spec" : "0",
             "Module::Metadata" : "0",
@@ -81,7 +82,7 @@
    "provides" : {
       "DBIx::Class::Helper::TableSample" : {
          "file" : "lib/DBIx/Class/Helper/TableSample.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.7.0"
       }
    },
    "release_status" : "stable",
@@ -95,10 +96,10 @@
          "web" : "https://github.com/robrwo/-DBIX-Class-Helper-TableSample"
       }
    },
-   "version" : "v0.6.0",
+   "version" : "v0.7.0",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

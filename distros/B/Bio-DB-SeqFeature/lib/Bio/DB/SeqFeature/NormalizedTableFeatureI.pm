@@ -1,5 +1,5 @@
 package Bio::DB::SeqFeature::NormalizedTableFeatureI;
-$Bio::DB::SeqFeature::NormalizedTableFeatureI::VERSION = '1.7.4';
+$Bio::DB::SeqFeature::NormalizedTableFeatureI::VERSION = '1.7.5';
 
 =head1 NAME
 

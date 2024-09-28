@@ -18,7 +18,7 @@ use Feature::Compat::Try;
 use Future::AsyncAwait;
 use Sublike::Extended; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-package Sys::Async::Virt v0.0.5;
+package Sys::Async::Virt v0.0.6;
 
 use parent qw(IO::Async::Notifier);
 
@@ -30,21 +30,25 @@ use Scalar::Util qw(reftype weaken);
 use Protocol::Sys::Virt::Remote::XDR v10.3.7;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Sys::Async::Virt::Domain v0.0.5;
-use Sys::Async::Virt::DomainCheckpoint v0.0.5;
-use Sys::Async::Virt::DomainSnapshot v0.0.5;
-use Sys::Async::Virt::Network v0.0.5;
-use Sys::Async::Virt::NetworkPort v0.0.5;
-use Sys::Async::Virt::NwFilter v0.0.5;
-use Sys::Async::Virt::NwFilterBinding v0.0.5;
-use Sys::Async::Virt::Interface v0.0.5;
-use Sys::Async::Virt::StoragePool v0.0.5;
-use Sys::Async::Virt::StorageVol v0.0.5;
-use Sys::Async::Virt::NodeDevice v0.0.5;
-use Sys::Async::Virt::Secret v0.0.5;
+use Protocol::Sys::Virt::Remote v10.3.7;
+use Protocol::Sys::Virt::Transport v10.3.7;
 
-use Sys::Async::Virt::Callback v0.0.5;
-use Sys::Async::Virt::Stream v0.0.5;
+use Sys::Async::Virt::Connection::Factory v0.0.6;
+use Sys::Async::Virt::Domain v0.0.6;
+use Sys::Async::Virt::DomainCheckpoint v0.0.6;
+use Sys::Async::Virt::DomainSnapshot v0.0.6;
+use Sys::Async::Virt::Network v0.0.6;
+use Sys::Async::Virt::NetworkPort v0.0.6;
+use Sys::Async::Virt::NwFilter v0.0.6;
+use Sys::Async::Virt::NwFilterBinding v0.0.6;
+use Sys::Async::Virt::Interface v0.0.6;
+use Sys::Async::Virt::StoragePool v0.0.6;
+use Sys::Async::Virt::StorageVol v0.0.6;
+use Sys::Async::Virt::NodeDevice v0.0.6;
+use Sys::Async::Virt::Secret v0.0.6;
+
+use Sys::Async::Virt::Callback v0.0.6;
+use Sys::Async::Virt::Stream v0.0.6;
 
 use constant {
     CLOSE_REASON_ERROR                                 => 0,
@@ -894,10 +898,15 @@ sub new {
         node_device_factory       => \&_node_device_factory,
         secret_factory            => \&_secret_factory,
 
-        on_stream => $args{on_stream},
+        url        => $args{url},
+        connection => $args{connection},
+        transport  => $args{transport},
+        remote     => $args{remote},
+        factory    => $args{factory},
+        keepalive  => $args{keepalive},
+        on_stream  => $args{on_stream},
     }, $class;
 
-    $self->register( $args{remote} ) if $args{remote};
     return $self;
 }
 
@@ -1004,7 +1013,7 @@ sub _secret_instance {
 extended async sub _call($self, $proc, $args = {}, :$unwrap = '', :$stream = '', :$empty = '') {
     my $serial = await $self->{remote}->call( $proc, $args );
     my $f = $self->loop->new_future;
-    $log->trace( "Setting serial $serial future" );
+    $log->trace( "Setting serial $serial future (proc: $proc)" );
     $self->{_replies}->{$serial} = $f;
     ### Return a stream somehow...
     my @rv = await $f;
@@ -1076,6 +1085,7 @@ sub _dispatch_message($self, %args) {
 
 sub _dispatch_reply {
     my ($self, %args) = @_;
+    $log->trace( "Dispatching serial $args{header}->{serial}" );
     my $f = delete $self->{_replies}->{$args{header}->{serial}};
 
     if (exists $args{data}) {
@@ -1129,6 +1139,52 @@ sub register {
         );
     $self->{remote} = $r;
 }
+
+
+async sub _pump($conn, $transport) {
+    my $eof;
+    my $data;
+    while (not $eof) {
+        my ($len, $type) = $transport->need;
+        $log->trace( "Reading data from connection: initiated (len: $len)" );
+        ($data, $eof) = await $conn->read( $type, $len );
+        $log->trace( 'Reading data from connection: completed' );
+
+        await Future->wait_all( $transport->receive($data) );
+        $log->trace( 'Processed input data from connection' );
+    }
+}
+
+extended async sub connect($self, :$pump = undef) {
+    unless ($self->{connection}) {
+        my $factory =
+            $self->{factory} //= Sys::Async::Virt::Connection::Factory->new;
+        my $conn = $factory->create_connection( $self->{url} );
+        $self->add_child( $conn );
+        $self->{connection} = $conn;
+    }
+
+    unless ($self->{transport}) {
+        my $conn      = $self->{connection};
+        my $transport = Protocol::Sys::Virt::Transport->new(
+            role => 'client',
+            on_send => async sub($opaque, @data) {
+                await $conn->write( @data );
+                return $opaque;
+            });
+        $self->{transport} = $transport;
+    }
+
+    $self->{remote} //= Protocol::Sys::Virt::Remote->new( role => 'client' );
+    $self->{remote}->register( $self->{transport} );
+    $self->register( $self->{remote} );
+
+    await $self->{connection}->connect;
+
+    $pump //= \&_pump;
+    $self->adopt_future( $pump->( $self->{connection}, $self->{transport} ) );
+}
+
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_CALLBACK_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_CALLBACK_DEREGISTER_ANY
@@ -1271,6 +1327,9 @@ async sub open {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK
 async sub close {
     my ($self) = @_;
+    for my $cb (values %{ $self->{_callbacks} }) {
+        await $cb->cancel;
+    }
     await $self->_call( $remote->PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK );
     await $self->_call( $remote->PROC_CONNECT_CLOSE, {} );
 }
@@ -1658,7 +1717,7 @@ async sub network_lookup_by_uuid($self, $uuid) {
 async sub node_get_cpu_stats($self, $cpuNum, $flags = 0) {
     my $nparams = await $self->_call(
         $remote->PROC_NODE_GET_CPU_STATS,
-        { cpuNum => $cpuNum, nparams => 0, flags => $flags // 0 }, 'nparams' );
+        { cpuNum => $cpuNum, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->_call(
         $remote->PROC_NODE_GET_CPU_STATS,
         { cpuNum => $cpuNum, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
@@ -1680,7 +1739,7 @@ async sub node_get_memory_parameters($self, $flags = 0) {
     $flags |= await $self->_typed_param_string_okay();
     my $nparams = await $self->_call(
         $remote->PROC_NODE_GET_MEMORY_PARAMETERS,
-        { nparams => 0, flags => $flags // 0 }, 'nparams' );
+        { nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->_call(
         $remote->PROC_NODE_GET_MEMORY_PARAMETERS,
         { nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
@@ -1689,7 +1748,7 @@ async sub node_get_memory_parameters($self, $flags = 0) {
 async sub node_get_memory_stats($self, $cellNum, $flags = 0) {
     my $nparams = await $self->_call(
         $remote->PROC_NODE_GET_MEMORY_STATS,
-        { nparams => 0, cellNum => $cellNum, flags => $flags // 0 }, 'nparams' );
+        { nparams => 0, cellNum => $cellNum, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->_call(
         $remote->PROC_NODE_GET_MEMORY_STATS,
         { nparams => $nparams, cellNum => $cellNum, flags => $flags // 0 }, unwrap => 'params' );
@@ -1699,7 +1758,7 @@ async sub node_get_sev_info($self, $flags = 0) {
     $flags |= await $self->_typed_param_string_okay();
     my $nparams = await $self->_call(
         $remote->PROC_NODE_GET_SEV_INFO,
-        { nparams => 0, flags => $flags // 0 }, 'nparams' );
+        { nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->_call(
         $remote->PROC_NODE_GET_SEV_INFO,
         { nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
@@ -1904,31 +1963,20 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.5
+v0.0.6
 
 Based on LibVirt tag v10.3.0
 
 =head1 SYNOPSIS
 
+  use IO::Async::Loop;
   use Sys::Async::Virt;
-  use Protocol::Sys::Virt::Remote;
-  use Protocol::Sys::Virt::Transport;
 
-  open my $fh, 'rw', '/run/libvirt/libvirt.sock';
-  my $transport = Protocol::Sys::Virt::Transport->new(
-       role => 'client',
-       on_send => sub { syswrite( $fh, $_ ) for @_ }
-  );
+  my $loop = IO::Async::Loop->new;
+  my $client = Sys::Async::Virt->new(url => 'qemu:///system');
 
-  my $remote = Protocol::Sys::Virt::Remote->new(
-       role => 'client',
-       on_reply => sub { say 'Reply handled!'; },
-  );
-  $remote->register( $transport );
-
-  my $client = Sys::Async::Virt->new();
-  $client->register( $remote );
-
+  $loop->add( $client );
+  await $client->connect;
   await $client->auth( $remote->AUTH_NONE );
   await $client->open( 'qemu:///system' );
 
@@ -2053,13 +2101,23 @@ Returns a L<Sys::Async::Virt::Callback> instance.
 
   $client = Sys::Async::Virt->new( remote => $remote, ... );
 
-Creates a new client instance.  The constructor supports the following arguments:
+Creates a new client instance.  The constructor supports these parameters:
 
 =over 8
+
+=item * C<factory> (optional)
+
+=item * C<connection> (optional)
+
+=item * C<transport> (optional)
 
 =item * C<remote> (optional)
 
 =item * C<keepalive> (optional)
+
+=item * C<url> (optional)
+
+=item * C<on_stream> (optional)
 
 =back
 
@@ -2070,6 +2128,12 @@ Creates a new client instance.  The constructor supports the following arguments
 =head2 register
 
   $client->register( $remote );
+
+=head2 connect
+
+  await $client->connect( $url );
+
+Sets up the transport connection to the server indicated by C<url>.
 
 =head2 auth
 
@@ -3282,8 +3346,8 @@ replies.
 
 =over 8
 
-=item * Talking to servers without the REMOTE_EVENT_CALLBACK feature (v1.3.3)
-  is not - currently - supported
+=item * Talking to servers without the REMOTE_EVENT_CALLBACK feature
+ (v1.3.3 - 2016-04-06) is not - currently - supported
 
 =begin fill-templates
 

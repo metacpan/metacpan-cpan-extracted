@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Domain v0.0.5;
+package Sys::Async::Virt::Domain v0.0.6;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.5;
+use Protocol::Sys::Virt::Remote::XDR v0.0.6;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -808,7 +808,7 @@ async sub block_stats_flags($self, $path, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
     my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_STATS_FLAGS,
-        { dom => $self->{id}, path => $path, nparams => 0, flags => $flags // 0 }, 'nparams' );
+        { dom => $self->{id}, path => $path, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->{client}->_call(
         $remote->PROC_DOMAIN_BLOCK_STATS_FLAGS,
         { dom => $self->{id}, path => $path, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
@@ -908,7 +908,7 @@ async sub get_blkio_parameters($self, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
     my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_BLKIO_PARAMETERS,
-        { dom => $self->{id}, nparams => 0, flags => $flags // 0 }, 'nparams' );
+        { dom => $self->{id}, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_BLKIO_PARAMETERS,
         { dom => $self->{id}, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
@@ -924,7 +924,7 @@ async sub get_block_io_tune($self, $disk, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
     my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_BLOCK_IO_TUNE,
-        { dom => $self->{id}, disk => $disk, nparams => 0, flags => $flags // 0 }, 'nparams' );
+        { dom => $self->{id}, disk => $disk, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_BLOCK_IO_TUNE,
         { dom => $self->{id}, disk => $disk, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
@@ -940,7 +940,7 @@ async sub get_cpu_stats($self, $start_cpu, $ncpus, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
     my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_CPU_STATS,
-        { dom => $self->{id}, nparams => 0, start_cpu => $start_cpu, ncpus => $ncpus, flags => $flags // 0 }, 'nparams' );
+        { dom => $self->{id}, nparams => 0, start_cpu => $start_cpu, ncpus => $ncpus, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_CPU_STATS,
         { dom => $self->{id}, nparams => $nparams, start_cpu => $start_cpu, ncpus => $ncpus, flags => $flags // 0 }, unwrap => 'params' );
@@ -988,7 +988,7 @@ async sub get_interface_parameters($self, $device, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
     my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_INTERFACE_PARAMETERS,
-        { dom => $self->{id}, device => $device, nparams => 0, flags => $flags // 0 }, 'nparams' );
+        { dom => $self->{id}, device => $device, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_INTERFACE_PARAMETERS,
         { dom => $self->{id}, device => $device, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
@@ -1022,7 +1022,7 @@ async sub get_memory_parameters($self, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
     my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_MEMORY_PARAMETERS,
-        { dom => $self->{id}, nparams => 0, flags => $flags // 0 }, 'nparams' );
+        { dom => $self->{id}, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_MEMORY_PARAMETERS,
         { dom => $self->{id}, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
@@ -1044,7 +1044,7 @@ async sub get_numa_parameters($self, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
     my $nparams = await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_NUMA_PARAMETERS,
-        { dom => $self->{id}, nparams => 0, flags => $flags // 0 }, 'nparams' );
+        { dom => $self->{id}, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->{client}->_call(
         $remote->PROC_DOMAIN_GET_NUMA_PARAMETERS,
         { dom => $self->{id}, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
@@ -1573,7 +1573,7 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.0.5
+v0.0.6
 
 =head1 SYNOPSIS
 

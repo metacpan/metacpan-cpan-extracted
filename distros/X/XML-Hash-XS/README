@@ -185,7 +185,7 @@ OPTIONS
     buf_size [ = 4096 ] *# hash2xml+xml2hash*
         Buffer size for reading end encoding data.
 
-    keep_root [ = 0 ] *# xml2hash*
+    keep_root [ = 1 ] *# hash2xml+xml2hash*
         Keep root element.
 
     filter [ = undef ] *# xml2hash*

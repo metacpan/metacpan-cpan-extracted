@@ -467,36 +467,54 @@ EOT
   subtest "global vs default" => sub {
     my $src = <<'EOT';
       section=$(=)
+      x=GLOBAL
+      x_val=$(x)
 
-      [sec A]
-      var 1 = $(section)
-      var 2 := $(section)
+      [local-sec]
+      var_1 := $(section)
+      var_2 = $(section)
+
+      x=LOCAL
+
+      x_1 := $(x_val)
+      x_2 = $(x_val)
 EOT
-    my $obj_gm = Config::INI::RefVars->new(global_mode => 1)->parse_ini(src => $src);
     my $obj_dflt = Config::INI::RefVars->new()->parse_ini(src => $src);
-    is_deeply($obj_gm->variables,
-              {
-               '__TOCOPY__' => {
-                                'section' => '__TOCOPY__'
-                               },
-               'sec A' => {
-                           'var 1' => '__TOCOPY__',
-                           'var 2' => 'sec A'
-                          }
-              },
-              'variables(), global mode');
+    my $obj_gm   = Config::INI::RefVars->new(global_mode => 1)->parse_ini(src => $src);
     is_deeply($obj_dflt->variables,
               {
                '__TOCOPY__' => {
-                                'section' => '__TOCOPY__'
+                                'section' => '__TOCOPY__',
+                                'x' => 'GLOBAL',
+                                'x_val' => 'GLOBAL'
                                },
-               'sec A' => {
-                           'section' => 'sec A',
-                           'var 1' => 'sec A',
-                           'var 2' => 'sec A'
-                          }
+               'local-sec' => {
+                               'section' => 'local-sec',
+                               'var_1' => 'local-sec',
+                               'var_2' => 'local-sec',
+                               'x' => 'LOCAL',
+                               'x_1' => 'LOCAL',
+                               'x_2' => 'LOCAL',
+                               'x_val' => 'LOCAL'
+                              }
               },
-              'variables(), global mode');
+              'variables(), default mode');
+    is_deeply($obj_gm->variables,
+              {
+               '__TOCOPY__' => {
+                                'section' => '__TOCOPY__',
+                                'x' => 'GLOBAL',
+                                'x_val' => 'GLOBAL'
+                               },
+               'local-sec' => {
+                               'var_1' => 'local-sec',
+                               'var_2' => '__TOCOPY__',
+                               'x' => 'LOCAL',
+                               'x_1' => 'LOCAL',
+                               'x_2' => 'GLOBAL'
+                         }
+              },
+              'variables(), global mode; different values for var_2 and ');
   };
 };
 

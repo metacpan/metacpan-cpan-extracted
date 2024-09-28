@@ -36,6 +36,7 @@
             "IO::Socket::SSL" : "0",
             "JSON" : "0",
             "REST::Client" : "0",
+            "String::Random" : "0",
             "Time::HiRes" : "0",
             "constant" : "0",
             "perl" : "5.006",
@@ -50,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.02",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

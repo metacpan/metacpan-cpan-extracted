@@ -1,5 +1,5 @@
 package Bio::DB::SeqFeature::Store;
-$Bio::DB::SeqFeature::Store::VERSION = '1.7.4';
+$Bio::DB::SeqFeature::Store::VERSION = '1.7.5';
 
 =head1 NAME
 
@@ -2711,7 +2711,7 @@ sub coverage_array {
 
 
 package Bio::DB::SeqFeature::Store::FeatureIterator;
-$Bio::DB::SeqFeature::Store::FeatureIterator::VERSION = '1.7.4';
+$Bio::DB::SeqFeature::Store::FeatureIterator::VERSION = '1.7.5';
 sub new {
     my $self     = shift;
     my @features = @_;

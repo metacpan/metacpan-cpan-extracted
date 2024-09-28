@@ -1,5 +1,9 @@
 Revision history for perl module XML::Hash::XS
 
+0.57    2024-09-27
+    - Use "keep_root" option to generate XML via "hash2xml"
+    - Change default value of "keep_root" option to "1"
+
 0.56    2021-02-14
     - Fix XML parsing with file handle
         - Thanks to Rory Zweistra for report

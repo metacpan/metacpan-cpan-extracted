@@ -5,7 +5,7 @@ package DBIx::Class::Helper::TableSample;
 use v5.14;
 use warnings;
 
-use parent 'DBIx::Class::ResultSet';
+use parent 'DBIx::Class';
 
 use Ref::Util qw/ is_plain_arrayref is_plain_hashref is_plain_scalarref /;
 
@@ -13,7 +13,7 @@ use Ref::Util qw/ is_plain_arrayref is_plain_hashref is_plain_scalarref /;
 
 use namespace::clean;
 
-our $VERSION = 'v0.6.0';
+our $VERSION = 'v0.7.0';
 
 
 sub _resolved_attrs {
@@ -68,6 +68,7 @@ sub _resolved_attrs {
 sub tablesample {
     my ( $rs, $frac, $options ) = @_;
     $options //= {};
+    $options = { method => $options } unless is_plain_hashref($options);
     return $rs->search_rs(
         undef,
         {
@@ -94,7 +95,7 @@ DBIx::Class::Helper::TableSample - Add support for tablesample clauses
 
 =head1 VERSION
 
-version v0.6.0
+version v0.7.0
 
 =head1 SYNOPSIS
 
@@ -268,7 +269,9 @@ references.
 
 This is a helper method.
 
-It was added in v0.4.1.
+It was added in v0.4.1, since v0.6.1 you can use a method name instead of an options hash reference:
+
+  my $rs = $schema->resultset('Wobbles')->tablesample( 10, 'system' );
 
 =head1 KNOWN ISSUES
 

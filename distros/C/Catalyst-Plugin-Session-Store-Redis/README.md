@@ -4,7 +4,7 @@ Catalyst::Plugin::Session::Store::Redis - Redis Session store for Catalyst
 
 # VERSION
 
-version 0.900
+version 0.901
 
 # SYNOPSIS
 
@@ -20,6 +20,11 @@ version 0.900
         redis_debug => 0, # or 1!
         redis_reconnect => 0, # or 1
         redis_db => 5, # or 0 by default
+        redis_ssl => 1, # or 0
+        redis_name => 'name',
+        redis_username => 'username', # or default user
+        redis_password => 'password',
+        redis_ssl_verify_mode => SSL_VERIFY_PEER, # IO::Socket::SSL
     };
 
     # ... in an action:
@@ -56,6 +61,40 @@ server was restarted.
 I leave the default of setting at `0` for now because changing it
 might break existing apps.
 
+Do not use this setting with authentication.
+
+### redis\_conservative\_reconnect
+
+Boolean flag. Default: 0, i.e. off.
+
+Use this setting for reconnect with authentication.
+
+### redis\_ssl
+
+Boolean flag. Default: 0, i.e. off.
+
+You can connect to Redis over SSL/TLS by setting this flag if the
+target Redis server or cluster has been setup to support SSL/TLS.
+This requires [IO::Socket::SSL](https://metacpan.org/pod/IO%3A%3ASocket%3A%3ASSL) to be installed on the client. It's off by default.
+
+### redis\_ssl\_verify\_mode
+
+This parameter will be applied when `redis_ssl` flag is set. It sets
+the verification mode for the peer certificate. It's compatible with
+the parameter with the same name in [IO::Socket::SSL](https://metacpan.org/pod/IO%3A%3ASocket%3A%3ASSL).
+
+### redis\_name
+
+Setting a different name for the connection.
+
+### redis\_username
+
+The username for the authentication
+
+### redis\_password
+
+The password, if your Redis server requires authentication.
+
 # NOTES
 
 - **Expired Sessions**
@@ -82,6 +121,7 @@ Thomas Klausner `domm@cpan.org`
 
 - Andreas Granig [https://github.com/agranig](https://github.com/agranig)
 - Mohammad S Anwar [https://github.com/manwar](https://github.com/manwar)
+- Torsten Raudssus [https://github.com/Getty](https://github.com/Getty)
 
 # AUTHOR
 

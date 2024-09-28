@@ -20,4 +20,9 @@ MsOffice::Word::Surgeon::Carp; - custom carping module for MsOffice::Word::Surge
 Used by all modules in MsOffice::Word::Surgeon for ignoring stack frames in
 MsOffice::Word::Surgeon while croaking or carping. See L<Carp::Object>.
 
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2024 by Laurent Dami.
+
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
 

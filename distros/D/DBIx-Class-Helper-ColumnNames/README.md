@@ -4,7 +4,7 @@ DBIx::Class::Helper::ColumnNames - Retrieve column names from a resultset
 
 # VERSION
 
-version v0.1.1
+version v0.1.2
 
 # SYNOPSIS
 
@@ -38,6 +38,8 @@ my @header = $rs->get_column_names;
 This method attempts to return the column names of the resultset.
 
 If no columns are specified using the `columns` or `select` attributes, then it will return the default columns names.
+
+Note that when multiple columns are defined in a hash reference that the order of columns will be non-deterministic.
 
 # CAVEATS
 

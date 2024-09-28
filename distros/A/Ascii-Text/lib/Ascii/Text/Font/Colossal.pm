@@ -1573,7 +1573,7 @@ Ascii::Text::Font::Colossal - Colossal font
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 

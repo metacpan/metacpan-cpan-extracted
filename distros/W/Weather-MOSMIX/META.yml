@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: 5.52_01
   File::ShareDir::Install: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,6 @@ requires:
   DBI: '0'
   DBIx::RunSQL: '0'
   File::ShareDir: '0'
-  Filter::signatures: '0.09'
   HTTP::Tiny: '0'
   IO::Socket::SSL: '1.42'
   JSON: '0'
@@ -39,9 +38,10 @@ requires:
   Time::Piece: '0'
   URI: '0'
   XML::Twig: '0'
+  experimental: '0.032'
   perl: '5.022'
 resources:
   repository: git://github.com/Corion/Weather-MOSMIX.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

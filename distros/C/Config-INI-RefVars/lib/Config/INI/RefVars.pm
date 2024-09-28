@@ -9,7 +9,7 @@ use feature ":5.10";
 use Config;
 use File::Spec::Functions qw(catdir rel2abs splitpath);
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use constant DFLT_TOCOPY_SECTION  => "__TOCOPY__";
 
@@ -290,6 +290,7 @@ sub parse_ini {
     $tocopy_section = $self->{+TOCOPY_SECTION};
   }
   $self->{+CURR_TOCP_SECTION} = $tocopy_section;
+  $Globals{'=TO_CP_SEC'} = $tocopy_section;
   if ($tocopy_vars) {
     $backup->{tocopy_vars} = $self->{+TOCOPY_VARS};
     $self->$_check_tocopy_vars($tocopy_vars, 1);
@@ -521,7 +522,7 @@ Config::INI::RefVars - INI file reader that supports make-style variable referen
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =head1 SYNOPSIS
 
@@ -670,7 +671,7 @@ Section names must be unique.
 
 An INI file does not have to start with a section header, it can also start
 with variable definitions. In this case, the variables are added to the
-I<tocopy section> (default name: C<__TOCOPY__>). You can explicitly specify
+I<tocopy> section (default name: C<__TOCOPY__>). You can explicitly specify
 the I<tocopy> section heading, but then this must be the first active line in
 your INI file.
 
@@ -960,6 +961,10 @@ C<$(var)>.
 
 =over
 
+=item C<=TO_CP_SEC>
+
+Name of the I<tocopy> section, see L</"THE I<TOCOPY> SECTION">.
+
 =item C<=VERSION>
 
 Version of the C<Config::INI::RefVars> module.
@@ -971,7 +976,7 @@ Version of the C<Config::INI::RefVars> module.
 
 Currently, custom predefined variables are not supported. But you can do
 something very similar, see argument C<tocopy_vars> (of C<new> and
-C<parse_ini>), see also L</"THE SECTION I<TOCOPY>">. With this argument you
+C<parse_ini>), see also L</"THE I<TOCOPY> SECTION">. With this argument you
 can also define variables whose names contain a C<=>, which is obviously
 impossible in an INI file.
 
@@ -1016,14 +1021,14 @@ Note: In contrast to C<$(=ENV:...)>, there is no lower-case counterpart to
 C<$(=CONFIG:...)>, as this would not make sense.
 
 
-=head2 THE SECTION I<TOCOPY>
+=head2 THE I<TOCOPY> SECTION
 
 =head3 Default Behavior
 
-If specified, the method C<parse_ini> copies the variables of the section
-I<tocopy> to any other section when the INI file is read (default, this
-behavior can be changed by the constructor argument C<global_mode>).
-For example this
+If specified, the method C<parse_ini> copies the variables of the I<tocopy>
+section (default name: C<__TOCOPY__>) to any other section when the INI file
+is read (default, this behavior can be changed by the constructor argument
+C<global_mode>).  For example this
 
    [__TOCOPY__]
    some var=some value
@@ -1048,7 +1053,14 @@ is exactly the same as this:
    section info=$(=)
 
 Of course, you can change or overwrite a variable copied from the C<tocopy>
-section locally within a section at any time without any side effects.
+section locally within a section at any time without any side effects. In this
+case, you can access the original value as follows:
+
+   $([__TOCOPY__]some var)
+
+or - more generally - like this:
+
+   $([$(=TO_CP_SEC)]some var)
 
 You can exclude variables with the argument C<not_tocopy> from copying
 (methods C<new> and C<parse_ini>), but there is currently no notation to do
@@ -1116,40 +1128,73 @@ But in global mode the result is:
 
 For a local copy of a global variable, use assignment operator C<:=>.
 
-A difference occurs if you use C<$(=)> in a global variable:
+B<NOTE:>
+In some special cases, variables have different values in standard mode than in global mode.
+
 
    section=$(=)
+   x=GLOBAL
+   x_val=$(x)
 
-   [sec A]
-   var 1 = $(section)
-   var 2 := $(section)
+   [local-sec]
+   var_1 := $(section)
+   var_2 = $(section)
 
-In global mode, you will get this:
+   x=LOCAL
 
-   {
-     '__TOCOPY__' => {
-                       'section' => '__TOCOPY__'
-                     },
-     'sec A' => {
-                  'var 1' => '__TOCOPY__',
-                  'var 2' => 'sec A'
-                }
-   }
+   x_1 := $(x_val)
+   x_2 = $(x_val)
 
-But without global mode you will get:
+By default, you will get:
 
    {
      '__TOCOPY__' => {
-                       'section' => '__TOCOPY__'
+                      'section' => '__TOCOPY__',
+                      'x' => 'GLOBAL',
+                      'x_val' => 'GLOBAL'
                      },
-     'sec A' => {
-                  'section' => 'sec A',
-                  'var 1' => 'sec A',
-                  'var 2' => 'sec A'
-                }
+     'local-sec' => {
+                     'section' => 'local-sec',
+                     'var_1' => 'local-sec',
+                     'var_2' => 'local-sec',
+                     'x' => 'LOCAL',
+                     'x_1' => 'LOCAL',
+                     'x_2' => 'LOCAL',
+                     'x_val' => 'LOCAL'
+                    }
    }
 
-Note the difference in the value of C<var 1>!
+But in global mode, the result is:
+
+   {
+     '__TOCOPY__' => {
+                      'section' => '__TOCOPY__',
+                      'x' => 'GLOBAL',
+                      'x_val' => 'GLOBAL'
+                     },
+     'local-sec' => {
+                     'var_1' => 'local-sec',
+                     'var_2' => '__TOCOPY__',
+                     'x' => 'LOCAL',
+                     'x_1' => 'LOCAL',
+                     'x_2' => 'GLOBAL'
+               }
+   }
+
+Note the different values for C<var_2> and C<x_2>.  When the assignment C<x_1
+:= $(x_val)> is reached, the right-hand side is evaluated immediately, so that
+C<$(x_val)> becomes C<$(x)>, which in turn leads to C<LOCAL>, since the
+definition of C<x> in C<[local-sec]> shadows the global C<x>.
+
+In contrast, the value of C<x_2> is evaluated after the file has been
+completely read. This value is C<$(x_val)> and the variable C<x_val> was in
+turn previously evaluated in the global section and has the value C<GLOBAL>,
+which then becomes the value of C<x_2>.
+
+In standard mode, C<x_val=$(x)> is copied to C<[local-sec]> and C<x_2> is
+given the value C<LOCAL> due to the local definition of C<x>.
+
+A corresponding explanation applies to the different values of C<var_2>.
 
 
 =head2 COMMENTS

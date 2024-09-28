@@ -1,9 +1,7 @@
 package Weather::MOSMIX;
 use strict;
 use Moo 2;
-use Filter::signatures;
-use feature 'signatures';
-no warnings 'experimental::signatures';
+use experimental 'signatures';
 use DBI;
 use JSON;
 use DBD::SQLite 1.56; # some virtual table bugfixes
@@ -12,7 +10,7 @@ use Storable 'dclone';
 use Time::Piece;
 use Encode 'encode', 'decode';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 

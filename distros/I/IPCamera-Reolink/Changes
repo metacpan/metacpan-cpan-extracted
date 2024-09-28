@@ -10,4 +10,9 @@ Revision history for IPCamera-Reolink
 1.02    Thu 25 Jan 2024 08:28:04 PM EST
         - added GetChannelstatus(): Return camera/NVR per channel status.
         - tested REST via https, set SSL_verify_mode => SSL_VERIFY_NONE
-
+1.03    Fri 27 Sep 2024 05:32:05 PM EDT
+        - added OPTZ_op_list, OPTZ_speed_list, PTZ_preset_list, PTZ_ZoomPos_list, PTZ_FocusPos_list, OSD_pos_list, AAP_AlarmMode_list for validation of various module parameter values.
+        - added new() method that takes a hash of paraaemter values.
+        - added PTZ_ToPos function to PtzCtrl) to allow camera movement to specified preset.
+        - added GetPtzPreset() method to return list of camera presets.
+        - added Snap() method to capture a JPG image from the camera.

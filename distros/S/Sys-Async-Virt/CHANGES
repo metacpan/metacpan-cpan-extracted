@@ -1,5 +1,17 @@
 -----
 
+
+0.0.6    2024-09-27
+    [Added]
+       * Abstract connection driver and Unix connection driver implementations
+       * Cleanup of callbacks at connection close; also waits for in-progress
+         cancellations (e.g. due to DESTROY) before finishing the connection
+       * Connection establishement now part of Sys::Async::Virt through
+         connect() function
+    [Fixed]
+       * Handling of the 'nparams' argument in network calls
+       * Dependency listing should include 'Sublike::Extended'
+
 0.0.5    2024-09-24
     [Added]
        * Documentation

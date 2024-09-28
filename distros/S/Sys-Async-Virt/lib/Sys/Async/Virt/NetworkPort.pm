@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::NetworkPort v0.0.5;
+package Sys::Async::Virt::NetworkPort v0.0.6;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.5;
+use Protocol::Sys::Virt::Remote::XDR v0.0.6;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -52,7 +52,7 @@ async sub get_parameters($self, $flags = 0) {
     $flags |= await $self->{client}->_typed_param_string_okay();
     my $nparams = await $self->{client}->_call(
         $remote->PROC_NETWORK_PORT_GET_PARAMETERS,
-        { port => $self->{id}, nparams => 0, flags => $flags // 0 }, 'nparams' );
+        { port => $self->{id}, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $self->{client}->_call(
         $remote->PROC_NETWORK_PORT_GET_PARAMETERS,
         { port => $self->{id}, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
@@ -84,7 +84,7 @@ Sys::Async::Virt::NetworkPort - Client side proxy to remote LibVirt network port
 
 =head1 VERSION
 
-v0.0.5
+v0.0.6
 
 =head1 SYNOPSIS
 

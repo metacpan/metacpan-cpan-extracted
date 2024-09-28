@@ -77,10 +77,9 @@ CONFIGURATION
     function.
 
     In this configuration, the custom field Purchase Order ID must be
-    unique, and can accept accept a combination of values. To insert a row
-    with this config, RT must find no existing tickets, and for update RT
-    must only find a single matching row. If neither condition matches, the
-    CSV row is skipped.
+    unique. To insert a row with this config, RT must find no existing
+    tickets, and for update RT must only find a single matching row. If
+    neither condition matches, the CSV row is skipped.
 
   Excluding Existing Tickets By Status
     In the example above, when searching for an existing ticket for a PO, it
@@ -473,8 +472,8 @@ EXAMPLES
 
   Putting it all together: migrating from Zendesk
     It's possible to migrate from Zendesk to Request Tracker using multiple
-    imports defined above. Starting with a Zendesk trial site as a basis,
-    the following steps are necessary before a migration can begin:
+    imports defined above. The following steps are necessary before a
+    migration can begin:
 
     Users must be exported via API
         Unfortunately, Zendesk only provides an export for what RT considers
@@ -486,6 +485,15 @@ EXAMPLES
     Tickets must be exported to CSV
         Any of the default lists of tickets in Zendesk can be exported to
         CSV. See the Zendesk documentation for more information.
+
+    RT Priority field must be customized
+        Zendesk priorities do not align 1:1 with RT's by default. The
+        following can be dropped into your RT configuration to match
+        priorities between the two systems:
+
+            Set(%PriorityAsString,
+                Default => { None => 0, Low => 25, Normal => 50, High => 75, Urgent => 100 },
+            );
 
     Exporting user information via the Zendesk API includes a bunch of
     unnecessary values. For this import, the only columns that matter are
@@ -525,8 +533,12 @@ EXAMPLES
             'Requestor'      => 'Requester',
             'Created'        => 'Requested',
             'LastUpdated'    => 'Updated',
-            'CF.Ticket Type' => 'Topic',
-            'CF.Channel'     => 'Channel',
+            'CF.Topic'       => 'Topic',
+            'Told'           => 'Assignee updated',
+            'Priority'       => sub {
+                my %priority = RT->Config->Get('PriorityAsString');
+                return $priority{ 'Default' }{ ($_[0]->{ 'Priority' }) };
+            },
         );
 
         Set( %CSVOptions, (
@@ -535,8 +547,7 @@ EXAMPLES
            escape_char => '',
         ) );
 
-    (you'll need to create two ticket custom fields: Ticket Type and
-    Channel)
+    (you'll need to create a custom field named Topic)
 
     If tickets were exported to a file named zendesk_tickets.csv, the
     following command will import tickets into your RT instance:

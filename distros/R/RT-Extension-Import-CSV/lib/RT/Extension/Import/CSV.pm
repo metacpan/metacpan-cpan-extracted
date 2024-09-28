@@ -5,7 +5,7 @@ package RT::Extension::Import::CSV;
 use Text::CSV_XS;
 use Test::MockTime 'restore_time';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our( $CurrentRow, $CurrentLine, $UniqueFields );
 
@@ -377,7 +377,7 @@ sub _run_tickets {
         } elsif ($fieldname =~ /^(id|Creator|LastUpdated|Created|Queue|Requestor|Cc|AdminCc|SquelchMailTo|Type|Owner|
             Subject|Priority|InitialPriority|FinalPriority|Status|TimeEstimated|TimeWorked|TimeLeft|Starts|Due|MIMEObj|
             Comment|Correspond|MemberOf|Parents|Parent|Members|Member|Children|Child|HasMember|RefersTo|ReferredToBy|
-            DependsOn|DependedOnBy)$/x) {
+            DependsOn|DependedOnBy|Told)$/x) {
             # no-op, these are fine
         } else {
             $RT::Logger->warning(
@@ -878,6 +878,15 @@ sub _run_tickets {
                 }
             }
 
+            my $told = delete( $args{Told} );
+            if( $told ) {
+                my $date = RT::Date->new( RT->SystemUser );
+                $date->Set( Format => 'unknown', Value => $told );
+                if ( !$date->Unix ) {
+                    RT->Logger->error("Told '$told' is not valid, creating without it");
+                }
+            }
+
             my $status = delete( $args{Status} );
             if ( $status && !$default_queue->LifecycleObj->IsValid($status) ) {
                 if ($force) {
@@ -911,7 +920,6 @@ sub _run_tickets {
             }
 
             my ($ok, $txnobj, $msg) = $ticket->Create( %args );
-
             if ($ok) {
                 $created++;
             } else {
@@ -919,6 +927,13 @@ sub _run_tickets {
                 $skipped++;
                 push @skipped, $item;
                 next ROW;
+            }
+
+            if( $told ) {
+                my $date = RT::Date->new( RT->SystemUser );
+                $date->Set( Format => 'unknown', Value => $told );
+                ($ok, $msg) = $ticket->__Set( Field => 'Told', Value => $date->ISO );
+                $RT::Logger->error("Failed to set Told on ticket: $msg") unless $ok;
             }
 
             if ($status && $status ne $ticket->Status) {
@@ -1373,16 +1388,15 @@ the basic functionality of the CSV importer:
         'Subject'              => 'name',
     );
 
-When creating a column mapping, the value to the left of C<=>> is
+When creating a column mapping, the value to the left of C<< => >> is
 the RT field name, and to the right is the column name in the CSV
 file. CSV files to be imported B<must> have a header line for the
 mapping to function.
 
 In this configuration, the custom field C<Purchase Order ID> must be
-unique, and can accept accept a combination of values. To insert a row
-with this config, RT must find no existing tickets, and for update RT
-must only find a single matching row. If neither condition matches, the
-CSV row is skipped.
+unique. To insert a row with this config, RT must find no existing
+tickets, and for update RT must only find a single matching row. If
+neither condition matches, the CSV row is skipped.
 
 =head2 Excluding Existing Tickets By Status
 
@@ -1798,8 +1812,8 @@ You need to add C<--article-class> when running the import:
 =head2 Putting it all together: migrating from Zendesk
 
 It's possible to migrate from Zendesk to Request Tracker using multiple
-imports defined above. Starting with a Zendesk trial site as a basis, the
-following steps are necessary before a migration can begin:
+imports defined above. The following steps are necessary before a
+migration can begin:
 
 =over
 
@@ -1813,6 +1827,16 @@ API. See L<this forum post|https://support.zendesk.com/hc/en-us/articles/4408882
 
 Any of the default lists of tickets in Zendesk can be exported to CSV.
 See the Zendesk documentation for more information.
+
+=item RT Priority field must be customized
+
+Zendesk priorities do not align 1:1 with RT's by default. The following
+can be dropped into your RT configuration to match priorities between
+the two systems:
+
+    Set(%PriorityAsString,
+        Default => { None => 0, Low => 25, Normal => 50, High => 75, Urgent => 100 },
+    );
 
 =back
 
@@ -1855,8 +1879,12 @@ configuration:
         'Requestor'      => 'Requester',
         'Created'        => 'Requested',
         'LastUpdated'    => 'Updated',
-        'CF.Ticket Type' => 'Topic',
-        'CF.Channel'     => 'Channel',
+        'CF.Topic'       => 'Topic',
+        'Told'           => 'Assignee updated',
+        'Priority'       => sub {
+            my %priority = RT->Config->Get('PriorityAsString');
+            return $priority{ 'Default' }{ ($_[0]->{ 'Priority' }) };
+        },
     );
 
     Set( %CSVOptions, (
@@ -1865,7 +1893,7 @@ configuration:
        escape_char => '',
     ) );
 
-(you'll need to create two ticket custom fields: Ticket Type and Channel)
+(you'll need to create a custom field named Topic)
 
 If tickets were exported to a file named F<zendesk_tickets.csv>, the
 following command will import tickets into your RT instance:

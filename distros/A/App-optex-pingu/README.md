@@ -15,11 +15,11 @@ command, see ["SEE ALSO"](#see-also) section.  All honor for this idea should go
 to the original author.
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-light.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu4-light.png">
 </div>
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-dark.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu4-dark.png">
 </div>
 
 This module is a quite good example to demonstrate [optex(1)](http://man.he.net/man1/optex) command
@@ -39,9 +39,11 @@ features.
     order.
 
         ./pingu
+        ./pingu.asc4
         ./pingu.asc2
         ./pingu.asc
         module-dir/pingu
+        module-dir/pingu.asc4
         module-dir/pingu.asc2
         module-dir/pingu.asc
 
@@ -107,10 +109,6 @@ features.
 
     `pingu.asc2`:
 
-         ...        .     ...   ..    ..     .........           
-         ...        .     ...   ..    ..     .........           
-         ...     ....          ..  ..      ... .....  .. ..      
-         ...     ....          ..  ..      ... .....  .. ..      
          ...    .......      ...         ... . .....  kkkkk      
          ...    .......      kkkkkkk     ... . ..... kkkkkkk     
         .....  ........ . kkkkkkkkkkkkk .....  ...  kkkkkkkkk.  .
@@ -141,14 +139,52 @@ features.
                kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWkkkkkkkk  .         
               kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWkkkkk .            
              kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWkk   .            
-             kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWW   ........       
-            kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWW  ........       
-          .kkkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWWWW    .........    
-          .kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWWWW   .........    
-         .kkkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWWWWWW       .... . . 
-         .kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWWWWW       .... . . 
 
-Other file format is not supported yet.
+    <div>
+            <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-light.png">
+    </div>
+
+    <div>
+            <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-dark.png">
+    </div>
+
+- ASCII4 (`.asc4`)
+
+    Each pixel is made by four blocks, with each color represented by 2x2
+    characters.
+
+    `pingu.asc4`:
+
+        ............            kkkkkkkkkkkkkk          ......  ..  ..........   k
+        ............  ..  kkkkkkkkkkkkkkkkkkkkkkkkkk  ..........    ......    kkkk
+        ............  kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk........    ......  kkkkkk
+        ..........  kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk  ..    ......  kkkkkkkk
+        ..........kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk..    ...... kkkkkkkkk
+        ........ kkkkkkwwwwwwkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk........  kkkkkkkkkk
+        ........kkkkkwwwwwwwwwwkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk....... kkkkkkkkkkk
+        ...... kkkkkwwwwKKKKwwwwkkkkkkkkkkkkkkkkkkkkkwwwwwwkkkkk......kkkkkkkkkkkk
+        ......kkkkkkwwwwKKKKwwwwkkkkkkkkkkkkkkkkkkkwwwwwwwwwwkkkk.....kkkkkkkkkkkk
+        ......kkkkkkkwwwwwwwwwwkkkkkkkkkkkkkkkkkkkwwwwKKKKwwwwkkk ..  .kkkkkkkkkkk
+        ......kkkkkkkkkwwwwwwkkkkkkkrrrrrrrrkkkkkkwwwwKKKKwwwwkkkk..  ..kkkkkkkkkk
+               kkkkkkkkkkkkkkkkkrrrrrrrrrrrrrrrrkkkwwwwwwwwwwkkkkk      ..kkkkkkkk
+               kkkkkkkkkkkkkkkrrrrrrrrrrrrrrrrrrrrkkkwwwwwwkkkkkkk      ..  kkkkkk
+              ..kkkkkkkkkkkkkkrrrrrrrrrrrrrrrrrrrrkkkkkkkkkkkkkkk.           kkkkk
+              ..  kkkkkkkkkkkkkkrrrrrrrrrrrrrrrrkkkkkkkkkkkkkkkk..            kkkk
+                ..  kkkkkkkkkkkkkkkkrrrrrrrrkkkkkkkkkkkkkkkkkkk.               kkk
+                ..    kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk ..                kk
+            ....  ..    kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk ..  ..            ..kk
+            ....  .. kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk    ..  ..            .kkk
+                  kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk    ..            .. kkk
+               kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk  ..            ..kkkk
+        ..  kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkyyyyyykkkkkkkkkk      ....     kkkkk
+        ..kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkyyyyyyWWWWWWWWkkkkkkkkk   ....   kkkkkkk
+        kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkyyyyWWWWWWWWWWWWWWkkkkkkkkkk     kkkkkkkkk
+        kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkyyyyWWWWWWWWWWWWWWWWWWkkkkkkkkkkkkkkkkkkkkkk
+        kkkkkkkkkkkkkkkkkkkkkkkkkkkkyyyyWWWWWWWWWWWWWWWWWWWWWWkkkkkkkkkkkkkkkkkkkk
+        kkkkkkkkkkkkkkkkkkkkkkkkkkyyyyWWWWWWWWWWWWWWWWWWWWWWWWWWkkkkkkkkkkkkkkkk  
+        kkkkkkkkkkkkkkkkkkkkkkkkkyyyWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWkkkkkkkkkkk ..  
+        kkkkkkkkkkkkkkkkkkkkkkkkyyyWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWkkkkkk    ..  
+        kkkkkkkkkkkkkkkkkkkkkkkyyyWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWkkk  ........
 
 Coloring is done by [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap) module.  See its document
 for detail.

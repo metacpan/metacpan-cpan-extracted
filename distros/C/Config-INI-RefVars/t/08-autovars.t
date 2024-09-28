@@ -16,9 +16,10 @@ sub test_data_file { catfile(qw(t 08-data), $_[0]) }
 
 my $Dir_Sep = catdir("", "");
 my $VERSION = $Config::INI::RefVars::VERSION;
-my %Global = ('=:'        => $Dir_Sep,
-              '=::'       => $Config{path_sep},
-              '=VERSION'  => $VERSION,
+my %Global = ('=:'         => $Dir_Sep,
+              '=::'        => $Config{path_sep},
+              '=VERSION'   => $VERSION,
+              '=TO_CP_SEC' => '__TOCOPY__',
              );
 
 sub exp_sec_1 {

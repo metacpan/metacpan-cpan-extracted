@@ -1,5 +1,5 @@
 package Bio::DB::SeqFeature::Store::memory;
-$Bio::DB::SeqFeature::Store::memory::VERSION = '1.7.4';
+$Bio::DB::SeqFeature::Store::memory::VERSION = '1.7.5';
 =head1 NAME
 
 Bio::DB::SeqFeature::Store::memory -- In-memory implementation of Bio::DB::SeqFeature::Store
@@ -750,7 +750,7 @@ sub _seq_ids {
 }
 
 package Bio::DB::SeqFeature::Store::memory::Iterator;
-$Bio::DB::SeqFeature::Store::memory::Iterator::VERSION = '1.7.4';
+$Bio::DB::SeqFeature::Store::memory::Iterator::VERSION = '1.7.5';
 sub new {
   my ($class, $store, $ids) = @_;
   return bless {store => $store,

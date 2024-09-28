@@ -1,6 +1,6 @@
 package App::optex::pingu;
 
-my $VERSION = '1.00';
+my $VERSION = '1.01';
 
 use v5.24;
 use warnings;
@@ -28,13 +28,13 @@ to the original author.
 
 =begin html
 
-<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-light.png">
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu4-light.png">
 
 =end html
 
 =begin html
 
-<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-dark.png">
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu4-dark.png">
 
 =end html
 
@@ -57,9 +57,11 @@ string C<pingu> is specified, module search the file in the following
 order.
 
     ./pingu
+    ./pingu.asc4
     ./pingu.asc2
     ./pingu.asc
     module-dir/pingu
+    module-dir/pingu.asc4
     module-dir/pingu.asc2
     module-dir/pingu.asc
 
@@ -142,10 +144,6 @@ in the lower half, with each color represented by two lines of data.
 
 C<pingu.asc2>:
 
-     ...        .     ...   ..    ..     .........           
-     ...        .     ...   ..    ..     .........           
-     ...     ....          ..  ..      ... .....  .. ..      
-     ...     ....          ..  ..      ... .....  .. ..      
      ...    .......      ...         ... . .....  kkkkk      
      ...    .......      kkkkkkk     ... . ..... kkkkkkk     
     .....  ........ . kkkkkkkkkkkkk .....  ...  kkkkkkkkk.  .
@@ -176,17 +174,58 @@ C<pingu.asc2>:
            kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWkkkkkkkk  .         
           kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWkkkkk .            
          kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWkk   .            
-         kkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWW   ........       
-        kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWW  ........       
-      .kkkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWWWW    .........    
-      .kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWWWW   .........    
-     .kkkkkkkkkkkkkkkkyyWWWWWWWWWWWWWWWWWWWWW       .... . . 
-     .kkkkkkkkkkkkkkkkyWWWWWWWWWWWWWWWWWWWWWW       .... . . 
 
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-light.png">
+
+=end html
+
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-pingu/refs/heads/main/images/pingu2-dark.png">
+
+=end html
+
+=item ASCII4 (C<.asc4>)
+
+Each pixel is made by four blocks, with each color represented by 2x2
+characters.
+
+C<pingu.asc4>:
+
+    ............            kkkkkkkkkkkkkk          ......  ..  ..........   k
+    ............  ..  kkkkkkkkkkkkkkkkkkkkkkkkkk  ..........    ......    kkkk
+    ............  kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk........    ......  kkkkkk
+    ..........  kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk  ..    ......  kkkkkkkk
+    ..........kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk..    ...... kkkkkkkkk
+    ........ kkkkkkwwwwwwkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk........  kkkkkkkkkk
+    ........kkkkkwwwwwwwwwwkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk....... kkkkkkkkkkk
+    ...... kkkkkwwwwKKKKwwwwkkkkkkkkkkkkkkkkkkkkkwwwwwwkkkkk......kkkkkkkkkkkk
+    ......kkkkkkwwwwKKKKwwwwkkkkkkkkkkkkkkkkkkkwwwwwwwwwwkkkk.....kkkkkkkkkkkk
+    ......kkkkkkkwwwwwwwwwwkkkkkkkkkkkkkkkkkkkwwwwKKKKwwwwkkk ..  .kkkkkkkkkkk
+    ......kkkkkkkkkwwwwwwkkkkkkkrrrrrrrrkkkkkkwwwwKKKKwwwwkkkk..  ..kkkkkkkkkk
+           kkkkkkkkkkkkkkkkkrrrrrrrrrrrrrrrrkkkwwwwwwwwwwkkkkk      ..kkkkkkkk
+           kkkkkkkkkkkkkkkrrrrrrrrrrrrrrrrrrrrkkkwwwwwwkkkkkkk      ..  kkkkkk
+          ..kkkkkkkkkkkkkkrrrrrrrrrrrrrrrrrrrrkkkkkkkkkkkkkkk.           kkkkk
+          ..  kkkkkkkkkkkkkkrrrrrrrrrrrrrrrrkkkkkkkkkkkkkkkk..            kkkk
+            ..  kkkkkkkkkkkkkkkkrrrrrrrrkkkkkkkkkkkkkkkkkkk.               kkk
+            ..    kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk ..                kk
+        ....  ..    kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk ..  ..            ..kk
+        ....  .. kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk    ..  ..            .kkk
+              kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk    ..            .. kkk
+           kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk  ..            ..kkkk
+    ..  kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkyyyyyykkkkkkkkkk      ....     kkkkk
+    ..kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkyyyyyyWWWWWWWWkkkkkkkkk   ....   kkkkkkk
+    kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkyyyyWWWWWWWWWWWWWWkkkkkkkkkk     kkkkkkkkk
+    kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkyyyyWWWWWWWWWWWWWWWWWWkkkkkkkkkkkkkkkkkkkkkk
+    kkkkkkkkkkkkkkkkkkkkkkkkkkkkyyyyWWWWWWWWWWWWWWWWWWWWWWkkkkkkkkkkkkkkkkkkkk
+    kkkkkkkkkkkkkkkkkkkkkkkkkkyyyyWWWWWWWWWWWWWWWWWWWWWWWWWWkkkkkkkkkkkkkkkk  
+    kkkkkkkkkkkkkkkkkkkkkkkkkyyyWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWkkkkkkkkkkk ..  
+    kkkkkkkkkkkkkkkkkkkkkkkkyyyWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWkkkkkk    ..  
+    kkkkkkkkkkkkkkkkkkkkkkkyyyWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWkkk  ........
 
 =back
-
-Other file format is not supported yet.
 
 Coloring is done by L<Getopt::EX::Colormap> module.  See its document
 for detail.
@@ -322,7 +361,7 @@ sub get_image {
 	first { -s }
 	map {
 	    my $dir = $_;
-	    map { "${dir}${name}$_" } '', '.asc2', '.asc';
+	    map { "${dir}${name}$_" } '', '.asc4', '.asc2', '.asc';
 	} '', "$image_dir/";
     };
     die "$name: image file not found.\n" unless $file;

@@ -7,7 +7,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK);
 use base 'Exporter';
 @EXPORT_OK = @EXPORT = qw( hash2xml xml2hash );
 
-$VERSION = '0.56';
+$VERSION = '0.57';
 
 require XSLoader;
 XSLoader::load('XML::Hash::XS', $VERSION);
@@ -32,7 +32,7 @@ $canonical      = 0;
 $use_attr       = 0;
 $content        = undef;
 $xml_decl       = 1;
-$keep_root      = 0;#
+$keep_root      = 1;
 $doc            = 0;
 $max_depth      = 1024;
 $buf_size       = 4096;
@@ -260,7 +260,7 @@ Maximum recursion depth.
 
 Buffer size for reading end encoding data.
 
-=item keep_root [ = 0 ] I<# xml2hash>
+=item keep_root [ = 1 ] I<# hash2xml+xml2hash>
 
 Keep root element.
 

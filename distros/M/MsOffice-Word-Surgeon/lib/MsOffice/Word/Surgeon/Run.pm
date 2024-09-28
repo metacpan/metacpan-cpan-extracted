@@ -7,7 +7,7 @@ use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level);
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.07';
+our $VERSION = '2.08';
 
 #======================================================================
 # ATTRIBUTES
@@ -207,7 +207,6 @@ Laurent Dami, E<lt>dami AT cpan DOT org<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019-2022 by Laurent Dami.
+Copyright 2019-2024 by Laurent Dami.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.

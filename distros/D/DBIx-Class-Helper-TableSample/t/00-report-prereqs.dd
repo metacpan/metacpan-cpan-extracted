@@ -27,7 +27,7 @@ do { my $x = {
                                         'Ref::Util::XS' => '0'
                                       },
                       'requires' => {
-                                      'DBIx::Class::ResultSet' => '0',
+                                      'DBIx::Class' => '0',
                                       'Ref::Util' => '0',
                                       'namespace::clean' => '0',
                                       'perl' => 'v5.14.0'
@@ -41,6 +41,7 @@ do { my $x = {
                                    'Class::Load' => '0',
                                    'DBD::SQLite' => '0',
                                    'DBIx::Class::Core' => '0',
+                                   'DBIx::Class::ResultSet' => '0',
                                    'DBIx::Class::Schema' => '0',
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',

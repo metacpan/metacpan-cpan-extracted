@@ -16,13 +16,13 @@ use experimental 'signatures';
 use Feature::Compat::Try;
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Callback v0.0.5;
+package Sys::Async::Virt::Callback v0.0.6;
 
 use Carp qw(croak);
 use Future::Queue;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.5;
+use Protocol::Sys::Virt::Remote::XDR v0.0.6;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 sub new {
@@ -43,12 +43,14 @@ async sub next_event($self) {
 }
 
 async sub cancel($self) {
-    return if $self->{cancelled};
+    return if ($self->{cancelled}
+               and $self->{cancelled}->is_ready);
+    return await $self->{cancelled} if $self->{cancelled};
 
-    $self->{cancelled} = 1;
-    await $self->{client}->_call(
+    $self->{cancelled} = $self->{client}->_call(
         $self->{deregister_call},
         { callbackID => $self->{id} });
+    await $self->{cancelled};
 
     $self->{queue}->finish;
     delete $self->{client}->{_callbacks}->{$self->{id}};
@@ -82,7 +84,7 @@ Sys::Async::Virt::Callback - Client side proxy to remote LibVirt event source
 
 =head1 VERSION
 
-v0.0.5
+v0.0.6
 
 =head1 SYNOPSIS
 

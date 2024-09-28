@@ -5,7 +5,7 @@ package DBIx::Class::Helper::ColumnNames;
 use v5.20;
 use warnings;
 
-use parent 'DBIx::Class::ResultSet';
+use parent 'DBIx::Class';
 
 use Ref::Util qw( is_plain_hashref is_ref );
 
@@ -15,7 +15,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::clean;
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 
 sub get_column_names ($self) {
@@ -23,8 +23,8 @@ sub get_column_names ($self) {
 
     state sub _get_name ($col) {
         if ( is_plain_hashref($col) ) {
-            my ($name) = keys $col->%*;
-            return $name;
+            my (@names) = grep { $_ !~ /^\-/ } keys $col->%*;
+            return @names;
         }
         else {
             die "Cannot determine column name from a reference" if is_ref($col);
@@ -59,7 +59,7 @@ DBIx::Class::Helper::ColumnNames - Retrieve column names from a resultset
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
 
 =head1 SYNOPSIS
 
@@ -89,6 +89,8 @@ HTML table or to export as a spreadsheet, for example.
 This method attempts to return the column names of the resultset.
 
 If no columns are specified using the C<columns> or C<select> attributes, then it will return the default columns names.
+
+Note that when multiple columns are defined in a hash reference that the order of columns will be non-deterministic.
 
 =head1 CAVEATS
 

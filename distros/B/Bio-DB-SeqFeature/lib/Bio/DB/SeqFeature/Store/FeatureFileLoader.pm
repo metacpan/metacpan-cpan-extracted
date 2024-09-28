@@ -1,5 +1,5 @@
 package Bio::DB::SeqFeature::Store::FeatureFileLoader;
-$Bio::DB::SeqFeature::Store::FeatureFileLoader::VERSION = '1.7.4';
+$Bio::DB::SeqFeature::Store::FeatureFileLoader::VERSION = '1.7.5';
 
 =head1 NAME
 

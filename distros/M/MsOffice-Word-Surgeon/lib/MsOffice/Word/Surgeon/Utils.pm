@@ -7,7 +7,7 @@ use Exporter    qw/import/;
 
 our @EXPORT = qw/maybe_preserve_spaces is_at_run_level parse_attrs decode_entities encode_entities/;
 
-our $VERSION = '2.07';
+our $VERSION = '2.08';
 
 sub maybe_preserve_spaces {
   my ($txt) = @_;
@@ -112,3 +112,10 @@ Decodes XML entities within the supplied string (in-place decoding).
   encode_entities($string)
 
 Encodes XML entities within the supplied string (in-place encoding).
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2019-2024 by Laurent Dami.
+
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.

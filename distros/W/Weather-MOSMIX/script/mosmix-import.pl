@@ -9,7 +9,7 @@ use File::Temp 'tempfile';
 
 use Getopt::Long;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 GetOptions(
     'create'  => \my $create,
