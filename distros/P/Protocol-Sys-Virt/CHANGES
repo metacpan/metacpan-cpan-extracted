@@ -1,5 +1,24 @@
 -----
 
+10.3.11   2024-09-28
+    [Fixed]
+        * parse_url 'bare' URLs should have their components URI encoded
+        * 'host' URL component should not be required (but is) in parse_url
+        * Undeclared variable '$type'
+    [Changed]
+        * parse_url now parses URLs as specified by https://libvirt.org/uri.html
+    [Added]
+        * Tests for parse_url
+        * Tests asserting code loads correctly
+
+10.3.10   2024-09-28
+    [Fixed]
+        * Package name of URI parser incorrect
+
+10.3.9   2024-09-28
+    [Added]
+        * Parser of LibVirt URIs
+
 10.3.8   2024-09-22
     [Added]
         * Added handling of streams

@@ -9,7 +9,7 @@ App::Codit::Plugins::Snippets - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.05;
+$VERSION = 0.10;
 
 use Carp;
 
@@ -36,12 +36,13 @@ Then it is opened in a new tab.
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_, 'ToolPanel');
+	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 	
 	$self->{CURRENT} = undef;
-	my $tp = $self->extGet('ToolPanel');
-	my $page = $tp->addPage('Snippets', 'insert-text', undef, 'Snippets');
+#	my $tp = $self->extGet('ToolPanel');
+#	my $page = $tp->addPage('Snippets', 'insert-text', undef, 'Snippets');
+	my $page = $self->ToolRightPageAdd('Snippets', 'insert-text', undef, 'Snippets');
 
 	my @padding = (-padx => 2, -pady => 2);
 
@@ -106,12 +107,6 @@ sub new {
 	return $self;
 }
 
-sub _current {
-	my $self = shift;
-	$self->{CURRENT} = shift if @_;
-	return $self->{CURRENT}
-}
-
 sub _list {
 	return $_[0]->{LIST}
 }
@@ -120,12 +115,18 @@ sub _text {
 	return $_[0]->{TEXT}
 }
 
+sub current {
+	my $self = shift;
+	$self->{CURRENT} = shift if @_;
+	return $self->{CURRENT}
+}
+
 sub listSelect {
 	my ($self, $item) = @_;
 	croak "Item not defined" unless defined $item;
-	my $cur = $self->_current;
+	my $cur = $self->current;
 	$self->snippetSave if defined $cur;
-	$self->_current($item);
+	$self->current($item);
 	$self->snippetLoad;
 }
 
@@ -140,7 +141,7 @@ sub listRefresh {
 	my $l = $self->_list;
 	$l->deleteAll;
 	$self->snippetSave;
-	$self->_current(undef);
+	$self->current(undef);
 	$self->_text->clear;
 	while (my $i = readdir($dh)) {
 		next if $i eq '.';
@@ -167,7 +168,7 @@ sub snippetAdd {
 
 sub snippetClipboard {
 	my $self = shift;
-	my $cur = $self->_current;
+	my $cur = $self->current;
 	return unless defined $cur;
 	my $text = $self->snippetGet;
 	$self->clipboardClear;
@@ -176,7 +177,7 @@ sub snippetClipboard {
 
 sub snippetCopy {
 	my $self = shift;
-	my $sel = $self->_current;
+	my $sel = $self->current;
 	return unless defined $sel;
 	my $text = $self->snippetGet;
 	my $new = $self->snippetDialog;
@@ -218,7 +219,7 @@ sub snippetDelete {
 		'Ok', 'Cancel'
 	);
 	if ($button eq 'Ok') {
-		$self->_current(undef);
+		$self->current(undef);
 		unlink $file;
 		$self->listRefresh;
 	}
@@ -238,14 +239,14 @@ sub snippetGet {
 
 sub snippetInsert {
 	my $self = shift;
-	my $cur = $self->_current;
+	my $cur = $self->current;
 	return unless defined $cur;
 	$self->cmdExecute('edit_insert', 'insert', $self->snippetGet);
 }
 
 sub snippetLoad {
 	my ($self, $item) = @_;
-	$item = $self->_current unless defined $item;
+	$item = $self->current unless defined $item;
 	return unless defined $item;
 	my $txt = $self->_text;
 	$txt->clear;
@@ -262,7 +263,7 @@ sub snippetNew {
 
 sub snippetSave {
 	my ($self, $item) = @_;
-	$item = $self->_current unless defined $item;
+	$item = $self->current unless defined $item;
 	return unless defined $item;
 	my $txt = $self->_text;
 	$txt->save($self->snippetsFolder . "/$item")
@@ -278,7 +279,8 @@ sub snippetsFolder {
 sub Unload {
 	my $self = shift;
 	$self->snippetSave;
-	$self->extGet('ToolPanel')->deletePage('Snippets');
+	$self->ToolRightPageRemove('Snippets');
+#	$self->extGet('ToolPanel')->deletePage('Snippets');
 	return $self->SUPER::Unload
 }
 

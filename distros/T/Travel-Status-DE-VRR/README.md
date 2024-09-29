@@ -85,7 +85,6 @@ pkg-config and a C compiler) installed. You will also need the following
 libraries with development headers:
 
 * libssl
-* libxml2
 * zlib
 
 Now, use a tool of your choice to install the module. Minimum working example:

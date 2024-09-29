@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Blast::Database;
 # ABSTRACT: Internal class for BLAST driver
-$Bio::MUST::Drivers::Blast::Database::VERSION = '0.210160';
+$Bio::MUST::Drivers::Blast::Database::VERSION = '0.242720';
 use Moose;
 use namespace::autoclean;
 
@@ -11,7 +11,6 @@ use Carp;
 
 extends 'Bio::FastParsers::Base';
 
-# TODO: warn user that we need to build db with -parse_seqids
 
 has 'type' => (
     is       => 'ro',
@@ -28,12 +27,29 @@ has 'remote' => (
 
 with 'Bio::MUST::Drivers::Roles::Blastable';
 
-# TODO: complete this with list of NCBI databases
-# http://ncbiinsights.ncbi.nlm.nih.gov/2013/03/19/\
-# blastdbinfo-api-access-to-a-database-of-blast-databases/
-my %type_for = (            # cannot be made constant to allow undefined keys
-    nt => 'nucl',
-    nr => 'prot',
+# http://ncbiinsights.ncbi.nlm.nih.gov/2013/03/19/blastdbinfo-api-access-to-a-database-of-blast-databases/
+# updated with ChatGPT in Sept 2024
+my %type_for = (
+    core_nt        => 'nucl',   # Core nucleotide database (streamlined version of nt)
+    nt             => 'nucl',   # Non-redundant nucleotide sequences
+    refseq_rna     => 'nucl',   # RefSeq RNA sequences
+    refseq_genomic => 'nucl',   # RefSeq genomic sequences
+    pdbnt          => 'nucl',   # Nucleotide sequences from the Protein Data Bank (PDB)
+    env_nt         => 'nucl',   # Non-redundant environmental nucleotide sequences
+    '16SMicrobial' => 'nucl',   # 16S ribosomal RNA sequences (bacteria and archaea)
+    pat            => 'nucl',   # Nucleotide sequences from patents
+    tsa_nr         => 'nucl',   # Transcriptome Shotgun Assembly nucleotide sequences
+    wgs            => 'nucl',   # Whole Genome Shotgun contigs
+    est            => 'nucl',   # Expressed Sequence Tags
+    metagenomes    => 'nucl',   # Metagenomic nucleotide sequences
+    sra            => 'nucl',   # Sequence Read Archive
+    swissprot      => 'prot',   # Swiss-Prot manually curated protein sequences
+    nr             => 'prot',   # Non-redundant protein sequences
+    refseq_protein => 'prot',   # RefSeq protein sequences
+    refseq_select  => 'prot',   # Streamlined RefSeq, one representative transcript per gene
+    pdbaa          => 'prot',   # Protein sequences from the PDB
+    env_nr         => 'prot',   # Non-redundant environmental protein sequences
+    pataa          => 'prot',   # Protein sequences from patents
 );
 
 sub BUILD {
@@ -71,7 +87,7 @@ Bio::MUST::Drivers::Blast::Database - Internal class for BLAST driver
 
 =head1 VERSION
 
-version 0.210160
+version 0.242720
 
 =head1 SYNOPSIS
 

@@ -27,7 +27,7 @@ for my $term (sort @valid_terms) {
     ok $suffix, 'have suffix';
 
     my (undef, $testoutput) = tempfile('pdl_graphics_gnuplot_test_aa_XXXXXXX',
-      SUFFIX => $suffix);
+      SUFFIX => $suffix, UNLINK => 1);
 
     my $x = zeroes(50)->xlinvals(0, 7);
     my $w = gpwin($term, output => $testoutput, aa => 2);

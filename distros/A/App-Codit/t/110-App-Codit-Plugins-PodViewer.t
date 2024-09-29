@@ -29,6 +29,7 @@ if (defined $app) {
 }
 push @tests, (
 	[ sub {
+		pause(400);
 		$pext->plugLoad('PodViewer');
 		pause(400);
 		my $b = $pext->plugGet('PodViewer');

@@ -1,11 +1,12 @@
 requires 'Carp';
 requires 'Class::Accessor';
 requires 'DateTime';
+requires 'DateTime::Format::Strptime';
 requires 'Getopt::Long';
+requires 'JSON';
 requires 'List::Util';
 requires 'LWP::UserAgent';
 requires 'LWP::Protocol::https';
-requires 'XML::LibXML';
 
 on test => sub {
 	requires 'File::Slurp';

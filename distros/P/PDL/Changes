@@ -1,3 +1,17 @@
+2.093 2024-09-29
+- PDL.set_datatype now doesn't physicalise input, PDL.convert_type does
+- new_around_datasv now sets nbytes and ALLOCATED
+- [xyz]{lin,log}vals now works with dim-length of one
+- minmax skips NaNs entirely, so now works with leading NaN
+- add Transform::Cartography::clean_lines options: orange, filter_nan
+- Transform::Proj4 captures projection information at build not runtime
+- move Stats::diff to Ufunc::diffover
+- remove t_raster2float and t_raster2fits, add raster2fits
+- IO::GD add OO to_rpic for ndarrays (3,x,y) if truecolour, y=0 at bottom, like rpic
+- IO::GD stop read_true_png segfaulting with non-true PNG
+- IO::Pic use IO::GD for JPEG if available, helps Windows with no NetPBM
+- Primitive::matmult handle bad values, treating like NaN
+
 2.092 2024-09-07
 - add Type::howbig
 - restore ABI (https://github.com/moocow-the-bovine/PDL-VectorValued/issues/10 https://github.com/PDLPorters/PDL-Stats/issues/33) - thanks @sebastic for report

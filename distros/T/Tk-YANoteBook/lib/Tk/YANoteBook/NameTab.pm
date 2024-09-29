@@ -3,7 +3,7 @@ package Tk::YANoteBook::NameTab;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.08';
 
 use Tk;
 use base qw(Tk::Derived Tk::Frame);
@@ -14,6 +14,12 @@ sub Populate {
 	
 	my $closebutton = delete $args->{'-closebutton'};
 	$closebutton = 0 unless defined $closebutton;
+
+	my $padx = delete $args->{'-tpadx'};
+	$padx = 1 unless defined $padx;
+
+	my $pady = delete $args->{'-tpady'};
+	$pady = 1 unless defined $pady;
 
 	my $closeimage;
 	if ($closebutton) {
@@ -27,8 +33,8 @@ sub Populate {
 		-side => 'left',
 		-expand => 1,
 		-fill => 'both',
-		-padx => 2,
-		-pady => 6,
+		-padx => $padx,
+		-pady => $pady,
 	);
 	$self->Advertise('Label' => $l);
 
@@ -50,8 +56,8 @@ sub Populate {
 			-highlightthickness => 0,
 		)->pack(
 			-side => 'right',
-			-padx => 2,
-			-pady => 2,
+			-padx => 1,
+			-pady => 1,
 		);
 		$b->bind('<Motion>', [$self, 'ItemMotion', $b, Ev('x'), Ev('y')]);
 	}

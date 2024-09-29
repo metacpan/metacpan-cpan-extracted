@@ -170,7 +170,7 @@ sub identity {
     my @dims = $n->dims;
     $out = zeroes($n->type, @dims[0, 0, 2..$#dims]);
   }
-  (my $tmp = $out->diagonal(0,1))++; # work around perl -d "feature"
+  $out->diagonal(0,1)++;
   $was_pdl ? bless $out, ref($n) : $out;
 }
 
@@ -195,12 +195,11 @@ Return a diagonal matrix with the specified diagonal elements
 sub stretcher {
   my $in = shift;
   my $out = zeroes($in->dim(0),$in->dims);
-  my $tmp;  # work around for perl -d "feature"
-  ($tmp = $out->diagonal(0,1)) += $in;
+  $out->diagonal(0,1) += $in;
   $out;
 }
 
-#line 190 "matrixops.pd"
+#line 189 "matrixops.pd"
 
 =head2 inv
 
@@ -294,7 +293,7 @@ sub inv {
   $x;
 }
 
-#line 290 "matrixops.pd"
+#line 289 "matrixops.pd"
 
 =head2 det
 
@@ -348,7 +347,7 @@ sub det {
   defined $lu ? $lu->diagonal(0,1)->prodover * $par : PDL->zeroes(sbyte,1);
 }
 
-#line 349 "matrixops.pd"
+#line 348 "matrixops.pd"
 
 =head2 determinant
 
@@ -430,7 +429,7 @@ sub determinant {
 
   return $sum;
 }
-#line 434 "MatrixOps.pm"
+#line 433 "MatrixOps.pm"
 
 
 =head2 eigens_sym
@@ -688,7 +687,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 686 "matrixops.pd"
+#line 685 "matrixops.pd"
 
 =head2 lu_decomp
 
@@ -845,9 +844,7 @@ sub lu_decomp {
             $sl2 = $permute->index($col);
             $tmpval .= $sl1; $sl1 .= $sl2; $sl2 .= $tmpval;
 
-            { my $tmp;
-               ($tmp = $parity->where($wh>0)) *= -1.0;
-            }
+            $parity->where($wh>0) *= -1.0;
          }
 
          # LAPACK cgetrf does not try fix singularity so nor do we, even though NR does
@@ -863,7 +860,7 @@ sub lu_decomp {
    wantarray ? ($out,$permute,$parity) : $out;
 }
 
-#line 865 "matrixops.pd"
+#line 862 "matrixops.pd"
 
 =head2 lu_decomp2
 
@@ -971,8 +968,7 @@ sub lu_decomp2 {
     # Figure a_ij, with no pivoting
     if($col < $n1) {
       # Divide the rest of the column by the diagonal element
-      my $tmp; # work around for perl -d "feature"
-      ($tmp = $out->slice("($col),".($col+1).":$n1")) /= $diagonal->index($col)->dummy(0,$n1-$col);
+      $out->slice("($col),".($col+1).":$n1") /= $diagonal->index($col)->dummy(0,$n1-$col);
     }
 
   } # end of column loop
@@ -980,7 +976,7 @@ sub lu_decomp2 {
   wantarray ? ($out,$perm,$par) : $out;
 }
 
-#line 987 "matrixops.pd"
+#line 983 "matrixops.pd"
 
 =head2 lu_backsub
 
@@ -1177,26 +1173,21 @@ BROADCAST_OK:
 
    for $row(1..$n1) {
       $r1 = $row-1;
-      my $tmp; # work around perl -d "feature
-      ($tmp = $out->index($row)) -= ($lu->slice("0:$r1,$row") *
+      $out->index($row) -= ($lu->slice("0:$r1,$row") *
          $out->slice("0:$r1")
       )->sumover;
    }
 
    ## Do backward substitution into U, and normalize by the diagonal
    my $ludiag = $lu->diagonal(0,1);
-   {
-      my $tmp; # work around for perl -d "feature"
-      ($tmp = $out->index($n1)) /= $ludiag->index($n1)->dummy(0);        # TODO: check broadcasting
-   }
+   $out->index($n1) /= $ludiag->index($n1)->dummy(0); # TODO: check broadcasting
 
    for ($row=$n1; $row>0; $row--) {
       $r1 = $row-1;
-      my $tmp; # work around for perl -d "feature"
-      ($tmp = $out->index($r1)) -= ($lu->slice("$row:$n1,$r1") *                  # TODO: check broadcast dims
+      $out->index($r1) -= ($lu->slice("$row:$n1,$r1") * # TODO: check broadcast dims
          $out->slice("$row:$n1")
       )->sumover;
-      ($tmp = $out->index($r1)) /= $ludiag->index($r1)->dummy(0);        # TODO: check broadcast dims
+      $out->index($r1) /= $ludiag->index($r1)->dummy(0); # TODO: check broadcast dims
    }
 
    if ($y->is_inplace) {
@@ -1205,7 +1196,7 @@ BROADCAST_OK:
    }
    $out;
 }
-#line 1209 "MatrixOps.pm"
+#line 1200 "MatrixOps.pm"
 
 
 =head2 simq
@@ -1429,7 +1420,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1395 "matrixops.pd"
+#line 1386 "matrixops.pd"
 
 =head1 AUTHOR
 
@@ -1441,7 +1432,7 @@ itself.  If this file is separated from the PDL distribution, then the
 PDL copyright notice should be included in this file.
 
 =cut
-#line 1445 "MatrixOps.pm"
+#line 1436 "MatrixOps.pm"
 
 # Exit with OK status
 

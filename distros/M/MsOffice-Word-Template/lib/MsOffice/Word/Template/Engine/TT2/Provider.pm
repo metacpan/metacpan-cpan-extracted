@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base 'Template::Provider';
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 
 sub _template_content {
@@ -69,6 +69,5 @@ Laurent Dami, E<lt>dami AT cpan DOT org<gt>
 
 Copyright 2024 by Laurent Dami.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
 

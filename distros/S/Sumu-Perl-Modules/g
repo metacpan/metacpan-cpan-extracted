@@ -1,0 +1,139 @@
+#!/usr/bin/sh
+
+#
+DATE=$(date '+%Y%m%d%H%M%S%Z');
+
+DATE02=$(date '+%Y-%m-%d %H:%M:%S %Z');
+
+# NNN+1
+NEXT_COMMIT_ID=`./get_commit_id.pl`;
+
+# get Next version
+NEXT_VERSION=`./get_next_version_number.pl`;
+
+# NNN
+CURRENT_COMMIT_ID=`./get_current_commit_id.pl`;
+
+# get NNN to N.N.N
+CURRENT_VERSION=`./get_current_version_number.pl`;
+
+COMMIT_MESSAGE=;
+
+YAMLNAME=`./get_val_from_name.pl YAML_NAME`;
+
+APP_NAME=`./get_val_from_name.pl APP_NAME`;
+
+VISITS_FILE="./$APP_NAME.visits";
+
+VERSION_FILE="./$APP_NAME.version";
+
+TOTAL=`cat $VISITS_FILE`;
+
+
+if [ "$1" = '' ]; then
+
+    # do not commit
+        # just show status/log/etc.
+
+    COMMIT_MESSAGE=$DATE;
+
+    echo "Showing last commit from log"
+    git log --oneline -5
+
+    echo "Show Status"
+    git status
+
+else
+    # if $1 is not empty, commit
+
+    COMMIT_MESSAGE="$1";
+
+    # update service-worker.js
+    sed -i "s/$CURRENT_COMMIT_ID/$NEXT_COMMIT_ID/" public/assets/service-worker.js;
+
+    # change version in .yml
+    sed -i "s/version: '$CURRENT_COMMIT_ID'/version: '$NEXT_COMMIT_ID'/" ./$YAMLNAME;
+
+    # Replace --version-- in dist.ini
+    sed -i "s/version = $CURRENT_VERSION/version = $NEXT_VERSION/" ./dist.ini;
+
+    # our $VERSION = '0.1.5';
+    sed -i "s/our \$VERSION = '$CURRENT_VERSION'/our \$VERSION = '$NEXT_VERSION'/" ./lib/Sumu/Perl/Modules.pm;
+
+    # write to CHANGELOG
+    echo "$DATE02\n\tCommit ID: Old $CURRENT_COMMIT_ID | New $NEXT_COMMIT_ID\n\tVersion ID: Old $CURRENT_VERSION | New $NEXT_VERSION\n\n" >> CHANGELOG;
+
+    # write to README.md
+    echo "#### $DATE02\n\n\tCommit ID: Old $CURRENT_COMMIT_ID | New $NEXT_COMMIT_ID\n\tVersion ID: Old $CURRENT_VERSION | New $NEXT_VERSION\n\n" >> README.md;
+
+    # write to DEVELOPER.md
+    echo "#### $DATE02\n\nCommit ID: Old $CURRENT_COMMIT_ID | New $NEXT_COMMIT_ID\nVersion ID: Old $CURRENT_VERSION | New $NEXT_VERSION\n\n" >> DEVELOPER.md;
+
+    echo ""
+    
+    # also push to repo automatically.
+    echo "Push/update Git Lab Repo"
+
+    if [ -f ./r ]; then
+        echo "hypnotoad hot deployment"
+        ./r
+    else
+        echo "./r not found";
+    fi
+
+    echo "$!";
+
+    echo ""
+
+    # also run hypnotoad hot deployment
+
+    if [ -f ./h ]; then
+        echo "hypnotoad hot deployment"
+        ./h
+    else
+        echo "./h not found";
+    fi
+
+    echo "$!";
+
+    echo ""
+
+    echo "/$CURRENT_COMMIT_ID/$NEXT_COMMIT_ID/";
+
+    echo ""
+
+    echo "$NEXT_COMMIT_ID|$DATE" > $VERSION_FILE;
+
+        # 
+    echo "Committing Message"
+    git commit -am "$NEXT_COMMIT_ID $COMMIT_MESSAGE $(date '+%Y%m%d%H%M%S') $CURRENT_COMMIT_ID";
+
+    echo "$!"
+
+fi
+
+echo "";
+
+#echo "Latest Version number from $YAMLNAME ";
+#grep -r 'version' $YAMLNAME;
+#echo "";
+
+#echo "Latest Version number from service-worker.js ";
+#grep -r 'version' ./public/assets/service-worker.js;
+#echo "";
+
+echo "Latest version number from the actual 'app.version' file ";
+cat $VERSION_FILE;
+echo "";
+
+#echo "Total Visits: (From $VISITS_FILE)";
+#echo "$TOTAL";
+#echo "";
+
+echo "Total Commits";
+git rev-list --count --all; 
+echo "";
+
+#echo "$DATE";
+#echo ""
+

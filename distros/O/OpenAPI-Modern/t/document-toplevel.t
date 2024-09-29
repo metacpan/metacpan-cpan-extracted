@@ -352,7 +352,7 @@ ERRORS
   cmp_deeply([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
   is($doc->json_schema_dialect, 'https://spec.openapis.org/oas/3.1/dialect/base', 'default jsonSchemaDialect is saved in the document');
 
-  $js->add_schema($doc);
+  $js->${$JSON::Schema::Modern::VERSION < 0.591 ? \'add_schema' : \'add_document'}($doc);
   cmp_deeply(
     $js->{_resource_index},
     superhashof({
@@ -415,7 +415,7 @@ ERRORS
   cmp_deeply([], [ map $_->TO_JSON, $doc->errors ], 'no errors with a custom jsonSchemaDialect');
   is($doc->json_schema_dialect, 'https://mymetaschema', 'custom jsonSchemaDialect is saved in the document');
 
-  $js->add_schema($doc);
+  $js->${$JSON::Schema::Modern::VERSION < 0.591 ? \'add_schema' : \'add_document'}($doc);
   cmp_deeply(
     $js->{_resource_index},
     superhashof({

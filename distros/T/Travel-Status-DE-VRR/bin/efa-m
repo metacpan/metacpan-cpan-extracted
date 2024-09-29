@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '2.02';
+our $VERSION = '3.00';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -16,13 +16,23 @@ use Travel::Status::DE::EFA;
 my $service = 'VRR';
 my $efa_url;
 my $efa_encoding;
+my $use_cache = 1;
+my $cache;
 my ( $date,        $time, $input_type, $list_lines, $offset, $relative_times );
-my ( $full_routes, $filter_via );
+my ( $full_routes, $filter_via, $show_jid );
 my ( $timeout,     $developer_mode );
 my ( @grep_lines,  @grep_platforms, @grep_mots );
 my ( %edata,       @edata_pre );
 my ( $list_services, $discover_and_print, $discover );
 my $efa;
+
+my %occupancy_map = (
+	MANY_SEATS    => '.',
+	FEW_SEATS     => 'o',
+	STANDING_ONLY => '*',
+	FULL          => '!',
+	unknown       => '?',
+);
 
 @ARGV = map { decode( 'UTF-8', $_ ) } @ARGV;
 
@@ -31,6 +41,7 @@ GetOptions(
 	'd|date=s'                      => \$date,
 	'D|discover'                    => \$discover,
 	'h|help'                        => sub { show_help(0) },
+	'j|with-jid'                    => \$show_jid,
 	'l|line=s@'                     => \@grep_lines,
 	'L|linelist'                    => \$list_lines,
 	'list'                          => \$list_services,
@@ -45,6 +56,7 @@ GetOptions(
 	'u|efa-url=s'                   => \$efa_url,
 	'v|via=s'                       => \$filter_via,
 	'V|track-via=s'                 => \$filter_via,
+	'cache!'                        => \$use_cache,
 	'version'                       => \&show_version,
 	'devmode'                       => \$developer_mode,
 
@@ -58,22 +70,48 @@ if ( @ARGV < 1 or @ARGV > 2 ) {
 	show_help(1);
 }
 
+if ($use_cache) {
+	my $cache_path = ( $ENV{XDG_CACHE_HOME} // "$ENV{HOME}/.cache" )
+	  . '/Travel-Status-DE-EFA';
+	eval {
+		require Cache::File;
+		$cache = Cache::File->new(
+			cache_root      => $cache_path,
+			default_expires => '90 seconds',
+			lock_level      => Cache::File::LOCK_LOCAL(),
+		);
+	};
+	if ($@) {
+		$cache = undef;
+	}
+}
+
 # --line=foo,bar support
 @edata_pre      = split( qr{,}, join( q{,}, @edata_pre ) );
 @grep_lines     = split( qr{,}, join( q{,}, @grep_lines ) );
 @grep_mots      = split( qr{,}, join( q{,}, @grep_mots ) );
 @grep_platforms = split( qr{,}, join( q{,}, @grep_platforms ) );
 
-my ( $place, $input );
+my ( $place, $input, $stopseq );
 
 if ( @ARGV == 1 ) {
-	$input = $ARGV[0];
+	if ( $ARGV[0] =~ m{ ^ ([^@]*) @ ([^@]*) [(] ([^)]*) [)] (.*)  $ }x ) {
+		$stopseq = {
+			stateless => $1,
+			stop_id   => $2,
+			date      => $3,
+			key       => $4
+		};
+	}
+	else {
+		$input = $ARGV[0];
+	}
 }
 else {
 	( $place, $input ) = @ARGV;
 }
 
-if ( $input =~ s{ ^ (?<type> address|poi|stop|stopID) : }{}x ) {
+if ( $input and $input =~ s{ ^ (?<type> address|poi|stop|stopID) : }{}x ) {
 	$input_type = $+{type};
 }
 
@@ -111,12 +149,14 @@ sub new_efa {
 	my $res = Travel::Status::DE::EFA->new(
 		service        => $s,
 		efa_url        => $u,
+		cache          => $cache,
 		date           => $date,
 		developer_mode => $developer_mode,
 		efa_encoding   => $efa_encoding,
 		full_routes    => $full_routes,
 		place          => $place,
 		name           => $input,
+		stopseq        => $stopseq,
 		time           => $time,
 		type           => $input_type,
 		timeout        => $timeout,
@@ -136,8 +176,10 @@ sub show_help {
 
 sub show_services {
 	printf( "%-45s %-14s %s\n\n", 'service', 'abbr. (-s)', 'url (-u)' );
-	for my $service ( Travel::Status::DE::EFA::get_efa_urls() ) {
-		printf( "%-45s %-14s %s\n", @{$service}{qw(name shortname url)} );
+	for my $shortname ( Travel::Status::DE::EFA::get_service_ids() ) {
+		my $service = Travel::Status::DE::EFA::get_service($shortname);
+		printf( "%-45s %-14s %s\n",
+			$service->{name}, $shortname, $service->{url} );
 	}
 
 	exit 0;
@@ -167,36 +209,45 @@ sub format_route {
 			say 'BUG';
 			next;
 		}
+		my $occupancy
+		  = $stop->occupancy ? format_occupancy( $stop->occupancy ) : q{ };
 		if ( defined $stop->arr and defined $stop->dep ) {
 			if ( $stop->arr->epoch == $stop->dep->epoch ) {
 				$output .= sprintf(
-					"    %5s      %40s %s\n",
+					"    %5s      %s %40s %s\n",
 					$stop->arr->strftime('%H:%M'),
-					$stop->name, $stop->platform,
+					$occupancy, $stop->full_name, $stop->platform,
 				);
 			}
 			else {
 				$output .= sprintf(
-					"%5s → %5s  %40s %s\n",
+					"%5s → %5s  %s %40s %s\n",
 					$stop->arr->strftime('%H:%M'),
 					$stop->dep->strftime('%H:%M'),
-					$stop->name, $stop->platform,
+					$occupancy, $stop->full_name, $stop->platform,
 				);
 			}
 		}
 		elsif ( defined $stop->arr ) {
 			$output .= sprintf(
-				"%5s          %40s %s\n",
+				"%5s          %s %40s %s\n",
 				$stop->arr->strftime('%H:%M'),
-				$stop->name, $stop->platform,
+				$occupancy, $stop->full_name, $stop->platform,
 			);
 		}
 		elsif ( defined $stop->dep ) {
 			$output .= sprintf(
-				"        %5s  %40s %s\n",
+				"        %5s  %s %40s %s\n",
 				$stop->dep->strftime('%H:%M'),
-				$stop->name, $stop->platform,
+				$occupancy, $stop->full_name, $stop->platform,
 			);
+		}
+		elsif ( $stop->full_name ) {
+			$output .= sprintf( "               %s %40s %s\n",
+				$occupancy, $stop->full_name, $stop->platform, );
+		}
+		else {
+			$output .= "?\n";
 		}
 	}
 	return $output;
@@ -217,12 +268,12 @@ sub display_result {
 
 	for my $line (@lines) {
 
-		if ( $edata{messages} and length( $line->[5] ) ) {
-			$line->[5] =~ tr{\n\x0d}{ }s;
-			chomp $line->[5];
+		if ( $edata{messages} and $line->[5]->hints ) {
 			print "\n";
-			for my $info_line ( split( qr{\n}, $line->[5] ) ) {
-				say "# ${info_line}";
+			for my $hint ( $line->[5]->hints ) {
+				$hint =~ tr{\n\x0d}{ }s;
+				chomp $hint;
+				say "# ${hint}";
 			}
 		}
 
@@ -239,12 +290,33 @@ sub display_result {
 	return;
 }
 
+sub show_stopseq {
+	my $trip = $efa->result;
+
+	printf( "%s %s → %s\n",
+		$trip->line, $trip->number // q{},
+		$trip->dest_name );
+
+	for my $stop ( $trip->route ) {
+		printf(
+			"%s → %s  %s (%s) %s\n",
+			$stop->arr ? $stop->arr->strftime('%H:%M')
+			: q{     },
+			$stop->dep ? $stop->dep->strftime('%H:%M')
+			: q{     },
+			$stop->full_name,
+			$stop->niveau,
+			$stop->platform
+		);
+	}
+}
+
 sub show_lines {
 	my @output;
 
 	for my $l ( $efa->lines ) {
 
-		if (   ( @grep_lines and none { $l->name eq $_ } @grep_lines )
+		if (   ( @grep_lines and none { $l->number eq $_ } @grep_lines )
 			or ( @grep_mots and none { $l->mot_name eq $_ } @grep_mots ) )
 		{
 			next;
@@ -254,14 +326,25 @@ sub show_lines {
 			next;
 		}
 
-		push( @output,
-			[ $l->type, $l->name, $l->direction // q{}, q{}, $l->route // q{} ]
+		push(
+			@output,
+			[
+				$l->type, $l->number,
+				$l->direction // q{}, q{},
+				$l->route // q{}
+			]
 		);
 	}
 
 	display_result(@output);
 
 	return;
+}
+
+sub format_occupancy {
+	my ($occupancy) = @_;
+
+	return $occupancy_map{$occupancy} // $occupancy_map{unknown};
 }
 
 sub show_results {
@@ -278,6 +361,15 @@ sub show_results {
 		$delay_fmt = $delay_len + 3;
 	}
 
+	if ( scalar $efa->stops > 1 ) {
+		for my $stop ( $efa->stops ) {
+			say $stop->full_name;
+		}
+	}
+	elsif ( $efa->stop_name ) {
+		say $efa->stop_name;
+	}
+
 	for my $d ( $efa->results ) {
 
 		my @output_line;
@@ -287,10 +379,6 @@ sub show_results {
 			? sprintf( '%2d min', $d->countdown )
 			: $d->datetime->strftime('%H:%M')
 		);
-
-		if ( $d->platform_db ) {
-			$platform .= ' (DB)';
-		}
 
 		if (
 			   ( @grep_lines and none { $d->line eq $_ } @grep_lines )
@@ -326,33 +414,29 @@ sub show_results {
 		}
 
 		my $line = $d->line;
-		if ( length($line) > 10 and $d->train_type and $d->train_no ) {
+		if (    ( length($line) > 10 or not $line )
+			and $d->train_type
+			and $d->train_no )
+		{
 			$line = $d->train_type . ' ' . $d->train_no;
 		}
 
-		@output_line
-		  = ( $dtime, $platform, $line, q{}, $d->destination, $d->info );
+		@output_line = ( $dtime, $platform, $line, q{}, $d->destination, $d );
+
+		if ($show_jid) {
+			$output_line[2] .= sprintf( '  %s@%d(%s)%d',
+				$d->stateless =~ s{ }{}gr,
+				scalar $d->route_pre ? ( $d->route_pre )[0]->id : $d->stop_id,
+				$d->sched_datetime->strftime('%Y%m%d'),
+				$d->key );
+		}
 
 		if ( $edata{route} ) {
 			$output_line[3]
-			  = join( q{  }, map { $_->name_suf } $d->route_interesting );
+			  = join( q{  }, map { $_->name } $d->route_interesting );
 		}
 		elsif ( $d->occupancy ) {
-			if ( $d->occupancy eq 'MANY_SEATS' ) {
-				$output_line[3] = '.';
-			}
-			elsif ( $d->occupancy eq 'FEW_SEATS' ) {
-				$output_line[3] = 'o';
-			}
-			elsif ( $d->occupancy eq 'STANDING_ONLY' ) {
-				$output_line[3] = '*';
-			}
-			elsif ( $d->occupancy eq 'FULL' ) {
-				$output_line[3] = '!';
-			}
-			else {
-				$output_line[3] = '?';
-			}
+			$output_line[3] = format_occupancy( $d->occupancy );
 		}
 
 		if ( $edata{fullroute} ) {
@@ -377,16 +461,17 @@ sub show_results {
 }
 
 if ( $discover or $discover_and_print ) {
-	for my $service_ref ( Travel::Status::DE::EFA::get_efa_urls() ) {
-		$efa = new_efa( $service_ref->{shortname} );
+	for my $shortname ( Travel::Status::DE::EFA::get_service_ids() ) {
+		$efa = new_efa($shortname);
 		if ( $efa and not $efa->errstr ) {
 			if ($discover_and_print) {
 				last;
 			}
+			my $service_ref = Travel::Status::DE::EFA::get_service($shortname);
 			printf(
 				"%s / %s (%s)\n   ->  efa-m -s %s %s\n\n",
-				@{$service_ref}{qw(name shortname url shortname)},
-				join( q{ }, map { "'$_'" } @ARGV ),
+				$service_ref->{name}, $shortname, $service_ref->{url},
+				$shortname,           join( q{ }, map { "'$_'" } @ARGV ),
 			);
 		}
 	}
@@ -412,7 +497,10 @@ if ( my $err = $efa->errstr ) {
 	exit 2;
 }
 
-if ($list_lines) {
+if ($stopseq) {
+	show_stopseq();
+}
+elsif ($list_lines) {
 	show_lines();
 }
 else {
@@ -433,7 +521,7 @@ B<efa-m> [B<-Lr>] [B<-d> I<dd.mm.yyyy>] [B<-t> I<hh:mm>]
 
 =head1 VERSION
 
-version 2.02
+version 3.00
 
 =head1 DESCRIPTION
 
@@ -614,8 +702,6 @@ None.
 =item * LWP::UserAgent(3pm)
 
 =item * Travel::Status::DE::EFA(3pm)
-
-=item * XML::LibXML(3pm)
 
 =back
 

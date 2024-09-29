@@ -1,5 +1,16 @@
+0.242720  2024-09-28 15:28:56+02:00 Europe/Brussels
+    - Additions
+      - Blast: expanded list of supported remote databases (e.g., core_nt)
+      - Mafft: added support for options --addlong and --addfragments
+      - binaries: new script annotate-ali.pl
+    - Changes
+	  - Blast: upgraded driver to better handle version 5 of BLAST databases
+    - Fixes
+      - Blast: updated tests to BLAST 2.16.0
+      - Mafft: fixed command-line bug with align_all method
+
 0.210160  2021-01-16 22:27:34+01:00 Europe/Brussels
-    Fixes
+    - Fixes
       - Blast: made Blastable role taint-safe
       - Blast: remote tests are now disabled by default
       - Exonerate: now forces Homebrew to install historical version 2.2.0
@@ -7,18 +18,18 @@
       - Mafft: updated tests to MAFFT 7.453
 
 0.193030  2019-10-30 21:33:56+01:00 Europe/Brussels
-    Fixes
+    - Fixes
       - ClustalO: fixed module filename (Clustalo.pm => ClustalO.pm)
 
 0.191910  2019-07-10 15:50:22+02:00 Europe/Rome
-    Additions
+    - Additions
       - all: now try to install external dependencies using Homebrew
       - Cap3: added support for optional args to constructor
       - CdHit: added autoselection of cd-hit-est for nt seqs
-    Changes
+    - Changes
       - all: improved warning and error messages (now prefixed by [BMD])
       - Blast: now explicitly requires perl-5.18
-    Fixes
+    - Fixes
       - Hmmer: updated tests to HMMER 3.2.1
       - Cap3: fixed inconsistent contig names between seqs and clusters
 

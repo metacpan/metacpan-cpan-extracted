@@ -60,4 +60,10 @@ subtest '#11 - parsing codepoints beyond the basic multilingual plane fails due 
 	is($i->abs, $value);
 };
 
+subtest 'trailing newline' => sub {
+	my $value	= "http://example.org/foo/bar\n";
+	eval { IRI->new( value => $value ) };
+	ok( $@, 'IRI parsing expected failure' );
+};
+
 done_testing();

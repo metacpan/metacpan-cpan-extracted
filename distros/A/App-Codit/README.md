@@ -7,8 +7,8 @@ It is written in Perl/Tk and based on the Tk::AppWindow application framework.
 
 It uses the Tk::CodeText text widget for editing.
 
-Codit has been under development for about one year now. And even though it is considered
-alpha software, it already has gone quite some miles on our systems.
+Codit has been under development for about one year now. It has gone quite some miles on our
+systems and can be considered beta software as of version 0.10.
 
 It features a multi document interface that can hold an unlimited number of documents,
 navigable through the tab bar at the top and a document list in the left side panel. 

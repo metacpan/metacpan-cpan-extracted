@@ -4,13 +4,13 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 6;
+use Test::More tests => 7;
 use File::Spec;
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
 
-$delay = 3000;
+$delay = 2000;
 $quitdelay = 1000;
 $delay = 5000 if $mswin;
 
@@ -24,9 +24,15 @@ createapp(
 );
 
 my $pext;
+my $ses;
 if (defined $app) {
 	$pext = $app->extGet('Plugins');
+	pause(1000);
+	$ses = $pext->plugGet('Sessions');
 }
+
+testaccessors($ses, 'sessionCurrent');
+
 push @tests, (
 	[ sub { 
 		return $pext->plugExists('Sessions') 

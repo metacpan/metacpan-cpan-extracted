@@ -568,8 +568,7 @@ sub PDL::convolveND {
     # at the end.
     $aa = double($aa);
     $_ = $aa->zeroes for my ($aai, $kk, $kki);
-    my $tmp;  # work around new perl -d "feature"
-    ($tmp = $kk->range( - ($kdims/2)->floor, $kdims, 'p')) .= $k;
+    $kk->range( - ($kdims/2)->floor, $kdims, 'p') .= $k;
     PDL::fftnd($kk, $kki);
     PDL::fftnd($aa, $aai);
 
@@ -799,7 +798,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1138 "imagend.pd"
+#line 1137 "imagend.pd"
 
 =head2 path_segs
 
@@ -868,7 +867,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 872 "ImageND.pm"
+#line 871 "ImageND.pm"
 
 # Exit with OK status
 

@@ -4,6 +4,7 @@ requires 'Hash::Util';
 requires 'File::Share', '0.27';
 requires 'Time::HiRes';
 requires 'App::optex', 'v0.5.3';
+requires 'Term::ANSIColor::Concise';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

@@ -1,7 +1,3 @@
-# This tests the 16-bit image capabilities of the rpic() and wpic()
-# commands.  The new code works with PNM output files and PNG format
-# too.
-
 use strict;
 use warnings;
 use Test::More;
@@ -11,51 +7,37 @@ use PDL::LiteF;
 use PDL::NiceSlice;
 use PDL::IO::Pic;
 
-my $test_pnmtopng;
-$test_pnmtopng = 1;
-if($^O =~ /MSWin32/i) {
-   $test_pnmtopng = `pnmtopng --help 2>&1`;
-   $test_pnmtopng = $test_pnmtopng =~ /^pnmtopng:/ ? 1 : 0;
-} elsif ( !defined( scalar( qx(pnmtopng --help 2>&1) ) ) ) {
-   $test_pnmtopng = 0;
-} 
+my $can_png = PDL->wpiccan('PNG');
+my $can_jpg = PDL->wpiccan('JPEG');
 
 $PDL::IO::Pic::debug=20;
+my $tmpdir = tempdir( CLEANUP => 1 );
+
+sub roundtrip {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  my ($in, $file, $label, $dimonly, @extra) = @_;
+  $file = File::Spec->catfile($tmpdir, $file);
+  $in->wpic($file);
+  my $got = rpic($file, @extra);
+  return is_deeply [$got->dims], [$in->dims] if $dimonly;
+  eval {ok all($in == $got), "$label image save+restore"};
+  is $@, '', "$label compare worked";
+}
 
 # test save/restore of 8-bit image
-my $x = sequence(16, 16);
-my $tmpdir = tempdir( CLEANUP => 1 );
-my $filestub = File::Spec->catfile($tmpdir, 't byte_a');
-$x->wpic("$filestub.pnm");
-my $a_pnm = rpic("$filestub.pnm");
-ok(sum(abs($x-$a_pnm)) == 0, 'pnm byte image save+restore');
-unlink "$filestub.pnm";
+roundtrip(my $x = sequence(16,16), 'byte_a.pnm', 'pnm byte');
 
-SKIP: {
-  skip ": pnmtopng not found, is NetPBM installed?", 1 unless $test_pnmtopng; 
-  $x->wpic("$filestub.png");
-  my $a_png;
-  unless ($^O =~ /MSWin32/i) { $a_png = rpic("$filestub.png") }
-  else { $a_png = rpic("$filestub.png", {FORMAT => 'PNG'}) }
-  ok(sum(abs($x-$a_png)) == 0, 'png byte image save+restore'); #test 3
-  unlink "$filestub.png";
-};
+roundtrip($x, 'byte_a.png', 'png byte', 0,
+  $^O =~ /MSWin32/i ? {FORMAT => 'PNG'} : ()) if $can_png;
 
 # test save/restore of 16-bit image
-my $a16 = sequence(256, 255)->ushort * 231;
-$a16->wpic('tushort_a16.pnm');
-my $a16_pnm = rpic('tushort_a16.pnm');
-ok(sum(abs($a16-$a16_pnm)) == 0, 'pnm ushort image save+restore'); # test 4
-unlink 'tushort_a16.pnm';
+roundtrip(my $a16 = sequence(256, 255)->ushort * 231,
+  'tushort_a16.pnm', 'pnm ushort',
+);
 
-SKIP : {
-  skip ": pnmtopng not found, is NetPBM installed?", 1 unless $test_pnmtopng;
-  $a16->wpic('tushort_a16.png');
-  my $a16_png;
-  unless($^O =~ /MSWin32/i) {$a16_png = rpic('tushort_a16.png')}
-  else {$a16_png = rpic('tushort_a16.png', {FORMAT => 'PNG'})} 
-  ok(sum(abs($a16-$a16_png)) == 0, 'png ushort image save+restore'); # test 5 (fails on Win32 if not skipped)
-  unlink 'tushort_a16.png';
-}
+roundtrip($a16, 'tushort_a16.png', 'png ushort', 0,
+  $^O =~ /MSWin32/i ? {FORMAT => 'PNG'} : ()) if $can_png;
+
+roundtrip(sequence(byte,3,32,24), 'byte_a.jpg', 'jpeg byte', 1, {FORMAT => 'JPEG'}) if $can_jpg;
 
 done_testing;

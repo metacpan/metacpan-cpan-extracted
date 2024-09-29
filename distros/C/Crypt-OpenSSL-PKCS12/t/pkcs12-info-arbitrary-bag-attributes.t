@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Digest::SHA qw/sha256_hex/;
-use Crypt::OpenSSL::Guess qw/openssl_version/;
+use Crypt::OpenSSL::Guess qw/openssl_version find_openssl_prefix find_openssl_exec/;
 
 my ($major, $minor, $patch) = openssl_version();
 BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
@@ -119,11 +119,15 @@ P8Y+hgY/lEKJ/Kb2uUz/ci3ZkTlu5XqOQmi3ChwcAMPLR3XCPP9NgAv3jhv/OvSF
 SLUzQIGHRMDH
 -----END CERTIFICATE-----
 OPENSSL_END
-if ($major eq '1.0') {
+my $prefix = find_openssl_prefix();
+my $ssl_exec = find_openssl_exec($prefix);
+my $ssl_version_string = `$ssl_exec version`;
+
+if ($major eq '1.0' && $ssl_version_string !~ /LibreSSL/) {
   $openssl_output =~ s/MAC: sha1, Iteration 10000/MAC Iteration 10000/g;
   $openssl_output =~ s/MAC length: .*/MAC verified OK/;
 }
-if ($major ge '3.2') {
+if ($major ge '3.2' && $ssl_version_string !~ /LibreSSL/) {
   $openssl_output =~ s/2.16.840.1.113894.746875.1.1/Trusted key usage (Oracle)/g;
 }
 

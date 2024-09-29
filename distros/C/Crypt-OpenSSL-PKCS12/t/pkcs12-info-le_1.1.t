@@ -87,6 +87,10 @@ my $pass   = "testing";
 #my $pkcs12 = Crypt::OpenSSL::PKCS12->new_from_file('certs/test.p12');
 my $pkcs12 = Crypt::OpenSSL::PKCS12->new_from_file('certs/test_le_1.1.p12');
 
+SKIP: {
+    if (! $pkcs12->legacy_support) {
+        skip("The Legacy provider cannot be loaded.  Unable to process Legacy PKCS12 files", 5);
+    }
 #my $certificate = $pkcs12->certificate($pass);
 
 my $info = $pkcs12->info($pass);
@@ -165,5 +169,6 @@ for (my $i = 0; $i < $pkcs7_enc_cnt; $i++) {
 
   $bag_attributes = @$bags[1]->{bag_attributes};
   is(keys %$bag_attributes, 0, "Zero bag attributes in bag");
+}
 }
 done_testing;

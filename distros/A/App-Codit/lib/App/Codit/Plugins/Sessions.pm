@@ -9,7 +9,7 @@ App::Codit::Plugins::Sessions - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.09;
+$VERSION = 0.10;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -78,6 +78,12 @@ sub AdjustTitle {
 		$name =  "$current: $name" ;
 	}
 	$self->configPut(-title => $name);
+}
+
+sub bookmarksInitialize {
+	my $self = shift;
+	my $bookmarks = $self->extGet('Plugins')->plugGet('Bookmarks');
+	$self->after(200, ['Initialize', $bookmarks]) if defined $bookmarks;
 }
 
 sub CanQuit {
@@ -283,6 +289,7 @@ sub sessionOpen {
 	}
 	$self->consoleDir($workdir) if defined $workdir;
 	$self->projectName($project) if defined $project;
+	$self->bookmarksInitialize;
 	$self->update;
 	$self->StatusMessage("Session '$name' loaded");
 }
@@ -322,6 +329,18 @@ sub sessionSave {
 			my $doc = $mdi->docGet($item);
 			my %h = ();
 			for (@saveoptions) { $h{$_} = $doc->cget($_) }
+
+			#saving bookmarks
+			my $w = $doc->CWidg;
+			my (@l) = $w->bookmarkList;
+			if (@l) {
+				my $bm = '';
+				for (@l) {
+					$bm = "$bm$_ ";
+				}
+				$h{'bookmarks'} = $bm;
+			}			
+
 			push @list, [$item, \%h]
 		}
 	}

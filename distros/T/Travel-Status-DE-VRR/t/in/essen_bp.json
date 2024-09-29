@@ -1,0 +1,3979 @@
+{
+   "parameters" : [
+      {
+         "value" : "EFAMOBIL3_",
+         "name" : "serverID"
+      },
+      {
+         "name" : "requestID",
+         "value" : "0"
+      },
+      {
+         "name" : "sessionID",
+         "value" : "0"
+      },
+      {
+         "name" : "calcTime",
+         "value" : "218.700"
+      },
+      {
+         "value" : "2024-09-21T18:34:21",
+         "name" : "serverTime"
+      }
+   ],
+   "dateTime" : {
+      "day" : "21",
+      "deparr" : "dep",
+      "month" : "9",
+      "year" : "2024",
+      "ttpTo" : "20250228",
+      "ttpFrom" : "20240601",
+      "hour" : "18",
+      "minute" : "34"
+   },
+   "departureList" : [
+      {
+         "stopName" : "Essen Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779634",
+         "nameWO" : "Berliner Platz",
+         "y" : "5297058",
+         "realDateTime" : {
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "40"
+         },
+         "operator" : {
+            "publicCode" : "EV-B",
+            "code" : "12",
+            "name" : "EVAG Bus"
+         },
+         "countdown" : "6",
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "minute" : "33",
+            "hour" : "18",
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21"
+         },
+         "area" : "4",
+         "servingLine" : {
+            "code" : "5",
+            "destID" : "20009222",
+            "name" : "Niederflurbus",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "symbol" : "145",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva",
+               "direction" : "R",
+               "line" : "12145",
+               "gid" : "de:vrr:eva-12-145:"
+            },
+            "key" : "558",
+            "delay" : "7",
+            "motType" : "5",
+            "direction" : "Essen Erbach",
+            "stateless" : "eva:12145: :R:j24",
+            "number" : "145",
+            "directionFrom" : "Essen Heisingen Baldeneysee",
+            "lineDisplay" : "line"
+         },
+         "platformName" : "1",
+         "platform" : "1",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.84932"
+            }
+         ],
+         "mapName" : "MRCV"
+      },
+      {
+         "platformName" : "Gleis 3",
+         "platform" : "3",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.2992",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "mapName" : "MRCV",
+         "area" : "2",
+         "servingLine" : {
+            "name" : "StraÃenbahn",
+            "destID" : "20009254",
+            "code" : "4",
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "symbol" : "106",
+            "liErgRiProj" : {
+               "direction" : "H",
+               "line" : "11106",
+               "gid" : "de:vrr:eva-11-106:",
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva"
+            },
+            "key" : "167",
+            "delay" : "0",
+            "direction" : "Essen Germaniaplatz",
+            "motType" : "4",
+            "stateless" : "eva:11106: :H:j24",
+            "lineDisplay" : "line",
+            "number" : "106",
+            "directionFrom" : "Essen Helenenstr."
+         },
+         "operator" : {
+            "name" : "EVAG Strab",
+            "publicCode" : "EV-T",
+            "code" : "11"
+         },
+         "countdown" : "1",
+         "dateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "minute" : "35",
+            "hour" : "18"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "realDateTime" : {
+            "hour" : "18",
+            "minute" : "35",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "weekday" : "7"
+         },
+         "y" : "5296977",
+         "x" : "779748",
+         "stopID" : "20009153",
+         "nameWO" : "Berliner Platz",
+         "stopName" : "Essen Berliner Platz"
+      },
+      {
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "weekday" : "7",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "minute" : "35",
+            "hour" : "18"
+         },
+         "operator" : {
+            "code" : "11",
+            "publicCode" : "EV-T",
+            "name" : "EVAG Strab"
+         },
+         "countdown" : "1",
+         "realDateTime" : {
+            "hour" : "18",
+            "minute" : "35",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "weekday" : "7"
+         },
+         "platform" : "4",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.3140",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "platformName" : "Gleis 4",
+         "servingLine" : {
+            "delay" : "0",
+            "motType" : "4",
+            "direction" : "Essen Helenenstr.",
+            "stateless" : "eva:11101: :H:j24",
+            "directionFrom" : "Essen Philippusstift",
+            "number" : "101",
+            "lineDisplay" : "line",
+            "code" : "4",
+            "name" : "StraÃenbahn",
+            "destID" : "20009306",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "network" : "eva",
+               "project" : "j24",
+               "direction" : "H",
+               "line" : "11101",
+               "gid" : "de:vrr:eva-11-101:"
+            },
+            "symbol" : "101",
+            "key" : "155"
+         },
+         "area" : "2",
+         "stopName" : "Essen Berliner Platz",
+         "y" : "5297057",
+         "nameWO" : "Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779692"
+      },
+      {
+         "stopID" : "20009153",
+         "x" : "779713",
+         "nameWO" : "Berliner Platz",
+         "y" : "5297149",
+         "stopName" : "Essen Berliner Platz",
+         "area" : "1",
+         "servingLine" : {
+            "destID" : "20009447",
+            "code" : "1",
+            "name" : "U-Bahn",
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "liErgRiProj" : {
+               "direction" : "H",
+               "gid" : "de:vrr:eva-10-U17:",
+               "line" : "10U17",
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva"
+            },
+            "symbol" : "U17",
+            "key" : "109",
+            "delay" : "0",
+            "direction" : "Essen MargarethenhÃ¶he",
+            "motType" : "2",
+            "stateless" : "eva:10U17: :H:j24",
+            "lineDisplay" : "line",
+            "directionFrom" : "Essen Karlsplatz",
+            "number" : "U17"
+         },
+         "platformName" : "2",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.274590",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "platform" : "2",
+         "realDateTime" : {
+            "minute" : "35",
+            "hour" : "18",
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21"
+         },
+         "countdown" : "1",
+         "operator" : {
+            "name" : "EVAG U-Bahn",
+            "publicCode" : "EV-U",
+            "code" : "10"
+         },
+         "dateTime" : {
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "35"
+         },
+         "realtimeTripStatus" : "MONITORED"
+      },
+      {
+         "stopName" : "Essen Berliner Platz",
+         "y" : "5297142",
+         "nameWO" : "Berliner Platz",
+         "x" : "779741",
+         "stopID" : "20009153",
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "hour" : "18",
+            "minute" : "36",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "weekday" : "7"
+         },
+         "operator" : {
+            "publicCode" : "EV-U",
+            "name" : "EVAG U-Bahn",
+            "code" : "10"
+         },
+         "countdown" : "2",
+         "realDateTime" : {
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "36"
+         },
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.274934",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platform" : "1",
+         "platformName" : "1",
+         "servingLine" : {
+            "motType" : "2",
+            "direction" : "Gelsenkirchen Buerer Str.",
+            "delay" : "0",
+            "directionFrom" : "Essen Messe W.-SÃ¼d/Gruga",
+            "number" : "U11",
+            "lineDisplay" : "line",
+            "stateless" : "eva:10U11: :R:j24",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "code" : "1",
+            "name" : "U-Bahn",
+            "destID" : "20005579",
+            "key" : "709",
+            "liErgRiProj" : {
+               "network" : "eva",
+               "project" : "j24",
+               "supplement" : " ",
+               "line" : "10U11",
+               "gid" : "de:vrr:eva-10-U11:",
+               "direction" : "R"
+            },
+            "symbol" : "U11"
+         },
+         "area" : "1"
+      },
+      {
+         "operator" : {
+            "code" : "12",
+            "publicCode" : "EV-B",
+            "name" : "EVAG Bus"
+         },
+         "countdown" : "2",
+         "dateTime" : {
+            "hour" : "18",
+            "minute" : "36",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "weekday" : "7"
+         },
+         "platformName" : "4",
+         "mapName" : "MRCV",
+         "platform" : "4",
+         "area" : "3",
+         "servingLine" : {
+            "realtime" : "0",
+            "mtSubcode" : "0",
+            "name" : "Niederflurbus",
+            "code" : "5",
+            "destID" : "20009197",
+            "key" : "190",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "network" : "eva",
+               "project" : "j24",
+               "direction" : "R",
+               "line" : "12166",
+               "gid" : "de:vrr:eva-12-166:"
+            },
+            "symbol" : "166",
+            "motType" : "5",
+            "direction" : "Essen Dellwig Bahnhof",
+            "directionFrom" : "E-Burgaltendorf Burgruine",
+            "number" : "166",
+            "lineDisplay" : "line",
+            "stateless" : "eva:12166: :R:j24"
+         },
+         "stopName" : "Essen Berliner Platz",
+         "y" : "5296893",
+         "x" : "779748",
+         "stopID" : "20009153",
+         "nameWO" : "Berliner Platz"
+      },
+      {
+         "area" : "2",
+         "servingLine" : {
+            "liErgRiProj" : {
+               "network" : "eva",
+               "project" : "j24",
+               "supplement" : " ",
+               "gid" : "de:vrr:eva-11-103:",
+               "line" : "11103",
+               "direction" : "R"
+            },
+            "symbol" : "103",
+            "key" : "462",
+            "code" : "4",
+            "destID" : "20009641",
+            "name" : "StraÃenbahn",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "stateless" : "eva:11103: :R:j24",
+            "directionFrom" : "Essen Steele S",
+            "number" : "103",
+            "lineDisplay" : "line",
+            "delay" : "0",
+            "motType" : "4",
+            "direction" : "Essen Wertstr."
+         },
+         "platformName" : "Gleis 3",
+         "platform" : "3",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.2316",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "realDateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "minute" : "37",
+            "hour" : "18"
+         },
+         "countdown" : "3",
+         "operator" : {
+            "name" : "EVAG Strab",
+            "publicCode" : "EV-T",
+            "code" : "11"
+         },
+         "dateTime" : {
+            "minute" : "37",
+            "hour" : "18",
+            "weekday" : "7",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "stopID" : "20009153",
+         "x" : "779748",
+         "nameWO" : "Berliner Platz",
+         "y" : "5296977",
+         "stopName" : "Essen Berliner Platz"
+      },
+      {
+         "realDateTime" : {
+            "minute" : "38",
+            "hour" : "18",
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21"
+         },
+         "dateTime" : {
+            "hour" : "18",
+            "minute" : "38",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "weekday" : "7"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "countdown" : "4",
+         "operator" : {
+            "publicCode" : "EV-T",
+            "name" : "EVAG Strab",
+            "code" : "11"
+         },
+         "servingLine" : {
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "code" : "4",
+            "name" : "StraÃenbahn",
+            "destID" : "20009665",
+            "key" : "365",
+            "symbol" : "105",
+            "liErgRiProj" : {
+               "direction" : "H",
+               "line" : "11105",
+               "gid" : "de:vrr:eva-11-105:",
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva"
+            },
+            "direction" : "Essen Zeche Ludwig",
+            "motType" : "4",
+            "delay" : "0",
+            "lineDisplay" : "line",
+            "number" : "105",
+            "directionFrom" : "Essen Unterstr.",
+            "stateless" : "eva:11105: :H:j24"
+         },
+         "area" : "2",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.2585",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "platform" : "4",
+         "platformName" : "Gleis 4",
+         "stopName" : "Essen Berliner Platz",
+         "nameWO" : "Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779692",
+         "y" : "5297057"
+      },
+      {
+         "servingLine" : {
+            "name" : "StraÃenbahn",
+            "code" : "4",
+            "destID" : "20009582",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "liErgRiProj" : {
+               "line" : "11109",
+               "gid" : "de:vrr:eva-11-109:",
+               "direction" : "H",
+               "project" : "j24",
+               "network" : "eva",
+               "supplement" : " "
+            },
+            "symbol" : "109",
+            "key" : "195",
+            "delay" : "0",
+            "motType" : "4",
+            "direction" : "Essen Steele S",
+            "stateless" : "eva:11109: :H:j24",
+            "directionFrom" : "Frohnhausen Breilsort",
+            "number" : "109",
+            "lineDisplay" : "line"
+         },
+         "area" : "2",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.3690"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platform" : "4",
+         "platformName" : "Gleis 4",
+         "realDateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "minute" : "40",
+            "hour" : "18"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "40"
+         },
+         "countdown" : "6",
+         "operator" : {
+            "publicCode" : "EV-T",
+            "code" : "11",
+            "name" : "EVAG Strab"
+         },
+         "nameWO" : "Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779692",
+         "y" : "5297057",
+         "stopName" : "Essen Berliner Platz"
+      },
+      {
+         "stopInfos" : null,
+         "stopName" : "Essen Berliner Platz",
+         "y" : "5296897",
+         "nameWO" : "Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779732",
+         "dateTime" : {
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "41"
+         },
+         "tripInfos" : null,
+         "operator" : {
+            "name" : "DB Bahn Rheinlandbus",
+            "publicCode" : "BVR",
+            "code" : "88"
+         },
+         "countdown" : "7",
+         "lineInfos" : {
+            "lineInfo" : {
+               "infoLinkText" : "Linie SB16 - Haltestellenausfall - Zwischen (H) Essen, Hollestr. und (H) Essen, Hollestr. - Grund: BaumaÃnahme",
+               "infoLinkURL" : "http://ems.vrr.de/info-link/5efeb629-f5df-5464-b4ff-753f43edd18f",
+               "paramList" : [
+                  {
+                     "name" : "publisher",
+                     "type" : "addInfoParam",
+                     "value" : "ems.comm.addinfo",
+                     "edit" : "0"
+                  },
+                  {
+                     "edit" : "0",
+                     "value" : "lineInfo",
+                     "name" : "infoType",
+                     "type" : "addInfoParam"
+                  },
+                  {
+                     "type" : "system",
+                     "name" : "infoID",
+                     "edit" : "0",
+                     "value" : "ems-19119"
+                  },
+                  {
+                     "edit" : "0",
+                     "value" : "5356663",
+                     "type" : "system",
+                     "name" : "seqID"
+                  },
+                  {
+                     "name" : "priority",
+                     "type" : "addInfoParam",
+                     "edit" : "0",
+                     "value" : "normal"
+                  },
+                  {
+                     "name" : "incidentDateTime",
+                     "type" : "system",
+                     "edit" : "0",
+                     "value" : "08/01/2024 03:00 - 08/01/2026 23:50"
+                  }
+               ],
+               "infoText" : {
+                  "content" : "<b>Linie SB16: </b>Zwischen <b>(H) Essen, Hollestr.</b> und <b>(H) Essen, Hollestr.</b> kommt es zu <b>einem Haltestellenausfall</b>.<br><br> Dauer: 08.01.24, 03:00 Uhr bis 08.01.26, 23:50 Uhr<br><br>Die Haltestelle wird nicht angefahren.  Abfahrtshaltestelle (Bussteig 6)",
+                  "subject" : "Haltestellenausfall durch BaumaÃnahme",
+                  "speechText" : "",
+                  "smsText" : "Linie SB16 - Haltestellenausfall - Zwischen (H) Essen, Hollestr. und (H) Essen, Hollestr. - Grund: BaumaÃnahme",
+                  "htmlText" : "",
+                  "additionalText" : "Die beschriebenen Ãnderungen sind in der elektronischen Fahrplanauskunft (EFA) <b>nicht</b> berÃ¼cksichtigt.",
+                  "subtitle" : "Haltestellenausfall durch BaumaÃnahme",
+                  "wmlText" : ""
+               }
+            }
+         },
+         "mapName" : "MRCV",
+         "platform" : "3",
+         "platformName" : "3",
+         "servingLine" : {
+            "lineDisplay" : "line",
+            "number" : "SB16",
+            "directionFrom" : "BOT St.-Anto.-Hosp./Gartenstr.",
+            "stateless" : "bvr:88016:K:R:j24",
+            "direction" : "Essen Hauptbahnhof",
+            "motType" : "7",
+            "key" : "92",
+            "symbol" : "SB16",
+            "liErgRiProj" : {
+               "direction" : "R",
+               "gid" : "de:vrr:bvr-88-16:K",
+               "line" : "88016",
+               "supplement" : "K",
+               "network" : "bvr",
+               "project" : "j24"
+            },
+            "mtSubcode" : "0",
+            "realtime" : "0",
+            "destID" : "20009289",
+            "name" : "SB",
+            "code" : "5"
+         },
+         "area" : "3"
+      },
+      {
+         "stopName" : "Essen Berliner Platz",
+         "y" : "5297149",
+         "nameWO" : "Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779713",
+         "dateTime" : {
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "42"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "countdown" : "8",
+         "operator" : {
+            "code" : "10",
+            "publicCode" : "EV-U",
+            "name" : "EVAG U-Bahn"
+         },
+         "realDateTime" : {
+            "minute" : "42",
+            "hour" : "18",
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21"
+         },
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.274464",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "platform" : "2",
+         "platformName" : "2",
+         "servingLine" : {
+            "motType" : "2",
+            "direction" : "Essen Messe W.-SÃ¼d/Gruga",
+            "delay" : "0",
+            "directionFrom" : "Gelsenkirchen Buerer Str.",
+            "number" : "U11",
+            "lineDisplay" : "line",
+            "stateless" : "eva:10U11: :H:j24",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "code" : "1",
+            "destID" : "20009270",
+            "name" : "U-Bahn",
+            "key" : "271",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva",
+               "direction" : "H",
+               "gid" : "de:vrr:eva-10-U11:",
+               "line" : "10U11"
+            },
+            "symbol" : "U11"
+         },
+         "area" : "1"
+      },
+      {
+         "y" : "5296977",
+         "stopID" : "20009153",
+         "x" : "779748",
+         "nameWO" : "Berliner Platz",
+         "stopName" : "Essen Berliner Platz",
+         "platformName" : "Gleis 3",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.3840"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platform" : "3",
+         "area" : "2",
+         "servingLine" : {
+            "lineDisplay" : "line",
+            "directionFrom" : "Essen Steele S",
+            "number" : "109",
+            "stateless" : "eva:11109: :R:j24",
+            "direction" : "Frohnhausen Breilsort",
+            "motType" : "4",
+            "delay" : "0",
+            "key" : "370",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "network" : "eva",
+               "project" : "j24",
+               "direction" : "R",
+               "line" : "11109",
+               "gid" : "de:vrr:eva-11-109:"
+            },
+            "symbol" : "109",
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "code" : "4",
+            "name" : "StraÃenbahn",
+            "destID" : "20009243"
+         },
+         "operator" : {
+            "code" : "11",
+            "publicCode" : "EV-T",
+            "name" : "EVAG Strab"
+         },
+         "countdown" : "8",
+         "dateTime" : {
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "minute" : "42",
+            "hour" : "18"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "realDateTime" : {
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "42"
+         }
+      },
+      {
+         "servingLine" : {
+            "motType" : "2",
+            "direction" : "Essen Karlsplatz",
+            "delay" : "0",
+            "number" : "U17",
+            "directionFrom" : "Essen MargarethenhÃ¶he",
+            "lineDisplay" : "line",
+            "stateless" : "eva:10U17: :R:j24",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "code" : "1",
+            "name" : "U-Bahn",
+            "destID" : "20009370",
+            "key" : "263",
+            "symbol" : "U17",
+            "liErgRiProj" : {
+               "network" : "eva",
+               "project" : "j24",
+               "supplement" : " ",
+               "gid" : "de:vrr:eva-10-U17:",
+               "line" : "10U17",
+               "direction" : "R"
+            }
+         },
+         "area" : "1",
+         "platform" : "1",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.274832"
+            }
+         ],
+         "platformName" : "1",
+         "realDateTime" : {
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "43"
+         },
+         "dateTime" : {
+            "hour" : "18",
+            "minute" : "43",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "weekday" : "7"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "operator" : {
+            "code" : "10",
+            "publicCode" : "EV-U",
+            "name" : "EVAG U-Bahn"
+         },
+         "countdown" : "9",
+         "nameWO" : "Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779741",
+         "y" : "5297142",
+         "stopName" : "Essen Berliner Platz"
+      },
+      {
+         "stopName" : "Essen Berliner Platz",
+         "x" : "779748",
+         "stopID" : "20009153",
+         "nameWO" : "Berliner Platz",
+         "y" : "5296893",
+         "realDateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "minute" : "44",
+            "hour" : "18"
+         },
+         "countdown" : "10",
+         "operator" : {
+            "name" : "Vestische",
+            "publicCode" : "VEST",
+            "code" : "40"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "minute" : "44",
+            "hour" : "18",
+            "weekday" : "7",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9"
+         },
+         "area" : "3",
+         "servingLine" : {
+            "symbol" : "SB16",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "ves",
+               "direction" : "H",
+               "line" : "40016",
+               "gid" : "de:vrr:SB16:VES-40-16"
+            },
+            "key" : "76",
+            "name" : "Niederflurbus",
+            "code" : "5",
+            "destID" : "20003174",
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "stateless" : "ves:40016: :H:j24",
+            "lineDisplay" : "line",
+            "number" : "SB16",
+            "directionFrom" : "Essen Hauptbahnhof",
+            "delay" : "0",
+            "direction" : "BOT St.-Anto.-Hosp./Gartenstr.",
+            "motType" : "5"
+         },
+         "platformName" : "4",
+         "platform" : "4",
+         "attrs" : [
+            {
+               "value" : "4001610010160413",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "mapName" : "MRCV"
+      },
+      {
+         "stopName" : "Essen Berliner Platz",
+         "x" : "779692",
+         "stopID" : "20009153",
+         "nameWO" : "Berliner Platz",
+         "y" : "5297057",
+         "realDateTime" : {
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "45"
+         },
+         "countdown" : "11",
+         "operator" : {
+            "publicCode" : "EV-T",
+            "code" : "11",
+            "name" : "EVAG Strab"
+         },
+         "dateTime" : {
+            "minute" : "45",
+            "hour" : "18",
+            "weekday" : "7",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "area" : "2",
+         "servingLine" : {
+            "liErgRiProj" : {
+               "project" : "j24",
+               "network" : "eva",
+               "supplement" : " ",
+               "gid" : "de:vrr:eva-11-103:",
+               "line" : "11103",
+               "direction" : "H"
+            },
+            "symbol" : "103",
+            "key" : "139",
+            "code" : "4",
+            "name" : "StraÃenbahn",
+            "destID" : "20009289",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "stateless" : "eva:11103: :H:j24",
+            "directionFrom" : "Essen Wertstr.",
+            "number" : "103",
+            "lineDisplay" : "line",
+            "delay" : "0",
+            "motType" : "4",
+            "direction" : "Essen Hauptbahnhof"
+         },
+         "platformName" : "Gleis 4",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.1938"
+            }
+         ],
+         "platform" : "4"
+      },
+      {
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "minute" : "45",
+            "hour" : "18",
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21"
+         },
+         "operator" : {
+            "publicCode" : "",
+            "code" : "13",
+            "name" : "Ruhrbahn MÃ¼lheim"
+         },
+         "countdown" : "11",
+         "realDateTime" : {
+            "hour" : "18",
+            "minute" : "45",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "weekday" : "7"
+         },
+         "platform" : "2",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.274790",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platformName" : "2",
+         "servingLine" : {
+            "key" : "77",
+            "symbol" : "U18",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "network" : "btm",
+               "project" : "j24",
+               "direction" : "H",
+               "line" : "13U18",
+               "gid" : "de:vrr:btm-13-U18:"
+            },
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "name" : "U-Bahn",
+            "destID" : "20015225",
+            "code" : "1",
+            "lineDisplay" : "line",
+            "number" : "U18",
+            "directionFrom" : "Essen Berliner Platz",
+            "stateless" : "btm:13U18: :H:j24",
+            "direction" : "MÃ¼lheim Hauptbahnhof",
+            "motType" : "2",
+            "delay" : "0"
+         },
+         "area" : "1",
+         "stopName" : "Essen Berliner Platz",
+         "y" : "5297149",
+         "nameWO" : "Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779713"
+      },
+      {
+         "platformName" : "Gleis 3",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.2888"
+            }
+         ],
+         "platform" : "3",
+         "area" : "2",
+         "servingLine" : {
+            "delay" : "0",
+            "direction" : "Essen Unterstr.",
+            "motType" : "4",
+            "stateless" : "eva:11105: :R:j24",
+            "lineDisplay" : "line",
+            "number" : "105",
+            "directionFrom" : "Essen Zeche Ludwig",
+            "code" : "4",
+            "destID" : "20009614",
+            "name" : "StraÃenbahn",
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "symbol" : "105",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "network" : "eva",
+               "project" : "j24",
+               "direction" : "R",
+               "gid" : "de:vrr:eva-11-105:",
+               "line" : "11105"
+            },
+            "key" : "753"
+         },
+         "countdown" : "11",
+         "operator" : {
+            "publicCode" : "EV-T",
+            "code" : "11",
+            "name" : "EVAG Strab"
+         },
+         "dateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "minute" : "45",
+            "hour" : "18"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "realDateTime" : {
+            "hour" : "18",
+            "minute" : "45",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "weekday" : "7"
+         },
+         "y" : "5296977",
+         "stopID" : "20009153",
+         "x" : "779748",
+         "nameWO" : "Berliner Platz",
+         "stopName" : "Essen Berliner Platz"
+      },
+      {
+         "y" : "5297057",
+         "stopID" : "20009153",
+         "x" : "779692",
+         "nameWO" : "Berliner Platz",
+         "stopName" : "Essen Berliner Platz",
+         "platformName" : "Gleis 4",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.3175"
+            }
+         ],
+         "platform" : "4",
+         "area" : "2",
+         "servingLine" : {
+            "direction" : "Essen Helenenstr.",
+            "motType" : "4",
+            "delay" : "1",
+            "lineDisplay" : "line",
+            "directionFrom" : "Essen Philippusstift",
+            "number" : "101",
+            "stateless" : "eva:11101: :H:j24",
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "name" : "StraÃenbahn",
+            "code" : "4",
+            "destID" : "20009306",
+            "key" : "159",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva",
+               "direction" : "H",
+               "line" : "11101",
+               "gid" : "de:vrr:eva-11-101:"
+            },
+            "symbol" : "101"
+         },
+         "countdown" : "17",
+         "operator" : {
+            "publicCode" : "EV-T",
+            "code" : "11",
+            "name" : "EVAG Strab"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "minute" : "50",
+            "hour" : "18",
+            "weekday" : "7",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21"
+         },
+         "realDateTime" : {
+            "minute" : "51",
+            "hour" : "18",
+            "weekday" : "7",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024"
+         }
+      },
+      {
+         "realDateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "minute" : "50",
+            "hour" : "18"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "minute" : "50",
+            "hour" : "18"
+         },
+         "operator" : {
+            "publicCode" : "EV-T",
+            "name" : "EVAG Strab",
+            "code" : "11"
+         },
+         "countdown" : "16",
+         "servingLine" : {
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva",
+               "direction" : "H",
+               "line" : "11106",
+               "gid" : "de:vrr:eva-11-106:"
+            },
+            "symbol" : "106",
+            "key" : "171",
+            "code" : "4",
+            "name" : "StraÃenbahn",
+            "destID" : "20009254",
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "stateless" : "eva:11106: :H:j24",
+            "lineDisplay" : "line",
+            "directionFrom" : "Essen Helenenstr.",
+            "number" : "106",
+            "delay" : "0",
+            "direction" : "Essen Germaniaplatz",
+            "motType" : "4"
+         },
+         "area" : "2",
+         "platform" : "3",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.1072"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platformName" : "Gleis 3",
+         "stopName" : "Essen Berliner Platz",
+         "nameWO" : "Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779748",
+         "y" : "5296977"
+      },
+      {
+         "platform" : "2",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.274551",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "platformName" : "2",
+         "servingLine" : {
+            "delay" : "0",
+            "direction" : "Essen MargarethenhÃ¶he",
+            "motType" : "2",
+            "stateless" : "eva:10U17: :H:j24",
+            "lineDisplay" : "line",
+            "number" : "U17",
+            "directionFrom" : "Essen Karlsplatz",
+            "name" : "U-Bahn",
+            "code" : "1",
+            "destID" : "20009447",
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "symbol" : "U17",
+            "liErgRiProj" : {
+               "project" : "j24",
+               "network" : "eva",
+               "supplement" : " ",
+               "line" : "10U17",
+               "gid" : "de:vrr:eva-10-U17:",
+               "direction" : "H"
+            },
+            "key" : "111"
+         },
+         "area" : "1",
+         "dateTime" : {
+            "weekday" : "7",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "minute" : "50",
+            "hour" : "18"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "countdown" : "16",
+         "operator" : {
+            "code" : "10",
+            "publicCode" : "EV-U",
+            "name" : "EVAG U-Bahn"
+         },
+         "realDateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "minute" : "50",
+            "hour" : "18"
+         },
+         "y" : "5297149",
+         "nameWO" : "Berliner Platz",
+         "x" : "779713",
+         "stopID" : "20009153",
+         "stopName" : "Essen Berliner Platz"
+      },
+      {
+         "y" : "5296897",
+         "stopID" : "20009153",
+         "x" : "779732",
+         "nameWO" : "Berliner Platz",
+         "stopName" : "Essen Berliner Platz",
+         "platformName" : "3",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.87593",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platform" : "3",
+         "area" : "3",
+         "servingLine" : {
+            "symbol" : "166",
+            "liErgRiProj" : {
+               "direction" : "H",
+               "line" : "12166",
+               "gid" : "de:vrr:eva-12-166:",
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva"
+            },
+            "key" : "316",
+            "name" : "Niederflurbus",
+            "destID" : "20008454",
+            "code" : "5",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "stateless" : "eva:12166: :H:j24",
+            "number" : "166",
+            "directionFrom" : "Essen Dellwig Bahnhof",
+            "lineDisplay" : "line",
+            "delay" : "0",
+            "motType" : "5",
+            "direction" : "Hattingen MÃ¤rkische Str."
+         },
+         "countdown" : "16",
+         "operator" : {
+            "name" : "EVAG Bus",
+            "publicCode" : "EV-B",
+            "code" : "12"
+         },
+         "dateTime" : {
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "50"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "realDateTime" : {
+            "hour" : "18",
+            "minute" : "50",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "weekday" : "7"
+         }
+      },
+      {
+         "area" : "4",
+         "servingLine" : {
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "name" : "Niederflurbus",
+            "code" : "5",
+            "destID" : "20009302",
+            "key" : "280",
+            "symbol" : "145",
+            "liErgRiProj" : {
+               "gid" : "de:vrr:eva-12-145:",
+               "line" : "12145",
+               "direction" : "H",
+               "project" : "j24",
+               "network" : "eva",
+               "supplement" : " "
+            },
+            "motType" : "5",
+            "direction" : "Essen Heisingen Baldeneysee",
+            "delay" : "0",
+            "number" : "145",
+            "directionFrom" : "Essen Erbach",
+            "lineDisplay" : "line",
+            "stateless" : "eva:12145: :H:j24"
+         },
+         "platformName" : "2",
+         "platform" : "2",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.84849"
+            }
+         ],
+         "mapName" : "MRCV",
+         "realDateTime" : {
+            "minute" : "51",
+            "hour" : "18",
+            "weekday" : "7",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21"
+         },
+         "countdown" : "17",
+         "operator" : {
+            "publicCode" : "EV-B",
+            "name" : "EVAG Bus",
+            "code" : "12"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "51"
+         },
+         "x" : "779673",
+         "stopID" : "20009153",
+         "nameWO" : "Berliner Platz",
+         "y" : "5297075",
+         "stopName" : "Essen Berliner Platz"
+      },
+      {
+         "realDateTime" : {
+            "hour" : "18",
+            "minute" : "51",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "weekday" : "7"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "minute" : "51",
+            "hour" : "18"
+         },
+         "operator" : {
+            "publicCode" : "EV-U",
+            "name" : "EVAG U-Bahn",
+            "code" : "10"
+         },
+         "countdown" : "17",
+         "servingLine" : {
+            "lineDisplay" : "line",
+            "directionFrom" : "Essen Messe W.-SÃ¼d/Gruga",
+            "number" : "U11",
+            "stateless" : "eva:10U11: :R:j24",
+            "direction" : "Gelsenkirchen Buerer Str.",
+            "motType" : "2",
+            "delay" : "0",
+            "key" : "712",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "network" : "eva",
+               "project" : "j24",
+               "direction" : "R",
+               "line" : "10U11",
+               "gid" : "de:vrr:eva-10-U11:"
+            },
+            "symbol" : "U11",
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "name" : "U-Bahn",
+            "code" : "1",
+            "destID" : "20005579"
+         },
+         "area" : "1",
+         "platform" : "1",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.274438",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "platformName" : "1",
+         "stopName" : "Essen Berliner Platz",
+         "nameWO" : "Berliner Platz",
+         "x" : "779741",
+         "stopID" : "20009153",
+         "y" : "5297142"
+      },
+      {
+         "stopName" : "Essen Berliner Platz",
+         "y" : "5296977",
+         "x" : "779748",
+         "stopID" : "20009153",
+         "nameWO" : "Berliner Platz",
+         "countdown" : "18",
+         "operator" : {
+            "code" : "11",
+            "publicCode" : "EV-T",
+            "name" : "EVAG Strab"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "hour" : "18",
+            "minute" : "52",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "weekday" : "7"
+         },
+         "realDateTime" : {
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "52"
+         },
+         "platformName" : "Gleis 3",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.3554"
+            }
+         ],
+         "platform" : "3",
+         "area" : "2",
+         "servingLine" : {
+            "delay" : "0",
+            "motType" : "4",
+            "direction" : "Essen Wertstr.",
+            "stateless" : "eva:11103: :R:j24",
+            "number" : "103",
+            "directionFrom" : "Essen Steele S",
+            "lineDisplay" : "line",
+            "name" : "StraÃenbahn",
+            "code" : "4",
+            "destID" : "20009641",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "symbol" : "103",
+            "liErgRiProj" : {
+               "gid" : "de:vrr:eva-11-103:",
+               "line" : "11103",
+               "direction" : "R",
+               "network" : "eva",
+               "project" : "j24",
+               "supplement" : " "
+            },
+            "key" : "463"
+         }
+      },
+      {
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.2648",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platform" : "4",
+         "platformName" : "Gleis 4",
+         "servingLine" : {
+            "motType" : "4",
+            "direction" : "Essen Zeche Ludwig",
+            "delay" : "0",
+            "directionFrom" : "Essen Unterstr.",
+            "number" : "105",
+            "lineDisplay" : "line",
+            "stateless" : "eva:11105: :H:j24",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "name" : "StraÃenbahn",
+            "code" : "4",
+            "destID" : "20009665",
+            "key" : "369",
+            "liErgRiProj" : {
+               "gid" : "de:vrr:eva-11-105:",
+               "line" : "11105",
+               "direction" : "H",
+               "network" : "eva",
+               "project" : "j24",
+               "supplement" : " "
+            },
+            "symbol" : "105"
+         },
+         "area" : "2",
+         "dateTime" : {
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "weekday" : "7",
+            "hour" : "18",
+            "minute" : "53"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "countdown" : "19",
+         "operator" : {
+            "name" : "EVAG Strab",
+            "publicCode" : "EV-T",
+            "code" : "11"
+         },
+         "realDateTime" : {
+            "minute" : "53",
+            "hour" : "18",
+            "weekday" : "7",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9"
+         },
+         "y" : "5297057",
+         "nameWO" : "Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779692",
+         "stopName" : "Essen Berliner Platz"
+      },
+      {
+         "platformName" : "Gleis 4",
+         "platform" : "4",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.3745",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "area" : "2",
+         "servingLine" : {
+            "lineDisplay" : "line",
+            "directionFrom" : "Frohnhausen Breilsort",
+            "number" : "109",
+            "stateless" : "eva:11109: :H:j24",
+            "direction" : "Essen Steele S",
+            "motType" : "4",
+            "delay" : "0",
+            "key" : "123",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "network" : "eva",
+               "project" : "j24",
+               "direction" : "H",
+               "line" : "11109",
+               "gid" : "de:vrr:eva-11-109:"
+            },
+            "symbol" : "109",
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "name" : "StraÃenbahn",
+            "code" : "4",
+            "destID" : "20009582"
+         },
+         "countdown" : "21",
+         "operator" : {
+            "code" : "11",
+            "publicCode" : "EV-T",
+            "name" : "EVAG Strab"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "minute" : "55",
+            "hour" : "18",
+            "weekday" : "7",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9"
+         },
+         "realDateTime" : {
+            "hour" : "18",
+            "minute" : "55",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "weekday" : "7"
+         },
+         "y" : "5297057",
+         "stopID" : "20009153",
+         "x" : "779692",
+         "nameWO" : "Berliner Platz",
+         "stopName" : "Essen Berliner Platz"
+      },
+      {
+         "operator" : {
+            "code" : "11",
+            "publicCode" : "EV-T",
+            "name" : "EVAG Strab"
+         },
+         "countdown" : "23",
+         "dateTime" : {
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "minute" : "57",
+            "hour" : "18"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "realDateTime" : {
+            "hour" : "18",
+            "minute" : "57",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "weekday" : "7"
+         },
+         "platformName" : "Gleis 3",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.1560",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platform" : "3",
+         "area" : "2",
+         "servingLine" : {
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "destID" : "20009243",
+            "code" : "4",
+            "name" : "StraÃenbahn",
+            "key" : "374",
+            "symbol" : "109",
+            "liErgRiProj" : {
+               "project" : "j24",
+               "network" : "eva",
+               "supplement" : " ",
+               "gid" : "de:vrr:eva-11-109:",
+               "line" : "11109",
+               "direction" : "R"
+            },
+            "direction" : "Frohnhausen Breilsort",
+            "motType" : "4",
+            "delay" : "0",
+            "lineDisplay" : "line",
+            "number" : "109",
+            "directionFrom" : "Essen Steele S",
+            "stateless" : "eva:11109: :R:j24"
+         },
+         "stopName" : "Essen Berliner Platz",
+         "y" : "5296977",
+         "stopID" : "20009153",
+         "x" : "779748",
+         "nameWO" : "Berliner Platz"
+      },
+      {
+         "servingLine" : {
+            "liErgRiProj" : {
+               "network" : "eva",
+               "project" : "j24",
+               "supplement" : " ",
+               "gid" : "de:vrr:eva-10-U11:",
+               "line" : "10U11",
+               "direction" : "H"
+            },
+            "symbol" : "U11",
+            "key" : "275",
+            "destID" : "20009270",
+            "name" : "U-Bahn",
+            "code" : "1",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "stateless" : "eva:10U11: :H:j24",
+            "directionFrom" : "Gelsenkirchen Buerer Str.",
+            "number" : "U11",
+            "lineDisplay" : "line",
+            "delay" : "0",
+            "motType" : "2",
+            "direction" : "Essen Messe W.-SÃ¼d/Gruga"
+         },
+         "area" : "1",
+         "platform" : "2",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.274909"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platformName" : "2",
+         "realDateTime" : {
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "minute" : "57",
+            "hour" : "18"
+         },
+         "dateTime" : {
+            "minute" : "57",
+            "hour" : "18",
+            "weekday" : "7",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "operator" : {
+            "name" : "EVAG U-Bahn",
+            "publicCode" : "EV-U",
+            "code" : "10"
+         },
+         "countdown" : "23",
+         "nameWO" : "Berliner Platz",
+         "x" : "779713",
+         "stopID" : "20009153",
+         "y" : "5297149",
+         "stopName" : "Essen Berliner Platz"
+      },
+      {
+         "stopName" : "Essen Berliner Platz",
+         "nameWO" : "Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779741",
+         "y" : "5297142",
+         "realDateTime" : {
+            "hour" : "18",
+            "minute" : "58",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "weekday" : "7"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "hour" : "18",
+            "minute" : "58",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "weekday" : "7"
+         },
+         "operator" : {
+            "publicCode" : "EV-U",
+            "name" : "EVAG U-Bahn",
+            "code" : "10"
+         },
+         "countdown" : "24",
+         "servingLine" : {
+            "stateless" : "eva:10U17: :R:j24",
+            "number" : "U17",
+            "directionFrom" : "Essen MargarethenhÃ¶he",
+            "lineDisplay" : "line",
+            "delay" : "0",
+            "motType" : "2",
+            "direction" : "Essen Karlsplatz",
+            "symbol" : "U17",
+            "liErgRiProj" : {
+               "direction" : "R",
+               "gid" : "de:vrr:eva-10-U17:",
+               "line" : "10U17",
+               "supplement" : " ",
+               "network" : "eva",
+               "project" : "j24"
+            },
+            "key" : "266",
+            "code" : "1",
+            "name" : "U-Bahn",
+            "destID" : "20009370",
+            "realtime" : "1",
+            "mtSubcode" : "0"
+         },
+         "area" : "1",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.274889"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platform" : "1",
+         "platformName" : "1"
+      },
+      {
+         "stopName" : "Essen Berliner Platz",
+         "x" : "779692",
+         "stopID" : "20009153",
+         "nameWO" : "Berliner Platz",
+         "y" : "5297057",
+         "realDateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "minute" : "0",
+            "hour" : "19"
+         },
+         "countdown" : "26",
+         "operator" : {
+            "name" : "EVAG Strab",
+            "publicCode" : "EV-T",
+            "code" : "11"
+         },
+         "dateTime" : {
+            "hour" : "19",
+            "minute" : "0",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "weekday" : "7"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "area" : "2",
+         "servingLine" : {
+            "stateless" : "eva:11103: :H:j24",
+            "directionFrom" : "Essen Wertstr.",
+            "number" : "103",
+            "lineDisplay" : "line",
+            "delay" : "0",
+            "motType" : "4",
+            "direction" : "Essen Hauptbahnhof",
+            "liErgRiProj" : {
+               "network" : "eva",
+               "project" : "j24",
+               "supplement" : " ",
+               "gid" : "de:vrr:eva-11-103:",
+               "line" : "11103",
+               "direction" : "H"
+            },
+            "symbol" : "103",
+            "key" : "141",
+            "name" : "StraÃenbahn",
+            "code" : "4",
+            "destID" : "20009289",
+            "realtime" : "1",
+            "mtSubcode" : "0"
+         },
+         "platformName" : "Gleis 4",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.2069"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platform" : "4"
+      },
+      {
+         "countdown" : "26",
+         "operator" : {
+            "code" : "13",
+            "publicCode" : "",
+            "name" : "Ruhrbahn MÃ¼lheim"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "minute" : "0",
+            "hour" : "19"
+         },
+         "realDateTime" : {
+            "minute" : "0",
+            "hour" : "19",
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21"
+         },
+         "platformName" : "2",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.274647",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platform" : "2",
+         "area" : "1",
+         "servingLine" : {
+            "delay" : "0",
+            "motType" : "2",
+            "direction" : "MÃ¼lheim Hauptbahnhof",
+            "stateless" : "btm:13U18: :H:j24",
+            "number" : "U18",
+            "directionFrom" : "Essen Berliner Platz",
+            "lineDisplay" : "line",
+            "name" : "U-Bahn",
+            "destID" : "20015225",
+            "code" : "1",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "symbol" : "U18",
+            "liErgRiProj" : {
+               "project" : "j24",
+               "network" : "btm",
+               "supplement" : " ",
+               "line" : "13U18",
+               "gid" : "de:vrr:btm-13-U18:",
+               "direction" : "H"
+            },
+            "key" : "78"
+         },
+         "stopName" : "Essen Berliner Platz",
+         "y" : "5297149",
+         "x" : "779713",
+         "stopID" : "20009153",
+         "nameWO" : "Berliner Platz"
+      },
+      {
+         "nameWO" : "Berliner Platz",
+         "x" : "779748",
+         "stopID" : "20009153",
+         "y" : "5296977",
+         "stopName" : "Essen Berliner Platz",
+         "servingLine" : {
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "code" : "4",
+            "name" : "StraÃenbahn",
+            "destID" : "20009614",
+            "key" : "755",
+            "symbol" : "105",
+            "liErgRiProj" : {
+               "direction" : "R",
+               "gid" : "de:vrr:eva-11-105:",
+               "line" : "11105",
+               "supplement" : " ",
+               "network" : "eva",
+               "project" : "j24"
+            },
+            "motType" : "4",
+            "direction" : "Essen Unterstr.",
+            "delay" : "0",
+            "number" : "105",
+            "directionFrom" : "Essen Zeche Ludwig",
+            "lineDisplay" : "line",
+            "stateless" : "eva:11105: :R:j24"
+         },
+         "area" : "2",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.2412",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "platform" : "3",
+         "platformName" : "Gleis 3",
+         "realDateTime" : {
+            "hour" : "19",
+            "minute" : "0",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "weekday" : "7"
+         },
+         "dateTime" : {
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21",
+            "minute" : "0",
+            "hour" : "19"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "countdown" : "26",
+         "operator" : {
+            "publicCode" : "EV-T",
+            "code" : "11",
+            "name" : "EVAG Strab"
+         }
+      },
+      {
+         "countdown" : "30",
+         "operator" : {
+            "code" : "12",
+            "publicCode" : "EV-B",
+            "name" : "EVAG Bus"
+         },
+         "dateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "minute" : "4",
+            "hour" : "19"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "realDateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "minute" : "4",
+            "hour" : "19"
+         },
+         "platformName" : "1",
+         "platform" : "1",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.84908"
+            }
+         ],
+         "area" : "4",
+         "servingLine" : {
+            "name" : "Niederflurbus",
+            "destID" : "20009222",
+            "code" : "5",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva",
+               "direction" : "R",
+               "line" : "12145",
+               "gid" : "de:vrr:eva-12-145:"
+            },
+            "symbol" : "145",
+            "key" : "561",
+            "delay" : "0",
+            "motType" : "5",
+            "direction" : "Essen Erbach",
+            "stateless" : "eva:12145: :R:j24",
+            "directionFrom" : "Essen Heisingen Baldeneysee",
+            "number" : "145",
+            "lineDisplay" : "line"
+         },
+         "stopName" : "Essen Berliner Platz",
+         "y" : "5297058",
+         "stopID" : "20009153",
+         "x" : "779634",
+         "nameWO" : "Berliner Platz"
+      },
+      {
+         "nameWO" : "Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779748",
+         "y" : "5296893",
+         "stopName" : "Essen Berliner Platz",
+         "servingLine" : {
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva",
+               "direction" : "R",
+               "line" : "12166",
+               "gid" : "de:vrr:eva-12-166:"
+            },
+            "symbol" : "166",
+            "key" : "246",
+            "name" : "Niederflurbus",
+            "code" : "5",
+            "destID" : "20009197",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "stateless" : "eva:12166: :R:j24",
+            "directionFrom" : "Hattingen MÃ¤rkische Str.",
+            "number" : "166",
+            "lineDisplay" : "line",
+            "delay" : "0",
+            "motType" : "5",
+            "direction" : "Essen Dellwig Bahnhof"
+         },
+         "area" : "3",
+         "platform" : "4",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.87911"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platformName" : "4",
+         "realDateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "minute" : "4",
+            "hour" : "19"
+         },
+         "dateTime" : {
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "weekday" : "7",
+            "hour" : "19",
+            "minute" : "4"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "countdown" : "30",
+         "operator" : {
+            "publicCode" : "EV-B",
+            "code" : "12",
+            "name" : "EVAG Bus"
+         }
+      },
+      {
+         "realDateTime" : {
+            "minute" : "5",
+            "hour" : "19",
+            "weekday" : "7",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21"
+         },
+         "countdown" : "31",
+         "operator" : {
+            "publicCode" : "EV-T",
+            "code" : "11",
+            "name" : "EVAG Strab"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "minute" : "5",
+            "hour" : "19",
+            "weekday" : "7",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9"
+         },
+         "area" : "2",
+         "servingLine" : {
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "code" : "4",
+            "name" : "StraÃenbahn",
+            "destID" : "20009254",
+            "key" : "174",
+            "symbol" : "106",
+            "liErgRiProj" : {
+               "line" : "11106",
+               "gid" : "de:vrr:eva-11-106:",
+               "direction" : "H",
+               "project" : "j24",
+               "network" : "eva",
+               "supplement" : " "
+            },
+            "direction" : "Essen Germaniaplatz",
+            "motType" : "4",
+            "delay" : "0",
+            "lineDisplay" : "line",
+            "number" : "106",
+            "directionFrom" : "Essen Helenenstr.",
+            "stateless" : "eva:11106: :H:j24"
+         },
+         "platformName" : "Gleis 3",
+         "platform" : "3",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.1395",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "mapName" : "MRCV",
+         "stopName" : "Essen Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779748",
+         "nameWO" : "Berliner Platz",
+         "y" : "5296977"
+      },
+      {
+         "x" : "779748",
+         "stopID" : "20009153",
+         "nameWO" : "Berliner Platz",
+         "y" : "5296977",
+         "stopName" : "Essen Berliner Platz",
+         "area" : "2",
+         "servingLine" : {
+            "stateless" : "eva:11103: :R:j24",
+            "lineDisplay" : "line",
+            "number" : "103",
+            "directionFrom" : "Essen Hauptbahnhof",
+            "delay" : "0",
+            "direction" : "Essen Wertstr.",
+            "motType" : "4",
+            "symbol" : "103",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva",
+               "direction" : "R",
+               "gid" : "de:vrr:eva-11-103:",
+               "line" : "11103"
+            },
+            "key" : "524",
+            "name" : "StraÃenbahn",
+            "destID" : "20009641",
+            "code" : "4",
+            "mtSubcode" : "0",
+            "realtime" : "1"
+         },
+         "platformName" : "Gleis 3",
+         "platform" : "3",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.1956",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "realDateTime" : {
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "weekday" : "7",
+            "hour" : "19",
+            "minute" : "5"
+         },
+         "operator" : {
+            "publicCode" : "EV-T",
+            "name" : "EVAG Strab",
+            "code" : "11"
+         },
+         "countdown" : "31",
+         "dateTime" : {
+            "weekday" : "7",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21",
+            "minute" : "5",
+            "hour" : "19"
+         },
+         "realtimeTripStatus" : "MONITORED"
+      },
+      {
+         "stopName" : "Essen Berliner Platz",
+         "stopID" : "20009153",
+         "x" : "779713",
+         "nameWO" : "Berliner Platz",
+         "y" : "5297149",
+         "realDateTime" : {
+            "minute" : "5",
+            "hour" : "19",
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21"
+         },
+         "operator" : {
+            "publicCode" : "EV-U",
+            "code" : "10",
+            "name" : "EVAG U-Bahn"
+         },
+         "countdown" : "31",
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "minute" : "5",
+            "hour" : "19",
+            "weekday" : "7",
+            "month" : "9",
+            "year" : "2024",
+            "day" : "21"
+         },
+         "area" : "1",
+         "servingLine" : {
+            "code" : "1",
+            "name" : "U-Bahn",
+            "destID" : "20009447",
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "liErgRiProj" : {
+               "line" : "10U17",
+               "gid" : "de:vrr:eva-10-U17:",
+               "direction" : "H",
+               "project" : "j24",
+               "network" : "eva",
+               "supplement" : " "
+            },
+            "symbol" : "U17",
+            "key" : "114",
+            "delay" : "0",
+            "direction" : "Essen MargarethenhÃ¶he",
+            "motType" : "2",
+            "stateless" : "eva:10U17: :H:j24",
+            "lineDisplay" : "line",
+            "directionFrom" : "Essen Karlsplatz",
+            "number" : "U17"
+         },
+         "platformName" : "2",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.274834",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "platform" : "2"
+      },
+      {
+         "stopName" : "Essen Berliner Platz",
+         "x" : "779692",
+         "stopID" : "20009153",
+         "nameWO" : "Berliner Platz",
+         "y" : "5297057",
+         "realDateTime" : {
+            "hour" : "19",
+            "minute" : "5",
+            "day" : "21",
+            "year" : "2024",
+            "month" : "9",
+            "weekday" : "7"
+         },
+         "countdown" : "31",
+         "operator" : {
+            "code" : "11",
+            "publicCode" : "EV-T",
+            "name" : "EVAG Strab"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "minute" : "5",
+            "hour" : "19",
+            "weekday" : "7",
+            "year" : "2024",
+            "month" : "9",
+            "day" : "21"
+         },
+         "area" : "2",
+         "servingLine" : {
+            "key" : "162",
+            "symbol" : "101",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "network" : "eva",
+               "project" : "j24",
+               "direction" : "H",
+               "gid" : "de:vrr:eva-11-101:",
+               "line" : "11101"
+            },
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "name" : "StraÃenbahn",
+            "code" : "4",
+            "destID" : "20009306",
+            "number" : "101",
+            "directionFrom" : "Essen Philippusstift",
+            "lineDisplay" : "line",
+            "stateless" : "eva:11101: :H:j24",
+            "motType" : "4",
+            "direction" : "Essen Helenenstr.",
+            "delay" : "0"
+         },
+         "platformName" : "Gleis 4",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.3224",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "platform" : "4"
+      },
+      {
+         "platformName" : "1",
+         "platform" : "1",
+         "mapName" : "MRCV",
+         "attrs" : [
+            {
+               "name" : "AVMSTripID",
+               "value" : "RB_EVAG.274465"
+            }
+         ],
+         "area" : "1",
+         "servingLine" : {
+            "key" : "714",
+            "symbol" : "U11",
+            "liErgRiProj" : {
+               "supplement" : " ",
+               "project" : "j24",
+               "network" : "eva",
+               "direction" : "R",
+               "gid" : "de:vrr:eva-10-U11:",
+               "line" : "10U11"
+            },
+            "mtSubcode" : "0",
+            "realtime" : "1",
+            "code" : "1",
+            "name" : "U-Bahn",
+            "destID" : "20005579",
+            "lineDisplay" : "line",
+            "number" : "U11",
+            "directionFrom" : "Essen Messe W.-SÃ¼d/Gruga",
+            "stateless" : "eva:10U11: :R:j24",
+            "direction" : "Gelsenkirchen Buerer Str.",
+            "motType" : "2",
+            "delay" : "0"
+         },
+         "operator" : {
+            "code" : "10",
+            "publicCode" : "EV-U",
+            "name" : "EVAG U-Bahn"
+         },
+         "countdown" : "32",
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "hour" : "19",
+            "minute" : "6",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "weekday" : "7"
+         },
+         "realDateTime" : {
+            "hour" : "19",
+            "minute" : "6",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "weekday" : "7"
+         },
+         "y" : "5297142",
+         "x" : "779741",
+         "stopID" : "20009153",
+         "nameWO" : "Berliner Platz",
+         "stopName" : "Essen Berliner Platz"
+      },
+      {
+         "y" : "5297057",
+         "stopID" : "20009153",
+         "x" : "779692",
+         "nameWO" : "Berliner Platz",
+         "stopName" : "Essen Berliner Platz",
+         "platformName" : "Gleis 4",
+         "attrs" : [
+            {
+               "value" : "RB_EVAG.2735",
+               "name" : "AVMSTripID"
+            }
+         ],
+         "mapName" : "MRCV",
+         "platform" : "4",
+         "area" : "2",
+         "servingLine" : {
+            "motType" : "4",
+            "direction" : "Essen Zeche Ludwig",
+            "delay" : "0",
+            "directionFrom" : "Essen Unterstr.",
+            "number" : "105",
+            "lineDisplay" : "line",
+            "stateless" : "eva:11105: :H:j24",
+            "realtime" : "1",
+            "mtSubcode" : "0",
+            "destID" : "20009665",
+            "code" : "4",
+            "name" : "StraÃenbahn",
+            "key" : "372",
+            "liErgRiProj" : {
+               "direction" : "H",
+               "line" : "11105",
+               "gid" : "de:vrr:eva-11-105:",
+               "supplement" : " ",
+               "network" : "eva",
+               "project" : "j24"
+            },
+            "symbol" : "105"
+         },
+         "countdown" : "34",
+         "operator" : {
+            "publicCode" : "EV-T",
+            "code" : "11",
+            "name" : "EVAG Strab"
+         },
+         "realtimeTripStatus" : "MONITORED",
+         "dateTime" : {
+            "weekday" : "7",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024",
+            "minute" : "8",
+            "hour" : "19"
+         },
+         "realDateTime" : {
+            "minute" : "8",
+            "hour" : "19",
+            "weekday" : "7",
+            "day" : "21",
+            "month" : "9",
+            "year" : "2024"
+         }
+      }
+   ],
+   "arr" : {
+      "points" : null,
+      "input" : {
+         "input" : ""
+      }
+   },
+   "dateRange" : [
+      {
+         "month" : "09",
+         "year" : "2024",
+         "day" : "21",
+         "weekday" : "7"
+      },
+      {
+         "year" : "2024",
+         "month" : "09",
+         "day" : "22",
+         "weekday" : "1"
+      },
+      {
+         "day" : "23",
+         "year" : "2024",
+         "month" : "09",
+         "weekday" : "2"
+      },
+      {
+         "day" : "24",
+         "month" : "09",
+         "year" : "2024",
+         "weekday" : "3"
+      },
+      {
+         "weekday" : "4",
+         "day" : "25",
+         "year" : "2024",
+         "month" : "09"
+      },
+      {
+         "weekday" : "5",
+         "day" : "26",
+         "year" : "2024",
+         "month" : "09"
+      },
+      {
+         "month" : "09",
+         "year" : "2024",
+         "day" : "27",
+         "weekday" : "6"
+      },
+      {
+         "year" : "2024",
+         "month" : "09",
+         "day" : "28",
+         "weekday" : "7"
+      },
+      {
+         "month" : "09",
+         "year" : "2024",
+         "day" : "29",
+         "weekday" : "1"
+      },
+      {
+         "month" : "09",
+         "year" : "2024",
+         "day" : "30",
+         "weekday" : "2"
+      },
+      {
+         "weekday" : "3",
+         "day" : "01",
+         "year" : "2024",
+         "month" : "10"
+      },
+      {
+         "day" : "02",
+         "month" : "10",
+         "year" : "2024",
+         "weekday" : "4"
+      },
+      {
+         "weekday" : "5",
+         "year" : "2024",
+         "month" : "10",
+         "day" : "03"
+      },
+      {
+         "weekday" : "6",
+         "day" : "04",
+         "year" : "2024",
+         "month" : "10"
+      },
+      {
+         "month" : "10",
+         "year" : "2024",
+         "day" : "05",
+         "weekday" : "7"
+      }
+   ],
+   "dm" : {
+      "points" : {
+         "point" : {
+            "stateless" : "20009153",
+            "infos" : [
+               {
+                  "infoText" : {
+                     "smsText" : "Die Fahrtreppe (Eingang D (abwÃÂ¤rts) von StraÃÂenebene zur Verteilerebene) an der Haltestelle Essen Berliner Platz ist ausser Betrieb.",
+                     "additionalText" : "Die beschriebenen Ãnderungen sind in der elektronischen Fahrplanauskunft (EFA) <b>nicht</b> berÃ¼cksichtigt.",
+                     "htmlText" : "",
+                     "subtitle" : "Haltestelle Essen Berliner Platz: Die Fahrtreppe ist nicht verfÃ¼gbar. (Eingang D (abwaerts) von Strassenebene zur Verteilerebene)",
+                     "wmlText" : "Die Fahrtreppe (Eingang D (abwÃÂ¤rts) von StraÃÂenebene zur Verteilerebene) an der Haltestelle Essen Berliner Platz ist ausser Betrieb.",
+                     "content" : "Vom 29.12. 07:46 Uhr bis voraussichtlich 21.09. 23:59 Uhr.",
+                     "subject" : "",
+                     "speechText" : ""
+                  },
+                  "paramList" : [
+                     {
+                        "type" : "addInfoParam",
+                        "name" : "infoType",
+                        "edit" : "0",
+                        "value" : "stopInfo"
+                     },
+                     {
+                        "type" : "system",
+                        "name" : "infoID",
+                        "edit" : "0",
+                        "value" : "20240514915345"
+                     },
+                     {
+                        "type" : "system",
+                        "name" : "seqID",
+                        "edit" : "0",
+                        "value" : "150"
+                     },
+                     {
+                        "name" : "incidentDateTime",
+                        "type" : "system",
+                        "value" : "29/12/2023 07:46 - 22/09/2024 00:00",
+                        "edit" : "0"
+                     }
+                  ],
+                  "infoLinkText" : "Haltestelle Essen Berliner Platz: Die Fahrtreppe ist nicht verfÃ¼gbar. (Eingang D (abwaerts) von Strassenebene zur Verteilerebene)",
+                  "infoLinkURL" : "http://217.70.161.100:80/cm/XSLT_CM_SHOWADDINFO_REQUEST?infoID=20240514915345&seqID=150"
+               },
+               {
+                  "paramList" : [
+                     {
+                        "name" : "infoType",
+                        "type" : "addInfoParam",
+                        "edit" : "0",
+                        "value" : "stopInfo"
+                     },
+                     {
+                        "type" : "system",
+                        "name" : "infoID",
+                        "edit" : "0",
+                        "value" : "20240514915357"
+                     },
+                     {
+                        "value" : "132",
+                        "edit" : "0",
+                        "name" : "seqID",
+                        "type" : "system"
+                     },
+                     {
+                        "edit" : "0",
+                        "value" : "13/02/2024 08:13 - 22/09/2024 00:00",
+                        "type" : "system",
+                        "name" : "incidentDateTime"
+                     }
+                  ],
+                  "infoText" : {
+                     "content" : "Vom 13.02. 08:13 Uhr bis voraussichtlich 21.09. 23:59 Uhr.",
+                     "subject" : "",
+                     "speechText" : "",
+                     "smsText" : "Die Fahrtreppe (Verteilerebene (abwÃÂ¤rts) zum Bahnsteig -2 Ebene) an der Haltestelle Essen Berliner Platz ist ausser Betrieb.",
+                     "htmlText" : "",
+                     "additionalText" : "Die beschriebenen Ãnderungen sind in der elektronischen Fahrplanauskunft (EFA) <b>nicht</b> berÃ¼cksichtigt.",
+                     "subtitle" : "Haltestelle Essen Berliner Platz: Die Fahrtreppe ist nicht verfÃ¼gbar. (Verteilerebene (abwaerts) zum Bahnsteig -2 Ebene)",
+                     "wmlText" : "Die Fahrtreppe (Verteilerebene (abwÃÂ¤rts) zum Bahnsteig -2 Ebene) an der Haltestelle Essen Berliner Platz ist ausser Betrieb."
+                  },
+                  "infoLinkURL" : "http://217.70.161.100:80/cm/XSLT_CM_SHOWADDINFO_REQUEST?infoID=20240514915357&seqID=132",
+                  "infoLinkText" : "Haltestelle Essen Berliner Platz: Die Fahrtreppe ist nicht verfÃ¼gbar. (Verteilerebene (abwaerts) zum Bahnsteig -2 Ebene)"
+               }
+            ],
+            "tariffArea" : "",
+            "ref" : {
+               "id" : "20009153",
+               "place" : "Essen",
+               "gid" : "de:05113:9153",
+               "coords" : "779595.00000,5297077.00000",
+               "placeID" : "18",
+               "omc" : "5113000"
+            },
+            "tariffLayer1" : "",
+            "type" : "stop",
+            "name" : "Essen, Berliner Platz",
+            "tariffLayer2" : "",
+            "tariffAreaName" : "",
+            "usage" : "dm"
+         }
+      },
+      "input" : {
+         "input" : "Berliner Platz"
+      }
+   },
+   "servingLines" : {
+      "lines" : [
+         {
+            "mode" : {
+               "diva" : {
+                  "isSTT" : "1",
+                  "isROP" : "1",
+                  "vF" : "20240601",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-U",
+                  "project" : "j24",
+                  "branch" : "10",
+                  "stateless" : "eva:10U11: :H:j24",
+                  "operator" : "EVAG U-Bahn",
+                  "network" : "eva",
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:eva-10-U11:",
+                  "supplement" : " ",
+                  "attrs" : [],
+                  "opCode" : "10",
+                  "line" : "10U11",
+                  "vTo" : "20250228",
+                  "tripCode" : "0"
+               },
+               "product" : "U-Bahn",
+               "type" : "2",
+               "destID" : "20009270",
+               "name" : "U-Bahn U11",
+               "code" : "1",
+               "number" : "U11",
+               "productId" : "0",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "destination" : "Essen Messe W.-SÃ¼d/Gruga",
+               "desc" : "GE-Buerer Str. - E-Karnap - Altenessen - Essen Hbf - RÃ¼ttenscheid - Messe/Gruga"
+            },
+            "index" : "2:0"
+         },
+         {
+            "mode" : {
+               "productId" : "0",
+               "number" : "U11",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "destination" : "Gelsenkirchen Buerer Str.",
+               "desc" : "Messe/Gruga - RÃ¼ttenscheid - Essen Hbf - Altenessen - E-Karnap - GE-Buerer Str.",
+               "diva" : {
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "opCode" : "10",
+                  "attrs" : [],
+                  "line" : "10U11",
+                  "globalId" : "de:vrr:eva-10-U11:",
+                  "lineDisplay" : "line",
+                  "supplement" : " ",
+                  "branch" : "10",
+                  "project" : "j24",
+                  "operator" : "EVAG U-Bahn",
+                  "network" : "eva",
+                  "stateless" : "eva:10U11: :R:j24",
+                  "opPublicCode" : "EV-U",
+                  "dir" : "R",
+                  "vF" : "20240601",
+                  "isROP" : "1",
+                  "isSTT" : "1"
+               },
+               "product" : "U-Bahn",
+               "type" : "2",
+               "destID" : "20005579",
+               "name" : "U-Bahn U11",
+               "code" : "1"
+            },
+            "index" : "2:1"
+         },
+         {
+            "mode" : {
+               "product" : "U-Bahn",
+               "diva" : {
+                  "vF" : "20240601",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-U",
+                  "isSTT" : "1",
+                  "isROP" : "1",
+                  "opCode" : "10",
+                  "attrs" : [],
+                  "line" : "10U17",
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "branch" : "10",
+                  "project" : "j24",
+                  "network" : "eva",
+                  "operator" : "EVAG U-Bahn",
+                  "stateless" : "eva:10U17: :H:j24",
+                  "globalId" : "de:vrr:eva-10-U17:",
+                  "lineDisplay" : "line",
+                  "supplement" : " "
+               },
+               "name" : "U-Bahn U17",
+               "destID" : "20009447",
+               "code" : "1",
+               "type" : "2",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "U17",
+               "productId" : "0",
+               "desc" : "Altenessen - Essen Hbf - Holsterhausen - MargarethenhÃ¶he",
+               "destination" : "Essen MargarethenhÃ¶he"
+            },
+            "index" : "2:2"
+         },
+         {
+            "mode" : {
+               "product" : "U-Bahn",
+               "diva" : {
+                  "dir" : "R",
+                  "opPublicCode" : "EV-U",
+                  "vF" : "20240601",
+                  "isROP" : "1",
+                  "isSTT" : "1",
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "opCode" : "10",
+                  "attrs" : [],
+                  "line" : "10U17",
+                  "globalId" : "de:vrr:eva-10-U17:",
+                  "lineDisplay" : "line",
+                  "supplement" : " ",
+                  "branch" : "10",
+                  "project" : "j24",
+                  "operator" : "EVAG U-Bahn",
+                  "network" : "eva",
+                  "stateless" : "eva:10U17: :R:j24"
+               },
+               "code" : "1",
+               "destID" : "20009370",
+               "name" : "U-Bahn U17",
+               "type" : "2",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "U17",
+               "productId" : "0",
+               "desc" : "MargarethenhÃ¶he - Holsterhausen - Essen Hbf - Altenessen",
+               "destination" : "Essen Karlsplatz"
+            },
+            "index" : "2:3"
+         },
+         {
+            "index" : "2:4",
+            "mode" : {
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "productId" : "0",
+               "number" : "U18",
+               "desc" : "E-Berliner Platz  - Essen Hbf - MH-Rhein-Ruhr-Zentrum - MÃ¼lheim Hbf",
+               "destination" : "MÃ¼lheim Hauptbahnhof",
+               "product" : "U-Bahn",
+               "diva" : {
+                  "isSTT" : "1",
+                  "isROP" : "1",
+                  "vF" : "20240601",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-U",
+                  "project" : "j24",
+                  "branch" : "10",
+                  "stateless" : "eva:10U18: :H:j24",
+                  "network" : "eva",
+                  "operator" : "EVAG U-Bahn",
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:eva-10-U18:",
+                  "supplement" : " ",
+                  "attrs" : [],
+                  "opCode" : "10",
+                  "line" : "10U18",
+                  "tripCode" : "0",
+                  "vTo" : "20250228"
+               },
+               "name" : "U-Bahn U18",
+               "destID" : "20015225",
+               "code" : "1",
+               "type" : "2"
+            }
+         },
+         {
+            "index" : "2:5",
+            "mode" : {
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "productId" : "0",
+               "number" : "U18",
+               "desc" : "Berliner Platz  - Essen Hbf - MH-Rhein-Ruhr-Zentrum - MÃ¼lheim Hbf",
+               "destination" : "MÃ¼lheim Hauptbahnhof",
+               "product" : "U-Bahn",
+               "diva" : {
+                  "branch" : "13",
+                  "project" : "j24",
+                  "operator" : "Ruhrbahn MÃ¼lheim",
+                  "network" : "btm",
+                  "stateless" : "btm:13U18: :H:j24",
+                  "globalId" : "de:vrr:btm-13-U18:",
+                  "lineDisplay" : "line",
+                  "supplement" : " ",
+                  "opCode" : "13",
+                  "attrs" : [],
+                  "line" : "13U18",
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "vF" : "20240601",
+                  "dir" : "H"
+               },
+               "destID" : "20015225",
+               "name" : "U-Bahn U18",
+               "code" : "1",
+               "type" : "2"
+            }
+         },
+         {
+            "index" : "4:0",
+            "mode" : {
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "101",
+               "productId" : "1",
+               "desc" : "Borbeck - Helenenstr. - Essen Hbf RÃ¼ttenscheid - Helenenstr.",
+               "destination" : "Essen Helenenstr.",
+               "product" : "StraÃenbahn",
+               "diva" : {
+                  "vF" : "20240601",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-T",
+                  "isSTT" : "1",
+                  "isROP" : "1",
+                  "opCode" : "11",
+                  "attrs" : [],
+                  "line" : "11101",
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "branch" : "11",
+                  "project" : "j24",
+                  "operator" : "EVAG Strab",
+                  "network" : "eva",
+                  "stateless" : "eva:11101: :H:j24",
+                  "globalId" : "de:vrr:eva-11-101:",
+                  "lineDisplay" : "line",
+                  "supplement" : " "
+               },
+               "name" : "StraÃenbahn 101",
+               "destID" : "20009306",
+               "code" : "4",
+               "type" : "4"
+            }
+         },
+         {
+            "index" : "4:1",
+            "mode" : {
+               "product" : "StraÃenbahn",
+               "diva" : {
+                  "network" : "eva",
+                  "operator" : "EVAG Strab",
+                  "stateless" : "eva:11103: :H:j24",
+                  "branch" : "11",
+                  "project" : "j24",
+                  "supplement" : " ",
+                  "globalId" : "de:vrr:eva-11-103:",
+                  "lineDisplay" : "line",
+                  "line" : "11103",
+                  "opCode" : "11",
+                  "attrs" : [],
+                  "tripCode" : "0",
+                  "vTo" : "20250228",
+                  "vF" : "20240601",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-T"
+               },
+               "code" : "4",
+               "destID" : "20009582",
+               "name" : "StraÃenbahn 103",
+               "type" : "4",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "productId" : "1",
+               "number" : "103",
+               "desc" : "Dellwig - Borbeck - Altendorf - Rathaus Essen - Essen Hbf - Steele",
+               "destination" : "Essen Steele S"
+            }
+         },
+         {
+            "mode" : {
+               "diva" : {
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "attrs" : [],
+                  "opCode" : "11",
+                  "line" : "11103",
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:eva-11-103:",
+                  "supplement" : " ",
+                  "project" : "j24",
+                  "branch" : "11",
+                  "stateless" : "eva:11103: :R:j24",
+                  "operator" : "EVAG Strab",
+                  "network" : "eva",
+                  "opPublicCode" : "EV-T",
+                  "dir" : "R",
+                  "vF" : "20240601"
+               },
+               "product" : "StraÃenbahn",
+               "type" : "4",
+               "destID" : "20009641",
+               "code" : "4",
+               "name" : "StraÃenbahn 103",
+               "number" : "103",
+               "productId" : "1",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "destination" : "Essen Wertstr.",
+               "desc" : "Steele - Essen Hbf - Rathaus Essen - Altendorf - Borbeck - Dellwig"
+            },
+            "index" : "4:2"
+         },
+         {
+            "mode" : {
+               "product" : "StraÃenbahn",
+               "diva" : {
+                  "supplement" : " ",
+                  "globalId" : "de:vrr:eva-11-105:",
+                  "lineDisplay" : "line",
+                  "operator" : "EVAG Strab",
+                  "network" : "eva",
+                  "stateless" : "eva:11105: :H:j24",
+                  "branch" : "11",
+                  "project" : "j24",
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "line" : "11105",
+                  "opCode" : "11",
+                  "attrs" : [],
+                  "isROP" : "1",
+                  "isSTT" : "1",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-T",
+                  "vF" : "20240601"
+               },
+               "name" : "StraÃenbahn 105",
+               "destID" : "20009665",
+               "code" : "4",
+               "type" : "4",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "productId" : "1",
+               "number" : "105",
+               "desc" : "Frintrop - Altendorf - Essen Hbf - Bergerhausen - Rellinghausen",
+               "destination" : "Essen Zeche Ludwig"
+            },
+            "index" : "4:3"
+         },
+         {
+            "mode" : {
+               "product" : "StraÃenbahn",
+               "diva" : {
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "opCode" : "11",
+                  "attrs" : [],
+                  "line" : "11105",
+                  "globalId" : "de:vrr:eva-11-105:",
+                  "lineDisplay" : "line",
+                  "supplement" : " ",
+                  "branch" : "11",
+                  "project" : "j24",
+                  "operator" : "EVAG Strab",
+                  "network" : "eva",
+                  "stateless" : "eva:11105: :R:j24",
+                  "dir" : "R",
+                  "opPublicCode" : "EV-T",
+                  "vF" : "20240601",
+                  "isROP" : "1",
+                  "isSTT" : "1"
+               },
+               "destID" : "20009614",
+               "name" : "StraÃenbahn 105",
+               "code" : "4",
+               "type" : "4",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "105",
+               "productId" : "1",
+               "desc" : "Rellinghausen - Bergerhausen - Essen Hbf - Altendorf - Frintrop",
+               "destination" : "Essen Unterstr."
+            },
+            "index" : "4:4"
+         },
+         {
+            "mode" : {
+               "desc" : "Helenenstr. - RÃ¼ttenscheid - Essen Hbf - Helenenstr. - Borbeck",
+               "destination" : "Essen Germaniaplatz",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "106",
+               "productId" : "1",
+               "destID" : "20009254",
+               "name" : "StraÃenbahn 106",
+               "code" : "4",
+               "type" : "4",
+               "product" : "StraÃenbahn",
+               "diva" : {
+                  "isSTT" : "1",
+                  "isROP" : "1",
+                  "vF" : "20240601",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-T",
+                  "project" : "j24",
+                  "branch" : "11",
+                  "stateless" : "eva:11106: :H:j24",
+                  "operator" : "EVAG Strab",
+                  "network" : "eva",
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:eva-11-106:",
+                  "supplement" : " ",
+                  "attrs" : [],
+                  "opCode" : "11",
+                  "line" : "11106",
+                  "tripCode" : "0",
+                  "vTo" : "20250228"
+               }
+            },
+            "index" : "4:5"
+         },
+         {
+            "mode" : {
+               "product" : "StraÃenbahn",
+               "diva" : {
+                  "network" : "eva",
+                  "operator" : "EVAG Strab",
+                  "stateless" : "eva:11109: :H:j24",
+                  "branch" : "11",
+                  "project" : "j24",
+                  "supplement" : " ",
+                  "globalId" : "de:vrr:eva-11-109:",
+                  "lineDisplay" : "line",
+                  "line" : "11109",
+                  "opCode" : "11",
+                  "attrs" : [],
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "isSTT" : "1",
+                  "isROP" : "1",
+                  "vF" : "20240601",
+                  "opPublicCode" : "EV-T",
+                  "dir" : "H"
+               },
+               "destID" : "20009582",
+               "code" : "4",
+               "name" : "StraÃenbahn 109",
+               "type" : "4",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "109",
+               "productId" : "1",
+               "desc" : "Frohnhausen - Holsterhausen - Rathaus Essen - Steele",
+               "destination" : "Essen Steele S"
+            },
+            "index" : "4:6"
+         },
+         {
+            "mode" : {
+               "desc" : "Steele - Rathaus Essen - Holsterhausen - Frohnhausen",
+               "destination" : "Frohnhausen Breilsort",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "109",
+               "productId" : "1",
+               "name" : "StraÃenbahn 109",
+               "destID" : "20009243",
+               "code" : "4",
+               "type" : "4",
+               "product" : "StraÃenbahn",
+               "diva" : {
+                  "opCode" : "11",
+                  "attrs" : [],
+                  "line" : "11109",
+                  "tripCode" : "0",
+                  "vTo" : "20250228",
+                  "branch" : "11",
+                  "project" : "j24",
+                  "operator" : "EVAG Strab",
+                  "network" : "eva",
+                  "stateless" : "eva:11109: :R:j24",
+                  "globalId" : "de:vrr:eva-11-109:",
+                  "lineDisplay" : "line",
+                  "supplement" : " ",
+                  "vF" : "20240601",
+                  "opPublicCode" : "EV-T",
+                  "dir" : "R",
+                  "isSTT" : "1",
+                  "isROP" : "1"
+               }
+            },
+            "index" : "4:7"
+         },
+         {
+            "index" : "5:0",
+            "mode" : {
+               "diva" : {
+                  "isROP" : "1",
+                  "isSTT" : "1",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-B",
+                  "vF" : "20240601",
+                  "globalId" : "de:vrr:eva-12-145:",
+                  "lineDisplay" : "line",
+                  "supplement" : " ",
+                  "branch" : "12",
+                  "project" : "j24",
+                  "network" : "eva",
+                  "operator" : "EVAG Bus",
+                  "stateless" : "eva:12145: :H:j24",
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "opCode" : "12",
+                  "attrs" : [],
+                  "line" : "12145"
+               },
+               "product" : "Niederflurbus",
+               "type" : "5",
+               "name" : "Niederflurbus 145",
+               "destID" : "20009302",
+               "code" : "5",
+               "productId" : "13",
+               "number" : "145",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "destination" : "Essen Heisingen Baldeneysee",
+               "desc" : "Haarzopf - Essen Hbf - Stadtwald - Heisingen"
+            }
+         },
+         {
+            "mode" : {
+               "code" : "5",
+               "destID" : "20009222",
+               "name" : "Niederflurbus 145",
+               "type" : "5",
+               "product" : "Niederflurbus",
+               "diva" : {
+                  "isROP" : "1",
+                  "isSTT" : "1",
+                  "opPublicCode" : "EV-B",
+                  "dir" : "R",
+                  "vF" : "20240601",
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:eva-12-145:",
+                  "supplement" : " ",
+                  "project" : "j24",
+                  "branch" : "12",
+                  "stateless" : "eva:12145: :R:j24",
+                  "operator" : "EVAG Bus",
+                  "network" : "eva",
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "attrs" : [],
+                  "opCode" : "12",
+                  "line" : "12145"
+               },
+               "desc" : "Heisingen - Stadtwald - Essen Hbf - Haarzopf",
+               "destination" : "Essen Erbach",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "145",
+               "productId" : "13"
+            },
+            "index" : "5:1"
+         },
+         {
+            "mode" : {
+               "productId" : "13",
+               "number" : "166",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "destination" : "E-Burgaltendorf Burgruine",
+               "desc" : "Dellwig - Essen Hbf - Steele - E-Burgaltendorf - HAT-Niederwenigern",
+               "diva" : {
+                  "globalId" : "de:vrr:eva-12-166:",
+                  "lineDisplay" : "line",
+                  "supplement" : " ",
+                  "branch" : "12",
+                  "project" : "j24",
+                  "network" : "eva",
+                  "operator" : "EVAG Bus",
+                  "stateless" : "eva:12166: :H:j24",
+                  "tripCode" : "0",
+                  "vTo" : "20250228",
+                  "opCode" : "12",
+                  "attrs" : [],
+                  "line" : "12166",
+                  "isROP" : "1",
+                  "isSTT" : "1",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-B",
+                  "vF" : "20240601"
+               },
+               "product" : "Niederflurbus",
+               "type" : "5",
+               "destID" : "20009182",
+               "name" : "Niederflurbus 166",
+               "code" : "5"
+            },
+            "index" : "5:2"
+         },
+         {
+            "mode" : {
+               "number" : "166",
+               "productId" : "13",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "destination" : "Essen Dellwig Bahnhof",
+               "desc" : "HAT-Niederwenigern  - E-Burgaltendorf - Steele - Essen Hbf - Dellwig",
+               "diva" : {
+                  "dir" : "R",
+                  "opPublicCode" : "EV-B",
+                  "vF" : "20240601",
+                  "isROP" : "1",
+                  "isSTT" : "1",
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "attrs" : [],
+                  "opCode" : "12",
+                  "line" : "12166",
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:eva-12-166:",
+                  "supplement" : " ",
+                  "project" : "j24",
+                  "branch" : "12",
+                  "stateless" : "eva:12166: :R:j24",
+                  "operator" : "EVAG Bus",
+                  "network" : "eva"
+               },
+               "product" : "Niederflurbus",
+               "type" : "5",
+               "destID" : "20009197",
+               "code" : "5",
+               "name" : "Niederflurbus 166"
+            },
+            "index" : "5:3"
+         },
+         {
+            "mode" : {
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "productId" : "13",
+               "number" : "NE10",
+               "desc" : "Essen Hbf - Frohnhausen - Haarzopf",
+               "destination" : "Essen Erbach",
+               "product" : "Niederflurbus",
+               "diva" : {
+                  "line" : "12M10",
+                  "opCode" : "12",
+                  "attrs" : [],
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "network" : "eva",
+                  "operator" : "EVAG Bus",
+                  "stateless" : "eva:12M10: :H:j24",
+                  "branch" : "12",
+                  "project" : "j24",
+                  "supplement" : " ",
+                  "globalId" : "de:vrr:eva-12-M10:",
+                  "lineDisplay" : "line",
+                  "vF" : "20240601",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-B",
+                  "isSTT" : "1",
+                  "isROP" : "1"
+               },
+               "name" : "Niederflurbus NE10",
+               "destID" : "20009222",
+               "code" : "5",
+               "type" : "5"
+            },
+            "index" : "5:4"
+         },
+         {
+            "index" : "5:5",
+            "mode" : {
+               "type" : "5",
+               "code" : "5",
+               "destID" : "20009289",
+               "name" : "Niederflurbus NE10",
+               "diva" : {
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:eva-12-M10:",
+                  "supplement" : " ",
+                  "project" : "j24",
+                  "branch" : "12",
+                  "stateless" : "eva:12M10: :R:j24",
+                  "operator" : "EVAG Bus",
+                  "network" : "eva",
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "attrs" : [],
+                  "opCode" : "12",
+                  "line" : "12M10",
+                  "isROP" : "1",
+                  "isSTT" : "1",
+                  "opPublicCode" : "EV-B",
+                  "dir" : "R",
+                  "vF" : "20240601"
+               },
+               "product" : "Niederflurbus",
+               "destination" : "Essen Hauptbahnhof",
+               "desc" : "Haarzopf - Frohnhausen - Essen Hbf",
+               "number" : "NE10",
+               "productId" : "13",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)"
+            }
+         },
+         {
+            "index" : "5:6",
+            "mode" : {
+               "code" : "5",
+               "destID" : "20014022",
+               "name" : "Niederflurbus NE11",
+               "type" : "5",
+               "product" : "Niederflurbus",
+               "diva" : {
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "line" : "12M11",
+                  "attrs" : [],
+                  "opCode" : "12",
+                  "supplement" : " ",
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:eva-12-M11:",
+                  "stateless" : "eva:12M11: :H:j24",
+                  "operator" : "EVAG Bus",
+                  "network" : "eva",
+                  "project" : "j24",
+                  "branch" : "12",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-B",
+                  "vF" : "20240601",
+                  "isROP" : "1",
+                  "isSTT" : "1"
+               },
+               "desc" : "Essen Hbf - Altendorf - Essen Frintrop - Oberhausen",
+               "destination" : "Oberhausen Hbf",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "NE11",
+               "productId" : "13"
+            }
+         },
+         {
+            "index" : "5:7",
+            "mode" : {
+               "type" : "5",
+               "destID" : "20009289",
+               "code" : "5",
+               "name" : "Niederflurbus NE11",
+               "diva" : {
+                  "vF" : "20240601",
+                  "dir" : "R",
+                  "opPublicCode" : "EV-B",
+                  "isSTT" : "1",
+                  "isROP" : "1",
+                  "line" : "12M11",
+                  "attrs" : [],
+                  "opCode" : "12",
+                  "tripCode" : "0",
+                  "vTo" : "20250228",
+                  "stateless" : "eva:12M11: :R:j24",
+                  "network" : "eva",
+                  "operator" : "EVAG Bus",
+                  "project" : "j24",
+                  "branch" : "12",
+                  "supplement" : " ",
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:eva-12-M11:"
+               },
+               "product" : "Niederflurbus",
+               "destination" : "Essen Hauptbahnhof",
+               "desc" : "Oberhausen - Essen Frintrop - Altendorf - Essen Hbf",
+               "productId" : "13",
+               "number" : "NE11",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)"
+            }
+         },
+         {
+            "index" : "5:8",
+            "mode" : {
+               "productId" : "13",
+               "number" : "NE12",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "destination" : "Essen Borbeck Bf",
+               "desc" : "Essen Hbf - Altendorf - Bergeborbeck - Dellwig - Borbeck",
+               "diva" : {
+                  "isROP" : "1",
+                  "isSTT" : "1",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-B",
+                  "vF" : "20240601",
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:eva-12-M12:",
+                  "supplement" : " ",
+                  "project" : "j24",
+                  "branch" : "12",
+                  "stateless" : "eva:12M12: :H:j24",
+                  "network" : "eva",
+                  "operator" : "EVAG Bus",
+                  "tripCode" : "0",
+                  "vTo" : "20250228",
+                  "attrs" : [],
+                  "opCode" : "12",
+                  "line" : "12M12"
+               },
+               "product" : "Niederflurbus",
+               "type" : "5",
+               "name" : "Niederflurbus NE12",
+               "destID" : "20009158",
+               "code" : "5"
+            }
+         },
+         {
+            "index" : "5:9",
+            "mode" : {
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "NE12",
+               "productId" : "13",
+               "desc" : "Borbeck - Dellwig - Bergeborbeck - Altendorf - Essen Hbf",
+               "destination" : "Essen Hauptbahnhof",
+               "product" : "Niederflurbus",
+               "diva" : {
+                  "operator" : "EVAG Bus",
+                  "network" : "eva",
+                  "stateless" : "eva:12M12: :R:j24",
+                  "branch" : "12",
+                  "project" : "j24",
+                  "supplement" : " ",
+                  "globalId" : "de:vrr:eva-12-M12:",
+                  "lineDisplay" : "line",
+                  "line" : "12M12",
+                  "opCode" : "12",
+                  "attrs" : [],
+                  "tripCode" : "0",
+                  "vTo" : "20250228",
+                  "isSTT" : "1",
+                  "isROP" : "1",
+                  "vF" : "20240601",
+                  "opPublicCode" : "EV-B",
+                  "dir" : "R"
+               },
+               "destID" : "20009289",
+               "code" : "5",
+               "name" : "Niederflurbus NE12",
+               "type" : "5"
+            }
+         },
+         {
+            "index" : "5:10",
+            "mode" : {
+               "destination" : "BOT ZOB Berliner Platz",
+               "desc" : "Essen Hbf - Bergeborbeck - Essen Dellwig - Bottrop",
+               "productId" : "13",
+               "number" : "NE16",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "type" : "5",
+               "destID" : "20003267",
+               "name" : "Niederflurbus NE16",
+               "code" : "5",
+               "diva" : {
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:eva-12-M16:",
+                  "supplement" : " ",
+                  "project" : "j24",
+                  "branch" : "12",
+                  "stateless" : "eva:12M16: :H:j24",
+                  "network" : "eva",
+                  "operator" : "EVAG Bus",
+                  "tripCode" : "0",
+                  "vTo" : "20250228",
+                  "attrs" : [],
+                  "opCode" : "12",
+                  "line" : "12M16",
+                  "isROP" : "1",
+                  "isSTT" : "1",
+                  "dir" : "H",
+                  "opPublicCode" : "EV-B",
+                  "vF" : "20240601"
+               },
+               "product" : "Niederflurbus"
+            }
+         },
+         {
+            "index" : "5:11",
+            "mode" : {
+               "number" : "NE16",
+               "productId" : "13",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "destination" : "Essen Hauptbahnhof",
+               "desc" : "Bottrop - Essen Dellwig - Bergeborbeck - Essen Hbf",
+               "diva" : {
+                  "dir" : "R",
+                  "opPublicCode" : "EV-B",
+                  "vF" : "20240601",
+                  "isROP" : "1",
+                  "isSTT" : "1",
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "opCode" : "12",
+                  "attrs" : [],
+                  "line" : "12M16",
+                  "globalId" : "de:vrr:eva-12-M16:",
+                  "lineDisplay" : "line",
+                  "supplement" : " ",
+                  "branch" : "12",
+                  "project" : "j24",
+                  "network" : "eva",
+                  "operator" : "EVAG Bus",
+                  "stateless" : "eva:12M16: :R:j24"
+               },
+               "product" : "Niederflurbus",
+               "type" : "5",
+               "code" : "5",
+               "destID" : "20009289",
+               "name" : "Niederflurbus NE16"
+            }
+         },
+         {
+            "mode" : {
+               "destination" : "BOT St.-Anto.-Hosp./Gartenstr.",
+               "desc" : "Essen Hbf - UniversitÃ¤t - BOT-Hbf - ZOB Berliner Platz - Grafenwald - Kirchhellen St.-Antonius-Hospital/Gartenstr.",
+               "number" : "SB16",
+               "productId" : "13",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "type" : "5",
+               "destID" : "20003174",
+               "code" : "5",
+               "name" : "Niederflurbus SB16",
+               "diva" : {
+                  "opPublicCode" : "VEST",
+                  "dir" : "H",
+                  "vF" : "20240601",
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:SB16:VES-40-16",
+                  "supplement" : " ",
+                  "project" : "j24",
+                  "branch" : "40",
+                  "stateless" : "ves:40016: :H:j24",
+                  "network" : "ves",
+                  "operator" : "Vestische",
+                  "tripCode" : "0",
+                  "vTo" : "20250228",
+                  "attrs" : [],
+                  "opCode" : "40",
+                  "line" : "40016"
+               },
+               "product" : "Niederflurbus"
+            },
+            "index" : "5:12"
+         },
+         {
+            "index" : "5:13",
+            "mode" : {
+               "product" : "Niederflurbus",
+               "diva" : {
+                  "vF" : "20240601",
+                  "opPublicCode" : "VEST",
+                  "dir" : "R",
+                  "line" : "40016",
+                  "opCode" : "40",
+                  "attrs" : [],
+                  "vTo" : "20250228",
+                  "tripCode" : "0",
+                  "network" : "ves",
+                  "operator" : "Vestische",
+                  "stateless" : "ves:40016: :R:j24",
+                  "branch" : "40",
+                  "project" : "j24",
+                  "supplement" : " ",
+                  "globalId" : "de:vrr:SB16:VES-40-16",
+                  "lineDisplay" : "line"
+               },
+               "destID" : "20009289",
+               "name" : "Niederflurbus SB16",
+               "code" : "5",
+               "type" : "5",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "SB16",
+               "productId" : "13",
+               "desc" : "BOT-Kirchhellen St..-Antonius-Hospital/ Gartenstr. - Grafenwald - ZOB Berliner Platz - BOT-Hbf - Essen UniversitÃ¤t - Hbf",
+               "destination" : "Essen Hauptbahnhof"
+            }
+         },
+         {
+            "index" : "7:0",
+            "mode" : {
+               "type" : "7",
+               "name" : "SB SB16",
+               "destID" : "20003174",
+               "code" : "5",
+               "diva" : {
+                  "tripCode" : "0",
+                  "vTo" : "20250228",
+                  "attrs" : [],
+                  "opCode" : "88",
+                  "line" : "88016",
+                  "lineDisplay" : "line",
+                  "globalId" : "de:vrr:bvr-88-16:K",
+                  "supplement" : "K",
+                  "project" : "j24",
+                  "branch" : "88",
+                  "stateless" : "bvr:88016:K:H:j24",
+                  "network" : "bvr",
+                  "operator" : "DB Bahn Rheinlandbus",
+                  "dir" : "H",
+                  "opPublicCode" : "BVR",
+                  "vF" : "20240601"
+               },
+               "product" : "SB",
+               "destination" : "BOT St.-Anto.-Hosp./Gartenstr.",
+               "desc" : "Essen Hbf - Dorsten ZOB Dorsten",
+               "number" : "SB16",
+               "productId" : "3",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)"
+            }
+         },
+         {
+            "index" : "7:1",
+            "mode" : {
+               "product" : "SB",
+               "diva" : {
+                  "vF" : "20240601",
+                  "dir" : "R",
+                  "opPublicCode" : "BVR",
+                  "branch" : "88",
+                  "project" : "j24",
+                  "network" : "bvr",
+                  "operator" : "DB Bahn Rheinlandbus",
+                  "stateless" : "bvr:88016:K:R:j24",
+                  "globalId" : "de:vrr:bvr-88-16:K",
+                  "lineDisplay" : "line",
+                  "supplement" : "K",
+                  "opCode" : "88",
+                  "attrs" : [],
+                  "line" : "88016",
+                  "tripCode" : "0",
+                  "vTo" : "20250228"
+               },
+               "name" : "SB SB16",
+               "destID" : "20009289",
+               "code" : "5",
+               "type" : "7",
+               "timetablePeriod" : "Jahresfahrplan 2024 (08.01.2024 - 06.01.2025)",
+               "number" : "SB16",
+               "productId" : "3",
+               "desc" : "Dorsten ZOB Dorsten - Essen Hbf",
+               "destination" : "Essen Hauptbahnhof"
+            }
+         }
+      ]
+   },
+   "option" : {
+      "ptOption" : {
+         "maxTime" : "360",
+         "routeType" : "LEASTTIME",
+         "activeSec" : "-1",
+         "maxChanges" : "9",
+         "overgroundTransfer" : "0",
+         "lowPlatformVhcl" : "0",
+         "noEscalators" : "0",
+         "activeImp" : "-1",
+         "plane" : "0",
+         "wheelchair" : "0",
+         "noElevators" : "0",
+         "bike" : "0",
+         "noInsecurePlaces" : "0",
+         "useProxFootSearchDestination" : "0",
+         "noLonelyTransfer" : "0",
+         "noSolidStairs" : "0",
+         "privateTransport" : "0",
+         "illumTransfer" : "0",
+         "SOSAvail" : "0",
+         "useProxFootSearch" : "0",
+         "needElevatedPlt" : "0",
+         "maxWait" : "120",
+         "useProxFootSearchOrigin" : "0",
+         "changeSpeed" : "normal",
+         "lineRestriction" : "403",
+         "active" : "-1",
+         "activeCom" : "-1",
+         "excludedMeans" : [
+            {
+               "value" : "0",
+               "selected" : "0"
+            },
+            {
+               "value" : "1",
+               "selected" : "0"
+            },
+            {
+               "value" : "2",
+               "selected" : "0"
+            },
+            {
+               "selected" : "0",
+               "value" : "3"
+            },
+            {
+               "value" : "4",
+               "selected" : "0"
+            },
+            {
+               "value" : "5",
+               "selected" : "0"
+            },
+            {
+               "selected" : "0",
+               "value" : "6"
+            },
+            {
+               "value" : "7",
+               "selected" : "0"
+            },
+            {
+               "value" : "8",
+               "selected" : "0"
+            },
+            {
+               "selected" : "0",
+               "value" : "9"
+            },
+            {
+               "selected" : "0",
+               "value" : "10"
+            },
+            {
+               "selected" : "0",
+               "value" : "11"
+            },
+            {
+               "selected" : "0",
+               "value" : "12"
+            },
+            {
+               "selected" : "0",
+               "value" : "13"
+            },
+            {
+               "selected" : "0",
+               "value" : "14"
+            },
+            {
+               "selected" : "0",
+               "value" : "15"
+            },
+            {
+               "selected" : "0",
+               "value" : "16"
+            },
+            {
+               "value" : "17",
+               "selected" : "0"
+            },
+            {
+               "selected" : "0",
+               "value" : "18"
+            },
+            {
+               "value" : "19",
+               "selected" : "0"
+            }
+         ],
+         "assistance" : "0",
+         "noCrowded" : "0"
+      }
+   }
+}

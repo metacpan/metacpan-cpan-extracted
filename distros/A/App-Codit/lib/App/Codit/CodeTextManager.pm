@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.09";
+$VERSION="0.10";
 use Tk;
 require Tk::CodeText;
 
@@ -34,6 +34,8 @@ sub Populate {
 	)->pack(-expand => 1, -fill => 'both');
 	$self->CWidg($text);
 	my $xt = $text->Subwidget('XText');
+	$xt->bind('<Control-f>', sub { $ext->cmdExecute('doc_find') });
+	$xt->bind('<Control-r>', sub { $ext->cmdExecute('doc_replace') });
 	$self->{NAME} = '';
 
 	$self->ConfigSpecs(
@@ -41,6 +43,7 @@ sub Populate {
 		-contentbackground => [{-background => $xt}],
 		-contentbgdspace => ['PASSIVE', undef, undef, '#E600A8'],
 		-contentbgdtab => ['PASSIVE', undef, undef, '#B5C200'],
+		-contentbookmarkcolor => [{-bookmarkcolor => $text}],
 		-contentinsertbg => ['PASSIVE', undef, undef, '#000000'],
 		-contentmatchbg => ['PASSIVE', undef, undef, '#0000FF'],
 		-contentmatchfg => ['PASSIVE', undef, undef, '#FFFF00'],

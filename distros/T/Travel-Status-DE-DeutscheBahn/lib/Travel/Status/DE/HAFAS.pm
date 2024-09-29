@@ -22,7 +22,7 @@ use Travel::Status::DE::HAFAS::Product;
 use Travel::Status::DE::HAFAS::Services;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '6.09';
+our $VERSION = '6.10';
 
 # {{{ Endpoint Definition
 
@@ -178,7 +178,7 @@ sub new {
 	}
 	else {
 		my $date = ( $conf{datetime} // $now )->strftime('%Y%m%d');
-		my $time = ( $conf{datetime} // $now )->strftime('%H%M%S');
+		my $time = ( $conf{datetime} // $now )->strftime('%H%M00');
 
 		my $lid;
 		if ( $self->{station} =~ m{ ^ [0-9]+ $ }x ) {
@@ -376,6 +376,9 @@ sub mot_mask {
 			if ( exists $mot_pos{$mot} ) {
 				$mot_mask |= 1 << $mot_pos{$mot};
 			}
+			elsif ( $mot =~ m{ ^ \d+ $ }x ) {
+				$mot_mask |= 1 << $mot;
+			}
 		}
 	}
 
@@ -383,6 +386,9 @@ sub mot_mask {
 		for my $mot (@mots) {
 			if ( exists $mot_pos{$mot} ) {
 				$mot_mask &= ~( 1 << $mot_pos{$mot} );
+			}
+			elsif ( $mot =~ m{ ^ \d+ $ }x ) {
+				$mot_mask &= ~( 1 << $mot );
 			}
 		}
 	}
@@ -395,7 +401,7 @@ sub post_with_cache {
 	my $cache = $self->{cache};
 
 	if ( $self->{developer_mode} ) {
-		say "POST $url";
+		say "POST $url $self->{post}";
 	}
 
 	if ($cache) {
@@ -885,7 +891,7 @@ monitors
 
 =head1 VERSION
 
-version 6.09
+version 6.10
 
 =head1 DESCRIPTION
 

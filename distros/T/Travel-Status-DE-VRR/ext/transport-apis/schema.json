@@ -1,0 +1,224 @@
+{
+  "$id": "https://raw.githubusercontent.com/public-transport/transport-apis/v1/schema.json#",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "public transport API description",
+  "type": "object",
+  "required": [
+    "name",
+    "type",
+    "supportedLanguages",
+    "coverage",
+    "options"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "efa",
+          "hafasMgate",
+          "hafasQuery",
+          "navitia",
+          "otpGraphQl",
+          "otpRest",
+          "trias",
+          "motis"
+        ]
+      },
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "supportedLanguages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z]$",
+        "description": "ISO-639-1 language code"
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "realtimeCoverage": {
+          "$ref": "#/definitions/coverage"
+        },
+        "regularCoverage": {
+          "$ref": "#/definitions/coverage"
+        },
+        "anyCoverage": {
+          "$ref": "#/definitions/coverage"
+        }
+      }
+    },
+    "attribution": {
+      "type": "object",
+      "anyOf": [
+        { "$ref": "#/definitions/attribution_opendata_specific" },
+        { "$ref": "#/definitions/attribution_opendata_mixed" },
+        { "$ref": "#/definitions/attribution_proprietary" }
+      ]
+    },
+    "options": {
+      "type": "object"
+    }
+  },
+  "definitions": {
+    "coverage": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "area": {
+          "oneOf": [
+            { "$ref": "#/definitions/coverage_geojson_polygon" },
+            { "$ref": "#/definitions/coverage_geojson_multipolygon" }
+          ]
+        },
+        "region": {
+          "$ref": "#/definitions/coverage_region"
+        }
+      }
+    },
+    "coverage_geojson_polygon": {
+      "type": "object",
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Polygon"
+          ]
+        },
+        "coordinates": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 4,
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "bbox": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "coverage_geojson_multipolygon": {
+      "type": "object",
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "MultiPolygon"
+          ]
+        },
+        "coordinates": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "minItems": 4,
+              "items": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "bbox": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "coverage_region": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,5})?$",
+        "description": "ISO-3166-1/2 country/region code"
+      },
+      "minItems": 1
+    },
+    "attribution_opendata_mixed": {
+      "type": "object",
+      "required": [
+        "mixedLicenses",
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "homepage": {
+          "type": "string"
+        },
+        "mixedLicenses": {
+          "type": "boolean"
+        }
+      }
+    },
+    "attribution_opendata_specific": {
+      "type": "object",
+      "required": [
+        "license",
+        "name"
+      ],
+      "properties": {
+        "license": {
+          "type": "string",
+          "description": "Open Definition license ID or SPDX license id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "homepage": {
+          "type": "string"
+        },
+        "mixedLicenses": {
+          "type": "boolean"
+        }
+      }
+    },
+    "attribution_proprietary": {
+      "type": "object",
+      "required": [
+        "isProprietary"
+      ],
+      "properties": {
+        "isProprietary": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

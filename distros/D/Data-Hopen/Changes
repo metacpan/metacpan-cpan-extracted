@@ -1,5 +1,16 @@
 Revision history for Data-Hopen
 
+0.000021 2024-09-28T14:26:19Z
+
+    - Non-TRIAL release --- all tests pass on Perl 5.41.5
+
+0.000020 2024-09-23T18:33:38Z (TRIAL RELEASE)
+
+    - Remove smartmatch-operator support, since smartmatch is being
+      removed from Perl (#6) (andk++)
+    - Manage this dist using Minilla (#8)
+    - Change the license to BSD-3-Clause (#9)
+
 0.000019    2020-12-26
     - No longer treat -phase specially when running DAGs.
 

@@ -34,13 +34,10 @@ You can pick a color from any place on the screen with the pick button. This doe
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_, 'ToolPanel');
+	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 	
-#	$self->interval(50);
-
-	my $tp = $self->extGet('ToolPanel');
-	my $page = $tp->addPage('Colors', 'fill-color', undef, 'Select and insert colors');
+	my $page = $self->ToolRightPageAdd('Colors', 'fill-color', undef, 'Select and insert colors');
 	
 	my @padding = (-padx => 3, -pady => 3);
 
@@ -135,7 +132,8 @@ sub SelectionCheck {
 
 sub Unload {
 	my $self = shift;
-	$self->extGet('ToolPanel')->deletePage('Colors');
+#	$self->extGet('ToolPanel')->deletePage('Colors');
+	$self->ToolRightPageRemove('Colors');
 	return $self->SUPER::Unload
 }
 

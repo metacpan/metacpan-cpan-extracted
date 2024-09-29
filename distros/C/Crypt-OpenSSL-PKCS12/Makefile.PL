@@ -16,6 +16,7 @@ my %args = (
 );
 
 my $cc_option_flags = " -O2 -g";
+my $cc_defines      = '';
 
 if ($Config::Config{cc} =~ /gcc/i) {
   $cc_option_flags .= $ENV{AUTHOR_TESTING} ? ' -Wall -Werror' : ' -Wall';
@@ -49,6 +50,8 @@ if ($Config{myuname} =~ /sunos|solaris/i) {
   if ($Config{PERL_VERSION} <= 24) {
     $args{LIBS} = [openssl_lib_paths() . ' -leay32'];
   }
+  $cc_defines .= ' -DOPENSSL_NO_SCRYPT';
+  $args{DEFINE} = $cc_defines;
 } elsif ($Config{myuname} =~ /darwin/ ) {
   $args{LDDLFLAGS} = openssl_lib_paths() . ' ' . $Config{lddlflags};
 } else {
@@ -78,7 +81,7 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.92",
+  "VERSION" => "1.93",
   "test" => {
     "TESTS" => "t/*.t"
   }

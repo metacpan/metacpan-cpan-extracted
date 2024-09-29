@@ -423,111 +423,111 @@ RREMSEAAQAQARASGPLRTRRG
 PEP
 
 my @exp_full_ids = (
-	'seq1 216 1167 . seq1 5080 8696 + 2636',
-	'seq1 53 142 . seq1 2903 3173 + 331'
+    'seq1 216 1167 . seq1 5080 8696 + 2636',
+    'seq1 53 142 . seq1 2903 3173 + 331'
 );
 
 my @exp_full_ids_rev = (
-	'seq1 216 1167 . seq1 4709 1093 - 2636',
-	'seq1 53 142 . seq1 6886 6616 - 331'
+    'seq1 216 1167 . seq1 4709 1093 - 2636',
+    'seq1 53 142 . seq1 6886 6616 - 331'
 );
 
 my @exp_sugars_in_order = (
-	[ qw( AK081544 AF542080  53  142 1 2903 3173 1  331 ) ],
-	[ qw( AK081544 AF542080 216 1167 1 5080 8696 1 2636 ) ],
+    [ qw( AK081544 AF542080  53  142 1 2903 3173 1  331 ) ],
+    [ qw( AK081544 AF542080 216 1167 1 5080 8696 1 2636 ) ],
 );
 
 my @exp_sugars_in_order_rev = (
-	[ qw( AK081544 AF542080  53  142 1 6886 6616 -1  331 ) ],
-	[ qw( AK081544 AF542080 216 1167 1 4709 1093 -1 2636 ) ],
+    [ qw( AK081544 AF542080  53  142 1 6886 6616 -1  331 ) ],
+    [ qw( AK081544 AF542080 216 1167 1 4709 1093 -1 2636 ) ],
 );
 
 my @str_methods = qw(
-	query_id target_id
+    query_id target_id
 );
 
 my @num_methods = qw(
-	 query_start  query_end  query_strand
-	target_start target_end target_strand
-	score
+     query_start  query_end  query_strand
+    target_start target_end target_strand
+    score
 );
 
 {
-	my $dna_seq = Bio::MUST::Core::Seq->new(
-		seq_id => 'AF542080',
-		seq    => $dna_str,
-	);
-	my $pep_seq = Bio::MUST::Core::Seq->new(
-		seq_id => 'AK081544',
-		seq    => $pep_str,
-	);
+    my $dna_seq = Bio::MUST::Core::Seq->new(
+        seq_id => 'AF542080',
+        seq    => $dna_str,
+    );
+    my $pep_seq = Bio::MUST::Core::Seq->new(
+        seq_id => 'AK081544',
+        seq    => $pep_str,
+    );
 
-	my $fac = Bio::MUST::Core::GeneticCode::Factory->new(
-		tax_dir => 'test/taxdump',
-	);
-	my $code = $fac->code_for(1);
+    my $fac = Bio::MUST::Core::GeneticCode::Factory->new(
+        tax_dir => 'test/taxdump',
+    );
+    my $code = $fac->code_for(1);
 
-	my $exo_fwd = $class->new(
-		dna_seq      => $dna_seq,
-		pep_seq      => $pep_seq,
-		genetic_code => $code,
-	);
-	check_exo($exo_fwd, \@exp_sugars_in_order, \@exp_full_ids);
+    my $exo_fwd = $class->new(
+        dna_seq      => $dna_seq,
+        pep_seq      => $pep_seq,
+        genetic_code => $code,
+    );
+    check_exo($exo_fwd, \@exp_sugars_in_order, \@exp_full_ids);
 
-	my $exo_rev = $class->new(
-		dna_seq      => $dna_seq->reverse_complemented_seq,
-		pep_seq      => $pep_seq,
-		genetic_code => $code,
-	);
-	check_exo($exo_rev, \@exp_sugars_in_order_rev, \@exp_full_ids_rev);
+    my $exo_rev = $class->new(
+        dna_seq      => $dna_seq->reverse_complemented_seq,
+        pep_seq      => $pep_seq,
+        genetic_code => $code,
+    );
+    check_exo($exo_rev, \@exp_sugars_in_order_rev, \@exp_full_ids_rev);
 }
 
 
 sub check_exo {
-	my $exo    = shift;
-	my $sugars = shift;
-	my $ids	   = shift;
+    my $exo    = shift;
+    my $sugars = shift;
+    my $ids    = shift;
 
-	isa_ok $exo, $class;
+    isa_ok $exo, $class;
 
-	is_deeply [ map { $_->full_id } $exo->all_cds ], $ids,
+    is_deeply [ map { $_->full_id } $exo->all_cds ], $ids,
         'got expected full_ids directly from Seqs';
 
-	cmp_deeply [ $exo->cds_order ], \@exp_order,
-		'got expected cds order';
+    cmp_deeply [ $exo->cds_order ], \@exp_order,
+        'got expected cds order';
 
-	for my $sugar ($exo->all_sugars_in_order) {
+    for my $sugar ($exo->all_sugars_in_order) {
         cmp_deeply [
             ( map {     $sugar->$_ } @str_methods ),
             ( map { 0 + $sugar->$_ } @num_methods )       # numberize results
         ], shift @{ $sugars },
             'got expected values for all methods for sugar: ';
         explain $sugar;
-	}
+    }
 
-	my @exp_exons_in_order = map {
-		Bio::MUST::Core::Seq->new( seq_id => 'seq', seq => $_ )
-	} @exp_str_in_order;
+    my @exp_exons_in_order = map {
+        Bio::MUST::Core::Seq->new( seq_id => 'seq', seq => $_ )
+    } @exp_str_in_order;
 
-	cmp_deeply [ map { $_->seq } $exo->all_exons_in_order ],
-			   [ map { $_->seq } @exp_exons_in_order ],
-				'got expected exons in order';
+    cmp_deeply [ map { $_->seq } $exo->all_exons_in_order ],
+               [ map { $_->seq } @exp_exons_in_order ],
+                'got expected exons in order';
 
-	my $exp_complete_cds = Bio::MUST::Core::Seq->new(
-		seq_id => 'CDS',
-		seq    => $exp_complete_cds_str,
-	);
-	cmp_ok $exo->complete_cds->seq, 'eq', $exp_complete_cds->seq,
-		'got expected complete CDS';
+    my $exp_complete_cds = Bio::MUST::Core::Seq->new(
+        seq_id => 'CDS',
+        seq    => $exp_complete_cds_str,
+    );
+    cmp_ok $exo->complete_cds->seq, 'eq', $exp_complete_cds->seq,
+        'got expected complete CDS';
 
-	my $exp_translation = Bio::MUST::Core::Seq->new(
-		seq_id => 'PEP',
-		seq    => $exp_translation_str,
-	);
-	cmp_ok $exo->translation->seq, 'eq', $exp_translation->seq,
-		'got expected translation';
+    my $exp_translation = Bio::MUST::Core::Seq->new(
+        seq_id => 'PEP',
+        seq    => $exp_translation_str,
+    );
+    cmp_ok $exo->translation->seq, 'eq', $exp_translation->seq,
+        'got expected translation';
 
-	return;
+    return;
 }
 
 done_testing;

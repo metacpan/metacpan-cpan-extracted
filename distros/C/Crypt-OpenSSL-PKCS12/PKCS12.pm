@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Exporter;
 
-our $VERSION = '1.92';
+our $VERSION = '1.93';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
@@ -57,7 +57,7 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
 =head1 VERSION
 
-This documentation describes version 1.92
+This documentation describes version 1.93 of Crypt::OpenSSL::PKCS12
 
 =head1 DESCRIPTION
 
@@ -70,6 +70,10 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
 =over 4
 
 =item * new( )
+
+=item * legacy_support ( )
+
+Check whether the openssl version installed supports the legacy provider.
 
 =item * new_from_string( C<$string> )
 

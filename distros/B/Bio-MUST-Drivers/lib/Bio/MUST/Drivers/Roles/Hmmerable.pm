@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::Roles::Hmmerable;
 # ABSTRACT: HMMER model-related methods
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Drivers::Roles::Hmmerable::VERSION = '0.210160';
+$Bio::MUST::Drivers::Roles::Hmmerable::VERSION = '0.242720';
 use Moose::Role;
 
 use autodie;
@@ -83,7 +83,7 @@ sub _search {
 }
 
 sub emit {
-	my $self = shift;
+    my $self = shift;
     my $args = shift // { '-C' => undef };
 
     # setup input/output files (outfile will be automatically unlinked)
@@ -96,7 +96,7 @@ sub emit {
     my $args_str = stringify_args($args);
     my $pgm = 'hmmemit';
     my $cmd = "$pgm $args_str $model > /dev/null 2> /dev/null";
-	# hmmemit -C -o hmmconsensus_GNTPAN12210.fasta test_emitGNT.hmm
+    # hmmemit -C -o hmmconsensus_GNTPAN12210.fasta test_emitGNT.hmm
     #### $cmd
 
     # try to robustly execute hmmemit
@@ -123,7 +123,7 @@ Bio::MUST::Drivers::Roles::Hmmerable - HMMER model-related methods
 
 =head1 VERSION
 
-version 0.210160
+version 0.242720
 
 =head1 SYNOPSIS
 

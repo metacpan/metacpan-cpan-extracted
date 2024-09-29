@@ -6,7 +6,7 @@ use MsOffice::Word::Surgeon::Utils qw(decode_entities);
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 #======================================================================
 # ATTRIBUTES
@@ -238,6 +238,11 @@ Translates a given text run into a fragment suitable to be processed by the temp
 Compiles the regexes to be tried on each text run.
 
 
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2020-2024 by Laurent Dami.
+
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
 
 
 

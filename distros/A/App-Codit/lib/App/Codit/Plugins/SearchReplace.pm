@@ -9,7 +9,7 @@ App::Codit::Plugins::SearchReplace - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.09;
+$VERSION = 0.10;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 require Tk::LabFrame;
@@ -18,6 +18,7 @@ require Tk::ITree;
 my $srchcur = 'Search in current document';
 my $srchall = 'Search in all documents';
 my $srchprj = 'Search in project files';
+my $srchres = 'Search in results';
 
 =head1 DESCRIPTION
 
@@ -36,11 +37,12 @@ You can skip replaces by pressing Skip. Clear deletes all search results.
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_, 'ToolPanel');
+	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 	
-	my $tp = $self->extGet('ToolPanel');
-	my $page = $tp->addPage('SearchReplace', 'edit-find-replace', undef, 'Search and replace');
+#	my $tp = $self->extGet('ToolPanel');
+#	my $page = $tp->addPage('SearchReplace', 'edit-find-replace', undef, 'Search and replace');
+	my $page = $self->ToolRightPageAdd('SearchReplace', 'edit-find-replace', undef, 'Search and replace');
 
 	my $searchterm = '';
 	my $replaceterm = '';
@@ -50,6 +52,7 @@ sub new {
 
 	$self->{CASE} = \$casesensitive;
 	$self->{FRESH} = {};
+	$self->{LASTRESULTS} = [];
 	$self->{MODE} = \$searchmode;
 	$self->{OFFSET} = {};
 	$self->{REPLACE} = \$replaceterm;
@@ -112,7 +115,7 @@ sub new {
 		-textvariable => \$searchmode,
 	)->pack(@padding, -fill => 'x');
 	my @menu = ();
-	for ($srchcur, $srchall, $srchprj) {
+	for ($srchcur, $srchall, $srchprj, $srchres) {
 		my $mode = $_;
 		push @menu, [command => $mode,
 			-command => sub { $searchmode = $mode },
@@ -169,18 +172,6 @@ sub new {
 
 	return $self;
 }
-sub _repl {
-	my $self = shift;
-	$self->{REPLACED} = shift if @_;
-	return $self->{REPLACED}
-}
-
-sub _skip {
-	my $self = shift;
-	$self->{SKIPPED} = shift if @_;
-	return $self->{SKIPPED}
-}
-
 
 sub BrowseNext {
 	my $self = shift;
@@ -254,10 +245,11 @@ sub Clear {
 	my $self = shift;
 	my $list = $self->{RESULTSLIST};
 	my @c = $list->infoChildren('');
+	$self->{LASTRESULTS} = \@c;
 	$list->deleteAll;
 	$self->{OFFSET} = {};
-	$self->_repl(0);
-	$self->_skip(0);
+	$self->repl(0);
+	$self->skipped(0);
 }
 
 sub ClearFresh {
@@ -301,6 +293,8 @@ sub Find {
 		}
 	} elsif ($$mode eq $srchprj) {
 		$self->FindInProject;
+	} elsif ($$mode eq $srchres) {
+		$self->FindInResults;
 	}
 }
 
@@ -320,7 +314,7 @@ sub FindInDoc {
 		my @ranges = $widg->tagRanges('sel');
 		if (@ranges) {
 			$results->add($name,
-				-text => $name,
+				-text => $self->abbreviate($name, 30),
 				-itemtype => 'imagetext',
 				-image =>  $self->getArt('text-x-plain')
 			); 
@@ -362,7 +356,7 @@ sub FindInDoc {
 		}
 		if (@hits) {
 			$results->add($name,
-				-text => $name,
+				-text => $self->abbreviate($name, 30),
 				-itemtype => 'imagetext',
 				-image =>  $self->getArt('text-x-plain')
 			); 
@@ -397,6 +391,15 @@ sub FindInProject {
 	for (@list) {
 		$self->FindInDoc($_) if -T $_;
 	}
+}
+
+sub FindInResults {
+	my $self = shift;
+	my $list = $self->{LASTRESULTS};
+	for (@$list) {
+		$self->FindInDoc($_);
+	}
+	
 }
 
 sub FinishedCheck {
@@ -516,7 +519,7 @@ sub Replace {
 		$widg->ReplaceSelectionsWith($$replace);
 		$list->deleteEntry($cur);
 
-		$self->_repl($self->_repl + 1);
+		$self->repl($self->repl + 1);
 		$self->Report;
 		my @h = $list->infoChildren($name);
 		$list->deleteEntry($name) unless @h;
@@ -526,11 +529,17 @@ sub Replace {
 	}
 }
 
+sub repl {
+	my $self = shift;
+	$self->{REPLACED} = shift if @_;
+	return $self->{REPLACED}
+}
+
 sub Report {
 	my ($self, $flag) = @_;
 	$flag = 0 unless defined $flag;
-	my $rep = $self->_repl;
-	my $skp = $self->_skip;
+	my $rep = $self->repl;
+	my $skp = $self->skipped;
 	my $text = "Made $rep replaces and skipped $skp";
 	$text = "Replacing finished. $text" if $flag;
 	$self->log($text)
@@ -546,6 +555,7 @@ sub Select {
 	$list->anchorClear;
 	$list->selectionSet($entry);
 	return if $entry eq $name;
+	$self->cmdExecute('doc_open', $name) unless ($mdi->docExists($name));
 	$mdi->docSelect($name);
 	my $widg = $mdi->docGet($name)->CWidg;
 	$widg->unselectAll;
@@ -553,6 +563,12 @@ sub Select {
 	my $len = length($$search);
 	$widg->tagAdd('sel', $index, "$index + $len c");
 	$widg->focus;
+}
+
+sub skipped {
+	my $self = shift;
+	$self->{SKIPPED} = shift if @_;
+	return $self->{SKIPPED}
 }
 
 sub Skip {
@@ -564,7 +580,7 @@ sub Skip {
 	}
 	my ($name, $index) = split(/@/, $cur);
 	$self->OffsetInc($name);
-	$self->_skip($self->_skip + 1);
+	$self->skipped($self->skipped + 1);
 	$self->Report;
 	$self->GoCurrent unless $self->FinishedCheck;
 }
@@ -583,7 +599,8 @@ sub SelectLast {
 
 sub Unload {
 	my $self = shift;
-	$self->extGet('ToolPanel')->deletePage('SearchReplace');
+	$self->ToolRightPageRemove('SearchReplace');
+#	$self->extGet('ToolPanel')->deletePage('SearchReplace');
 	my $id = $self->{REFRESHID};
 	$self->afterCancel($id) if defined $id;
 	return $self->SUPER::Unload

@@ -6,7 +6,7 @@ IRI - Internationalized Resource Identifiers
 
 =head1 VERSION
 
-This document describes IRI version 0.011
+This document describes IRI version 0.012
 
 =head1 SYNOPSIS
 
@@ -80,7 +80,7 @@ Returns the respective component of the parsed IRI.
 	package IRI; 
 	use v5.10.1;
 	use warnings;
-	our $VERSION	= '0.011';
+	our $VERSION	= '0.012';
 	use Moo;
 	use MooX::HandlesVia;
 	use Types::Standard qw(Str InstanceOf HashRef Bool);
@@ -248,7 +248,7 @@ Returns the respective component of the parsed IRI.
 		my $v		= shift;
 		my $c;
 		
-		if ($v =~ /^${IRIreference}$/o) {
+		if ($v =~ /\A(${IRIreference})\Z/mso and length($1) == length($v)) {
 			%$c = %+;
 		} else {
 			use Data::Dumper;
@@ -619,7 +619,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2018 Gregory Todd Williams. This
+Copyright (c) 2014--2024 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

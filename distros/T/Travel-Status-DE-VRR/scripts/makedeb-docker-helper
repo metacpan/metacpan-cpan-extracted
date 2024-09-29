@@ -9,7 +9,7 @@ apt-get update
 apt-get -y install \
 	apt-file dh-make-perl libmodule-build-perl \
 	libclass-accessor-perl libdatetime-perl libexception-class-perl \
-	libfile-slurp-perl libwww-perl libxml-libxml-perl \
+	libfile-slurp-perl libwww-perl libjson-xs-perl \
 	libtest-compile-perl libtest-pod-perl \
 	libtest-fatal-perl libtest-simple-perl
 

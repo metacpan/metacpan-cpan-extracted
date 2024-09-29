@@ -8,6 +8,7 @@ lib/Protocol/Sys/Virt/Remote.pm
 lib/Protocol/Sys/Virt/Remote/XDR.pm
 lib/Protocol/Sys/Virt/Transport.pm
 lib/Protocol/Sys/Virt/Transport/XDR.pm
+lib/Protocol/Sys/Virt/URI.pm
 Makefile.PL
 MANIFEST
 README.pod

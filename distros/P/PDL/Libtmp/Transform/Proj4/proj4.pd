@@ -137,7 +137,6 @@ proj_version(...)
     mPUSHu(PROJ_VERSION_PATCH);
 ENDXS
 
-my $load_desc = <<'EOF';
 my %SKIP = map +($_=>1), qw(
   and or Special for Madagascar
   fixed Earth For CH1903
@@ -189,11 +188,8 @@ sub load_projection_information {
     $info{nzmg}{CATEGORIES} = [ 'fixed Earth' ];
     return \%info;
 }
-EOF
-eval $load_desc;
-die if $@;
 
-pp_addpm( <<'ENDPM' . $load_desc );
+pp_addpm(<<'ENDPM');
 =head2 proj_version
 
 Returns a 3-element list with PROJ major, minor, patch version-numbers.
@@ -202,6 +198,13 @@ Not exported.
 =cut
 
 ENDPM
+pp_addpm("sub load_projection_information {+" . do {
+  use Data::Dumper;
+  local $Data::Dumper::Sortkeys = 1;
+  local $Data::Dumper::Terse = 1;
+  local $Data::Dumper::Indent = 1;
+  join '', Dumper load_projection_information();
+}."}\n\n");
 pp_export_nothing();
 
 pp_addpm( { At => 'Top' }, <<'ENDPM' );
@@ -220,21 +223,23 @@ PDL::Transform::Proj4 - PDL::Transform interface to the Proj4 projection library
  # Make an orthographic map of Earth
  use PDL::Transform::Cartography;
  use PDL::Transform::Proj4;
+ use PDL::Graphics::Simple;
  $x = earth_coast();
  $x = graticule(10,2)->glue(1,$x);
  $t = t_proj( proj_params => "+proj=ortho +ellps=WGS84 +lon_0=-90 +lat_0=40" );
- $w = pgwin(xs);
- $w->lines($t->apply($x)->clean_lines());
+ $w = pgswin();
+ $w->plot(with=>'polylines', $t->apply($x)->clean_lines);
 
  # Using the aliased functions:
  # Make an orthographic map of Earth
  use PDL::Transform::Cartography;
  use PDL::Transform::Proj4;
+ use PDL::Graphics::Simple;
  $x = earth_coast();
  $x = graticule(10,2)->glue(1,$x);
  $t = t_proj_ortho( ellps => 'WGS84', lon_0 => -90, lat_0 => 40 )
- $w = pgwin(xs);
- $w->lines($t->apply($x)->clean_lines());
+ $w = pgswin();
+ $w->plot(with=>'polylines', $t->apply($x)->clean_lines);
 
 =head1 DESCRIPTION
 

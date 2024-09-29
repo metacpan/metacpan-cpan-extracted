@@ -1,3 +1,20 @@
+Travel::Status::DE::VRR 3.00 - Sun Sep 29 2024
+    * Drop XML::LibXML dependency
+    * New dependencies: DateTime::Format::Strptime, JSON
+    * Switch API language from XML to JSON
+    * Rename Travel::Status::DE::EFA::Result to Travel::Status::DE::EFA::Departure
+    * EFA: Add static "get_service_ids" function
+    * EFA: Add bwegt backend service
+    * EFA: Remove "identified_data" accessor (not supported by JSON backends)
+    * EFA: Remove static "get_efa_urls" function; use "get_service_ids" instead
+    * EFA->new, EFA->new_p: Add optional "cache" key
+    * Result/Departure: Add "hints" accessor
+    * Result/Departure: Remove "info" accessor; use "hints" instead
+    * Stop: Add "place", "full_name" and "occupancy" accessors
+    * Line: Add "number" accessor
+    * Stop: Remove "name_suf" accessor; use "name" instead
+    * efa-m: -Oa, -Ob, -Of: show per-stop occupancy, if available
+
 Travel::Status::DE::VRR 2.02 - Sun May 19 2024
     * EFA->new: Deprecate "efa_url" option. Use "service" instead.
       "efa_url" is still supported, just not documented anymore.

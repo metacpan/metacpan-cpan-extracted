@@ -18,31 +18,38 @@ name: Travel-Status-DE-VRR
 provides:
   Travel::Status::DE::EFA:
     file: lib/Travel/Status/DE/EFA.pm
-    version: '2.02'
+    version: '3.00'
+  Travel::Status::DE::EFA::Departure:
+    file: lib/Travel/Status/DE/EFA/Departure.pm
+    version: '3.00'
   Travel::Status::DE::EFA::Line:
     file: lib/Travel/Status/DE/EFA/Line.pm
-    version: '2.02'
-  Travel::Status::DE::EFA::Result:
-    file: lib/Travel/Status/DE/EFA/Result.pm
-    version: '2.02'
+    version: '3.00'
+  Travel::Status::DE::EFA::Services:
+    file: lib/Travel/Status/DE/EFA/Services.pm
+    version: '3.00'
   Travel::Status::DE::EFA::Stop:
     file: lib/Travel/Status/DE/EFA/Stop.pm
-    version: '2.02'
+    version: '3.00'
+  Travel::Status::DE::EFA::Trip:
+    file: lib/Travel/Status/DE/EFA/Trip.pm
+    version: '3.00'
   Travel::Status::DE::VRR:
     file: lib/Travel/Status/DE/VRR.pm
-    version: '2.02'
+    version: '3.00'
 requires:
   Carp: '0'
   Class::Accessor: '0'
   DateTime: '0'
+  DateTime::Format::Strptime: '0'
   Getopt::Long: '0'
+  JSON: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   List::Util: '0'
-  XML::LibXML: '0'
   perl: v5.10.1
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-DE-VRR
-version: '2.02'
+version: '3.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

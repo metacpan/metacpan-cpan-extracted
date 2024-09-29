@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Digest::SHA qw/sha256_hex/;
-use Crypt::OpenSSL::Guess qw/openssl_version/;
+use Crypt::OpenSSL::Guess qw/openssl_version find_openssl_prefix find_openssl_exec/;
 
 my ($major, $minor, $patch) = openssl_version();
 BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
@@ -57,6 +57,15 @@ if ($major eq '1.0') {
 }
 my $pass   = "v3-certs";
 my $pkcs12 = Crypt::OpenSSL::PKCS12->new_from_file('certs/v3-certs-TDES.p12');
+
+my $prefix = find_openssl_prefix();
+my $ssl_exec = find_openssl_exec($prefix);
+
+my $ssl_version_string = `$ssl_exec version`;
+
+SKIP: {
+
+    skip("LibreSSL bug unable to parse certificate date", 20) if ( $ssl_version_string =~ /LibreSSL/);
 
 my $info = $pkcs12->info($pass);
 ok(sha256_hex($info) eq sha256_hex($openssl_output), "Output matches OpenSSL");
@@ -113,5 +122,6 @@ for (my $i = 0; $i < $pkcs7_enc_cnt; $i++) {
 
   $bag_attributes = @$bags[1]->{bag_attributes};
   is(keys %$bag_attributes, 0, "Zero bag attributes in bag");
+}
 }
 done_testing;

@@ -13,6 +13,8 @@
 #include <openssl/ssl.h>
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 #include <openssl/provider.h>
+OSSL_PROVIDER *legacy   = NULL;
+OSSL_PROVIDER *deflt    = NULL;
 #endif
 #define NOKEYS          0x1
 #define NOCERTS         0x2
@@ -898,6 +900,7 @@ static int alg_print(pTHX_ BIO *bio, CONST_X509_ALGOR *alg, HV * parameters_hash
                        ASN1_INTEGER_get(kdf->iter), OBJ_nid2sn(prfnid));
       PBKDF2PARAM_free(kdf);
 #if OPENSSL_VERSION_NUMBER > 0x10100000L
+#ifndef LIBRESSL_VERSION_NUMBER
 #ifndef OPENSSL_NO_SCRYPT
       } else if (pbenid == NID_id_scrypt) {
         SCRYPT_PARAMS *kdf = NULL;
@@ -925,6 +928,7 @@ static int alg_print(pTHX_ BIO *bio, CONST_X509_ALGOR *alg, HV * parameters_hash
                        ASN1_INTEGER_get(kdf->blockSize),
                        ASN1_INTEGER_get(kdf->parallelizationParameter));
         SCRYPT_PARAMS_free(kdf);
+#endif
 #endif
 #endif
     }
@@ -992,6 +996,20 @@ new(class)
   OUTPUT:
   RETVAL
 
+IV legacy_support(class)
+  SV *class;
+
+  CODE:
+  RETVAL = 1;
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+  if (legacy)
+      RETVAL = 1;
+  else
+      RETVAL = 0;
+#endif
+  OUTPUT:
+  RETVAL
+
 Crypt::OpenSSL::PKCS12
 new_from_string(class, string)
   SV  *class
@@ -1004,19 +1022,15 @@ new_from_string(class, string)
   BIO *bio;
   STRLEN str_len;
   char *str_ptr;
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
-  OSSL_PROVIDER *legacy = NULL;
-  OSSL_PROVIDER *deflt = NULL;
-#endif
   CODE:
 
   SvGETMAGIC(string);
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
-  /*FIXME: There should likely be an option for whether to load the legacy provider */
+  /* FIXME: There should likely be an option for whether to load the legacy provider */
   legacy = OSSL_PROVIDER_load(NULL, "legacy");
-    if (legacy == NULL) {
-      croak("Failed to load Legacy provider\n");
-    }
+  if (legacy == NULL) {
+      warn("Failed to load Legacy provider\n");
+  }
   deflt = OSSL_PROVIDER_load(NULL, "default");
   if (deflt == NULL) {
       OSSL_PROVIDER_unload(legacy);

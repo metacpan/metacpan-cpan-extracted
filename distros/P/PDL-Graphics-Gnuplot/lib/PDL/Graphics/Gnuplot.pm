@@ -1942,7 +1942,7 @@ Many hardcopy output terminals (such as C<pdf> and C<svg>) will not
 dump their plot to the file unless the file is explicitly closed with a
 change of output device or a call to C<reset>, C<restart>, or C<close>.
 This is because those devices support multipage output and also require
-and end-of-file marker to close the file.
+an end-of-file marker to close the file.
 
 =head1 Plotting examples
 
@@ -2061,7 +2061,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.029';
+our $VERSION = '2.030';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -3058,12 +3058,14 @@ unset ylabel
 unset cblabel
 unset xrange
 unset yrange
+unset link x2
+unset link y2
+POS
+	$plotOptionsString .= <<'POS' if $gp_numversion >= 5.002;
 unset nonlinear x
 unset nonlinear y
 unset nonlinear x2
 unset nonlinear y2
-unset link x2
-unset link y2
 POS
     } else {
 	# In single-plot mode, just issue a reset.  Multiple newlines to work around a gnuplot problem.
@@ -7470,7 +7472,7 @@ sub _printGnuplotPipe
 # are explicitly stripped out
 our $cp_serial = 0;
 
-my $qt_re = qr/^qt\..*/m;
+my $graphics_re = qr/^(?:qt\.|XType:|MESA:).*/m;
 sub _checkpoint {
     my $this   = shift;
     my $suffix = shift || "main";
@@ -7603,7 +7605,7 @@ EOM
     # that some warnings come with a line specifier and others don't.
 
   WARN: while( $fromerr =~ m/^(\s*(line \d+\:\s*)?[wW]arning\:.*)$/m or
-	       $fromerr =~ m/$qt_re/ or
+	       $fromerr =~ m/$graphics_re/ or
 	       $fromerr =~ m/^Populating font family aliases took/m     # CED - Quicktime on MacOS Catalina throws a warning marked as an error.  Stupid.
 	) {
       if ($2) {
@@ -7613,7 +7615,7 @@ EOM
 	  $a =~ s/^\s*line \d+\:/Gnuplot:/m;
 	  carp $a if($printwarnings);
       } else {
-	  $fromerr =~ s/$qt_re//;
+	  $fromerr =~ s/$graphics_re//;
 	  last WARN unless $fromerr =~ s/^(\s*(line \d+\:\s*)?[wW](arning\:.*(\n|$)))//m;
 	  carp "Gnuplot w$3\n" if($printwarnings);
       }

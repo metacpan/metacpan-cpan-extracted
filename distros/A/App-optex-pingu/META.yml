@@ -26,7 +26,7 @@ no_index:
 provides:
   App::optex::pingu:
     file: lib/App/optex/pingu.pm
-    version: '1.01'
+    version: '1.02'
   App::optex::pingu::Picture:
     file: lib/App/optex/pingu/Picture.pm
 requires:
@@ -34,13 +34,14 @@ requires:
   File::Share: '0.27'
   Hash::Util: '0'
   List::Util: '1.56'
+  Term::ANSIColor::Concise: '0'
   Time::HiRes: '0'
   perl: v5.24.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/optex-pingu/issues
   homepage: https://github.com/kaz-utashiro/optex-pingu
   repository: https://github.com/kaz-utashiro/optex-pingu.git
-version: '1.01'
+version: '1.02'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

@@ -71,8 +71,11 @@ while(my $line = <$fh>) {
         next;
     } elsif($tweak_name && $saw_name && $line =~ m{\H\h*$/}) {
         $output .= ($format eq 'md' ? '# ' : '') . "$line\n";
-        $output .= "[![Appveyor Status](https://img.shields.io/appveyor/ci/${appveyor_badge}.svg?logo=appveyor)](https://ci.appveyor.com/project/${appveyor}) " if $appveyor;
-        $output .= "[![Travis Status](https://img.shields.io/travis/${travis_badge}.svg?logo=travis)](https://travis-ci.org/${travis}) " if $travis;
+
+        my @badges;
+        push @badges, "[![Appveyor Status](https://img.shields.io/appveyor/ci/${appveyor_badge}.svg?logo=appveyor)](https://ci.appveyor.com/project/${appveyor})" if $appveyor;
+        push @badges, "[![Travis Status](https://img.shields.io/travis/${travis_badge}.svg?logo=travis)](https://travis-ci.org/${travis})" if $travis;
+        $output .= join ' ', @badges;
 
         $output .= "\n\n" if $appveyor || $travis;
         $saw_name = 0;

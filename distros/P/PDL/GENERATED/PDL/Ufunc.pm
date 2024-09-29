@@ -3,7 +3,7 @@
 #
 package PDL::Ufunc;
 
-our @EXPORT_OK = qw(prodover cprodover dprodover cumuprodover ccumuprodover dcumuprodover sumover csumover dsumover cumusumover ccumusumover dcumusumover andover bandover borover orover zcover diff2 intover average avgover caverage cavgover daverage davgover minimum minover minimum_ind minover_ind minimum_n_ind minover_n_ind maximum maxover maximum_ind maxover_ind maximum_n_ind maxover_n_ind minmaximum minmaxover avg sum prod davg dsum dprod zcheck and band or bor min max median mode oddmedian any all minmax medover oddmedover modeover pctover oddpctover pct oddpct qsort qsorti qsortvec qsortveci magnover );
+our @EXPORT_OK = qw(prodover cprodover dprodover cumuprodover ccumuprodover dcumuprodover sumover csumover dsumover cumusumover ccumusumover dcumusumover andover bandover borover orover zcover diffover diff2 intover average avgover caverage cavgover daverage davgover minimum minover minimum_ind minover_ind minimum_n_ind minover_n_ind maximum maxover maximum_ind maxover_ind maximum_n_ind maxover_n_ind minmaximum minmaxover avg sum prod davg dsum dprod zcheck and band or bor min max median mode oddmedian any all minmax medover oddmedover modeover pctover oddpctover pct oddpct qsort qsorti qsortvec qsortveci magnover );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -804,6 +804,36 @@ as it will not contain any bad values.
 
 
 
+=head2 diffover
+
+=for sig
+
+  Signature: (x(t); [o]dx(t))
+
+=for ref
+
+Differencing. DX(t) = X(t) - X(t-1), DX(0) = X(0). Can be done inplace.
+
+Unlike L</diff2>, output vector is same length.
+Originally by Maggie J. Xiong.
+
+=for bad
+
+diffover does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*diffover = \&PDL::diffover;
+
+
+
+
+
+
 =head2 diff2
 
 =for sig
@@ -815,6 +845,7 @@ as it will not contain any bad values.
 Numerically differentiates a vector along 0th dimension.
 
 By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
+Unlike L</diffover>, output vector is one shorter.
 
 =for usage
 
@@ -929,7 +960,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 329 "ufunc.pd"
+#line 343 "ufunc.pd"
 
 =head2 avgover
 
@@ -940,7 +971,7 @@ Synonym for L</average>.
 =cut
 
 *PDL::avgover = *avgover = \&PDL::average;
-#line 944 "Ufunc.pm"
+#line 975 "Ufunc.pm"
 
 
 =head2 caverage
@@ -986,7 +1017,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 329 "ufunc.pd"
+#line 343 "ufunc.pd"
 
 =head2 cavgover
 
@@ -997,7 +1028,7 @@ Synonym for L</caverage>.
 =cut
 
 *PDL::cavgover = *cavgover = \&PDL::caverage;
-#line 1001 "Ufunc.pm"
+#line 1032 "Ufunc.pm"
 
 
 =head2 daverage
@@ -1043,7 +1074,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 329 "ufunc.pd"
+#line 343 "ufunc.pd"
 
 =head2 davgover
 
@@ -1054,7 +1085,7 @@ Synonym for L</daverage>.
 =cut
 
 *PDL::davgover = *davgover = \&PDL::daverage;
-#line 1058 "Ufunc.pm"
+#line 1089 "Ufunc.pm"
 
 
 =head2 minimum
@@ -1101,7 +1132,7 @@ for ways of masking NaNs.
 
 
 
-#line 329 "ufunc.pd"
+#line 343 "ufunc.pd"
 
 =head2 minover
 
@@ -1112,7 +1143,7 @@ Synonym for L</minimum>.
 =cut
 
 *PDL::minover = *minover = \&PDL::minimum;
-#line 1116 "Ufunc.pm"
+#line 1147 "Ufunc.pm"
 
 
 =head2 minimum_ind
@@ -1145,7 +1176,7 @@ for ways of masking NaNs.
 
 
 
-#line 329 "ufunc.pd"
+#line 343 "ufunc.pd"
 
 =head2 minover_ind
 
@@ -1156,7 +1187,7 @@ Synonym for L</minimum_ind>.
 =cut
 
 *PDL::minover_ind = *minover_ind = \&PDL::minimum_ind;
-#line 1160 "Ufunc.pm"
+#line 1191 "Ufunc.pm"
 
 
 =head2 minimum_n_ind
@@ -1193,7 +1224,7 @@ for ways of masking NaNs.
 
 
 
-#line 433 "ufunc.pd"
+#line 447 "ufunc.pd"
 sub PDL::minimum_n_ind {
   my ($a, $c, $m_size) = @_;
   $m_size //= ref($c) ? $c->dim(0) : $c; # back-compat with pre-2.077
@@ -1203,7 +1234,7 @@ sub PDL::minimum_n_ind {
   PDL::_minimum_n_ind_int($a, $c, $m_size);
   $set_out ? $_[1] = $c : $c;
 }
-#line 1207 "Ufunc.pm"
+#line 1238 "Ufunc.pm"
 
 *minimum_n_ind = \&PDL::minimum_n_ind;
 
@@ -1211,7 +1242,7 @@ sub PDL::minimum_n_ind {
 
 
 
-#line 329 "ufunc.pd"
+#line 343 "ufunc.pd"
 
 =head2 minover_n_ind
 
@@ -1222,7 +1253,7 @@ Synonym for L</minimum_n_ind>.
 =cut
 
 *PDL::minover_n_ind = *minover_n_ind = \&PDL::minimum_n_ind;
-#line 1226 "Ufunc.pm"
+#line 1257 "Ufunc.pm"
 
 
 =head2 maximum
@@ -1269,7 +1300,7 @@ for ways of masking NaNs.
 
 
 
-#line 329 "ufunc.pd"
+#line 343 "ufunc.pd"
 
 =head2 maxover
 
@@ -1280,7 +1311,7 @@ Synonym for L</maximum>.
 =cut
 
 *PDL::maxover = *maxover = \&PDL::maximum;
-#line 1284 "Ufunc.pm"
+#line 1315 "Ufunc.pm"
 
 
 =head2 maximum_ind
@@ -1313,7 +1344,7 @@ for ways of masking NaNs.
 
 
 
-#line 329 "ufunc.pd"
+#line 343 "ufunc.pd"
 
 =head2 maxover_ind
 
@@ -1324,7 +1355,7 @@ Synonym for L</maximum_ind>.
 =cut
 
 *PDL::maxover_ind = *maxover_ind = \&PDL::maximum_ind;
-#line 1328 "Ufunc.pm"
+#line 1359 "Ufunc.pm"
 
 
 =head2 maximum_n_ind
@@ -1361,7 +1392,7 @@ for ways of masking NaNs.
 
 
 
-#line 433 "ufunc.pd"
+#line 447 "ufunc.pd"
 sub PDL::maximum_n_ind {
   my ($a, $c, $m_size) = @_;
   $m_size //= ref($c) ? $c->dim(0) : $c; # back-compat with pre-2.077
@@ -1371,7 +1402,7 @@ sub PDL::maximum_n_ind {
   PDL::_maximum_n_ind_int($a, $c, $m_size);
   $set_out ? $_[1] = $c : $c;
 }
-#line 1375 "Ufunc.pm"
+#line 1406 "Ufunc.pm"
 
 *maximum_n_ind = \&PDL::maximum_n_ind;
 
@@ -1379,7 +1410,7 @@ sub PDL::maximum_n_ind {
 
 
 
-#line 329 "ufunc.pd"
+#line 343 "ufunc.pd"
 
 =head2 maxover_n_ind
 
@@ -1390,7 +1421,7 @@ Synonym for L</maximum_n_ind>.
 =cut
 
 *PDL::maxover_n_ind = *maxover_n_ind = \&PDL::maximum_n_ind;
-#line 1394 "Ufunc.pm"
+#line 1425 "Ufunc.pm"
 
 
 =head2 minmaximum
@@ -1430,7 +1461,7 @@ since they will not contain any bad values.
 
 
 
-#line 329 "ufunc.pd"
+#line 343 "ufunc.pd"
 
 =head2 minmaxover
 
@@ -1442,7 +1473,7 @@ Synonym for L</minmaximum>.
 
 *PDL::minmaxover = *minmaxover = \&PDL::minmaximum;
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 avg
 
@@ -1465,7 +1496,7 @@ This routine handles bad values.
 *avg = \&PDL::avg;
 sub PDL::avg { $_[0]->flat->average }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 sum
 
@@ -1488,7 +1519,7 @@ This routine handles bad values.
 *sum = \&PDL::sum;
 sub PDL::sum { $_[0]->flat->sumover }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 prod
 
@@ -1511,7 +1542,7 @@ This routine handles bad values.
 *prod = \&PDL::prod;
 sub PDL::prod { $_[0]->flat->prodover }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 davg
 
@@ -1534,7 +1565,7 @@ This routine handles bad values.
 *davg = \&PDL::davg;
 sub PDL::davg { $_[0]->flat->daverage }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 dsum
 
@@ -1557,7 +1588,7 @@ This routine handles bad values.
 *dsum = \&PDL::dsum;
 sub PDL::dsum { $_[0]->flat->dsumover }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 dprod
 
@@ -1580,7 +1611,7 @@ This routine handles bad values.
 *dprod = \&PDL::dprod;
 sub PDL::dprod { $_[0]->flat->dprodover }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 zcheck
 
@@ -1603,7 +1634,7 @@ This routine handles bad values.
 *zcheck = \&PDL::zcheck;
 sub PDL::zcheck { $_[0]->flat->zcover }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 and
 
@@ -1626,7 +1657,7 @@ This routine handles bad values.
 *and = \&PDL::and;
 sub PDL::and { $_[0]->flat->andover }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 band
 
@@ -1649,7 +1680,7 @@ This routine handles bad values.
 *band = \&PDL::band;
 sub PDL::band { $_[0]->flat->bandover }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 or
 
@@ -1672,7 +1703,7 @@ This routine handles bad values.
 *or = \&PDL::or;
 sub PDL::or { $_[0]->flat->orover }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 bor
 
@@ -1695,7 +1726,7 @@ This routine handles bad values.
 *bor = \&PDL::bor;
 sub PDL::bor { $_[0]->flat->borover }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 min
 
@@ -1718,7 +1749,7 @@ This routine handles bad values.
 *min = \&PDL::min;
 sub PDL::min { $_[0]->flat->minimum }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 max
 
@@ -1741,7 +1772,7 @@ This routine handles bad values.
 *max = \&PDL::max;
 sub PDL::max { $_[0]->flat->maximum }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 median
 
@@ -1764,7 +1795,7 @@ This routine handles bad values.
 *median = \&PDL::median;
 sub PDL::median { $_[0]->flat->medover }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 mode
 
@@ -1787,7 +1818,7 @@ This routine handles bad values.
 *mode = \&PDL::mode;
 sub PDL::mode { $_[0]->flat->modeover }
 
-#line 564 "ufunc.pd"
+#line 579 "ufunc.pd"
 
 =head2 oddmedian
 
@@ -1810,7 +1841,7 @@ This routine handles bad values.
 *oddmedian = \&PDL::oddmedian;
 sub PDL::oddmedian { $_[0]->flat->oddmedover }
 
-#line 590 "ufunc.pd"
+#line 605 "ufunc.pd"
 
 =head2 any
 
@@ -1883,7 +1914,7 @@ and therefore ignore whether the values are bad.
 
 *minmax = \&PDL::minmax;
 sub PDL::minmax { map $_->sclr, ($_[0]->flat->minmaximum)[0,1] }
-#line 1887 "Ufunc.pm"
+#line 1918 "Ufunc.pm"
 
 
 =head2 medover
@@ -2122,7 +2153,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 947 "ufunc.pd"
+#line 962 "ufunc.pd"
 
 =head2 pct
 
@@ -2145,7 +2176,7 @@ sub PDL::pct {
 	$tmp;
 }
 
-#line 947 "ufunc.pd"
+#line 962 "ufunc.pd"
 
 =head2 oddpct
 
@@ -2167,7 +2198,7 @@ sub PDL::oddpct {
 	$x->flat->oddpctover($p, my $tmp=PDL->nullcreate($x));
 	$tmp;
 }
-#line 2171 "Ufunc.pm"
+#line 2202 "Ufunc.pm"
 
 
 =head2 qsort
@@ -2375,7 +2406,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1215 "ufunc.pd"
+#line 1230 "ufunc.pd"
 
 =head1 AUTHOR
 
@@ -2389,7 +2420,7 @@ from the PDL distribution, the copyright notice should be included in
 the file.
 
 =cut
-#line 2393 "Ufunc.pm"
+#line 2424 "Ufunc.pm"
 
 # Exit with OK status
 

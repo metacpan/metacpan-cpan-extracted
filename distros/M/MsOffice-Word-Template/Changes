@@ -1,5 +1,8 @@
 Revision history for MsOffice-Word-Template
 
+2.05    28.09.2024
+  - consistent licensing declarations : artistic 2 in all files
+
 2.04    09.06.2024
   - recommends GD, necessary for barcode generation in addition to Barcode::Code128
 

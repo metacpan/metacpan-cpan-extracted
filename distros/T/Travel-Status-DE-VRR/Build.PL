@@ -8,29 +8,29 @@ Module::Build->new(
 
 	build_requires => {
 		'File::Slurp' => 0,
-		'Test::More' => 0,
-		'Test::Pod' => 0,
+		'Test::More'  => 0,
+		'Test::Pod'   => 0,
 	},
 	configure_requires => {
 		'Module::Build' => 0.40,
 	},
 	module_name => 'Travel::Status::DE::VRR',
-	license => 'perl',
-	requires => {
-		'perl' => '5.10.1',
-		'Carp' => 0,
-		'Class::Accessor' => 0,
-		'DateTime' => 0,
-		'Getopt::Long' => 0,
-		'List::Util' => 0,
-		'LWP::UserAgent' => 0,
-		'LWP::Protocol::https' => 0,
-		'XML::LibXML' => 0,
+	license     => 'perl',
+	requires    => {
+		'perl'                       => '5.10.1',
+		'Carp'                       => 0,
+		'Class::Accessor'            => 0,
+		'DateTime'                   => 0,
+		'DateTime::Format::Strptime' => 0,
+		'Getopt::Long'               => 0,
+		'JSON'                       => 0,
+		'List::Util'                 => 0,
+		'LWP::UserAgent'             => 0,
+		'LWP::Protocol::https'       => 0,
 	},
-	sign => 1,
+	sign       => 1,
 	meta_merge => {
-		resources => {
-			repository => 'https://github.com/derf/Travel-Status-DE-VRR'
-		}
+		resources =>
+		  { repository => 'https://github.com/derf/Travel-Status-DE-VRR' }
 	},
 )->create_build_script();

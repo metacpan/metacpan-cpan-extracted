@@ -65,7 +65,7 @@
       },
       {
         "id": "bus",
-        "bitmasks": [64, 128],
+        "bitmasks": [64],
         "name": "Bus"
       },
       {

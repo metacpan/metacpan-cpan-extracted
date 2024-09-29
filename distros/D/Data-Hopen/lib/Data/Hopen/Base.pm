@@ -2,13 +2,13 @@
 # Thanks to David Farrell,
 # https://www.perl.com/article/how-to-build-a-base-module/
 # Copyright (c) 2018 Christopher White.  All rights reserved.
-# LGPL 2.1+ - see the accompanying LICENSE file
+# SPDX-License-Identifier: BSD-3-Clause
 
 package Data::Hopen::Base;
 use parent 'Exporter';
 use Import::Into;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000021';
 
 # Pragmas
 use 5.014;
@@ -55,12 +55,6 @@ sub import {
     # Re-export packages
     Data::Dumper->import::into($target);
     Carp->import::into($target, qw(carp croak confess));
-
-    # Permit smartmatch.
-    # http://blogs.perl.org/users/mike_b/2013/06/a-little-nicer-way-to-use-smartmatch-on-perl-518.html
-    # (Also, https://www.perlmonks.org/?node_id=1163370 is another approach.)
-    experimental->import::into($target, 'smartmatch');
-
 } #import()
 
 1;

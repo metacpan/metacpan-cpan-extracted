@@ -1,3 +1,6 @@
+2.030 2024-09-29
+- require PDL version that has raster2fits; previously didn't require one with t_raster2fits which test used
+
 2.029 2024-09-24
 - Gnuplot 6: handle all Qt warnings
 

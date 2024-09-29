@@ -1,14 +1,14 @@
 package Bio::MUST::Drivers::Mafft;
 # ABSTRACT: Bio::MUST driver for running the MAFFT program
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Drivers::Mafft::VERSION = '0.210160';
+$Bio::MUST::Drivers::Mafft::VERSION = '0.242720';
 use Moose;
 use namespace::autoclean;
 
 use autodie;
 use feature qw(say);
 
-# use Smart::Comments;
+use Smart::Comments '###';
 
 use Carp;
 use IPC::System::Simple qw(system);
@@ -26,16 +26,31 @@ sub align_all {                             ## no critic (RequireArgUnpacking)
     return shift->_mafft('align_all', @_);
 }
 
-sub seqs2profile {                          ## no critic (RequireArgUnpacking)
-    return shift->_mafft('seqs2profile', @_);
-}
-
 sub profile2profile {                       ## no critic (RequireArgUnpacking)
     my $out = shift->_mafft('profile2profile' , @_);
     return $out if $out;
 
     carp '[BMD] Warning: cannot align profiles; returning nothing!';
     return;
+}
+
+sub seqs2profile {
+    my $self    = shift;
+    my $profile = shift;
+    my $args    = shift // {};
+
+    # setup specialized options
+    my $mode = 'seqs2profile';
+    for my $suffix ( qw(long fragments) ) {
+        my $opt = '--' . $suffix;
+        if (exists $args->{$opt}) {
+            $mode =~ s/seqs/$suffix/xms;
+            delete $args->{$opt};
+        }
+    }
+    #### $mode
+
+    return $self->_mafft($mode, $profile, $args);
 }
 
 sub _mafft {
@@ -58,15 +73,19 @@ sub _mafft {
     $args->{$profile} = undef if $profile;      # should come last (no --)
     my $args_str  = stringify_args($args);
 
+    # see https://mafft.cbrc.jp/alignment/server/add.html
     my %opt_for = (
-        align_all       => q{},
-        seqs2profile    => '--add',
-        profile2profile => '--addprofile',
+        align_all         => q{},
+        profile2profile   => '--addprofile',
+        seqs2profile      => '--add',
+        long2profile      => '--addlong',
+        fragments2profile => '--addfragments',
     );
 
     # create mafft command
     my $pgm = 'mafft';      # linsi, ginsi,... do not work
-    my $cmd = "$pgm $opt_for{$mode} $infile $args_str > $outfile 2> /dev/null";
+    my $final_args = $mode eq 'align_all' ? "$args_str $infile" : "$infile $args_str";
+    my $cmd = "$pgm $opt_for{$mode} $final_args > $outfile 2> /dev/null";
     #### $cmd
 
     # try to robustly execute mafft
@@ -106,7 +125,7 @@ Bio::MUST::Drivers::Mafft - Bio::MUST driver for running the MAFFT program
 
 =head1 VERSION
 
-version 0.210160
+version 0.242720
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ extends 'MsOffice::Word::Template::Engine';
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 #======================================================================
 # ATTRIBUTES
@@ -67,3 +67,8 @@ Implements a templating engine for L<MsOffice::Word::Template>, based on
 L<Template::Mustache>.
 
 
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2020-2024 by Laurent Dami.
+
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.

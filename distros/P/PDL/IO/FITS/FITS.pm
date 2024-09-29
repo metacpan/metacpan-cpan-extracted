@@ -315,16 +315,11 @@ sub PDL::rfitshdr {
 }
 
 sub PDL::rfits {
-  
   my $class = shift;
-  
   barf 'Usage: $x = rfits($file)  -or-   $x = PDL->rfits($file)' if (@_ < 1 || @_ > 2);
-  
   my $file = shift; 
-  
   my $u_opt = ifhref(shift);
   my $opt = $rfits_options->options($u_opt);
-  
   my($nbytes, $line, $name, $rest, $size, $i, $bscale, $bzero, $extnum);
 
   $nbytes = 0;
@@ -1226,6 +1221,8 @@ our $tile_compressors = {
   'GZIP_1' => undef,
   'RICE_1' => [
     sub { ### RICE_1 compressor
+      eval { require PDL::Compression };
+      die "rfits: error while loading PDL::Compression to pack tile-compressed image.\n\t$@\n" if $@;
       my ($tiles, $tbl, $params) = @_;
       my $blocksize = $params->{BLOCKSIZE} || 32;
       my ($compressed,undef,undef,$len) = $tiles->rice_compress($blocksize);

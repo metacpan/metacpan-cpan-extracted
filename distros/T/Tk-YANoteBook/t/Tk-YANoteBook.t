@@ -18,10 +18,11 @@ my $nb;
 if (defined $app) {
 	my $nbf = $app->Frame(-relief => 'groove', -borderwidth => 4);
 	$nb = $nbf->YANoteBook(
+#		-image => $app->Pixmap(-file => 'document-multiple.xpm'),
 #		-autoupdate => 1,
 #		-background => 'red',
-		-relief => 'raised',
-		-borderwidth => 2,
+#		-relief => 'raised',
+#		-borderwidth => 2,
 #		-selectoptions => [
 #			-relief => 'raised',
 #			-borderwidth => 1,

@@ -4,7 +4,7 @@ use Test::More;
 use PDL::Graphics::Gnuplot qw(plot gpwin);
 use File::Temp qw(tempfile);
 use PDL;
-use PDL::Transform::Cartography; # t_raster2fits
+use PDL::Transform::Cartography; # raster2fits
 
 ##########
 # Uncomment these to test error handling on Microsoft Windows, from within POSIX....
@@ -167,7 +167,7 @@ unlink($testoutput) or warn "\$!: $! for '$testoutput'";
   eval {$w->plot({with => 'fits', resample=>[100,100]},$r9)};
   is($@, '', "with 'fits', resample [100,100]");
   my $r9_rgb = pdl(0,$r9,$r9)->mv(-1,0); $r9_rgb->slice(0) .= 6; $r9_rgb *= 20;
-  eval {$w->plot({with => 'fits'}, t_raster2fits()->apply($r9_rgb))};
+  eval {$w->plot({with => 'fits'}, scalar raster2fits($r9_rgb, @PDL::Transform::Cartography::PLATE_CARREE))}; # scalar is because typo in 2.093 with "," instead of ";"
   is($@, '', "with 'fits', rgb");
 }
 

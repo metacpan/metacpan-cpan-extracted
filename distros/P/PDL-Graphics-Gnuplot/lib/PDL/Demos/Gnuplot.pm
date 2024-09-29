@@ -1,5 +1,4 @@
 package PDL::Demos::Gnuplot;
-use PDL::Graphics::Gnuplot;
 use File::Spec;
 
 my $subst = "";

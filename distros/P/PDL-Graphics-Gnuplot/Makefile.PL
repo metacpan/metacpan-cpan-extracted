@@ -44,7 +44,8 @@ WriteMakefile(
     },
     PREREQ_PM => { 
 	    'Alien::Gnuplot'      => '1.031',
-	    'PDL'                 => 0,
+	    'PDL'                 => '2.093', # raster2fits
+	    'PDL::Transform'      => 0, # anticipating split
 	    'PDL::Transform::Color' => 0,
 	    'IPC::Run'            => 0,
 	    'List::Util'          => 0,

@@ -3,7 +3,7 @@
 #
 package PDL::IO::GD;
 
-our @EXPORT_OK = qw(write_png write_png_ex write_true_png write_true_png_ex write_png_best write_true_png_best recompress_png_best load_lut read_true_png read_png _gd_image_to_pdl_true _gd_image_to_pdl _pdl_to_gd_image_true _pdl_to_gd_image_lut read_png_lut _gdImageColorAllocates _gdImageColorAllocateAlphas _gdImageSetPixels _gdImageLines _gdImageDashedLines _gdImageRectangles _gdImageFilledRectangles _gdImageFilledArcs _gdImageArcs _gdImageFilledEllipses  gdAlphaBlend   gdTrueColor   gdTrueColorAlpha   gdFree   gdFontGetLarge   gdFontGetSmall   gdFontGetMediumBold   gdFontGetGiant   gdFontGetTiny  );
+our @EXPORT_OK = qw(write_png write_png_ex write_true_png write_true_png_ex write_png_best write_true_png_best recompress_png_best load_lut read_true_png read_png _gd_image_to_pdl_true _gd_image_to_rpic_true _gd_image_to_pdl _gd_image_to_rpic _pdl_to_gd_image_true _pdl_to_gd_image_lut read_png_lut _gdImageColorAllocates _gdImageColorAllocateAlphas _gdImageSetPixels _gdImageLines _gdImageDashedLines _gdImageRectangles _gdImageFilledRectangles _gdImageFilledArcs _gdImageArcs _gdImageFilledEllipses  gdAlphaBlend   gdTrueColor   gdTrueColorAlpha   gdFree   gdFontGetLarge   gdFontGetSmall   gdFontGetMediumBold   gdFontGetGiant   gdFontGetTiny  );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -183,7 +183,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 222 "GD.pd"
+#line 233 "GD.pd"
 
 =head2 write_png_best
 
@@ -220,7 +220,7 @@ sub write_true_png_best
     return write_true_png_ex( $img, $filename, 9 );
 } # End of write_true_png_best()...
 
-#line 296 "GD.pd"
+#line 308 "GD.pd"
 
 =head2 load_lut( $filename )
 
@@ -291,7 +291,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+*_gd_image_to_rpic_true = \&PDL::_gd_image_to_rpic_true;
+
+
+
+
 *_gd_image_to_pdl = \&PDL::_gd_image_to_pdl;
+
+
+
+
+*_gd_image_to_rpic = \&PDL::_gd_image_to_rpic;
 
 
 
@@ -386,7 +396,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 397 "GD.pd"
+#line 425 "GD.pd"
 
 =head1 OO INTERFACE
  
@@ -403,7 +413,10 @@ Object Oriented interface to the GD image library.
  my $y = $gd->SY();
 
  # Grab the PDL of the data:
- my $pdl = $gd->to_pdl();
+ my $pdl = $gd->to_pdl; # (x,y,3) y=0 at top
+
+ # Grab the PDL of the data:
+ my $pdl = $gd->to_rpic; # (3,x,y) y=0 at bottom
 
  # Kill this thing:
  $gd->DESTROY();
@@ -685,24 +698,24 @@ EOF
         {
             if( defined( $options->{lut} ) )
             {
-                die "$sub: _pdl_to_gd_image_lut() failed!\n" unless
+                die "$sub: _pdl_to_gd_image_lut() failed\n" unless
                   $self->{IMG_PTR} = _pdl_to_gd_image_lut( $pdl, $options->{lut} )->sclr;
             }
             else
             {
-                my $lut = sequence(byte, 255)->slice("*3,:");
-                die "$sub: _pdl_to_gd_image_lut() failed!\n" unless
+                my $lut = sequence(byte, 256)->slice("*3,:");
+                die "$sub: _pdl_to_gd_image_lut() failed\n" unless
                   $self->{IMG_PTR} = _pdl_to_gd_image_lut( $pdl, $lut )->sclr;
             }
         }
         elsif( $num_dims == 3 )
         {
-            die "$sub: _pdl_to_gd_image_true() failed!\n" unless
+            die "$sub: _pdl_to_gd_image_true() failed\n" unless
               $self->{IMG_PTR} = _pdl_to_gd_image_true( $pdl )->sclr;
         }
         else
         {
-            die "Can't create a PDL::IO::GD from a PDL with bad dims!\n";
+            die "Can't create a PDL::IO::GD from a PDL with bad dims\n";
         }
     }
     elsif( exists( $options->{filename} ) )
@@ -714,24 +727,24 @@ EOF
 
         # Figure out what type of file it is:
         $self->{input_type} = _id_image_file( $options->{filename} )
-            or die "$sub: Can't determine image type of filename => \'$options->{filename}\'!\n";
+            or die "$sub: Can't determine image type of filename => \'$options->{filename}\'\n";
         
         # Read in the file:
         $self->{IMG_PTR} = _img_ptr_from_file( $options->{filename}, $self->{input_type} )
-            or die "$sub: Can't read in the input file!\n";
+            or die "$sub: Can't read in the input file\n";
     }
     elsif( defined( $options->{x} ) && defined( $options->{y} ) )
     {   # Create an empty image:
         my $done = 0;
         if( $options->{true_color} )
         {   # Create an empty true color image:
-            die "$sub: _gdImageCreateTrueColor() failed!\n" unless
+            die "$sub: _gdImageCreateTrueColor() failed\n" unless
               $self->{IMG_PTR} = _gdImageCreateTrueColor( $options->{x}, $options->{y} );
             $done = 1;
         }
         unless( $done )
         {   # Create an empty palette image:
-            die "$sub: _gdImageCreatePalette() failed!\n" unless
+            die "$sub: _gdImageCreatePalette() failed\n" unless
               $self->{IMG_PTR} = _gdImageCreatePalette( $options->{x}, $options->{y} );
         }
     }
@@ -752,12 +765,12 @@ EOF
         else
         {
             $self->{input_type} = _id_image_data( $options->{data} )
-                or die "$sub: Can't determine image type given data!\n";
+                or die "$sub: Can't determine image type given data\n";
         }
         
         # Load the data:
         $self->{IMG_PTR} = _img_ptr_from_data( $options->{data}, $self->{input_type} )
-            or die "$sub: Can't load the input image data!\n";
+            or die "$sub: Can't load the input image data\n";
     }
     
     # Bless and return:
@@ -769,6 +782,8 @@ EOF
 =head2 to_pdl
 
 When you're done playing with your GDImage and want an ndarray back, use this function to return one.
+For true-colour, RGB dim is highest (x,y,3).
+To get it in the lowest dim (and with y=0 is the bottom), use L</to_rpic>.
 
 =cut
 
@@ -776,6 +791,20 @@ sub to_pdl {
     my $self = shift;
     $self->gdImageTrueColor() ? _gd_image_to_pdl_true( $self->{IMG_PTR} )
       : _gd_image_to_pdl( $self->{IMG_PTR} );
+}
+
+=head2 to_rpic
+
+When you're done playing with your GDImage and want an ndarray back, use this function to return one.
+For true-colour, RGB dim is lowest (3,x,y).
+To get it in the highest dim (and with y=0 is the top), use L</to_pdl>.
+
+=cut
+
+sub to_rpic {
+    my $self = shift;
+    $self->gdImageTrueColor() ? _gd_image_to_rpic_true( $self->{IMG_PTR} )
+      : _gd_image_to_rpic( $self->{IMG_PTR} );
 }
 
 =head2 apply_lut( $lut(ndarray) )
@@ -800,7 +829,7 @@ sub DESTROY
     my $self = shift;
     my $sub = _pkg_name( "DESTROY" );
  
-    #print STDERR sprintf("$sub: destroying gdImagePtr: 0x%p (%d) (%ld) (%lld)!\n", $self->{IMG_PTR}, $self->{IMG_PTR},$self->{IMG_PTR},$self->{IMG_PTR});
+    #print STDERR sprintf("$sub: destroying gdImagePtr: 0x%p (%d) (%ld) (%lld)\n", $self->{IMG_PTR}, $self->{IMG_PTR},$self->{IMG_PTR},$self->{IMG_PTR});
     
     if( defined( $self->{IMG_PTR} ) )
     {
@@ -817,7 +846,7 @@ that function works and what it does.
 
 =cut
 
-#line 1303 "GD.pd"
+#line 1350 "GD.pd"
 
 =head2 write_Png
 
@@ -831,7 +860,7 @@ sub write_Png
     return _gdImagePng ( $self->{IMG_PTR}, @_ );
 } # End of write_Png()...
 
-#line 1303 "GD.pd"
+#line 1350 "GD.pd"
 
 =head2 write_PngEx
 
@@ -845,7 +874,7 @@ sub write_PngEx
     return _gdImagePngEx ( $self->{IMG_PTR}, @_ );
 } # End of write_PngEx()...
 
-#line 1303 "GD.pd"
+#line 1350 "GD.pd"
 
 =head2 write_WBMP
 
@@ -859,7 +888,7 @@ sub write_WBMP
     return _gdImageWBMP ( $self->{IMG_PTR}, @_ );
 } # End of write_WBMP()...
 
-#line 1303 "GD.pd"
+#line 1350 "GD.pd"
 
 =head2 write_Jpeg
 
@@ -873,7 +902,7 @@ sub write_Jpeg
     return _gdImageJpeg ( $self->{IMG_PTR}, @_ );
 } # End of write_Jpeg()...
 
-#line 1303 "GD.pd"
+#line 1350 "GD.pd"
 
 =head2 write_Gd
 
@@ -887,7 +916,7 @@ sub write_Gd
     return _gdImageGd ( $self->{IMG_PTR}, @_ );
 } # End of write_Gd()...
 
-#line 1303 "GD.pd"
+#line 1350 "GD.pd"
 
 =head2 write_Gd2
 
@@ -901,7 +930,7 @@ sub write_Gd2
     return _gdImageGd2 ( $self->{IMG_PTR}, @_ );
 } # End of write_Gd2()...
 
-#line 1303 "GD.pd"
+#line 1350 "GD.pd"
 
 =head2 write_Gif
 
@@ -915,7 +944,7 @@ sub write_Gif
     return _gdImageGif ( $self->{IMG_PTR}, @_ );
 } # End of write_Gif()...
 
-#line 1415 "GD.pd"
+#line 1462 "GD.pd"
 
 =head2 get_Png_data
 
@@ -929,7 +958,7 @@ sub get_Png_data
     return _gdImagePngPtr ( $self->{IMG_PTR}, @_ );
 } # End of get_Png_data()...
 
-#line 1415 "GD.pd"
+#line 1462 "GD.pd"
 
 =head2 get_PngEx_data
 
@@ -943,7 +972,7 @@ sub get_PngEx_data
     return _gdImagePngPtrEx ( $self->{IMG_PTR}, @_ );
 } # End of get_PngEx_data()...
 
-#line 1415 "GD.pd"
+#line 1462 "GD.pd"
 
 =head2 get_WBMP_data
 
@@ -957,7 +986,7 @@ sub get_WBMP_data
     return _gdImageWBMPPtr ( $self->{IMG_PTR}, @_ );
 } # End of get_WBMP_data()...
 
-#line 1415 "GD.pd"
+#line 1462 "GD.pd"
 
 =head2 get_Jpeg_data
 
@@ -971,7 +1000,7 @@ sub get_Jpeg_data
     return _gdImageJpegPtr ( $self->{IMG_PTR}, @_ );
 } # End of get_Jpeg_data()...
 
-#line 1415 "GD.pd"
+#line 1462 "GD.pd"
 
 =head2 get_Gd_data
 
@@ -985,7 +1014,7 @@ sub get_Gd_data
     return _gdImageGdPtr ( $self->{IMG_PTR}, @_ );
 } # End of get_Gd_data()...
 
-#line 1415 "GD.pd"
+#line 1462 "GD.pd"
 
 =head2 get_Gd2_data
 
@@ -999,7 +1028,7 @@ sub get_Gd2_data
     return _gdImageGd2Ptr ( $self->{IMG_PTR}, @_ );
 } # End of get_Gd2_data()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 SetPixel
 
@@ -1026,7 +1055,7 @@ sub gdImageSetPixel
     return _gdImageSetPixel ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetPixel()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 GetPixel
 
@@ -1053,7 +1082,7 @@ sub gdImageGetPixel
     return _gdImageGetPixel ( $self->{IMG_PTR}, @_ );
 } # End of gdImageGetPixel()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 AABlend
 
@@ -1080,7 +1109,7 @@ sub gdImageAABlend
     return _gdImageAABlend ( $self->{IMG_PTR}, @_ );
 } # End of gdImageAABlend()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 Line
 
@@ -1107,7 +1136,7 @@ sub gdImageLine
     return _gdImageLine ( $self->{IMG_PTR}, @_ );
 } # End of gdImageLine()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 DashedLine
 
@@ -1134,7 +1163,7 @@ sub gdImageDashedLine
     return _gdImageDashedLine ( $self->{IMG_PTR}, @_ );
 } # End of gdImageDashedLine()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 Rectangle
 
@@ -1161,7 +1190,7 @@ sub gdImageRectangle
     return _gdImageRectangle ( $self->{IMG_PTR}, @_ );
 } # End of gdImageRectangle()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 FilledRectangle
 
@@ -1188,7 +1217,7 @@ sub gdImageFilledRectangle
     return _gdImageFilledRectangle ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFilledRectangle()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 SetClip
 
@@ -1215,7 +1244,7 @@ sub gdImageSetClip
     return _gdImageSetClip ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetClip()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 GetClip
 
@@ -1242,7 +1271,7 @@ sub gdImageGetClip
     return _gdImageGetClip ( $self->{IMG_PTR}, @_ );
 } # End of gdImageGetClip()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 BoundsSafe
 
@@ -1269,7 +1298,7 @@ sub gdImageBoundsSafe
     return _gdImageBoundsSafe ( $self->{IMG_PTR}, @_ );
 } # End of gdImageBoundsSafe()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 Char
 
@@ -1296,7 +1325,7 @@ sub gdImageChar
     return _gdImageChar ( $self->{IMG_PTR}, @_ );
 } # End of gdImageChar()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 CharUp
 
@@ -1323,7 +1352,7 @@ sub gdImageCharUp
     return _gdImageCharUp ( $self->{IMG_PTR}, @_ );
 } # End of gdImageCharUp()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 String
 
@@ -1350,7 +1379,7 @@ sub gdImageString
     return _gdImageString ( $self->{IMG_PTR}, @_ );
 } # End of gdImageString()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 StringUp
 
@@ -1377,7 +1406,7 @@ sub gdImageStringUp
     return _gdImageStringUp ( $self->{IMG_PTR}, @_ );
 } # End of gdImageStringUp()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 String16
 
@@ -1404,7 +1433,7 @@ sub gdImageString16
     return _gdImageString16 ( $self->{IMG_PTR}, @_ );
 } # End of gdImageString16()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 StringUp16
 
@@ -1431,7 +1460,7 @@ sub gdImageStringUp16
     return _gdImageStringUp16 ( $self->{IMG_PTR}, @_ );
 } # End of gdImageStringUp16()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 Polygon
 
@@ -1458,7 +1487,7 @@ sub gdImagePolygon
     return _gdImagePolygon ( $self->{IMG_PTR}, @_ );
 } # End of gdImagePolygon()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 FilledPolygon
 
@@ -1485,7 +1514,7 @@ sub gdImageFilledPolygon
     return _gdImageFilledPolygon ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFilledPolygon()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorAllocate
 
@@ -1512,7 +1541,7 @@ sub gdImageColorAllocate
     return _gdImageColorAllocate ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorAllocate()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorAllocateAlpha
 
@@ -1539,7 +1568,7 @@ sub gdImageColorAllocateAlpha
     return _gdImageColorAllocateAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorAllocateAlpha()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorClosest
 
@@ -1566,7 +1595,7 @@ sub gdImageColorClosest
     return _gdImageColorClosest ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorClosest()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorClosestAlpha
 
@@ -1593,7 +1622,7 @@ sub gdImageColorClosestAlpha
     return _gdImageColorClosestAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorClosestAlpha()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorClosestHWB
 
@@ -1620,7 +1649,7 @@ sub gdImageColorClosestHWB
     return _gdImageColorClosestHWB ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorClosestHWB()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorExact
 
@@ -1647,7 +1676,7 @@ sub gdImageColorExact
     return _gdImageColorExact ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorExact()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorExactAlpha
 
@@ -1674,7 +1703,7 @@ sub gdImageColorExactAlpha
     return _gdImageColorExactAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorExactAlpha()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorResolve
 
@@ -1701,7 +1730,7 @@ sub gdImageColorResolve
     return _gdImageColorResolve ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorResolve()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorResolveAlpha
 
@@ -1728,7 +1757,7 @@ sub gdImageColorResolveAlpha
     return _gdImageColorResolveAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorResolveAlpha()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorDeallocate
 
@@ -1755,7 +1784,7 @@ sub gdImageColorDeallocate
     return _gdImageColorDeallocate ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorDeallocate()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 TrueColorToPalette
 
@@ -1782,7 +1811,7 @@ sub gdImageTrueColorToPalette
     return _gdImageTrueColorToPalette ( $self->{IMG_PTR}, @_ );
 } # End of gdImageTrueColorToPalette()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorTransparent
 
@@ -1809,7 +1838,7 @@ sub gdImageColorTransparent
     return _gdImageColorTransparent ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorTransparent()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 FilledArc
 
@@ -1836,7 +1865,7 @@ sub gdImageFilledArc
     return _gdImageFilledArc ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFilledArc()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 Arc
 
@@ -1863,7 +1892,7 @@ sub gdImageArc
     return _gdImageArc ( $self->{IMG_PTR}, @_ );
 } # End of gdImageArc()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 FilledEllipse
 
@@ -1890,7 +1919,7 @@ sub gdImageFilledEllipse
     return _gdImageFilledEllipse ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFilledEllipse()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 FillToBorder
 
@@ -1917,7 +1946,7 @@ sub gdImageFillToBorder
     return _gdImageFillToBorder ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFillToBorder()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 Fill
 
@@ -1944,7 +1973,7 @@ sub gdImageFill
     return _gdImageFill ( $self->{IMG_PTR}, @_ );
 } # End of gdImageFill()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 CopyRotated
 
@@ -1971,7 +2000,7 @@ sub gdImageCopyRotated
     return _gdImageCopyRotated ( $self->{IMG_PTR}, @_ );
 } # End of gdImageCopyRotated()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 SetBrush
 
@@ -1998,7 +2027,7 @@ sub gdImageSetBrush
     return _gdImageSetBrush ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetBrush()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 SetTile
 
@@ -2025,7 +2054,7 @@ sub gdImageSetTile
     return _gdImageSetTile ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetTile()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 SetAntiAliased
 
@@ -2052,7 +2081,7 @@ sub gdImageSetAntiAliased
     return _gdImageSetAntiAliased ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetAntiAliased()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 SetAntiAliasedDontBlend
 
@@ -2079,7 +2108,7 @@ sub gdImageSetAntiAliasedDontBlend
     return _gdImageSetAntiAliasedDontBlend ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetAntiAliasedDontBlend()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 SetStyle
 
@@ -2106,7 +2135,7 @@ sub gdImageSetStyle
     return _gdImageSetStyle ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetStyle()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 SetThickness
 
@@ -2133,7 +2162,7 @@ sub gdImageSetThickness
     return _gdImageSetThickness ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSetThickness()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 Interlace
 
@@ -2160,7 +2189,7 @@ sub gdImageInterlace
     return _gdImageInterlace ( $self->{IMG_PTR}, @_ );
 } # End of gdImageInterlace()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 AlphaBlending
 
@@ -2187,7 +2216,7 @@ sub gdImageAlphaBlending
     return _gdImageAlphaBlending ( $self->{IMG_PTR}, @_ );
 } # End of gdImageAlphaBlending()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 SaveAlpha
 
@@ -2214,7 +2243,7 @@ sub gdImageSaveAlpha
     return _gdImageSaveAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSaveAlpha()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 TrueColor
 
@@ -2241,7 +2270,7 @@ sub gdImageTrueColor
     return _gdImageTrueColor ( $self->{IMG_PTR}, @_ );
 } # End of gdImageTrueColor()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 ColorsTotal
 
@@ -2268,7 +2297,7 @@ sub gdImageColorsTotal
     return _gdImageColorsTotal ( $self->{IMG_PTR}, @_ );
 } # End of gdImageColorsTotal()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 Red
 
@@ -2295,7 +2324,7 @@ sub gdImageRed
     return _gdImageRed ( $self->{IMG_PTR}, @_ );
 } # End of gdImageRed()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 Green
 
@@ -2322,7 +2351,7 @@ sub gdImageGreen
     return _gdImageGreen ( $self->{IMG_PTR}, @_ );
 } # End of gdImageGreen()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 Blue
 
@@ -2349,7 +2378,7 @@ sub gdImageBlue
     return _gdImageBlue ( $self->{IMG_PTR}, @_ );
 } # End of gdImageBlue()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 Alpha
 
@@ -2376,7 +2405,7 @@ sub gdImageAlpha
     return _gdImageAlpha ( $self->{IMG_PTR}, @_ );
 } # End of gdImageAlpha()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 GetTransparent
 
@@ -2403,7 +2432,7 @@ sub gdImageGetTransparent
     return _gdImageGetTransparent ( $self->{IMG_PTR}, @_ );
 } # End of gdImageGetTransparent()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 GetInterlaced
 
@@ -2430,7 +2459,7 @@ sub gdImageGetInterlaced
     return _gdImageGetInterlaced ( $self->{IMG_PTR}, @_ );
 } # End of gdImageGetInterlaced()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 SX
 
@@ -2457,7 +2486,7 @@ sub gdImageSX
     return _gdImageSX ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSX()...
 
-#line 1515 "GD.pd"
+#line 1562 "GD.pd"
 
 =head2 SY
 
@@ -2484,7 +2513,7 @@ sub gdImageSY
     return _gdImageSY ( $self->{IMG_PTR}, @_ );
 } # End of gdImageSY()...
 
-#line 1617 "GD.pd"
+#line 1664 "GD.pd"
 
 =head2 ColorAllocates
 
@@ -2511,7 +2540,7 @@ sub gdImageColorAllocates
     return _gdImageColorAllocates ( @_, $self->{IMG_PTR} );
 } # End of gdImageColorAllocates()...
 
-#line 1617 "GD.pd"
+#line 1664 "GD.pd"
 
 =head2 ColorAllocateAlphas
 
@@ -2538,7 +2567,7 @@ sub gdImageColorAllocateAlphas
     return _gdImageColorAllocateAlphas ( @_, $self->{IMG_PTR} );
 } # End of gdImageColorAllocateAlphas()...
 
-#line 1617 "GD.pd"
+#line 1664 "GD.pd"
 
 =head2 SetPixels
 
@@ -2565,7 +2594,7 @@ sub gdImageSetPixels
     return _gdImageSetPixels ( @_, $self->{IMG_PTR} );
 } # End of gdImageSetPixels()...
 
-#line 1617 "GD.pd"
+#line 1664 "GD.pd"
 
 =head2 Lines
 
@@ -2592,7 +2621,7 @@ sub gdImageLines
     return _gdImageLines ( @_, $self->{IMG_PTR} );
 } # End of gdImageLines()...
 
-#line 1617 "GD.pd"
+#line 1664 "GD.pd"
 
 =head2 DashedLines
 
@@ -2619,7 +2648,7 @@ sub gdImageDashedLines
     return _gdImageDashedLines ( @_, $self->{IMG_PTR} );
 } # End of gdImageDashedLines()...
 
-#line 1617 "GD.pd"
+#line 1664 "GD.pd"
 
 =head2 Rectangles
 
@@ -2646,7 +2675,7 @@ sub gdImageRectangles
     return _gdImageRectangles ( @_, $self->{IMG_PTR} );
 } # End of gdImageRectangles()...
 
-#line 1617 "GD.pd"
+#line 1664 "GD.pd"
 
 =head2 FilledRectangles
 
@@ -2673,7 +2702,7 @@ sub gdImageFilledRectangles
     return _gdImageFilledRectangles ( @_, $self->{IMG_PTR} );
 } # End of gdImageFilledRectangles()...
 
-#line 1617 "GD.pd"
+#line 1664 "GD.pd"
 
 =head2 FilledArcs
 
@@ -2700,7 +2729,7 @@ sub gdImageFilledArcs
     return _gdImageFilledArcs ( @_, $self->{IMG_PTR} );
 } # End of gdImageFilledArcs()...
 
-#line 1617 "GD.pd"
+#line 1664 "GD.pd"
 
 =head2 Arcs
 
@@ -2727,7 +2756,7 @@ sub gdImageArcs
     return _gdImageArcs ( @_, $self->{IMG_PTR} );
 } # End of gdImageArcs()...
 
-#line 1617 "GD.pd"
+#line 1664 "GD.pd"
 
 =head2 FilledEllipses
 
@@ -2754,13 +2783,13 @@ sub gdImageFilledEllipses
     return _gdImageFilledEllipses ( @_, $self->{IMG_PTR} );
 } # End of gdImageFilledEllipses()...
 
-#line 1629 "GD.pd"
+#line 1676 "GD.pd"
 
 =head1 CLASS FUNCTIONS
 
 =cut
 
-#line 1699 "GD.pd"
+#line 1746 "GD.pd"
 
 =head2 gdImageCopy
 
@@ -2782,7 +2811,7 @@ sub gdImageCopy
     return _gdImageCopy ( $dst->{IMG_PTR}, $src->{IMG_PTR}, $dstX, $dstY, $srcX, $srcY, $w, $h );
 } # End of gdImageCopy()...
 
-#line 1699 "GD.pd"
+#line 1746 "GD.pd"
 
 =head2 gdImageCopyMerge
 
@@ -2805,7 +2834,7 @@ sub gdImageCopyMerge
     return _gdImageCopyMerge ( $dst->{IMG_PTR}, $src->{IMG_PTR}, $dstX, $dstY, $srcX, $srcY, $w, $h, $pct );
 } # End of gdImageCopyMerge()...
 
-#line 1699 "GD.pd"
+#line 1746 "GD.pd"
 
 =head2 gdImageCopyMergeGray
 
@@ -2828,7 +2857,7 @@ sub gdImageCopyMergeGray
     return _gdImageCopyMergeGray ( $dst->{IMG_PTR}, $src->{IMG_PTR}, $dstX, $dstY, $srcX, $srcY, $w, $h, $pct );
 } # End of gdImageCopyMergeGray()...
 
-#line 1699 "GD.pd"
+#line 1746 "GD.pd"
 
 =head2 gdImageCopyResized
 
@@ -2852,7 +2881,7 @@ sub gdImageCopyResized
     return _gdImageCopyResized ( $dst->{IMG_PTR}, $src->{IMG_PTR}, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $srcW, $srcH );
 } # End of gdImageCopyResized()...
 
-#line 1699 "GD.pd"
+#line 1746 "GD.pd"
 
 =head2 gdImageCopyResampled
 
@@ -2876,7 +2905,7 @@ sub gdImageCopyResampled
     return _gdImageCopyResampled ( $dst->{IMG_PTR}, $src->{IMG_PTR}, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $srcW, $srcH );
 } # End of gdImageCopyResampled()...
 
-#line 1699 "GD.pd"
+#line 1746 "GD.pd"
 
 =head2 gdImageCompare
 
@@ -2892,7 +2921,7 @@ sub gdImageCompare
     return _gdImageCompare ( $im1->{IMG_PTR}, $im2->{IMG_PTR} );
 } # End of gdImageCompare()...
 
-#line 1699 "GD.pd"
+#line 1746 "GD.pd"
 
 =head2 gdImagePaletteCopy
 
@@ -2908,7 +2937,7 @@ sub gdImagePaletteCopy
     return _gdImagePaletteCopy ( $dst->{IMG_PTR}, $src->{IMG_PTR} );
 } # End of gdImagePaletteCopy()...
 
-#line 1024 "GD.pd"
+#line 1071 "GD.pd"
 
 =head2 StringTTF
 
@@ -2935,7 +2964,7 @@ sub gdImageStringTTF
     return _gdImageStringTTF ( $self->{IMG_PTR}, @_ );
 } # End of gdImageStringTTF()...
 
-#line 1077 "GD.pd"
+#line 1124 "GD.pd"
 
 =head2 StringFT
 
@@ -2962,7 +2991,7 @@ sub gdImageStringFT
     return _gdImageStringFT ( $self->{IMG_PTR}, @_ );
 } # End of gdImageStringFT()...
 
-#line 1109 "GD.pd"
+#line 1156 "GD.pd"
 
 =head1 AUTHOR
 
@@ -2970,7 +2999,7 @@ Judd Taylor, Orbital Systems, Ltd.
 judd dot t at orbitalsystems dot com
 
 =cut
-#line 2974 "GD.pm"
+#line 3003 "GD.pm"
 
 # Exit with OK status
 

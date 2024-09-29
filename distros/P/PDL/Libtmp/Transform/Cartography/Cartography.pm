@@ -6,11 +6,12 @@ PDL::Transform::Cartography - Useful cartographic projections
 
  # make a Mercator map of Earth
  use PDL::Transform::Cartography;
+ use PDL::Graphics::Simple;
  $x = earth_coast();
  $x = graticule(10,2)->glue(1,$x);
  $t = t_mercator;
- $w = pgwin(xs);
- $w->lines($t->apply($x)->clean_lines());
+ $w = pgswin();
+ $w->plot(with=>'polylines', $t->apply($x)->clean_lines);
 
 =head1 DESCRIPTION
 
@@ -173,8 +174,8 @@ at load time.
 
 Draw a Mercator map of the world on-screen:
 
-   $w = pgwin(xs);
-   $w->lines(earth_coast->apply(t_mercator)->clean_lines);
+   $w = pgswin();
+   $w->plot(with=>'polylines', earth_coast->apply(t_mercator)->clean_lines);
 
 Here, C<earth_coast()> returns a 3xn ndarray containing (lon, lat, pen) 
 values for the included world coastal outline; C<t_mercator> converts
@@ -183,9 +184,9 @@ lines that cross the 180th meridian.
 
 Draw a Mercator map of the world, with lon/lat at 10 degree intervals:
 
-   $w = pgwin(xs)
+   $w = pgswin();
    $x = earth_coast()->glue(1,graticule(10,1));
-   $w->lines($x->apply(t_mercator)->clean_lines);
+   $w->plot(with=>'polylines', $x->apply(t_mercator)->clean_lines);
 
 This works just the same as the first example, except that a map graticule
 has been applied with interline spacing of 10 degrees lon/lat and 
@@ -257,13 +258,16 @@ our $VERSION = "0.6";
 $VERSION = eval $VERSION;
 our @EXPORT_OK = qw(
   graticule earth_image earth_coast earth_shape clean_lines t_unit_sphere
+  raster2fits
   t_orthographic t_rot_sphere t_caree t_carree t_mercator t_utm t_sin_lat
   t_sinusoidal t_conic t_albers t_lambert t_stereographic t_gnomonic
   t_az_eqd t_az_eqa t_vertical t_perspective t_hammer t_aitoff
-  t_raster2fits t_raster2float
 );
 our @EXPORT = @EXPORT_OK;
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
+
+our @PLATE_CARREE = ([qw(Longitude Latitude RGB)],
+  [qw(degrees degrees index)], [[-180,180], [-90,90], [0,2]]);
 
 ##############################
 # Steal _opt from PDL::Transform.
@@ -294,7 +298,7 @@ sub _strval {
 
 Returns a grid of meridians and parallels as a list of vectors suitable
 for sending to
-L<PDL::Graphics::PGPLOT::Window::lines|PDL::Graphics::PGPLOT::Window/lines>
+L<PDL::Graphics::Simple|PDL::Graphics::Simple/polylines>
 for plotting.
 The grid is in degrees in (theta, phi) coordinates -- this is (E lon, N lat) 
 for terrestrial grids or (RA, dec) for celestial ones.  You must then 
@@ -307,11 +311,11 @@ You can attach the graticule to a vector map using the syntax:
 In array context you get back a 2-element list containing an ndarray of
 the (theta,phi) pairs and an ndarray of the pen values (1 or 0) suitable for
 calling
-L<PDL::Graphics::PGPLOT::Window::lines|PDL::Graphics::PGPLOT::Window/lines>.
+L<PDL::Graphics::Simple|PDL::Graphics::Simple/polylines>.
 In scalar context the two elements are combined into a single ndarray.
 
 The pen values associated with the graticule are negative, which will cause
-L<PDL::Graphics::PGPLOT::Window::lines|PDL::Graphics::PGPLOT::Window/lines>
+L<PDL::Graphics::Simple|PDL::Graphics::Simple/polylines>
 to plot them as hairlines.
 
 If a third argument is given, it is a hash of options, which can be:
@@ -397,8 +401,8 @@ database (see author information).  The vector coastline data are in
 plate carree format so they can be converted to other projections via
 the L<apply|PDL::Transform/apply> method and cartographic transforms,
 and are suitable for plotting with the
-L<lines|PDL::Graphics::PGPLOT::Window/lines>
-method in the PGPLOT
+L<polylines|PDL::Graphics::Simple/polylines>
+plot type in the PDL::Graphics::Simple
 output library:  the first dimension is (X,Y,pen) with breaks having 
 a pen value of 0 and hairlines having negative pen values.  The second 
 dimension broadcasts over all the points in the data set.
@@ -407,9 +411,11 @@ The vector map includes lines that pass through the antipodean
 meridian, so if you want to plot it without reprojecting, you should
 run it through L</clean_lines> first:
 
-    $w = pgwin();
-    $w->lines(earth_coast->clean_lines);     # plot plate carree map of world
-    $w->lines(earth_coast->apply(t_gnomonic))# plot gnomonic map of world
+    $w = pgswin();
+    $w->plot(with=>'polylines',
+      earth_coast->clean_lines);     # plot plate carree map of world
+    $w->plot(with=>'polylines',
+      earth_coast->apply(t_gnomonic)->clean_lines)# plot gnomonic map of world
 
 C<earth_coast> is just a quick-and-dirty way of loading the file
 "earth_coast.vec.fits" that is part of the normal installation tree.
@@ -469,7 +475,7 @@ sub earth_image {
   barf("earth_image: $f not found in \@INC\n") if !$found;
   barf("earth_image: couldn't load $f; you may need to install netpbm.\n")
     unless defined($im);
-  t_raster2fits()->apply($im);
+  raster2fits($im, @PLATE_CARREE);
 }
 
 =head2 earth_shape
@@ -489,14 +495,9 @@ L<http://visibleearth.nasa.gov/view.php?id=73934>).  The image is a
 plate carree map, so you can convert it to other projections via the
 L<map|PDL::Transform/map> method and cartographic transforms.
 The data is from 8-bit grayscale (so only 256 levels), but is returned
-in a similar format to L</earth_image>. The range represents a span of
-6400m, so Everest and the Marianas Trench are not accurately represented.
-
-To turn this into a C<float>, (C<lonlatradius,x,y>) with C<x>
-and C<y> in radians, and the radius as a C<float> as a proportion of the
-Earth's mean radius, use L</t_raster2float>.
-The Earth is treated here as a perfect sphere with sea
-level at radius 6,371km.
+as float, values in Earth radii, in dimensions (2048,1024), like
+L</earth_image>. The range represents a span of 6400m, so Everest and
+the Marianas Trench are not accurately represented.
 
   Value       Hex value   Float    From centre in km   Float as radius
   Base        00          0.0      6370.69873km        0.99995
@@ -506,10 +507,6 @@ level at radius 6,371km.
 Code:
 
   $shape = earth_shape();
-  $floats = t_raster2float()->apply($shape->mv(2,0));
-  $lonlatradius = $floats->slice('0:2'); # r g b all same
-  $lonlatradius->slice('(2)') *= float((6377.09863 - 6370.69873) / 6371);
-  $lonlatradius->slice('(2)') += float(6370.69873 / 6371);
 
 =cut
 
@@ -532,8 +529,43 @@ sub earth_shape {
     unless defined($found);
   barf("earth_shape: couldn't load $f; you may need to install netpbm.\n")
     unless defined($im);
-  $im = $im->dummy(0,3); # fake RGB
-  t_raster2fits()->apply($im);
+  ((raster2fits($im, @PLATE_CARREE)->float - float(0x0C)) / float(255*6400))
+    + float(1);
+}
+
+=head2 raster2fits
+
+=for usage
+
+  $pdl_fits = raster2fits($pdl, \@axislabels, \@axisunits, \@axisranges);
+  $pdl_fits = raster2fits($pdl, @PDL::Transform::Cartography::PLATE_CARREE);
+
+=for ref
+
+Convert a raster ([3,]x,y) to FITS (x,y[,3]), with a suitable header
+for the given parameters.
+
+=cut
+
+sub raster2fits {
+  die "Usage: raster2fits(\$d, \\\@axislabels, \\\@axisunits, \\\@axisranges)\n" if @_ != 4;
+  my ($d, $axislabels, $axisunits, $axisranges) = @_;
+  my $is_single_plane = (my $ndims = $d->ndims) <= 2;
+  my $out = $is_single_plane ? $d : $d->mv(0,2);
+  my $h = $out->fhdr;
+  $h->{SIMPLE} = 'T';
+  $h->{NAXIS} = $ndims;
+  local $_;
+  my @dims = $out->dims;
+  $h->{"NAXIS".($_+1)} = $dims[$_] for 0..$ndims-1;
+  $h->{"CRVAL".($_+1)} = 0 for 0..$ndims-1;
+  $h->{"CRPIX".($_+1)} = $_<2 ? ($dims[$_]+1)/2 : 1 for 0..$ndims-1;
+  $h->{"CTYPE".($_+1)} = $axislabels->[$_] for 0..$ndims-1;
+  $h->{"CUNIT".($_+1)} = $axisunits->[$_] for 0..$ndims-1;
+  $h->{"CDELT".($_+1)} = ($axisranges->[$_][1]-$axisranges->[$_][0])/$dims[$_]
+    for 0..$ndims-1;
+  $h->{HISTORY}='PDL conversion from raster image',
+  $out;
 }
 
 =head2 clean_lines
@@ -541,8 +573,9 @@ sub earth_shape {
 =for usage
 
  $x = clean_lines(t_mercator->apply(scalar(earth_coast())));
- $x = clean_lines($line_pen, [threshold]);
- $x = $lines->clean_lines;
+ $x = $lines->clean_lines; # same as above, both "first (scalar) form"
+ $x = clean_lines($line_pen[,threshold][,opt]); # also same but threshold given
+ $x = clean_lines($line,$pen[,threshold][,opt]); # "second (list) form"
 
 =for ref
 
@@ -552,10 +585,12 @@ C<clean_lines> massages vector data to remove jumps due to singularities
 in the transform.
 
 In the first (scalar) form, C<$line_pen> contains both (X,Y) points and pen 
-values suitable to be fed to
-L<lines|PDL::Graphics::PGPLOT::Window/lines>:
-in the second (list) form, C<$lines> contains the (X,Y) points and C<$pen>
-contains the pen values.  
+values in the 3rd column suitable to be fed to
+the L<polylines|PDL::Graphics::Simple/polylines>
+plot type in the PDL::Graphics::Simple.
+
+In the second (list) form, C<$lines> contains the (X,Y) points and C<$pen>
+contains the pen values, in one less dimension than the C<$lines>.
 
 C<clean_lines> assumes that all the outline polylines are local --
 that is to say, there are no large jumps.  Any jumps larger than a
@@ -563,7 +598,34 @@ threshold size are broken by setting the appropriate pen values to 0.
 
 The C<threshold> parameter sets the relative size of the largest jump, relative
 to the map range (as determined by a min/max operation).  The default size is
-0.1.
+0.1. If C<threshold> is greater than or equal to 1, lines will not be
+broken based on point separation.
+
+=for options
+
+The following options are interpreted:
+
+=over 3
+
+=item or, orange, output_range, Output_Range
+
+  $lp = $lp->clean_lines(1.1,{or=>[[178.9,179.7], [62.8,64.5]]})
+
+This sets the window of output space, similar to that in
+L<PDL::Transform/map>. As there, it specifies a quadrilateral in
+output space. Any points not in that will be removed from the output,
+and line breaks (0 pen values) will be inserted before.
+
+Because this returns a selection of the inputs, it will not broadcast.
+
+=item fn, filter_nan
+
+Defaults to true. Will break before any points with bad/C<NaN>/C<Inf>
+coordinates, and remove those points from the output.
+
+Because this returns a selection of the inputs, it will not broadcast.
+
+=back
 
 NOTES
 
@@ -577,58 +639,55 @@ it is probably not worth the computational overhead.
 
 *PDL::clean_lines = *PDL::clean_lines = \&clean_lines;
 sub clean_lines {
-    my($lines) = shift;
-    my($x) = shift;
-    my($y) = shift;
-    my($l,$p,$th);
-
-    $th = 0.1;
-
-    if(defined($y)) {
-	# separate case with thresh
-	$l = $lines;
-	$p = $x->is_inplace?$x:$x->copy;
-	$th = $y;
-    } else {
-	if(!defined($x)) {
-	    # duplex case no thresh
-	    $l = $lines->slice("0:1");
-	    $p = $lines->is_inplace ? $lines->slice("(2)") : $lines->slice("(2)")->sever;
-	} elsif(UNIVERSAL::isa($x,'PDL') && 
-		$lines->slice("(0)")->nelem == $x->nelem) {
-	    # Separate case no thresh
-	    $l = $lines;
-	    $p = $x->is_inplace ? $x : $x->copy;;
-	} else {
-	    # duplex case with thresh
-	    $l = $lines->slice("0:1");
-	    $p = $lines->is_inplace ? $lines->slice("(2)") : $lines->slice("(2)")->sever;
-	    $th = $x;
-	}
-    }
-
-    my $pok = (($p != 0) & isfinite($p));
-    # Kludge to work around minmax bug (nans confuse it!)
-    my($l0) = $l->slice("(0)");
-    my($x0,$x1) = $l0->where(isfinite($l0) & $pok)->minmax;
-    my($xth) = abs($x1-$x0) * $th;
-
-    my($l1) = $l->slice("(1)");
-    ($x0,$x1) = $l1->where(isfinite($l1) & $pok)->minmax;
-    my($yth) = abs($x1-$x0) * $th;
-
-    my $diff = abs($l->slice(":,1:-1") - $l->slice(":,0:-2"));
-
-    $diff->where(!isfinite($diff)) .= 2*($xth + $yth); 
-    $p->where(($diff->slice("(0)") > $xth) | ($diff->slice("(1)") > $yth)) .= 0;
-    if(wantarray){
-	return($l,$p);
-    } else {
-	return $l->append($p->dummy(0,1));
-    }
+  my $opt = ref($_[-1]) eq 'HASH' ? pop : {};
+  my $th = !UNIVERSAL::isa($_[-1],'PDL') ? pop : 0.1;
+  die "Usage: clean_lines(\$line[, \$pen][, \$thresh])\n"
+    if @_ > 2 || !@_;
+  die "clean_lines: all non-threshold args must be ndarrays\n"
+    if grep !UNIVERSAL::isa($_,'PDL'), @_;
+  die "clean_lines: need lines[3,n...] in single-arg case\n"
+    if @_ == 1 and $_[0]->dim(0) != 3;
+  my ($l, $p) = @_ == 1
+    ? ($_[0]->slice("0:1"), $_[0]->is_inplace ? $_[0]->slice("(2)") : $_[0]->slice("(2)")->sever)
+    : ($_[0], $_[1]->is_inplace ? $_[1] : $_[1]->copy);
+  my $break_mask = !isfinite($p); # break on NaN/Inf/BAD
+  $break_mask |= !isfinite($l)->orover; # break on either coord NaN/Inf/BAD
+  if ($th < 1) {
+    my ($mins, $maxes) = $l->t->whereND(($p != 0) & isfinite($p))->minmaxover;
+    my $threshes = abs($maxes-$mins) * $th;
+    my $diff = $l->t->diff2->abs->t;
+    $break_mask |= ($diff > $threshes)->orover->append(pdl(0));
+  }
+  $p->whereND($break_mask) .= 0;
+  my $fn = PDL::Transform::_opt($opt, ['fn','filter_nan'], 1);
+  if ($fn) {
+    die "clean_lines: no broadcasting with filter_nan\n" if $p->ndims > 1;
+    my $nonfinite_mask = (!$l->isfinite)->orover;
+    $break_mask = $nonfinite_mask->slice('1:-1')->append(pdl(0)); # break before
+    $p->whereND($break_mask) .= 0;
+    my $keep_inds = (!$nonfinite_mask)->which;
+    $l = $l->dice_axis(1, $keep_inds)->sever;
+    $p = $p->dice_axis(0, $keep_inds)->sever;
+  }
+  my $orange = PDL::Transform::_opt($opt, ['or','orange','output_range','Output_Range']);
+  if (defined $orange) {
+    die "clean_lines: no broadcasting with orange\n" if $p->ndims > 1;
+    die "clean_lines: orange must be array-ref\n" if ref($orange) ne 'ARRAY';
+    die "clean_lines: orange must have two elements" if @$orange != 2;
+    die "clean_lines: orange must have two array-refs\n"
+      if grep ref() ne 'ARRAY', @$orange;
+    die "clean_lines: orange must have two array-refs each with two elements\n"
+      if grep @$_ != 2, @$orange;
+    my ($mins, $maxes) = PDL->pdl($orange)->using(0,1);
+    my $outside_mask = (($l < $mins) | ($l > $maxes))->orover;
+    $break_mask = $outside_mask->slice('1:-1')->append(pdl(0)); # break before
+    $p->whereND($break_mask) .= 0;
+    my $keep_inds = (!$outside_mask)->which;
+    $l = $l->dice_axis(1, $keep_inds)->sever;
+    $p = $p->dice_axis(0, $keep_inds)->sever;
+  }
+  wantarray ? ($l,$p) : $l->append($p->dummy(0,1));
 }    
-
-
 
 ######################################################################
 
@@ -762,99 +821,6 @@ sub PDL::Transform::Cartography::_finish {
       return $out;
     } 
   return $me;
-}
-
-=head2 t_raster2float
-
-=for usage
-
-  $t = t_raster2float();
-
-=for ref
-
-(Cartography) Convert a raster (3,x,y) to C<float> (lonlatrgb,x,y)
-
-Assumes C<bytes> input, and radians and C<float> output, with the first
-2 coordinates suitable for use as plate carree.
-
-=cut
-
-sub t_raster2float {
-  my ($me) = _new(@_, 'Raster FITS plate carree to OpenGL-ready float conversion');
-  $me->{odim} = 3;
-  $me->{params}->{itype} = ['RGB','X','Y'];
-  $me->{params}->{iunit} = ['index','pixels','pixels'];
-  $me->{odim} = 2;
-  $me->{params}->{otype} = ['LonLatRGB','X','Y'];
-  $me->{params}->{ounit} = ['Float','index','index'];
-  $me->{func} = sub {
-    my($d,$o) = @_;
-    my (undef, $x, $y, @otherdims) = $d->dims;
-    my $type = float;
-    my $out_xy = zeroes(byte, $x, $y, @otherdims);
-    my $out = zeroes($type, 5, $x, $y, @otherdims);
-    $out->slice($_->[0]) .= $_->[1]
-      for ['(0)', $out_xy->xlinvals(-$PI, $PI)],
-        ['(1)', $out_xy->ylinvals(-$PI/2, $PI/2)],
-        ['2:4', $d->convert($type) / 255];
-    $out;
-  };
-  $me->{inv} = sub {
-    my($d,$o) = @_;
-    my $type = byte;
-    my (undef, $x, $y, @otherdims) = $d->dims;
-    my $out = zeroes($type, 3, $x, $y, @otherdims);
-    $out .= $d->slice('2:4') * 255;
-    $out;
-  };
-  $me;
-}
-
-=head2 t_raster2fits
-
-=for usage
-
-  $t = t_raster2fits();
-
-=for ref
-
-(Cartography) Convert a raster (3,x,y) to FITS plate carree (x,y,3)
-
-Adds suitable C<hdr>. Assumes degrees. Used by L</earth_image>.
-
-=cut
-
-sub t_raster2fits {
-  my ($me) = _new(@_, 'Raster to FITS plate carree conversion');
-  $me->{odim} = 3;
-  $me->{params}->{itype} = ['RGB','X','Y'];
-  $me->{params}->{iunit} = ['RGB','pixels','pixels'];
-  $me->{params}->{otype} = ['X','Y','RGB'];
-  $me->{params}->{ounit} = ['pixels','pixels','RGB'];
-  $me->{func} = sub {
-    my($d,$o) = @_;
-    my $out = $d->mv(0,2);
-    my $h = $out->fhdr;
-    $h->{SIMPLE} = 'T';
-    $h->{NAXIS} = $d->ndims;
-    local $_;
-    $h->{"NAXIS".($_+1)} = $out->dim($_) for 0..$out->ndims-1;
-    $h->{"CRVAL".($_+1)} = 0 for 0..$out->ndims-1;
-    $h->{"CRPIX".($_+1)} = $_<2 ? ($out->dim($_)+1)/2 : 1 for 0..$out->ndims-1;
-    my ($lon, $lat) = $out->dims;
-    $h->{CTYPE1}='Longitude';   $h->{CUNIT1}='degrees'; $h->{CDELT1}=360/$lon;
-    $h->{CTYPE2}='Latitude';    $h->{CUNIT2}='degrees'; $h->{CDELT2}=180/$lat;
-    $h->{CTYPE3}='RGB';         $h->{CUNIT3}='index';   $h->{CDELT3}=1.0;
-    $h->{COMMENT}='Plate Carree Projection';
-    $h->{HISTORY}='PDL conversion from raster image',
-    $out->hdrcpy(1);
-    $out;
-  };
-  $me->{inv} = sub {
-    my($d,$o) = @_;
-    $d->mv(2,0);
-  };
-  $me;
 }
 
 ######################################################################
@@ -2800,11 +2766,9 @@ roughly 77W,38N).  Superimpose a linear coastline map on a photographic map.
 
   $x = graticule(1,0.1)->glue(1,earth_coast());
   $t = t_perspective(r0=>6478/6378.0,fov=>60,cam=>[22.5,-20],o=>[-77,36])
-  $w = pgwin(size=>[10,6],J=>1);
-  $w->fits_imag(earth_image()->map($t,[800,500],{m=>linear}));
-  $w->hold;
-  $w->lines($x->apply($t),{xt=>'Degrees',yt=>'Degrees'});
-  $w->release;
+  $w = pgswin(size=>[10,6],J=>1);
+  $w->plot(with=>'fits', earth_image()->map($t,[800,500],{m=>linear}),
+    with=>'polylines', $x->apply($t)->clean_lines);
 
 Model a 5x telescope looking at Betelgeuse with a 10 degree field of view
 (since the telescope is looking at the Celestial sphere, r is 0 and this

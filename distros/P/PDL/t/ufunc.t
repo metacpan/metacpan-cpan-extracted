@@ -33,7 +33,7 @@ my $e_sort = $e->qsortvec;
 eval { sequence(3, 3)->medover(my $o = null, my $t = null); };
 isnt $@, '', 'a [t] Par cannot be passed';
 
-my $med_dim = 1000;
+my $med_dim = 5;
 ok tapprox(sequence(10,$med_dim,$med_dim)->medover, sequence($med_dim,$med_dim)*10+4.5), 'medover';
 
 # Test a range of values
@@ -109,13 +109,16 @@ EOF
 #   NaN values are handled inconsistently by min, minimum, max, maximum...
 #
 {
- my $inf = inf();
  my $nan = nan();
  my $x = pdl($nan, 0, 1, 2);
  my $y = pdl(0, 1, 2, $nan);
 
- ok($x->min == $y->min, "min with NaNs");
- ok($x->max == $y->max, "max with NaNs");
+ is "".$x->min, '0', 'min leading nan';
+ is "".$y->min, '0', 'min trailing nan';
+ is "".$x->max, '2', 'max leading nan';
+ is "".$y->max, '2', 'max trailing nan';
+ is join(" ", $x->minmax), '0 2', 'minmax leading nan';
+ is join(" ", $y->minmax), '0 2', 'minmax trailing nan';
 }
 my $empty = empty();
 $x = $empty->maximum;
@@ -210,7 +213,7 @@ ok( tapprox( X->average(),  PDL->pdl( [ 4,  2.16666 ] ) ), "average" );
 ok( tapprox( X->sumover(),  PDL->pdl( [ 12, 6.5 ] ) ),     "sumover" );
 ok( tapprox( X->prodover(), PDL->pdl( [ 60, 9 ] ) ),       "prodover" );
 
-# provide indepdent copies of test data.
+# provide independent copies of test data.
 sub IM {
     PDL->new(
         [
@@ -270,6 +273,13 @@ subtest 'minimum_n_ind' => sub {
         minimum_n_ind $p, $q;
         is $q. '', '[0 7 2 6 3]', "some bad, sufficient good";
     }
+};
+
+subtest diffover => sub {
+  my $a = sequence(5) + 2;
+  ok tapprox($a->diffover, pdl(0, 1, 1, 1, 1)), "diffover";
+  $a->inplace->diffover;
+  ok tapprox($a, pdl(0, 1, 1, 1, 1)), "diffover inplace";
 };
 
 subtest diff2 => sub {

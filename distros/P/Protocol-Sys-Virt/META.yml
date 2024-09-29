@@ -21,8 +21,9 @@ no_index:
     - inc
 requires:
   Log::Any: '0'
+  URI::Encode: '0'
   perl: v5.14.1
 resources:
   repository: git://github.com/ehuelsmann/perl-protocol-sys-virt.git
-version: v10.3.8
+version: v10.3.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

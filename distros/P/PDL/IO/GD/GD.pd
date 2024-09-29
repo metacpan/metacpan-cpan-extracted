@@ -95,10 +95,10 @@ my %gdi_from_pngfile = (
   Comp => 'gdImagePtr im',
   MakeComp => '
     FILE *fh = fopen($COMP(filename), "rb");
-    if (!fh) $CROAK("Error opening %s!\n", $COMP(filename));
+    if (!fh) $CROAK("Error opening %s\n", $COMP(filename));
     $COMP(im) = gdImageCreateFromPng(fh);
     fclose(fh);
-    if (!$COMP(im)) $CROAK("Error reading PNG data!\n");
+    if (!$COMP(im)) $CROAK("Error reading PNG data\n");
   ',
   CompFreeCodeComp => 'gdImageDestroy($COMP(im));',
 );
@@ -115,7 +115,7 @@ EOF
 my %level_check = (
   RedoDimsCode => <<'EOF',
 if( $COMP(level) < -1 || $COMP(level) > 9 )
-    $CROAK("Invalid compression level %d, should be [-1,9]!\n",
+    $CROAK("Invalid compression level %d, should be [-1,9]\n",
         $COMP(level) );
 EOF
 );
@@ -125,12 +125,14 @@ my %lu_dim_level_check = (
 my $gdi_from_dims = "gdImagePtr im = gdImageCreate(\$SIZE(x), \$SIZE(y));\n";
 my $gdi_to_file = <<'EOF';
 FILE *out = fopen($COMP(filename), "wb");
+if (!out) $CROAK("Error opening %s\n", $COMP(filename));
 gdImagePng(im, out);
 fclose(out);
 gdImageDestroy(im);
 EOF
 my $gdi_to_fileEx = <<'EOF';
 FILE *out = fopen($COMP(filename), "wb");
+if (!out) $CROAK("Error opening %s\n", $COMP(filename));
 gdImagePngEx(im, out, $COMP(level));
 fclose(out);
 gdImageDestroy(im);
@@ -140,10 +142,14 @@ my $lut_allocate = <<'EOF';
 loop(j) %{
   int tmp = gdImageColorAllocate(im, $lut(i=>0), $lut(i=>1), $lut(i=>2));
   if (tmp != j)
-    $CROAK("palette mismatch on index %"IND_FLAG" (mapped to %d)!\n", j, tmp);
+    $CROAK("palette mismatch on index %"IND_FLAG" (mapped to %d)\n", j, tmp);
 %}
 EOF
-my $img_to_gdi = 'loop(y,x) %{ gdImageSetPixel(im, x, y, $img()); %}';
+my $img_to_gdi = 'loop(y,x) %{
+  if ($img() >= $SIZE(j))
+    $CROAK("Pixel value=%d exceeded LUT size", (int)$img());
+  gdImageSetPixel(im, x, y, $img());
+%}';
 my $img_to_gdiTrue = <<'EOF';
 loop(y,x) %{
   gdImageSetPixel(im, x, y,
@@ -151,15 +157,20 @@ loop(y,x) %{
   );
 %}
 EOF
-my $gdi_to_img = 'loop(y,x) %{ $img() = gdImageGetPixel($COMP(im), x, y); %}';
-my $gdiTrue_to_img = <<'EOF';
-loop(y,x) %{
-  int tpixel = gdImageTrueColorPixel($COMP(im), x, y);
+my $gdi_to_img_tpl = 'loop(y,x) %%{ $img() = gdImageGetPixel($COMP(im), x, %sy); %%}';
+my $gdi_to_img = sprintf $gdi_to_img_tpl, '';
+my $gdi_to_img_inv = sprintf $gdi_to_img_tpl, '$SIZE(y)-1-';
+my $gdiTrue_to_img_tpl = <<'EOF';
+if (!$COMP(im)->trueColor) $CROAK("Tried to read a non-truecolour image as truecolour");
+loop(y,x) %%{
+  int tpixel = gdImageTrueColorPixel($COMP(im), x, %sy);
   $img(z=>0) = gdTrueColorGetRed(tpixel);
   $img(z=>1) = gdTrueColorGetGreen(tpixel);
   $img(z=>2) = gdTrueColorGetBlue(tpixel);
-%}
+%%}
 EOF
+my $gdiTrue_to_img = sprintf $gdiTrue_to_img_tpl, '';
+my $gdiTrue_to_img_inv = sprintf $gdiTrue_to_img_tpl, '$SIZE(y)-1-';
 my $gdi_to_ptr = '$img_ptr() = PTR2IV(im);';
 
 # Function to write a PNG image from an ndarray variable:
@@ -280,11 +291,12 @@ void
 recompress_png_best(char* filename)
     CODE:
         gdImagePtr im;
-        FILE* file;
-        file = fopen(filename, "rb");
+        FILE* file = fopen(filename, "rb");
+        if (!file) croak("Error opening %s\n", filename);
         im = gdImageCreateFromPng(file);
         fclose(file);
         file = fopen(filename, "wb");
+        if (!file) croak("Error opening %s\n", filename);
         gdImagePngEx( im, file, 9 );
         fclose(file);
         gdImageDestroy(im);
@@ -331,12 +343,28 @@ pp_def( '_gd_image_to_pdl_true',
         Code => $gdiTrue_to_img,
 );
 
+pp_def( '_gd_image_to_rpic_true',
+        Pars => '[o] img(z=3,x=CALC(gdImageSX($COMP(im))),y=CALC(gdImageSY($COMP(im))));',
+        GenericTypes => ['B'],
+        %gdi_from_args,
+        Doc => undef,
+        Code => $gdiTrue_to_img_inv,
+);
+
 pp_def( '_gd_image_to_pdl',
         Pars => '[o] img(x=CALC(gdImageSX($COMP(im))),y=CALC(gdImageSY($COMP(im))));',
         GenericTypes => ['L'],
         %gdi_from_args,
         Doc => undef,
         Code => $gdi_to_img,
+);
+
+pp_def( '_gd_image_to_rpic',
+        Pars => '[o] img(x=CALC(gdImageSX($COMP(im))),y=CALC(gdImageSY($COMP(im))));',
+        GenericTypes => ['L'],
+        %gdi_from_args,
+        Doc => undef,
+        Code => $gdi_to_img_inv,
 );
 
 pp_def( '_pdl_to_gd_image_true',
@@ -411,7 +439,10 @@ Object Oriented interface to the GD image library.
  my $y = $gd->SY();
 
  # Grab the PDL of the data:
- my $pdl = $gd->to_pdl();
+ my $pdl = $gd->to_pdl; # (x,y,3) y=0 at top
+
+ # Grab the PDL of the data:
+ my $pdl = $gd->to_rpic; # (3,x,y) y=0 at bottom
 
  # Kill this thing:
  $gd->DESTROY();
@@ -696,24 +727,24 @@ EOF
         {
             if( defined( $options->{lut} ) )
             {
-                die "$sub: _pdl_to_gd_image_lut() failed!\n" unless
+                die "$sub: _pdl_to_gd_image_lut() failed\n" unless
                   $self->{IMG_PTR} = _pdl_to_gd_image_lut( $pdl, $options->{lut} )->sclr;
             }
             else
             {
-                my $lut = sequence(byte, 255)->slice("*3,:");
-                die "$sub: _pdl_to_gd_image_lut() failed!\n" unless
+                my $lut = sequence(byte, 256)->slice("*3,:");
+                die "$sub: _pdl_to_gd_image_lut() failed\n" unless
                   $self->{IMG_PTR} = _pdl_to_gd_image_lut( $pdl, $lut )->sclr;
             }
         }
         elsif( $num_dims == 3 )
         {
-            die "$sub: _pdl_to_gd_image_true() failed!\n" unless
+            die "$sub: _pdl_to_gd_image_true() failed\n" unless
               $self->{IMG_PTR} = _pdl_to_gd_image_true( $pdl )->sclr;
         }
         else
         {
-            die "Can't create a PDL::IO::GD from a PDL with bad dims!\n";
+            die "Can't create a PDL::IO::GD from a PDL with bad dims\n";
         }
     }
     elsif( exists( $options->{filename} ) )
@@ -725,24 +756,24 @@ EOF
 
         # Figure out what type of file it is:
         $self->{input_type} = _id_image_file( $options->{filename} )
-            or die "$sub: Can't determine image type of filename => \'$options->{filename}\'!\n";
+            or die "$sub: Can't determine image type of filename => \'$options->{filename}\'\n";
         
         # Read in the file:
         $self->{IMG_PTR} = _img_ptr_from_file( $options->{filename}, $self->{input_type} )
-            or die "$sub: Can't read in the input file!\n";
+            or die "$sub: Can't read in the input file\n";
     }
     elsif( defined( $options->{x} ) && defined( $options->{y} ) )
     {   # Create an empty image:
         my $done = 0;
         if( $options->{true_color} )
         {   # Create an empty true color image:
-            die "$sub: _gdImageCreateTrueColor() failed!\n" unless
+            die "$sub: _gdImageCreateTrueColor() failed\n" unless
               $self->{IMG_PTR} = _gdImageCreateTrueColor( $options->{x}, $options->{y} );
             $done = 1;
         }
         unless( $done )
         {   # Create an empty palette image:
-            die "$sub: _gdImageCreatePalette() failed!\n" unless
+            die "$sub: _gdImageCreatePalette() failed\n" unless
               $self->{IMG_PTR} = _gdImageCreatePalette( $options->{x}, $options->{y} );
         }
     }
@@ -763,12 +794,12 @@ EOF
         else
         {
             $self->{input_type} = _id_image_data( $options->{data} )
-                or die "$sub: Can't determine image type given data!\n";
+                or die "$sub: Can't determine image type given data\n";
         }
         
         # Load the data:
         $self->{IMG_PTR} = _img_ptr_from_data( $options->{data}, $self->{input_type} )
-            or die "$sub: Can't load the input image data!\n";
+            or die "$sub: Can't load the input image data\n";
     }
     
     # Bless and return:
@@ -780,6 +811,8 @@ EOF
 =head2 to_pdl
 
 When you're done playing with your GDImage and want an ndarray back, use this function to return one.
+For true-colour, RGB dim is highest (x,y,3).
+To get it in the lowest dim (and with y=0 is the bottom), use L</to_rpic>.
 
 =cut
 
@@ -787,6 +820,20 @@ sub to_pdl {
     my $self = shift;
     $self->gdImageTrueColor() ? _gd_image_to_pdl_true( $self->{IMG_PTR} )
       : _gd_image_to_pdl( $self->{IMG_PTR} );
+}
+
+=head2 to_rpic
+
+When you're done playing with your GDImage and want an ndarray back, use this function to return one.
+For true-colour, RGB dim is lowest (3,x,y).
+To get it in the highest dim (and with y=0 is the top), use L</to_pdl>.
+
+=cut
+
+sub to_rpic {
+    my $self = shift;
+    $self->gdImageTrueColor() ? _gd_image_to_rpic_true( $self->{IMG_PTR} )
+      : _gd_image_to_rpic( $self->{IMG_PTR} );
 }
 
 =head2 apply_lut( $lut(ndarray) )
@@ -812,7 +859,7 @@ sub DESTROY
     my $self = shift;
     my $sub = _pkg_name( "DESTROY" );
  
-    #print STDERR sprintf("$sub: destroying gdImagePtr: 0x%p (%d) (%ld) (%lld)!\n", $self->{IMG_PTR}, $self->{IMG_PTR},$self->{IMG_PTR},$self->{IMG_PTR});
+    #print STDERR sprintf("$sub: destroying gdImagePtr: 0x%p (%d) (%ld) (%lld)\n", $self->{IMG_PTR}, $self->{IMG_PTR},$self->{IMG_PTR},$self->{IMG_PTR});
     
     if( defined( $self->{IMG_PTR} ) )
     {
@@ -1138,7 +1185,7 @@ sub generate_create_functions
         #print "$sub: Generating read function for $func...\n";
     
         my $info = parse_prototype( $func )
-            or die "$sub: Couldn't parse prototype!\n";
+            or die "$sub: Couldn't parse prototype\n";
          
         # If it wants a FILE*, we need to do something different in the XS code:   
         if( $info->{ARGS}->{1}->{TYPE} =~ /FILE\s*\*/ )
@@ -1150,8 +1197,8 @@ sub generate_create_functions
 $return_type
 _$function_name( char* filename )
     CODE:
-        FILE* file;
-        file = fopen( filename, "rb");
+        FILE *file = fopen( filename, "rb");
+        if (!file) croak("Error opening %s\\n", filename);
         RETVAL = $function_name( file );
         fclose(file);
     OUTPUT:
@@ -1182,7 +1229,7 @@ sub generate_create_from_data_functions
         #print "$sub: Generating read function for $func...\n";
     
         my $info = parse_prototype( $func )
-            or die "$sub: Couldn't parse prototype!\n";
+            or die "$sub: Couldn't parse prototype\n";
         
         my $function_name = $info->{NAME};
         my $return_type = $info->{RETURN_TYPE};
@@ -1218,7 +1265,7 @@ sub generate_write_functions
         #print "$sub: Generating write function for $func...\n";
     
         my $info = parse_prototype( $func )
-            or die "$sub: Couldn't parse prototype!\n";
+            or die "$sub: Couldn't parse prototype\n";
         
         my $function_name = $info->{NAME};
         my $return_type = $info->{RETURN_TYPE};
@@ -1249,8 +1296,8 @@ $return_type
 _$function_name ( $arg_list )
 $arg_decl_string
     CODE:
-        FILE* file;
-        file = fopen( filename, "wb");
+        FILE *file = fopen( filename, "wb");
+        if (!file) croak("Error opening %s\\n", filename);
         $function_name ( $call_arg_list );
         fclose( file );
 ENDXS
@@ -1326,7 +1373,7 @@ sub generate_data_ptr_functions
     {
         #print "$sub: Generating data_ptr function for $func...\n";
         my $info = parse_prototype( $func )
-            or die "$sub: Couldn't parse prototype!\n";
+            or die "$sub: Couldn't parse prototype\n";
         
         #use Data::Dumper;
         #print Data::Dumper->Dump([$info], ['info']);
@@ -1432,7 +1479,7 @@ sub generate_member_functions
         #print "$sub: Generating member function for $func...\n";
     
         my $info = parse_prototype( $func )
-            or die "$sub: Couldn't parse prototype!\n";
+            or die "$sub: Couldn't parse prototype\n";
         
         # Add the XS portion of the code:
         my @macro_list = qw(
@@ -1529,7 +1576,7 @@ sub generate_pp_def_members
         #print "$sub: Generating member function for $func...\n";
     
         my $info = parse_prototype( $func )
-            or die "$sub: Couldn't parse prototype!\n";
+            or die "$sub: Couldn't parse prototype\n";
         
         my $orig_name = $info->{NAME};
         my $name = $orig_name . "s";
@@ -1639,7 +1686,7 @@ ENDPM
         #print "$sub: Generating class function for $func...\n";
     
         my $info = parse_prototype( $func )
-            or die "$sub: Couldn't parse prototype!\n";
+            or die "$sub: Couldn't parse prototype\n";
 
         # Add the XS portion of the code:
         add_basic_xs( $info, '_' );
@@ -1714,7 +1761,7 @@ sub generate_general_functions
         #print "$sub: Generating general function for $func...\n";
     
         my $info = parse_prototype( $func )
-            or die "$sub: Couldn't parse prototype!\n";
+            or die "$sub: Couldn't parse prototype\n";
 
         # Add the XS portion of the code:
         my @macro_list = qw(

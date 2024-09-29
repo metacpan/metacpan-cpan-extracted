@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Roles::Blastable;
 # ABSTRACT: BLAST database-related methods
-$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.210160';
+$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.242720';
 use 5.018;                      # to avoid a crash due to call to "can" below
 use Moose::Role;
 
@@ -45,10 +45,10 @@ sub tblastx {                               ## no critic (RequireArgUnpacking)
 }
 
 my %pgm_for = (             # cannot be made constant to allow undefined keys
-	'nucl:nucl' =>  'blastn',
-	'nucl:prot' =>  'blastx',
-	'prot:prot' =>  'blastp',
-	'prot:nucl' => 'tblastn',
+    'nucl:nucl' =>  'blastn',
+    'nucl:prot' =>  'blastx',
+    'prot:prot' =>  'blastp',
+    'prot:nucl' => 'tblastn',
 );
 
 sub blast {                                 ## no critic (RequireArgUnpacking)
@@ -151,12 +151,14 @@ sub blastdbcmd {
     # format blastdbcmd (optional) arguments
     $args->{-db}          = $self->filename;
     $args->{-entry_batch} =   $in->filename;
-    $args->{-out}         =  $out->filename;
+    # $args->{-out}       =  $out->filename;    # see sed workaround below
     my $args_str = stringify_args($args);
 
     # create blastdbcmd command
     my $pgm = file($ENV{BMD_BLAST_BINDIR}, 'blastdbcmd');
     my $cmd = join q{ }, $pgm, $args_str;
+    # pipe to sed to remove extraneous whitespace added after accession
+       $cmd .= q{ | sed 's/[[:space:]]$//' > } . $out->filename;
     #### $cmd
 
     # try to robustly execute blastdbcmd
@@ -183,7 +185,7 @@ Bio::MUST::Drivers::Roles::Blastable - BLAST database-related methods
 
 =head1 VERSION
 
-version 0.210160
+version 0.242720
 
 =head1 SYNOPSIS
 

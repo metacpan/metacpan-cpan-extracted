@@ -10,7 +10,7 @@ use MsOffice::Word::Template::Engine::TT2::Provider;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 #======================================================================
 # ATTRIBUTES
@@ -363,5 +363,4 @@ Laurent Dami, E<lt>dami AT cpan DOT org<gt>
 
 Copyright 2020-2024 by Laurent Dami.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.

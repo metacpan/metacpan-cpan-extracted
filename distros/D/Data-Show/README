@@ -1,4 +1,4 @@
-Data::Show version 0.004000
+Data::Show version 0.004001
 
     Wrapper around Data::Dump (or other dumper modules)
     to provide better context information

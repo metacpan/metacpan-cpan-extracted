@@ -3,6 +3,10 @@
 
 pingu - optex make-everything-pingu filter
 
+# VERSION
+
+Version 1.02
+
 # SYNOPSIS
 
 **optex** -Mpingu \[ options -- \] _command_
@@ -186,8 +190,8 @@ features.
         kkkkkkkkkkkkkkkkkkkkkkkkyyyWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWkkkkkk    ..  
         kkkkkkkkkkkkkkkkkkkkkkkyyyWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWkkk  ........
 
-Coloring is done by [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap) module.  See its document
-for detail.
+Coloring is done by [Term::ANSIColor::Concise](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise) module.  See its
+document for detail.
 
 # INSTALL
 

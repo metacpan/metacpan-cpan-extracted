@@ -1,0 +1,327 @@
+{
+   "dm" : {
+      "message" : [
+         {
+            "value" : "1",
+            "name" : "code"
+         },
+         {
+            "value" : "name list",
+            "name" : "error"
+         },
+         {
+            "name" : "type",
+            "value" : ""
+         },
+         {
+            "name" : "module",
+            "value" : "BROKER"
+         }
+      ],
+      "input" : {
+         "input" : "Alfred"
+      },
+      "points" : [
+         {
+            "usage" : "dm",
+            "tariffLayer2" : "",
+            "stateless" : "20009114",
+            "type" : "stop",
+            "name" : "Essen, Alfred-Krupp-Schule",
+            "tariffAreaName" : "",
+            "tariffArea" : "",
+            "ref" : {
+               "gid" : "",
+               "place" : "Essen",
+               "omc" : "5113000",
+               "id" : "20009114",
+               "placeID" : "18"
+            },
+            "tariffLayer1" : ""
+         },
+         {
+            "name" : "Essen, Alfredbrücke",
+            "type" : "stop",
+            "stateless" : "20009113",
+            "tariffLayer2" : "",
+            "usage" : "dm",
+            "tariffAreaName" : "",
+            "ref" : {
+               "gid" : "",
+               "place" : "Essen",
+               "placeID" : "18",
+               "omc" : "5113000",
+               "id" : "20009113"
+            },
+            "tariffArea" : "",
+            "tariffLayer1" : ""
+         },
+         {
+            "ref" : {
+               "omc" : "5113000",
+               "id" : "20009115",
+               "placeID" : "18",
+               "gid" : "",
+               "place" : "Essen"
+            },
+            "tariffArea" : "",
+            "tariffLayer1" : "",
+            "name" : "Essen, Alfredusbad",
+            "type" : "stop",
+            "stateless" : "20009115",
+            "usage" : "dm",
+            "tariffLayer2" : "",
+            "tariffAreaName" : ""
+         }
+      ]
+   },
+   "arr" : {
+      "points" : null,
+      "input" : {
+         "input" : ""
+      }
+   },
+   "servingLines" : {
+      "lines" : null
+   },
+   "departureList" : null,
+   "dateRange" : [
+      {
+         "year" : "2024",
+         "day" : "21",
+         "weekday" : "7",
+         "month" : "09"
+      },
+      {
+         "month" : "09",
+         "day" : "22",
+         "weekday" : "1",
+         "year" : "2024"
+      },
+      {
+         "day" : "23",
+         "weekday" : "2",
+         "month" : "09",
+         "year" : "2024"
+      },
+      {
+         "year" : "2024",
+         "day" : "24",
+         "weekday" : "3",
+         "month" : "09"
+      },
+      {
+         "year" : "2024",
+         "day" : "25",
+         "weekday" : "4",
+         "month" : "09"
+      },
+      {
+         "month" : "09",
+         "day" : "26",
+         "weekday" : "5",
+         "year" : "2024"
+      },
+      {
+         "year" : "2024",
+         "month" : "09",
+         "day" : "27",
+         "weekday" : "6"
+      },
+      {
+         "year" : "2024",
+         "weekday" : "7",
+         "day" : "28",
+         "month" : "09"
+      },
+      {
+         "year" : "2024",
+         "month" : "09",
+         "weekday" : "1",
+         "day" : "29"
+      },
+      {
+         "year" : "2024",
+         "weekday" : "2",
+         "day" : "30",
+         "month" : "09"
+      },
+      {
+         "weekday" : "3",
+         "day" : "01",
+         "month" : "10",
+         "year" : "2024"
+      },
+      {
+         "month" : "10",
+         "day" : "02",
+         "weekday" : "4",
+         "year" : "2024"
+      },
+      {
+         "day" : "03",
+         "weekday" : "5",
+         "month" : "10",
+         "year" : "2024"
+      },
+      {
+         "year" : "2024",
+         "day" : "04",
+         "weekday" : "6",
+         "month" : "10"
+      },
+      {
+         "year" : "2024",
+         "day" : "05",
+         "weekday" : "7",
+         "month" : "10"
+      }
+   ],
+   "dateTime" : {
+      "hour" : "18",
+      "minute" : "33",
+      "ttpTo" : "20250228",
+      "ttpFrom" : "20240601",
+      "deparr" : "dep",
+      "year" : "2024",
+      "day" : "21",
+      "month" : "9"
+   },
+   "option" : {
+      "ptOption" : {
+         "assistance" : "0",
+         "lowPlatformVhcl" : "0",
+         "useProxFootSearchDestination" : "0",
+         "useProxFootSearch" : "0",
+         "privateTransport" : "0",
+         "noSolidStairs" : "0",
+         "activeCom" : "-1",
+         "noCrowded" : "0",
+         "noInsecurePlaces" : "0",
+         "maxChanges" : "9",
+         "useProxFootSearchOrigin" : "0",
+         "routeType" : "LEASTTIME",
+         "active" : "-1",
+         "changeSpeed" : "normal",
+         "illumTransfer" : "0",
+         "activeSec" : "-1",
+         "excludedMeans" : [
+            {
+               "selected" : "0",
+               "value" : "0"
+            },
+            {
+               "value" : "1",
+               "selected" : "0"
+            },
+            {
+               "selected" : "0",
+               "value" : "2"
+            },
+            {
+               "selected" : "0",
+               "value" : "3"
+            },
+            {
+               "selected" : "0",
+               "value" : "4"
+            },
+            {
+               "selected" : "0",
+               "value" : "5"
+            },
+            {
+               "selected" : "0",
+               "value" : "6"
+            },
+            {
+               "selected" : "0",
+               "value" : "7"
+            },
+            {
+               "value" : "8",
+               "selected" : "0"
+            },
+            {
+               "value" : "9",
+               "selected" : "0"
+            },
+            {
+               "value" : "10",
+               "selected" : "0"
+            },
+            {
+               "value" : "11",
+               "selected" : "0"
+            },
+            {
+               "selected" : "0",
+               "value" : "12"
+            },
+            {
+               "value" : "13",
+               "selected" : "0"
+            },
+            {
+               "selected" : "0",
+               "value" : "14"
+            },
+            {
+               "value" : "15",
+               "selected" : "0"
+            },
+            {
+               "selected" : "0",
+               "value" : "16"
+            },
+            {
+               "value" : "17",
+               "selected" : "0"
+            },
+            {
+               "value" : "18",
+               "selected" : "0"
+            },
+            {
+               "selected" : "0",
+               "value" : "19"
+            }
+         ],
+         "plane" : "0",
+         "maxWait" : "120",
+         "maxTime" : "360",
+         "noElevators" : "0",
+         "overgroundTransfer" : "0",
+         "activeImp" : "-1",
+         "noEscalators" : "0",
+         "needElevatedPlt" : "0",
+         "bike" : "0",
+         "SOSAvail" : "0",
+         "lineRestriction" : "403",
+         "noLonelyTransfer" : "0",
+         "wheelchair" : "0"
+      }
+   },
+   "parameters" : [
+      {
+         "name" : "serverID",
+         "value" : "EFA2_"
+      },
+      {
+         "name" : "requestID",
+         "value" : "0"
+      },
+      {
+         "name" : "sessionID",
+         "value" : "0"
+      },
+      {
+         "name" : "calcTime",
+         "value" : "166.310"
+      },
+      {
+         "value" : "2024-09-21T18:33:39",
+         "name" : "serverTime"
+      }
+   ]
+}

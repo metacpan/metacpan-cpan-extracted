@@ -183,17 +183,16 @@ sub _burp_1D {
 
    my $start = $index - @{$databox} + 1;
 
-   my $tmp; # work around for perl -d "feature"
    if (ref $data eq 'ARRAY') {
       push @{$data}, @{$databox};
    } elsif ( ref($databox->[0]) eq "ARRAY" ) {
       # could add POSIX::strtol for hex and octal support but
       # can't break float conversions (how?)
-      ($tmp = $data->slice(":,$start:$index")) .= pdl($databox);
+      $data->slice(":,$start:$index") .= pdl($databox);
    } else {
       # could add POSIX::strtol for hex and octal support but
       # can't break float conversions (how?)
-      ($tmp = $data->slice("$start:$index")) .= pdl($databox);
+      $data->slice("$start:$index") .= pdl($databox);
    }
    $_[0] = [ $data, [] ];
 }
@@ -1187,11 +1186,11 @@ of C<$1>, C<$2> etc.
 
 =cut
 
-#line 1179 "misc.pd"
+#line 1178 "misc.pd"
 sub PDL::isbigendian { return 0; };
 *isbigendian = \&PDL::isbigendian;
 
-#line 1195 "misc.pd"
+#line 1194 "misc.pd"
 
 =head2 rcube
 
@@ -1225,7 +1224,7 @@ sub rcube {
     barf "Usage: blah" unless ref($reader) eq "CODE";
 
     my $k=0;
-    my ($im,$cube,$tmp,$nx,$ny);
+    my ($im,$cube,$nx,$ny);
     my $nz = scalar(@_);
 
     for my $file (@_) {
@@ -1241,14 +1240,13 @@ sub rcube {
              $im->getdim(0) != $nx or $im->getdim(1) != $ny ;
 
        }
-       $tmp = $cube->slice(":,:,($k)");
-       $tmp .= $im;
+       $cube->slice(":,:,($k)") .= $im;
        $k++;
       }
 
       return $cube;
 }
-#line 1252 "Misc.pm"
+#line 1250 "Misc.pm"
 
 
 =head2 rasc
@@ -1331,7 +1329,7 @@ separated from the PDL distribution, the copyright notice
 should be included in the file.
 
 =cut
-#line 1335 "Misc.pm"
+#line 1333 "Misc.pm"
 
 # Exit with OK status
 

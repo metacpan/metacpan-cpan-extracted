@@ -2,9 +2,9 @@
 <!DOCTYPE BlastOutput PUBLIC "-//NCBI//NCBI BlastOutput/EN" "http://www.ncbi.nlm.nih.gov/dtd/NCBI_BlastOutput.dtd">
 <BlastOutput>
   <BlastOutput_program>blastp</BlastOutput_program>
-  <BlastOutput_version>BLASTP 2.5.0+</BlastOutput_version>
+  <BlastOutput_version>BLASTP 2.16.0+</BlastOutput_version>
   <BlastOutput_reference>Stephen F. Altschul, Thomas L. Madden, Alejandro A. Sch&amp;auml;ffer, Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997), &quot;Gapped BLAST and PSI-BLAST: a new generation of protein database search programs&quot;, Nucleic Acids Res. 25:3389-3402.</BlastOutput_reference>
-  <BlastOutput_db>/var/folders/zd/h9vt4d056t552wjnjjsfgstm0000gn/T/KQg_sjfYLh.fasta</BlastOutput_db>
+  <BlastOutput_db>/var/folders/zd/h9vt4d056t552wjnjjsfgstm0000gn/T/X7FCFANXyW.fasta</BlastOutput_db>
   <BlastOutput_query-ID>Query_1</BlastOutput_query-ID>
   <BlastOutput_query-def>seq1</BlastOutput_query-def>
   <BlastOutput_query-len>881</BlastOutput_query-len>
@@ -26,9 +26,9 @@
 <Iteration_hits>
 <Hit>
   <Hit_num>1</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|2</Hit_id>
-  <Hit_def>seq3</Hit_def>
-  <Hit_accession>2</Hit_accession>
+  <Hit_id>seq3</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq3</Hit_accession>
   <Hit_len>881</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -54,9 +54,9 @@
 </Hit>
 <Hit>
   <Hit_num>2</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|8</Hit_id>
-  <Hit_def>seq9</Hit_def>
-  <Hit_accession>8</Hit_accession>
+  <Hit_id>seq9</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq9</Hit_accession>
   <Hit_len>876</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -82,9 +82,9 @@
 </Hit>
 <Hit>
   <Hit_num>3</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|17</Hit_id>
-  <Hit_def>seq18</Hit_def>
-  <Hit_accession>17</Hit_accession>
+  <Hit_id>seq18</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq18</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -110,9 +110,9 @@
 </Hit>
 <Hit>
   <Hit_num>4</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|19</Hit_id>
-  <Hit_def>seq20</Hit_def>
-  <Hit_accession>19</Hit_accession>
+  <Hit_id>seq20</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq20</Hit_accession>
   <Hit_len>871</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -138,9 +138,9 @@
 </Hit>
 <Hit>
   <Hit_num>5</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|0</Hit_id>
-  <Hit_def>seq1</Hit_def>
-  <Hit_accession>0</Hit_accession>
+  <Hit_id>seq1</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq1</Hit_accession>
   <Hit_len>888</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -166,9 +166,9 @@
 </Hit>
 <Hit>
   <Hit_num>6</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|3</Hit_id>
-  <Hit_def>seq4</Hit_def>
-  <Hit_accession>3</Hit_accession>
+  <Hit_id>seq4</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq4</Hit_accession>
   <Hit_len>901</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -194,9 +194,9 @@
 </Hit>
 <Hit>
   <Hit_num>7</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|7</Hit_id>
-  <Hit_def>seq8</Hit_def>
-  <Hit_accession>7</Hit_accession>
+  <Hit_id>seq8</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq8</Hit_accession>
   <Hit_len>897</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -222,9 +222,9 @@
 </Hit>
 <Hit>
   <Hit_num>8</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|14</Hit_id>
-  <Hit_def>seq15</Hit_def>
-  <Hit_accession>14</Hit_accession>
+  <Hit_id>seq15</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq15</Hit_accession>
   <Hit_len>894</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -250,9 +250,9 @@
 </Hit>
 <Hit>
   <Hit_num>9</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|16</Hit_id>
-  <Hit_def>seq17</Hit_def>
-  <Hit_accession>16</Hit_accession>
+  <Hit_id>seq17</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq17</Hit_accession>
   <Hit_len>885</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -278,9 +278,9 @@
 </Hit>
 <Hit>
   <Hit_num>10</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|18</Hit_id>
-  <Hit_def>seq19</Hit_def>
-  <Hit_accession>18</Hit_accession>
+  <Hit_id>seq19</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq19</Hit_accession>
   <Hit_len>890</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -306,9 +306,9 @@
 </Hit>
 <Hit>
   <Hit_num>11</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|15</Hit_id>
-  <Hit_def>seq16</Hit_def>
-  <Hit_accession>15</Hit_accession>
+  <Hit_id>seq16</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq16</Hit_accession>
   <Hit_len>959</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -334,9 +334,9 @@
 </Hit>
 <Hit>
   <Hit_num>12</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|6</Hit_id>
-  <Hit_def>seq7</Hit_def>
-  <Hit_accession>6</Hit_accession>
+  <Hit_id>seq7</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq7</Hit_accession>
   <Hit_len>875</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -362,9 +362,9 @@
 </Hit>
 <Hit>
   <Hit_num>13</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|9</Hit_id>
-  <Hit_def>seq10</Hit_def>
-  <Hit_accession>9</Hit_accession>
+  <Hit_id>seq10</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq10</Hit_accession>
   <Hit_len>882</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -390,9 +390,9 @@
 </Hit>
 <Hit>
   <Hit_num>14</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|20</Hit_id>
-  <Hit_def>seq21</Hit_def>
-  <Hit_accession>20</Hit_accession>
+  <Hit_id>seq21</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq21</Hit_accession>
   <Hit_len>982</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -418,9 +418,9 @@
 </Hit>
 <Hit>
   <Hit_num>15</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|1</Hit_id>
-  <Hit_def>seq2</Hit_def>
-  <Hit_accession>1</Hit_accession>
+  <Hit_id>seq2</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq2</Hit_accession>
   <Hit_len>845</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -446,9 +446,9 @@
 </Hit>
 <Hit>
   <Hit_num>16</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|13</Hit_id>
-  <Hit_def>seq14</Hit_def>
-  <Hit_accession>13</Hit_accession>
+  <Hit_id>seq14</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq14</Hit_accession>
   <Hit_len>918</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -474,9 +474,9 @@
 </Hit>
 <Hit>
   <Hit_num>17</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|5</Hit_id>
-  <Hit_def>seq6</Hit_def>
-  <Hit_accession>5</Hit_accession>
+  <Hit_id>seq6</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq6</Hit_accession>
   <Hit_len>933</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -502,9 +502,9 @@
 </Hit>
 <Hit>
   <Hit_num>18</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|10</Hit_id>
-  <Hit_def>seq11</Hit_def>
-  <Hit_accession>10</Hit_accession>
+  <Hit_id>seq11</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq11</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -530,9 +530,9 @@
 </Hit>
 <Hit>
   <Hit_num>19</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|11</Hit_id>
-  <Hit_def>seq12</Hit_def>
-  <Hit_accession>11</Hit_accession>
+  <Hit_id>seq12</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq12</Hit_accession>
   <Hit_len>968</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -558,9 +558,9 @@
 </Hit>
 <Hit>
   <Hit_num>20</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|4</Hit_id>
-  <Hit_def>seq5</Hit_def>
-  <Hit_accession>4</Hit_accession>
+  <Hit_id>seq5</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq5</Hit_accession>
   <Hit_len>850</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -586,9 +586,9 @@
 </Hit>
 <Hit>
   <Hit_num>21</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|85</Hit_id>
-  <Hit_def>seq86</Hit_def>
-  <Hit_accession>85</Hit_accession>
+  <Hit_id>seq86</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq86</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -614,9 +614,9 @@
 </Hit>
 <Hit>
   <Hit_num>22</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|86</Hit_id>
-  <Hit_def>seq87</Hit_def>
-  <Hit_accession>86</Hit_accession>
+  <Hit_id>seq87</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq87</Hit_accession>
   <Hit_len>972</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -642,9 +642,9 @@
 </Hit>
 <Hit>
   <Hit_num>23</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|82</Hit_id>
-  <Hit_def>seq83</Hit_def>
-  <Hit_accession>82</Hit_accession>
+  <Hit_id>seq83</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq83</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -670,9 +670,9 @@
 </Hit>
 <Hit>
   <Hit_num>24</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|12</Hit_id>
-  <Hit_def>seq13</Hit_def>
-  <Hit_accession>12</Hit_accession>
+  <Hit_id>seq13</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq13</Hit_accession>
   <Hit_len>920</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -698,9 +698,9 @@
 </Hit>
 <Hit>
   <Hit_num>25</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|87</Hit_id>
-  <Hit_def>seq88</Hit_def>
-  <Hit_accession>87</Hit_accession>
+  <Hit_id>seq88</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq88</Hit_accession>
   <Hit_len>1046</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -726,9 +726,9 @@
 </Hit>
 <Hit>
   <Hit_num>26</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|23</Hit_id>
-  <Hit_def>seq24</Hit_def>
-  <Hit_accession>23</Hit_accession>
+  <Hit_id>seq24</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq24</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -754,9 +754,9 @@
 </Hit>
 <Hit>
   <Hit_num>27</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|31</Hit_id>
-  <Hit_def>seq32</Hit_def>
-  <Hit_accession>31</Hit_accession>
+  <Hit_id>seq32</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq32</Hit_accession>
   <Hit_len>902</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -782,9 +782,9 @@
 </Hit>
 <Hit>
   <Hit_num>28</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|22</Hit_id>
-  <Hit_def>seq23</Hit_def>
-  <Hit_accession>22</Hit_accession>
+  <Hit_id>seq23</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq23</Hit_accession>
   <Hit_len>878</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -810,9 +810,9 @@
 </Hit>
 <Hit>
   <Hit_num>29</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|24</Hit_id>
-  <Hit_def>seq25</Hit_def>
-  <Hit_accession>24</Hit_accession>
+  <Hit_id>seq25</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq25</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -838,9 +838,9 @@
 </Hit>
 <Hit>
   <Hit_num>30</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|26</Hit_id>
-  <Hit_def>seq27</Hit_def>
-  <Hit_accession>26</Hit_accession>
+  <Hit_id>seq27</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq27</Hit_accession>
   <Hit_len>856</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -866,9 +866,9 @@
 </Hit>
 <Hit>
   <Hit_num>31</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|25</Hit_id>
-  <Hit_def>seq26</Hit_def>
-  <Hit_accession>25</Hit_accession>
+  <Hit_id>seq26</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq26</Hit_accession>
   <Hit_len>912</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -894,9 +894,9 @@
 </Hit>
 <Hit>
   <Hit_num>32</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|30</Hit_id>
-  <Hit_def>seq31</Hit_def>
-  <Hit_accession>30</Hit_accession>
+  <Hit_id>seq31</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq31</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -922,9 +922,9 @@
 </Hit>
 <Hit>
   <Hit_num>33</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|28</Hit_id>
-  <Hit_def>seq29</Hit_def>
-  <Hit_accession>28</Hit_accession>
+  <Hit_id>seq29</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq29</Hit_accession>
   <Hit_len>942</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -950,9 +950,9 @@
 </Hit>
 <Hit>
   <Hit_num>34</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|21</Hit_id>
-  <Hit_def>seq22</Hit_def>
-  <Hit_accession>21</Hit_accession>
+  <Hit_id>seq22</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq22</Hit_accession>
   <Hit_len>847</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -978,9 +978,9 @@
 </Hit>
 <Hit>
   <Hit_num>35</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|84</Hit_id>
-  <Hit_def>seq85</Hit_def>
-  <Hit_accession>84</Hit_accession>
+  <Hit_id>seq85</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq85</Hit_accession>
   <Hit_len>868</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1006,9 +1006,9 @@
 </Hit>
 <Hit>
   <Hit_num>36</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|27</Hit_id>
-  <Hit_def>seq28</Hit_def>
-  <Hit_accession>27</Hit_accession>
+  <Hit_id>seq28</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq28</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1034,9 +1034,9 @@
 </Hit>
 <Hit>
   <Hit_num>37</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|83</Hit_id>
-  <Hit_def>seq84</Hit_def>
-  <Hit_accession>83</Hit_accession>
+  <Hit_id>seq84</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq84</Hit_accession>
   <Hit_len>858</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1062,9 +1062,9 @@
 </Hit>
 <Hit>
   <Hit_num>38</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|77</Hit_id>
-  <Hit_def>seq78</Hit_def>
-  <Hit_accession>77</Hit_accession>
+  <Hit_id>seq78</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq78</Hit_accession>
   <Hit_len>809</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1090,9 +1090,9 @@
 </Hit>
 <Hit>
   <Hit_num>39</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|76</Hit_id>
-  <Hit_def>seq77</Hit_def>
-  <Hit_accession>76</Hit_accession>
+  <Hit_id>seq77</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq77</Hit_accession>
   <Hit_len>778</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1118,9 +1118,9 @@
 </Hit>
 <Hit>
   <Hit_num>40</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|29</Hit_id>
-  <Hit_def>seq30</Hit_def>
-  <Hit_accession>29</Hit_accession>
+  <Hit_id>seq30</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq30</Hit_accession>
   <Hit_len>910</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1146,9 +1146,9 @@
 </Hit>
 <Hit>
   <Hit_num>41</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|75</Hit_id>
-  <Hit_def>seq76</Hit_def>
-  <Hit_accession>75</Hit_accession>
+  <Hit_id>seq76</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq76</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1174,9 +1174,9 @@
 </Hit>
 <Hit>
   <Hit_num>42</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|78</Hit_id>
-  <Hit_def>seq79</Hit_def>
-  <Hit_accession>78</Hit_accession>
+  <Hit_id>seq79</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq79</Hit_accession>
   <Hit_len>1056</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1202,9 +1202,9 @@
 </Hit>
 <Hit>
   <Hit_num>43</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|79</Hit_id>
-  <Hit_def>seq80</Hit_def>
-  <Hit_accession>79</Hit_accession>
+  <Hit_id>seq80</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq80</Hit_accession>
   <Hit_len>795</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1230,9 +1230,9 @@
 </Hit>
 <Hit>
   <Hit_num>44</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|46</Hit_id>
-  <Hit_def>seq47</Hit_def>
-  <Hit_accession>46</Hit_accession>
+  <Hit_id>seq47</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq47</Hit_accession>
   <Hit_len>796</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1258,9 +1258,9 @@
 </Hit>
 <Hit>
   <Hit_num>45</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|66</Hit_id>
-  <Hit_def>seq67</Hit_def>
-  <Hit_accession>66</Hit_accession>
+  <Hit_id>seq67</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq67</Hit_accession>
   <Hit_len>697</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1286,9 +1286,9 @@
 </Hit>
 <Hit>
   <Hit_num>46</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|39</Hit_id>
-  <Hit_def>seq40</Hit_def>
-  <Hit_accession>39</Hit_accession>
+  <Hit_id>seq40</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq40</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1314,9 +1314,9 @@
 </Hit>
 <Hit>
   <Hit_num>47</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|42</Hit_id>
-  <Hit_def>seq43</Hit_def>
-  <Hit_accession>42</Hit_accession>
+  <Hit_id>seq43</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq43</Hit_accession>
   <Hit_len>802</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1342,9 +1342,9 @@
 </Hit>
 <Hit>
   <Hit_num>48</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|56</Hit_id>
-  <Hit_def>seq57</Hit_def>
-  <Hit_accession>56</Hit_accession>
+  <Hit_id>seq57</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq57</Hit_accession>
   <Hit_len>708</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1370,9 +1370,9 @@
 </Hit>
 <Hit>
   <Hit_num>49</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|35</Hit_id>
-  <Hit_def>seq36</Hit_def>
-  <Hit_accession>35</Hit_accession>
+  <Hit_id>seq36</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq36</Hit_accession>
   <Hit_len>828</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1398,9 +1398,9 @@
 </Hit>
 <Hit>
   <Hit_num>50</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|54</Hit_id>
-  <Hit_def>seq55</Hit_def>
-  <Hit_accession>54</Hit_accession>
+  <Hit_id>seq55</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq55</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1426,9 +1426,9 @@
 </Hit>
 <Hit>
   <Hit_num>51</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|32</Hit_id>
-  <Hit_def>seq33</Hit_def>
-  <Hit_accession>32</Hit_accession>
+  <Hit_id>seq33</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq33</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1454,9 +1454,9 @@
 </Hit>
 <Hit>
   <Hit_num>52</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|34</Hit_id>
-  <Hit_def>seq35</Hit_def>
-  <Hit_accession>34</Hit_accession>
+  <Hit_id>seq35</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq35</Hit_accession>
   <Hit_len>838</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1482,9 +1482,9 @@
 </Hit>
 <Hit>
   <Hit_num>53</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|67</Hit_id>
-  <Hit_def>seq68</Hit_def>
-  <Hit_accession>67</Hit_accession>
+  <Hit_id>seq68</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq68</Hit_accession>
   <Hit_len>685</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1510,9 +1510,9 @@
 </Hit>
 <Hit>
   <Hit_num>54</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|33</Hit_id>
-  <Hit_def>seq34</Hit_def>
-  <Hit_accession>33</Hit_accession>
+  <Hit_id>seq34</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq34</Hit_accession>
   <Hit_len>818</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1538,9 +1538,9 @@
 </Hit>
 <Hit>
   <Hit_num>55</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|43</Hit_id>
-  <Hit_def>seq44</Hit_def>
-  <Hit_accession>43</Hit_accession>
+  <Hit_id>seq44</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq44</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1566,9 +1566,9 @@
 </Hit>
 <Hit>
   <Hit_num>56</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|37</Hit_id>
-  <Hit_def>seq38</Hit_def>
-  <Hit_accession>37</Hit_accession>
+  <Hit_id>seq38</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq38</Hit_accession>
   <Hit_len>798</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1594,9 +1594,9 @@
 </Hit>
 <Hit>
   <Hit_num>57</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|55</Hit_id>
-  <Hit_def>seq56</Hit_def>
-  <Hit_accession>55</Hit_accession>
+  <Hit_id>seq56</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq56</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1622,9 +1622,9 @@
 </Hit>
 <Hit>
   <Hit_num>58</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|61</Hit_id>
-  <Hit_def>seq62</Hit_def>
-  <Hit_accession>61</Hit_accession>
+  <Hit_id>seq62</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq62</Hit_accession>
   <Hit_len>711</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1650,9 +1650,9 @@
 </Hit>
 <Hit>
   <Hit_num>59</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|74</Hit_id>
-  <Hit_def>seq75</Hit_def>
-  <Hit_accession>74</Hit_accession>
+  <Hit_id>seq75</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq75</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1678,9 +1678,9 @@
 </Hit>
 <Hit>
   <Hit_num>60</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|41</Hit_id>
-  <Hit_def>seq42</Hit_def>
-  <Hit_accession>41</Hit_accession>
+  <Hit_id>seq42</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq42</Hit_accession>
   <Hit_len>671</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1706,9 +1706,9 @@
 </Hit>
 <Hit>
   <Hit_num>61</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|72</Hit_id>
-  <Hit_def>seq73</Hit_def>
-  <Hit_accession>72</Hit_accession>
+  <Hit_id>seq73</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq73</Hit_accession>
   <Hit_len>673</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1734,9 +1734,9 @@
 </Hit>
 <Hit>
   <Hit_num>62</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|69</Hit_id>
-  <Hit_def>seq70</Hit_def>
-  <Hit_accession>69</Hit_accession>
+  <Hit_id>seq70</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq70</Hit_accession>
   <Hit_len>677</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1762,9 +1762,9 @@
 </Hit>
 <Hit>
   <Hit_num>63</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|71</Hit_id>
-  <Hit_def>seq72</Hit_def>
-  <Hit_accession>71</Hit_accession>
+  <Hit_id>seq72</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq72</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1790,9 +1790,9 @@
 </Hit>
 <Hit>
   <Hit_num>64</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|68</Hit_id>
-  <Hit_def>seq69</Hit_def>
-  <Hit_accession>68</Hit_accession>
+  <Hit_id>seq69</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq69</Hit_accession>
   <Hit_len>676</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1818,9 +1818,9 @@
 </Hit>
 <Hit>
   <Hit_num>65</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|73</Hit_id>
-  <Hit_def>seq74</Hit_def>
-  <Hit_accession>73</Hit_accession>
+  <Hit_id>seq74</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq74</Hit_accession>
   <Hit_len>675</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1846,9 +1846,9 @@
 </Hit>
 <Hit>
   <Hit_num>66</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|59</Hit_id>
-  <Hit_def>seq60</Hit_def>
-  <Hit_accession>59</Hit_accession>
+  <Hit_id>seq60</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq60</Hit_accession>
   <Hit_len>705</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1874,9 +1874,9 @@
 </Hit>
 <Hit>
   <Hit_num>67</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|64</Hit_id>
-  <Hit_def>seq65</Hit_def>
-  <Hit_accession>64</Hit_accession>
+  <Hit_id>seq65</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq65</Hit_accession>
   <Hit_len>656</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1902,9 +1902,9 @@
 </Hit>
 <Hit>
   <Hit_num>68</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|70</Hit_id>
-  <Hit_def>seq71</Hit_def>
-  <Hit_accession>70</Hit_accession>
+  <Hit_id>seq71</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq71</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1930,9 +1930,9 @@
 </Hit>
 <Hit>
   <Hit_num>69</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|58</Hit_id>
-  <Hit_def>seq59</Hit_def>
-  <Hit_accession>58</Hit_accession>
+  <Hit_id>seq59</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq59</Hit_accession>
   <Hit_len>627</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1958,9 +1958,9 @@
 </Hit>
 <Hit>
   <Hit_num>70</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|57</Hit_id>
-  <Hit_def>seq58</Hit_def>
-  <Hit_accession>57</Hit_accession>
+  <Hit_id>seq58</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq58</Hit_accession>
   <Hit_len>625</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -1986,9 +1986,9 @@
 </Hit>
 <Hit>
   <Hit_num>71</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|38</Hit_id>
-  <Hit_def>seq39</Hit_def>
-  <Hit_accession>38</Hit_accession>
+  <Hit_id>seq39</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq39</Hit_accession>
   <Hit_len>737</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2033,9 +2033,9 @@
 </Hit>
 <Hit>
   <Hit_num>72</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|50</Hit_id>
-  <Hit_def>seq51</Hit_def>
-  <Hit_accession>50</Hit_accession>
+  <Hit_id>seq51</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq51</Hit_accession>
   <Hit_len>699</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2061,9 +2061,9 @@
 </Hit>
 <Hit>
   <Hit_num>73</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|44</Hit_id>
-  <Hit_def>seq45</Hit_def>
-  <Hit_accession>44</Hit_accession>
+  <Hit_id>seq45</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq45</Hit_accession>
   <Hit_len>742</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2108,9 +2108,9 @@
 </Hit>
 <Hit>
   <Hit_num>74</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|60</Hit_id>
-  <Hit_def>seq61</Hit_def>
-  <Hit_accession>60</Hit_accession>
+  <Hit_id>seq61</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq61</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2136,9 +2136,9 @@
 </Hit>
 <Hit>
   <Hit_num>75</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|40</Hit_id>
-  <Hit_def>seq41</Hit_def>
-  <Hit_accession>40</Hit_accession>
+  <Hit_id>seq41</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq41</Hit_accession>
   <Hit_len>791</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2183,9 +2183,9 @@
 </Hit>
 <Hit>
   <Hit_num>76</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|36</Hit_id>
-  <Hit_def>seq37</Hit_def>
-  <Hit_accession>36</Hit_accession>
+  <Hit_id>seq37</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq37</Hit_accession>
   <Hit_len>701</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2230,9 +2230,9 @@
 </Hit>
 <Hit>
   <Hit_num>77</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|48</Hit_id>
-  <Hit_def>seq49</Hit_def>
-  <Hit_accession>48</Hit_accession>
+  <Hit_id>seq49</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq49</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2277,9 +2277,9 @@
 </Hit>
 <Hit>
   <Hit_num>78</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|81</Hit_id>
-  <Hit_def>seq82</Hit_def>
-  <Hit_accession>81</Hit_accession>
+  <Hit_id>seq82</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq82</Hit_accession>
   <Hit_len>623</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2324,9 +2324,9 @@
 </Hit>
 <Hit>
   <Hit_num>79</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|52</Hit_id>
-  <Hit_def>seq53</Hit_def>
-  <Hit_accession>52</Hit_accession>
+  <Hit_id>seq53</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq53</Hit_accession>
   <Hit_len>634</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2371,9 +2371,9 @@
 </Hit>
 <Hit>
   <Hit_num>80</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|45</Hit_id>
-  <Hit_def>seq46</Hit_def>
-  <Hit_accession>45</Hit_accession>
+  <Hit_id>seq46</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq46</Hit_accession>
   <Hit_len>949</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2418,9 +2418,9 @@
 </Hit>
 <Hit>
   <Hit_num>81</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|53</Hit_id>
-  <Hit_def>seq54</Hit_def>
-  <Hit_accession>53</Hit_accession>
+  <Hit_id>seq54</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq54</Hit_accession>
   <Hit_len>700</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2465,9 +2465,9 @@
 </Hit>
 <Hit>
   <Hit_num>82</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|80</Hit_id>
-  <Hit_def>seq81</Hit_def>
-  <Hit_accession>80</Hit_accession>
+  <Hit_id>seq81</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq81</Hit_accession>
   <Hit_len>601</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2512,9 +2512,9 @@
 </Hit>
 <Hit>
   <Hit_num>83</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|63</Hit_id>
-  <Hit_def>seq64</Hit_def>
-  <Hit_accession>63</Hit_accession>
+  <Hit_id>seq64</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq64</Hit_accession>
   <Hit_len>710</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2559,9 +2559,9 @@
 </Hit>
 <Hit>
   <Hit_num>84</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|49</Hit_id>
-  <Hit_def>seq50</Hit_def>
-  <Hit_accession>49</Hit_accession>
+  <Hit_id>seq50</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq50</Hit_accession>
   <Hit_len>788</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2606,9 +2606,9 @@
 </Hit>
 <Hit>
   <Hit_num>85</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|65</Hit_id>
-  <Hit_def>seq66</Hit_def>
-  <Hit_accession>65</Hit_accession>
+  <Hit_id>seq66</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq66</Hit_accession>
   <Hit_len>658</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2653,9 +2653,9 @@
 </Hit>
 <Hit>
   <Hit_num>86</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|62</Hit_id>
-  <Hit_def>seq63</Hit_def>
-  <Hit_accession>62</Hit_accession>
+  <Hit_id>seq63</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq63</Hit_accession>
   <Hit_len>666</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2700,9 +2700,9 @@
 </Hit>
 <Hit>
   <Hit_num>87</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|51</Hit_id>
-  <Hit_def>seq52</Hit_def>
-  <Hit_accession>51</Hit_accession>
+  <Hit_id>seq52</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq52</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2747,9 +2747,9 @@
 <Iteration_hits>
 <Hit>
   <Hit_num>1</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|23</Hit_id>
-  <Hit_def>seq24</Hit_def>
-  <Hit_accession>23</Hit_accession>
+  <Hit_id>seq24</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq24</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2775,9 +2775,9 @@
 </Hit>
 <Hit>
   <Hit_num>2</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|31</Hit_id>
-  <Hit_def>seq32</Hit_def>
-  <Hit_accession>31</Hit_accession>
+  <Hit_id>seq32</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq32</Hit_accession>
   <Hit_len>902</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2803,9 +2803,9 @@
 </Hit>
 <Hit>
   <Hit_num>3</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|25</Hit_id>
-  <Hit_def>seq26</Hit_def>
-  <Hit_accession>25</Hit_accession>
+  <Hit_id>seq26</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq26</Hit_accession>
   <Hit_len>912</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2831,9 +2831,9 @@
 </Hit>
 <Hit>
   <Hit_num>4</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|26</Hit_id>
-  <Hit_def>seq27</Hit_def>
-  <Hit_accession>26</Hit_accession>
+  <Hit_id>seq27</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq27</Hit_accession>
   <Hit_len>856</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2859,9 +2859,9 @@
 </Hit>
 <Hit>
   <Hit_num>5</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|24</Hit_id>
-  <Hit_def>seq25</Hit_def>
-  <Hit_accession>24</Hit_accession>
+  <Hit_id>seq25</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq25</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2887,9 +2887,9 @@
 </Hit>
 <Hit>
   <Hit_num>6</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|28</Hit_id>
-  <Hit_def>seq29</Hit_def>
-  <Hit_accession>28</Hit_accession>
+  <Hit_id>seq29</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq29</Hit_accession>
   <Hit_len>942</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2915,9 +2915,9 @@
 </Hit>
 <Hit>
   <Hit_num>7</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|27</Hit_id>
-  <Hit_def>seq28</Hit_def>
-  <Hit_accession>27</Hit_accession>
+  <Hit_id>seq28</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq28</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2943,9 +2943,9 @@
 </Hit>
 <Hit>
   <Hit_num>8</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|30</Hit_id>
-  <Hit_def>seq31</Hit_def>
-  <Hit_accession>30</Hit_accession>
+  <Hit_id>seq31</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq31</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2971,9 +2971,9 @@
 </Hit>
 <Hit>
   <Hit_num>9</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|29</Hit_id>
-  <Hit_def>seq30</Hit_def>
-  <Hit_accession>29</Hit_accession>
+  <Hit_id>seq30</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq30</Hit_accession>
   <Hit_len>910</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -2999,9 +2999,9 @@
 </Hit>
 <Hit>
   <Hit_num>10</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|3</Hit_id>
-  <Hit_def>seq4</Hit_def>
-  <Hit_accession>3</Hit_accession>
+  <Hit_id>seq4</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq4</Hit_accession>
   <Hit_len>901</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3027,9 +3027,9 @@
 </Hit>
 <Hit>
   <Hit_num>11</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|11</Hit_id>
-  <Hit_def>seq12</Hit_def>
-  <Hit_accession>11</Hit_accession>
+  <Hit_id>seq12</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq12</Hit_accession>
   <Hit_len>968</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3055,9 +3055,9 @@
 </Hit>
 <Hit>
   <Hit_num>12</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|17</Hit_id>
-  <Hit_def>seq18</Hit_def>
-  <Hit_accession>17</Hit_accession>
+  <Hit_id>seq18</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq18</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3083,9 +3083,9 @@
 </Hit>
 <Hit>
   <Hit_num>13</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|10</Hit_id>
-  <Hit_def>seq11</Hit_def>
-  <Hit_accession>10</Hit_accession>
+  <Hit_id>seq11</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq11</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3111,9 +3111,9 @@
 </Hit>
 <Hit>
   <Hit_num>14</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|0</Hit_id>
-  <Hit_def>seq1</Hit_def>
-  <Hit_accession>0</Hit_accession>
+  <Hit_id>seq1</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq1</Hit_accession>
   <Hit_len>888</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3139,9 +3139,9 @@
 </Hit>
 <Hit>
   <Hit_num>15</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|19</Hit_id>
-  <Hit_def>seq20</Hit_def>
-  <Hit_accession>19</Hit_accession>
+  <Hit_id>seq20</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq20</Hit_accession>
   <Hit_len>871</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3167,9 +3167,9 @@
 </Hit>
 <Hit>
   <Hit_num>16</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|18</Hit_id>
-  <Hit_def>seq19</Hit_def>
-  <Hit_accession>18</Hit_accession>
+  <Hit_id>seq19</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq19</Hit_accession>
   <Hit_len>890</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3195,9 +3195,9 @@
 </Hit>
 <Hit>
   <Hit_num>17</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|14</Hit_id>
-  <Hit_def>seq15</Hit_def>
-  <Hit_accession>14</Hit_accession>
+  <Hit_id>seq15</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq15</Hit_accession>
   <Hit_len>894</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3223,9 +3223,9 @@
 </Hit>
 <Hit>
   <Hit_num>18</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|9</Hit_id>
-  <Hit_def>seq10</Hit_def>
-  <Hit_accession>9</Hit_accession>
+  <Hit_id>seq10</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq10</Hit_accession>
   <Hit_len>882</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3251,9 +3251,9 @@
 </Hit>
 <Hit>
   <Hit_num>19</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|7</Hit_id>
-  <Hit_def>seq8</Hit_def>
-  <Hit_accession>7</Hit_accession>
+  <Hit_id>seq8</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq8</Hit_accession>
   <Hit_len>897</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3279,9 +3279,9 @@
 </Hit>
 <Hit>
   <Hit_num>20</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|2</Hit_id>
-  <Hit_def>seq3</Hit_def>
-  <Hit_accession>2</Hit_accession>
+  <Hit_id>seq3</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq3</Hit_accession>
   <Hit_len>881</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3307,9 +3307,9 @@
 </Hit>
 <Hit>
   <Hit_num>21</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|8</Hit_id>
-  <Hit_def>seq9</Hit_def>
-  <Hit_accession>8</Hit_accession>
+  <Hit_id>seq9</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq9</Hit_accession>
   <Hit_len>876</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3335,9 +3335,9 @@
 </Hit>
 <Hit>
   <Hit_num>22</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|82</Hit_id>
-  <Hit_def>seq83</Hit_def>
-  <Hit_accession>82</Hit_accession>
+  <Hit_id>seq83</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq83</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3363,9 +3363,9 @@
 </Hit>
 <Hit>
   <Hit_num>23</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|5</Hit_id>
-  <Hit_def>seq6</Hit_def>
-  <Hit_accession>5</Hit_accession>
+  <Hit_id>seq6</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq6</Hit_accession>
   <Hit_len>933</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3391,9 +3391,9 @@
 </Hit>
 <Hit>
   <Hit_num>24</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|16</Hit_id>
-  <Hit_def>seq17</Hit_def>
-  <Hit_accession>16</Hit_accession>
+  <Hit_id>seq17</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq17</Hit_accession>
   <Hit_len>885</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3419,9 +3419,9 @@
 </Hit>
 <Hit>
   <Hit_num>25</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|6</Hit_id>
-  <Hit_def>seq7</Hit_def>
-  <Hit_accession>6</Hit_accession>
+  <Hit_id>seq7</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq7</Hit_accession>
   <Hit_len>875</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3447,9 +3447,9 @@
 </Hit>
 <Hit>
   <Hit_num>26</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|1</Hit_id>
-  <Hit_def>seq2</Hit_def>
-  <Hit_accession>1</Hit_accession>
+  <Hit_id>seq2</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq2</Hit_accession>
   <Hit_len>845</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3475,9 +3475,9 @@
 </Hit>
 <Hit>
   <Hit_num>27</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|87</Hit_id>
-  <Hit_def>seq88</Hit_def>
-  <Hit_accession>87</Hit_accession>
+  <Hit_id>seq88</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq88</Hit_accession>
   <Hit_len>1046</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3503,9 +3503,9 @@
 </Hit>
 <Hit>
   <Hit_num>28</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|4</Hit_id>
-  <Hit_def>seq5</Hit_def>
-  <Hit_accession>4</Hit_accession>
+  <Hit_id>seq5</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq5</Hit_accession>
   <Hit_len>850</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3531,9 +3531,9 @@
 </Hit>
 <Hit>
   <Hit_num>29</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|20</Hit_id>
-  <Hit_def>seq21</Hit_def>
-  <Hit_accession>20</Hit_accession>
+  <Hit_id>seq21</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq21</Hit_accession>
   <Hit_len>982</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3559,9 +3559,9 @@
 </Hit>
 <Hit>
   <Hit_num>30</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|86</Hit_id>
-  <Hit_def>seq87</Hit_def>
-  <Hit_accession>86</Hit_accession>
+  <Hit_id>seq87</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq87</Hit_accession>
   <Hit_len>972</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3587,9 +3587,9 @@
 </Hit>
 <Hit>
   <Hit_num>31</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|12</Hit_id>
-  <Hit_def>seq13</Hit_def>
-  <Hit_accession>12</Hit_accession>
+  <Hit_id>seq13</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq13</Hit_accession>
   <Hit_len>920</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3615,9 +3615,9 @@
 </Hit>
 <Hit>
   <Hit_num>32</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|13</Hit_id>
-  <Hit_def>seq14</Hit_def>
-  <Hit_accession>13</Hit_accession>
+  <Hit_id>seq14</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq14</Hit_accession>
   <Hit_len>918</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3643,9 +3643,9 @@
 </Hit>
 <Hit>
   <Hit_num>33</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|83</Hit_id>
-  <Hit_def>seq84</Hit_def>
-  <Hit_accession>83</Hit_accession>
+  <Hit_id>seq84</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq84</Hit_accession>
   <Hit_len>858</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3671,9 +3671,9 @@
 </Hit>
 <Hit>
   <Hit_num>34</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|84</Hit_id>
-  <Hit_def>seq85</Hit_def>
-  <Hit_accession>84</Hit_accession>
+  <Hit_id>seq85</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq85</Hit_accession>
   <Hit_len>868</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3699,9 +3699,9 @@
 </Hit>
 <Hit>
   <Hit_num>35</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|77</Hit_id>
-  <Hit_def>seq78</Hit_def>
-  <Hit_accession>77</Hit_accession>
+  <Hit_id>seq78</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq78</Hit_accession>
   <Hit_len>809</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3727,9 +3727,9 @@
 </Hit>
 <Hit>
   <Hit_num>36</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|15</Hit_id>
-  <Hit_def>seq16</Hit_def>
-  <Hit_accession>15</Hit_accession>
+  <Hit_id>seq16</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq16</Hit_accession>
   <Hit_len>959</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3774,9 +3774,9 @@
 </Hit>
 <Hit>
   <Hit_num>37</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|76</Hit_id>
-  <Hit_def>seq77</Hit_def>
-  <Hit_accession>76</Hit_accession>
+  <Hit_id>seq77</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq77</Hit_accession>
   <Hit_len>778</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3802,9 +3802,9 @@
 </Hit>
 <Hit>
   <Hit_num>38</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|22</Hit_id>
-  <Hit_def>seq23</Hit_def>
-  <Hit_accession>22</Hit_accession>
+  <Hit_id>seq23</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq23</Hit_accession>
   <Hit_len>878</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3830,9 +3830,9 @@
 </Hit>
 <Hit>
   <Hit_num>39</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|75</Hit_id>
-  <Hit_def>seq76</Hit_def>
-  <Hit_accession>75</Hit_accession>
+  <Hit_id>seq76</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq76</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3858,9 +3858,9 @@
 </Hit>
 <Hit>
   <Hit_num>40</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|78</Hit_id>
-  <Hit_def>seq79</Hit_def>
-  <Hit_accession>78</Hit_accession>
+  <Hit_id>seq79</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq79</Hit_accession>
   <Hit_len>1056</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3886,9 +3886,9 @@
 </Hit>
 <Hit>
   <Hit_num>41</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|46</Hit_id>
-  <Hit_def>seq47</Hit_def>
-  <Hit_accession>46</Hit_accession>
+  <Hit_id>seq47</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq47</Hit_accession>
   <Hit_len>796</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3914,9 +3914,9 @@
 </Hit>
 <Hit>
   <Hit_num>42</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|85</Hit_id>
-  <Hit_def>seq86</Hit_def>
-  <Hit_accession>85</Hit_accession>
+  <Hit_id>seq86</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq86</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3961,9 +3961,9 @@
 </Hit>
 <Hit>
   <Hit_num>43</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|21</Hit_id>
-  <Hit_def>seq22</Hit_def>
-  <Hit_accession>21</Hit_accession>
+  <Hit_id>seq22</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq22</Hit_accession>
   <Hit_len>847</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -3989,9 +3989,9 @@
 </Hit>
 <Hit>
   <Hit_num>44</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|32</Hit_id>
-  <Hit_def>seq33</Hit_def>
-  <Hit_accession>32</Hit_accession>
+  <Hit_id>seq33</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq33</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4017,9 +4017,9 @@
 </Hit>
 <Hit>
   <Hit_num>45</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|44</Hit_id>
-  <Hit_def>seq45</Hit_def>
-  <Hit_accession>44</Hit_accession>
+  <Hit_id>seq45</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq45</Hit_accession>
   <Hit_len>742</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4045,9 +4045,9 @@
 </Hit>
 <Hit>
   <Hit_num>46</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|35</Hit_id>
-  <Hit_def>seq36</Hit_def>
-  <Hit_accession>35</Hit_accession>
+  <Hit_id>seq36</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq36</Hit_accession>
   <Hit_len>828</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4073,9 +4073,9 @@
 </Hit>
 <Hit>
   <Hit_num>47</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|42</Hit_id>
-  <Hit_def>seq43</Hit_def>
-  <Hit_accession>42</Hit_accession>
+  <Hit_id>seq43</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq43</Hit_accession>
   <Hit_len>802</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4101,9 +4101,9 @@
 </Hit>
 <Hit>
   <Hit_num>48</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|39</Hit_id>
-  <Hit_def>seq40</Hit_def>
-  <Hit_accession>39</Hit_accession>
+  <Hit_id>seq40</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq40</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4129,9 +4129,9 @@
 </Hit>
 <Hit>
   <Hit_num>49</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|45</Hit_id>
-  <Hit_def>seq46</Hit_def>
-  <Hit_accession>45</Hit_accession>
+  <Hit_id>seq46</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq46</Hit_accession>
   <Hit_len>949</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4157,9 +4157,9 @@
 </Hit>
 <Hit>
   <Hit_num>50</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|79</Hit_id>
-  <Hit_def>seq80</Hit_def>
-  <Hit_accession>79</Hit_accession>
+  <Hit_id>seq80</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq80</Hit_accession>
   <Hit_len>795</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4185,9 +4185,9 @@
 </Hit>
 <Hit>
   <Hit_num>51</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|33</Hit_id>
-  <Hit_def>seq34</Hit_def>
-  <Hit_accession>33</Hit_accession>
+  <Hit_id>seq34</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq34</Hit_accession>
   <Hit_len>818</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4213,9 +4213,9 @@
 </Hit>
 <Hit>
   <Hit_num>52</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|41</Hit_id>
-  <Hit_def>seq42</Hit_def>
-  <Hit_accession>41</Hit_accession>
+  <Hit_id>seq42</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq42</Hit_accession>
   <Hit_len>671</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4241,9 +4241,9 @@
 </Hit>
 <Hit>
   <Hit_num>53</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|54</Hit_id>
-  <Hit_def>seq55</Hit_def>
-  <Hit_accession>54</Hit_accession>
+  <Hit_id>seq55</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq55</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4269,9 +4269,9 @@
 </Hit>
 <Hit>
   <Hit_num>54</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|48</Hit_id>
-  <Hit_def>seq49</Hit_def>
-  <Hit_accession>48</Hit_accession>
+  <Hit_id>seq49</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq49</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4297,9 +4297,9 @@
 </Hit>
 <Hit>
   <Hit_num>55</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|55</Hit_id>
-  <Hit_def>seq56</Hit_def>
-  <Hit_accession>55</Hit_accession>
+  <Hit_id>seq56</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq56</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4325,9 +4325,9 @@
 </Hit>
 <Hit>
   <Hit_num>56</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|56</Hit_id>
-  <Hit_def>seq57</Hit_def>
-  <Hit_accession>56</Hit_accession>
+  <Hit_id>seq57</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq57</Hit_accession>
   <Hit_len>708</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4353,9 +4353,9 @@
 </Hit>
 <Hit>
   <Hit_num>57</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|68</Hit_id>
-  <Hit_def>seq69</Hit_def>
-  <Hit_accession>68</Hit_accession>
+  <Hit_id>seq69</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq69</Hit_accession>
   <Hit_len>676</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4381,9 +4381,9 @@
 </Hit>
 <Hit>
   <Hit_num>58</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|37</Hit_id>
-  <Hit_def>seq38</Hit_def>
-  <Hit_accession>37</Hit_accession>
+  <Hit_id>seq38</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq38</Hit_accession>
   <Hit_len>798</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4428,9 +4428,9 @@
 </Hit>
 <Hit>
   <Hit_num>59</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|60</Hit_id>
-  <Hit_def>seq61</Hit_def>
-  <Hit_accession>60</Hit_accession>
+  <Hit_id>seq61</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq61</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4456,9 +4456,9 @@
 </Hit>
 <Hit>
   <Hit_num>60</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|61</Hit_id>
-  <Hit_def>seq62</Hit_def>
-  <Hit_accession>61</Hit_accession>
+  <Hit_id>seq62</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq62</Hit_accession>
   <Hit_len>711</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4484,9 +4484,9 @@
 </Hit>
 <Hit>
   <Hit_num>61</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|40</Hit_id>
-  <Hit_def>seq41</Hit_def>
-  <Hit_accession>40</Hit_accession>
+  <Hit_id>seq41</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq41</Hit_accession>
   <Hit_len>791</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4531,9 +4531,9 @@
 </Hit>
 <Hit>
   <Hit_num>62</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|74</Hit_id>
-  <Hit_def>seq75</Hit_def>
-  <Hit_accession>74</Hit_accession>
+  <Hit_id>seq75</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq75</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4559,9 +4559,9 @@
 </Hit>
 <Hit>
   <Hit_num>63</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|66</Hit_id>
-  <Hit_def>seq67</Hit_def>
-  <Hit_accession>66</Hit_accession>
+  <Hit_id>seq67</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq67</Hit_accession>
   <Hit_len>697</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4587,9 +4587,9 @@
 </Hit>
 <Hit>
   <Hit_num>64</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|64</Hit_id>
-  <Hit_def>seq65</Hit_def>
-  <Hit_accession>64</Hit_accession>
+  <Hit_id>seq65</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq65</Hit_accession>
   <Hit_len>656</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4615,9 +4615,9 @@
 </Hit>
 <Hit>
   <Hit_num>65</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|67</Hit_id>
-  <Hit_def>seq68</Hit_def>
-  <Hit_accession>67</Hit_accession>
+  <Hit_id>seq68</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq68</Hit_accession>
   <Hit_len>685</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4643,9 +4643,9 @@
 </Hit>
 <Hit>
   <Hit_num>66</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|34</Hit_id>
-  <Hit_def>seq35</Hit_def>
-  <Hit_accession>34</Hit_accession>
+  <Hit_id>seq35</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq35</Hit_accession>
   <Hit_len>838</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4690,9 +4690,9 @@
 </Hit>
 <Hit>
   <Hit_num>67</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|69</Hit_id>
-  <Hit_def>seq70</Hit_def>
-  <Hit_accession>69</Hit_accession>
+  <Hit_id>seq70</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq70</Hit_accession>
   <Hit_len>677</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4718,9 +4718,9 @@
 </Hit>
 <Hit>
   <Hit_num>68</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|72</Hit_id>
-  <Hit_def>seq73</Hit_def>
-  <Hit_accession>72</Hit_accession>
+  <Hit_id>seq73</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq73</Hit_accession>
   <Hit_len>673</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4746,9 +4746,9 @@
 </Hit>
 <Hit>
   <Hit_num>69</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|38</Hit_id>
-  <Hit_def>seq39</Hit_def>
-  <Hit_accession>38</Hit_accession>
+  <Hit_id>seq39</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq39</Hit_accession>
   <Hit_len>737</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4793,9 +4793,9 @@
 </Hit>
 <Hit>
   <Hit_num>70</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|73</Hit_id>
-  <Hit_def>seq74</Hit_def>
-  <Hit_accession>73</Hit_accession>
+  <Hit_id>seq74</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq74</Hit_accession>
   <Hit_len>675</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4821,9 +4821,9 @@
 </Hit>
 <Hit>
   <Hit_num>71</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|52</Hit_id>
-  <Hit_def>seq53</Hit_def>
-  <Hit_accession>52</Hit_accession>
+  <Hit_id>seq53</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq53</Hit_accession>
   <Hit_len>634</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4868,9 +4868,9 @@
 </Hit>
 <Hit>
   <Hit_num>72</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|70</Hit_id>
-  <Hit_def>seq71</Hit_def>
-  <Hit_accession>70</Hit_accession>
+  <Hit_id>seq71</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq71</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4896,9 +4896,9 @@
 </Hit>
 <Hit>
   <Hit_num>73</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|58</Hit_id>
-  <Hit_def>seq59</Hit_def>
-  <Hit_accession>58</Hit_accession>
+  <Hit_id>seq59</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq59</Hit_accession>
   <Hit_len>627</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4943,9 +4943,9 @@
 </Hit>
 <Hit>
   <Hit_num>74</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|47</Hit_id>
-  <Hit_def>seq48</Hit_def>
-  <Hit_accession>47</Hit_accession>
+  <Hit_id>seq48</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq48</Hit_accession>
   <Hit_len>709</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4971,9 +4971,9 @@
 </Hit>
 <Hit>
   <Hit_num>75</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|71</Hit_id>
-  <Hit_def>seq72</Hit_def>
-  <Hit_accession>71</Hit_accession>
+  <Hit_id>seq72</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq72</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -4999,9 +4999,9 @@
 </Hit>
 <Hit>
   <Hit_num>76</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|59</Hit_id>
-  <Hit_def>seq60</Hit_def>
-  <Hit_accession>59</Hit_accession>
+  <Hit_id>seq60</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq60</Hit_accession>
   <Hit_len>705</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5027,9 +5027,9 @@
 </Hit>
 <Hit>
   <Hit_num>77</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|80</Hit_id>
-  <Hit_def>seq81</Hit_def>
-  <Hit_accession>80</Hit_accession>
+  <Hit_id>seq81</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq81</Hit_accession>
   <Hit_len>601</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5055,9 +5055,9 @@
 </Hit>
 <Hit>
   <Hit_num>78</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|63</Hit_id>
-  <Hit_def>seq64</Hit_def>
-  <Hit_accession>63</Hit_accession>
+  <Hit_id>seq64</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq64</Hit_accession>
   <Hit_len>710</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5083,9 +5083,9 @@
 </Hit>
 <Hit>
   <Hit_num>79</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|53</Hit_id>
-  <Hit_def>seq54</Hit_def>
-  <Hit_accession>53</Hit_accession>
+  <Hit_id>seq54</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq54</Hit_accession>
   <Hit_len>700</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5111,9 +5111,9 @@
 </Hit>
 <Hit>
   <Hit_num>80</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|57</Hit_id>
-  <Hit_def>seq58</Hit_def>
-  <Hit_accession>57</Hit_accession>
+  <Hit_id>seq58</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq58</Hit_accession>
   <Hit_len>625</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5139,9 +5139,9 @@
 </Hit>
 <Hit>
   <Hit_num>81</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|36</Hit_id>
-  <Hit_def>seq37</Hit_def>
-  <Hit_accession>36</Hit_accession>
+  <Hit_id>seq37</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq37</Hit_accession>
   <Hit_len>701</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5167,9 +5167,9 @@
 </Hit>
 <Hit>
   <Hit_num>82</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|81</Hit_id>
-  <Hit_def>seq82</Hit_def>
-  <Hit_accession>81</Hit_accession>
+  <Hit_id>seq82</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq82</Hit_accession>
   <Hit_len>623</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5195,9 +5195,9 @@
 </Hit>
 <Hit>
   <Hit_num>83</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|51</Hit_id>
-  <Hit_def>seq52</Hit_def>
-  <Hit_accession>51</Hit_accession>
+  <Hit_id>seq52</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq52</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5223,9 +5223,9 @@
 </Hit>
 <Hit>
   <Hit_num>84</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|62</Hit_id>
-  <Hit_def>seq63</Hit_def>
-  <Hit_accession>62</Hit_accession>
+  <Hit_id>seq63</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq63</Hit_accession>
   <Hit_len>666</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5270,9 +5270,9 @@
 <Iteration_hits>
 <Hit>
   <Hit_num>1</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|35</Hit_id>
-  <Hit_def>seq36</Hit_def>
-  <Hit_accession>35</Hit_accession>
+  <Hit_id>seq36</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq36</Hit_accession>
   <Hit_len>828</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5298,9 +5298,9 @@
 </Hit>
 <Hit>
   <Hit_num>2</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|33</Hit_id>
-  <Hit_def>seq34</Hit_def>
-  <Hit_accession>33</Hit_accession>
+  <Hit_id>seq34</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq34</Hit_accession>
   <Hit_len>818</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5326,9 +5326,9 @@
 </Hit>
 <Hit>
   <Hit_num>3</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|44</Hit_id>
-  <Hit_def>seq45</Hit_def>
-  <Hit_accession>44</Hit_accession>
+  <Hit_id>seq45</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq45</Hit_accession>
   <Hit_len>742</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5373,9 +5373,9 @@
 </Hit>
 <Hit>
   <Hit_num>4</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|46</Hit_id>
-  <Hit_def>seq47</Hit_def>
-  <Hit_accession>46</Hit_accession>
+  <Hit_id>seq47</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq47</Hit_accession>
   <Hit_len>796</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5420,9 +5420,9 @@
 </Hit>
 <Hit>
   <Hit_num>5</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|37</Hit_id>
-  <Hit_def>seq38</Hit_def>
-  <Hit_accession>37</Hit_accession>
+  <Hit_id>seq38</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq38</Hit_accession>
   <Hit_len>798</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5467,9 +5467,9 @@
 </Hit>
 <Hit>
   <Hit_num>6</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|32</Hit_id>
-  <Hit_def>seq33</Hit_def>
-  <Hit_accession>32</Hit_accession>
+  <Hit_id>seq33</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq33</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5495,9 +5495,9 @@
 </Hit>
 <Hit>
   <Hit_num>7</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|42</Hit_id>
-  <Hit_def>seq43</Hit_def>
-  <Hit_accession>42</Hit_accession>
+  <Hit_id>seq43</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq43</Hit_accession>
   <Hit_len>802</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5523,9 +5523,9 @@
 </Hit>
 <Hit>
   <Hit_num>8</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|40</Hit_id>
-  <Hit_def>seq41</Hit_def>
-  <Hit_accession>40</Hit_accession>
+  <Hit_id>seq41</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq41</Hit_accession>
   <Hit_len>791</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5551,9 +5551,9 @@
 </Hit>
 <Hit>
   <Hit_num>9</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|45</Hit_id>
-  <Hit_def>seq46</Hit_def>
-  <Hit_accession>45</Hit_accession>
+  <Hit_id>seq46</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq46</Hit_accession>
   <Hit_len>949</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5579,9 +5579,9 @@
 </Hit>
 <Hit>
   <Hit_num>10</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|34</Hit_id>
-  <Hit_def>seq35</Hit_def>
-  <Hit_accession>34</Hit_accession>
+  <Hit_id>seq35</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq35</Hit_accession>
   <Hit_len>838</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5607,9 +5607,9 @@
 </Hit>
 <Hit>
   <Hit_num>11</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|38</Hit_id>
-  <Hit_def>seq39</Hit_def>
-  <Hit_accession>38</Hit_accession>
+  <Hit_id>seq39</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq39</Hit_accession>
   <Hit_len>737</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5654,9 +5654,9 @@
 </Hit>
 <Hit>
   <Hit_num>12</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|39</Hit_id>
-  <Hit_def>seq40</Hit_def>
-  <Hit_accession>39</Hit_accession>
+  <Hit_id>seq40</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq40</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5682,9 +5682,9 @@
 </Hit>
 <Hit>
   <Hit_num>13</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|41</Hit_id>
-  <Hit_def>seq42</Hit_def>
-  <Hit_accession>41</Hit_accession>
+  <Hit_id>seq42</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq42</Hit_accession>
   <Hit_len>671</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5710,9 +5710,9 @@
 </Hit>
 <Hit>
   <Hit_num>14</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|54</Hit_id>
-  <Hit_def>seq55</Hit_def>
-  <Hit_accession>54</Hit_accession>
+  <Hit_id>seq55</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq55</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5738,9 +5738,9 @@
 </Hit>
 <Hit>
   <Hit_num>15</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|61</Hit_id>
-  <Hit_def>seq62</Hit_def>
-  <Hit_accession>61</Hit_accession>
+  <Hit_id>seq62</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq62</Hit_accession>
   <Hit_len>711</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5766,9 +5766,9 @@
 </Hit>
 <Hit>
   <Hit_num>16</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|55</Hit_id>
-  <Hit_def>seq56</Hit_def>
-  <Hit_accession>55</Hit_accession>
+  <Hit_id>seq56</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq56</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5794,9 +5794,9 @@
 </Hit>
 <Hit>
   <Hit_num>17</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|36</Hit_id>
-  <Hit_def>seq37</Hit_def>
-  <Hit_accession>36</Hit_accession>
+  <Hit_id>seq37</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq37</Hit_accession>
   <Hit_len>701</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5822,9 +5822,9 @@
 </Hit>
 <Hit>
   <Hit_num>18</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|59</Hit_id>
-  <Hit_def>seq60</Hit_def>
-  <Hit_accession>59</Hit_accession>
+  <Hit_id>seq60</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq60</Hit_accession>
   <Hit_len>705</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5850,9 +5850,9 @@
 </Hit>
 <Hit>
   <Hit_num>19</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|53</Hit_id>
-  <Hit_def>seq54</Hit_def>
-  <Hit_accession>53</Hit_accession>
+  <Hit_id>seq54</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq54</Hit_accession>
   <Hit_len>700</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5878,9 +5878,9 @@
 </Hit>
 <Hit>
   <Hit_num>20</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|43</Hit_id>
-  <Hit_def>seq44</Hit_def>
-  <Hit_accession>43</Hit_accession>
+  <Hit_id>seq44</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq44</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5906,9 +5906,9 @@
 </Hit>
 <Hit>
   <Hit_num>21</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|56</Hit_id>
-  <Hit_def>seq57</Hit_def>
-  <Hit_accession>56</Hit_accession>
+  <Hit_id>seq57</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq57</Hit_accession>
   <Hit_len>708</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5934,9 +5934,9 @@
 </Hit>
 <Hit>
   <Hit_num>22</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|49</Hit_id>
-  <Hit_def>seq50</Hit_def>
-  <Hit_accession>49</Hit_accession>
+  <Hit_id>seq50</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq50</Hit_accession>
   <Hit_len>788</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5962,9 +5962,9 @@
 </Hit>
 <Hit>
   <Hit_num>23</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|48</Hit_id>
-  <Hit_def>seq49</Hit_def>
-  <Hit_accession>48</Hit_accession>
+  <Hit_id>seq49</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq49</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -5990,9 +5990,9 @@
 </Hit>
 <Hit>
   <Hit_num>24</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|60</Hit_id>
-  <Hit_def>seq61</Hit_def>
-  <Hit_accession>60</Hit_accession>
+  <Hit_id>seq61</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq61</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6018,9 +6018,9 @@
 </Hit>
 <Hit>
   <Hit_num>25</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|50</Hit_id>
-  <Hit_def>seq51</Hit_def>
-  <Hit_accession>50</Hit_accession>
+  <Hit_id>seq51</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq51</Hit_accession>
   <Hit_len>699</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6046,9 +6046,9 @@
 </Hit>
 <Hit>
   <Hit_num>26</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|80</Hit_id>
-  <Hit_def>seq81</Hit_def>
-  <Hit_accession>80</Hit_accession>
+  <Hit_id>seq81</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq81</Hit_accession>
   <Hit_len>601</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6074,9 +6074,9 @@
 </Hit>
 <Hit>
   <Hit_num>27</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|64</Hit_id>
-  <Hit_def>seq65</Hit_def>
-  <Hit_accession>64</Hit_accession>
+  <Hit_id>seq65</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq65</Hit_accession>
   <Hit_len>656</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6102,9 +6102,9 @@
 </Hit>
 <Hit>
   <Hit_num>28</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|57</Hit_id>
-  <Hit_def>seq58</Hit_def>
-  <Hit_accession>57</Hit_accession>
+  <Hit_id>seq58</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq58</Hit_accession>
   <Hit_len>625</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6130,9 +6130,9 @@
 </Hit>
 <Hit>
   <Hit_num>29</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|65</Hit_id>
-  <Hit_def>seq66</Hit_def>
-  <Hit_accession>65</Hit_accession>
+  <Hit_id>seq66</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq66</Hit_accession>
   <Hit_len>658</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6158,9 +6158,9 @@
 </Hit>
 <Hit>
   <Hit_num>30</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|63</Hit_id>
-  <Hit_def>seq64</Hit_def>
-  <Hit_accession>63</Hit_accession>
+  <Hit_id>seq64</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq64</Hit_accession>
   <Hit_len>710</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6186,9 +6186,9 @@
 </Hit>
 <Hit>
   <Hit_num>31</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|52</Hit_id>
-  <Hit_def>seq53</Hit_def>
-  <Hit_accession>52</Hit_accession>
+  <Hit_id>seq53</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq53</Hit_accession>
   <Hit_len>634</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6214,9 +6214,9 @@
 </Hit>
 <Hit>
   <Hit_num>32</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|58</Hit_id>
-  <Hit_def>seq59</Hit_def>
-  <Hit_accession>58</Hit_accession>
+  <Hit_id>seq59</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq59</Hit_accession>
   <Hit_len>627</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6242,9 +6242,9 @@
 </Hit>
 <Hit>
   <Hit_num>33</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|47</Hit_id>
-  <Hit_def>seq48</Hit_def>
-  <Hit_accession>47</Hit_accession>
+  <Hit_id>seq48</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq48</Hit_accession>
   <Hit_len>709</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6270,9 +6270,9 @@
 </Hit>
 <Hit>
   <Hit_num>34</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|81</Hit_id>
-  <Hit_def>seq82</Hit_def>
-  <Hit_accession>81</Hit_accession>
+  <Hit_id>seq82</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq82</Hit_accession>
   <Hit_len>623</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6298,9 +6298,9 @@
 </Hit>
 <Hit>
   <Hit_num>35</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|51</Hit_id>
-  <Hit_def>seq52</Hit_def>
-  <Hit_accession>51</Hit_accession>
+  <Hit_id>seq52</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq52</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6326,9 +6326,9 @@
 </Hit>
 <Hit>
   <Hit_num>36</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|62</Hit_id>
-  <Hit_def>seq63</Hit_def>
-  <Hit_accession>62</Hit_accession>
+  <Hit_id>seq63</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq63</Hit_accession>
   <Hit_len>666</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6354,9 +6354,9 @@
 </Hit>
 <Hit>
   <Hit_num>37</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|67</Hit_id>
-  <Hit_def>seq68</Hit_def>
-  <Hit_accession>67</Hit_accession>
+  <Hit_id>seq68</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq68</Hit_accession>
   <Hit_len>685</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6382,9 +6382,9 @@
 </Hit>
 <Hit>
   <Hit_num>38</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|66</Hit_id>
-  <Hit_def>seq67</Hit_def>
-  <Hit_accession>66</Hit_accession>
+  <Hit_id>seq67</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq67</Hit_accession>
   <Hit_len>697</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6410,9 +6410,9 @@
 </Hit>
 <Hit>
   <Hit_num>39</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|68</Hit_id>
-  <Hit_def>seq69</Hit_def>
-  <Hit_accession>68</Hit_accession>
+  <Hit_id>seq69</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq69</Hit_accession>
   <Hit_len>676</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6438,9 +6438,9 @@
 </Hit>
 <Hit>
   <Hit_num>40</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|72</Hit_id>
-  <Hit_def>seq73</Hit_def>
-  <Hit_accession>72</Hit_accession>
+  <Hit_id>seq73</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq73</Hit_accession>
   <Hit_len>673</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6466,9 +6466,9 @@
 </Hit>
 <Hit>
   <Hit_num>41</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|69</Hit_id>
-  <Hit_def>seq70</Hit_def>
-  <Hit_accession>69</Hit_accession>
+  <Hit_id>seq70</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq70</Hit_accession>
   <Hit_len>677</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6494,9 +6494,9 @@
 </Hit>
 <Hit>
   <Hit_num>42</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|74</Hit_id>
-  <Hit_def>seq75</Hit_def>
-  <Hit_accession>74</Hit_accession>
+  <Hit_id>seq75</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq75</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6522,9 +6522,9 @@
 </Hit>
 <Hit>
   <Hit_num>43</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|70</Hit_id>
-  <Hit_def>seq71</Hit_def>
-  <Hit_accession>70</Hit_accession>
+  <Hit_id>seq71</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq71</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6550,9 +6550,9 @@
 </Hit>
 <Hit>
   <Hit_num>44</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|73</Hit_id>
-  <Hit_def>seq74</Hit_def>
-  <Hit_accession>73</Hit_accession>
+  <Hit_id>seq74</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq74</Hit_accession>
   <Hit_len>675</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6578,9 +6578,9 @@
 </Hit>
 <Hit>
   <Hit_num>45</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|71</Hit_id>
-  <Hit_def>seq72</Hit_def>
-  <Hit_accession>71</Hit_accession>
+  <Hit_id>seq72</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq72</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6606,9 +6606,9 @@
 </Hit>
 <Hit>
   <Hit_num>46</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|17</Hit_id>
-  <Hit_def>seq18</Hit_def>
-  <Hit_accession>17</Hit_accession>
+  <Hit_id>seq18</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq18</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6634,9 +6634,9 @@
 </Hit>
 <Hit>
   <Hit_num>47</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|20</Hit_id>
-  <Hit_def>seq21</Hit_def>
-  <Hit_accession>20</Hit_accession>
+  <Hit_id>seq21</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq21</Hit_accession>
   <Hit_len>982</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6662,9 +6662,9 @@
 </Hit>
 <Hit>
   <Hit_num>48</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|16</Hit_id>
-  <Hit_def>seq17</Hit_def>
-  <Hit_accession>16</Hit_accession>
+  <Hit_id>seq17</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq17</Hit_accession>
   <Hit_len>885</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6690,9 +6690,9 @@
 </Hit>
 <Hit>
   <Hit_num>49</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|22</Hit_id>
-  <Hit_def>seq23</Hit_def>
-  <Hit_accession>22</Hit_accession>
+  <Hit_id>seq23</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq23</Hit_accession>
   <Hit_len>878</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6718,9 +6718,9 @@
 </Hit>
 <Hit>
   <Hit_num>50</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|8</Hit_id>
-  <Hit_def>seq9</Hit_def>
-  <Hit_accession>8</Hit_accession>
+  <Hit_id>seq9</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq9</Hit_accession>
   <Hit_len>876</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6746,9 +6746,9 @@
 </Hit>
 <Hit>
   <Hit_num>51</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|14</Hit_id>
-  <Hit_def>seq15</Hit_def>
-  <Hit_accession>14</Hit_accession>
+  <Hit_id>seq15</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq15</Hit_accession>
   <Hit_len>894</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6774,9 +6774,9 @@
 </Hit>
 <Hit>
   <Hit_num>52</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|2</Hit_id>
-  <Hit_def>seq3</Hit_def>
-  <Hit_accession>2</Hit_accession>
+  <Hit_id>seq3</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq3</Hit_accession>
   <Hit_len>881</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6802,9 +6802,9 @@
 </Hit>
 <Hit>
   <Hit_num>53</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|77</Hit_id>
-  <Hit_def>seq78</Hit_def>
-  <Hit_accession>77</Hit_accession>
+  <Hit_id>seq78</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq78</Hit_accession>
   <Hit_len>809</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6830,9 +6830,9 @@
 </Hit>
 <Hit>
   <Hit_num>54</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|10</Hit_id>
-  <Hit_def>seq11</Hit_def>
-  <Hit_accession>10</Hit_accession>
+  <Hit_id>seq11</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq11</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6858,9 +6858,9 @@
 </Hit>
 <Hit>
   <Hit_num>55</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|19</Hit_id>
-  <Hit_def>seq20</Hit_def>
-  <Hit_accession>19</Hit_accession>
+  <Hit_id>seq20</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq20</Hit_accession>
   <Hit_len>871</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6886,9 +6886,9 @@
 </Hit>
 <Hit>
   <Hit_num>56</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|11</Hit_id>
-  <Hit_def>seq12</Hit_def>
-  <Hit_accession>11</Hit_accession>
+  <Hit_id>seq12</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq12</Hit_accession>
   <Hit_len>968</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6914,9 +6914,9 @@
 </Hit>
 <Hit>
   <Hit_num>57</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|76</Hit_id>
-  <Hit_def>seq77</Hit_def>
-  <Hit_accession>76</Hit_accession>
+  <Hit_id>seq77</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq77</Hit_accession>
   <Hit_len>778</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6942,9 +6942,9 @@
 </Hit>
 <Hit>
   <Hit_num>58</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|24</Hit_id>
-  <Hit_def>seq25</Hit_def>
-  <Hit_accession>24</Hit_accession>
+  <Hit_id>seq25</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq25</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6970,9 +6970,9 @@
 </Hit>
 <Hit>
   <Hit_num>59</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|23</Hit_id>
-  <Hit_def>seq24</Hit_def>
-  <Hit_accession>23</Hit_accession>
+  <Hit_id>seq24</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq24</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -6998,9 +6998,9 @@
 </Hit>
 <Hit>
   <Hit_num>60</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|82</Hit_id>
-  <Hit_def>seq83</Hit_def>
-  <Hit_accession>82</Hit_accession>
+  <Hit_id>seq83</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq83</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7026,9 +7026,9 @@
 </Hit>
 <Hit>
   <Hit_num>61</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|25</Hit_id>
-  <Hit_def>seq26</Hit_def>
-  <Hit_accession>25</Hit_accession>
+  <Hit_id>seq26</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq26</Hit_accession>
   <Hit_len>912</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7054,9 +7054,9 @@
 </Hit>
 <Hit>
   <Hit_num>62</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|87</Hit_id>
-  <Hit_def>seq88</Hit_def>
-  <Hit_accession>87</Hit_accession>
+  <Hit_id>seq88</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq88</Hit_accession>
   <Hit_len>1046</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7082,9 +7082,9 @@
 </Hit>
 <Hit>
   <Hit_num>63</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|79</Hit_id>
-  <Hit_def>seq80</Hit_def>
-  <Hit_accession>79</Hit_accession>
+  <Hit_id>seq80</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq80</Hit_accession>
   <Hit_len>795</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7110,9 +7110,9 @@
 </Hit>
 <Hit>
   <Hit_num>64</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|83</Hit_id>
-  <Hit_def>seq84</Hit_def>
-  <Hit_accession>83</Hit_accession>
+  <Hit_id>seq84</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq84</Hit_accession>
   <Hit_len>858</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7138,9 +7138,9 @@
 </Hit>
 <Hit>
   <Hit_num>65</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|75</Hit_id>
-  <Hit_def>seq76</Hit_def>
-  <Hit_accession>75</Hit_accession>
+  <Hit_id>seq76</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq76</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7166,9 +7166,9 @@
 </Hit>
 <Hit>
   <Hit_num>66</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|78</Hit_id>
-  <Hit_def>seq79</Hit_def>
-  <Hit_accession>78</Hit_accession>
+  <Hit_id>seq79</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq79</Hit_accession>
   <Hit_len>1056</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7194,9 +7194,9 @@
 </Hit>
 <Hit>
   <Hit_num>67</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|28</Hit_id>
-  <Hit_def>seq29</Hit_def>
-  <Hit_accession>28</Hit_accession>
+  <Hit_id>seq29</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq29</Hit_accession>
   <Hit_len>942</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7222,9 +7222,9 @@
 </Hit>
 <Hit>
   <Hit_num>68</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|30</Hit_id>
-  <Hit_def>seq31</Hit_def>
-  <Hit_accession>30</Hit_accession>
+  <Hit_id>seq31</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq31</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7250,9 +7250,9 @@
 </Hit>
 <Hit>
   <Hit_num>69</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|31</Hit_id>
-  <Hit_def>seq32</Hit_def>
-  <Hit_accession>31</Hit_accession>
+  <Hit_id>seq32</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq32</Hit_accession>
   <Hit_len>902</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7278,9 +7278,9 @@
 </Hit>
 <Hit>
   <Hit_num>70</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|9</Hit_id>
-  <Hit_def>seq10</Hit_def>
-  <Hit_accession>9</Hit_accession>
+  <Hit_id>seq10</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq10</Hit_accession>
   <Hit_len>882</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7325,9 +7325,9 @@
 </Hit>
 <Hit>
   <Hit_num>71</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|0</Hit_id>
-  <Hit_def>seq1</Hit_def>
-  <Hit_accession>0</Hit_accession>
+  <Hit_id>seq1</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq1</Hit_accession>
   <Hit_len>888</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7372,9 +7372,9 @@
 </Hit>
 <Hit>
   <Hit_num>72</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|86</Hit_id>
-  <Hit_def>seq87</Hit_def>
-  <Hit_accession>86</Hit_accession>
+  <Hit_id>seq87</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq87</Hit_accession>
   <Hit_len>972</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7400,9 +7400,9 @@
 </Hit>
 <Hit>
   <Hit_num>73</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|26</Hit_id>
-  <Hit_def>seq27</Hit_def>
-  <Hit_accession>26</Hit_accession>
+  <Hit_id>seq27</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq27</Hit_accession>
   <Hit_len>856</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7428,9 +7428,9 @@
 </Hit>
 <Hit>
   <Hit_num>74</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|27</Hit_id>
-  <Hit_def>seq28</Hit_def>
-  <Hit_accession>27</Hit_accession>
+  <Hit_id>seq28</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq28</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7456,9 +7456,9 @@
 </Hit>
 <Hit>
   <Hit_num>75</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|3</Hit_id>
-  <Hit_def>seq4</Hit_def>
-  <Hit_accession>3</Hit_accession>
+  <Hit_id>seq4</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq4</Hit_accession>
   <Hit_len>901</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7503,9 +7503,9 @@
 </Hit>
 <Hit>
   <Hit_num>76</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|84</Hit_id>
-  <Hit_def>seq85</Hit_def>
-  <Hit_accession>84</Hit_accession>
+  <Hit_id>seq85</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq85</Hit_accession>
   <Hit_len>868</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7531,9 +7531,9 @@
 </Hit>
 <Hit>
   <Hit_num>77</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|29</Hit_id>
-  <Hit_def>seq30</Hit_def>
-  <Hit_accession>29</Hit_accession>
+  <Hit_id>seq30</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq30</Hit_accession>
   <Hit_len>910</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7559,9 +7559,9 @@
 </Hit>
 <Hit>
   <Hit_num>78</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|18</Hit_id>
-  <Hit_def>seq19</Hit_def>
-  <Hit_accession>18</Hit_accession>
+  <Hit_id>seq19</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq19</Hit_accession>
   <Hit_len>890</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7606,9 +7606,9 @@
 </Hit>
 <Hit>
   <Hit_num>79</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|85</Hit_id>
-  <Hit_def>seq86</Hit_def>
-  <Hit_accession>85</Hit_accession>
+  <Hit_id>seq86</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq86</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7634,9 +7634,9 @@
 </Hit>
 <Hit>
   <Hit_num>80</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|1</Hit_id>
-  <Hit_def>seq2</Hit_def>
-  <Hit_accession>1</Hit_accession>
+  <Hit_id>seq2</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq2</Hit_accession>
   <Hit_len>845</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7681,9 +7681,9 @@
 </Hit>
 <Hit>
   <Hit_num>81</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|7</Hit_id>
-  <Hit_def>seq8</Hit_def>
-  <Hit_accession>7</Hit_accession>
+  <Hit_id>seq8</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq8</Hit_accession>
   <Hit_len>897</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7728,9 +7728,9 @@
 </Hit>
 <Hit>
   <Hit_num>82</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|4</Hit_id>
-  <Hit_def>seq5</Hit_def>
-  <Hit_accession>4</Hit_accession>
+  <Hit_id>seq5</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq5</Hit_accession>
   <Hit_len>850</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7775,9 +7775,9 @@
 </Hit>
 <Hit>
   <Hit_num>83</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|6</Hit_id>
-  <Hit_def>seq7</Hit_def>
-  <Hit_accession>6</Hit_accession>
+  <Hit_id>seq7</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq7</Hit_accession>
   <Hit_len>875</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7822,9 +7822,9 @@
 </Hit>
 <Hit>
   <Hit_num>84</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|15</Hit_id>
-  <Hit_def>seq16</Hit_def>
-  <Hit_accession>15</Hit_accession>
+  <Hit_id>seq16</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq16</Hit_accession>
   <Hit_len>959</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7869,9 +7869,9 @@
 </Hit>
 <Hit>
   <Hit_num>85</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|5</Hit_id>
-  <Hit_def>seq6</Hit_def>
-  <Hit_accession>5</Hit_accession>
+  <Hit_id>seq6</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq6</Hit_accession>
   <Hit_len>933</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7916,9 +7916,9 @@
 </Hit>
 <Hit>
   <Hit_num>86</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|13</Hit_id>
-  <Hit_def>seq14</Hit_def>
-  <Hit_accession>13</Hit_accession>
+  <Hit_id>seq14</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq14</Hit_accession>
   <Hit_len>918</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -7963,9 +7963,9 @@
 </Hit>
 <Hit>
   <Hit_num>87</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|12</Hit_id>
-  <Hit_def>seq13</Hit_def>
-  <Hit_accession>12</Hit_accession>
+  <Hit_id>seq13</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq13</Hit_accession>
   <Hit_len>920</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8029,9 +8029,9 @@
 <Iteration_hits>
 <Hit>
   <Hit_num>1</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|52</Hit_id>
-  <Hit_def>seq53</Hit_def>
-  <Hit_accession>52</Hit_accession>
+  <Hit_id>seq53</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq53</Hit_accession>
   <Hit_len>634</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8057,9 +8057,9 @@
 </Hit>
 <Hit>
   <Hit_num>2</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|62</Hit_id>
-  <Hit_def>seq63</Hit_def>
-  <Hit_accession>62</Hit_accession>
+  <Hit_id>seq63</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq63</Hit_accession>
   <Hit_len>666</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8085,9 +8085,9 @@
 </Hit>
 <Hit>
   <Hit_num>3</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|48</Hit_id>
-  <Hit_def>seq49</Hit_def>
-  <Hit_accession>48</Hit_accession>
+  <Hit_id>seq49</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq49</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8113,9 +8113,9 @@
 </Hit>
 <Hit>
   <Hit_num>4</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|57</Hit_id>
-  <Hit_def>seq58</Hit_def>
-  <Hit_accession>57</Hit_accession>
+  <Hit_id>seq58</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq58</Hit_accession>
   <Hit_len>625</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8141,9 +8141,9 @@
 </Hit>
 <Hit>
   <Hit_num>5</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|58</Hit_id>
-  <Hit_def>seq59</Hit_def>
-  <Hit_accession>58</Hit_accession>
+  <Hit_id>seq59</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq59</Hit_accession>
   <Hit_len>627</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8169,9 +8169,9 @@
 </Hit>
 <Hit>
   <Hit_num>6</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|56</Hit_id>
-  <Hit_def>seq57</Hit_def>
-  <Hit_accession>56</Hit_accession>
+  <Hit_id>seq57</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq57</Hit_accession>
   <Hit_len>708</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8197,9 +8197,9 @@
 </Hit>
 <Hit>
   <Hit_num>7</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|54</Hit_id>
-  <Hit_def>seq55</Hit_def>
-  <Hit_accession>54</Hit_accession>
+  <Hit_id>seq55</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq55</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8225,9 +8225,9 @@
 </Hit>
 <Hit>
   <Hit_num>8</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|55</Hit_id>
-  <Hit_def>seq56</Hit_def>
-  <Hit_accession>55</Hit_accession>
+  <Hit_id>seq56</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq56</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8253,9 +8253,9 @@
 </Hit>
 <Hit>
   <Hit_num>9</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|61</Hit_id>
-  <Hit_def>seq62</Hit_def>
-  <Hit_accession>61</Hit_accession>
+  <Hit_id>seq62</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq62</Hit_accession>
   <Hit_len>711</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8281,9 +8281,9 @@
 </Hit>
 <Hit>
   <Hit_num>10</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|59</Hit_id>
-  <Hit_def>seq60</Hit_def>
-  <Hit_accession>59</Hit_accession>
+  <Hit_id>seq60</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq60</Hit_accession>
   <Hit_len>705</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8309,9 +8309,9 @@
 </Hit>
 <Hit>
   <Hit_num>11</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|64</Hit_id>
-  <Hit_def>seq65</Hit_def>
-  <Hit_accession>64</Hit_accession>
+  <Hit_id>seq65</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq65</Hit_accession>
   <Hit_len>656</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8337,9 +8337,9 @@
 </Hit>
 <Hit>
   <Hit_num>12</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|46</Hit_id>
-  <Hit_def>seq47</Hit_def>
-  <Hit_accession>46</Hit_accession>
+  <Hit_id>seq47</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq47</Hit_accession>
   <Hit_len>796</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8365,9 +8365,9 @@
 </Hit>
 <Hit>
   <Hit_num>13</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|37</Hit_id>
-  <Hit_def>seq38</Hit_def>
-  <Hit_accession>37</Hit_accession>
+  <Hit_id>seq38</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq38</Hit_accession>
   <Hit_len>798</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8393,9 +8393,9 @@
 </Hit>
 <Hit>
   <Hit_num>14</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|53</Hit_id>
-  <Hit_def>seq54</Hit_def>
-  <Hit_accession>53</Hit_accession>
+  <Hit_id>seq54</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq54</Hit_accession>
   <Hit_len>700</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8421,9 +8421,9 @@
 </Hit>
 <Hit>
   <Hit_num>15</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|60</Hit_id>
-  <Hit_def>seq61</Hit_def>
-  <Hit_accession>60</Hit_accession>
+  <Hit_id>seq61</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq61</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8449,9 +8449,9 @@
 </Hit>
 <Hit>
   <Hit_num>16</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|39</Hit_id>
-  <Hit_def>seq40</Hit_def>
-  <Hit_accession>39</Hit_accession>
+  <Hit_id>seq40</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq40</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8477,9 +8477,9 @@
 </Hit>
 <Hit>
   <Hit_num>17</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|33</Hit_id>
-  <Hit_def>seq34</Hit_def>
-  <Hit_accession>33</Hit_accession>
+  <Hit_id>seq34</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq34</Hit_accession>
   <Hit_len>818</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8505,9 +8505,9 @@
 </Hit>
 <Hit>
   <Hit_num>18</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|40</Hit_id>
-  <Hit_def>seq41</Hit_def>
-  <Hit_accession>40</Hit_accession>
+  <Hit_id>seq41</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq41</Hit_accession>
   <Hit_len>791</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8533,9 +8533,9 @@
 </Hit>
 <Hit>
   <Hit_num>19</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|49</Hit_id>
-  <Hit_def>seq50</Hit_def>
-  <Hit_accession>49</Hit_accession>
+  <Hit_id>seq50</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq50</Hit_accession>
   <Hit_len>788</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8561,9 +8561,9 @@
 </Hit>
 <Hit>
   <Hit_num>20</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|35</Hit_id>
-  <Hit_def>seq36</Hit_def>
-  <Hit_accession>35</Hit_accession>
+  <Hit_id>seq36</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq36</Hit_accession>
   <Hit_len>828</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8589,9 +8589,9 @@
 </Hit>
 <Hit>
   <Hit_num>21</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|65</Hit_id>
-  <Hit_def>seq66</Hit_def>
-  <Hit_accession>65</Hit_accession>
+  <Hit_id>seq66</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq66</Hit_accession>
   <Hit_len>658</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8617,9 +8617,9 @@
 </Hit>
 <Hit>
   <Hit_num>22</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|42</Hit_id>
-  <Hit_def>seq43</Hit_def>
-  <Hit_accession>42</Hit_accession>
+  <Hit_id>seq43</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq43</Hit_accession>
   <Hit_len>802</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8645,9 +8645,9 @@
 </Hit>
 <Hit>
   <Hit_num>23</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|45</Hit_id>
-  <Hit_def>seq46</Hit_def>
-  <Hit_accession>45</Hit_accession>
+  <Hit_id>seq46</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq46</Hit_accession>
   <Hit_len>949</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8673,9 +8673,9 @@
 </Hit>
 <Hit>
   <Hit_num>24</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|38</Hit_id>
-  <Hit_def>seq39</Hit_def>
-  <Hit_accession>38</Hit_accession>
+  <Hit_id>seq39</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq39</Hit_accession>
   <Hit_len>737</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8701,9 +8701,9 @@
 </Hit>
 <Hit>
   <Hit_num>25</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|63</Hit_id>
-  <Hit_def>seq64</Hit_def>
-  <Hit_accession>63</Hit_accession>
+  <Hit_id>seq64</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq64</Hit_accession>
   <Hit_len>710</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8729,9 +8729,9 @@
 </Hit>
 <Hit>
   <Hit_num>26</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|44</Hit_id>
-  <Hit_def>seq45</Hit_def>
-  <Hit_accession>44</Hit_accession>
+  <Hit_id>seq45</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq45</Hit_accession>
   <Hit_len>742</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8757,9 +8757,9 @@
 </Hit>
 <Hit>
   <Hit_num>27</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|50</Hit_id>
-  <Hit_def>seq51</Hit_def>
-  <Hit_accession>50</Hit_accession>
+  <Hit_id>seq51</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq51</Hit_accession>
   <Hit_len>699</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8785,9 +8785,9 @@
 </Hit>
 <Hit>
   <Hit_num>28</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|41</Hit_id>
-  <Hit_def>seq42</Hit_def>
-  <Hit_accession>41</Hit_accession>
+  <Hit_id>seq42</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq42</Hit_accession>
   <Hit_len>671</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8813,9 +8813,9 @@
 </Hit>
 <Hit>
   <Hit_num>29</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|32</Hit_id>
-  <Hit_def>seq33</Hit_def>
-  <Hit_accession>32</Hit_accession>
+  <Hit_id>seq33</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq33</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8841,9 +8841,9 @@
 </Hit>
 <Hit>
   <Hit_num>30</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|51</Hit_id>
-  <Hit_def>seq52</Hit_def>
-  <Hit_accession>51</Hit_accession>
+  <Hit_id>seq52</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq52</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8869,9 +8869,9 @@
 </Hit>
 <Hit>
   <Hit_num>31</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|34</Hit_id>
-  <Hit_def>seq35</Hit_def>
-  <Hit_accession>34</Hit_accession>
+  <Hit_id>seq35</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq35</Hit_accession>
   <Hit_len>838</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8897,9 +8897,9 @@
 </Hit>
 <Hit>
   <Hit_num>32</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|80</Hit_id>
-  <Hit_def>seq81</Hit_def>
-  <Hit_accession>80</Hit_accession>
+  <Hit_id>seq81</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq81</Hit_accession>
   <Hit_len>601</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8925,9 +8925,9 @@
 </Hit>
 <Hit>
   <Hit_num>33</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|36</Hit_id>
-  <Hit_def>seq37</Hit_def>
-  <Hit_accession>36</Hit_accession>
+  <Hit_id>seq37</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq37</Hit_accession>
   <Hit_len>701</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8953,9 +8953,9 @@
 </Hit>
 <Hit>
   <Hit_num>34</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|81</Hit_id>
-  <Hit_def>seq82</Hit_def>
-  <Hit_accession>81</Hit_accession>
+  <Hit_id>seq82</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq82</Hit_accession>
   <Hit_len>623</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -8981,9 +8981,9 @@
 </Hit>
 <Hit>
   <Hit_num>35</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|43</Hit_id>
-  <Hit_def>seq44</Hit_def>
-  <Hit_accession>43</Hit_accession>
+  <Hit_id>seq44</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq44</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9009,9 +9009,9 @@
 </Hit>
 <Hit>
   <Hit_num>36</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|74</Hit_id>
-  <Hit_def>seq75</Hit_def>
-  <Hit_accession>74</Hit_accession>
+  <Hit_id>seq75</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq75</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9037,9 +9037,9 @@
 </Hit>
 <Hit>
   <Hit_num>37</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|47</Hit_id>
-  <Hit_def>seq48</Hit_def>
-  <Hit_accession>47</Hit_accession>
+  <Hit_id>seq48</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq48</Hit_accession>
   <Hit_len>709</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9065,9 +9065,9 @@
 </Hit>
 <Hit>
   <Hit_num>38</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|73</Hit_id>
-  <Hit_def>seq74</Hit_def>
-  <Hit_accession>73</Hit_accession>
+  <Hit_id>seq74</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq74</Hit_accession>
   <Hit_len>675</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9093,9 +9093,9 @@
 </Hit>
 <Hit>
   <Hit_num>39</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|72</Hit_id>
-  <Hit_def>seq73</Hit_def>
-  <Hit_accession>72</Hit_accession>
+  <Hit_id>seq73</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq73</Hit_accession>
   <Hit_len>673</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9121,9 +9121,9 @@
 </Hit>
 <Hit>
   <Hit_num>40</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|67</Hit_id>
-  <Hit_def>seq68</Hit_def>
-  <Hit_accession>67</Hit_accession>
+  <Hit_id>seq68</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq68</Hit_accession>
   <Hit_len>685</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9149,9 +9149,9 @@
 </Hit>
 <Hit>
   <Hit_num>41</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|69</Hit_id>
-  <Hit_def>seq70</Hit_def>
-  <Hit_accession>69</Hit_accession>
+  <Hit_id>seq70</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq70</Hit_accession>
   <Hit_len>677</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9177,9 +9177,9 @@
 </Hit>
 <Hit>
   <Hit_num>42</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|70</Hit_id>
-  <Hit_def>seq71</Hit_def>
-  <Hit_accession>70</Hit_accession>
+  <Hit_id>seq71</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq71</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9205,9 +9205,9 @@
 </Hit>
 <Hit>
   <Hit_num>43</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|68</Hit_id>
-  <Hit_def>seq69</Hit_def>
-  <Hit_accession>68</Hit_accession>
+  <Hit_id>seq69</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq69</Hit_accession>
   <Hit_len>676</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9233,9 +9233,9 @@
 </Hit>
 <Hit>
   <Hit_num>44</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|66</Hit_id>
-  <Hit_def>seq67</Hit_def>
-  <Hit_accession>66</Hit_accession>
+  <Hit_id>seq67</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq67</Hit_accession>
   <Hit_len>697</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9261,9 +9261,9 @@
 </Hit>
 <Hit>
   <Hit_num>45</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|71</Hit_id>
-  <Hit_def>seq72</Hit_def>
-  <Hit_accession>71</Hit_accession>
+  <Hit_id>seq72</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq72</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9289,9 +9289,9 @@
 </Hit>
 <Hit>
   <Hit_num>46</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|83</Hit_id>
-  <Hit_def>seq84</Hit_def>
-  <Hit_accession>83</Hit_accession>
+  <Hit_id>seq84</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq84</Hit_accession>
   <Hit_len>858</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9317,9 +9317,9 @@
 </Hit>
 <Hit>
   <Hit_num>47</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|75</Hit_id>
-  <Hit_def>seq76</Hit_def>
-  <Hit_accession>75</Hit_accession>
+  <Hit_id>seq76</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq76</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9345,9 +9345,9 @@
 </Hit>
 <Hit>
   <Hit_num>48</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|22</Hit_id>
-  <Hit_def>seq23</Hit_def>
-  <Hit_accession>22</Hit_accession>
+  <Hit_id>seq23</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq23</Hit_accession>
   <Hit_len>878</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9373,9 +9373,9 @@
 </Hit>
 <Hit>
   <Hit_num>49</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|28</Hit_id>
-  <Hit_def>seq29</Hit_def>
-  <Hit_accession>28</Hit_accession>
+  <Hit_id>seq29</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq29</Hit_accession>
   <Hit_len>942</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9401,9 +9401,9 @@
 </Hit>
 <Hit>
   <Hit_num>50</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|76</Hit_id>
-  <Hit_def>seq77</Hit_def>
-  <Hit_accession>76</Hit_accession>
+  <Hit_id>seq77</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq77</Hit_accession>
   <Hit_len>778</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9429,9 +9429,9 @@
 </Hit>
 <Hit>
   <Hit_num>51</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|8</Hit_id>
-  <Hit_def>seq9</Hit_def>
-  <Hit_accession>8</Hit_accession>
+  <Hit_id>seq9</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq9</Hit_accession>
   <Hit_len>876</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9457,9 +9457,9 @@
 </Hit>
 <Hit>
   <Hit_num>52</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|1</Hit_id>
-  <Hit_def>seq2</Hit_def>
-  <Hit_accession>1</Hit_accession>
+  <Hit_id>seq2</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq2</Hit_accession>
   <Hit_len>845</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9485,9 +9485,9 @@
 </Hit>
 <Hit>
   <Hit_num>53</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|77</Hit_id>
-  <Hit_def>seq78</Hit_def>
-  <Hit_accession>77</Hit_accession>
+  <Hit_id>seq78</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq78</Hit_accession>
   <Hit_len>809</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9513,9 +9513,9 @@
 </Hit>
 <Hit>
   <Hit_num>54</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|27</Hit_id>
-  <Hit_def>seq28</Hit_def>
-  <Hit_accession>27</Hit_accession>
+  <Hit_id>seq28</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq28</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9541,9 +9541,9 @@
 </Hit>
 <Hit>
   <Hit_num>55</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|29</Hit_id>
-  <Hit_def>seq30</Hit_def>
-  <Hit_accession>29</Hit_accession>
+  <Hit_id>seq30</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq30</Hit_accession>
   <Hit_len>910</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9569,9 +9569,9 @@
 </Hit>
 <Hit>
   <Hit_num>56</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|26</Hit_id>
-  <Hit_def>seq27</Hit_def>
-  <Hit_accession>26</Hit_accession>
+  <Hit_id>seq27</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq27</Hit_accession>
   <Hit_len>856</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9597,9 +9597,9 @@
 </Hit>
 <Hit>
   <Hit_num>57</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|31</Hit_id>
-  <Hit_def>seq32</Hit_def>
-  <Hit_accession>31</Hit_accession>
+  <Hit_id>seq32</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq32</Hit_accession>
   <Hit_len>902</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9625,9 +9625,9 @@
 </Hit>
 <Hit>
   <Hit_num>58</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|79</Hit_id>
-  <Hit_def>seq80</Hit_def>
-  <Hit_accession>79</Hit_accession>
+  <Hit_id>seq80</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq80</Hit_accession>
   <Hit_len>795</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9653,9 +9653,9 @@
 </Hit>
 <Hit>
   <Hit_num>59</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|9</Hit_id>
-  <Hit_def>seq10</Hit_def>
-  <Hit_accession>9</Hit_accession>
+  <Hit_id>seq10</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq10</Hit_accession>
   <Hit_len>882</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9700,9 +9700,9 @@
 </Hit>
 <Hit>
   <Hit_num>60</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|0</Hit_id>
-  <Hit_def>seq1</Hit_def>
-  <Hit_accession>0</Hit_accession>
+  <Hit_id>seq1</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq1</Hit_accession>
   <Hit_len>888</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9747,9 +9747,9 @@
 </Hit>
 <Hit>
   <Hit_num>61</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|24</Hit_id>
-  <Hit_def>seq25</Hit_def>
-  <Hit_accession>24</Hit_accession>
+  <Hit_id>seq25</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq25</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9775,9 +9775,9 @@
 </Hit>
 <Hit>
   <Hit_num>62</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|17</Hit_id>
-  <Hit_def>seq18</Hit_def>
-  <Hit_accession>17</Hit_accession>
+  <Hit_id>seq18</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq18</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9822,9 +9822,9 @@
 </Hit>
 <Hit>
   <Hit_num>63</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|19</Hit_id>
-  <Hit_def>seq20</Hit_def>
-  <Hit_accession>19</Hit_accession>
+  <Hit_id>seq20</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq20</Hit_accession>
   <Hit_len>871</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9869,9 +9869,9 @@
 </Hit>
 <Hit>
   <Hit_num>64</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|6</Hit_id>
-  <Hit_def>seq7</Hit_def>
-  <Hit_accession>6</Hit_accession>
+  <Hit_id>seq7</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq7</Hit_accession>
   <Hit_len>875</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9916,9 +9916,9 @@
 </Hit>
 <Hit>
   <Hit_num>65</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|16</Hit_id>
-  <Hit_def>seq17</Hit_def>
-  <Hit_accession>16</Hit_accession>
+  <Hit_id>seq17</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq17</Hit_accession>
   <Hit_len>885</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9944,9 +9944,9 @@
 </Hit>
 <Hit>
   <Hit_num>66</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|4</Hit_id>
-  <Hit_def>seq5</Hit_def>
-  <Hit_accession>4</Hit_accession>
+  <Hit_id>seq5</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq5</Hit_accession>
   <Hit_len>850</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -9991,9 +9991,9 @@
 </Hit>
 <Hit>
   <Hit_num>67</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|11</Hit_id>
-  <Hit_def>seq12</Hit_def>
-  <Hit_accession>11</Hit_accession>
+  <Hit_id>seq12</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq12</Hit_accession>
   <Hit_len>968</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10038,9 +10038,9 @@
 </Hit>
 <Hit>
   <Hit_num>68</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|85</Hit_id>
-  <Hit_def>seq86</Hit_def>
-  <Hit_accession>85</Hit_accession>
+  <Hit_id>seq86</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq86</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10066,9 +10066,9 @@
 </Hit>
 <Hit>
   <Hit_num>69</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|2</Hit_id>
-  <Hit_def>seq3</Hit_def>
-  <Hit_accession>2</Hit_accession>
+  <Hit_id>seq3</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq3</Hit_accession>
   <Hit_len>881</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10113,9 +10113,9 @@
 </Hit>
 <Hit>
   <Hit_num>70</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|10</Hit_id>
-  <Hit_def>seq11</Hit_def>
-  <Hit_accession>10</Hit_accession>
+  <Hit_id>seq11</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq11</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10160,9 +10160,9 @@
 </Hit>
 <Hit>
   <Hit_num>71</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|84</Hit_id>
-  <Hit_def>seq85</Hit_def>
-  <Hit_accession>84</Hit_accession>
+  <Hit_id>seq85</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq85</Hit_accession>
   <Hit_len>868</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10188,9 +10188,9 @@
 </Hit>
 <Hit>
   <Hit_num>72</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|86</Hit_id>
-  <Hit_def>seq87</Hit_def>
-  <Hit_accession>86</Hit_accession>
+  <Hit_id>seq87</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq87</Hit_accession>
   <Hit_len>972</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10216,9 +10216,9 @@
 </Hit>
 <Hit>
   <Hit_num>73</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|78</Hit_id>
-  <Hit_def>seq79</Hit_def>
-  <Hit_accession>78</Hit_accession>
+  <Hit_id>seq79</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq79</Hit_accession>
   <Hit_len>1056</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10244,9 +10244,9 @@
 </Hit>
 <Hit>
   <Hit_num>74</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|5</Hit_id>
-  <Hit_def>seq6</Hit_def>
-  <Hit_accession>5</Hit_accession>
+  <Hit_id>seq6</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq6</Hit_accession>
   <Hit_len>933</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10291,9 +10291,9 @@
 </Hit>
 <Hit>
   <Hit_num>75</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|18</Hit_id>
-  <Hit_def>seq19</Hit_def>
-  <Hit_accession>18</Hit_accession>
+  <Hit_id>seq19</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq19</Hit_accession>
   <Hit_len>890</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10338,9 +10338,9 @@
 </Hit>
 <Hit>
   <Hit_num>76</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|30</Hit_id>
-  <Hit_def>seq31</Hit_def>
-  <Hit_accession>30</Hit_accession>
+  <Hit_id>seq31</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq31</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10366,9 +10366,9 @@
 </Hit>
 <Hit>
   <Hit_num>77</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|3</Hit_id>
-  <Hit_def>seq4</Hit_def>
-  <Hit_accession>3</Hit_accession>
+  <Hit_id>seq4</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq4</Hit_accession>
   <Hit_len>901</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10394,9 +10394,9 @@
 </Hit>
 <Hit>
   <Hit_num>78</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|82</Hit_id>
-  <Hit_def>seq83</Hit_def>
-  <Hit_accession>82</Hit_accession>
+  <Hit_id>seq83</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq83</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10422,9 +10422,9 @@
 </Hit>
 <Hit>
   <Hit_num>79</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|15</Hit_id>
-  <Hit_def>seq16</Hit_def>
-  <Hit_accession>15</Hit_accession>
+  <Hit_id>seq16</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq16</Hit_accession>
   <Hit_len>959</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10469,9 +10469,9 @@
 </Hit>
 <Hit>
   <Hit_num>80</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|23</Hit_id>
-  <Hit_def>seq24</Hit_def>
-  <Hit_accession>23</Hit_accession>
+  <Hit_id>seq24</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq24</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10516,9 +10516,9 @@
 </Hit>
 <Hit>
   <Hit_num>81</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|12</Hit_id>
-  <Hit_def>seq13</Hit_def>
-  <Hit_accession>12</Hit_accession>
+  <Hit_id>seq13</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq13</Hit_accession>
   <Hit_len>920</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10544,9 +10544,9 @@
 </Hit>
 <Hit>
   <Hit_num>82</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|14</Hit_id>
-  <Hit_def>seq15</Hit_def>
-  <Hit_accession>14</Hit_accession>
+  <Hit_id>seq15</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq15</Hit_accession>
   <Hit_len>894</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10591,9 +10591,9 @@
 </Hit>
 <Hit>
   <Hit_num>83</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|20</Hit_id>
-  <Hit_def>seq21</Hit_def>
-  <Hit_accession>20</Hit_accession>
+  <Hit_id>seq21</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq21</Hit_accession>
   <Hit_len>982</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10638,9 +10638,9 @@
 </Hit>
 <Hit>
   <Hit_num>84</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|87</Hit_id>
-  <Hit_def>seq88</Hit_def>
-  <Hit_accession>87</Hit_accession>
+  <Hit_id>seq88</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq88</Hit_accession>
   <Hit_len>1046</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10666,9 +10666,9 @@
 </Hit>
 <Hit>
   <Hit_num>85</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|25</Hit_id>
-  <Hit_def>seq26</Hit_def>
-  <Hit_accession>25</Hit_accession>
+  <Hit_id>seq26</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq26</Hit_accession>
   <Hit_len>912</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10694,9 +10694,9 @@
 </Hit>
 <Hit>
   <Hit_num>86</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|13</Hit_id>
-  <Hit_def>seq14</Hit_def>
-  <Hit_accession>13</Hit_accession>
+  <Hit_id>seq14</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq14</Hit_accession>
   <Hit_len>918</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10741,9 +10741,9 @@
 </Hit>
 <Hit>
   <Hit_num>87</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|7</Hit_id>
-  <Hit_def>seq8</Hit_def>
-  <Hit_accession>7</Hit_accession>
+  <Hit_id>seq8</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq8</Hit_accession>
   <Hit_len>897</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10788,9 +10788,9 @@
 <Iteration_hits>
 <Hit>
   <Hit_num>1</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|68</Hit_id>
-  <Hit_def>seq69</Hit_def>
-  <Hit_accession>68</Hit_accession>
+  <Hit_id>seq69</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq69</Hit_accession>
   <Hit_len>676</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10816,9 +10816,9 @@
 </Hit>
 <Hit>
   <Hit_num>2</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|70</Hit_id>
-  <Hit_def>seq71</Hit_def>
-  <Hit_accession>70</Hit_accession>
+  <Hit_id>seq71</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq71</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10844,9 +10844,9 @@
 </Hit>
 <Hit>
   <Hit_num>3</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|69</Hit_id>
-  <Hit_def>seq70</Hit_def>
-  <Hit_accession>69</Hit_accession>
+  <Hit_id>seq70</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq70</Hit_accession>
   <Hit_len>677</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10872,9 +10872,9 @@
 </Hit>
 <Hit>
   <Hit_num>4</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|66</Hit_id>
-  <Hit_def>seq67</Hit_def>
-  <Hit_accession>66</Hit_accession>
+  <Hit_id>seq67</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq67</Hit_accession>
   <Hit_len>697</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10900,9 +10900,9 @@
 </Hit>
 <Hit>
   <Hit_num>5</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|74</Hit_id>
-  <Hit_def>seq75</Hit_def>
-  <Hit_accession>74</Hit_accession>
+  <Hit_id>seq75</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq75</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10928,9 +10928,9 @@
 </Hit>
 <Hit>
   <Hit_num>6</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|71</Hit_id>
-  <Hit_def>seq72</Hit_def>
-  <Hit_accession>71</Hit_accession>
+  <Hit_id>seq72</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq72</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10956,9 +10956,9 @@
 </Hit>
 <Hit>
   <Hit_num>7</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|72</Hit_id>
-  <Hit_def>seq73</Hit_def>
-  <Hit_accession>72</Hit_accession>
+  <Hit_id>seq73</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq73</Hit_accession>
   <Hit_len>673</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -10984,9 +10984,9 @@
 </Hit>
 <Hit>
   <Hit_num>8</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|67</Hit_id>
-  <Hit_def>seq68</Hit_def>
-  <Hit_accession>67</Hit_accession>
+  <Hit_id>seq68</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq68</Hit_accession>
   <Hit_len>685</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11012,9 +11012,9 @@
 </Hit>
 <Hit>
   <Hit_num>9</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|73</Hit_id>
-  <Hit_def>seq74</Hit_def>
-  <Hit_accession>73</Hit_accession>
+  <Hit_id>seq74</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq74</Hit_accession>
   <Hit_len>675</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11040,9 +11040,9 @@
 </Hit>
 <Hit>
   <Hit_num>10</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|34</Hit_id>
-  <Hit_def>seq35</Hit_def>
-  <Hit_accession>34</Hit_accession>
+  <Hit_id>seq35</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq35</Hit_accession>
   <Hit_len>838</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11068,9 +11068,9 @@
 </Hit>
 <Hit>
   <Hit_num>11</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|33</Hit_id>
-  <Hit_def>seq34</Hit_def>
-  <Hit_accession>33</Hit_accession>
+  <Hit_id>seq34</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq34</Hit_accession>
   <Hit_len>818</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11096,9 +11096,9 @@
 </Hit>
 <Hit>
   <Hit_num>12</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|46</Hit_id>
-  <Hit_def>seq47</Hit_def>
-  <Hit_accession>46</Hit_accession>
+  <Hit_id>seq47</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq47</Hit_accession>
   <Hit_len>796</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11124,9 +11124,9 @@
 </Hit>
 <Hit>
   <Hit_num>13</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|35</Hit_id>
-  <Hit_def>seq36</Hit_def>
-  <Hit_accession>35</Hit_accession>
+  <Hit_id>seq36</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq36</Hit_accession>
   <Hit_len>828</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11152,9 +11152,9 @@
 </Hit>
 <Hit>
   <Hit_num>14</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|37</Hit_id>
-  <Hit_def>seq38</Hit_def>
-  <Hit_accession>37</Hit_accession>
+  <Hit_id>seq38</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq38</Hit_accession>
   <Hit_len>798</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11180,9 +11180,9 @@
 </Hit>
 <Hit>
   <Hit_num>15</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|32</Hit_id>
-  <Hit_def>seq33</Hit_def>
-  <Hit_accession>32</Hit_accession>
+  <Hit_id>seq33</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq33</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11208,9 +11208,9 @@
 </Hit>
 <Hit>
   <Hit_num>16</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|48</Hit_id>
-  <Hit_def>seq49</Hit_def>
-  <Hit_accession>48</Hit_accession>
+  <Hit_id>seq49</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq49</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11236,9 +11236,9 @@
 </Hit>
 <Hit>
   <Hit_num>17</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|39</Hit_id>
-  <Hit_def>seq40</Hit_def>
-  <Hit_accession>39</Hit_accession>
+  <Hit_id>seq40</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq40</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11264,9 +11264,9 @@
 </Hit>
 <Hit>
   <Hit_num>18</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|42</Hit_id>
-  <Hit_def>seq43</Hit_def>
-  <Hit_accession>42</Hit_accession>
+  <Hit_id>seq43</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq43</Hit_accession>
   <Hit_len>802</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11292,9 +11292,9 @@
 </Hit>
 <Hit>
   <Hit_num>19</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|45</Hit_id>
-  <Hit_def>seq46</Hit_def>
-  <Hit_accession>45</Hit_accession>
+  <Hit_id>seq46</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq46</Hit_accession>
   <Hit_len>949</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11320,9 +11320,9 @@
 </Hit>
 <Hit>
   <Hit_num>20</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|41</Hit_id>
-  <Hit_def>seq42</Hit_def>
-  <Hit_accession>41</Hit_accession>
+  <Hit_id>seq42</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq42</Hit_accession>
   <Hit_len>671</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11348,9 +11348,9 @@
 </Hit>
 <Hit>
   <Hit_num>21</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|56</Hit_id>
-  <Hit_def>seq57</Hit_def>
-  <Hit_accession>56</Hit_accession>
+  <Hit_id>seq57</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq57</Hit_accession>
   <Hit_len>708</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11376,9 +11376,9 @@
 </Hit>
 <Hit>
   <Hit_num>22</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|38</Hit_id>
-  <Hit_def>seq39</Hit_def>
-  <Hit_accession>38</Hit_accession>
+  <Hit_id>seq39</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq39</Hit_accession>
   <Hit_len>737</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11404,9 +11404,9 @@
 </Hit>
 <Hit>
   <Hit_num>23</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|64</Hit_id>
-  <Hit_def>seq65</Hit_def>
-  <Hit_accession>64</Hit_accession>
+  <Hit_id>seq65</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq65</Hit_accession>
   <Hit_len>656</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11432,9 +11432,9 @@
 </Hit>
 <Hit>
   <Hit_num>24</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|58</Hit_id>
-  <Hit_def>seq59</Hit_def>
-  <Hit_accession>58</Hit_accession>
+  <Hit_id>seq59</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq59</Hit_accession>
   <Hit_len>627</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11460,9 +11460,9 @@
 </Hit>
 <Hit>
   <Hit_num>25</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|40</Hit_id>
-  <Hit_def>seq41</Hit_def>
-  <Hit_accession>40</Hit_accession>
+  <Hit_id>seq41</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq41</Hit_accession>
   <Hit_len>791</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11488,9 +11488,9 @@
 </Hit>
 <Hit>
   <Hit_num>26</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|57</Hit_id>
-  <Hit_def>seq58</Hit_def>
-  <Hit_accession>57</Hit_accession>
+  <Hit_id>seq58</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq58</Hit_accession>
   <Hit_len>625</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11516,9 +11516,9 @@
 </Hit>
 <Hit>
   <Hit_num>27</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|52</Hit_id>
-  <Hit_def>seq53</Hit_def>
-  <Hit_accession>52</Hit_accession>
+  <Hit_id>seq53</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq53</Hit_accession>
   <Hit_len>634</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11544,9 +11544,9 @@
 </Hit>
 <Hit>
   <Hit_num>28</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|49</Hit_id>
-  <Hit_def>seq50</Hit_def>
-  <Hit_accession>49</Hit_accession>
+  <Hit_id>seq50</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq50</Hit_accession>
   <Hit_len>788</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11572,9 +11572,9 @@
 </Hit>
 <Hit>
   <Hit_num>29</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|54</Hit_id>
-  <Hit_def>seq55</Hit_def>
-  <Hit_accession>54</Hit_accession>
+  <Hit_id>seq55</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq55</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11600,9 +11600,9 @@
 </Hit>
 <Hit>
   <Hit_num>30</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|55</Hit_id>
-  <Hit_def>seq56</Hit_def>
-  <Hit_accession>55</Hit_accession>
+  <Hit_id>seq56</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq56</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11628,9 +11628,9 @@
 </Hit>
 <Hit>
   <Hit_num>31</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|65</Hit_id>
-  <Hit_def>seq66</Hit_def>
-  <Hit_accession>65</Hit_accession>
+  <Hit_id>seq66</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq66</Hit_accession>
   <Hit_len>658</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11656,9 +11656,9 @@
 </Hit>
 <Hit>
   <Hit_num>32</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|61</Hit_id>
-  <Hit_def>seq62</Hit_def>
-  <Hit_accession>61</Hit_accession>
+  <Hit_id>seq62</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq62</Hit_accession>
   <Hit_len>711</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11684,9 +11684,9 @@
 </Hit>
 <Hit>
   <Hit_num>33</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|36</Hit_id>
-  <Hit_def>seq37</Hit_def>
-  <Hit_accession>36</Hit_accession>
+  <Hit_id>seq37</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq37</Hit_accession>
   <Hit_len>701</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11712,9 +11712,9 @@
 </Hit>
 <Hit>
   <Hit_num>34</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|44</Hit_id>
-  <Hit_def>seq45</Hit_def>
-  <Hit_accession>44</Hit_accession>
+  <Hit_id>seq45</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq45</Hit_accession>
   <Hit_len>742</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11740,9 +11740,9 @@
 </Hit>
 <Hit>
   <Hit_num>35</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|43</Hit_id>
-  <Hit_def>seq44</Hit_def>
-  <Hit_accession>43</Hit_accession>
+  <Hit_id>seq44</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq44</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11768,9 +11768,9 @@
 </Hit>
 <Hit>
   <Hit_num>36</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|77</Hit_id>
-  <Hit_def>seq78</Hit_def>
-  <Hit_accession>77</Hit_accession>
+  <Hit_id>seq78</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq78</Hit_accession>
   <Hit_len>809</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11796,9 +11796,9 @@
 </Hit>
 <Hit>
   <Hit_num>37</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|17</Hit_id>
-  <Hit_def>seq18</Hit_def>
-  <Hit_accession>17</Hit_accession>
+  <Hit_id>seq18</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq18</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11824,9 +11824,9 @@
 </Hit>
 <Hit>
   <Hit_num>38</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|53</Hit_id>
-  <Hit_def>seq54</Hit_def>
-  <Hit_accession>53</Hit_accession>
+  <Hit_id>seq54</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq54</Hit_accession>
   <Hit_len>700</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11852,9 +11852,9 @@
 </Hit>
 <Hit>
   <Hit_num>39</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|9</Hit_id>
-  <Hit_def>seq10</Hit_def>
-  <Hit_accession>9</Hit_accession>
+  <Hit_id>seq10</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq10</Hit_accession>
   <Hit_len>882</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11880,9 +11880,9 @@
 </Hit>
 <Hit>
   <Hit_num>40</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|78</Hit_id>
-  <Hit_def>seq79</Hit_def>
-  <Hit_accession>78</Hit_accession>
+  <Hit_id>seq79</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq79</Hit_accession>
   <Hit_len>1056</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11908,9 +11908,9 @@
 </Hit>
 <Hit>
   <Hit_num>41</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|63</Hit_id>
-  <Hit_def>seq64</Hit_def>
-  <Hit_accession>63</Hit_accession>
+  <Hit_id>seq64</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq64</Hit_accession>
   <Hit_len>710</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11936,9 +11936,9 @@
 </Hit>
 <Hit>
   <Hit_num>42</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|60</Hit_id>
-  <Hit_def>seq61</Hit_def>
-  <Hit_accession>60</Hit_accession>
+  <Hit_id>seq61</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq61</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11964,9 +11964,9 @@
 </Hit>
 <Hit>
   <Hit_num>43</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|62</Hit_id>
-  <Hit_def>seq63</Hit_def>
-  <Hit_accession>62</Hit_accession>
+  <Hit_id>seq63</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq63</Hit_accession>
   <Hit_len>666</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -11992,9 +11992,9 @@
 </Hit>
 <Hit>
   <Hit_num>44</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|76</Hit_id>
-  <Hit_def>seq77</Hit_def>
-  <Hit_accession>76</Hit_accession>
+  <Hit_id>seq77</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq77</Hit_accession>
   <Hit_len>778</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12020,9 +12020,9 @@
 </Hit>
 <Hit>
   <Hit_num>45</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|75</Hit_id>
-  <Hit_def>seq76</Hit_def>
-  <Hit_accession>75</Hit_accession>
+  <Hit_id>seq76</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq76</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12048,9 +12048,9 @@
 </Hit>
 <Hit>
   <Hit_num>46</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|2</Hit_id>
-  <Hit_def>seq3</Hit_def>
-  <Hit_accession>2</Hit_accession>
+  <Hit_id>seq3</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq3</Hit_accession>
   <Hit_len>881</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12076,9 +12076,9 @@
 </Hit>
 <Hit>
   <Hit_num>47</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|0</Hit_id>
-  <Hit_def>seq1</Hit_def>
-  <Hit_accession>0</Hit_accession>
+  <Hit_id>seq1</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq1</Hit_accession>
   <Hit_len>888</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12104,9 +12104,9 @@
 </Hit>
 <Hit>
   <Hit_num>48</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|81</Hit_id>
-  <Hit_def>seq82</Hit_def>
-  <Hit_accession>81</Hit_accession>
+  <Hit_id>seq82</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq82</Hit_accession>
   <Hit_len>623</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12132,9 +12132,9 @@
 </Hit>
 <Hit>
   <Hit_num>49</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|80</Hit_id>
-  <Hit_def>seq81</Hit_def>
-  <Hit_accession>80</Hit_accession>
+  <Hit_id>seq81</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq81</Hit_accession>
   <Hit_len>601</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12160,9 +12160,9 @@
 </Hit>
 <Hit>
   <Hit_num>50</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|7</Hit_id>
-  <Hit_def>seq8</Hit_def>
-  <Hit_accession>7</Hit_accession>
+  <Hit_id>seq8</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq8</Hit_accession>
   <Hit_len>897</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12188,9 +12188,9 @@
 </Hit>
 <Hit>
   <Hit_num>51</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|8</Hit_id>
-  <Hit_def>seq9</Hit_def>
-  <Hit_accession>8</Hit_accession>
+  <Hit_id>seq9</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq9</Hit_accession>
   <Hit_len>876</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12216,9 +12216,9 @@
 </Hit>
 <Hit>
   <Hit_num>52</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|22</Hit_id>
-  <Hit_def>seq23</Hit_def>
-  <Hit_accession>22</Hit_accession>
+  <Hit_id>seq23</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq23</Hit_accession>
   <Hit_len>878</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12244,9 +12244,9 @@
 </Hit>
 <Hit>
   <Hit_num>53</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|50</Hit_id>
-  <Hit_def>seq51</Hit_def>
-  <Hit_accession>50</Hit_accession>
+  <Hit_id>seq51</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq51</Hit_accession>
   <Hit_len>699</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12272,9 +12272,9 @@
 </Hit>
 <Hit>
   <Hit_num>54</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|3</Hit_id>
-  <Hit_def>seq4</Hit_def>
-  <Hit_accession>3</Hit_accession>
+  <Hit_id>seq4</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq4</Hit_accession>
   <Hit_len>901</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12300,9 +12300,9 @@
 </Hit>
 <Hit>
   <Hit_num>55</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|83</Hit_id>
-  <Hit_def>seq84</Hit_def>
-  <Hit_accession>83</Hit_accession>
+  <Hit_id>seq84</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq84</Hit_accession>
   <Hit_len>858</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12328,9 +12328,9 @@
 </Hit>
 <Hit>
   <Hit_num>56</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|10</Hit_id>
-  <Hit_def>seq11</Hit_def>
-  <Hit_accession>10</Hit_accession>
+  <Hit_id>seq11</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq11</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12356,9 +12356,9 @@
 </Hit>
 <Hit>
   <Hit_num>57</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|59</Hit_id>
-  <Hit_def>seq60</Hit_def>
-  <Hit_accession>59</Hit_accession>
+  <Hit_id>seq60</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq60</Hit_accession>
   <Hit_len>705</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12384,9 +12384,9 @@
 </Hit>
 <Hit>
   <Hit_num>58</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|16</Hit_id>
-  <Hit_def>seq17</Hit_def>
-  <Hit_accession>16</Hit_accession>
+  <Hit_id>seq17</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq17</Hit_accession>
   <Hit_len>885</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12412,9 +12412,9 @@
 </Hit>
 <Hit>
   <Hit_num>59</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|11</Hit_id>
-  <Hit_def>seq12</Hit_def>
-  <Hit_accession>11</Hit_accession>
+  <Hit_id>seq12</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq12</Hit_accession>
   <Hit_len>968</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12440,9 +12440,9 @@
 </Hit>
 <Hit>
   <Hit_num>60</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|31</Hit_id>
-  <Hit_def>seq32</Hit_def>
-  <Hit_accession>31</Hit_accession>
+  <Hit_id>seq32</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq32</Hit_accession>
   <Hit_len>902</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12468,9 +12468,9 @@
 </Hit>
 <Hit>
   <Hit_num>61</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|51</Hit_id>
-  <Hit_def>seq52</Hit_def>
-  <Hit_accession>51</Hit_accession>
+  <Hit_id>seq52</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq52</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12496,9 +12496,9 @@
 </Hit>
 <Hit>
   <Hit_num>62</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|19</Hit_id>
-  <Hit_def>seq20</Hit_def>
-  <Hit_accession>19</Hit_accession>
+  <Hit_id>seq20</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq20</Hit_accession>
   <Hit_len>871</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12524,9 +12524,9 @@
 </Hit>
 <Hit>
   <Hit_num>63</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|20</Hit_id>
-  <Hit_def>seq21</Hit_def>
-  <Hit_accession>20</Hit_accession>
+  <Hit_id>seq21</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq21</Hit_accession>
   <Hit_len>982</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12552,9 +12552,9 @@
 </Hit>
 <Hit>
   <Hit_num>64</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|1</Hit_id>
-  <Hit_def>seq2</Hit_def>
-  <Hit_accession>1</Hit_accession>
+  <Hit_id>seq2</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq2</Hit_accession>
   <Hit_len>845</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12580,9 +12580,9 @@
 </Hit>
 <Hit>
   <Hit_num>65</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|14</Hit_id>
-  <Hit_def>seq15</Hit_def>
-  <Hit_accession>14</Hit_accession>
+  <Hit_id>seq15</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq15</Hit_accession>
   <Hit_len>894</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12608,9 +12608,9 @@
 </Hit>
 <Hit>
   <Hit_num>66</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|18</Hit_id>
-  <Hit_def>seq19</Hit_def>
-  <Hit_accession>18</Hit_accession>
+  <Hit_id>seq19</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq19</Hit_accession>
   <Hit_len>890</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12636,9 +12636,9 @@
 </Hit>
 <Hit>
   <Hit_num>67</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|79</Hit_id>
-  <Hit_def>seq80</Hit_def>
-  <Hit_accession>79</Hit_accession>
+  <Hit_id>seq80</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq80</Hit_accession>
   <Hit_len>795</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12664,9 +12664,9 @@
 </Hit>
 <Hit>
   <Hit_num>68</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|82</Hit_id>
-  <Hit_def>seq83</Hit_def>
-  <Hit_accession>82</Hit_accession>
+  <Hit_id>seq83</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq83</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12692,9 +12692,9 @@
 </Hit>
 <Hit>
   <Hit_num>69</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|87</Hit_id>
-  <Hit_def>seq88</Hit_def>
-  <Hit_accession>87</Hit_accession>
+  <Hit_id>seq88</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq88</Hit_accession>
   <Hit_len>1046</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12720,9 +12720,9 @@
 </Hit>
 <Hit>
   <Hit_num>70</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|4</Hit_id>
-  <Hit_def>seq5</Hit_def>
-  <Hit_accession>4</Hit_accession>
+  <Hit_id>seq5</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq5</Hit_accession>
   <Hit_len>850</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12748,9 +12748,9 @@
 </Hit>
 <Hit>
   <Hit_num>71</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|24</Hit_id>
-  <Hit_def>seq25</Hit_def>
-  <Hit_accession>24</Hit_accession>
+  <Hit_id>seq25</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq25</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12776,9 +12776,9 @@
 </Hit>
 <Hit>
   <Hit_num>72</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|5</Hit_id>
-  <Hit_def>seq6</Hit_def>
-  <Hit_accession>5</Hit_accession>
+  <Hit_id>seq6</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq6</Hit_accession>
   <Hit_len>933</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12804,9 +12804,9 @@
 </Hit>
 <Hit>
   <Hit_num>73</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|29</Hit_id>
-  <Hit_def>seq30</Hit_def>
-  <Hit_accession>29</Hit_accession>
+  <Hit_id>seq30</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq30</Hit_accession>
   <Hit_len>910</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12832,9 +12832,9 @@
 </Hit>
 <Hit>
   <Hit_num>74</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|26</Hit_id>
-  <Hit_def>seq27</Hit_def>
-  <Hit_accession>26</Hit_accession>
+  <Hit_id>seq27</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq27</Hit_accession>
   <Hit_len>856</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12860,9 +12860,9 @@
 </Hit>
 <Hit>
   <Hit_num>75</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|30</Hit_id>
-  <Hit_def>seq31</Hit_def>
-  <Hit_accession>30</Hit_accession>
+  <Hit_id>seq31</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq31</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12888,9 +12888,9 @@
 </Hit>
 <Hit>
   <Hit_num>76</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|47</Hit_id>
-  <Hit_def>seq48</Hit_def>
-  <Hit_accession>47</Hit_accession>
+  <Hit_id>seq48</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq48</Hit_accession>
   <Hit_len>709</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12916,9 +12916,9 @@
 </Hit>
 <Hit>
   <Hit_num>77</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|27</Hit_id>
-  <Hit_def>seq28</Hit_def>
-  <Hit_accession>27</Hit_accession>
+  <Hit_id>seq28</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq28</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12944,9 +12944,9 @@
 </Hit>
 <Hit>
   <Hit_num>78</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|13</Hit_id>
-  <Hit_def>seq14</Hit_def>
-  <Hit_accession>13</Hit_accession>
+  <Hit_id>seq14</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq14</Hit_accession>
   <Hit_len>918</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -12972,9 +12972,9 @@
 </Hit>
 <Hit>
   <Hit_num>79</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|28</Hit_id>
-  <Hit_def>seq29</Hit_def>
-  <Hit_accession>28</Hit_accession>
+  <Hit_id>seq29</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq29</Hit_accession>
   <Hit_len>942</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13000,9 +13000,9 @@
 </Hit>
 <Hit>
   <Hit_num>80</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|23</Hit_id>
-  <Hit_def>seq24</Hit_def>
-  <Hit_accession>23</Hit_accession>
+  <Hit_id>seq24</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq24</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13028,9 +13028,9 @@
 </Hit>
 <Hit>
   <Hit_num>81</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|25</Hit_id>
-  <Hit_def>seq26</Hit_def>
-  <Hit_accession>25</Hit_accession>
+  <Hit_id>seq26</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq26</Hit_accession>
   <Hit_len>912</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13056,9 +13056,9 @@
 </Hit>
 <Hit>
   <Hit_num>82</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|15</Hit_id>
-  <Hit_def>seq16</Hit_def>
-  <Hit_accession>15</Hit_accession>
+  <Hit_id>seq16</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq16</Hit_accession>
   <Hit_len>959</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13103,9 +13103,9 @@
 </Hit>
 <Hit>
   <Hit_num>83</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|6</Hit_id>
-  <Hit_def>seq7</Hit_def>
-  <Hit_accession>6</Hit_accession>
+  <Hit_id>seq7</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq7</Hit_accession>
   <Hit_len>875</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13131,9 +13131,9 @@
 </Hit>
 <Hit>
   <Hit_num>84</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|12</Hit_id>
-  <Hit_def>seq13</Hit_def>
-  <Hit_accession>12</Hit_accession>
+  <Hit_id>seq13</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq13</Hit_accession>
   <Hit_len>920</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13159,9 +13159,9 @@
 </Hit>
 <Hit>
   <Hit_num>85</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|86</Hit_id>
-  <Hit_def>seq87</Hit_def>
-  <Hit_accession>86</Hit_accession>
+  <Hit_id>seq87</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq87</Hit_accession>
   <Hit_len>972</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13187,9 +13187,9 @@
 </Hit>
 <Hit>
   <Hit_num>86</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|85</Hit_id>
-  <Hit_def>seq86</Hit_def>
-  <Hit_accession>85</Hit_accession>
+  <Hit_id>seq86</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq86</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13215,9 +13215,9 @@
 </Hit>
 <Hit>
   <Hit_num>87</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|84</Hit_id>
-  <Hit_def>seq85</Hit_def>
-  <Hit_accession>84</Hit_accession>
+  <Hit_id>seq85</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq85</Hit_accession>
   <Hit_len>868</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13262,9 +13262,9 @@
 <Iteration_hits>
 <Hit>
   <Hit_num>1</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|75</Hit_id>
-  <Hit_def>seq76</Hit_def>
-  <Hit_accession>75</Hit_accession>
+  <Hit_id>seq76</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq76</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13290,9 +13290,9 @@
 </Hit>
 <Hit>
   <Hit_num>2</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|77</Hit_id>
-  <Hit_def>seq78</Hit_def>
-  <Hit_accession>77</Hit_accession>
+  <Hit_id>seq78</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq78</Hit_accession>
   <Hit_len>809</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13318,9 +13318,9 @@
 </Hit>
 <Hit>
   <Hit_num>3</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|76</Hit_id>
-  <Hit_def>seq77</Hit_def>
-  <Hit_accession>76</Hit_accession>
+  <Hit_id>seq77</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq77</Hit_accession>
   <Hit_len>778</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13346,9 +13346,9 @@
 </Hit>
 <Hit>
   <Hit_num>4</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|79</Hit_id>
-  <Hit_def>seq80</Hit_def>
-  <Hit_accession>79</Hit_accession>
+  <Hit_id>seq80</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq80</Hit_accession>
   <Hit_len>795</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13374,9 +13374,9 @@
 </Hit>
 <Hit>
   <Hit_num>5</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|78</Hit_id>
-  <Hit_def>seq79</Hit_def>
-  <Hit_accession>78</Hit_accession>
+  <Hit_id>seq79</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq79</Hit_accession>
   <Hit_len>1056</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13402,9 +13402,9 @@
 </Hit>
 <Hit>
   <Hit_num>6</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|18</Hit_id>
-  <Hit_def>seq19</Hit_def>
-  <Hit_accession>18</Hit_accession>
+  <Hit_id>seq19</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq19</Hit_accession>
   <Hit_len>890</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13430,9 +13430,9 @@
 </Hit>
 <Hit>
   <Hit_num>7</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|4</Hit_id>
-  <Hit_def>seq5</Hit_def>
-  <Hit_accession>4</Hit_accession>
+  <Hit_id>seq5</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq5</Hit_accession>
   <Hit_len>850</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13458,9 +13458,9 @@
 </Hit>
 <Hit>
   <Hit_num>8</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|17</Hit_id>
-  <Hit_def>seq18</Hit_def>
-  <Hit_accession>17</Hit_accession>
+  <Hit_id>seq18</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq18</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13486,9 +13486,9 @@
 </Hit>
 <Hit>
   <Hit_num>9</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|16</Hit_id>
-  <Hit_def>seq17</Hit_def>
-  <Hit_accession>16</Hit_accession>
+  <Hit_id>seq17</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq17</Hit_accession>
   <Hit_len>885</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13514,9 +13514,9 @@
 </Hit>
 <Hit>
   <Hit_num>10</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|1</Hit_id>
-  <Hit_def>seq2</Hit_def>
-  <Hit_accession>1</Hit_accession>
+  <Hit_id>seq2</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq2</Hit_accession>
   <Hit_len>845</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13542,9 +13542,9 @@
 </Hit>
 <Hit>
   <Hit_num>11</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|9</Hit_id>
-  <Hit_def>seq10</Hit_def>
-  <Hit_accession>9</Hit_accession>
+  <Hit_id>seq10</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq10</Hit_accession>
   <Hit_len>882</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13570,9 +13570,9 @@
 </Hit>
 <Hit>
   <Hit_num>12</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|82</Hit_id>
-  <Hit_def>seq83</Hit_def>
-  <Hit_accession>82</Hit_accession>
+  <Hit_id>seq83</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq83</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13598,9 +13598,9 @@
 </Hit>
 <Hit>
   <Hit_num>13</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|12</Hit_id>
-  <Hit_def>seq13</Hit_def>
-  <Hit_accession>12</Hit_accession>
+  <Hit_id>seq13</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq13</Hit_accession>
   <Hit_len>920</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13626,9 +13626,9 @@
 </Hit>
 <Hit>
   <Hit_num>14</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|14</Hit_id>
-  <Hit_def>seq15</Hit_def>
-  <Hit_accession>14</Hit_accession>
+  <Hit_id>seq15</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq15</Hit_accession>
   <Hit_len>894</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13654,9 +13654,9 @@
 </Hit>
 <Hit>
   <Hit_num>15</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|20</Hit_id>
-  <Hit_def>seq21</Hit_def>
-  <Hit_accession>20</Hit_accession>
+  <Hit_id>seq21</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq21</Hit_accession>
   <Hit_len>982</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13682,9 +13682,9 @@
 </Hit>
 <Hit>
   <Hit_num>16</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|87</Hit_id>
-  <Hit_def>seq88</Hit_def>
-  <Hit_accession>87</Hit_accession>
+  <Hit_id>seq88</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq88</Hit_accession>
   <Hit_len>1046</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13710,9 +13710,9 @@
 </Hit>
 <Hit>
   <Hit_num>17</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|0</Hit_id>
-  <Hit_def>seq1</Hit_def>
-  <Hit_accession>0</Hit_accession>
+  <Hit_id>seq1</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq1</Hit_accession>
   <Hit_len>888</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13738,9 +13738,9 @@
 </Hit>
 <Hit>
   <Hit_num>18</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|8</Hit_id>
-  <Hit_def>seq9</Hit_def>
-  <Hit_accession>8</Hit_accession>
+  <Hit_id>seq9</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq9</Hit_accession>
   <Hit_len>876</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13766,9 +13766,9 @@
 </Hit>
 <Hit>
   <Hit_num>19</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|19</Hit_id>
-  <Hit_def>seq20</Hit_def>
-  <Hit_accession>19</Hit_accession>
+  <Hit_id>seq20</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq20</Hit_accession>
   <Hit_len>871</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13794,9 +13794,9 @@
 </Hit>
 <Hit>
   <Hit_num>20</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|3</Hit_id>
-  <Hit_def>seq4</Hit_def>
-  <Hit_accession>3</Hit_accession>
+  <Hit_id>seq4</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq4</Hit_accession>
   <Hit_len>901</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13822,9 +13822,9 @@
 </Hit>
 <Hit>
   <Hit_num>21</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|10</Hit_id>
-  <Hit_def>seq11</Hit_def>
-  <Hit_accession>10</Hit_accession>
+  <Hit_id>seq11</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq11</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13850,9 +13850,9 @@
 </Hit>
 <Hit>
   <Hit_num>22</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|5</Hit_id>
-  <Hit_def>seq6</Hit_def>
-  <Hit_accession>5</Hit_accession>
+  <Hit_id>seq6</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq6</Hit_accession>
   <Hit_len>933</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13878,9 +13878,9 @@
 </Hit>
 <Hit>
   <Hit_num>23</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|2</Hit_id>
-  <Hit_def>seq3</Hit_def>
-  <Hit_accession>2</Hit_accession>
+  <Hit_id>seq3</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq3</Hit_accession>
   <Hit_len>881</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13906,9 +13906,9 @@
 </Hit>
 <Hit>
   <Hit_num>24</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|22</Hit_id>
-  <Hit_def>seq23</Hit_def>
-  <Hit_accession>22</Hit_accession>
+  <Hit_id>seq23</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq23</Hit_accession>
   <Hit_len>878</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13934,9 +13934,9 @@
 </Hit>
 <Hit>
   <Hit_num>25</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|13</Hit_id>
-  <Hit_def>seq14</Hit_def>
-  <Hit_accession>13</Hit_accession>
+  <Hit_id>seq14</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq14</Hit_accession>
   <Hit_len>918</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13962,9 +13962,9 @@
 </Hit>
 <Hit>
   <Hit_num>26</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|7</Hit_id>
-  <Hit_def>seq8</Hit_def>
-  <Hit_accession>7</Hit_accession>
+  <Hit_id>seq8</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq8</Hit_accession>
   <Hit_len>897</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -13990,9 +13990,9 @@
 </Hit>
 <Hit>
   <Hit_num>27</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|26</Hit_id>
-  <Hit_def>seq27</Hit_def>
-  <Hit_accession>26</Hit_accession>
+  <Hit_id>seq27</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq27</Hit_accession>
   <Hit_len>856</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14018,9 +14018,9 @@
 </Hit>
 <Hit>
   <Hit_num>28</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|23</Hit_id>
-  <Hit_def>seq24</Hit_def>
-  <Hit_accession>23</Hit_accession>
+  <Hit_id>seq24</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq24</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14046,9 +14046,9 @@
 </Hit>
 <Hit>
   <Hit_num>29</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|11</Hit_id>
-  <Hit_def>seq12</Hit_def>
-  <Hit_accession>11</Hit_accession>
+  <Hit_id>seq12</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq12</Hit_accession>
   <Hit_len>968</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14074,9 +14074,9 @@
 </Hit>
 <Hit>
   <Hit_num>30</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|25</Hit_id>
-  <Hit_def>seq26</Hit_def>
-  <Hit_accession>25</Hit_accession>
+  <Hit_id>seq26</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq26</Hit_accession>
   <Hit_len>912</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14102,9 +14102,9 @@
 </Hit>
 <Hit>
   <Hit_num>31</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|24</Hit_id>
-  <Hit_def>seq25</Hit_def>
-  <Hit_accession>24</Hit_accession>
+  <Hit_id>seq25</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq25</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14130,9 +14130,9 @@
 </Hit>
 <Hit>
   <Hit_num>32</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|83</Hit_id>
-  <Hit_def>seq84</Hit_def>
-  <Hit_accession>83</Hit_accession>
+  <Hit_id>seq84</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq84</Hit_accession>
   <Hit_len>858</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14158,9 +14158,9 @@
 </Hit>
 <Hit>
   <Hit_num>33</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|37</Hit_id>
-  <Hit_def>seq38</Hit_def>
-  <Hit_accession>37</Hit_accession>
+  <Hit_id>seq38</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq38</Hit_accession>
   <Hit_len>798</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14186,9 +14186,9 @@
 </Hit>
 <Hit>
   <Hit_num>34</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|30</Hit_id>
-  <Hit_def>seq31</Hit_def>
-  <Hit_accession>30</Hit_accession>
+  <Hit_id>seq31</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq31</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14214,9 +14214,9 @@
 </Hit>
 <Hit>
   <Hit_num>35</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|84</Hit_id>
-  <Hit_def>seq85</Hit_def>
-  <Hit_accession>84</Hit_accession>
+  <Hit_id>seq85</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq85</Hit_accession>
   <Hit_len>868</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14242,9 +14242,9 @@
 </Hit>
 <Hit>
   <Hit_num>36</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|29</Hit_id>
-  <Hit_def>seq30</Hit_def>
-  <Hit_accession>29</Hit_accession>
+  <Hit_id>seq30</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq30</Hit_accession>
   <Hit_len>910</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14270,9 +14270,9 @@
 </Hit>
 <Hit>
   <Hit_num>37</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|34</Hit_id>
-  <Hit_def>seq35</Hit_def>
-  <Hit_accession>34</Hit_accession>
+  <Hit_id>seq35</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq35</Hit_accession>
   <Hit_len>838</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14298,9 +14298,9 @@
 </Hit>
 <Hit>
   <Hit_num>38</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|68</Hit_id>
-  <Hit_def>seq69</Hit_def>
-  <Hit_accession>68</Hit_accession>
+  <Hit_id>seq69</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq69</Hit_accession>
   <Hit_len>676</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14326,9 +14326,9 @@
 </Hit>
 <Hit>
   <Hit_num>39</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|15</Hit_id>
-  <Hit_def>seq16</Hit_def>
-  <Hit_accession>15</Hit_accession>
+  <Hit_id>seq16</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq16</Hit_accession>
   <Hit_len>959</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14373,9 +14373,9 @@
 </Hit>
 <Hit>
   <Hit_num>40</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|28</Hit_id>
-  <Hit_def>seq29</Hit_def>
-  <Hit_accession>28</Hit_accession>
+  <Hit_id>seq29</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq29</Hit_accession>
   <Hit_len>942</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14401,9 +14401,9 @@
 </Hit>
 <Hit>
   <Hit_num>41</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|44</Hit_id>
-  <Hit_def>seq45</Hit_def>
-  <Hit_accession>44</Hit_accession>
+  <Hit_id>seq45</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq45</Hit_accession>
   <Hit_len>742</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14429,9 +14429,9 @@
 </Hit>
 <Hit>
   <Hit_num>42</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|46</Hit_id>
-  <Hit_def>seq47</Hit_def>
-  <Hit_accession>46</Hit_accession>
+  <Hit_id>seq47</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq47</Hit_accession>
   <Hit_len>796</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14457,9 +14457,9 @@
 </Hit>
 <Hit>
   <Hit_num>43</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|42</Hit_id>
-  <Hit_def>seq43</Hit_def>
-  <Hit_accession>42</Hit_accession>
+  <Hit_id>seq43</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq43</Hit_accession>
   <Hit_len>802</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14485,9 +14485,9 @@
 </Hit>
 <Hit>
   <Hit_num>44</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|70</Hit_id>
-  <Hit_def>seq71</Hit_def>
-  <Hit_accession>70</Hit_accession>
+  <Hit_id>seq71</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq71</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14513,9 +14513,9 @@
 </Hit>
 <Hit>
   <Hit_num>45</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|41</Hit_id>
-  <Hit_def>seq42</Hit_def>
-  <Hit_accession>41</Hit_accession>
+  <Hit_id>seq42</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq42</Hit_accession>
   <Hit_len>671</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14541,9 +14541,9 @@
 </Hit>
 <Hit>
   <Hit_num>46</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|35</Hit_id>
-  <Hit_def>seq36</Hit_def>
-  <Hit_accession>35</Hit_accession>
+  <Hit_id>seq36</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq36</Hit_accession>
   <Hit_len>828</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14569,9 +14569,9 @@
 </Hit>
 <Hit>
   <Hit_num>47</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|40</Hit_id>
-  <Hit_def>seq41</Hit_def>
-  <Hit_accession>40</Hit_accession>
+  <Hit_id>seq41</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq41</Hit_accession>
   <Hit_len>791</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14597,9 +14597,9 @@
 </Hit>
 <Hit>
   <Hit_num>48</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|74</Hit_id>
-  <Hit_def>seq75</Hit_def>
-  <Hit_accession>74</Hit_accession>
+  <Hit_id>seq75</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq75</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14625,9 +14625,9 @@
 </Hit>
 <Hit>
   <Hit_num>49</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|32</Hit_id>
-  <Hit_def>seq33</Hit_def>
-  <Hit_accession>32</Hit_accession>
+  <Hit_id>seq33</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq33</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14653,9 +14653,9 @@
 </Hit>
 <Hit>
   <Hit_num>50</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|6</Hit_id>
-  <Hit_def>seq7</Hit_def>
-  <Hit_accession>6</Hit_accession>
+  <Hit_id>seq7</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq7</Hit_accession>
   <Hit_len>875</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14700,9 +14700,9 @@
 </Hit>
 <Hit>
   <Hit_num>51</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|52</Hit_id>
-  <Hit_def>seq53</Hit_def>
-  <Hit_accession>52</Hit_accession>
+  <Hit_id>seq53</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq53</Hit_accession>
   <Hit_len>634</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14728,9 +14728,9 @@
 </Hit>
 <Hit>
   <Hit_num>52</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|67</Hit_id>
-  <Hit_def>seq68</Hit_def>
-  <Hit_accession>67</Hit_accession>
+  <Hit_id>seq68</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq68</Hit_accession>
   <Hit_len>685</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14756,9 +14756,9 @@
 </Hit>
 <Hit>
   <Hit_num>53</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|86</Hit_id>
-  <Hit_def>seq87</Hit_def>
-  <Hit_accession>86</Hit_accession>
+  <Hit_id>seq87</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq87</Hit_accession>
   <Hit_len>972</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14803,9 +14803,9 @@
 </Hit>
 <Hit>
   <Hit_num>54</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|45</Hit_id>
-  <Hit_def>seq46</Hit_def>
-  <Hit_accession>45</Hit_accession>
+  <Hit_id>seq46</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq46</Hit_accession>
   <Hit_len>949</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14831,9 +14831,9 @@
 </Hit>
 <Hit>
   <Hit_num>55</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|66</Hit_id>
-  <Hit_def>seq67</Hit_def>
-  <Hit_accession>66</Hit_accession>
+  <Hit_id>seq67</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq67</Hit_accession>
   <Hit_len>697</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14859,9 +14859,9 @@
 </Hit>
 <Hit>
   <Hit_num>56</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|69</Hit_id>
-  <Hit_def>seq70</Hit_def>
-  <Hit_accession>69</Hit_accession>
+  <Hit_id>seq70</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq70</Hit_accession>
   <Hit_len>677</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14887,9 +14887,9 @@
 </Hit>
 <Hit>
   <Hit_num>57</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|71</Hit_id>
-  <Hit_def>seq72</Hit_def>
-  <Hit_accession>71</Hit_accession>
+  <Hit_id>seq72</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq72</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14915,9 +14915,9 @@
 </Hit>
 <Hit>
   <Hit_num>58</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|33</Hit_id>
-  <Hit_def>seq34</Hit_def>
-  <Hit_accession>33</Hit_accession>
+  <Hit_id>seq34</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq34</Hit_accession>
   <Hit_len>818</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14943,9 +14943,9 @@
 </Hit>
 <Hit>
   <Hit_num>59</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|56</Hit_id>
-  <Hit_def>seq57</Hit_def>
-  <Hit_accession>56</Hit_accession>
+  <Hit_id>seq57</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq57</Hit_accession>
   <Hit_len>708</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14971,9 +14971,9 @@
 </Hit>
 <Hit>
   <Hit_num>60</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|27</Hit_id>
-  <Hit_def>seq28</Hit_def>
-  <Hit_accession>27</Hit_accession>
+  <Hit_id>seq28</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq28</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -14999,9 +14999,9 @@
 </Hit>
 <Hit>
   <Hit_num>61</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|54</Hit_id>
-  <Hit_def>seq55</Hit_def>
-  <Hit_accession>54</Hit_accession>
+  <Hit_id>seq55</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq55</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15027,9 +15027,9 @@
 </Hit>
 <Hit>
   <Hit_num>62</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|72</Hit_id>
-  <Hit_def>seq73</Hit_def>
-  <Hit_accession>72</Hit_accession>
+  <Hit_id>seq73</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq73</Hit_accession>
   <Hit_len>673</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15055,9 +15055,9 @@
 </Hit>
 <Hit>
   <Hit_num>63</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|61</Hit_id>
-  <Hit_def>seq62</Hit_def>
-  <Hit_accession>61</Hit_accession>
+  <Hit_id>seq62</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq62</Hit_accession>
   <Hit_len>711</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15083,9 +15083,9 @@
 </Hit>
 <Hit>
   <Hit_num>64</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|55</Hit_id>
-  <Hit_def>seq56</Hit_def>
-  <Hit_accession>55</Hit_accession>
+  <Hit_id>seq56</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq56</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15111,9 +15111,9 @@
 </Hit>
 <Hit>
   <Hit_num>65</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|36</Hit_id>
-  <Hit_def>seq37</Hit_def>
-  <Hit_accession>36</Hit_accession>
+  <Hit_id>seq37</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq37</Hit_accession>
   <Hit_len>701</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15139,9 +15139,9 @@
 </Hit>
 <Hit>
   <Hit_num>66</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|80</Hit_id>
-  <Hit_def>seq81</Hit_def>
-  <Hit_accession>80</Hit_accession>
+  <Hit_id>seq81</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq81</Hit_accession>
   <Hit_len>601</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15167,9 +15167,9 @@
 </Hit>
 <Hit>
   <Hit_num>67</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|85</Hit_id>
-  <Hit_def>seq86</Hit_def>
-  <Hit_accession>85</Hit_accession>
+  <Hit_id>seq86</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq86</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15214,9 +15214,9 @@
 </Hit>
 <Hit>
   <Hit_num>68</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|39</Hit_id>
-  <Hit_def>seq40</Hit_def>
-  <Hit_accession>39</Hit_accession>
+  <Hit_id>seq40</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq40</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15242,9 +15242,9 @@
 </Hit>
 <Hit>
   <Hit_num>69</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|64</Hit_id>
-  <Hit_def>seq65</Hit_def>
-  <Hit_accession>64</Hit_accession>
+  <Hit_id>seq65</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq65</Hit_accession>
   <Hit_len>656</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15270,9 +15270,9 @@
 </Hit>
 <Hit>
   <Hit_num>70</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|38</Hit_id>
-  <Hit_def>seq39</Hit_def>
-  <Hit_accession>38</Hit_accession>
+  <Hit_id>seq39</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq39</Hit_accession>
   <Hit_len>737</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15298,9 +15298,9 @@
 </Hit>
 <Hit>
   <Hit_num>71</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|58</Hit_id>
-  <Hit_def>seq59</Hit_def>
-  <Hit_accession>58</Hit_accession>
+  <Hit_id>seq59</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq59</Hit_accession>
   <Hit_len>627</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15326,9 +15326,9 @@
 </Hit>
 <Hit>
   <Hit_num>72</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|48</Hit_id>
-  <Hit_def>seq49</Hit_def>
-  <Hit_accession>48</Hit_accession>
+  <Hit_id>seq49</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq49</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15354,9 +15354,9 @@
 </Hit>
 <Hit>
   <Hit_num>73</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|31</Hit_id>
-  <Hit_def>seq32</Hit_def>
-  <Hit_accession>31</Hit_accession>
+  <Hit_id>seq32</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq32</Hit_accession>
   <Hit_len>902</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15401,9 +15401,9 @@
 </Hit>
 <Hit>
   <Hit_num>74</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|73</Hit_id>
-  <Hit_def>seq74</Hit_def>
-  <Hit_accession>73</Hit_accession>
+  <Hit_id>seq74</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq74</Hit_accession>
   <Hit_len>675</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15429,9 +15429,9 @@
 </Hit>
 <Hit>
   <Hit_num>75</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|51</Hit_id>
-  <Hit_def>seq52</Hit_def>
-  <Hit_accession>51</Hit_accession>
+  <Hit_id>seq52</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq52</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15457,9 +15457,9 @@
 </Hit>
 <Hit>
   <Hit_num>76</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|59</Hit_id>
-  <Hit_def>seq60</Hit_def>
-  <Hit_accession>59</Hit_accession>
+  <Hit_id>seq60</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq60</Hit_accession>
   <Hit_len>705</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15485,9 +15485,9 @@
 </Hit>
 <Hit>
   <Hit_num>77</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|43</Hit_id>
-  <Hit_def>seq44</Hit_def>
-  <Hit_accession>43</Hit_accession>
+  <Hit_id>seq44</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq44</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15513,9 +15513,9 @@
 </Hit>
 <Hit>
   <Hit_num>78</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|60</Hit_id>
-  <Hit_def>seq61</Hit_def>
-  <Hit_accession>60</Hit_accession>
+  <Hit_id>seq61</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq61</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15541,9 +15541,9 @@
 </Hit>
 <Hit>
   <Hit_num>79</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|47</Hit_id>
-  <Hit_def>seq48</Hit_def>
-  <Hit_accession>47</Hit_accession>
+  <Hit_id>seq48</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq48</Hit_accession>
   <Hit_len>709</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15569,9 +15569,9 @@
 </Hit>
 <Hit>
   <Hit_num>80</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|57</Hit_id>
-  <Hit_def>seq58</Hit_def>
-  <Hit_accession>57</Hit_accession>
+  <Hit_id>seq58</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq58</Hit_accession>
   <Hit_len>625</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15597,9 +15597,9 @@
 </Hit>
 <Hit>
   <Hit_num>81</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|65</Hit_id>
-  <Hit_def>seq66</Hit_def>
-  <Hit_accession>65</Hit_accession>
+  <Hit_id>seq66</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq66</Hit_accession>
   <Hit_len>658</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15625,9 +15625,9 @@
 </Hit>
 <Hit>
   <Hit_num>82</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|53</Hit_id>
-  <Hit_def>seq54</Hit_def>
-  <Hit_accession>53</Hit_accession>
+  <Hit_id>seq54</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq54</Hit_accession>
   <Hit_len>700</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15653,9 +15653,9 @@
 </Hit>
 <Hit>
   <Hit_num>83</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|49</Hit_id>
-  <Hit_def>seq50</Hit_def>
-  <Hit_accession>49</Hit_accession>
+  <Hit_id>seq50</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq50</Hit_accession>
   <Hit_len>788</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15681,9 +15681,9 @@
 </Hit>
 <Hit>
   <Hit_num>84</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|50</Hit_id>
-  <Hit_def>seq51</Hit_def>
-  <Hit_accession>50</Hit_accession>
+  <Hit_id>seq51</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq51</Hit_accession>
   <Hit_len>699</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15709,9 +15709,9 @@
 </Hit>
 <Hit>
   <Hit_num>85</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|81</Hit_id>
-  <Hit_def>seq82</Hit_def>
-  <Hit_accession>81</Hit_accession>
+  <Hit_id>seq82</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq82</Hit_accession>
   <Hit_len>623</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15737,9 +15737,9 @@
 </Hit>
 <Hit>
   <Hit_num>86</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|63</Hit_id>
-  <Hit_def>seq64</Hit_def>
-  <Hit_accession>63</Hit_accession>
+  <Hit_id>seq64</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq64</Hit_accession>
   <Hit_len>710</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15765,9 +15765,9 @@
 </Hit>
 <Hit>
   <Hit_num>87</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|21</Hit_id>
-  <Hit_def>seq22</Hit_def>
-  <Hit_accession>21</Hit_accession>
+  <Hit_id>seq22</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq22</Hit_accession>
   <Hit_len>847</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15812,9 +15812,9 @@
 <Iteration_hits>
 <Hit>
   <Hit_num>1</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|80</Hit_id>
-  <Hit_def>seq81</Hit_def>
-  <Hit_accession>80</Hit_accession>
+  <Hit_id>seq81</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq81</Hit_accession>
   <Hit_len>601</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15840,9 +15840,9 @@
 </Hit>
 <Hit>
   <Hit_num>2</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|81</Hit_id>
-  <Hit_def>seq82</Hit_def>
-  <Hit_accession>81</Hit_accession>
+  <Hit_id>seq82</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq82</Hit_accession>
   <Hit_len>623</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15868,9 +15868,9 @@
 </Hit>
 <Hit>
   <Hit_num>3</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|54</Hit_id>
-  <Hit_def>seq55</Hit_def>
-  <Hit_accession>54</Hit_accession>
+  <Hit_id>seq55</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq55</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15896,9 +15896,9 @@
 </Hit>
 <Hit>
   <Hit_num>4</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|55</Hit_id>
-  <Hit_def>seq56</Hit_def>
-  <Hit_accession>55</Hit_accession>
+  <Hit_id>seq56</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq56</Hit_accession>
   <Hit_len>712</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15924,9 +15924,9 @@
 </Hit>
 <Hit>
   <Hit_num>5</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|56</Hit_id>
-  <Hit_def>seq57</Hit_def>
-  <Hit_accession>56</Hit_accession>
+  <Hit_id>seq57</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq57</Hit_accession>
   <Hit_len>708</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15952,9 +15952,9 @@
 </Hit>
 <Hit>
   <Hit_num>6</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|50</Hit_id>
-  <Hit_def>seq51</Hit_def>
-  <Hit_accession>50</Hit_accession>
+  <Hit_id>seq51</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq51</Hit_accession>
   <Hit_len>699</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -15980,9 +15980,9 @@
 </Hit>
 <Hit>
   <Hit_num>7</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|48</Hit_id>
-  <Hit_def>seq49</Hit_def>
-  <Hit_accession>48</Hit_accession>
+  <Hit_id>seq49</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq49</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16008,9 +16008,9 @@
 </Hit>
 <Hit>
   <Hit_num>8</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|49</Hit_id>
-  <Hit_def>seq50</Hit_def>
-  <Hit_accession>49</Hit_accession>
+  <Hit_id>seq50</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq50</Hit_accession>
   <Hit_len>788</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16036,9 +16036,9 @@
 </Hit>
 <Hit>
   <Hit_num>9</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|53</Hit_id>
-  <Hit_def>seq54</Hit_def>
-  <Hit_accession>53</Hit_accession>
+  <Hit_id>seq54</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq54</Hit_accession>
   <Hit_len>700</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16064,9 +16064,9 @@
 </Hit>
 <Hit>
   <Hit_num>10</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|65</Hit_id>
-  <Hit_def>seq66</Hit_def>
-  <Hit_accession>65</Hit_accession>
+  <Hit_id>seq66</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq66</Hit_accession>
   <Hit_len>658</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16092,9 +16092,9 @@
 </Hit>
 <Hit>
   <Hit_num>11</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|35</Hit_id>
-  <Hit_def>seq36</Hit_def>
-  <Hit_accession>35</Hit_accession>
+  <Hit_id>seq36</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq36</Hit_accession>
   <Hit_len>828</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16120,9 +16120,9 @@
 </Hit>
 <Hit>
   <Hit_num>12</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|33</Hit_id>
-  <Hit_def>seq34</Hit_def>
-  <Hit_accession>33</Hit_accession>
+  <Hit_id>seq34</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq34</Hit_accession>
   <Hit_len>818</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16148,9 +16148,9 @@
 </Hit>
 <Hit>
   <Hit_num>13</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|61</Hit_id>
-  <Hit_def>seq62</Hit_def>
-  <Hit_accession>61</Hit_accession>
+  <Hit_id>seq62</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq62</Hit_accession>
   <Hit_len>711</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16176,9 +16176,9 @@
 </Hit>
 <Hit>
   <Hit_num>14</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|64</Hit_id>
-  <Hit_def>seq65</Hit_def>
-  <Hit_accession>64</Hit_accession>
+  <Hit_id>seq65</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq65</Hit_accession>
   <Hit_len>656</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16204,9 +16204,9 @@
 </Hit>
 <Hit>
   <Hit_num>15</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|37</Hit_id>
-  <Hit_def>seq38</Hit_def>
-  <Hit_accession>37</Hit_accession>
+  <Hit_id>seq38</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq38</Hit_accession>
   <Hit_len>798</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16232,9 +16232,9 @@
 </Hit>
 <Hit>
   <Hit_num>16</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|63</Hit_id>
-  <Hit_def>seq64</Hit_def>
-  <Hit_accession>63</Hit_accession>
+  <Hit_id>seq64</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq64</Hit_accession>
   <Hit_len>710</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16260,9 +16260,9 @@
 </Hit>
 <Hit>
   <Hit_num>17</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|40</Hit_id>
-  <Hit_def>seq41</Hit_def>
-  <Hit_accession>40</Hit_accession>
+  <Hit_id>seq41</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq41</Hit_accession>
   <Hit_len>791</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16288,9 +16288,9 @@
 </Hit>
 <Hit>
   <Hit_num>18</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|57</Hit_id>
-  <Hit_def>seq58</Hit_def>
-  <Hit_accession>57</Hit_accession>
+  <Hit_id>seq58</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq58</Hit_accession>
   <Hit_len>625</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16316,9 +16316,9 @@
 </Hit>
 <Hit>
   <Hit_num>19</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|44</Hit_id>
-  <Hit_def>seq45</Hit_def>
-  <Hit_accession>44</Hit_accession>
+  <Hit_id>seq45</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq45</Hit_accession>
   <Hit_len>742</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16344,9 +16344,9 @@
 </Hit>
 <Hit>
   <Hit_num>20</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|60</Hit_id>
-  <Hit_def>seq61</Hit_def>
-  <Hit_accession>60</Hit_accession>
+  <Hit_id>seq61</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq61</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16372,9 +16372,9 @@
 </Hit>
 <Hit>
   <Hit_num>21</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|42</Hit_id>
-  <Hit_def>seq43</Hit_def>
-  <Hit_accession>42</Hit_accession>
+  <Hit_id>seq43</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq43</Hit_accession>
   <Hit_len>802</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16400,9 +16400,9 @@
 </Hit>
 <Hit>
   <Hit_num>22</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|45</Hit_id>
-  <Hit_def>seq46</Hit_def>
-  <Hit_accession>45</Hit_accession>
+  <Hit_id>seq46</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq46</Hit_accession>
   <Hit_len>949</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16428,9 +16428,9 @@
 </Hit>
 <Hit>
   <Hit_num>23</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|41</Hit_id>
-  <Hit_def>seq42</Hit_def>
-  <Hit_accession>41</Hit_accession>
+  <Hit_id>seq42</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq42</Hit_accession>
   <Hit_len>671</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16456,9 +16456,9 @@
 </Hit>
 <Hit>
   <Hit_num>24</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|59</Hit_id>
-  <Hit_def>seq60</Hit_def>
-  <Hit_accession>59</Hit_accession>
+  <Hit_id>seq60</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq60</Hit_accession>
   <Hit_len>705</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16484,9 +16484,9 @@
 </Hit>
 <Hit>
   <Hit_num>25</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|46</Hit_id>
-  <Hit_def>seq47</Hit_def>
-  <Hit_accession>46</Hit_accession>
+  <Hit_id>seq47</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq47</Hit_accession>
   <Hit_len>796</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16512,9 +16512,9 @@
 </Hit>
 <Hit>
   <Hit_num>26</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|38</Hit_id>
-  <Hit_def>seq39</Hit_def>
-  <Hit_accession>38</Hit_accession>
+  <Hit_id>seq39</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq39</Hit_accession>
   <Hit_len>737</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16540,9 +16540,9 @@
 </Hit>
 <Hit>
   <Hit_num>27</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|39</Hit_id>
-  <Hit_def>seq40</Hit_def>
-  <Hit_accession>39</Hit_accession>
+  <Hit_id>seq40</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq40</Hit_accession>
   <Hit_len>641</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16568,9 +16568,9 @@
 </Hit>
 <Hit>
   <Hit_num>28</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|52</Hit_id>
-  <Hit_def>seq53</Hit_def>
-  <Hit_accession>52</Hit_accession>
+  <Hit_id>seq53</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq53</Hit_accession>
   <Hit_len>634</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16596,9 +16596,9 @@
 </Hit>
 <Hit>
   <Hit_num>29</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|34</Hit_id>
-  <Hit_def>seq35</Hit_def>
-  <Hit_accession>34</Hit_accession>
+  <Hit_id>seq35</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq35</Hit_accession>
   <Hit_len>838</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16624,9 +16624,9 @@
 </Hit>
 <Hit>
   <Hit_num>30</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|58</Hit_id>
-  <Hit_def>seq59</Hit_def>
-  <Hit_accession>58</Hit_accession>
+  <Hit_id>seq59</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq59</Hit_accession>
   <Hit_len>627</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16652,9 +16652,9 @@
 </Hit>
 <Hit>
   <Hit_num>31</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|32</Hit_id>
-  <Hit_def>seq33</Hit_def>
-  <Hit_accession>32</Hit_accession>
+  <Hit_id>seq33</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq33</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16680,9 +16680,9 @@
 </Hit>
 <Hit>
   <Hit_num>32</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|51</Hit_id>
-  <Hit_def>seq52</Hit_def>
-  <Hit_accession>51</Hit_accession>
+  <Hit_id>seq52</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq52</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16708,9 +16708,9 @@
 </Hit>
 <Hit>
   <Hit_num>33</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|36</Hit_id>
-  <Hit_def>seq37</Hit_def>
-  <Hit_accession>36</Hit_accession>
+  <Hit_id>seq37</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq37</Hit_accession>
   <Hit_len>701</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16736,9 +16736,9 @@
 </Hit>
 <Hit>
   <Hit_num>34</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|47</Hit_id>
-  <Hit_def>seq48</Hit_def>
-  <Hit_accession>47</Hit_accession>
+  <Hit_id>seq48</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq48</Hit_accession>
   <Hit_len>709</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16764,9 +16764,9 @@
 </Hit>
 <Hit>
   <Hit_num>35</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|43</Hit_id>
-  <Hit_def>seq44</Hit_def>
-  <Hit_accession>43</Hit_accession>
+  <Hit_id>seq44</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq44</Hit_accession>
   <Hit_len>633</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16792,9 +16792,9 @@
 </Hit>
 <Hit>
   <Hit_num>36</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|62</Hit_id>
-  <Hit_def>seq63</Hit_def>
-  <Hit_accession>62</Hit_accession>
+  <Hit_id>seq63</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq63</Hit_accession>
   <Hit_len>666</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16820,9 +16820,9 @@
 </Hit>
 <Hit>
   <Hit_num>37</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|66</Hit_id>
-  <Hit_def>seq67</Hit_def>
-  <Hit_accession>66</Hit_accession>
+  <Hit_id>seq67</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq67</Hit_accession>
   <Hit_len>697</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16848,9 +16848,9 @@
 </Hit>
 <Hit>
   <Hit_num>38</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|67</Hit_id>
-  <Hit_def>seq68</Hit_def>
-  <Hit_accession>67</Hit_accession>
+  <Hit_id>seq68</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq68</Hit_accession>
   <Hit_len>685</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16876,9 +16876,9 @@
 </Hit>
 <Hit>
   <Hit_num>39</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|71</Hit_id>
-  <Hit_def>seq72</Hit_def>
-  <Hit_accession>71</Hit_accession>
+  <Hit_id>seq72</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq72</Hit_accession>
   <Hit_len>686</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16904,9 +16904,9 @@
 </Hit>
 <Hit>
   <Hit_num>40</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|69</Hit_id>
-  <Hit_def>seq70</Hit_def>
-  <Hit_accession>69</Hit_accession>
+  <Hit_id>seq70</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq70</Hit_accession>
   <Hit_len>677</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16932,9 +16932,9 @@
 </Hit>
 <Hit>
   <Hit_num>41</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|74</Hit_id>
-  <Hit_def>seq75</Hit_def>
-  <Hit_accession>74</Hit_accession>
+  <Hit_id>seq75</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq75</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16960,9 +16960,9 @@
 </Hit>
 <Hit>
   <Hit_num>42</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|72</Hit_id>
-  <Hit_def>seq73</Hit_def>
-  <Hit_accession>72</Hit_accession>
+  <Hit_id>seq73</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq73</Hit_accession>
   <Hit_len>673</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -16988,9 +16988,9 @@
 </Hit>
 <Hit>
   <Hit_num>43</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|73</Hit_id>
-  <Hit_def>seq74</Hit_def>
-  <Hit_accession>73</Hit_accession>
+  <Hit_id>seq74</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq74</Hit_accession>
   <Hit_len>675</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17016,9 +17016,9 @@
 </Hit>
 <Hit>
   <Hit_num>44</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|70</Hit_id>
-  <Hit_def>seq71</Hit_def>
-  <Hit_accession>70</Hit_accession>
+  <Hit_id>seq71</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq71</Hit_accession>
   <Hit_len>681</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17044,9 +17044,9 @@
 </Hit>
 <Hit>
   <Hit_num>45</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|68</Hit_id>
-  <Hit_def>seq69</Hit_def>
-  <Hit_accession>68</Hit_accession>
+  <Hit_id>seq69</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq69</Hit_accession>
   <Hit_len>676</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17072,9 +17072,9 @@
 </Hit>
 <Hit>
   <Hit_num>46</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|17</Hit_id>
-  <Hit_def>seq18</Hit_def>
-  <Hit_accession>17</Hit_accession>
+  <Hit_id>seq18</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq18</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17100,9 +17100,9 @@
 </Hit>
 <Hit>
   <Hit_num>47</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|77</Hit_id>
-  <Hit_def>seq78</Hit_def>
-  <Hit_accession>77</Hit_accession>
+  <Hit_id>seq78</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq78</Hit_accession>
   <Hit_len>809</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17128,9 +17128,9 @@
 </Hit>
 <Hit>
   <Hit_num>48</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|7</Hit_id>
-  <Hit_def>seq8</Hit_def>
-  <Hit_accession>7</Hit_accession>
+  <Hit_id>seq8</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq8</Hit_accession>
   <Hit_len>897</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17156,9 +17156,9 @@
 </Hit>
 <Hit>
   <Hit_num>49</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|76</Hit_id>
-  <Hit_def>seq77</Hit_def>
-  <Hit_accession>76</Hit_accession>
+  <Hit_id>seq77</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq77</Hit_accession>
   <Hit_len>778</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17184,9 +17184,9 @@
 </Hit>
 <Hit>
   <Hit_num>50</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|75</Hit_id>
-  <Hit_def>seq76</Hit_def>
-  <Hit_accession>75</Hit_accession>
+  <Hit_id>seq76</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq76</Hit_accession>
   <Hit_len>806</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17212,9 +17212,9 @@
 </Hit>
 <Hit>
   <Hit_num>51</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|78</Hit_id>
-  <Hit_def>seq79</Hit_def>
-  <Hit_accession>78</Hit_accession>
+  <Hit_id>seq79</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq79</Hit_accession>
   <Hit_len>1056</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17240,9 +17240,9 @@
 </Hit>
 <Hit>
   <Hit_num>52</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|82</Hit_id>
-  <Hit_def>seq83</Hit_def>
-  <Hit_accession>82</Hit_accession>
+  <Hit_id>seq83</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq83</Hit_accession>
   <Hit_len>892</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17268,9 +17268,9 @@
 </Hit>
 <Hit>
   <Hit_num>53</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|83</Hit_id>
-  <Hit_def>seq84</Hit_def>
-  <Hit_accession>83</Hit_accession>
+  <Hit_id>seq84</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq84</Hit_accession>
   <Hit_len>858</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17296,9 +17296,9 @@
 </Hit>
 <Hit>
   <Hit_num>54</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|24</Hit_id>
-  <Hit_def>seq25</Hit_def>
-  <Hit_accession>24</Hit_accession>
+  <Hit_id>seq25</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq25</Hit_accession>
   <Hit_len>870</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17324,9 +17324,9 @@
 </Hit>
 <Hit>
   <Hit_num>55</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|0</Hit_id>
-  <Hit_def>seq1</Hit_def>
-  <Hit_accession>0</Hit_accession>
+  <Hit_id>seq1</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq1</Hit_accession>
   <Hit_len>888</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17371,9 +17371,9 @@
 </Hit>
 <Hit>
   <Hit_num>56</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|79</Hit_id>
-  <Hit_def>seq80</Hit_def>
-  <Hit_accession>79</Hit_accession>
+  <Hit_id>seq80</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq80</Hit_accession>
   <Hit_len>795</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17399,9 +17399,9 @@
 </Hit>
 <Hit>
   <Hit_num>57</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|3</Hit_id>
-  <Hit_def>seq4</Hit_def>
-  <Hit_accession>3</Hit_accession>
+  <Hit_id>seq4</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq4</Hit_accession>
   <Hit_len>901</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17427,9 +17427,9 @@
 </Hit>
 <Hit>
   <Hit_num>58</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|1</Hit_id>
-  <Hit_def>seq2</Hit_def>
-  <Hit_accession>1</Hit_accession>
+  <Hit_id>seq2</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq2</Hit_accession>
   <Hit_len>845</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17455,9 +17455,9 @@
 </Hit>
 <Hit>
   <Hit_num>59</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|84</Hit_id>
-  <Hit_def>seq85</Hit_def>
-  <Hit_accession>84</Hit_accession>
+  <Hit_id>seq85</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq85</Hit_accession>
   <Hit_len>868</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17483,9 +17483,9 @@
 </Hit>
 <Hit>
   <Hit_num>60</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|87</Hit_id>
-  <Hit_def>seq88</Hit_def>
-  <Hit_accession>87</Hit_accession>
+  <Hit_id>seq88</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq88</Hit_accession>
   <Hit_len>1046</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17530,9 +17530,9 @@
 </Hit>
 <Hit>
   <Hit_num>61</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|16</Hit_id>
-  <Hit_def>seq17</Hit_def>
-  <Hit_accession>16</Hit_accession>
+  <Hit_id>seq17</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq17</Hit_accession>
   <Hit_len>885</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17577,9 +17577,9 @@
 </Hit>
 <Hit>
   <Hit_num>62</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|26</Hit_id>
-  <Hit_def>seq27</Hit_def>
-  <Hit_accession>26</Hit_accession>
+  <Hit_id>seq27</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq27</Hit_accession>
   <Hit_len>856</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17605,9 +17605,9 @@
 </Hit>
 <Hit>
   <Hit_num>63</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|19</Hit_id>
-  <Hit_def>seq20</Hit_def>
-  <Hit_accession>19</Hit_accession>
+  <Hit_id>seq20</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq20</Hit_accession>
   <Hit_len>871</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17633,9 +17633,9 @@
 </Hit>
 <Hit>
   <Hit_num>64</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|85</Hit_id>
-  <Hit_def>seq86</Hit_def>
-  <Hit_accession>85</Hit_accession>
+  <Hit_id>seq86</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq86</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17661,9 +17661,9 @@
 </Hit>
 <Hit>
   <Hit_num>65</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|15</Hit_id>
-  <Hit_def>seq16</Hit_def>
-  <Hit_accession>15</Hit_accession>
+  <Hit_id>seq16</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq16</Hit_accession>
   <Hit_len>959</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17689,9 +17689,9 @@
 </Hit>
 <Hit>
   <Hit_num>66</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|20</Hit_id>
-  <Hit_def>seq21</Hit_def>
-  <Hit_accession>20</Hit_accession>
+  <Hit_id>seq21</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq21</Hit_accession>
   <Hit_len>982</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17736,9 +17736,9 @@
 </Hit>
 <Hit>
   <Hit_num>67</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|10</Hit_id>
-  <Hit_def>seq11</Hit_def>
-  <Hit_accession>10</Hit_accession>
+  <Hit_id>seq11</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq11</Hit_accession>
   <Hit_len>971</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17783,9 +17783,9 @@
 </Hit>
 <Hit>
   <Hit_num>68</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|8</Hit_id>
-  <Hit_def>seq9</Hit_def>
-  <Hit_accession>8</Hit_accession>
+  <Hit_id>seq9</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq9</Hit_accession>
   <Hit_len>876</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17811,9 +17811,9 @@
 </Hit>
 <Hit>
   <Hit_num>69</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|2</Hit_id>
-  <Hit_def>seq3</Hit_def>
-  <Hit_accession>2</Hit_accession>
+  <Hit_id>seq3</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq3</Hit_accession>
   <Hit_len>881</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17858,9 +17858,9 @@
 </Hit>
 <Hit>
   <Hit_num>70</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|22</Hit_id>
-  <Hit_def>seq23</Hit_def>
-  <Hit_accession>22</Hit_accession>
+  <Hit_id>seq23</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq23</Hit_accession>
   <Hit_len>878</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17886,9 +17886,9 @@
 </Hit>
 <Hit>
   <Hit_num>71</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|6</Hit_id>
-  <Hit_def>seq7</Hit_def>
-  <Hit_accession>6</Hit_accession>
+  <Hit_id>seq7</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq7</Hit_accession>
   <Hit_len>875</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17933,9 +17933,9 @@
 </Hit>
 <Hit>
   <Hit_num>72</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|27</Hit_id>
-  <Hit_def>seq28</Hit_def>
-  <Hit_accession>27</Hit_accession>
+  <Hit_id>seq28</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq28</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17961,9 +17961,9 @@
 </Hit>
 <Hit>
   <Hit_num>73</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|86</Hit_id>
-  <Hit_def>seq87</Hit_def>
-  <Hit_accession>86</Hit_accession>
+  <Hit_id>seq87</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq87</Hit_accession>
   <Hit_len>972</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -17989,9 +17989,9 @@
 </Hit>
 <Hit>
   <Hit_num>74</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|18</Hit_id>
-  <Hit_def>seq19</Hit_def>
-  <Hit_accession>18</Hit_accession>
+  <Hit_id>seq19</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq19</Hit_accession>
   <Hit_len>890</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -18036,9 +18036,9 @@
 </Hit>
 <Hit>
   <Hit_num>75</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|14</Hit_id>
-  <Hit_def>seq15</Hit_def>
-  <Hit_accession>14</Hit_accession>
+  <Hit_id>seq15</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq15</Hit_accession>
   <Hit_len>894</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -18064,9 +18064,9 @@
 </Hit>
 <Hit>
   <Hit_num>76</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|11</Hit_id>
-  <Hit_def>seq12</Hit_def>
-  <Hit_accession>11</Hit_accession>
+  <Hit_id>seq12</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq12</Hit_accession>
   <Hit_len>968</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -18111,9 +18111,9 @@
 </Hit>
 <Hit>
   <Hit_num>77</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|29</Hit_id>
-  <Hit_def>seq30</Hit_def>
-  <Hit_accession>29</Hit_accession>
+  <Hit_id>seq30</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq30</Hit_accession>
   <Hit_len>910</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -18158,9 +18158,9 @@
 </Hit>
 <Hit>
   <Hit_num>78</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|12</Hit_id>
-  <Hit_def>seq13</Hit_def>
-  <Hit_accession>12</Hit_accession>
+  <Hit_id>seq13</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq13</Hit_accession>
   <Hit_len>920</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -18186,9 +18186,9 @@
 </Hit>
 <Hit>
   <Hit_num>79</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|13</Hit_id>
-  <Hit_def>seq14</Hit_def>
-  <Hit_accession>13</Hit_accession>
+  <Hit_id>seq14</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq14</Hit_accession>
   <Hit_len>918</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -18233,9 +18233,9 @@
 </Hit>
 <Hit>
   <Hit_num>80</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|4</Hit_id>
-  <Hit_def>seq5</Hit_def>
-  <Hit_accession>4</Hit_accession>
+  <Hit_id>seq5</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq5</Hit_accession>
   <Hit_len>850</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -18261,9 +18261,9 @@
 </Hit>
 <Hit>
   <Hit_num>81</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|25</Hit_id>
-  <Hit_def>seq26</Hit_def>
-  <Hit_accession>25</Hit_accession>
+  <Hit_id>seq26</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq26</Hit_accession>
   <Hit_len>912</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -18289,9 +18289,9 @@
 </Hit>
 <Hit>
   <Hit_num>82</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|9</Hit_id>
-  <Hit_def>seq10</Hit_def>
-  <Hit_accession>9</Hit_accession>
+  <Hit_id>seq10</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq10</Hit_accession>
   <Hit_len>882</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -18336,9 +18336,9 @@
 </Hit>
 <Hit>
   <Hit_num>83</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|5</Hit_id>
-  <Hit_def>seq6</Hit_def>
-  <Hit_accession>5</Hit_accession>
+  <Hit_id>seq6</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq6</Hit_accession>
   <Hit_len>933</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -18383,9 +18383,9 @@
 </Hit>
 <Hit>
   <Hit_num>84</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|23</Hit_id>
-  <Hit_def>seq24</Hit_def>
-  <Hit_accession>23</Hit_accession>
+  <Hit_id>seq24</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq24</Hit_accession>
   <Hit_len>886</Hit_len>
   <Hit_hsps>
     <Hsp>
@@ -18411,9 +18411,9 @@
 </Hit>
 <Hit>
   <Hit_num>85</Hit_num>
-  <Hit_id>gnl|BL_ORD_ID|31</Hit_id>
-  <Hit_def>seq32</Hit_def>
-  <Hit_accession>31</Hit_accession>
+  <Hit_id>seq32</Hit_id>
+  <Hit_def>No definition line</Hit_def>
+  <Hit_accession>seq32</Hit_accession>
   <Hit_len>902</Hit_len>
   <Hit_hsps>
     <Hsp>

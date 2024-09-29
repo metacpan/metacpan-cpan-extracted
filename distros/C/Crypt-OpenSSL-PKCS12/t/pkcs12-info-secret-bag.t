@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Digest::SHA qw/sha256_hex/;
-use Crypt::OpenSSL::Guess qw/openssl_version/;
+use Crypt::OpenSSL::Guess qw/openssl_version find_openssl_prefix find_openssl_exec/;
 
 my ($major, $minor, $patch) = openssl_version();
 BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
@@ -24,9 +24,14 @@ if ($major eq '1.0') {
   $openssl_output =~ s/MAC length: .*/MAC verified OK/;
 }
 
+my $prefix = find_openssl_prefix();
+my $ssl_exec = find_openssl_exec($prefix);
+my $ssl_version_string = `$ssl_exec version`;
+
 SKIP: {
 
     skip ("Pre OpenSSL 3.0.0 release secret bags unsupported", 22) if ($major lt '3.0');
+    skip ("LibreSSL does not support secret bags", 22) if ($ssl_version_string =~ /LibreSSL/);
 
 my $pass   = "Password1";
 my $pkcs12 = Crypt::OpenSSL::PKCS12->new_from_file('certs/secretbag.p12');

@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::YANoteBook.
 
+0.08  Sat Sep 28 2024
+	adjusted sizes of the name tabs and the more button
+	added options -tabpadx and -tabpady
+
 0.07  Tue Sep 10 2024
 	fixed occasional error in method UpdateTabs
 
@@ -10,7 +14,8 @@ Revision history for Perl extension Tk::YANoteBook.
 0.05  Mon Feb 12 2024
 	changed option -closetabcall to call deletePage by default.
 	updated documentation.
-	adjusted the IsFull method to prevent oscillation. Hope it works.
+	adjusted the IsFull method to prev
+ent oscillation. Hope it works.
 
 0.04  Thu Sep 14 2023
 	tidied up documentation.

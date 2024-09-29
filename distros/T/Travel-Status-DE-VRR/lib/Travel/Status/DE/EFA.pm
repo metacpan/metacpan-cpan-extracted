@@ -5,83 +5,19 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '2.02';
+our $VERSION = '3.00';
 
 use Carp qw(confess cluck);
 use DateTime;
+use DateTime::Format::Strptime;
 use Encode qw(encode);
+use JSON;
+use Travel::Status::DE::EFA::Departure;
 use Travel::Status::DE::EFA::Line;
-use Travel::Status::DE::EFA::Result;
+use Travel::Status::DE::EFA::Services;
 use Travel::Status::DE::EFA::Stop;
+use Travel::Status::DE::EFA::Trip;
 use LWP::UserAgent;
-use XML::LibXML;
-
-my %efa_instance = (
-	BSVG => {
-		url  => 'https://bsvg.efa.de/bsvagstd/XML_DM_REQUEST',
-		name => 'Braunschweiger Verkehrs-GmbH',
-	},
-	DING => {
-		url  => 'https://www.ding.eu/ding3/XSLT_DM_REQUEST',
-		name => 'Donau-Iller Nahverkehrsverbund',
-	},
-	KVV => {
-		url  => 'https://projekte.kvv-efa.de/sl3-alone/XSLT_DM_REQUEST',
-		name => 'Karlsruher Verkehrsverbund',
-	},
-	LinzAG => {
-		url      => 'https://www.linzag.at/static/XSLT_DM_REQUEST',
-		name     => 'Linz AG',
-		encoding => 'iso-8859-15',
-	},
-	MVV => {
-		url  => 'https://efa.mvv-muenchen.de/mobile/XSLT_DM_REQUEST',
-		name => 'Münchner Verkehrs- und Tarifverbund',
-	},
-	NVBW => {
-		url  => 'https://www.efa-bw.de/nvbw/XSLT_DM_REQUEST',
-		name => 'Nahverkehrsgesellschaft Baden-Württemberg',
-	},
-	VAG => {
-		url  => 'https://efa.vagfr.de/vagfr3/XSLT_DM_REQUEST',
-		name => 'Freiburger Verkehrs AG',
-	},
-	VGN => {
-		url  => 'https://efa.vgn.de/vgnExt_oeffi/XML_DM_REQUEST',
-		name => 'Verkehrsverbund Grossraum Nuernberg',
-	},
-
-	# HTTPS: certificate verification fails
-	VMV => {
-		url  => 'http://efa.vmv-mbh.de/vmv/XML_DM_REQUEST',
-		name => 'Verkehrsgesellschaft Mecklenburg-Vorpommern',
-	},
-	VRN => {
-		url  => 'https://www.vrn.de/mngvrn//XML_DM_REQUEST',
-		name => 'Verkehrsverbund Rhein-Neckar',
-	},
-	VRR => {
-		url  => 'https://efa.vrr.de/vrr/XSLT_DM_REQUEST',
-		name => 'Verkehrsverbund Rhein-Ruhr',
-	},
-	VRR2 => {
-		url  => 'https://app.vrr.de/standard/XML_DM_REQUEST',
-		name => 'Verkehrsverbund Rhein-Ruhr (alternative)',
-	},
-	VRR3 => {
-		url  => 'https://efa.vrr.de/rbgstd3/XML_DM_REQUEST',
-		name => 'Verkehrsverbund Rhein-Ruhr (alternative alternative)',
-	},
-	VVO => {
-		url  => 'https://efa.vvo-online.de/VMSSL3/XSLT_DM_REQUEST',
-		name => 'Verkehrsverbund Oberelbe',
-	},
-	VVS => {
-		url  => 'https://www2.vvs.de/vvs/XSLT_DM_REQUEST',
-		name => 'Verkehrsverbund Stuttgart',
-	},
-
-);
 
 sub new_p {
 	my ( $class, %opt ) = @_;
@@ -96,37 +32,13 @@ sub new_p {
 
 	$self->{promise} = $opt{promise};
 
-	$self->{ua}->post_p( $self->{efa_url} => form => $self->{post} )->then(
+	$self->post_with_cache_p->then(
 		sub {
-			my ($tx) = @_;
-			if ( my $err = $tx->error ) {
-				$promise->reject(
-"POST $self->{efa_url} returned HTTP $err->{code} $err->{message}"
-				);
-				return;
-			}
-			my $content = $tx->res->body;
-
-			if ( $opt{efa_encoding} ) {
-				$self->{xml} = encode( $opt{efa_encoding}, $content );
-			}
-			else {
-				$self->{xml} = $content;
-			}
-
-			if ( not $self->{xml} ) {
-
-				# LibXML doesn't like empty documents
-				$promise->reject('Server returned nothing (empty result)');
-				return;
-			}
-
-			$self->{tree} = XML::LibXML->load_xml(
-				string => $self->{xml},
-			);
+			my ($content) = @_;
+			$self->{response} = $self->{json}->decode($content);
 
 			if ( $self->{developer_mode} ) {
-				say $self->{tree}->toString(1);
+				say $self->{json}->pretty->encode( $self->{response} );
 			}
 
 			$self->check_for_ambiguous();
@@ -158,25 +70,36 @@ sub new {
 		delete $opt{timeout};
 	}
 
-	if ( not( $opt{name} ) ) {
+	if ( not( $opt{name} or $opt{stopseq} or $opt{from_json} ) ) {
 		confess('You must specify a name');
 	}
 	if ( $opt{type}
-		and not( $opt{type} =~ m{ ^ (?: stop stopID address poi ) $ }x ) )
+		and not( $opt{type} =~ m{ ^ (?: stop | stopID | address | poi ) $ }x ) )
 	{
 		confess('type must be stop, stopID, address, or poi');
 	}
 
-	if ( $opt{service} and exists $efa_instance{ $opt{service} } ) {
-		$opt{efa_url} = $efa_instance{ $opt{service} }{url};
-		$opt{time_zone} //= $efa_instance{ $opt{service} }{time_zone};
+	if ( $opt{service} ) {
+		if ( my $service
+			= Travel::Status::DE::EFA::Services::get_service( $opt{service} ) )
+		{
+			$opt{efa_url} = $service->{url};
+			if ( $opt{stopseq} ) {
+				$opt{efa_url} .= '/XML_STOPSEQCOORD_REQUEST';
+			}
+			else {
+				$opt{efa_url} .= '/XML_DM_REQUEST';
+			}
+			$opt{time_zone} //= $service->{time_zone};
+		}
 	}
+
+	$opt{time_zone} //= 'Europe/Berlin';
 
 	if ( not $opt{efa_url} ) {
 		confess('service or efa_url must be specified');
 	}
-	my $dt = $opt{datetime}
-	  // DateTime->now( time_zone => $opt{time_zone} // 'Europe/Berlin' );
+	my $dt = $opt{datetime} // DateTime->now( time_zone => $opt{time_zone} );
 
 	## no critic (RegularExpressions::ProhibitUnusedCapture)
 	## no critic (Variables::ProhibitPunctuationVars)
@@ -218,41 +141,52 @@ sub new {
 	}
 
 	my $self = {
-		post => {
-			command                => q{},
-			deleteAssignedStops_dm => '1',
-			help                   => 'Hilfe',
-			itdDateDay             => $dt->day,
-			itdDateMonth           => $dt->month,
-			itdDateYear            => $dt->year,
-			itdLPxx_id_dm          => ':dm',
-			itdLPxx_mapState_dm    => q{},
-			itdLPxx_mdvMap2_dm     => q{},
-			itdLPxx_mdvMap_dm      => '3406199:401077:NAV3',
-			itdLPxx_transpCompany  => 'vrr',
-			itdLPxx_view           => q{},
-			itdTimeHour            => $dt->hour,
-			itdTimeMinute          => $dt->minute,
-			language               => 'de',
-			mode                   => 'direct',
-			nameInfo_dm            => 'invalid',
-			nameState_dm           => 'empty',
-			name_dm                => encode( 'UTF-8', $opt{name} ),
-			outputFormat           => 'XML',
-			ptOptionsActive        => '1',
-			requestID              => '0',
-			reset                  => 'neue Anfrage',
-			sessionID              => '0',
-			submitButton           => 'anfordern',
-			typeInfo_dm            => 'invalid',
-			type_dm                => $opt{type} // 'stop',
-			useProxFootSearch      => $opt{proximity_search} ? '1' : '0',
-			useRealtime            => '1',
-		},
+		cache          => $opt{cache},
+		response       => $opt{from_json},
 		developer_mode => $opt{developer_mode},
 		efa_url        => $opt{efa_url},
 		service        => $opt{service},
+		strp_stopseq   => DateTime::Format::Strptime->new(
+			pattern   => '%Y%m%d %H:%M',
+			time_zone => $opt{time_zone},
+		),
+		strp_stopseq_s => DateTime::Format::Strptime->new(
+			pattern   => '%Y%m%d %H:%M:%S',
+			time_zone => $opt{time_zone},
+		),
+
+		json => JSON->new->utf8,
 	};
+
+	if ( $opt{stopseq} ) {
+
+		# outputFormat => 'JSON' also works; leads to different output
+		$self->{post} = {
+			line              => $opt{stopseq}{stateless},
+			stop              => $opt{stopseq}{stop_id},
+			tripCode          => $opt{stopseq}{key},
+			date              => $opt{stopseq}{date},
+			coordOutputFormat => 'WGS84[DD.DDDDD]',
+			outputFormat      => 'rapidJson',
+			useRealtime       => '1',
+		};
+	}
+	else {
+		$self->{post} = {
+			language          => 'de',
+			mode              => 'direct',
+			outputFormat      => 'JSON',
+			type_dm           => $opt{type} // 'stop',
+			useProxFootSearch => $opt{proximity_search} ? '1' : '0',
+			useRealtime       => '1',
+			itdDateDay        => $dt->day,
+			itdDateMonth      => $dt->month,
+			itdDateYear       => $dt->year,
+			itdTimeHour       => $dt->hour,
+			itdTimeMinute     => $dt->minute,
+			name_dm           => encode( 'UTF-8', $opt{name} ),
+		};
+	}
 
 	if ( $opt{place} ) {
 		$self->{post}{placeInfo_dm}  = 'invalid';
@@ -277,37 +211,37 @@ sub new {
 		$self->{ua}->env_proxy;
 	}
 
+	if ( $self->{cache} ) {
+		$self->{cache_key}
+		  = $self->{efa_url} . '?'
+		  . join( '&',
+			map { $_ . '=' . $self->{post}{$_} } sort keys %{ $self->{post} } );
+	}
+
 	if ( $opt{async} ) {
 		return $self;
 	}
 
-	my $response = $self->{ua}->post( $self->{efa_url}, $self->{post} );
-
-	if ( $response->is_error ) {
-		$self->{errstr} = $response->status_line;
-		return $self;
+	if ( $self->{developer_mode} ) {
+		say 'POST ' . $self->{efa_url};
+		while ( my ( $key, $value ) = each %{ $self->{post} } ) {
+			printf( "%30s = %s\n", $key, $value );
+		}
 	}
 
-	if ( $opt{efa_encoding} ) {
-		$self->{xml} = encode( $opt{efa_encoding}, $response->content );
-	}
-	else {
-		$self->{xml} = $response->decoded_content;
-	}
+	if ( not $self->{response} ) {
+		my ( $response, $error ) = $self->post_with_cache;
 
-	if ( not $self->{xml} ) {
+		if ($error) {
+			$self->{errstr} = $error;
+			return $self;
+		}
 
-		# LibXML doesn't like empty documents
-		$self->{errstr} = 'Server returned nothing (empty result)';
-		return $self;
+		$self->{response} = $self->{json}->decode($response);
 	}
-
-	$self->{tree} = XML::LibXML->load_xml(
-		string => $self->{xml},
-	);
 
 	if ( $self->{developer_mode} ) {
-		say $self->{tree}->toString(1);
+		say $self->{json}->pretty->encode( $self->{response} );
 	}
 
 	$self->check_for_ambiguous();
@@ -315,18 +249,92 @@ sub new {
 	return $self;
 }
 
-sub new_from_xml {
-	my ( $class, %opt ) = @_;
+sub post_with_cache {
+	my ($self) = @_;
+	my $cache  = $self->{cache};
+	my $url    = $self->{efa_url};
 
-	my $self = {
-		xml => $opt{xml},
-	};
+	if ( $self->{developer_mode} ) {
+		say 'POST ' . ( $self->{cache_key} // $url );
+	}
 
-	$self->{tree} = XML::LibXML->load_xml(
-		string => $self->{xml},
-	);
+	if ($cache) {
+		my $content = $cache->thaw( $self->{cache_key} );
+		if ($content) {
+			if ( $self->{developer_mode} ) {
+				say '  cache hit';
+			}
+			return ( ${$content}, undef );
+		}
+	}
 
-	return bless( $self, $class );
+	if ( $self->{developer_mode} ) {
+		say '  cache miss';
+	}
+
+	my $reply = $self->{ua}->post( $url, $self->{post} );
+
+	if ( $reply->is_error ) {
+		return ( undef, $reply->status_line );
+	}
+	my $content = $reply->content;
+
+	if ($cache) {
+		$cache->freeze( $self->{cache_key}, \$content );
+	}
+
+	return ( $content, undef );
+}
+
+sub post_with_cache_p {
+	my ($self) = @_;
+	my $cache  = $self->{cache};
+	my $url    = $self->{efa_url};
+
+	if ( $self->{developer_mode} ) {
+		say 'POST ' . ( $self->{cache_key} // $url );
+	}
+
+	my $promise = $self->{promise}->new;
+
+	if ($cache) {
+		my $content = $cache->thaw( $self->{cache_key} );
+		if ($content) {
+			if ( $self->{developer_mode} ) {
+				say '  cache hit';
+			}
+			return $promise->resolve( ${$content} );
+		}
+	}
+
+	if ( $self->{developer_mode} ) {
+		say '  cache miss';
+	}
+
+	$self->{ua}->post_p( $url, form => $self->{post} )->then(
+		sub {
+			my ($tx) = @_;
+			if ( my $err = $tx->error ) {
+				$promise->reject(
+					"POST $url returned HTTP $err->{code} $err->{message}");
+				return;
+			}
+			my $content = $tx->res->body;
+			if ($cache) {
+				$cache->freeze( $self->{cache_key}, \$content );
+			}
+			$promise->resolve($content);
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject($err);
+			return;
+		}
+	)->wait;
+
+	return $promise;
 }
 
 sub errstr {
@@ -356,197 +364,96 @@ sub place_candidates {
 sub check_for_ambiguous {
 	my ($self) = @_;
 
-	my $xml = $self->{tree};
+	my $json = $self->{response};
 
-	my $xp_place = XML::LibXML::XPathExpression->new('//itdOdv/itdOdvPlace');
-	my $xp_name  = XML::LibXML::XPathExpression->new('//itdOdv/itdOdvName');
-	my $xp_mesg
-	  = XML::LibXML::XPathExpression->new('//itdMessage[@type="error"]');
-
-	my $xp_place_elem = XML::LibXML::XPathExpression->new('./odvPlaceElem');
-	my $xp_name_elem  = XML::LibXML::XPathExpression->new('./odvNameElem');
-
-	my $e_place = ( $xml->findnodes($xp_place) )[0];
-	my $e_name  = ( $xml->findnodes($xp_name) )[0];
-	my @e_mesg  = $xml->findnodes($xp_mesg);
-
-	if ( not( $e_place and $e_name ) ) {
-
-		# this should not happen[tm]
-		cluck('skipping ambiguity check- itdOdvPlace/itdOdvName missing');
+	if ( $json->{departureList} ) {
 		return;
 	}
 
-	my $s_place = $e_place->getAttribute('state');
-	my $s_name  = $e_name->getAttribute('state');
-
-	if ( $s_place eq 'list' ) {
-		$self->{place_candidates} = [ map { $_->textContent }
-			  @{ $e_place->findnodes($xp_place_elem) } ];
-		$self->{errstr} = 'ambiguous place parameter';
-		return;
-	}
-	if ( $s_name eq 'list' ) {
-		$self->{name_candidates}
-		  = [ map { $_->textContent } @{ $e_name->findnodes($xp_name_elem) } ];
-
-		$self->{errstr} = 'ambiguous name parameter';
-		return;
-	}
-	if ( $s_place eq 'notidentified' ) {
-		$self->{errstr} = 'invalid place parameter';
-		return;
-	}
-	if ( $s_name eq 'notidentified' ) {
-		$self->{errstr} = 'invalid name parameter';
-		return;
-	}
-	if (@e_mesg) {
-		$self->{errstr} = join( q{; }, map { $_->textContent } @e_mesg );
-		return;
+	for my $m ( @{ $json->{dm}{message} // [] } ) {
+		if ( $m->{name} eq 'error' and $m->{value} eq 'name list' ) {
+			$self->{errstr} = "ambiguous name parameter";
+			$self->{name_candidates}
+			  = [ map { $_->{name} } @{ $json->{dm}{points} // [] } ];
+			return;
+		}
+		if ( $m->{name} eq 'error' and $m->{value} eq 'place list' ) {
+			$self->{errstr} = "ambiguous name parameter";
+			$self->{name_candidates}
+			  = [ map { $_->{name} } @{ $json->{dm}{points} // [] } ];
+			return;
+		}
 	}
 
 	return;
 }
 
-sub identified_data {
+sub stop_name {
 	my ($self) = @_;
 
-	if ( not $self->{tree} ) {
-		return;
+	return $self->{response}{dm}{points}{point}{name};
+}
+
+sub stops {
+	my ($self) = @_;
+
+	if ( $self->{stops} ) {
+		return @{ $self->{stops} };
 	}
 
-	my $xp_place
-	  = XML::LibXML::XPathExpression->new('//itdOdv/itdOdvPlace/odvPlaceElem');
-	my $xp_name
-	  = XML::LibXML::XPathExpression->new('//itdOdv/itdOdvName/odvNameElem');
+	my $stops = $self->{response}{dm}{itdOdvAssignedStops} // [];
 
-	my $e_place = ( $self->{tree}->findnodes($xp_place) )[0];
-	my $e_name  = ( $self->{tree}->findnodes($xp_name) )[0];
+	if ( ref($stops) eq 'HASH' ) {
+		$stops = [$stops];
+	}
 
-	return ( $e_place->textContent, $e_name->textContent );
+	my @stops;
+	for my $stop ( @{$stops} ) {
+		push(
+			@stops,
+			Travel::Status::DE::EFA::Stop->new(
+				place     => $stop->{place},
+				name      => $stop->{name},
+				full_name => $stop->{nameWithPlace},
+				id        => $stop->{stopID},
+			)
+		);
+	}
+
+	$self->{stops} = \@stops;
+	return @stops;
 }
 
 sub lines {
 	my ($self) = @_;
-	my @lines;
 
 	if ( $self->{lines} ) {
 		return @{ $self->{lines} };
 	}
 
-	if ( not $self->{tree} ) {
-		return;
+	for my $line ( @{ $self->{response}{servingLines}{lines} // [] } ) {
+		push( @{ $self->{lines} }, $self->parse_line($line) );
 	}
 
-	my $xp_element
-	  = XML::LibXML::XPathExpression->new('//itdServingLines/itdServingLine');
-
-	my $xp_info  = XML::LibXML::XPathExpression->new('./itdNoTrain');
-	my $xp_route = XML::LibXML::XPathExpression->new('./itdRouteDescText');
-	my $xp_oper  = XML::LibXML::XPathExpression->new('./itdOperator/name');
-
-	for my $e ( $self->{tree}->findnodes($xp_element) ) {
-
-		my $e_info  = ( $e->findnodes($xp_info) )[0];
-		my $e_route = ( $e->findnodes($xp_route) )[0];
-		my $e_oper  = ( $e->findnodes($xp_oper) )[0];
-
-		if ( not($e_info) ) {
-			cluck( 'node with insufficient data. This should not happen. '
-				  . $e->getAttribute('number') );
-			next;
-		}
-
-		my $line       = $e->getAttribute('number');
-		my $direction  = $e->getAttribute('direction');
-		my $valid      = $e->getAttribute('valid');
-		my $type       = $e_info->getAttribute('name');
-		my $mot        = $e->getAttribute('motType');
-		my $route      = ( $e_route ? $e_route->textContent : undef );
-		my $operator   = ( $e_oper  ? $e_oper->textContent  : undef );
-		my $identifier = $e->getAttribute('stateless');
-
-		push(
-			@lines,
-			Travel::Status::DE::EFA::Line->new(
-				name       => $line,
-				direction  => $direction,
-				valid      => $valid,
-				type       => $type,
-				mot        => $mot,
-				route      => $route,
-				operator   => $operator,
-				identifier => $identifier,
-			)
-		);
-	}
-
-	$self->{lines} = \@lines;
-
-	return @lines;
+	return @{ $self->{lines} // [] };
 }
 
-sub parse_route {
-	my ( $self, @nodes ) = @_;
-	my $xp_routepoint_date
-	  = XML::LibXML::XPathExpression->new('./itdDateTime/itdDate');
-	my $xp_routepoint_time
-	  = XML::LibXML::XPathExpression->new('./itdDateTime/itdTime');
+sub parse_line {
+	my ( $self, $line ) = @_;
 
-	my @ret;
+	my $mode = $line->{mode} // {};
 
-	for my $e (@nodes) {
-		my @dates = $e->findnodes($xp_routepoint_date);
-		my @times = $e->findnodes($xp_routepoint_time);
-
-		my ( $arr, $dep );
-
-		# note that the first stop has an arrival node with an invalid
-		# timestamp and the terminal stop has a departure node with an
-		# invalid timestamp.
-
-		if ( $dates[0] and $times[0] and $dates[0]->getAttribute('day') != -1 )
-		{
-			$arr = DateTime->new(
-				year      => $dates[0]->getAttribute('year'),
-				month     => $dates[0]->getAttribute('month'),
-				day       => $dates[0]->getAttribute('day'),
-				hour      => $times[0]->getAttribute('hour'),
-				minute    => $times[0]->getAttribute('minute'),
-				second    => $times[0]->getAttribute('second') // 0,
-				time_zone => 'Europe/Berlin'
-			);
-		}
-
-		if (    $dates[-1]
-			and $times[-1]
-			and $dates[-1]->getAttribute('day') != -1 )
-		{
-			$dep = DateTime->new(
-				year      => $dates[-1]->getAttribute('year'),
-				month     => $dates[-1]->getAttribute('month'),
-				day       => $dates[-1]->getAttribute('day'),
-				hour      => $times[-1]->getAttribute('hour'),
-				minute    => $times[-1]->getAttribute('minute'),
-				second    => $times[-1]->getAttribute('second') // 0,
-				time_zone => 'Europe/Berlin'
-			);
-		}
-
-		push(
-			@ret,
-			Travel::Status::DE::EFA::Stop->new(
-				arr      => $arr,
-				dep      => $dep,
-				name     => $e->getAttribute('name'),
-				name_suf => $e->getAttribute('nameWO'),
-				platform => $e->getAttribute('platformName'),
-			)
-		);
-	}
-
-	return @ret;
+	return Travel::Status::DE::EFA::Line->new(
+		type       => $mode->{product},
+		name       => $mode->{name},
+		number     => $mode->{number},
+		direction  => $mode->{destination},
+		valid      => $mode->{timetablePeriod},
+		mot        => $mode->{product},
+		operator   => $mode->{diva}{operator},
+		identifier => $mode->{diva}{globalId},
+		,
+	);
 }
 
 sub results {
@@ -557,145 +464,15 @@ sub results {
 		return @{ $self->{results} };
 	}
 
-	if ( not $self->{tree} ) {
-		return;
-	}
+	my $json = $self->{response};
 
-	my $xp_element = XML::LibXML::XPathExpression->new('//itdDeparture');
-
-	my $xp_date  = XML::LibXML::XPathExpression->new('./itdDateTime/itdDate');
-	my $xp_time  = XML::LibXML::XPathExpression->new('./itdDateTime/itdTime');
-	my $xp_rdate = XML::LibXML::XPathExpression->new('./itdRTDateTime/itdDate');
-	my $xp_rtime = XML::LibXML::XPathExpression->new('./itdRTDateTime/itdTime');
-	my $xp_line  = XML::LibXML::XPathExpression->new('./itdServingLine');
-	my $xp_info
-	  = XML::LibXML::XPathExpression->new('./itdServingLine/itdNoTrain');
-	my $xp_prev_route
-	  = XML::LibXML::XPathExpression->new('./itdPrevStopSeq/itdPoint');
-	my $xp_next_route
-	  = XML::LibXML::XPathExpression->new('./itdOnwardStopSeq/itdPoint');
-
-	$self->lines;
-
-	for my $e ( $self->{tree}->findnodes($xp_element) ) {
-
-		my $e_date = ( $e->findnodes($xp_date) )[0];
-		my $e_time = ( $e->findnodes($xp_time) )[0];
-		my $e_line = ( $e->findnodes($xp_line) )[0];
-		my $e_info = ( $e->findnodes($xp_info) )[0];
-
-		my $e_rdate = ( $e->findnodes($xp_rdate) )[0];
-		my $e_rtime = ( $e->findnodes($xp_rtime) )[0];
-
-		if ( not( $e_date and $e_time and $e_line ) ) {
-			cluck('node with insufficient data. This should not happen');
-			next;
-		}
-
-		my ( $sched_dt, $real_dt );
-
-		if ( $e_date and $e_time and $e_date->getAttribute('day') != -1 ) {
-			$sched_dt = DateTime->new(
-				year      => $e_date->getAttribute('year'),
-				month     => $e_date->getAttribute('month'),
-				day       => $e_date->getAttribute('day'),
-				hour      => $e_time->getAttribute('hour'),
-				minute    => $e_time->getAttribute('minute'),
-				second    => $e_time->getAttribute('second') // 0,
-				time_zone => 'Europe/Berlin'
-			);
-		}
-
-		if ( $e_rdate and $e_rtime and $e_rdate->getAttribute('day') != -1 ) {
-			$real_dt = DateTime->new(
-				year      => $e_rdate->getAttribute('year'),
-				month     => $e_rdate->getAttribute('month'),
-				day       => $e_rdate->getAttribute('day'),
-				hour      => $e_rtime->getAttribute('hour'),
-				minute    => $e_rtime->getAttribute('minute'),
-				second    => $e_rtime->getAttribute('second') // 0,
-				time_zone => 'Europe/Berlin'
-			);
-		}
-
-		my $platform      = $e->getAttribute('platform');
-		my $platform_name = $e->getAttribute('platformName');
-		my $countdown     = $e->getAttribute('countdown');
-		my $occupancy     = $e->getAttribute('occupancy');
-		my $line          = $e_line->getAttribute('number');
-		my $train_type    = $e_line->getAttribute('trainType');
-		my $train_name    = $e_line->getAttribute('trainName');
-		my $train_no      = $e_line->getAttribute('trainNum');
-		my $dest          = $e_line->getAttribute('direction');
-		my $info          = $e_info->textContent;
-		my $key           = $e_line->getAttribute('key');
-		my $delay         = $e_info->getAttribute('delay');
-		my $type          = $e_info->getAttribute('name');
-		my $mot           = $e_line->getAttribute('motType');
-
-		my $platform_is_db = 0;
-
-		my @prev_route;
-		my @next_route;
-
-		if ( $self->{want_full_routes} ) {
-			@prev_route
-			  = $self->parse_route( @{ [ $e->findnodes($xp_prev_route) ] } );
-			@next_route
-			  = $self->parse_route( @{ [ $e->findnodes($xp_next_route) ] } );
-		}
-
-		my @line_obj
-		  = grep { $_->{identifier} eq $e_line->getAttribute('stateless') }
-		  @{ $self->{lines} };
-
-		# platform / platformName are inconsistent. The following cases are
-		# known:
-		#
-		# * platform="int", platformName="" : non-DB platform
-		# * platform="int", platformName="Bstg. int" : non-DB platform
-		# * platform="#int", platformName="Gleis int" : non-DB platform
-		# * platform="#int", platformName="Gleis int" : DB platform?
-		# * platform="", platformName="Gleis int" : DB platform
-		# * platform="DB", platformName="Gleis int" : DB platform
-		# * platform="gibberish", platformName="Gleis int" : DB platform
-
-		if ( ( $platform_name and $platform_name =~ m{ ^ Gleis }ox )
-			and not( $platform and $platform =~ s{ ^ \# }{}ox ) )
-		{
-			$platform_is_db = 1;
-		}
-
-		if ( $platform_name and $platform_name =~ m{ ^ (Gleis | Bstg[.])}ox ) {
-			$platform = ( split( / /, $platform_name ) )[1];
-		}
-		elsif ( $platform_name and not $platform ) {
-			$platform = $platform_name;
-		}
-
+	for my $departure ( @{ $json->{departureList} // [] } ) {
 		push(
 			@results,
-			Travel::Status::DE::EFA::Result->new(
-				rt_datetime    => $real_dt,
-				platform       => $platform,
-				platform_db    => $platform_is_db,
-				platform_name  => $platform_name,
-				key            => $key,
-				lineref        => $line_obj[0] // undef,
-				line           => $line,
-				train_type     => $train_type,
-				train_name     => $train_name,
-				train_no       => $train_no,
-				destination    => $dest,
-				occupancy      => $occupancy,
-				countdown      => $countdown,
-				info           => $info,
-				delay          => $delay,
-				sched_datetime => $sched_dt,
-				type           => $type,
-				mot            => $mot,
-				prev_route     => \@prev_route,
-				next_route     => \@next_route,
+			Travel::Status::DE::EFA::Departure->new(
+				json           => $departure,
+				strp_stopseq   => $self->{strp_stopseq},
+				strp_stopseq_s => $self->{strp_stopseq_s}
 			)
 		);
 	}
@@ -709,16 +486,20 @@ sub results {
 	return @results;
 }
 
-# static
-sub get_efa_urls {
-	return map {
-		{ %{ $efa_instance{$_} }, shortname => $_ }
-	} sort keys %efa_instance;
+sub result {
+	my ($self) = @_;
+
+	return Travel::Status::DE::EFA::Trip->new( json => $self->{response} );
 }
 
+# static
+sub get_service_ids {
+	return Travel::Status::DE::EFA::Services::get_service_ids(@_);
+}
+
+# static
 sub get_service {
-	my ($service) = @_;
-	return $efa_instance{$service};
+	return Travel::Status::DE::EFA::Services::get_service(@_);
 }
 
 1;
@@ -734,7 +515,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
     use Travel::Status::DE::EFA;
 
     my $status = Travel::Status::DE::EFA->new(
-        efa_url => 'https://efa.vrr.de/vrr/XSLT_DM_REQUEST',
+        service => 'VRR',
         name => 'Essen Helenenstr'
     );
 
@@ -748,7 +529,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 2.02
+version 3.00
 
 =head1 DESCRIPTION
 
@@ -805,7 +586,7 @@ iso-8859-15.
 
 If true: Request full routes for all departures from the backend. This
 enables the B<route_pre>, B<route_post> and B<route_interesting> accessors in
-Travel::Status::DE::EFA::Result(3pm).
+Travel::Status::DE::EFA::Departure(3pm).
 
 =item B<proximity_search> => B<0>|B<1>
 
@@ -844,12 +625,6 @@ a B<post_p> function. Recommended: Mojo::UserAgent(3pm).
 In case of an HTTP request or EFA error, returns a string describing it. If
 none occured, returns undef.
 
-=item $status->identified_data
-
-Returns a list of the identified values for I<place> and I<name>.
-For instance, when requesting data for "E", "MartinSTR", B<identified_data>
-will return ("Essen", "Martinstr.").
-
 =item $status->lines
 
 Returns a list of Travel::Status::DE::EFA::Line(3pm) objects, each one
@@ -867,30 +642,43 @@ nothing (undef / empty list) otherwise.
 
 =item $status->results
 
-Returns a list of Travel::Status::DE::EFA::Result(3pm) objects, each one describing
+Returns a list of Travel::Status::DE::EFA::Departure(3pm) objects, each one describing
 one departure.
 
-=item Travel::Status::DE::EFA::get_efa_urls()
+=item Travel::Status::DE::EFA::get_service_ids()
 
-Returns a list of known EFA entry points. Each list element is a hashref with
-the following elements.
+Returns the list of supported services (backends).
+
+=item Travel::Status::DE::EFA::get_service(I<service>)
+
+Returns a hashref describing the requested I<service> ID with the following keys.
 
 =over
 
-=item B<url>: service URL as passed to B<efa_url>
+=item B<name> => I<string>
 
-=item B<name>: Name of the entity operating this service
+Provider name, e.g. Verkehrsverbund Oberelbe.
 
-=item B<shortname>: Short name of the entity
+=item B<url> => I<string>
 
-=item B<encoding>: Server-side encoding override for B<efa_encoding> (optional)
+Backend base URL.
+
+=item B<homepage> => I<string> (optional)
+
+Provider homepage.
+
+=item B<languages> => I<arrayref> (optional)
+
+Supportde languages, e.g. de, en.
+
+=item B<coverage> => I<hashref>
+
+Area in which the  service  provides  near-optimal  coverage.  Typically,  this
+means  a (nearly)  complete  list  of  departures  and  real-time  data.  The
+hashref contains two optional keys: B<area> (GeoJSON) and B<regions> (list of
+strings, e.g. "DE" or "CH-BE").
 
 =back
-
-=item Travel::Status::DE::EFA::service(I<$service>)
-
-Returns a hashref describing the service I<$service>, or undef if it is not
-known. See B<get_efa_urls> for the hashref layout.
 
 =back
 
@@ -906,23 +694,25 @@ None.
 
 =item * DateTime(3pm)
 
-=item * LWP::UserAgent(3pm)
+=item * DateTime::Format::Strptime(3pm)
 
-=item * XML::LibXML(3pm)
+=item * JSON(3pm)
+
+=item * LWP::UserAgent(3pm)
 
 =back
 
 =head1 BUGS AND LIMITATIONS
 
-Not all features of the web interface are supported.
+The API is not exposed completely.
 
 =head1 SEE ALSO
 
-efa-m(1), Travel::Status::DE::EFA::Result(3pm).
+efa-m(1), Travel::Status::DE::EFA::Departure(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2011-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

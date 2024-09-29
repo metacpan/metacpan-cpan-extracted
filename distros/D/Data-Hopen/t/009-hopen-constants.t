@@ -5,15 +5,15 @@ use HopenTest;
 
 use Data::Hopen ':all';
 
-ok $_ ~~ UNSPECIFIED, "UNSPECIFIED accepts $_"
+ok UNSPECIFIED->contains($_), "UNSPECIFIED accepts $_"
     foreach qw(a 0 - ab a0 0a a- -a русский язык 日本語 ひらがな);
 
-ok !($_ ~~ NOTHING), "NOTHING rejects $_"
+ok !NOTHING->contains($_), "NOTHING rejects $_"
     foreach qw(a 0 - ab a0 0a a- -a русский язык 日本語 ひらがな);
 
-ok !("" ~~ UNSPECIFIED), "UNSPECIFIED rejects the empty string";
+ok !UNSPECIFIED->contains(""), "UNSPECIFIED rejects the empty string";
     # Because UNSPECIFIED doesn't mean missing
-ok !("" ~~ NOTHING), "NOTHING rejects the empty string";
+ok !NOTHING->contains(""), "NOTHING rejects the empty string";
     # Because NOTHING really means nothing!
 
 done_testing();

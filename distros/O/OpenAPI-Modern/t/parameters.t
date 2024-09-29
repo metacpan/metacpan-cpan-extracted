@@ -29,7 +29,6 @@ my $openapi = OpenAPI::Modern->new(
         ref_to_deep_string => { '$ref' => '#/components/schemas/string' },
       },
     },
-    paths => {},
   },
 );
 

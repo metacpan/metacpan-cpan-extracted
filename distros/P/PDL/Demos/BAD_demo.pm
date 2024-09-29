@@ -202,23 +202,17 @@ my @demos = (
 
 [act => q|
     # add on some contours showing the large scale structure of the galaxy
-    imag $unsharp, $just;
-    hold;
-    cont $filtered;
-    release;
-|],
-
-[actnw => q|
-    # close the graphics window
-    erase;
+    erase; $w = pgswin();
+    $w->plot(with=>'image', $unsharp, with=>'contours', $filtered, $just);
 |],
 ) # end of graphics-only bit
 );
 $@ = ''; # reset
 
-sub info {('bad', 'Bad-value demo (Optional: PDL::Graphics::Simple)')}
+sub info {('bad', 'Bad-value support (Optional: PDL::Graphics::Simple)')}
 
 sub demo { @demos }
 sub init { 'eval "use PDL::Graphics::Simple"' }
+sub done {'undef $w'}
 
 1;

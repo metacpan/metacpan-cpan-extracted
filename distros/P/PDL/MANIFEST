@@ -1,9 +1,6 @@
 Basic/AutoLoader.pm
 Basic/Bad/bad.pd
 Basic/Bad/Makefile.PL
-Basic/Complex/complex.pd
-Basic/Complex/Makefile.PL
-Basic/Complex/t/complex.t
 Basic/Constants.pm
 Basic/Core/Basic.pm
 Basic/Core/Char.pm
@@ -128,20 +125,18 @@ Basic/Ufunc/ufunc.pd
 Bugs.pod
 Changes
 COPYING
-cygwin/drivers.list
 cygwin/g77_gcc.conf
 cygwin/INSTALL
 cygwin/README
 Demos/BAD_demo.pm
-Demos/Cartography_demo.pm
 Demos/Demos.pm
 Demos/earth-interp.pl
 Demos/earth.txt
 Demos/General.pm
+Demos/harness
 Demos/Makefile.PL
 Demos/Sound.pm
 Demos/t/demos.t
-Demos/Transform_demo.pm
 DEPENDENCIES
 Doc/Doc.pm
 Doc/Doc/Config.pm.PL
@@ -439,6 +434,9 @@ Libtmp/ImageRGB/ppm_quant.c
 Libtmp/ImageRGB/t/imagergb.t
 Libtmp/ImageRGB/t/picnorgb.t
 Libtmp/ImageRGB/t/picrgb.t
+Libtmp/LegacyComplex/complex.pd
+Libtmp/LegacyComplex/Makefile.PL
+Libtmp/LegacyComplex/t/complex.t
 Libtmp/Makefile.PL
 Libtmp/Minuit/FCN.c
 Libtmp/Minuit/FCN.h
@@ -584,6 +582,7 @@ Libtmp/Transform/Cartography/earth_height-2048x1024.jpg
 Libtmp/Transform/Cartography/earth_night.jpg
 Libtmp/Transform/Cartography/earth_water-2048x1024.png
 Libtmp/Transform/Cartography/Makefile.PL
+Libtmp/Transform/Cartography_demo.pm
 Libtmp/Transform/Makefile.PL
 Libtmp/Transform/Proj4/Makefile.PL
 Libtmp/Transform/Proj4/proj4.pd
@@ -592,6 +591,7 @@ Libtmp/Transform/Proj4/t/proj_transform.t
 Libtmp/Transform/Proj4/t/proj_transform2.t
 Libtmp/Transform/t/transform.t
 Libtmp/Transform/transform.pd
+Libtmp/Transform/Transform_demo.pm
 m51.fits
 macosx/README
 Makefile.PL
@@ -668,7 +668,7 @@ win32/win32f77.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 GENERATED/PDL/Bad.pm                     mod=PDL::Bad pd=Basic/Bad/bad.pd (added by pdlpp_mkgen)
-GENERATED/PDL/Complex.pm                 mod=PDL::Complex pd=Basic/Complex/complex.pd (added by pdlpp_mkgen)
+GENERATED/PDL/Complex.pm                 mod=PDL::Complex pd=Libtmp/LegacyComplex/complex.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Compression.pm             mod=PDL::Compression pd=Libtmp/Compression/compression.pd (added by pdlpp_mkgen)
 GENERATED/PDL/FFT.pm                     mod=PDL::FFT pd=Libtmp/FFT/fft.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Fit/Gaussian.pm            mod=PDL::Fit::Gaussian pd=Libtmp/Fit/Gaussian/gaussian.pd (added by pdlpp_mkgen)

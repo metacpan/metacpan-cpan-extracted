@@ -51,6 +51,6 @@
          "web" : "https://github.com/mxguardian/Text-ASCII-Convert"
       }
    },
-   "version" : "0.26",
+   "version" : "0.27",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

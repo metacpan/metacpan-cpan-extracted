@@ -6,12 +6,13 @@ my %prereq = (
 	'File::Path'          => '2.18',
 	'File::Spec'          => '3.75',
 	'Getopt::Long'        => '2.54',
-	'Test::Tk'            => '3.03',
+	'Test::Tk'            => '3.04',
 	'Tk'                  => '804.030',
-	'Tk::AppWindow'       => '0.11',
-	'Tk::CodeText'        => '0.51',
+	'Tk::AppWindow'       => '0.14',
+	'Tk::CodeText'        => '0.53',
 	'Tk::FileBrowser'     =>	'0.04',
-	'Tk::Terminal'        =>	'0.01',
+	'Tk::PodViewer'       =>	'0.03',
+	'Tk::Terminal'        =>	'0.03',
 );
 
 WriteMakefile(

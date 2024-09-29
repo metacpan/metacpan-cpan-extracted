@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 use Tk;
 require Tk::YANoteBook::NameTab;
@@ -93,6 +93,12 @@ Default is 1. When cleared the widget will resize to minium when no page is sele
 Default value 'top'. Only available at create time.
 Can be I<top>, I<left>, I<bottom> or I<right>.
 
+=item Switch: B<-tabpadx>
+
+=item Switch: B<-tabpady>
+
+Internal padding for the name tabs. Default value 2 for both x and y.
+
 =item Switch: B<-text>
 
 Text for the more button.
@@ -126,7 +132,7 @@ sub Populate {
 	my $buttonside;
 	if (($tabside eq 'top') or ($tabside eq 'bottom')) {
 		push @barpack, -side => $tabside, -fill => 'both';
-		@tabpack = (-side => 'left');
+		@tabpack = (-side => 'left', -fill => 'y');
 		$buttonside = 'right';
 	} elsif (($tabside eq 'left') or ($tabside eq 'right')) {
 		push @barpack, -side => $tabside, -fill, 'both';
@@ -154,14 +160,15 @@ sub Populate {
 	$self->Advertise('TabFrame' => $tabframe);
 
 	my $morebutton = $barframe->Button(
+		-highlightthickness => 0,
 		-relief => 'flat',
 		-command => ['ListPop', $self],
 	);
 	$self->Advertise('MoreButton' => $morebutton);
 	$self->{MOREBUTTONPACK} = [
 		-side => $buttonside,
-		-padx => 2,
-		-pady => 2,
+#		-padx => 2,
+#		-pady => 2,
 	];
 	$self->{MOREBUTTONISPACKED} = 0;
 
@@ -215,6 +222,8 @@ sub Populate {
 		-selecttabcall => ['CALLBACK', undef, undef, sub {}],
 		-text => [$morebutton, undef, undef, 'More'],
 		-tabpack => ['PASSIVE', undef, undef, \@tabpack], 
+		-tabpadx => ['PASSIVE', undef, undef, 2], 
+		-tabpady => ['PASSIVE', undef, undef, 2], 
 		-unselecttabcall => ['CALLBACK', undef, undef, sub {}],
 		-unselectoptions => ['PASSIVE', undef, undef, [
 			-relief => 'flat',
@@ -276,6 +285,8 @@ sub addPage {
 		-closecall => $self->cget('-closetabcall'),
 		-motioncall => ['MotionCall', $self],
 		-releasecall => ['ReleaseCall', $self],
+		-tpadx => $self->cget('-tabpadx'),
+		-tpady => $self->cget('-tabpady'),
 #		-borderwidth => 4,
 	);
 	my $ud = $self->{UNDISPLAYED};
@@ -319,6 +330,55 @@ sub ClickCall {
 sub ConfigureCall {
 	my $self = shift;
 	$self->UpdateTabs;
+}
+
+sub CoverUp {
+	my $self = shift;
+	my $curcover = $self->{COVERFRAME};
+	if (defined $curcover) {
+		$curcover->destroy;
+		$self->{COVERFRAME} = undef;
+	}
+	
+	my $page = $self->Selected;
+	return unless defined $page;
+	my $tab = $self->getTab($page);
+	my $tabside = $self->{TABSIDE};
+	my $bf = $self->Subwidget('BarFrame');
+	my $tbw = $tab->cget(-borderwidth);
+	my $borderoffset = $tbw + $bf->cget(-borderwidth);
+	my ($cheight, $cwidth, $cx, $cy);
+	if ($tabside eq 'top') {
+		$cwidth = $tab->width - (2 * $tbw);
+		$cheight = $borderoffset;
+		$cx = $tab->x + $tbw;
+		$cy = $tab->height - $tbw;
+	} elsif ($tabside eq 'bottom') {
+		$cwidth = $tab->width - (2 * $tbw);
+		$cheight = $borderoffset;
+		$cx = $tab->x + $tbw;
+		$cy = - $tbw;
+	} elsif ($tabside eq 'left') {
+		$cwidth = $borderoffset;
+		$cheight = $tab->height - (2 * $tbw);
+		$cx = $tab->width - $tbw;
+		$cy =  $tab->y + $tbw;
+	} elsif ($tabside eq 'right') {
+		$cwidth = $borderoffset;
+		$cheight = $tab->height - (2 * $tbw);
+		$cx = - $tbw;
+		$cy =  $tab->y + $tbw;
+	}
+	my $cf = $self->Subwidget('BarFrame')->Frame(
+#		-background => 'red',
+		-height => $cheight,
+		-width => $cwidth,
+	)->place(
+		-x => $cx,
+		-y => $cy,
+	);
+	$cf->raise;
+	$self->{COVERFRAME} = $cf;
 }
 
 =item B<deletePage>I<($name)>
@@ -681,45 +741,8 @@ sub selectPage {
 		);
 		$frame->pack(-expand => 1, -fill => 'both');
 		
-		#configure the cover frame
-		my $tabside = $self->{TABSIDE};
-		my $bf = $self->Subwidget('BarFrame');
-		my $tbw = $tab->cget(-borderwidth);
-		my $borderoffset = $tbw + $bf->cget(-borderwidth);
-		my ($cheight, $cwidth, $cx, $cy);
-		if ($tabside eq 'top') {
-			$cwidth = $tab->width - (2 * $tbw);
-			$cheight = $borderoffset;
-			$cx = $tab->x + $tbw;
-			$cy = $tab->height - $tbw;
-		} elsif ($tabside eq 'bottom') {
-			$cwidth = $tab->width - (2 * $tbw);
-			$cheight = $borderoffset;
-			$cx = $tab->x + $tbw;
-			$cy = - $tbw;
-		} elsif ($tabside eq 'left') {
-			$cwidth = $borderoffset;
-			$cheight = $tab->height - (2 * $tbw);
-			$cx = $tab->width - $tbw;
-			$cy =  $tab->y + $tbw;
-		} elsif ($tabside eq 'right') {
-			$cwidth = $borderoffset;
-			$cheight = $tab->height - (2 * $tbw);
-			$cx = - $tbw;
-			$cy =  $tab->y + $tbw;
-		}
-		my $cf = $self->Subwidget('BarFrame')->Frame(
-#			-background => 'red',
-			-height => $cheight,
-			-width => $cwidth,
-		)->place(
-			-x => $cx,
-			-y => $cy,
-		);
-		$cf->raise;
-		$self->{COVERFRAME} = $cf;
-
 		$self->{SELECTED} = $name;
+		$self->CoverUp;
 		$self->Callback('-selecttabcall', $name);
 	} else {
 		warn "Page $name does not exist"
@@ -763,11 +786,6 @@ sub unselectPage {
 		$tab->configure(@$o,
 			-background => $self->cget('-backpagecolor'),
 		);
-		my $cf = $self->{COVERFRAME};
-		if (defined $cf) {
-			$cf->destroy;
-			$self->{COVERFRAME} = undef;
-		}
 		$frame->packForget;
 		$self->{SELECTED} = undef;
 		$self->Subwidget('PageFrame')->packForget unless $self->cget('-rigid');;
@@ -803,11 +821,13 @@ sub UpdateTabs {
 		unless ($self->{MOREBUTTONISPACKED}) {
 			my $o = $self->{MOREBUTTONPACK};
 			$b->pack(@$o);
+			$self->after(50, ['CoverUp', $self]);
 			$self->{MOREBUTTONISPACKED} = 1;
 		}
 	} else {
 		if ($self->{MOREBUTTONISPACKED}) {
 			$b->packForget;
+			$self->after(50, ['CoverUp', $self]);
 			$self->{MOREBUTTONISPACKED} = 0;
 		}
 	}

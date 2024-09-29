@@ -88,7 +88,7 @@ subtest recursive_get => sub {
   );
 
   is($doc2->errors, 0, 'no errors during traversal');
-  $openapi->evaluator->add_schema($doc2);
+  $openapi->evaluator->${$JSON::Schema::Modern::VERSION < 0.591 ? \'add_schema' : \'add_document'}($doc2);
 
   like(
     exception { $openapi->recursive_get('#/paths/~1foo/post/parameters/0') },

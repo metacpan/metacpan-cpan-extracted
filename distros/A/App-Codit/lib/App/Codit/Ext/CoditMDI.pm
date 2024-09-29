@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.09";
+$VERSION="0.10";
 
 use base qw( Tk::AppWindow::Ext::MDI );
 
@@ -63,6 +63,10 @@ Sets and returns the shownumbers option of the currently selected document.
 =item B<-doc_view_status>
 
 Sets and returns the showstatus option of the currently selected document.
+
+=item B<-doc_wrap>
+
+Sets and returns the wrap option of the currently selected document.
 
 =back
 
@@ -168,6 +172,12 @@ sub new {
 		-doc_wrap => ['docWrap', $self],
 	);
 	$self->cmdConfig(
+		bookmark_add => ['bookmarkAdd', $self],
+		bookmark_clear => ['bookmarkClear', $self],
+		bookmark_fill => ['bookmarkFill', $self],
+		bookmark_next => ['bookmarkNext', $self],
+		bookmark_prev => ['bookmarkPrev', $self],
+		bookmark_remove => ['bookmarkRemove', $self],
 		doc_autoindent => ['docAutoIndent', $self],
 		doc_case_lower => ['docCaseLower', $self],
 		doc_case_upper => ['docCaseUpper', $self],
@@ -190,6 +200,73 @@ sub new {
 }
 
 sub _mcr { return $_[0]->{MACROS} }
+
+sub bookmarkAdd {
+	my $self = shift;
+	my $doc = $self->docSelected;
+	if (defined $doc) {
+		my $w = $self->docGet($doc)->CWidg;
+		$w->bookmarkNew
+	}
+}
+
+sub bookmarkClear {
+	my $self = shift;
+	my $doc = $self->docSelected;
+	if (defined $doc) {
+		my $w = $self->docGet($doc)->CWidg;
+		$w->bookmarkRemoveAll;
+	}
+}
+
+sub bookmarkFill {
+	my $self = shift;
+	my $mnu = $self->extGet('MenuBar');
+	my ($menu, $index) = $mnu->FindMenuEntry('Bookmarks');
+	my $submenu = $menu->entrycget($index, '-menu');
+	my $i = $submenu->index('end');
+	if ($i > 7) {
+		$submenu->delete(8, 'last');
+	}
+	my $doc = $self->docSelected;
+	if (defined $doc) {
+		my $w = $self->docGet($doc)->CWidg;
+		my @list = $w->bookmarkList;
+		for (@list) {
+			$submenu->add('command',
+				-label => "$_ - " . $w->bookmarkText($_),
+				-command => ['bookmarkGo', $w, $_],
+			);
+		}
+	}
+}
+
+sub bookmarkNext {
+	my $self = shift;
+	my $doc = $self->docSelected;
+	if (defined $doc) {
+		my $w = $self->docGet($doc)->CWidg;
+		$w->bookmarkNext
+	}
+}
+
+sub bookmarkPrev {
+	my $self = shift;
+	my $doc = $self->docSelected;
+	if (defined $doc) {
+		my $w = $self->docGet($doc)->CWidg;
+		$w->bookmarkPrev
+	}
+}
+
+sub bookmarkRemove {
+	my $self = shift;
+	my $doc = $self->docSelected;
+	if (defined $doc) {
+		my $w = $self->docGet($doc)->CWidg;
+		$w->bookmarkRemove
+	}
+}
 
 sub CmdDocClose {
 	my ($self, $name) =  @_;
@@ -258,6 +335,22 @@ sub CreateContentHandler {
 	my $h = $self->SUPER::CreateContentHandler($name);
 	$h->Name($name);
 	return $h;
+}
+
+sub deferredOpen {
+	my ($self, $name) = @_;
+	croak 'Name not defined' unless defined $name;
+	my $options = $self->deferredOptions($name);
+	my $bookmarks = delete $options->{'bookmarks'};
+	$self->SUPER::deferredOpen($name);
+	$self->after(100, sub {
+		if (defined $bookmarks) {
+			my $w = $self->docGet($name)->CWidg;
+			while ($bookmarks =~ s/^(\d+)\s//) {
+				$w->bookmarkNew($1);
+			}
+		}
+	});
 }
 
 sub disposeUntitled {
@@ -683,6 +776,15 @@ sub MenuItems {
       [ 'menu_separator', 'Edit::',          'e5' ],
       [ 'menu_normal',    'Edit::',          '~Select all',        '<Control-a>',       'edit-select-all','*CTRL+A'],
 
+      [ 'menu',           undef,             '~Bookmarks',         'bookmark_fill'],
+      [ 'menu_normal',    'Bookmarks::',     '~Add bookmark',      'bookmark_add',      'bookmark_new',      'CTRL+B',],
+      [ 'menu_normal',    'Bookmarks::',     '~Remove bookmark',   'bookmark_remove',   'bookmark_remove',   'CTRL+SHIFT+B',],
+      [ 'menu_normal',    'Bookmarks::',     '~Clear bookmarks',   'bookmark_clear',    undef],
+      [ 'menu_separator', 'Bookmarks::',     'b1' ],
+      [ 'menu_normal',    'Bookmarks::',     '~Previous bookmark', 'bookmark_prev',     'bookmark_previous'],
+      [ 'menu_normal',    'Bookmarks::',     '~Next bookmark',     'bookmark_next',     'bookmark_next'],
+      [ 'menu_separator', 'Bookmarks::',     'b2' ],
+
       [ 'menu_separator', 'View::',          'v1' ],
       [ 'menu_check',     'View::',          'Show ~folds',          undef,   '-doc_view_folds', undef, 0, 1],
       [ 'menu_check',     'View::',          'Show ~line numbers',   undef,   '-doc_view_numbers', undef, 0, 1],
@@ -691,8 +793,8 @@ sub MenuItems {
       [ 'menu_check',     'View::',          'Show ~spaces and tabs','show-spaces', '-doc_show_spaces', undef, 0, 1],
 
       [ 'menu',           undef,             '~Tools'],
-      [ 'menu_normal',    'Tools::',         '~Find',              'doc_find',          'edit-find',      'CTRL+F',],
-      [ 'menu_normal',    'Tools::',         '~Replace',	          'doc_replace',       'edit-find-replace','CTRL+R',],
+      [ 'menu_normal',    'Tools::',         '~Find',              'doc_find',          'edit-find',      '*CTRL+F',],
+      [ 'menu_normal',    'Tools::',         '~Replace',	          'doc_replace',       'edit-find-replace','*CTRL+R',],
       [ 'menu_separator', 'Tools::',          't1' ],
       [ 'menu_check',     'Tools::',          'A~uto indent',        undef,   '-doc_autoindent', undef, 0, 1],
       [ 'menu_radio_s',   'Tools::',          '~Wrap',  [qw/char word none/],  undef, '-doc_wrap'],

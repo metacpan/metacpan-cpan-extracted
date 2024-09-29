@@ -16,7 +16,14 @@ use Bio::MUST::Drivers;
 
 
 const my $NET_VAR => 'BMD_TEST_NETWORK';
-say 'Note: tests designed for: blast 2.10.0, build Jan  8 2020 22:00:09';
+
+say <<'EOT';
+Note: tests designed for:
+- blast 2.8.1, build Nov 26 2018 11:55:45
+- blast 2.10.0, build Jan  8 2020 22:00:09
+- blast 2.11.0, build Nov  3 2020 16:32:26
+- blast 2.16.0, build Jun 25 2024 12:36:54
+EOT
 
 my $qr_class = 'Bio::MUST::Core::Ali::Temporary';
 my $db_class = 'Bio::MUST::Drivers::Blast::Database';
@@ -45,6 +52,7 @@ my $report_xml;
     $basename = $db->filename;
     ok(-e "$basename.$_", "wrote db file with expected suffix: $_")
         for qw(phr pin psq);
+    #   for qw(pdb phr pin pjs pog pos pot psq ptf pto);    # too stringent!
     explain $basename;
 
     # 1. prebuilt query file (need selecting BLAST program)
@@ -97,9 +105,16 @@ my $report_xml;
     compare_filter_ok $report_xml, file('test', 'report.blastp.xml'),
         \&filter, 'wrote expected XML BLASTP report';
     $xml_parser->remove;
+
+    # blastdbcmd from temporary database
+    my @ids = qw(seq2 seq4 seq6);
+    my $seqs = $db->blastdbcmd( \@ids );
+    cmp_ok $seqs->count_seqs, '==', 3,
+        'fetched expected number of seqs from temporary database';
 }
 ok(!-e "$basename.$_", "deleted db file with expected suffix: $_")
     for qw(phr pin psq);
+#   for qw(pdb phr pin pjs pog pos pot psq ptf pto);    # too stringent!
 ok(!-e $filename,   'deleted query file');
 ok(!-e $report_m6,  'deleted tabular report file');
 ok(!-e $report_xml, 'deleted XML report file');
@@ -112,7 +127,7 @@ To enable them use:
 \$ $NET_VAR=1 make test
 EOT
 
-    my $db = $db_class->new( file => 'nt', remote => 1 );
+    my $db = $db_class->new( file => 'core_nt', remote => 1 );
     cmp_ok $db->type, 'eq', 'nucl', 'got expected -db_type';
     $basename = $db->filename;
     explain $basename;
@@ -122,9 +137,9 @@ EOT
     explain $filename;
 
     my $parser = $db->blast($query, {
-        '-entrez_query' => q{'Euglenozoa[ORGN]'},
-        '-evalue'       => 1e-250,
-        '-outfmt'       => 7,
+        '-entrez_query'    => q{'Euglenozoa[ORGN]'},
+        '-evalue'          => 1e-250,
+        '-outfmt'          => 7,
     } );
     isa_ok($parser, 'Bio::FastParsers::Blast::Table');
 
@@ -152,12 +167,15 @@ EOT
     cmp_ok $db->type, 'eq', 'prot', 'got expected -db_type';
     $basename = $db->filename;
     ok(-e "$basename.$_", "found db file with expected suffix: $_")
-        for qw(phr pin psq pog psi psd);
+        for qw(phr pin psq);
+    #   for qw(pdb phr pin pjs pog pos pot psq ptf pto);    # too stringent!
     explain $basename;
 
+    # blastdbcmd from prebuilt database
     my @ids = qw(gnl|Ca|29376464 gnl|Mg|16801896 gnl|Cu|29375460);
     my $seqs = $db->blastdbcmd( \@ids );
-    cmp_ok $seqs->count_seqs, '==', 3, 'fetched expected number of seqs';
+    cmp_ok $seqs->count_seqs, '==', 3,
+        'fetched expected number of seqs from prebuilt database';
 }
 
 # TODO: test other BLAST variants and options?

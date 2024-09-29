@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 use 5.020;
 use Moo;
@@ -337,7 +337,7 @@ sub _add_vocab_and_default_schemas ($self) {
     my ($filename, $uri) = @$pairs;
     my $document = $js->add_schema($uri,
       $js->_json_decoder->decode(path(dist_dir('OpenAPI-Modern'), $filename)->slurp_raw));
-    $js->add_schema($uri.'/latest', $document) if $uri =~ /schema(-base)?$/;
+    $js->${$JSON::Schema::Modern::VERSION < 0.591 ? \'add_schema' : \'add_document'}($uri.'/latest', $document) if $uri =~ /schema(-base)?$/;
   }
 }
 
@@ -386,7 +386,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.068
+version 0.069
 
 =head1 SYNOPSIS
 

@@ -9,7 +9,7 @@ App::Codit::Plugins::Console - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.08;
+$VERSION = 0.10;
 
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
@@ -59,160 +59,40 @@ This plugin does not work and cannot load on Windows.
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_, 'ToolPanel');
+	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 	return undef if $mswin; #will not load on windows.
 
-
-	my $tp = $self->extGet('ToolPanel');
-	my $page = $tp->addPage('Console', 'utilities-terminal', undef, 'System commands');
+	my $page = $self->ToolBottomPageAdd('Console', 'utilities-terminal', undef, 'Execute system commands', 500);
 	
 	my @pad = (-padx => 2, -pady => 2);
-	my $text;
 	
 	my $workdir = '';
 	$self->{WORKDIR} = \$workdir;
 	$self->{UPDATEBLOCK} = 0;
-
-	my $wff = $page->LabFrame(
-		-label => 'Working directory',
-		-labelside => 'acrosstop',
-	)->pack(-fill => 'x');
-	my $e = $wff->Entry(
-		-textvariable => \$workdir,
-	)->pack(@pad, -side => 'left', -expand => 1, -fill => 'both');
-	$e->bind('<Return>', sub {
-		$self->{UPDATEBLOCK} = 1;
-		$self->dirSet($workdir);
-		$self->{UPDATEBLOCK} = 0;
-	});
-	my $b = $wff->Button(
-		-image => $self->getArt('folder', 22),
-		-text => 'Select',
-		-relief => 'flat',
-		-command => sub {
-			my $folder = $self->chooseDirectory;
-			$self->dirSet($folder) if defined $folder;
-		},
-	)->pack(@pad, -side => 'left');
-	
-	my $nb = $page->NoteBook->pack(@pad, -expand => 1, -fill => 'both');
-
-	my $cmdpage = $nb->add('cmd', -label => 'Commands');
-	my $clist = $cmdpage->Scrolled('HList',
-		-command => ['commandRun', $self],
-		-width => 8,
-		-height => 4,
-		-scrollbars => 'osoe',
-		-selectmode => 'single',
-	)->pack(@pad,-expand => 1, -fill => 'both');
-	$self->{CLIST} = $clist;
-
-	my $testpage = $nb->add('test', -label => 'Tests');
-	my $tlist = $testpage->Scrolled('HList',
-		-command => ['testRun', $self],
-		-width => 8,
-		-height => 4,
-		-scrollbars => 'osoe',
-		-selectmode => 'single',
-	)->pack(@pad, -expand => 1, -fill => 'both');
-	$self->{TLIST} = $tlist;
-
-	my $of = $page->Frame->pack(-fill => 'x');
-	my $options = '';
-	my $oe;
-	my $state = '';
-	$self->{OPTSTATE} = \$state;
-	$of->Checkbutton(
-		-command => sub {
-			if ($state) {
-				$oe->configure(-state => 'normal');
-			} else {
-				$oe->configure(-state => 'disabled');
-			}
-		},
-		-text => 'Options',
-		-variable => \$state,
-	)->pack(@pad, -side => 'left');
-	$oe = $of->Entry(
-		-state => 'disabled',
-		-textvariable => \$options
-	)->pack(@pad, -expand => 1, -fill => 'x', -side => 'left');
-	$self->{OPTIONS} = \$options;
-	$of->Button(
-		-command => ['refresh', $self],
-		-text => 'Refresh'
-	)->pack(@pad, -side => 'left');
 	
 	my $folder = $self->configGet('-configfolder');
 	my $hist = "$folder/console_history";
-	$text = $page->Scrolled('Terminal',
+	my $text = $page->Scrolled('Terminal',
 		-width => 8,
 		-height => 8,
 		-historyfile => $hist,
 		-scrollbars => 'oe',
-		-dircall => ['changeDir', $self],
 		-linkcall => ['linkSelect', $self],
 		-linkreg => qr/[^\s]+\sline\s\d+/,
 	)->pack(@pad, -expand => 1, -fill => 'both');
 	$self->{TXT} = $text;
 	$workdir = $text->cget('-workdir');
 	
-	$page->Adjuster(
-		-side => 'bottom',
-		-widget => $text,
-	)->pack(@pad, -before => $text, -fill => 'x');
-	
-	$self->refresh;
-	
+
 	return $self;
 }
 
-sub _cl { return $_[0]->{CLIST} }
-
-sub _ln {
-	my ($self, $name) = @_;
-	$name =~ s/\./_/;
-	return $name
-}
-
-sub _tl { return $_[0]->{TLIST} }
-
 sub _txt { return $_[0]->{TXT} }
 
-sub changeDir {
-	my ($self, $dir) = @_;
-	if ((defined $dir) and (-d $dir)) {
-		unless ($self->{UPDATEBLOCK}) {
-			my $workdir = $self->{WORKDIR};
-			$$workdir = $dir;
-		}
-		$self->refresh;
-	}
-}
-
-sub commandRun {
-	my ($self, $cmd) = @_;
-	my $list = $self->_cl;
-	my $command = $list->entrycget($cmd, '-text');
-	my $options = $self->options;
-	$command = "$command $options" if $options ne '';
-	$self->run($command);
-}
-
-=item B<dirGet>
-
-=cut
-
 sub dirGet {
-	my ($self, $dir) = @_;
-	my $workdir = $self->{WORKDIR};
-	return $$workdir
+	return $_[0]->_txt->workdir
 }
-
-=item B<dirSet>I<($dir)>
-
-=cut
 
 sub dirSet { # TODO
 	my ($self, $dir) = @_;
@@ -242,96 +122,9 @@ sub linkSelect {
 	}
 }
 
-sub options {
-	my $self = shift;
-	my $fl = $self->{OPTSTATE};
-	return '' unless $$fl;
-	my $op = $self->{OPTIONS};
-	return $$op
-}
-
-sub refresh {
-	my $self = shift;
-
-	#refreshing commands
-	my $clist = $self->_cl;
-	$clist->deleteAll;
-	my $d = $self->{WORKDIR};
-	my $dir = $$d;
-	if (-e "$dir/Makefile.PL") {
-		for (
-			'perl Makefile.PL',
-			'make',
-			'make clean',
-			'make dist',
-			'make disttest',
-			'make manifest',
-			'make realclean',
-			'make test',
-		) {
-			my $cmd = $_;
-			my $name = $self->_ln($cmd);
-			$clist->add($name, -text => $cmd);
-		}
-	}
-	if (-e "$dir/Build.PL") {
-		for (
-			'perl Build.PL',
-			'./Build',
-			'./Build clean',
-			'./Build dist',
-			'./Build disttest',
-			'./Build manifest',
-			'./Build realclean',
-			'./Build test',
-		) {
-			my $cmd = $_;
-			my $name = $self->_ln($cmd);
-			$clist->add($name, -text => $cmd);
-		}
-	}
-	
-	#refreshing tests
-	my $tdir = $self->testDir;
-	my $tlist = $self->_tl;
-	$tlist->deleteAll;
-	my @tests = ();
-	if (opendir my $dh, $tdir) {
-		while (my $entry = readdir $dh) {
-			next unless $entry =~ /\.t$/;
-			push @tests, $entry
-		}
-		closedir $dh;
-	}
-	for (sort @tests) {
-		$tlist->add($self->_ln($_), -text => $_);
-	}
-}
-
-sub run {
-	my ($self, $command) = @_;
-	$self->_txt->launch($command);
-}
-
-sub testDir {
-	my $self = shift;
-	my $dir = $self->dirGet;
-	$dir = "$dir/t";
-	return $dir;
-}
-
-sub testRun {
-	my ($self, $test) = @_;
-	my $list = $self->_tl;
-	my $command = "make; perl -Mblib t/" . $list->entrycget($test, '-text');
-	my $options = $self->options;
-	$command = "$command $options" if $options ne '';
-	$self->run($command);
-}
-
 sub Unload {
 	my $self = shift;
-	$self->extGet('ToolPanel')->deletePage('Console');
+	$self->ToolBottomPageRemove('Console');
 	return $self->SUPER::Unload
 }
 

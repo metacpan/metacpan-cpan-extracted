@@ -3320,6 +3320,10 @@ C<unpdl> does not support this. However, it is suggested you would
 generate an index-set with C<< $pdl->whereND($pdl == $PDL::undefval)
 >>, then loop over the Perl data, setting those locations to C<undef>.
 
+Another round-trip caveat: a zero-dimensional ndarray (a scalar) will be
+returned as a single-element array-ref. This is conceptually incorrect,
+but cannot now be changed due to backward compatibility.
+
 =for example
 
  use JSON;
@@ -3330,22 +3334,6 @@ generate an index-set with C<< $pdl->whereND($pdl == $PDL::undefval)
 unpdl converts any bad values into the string 'BAD'.
 
 =cut
-
-sub PDL::unpdl {
-    barf 'Usage: unpdl($pdl)' if $#_ != 0;
-    my $pdl = PDL->topdl(shift);
-    return [] if $pdl->nelem == 0;
-    return _unpdl_int($pdl);
-}
-
-sub _unpdl_int {
-    my $pdl = shift;
-    if ($pdl->ndims > 1) {
-        return [ map { _unpdl_int($_) } dog $pdl ];
-    } else {
-        return listref_c($pdl);
-    }
-}
 
 =head2 listindices
 
@@ -3653,14 +3641,6 @@ e.g.:
 The output ndarrays are set bad if the original ndarray has its bad flag set.
 
 =cut
-
-sub PDL::dog {
-  my $opt = ref($_[-1]) eq 'HASH' ? pop @_ : {};
-  my $p = shift;
-  my $s = ":,"x($p->getndims-1);
-  my @res = map $p->slice($s."(".$_.")"), 0..$p->dim(-1)-1;
-  $$opt{Break} ? map $_->copy, @res : @res
-}
 
 ###################### Misc internal routines ####################
 

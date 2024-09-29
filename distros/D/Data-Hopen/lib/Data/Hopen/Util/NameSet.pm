@@ -3,7 +3,7 @@ package Data::Hopen::Util::NameSet;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000021';
 
 # Docs {{{1
 
@@ -81,29 +81,6 @@ sub contains {
     #say STDERR $self->{_RE};
     return shift =~ $self->{_RE};
 } #contains()
-
-=head2 smartmatch overload
-
-For convenience, C<< 'foo' ~~ $nameset >> invokes
-C<< $nameset->contains('foo') >>.  This is inspired by the Raku behaviour,
-in which C<< $x ~~ $y >> calls C<< $y.ACCEPTS($x) >>
-
-NOTE: C<< $nameset ~~ 'foo' >> (object first) is officially not supported by
-this module.  This form is possible in stable perls at least through 5.26.
-However, the changes (since reverted) in 5.27.7 would not have supported this
-form.  See
-L<http://blogs.perl.org/users/leon_timmermans/2017/12/smartmatch-in-5277.html>.
-However, as far as I can tell, even 5.27.7 would have supported the
-C<< 'foo' ~~ $nameset >> form.
-
-=cut
-
-use overload
-    fallback => 1,
-    '~~' => sub {
-        #my ($self, $other, $swap) = @_;
-        $_[0]->contains($_[1])
-    };
 
 =head2 strings
 

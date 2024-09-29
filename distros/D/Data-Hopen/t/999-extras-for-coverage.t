@@ -4,6 +4,8 @@
 use rlib 'lib';
 use HopenTest;
 
+ok($Data::Hopen::VERSION, 'has a VERSION');
+
 # Fake package, used for testing hnew
 package MY::ReturnsFalsyInstance {
     sub new {

@@ -1,5 +1,17 @@
 Revision history for Perl extension App::Codit.
 
+0.10 Tue Sep 28 2024
+	- Entering beta phase.
+	- Plugin PodViewer now uses Tk::PodViewer instead of Tk::Pod
+	- Toolpanel now created on the fly, no longer using extension ToolPanel
+	- Added a bottom bar for plugins Console and PodViewer
+	- Added bookmarks menu.
+	- Plugins Bookmarks and WordCompletion now functional.
+	- Fixed bug in plugin SearchReplace.
+	- You can now search inside results in plugin SearchReplace.
+	- Added option to make codit a unique instance.
+	- Updated manual and documentation
+
 0.09 Sat Jul 27 2024
 	- added many more components to the About tab.
 	- added module App::Codit::Macro.

@@ -6,10 +6,10 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '2.02';
+our $VERSION = '3.00';
 
 Travel::Status::DE::EFA::Line->mk_ro_accessors(
-	qw(direction mot name operator route type valid));
+	qw(direction mot name number operator route type valid));
 
 my @mot_mapping = qw{
   zug s-bahn u-bahn stadtbahn tram stadtbus regionalbus
@@ -57,7 +57,7 @@ requested station
 
 =head1 VERSION
 
-version 2.02
+version 3.00
 
 =head1 DESCRIPTION
 

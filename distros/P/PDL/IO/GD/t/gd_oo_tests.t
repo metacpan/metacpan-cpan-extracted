@@ -19,9 +19,9 @@ sub tapprox {
 
 my $tempdir = tempdir( CLEANUP => 1 );
 my $lutfile = "$tempdir/default.rcols";
-my $testfile1 = "$tempdir/test.png";
+my $testfile_lut = "$tempdir/test.png";
 my $testfile2 = "$tempdir/test2.png";
-my $testfile3 = "$tempdir/test3.png";
+my $testfile_true = "$tempdir/test3.png";
 
 # Write out the lutfile below, so we don't have to include it in the distro:
 write_lut($lutfile);
@@ -32,11 +32,13 @@ my $pdl = sequence(byte, 30, 30);
 my $lut = load_lut( $lutfile );
 ok( ($lut->dim(0) == 3 && $lut->dim(1) == 256), 'Load a lut from an ASCII file' );
 
-write_png( $pdl, $lut, $testfile1 );
+write_png( $pdl, $lut, $testfile_lut );
 
-write_true_png(sequence(100, 100, 3), $testfile3);
+write_true_png(sequence(100, 100, 3), $testfile_true);
 
-my $gd = PDL::IO::GD->new( { filename => $testfile1 } );
+eval {PDL::IO::GD->new( { filename => "$tempdir/notthere.png" } )};
+like $@, qr/Error/, 'exception not segfault on non-existent file';
+my $gd = PDL::IO::GD->new( { filename => $testfile_lut } );
 #diag "Object created!\n";
 ok( defined( $gd ), 'Object created' );
 
@@ -45,10 +47,15 @@ ok( $x, 'query X dim' );
 my $y = $gd->gdImageSY();
 ok( $y, 'query Y dim' );
 
-my $pdl2 = $gd->to_pdl();
+my $pdl2 = $gd->to_pdl;
 ok( tapprox( $pdl, $pdl2 ), 'image matches original pdl' );
 
-$gd->DESTROY();
+my $pdl3 = $gd->to_rpic->slice(',-1:0');
+ok( tapprox( $pdl3, $pdl ), 'rpic image matches original pdl' )
+  or diag 'orig(0:3,0:3)=', $pdl->slice('0:3,0:3'),
+    'new(0:3,0:3)=', $pdl3->slice('0:3,0:3');
+
+undef $gd;
 
 my $im = PDL::IO::GD->new( { x => 300, y => 300 } );
 ok( defined( $im ), 'create new image from scratch' );
@@ -83,86 +90,73 @@ ok( 1, 'generate a color bar' );
 # Write the output file:
 $im->write_Png( $testfile2 );
 ok( 1, 'write the output file' );
-$im->DESTROY(); $im = undef;
+undef $im;
 
-# Create from a 2d PDL without a LUT:
 my $pic = sequence(100, 100);
 $im = PDL::IO::GD->new({ pdl => $pic });
 ok( defined( $im ), 'create from 2d PDL without a LUT' );
-$im->DESTROY(); $im = undef;
+undef $im;
 
-# Create from a 2d PDL and a LUT:
 $im = PDL::IO::GD->new({ pdl => $pic, lut => $lut });
 ok( defined( $im ), 'create from 2d PDL and a LUT' );
-$im->DESTROY(); $im = undef;
+undef $im;
 
-# Create from a RGB PDL:
 my $pic3d = $pic->dummy(2,3);
 $im = PDL::IO::GD->new({ pdl => $pic3d });
 ok( defined( $im ), 'create from a RGB PDL' );
-$im->DESTROY(); $im = undef;
+undef $im;
 
-# Create an RGB from scratch:
 $im = PDL::IO::GD->new({ x => 100, y => 100, true_color => 1 });
 ok( defined( $im ), 'create an RGB from scratch' );
-$im->DESTROY(); $im = undef;
+undef $im;
 
 # Create from a 2d PNG data glob:
-my $rc = open( TF1, $testfile1 );
-ok( $rc, 'opened test file and handle' );
-binmode( TF1 );
-$/ = undef;
-my $blob = <TF1>;
-close( TF1 );
+my $blob = do { open my $fh, $testfile_lut or die "$testfile_lut: $!"; binmode $fh; local $/; <$fh> };
+ok defined $blob, "read test file $testfile_lut";
 $im = PDL::IO::GD->new({ data => $blob });
 ok( defined( $im ), 'create from a 2d PNG data glob' );
-$im->DESTROY(); $im = undef;
+undef $im;
 
 # Create from a 2d PNG data glob, with the type given:
 $im = PDL::IO::GD->new({ data => $blob, type => 'png' });
 ok( defined( $im ), 'create from glob with type given' );
-$im->DESTROY(); $im = undef;
+undef $im;
 
 # Create from a 3d PNG data glob:
-$rc = open( TF3, $testfile3 );
-ok( $rc , 'testfile3 successfully opened');
-binmode( TF3 );
-$/ = undef;
-my $blob3d = <TF3>;
-close( TF3 );
+my $blob3d = do { open my $fh, $testfile_true or die "$testfile_true: $!"; binmode $fh; local $/; <$fh> };
+ok defined $blob, "read test file $testfile_true";
 $im = PDL::IO::GD->new({ data => $blob3d });
 ok( defined( $im ), 'create from a 3d PNG data glob' );
-
 # Get a PNG data glob from a created 
 my $png_blob = $im->get_Png_data();
 ok( $blob3d eq $png_blob, 'get a PNG data glob' );
-$im->DESTROY(); $im = undef;
+undef $im;
 
 # Try a nicer way to make an object. Just pass in a filename:
-my $gd_new_just_filename = PDL::IO::GD->new( $testfile1 );
+my $gd_new_just_filename = PDL::IO::GD->new( $testfile_lut );
 ok( defined( $gd_new_just_filename ), 'initialize an object from JUST the filename' );
 
 # Try another nicer way to make an object: Pass in an inline hash:
-my $gd_new_inline_hash = PDL::IO::GD->new( filename => $testfile1 );
+my $gd_new_inline_hash = PDL::IO::GD->new( filename => $testfile_lut );
 ok( defined( $gd_new_inline_hash ), 'initialize an object from an inline hash' );
 
 # Make sure bogus inline hashes generate complaints. First, give an odd
 # number of args
 my $gd_new_inline_hash_broken1;
-eval { $gd_new_inline_hash_broken1 = PDL::IO::GD->new( filename => $testfile1, 34 ) };
+eval { $gd_new_inline_hash_broken1 = PDL::IO::GD->new( filename => $testfile_lut, 34 ) };
 ok( $@ && !defined( $gd_new_inline_hash_broken1 ), 'incorrectly initialize an object from an inline hash: odd Nargs' );
 # TEST 32:
 # Make sure bogus inline hashes generate complaints. Give a non-string key
 my $gd_new_inline_hash_broken2;
-eval { $gd_new_inline_hash_broken2 = PDL::IO::GD->new( filename => $testfile1, [34] => 12 ) };
+eval { $gd_new_inline_hash_broken2 = PDL::IO::GD->new( filename => $testfile_lut, [34] => 12 ) };
 ok( $@ && !defined( $gd_new_inline_hash_broken2 ), 'incorrectly initialize an object from an inline hash: non-string key' );
 
 done_testing;
 
 sub write_lut {
     my $filename = shift;
-    open( LUT, ">$filename" );
-    print LUT <<'ENDLUT';
+    open my $fh, ">", $filename or die "Can't write $filename: $!\n";
+    print $fh <<'ENDLUT';
   2    0    4
   9    0    7
  22    0   19
@@ -420,5 +414,4 @@ sub write_lut {
   0    0    0
 255  255  255
 ENDLUT
-    close( LUT );
 } # End of write_lut()...

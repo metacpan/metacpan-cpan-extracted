@@ -2,6 +2,7 @@
 
 requires 'perl' => '5.14.1';
 requires 'Log::Any';
+requires 'URI::Encode';
 
 on configure => sub {
     requires 'ExtUtils::MakeMaker' => '7.32'; # correctly deals with toplevel README.pod

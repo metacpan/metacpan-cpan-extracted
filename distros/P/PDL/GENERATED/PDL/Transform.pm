@@ -91,27 +91,28 @@ Coordinate transformations and mappings are a little counterintuitive
 at first.  Here are some examples of transforms in action:
 
    use PDL::Transform;
+   use PDL::Graphics::Simple;
    $x = rfits('m51.fits');   # Substitute path if necessary!
    $ts = t_linear(Scale=>3); # Scaling transform
 
-   $w = pgwin(xs);
-   $w->imag($x);
+   $w = pgswin(xs);
+   $w->plot(with=>'image', $x);
 
    ## Grow m51 by a factor of 3; origin is at lower left.
    $y = $ts->map($x,{pix=>1});    # pix option uses direct pixel coord system
-   $w->imag($y);
+   $w->plot(with=>'image', $y);
 
    ## Shrink m51 by a factor of 3; origin still at lower left.
    $c = $ts->unmap($x, {pix=>1});
-   $w->imag($c);
+   $w->plot(with=>'image', $c);
 
    ## Grow m51 by a factor of 3; origin is at scientific origin.
    $d = $ts->map($x,$x->hdr);    # FITS hdr template prevents autoscaling
-   $w->imag($d);
+   $w->plot(with=>'image', $d);
 
    ## Shrink m51 by a factor of 3; origin is still at sci. origin.
    $e = $ts->unmap($x,$x->hdr);
-   $w->imag($e);
+   $w->plot(with=>'image', $e);
 
    ## A no-op: shrink m51 by a factor of 3, then autoscale back to size
    $f = $ts->map($x);            # No template causes autoscaling of output
@@ -260,7 +261,7 @@ are both Transform methods and PDL methods.
 
 use strict;
 use warnings;
-#line 264 "Transform.pm"
+#line 265 "Transform.pm"
 
 
 =head1 FUNCTIONS
@@ -271,7 +272,7 @@ use warnings;
 
 
 
-#line 314 "transform.pd"
+#line 315 "transform.pd"
 
 =head2 apply
 
@@ -310,7 +311,7 @@ sub apply {
   return $result;
 }
 
-#line 356 "transform.pd"
+#line 357 "transform.pd"
 
 =head2 invert
 
@@ -346,7 +347,7 @@ sub invert {
   $result->is_inplace(0);  # make sure inplace flag is clear.
   return $result;
 }
-#line 350 "Transform.pm"
+#line 351 "Transform.pm"
 
 
 =head2 map
@@ -492,8 +493,7 @@ value, then it is the aspect ratio between the first dimension and all
 subsequent dimensions -- or, for a 2-D transformation, the scientific
 pixel aspect ratio.  Values less than 1 shrink the scale in the first
 dimension compared to the other dimensions; values greater than 1
-enlarge it compared to the other dimensions.  (This is the same sense
-as in the L<PGPLOT|PDL::Graphics::PGPLOT> interface.)
+enlarge it compared to the other dimensions.
 
 =item ir, irange, input_range, Input_Range
 
@@ -889,8 +889,7 @@ sub map {
 
       my $justify = _opt($opt,['j','J','just','justify','Justify'],0);
       if($justify) {
-          my $tmp; # work around perl -d "feature"
-          ($tmp = $scale->slice("0")) *= $justify;
+          $scale->slice("0") *= $justify;
           $scale .= $scale->max;
           $scale->slice("0") /= $justify;
       }
@@ -924,7 +923,7 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1761 "transform.pd"
+#line 1760 "transform.pd"
           };
       } else {
           # Non-rectified output -- generate a CDi_j matrix instead of the simple formalism.
@@ -968,7 +967,7 @@ sub map {
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1804 "transform.pd"
+#line 1803 "transform.pd"
           };
       }
     }
@@ -1003,8 +1002,7 @@ sub map {
   ##  ( Kind of an anticlimax after all that, eh? )
   if(!$integrate) {
     my $x = $in->interpND($idx,{method=>$method, bound=>$bound});
-    my $tmp; # work around perl -d "feature"
-    ($tmp = $out->slice(":")) .= $x; # trivial slice prevents header overwrite...
+    $out->slice(":") .= $x; # trivial slice prevents header overwrite...
     return $out;
   }
 
@@ -1074,12 +1072,11 @@ sub map {
 
   my @rdims = (@iddims[1..$#iddims], @idims[$#iddims..$#idims]);
   {
-     my $tmp; # work around perl -d "feature"
-     ($tmp = $out->slice(":")) .= $o2->reshape(@rdims);
+     $out->slice(":") .= $o2->reshape(@rdims);
   }
   return $out;
 }
-#line 1083 "Transform.pm"
+#line 1080 "Transform.pm"
 
 *map = \&PDL::map;
 
@@ -1087,7 +1084,7 @@ sub map {
 
 
 
-#line 1921 "transform.pd"
+#line 1918 "transform.pd"
 
 ######################################################################
 
@@ -1127,7 +1124,7 @@ sub unmap {
   return $me->inverse->map($data,@params);
 }
 
-#line 1964 "transform.pd"
+#line 1961 "transform.pd"
 
 =head2 t_inverse
 
@@ -1171,7 +1168,7 @@ sub inverse {
   }, ref $me;
 }
 
-#line 2011 "transform.pd"
+#line 2008 "transform.pd"
 
 =head2 t_compose
 
@@ -1255,8 +1252,8 @@ sub compose {
     $data;
   };
   $me->{inv} = sub {
-    my($data,$p) = @_;
-    my($ip) = $data->is_inplace;
+    my ($data,$p) = @_;
+    my $ip = $data->is_inplace;
     for my $t ( @{$p->{clist}} ) {
       croak("Error: tried to invert a non-invertible PDL::Transform inside a composition!\n  offending transform: $t\n")
           unless(defined($t->{inv}) and ref($t->{inv}) eq 'CODE');
@@ -1267,7 +1264,7 @@ sub compose {
   return bless($me,'PDL::Transform::Composition');
 }
 
-#line 2110 "transform.pd"
+#line 2107 "transform.pd"
 
 =head2 t_wrap
 
@@ -1334,7 +1331,7 @@ sub _pow_op {
     t_compose(@l);
 }
 
-#line 2183 "transform.pd"
+#line 2180 "transform.pd"
 
 =head2 t_identity
 
@@ -1368,7 +1365,7 @@ sub new {
   return bless $me,$class;
 }
 
-#line 2221 "transform.pd"
+#line 2218 "transform.pd"
 
 =head2 t_lookup
 
@@ -1567,9 +1564,8 @@ sub t_lookup {
             mv(0,-1)->
             clump($itable->ndims-1);  # oloop: (pixel, index)
         {
-            my $tmp; # work around perl -d "feature"
-            ($tmp = $oloop->mv(-1,0)) -= $offset;
-            ($tmp = $oloop->mv(-1,0)) /= $scale;
+            $oloop->mv(-1,0) -= $offset;
+            $oloop->mv(-1,0) /= $scale;
         }
 
         # The Right Thing to do here is to take the outer product of $itable and $otable, then collapse
@@ -1598,17 +1594,15 @@ sub t_lookup {
             my $coord = $c + $dc;
             # At last, we've found the best-fit to an enl_scale'th of an input-table pixel.
             # Back it out to input-science coordinates, and stuff it in the inverse table.
-            my $tmp; # work around perl -d "feature"
-            ($tmp = $itable_flattened->slice("($i)")) .= $coord;
+            $itable_flattened->slice("($i)") .= $coord;
 
             print " $i..." if( ($i%1000==0) && ( $PDL::verbose || $PDL::debug || $PDL::Transform::debug));
         }
 
         {
-            my $tmp; # work around perl -d "feature"
-            ($tmp = $itable->clump($itable->ndims-1)) .= $itable_flattened;
-            ($tmp = $itable->mv(-1,0)) -= $p->{offset};
-            ($tmp = $itable->mv(-1,0)) /= $p->{scale};
+            $itable->clump($itable->ndims-1) .= $itable_flattened;
+            $itable->mv(-1,0) -= $p->{offset};
+            $itable->mv(-1,0) /= $p->{scale};
         }
 
         $p->{itable} = $itable;
@@ -1621,7 +1615,7 @@ sub t_lookup {
   return $me;
 }
 
-#line 2481 "transform.pd"
+#line 2475 "transform.pd"
 
 =head2 t_linear
 
@@ -1810,8 +1804,7 @@ sub new {
     }
 
     $me->{params}->{matrix} = PDL->zeroes($me->{idim},$me->{odim});
-    my $tmp; # work around perl -d "feature"
-    ($tmp = $me->{params}->{matrix}->diagonal(0,1)) .= 1;
+    $me->{params}->{matrix}->diagonal(0,1) .= 1;
   }
 
   ### Handle rotation option
@@ -1855,8 +1848,7 @@ sub new {
 
   # Apply scaling
   $me->{params}{matrix} = $me->{params}{matrix}->slice(":,:");
-  my $tmp; # work around perl -d "feature"
-  ($tmp = $me->{params}{matrix}->diagonal(0,1)) *= $scale
+  $me->{params}{matrix}->diagonal(0,1) *= $scale
     if defined($scale);
 
   # Check for an inverse and apply it if possible
@@ -1890,8 +1882,7 @@ sub new {
         if $in->dim(0) <= $d;
     my $x = $in->slice("0:$d")->copy - $opt->{post};
     my $out = $in->is_inplace ? $in : $in->copy;
-    my $tmp; # work around perl -d "feature"
-    ($tmp = $out->slice("0:$d")) .= $x x $opt->{inverse} - $opt->{pre};
+    $out->slice("0:$d") .= $x x $opt->{inverse} - $opt->{pre};
     $out;
   } : undef;
 
@@ -1933,7 +1924,7 @@ sub stringify {
 }
 }
 
-#line 2796 "transform.pd"
+#line 2787 "transform.pd"
 
 =head2 t_scale
 
@@ -1946,7 +1937,7 @@ sub stringify {
 Convenience interface to L</t_linear>.
 
 t_scale produces a transform that scales around the origin by a fixed
-amount.  It acts exactly the same as C<t_linear(Scale=>\<scale\>)>.
+amount.  It acts exactly the same as C<<< t_linear(Scale=>$scale) >>>.
 
 =cut
 
@@ -1954,12 +1945,12 @@ sub t_scale {
     my($scale) = shift;
     my($y) = shift;
     return t_linear(scale=>$scale,%{$y})
-#line 2817 "transform.pd"
+#line 2808 "transform.pd"
         if(ref $y eq 'HASH');
     t_linear(Scale=>$scale,$y,@_);
 }
 
-#line 2824 "transform.pd"
+#line 2815 "transform.pd"
 
 =head2 t_offset
 
@@ -1972,7 +1963,7 @@ sub t_scale {
 Convenience interface to L</t_linear>.
 
 t_offset produces a transform that shifts the origin to a new location.
-It acts exactly the same as C<t_linear(Pre=>\<shift\>)>.
+It acts exactly the same as C<<< t_linear(Pre=>$shift) >>>.
 
 =cut
 
@@ -1980,13 +1971,13 @@ sub t_offset {
     my($pre) = shift;
     my($y) = shift;
     return t_linear(pre=>$pre,%{$y})
-#line 2845 "transform.pd"
+#line 2836 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(pre=>$pre,$y,@_);
 }
 
-#line 2853 "transform.pd"
+#line 2844 "transform.pd"
 
 =head2 t_rot
 
@@ -2008,13 +1999,13 @@ sub t_rotate    {
     my $rot = shift;
     my($y) = shift;
     return t_linear(rot=>$rot,%{$y})
-#line 2875 "transform.pd"
+#line 2866 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(rot=>$rot,$y,@_);
 }
 
-#line 2885 "transform.pd"
+#line 2876 "transform.pd"
 
 =head2 t_fits
 
@@ -2085,8 +2076,7 @@ sub t_fits {
     #
     for my $h(@hgrab) {
       $h =~ m/CD(\d{1,3})_(\d{1,3})/;  # Should always match
-      my $tmp; # work around perl -d "feature"
-      ($tmp = $matrix->slice("(".($1-1)."),(".($2-1).")")) .= $hdr->{$h};
+      $matrix->slice("(".($1-1)."),(".($2-1).")") .= $hdr->{$h};
     }
     print "t_fits: Detected CDi_j matrix: \n",$matrix,"\n"
       if($PDL::Transform::debug);
@@ -2103,16 +2093,14 @@ sub t_fits {
     my($cd) = $cdm->diagonal(0,1);
 
     my($cpm) = PDL->zeroes($n,$n);
-    my $tmp; # work around perl -d "feature"
-    ($tmp = $cpm->diagonal(0,1)) .= 1;     # PC: diagonal defaults to unity
+    $cpm->diagonal(0,1) .= 1;     # PC: diagonal defaults to unity
     $cd .= 1;
 
     if( @hgrab = grep(m/^PC\d{1,3}_\d{1,3}$/,sort keys %$hdr) ) {  # assignment
 
       for my $h(@hgrab) {
         $h =~ m/PC(\d{1,3})_(\d{1,3})$/ || die "t_fits - match failed! This should never happen!";
-        my $tmp; # work around perl -d "feature"
-        ($tmp = $cpm->slice("(".($1-1)."),(".($2-1).")")) .= $hdr->{$h};
+        $cpm->slice("(".($1-1)."),(".($2-1).")") .= $hdr->{$h};
       }
       print "t_fits: Detected PCi_j matrix: \n",$cpm,"\n"
         if($PDL::Transform::debug && @hgrab);
@@ -2131,11 +2119,9 @@ sub t_fits {
     }
 
     for my $i(1..$n) {
-      my $tmp; # work around perl -d "feature"
-      ($tmp = $cd->slice("(".($i-1).")")) .= $hdr->{"CDELT$i"};
+      $cd->slice("(".($i-1).")") .= $hdr->{"CDELT$i"};
     }
-#If there are no CDELTs, then we assume they are all 1.0,
-#as in PDL::Graphics::PGPLOT::Window::_FITS_tr.
+#If there are no CDELTs, then we assume they are all 1.0
     $cd+=1 if (all($cd==0));
 
     $matrix = $cdm x $cpm;
@@ -2143,9 +2129,8 @@ sub t_fits {
 
   my($i1) = 0;
   for my $i(1..$n) {
-    my $tmp; # work around perl -d "feature"
-    ($tmp = $pre->slice("($i1)"))  .= 1 - $hdr->{"CRPIX$i"};
-    ($tmp = $post->slice("($i1)")) .= $hdr->{"CRVAL$i"};
+    $pre->slice("($i1)")  .= 1 - $hdr->{"CRPIX$i"};
+    $post->slice("($i1)") .= $hdr->{"CRVAL$i"};
     $i1++;
   }
 
@@ -2175,7 +2160,7 @@ sub t_fits {
   return $me;
 }
 
-#line 3054 "transform.pd"
+#line 3039 "transform.pd"
 
 =head2 t_code
 
@@ -2268,7 +2253,7 @@ sub t_code {
   $me;
 }
 
-#line 3153 "transform.pd"
+#line 3138 "transform.pd"
 
 =head2 t_cylindrical
 
@@ -2402,16 +2387,15 @@ sub t_radial {
       my($out) = ($data->new_or_inplace);
 
       my($d) = $data->copy;
-      my $tmp; # work around perl -d "feature"
-      ($tmp = $d->slice("0:1")) -= $o->{origin};
+      $d->slice("0:1") -= $o->{origin};
 
       my($d0) = $d->slice("(0)");
       my($d1) = $d->slice("(1)");
 
       # (mod operator on atan2 puts everything in the interval [0,2*PI).)
-      ($tmp = $out->slice("(0)")) .= (atan2(-$d1,$d0) % (2*$PDL::Transform::PI)) * $me->{params}->{angunit};
+      $out->slice("(0)") .= (atan2(-$d1,$d0) % (2*$PDL::Transform::PI)) * $me->{params}->{angunit};
 
-      ($tmp = $out->slice("(1)")) .= (defined $o->{r0}) ?
+      $out->slice("(1)") .= (defined $o->{r0}) ?
               0.5 * log( ($d1*$d1 + $d0 * $d0) / ($o->{r0} * $o->{r0}) ) :
               sqrt($d1*$d1 + $d0*$d0);
 
@@ -2440,7 +2424,7 @@ sub t_radial {
   $me;
 }
 
-#line 3331 "transform.pd"
+#line 3315 "transform.pd"
 
 =head2 t_quadratic
 
@@ -2555,7 +2539,7 @@ sub t_quadratic {
     $me;
 }
 
-#line 3450 "transform.pd"
+#line 3434 "transform.pd"
 
 =head2 t_cubic
 
@@ -2695,7 +2679,7 @@ sub t_cubic {
     $me;
 }
 
-#line 3596 "transform.pd"
+#line 3580 "transform.pd"
 
 =head2 t_quartic
 
@@ -2814,7 +2798,7 @@ sub t_quartic {
     $me;
 }
 
-#line 3719 "transform.pd"
+#line 3703 "transform.pd"
 
 =head2 t_spherical
 
@@ -2903,12 +2887,11 @@ sub t_spherical {
         my($d0,$d1,$d2) = ($d->slice("(0)"),$d->slice("(1)"),$d->slice("(2)"));
         my($out) =   ($d->is_inplace) ? $data : $data->copy;
 
-        my $tmp; # work around perl -d "feature"
-        ($tmp = $out->slice("(0)")) .= PDL::atan2($d1, $d0);
-        ($tmp = $out->slice("(2)")) .= PDL::sqrt($d0*$d0 + $d1*$d1 + $d2*$d2);
-        ($tmp = $out->slice("(1)")) .= PDL::asin($d2 / $out->slice("(2)"));
+        $out->slice("(0)") .= PDL::atan2($d1, $d0);
+        $out->slice("(2)") .= PDL::sqrt($d0*$d0 + $d1*$d1 + $d2*$d2);
+        $out->slice("(1)") .= PDL::asin($d2 / $out->slice("(2)"));
 
-        ($tmp = $out->slice("0:1")) /= $o->{angunit}
+        $out->slice("0:1") /= $o->{angunit}
           if(defined $o->{angunit});
 
         $out;
@@ -2947,7 +2930,7 @@ sub t_spherical {
     $me;
   }
 
-#line 3856 "transform.pd"
+#line 3839 "transform.pd"
 
 =head2 t_projective
 
@@ -3069,8 +3052,7 @@ sub t_projective {
     my $h = ($M->inv x $p->slice(":,(1),:")->flat->slice("*1"))->slice("(0)");
 #    print "ok\n";
     my $matrix = ones(3,3);
-    my $tmp; # work around perl -d "feature"
-    ($tmp = $matrix->flat->slice("0:7")) .= $h;
+    $matrix->flat->slice("0:7") .= $h;
     $me->{params}->{matrix} = $matrix;
 
     $me->{params}->{matinv} = $matrix->inv;
@@ -3100,7 +3082,7 @@ sub t_projective {
   $me;
 }
 
-#line 244 "transform.pd"
+#line 245 "transform.pd"
 
 =head1 AUTHOR
 
@@ -3165,7 +3147,7 @@ sub stringify {
   $out .= "fwd ". ((defined ($me->{func})) ? ( (ref($me->{func}) eq 'CODE') ? "ok" : "non-CODE(!!)" ): "missing")."; ";
   $out .= "inv ". ((defined ($me->{inv})) ?  ( (ref($me->{inv}) eq 'CODE') ? "ok" : "non-CODE(!!)" ):"missing").".\n";
 }
-#line 3169 "Transform.pm"
+#line 3151 "Transform.pm"
 
 # Exit with OK status
 

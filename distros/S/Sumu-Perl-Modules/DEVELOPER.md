@@ -1,0 +1,218 @@
+# Sumu Perl Modules 
+
+Sat Sep 28 11:01:36 CDT 2024
+
+## DZIL
+
+### First Release 
+
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil release
+[DZ] beginning to build Sumu-Perl-Modules
+[DZ] guessing dist's main_module is lib/Sumu/Perl/Modules.pm
+[@Classic/ExtraTests] rewriting author test xt/author/pod-coverage.t
+[@Classic/ExtraTests] rewriting author test xt/author/pod-syntax.t
+[DZ] writing Sumu-Perl-Modules in Sumu-Perl-Modules-0.001
+[DZ] building archive with Archive::Tar; install Archive::Tar::Wrapper 0.15 or newer for improved speed
+[DZ] writing archive to Sumu-Perl-Modules-0.001.tar.gz
+[@Classic/ConfirmRelease] *** Preparing to release Sumu-Perl-Modules-0.001.tar.gz with @Classic/UploadToCPAN ***
+Do you want to continue the release process? [y/N]: y
+[@Classic/UploadToCPAN] registering upload with PAUSE web server
+[@Classic/UploadToCPAN] POSTing upload for Sumu-Perl-Modules-0.001.tar.gz to https://pause.perl.org/pause/authenquery?ACTION=add_uri
+[@Classic/UploadToCPAN] PAUSE add message sent ok [200]
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
+
+#### installed on windows 
+
+PS C:\Users\sumu> cpanm Sumu::Perl::Modules
+! Finding Sumu::Perl::Modules on cpanmetadb failed.
+--> Working on Sumu::Perl::Modules
+Fetching http://cpan.metacpan.org/authors/id/C/CE/CEEJAY/Sumu-Perl-Modules-0.001.tar.gz ... OK
+Configuring Sumu-Perl-Modules-0.001 ... OK
+Building and testing Sumu-Perl-Modules-0.001 ... OK
+Successfully installed Sumu-Perl-Modules-0.001
+1 distribution installed
+PS C:\Users\sumu>
+
+### release 0.002 
+
+uploaded to cpan
+
+
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil release
+[DZ] beginning to build Sumu-Perl-Modules
+[DZ] guessing dist's main_module is lib/Sumu/Perl/Modules.pm
+[@Classic/PkgVersion] skipping lib/Sumu/Perl/Modules.pm: assigns to $VERSION
+[@Classic/ExtraTests] rewriting author test xt/author/pod-coverage.t
+[@Classic/ExtraTests] rewriting author test xt/author/pod-syntax.t
+[DZ] writing Sumu-Perl-Modules in Sumu-Perl-Modules-0.002
+[DZ] building archive with Archive::Tar; install Archive::Tar::Wrapper 0.15 or newer for improved speed
+[DZ] writing archive to Sumu-Perl-Modules-0.002.tar.gz
+[@Classic/ConfirmRelease] *** Preparing to release Sumu-Perl-Modules-0.002.tar.gz with @Classic/UploadToCPAN ***
+Do you want to continue the release process? [y/N]: y
+[@Classic/UploadToCPAN] registering upload with PAUSE web server
+[@Classic/UploadToCPAN] POSTing upload for Sumu-Perl-Modules-0.002.tar.gz to https://pause.perl.org/pause/authenquery?ACTION=add_uri
+[@Classic/UploadToCPAN] PAUSE add message sent ok [200]
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
+
+### Still installing 0.001 
+
+even after uploading 0.002 and reindexing it on PAUSE
+
+### release 0.1.4
+
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil release
+[DZ] beginning to build Sumu-Perl-Modules
+[DZ] guessing dist's main_module is lib/Sumu/Perl/Modules.pm
+[@Classic/PkgVersion] skipping lib/Sumu/Perl/Modules.pm: assigns to $VERSION
+[@Classic/ExtraTests] rewriting author test xt/author/pod-coverage.t
+[@Classic/ExtraTests] rewriting author test xt/author/pod-syntax.t
+[DZ] writing Sumu-Perl-Modules in Sumu-Perl-Modules-0.1.4
+[DZ] building archive with Archive::Tar; install Archive::Tar::Wrapper 0.15 or newer for improved speed
+[DZ] writing archive to Sumu-Perl-Modules-0.1.4.tar.gz
+[@Classic/ConfirmRelease] *** Preparing to release Sumu-Perl-Modules-0.1.4.tar.gz with @Classic/UploadToCPAN ***
+Do you want to continue the release process? [y/N]: y
+[@Classic/UploadToCPAN] registering upload with PAUSE web server
+[@Classic/UploadToCPAN] POSTing upload for Sumu-Perl-Modules-0.1.4.tar.gz to https://pause.perl.org/pause/authenquery?ACTION=add_uri
+[@Classic/UploadToCPAN] PAUSE add message sent ok [200]
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
+
+
+#### on windows 
+
+PS C:\WINDOWS\system32> cpanm CEEJAY/Sumu-Perl-Modules-0.1.4.tar.gz                                                     --> Working on CEEJAY/Sumu-Perl-Modules-0.1.4.tar.gz                                                                    Fetching http://www.cpan.org/authors/id/C/CE/CEEJAY/Sumu-Perl-Modules-0.1.4.tar.gz ... OK                               Configuring Sumu-Perl-Modules-0.1.4 ... OK                                                                              Building and testing Sumu-Perl-Modules-0.1.4 ... OK                                                                     Successfully installed Sumu-Perl-Modules-0.1.4                                                                          1 distribution installed                                                                                                PS C:\WINDOWS\system32> 
+
+### 0.1.5
+
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil release
+[DZ] beginning to build Sumu-Perl-Modules
+[DZ] guessing dist's main_module is lib/Sumu/Perl/Modules.pm
+[@Classic/PkgVersion] skipping lib/Sumu/Perl/Modules.pm: assigns to $VERSION
+[@Classic/ExtraTests] rewriting author test xt/author/pod-coverage.t
+[@Classic/ExtraTests] rewriting author test xt/author/pod-syntax.t
+[DZ] writing Sumu-Perl-Modules in Sumu-Perl-Modules-0.1.5
+[DZ] building archive with Archive::Tar; install Archive::Tar::Wrapper 0.15 or newer for improved speed
+[DZ] writing archive to Sumu-Perl-Modules-0.1.5.tar.gz
+[@Classic/ConfirmRelease] *** Preparing to release Sumu-Perl-Modules-0.1.5.tar.gz with @Classic/UploadToCPAN ***
+Do you want to continue the release process? [y/N]: y
+[@Classic/UploadToCPAN] registering upload with PAUSE web server
+[@Classic/UploadToCPAN] POSTing upload for Sumu-Perl-Modules-0.1.5.tar.gz to https://pause.perl.org/pause/authenquery?ACTION=add_uri
+[@Classic/UploadToCPAN] PAUSE add message sent ok [200]
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
+
+### automatically change version numbers
+
+in both .pm and .ini to this format: 0.1.1
+
+### dzil 0.1.1 (Automated)
+
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil release
+[DZ] beginning to build Sumu-Perl-Modules
+[DZ] guessing dist's main_module is lib/Sumu/Perl/Modules.pm
+[@Classic/PkgVersion] skipping lib/Sumu/Perl/Modules.pm: assigns to $VERSION
+[@Classic/ExtraTests] rewriting author test xt/author/pod-coverage.t
+[@Classic/ExtraTests] rewriting author test xt/author/pod-syntax.t
+[DZ] writing Sumu-Perl-Modules in Sumu-Perl-Modules-0.1.1
+[DZ] building archive with Archive::Tar; install Archive::Tar::Wrapper 0.15 or newer for improved speed
+[DZ] writing archive to Sumu-Perl-Modules-0.1.1.tar.gz
+[@Classic/ConfirmRelease] *** Preparing to release Sumu-Perl-Modules-0.1.1.tar.gz with @Classic/UploadToCPAN ***
+Do you want to continue the release process? [y/N]: y
+[@Classic/UploadToCPAN] registering upload with PAUSE web server
+[@Classic/UploadToCPAN] POSTing upload for Sumu-Perl-Modules-0.1.1.tar.gz to https://pause.perl.org/pause/authenquery?ACTION=add_uri
+[@Classic/UploadToCPAN] PAUSE add message sent ok [200]
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
+
+## On CPAN, deleted 
+
+0.001
+0.002
+0.1.4
+0.1.5
+
+## dzil release fails when @Git is enabled
+
+does it require a repo named origin??
+
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil release
+[DZ] beginning to build Sumu-Perl-Modules
+[DZ] guessing dist's main_module is lib/Sumu/Perl/Modules.pm
+[@Classic/PkgVersion] skipping lib/Sumu/Perl/Modules.pm: assigns to $VERSION
+[@Classic/ExtraTests] rewriting author test xt/author/pod-coverage.t
+[@Classic/ExtraTests] rewriting author test xt/author/pod-syntax.t
+[DZ] writing Sumu-Perl-Modules in Sumu-Perl-Modules-0.2.6
+[DZ] building archive with Archive::Tar; install Archive::Tar::Wrapper 0.15 or newer for improved speed
+[DZ] writing archive to Sumu-Perl-Modules-0.2.6.tar.gz
+[@Git/Check] branch main has some uncommitted files:
+[@Git/Check]    g
+[@Git/Check] branch main has some uncommitted files:
+[@Git/Check]    g at inline delegation in Dist::Zilla::Plugin::Git::Check for logger->log_fatal (attribute declared in /home/ns21u2204/perl5/lib/perl5/Dist/Zilla/Role/Plugin.pm at line 61) line 18.
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
+
+
+### Automated updates to this file 
+
+#### 2024-09-28 20:08:31 CDT
+
+Commit ID: Old 017 | New 018
+Version ID: Old 0.1.7 | New 0.1.8
+
+
+#### 2024-09-28 20:09:13 CDT
+
+Commit ID: Old 018 | New 019
+Version ID: Old 0.1.8 | New 0.1.9
+
+
+#### 2024-09-28 20:11:23 CDT
+
+Commit ID: Old 019 | New 020
+Version ID: Old 0.1.9 | New 0.2.0
+
+
+#### 2024-09-28 20:19:35 CDT
+
+Commit ID: Old 020 | New 021
+Version ID: Old 0.2.0 | New 0.2.1
+
+
+#### 2024-09-28 20:23:35 CDT
+
+Commit ID: Old 021 | New 022
+Version ID: Old 0.2.1 | New 0.2.2
+
+
+#### 2024-09-28 20:27:22 CDT
+
+Commit ID: Old 022 | New 023
+Version ID: Old 0.2.2 | New 0.2.3
+
+
+#### 2024-09-28 20:30:08 CDT
+
+Commit ID: Old 023 | New 024
+Version ID: Old 0.2.3 | New 0.2.4
+
+
+#### 2024-09-28 20:30:54 CDT
+
+Commit ID: Old 024 | New 025
+Version ID: Old 0.2.4 | New 0.2.5
+
+
+#### 2024-09-28 20:44:09 CDT
+
+Commit ID: Old 025 | New 026
+Version ID: Old 0.2.5 | New 0.2.6
+
+
+#### 2024-09-28 20:49:41 CDT
+
+Commit ID: Old 026 | New 027
+Version ID: Old 0.2.6 | New 0.2.7
+
+
+#### 2024-09-28 20:57:00 CDT
+
+Commit ID: Old 027 | New 028
+Version ID: Old 0.2.7 | New 0.2.8
+
+

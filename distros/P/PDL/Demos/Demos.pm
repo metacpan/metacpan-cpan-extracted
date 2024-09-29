@@ -7,7 +7,7 @@ use Exporter;
 require File::Spec;
 
 our @ISA="Exporter";
-our @EXPORT = qw/comment act actnw output/;
+our @EXPORT = qw/comment act actnw/;
 
 sub comment($) {
    local $SIG{__DIE__} = \&Carp::confess;
@@ -31,7 +31,6 @@ sub _eval_pkg {
 sub actnw($) {
    local $SIG{__DIE__} = \&Carp::confess;
    my ($script, $pack) = @_;
-   $script =~ s/^(\s*)output/$1print/mg;
    print "---- Code:";
    print $script;
    print "---- Output:\n";
@@ -39,8 +38,6 @@ sub actnw($) {
    print "----\n";
    print "----\nOOPS!!! Something went wrong, please make a bug report!: $@\n----\n" if $@;
 }
-
-sub output {local $SIG{__DIE__} = \&Carp::confess; print @_;}
 
 my ($searched, @found);
 my @d = qw(PDL Demos);
@@ -76,7 +73,6 @@ my ($kw_loaded, %kw2info); # info = [kw, description, module]
 sub _load_keywords {
   return if $kw_loaded;
   $kw_loaded = 1;
-  # || do {warn "\n\n\n\nerror: $@";0}
   my @modules = grep eval "require $_; 1", __PACKAGE__->list;
   my %mod2i = map +($_ => [$_->info]), grep $_->can('info'), @modules;
   %kw2info = map +($mod2i{$_}[0] => [@{$mod2i{$_}}, $_]), keys %mod2i;
@@ -109,12 +105,12 @@ PDL::Demos - PDL demo infrastructure
   # in a demo, if text-orientated
   package PDL::Demos::Blah;
   sub info { ('blah', 'Longer description of demo') }
-  sub init { 'use PDL::Graphics::PGPLOT;' }
+  sub init { 'use PDL::Graphics::Simple;' }
   my @demo = (
     [comment => "Welcome to the Blah demo"],
     [act => <<'EOF'],
-  output "PDL can make n-dimensional sequences:\n";
-  output $x = sequence(2,3);
+  print "PDL can make n-dimensional sequences:\n";
+  print $x = sequence(2,3);
   EOF
   );
   sub demo { @demo }
@@ -230,10 +226,6 @@ These are all exported.
 =head2 comment
 
 Prints its argument, prompts user to press enter before returning.
-
-=head2 output
-
-Prints its argument (best for use in C<actnw> etc).
 
 =head2 actnw
 

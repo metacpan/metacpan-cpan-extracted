@@ -22,4 +22,3 @@ t/rel.t
 xt/pod-coverage.t
 xt/pod.t
 README
-SIGNATURE                                Public-key signature (added by MakeMaker)

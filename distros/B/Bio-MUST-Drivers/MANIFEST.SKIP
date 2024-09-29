@@ -1,8 +1,9 @@
-\btest\/.*-my*
-\btest\/.*\.bak
+bin
+codegen
 stuff
 dist\.ini
 weaver\.ini
+\btest\/.*-my*
+\btest\/.*\.bak
 tags
 .DS_Store
-bin

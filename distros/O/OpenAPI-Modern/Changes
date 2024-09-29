@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.069     2024-09-28 23:34:35Z
+          - adjust for changes in JSON::Schema::Modern 0.591 (which deprecate
+            form of "add_schema")
+
 0.068     2024-09-14 23:35:47Z
           - path-item+operation lookup can now be performed by operation_id
             alone (a valid usecase for response validation)

@@ -1,0 +1,24 @@
+{
+  "version": "1.2",
+  "dbname": "prebuiltdb",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "protdb.fasta",
+  "number-of-letters": 70474,
+  "number-of-sequences": 88,
+  "last-updated": "2024-09-27T12:04:00",
+  "number-of-volumes": 1,
+  "bytes-total": 347701,
+  "bytes-to-cache": 71363,
+  "files": [
+    "prebuiltdb.pdb",
+    "prebuiltdb.phr",
+    "prebuiltdb.pin",
+    "prebuiltdb.pog",
+    "prebuiltdb.pos",
+    "prebuiltdb.pot",
+    "prebuiltdb.psq",
+    "prebuiltdb.ptf",
+    "prebuiltdb.pto"
+  ]
+}

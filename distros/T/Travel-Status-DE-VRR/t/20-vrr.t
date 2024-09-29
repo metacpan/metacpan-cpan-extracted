@@ -6,92 +6,81 @@ use utf8;
 
 use Encode      qw(decode);
 use File::Slurp qw(slurp);
-use Test::More tests => 113;
+use JSON;
+use Test::More tests => 112;
 
 BEGIN {
 	use_ok('Travel::Status::DE::VRR');
 }
 require_ok('Travel::Status::DE::VRR');
 
-my $xml = slurp('t/in/essen_hb.xml');
+my $json = JSON->new->utf8->decode( scalar slurp('t/in/essen_bp.json') );
 
-my $status = Travel::Status::DE::VRR->new_from_xml( xml => $xml );
+my $status = Travel::Status::DE::VRR->new( from_json => $json );
 
 isa_ok( $status, 'Travel::Status::DE::EFA' );
 can_ok( $status, qw(errstr results) );
 
 is( $status->errstr, undef, 'no error' );
-is_deeply( [ $status->identified_data ],
-	[qw[Essen Hauptbahnhof]], 'identified_data' );
 
 my @results = $status->results;
 
 for my $result (@results) {
-	isa_ok( $result, 'Travel::Status::DE::EFA::Result' );
+	isa_ok( $result, 'Travel::Status::DE::EFA::Departure' );
 	can_ok( $result,
-		qw(datetime destination info line type platform sched_datetime) );
+		qw(datetime destination hints line type platform sched_datetime) );
 }
 
-is( $results[0]->destination, 'Düsseldorf Hbf',
-	'first result: destination ok' );
-is( $results[0]->info, 'Bordrestaurant',            'first result: no info' );
-is( $results[0]->line, 'ICE 946 Intercity-Express', 'first result: line ok' );
+is(
+	$results[0]->destination,
+	'Essen Germaniaplatz',
+	'first result: destination ok'
+);
+is_deeply( [ $results[0]->hints ], [], 'first result: no hints' );
+is( $results[0]->line, '106', 'first result: line ok' );
 is( $results[0]->datetime->strftime('%d.%m.%Y'),
-	'16.11.2011', 'first result: real date ok' );
+	'21.09.2024', 'first result: real date ok' );
 is( $results[0]->datetime->strftime('%H:%M'),
-	'09:40', 'first result: real time ok' );
-is( $results[0]->delay, 4, 'first result: delay 4' );
+	'18:35', 'first result: real time ok' );
+is( $results[0]->delay, 0, 'first result: delay 0' );
 is( $results[0]->sched_datetime->strftime('%d.%m.%Y'),
-	'16.11.2011', 'first result: scheduled date ok' );
+	'21.09.2024', 'first result: scheduled date ok' );
 is( $results[0]->sched_datetime->strftime('%H:%M'),
-	'09:36', 'first result: scheduled time ok' );
-is( $results[0]->mot_name, 'zug', 'first result: mot_name ok' );
-
-#is($results[0]->platform, '1', 'first result: platform ok');
-#is($results[0]->platform_db, 1, 'first result: platform_db ok');
+	'18:35', 'first result: scheduled time ok' );
+is( $results[0]->mot_name, 'tram', 'first result: mot_name ok' );
 
 is(
 	$results[3]->destination,
-	'Mülheim Heißen Kirche',
+	'Gelsenkirchen Buerer Str.',
 	'fourth result: destination ok'
 );
-is(
-	$results[3]->info,
-	'Ab (H) Heißen Kirche, Umstieg in den SEV Ri. Mülheim Hbf.',
-	'fourth result: no info'
-);
-is( $results[3]->line, '18', 'fourth result: line ok' );
+is_deeply( [ $results[3]->hints ], [], 'fourth result: no hints' );
+is( $results[3]->line, 'U11', 'fourth result: line ok' );
 is( $results[3]->datetime->strftime('%d.%m.%Y'),
-	'16.11.2011', 'fourth result: real date ok' );
+	'21.09.2024', 'fourth result: real date ok' );
 is( $results[3]->datetime->strftime('%H:%M'),
-	'09:39', 'fourth result: real time ok' );
-is( $results[3]->delay, undef, 'fourth result: delay undef' );
+	'18:36', 'fourth result: real time ok' );
+is( $results[3]->delay, 0, 'fourth result: delay 0' );
 is( $results[3]->sched_datetime->strftime('%d.%m.%Y'),
-	'16.11.2011', 'fourth result: scheduled date ok' );
+	'21.09.2024', 'fourth result: scheduled date ok' );
 is( $results[3]->sched_datetime->strftime('%H:%M'),
-	'09:39', 'fourth result: scheduled time ok' );
+	'18:36', 'fourth result: scheduled time ok' );
 is( $results[3]->mot_name, 'u-bahn', 'fourth result: mot_name ok' );
 
-#is($results[3]->platform, '2', 'fourth result: platform ok');
-#is($results[3]->platform_db, 0, 'fourth result: platform_db ok');
-
-is( $results[-1]->destination, 'Hamm (Westf)', 'last result: destination ok' );
 is(
-	$results[-1]->info,
-	'Fahrradmitnahme begrenzt möglich',
-	'last result: info ok'
+	$results[-1]->destination,
+	'Essen Zeche Ludwig',
+	'last result: destination ok'
 );
-is( $results[-1]->delay, 12,    'last result: delay 12' );
-is( $results[-1]->line,  'RE1', 'last result: line ok' );
+is_deeply( [ $results[-1]->hints ], [], 'last result: no hints' );
+is( $results[-1]->delay, 0,     'last result: delay 0' );
+is( $results[-1]->line,  '105', 'last result: line ok' );
 is( $results[-1]->datetime->strftime('%d.%m.%Y'),
-	'16.11.2011', 'last result: date ok' );
-is( $results[-1]->datetime->strftime('%H:%M'), '10:05',
+	'21.09.2024', 'last result: date ok' );
+is( $results[-1]->datetime->strftime('%H:%M'), '19:08',
 	'last result: time ok' );
 is( $results[-1]->sched_datetime->strftime('%d.%m.%Y'),
-	'16.11.2011', 'first result: scheduled date ok' );
+	'21.09.2024', 'first result: scheduled date ok' );
 is( $results[-1]->sched_datetime->strftime('%H:%M'),
-	'09:53', 'last result: scheduled time ok' );
-is( $results[-1]->mot_name, 'zug', 'last result: mot_name ok' );
-
-#is($results[-1]->platform, '6', 'last result: platform ok');
-#is($results[-1]->platform_db, 1, 'last result: platform ok');
+	'19:08', 'last result: scheduled time ok' );
+is( $results[-1]->mot_name, 'tram', 'last result: mot_name ok' );

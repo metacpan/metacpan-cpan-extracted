@@ -4,14 +4,14 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 6;
+use Test::More tests => 8;
 use File::Spec;
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
 
 $quitdelay = 1000;
-$delay = 3000;
+$delay = 2000;
 $delay = 5000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::SearchReplace') };
@@ -24,9 +24,15 @@ createapp(
 );
 
 my $pext;
+my $sr;
 if (defined $app) {
 	$pext = $app->extGet('Plugins');
+	pause(1000);
+	$sr = $pext->plugGet('SearchReplace');
 }
+
+testaccessors($sr, 'repl', 'skipped');
+
 push @tests, (
 	[ sub { 
 		return $pext->plugExists('SearchReplace') 

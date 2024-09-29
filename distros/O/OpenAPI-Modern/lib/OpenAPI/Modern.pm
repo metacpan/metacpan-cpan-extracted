@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.067-26-g2c788d7
+package OpenAPI::Modern; # git description: v0.068-7-g45d9428
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 use 5.020;
 use utf8;
@@ -76,7 +76,7 @@ around BUILDARGS => sub ($orig, $class, @args) {
   );
 
   # if there were errors, this will die with a JSON::Schema::Modern::Result object
-  $args->{evaluator}->add_schema($args->{openapi_document});
+  $args->{evaluator}->${$JSON::Schema::Modern::VERSION < 0.591 ? \'add_schema' : \'add_document'}($args->{openapi_document});
 
   return $args;
 };
@@ -955,7 +955,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.068
+version 0.069
 
 =head1 SYNOPSIS
 
@@ -1084,8 +1084,8 @@ errors! But you never do C<if ($@) { ... }>, right?
 The URI that identifies the OpenAPI document.
 Ignored if L</openapi_document> is provided.
 
-If it is not absolute, it is resolved at runtime against the request's C<Host> header (when available)
-and scheme (e.g. C<https>).
+It is used at runtime as the base for absolute URIs used in L<JSON::Schema::Modern::Result> objects,
+along with the request's C<Host> header and scheme (e.g. C<https>), when available.
 
 =head2 openapi_schema
 
@@ -1149,6 +1149,10 @@ Validates an L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request> or L<Mojo
 object against the corresponding OpenAPI v3.1 document, returning a
 L<JSON::Schema::Modern::Result> object.
 
+Absolute URIs in the result object are constructed by resolving the openapi document path against
+the L</openapi_uri>, as well as the C<Host> header of the request if a host component is not
+included in the L</openapi_uri>.
+
 The second argument is an optional hashref that contains extra information about the request,
 corresponding to the values expected by L</find_path> below. It is populated with some information
 about the request:
@@ -1168,6 +1172,10 @@ to improve performance.
 Validates an L<HTTP::Response>, L<Plack::Response>, L<Catalyst::Response> or L<Mojo::Message::Response>
 object against the corresponding OpenAPI v3.1 document, returning a
 L<JSON::Schema::Modern::Result> object.
+
+Absolute URIs in the result object are constructed by resolving the openapi document path against
+the L</openapi_uri>, as well as the C<Host> header of the request if the request is provided and if a
+host component is not included in the L</openapi_uri>.
 
 The second argument is an optional hashref that contains extra information about the request
 corresponding to the response, as in L</find_path>.
@@ -1371,6 +1379,22 @@ cookie parameters are not checked at all yet
 =item *
 
 C<application/x-www-form-urlencoded> and C<multipart/*> messages are not yet supported
+
+=item *
+
+C<server> fields in definitions are completely ignored, and not considered when parsing request URIs.
+
+=item *
+
+OpenAPI descriptions must be contained in a single document; C<$ref>erences to other documents are not fully supported at this time.
+
+=item *
+
+The use of C<$ref> within a path-item object is not permitted.
+
+=item *
+
+Security schemes in the OpenAPI description, and the use of any C<Authorization> headers in requests, are not currently supported.
 
 =back
 

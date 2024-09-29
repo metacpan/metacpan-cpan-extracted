@@ -955,8 +955,7 @@ pdl_error pdl_set_datatype(pdl *a, int datatype)
       if (PDL_CHILDLOOP_THISCHILD(a))
         return pdl_make_error_simple(PDL_EUSERERROR, "set_datatype: ndarray has child transform");
     PDL_END_CHILDLOOP(a)
-    PDL_RETERROR(PDL_err, pdl_make_physical(a));
-    if(a->trans_parent)
+    if (a->trans_parent)
 	PDL_RETERROR(PDL_err, pdl_destroytransform(a->trans_parent,1,0));
     if (a->state & PDL_NOMYDIMS)
 	a->datatype = datatype;
@@ -965,6 +964,7 @@ pdl_error pdl_set_datatype(pdl *a, int datatype)
     return PDL_err;
 }
 
+/* do SetSV_PDL first, else .sv will be false and destroytransform will destroy src */
 pdl_error pdl_sever(pdl *src)
 {
     pdl_error PDL_err = {0, NULL, 0};
@@ -1149,7 +1149,7 @@ char pdl_trans_badflag_from_inputs(pdl_trans *trans) {
     break;
   }
   if (retval && (vtable->flags & PDL_TRANS_BADIGNORE)) {
-    printf("WARNING: %s does not handle bad values.\n", vtable->name);
+    pdl_pdl_warn("WARNING: %s does not handle bad values", vtable->name);
     trans->bvalflag = 0; /* but still return true */
   }
   return retval;

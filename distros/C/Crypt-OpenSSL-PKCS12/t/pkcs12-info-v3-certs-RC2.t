@@ -4,6 +4,10 @@ use Test::More;
 use Digest::SHA qw/sha256_hex/;
 use Crypt::OpenSSL::Guess qw/openssl_version/;
 
+SKIP: {
+
+skip ("PKCS12 files has a certificate date that cannot be parsed in some LibreSSL versions", 24) unless $ENV{AUTHOR_TESTING};
+
 my ($major, $minor, $patch) = openssl_version();
 BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
 my $openssl_output =<< 'OPENSSL_END';
@@ -58,6 +62,11 @@ if ($major eq '1.0') {
 my $pass   = "v3-certs";
 my $pkcs12 = Crypt::OpenSSL::PKCS12->new_from_file('certs/v3-certs-RC2.p12');
 
+SKIP: {
+    if (! $pkcs12->legacy_support) {
+        skip("The Legacy provider cannot be loaded.  Unable to process Legacy PKCS12 files", 5);
+    }
+
 my $info = $pkcs12->info($pass);
 ok(sha256_hex($info) eq sha256_hex($openssl_output), "Output matches OpenSSL");
 
@@ -107,5 +116,7 @@ for (my $i = 0; $i < $pkcs7_enc_cnt; $i++) {
 
   $bag_attributes = @$bags[1]->{bag_attributes};
   is(keys %$bag_attributes, 0, "Zero bag attributes in bag");
+}
+}
 }
 done_testing;

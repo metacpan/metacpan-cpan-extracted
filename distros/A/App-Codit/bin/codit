@@ -99,38 +99,44 @@ push @options, -plugins => getItems($plugins) if defined $plugins;
 
 my $codit = App::Codit->new(@options);
 
-$codit->addPostConfig(sub {
-	my $mdi = $codit->extGet('CoditMDI');
+my $file = $codit->lockfile;
 
-	if (defined $session) {
-		my $s = $codit->extGet('Plugins')->plugGet('Sessions');
-		$s->sessionOpen($session) if defined $s;
+if ((defined $file) and (@ARGV)){
+	if (open OUT, '>', $file) {
+		for (@ARGV) { print OUT "$_\n" }
+		close OUT;
 	}
-
-	if (@ARGV) {
-		$mdi->silentMode(1);
+	$codit->destroy;
+} else {
+	$codit->addPostConfig(sub {
+		my $mdi = $codit->extGet('CoditMDI');
 	
-		for (@ARGV) {
-			my $file = File::Spec->rel2abs($_);
-			unless (-e $file) {
-				warn "File $_ does not exit";
-				next;
-			}
-			if (-d $file) {
-				warn "'$file' is a folder";
-				next;
-			}
-			$codit->cmdExecute('doc_open', $file);
+		if (defined $session) {
+			my $s = $codit->extGet('Plugins')->plugGet('Sessions');
+			$s->sessionOpen($session) if defined $s;
 		}
 	
-		$mdi->silentMode(0);
-		$mdi->docSelectFirst;
-	}
-});
-
-$codit->geometry('800x600+100+100');
-
-$codit->MainLoop;
+		if (@ARGV) {
+			for (@ARGV) {
+				my $file = File::Spec->rel2abs($_);
+				unless (-e $file) {
+					warn "File $_ does not exit";
+					next;
+				}
+				if (-d $file) {
+					warn "'$file' is a folder";
+					next;
+				}
+				$codit->cmdExecute('doc_open', $file);
+			}
+			$mdi->docSelectFirst;
+		}
+	});
+	
+	$codit->geometry('800x600+100+100');
+	
+	$codit->MainLoop;
+}
 
 sub getItems {
 	my $path = shift;

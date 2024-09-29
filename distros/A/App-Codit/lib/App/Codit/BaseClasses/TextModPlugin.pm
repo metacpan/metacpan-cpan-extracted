@@ -9,7 +9,7 @@ App::Codit::BaseClasses::TextModPlugin - baseclass for plugins that respond to t
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.09;
+$VERSION = 0.10;
 use Tk;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
@@ -60,7 +60,7 @@ sub docSelect {
 
 	if (exists $self->{'select_block'}) {
 		$self->after(100, sub { delete $self->{'select_block'} });
-		return;
+		return @_;
 	}
 
 	my $mdi = $self->extGet('CoditMDI');

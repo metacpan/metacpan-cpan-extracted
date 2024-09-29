@@ -1879,7 +1879,7 @@ Many hardcopy output terminals (such as C<pdf> and C<svg>) will not
 dump their plot to the file unless the file is explicitly closed with a
 change of output device or a call to C<reset>, C<restart>, or C<close>.
 This is because those devices support multipage output and also require
-and end-of-file marker to close the file.
+an end-of-file marker to close the file.
 
 =head1 Plotting examples
 

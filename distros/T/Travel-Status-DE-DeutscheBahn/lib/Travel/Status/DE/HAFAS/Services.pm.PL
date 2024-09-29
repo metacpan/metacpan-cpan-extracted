@@ -27,9 +27,9 @@ sub load_instance {
 			auth   => $data->{options}{auth},
 		},
 		coverage => {
-		  area => $data->{coverage}{realtimeCoverage}{area},
-		  regions => $data->{coverage}{realtimeCoverage}{region} // []
-		 },
+			area    => $data->{coverage}{realtimeCoverage}{area},
+			regions => $data->{coverage}{realtimeCoverage}{region} // []
+		},
 
 		#coverage => {
 		#	area => $data->{coverage}{realtimeCoverage}{area},
@@ -105,9 +105,7 @@ my %hafas_instance = (
 		load_instance(
 			'ch/bls',
 			lang => 'deu',
-			ver  => '1.46'
 		),
-		languages  => [qw[de fr it en]],
 		stopfinder => 'https://bls.hafas.de/bin/ajax-stopfinder.exe',
 	},
 	BVG => {
@@ -232,7 +230,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '6.09';
+our $VERSION = '6.10';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

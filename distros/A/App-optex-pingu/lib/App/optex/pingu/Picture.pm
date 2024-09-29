@@ -8,11 +8,12 @@ use Exporter 'import';
 our @EXPORT_OK = qw(&load);
 
 use Data::Dumper;
-use List::Util qw(pairs zip reduce all);
+use List::Util qw(pairs zip reduce all any);
 use Term::ANSIColor::Concise qw(ansi_color);
 $Term::ANSIColor::Concise::NO_RESET_EL = 1;
 
 use constant {
+    FB    => "\N{FULL BLOCK}",
     THB   => "\N{UPPER HALF BLOCK}",
     BHB   => "\N{LOWER HALF BLOCK}",
     LHB   => "\N{LEFT HALF BLOCK}",
@@ -21,13 +22,23 @@ use constant {
     QUR   => "\N{QUADRANT UPPER RIGHT}",
     QLL   => "\N{QUADRANT LOWER LEFT}",
     QLR   => "\N{QUADRANT LOWER RIGHT}",
-    QULx  => "\N{U+259F}",
-    QURx  => "\N{U+2599}",
-    QLLx  => "\N{U+259C}",
-    QLRx  => "\N{U+259B}",
     QULLR => "\N{QUADRANT UPPER LEFT AND LOWER RIGHT}",
     QURLL => "\N{QUADRANT UPPER RIGHT AND LOWER LEFT}",
-    FB    => "\N{FULL BLOCK}",
+    Qxx__ => "\N{UPPER HALF BLOCK}",
+    Q__xx => "\N{LOWER HALF BLOCK}",
+    Qx_x_ => "\N{LEFT HALF BLOCK}",
+    Q_x_x => "\N{RIGHT HALF BLOCK}",
+    Qx___ => "\N{QUADRANT UPPER LEFT}",
+    Q_x__ => "\N{QUADRANT UPPER RIGHT}",
+    Q__x_ => "\N{QUADRANT LOWER LEFT}",
+    Q___x => "\N{QUADRANT LOWER RIGHT}",
+    Qx__x => "\N{QUADRANT UPPER LEFT AND LOWER RIGHT}",
+    Q_xx_ => "\N{QUADRANT UPPER RIGHT AND LOWER LEFT}",
+    Q_xxx => "\N{QUADRANT UPPER RIGHT AND LOWER LEFT AND LOWER RIGHT}",
+    Qx_xx => "\N{QUADRANT UPPER LEFT AND LOWER LEFT AND LOWER RIGHT}",
+    Qxx_x => "\N{QUADRANT UPPER LEFT AND UPPER RIGHT AND LOWER RIGHT}",
+    Qxxx_ => "\N{QUADRANT UPPER LEFT AND UPPER RIGHT AND LOWER LEFT}",
+    Qxxxx => "\N{FULL BLOCK}",
 };
 my $color_re = qr/[RGBCMYKW]/i;
 
@@ -48,6 +59,80 @@ sub load {
     }
 }
 
+sub squash {
+    map @$_, reduce {
+	my $x = $a->[-1];
+	if ($x && all { $x->[$_] eq $b->[$_] } keys @$b) {
+	    $x->[-1]++;
+	} else {
+	    push @$a, [ @$b, 1 ];
+	}
+	$a;
+    } [], @_;
+}
+
+my %element = (
+    "0"    => '',    #
+    "1"    => FB,    # █
+    "00"   => '',    #
+    "10"   => THB,   # ▀
+    "01"   => BHB,   # ▄
+    "11"   => FB,    # █
+    "0000" => '',    #
+    "0001" => Q___x, # ▗
+    "0010" => Q__x_, # ▖
+    "0011" => Q__xx, # ▄
+    "0100" => Q_x__, # ▝
+    "0101" => Q_x_x, # ▐
+    "0110" => Q_xx_, # ▞
+    "0111" => Q_xxx, # ▟
+    "1000" => Qx___, # ▘
+    "1001" => Qx__x, # ▚
+    "1010" => Qx_x_, # ▄
+    "1011" => Qx_xx, # ▙
+    "1100" => Qxx__, # ▀
+    "1101" => Qxx_x, # ▜
+    "1110" => Qxxx_, # ▛
+    "1111" => Qxxxx, # █
+);
+
+sub stringify {
+    my $vec = shift;
+    my $n = pop @$vec;
+    my $spec = join '', @$vec;
+    my $c1 = ($spec =~ /($color_re)/)[0] // '';
+    my $c2 = ($spec =~ /((?!$c1)$color_re)/)[0] // '';
+    my $ch = (state $cache = {})->{$spec} //= do {
+	if ($c1) {
+	    my $bit = $spec =~ s/(.)/int($1 eq $c1)/ger;
+	    $element{$bit} // die "$spec -> $bit";
+	} else {
+	    substr $spec, 0, 1;
+	}
+    };
+    my $s = $ch x $n || 1;
+    $c1 ? ansi_color("$c1/$c2", $s) : $s;
+}
+
+sub read_asc {
+    my $opt = ref $_[0] eq 'HASH' ? shift : {};
+    my $x = $opt->{x} // 1;
+    my $y = $opt->{y} // 1;
+    my $data = shift;
+    my @data = $data =~ /.+/g;
+    @data % $y                  and die "data format error.";
+    any { (length) % $x } @data and die "data format error.";
+    my @image;
+    while (my @y = splice(@data, 0, $y)) {
+	my @sequence = squash zip map { [ /\X{$x}/g ] } @y;
+	my $line = join '', map stringify($_), @sequence;
+	push @image, $line;
+    }
+    wantarray ? @image : join('', map "$_\n", @image);
+}
+
+######################################################################
+
 sub read_asc_1 {
     local $_ = shift;
     s/^#.*\n//mg;
@@ -55,20 +140,6 @@ sub read_asc_1 {
 	ansi_color($+{col}, FB x length($+{str}))
     }xge;
     /.+/g;
-}
-
-######################################################################
-
-sub squeeze {
-    map @$_, reduce {
-	my $x = $a->[-1];
-	if ($x && all { $x->[$_] eq $b->[$_] } 0 .. $#{$b}) {
-	    $x->[-1]++;
-	} else {
-	    push @$a, [ @$b, 1 ];
-	}
-	$a;
-    } [], @_;
 }
 
 my $use_FB  = 0; # use FULL BLOCK when upper/lower are same
@@ -105,76 +176,13 @@ sub read_asc_2 {
     my @image;
     for (pairs @data) {
 	my($hi, $lo) = @$_;
-	my @data = squeeze zip [ $hi =~ /\X/g ], [ $lo =~ /\X/g ];
-	my $line = join '', map stringify2($_), @data;
+	my @data = squash zip [ $hi =~ /\X/g ], [ $lo =~ /\X/g ];
+	my $line = join '', map stringify_2($_), @data;
 	push @image, $line;
     }
     wantarray ? @image : join('', map "$_\n", @image);
 }
 
 ######################################################################
-
-my %elements = (
-    "0"    => '',    #
-    "1"    => FB,    #
-    "00"   => '',    #
-    "10"   => THB,   #
-    "01"   => BHB,   #
-    "11"   => FB,    #
-    "0000" => '',    #
-    "0001" => QLR,   #
-    "0010" => QLL,   #
-    "0011" => BHB,   #
-    "0100" => QUR,   #
-    "0101" => RHB,   #
-    "0110" => QURLL, #
-    "0111" => QULx,  #
-    "1000" => QUL,   #
-    "1001" => QULLR, #
-    "1010" => LHB,   #
-    "1011" => QURx,  #
-    "1100" => THB,   #
-    "1101" => QLLx,  #
-    "1110" => QLRx,  #
-    "1111" => FB,    #
-);
-
-sub stringify {
-    my $vec = shift;
-    my $n = pop @$vec;
-    my $spec = join '', @$vec;
-    my $fg = ($spec =~ /($color_re)/)[0] // '';
-    my $bg = ($spec =~ /((?!$fg).)/)[0] // '';
-    my $ch = (state $cache = {})->{$spec} //= do {
-	if (!$fg) {
-	    substr $spec, 0, 1;
-	} else {
-	    my $bit = $spec =~ s/(.)/int($1 eq $fg)/ger;
-	    $elements{$bit} // die "$bit";
-	}
-    };
-    my $s = $ch x $n || 1;
-    if (my $color = $fg) {
-	$color .= "/$bg" if $bg =~ /$color_re/;
-	$s = ansi_color($color, $s);
-    }
-    $s;
-}
-
-sub read_asc {
-    my $opt = ref $_[0] eq 'HASH' ? shift : {};
-    my $x = $opt->{x} // 1;
-    my $y = $opt->{y} // 1;
-    my $data = shift;
-    my @data = $data =~ /.+/g;
-    @data % 2 and die;
-    my @image;
-    while (my @y = splice(@data, 0, $y)) {
-	my @data = squeeze zip map { [ /\X{$x}/g ] } @y;
-	my $line = join '', map stringify($_), @data;
-	push @image, $line;
-    }
-    wantarray ? @image : join('', map "$_\n", @image);
-}
 
 1;
