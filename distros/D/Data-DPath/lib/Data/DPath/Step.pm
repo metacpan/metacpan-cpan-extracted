@@ -1,7 +1,7 @@
 package Data::DPath::Step;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Abstraction for a single Step through a Path
-$Data::DPath::Step::VERSION = '0.59';
+$Data::DPath::Step::VERSION = '0.60';
 use strict;
 use warnings;
 
@@ -54,7 +54,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Steffen Schwigon.
+This software is copyright (c) 2024 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

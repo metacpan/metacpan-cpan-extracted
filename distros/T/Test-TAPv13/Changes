@@ -1,5 +1,12 @@
 Revision history for Test-TAPv13
 
+0.003     2024-09-29
+        - DEPRECATED and DYSFUNCTIONAL for Test::More versions >= 1.302013_002 (Dec 2015)
+          The module relied on internals of Test::Builder which are no
+          longer available after Test::More was migrated to use Test2::Builder.
+          If anyone depends on this module (which I doubt) I am happy to
+          accept fixes or even hand over (co-)maintainership.
+
 0.002     2012-08-07
         - request Test::Builder singelton everytime to respond to changes
           there [Michael Schwern]

@@ -8,7 +8,7 @@ package Sumu::Perl::Modules;
 
 =head1 VERSION
 
-version 0.2.8
+version 0.3.4
 
 =head2 DESC
 
@@ -31,7 +31,7 @@ use warnings;
 
 =cut
 
-our $VERSION = '0.2.8';
+our $VERSION = '0.3.4';
 
 use parent qw(Exporter); 
 require Exporter; 

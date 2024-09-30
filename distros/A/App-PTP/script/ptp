@@ -142,8 +142,8 @@ of these flags are specified more than once.
 =item * L</PIPELINE MODES> flags, which modify how the pipeline commands behave.
 These flags have effect starting at the point where they are specified for all
 the pipeline commands that are specified after them. Usually, each of these
-flags will have an opposite flag that allow to revert to the default behavior if
-needed.
+flags will have an opposite flag that allows to revert to the default behavior
+if needed.
 
 =back
 
@@ -168,9 +168,9 @@ The options in this section specify what processing to apply on the input files.
 For each input file, all of these commands are applied in the order in which
 they are specified, before the next file is processed.
 
-If the B<--merge> flag was specified, then all the input files are merged and
-considered as a single input (this is described further in L</PROGRAM BEHAVIOR>
-below).
+If the B<--merge> command is used, then all the input files are merged  at that
+point and all the content processed up to that point is considered as a single
+input for the rest of the pipeline (this is described below).
 
 Many of the commands from this list are affected by the flags described in
 L</PIPELINE MODES>. An overview of the most important one is given in the
@@ -487,6 +487,14 @@ number of lines in the file currently being processed.
 
 The resulting line has its marker unset.
 
+=item B<-m>, B<--merge>
+
+Merge the content of all the files at this point in the pipeline. Then continue
+to process the rest of the pipeline (specified after this command) as if there
+was a single merged input with the content of all the files.
+
+This command can only be specified once in a pipeline.
+
 =item B<--tee> I<filename>
 
 Output the current content of the input to the given file. When inserted in the
@@ -537,16 +545,11 @@ You can only specify a single output file.
 Same as B<--output> but append to the specified file instead of deleting its
 content.
 
-=item B<-m>, B<--merge>
-
-Merge the content of all the input files before the execution of the pipeline.
-The pipeline is then applied only once on the entire content of all the files,
-as if this was from a single big file.
-
 =item B<-i>, B<--in-place>
 
 Write the output of the pipeline for each input file in-place into these files.
-This cannot be used when reading from the standard input.
+This cannot be used when reading from the standard input or when B<--merge> is
+used in the pipeline.
 
 =item B<-R>, B<--recursive>
 
@@ -1043,7 +1046,7 @@ user supplied Perl code, as if the B<--safe> option was given.
 This program is optimized for expressivity rather than performance (also,
 modern computers are powerful). So it will read each file in memory entirely
 before processing it. In particular, if you use the B<--merge> option, then all
-the input files are entirely loaded in memory before they are processed.
+the input files are entirely loaded in memory at the same time.
 
 Handling of the user supplied code might differ depending on whether the
 B<--safe> option is in effect or not. In particular, currently any exception

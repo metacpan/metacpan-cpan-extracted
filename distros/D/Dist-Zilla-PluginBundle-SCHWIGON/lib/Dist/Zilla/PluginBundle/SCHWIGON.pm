@@ -1,9 +1,9 @@
 package Dist::Zilla::PluginBundle::SCHWIGON;
-# git description: v0.018-2-gb3bc1a3
+# git description: v0.019-6-gbe6cde0
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Build your distributions like SCHWIGON does
-$Dist::Zilla::PluginBundle::SCHWIGON::VERSION = '0.019';
+$Dist::Zilla::PluginBundle::SCHWIGON::VERSION = '0.021';
 # (well actually like FLORA - as it is shamelessly stolen)
 
 use 5.008;
@@ -332,7 +332,7 @@ method configure {
     $self->add_plugins(['Test::Compile' => {
                                             $self->has_test_compile_skip
                                             ? (skip => $self->test_compile_skip)
-                                            : (),
+                                            : (skip => [qw{ Test::TAPv13}]),
                                            }]);
 
     $self->add_plugins('Test::NoTabs')
@@ -430,6 +430,7 @@ It is roughly equivalent to:
 
   [MetaConfig]
   [MetaJSON]
+  [MetaProvides::Package]
   [PkgVersion]
   [PodSyntaxTests]
   [PodCoverageTests]
@@ -474,7 +475,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Steffen Schwigon.
+This software is copyright (c) 2024 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

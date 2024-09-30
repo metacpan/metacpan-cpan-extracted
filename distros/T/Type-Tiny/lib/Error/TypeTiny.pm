@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::VERSION   = '2.004000';
+	$Error::TypeTiny::VERSION   = '2.006000';
 }
 
 $Error::TypeTiny::VERSION =~ tr/_//d;
@@ -56,14 +56,17 @@ sub throw_cb {
 		$level++ if caller( $level ) eq ( $pkg || "" );
 	}
 	
-	# Moo's Method::Generate::Constructor puts an eval in the stack trace,
-	# that is useless for debugging, so show the stack frame one above.
-	$level++
-		if (
-		( caller( $level ) )[1] =~ /^\(eval \d+\)$/
-		and ( caller( $level ) )[3] eq '(eval)'    # (caller())[3] is $subroutine
-		);
-	@ctxt{qw/ package file line /} = caller( $level );
+	{
+		no warnings 'uninitialized';
+		# Moo's Method::Generate::Constructor puts an eval in the stack trace,
+		# that is useless for debugging, so show the stack frame one above.
+		$level++
+			if (
+			( caller( $level ) )[1] =~ /^\(eval \d+\)$/
+			and ( caller( $level ) )[3] eq '(eval)'    # (caller())[3] is $subroutine
+			);
+		@ctxt{qw/ package file line /} = caller( $level );
+	}
 	
 	my $stack = undef;
 	if ( our $StackTrace ) {
@@ -273,7 +276,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

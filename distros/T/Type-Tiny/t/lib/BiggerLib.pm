@@ -7,7 +7,7 @@
 Type library used in several test cases.
 
 Defines types C<SmallInteger>, C<BigInteger> and C<Distance>.
-Defines classes C<Foo::Bar> and C<Foo::Baz> along with correponding
+Defines classes C<Foo::Bar> and C<Foo::Baz> along with corresponding
 C<FooBar> and C<FooBaz> class type constraints; defines role C<Quux>
 and the C<DoesQuux> role type constraint.
 
@@ -19,7 +19,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

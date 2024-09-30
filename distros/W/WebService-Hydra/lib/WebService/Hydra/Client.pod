@@ -1,0 +1,166 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Hydra::Client
+at lib/WebService/Hydra/Client.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::Hydra::Client - Hydra Client Object
+
+=head2 Description
+
+Object::Pad based class which is used to create a Hydra Client Object which interacts with the Hydra service API.
+
+=head1 SYNOPSIS
+
+    use WebService::Hydra::Client;
+    my $obj = WebService::Hydra::Client->new(admin_endpoint => 'url' , public_endpoint => 'url');
+
+=head1 METHODS
+
+=head2 new
+
+=over 1
+
+=item C<admin_endpoint>
+
+admin_endpoint is a string which contains admin URL for the hydra service. Eg: http://localhost:4445
+This is a required parameter when creating Hydra Client Object using new.
+
+=item C<public_endpoint>
+
+public_endpoint is a string which contains the public URL for the hydra service. Eg: http://localhost:4444
+This is a required parameter when creating Hydra Client Object using new.
+
+=back
+
+=head2 admin_endpoint
+
+Returns the base URL for the hydra service.
+
+=head2 public_endpoint
+
+Returns the base URL for the hydra service.
+
+=head2 http
+
+Return HTTP object.
+
+=head2 jwks
+return jwks object
+=cut
+
+method jwks {
+    return $jwks //= $self->fetch_jwks();
+}
+
+=head2 oidc_config
+
+returns an object with oidc configuration
+
+=head2 api_call
+
+Takes request method, the endpoint, and the payload. It sends the request to the Hydra service, parses the response and returns:
+
+1. JSON object of code and data returned from the service.
+2. Error string in case an exception is thrown.
+
+=head2 get_login_request
+
+Fetches the OAuth2 login request from hydra.
+
+Arguments:
+
+=over 1
+
+=item C<$login_challenge>
+
+Authentication challenge string that is used to identify and fetch information
+about the OAuth2 request from hydra.
+
+=back
+
+=head2 accept_login_request
+
+Accepts the login request and returns the response from hydra.
+
+Arguments:
+
+=over 1
+
+=item C<$login_challenge>
+
+Authentication challenge string that is used to identify the login request.
+
+=item C<$accept_payload>
+
+Payload to be sent to the Hydra service to confirm the login challenge.
+
+=back
+
+=head2 get_logout_request
+
+Get the logout request and return the response from Hydra.
+
+=head2 accept_logout_request
+
+The response contains a redirect URL which the logout provider should redirect the user-agent to.
+
+=head2 exchange_token
+
+Exchanges the authorization code with Hydra service for access and ID tokens.
+
+=head2 fetch_jwks
+
+Fetches the JSON Web Key Set published by Hydra which is used to validate signatures.
+
+=head2 fetch_openid_configuration
+
+Fetches the openid-configuration from hydra
+
+=head2 validate_id_token
+
+Decodes the id_token and validates its signature against Hydra and returns the decoded payload.
+
+=head2 validate_token
+
+Decodes the token and validates its signature against hydra and returns the decoded payload.
+
+=over 1
+
+=item C<$token> jwt token to be validated
+
+=back
+
+Returns the decoded payload if the token is valid, otherwise throws an exception.
+
+=head2 get_consent_request
+
+Fetches the consent request from Hydra.
+
+=head2 accept_consent_request
+
+Accepts the consent request and returns the response from Hydra.
+
+=head2 revoke_login_sessions
+
+This endpoint invalidates authentication sessions.
+It expects a user ID (subject) and invalidates all sessions for this user. or session ID (sid) and invalidates the session.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+

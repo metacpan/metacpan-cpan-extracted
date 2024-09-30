@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use Test::More;
 use Test::Deep;
@@ -11,13 +10,7 @@ use Data::Dumper;
 
 # local $Data::DPath::DEBUG = 1;
 
-BEGIN {
-        if ($] < 5.010) {
-                plan skip_all => "Perl 5.010 required for the smartmatch overloaded tests. This is ".$];
-        } else {
-                plan tests => 5;
-        }
-}
+plan tests => 5;
 
 use_ok( 'Data::DPath' );
 
@@ -34,10 +27,10 @@ my $data = $VAR1;
 
 my $res;
 
-$res = $data ~~ dpath('/report');
+$res = [ dpath('/report')->match($data) ];
 is($res->[0]{reportgroup_testrun_id}, 30862, "simple dpath" );
 
-$res = $data ~~ dpath('//data//benchmark[ value eq "call_simple"]/../mean/..');
+$res = [ dpath('//data//benchmark[ value eq "call_simple"]/../mean/..')->match($data) ];
 cmp_bag($res, [
                {
                 'glibc'              => 'glibc, 2.4',
@@ -68,10 +61,10 @@ $datacontent='';
 eval $datacontent;
 $data = $VAR1;
 
-$res = $data ~~ dpath('/report');
+$res = [ dpath('/report')->match($data) ];
 is($res->[0]{reportgroup_testrun_id}, 30862, "simple dpath 2" );
 
-$res = $data ~~ dpath('//data//benchmark[ value eq "xcall_simple"]/../mean/..');
+$res = [ dpath('//data//benchmark[ value eq "xcall_simple"]/../mean/..')->match($data) ];
 cmp_bag($res, [
                {
                 'glibc'              => 'xglibc, 2.4',

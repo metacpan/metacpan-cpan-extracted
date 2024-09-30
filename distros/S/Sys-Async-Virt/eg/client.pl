@@ -6,31 +6,27 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Feature::Compat::Try;
 
+use Data::Dumper;
+
 use IO::Async::Loop;
-use IO::Async::Stream;
 use Log::Any qw($log);
 use Log::Any::Adapter;
 use Log::Any::Adapter::Stdout;
-use Protocol::Sys::Virt::Transport;
-use Protocol::Sys::Virt::Remote;
 use Sys::Async::Virt;
-use Sys::Async::Virt::Connection::Factory;
 
 Log::Any::Adapter->set('Stdout', log_level => 'trace');
 my $loop = IO::Async::Loop->new;
-my $prot = 'Protocol::Sys::Virt::Remote::XDR';
 
 my $virt = Sys::Async::Virt->new(url => 'qemu:///system');
 $loop->add( $virt );
 await $virt->connect;
 $log->trace( 'Created libvirt client application layer' );
 
-await $virt->auth( $prot->AUTH_NONE );
+await $virt->auth();
 $log->trace( 'Authenticated' );
 
-await $virt->open( 'qemu:///system' );
+await $virt->open;
 
-use Data::Dumper;
 try {
     my $es = await $virt->domain_event_register_any(
         $virt->DOMAIN_EVENT_ID_LIFECYCLE);
@@ -48,4 +44,5 @@ catch ($e) {
     say 'abc: ' . Dumper($e);
 }
 
+await $loop->delay_future( after => 8*60 );
 await $virt->close;

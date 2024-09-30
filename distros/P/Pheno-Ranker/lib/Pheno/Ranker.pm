@@ -28,7 +28,7 @@ $SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_ };
 
 # Global variables:
 $Data::Dumper::Sortkeys = 1;
-our $VERSION   = '0.10';
+our $VERSION   = '0.11';
 our $share_dir = dist_dir('Pheno-Ranker');
 
 # Set developoent mode
@@ -100,11 +100,11 @@ sub _validate_and_set_exclusive_config {
 sub _set_additional_config {
     my ( $self, $config, $config_file ) = @_;
     $self->{primary_key}              = $config->{primary_key} // 'id';       # setter
-    $self->{exclude_properties_regex} = $config->{exclude_properties_regex}
+    $self->{exclude_variables_regex} = $config->{exclude_variables_regex}
       // undef;                                                               # setter
-    $self->{exclude_properties_regex_qr} =
-      defined $self->{exclude_properties_regex}
-      ? qr/$self->{exclude_properties_regex}/
+    $self->{exclude_variables_regex_qr} =
+      defined $self->{exclude_variables_regex}
+      ? qr/$self->{exclude_variables_regex}/
       : undef;                                                                # setter
     $self->{array_terms}    = $config->{array_terms} // ['foo'];              # setter (TBV)
     $self->{array_regex}    = $config->{array_regex} // '^([^:]+):(\d+)';     # setter (TBV)

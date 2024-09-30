@@ -58,6 +58,6 @@
          "web" : "https://github.com/briandfoy/PerlPowerTools"
       }
    },
-   "version" : "1.046",
+   "version" : "1.047",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

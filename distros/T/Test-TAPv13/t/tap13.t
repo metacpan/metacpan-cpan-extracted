@@ -1,5 +1,15 @@
 #! /usr/bin/perl
 
+BEGIN {
+    require Test::Builder;
+    require Test::More;
+    if ($Test::Builder::VERSION >= 1.302013) {
+        Test::More::skip_all => "Test::TAPv13 only works for old Test::More versions < 1.302013, you have $Test::Builder::VERSION.";
+        print "1..0 # SKIP Test::TAPv13 only works for old Test::More versions < 1.302013, you have $Test::Builder::VERSION.";
+        exit 0;
+    }
+}
+
 use Test::TAPv13 ':all'; # must come before Test::More
 use Test::More tests => 3;
 

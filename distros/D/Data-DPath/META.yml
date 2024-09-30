@@ -8,17 +8,38 @@ build_requires:
   IPC::Open3: '0'
   Test::Deep: '0'
   Test::More: '0.88'
-  blib: '1.01'
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-DPath
+provides:
+  Data::DPath:
+    file: lib/Data/DPath.pm
+    version: '0.60'
+  Data::DPath::Attrs:
+    file: lib/Data/DPath/Attrs.pm
+    version: '0.60'
+  Data::DPath::Context:
+    file: lib/Data/DPath/Context.pm
+    version: '0.60'
+  Data::DPath::Filters:
+    file: lib/Data/DPath/Filters.pm
+    version: '0.60'
+  Data::DPath::Path:
+    file: lib/Data/DPath/Path.pm
+    version: '0.60'
+  Data::DPath::Point:
+    file: lib/Data/DPath/Point.pm
+    version: '0.60'
+  Data::DPath::Step:
+    file: lib/Data/DPath/Step.pm
+    version: '0.60'
 requires:
   Class::XSAccessor: '0'
   Class::XSAccessor::Array: '0'
@@ -40,10 +61,10 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Data-DPath
   homepage: http://metacpan.org/release/Data-DPath
   repository: git://github.com/renormalist/data-dpath.git
-version: '0.59'
+version: '0.60'
 x_Dist_Zilla:
   perl:
-    version: '5.022000'
+    version: '5.041003'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -57,83 +78,103 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@SCHWIGON/@Basic/GatherDir'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@SCHWIGON/@Basic/PruneCruft'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@SCHWIGON/@Basic/ManifestSkip'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@SCHWIGON/@Basic/MetaYAML'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::License
       name: '@SCHWIGON/@Basic/License'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@SCHWIGON/@Basic/Readme'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@SCHWIGON/@Basic/ExtraTests'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@SCHWIGON/@Basic/ExecDir'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@SCHWIGON/@Basic/ShareDir'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@SCHWIGON/@Basic/MakeMaker'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@SCHWIGON/@Basic/Manifest'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@SCHWIGON/@Basic/TestRelease'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@SCHWIGON/@Basic/ConfirmRelease'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@SCHWIGON/@Basic/UploadToCPAN'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@SCHWIGON/MetaConfig'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@SCHWIGON/MetaJSON'
-      version: '6.024'
+      version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@SCHWIGON/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.032'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000038'
+          version: '0.006'
+      name: '@SCHWIGON/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@SCHWIGON/PkgVersion'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@SCHWIGON/PodSyntaxTests'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: author
           fake_home: 0
           filename: t/00-compile.t
@@ -144,8 +185,9 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
+          switch: []
       name: '@SCHWIGON/Test::Compile'
-      version: '2.054'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -160,11 +202,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
       name: '@SCHWIGON/Test::Pod::Coverage::Configurable'
-      version: '0.05'
+      version: '0.07'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@SCHWIGON/MetaResources'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@SCHWIGON/Authority'
@@ -175,12 +217,12 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::EOL:
           filename: xt/author/eol.t
           finder:
-            - ':InstallModules'
             - ':ExecFiles'
+            - ':InstallModules'
             - ':TestFiles'
-          trailing_whitespace: '0'
+          trailing_whitespace: 0
       name: '@SCHWIGON/Test::EOL'
-      version: '0.18'
+      version: '0.19'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -189,101 +231,102 @@ x_Dist_Zilla:
             - '@SCHWIGON'
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Name
               name: '@SCHWIGON/Name'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Region
               name: '@SCHWIGON/prelude'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Collect
               name: TYPES
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@SCHWIGON/Leftovers'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Region
               name: '@SCHWIGON/postlude'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SCHWIGON/Authors'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Legal
               name: '@SCHWIGON/Legal'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@SCHWIGON/List'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@SCHWIGON/SingleEncoding'
-              version: '4.012'
+              version: '4.020'
       name: '@SCHWIGON/PodWeaver'
-      version: '4.008'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@SCHWIGON/AutoPrereqs'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Git::Describe
       name: '@SCHWIGON/Git::Describe'
-      version: '0.006'
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@SCHWIGON/CheckChangesHasContent'
-      version: '0.008'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@SCHWIGON/NextRelease'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.1
           repo_root: .
       name: '@SCHWIGON/Git::CheckFor::CorrectBranch'
-      version: '0.013'
+      version: '0.014'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -292,9 +335,10 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.1
           repo_root: .
       name: '@SCHWIGON/Git::NextVersion'
-      version: '2.036'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -307,15 +351,17 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.1
           repo_root: .
       name: '@SCHWIGON/@Git/Check'
-      version: '2.036'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -323,11 +369,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@SCHWIGON/@Git/Commit'
-      version: '2.036'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -335,15 +382,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.59
-          tag_format: v%v
-          tag_message: v%v
+          tag: v0.60
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@SCHWIGON/@Git/Tag'
-      version: '2.036'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -352,13 +400,14 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.1
           repo_root: .
       name: '@SCHWIGON/@Git/Push'
-      version: '2.036'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: ManifestSkip
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -366,7 +415,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Prereqs::Soften
       config:
@@ -382,49 +431,53 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.024'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.024'
+      version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@SCHWIGON/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.032'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
-    version: '6.024'
+      is_trial: 0
+    version: '6.032'
 x_authority: cpan:SCHWIGON
-x_generated_by_perl: v5.22.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.41.3
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

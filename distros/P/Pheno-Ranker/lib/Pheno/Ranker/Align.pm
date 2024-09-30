@@ -613,7 +613,7 @@ sub remap_hash {
     my $id_correspondence = $self->{id_correspondence};
 
     # Load values for the for loop
-    my $exclude_properties_regex_qr = $self->{exclude_properties_regex_qr};
+    my $exclude_variables_regex_qr = $self->{exclude_variables_regex_qr};
     my $misc_regex_qr = qr/1900-01-01|NA0000|P999Y|P9999Y|phenopacket_id/;
 
     # Pre-compile a list of fixed scalar values to exclude into a hash for quick lookup
@@ -635,8 +635,8 @@ sub remap_hash {
         # NB2: info|metaData are always discarded
 
         next
-          if ( defined $exclude_properties_regex_qr
-            && $key =~ $exclude_properties_regex_qr );
+          if ( defined $exclude_variables_regex_qr
+            && $key =~ $exclude_variables_regex_qr );
 
         # The user can turn on age related values
         next

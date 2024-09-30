@@ -15,6 +15,20 @@
 	.
 
 
+<http://kasei.us/code/files/IRI-0.013.tar.gz>
+	dcterms:isVersionOf my:project ;
+	dcterms:replaces    <http://kasei.us/code/files/IRI-0.012.tar.gz> ;
+	
+	doap:Version [
+		doap:revision	"0.013" ;
+		doap:created	"2024-09-29" ;
+	] ;
+	asc:changes [
+		asc:update		"New version to address bad data in META.yml in 0.12 release." ;
+	] ;
+	.
+
+
 <http://kasei.us/code/files/IRI-0.012.tar.gz>
 	dcterms:isVersionOf my:project ;
 	dcterms:replaces    <http://kasei.us/code/files/IRI-0.011.tar.gz> ;

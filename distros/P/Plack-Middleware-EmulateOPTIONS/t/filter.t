@@ -1,4 +1,4 @@
-use v5.14;
+use v5.20;
 use warnings;
 
 use Test2::V0;
@@ -9,17 +9,15 @@ use Plack::Builder;
 use Plack::Response;
 use Plack::Test;
 
+use experimental qw/ signatures /;
+
 my $handler = builder {
 
-    enable "EmulateOPTIONS", filter => sub {
-        my ($env) = @_;
-
+    enable "EmulateOPTIONS", filter => sub($env) {
         return $env->{PATH_INFO} !~ m[^/x+$]
     };
 
-    sub {
-        my ($env) = @_;
-
+    sub($env) {
         my $code = HTTP_OK;
         $code = HTTP_METHOD_NOT_ALLOWED unless $env->{REQUEST_METHOD} =~ /^(?:GET|HEAD)$/;
         $code = HTTP_NOT_FOUND          unless $env->{PATH_INFO} =~ m[^/x*$];
@@ -78,8 +76,7 @@ my @Tests = (
 
 test_psgi
   app    => $handler,
-  client => sub {
-    my $cb = shift;
+  client => sub($cb) {
 
     for my $case (@Tests) {
 

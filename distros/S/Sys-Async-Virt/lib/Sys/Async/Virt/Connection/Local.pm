@@ -10,25 +10,28 @@
 ####################################################################
 
 
-use v5.20;
+use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection::Local v0.0.6;
+package Sys::Async::Virt::Connection::Local v0.0.7;
 
 use parent qw(Sys::Async::Virt::Connection);
 
 use Carp qw(croak);
-use Log::Any qw($log);
 use IO::Async::Stream;
+use Log::Any qw($log);
 
-sub new {
-    my ($class, $url, %args) = @_;
+sub new($class, $url, %args) {
     return bless {
         url => $url,
         %args{ qw( socket ) }
     }, $class;
+}
+
+sub close($self) {
+    $self->{in}->close;
 }
 
 async sub connect($self) {
@@ -66,7 +69,7 @@ Sys::Async::Virt::Connection::Local - Connection to LibVirt server over Unix
 
 =head1 VERSION
 
-v0.0.6
+v0.0.7
 
 =head1 SYNOPSIS
 

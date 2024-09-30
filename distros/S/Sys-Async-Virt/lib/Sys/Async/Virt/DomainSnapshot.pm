@@ -10,17 +10,17 @@
 ####################################################################
 
 
-use v5.20;
+use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::DomainSnapshot v0.0.6;
+package Sys::Async::Virt::DomainSnapshot v0.0.7;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.6;
+use Protocol::Sys::Virt::Remote::XDR v0.0.7;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -47,8 +47,7 @@ use constant {
 };
 
 
-sub new {
-    my ($class, %args) = @_;
+sub new($class, %args) {
     return bless {
         id => $args{id},
         client => $args{client},
@@ -122,7 +121,7 @@ Sys::Async::Virt::DomainSnapshot - Client side proxy to remote LibVirt domain sn
 
 =head1 VERSION
 
-v0.0.6
+v0.0.7
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use Test::More;
 use Test::Deep;
@@ -10,12 +9,6 @@ use Data::DPath 'dpath';
 use Data::Dumper;
 
 # local $Data::DPath::DEBUG = 1;
-
-BEGIN {
-        if ($] < 5.010) {
-                plan skip_all => "Perl 5.010 required for the smartmatch overloaded tests. This is ".$];
-        }
-}
 
 use_ok( 'Data::DPath' );
 
@@ -40,31 +33,31 @@ my $data = {
 
 my $res;
 
-$res = $data ~~ dpath '//goal[ value == 15]';
+$res = [ dpath('//goal[ value == 15]')->match($data) ];
 cmp_bag($res, [ 15 ], "leaf with value");
 
-$res = $data ~~ dpath '//goal';
+$res = [ dpath('//goal')->match($data) ];
 cmp_bag($res, [ 15, 0, undef ], "many leafs with value");
 
-$res = $data ~~ dpath '//goal[value == 15]/../data_size';
+$res = [ dpath('//goal[value == 15]/../data_size')->match($data) ];
 cmp_bag($res, [ 254242 ], "data_size via leaf");
 
-$res = $data ~~ dpath '//goal[ value eq 0 ]';
+$res = [ dpath('//goal[ value eq 0 ]')->match($data) ];
 cmp_bag($res, [ 0 ], "leaf of value 0");
 
-$res = $data ~~ dpath '//goal[value eq 0]/../count';
+$res = [ dpath('//goal[value eq 0]/../count')->match($data) ];
 cmp_bag($res, [ "zero" ], "data_size via leaf of value 0");
 
-$res = $data ~~ dpath '//goal[ value eq undef ]';
+$res = [ dpath('//goal[ value eq undef ]')->match($data) ];
 cmp_bag($res, [ undef ], "leaf of value undef");
 
-$res = $data ~~ dpath '//goal[ value eq undef ]/../count';
+$res = [ dpath('//goal[ value eq undef ]/../count')->match($data) ];
 cmp_bag($res, [ "UNDEF" ], "data_size via leaf of value undef");
 
-$res = $data ~~ dpath '/normal/normal/goal';
+$res = [ dpath('/normal/normal/goal')->match($data) ];
 cmp_bag($res, [ 15 ], "absolute path - leaf with value");
 
-$res = $data ~~ dpath '/zero/goal';
+$res = [ dpath('/zero/goal')->match($data) ];
 cmp_bag($res, [ 0 ], "absolute path - leaf of value 0");
 
 done_testing();

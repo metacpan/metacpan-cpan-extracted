@@ -611,11 +611,11 @@ Version 0.21 Mar 2, 2023
 	Updated syntax xslt from version 4 to version 10
 	Updated syntax yacas from version 2 to version 5
 
-	Version 0.22 Mar 27 2023
+Version 0.22 Mar 27 2023
 	Fixed method SuggestSyntax in Syntax::Kamelon
 	Fixed method CreateExtIndex in Syntax::Kamelon::Indexer
 
-	Version 0.23 Apr 17 2023
+Version 0.23 Apr 17 2023
 	Reverted back to the syntax definition files of version 0.19.
 	We do not yet know why the new ones perform so poorly.
 	Defined EXE_FILES in Makefile.PL
@@ -623,6 +623,10 @@ Version 0.21 Mar 2, 2023
 	Fixed method SuggestSyntax in Syntax::Kamelon ... again
 	Improved testing
 
-	Version 0.24 Sep 24 2023
+Version 0.24 Sep 24 2023
 	Patch from Andreas Vögele fix for matching section names with square brackets in Indexer.pm
 	Added newline to the list of deliminators
+
+Version 0.25 Sep 29 2024
+	The Syntax method now gives proper warning when attempting to set an invalid syntax.
+	Applied patch from git user PommesSchranke removing warnings for already defined variables.

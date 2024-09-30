@@ -1,5 +1,20 @@
 Revision history for Plack-Middleware-EmulateOPTIONS:
 
+v0.4.0    2024-09-29 19:32:57+01:00 Europe/London
+  [Incompatible Changes]
+  - Minimum Perl version is v5.20.
+
+  [Documentation]
+  - Updated support policy for earlier versions.
+
+  - Updated copyright year.
+
+  [Enhancements]
+  - Internal code was changed to use newer Perl syntax features.
+
+  [Other]
+  - Tidied code.
+
 v0.3.2    2023-11-07 13:00:11+00:00 Europe/London
   [Documentation]
   - Removed unnecessary SEE ALSO section.

@@ -1,0 +1,53 @@
+---
+abstract: "Perl extension to OpenSSL's PKCS12 API."
+author:
+  - 'Dan Sully'
+build_requires:
+  Crypt::OpenSSL::Guess: '0.11'
+  Crypt::OpenSSL::PKCS10: '0'
+  Data::Dumper: '0'
+  Digest::SHA: '0'
+  File::Spec::Functions: '0'
+  Test::More: '0'
+configure_requires:
+  Crypt::OpenSSL::Guess: '0.11'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alt-Crypt-OpenSSL-PKCS12-Broadbean
+requires:
+  Exporter: '0'
+  XSLoader: '0'
+version: '1.93'
+x_contributors:
+  - '@mmuehlenhoff'
+  - '@sectokia'
+  - '@SmartCodeMaker'
+  - 'Alexandr Ciornii, @chorny'
+  - 'Christopher Hoskin, @mans0954'
+  - 'Daisuke Murase, @typester'
+  - 'Darko Prelec, @dprelec'
+  - 'David Steinbrunner, @dsteinbrunner'
+  - 'Giuseppe Di Terlizzi, @giterlizzi'
+  - 'H.Merijn Brand, @tux'
+  - 'Hakim, @osfameron'
+  - 'J. Nick Koston, @bdraco'
+  - 'James Rouzier, @jrouzierinverse'
+  - 'jonasbn. @jonasbn'
+  - 'Kelson, @kelson42'
+  - 'Lance Wicks, @lancew'
+  - 'Leonid Antonenkov'
+  - 'Masayuki Matsuki, @songmu'
+  - 'Mikołaj Zalewski'
+  - 'Shoichi Kaji'
+  - 'Slaven Rezić'
+  - 'Todd Rinaldo, @toddr'
+x_generated_by_perl: v5.40.0
+x_maintainers:
+  - 'JONASBN <jonasbn@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

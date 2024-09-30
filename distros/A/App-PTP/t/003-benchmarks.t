@@ -3,8 +3,6 @@
 use strict;
 use warnings;
 
-no warnings 'experimental::smartmatch';
-
 use App::PTP::Args;
 use App::PTP::Commands qw(do_perl do_grep do_substitute do_sort);
 use English;
@@ -33,7 +31,7 @@ my %options = App::PTP::Args::get_default_options();
   my $input = [@content];
   my @expected = ('obcdefgh') x $content_size;
   do_perl($input, \@markers, \%modes, \%options, 'perl', 's/a/o/');
-  ok(@$input ~~ @expected);
+  is_deeply(\@$input, \@expected);
 }
 
 sub substitute_perl_version {

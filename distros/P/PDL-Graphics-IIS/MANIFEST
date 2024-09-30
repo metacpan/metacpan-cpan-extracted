@@ -1,0 +1,9 @@
+Changes
+iis.pd
+libiis.h
+Makefile.PL
+MANIFEST
+pdliisdisp.c
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/Graphics/IIS.pm            mod=PDL::Graphics::IIS pd=iis.pd (added by pdlpp_mkgen)

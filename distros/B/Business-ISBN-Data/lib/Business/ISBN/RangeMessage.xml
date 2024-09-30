@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>0ccc534e-114e-4443-9d36-b89ce1b38cfb</MessageSerialNumber>
-  <MessageDate>Wed, 18 Sep 2024 04:42:28 BST</MessageDate>
+  <MessageSerialNumber>5b2a94bb-e6bf-40fd-832d-de26c373c9a2</MessageSerialNumber>
+  <MessageDate>Mon, 30 Sep 2024 04:44:45 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -1655,6 +1655,40 @@
         <Rule>
           <Range>6800000-9999999</Range>
           <Length>0</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
+      <Prefix>978-633</Prefix>
+      <Agency>Egypt</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-0199999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>0200000-2999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>3000000-3499999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>3500000-8249999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>8250000-8999999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>9000000-9949999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9950000-9999999</Range>
+          <Length>5</Length>
         </Rule>
       </Rules>
     </Group>

@@ -1,0 +1,64 @@
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.15
+
+use Test::More 0.88;
+use Test::NoTabs;
+
+my @files = (
+    'lib/WebService/Hydra.pm',
+    'lib/WebService/Hydra/Client.pm',
+    'lib/WebService/Hydra/Client.pod',
+    'lib/WebService/Hydra/Exception.pm',
+    'lib/WebService/Hydra/Exception.pod',
+    'lib/WebService/Hydra/Exception/FeatureUnavailable.pm',
+    'lib/WebService/Hydra/Exception/FeatureUnavailable.pod',
+    'lib/WebService/Hydra/Exception/HydraRequestError.pm',
+    'lib/WebService/Hydra/Exception/HydraRequestError.pod',
+    'lib/WebService/Hydra/Exception/HydraServiceUnreachable.pm',
+    'lib/WebService/Hydra/Exception/HydraServiceUnreachable.pod',
+    'lib/WebService/Hydra/Exception/InternalServerError.pm',
+    'lib/WebService/Hydra/Exception/InternalServerError.pod',
+    'lib/WebService/Hydra/Exception/InvalidClaims.pm',
+    'lib/WebService/Hydra/Exception/InvalidClaims.pod',
+    'lib/WebService/Hydra/Exception/InvalidConsentChallenge.pm',
+    'lib/WebService/Hydra/Exception/InvalidConsentChallenge.pod',
+    'lib/WebService/Hydra/Exception/InvalidIdToken.pm',
+    'lib/WebService/Hydra/Exception/InvalidIdToken.pod',
+    'lib/WebService/Hydra/Exception/InvalidLoginChallenge.pm',
+    'lib/WebService/Hydra/Exception/InvalidLoginChallenge.pod',
+    'lib/WebService/Hydra/Exception/InvalidLoginRequest.pm',
+    'lib/WebService/Hydra/Exception/InvalidLoginRequest.pod',
+    'lib/WebService/Hydra/Exception/InvalidLogoutChallenge.pm',
+    'lib/WebService/Hydra/Exception/InvalidLogoutChallenge.pod',
+    'lib/WebService/Hydra/Exception/InvalidToken.pm',
+    'lib/WebService/Hydra/Exception/InvalidToken.pod',
+    'lib/WebService/Hydra/Exception/RevokeLoginSessionsFailed.pm',
+    'lib/WebService/Hydra/Exception/RevokeLoginSessionsFailed.pod',
+    'lib/WebService/Hydra/Exception/TokenExchangeFailed.pm',
+    'lib/WebService/Hydra/Exception/TokenExchangeFailed.pod',
+    't/00-check-deps.t',
+    't/00-compile.t',
+    't/00-report-prereqs.dd',
+    't/00-report-prereqs.t',
+    't/rc/perlcriticrc',
+    't/rc/perltidyrc',
+    't/unit/exception.t',
+    't/unit/exceptions.t',
+    't/unit/hydra_client.t',
+    'xt/author/critic.t',
+    'xt/author/distmeta.t',
+    'xt/author/eol.t',
+    'xt/author/minimum-version.t',
+    'xt/author/mojibake.t',
+    'xt/author/no-tabs.t',
+    'xt/author/pod-syntax.t',
+    'xt/author/portability.t',
+    'xt/author/test-version.t',
+    'xt/release/common_spelling.t',
+    'xt/release/cpan-changes.t'
+);
+
+notabs_ok($_) foreach @files;
+done_testing;

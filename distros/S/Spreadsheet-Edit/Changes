@@ -1,5 +1,6 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1000.016 : Avoid warnings about !$foo ne $bar with perl v5.41.5
 1000.016 : Allow {data_soruce} as option to read_spreadsheet()
 1000.015 : Add sort_indicies() method.   Remove unused t/LpodhTestUtils.pm
            Add btwN, btwbt added to Spreadsheet::Edit::Log

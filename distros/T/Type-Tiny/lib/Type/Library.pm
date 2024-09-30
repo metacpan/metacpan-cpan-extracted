@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Library::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Library::VERSION   = '2.004000';
+	$Type::Library::VERSION   = '2.006000';
 }
 
 $Type::Library::VERSION =~ tr/_//d;
@@ -446,12 +446,6 @@ object which other methods can get called on. For example:
 
    Types::Mine->meta->add_type($foo);
 
-=begin trustme
-
-=item meta
-
-=end trustme
-
 =over
 
 =item C<< add_type($type) >> or C<< add_type(%opts) >>
@@ -641,7 +635,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -651,3 +645,9 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=begin trustme
+
+=item meta
+
+=end trustme

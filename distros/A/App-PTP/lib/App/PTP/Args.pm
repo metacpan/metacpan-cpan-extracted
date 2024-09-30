@@ -22,12 +22,21 @@ my @inputs;
 # The list of actions applied to the input. This is a list of array reference.
 # Each of these array will contain the name of the command to run, the coderef
 # for it, and then its arguments if any.
-my @pipeline;
+#
+# There are two lists, the set of actions that happens before the --merge flag
+# and the set of action that happens after.
+my @pre_merge_pipeline;
+my @post_merge_pipeline;
+my $cur_pipeline = \@pre_merge_pipeline;
 
 # This hash contains options that are used during the pipeline and that can be
 # set or un-set for each command.
 my %modes;
+
 # This hash contains options that are global for the whole program.
+# Note that --merge is an option because it impacts the way the final result is
+# handled (and has compatibility limitations with other options), but it also
+# impact the way the pipeline is built.
 my %options;
 
 my $default_input_field = '\s*,\s*|\t';
@@ -82,7 +91,8 @@ sub get_default_options {
 # really useful only in tests.
 sub reset_global {
   @inputs = ();
-  @pipeline = ();
+  @pre_merge_pipeline = ();
+  @post_merge_pipeline = ();
   %modes = get_default_modes();
   %options = get_default_options();
 }
@@ -99,7 +109,13 @@ sub options_flags {
   (
     'help|h' => sub { pod2usage(-exitval => 0, -verbose => 2) },
     'debug|d+' => \$options{debug_mode},
-    'merge|m!' => \$options{merge},
+    # Merge is documented to be a pipeline command, but it is implemented as a
+    # very custom option.
+    'merge|m' => sub {
+      die "The --merge option can only be specified once\n" if $options{merge};
+      $options{merge} = 1;
+      $cur_pipeline = \@post_merge_pipeline;
+    },
     'in-place|i!' => \$options{in_place},
     'output|o=s' => \&set_output,
     'append|a=s' => sub { set_output(@_); $options{append} = 1; },
@@ -184,101 +200,125 @@ sub validate_cut_spec {
 # other arguments that should be passed to the method.
 sub action_flags {
   (
-    'grep|g=s' => sub { push @pipeline, ['grep', \&do_grep, {%modes}, $_[1]] },
+    'grep|g=s' => sub { push @{$cur_pipeline}, ['grep', \&do_grep, {%modes}, $_[1]] },
     'substitute|s=s{2}' => sub {
-      push @pipeline, ['substitute', \&do_substitute, {%modes}, $_[1]];
+      push @{$cur_pipeline}, ['substitute', \&do_substitute, {%modes}, $_[1]];
     },
     # All the do_perl below could have the same sub using "$_[0]" instead of the
     # manually specified name.
-    'perl|p=s' => sub { push @pipeline, ['perl', \&do_perl, {%modes}, 'perl', $_[1]] },
-    'n=s' => sub { push @pipeline, ['n', \&do_perl, {%modes}, 'n', $_[1]] },
-    'filter|f=s' => sub { push @pipeline, ['filter', \&do_perl, {%modes}, 'filter', $_[1]] },
+    'perl|p=s' => sub { push @{$cur_pipeline}, ['perl', \&do_perl, {%modes}, 'perl', $_[1]] },
+    'n=s' => sub { push @{$cur_pipeline}, ['n', \&do_perl, {%modes}, 'n', $_[1]] },
+    'filter|f=s' => sub { push @{$cur_pipeline}, ['filter', \&do_perl, {%modes}, 'filter', $_[1]] },
     'mark-line|ml=s' => sub {
-      push @pipeline, ['mark-line', \&do_perl, {%modes}, 'mark-line', $_[1]];
+      push @{$cur_pipeline}, ['mark-line', \&do_perl, {%modes}, 'mark-line', $_[1]];
     },
     'execute|e=s' => sub {
-      push @pipeline, ['execute', \&do_execute, {%modes}, 'execute', $_[1]];
+      push @{$cur_pipeline}, ['execute', \&do_execute, {%modes}, 'execute', $_[1]];
     },
-    'M=s' => sub { push @pipeline, ['M', \&do_execute, {%modes}, 'M', $_[1]] },
-    'load|l=s' => sub { push @pipeline, ['load', \&do_load, {%modes}, $_[1]] },
-    'sort' => sub { push @pipeline, ['sort', \&do_sort, {%modes}] },
+    'M=s' => sub { push @{$cur_pipeline}, ['M', \&do_execute, {%modes}, 'M', $_[1]] },
+    'load|l=s' => sub { push @{$cur_pipeline}, ['load', \&do_load, {%modes}, $_[1]] },
+    'sort' => sub { push @{$cur_pipeline}, ['sort', \&do_sort, {%modes}] },
     'numeric-sort|ns' => sub {
       my $opt = {%modes, comparator => \'numeric'};
-      push @pipeline, ['numeric-sort', \&do_sort, $opt];
+      push @{$cur_pipeline}, ['numeric-sort', \&do_sort, $opt];
     },
     'locale-sort|ls' => sub {
       my $opt = {%modes, comparator => \'locale'};
-      push @pipeline, ['numeric-sort', \&do_sort, $opt];
+      push @{$cur_pipeline}, ['numeric-sort', \&do_sort, $opt];
     },
     'custom-sort|cs=s' => sub {
       my $opt = {%modes, comparator => $_[1]};
-      push @pipeline, ['custom-sort', \&do_sort, $opt];
+      push @{$cur_pipeline}, ['custom-sort', \&do_sort, $opt];
     },
     'unique|uniq|u' => sub {
-      push @pipeline, ['unique', \&do_list_op, {%modes}, \&App::PTP::Util::uniqstr, 'together'];
+      push @{$cur_pipeline},
+          ['unique', \&do_list_op, {%modes}, \&App::PTP::Util::uniqstr, 'together'];
     },
     'global-unique|guniq|gu' => sub {
-      push @pipeline,
+      push @{$cur_pipeline},
           ['global-unique', \&do_list_op, {%modes}, \&App::PTP::Util::globaluniqstr, 'together'];
     },
-    'head:i' => sub { push @pipeline, ['head', \&do_head, {%modes}, $_[1]] },
-    'tail:i' => sub { push @pipeline, ['tail', \&do_tail, {%modes}, $_[1]] },
+    'head:i' => sub { push @{$cur_pipeline}, ['head', \&do_head, {%modes}, $_[1]] },
+    'tail:i' => sub { push @{$cur_pipeline}, ['tail', \&do_tail, {%modes}, $_[1]] },
     'reverse|tac' => sub {
-      push @pipeline, ['reverse', \&do_list_op, {%modes}, sub { reverse @_ }, 'same'];
+      push @{$cur_pipeline}, ['reverse', \&do_list_op, {%modes}, sub { reverse @_ }, 'same'];
     },
     'shuffle' => sub {
-      push @pipeline, ['shuffle', \&do_list_op, {%modes}, \&List::Util::shuffle, 'none'];
+      push @{$cur_pipeline}, ['shuffle', \&do_list_op, {%modes}, \&List::Util::shuffle, 'none'];
     },
-    'eat' => sub { push @pipeline, ['eat', \&do_eat, {%modes}] },
+    'eat' => sub { push @{$cur_pipeline}, ['eat', \&do_eat, {%modes}] },
     'delete-marked' => sub {
-      push @pipeline, ['delete-marked', \&do_delete_marked, {%modes}, 0];
+      push @{$cur_pipeline}, ['delete-marked', \&do_delete_marked, {%modes}, 0];
     },
     'delete-before' => sub {
-      push @pipeline, ['delete-before', \&do_delete_marked, {%modes}, -1];
+      push @{$cur_pipeline}, ['delete-before', \&do_delete_marked, {%modes}, -1];
     },
     'delete-after' => sub {
-      push @pipeline, ['delete-after', \&do_delete_marked, {%modes}, 1];
+      push @{$cur_pipeline}, ['delete-after', \&do_delete_marked, {%modes}, 1];
     },
     'delete-at-offset=i' => sub {
-      push @pipeline, ['delete-at-offset', \&do_delete_marked, {%modes}, $_[1]];
+      push @{$cur_pipeline}, ['delete-at-offset', \&do_delete_marked, {%modes}, $_[1]];
     },
     'insert-before=s' => sub {
-      push @pipeline, ['insert-before', \&do_insert_marked, {%modes}, -1, $_[1]];
+      push @{$cur_pipeline}, ['insert-before', \&do_insert_marked, {%modes}, -1, $_[1]];
     },
     'insert-after=s' => sub {
-      push @pipeline, ['insert-after', \&do_insert_marked, {%modes}, 0, $_[1]];
+      push @{$cur_pipeline}, ['insert-after', \&do_insert_marked, {%modes}, 0, $_[1]];
     },
     'insert-at-offset=s{2}' => sub {
-      push @pipeline, ['insert-at-offset', \&do_insert_marked, {%modes}, $_[1]];
+      push @{$cur_pipeline}, ['insert-at-offset', \&do_insert_marked, {%modes}, $_[1]];
     },
-    'clear-markers' => sub { push @pipeline, ['clear-markers', \&do_set_markers, {%modes}, 0] },
+    'clear-markers' =>
+        sub { push @{$cur_pipeline}, ['clear-markers', \&do_set_markers, {%modes}, 0] },
     'set-all-markers' => sub {
-      push @pipeline, ['set-all-markers', \&do_set_markers, {%modes}, 1];
+      push @{$cur_pipeline}, ['set-all-markers', \&do_set_markers, {%modes}, 1];
     },
     'cut=s' => sub {
-      push @pipeline, ['cut', \&do_cut, {%modes}, validate_cut_spec($_[1])];
+      push @{$cur_pipeline}, ['cut', \&do_cut, {%modes}, validate_cut_spec($_[1])];
     },
-    'paste=s' => sub { push @pipeline, ['paste', \&do_paste, {%modes}, $_[1]] },
-    'pivot' => sub { push @pipeline, ['pivot', \&do_pivot, {%modes}, 'pivot'] },
+    'paste=s' => sub { push @{$cur_pipeline}, ['paste', \&do_paste, {%modes}, $_[1]] },
+    'pivot' => sub { push @{$cur_pipeline}, ['pivot', \&do_pivot, {%modes}, 'pivot'] },
     'anti-pivot' => sub {
-      push @pipeline, ['anti-pivot', \&do_pivot, {%modes}, 'anti-pivot'];
+      push @{$cur_pipeline}, ['anti-pivot', \&do_pivot, {%modes}, 'anti-pivot'];
     },
     'transpose' => sub {
-      push @pipeline, ['transpose', \&do_pivot, {%modes}, 'transpose'];
+      push @{$cur_pipeline}, ['transpose', \&do_pivot, {%modes}, 'transpose'];
     },
-    'number-lines|nl' => sub { push @pipeline, ['number-lines', \&do_number_lines, {%modes}] },
-    'file-name|fn' => sub { push @pipeline, ['file-name', \&do_file_name, {%modes}, 1] },
+    'number-lines|nl' =>
+        sub { push @{$cur_pipeline}, ['number-lines', \&do_number_lines, {%modes}] },
+    'file-name|fn' => sub { push @{$cur_pipeline}, ['file-name', \&do_file_name, {%modes}, 1] },
     'prefix-file-name|pfn' =>
-        sub { push @pipeline, ['prefix-file-name', \&do_file_name, {%modes}, 0] },
-    'line-count|lc' => sub { push @pipeline, ['line-count', \&do_line_count, {%modes}] },
-    'tee=s' => sub { push @pipeline, ['tee', \&do_tee, {%modes}, $_[1]] },
+        sub { push @{$cur_pipeline}, ['prefix-file-name', \&do_file_name, {%modes}, 0] },
+    'line-count|lc' => sub { push @{$cur_pipeline}, ['line-count', \&do_line_count, {%modes}] },
+    'tee=s' => sub { push @{$cur_pipeline}, ['tee', \&do_tee, {%modes}, $_[1]] },
     'shell=s' => sub {
-      push @pipeline, ['shell', \&do_shell, {%modes}, 'shell', $_[1]];
+      push @{$cur_pipeline}, ['shell', \&do_shell, {%modes}, 'shell', $_[1]];
     })
 }
 
 sub all_args {
   return (options_flags(), modes_flags(), input_flags(), action_flags());
+}
+
+# Because of the way the options are processed, each --replace options
+# (expecting two arguments) is pushed twice in the pipeline sub (once for each
+# argument). We're fixing this here.
+sub fix_pipeline {
+  my ($pipeline) = @_;
+  for my $i (0 .. $#{$pipeline}) {
+    if ($pipeline->[$i][0] eq 'substitute') {
+      push @{$pipeline->[$i]}, $pipeline->[$i + 1]->[3];
+      $pipeline->[$i + 1][0] = 'garbage';
+    } elsif ($pipeline->[$i][0] eq 'insert-at-offset') {
+      my $o = $pipeline->[$i]->[3];
+      if (!ist_int($o)) {
+        die "The first argument to --insert-at-offset must be an integer: $o\n";
+      }
+      push @{$pipeline->[$i]}, $pipeline->[$i + 1]->[3];
+      $pipeline->[$i + 1][0] = 'garbage';
+    }
+  }
+  @{$pipeline} = grep { $_->[0] ne 'garbage' } @{$pipeline};
 }
 
 # parse_command_line(\@args)
@@ -291,27 +331,12 @@ sub parse_command_line {
   if ($options{debug_mode} > 1) {
     # When -d is specified multiple times, we add the marker on the final
     # output.
-    push @pipeline,
+    push @{$cur_pipeline},
         ['show-marker', \&do_perl, {%modes}, 'perl', 'pf "%s %s", ($m ? "*" : " "), $_'];
   }
 
-  # Because of the way the options are processed, each --replace options
-  # (expecting two arguments) is pushed twice in the pipeline sub (once for each
-  # argument). We're fixing this here.
-  for my $i (0 .. $#pipeline) {
-    if ($pipeline[$i][0] eq 'substitute') {
-      push @{$pipeline[$i]}, $pipeline[$i + 1]->[3];
-      $pipeline[$i + 1][0] = 'garbage';
-    } elsif ($pipeline[$i][0] eq 'insert-at-offset') {
-      my $o = $pipeline[$i]->[3];
-      if (!ist_int($o)) {
-        die "The first argument to --insert-at-offset must be an integer: $o\n";
-      }
-      push @{$pipeline[$i]}, $pipeline[$i + 1]->[3];
-      $pipeline[$i + 1][0] = 'garbage';
-    }
-  }
-  @pipeline = grep { $_->[0] ne 'garbage' } @pipeline;
+  fix_pipeline(\@pre_merge_pipeline);
+  fix_pipeline(\@post_merge_pipeline);
 
   # Add any options that were passed after a '--' to the list of inputs.
   push @inputs, @$args;
@@ -336,7 +361,7 @@ sub parse_command_line {
     print "WARNING: The --input-filter option is useless unless --recursive is specified too.\n";
   }
 
-  return (\@inputs, \@pipeline, \%options);
+  return (\@inputs, \@pre_merge_pipeline, \@post_merge_pipeline, \%options);
 }
 
 1;

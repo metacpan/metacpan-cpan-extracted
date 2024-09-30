@@ -2,7 +2,7 @@
 #
 #   A script that performs semantic similarity in PXF|BFF data structures
 #
-#   Last Modified: Dec/22/2023
+#   Last Modified: Aug/09/2024
 #
 #   $VERSION taken from Pheno::Ranker
 #
@@ -82,6 +82,11 @@ pod2usage(
       "<--graph_stats> only works in conjunction with <--cytoscape-json>\n",
     -exitval => 1
 ) if ( defined $graph_stats && !defined $cytoscape_json );
+pod2usage(
+    -message =>
+      "Weights file <$weights_file> does not exist\n",
+    -exitval => 1
+) if ( defined $weights_file && !-f $weights_file );
 
 # Set the name of the output
 my $out_file = $out_file_arg
@@ -240,7 +245,7 @@ pheno-ranker: A script that performs semantic similarity in PXF/BFF data structu
      -cytoscape-json [file]           Serializes the pairwise comparison matrix as an undirected graph in JSON, compatible with Cytoscape [default: graph.json]
      -e, --export [path/basename]     Export miscellaneous JSON files. If not specified, default filenames are used [default: export.*]
      -exclude-terms <terms>           Exclude BFF/PXF terms (e.g., --exclude-terms sex, id)
-     -graph-stats [file]              Generates a text file with key graph metrics, for use with <-cytoscape-json>
+     -graph-stats [file]              Generates a text file with key graph metrics, for use with <-cytoscape-json> [default: graph_stats.txt]
      -include-hpo-ascendants          Include ascendant terms from the Human Phenotype Ontology (HPO)
      -include-terms <terms>           Include BFF/PXF terms (e.g., --include-terms diseases)
      -max-number-var <number>         Maximum variables for binary string [default: 10000]
@@ -269,13 +274,76 @@ The script also accepts CSV files that have been pre-processed using the C<csv2p
 
 =head1 SUMMARY
 
-Pheno-Ranker is a lightweight and easily to install tool specifically designed for performing semantic similarity analysis on phenotypic data structured in JSON format, such as Beacon v2 Models or Phenopackets v2.
+Pheno-Ranker is a lightweight and easy to install tool specifically designed for performing semantic similarity analysis on phenotypic data structured in JSON format, such as Beacon v2 Models or Phenopackets v2.
 
 =head1 INSTALLATION
 
+=head2 Non containerized
+
+The script runs on command-line Linux and it has been tested on Debian/RedHat/macOS based distributions (only showing commands for Debian). Perl 5 is installed by default on Linux, 
+but we will install a few CPAN modules with C<cpanminus>.
+
+=head3 Method 1: From CPAN
+
+First install system level dependencies:
+
+  sudo apt-get install cpanminus libperl-dev
+
+Now you have to choose between one of the 2 options below:
+
+B<Option 1:> System-level installation:
+
+  cpanm --notest --sudo Pheno::Ranker
+  pheno-ranker -h
+
+B<Option 2:> Install Pheno-Ranker and the dependencies at C<~/perl5>
+
+  cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+  cpanm --notest Pheno::Ranker
+  pheno-ranker --help
+
+To ensure Perl recognizes your local modules every time you start a new terminal, you should type:
+
+  echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
+
+=head3 Method 2: From CPAN in a CONDA environment
+
+Please follow L<these instructions|https://cnag-biomedical-informatics.github.io/pheno-ranker/download-and-installation/#__tabbed_1_2>.
+
+=head3 Method 3: From GitHub
+
+  git clone https://github.com/cnag-biomedical-informatics/pheno-ranker.git
+  cd pheno-ranker
+
+Install system level dependencies:
+  
+  sudo apt-get install cpanminus libperl-dev
+
+Now you have to choose between one of the 2 options below:
+
+B<Option 1:> Install dependencies (they're harmless to your system) as C<sudo>:
+
+  cpanm --notest --sudo --installdeps .
+  bin/pheno-ranker --help            
+
+B<Option 2:> Install the dependencies at C<~/perl5>:
+
+  cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+  cpanm --notest --installdeps .
+  bin/pheno-ranker --help
+
+To ensure Perl recognizes your local modules every time you start a new terminal, you should type:
+
+  echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
+
+I<Optional:> If you want to use C<utils/barcode> or C<utils/bff_pxf_plot>:
+
+  sudo apt-get install python3-pip libzbar0
+  pip3 install -r requirements.txt
+
 =head2 Containerized
 
-=head3 Method 1: From Docker Hub
+=head3 Method 4: From Docker Hub
 
 Download a docker image (latest version - amd64|x86-64) from L<Docker Hub|https://hub.docker.com/r/manuelrueda/pheno-ranker> by executing:
 
@@ -284,7 +352,7 @@ Download a docker image (latest version - amd64|x86-64) from L<Docker Hub|https:
 
 See additional instructions below.
 
-=head3 Method 2: With Dockerfile
+=head3 Method 5: With Dockerfile
 
 Please download the C<Dockerfile> from the repo:
 
@@ -292,9 +360,13 @@ Please download the C<Dockerfile> from the repo:
 
 And then run:
 
+  # Docker Version 19.03 and Above (Supports buildx)
   docker buildx build -t cnag/pheno-ranker:latest .
 
-=head3 Additional instructions for Methods 1 and 2
+  # Docker Version Older than 19.03 (Does Not Support buildx)
+  docker build -t cnag/pheno-ranker:latest .
+
+=head3 Additional instructions for Methods 4 and 5
 
 To run the container (detached) execute:
 
@@ -327,68 +399,9 @@ Then I will do something like this:
   # Now I use the alias to run the command (note that I use the flag --o to specify the filepath)
   pheno-ranker -r /data/individuals.json -o /data/matrix.txt
 
-=head2 Non containerized
-
-The script runs on command-line Linux and it has been tested on Debian/RedHat/MacOS based distributions (only showing commands for Debian's). Perl 5 is installed by default on Linux, 
-but we will install a few CPAN modules with C<cpanminus>.
-
-=head3 From Github
-
-  git clone https://github.com/cnag-biomedical-informatics/pheno-ranker.git
-  cd pheno-ranker
-
-Install system level dependencies:
-  
-  sudo apt-get install cpanminus libperl-dev
-
-Now you have two choose between one of the 2 options below:
-
-B<Option 1:> Install dependencies (they're harmless to your system) as C<sudo>:
-
-  cpanm --notest --sudo --installdeps .
-  bin/pheno-ranker --help            
-
-B<Option 2:> Install the dependencies at C<~/perl5>:
-
-  cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-  cpanm --notest --installdeps .
-  bin/pheno-ranker --help
-
-To ensure Perl recognizes your local modules every time you start a new terminal, you should type:
-
-  echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
-
-I<Optional:> If you want to use C<utils/barcode> or C<utils/bff_pxf_plot>:
-
-  sudo apt-get install python3-pip libzbar0
-  pip3 install -r requirements.txt
-
-=head3 From CPAN
-
-First install system level dependencies:
-
-  sudo apt-get install cpanminus libperl-dev
-
-Now you have two choose between one of the 2 options below:
-
-B<Option 1:> System-level installation:
-
-  cpanm --notest --sudo Pheno::Ranker
-  pheno-ranker -h
-
-B<Option 2:> Install Pheno-Ranker and the dependencies at C<~/perl5>
-
-  cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-  cpanm --notest Pheno::Ranker
-  pheno-ranker --help
-
-To ensure Perl recognizes your local modules every time you start a new terminal, you should type:
-
-  echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
-
 =head3 System requirements
 
-  * Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOs, OpenSuse) should do as well.
+  * Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOS, OpenSUSE) should do as well.
     (It should also work on macOS and Windows Server, but we are only providing information for Linux here)
   * Perl 5 (>= 5.26 core; installed by default in most Linux distributions). Check the version with "perl -v".
   * >= 4GB of RAM
@@ -398,6 +411,8 @@ To ensure Perl recognizes your local modules every time you start a new terminal
 =head1 HOW TO RUN PHENO-RANKER
 
 For executing pheno-ranker you will need a PXF/BFF file(s) in JSON|YAML format. The reference cohort must be a JSON array, where each individual data are consolidated in one object.
+
+You can download examples from L<this location|https://github.com/CNAG-Biomedical-Informatics/pheno-ranker/tree/main/share/ex>.
 
 There are two modes of operation:
 
@@ -442,9 +457,9 @@ B<Examples:>
 
 =head1 CITATION
 
-The author requests that any published work that utilizes C<Pheno-Ranker> includes a cite to the the following reference:
+The author requests that any published work that utilizes C<Pheno-Ranker> includes a cite to the following reference:
 
-Leist, I.C. et al., (2024). Advancing Semantic Similarity Analysis of Phenotypic Data Stored in GA4GH Standards and Beyond. I<Submitted>.
+Leist, I.C. et al., (2024). Pheno-Ranker: A Toolkit for Comparison of Phenotypic Data Stored in GA4GH Standards and Beyond. I<Submitted>.
 
 =head1 AUTHOR 
 

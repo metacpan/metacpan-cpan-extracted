@@ -10,7 +10,7 @@
 ####################################################################
 
 
-use v5.20;
+use v5.26;
 use warnings;
 no warnings qw(void);
 use experimental 'signatures';
@@ -18,7 +18,7 @@ use Feature::Compat::Try;
 use Future::AsyncAwait;
 use Sublike::Extended; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-package Sys::Async::Virt v0.0.6;
+package Sys::Async::Virt v0.0.7;
 
 use parent qw(IO::Async::Notifier);
 
@@ -27,28 +27,30 @@ use Future::Queue;
 use Log::Any qw($log);
 use Scalar::Util qw(reftype weaken);
 
-use Protocol::Sys::Virt::Remote::XDR v10.3.7;
+use Protocol::Sys::Virt::Remote::XDR v10.3.12;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Protocol::Sys::Virt::Remote v10.3.7;
-use Protocol::Sys::Virt::Transport v10.3.7;
+use Protocol::Sys::Virt::KeepAlive v10.3.12;
+use Protocol::Sys::Virt::Remote v10.3.12;
+use Protocol::Sys::Virt::Transport v10.3.12;
+use Protocol::Sys::Virt::URI v10.3.12; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.0.6;
-use Sys::Async::Virt::Domain v0.0.6;
-use Sys::Async::Virt::DomainCheckpoint v0.0.6;
-use Sys::Async::Virt::DomainSnapshot v0.0.6;
-use Sys::Async::Virt::Network v0.0.6;
-use Sys::Async::Virt::NetworkPort v0.0.6;
-use Sys::Async::Virt::NwFilter v0.0.6;
-use Sys::Async::Virt::NwFilterBinding v0.0.6;
-use Sys::Async::Virt::Interface v0.0.6;
-use Sys::Async::Virt::StoragePool v0.0.6;
-use Sys::Async::Virt::StorageVol v0.0.6;
-use Sys::Async::Virt::NodeDevice v0.0.6;
-use Sys::Async::Virt::Secret v0.0.6;
+use Sys::Async::Virt::Connection::Factory v0.0.7;
+use Sys::Async::Virt::Domain v0.0.7;
+use Sys::Async::Virt::DomainCheckpoint v0.0.7;
+use Sys::Async::Virt::DomainSnapshot v0.0.7;
+use Sys::Async::Virt::Network v0.0.7;
+use Sys::Async::Virt::NetworkPort v0.0.7;
+use Sys::Async::Virt::NwFilter v0.0.7;
+use Sys::Async::Virt::NwFilterBinding v0.0.7;
+use Sys::Async::Virt::Interface v0.0.7;
+use Sys::Async::Virt::StoragePool v0.0.7;
+use Sys::Async::Virt::StorageVol v0.0.7;
+use Sys::Async::Virt::NodeDevice v0.0.7;
+use Sys::Async::Virt::Secret v0.0.7;
 
-use Sys::Async::Virt::Callback v0.0.6;
-use Sys::Async::Virt::Stream v0.0.6;
+use Sys::Async::Virt::Callback v0.0.7;
+use Sys::Async::Virt::Stream v0.0.7;
 
 use constant {
     CLOSE_REASON_ERROR                                 => 0,
@@ -790,14 +792,15 @@ my @reply_translators = (
 
 
 sub _map( $client, $unwrap, $argmap, $data) {
-    for my $key (keys %{ $argmap }) {
+    for my $key (keys $argmap->%*) {
         my $val = $data->{$key};
 
         if (ref $argmap->{$key} and reftype $argmap->{$key} eq 'HASH') {
             $data->{$key} = _map( $client, undef, $argmap->{$key}, $val );
         }
         elsif (ref $val and reftype $val eq 'ARRAY') {
-            $data->{$key} = [ map { $argmap->{$key}->( $client, $_ ) } @{ $val } ];
+            $data->{$key} = [
+                map { $argmap->{$key}->( $client, $_ ) } $val->@* ];
         }
         else {
             $data->{$key} = $argmap->{$key}->( $client, $val );
@@ -865,8 +868,7 @@ sub _secret_factory {
     return Sys::Async::Virt::Secret->new( @_ );
 }
 
-sub new {
-    my ($class, %args) = @_;
+sub new($class, %args) {
     my $self = bless {
         _domains => {},
         _domain_checkpoints => {},
@@ -904,22 +906,22 @@ sub new {
         remote     => $args{remote},
         factory    => $args{factory},
         keepalive  => $args{keepalive},
+
+        on_close   => $args{on_close} // sub {},
         on_stream  => $args{on_stream},
     }, $class;
 
     return $self;
 }
 
-sub _domain_instance {
-    my ($self, $id) = @_;
+sub _domain_instance($self, $id) {
     my $c = $self->{_domains}->{$id->{uuid}}
        //= $self->{domain_factory}->( client => $self, remote => $self->{remote}, id => $id );
     weaken $self->{_domains}->{$id->{uuid}};
     return $c;
 }
 
-sub _domain_checkpoint_instance {
-    my ($self, $id) = @_;
+sub _domain_checkpoint_instance($self, $id) {
     my $key = "$id->{dom}->{uuid}/$id->{name}";
     my $c = $self->{_domain_checkpoints}->{$key}
        //= $self->{domain_checkpoint_factory}->( client => $self, remote => $self->{remote}, id => $id );
@@ -927,8 +929,7 @@ sub _domain_checkpoint_instance {
     return $c;
 }
 
-sub _domain_snapshot_instance {
-    my ($self, $id) = @_;
+sub _domain_snapshot_instance($self, $id) {
     my $key = "$id->{dom}->{uuid}/$id->{name}";
     my $c = $self->{_domain_snapshots}->{$id->{uuid}}
        //= $self->{domain_snapshot_factory}->( client => $self, remote => $self->{remote}, id => $id );
@@ -936,32 +937,28 @@ sub _domain_snapshot_instance {
     return $c;
 }
 
-sub _network_instance {
-    my ($self, $id) = @_;
+sub _network_instance($self, $id) {
     my $c = $self->{_networks}->{$id->{uuid}}
        //= $self->{network_factory}->( client => $self, remote => $self->{remote}, id => $id );
     weaken $self->{_networks}->{$id->{uuid}};
     return $c;
 }
 
-sub _network_port_instance {
-    my ($self, $id) = @_;
+sub _network_port_instance($self, $id) {
     my $c = $self->{_network_ports}->{$id->{uuid}}
        //= $self->{network_port_factory}->( client => $self, remote => $self->{remote}, id => $id );
     weaken $self->{_network_ports}->{$id->{uuid}};
     return $c;
 }
 
-sub _nwfilter_instance {
-    my ($self, $id) = @_;
+sub _nwfilter_instance($self, $id) {
     my $c = $self->{_nwfilters}->{$id->{uuid}}
        //= $self->{nwfilter_factory}->( client => $self, remote => $self->{remote}, id => $id );
     weaken $self->{_nwfilters}->{$id->{uuid}};
     return $c;
 }
 
-sub _nwfilter_binding_instance {
-    my ($self, $id) = @_;
+sub _nwfilter_binding_instance($self, $id) {
     my $key = "$id->{portdev}/$id->{filtername}";
     my $c = $self->{_nwfilter_bindings}->{$key}
        //= $self->{nwfilter_binding_factory}->( client => $self, remote => $self->{remote}, id => $id );
@@ -969,8 +966,7 @@ sub _nwfilter_binding_instance {
     return $c;
 }
 
-sub _interface_instance {
-    my ($self, $id) = @_;
+sub _interface_instance($self, $id) {
     my $key = "$id->{mac}/$id->{name}";
     my $c = $self->{_interfaces}->{$key}
        //= $self->{interface_factory}->( client => $self, remote => $self->{remote}, id => $id );
@@ -978,32 +974,28 @@ sub _interface_instance {
     return $c;
 }
 
-sub _storage_pool_instance {
-    my ($self, $id) = @_;
+sub _storage_pool_instance($self, $id) {
     my $c = $self->{_storage_pools}->{$id->{uuid}}
        //= $self->{storage_pool_factory}->( client => $self, remote => $self->{remote}, id => $id );
     weaken $self->{_storage_pools}->{$id->{uuid}};
     return $c;
 }
 
-sub _storage_vol_instance {
-    my ($self, $id) = @_;
+sub _storage_vol_instance($self, $id) {
     my $c = $self->{_storage_vols}->{$id->{key}}
        //= $self->{storage_vol_factory}->( client => $self, remote => $self->{remote}, id => $id );
     weaken $self->{_storage_vols}->{$id->{key}};
     return $c;
 }
 
-sub _node_device_instance {
-    my ($self, $id) = @_;
+sub _node_device_instance($self, $id) {
     my $c = $self->{_node_devices}->{$id->{name}}
        //= $self->{node_device_factory}->( client => $self, remote => $self->{remote}, id => $id );
     weaken $self->{_node_devices}->{$id->{name}};
     return $c;
 }
 
-sub _secret_instance {
-    my ($self, $id) = @_;
+sub _secret_instance($self, $id) {
     my $c = $self->{_secrets}->{$id->{uuid}}
        //= $self->{secret_factory}->( client => $self, remote => $self->{remote}, id => $id );
     weaken $self->{_secrets}->{$id->{uuid}};
@@ -1061,13 +1053,14 @@ async sub _filter_typed_param_string($self, $params) {
             } @$params ];
 }
 
-sub _dispatch_closed {
-    my $self = shift;
-
-    $self->{on_closed}->( @_ );
+sub _dispatch_closed($self, @args) {
+    $self->{on_closed}->( $self, @args );
 }
 
 sub _dispatch_message($self, %args) {
+    if (my $k = $self->{keepalive}) {
+        $k->mark_active;
+    }
     if ($args{data}
         and defined $args{data}->{callbackID}
         and my $cb = $self->{_callbacks}->{$args{data}->{callbackID}}) {
@@ -1083,13 +1076,15 @@ sub _dispatch_message($self, %args) {
     }
 }
 
-sub _dispatch_reply {
-    my ($self, %args) = @_;
+sub _dispatch_reply($self, %args) {
     $log->trace( "Dispatching serial $args{header}->{serial}" );
+    if (my $k = $self->{keepalive}) {
+        $k->mark_active;
+    }
     my $f = delete $self->{_replies}->{$args{header}->{serial}};
 
     if (exists $args{data}) {
-        my %cbargs = $reply_translators[$args{header}->{proc}]->( @_ );
+        my %cbargs = $reply_translators[$args{header}->{proc}]->( $self, %args );
         $f->done( $cbargs{data} );
     }
     elsif (exists $args{error}) {
@@ -1102,10 +1097,10 @@ sub _dispatch_reply {
     return;
 }
 
-sub _dispatch_stream {
-    my $self = shift;
-    my %args = @_;
-
+sub _dispatch_stream($self, %args) {
+    if (my $k = $self->{keepalive}) {
+        $k->mark_active;
+    }
     if (my $stream = $self->{_streams}->{$args{header}->{serial}}) {
         if ($args{error}) {
             return $stream->_dispatch_error($args{error});
@@ -1115,22 +1110,17 @@ sub _dispatch_stream {
         }
     }
     else {
-        return $self->{on_stream}->( @_ );
+        return $self->{on_stream}->( $self, %args );
     }
 }
 
-sub configure {
-    my $self = shift;
-    my %args = @_;
+sub configure($self, %args) {
     for my $key (keys %args) {
         $self->{$key} = $args{$key} // sub {};
     }
 }
 
-sub register {
-    my $self = shift;
-    my $r = shift;
-
+sub register($self, $r) {
     $r->configure(
         on_closed  => sub { $self->_dispatch_closed( @_ ) },
         on_message => sub { $self->_dispatch_message( @_ ) },
@@ -1183,6 +1173,38 @@ extended async sub connect($self, :$pump = undef) {
 
     $pump //= \&_pump;
     $self->adopt_future( $pump->( $self->{connection}, $self->{transport} ) );
+
+    if (await $self->_supports_feature(
+            $self->{remote}->DRV_FEATURE_PROGRAM_KEEPALIVE )) {
+        $self->{keepalive} //= Protocol::Sys::Virt::KeepAlive->new(
+            max_inactive => 5,
+            on_ack       => sub { $log->trace('KeepAlive PING ACK'); return; },
+            on_ping      => sub {
+                $log->trace('KeepAlive ACK-ing PING');
+                $self->adopt_future( $_[0]->pong );
+                return;
+            },
+            on_fail      => sub {
+                $log->fatal('KeepAlive time out - closing connection');
+                $self->{on_close}->( $self->CLOSE_REASON_KEEPALIVE );
+                $self->{connection}->close;
+                return;
+            });
+
+        $self->{keepalive}->register( $self->{transport} );
+        my $keep_pump = async sub {
+            while (1) {
+                await $self->loop->delay_future( after => 10 );
+                $log->trace('Sending PING');
+                if (my $f = $self->{keepalive}->ping ) {
+                    $self->adopt_future( $f );
+                }
+            }
+        };
+        $self->adopt_future( $keep_pump->() );
+    }
+
+    return;
 }
 
 
@@ -1280,17 +1302,37 @@ async sub secret_event_register_any($self, $eventID, $secret = undef) {
 # ENTRYPOINT: REMOTE_PROC_AUTH_LIST
 # ENTRYPOINT: REMOTE_PROC_AUTH_POLKIT
 # ENTRYPOINT: REMOTE_PROC_AUTH_SASL_INIT
-async sub auth {
-    my ($self, $auth_type) = @_;
+async sub auth($self, $auth_type = undef) {
+    my $auth_types = await $self->_call( $remote->PROC_AUTH_LIST, {},
+                                         unwrap => 'types' );
 
-    my $rv = await $self->_call( $remote->PROC_AUTH_LIST );
-    my $auth_types = $rv->{types};
-    my $selected = $remote->AUTH_NONE;
-    for my $type ( @{ $auth_types } ) {
-        if ($auth_type == $type) {
-            $selected = $type;
-            last;
+    my $selected;
+    if (defined $auth_type) {
+        my $want;
+        if ($auth_type eq 'sasl') {
+            $want = $remote->AUTH_SASL;
         }
+        elsif ($auth_type eq 'polkit') {
+            $want = $remote->AUTH_POLKIT;
+        }
+        elsif ($auth_type eq 'none') {
+            $want = $remote->AUTH_NONE;
+        }
+        else {
+            die "Unknown authentication method $auth_type requested";
+        }
+
+        for my $type ( $auth_types->@* ) {
+            if ($want == $type) {
+                $selected = $type;
+                last;
+            }
+        }
+        die "Requested authentication method $auth_type not supported by the server"
+            if not defined $selected;
+    }
+    else {
+        $selected = shift $auth_types->@*;
     }
     return if $selected == $remote->AUTH_NONE;
 
@@ -1299,8 +1341,8 @@ async sub auth {
         return;
     }
     if ($selected == $remote->AUTH_SASL) {
-        $rv = await $self->_call( $remote->PROC_AUTH_SASL_INIT );
-        my $mechs = $rv->{mechlist};
+        my $mechs = await $self->_call( $remote->PROC_AUTH_SASL_INIT, {},
+                                        unwrap => 'mechlist' );
         ...
     }
     return;
@@ -1309,25 +1351,24 @@ async sub auth {
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_OPEN
 # ENTRYPOINT: REMOTE_PROC_CONNECT_REGISTER_CLOSE_CALLBACK
-async sub open {
-    my ($self, $url, $flags) = @_;
+async sub open($self, $flags = undef) {
+    my %parsed_url = parse_url( $self->{url} );
     await $self->_call( $remote->PROC_CONNECT_OPEN,
-                        { name => $url, flags => $flags // 0 } );
+                        { name => $parsed_url{name}, flags => $flags // 0 } );
     if (await $self->_supports_feature(
             $self->{remote}->DRV_FEATURE_REMOTE_CLOSE_CALLBACK )) {
         await $self->_call( $remote->PROC_CONNECT_REGISTER_CLOSE_CALLBACK );
     }
     if (not await $self->_supports_feature(
             $self->{remote}->DRV_FEATURE_REMOTE_EVENT_CALLBACK )) {
-        die "Remote not supported: REMOTE_EVENT_CALLBACK feature not available";
+        die "Remote does not support REMOTE_EVENT_CALLBACK feature";
     }
 }
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_CLOSE
 # ENTRYPOINT: REMOTE_PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK
-async sub close {
-    my ($self) = @_;
-    for my $cb (values %{ $self->{_callbacks} }) {
+async sub close($self) {
+    for my $cb (values $self->{_callbacks}->%*) {
         await $cb->cancel;
     }
     await $self->_call( $remote->PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK );
@@ -1963,7 +2004,7 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.6
+v0.0.7
 
 Based on LibVirt tag v10.3.0
 
@@ -2137,10 +2178,23 @@ Sets up the transport connection to the server indicated by C<url>.
 
 =head2 auth
 
-  await $client->auth( $auth_type );
+  await $client->auth( $auth_type = undef );
   # -> (* no data *)
 
-Authenticates against the server.
+Authenticates against the server. C<$auth_type> can be any of:
+
+=over 8
+
+=item * C<none>
+
+=item * C<sasl>
+
+=item * C<polkit>
+
+=back
+
+When no C<$auth_type> is passed, the first authentication method announced
+by the server, is used.
 
 =head2 open
 
@@ -3372,9 +3426,7 @@ it seems sloppy that there's no update of the domain 'id' when one becomes
 available when the domain is started. (Looking at the sources of LibVirt,
 the 'id' doesn't get cleared when the domain is destroyed???)
 
-=item * KeepAlive support
-
-=item * Modules implementing connections for various protocols (unix, tcp, tls, etc)
+=item * Modules implementing connections for various protocols (tcp, tls, etc)
 
 =item * C<@generate: none> entrypoints review (and implement relevant ones)
 

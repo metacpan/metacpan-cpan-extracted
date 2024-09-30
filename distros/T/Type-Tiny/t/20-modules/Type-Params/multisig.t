@@ -14,7 +14,7 @@ Portions by Diab Jerius E<lt>djerius@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -46,9 +46,9 @@ is_deeply(
 );
 
 is(
-	${^TYPE_PARAMS_MULTISIG},
+	${^_TYPE_PARAMS_MULTISIG},
 	0,
-	'...${^TYPE_PARAMS_MULTISIG}',
+	'...${^_TYPE_PARAMS_MULTISIG}',
 );
 
 is_deeply(
@@ -58,9 +58,9 @@ is_deeply(
 );
 
 is(
-	${^TYPE_PARAMS_MULTISIG},
+	${^_TYPE_PARAMS_MULTISIG},
 	0,
-	'...${^TYPE_PARAMS_MULTISIG}',
+	'...${^_TYPE_PARAMS_MULTISIG}',
 );
 
 like(
@@ -76,9 +76,9 @@ is_deeply(
 );
 
 is(
-	${^TYPE_PARAMS_MULTISIG},
+	${^_TYPE_PARAMS_MULTISIG},
 	1,
-	'...${^TYPE_PARAMS_MULTISIG}',
+	'...${^_TYPE_PARAMS_MULTISIG}',
 );
 
 is_deeply(
@@ -88,9 +88,9 @@ is_deeply(
 );
 
 is(
-	${^TYPE_PARAMS_MULTISIG},
+	${^_TYPE_PARAMS_MULTISIG},
 	1,
-	'...${^TYPE_PARAMS_MULTISIG}',
+	'...${^_TYPE_PARAMS_MULTISIG}',
 );
 
 like(
@@ -106,9 +106,9 @@ is_deeply(
 );
 
 is(
-	${^TYPE_PARAMS_MULTISIG},
+	${^_TYPE_PARAMS_MULTISIG},
 	2,
-	'...${^TYPE_PARAMS_MULTISIG}',
+	'...${^_TYPE_PARAMS_MULTISIG}',
 );
 
 like(

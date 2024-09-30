@@ -3,7 +3,8 @@ Upstream-Name: Type-Tiny
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://typetiny.toby.ink/
 
-Files: lib/Error/TypeTiny.pm
+Files: examples/benchmarking/benchmark-coercions.pl
+ lib/Error/TypeTiny.pm
  lib/Error/TypeTiny/Assertion.pm
  lib/Error/TypeTiny/Compilation.pm
  lib/Error/TypeTiny/WrongNumberOfParameters.pm
@@ -148,7 +149,7 @@ Files: lib/Error/TypeTiny.pm
  t/30-external/Validation-Class-Simple/basic.t
  t/lib/BiggerLib.pm
  t/lib/DemoLib.pm
-Copyright: This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
+Copyright: This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Type/Tiny/ConstrainedObject.pm
@@ -238,7 +239,7 @@ Files: lib/Type/Tiny/ConstrainedObject.pm
  t/40-bugs/rt129729.t
  t/40-bugs/rt130823.t
  t/98-param-eg-from-docs.t
-Copyright: This software is copyright (c) 2019-2023 by Toby Inkster.
+Copyright: This software is copyright (c) 2019-2024 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Eval/TypeTiny/CodeAccumulator.pm
@@ -294,7 +295,7 @@ Files: lib/Eval/TypeTiny/CodeAccumulator.pm
  t/30-external/Class-Plain/multisig.t
  t/30-external/Type-Library-Compiler/basic.t
  t/40-bugs/gh96.t
-Copyright: This software is copyright (c) 2022-2023 by Toby Inkster.
+Copyright: This software is copyright (c) 2022-2024 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/20-modules/Devel-TypeTiny-Perl58Compat/basic.t
@@ -335,13 +336,21 @@ Files: t/20-modules/Devel-TypeTiny-Perl58Compat/basic.t
  t/30-external/Sub-Quote/unquote-constraints.t
  t/30-external/Switcheroo/basic.t
  t/30-external/match-simple/basic.t
-Copyright: This software is copyright (c) 2014, 2017-2023 by Toby Inkster.
+Copyright: This software is copyright (c) 2014, 2017-2024 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: META.json
  META.yml
  NEWS
  doap.ttl
+ examples/benchmarking/benchmark-constraints.pl
+ examples/benchmarking/benchmark-named-param-validation.pl
+ examples/benchmarking/benchmark-param-validation.pl
+ examples/benchmarking/versus-scalar-validation.pl
+ examples/datetime-coercions.pl
+ examples/jsoncapable.pl
+ examples/nonempty.pl
+ examples/page-numbers.pl
  lib/Devel/TypeTiny/Perl58Compat.pm
  lib/Type/Params/Alternatives.pm
  lib/Type/Params/Parameter.pm
@@ -364,7 +373,7 @@ Files: META.json
  t/lib/Type/Puny.pm
  t/mk-test-manifest.pl
  t/not-covered.pl
-Copyright: Copyright 2023 Toby Inkster.
+Copyright: Copyright 2024 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/20-modules/Type-Library/deprecation.t
@@ -381,7 +390,7 @@ Files: t/20-modules/Type-Library/deprecation.t
  t/20-modules/Types-Standard/filehandle.t
  t/20-modules/Types-TypeTiny/progressiveexporter.t
  t/30-external/Sub-Quote/delayed-quoting.t
-Copyright: This software is copyright (c) 2018-2023 by Toby Inkster.
+Copyright: This software is copyright (c) 2018-2024 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/20-modules/Type-Library/declared-types.t
@@ -396,29 +405,7 @@ Files: t/20-modules/Type-Library/declared-types.t
  t/30-external/Data-Constraint/basic.t
  t/40-bugs/rt131401.t
  t/40-bugs/rt131576.t
-Copyright: This software is copyright (c) 2020-2023 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: CONTRIBUTING
- dist.ini
- examples/benchmarking/benchmark-constraints.pl
- examples/benchmarking/benchmark-named-param-validation.pl
- examples/benchmarking/benchmark-param-validation.pl
- examples/benchmarking/versus-scalar-validation.pl
- examples/datetime-coercions.pl
- examples/jsoncapable.pl
- examples/nonempty.pl
- examples/page-numbers.pl
-Copyright: Copyright 2022 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: lib/Type/Tiny/Bitfield.pm
- t/20-modules/Type-Params/compile-named-avoidcallbacks.t
- t/20-modules/Type-Params/multisig-gotonext.t
- t/20-modules/Type-Tiny/custom-exception-classes.t
- t/21-types/BoolLike.t
- t/30-external/JSON-PP/basic.t
-Copyright: This software is copyright (c) 2023 by Toby Inkster.
+Copyright: This software is copyright (c) 2020-2024 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: CREDITS
@@ -430,12 +417,13 @@ Files: CREDITS
 Copyright: Copyright 1970 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/40-bugs/rt92571-2.t
- t/40-bugs/rt92571.t
- t/40-bugs/rt92591.t
- t/40-bugs/rt94196.t
- t/40-bugs/rt97684.t
-Copyright: This software is copyright (c) 2014, 2017-2023 by Diab Jerius.
+Files: lib/Type/Tiny/Bitfield.pm
+ t/20-modules/Type-Params/compile-named-avoidcallbacks.t
+ t/20-modules/Type-Params/multisig-gotonext.t
+ t/20-modules/Type-Tiny/custom-exception-classes.t
+ t/21-types/BoolLike.t
+ t/30-external/JSON-PP/basic.t
+Copyright: This software is copyright (c) 2023-2024 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Type/Tie.pm
@@ -443,34 +431,47 @@ Files: lib/Type/Tie.pm
  t/20-modules/Type-Tie/02moosextypes.t
  t/20-modules/Type-Tie/04nots.t
  t/20-modules/Type-Tie/05typetiny.t
-Copyright: This software is copyright (c) 2013-2014, 2018-2019, 2022-2023 by Toby Inkster.
+Copyright: This software is copyright (c) 2013-2014, 2018-2019, 2022-2024 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/20-modules/Type-Tiny-_HalfOp/double-union.t
- t/20-modules/Type-Tiny/constraint-strings.t
- t/20-modules/Types-Standard/cycletuple.t
- t/40-bugs/gh14.t
-Copyright: This software is copyright (c) 2017-2023 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: lib/Type/Tiny/_HalfOp.pm
- t/20-modules/Type-Tiny-_HalfOp/overload-precedence.t
- t/40-bugs/73f51e2d.pl
- t/40-bugs/73f51e2d.t
-Copyright: This software is copyright (c) 2014, 2017-2023 by Graham Knop.
+Files: t/40-bugs/rt92571-2.t
+ t/40-bugs/rt92571.t
+ t/40-bugs/rt92591.t
+ t/40-bugs/rt94196.t
+ t/40-bugs/rt97684.t
+Copyright: This software is copyright (c) 2014, 2017-2024 by Diab Jerius.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/20-modules/Types-Common-Numeric/basic.t
  t/20-modules/Types-Common-String/basic.t
  t/20-modules/Types-Common-String/coerce.t
  t/20-modules/Types-Common-String/unicode.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2023 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
+Copyright: This software is copyright (c) 2013-2014, 2017-2024 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/20-modules/Type-Tiny-_HalfOp/double-union.t
+ t/20-modules/Type-Tiny/constraint-strings.t
+ t/20-modules/Types-Standard/cycletuple.t
+ t/40-bugs/gh14.t
+Copyright: This software is copyright (c) 2017-2024 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Type/Tiny/_HalfOp.pm
+ t/20-modules/Type-Tiny-_HalfOp/overload-precedence.t
+ t/40-bugs/73f51e2d.pl
+ t/40-bugs/73f51e2d.t
+Copyright: This software is copyright (c) 2014, 2017-2024 by Graham Knop.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/40-bugs/rt85911.t
  t/40-bugs/rt86004.t
  t/40-bugs/rt90096-2.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2023 by Diab Jerius.
+Copyright: This software is copyright (c) 2013-2014, 2017-2024 by Diab Jerius.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-bugs/rt86233.t
+ t/40-bugs/rt86239.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2024 by Vyacheslav Matyukhin.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/archaic/Test/More.pm
@@ -478,9 +479,9 @@ Files: inc/archaic/Test/More.pm
 Copyright: Copyright 2001-2008 by Michael G Schwern <schwern@pobox.com>.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/40-bugs/rt86233.t
- t/40-bugs/rt86239.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2023 by Vyacheslav Matyukhin.
+Files: CONTRIBUTING
+ dist.ini
+Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -488,16 +489,60 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: inc/Test/Requires.pm
-Copyright: Copyright 2022 MATSUNO Tokuhiro.
+Files: lib/Type/Tiny/_DeclaredType.pm
+Copyright: This software is copyright (c) 2013-2024 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: examples/benchmarking/benchmark-coercions.pl
-Copyright: This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
+Files: t/20-modules/Type-Tiny-_HalfOp/extra-params.t
+Copyright: This software is copyright (c) 2020-2024 by Graham Knop.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/40-bugs/ttxs-gh1.t
-Copyright: This software is copyright (c) 2014, 2017-2023 by Jed Lund.
+Files: t/40-bugs/rt133141.t
+Copyright: This software is copyright (c) 2020-2024 by Andrew Ruder.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/30-external/Class-InsideOut/basic.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2024 by David Golden, Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/30-external/MooseX-Getopt/coercion.t
+Copyright: This software is copyright (c) 2014, 2017-2024 by Alexander Hartmaier.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/20-modules/Type-Tie/06storable.t
+Copyright: This software is copyright (c) 2013-2014, 2022-2024 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-bugs/gh143.t
+Copyright: This software is copyright (c) 2024 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/archaic/Test/Builder/Tester.pm
+Copyright: Copyright 2024 Richard Clamp.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/archaic/Test/Builder/Module.pm
+Copyright: Copyright 2024 Chromatic.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-bugs/rt125765.t
+Copyright: This software is copyright (c) 2018-2024 by KB JÃ¸rgensen.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-bugs/gh140.t
+Copyright: This software is copyright (c) 2023-2024 by XSven.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-bugs/gh80.t
+Copyright: This software is copyright (c) 2021-2024 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/99-moose-std-types-test.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2024 by Infinity Interactive, Inc..
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-bugs/gh1.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2024 by Richard SimÃµes.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/archaic/Test/Builder/IO/Scalar.pm
@@ -505,99 +550,63 @@ Copyright: Copyright (c) 1996 by Eryq.  All rights reserved.
  Copyright (c) 1999,2001 by ZeeGee Software Inc.  All rights reserved.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/30-external/Class-InsideOut/basic.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2023 by David Golden, Toby Inkster.
+Files: t/40-bugs/gh158.t
+Copyright: This software is copyright (c) 2024 by Diab Jerius.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/20-modules/Type-Params/multisig-custom-message.t
+Copyright: This software is copyright (c) 2018-2024 by Benct Philip Jonsson.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/archaic/Test/Builder/Tester/Color.pm
-Copyright: Copyright 2022 Mark Fowler.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/40-bugs/gh80.t
-Copyright: This software is copyright (c) 2021-2023 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/40-bugs/rt90096.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2023 by Samuel Kaufman.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/99-moose-std-types-test.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2023 by Infinity Interactive, Inc..
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/20-modules/Type-Tie/06storable.t
-Copyright: This software is copyright (c) 2013-2014, 2022-2023 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: lib/Type/Tiny/_DeclaredType.pm
-Copyright: This software is copyright (c) 2013-2023 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/Try/Tiny.pm
-Copyright: Copyright 2022 Yuval Kogman.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/archaic/Test/Builder/Tester.pm
-Copyright: Copyright 2022 Richard Clamp.
+Copyright: Copyright 2024 Mark Fowler.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/archaic/Test/Builder.pm
 Copyright: Copyright 2002-2008 by chromatic <chromatic@wgz.org> and.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/40-bugs/rt90096.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2024 by Samuel Kaufman.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: t/20-modules/Type-Tie/03prototypicalweirdness.t
-Copyright: This software is copyright (c) 2014, 2018-2019, 2022-2023 by Toby Inkster.
+Copyright: This software is copyright (c) 2014, 2018-2019, 2022-2024 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/40-bugs/rt125765.t
-Copyright: This software is copyright (c) 2018-2023 by KB JÃ¸rgensen.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/30-external/MooseX-Getopt/coercion.t
-Copyright: This software is copyright (c) 2014, 2017-2023 by Alexander Hartmaier.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/40-bugs/gh1.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2023 by Richard SimÃµes.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/20-modules/Type-Params/multisig-custom-message.t
-Copyright: This software is copyright (c) 2018-2023 by Benct Philip Jonsson.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/40-bugs/rt133141.t
-Copyright: This software is copyright (c) 2020-2023 by Andrew Ruder.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/20-modules/Type-Tiny-_HalfOp/extra-params.t
-Copyright: This software is copyright (c) 2020-2023 by Graham Knop.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/40-bugs/rt98113.t
-Copyright: This software is copyright (c) 2014, 2017-2023 by Dagfinn Ilmari MannsÃ¥ker.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/archaic/Test/Builder/Module.pm
-Copyright: Copyright 2022 Chromatic.
+Files: t/40-bugs/ttxs-gh1.t
+Copyright: This software is copyright (c) 2014, 2017-2024 by Jed Lund.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/Test/Fatal.pm
-Copyright: Copyright 2022 Ricardo Signes.
+Copyright: Copyright 2024 Ricardo Signes.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/40-bugs/rt125132.t
-Copyright: This software is copyright (c) 2018-2023 by Marc Ballarin.
+Copyright: This software is copyright (c) 2018-2024 by Marc Ballarin.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Try/Tiny.pm
+Copyright: Copyright 2024 Yuval Kogman.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-bugs/rt98113.t
+Copyright: This software is copyright (c) 2014, 2017-2024 by Dagfinn Ilmari MannsÃ¥ker.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Test/Requires.pm
+Copyright: Copyright 2024 MATSUNO Tokuhiro.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2024 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2024 by the copyright holder(s).
  
  This is free software, licensed under:
  

@@ -11,7 +11,7 @@ use Data::Dumper;
 use File::Find;
 use Safe;
 
-our $VERSION = '1.13';
+our $VERSION = '1.15';
 
 $Data::Dumper::Terse = 1;  # Don't output variable names.
 $Data::Dumper::Sortkeys = 1;  # Sort the content of the hash variables.
@@ -73,29 +73,36 @@ sub maybe_expand_dirs {
 }
 
 sub process_all {
-  my ($inputs, $pipeline, $options, $stdin) = @_;
+  my ($inputs, $pre_merge_pipeline, $post_merge_pipeline, $options, $stdin) = @_;
   $App::PTP::Commands::I_setter->set(1);
-  if ($options->{merge}) {
-    print "Merging all the inputs.\n" if $options->{debug_mode};
-    my $missing_final_separator = 0;
-    my @content;
-    for my $input (@{$inputs}) {
-      my ($content, $missing_separator) = read_input($input, $options, $stdin);
-      push @content, @{$content};
-      $missing_final_separator = $missing_separator;
-    }
-    App::PTP::Commands::process(\$App::PTP::Files::merged_marker,
-      $pipeline, $options, \@content, $missing_final_separator);
-    write_output(\$App::PTP::Files::merged_marker, \@content, $missing_final_separator, $options);
-  } else {
-    for my $file_name (@{$inputs}) {
-      my ($content, $missing_final_separator) = read_input($file_name, $options, $stdin);
-      # Note that process can modify the input $file_name variable.
-      App::PTP::Commands::process($file_name, $pipeline, $options, $content,
+
+  my $missing_final_separator = 0;
+  my @merged_content;
+
+  for my $file_name (@{$inputs}) {
+    my ($content, $missing_separator) = read_input($file_name, $options, $stdin);
+    $missing_final_separator = $missing_separator;
+    # Note that process can modify the input $file_name variable.
+    if (@{$pre_merge_pipeline}) {
+      App::PTP::Commands::process($file_name, $pre_merge_pipeline, $options, $content,
         $missing_final_separator);
-      write_output($file_name, $content, $missing_final_separator, $options);
+    }
+
+    if ($options->{merge}) {
+      push @merged_content, @{$content};
+    } else {
+      write_output($file_name, $content, $missing_separator, $options);
       $App::PTP::Commands::I_setter->inc();
     }
+  }
+
+  if ($options->{merge}) {
+    if (@{$post_merge_pipeline}) {
+      App::PTP::Commands::process(\$App::PTP::Files::merged_marker,
+        $post_merge_pipeline, $options, \@merged_content, $missing_final_separator);
+    }
+    write_output(\$App::PTP::Files::merged_marker,
+      \@merged_content, $missing_final_separator, $options);
   }
 }
 
@@ -103,12 +110,14 @@ sub Run {
   my ($stdin, $stdout, $stderr, $argv) = @_;
   # All debug output is sent to STDERR, this applies inside the safe too.
   select($stderr);  ## no critic (ProhibitOneArgSelect)
-  my ($inputs, $pipeline, $options) = App::PTP::Args::parse_command_line($argv);
+  my ($inputs, $pre_merge_pipeline, $post_merge_pipeline, $options) =
+      App::PTP::Args::parse_command_line($argv);
 
   if ($options->{debug_mode}) {
     print 'options = '.Dumper($options)."\n";
     print 'inputs = '.Dumper($inputs)."\n";
-    print 'pipeline = '.Dumper($pipeline)."\n";
+    print 'pre merge pipeline = '.Dumper($pre_merge_pipeline)."\n";
+    print 'post merge pipeline = '.Dumper($post_merge_pipeline)."\n";
   }
 
   @{$inputs} = map { maybe_expand_dirs($_, $options) } @{$inputs};
@@ -117,7 +126,7 @@ sub Run {
   return if $options->{abort};
 
   init_global_output($options, $stdout);
-  process_all($inputs, $pipeline, $options, $stdin);
+  process_all($inputs, $pre_merge_pipeline, $post_merge_pipeline, $options, $stdin);
   close_global_output($options);
 }
 

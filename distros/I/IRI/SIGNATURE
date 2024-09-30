@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 c719fe7260a2234277fb32f0bf48bc20cf3c797c9b194e4a56214db2105e44fa Changes
+SHA256 0cb463fb465ba4f5639147e857b956462fc2cfee2df68554f019bc405f431370 MANIFEST
+SHA256 ef2aa244a3abcd23cc2d952912304c16655621a6b0c4bd1139952c5624e58ade META.yml
+SHA256 59b2ee817b8a2627406847471057df3cfbc0d5268192fbefc8d2afc0e9a50959 Makefile.PL
+SHA256 12340142517a8cd8cbc74570cec1e9f0b209b701917a054cb57306e55a6f035d README
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 668306ae2fad17b3049f885251b8679497c4eb8d5c4b0d13f5c95bda331d1f00 inc/Module/Install/DOAPChangeSets.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 70ce2c66074e5cf95a2932b186fc2f876efaec86f6e1e20d326b85453f211c8f lib/IRI.pm
+SHA256 bbceafb90362a8518ecb267bdf2cc74d9ff2ca609c0d4574615d6b514f8a9da7 meta/changes.ttl
+SHA256 4417564b7d518113f64bed37b71cc2e71878f4439d4f0483a352a340c7307dc0 t/00-simple.t
+SHA256 7de4d22c6f2109895c9ce998cd516b26c28d8742bde50f34f59e7bdc8486996f t/base_resolution.t
+SHA256 1737883fcdb17ca4f32bc68154fb8c1c56b6983a9d7b2746790de7286cc53b21 t/bugs.t
+SHA256 606e752df44d8377c6bbdd4387fa21980ef843253c1c467c44d9ee6a6fe2c9cf t/coercion.t
+SHA256 2bed522ac451881ad783c7ead37f0ab4a2b7e17abdd43be61e696c8f5d480fa0 t/rel.t
+SHA256 76a58ab06a5b907415ab8835240c4af63272d60435f381eff60700c1885338d6 xt/pod-coverage.t
+SHA256 2b04b20ff767801fde2fb6435361dc8ca0a9b60dda6cb0bbd18dd52962e1c1a3 xt/pod.t

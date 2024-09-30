@@ -1,6 +1,6 @@
 package Syntax::Kamelon::Builder;
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 use strict;
 use Carp qw(cluck);
@@ -14,7 +14,7 @@ my $regchars = "\\^.\$|()[]{}*+?~!%^&/";
 sub new {
 	my $class = shift;
 	my %args = (@_);
-	
+
 	my $engine = delete $args{engine};
    my $self = $class->SUPER::new(%args);
 
@@ -36,7 +36,7 @@ sub AttributeGet {
 		return $self->{ATTRIBUTES}->{$attribute}
 	} else {
 		return $self->AttributeGetContext;
-	} 
+	}
 	return 'Normal'
 }
 
@@ -46,7 +46,7 @@ sub AttributeGetContext {
 		my $attribute = $self->ContextData->{$self->CurContext}->{attribute};
 		if (exists $self->{ATTRIBUTES}->{$attribute}) {
 			return $self->{ATTRIBUTES}->{$attribute}
-		} 
+		}
 	}
 	return 'Normal'
 }
@@ -59,7 +59,7 @@ sub AttributeGetF {
 
 sub ContextExists {
 	my ($self, $context) = @_;
-	return (exists $self->{CONTEXTDATA}->{$context}) 
+	return (exists $self->{CONTEXTDATA}->{$context})
 }
 
 sub CurContext {
@@ -188,7 +188,7 @@ my %tests = (
 
 sub Setup {
 	my $self = shift;
-	
+
 	my $casesensitive = 1;
 	unless ($self->KeywordsCase eq 'undef') {
 		$casesensitive = $self->KeywordsCase
@@ -328,7 +328,7 @@ sub SetupContextRules {
 		if ($type eq 'IncludeRules') {
 			my $context = $i->{'context'};
 			my ($inclattr) = $self->RuleGetArgs($i, qw/ includeAttrib /);
-			if ($context =~ s/##(.*)//) { #it refers to another syntax 
+			if ($context =~ s/##(.*)//) { #it refers to another syntax
 				my $language = $1;
 				my $p = $eng->{POSTCREATE};
 				push @$p, $language;
@@ -375,10 +375,10 @@ sub SetupContextRules {
 				$self->CurRule($num);
 				$self->CurContext($cback);
 			}
-		
+
 		} else {
 			#get general options
-			my ($lookahead, $column, $firstnonspace, $command, $overstrike, $replace, $beginreg, $endreg) = 
+			my ($lookahead, $column, $firstnonspace, $command, $overstrike, $replace, $beginreg, $endreg) =
 				$self->RuleGetArgs($i, qw/ lookAhead column firstNonSpace command overstrike replace beginRegion endRegion /);
 
 			#get method and rulse specfic options
@@ -388,34 +388,34 @@ sub SetupContextRules {
 				my $formatter = $eng->Formatter;
 				$i->{method} = $method;
 
-				#set the test method 
+				#set the test method
 				unshift @options, $eng->can($method);
 
 				#add context
 				my ($context) = $self->RuleGetArgs($i, qw/ context /);
 				$context = $self->SetupContextShifter($parser, $context);
 				push @options, $context;
-				
+
 				#add attribute
 				my ($attribute) = $self->RuleGetArgs($i, qw/ attribute /);
 				unless (defined $attribute) { $attribute = '' };
 				$attribute = $self->AttributeGetF($attribute);
 				push @options, $attribute;
-				
+
 				#prepend column call if needed
-				if (defined $column) { 
+				if (defined $column) {
 					unshift @options, $column;
 					unshift @options, $eng->can('testCommonColumn');
 				}
 
 				#prepend firstNonSpace call if needed
-				if ($firstnonspace) { 
+				if ($firstnonspace) {
 					unshift @options, $eng->can('testCommonFirstNonSpace');
 				}
 
 				#Add result parsers. Note: Last one to be called is first one to be pushed.
 				my $rparser = 'ParseResult';
-				if ($lookahead) { 
+				if ($lookahead) {
 					$rparser = $rparser . 'LookAhead'
 				}
 				push @options, $eng->can($rparser);
@@ -425,8 +425,8 @@ sub SetupContextRules {
 					}
 					push @options, $overstrike;
 					push @options, $eng->can('ParseResultOverStrike');
-					
-				} 
+
+				}
 				if (defined $replace) {
 					push @options, $replace;
 					push @options, $eng->can('ParseResultReplace');
@@ -434,7 +434,7 @@ sub SetupContextRules {
 				if (defined $command) {
 					push @options, $command, $eng->can('ParseResultCommand');
 				}
-				
+
 				#add region marker parsers
 				if ($formatter->Foldingdepth) {
 					if (defined $beginreg) {
@@ -495,15 +495,15 @@ sub SetupContextShifter {
 					$self->LogWarning("Context '$tcontext' does not exist, only doing the #pop part");
 					return $default
 				}
-				return sub { 
+				return sub {
 					for (1 .. $count) { $eng->StackPull }
-					$eng->StackPush($parser, $tcontext) 
+					$eng->StackPush($parser, $tcontext)
 				}
 			}
 		}
 		return $default;
 	} elsif ($tcontext =~ /^#stay/i) {
-		return sub {} 
+		return sub {}
 	} else {
 		if ($self->ContextExists($tcontext)) {
 			return sub { $eng->StackPush($parser, $tcontext) }
@@ -524,7 +524,7 @@ sub SetupRuleAnyChar {
 		return (undef);
 	}
 	my $i = shift @o;
-	if ($i) { 
+	if ($i) {
 		$method = $method . 'I';
 		$string = lc($string)
 	}
@@ -553,7 +553,7 @@ sub SetupRuleDetectChar {
 	if ($d and $self->CurContextIsDynamic) {
 		$method = $method . 'D';
 	}
-	if ($i) { 
+	if ($i) {
 		$method = $method . 'I';
 		$char = lc($char)
 	}
@@ -585,7 +585,7 @@ sub SetupRuleDetect2Chars {
 	if ($d and $self->CurContextIsDynamic) {
 		$method = $method . 'D';
 	}
-	if ($i) { 
+	if ($i) {
 		$method = $method . 'I';
 		$char = lc($char);
 		$char1 = lc($char1);
@@ -610,7 +610,7 @@ sub SetupRuleKeyword {
 	my $method = $tests{$rule->{'type'}};
 	unless ($self->KeywordsCase) { $method = $method . 'I' }
 	my $lsts = $self->Lists;
-	unless (exists $lsts->{$string}) { 
+	unless (exists $lsts->{$string}) {
 		$method = undef;
 		$self->LogWarning("List $string does not exist");
 	}
@@ -628,17 +628,17 @@ sub SetupRuleLineContinue {
 	my ($char) = $self->RuleGetArgs($rule, 'char' );
 	if  (defined $char) {
 		$self->RuleGetChar($char);
-	} else { 
-		$char = '\\' 
+	} else {
+		$char = '\\'
 	}
 	unless (length($char) eq 1) { #the regex did not compile, the rule is useless
 		$self->LogWarning("Option char is longer than one character");
 		return (undef);
 	}
 	if (index($regchars, $char) >= 0) { $char = "\\$char" };
-	
+
 	my $method = $tests{$rule->{'type'}};
-	return $method, $char 
+	return $method, $char
 }
 
 sub SetupRuleNumber {
@@ -674,7 +674,7 @@ sub SetupRuleRangeDetect {
 		$self->LogWarning("Option char1 is longer than one character");
 		return (undef);
 	}
-	if ($i) { 
+	if ($i) {
 		$method = $method . 'I';
 		$char = lc($char);
 		$char1 = lc($char1);
@@ -703,7 +703,7 @@ sub SetupRuleRegExpr {
 				if ($reg =~ s/^(.)//) {
 					$string = "$string$1";
 					$lastchar = $1;
-				} 
+				}
 			}
 		}
 		$reg = $string
@@ -714,14 +714,14 @@ sub SetupRuleRegExpr {
 		$self->LogWarning("Option string is not defined or is empty");
 		return (undef);
 	}
-	if ($reg =~ s/^\^//) { 
+	if ($reg =~ s/^\^//) {
 		$prepend = 'testCommonLineStart'
 	} elsif ($reg =~ s/^\\(b)//) {
 		$prepend = 'testCommonLastCharBb'
 	} elsif ($reg =~ s/^\\(B)//) {
 		$prepend = 'testCommonLastCharBB'
 	}
-	unless ($d and $self->CurContextIsDynamic) { 
+	unless ($d and $self->CurContextIsDynamic) {
 		$reg = "^($reg)";
 		no warnings;
 		if ($i) {
@@ -737,7 +737,7 @@ sub SetupRuleRegExpr {
 	if ($d and $self->CurContextIsDynamic) {
 		$method = $method . 'D'
 	}
-	if ($i) { 
+	if ($i) {
 		$method = $method . 'I';
 	}
 	my @out = ($reg);
@@ -763,7 +763,7 @@ sub SetupRuleStringDetect {
 	if ($d and $self->CurContextIsDynamic) {
 		$method = $method . 'D'
 	}
-	if ($i) { 
+	if ($i) {
 		$method = $method . 'I';
 		$string = lc($string);
 	}
@@ -784,12 +784,12 @@ sub SetupRuleWordDetect {
 	if ($d and $self->CurContextIsDynamic) {
 		$method = $method . 'D'
 	}
-	if ($i) { 
+	if ($i) {
 		$method = $method . 'I';
 		$string = lc($string);
 	}
-	my $d = $self->WordWrapDeliminators;
-	my %delim = %$d;
+	my $wwd = $self->WordWrapDeliminators;
+	my %delim = %$wwd;
 	my $weak = shift @o;
 	$self->MergeWeakDeliminators(\%delim, $weak) if defined $weak;
 	my $additional = shift @o;
@@ -812,4 +812,3 @@ sub SyntaxExists {
 1;
 
 __END__
-

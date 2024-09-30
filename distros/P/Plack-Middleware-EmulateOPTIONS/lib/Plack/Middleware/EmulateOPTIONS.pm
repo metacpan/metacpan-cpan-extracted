@@ -2,47 +2,48 @@ package Plack::Middleware::EmulateOPTIONS;
 
 # ABSTRACT: handle OPTIONS requests as HEAD
 
-use v5.14;
+use v5.20;
 
 use warnings;
 
 use parent 'Plack::Middleware';
 
 use Plack::Util;
-use Plack::Util::Accessor qw/ filter callback /;
-use HTTP::Status ();
+use Plack::Util::Accessor qw( filter callback );
+use HTTP::Status          ();
 
-our $VERSION = 'v0.3.2';
+use experimental qw( postderef signatures );
+
+our $VERSION = 'v0.4.0';
 
 
-sub prepare_app {
-    my ($self) = @_;
+sub prepare_app($self) {
 
-    unless (defined $self->callback) {
+    unless ( defined $self->callback ) {
 
-        $self->callback( sub {
-            my ($res) = @_;
-            Plack::Util::header_set( $res->[1], 'allow', "GET, HEAD, OPTIONS" );
-        });
+        $self->callback(
+            sub( $res, $env ) {
+                Plack::Util::header_set( $res->[1], 'allow', "GET, HEAD, OPTIONS" );
+            }
+        );
 
     }
 }
 
-sub call {
-    my ( $self, $env ) = @_;
+sub call( $self, $env ) {
 
-    my $filter = $self->filter;
+    my $filter   = $self->filter;
     my $callback = $self->callback;
 
     if ( $env->{REQUEST_METHOD} eq "OPTIONS" && ( !$filter || $filter->($env) ) ) {
 
-        my $res = $self->app->( { %$env, REQUEST_METHOD => "HEAD" } );
+        my $res = $self->app->( { $env->%*, REQUEST_METHOD => "HEAD" } );
 
         return Plack::Util::response_cb(
             $res,
             sub {
                 my ($res) = @_;
-                if ( HTTP::Status::is_success($res->[0]) ) {
+                if ( HTTP::Status::is_success( $res->[0] ) ) {
                     $callback->( $res, $env );
                 }
             }
@@ -71,7 +72,7 @@ Plack::Middleware::EmulateOPTIONS - handle OPTIONS requests as HEAD
 
 =head1 VERSION
 
-version v0.3.2
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -122,9 +123,7 @@ If you override this, then you will need to manually set the header yourself, fo
     use Plack::Util;
 
     enable "EmulateOPTIONS",
-      callback => sub {
-          my $res = shift;
-          my $env = shift;
+      callback => sub($res, $env) {
 
           my @allowed = qw( GET HEAD OPTIONS );
           if ( $env->{PATH_INFO} =~ m[^/api/] ) {
@@ -139,11 +138,9 @@ This was added in v0.2.0.
 
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
-Since v0.3.0, the this module requires Perl v5.14 or later.
+Since v0.4.0, the this module requires Perl v5.20 or later.
 
-If you need this module on Perl v5.10, please use one of the v0.2.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
+Future releases may only support Perl versions released in the last ten years.
 
 =head1 SOURCE
 
@@ -165,7 +162,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022-2023 by Robert Rothenberg.
+This software is Copyright (c) 2022-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

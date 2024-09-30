@@ -1,5 +1,11 @@
 Revision history for Perl distribution Pheno-Ranker
 
+0.11 2024-09-29T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Added support for BFF pedigrees (excluded by default via regex in config)
+ - Discarded '_id|datasetId' keys using regex in config
+ - Used sprintf in 'Average Path Length' at <graph_stats.txt> for CPAN test compliance
+
 0.10 2024-08-07T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Fixed UTF-8 printing issue for primary_key in STDOUT
@@ -24,7 +30,7 @@ Revision history for Perl distribution Pheno-Ranker
  - Excluded keys with {} or [] values (e.g. subject.vitalStatus: {})
  - Precompiled regex patterns where possible
  - Schema validation errors related to weights are now directed to STDERR
- - Added support for variables with non-word characters (e.g., "Survey.Timestamp.1")
+ - Added support for keys with non-word characters (e.g., "Survey.Timestamp.1")
 
 0.06 2024-04-06T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 

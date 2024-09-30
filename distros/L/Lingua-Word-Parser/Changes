@@ -1,5 +1,8 @@
 Revision history for Lingua-Word-Parser
 
+0.0808 2024-09-29 10:16:04
+    - Special case the DSN for SQLite.
+
 0.0807 2022-10-22
     - Avoid implicit imports.
 

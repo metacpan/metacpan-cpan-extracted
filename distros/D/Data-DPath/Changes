@@ -1,5 +1,8 @@
 Revision history for Data-DPath
 
+0.60      2024-09-29
+  - avoid deprecated smartmatch for most tests [GH #29, Graham Knop]
+
 0.59      2023-07-24
   - don't use warnings.pm inside Safe container [GH #28, Graham Knop]
     (needed for Perl v5.39+)

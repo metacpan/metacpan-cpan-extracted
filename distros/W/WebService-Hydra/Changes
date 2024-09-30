@@ -1,0 +1,14 @@
+0.001     2024-09-30 03:56:03+00:00 UTC
+  - Initial release
+  - get_login_request
+  - accept_login_request
+  - get_logout_request
+  - accept_logout_request
+  - exchange_token
+  - fetch_jwks
+  - fetch_openid_configuration
+  - validate_token
+  - validate_id_token
+  - get_consent_request
+  - accept_consent_request
+  - revoke_login_sessions

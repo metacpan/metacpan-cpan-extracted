@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '2.004000';
+	$Type::Params::VERSION   = '2.006000';
 }
 
 $Type::Params::VERSION =~ tr/_//d;
@@ -516,7 +516,7 @@ coderef as a list:
 =head4 C<< named >> B<ArrayRef>
 
 This is conceptually a list of pairs of names and type constraints, one
-name+type pair for each positional parameter. For example, a signature for
+name+type pair for each named parameter. For example, a signature for
 a function which accepts two integers:
 
  signature( named => [ foo => Int, bar => Int ] )
@@ -578,7 +578,7 @@ You can think of C<add_numbers> above as a function which takes named
 parameters from the outside, but receives positional parameters on the
 inside.
 
-You can use an arrayref to specify the order the paramaters will be
+You can use an arrayref to specify the order the parameters will be
 returned in. (By default they are returned in the order they were defined
 in.)
 
@@ -679,7 +679,7 @@ Usually the default will be fine.
 
 =head4 C<< package >> B<Str>
 
-The package of the sub whose paramaters we're supposed to be checking.
+The package of the sub whose parameters we're supposed to be checking.
 As well as showing up in stack traces, it's used by C<dwim_type> if you
 provide any type constraints as strings.
 
@@ -689,7 +689,7 @@ provide it.
 
 =head4 C<< subname >> B<Str>
 
-The name of the sub whose paramaters we're supposed to be checking.
+The name of the sub whose parameters we're supposed to be checking.
 
 The default is probably fine, but if you're wrapping C<signature> so that
 you can check signatures on behalf of another package, you may need to
@@ -937,8 +937,8 @@ So C<< signature( multi => [...] ) >> can be used instead of the longer
 C<< signature( multiple => [...] ) >>. Three whole keystrokes saved!
 
 (B<Note:> in older releases of Type::Params, C<< ${^_TYPE_PARAMS_MULTISIG} >>
-was called C<< ${^TYPE_PARAMS_MULTISIG} >>. The latter name is deprecated,
-and support for it will be removed in a future release of Type::Params.)
+was called C<< ${^TYPE_PARAMS_MULTISIG} >>. The latter name is no longer
+supported.)
 
 =head4 C<< message >> B<Str>
 
@@ -1672,7 +1672,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

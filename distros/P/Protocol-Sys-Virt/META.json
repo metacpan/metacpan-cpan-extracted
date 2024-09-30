@@ -52,6 +52,6 @@
          "web" : "https://github.com/ehuelsmann/perl-protocol-sys-virt"
       }
    },
-   "version" : "v10.3.11",
+   "version" : "v10.3.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

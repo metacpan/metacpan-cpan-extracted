@@ -157,7 +157,7 @@ sub graph_stats {
     # Diameter and average path length, check if the graph is connected first
     if ( $g->is_connected ) {
         print $fh "Graph Diameter: ", ( join "->", $g->diameter ), "\n";
-        print $fh "Average Path Length: ", $g->average_path_length, "\n";
+        print $fh "Average Path Length: ", sprintf ("%7.3f",$g->average_path_length), "\n";
     }
 
     # Display degrees of all vertices

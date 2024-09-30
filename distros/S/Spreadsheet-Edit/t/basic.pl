@@ -379,14 +379,15 @@ options silent => $silent, verbose => $verbose, debug => $debug;
     use File::Spec ();
     open STDERR, ">", File::Spec->devnull() or die "reopenErr: $!";
     eval {
+        #no warnings; # Grr. See https://github.com/jimav/Spreadsheet-Edit/issues/3#issuecomment-2381756773
         options($key => $new);
         { my %nopts = options(); bug() unless !!$nopts{$key} == !!$new; }
         options($key => $old);
-        { my %nopts = options(); bug() unless !!$nopts{$key} eq !!$old && !!$nopts{$key} ne $new; }
+        { my %nopts = options(); bug() unless !!$nopts{$key} eq !!$old && !!$nopts{$key} ne !!$new; }
         $s->options($key => $new);
-        { my %nopts = options(); bug() unless $nopts{$key} eq $new; }
+        { my %nopts = options(); bug() unless $nopts{$key} eq !!$new; }
         $s->options($key => $old);
-        { my %nopts = options(); bug() unless !!$nopts{$key} eq !!$old && !!$nopts{$key} ne $new; }
+        { my %nopts = options(); bug() unless !!$nopts{$key} eq !!$old && !!$nopts{$key} ne !!$new; }
 
         # There was a bug where $sheet->options() used current sheet instead of $sheet
         # (and died if there was no current sheet)

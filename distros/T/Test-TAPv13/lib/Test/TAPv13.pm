@@ -1,15 +1,16 @@
+use 5.008;
 use strict;
 use warnings;
 package Test::TAPv13;
-# git description: v0.001-2-gbb3eefb
+# git description: v0.002-4-g1b1b8f6
 
-BEGIN {
-  $Test::TAPv13::AUTHORITY = 'cpan:SCHWIGON';
-}
-{
-  $Test::TAPv13::VERSION = '0.002';
-}
+our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: provide TAP v13 support to test scripts
+$Test::TAPv13::VERSION = '0.003';
+BEGIN {
+    require Test::Builder;
+    die "Test::TAPv13 only works for old Test::More versions < 1.302013, you have $Test::Builder::VERSION.\n" if $Test::Builder::VERSION >= 1.302013;
+}
 
 use Test::Builder;
 use Data::YAML::Writer;
@@ -67,11 +68,11 @@ use Sub::Exporter { installer => \&Test::TAPv13::_installer },
 
 1;
 
-
+__END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -180,13 +181,9 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Steffen Schwigon.
+This software is copyright (c) 2024 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

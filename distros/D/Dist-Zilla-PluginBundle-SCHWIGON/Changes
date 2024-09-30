@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-SCHWIGON
 
+0.021     2024-09-29
+        - skip compile testing on own difficult module Test::TAPv13
+        - mention MetaProvides::Package in pod
+        - re-upload after rebase struggle
+
+0.020     2024-09-29
+        - skip compile testing on own difficult module Test::TAPv13
+
 0.019     2016-04-29
         - added Dist::Zilla::Plugin::MetaProvides::Package
         - turn Dist::Zilla::Plugin::Test::Compile into normal dependency
@@ -46,7 +54,7 @@ Revision history for Dist-Zilla-PluginBundle-SCHWIGON
         - fix a 'Odd number of elements in anonymous hash' in eol tests
 
 0.006     2012-04-11
-        - NextRelease.0.019     2016-04-29 more CPAN::Changes::Spec conform
+        - NextRelease.0.021     2024-09-29 more CPAN::Changes::Spec conform
         - add [CheckChangesHasContent]
 
 0.005     2012-04-04

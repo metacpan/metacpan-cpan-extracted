@@ -16,6 +16,15 @@ mkdocs.yml
 requirements.txt
 share/conf/config.yaml
 share/db/hp.json
+share/ex/individuals_random_100.json
+share/ex/movies.json
+share/ex/movies_config.yaml
+share/ex/pxf_random_100.json
+share/ex/weights.yaml
+share/fig/README.md
+share/fig/weights_fig4.yaml
+share/fig/weights_sex.yaml
+share/fig/weights_sex_treatments.yaml
 share/r/heatmap.R
 share/r/heatmap_scale.R
 share/r/mds.R

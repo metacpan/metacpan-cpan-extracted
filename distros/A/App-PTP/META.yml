@@ -25,6 +25,8 @@ no_index:
     - local
     - vendor
     - t
+  namespace:
+    - App::PTP
 requires:
   Cwd: '0'
   Data::Dumper: '0'
@@ -41,5 +43,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/ptp/issues
   repository: https://github.com/mkende/ptp
-version: '1.13'
+version: '1.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

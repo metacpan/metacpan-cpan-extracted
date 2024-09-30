@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0807';
+our $VERSION = '0.0808';
 
 use Bit::Vector ();
 use DBI ();
@@ -86,7 +86,13 @@ sub _fetch_lex {
 sub _db_fetch {
     my $self = shift;
 
-    my $dsn = "DBI:$self->{dbtype}:$self->{dbname};$self->{dbhost}";
+    my $dsn;
+    if (lc($self->{dbtype}) eq 'sqlite') {
+      $dsn = "DBI:$self->{dbtype}:dbname=$self->{dbname};$self->{dbhost}";
+    }
+    else {
+      $dsn = "DBI:$self->{dbtype}:$self->{dbname};$self->{dbhost}";
+    }
 
     my $dbh = DBI->connect( $dsn, $self->{dbuser}, $self->{dbpass}, { RaiseError => 1, AutoCommit => 1 } )
       or die "Unable to connect to $self->{dbname}: $DBI::errstr\n";
@@ -420,7 +426,7 @@ Lingua::Word::Parser - Parse a word into scored known and unknown parts
 
 =head1 VERSION
 
-version 0.0807
+version 0.0808
 
 =head1 SYNOPSIS
 
@@ -545,7 +551,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2014-2024 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

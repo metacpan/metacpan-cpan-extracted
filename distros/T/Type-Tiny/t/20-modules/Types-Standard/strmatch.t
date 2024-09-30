@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -91,6 +91,18 @@ is(
 	scalar( @got ),
 	1,
 	'StrMatch->of(...)->compiled_check( $val ) always returns a single value, even in list context',
+);
+
+my $assertion = Eval::TypeTiny::eval_closure(
+	source => sprintf(
+		'sub { use warnings; %s }',
+		ArrayRef->of( StrMatch[qr/[A-D]/] )->inline_assert( '$_[0]' ),
+	),
+);
+
+like(
+	exception { $assertion->( [ 'ABC', undef, 'DEF' ] ) },
+	qr/\AReference \[([^]]+)\] did not pass type constraint/ms,
 );
 
 done_testing;

@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION    = '2.004000';
+	$Type::Tiny::VERSION    = '2.006000';
 	$Type::Tiny::XS_VERSION = '0.016';
 }
 
@@ -86,7 +86,7 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 sub _swap { $_[2] ? @_[ 1, 0 ] : @_[ 0, 1 ] }
 
 BEGIN {
-	my $support_smartmatch = 0+ !!( $] >= 5.010001 );
+	my $support_smartmatch = 0+ !!( $] >= 5.010001 && $] <= 5.041002 );
 	eval qq{ sub SUPPORT_SMARTMATCH () { !! $support_smartmatch } };
 	
 	my $fixed_precedence = 0+ !!( $] >= 5.014 );
@@ -1936,6 +1936,12 @@ You may pass C<< coercion => 1 >> to the constructor to inherit coercions
 from the constraint's parent. (This requires the parent constraint to have
 a coercion.)
 
+If an arrayref is passed to the constructor (C<< coercion => [ ... ] >>),
+then the coercion object will be lazily built and this array will be fed to
+its C<add_type_coercions> method. If a coderef is passed to the constructor
+(C<< coercion => sub { ... } >>), then the coercion object will be lazily built
+and this code will be used as a coercion from B<Any>.
+
 =item C<< sorter >>
 
 A coderef which can be passed two values conforming to this type constraint
@@ -2745,7 +2751,7 @@ Thanks to Matt S Trout for advice on L<Moo> integration.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

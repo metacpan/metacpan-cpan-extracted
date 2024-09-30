@@ -10,16 +10,16 @@
 ####################################################################
 
 
-use v5.20;
+use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection::Factory v0.0.6;
+package Sys::Async::Virt::Connection::Factory v0.0.7;
 
 use Carp qw(croak);
 use Log::Any qw($log);
-
+use Protocol::Sys::Virt::URI; # imports 'parse_url'
 
 sub new {
     my ($class, %args) = @_;
@@ -43,31 +43,26 @@ sub _cls_name($n) {
 }
 
 sub create_connection( $self, $url, %args ) {
-    if ($url =~ m|^[a-z0-9_]+(?:\+([a-z0-9_]+))?://([^/]*)|i) {
-        my $transport = $1 // '';
-        my $host = $2 // '';
+    my %components = parse_url( $url );
+    my $transport = $components{transport} // '';
+    my $host = $components{host} // '';
 
-        say "transport $transport";
-        say "host $host";
-        for my $driver (@{ $self->{drivers} }) {
-            if ($transport eq $driver->{transport}) {
-                if (defined $driver->{host}) {
-                    if (($driver->{host} and $host)
-                        or (not $driver->{host} and not $host)) {
-                        say "m1";
-                        my $c = _cls_name( $driver->{class} );
-                        if (not eval "require $c; 1") {
-                            die @!;
-                        }
-                        return $c->new( $url, %args );
-                    }
-                }
-                else { # "host" not defined, so not required
-                    say "m2";
+    for my $driver ($self->{drivers}->@*) {
+        if ($transport eq $driver->{transport}) {
+            if (defined $driver->{host}) {
+                if (($driver->{host} and $host)
+                    or (not $driver->{host} and not $host)) {
                     my $c = _cls_name( $driver->{class} );
-                    eval "require $c";
+                    if (not eval "require $c; 1") {
+                        die @!;
+                    }
                     return $c->new( $url, %args );
                 }
+            }
+            else { # "host" not defined, so not required
+                my $c = _cls_name( $driver->{class} );
+                eval "require $c";
+                return $c->new( $url, %args );
             }
         }
     }
@@ -87,7 +82,7 @@ Sys::Async::Virt::Connection::Factory - Class for
 
 =head1 VERSION
 
-v0.0.6
+v0.0.7
 
 =head1 SYNOPSIS
 

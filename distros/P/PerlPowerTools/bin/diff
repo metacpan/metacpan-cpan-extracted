@@ -37,9 +37,8 @@ License: perl
 use strict;
 
 use File::Basename qw(basename);
+use File::Spec;
 use Getopt::Std qw(getopts);
-
-Algorithm::Diff->import('diff');
 
 use constant EX_SUCCESS   => 0;
 use constant EX_DIFFERENT => 1;
@@ -124,7 +123,7 @@ if ($file1 eq '-') {
 } elsif (-d $file1) {
     bag("cannot compare '-' to a directory") if ($file2 eq '-');
     bag("'$file2': is a directory") if (-d $file2);
-    my $path = join('/', $file1, basename($file2));
+    my $path = File::Spec->catfile($file1, basename($file2));
     open($fh1, '<', $path) or bag("Couldn't open '$path': $!");
 } else {
     open($fh1, '<', $file1) or bag("Couldn't open '$file1': $!");
@@ -134,7 +133,7 @@ if ($file2 eq '-') {
     $fh2 = *STDIN;
 } elsif (-d $file2) {
     bag("'$file1': is a directory") if (-d $file1);
-    my $path = join('/', $file2, basename($file1));
+    my $path = File::Spec->catfile($file2, basename($file1));
     open($fh2, '<', $path) or bag("Couldn't open '$path': $!");
 } else {
     open($fh2, '<', $file2) or bag("Couldn't open '$file2': $!");
@@ -148,7 +147,7 @@ close $fh2;
 exit(EX_SUCCESS) if (scalar(@f1) == 0 && scalar(@f2) == 0);
 
 # diff yields lots of pieces, each of which is basically a Block object
-my $diffs = diff(\@f1, \@f2);
+my $diffs = Algorithm::Diff::diff(\@f1, \@f2);
 exit(EX_SUCCESS) unless @$diffs;
 
 if ($opt_q) {
@@ -533,7 +532,7 @@ package
 	Block; # hide from PAUSE
 
 sub new {
-# Input is a chunk from &Algorithm::LCS::diff
+# Input is a chunk from &Algorithm::Diff::diff
 # Fields in a block:
 # length_diff - how much longer file 2 is than file 1 due to this block
 # Each change has:
@@ -608,30 +607,8 @@ package
 	Algorithm::Diff; # Hide from PAUSE
 
 use strict;
-BEGIN {
-  $Algorithm::Diff::VERSION = '0.57';
 
-
-  %Algorithm::Diff::EXPORT_OK = (LCS => 1,
-				 diff => 1,
-				 traverse_sequences => 1,
-				);
-}
-
-sub import {
-  no strict;
-  my $package = shift;
-  my $caller = caller;
-  for my $func (@_) {
-    unless ($ {$package . '::EXPORT_OK'}{$func}) {
-      require Carp;
-      Carp::croak("$package does not export function `$func'; aborting");
-    }
-    *{"$ {caller}::$func"} = \&{"$ {package}::$func"};
-  }
-  1;
-}
-
+our $VERSION = '0.57';
 
 sub LCS_matrix {
   my @x;
@@ -712,15 +689,6 @@ sub traverse_sequences {
   }
 }
 
-sub LCS {
-  my $lcs = [];
-  my ($a, $b);
-  my $functions = { MATCH => sub {push @$lcs, $a->[$_[0]]} };
-
-  traverse_sequences($functions, @_);
-  wantarray ? @$lcs : $lcs;
-}
-
 sub diff {
   my ($a, $b) = @_;
   my @cur_diff = ();
@@ -745,6 +713,8 @@ sub usage {
 }
 
 1;
+
+__END__
 
 =head1 NAME
 

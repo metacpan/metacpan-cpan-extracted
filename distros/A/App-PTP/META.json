@@ -20,6 +20,9 @@
          "local",
          "vendor",
          "t"
+      ],
+      "namespace" : [
+         "App::PTP"
       ]
    },
    "prereqs" : {
@@ -97,6 +100,6 @@
          "web" : "https://github.com/mkende/ptp"
       }
    },
-   "version" : "1.13",
+   "version" : "1.15",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

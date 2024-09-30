@@ -21,10 +21,10 @@ max_number_var: 10000
 seed: 123456789 
 
 # Set the regex to exclude variables matching a specific pattern
-exclude_properties_regex: 'info|notes|label|value|\.high|\.low|metaData|familyHistory|excluded|_visit|dateOfProcedure|files|reference\.id|reference\.description|timeObserved|dateOfBirth|timestamp|treatmentTarget|treatmentIntent|adverseEvents|treatmentTerminationReason'
+exclude_variables_regex: 'info|notes|label|value|\.high|\.low|metaData|familyHistory|excluded|_visit|dateOfProcedure|files|reference\.id|reference\.description|timeObserved|dateOfBirth|timestamp|treatmentTarget|treatmentIntent|adverseEvents|treatmentTerminationReason|_id|pedigrees|datasetId'
 
 # Set the terms which are arrays
-array_terms: [biosamples,diseases,exposures,interpretations,interventionsOrProcedures,measures,measurements,medicalActions,phenotypicFeatures,treatments]
+array_terms: [biosamples,diseases,exposures,interpretations,interventionsOrProcedures,measures,measurements,medicalActions,pedigrees,phenotypicFeatures,treatments]
 
 # Set the regex to identify array indexes, guiding their substitution within array elements
 array_regex: '^([^:]+):(\d+)\.(\S+)'
@@ -36,6 +36,7 @@ id_correspondence:
     exposures: 'exposureCode.id'
     interventionsOrProcedures: 'procedureCode.id'
     measures: 'assayCode.id'
+    pedigrees: 'id'
     phenotypicFeatures: 'featureType.id'
     treatments: 'treatmentCode.id'
   PXF:

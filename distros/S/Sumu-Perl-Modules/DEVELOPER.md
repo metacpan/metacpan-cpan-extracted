@@ -147,6 +147,33 @@ ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil release
 [@Git/Check]    g at inline delegation in Dist::Zilla::Plugin::Git::Check for logger->log_fatal (attribute declared in /home/ns21u2204/perl5/lib/perl5/Dist/Zilla/Role/Plugin.pm at line 61) line 18.
 ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
 
+## dzil succeeded
+
+with changing remote name to origin
+
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil release
+[DZ] beginning to build Sumu-Perl-Modules
+[DZ] guessing dist's main_module is lib/Sumu/Perl/Modules.pm
+[@Classic/PkgVersion] skipping lib/Sumu/Perl/Modules.pm: assigns to $VERSION
+[@Classic/ExtraTests] rewriting author test xt/author/pod-coverage.t
+[@Classic/ExtraTests] rewriting author test xt/author/pod-syntax.t
+[DZ] writing Sumu-Perl-Modules in Sumu-Perl-Modules-0.2.8
+[DZ] building archive with Archive::Tar; install Archive::Tar::Wrapper 0.15 or newer for improved speed
+[DZ] writing archive to Sumu-Perl-Modules-0.2.8.tar.gz
+[@Git/Check] branch main is in a clean state
+[@Classic/ConfirmRelease] *** Preparing to release Sumu-Perl-Modules-0.2.8.tar.gz with @Classic/UploadToCPAN ***
+Do you want to continue the release process? [y/N]: y
+[@Classic/UploadToCPAN] registering upload with PAUSE web server
+[@Classic/UploadToCPAN] POSTing upload for Sumu-Perl-Modules-0.2.8.tar.gz to https://pause.perl.org/pause/authenquery?ACTION=add_uri
+[@Classic/UploadToCPAN] PAUSE add message sent ok [200]
+[@Git/Tag] Tagged v0.2.8
+[@Git/Push] pushing to origin
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
+
+
+
+
+
 
 ### Automated updates to this file 
 
@@ -214,5 +241,41 @@ Version ID: Old 0.2.6 | New 0.2.7
 
 Commit ID: Old 027 | New 028
 Version ID: Old 0.2.7 | New 0.2.8
+
+
+#### 2024-09-28 20:59:35 CDT
+
+Commit ID: Old 028 | New 029
+Version ID: Old 0.2.8 | New 0.2.9
+
+
+#### 2024-09-28 21:10:49 CDT
+
+Commit ID: Old 029 | New 030
+Version ID: Old 0.2.9 | New 0.3.0
+
+
+#### 2024-09-28 21:31:35 CDT
+
+Commit ID: Old 030 | New 031
+Version ID: Old 0.3.0 | New 0.3.1
+
+
+#### 2024-09-28 21:34:08 CDT
+
+Commit ID: Old 031 | New 032
+Version ID: Old 0.3.1 | New 0.3.2
+
+
+#### 2024-09-28 21:44:41 CDT
+
+Commit ID: Old 032 | New 033
+Version ID: Old 0.3.2 | New 0.3.3
+
+
+#### 2024-09-29 08:46:47 CDT
+
+Commit ID: Old 033 | New 034
+Version ID: Old 0.3.3 | New 0.3.4
 
 

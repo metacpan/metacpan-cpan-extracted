@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::Signature::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Signature::VERSION    = '2.004000';
+	$Type::Params::Signature::VERSION    = '2.006000';
 }
 
 $Type::Params::Signature::VERSION =~ tr/_//d;
@@ -159,6 +159,13 @@ sub _rationalize_slurpies {
 		our @CARP_NOT = ( __PACKAGE__, 'Type::Params' );
 		Carp::carp( "Warning: the default for the slurpy parameter will be ignored, continuing anyway" );
 		delete $self->{slurpy}{default};
+	}
+	
+	if ( $self->{slurpy} and $self->{slurpy}->optional ) {
+		require Carp;
+		our @CARP_NOT = ( __PACKAGE__, 'Type::Params' );
+		Carp::carp( "Warning: the optional for the slurpy parameter will be ignored, continuing anyway" );
+		delete $self->{slurpy}{optional};
 	}
 }
 

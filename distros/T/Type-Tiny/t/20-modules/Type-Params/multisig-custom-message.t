@@ -12,7 +12,7 @@ Benct Philip Jonsson E<lt>bpjonsson@gmail.comE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2018-2023 by Benct Philip Jonsson.
+This software is copyright (c) 2018-2024 by Benct Philip Jonsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -118,7 +118,7 @@ for my $test ( @tests ) {
 	no warnings 'uninitialized';
 	my($name, $code, $expected, $sig) = @$test;
 	like( exception { $code->() } || '', qr/\A\Q$expected/, $name );
-	is ${^TYPE_PARAMS_MULTISIG}, $sig, "$name \${^TYPE_PARAMS_MULTISIG}";
+	is ${^_TYPE_PARAMS_MULTISIG}, $sig, "$name \${^_TYPE_PARAMS_MULTISIG}";
 }
 
 done_testing;

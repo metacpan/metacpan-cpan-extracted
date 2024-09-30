@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -26,6 +26,7 @@ my @files = (
     't/00-load.t',
     't/author-eol.t',
     't/author-no-tabs.t',
+    't/author-pod-coverage.t',
     't/author-pod-syntax.t',
     't/basics_without_overload.t',
     't/bigdata.dump',
@@ -35,12 +36,13 @@ my @files = (
     't/data_dpath_path_unescape.t',
     't/iterator.t',
     't/matchr.t',
+    't/newline.t',
     't/optimization.t',
     't/parallel.t',
     't/path.t',
     't/references.t',
     't/regressions.t',
-    't/release-pod-coverage.t',
+    't/smartmatch.t',
     't/zeros.t'
 );
 

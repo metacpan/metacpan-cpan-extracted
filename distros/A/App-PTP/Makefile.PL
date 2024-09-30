@@ -29,6 +29,7 @@ WriteMakefile(
       dynamic_config => 0,
       no_index => {
         directory => [ 'local', 'vendor', 't' ],
+        namespace => ['App::PTP',],
       },
       resources => {
         repository => {

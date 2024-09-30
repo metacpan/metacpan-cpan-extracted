@@ -1,7 +1,7 @@
 package Data::DPath::Path;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Abstraction for a DPath
-$Data::DPath::Path::VERSION = '0.59';
+$Data::DPath::Path::VERSION = '0.60';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ sub unquote {
 
 sub quoted { shift =~ m,^/["'],; }                                             # "
 
-eval 'use overload "~~" => \&op_match' if $] >= 5.010;
+eval 'use overload "~~" => \&op_match' if $] >= 5.010 and $] < 5.041003;
 
 sub op_match {
         my ($self, $data, $rhs) = @_;
@@ -238,7 +238,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Steffen Schwigon.
+This software is copyright (c) 2024 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

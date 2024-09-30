@@ -4,7 +4,7 @@ Number of edges: 630
 Is connected: 1
 Connected Components: 1
 Graph Diameter: 215:week_52_arm_1->305:week_0_arm_1
-Average Path Length: 23.5238095238095
+Average Path Length:  23.524
 Degree of vertex 107:week_0_arm_1: 35
 Degree of vertex 107:week_2_arm_1: 35
 Degree of vertex 107:week_14_arm_1: 35

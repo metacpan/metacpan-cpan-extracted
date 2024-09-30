@@ -37,9 +37,9 @@
             "Future::Queue" : "0",
             "IO::Async::Notifier" : "0",
             "Log::Any" : "0",
-            "Protocol::Sys::Virt" : "v10.3.8",
+            "Protocol::Sys::Virt" : "v10.3.12",
             "Sublike::Extended" : "0",
-            "perl" : "v5.20.0"
+            "perl" : "v5.26.0"
          }
       },
       "test" : {
@@ -56,6 +56,6 @@
          "web" : "https://github.com/ehuelsmann/perl-sys-async-virt"
       }
    },
-   "version" : "v0.0.6",
+   "version" : "v0.0.7",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

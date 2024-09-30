@@ -1,9 +1,9 @@
 package Data::DPath;
-# git description: v0.58-3-g9898e48
+# git description: v0.59-6-g53d9a3f
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: DPath is not XPath!
-$Data::DPath::VERSION = '0.59';
+$Data::DPath::VERSION = '0.60';
 use 5.008;
 use strict;
 use warnings;
@@ -876,7 +876,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Steffen Schwigon.
+This software is copyright (c) 2024 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

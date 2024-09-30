@@ -1,5 +1,16 @@
 -----
 
+10.3.12   2024-09-29
+    [Fixed]
+        * KeepAlive sends messages, not call/replies
+        * Generate KeepAlive, so it has a version number
+    [Breaking]
+        * Constructor parameter 'max_unacked' renamed to 'max_inactive'
+    [Added]
+        * KeepAlive 'on_ping' event which should call the new 'pong' method
+        * KeepAlive 'mark_active' method which should be called
+          to signal other activity on the connection than keepalive messages
+
 10.3.11   2024-09-28
     [Fixed]
         * parse_url 'bare' URLs should have their components URI encoded

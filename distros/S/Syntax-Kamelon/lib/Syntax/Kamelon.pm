@@ -11,7 +11,7 @@ use Syntax::Kamelon::Indexer;
 use Module::Load::Conditional qw[can_load];
 use Data::Dumper;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 my @attributes = qw (
 	Alert
@@ -683,10 +683,14 @@ sub SuggestSyntax {
 }
 
 sub Syntax {
-	my $self = shift;
-	if (@_) {
-		$self->{SYNTAX} = shift;
-		$self->Reset;
+	my ($self, $syntax) = @_;
+	if (defined $syntax) {
+		if ($self->GetIndexer->SyntaxExists($syntax)) {
+			$self->{SYNTAX} = $syntax;
+			$self->Reset;
+		} else {
+			warn "Unknown syntax: '$syntax'"
+		}
 	}
 	return $self->{SYNTAX};
 }

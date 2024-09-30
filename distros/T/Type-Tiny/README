@@ -8,7 +8,7 @@ SYNOPSIS
     was previously distributed as part of Type::Tiny but has since been spun
     off), and can be used with Moose, Mouse, or Moo (or none of the above).
 
-    Type::Tiny is used by over 800 Perl distributions on the CPAN
+    Type::Tiny is used by over 1000 Perl distributions on the CPAN
     (Comprehensive Perl Archive Network) and can be considered a stable and
     mature framework for efficiently and reliably enforcing data types.
 
@@ -208,7 +208,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
+    This software is copyright (c) 2013-2014, 2017-2024 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

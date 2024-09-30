@@ -15,8 +15,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.016'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-09-24'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.017'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-09-29'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -933,8 +933,13 @@ sub _carponce { # if not silent
   my $msg = join "",@_;
   return if $$self->{_carponce}->{$msg}++;
   $msg .= "\n" unless $msg =~ /\n\z/s;
-  carp($msg)
-    unless $$self->{silent}; # never appears even if silent is later unset
+  unless ($$self->{silent}) {
+    if ($$self->{debug}) {
+      Carp::cluck($msg)
+    } else {
+      carp($msg)
+    }
+  } # else never appears even if silent is later unset!
 }
 
 ###################### METHODS/FUNCTIONS #######################
@@ -2633,6 +2638,7 @@ sub read_spreadsheet($;@) {
   my ($self, $opthash, $inpath) = &__self_opthash_1arg;
   my $orig_opthash = { %$opthash };
 
+  # !! This removes verbose/debug/silent from %$opthash !!
   my $saved_stdopts = $self->_set_stdopts($opthash);
   scope_guard{ $self->_restore_stdopts($saved_stdopts) };
 
@@ -2651,13 +2657,13 @@ sub read_spreadsheet($;@) {
   __validate_opthash( $opthash,
                       [
       qw/data_source title_rx/,
-      qw/iolayers encoding verbose silent debug/,
+      qw/iolayers encoding                     /,
       qw/tempdir use_gnumeric raw_values sheetname/, # for OpenAsCsv
       qw/required min_rx max_rx first_cx last_cx/, # for title_rx
                       ],
       desc => "read_spreadsheet option",
       undef_ok_only => [qw/data_source title_rx iolayers encoding
-                           verbose silent debug use_gnumeric/] );
+                                                use_gnumeric/] );
 
   # convert {encoding} to {iolayers}
   if (my $enc = delete $opthash->{encoding}) {
@@ -2668,18 +2674,18 @@ sub read_spreadsheet($;@) {
   # N.B. If user says nothing, OpenAsCsv() defaults to UTF-8
   $opthash->{iolayers} //= $$self->{iolayers} // "";
 
-  my ($rows, $linenums, $meta_info, $verbose, $debug)
-    = @$$self{qw/rows linenums meta_info verbose debug/};
+  my ($rows, $linenums, $meta_info, $verbose, $silent, $debug)
+    = @$$self{qw/rows linenums meta_info verbose silent debug/};
 
   ##$self->_check_currsheet;
 
   my $hash;
   { local $$self->{verbose} = 0;
     $hash = OpenAsCsv(
-                   inpath => $inpath,
-                   debug => $$self->{debug},
-                   silent => $$self->{silent},
-                   verbose => ($$self->{verbose} || $$self->{debug}),
+                   inpath  => $inpath,
+                   debug   => $debug,
+                   silent  => $silent,
+                   verbose => ($verbose || $debug),
                    %$opthash, # all our opts are valid here
              );
   }
@@ -3216,16 +3222,16 @@ Spreadsheet::Edit - Slice and dice spreadsheets, optionally using tied variables
   apply {
     printf "%20s %8d %8.2f %-13s %s\n",
            $crow{Name},              # this key is an explicit alias
-           $crow{"Account Number"},  #   ...actual title
-           $crow{Income},            #   ...actual title
-           $crow{Home_phone},        #   ...auto-generated alias
-           $crow{Email} ;            #   ...actual title
+           $crow{"Account Number"},  #            ... actual title
+           $crow{Income},            #            ... actual title
+           $crow{Home_phone},        #            ... auto-generated alias
+           $crow{Email} ;            #            ... actual title
   };
 
   # Randomly access rows.
   print "Row 42: Column 'C' is ",      $rows[41]{C},    "\n";
-  print "Row 42: Customer's Name is ", $rows[41]{Name}, "\n";
   print "Row 42: 3rd column is ",      $rows[41][2],    "\n";
+  print "Row 42: Customer's Name is ", $rows[41]{Name}, "\n";
 
   # Split the "Customer's Name" into separate FName and LName columns
   insert_cols '>Name', "FName", "LName";
@@ -3242,9 +3248,9 @@ Spreadsheet::Edit - Slice and dice spreadsheets, optionally using tied variables
 
   our $Name;            # 'Name' is the explicit alias created above
   our $Account_Number;  # Auto-generated alias for "Account Number"
-  our $Home_phone;      #   ditto
+  our $Home_phone;      #   ditto for "Home-phone"
   our $Income;          # 'Income' is an actual title
-  our $Email;           #   ditto
+  our $Email;           #   and so is 'Email'
   our ($FName, $LName); # These columns do not yet exist
 
   tie_column_vars "Name", "Account_Number",
@@ -3280,7 +3286,7 @@ Spreadsheet::Edit - Slice and dice spreadsheets, optionally using tied variables
   Dear $FName,
     If you have disposable income, we can help with that.
   Sincerely,
-  Your investment advisor.
+  Your stock broker.
   EOF
     close SENDMAIL || die "sendmail failed ($?)\n";
   };
@@ -3377,7 +3383,7 @@ You may want to skip ahead to "LIST OF FUNCTIONS (and OO methods)".
 =back
 
 Columns may be referenced by title without knowing their positions.
-Optionally, global (package) variables may be tied to columns and used
+Optionally, global (i.e. package) variables may be tied to columns and used
 during C<apply()>.
 
 Data tables can come from Spreadsheets, CSV files, or your code.
@@ -3418,9 +3424,9 @@ I<Functions> and helper variables implicitly operate on a
 package-global "current sheet" object, which can be switched at will.
 OO I<Methods> operate on the C<sheet> object they are called on.
 
-Functions which operates on the "current sheet" have
+Functions which operate on the "current sheet" have
 corresponding OO methods with the same names and arguments
-(note that method args must be enclosed by parenthesis).
+(except that method arguments must be enclosed by parenthesis).
 
 =head1 TIED COLUMN VARIABLES
 
