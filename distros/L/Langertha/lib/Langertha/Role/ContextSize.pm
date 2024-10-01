@@ -1,7 +1,7 @@
 package Langertha::Role::ContextSize;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for an engine where you can specify the context size (in tokens)
-$Langertha::Role::ContextSize::VERSION = '0.005';
+$Langertha::Role::ContextSize::VERSION = '0.006';
 use Moose::Role;
 
 has context_size => (
@@ -31,7 +31,7 @@ Langertha::Role::ContextSize - Role for an engine where you can specify the cont
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

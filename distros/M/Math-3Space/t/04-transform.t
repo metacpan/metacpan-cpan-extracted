@@ -51,9 +51,15 @@ subtest rotate => sub {
 		call yv => vec_check(-1,0,0);
 		call zv => vec_check(0,0,1);
 	}, 'rotate around parent Z axis' );
+	is( space->rot_x(.1)->rot_y(.4), object {
+		call is_normal => T;
+		call xv => vec_check(-0.80901699,0,-0.58778525);
+		call yv => vec_check(0.34549150,0.80901699,-0.47552825);
+		call zv => vec_check(0.47552825,-0.58778525,-0.65450849);
+	}, 'two non-right-angle rotations' );
 	
 	# Rotations of non-unit-length axis vectors:
-	# Ensure that magnitude is preserved and that they remain orthagonal.
+	# Ensure that magnitude is preserved and that they remain orthogonal.
 	my $s1= space->scale(2,3,4)->rot_x(.1)->rot_y(.4)->rot_z(.8);
 	is( $s1, object {
 		call is_normal => F;
@@ -116,6 +122,44 @@ subtest rotate => sub {
 		call yv => vec_check(0,0,1);
 		call zv => vec_check(1,0,0);
 	}, 'rotate around (1,1,1)' );
+};
+
+subtest rotate_subspace => sub {
+  my $sp1= space->rot_z(.125);
+  my $sp2= $sp1->space->rot_z(.125);
+  my $sp3= $sp2->space->rot_z(.125);
+  my $sp4= $sp3->space->rot_z(.125);
+  is( $sp4, object {
+    call is_normal => T;
+    call origin => vec_check(0,0,0);
+    call xv => vec_check(0.70710678,0.70710678,0);
+    call yv => vec_check(-0.70710678,0.70710678,0);
+    call zv => vec_check(0,0,1);
+  }, 'rotate 4 times, each subspaced' );
+};
+
+subtest project => sub {
+	my $sp= space->rot_z(.25);
+	is( $sp->project(vec3(1,1,1)), vec_check(1,-1,1), 'vec3' );
+	is( $sp->project([1,1,1]), [1,-1,1], 'array' );
+	is( $sp->project({ x => 1, y => 1, z => 1 }), { x => 1, y => -1, z => 1 }, 'hash' );
+	is( $sp->project([1,1]), [1,-1,0], 'array[2]' );
+	is( $sp->project({ x => 1, y => 1 }), { x => 1, y => -1, z => 0 }, 'hash x,y' );
+};
+
+subtest project_inplace => sub {
+	my $sp= space->rot_z(.25);
+	my $x;
+	$sp->project_inplace($x= vec3(1,1,1));
+	is( $x, vec_check(1,-1,1), 'vec3' );
+	$sp->project_inplace($x= [1,1,1]);
+	is( $x, [1,-1,1], 'array' );
+	$sp->project_inplace($x= { x => 1, y => 1, z => 1 });
+	is( $x, { x => 1, y => -1, z => 1 }, 'hash' );
+	$sp->project_inplace($x= [1,1]);
+	is( $x, [1,-1], 'array[2]' );
+	$sp->project_inplace($x= { x => 1, y => 1 });
+	is( $x, { x => 1, y => -1 }, 'hash x,y' );
 };
 
 done_testing;

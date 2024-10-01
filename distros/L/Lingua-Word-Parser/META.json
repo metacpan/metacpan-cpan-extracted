@@ -63,7 +63,7 @@
          "web" : "https://github.com/ology/Lingua-Word-Parser"
       }
    },
-   "version" : "0.0808",
+   "version" : "0.0809",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

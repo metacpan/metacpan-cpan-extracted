@@ -1,0 +1,13 @@
+Changes
+FCN.c
+FCN.h
+Makefile.PL
+MANIFEST
+minuit.pd
+minuitlib/futils.f
+minuitlib/intracfalse.f
+minuitlib/minuit.f
+t/minuit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/Minuit.pm                  mod=PDL::Minuit pd=minuit.pd (added by pdlpp_mkgen)

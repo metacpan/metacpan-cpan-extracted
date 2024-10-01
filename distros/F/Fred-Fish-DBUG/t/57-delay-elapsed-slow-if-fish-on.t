@@ -14,12 +14,22 @@ use File::Spec;
 
 my $delay;          # How long to delay ...
 my $start_level;
+my $start_time;
 
 sub my_warn
 {
    my $msg = shift;
    chomp($msg);
    ok2 (0, "There was an expected warning!  Check fish.");
+}
+
+BEGIN {
+   eval {
+      require Time::HiRes;
+      Time::HiRes->import ( qw(time sleep) );
+   };
+
+   $start_time = time ();
 }
 
 BEGIN {
@@ -96,6 +106,16 @@ END {
    }
 
    DBUG_VOID_RETURN ();
+}
+
+END {
+   my $end_time = time ();
+   if ( $delay != 0 ) {
+      open (DELAY_FILE, ">", get_delay_file ()) or
+               die ("Can' open delay file: " . get_delay_file () . "($!)\n");
+      print DELAY_FILE ( $end_time - $start_time) . "\n";
+      close (DELAY_FILE);
+   }
 }
 
 # --------------------------------------

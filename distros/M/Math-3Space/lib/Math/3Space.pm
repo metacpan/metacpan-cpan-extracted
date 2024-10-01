@@ -1,6 +1,6 @@
 package Math::3Space;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 # ABSTRACT: 3D Coordinate math with an intuitive cross-space mapping API
 
 use strict;
@@ -10,16 +10,30 @@ use Carp;
 require XSLoader;
 XSLoader::load('Math::3Space', $Math::3Space::VERSION);
 
+use overload '""' => sub {
+  my @vecs = map [$_[0]->$_->xyz], qw(xv yv zv origin);
+  "[\n" . join('', map " [@$_]\n", @vecs) . "]\n";
+};
+
 
 { package Math::3Space::Exports;
 	use Exporter::Extensible -exporter_setup => 1;
 	*vec3= *Math::3Space::Vector::vec3;
 	*space= *Math::3Space::space;
-	export 'vec3', 'space';
+	*frustum_projection= *Math::3Space::Projection::new_frustum;
+	*perspective_projection= *Math::3Space::Projection::new_perspective;
+	export qw( vec3 space frustum_projection perspective_projection );
 }
 sub import { shift; Math::3Space::Exports->import_into(scalar(caller), @_) }
 
 sub parent { $_[0]{parent} }
+
+# used by XS to avoid linking directly to PDL
+sub _pdl_project_inplace {
+	$_[0] -= $_[1] if defined $_[1];
+	$_[0] .= $_[0] x $_[2];
+	$_[0] += $_[3] if defined $_[3];
+}
 
 require Math::3Space::Vector;
 1;
@@ -107,6 +121,32 @@ Construct a space (optionally within C<$parent>) initialized to an identity:
 
 Initialize a space from raw attributes.
 
+=head1 VECTOR FORMATS
+
+This module currently allows vectors to be specified as:
+
+=over
+
+=item L<Math::3Space::Vector>
+
+This is a blessed scalar-ref of packed perl-floats (usually double, but perl can be compiled for long double)
+
+=item Array-ref
+
+C<< [X,Y,Z] >> or C<< [X,Y] >>
+
+=item Hash-ref
+
+C<< { x => $x, y => $y, z => $z } >>
+
+=item PDL ndarray
+
+To assign vectors, you need a 2-element or 3-element array slice:  C<< pdl($x,$y) >>
+or C<< pdl($x,$y,$z) >>.  For the projection methods, you can specify higher dimensions as long
+as the lowest dimension is 3.
+
+=back
+
 =head1 ATTRIBUTES
 
 =head2 parent
@@ -138,7 +178,7 @@ The C<< [x,y,z] >> vector of the Z axis (often named "K" in math text)
 
 =head2 is_normal
 
-Returns true if all axis vectors are unit-length and orthagonal to eachother.
+Returns true if all axis vectors are unit-length and orthogonal to each other.
 
 =head1 METHODS
 
@@ -212,8 +252,8 @@ Variants:
 
 =head2 normalize
 
-Ensure that the C<xv>, C<yv>, and C<zv> axis vectors are unit length and orthagonal to
-eachother, like proper eigenvectors.  The algorithm is:
+Ensure that the C<xv>, C<yv>, and C<zv> axis vectors are unit length and orthogonal to
+each other, like proper eigenvectors.  The algorithm is:
 
   * make zv a unit vector
   * xv = yv cross zv, and make it a unit vector
@@ -311,17 +351,33 @@ Get an OpenGL-compatible 16-element array representing a 4x4 matrix that would p
 projection as this space.  This can either be returned as 16 perl floats, or written into a
 packed buffer of 16 doubles.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<PDL>, L<PDL::Graphics::TriD>
+
+PDL has many tools for working with vectors and crunching numbers in parallel.
+The TriD library defines a number of objects for grouping polygon meshes and ways to
+visualize them.
+
+=item L<OpenGL::Sandbox>
+
+OpenGL::Sandbox provides handy wrappers around OpenGL textures, shaders, fonts, etc.
+
+=back
+
 =head1 AUTHOR
 
 Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

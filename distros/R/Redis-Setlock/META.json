@@ -4,7 +4,7 @@
       "FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -66,7 +66,7 @@
    "provides" : {
       "Redis::Setlock" : {
          "file" : "lib/Redis/Setlock.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -76,11 +76,15 @@
       },
       "homepage" : "https://github.com/fujiwara/Redis-Setlock",
       "repository" : {
-         "url" : "git://github.com/fujiwara/Redis-Setlock.git",
+         "type" : "git",
+         "url" : "https://github.com/fujiwara/Redis-Setlock.git",
          "web" : "https://github.com/fujiwara/Redis-Setlock"
       }
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "version" : "0.14",
+   "x_contributors" : [
+      "FUJIWARA Shunichiro <67804+fujiwara@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

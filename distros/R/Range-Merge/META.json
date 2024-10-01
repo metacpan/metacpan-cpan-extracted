@@ -4,7 +4,7 @@
       "Joelle Maslak <jmaslak@antelope.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,6 +27,7 @@
       "develop" : {
          "requires" : {
             "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
             "Test::More" : "0.88",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
@@ -66,11 +67,11 @@
    "provides" : {
       "Range::Merge" : {
          "file" : "lib/Range/Merge.pm",
-         "version" : "2.191190"
+         "version" : "2.242740"
       },
       "Range::Merge::Boilerplate" : {
          "file" : "lib/Range/Merge/Boilerplate.pm",
-         "version" : "2.191190"
+         "version" : "2.242740"
       }
    },
    "release_status" : "stable",
@@ -84,11 +85,12 @@
          "web" : "https://github.com/jmaslak/Range-Merge"
       }
    },
-   "version" : "2.191190",
+   "version" : "2.242740",
    "x_contributor_covenant" : {
       "version" : 0.02
    },
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

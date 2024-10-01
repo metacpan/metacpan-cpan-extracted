@@ -2,6 +2,7 @@ TYPEMAP
 m3s_space_t*        O_ThreeSpace
 m3s_space_or_null   O_ThreeSpaceOrNull
 m3s_vector_p        O_ThreeSpace_Vector
+m3s_4space_projection_t* O_ThreeSpace_Projection
 
 INPUT
 O_ThreeSpace
@@ -22,3 +23,7 @@ O_ThreeSpace_Vector
 OUTPUT
 O_ThreeSpace_Vector
 	$arg= m3s_wrap_vector($var);
+
+INPUT
+O_ThreeSpace_Projection
+	$var= m3s_projection_get($arg);

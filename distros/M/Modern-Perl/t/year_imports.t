@@ -36,6 +36,9 @@ sub test_lexical_subs_for
 }
 
 sub test_switch_for {
+    # given removed in 5.41.4
+    return if $] >= 5.041004;
+
     my $year = _get_year(shift);
 
     eval qq|use Modern::Perl $year; sub { given (0) {} }|;
@@ -43,6 +46,9 @@ sub test_switch_for {
 }
 
 sub test_no_switch_for {
+    # given removed in 5.41.4
+    return if $] >= 5.041004;
+
     my $year = _get_year(shift);
 
     eval qq|use Modern::Perl $year; sub { given (0) {} }|;
@@ -189,15 +195,19 @@ sub test_module_true_for {
 
     open my $fh, '>', 'Foo.pm'
         or die "Cannot write 'Foo.pm': $!\n";
-    $fh->print(<<~EOF);
-    package Foo;
 
-    use Modern::Perl $year;
+    # don't use <<~ heredoc to trim whitespace
+    # as this will fail with Perl < 5.26
+    # see RT #151189
+    $fh->print(<<EOF);
+package Foo;
 
-    sub bar { 'returned from Foo::bar()' }
+use Modern::Perl $year;
 
-    return 0;
-    EOF
+sub bar { 'returned from Foo::bar()' }
+
+return 0;
+EOF
     close $fh;
 
     local @INC = '.';

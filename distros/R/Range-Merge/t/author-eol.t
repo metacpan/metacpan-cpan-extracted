@@ -25,6 +25,7 @@ my @files = (
     't/03-basic-merge-with-data.t',
     't/04.cidrs.t',
     't/05.discrete.t',
+    't/99.leading-zero.t',
     't/author-01-full-bgp-table.t',
     't/author-02-full-bgp-cidr.t',
     't/author-critic.t',
@@ -63,8 +64,7 @@ my @files = (
     't/data/perlcriticrc',
     't/release-changes_has_content.t',
     't/release-kwalitee.t',
-    't/release-trailing-space.t',
-    't/release-unused-vars.t'
+    't/release-trailing-space.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

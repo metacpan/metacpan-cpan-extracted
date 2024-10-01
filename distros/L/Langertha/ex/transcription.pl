@@ -14,9 +14,13 @@ use Path::Tiny;
 
 use Langertha::Engine::Whisper;
 use Langertha::Engine::OpenAI;
+use Langertha::Engine::Groq;
 
-if ($ENV{OPENAI_API_KEY}) {
-  warn "Will be using your OPENAI_API_KEY environment variable, which may produce cost.";
+if ($ENV{OPENAI_API_KEY} || $ENV{GROQ_API_KEY}) {
+  my @keys;
+  push @keys, 'OPENAI_API_KEY' if $ENV{OPENAI_API_KEY};
+  push @keys, 'GROQ_API_KEY' if $ENV{GROQ_API_KEY};
+  warn "Will be using your ".join(", ", @keys)." environment variable(s), which may produce cost.";
   sleep 5;
 }
 
@@ -49,6 +53,21 @@ if ($ENV{OPENAI_API_KEY}) {
 
     my $end = time;
     printf("\n -- %u seconds (%s)\n", ($end - $start), $openai->transcription_model);
+  }
+}
+
+{
+  if ($ENV{GROQ_API_KEY}) {
+    my $start = time;
+
+    my $groq = Langertha::Engine::Groq->new(
+      api_key => $ENV{GROQ_API_KEY},
+    );
+
+    print($groq->simple_transcription(path(__FILE__)->parent->child('sample.ogg'), language => 'en'));
+
+    my $end = time;
+    printf("\n -- %u seconds (%s)\n", ($end - $start), $groq->transcription_model);
   }
 }
 

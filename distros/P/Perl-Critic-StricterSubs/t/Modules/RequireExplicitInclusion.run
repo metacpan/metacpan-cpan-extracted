@@ -274,6 +274,31 @@ Foo::Bar::->test();
 ## cut
 utf8::is_utf8("abc");
 
+
+## name Test::More brings in Test::Builder.
+## failures 2
+## cut
+
+use Test::More;
+local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+
+## name Test::More brings in Test::Builder, but we can ignore it.
+## parms { ignore_modules => 'Test::Builder' }
+## failures 0
+## cut
+
+use Test::More;
+local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+## name Test::More brings in Test::Builder, but we can ignore it with a regex.
+## parms { ignore_modules => '/Test::B/' }
+## failures 0
+## cut
+
+use Test::More;
+local $Test::Builder::Level = $Test::Builder::Level + 1;
+
 ##############################################################################
 # Local Variables:
 #   mode: cperl

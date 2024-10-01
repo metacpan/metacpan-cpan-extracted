@@ -170,8 +170,55 @@ Do you want to continue the release process? [y/N]: y
 [@Git/Push] pushing to origin
 ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
 
+## dzil
+
+dzil test and release 2024-9-29 8:50 AM
+
+### test
+
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil test
+[DZ] building distribution under .build/jBsQ0_fYKU for installation
+[DZ] beginning to build Sumu-Perl-Modules
+[DZ] guessing dist's main_module is lib/Sumu/Perl/Modules.pm
+[PkgVersion] skipping lib/Sumu/Perl/Modules.pm: assigns to $VERSION
+[ExtraTests] rewriting author test xt/author/pod-coverage.t
+[ExtraTests] rewriting author test xt/author/pod-syntax.t
+[DZ] writing Sumu-Perl-Modules in .build/jBsQ0_fYKU
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Sumu::Perl::Modules
+Writing MYMETA.yml and MYMETA.json
+cp lib/Sumu/Perl/Modules.pm blib/lib/Sumu/Perl/Modules.pm
+PERL_DL_NONLAZY=1 "/home/ns21u2204/perl5/perlbrew/perls/perl-5.38.0/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/author-pod-coverage.t .. ok
+t/author-pod-syntax.t .... ok
+All tests successful.
+Files=2, Tests=2,  1 wallclock secs ( 0.01 usr  0.00 sys +  0.20 cusr  0.05 csys =  0.26 CPU)
+Result: PASS
+[DZ] all's well; removing .build/jBsQ0_fYKU
 
 
+### release 
+
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil release
+[DZ] beginning to build Sumu-Perl-Modules
+[DZ] guessing dist's main_module is lib/Sumu/Perl/Modules.pm
+[PkgVersion] skipping lib/Sumu/Perl/Modules.pm: assigns to $VERSION
+[ExtraTests] rewriting author test xt/author/pod-coverage.t
+[ExtraTests] rewriting author test xt/author/pod-syntax.t
+[DZ] writing Sumu-Perl-Modules in Sumu-Perl-Modules-0.3.4
+[DZ] building archive with Archive::Tar; install Archive::Tar::Wrapper 0.15 or newer for improved speed
+[DZ] writing archive to Sumu-Perl-Modules-0.3.4.tar.gz
+[@Git/Check] branch main is in a clean state
+[ConfirmRelease] *** Preparing to release Sumu-Perl-Modules-0.3.4.tar.gz with UploadToCPAN ***
+Do you want to continue the release process? [y/N]: y
+[UploadToCPAN] registering upload with PAUSE web server
+[UploadToCPAN] POSTing upload for Sumu-Perl-Modules-0.3.4.tar.gz to https://pause.perl.org/pause/authenquery?ACTION=add_uri
+[UploadToCPAN] PAUSE add message sent ok [200]
+[@Git/Tag] Tagged v0.3.4
+[@Git/Push] pushing to origin
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
 
 
 
@@ -277,5 +324,23 @@ Version ID: Old 0.3.2 | New 0.3.3
 
 Commit ID: Old 033 | New 034
 Version ID: Old 0.3.3 | New 0.3.4
+
+
+#### 2024-09-30 07:33:47 CDT
+
+Commit ID: Old 034 | New 035
+Version ID: Old 0.3.4 | New 0.3.5
+
+
+#### 2024-09-30 07:59:07 CDT
+
+Commit ID: Old 035 | New 036
+Version ID: Old 0.3.5 | New 0.3.6
+
+
+#### 2024-09-30 08:41:46 CDT
+
+Commit ID: Old 036 | New 037
+Version ID: Old 0.3.6 | New 0.3.7
 
 

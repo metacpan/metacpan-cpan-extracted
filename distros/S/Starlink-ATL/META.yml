@@ -16,17 +16,18 @@ name: Starlink-ATL
 provides:
   Starlink::ATL:
     file: lib/Starlink/ATL.pm
-    version: '0.06'
+    version: '0.07'
   Starlink::ATL::MOC:
     file: lib/Starlink/ATL/MOC.pm
-    version: '0.06'
+    version: '0.07'
   Starlink::ATL::Region:
     file: lib/Starlink/ATL/Region.pm
-    version: '0.06'
+    version: '0.07'
 requires:
+  Astro::FITS::CFITSIO: '0'
   Pod::Usage: '0'
   Starlink::AST: '1.02'
 resources:
   license: http://opensource.org/licenses/gpl-3.0.html
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,13 +6,14 @@ use warnings;
 use Test2::Bundle::More;
 use JSON::MaybeXS;
 
-use Langertha::Engine::OpenAI;
-use Langertha::Engine::Ollama;
 use Langertha::Engine::Anthropic;
+use Langertha::Engine::Groq;
+use Langertha::Engine::Ollama;
+use Langertha::Engine::OpenAI;
 
 my $json = JSON::MaybeXS->new->canonical(1)->utf8(1);
 
-plan(19);
+plan(24);
 
 my $ollama_testurl = 'http://test.url:12345';
 my $ollama = Langertha::Engine::Ollama->new(
@@ -113,5 +114,26 @@ is_deeply($ollama_openai_data, {
   stream => JSON->false,
   temperature => 0.5,
 }, 'Ollama OpenAI request body is correct');
+
+my $groq = Langertha::Engine::Groq->new(
+  api_key => 'apikey',
+  model => 'gemma2-9b-it',
+  system_prompt => 'systemprompt',
+);
+my $groq_request = $groq->chat('testprompt');
+is($groq_request->uri, 'https://api.groq.com/openai/v1/chat/completions', 'Groq request uri is correct');
+is($groq_request->method, 'POST', 'OpenAI request method is correct');
+is($groq_request->header('Authorization'), 'Bearer apikey', 'Groq request Authorization header is correct');
+is($groq_request->header('Content-Type'), 'application/json; charset=utf-8', 'Groq request JSON Content Type is set');
+my $groq_data = $json->decode($groq_request->content);
+is_deeply($groq_data, {
+  messages => [{
+    content => "systemprompt", role => "system",
+  },{
+    content => "testprompt", role => "user",
+  }],
+  model => "gemma2-9b-it",
+  stream => JSON->false,
+}, 'Groq request body is correct');
 
 done_testing;

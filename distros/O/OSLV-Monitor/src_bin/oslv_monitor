@@ -17,15 +17,15 @@ oslv_monitor - LibreNMS style JSON SNMP extend for OS level virtualization monit
 
 =head1 VERSION
 
-0.0.1
+0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 =head1 SYNOPSIS
 
-oslv_monitor [B<-c>] [B<-f> <config file>] [B<-f> <config json>] [B<-q>]
+oslv_monitor [B<-c>] [B<-f> <config file>] [B<-b> <base dir>] [B<-q>]
 
 =head1 DESCRIPTION
 
@@ -107,6 +107,7 @@ GetOptions(
 	'h'       => \$help,
 	'q'       => \$quiet,
 	'f=s'     => \$config_file,
+	'b=s'     => \$base_dir,
 );
 
 if ($version) {

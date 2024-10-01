@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-Signal.pm - Fred Fish library extension to trap Signals.
+Fred::Fish::DBUG::Signal - Fred Fish library extension to trap Signals.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-use Fred::Fish::DBUG::ON 2.03;
+use Fred::Fish::DBUG::ON 2.04;
 
 use Perl::AtEndOfScope;
 use Config qw( %Config );
@@ -57,7 +57,7 @@ use File::Basename;
 use Cwd 'abs_path';
 use Sub::Identify 'sub_fullname';
 
-$VERSION = "2.03";
+$VERSION = "2.04";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( DBUG_TRAP_SIGNAL  DBUG_FIND_CURRENT_TRAPS  DBUG_DIE_CONTEXT

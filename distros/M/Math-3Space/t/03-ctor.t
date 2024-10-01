@@ -15,6 +15,14 @@ is( Math::3Space::space(), object {
 	call parent => undef;
 }, 'global ctor' );
 
+is space(), '[
+ [1 0 0]
+ [0 1 0]
+ [0 0 1]
+ [0 0 0]
+]
+', 'stringify';
+
 is( my $s1= space(), object {
 	call xv     => check_vec(1, 0, 0);
 	call yv     => check_vec(0, 1, 0);

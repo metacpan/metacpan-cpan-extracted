@@ -8,7 +8,7 @@ package Sumu::Perl::Modules;
 
 =head1 VERSION
 
-version 0.3.4
+version 0.3.7
 
 =head2 DESC
 
@@ -23,31 +23,42 @@ version 0.3.4
 =cut
 
 use strict;
-use warnings;
+#use warnings;
 
-=head2 VERSION
+=head2 our VERSION
 
-    our VERSION = 'N.N.N'
+    our $VERSION = '0.3.7'
 
 =cut
 
-our $VERSION = '0.3.4';
+our $VERSION = '0.3.7';
+
+=head2 Internals
+
+    Exporter
+
+=cut    
 
 use parent qw(Exporter); 
 require Exporter; 
 our @ISA = ("Exporter"); 
 
 our @EXPORT_OK = qw(
+    NAME 
     _extutils 
     _dirs 
     _doc
 ); 
 
 =head3 sub NAME
-    Returns the name of the app/module
+
+    Returns NAME: 
+    
+        The name of the app/module
+
 =cut
 
-sub NAME { my $self = shift; my $NAME = "Perl Modules"; return $NAME; }
+sub NAME { my $self = shift; my $NAME = "Sumu Perl Modules"; return $NAME; }
 
 
 =head3 Sub new
@@ -75,7 +86,9 @@ my $inst = ExtUtils::Installed->new();
 
 
 =head3 Sub _extutils
+
     Returns List of modules 
+
 =cut
 
 sub _extutils {

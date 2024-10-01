@@ -22,6 +22,7 @@ $VERSION = "2.03";
               bail
               dbug_active_ok_test
               get_fish_log
+              get_delay_file
               get_fish_module
               get_fish_opts
               get_called_by_code_ref
@@ -43,6 +44,7 @@ $VERSION = "2.03";
 
 # The name of the log file to use ...
 my $fish_file;
+my $delay_file;
 
 # The use/import options for the module ...
 my @fish_opts;
@@ -75,12 +77,16 @@ BEGIN
 
    $fish_file = File::Spec->catfile (dirname ($fish_file), "fish", basename ($fish_file));
 
+   my $num = (basename($0) =~ m/^(\d+)/) ? $1 : "0";
+   $delay_file = File::Spec->catfile (dirname ($0), "fish", "delay_" . $num . ".txt");
+
    @fish_opts = qw / on /;
 
    if ( $ENV{FISH_OFF_FLAG} ) {
       unlink ( $fish_file );
       @fish_opts = qw / off /  if ( $ENV{FISH_OFF_FLAG} < 0 );
    }
+   unlink ( $delay_file );
 
    # Can't use use_ok() here!  It messes the flow of the tests ...
    # use_ok ("Fred::Fish::DBUG", @fish_opts);
@@ -186,6 +192,11 @@ sub dbug_active_ok_test
 sub get_fish_log
 {
    return ( $fish_file );
+}
+
+sub get_delay_file
+{
+   return ( $delay_file );
 }
 
 # Returns the ON or OFF modue used for the spcified file.

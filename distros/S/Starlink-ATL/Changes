@@ -1,5 +1,8 @@
 Revision history for Starlink::ATL
 
+0.07 2024-09-30
+    - Added Astro::FITS::CFITSIO to requirements.
+
 0.06 2024-09-25
     - Moved MOC reading and writing functions from astmoctool
       script to new module Starlink::ATL::MOC.

@@ -64,9 +64,13 @@ subtest reproject_space_via_common_parent => sub {
 	# translate by (1,1,1).
 	my $vec= vec3(1,1,1);
 	$sp3->unproject_inplace($vec);
+	is( $vec, vec_check(1,1,-1) );
 	$sp3->parent->unproject_inplace($vec);
+	is( $vec, vec_check(1,1,-1) );
 	$sp3->parent->parent->unproject_inplace($vec);
+	is( $vec, vec_check(1,1.39680224,-0.22123174) );
 	$sp2->parent->project_inplace($vec);
+	is( $vec, vec_check(1,1,-1) );
 	$sp2->project_inplace($vec);
 	is( $vec, vec_check(2,2,0), 'transform vec the long way' );
 	# now reparent a clone of sp2 into sp3 so that we can just project into that

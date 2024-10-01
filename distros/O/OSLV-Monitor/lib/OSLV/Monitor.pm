@@ -10,11 +10,11 @@ OSLV::Monitor - OS level virtualization monitoring extend for LibreNMS.
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.1.0';
 
 =head1 SYNOPSIS
 
@@ -51,6 +51,9 @@ The keys are list as below.
     - backend :: The name of the backend to use. If undef, it is choosen based on $^O
         freebsd :: FreeBSD
         linux :: cgroups
+
+    - base_dir :: The dir to use for any caches as well as output.
+        Default :: /var/cache/oslv_monitor
 
     - include :: An array of regexps to match names against for seeing if they should
             be included or not. By default everything is return.
@@ -106,6 +109,10 @@ sub new {
 
 	if ( !defined( $opts{base_dir} ) ) {
 		$opts{base_dir} = '/var/cache/oslv_monitor';
+	}
+
+	if (!-d $opts{base_dir}) {
+		mkdir($opts{base_dir}) || die($opts{base_dir}.' was not a directory and could not be created');
 	}
 
 	my $self = {

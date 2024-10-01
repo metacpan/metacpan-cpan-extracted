@@ -128,8 +128,12 @@ my $start_level;
 sub my_warn
 {
    chomp (my $msg = shift);
-   my $sts = ( $msg =~ m/^In a depth of \d+/ ) ? 1 : 0;
-   ok3 ($sts, "There was an expected warning!  Check fish. (Thread " . threads->tid() . ")");
+   my $sts1 = ( $msg =~ m/^In a depth of \d+/ ) ? 1 : 0;
+
+   # One of the CPAN testers gets this warning.
+   my $sts2 = ( $msg =~ m/SHM Read error: Invalid argument/ ) ? 1 : 0;
+
+   ok3 ($sts1 || $sts2, "There was an expected warning!  Check fish. (Thread " . threads->tid() . ")");
 
    # Get where the origial warn happened!
    # Skipp over the DBUG code.

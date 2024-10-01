@@ -21,7 +21,7 @@ use Perl::Critic::Utils qw(
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.06;
+our $VERSION = '0.07';
 
 #-----------------------------------------------------------------------------
 
@@ -92,7 +92,7 @@ sub violates {
 
     my @included_packages = get_package_names_from_include_statements( $doc );
 
-    my @violations = ();
+    my @violations;
     for my $elem ( find_subroutine_calls($doc) ){
 
         next if is_qualified_name( $elem );
@@ -171,7 +171,7 @@ Jeffrey Ryan Thalhammer <thaljef@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 Jeffrey Ryan Thalhammer.  All rights reserved.
+Copyright 2007-2024 Jeffrey Ryan Thalhammer and Andy Lester
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.  The full text of this license can be found in

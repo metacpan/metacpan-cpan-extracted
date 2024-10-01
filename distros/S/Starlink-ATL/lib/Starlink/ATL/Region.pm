@@ -22,7 +22,7 @@ use strict;
 use Exporter;
 use Starlink::AST;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 our @ISA = qw/Exporter/;
 our @EXPORT_OK = qw/merge_regions/;
 

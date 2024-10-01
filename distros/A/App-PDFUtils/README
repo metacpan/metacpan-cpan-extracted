@@ -2,32 +2,22 @@ NAME
     App::PDFUtils - Command-line utilities related to PDF files
 
 VERSION
-    This document describes version 0.015 of App::PDFUtils (from Perl
-    distribution App-PDFUtils), released on 2023-02-10.
+    This document describes version 0.016 of App::PDFUtils (from Perl
+    distribution App-PDFUtils), released on 2024-09-28.
 
 SYNOPSIS
+DESCRIPTION
     This distribution provides tha following command-line utilities related
     to PDF files:
 
-    *   add-pdf-password
-
-    *   compress-pdf
-
-    *   convert-epub-to-pdf
-
-    *   epub2pdf
-
-    *   grep-from-pdf
-
-    *   less-pdf-text
-
-    *   pdf-has-password
-
-    *   pdfgrep
-
-    *   pdfnopass
-
-    *   remove-pdf-password
+    1. add-pdf-password
+    2. compress-pdf
+    3. grep-from-pdf
+    4. less-pdf-text
+    5. pdf-has-password
+    6. pdfgrep
+    7. pdfnopass
+    8. remove-pdf-password
 
 FUNCTIONS
   add_pdf_password
@@ -38,7 +28,11 @@ FUNCTIONS
     Password-protect PDF files.
 
     This program is a wrapper for qpdf to password-protect PDF files
-    (in-place). This is the counterpart for remove-pdf-password.
+    (in-place). This is the counterpart for remove-pdf-password. Why use
+    this wrapper instead of qpdf directly? This wrapper offers configuration
+    file support, where you can put the password(s) you want to use there.
+    The wrapper also offers multiple file support and additional options,
+    e.g. whether to create backup.
 
     This function is not exported.
 
@@ -82,8 +76,8 @@ FUNCTIONS
 
      % gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile=output.pdf input.pdf
 
-    with support for multiple files and output files automatically named
-    "INPUT.compressed.pdf".
+    This wrapper offers support for multiple files and automatically naming
+    output "INPUT.compressed.pdf" by default.
 
     This function is not exported.
 
@@ -115,44 +109,6 @@ FUNCTIONS
 
     Return value: (any)
 
-  convert_epub_to_pdf
-    Usage:
-
-     convert_epub_to_pdf(%args) -> [$status_code, $reason, $payload, \%result_meta]
-
-    Convert epub file to PDF.
-
-    This utility is a simple wrapper to "ebook-convert". It allows setting
-    output filenames ("foo.epub.pdf") so you don't have to specify them
-    manually. It also allows processing multiple files in a single
-    invocation
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   files* => *array[filename]*
-
-        (No description)
-
-    *   overwrite => *bool*
-
-        (No description)
-
-    Returns an enveloped result (an array).
-
-    First element ($status_code) is an integer containing HTTP-like status
-    code (200 means OK, 4xx caller error, 5xx function error). Second
-    element ($reason) is a string containing error message, or something
-    like "OK" if status is 200. Third element ($payload) is the actual
-    result, but usually not present when enveloped result is an error
-    response ($status_code is not 2xx). Fourth element (%result_meta) is
-    called result metadata and is optional, a hash that contains extra
-    information, much like how HTTP response headers provide additional
-    metadata.
-
-    Return value: (any)
-
   convert_pdf_to_text
     Usage:
 
@@ -163,6 +119,12 @@ FUNCTIONS
     This utility uses one of the following backends:
 
     *   pdftotext
+
+    as well as optionally uses pdftk to manipulate PDF, and fmt to format
+    text. It offers some options and conveniences like page ranges, output
+    file specification, whether to overwrite existing files, etc.
+
+    TODO: add ocrmypdf as backend.
 
     This function is not exported.
 
@@ -221,6 +183,9 @@ FUNCTIONS
 
     Check if PDF file has password.
 
+    This is a wrapper for "qpdf --check". The wrapper offers additional
+    options like `--quiet``.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -257,7 +222,7 @@ FUNCTIONS
     This program is a wrapper for qpdf to remove passwords from PDF files
     (in-place).
 
-    The motivation for this program is the increasing occurence of financial
+    The motivation for this wrapper is the increasing occurence of financial
     institutions sending financial statements or documents in the format of
     password-protected PDF file. This is annoying when we want to archive
     the file or use it in an organization because we have to remember
@@ -265,6 +230,11 @@ FUNCTIONS
     the password everytime we want to use the file. (The banks could've sent
     the PDF in a password-protected .zip, or use PGP-encrypted email, but I
     digress.)
+
+    Compared to using qpdf directly, this wrapper offers some additional
+    features/options and convenience, for example: multiple file support,
+    multiple password matching attempt, configuration file, option whether
+    you want backup, etc.
 
     You can provide the passwords to be tried in a configuration file,
     "~/remove-pdf-password.conf", e.g.:
@@ -338,8 +308,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2021, 2020, 2017 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2017 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

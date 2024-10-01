@@ -1,6 +1,6 @@
 package Math::3Space::Vector;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 # ABSTRACT: Object wrapping a buffer of three doubles
 
 use Exporter 'import';
@@ -8,6 +8,8 @@ our @EXPORT_OK= qw( vec3 );
 
 # All methods handled by XS
 require Math::3Space;
+
+use overload '""' => sub { "[@{[$_[0]->xyz]}]" };
 
 1;
 
@@ -49,6 +51,8 @@ to pass vectors around without fully allocating Perl structures for them.
 
   $vec= vec3($x, $y, $z);
   $vec= vec3([ $x, $y, $z ]);
+  $vec= vec3({ x => $x, y => $y, z => $z });
+  $vec= pdl([ $x, $y, $z ]);
   $vec2= vec3($vec);
 
 =head2 new
@@ -57,6 +61,7 @@ to pass vectors around without fully allocating Perl structures for them.
   $vec= Math::3Space::Vector->new([ $x, $y, $z ]);
   $vec= Math::3Space::Vector->new(x => $x, y => $y, z => $z);
   $vec= Math::3Space::Vector->new({ x => $x, y => $y, z => $z });
+  $vec= Math::3Space::Vector->new(pdl([ $x, $y, $z ]));
 
 =head1 ATTRIBUTES
 
@@ -124,6 +129,16 @@ Multiply each component of the vector by a scalar.
 
 Dot product with another vector.
 
+=head2 cos
+
+  $cos= $vector->cos($vector2);
+  $cos= $vector->cos($x,$y,$z);
+  $cos= $vector->cos([$x,$y,$z]);
+
+Return the vector-cosine to the other vector.  This is the same as the dot product divided by
+the magnitudes of the vectors, or identical to the dot product when the vectors are unit-length.
+This dies if either vector is zero length (or too close to zero for available floating precision).
+
 =head2 cross
 
   $c= $a->cross($b);
@@ -134,17 +149,27 @@ Dot product with another vector.
 Return a new vector which is the cross product C<< A x B >>, or if called with 2 parameters
 assign the cross product to the object itself.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<PDL>
+
+Perl Data Language ndarray are a good alternative, allowing for operations on many vectors in parallel.
+
+=back
+
 =head1 AUTHOR
 
 Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

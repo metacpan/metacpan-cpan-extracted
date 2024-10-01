@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-10'; # DATE
+our $DATE = '2024-09-28'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/pdfgrep/pdfgrep",
@@ -42,7 +42,7 @@ pdfgrep - Short alias for grep-from-pdf
 
 =head1 VERSION
 
-This document describes version 0.015 of pdfgrep (from Perl distribution App-PDFUtils), released on 2023-02-10.
+This document describes version 0.016 of pdfgrep (from Perl distribution App-PDFUtils), released on 2024-09-28.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ B<pdfgrep> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?
 
 B<pdfgrep> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<pdfgrep> [B<L<--all|/"--all">>] [B<L<--color|/"--color=s">>=I<str>] [B<L<--count|/"--count, -c">>|B<L<-c|/"--count, -c">>] [B<L<--dash-prefix-inverts|/"--dash-prefix-inverts">>|B<L<--no-dash-prefix-inverts|/"--dash-prefix-inverts">>|B<L<--nodash-prefix-inverts|/"--dash-prefix-inverts">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [(B<L<--file|/"--files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--files-json|/"--files-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-case|/"--ignore-case, -i">>|B<L<-i|/"--ignore-case, -i">>|B<L<--no-ignore-case|/"--ignore-case, -i">>|B<L<--noignore-case|/"--ignore-case, -i">>] [B<L<--invert-match|/"--invert-match, -v">>|B<L<-v|/"--invert-match, -v">>|B<L<--no-invert-match|/"--invert-match, -v">>|B<L<--noinvert-match|/"--invert-match, -v">>] [B<L<--line-number|/"--line-number, -n">>|B<L<-n|/"--line-number, -n">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quiet-arg|/"--quiet-arg, --silent, -q">>|B<L<-q|/"--quiet-arg, --silent, -q">>|B<L<--silent|/"--quiet-arg, --silent, -q">>] [(B<L<--regexp|/"--regexps-json=s">>=I<str>)+|B<L<--regexps-json|/"--regexps-json=s">>=I<json>|(B<L<-e|/"--regexps-json=s">>=I<str>)+] -- [I<L<pattern|/"--pattern=s">>] [I<L<file|/"--files-json=s">>] ...
+B<pdfgrep> [B<L<--all|/"--all">>] [B<L<--color|/"--color=s">>=I<str>] [B<L<--count|/"--count, -c">>|B<L<-c|/"--count, -c">>] [B<L<--dash-prefix-inverts|/"--dash-prefix-inverts">>|B<L<--no-dash-prefix-inverts|/"--dash-prefix-inverts">>|B<L<--nodash-prefix-inverts|/"--dash-prefix-inverts">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [(B<L<--file|/"--files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--files-json|/"--files-json=s">>=I<json>] [B<L<--files-with-matches|/"--files-with-matches, -l">>|B<L<-l|/"--files-with-matches, -l">>] [B<L<--files-without-match|/"--files-without-match, -L">>|B<L<-L|/"--files-without-match, -L">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-case|/"--ignore-case, -i">>|B<L<-i|/"--ignore-case, -i">>|B<L<--no-ignore-case|/"--ignore-case, -i">>|B<L<--noignore-case|/"--ignore-case, -i">>] [B<L<--invert-match|/"--invert-match, -v">>|B<L<-v|/"--invert-match, -v">>|B<L<--no-invert-match|/"--invert-match, -v">>|B<L<--noinvert-match|/"--invert-match, -v">>] [B<L<--line-number|/"--line-number, -n">>|B<L<-n|/"--line-number, -n">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quiet-arg|/"--quiet-arg, --silent, -q">>|B<L<-q|/"--quiet-arg, --silent, -q">>|B<L<--silent|/"--quiet-arg, --silent, -q">>] [(B<L<--regexp|/"--regexps-json=s">>=I<str>)+|B<L<--regexps-json|/"--regexps-json=s">>=I<json>|(B<L<-e|/"--regexps-json=s">>=I<str>)+] -- [I<L<pattern|/"--pattern=s">>] [I<L<file|/"--files-json=s">>] ...
 
 =head1 DESCRIPTION
 
@@ -128,7 +128,15 @@ Valid values:
 
 =item B<--count>, B<-c>
 
-Supress normal output, return a count of matching lines.
+Supress normal output; instead return a count of matching lines.
+
+=item B<--files-with-matches>, B<-l>
+
+Supress normal output; instead return filenames with matching lines; scanning for each file will stop on the first match.
+
+=item B<--files-without-match>, B<-L>
+
+Supress normal output; instead return filenames without matching lines.
 
 =item B<--quiet-arg>, B<--silent>, B<-q>
 
@@ -353,7 +361,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

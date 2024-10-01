@@ -1,7 +1,7 @@
 package Langertha::Role::Seed;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for an engine that can set a seed
-$Langertha::Role::Seed::VERSION = '0.005';
+$Langertha::Role::Seed::VERSION = '0.006';
 use Moose::Role;
 use Carp qw( croak );
 
@@ -34,7 +34,7 @@ Langertha::Role::Seed - Role for an engine that can set a seed
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -1,7 +1,7 @@
 package Langertha::Role::Embedding;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for APIs with embedding functionality
-$Langertha::Role::Embedding::VERSION = '0.005';
+$Langertha::Role::Embedding::VERSION = '0.006';
 use Moose::Role;
 use Carp qw( croak );
 
@@ -48,7 +48,7 @@ Langertha::Role::Embedding - Role for APIs with embedding functionality
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

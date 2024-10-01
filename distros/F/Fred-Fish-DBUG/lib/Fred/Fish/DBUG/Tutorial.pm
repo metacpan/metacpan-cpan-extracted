@@ -1,9 +1,9 @@
 ###
 ###  Copyright (c) 2019 - 2024 Curtis Leach.  All rights reserved.
 ###
-###  Module: Fred::Fish::Tutorial
+###  Module: Fred::Fish::DBUG::Tutorial
 
-package Fred::Fish::Tutorial;
+package Fred::Fish::DBUG::Tutorial;
 
 use strict;
 use warnings;
@@ -11,13 +11,10 @@ use warnings;
 use vars qw ( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION   = "2.03";
+$VERSION   = "2.04";
 @ISA       = qw ( Exporter );
 @EXPORT    = qw ();
 @EXPORT_OK = qw ();
-
-# Required if module is included w/ require command;
-1;
 
 # =============================================================================
 # Only POD text appears below this line!
@@ -25,8 +22,8 @@ $VERSION   = "2.03";
 
 =head1 NAME
 
-Tutorial.pm - Gives a basic tutorial on how to use the L<Fred::Fish::DBUG>
-module.
+Fred::Fish::DBUG::Tutorial - Gives a basic tutorial on how to use the
+L<Fred::Fish::DBUG> module.
 
 =head1 SYNOPSIS
 
@@ -217,8 +214,8 @@ expect to see this value as a string in your data and know which is which.
 =head1 EXAMPLE # 6 - Lets do some printing ...
 
     use Fred::Fish::DBUG qw / on /;
-    DBUG_PUSH ($file);         # Assuming $file is already set.
-    DBUG_ENTER_FUNC (@ARGV, kill_end_trace => 1);
+    DBUG_PUSH ($file, kill_end_trace => 1);    # Assuming $file is already set.
+    DBUG_ENTER_FUNC (@ARGV);
     some_function ( qw /Once upon a time!/ );
     DBUG_LEAVE (0);
 
@@ -703,3 +700,6 @@ code bases.
 
 =cut
 
+# ==============================================================
+#required if module is included w/ require command;
+1;

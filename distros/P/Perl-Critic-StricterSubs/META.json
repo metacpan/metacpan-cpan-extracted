@@ -4,7 +4,7 @@
       "Jeffrey Thalhammer <thaljef@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -50,31 +50,31 @@
    "provides" : {
       "Perl::Critic::Policy::Modules::RequireExplicitInclusion" : {
          "file" : "lib/Perl/Critic/Policy/Modules/RequireExplicitInclusion.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs" : {
          "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitCallsToUndeclaredSubs.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs" : {
          "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitCallsToUnexportedSubs.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs" : {
          "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitExportingUndeclaredSubs.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Perl::Critic::Policy::Subroutines::ProhibitQualifiedSubDeclarations" : {
          "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitQualifiedSubDeclarations.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Perl::Critic::StricterSubs" : {
          "file" : "lib/Perl/Critic/StricterSubs.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Perl::Critic::StricterSubs::Utils" : {
          "file" : "lib/Perl/Critic/StricterSubs/Utils.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -90,6 +90,5 @@
          "url" : "git://github.com/Perl-Critic/Perl-Critic-StricterSubs.git"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.07"
 }

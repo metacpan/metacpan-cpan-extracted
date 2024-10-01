@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Unicode
 
+v0.3.8 2024-10-01T14:40:46+0900
+    - Change in minimum supported perl version to v5.10.1 to include overloading
+
 v0.3.7 2024-09-22T08:38:38+0900
     - Minor change in value returned in boolean
 

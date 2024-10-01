@@ -30,7 +30,7 @@ else {
     fail("No experimental features available on perl $]");
 }
 
-if ($] >= 5.010001) {
+if ($] >= 5.010001 && $] <= 5.040) {
     is (eval <<'END', 1, 'switch compiles') or diag $@;
     use experimentals;
     sub bar { 1 };

@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use base 'Perl::Critic::Policy';
 
+use Readonly;
+
 use Perl::Critic::Utils qw(
     :characters
     :severities
@@ -15,6 +17,10 @@ use Perl::Critic::Utils qw(
     &policy_short_name
 );
 
+use Perl::Critic::Exception::Configuration::Option::Policy::ParameterValue qw(
+    throw_policy_value
+);
+
 use Perl::Critic::StricterSubs::Utils qw(
     &get_package_names_from_include_statements
     &get_package_names_from_package_statements
@@ -22,17 +28,120 @@ use Perl::Critic::StricterSubs::Utils qw(
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.06;
+our $VERSION = '0.07';
 
 my $expl =
     'Without importing a package, it is unlikely that references to things inside it even exist.';
 
 #-----------------------------------------------------------------------------
 
-sub supported_parameters { return }
+sub supported_parameters {
+    return (
+        {
+            name            => 'ignore_modules',
+            description     => 'The names of modules to ignore if a violation is found',
+            default_string  => q{},
+            parser          => \&_parse_modules,
+        },
+    );
+}
 sub default_severity     { return $SEVERITY_HIGH          }
 sub default_themes       { return qw( strictersubs bugs ) }
 sub applies_to           { return 'PPI::Document'         }
+
+#-----------------------------------------------------------------------------
+
+Readonly my $MODULE_NAME_REGEX =>
+    qr{
+        \b
+        [[:alpha:]_]
+        (?:
+            (?: \w | :: )*
+            \w
+        )?
+        \b
+    }xms;
+Readonly my $REGULAR_EXPRESSION_REGEX => qr{ [/] ( [^/]+ ) [/] }xms;
+
+# It's kind of unfortunate that I had to put capturing parentheses in the
+# component regexes above, because they're not visible here and so make
+# figuring out the positions of captures hard.  Too bad we can't make the
+# minimum perl version 5.10. :]
+Readonly my $MODULES_REGEX =>
+    qr{
+        \A
+        \s*
+        (?:
+                ( $MODULE_NAME_REGEX )
+            |   $REGULAR_EXPRESSION_REGEX
+        )
+        \s*
+    }xms;
+
+#-----------------------------------------------------------------------------
+
+sub _parse_modules {
+    my ($self, $parameter, $config_string) = @_;
+
+    my $module_specifications = $config_string // $parameter->get_default_string();
+
+    return if not $module_specifications;
+    return if $module_specifications =~ m{ \A \s* \z }xms;
+
+    while ( $module_specifications =~ s{ $MODULES_REGEX }{}xms ) {
+        my ($module, $regex_string) = ($1, $2);
+
+        $self->_handle_module_specification(
+            module                  => $module,
+            regex_string            => $regex_string,
+            option_name             => 'ignore_modules',
+            option_value            => $config_string,
+        );
+    }
+
+    if ($module_specifications) {
+        throw_policy_value
+            policy         => $self->get_short_name(),
+            option_name    => 'ignore_modules',
+            option_value   => $config_string,
+            message_suffix =>
+                qq{contains unparseable data: "$module_specifications"};
+    }
+
+    return;
+}
+
+
+sub _handle_module_specification {
+    my ($self, %arguments) = @_;
+
+    if ( my $regex_string = $arguments{regex_string} ) {
+        # These are module name patterns (e.g. /Acme/)
+        my $actual_regex;
+
+        eval { $actual_regex = qr/$regex_string/; 1 }  ## no critic (ExtendedFormatting, LineBoundaryMatching, DotMatchAnything)
+            or throw_policy_value
+                policy         => $self->get_short_name(),
+                option_name    => $arguments{option_name},
+                option_value   => $arguments{option_value},
+                message_suffix =>
+                    qq{contains an invalid regular expression: "$regex_string"};
+
+        # Can't use a hash due to stringification, so this is an AoA.
+        $self->{_ignore_modules_regexes} ||= [];
+
+        push
+            @{ $self->{_ignore_modules_regexes} },
+            $actual_regex;
+    }
+    else {
+        # These are literal module names (e.g. Acme::Foo)
+        $self->{_ignore_modules} ||= {};
+        $self->{_ignore_modules}{ $arguments{module} } = undef;
+    }
+
+    return;
+}
 
 #-----------------------------------------------------------------------------
 
@@ -44,7 +153,7 @@ sub violates {
     if ( @declared_packages > 1 ) {
         my $fname = $doc->filename() || 'unknown';
         my $pname = policy_short_name(__PACKAGE__);
-        warn qq{$pname: Cannot cope with mutiple packages in file "$fname"\n};
+        warn qq{$pname: Cannot cope with multiple packages in file "$fname"\n};
         return;
     }
 
@@ -188,17 +297,37 @@ sub _extract_package_from_symbol {
 sub _find_violations {
 
     my ($self, $doc, $included_packages, $finder, $package_extractor) = @_;
-    my @violations = ();
+    my @violations;
 
     for my $call ( $finder->( $doc ) ) {
         my $package = $package_extractor->( $call );
         next if exists $included_packages->{ $package };
+        next if $self->_is_ignored_module( $package );
+
+        next if exists $self->{_ignore_modules}->{ $package };
 
         my $desc = qq{Use of "$call" without including "$package"};
         push @violations, $self->violation( $desc, $expl, $call );
     }
 
     return @violations;
+}
+
+
+sub _is_ignored_module {
+    my ($self, $package) = @_;
+
+    my $ignore_hash = ($self->{_ignore_modules} //= {});
+    return if $ignore_hash->{ $package };
+
+    my $ignore_regex_list = ($self->{_ignore_modules_regexes} //= []);
+    for my $i ( @{$ignore_regex_list} ) {
+        if ( $package =~ m/$i/smx ) {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 #-----------------------------------------------------------------------------
@@ -362,6 +491,34 @@ in the scope of a file or a C<BEGIN>, C<CHECK>, or C<INIT> block.
       push @Lexical::Block::numbers, 52, 93, 25; #not ok
   }
 
+=head1 CONFIGURATION
+
+You can configure a list of modules that should be ignored by this policy.
+For example, it's common to use Test::Builder's variables in functions
+built on Test::More.
+
+    use Test::More
+
+    sub test_something {
+        local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+        return is( ... );
+    }
+
+Using Test::More also brings in Test::Builder, so you don't need to do
+a call to C<use>.  Unfortunately that trips this policy.
+
+So to ignore violations on Test::Builder, you can add to your perlcriticrc
+file this section:
+
+    [Modules::RequireExplicitInclusion]
+    ignore_modules = Test::Builder
+
+The C<ignore_modules> argument can take a space-delimited list of modules,
+or of regexes, or both.
+
+    [Modules::RequireExplicitInclusion]
+    ignore_modules = Test::Builder /MooseX::/
 
 =head1 CAVEATS
 
@@ -396,15 +553,11 @@ subroutine is made, this Policy does not check that a
 C<process_widgets()> subroutine actually exists in the C<Foo> package.
 
 
-=head1 CONFIGURATION
-
-None.
-
 =head1 DIAGNOSTICS
 
 =over
 
-=item C<Modules::RequireExplicitInclusion: Cannot cope with mutiple packages in file>
+=item C<Modules::RequireExplicitInclusion: Cannot cope with multiple packages in file>
 
 This warning happens when the file under analysis contains multiple packages,
 which is not currently supported.  This Policy will simply ignore any file
@@ -425,7 +578,7 @@ Jeffrey Ryan Thalhammer <thaljef@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 Jeffrey Ryan Thalhammer.  All rights reserved.
+Copyright 2007-2024 Jeffrey Ryan Thalhammer and Andy Lester
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.  The full text of this license can be found in

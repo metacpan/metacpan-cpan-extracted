@@ -1,5 +1,15 @@
 Revision history for Perl module Perl::Critic::StricterSubs
 
+0.07 2024-09-30
+
+    [Enhancements]
+    * ProhibitCallsToUndeclaredSubs did not know that functions like
+      flock and seek and opendir took filehandles or readhandles, so would
+      give false positives. (GH#15)
+
+    * Added configuration to Modules::RequireExplicitInclusion to specify
+      modules to ignore for violations.
+
 0.06 2022-04-25
 
     [Enhancements]

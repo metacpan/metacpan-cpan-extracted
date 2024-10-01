@@ -1,6 +1,6 @@
 package Modern::Perl;
 # ABSTRACT: enable all of the features of Modern Perl with one import
-$Modern::Perl::VERSION = '1.20240115';
+$Modern::Perl::VERSION = '1.20241001';
 use 5.010_000;
 
 use strict;
@@ -27,6 +27,11 @@ sub VERSION {
     return $default;
 }
 
+my $unimport_tag;
+BEGIN {
+    $unimport_tag = $] > 5.015 ? ':all' : ':5.10';
+}
+
 sub import {
     my ($class, $date) = @_;
     $date = $wanted_date unless defined $date;
@@ -36,7 +41,7 @@ sub import {
 
     warnings->import;
     strict->import;
-    feature->unimport( ':all' );
+    feature->unimport( $unimport_tag );
     feature->import( $feature_tag );
 
     if ($feature_tag ge ':5.34') {
@@ -106,7 +111,7 @@ Modern::Perl - enable all of the features of Modern Perl with one import
 
 =head1 VERSION
 
-version 1.20240115
+version 1.20241001
 
 =head1 SYNOPSIS
 
@@ -227,6 +232,9 @@ equivalent to the use of this module. For the purpose of forward compatibility,
 this module will continue to work as expected--and will continue regular
 maintenance.
 
+As of Perl 5.41.4, C<given> is no longer available, so any import tags for
+older versions of Perl will not enable this feature, no matter how much you try.
+
 =head1 AUTHOR
 
 chromatic, C<< <chromatic at wgz.org> >>
@@ -275,8 +283,8 @@ Damian Conway (inspiration from L<Toolkit>), Florian Ragwitz
 (L<B::Hooks::Parser>, so I didn't have to write it myself), chocolateboy (for
 suggesting that I don't even need L<B::Hooks::Parser>), Damien Learns Perl,
 David Moreno, Evan Carroll, Elliot Shank, Andreas König, Father Chrysostomos,
-Gryphon Shafer, and Norbert E. Grüner for reporting bugs, filing patches, and
-requesting features.
+Gryphon Shafer, Norbert E. Grüner, and Slaven Rezic for reporting bugs, filing
+patches, and requesting features.
 
 =head1 AUTHOR
 
@@ -284,7 +292,7 @@ chromatic
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 20242424242424242424 by chromatic@wgz.org.
+This software is copyright (c) 2024 by chromatic@wgz.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

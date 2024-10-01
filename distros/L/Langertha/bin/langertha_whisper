@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use Langertha::Engine::Whisper;
 use Langertha::Engine::OpenAI;
+use Langertha::Engine::Groq;
 use Carp qw( croak );
 use Time::HiRes qw( time );
 use Path::Tiny;
@@ -19,13 +20,17 @@ if ($ENV{LANGERTHA_WHISPER_OPENAI_API_KEY}) {
   $engine = Langertha::Engine::OpenAI->new(
     api_key => $ENV{LANGERTHA_WHISPER_OPENAI_API_KEY},
   );
+} elsif ($ENV{LANGERTHA_WHISPER_GROQ_API_KEY}) {
+  $engine = Langertha::Engine::Groq->new(
+    api_key => $ENV{LANGERTHA_WHISPER_GROQ_API_KEY},
+  );
 } elsif ($ENV{LANGERTHA_WHISPER_WHISPER_URL}) {
   $engine = Langertha::Engine::Whisper->new(
     url => $ENV{LANGERTHA_WHISPER_WHISPER_URL},
     $ENV{LANGERTHA_WHISPER_WHISPER_MODEL} ? ( model => $ENV{LANGERTHA_WHISPER_WHISPER_MODEL} ) : (),
   );  
 } else {
-  die "Requires LANGERTHA_WHISPER_WHISPER_URL or LANGERTHA_WHISPER_OPENAI_API_KEY";
+  die "Requires LANGERTHA_WHISPER_WHISPER_URL or LANGERTHA_WHISPER_OPENAI_API_KEY or LANGERTHA_WHISPER_GROQ_API_KEY";
 }
 
 my $start = time;
@@ -45,17 +50,25 @@ langertha_whisper - Simple transcription with a Whisper compatible server or Ope
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
-  bash$ LANGERTHA_WHISPER_WHISPER_URL=http://10.0.0.8:8000/v1 langertha_whisper sample.ogg
+  $ LANGERTHA_WHISPER_WHISPER_URL=http://10.0.0.8:8000/v1 langertha_whisper sample.ogg
+  This is an example sound file in AugVorbis format from Wikipedia, the free encyclopedia.
+   -- 13 seconds
+
+  $ LANGERTHA_WHISPER_GROQ_API_KEY=$GROQ_API_KEY langertha_whisper sample.ogg
+  This is an example sound file in AugVorbis format from Wikipedia, the free encyclopedia.
+   -- 13 seconds
+
+  $ LANGERTHA_WHISPER_OPENAI_API_KEY=$OPENAI_API_KEY langertha_whisper sample.ogg
   This is an example sound file in AugVorbis format from Wikipedia, the free encyclopedia.
    -- 13 seconds
 
 =head1 DESCRIPTION
 
-Simple transcription with a Whisper compatible server or OpenAI.
+Simple transcription with a Whisper compatible server, Groq or OpenAI.
 
 =head1 HOW TO INSTALL FASTER WHISPER
 

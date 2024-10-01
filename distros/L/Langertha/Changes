@@ -1,9 +1,55 @@
 ==================================================
-Changes from 1750-11-08 00:00:00 +0000 to present.
+Changes from 1750-12-17 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.005 at 2024-08-22 11:43:56 +0000
+version 0.006 at 2024-09-30 12:07:54 +0000
+------------------------------------------
+
+  Change: 5004555b6f69a68cb43bf3d5b88efae2289094d9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-09-30 14:07:25 +0000
+
+    More structured examples 
+
+  Change: 84b2e1d7102c64b6f06431bd8c3efe2ea10153cf
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-09-07 04:55:15 +0000
+
+    Added TEST_WITHOUT_STRUCTURED_OUTPUT 
+
+  Change: afc42ad6d1a7e430e47377980d87c92a62923647
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-09-07 04:14:27 +0000
+
+    Adding Structured Output support with sample script 
+
+  Change: e6092c6861053778c6aa347e792e1f10af5cc022
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-24 00:14:16 +0000
+
+    Ok, GitHub prefers 4 tab width 
+
+  Change: 8e2c0647b745ba062d3242fa686659634ad65c91
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-24 00:13:07 +0000
+
+    Reformatting README.md and adding Groq to it 
+
+  Change: 60e17e9c5ba222c15937a8f54fd2c3aafc9974b6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-23 23:49:14 +0000
+
+    Adding Groq support to langertha_whisper 
+
+  Change: 354de1214fccb4042e2ceacbe9b3ebd40c72e83d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-23 23:34:58 +0000
+
+    Adding Groq Engine 
+
+------------------------------------------
+version 0.005 at 2024-08-22 11:43:31 +0000
 ------------------------------------------
 
   Change: a02bd16589444b93b13e3cd52bbe9659f21efb4e

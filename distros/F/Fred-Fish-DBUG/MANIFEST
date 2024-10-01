@@ -5,6 +5,8 @@ MANIFEST
 Makefile.PL
 README
 full_developer_test.pl.src
+lib/Fred/Fish/DBUG/DEBUG.pm
+lib/Fred/Fish/DBUG/Log.pm
 lib/Fred/Fish/DBUG/OFF.pm
 lib/Fred/Fish/DBUG/ON.pm
 lib/Fred/Fish/DBUG/Signal.pm

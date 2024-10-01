@@ -30,7 +30,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Lingua-Word-Parser
   repository: https://github.com/ology/Lingua-Word-Parser.git
-version: '0.0808'
+version: '0.0809'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

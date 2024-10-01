@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016-2019 Joelle Maslak
+# Copyright (C) 2016-2021 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Range::Merge;
-$Range::Merge::VERSION = '2.191190';
+$Range::Merge::VERSION = '2.242740';
 use strict;
 use warnings;
 
@@ -66,6 +66,7 @@ sub merge_ipv4($cidr) {
 
 sub _cidr2range($cidr) {
     my ( $ip, @a ) = @$cidr;
+    die("Invalid IP address: $ip") if ( grep { /^0[0-9]/ } split( /[\/.]/, $ip ) );
     my ($range) = Net::CIDR::cidr2range($ip);
     my (@parts) = map { unpack( 'N', inet_aton($_) ) } split( /-/, $range );
 
@@ -224,7 +225,7 @@ Range::Merge - Merges ranges of data including subset/superset ranges
 
 =head1 VERSION
 
-version 2.191190
+version 2.242740
 
 =head1 SYNOPSIS
 
@@ -327,7 +328,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016-2019 by Joelle Maslak.
+This software is copyright (c) 2016-2021 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -12,7 +12,7 @@ use Carp;
 use Digest::SHA qw/ sha1_hex /;
 use Guard ();
 
-our $VERSION                  = "0.13";
+our $VERSION                  = "0.14";
 our $DEFAULT_EXPIRES          = 86400;
 our $RETRY_INTERVAL           = 0.5;
 our $BLOCKING_KEY_POSTFIX     = ":wait";
@@ -97,9 +97,9 @@ sub lock_guard {
     return Guard::guard {
         my $elapsed = Time::HiRes::tv_interval($start);
         if ($opt->{expires} < $elapsed) {
-            warnf "guard(token:%s) seems to be already expired. elasped %s sec", $token, $elapsed;
+            warnf "guard(key:%s token:%s) seems to be already expired. elasped %s sec", $key, $token, $elapsed;
         } elsif (0 < $WARN_LOCK_TIME_THRESHOLD && $WARN_LOCK_TIME_THRESHOLD < $elapsed) {
-            warnf "guard(token:%s) elasped %s sec", $token, $elapsed;
+            warnf "guard(key:%s token:%s) elasped %s sec", $key, $token, $elapsed;
         }
         release_lock($redis, $opt, $key, $token);
     };

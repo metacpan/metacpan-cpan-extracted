@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.3.7
+## Version v0.3.8
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/09/22
+## Modified 2024/10/01
 ## All rights reserved
 ## 
 ## 
@@ -407,7 +407,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.3.7';
+    our $VERSION = 'v0.3.8';
 };
 
 use strict;
@@ -3654,6 +3654,7 @@ BEGIN
 };
 use strict;
 use warnings;
+use overloading;
 
 sub new
 {
@@ -3937,7 +3938,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.3.7
+    v0.3.8
 
 =head1 DESCRIPTION
 

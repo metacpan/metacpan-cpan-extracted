@@ -1,7 +1,7 @@
 package Langertha::Role::Temperature;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for an engine that can have a temperature setting
-$Langertha::Role::Temperature::VERSION = '0.005';
+$Langertha::Role::Temperature::VERSION = '0.006';
 use Moose::Role;
 
 has temperature => (
@@ -24,7 +24,7 @@ Langertha::Role::Temperature - Role for an engine that can have a temperature se
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

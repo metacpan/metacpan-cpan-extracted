@@ -8,7 +8,7 @@
 
 =head1 NAME
 
-DBUG.pm - Fred Fish library for Perl
+Fred::Fish::DBUG - Fred Fish library for Perl
 
 =head1 SYNOPSIS  (Default)
 
@@ -67,7 +67,7 @@ In summary all the options are:
    use Fred::Fish::DBUG;         # Same as if qw / on / was used.
 
    # While enforcing a minimum version ...
-   use Fred::Fish::DBUG 2.03 qw / on /;
+   use Fred::Fish::DBUG 2.04 qw / on /;
 
 =head1 TRAPPING SIGNALS IN FISH
 
@@ -190,7 +190,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION = "2.03";
+$VERSION = "2.04";
 @ISA = qw( Exporter );
 
 # ------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ sub import
    my @imports;
    my $fish_module = __PACKAGE__ . "::";
 
-   my $minVer = 2.03;
+   my $minVer = 2.04;
    if ( $on_flag ) {
       $fish_module .= "ON";
       require Fred::Fish::DBUG::ON;
@@ -403,6 +403,8 @@ sub dbug_level
    my $fish_module = _find_module ($file);
 
    my $func = ${fish_module}->can ('dbug_level');
+   if (! defined $func) { return(-100); }   # Hack.
+
    return ( $func->( $hint ) );   # A count ...
 }
 

@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     {
         # available in perl v5.10
         'overload'              => '1.06',
+        'overloading'           => 0,
         'strict'                => 0,
         'vars'                  => 0,
         'warnings'              => 0,
@@ -41,8 +42,8 @@ my %WriteMakefileArgs = (
         'Test::Pod'     => '1.52',
     },
     LICENSE             => 'perl_5',
-    # 2007-12-18
-    MIN_PERL_VERSION    => 'v5.10',
+    # 2009-08-23 to support overloading
+    MIN_PERL_VERSION    => 'v5.10.1',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
     clean               => { FILES => 'Locale-Unicode-*' },

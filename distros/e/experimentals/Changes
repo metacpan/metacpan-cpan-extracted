@@ -51,3 +51,10 @@ Revision history for experimentals
 
     - Removed deprecation warnings for all use of smartmatching and given/when
       under Perl 5.38 and 5.40
+
+
+
+0.021  Mon Sep 30 20:16:54 2024
+
+    - Rearranged tests and removed issue with smartmatching post-5.40
+      (Thanks, Andreas)

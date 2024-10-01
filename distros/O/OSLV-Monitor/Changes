@@ -1,5 +1,9 @@
 Revision history for OSLV-Monitor
 
+0.1.0   2024-09-30/16:00
+        - Add -b for setting output/cache base path
+        - More FreeBSD fixes.
+
 0.0.2   2024-09-25/14:00
         - Various fixes for on FreeBSD when jailname and hostname for the jail differ.
 

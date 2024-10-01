@@ -158,6 +158,17 @@ sub return_test_2
 {
    DBUG_ENTER_FUNC (@_);
 
+   # Test to prove waantarray works aas epectected.
+   unless (defined wantarray) {
+      ok2 (1, "wantarray is <udef>");
+   } elsif (wantarray == 0)  {
+      ok2 (1, "wantarray is 0 (scalar)");
+   } elsif (wantarray == 1)  {
+      ok2 (1, "wantarray is 1 (array)");
+   } else {
+      ok2 (0, "ERROR: wantarray is " . wantarray);
+   }
+
    # Prints to fish the expected return values, but doesn't actually return
    # anything since used in a void context.
    DBUG_RETURN (@ret_val);

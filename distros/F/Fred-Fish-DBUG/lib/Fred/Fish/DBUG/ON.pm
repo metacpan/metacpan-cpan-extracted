@@ -8,7 +8,7 @@
 
 =head1 NAME
 
-DBUG.pm - Fred Fish library for Perl
+Fred::Fish::DBUG::ON - Fred Fish Live library for Perl
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ use Cwd 'abs_path';
 use Config qw( %Config );
 use Sub::Identify 'sub_fullname';
 
-$VERSION = "2.03";
+$VERSION = "2.04";
 @ISA = qw( Exporter );
 
 # ------------------------------------------------------------------------------

@@ -5,7 +5,7 @@ use warnings;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.06;
+our $VERSION = '0.07';
 
 #-----------------------------------------------------------------------------
 
@@ -142,7 +142,7 @@ Jeffrey Ryan Thalhammer <thaljef@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007-2022 Jeffrey Ryan Thalhammer.
+Copyright 2007-2024 Jeffrey Ryan Thalhammer and Andy Lester
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.  The full text of this license

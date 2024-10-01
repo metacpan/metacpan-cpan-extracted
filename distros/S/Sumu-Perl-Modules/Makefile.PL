@@ -19,10 +19,9 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "ExtUtils::Installed" => 0,
     "parent" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "strict" => 0
   },
-  "VERSION" => "0.3.4",
+  "VERSION" => "0.3.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,8 +32,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "ExtUtils::Installed" => 0,
   "parent" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "strict" => 0
 );
 
 

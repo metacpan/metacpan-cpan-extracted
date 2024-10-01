@@ -11,8 +11,6 @@ Modules.version
 README
 README.md
 SETUP.md
-dist.ini
-example2home.sh
 lib/Sumu/Perl/Modules.pm
 r
 t/author-pod-coverage.t

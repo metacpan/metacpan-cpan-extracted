@@ -1,7 +1,7 @@
 package LangerthaX;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Bring your own viking!
-$LangerthaX::VERSION = '0.005';
+$LangerthaX::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ LangerthaX - Bring your own viking!
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

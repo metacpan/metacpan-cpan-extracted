@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-10'; # DATE
+our $DATE = '2024-09-28'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/PDFUtils/remove_pdf_password",
@@ -39,7 +39,7 @@ pdfnopass - Short alias for remove-pdf-password
 
 =head1 VERSION
 
-This document describes version 0.015 of pdfnopass (from Perl distribution App-PDFUtils), released on 2023-02-10.
+This document describes version 0.016 of pdfnopass (from Perl distribution App-PDFUtils), released on 2024-09-28.
 
 =head1 SYNOPSIS
 
@@ -54,13 +54,18 @@ B<pdfnopass> [B<L<--backup|/"--no-backup">>|B<L<--no-backup|/"--no-backup">>|B<L
 This program is a wrapper for L<qpdf> to remove passwords from PDF files
 (in-place).
 
-The motivation for this program is the increasing occurence of financial
+The motivation for this wrapper is the increasing occurence of financial
 institutions sending financial statements or documents in the format of
 password-protected PDF file. This is annoying when we want to archive the file
 or use it in an organization because we have to remember different passwords for
 different financial institutions and re-enter the password everytime we want to
 use the file. (The banks could've sent the PDF in a password-protected .zip, or
 use PGP-encrypted email, but I digress.)
+
+Compared to using B<qpdf> directly, this wrapper offers some additional
+features/options and convenience, for example: multiple file support, multiple
+password matching attempt, configuration file, option whether you want backup,
+etc.
 
 You can provide the passwords to be tried in a configuration file,
 C<~/remove-pdf-password.conf>, e.g.:
@@ -407,7 +412,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

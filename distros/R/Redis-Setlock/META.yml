@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ no_index:
 provides:
   Redis::Setlock:
     file: lib/Redis/Setlock.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Digest::SHA: '0'
   Getopt::Long: '2.42'
@@ -44,7 +44,9 @@ requires:
 resources:
   bugtracker: https://github.com/fujiwara/Redis-Setlock/issues
   homepage: https://github.com/fujiwara/Redis-Setlock
-  repository: git://github.com/fujiwara/Redis-Setlock.git
-version: '0.13'
+  repository: https://github.com/fujiwara/Redis-Setlock.git
+version: '0.14'
+x_contributors:
+  - 'FUJIWARA Shunichiro <67804+fujiwara@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

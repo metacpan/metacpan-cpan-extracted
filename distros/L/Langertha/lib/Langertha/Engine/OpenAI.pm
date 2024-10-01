@@ -1,7 +1,7 @@
 package Langertha::Engine::OpenAI;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: OpenAI API
-$Langertha::Engine::OpenAI::VERSION = '0.005';
+$Langertha::Engine::OpenAI::VERSION = '0.006';
 use Moose;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
@@ -14,6 +14,7 @@ with 'Langertha::Role::'.$_ for (qw(
   Models
   Temperature
   ResponseSize
+  ResponseFormat
   SystemPrompt
   Chat
   Embedding
@@ -78,6 +79,7 @@ sub chat_request {
     model => $self->chat_model,
     messages => $messages,
     $self->get_response_size ? ( max_tokens => $self->get_response_size ) : (),
+    $self->has_response_format ? ( response_format => $self->response_format ) : (),
     $self->has_temperature ? ( temperature => $self->temperature ) : (),
     stream => JSON->false,
     # $self->has_seed ? ( seed => $self->seed )
@@ -123,7 +125,7 @@ Langertha::Engine::OpenAI - OpenAI API
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

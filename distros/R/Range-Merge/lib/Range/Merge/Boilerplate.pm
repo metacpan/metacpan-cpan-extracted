@@ -5,7 +5,7 @@
 
 package Range::Merge::Boilerplate;
 # ABSTRACT: Generic Boilerplate (copied from JTM::Bootstrap)
-$Range::Merge::Boilerplate::VERSION = '2.191190';
+$Range::Merge::Boilerplate::VERSION = '2.242740';
 
 use v5.22;
 use strict;
@@ -53,7 +53,6 @@ sub import($self, $type='script') {
     # feature->import::into($target, 'refaliasing');
     feature->import::into($target, 'signatures');
 
-    feature->import::into($target, 'switch');
     feature->import::into($target, 'unicode_strings');
     # warnings->unimport::out_of($target, 'experimental::refaliasing');
     warnings->unimport::out_of($target, 'experimental::signatures');
@@ -61,9 +60,6 @@ sub import($self, $type='script') {
     if ($PERL_VERSION lt v5.24.0) {
         warnings->unimport::out_of($target, 'experimental::postderef');
     }
-
-    # For "switch" feature
-    warnings->unimport::out_of($target, 'experimental::smartmatch');
 
     return;
 }
@@ -82,7 +78,7 @@ Range::Merge::Boilerplate - Generic Boilerplate (copied from JTM::Bootstrap)
 
 =head1 VERSION
 
-version 2.191190
+version 2.242740
 
 =head1 SYNOPSIS
 
@@ -108,7 +104,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016-2019 by Joelle Maslak.
+This software is copyright (c) 2016-2021 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

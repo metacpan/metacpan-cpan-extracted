@@ -15,12 +15,14 @@ use Langertha::Engine::Ollama;
 use Langertha::Engine::OpenAI;
 use Langertha::Engine::Anthropic;
 use Langertha::Engine::vLLM;
+use Langertha::Engine::Groq;
 
-if ($ENV{OPENAI_API_KEY} || $ENV{ANTHROPIC_API_KEY}) {
+if ($ENV{OPENAI_API_KEY} || $ENV{ANTHROPIC_API_KEY} || $ENV{GROQ_API_KEY}) {
   my @keys;
   push @keys, 'OPENAI_API_KEY' if $ENV{OPENAI_API_KEY};
   push @keys, 'ANTHROPIC_API_KEY' if $ENV{ANTHROPIC_API_KEY};
-  warn "Will be using your ".join(" ", @keys)." environment variable, which may produce cost.";
+  push @keys, 'GROQ_API_KEY' if $ENV{GROQ_API_KEY};
+  warn "Will be using your ".join(", ", @keys)." environment variable(s), which may produce cost.";
   sleep 5;
 }
 
@@ -235,6 +237,26 @@ __EOP__
     printf("\n\n%s\n\n", $prompt);
 
     print($vllm->simple_chat($prompt));
+
+  }
+}
+
+{
+  if ($ENV{GROQ_API_KEY} and $ENV{GROQ_MODEL}) {
+
+    my $groq = Langertha::Engine::Groq->new(
+      api_key => $ENV{GROQ_API_KEY},
+      model => $ENV{GROQ_MODEL},
+      system_prompt => $system_prompt,
+    );
+
+    use DDP; p($groq);
+
+    my $prompt = 'Do you wanna build a snowman?';
+
+    printf("\n\n%s\n\n", $prompt);
+
+    print($groq->simple_chat($prompt));
 
   }
 }

@@ -1,0 +1,60 @@
+{
+   "abstract" : "Minuit 1 optimization routines for PDL",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDL-Minuit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::F77" : "1.26",
+            "PDL" : "2.093"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "2.093"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/PDL-Minuit/issues"
+      },
+      "homepage" : "http://pdl.perl.org/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/PDL-Minuit.git",
+         "web" : "https://github.com/PDLPorters/PDL-Minuit"
+      }
+   },
+   "version" : "0.001",
+   "x_IRC" : "irc://irc.perl.org/#pdl",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

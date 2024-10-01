@@ -1,5 +1,5 @@
 package experimentals;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use 5.010;
 use strict;
@@ -90,7 +90,7 @@ experimentals - Experimental features made even easier
 
 =head1 VERSION
 
-This document describes experimentals version 0.020
+This document describes experimentals version 0.021
 
 
 =head1 SYNOPSIS

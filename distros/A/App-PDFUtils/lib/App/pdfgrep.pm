@@ -3,9 +3,9 @@
 package App::pdfgrep;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-10'; # DATE
+our $DATE = '2024-09-28'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use 5.010001;
 use strict;
@@ -131,7 +131,7 @@ App::pdfgrep - Print lines matching text in PDF files
 
 =head1 VERSION
 
-This document describes version 0.015 of App::pdfgrep (from Perl distribution App-PDFUtils), released on 2023-02-10.
+This document describes version 0.016 of App::pdfgrep (from Perl distribution App-PDFUtils), released on 2024-09-28.
 
 =head1 FUNCTIONS
 
@@ -164,7 +164,7 @@ Specify when to show color (never, always, or autoE<sol>when interactive).
 
 =item * B<count> => I<true>
 
-Supress normal output, return a count of matching lines.
+Supress normal output; instead return a count of matching lines.
 
 =item * B<dash_prefix_inverts> => I<bool>
 
@@ -179,6 +179,14 @@ Google search and a few other search engines.
 
 If not specified, will search for all PDF files recursively from the current
 directory.
+
+=item * B<files_with_matches> => I<true>
+
+Supress normal output; instead return filenames with matching lines; scanning for each file will stop on the first match.
+
+=item * B<files_without_match> => I<true>
+
+Supress normal output; instead return filenames without matching lines.
 
 =item * B<ignore_case> => I<bool>
 
@@ -250,7 +258,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

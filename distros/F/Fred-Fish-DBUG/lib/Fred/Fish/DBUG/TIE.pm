@@ -8,7 +8,7 @@
 
 =head1 NAME
 
-TIE.pm - Fred Fish library extension to trap STDERR & STDOUT.
+Fred::Fish::DBUG::TIE - Fred Fish library extension to trap STDERR & STDOUT.
 
 =head1 SYNOPSIS
 
@@ -54,7 +54,7 @@ use Fred::Fish::DBUG::ON;
 # use Config qw( %Config );
 # use Sub::Identify 'sub_fullname';
 
-$VERSION = "2.03";
+$VERSION = "2.04";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( 

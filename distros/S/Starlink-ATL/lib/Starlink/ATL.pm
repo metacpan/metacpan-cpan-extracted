@@ -12,7 +12,13 @@ This package contains:
 
 =over 4
 
-=item Starlink::ATL::Region - Tools for AST regions.
+=item Starlink::ATL::MOC
+
+Tools for MOC using AST.
+
+=item Starlink::ATL::Region
+
+Tools for AST regions.
 
 =back
 
@@ -24,7 +30,7 @@ use strict;
 
 use Starlink::AST;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 1;
 

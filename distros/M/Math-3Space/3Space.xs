@@ -9,6 +9,15 @@
 #  define inline __inline
 #endif
 
+#ifndef newAV_alloc_x
+static AV *shim_newAV_alloc_x(int n) {
+	AV *ret= newAV();
+	av_extend(ret, n-1);
+	return ret;
+}
+#define newAV_alloc_x shim_newAV_alloc_x
+#endif
+
 /**********************************************************************************************\
 * m3s API, defining all the math for this module.
 \**********************************************************************************************/
@@ -37,10 +46,39 @@ static const m3s_space_t m3s_identity= {
 	0,
 };
 
+#define M3S_VECTYPE_VECOBJ   1
+#define M3S_VECTYPE_ARRAY    2
+#define M3S_VECTYPE_HASH     3
+#define M3S_VECTYPE_PDL      4
+#define M3S_VECTYPE_PDLMULTI 5
+
+#define M3S_VECLOAD(vec,x_or_vec,y,z,dflt) do { \
+  if (y) { \
+    vec[0]= SvNV(x_or_vec); \
+    vec[1]= SvNV(y); \
+    vec[2]= z? SvNV(z) : dflt; \
+  } else { \
+    m3s_read_vector_from_sv(vec, x_or_vec, NULL, NULL); \
+  } } while(0)
+
 typedef NV m3s_vector_t[3];
 typedef NV *m3s_vector_p;
 
+struct m3s_4space_frustum_projection {
+	/*   _                  _
+	 *  | m00   0   m20   0  |
+	 *  |  0   m11  m21   0  |
+	 *  |  0    0   m22  m32 |
+	 *  |_ 0    0   -1    0 _|
+	 */
+	double m00, m11, m20, m21, m22, m32;
+};
+typedef union m3s_4space_projection {
+	struct m3s_4space_frustum_projection frustum;
+} m3s_4space_projection_t;
+
 static const NV NV_tolerance = 1e-14;
+static const double double_tolerance = 1e-14;
 
 // Initialize to identity, known to be normal
 void m3s_space_init(m3s_space_t *space) {
@@ -56,29 +94,34 @@ static inline void m3s_vector_cross(NV *dest, NV *vec1, NV *vec2) {
 
 // Vector dot Product, N = A dot B
 static inline NV m3s_vector_dotprod(NV *vec1, NV *vec2) {
+	return vec1[0]*vec2[0] + vec1[1]*vec2[1] + vec1[2]*vec2[2];
+}
+
+// Vector cosine.  Same as dotprod for unit vectors.
+static inline NV m3s_vector_cosine(NV *vec1, NV *vec2) {
 	NV mag, prod;
-	mag= (vec1[0]*vec1[0] + vec1[1]*vec1[1] + vec1[2]*vec1[2])
-	   * (vec2[0]*vec2[0] + vec2[1]*vec2[1] + vec2[2]*vec2[2]);
-	prod= vec1[0]*vec2[0] + vec1[1]*vec2[1] + vec1[2]*vec2[2];
+	mag= m3s_vector_dotprod(vec1,vec1) * m3s_vector_dotprod(vec2,vec2);
+	prod= m3s_vector_dotprod(vec1,vec2);
 	if (mag < NV_tolerance)
-		croak("Can't calculate dot product of vector with length == 0");
+		croak("Can't calculate vector cosine of vector with length < 1e-14");
 	else if (fabs(mag - 1) > NV_tolerance)
 		prod /= sqrt(mag);
 	return prod;
 }
 
-/* Check whether a space's axis vectors are unit length and orthagonal to
+/* Check whether a space's axis vectors are unit length and orthogonal to
  * eachother, and update the 'is_normal' flag on the space.
  * Having this flag = 1 can optimize relative rotations later.
  * The flag gets set to -1 any time an operation may have broken normality.
  * Approx Cost: 4-19 load, 3-18 mul, 4-17 add, 1-2 stor
  */
 static int m3s_space_check_normal(m3s_space_t *sp) {
+	NV *vec, *pvec;
 	sp->is_normal= 0;
-	for (NV *vec= sp->mat+6, *pvec= sp->mat; vec > sp->mat; pvec= vec, vec -= 3) {
-		if (fabs(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2] - 1) > NV_tolerance)
+	for (vec= sp->mat+6, pvec= sp->mat; vec > sp->mat; pvec= vec, vec -= 3) {
+		if (fabs(m3s_vector_dotprod(vec,vec) - 1) > NV_tolerance)
 			return 0;
-		if ((vec[0]*pvec[0] + vec[1]*pvec[1] + vec[2]*pvec[2]) > NV_tolerance)
+		if (m3s_vector_dotprod(vec,pvec) > NV_tolerance)
 			return 0;
 	}
 	return sp->is_normal= 1;
@@ -184,32 +227,34 @@ static void m3s_space_reparent(m3s_space_t *space, m3s_space_t *parent) {
 	// Short circuit for nothing to do
 	if (space->parent == parent)
 		return;
-	// Walk back the stack of "from" until it has fewer parents than dest.
-	// This way dest->parent has a chance to be "from".
+	// Walk back the stack of parents until it has fewer parents than 'space'.
+	// This way space->parent has a chance to be 'common_parent'.
 	common_parent= parent;
 	while (common_parent && common_parent->n_parents >= space->n_parents)
 		common_parent= common_parent->parent;
-	// Now unproject 'space' from each of its parents until its parent is "common_parent".
+	// Now unproject 'space' from each of its parents until its parent is 'common_parent'.
 	while (space->n_parents && space->parent != common_parent) {
-		// Map dest out to be a sibling of its parent
+		// Map 'space' out to be a sibling of its parent
 		m3s_space_unproject_space(space->parent, space);
-		// back up common_parent one more time, if dest reached it
+		// if 'space' reached the depth of common_parent+1 and the loop didn't stop,
+		// then it wasn't actually the parent they have in common, yet.
 		if (common_parent && common_parent->n_parents + 1 == space->n_parents)
 			common_parent= common_parent->parent;
 	}
-	// At this point, 'dest' is either a root 3Space, or common_parent is its parent.
-	// If the common parent is the original from_space, then we're done.
-	if (parent != common_parent) {
-		// Calculate what from_space would be at this parent depth.
-		if (!(parent != NULL)) croak("assertion failed: parent != NULL");
-		memcpy(&sp_tmp, parent, sizeof(sp_tmp));
-		while (sp_tmp.parent != common_parent)
-			m3s_space_unproject_space(sp_tmp.parent, &sp_tmp);
-		// sp_tmp is now equivalent to projecting through the chain from common_parent to parent
-		m3s_space_project_space(&sp_tmp, space);
-		space->parent= parent;
-		space->n_parents= parent->n_parents + 1;
-	}
+	// At this point, 'space' is either a root 3Space, or 'common_parent' is its parent.
+	// If the common parent is the original 'parent', then we're done.
+	if (parent == common_parent)
+		return;
+	// Calculate an equivalent space to 'parent' at this parent depth.
+	if (!(parent != NULL)) croak("assertion failed: parent != NULL");
+	memcpy(&sp_tmp, parent, sizeof(sp_tmp));
+	while (sp_tmp.parent != common_parent)
+		m3s_space_unproject_space(sp_tmp.parent, &sp_tmp);
+	// 'sp_tmp' is now equivalent to projecting through the chain from common_parent to parent,
+	// so just project 'space' into this temporary and we're done.
+	m3s_space_project_space(&sp_tmp, space);
+	space->parent= parent;
+	space->n_parents= parent->n_parents + 1;
 	// Note that any space which has 'space' as a parent will now have an invalid n_parents
 	// cache, which is why those caches need rebuilt before calling this function.
 }
@@ -224,7 +269,7 @@ static void m3s_space_rotate(m3s_space_t *space, NV angle_sin, NV angle_cos, m3s
 	m3s_space_t r;
 
 	// Construct temporary coordinate space where 'zv' is 'axis'
-	mag_sq= axis[0]*axis[0] + axis[1]*axis[1] + axis[2]*axis[2];
+	mag_sq= m3s_vector_dotprod(axis,axis);
 	if (mag_sq == 0)
 		croak("Can't rotate around vector with 0 magnitude");
 	scale= (fabs(mag_sq - 1) > NV_tolerance)? 1/sqrt(mag_sq) : 1;
@@ -237,13 +282,13 @@ static void m3s_space_rotate(m3s_space_t *space, NV angle_sin, NV angle_cos, m3s
 	r.mat[5]= 0;
 	// x = normalize( y cross z )
 	m3s_vector_cross(r.mat, r.mat+3, r.mat+6);
-	mag_sq= r.mat[0]*r.mat[0] + r.mat[1]*r.mat[1] + r.mat[2]*r.mat[2];
+	mag_sq= m3s_vector_dotprod(r.mat,r.mat);
 	if (mag_sq < NV_tolerance) {
 		// try again with a different vector
 		r.mat[3]= 0;
 		r.mat[4]= 1;
 		m3s_vector_cross(r.mat, r.mat+3, r.mat+6);
-		mag_sq= r.mat[0]*r.mat[0] + r.mat[1]*r.mat[1] + r.mat[2]*r.mat[2];
+		mag_sq= m3s_vector_dotprod(r.mat,r.mat);
 		if (mag_sq == 0)
 			croak("BUG: failed to find perpendicular vector");
 	}
@@ -264,14 +309,42 @@ static void m3s_space_rotate(m3s_space_t *space, NV angle_sin, NV angle_cos, m3s
 	}
 }
 
+/* Rotate the space around an axis of its parent.  axis_idx: 0 (xv), 1 (yv) or 2 (zv)
+ * Angle is supplied as direct sine / cosine values.
+ * Approx Cost: 12 fmul, 6 fadd
+ */
+static void m2s_space_parent_axis_rotate(m3s_space_t *space, NV angle_sin, NV angle_cos, int axis_idx) {
+	int ofs1, ofs2;
+	NV tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, *matp;
+	switch (axis_idx) {
+	case 0: ofs1= 1, ofs2= 2; break;
+	case 1: ofs1= 2, ofs2= 0; break;
+	case 2: ofs1= 0, ofs2= 1; break;
+	default: croak("BUG: axis_idx > 2");
+	}
+	matp= SPACE_XV(space);
+	tmp1= angle_cos * matp[ofs1  ] - angle_sin * matp[ofs2  ];
+	tmp2= angle_sin * matp[ofs1  ] + angle_cos * matp[ofs2  ];
+	tmp3= angle_cos * matp[ofs1+3] - angle_sin * matp[ofs2+3];
+	tmp4= angle_sin * matp[ofs1+3] + angle_cos * matp[ofs2+3];
+	tmp5= angle_cos * matp[ofs1+6] - angle_sin * matp[ofs2+6];
+	tmp6= angle_sin * matp[ofs1+6] + angle_cos * matp[ofs2+6];
+	matp[ofs1]= tmp1;
+	matp[ofs2]= tmp2;
+	matp[ofs1+3]= tmp3;
+	matp[ofs2+3]= tmp4;
+	matp[ofs1+6]= tmp5;
+	matp[ofs2+6]= tmp6;
+}
+
 /* Rotate the space around one of its own axes.  axis_idx: 0 (xv), 1 (yv) or 2 (zv)
  * Angle is supplied as direct sine / cosine values.
- * If the space is_normal (unit-length vectors orthagonal to eachother) this uses a very
+ * If the space is_normal (unit-length vectors orthogonal to eachother) this uses a very
  * efficient optimization.  Else it falls back to the full m3s_space_rotate function.
  * Approx Cost, if normal: 18 fmul, 12 fadd
  * Approx Cost, else:      87-99 fmul, 1-2 fdiv, 56-62 fadd, 1 fabs, 1-2 sqrt
  */
-static void m3s_space_self_rotate(m3s_space_t *space, NV angle_sin, NV angle_cos, int axis_idx) {
+static void m3s_space_self_axis_rotate(m3s_space_t *space, NV angle_sin, NV angle_cos, int axis_idx) {
 	m3s_vector_t vec1, vec2;
 
 	if (space->is_normal == -1)
@@ -279,7 +352,7 @@ static void m3s_space_self_rotate(m3s_space_t *space, NV angle_sin, NV angle_cos
 	if (!space->is_normal) {
 		m3s_space_rotate(space, angle_sin, angle_cos, space->mat + axis_idx*3);
 	} else {
-		// Axes are all unit vectors, orthagonal to eachother, and can skip setting up a
+		// Axes are all unit vectors, orthogonal to eachother, and can skip setting up a
 		// custom rotation matrix.  Just define the vectors inside the space post-rotation,
 		// then project them out of the space.
 		if (axis_idx == 0) { // around XV, Y -> Z
@@ -420,7 +493,7 @@ static void m3s_make_aligned_buffer(SV *buf, size_t size) {
 
 	if (!SvPOK(buf))
 		sv_setpvs(buf, "");
-	p= SvPV(buf, len);
+	p= SvPV_force(buf, len);
 	if (len < size) {
 		SvGROW(buf, size);
 		SvCUR_set(buf, size);
@@ -463,33 +536,150 @@ static NV * m3s_vector_get_array(SV *vector) {
 
 // Read the values of a vector out of perl data 'in' and store them in 'vec'
 // This should be extended to handle any sensible format a user might supply vectors.
-// It currently supports arrayref-of-SvNV and vector objects.
-static void m3s_read_vector_from_sv(m3s_vector_p vec, SV *in) {
-	SV **el;
+// It currently supports arrayref-of-SvNV, hashref of SvNV, scalarrefs of packed doubles
+// (i.e. vector objects), and PDL ndarrays.
+// The return type is one of the M3S_VECTYPE_ constants.  The output params 'vec', 'pdl_dims',
+// and 'component_sv' may or may not get filled in, depending on that return type.
+// The function 'croak's if the input is not valid.
+static int m3s_read_vector_from_sv(m3s_vector_p vec, SV *in, size_t pdl_dims[3], SV *component_sv[3]) {
+	SV **el, *rv= SvROK(in)? SvRV(in) : NULL;
 	AV *vec_av;
 	HV *attrs;
 	size_t i, n;
-	if (SvROK(in) && SvTYPE(SvRV(in)) == SVt_PVAV) {
-		vec_av= (AV*) SvRV(in);
+	if (!rv)
+		croak("Vector must be a reference type");
+
+	// Given a scalar-ref to a buffer the size of 3 packed NV (could be double or long double)
+	// which is also the structure used by blessed Math::3Space::Vector, simply copy the value
+	// into 'vec'.
+	if (SvPOK(rv) && SvCUR(rv) == sizeof(NV)*3) {
+		memcpy(vec, SvPV_force_nolen(rv), sizeof(NV)*3);
+		return M3S_VECTYPE_VECOBJ;
+	}
+	// Given an array, the array must be length 2 or 3, and each element must look like a number.
+	// If it matches, the values are loaded into 'vec', and pointers to the SVs are stored in
+	// component_sv if the caller provided that.
+	else if (SvTYPE(rv) == SVt_PVAV) {
+		vec_av= (AV*) rv;
 		n= av_len(vec_av)+1;
 		if (n != 3 && n != 2)
 			croak("Vector arrayref must have 2 or 3 elements");
 		vec[2]= 0;
+		if (component_sv) component_sv[2]= NULL;
 		for (i=0; i < n; i++) {
 			el= av_fetch(vec_av, i, 0);
 			if (!el || !*el || !looks_like_number(*el))
 				croak("Vector element %d is not a number", (int)i);
 			vec[i]= SvNV(*el);
+			if (component_sv) component_sv[i]= *el;
 		}
-	} else if (SvROK(in) && SvTYPE(SvRV(in)) == SVt_PVHV) {
-		attrs= (HV*) SvRV(in);
-		vec[0]= ((el= hv_fetchs(attrs, "x", 0)) && *el && SvOK(*el))? SvNV(*el) : 0;
-		vec[1]= ((el= hv_fetchs(attrs, "y", 0)) && *el && SvOK(*el))? SvNV(*el) : 0;
-		vec[2]= ((el= hv_fetchs(attrs, "z", 0)) && *el && SvOK(*el))? SvNV(*el) : 0;
-	} else if (SvROK(in) && SvPOK(SvRV(in)) && SvCUR(SvRV(in)) == sizeof(NV)*3) {
-		memcpy(vec, SvPV_nolen(SvRV(in)), sizeof(NV)*3);
+		return M3S_VECTYPE_ARRAY;
+	}
+	// Given a hashref, look for elements 'x', 'y', and 'z'.  They default to 0 if not found.
+	// Each found element must be a number.  The SV pointers are saved into component_sv if
+	// it was provided by the caller.
+	else if (SvTYPE(rv) == SVt_PVHV) {
+		const char *keys= "x\0y\0z";
+		attrs= (HV*) rv;
+		for (i=0; i < 3; i++) {
+			if ((el= hv_fetch(attrs, keys+(i<<1), 1, 0)) && *el && SvOK(*el)) {
+				if (!looks_like_number(*el))
+					croak("Hash element %s is not a number", keys+(i<<1));
+				vec[i]= SvNV(*el);
+				if (component_sv) component_sv[i]= *el;
+			} else {
+				vec[i]= 0;
+				if (component_sv) component_sv[i]= NULL;
+			}
+		}
+		return M3S_VECTYPE_HASH;
+	}
+	// Given a PDL ndarray object, check its dimensions.  If the ndarray is exactly a 2x1 or 3x1
+	// array, then copy those values into 'vec'.  If the ndarray has higher dimensions, let the
+	// caller know about them in the 'pdl_dims' array, and don't touch 'vec'.  The caller can
+	// then decide how to handle those higher dimensions, or throw an error etc.
+	else if (sv_derived_from(in, "PDL")) {
+		dSP;
+		int count, single_dim= 0;
+		SV *ret;
+
+		ENTER;
+		SAVETMPS;
+		PUSHMARK(SP);
+		EXTEND(SP,1);
+		PUSHs(in);
+		PUTBACK;
+		count= call_method("dims", G_LIST);
+		SPAGAIN;
+		if (pdl_dims) {
+			// return up to 3 dims; more than that doesn't change our behavior.
+			if (count > 3) SP -= (count-3);
+			pdl_dims[2]= (count > 2)? POPi : 0;
+			pdl_dims[1]= (count > 1)? POPi : 0;
+			pdl_dims[0]= (count > 0)? POPi : 0;
+			if (pdl_dims[1] == 0)
+				single_dim= pdl_dims[0];
+		}
+		// if caller doesn't pass pdl_dims, they expect a simple 1x3 vector.
+		else if (count == 1) {
+			single_dim= POPi;
+		} else {
+			SP -= count;
+		}
+		PUTBACK;
+		FREETMPS;
+		LEAVE;
+
+		if (single_dim == 2 || single_dim == 3) {
+			ENTER;
+			SAVETMPS;
+			PUSHMARK(SP);
+			EXTEND(SP,1);
+			PUSHs(in);
+			PUTBACK;
+			count= call_method("list", G_LIST);
+			SPAGAIN;
+			if (count > 3) SP -= (count-3); // should never happen
+			vec[2]= (count > 2)? POPn : 0;
+			vec[1]= (count > 1)? POPn : 0;
+			vec[0]= (count > 0)? POPn : 0;
+			PUTBACK;
+			FREETMPS;
+			LEAVE;
+			return M3S_VECTYPE_PDL;
+		}
+		else if (!pdl_dims)
+			croak("Expected PDL dimensions of 2x1 or 3x1");
+		else
+			return M3S_VECTYPE_PDLMULTI;
 	} else
 		croak("Can't read vector from %s", sv_reftype(in, 1));
+}
+
+// Create a new Math::3Space::Vector object, which is a blessed scalar-ref containing
+// the aligned bytes of three NV (usually doubles)
+static SV* m3s_wrap_projection(m3s_4space_projection_t *p, const char* pkg) {
+	SV *obj, *buf;
+	buf= newSVpvn((char*) p, sizeof(m3s_4space_projection_t));
+	if ((intptr_t)SvPVX(buf) & NV_ALIGNMENT_MASK) {
+		m3s_make_aligned_buffer(buf, sizeof(m3s_4space_projection_t));
+		memcpy(SvPVX(buf), p, sizeof(m3s_4space_projection_t));
+	}
+	obj= newRV_noinc(buf);
+	sv_bless(obj, gv_stashpv(pkg, GV_ADD));
+	return obj;
+}
+
+// Return a pointer to the aligned NV[3] inside the scalar ref 'vector'.
+// These can be written directly to modify the vector's value.
+static m3s_4space_projection_t * m3s_projection_get(SV *vector) {
+	char *p= NULL;
+	STRLEN len= 0;
+	if (sv_isobject(vector) && SvPOK(SvRV(vector)))
+		p= SvPV(SvRV(vector), len);
+	if (len != sizeof(m3s_4space_projection_t) || ((intptr_t)p & NV_ALIGNMENT_MASK) != 0)
+		croak("Invalid or corrupt Math::3Space::Projection object");
+	return (m3s_4space_projection_t*) p;
 }
 
 // Walk the perl-side chain of $space->parent->parent->... and update the C-side
@@ -528,6 +718,57 @@ static void m3s_space_recache_parent(SV *space_sv) {
 		space->n_parents= depth--;
 }
 
+// TODO: find a way to tap into PDL without compile-time dependency...
+static SV* m3s_pdl_vector(m3s_vector_p vec, int dim) {
+	SV *ret;
+	int count;
+	dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	EXTEND(SP, 3);
+	PUSHs(sv_2mortal(newSVnv(vec[0])));
+	PUSHs(sv_2mortal(newSVnv(vec[1])));
+	if (dim == 3) PUSHs(sv_2mortal(newSVnv(vec[2])));
+	PUTBACK;
+	count= call_pv("PDL::Core::pdl", G_SCALAR);
+	if (count != 1) croak("call to PDL::Core::pdl did not return an ndarray");
+	SPAGAIN;
+	ret= POPs;
+	SvREFCNT_inc(ret); // protect from FREETMPS
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+	return ret;
+}
+static SV* m3s_pdl_matrix(NV *mat, bool transpose) {
+	AV *av;
+	SV *ret;
+	int i, count;
+	dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	EXTEND(SP, 3);
+	for (i= 0; i < 3; i++) {
+		av= newAV_alloc_x(3);
+		av_push(av, newSVnv(mat[transpose? i+0 : (i*3)+0]));
+		av_push(av, newSVnv(mat[transpose? i+3 : (i*3)+1]));
+		av_push(av, newSVnv(mat[transpose? i+6 : (i*3)+2]));
+		PUSHs(sv_2mortal((SV*)newRV_noinc((SV*)av)));
+	}
+	PUTBACK;
+	count= call_pv("PDL::Core::pdl", G_SCALAR);
+	if (count != 1) croak("call to PDL::Core::pdl did not return an ndarray");
+	SPAGAIN;
+	ret= POPs;
+	SvREFCNT_inc(ret); // protect from FREETMPS
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+	return ret;
+}
+
 /**********************************************************************************************\
 * Math::3Space Public API
 \**********************************************************************************************/
@@ -550,19 +791,19 @@ _init(obj, source=NULL)
 			} else if (SvROK(source) && SvTYPE(source) == SVt_PVHV) {
 				attrs= (HV*) SvRV(source);
 				if ((field= hv_fetch(attrs, "xv", 2, 0)) && *field && SvOK(*field))
-					m3s_read_vector_from_sv(SPACE_XV(space), *field);
+					m3s_read_vector_from_sv(SPACE_XV(space), *field, NULL, NULL);
 				else
 					SPACE_XV(space)[0]= 1;
 				if ((field= hv_fetch(attrs, "yv", 2, 0)) && *field && SvOK(*field))
-					m3s_read_vector_from_sv(SPACE_YV(space), *field);
+					m3s_read_vector_from_sv(SPACE_YV(space), *field, NULL, NULL);
 				else
 					SPACE_YV(space)[1]= 1;
 				if ((field= hv_fetch(attrs, "zv", 2, 0)) && *field && SvOK(*field))
-					m3s_read_vector_from_sv(SPACE_ZV(space), *field);
+					m3s_read_vector_from_sv(SPACE_ZV(space), *field, NULL, NULL);
 				else
 					SPACE_ZV(space)[2]= 1;
 				if ((field= hv_fetch(attrs, "origin", 6, 0)) && *field && SvOK(*field))
-					m3s_read_vector_from_sv(SPACE_ORIGIN(space), *field);
+					m3s_read_vector_from_sv(SPACE_ORIGIN(space), *field, NULL, NULL);
 				space->is_normal= -1;
 			} else
 				croak("Invalid source for _init");
@@ -615,14 +856,8 @@ xv(space, x_or_vec=NULL, y=NULL, z=NULL)
 		NV *vec= space->mat + ix * 3;
 	PPCODE:
 		if (x_or_vec) {
-			if (y) {
-				vec[0]= SvNV(x_or_vec);
-				vec[1]= SvNV(y);
-				vec[2]= z? SvNV(z) : 0;
-			} else {
-				m3s_read_vector_from_sv(vec, x_or_vec);
-			}
-			space->is_normal= -1;
+			M3S_VECLOAD(vec,x_or_vec,y,z,0);
+			if (ix < 3) space->is_normal= -1;
 			// leave $self on stack as return value
 		} else {
 			ST(0)= sv_2mortal(m3s_wrap_vector(vec));
@@ -653,7 +888,7 @@ reparent(space, parent)
 	SV *space
 	SV *parent
 	INIT:
-		m3s_space_t *sp3= m3s_get_magic_space(space, OR_DIE), *psp3, *cur;
+		m3s_space_t *sp3= m3s_get_magic_space(space, OR_DIE), *psp3=NULL, *cur;
 	PPCODE:
 		m3s_space_recache_parent(space);
 		if (SvOK(parent)) {
@@ -663,10 +898,8 @@ reparent(space, parent)
 			for (cur= psp3; cur; cur= cur->parent)
 				if (cur == sp3)
 					croak("Attempt to create a cycle: new 'parent' is a child of this space");
-			m3s_space_reparent(sp3, psp3);
-		} else {
-			m3s_space_reparent(sp3, NULL);
 		}
+		m3s_space_reparent(sp3, psp3);
 		hv_store((HV*) SvRV(space), "parent", 6, newSVsv(parent), 0);
 		XSRETURN(1);
 
@@ -683,13 +916,7 @@ translate(space, x_or_vec, y=NULL, z=NULL)
 	INIT:
 		NV vec[3], *matp;
 	PPCODE:
-		if (y) {
-			vec[0]= SvNV(x_or_vec);
-			vec[1]= SvNV(y);
-			vec[2]= z? SvNV(z) : 0;
-		} else {
-			m3s_read_vector_from_sv(vec, x_or_vec);
-		}
+		M3S_VECLOAD(vec,x_or_vec,y,z,0);
 		if (ix) {
 			matp= space->mat;
 			matp[9] += vec[0] * matp[0] + vec[1] * matp[3] + vec[2] * matp[6];
@@ -718,7 +945,7 @@ scale(space, xscale_or_vec, yscale=NULL, zscale=NULL)
 		size_t i;
 	PPCODE:
 		if (SvROK(xscale_or_vec) && yscale == NULL) {
-			m3s_read_vector_from_sv(vec, xscale_or_vec);
+			m3s_read_vector_from_sv(vec, xscale_or_vec, NULL, NULL);
 		} else {
 			vec[0]= SvNV(xscale_or_vec);
 			vec[1]= yscale? SvNV(yscale) : vec[0];
@@ -727,7 +954,7 @@ scale(space, xscale_or_vec, yscale=NULL, zscale=NULL)
 		for (i= 0; i < 3; i++) {
 			s= vec[i];
 			if (ix == 1) {
-				m= sqrt(matp[0]*matp[0] + matp[1]*matp[1] + matp[2]*matp[2]);
+				m= sqrt(m3s_vector_dotprod(matp,matp));
 				if (m > 0)
 					s /= m;
 				else
@@ -758,7 +985,7 @@ rotate(space, angle, x_or_vec, y=NULL, z=NULL)
 			vec[1]= SvNV(y);
 			vec[2]= SvNV(z);
 		} else {
-			m3s_read_vector_from_sv(vec, x_or_vec);
+			m3s_read_vector_from_sv(vec, x_or_vec, NULL, NULL);
 		}
 		m3s_space_rotate(space, sin(angle * 2 * M_PI), cos(angle * 2 * M_PI), vec);
 		// return $self
@@ -779,27 +1006,10 @@ rot_x(space, angle)
 		size_t ofs1, ofs2;
 		NV s= sin(angle * 2 * M_PI), c= cos(angle * 2 * M_PI);
 	PPCODE:
-		if (ix < 3) { // Rotate around axis of parent
-			matp= SPACE_XV(space);
-			ofs1= (ix+1) % 3;
-			ofs2= (ix+2) % 3;
-			tmp1= c * matp[ofs1] - s * matp[ofs2];
-			tmp2= s * matp[ofs1] + c * matp[ofs2];
-			matp[ofs1]= tmp1;
-			matp[ofs2]= tmp2;
-			matp += 3;
-			tmp1= c * matp[ofs1] - s * matp[ofs2];
-			tmp2= s * matp[ofs1] + c * matp[ofs2];
-			matp[ofs1]= tmp1;
-			matp[ofs2]= tmp2;
-			matp += 3;
-			tmp1= c * matp[ofs1] - s * matp[ofs2];
-			tmp2= s * matp[ofs1] + c * matp[ofs2];
-			matp[ofs1]= tmp1;
-			matp[ofs2]= tmp2;
-		} else {
-			m3s_space_self_rotate(space, s, c, ix - 3);
-		}
+		if (ix < 3) // Rotate around axis of parent
+			m2s_space_parent_axis_rotate(space, s, c, ix);
+		else
+			m3s_space_self_axis_rotate(space, s, c, ix - 3);
 		XSRETURN(1);
 
 void
@@ -807,30 +1017,75 @@ project_vector(space, ...)
 	m3s_space_t *space
 	INIT:
 		m3s_vector_t vec;
-		int i;
+		int i, vectype, count;
 		AV *vec_av;
+		HV *vec_hv;
+		SV *pdl_origin= NULL, *pdl_matrix= NULL;
+		size_t pdl_dims[3];
 	ALIAS:
 		Math::3Space::project = 1
 		Math::3Space::unproject_vector = 2
 		Math::3Space::unproject = 3
 	PPCODE:
 		for (i= 1; i < items; i++) {
-			m3s_read_vector_from_sv(vec, ST(i));
-			switch (ix) {
-			case 0: m3s_space_project_vector(space, vec); break;
-			case 1: m3s_space_project_point(space, vec); break;
-			case 2: m3s_space_unproject_vector(space, vec); break;
-			default: m3s_space_unproject_point(space, vec);
+			vectype= m3s_read_vector_from_sv(vec, ST(i), pdl_dims, NULL);
+			if (vectype == M3S_VECTYPE_PDLMULTI) {
+				dSP;
+				if (!pdl_origin) {
+					pdl_origin= sv_2mortal(m3s_pdl_vector(SPACE_ORIGIN(space), 3));
+					pdl_matrix= sv_2mortal(m3s_pdl_matrix(SPACE_XV(space), !(ix&2) /*transpose bool*/));
+				}
+				ENTER;
+				SAVETMPS;
+				PUSHMARK(SP);
+				// first, clone the input.  Then modify it in place.
+				EXTEND(SP, 4);
+				PUSHs(ST(i));
+				PUTBACK;
+				count= call_method("copy", G_SCALAR);
+				SPAGAIN;
+				if (count != 1) croak("PDL->copy failed?");
+				// project point subtracts origin
+				PUSHs(ix == 3? pdl_origin : &PL_sv_undef);
+				PUSHs(pdl_matrix);
+				// unproject point adds origin
+				PUSHs(ix == 1? pdl_origin : &PL_sv_undef);
+				PUTBACK;
+				count= call_pv("Math::3Space::_pdl_project_inplace", G_DISCARD);
+				
+				FREETMPS;
+				LEAVE;
+				ST(i-1)= ST(i);
 			}
-			if (SvTYPE(SvRV(ST(i))) == SVt_PVAV) {
-				vec_av= newAV();
-				av_extend(vec_av, 2);
-				av_push(vec_av, newSVnv(vec[0]));
-				av_push(vec_av, newSVnv(vec[1]));
-				av_push(vec_av, newSVnv(vec[2]));
-				ST(i-1)= sv_2mortal(newRV_noinc((SV*)vec_av));
-			} else {
-				ST(i-1)= sv_2mortal(m3s_wrap_vector(vec));
+			else {
+				switch (ix) {
+				case 0: m3s_space_project_vector(space, vec); break;
+				case 1: m3s_space_project_point(space, vec); break;
+				case 2: m3s_space_unproject_vector(space, vec); break;
+				default: m3s_space_unproject_point(space, vec);
+				}
+				switch (vectype) {
+				case M3S_VECTYPE_ARRAY:
+					vec_av= newAV();
+					av_extend(vec_av, 2);
+					av_push(vec_av, newSVnv(vec[0]));
+					av_push(vec_av, newSVnv(vec[1]));
+					av_push(vec_av, newSVnv(vec[2]));
+					ST(i-1)= sv_2mortal(newRV_noinc((SV*)vec_av));
+					break;
+				case M3S_VECTYPE_HASH:
+					vec_hv= newHV();
+					hv_stores(vec_hv, "x", newSVnv(vec[0]));
+					hv_stores(vec_hv, "y", newSVnv(vec[1]));
+					hv_stores(vec_hv, "z", newSVnv(vec[2]));
+					ST(i-1)= sv_2mortal(newRV_noinc((SV*)vec_hv));
+					break;
+				case M3S_VECTYPE_PDL:
+					ST(i-1)= sv_2mortal(m3s_pdl_vector(vec, pdl_dims[0]));
+					break;
+				default:
+					ST(i-1)= sv_2mortal(m3s_wrap_vector(vec));
+				}
 			}
 		}
 		XSRETURN(items-1);
@@ -841,9 +1096,12 @@ project_vector_inplace(space, ...)
 	INIT:
 		m3s_vector_t vec;
 		m3s_vector_p vecp;
-		size_t i, n;
+		size_t i, j, n;
+		int vectype;
 		AV *vec_av;
-		SV **item, *x, *y, *z;
+		SV **item, *x, *y, *z, *pdl_origin= NULL, *pdl_matrix= NULL;
+		size_t pdl_dims[3];
+		SV *component_sv[3];
 	ALIAS:
 		Math::3Space::project_inplace = 1
 		Math::3Space::unproject_vector_inplace = 2
@@ -852,7 +1110,9 @@ project_vector_inplace(space, ...)
 		for (i= 1; i < items; i++) {
 			if (!SvROK(ST(i)))
 				croak("Expected vector at $_[%d]", (int)(i-1));
-			else if (SvPOK(SvRV(ST(i)))) {
+			vectype= m3s_read_vector_from_sv(vec, ST(i), pdl_dims, component_sv);
+			switch (vectype) {
+			case M3S_VECTYPE_VECOBJ:
 				vecp= m3s_vector_get_array(ST(i));
 				switch (ix) {
 				case 0: m3s_space_project_vector(space, vecp); break;
@@ -860,34 +1120,47 @@ project_vector_inplace(space, ...)
 				case 2: m3s_space_unproject_vector(space, vecp); break;
 				default: m3s_space_unproject_point(space, vecp);
 				}
-			}
-			else if (SvTYPE(SvRV(ST(i))) == SVt_PVAV) {
-				vec_av= (AV*) SvRV(ST(i));
-				n= av_len(vec_av)+1;
-				if (n != 3 && n != 2) croak("Expected 2 or 3 elements in vector");
-				item= av_fetch(vec_av, 0, 0);
-				if (!(item && *item && SvOK(*item))) croak("Expected x value at $vec->[0]");
-				x= *item;
-				item= av_fetch(vec_av, 1, 0);
-				if (!(item && *item && SvOK(*item))) croak("Expected y value at $vec->[1]");
-				y= *item;
-				item= n == 3? av_fetch(vec_av, 2, 0) : NULL;
-				if (item && !(*item && SvOK(*item))) croak("Invalid z value at $vec->[2]");
-				z= item? *item : NULL;
-				vec[0]= SvNV(x);
-				vec[1]= SvNV(y);
-				vec[2]= z? SvNV(z) : 0;
-				
+				break;
+			case M3S_VECTYPE_ARRAY:
+			case M3S_VECTYPE_HASH:
 				switch (ix) {
 				case 0: m3s_space_project_vector(space, vec); break;
 				case 1: m3s_space_project_point(space, vec); break;
 				case 2: m3s_space_unproject_vector(space, vec); break;
 				default: m3s_space_unproject_point(space, vec);
 				}
-				
-				sv_setnv(x, vec[0]);
-				sv_setnv(y, vec[1]);
-				if (z) sv_setnv(z, vec[2]);
+				for (j=0; j < 3; j++)
+					if (component_sv[j])
+						sv_setnv(component_sv[j], vec[j]);
+				break;
+			case M3S_VECTYPE_PDL:
+			case M3S_VECTYPE_PDLMULTI:
+				{
+					int count;
+					dSP;
+					if (!pdl_origin) {
+						pdl_origin= sv_2mortal(m3s_pdl_vector(SPACE_ORIGIN(space), 3));
+						pdl_matrix= sv_2mortal(m3s_pdl_matrix(SPACE_XV(space), !(ix&2) /*transpose bool*/));
+					}
+					ENTER;
+					SAVETMPS;
+					PUSHMARK(SP);
+					EXTEND(SP, 4);
+					PUSHs(ST(i));
+					// project point subtracts origin
+					PUSHs(ix == 3? pdl_origin : &PL_sv_undef);
+					PUSHs(pdl_matrix);
+					// unproject point adds origin
+					PUSHs(ix == 1? pdl_origin : &PL_sv_undef);
+					PUTBACK;
+					count= call_pv("Math::3Space::_pdl_project_inplace", G_DISCARD);
+					
+					FREETMPS;
+					LEAVE;
+				}
+				break;
+			default:
+				croak("bug: unhandled vec type");
 			}
 		}
 		// return $self
@@ -920,6 +1193,156 @@ get_gl_matrix(space, buffer=NULL)
 		}
 
 #**********************************************************************************************
+# Math::3Space::Projection
+#**********************************************************************************************
+MODULE = Math::3Space              PACKAGE = Math::3Space::Projection
+
+SV *
+new_frustum(left, right, bottom, top, near, far)
+	double left
+	double right
+	double bottom
+	double top
+	double near
+	double far
+	INIT:
+		m3s_4space_projection_t proj;
+		double w, h, d, w_1, h_1, d_1;
+	CODE:
+		w= right - left;
+		h= top - bottom;
+		d= far - near;
+		if (fabs(w) < double_tolerance || fabs(h) < double_tolerance || fabs(d) < double_tolerance)
+			croak("Described frustum has a zero-sized dimension");
+
+		w_1= 1/w;
+		h_1= 1/h;
+		d_1= 1/d;
+		proj.frustum.m00= near * 2 * w_1;
+		proj.frustum.m11= near * 2 * h_1;
+		proj.frustum.m20= (right+left) * w_1;
+		proj.frustum.m21= (top+bottom) * h_1;
+		proj.frustum.m22= -(near+far) * d_1;
+		proj.frustum.m32= -2 * near * far * d_1;
+		RETVAL= m3s_wrap_projection(&proj,
+			// use optimized version if m20 and m21 are zero
+			fabs(proj.frustum.m20) < double_tolerance && fabs(proj.frustum.m21) < double_tolerance
+			? "Math::3Space::Projection::CenteredFrustum"
+			: "Math::3Space::Projection::Frustum"
+		);
+	OUTPUT:
+		RETVAL
+
+SV *
+new_perspective(vertical_field_of_view, aspect, near, far)
+	double vertical_field_of_view
+	double aspect
+	double near
+	double far
+	INIT:
+		m3s_4space_projection_t proj;
+		double f;
+	CODE:
+		f= tan(M_PI_2 - vertical_field_of_view * M_PI);
+		proj.frustum.m00= f /aspect;
+		proj.frustum.m11= f;
+		proj.frustum.m22= -1;
+		proj.frustum.m32= -near;
+		RETVAL= m3s_wrap_projection(&proj, "Math::3Space::Projection::CenteredFrustum");
+	OUTPUT:
+		RETVAL
+
+MODULE = Math::3Space              PACKAGE = Math::3Space::Projection::Frustum
+
+# This is an optimized matrix multiplication taking advantage of all the
+# zeroes and ones in both the 3Space matrix and the projection matrix.
+
+void
+get_gl_matrix(proj, space, buffer=NULL)
+	m3s_4space_projection_t *proj
+	m3s_space_t *space
+	SV *buffer
+	INIT:
+		double tmp[16];
+		double *dst= tmp;
+		struct m3s_4space_frustum_projection *f= &proj->frustum;
+	PPCODE:
+		if (buffer) {
+			m3s_make_aligned_buffer(buffer, sizeof(double)*16);
+			dst= (double*) SvPVX(buffer);
+		}
+		dst[ 0]= f->m00 * SPACE_XV(space)[0] +                               f->m20 * SPACE_XV(space)[2];
+		dst[ 1]=                               f->m11 * SPACE_XV(space)[1] + f->m21 * SPACE_XV(space)[2];
+		dst[ 2]=                                                             f->m22 * SPACE_XV(space)[2];
+		dst[ 3]=                                                                     -SPACE_XV(space)[2];
+		dst[ 4]= f->m00 * SPACE_YV(space)[0] +                               f->m20 * SPACE_YV(space)[2];
+		dst[ 5]=                               f->m11 * SPACE_YV(space)[1] + f->m21 * SPACE_YV(space)[2];
+		dst[ 6]=                                                             f->m22 * SPACE_YV(space)[2];
+		dst[ 7]=                                                                     -SPACE_YV(space)[2];
+		dst[ 8]= f->m00 * SPACE_ZV(space)[0] +                               f->m20 * SPACE_ZV(space)[2];
+		dst[ 9]=                               f->m11 * SPACE_ZV(space)[1] + f->m21 * SPACE_ZV(space)[2];
+		dst[10]=                                                             f->m22 * SPACE_ZV(space)[2];
+		dst[11]=                                                                     -SPACE_ZV(space)[2];
+		dst[12]= f->m00 * SPACE_ORIGIN(space)[0]                           + f->m20 * SPACE_ORIGIN(space)[2];
+		dst[13]=                           f->m11 * SPACE_ORIGIN(space)[1] + f->m21 * SPACE_ORIGIN(space)[2];
+		dst[14]=                                                             f->m22 * SPACE_ORIGIN(space)[2] + f->m32;
+		dst[15]=                                                                     -SPACE_ORIGIN(space)[2];
+		if (buffer)
+			XSRETURN(0);
+		else {
+			int i;
+			EXTEND(SP, 16);
+			for (i= 0; i < 16; i++)
+				mPUSHn(dst[i]);
+			XSRETURN(16);
+		}
+
+MODULE = Math::3Space              PACKAGE = Math::3Space::Projection::CenteredFrustum
+
+# This is an optimized version of Projection::Frustum that assumes
+# the projection matrix m20 and m21 are zero.
+
+void
+get_gl_matrix(proj, space, buffer=NULL)
+	m3s_4space_projection_t *proj
+	m3s_space_t *space
+	SV *buffer
+	INIT:
+		double tmp[16];
+		double *dst= tmp;
+		struct m3s_4space_frustum_projection *f= &proj->frustum;
+	PPCODE:
+		if (buffer) {
+			m3s_make_aligned_buffer(buffer, sizeof(double)*16);
+			dst= (double*) SvPVX(buffer);
+		}
+		dst[ 0]= f->m00 * SPACE_XV(space)[0];
+		dst[ 1]= f->m11 * SPACE_XV(space)[1];
+		dst[ 2]= f->m22 * SPACE_XV(space)[2];
+		dst[ 3]=         -SPACE_XV(space)[2];
+		dst[ 4]= f->m00 * SPACE_YV(space)[0];
+		dst[ 5]= f->m11 * SPACE_YV(space)[1];
+		dst[ 6]= f->m22 * SPACE_YV(space)[2];
+		dst[ 7]=         -SPACE_YV(space)[2];
+		dst[ 8]= f->m00 * SPACE_ZV(space)[0];
+		dst[ 9]= f->m11 * SPACE_ZV(space)[1];
+		dst[10]= f->m22 * SPACE_ZV(space)[2];
+		dst[11]=         -SPACE_ZV(space)[2];
+		dst[12]= f->m00 * SPACE_ORIGIN(space)[0];
+		dst[13]= f->m11 * SPACE_ORIGIN(space)[1];
+		dst[14]= f->m22 * SPACE_ORIGIN(space)[2] + f->m32;
+		dst[15]=         -SPACE_ORIGIN(space)[2];
+		if (buffer)
+			XSRETURN(0);
+		else {
+			int i;
+			EXTEND(SP, 16);
+			for (i= 0; i < 16; i++)
+				mPUSHn(dst[i]);
+			XSRETURN(16);
+		}
+
+#**********************************************************************************************
 # Math::3Space::Vector
 #**********************************************************************************************
 MODULE = Math::3Space              PACKAGE = Math::3Space::Vector
@@ -932,13 +1355,7 @@ vec3(vec_or_x, y=NULL, z=NULL)
 	INIT:
 		m3s_vector_t vec;
 	CODE:
-		if (y) {
-			vec[0]= SvNV(vec_or_x);
-			vec[1]= SvNV(y);
-			vec[2]= z? SvNV(z) : 0;
-		} else {
-			m3s_read_vector_from_sv(vec, vec_or_x);
-		}
+		M3S_VECLOAD(vec,vec_or_x,y,z,0);
 		RETVAL = vec;
 	OUTPUT:
 		RETVAL
@@ -952,7 +1369,7 @@ new(pkg, ...)
 		IV i, ofs;
 	CODE:
 		if (items == 2 && SvROK(ST(1))) {
-			m3s_read_vector_from_sv(vec, ST(1));
+			m3s_read_vector_from_sv(vec, ST(1), NULL, NULL);
 		}
 		else if (items & 1) {
 			for (i= 1; i < items; i+= 2) {
@@ -1002,7 +1419,7 @@ magnitude(vec, scale=NULL)
 	m3s_vector_p vec
 	SV *scale
 	INIT:
-		NV s, m= sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
+		NV s, m= sqrt(m3s_vector_dotprod(vec,vec));
 	PPCODE:
 		if (scale) {
 			if (m > 0) {
@@ -1030,13 +1447,7 @@ set(vec1, vec2_or_x, y=NULL, z=NULL)
 	INIT:
 		NV vec2[3];
 	PPCODE:
-		if (y || looks_like_number(vec2_or_x)) {
-			vec2[0]= SvNV(vec2_or_x);
-			vec2[1]= y? SvNV(y) : 0;
-			vec2[2]= z? SvNV(z) : 0;
-		} else {
-			m3s_read_vector_from_sv(vec2, vec2_or_x);
-		}
+		M3S_VECLOAD(vec2,vec2_or_x,y,z,0);
 		if (ix == 0) {
 			vec1[0]= vec2[0];
 			vec1[1]= vec2[1];
@@ -1061,14 +1472,14 @@ scale(vec1, vec2_or_x, y=NULL, z=NULL)
 	INIT:
 		NV vec2[3];
 	PPCODE:
-		// single value should be treated as ($x,$x,$x) inatead of ($x,0,0)
+		// single value should be treated as ($x,$x,$x) instead of ($x,0,0)
 		if (looks_like_number(vec2_or_x)) {
 			vec2[0]= SvNV(vec2_or_x);
 			vec2[1]= y? SvNV(y) : vec2[0];
 			vec2[2]= z? SvNV(z) : y? 1 : vec2[0];
 		}
 		else {
-			m3s_read_vector_from_sv(vec2, vec2_or_x);
+			m3s_read_vector_from_sv(vec2, vec2_or_x, NULL, NULL);
 		}
 		vec1[0]*= vec2[0];
 		vec1[1]*= vec2[1];
@@ -1084,14 +1495,22 @@ dot(vec1, vec2_or_x, y=NULL, z=NULL)
 	INIT:
 		NV vec2[3];
 	CODE:
-		if (y) {
-			vec2[0]= SvNV(vec2_or_x);
-			vec2[1]= SvNV(y);
-			vec2[2]= z? SvNV(z) : 0;
-		} else {
-			m3s_read_vector_from_sv(vec2, vec2_or_x);
-		}
+		M3S_VECLOAD(vec2,vec2_or_x,y,z,0);
 		RETVAL= m3s_vector_dotprod(vec1, vec2);
+	OUTPUT:
+		RETVAL
+
+NV
+cos(vec1, vec2_or_x, y=NULL, z=NULL)
+	m3s_vector_p vec1
+	SV *vec2_or_x
+	SV *y
+	SV *z
+	INIT:
+		NV vec2[3];
+	CODE:
+		M3S_VECLOAD(vec2,vec2_or_x,y,z,0);
+		RETVAL= m3s_vector_cosine(vec1, vec2);
 	OUTPUT:
 		RETVAL
 
@@ -1105,7 +1524,7 @@ cross(vec1, vec2_or_x, vec3_or_y=NULL, z=NULL)
 		m3s_vector_t vec2, vec3;
 	PPCODE:
 		if (!vec3_or_y) { // RET = vec1->cross(vec2)
-			m3s_read_vector_from_sv(vec2, vec2_or_x);
+			m3s_read_vector_from_sv(vec2, vec2_or_x, NULL, NULL);
 			m3s_vector_cross(vec3, vec1, vec2);
 			ST(0)= sv_2mortal(m3s_wrap_vector(vec3));
 		} else if (z || !SvROK(vec2_or_x) || looks_like_number(vec2_or_x)) { // RET = vec1->cross(x,y,z)
@@ -1115,9 +1534,20 @@ cross(vec1, vec2_or_x, vec3_or_y=NULL, z=NULL)
 			m3s_vector_cross(vec3, vec1, vec2);
 			ST(0)= sv_2mortal(m3s_wrap_vector(vec3));
 		} else {
-			m3s_read_vector_from_sv(vec2, vec2_or_x);
-			m3s_read_vector_from_sv(vec3, vec3_or_y);
+			m3s_read_vector_from_sv(vec2, vec2_or_x, NULL, NULL);
+			m3s_read_vector_from_sv(vec3, vec3_or_y, NULL, NULL);
 			m3s_vector_cross(vec1, vec2, vec3);
 			// leave $self on stack
 		}
 		XSRETURN(1);
+
+BOOT:
+	HV *inc= get_hv("INC", GV_ADD);
+	AV *isa;
+	hv_stores(inc, "Math::3Space::Projection",                  newSVpvs("Math/3Space.pm"));
+	hv_stores(inc, "Math::3Space::Projection::Frustum",         newSVpvs("Math/3Space.pm"));
+	hv_stores(inc, "Math::3Space::Projection::CenteredFrustum", newSVpvs("Math/3Space.pm"));
+	isa= get_av("Math::3Space::Projection::Frustum::ISA", GV_ADD);
+	av_push(isa, newSVpvs("Math::3Space::Projection"));
+	isa= get_av("Math::3Space::Projection::CenteredFrustum::ISA", GV_ADD);
+	av_push(isa, newSVpvs("Math::3Space::Projection"));

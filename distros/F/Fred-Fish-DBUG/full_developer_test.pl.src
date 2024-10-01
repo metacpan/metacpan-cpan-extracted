@@ -61,6 +61,14 @@ use constant MAX => 40;
 
 my $fish_dir;
 
+BEGIN {
+   eval {
+      require Time::HiRes;
+      Time::HiRes->import ( qw(time sleep) );
+   };
+}
+
+
 {
    $fish_dir = File::Spec->catdir ("t", "fish");
 
@@ -176,10 +184,13 @@ sub run_all_tests
    my $t3 = run_one_test ( $make,  0, MAX, "~",
                            "Fred::Fish::DBUG qw /ON/, with fish turned on" );
 
+   my $d = get_delay ();
+
    print "All tests ran OK!\n\n";
-   printf ("Pass 1: %d second(s)\n", $t1 - $t0);
-   printf ("Pass 2: %d second(s)\n", $t2 - $t1);
-   printf ("Pass 3: %d second(s)\n", $t3 - $t2);
+   printf "Pass 1: %.1f second(s)\n", ($t1 - $t0);
+   printf "Pass 2: %.1f second(s)\n", ($t2 - $t1);
+   printf "Pass 3: %.1f second(s) = %.1f sec(s) - %.1f delay\n",
+	  ($t3 - $t2 - $d), ($t3 - $t2), $d;
    print "\n";
 
    return;
@@ -332,6 +343,24 @@ sub delete_old_fish_logs
    }
 
    return;
+}
+
+sub get_delay
+{
+   my $total_delay = 0;
+
+   my $wild = File::Spec->catfile ( $fish_dir, "delay_*.txt" );
+
+   foreach my $f ( glob ( $wild ) ) {
+      open (my $fh, "<", $f)  or die ("Can't open $f:  $!\n");
+      while ( my $line = <$fh> ) {
+         chomp ($line);
+	 $total_delay += $line;
+      }
+      close ($fh)  or die ("Failed to close file $f: $!\n");
+   }
+
+   return ($total_delay);
 }
 
 

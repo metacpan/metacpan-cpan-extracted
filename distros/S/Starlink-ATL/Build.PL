@@ -15,6 +15,7 @@ my $build = Module::Build->new(
     requires => {
         'Starlink::AST' => 1.02,
         'Pod::Usage' => 0,
+        'Astro::FITS::CFITSIO' => 0,
     },
     build_requires => {
         'Astro::Coords' => 0.18,

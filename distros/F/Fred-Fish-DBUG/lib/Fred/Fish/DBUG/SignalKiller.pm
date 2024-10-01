@@ -7,7 +7,7 @@
 
 =head1 NAME
 
-SignalKiller.pm - A crazy extension module for Fred::Fish::DBUG.
+Fred::Fish::DBUG::SignalKiller - A crazy extension module for Fred::Fish::DBUG.
 
 =head1 SYNOPSIS
 
@@ -66,9 +66,9 @@ use Exporter;
 
 # The module whose behaviour we want to modify
 # so that we can sabotage everything else!
-use Fred::Fish::DBUG::Signal 2.03;
+use Fred::Fish::DBUG::Signal 2.04;
 
-$VERSION = "2.03";
+$VERSION = "2.04";
 @ISA = qw( Exporter );
 @EXPORT = qw( );
 @EXPORT_OK = qw( );

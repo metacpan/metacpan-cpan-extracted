@@ -20,7 +20,7 @@ use Perl::Critic::StricterSubs::Utils qw(
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.06;
+our $VERSION = '0.07';
 
 #-----------------------------------------------------------------------------
 
@@ -32,9 +32,9 @@ sub applies_to           { return 'PPI::Document'         }
 #-----------------------------------------------------------------------------
 
 sub violates {
-    my ($self, $elem, $doc) = @_;
+    my ($self, undef, $doc) = @_;
 
-    my @exported_sub_names = ();
+    my @exported_sub_names;
     eval {
         @exported_sub_names = find_exported_subroutine_names( $doc );
         1;
@@ -54,7 +54,7 @@ sub violates {
     my %declared_sub_names = hashify( @declared_sub_names,
                                       @declared_constants );
 
-    my @violations = ();
+    my @violations;
     for my $sub_name ( @exported_sub_names ) {
         if ( not exists $declared_sub_names{ $sub_name } ){
             my $desc = qq{Subroutine "$sub_name" is exported but not declared};
@@ -93,7 +93,7 @@ Jeffrey Ryan Thalhammer <thaljef@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 Jeffrey Ryan Thalhammer.  All rights reserved.
+Copyright 2007-2024 Jeffrey Ryan Thalhammer and Andy Lester
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.  The full text of this license can be found in

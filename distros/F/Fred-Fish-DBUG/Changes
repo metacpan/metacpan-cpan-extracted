@@ -23,6 +23,22 @@
 
 Version - YYYY/MM/DD
 ---------------------
+2.04 2024-09-27 08:30:00
+  - Added a delay log file whenever the delay option was used in a test case.
+  - Modified full_developer_test.pl.src to take delays into account.
+  - Fixed bug in Tutorial.pm Example # 6.  Also moved required to end of file.
+    Fixed typo in package name that broke the links.
+  - Fixed the POD NAME section in all *.pm files to follow the correct naming
+    standards.
+  - Fixed t/21-return_simple.t to also test that wantarray keyword works as
+    expected.  Since so much logic depends on it.
+  - CPAN Tester hack, didn't like me calling dbug_level() from BEGIN ?
+    So added test in DBUG.pm to verify since I can't reproduce it (-100).
+  - Updated the POD NAME for all *.pm files to be fully qualified.
+  - Depreciate DEBUG.pm & Log.pm, now just POD stubs.
+  - Fixed unexpected warning error ecountered by a CPAN tester on test case
+    t/70_multi_thread-test.t
+
 2.03 2024-08-05 08:30:00
   - Split Signal logging from ON.pm to Signal.pm, required an update to most
     test scripts as well.

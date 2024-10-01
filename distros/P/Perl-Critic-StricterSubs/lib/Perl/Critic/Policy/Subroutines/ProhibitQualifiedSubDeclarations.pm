@@ -8,7 +8,7 @@ use Perl::Critic::Utils qw( :severities &is_qualified_name );
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.06;
+our $VERSION = '0.07';
 
 #-----------------------------------------------------------------------------
 
@@ -85,7 +85,7 @@ Jeffrey Ryan Thalhammer <thaljef@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 Jeffrey Ryan Thalhammer.  All rights reserved.
+Copyright 2007-2024 Jeffrey Ryan Thalhammer and Andy Lester
 
 =cut
 

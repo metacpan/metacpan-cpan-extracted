@@ -8,7 +8,7 @@
 
 =head1 NAME
 
-OFF.pm - Fred Fish Stub library for Perl
+Fred::Fish::DBUG::OFF - Fred Fish Stub library for Perl
 
 =head1 SYNOPSIS
 
@@ -94,7 +94,7 @@ use Exporter;
 
 use FileHandle;
 
-$VERSION = "2.03";
+$VERSION = "2.04";
 @ISA = qw( Exporter );
 @EXPORT = qw( );
 @EXPORT_OK = qw( );

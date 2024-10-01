@@ -21,10 +21,14 @@ ex/json_grammar.pl
 ex/logic.pl
 ex/ollama.pl
 ex/sample.ogg
+ex/structured_code.pl
+ex/structured_output.pl
+ex/structured_sentences.pl
 ex/synopsis.pl
 ex/transcription.pl
 lib/Langertha.pm
 lib/Langertha/Engine/Anthropic.pm
+lib/Langertha/Engine/Groq.pm
 lib/Langertha/Engine/Ollama.pm
 lib/Langertha/Engine/OpenAI.pm
 lib/Langertha/Engine/Whisper.pm
@@ -37,6 +41,7 @@ lib/Langertha/Role/HTTP.pm
 lib/Langertha/Role/JSON.pm
 lib/Langertha/Role/Models.pm
 lib/Langertha/Role/OpenAPI.pm
+lib/Langertha/Role/ResponseFormat.pm
 lib/Langertha/Role/ResponseSize.pm
 lib/Langertha/Role/Seed.pm
 lib/Langertha/Role/SystemPrompt.pm
