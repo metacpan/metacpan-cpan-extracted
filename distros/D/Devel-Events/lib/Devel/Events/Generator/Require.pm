@@ -1,8 +1,7 @@
-#!/usr/bin/perl
-
 package Devel::Events::Generator::Require;
+# vim: set ts=2 sw=2 noet nolist :
 # ABSTRACT: Event generator for loading of code using C<require>
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use strict;
 use warnings;
 
@@ -98,7 +97,7 @@ Devel::Events::Generator::Require - Event generator for loading of code using C<
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

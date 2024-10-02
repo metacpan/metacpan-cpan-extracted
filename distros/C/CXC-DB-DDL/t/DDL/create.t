@@ -52,6 +52,15 @@ my %main = (
             is_auto_increment => 1,
         ),
     ),
+    constraints => [ {
+            type   => UNIQUE,
+            fields => '-all',
+        },
+        {
+            type   => UNIQUE,
+            fields => ['id'],
+        },
+    ],
 );
 
 my %dep = (

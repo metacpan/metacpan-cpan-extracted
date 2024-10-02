@@ -1,10 +1,9 @@
-#!/usr/bin/perl
-
 BEGIN { $^P |= 0x02 }
 
 package Devel::Events::Generator::LineTrace;
+# vim: set ts=2 sw=2 noet nolist :
 # ABSTRACT: Generate C<executing_line> events using the perl debugger api
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Moose;
 
 with qw/Devel::Events::Generator/;
@@ -50,7 +49,7 @@ Devel::Events::Generator::LineTrace - Generate C<executing_line> events using th
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

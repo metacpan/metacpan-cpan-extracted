@@ -1,8 +1,7 @@
-#!/usr/bin/perl
-
 package Devel::Events::Filter::Warn;
+# vim: set ts=2 sw=2 noet nolist :
 # ABSTRACT: log every event to STDERR
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Moose;
 
 use overload ();
@@ -98,7 +97,7 @@ Devel::Events::Filter::Warn - log every event to STDERR
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

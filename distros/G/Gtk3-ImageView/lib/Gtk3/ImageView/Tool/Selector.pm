@@ -3,13 +3,13 @@ package Gtk3::ImageView::Tool::Selector;
 use warnings;
 use strict;
 use base 'Gtk3::ImageView::Tool';
-use Glib qw(TRUE FALSE);    # To get TRUE and FALSE
+use Glib       qw(TRUE FALSE);    # To get TRUE and FALSE
 use List::Util qw(min);
 use Readonly;
 Readonly my $RIGHT_BUTTON => 3;
 Readonly my $EDGE_WIDTH   => 5;
 
-our $VERSION = '10';
+our $VERSION = '11';
 
 sub button_pressed {
     my ( $self, $event ) = @_;

@@ -1,5 +1,8 @@
 Revision history for Syntax-Construct
 
+1.038   2024-10-01
+        - Add "split-space"
+
 1.037   2024-06-20
         - Fix turkic casing: reset original locale
 

@@ -1,12 +1,11 @@
-#!/usr/bin/perl
-
-package Devel::Events; # git description: 695e81c
+package Devel::Events; # git description: v0.09-9-gb708a33
+# vim: set ts=2 sw=2 noet nolist :
 # ABSTRACT: Extensible instrumentation framework
 
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 __PACKAGE__;
 
@@ -22,7 +21,7 @@ Devel::Events - Extensible instrumentation framework
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

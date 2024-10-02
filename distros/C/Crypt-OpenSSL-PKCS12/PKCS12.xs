@@ -1252,6 +1252,29 @@ certificate(pkcs12, pwd = "")
   RETVAL
 
 SV*
+ca_certificate(pkcs12, pwd = "")
+  Crypt::OpenSSL::PKCS12 pkcs12
+  char *pwd
+
+  PREINIT:
+  BIO *bio;
+  STACK_OF(PKCS7) *asafes = NULL;
+
+  CODE:
+
+  CHECK_OPEN_SSL(bio = BIO_new(BIO_s_mem()));
+
+  if ((asafes = PKCS12_unpack_authsafes(pkcs12)) == NULL)
+        RETVAL = newSVpvn("",0);
+
+  dump_certs_keys_p12(aTHX_ bio, pkcs12, pwd, strlen(pwd), CACERTS|NOKEYS, NULL, NULL);
+
+  RETVAL = extractBioString(aTHX_ bio);
+
+  OUTPUT:
+  RETVAL
+
+SV*
 private_key(pkcs12, pwd = "")
   Crypt::OpenSSL::PKCS12 pkcs12
   char *pwd

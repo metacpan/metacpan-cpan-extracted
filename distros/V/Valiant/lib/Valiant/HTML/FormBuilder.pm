@@ -62,6 +62,12 @@ sub form_method { shift->options->{html}{method} }
 sub form_enctype { shift->options->{html}{method} }
 sub csrf_token { shift->options->{html}{data}{csrf_token} }
 
+sub allow_method_names_outside_object {
+  return exists(shift->options->{allow_method_names_outside_object})
+  ? shift->options->{allow_method_names_outside_object}
+  : 1;
+}
+
 sub DEFAULT_MODEL_ERROR_MSG_ON_FIELD_ERRORS { return 'Your form has errors' }
 sub DEFAULT_MODEL_ERROR_TAG_ON_FIELD_ERRORS { return 'invalid_form' }
 sub DEFAULT_COLLECTION_CHECKBOX_BUILDER { return 'Valiant::HTML::FormBuilder::Checkbox' }
@@ -100,6 +106,11 @@ sub tag_name_for_attribute {
 sub tag_value_for_attribute {
   my ($self, $attribute) = @_;
   return $self->tag_helpers->field_value($self->model, $attribute);
+}
+
+sub tag_errors_for_attribute {
+  my ($self, $attribute) = @_;
+  return $self->tag_helpers->field_errors($self->model, $attribute);
 }
 
 sub human_name_for_attribute {
@@ -290,7 +301,8 @@ sub errors_for {
 
   return '' unless $self->model->can('errors');
 
-  my @errors = $self->model->errors->full_messages_for($attribute);
+  my @errors = $self->tag_errors_for_attribute($attribute);
+  #my @errors = $self->model->errors->full_messages_for($attribute);
   return '' unless scalar(@errors);
   
   my $max_errors = exists($options->{max_errors}) ? delete($options->{max_errors}) : undef;
@@ -385,7 +397,7 @@ sub _input {
   $html_attrs->{value} = $self->tag_value_for_attribute($attribute) unless defined($html_attrs->{value});
   $html_attrs = $self->process_options($attribute, $html_attrs);
 
-  my $response = $self->tag_helpers->input_tag($attribute, $html_attrs);
+  return my $response_obj = $self->tag_helpers->input_tag($attribute, $html_attrs);
 }
 
 sub password {
@@ -1280,9 +1292,13 @@ Given a string return string that has been HTML escaped.
 
 Given an attribute name return the value that the view has defined for it.
 
+B<NOTE> Optional
+
 =item attribute_for_view_exists
 
 Given an attribute name return true if the view has defined a value for it.
+
+B<NOTE> Optional
 
 =back
 
@@ -1313,6 +1329,15 @@ the form enctype attribute
 =head2 csrf_token
 
 The CSRF token, if there is one
+
+=head2 allow_method_names_outside_object
+
+accessor to the 'allow_method_names_outside_object' option.  This is true by default.   Allow you
+to control the behavior of what happens when you try to access a model attribute that doesn't exist
+
+=head2 tag_errors_for_attribute
+
+Given an attribute return an array of error messages for that attribute if any.
 
 =head2 form_has_errors
 

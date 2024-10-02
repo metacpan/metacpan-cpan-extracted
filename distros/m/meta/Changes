@@ -1,5 +1,14 @@
 Revision history for meta
 
+0.010   2024-10-01
+        [CHANGES]
+         * Added `$metasub->signature` and the meta-signature object
+           representation
+
+        [BUGFIXES]
+         * Don't leak extra `SVt_NULL` SVs from the internal `wrap_*()` helper
+           functions
+
 0.009   2024-09-14
         [CHANGES]
          * Added `$metapkg->is_class` and `$metasub->is_method` for querying

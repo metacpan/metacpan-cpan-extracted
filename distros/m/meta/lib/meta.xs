@@ -31,6 +31,10 @@
                             gv_init(gv, stash, pv, len, flags)
 #endif
 
+#if HAVE_PERL_VERSION(5, 26, 0)
+#  define HAVE_SUB_SIGNATURES
+#endif
+
 #ifndef av_count
 #  define av_count(av)  (AvFILL(av)+1)
 #endif
@@ -61,7 +65,6 @@
 #define wrap_sv_refsv(sv)  S_wrap_sv_refsv(aTHX_ sv)
 SV *S_wrap_sv_refsv(pTHX_ SV *sv)
 {
-  SV *ret = newSV(0);
   const char *metaclass;
   switch(SvTYPE(sv)) {
     case SVt_PVGV: metaclass = "meta::glob";       break;
@@ -74,9 +77,20 @@ SV *S_wrap_sv_refsv(pTHX_ SV *sv)
 #define wrap_stash(stash)  S_wrap_stash(aTHX_ stash)
 static SV *S_wrap_stash(pTHX_ HV *stash)
 {
-  SV *ret = newSV(0);
   // TODO: Do we need to refcnt_inc stash?
-  return sv_setref_uv(ret, "meta::package", PTR2UV(stash));
+  return sv_setref_uv(newSV(0), "meta::package", PTR2UV(stash));
+}
+
+struct CVwithOP {
+  CV *cv;
+  OP *op;
+};
+
+#define wrap_cv_signature(cv, op)  S_wrap_cv_signature(aTHX_ cv, op)
+static SV *S_wrap_cv_signature(pTHX_ CV *cv, OP *op)
+{
+  struct CVwithOP ret = { .cv = CvREFCNT_inc(cv), .op = op, };
+  return sv_setref_pvn(newSV(0), "meta::subsignature", (const char *)&ret, sizeof(ret));
 }
 
 #ifdef SVf_QUOTEDPREFIX
@@ -995,6 +1009,110 @@ set_prototype(SV *metasub, SV *proto)
       SvPOK_off((SV *)cv);
 
     RETVAL = SvREFCNT_inc(metasub);
+  }
+  OUTPUT:
+    RETVAL
+
+SV *
+signature(SV *metasub)
+  CODE:
+  {
+    CV *cv = MUST_CV_FROM_REFSV(metasub);
+
+    RETVAL = &PL_sv_undef;
+#ifdef HAVE_SUB_SIGNATURES
+    if(CvISXSUB(cv))
+      goto nosig;
+
+    OP *oproot = CvROOT(cv);
+    if(!oproot)
+      goto nosig;
+
+    /* The optree of a signatured sub should be an OP_LEAVESUB at toplevel.
+     * Nested inside will be maybe one or two OP_NULL[OP_LINESEQ[...]]
+     * subtrees, inside of which will be a COP, OP_ARGCHECK, ...
+     * It is the OP_ARGCHECK we are looking for
+     */
+
+    assert(oproot->op_type == OP_LEAVESUB);
+    OP *o = cUNOPx(oproot)->op_first;
+
+    /* Descend into OP_NULL / OP_LINESEQ trees while skipping past COPs
+     */
+    while(o) {
+      if(o->op_type == OP_NULL)
+        o = cUNOPo->op_first;
+      else if(o->op_type == OP_LINESEQ)
+        o = (o->op_flags & OPf_KIDS) ? cUNOPo->op_first : NULL;
+      else if(o->op_type == OP_NEXTSTATE || o->op_type == OP_DBSTATE)
+        o = OpSIBLING(o);
+      else
+        break;
+    }
+
+    if(!o || o->op_type != OP_ARGCHECK)
+      goto nosig;
+
+    RETVAL = wrap_cv_signature(cv, o);
+
+    nosig:
+      ;
+#endif
+  }
+  OUTPUT:
+    RETVAL
+
+MODULE = meta    PACKAGE = meta::subsignature
+
+void
+DESTROY(SV *metasig)
+  CODE:
+  {
+    struct CVwithOP *cvop = (struct CVwithOP *)SvPVX(SvRV(metasig));
+
+    SvREFCNT_dec(cvop->cv);
+    // ->op is not refcounted
+  }
+
+SV *
+mandatory_params(SV *metasig)
+  ALIAS:
+    mandatory_params = 0
+    optional_params  = 1
+    slurpy           = 2
+    min_args         = 0
+    max_args         = 3
+  CODE:
+  {
+#ifdef HAVE_SUB_SIGNATURES
+    struct CVwithOP *cvop = (struct CVwithOP *)SvPVX(SvRV(metasig));
+#  if HAVE_PERL_VERSION(5, 31, 5)
+    struct op_argcheck_aux *aux = (struct op_argcheck_aux *)cUNOP_AUXx(cvop->op)->op_aux;
+    int params     = aux->params;
+    int opt_params = aux->opt_params;
+    char slurpy    = aux->slurpy;
+#  else
+    UNOP_AUX_item *aux = cUNOP_AUXx(cvop->op)->op_aux;
+    int params     = aux[0].iv;
+    int opt_params = aux[1].iv;
+    char slurpy    = aux[2].iv;
+#  endif
+
+    switch(ix) {
+      case 0:
+        RETVAL = newSViv(params - opt_params);
+        break;
+      case 1:
+        RETVAL = newSViv(opt_params);
+        break;
+      case 2:
+        RETVAL = slurpy ? newSVpvf("%c", slurpy) : &PL_sv_undef;
+        break;
+      case 3:
+        RETVAL = slurpy ? &PL_sv_undef : newSViv(params);
+        break;
+    }
+#endif
   }
   OUTPUT:
     RETVAL

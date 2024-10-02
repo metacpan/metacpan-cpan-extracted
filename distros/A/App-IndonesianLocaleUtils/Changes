@@ -1,4 +1,11 @@
-0.02    2021-05-07  Released-By: PERLANCAR; Urgency: medium
+0.021   2024-09-30  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Locale::ID:Province.
+
+
+0.020   2021-05-07  Released-By: PERLANCAR; Urgency: medium
 
 	- [incompatible change] Update to newer Locale::ID::Province &
 	  Locale::ID::Locality (renamed CLIs

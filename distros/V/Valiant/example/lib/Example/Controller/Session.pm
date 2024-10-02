@@ -5,7 +5,7 @@ use Example::Syntax;
 
 extends 'Example::Controller';
 
-has person => (is=>'ro', context=>'user');
+has person => (is=>'ro', shared=>1, default=>sub { shift->ctx->user });
 
 sub root :At('login/...') Via('../root') ($self, $c) {
   return $c->redirect_to_action('/home/user_show') && $c->detach

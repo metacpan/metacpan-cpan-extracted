@@ -11,7 +11,7 @@ use experimental 'signatures', 'postderef';
 
 use namespace::clean -except => [ '_tag_list', '_tags' ];
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 
 
@@ -69,7 +69,7 @@ CXC::DB::DDL::CloneClear - Provide attribute tags and a method for Moo objects t
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 

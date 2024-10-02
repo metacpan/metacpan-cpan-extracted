@@ -180,3 +180,33 @@ Latest Update/release info (added automatically)
 	Version ID: Old 0.3.6 | New 0.3.7
 
 
+#### 2024-10-01 08:46:34 CDT
+
+	Commit ID: Old 037 | New 038
+	Version ID: Old 0.3.7 | New 0.3.8
+
+
+#### 2024-10-01 09:07:07 CDT
+
+	Commit ID: Old 038 | New 039
+	Version ID: Old 0.3.8 | New 0.3.9
+
+
+#### 2024-10-01 09:16:16 CDT
+
+	Commit ID: Old 039 | New 040
+	Version ID: Old 0.3.9 | New 0.4.0
+
+
+#### 2024-10-01 09:23:16 CDT
+
+	Commit ID: Old 040 | New 041
+	Version ID: Old 0.4.0 | New 0.4.1
+
+
+#### 2024-10-01 11:26:47 CDT
+
+	Commit ID: Old 041 | New 042
+	Version ID: Old 0.4.1 | New 0.4.2
+
+

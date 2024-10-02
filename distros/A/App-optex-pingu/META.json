@@ -60,7 +60,7 @@
    "provides" : {
       "App::optex::pingu" : {
          "file" : "lib/App/optex/pingu.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "App::optex::pingu::Picture" : {
          "file" : "lib/App/optex/pingu/Picture.pm"
@@ -78,7 +78,7 @@
          "web" : "https://github.com/kaz-utashiro/optex-pingu"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

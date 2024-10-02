@@ -24,6 +24,7 @@ use constant {
     QLR   => "\N{QUADRANT LOWER RIGHT}",
     QULLR => "\N{QUADRANT UPPER LEFT AND LOWER RIGHT}",
     QURLL => "\N{QUADRANT UPPER RIGHT AND LOWER LEFT}",
+    Q____ => "\N{SPACE}",
     Qxx__ => "\N{UPPER HALF BLOCK}",
     Q__xx => "\N{LOWER HALF BLOCK}",
     Qx_x_ => "\N{LEFT HALF BLOCK}",
@@ -42,21 +43,34 @@ use constant {
 };
 my $color_re = qr/[RGBCMYKW]/i;
 
+my %loader = (
+    asc  => \&read_asc,
+    asc2 => sub { read_asc({ y => 2}, @_) },
+    asc4 => sub { read_asc({ x => 2, y => 2}, @_) },
+    );
+$loader{default} //= $loader{asc};
+
 sub load {
     my $file = shift;
+    my %opt = @_;
     open my $fh, '<', $file or die "$file: $!\n";
-    local $_ = do { local $/; <$fh> };
-    s/.*^__DATA__\n//ms;
-    s/^#.*\n//mg;
-    if ($file =~ /\.asc$/) {
-	read_asc($_);
+    my $data = do { local $/; <$fh> };
+    if ($file =~ /\.(\w+)$/) {
+	$opt{format} ||= $1;
     }
-    elsif ($file =~ /\.asc2$/) {
-	read_asc({ y => 2 }, $_);
+    load_data($data, %opt);
+}
+
+sub load_data {
+    my $data = shift;
+    my %opt = @_;
+    for ($data) {
+	s/.*^__DATA__\n//ms;
+	s/^#.*\n//mg;
     }
-    elsif ($file =~ /\.asc4$/) {
-	read_asc({ x => 2, y => 2 }, $_);
-    }
+    $opt{format} ||= 'default';
+    my $loader = $loader{$opt{format}} // die "$opt{format}: unknown format.\n";
+    $loader->($data);
 }
 
 sub squash {
@@ -72,28 +86,28 @@ sub squash {
 }
 
 my %element = (
-    "0"    => '',    #
-    "1"    => FB,    # █
-    "00"   => '',    #
-    "10"   => THB,   # ▀
-    "01"   => BHB,   # ▄
-    "11"   => FB,    # █
-    "0000" => '',    #
-    "0001" => Q___x, # ▗
-    "0010" => Q__x_, # ▖
-    "0011" => Q__xx, # ▄
-    "0100" => Q_x__, # ▝
-    "0101" => Q_x_x, # ▐
-    "0110" => Q_xx_, # ▞
-    "0111" => Q_xxx, # ▟
-    "1000" => Qx___, # ▘
-    "1001" => Qx__x, # ▚
-    "1010" => Qx_x_, # ▄
-    "1011" => Qx_xx, # ▙
-    "1100" => Qxx__, # ▀
-    "1101" => Qxx_x, # ▜
-    "1110" => Qxxx_, # ▛
-    "1111" => Qxxxx, # █
+    "0"    => Q____ , #  
+    "1"    => Qxxxx , # █
+    "00"   => Q____ , #
+    "10"   => Qxx__ , # ▀
+    "01"   => Q__xx , # ▄
+    "11"   => Qxxxx , # █
+    "0000" => Q____ , #  
+    "0001" => Q___x , # ▗
+    "0010" => Q__x_ , # ▖
+    "0011" => Q__xx , # ▄
+    "0100" => Q_x__ , # ▝
+    "0101" => Q_x_x , # ▐
+    "0110" => Q_xx_ , # ▞
+    "0111" => Q_xxx , # ▟
+    "1000" => Qx___ , # ▘
+    "1001" => Qx__x , # ▚
+    "1010" => Qx_x_ , # ▄
+    "1011" => Qx_xx , # ▙
+    "1100" => Qxx__ , # ▀
+    "1101" => Qxx_x , # ▜
+    "1110" => Qxxx_ , # ▛
+    "1111" => Qxxxx , # █
 );
 
 sub stringify {
@@ -123,8 +137,8 @@ sub read_asc {
     @data % $y                  and die "data format error.";
     any { (length) % $x } @data and die "data format error.";
     my @image;
-    while (my @y = splice(@data, 0, $y)) {
-	my @sequence = squash zip map { [ /\X{$x}/g ] } @y;
+    while (my @y = splice @data, 0, $y) {
+	my @sequence = squash zip map [ /\X{$x}/g ], @y;
 	my $line = join '', map stringify($_), @sequence;
 	push @image, $line;
     }
@@ -139,7 +153,8 @@ sub read_asc_1 {
     s{ (?<str>(?<col>$color_re)\g{col}*) }{
 	ansi_color($+{col}, FB x length($+{str}))
     }xge;
-    /.+/g;
+    my @image = /.+/g;
+    wantarray ? @image : join('', map "$_\n", @image);
 }
 
 my $use_FB  = 0; # use FULL BLOCK when upper/lower are same
@@ -184,5 +199,14 @@ sub read_asc_2 {
 }
 
 ######################################################################
+
+if (__FILE__ eq $0) {
+    use open IO => ':utf8', ':std';
+    local $/;
+    while (<>) {
+	my $suffix = ($ARGV =~ /\.(\w+)$/)[0] // 'default';
+	print scalar load_data($_, format => $suffix);
+    }
+}
 
 1;

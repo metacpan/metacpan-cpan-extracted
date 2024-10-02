@@ -1,9 +1,8 @@
-#!/usr/bin/perl
-
+# vim: set ts=2 sw=2 noet nolist :
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 0.88;
 
 
 my $m; use ok $m = "Devel::Events::Handler::Callback";
@@ -37,3 +36,5 @@ can_ok($m, "new");
 		"callback",
 	);
 }
+
+done_testing;

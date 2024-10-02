@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::More tests => 16;
+use Test::More tests => 17;
 use File::Spec::Functions qw(:ALL);
 use Data::Dumper;
 use Crypt::OpenSSL::Guess;
@@ -30,6 +30,10 @@ ok($pkcs12, 'PKCS object created');
 my $pemcert = $pkcs12->certificate($pass);
 
 ok($pemcert, 'PEM certificate created');
+
+my $cacert = $pkcs12->ca_certificate($pass);
+
+ok($cacert, 'CA certificate created');
 
 my $pemkey = $pkcs12->private_key($pass);
 

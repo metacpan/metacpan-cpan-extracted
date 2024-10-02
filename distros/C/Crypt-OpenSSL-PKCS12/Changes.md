@@ -1,8 +1,13 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+# 1.94 2024-10-01
+
+- Merge of PR: [#52](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/52) from @dakkar, first time contributor to the distribution, thanks for the contribution
+  This PR introduces a new feature, which allows for the extraction a certificate chain from a PKCS12 file via a new method `ca- certificate`
+
 # 1.93 2024-09-28
 
-- Inclusion of PR: [#51](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/44) aimed at addressing the following issues observed with previous release: `1.92`, thanks to @timlegge for the contribution
+- Inclusion of PR: [#51](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/51) aimed at addressing the following issues observed with previous release: `1.92`, thanks to @timlegge for the contribution
   - [#48](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/48)
   - [#49](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/49)
   - [#40](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/50)

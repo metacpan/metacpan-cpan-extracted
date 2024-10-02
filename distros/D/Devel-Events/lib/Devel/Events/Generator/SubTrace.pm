@@ -1,13 +1,12 @@
-#!/usr/bin/perl
-
 use Moose ();
 use Moose::Role ();
 
 BEGIN { $^P |= 0x01 }
 
 package Devel::Events::Generator::SubTrace;
+# vim: set ts=2 sw=2 noet nolist :
 # ABSTRACT: generate C<executing_line> events using the perl debugger api
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Moose;
 
 with qw/Devel::Events::Generator/;
@@ -117,7 +116,7 @@ Devel::Events::Generator::SubTrace - generate C<executing_line> events using the
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

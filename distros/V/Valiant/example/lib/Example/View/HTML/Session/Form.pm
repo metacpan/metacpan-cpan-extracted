@@ -5,7 +5,7 @@ use Example::Syntax;
 use Example::View::HTML
   qw(form_for link_to uri);
 
-has 'person' => (is=>'ro', required=>1, context=>1);
+has 'person' => (is=>'ro', shared=>1);
 
 sub render($self, $c) {
   $self->form_for('person', {data=>{remote=>1}}, sub ($self, $fb, $person) {

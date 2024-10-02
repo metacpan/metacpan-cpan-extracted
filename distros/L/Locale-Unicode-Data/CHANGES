@@ -1,5 +1,9 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.0.3 2024-10-02T07:07:17+0900
+    - Improved handling of UTC data for the timezones table in the script create_database.pl
+    - Updated the SQL check constraint for the tables timezones, aliases, bcp47_values, locales_l10n, scripts_l10n, territories_l10n, variants_l10n, calendar_datetime_formats, and time_formats
+
 v1.0.2 2024-09-16T18:20:54+0900
     - Removed test dependency
     - Updated method calendars to allow search by 'calendar'

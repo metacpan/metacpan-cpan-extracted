@@ -1,4 +1,18 @@
 ----------------------------
+Version 0.85 (2024-10-01)
+----------------------------
+
+* remove bundled Test modules (should fix github #11)
+
+* small change for compatibility with pre-dor perls
+  (should fix github #10)
+
+* suppress some gcc warnings during build
+
+* update `ppport.h`, which gets rid of a lot of clang
+  warnings
+
+----------------------------
 Version 0.84 (2020-11-23)
 ----------------------------
 

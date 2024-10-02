@@ -4,7 +4,7 @@ use warnings;
 use IO::File;
 use File::Spec;
 
-my $dir = shift // '.';
+my $dir = @ARGV ? shift : '.';
 
 for my $f ('aa' .. 'az') {
   my $fh = IO::File->new(">" . File::Spec->catfile($dir, "$f.h")) or die;

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="16" failures="0" disabled="0" errors="0" time="4.314" timestamp="2024-10-01T12:12:08.508" name="AllTests">
+  <testsuite name="Unit" tests="16" failures="0" disabled="0" skipped="0" errors="0" time="4.314" timestamp="2024-10-01T12:12:08.508">
+    <testcase name="Activation_Activate_correct_credentials" file="/home/vsts/work/1/s/src/native/UnitTests/ActivationTests.cpp" line="8" status="run" result="completed" time="2.355" timestamp="2024-10-01T12:12:08.508" classname="Unit" />
+    <testcase name="Activation_Activate_javonet_lic_exists" file="/home/vsts/work/1/s/src/native/UnitTests/ActivationTests.cpp" line="15" status="run" result="completed" time="0.067" timestamp="2024-10-01T12:12:10.863" classname="Unit" />
+    <testcase name="Activation_Activate_incorrect_license_key" file="/home/vsts/work/1/s/src/native/UnitTests/ActivationTests.cpp" line="21" status="run" result="completed" time="0.683" timestamp="2024-10-01T12:12:10.931" classname="Unit" />
+    <testcase name="ConfigFileReader_ExisitingFile" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="8" status="run" result="completed" time="0." timestamp="2024-10-01T12:12:11.615" classname="Unit" />
+    <testcase name="SetConfigSource_MissingFile" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="13" status="run" result="completed" time="0.566" timestamp="2024-10-01T12:12:11.615" classname="Unit" />
+    <testcase name="ConfigFileReader_GetLicenseKey" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="33" status="run" result="completed" time="0." timestamp="2024-10-01T12:12:12.182" classname="Unit" />
+    <testcase name="ConfigFileReader_GetRuntimeName_Jvm" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="39" status="run" result="completed" time="0." timestamp="2024-10-01T12:12:12.182" classname="Unit" />
+    <testcase name="ConfigFileReader_GetRuntimeName_Netcore" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="45" status="run" result="completed" time="0." timestamp="2024-10-01T12:12:12.183" classname="Unit" />
+    <testcase name="ConfigFileReader_GetRuntimeType_MissingType" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="51" status="run" result="completed" time="0.567" timestamp="2024-10-01T12:12:12.184" classname="Unit" />
+    <testcase name="ConfigFileReader_GetChannelType_Jvm" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="69" status="run" result="completed" time="0." timestamp="2024-10-01T12:12:12.751" classname="Unit" />
+    <testcase name="ConfigFileReader_GetChannelType_Netcore" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="75" status="run" result="completed" time="0." timestamp="2024-10-01T12:12:12.752" classname="Unit" />
+    <testcase name="ConfigFileReader_GetChannelHost_Jvm" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="81" status="run" result="completed" time="0." timestamp="2024-10-01T12:12:12.752" classname="Unit" />
+    <testcase name="ConfigFileReader_GetChannelHost_Netcore" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="88" status="run" result="completed" time="0." timestamp="2024-10-01T12:12:12.753" classname="Unit" />
+    <testcase name="ConfigFileReader_GetChannelPort_Jvm" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="95" status="run" result="completed" time="0." timestamp="2024-10-01T12:12:12.754" classname="Unit" />
+    <testcase name="ConfigFileReader_GetChannelPort_Netcore" file="/home/vsts/work/1/s/src/native/UnitTests/ConfigFileReaderTests.cpp" line="102" status="run" result="completed" time="0." timestamp="2024-10-01T12:12:12.755" classname="Unit" />
+    <testcase name="AppInsightLogger" file="/home/vsts/work/1/s/src/native/UnitTests/LoggingTests.cpp" line="4" status="run" result="completed" time="0.066" timestamp="2024-10-01T12:12:12.755" classname="Unit" />
+  </testsuite>
+</testsuites>

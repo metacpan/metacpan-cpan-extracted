@@ -1,8 +1,7 @@
-#!/usr/bin/perl
-
 package Devel::Events::Filter::Drop;
+# vim: set ts=2 sw=2 noet nolist :
 # ABSTRACT: Remove events that match or don't match a condition
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Moose;
 
 with qw/Devel::Events::Filter/;
@@ -69,7 +68,7 @@ Devel::Events::Filter::Drop - Remove events that match or don't match a conditio
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

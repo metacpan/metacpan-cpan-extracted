@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Perl Modules",
+  "ABSTRACT" => "Sumu Perl Modules : List all installed Perl Modules",
   "AUTHOR" => "SuMu <pause\@a1z.us>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -19,9 +19,10 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "ExtUtils::Installed" => 0,
     "parent" => 0,
-    "strict" => 0
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "0.3.7",
+  "VERSION" => "0.4.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,7 +33,8 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "ExtUtils::Installed" => 0,
   "parent" => 0,
-  "strict" => 0
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

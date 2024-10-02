@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ################################################################################
 #
-# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2024 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 # 
@@ -338,6 +338,12 @@ sub configure
     $config->{'CCFLAGS'} .= ' -Wformat=2';
   }
 
+  if (eval $ExtUtils::MakeMaker::VERSION >= 6.64) {
+    $config->{'TEST_REQUIRES'} = {
+      'Test::More' => 0,
+    };
+  }
+
   if (eval $ExtUtils::MakeMaker::VERSION >= 6) {
     $config->{'AUTHOR'} = 'Marcus Holland-Moritz <mhx@cpan.org>';
     $config->{'ABSTRACT_FROM'} = 'lib/Convert/Binary/C.pm';
@@ -347,7 +353,6 @@ sub configure
     $config->{'META_MERGE'} = {
       'meta-spec' => { version => 2 },
       no_index => {
-        directory => [qw( support )],
         file      => [qw( bin/elf.PL )],
       },
       resources => {

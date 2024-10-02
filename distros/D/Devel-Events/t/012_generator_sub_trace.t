@@ -1,9 +1,8 @@
-#!/usr/bin/perl
-
+# vim: set ts=2 sw=2 noet nolist :
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 0.88;
 
 use Devel::Events::Generator::SubTrace;
 
@@ -41,3 +40,5 @@ is_deeply(
 	],
 	"call chain events",
 );
+
+done_testing;

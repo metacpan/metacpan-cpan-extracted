@@ -1,9 +1,8 @@
-#!/usr/bin/perl
-
+# vim: set ts=2 sw=2 noet nolist :
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 0.88;
 use Test::Deep;
 
 use Devel::Events::Handler::Callback;
@@ -22,7 +21,9 @@ is_deeply( \@log, [], "log empty" );
 
 eval { +require "this_file_does_not_exist.pm" }; my $line = __LINE__;
 
-my $error = quotemeta("Can't locate this_file_does_not_exist.pm in \@INC ") . ".*" . quotemeta("\@INC contains: @INC) at " . __FILE__ . " line $line.") . "\n";
+my $inc_contains = "$]" >= 5.037007 ? '@INC entries checked' : '@INC contains';
+
+my $error = quotemeta("Can't locate this_file_does_not_exist.pm in \@INC ") . ".*" . quotemeta("$inc_contains: @INC) at " . __FILE__ . " line $line.") . "\n";
 cmp_deeply(
         [ @log[0..1] ],
 	[
@@ -41,7 +42,7 @@ cmp_deeply(
 
 eval { +require This::Module::Does::Not::Exist }; $line = __LINE__;
 
-$error = quotemeta("Can't locate This/Module/Does/Not/Exist.pm in \@INC ") . ".*" . quotemeta("(\@INC contains: @INC) at " . __FILE__ . " line $line.") . "\n";
+$error = quotemeta("Can't locate This/Module/Does/Not/Exist.pm in \@INC ") . ".*" . quotemeta("($inc_contains: @INC) at " . __FILE__ . " line $line.") . "\n";
 cmp_deeply(
 	\@log,
 	[
@@ -75,3 +76,5 @@ is_deeply(
 	],
 	"log events"
 );
+
+done_testing;

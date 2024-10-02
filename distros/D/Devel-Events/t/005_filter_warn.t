@@ -1,9 +1,8 @@
-#!/usr/bin/perl
-
+# vim: set ts=2 sw=2 noet nolist :
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 0.88;
 
 use ok 'Devel::Events::Filter::Warn';
 
@@ -19,3 +18,4 @@ is_deeply(
 	[ [ "foo: bar => 42\n" ] ],
 );
 
+done_testing;

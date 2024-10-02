@@ -1,5 +1,9 @@
 Revision history for Devel-Events
 
+0.10      2024-10-01 19:32:23Z
+        - remove the use of MooseX::AttributeHelpers
+        - fix test for changes to an error message in perl 5.37.7
+
 0.09      2018-03-27 00:57:48Z
         - converted packaging to Dist::Zilla
         - fixed tests that expect an error message that changed in perl 5.18.0

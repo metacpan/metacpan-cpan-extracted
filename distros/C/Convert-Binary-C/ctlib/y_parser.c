@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.7.1.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -45,11 +45,11 @@
    define necessary library symbols; they are noted "INFRINGES ON
    USER NAME SPACE" below.  */
 
-/* Identify Bison output.  */
-#define YYBISON 1
+/* Identify Bison output, and Bison version.  */
+#define YYBISON 30802
 
-/* Bison version.  */
-#define YYBISON_VERSION "3.7.1"
+/* Bison version string.  */
+#define YYBISON_VERSION "3.8.2"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -84,7 +84,7 @@
 *
 ********************************************************************************
 *
-* Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
+* Copyright (c) 2002-2024 Marcus Holland-Moritz. All rights reserved.
 * This program is free software; you can redistribute it and/or modify
 * it under the same terms as Perl itself.
 *
@@ -409,7 +409,9 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
+
 int c_parse (ParserState *pState);
+
 
 
 /* Symbol kind.  */
@@ -746,7 +748,7 @@ static inline int   check_type(YYSTYPE *plval, ParserState *pState, const char *
 static        void  parser_error(ParserState *pState, const char *msg);
 
 
-#line 750 "ctlib/y_parser.c"
+#line 752 "ctlib/y_parser.c"
 
 
 #ifdef short
@@ -784,6 +786,18 @@ typedef __INT_LEAST16_TYPE__ yytype_int16;
 typedef int_least16_t yytype_int16;
 #else
 typedef short yytype_int16;
+#endif
+
+/* Work around bug in HP-UX 11.23, which defines these macros
+   incorrectly for preprocessor constants.  This workaround can likely
+   be removed in 2023, as HPE has promised support for HP-UX 11.23
+   (aka HP-UX 11i v2) only through the end of 2022; see Table 2 of
+   <https://h20195.www2.hpe.com/V2/getpdf.aspx/4AA4-7673ENW.pdf>.  */
+#ifdef __hpux
+# undef UINT_LEAST8_MAX
+# undef UINT_LEAST16_MAX
+# define UINT_LEAST8_MAX 255
+# define UINT_LEAST16_MAX 65535
 #endif
 
 #if defined __UINT_LEAST8_MAX__ && __UINT_LEAST8_MAX__ <= __INT_MAX__
@@ -883,17 +897,23 @@ typedef int yy_state_fast_t;
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
-# define YYUSE(E) ((void) (E))
+# define YY_USE(E) ((void) (E))
 #else
-# define YYUSE(E) /* empty */
+# define YY_USE(E) /* empty */
 #endif
 
-#if defined __GNUC__ && ! defined __ICC && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
 /* Suppress an incorrect diagnostic about yylval being uninitialized.  */
-# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                            \
+#if defined __GNUC__ && ! defined __ICC && 406 <= __GNUC__ * 100 + __GNUC_MINOR__
+# if __GNUC__ * 100 + __GNUC_MINOR__ < 407
+#  define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                           \
+    _Pragma ("GCC diagnostic push")                                     \
+    _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")
+# else
+#  define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                           \
     _Pragma ("GCC diagnostic push")                                     \
     _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")              \
     _Pragma ("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
+# endif
 # define YY_IGNORE_MAYBE_UNINITIALIZED_END      \
     _Pragma ("GCC diagnostic pop")
 #else
@@ -1113,7 +1133,7 @@ static const yytype_int8 yytranslate[] =
 };
 
 #if YYDEBUG
-  /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
+/* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
        0,   620,   620,   621,   629,   633,   634,   638,   642,   643,
@@ -1236,23 +1256,6 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#ifdef YYPRINT
-/* YYTOKNUM[NUM] -- (External) token number corresponding to the
-   (internal) symbol number NUM (which must be that of a token).  */
-static const yytype_int16 yytoknum[] =
-{
-       0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-     305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
-     315,   316,   317,   318,   319,    40,    41,    59,    58,    44,
-      91,    93,    46,   123,   125,    38,    42,    43,    45,   126,
-      33,    47,    37,    60,    62,    94,   124,    63,    61
-};
-#endif
-
 #define YYPACT_NINF (-507)
 
 #define yypact_value_is_default(Yyn) \
@@ -1263,8 +1266,8 @@ static const yytype_int16 yytoknum[] =
 #define yytable_value_is_error(Yyn) \
   0
 
-  /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
-     STATE-NUM.  */
+/* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
+   STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
     1279,  -507,  -507,  -507,  -507,  -507,  -507,  -507,  -507,  -507,
@@ -1331,9 +1334,9 @@ static const yytype_int16 yypact[] =
      111,   392,   445,   737,   497,  -507,  -507,   111
 };
 
-  /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
-     Performed when YYTABLE does not specify something else to do.  Zero
-     means the default is an error.  */
+/* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
+   Performed when YYTABLE does not specify something else to do.  Zero
+   means the default is an error.  */
 static const yytype_int16 yydefact[] =
 {
      273,   161,   169,   164,   179,   167,   198,   162,   158,   165,
@@ -1400,7 +1403,7 @@ static const yytype_int16 yydefact[] =
       18,     0,     0,     0,     0,    17,    11,    19
 };
 
-  /* YYPGOTO[NTERM-NUM].  */
+/* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
     -507,  -310,  -507,   -20,  -507,  -507,   166,  -507,   209,  -507,
@@ -1419,10 +1422,10 @@ static const yytype_int16 yypgoto[] =
     -507,  -300,  -123
 };
 
-  /* YYDEFGOTO[NTERM-NUM].  */
+/* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
-      -1,   152,   196,   205,    27,   369,   586,   587,   588,   611,
+       0,   152,   196,   205,    27,   369,   586,   587,   588,   611,
      153,   154,   268,   269,   518,   421,   155,   156,   157,   158,
      159,   160,   161,   162,   163,   164,   165,   166,   167,   168,
      169,   281,   408,   370,   466,   371,   132,    29,    30,   133,
@@ -1438,9 +1441,9 @@ static const yytype_int16 yydefgoto[] =
      131,   388,   389
 };
 
-  /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
-     positive, shift that token.  If negative, reduce the rule whose
-     number is the opposite.  If YYTABLE_NINF, syntax error.  */
+/* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
+   positive, shift that token.  If negative, reduce the rule whose
+   number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int16 yytable[] =
 {
      170,    55,   465,   478,   122,    28,   130,   124,    62,    61,
@@ -1887,8 +1890,8 @@ static const yytype_int16 yycheck[] =
       30,    -1,    -1,    -1,    -1,    -1,    36
 };
 
-  /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
-     symbol of state STATE-NUM.  */
+/* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
+   state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
        0,     3,     4,     5,     6,     9,    12,    13,    14,    15,
@@ -1955,7 +1958,7 @@ static const yytype_uint8 yystos[] =
       90,    98,   122,    66,    69,    66,    67,    90
 };
 
-  /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
+/* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_uint8 yyr1[] =
 {
        0,    89,    90,    90,    91,    92,    92,    93,    94,    94,
@@ -1997,7 +2000,7 @@ static const yytype_uint8 yyr1[] =
      220,   220,   220,   220,   221,   221,   221,   221
 };
 
-  /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
+/* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     2,     4,     0,     1,     5,     6,     8,
@@ -2048,6 +2051,7 @@ enum { YYENOMEM = -2 };
 #define YYACCEPT        goto yyacceptlab
 #define YYABORT         goto yyabortlab
 #define YYERROR         goto yyerrorlab
+#define YYNOMEM         goto yyexhaustedlab
 
 
 #define YYRECOVERING()  (!!yyerrstatus)
@@ -2088,10 +2092,7 @@ do {                                            \
     YYFPRINTF Args;                             \
 } while (0)
 
-/* This macro is provided for backward compatibility. */
-# ifndef YY_LOCATION_PRINT
-#  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
-# endif
+
 
 
 # define YY_SYMBOL_PRINT(Title, Kind, Value, Location)                    \
@@ -2115,14 +2116,10 @@ yy_symbol_value_print (FILE *yyo,
                        yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, ParserState *pState)
 {
   FILE *yyoutput = yyo;
-  YYUSE (yyoutput);
-  YYUSE (pState);
+  YY_USE (yyoutput);
+  YY_USE (pState);
   if (!yyvaluep)
     return;
-# ifdef YYPRINT
-  if (yykind < YYNTOKENS)
-    YYPRINT (yyo, yytoknum[yykind], *yyvaluep);
-# endif
   YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   switch (yykind)
     {
@@ -2134,7 +2131,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2138 "ctlib/y_parser.c"
+#line 2135 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_member_declarator: /* member_declarator  */
@@ -2161,7 +2158,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2165 "ctlib/y_parser.c"
+#line 2162 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_identifier_or_typedef_name: /* identifier_or_typedef_name  */
@@ -2172,7 +2169,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2176 "ctlib/y_parser.c"
+#line 2173 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_declarator: /* declarator  */
@@ -2199,7 +2196,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2203 "ctlib/y_parser.c"
+#line 2200 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_typedef_declarator: /* typedef_declarator  */
@@ -2226,7 +2223,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2230 "ctlib/y_parser.c"
+#line 2227 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_parameter_typedef_declarator: /* parameter_typedef_declarator  */
@@ -2253,7 +2250,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2257 "ctlib/y_parser.c"
+#line 2254 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_clean_typedef_declarator: /* clean_typedef_declarator  */
@@ -2280,7 +2277,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2284 "ctlib/y_parser.c"
+#line 2281 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_clean_postfix_typedef_declarator: /* clean_postfix_typedef_declarator  */
@@ -2307,7 +2304,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2311 "ctlib/y_parser.c"
+#line 2308 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_paren_typedef_declarator: /* paren_typedef_declarator  */
@@ -2334,7 +2331,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2338 "ctlib/y_parser.c"
+#line 2335 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_paren_postfix_typedef_declarator: /* paren_postfix_typedef_declarator  */
@@ -2361,7 +2358,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2365 "ctlib/y_parser.c"
+#line 2362 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_simple_paren_typedef_declarator: /* simple_paren_typedef_declarator  */
@@ -2388,7 +2385,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2392 "ctlib/y_parser.c"
+#line 2389 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_identifier_declarator: /* identifier_declarator  */
@@ -2415,7 +2412,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2419 "ctlib/y_parser.c"
+#line 2416 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_unary_identifier_declarator: /* unary_identifier_declarator  */
@@ -2442,7 +2439,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2446 "ctlib/y_parser.c"
+#line 2443 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_postfix_identifier_declarator: /* postfix_identifier_declarator  */
@@ -2469,7 +2466,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2473 "ctlib/y_parser.c"
+#line 2470 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_paren_identifier_declarator: /* paren_identifier_declarator  */
@@ -2496,7 +2493,7 @@ yy_symbol_value_print (FILE *yyo,
   else
     fprintf(yyoutput, "NULL");
 }
-#line 2500 "ctlib/y_parser.c"
+#line 2497 "ctlib/y_parser.c"
         break;
 
       default:
@@ -2882,8 +2879,8 @@ static void
 yydestruct (const char *yymsg,
             yysymbol_kind_t yykind, YYSTYPE *yyvaluep, ParserState *pState)
 {
-  YYUSE (yyvaluep);
-  YYUSE (pState);
+  YY_USE (yyvaluep);
+  YY_USE (pState);
   if (!yymsg)
     yymsg = "Deleting";
   YY_SYMBOL_PRINT (yymsg, yykind, yyvaluep, yylocationp);
@@ -2900,7 +2897,7 @@ yydestruct (const char *yymsg,
     HN_delete(((*yyvaluep).identifier));
   }
 }
-#line 2904 "ctlib/y_parser.c"
+#line 2901 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_member_declaration_list_opt: /* member_declaration_list_opt  */
@@ -2912,7 +2909,7 @@ yydestruct (const char *yymsg,
     LL_destroy(((*yyvaluep).list), (LLDestroyFunc) structdecl_delete);
   }
 }
-#line 2916 "ctlib/y_parser.c"
+#line 2913 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_member_declaration_list: /* member_declaration_list  */
@@ -2924,7 +2921,7 @@ yydestruct (const char *yymsg,
     LL_destroy(((*yyvaluep).list), (LLDestroyFunc) structdecl_delete);
   }
 }
-#line 2928 "ctlib/y_parser.c"
+#line 2925 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_member_declaration: /* member_declaration  */
@@ -2936,7 +2933,7 @@ yydestruct (const char *yymsg,
     structdecl_delete(((*yyvaluep).pStructDecl));
   }
 }
-#line 2940 "ctlib/y_parser.c"
+#line 2937 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_unnamed_su_declaration: /* unnamed_su_declaration  */
@@ -2948,7 +2945,7 @@ yydestruct (const char *yymsg,
     structdecl_delete(((*yyvaluep).pStructDecl));
   }
 }
-#line 2952 "ctlib/y_parser.c"
+#line 2949 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_member_declaring_list: /* member_declaring_list  */
@@ -2960,7 +2957,7 @@ yydestruct (const char *yymsg,
     structdecl_delete(((*yyvaluep).pStructDecl));
   }
 }
-#line 2964 "ctlib/y_parser.c"
+#line 2961 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_member_declarator: /* member_declarator  */
@@ -2972,7 +2969,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 2976 "ctlib/y_parser.c"
+#line 2973 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_enumerator_list: /* enumerator_list  */
@@ -2984,7 +2981,7 @@ yydestruct (const char *yymsg,
     LL_destroy(((*yyvaluep).list), (LLDestroyFunc) enum_delete);
   }
 }
-#line 2988 "ctlib/y_parser.c"
+#line 2985 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_identifier_or_typedef_name: /* identifier_or_typedef_name  */
@@ -2996,7 +2993,7 @@ yydestruct (const char *yymsg,
     HN_delete(((*yyvaluep).identifier));
   }
 }
-#line 3000 "ctlib/y_parser.c"
+#line 2997 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_declarator: /* declarator  */
@@ -3008,7 +3005,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3012 "ctlib/y_parser.c"
+#line 3009 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_typedef_declarator: /* typedef_declarator  */
@@ -3020,7 +3017,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3024 "ctlib/y_parser.c"
+#line 3021 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_parameter_typedef_declarator: /* parameter_typedef_declarator  */
@@ -3032,7 +3029,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3036 "ctlib/y_parser.c"
+#line 3033 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_clean_typedef_declarator: /* clean_typedef_declarator  */
@@ -3044,7 +3041,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3048 "ctlib/y_parser.c"
+#line 3045 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_clean_postfix_typedef_declarator: /* clean_postfix_typedef_declarator  */
@@ -3056,7 +3053,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3060 "ctlib/y_parser.c"
+#line 3057 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_paren_typedef_declarator: /* paren_typedef_declarator  */
@@ -3068,7 +3065,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3072 "ctlib/y_parser.c"
+#line 3069 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_paren_postfix_typedef_declarator: /* paren_postfix_typedef_declarator  */
@@ -3080,7 +3077,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3084 "ctlib/y_parser.c"
+#line 3081 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_simple_paren_typedef_declarator: /* simple_paren_typedef_declarator  */
@@ -3092,7 +3089,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3096 "ctlib/y_parser.c"
+#line 3093 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_identifier_declarator: /* identifier_declarator  */
@@ -3104,7 +3101,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3108 "ctlib/y_parser.c"
+#line 3105 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_unary_identifier_declarator: /* unary_identifier_declarator  */
@@ -3116,7 +3113,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3120 "ctlib/y_parser.c"
+#line 3117 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_postfix_identifier_declarator: /* postfix_identifier_declarator  */
@@ -3128,7 +3125,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3132 "ctlib/y_parser.c"
+#line 3129 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_paren_identifier_declarator: /* paren_identifier_declarator  */
@@ -3140,7 +3137,7 @@ yydestruct (const char *yymsg,
     decl_delete(((*yyvaluep).pDecl));
   }
 }
-#line 3144 "ctlib/y_parser.c"
+#line 3141 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_postfixing_abstract_declarator: /* postfixing_abstract_declarator  */
@@ -3152,7 +3149,7 @@ yydestruct (const char *yymsg,
     LL_destroy(((*yyvaluep).list), (LLDestroyFunc) value_delete);
   }
 }
-#line 3156 "ctlib/y_parser.c"
+#line 3153 "ctlib/y_parser.c"
         break;
 
     case YYSYMBOL_array_abstract_declarator: /* array_abstract_declarator  */
@@ -3164,7 +3161,7 @@ yydestruct (const char *yymsg,
     LL_destroy(((*yyvaluep).list), (LLDestroyFunc) value_delete);
   }
 }
-#line 3168 "ctlib/y_parser.c"
+#line 3165 "ctlib/y_parser.c"
         break;
 
       default:
@@ -3241,6 +3238,7 @@ YYSTYPE yylval YY_INITIAL_VALUE (= yyval_default);
   YYDPRINTF ((stderr, "Starting parse\n"));
 
   yychar = YYEMPTY; /* Cause a token to be read.  */
+
   goto yysetstate;
 
 
@@ -3266,7 +3264,7 @@ yysetstate:
 
   if (yyss + yystacksize - 1 <= yyssp)
 #if !defined yyoverflow && !defined YYSTACK_RELOCATE
-    goto yyexhaustedlab;
+    YYNOMEM;
 #else
     {
       /* Get the current used size of the three stacks, in elements.  */
@@ -3294,7 +3292,7 @@ yysetstate:
 # else /* defined YYSTACK_RELOCATE */
       /* Extend the stack our own way.  */
       if (YYMAXDEPTH <= yystacksize)
-        goto yyexhaustedlab;
+        YYNOMEM;
       yystacksize *= 2;
       if (YYMAXDEPTH < yystacksize)
         yystacksize = YYMAXDEPTH;
@@ -3305,7 +3303,7 @@ yysetstate:
           YY_CAST (union yyalloc *,
                    YYSTACK_ALLOC (YY_CAST (YYSIZE_T, YYSTACK_BYTES (yystacksize))));
         if (! yyptr)
-          goto yyexhaustedlab;
+          YYNOMEM;
         YYSTACK_RELOCATE (yyss_alloc, yyss);
         YYSTACK_RELOCATE (yyvs_alloc, yyvs);
 #  undef YYSTACK_RELOCATE
@@ -3326,6 +3324,7 @@ yysetstate:
         YYABORT;
     }
 #endif /* !defined yyoverflow && !defined YYSTACK_RELOCATE */
+
 
   if (yystate == YYFINAL)
     YYACCEPT;
@@ -3441,7 +3440,7 @@ yyreduce:
   case 3: /* string_literal_list: string_literal_list STRING_LITERAL  */
 #line 622 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-1].value), +, (yyvsp[0].value)); }
-#line 3445 "ctlib/y_parser.c"
+#line 3444 "ctlib/y_parser.c"
     break;
 
   case 17: /* asm_operand: '[' IDENTIFIER ']' STRING_LITERAL '(' comma_expression ')'  */
@@ -3450,7 +3449,7 @@ yyreduce:
 	    if ((yyvsp[-5].identifier))
 	      HN_delete((yyvsp[-5].identifier));
 	  }
-#line 3454 "ctlib/y_parser.c"
+#line 3453 "ctlib/y_parser.c"
     break;
 
   case 20: /* primary_expression: IDENTIFIER  */
@@ -3469,115 +3468,115 @@ yyreduce:
 	      HN_delete((yyvsp[0].identifier));
 	    }
 	  }
-#line 3473 "ctlib/y_parser.c"
+#line 3472 "ctlib/y_parser.c"
     break;
 
   case 22: /* primary_expression: string_literal_list  */
 #line 696 "ctlib/parser.y"
                               { (yyval.value) = (yyvsp[0].value); (yyval.value).iv++; }
-#line 3479 "ctlib/y_parser.c"
+#line 3478 "ctlib/y_parser.c"
     break;
 
   case 23: /* primary_expression: '(' comma_expression ')'  */
 #line 697 "ctlib/parser.y"
                                    { (yyval.value) = (yyvsp[-1].value); }
-#line 3485 "ctlib/y_parser.c"
+#line 3484 "ctlib/y_parser.c"
     break;
 
   case 25: /* postfix_expression: postfix_expression '[' comma_expression ']'  */
 #line 708 "ctlib/parser.y"
                                                                 { UNDEF_VAL((yyval.value)); }
-#line 3491 "ctlib/y_parser.c"
+#line 3490 "ctlib/y_parser.c"
     break;
 
   case 26: /* postfix_expression: postfix_expression '(' ')'  */
 #line 709 "ctlib/parser.y"
                                                                 { UNDEF_VAL((yyval.value)); }
-#line 3497 "ctlib/y_parser.c"
+#line 3496 "ctlib/y_parser.c"
     break;
 
   case 27: /* postfix_expression: postfix_expression '(' argument_expression_list ')'  */
 #line 710 "ctlib/parser.y"
                                                                 { UNDEF_VAL((yyval.value)); }
-#line 3503 "ctlib/y_parser.c"
+#line 3502 "ctlib/y_parser.c"
     break;
 
   case 28: /* $@1: %empty  */
 #line 711 "ctlib/parser.y"
                              {}
-#line 3509 "ctlib/y_parser.c"
+#line 3508 "ctlib/y_parser.c"
     break;
 
   case 29: /* postfix_expression: postfix_expression $@1 '.' member_name  */
 #line 711 "ctlib/parser.y"
                                                                 { UNDEF_VAL((yyval.value)); }
-#line 3515 "ctlib/y_parser.c"
+#line 3514 "ctlib/y_parser.c"
     break;
 
   case 30: /* $@2: %empty  */
 #line 712 "ctlib/parser.y"
                              {}
-#line 3521 "ctlib/y_parser.c"
+#line 3520 "ctlib/y_parser.c"
     break;
 
   case 31: /* postfix_expression: postfix_expression $@2 PTR_OP member_name  */
 #line 712 "ctlib/parser.y"
                                                                 { UNDEF_VAL((yyval.value)); }
-#line 3527 "ctlib/y_parser.c"
+#line 3526 "ctlib/y_parser.c"
     break;
 
   case 32: /* postfix_expression: postfix_expression INC_OP  */
 #line 713 "ctlib/parser.y"
                                                                 { UNDEF_VAL((yyval.value)); }
-#line 3533 "ctlib/y_parser.c"
+#line 3532 "ctlib/y_parser.c"
     break;
 
   case 33: /* postfix_expression: postfix_expression DEC_OP  */
 #line 714 "ctlib/parser.y"
                                                                 { UNDEF_VAL((yyval.value)); }
-#line 3539 "ctlib/y_parser.c"
+#line 3538 "ctlib/y_parser.c"
     break;
 
   case 34: /* postfix_expression: '(' type_name ')' '{' initializer_list comma_opt '}'  */
 #line 715 "ctlib/parser.y"
                                                                 { UNDEF_VAL((yyval.value)); }
-#line 3545 "ctlib/y_parser.c"
+#line 3544 "ctlib/y_parser.c"
     break;
 
   case 35: /* member_name: IDENTIFIER  */
 #line 719 "ctlib/parser.y"
                      { if((yyvsp[0].identifier)) HN_delete((yyvsp[0].identifier)); }
-#line 3551 "ctlib/y_parser.c"
+#line 3550 "ctlib/y_parser.c"
     break;
 
   case 36: /* member_name: TYPE_NAME  */
 #line 720 "ctlib/parser.y"
                     {}
-#line 3557 "ctlib/y_parser.c"
+#line 3556 "ctlib/y_parser.c"
     break;
 
   case 37: /* argument_expression_list: assignment_expression  */
 #line 724 "ctlib/parser.y"
                                 {}
-#line 3563 "ctlib/y_parser.c"
+#line 3562 "ctlib/y_parser.c"
     break;
 
   case 38: /* argument_expression_list: argument_expression_list ',' assignment_expression  */
 #line 725 "ctlib/parser.y"
                                                              {}
-#line 3569 "ctlib/y_parser.c"
+#line 3568 "ctlib/y_parser.c"
     break;
 
   case 40: /* unary_expression: INC_OP unary_expression  */
 #line 730 "ctlib/parser.y"
                                   { UNDEF_VAL((yyval.value)); }
-#line 3575 "ctlib/y_parser.c"
+#line 3574 "ctlib/y_parser.c"
     break;
 
   case 41: /* unary_expression: DEC_OP unary_expression  */
 #line 731 "ctlib/parser.y"
                                   { UNDEF_VAL((yyval.value)); }
-#line 3581 "ctlib/y_parser.c"
+#line 3580 "ctlib/y_parser.c"
     break;
 
   case 42: /* unary_expression: unary_operator cast_expression  */
@@ -3599,67 +3598,67 @@ yyreduce:
 	        break;
 	    }
 	  }
-#line 3603 "ctlib/y_parser.c"
+#line 3602 "ctlib/y_parser.c"
     break;
 
   case 43: /* unary_expression: SIZEOF_TOK unary_expression  */
 #line 750 "ctlib/parser.y"
                                        { (yyval.value) = (yyvsp[0].value); }
-#line 3609 "ctlib/y_parser.c"
+#line 3608 "ctlib/y_parser.c"
     break;
 
   case 44: /* unary_expression: SIZEOF_TOK '(' type_name ')'  */
 #line 751 "ctlib/parser.y"
                                        { (yyval.value) = (yyvsp[-1].value); }
-#line 3615 "ctlib/y_parser.c"
+#line 3614 "ctlib/y_parser.c"
     break;
 
   case 45: /* unary_operator: '&'  */
 #line 755 "ctlib/parser.y"
               { (yyval.oper) = '&'; }
-#line 3621 "ctlib/y_parser.c"
+#line 3620 "ctlib/y_parser.c"
     break;
 
   case 46: /* unary_operator: '*'  */
 #line 756 "ctlib/parser.y"
               { (yyval.oper) = '*'; }
-#line 3627 "ctlib/y_parser.c"
+#line 3626 "ctlib/y_parser.c"
     break;
 
   case 47: /* unary_operator: '+'  */
 #line 757 "ctlib/parser.y"
               { (yyval.oper) = '+'; }
-#line 3633 "ctlib/y_parser.c"
+#line 3632 "ctlib/y_parser.c"
     break;
 
   case 48: /* unary_operator: '-'  */
 #line 758 "ctlib/parser.y"
               { (yyval.oper) = '-'; }
-#line 3639 "ctlib/y_parser.c"
+#line 3638 "ctlib/y_parser.c"
     break;
 
   case 49: /* unary_operator: '~'  */
 #line 759 "ctlib/parser.y"
               { (yyval.oper) = '~'; }
-#line 3645 "ctlib/y_parser.c"
+#line 3644 "ctlib/y_parser.c"
     break;
 
   case 50: /* unary_operator: '!'  */
 #line 760 "ctlib/parser.y"
               { (yyval.oper) = '!'; }
-#line 3651 "ctlib/y_parser.c"
+#line 3650 "ctlib/y_parser.c"
     break;
 
   case 52: /* cast_expression: '(' type_name ')' cast_expression  */
 #line 765 "ctlib/parser.y"
                                             { (yyval.value) = (yyvsp[0].value); (yyval.value).flags |= V_IS_UNSAFE_CAST; }
-#line 3657 "ctlib/y_parser.c"
+#line 3656 "ctlib/y_parser.c"
     break;
 
   case 54: /* multiplicative_expression: multiplicative_expression '*' cast_expression  */
 #line 771 "ctlib/parser.y"
           { BINARY_OP( (yyval.value), (yyvsp[-2].value), *, (yyvsp[0].value) ); }
-#line 3663 "ctlib/y_parser.c"
+#line 3662 "ctlib/y_parser.c"
     break;
 
   case 55: /* multiplicative_expression: multiplicative_expression '/' cast_expression  */
@@ -3670,7 +3669,7 @@ yyreduce:
 	    else
 	      BINARY_OP((yyval.value), (yyvsp[-2].value), /, (yyvsp[0].value));
 	  }
-#line 3674 "ctlib/y_parser.c"
+#line 3673 "ctlib/y_parser.c"
     break;
 
   case 56: /* multiplicative_expression: multiplicative_expression '%' cast_expression  */
@@ -3681,217 +3680,217 @@ yyreduce:
 	    else
 	      BINARY_OP((yyval.value), (yyvsp[-2].value), %, (yyvsp[0].value));
 	  }
-#line 3685 "ctlib/y_parser.c"
+#line 3684 "ctlib/y_parser.c"
     break;
 
   case 58: /* additive_expression: additive_expression '+' multiplicative_expression  */
 #line 791 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), +, (yyvsp[0].value)); }
-#line 3691 "ctlib/y_parser.c"
+#line 3690 "ctlib/y_parser.c"
     break;
 
   case 59: /* additive_expression: additive_expression '-' multiplicative_expression  */
 #line 793 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), -, (yyvsp[0].value)); }
-#line 3697 "ctlib/y_parser.c"
+#line 3696 "ctlib/y_parser.c"
     break;
 
   case 61: /* shift_expression: shift_expression LEFT_OP additive_expression  */
 #line 799 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), <<, (yyvsp[0].value)); }
-#line 3703 "ctlib/y_parser.c"
+#line 3702 "ctlib/y_parser.c"
     break;
 
   case 62: /* shift_expression: shift_expression RIGHT_OP additive_expression  */
 #line 801 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), >>, (yyvsp[0].value)); }
-#line 3709 "ctlib/y_parser.c"
+#line 3708 "ctlib/y_parser.c"
     break;
 
   case 64: /* relational_expression: relational_expression '<' shift_expression  */
 #line 807 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), <,  (yyvsp[0].value)); }
-#line 3715 "ctlib/y_parser.c"
+#line 3714 "ctlib/y_parser.c"
     break;
 
   case 65: /* relational_expression: relational_expression '>' shift_expression  */
 #line 809 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), >,  (yyvsp[0].value)); }
-#line 3721 "ctlib/y_parser.c"
+#line 3720 "ctlib/y_parser.c"
     break;
 
   case 66: /* relational_expression: relational_expression LE_OP shift_expression  */
 #line 811 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), <=, (yyvsp[0].value)); }
-#line 3727 "ctlib/y_parser.c"
+#line 3726 "ctlib/y_parser.c"
     break;
 
   case 67: /* relational_expression: relational_expression GE_OP shift_expression  */
 #line 813 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), >=, (yyvsp[0].value)); }
-#line 3733 "ctlib/y_parser.c"
+#line 3732 "ctlib/y_parser.c"
     break;
 
   case 69: /* equality_expression: equality_expression EQ_OP relational_expression  */
 #line 819 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), ==, (yyvsp[0].value)); }
-#line 3739 "ctlib/y_parser.c"
+#line 3738 "ctlib/y_parser.c"
     break;
 
   case 70: /* equality_expression: equality_expression NE_OP relational_expression  */
 #line 821 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), !=, (yyvsp[0].value)); }
-#line 3745 "ctlib/y_parser.c"
+#line 3744 "ctlib/y_parser.c"
     break;
 
   case 72: /* AND_expression: AND_expression '&' equality_expression  */
 #line 827 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), &, (yyvsp[0].value)); }
-#line 3751 "ctlib/y_parser.c"
+#line 3750 "ctlib/y_parser.c"
     break;
 
   case 74: /* exclusive_OR_expression: exclusive_OR_expression '^' AND_expression  */
 #line 833 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), ^, (yyvsp[0].value)); }
-#line 3757 "ctlib/y_parser.c"
+#line 3756 "ctlib/y_parser.c"
     break;
 
   case 76: /* inclusive_OR_expression: inclusive_OR_expression '|' exclusive_OR_expression  */
 #line 839 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), |, (yyvsp[0].value)); }
-#line 3763 "ctlib/y_parser.c"
+#line 3762 "ctlib/y_parser.c"
     break;
 
   case 78: /* logical_AND_expression: logical_AND_expression AND_OP inclusive_OR_expression  */
 #line 845 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), &&, (yyvsp[0].value)); }
-#line 3769 "ctlib/y_parser.c"
+#line 3768 "ctlib/y_parser.c"
     break;
 
   case 80: /* logical_OR_expression: logical_OR_expression OR_OP logical_AND_expression  */
 #line 851 "ctlib/parser.y"
           { BINARY_OP((yyval.value), (yyvsp[-2].value), ||, (yyvsp[0].value)); }
-#line 3775 "ctlib/y_parser.c"
+#line 3774 "ctlib/y_parser.c"
     break;
 
   case 82: /* conditional_expression: logical_OR_expression '?' comma_expression ':' conditional_expression  */
 #line 857 "ctlib/parser.y"
           { (yyval.value) = (yyvsp[-4].value).iv ? (yyvsp[-2].value) : (yyvsp[0].value); (yyval.value).flags |= (yyvsp[-4].value).flags; }
-#line 3781 "ctlib/y_parser.c"
+#line 3780 "ctlib/y_parser.c"
     break;
 
   case 84: /* assignment_expression: unary_expression assignment_operator assignment_expression  */
 #line 862 "ctlib/parser.y"
                                                                      { UNDEF_VAL((yyval.value)); }
-#line 3787 "ctlib/y_parser.c"
+#line 3786 "ctlib/y_parser.c"
     break;
 
   case 85: /* assignment_operator: '='  */
 #line 866 "ctlib/parser.y"
               {}
-#line 3793 "ctlib/y_parser.c"
+#line 3792 "ctlib/y_parser.c"
     break;
 
   case 86: /* assignment_operator: MUL_ASSIGN  */
 #line 867 "ctlib/parser.y"
                      {}
-#line 3799 "ctlib/y_parser.c"
+#line 3798 "ctlib/y_parser.c"
     break;
 
   case 87: /* assignment_operator: DIV_ASSIGN  */
 #line 868 "ctlib/parser.y"
                      {}
-#line 3805 "ctlib/y_parser.c"
+#line 3804 "ctlib/y_parser.c"
     break;
 
   case 88: /* assignment_operator: MOD_ASSIGN  */
 #line 869 "ctlib/parser.y"
                      {}
-#line 3811 "ctlib/y_parser.c"
+#line 3810 "ctlib/y_parser.c"
     break;
 
   case 89: /* assignment_operator: ADD_ASSIGN  */
 #line 870 "ctlib/parser.y"
                      {}
-#line 3817 "ctlib/y_parser.c"
+#line 3816 "ctlib/y_parser.c"
     break;
 
   case 90: /* assignment_operator: SUB_ASSIGN  */
 #line 871 "ctlib/parser.y"
                      {}
-#line 3823 "ctlib/y_parser.c"
+#line 3822 "ctlib/y_parser.c"
     break;
 
   case 91: /* assignment_operator: LEFT_ASSIGN  */
 #line 872 "ctlib/parser.y"
                       {}
-#line 3829 "ctlib/y_parser.c"
+#line 3828 "ctlib/y_parser.c"
     break;
 
   case 92: /* assignment_operator: RIGHT_ASSIGN  */
 #line 873 "ctlib/parser.y"
                        {}
-#line 3835 "ctlib/y_parser.c"
+#line 3834 "ctlib/y_parser.c"
     break;
 
   case 93: /* assignment_operator: AND_ASSIGN  */
 #line 874 "ctlib/parser.y"
                      {}
-#line 3841 "ctlib/y_parser.c"
+#line 3840 "ctlib/y_parser.c"
     break;
 
   case 94: /* assignment_operator: XOR_ASSIGN  */
 #line 875 "ctlib/parser.y"
                      {}
-#line 3847 "ctlib/y_parser.c"
+#line 3846 "ctlib/y_parser.c"
     break;
 
   case 95: /* assignment_operator: OR_ASSIGN  */
 #line 876 "ctlib/parser.y"
                     {}
-#line 3853 "ctlib/y_parser.c"
+#line 3852 "ctlib/y_parser.c"
     break;
 
   case 96: /* assignment_expression_opt: %empty  */
 #line 880 "ctlib/parser.y"
                         { UNDEF_VAL((yyval.value)); }
-#line 3859 "ctlib/y_parser.c"
+#line 3858 "ctlib/y_parser.c"
     break;
 
   case 99: /* comma_expression: comma_expression ',' assignment_expression  */
 #line 885 "ctlib/parser.y"
                                                      { (yyval.value) = (yyvsp[0].value); }
-#line 3865 "ctlib/y_parser.c"
+#line 3864 "ctlib/y_parser.c"
     break;
 
   case 102: /* comma_expression_opt: comma_expression  */
 #line 895 "ctlib/parser.y"
                            {}
-#line 3871 "ctlib/y_parser.c"
+#line 3870 "ctlib/y_parser.c"
     break;
 
   case 103: /* declaration: sue_declaration_specifier ';'  */
 #line 933 "ctlib/parser.y"
                                         {}
-#line 3877 "ctlib/y_parser.c"
+#line 3876 "ctlib/y_parser.c"
     break;
 
   case 104: /* declaration: sue_type_specifier ';'  */
 #line 934 "ctlib/parser.y"
                                  {}
-#line 3883 "ctlib/y_parser.c"
+#line 3882 "ctlib/y_parser.c"
     break;
 
   case 105: /* declaration: declaring_list ';'  */
 #line 935 "ctlib/parser.y"
                              {}
-#line 3889 "ctlib/y_parser.c"
+#line 3888 "ctlib/y_parser.c"
     break;
 
   case 106: /* declaration: default_declaring_list ';'  */
 #line 936 "ctlib/parser.y"
                                      {}
-#line 3895 "ctlib/y_parser.c"
+#line 3894 "ctlib/y_parser.c"
     break;
 
   case 107: /* default_declaring_list: declaration_qualifier_list identifier_declarator asm_string_opt initializer_opt  */
@@ -3919,7 +3918,7 @@ yyreduce:
 	      }
 	    }
 	  }
-#line 3923 "ctlib/y_parser.c"
+#line 3922 "ctlib/y_parser.c"
     break;
 
   case 108: /* default_declaring_list: type_qualifier_list identifier_declarator asm_string_opt initializer_opt  */
@@ -3929,7 +3928,7 @@ yyreduce:
 	    if ((yyvsp[-2].pDecl))
 	      decl_delete((yyvsp[-2].pDecl));
 	  }
-#line 3933 "ctlib/y_parser.c"
+#line 3932 "ctlib/y_parser.c"
     break;
 
   case 109: /* default_declaring_list: default_declaring_list ',' identifier_declarator asm_string_opt initializer_opt  */
@@ -3941,7 +3940,7 @@ yyreduce:
 	    else if((yyvsp[-2].pDecl))
 	      decl_delete((yyvsp[-2].pDecl));
 	  }
-#line 3945 "ctlib/y_parser.c"
+#line 3944 "ctlib/y_parser.c"
     break;
 
   case 110: /* declaring_list: declaration_specifier declarator asm_string_opt initializer_opt  */
@@ -3967,7 +3966,7 @@ yyreduce:
 	      }
 	    }
 	  }
-#line 3971 "ctlib/y_parser.c"
+#line 3970 "ctlib/y_parser.c"
     break;
 
   case 111: /* declaring_list: type_specifier declarator asm_string_opt initializer_opt  */
@@ -3977,7 +3976,7 @@ yyreduce:
 	    if ((yyvsp[-2].pDecl))
 	      decl_delete((yyvsp[-2].pDecl));
 	  }
-#line 3981 "ctlib/y_parser.c"
+#line 3980 "ctlib/y_parser.c"
     break;
 
   case 112: /* declaring_list: declaring_list ',' declarator asm_string_opt initializer_opt  */
@@ -3989,7 +3988,7 @@ yyreduce:
 	    else if ((yyvsp[-2].pDecl))
 	      decl_delete((yyvsp[-2].pDecl));
 	  }
-#line 3993 "ctlib/y_parser.c"
+#line 3992 "ctlib/y_parser.c"
     break;
 
   case 113: /* declaration_specifier: basic_declaration_specifier  */
@@ -3998,7 +3997,7 @@ yyreduce:
 	    (yyval.tspec).ptr    = NULL;
 	    (yyval.tspec).tflags = (yyvsp[0].uval);
 	  }
-#line 4002 "ctlib/y_parser.c"
+#line 4001 "ctlib/y_parser.c"
     break;
 
   case 116: /* type_specifier: basic_type_specifier  */
@@ -4007,67 +4006,67 @@ yyreduce:
 	    (yyval.tspec).ptr    = NULL;
 	    (yyval.tspec).tflags = (yyvsp[0].uval);
 	  }
-#line 4011 "ctlib/y_parser.c"
+#line 4010 "ctlib/y_parser.c"
     break;
 
   case 120: /* declaration_qualifier_list: type_qualifier_list storage_class  */
 #line 1048 "ctlib/parser.y"
                                                            { (yyval.uval) = (yyvsp[0].uval);      }
-#line 4017 "ctlib/y_parser.c"
+#line 4016 "ctlib/y_parser.c"
     break;
 
   case 121: /* declaration_qualifier_list: declaration_qualifier_list declaration_qualifier  */
 #line 1049 "ctlib/parser.y"
                                                            { (yyval.uval) = (yyvsp[-1].uval) | (yyvsp[0].uval); }
-#line 4023 "ctlib/y_parser.c"
+#line 4022 "ctlib/y_parser.c"
     break;
 
   case 127: /* declaration_qualifier: type_qualifier  */
 #line 1064 "ctlib/parser.y"
                          { (yyval.uval) = 0;  }
-#line 4029 "ctlib/y_parser.c"
+#line 4028 "ctlib/y_parser.c"
     break;
 
   case 131: /* basic_declaration_specifier: declaration_qualifier_list basic_type_name  */
 #line 1074 "ctlib/parser.y"
                                                             { (yyval.uval) = LLC_OR((yyvsp[-1].uval), (yyvsp[0].uval)); }
-#line 4035 "ctlib/y_parser.c"
+#line 4034 "ctlib/y_parser.c"
     break;
 
   case 132: /* basic_declaration_specifier: basic_type_specifier storage_class  */
 #line 1075 "ctlib/parser.y"
                                                             { (yyval.uval) = LLC_OR((yyvsp[-1].uval), (yyvsp[0].uval)); }
-#line 4041 "ctlib/y_parser.c"
+#line 4040 "ctlib/y_parser.c"
     break;
 
   case 133: /* basic_declaration_specifier: basic_declaration_specifier declaration_qualifier  */
 #line 1076 "ctlib/parser.y"
                                                             { (yyval.uval) = LLC_OR((yyvsp[-1].uval), (yyvsp[0].uval)); }
-#line 4047 "ctlib/y_parser.c"
+#line 4046 "ctlib/y_parser.c"
     break;
 
   case 134: /* basic_declaration_specifier: basic_declaration_specifier basic_type_name  */
 #line 1077 "ctlib/parser.y"
                                                             { (yyval.uval) = LLC_OR((yyvsp[-1].uval), (yyvsp[0].uval)); }
-#line 4053 "ctlib/y_parser.c"
+#line 4052 "ctlib/y_parser.c"
     break;
 
   case 136: /* basic_type_specifier: type_qualifier_list basic_type_name  */
 #line 1082 "ctlib/parser.y"
                                                             { (yyval.uval) = (yyvsp[0].uval);             }
-#line 4059 "ctlib/y_parser.c"
+#line 4058 "ctlib/y_parser.c"
     break;
 
   case 137: /* basic_type_specifier: basic_type_specifier type_qualifier  */
 #line 1083 "ctlib/parser.y"
                                                             { (yyval.uval) = (yyvsp[-1].uval);             }
-#line 4065 "ctlib/y_parser.c"
+#line 4064 "ctlib/y_parser.c"
     break;
 
   case 138: /* basic_type_specifier: basic_type_specifier basic_type_name  */
 #line 1084 "ctlib/parser.y"
                                                             { (yyval.uval) = LLC_OR((yyvsp[-1].uval), (yyvsp[0].uval)); }
-#line 4071 "ctlib/y_parser.c"
+#line 4070 "ctlib/y_parser.c"
     break;
 
   case 139: /* sue_declaration_specifier: declaration_qualifier_list elaborated_type_name  */
@@ -4076,7 +4075,7 @@ yyreduce:
 	    (yyval.tspec).ptr    = (yyvsp[0].tspec).ptr;
 	    (yyval.tspec).tflags = (yyvsp[0].tspec).tflags | (yyvsp[-1].uval);
 	  }
-#line 4080 "ctlib/y_parser.c"
+#line 4079 "ctlib/y_parser.c"
     break;
 
   case 140: /* sue_declaration_specifier: sue_type_specifier storage_class  */
@@ -4085,7 +4084,7 @@ yyreduce:
 	    (yyval.tspec).ptr    = (yyvsp[-1].tspec).ptr;
 	    (yyval.tspec).tflags = (yyvsp[-1].tspec).tflags | (yyvsp[0].uval);
 	  }
-#line 4089 "ctlib/y_parser.c"
+#line 4088 "ctlib/y_parser.c"
     break;
 
   case 141: /* sue_declaration_specifier: sue_declaration_specifier declaration_qualifier  */
@@ -4094,31 +4093,31 @@ yyreduce:
 	    (yyval.tspec).ptr    = (yyvsp[-1].tspec).ptr;
 	    (yyval.tspec).tflags = (yyvsp[-1].tspec).tflags | (yyvsp[0].uval);
 	  }
-#line 4098 "ctlib/y_parser.c"
+#line 4097 "ctlib/y_parser.c"
     break;
 
   case 145: /* enum_type_specifier: type_qualifier_list enum_name  */
 #line 1112 "ctlib/parser.y"
                                                      { (yyval.tspec) = (yyvsp[0].tspec); }
-#line 4104 "ctlib/y_parser.c"
+#line 4103 "ctlib/y_parser.c"
     break;
 
   case 146: /* enum_type_specifier: enum_type_specifier type_qualifier  */
 #line 1113 "ctlib/parser.y"
                                                      { (yyval.tspec) = (yyvsp[-1].tspec); }
-#line 4110 "ctlib/y_parser.c"
+#line 4109 "ctlib/y_parser.c"
     break;
 
   case 148: /* su_type_specifier: type_qualifier_list aggregate_name  */
 #line 1118 "ctlib/parser.y"
                                                      { (yyval.tspec) = (yyvsp[0].tspec); }
-#line 4116 "ctlib/y_parser.c"
+#line 4115 "ctlib/y_parser.c"
     break;
 
   case 149: /* su_type_specifier: su_type_specifier type_qualifier  */
 #line 1119 "ctlib/parser.y"
                                                      { (yyval.tspec) = (yyvsp[-1].tspec); }
-#line 4122 "ctlib/y_parser.c"
+#line 4121 "ctlib/y_parser.c"
     break;
 
   case 152: /* typedef_declaration_specifier: typedef_type_specifier storage_class  */
@@ -4127,7 +4126,7 @@ yyreduce:
 	    (yyval.tspec).ptr    = (yyvsp[-1].tspec).ptr;
 	    (yyval.tspec).tflags = (yyvsp[-1].tspec).tflags | (yyvsp[0].uval);
 	  }
-#line 4131 "ctlib/y_parser.c"
+#line 4130 "ctlib/y_parser.c"
     break;
 
   case 153: /* typedef_declaration_specifier: declaration_qualifier_list TYPE_NAME  */
@@ -4136,7 +4135,7 @@ yyreduce:
 	    (yyval.tspec).ptr    = (yyvsp[0].pTypedef);
 	    (yyval.tspec).tflags = T_TYPE | (yyvsp[-1].uval);
 	  }
-#line 4140 "ctlib/y_parser.c"
+#line 4139 "ctlib/y_parser.c"
     break;
 
   case 154: /* typedef_declaration_specifier: typedef_declaration_specifier declaration_qualifier  */
@@ -4145,115 +4144,115 @@ yyreduce:
 	    (yyval.tspec).ptr    = (yyvsp[-1].tspec).ptr;
 	    (yyval.tspec).tflags = (yyvsp[-1].tspec).tflags | (yyvsp[0].uval);
 	  }
-#line 4149 "ctlib/y_parser.c"
+#line 4148 "ctlib/y_parser.c"
     break;
 
   case 155: /* typedef_type_specifier: TYPE_NAME  */
 #line 1145 "ctlib/parser.y"
                                                      { (yyval.tspec).ptr = (yyvsp[0].pTypedef); (yyval.tspec).tflags = T_TYPE; }
-#line 4155 "ctlib/y_parser.c"
+#line 4154 "ctlib/y_parser.c"
     break;
 
   case 156: /* typedef_type_specifier: type_qualifier_list TYPE_NAME  */
 #line 1146 "ctlib/parser.y"
                                                      { (yyval.tspec).ptr = (yyvsp[0].pTypedef); (yyval.tspec).tflags = T_TYPE; }
-#line 4161 "ctlib/y_parser.c"
+#line 4160 "ctlib/y_parser.c"
     break;
 
   case 157: /* typedef_type_specifier: typedef_type_specifier type_qualifier  */
 #line 1147 "ctlib/parser.y"
                                                      { (yyval.tspec) = (yyvsp[-1].tspec);                         }
-#line 4167 "ctlib/y_parser.c"
+#line 4166 "ctlib/y_parser.c"
     break;
 
   case 158: /* storage_class: TYPEDEF_TOK  */
 #line 1151 "ctlib/parser.y"
                        { (yyval.uval) = T_TYPEDEF;  }
-#line 4173 "ctlib/y_parser.c"
+#line 4172 "ctlib/y_parser.c"
     break;
 
   case 159: /* storage_class: EXTERN_TOK  */
 #line 1152 "ctlib/parser.y"
                        { (yyval.uval) = 0;          }
-#line 4179 "ctlib/y_parser.c"
+#line 4178 "ctlib/y_parser.c"
     break;
 
   case 160: /* storage_class: STATIC_TOK  */
 #line 1153 "ctlib/parser.y"
                        { (yyval.uval) = 0;          }
-#line 4185 "ctlib/y_parser.c"
+#line 4184 "ctlib/y_parser.c"
     break;
 
   case 161: /* storage_class: AUTO_TOK  */
 #line 1154 "ctlib/parser.y"
                        { (yyval.uval) = 0;          }
-#line 4191 "ctlib/y_parser.c"
+#line 4190 "ctlib/y_parser.c"
     break;
 
   case 162: /* storage_class: REGISTER_TOK  */
 #line 1155 "ctlib/parser.y"
                        { (yyval.uval) = 0;          }
-#line 4197 "ctlib/y_parser.c"
+#line 4196 "ctlib/y_parser.c"
     break;
 
   case 163: /* storage_class: INLINE_TOK  */
 #line 1156 "ctlib/parser.y"
                        { (yyval.uval) = 0;          }
-#line 4203 "ctlib/y_parser.c"
+#line 4202 "ctlib/y_parser.c"
     break;
 
   case 164: /* basic_type_name: INT_TOK  */
 #line 1160 "ctlib/parser.y"
                        { (yyval.uval) = T_INT;      }
-#line 4209 "ctlib/y_parser.c"
+#line 4208 "ctlib/y_parser.c"
     break;
 
   case 165: /* basic_type_name: CHAR_TOK  */
 #line 1161 "ctlib/parser.y"
                        { (yyval.uval) = T_CHAR;     }
-#line 4215 "ctlib/y_parser.c"
+#line 4214 "ctlib/y_parser.c"
     break;
 
   case 166: /* basic_type_name: SHORT_TOK  */
 #line 1162 "ctlib/parser.y"
                        { (yyval.uval) = T_SHORT;    }
-#line 4221 "ctlib/y_parser.c"
+#line 4220 "ctlib/y_parser.c"
     break;
 
   case 167: /* basic_type_name: LONG_TOK  */
 #line 1163 "ctlib/parser.y"
                        { (yyval.uval) = T_LONG;     }
-#line 4227 "ctlib/y_parser.c"
+#line 4226 "ctlib/y_parser.c"
     break;
 
   case 168: /* basic_type_name: FLOAT_TOK  */
 #line 1164 "ctlib/parser.y"
                        { (yyval.uval) = T_FLOAT;    }
-#line 4233 "ctlib/y_parser.c"
+#line 4232 "ctlib/y_parser.c"
     break;
 
   case 169: /* basic_type_name: DOUBLE_TOK  */
 #line 1165 "ctlib/parser.y"
                        { (yyval.uval) = T_DOUBLE;   }
-#line 4239 "ctlib/y_parser.c"
+#line 4238 "ctlib/y_parser.c"
     break;
 
   case 170: /* basic_type_name: SIGNED_TOK  */
 #line 1166 "ctlib/parser.y"
                        { (yyval.uval) = T_SIGNED;   }
-#line 4245 "ctlib/y_parser.c"
+#line 4244 "ctlib/y_parser.c"
     break;
 
   case 171: /* basic_type_name: UNSIGNED_TOK  */
 #line 1167 "ctlib/parser.y"
                        { (yyval.uval) = T_UNSIGNED; }
-#line 4251 "ctlib/y_parser.c"
+#line 4250 "ctlib/y_parser.c"
     break;
 
   case 172: /* basic_type_name: VOID_TOK  */
 #line 1168 "ctlib/parser.y"
                        { (yyval.uval) = T_VOID;     }
-#line 4257 "ctlib/y_parser.c"
+#line 4256 "ctlib/y_parser.c"
     break;
 
   case 175: /* aggregate_name: aggregate_key_context '{' member_declaration_list_opt '}'  */
@@ -4274,7 +4273,7 @@ yyreduce:
 	      (yyval.tspec).ptr = pStruct;
 	    }
 	  }
-#line 4278 "ctlib/y_parser.c"
+#line 4277 "ctlib/y_parser.c"
     break;
 
   case 176: /* aggregate_name: aggregate_key_context identifier_or_typedef_name '{' member_declaration_list_opt '}'  */
@@ -4314,7 +4313,7 @@ yyreduce:
 	      (yyval.tspec).ptr = pStruct;
 	    }
 	  }
-#line 4318 "ctlib/y_parser.c"
+#line 4317 "ctlib/y_parser.c"
     break;
 
   case 177: /* aggregate_name: aggregate_key_context identifier_or_typedef_name  */
@@ -4344,7 +4343,7 @@ yyreduce:
 	      (yyval.tspec).ptr = pStruct;
 	    }
 	  }
-#line 4348 "ctlib/y_parser.c"
+#line 4347 "ctlib/y_parser.c"
     break;
 
   case 178: /* aggregate_key_context: aggregate_key  */
@@ -4354,25 +4353,25 @@ yyreduce:
 	    (yyval.context).ctx.pFI  = PSTATE->pFI;
 	    (yyval.context).ctx.line = PSTATE->pLexer->ctok->line;
 	  }
-#line 4358 "ctlib/y_parser.c"
+#line 4357 "ctlib/y_parser.c"
     break;
 
   case 179: /* aggregate_key: STRUCT_TOK  */
 #line 1268 "ctlib/parser.y"
                      { (yyval.uval) = T_STRUCT; }
-#line 4364 "ctlib/y_parser.c"
+#line 4363 "ctlib/y_parser.c"
     break;
 
   case 180: /* aggregate_key: UNION_TOK  */
 #line 1269 "ctlib/parser.y"
                      { (yyval.uval) = T_UNION;  }
-#line 4370 "ctlib/y_parser.c"
+#line 4369 "ctlib/y_parser.c"
     break;
 
   case 181: /* member_declaration_list_opt: %empty  */
 #line 1273 "ctlib/parser.y"
                                   { (yyval.list) = IS_LOCAL ? NULL : LL_new(); }
-#line 4376 "ctlib/y_parser.c"
+#line 4375 "ctlib/y_parser.c"
     break;
 
   case 183: /* member_declaration_list: member_declaration  */
@@ -4387,7 +4386,7 @@ yyreduce:
 	      LL_push((yyval.list), (yyvsp[0].pStructDecl));
 	    }
 	  }
-#line 4391 "ctlib/y_parser.c"
+#line 4390 "ctlib/y_parser.c"
     break;
 
   case 184: /* member_declaration_list: member_declaration_list member_declaration  */
@@ -4402,13 +4401,13 @@ yyreduce:
 	      LL_push((yyval.list), (yyvsp[0].pStructDecl));
 	    }
 	  }
-#line 4406 "ctlib/y_parser.c"
+#line 4405 "ctlib/y_parser.c"
     break;
 
   case 187: /* unnamed_su_declaration: sut_type_specifier  */
 #line 1308 "ctlib/parser.y"
                              { (yyval.pStructDecl) = IS_LOCAL ? NULL : structdecl_new((yyvsp[0].tspec), NULL); }
-#line 4412 "ctlib/y_parser.c"
+#line 4411 "ctlib/y_parser.c"
     break;
 
   case 188: /* member_declaring_list: type_specifier member_declarator  */
@@ -4425,7 +4424,7 @@ yyreduce:
 	        LL_push((yyval.pStructDecl)->declarators, (yyvsp[0].pDecl));
 	    }
 	  }
-#line 4429 "ctlib/y_parser.c"
+#line 4428 "ctlib/y_parser.c"
     break;
 
   case 189: /* member_declaring_list: member_declaring_list ',' member_declarator  */
@@ -4440,7 +4439,7 @@ yyreduce:
 	        LL_push((yyval.pStructDecl)->declarators, (yyvsp[0].pDecl));
 	    }
 	  }
-#line 4444 "ctlib/y_parser.c"
+#line 4443 "ctlib/y_parser.c"
     break;
 
   case 190: /* member_declarator: declarator bit_field_size_opt  */
@@ -4471,7 +4470,7 @@ yyreduce:
 	      }
 	    }
 	  }
-#line 4475 "ctlib/y_parser.c"
+#line 4474 "ctlib/y_parser.c"
     break;
 
   case 191: /* member_declarator: bit_field_size  */
@@ -4492,19 +4491,19 @@ yyreduce:
 	      (yyval.pDecl)->ext.bitfield.bits = (unsigned char) (yyvsp[0].value).iv;
 	    }
 	  }
-#line 4496 "ctlib/y_parser.c"
+#line 4495 "ctlib/y_parser.c"
     break;
 
   case 192: /* bit_field_size_opt: %empty  */
 #line 1386 "ctlib/parser.y"
                          { UNDEF_VAL((yyval.value)); }
-#line 4502 "ctlib/y_parser.c"
+#line 4501 "ctlib/y_parser.c"
     break;
 
   case 194: /* bit_field_size: ':' constant_expression  */
 #line 1391 "ctlib/parser.y"
                                   { (yyval.value) = (yyvsp[0].value); }
-#line 4508 "ctlib/y_parser.c"
+#line 4507 "ctlib/y_parser.c"
     break;
 
   case 195: /* enum_name: enum_key_context '{' enumerator_list comma_opt '}'  */
@@ -4525,7 +4524,7 @@ yyreduce:
 	      (yyval.tspec).ptr = pEnum;
 	    }
 	  }
-#line 4529 "ctlib/y_parser.c"
+#line 4528 "ctlib/y_parser.c"
     break;
 
   case 196: /* enum_name: enum_key_context identifier_or_typedef_name '{' enumerator_list comma_opt '}'  */
@@ -4565,7 +4564,7 @@ yyreduce:
 	      (yyval.tspec).ptr = pEnum;
 	    }
 	  }
-#line 4569 "ctlib/y_parser.c"
+#line 4568 "ctlib/y_parser.c"
     break;
 
   case 197: /* enum_name: enum_key_context identifier_or_typedef_name  */
@@ -4597,7 +4596,7 @@ yyreduce:
 	      (yyval.tspec).ptr = pEnum;
 	    }
 	  }
-#line 4601 "ctlib/y_parser.c"
+#line 4600 "ctlib/y_parser.c"
     break;
 
   case 198: /* enum_key_context: ENUM_TOK  */
@@ -4606,7 +4605,7 @@ yyreduce:
 	    (yyval.context).ctx.pFI  = PSTATE->pFI;
 	    (yyval.context).ctx.line = PSTATE->pLexer->ctok->line;
 	  }
-#line 4610 "ctlib/y_parser.c"
+#line 4609 "ctlib/y_parser.c"
     break;
 
   case 199: /* enumerator_list: enumerator  */
@@ -4625,7 +4624,7 @@ yyreduce:
 	      LL_push((yyval.list), (yyvsp[0].pEnum));
 	    }
 	  }
-#line 4629 "ctlib/y_parser.c"
+#line 4628 "ctlib/y_parser.c"
     break;
 
   case 200: /* enumerator_list: enumerator_list ',' enumerator  */
@@ -4645,7 +4644,7 @@ yyreduce:
 	      (yyval.list) = (yyvsp[-2].list);
 	    }
 	  }
-#line 4649 "ctlib/y_parser.c"
+#line 4648 "ctlib/y_parser.c"
     break;
 
   case 201: /* enumerator: identifier_or_typedef_name  */
@@ -4662,7 +4661,7 @@ yyreduce:
 	      HT_storenode(PSTATE->pCPI->htEnumerators, (yyvsp[0].identifier), (yyval.pEnum));
 	    }
 	  }
-#line 4666 "ctlib/y_parser.c"
+#line 4665 "ctlib/y_parser.c"
     break;
 
   case 202: /* enumerator: identifier_or_typedef_name '=' constant_expression  */
@@ -4679,103 +4678,103 @@ yyreduce:
 	      HT_storenode(PSTATE->pCPI->htEnumerators, (yyvsp[-2].identifier), (yyval.pEnum));
 	    }
 	  }
-#line 4683 "ctlib/y_parser.c"
+#line 4682 "ctlib/y_parser.c"
     break;
 
   case 207: /* parameter_declaration: declaration_specifier  */
 #line 1560 "ctlib/parser.y"
                                                               {}
-#line 4689 "ctlib/y_parser.c"
+#line 4688 "ctlib/y_parser.c"
     break;
 
   case 208: /* parameter_declaration: declaration_specifier abstract_declarator  */
 #line 1561 "ctlib/parser.y"
                                                               {}
-#line 4695 "ctlib/y_parser.c"
+#line 4694 "ctlib/y_parser.c"
     break;
 
   case 209: /* parameter_declaration: declaration_specifier identifier_declarator  */
 #line 1562 "ctlib/parser.y"
                                                               { if ((yyvsp[0].pDecl)) decl_delete((yyvsp[0].pDecl)); }
-#line 4701 "ctlib/y_parser.c"
+#line 4700 "ctlib/y_parser.c"
     break;
 
   case 210: /* parameter_declaration: declaration_specifier parameter_typedef_declarator  */
 #line 1563 "ctlib/parser.y"
                                                               { if ((yyvsp[0].pDecl)) decl_delete((yyvsp[0].pDecl)); }
-#line 4707 "ctlib/y_parser.c"
+#line 4706 "ctlib/y_parser.c"
     break;
 
   case 211: /* parameter_declaration: declaration_qualifier_list  */
 #line 1564 "ctlib/parser.y"
                                                               {}
-#line 4713 "ctlib/y_parser.c"
+#line 4712 "ctlib/y_parser.c"
     break;
 
   case 212: /* parameter_declaration: declaration_qualifier_list abstract_declarator  */
 #line 1565 "ctlib/parser.y"
                                                               {}
-#line 4719 "ctlib/y_parser.c"
+#line 4718 "ctlib/y_parser.c"
     break;
 
   case 213: /* parameter_declaration: declaration_qualifier_list identifier_declarator  */
 #line 1566 "ctlib/parser.y"
                                                               { if ((yyvsp[0].pDecl)) decl_delete((yyvsp[0].pDecl)); }
-#line 4725 "ctlib/y_parser.c"
+#line 4724 "ctlib/y_parser.c"
     break;
 
   case 214: /* parameter_declaration: type_specifier  */
 #line 1567 "ctlib/parser.y"
                                                               {}
-#line 4731 "ctlib/y_parser.c"
+#line 4730 "ctlib/y_parser.c"
     break;
 
   case 215: /* parameter_declaration: type_specifier abstract_declarator  */
 #line 1568 "ctlib/parser.y"
                                                               {}
-#line 4737 "ctlib/y_parser.c"
+#line 4736 "ctlib/y_parser.c"
     break;
 
   case 216: /* parameter_declaration: type_specifier identifier_declarator  */
 #line 1569 "ctlib/parser.y"
                                                               { if ((yyvsp[0].pDecl)) decl_delete((yyvsp[0].pDecl)); }
-#line 4743 "ctlib/y_parser.c"
+#line 4742 "ctlib/y_parser.c"
     break;
 
   case 217: /* parameter_declaration: type_specifier parameter_typedef_declarator  */
 #line 1570 "ctlib/parser.y"
                                                               { if ((yyvsp[0].pDecl)) decl_delete((yyvsp[0].pDecl)); }
-#line 4749 "ctlib/y_parser.c"
+#line 4748 "ctlib/y_parser.c"
     break;
 
   case 218: /* parameter_declaration: type_qualifier_list  */
 #line 1571 "ctlib/parser.y"
                                                               {}
-#line 4755 "ctlib/y_parser.c"
+#line 4754 "ctlib/y_parser.c"
     break;
 
   case 219: /* parameter_declaration: type_qualifier_list abstract_declarator  */
 #line 1572 "ctlib/parser.y"
                                                               {}
-#line 4761 "ctlib/y_parser.c"
+#line 4760 "ctlib/y_parser.c"
     break;
 
   case 220: /* parameter_declaration: type_qualifier_list identifier_declarator  */
 #line 1573 "ctlib/parser.y"
                                                               { if ((yyvsp[0].pDecl)) decl_delete((yyvsp[0].pDecl)); }
-#line 4767 "ctlib/y_parser.c"
+#line 4766 "ctlib/y_parser.c"
     break;
 
   case 221: /* identifier_list: IDENTIFIER  */
 #line 1581 "ctlib/parser.y"
                                          { if ((yyvsp[0].identifier)) HN_delete((yyvsp[0].identifier)); }
-#line 4773 "ctlib/y_parser.c"
+#line 4772 "ctlib/y_parser.c"
     break;
 
   case 222: /* identifier_list: identifier_list ',' IDENTIFIER  */
 #line 1582 "ctlib/parser.y"
                                          { if ((yyvsp[0].identifier)) HN_delete((yyvsp[0].identifier)); }
-#line 4779 "ctlib/y_parser.c"
+#line 4778 "ctlib/y_parser.c"
     break;
 
   case 224: /* identifier_or_typedef_name: TYPE_NAME  */
@@ -4783,7 +4782,7 @@ yyreduce:
           {
 	    (yyval.identifier) = IS_LOCAL ? NULL : HN_new((yyvsp[0].pTypedef)->pDecl->identifier, CTT_IDLEN((yyvsp[0].pTypedef)->pDecl), 0);
 	  }
-#line 4787 "ctlib/y_parser.c"
+#line 4786 "ctlib/y_parser.c"
     break;
 
   case 225: /* type_name: type_specifier  */
@@ -4800,7 +4799,7 @@ yyreduce:
 	        (yyval.value).flags |= V_IS_UNSAFE;
 	    }
 	  }
-#line 4804 "ctlib/y_parser.c"
+#line 4803 "ctlib/y_parser.c"
     break;
 
   case 226: /* type_name: type_specifier abstract_declarator  */
@@ -4825,7 +4824,7 @@ yyreduce:
 	      }
 	    }
 	  }
-#line 4829 "ctlib/y_parser.c"
+#line 4828 "ctlib/y_parser.c"
     break;
 
   case 227: /* type_name: type_qualifier_list  */
@@ -4837,7 +4836,7 @@ yyreduce:
 	      (yyval.value).flags = 0;
 	    }
 	  }
-#line 4841 "ctlib/y_parser.c"
+#line 4840 "ctlib/y_parser.c"
     break;
 
   case 228: /* type_name: type_qualifier_list abstract_declarator  */
@@ -4850,211 +4849,211 @@ yyreduce:
 	      (yyval.value).flags = 0;
 	    }
 	  }
-#line 4854 "ctlib/y_parser.c"
+#line 4853 "ctlib/y_parser.c"
     break;
 
   case 233: /* initializer: assignment_expression  */
 #line 1655 "ctlib/parser.y"
                                 {}
-#line 4860 "ctlib/y_parser.c"
+#line 4859 "ctlib/y_parser.c"
     break;
 
   case 241: /* designator: '.' identifier_or_typedef_name  */
 #line 1675 "ctlib/parser.y"
                                          { DELETE_NODE((yyvsp[0].identifier)); }
-#line 4866 "ctlib/y_parser.c"
+#line 4865 "ctlib/y_parser.c"
     break;
 
   case 251: /* labeled_statement: identifier_or_typedef_name ':' statement  */
 #line 1695 "ctlib/parser.y"
                                                    { DELETE_NODE((yyvsp[-2].identifier)); }
-#line 4872 "ctlib/y_parser.c"
+#line 4871 "ctlib/y_parser.c"
     break;
 
   case 269: /* jump_statement: GOTO_TOK identifier_or_typedef_name ';'  */
 #line 1734 "ctlib/parser.y"
                                                   { DELETE_NODE((yyvsp[-1].identifier)); }
-#line 4878 "ctlib/y_parser.c"
+#line 4877 "ctlib/y_parser.c"
     break;
 
   case 280: /* $@3: %empty  */
 #line 1760 "ctlib/parser.y"
                                                            { BEGIN_LOCAL; }
-#line 4884 "ctlib/y_parser.c"
+#line 4883 "ctlib/y_parser.c"
     break;
 
   case 281: /* function_definition: identifier_declarator $@3 compound_statement  */
 #line 1761 "ctlib/parser.y"
                                                            { END_LOCAL; decl_delete((yyvsp[-2].pDecl)); }
-#line 4890 "ctlib/y_parser.c"
+#line 4889 "ctlib/y_parser.c"
     break;
 
   case 282: /* $@4: %empty  */
 #line 1762 "ctlib/parser.y"
                                                            { BEGIN_LOCAL; }
-#line 4896 "ctlib/y_parser.c"
+#line 4895 "ctlib/y_parser.c"
     break;
 
   case 283: /* function_definition: declaration_specifier identifier_declarator $@4 compound_statement  */
 #line 1763 "ctlib/parser.y"
                                                            { END_LOCAL; decl_delete((yyvsp[-2].pDecl)); }
-#line 4902 "ctlib/y_parser.c"
+#line 4901 "ctlib/y_parser.c"
     break;
 
   case 284: /* $@5: %empty  */
 #line 1764 "ctlib/parser.y"
                                                            { BEGIN_LOCAL; }
-#line 4908 "ctlib/y_parser.c"
+#line 4907 "ctlib/y_parser.c"
     break;
 
   case 285: /* function_definition: type_specifier identifier_declarator $@5 compound_statement  */
 #line 1765 "ctlib/parser.y"
                                                            { END_LOCAL; decl_delete((yyvsp[-2].pDecl)); }
-#line 4914 "ctlib/y_parser.c"
+#line 4913 "ctlib/y_parser.c"
     break;
 
   case 286: /* $@6: %empty  */
 #line 1766 "ctlib/parser.y"
                                                            { BEGIN_LOCAL; }
-#line 4920 "ctlib/y_parser.c"
+#line 4919 "ctlib/y_parser.c"
     break;
 
   case 287: /* function_definition: declaration_qualifier_list identifier_declarator $@6 compound_statement  */
 #line 1767 "ctlib/parser.y"
                                                            { END_LOCAL; decl_delete((yyvsp[-2].pDecl)); }
-#line 4926 "ctlib/y_parser.c"
+#line 4925 "ctlib/y_parser.c"
     break;
 
   case 288: /* $@7: %empty  */
 #line 1768 "ctlib/parser.y"
                                                            { BEGIN_LOCAL; }
-#line 4932 "ctlib/y_parser.c"
+#line 4931 "ctlib/y_parser.c"
     break;
 
   case 289: /* function_definition: type_qualifier_list identifier_declarator $@7 compound_statement  */
 #line 1769 "ctlib/parser.y"
                                                            { END_LOCAL; decl_delete((yyvsp[-2].pDecl)); }
-#line 4938 "ctlib/y_parser.c"
+#line 4937 "ctlib/y_parser.c"
     break;
 
   case 290: /* $@8: %empty  */
 #line 1771 "ctlib/parser.y"
                                                              { BEGIN_LOCAL; }
-#line 4944 "ctlib/y_parser.c"
+#line 4943 "ctlib/y_parser.c"
     break;
 
   case 291: /* function_definition: old_function_declarator $@8 compound_statement  */
 #line 1771 "ctlib/parser.y"
                                                                                                  { END_LOCAL; }
-#line 4950 "ctlib/y_parser.c"
+#line 4949 "ctlib/y_parser.c"
     break;
 
   case 292: /* $@9: %empty  */
 #line 1772 "ctlib/parser.y"
                                                              { BEGIN_LOCAL; }
-#line 4956 "ctlib/y_parser.c"
+#line 4955 "ctlib/y_parser.c"
     break;
 
   case 293: /* function_definition: declaration_specifier old_function_declarator $@9 compound_statement  */
 #line 1772 "ctlib/parser.y"
                                                                                                  { END_LOCAL; }
-#line 4962 "ctlib/y_parser.c"
+#line 4961 "ctlib/y_parser.c"
     break;
 
   case 294: /* $@10: %empty  */
 #line 1773 "ctlib/parser.y"
                                                              { BEGIN_LOCAL; }
-#line 4968 "ctlib/y_parser.c"
+#line 4967 "ctlib/y_parser.c"
     break;
 
   case 295: /* function_definition: type_specifier old_function_declarator $@10 compound_statement  */
 #line 1773 "ctlib/parser.y"
                                                                                                  { END_LOCAL; }
-#line 4974 "ctlib/y_parser.c"
+#line 4973 "ctlib/y_parser.c"
     break;
 
   case 296: /* $@11: %empty  */
 #line 1774 "ctlib/parser.y"
                                                              { BEGIN_LOCAL; }
-#line 4980 "ctlib/y_parser.c"
+#line 4979 "ctlib/y_parser.c"
     break;
 
   case 297: /* function_definition: declaration_qualifier_list old_function_declarator $@11 compound_statement  */
 #line 1774 "ctlib/parser.y"
                                                                                                  { END_LOCAL; }
-#line 4986 "ctlib/y_parser.c"
+#line 4985 "ctlib/y_parser.c"
     break;
 
   case 298: /* $@12: %empty  */
 #line 1775 "ctlib/parser.y"
                                                              { BEGIN_LOCAL; }
-#line 4992 "ctlib/y_parser.c"
+#line 4991 "ctlib/y_parser.c"
     break;
 
   case 299: /* function_definition: type_qualifier_list old_function_declarator $@12 compound_statement  */
 #line 1775 "ctlib/parser.y"
                                                                                                  { END_LOCAL; }
-#line 4998 "ctlib/y_parser.c"
+#line 4997 "ctlib/y_parser.c"
     break;
 
   case 300: /* $@13: %empty  */
 #line 1777 "ctlib/parser.y"
                                                                               { BEGIN_LOCAL; }
-#line 5004 "ctlib/y_parser.c"
+#line 5003 "ctlib/y_parser.c"
     break;
 
   case 301: /* function_definition: old_function_declarator declaration_list $@13 compound_statement  */
 #line 1777 "ctlib/parser.y"
                                                                                                                   { END_LOCAL; }
-#line 5010 "ctlib/y_parser.c"
+#line 5009 "ctlib/y_parser.c"
     break;
 
   case 302: /* $@14: %empty  */
 #line 1778 "ctlib/parser.y"
                                                                               { BEGIN_LOCAL; }
-#line 5016 "ctlib/y_parser.c"
+#line 5015 "ctlib/y_parser.c"
     break;
 
   case 303: /* function_definition: declaration_specifier old_function_declarator declaration_list $@14 compound_statement  */
 #line 1778 "ctlib/parser.y"
                                                                                                                   { END_LOCAL; }
-#line 5022 "ctlib/y_parser.c"
+#line 5021 "ctlib/y_parser.c"
     break;
 
   case 304: /* $@15: %empty  */
 #line 1779 "ctlib/parser.y"
                                                                               { BEGIN_LOCAL; }
-#line 5028 "ctlib/y_parser.c"
+#line 5027 "ctlib/y_parser.c"
     break;
 
   case 305: /* function_definition: type_specifier old_function_declarator declaration_list $@15 compound_statement  */
 #line 1779 "ctlib/parser.y"
                                                                                                                   { END_LOCAL; }
-#line 5034 "ctlib/y_parser.c"
+#line 5033 "ctlib/y_parser.c"
     break;
 
   case 306: /* $@16: %empty  */
 #line 1780 "ctlib/parser.y"
                                                                               { BEGIN_LOCAL; }
-#line 5040 "ctlib/y_parser.c"
+#line 5039 "ctlib/y_parser.c"
     break;
 
   case 307: /* function_definition: declaration_qualifier_list old_function_declarator declaration_list $@16 compound_statement  */
 #line 1780 "ctlib/parser.y"
                                                                                                                   { END_LOCAL; }
-#line 5046 "ctlib/y_parser.c"
+#line 5045 "ctlib/y_parser.c"
     break;
 
   case 308: /* $@17: %empty  */
 #line 1781 "ctlib/parser.y"
                                                                               { BEGIN_LOCAL; }
-#line 5052 "ctlib/y_parser.c"
+#line 5051 "ctlib/y_parser.c"
     break;
 
   case 309: /* function_definition: type_qualifier_list old_function_declarator declaration_list $@17 compound_statement  */
 #line 1781 "ctlib/parser.y"
                                                                                                                   { END_LOCAL; }
-#line 5058 "ctlib/y_parser.c"
+#line 5057 "ctlib/y_parser.c"
     break;
 
   case 314: /* parameter_typedef_declarator: TYPE_NAME  */
@@ -5062,7 +5061,7 @@ yyreduce:
           {
 	    (yyval.pDecl) = IS_LOCAL ? NULL : decl_new((yyvsp[0].pTypedef)->pDecl->identifier, CTT_IDLEN((yyvsp[0].pTypedef)->pDecl));
 	  }
-#line 5066 "ctlib/y_parser.c"
+#line 5065 "ctlib/y_parser.c"
     break;
 
   case 315: /* parameter_typedef_declarator: TYPE_NAME postfixing_abstract_declarator  */
@@ -5080,7 +5079,7 @@ yyreduce:
 	      }
 	    }
 	  }
-#line 5084 "ctlib/y_parser.c"
+#line 5083 "ctlib/y_parser.c"
     break;
 
   case 318: /* clean_typedef_declarator: '*' parameter_typedef_declarator  */
@@ -5090,7 +5089,7 @@ yyreduce:
 	      (yyvsp[0].pDecl)->pointer_flag = 1;
 	    (yyval.pDecl) = (yyvsp[0].pDecl);
 	  }
-#line 5094 "ctlib/y_parser.c"
+#line 5093 "ctlib/y_parser.c"
     break;
 
   case 319: /* clean_typedef_declarator: '*' type_qualifier_list parameter_typedef_declarator  */
@@ -5100,13 +5099,13 @@ yyreduce:
 	      (yyvsp[0].pDecl)->pointer_flag = 1;
 	    (yyval.pDecl) = (yyvsp[0].pDecl);
 	  }
-#line 5104 "ctlib/y_parser.c"
+#line 5103 "ctlib/y_parser.c"
     break;
 
   case 320: /* clean_postfix_typedef_declarator: '(' clean_typedef_declarator ')'  */
 #line 1836 "ctlib/parser.y"
                                            { (yyval.pDecl) = (yyvsp[-1].pDecl); }
-#line 5110 "ctlib/y_parser.c"
+#line 5109 "ctlib/y_parser.c"
     break;
 
   case 321: /* clean_postfix_typedef_declarator: '(' clean_typedef_declarator ')' postfixing_abstract_declarator  */
@@ -5115,7 +5114,7 @@ yyreduce:
 	    POSTFIX_DECL((yyvsp[-2].pDecl), (yyvsp[0].list));
 	    (yyval.pDecl) = (yyvsp[-2].pDecl);
 	  }
-#line 5119 "ctlib/y_parser.c"
+#line 5118 "ctlib/y_parser.c"
     break;
 
   case 323: /* paren_typedef_declarator: '*' '(' simple_paren_typedef_declarator ')'  */
@@ -5125,7 +5124,7 @@ yyreduce:
 	      (yyvsp[-1].pDecl)->pointer_flag = 1;
 	    (yyval.pDecl) = (yyvsp[-1].pDecl);
 	  }
-#line 5129 "ctlib/y_parser.c"
+#line 5128 "ctlib/y_parser.c"
     break;
 
   case 324: /* paren_typedef_declarator: '*' type_qualifier_list '(' simple_paren_typedef_declarator ')'  */
@@ -5135,7 +5134,7 @@ yyreduce:
 	      (yyvsp[-1].pDecl)->pointer_flag = 1;
 	    (yyval.pDecl) = (yyvsp[-1].pDecl);
 	  }
-#line 5139 "ctlib/y_parser.c"
+#line 5138 "ctlib/y_parser.c"
     break;
 
   case 325: /* paren_typedef_declarator: '*' paren_typedef_declarator  */
@@ -5145,7 +5144,7 @@ yyreduce:
 	      (yyvsp[0].pDecl)->pointer_flag = 1;
 	    (yyval.pDecl) = (yyvsp[0].pDecl);
 	  }
-#line 5149 "ctlib/y_parser.c"
+#line 5148 "ctlib/y_parser.c"
     break;
 
   case 326: /* paren_typedef_declarator: '*' type_qualifier_list paren_typedef_declarator  */
@@ -5155,13 +5154,13 @@ yyreduce:
 	      (yyvsp[0].pDecl)->pointer_flag = 1;
 	    (yyval.pDecl) = (yyvsp[0].pDecl);
 	  }
-#line 5159 "ctlib/y_parser.c"
+#line 5158 "ctlib/y_parser.c"
     break;
 
   case 327: /* paren_postfix_typedef_declarator: '(' paren_typedef_declarator ')'  */
 #line 1876 "ctlib/parser.y"
                                            { (yyval.pDecl) = (yyvsp[-1].pDecl); }
-#line 5165 "ctlib/y_parser.c"
+#line 5164 "ctlib/y_parser.c"
     break;
 
   case 328: /* paren_postfix_typedef_declarator: '(' simple_paren_typedef_declarator postfixing_abstract_declarator ')'  */
@@ -5170,7 +5169,7 @@ yyreduce:
 	    POSTFIX_DECL((yyvsp[-2].pDecl), (yyvsp[-1].list));
 	    (yyval.pDecl) = (yyvsp[-2].pDecl);
 	  }
-#line 5174 "ctlib/y_parser.c"
+#line 5173 "ctlib/y_parser.c"
     break;
 
   case 329: /* paren_postfix_typedef_declarator: '(' paren_typedef_declarator ')' postfixing_abstract_declarator  */
@@ -5179,7 +5178,7 @@ yyreduce:
 	    POSTFIX_DECL((yyvsp[-2].pDecl), (yyvsp[0].list));
 	    (yyval.pDecl) = (yyvsp[-2].pDecl);
 	  }
-#line 5183 "ctlib/y_parser.c"
+#line 5182 "ctlib/y_parser.c"
     break;
 
   case 330: /* simple_paren_typedef_declarator: TYPE_NAME  */
@@ -5187,13 +5186,13 @@ yyreduce:
           {
 	    (yyval.pDecl) = IS_LOCAL ? NULL : decl_new((yyvsp[0].pTypedef)->pDecl->identifier, CTT_IDLEN((yyvsp[0].pTypedef)->pDecl));
 	  }
-#line 5191 "ctlib/y_parser.c"
+#line 5190 "ctlib/y_parser.c"
     break;
 
   case 331: /* simple_paren_typedef_declarator: '(' simple_paren_typedef_declarator ')'  */
 #line 1894 "ctlib/parser.y"
                                                   { (yyval.pDecl) = (yyvsp[-1].pDecl); }
-#line 5197 "ctlib/y_parser.c"
+#line 5196 "ctlib/y_parser.c"
     break;
 
   case 335: /* unary_identifier_declarator: '*' identifier_declarator  */
@@ -5203,7 +5202,7 @@ yyreduce:
 	      (yyvsp[0].pDecl)->pointer_flag = 1;
 	    (yyval.pDecl) = (yyvsp[0].pDecl);
 	  }
-#line 5207 "ctlib/y_parser.c"
+#line 5206 "ctlib/y_parser.c"
     break;
 
   case 336: /* unary_identifier_declarator: '*' type_qualifier_list identifier_declarator  */
@@ -5213,7 +5212,7 @@ yyreduce:
 	      (yyvsp[0].pDecl)->pointer_flag = 1;
 	    (yyval.pDecl) = (yyvsp[0].pDecl);
 	  }
-#line 5217 "ctlib/y_parser.c"
+#line 5216 "ctlib/y_parser.c"
     break;
 
   case 337: /* postfix_identifier_declarator: paren_identifier_declarator postfixing_abstract_declarator  */
@@ -5222,13 +5221,13 @@ yyreduce:
 	    POSTFIX_DECL((yyvsp[-1].pDecl), (yyvsp[0].list));
 	    (yyval.pDecl) = (yyvsp[-1].pDecl);
 	  }
-#line 5226 "ctlib/y_parser.c"
+#line 5225 "ctlib/y_parser.c"
     break;
 
   case 338: /* postfix_identifier_declarator: '(' unary_identifier_declarator ')'  */
 #line 1924 "ctlib/parser.y"
                                               { (yyval.pDecl) = (yyvsp[-1].pDecl); }
-#line 5232 "ctlib/y_parser.c"
+#line 5231 "ctlib/y_parser.c"
     break;
 
   case 339: /* postfix_identifier_declarator: '(' unary_identifier_declarator ')' postfixing_abstract_declarator  */
@@ -5237,7 +5236,7 @@ yyreduce:
 	    POSTFIX_DECL((yyvsp[-2].pDecl), (yyvsp[0].list));
 	    (yyval.pDecl) = (yyvsp[-2].pDecl);
 	  }
-#line 5241 "ctlib/y_parser.c"
+#line 5240 "ctlib/y_parser.c"
     break;
 
   case 340: /* paren_identifier_declarator: IDENTIFIER  */
@@ -5253,31 +5252,31 @@ yyreduce:
 	      (yyval.pDecl) = NULL;
 	    }
 	  }
-#line 5257 "ctlib/y_parser.c"
+#line 5256 "ctlib/y_parser.c"
     break;
 
   case 341: /* paren_identifier_declarator: '(' paren_identifier_declarator ')'  */
 #line 1945 "ctlib/parser.y"
                                               { (yyval.pDecl) = (yyvsp[-1].pDecl); }
-#line 5263 "ctlib/y_parser.c"
+#line 5262 "ctlib/y_parser.c"
     break;
 
   case 342: /* old_function_declarator: postfix_old_function_declarator  */
 #line 1949 "ctlib/parser.y"
                                           {}
-#line 5269 "ctlib/y_parser.c"
+#line 5268 "ctlib/y_parser.c"
     break;
 
   case 343: /* old_function_declarator: '*' old_function_declarator  */
 #line 1950 "ctlib/parser.y"
                                       {}
-#line 5275 "ctlib/y_parser.c"
+#line 5274 "ctlib/y_parser.c"
     break;
 
   case 344: /* old_function_declarator: '*' type_qualifier_list old_function_declarator  */
 #line 1951 "ctlib/parser.y"
                                                           {}
-#line 5281 "ctlib/y_parser.c"
+#line 5280 "ctlib/y_parser.c"
     break;
 
   case 345: /* postfix_old_function_declarator: paren_identifier_declarator '(' identifier_list ')'  */
@@ -5286,13 +5285,13 @@ yyreduce:
 	    if ((yyvsp[-3].pDecl))
 	      decl_delete((yyvsp[-3].pDecl));
 	  }
-#line 5290 "ctlib/y_parser.c"
+#line 5289 "ctlib/y_parser.c"
     break;
 
   case 346: /* postfix_old_function_declarator: '(' old_function_declarator ')'  */
 #line 1960 "ctlib/parser.y"
                                           {}
-#line 5296 "ctlib/y_parser.c"
+#line 5295 "ctlib/y_parser.c"
     break;
 
   case 347: /* postfix_old_function_declarator: '(' old_function_declarator ')' postfixing_abstract_declarator  */
@@ -5301,7 +5300,7 @@ yyreduce:
 	    if ((yyvsp[0].list))
 	      LL_destroy((yyvsp[0].list), (LLDestroyFunc) value_delete);
 	  }
-#line 5305 "ctlib/y_parser.c"
+#line 5304 "ctlib/y_parser.c"
     break;
 
   case 350: /* abstract_declarator: postfixing_abstract_declarator  */
@@ -5320,19 +5319,19 @@ yyreduce:
 	      LL_destroy((yyvsp[0].list), (LLDestroyFunc) value_delete);
 	    }
 	  }
-#line 5324 "ctlib/y_parser.c"
+#line 5323 "ctlib/y_parser.c"
     break;
 
   case 352: /* postfixing_abstract_declarator: '(' ')'  */
 #line 1990 "ctlib/parser.y"
                                       { (yyval.list) = NULL; }
-#line 5330 "ctlib/y_parser.c"
+#line 5329 "ctlib/y_parser.c"
     break;
 
   case 353: /* postfixing_abstract_declarator: '(' parameter_type_list ')'  */
 #line 1991 "ctlib/parser.y"
                                       { (yyval.list) = NULL; }
-#line 5336 "ctlib/y_parser.c"
+#line 5335 "ctlib/y_parser.c"
     break;
 
   case 354: /* array_abstract_declarator: '[' type_qualifier_list_opt assignment_expression_opt ']'  */
@@ -5347,7 +5346,7 @@ yyreduce:
 	      CT_DEBUG(PARSER, ("array dimension => %ld", (yyvsp[-1].value).iv));
 	    }
 	  }
-#line 5351 "ctlib/y_parser.c"
+#line 5350 "ctlib/y_parser.c"
     break;
 
   case 355: /* array_abstract_declarator: '[' STATIC_TOK type_qualifier_list_opt assignment_expression ']'  */
@@ -5362,7 +5361,7 @@ yyreduce:
 	      CT_DEBUG(PARSER, ("array dimension => %ld", (yyvsp[-1].value).iv));
 	    }
 	  }
-#line 5366 "ctlib/y_parser.c"
+#line 5365 "ctlib/y_parser.c"
     break;
 
   case 356: /* array_abstract_declarator: '[' type_qualifier_list STATIC_TOK assignment_expression ']'  */
@@ -5377,13 +5376,13 @@ yyreduce:
 	      CT_DEBUG(PARSER, ("array dimension => %ld", (yyvsp[-1].value).iv));
 	    }
 	  }
-#line 5381 "ctlib/y_parser.c"
+#line 5380 "ctlib/y_parser.c"
     break;
 
   case 357: /* array_abstract_declarator: '[' type_qualifier_list_opt '*' ']'  */
 #line 2028 "ctlib/parser.y"
                                               { (yyval.list) = NULL; }
-#line 5387 "ctlib/y_parser.c"
+#line 5386 "ctlib/y_parser.c"
     break;
 
   case 358: /* array_abstract_declarator: array_abstract_declarator '[' assignment_expression ']'  */
@@ -5398,7 +5397,7 @@ yyreduce:
 	      CT_DEBUG(PARSER, ("array dimension => %ld", (yyvsp[-1].value).iv));
 	    }
 	  }
-#line 5402 "ctlib/y_parser.c"
+#line 5401 "ctlib/y_parser.c"
     break;
 
   case 359: /* array_abstract_declarator: array_abstract_declarator '[' '*' ']'  */
@@ -5413,7 +5412,7 @@ yyreduce:
 	      CT_DEBUG(PARSER, ("array dimension => *" ));
 	    }
 	  }
-#line 5417 "ctlib/y_parser.c"
+#line 5416 "ctlib/y_parser.c"
     break;
 
   case 360: /* unary_abstract_declarator: '*'  */
@@ -5422,7 +5421,7 @@ yyreduce:
 	    (yyval.absDecl).pointer_flag = 1;
 	    (yyval.absDecl).multiplicator = 1;
 	  }
-#line 5426 "ctlib/y_parser.c"
+#line 5425 "ctlib/y_parser.c"
     break;
 
   case 361: /* unary_abstract_declarator: '*' type_qualifier_list  */
@@ -5431,7 +5430,7 @@ yyreduce:
 	    (yyval.absDecl).pointer_flag = 1;
 	    (yyval.absDecl).multiplicator = 1;
 	  }
-#line 5435 "ctlib/y_parser.c"
+#line 5434 "ctlib/y_parser.c"
     break;
 
   case 362: /* unary_abstract_declarator: '*' abstract_declarator  */
@@ -5440,7 +5439,7 @@ yyreduce:
 	    (yyvsp[0].absDecl).pointer_flag = 1;
 	    (yyval.absDecl) = (yyvsp[0].absDecl);
 	  }
-#line 5444 "ctlib/y_parser.c"
+#line 5443 "ctlib/y_parser.c"
     break;
 
   case 363: /* unary_abstract_declarator: '*' type_qualifier_list abstract_declarator  */
@@ -5449,19 +5448,19 @@ yyreduce:
 	    (yyvsp[0].absDecl).pointer_flag = 1;
 	    (yyval.absDecl) = (yyvsp[0].absDecl);
 	  }
-#line 5453 "ctlib/y_parser.c"
+#line 5452 "ctlib/y_parser.c"
     break;
 
   case 364: /* postfix_abstract_declarator: '(' unary_abstract_declarator ')'  */
 #line 2077 "ctlib/parser.y"
                                             { (yyval.absDecl) = (yyvsp[-1].absDecl); }
-#line 5459 "ctlib/y_parser.c"
+#line 5458 "ctlib/y_parser.c"
     break;
 
   case 365: /* postfix_abstract_declarator: '(' postfix_abstract_declarator ')'  */
 #line 2078 "ctlib/parser.y"
                                               { (yyval.absDecl) = (yyvsp[-1].absDecl); }
-#line 5465 "ctlib/y_parser.c"
+#line 5464 "ctlib/y_parser.c"
     break;
 
   case 366: /* postfix_abstract_declarator: '(' postfixing_abstract_declarator ')'  */
@@ -5480,7 +5479,7 @@ yyreduce:
 	      LL_destroy((yyvsp[-1].list), (LLDestroyFunc) value_delete);
 	    }
 	  }
-#line 5484 "ctlib/y_parser.c"
+#line 5483 "ctlib/y_parser.c"
     break;
 
   case 367: /* postfix_abstract_declarator: '(' unary_abstract_declarator ')' postfixing_abstract_declarator  */
@@ -5490,11 +5489,11 @@ yyreduce:
 	    if ((yyvsp[0].list))
 	      LL_destroy((yyvsp[0].list), (LLDestroyFunc) value_delete);
 	  }
-#line 5494 "ctlib/y_parser.c"
+#line 5493 "ctlib/y_parser.c"
     break;
 
 
-#line 5498 "ctlib/y_parser.c"
+#line 5497 "ctlib/y_parser.c"
 
       default: break;
     }
@@ -5570,7 +5569,7 @@ yyerrlab:
           }
         yyerror (pState, yymsgp);
         if (yysyntax_error_status == YYENOMEM)
-          goto yyexhaustedlab;
+          YYNOMEM;
       }
     }
 
@@ -5606,6 +5605,7 @@ yyerrorlab:
      label yyerrorlab therefore never appears in user code.  */
   if (0)
     YYERROR;
+  ++yynerrs;
 
   /* Do not reclaim the symbols of the rule whose action triggered
      this YYERROR.  */
@@ -5666,7 +5666,7 @@ yyerrlab1:
 `-------------------------------------*/
 yyacceptlab:
   yyresult = 0;
-  goto yyreturn;
+  goto yyreturnlab;
 
 
 /*-----------------------------------.
@@ -5674,24 +5674,22 @@ yyacceptlab:
 `-----------------------------------*/
 yyabortlab:
   yyresult = 1;
-  goto yyreturn;
+  goto yyreturnlab;
 
 
-#if 1
-/*-------------------------------------------------.
-| yyexhaustedlab -- memory exhaustion comes here.  |
-`-------------------------------------------------*/
+/*-----------------------------------------------------------.
+| yyexhaustedlab -- YYNOMEM (memory exhaustion) comes here.  |
+`-----------------------------------------------------------*/
 yyexhaustedlab:
   yyerror (pState, YY_("memory exhausted"));
   yyresult = 2;
-  goto yyreturn;
-#endif
+  goto yyreturnlab;
 
 
-/*-------------------------------------------------------.
-| yyreturn -- parsing is finished, clean up and return.  |
-`-------------------------------------------------------*/
-yyreturn:
+/*----------------------------------------------------------.
+| yyreturnlab -- parsing is finished, clean up and return.  |
+`----------------------------------------------------------*/
+yyreturnlab:
   if (yychar != YYEMPTY)
     {
       /* Make sure we have latest lookahead translation.  See comments at

@@ -6,7 +6,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use CXC::DB::DDL::Constants -all;
 
@@ -131,16 +131,14 @@ coerce Index, from ArrayRef [Str], q[ { fields => $_ } ];
 
 
 
-use constant ArrayRefFromStr => ArrayRef->of( Str )->plus_coercions( Str, q{[$_]} ), coercion => 1;
-
 declare Constraint,
   as Dict [
     type              => Enum [SCHEMA_CONSTANTS],
     name              => Optional [Str],
     deferrable        => Optional [Bool],
     expression        => Optional [ Str | CodeRef ],
-    fields            => Optional [ArrayRefFromStr],
-    referenced_fields => Optional [ArrayRefFromStr],
+    fields            => Optional [ Str | ArrayRef [Str] ],
+    referenced_fields => Optional [ Str | ArrayRef [Str] ],
     reference_table   => Optional [Str],
     match_type        => Optional [ Enum [SCHEMA_CONSTRAINT_MATCH_TYPES] ],
     on_delete         => Optional [ Enum [SCHEMA_CONSTRAINT_ON_DELETE] ],
@@ -174,7 +172,7 @@ CXC::DB::DDL::Types - Types, oh my!
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 

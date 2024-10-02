@@ -2323,7 +2323,15 @@ sub process
         }
         if( exists( $eng_territories_names_to_code->{ $name } ) )
         {
-            die( "Found another territory (", $eng_territories_names_to_code->{ $name }, ") with the same name '${name}' for our code '${code}'" );
+            # This is a variation, which we ignore.
+            if( $el->hasAttribute( 'alt' ) )
+            {
+                next;
+            }
+            else
+            {
+                die( "Found another territory (", $eng_territories_names_to_code->{ $name }, ") with the same name '${name}' for our code '${code}'" );
+            }
         }
         $eng_territories_names_to_code->{ $name } = $code;
     }
@@ -2604,7 +2612,7 @@ sub process
                     ) )
                 {
                     $tzs->{ $zone }->{territory} = $territory;
-                    $tzs->{ $zone }->{region} = [split( /\//, $zone )]->[0];
+                    $tzs->{ $zone }->{region} = [split( /\//, $zone )]->[0] if( index( $zone, '/' ) != -1 );
                     $n++;
                     $out->print( "added territory ${territory}\n" ) if( $DEBUG );
                 }
@@ -2619,7 +2627,7 @@ sub process
                 {
                     timezone => $zone,
                     territory => $territory,
-                    region => [split( /\//, $zone )]->[0],
+                    region => ( index( $zone, '/' ) != -1 ? [split( /\//, $zone )]->[0] : undef ),
                 };
                 $out->print( "missing time zone added\n" ) if( $DEBUG );
             }
@@ -2704,7 +2712,8 @@ sub process
                     }
                     my $tz_info = Clone::clone( $tzs->{ $main_tz } );
                     $tz_info->{timezone} = $tz;
-                    $tz_info->{region} = [split( '/', $tz )]->[0];
+                    # $tz_info->{region} = [split( '/', $tz )]->[0];
+                    $tz_info->{region} = [split( '/', $tz )]->[0] if( index( $tz, '/' ) != -1 );
                     $tz_info->{tz_bcpid} = $def->{tzid};
                     $tz_info->{alias} = [grep( $_ ne $tz, @{$def->{alias}} )];
                     $tz_info->{is_primary} = 0;
@@ -2764,7 +2773,17 @@ sub process
                 die( "Missing 'territory' property for time zone '${tz}': ", dump( $def ) );
             }
         }
-        elsif( substr( $tz, 0, 3 ) eq 'GMT' )
+        elsif( substr( $tz, 0, 3 ) eq 'GMT' || 
+               substr( $tz, 0, 3 ) eq 'UTC' ||
+               substr( $tz, 0, 7 ) eq 'Etc/GMT' ||
+               substr( $tz, 0, 7 ) eq 'Etc/UTC' ||
+               substr( $tz, 0, 7 ) eq 'Etc/UCT' ||
+               $tz eq 'Etc/Universal' )
+        {
+            $def->{region} = 'World';
+        }
+        # No region has been set so far, and this is because this is a zone that belongs to the World, such as CST6CDT or Greenwich
+        elsif( !length( $def->{region} // '' ) )
         {
             $def->{region} = 'World';
         }

@@ -4,6 +4,7 @@ use Moo;
 use Valiant::HTML::Util::Collection;
 use Scalar::Util;
 use URI;
+use Carp;
 
 extends 'Valiant::HTML::Util::TagBuilder';
 
@@ -376,10 +377,14 @@ sub _sanitize {
 }
 
 sub field_value {
-  my ($self, $model, $attribute) = @_;
+  my ($self, $model, $attribute, $options) = @_;
+  $options = +{} unless defined $options;
   return $model->read_attribute_for_html($attribute) if $model->can('read_attribute_for_html');
   return $model->$attribute if $model->can($attribute);
-  return ''; # TODO should look at $formbuilder->options->{allow_method_names_outside_object}
+  croak "Model '@{ $model->model_name->human}' has no attribute '' with a readable value" if $options->{strict}; 
+  return '' if $self->can('allow_method_names_outside_object') && $self->allow_method_names_outside_object;
+  croak "Model '@{ $model->model_name->human}' has no attribute '' with a readable value" if $options->{strict}; 
+  return '';
 }
 
 sub field_id {
@@ -419,6 +424,19 @@ sub field_name {
 
   return $name;
 }
+
+sub field_errors {
+  my ($self, $model, $attribute) = @_;
+  return $model->read_attribute_errors_for($attribute) if $model->can('read_attribute_errors_for');
+  return $model->errors->full_messages_for($attribute);
+}
+
+#sub field_label {
+#  my ($self, $model, $attribute) = @_;
+#  return $model->read_attribute_errors_for($attribute) if $model->can('read_attribute_errors_for');
+#  return $model->errors->full_messages_for($attribute);
+#}
+
 
 1;
 
@@ -502,6 +520,58 @@ This class extends L<Valiant::HTML::Util::TagBuilder> and inherits all methods f
 =head1 METHODS
 
 The following instance methods are supported by this class
+
+=head2 field_value
+
+    my $model_value = $tb->field_value($model, $attribute, \%options);
+
+For a given model return the value for an attribute.  This finds the value by first looking for
+a method on the model called C<read_attribute_for_html> and if that doesn't exist it tries
+looking for a method called C<$attribute> on the model.
+
+If neither work the value is '' (empty string) if option C<allow_method_names_outside_object>
+is passed to the C<$tb> object and is true or if its false (or {strict=>1} is $passed to
+%options) you get an exception.
+
+=head2 field_id
+
+The field_id method is used within form builders to generate a consistent and unique id attribute
+for form fields based on the object's name and the attribute's name. This method is particularly
+helpful when you need to create custom form fields or labels manually and want to ensure they 
+follow conventions.
+
+    my $id = $tb->field_id($model_or_model_name, $attribute, \%options, @extra);
+
+Argument are:
+
+=over
+
+=item $model_or_model_name
+
+Either a model object or the string name of the model.
+
+=item $attribute
+
+The attribute on the model we are creating an id for.
+
+=item \%options
+
+A hashref of options.  Two are supported.  C<namespace> which prepends a string to the start of
+the id, and C<index> which is a number indicating the index of a nested form.
+
+=item @extra
+
+An array of extra strings to be added to the end of the id.
+
+=back
+
+=head2 field_name
+
+Similar to C<field_id> but for creating a unique form field name
+
+=head3 field_errors
+
+An array of error messages for a field.
 
 =head2 button_tag
 

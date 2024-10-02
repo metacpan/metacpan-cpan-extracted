@@ -9,7 +9,7 @@
 *
 ********************************************************************************
 *
-* Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
+* Copyright (c) 2002-2024 Marcus Holland-Moritz. All rights reserved.
 * This program is free software; you can redistribute it and/or modify
 * it under the same terms as Perl itself.
 *

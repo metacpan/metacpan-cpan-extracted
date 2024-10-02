@@ -1,9 +1,8 @@
-#!/usr/bin/perl
-
+# vim: set ts=2 sw=2 noet nolist :
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 0.88;
 
 
 my $m; use ok $m = "Devel::Events::Filter::RemoveFields";
@@ -23,4 +22,4 @@ is_deeply(
 	"remove fields",
 );
 
-
+done_testing;

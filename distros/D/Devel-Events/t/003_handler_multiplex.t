@@ -1,9 +1,8 @@
-#!/usr/bin/perl
-
+# vim: set ts=2 sw=2 noet nolist :
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 0.88;
 
 use ok 'Devel::Events::Handler::Multiplex';
 
@@ -22,3 +21,5 @@ $h->new_event( blah => ( foo => [ 1 .. 3 ] ) );
 
 is_deeply( \@a, [ [ blah => ( foo => [ 1 .. 3 ] ) ] ], "first handler" );
 is_deeply( \@b, [ [ blah => ( foo => [ 1 .. 3 ] ) ] ], "second handler" );
+
+done_testing;

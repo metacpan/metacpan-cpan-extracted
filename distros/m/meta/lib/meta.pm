@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package meta 0.009;
+package meta 0.010;
 
 use v5.14;
 use warnings;
@@ -455,6 +455,57 @@ I<Since version 0.007.>
 Sets a new prototype for the subroutine.
 
 Returns the C<$metasub> instance itself to allow for easy chaining.
+
+=head2 signature
+
+   $metasig = $metasub->signature;
+
+I<Since version 0.010.>
+
+If on Perl version 5.26 or above and the subroutine has a signature, returns
+an object reference representing details about the signature. This can be
+queried using the methods below. If the subroutine does not use a signature
+(or on Perl versions before 5.26) returns C<undef>.
+
+=cut
+
+=head1 METHODS ON SUBROUTINE METASIGNATURES
+
+=head2 mandatory_params
+
+   $n = $metasig->mandatory_params;
+
+Returns the number of parameters that are mandatory (i.e. do not have a
+defaulting expression). This is the minimum number of argument values that
+must be passed to any call of this function and does not count a final slurpy
+parameter.
+
+=head2 optional_params
+
+   $n = $metasig->optional_params;
+
+Returns the number of parameters that are optional (i.e. have a defaulting
+expression).
+
+=head2 slurpy
+
+   $slurpy = $metasig->slurpy;
+
+Returns the sigil character associated with the final slurpy parameter if it
+exists (i.e. C<%> or C<@>), or C<undef> if no slurpy parameter is defined.
+
+=head2 min_args
+
+=head2 max_args
+
+   $n = $metasig->min_args;
+
+   $n = $metasig->max_args;
+
+Returns the minimum or maximum number of argument values that can be passed to
+a call to this function. C<min_args> is the same as C<mandatory_params> but is
+offered as an alias in case the data model ever changes. C<max_args> will be
+C<undef> if the function uses a slurpy final parameter.
 
 =cut
 

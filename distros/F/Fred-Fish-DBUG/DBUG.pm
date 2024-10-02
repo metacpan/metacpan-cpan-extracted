@@ -67,7 +67,7 @@ In summary all the options are:
    use Fred::Fish::DBUG;         # Same as if qw / on / was used.
 
    # While enforcing a minimum version ...
-   use Fred::Fish::DBUG 2.04 qw / on /;
+   use Fred::Fish::DBUG 2.03 qw / on /;
 
 =head1 TRAPPING SIGNALS IN FISH
 
@@ -190,7 +190,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION = "2.04";
+$VERSION = "2.05";
 @ISA = qw( Exporter );
 
 # ------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ sub import
    my @imports;
    my $fish_module = __PACKAGE__ . "::";
 
-   my $minVer = 2.04;
+   my $minVer = 2.05;
    if ( $on_flag ) {
       $fish_module .= "ON";
       require Fred::Fish::DBUG::ON;

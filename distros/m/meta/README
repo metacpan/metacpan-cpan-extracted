@@ -407,6 +407,56 @@ METHODS ON METASUBROUTINES
 
     Returns the $metasub instance itself to allow for easy chaining.
 
+ signature
+
+       $metasig = $metasub->signature;
+
+    Since version 0.010.
+
+    If on Perl version 5.26 or above and the subroutine has a signature,
+    returns an object reference representing details about the signature.
+    This can be queried using the methods below. If the subroutine does not
+    use a signature (or on Perl versions before 5.26) returns undef.
+
+METHODS ON SUBROUTINE METASIGNATURES
+
+ mandatory_params
+
+       $n = $metasig->mandatory_params;
+
+    Returns the number of parameters that are mandatory (i.e. do not have a
+    defaulting expression). This is the minimum number of argument values
+    that must be passed to any call of this function and does not count a
+    final slurpy parameter.
+
+ optional_params
+
+       $n = $metasig->optional_params;
+
+    Returns the number of parameters that are optional (i.e. have a
+    defaulting expression).
+
+ slurpy
+
+       $slurpy = $metasig->slurpy;
+
+    Returns the sigil character associated with the final slurpy parameter
+    if it exists (i.e. % or @), or undef if no slurpy parameter is defined.
+
+ min_args
+
+ max_args
+
+       $n = $metasig->min_args;
+    
+       $n = $metasig->max_args;
+
+    Returns the minimum or maximum number of argument values that can be
+    passed to a call to this function. min_args is the same as
+    mandatory_params but is offered as an alias in case the data model ever
+    changes. max_args will be undef if the function uses a slurpy final
+    parameter.
+
 TODO
 
       * Some kind of access around the signature of a signatured sub.

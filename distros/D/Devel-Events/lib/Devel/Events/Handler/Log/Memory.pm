@@ -1,15 +1,12 @@
-#!/usr/bin/perl
-
 package Devel::Events::Handler::Log::Memory;
+# vim: set ts=2 sw=2 noet nolist :
 # ABSTRACT: An optional base role for event generators.
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Moose;
 
 with qw/Devel::Events::Handler/;
 
 use Devel::Events::Match;
-
-use MooseX::AttributeHelpers;
 
 has matcher => (
 	isa => "Devel::Events::Match",
@@ -36,15 +33,15 @@ has matcher => (
 );
 
 has events => (
-	metaclass => 'Collection::Array',
 	isa => "ArrayRef",
 	is  => "ro",
 	default    => sub { [] },
 	auto_deref => 1,
-	provides   => {
-		push  => 'add_event',
-		clear => 'clear',
-	},
+  traits => ['Array'],
+  handles => {
+    clear => 'clear',
+    add_event => 'push',
+  },
 );
 
 sub new_event {
@@ -71,7 +68,7 @@ Devel::Events::Handler::Log::Memory - An optional base role for event generators
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

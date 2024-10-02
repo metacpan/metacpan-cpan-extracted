@@ -1,20 +1,43 @@
 package Sumu::Perl::Modules;
 
-# ABSTRACT: Perl Modules
+# ABSTRACT: Sumu Perl Modules : List all installed Perl Modules
 
 =head1 NAME
 
-    Perl Modules
+    Sumu Perl Modules
 
 =head1 VERSION
 
-version 0.3.7
+version 0.4.2
 
-=head2 DESC
+=head2 SYNOPSIS
+
+    Usage:
+    
+        my $module = $c->param('module');
+            
+            chomp $module;
+        
+        my $modules = Sumu::Perl::Modules->new();
+
+        my ($mod, $dirs, $files) = $modules->_dirs(current_user => $current_user, module => "$module");
+
+        my ($mod, $out) = $modules->_doc( module => $module );
+
+
+=head2 DESCRIPTION
 
     List all installed Perl Modules on your system
-    
-=cut
+
+    Tested in:
+
+        Dist: 
+
+            Ubuntu 22.04 (WSL)
+
+        UI: 
+
+            Rocky Linux 9 (Hyper-V)
 
 =head2 Strictures
 
@@ -23,15 +46,18 @@ version 0.3.7
 =cut
 
 use strict;
-#use warnings;
+use warnings;
 
 =head2 our VERSION
 
-    our $VERSION = '0.3.7'
+    our $VERSION = '0.4.2'
+
+    This version number is updated automatically!
 
 =cut
 
-our $VERSION = '0.3.7';
+our $VERSION = '0.4.2';
+
 
 =head2 Internals
 
@@ -45,12 +71,13 @@ our @ISA = ("Exporter");
 
 our @EXPORT_OK = qw(
     NAME 
+    new
     _extutils 
     _dirs 
     _doc
 ); 
 
-=head3 sub NAME
+=head2 sub NAME
 
     Returns NAME: 
     
@@ -61,7 +88,7 @@ our @EXPORT_OK = qw(
 sub NAME { my $self = shift; my $NAME = "Sumu Perl Modules"; return $NAME; }
 
 
-=head3 Sub new
+=head2 Sub new
 
     Bless the classes 
 
@@ -74,8 +101,10 @@ sub new {
 }
 
 
-=head3 Required Modules
+=head2 Required Modules
 
+    Eporter
+    
     ExtUtils::Installed
 
 =cut
@@ -85,9 +114,9 @@ use ExtUtils::Installed;
 my $inst = ExtUtils::Installed->new();
 
 
-=head3 Sub _extutils
+=head2 Sub _extutils
 
-    Returns List of modules 
+    Returns List of modules as a table
 
 =cut
 
@@ -133,7 +162,7 @@ sub _extutils {
 # end 
 
 
-=head3 Sub _dirs 
+=head2 Sub _dirs 
 
     Show/Get Dirs in a given module 
 
@@ -193,16 +222,18 @@ sub _dirs  {
     return ($module, $dirs, $files);
 
 }
-# end 
+# end _dirs
 
 
-=head3 Sub _doc
+=head2 Sub _doc
 
     Show Doc for a given module 
 
-    Module includes path 
+        Returns results from command
 
-    Returns an ordered list 
+            perldoc Module
+
+        as text with a line break (<br>) appended to end of each line
 
 =cut
 

@@ -223,7 +223,7 @@ CREATE TABLE time_formats (
     ,time_format        VARCHAR(1) DEFAULT 'H'
     ,time_allowed       TEXT[] DEFAULT '["H", "h"]'
     ,PRIMARY KEY(time_format_id)
-    ,CHECK( region REGEXP '^[a-zA-Z0-9\-]+$' )
+    ,CHECK( region REGEXP '^[-a-zA-Z0-9]+$' )
     ,CHECK( time_format REGEXP '^[a-zA-Z]$' )
     ,FOREIGN KEY(territory) REFERENCES territories(territory) ON UPDATE CASCADE ON DELETE RESTRICT
     ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
@@ -270,7 +270,7 @@ CREATE TABLE aliases (
     ,type               VARCHAR(17)
     ,comment            TEXT
     ,PRIMARY KEY(alias_id)
-    ,CHECK( alias REGEXP '^[a-zA-Z0-9\/\_\-]+$' )
+    ,CHECK( alias REGEXP '^[-a-zA-Z0-9\/\_]+$' )
 );
 CREATE UNIQUE INDEX idx_aliases_unique ON aliases(alias,type);
 
@@ -313,8 +313,8 @@ CREATE TABLE timezones (
     ,is_canonical       BOOLEAN DEFAULT FALSE
     ,alias              TEXT[]
     ,PRIMARY KEY(timezone_id)
-    ,CHECK( timezone REGEXP '^[a-zA-Z0-9\/\_\-\+]+$' )
-    ,CHECK( region REGEXP '^[a-zA-Z0-9\-]+$' )
+    ,CHECK( timezone REGEXP '^[-a-zA-Z0-9\/\_\+]+$' )
+    ,CHECK( region REGEXP '^[-a-zA-Z0-9]+$' )
     ,CHECK( tzid REGEXP '^[a-zA-Z0-9]+$' )
     ,CHECK( tz_bcpid REGEXP '^[a-zA-Z0-9]+$' )
     ,FOREIGN KEY(territory) REFERENCES territories(territory) ON UPDATE CASCADE ON DELETE RESTRICT
@@ -509,7 +509,7 @@ CREATE TABLE bcp47_values (
     ,description        TEXT
     ,PRIMARY KEY(bcp47_value_id)
     ,FOREIGN KEY(category,extension) REFERENCES bcp47_extensions(category,extension) ON UPDATE CASCADE ON DELETE RESTRICT
-    ,CHECK( value REGEXP '^[a-zA-Z0-9][a-zA-Z0-9\-\_]+$' )
+    ,CHECK( value REGEXP '^[a-zA-Z0-9][-a-zA-Z0-9\_]+$' )
 );
 CREATE UNIQUE INDEX idx_bcp47_values_unique ON bcp47_values(extension, value);
 
@@ -561,7 +561,7 @@ CREATE TABLE locales_l10n (
     ,PRIMARY KEY(locales_l10n_id)
     ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
     ,FOREIGN KEY(locale_id) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
-    ,CHECK( alt REGEXP '^[a-z][a-z\-]+$' )
+    ,CHECK( alt REGEXP '^[a-z][-a-z]+$' )
 );
 CREATE UNIQUE INDEX idx_locales_l10n_unique ON locales_l10n(locale, locale_id, IFNULL(alt, ''));
 
@@ -576,7 +576,7 @@ CREATE TABLE scripts_l10n (
     ,PRIMARY KEY(scripts_l10n_id)
     ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
     ,FOREIGN KEY(script) REFERENCES scripts(script) ON UPDATE CASCADE ON DELETE RESTRICT
-    ,CHECK( alt REGEXP '^[a-z][a-z\-]+$' )
+    ,CHECK( alt REGEXP '^[a-z][-a-z]+$' )
 );
 CREATE UNIQUE INDEX idx_scripts_l10n_unique ON scripts_l10n(locale,script, IFNULL(alt, ''));
 
@@ -591,7 +591,7 @@ CREATE TABLE territories_l10n (
     ,PRIMARY KEY(terr_l10n_id)
     ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
     ,FOREIGN KEY(territory) REFERENCES territories(territory) ON UPDATE CASCADE ON DELETE RESTRICT
-    ,CHECK( alt REGEXP '^[a-z][a-z\-]+$' )
+    ,CHECK( alt REGEXP '^[a-z][-a-z]+$' )
 );
 CREATE UNIQUE INDEX idx_territories_l10n_unique ON territories_l10n(locale,territory, IFNULL(alt, ''));
 
@@ -606,7 +606,7 @@ CREATE TABLE variants_l10n (
     ,PRIMARY KEY(var_l10n_id)
     ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
     ,FOREIGN KEY(variant) REFERENCES variants(variant) ON UPDATE CASCADE ON DELETE RESTRICT
-    ,CHECK( alt REGEXP '^[a-z][a-z\-]+$' )
+    ,CHECK( alt REGEXP '^[a-z][-a-z]+$' )
 );
 CREATE UNIQUE INDEX idx_variants_l10n_unique ON variants_l10n(locale,variant, IFNULL(alt, ''));
 
@@ -819,7 +819,7 @@ CREATE TABLE calendar_datetime_formats (
     ,format_pattern     VARCHAR(20) NOT NULL
     ,PRIMARY KEY(cal_dt_fmt_id)
     ,CHECK( format_length REGEXP '^[a-zA-Z0-9]+$' )
-    ,CHECK( format_type REGEXP '^[a-zA-Z0-9][a-zA-Z0-9\-]+$' )
+    ,CHECK( format_type REGEXP '^[a-zA-Z0-9][-a-zA-Z0-9]+$' )
     ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
     ,FOREIGN KEY(calendar) REFERENCES calendars(calendar) ON UPDATE CASCADE ON DELETE RESTRICT
 );

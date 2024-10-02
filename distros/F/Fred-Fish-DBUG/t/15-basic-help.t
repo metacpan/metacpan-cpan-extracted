@@ -24,7 +24,7 @@ sub my_warn
 # BEGIN { $ENV{FISH_OFF_FLAG} = -1; }
 
 BEGIN {
-   # Can't use any of the constants defined by this module
+   # Can't use any of the constants or funcs defined by this module
    # unless we use them in a separate BEGIN block!
 
    push (@INC, File::Spec->catdir (".", "t", "off"));
@@ -35,7 +35,9 @@ BEGIN {
       BAIL_OUT ( "Can't load helper1234" );   # Test # 1
       exit (0);
    }
+}
 
+BEGIN {
    my $fish_module = get_fish_module ();
    my @opts = get_fish_opts ();
 

@@ -48,11 +48,11 @@ sub flattened_raw {
 
 sub is_safe {
   my $string_to_test = shift;
-  return 0 unless defined($string_to_test);
-  return 0 unless
-    ((Scalar::Util::blessed($string_to_test)||'') eq 'Valiant::HTML::SafeString') || 
-    ((Scalar::Util::blessed($string_to_test)||'') eq 'Mojo::ByteStream');
-  return 1;
+  return 0 unless defined($string_to_test); # must be defined
+  return 0 unless Scalar::Util::blessed($string_to_test); # must be a blessed object
+  return 1 if $string_to_test->isa('Valiant::HTML::SafeString'); # must be a blessed object of the right class
+
+  return 0;
 }
 
 sub safe {

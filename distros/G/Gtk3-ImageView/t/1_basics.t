@@ -49,8 +49,8 @@ SKIP: {
         {
             x      => 0,
             y      => num( -12, 0.001 ),
-            width  => num( 70,  0.001 ),
-            height => num( 70,  0.001 ),
+            width  => num(  70, 0.001 ),
+            height => num(  70, 0.001 ),
         },
         'get_viewport'
     );

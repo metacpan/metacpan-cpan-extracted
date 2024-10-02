@@ -23,6 +23,14 @@
 
 Version - YYYY/MM/DD
 ---------------------
+2.05 2024-10-01 08:30:00
+  - In researching why certain CPAN Testers fail, it looks like use_ok() inside
+    of a BEGIN block has issues with BEGIN/import() executing in different order
+    for different versions of perl.  I can't test directly, but my fix is to
+    put the use_ok('helper1234) in one BEGIN block & call any helper1234 funcs
+    in a separate BEGIN block.  Using t/15-basic-help.t as a test case.
+    If this fix works, I'll fix all the other t/*.t progs in the next release.
+
 2.04 2024-09-27 08:30:00
   - Added a delay log file whenever the delay option was used in a test case.
   - Modified full_developer_test.pl.src to take delays into account.
@@ -34,6 +42,7 @@ Version - YYYY/MM/DD
     expected.  Since so much logic depends on it.
   - CPAN Tester hack, didn't like me calling dbug_level() from BEGIN ?
     So added test in DBUG.pm to verify since I can't reproduce it (-100).
+    (used to verfy CPAN Tester issue of v2.05)
   - Updated the POD NAME for all *.pm files to be fully qualified.
   - Depreciate DEBUG.pm & Log.pm, now just POD stubs.
   - Fixed unexpected warning error ecountered by a CPAN tester on test case

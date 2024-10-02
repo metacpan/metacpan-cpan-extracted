@@ -1,0 +1,1181 @@
+class TestCase::Module::Packer {
+  use Packer;
+  
+  static method new : int () {
+    
+    {
+      my $packer = Packer->new;
+      
+      unless ($packer is_type Packer) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method pack_unpack_string : int () {
+    
+    my $packer = Packer->new;
+    
+    # a3
+    {
+      my $objects = [(object)"abc"];
+      
+      my $template = "a3";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 3) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type string) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(string) eq "abc") {
+        return 0;
+      }
+      
+    }
+    
+    # a2
+    {
+      my $objects = [(object)"abc"];
+      
+      my $template = "a2";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 2) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type string) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(string) eq "ab") {
+        return 0;
+      }
+      
+    }
+    
+    # a4
+    {
+      my $objects = [(object)"abc"];
+      
+      my $template = "a4";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type string) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(string) eq "abc\0") {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method pack_unpack_numeric_object : int () {
+    
+    my $packer = Packer->new;
+    
+    # c
+    {
+      my $objects = [(object)(byte)Fn->BYTE_MIN];
+      
+      my $template = "c";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 1) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type Byte) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(byte) == Fn->BYTE_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # s
+    {
+      my $objects = [(object)(short)Fn->SHORT_MIN];
+      
+      my $template = "s";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 2) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type Short) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(short) == Fn->SHORT_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # l
+    {
+      my $objects = [(object)Fn->INT_MIN];
+      
+      my $template = "l";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type Int) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int) == Fn->INT_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # l - objects are too many
+    {
+      my $objects = [(object)Fn->INT_MIN, 1];
+      
+      my $template = "l";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type Int) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int) == Fn->INT_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # q
+    {
+      my $objects = [(object)Fn->LONG_MIN];
+      
+      my $template = "q";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 8) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type Long) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(long) == Fn->LONG_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # f
+    {
+      my $objects = [(object)Fn->FLT_MIN];
+      
+      my $template = "f";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type Float) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(float) == Fn->FLT_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # d
+    {
+      my $objects = [(object)Fn->DBL_MIN];
+      
+      my $template = "d";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4 * 2) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type Double) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(double) == Fn->DBL_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method pack_unpack_big_endian : int () {
+    
+    my $packer = Packer->new;
+    
+    # l2
+    {
+      my $objects = [(object)[Fn->INT_MIN, 1]];
+      
+      my $template = "l>2";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4 * 2) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type int[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int[])->[0] == Fn->INT_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int[])->[1] == 1) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method pack_unpack_numeric_array : int () {
+    
+    my $packer = Packer->new;
+    
+    # c1
+    {
+      my $objects = [(object)[(byte)Fn->BYTE_MIN]];
+      
+      my $template = "c1";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 1) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type byte[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(byte[])->[0] == Fn->BYTE_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # s1
+    {
+      my $objects = [(object)[(short)Fn->SHORT_MIN]];
+      
+      my $template = "s1";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 2) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type short[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(short[])->[0] == Fn->SHORT_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # l1
+    {
+      my $objects = [(object)[Fn->INT_MIN]];
+      
+      my $template = "l1";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type int[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int[])->[0] == Fn->INT_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # l2
+    {
+      my $objects = [(object)[Fn->INT_MIN, 1]];
+      
+      my $template = "l2";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4 * 2) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type int[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int[])->[0] == Fn->INT_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int[])->[1] == 1) {
+        return 0;
+      }
+      
+    }
+    
+    # l2 - too many objects
+    {
+      my $objects = [(object)[Fn->INT_MIN, 1, 2]];
+      
+      my $template = "l2";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4 * 2) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type int[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int[])->[0] == Fn->INT_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int[])->[1] == 1) {
+        return 0;
+      }
+      
+    }
+    
+    # l2 - too few objects
+    {
+      my $objects = [(object)[Fn->INT_MIN]];
+      
+      my $template = "l2";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4 * 2) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type int[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int[])->[0] == Fn->INT_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int[])->[1] == 0) {
+        return 0;
+      }
+      
+    }
+    
+    # q1
+    {
+      my $objects = [(object)[Fn->LONG_MIN]];
+      
+      my $template = "q1";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 8) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type long[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(long[])->[0] == Fn->LONG_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # f1
+    {
+      my $objects = [(object)[Fn->FLT_MIN]];
+      
+      my $template = "f1";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type float[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(float[])->[0] == Fn->FLT_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # d1
+    {
+      my $objects = [(object)[Fn->DBL_MIN]];
+      
+      my $template = "d1";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4 * 2) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type double[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(double[])->[0] == Fn->DBL_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method pack_unpack_little_endian : int () {
+    
+    my $packer = Packer->new;
+    
+    # l2
+    {
+      my $objects = [(object)[Fn->INT_MIN, 1]];
+      
+      my $template = "l<2";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4 * 2) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type int[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int[])->[0] == Fn->INT_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int[])->[1] == 1) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method pack_unpack_specifiers : int () {
+    
+    my $packer = Packer->new;
+    
+    # ll
+    {
+      my $objects = [(object)Fn->INT_MIN, Fn->INT_MAX];
+      
+      my $template = "ll";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4 * 2) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 2) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type Int) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int) == Fn->INT_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[1] is_type Int) {
+        return 0;
+      }
+      
+      unless ($objects_again->[1]->(int) == Fn->INT_MAX) {
+        return 0;
+      }
+      
+    }
+    
+    # lll
+    {
+      my $objects = [(object)Fn->INT_MIN, Fn->INT_MAX, 1];
+      
+      my $template = "lll";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 4 * 3) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 3) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type Int) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(int) == Fn->INT_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[1] is_type Int) {
+        return 0;
+      }
+      
+      unless ($objects_again->[1]->(int) == Fn->INT_MAX) {
+        return 0;
+      }
+      
+      unless ($objects_again->[2] is_type Int) {
+        return 0;
+      }
+      
+      unless ($objects_again->[2]->(int) == 1) {
+        return 0;
+      }
+      
+    }
+    
+    # cslqfd
+    {
+      my $objects = [(object)(byte)1, (short)2, Fn->INT_MIN, Fn->LONG_MIN, Fn->FLT_MIN, Fn->DBL_MIN];
+      
+      my $template = "cslqfd";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 1 + 2 + 4 + 8 + 4 + 8) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 6) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type Byte) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(byte) == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[1] is_type Short) {
+        return 0;
+      }
+      
+      unless ($objects_again->[1]->(short) == 2) {
+        return 0;
+      }
+      
+      unless ($objects_again->[2] is_type Int) {
+        return 0;
+      }
+      
+      unless ($objects_again->[2]->(int) == Fn->INT_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[3] is_type Long) {
+        return 0;
+      }
+      
+      unless ($objects_again->[3]->(long) == Fn->LONG_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[4] is_type Float) {
+        return 0;
+      }
+      
+      unless ($objects_again->[4]->(float) == Fn->FLT_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[5] is_type Double) {
+        return 0;
+      }
+      
+      unless ($objects_again->[5]->(double) == Fn->DBL_MIN) {
+        return 0;
+      }
+      
+    }
+    
+    # cslqfd
+    {
+      my $objects = [(object)[(byte)1], [(short)2], [Fn->INT_MIN, 1], [Fn->LONG_MIN], [Fn->FLT_MIN], [Fn->DBL_MIN], "abc"];
+      
+      my $template = "c1s1l2q1f1d1a3";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      unless (length $binary == 1 + 2 + (4 * 2) + 8 + 4 + 8 + 3) {
+        return 0;
+      }
+      
+      my $objects_again = $packer->unpack($template, $binary);
+      
+      unless (@$objects_again == 7) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0] is_type byte[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[0]->(byte[])->[0] == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[1] is_type short[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[1]->(short[])->[0] == 2) {
+        return 0;
+      }
+      
+      unless ($objects_again->[2] is_type int[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[2]->(int[])->[0] == Fn->INT_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[2]->(int[])->[1] == 1) {
+        return 0;
+      }
+      
+      unless ($objects_again->[3] is_type long[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[3]->(long[])->[0] == Fn->LONG_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[4] is_type float[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[4]->(float[])->[0] == Fn->FLT_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[5] is_type double[]) {
+        return 0;
+      }
+      
+      unless ($objects_again->[5]->(double[])->[0] == Fn->DBL_MIN) {
+        return 0;
+      }
+      
+      unless ($objects_again->[6] is_type string) {
+        return 0;
+      }
+      
+      unless ($objects_again->[6]->(string) eq "abc") {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method pack_exceptions : int () {
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "l";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack(undef, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, undef); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "ll";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "c";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "c1";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "s";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "s1";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "l";
+      my $objects = [(object)1L];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "c1";
+      my $objects = [(object)1L];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "q";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "q1";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "f";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "f1";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "d";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "d1";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $template = "a3";
+      my $objects = [(object)1];
+      
+      eval { $packer->pack($template, $objects); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method unpack_exceptions : int () {
+
+=pod
+
+    {
+      my $packer = Packer->new;
+      
+      my $objects = [(object)(byte)Fn->BYTE_MIN];
+      
+      my $template = "c";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      eval { my $objects_again = $packer->unpack($template, $binary); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+=cut
+    
+    {
+      my $packer = Packer->new;
+      
+      my $objects = [(object)(byte)Fn->BYTE_MIN];
+      
+      my $template = "c";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      eval { my $objects_again = $packer->unpack(undef, $binary); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $objects = [(object)(byte)Fn->BYTE_MIN];
+      
+      my $template = "c";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      eval { my $objects_again = $packer->unpack($template, undef); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    {
+      my $packer = Packer->new;
+      
+      my $objects = [(object)(byte)Fn->BYTE_MIN];
+      
+      my $template = "c";
+      
+      my $binary = $packer->pack($template, $objects);
+      
+      eval { my $objects_again = $packer->unpack("cc", $binary); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+}

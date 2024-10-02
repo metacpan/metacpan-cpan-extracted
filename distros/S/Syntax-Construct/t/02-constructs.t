@@ -227,6 +227,8 @@ my %tests = (
           1 ],
         [ 'method-on-any-string',
           '"3foo"->CORE::uc', '3FOO' ],
+        [ 'split-space',
+          'my $s = " "; join "", split $s, "a\tb"', 'ab']
     ],
 
     '5.016' => [

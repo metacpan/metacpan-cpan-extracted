@@ -71,17 +71,6 @@ Makefile.PL
 MANIFEST
 ppport.h
 README.md
-support/Test.pm
-support/Test/Builder.pm
-support/Test/Builder/Module.pm
-support/Test/Builder/Tester.pm
-support/Test/Builder/Tester/Color.pm
-support/Test/Harness.pm
-support/Test/Harness/Assert.pm
-support/Test/Harness/Iterator.pm
-support/Test/Harness/Point.pm
-support/Test/Harness/Straps.pm
-support/Test/More.pm
 test.pl
 tests/001_init.t
 tests/101_basic.t

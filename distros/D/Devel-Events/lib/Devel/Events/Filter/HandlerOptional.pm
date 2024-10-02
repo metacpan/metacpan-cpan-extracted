@@ -1,8 +1,7 @@
-#!/usr/bin/perl
-
 package Devel::Events::Filter::HandlerOptional;
+# vim: set ts=2 sw=2 noet nolist :
 # ABSTRACT: A role for filters that are useful even without a handler
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Moose::Role;
 
 with 'Devel::Events::Filter' => { excludes => [qw(send_filtered_event)] };
@@ -46,7 +45,7 @@ Devel::Events::Filter::HandlerOptional - A role for filters that are useful even
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

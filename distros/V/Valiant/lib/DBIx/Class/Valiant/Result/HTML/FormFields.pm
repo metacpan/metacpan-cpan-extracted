@@ -131,12 +131,26 @@ sub radio_buttons_for {
   return @buttons;
 }
 
+# $class->add_form_field_for($column);
+# $class->add_form_field_for($column, \&code);
+# $class->add_form_field_for($column, \%options);
+# $class->add_form_field_for($column, \%options, \&code);
+
 sub add_form_field_for {
-  my ($class, $column, $code) = @_;
-  $code = sub { $class->_auto_read_attribute_for_html($column) }
-    unless $code and ref $code eq 'CODE';
-  $class->__field_attribute_for->{$column} = $code;
+  my ($class, $column) = (shift(@_), shift(@_));
+  my $options = (ref($_[0])||'') eq 'HASH' ? shift(@_) : +{};
+  my $code = (ref($_[0])||'') eq 'CODE' ? shift(@_) : sub { $class->_auto_read_attribute_for_html($column) };
+
+  $class->__field_attribute_for->{$column} = [$code, $options];
 }
+
+# __PACKAGE__->add_form_field_for(
+#   'user',
+#   sub ($self) { $self->user},
+#   { label=>..., type=>..., context=>'admin' } );
+
+# add 'context' to this so that you can have different forms for same
+# TODO maybe need to add way to wrap getting label and errors...
 
 sub has_form_fields {
   my ($self) = @_;
@@ -150,10 +164,16 @@ sub has_form_field {
 
 sub read_form_field_for {
   my ($self, $column) = @_;
-  my $code = $self->__field_attribute_for->{$column};
-  die "Can't find a form field for column '$column'" unless $code;
+  die "Can't find a form field for column '$column'" unless $self->has_form_field($column);
+  return $self->_read_form_field_for($column);
+}
+
+sub _read_form_field_for {
+  my ($self, $column) = @_;
+  my ($code, $options) = @{$self->__field_attribute_for->{$column}};
   return $code->($self, $column);
 }
+
 
 sub read_attribute_for_html {
   my ($self, $attribute) = @_;
@@ -164,7 +184,7 @@ sub read_attribute_for_html {
   # and only that.  Otherwise we'll fall back to the auto reading method
 
   if($self->has_form_fields) {
-    return $self->read_form_field_for($attribute) if $self->has_form_field($attribute);
+    return $self->_read_form_field_for($attribute) if $self->has_form_field($attribute);
   } else {
     return $self->_auto_read_attribute_for_html($attribute);
   }

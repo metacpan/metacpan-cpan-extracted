@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Exporter;
 
-our $VERSION = '1.93';
+our $VERSION = '1.94';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
@@ -57,7 +57,7 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
 =head1 VERSION
 
-This documentation describes version 1.93 of Crypt::OpenSSL::PKCS12
+This documentation describes version 1.94 of Crypt::OpenSSL::PKCS12
 
 =head1 DESCRIPTION
 
@@ -84,6 +84,10 @@ Create a new Crypt::OpenSSL::PKCS12 instance.
 =item * certificate( [C<$pass>] )
 
 Get the Base64 representation of the certificate.
+
+=item * ca_certificate( [C<$pass>] )
+
+Get the Base64 representation of the CA certificate chain.
 
 =item * private_key( [C<$pass>] )
 
@@ -346,6 +350,8 @@ In alphabetical order, contributors, bug reporters and all
 =item * Darko Prelec, @dprelec
 
 =item * David Steinbrunner, @dsteinbrunner
+
+=item * Gianni Ceccarelli, @dakkar
 
 =item * Giuseppe Di Terlizzi, @giterlizzi
 

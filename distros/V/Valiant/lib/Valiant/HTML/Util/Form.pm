@@ -127,7 +127,7 @@ sub form_for {
   $options->{scope} = $object_name;
   $options->{skip_default_ids} = 0;
   $options->{allow_method_names_outside_object} = exists $options->{allow_method_names_outside_object} ?
-    $options->{allow_method_names_outside_object} : 0;
+  $options->{allow_method_names_outside_object} : 0;
 
   return $self->form_with($options, $content_block_coderef);
 }
@@ -166,9 +166,11 @@ sub form_with {
   my $options = @_ ? shift : +{};
     my $scope = exists $options->{scope} ? $options->{scope} : undef;
 
-    $options->{allow_method_names_outside_object} = 1;
     $options->{skip_default_ids} = 0;
     $options->{controller} ||= $self->controller if $self->has_controller;
+
+    $options->{allow_method_names_outside_object} = exists $options->{allow_method_names_outside_object} ?
+    $options->{allow_method_names_outside_object} : 1;
 
     my ($model, $model_path, $url);
     if($options->{model}) {
@@ -245,7 +247,7 @@ sub _polymorphic_path_for_model {
 sub _edit_action_for_model {
   my ($self, $model_path, $scope, $controller) = @_;
 
-  if($self->can('update_uri_for')) {
+  if($self->can('update_uri_for')) { # check view first
     my $url = $self->update_uri_for($model_path, $scope, $controller);
     return $url if $url;
   }   
@@ -496,7 +498,7 @@ interface.
 =head2 to_model
 
 This is an optional method.  If this is supported, we call C<to_model> on the wrapped object
-before using it on the form methods.  This allows you to delegate the required API to a secondard
+before using it on the form methods.  This allows you to delegate the required API to a secondary
 object, which can result in a cleaner API depending on your designs and use cases.
 
 =head2 in_storage
@@ -532,6 +534,14 @@ Optional.  If provided must access the string name of the field or attribute and
 value for that attribute suitable for HTML form display.  You might wish to use this as a way to deflate
 or otherwise stringify non string values.  If not provided we just use the attribute name and call it as an
 accessor against the model.
+
+=head2 read_attribute_errors_for
+
+    $model->read_attribute_errors_for('user');
+
+Optional.  If provided should return an array of validation errors on a field.  Allows you to do some
+final tuning of the error messages.  If not provides we expect and errors object as documented in
+L<Valiant> 
 
 =head2 errors
 
@@ -584,7 +594,9 @@ API in those classes in order to influence the form generation.
 Optional.  If provided should return a string that is the name of a class that will be used to instantiate
 the formbuilder.  If not provided we default to L<Valiant::HTML::FormBuilder>.
 
-=head2 Generating a URL for the action attribure
+=head2 Generating a URL for the action attribute
+
+B<NOTE>: This is a work in progress and subject to change.
 
 The following methods are used to generate the URL for the C<action> attribute of the form tag.  They
 are tried in the following order:
@@ -600,6 +612,8 @@ are tried in the following order:
 =item * $controller->update_uri
 
 =back
+
+?? Should there be a $c->uri_for_model($path, $model) ??
 
 The 'create' methods are checked when the model is not persistent (ie not in storage).  The 'update' methods
 are checked when the model is persistent (ie in storage).
@@ -743,6 +757,17 @@ will be the path to the model minus the last element (which is the model itself)
 
 The controller object that is associated with the form, if one exists.  Defaults to the controller
 associated with the view if it exists.
+
+=item allow_method_names_outside_object
+
+By default you can indicate field attribute names in your formbuilder methods that have no map to
+anything on the model to provide a value.   This is useful when you are adding fields that you are
+making part of the form but are not part of the model to be updated.   However this could lead to
+hard to debug errors in your code if you make a typo in the field attribute name or if you change
+the model.   Setting this to 1 (true) will instead result in an error when you try to use a field
+name that isn't part of the model.
+
+This defaults to false for 'form_for', 'fields_for' and true for 'form_with', 'fields'.
 
 =back
 

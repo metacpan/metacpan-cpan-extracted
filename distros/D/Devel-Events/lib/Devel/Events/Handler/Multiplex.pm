@@ -1,8 +1,7 @@
-#!/usr/bin/perl
-
 package Devel::Events::Handler::Multiplex;
+# vim: set ts=2 sw=2 noet nolist :
 # ABSTRACT: Delegate events to multiple handlers
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Moose;
 
 with qw/Devel::Events::Handler/;
@@ -65,7 +64,7 @@ Devel::Events::Handler::Multiplex - Delegate events to multiple handlers
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

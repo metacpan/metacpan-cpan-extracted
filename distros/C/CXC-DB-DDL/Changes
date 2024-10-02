@@ -1,5 +1,12 @@
 Revision history for CXC-DB-DDL
 
+0.17      2024-10-01 13:59:14-04:00 America/New_York
+
+  [BUG FIX]
+
+   * V0.14 broke using a table constraint field value of '-all' to
+     apply to all fields.
+
 0.16      2024-07-01 16:42:32-04:00 America/New_York
 
 

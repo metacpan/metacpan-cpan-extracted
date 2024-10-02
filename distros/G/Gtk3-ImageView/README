@@ -142,25 +142,25 @@ DEPENDENCIES
 INCOMPATIBILITIES
   Porting from Gtk2::ImageView
     *
-     "set_from_pixbuf()" was renamed to "set_pixbuf()" and now its second
-     argument means "zoom_to_fit()" instead of "set_fitting()".
+     set_from_pixbuf() was renamed to set_pixbuf() and now its second
+     argument means zoom_to_fit() instead of set_fitting().
 
     *
-     "set_fitting(TRUE)" used to be the default, now you need to call it
+     set_fitting(TRUE) used to be the default, now you need to call it
      explicitly if you want that behavior. However, once it's called, new
-     calls to "set_from_pixbuf()" won't reset it, see "set_zoom_to_fit()"
-     for more details..
+     calls to set_from_pixbuf() won't reset it, see set_zoom_to_fit() for
+     more details..
 
     *
      Drag and drop now can be triggered by subscribing to "dnd-start"
      signal, and calling "$view->drag_begin_with_coordinates()" from the
-     handler. "drag_source_set()" won't work.
+     handler. drag_source_set() won't work.
 
     *
      "Gtk2::ImageView::ScrollWin" replacement is not yet implemented.
 
     *
-     "set_transp()" is now available through CSS
+     set_transp() is now available through CSS
      <https://developer.gnome.org/gtk3/stable/chap-css-overview.html>
      instead, e.g. via
 
@@ -169,7 +169,7 @@ INCOMPATIBILITIES
       }
 
     *
-     "set_interpolation()" now accepts "cairo_filter_t"
+     set_interpolation() now accepts "cairo_filter_t"
      <https://www.cairographics.org/manual/cairo-cairo-pattern-t.html#cairo-
      filter-t> instead of "GdkInterpType"
      <https://developer.gnome.org/gdk-pixbuf/stable/gdk-pixbuf-Scaling.html#
@@ -189,7 +189,7 @@ LICENSE AND COPYRIGHT
 
     Copyright (C) 2020 by Google LLC
 
-    Modelled after the GtkImageView C widget by Björn Lindqvist
+    Modelled after the GtkImageView C widget by BjÃ¶rn Lindqvist
     <bjourne@gmail.com>
 
     This library is free software; you can redistribute it and/or modify it

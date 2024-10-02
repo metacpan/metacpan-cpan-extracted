@@ -1,5 +1,12 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002005 2024 October 1
+          - Added support for a model to declare its form fields.
+          - documentation improvements
+          - better control on allowing virtual methods on a model versus throwing
+            an error when an attribute doesn't exist
+          - dedication updates.
+
 0.002004 2024 July 29
           - Lots of updates to the example application (again).  Most more
             testing of AJAXy bits to try to figure out weaknesses in the overall

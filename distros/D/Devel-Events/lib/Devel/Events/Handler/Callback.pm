@@ -1,8 +1,7 @@
-#!/usr/bin/perl
-
 package Devel::Events::Handler::Callback;
+# vim: set ts=2 sw=2 noet nolist :
 # ABSTRACT: An event handler that delegates to code references.
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Moose;
 
 with qw/Devel::Events::Handler/;
@@ -40,7 +39,7 @@ Devel::Events::Handler::Callback - An event handler that delegates to code refer
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

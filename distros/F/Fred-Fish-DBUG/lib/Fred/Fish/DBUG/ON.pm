@@ -57,7 +57,7 @@ use Cwd 'abs_path';
 use Config qw( %Config );
 use Sub::Identify 'sub_fullname';
 
-$VERSION = "2.04";
+$VERSION = "2.05";
 @ISA = qw( Exporter );
 
 # ------------------------------------------------------------------------------

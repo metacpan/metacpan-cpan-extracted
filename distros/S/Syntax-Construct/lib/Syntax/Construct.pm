@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.037';
+our $VERSION = '1.038';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.040' => [qw[
@@ -51,6 +51,7 @@ my %introduces = do { no warnings 'qw';
                               ]],
                    '5.018' => [qw[
                                  computed-labels while-each method-on-any-string
+                                 split-space
                               ]],
                    '5.016' => [qw[
                                  charnames
@@ -301,7 +302,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.037
+Version 1.038
 
 =head1 SYNOPSIS
 
@@ -653,6 +654,10 @@ See in L<perl5180delta/Selected Bug Fixes> or C<each> in L<perlfunc>.
 =head3 method-on-any-string
 
 See [perl #105922] in L<perl5180delta/Selected Bug Fixes>.
+
+=head3 split-space
+
+See L<perl5180delta/split's first argument is more consistently interpreted>.
 
 =head2 5.020
 

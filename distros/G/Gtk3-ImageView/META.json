@@ -2,10 +2,10 @@
    "abstract" : "Image viewer widget for Gtk3",
    "author" : [
       "Jeffrey Ratcliffe <jffry@posteo.net>",
-      "Alexey Sokolov <sokolov@google.com>"
+      "Alexey Sokolov"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -84,39 +84,39 @@
    "provides" : {
       "Gtk3::ImageView" : {
          "file" : "lib/Gtk3/ImageView.pm",
-         "version" : "10"
+         "version" : "11"
       },
       "Gtk3::ImageView::Tool" : {
          "file" : "lib/Gtk3/ImageView/Tool.pm",
-         "version" : "10"
+         "version" : "11"
       },
       "Gtk3::ImageView::Tool::Dragger" : {
          "file" : "lib/Gtk3/ImageView/Tool/Dragger.pm",
-         "version" : "10"
+         "version" : "11"
       },
       "Gtk3::ImageView::Tool::Selector" : {
          "file" : "lib/Gtk3/ImageView/Tool/Selector.pm",
-         "version" : "10"
+         "version" : "11"
       },
       "Gtk3::ImageView::Tool::SelectorDragger" : {
          "file" : "lib/Gtk3/ImageView/Tool/SelectorDragger.pm",
-         "version" : "10"
+         "version" : "11"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/carygravel/gtk3-imageview/issues"
+         "web" : "https://github.com/DarthGandalf/gtk3-imageview/issues"
       },
-      "homepage" : "https://github.com/carygravel/gtk3-imageview",
+      "homepage" : "https://github.com/DarthGandalf/gtk3-imageview",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/carygravel/gtk3-imageview.git",
-         "web" : "https://github.com/carygravel/gtk3-imageview"
+         "url" : "https://github.com/DarthGandalf/gtk3-imageview.git",
+         "web" : "https://github.com/DarthGandalf/gtk3-imageview"
       }
    },
-   "version" : "10",
-   "x_generated_by_perl" : "v5.34.0",
+   "version" : "11",
+   "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

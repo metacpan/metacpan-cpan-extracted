@@ -3,7 +3,7 @@ package Valiant;
 use warnings;
 use strict;
 
-our $VERSION = '0.002004';
+our $VERSION = '0.002005';
 $VERSION = eval $VERSION;
 
 1;
@@ -1431,19 +1431,22 @@ L<Valiant::Filterable>
 =head1 DEDICATIONS
 
 This module is eternally dedicated to the memory of my beloved animal companions; our Bernese 
-Mountain Dog 'Tornado' who we lost to cancer in 16 August 2020; our Akita 'Sunshine' who passed
-from complications due to age on July 14th, 2021 and their pup 'Squeaker' also lost to cancer on
-December 18th, 2021.
+Mountain Dog 'Tornado' who we lost to cancer on 16 August 2020; our Akita 'Sunshine' who passed
+from complications due to age on July 14th, 2021 and their pups 'Squeaker', lost to cancer on
+December 18th, 2021 and Bear, also lost to cancer 17 August 2024.
 
 The distribution as a whole is dedicated in their memory, but specifically the core L<Valiant>
-code is dedicated to Tornado, the DBIC integration work to Sunshine and the HTML form generation
-and templating code to Squeaker.
+code is dedicated to Tornado, the DBIC integration work to Sunshine, the HTML form generation
+and templating code to Squeaker and all the documentation and example code to Bear.
 
 If you find this code useful, if it helps your company or makes you money please consider a donation
 to help other owners of these dog breeds or aid in the quest to end dog cancer: 
 
 L<http://www.berner.org/pages/charities.php>, L<https://akitarescue.rescuegroups.org/info/donate>,
 L<https://wearethecure.org/donations/>.
+
+You can also very easily donate to the Austin Texas Humane society, where I live, via their Amazon
+wish page: L<https://www.amazon.com/hz/wishlist/ls/OZGD9S34VITI?leftNavSection=Reorder&ref_=abls_lnv_rl>.
 
 Or to any dog charity that fits best with your personal beliefs and economic means.
 

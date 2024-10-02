@@ -1,5 +1,10 @@
 Revision history for Perl extension App-optex-pingu
 
+1.03 2024-10-01T17:29:13Z
+
+    - update interval time control
+    - update pingu.asc4
+
 1.02 2024-09-29T08:25:22Z
 
     - update ping.asc4 and image processing

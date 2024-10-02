@@ -8,7 +8,7 @@
 #
 ################################################################################
 #
-# Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2024 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION );
 
 @ISA = qw(Convert::Binary::C);
 
-$VERSION = '0.84';
+$VERSION = '0.85';
 
 sub new
 {
@@ -438,7 +438,7 @@ algorithm cannot detect that an update is required.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
+Copyright (c) 2002-2024 Marcus Holland-Moritz. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

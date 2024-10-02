@@ -1,12 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Locale/ID/Locality/list_idn_localities
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-07'; # DATE
-our $DIST = 'App-IndonesianLocaleUtils'; # DIST
-our $VERSION = '0.02'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -14,9 +9,16 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-09-30'; # DATE
+our $DIST = 'App-IndonesianLocaleUtils'; # DIST
+our $VERSION = '0.021'; # VERSION
+
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Locale/ID/Locality/list_idn_localities",
     program_name => "list-idn-localities",
+    read_config => 0,
+    read_env => 0,
 );
 
 $cmdline->run;
@@ -36,36 +38,15 @@ list-idn-localities - Localities (cities & regencies) in Indonesia
 
 =head1 VERSION
 
-This document describes version 0.02 of list-idn-localities (from Perl distribution App-IndonesianLocaleUtils), released on 2021-05-07.
+This document describes version 0.021 of list-idn-localities (from Perl distribution App-IndonesianLocaleUtils), released on 2024-09-30.
 
 =head1 SYNOPSIS
 
-Usage:
+B<list-idn-localities> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
- % list-idn-localities [--bps-code-in-json=s] [--bps-code-in=s+]
-     [--bps-code-is=s] [--bps-code-isnt=s] [--bps-code-max=s]
-     [--bps-code-min=s] [--bps-code-not-in-json=s] [--bps-code-not-in=s+]
-     [--bps-code-xmax=s] [--bps-code-xmin=s] [--bps-code=s]
-     [--bps-prov-code-in-json=s] [--bps-prov-code-in=s+]
-     [--bps-prov-code-is=s] [--bps-prov-code-isnt=s]
-     [--bps-prov-code-max=s] [--bps-prov-code-min=s]
-     [--bps-prov-code-not-in-json=s] [--bps-prov-code-not-in=s+]
-     [--bps-prov-code-xmax=s] [--bps-prov-code-xmin=s] [--bps-prov-code=s]
-     [--config-path=path | -c] [--config-profile=profile | -P] [--detail]
-     [--exclude-field=s+] [--exclude-fields-json=s] [--field=s+]
-     [--fields-json=s] [--format=name] [--ind-name-contains=s]
-     [--ind-name-in-json=s] [--ind-name-in=s+] [--ind-name-is=s]
-     [--ind-name-isnt=s] [--ind-name-max=s] [--ind-name-min=s]
-     [--ind-name-not-contains=s] [--ind-name-not-in-json=s]
-     [--ind-name-not-in=s+] [--ind-name-xmax=s] [--ind-name-xmin=s]
-     [--ind-name=s] [--json] [-l] [--(no)naked-res] [--no-config | -C]
-     [--no-detail] [--no-env] [--no-random] [--nodetail] [--norandom]
-     [--page-result[=program]] [--random] [--result-limit=s]
-     [--result-start=s] [--sort-json=s] [--sort=s+] [--type-in-json=s]
-     [--type-in=s+] [--type-is=s] [--type-isnt=s] [--type-max=s]
-     [--type-min=s] [--type-not-in-json=s] [--type-not-in=s+]
-     [--type-xmax=s] [--type-xmin=s] [--type=s] [--view-result[=program]]
-     [--with-field-names] [--without-field-names] [query]
+B<list-idn-localities> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<list-idn-localities> [(B<L<--bps-code-in|/"--bps-code-in=s@">>=I<int>)+|B<L<--bps-code-in-json|/"--bps-code-in=s@">>=I<json>] [B<L<--bps-code-is|/"--bps-code-is=s">>=I<int>] [B<L<--bps-code-isnt|/"--bps-code-isnt=s">>=I<int>] [B<L<--bps-code-max|/"--bps-code-max=s">>=I<int>] [B<L<--bps-code-min|/"--bps-code-min=s">>=I<int>] [(B<L<--bps-code-not-in|/"--bps-code-not-in=s@">>=I<int>)+|B<L<--bps-code-not-in-json|/"--bps-code-not-in=s@">>=I<json>] [B<L<--bps-code-xmax|/"--bps-code-xmax=s">>=I<int>] [B<L<--bps-code-xmin|/"--bps-code-xmin=s">>=I<int>] [B<L<--bps-code|/"--bps-code=s">>=I<int>] [(B<L<--bps-prov-code-in|/"--bps-prov-code-in=s@">>=I<int>)+|B<L<--bps-prov-code-in-json|/"--bps-prov-code-in=s@">>=I<json>] [B<L<--bps-prov-code-is|/"--bps-prov-code-is=s">>=I<int>] [B<L<--bps-prov-code-isnt|/"--bps-prov-code-isnt=s">>=I<int>] [B<L<--bps-prov-code-max|/"--bps-prov-code-max=s">>=I<int>] [B<L<--bps-prov-code-min|/"--bps-prov-code-min=s">>=I<int>] [(B<L<--bps-prov-code-not-in|/"--bps-prov-code-not-in=s@">>=I<int>)+|B<L<--bps-prov-code-not-in-json|/"--bps-prov-code-not-in=s@">>=I<json>] [B<L<--bps-prov-code-xmax|/"--bps-prov-code-xmax=s">>=I<int>] [B<L<--bps-prov-code-xmin|/"--bps-prov-code-xmin=s">>=I<int>] [B<L<--bps-prov-code|/"--bps-prov-code=s">>=I<int>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ind-name-contains|/"--ind-name-contains=s">>=I<str>] [(B<L<--ind-name-in|/"--ind-name-in=s@">>=I<str>)+|B<L<--ind-name-in-json|/"--ind-name-in=s@">>=I<json>] [B<L<--ind-name-is|/"--ind-name-is=s">>=I<str>] [B<L<--ind-name-isnt|/"--ind-name-isnt=s">>=I<str>] [B<L<--ind-name-max|/"--ind-name-max=s">>=I<str>] [B<L<--ind-name-min|/"--ind-name-min=s">>=I<str>] [B<L<--ind-name-not-contains|/"--ind-name-not-contains=s">>=I<str>] [(B<L<--ind-name-not-in|/"--ind-name-not-in=s@">>=I<str>)+|B<L<--ind-name-not-in-json|/"--ind-name-not-in=s@">>=I<json>] [B<L<--ind-name-xmax|/"--ind-name-xmax=s">>=I<str>] [B<L<--ind-name-xmin|/"--ind-name-xmin=s">>=I<str>] [B<L<--ind-name|/"--ind-name=s">>=I<str>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--query-boolean|/"--query-boolean=s">>=I<str>|B<L<--and|/"--query-boolean=s">>|B<L<--or|/"--query-boolean=s">>] [(B<L<--query|/"--query=s@">>=I<str>)+|B<L<--queries-json|/"--query=s@">>=I<json>|(B<L<-q|/"--query=s@">>=I<str>)+] [B<L<--random|/"--random">>|B<L<--no-random|/"--random">>|B<L<--norandom|/"--random">>] [B<L<--result-limit|/"--result-limit=s">>=I<int>] [B<L<--result-start|/"--result-start=s">>=I<int>] [(B<L<--sort|/"--sort=s@">>=I<str>)+|B<L<--sort-json|/"--sort=s@">>=I<json>] [(B<L<--type-in|/"--type-in=s@">>=I<int>)+|B<L<--type-in-json|/"--type-in=s@">>=I<json>] [B<L<--type-is|/"--type-is=s">>=I<int>] [B<L<--type-isnt|/"--type-isnt=s">>=I<int>] [B<L<--type-max|/"--type-max=s">>=I<int>] [B<L<--type-min|/"--type-min=s">>=I<int>] [(B<L<--type-not-in|/"--type-not-in=s@">>=I<int>)+|B<L<--type-not-in-json|/"--type-not-in=s@">>=I<json>] [B<L<--type-xmax|/"--type-xmax=s">>=I<int>] [B<L<--type-xmin|/"--type-xmin=s">>=I<int>] [B<L<--type|/"--type=s">>=I<int>] [B<L<--with-field-names|/"--with-field-names">>|B<L<--without-field-names|/"--with-field-names">>] -- [I<L<query|/"--query=s@">>] ...
 
 =head1 DESCRIPTION
 
@@ -74,34 +55,6 @@ REPLACE ME
 =head1 OPTIONS
 
 C<*> marks required options.
-
-=head2 Configuration options
-
-=over
-
-=item B<--config-path>=I<s>, B<-c>
-
-Set path to configuration file.
-
-=item B<--config-profile>=I<s>, B<-P>
-
-Set configuration profile to use.
-
-=item B<--no-config>, B<-C>
-
-Do not use any configuration file.
-
-=back
-
-=head2 Environment options
-
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
-
-=back
 
 =head2 Field selection options
 
@@ -397,9 +350,56 @@ Only return records where the 'type' field equals specified value.
 
 =over
 
-=item B<--query>=I<s>, B<-q>
+=item B<--and>
+
+Shortcut for --query-boolean=and.
+
+See C<--query-boolean>.
+
+=item B<--or>
+
+Shortcut for --query-boolean=or.
+
+See C<--query-boolean>.
+
+=item B<--queries-json>=I<s>, B<-q>
+
+Search (JSON-encoded).
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query-boolean>=I<s>
+
+Whether records must match all search queries ('and') or just one ('or').
+
+Default value:
+
+ "and"
+
+Valid values:
+
+ ["and","or"]
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+
+=item B<--query>=I<s@>
 
 Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
 
 =back
 
@@ -441,6 +441,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -455,24 +461,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -542,103 +557,6 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/list-idn-localities.conf>, F<~/list-idn-localities.conf>, or F</etc/list-idn-localities.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
-
- [plugin=DumpArgs]
- -event=before_validate_args
- -prio=99
- 
- [plugin=Foo]
- -event=after_validate_args
- arg1=val1
- arg2=val2
-
- 
-
-which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
-
-List of available configuration parameters:
-
- bps_code (see --bps-code)
- bps_code.in (see --bps-code-in)
- bps_code.is (see --bps-code-is)
- bps_code.isnt (see --bps-code-isnt)
- bps_code.max (see --bps-code-max)
- bps_code.min (see --bps-code-min)
- bps_code.not_in (see --bps-code-not-in)
- bps_code.xmax (see --bps-code-xmax)
- bps_code.xmin (see --bps-code-xmin)
- bps_prov_code (see --bps-prov-code)
- bps_prov_code.in (see --bps-prov-code-in)
- bps_prov_code.is (see --bps-prov-code-is)
- bps_prov_code.isnt (see --bps-prov-code-isnt)
- bps_prov_code.max (see --bps-prov-code-max)
- bps_prov_code.min (see --bps-prov-code-min)
- bps_prov_code.not_in (see --bps-prov-code-not-in)
- bps_prov_code.xmax (see --bps-prov-code-xmax)
- bps_prov_code.xmin (see --bps-prov-code-xmin)
- detail (see --detail)
- exclude_fields (see --exclude-field)
- fields (see --field)
- format (see --format)
- ind_name (see --ind-name)
- ind_name.contains (see --ind-name-contains)
- ind_name.in (see --ind-name-in)
- ind_name.is (see --ind-name-is)
- ind_name.isnt (see --ind-name-isnt)
- ind_name.max (see --ind-name-max)
- ind_name.min (see --ind-name-min)
- ind_name.not_contains (see --ind-name-not-contains)
- ind_name.not_in (see --ind-name-not-in)
- ind_name.xmax (see --ind-name-xmax)
- ind_name.xmin (see --ind-name-xmin)
- naked_res (see --naked-res)
- query (see --query)
- random (see --random)
- result_limit (see --result-limit)
- result_start (see --result-start)
- sort (see --sort)
- type (see --type)
- type.in (see --type-in)
- type.is (see --type-is)
- type.isnt (see --type-isnt)
- type.max (see --type-max)
- type.min (see --type-min)
- type.not_in (see --type-not-in)
- type.xmax (see --type-xmax)
- type.xmin (see --type-xmin)
- with_field_names (see --with-field-names)
-
-=head1 ENVIRONMENT
-
-=head2 LIST_IDN_LOCALITIES_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/list-idn-localities.conf>
-
-F<~/list-idn-localities.conf>
-
-F</etc/list-idn-localities.conf>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-IndonesianLocaleUtils>.
@@ -647,6 +565,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Indone
 
 Source repository is at L<https://github.com/perlancar/perl-App-IndonesianLocaleUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianLocaleUtils>
@@ -654,16 +601,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

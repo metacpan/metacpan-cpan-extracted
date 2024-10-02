@@ -5,7 +5,7 @@ pingu - optex make-everything-pingu filter
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # SYNOPSIS
 

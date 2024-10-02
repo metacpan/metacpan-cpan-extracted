@@ -1,0 +1,2 @@
+2024-10-01 13:26:40	Thread ID: 6432	Configuration file javonet2.config not found
+If the error persists, contact Javonet support on: support@javonet.com

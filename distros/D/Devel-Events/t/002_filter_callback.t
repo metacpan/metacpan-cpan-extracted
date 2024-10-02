@@ -1,9 +1,8 @@
-#!/usr/bin/perl
-
+# vim: set ts=2 sw=2 noet nolist :
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 0.88;
 
 use ok 'Devel::Events::Filter::Callback';
 
@@ -38,3 +37,5 @@ my $h = Devel::Events::Handler::Callback->new(sub { push @events, [@_] });
 
 	is_deeply(\@events, [["bar"],["baz"]], "filter drop");
 }
+
+done_testing;

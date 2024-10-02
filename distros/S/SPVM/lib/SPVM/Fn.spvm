@@ -16,6 +16,9 @@ class Fn {
   use Callback::Map;
   use Callback::MapExpand;
   use Cloneable;
+  use Packer;
+  
+  # Do not use Native and Native::XXX classes because dependencies can have serious negative effects.
   
   static method BYTE_MAX : int () { return 127; }
   static method BYTE_MIN : int () { return -128; }
@@ -1683,7 +1686,7 @@ class Fn {
     return $sorted_array;
   }
   
-  static method change_endian : void ($binary : mutable string, $size : int) {
+  static method change_endian : void ($binary : mutable string, $size : int, $offset : int = 0) {
     
     unless ($binary) {
       die "The binary data \$binary must be defined.";
@@ -1693,10 +1696,14 @@ class Fn {
       die "The byte size \$size must be greater than 0.";
     }
     
+    unless ($offset >= 0) {
+      die "The offset \$offset must be greater than or equal to 0.";
+    }
+    
     my $binary_length = length $binary;
     
-    unless ($size <= $binary_length) {
-      die "The byte size \$size must be less than or equal to the length of the binary data \$binary.";
+    unless ($offset + $size <= $binary_length) {
+      die "The byte size \$size must be less than or equal to the offset \$offset plus the length of the binary data \$binary.";
     }
     
     if ($size == 1) {
@@ -1705,27 +1712,51 @@ class Fn {
     
     my $buffer = new_string_len $size;
     
-    Fn->memcpy($buffer, 0, $binary, 0, $size);
+    Fn->memcpy($buffer, 0, $binary, $offset, $size);
     
     Fn->reverse_inplace($buffer);
     
-    Fn->memcpy($binary, 0, $buffer, 0, $size);
+    Fn->memcpy($binary, $offset, $buffer, 0, $size);
   }
   
-  static method big_endian_to_system_endian : void ($binary : mutable string, $size : int) {
+  static method big_endian_to_system_endian : void ($binary : mutable string, $size : int, $offset : int = 0) {
     
     if (Fn->system_is_little_endian) {
-      &change_endian($binary, $size);
+      &change_endian($binary, $size, $offset);
     }
     
   }
   
-  static method system_endian_to_big_endian : void ($binary : mutable string, $size : int) {
+  static method system_endian_to_big_endian : void ($binary : mutable string, $size : int, $offset : int = 0) {
     
     if (Fn->system_is_little_endian) {
-      &change_endian($binary, $size);
+      &change_endian($binary, $size, $offset);
     }
     
+  }
+  
+  static method little_endian_to_system_endian : void ($binary : mutable string, $size : int, $offset : int = 0) {
+    
+    unless (Fn->system_is_little_endian) {
+      &change_endian($binary, $size, $offset);
+    }
+    
+  }
+  
+  static method system_endian_to_little_endian : void ($binary : mutable string, $size : int, $offset : int = 0) {
+    
+    unless (Fn->system_is_little_endian) {
+      &change_endian($binary, $size, $offset);
+    }
+    
+  }
+  
+  static method pack : string ($template : string, $objects : object[]) {
+    return Packer->new->pack($template, $objects);
+  }
+  
+  static method unpack : object[] ($template : string, $binary : string) {
+    return Packer->new->unpack($template, $binary);
   }
   
 }

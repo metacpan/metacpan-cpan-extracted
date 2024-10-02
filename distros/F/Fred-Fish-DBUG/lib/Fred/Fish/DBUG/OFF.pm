@@ -94,7 +94,7 @@ use Exporter;
 
 use FileHandle;
 
-$VERSION = "2.04";
+$VERSION = "2.05";
 @ISA = qw( Exporter );
 @EXPORT = qw( );
 @EXPORT_OK = qw( );

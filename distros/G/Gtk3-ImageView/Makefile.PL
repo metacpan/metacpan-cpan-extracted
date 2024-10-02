@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Image viewer widget for Gtk3",
-  "AUTHOR" => "Jeffrey Ratcliffe <jffry\@posteo.net>, Alexey Sokolov <sokolov\@google.com>",
+  "AUTHOR" => "Jeffrey Ratcliffe <jffry\@posteo.net>, Alexey Sokolov",
   "BUILD_REQUIRES" => {
     "Glib" => "1.210"
   },
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::Perl::Critic" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => 10,
+  "VERSION" => 11,
   "test" => {
     "TESTS" => "t/*.t"
   }

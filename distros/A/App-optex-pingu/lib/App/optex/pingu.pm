@@ -1,6 +1,6 @@
 package App::optex::pingu;
 
-my $VERSION = '1.02';
+my $VERSION = '1.03';
 
 use v5.24;
 use warnings;
@@ -17,7 +17,7 @@ pingu - optex make-everything-pingu filter
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -380,6 +380,7 @@ sub pingu {
     while (<>) {
 	print $image[$i++ % @image] if $pingu;
 	print $_;
+	last if eof;
 	usleep $sleep if $sleep > 0;
     }
 }
