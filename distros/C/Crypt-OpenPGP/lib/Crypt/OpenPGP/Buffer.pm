@@ -1,4 +1,7 @@
 package Crypt::OpenPGP::Buffer;
+
+use strict;
+
 use base qw( Data::Buffer );
 
 use Crypt::OpenPGP::Util qw( bin2mp mp2bin bitsize );

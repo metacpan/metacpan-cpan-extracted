@@ -1,7 +1,7 @@
 CREATE TABLE "artist" (
   "artistid" INTEGER PRIMARY KEY NOT NULL,
   "name" varchar(100),
-  "rank" integer NOT NULL DEFAULT 13,
+  "ranking" integer NOT NULL DEFAULT 13,
   "charfield" char(10)
 );
 
@@ -9,7 +9,7 @@ CREATE INDEX "artist_name_hookidx" ON "artist" ("name");
 
 CREATE UNIQUE INDEX "artist_name" ON "artist" ("name");
 
-CREATE UNIQUE INDEX "u_nullable" ON "artist" ("charfield", "rank");
+CREATE UNIQUE INDEX "u_nullable" ON "artist" ("charfield", "ranking");
 
 CREATE TABLE "genre" (
   "genreid" INTEGER PRIMARY KEY NOT NULL,

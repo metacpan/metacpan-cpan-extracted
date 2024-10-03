@@ -1,5 +1,99 @@
 Revision history for Perl module Crypt::OpenPGP
 
+1.15 -- Wed Oct 02 07:45:07 ADT 2024
+
+    [Module Status]
+    Crypt::OpenPGP has a new maintainer.  Current work is to merge past PRs that
+    are fairly simple to review and test.  Other issues will be reviewed
+    as time permits.
+
+    [Changes since 1.12]
+    - Release of TRIAL 1.14 as production
+    - PR #15 - (@nielslaukens) Added UserAttribute class (unparsed)
+    - PR #16 - (@nielslaukens) Bugfix: allow multiple 'Preferred hash/compression algorithms'
+    - PR #17 - (@nielslaukens) Added UserAttribute class (unparsed)
+    - PR #18 - (@nielslaukens) Bugfix: parse notation data subpacket of Signature correctly
+    - PR #19 - (@nielslaukens) Support unknown algos
+    - Closed RT#53323: Failing on 64bit machines
+    - Fix RT#123452 Require at least one Random Source
+    - GH PR#29 (@andyjack) Add use strict to increase kwalitee
+    - GH PR#31 (@gozer) ElGamal: key's p can be a large integer, use Bigint
+    - GH PR#32 (@Shildus). Add support for SHA-2 (SHA-512, SHA-256,...) signatures verification
+
+    [Detailed Changelog]
+    - d23dc25 Fix the version regex in dist.ini
+    - 4acfd00 Add to .gitignore
+    - 2a6c65a Add note on Random Number Module requirements
+    - 46fbd15 Add back the number of tests
+    - 7ef4fda Added SubSignature with notation to test suite
+    - 451bd6e Added support for unknown key algorithms
+    - 548bb07 Added ECC public key to test suite
+    - 6e0c442 Use done testing instead of a test plan
+    - ac14115 Bugfix: parse notation data subpacket of Signature correctly
+    - ffa9e30 Added support for unparsed SubPackets
+    - 66897ea Added SubSignature packet to test suite
+    - a72137e Bugfix: allow multiple 'Preferred hash/compression algorithms'
+    - 50f9a30 Added UserAttribute class (unparsed)
+    - 26632de Added User Attribute test packet to test suite
+    - 9e7d578 Added test to run packets through a parse/save cycle
+    - 0727bbe RT#123452 Require at least one Random Source
+    - a30bc95 Closed RT#53323: Failing on 64bit machines
+    - 67c4ee9 Fix Bignum subtraction
+    - 8c21506 v1.13
+    - 04010a5 (tag: 1.13) Add some additional Dist::Zilla configuration
+    - 51ae276 Whitespace and alignment changes
+    - 17ad689 Add use strict to increase kwalitee
+    - 4221098 ElGamal: key's p can be a large integer, use Bigint
+    - f3f20a0 Add support for SHA-2 (SHA-512, SHA-256,...) signatures verification.
+
+1.14 -- Tue Oct 01 18:53:32 ADT 2024
+
+    [Module Status]
+    Crypt::OpenPGP has a new maintainer.  Current work is to merge past PRs that
+    are fairly simple to review and test.  Other issues will be reviewed
+    as time permits.
+
+    @nielslaukens provided a number of PRs at https://github.com/btrott/Crypt-OpenPGP/pulls
+
+    - PR #15 - Added UserAttribute class (unparsed)
+    - PR #16 - Bugfix: allow multiple 'Preferred hash/compression algorithms'
+    - PR #17 - Added UserAttribute class (unparsed)
+    - PR #18 - Bugfix: parse notation data subpacket of Signature correctly
+    - PR #19 - Support unknown algos
+    - Closed RT#53323: Failing on 64bit machines
+    - Fix RT#123452 Require at least one Random Source
+
+    [Detailed Changelog]
+    - d23dc25 Fix the version regex in dist.ini
+    - 4acfd00 Add to .gitignore
+    - 2a6c65a Add note on Random Number Module requirements
+    - 46fbd15 Add back the number of tests
+    - 7ef4fda Added SubSignature with notation to test suite
+    - 451bd6e Added support for unknown key algorithms
+    - 548bb07 Added ECC public key to test suite
+    - 6e0c442 Use done testing instead of a test plan
+    - ac14115 Bugfix: parse notation data subpacket of Signature correctly
+    - ffa9e30 Added support for unparsed SubPackets
+    - 66897ea Added SubSignature packet to test suite
+    - a72137e Bugfix: allow multiple 'Preferred hash/compression algorithms'
+    - 50f9a30 Added UserAttribute class (unparsed)
+    - 26632de Added User Attribute test packet to test suite
+    - 9e7d578 Added test to run packets through a parse/save cycle
+    - 0727bbe RT#123452 Require at least one Random Source
+    - a30bc95 Closed RT#53323: Failing on 64bit machines
+    - 67c4ee9 Fix Bignum subtraction
+
+1.13 -- Sun Sep 29 23:13:17 ADT 2024
+
+    [Module Status]
+    Crypt::OpenPGP has a new maintainer.  Current work is to merge past PRs that
+    are fairly simple to review and test.  Other issues will be reviewed
+    as time permits.
+
+    - GH PR#29 Add use strict to increase kwalitee
+    - GH PR#31 ElGamal: key's p can be a large integer, use Bigint
+    - GH PR#32 Add support for SHA-2 (SHA-512, SHA-256,...) signatures verification.
+
 1.12  2015-08-16 CPAN Day release
     - Add NoVersion parameter to CO::Armour->armour (GH#26)
 

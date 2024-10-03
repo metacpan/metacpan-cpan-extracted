@@ -2,6 +2,7 @@ Changes
 cpanfile
 lib/App/PTP.pm
 lib/App/PTP/Args.pm
+lib/App/PTP/Cheat_Sheet.pod
 lib/App/PTP/Commands.pm
 lib/App/PTP/Files.pm
 lib/App/PTP/PerlEnv.pm
@@ -9,6 +10,7 @@ lib/App/PTP/Util.pm
 LICENSE
 Makefile.PL
 MANIFEST
+ptp_cheat_sheet.pdf
 script/ptp
 t/000-load.t
 t/001-cpanfile.t

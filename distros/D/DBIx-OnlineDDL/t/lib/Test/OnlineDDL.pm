@@ -3,10 +3,12 @@ package Test::OnlineDDL;
 use strict;
 use warnings;
 
-use Test2::Bundle::More;
+use Test2::Tools::Basic;
+use Test2::Tools::ClassicCompare qw< cmp_ok >;
 use Test2::Tools::Compare;
 use Test2::Tools::Exception;
 use Test2::Tools::Explain;
+use Test2::Tools::Subtest qw< subtest_streamed >;
 
 use DBI;
 use DBIx::BatchChunker;
@@ -70,7 +72,7 @@ sub import {
 
 sub onlineddl_test ($$&) {
     my ($test_name, $source_name, $test_code) = @_;
-    subtest("$source_name: $test_name", sub {
+    subtest_streamed("$source_name: $test_name", sub {
         # Initialize the schema
         my $cd_schema;
         try_ok {

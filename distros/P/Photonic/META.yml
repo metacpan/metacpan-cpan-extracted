@@ -12,6 +12,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Machine::Epsilon: '0'
   Test::More: '0'
+  Test::Version: '1.003001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -50,5 +51,5 @@ requires:
   perl: '5.014000'
 resources:
   repository: https://github.com/wlmb/Photonic
-version: '0.022'
+version: '0.023'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

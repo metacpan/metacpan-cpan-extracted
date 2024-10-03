@@ -416,7 +416,7 @@ subtest 'revoke_login_sessions' => sub {
     is_deeply $got , $mock_api_response->{data}, 'api_call response correctly parsed';
 
     @params = ();
-    $got = $client->revoke_login_sessions(sid => '1234');
+    $got    = $client->revoke_login_sessions(sid => '1234');
 
     is $params[1], 'DELETE',                                                                'DELETE request method';
     is $params[2], 'http://dummyhydra.com/admin/admin/oauth2/auth/sessions/login?sid=1234', 'Request URL built with correct parameters';
@@ -537,6 +537,62 @@ subtest 'oidc_config' => sub {
         is $call_count, 1, 'fetch_openid_configuration not called again';
     };
 
+};
+
+subtest 'validate_token' => sub {
+    my $mock_hydra       = Test::MockModule->new('WebService::Hydra::Client');
+    my $mock_token       = 'mock.jwt.token';
+    my $mock_oidc_config = {issuer => 'https://example.com'};
+    my $mock_jwks        = {keys   => [{kid => 'key1', kty => 'RSA', n => '...', e => '...'}]};
+    my $mock_payload     = {
+        sub   => '1234567890',
+        name  => 'John Doe',
+        admin => 'true'
+    };
+
+    $mock_hydra->redefine(
+        'decode_jwt',
+        sub {
+            my %args = @_;
+            if ($args{token} eq $mock_token) {
+                return $mock_payload;
+            } else {
+                die "Invalid token";
+            }
+        });
+
+    $mock_hydra->redefine(
+        'fetch_openid_configuration',
+        sub {
+            return $mock_oidc_config;
+        });
+
+    $mock_hydra->redefine(
+        'fetch_jwks',
+        sub {
+            return $mock_jwks;
+        });
+
+    my $client = WebService::Hydra::Client->new(
+        admin_endpoint  => 'http://dummyhydra.com/admin',
+        public_endpoint => 'http://dummyhydra.com'
+    );
+
+    subtest 'validate_token' => sub {
+        my $decoded_payload;
+
+        lives_ok {
+            $decoded_payload = $client->validate_token($mock_token);
+        }
+        'Token validation should succeed';
+
+        is_deeply($decoded_payload, $mock_payload, 'Decoded payload should match expected payload');
+
+        throws_ok {
+            $client->validate_token('invalid.token');
+        }
+        qr/Invalid token/, 'Invalid token should throw an exception';
+    };
 };
 
 done_testing();

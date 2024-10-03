@@ -43,6 +43,23 @@ our $I_setter = tie $App::PTP::PerlEnv::I, 'App::PTP::Util::ReadOnlyVar';
 # execution provided by the user.
 my $safe;  # Sets to Safe->new() before each new file processed;
 
+my %modules_to_load = (
+  'Data::Dumper' => [],
+  'File::Basename' => [],
+  'File::Copy' => [],
+  'File::Path' => [qw(make_path remove_tree mkpath rmtree)],
+  'File::Spec::Functions' => [':ALL'],
+  'List::Util' => [@List::Util::EXPORT_OK],
+  'Math::Trig' => [],
+  'Text::Tabs' => [],
+  'Text::Wrap' => [qw(wrap fill $columns $break $huge)],
+);
+
+sub list_to_string {
+  return join(', ', map { "'$_'" } @_) if @_;
+  return '';
+}
+
 # Prepare the $safe variable so that it can execute code with access to our
 # PerlEnv.
 sub new_safe {
@@ -55,6 +72,8 @@ sub new_safe {
   }
   print "Creating a new safe.\n" if $options->{debug_mode};
   $safe = Safe->new();
+  # Loading arbitrary modules in the Safe does not work well so we don’t do it
+  # here.
   $safe->share_from('App::PTP::PerlEnv', \@App::PTP::PerlEnv::EXPORT_OK);
   if ($options->{use_safe} > 1) {
     $safe->permit_only(
@@ -95,6 +114,9 @@ sub reset_safe_env {
   ) {
     chomp($@);
     die "INTERNAL ERROR: cannot prepare the SafeEnv package: ${@}\n";
+  }
+  while (my ($m, $i) = each %modules_to_load) {
+    eval("package App::PTP::SafeEnv; use $m ".list_to_string(@{$i}));  ## no critic (Eval)
   }
 }
 

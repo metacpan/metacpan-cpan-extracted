@@ -35,7 +35,8 @@ use PDL::NiceSlice;
 use Photonic::Geometry::FromB;
 use Photonic::WE::R2::Metric;
 use Photonic::WE::S::Metric;
-use Test::More tests => 9;
+use Photonic::WE::ST::Metric;
+use Test::More;
 use lib 't/lib';
 use TestUtils;
 
@@ -43,6 +44,7 @@ use TestUtils;
 
 my $B=zeroes(11)->xvals<5; #1D system
 my $g=Photonic::Geometry::FromB->new(B=>$B);
+
 my $gGG=Photonic::WE::R2::Metric->new(geometry=>$g, epsilon=>pdl(2),
    wavenumber=>pdl(1), wavevector=>pdl([1]));
 my $v=$gGG->value;
@@ -52,6 +54,7 @@ ok(agree($v, ones(1,1,11)), "Actual metric for 1d");
 
 $B=zeroes(1,11)->xvals<5; #2D system
 $g=Photonic::Geometry::FromB->new(B=>$B);
+
 $gGG=Photonic::WE::R2::Metric->new(geometry=>$g, epsilon=>pdl(2),
    wavenumber=>pdl(1), wavevector=>pdl([0,1]));
 $v=$gGG->value;
@@ -66,13 +69,20 @@ my $gsGG=Photonic::WE::S::Metric->new(geometry=>$g, epsilon=>pdl(3),
    wavenumber=>pdl(1), wavevector=>pdl([1,1]));
 my $vs=$gsGG->value;
 
+my $gstGG=Photonic::WE::ST::Metric->new(geometry=>$g, epsilon=>pdl(3),
+   wavenumber=>pdl(1), wavevector=>pdl([1,1]));
+my $vst=$gstGG->value;
+
 $gGG=Photonic::WE::R2::Metric->new(geometry=>$g, epsilon=>pdl(3),
    wavenumber=>pdl(1), wavevector=>pdl([1,1]));
 $v=$gGG->value;
-
 ok(agree($vs->(:,:,(0)), $v), "S and R2 metrics agree for k");
+ok(agree($vst->(:,:,(0)), $v), "ST and R2 metrics agree for k");
+
 $gGG=Photonic::WE::R2::Metric->new(geometry=>$g, epsilon=>pdl(3),
    wavenumber=>pdl(1), wavevector=>-pdl([1,1]));
 $v=$gGG->value;
-
 ok(agree($vs->(:,:,(1)), $v), "S and R2 metrics agree for -k");
+ok(agree($vst->(:,:,(1)), $v), "ST and R2 metrics agree for -k");
+
+done_testing;

@@ -93,7 +93,7 @@ use constant AAP_AlarmModeManual => "manu"; # play continuously until next Audio
 # IPCamera::Reolink:AudioAlarmPlay() alarm_mode values as list.
 our @AAP_AlarmMode_list = (AAP_AlarmModeTimes, AAP_AlarmModeManual, );
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 our $DEBUG = 0; # > 0 for debug output to STDERR
 
@@ -564,6 +564,12 @@ IPCamera::Reolink - Reolink API provides access to the System, Security, Network
  my $l = length($jpg_image_data);
  (syswrite($fh, $jpg_image_data, $l) == $l) || die("syswrite($file_name, $l) failed - $!\n");
  close($fh);
+
+ # Play Audio Alarm 1 time 
+ 
+ my $r = $camera->AudioAlarmPlay(IPCamera::Reolink::ChannelDefault, 0, 1, IPCamera::Reolink::AAP_AlarmModeTimes);
+
+ # Logout of camera
 
  $camera->Logout();
 
@@ -1665,7 +1671,7 @@ Upon successful return the connection to the camera is lost and new session must
 
 =back
 
-=head2 AudioAlarmPlay()
+=head2 AudioAlarmPlay($camera_channel, $manual_switch, $num_times, $alarm_mode)
 
 Play audio alarm.
 

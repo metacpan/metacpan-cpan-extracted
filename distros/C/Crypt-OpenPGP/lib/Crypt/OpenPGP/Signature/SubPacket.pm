@@ -57,23 +57,25 @@ use vars qw( %SUBPACKET_TYPES );
             w    => sub { $_[0]->put_bytes($_[1], 8) } },
 
     20 => { name => 'Notation data',
-            r    => sub {
-                        { flags => $_[0]->get_int32,
-                          name => $_[0]->get_bytes($_[0]->get_int16),
-                          value => $_[0]->get_bytes($_[0]->get_int16) } },
+            r    => sub { my $flags = $_[0]->get_int32;
+                          my $namelen = $_[0]->get_int16;
+                          my $valuelen = $_[0]->get_int16;
+                        { flags => $flags,
+                          name => $_[0]->get_bytes($namelen),
+                          value => $_[0]->get_bytes($valuelen) } },
             w    => sub {
                         $_[0]->put_int32($_[1]->{flags});
                         $_[0]->put_int16(length $_[1]->{name});
-                        $_[0]->put_bytes($_[1]->{name});
                         $_[0]->put_int16(length $_[1]->{value});
+                        $_[0]->put_bytes($_[1]->{name});
                         $_[0]->put_bytes($_[1]->{value}) } },
 
     21 => { name => 'Preferred hash algorithms',
-            r    => sub { [ unpack 'C', $_[0]->bytes ] },
+            r    => sub { [ unpack 'C*', $_[0]->bytes ] },
             w    => sub { $_[0]->put_bytes(pack 'C*', @{ $_[1] }) } },
 
     22 => { name => 'Preferred compression algorithms',
-            r    => sub { [ unpack 'C', $_[0]->bytes ] },
+            r    => sub { [ unpack 'C*', $_[0]->bytes ] },
             w    => sub { $_[0]->put_bytes(pack 'C*', @{ $_[1] }) } },
 
     23 => { name => 'Key server preferences',
@@ -122,7 +124,11 @@ sub parse {
     $buf->bytes(0, 1, '');   ## Cut off tag byte
     $buf->{offset} = 0;
     my $ref = $SUBPACKET_TYPES{$sp->{type}};
-    $sp->{data} = $ref->{r}->($buf) if $ref && $ref->{r};
+    if( defined $ref ) {
+        $sp->{data} = $ref->{r}->($buf) if $ref && $ref->{r};
+    } else {
+        $sp->{data} = $buf->bytes;
+    }
     $sp;
 }
 
@@ -133,7 +139,11 @@ sub save {
     $tag |= 0x80 if $sp->{critical};
     $buf->put_int8($tag);
     my $ref = $SUBPACKET_TYPES{$sp->{type}};
-    $ref->{w}->($buf, $sp->{data}) if $ref && $ref->{w};
+    if( defined $ref ) {
+        $ref->{w}->($buf, $sp->{data}) if $ref && $ref->{w};
+    } else {
+        $buf->put_bytes($sp->{data});
+    }
     $buf->bytes;
 }
 

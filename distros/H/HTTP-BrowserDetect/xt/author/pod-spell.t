@@ -20,6 +20,7 @@ AnnoCPAN
 Anwar
 Aran
 Atsushi
+Aubrey
 Balakrishnan
 Barr
 Bilodeau
@@ -65,6 +66,7 @@ Mahdi
 Marco
 Marius
 Maros
+Maurice
 McGregor
 Mohammad
 Moise
@@ -115,6 +117,7 @@ ahrefs
 alexchorny
 altavista
 altblue
+amazonbot
 andrew
 aol
 apache
@@ -195,6 +198,7 @@ macppc
 maintainer
 malware
 maros
+maurice
 merlynkline
 mj
 mohammad

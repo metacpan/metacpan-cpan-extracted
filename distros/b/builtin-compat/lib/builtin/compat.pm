@@ -2,7 +2,7 @@ package builtin::compat;
 use strict;
 use warnings;
 
-our $VERSION = '0.002001';
+our $VERSION = '0.003000';
 $VERSION =~ tr/_//d;
 
 use namespace::clean ();
@@ -10,6 +10,8 @@ use namespace::clean ();
 sub true ();
 sub false ();
 sub is_bool ($);
+sub inf ();
+sub nan ();
 sub weaken ($);
 sub unweaken ($);
 sub is_weak ($);
@@ -18,10 +20,12 @@ sub refaddr ($);
 sub reftype ($);
 sub created_as_string ($);
 sub created_as_number ($);
+sub stringify ($);
 sub ceil ($);
 sub floor ($);
 sub trim ($);
-sub indexed;
+sub indexed (@);
+sub load_module ($);
 
 BEGIN { eval { require builtin } }
 {
@@ -53,6 +57,8 @@ sub is_bool ($) {
   );
 }
 END_CODE
+  inf       => 'sub inf () { 9**9**9**9 }',
+  nan       => 'sub nan () { 9**9**9**9*0 }',
   weaken    => \'Scalar::Util::weaken',
   unweaken  => \'Scalar::Util::unweaken',
   is_weak   => \'Scalar::Util::isweak',
@@ -87,6 +93,11 @@ sub created_as_string ($) {
   );
 }
 END_CODE
+  stringify => sprintf(qq{#line %s "%s"\n}, __LINE__+1, __FILE__).<<'END_CODE',
+sub stringify ($) {
+  "$_[0]"
+}
+END_CODE
   ceil      => sprintf(qq{#line %s "%s"\n}, __LINE__+1, __FILE__).<<'END_CODE',
 use POSIX ();
 sub ceil ($) {
@@ -107,12 +118,40 @@ sub trim ($) {
 }
 END_CODE
   indexed   => sprintf(qq{#line %s "%s"\n}, __LINE__+1, __FILE__).<<'END_CODE',
-sub indexed {
+sub indexed (@) {
   my $i = 0;
   map +($i++, $_), @_;
 }
 END_CODE
   is_tainted => \'Scalar::Util::tainted',
+  load_module => ( ( "$]" < 5.011 && !("$]" >= 5.009004 && "$]" < 5.010001) )
+    ? sprintf(qq{#line %s "%s"\n}, __LINE__+1, __FILE__).<<'END_CODE'
+sub builtin::compat::load_module::__GUARD__::DESTROY {
+  delete $INC{$_[0]->[0]} if @{$_[0]};
+}
+
+sub load_module ($) {
+  my $module = $_[0];
+  (my $file = $module) =~ s{::}{/}g;
+  $file .= ".pm";
+
+  local %^H;
+  my $guard = bless [ $file ], 'builtin::compat::load_module::__GUARD__';
+  my $result = CORE::require($file);
+  pop @$guard;
+
+  return $result;
+}
+END_CODE
+    : sprintf(qq{#line %s "%s"\n}, __LINE__+1, __FILE__).<<'END_CODE'
+sub load_module ($) {
+  my $module = $_[0];
+  (my $file = $module) =~ s{::}{/}g;
+  $file .= ".pm";
+  return scalar CORE::require($file);
+}
+END_CODE
+  ),
 );
 
 my @EXPORT_OK;
@@ -124,6 +163,7 @@ no strict 'refs';
 while (my ($sub, $fb) = splice @fb, 0, 2) {
   push @EXPORT_OK, $sub;
   if (defined &{'builtin::'.$sub}) {
+    no warnings 'prototype';
     *$sub = \&{'builtin::'.$sub};
     next;
   }
@@ -260,6 +300,14 @@ Prior to perl 5.36, it was not possible to track boolean values fully
 accurately. This function will not be perfectly accurate on earlier perl
 versions.
 
+=item inf
+
+See L<builtin/inf>.
+
+=item nan
+
+See L<builtin/nan>.
+
 =item weaken
 
 See L<builtin/weaken>.
@@ -301,6 +349,10 @@ See L<builtin/created_as_number>.
 
 Has the same caveats as C<created_as_string>.
 
+=item stringify
+
+See L<builtin/stringify>.
+
 =item ceil
 
 See L<builtin/ceil>.
@@ -316,6 +368,10 @@ See L<builtin/trim>.
 =item indexed
 
 See L<builtin/indexed>.
+
+=item load_module
+
+See L<builtin/load_module>.
 
 =back
 

@@ -72,7 +72,8 @@
       "test" : {
          "requires" : {
             "Machine::Epsilon" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Version" : "1.003001"
          }
       }
    },
@@ -83,6 +84,6 @@
          "web" : "https://github.com/wlmb/Photonic"
       }
    },
-   "version" : "0.022",
+   "version" : "0.023",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

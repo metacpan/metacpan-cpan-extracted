@@ -2,7 +2,7 @@ package Crypt::OpenPGP;
 use strict;
 use 5.008_001;
 
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 use Crypt::OpenPGP::Constants qw( DEFAULT_CIPHER );
 use Crypt::OpenPGP::KeyRing;
@@ -925,6 +925,14 @@ back to their default settings.
 I<Crypt::OpenPGP> has the following high-level interface. On failure,
 all methods will return C<undef> and set the I<errstr> for the object;
 look below at the I<ERROR HANDLING> section for more information.
+
+=head1 RANDOM SOURCE
+
+I<Crypt::OpenPGP> requires a Random source.  I<Bytes::Random::Secure> is
+now specified as a dependency, as some installations failed to have one
+installed.
+
+I<Crypt::Random>, if installed, is used instead.
 
 =head2 Crypt::OpenPGP->new( %args )
 

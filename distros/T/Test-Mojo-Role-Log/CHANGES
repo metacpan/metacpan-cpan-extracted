@@ -1,3 +1,13 @@
+0.2.3 2024-10-02 15:33:33 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - update github unit tests
+ - fix shift warnings in Perl v5.40
+ - remove unused variable
+
+0.2.2 2024-10-02 13:55:14 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix link to issue tracker
+
 0.2.1 2021-09-06 08:36:03 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix documentation
@@ -9,4 +19,3 @@
 0.1.0 2020-09-03 11:27:29 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - initial release
-

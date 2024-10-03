@@ -44,12 +44,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/oetiker/mojo-test-log/issues"
+         "web" : "https://github.com/oposs/test-mojo-role-log/issues"
       },
       "repository" : {
-         "url" : "https://github.com/oetiker/mojo-test-log"
+         "url" : "https://github.com/oposs/test-mojo-role-log"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.2.3",
+   "x_contributors" : [
+      "Robert Rothenberg <rrwo@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

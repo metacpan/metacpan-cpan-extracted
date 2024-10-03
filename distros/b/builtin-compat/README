@@ -48,6 +48,10 @@ FUNCTIONS
         fully accurately. This function will not be perfectly accurate on
         earlier perl versions.
 
+    inf See "inf" in builtin.
+
+    nan See "nan" in builtin.
+
     weaken
         See "weaken" in builtin.
 
@@ -82,6 +86,9 @@ FUNCTIONS
 
         Has the same caveats as "created_as_string".
 
+    stringify
+        See "stringify" in builtin.
+
     ceil
         See "ceil" in builtin.
 
@@ -93,6 +100,9 @@ FUNCTIONS
 
     indexed
         See "indexed" in builtin.
+
+    load_module
+        See "load_module" in builtin.
 
 AUTHOR
     haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>

@@ -18,6 +18,7 @@ use vars qw( %CONSTANTS );
     'PGP_PKT_RING_TRUST'    => 12,
     'PGP_PKT_USER_ID'       => 13,
     'PGP_PKT_PUBLIC_SUBKEY' => 14,
+    'PGP_PKT_USER_ATTRIBUTE' => 17,
     'PGP_PKT_ENCRYPTED_MDC' => 18,
     'PGP_PKT_MDC'           => 19,
 

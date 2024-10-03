@@ -40,8 +40,10 @@ WriteMakefile(
 	'Storable'                       => '0',
     },
     TEST_REQUIRES => {
-	'Machine::Epsilon'            => '0',
+        'Machine::Epsilon'            => '0',
 	'Test::More'                  => '0',
+	'Test::Version'               => '1.003001'
+
     },
     CONFIGURE_REQUIRES => {
 	'ExtUtils::MakeMaker' => '0',

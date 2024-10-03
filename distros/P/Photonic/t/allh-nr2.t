@@ -56,9 +56,9 @@ my $Bt=zeroes(1,11)->yvals<5; #2D flat system
 my $gt=Photonic::Geometry::FromB->new(B=>$Bt, Direction0=>pdl([1,0])); #trans
 my $at=Photonic::LE::NR2::Haydock->new(geometry=>$gt, nh=>10);
 $at->run;
-my $ast=$a->as;
-my $bst=$a->bs;
-my $b2st=$a->b2s;
+my $ast=$at->as;
+my $bst=$at->bs;
+my $b2st=$at->b2s;
 ok(agree(pdl($at->iteration), 1), "Number of iterations 1D trans");
 ok(agree($b2st->slice("(0)"), 1), "1D T b_0^2");
 ok(agree($ast->slice("(0)"), $g->f), "1D T a_0");

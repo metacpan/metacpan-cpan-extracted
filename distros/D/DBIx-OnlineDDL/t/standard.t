@@ -51,6 +51,14 @@ onlineddl_test 'No-op copy' => 'Track' => sub {
     $new_table_track_sql   =~ s/ AUTO_INCREMENT=\K\d+/###/;
     $new_table_lyrics_sql  =~ s/ AUTO_INCREMENT=\K\d+/###/;
 
+    if ($dbms_name eq 'MySQL') {
+        # This can sometimes disappear in MySQL 8, since it considers utf8mb4 the default
+        $orig_table_track_sql  =~ s/ CHARACTER SET utf8mb4//g;
+        $orig_table_lyrics_sql =~ s/ CHARACTER SET utf8mb4//g;
+        $new_table_track_sql   =~ s/ CHARACTER SET utf8mb4//g;
+        $new_table_lyrics_sql  =~ s/ CHARACTER SET utf8mb4//g;
+    }
+
     is $new_table_track_sql,  $orig_table_track_sql,  'New table SQL for `track` matches the old one';
     SKIP: {
         skip "MySQL versions below 5.7 cannot fix the index problem", 1 if $dbms_name eq 'MySQL' && $mmver < 5.007;
@@ -210,8 +218,9 @@ onlineddl_test 'Add column + title change' => 'Track' => sub {
                     process_past_max => 1,
 
                     dbic_storage => $oddl->rsrc->storage,
-                    min_stmt => "SELECT MIN(trackid) FROM $qname",
-                    max_stmt => "SELECT MAX(trackid) FROM $qname",
+                    min_stmt   => "SELECT MIN(trackid) FROM $qname",
+                    max_stmt   => "SELECT MAX(trackid) FROM $qname",
+                    count_stmt => "SELECT COUNT(*) FROM $qname WHERE trackid BETWEEN ? AND ?",
                     stmt     => join( ' ',
                         'UPDATE',
                         $dbh->quote_identifier($name),

@@ -1,5 +1,5 @@
 package Photonic::Roles::Geometry;
-$Photonic::Roles::Geometry::VERSION = '0.022';
+$Photonic::Roles::Geometry::VERSION = '0.023';
 
 =encoding UTF-8
 
@@ -94,13 +94,13 @@ has 'Direction0' =>(is => 'ro', isa => PDLObj,
 
 sub _build_L {
     my $self=shift;
-    my $L=PDL->pdl($self->dims);
+    my $L=PDL->pdl($self->B->dims);
     return $L;
 }
 
 sub _build_units {
     my $self=shift;
-    PDL::MatrixOps::identity($self->ndims); # unit vectors
+    PDL::MatrixOps::identity($self->B->ndims); # unit vectors
 }
 
 sub _build_primitive {
@@ -190,7 +190,7 @@ sub BUILD {
   my ($self) = @_;
   if ($self->has_Direction0) {
     my $value = $self->Direction0;
-    confess "Direction0 must be length ".$self->ndims." vector" unless
+    confess "Direction0 must be of dimension ".$self->ndims." vector" unless
       $value->dim(0)==$self->ndims and $value->ndims==1;
     confess "Direction must be non-null" unless $value->inner($value)>0;
     my $arg=":". (",(0)" x $self->ndims); #:,(0),... dimension of space times
@@ -281,7 +281,7 @@ Photonic::Roles::Geometry
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -295,7 +295,7 @@ version 0.022
 =item (for developers)
 
     package Photonic::Geometry::FromB;
-    $Photonic::Geometry::Geometry::VERSION = '0.022';
+    $Photonic::Geometry::Geometry::VERSION = '0.023';
     use namespace::autoclean;
     use Moo;
     has 'B' =>(is=>'ro', isa=>PDLObj, required=>1,

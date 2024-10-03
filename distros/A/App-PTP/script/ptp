@@ -39,10 +39,10 @@ are described (and in more details) below, in the L</OPTIONS> section.
 
 =over 4
 
-=item B<-g> I<pattern>, B<-s> I<pattern> I<subst>
+=item B<-g> I<regex>, B<-s> I<regex> I<string>
 
-Filter all the lines using the given pattern (inverted with B<-V> before the
-B<-g> option), or replace all the match of the pattern by the given substitution
+Filter all the lines using the given regex (inverted with B<-V> before the
+B<-g> option), or replace all the match of the regex by the given substitution
 string.
 
 =item B<-p> I<perl code>
@@ -178,7 +178,7 @@ description of the affected commands.
 
 =over 8
 
-=item B<--g> I<pattern>, B<--grep>
+=item B<--g> I<regex>, B<--grep>
 
 Filter each input to keep only the lines that match the given regular
 expression. That expression cannot have delimiters (e.g. /foo/) so, if you
@@ -192,12 +192,12 @@ This command is much faster then manually giving a match operation to the
 B<--filter> command, because the code does not need to be escaped.
 
 This operation can be made case-insensitive with the B<-I> flag, inverted with
-B<-V> and the pattern can be interpreted as an exact string with B<-Q>.
+B<-V> and the regex can be interpreted as an exact string with B<-Q>.
 
-=item B<-s> I<pattern> I<subst>, B<--substitute>
+=item B<-s> I<regex> I<string>, B<--substitute>
 
 Replace all matches of the given regular expression by the given substitution
-pattern on each line of the input. The substitution string is evaluated like a
+text on each line of the input. The substitution string is evaluated like a
 Perl string, so it can contain references to capture group in the regular
 expression using the B<$1>, B<$2>, etc. syntax.
 
@@ -245,15 +245,6 @@ doing it.
 An error in the Perl code will result in a message printed to the standard
 output but the processing will continue. The current line will not be removed.
 
-=item B<--ml> I<code>, B<--mark-line>
-
-Execute the given code for each line of input (the current line is in the B<$_>
-variable) and store the return value (usually a boolean) in the I<marker> of
-the current line.
-
-The marker can then be accessed by other commands through the B<$m> variable or
-used directly by the commands that operate on marked lines.
-
 =item B<-e> I<code>, B<--execute>
 
 Execute the given code. As other command, this will be executed once per input
@@ -262,17 +253,17 @@ functions used in B<--perl> or B<-n> commands.
 
 Any error in the Perl code will terminate the execution of the program.
 
-=item B<-M> I<module>
-
-Load the given Perl module in the Perl environment. This option cannot be used
-when B<--safe> is specified with level strictly greater than 0.
-
 =item B<-l> I<path>, B<--load>
 
 Same as B<--execute> except that it takes the code to execute from the given
 file.
 
 Any error in the Perl code will terminate the execution of the program.
+
+=item B<-M> I<module>
+
+Load the given Perl module in the Perl environment. This option cannot be used
+when B<--safe> is specified with level strictly greater than 0.
 
 =item B<--sort>
 
@@ -349,31 +340,48 @@ the content any-more (maybe you have sent it to another command with B<--shell>)
 but you cannot redirect the output (typically to get the output of that shell
 command).
 
+=item B<--ml> I<code>, B<--mark-line>
+
+Execute the given code for each line of input (the current line is in the B<$_>
+variable) and store the return value (usually a boolean) in the I<marker> of
+the current line.
+
+The marker can then be accessed by other commands through the B<$m> variable or
+used directly by the commands that operate on marked lines.
+
+=item B<--clear-markers>
+
+Clear the marker of all the input lines.
+
+=item B<--set-all-markers>
+
+Set the marker of all the input lines.
+
 =item B<--delete-marked>
 
-Delete every line whose marker is currently set. See the B<--mark-line> command
-for details on how to set the marker of a line.
+Delete every line whose marker is currently set to a true value. See the
+B<--mark-line> command for details on how to set the marker of a line.
 
 After this operation, no line has a marker set (they were all deleted).
 
 =item B<--delete-before>
 
-Delete all the lines immediately preceding a line whose marker is set. The
-markers of the lines that are not deleted are not changed.
+Delete all the lines immediately preceding a line whose marker is set to a true
+value. The markers of the lines that are not deleted are not changed.
 
 =item B<--delete-after>
 
-Delete all the lines immediately following a line whose marker is set. The
-markers of the lines that are not deleted are not changed.
+Delete all the lines immediately following a line whose marker is set to a true
+value. The markers of the lines that are not deleted are not changed.
 
 =item B<--delete-at-offset> I<offset>
 
 Delete all the lines situated at the given offset from a marked line. A positive offset means lines that are after the marked lines.
 
-=item B<--insert-before> I<text>
+=item B<--insert-before> I<string>
 
 Insert the given line of text immediately before each marked line. The given
-I<text> is treated as a quoted Perl string, so it can use any of the variable
+I<string> is treated as a quoted Perl string, so it can use any of the variable
 described in L</PERL ENVIRONMENT>. In particular, the B<$_> variable is set to
 the marked line before which the insertion is taking place. However this text is
 not a general Perl expression, so you may have to post-process with an other
@@ -386,23 +394,15 @@ your shell before the argument is read by the program).
 The newly inserted lines have their markers unset. Other lines' markers are not
 changed.
 
-=item B<--insert-after> I<text>
+=item B<--insert-after> I<string>
 
 Same as B<--insert-before>, but the new line is inserted after the marked line.
 
-=item B<--insert-at-offset> I<offset> I<text>
+=item B<--insert-at-offset> I<offset> I<string>
 
 Generalized version of the B<--insert-before> and <--insert-after> commands.
 This commands insert the given text at the given offset relative to the marked
 line. Offset I<0> means inserting the line immediately after the marked line.
-
-=item B<--clear-markers>
-
-Clear the marker of all the input lines.
-
-=item B<--set-all-markers>
-
-Set the marker of all the input lines.
 
 =item B<--cut> I<field>,I<field>,...
 
@@ -566,7 +566,7 @@ returns a true value are kept. The complete file name is passed to the code in
 the default B<$_> variable. You can view this option in action in the
 L</EXAMPLES> sections
 
-This option applies only of files recursively expended from a directory passed
+This option only applies on files recursively expended from a directory passed
 on the command line. It does not apply on files that are explicitly listed. In
 particular, this option does not apply on files that are expended by a shell
 glob. It derives that this option is useless unless B<-R> is specified too.
@@ -719,15 +719,24 @@ of regular expressions.
 
 This is the default mode when B<--quote-regexp> is not specified.
 
-=item B<-G>, B<--global-match>
+=item B<-V>, B<--inverse-match>
 
-Apply the substitution given to the B<--substitute> command as many times as
-possible (this is the default).
+Inverse the behavior of the B<--grep> and B<--filter> commands (lines that
+would normally be dropped are kept and inversely).
+
+=item B<-N>, B<--normal-match>
+
+Give the default behavior to the B<--grep> and B<--filter> commands.
 
 =item B<-L>, B<--local-match>
 
 Apply the substitution given to the B<--substitute> command at most once per
 line.
+
+=item B<-G>, B<--global-match>
+
+Apply the substitution given to the B<--substitute> command as many times as
+possible (this is the default).
 
 =item B<-C> I<code>, B<--comparator>
 
@@ -814,7 +823,7 @@ commands. The default value I<perl> uses Perl built-in engine. Other values are 
 (e.g. I<RE2>, I<PCRE>, I<TRE>, I<GNU>, etc.). The matching Perl module needs to
 be installed. Note that the name of the engine is case-sensitive.
 
-For the B<--substitute> command, only the pattern is affected by this option.
+For the B<--substitute> command, only the regex is affected by this option.
 The substitution still uses the Perl syntax to refer to matched group (e.g.
 B<$1>, etc.).
 
@@ -833,15 +842,6 @@ Print an error to the standard output when an error occurs in the Perl code
 provided to the B<--perl>, B<-n> and B<--filter> commands and continue the
 processing (this is the default).
 
-=item B<-V>, B<--inverse-match>
-
-Inverse the behavior of the B<--grep> and B<--filter> commands (lines that
-would normally be dropped are kept and inversely).
-
-=item B<-N>, B<--normal-match>
-
-Give the default behavior to the B<--grep> and B<--filter> commands.
-
 =back
 
 =head2 PERL ENVIRONMENT
@@ -854,6 +854,21 @@ commands.
 While not directly executing Perl code, the B<--grep> and B<--substitute>
 commands also have access to the variables described below and those that are
 created by user supplied code.
+
+Note that the Perl environment is entirely reset between each file (and when
+encountering the B<--merge> command) unless the B<--preserve-perl-env> option
+was passed.
+
+When using the default B<--safe 0> mode, the following modules are loaded in the
+environment, with most of their methods imported by default, in addition to the
+variables and functions listed below :
+L<Data::Dumper> (C<Dumper>, with C<Terse> set to true by default),
+L<File::Basename> (C<fileparse>, C<basename>, C<dirname>), L<File::Copy>
+(C<copy>, C<move>), L<File::Path> (C<make_path>, C<remove_tree>),
+L<File::Spec::Functions> (C<canonpath>, ...), L<List::Util> (C<any>, C<all>,
+C<none>, C<min>, C<max>, C<sum>, ...), L<Math::Trig> (C<pi>, C<acos>, ...),
+L<Text::Tabs> (C<expand>, C<unexpand>, C<$tabstop>), L<Text::Wrap> (C<wrap>,
+C<fill>, C<$columns>, ...).
 
 =head3 B<$_>
 
@@ -939,16 +954,13 @@ files:
 
   ptp file1 file2 file3
 
-This example is similar to the built-in B<--nl> commands. It replaces each line
-with the output of the B<sprintf> function which, here, will prefix the line
-number to each line.
+This next example replaces each line with the output of the B<sprintf> function
+which, here, will prefix the line number to each line (similar to the B<--nl>
+command). This example also demonstrates that a variable can be re-used across
+the lines of an input (the B<$i> variable), but that it is reset between each
+input. Using the variables and functions described in L</PERL ENVIRONMENT>:
 
-That example also demonstrates that a variable can be re-used across the lines
-of an input (the B<$i> variable), but that it is reset between each input. Using
-the variables and functions described in L</PERL ENVIRONMENT> the argument to
-the B<-n> command could be rewritten C<spf "% 5d  %s", $n, $_>:
-
-  ptp file1 file2 -n 'sprintf("%5d  %s", ++$i, $_)'
+  ptp file1 file2 -n 'spf("% 5d  %s", ++$i, $_)'
 
 Same as the example above, but does not number empty lines (this is the default
 behavior of the GNU B<nl> util). Also this uses the B<pf> function that modifies
@@ -1011,6 +1023,12 @@ Setting this variable to B<1> means the the B<-Q> flag is in effect at the
 beginning of the parsing of the command line arguments. Setting the variable to
 B<0> gives the default behavior (as if B<-E> was passed).
 
+=item PTP_DEFAULT_INVERSE_MATCH
+
+Setting this variable to B<1> means that the B<-V> flag is in effect at the
+beginning of the parsing of the command line arguments. Setting the variable to
+B<0> gives the default behavior (as if B<-N> was passed).
+
 =item PTP_DEFAULT_LOCAL_MATCH
 
 Setting this variable to B<1> means the the B<-L> flag is in effect at the
@@ -1027,12 +1045,6 @@ program. That variable can take the same values as the B<--re> flag.
 Setting this variable to B<1> means that the B<-X> flag is in effect at the
 beginning of the parsing of the command line arguments. Setting the variable to
 B<0> gives the default behavior (as if B<-ignore-error> was passed).
-
-=item PTP_DEFAULT_INVERSE_MATCH
-
-Setting this variable to B<1> means that the B<-V> flag is in effect at the
-beginning of the parsing of the command line arguments. Setting the variable to
-B<0> gives the default behavior (as if B<-N> was passed).
 
 =item PTP_DEFAULT_SAFE
 
@@ -1060,7 +1072,7 @@ This program has been written by L<Mathias Kende|mailto:mathias@cpan.org>.
 
 =head1 LICENCE
 
-Copyright 2019 Mathias Kende
+Copyright 2019-2024 Mathias Kende
 
 This program is distributed under the MIT (X11) License:
 L<http://www.opensource.org/licenses/mit-license.php>

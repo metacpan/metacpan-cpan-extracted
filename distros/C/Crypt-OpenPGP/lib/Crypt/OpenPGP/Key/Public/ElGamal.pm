@@ -53,7 +53,8 @@ sub gen_k {
     my($p) = @_;
     ## XXX choose bitsize based on bitsize of $p
     my $bits = 198;
-    my $p_minus1 = $p - 1;
+    my $p_minus1 = Math::BigInt->new($p);
+    $p_minus1->bsub(1);
 
     my $k = Crypt::OpenPGP::Util::get_random_bigint($bits);
     while (1) {

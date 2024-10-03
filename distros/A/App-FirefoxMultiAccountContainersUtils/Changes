@@ -1,3 +1,11 @@
+0.018   2024-10-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Explain how to do something similar to firefox-container
+          with Google Chrome.
+
+
 0.017   2023-06-06  Released-By: PERLANCAR; Urgency: medium
 
         - [cli open-firefox-container] Allow passing options to firefox via

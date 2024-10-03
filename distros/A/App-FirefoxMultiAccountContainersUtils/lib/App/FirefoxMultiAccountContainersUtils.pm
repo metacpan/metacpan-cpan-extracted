@@ -8,9 +8,9 @@ use Log::ger;
 use Sort::Sub ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-06'; # DATE
+our $DATE = '2024-10-01'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 $Sort::Sub::argsopt_sortsub{sort_sub}{cmdline_aliases} = {S=>{}};
 $Sort::Sub::argsopt_sortsub{sort_args}{cmdline_aliases} = {A=>{}};
@@ -444,6 +444,19 @@ to open this URL:
 
 Ref: <https://github.com/mozilla/multi-account-containers/issues/365>
 
+**Related topics**
+
+In Google Chrome browser, profiles is what you would use to separate
+sessions/cookies (and other things). Opening a URL in a specific profile from
+the command-line is easier with Chrome:
+
+    % google-chrome --profile-directory="PROFILEDIRNAME" URL
+
+where `PROFILEDIRNAME` is a directory name under the profiles directory,
+typically `~/.config/google-chrome/` on Unix. You can use the
+<prog:list-chrome-profiles> (with option `-l`) (from <pm:App::ChromeUtils>) to
+list Chrome profiles.
+
 _
     args => {
         %argspecopt_profile,
@@ -542,7 +555,7 @@ App::FirefoxMultiAccountContainersUtils - Utilities related to Firefox Multi-Acc
 
 =head1 VERSION
 
-This document describes version 0.017 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2023-06-06.
+This document describes version 0.018 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2024-10-01.
 
 =head1 SYNOPSIS
 
@@ -905,6 +918,19 @@ to open this URL:
 
 Ref: L<https://github.com/mozilla/multi-account-containers/issues/365>
 
+B<Related topics>
+
+In Google Chrome browser, profiles is what you would use to separate
+sessions/cookies (and other things). Opening a URL in a specific profile from
+the command-line is easier with Chrome:
+
+ % google-chrome --profile-directory="PROFILEDIRNAME" URL
+
+where C<PROFILEDIRNAME> is a directory name under the profiles directory,
+typically C<~/.config/google-chrome/> on Unix. You can use the
+L<list-chrome-profiles> (with option C<-l>) (from L<App::ChromeUtils>) to
+list Chrome profiles.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -990,7 +1016,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

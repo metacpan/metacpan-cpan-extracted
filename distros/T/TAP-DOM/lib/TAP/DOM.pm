@@ -1,9 +1,9 @@
 package TAP::DOM;
-# git description: v0.97-7-g357ca13
+# git description: v0.98-5-gda1ab78
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: TAP as Document Object Model.
-$TAP::DOM::VERSION = '0.98';
+$TAP::DOM::VERSION = '0.99';
 use 5.006;
 use strict;
 use warnings;
@@ -34,6 +34,7 @@ our $HAS_TODO     = 4096;
 our @tap_dom_args = (qw(ignore
                         ignorelines
                         dontignorelines
+                        ignoreunknown
                         usebitsets
                         disable_global_kv_data
                         put_dangling_kv_data_under_lazy_plan
@@ -42,6 +43,7 @@ our @tap_dom_args = (qw(ignore
                         preprocess_ignorelines
                         preprocess_tap
                         noempty_tap
+                        utf8
                         lowercase_fieldnames
                         lowercase_fieldvalues
                         trim_fieldvalues
@@ -209,6 +211,44 @@ sub noempty_tap {
     return %args
 }
 
+# Assume TAP is UTF-8 and filter out forbidden characters.
+#
+# Convert illegal chars into Unicode 'REPLACEMENT CHARACTER'
+# (\N{U+FFFD} ... i.e. diamond with question mark in it).
+#
+# For more info see:
+#
+#  - https://stackoverflow.com/a/2656433/1342345
+#  - https://metacpan.org/pod/Encode#FB_DEFAULT
+#  - https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character
+#
+# Additionall convert \0 as it's not covered by Encode::decode()
+# but is still illegal for some tools.
+sub utf8_tap {
+    my %args = @_;
+
+    if ($args{source}) {
+      local $/;
+      my $F;
+      if (ref($args{source}) eq 'GLOB') {
+        $F = $args{source};
+      } else {
+        open $F, '<', $args{source};
+      }
+      $args{tap} = <$F>;
+      close $F;
+      delete $args{source};
+    }
+
+    if ($args{tap}) {
+      require Encode;
+      $args{tap} = Encode::decode('UTF-8', $args{tap});
+      $args{tap} =~ s/\0/\N{U+FFFD}/g;
+      delete $args{utf8}; # don't try it again during parsing later
+    }
+    return %args
+}
+
 sub new {
         # hash or hash ref
         my $class = shift;
@@ -225,10 +265,12 @@ sub new {
         %args = preprocess_ignorelines(%args) if $args{preprocess_ignorelines};
         %args = preprocess_tap(%args)         if $args{preprocess_tap};
         %args = noempty_tap(%args)            if $args{noempty_tap};
+        %args = utf8_tap(%args)               if $args{utf8};
 
         my %IGNORE      = map { $_ => 1 } @{$args{ignore}};
         my $IGNORELINES = $args{ignorelines};
         my $DONTIGNORELINES = $args{dontignorelines};
+        my $IGNOREUNKNOWN = $args{ignoreunknown};
         my $USEBITSETS  = $args{usebitsets};
         my $DISABLE_GLOBAL_KV_DATA  = $args{disable_global_kv_data};
         my $PUT_DANGLING_KV_DATA_UNDER_LAZY_PLAN  = $args{put_dangling_kv_data_under_lazy_plan};
@@ -241,6 +283,7 @@ sub new {
         delete $args{ignore};
         delete $args{ignorelines};
         delete $args{dontignorelines};
+        delete $args{ignoreunknown};
         delete $args{usebitsets};
         delete $args{disable_global_kv_data};
         delete $args{put_dangling_kv_data_under_lazy_plan};
@@ -249,6 +292,7 @@ sub new {
         delete $args{preprocess_ignorelines};
         delete $args{preprocess_tap};
         delete $args{noempty_tap};
+        delete $args{utf8};
         delete $args{lowercase_fieldnames};
         delete $args{lowercase_fieldvalues};
         delete $args{trim_fieldvalues};
@@ -267,6 +311,7 @@ sub new {
                 no strict 'refs';
 
                 next if $IGNORELINES && $result->raw =~ m/$IGNORELINES/ && !($DONTIGNORELINES && $result->raw =~ m/$DONTIGNORELINES/);
+                next if $IGNOREUNKNOWN and $result->is_unknown;
 
                 my $entry = TAP::DOM::Entry->new;
                 $entry->{is_has} = 0 if $USEBITSETS;
@@ -656,6 +701,7 @@ and returns a big data structure containing the extracted results.
    put_dangling_kv_data_under_lazy_plan => 1,
    ignorelines                          => '(## |# Test-mymeta_)',
    dontignorelines                      => '# Test-mymeta_(tool1|tool2)_',
+   ignoreunknown                        => 1,
    preprocess_ignorelines               => 1,
    preprocess_tap                       => 1,
    usebitsets                           => 0,
@@ -719,6 +765,16 @@ zero-width negative-lookaround conditions
 use Perl version
 
 =back
+
+=item ignoreunknown
+
+By default non-TAP lines are still part of the TAP::DOM (with
+C<is_unknown=1> and most other entry fields set to C<undef>).
+
+If you mix a lot of non-TAP lines with actual TAP lines then
+this can lead to a huge TAP::DOM data structure.
+
+With this option set to 1 the C<unknown> lines are skipped.
 
 =item usebitsets
 
@@ -1105,6 +1161,31 @@ then this option set to 1 triggers to put in some replacement line.
 which in turn assigns it an error severity, so that these situations
 are no longer invisible.
 
+=item * utf8
+
+Declare a document is UTF-8 encoded Unicode.
+
+This triggers decoding the document accordingly, inclusive filtering
+out illegal Unicode characters.
+
+In particular it converts illegal chars into Unicode I<REPLACEMENT
+CHARACTER> (C<\N{U+FFFD}> ... i.e. diamond with question mark in it).
+
+For more info see:
+
+=over 4
+
+=item * https://stackoverflow.com/a/2656433/1342345
+
+=item * https://metacpan.org/pod/Encode#FB_DEFAULT
+
+=item * https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character
+
+=back
+
+Additionall convert C<\0> as it's not covered by Encode::decode() but
+is still illegal for some tools.
+
 =back
 
 =head1 USING BITSETS
@@ -1216,7 +1297,7 @@ Summary: for consistency it is suggested to set both options:
  disable_global_kv_data => 1,
  put_dangling_kv_data_under_lazy_plan => 1
 
-=head1 ACCESSORS
+=head1 ACCESSORS AND UTILITY METHODS
 
 =head2 end_time
 
@@ -1241,6 +1322,10 @@ Summary: for consistency it is suggested to set both options:
 =head2 summary
 
 =head2 tapdom_config
+
+=head2 utf8_tap
+
+The actual worker function behind C<utf8> option.
 
 =head2 document_data
 
@@ -1363,7 +1448,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Steffen Schwigon.
+This software is copyright (c) 2024 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,9 +3,9 @@ NAME
     Multi-Account Containers add-on
 
 VERSION
-    This document describes version 0.017 of
+    This document describes version 0.018 of
     App::FirefoxMultiAccountContainersUtils (from Perl distribution
-    App-FirefoxMultiAccountContainersUtils), released on 2023-06-06.
+    App-FirefoxMultiAccountContainersUtils), released on 2024-10-01.
 
 SYNOPSIS
 DESCRIPTION
@@ -310,6 +310,19 @@ FUNCTIONS
 
     Ref: <https://github.com/mozilla/multi-account-containers/issues/365>
 
+    Related topics
+
+    In Google Chrome browser, profiles is what you would use to separate
+    sessions/cookies (and other things). Opening a URL in a specific profile
+    from the command-line is easier with Chrome:
+
+     % google-chrome --profile-directory="PROFILEDIRNAME" URL
+
+    where "PROFILEDIRNAME" is a directory name under the profiles directory,
+    typically "~/.config/google-chrome/" on Unix. You can use the
+    list-chrome-profiles (with option "-l") (from App::ChromeUtils) to list
+    Chrome profiles.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -389,7 +402,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2020 by perlancar
+    This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

@@ -58,14 +58,14 @@ ok(Cagree($b2s->slice("(1)"), ($eb-$ea)**2*$f*(1-$f)), "1D L b_1^2");
 ok(Cagree($b2s, $bs**2), "1D L b2==b^2");
 
 #View 1D system as 2D. Transverse direction
-my $epst=r2C($ea*(zeroes(1,11)->xvals<5)+ $eb*(zeroes(1,11)->xvals>=5));
+my $epst=r2C($ea*(zeroes(1,11)->yvals<5)+ $eb*(zeroes(1,11)->yvals>=5));
 my $gt=Photonic::Geometry::FromEpsilon
    ->new(epsilon=>$epst, Direction0=>pdl([1,0])); #trans
 my $at=Photonic::LE::S::Haydock->new(geometry=>$gt, nh=>10);
 $at->run;
-my $ast=$a->as;
-my $bst=$a->bs;
-my $b2st=$a->b2s;
+my $ast=$at->as;
+my $bst=$at->bs;
+my $b2st=$at->b2s;
 is($at->iteration, 1, "Number of iterations 1D trans");
 ok(Cagree($b2st->slice("(0)"), 1), "1D T b_0^2");
 ok(Cagree($ast->slice("(0)"), $ea*(1-$f)+$eb*$f), "1D T a_0");

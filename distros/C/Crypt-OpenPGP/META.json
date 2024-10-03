@@ -4,7 +4,7 @@
       "Sergey Romanov <sromanov@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,13 +22,14 @@
       "runtime" : {
          "requires" : {
             "Alt::Crypt::RSA::BigInt" : "0",
+            "Bytes::Random::Secure" : "0",
             "Compress::Zlib" : "0",
             "Crypt::Blowfish" : "0",
             "Crypt::CAST5_PP" : "0",
             "Crypt::DES_EDE3" : "0",
-            "Crypt::DSA" : "0",
+            "Crypt::DSA" : "1.17",
             "Crypt::IDEA" : "0",
-            "Crypt::RIPEMD160" : "0",
+            "Crypt::RIPEMD160" : "0.05",
             "Crypt::Rijndael" : "0",
             "Crypt::Twofish" : "0",
             "Data::Buffer" : "0.04",
@@ -50,13 +51,19 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/btrott/Crypt-OpenPGP",
+      "homepage" : "https://github.com/perl-Crypt-OpenPGP/Crypt-OpenPGP",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/btrott/Crypt-OpenPGP.git",
-         "web" : "https://github.com/btrott/Crypt-OpenPGP"
+         "url" : "https://github.com/perl-Crypt-OpenPGP/Crypt-OpenPGP.git",
+         "web" : "https://github.com/perl-Crypt-OpenPGP/Crypt-OpenPGP"
       }
    },
-   "version" : "1.12"
+   "version" : "1.15",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_maintainers" : [
+      "Timothy Legge <timlegge@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,5 +1,5 @@
 package Photonic::Roles::Field;
-$Photonic::Roles::Field::VERSION = '0.022';
+$Photonic::Roles::Field::VERSION = '0.023';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::Field
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 COPYRIGHT NOTICE
 

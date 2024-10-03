@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Object::Pad;
 
-our $VERSION = '0.001'; ## VERSION
+our $VERSION = '0.002'; ## VERSION
 
 class WebService::Hydra::Exception::TokenExchangeFailed :isa(WebService::Hydra::Exception) {
 

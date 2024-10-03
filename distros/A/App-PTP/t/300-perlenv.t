@@ -7,7 +7,8 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use AppPtpTest;
-use Test::More tests => 37;
+use File::Spec::Functions 'catfile';
+use Test::More tests => 38;
 
 
 for my $use_safe (0..2) {
@@ -66,5 +67,7 @@ for my $use_safe (0..2) {
   ok($@ =~ /Perl code failed.*trapped by operation mask/,
      'tie disallowed with --safe 2');
 }{
-  is(ptp(['-M', 'File::Basename', '--pivot', '-n', 'dirname($f)', 'src/fake.h']), "src\n", 'load module');
+  is(ptp(['--pivot', '-M', 'File::Spec', '-n', 'File::Spec->catfile("foo", "bar")', 'src/fake.h']), catfile('foo', 'bar')."\n", 'load module');
+}{
+  is(ptp(['--pivot', '-n', 'dirname($f)', 'src/fake.h']), "src\n", 'default module');
 }

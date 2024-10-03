@@ -16,7 +16,6 @@ $t->get_ok('/gugus')
    ->log_debug_like(qr{200 OK.+s.+/s})
 
 done_testing();
-
 ```
 
 # DESCRIPTION
@@ -36,9 +35,8 @@ The role [Test::Mojo::Role::Log](https://metacpan.org/pod/Test%3A%3AMojo%3A%3ARo
 ## log\_like($rx,$desc)
 
 ```
- $t->get_ok('/hello')
-   ->log_like(undef,qr{/hello not found},"Request got logged")
-
+$t->get_ok('/hello')
+  ->log_like(undef,qr{/hello not found},"Request got logged")
 ```
 
 Check if the given log message has been issued. All the log messages issued since the start of the current request will get checked.

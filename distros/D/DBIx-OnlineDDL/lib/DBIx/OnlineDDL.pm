@@ -3,7 +3,7 @@ package DBIx::OnlineDDL;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Run DDL on online databases safely
 use version;
-our $VERSION = 'v1.0.0'; # VERSION
+our $VERSION = 'v1.0.1'; # VERSION
 
 use utf8;
 use open qw(:utf8 :std);
@@ -592,6 +592,10 @@ sub _build_helper {
 }
 
 ### BUILD methods
+
+#pod =for Pod::Coverage BUILDARGS BUILD
+#pod
+#pod =cut
 
 around BUILDARGS => sub {
     my $next  = shift;
@@ -1355,7 +1359,6 @@ sub swap_tables {
         'SQL_MAXIMUM_TABLE_NAME_LENGTH',
     );
     my $old_table_name_quote = $dbh->quote_identifier($old_table_name);
-
     $progress->message("Swapping tables ($new_table_name --> $orig_table_name --> $old_table_name)");
 
     # Let's swap tables!
@@ -1751,7 +1754,7 @@ DBIx::OnlineDDL - Run DDL on online databases safely
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SYNOPSIS
 
@@ -2058,6 +2061,8 @@ Default value is 28,800 seconds (8 hours), which is MySQL's default.
 A L<Eval::Reversible> object, used for rollbacks.  A default will be created, if not
 specified.
 
+=for Pod::Coverage BUILDARGS BUILD
+
 =head1 CONSTRUCTORS
 
 See L</ATTRIBUTES> for information on what can be passed into these constructors.
@@ -2221,7 +2226,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2022 by Grant Street Group.
+This software is Copyright (c) 2018 - 2024 by Grant Street Group.
 
 This is free software, licensed under:
 

@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.40';
+our $VERSION = '3.41';
 
 # Operating Systems
 our @OS_TESTS = qw(
@@ -128,6 +128,7 @@ our @ENGINE_TESTS = qw(
 my @OLD_ROBOT_TESTS = qw(
     ahrefs
     altavista
+    amazonbot
     apache
     askjeeves
     baidu
@@ -201,6 +202,7 @@ our @ROBOT_TESTS = (
     [ 'vkShare',                            'vkshare' ],
     [ 'W3C_Validator',                      'w3c-validator' ],
     [ 'WhatsApp',                           'whatsapp' ],
+    [ 'Amazonbot',                          'amazonbot' ],
 );
 
 our @MISC_TESTS = qw(
@@ -225,6 +227,7 @@ our @ALL_TESTS = (
 my %ROBOT_NAMES = (
     ahrefs                => 'Ahrefs',
     altavista             => 'AltaVista',
+    amazonbot             => 'Amazonbot',
     'apache-http-client'  => 'Apache HttpClient',
     apple                 => 'Apple',
     'archive-org'         => 'Internet Archive',
@@ -347,6 +350,7 @@ my %ROBOT_IDS = (
     yandex          => 'yandex',
     yandeximages    => 'yandex-images',
     headlesschrome  => 'headless-chrome',
+    amazonbot       => 'amazonbot',
 );
 
 my %BROWSER_NAMES = (
@@ -707,7 +711,7 @@ sub _init_core {
                 \/
                 ( [^.]* )           # Major version number is everything before first dot
                 \.                  # The first dot
-                ( [\d]* )           # Minor version nnumber is digits after first dot
+                ( [\d]* )           # Minor version number is digits after first dot
             }xo
         && index( $ua, 'not firefox' ) == -1
         )    # Hack for Yahoo Slurp
@@ -744,7 +748,7 @@ sub _init_core {
         $browser = 'opera';
         $browser_tests->{opera} = 1;
     }
-    elsif ($tests->{trident}
+    elsif ( $tests->{trident}
         || index( $ua, 'msie' ) != -1
         || index( $ua, 'microsoft internet explorer' ) != -1 ) {
 
@@ -1419,7 +1423,7 @@ sub _init_robots {
                 $self->{robot_version} = undef;
             }
 
-            # Set robot_string, if we don't already have an explictly set
+            # Set robot_string, if we don't already have an explicitly set
             # one
             if ( !defined $self->{robot_string} ) {
                 $self->{robot_string} = $full_string;
@@ -3073,7 +3077,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.40
+version 3.41
 
 =head1 SYNOPSIS
 
@@ -3276,7 +3280,8 @@ googleadsbot, googleadsense, googlebotimage, googlebotnews,
 googlebotvideo, googlefavicon, googlemobile, google, golib, indy,
 infoseek, ipsagent, linkchecker, linkexchange, lycos, malware,
 mj12bot, nutch, phplib, puf, rubylib, scooter, specialarchiver,
-wget, yandexbot, yandeximages, java, headlesschrome, unknown
+wget, yandexbot, yandeximages, java, headlesschrome, amazonbot,
+unknown
 
 Returns "unknown" when the user agent is believed to be a robot but
 is not identified as one of the above specific robots.

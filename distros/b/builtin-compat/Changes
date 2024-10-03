@@ -1,5 +1,11 @@
 Revision history for builtin-compat
 
+0.003000 - 2024-10-02
+  - change prototype of indexed to (@) to match 5.40 and newer
+  - added inf and nan functions
+  - added stringify function
+  - added load_module function
+
 0.002001 - 2023-07-30
   - change prototype of trim to ($) to match perl 5.38 and newer
   - avoid possible conflicts with builtin::Backport

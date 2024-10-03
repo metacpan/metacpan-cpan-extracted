@@ -153,8 +153,11 @@ sub parse {
     $cert->{pk_alg} = $buf->get_int8;
 
     my $key_class = 'Crypt::OpenPGP::Key::' . ($secret ? 'Secret' : 'Public');
-    my $key = $cert->{key} = $key_class->new($cert->{pk_alg}) or
-        return $class->error("Key creation failed: " . $key_class->errstr);
+    my $key = $cert->{key} = $key_class->new($cert->{pk_alg});
+    if( ! defined $key ) {
+        $cert->{unparsed_key} = $buf->get_bytes( $buf->length - $buf->offset );
+        return $cert;
+    }
 
     my @pub = $key->public_props;
     for my $e (@pub) {
@@ -222,6 +225,11 @@ sub save {
     $buf->put_int8($cert->{pk_alg});
 
     my $key = $cert->{key};
+    if( ! defined $key && defined $cert->{unparsed_key} ) {
+        $buf->put_bytes($cert->{unparsed_key});
+        return $buf->bytes;
+    }
+
     my @pub = $key->public_props;
     for my $e (@pub) {
         $buf->put_mp_int($key->$e());

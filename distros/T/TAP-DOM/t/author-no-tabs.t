@@ -58,9 +58,11 @@ my @files = (
     't/tap_dom_dontignore_lines.t',
     't/tap_dom_empty.t',
     't/tap_dom_ignore_lines.t',
+    't/tap_dom_ignore_unknown.t',
     't/tap_dom_key_values.t',
     't/tap_dom_key_values_case_insensitive.t',
     't/tap_dom_pragma.t',
+    't/tap_dom_unicode.t',
     't/tap_dom_whitespace.t'
 );
 

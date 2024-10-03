@@ -18,6 +18,7 @@ use vars qw( %PACKET_TYPES %PACKET_TYPES_BY_CLASS );
     PGP_PKT_SECRET_SUBKEY() => { class => 'Crypt::OpenPGP::Certificate',
                                  args  => [ 1, 1 ] },
     PGP_PKT_USER_ID()       => { class => 'Crypt::OpenPGP::UserID' },
+    PGP_PKT_USER_ATTRIBUTE() => { class => 'Crypt::OpenPGP::UserAttribute' },
     PGP_PKT_PUBLIC_SUBKEY() => { class => 'Crypt::OpenPGP::Certificate',
                                  args  => [ 0, 1 ] },
     PGP_PKT_COMPRESSED()    => { class => 'Crypt::OpenPGP::Compressed' },

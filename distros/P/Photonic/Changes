@@ -1,5 +1,20 @@
+- Add tests for modules ST
+- Add tensorial modules ST, to deal with anisotropic components
 0.022 2024-09-21
+- Fix mistake in Ph::WE::ST::Haydock::applyMetric
 - Fix mistake in Ph::WE::S::Haydock::applyMetric
+- Add Photonic::LE::ST::GreenP
+
+- Add Photonic::WE::ST::Metric Almost identical to Photonic::WE::S::Metric
+- Add Photonic::LE::ST::Field Almost identical to Ph::LE::S::Field
+- Add Photonic::LE::ST::EpsTensor Almost identical to Ph::LE::S::EpsTensor
+- Add Photonic::LE::ST::EpsL. Almost identical to Ph::LE::S::EpsL
+- Add tests for Photonic::LE::ST::Haydock
+- Add and mofify Photonic::LE::ST::Haydock to use tensorial epsilon
+- Add some tests for Photonic::Geometry::FromEpsilonTensor
+- Modify Photonic::Roles::Geometry so it can deal with Epsilon Tensor
+- Add Photonic::Geometry::FromEpsilonTensor
+- Add types ComplexMatrix and ComplexMatrixField, for tensorial input in dielectric functions
 - Fix bug in macroscopic response from fields in Ph::LE::NR2::Field and Ph::LE::S::Field
 - Fix skip test in geometry.t when there is no image converter
 - separate storeAllFN from stateFN

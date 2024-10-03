@@ -1,6 +1,14 @@
 Changelog for DBIx-OnlineDDL
 
-v1.0.0 2022-08-01T21:56:39
+v1.0.1 2024-10-02T18:48:27
+ - Pod::Coverage fixes (Brendan Byrd)
+ - Pull request #7: Patch - SRE-8473 (Brendan Byrd)
+ - Fix up unit tests to handle MySQL 8 / Test2 / BatchChunker changes
+   (Brendan Byrd)
+ - Update root files; clean out repo xt/ (Brendan Byrd)
+ - Add sleep before table swap for Galera/MySQL 8 (Brendan Byrd)
+
+v1.0.0 2022-08-01T21:55:54
  - Pull request #6: SRE-5588 (Brendan Byrd)
  - Update README / LICENSE / Makefile (Brendan Byrd)
  - Add a warning about missing a before_triggers hook (Brendan Byrd)
@@ -22,7 +30,8 @@ v0.930.1 2021-01-27T20:24:06
    Byrd)
 
 v0.930.0 2020-11-13T23:02:38
- - No changes found
+ - Update README (Brendan Byrd)
+ - Fix quoting issues with MySQL ansi_quotes mode (Brendan Byrd)
 
 v0.920.1 2020-05-08T19:14:18
  - Clean up cpanfile (Andrew Hewus Fresh)
@@ -32,15 +41,6 @@ v0.920.1 2020-05-08T19:14:18
 
 v0.920.0 2019-08-08T15:14:41
  - No changes found
-
-0.92 2019-08-08T15:14:41
- - Fix year in CHANGES (Brendan Byrd)
- - Version changes to 0.92 (Brendan Byrd)
- - Fix copyright years (Brendan Byrd)
- - Update version date in CHANGES (Brendan Byrd)
- - SM-1858 Fix typos in pod. (Tom Christiansen)
- - SM-1858: Use MooX::StrictConstructor to prevent attribute misspellings
-   (Brendan Byrd)
 
 0.91 2019-01-29T20:08:03
  - POD version fixes to 0.91 (Brendan Byrd)
@@ -61,6 +61,38 @@ v0.920.0 2019-08-08T15:14:41
  - SM-1647: Remove .perl-version (Brendan Byrd)
 
 0.90 2018-09-27T15:37:59
+ - No changes found
+
+v0.93.0 2020-11-13T23:02:38
+ - Update README (Brendan Byrd)
+ - Fix quoting issues with MySQL ansi_quotes mode (Brendan Byrd)
+ - Clean up cpanfile (Andrew Hewus Fresh)
+ - Clean up POD for new PodWeaver settings (Andrew Hewus Fresh)
+ - Move xt tests where they belong (Andrew Hewus Fresh)
+ - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
+ - Fix year in CHANGES (Brendan Byrd)
+ - Version changes to 0.92 (Brendan Byrd)
+ - Fix copyright years (Brendan Byrd)
+ - Update version date in CHANGES (Brendan Byrd)
+ - SM-1858 Fix typos in pod. (Tom Christiansen)
+ - SM-1858: Use MooX::StrictConstructor to prevent attribute misspellings
+   (Brendan Byrd)
+ - POD version fixes to 0.91 (Brendan Byrd)
+ - SM-1647a: Quiet the "multi-column primary key" warning for all_tables.t
+   (Brendan Byrd)
+ - SM-1647a: Fix FK renaming inconsistency in SQLite >= 3.26.0 (Brendan
+   Byrd)
+ - SM-1647a: Bump List::Utils version to 1.44 (Brendan Byrd)
+ - SM-1647 Add clarifying comments (Nathaniel Blake)
+ - SM-1647: Prep for new version 0.91 (Brendan Byrd)
+ - SM-1647: Bulletproof the statistics_info call (Brendan Byrd)
+ - SM-1647: More bulletproofing against DB errors (Brendan Byrd)
+ - SM-1647: Add 'WSREP has not yet prepared node' as a retryable error
+   (Brendan Byrd)
+ - SM-1647: Add more sleep time to retries in the retry handler (Brendan
+   Byrd)
+ - SM-1647: Add default target_time and sleep for copy_opts (Brendan Byrd)
+ - SM-1647: Remove .perl-version (Brendan Byrd)
  - CHANGES date adjustment (Brendan Byrd)
  - SM-1394: Makefile.PL cleanup (Brendan Byrd)
  - SM-1394: Use dbh_runner_do in basic example script (Brendan Byrd)
@@ -91,7 +123,3 @@ v0.920.0 2019-08-08T15:14:41
  - Skeleton framework (Brendan Byrd)
  - Add examples/basic.pl (Brendan Byrd)
  - Initial version of DBIx::OnlineDDL (Brendan Byrd)
-
-v0.93.0 2020-11-13T23:02:38
- - Update README (Brendan Byrd)
- - Fix quoting issues with MySQL ansi_quotes mode (Brendan Byrd)

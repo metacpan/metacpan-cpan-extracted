@@ -2,9 +2,6 @@ use utf8;
 package # hide from PAUSE
     CDTest::Schema::Result::Artist;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
-
 =head1 NAME
 
 CDTest::Schema::Result::Artist
@@ -36,7 +33,7 @@ __PACKAGE__->table("artist");
   is_nullable: 1
   size: 100
 
-=head2 rank
+=head2 ranking
 
   data_type: 'integer'
   default_value: 13
@@ -55,7 +52,7 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
   { data_type => "varchar", is_nullable => 1, size => 100 },
-  "rank",
+  "ranking",
   { data_type => "integer", default_value => 13, is_nullable => 0 },
   "charfield",
   { data_type => "char", is_nullable => 1, size => 10 },
@@ -81,13 +78,13 @@ __PACKAGE__->set_primary_key("artistid");
 
 =item * L</charfield>
 
-=item * L</rank>
+=item * L</ranking>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint("charfield_rank_unique", ["charfield", "rank"]);
+__PACKAGE__->add_unique_constraint("charfield_rank_unique", ["charfield", "ranking"]);
 
 =head2 C<name_unique>
 
@@ -142,11 +139,6 @@ Composing rels: L</artwork_to_artists> -> artwork_cd
 =cut
 
 __PACKAGE__->many_to_many("artwork_cds", "artwork_to_artists", "artwork_cd");
-
-
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-01-11 08:18:17
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:/QXsqYUpe46E+nYOtOagAw
-
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 1;

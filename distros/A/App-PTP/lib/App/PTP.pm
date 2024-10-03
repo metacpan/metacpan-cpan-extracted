@@ -11,7 +11,7 @@ use Data::Dumper;
 use File::Find;
 use Safe;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 $Data::Dumper::Terse = 1;  # Don't output variable names.
 $Data::Dumper::Sortkeys = 1;  # Sort the content of the hash variables.

@@ -1,5 +1,9 @@
 Revision history for Perl distribution App-PTP
 
+1.16 - 2024-30-02
+ - Add a "cheat sheet" POD to the distribution.
+ - Load a set of modules by default in the Perl environment.
+
 1.15 - 2024-09-29
  - Remove a remaining smartmatch usage from our benchmarks.
 

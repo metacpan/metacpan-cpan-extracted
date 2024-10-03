@@ -58,7 +58,7 @@
          "web" : "https://github.com/haarg/builtin-compat"
       }
    },
-   "version" : "0.002001",
+   "version" : "0.003000",
    "x_authority" : "cpan:HAARG",
    "x_breaks" : {},
    "x_serialization_backend" : "JSON::PP version 4.16"

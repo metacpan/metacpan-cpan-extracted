@@ -1,0 +1,223 @@
+=pod
+
+=head1 PTP Cheat Sheet
+
+=head2 SYNOPSIS
+
+Install with:
+
+  sudo apt-get install perl cpanminus perl-doc build-essential
+  # or
+  sudo yum install perl Perl-App-cpanminus perl-doc gcc make
+
+  sudo cpanm App::PTP -n -L /usr/local --man-pages --install-args \
+    'DESTINSTALLBIN=/usr/local/bin'
+
+Run with:
+
+  ptp file1 file2 ... [--grep re] [--substitute re subst] ... [-o out]
+
+=head2 INPUT FILES
+
+Input files can appear anywhere on the command line and are processed in the
+order in which they are given.
+
+=over 8
+
+=item C<F<filename>> (anywhere in the command line, not starting with a C<->)
+
+=item C<-> (reads from stdin)
+
+=item C<-- F<filename> ...> (for any filename)
+
+=back
+
+=head2 PIPELINE COMMANDS
+
+Pipeline commands are applied, in order, to all the input files.
+
+=over 8
+
+=item B<--g> I<regex> (B<--grep>), B<-s> I<regex> I<string> (B<--substitute>)
+
+=item B<--p> I<code> (B<-perl>): read and write C<$_> to modify the file
+
+=item B<-n> I<code>: read from C<$_>, write the return values
+
+=item B<-f> I<code> (B<--filter>): return I<true> to keep the line
+
+=item B<-e> I<code> (B<--execute>): execute once per input file
+
+=item B<-l> I<path> (B<--load>): execute the given file, once per input file
+
+=item B<-M> I<module>: load the given module
+
+=item B<--sort>, B<--ns> (B<--numeric-sort>), B<--ls>, (B<--locale-sort>),
+B<--cs> I<code> (B<--custom-sort>)
+
+=item B<-u> (B<--unique>), B<--gu> (B<--global-unique>)
+
+=item B<--head> [I<n>], B<--tail> [I<n>], B<--reverse> (B<--tac>), B<--shuffle>
+
+=item B<--eat>: discard the content of the file
+
+=item B<--ml> I<code> (B<--mark-line>): set the marker for the line with the
+return value
+
+=item B<--clear-markers>, B<--set-all-markers>
+
+=item B<--delete-marked>, B<--delete-before>, B<--delete-after>,
+B<--delete-at-offset> I<offset>
+
+=item B<--insert-before> I<string>, B<--insert-after> I<string>,
+B<--insert-at-offset> I<offset> I<string>: insert interpolated text next to marked
+lines (offset I<0> is just after)
+
+=item B<--cut> I<N>,I<N>,...: select fields according to B<-F> and concatenate
+them with B<-P>
+
+=item B<--paste> I<file>: paste with B<-P> line by line with the current content
+
+=item B<--pivot>: turn the file into a single line with B<-P>
+
+=item B<--anti-pivot>: split all lines according to B<-F>
+
+=item B<--transpose>: transpose lines and columns using B<-F> and B<-P>
+
+=item B<--nl> (B<--number-lines>), B<--pfn> (B<--prefix-file-name>)
+
+=item B<--fn> (B<--file-name>), B<--lc>, B<--line-count>: replace the content of
+the file
+
+=item B<-m> (B<--merge>): merge all the files in a single one
+
+=item B<--tee> I<filename>: duplicate the output
+
+=item B<--shell> I<command>: sends the content as input to the command
+
+=back
+
+=head2 PROGRAM BEHAVIOR
+
+Global option for the program execution.
+
+=over 8
+
+=item B<-o> I<output_file> (B<--output>), B<-a> I<output_file> (B<--append>),
+B<-i> (B<--in-place>): by default output to standard output
+
+=item B<-R>, B<--recursive>, B<--input-filter> I<code>: expand directories,
+optionally filter input files
+
+=item B<--input-encoding> I<encoding>, B<--output-encoding> I<encoding>: default
+is UTF-8
+
+=item B<--input-separator> I<separator>, B<--output-separator> I<separator>:
+default is C<\n>
+
+=item B<--eol> (B<--preserve-input-separator>), B<--fix-final-separator>
+
+=item B<-0>: set B<--input-separator> to C<NUL> and B<--output-separator> to the
+empty string.
+
+=item B<--00>: set B<--output-separator> to C<NUL>, useful with C<xargs -0>
+
+=item B<-h> (B<--help>), B<--version>: remember to have B<perldoc> installed
+
+=item B<-d> (B<--debug>), B<--abort>
+
+=item B<--preserve-perl-env>: keep environment across files
+
+=item B<--safe> [I<n>]: default is I<0>, strictest is I<2>
+
+=back
+
+=head2 PIPELINE MODES
+
+Options for the pipeline commands coming after them. Most modes have a reverse
+mode to return to the default.
+
+=over 8
+
+=item B<-I> (B<--case-insensitive>), B<-S> (B<--case-sensitive>): mode for any
+I<regex> argument, B<-S> is the default
+
+=item B<-Q> (B<--quote-regexp>), B<-E> (B<--end-quote-regexp>): disable
+interpolation in any I<regex>, I<string>, I<filename> or I<command> argument,
+B<-E> is the default
+
+=item B<-V> (B<--inverse-match>), B<-N> (B<--normal-match>): inverse behavior of
+B<--grep> and B<--filter>
+
+=item B<-L> (B<--local-match>), B<-G> (B<--global-match>): apply B<--substitute>
+once per line or as much as possible (this is the default)
+
+=item B<-C> I<code> (B<--comparator>): for B<--sort>, default is C<$a cmp $b>
+
+=item B<-F> I<regex> (B<--input-field-spec>): how to split fields, default is
+B<\s*,\*s|\t>
+
+=item B<-P> I<string> (B<--output-field-spec>): how to paste fields, default is
+a tab
+
+=item B<--default>, B<--bytes>, B<--csv>, B<--tsv>, B<--none>: set the B<-F> and
+B<-P> flags
+
+=item B<--sq> I<string> (B<--single-quote-replacement>),
+B<--dq> I<string> (B<--double-quote-replacement>), B<--ds> I<string>
+(B<--dollar-sigil-replacement>): replace the given character or string by C<'>,
+C<">, or C<$> in all I<code> arguments
+
+=item B<--re> I<engine>, B<--regex-engine>: use the specified regex engine (e.g.
+I<RE2>, I<PCRE>, I<TRE>, I<GNU>, etc.) if installed
+
+=item B<-X> (B<--fatal-error>), B<--ignore-error>: die on error in B<--perl>,
+B<-n> and B<--filter>
+
+=back
+
+=head2 PERL ENVIRONMENT
+
+Variables and functions available to I<code> arguments as well as I<regex>,
+I<string>, I<filename>, and I<command> ones (unless B<-Q> has been passed).
+
+=over 8
+
+=item B<Dumper>, B<fileparse>, B<basename>, B<dirname>, B<copy>, B<move>,
+B<make_path>, B<remove_tree>, B<canonpath>, B<any>, B<all>, B<none>, B<min>,
+B<max>, B<sum>, B<pi>, B<acos>, B<expand>, B<unexpand>, B<$tabstop>, B<wrap>,
+B<fill>, B<$columns>, ...
+
+=item B<$_>: current line content (I<RW>)
+
+=item B<$f>, B<$F>: current file name, current absolute file name (I<RO>)
+
+=item B<$n>: current line number (same as standard B<$.>)  (I<RO>)
+
+=item B<$N>: number of lines in the current file (I<RO>)
+
+=item B<$m>: marker of the current line (I<RW>)
+
+=item B<@m>: markers for all the lines, current line is at index 0 (I<RW>)
+
+=item B<$I>: 1-based index of the file being processed (I<RW>)
+
+=item B<ss> I<start>[, I<len>[, I<$var>]]: like C<substr> but returns C<''>
+instead of C<undef>.
+
+=item B<pf> I<format>[, I<args...>]: like C<$_ = sprintf I<format>, I<arg...>>
+
+=item B<spf> I<format>[, I<args...>]: like C<sprintf>
+
+=back
+
+=head2 AUTHOR AND LICENCE
+
+Copyright 2019-2024 Mathias Kende (L<mailto:mathias@cpan.org>).
+
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+See more in the full documentation at L<https://metacpan.org/pod/ptp>.
+
+=cut

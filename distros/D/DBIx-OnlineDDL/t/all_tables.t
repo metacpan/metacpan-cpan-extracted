@@ -58,6 +58,12 @@ foreach my $source_name (sort @source_names) {
         $orig_table_sql =~ s/ AUTO_INCREMENT=\K\d+/###/;
         $new_table_sql  =~ s/ AUTO_INCREMENT=\K\d+/###/;
 
+        if ($dbms_name eq 'MySQL') {
+            # This can sometimes disappear in MySQL 8, since it considers utf8mb4 the default
+            $orig_table_sql =~ s/ CHARACTER SET utf8mb4//g;
+            $new_table_sql  =~ s/ CHARACTER SET utf8mb4//g;
+        }
+
         is $new_table_sql, $orig_table_sql,  "New table SQL for `$table_name` matches the old one" or do {
             diag "NEW: $new_table_sql";
             diag "OLD: $orig_table_sql";

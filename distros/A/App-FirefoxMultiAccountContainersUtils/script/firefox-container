@@ -7,9 +7,9 @@ use Log::ger::Screen;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-06'; # DATE
+our $DATE = '2024-10-01'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 my $container;
 if (defined(my $c = $ENV{FIREFOX_CONTAINER})) {
@@ -50,7 +50,7 @@ firefox-container - Firefox wrapper to open URL's in a specific container
 
 =head1 VERSION
 
-This document describes version 0.017 of firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2023-06-06.
+This document describes version 0.018 of firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2024-10-01.
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

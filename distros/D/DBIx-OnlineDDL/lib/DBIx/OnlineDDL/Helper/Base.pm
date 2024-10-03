@@ -3,12 +3,12 @@ package DBIx::OnlineDDL::Helper::Base;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for RDBMS-specific code
 use version;
-our $VERSION = 'v1.0.0'; # VERSION
+our $VERSION = 'v1.0.1'; # VERSION
 
 use v5.10;
 use Moo;
 
-use Types::Standard qw( InstanceOf );
+use Types::Standard qw( InstanceOf Num );
 
 use DBI::Const::GetInfoType;
 use Sub::Util qw( set_subname );
@@ -58,6 +58,10 @@ has online_ddl => (
     },
 );
 
+#pod =for Pod::Coverage dbms_name progress
+#pod
+#pod =cut
+
 # Other "handles"
 sub dbms_name { shift->vars->{dbms_name}    }  # used for die errors only
 sub progress  { shift->vars->{progress_bar} }
@@ -106,7 +110,12 @@ sub null_safe_equals_op { 'IS NOT DISTINCT FROM' }
 #pod
 #pod =cut
 
-sub mmver {
+has mmver => (
+    is  => 'lazy',
+    isa => Num,
+);
+
+sub _build_mmver {
     my $self = shift;
     my ($mmver) = ($self->dbh->get_info($GetInfoType{SQL_DBMS_VER}) =~ /(\d+\.\d+(?:\.\d+)?)/);
     return version->parse("v$mmver")->numify;
@@ -492,7 +501,7 @@ DBIx::OnlineDDL::Helper::Base - Private OnlineDDL helper for RDBMS-specific code
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 DESCRIPTION
 
@@ -509,6 +518,8 @@ module for their RDBMS and submit it to us.  Or fix bugs with the existing helpe
 
 Points back to the parent L<DBIx::OnlineDDL>.  This comes with a bunch of handles to be
 able to call common methods with fewer keystrokes.
+
+=for Pod::Coverage dbms_name progress
 
 =head1 PRIVATE CLASS "ATTRIBUTES"
 
@@ -687,7 +698,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2022 by Grant Street Group.
+This software is Copyright (c) 2018 - 2024 by Grant Street Group.
 
 This is free software, licensed under:
 

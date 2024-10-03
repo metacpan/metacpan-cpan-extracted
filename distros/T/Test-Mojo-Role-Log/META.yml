@@ -25,7 +25,9 @@ requires:
   Role::Tiny: '0'
   perl: '5.022000'
 resources:
-  bugtracker: https://github.com/oetiker/mojo-test-log/issues
-  repository: https://github.com/oetiker/mojo-test-log
-version: v0.2.1
+  bugtracker: https://github.com/oposs/test-mojo-role-log/issues
+  repository: https://github.com/oposs/test-mojo-role-log
+version: v0.2.3
+x_contributors:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

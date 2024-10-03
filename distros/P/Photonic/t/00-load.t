@@ -40,6 +40,7 @@ Photonic
 Photonic::CharacteristicFunctions
 Photonic::Geometry::FromB
 Photonic::Geometry::FromEpsilon
+Photonic::Geometry::FromEpsilonTensor
 Photonic::Geometry::FromImage2D
 Photonic::LE::NP::EpsL
 Photonic::LE::NP::EpsTensor
@@ -55,6 +56,10 @@ Photonic::LE::S::EpsL
 Photonic::LE::S::EpsTensor
 Photonic::LE::S::Field
 Photonic::LE::S::Haydock
+Photonic::LE::ST::EpsL
+Photonic::LE::ST::EpsTensor
+Photonic::LE::ST::Field
+Photonic::LE::ST::Haydock
 Photonic::Roles::EpsFromGeometry
 Photonic::Roles::EpsL
 Photonic::Roles::EpsTensor
@@ -77,7 +82,14 @@ Photonic::WE::S::Green
 Photonic::WE::S::GreenP
 Photonic::WE::S::Haydock
 Photonic::WE::S::Metric
+Photonic::WE::ST::Field
+Photonic::WE::ST::Green
+Photonic::WE::ST::GreenP
+Photonic::WE::ST::Haydock
+Photonic::WE::ST::Metric
 	);
+
+
     foreach(@mods){
 	use_ok( $_ ) || print "Bail out!\n";
     }

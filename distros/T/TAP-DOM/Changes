@@ -1,5 +1,10 @@
 Revision history for TAP-DOM
 
+0.99      2024-10-02
+        - new option 'utf8' to interpret TAP source and potentially
+          filter out illegal UTF-8 characters and the binary \0
+        - new option 'ignoreunknown' to not include non-TAP lines in DOM
+
 0.98      2023-03-19
         - extend 'noempty_tap' logic to "not empty but no tap lines"
           (not relevant when 'preprocess_tap' is set)

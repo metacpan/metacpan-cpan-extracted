@@ -35,6 +35,7 @@ use PDL::NiceSlice;
 use Photonic::Geometry::FromB;
 use Photonic::Geometry::FromImage2D;
 use Photonic::Geometry::FromEpsilon;
+use Photonic::Geometry::FromEpsilonTensor;
 use Photonic::Utils qw(lu_solve);
 use lib 't/lib';
 use TestUtils;
@@ -94,6 +95,7 @@ ok(agree($g->Vec2LC_G(zeroes(11,11)->ndcoords->r2C)->re,
    "Vec2LC");
 ok(agree($g->LC2Vec_G(ones(11,11)->r2C)->re, $g->GNorm), "LC2Vec_G");
 
+
 SKIP: {
      skip "image converter not found", 7 unless rpiccan("PNG");
      my $gw=Photonic::Geometry::FromImage2D->new(path=>'data/white.png');
@@ -114,5 +116,12 @@ my $ge=Photonic::Geometry::FromEpsilon->new(epsilon=>$eps);
 ok(defined $ge, "Create geometry from epsilon");
 is($ge->ndims, 2, "Number of dimensions");
 ok(agree(pdl($ge->dims),pdl(11,11)), "Size of each dimension");
+
+my $epst=r2C(zeroes(2,2,11,11));
+my $get=Photonic::Geometry::FromEpsilonTensor->new(epsilon=>$epst);
+ok(defined $get, "Create geometry from epsilon tensor");
+is($get->ndims, 2, "Number of dimensions");
+ok(agree(pdl($get->dims),pdl(11,11)), "Size of each dimension");
+
 
 done_testing;

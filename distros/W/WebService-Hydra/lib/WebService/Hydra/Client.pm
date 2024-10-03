@@ -18,7 +18,7 @@ use constant OK_STATUS_CODE          => 200;
 use constant OK_NO_CONTENT_CODE      => 204;
 use constant BAD_REQUEST_STATUS_CODE => 400;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 field $http;
 field $jwks;
@@ -354,7 +354,7 @@ method validate_id_token ($id_token) {
     try {
         my $payload = decode_jwt(
             token    => $id_token,
-            kid_keys => $jwks
+            kid_keys => $self->jwks
         );
         return $payload;
     } catch ($e) {
@@ -385,8 +385,8 @@ method validate_token ($token) {
         token      => $token,
         verify_iat => 1,
         verify_exp => 1,
-        verify_iss => $oidc_config->{issuer},
-        kid_keys   => $jwks
+        verify_iss => $self->oidc_config->{issuer},
+        kid_keys   => $self->jwks
     );
     return $payload;
 }

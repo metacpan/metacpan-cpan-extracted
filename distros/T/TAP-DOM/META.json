@@ -4,7 +4,7 @@
       "Steffen Schwigon <ss5@renormalist.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -36,6 +36,7 @@
             "Archive::Tar" : "0",
             "Class::XSAccessor" : "1.05",
             "Data::Dumper" : "0",
+            "Encode" : "0",
             "Exporter" : "0",
             "IO::String" : "0",
             "IO::Zlib" : "0",
@@ -57,8 +58,35 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0.88",
-            "blib" : "1.01"
+            "blib" : "1.01",
+            "utf8" : "0"
          }
+      }
+   },
+   "provides" : {
+      "TAP::DOM" : {
+         "file" : "lib/TAP/DOM.pm",
+         "version" : "0.99"
+      },
+      "TAP::DOM::Archive" : {
+         "file" : "lib/TAP/DOM/Archive.pm",
+         "version" : "0.99"
+      },
+      "TAP::DOM::Config" : {
+         "file" : "lib/TAP/DOM/Config.pm",
+         "version" : "0.99"
+      },
+      "TAP::DOM::DocumentData" : {
+         "file" : "lib/TAP/DOM/DocumentData.pm",
+         "version" : "0.99"
+      },
+      "TAP::DOM::Entry" : {
+         "file" : "lib/TAP/DOM/Entry.pm",
+         "version" : "0.99"
+      },
+      "TAP::DOM::Summary" : {
+         "file" : "lib/TAP/DOM/Summary.pm",
+         "version" : "0.99"
       }
    },
    "release_status" : "stable",
@@ -74,7 +102,7 @@
          "web" : "http://github.com/renormalist/tap-dom"
       }
    },
-   "version" : "0.98",
+   "version" : "0.99",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022000"
@@ -94,47 +122,47 @@
                }
             },
             "name" : "@SCHWIGON/@Basic/GatherDir",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@SCHWIGON/@Basic/PruneCruft",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@SCHWIGON/@Basic/ManifestSkip",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@SCHWIGON/@Basic/MetaYAML",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@SCHWIGON/@Basic/License",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "@SCHWIGON/@Basic/Readme",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@SCHWIGON/@Basic/ExtraTests",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@SCHWIGON/@Basic/ExecDir",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@SCHWIGON/@Basic/ShareDir",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -144,47 +172,74 @@
                }
             },
             "name" : "@SCHWIGON/@Basic/MakeMaker",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@SCHWIGON/@Basic/Manifest",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@SCHWIGON/@Basic/TestRelease",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@SCHWIGON/@Basic/ConfirmRelease",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@SCHWIGON/@Basic/UploadToCPAN",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@SCHWIGON/MetaConfig",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@SCHWIGON/MetaJSON",
-            "version" : "6.024"
+            "version" : "6.030"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@SCHWIGON/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.030"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : "1",
+                  "inherit_version" : "1",
+                  "meta_noindex" : "1"
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000026",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@SCHWIGON/MetaProvides::Package",
+            "version" : "2.004003"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "@SCHWIGON/PkgVersion",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@SCHWIGON/PodSyntaxTests",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -202,7 +257,9 @@
                   "script_finder" : [
                      ":PerlExecFiles"
                   ],
-                  "skips" : []
+                  "skips" : [
+                     "Test::TAPv13"
+                  ]
                }
             },
             "name" : "@SCHWIGON/Test::Compile",
@@ -231,7 +288,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@SCHWIGON/MetaResources",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Authority",
@@ -360,7 +417,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@SCHWIGON/AutoPrereqs",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Describe",
@@ -375,7 +432,7 @@
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@SCHWIGON/NextRelease",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
@@ -455,7 +512,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.98",
+                  "tag" : "v0.99",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
@@ -488,7 +545,7 @@
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "ManifestSkip",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -499,62 +556,67 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Encoding",
             "name" : "Encoding",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.024"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.024"
+            "version" : "6.030"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@SCHWIGON/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "6.030"
          }
       ],
       "zilla" : {
@@ -562,7 +624,7 @@
          "config" : {
             "is_trial" : "0"
          },
-         "version" : "6.024"
+         "version" : "6.030"
       }
    },
    "x_authority" : "cpan:SCHWIGON",

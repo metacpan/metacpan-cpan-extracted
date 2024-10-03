@@ -1,5 +1,5 @@
 package Photonic::WE::S::Haydock;
-$Photonic::WE::S::Haydock::VERSION = '0.022';
+$Photonic::WE::S::Haydock::VERSION = '0.023';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::Haydock
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,8 @@ sub applyMetric {
     my $g=$self->metric->value;
     #$g is xy:xy:pm:nx:ny
     #real or complex matrix times complex vector
-    my $gpsi=($g*$psi(:,*1)) #xy:xy:pm:nx:ny
+    my $gpsi=($g  #xy:xy:pm:nx:ny
+	      *$psi(:,*1)) #xy:xy:pm:nx:ny
 	->sumover; #xy:pm:nx:ny
     return $gpsi;
 }
@@ -200,7 +201,7 @@ sub changesign { #don't change sign
 sub _build_firstState { #\delta_{G0}
     my $self=shift;
     my $v=PDL->zeroes(2,@{$self->dims})->r2C; #pm:nx:ny...
-    my $arg=join ',', ':', ("(0)") x $self->ndims; #(0),(0),... ndims+1 times
+    my $arg=join ',', ':', ("(0)") x $self->ndims; #:,(0),(0),... ndims times
     $v->slice($arg).=1/sqrt(2);
     my $e=$self->polarization; #xy
     my $d=$e->dim(0);
@@ -213,9 +214,9 @@ sub _build_firstState { #\delta_{G0}
     $e=$e/sqrt($modulus2);
     $self->_normalizedPolarization($e);
     #I'm using the same polarization for k and for -k. Could be
-    #different (for chiral systems, for example
-    my $phi=$e*$v(*1); #initial state ordinarily normalized
-                       # xy:pm:nx:ny
+    #different (for chiral systems, for example (maybe I should conjugate to avoid null states)
+    my $phi=$e*$v(*1); #initial state ordinarily normalized #suspicious, what about circular polarization?
+    # xy:pm:nx:ny
     return $phi;
 }
 

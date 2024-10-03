@@ -1,5 +1,5 @@
 package Photonic::WE::S::GreenP;
-$Photonic::WE::S::GreenP::VERSION = '0.022';
+$Photonic::WE::S::GreenP::VERSION = '0.023';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::GreenP
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 COPYRIGHT NOTICE
 
@@ -44,7 +44,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =head1 SYNOPSIS
 
    use Photonic::WE::S::GreenP;
-   my $green=Photonic::WE::S::GreepP->new(haydock=>$h, nh=>$nh);
+   my $green=Photonic::WE::S::GreenP->new(haydock=>$h, nh=>$nh);
    my $greenProjection=$green->Gpp;
    my $WaveProjection=$green->waveOperator;
    my $EpsTensor=$green->epsilon;

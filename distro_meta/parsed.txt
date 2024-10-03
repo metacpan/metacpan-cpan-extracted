@@ -94403,3 +94403,15 @@ B/BR/BRTASTIC/Rex-Commands-PerlSync-0.001.tar.gz
 K/KI/KIMOTO/SPVM-0.990013.tar.gz
 C/CE/CEEJAY/Sumu-Perl-Modules-0.4.2.tar.gz
 C/CH/CHOROBA/Syntax-Construct-1.038.tar.gz
+P/PE/PERLANCAR/App-FirefoxMultiAccountContainersUtils-0.018.tar.gz
+M/MA/MATHIAS/Dist-Setup/App-PTP-1.16.tar.gz
+H/HA/HAARG/builtin-compat-0.003000.tar.gz
+T/TI/TIMLEGGE/Crypt-OpenPGP-1.15.tar.gz
+G/GS/GSG/DBIx-OnlineDDL-v1.0.1.tar.gz
+L/LI/LION/File-ValueFile-v0.01.tar.gz
+O/OA/OALDERS/HTTP-BrowserDetect-3.41.tar.gz
+S/SF/SFOBERSKI/IPCamera-Reolink-1.04.tar.gz
+W/WL/WLMB/Photonic-0.023.tar.gz
+S/SC/SCHWIGON/TAP-DOM-0.99.tar.gz
+O/OE/OETIKER/Test-Mojo-Role-Log-0.2.3.tar.gz
+D/DE/DERIV/WebService-Hydra-0.002.tar.gz

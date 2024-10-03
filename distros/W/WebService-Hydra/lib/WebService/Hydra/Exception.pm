@@ -11,7 +11,7 @@ use Module::Load;
 use JSON::MaybeUTF8 qw(encode_json_text);
 use Log::Any        qw($log);
 
-our $VERSION = '0.001'; ## VERSION
+our $VERSION = '0.002'; ## VERSION
 
 =head1 NAME
 
