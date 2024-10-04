@@ -6,8 +6,10 @@ $INC{'Template/EmbeddedPerl/Test/FF.pm'} = __FILE__;
 BEGIN {
   use Test::Most;
   eval "
+    use V5.40;
     use Valiant::HTML::Util::View;
     use Valiant::HTML::Util::Form;
+    use strictures;
   ";
   plan skip_all => 'Valiant required for these tests' if $@;
 }

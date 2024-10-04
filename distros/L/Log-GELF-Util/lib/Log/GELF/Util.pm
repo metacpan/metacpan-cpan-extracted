@@ -20,7 +20,7 @@ our (
     $LEVEL_NAME_REGEX,
 );
 
-$VERSION = "0.96";
+$VERSION = "1.02";
 
 use Params::Validate qw(
     validate
@@ -164,7 +164,7 @@ sub validate_message {
 
     foreach my $key ( keys %p ) {
 
-        if ( ! $key =~ /^[\w\.\-]+$/ ) {
+        if ( ! ($key =~ /^[\w\.\-]+$/) ) {
             die "invalid field name '$key'";
         }
 
@@ -686,13 +686,13 @@ fields are associated with a false value.
 
 =head1 LICENSE
 
-Copyright (C) Strategic Data.
+Copyright (C) Logicly.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Adam Clarke E<lt>adamc@strategicdata.com.auE<gt>
+Adam Clarke E<lt>adamc@logicly.com.auE<gt>
 
 =cut

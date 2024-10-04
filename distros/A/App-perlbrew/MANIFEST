@@ -13,6 +13,7 @@ lib/App/Perlbrew/Path.pm
 lib/App/Perlbrew/Path/Installation.pm
 lib/App/Perlbrew/Path/Installations.pm
 lib/App/Perlbrew/Path/Root.pm
+lib/App/Perlbrew/Sys.pm
 lib/App/Perlbrew/Util.pm
 lib/App/perlbrew.pm
 script/perlbrew
@@ -86,7 +87,9 @@ t/installation.t
 t/installation2.t
 t/installation3.t
 t/list_modules.t
+t/sys.t
 t/test.tar.gz
 t/test2_helpers.pl
 t/unit-files-are-the-same.t
 t/util-find-similar-tokens.t
+t/util-looks-like.t

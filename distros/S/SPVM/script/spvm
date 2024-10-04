@@ -14,7 +14,8 @@ SPVM::Builder::Util::getopt
   'B|build-dir=s'   => \my $build_dir,
   
   # spvm only
-  'e=s' => \my $program_source,
+  'E=s' => \my $source,
+  'e=s' => \my $source_in_main,
   '-M=s' => \my @use_class_names,
 ;
 
@@ -34,36 +35,63 @@ if (defined $build_dir) {
   $ENV{SPVM_BUILD_DIR} = $build_dir;
 }
 
-my $class_name = shift;
+my $script_name = shift;
 
-if (!defined $class_name && !defined $program_source) {
+if (!defined $script_name && !defined $source_in_main && !defined $source) {
   die SPVM::Builder::Util::extract_usage;
+}
+
+if (defined $script_name && defined $source_in_main) {
+  die "[spvm command]Specifying both <script_name> and -e option is not allowed.";
+}
+
+if (defined $script_name && defined $source) {
+  die "[spvm command]Specifying both <script_name> and -E option is not allowed.";
+}
+
+if (defined $source_in_main && defined $source) {
+  die "[spvm command]Specifying both -E option and -e option is not allowed.";
+}
+
+if (defined $source_in_main) {
+  $0 = "-e";
+  
+  $source = "
+class {
+static method main : void () {
+#line 1
+$source_in_main
+}
+}
+";
+
+}
+elsif (defined $script_name) {
+  
+  $0 = $script_name;
+  
+  open my $script_fh, '<', $script_name
+    or die "Can't open file \"$script_name\":$!";
+    
+  $source = do { local $/; <$script_fh> };
+  
+  $source = "#file \"$script_name\"\x{A}$source";
 }
 
 for my $use_class_name (@use_class_names) {
   SPVM::Global::build_class($use_class_name, __FILE__, __LINE__);
 }
 
-if (defined $class_name) {
-  SPVM::Global::build_class($class_name, __FILE__, __LINE__);
-}
-
 SPVM::Global::build_class('Native', __FILE__, __LINE__);
+SPVM::Global::build_class('Native::MethodCall', __FILE__, __LINE__);
 
-if (defined $program_source) {
-  my $current_compiler = SPVM::Native->get_current_compiler;
-  
-  $current_compiler->set_start_file(__FILE__);
-  $current_compiler->set_start_line(__LINE__ + 1);
-  $current_compiler->eval_string($program_source);
-}
-else {
-  SPVM::Native->check_bootstrap_method($class_name);
-  
-  my $spvm_class_name = "SPVM::$class_name";
-  
-  $spvm_class_name->main;
-}
+my $anon_class_name = SPVM::Global::build_anon_class($source, __FILE__, __LINE__);
+
+SPVM::Native->check_bootstrap_method($anon_class_name);
+
+my $spvm_anon_class_name = "SPVM::$anon_class_name";
+
+$spvm_anon_class_name->main;
 
 =encoding utf8
 
@@ -77,26 +105,32 @@ The spvm command executes SPVM programs.
 
 =head1 Usage
 
-  usage: spvm [<options>] <class name>
+  usage: spvm [<options>] <script_name>
     
-    spvm -I lib/SPVM Myapp
-  
+    spvm myapp.spvm
+    
   options:
     -h, --help                     Shows this message
     -v, --version                  Shows the version
     -I, --include-dir <directory>  Adds a include directory
     -B, --build-dir <directory>    Build diretory
-    -e <source>                    Executes a program source code
+    -e <source>                    Executes a program source code in main method.
 
 =head1 Details
 
-  spvm [<options>] <class name>
+  spvm [<options>] <script_name>
 
 The C<spvm> command executes a SPVM program.
 
 C<E<lt>optionsE<gt>> are L<options|/"Options">.
 
-C<E<lt>class nameE<gt>> is a class name that contains a L<bootstrap method|SPVM::Document::Language::Class/"Bootstrap Method">.
+C<E<lt>script_nameE<gt>> is a script name that contains a L<bootstrap method|SPVM::Document::Language::Class/"Bootstrap Method"> in an L<anon class|SPVM::Document::Language::Class/"Anon Class">.
+
+  class {
+    static method main : void () {
+      
+    }
+  }
 
 See L<Class Search Directories|SPVM::Document::Language::Class/"Class Search Directories"> about default class search directories.
 
@@ -156,13 +190,21 @@ Sets L<SPVM_BUILD_DIR|SPVM::Document::EnvironmentVariables/"SPVM_BUILD_DIR"> env
 
 Same as L</"--build-dir">.
 
+=head2 -E
+
+  -E <source>
+
+Executes a source code E<lt>sourceE<gt>.
+
+Examples:
+
+  spvm -E 'class { static method main : void () { say "Hello World!"; } }';
+
 =head2 -e
 
   -e <source>
 
-Executes a program from the source string E<lt>sourceE<gt>.
-
-C<E<lt>sourceE<gt>> is exceuted by L<Native::Compiler#eval_string|SPVM::Native::Compiler/"eval_string">.
+Executes a source code E<lt>sourceE<gt> in C<main> method.
 
 Examples:
 

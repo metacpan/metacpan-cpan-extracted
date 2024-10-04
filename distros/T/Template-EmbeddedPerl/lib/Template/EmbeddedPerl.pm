@@ -1,6 +1,6 @@
 package Template::EmbeddedPerl;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001005';
 $VERSION = eval $VERSION;
 
 use warnings;

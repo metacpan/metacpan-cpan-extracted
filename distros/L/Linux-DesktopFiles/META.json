@@ -1,10 +1,10 @@
 {
    "abstract" : "Fast parsing of the Linux desktop files.",
    "author" : [
-      "Daniel \"Trizen\" Șuteu <trizenx@gmail.com>"
+      "Daniel Șuteu <trizen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
@@ -28,7 +28,7 @@
    "provides" : {
       "Linux::DesktopFiles" : {
          "file" : "lib/Linux/DesktopFiles.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       }
    },
    "release_status" : "stable",
@@ -38,12 +38,12 @@
       },
       "homepage" : "https://github.com/trizen/Linux-DesktopFiles",
       "license" : [
-         "http://opensource.org/licenses/artistic-license-2.0.php"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
          "url" : "https://github.com/trizen/Linux-DesktopFiles"
       }
    },
-   "version" : "0.25",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.26",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

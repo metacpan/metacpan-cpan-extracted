@@ -1,3 +1,70 @@
+0.990015 2023-10-04
+  [Exception Message Improvement]
+    * An exception message in an array access is improved.
+      
+      [After]
+      An array access failed. The index is out of range.
+  [Incompatible Changes]
+    * Remove deprecated <class_name> argument in spvm command. This is a big imcompatible change, but without this, the bug that FindBin->Bin do not work well will be not fixed.
+    * Remove deprecated <class_name> argument in spvmcc command. This is a big imcompatible change, but without this, the bug that FindBin->Bin do not work well will be not fixed.
+  [New Features]
+    * Add -E option to spvm command.
+    
+0.990014 2023-10-04
+  [New Feature]
+    * spvm command support script name. Currently script name must start with [a-z] or contain / or \ because of class name argument is not removed.
+      
+      spvm path/foo.spvm
+      spvm foo.spvm
+      spvm foo
+      
+      the script contains main method in an anon class.
+      
+        class {
+          static method main : void () {
+            
+          }
+        }
+      
+    * spvmcc command support script name. Currently script name must start with [a-z] or contain / or \ because of class name argument is not removed.
+      
+      spvmcc path/foo.spvm
+      spvmcc foo.spvm
+      spvmcc foo
+      
+      the script contains main method in an anon class.
+      
+        class {
+          static method main : void () {
+            
+          }
+        }
+      
+  [Deprecation]
+    * Deprecate spvm command's class name argument.
+    
+      spvm Foo
+      
+      this will be changed to script name in a future release.
+      
+      spvm path/foo.spvm
+    
+    * Deprecate spvmcc command's class name argument.
+    
+      spvmcc Foo
+      
+      this will be changed to script name in a future release.
+      
+      spvmcc path/foo.spvm
+      
+  [Improve Compilation Error Messages]
+    * Improve a compilation message in file derective.
+      
+      A file directive must start with '\"'.
+  [Internal Bug Fix]
+    * Fix a bug that compile_with_exit do not receive the file and line in arguments in SPVM::Global::build_class.
+  [Bug Fix]
+    * Fix a bug that spvm command -e option do not work well in precompilation and native methods.
 0.990013 2023-10-02
   [New Features]
     * Add Fn#pack method.

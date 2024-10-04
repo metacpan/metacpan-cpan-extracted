@@ -1,7 +1,7 @@
 ---
 abstract: "Utility functions for Graylog's GELF format."
 author:
-  - 'Adam Clarke <adamc@strategicdata.com.au>'
+  - 'Adam Clarke <adamc@logicly.com.au>'
 build_requires:
   Test::Exception: '0'
   Test::More: '0.98'
@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   Log::GELF::Util:
     file: lib/Log/GELF/Util.pm
-    version: '0.96'
+    version: '1.02'
 requires:
   JSON::MaybeXS: '0'
   Math::Random::MT: '0'
@@ -38,11 +38,9 @@ requires:
   Time::HiRes: '0'
   perl: '5.010'
 resources:
-  bugtracker: https://github.com/strategicdata/log-gelf-util/issues
-  homepage: https://github.com/strategicdata/log-gelf-util
-  repository: git://github.com/strategicdata/log-gelf-util.git
-version: '0.96'
-x_contributors:
-  - 'Adam Clarke <adam.clarke@strategicdata.com.au>'
-  - 'Adam Clarke <adam@clarke.id.au>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  bugtracker: https://github.com/logicly-au/log-gelf-util/issues
+  homepage: https://github.com/logicly-au/log-gelf-util
+  repository: https://github.com/logicly-au/log-gelf-util.git
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

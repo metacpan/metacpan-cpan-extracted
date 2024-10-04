@@ -1,4 +1,4 @@
-class MyExeCompileError {
+class {
   static method main : int () {
     my $foo;
   }

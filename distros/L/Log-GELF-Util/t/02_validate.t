@@ -58,7 +58,7 @@ throws_ok{
         'bad name'     => 'to the bone.',
     );
 }
-qr/invalid field 'bad name'.*/,
+qr/invalid field name 'bad name'.*/,
 'bad field check 2';
 
 allow_warnings 1; #throws legit warnings
@@ -97,7 +97,7 @@ like( warning {
     validate_message(
         host           => 1,
         short_message  => 1,
-        line       => 1,
+        line           => 1,
     );
 },
 qr/^line is deprecated.*/,
@@ -135,7 +135,7 @@ lives_ok{
     );
 }
 'numeric level';
-is($msg->{level},       2, 'default level');
+is($msg->{level}, 2, 'default level');
 
 lives_ok{
     $msg = validate_message(

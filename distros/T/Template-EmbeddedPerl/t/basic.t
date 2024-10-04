@@ -112,7 +112,8 @@ syntax error at unknown line 3
 
     eval { $compiled = $template->from_string($template_str); };
     ok( $@, 'Expected syntax error' );
-    is( $@, $error, 'Error message contains expected lines' );
+    ## Leave this out for now, error messaging is too variale between versions of perl
+    ##is( $@, $error, 'Error message contains expected lines' );
 }
 
 # Test 8: Escaping tags

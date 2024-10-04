@@ -1,5 +1,19 @@
 Revision history for Perl extension Log-GELF-Util
 
+1.02 2024-10-04T00:23:06Z
+
+   - reflect Logicly rebrand of Strategic Data
+
+1.01 2024-10-03T02:48:23Z
+
+   - update github.com repo name
+   - minor code formatting tidy 
+
+1.00 2024-10-02T06:50:12Z
+
+   - fix build failure due to new bleadperl linting
+   - bump version to 1.00
+
 0.96 2016-03-01T12:49:34Z
 
     - added ability to specify message id when chunking
@@ -28,4 +42,3 @@ Revision history for Perl extension Log-GELF-Util
 0.90 2016-02-24T04:55:07Z
 
     - original version
-

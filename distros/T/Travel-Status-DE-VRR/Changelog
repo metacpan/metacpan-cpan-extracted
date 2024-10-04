@@ -1,4 +1,10 @@
+Travel::Status::DE::VRR 3.01 - Thu Oct 03 2024
+
+    * Fix Departure->route_interesting
+    * efa-m: Add --json option
+
 Travel::Status::DE::VRR 3.00 - Sun Sep 29 2024
+
     * Drop XML::LibXML dependency
     * New dependencies: DateTime::Format::Strptime, JSON
     * Switch API language from XML to JSON

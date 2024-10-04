@@ -5,11 +5,12 @@ use warnings;
 use 5.010;
 
 use DateTime;
+use List::Util qw(any);
 use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 
 Travel::Status::DE::EFA::Departure->mk_ro_accessors(
 	qw(countdown datetime delay destination is_cancelled key line lineref mot
@@ -197,7 +198,7 @@ sub route_interesting {
 
 	for my $stop (@via) {
 		if (
-			$stop->name_suf =~ m{ Bf | Hbf | Flughafen | Hauptbahnhof
+			$stop->name =~ m{ Bf | Hbf | Flughafen | [Bb]ahnhof
 				| Krankenhaus | Klinik | (?: S $ ) }ox
 		  )
 		{
@@ -230,11 +231,11 @@ sub route_interesting {
 
 		while ( @via_show < $max_parts and @via_main ) {
 			my $stop = shift(@via_main);
-
-			# FIXME cannot smartmatch $stop since it became an object
-			#			if ( $stop ~~ \@via_show or $stop == $last_stop ) {
-			#				next;
-			#			}
+			if ( any { $_->name eq $stop->name } @via_show
+				or $stop->name eq $last_stop->name )
+			{
+				next;
+			}
 			push( @via_show, $stop );
 		}
 	}
@@ -245,7 +246,18 @@ sub route_interesting {
 sub TO_JSON {
 	my ($self) = @_;
 
-	return { %{$self} };
+	my $ret = { %{$self} };
+
+	delete $ret->{strp_stopseq};
+	delete $ret->{strp_stopseq_s};
+
+	for my $k (qw(datetime rt_datetime sched_datetime)) {
+		if ( $ret->{$k} ) {
+			$ret->{$k} = $ret->{$k}->epoch;
+		}
+	}
+
+	return $ret;
 }
 
 1;
@@ -269,7 +281,7 @@ departure received by Travel::Status::DE::EFA
 
 =head1 VERSION
 
-version 3.00
+version 3.01
 
 =head1 DESCRIPTION
 

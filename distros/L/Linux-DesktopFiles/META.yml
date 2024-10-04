@@ -1,12 +1,12 @@
 ---
 abstract: 'Fast parsing of the Linux desktop files.'
 author:
-  - 'Daniel "Trizen" Șuteu <trizenx@gmail.com>'
+  - 'Daniel Șuteu <trizen@cpan.org>'
 build_requires: {}
 configure_requires:
   Module::Build: '0'
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,13 +15,13 @@ name: Linux-DesktopFiles
 provides:
   Linux::DesktopFiles:
     file: lib/Linux/DesktopFiles.pm
-    version: '0.25'
+    version: '0.26'
 requires:
   perl: '5.014'
 resources:
   bugtracker: https://github.com/trizen/Linux-DesktopFiles/issues
   homepage: https://github.com/trizen/Linux-DesktopFiles
-  license: http://opensource.org/licenses/artistic-license-2.0.php
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/Linux-DesktopFiles
-version: '0.25'
+version: '0.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

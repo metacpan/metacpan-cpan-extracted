@@ -18,11 +18,12 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Exporter" => 0,
     "ExtUtils::Installed" => 0,
+    "Pod::Html" => 0,
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.4.2",
+  "VERSION" => "0.4.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,6 +33,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Exporter" => 0,
   "ExtUtils::Installed" => 0,
+  "Pod::Html" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

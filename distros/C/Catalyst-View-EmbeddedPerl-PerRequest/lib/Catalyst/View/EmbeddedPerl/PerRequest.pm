@@ -6,7 +6,7 @@ use Template::EmbeddedPerl;
 
 extends 'Catalyst::View::BasePerRequest';
 
-our $VERSION = 0.001003;
+our $VERSION = 0.001005;
 eval $VERSION;
 
 # Args that get passed cleanly to Template::EmbeddedPerl

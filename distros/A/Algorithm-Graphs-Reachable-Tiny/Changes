@@ -1,24 +1,28 @@
 Revision history for Algorithm-Graphs-Reachable-Tiny
 
-0.07    2023/05/02
-        Adapted README, added LICENSE file
+0.08  2024/10/02
+    - Reformatted changelog.
+    - Makefile.PL: License corrected to 'perl', added META_MERGE and all dependencies.
 
-0.06    2023/05/01
-        POD: Added link to git repo
+0.07  2023/05/02
+    - Adapted README, added LICENSE file.
 
-0.05    2023/04/29
-        POD: Removed link to cpanratings.perl.org (Id: 147783)
+0.06  2023/05/01
+    - POD: Added link to git repo.
 
-0.04    2023/04/28
-        Rudimentary argument check added
-        Graph can be specified as an array
+0.05  2023/04/29
+    - POD: Removed link to cpanratings.perl.org (Id: 147783).
 
-0.03    2022/08/12
-        Renamed test file.
+0.04  2023/04/28
+    - Rudimentary argument check added.
+    - Graph can be specified as an array.
 
-0.02    2022/08/06
-        Minor changes in docu.
+0.03  2022/08/12
+    - Renamed test file.
 
-0.01    2022/08/05
-        First version, released on an unsuspecting world.
+0.02  2022/08/06
+    - Minor changes in docu.
+
+0.01  2022/08/05
+    - First version, released on an unsuspecting world.
 

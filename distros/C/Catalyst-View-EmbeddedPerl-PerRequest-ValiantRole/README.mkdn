@@ -1,0 +1,135 @@
+# NAME
+
+Catalyst::View::EmbeddedPerl::PerRequest::ValiantRole - Add Valiant Formbuilder methods
+
+# SYNOPSIS
+
+Declare a view in your Catalyst application:
+
+    package Example::View::Hello;
+
+    use Moose;
+    extends 'Catalyst::View::EmbeddedPerl::PerRequest';
+    with 'Catalyst::View::EmbeddedPerl::PerRequest::ValiantRole';
+
+    has 'name' => (is => 'ro', isa => 'Str');
+
+    __PACKAGE__->config(prepend => 'use v5.40', content_type=>'text/html; charset=UTF-8');
+    __PACKAGE__->meta->make_immutable;
+
+    __DATA__
+    %= form_for('person', sub ($self, $fb, $model) {
+      %= $fb->input('name');
+      %= $fb->input('age');
+    % });
+
+Produces the following output:
+
+    <p>Hello Perl Hacker!</p>
+
+# DESCRIPTION
+
+This is just a role that proxies methods from [Valiant::HTML::Util::Form](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AUtil%3A%3AForm) into you
+instance of [Catalyst::View::EmbeddedPerl::PerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3AEmbeddedPerl%3A%3APerRequest).  These are used to create
+HTML form elements.  All methods are also exposed as helpers directly into your
+template.
+
+Since [Valiant::HTML::Util::Form](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AUtil%3A%3AForm) inherits from [Valiant::HTML::Util::FormTags](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AUtil%3A%3AFormTags),
+which inherits from [Valiant::HTML::Util::TagBuilder](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AUtil%3A%3ATagBuilder), this adds quite a few methods
+to your namespace:
+
+From [Valiant::HTML::Util::TagBuilder](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AUtil%3A%3ATagBuilder)
+
+    tags tag content_tag join_tags text link_to
+
+From [Valiant::HTML::Util::FormTags](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AUtil%3A%3AFormTags)
+
+    field_value field_id field_name button_tag checkbox_tag fieldset_tag
+    legend_tag form_tag label_tag radio_button_tag option_tag text_area_tag 
+    input_tag password_tag hidden_tag submit_tag select_tag options_for_select
+    options_from_collection_for_select
+
+From [Valiant::HTML::Util::Form](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AUtil%3A%3AForm)
+
+    form_for fields_for
+
+You will also have all the methods that are public for [Catalyst::View::EmbeddedPerl::PerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3AEmbeddedPerl%3A%3APerRequest).
+
+# HTML ESCAPING
+
+By default the view will escape all output to prevent cross site scripting attacks.
+If you want to output raw HTML you can use the `raw` helper.  For example:
+
+    <%= raw $self->html %>
+
+See [Template::EmbeddedPerl::SafeString](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl%3A%3ASafeString) for more information.
+
+You can disable this feature by setting the `auto_escape` option to false in the
+view configuration.  For example if you are not using this to generate HTML output
+you might not want it.
+
+# COOKBOOK
+
+Ideas for using this module.
+
+## Creating a base view
+
+Given you will need to make a lot of view classes (at least one class per template) you
+might be well off to create a common base class:
+
+    package Example::View::HTML;
+
+    use Moose;
+
+    extends 'Catalyst::View::EmbeddedPerl::PerRequest';
+    with 'Catalyst::View::EmbeddedPerl::PerRequest::ValiantRole';
+
+    __PACKAGE__->meta->make_immutable;
+    __PACKAGE__->config(
+      prepend => 'use v5.40', 
+      content_type=>'text/html; charset=UTF-8'
+    );
+
+Used like this:
+
+    package Example::View::Hello;
+
+    use Moose;
+    extends 'Example::View::HTML';
+
+    has 'name' => (is => 'ro', isa => 'Str');
+
+    __PACKAGE__->meta->make_immutable;
+    __DATA__
+    %= form_for('person', sub ($self, $fb, $model) {
+        %= $fb->input('name');
+        %= $fb->input('age');
+    % });
+
+# SEE ALSO
+
+Related reading
+
+- [Catalyst](https://metacpan.org/pod/Catalyst)
+
+    The Catalyst web framework.
+
+- [Catalyst::View::BasePerRequest](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3ABasePerRequest)
+
+    The base class for per-request views in Catalyst.
+
+- [Template::EmbeddedPerl](https://metacpan.org/pod/Template%3A%3AEmbeddedPerl)
+
+    Module used for processing embedded Perl templates.
+
+- [Catalyst::View::EmbeddedPerl](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3AEmbeddedPerl)
+
+    The view for which this role applies
+
+# AUTHOR
+
+John Napiorkowski `<jjnapiork@cpan.org>`
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

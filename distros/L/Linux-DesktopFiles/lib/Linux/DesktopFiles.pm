@@ -9,13 +9,17 @@ use 5.014;
 #use strict;
 #use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 our %TRUE_VALUES = (
                     'true' => 1,
                     'True' => 1,
                     '1'    => 1
                    );
+
+sub _make_case_insensitive {
+    lc($_[0]) =~ tr/_a-z0-9/_/cr;
+}
 
 sub new {
     my ($class, %opt) = @_;
@@ -46,36 +50,273 @@ sub new {
 
         categories => [
             qw(
-              Utility
+              AudioVideo
               Development
               Education
               Game
               Graphics
-              AudioVideo
               Network
               Office
+              Science
               Settings
               System
+              Utility
+              Engineering
+              Amusement
+              Documentation
+              Adult
+              Core
+              COSMIC
+              GTK
+              Qt
+              Motif
+              Java
+              ConsoleOnly
               )
         ],
 
+        subcategories => {
+            AudioVideo => [
+                qw(
+                  Audio
+                  AudioVideoEditing
+                  DiscBurning
+                  Midi
+                  Mixer
+                  Music
+                  Player
+                  Recorder
+                  Sequencer
+                  Tuner
+                  TV
+                  Video
+                  )
+            ],
+            Development => [
+                qw(
+                  Building
+                  Database
+                  Debugger
+                  GUIDesigner
+                  IDE
+                  Profiling
+                  ProjectManagement
+                  RevisionControl
+                  Translation
+                  WebDevelopment
+                  )
+            ],
+            Education => [
+                qw(
+                  Art
+                  ArtificialIntelligence
+                  Astronomy
+                  Biology
+                  Chemistry
+                  ComputerScience
+                  Construction
+                  DataVisualization
+                  Economy
+                  Electricity
+                  Geography
+                  Geology
+                  Geoscience
+                  History
+                  Humanities
+                  ImageProcessing
+                  Music
+                  Languages
+                  Literature
+                  Maps
+                  Math
+                  NumericalAnalysis
+                  MedicalSoftware
+                  ParallelComputing
+                  Physics
+                  Robotics
+                  Spirituality
+                  Sports
+                  )
+            ],
+            Game => [
+                qw(
+                  ActionGame
+                  AdventureGame
+                  ArcadeGame
+                  BoardGame
+                  BlocksGame
+                  CardGame
+                  KidsGame
+                  LogicGame
+                  RolePlaying
+                  Shooter
+                  Simulation
+                  SportsGame
+                  StrategyGame
+                  Emulation
+                  )
+            ],
+            Graphics => [
+                qw(
+                  2DGraphics
+                  VectorGraphics
+                  RasterGraphics
+                  3DGraphics
+                  Scanning
+                  Photography
+                  Publishing
+                  Viewer
+                  ImageProcessing
+                  )
+            ],
+            Network => [
+                qw(
+                  Email
+                  Dialup
+                  InstantMessaging
+                  Chat
+                  IRCClient
+                  Feed
+                  FileTransfer
+                  HamRadio
+                  News
+                  P2P
+                  RemoteAccess
+                  Telephony
+                  TelephonyTools
+                  VideoConference
+                  WebBrowser
+                  WebDevelopment
+                  Monitor
+                  )
+            ],
+            Office => [
+                qw(
+                  Calendar
+                  ContactManagement
+                  Database
+                  Dictionary
+                  Chart
+                  Email
+                  Finance
+                  FlowChart
+                  PDA
+                  ProjectManagement
+                  Presentation
+                  Spreadsheet
+                  WordProcessor
+                  Photography
+                  Publishing
+                  )
+            ],
+            Science => [
+                qw(
+                  Art
+                  Construction
+                  Languages
+                  ArtificialIntelligence
+                  Astronomy
+                  Biology
+                  Chemistry
+                  ComputerScience
+                  DataVisualization
+                  Economy
+                  Electricity
+                  Geography
+                  Geology
+                  Geoscience
+                  History
+                  Humanities
+                  ImageProcessing
+                  Literature
+                  Maps
+                  Math
+                  NumericalAnalysis
+                  MedicalSoftware
+                  Physics
+                  Robotics
+                  Spirituality
+                  Sports
+                  ParallelComputing
+                  Electronics
+                  )
+            ],
+            Settings => [
+                qw(
+                  DesktopSettings
+                  HardwareSettings
+                  Printing
+                  PackageManager
+                  Security
+                  Accessibility
+                  )
+            ],
+            System => [
+                qw(
+                  Emulator
+                  FileManager
+                  TerminalEmulator
+                  Filesystem
+                  Monitor
+                  Security
+                  )
+            ],
+            Utility => [
+                qw(
+                  TextTools
+                  Archiving
+                  FileTools
+                  Accessibility
+                  Calculator
+                  Clock
+                  TextEditor
+                  )
+            ],
+            GTK => [
+                qw(
+                  GNOME
+                  XFCE
+                  )
+            ],
+            Qt => [
+                qw(
+                  KDE
+                  DDE
+                  )
+            ],
+        },
+
         %opt,
-               );
+    );
 
     $data{_file_keys_re} = do {
         my %seen;
-        my @keys = map { quotemeta($_) } grep { !$seen{$_}++ }
-          (@{$data{keys_to_keep}}, qw(Hidden NoDisplay Categories), ($data{terminalize} ? qw(Terminal) : ()));
+        my @keys = map { quotemeta($_) }
+          grep { !$seen{$_}++ } (@{$data{keys_to_keep}}, qw(Hidden NoDisplay Categories), ($data{terminalize} ? qw(Terminal) : ()));
 
         local $" = q{|};
         qr/^(@keys)=(.*\S)/m;
     };
 
-    if ($data{case_insensitive_cats}) {
-        @{$data{_categories}}{map { (lc $_) =~ tr/_a-z0-9/_/cr } @{$data{categories}}} = ();
+    {
+        my @cats = @{$data{categories}};
+
+        if ($data{case_insensitive_cats}) {
+            @cats = map { _make_case_insensitive($_) } @cats;
+        }
+
+        @{$data{_categories}}{@cats} = ();
     }
-    else {
-        @{$data{_categories}}{@{$data{categories}}} = ();
+
+    foreach my $subcat (keys %{$data{subcategories}}) {
+
+        my @subcats = @{$data{subcategories}{$subcat}};
+
+        if ($data{case_insensitive_cats}) {
+            $subcat = _make_case_insensitive($subcat);
+        }
+
+        @{$data{_subcategories}{$subcat}}{@subcats} = ();
     }
 
     bless \%data, $class;
@@ -169,20 +410,15 @@ sub parse_desktop_file {
         }
     }
 
-    # Parse categories (and remove any duplicates)
-    my %categories;
+    # Parse categories
+    my @file_categories    = split(/;/, $info{Categories} // '');
+    my @file_subcategories = @file_categories;
 
-#<<<
-        @categories{
-            grep { exists $self->{_categories}{$_} } (
-                      $self->{case_insensitive_cats}
-                      ? (map { lc($_) =~ tr/_a-z0-9/_/cr } split(/;/, $info{Categories} // ''))
-                      : (split(/;/, $info{Categories} // ''))
-            )
-        } = ();
-#>>>
+    if ($self->{case_insensitive_cats}) {
+        @file_categories = map { _make_case_insensitive($_) } @file_categories;
+    }
 
-    my @cats = keys %categories;
+    my @cats = grep { exists($self->{_categories}{$_}) } @file_categories;
 
     # Skip entry when there are no categories and `keep_unknown_categories` is false
     # When `keep_unknown_categories` is true, set `@cats` to `unknown_category_key`.
@@ -197,6 +433,17 @@ sub parse_desktop_file {
 
     # Store the categories
     $info{Categories} = \@cats;
+
+    # Add subcategories
+    my %subcategories;
+
+    foreach my $cat (@file_categories) {
+        if (exists $self->{_subcategories}{$cat}) {
+            push @{$subcategories{$cat}}, grep { exists $self->{_subcategories}{$cat}{$_} } @file_subcategories;
+        }
+    }
+
+    $info{SubCategories} = \%subcategories;
 
     # Remove `% ...` from the value of `Exec`
     index($info{Exec}, ' %') != -1 and $info{Exec} =~ s/ +%.*//s;
@@ -424,7 +671,7 @@ For global matching/substitution, set the B<global> key to a true value.
 Example:
 
         substitutions => [
-            {key => 'Exec', re => qr/xterm/,    value => 'sakura'},
+            {key => 'Exec', re => qr/xterm/,    value => 'tilix'},
             {key => 'Exec', re => qr/\$HOME\b/, value => '/my/home', global => 1},
         ],
 
@@ -457,10 +704,11 @@ Example:
 where C<%info> might look something like this:
 
     my %info = (
-        Name       => "...",
-        Exec       => "...",
-        Icon       => "...",
-        Categories => ["...", "...", "..."],
+        Name          => "...",
+        Exec          => "...",
+        Icon          => "...",
+        Categories    => ["...", "...", "..."],
+        SubCategories => {Category1 => ["...", "..."], Category2 => ["...", "..."]},
     );
 
 When B<keep_unknown_categories> is true and a given entry does not belong to any category,
@@ -497,7 +745,7 @@ L<https://github.com/trizen/Linux-DesktopFiles>
 
 =head1 AUTHOR
 
-Daniel "Trizen" Șuteu, E<lt>trizenx@gmail.comE<gt>
+Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 

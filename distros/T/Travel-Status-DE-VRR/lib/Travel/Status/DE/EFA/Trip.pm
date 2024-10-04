@@ -9,10 +9,10 @@ use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 
 Travel::Status::DE::EFA::Trip->mk_ro_accessors(
-	qw(operator name line number type id dest_name dest_id));
+	qw(operator product product_class name line number type id dest_name dest_id));
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -21,11 +21,13 @@ sub new {
 
 	my $ref = {
 		operator     => $json->{operator}{name},
+		product      => $json->{product}{name},
+		product_class => $json->{product}{class},
 		polyline     => $json->{coords},
 		name         => $json->{name},
 		line         => $json->{disassembledName},
 		number       => $json->{properties}{trainNumber},
-		type         => $json->{properties}{trainType},
+		type         => $json->{properties}{trainType} // $json->{product}{name},
 		id           => $json->{id},
 		dest_name    => $json->{destination}{name},
 		dest_id      => $json->{destination}{id},
@@ -106,7 +108,11 @@ sub route {
 sub TO_JSON {
 	my ($self) = @_;
 
-	return { %{$self} };
+	my $ret = { %{$self} };
+
+	delete $ret->{strptime_obj};
+
+	return $ret;
 }
 
 1;

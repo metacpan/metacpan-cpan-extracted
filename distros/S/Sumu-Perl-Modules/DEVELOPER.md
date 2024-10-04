@@ -220,6 +220,90 @@ Do you want to continue the release process? [y/N]: y
 [@Git/Push] pushing to origin
 ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
 
+## g and dzil 
+
+### g 
+
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ ./g 'POD'
+Visits File does not exist
+
+File service-worker not found
+
+File .yml not found
+
+./h not found
+
+
+/041/042/
+
+Committing Message
+[main 57a000d] 042 POD 20241001112647 041
+ 6 files changed, 25 insertions(+), 6 deletions(-)
+
+./c not found
+
+Push/update Git Lab Repo
+Uploading to remote/git
+Enumerating objects: 21, done.
+Counting objects: 100% (21/21), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (7/7), done.
+Writing objects: 100% (11/11), 1018 bytes | 1018.00 KiB/s, done.
+Total 11 (delta 6), reused 0 (delta 0), pack-reused 0
+To 192.168.1.225:ns21u2204/sumu-perl-modules-dist-zilla.git
+   4324301..57a000d  main -> main
+Branch 'main' set up to track remote branch 'main' from 'origin'.
+
+Latest version number from the actual 'app.version' file
+042|20241001112647CDT
+
+Total Commits
+50
+
+### test 
+
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil test
+[DZ] building distribution under .build/vSCGUQyXGg for installation
+[DZ] beginning to build Sumu-Perl-Modules
+[DZ] guessing dist's main_module is lib/Sumu/Perl/Modules.pm
+[PkgVersion] skipping lib/Sumu/Perl/Modules.pm: assigns to $VERSION
+[ExtraTests] rewriting author test xt/author/pod-coverage.t
+[ExtraTests] rewriting author test xt/author/pod-syntax.t
+[DZ] writing Sumu-Perl-Modules in .build/vSCGUQyXGg
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Sumu::Perl::Modules
+Writing MYMETA.yml and MYMETA.json
+cp lib/Sumu/Perl/Modules.pm blib/lib/Sumu/Perl/Modules.pm
+PERL_DL_NONLAZY=1 "/home/ns21u2204/perl5/perlbrew/perls/perl-5.38.0/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/author-pod-coverage.t .. ok
+t/author-pod-syntax.t .... ok
+All tests successful.
+Files=2, Tests=2,  1 wallclock secs ( 0.02 usr  0.00 sys +  0.30 cusr  0.19 csys =  0.51 CPU)
+Result: PASS
+[DZ] all's well; removing .build/vSCGUQyXGg
+
+### release 
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$ dzil release
+[DZ] beginning to build Sumu-Perl-Modules
+[DZ] guessing dist's main_module is lib/Sumu/Perl/Modules.pm
+[PkgVersion] skipping lib/Sumu/Perl/Modules.pm: assigns to $VERSION
+[ExtraTests] rewriting author test xt/author/pod-coverage.t
+[ExtraTests] rewriting author test xt/author/pod-syntax.t
+[DZ] writing Sumu-Perl-Modules in Sumu-Perl-Modules-0.4.2
+[DZ] building archive with Archive::Tar; install Archive::Tar::Wrapper 0.15 or newer for improved speed
+[DZ] writing archive to Sumu-Perl-Modules-0.4.2.tar.gz
+[@Git/Check] branch main is in a clean state
+[ConfirmRelease] *** Preparing to release Sumu-Perl-Modules-0.4.2.tar.gz with UploadToCPAN ***
+Do you want to continue the release process? [y/N]: y
+[UploadToCPAN] registering upload with PAUSE web server
+[UploadToCPAN] POSTing upload for Sumu-Perl-Modules-0.4.2.tar.gz to https://pause.perl.org/pause/authenquery?ACTION=add_uri
+[UploadToCPAN] PAUSE add message sent ok [200]
+[@Git/Tag] Tagged v0.4.2
+[@Git/Push] pushing to origin
+ns21u2204@ns21:~/p/perl/Sumu-Perl-Modules$
+
 
 
 ### Automated updates to this file 
@@ -372,5 +456,17 @@ Version ID: Old 0.4.0 | New 0.4.1
 
 Commit ID: Old 041 | New 042
 Version ID: Old 0.4.1 | New 0.4.2
+
+
+#### 2024-10-01 11:45:32 CDT
+
+Commit ID: Old 042 | New 043
+Version ID: Old 0.4.2 | New 0.4.3
+
+
+#### 2024-10-03 08:00:53 CDT
+
+Commit ID: Old 043 | New 044
+Version ID: Old 0.4.3 | New 0.4.4
 
 

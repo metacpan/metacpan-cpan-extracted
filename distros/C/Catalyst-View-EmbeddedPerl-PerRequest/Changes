@@ -1,5 +1,11 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001005  03 October 2024
+          - Tweak dependency version
+
+0.001004  03 October 2024
+          - Added missing dependency
+
 0.001002  15 September 2024
           - Fix issues with distribution metadata.
 

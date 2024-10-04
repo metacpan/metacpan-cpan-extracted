@@ -1,5 +1,8 @@
 Revision history for perl module Net::RDAP:
 
+0.31 - 2024-10-03
+  - fix dependencies in Makefile.PL (thanks Petr Pisar)
+
 0.30 - 2024-08-29
   - use JSON instead of JSON::XS in jcard.t.
   - resolve warning in Net::RDAP::UA.

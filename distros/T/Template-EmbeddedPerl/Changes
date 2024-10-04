@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Template-EmbeddedPerl
 
+0.001005  03 October 2024
+          - fixed bad test cases
+
 0.001004  24 September 2024
           - Fix issue with dependency listings
 

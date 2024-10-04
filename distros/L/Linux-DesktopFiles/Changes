@@ -1,50 +1,66 @@
 Revision history for Perl extension Linux::DesktopFiles.
 
+0.26  2024-10-03
+
+    - Added support for subcategories.
+
 0.25  2017-10-22
+
     - `parse_desktop_file()` and `parse_desktop_files()` are now context-sensitive, returning a key-value list or a HASH reference, depending on the context.
     - Documentation improvements.
 
 0.24  2017-10-21
+
     - When `keep_unknown_categories` is true and a given entry does not belong to any category, `parse_desktop_file` will set `Categories` to [`unknown_category_key`].
 
 0.23  2017-10-21
+
     - Escaped strings are now unescaped.
     - Added the `parse_desktop_file` method, which parses a single desktop file.
 
 0.22  2017-10-04
+
     - Make sure the category names are unique, so we don't store an application twice under the same category.
 
 0.21  2017-09-21
+
     - Fixed a minor bug for icon names that contain one or more dots (e.g.: "foo.bar.baz").
       Thanks to Erik Dubois for reporting this issue (https://github.com/trizen/obmenu-generator/issues/16).
 
 0.20  2017-09-15
+
     - Added support for desktop IDs.
       When a desktop entry is located under a local directory,
       it will overwrite an existent file with the same basename.
     - Removed the support for resolving absolute icon paths, as it was broken beyond repair.
 
 0.13  2017-06-03
+
     - Fixed a potential infinite loop for circular inherited icon directories.
 
 0.12  2016-10-17
+
     - Removed the no-op `keep_empty_categories` option.
     - Documentation improvements.
 
 0.11  2016-07-24
+
     - Better detection for inherited icon themes.
 
 0.10  2016-06-04
+
     - When a file does not have a `Name`, use the name of the file.
     - Added the GitHub repository URL.
 
 0.09  2015-01-29
+
     - More performance improvements.
     - Added the "parse" method which can parse a list of desktop files.
     - Removed the "iterate_desktop_files" method. (it's faster to use the "get_desktop_files" method instead)
     - Removed the support to keep empty categories after parsing.
 
 0.08  2013-10-03
+
     - Performance improvements.
     - Added support for the 'Other' category.
     - Added support for a customized terminalization format.
@@ -53,27 +69,34 @@ Revision history for Perl extension Linux::DesktopFiles.
     - Many other minor changes.
 
 0.07  2013-03-15
+
     - Added a new option: use_current_theme_icons
     - Added support to look in index.theme for inherited icon themes.
 
 0.06  2012-07-26
+
     - Fixed a critical (_clean_categories) bug.
 
 0.05  2012-07-26
+
     - Updated the documentation.
     - No more unexpected dies.
 
 0.04  2012-07-24
+
     - Fixed the issue when requesting comments in multiple languages (ex: Comments, Comments[fr], etc...);
 
 0.03  2012-07-24
+
     - Skip desktop files if the "Hidden" value is set to true.
     - Keep any specified keys as ->new(keys_to_keep => [...]) (previously: only alphanumeric keys)
     - Improved the performance.
 
 0.02  2012-07-21
+
     - Improved the documentation.
 
 0.01  2013-06-03
+
     - original version; created by h2xs 1.23 with options
         -A -a -b 5.10.1 -X --skip-exporter --skip-warnings --skip-ppport --skip-autoloader -n Linux::DesktopFiles

@@ -8,7 +8,7 @@ package Sumu::Perl::Modules;
 
 =head1 VERSION
 
-version 0.4.2
+version 0.4.4
 
 =head2 SYNOPSIS
 
@@ -29,15 +29,38 @@ version 0.4.2
 
     List all installed Perl Modules on your system
 
-    Tested in:
+=head2 For Developer Only
 
-        Dist: 
+    Being tested in:
 
-            Ubuntu 22.04 (WSL)
+        Ubuntu 22.04 (WSL):
 
-        UI: 
+            Dist:
 
-            Rocky Linux 9 (Hyper-V)
+                Folder/Path:
+                
+                    ~/p/perl/Sumu-Perl-Modules
+
+                GitLab Repo: 
+                
+                    http://ns44:40225/ns21u2204/sumu-perl-modules-dist-zilla
+
+            UI: 
+
+                Folder/Path:
+                
+                    ~/p/perl/Perl-Modules-Companion
+
+                GitLab Repo:
+                
+                    http://ns44:40225/ns21u2204/sumu-perl-modules-companion
+
+
+        Rocky Linux 9 (Hyper-V):
+
+            Dist:
+
+            UI:
 
 =head2 Strictures
 
@@ -50,13 +73,13 @@ use warnings;
 
 =head2 our VERSION
 
-    our $VERSION = '0.4.2'
+    our $VERSION = '0.4.4'
 
     This version number is updated automatically!
 
 =cut
 
-our $VERSION = '0.4.2';
+our $VERSION = '0.4.4';
 
 
 =head2 Internals
@@ -107,16 +130,26 @@ sub new {
     
     ExtUtils::Installed
 
+    Pod::Html;
+
 =cut
 
 use ExtUtils::Installed;
 
 my $inst = ExtUtils::Installed->new();
 
+use Pod::Html;
+
 
 =head2 Sub _extutils
 
     Returns List of modules as a table
+
+        including version number and number of dirs/files under given module
+
+    Usage:
+
+        my $modules_list = $modules->_extutils( module => $"module" );
 
 =cut
 
@@ -150,13 +183,13 @@ sub _extutils {
             <td> <a href="_dirs/$_" title="$_">$_</a> </td> 
             <td>$module_version</td> 
             <td>$module_files</td> 
-            <td> $mod_dirs </td> 
+            <td>$mod_dirs</td> 
         </tr>
         };
     }
     $mods .= qq{};
 
-    return $mods;
+    return "$mods";
 
 }
 # end 
@@ -167,6 +200,10 @@ sub _extutils {
     Show/Get Dirs in a given module 
 
     Returns an ordered list
+
+    Usage:
+
+        my ($module, $dirs, $files) = $modules->_dirs( module => "$module");
 
 =cut
 
@@ -233,7 +270,10 @@ sub _dirs  {
 
             perldoc Module
 
-        as text with a line break (<br>) appended to end of each line
+            as text with a line break (<br>) appended to end of each line
+    Usage:
+
+        my ($total_lines, $out) = $modules->_doc( module => "$module" );
 
 =cut
 
@@ -243,16 +283,21 @@ sub _doc {
         module => '',
         @_,
     );
-    
+
+    #
+    my $out;
+    #
+    my $total_lines;
+
     #
     my $module = $in{module};
         chomp $module;
 
     $module =~ s!\\!\/!g;
     
-    my @doc = `perldoc $module`;
+    my @doc = `perldoc "$module"`;
 
-    my $out;
+    $total_lines = scalar @doc;
 
     for (@doc) {
         $_ =~ s!\<!&lt;!g;
@@ -260,12 +305,143 @@ sub _doc {
         $out .= qq{$_<br>};
     }
 
-    return ($module, $out);
+    if ($total_lines < 9 ) {
+        @doc = `pod2html "$module"`;
+    }
+
+    for (@doc) {
+        $out .= qq{$_ };
+    }
+
+    $total_lines = scalar @doc;
+
+    return ($total_lines, $out);
 
     #
 
 }
 # end _doc 
+
+
+=head2 Sub _inc
+
+    List all directories in the @INC
+
+    Returns an ordered list
+
+        with link to given URL
+
+            default is '/_inc_dir'
+
+                see sub _inc_dir 
+
+=cut
+
+sub _inc {
+
+    my %in = (
+        url => '/_inc_dir',
+        @_,
+    );
+
+    chomp $in{_inc_dir};
+
+    my $out;
+
+    $out .= qq{<ol>};
+    
+    for (@INC) {
+        # link text
+        my @name = split(/\//, $_);
+        # link 
+        $out .= qq{<li>}; 
+        $out .= qq{<a href="$in{_inc_dir}/$_" };
+        $out .= qq{title="$name[$#name]">};
+        $out .= qq{$name[$#name]};
+        $out .= qq{</a>};
+        $out .= qq{</li> };
+    }
+
+    $out .= qq{</ol>}; 
+
+    return "$out";
+
+}
+# end sub _inc
+
+
+=head2 Sub _inc_dir 
+
+    Do stuff with a given directory path from the @INC
+
+    Show files and subdirectories in the given dir.
+
+    Given directory should be an absolute path 
+
+    Usage:
+
+        my $out = $modules->_inc_dir( dir => "")
+
+=cut
+
+sub _inc_dir {
+	#
+	my %in = (
+        inc_dir => '',
+        @_,
+    );
+
+	my $out;
+	$out .= qq{};
+
+	my @directoreis;
+	my @files;
+
+	my $dir = $in{inc_dir};
+	chomp $dir;
+
+	if (-d "$dir") {
+		if ( opendir (my $DIR, "$dir") ) {
+			#
+			my @dir = readdir($DIR);
+			#
+			while ( my $item = <@dir> ) {
+				#Directories
+				push(@directoreis, "$dir/$item") if (-d "$dir/$item");
+				# Files
+				push(@files, "$dir/$item") if (-f "$dir/$item");
+			}
+			#
+		} else {
+			$out = qq{Unable to open dir};
+		}
+	} else {
+		$out = qq{Not a Dir};
+	}
+	#
+
+	#
+	$out .= qq{<article class="container"><h2>Files</h2>};
+	for (@files) {
+		my @file = split(/\//, $_);
+		$out .= qq{<a href="/_doc/$_" title="$file[$#file]">$file[$#file]</a> };
+	}
+	$out .= qq{</article>};
+
+	#
+	$out .= qq{<article class="container"><h2>Directories</h2>};
+	for (@directoreis) {
+		#
+		my @d_name = split(/\//, $_);
+		$out .= qq{<a href="/_inc/$_" title="$d_name[$#d_name]">$d_name[$#d_name]</a> };
+	}
+	$out .= qq{</article>};
+
+	return "$out";
+
+}
+# end _inc_dir
+
 
 
 1;

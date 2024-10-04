@@ -1,10 +1,10 @@
 {
    "abstract" : "Utility functions for Graylog's GELF format.",
    "author" : [
-      "Adam Clarke <adamc@strategicdata.com.au>"
+      "Adam Clarke <adamc@logicly.com.au>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -62,24 +62,22 @@
    "provides" : {
       "Log::GELF::Util" : {
          "file" : "lib/Log/GELF/Util.pm",
-         "version" : "0.96"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/strategicdata/log-gelf-util/issues"
+         "web" : "https://github.com/logicly-au/log-gelf-util/issues"
       },
-      "homepage" : "https://github.com/strategicdata/log-gelf-util",
+      "homepage" : "https://github.com/logicly-au/log-gelf-util",
       "repository" : {
-         "url" : "git://github.com/strategicdata/log-gelf-util.git",
-         "web" : "https://github.com/strategicdata/log-gelf-util"
+         "type" : "git",
+         "url" : "https://github.com/logicly-au/log-gelf-util.git",
+         "web" : "https://github.com/logicly-au/log-gelf-util"
       }
    },
-   "version" : "0.96",
-   "x_contributors" : [
-      "Adam Clarke <adam.clarke@strategicdata.com.au>",
-      "Adam Clarke <adam@clarke.id.au>"
-   ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_static_install" : 1
 }

@@ -28,6 +28,17 @@ sub builder {
   }
 }
 
+sub script_name {
+  my $self = shift;
+  if (@_) {
+    $self->{script_name} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{script_name};
+  }
+}
+
 sub class_name {
   my $self = shift;
   if (@_) {
@@ -162,10 +173,10 @@ sub new {
     %options
   }, $class;
   
-  # Target class name
-  my $class_name = $self->{class_name};
-  unless (defined $class_name) {
-    confess("A class name must be defined.");
+  my $script_name = $self->{script_name};
+  
+  unless (defined $script_name) {
+    confess("A script name must be defined.");
   }
   
   # Excutable file name
@@ -191,10 +202,12 @@ sub new {
   my $config_argv = $self->{argv};
   
   # Config
-  my $config_file = SPVM::Builder::Util::search_config_file($class_name);
+  my $config_file = $script_name;
+  $config_file =~ s/\..*$//;
+  $config_file .= '.config';
   
   my $config;
-  if (defined $config_file) {
+  if (-f $config_file) {
     $config = SPVM::Builder::Config::Exe->load_mode_config($config_file, $config_mode, $config_argv);
   }
   else {
@@ -202,10 +215,7 @@ sub new {
       $config = SPVM::Builder::Config::Exe->new(file_optional => 1);
     }
     else {
-      unless (defined $config_file) {
-        my $config_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'config');
-        confess("A config file \"$config_rel_file\" is not found in (@INC).");
-      }
+      confess("The config file \"$config_file\" is not found.");
     }
   }
   
@@ -216,8 +226,6 @@ sub new {
   unless ($config->output_type eq 'exe') {
     confess("output_type field in the config file \"$config_file\" for creating an executable file must be \"exe\".");
   }
-  
-  $config->class_name($class_name);
   
   $self->{config} = $config;
   
@@ -306,15 +314,24 @@ sub build_exe_file {
 
 sub compile {
   my ($self) = @_;
-
+  
   # Builder
   my $builder = $self->builder;
   
-  my $class_name = $self->{class_name};
+  my $script_name = $self->{script_name};
   
   my $compiler = $self->compiler;
   
-  $compiler->compile_with_exit($class_name, __FILE__, __LINE__);
+  open my $script_fh, '<', $script_name
+    or die "Can't open file \"$script_name\":$!";
+    
+  my $source = do { local $/; <$script_fh> };
+  
+  $source = "#file \"$script_name\"\x{A}$source";
+  
+  my $class_name = $compiler->compile_anon_class_with_exit($source, __FILE__, __LINE__);
+  
+  $self->class_name($class_name);
   
   my $runtime = $compiler->get_runtime;
   
@@ -993,9 +1010,18 @@ sub compile_native_class {
   
   my $runtime = $self->runtime;
   
-  my $config_file = SPVM::Builder::Util::search_config_file($class_name);
+  my $script_name = $self->script_name;
+  my $config_file;
+  if ($class_name eq $self->class_name) {
+    $config_file = $script_name;
+    $config_file =~ s/\..*$//;
+    $config_file .= '.config';
+  }
+  else {
+    $config_file = SPVM::Builder::Util::search_config_file($class_name);
+  }
   
-  if (defined $config_file) {
+  if (defined $config_file && -f $config_file) {
     
     my $mode;
     if ($class_name eq $self->class_name) {
@@ -1035,7 +1061,7 @@ sub get_user_defined_basic_type_names {
     7, # SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE,
   ];
   
-  my $basic_types = [grep { $_->get_name !~ /::anon_class::/ && $_->get_name !~ /::anon_method::/ } @{$runtime->get_basic_types({category => $category})}];
+  my $basic_types = [grep { $_->get_name !~ /::anon_method::/ } @{$runtime->get_basic_types({category => $category})}];
   
   my $class_names = [map { $_->get_name } @$basic_types];
   

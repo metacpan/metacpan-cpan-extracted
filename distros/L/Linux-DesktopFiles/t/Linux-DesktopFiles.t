@@ -5,17 +5,15 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 17;
 BEGIN { use_ok('Linux::DesktopFiles') }
 
 #########################
 
-my $obj = Linux::DesktopFiles->new(
-        keys_to_keep => [qw(Name GenericName Comment Comment[ro] Terminal Icon Exec)],
-        categories   => [qw(Game Archiving)],
-);
+my $obj = Linux::DesktopFiles->new(keys_to_keep => [qw(Name GenericName Comment Comment[ro] Terminal Icon Exec)],
+                                   categories   => [qw(Game Archiving GTK)],);
 
-my $t_file = 't/file.desktop';
+my $t_file       = 't/file.desktop';
 my $desktop_file = (-f $t_file) ? $t_file : (-f $0) ? 'file.desktop' : ();
 
 $obj->parse(\my %hash, $desktop_file);
@@ -36,3 +34,9 @@ is($entry{Name},     'The right name',     'Name');
 is($entry{Exec},     'some_command -z -9', 'Exec');
 is($entry{Terminal}, 'true',               'Terminal');
 is($entry{Icon},     'icon_name',          'Icon');
+
+is(join(';', @{$entry{Categories}}), 'GTK;Archiving');
+ok(exists($entry{SubCategories}{GTK}));
+ok(exists($entry{SubCategories}{Utility}));
+is(join(';', @{$entry{SubCategories}{Utility}}), 'Archiving');
+is(join(';', @{$entry{SubCategories}{GTK}}),     '');

@@ -9,10 +9,14 @@ use Module::Build;
 my $builder = Module::Build->new(
     dist_name         => 'Linux-DesktopFiles',
     license           => 'artistic_2',
-    dist_author       => q{Daniel "Trizen" Șuteu <trizenx@gmail.com>},
+    dist_author       => q<Daniel Șuteu <trizen@cpan.org>>,
     dist_version_from => 'lib/Linux/DesktopFiles.pm',
     dist_abstract     => 'Fast parsing of the Linux desktop files.',
     release_status    => 'stable',
+
+    sign              => 1,
+    dynamic_config    => 0,
+    extra_manify_args => { utf8 => 1 },
 
     configure_requires => {
                            'Module::Build' => 0,

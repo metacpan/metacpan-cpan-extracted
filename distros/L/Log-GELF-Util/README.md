@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/strategicdata/log-gelf-util.svg?branch=master)](https://travis-ci.org/strategicdata/log-gelf-util)
+[![Actions Status](https://github.com/logicly-au/log-gelf-util/actions/workflows/test.yml/badge.svg)](https://github.com/logicly-au/log-gelf-util/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Log-GELF-Util.svg)](https://metacpan.org/release/Log-GELF-Util)
 # NAME
 
 Log::GELF::Util - Utility functions for Graylog's GELF format.
@@ -56,11 +56,11 @@ specification:
 
 - host
 
-    String, defaults to hostname() from [Sys::Hostname](https://metacpan.org/pod/Sys::Hostname).
+    String, defaults to hostname() from [Sys::Hostname](https://metacpan.org/pod/Sys%3A%3AHostname).
 
 - timestamp
 
-    Timestamp, defaults to time() from [Time::HiRes](https://metacpan.org/pod/Time::HiRes).
+    Timestamp, defaults to time() from [Time::HiRes](https://metacpan.org/pod/Time%3A%3AHiRes).
 
 - level
 
@@ -127,7 +127,7 @@ will be applied.
 
 The optional third parameter is the message id used to identify associated
 chunks. This must be 8 bytes. It defaults to 8 bytes of randomness generated
-by [Math::Random::MT](https://metacpan.org/pod/Math::Random::MT).
+by [Math::Random::MT](https://metacpan.org/pod/Math%3A%3ARandom%3A%3AMT).
 
 If the message size is greater than the maximum size then an array of
 chunks is retuned, otherwise the message is retuned unaltered as the first
@@ -233,11 +233,11 @@ fields are associated with a false value.
 
 # LICENSE
 
-Copyright (C) Strategic Data.
+Copyright (C) Logicly.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 # AUTHOR
 
-Adam Clarke &lt;adamc@strategicdata.com.au>
+Adam Clarke <adamc@logicly.com.au>

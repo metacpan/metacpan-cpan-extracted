@@ -5,7 +5,7 @@ use warnings;
 
 use SPVM::Global;
 
-our $VERSION = "0.990013";
+our $VERSION = "0.990015";
 
 require XSLoader;
 XSLoader::load('SPVM', $VERSION);
@@ -58,25 +58,27 @@ Run a one liner with loading a class.
 
 =head2 Executing An SPVM Program
 
-Write a L<SPVM class|SPVM::Document::Language::Class> to print "Hello World!" using L<the say operator|SPVM::Document::Language::Operators/"say Operator">.
+Write a L<SPVM class|SPVM::Document::Language::Class> named C<hello.spvm> to print "Hello World!" using L<the say operator|SPVM::Document::Language::Operators/"say Operator">.
 
-  # lib/SPVM/HelloWorld.spvm
-  class HelloWorld {
+  # hello.spvm
+  class {
     static method main : void () {
       
       say "Hello World!";
     }
   }
 
+This class is an L<anon class|SPVM::Document::Language::Class/"Anon Class"> and has C<main> method that is an L<bootstrap method|SPVM::Document::Language::Class/"Bootstrap Method">.
+
 Run the SPVM program using L<spvm> command.
 
-  spvm -I lib/SPVM HelloWorld
+  spvm hello.spvm
 
 =head2 Generating An Executable File
 
 Generate an executable file using L<spvmcc> command.
 
-  spvmcc -B ~/.spvm_build -o ./hello --no-config -I lib/SPVM HelloWorld
+  spvmcc -B ~/.spvm_build -o ./hello --no-config hello.spvm
 
 Run the executable file.
 

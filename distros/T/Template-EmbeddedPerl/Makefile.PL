@@ -16,10 +16,10 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Template::EmbeddedPerl",
   "PREREQ_PM" => {
-    "Carp" => "1.54",
+    "Carp" => "1.50",
     "Digest::MD5" => "2.58_01",
     "Exporter" => "5.78",
-    "File::Spec" => "3.90",
+    "File::Spec" => "3.75",
     "HTML::Escape" => "1.11",
     "PPI" => "1.279",
     "Scalar::Util" => "1.63",
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Most" => "0.34"
   },
-  "VERSION" => "0.001004",
+  "VERSION" => "0.001005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,10 +36,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => "1.54",
+  "Carp" => "1.50",
   "Digest::MD5" => "2.58_01",
   "Exporter" => "5.78",
-  "File::Spec" => "3.90",
+  "File::Spec" => "3.75",
   "HTML::Escape" => "1.11",
   "PPI" => "1.279",
   "Scalar::Util" => "1.63",

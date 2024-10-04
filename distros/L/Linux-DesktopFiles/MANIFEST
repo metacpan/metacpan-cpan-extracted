@@ -12,3 +12,4 @@ t/file.desktop
 t/Linux-DesktopFiles.t
 t/pod-coverage.t
 t/pod.t
+SIGNATURE    Added here by Module::Build

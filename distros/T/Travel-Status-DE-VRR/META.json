@@ -44,31 +44,31 @@
    "provides" : {
       "Travel::Status::DE::EFA" : {
          "file" : "lib/Travel/Status/DE/EFA.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Travel::Status::DE::EFA::Departure" : {
          "file" : "lib/Travel/Status/DE/EFA/Departure.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Travel::Status::DE::EFA::Line" : {
          "file" : "lib/Travel/Status/DE/EFA/Line.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Travel::Status::DE::EFA::Services" : {
          "file" : "lib/Travel/Status/DE/EFA/Services.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Travel::Status::DE::EFA::Stop" : {
          "file" : "lib/Travel/Status/DE/EFA/Stop.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Travel::Status::DE::EFA::Trip" : {
          "file" : "lib/Travel/Status/DE/EFA/Trip.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Travel::Status::DE::VRR" : {
          "file" : "lib/Travel/Status/DE/VRR.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       }
    },
    "release_status" : "stable",
@@ -80,6 +80,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-VRR"
       }
    },
-   "version" : "3.00",
+   "version" : "3.01",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
