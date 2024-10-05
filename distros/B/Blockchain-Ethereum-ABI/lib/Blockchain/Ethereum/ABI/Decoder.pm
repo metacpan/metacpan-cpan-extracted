@@ -12,7 +12,7 @@ package Blockchain::Ethereum::ABI::Decoder;
 class Blockchain::Ethereum::ABI::Decoder;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.015';          # VERSION
+our $VERSION   = '0.016';          # VERSION
 
 use Carp;
 
@@ -63,7 +63,7 @@ Blockchain::Ethereum::ABI::Decoder - ABI utility for decoding ethereum contract 
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

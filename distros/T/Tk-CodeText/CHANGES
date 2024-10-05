@@ -1,5 +1,11 @@
 Tk::CodeText module changes log
 
+0.54 04 Oct 2024
+	Removed -updatelines option from documentation.
+	Added -linespercycle option.
+	Method highlightLoop now highlights the number of lines in -linespercycle. Nearly doubled the highlighting speed.
+	Setting Overstrike Mode is indicated by the insert width
+
 0.53 31 Jul 2024
 	Added option -readonly.
 	Added bookmarks functionality

@@ -28,6 +28,7 @@ SPVM::Builder::Util::getopt
     my ($opt_name, $opt_value) = @_;
     push @argv, SPVM::Builder::Exe->parse_config_argv_option($opt_value);
   },
+  'resource-info' => \my $show_resource_info,
 ;
 
 if ($help) {
@@ -42,6 +43,20 @@ elsif ($show_version) {
 
 my $script_name = shift;
 
+unshift @INC, map { $_ =~ s/[\\\/]SPVM$//; $_; } @include_dirs;
+
+if ($show_resource_info) {
+  
+  unless (defined $script_name) {
+    die "[spvmcc command]--resource-info option needs <script_name>."
+  }
+  
+  my $resource_info = SPVM::Builder::Exe->dump_resource_info($script_name);
+  
+  print $resource_info;
+  exit 0;
+}
+
 unless (defined $script_name) {
   warn "<script_name> is required.\n\n";
   warn SPVM::Builder::Util::extract_usage;
@@ -53,8 +68,6 @@ unless (defined $output_file) {
   warn SPVM::Builder::Util::extract_usage;
   exit 255;
 }
-
-unshift @INC, map { $_ =~ s/[\\\/]SPVM$//; $_; } @include_dirs;
 
 my $build_exe = SPVM::Builder::Exe->new(
   script_name => $script_name,
@@ -101,6 +114,7 @@ The spvmcc command generates an executable file from SPVM classes.
     --config-argv <arg>             A config argument
     --config-argv-option <arg pair> Key-value config arguments such as KEY=VALUE
     --optimize <level>              Optimization level such as O3, "-O0 -g"
+    --resource-info                 Show dependent resource information
 
 =head1 Details
 
@@ -311,6 +325,12 @@ This affects all source files that are compiled.
 Examples:
 
   --optimize "-O0 -g"
+
+=head2 --resource-info
+
+  --resource-info
+
+Shows dependent resource information.
 
 =head1 Copyright & License
 

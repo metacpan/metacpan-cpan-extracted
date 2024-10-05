@@ -1,3 +1,8 @@
+0.010     2024-10-04 17:55:17-03:00 America/Sao_Paulo
+    [Improvements]
+    - Object::Pad upgrade
+    - Include Object::Pad implied pragmata due it's deprecation
+    - Remove standalone RLP utility
 0.009     2023-10-16 00:14:24-03:00 America/Sao_Paulo
     [Bug fixes]
     - Remove xt files and add perlcritirc and perltidyrc to build

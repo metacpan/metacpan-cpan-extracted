@@ -14,7 +14,7 @@ class Blockchain::Ethereum::ABI::Type::Array
     :does(Blockchain::Ethereum::ABI::TypeRole);
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.015';          # VERSION
+our $VERSION   = '0.016';          # VERSION
 
 use Carp;
 
@@ -60,7 +60,7 @@ method decode {
 
     my @data = $self->data->@*;
 
-    my $size = $self->fixed_length // shift $self->data->@*;
+    my $size = $self->fixed_length // hex shift $self->data->@*;
     push $self->_instances->@*, Blockchain::Ethereum::ABI::Type->new(signature => $self->_remove_parent) for 0 .. $size - 1;
 
     return $self->_read_stack_set_data;
@@ -108,7 +108,7 @@ Blockchain::Ethereum::ABI::Type::Array - Solidity array type interface
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

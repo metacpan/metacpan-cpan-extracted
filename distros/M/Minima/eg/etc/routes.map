@@ -1,0 +1,4 @@
+GET	/		Minima::Controller	hello
+GET	/env		Minima::Controller	print_env
+GET 	/html		Controller		main
+@	not_found	Minima::Controller	not_found

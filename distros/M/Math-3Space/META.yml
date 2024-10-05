@@ -26,7 +26,9 @@ requires:
 resources:
   bugtracker: https://github.com/nrdvana/perl-Math-3Space/issues
   repository: https://github.com/nrdvana/perl-Math-3Space.git
-version: '0.004'
+version: '0.005'
+x_contributors:
+  - 'Ed J <mohawk2@users.noreply.github.com>'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

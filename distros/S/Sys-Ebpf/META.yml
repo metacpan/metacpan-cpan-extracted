@@ -1,0 +1,89 @@
+---
+abstract: 'Pure-Perl interface for eBPF (extended Berkeley Packet Filter)'
+author:
+  - 'TAKERU HAYASAKA <hayatake396@gmail.com>'
+build_requires:
+  IO::Interface::Simple: '0'
+  Minilla: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sys-Ebpf
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Sys::Ebpf:
+    file: lib/Sys/Ebpf.pm
+    version: '0.03'
+  Sys::Ebpf::Asm:
+    file: lib/Sys/Ebpf/Asm.pm
+  Sys::Ebpf::Constants::BpfAttachType:
+    file: lib/Sys/Ebpf/Constants/BpfAttachType.pm
+  Sys::Ebpf::Constants::BpfCmd:
+    file: lib/Sys/Ebpf/Constants/BpfCmd.pm
+  Sys::Ebpf::Constants::BpfMapCreateFlags:
+    file: lib/Sys/Ebpf/Constants/BpfMapCreateFlags.pm
+  Sys::Ebpf::Constants::BpfMapType:
+    file: lib/Sys/Ebpf/Constants/BpfMapType.pm
+  Sys::Ebpf::Constants::BpfMapUpdateFlags:
+    file: lib/Sys/Ebpf/Constants/BpfMapUpdateFlags.pm
+  Sys::Ebpf::Constants::BpfProgType:
+    file: lib/Sys/Ebpf/Constants/BpfProgType.pm
+  Sys::Ebpf::Elf::Constants:
+    file: lib/Sys/Ebpf/Elf/Constants.pm
+  Sys::Ebpf::Elf::MachineType:
+    file: lib/Sys/Ebpf/Elf/MachineType.pm
+  Sys::Ebpf::Elf::Parser:
+    file: lib/Sys/Ebpf/Elf/Parser.pm
+    version: '0'
+  Sys::Ebpf::Link::Netlink::Constants::Iflink:
+    file: lib/Sys/Ebpf/Link/Netlink/Constants/Iflink.pm
+  Sys::Ebpf::Link::Netlink::Constants::Netlink:
+    file: lib/Sys/Ebpf/Link/Netlink/Constants/Netlink.pm
+  Sys::Ebpf::Link::Netlink::Constants::Rtnetlink:
+    file: lib/Sys/Ebpf/Link/Netlink/Constants/Rtnetlink.pm
+  Sys::Ebpf::Link::Netlink::Constants::Socket:
+    file: lib/Sys/Ebpf/Link/Netlink/Constants/Socket.pm
+  Sys::Ebpf::Link::Netlink::Socket:
+    file: lib/Sys/Ebpf/Link/Netlink/Socket.pm
+  Sys::Ebpf::Link::Netlink::Xdp:
+    file: lib/Sys/Ebpf/Link/Netlink/Xdp.pm
+  Sys::Ebpf::Link::Perf::Arch:
+    file: lib/Sys/Ebpf/Link/Perf/Arch.pm
+  Sys::Ebpf::Link::Perf::Constants::PerfEvent:
+    file: lib/Sys/Ebpf/Link/Perf/Constants/PerfEvent.pm
+  Sys::Ebpf::Link::Perf::Constants::PerfEventIoctl:
+    file: lib/Sys/Ebpf/Link/Perf/Constants/PerfEventIoctl.pm
+  Sys::Ebpf::Link::Perf::Kprobe:
+    file: lib/Sys/Ebpf/Link/Perf/Kprobe.pm
+  Sys::Ebpf::Loader:
+    file: lib/Sys/Ebpf/Loader.pm
+  Sys::Ebpf::Map:
+    file: lib/Sys/Ebpf/Map.pm
+  Sys::Ebpf::Reader:
+    file: lib/Sys/Ebpf/Reader.pm
+  Sys::Ebpf::Syscall:
+    file: lib/Sys/Ebpf/Syscall.pm
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/takehaya/perl-ebpf/issues
+  homepage: https://github.com/takehaya/perl-ebpf
+  repository: https://github.com/takehaya/perl-ebpf.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

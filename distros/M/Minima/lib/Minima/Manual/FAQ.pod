@@ -1,0 +1,15 @@
+=head1 FAQ
+
+You've stumbled upon the empty FAQ! If you're pondering the mysteries of
+the universe -- or just this documentation -- feel free to ask the
+author. Help fill this void with questions.
+
+=head1 SEE ALSO
+
+L<Minima>, L<Minima::Manual::Customizing>, L<perlclass>.
+
+=head1 AUTHOR
+
+Cesar Tessarin, <cesar@tessarin.com.br>.
+
+Written in September 2024.

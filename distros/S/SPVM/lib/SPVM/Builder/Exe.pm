@@ -15,6 +15,7 @@ use SPVM::Builder::Native::Compiler;
 use SPVM::Builder::Native::Runtime;
 use SPVM::Builder::Native::BasicType;
 use SPVM::Builder::Native::ClassFile;
+use SPVM::Builder::Config::Info;
 
 # Fields
 sub builder {
@@ -1061,11 +1062,42 @@ sub get_user_defined_basic_type_names {
     7, # SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE,
   ];
   
+  # Classes for anon methods are contained in another class.
   my $basic_types = [grep { $_->get_name !~ /::anon_method::/ } @{$runtime->get_basic_types({category => $category})}];
   
   my $class_names = [map { $_->get_name } @$basic_types];
   
   return $class_names;
+}
+
+sub dump_resource_info {
+  my ($class, $script_name) = @_;
+  
+  my $info = SPVM::Builder::Config::Info->new(script_name => $script_name);
+  
+  my $class_names = [grep { $info->is_resource_loader($_) } @{$info->get_class_names}];
+  
+  my $resource_info = "";
+  
+  for my $class_name (@$class_names) {
+    my $config_file = $info->get_config_file($class_name);
+    
+    $resource_info .= <<"EOS";
+[$class_name]
+# $config_file
+# Loaded Resources:
+EOS
+    
+    for my $resource_name (@{$info->get_config($class_name)->get_resource_names}) {
+      $resource_info .= "#    $resource_name\n";
+    }
+    
+    my $config_content = $info->get_config_content($class_name);
+    
+    $resource_info .= "$config_content\n";
+  }
+  
+  return $resource_info;
 }
 
 1;

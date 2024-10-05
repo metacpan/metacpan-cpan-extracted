@@ -32,8 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Locale::Unicode" : "v0.3.7",
-            "Locale::Unicode::Data" : "v1.0.2",
+            "Locale::Unicode" : "v0.3.8",
+            "Locale::Unicode::Data" : "v1.0.4",
             "Scalar::Util" : "0",
             "Want" : "0.17",
             "overload" : "1.06",
@@ -67,6 +67,6 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR"
       }
    },
-   "version" : "v0.4.2",
+   "version" : "v0.4.3",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

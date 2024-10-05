@@ -1,6 +1,17 @@
 -----
 
-0.0.7    to be released
+0.0.8    2024-10-04
+    [Added]
+       * Support for SSH-transport ('...+ssh://') connection URLs
+       * Run read-only connections through '*-ro' sockets
+    [Changed]
+       * Calls to auth() and open() are now part of the
+         connect() function
+    [Fixed]
+       * Completeness 'cpanfile' dependency listing
+       * Error reporting on Connection module load failure
+
+0.0.7    2024-09-29
     [Breaking]
        * Minimum Perl increased from 5.20 to 5.26 due to the combination
          of signatures with Future::AsyncAwait.  Incidentally also allows

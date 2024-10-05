@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 3;
+use Test2::V0 '-no_srand';
 
 {
 package My::Package;
@@ -26,3 +26,5 @@ $t = My::Package->new(
     },
 );
 ok defined $t->{_dbh}, 'dbh was created immediately';
+
+done_testing;

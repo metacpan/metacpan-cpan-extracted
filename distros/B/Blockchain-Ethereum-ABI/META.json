@@ -4,7 +4,7 @@
       "Reginaldo Costa <refeco@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -40,7 +40,7 @@
             "Crypt::Digest::Keccak256" : "0.078",
             "Math::BigInt" : "1.999811",
             "Module::Load" : "0.36",
-            "Object::Pad" : "0.805",
+            "Object::Pad" : "0.814",
             "Scalar::Util" : "1.63",
             "indirect" : "0.39",
             "perl" : "v5.26.0"
@@ -60,47 +60,47 @@
    "provides" : {
       "Blockchain::Ethereum::ABI" : {
          "file" : "lib/Blockchain/Ethereum/ABI.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Blockchain::Ethereum::ABI::Decoder" : {
          "file" : "lib/Blockchain/Ethereum/ABI/Decoder.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Blockchain::Ethereum::ABI::Encoder" : {
          "file" : "lib/Blockchain/Ethereum/ABI/Encoder.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Blockchain::Ethereum::ABI::Type" : {
          "file" : "lib/Blockchain/Ethereum/ABI/Type.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Blockchain::Ethereum::ABI::Type::Address" : {
          "file" : "lib/Blockchain/Ethereum/ABI/Type/Address.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Blockchain::Ethereum::ABI::Type::Array" : {
          "file" : "lib/Blockchain/Ethereum/ABI/Type/Array.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Blockchain::Ethereum::ABI::Type::Bytes" : {
          "file" : "lib/Blockchain/Ethereum/ABI/Type/Bytes.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Blockchain::Ethereum::ABI::Type::Int" : {
          "file" : "lib/Blockchain/Ethereum/ABI/Type/Int.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Blockchain::Ethereum::ABI::Type::String" : {
          "file" : "lib/Blockchain/Ethereum/ABI/Type/String.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Blockchain::Ethereum::ABI::Type::Tuple" : {
          "file" : "lib/Blockchain/Ethereum/ABI/Type/Tuple.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Blockchain::Ethereum::ABI::TypeRole" : {
          "file" : "lib/Blockchain/Ethereum/ABI/TypeRole.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -112,10 +112,10 @@
          "web" : "https://github.com/refeco/Blockchain-Ethereum-ABI"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_authority" : "cpan:REFECO",
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "MIT"
 }
 

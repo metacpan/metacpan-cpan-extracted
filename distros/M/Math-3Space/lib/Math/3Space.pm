@@ -1,6 +1,6 @@
 package Math::3Space;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: 3D Coordinate math with an intuitive cross-space mapping API
 
 use strict;
@@ -371,9 +371,15 @@ OpenGL::Sandbox provides handy wrappers around OpenGL textures, shaders, fonts, 
 
 Michael Conrad <mike@nrdvana.net>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Ed J
+
+Ed J <mohawk2@users.noreply.github.com>
+
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 COPYRIGHT AND LICENSE
 

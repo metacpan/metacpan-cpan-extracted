@@ -63,3 +63,5 @@ This script allows you to chat with the OpenAI API using the `gpt-3.5-turbo`
 model.  It remembers past messages so you can ask about previous messages.
 Note that this is an example script. In reality, you might need to ensure you
 don't keep too many messages in memory.
+
+See also L<An OpenAI Chatbot in Perl|https://curtispoe.org/articles/an-openai-chatbot-in-perl.html>.

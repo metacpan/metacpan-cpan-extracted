@@ -4,7 +4,7 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,19 +32,16 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "DBI" : "0",
-            "Exporter" : "5",
-            "File::Spec" : "0",
-            "Filter::signatures" : "0.09",
             "Moo" : "2",
-            "POSIX" : "0",
-            "perl" : "5.010"
+            "experimental" : "0.032",
+            "perl" : "5.020"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Module::Load" : "0",
+            "Test2::V0" : "0"
          }
       }
    },
@@ -62,7 +59,7 @@
          "web" : "https://github.com/Corion/MooX-Role-DBIConnection"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.11",
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

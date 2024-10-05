@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection::Local v0.0.7;
+package Sys::Async::Virt::Connection::Local v0.0.8;
 
 use parent qw(Sys::Async::Virt::Connection);
 
@@ -26,7 +26,7 @@ use Log::Any qw($log);
 sub new($class, $url, %args) {
     return bless {
         url => $url,
-        %args{ qw( socket ) }
+        %args{ qw( readonly socket ) }
     }, $class;
 }
 
@@ -36,7 +36,8 @@ sub close($self) {
 
 async sub connect($self) {
     # disect URL
-    $self->{socket} //= '/run/libvirt/libvirt-sock';
+    $self->{socket} //=
+        '/run/libvirt/libvirt-sock' . ($self->{readonly} ? '-ro' : '');
     my $sock = await $self->loop->connect(
         addr => {
             family => 'unix',
@@ -69,7 +70,7 @@ Sys::Async::Virt::Connection::Local - Connection to LibVirt server over Unix
 
 =head1 VERSION
 
-v0.0.7
+v0.0.8
 
 =head1 SYNOPSIS
 

@@ -15,11 +15,11 @@ Math::Symbolic::Custom::Collect - Collect up Math::Symbolic expressions
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Custom::Base;
@@ -762,7 +762,7 @@ sub prepare {
                 my $new_numerator = Math::Symbolic::Operator->new( '+', $numerator, $m1 );
                 $return_t = prepare(Math::Symbolic::Operator->new( '/', $new_numerator, $denominator ), $d);                                  
             }
-            elsif ( ($t->op2()->term_type() == T_OPERATOR) && ($t->op2()->type() == B_DIVISION) ) {                
+            elsif ( ($op2->term_type() == T_OPERATOR) && ($op2->type() == B_DIVISION) ) {                
                 # Merging sum into fraction                
                 my $numerator = $op2->op1();
                 my $denominator = $op2->op2();
@@ -817,7 +817,7 @@ sub prepare {
                 my $new_numerator = Math::Symbolic::Operator->new( '-', $numerator, $m1 );
                 $return_t = prepare(Math::Symbolic::Operator->new( '/', $new_numerator, $denominator ), $d);                                  
             }
-            elsif ( ($t->op2()->term_type() == T_OPERATOR) && ($t->op2()->type() == B_DIVISION) ) {
+            elsif ( ($op2->term_type() == T_OPERATOR) && ($op2->type() == B_DIVISION) ) {
                 # Merging subtraction into fraction                
                 my $numerator = $op2->op1();
                 my $denominator = $op2->op2();

@@ -1,0 +1,36 @@
+=head1 TESTING
+
+Testing a Minima web application is a straightforward task thanks to
+L<Plack::Test> and L<HTTP::Request::Common>. A basic setup looks like
+this:
+
+    use HTTP::Request::Common;
+    use Minima::Setup;
+    use Plack::Test;
+
+    my $app  = \&Minima::Setup::init;
+    my $test = Plack::Test->create($app);
+
+If you'd prefer to simplify it further, L<Minima::Setup> provides a
+C<test> method:
+
+    use HTTP::Request::Common;
+    use Minima::Setup;
+    use Test2::V0;
+
+    my $test = Minima::Setup::test;
+
+    my $res = $test->request(GET '/');
+
+    is( $res->code, 200, 'returned 200 for root' );
+    like( $res->content, qr/<html>/, 'outputs HTML' );
+
+=head1 SEE ALSO
+
+L<Minima>, L<Minima::Project>, L<Minima::App>.
+
+=head1 AUTHOR
+
+Cesar Tessarin, <cesar@tessarin.com.br>.
+
+Written in September 2024.

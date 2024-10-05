@@ -1,5 +1,10 @@
 -----
 
+10.3.13   2024-10-04
+    [Added]
+        * Module for querying the unix socket path
+          (Protocol::Sys::Virt::UNIXSocket)
+
 10.3.12   2024-09-29
     [Fixed]
         * KeepAlive sends messages, not call/replies

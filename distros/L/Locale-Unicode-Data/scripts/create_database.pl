@@ -298,6 +298,7 @@ sub process
         currencies_info => "INSERT INTO currencies_info (territory, currency, start, until, is_tender, hist_sequence, is_obsolete) VALUES(?, ?, ?, ?, ?, ?, ?)",
         currencies_l10n => "INSERT INTO currencies_l10n (locale, currency, count, locale_name, symbol) VALUES(?, ?, ?, ?, ?)",
         date_fields_l10n => "INSERT INTO date_fields_l10n (locale, field_type, field_length, relative, locale_name) VALUES(?, ?, ?, ?, ?)",
+        date_terms => "INSERT INTO date_terms (locale, term_type, term_length, display_name) VALUES(?, ?, ?, ?)",
         day_periods => "INSERT INTO day_periods (locale, day_period, start, until) VALUES(?, ?, ?, ?)",
         language_population => "INSERT INTO language_population (territory, locale, population_percent, literacy_percent, writing_percent, official_status) VALUES(?, ?, ?, ?, ?, ?)",
         languages => "INSERT OR IGNORE INTO languages (language, scripts, territories, parent, alt, status) VALUES(?, ?, ?, ?, ?, ?)",
@@ -3827,6 +3828,7 @@ sub process
     my $sth_inter_fmt = $sths->{calendar_interval_formats} || die( "No SQL statement object for calendar_interval_formats" );
     my $sth_cyclic = $sths->{calendar_cyclics_l10n} || die( "No SQL statement object for calendar_cyclics_l10n" );
     my $sth_field = $sths->{date_fields_l10n} || die( "No SQL statement object for date_fields_l10n" );
+    my $sth_date_term = $sths->{date_terms} || die( "No SQL statement object for date_terms" );
     my $sth_locale_info = $sths->{locales_info} || die( "No SQL statement object for locales_info" );
     my $sth_locale_num_sys = $sths->{locale_number_systems} || die( "No SQL statement object for locale_number_systems" );
     my $sth_num_sys_l10n = $sths->{number_systems_l10n} || die( "No SQL statement object for number_systems_l10n" );
@@ -4873,10 +4875,31 @@ sub process
                         $el_field = resolve_alias( $calDateFieldHasAliasRes ) ||
                             die( "This date field of type ${type} is aliased, but I could not resolve it for locale ${locale} in file ${f}." );
                     }
+                    my $displayNameRes = $el_field->findnodes( './displayName' );
+                    my $display_name;
+                    if( !$displayNameRes->size )
+                    {
+                        warn( "Warning only: missing display name for this field of type '${type}' for locale '${locale}' in file ${f}" );
+                    }
+                    else
+                    {
+                        $display_name = trim( $displayNameRes->shift->textContent );
+                        my $def =
+                        {
+                            locale          => $locale,
+                            term_type       => $field_type,
+                            term_length     => $field_length,
+                            display_name    => $display_name,
+                        };
+                        eval
+                        {
+                            $sth_date_term->execute( @$def{qw( locale term_type term_length display_name )} );
+                        } || die( "Error executing query to add date term for locale ${locale} and term type $def->{term_type} and term length $def->{term_length} from file ${f}: ", ( $@ || $sth_date_term->errstr ), "\nwith query: ", $sth_date_term->{Statement}, "\n", dump( $def ) );
+                        $added->{date_term}++;
+                    }
                     my $calDateFieldItemsRes = $el_field->findnodes( './relative[@type]' );
                     while( my $el_item = $calDateFieldItemsRes->shift )
                     {
-                        # TODO process each item.
                         my $def =
                         {
                             locale          => $locale,

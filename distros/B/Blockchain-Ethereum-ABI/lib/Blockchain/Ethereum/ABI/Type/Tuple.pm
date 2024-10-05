@@ -14,7 +14,7 @@ class Blockchain::Ethereum::ABI::Type::Tuple
     :does(Blockchain::Ethereum::ABI::TypeRole);
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.015';          # VERSION
+our $VERSION   = '0.016';          # VERSION
 
 use Carp;
 
@@ -106,7 +106,7 @@ Blockchain::Ethereum::ABI::Type::Tuple - Solidity uint/int/bool type interface
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

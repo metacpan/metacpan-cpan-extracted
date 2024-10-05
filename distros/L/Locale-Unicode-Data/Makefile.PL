@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
         'File::Spec'            => '3.2501',
         # 2007-12-19
         'JSON'                  => '2.00',
-        'Locale::Unicode'       => 'v0.3.5',
+        'Locale::Unicode'       => 'v0.3.8',
         'Scalar::Util'          => 0,
         # 2004-11-05
         # 'URI::file'             => '4.19',

@@ -14,7 +14,7 @@ class Blockchain::Ethereum::ABI::Type::String
     :does(Blockchain::Ethereum::ABI::TypeRole);
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.015';          # VERSION
+our $VERSION   = '0.016';          # VERSION
 
 method _configure { return }
 
@@ -55,7 +55,7 @@ Blockchain::Ethereum::ABI::Type::String - Solidity string type interface
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

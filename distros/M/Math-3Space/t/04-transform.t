@@ -6,6 +6,16 @@ sub vec_check {
 	my ($x, $y, $z)= @_;
 	return object { call sub { [shift->xyz] }, [ float($x), float($y), float($z) ]; }
 }
+sub vec_hashref_check {
+	my ($x, $y, $z)= @_;
+	return @_ == 2? { x => float($x), y => float($y) }
+		: { x => float($x), y => float($y), z => float($z) };
+}
+sub vec_arrayref_check {
+	my ($x, $y, $z)= @_;
+	return @_ == 2? [ float($x), float($y) ]
+		: [ float($x), float($y), float($z) ];
+}
 
 subtest translate => sub {
 	my $s1= space();
@@ -153,13 +163,13 @@ subtest project_inplace => sub {
 	$sp->project_inplace($x= vec3(1,1,1));
 	is( $x, vec_check(1,-1,1), 'vec3' );
 	$sp->project_inplace($x= [1,1,1]);
-	is( $x, [1,-1,1], 'array' );
+	is( $x, vec_arrayref_check(1,-1,1), 'array' );
 	$sp->project_inplace($x= { x => 1, y => 1, z => 1 });
-	is( $x, { x => 1, y => -1, z => 1 }, 'hash' );
+	is( $x, vec_hashref_check(1,-1,1), 'hash' );
 	$sp->project_inplace($x= [1,1]);
-	is( $x, [1,-1], 'array[2]' );
+	is( $x, vec_arrayref_check(1,-1), 'array[2]' );
 	$sp->project_inplace($x= { x => 1, y => 1 });
-	is( $x, { x => 1, y => -1 }, 'hash x,y' );
+	is( $x, vec_hashref_check(1,-1), 'hash x,y' );
 };
 
 done_testing;

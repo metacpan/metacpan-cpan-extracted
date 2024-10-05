@@ -1,0 +1,80 @@
+=head1 CUSTOMIZING
+
+Customizing you usage of Minima is quite straightforward once you
+understand how it works and a few PSGI concepts. If you haven't yet,
+check L<Minima/How it works>.
+
+=head1 Setup
+
+The setup process can be completely skipped. If your goal is to create a
+custom app, load your configuration hash and create L<Minima::App>
+yourself:
+
+F<app.psgi>
+
+    use Minima::App;
+
+    my $app = Minima::App->new(
+        environment => $env,
+        configuration => $config,
+    );
+
+    sub { $app->run }
+
+=head1 Controllers
+
+The main objective of a controller is to return a valid PSGI response.
+L<Minima::Controller> is provided as a starting point for you to
+subclass and implement your logic as desired.
+
+If you don't want to subclass it and are relying on L<Minima::App> to
+instantiate and call your controller, you should note that by default it
+will pass two named arguments to your controller's C<new> method:
+
+    app => $self,
+    route => $m,
+
+Depending on your implementation details (whether your controller is a
+class, package, or another type of object) you may want to use those
+arguments or not.
+
+=head2 Arguments
+
+=over 16
+
+=item C<environment>
+
+L<Plack> environment reference.
+
+=item C<app>
+
+A reference to the L<Minima::App> instance which is initializing your
+controller.
+
+=item C<route>
+
+The matched route as returned by L<Minima::Router>.
+
+=back
+
+As your controller is called last, remember to return a valid PSGI
+response and you're good to go.
+
+=head1 Templating System
+
+If you want to customize how L<Template Toolkit|Template> is used in
+L<Minima::View::HTML>, check L<Minima::View::HTML/Configuration>.
+
+If you don't want to use Template Toolkit at all, just skip
+L<Minima::View::HTML>. Your controller logic is solely responsible
+for calling it, so feel free to create your own views.
+
+=head1 SEE ALSO
+
+L<Minima>, L<Minima::Manual::FAQ>, L<perlclass>.
+
+=head1 AUTHOR
+
+Cesar Tessarin, <cesar@tessarin.com.br>.
+
+Written in September 2024.

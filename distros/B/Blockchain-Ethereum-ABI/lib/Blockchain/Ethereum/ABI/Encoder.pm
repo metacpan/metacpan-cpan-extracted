@@ -12,7 +12,7 @@ package Blockchain::Ethereum::ABI::Encoder;
 class Blockchain::Ethereum::ABI::Encoder;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.015';          # VERSION
+our $VERSION   = '0.016';          # VERSION
 
 use Carp;
 use Crypt::Digest::Keccak256 qw(keccak256_hex);
@@ -88,7 +88,7 @@ Blockchain::Ethereum::ABI::Encoder - ABI utility for encoding ethereum contract 
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

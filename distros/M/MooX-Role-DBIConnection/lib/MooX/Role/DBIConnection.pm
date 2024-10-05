@@ -1,11 +1,8 @@
-package MooX::Role::DBIConnection;
+package MooX::Role::DBIConnection 0.06;
+use 5.020;
+use experimental 'signatures';
 use Moo::Role;
-use Filter::signatures;
-use feature 'signatures';
-no warnings 'experimental::signatures';
 use DBI;
-
-our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -75,12 +72,10 @@ the C<< ->dbh >>. The default is to make the connection lazily on first use.
 
 sub BUILD( $self, $args ) {
     if( my $_dbh = delete $args->{dbh}) {
+        $self->{_dbh_options} = $_dbh;
         if(ref $_dbh eq 'HASH' && $_dbh->{eager}) {
-            $_dbh = $self->_connect_db( $_dbh );
-            $self->{_dbh} = $_dbh;
-        } else {
-            $self->{_dbh_options} = $_dbh;
-        }
+            $self->reconnect( $_dbh );
+        };
     }
 };
 
@@ -91,11 +86,12 @@ sub _connect_db( $self, $dbh ) {
     return $dbh
 }
 
+sub reconnect( $self, $options = $self->{_dbh_options} ) {
+    $self->{_dbh} = $self->_connect_db( $options )
+}
+
 sub dbh( $self ) {
-    if( my $opt = delete $self->{_dbh_options}) {
-        $self->{_dbh} = $self->_connect_db( $opt );
-    }
-    $self->{_dbh}
+    return $self->{_dbh} //= $self->_connect_db( $self->{_dbh_options} );
 }
 
 1;
@@ -121,7 +117,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2019-2023 by Max Maischein C<corion@cpan.org>.
+Copyright 2019-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

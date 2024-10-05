@@ -1,5 +1,11 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.0.4 2024-10-03T06:34:57+0900
+    - Added table date_terms to capture missing field display_name in main/*.xml/ldml/dates/fields/field[@type]/displayName
+    - Updated the create_database.pl script to add the new table date_terms
+    - Added 2 methods: date_term and date_terms
+    - Updated the documentation to reflect the new table and methods
+
 v1.0.3 2024-10-02T07:07:17+0900
     - Improved handling of UTC data for the timezones table in the script create_database.pl
     - Updated the SQL check constraint for the tables timezones, aliases, bcp47_values, locales_l10n, scripts_l10n, territories_l10n, variants_l10n, calendar_datetime_formats, and time_formats

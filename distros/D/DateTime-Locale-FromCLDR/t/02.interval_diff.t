@@ -171,6 +171,11 @@ BAIL_OUT( $locale->error ) if( !defined( $diff ) && $locale->error );
 diag( "Greatest difference is: '${diff}'" ) if( $DEBUG );
 is( $diff, 'a', 'a' );
 
+$diff = $locale->interval_greatest_diff( $dt1, $dt2, day_period_first => 1 );
+BAIL_OUT( $locale->error ) if( !defined( $diff ) && $locale->error );
+diag( "Greatest difference is: '${diff}'" ) if( $DEBUG );
+is( $diff, 'B', 'B' );
+
 # NOTE: Different periods of the day
 diag( "Testing different periods of the day" ) if( $DEBUG );
 $dt1 = DateTime->new(

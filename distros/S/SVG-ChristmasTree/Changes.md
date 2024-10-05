@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.5] - 2024-10-05
+
+### Fixed
+
+- Duplicate code in Makefile.PL (thanks hakonhagland)
+
 ## [0.0.5] - 2021-01-12
 
 ### Added

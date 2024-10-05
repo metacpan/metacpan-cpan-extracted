@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.53';
+$VERSION = '0.54';
 use strict;
 use warnings;
 use Carp;
@@ -176,6 +176,7 @@ sub Populate {
 	$self->bind('<ButtonRelease-1>', 'matchCheck');
 	$self->bind('<Control-a>', 'selectAll');
 	$self->markSet('match', '0.0');
+	$self->after(10, ['DoPostConfig', $self]);
 }
 
 sub Backspace {
@@ -458,6 +459,15 @@ sub delete {
 	$self->RecordUndo('delete', $self->editModified, $begin, $string);
 	$self->SUPER::delete(@_);
 	$self->Callback('-modifycall', $begin);
+}
+
+sub DoPostConfig {
+	my $self = shift;
+	my $string = '00000000';
+	my $length = $self->fontMeasure($self->cget('-font'), $string);
+	my $iw =  $self->cget('-insertwidth');
+	$self->{'ins_width_ins'} = $iw;
+	$self->{'ins_width_ovr'} = int($length/8);
 }
 
 sub EditMenuItems {
@@ -852,6 +862,22 @@ sub matchoptions {
 	}
 }
 
+
+sub OverstrikeMode {
+	my ($self, $mode) = @_;
+	$self->{'OVERSTRIKE_MODE'} = 0 unless exists $self->{'OVERSTRIKE_MODE'};
+	if (defined $mode) {
+		if ($mode) {
+			$self->configure('-insertwidth', $self->{'ins_width_ovr'})
+		} else {
+			my $iw = $self->{'ins_width_ins'};
+			$iw = 2 unless defined $iw;
+			$self->configure('-insertwidth', $iw)
+		}
+		$self->{'OVERSTRIKE_MODE'} = $mode;
+	}
+	return $self->{'OVERSTRIKE_MODE'};
+}
 
 sub PostPopupMenu {
 	my ($self, $x, $y) = @_;

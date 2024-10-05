@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Client-OpenAI
 
+0.09    2024-10-05
+        - Update OpenAI spec
+        - Include examples/describe_image.pl
+
 0.08    2024-09-19 12:24 (CEST)
         - Bump OpenAI spec to version 2.3.0
 

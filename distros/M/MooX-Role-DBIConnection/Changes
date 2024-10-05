@@ -1,3 +1,9 @@
+0.06 2024-10-12
+    * Add ->reconnect() method
+      This changes the behaviour of the role a bit. The role now retains
+      the parameters used for the DBI->connect call in C<_dbh_options>.
+    * Require Perl 5.020
+
 0.05 2023-07-21
     * Various test suite updates, no code changes, no need to upgrade
 

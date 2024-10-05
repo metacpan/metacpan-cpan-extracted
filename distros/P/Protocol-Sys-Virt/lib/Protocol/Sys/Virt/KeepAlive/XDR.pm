@@ -9,7 +9,7 @@
 #
 ####################################################################
 
-package Protocol::Sys::Virt::KeepAlive::XDR v10.3.12;
+package Protocol::Sys::Virt::KeepAlive::XDR v10.3.13;
 
 use v5.14;
 use warnings FATAL => 'uninitialized';
@@ -57,7 +57,7 @@ Protocol::Sys::Virt::KeepAlive::XDR - Constants and (de)serializers for KeepAliv
 
 =head1 VERSION
 
-v10.3.12
+v10.3.13
 
 Based on LibVirt tag v10.3.0
 

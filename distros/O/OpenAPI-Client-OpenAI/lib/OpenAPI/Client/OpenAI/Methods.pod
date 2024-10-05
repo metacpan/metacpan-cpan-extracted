@@ -1827,7 +1827,9 @@ Return only events for these projects.
 
 Return only events with a C<type> in one of these values. For example,
 C<project.created>. For all options, see the documentation for the
-L<audit log object|https://platform.openai.com/docs/api-reference/audit-logs/object>.
+L<audit log
+object|https://platform.openai.com/docs/api-reference/audit-logs/object
+>.
 
 =over 4
 

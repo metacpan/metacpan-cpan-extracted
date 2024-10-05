@@ -1,5 +1,8 @@
 Revision history for Math-Symbolic-Custom-Collect
 
+0.02    Fri Oct 04 14:00 2024
+        Bug fix in combining fractions
+
 0.01    Fri Sep 27 10:00 2024
         First version
 

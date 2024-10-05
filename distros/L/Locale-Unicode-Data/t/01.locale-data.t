@@ -91,6 +91,8 @@ can_ok( $cldr, 'database_handler' );
 can_ok( $cldr, 'datafile' );
 can_ok( $cldr, 'date_field_l10n' );
 can_ok( $cldr, 'date_fields_l10n' );
+can_ok( $cldr, 'date_term' );
+can_ok( $cldr, 'date_terms' );
 can_ok( $cldr, 'day_period' );
 can_ok( $cldr, 'day_periods' );
 can_ok( $cldr, 'decode_sql_arrays' );
@@ -214,7 +216,7 @@ SKIP:
         calendar_interval_formats calendar_terms calendars
         calendars_l10n casings code_mappings collations
         collations_l10n currencies currencies_info
-        currencies_l10n date_fields_l10n day_periods
+        currencies_l10n date_fields_l10n date_terms day_periods
         language_population languages languages_match
         likely_subtags locale_number_systems locales
         locales_info locales_l10n metainfos metazones

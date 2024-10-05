@@ -6,12 +6,13 @@ no indirect;
 use feature 'signatures';
 
 use Object::Pad;
+# ABSTRACT: Type interface roles
 
 package Blockchain::Ethereum::ABI::TypeRole;
 role Blockchain::Ethereum::ABI::TypeRole;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.015';          # VERSION
+our $VERSION   = '0.016';          # VERSION
 
 method encode;
 
@@ -29,11 +30,11 @@ __END__
 
 =head1 NAME
 
-Blockchain::Ethereum::ABI::TypeRole
+Blockchain::Ethereum::ABI::TypeRole - Type interface roles
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 METHODS
 

@@ -1,0 +1,81 @@
+{
+   "abstract" : "Efficient web framework built with modern core classes",
+   "author" : [
+      "Cesar Tessarin, <cesar@tessarin.com.br>."
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Minima",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Share" : "0.27",
+            "File::ShareDir" : "1.00",
+            "Path::Tiny" : "0.142",
+            "Plack" : "1.0050",
+            "Router::Simple" : "0.17",
+            "Template" : "3.100",
+            "perl" : "v5.40.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "2.1",
+            "HTTP::Request::Common" : "6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Minima" : {
+         "file" : "lib/Minima.pm",
+         "version" : "v0.1.0"
+      },
+      "Minima::App" : {
+         "file" : "lib/Minima/App.pm"
+      },
+      "Minima::Controller" : {
+         "file" : "lib/Minima/Controller.pm"
+      },
+      "Minima::Project" : {
+         "file" : "lib/Minima/Project.pm"
+      },
+      "Minima::Router" : {
+         "file" : "lib/Minima/Router.pm"
+      },
+      "Minima::Setup" : {
+         "file" : "lib/Minima/Setup.pm"
+      },
+      "Minima::View" : {
+         "file" : "lib/Minima/View.pm"
+      },
+      "Minima::View::HTML" : {
+         "file" : "lib/Minima/View/HTML.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tessarin/Minima/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/tessarin/Minima"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

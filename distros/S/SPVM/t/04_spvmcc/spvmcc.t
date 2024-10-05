@@ -27,9 +27,30 @@ rmtree "$build_dir/work";
 
 my $dev_null = File::Spec->devnull;
 
+# Failed to parse options.
+{
+  {
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc --not-exist t/04_spvmcc/script/myapp.spvm);
+    my $status = system($spvmcc_cmd);
+    isnt($status, 0);
+  }
+}
+
+{
+  # --resource-info
+  {
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -B $build_dir -I $test_dir/lib/SPVM -I t/02_vm/lib/SPVM --resource-info t/04_spvmcc/script/myapp.spvm);
+    my $output = `$spvmcc_cmd`;
+    like($output, qr|\Q[TestCase::NativeAPI2]|);
+    like($output, qr|TestCase::Resource::Mylib1|);
+    like($output, qr|TestCase::Resource::Mylib2|);
+    like($output, qr|\Q[TestCase::Precompile]|);
+  }
+}
+
 # Compilation Error
 {
-  my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -o $exe_dir/myexe_compile_error --no-config t/04_spvmcc/script/my_exe_compile_error.spvm);
+  my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -o $exe_dir/myapp_compile_error --no-config t/04_spvmcc/script/myapp_compile_error.spvm);
   my $status = system($spvmcc_cmd);
   ok($status != 0);
   
@@ -41,11 +62,11 @@ my $dev_null = File::Spec->devnull;
 {
   {
     
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -o $exe_dir/myexe_runtime_error --no-config t/04_spvmcc/script/my_exe_compile_error/main_instant_method.spvm);
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -o $exe_dir/myapp_runtime_error --no-config t/04_spvmcc/script/myapp_compile_error/main_instant_method.spvm);
     my $status = system($spvmcc_cmd);
     ok($status == 0);
     
-    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe_runtime_error/);
+    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myapp_runtime_error/);
     my $execute_cmd_with_args = "$execute_cmd args1 args2";
     
     my $error = `$execute_cmd_with_args 2>&1 1>$devnull`;
@@ -55,11 +76,11 @@ my $dev_null = File::Spec->devnull;
   sleep 1;
   
   {
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -o $exe_dir/myexe_runtime_error --no-config t/04_spvmcc/script/my_exe_compile_error/main_has_arguments.spvm);
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -o $exe_dir/myapp_runtime_error --no-config t/04_spvmcc/script/myapp_compile_error/main_has_arguments.spvm);
     my $status = system($spvmcc_cmd);
     ok($status == 0);
     
-    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe_runtime_error/);
+    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myapp_runtime_error/);
     my $execute_cmd_with_args = "$execute_cmd args1 args2";
     
     my $error = `$execute_cmd_with_args 2>&1 1>$devnull`;
@@ -69,11 +90,11 @@ my $dev_null = File::Spec->devnull;
   sleep 1;
   
   {
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -o $exe_dir/myexe_runtime_error --no-config t/04_spvmcc/script/my_exe_compile_error/main_not_found.spvm);
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -o $exe_dir/myapp_runtime_error --no-config t/04_spvmcc/script/myapp_compile_error/main_not_found.spvm);
     my $status = system($spvmcc_cmd);
     ok($status == 0);
     
-    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe_runtime_error/);
+    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myapp_runtime_error/);
     my $execute_cmd_with_args = "$execute_cmd args1 args2";
     
     my $error = `$execute_cmd_with_args 2>&1 1>$devnull`;
@@ -82,38 +103,13 @@ my $dev_null = File::Spec->devnull;
 }
 
 {
-  # Basic
-  {
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -B $build_dir -I $test_dir/lib/SPVM -o $exe_dir/myexe t/04_spvmcc/script/my_exe.spvm);
-    system($spvmcc_cmd) == 0
-      or die "Can't execute spvmcc command $spvmcc_cmd:$!";
-
-    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe/);
-    my $execute_cmd_with_args = "$execute_cmd args1 args2";
-    system($execute_cmd_with_args) == 0
-      or die "Can't execute command:$execute_cmd_with_args:$!";
-    
-    my $output = `$execute_cmd_with_args`;
-    chomp $output;
-    my $output_expect = "AAA $execute_cmd 3 1 1 7 args1 args2 1";
-    is($output, $output_expect);
-    
-    # Check -B option
-    {
-      ok(-f "$build_dir/work/exe/myexe$Config{exe_ext}");
-    }
-  }
-}
-
-
-{
   # --optimize="-O0 -g"
   {
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc --optimize="-O0 -g" -B $build_dir -I $test_dir/lib/SPVM -o $exe_dir/myexe t/04_spvmcc/script/my_exe.spvm);
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc --optimize="-O0 -g" -B $build_dir -I $test_dir/lib/SPVM -o $exe_dir/myapp t/04_spvmcc/script/myapp.spvm);
     system($spvmcc_cmd) == 0
       or die "Can't execute spvmcc command $spvmcc_cmd:$!";
 
-    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe/);
+    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myapp/);
     my $execute_cmd_with_args = "$execute_cmd args1 args2";
     system($execute_cmd_with_args) == 0
       or die "Can't execute command:$execute_cmd_with_args:$!";
@@ -125,7 +121,7 @@ my $dev_null = File::Spec->devnull;
     
     # Check -B option
     {
-      ok(-f "$build_dir/work/exe/myexe$Config{exe_ext}");
+      ok(-f "$build_dir/work/exe/myapp$Config{exe_ext}");
     }
   }
 }
@@ -149,11 +145,11 @@ my $dev_null = File::Spec->devnull;
   
   # Basic
   {
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -B $build_dir -I $test_dir/lib/SPVM -o $exe_dir/myexe t/04_spvmcc/script/my_exe.spvm);
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -B $build_dir -I $test_dir/lib/SPVM -o $exe_dir/myapp t/04_spvmcc/script/myapp.spvm);
     system($spvmcc_cmd) == 0
       or die "Can't execute spvmcc command $spvmcc_cmd:$!";
     
-    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe/);
+    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myapp/);
     my $execute_cmd_with_args = "$execute_cmd args1 args2";
     system($execute_cmd_with_args) == 0
       or die "Can't execute command:$execute_cmd_with_args:$!";
@@ -165,13 +161,13 @@ my $dev_null = File::Spec->devnull;
     
     # Check -B option
     {
-      ok(-f "$build_dir/work/exe/myexe$Config{exe_ext}");
+      ok(-f "$build_dir/work/exe/myapp$Config{exe_ext}");
     }
   }
 
   # Compile and link cached
   {
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc --build-dir $build_dir -I $test_dir/lib/SPVM -o $exe_dir/myexe --no-config t/04_spvmcc/script/my_exe.spvm);
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc --build-dir $build_dir -I $test_dir/lib/SPVM -o $exe_dir/myapp --no-config t/04_spvmcc/script/myapp.spvm);
     my $spvmcc_output = `$spvmcc_cmd 2>&1 1>$dev_null`;
     if (length $spvmcc_output == 0) {
       ok(1);
@@ -184,7 +180,7 @@ my $dev_null = File::Spec->devnull;
   
   # debug config -O0 -g, --config-argv, --config-argv-option
   {
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -f -B $build_dir -I $test_dir/lib/SPVM -o $exe_dir/myexe --mode debug --config-argv ARG0 --config-argv ARG1 --config-argv-option NAME=VALUE t/04_spvmcc/script/my_exe.spvm);
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -f -B $build_dir -I $test_dir/lib/SPVM -o $exe_dir/myapp --mode debug --config-argv ARG0 --config-argv ARG1 --config-argv-option NAME=VALUE t/04_spvmcc/script/myapp.spvm);
     my $spvmcc_output = `$spvmcc_cmd 2>&1 1>$dev_null`;
     like($spvmcc_output, qr/NativeAPI2\.o/);
     like($spvmcc_output, qr/NativeAPI2\.precompile\.o/);
@@ -200,7 +196,7 @@ my $dev_null = File::Spec->devnull;
     
     warn "$spvmcc_output";
 
-    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe/);
+    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myapp/);
     my $execute_cmd_with_args = "$execute_cmd args1 args2";
     system($execute_cmd_with_args) == 0
       or die "Can't execute command: $execute_cmd_with_args:$!";
@@ -214,11 +210,11 @@ my $dev_null = File::Spec->devnull;
 
 {
   {
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -B $build_dir -o $exe_dir/myexe --no-config t/04_spvmcc/script/program_name.spvm);
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -B $build_dir -o $exe_dir/myapp --no-config t/04_spvmcc/script/program_name.spvm);
     system($spvmcc_cmd) == 0
       or die "Can't execute spvmcc command $spvmcc_cmd:$!";
     
-    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe/);
+    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myapp/);
     my $execute_cmd_with_args = "$execute_cmd args1 args2";
     system($execute_cmd_with_args) == 0
       or die "Can't execute command:$execute_cmd_with_args:$!";
@@ -232,11 +228,11 @@ my $dev_null = File::Spec->devnull;
 
 # Execute solo test. This is described in DEVELOPMENT.txt
 {
-  my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -I solo/lib/SPVM -o $exe_dir/myexe_solo --no-config solo/script/my_exe.spvm foo bar);
+  my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -I solo/lib/SPVM -o $exe_dir/myapp_solo --no-config solo/script/myapp.spvm foo bar);
   system($spvmcc_cmd) == 0
    or die "Can't execute spvmcc command $spvmcc_cmd:$!";
 
-  my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe_solo/);
+  my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myapp_solo/);
   my $execute_cmd_with_args = "$execute_cmd foo bar";
   system($execute_cmd_with_args) == 0
     or die "Can't execute command:$execute_cmd_with_args:$!";

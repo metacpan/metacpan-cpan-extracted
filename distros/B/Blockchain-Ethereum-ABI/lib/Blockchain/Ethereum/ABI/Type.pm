@@ -6,12 +6,13 @@ no indirect;
 use feature 'signatures';
 
 use Object::Pad ':experimental(init_expr)';
+# ABSTRACT: Type interface
 
 package Blockchain::Ethereum::ABI::Type;
 class Blockchain::Ethereum::ABI::Type;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.015';          # VERSION
+our $VERSION   = '0.016';          # VERSION
 
 use Carp;
 use Module::Load;
@@ -199,11 +200,11 @@ __END__
 
 =head1 NAME
 
-Blockchain::Ethereum::ABI::Type
+Blockchain::Ethereum::ABI::Type - Type interface
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

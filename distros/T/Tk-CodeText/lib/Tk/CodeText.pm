@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.53';
+$VERSION = '0.54';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -181,6 +181,11 @@ line by line basis. This is the time between lines.
 Default value 'tab'. You can also set it to a number.
 In that case an indent will be the number of spaces.
 
+=item Switch: B<-linespercycle>
+
+Default value 10. It specifies how many lines Tk::CodeText will Highlight in one cycle.
+You can tone it down if the application responds sluggish.
+
 =item Switch: B<-match>
 
 Default value '[]{}()'. Specifies which items to match
@@ -274,16 +279,6 @@ used syntax definition.
 Default value undef. Sets and loads a theme file with tags information 
 for highlighting. A call to cget returns the name of the loaded theme file.
 See also L<Tk::CodeText::Theme>.
-
-=item Name: B<updateLines>
-
-=item Class: B<UpdateLines>
-
-=item Switch: B<-updatelines>
-
-Default value 100. If is used during save and load operation. 
-It specifies after how many lines an update on the progress bar on
-the status bar should occur.
 
 =item Switch: B<-xmlfolder>
 
@@ -512,6 +507,7 @@ sub Populate {
 		-bookmarksize => [qw/PASSIVE bookmarkSize BookmarkSize/, 20],
 		-configdir => [qw/PASSIVE configdir ConfigDir/, ''],
 		-highlightinterval => [qw/METHOD highlightInterval HighlightInterval/, 1],
+		-linespercycle => ['PASSIVE', undef, undef, 1],
 		-minusimg => ['PASSIVE', undef, undef, $self->Bitmap(
 			-data => $minusimg,
 			-foreground => $fg,
@@ -786,7 +782,7 @@ sub bookmarkRemove {
 	$self->bookmarkCheck;
 }
 
-=item B<bookmarkRemoveAll>I<(?$line?)>
+=item B<bookmarkRemoveAll>
 
 Removes all bookmarks. 
 
@@ -1174,17 +1170,22 @@ sub highlightLoop {
 		$self->LoopActive(0);
 		return
 	}
-	my $colored = $self->Colored;
 	my $xt = $self->Subwidget('XText');
-	if ($colored <= $xt->linenumber('end - 1c')) {
-		$self->LoopActive(1);
-		$self->highlightLine($colored);
-		$colored ++;
-		$self->Colored($colored);
-		$self->after($self->highlightinterval, ['highlightLoop', $self]);
-	} else {
-		$self->LoopActive(0);
+	my $lpc = $self->cget('-linespercycle');
+	$lpc = 1 unless defined $lpc;
+	for (1 .. $lpc) {
+		my $colored = $self->Colored;
+		if ($colored <= $xt->linenumber('end - 1c')) {
+			$self->LoopActive(1);
+			$self->highlightLine($colored);
+			$colored ++;
+			$self->Colored($colored);
+		} else {
+			$self->LoopActive(0);
+		}
+		last unless $self->LoopActive;
 	}
+	$self->after($self->highlightinterval, ['highlightLoop', $self]) if $self->LoopActive;
 }
 
 sub highlightPurge {

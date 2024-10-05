@@ -8,7 +8,7 @@ package Sumu::Perl::Modules;
 
 =head1 VERSION
 
-version 0.4.4
+version 0.4.8
 
 =head2 SYNOPSIS
 
@@ -22,14 +22,14 @@ version 0.4.4
 
         my ($mod, $dirs, $files) = $modules->_dirs(current_user => $current_user, module => "$module");
 
-        my ($mod, $out) = $modules->_doc( module => $module );
+        my ($mod, $out) = $modules->_doc( module => "$module" );
 
 
 =head2 DESCRIPTION
 
     List all installed Perl Modules on your system
 
-=head2 For Developer Only
+=head2 For Developer
 
     Being tested in:
 
@@ -73,13 +73,13 @@ use warnings;
 
 =head2 our VERSION
 
-    our $VERSION = '0.4.4'
+    our $VERSION = '0.4.8'
 
     This version number is updated automatically!
 
 =cut
 
-our $VERSION = '0.4.4';
+our $VERSION = '0.4.8';
 
 
 =head2 Internals
@@ -98,6 +98,8 @@ our @EXPORT_OK = qw(
     _extutils 
     _dirs 
     _doc
+    _inc
+    _inc_dir
 ); 
 
 =head2 sub NAME
@@ -149,7 +151,7 @@ use Pod::Html;
 
     Usage:
 
-        my $modules_list = $modules->_extutils( module => $"module" );
+        my $modules_list = $modules->_extutils( module => "$module" );
 
 =cut
 
@@ -221,7 +223,7 @@ sub _dirs  {
     my $module = $in{module};
     chomp $module; 
 
-    $module =~ s!\\!\/!g;
+    #$module =~ s!\\!\/!g;
 
     #
     my @mod_dirs = $inst->directories("$module");
@@ -273,7 +275,7 @@ sub _dirs  {
             as text with a line break (<br>) appended to end of each line
     Usage:
 
-        my ($total_lines, $out) = $modules->_doc( module => "$module" );
+        my ($total_lines, $out, $error) = $modules->_doc( module => "$module" );
 
 =cut
 
@@ -288,34 +290,35 @@ sub _doc {
     my $out;
     #
     my $total_lines;
-
+    #
+    my $error;
     #
     my $module = $in{module};
         chomp $module;
 
-    $module =~ s!\\!\/!g;
+    #$module =~ s!\\!\/!g;
+
+    if ( -f "$module" ) {
+        if ( open( my $FILE, "<", "$module" ) ) {
+            while ( my $line = <$FILE> ) {
+                #
+                $total_lines++ if $line;
+                #
+                $line =~ s!\<!&lt;!g;
+                $line =~ s!\>!&gt;!g;
+                #
+                $out .= qq{$line<br>};
+            }
+            close $FILE;
+        } else {
+            $error .= qq{<div class="alert alert-danger">Unable to open module</div>};
+        }
+    } else {
+        $error = qq{<div class="alert alert-danger">Not a file or incorrect file path</div>};
+    }
     
-    my @doc = `perldoc "$module"`;
 
-    $total_lines = scalar @doc;
-
-    for (@doc) {
-        $_ =~ s!\<!&lt;!g;
-        $_ =~ s!\>!&gt;!g;
-        $out .= qq{$_<br>};
-    }
-
-    if ($total_lines < 9 ) {
-        @doc = `pod2html "$module"`;
-    }
-
-    for (@doc) {
-        $out .= qq{$_ };
-    }
-
-    $total_lines = scalar @doc;
-
-    return ($total_lines, $out);
+    return ($total_lines, $out, $error);
 
     #
 
@@ -334,6 +337,10 @@ sub _doc {
             default is '/_inc_dir'
 
                 see sub _inc_dir 
+
+    Usage:
+
+        my $out = $modules->_inc( module = "$module" );
 
 =cut
 
@@ -355,7 +362,7 @@ sub _inc {
         my @name = split(/\//, $_);
         # link 
         $out .= qq{<li>}; 
-        $out .= qq{<a href="$in{_inc_dir}/$_" };
+        $out .= qq{<a href="$in{url}/$_" };
         $out .= qq{title="$name[$#name]">};
         $out .= qq{$name[$#name]};
         $out .= qq{</a>};
@@ -382,6 +389,20 @@ sub _inc {
 
         my $out = $modules->_inc_dir( dir => "")
 
+        <a 
+            href="http://loclhost:20202/_inc_dir//home/ns21u2204/perl5/perlbrew/perls/perl-5.38.0/lib/5.38.0/x86_64-linux"
+            title="x86_64-linux"
+        >
+        x86_64-linux
+        </a>
+
+        <a 
+            href="http://CompanionUrl/_inc_dir//home/ns21u2204/p/perl/Perl-Modules-Companion/lib" 
+            title="lib"
+        >
+        lib
+        </a>
+
 =cut
 
 sub _inc_dir {
@@ -394,10 +415,10 @@ sub _inc_dir {
 	my $out;
 	$out .= qq{};
 
-	my @directoreis;
+	my @directories;
 	my @files;
 
-	my $dir = $in{inc_dir};
+	my $dir = "$in{inc_dir}";
 	chomp $dir;
 
 	if (-d "$dir") {
@@ -407,16 +428,16 @@ sub _inc_dir {
 			#
 			while ( my $item = <@dir> ) {
 				#Directories
-				push(@directoreis, "$dir/$item") if (-d "$dir/$item");
+				push(@directories, "$dir/$item") if (-d "$dir/$item");
 				# Files
 				push(@files, "$dir/$item") if (-f "$dir/$item");
 			}
 			#
 		} else {
-			$out = qq{Unable to open dir};
+			$out = qq{<div class="alert alert-warning">Unable to open dir</div>};
 		}
 	} else {
-		$out = qq{Not a Dir};
+		$out = qq{<div class="alert alert-warning">Not a Dir $dir</div>};
 	}
 	#
 
@@ -430,7 +451,7 @@ sub _inc_dir {
 
 	#
 	$out .= qq{<article class="container"><h2>Directories</h2>};
-	for (@directoreis) {
+	for (@directories) {
 		#
 		my @d_name = split(/\//, $_);
 		$out .= qq{<a href="/_inc/$_" title="$d_name[$#d_name]">$d_name[$#d_name]</a> };

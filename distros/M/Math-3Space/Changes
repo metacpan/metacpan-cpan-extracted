@@ -1,3 +1,7 @@
+0.005 - 2024-10-04
+  - Fix failing tests in t/04-transform related to floating point rounding
+  - Enable CONTRIBUTORS section of pod
+
 0.004 - 2024-09-30
   - BREAKNG CHANGE: Function previously named Vector::dot was actually cosine,
     and is now renamed to Vector::cos.  New Vector::dot is a pure dot product

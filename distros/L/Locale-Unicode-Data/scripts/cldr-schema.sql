@@ -912,7 +912,7 @@ CREATE TABLE calendar_cyclics_l10n (
 );
 CREATE UNIQUE INDEX idx_calendar_cyclics_l10n_unique ON calendar_cyclics_l10n(locale, calendar, format_set, format_type, format_length, format_id);
 
--- Source: main/*.xml/ldml/dates/fields
+-- Source: main/*.xml/ldml/dates/fields/field[@type]/relative
 CREATE TABLE date_fields_l10n (
      date_field_id      INTEGER
     ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
@@ -920,6 +920,7 @@ CREATE TABLE date_fields_l10n (
     ,field_type         VARCHAR(10) NOT NULL COLLATE NOCASE
     -- standard (if none defined), short, narrow
     ,field_length       VARCHAR(10) NOT NULL
+    -- The localised value for the field type
     ,relative           INTEGER NOT NULL
     ,locale_name        TEXT NOT NULL
     ,PRIMARY KEY(date_field_id)
@@ -928,6 +929,23 @@ CREATE TABLE date_fields_l10n (
     ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 CREATE UNIQUE INDEX idx_date_fields_l10n_unique ON date_fields_l10n(locale, field_type, field_length, relative);
+
+-- Source: main/*.xml/ldml/dates/fields/field[@type]/displayName
+CREATE TABLE date_terms (
+     date_term_id       INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    -- Example: era, year, quarter, month, week, weekOfMonth, day, dayOfYear, weekday, weekdayOfMonth, mon..sun, dayperiod, hour, minute, second, zone and for each *-short. *-narrow
+    ,term_type         VARCHAR(10) NOT NULL COLLATE NOCASE
+    -- standard (if none defined), short, narrow
+    ,term_length       VARCHAR(10) NOT NULL
+    -- The localised value for the field type
+    ,display_name       VARCHAR(40)
+    ,PRIMARY KEY(date_term_id)
+    ,CHECK( term_type REGEXP '^[a-zA-Z][a-zA-Z0-9]+(?:\-[a-zA-Z][a-zA-Z0-9]+)*$' )
+    ,CHECK( term_length REGEXP '^[a-zA-Z][a-zA-Z0-9]+$' )
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX idx_date_terms_unique ON date_terms(locale, term_type, term_length);
 
 -- Source: main/*.xml->//layout/orientation/characterOrder
 -- left-to-right or right-to-left

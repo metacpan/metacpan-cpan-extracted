@@ -1,0 +1,170 @@
+use strict;
+use warnings;
+use Test::More tests => 35;
+use Test::Tk;
+use lib 't/lib';
+use Tk;
+
+BEGIN { use_ok('BenchCodeText') };
+
+# $delay = 3000;
+createapp;
+
+my $reffile = 't/ref_file.pl';
+my $text;
+if (defined $app) {
+	$text = $app->BenchCodeText(
+		-autoindent => 1,
+		-tabs => '7m',
+		-font => 'Monospace 12',
+		-modifiedcall => sub { my $index = shift; print "index $index\n"; },
+#		-readonly => 1,
+		-syntax => 'XML',
+	)->pack(
+		-expand => 1,
+		-fill => 'both',
+	) if defined $app;
+
+	$text->Subwidget('Statusbar')->Button(
+		-text=> 'Reset',
+		-relief => 'flat',
+		-command => ['clear', $text], 
+	)->pack(-side => 'left');
+
+	$text->Subwidget('Statusbar')->Button(
+		-text=> 'Load Ref file',
+		-relief => 'flat',
+		-command => ['load', $text, $reffile], 
+	)->pack(-side => 'left');
+
+	$text->Subwidget('Statusbar')->Button(
+		-text=> 'Bm new',
+		-relief => 'flat',
+		-command => ['bookmarkNew', $text], 
+	)->pack(-side => 'left');
+
+	$text->Subwidget('Statusbar')->Button(
+		-text=> 'Bm clear',
+		-relief => 'flat',
+		-command => ['bookmarkRemove', $text], 
+	)->pack(-side => 'left');
+
+	my $menu;
+	$menu = $app->Menu(
+		-menuitems => [
+			[ cascade => '~File',
+				-menuitems => [
+					[ command => '~Load', -command => sub {
+						my $file = $app->getOpenFile;
+						$text->load($file) if defined $file;
+					}],
+					[ command => '~Save', -command => sub {
+						my $file = $app->getSaveFile;
+						$text->save($file) if defined $file;
+					}],
+				]
+			],
+			[ cascade => '~Edit',
+				-menuitems => [ $text->EditMenuItems ],
+			],
+			[ cascade => '~Search',
+				-menuitems => $text->SearchMenuItems,
+			],
+			[ cascade => '~View',
+				-menuitems => [ $text->ViewMenuItems ],
+			],
+			[ cascade => '~Bookmarks',
+				-postcommand => sub { $text->bookmarkMenuPop($menu, 'Bookmarks') },
+				-menuitems => [ $text->bookmarkMenuItems ],
+			],
+		],
+	);
+	$app->configure(-menu => $menu);
+	$app->geometry('800x600+200+200');
+}
+
+my $timerresult;
+push @tests, (
+	[ sub { return defined $text }, 1, 'BenchCodeText widget created' ],
+	[ sub { 
+		$text->load($reffile);
+		pause(1000);
+		return 1
+	}, 1, 'ref file loaded' ],
+);
+
+my $filesize = -s $reffile;
+my @times = ();
+for (1 .. 20) {
+	my $lines_per_cycle = $_;
+	push @tests, [
+		sub {
+			$text->configure('-linespercycle', $lines_per_cycle);
+			my @t = ();
+			for (1 .. 5) {
+				$text->TimerReset;
+				$text->highlightPurge(1);
+				pause(1000);
+				push @t, $text->TimerResult;
+			}
+			my $min = 10000;
+			my $max = 0;
+			my $avg = 0;
+			my $speed = 0;
+			for (@t) {
+				my $timed = $_;
+				$min = $timed if $timed < $min;
+				$max = $timed if $timed > $max;
+				$avg = $avg + $timed;
+			}
+			$avg = $avg / 5;
+			$speed = $filesize / $avg;
+			push @times, [$lines_per_cycle, $min, $max, $avg, $speed]; 
+			
+#			print "min: $min\n";
+#			print "max: $max\n";
+#			print "avg: $avg\n";
+#			print "speed: $speed\n";
+			return 1
+		}, 1, "$lines_per_cycle lines per cycle"
+	]
+}
+
+starttesting;
+
+print "lines/cycle  minimum   maximum   average   speed\n";
+for (@times) {
+	my ($lin, $min, $max, $avg, $speed) = @$_;
+	my $pos = 0;
+	print $lin;
+	$pos = $pos + length($lin);
+	while ($pos ne 13) {
+		$pos++;
+		print " "
+	}
+	my $m = sprintf("%4f", $min);
+	$pos = $pos + length($m);
+	print $m;
+	while ($pos ne 23) {
+		$pos++;
+		print " "
+	}
+	my $x = sprintf("%4f", $max);
+	$pos = $pos + length($x);
+	print $x;
+	while ($pos ne 33) {
+		$pos++;
+		print " "
+	}
+	my $a = sprintf("%4f", $avg);
+	$pos = $pos + length($a);
+	print $a;
+	while ($pos ne 43) {
+		$pos++;
+		print " "
+	}
+	my $s = sprintf("%6f", $speed);
+#	$pos = $pos + length($s);
+	print $s;
+	print "\n";
+}

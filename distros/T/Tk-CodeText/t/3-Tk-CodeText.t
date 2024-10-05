@@ -82,19 +82,7 @@ if (defined $app) {
 }
 
 #testing accessors
-my @accessors = qw(Colored ColorInf FoldButtons FoldInf highlightinterval LoopActive NoHighlighting SaveFirstVisible SaveLastVisible);
-for (@accessors) {
-	my $method = $_;
-	push @tests, [sub {
-		my $default = $text->$method;
-		$text->$method('blieb');
-		my $res1 = $text->$method;
-		$text->$method('quep');
-		my $res2 = $text->$method;
-		$text->$method($default);
-		return (($res1 eq 'blieb') and ($res2 eq 'quep'));
-	}, 1, "Accessor $method"];
-}
+testaccessors($text, qw /Colored ColorInf FoldButtons FoldInf highlightinterval LoopActive NoHighlighting SaveFirstVisible SaveLastVisible/);
 
 push @tests, (
 	[ sub { return defined $text }, 1, 'CodeText widget created' ],

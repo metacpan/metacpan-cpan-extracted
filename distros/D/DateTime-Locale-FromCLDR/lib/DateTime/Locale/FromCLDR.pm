@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/DateTime/Locale/FromCLDR.pm
-## Version v0.4.2
+## Version v0.4.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/07
-## Modified 2024/09/24
+## Modified 2024/09/26
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     # "If a given short metazone form is known NOT to be understood in a given locale and the parent locale has this value such that it would normally be inherited, the inheritance of this value can be explicitly disabled by use of the 'no inheritance marker' as the value, which is 3 simultaneous empty set characters (U+2205)."
     # <https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
     our $EMPTY_SET = "∅∅∅";
-    our $VERSION = 'v0.4.2';
+    our $VERSION = 'v0.4.3';
 };
 
 use strict;
@@ -544,6 +544,10 @@ sub format_gmt
     {
         return( $self->error( "No time offset was provided." ) );
     }
+    elsif( ref( $offset ) && !overload::Method( $offset => '""' ) )
+    {
+        return( $self->error( "Offset provided (", overload::StrVal( $offset ), ") is a reference that does not stringify!" ) );
+    }
     elsif( $offset !~ /^(?:\-|\+)?\d+$/ )
     {
         return( $self->error( "Invalid offset value '${offset}'" ) );
@@ -552,6 +556,10 @@ sub format_gmt
            $offset > 359999 )
     {
         return( $self->error( "Out of bound offset value provided: '${offset}'" ) );
+    }
+    elsif( ref( $opts->{width} ) && !overload::Method( $opts->{width} => '""' ) )
+    {
+        return( $self->error( "Width provided (", overload::StrVal( $opts->{width} ), ") is a reference that does not stringify!" ) );
     }
     elsif( $opts->{width} !~ /^(?:long|short)$/ )
     {
@@ -653,6 +661,7 @@ sub format_timezone_location
     my $opts = $self->_get_args_as_hash( @_ );
     my $timezone = $opts->{timezone} ||
         return( $self->error( "No timezone was provided." ) );
+    return( $self->error( "Time zone provided (", overload::StrVal( $timezone ), ") is a reference that does not stringify!" ) ) if( ref( $timezone ) && !overload::Method( $timezone => '""' ) );
     $timezone = $self->timezone_canonical( $timezone );
     return( $self->pass_error ) if( !defined( $timezone ) );
     return( "Unknown time zone '${timezone}'" ) if( !$timezone );
@@ -732,8 +741,10 @@ sub format_timezone_non_location
     my $opts = $self->_get_args_as_hash( @_ );
     my $timezone = $opts->{timezone} ||
         return( $self->error( "No timezone was provided." ) );
+    return( $self->error( "Time zone provided (", overload::StrVal( $timezone ), ") is a reference that does not stringify!" ) ) if( ref( $timezone ) && !overload::Method( $timezone => '""' ) );
     my $type = $opts->{type} ||
         return( $self->error( "No timezone type was provided. It must be one of: generic, standard, or daylight" ) );
+    return( $self->error( "Type provided (", overload::StrVal( $type ), ") is a reference that does not stringify!" ) ) if( ref( $type ) && !overload::Method( $type => '""' ) );
     if( $type ne 'generic' &&
         $type ne 'standard' &&
         $type ne 'daylight' )
@@ -741,6 +752,7 @@ sub format_timezone_non_location
         return( $self->error( "Invalid timezone type provided (${type}). It must be one of: generic, standard or daylight" ) );
     }
     my $width = $opts->{width} || 'long';
+    return( $self->error( "Width provided (", overload::StrVal( $width ), ") is a reference that does not stringify!" ) ) if( ref( $width ) && !overload::Method( $width => '""' ) );
     if( $width ne 'long' &&
         $width ne 'short' )
     {
@@ -769,6 +781,10 @@ sub format_timezone_non_location
         my $meta_name_cache = {};
         my $get_meta_names = sub
         {
+            if( !length( $tz_info->{metazone} // '' ) )
+            {
+                return( {} );
+            }
             return( $meta_name_cache->{ $tz_info->{metazone} }->{ $width } ) if( exists( $meta_name_cache->{ $tz_info->{metazone} }->{ $width } ) && ref( $meta_name_cache->{ $tz_info->{metazone} }->{ $width } ) eq 'HASH' );
             foreach my $loc ( @$tree )
             {
@@ -785,7 +801,8 @@ sub format_timezone_non_location
                     return( $meta_name_cache->{ $tz_info->{metazone} }->{ $width } = $ref );
                 }
             }
-            return;
+            # We return an empty string to differentiate from an error that returns undef
+            return( {} );
         };
         my $get_meta_info = sub
         {
@@ -804,7 +821,7 @@ sub format_timezone_non_location
                 $meta_names = $get_meta_names->();
                 if( !defined( $meta_names ) )
                 {
-                    return( $self->error( "Unable to find the metazone information for metazone '$tz_info->{metazone}'." ) );
+                    return( $self->pass_error );
                 }
             }
     
@@ -832,8 +849,9 @@ sub format_timezone_non_location
             }
             # "Otherwise if the generic type is needed, but not available, and the offset and daylight offset do not change within 184 day +/- interval around the exact formatted time, use the standard type."
             elsif( $type eq 'generic' && 
+                   scalar( keys( %$meta_names ) ) &&
                    !$meta_names->{generic} &&
-                   !$self->has_dst )
+                   !$self->has_dst( $timezone ) )
             {
                 return( $type_fallback = $meta_names->{standard} );
             }
@@ -1049,6 +1067,7 @@ sub has_dst
     my $self = shift( @_ );
     my $timezone = shift( @_ ) ||
         return( $self->error( "No time zone was provided." ) );
+    return( $self->error( "Time zone provided (", overload::StrVal( $timezone ), ") is a reference that does not stringify!" ) ) if( ref( $timezone ) && !overload::Method( $timezone => '""' ) );
     $TZ_DST_CACHE //= {};
     $timezone = $self->timezone_canonical( $timezone );
     return( $self->pass_error ) if( !defined( $timezone ) );
@@ -1096,6 +1115,22 @@ sub interval_format
         return( $self->error( "No greatest difference token was provided." ) );
     my $locale = $self->{locale} ||
         return( $self->error( "No locale is set!" ) );
+    if( ref( $id ) && !overload::Method( $id => '""' ) )
+    {
+        return( $self->error( "Interval format ID provided (", overload::StrVal( $id ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( ref( $greatest_diff ) && !overload::Method( $greatest_diff => '""' ) )
+    {
+        return( $self->error( "Greatest difference provided (", overload::StrVal( $greatest_diff ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( $id !~ /^[a-zA-Z]+$/ )
+    {
+        return( $self->error( "Invalid interval format ID provided." ) );
+    }
+    elsif( $greatest_diff !~ /^[a-zA-Z]$/ )
+    {
+        return( $self->error( "Invalid greatest difference value provided (", overload::StrVal( $greatest_diff ), ")" ) );
+    }
     $locale = $self->_locale_object( $locale ) ||
         return( $self->pass_error );
     my $cldr = $self->{_cldr} ||
@@ -1181,25 +1216,26 @@ sub interval_greatest_diff
         return( $self->error( "No DateTime object was provided. \$locale->interval_greatest_diff( \$dt1, \$dt2 )" ) );
     my $dt2 = shift( @_ ) ||
         return( $self->error( "Missing DateTime object. I was expecting 2 DateTime object, but only 1 was provided. \$locale->interval_greatest_diff( \$dt1, \$dt2 )" ) );
-    if( !defined( $dt1 ) ||
-        !Scalar::Util::blessed( $dt1 ) ||
-        !$dt1->isa( 'DateTime' ) )
+    my $opts = $self->_get_args_as_hash( @_ );
+    foreach my $dt ( $dt1, $dt2 )
     {
-        return( $self->error( "The first DateTime value provided (", overload::StrVal( $dt1 // 'undef' ), ") is not a DateTime object." ) );
+        if( !defined( $dt ) ||
+            !Scalar::Util::blessed( $dt ) ||
+            !$dt->isa( 'DateTime' ) )
+        {
+            return( $self->error( "Invalid DateTime object provided (", overload::StrVal( $dt // 'undef' ), ")." ) );
+        }
     }
-    if( !defined( $dt2 ) ||
-        !Scalar::Util::blessed( $dt2 ) ||
-        !$dt2->isa( 'DateTime' ) )
+    my $locale = $self->{locale} ||
+        die( "The locale ID is gone!" );
+    if( $opts->{day_period_first} && ref( $opts->{day_period_first} ) && !overload::Method( $opts->{day_period_first} => '""' ) )
     {
-        return( $self->error( "The first DateTime value provided (", overload::StrVal( $dt2 // 'undef' ), ") is not a DateTime object." ) );
+        return( $self->error( "Day period first option provided (", overload::StrVal( $opts->{day_period_first} ), ") is a reference that does not stringify!" ) );
     }
 
     local $@;
     # try-catch
-    eval
-    {
-        require DateTime;
-    };
+    eval { require DateTime; };
     if( $@ )
     {
         return( $self->error( "Unable to load the DateTime object: $@" ) );
@@ -1218,144 +1254,83 @@ sub interval_greatest_diff
     {
         return( '' );
     }
-    my $period2val =
-    {
-        # 00:00  00:00
-        midnight => 1,
-        # 06:00  12:00
-        # or
-        # 05:00  10:00
-        morning1 => 2,
-        # 10:00  12:00
-        morning2 => 3,
-        # 12:00  12:00
-        noon => 4,
-        # 12:00  18:00
-        # or
-        # 12:00  13:00
-        afternoon1 => 5,
-        # 13:00  18:00
-        afternoon2 => 6,
-        # 18:00  21:00
-        # or
-        # 16:00  18:00
-        evening1 => 7,
-        # 18:00  21:00
-        evening2 => 8,
-        # 21:00  06:00
-        # or
-        # 19:00  23:00
-        night1 => 9,
-        # 23:00  04:00
-        night2 => 10,
-    };
     my $greatest_diff;
-    my $tokens = {};
+
+    # Components to check from largest to smallest unit
+    my @components = ( exists( $opts->{day_period_first} ) && $opts->{day_period_first} ) ? qw( G y M d B a h m ) : qw( G y M d a B h m );
     # Seconds are not used in CLDR as the greatest difference between two datetimes, but we want to know so we can issue a proper warning if we failed to find it.
     my $seconds_are_different = 0;
-    my $era1 = $dt1->year < 0 ? 0 : 1;
-    my $era2 = $dt2->year < 0 ? 0 : 1;
-    $tokens->{G} = ( $era1 == $era2 ? 0 : 1 );
-    if( $tokens->{G} == 0 )
-    {
-        $tokens->{'y'} = $dt2->year - $dt1->year;
-        if( $tokens->{'y'} == 0 )
-        {
-            $tokens->{M} = $dt2->month - $dt1->month;
-            if( $tokens->{M} == 0 )
-            {
-                $tokens->{d} = $dt2->day - $dt1->day;
-                if( $tokens->{d} == 0 )
-                {
-                    my $ampm1 = ( $dt1->hour < 12 ? 0 : 1 );
-                    my $ampm2 = ( $dt2->hour < 12 ? 0 : 1 );
-                    if( $ampm1 == $ampm2 )
-                    {
-                        # Get the day periods for our locale
-                        my $locale = $self->{locale} ||
-                            die( "The locale ID is gone!" );
-                        my $cldr = $self->{_cldr} ||
-                            die( "The Locale::Unicode::Data object is gone!" );
-                        # my $ref = $cldr->day_periods( locale => $locale ) ||
-                        #    return( $self->pass_error( $cldr->error ) );
-                        my $ref = $self->day_periods || return( $self->pass_error );
-                        my $period_token1 = $self->_find_day_period( $dt1, day_periods => $ref );
-                        my $period_token2 = $self->_find_day_period( $dt2, day_periods => $ref );
-                        my $period1 = $period2val->{ $period_token1 };
-                        my $period2 = $period2val->{ $period_token2 };
 
-                        if( defined( $period1 ) && defined( $period2 ) )
-                        {
-                            $tokens->{B} = ( $period1 == $period2 ) ? 0 : 1;
-                        }
-                        elsif( !defined( $period1 ) )
-                        {
-                            warn( "Unable to find in which day period the first time '", $dt1->time, "' falls into for locale ${locale}" ) if( warnings::enabled() );
-                        }
-                        elsif( !defined( $period2 ) )
-                        {
-                            warn( "Unable to find in which day period the second time '", $dt2->time, "' falls into for locale ${locale}" ) if( warnings::enabled() );
-                        }
-                        # If either of the period could not be defined, we fallback to null
-                        $tokens->{B} //= 0;
-                        if( $tokens->{B} == 0 )
-                        {
-                            $tokens->{h} = ( $dt1->hour == $dt2->hour ) ? 0 : 1;
-                            if( $tokens->{h} == 0 )
-                            {
-                                $tokens->{'m'} = ( $dt1->minute == $dt2->minute ) ? 0 : 1;
-                                if( $tokens->{'m'} == 0 )
-                                {
-                                    $seconds_are_different = ( $dt1->second == $dt2->second ) ? 0 : 1;
-                                }
-                                # Minute
-                                else
-                                {
-                                    $greatest_diff = 'm';
-                                }
-                            }
-                            # Hour
-                            else
-                            {
-                                $greatest_diff = 'h';
-                            }
-                        }
-                        # Day period
-                        else
-                        {
-                            $greatest_diff = 'B';
-                        }
-                    }
-                    # AM/PN
-                    else
-                    {
-                        $greatest_diff = 'a';
-                    }
-                }
-                # Day
-                else
-                {
-                $greatest_diff = 'd';
-                }
+    # Determine the greatest difference
+    foreach my $comp ( @components )
+    {
+        # Check era
+        if( $comp eq 'G' )
+        {
+            my $era1 = $dt1->year < 0 ? 0 : 1;
+            my $era2 = $dt2->year < 0 ? 0 : 1;
+            $greatest_diff = $comp if( $era1 != $era2 );
+        }
+        # Check year
+        elsif( $comp eq 'y' )
+        {
+            $greatest_diff = $comp if( $dt1->year != $dt2->year );
+        }
+        # Check month
+        elsif( $comp eq 'M' )
+        {
+            $greatest_diff = $comp if( $dt1->month != $dt2->month );
+        }
+        # Check day
+        elsif( $comp eq 'd' )
+        {
+            $greatest_diff = $comp if( $dt1->day != $dt2->day );
+        }
+        # Check day period
+        elsif( $comp eq 'B' )
+        {
+            my $ref = $self->day_periods || return( $self->pass_error );
+            # This finds the day period as a string, such as morning1, or afternoon2, etc based on the time of the datetime
+            my $period1 = $self->_find_day_period( $dt1, day_periods => $ref );
+            my $period2 = $self->_find_day_period( $dt2, day_periods => $ref );
+            if( defined( $period1 ) && defined( $period2 ) )
+            {
+                $greatest_diff = $comp if( $period1 ne $period2 );
             }
-            # Month
+            elsif( !defined( $period1 ) )
+            {
+                warn( "Unable to find in which day period the first time '", $dt1->time, "' falls into for locale ${locale}" ) if( warnings::enabled() );
+            }
+            elsif( !defined( $period2 ) )
+            {
+                warn( "Unable to find in which day period the second time '", $dt2->time, "' falls into for locale ${locale}" ) if( warnings::enabled() );
+            }
+        }
+        # Check AM/PM
+        elsif( $comp eq 'a' )
+        {
+            $greatest_diff = $comp if( ( $dt1->hour >= 12 ) != ( $dt2->hour >= 12 ) );
+        }
+        # Check hour
+        # Actually in the caller application 'h' would become 'H' if the locale uses h23 or h24 time format
+        elsif( $comp eq 'h' )
+        {
+            $greatest_diff = $comp if( $dt1->hour != $dt2->hour );
+        }
+        # Check minute
+        elsif( $comp eq 'm' )
+        {
+            if( $dt1->minute != $dt2->minute )
+            {
+                $greatest_diff = $comp;
+            }
             else
             {
-                $greatest_diff = 'M';
+                $seconds_are_different = ( ( $dt1->second == $dt2->second ) ? 0 : 1 );
             }
         }
-        # Year
-        else
-        {
-            $greatest_diff = 'y';
-        }
+        last if( defined( $greatest_diff ) );
     }
-    # Era
-    else
-    {
-        $greatest_diff = 'G';
-    }
-    
     if( !defined( $greatest_diff ) )
     {
         warn( "First datetime ", ( $is_reverse ? $dt2->iso8601 : $dt1->iso8601 ), " and second datetime ", ( $is_reverse ? $dt1->iso8601 : $dt2->iso8601 ), " are not the same, but I could not find their greatest difference." ) if( !$seconds_are_different && warnings::enabled() );
@@ -1923,6 +1898,45 @@ sub native_variants
     return( $names );
 }
 
+sub number_symbols
+{
+    my $self = shift( @_ );
+    my $num_sys = shift( @_ ) || 'latn';
+    my $meth_id = "number_symbols_for_${num_sys}";
+    my $ref;
+    unless( defined( $ref = $self->{ $meth_id } ) )
+    {
+        my $locale = $self->{locale} ||
+            die( "No locale is set!" );
+        my $cldr = $self->{_cldr} || die( "The Locale::Unicode::Data object is gone!" );
+        my $tree = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        # Crawl all the way up the locale's tree and get all the number symbols we can
+        foreach my $loc ( @$tree )
+        {
+            my $all = $cldr->number_symbols_l10n(
+                locale => $loc,
+                number_system => $num_sys,
+            );
+            return( $self->pass_error( $cldr->error ) ) if( !defined( $all ) && $cldr->error );
+            if( $all && scalar( @$all ) )
+            {
+                $ref //= {};
+                for( @$all )
+                {
+                    unless( exists( $ref->{ $_->{property} } ) )
+                    {
+                        $ref->{ $_->{property} } = $_->{value};
+                    }
+                }
+            }
+        }
+        $ref //= {};
+        $self->{ $meth_id } = $ref;
+    }
+    return( $ref );
+}
+
 sub number_system
 {
     my $self = shift( @_ );
@@ -2227,6 +2241,7 @@ sub timezone_city
     my $opts = $self->_get_args_as_hash( @_ );
     my $timezone = $opts->{timezone} ||
         return( $self->error( "No timezone was provided to get the examplar city." ) );
+    return( $self->error( "Time zone provided (", overload::StrVal( $timezone ), ") is a reference that does not stringify!" ) ) if( ref( $timezone ) && !overload::Method( $timezone => '""' ) );
     my $meth_id = 'timezone_city_for_tz_' . $timezone;
     my $name;
     unless( defined( $name = $self->{ $meth_id } ) )
@@ -2315,13 +2330,11 @@ sub timezone_id
     my $opts = $self->_get_args_as_hash( @_ );
     my $tz   = $opts->{timezone} ||
         return( $self->error( "No time zone was provided to get its short ID." ) );
+    return( $self->error( "Time zone provided (", overload::StrVal( $tz ), ") is a reference that does not stringify!" ) ) if( ref( $tz ) && !overload::Method( $tz => '""' ) );
     $tz = $self->timezone_canonical( $tz );
     return( $self->pass_error ) if( !defined( $tz ) && $self->error );
     return( $self->error( "Unable to get the canonical time zone for '$opts->{timezone}'" ) ) if( !length( $tz // '' ) );
     my $cldr = $self->{_cldr} || die( "The Locale::Unicode::Data object is gone!" );
-#     my $locale = $self->{locale} || die( "Locale is not set!" );
-#     $locale = $self->_locale_object( $locale ) ||
-#         return( $self->pass_error );
     my $ref = $cldr->timezone( timezone => $tz );
     return( $self->pass_error( $cldr->error ) ) if( !defined( $ref ) && $cldr->error );
     return( $self->error( "No time zone '${tz}' exists." ) ) if( !$ref );
@@ -2432,6 +2445,18 @@ sub _am_pm
     {
         die( "No width was provided to retrieve AM/PN localised terms." );
     }
+    elsif( ref( $opts->{context} ) && ref( $opts->{context} ) ne 'ARRAY' && !overload::Method( $opts->{context} => '""' ) )
+    {
+        return( $self->error( "Context provided (", overload::StrVal( $opts->{context} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( ref( $opts->{width} ) && ref( $opts->{width} ) ne 'ARRAY' && !overload::Method( $opts->{width} => '""' ) )
+    {
+        return( $self->error( "Width provided (", overload::StrVal( $opts->{width} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( $opts->{calendar} && ref( $opts->{calendar} ) && !overload::Method( $opts->{calendar} => '""' ) )
+    {
+        return( $self->error( "Calendar provided (", overload::StrVal( $opts->{calendar} ), ") is a reference that does not stringify!" ) );
+    }
     my $calendar = $opts->{calendar} || $self->{calendar} || 'gregorian';
     my $meth_id = 'am_pm_' . $calendar . '_' . $opts->{width} . '_' . $opts->{context};
     my $ampm;
@@ -2485,7 +2510,18 @@ sub _available_formats
     {
         die( "No format ID specified." );
     }
-    return( $self->error( "No format ID was provided" ) ) if( !length( $opts->{id} // '' ) );
+    elsif( !length( $opts->{id} // '' ) )
+    {
+        return( $self->error( "No format ID was provided" ) );
+    }
+    elsif( ref( $opts->{id} ) && !overload::Method( $opts->{id} => '""' ) )
+    {
+        return( $self->error( "Format ID provided (", overload::StrVal( $opts->{id} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( $opts->{calendar} && ref( $opts->{calendar} ) && !overload::Method( $opts->{calendar} => '""' ) )
+    {
+        return( $self->error( "Calendar provided (", overload::StrVal( $opts->{calendar} ), ") is a reference that does not stringify!" ) );
+    }
     my $calendar = $opts->{calendar} || $self->{calendar} || 'gregorian';
     my $meth_id = 'available_formats_' . $calendar . '_' . $opts->{id};
     my $pattern;
@@ -2521,9 +2557,20 @@ sub _calendar_eras
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $id   = $opts->{id} || die( "Missing ID" );
-    my $calendar = $opts->{calendar} || $self->{calendar} || 'gregorian';
     die( "Missing width" ) if( !$opts->{width} );
-    die( "Missing alt" ) if( !exists( $opts->{width} ) );
+    if( ref( $opts->{id} ) && !overload::Method( $opts->{id} => '""' ) )
+    {
+        return( $self->error( "Format ID provided (", overload::StrVal( $opts->{id} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( ref( $opts->{width} ) && ref( $opts->{width} ) ne 'ARRAY' && !overload::Method( $opts->{width} => '""' ) )
+    {
+        return( $self->error( "Width provided (", overload::StrVal( $opts->{width} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( $opts->{calendar} && ref( $opts->{calendar} ) && !overload::Method( $opts->{calendar} => '""' ) )
+    {
+        return( $self->error( "Calendar provided (", overload::StrVal( $opts->{calendar} ), ") is a reference that does not stringify!" ) );
+    }
+    my $calendar = $opts->{calendar} || $self->{calendar} || 'gregorian';
     $opts->{width} = [$opts->{width}] unless( ref( $opts->{width} ) eq 'ARRAY' );
     my $eras;
     unless( defined( $eras = $self->{ "${id}_${calendar}" } ) )
@@ -2562,15 +2609,36 @@ sub _calendar_terms
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $id   = $opts->{id} || die( "Missing ID" );
-    my $calendar = $opts->{calendar} || $self->{calendar} || 'gregorian';
     die( "Missing type" ) if( !$opts->{type} );
     die( "Missing context" ) if( !$opts->{context} );
     die( "Missing width" ) if( !$opts->{width} );
+    if( ref( $id ) && !overload::Method( $id => '""' ) )
+    {
+        return( $self->error( "Format ID provided (", overload::StrVal( $id ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( ref( $opts->{type} ) && !overload::Method( $opts->{type} => '""' ) )
+    {
+        return( $self->error( "Type provided (", overload::StrVal( $opts->{type} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( ref( $opts->{context} ) && ref( $opts->{context} ) ne 'ARRAY' && !overload::Method( $opts->{context} => '""' ) )
+    {
+        return( $self->error( "Context provided (", overload::StrVal( $opts->{context} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( ref( $opts->{width} ) && ref( $opts->{width} ) ne 'ARRAY' && !overload::Method( $opts->{width} => '""' ) )
+    {
+        return( $self->error( "Width provided (", overload::StrVal( $opts->{width} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( $opts->{calendar} && ref( $opts->{calendar} ) && !overload::Method( $opts->{calendar} => '""' ) )
+    {
+        return( $self->error( "Calendar provided (", overload::StrVal( $opts->{calendar} ), ") is a reference that does not stringify!" ) );
+    }
+    my $calendar = $opts->{calendar} || $self->{calendar} || 'gregorian';
     $opts->{width} = [$opts->{width}] unless( ref( $opts->{width} ) eq 'ARRAY' );
     # If some type (e.g. short, narrow, etc) are missing in 'format', we can try to look for it in 'stand-alone'
     $opts->{context} = [$opts->{context}] unless( ref( $opts->{context} ) eq 'ARRAY' );
+    my $meth_id = "${id}_${calendar}_type=$opts->{type}_context=" . join( ';', @{$opts->{context}} ) . '_width=' . join( ';', @{$opts->{width}} );
     my $terms;
-    unless( defined( $terms = $self->{ "${id}_${calendar}" } ) )
+    unless( defined( $terms = $self->{ $meth_id } ) )
     {
         my $locale = $self->{locale} || die( "Locale value is gone!" );
         my $cldr = $self->{_cldr} || die( "Locale::Unicode::Data object is gone!" );
@@ -2612,7 +2680,7 @@ sub _calendar_terms
         }
         # We make it NOT undef, so we do not go through this again, in the unlikely event nothing was found.
         $terms = [] if( !defined( $terms ) );
-        $self->{ $id } = $terms;
+        $self->{ $meth_id } = $terms;
     }
     return( $terms );
 }
@@ -2630,14 +2698,26 @@ sub _date_time_format
     {
         die( "No type provided. Please specify either 'date' or 'time'" );
     }
+    elsif( ref( $opts->{type} ) && ref( $opts->{type} ) ne 'ARRAY' && !overload::Method( $opts->{type} => '""' ) )
+    {
+        return( $self->error( "Type provided (", overload::StrVal( $opts->{type} ), ") is a reference that does not stringify!" ) );
+    }
     elsif( $opts->{type} ne 'date' &&
            $opts->{type} ne 'time' )
     {
         die( "Invalid type provided. Please specify either 'date' or 'time'" );
     }
+    elsif( ref( $opts->{width} ) && ref( $opts->{width} ) ne 'ARRAY' && !overload::Method( $opts->{width} => '""' ) )
+    {
+        return( $self->error( "Width provided (", overload::StrVal( $opts->{width} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( $opts->{calendar} && ref( $opts->{calendar} ) && !overload::Method( $opts->{calendar} => '""' ) )
+    {
+        return( $self->error( "Calendar provided (", overload::StrVal( $opts->{calendar} ), ") is a reference that does not stringify!" ) );
+    }
     my $widths = ref( $opts->{width} ) eq 'ARRAY' ? $opts->{width} : [$opts->{width}];
     my $calendar = $opts->{calendar} || $self->{calendar} || 'gregorian';
-    my $meth_id = $opts->{type} . '_format_' . $calendar . '_' . $widths->[0];
+    my $meth_id = '_date_time_format_' . $opts->{type} . '_format_' . $calendar . '_' . $widths->[0];
     my $pattern;
     unless( defined( $pattern = $self->{ $meth_id } ) )
     {
@@ -2688,13 +2768,21 @@ sub _datetime_format
     {
         die( "No type provided. Please specify either 'atTime' or 'standard'" );
     }
+    elsif( ref( $opts->{type} ) && !overload::Method( $opts->{type} => '""' ) )
+    {
+        return( $self->error( "Type provided (", overload::StrVal( $opts->{type} ), ") is a reference that does not stringify!" ) );
+    }
     elsif( $opts->{type} ne 'atTime' &&
            $opts->{type} ne 'standard' )
     {
         die( "Invalid type provided. Please specify either 'atTime' or 'standard'" );
     }
+    elsif( $opts->{calendar} && ref( $opts->{calendar} ) && !overload::Method( $opts->{calendar} => '""' ) )
+    {
+        return( $self->error( "Calendar provided (", overload::StrVal( $opts->{calendar} ), ") is a reference that does not stringify!" ) );
+    }
     my $calendar = $opts->{calendar} || $self->{calendar} || 'gregorian';
-    my $meth_id = "datetime_format_" . $calendar . '_' . $opts->{width} . '_' . $opts->{type};
+    my $meth_id = "_datetime_format_" . $calendar . '_' . $opts->{width} . '_' . $opts->{type};
     my $pattern;
     unless( defined( $pattern = $self->{ $meth_id } ) )
     {
@@ -2754,9 +2842,22 @@ sub _day_period
         return( $self->error( "The local value is gone!" ) );
     my $cldr = $self->{_cldr} ||
         return( $self->error( "The Locale::Unicode::Data object is gone!" ) );
+    if( $opts->{calendar} && ref( $opts->{calendar} ) && !overload::Method( $opts->{calendar} => '""' ) )
+    {
+        return( $self->error( "Calendar provided (", overload::StrVal( $opts->{calendar} ), ") is a reference that does not stringify!" ) );
+    }
     my $calendar = $opts->{calendar} || $self->{calendar} || 'gregorian';
     die( "No 'context' argument was provided." ) if( !exists( $def->{context} ) );
     die( "No 'width' argument was provided." ) if( !exists( $def->{width} ) );
+    if( ref( $def->{context} ) && ref( $def->{context} ) ne 'ARRAY' && !overload::Method( $def->{context} => '""' ) )
+    {
+        return( $self->error( "Context provided (", overload::StrVal( $def->{context} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( ref( $def->{width} ) && ref( $def->{width} ) ne 'ARRAY' && !overload::Method( $def->{width} => '""' ) )
+    {
+        return( $self->error( "Width provided (", overload::StrVal( $def->{width} ), ") is a reference that does not stringify!" ) );
+    }
+
     my $width = ref( $def->{width} ) eq 'ARRAY' ? $def->{width} : [$def->{width}];
     my $tree = $cldr->make_inheritance_tree( $locale ) ||
         return( $self->pass_error( $cldr->error ) );
@@ -3090,6 +3191,14 @@ sub _metazone_name
     {
         die( "No 'width' option provided." );
     }
+    elsif( ref( $def->{type} ) && !overload::Method( $def->{type} => '""' ) )
+    {
+        return( $self->error( "Type provided (", overload::StrVal( $def->{type} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( ref( $def->{width} ) && !overload::Method( $def->{width} => '""' ) )
+    {
+        return( $self->error( "Width provided (", overload::StrVal( $def->{width} ), ") is a reference that does not stringify!" ) );
+    }
     elsif( $def->{type} !~ /^(?:generic|standard|daylight)$/ )
     {
         die( "Bad type provided. It must be one of: generic, generic or daylight" );
@@ -3101,6 +3210,10 @@ sub _metazone_name
     elsif( !$opts->{metazone} )
     {
         return( $self->error( "No metazone was provided." ) );
+    }
+    elsif( ref( $opts->{metazone} ) && !overload::Method( $opts->{metazone} => '""' ) )
+    {
+        return( $self->error( "Metazone provided (", overload::StrVal( $opts->{metazone} ), ") is a reference that does not stringify!" ) );
     }
     my $meth_id = "metazone_name_" . $def->{type} . '_' . $def->{width} . '_meta_tz=' . $opts->{metazone};
     my $name;
@@ -3270,6 +3383,11 @@ sub _territory_info
     my $opts = $self->_get_args_as_hash( @_ );
     my $cldr = $self->{_cldr} || die( "Locale::Unicode::Data object is gone!" );
     my $territory;
+    if( $opts->{territory} && ref( $opts->{territory} ) && !overload::Method( $opts->{territory} => '""' ) )
+    {
+        return( $self->error( "Territory provided (", overload::StrVal( $opts->{territory} ), ") is a reference that does not stringify!" ) );
+    }
+
     unless( $territory = $opts->{territory} )
     {
         my $locale = $opts->{locale} ||
@@ -3326,7 +3444,14 @@ sub _time_formats
     my $self = shift( @_ );
     my $type = shift( @_ ) ||
         die( "Time format type was not provided." );
-    die( "Unsupported type '${type}'. Use one of 'preferred' or 'allowed'." ) if( $type ne 'preferred' && $type ne 'allowed' );
+    if( ref( $type ) && !overload::Method( $type => '""' ) )
+    {
+        die( "Type provided (", overload::StrVal( $type ), ") is a reference that does not stringify!" );
+    }
+    elsif( $type ne 'preferred' && $type ne 'allowed' )
+    {
+        die( "Unsupported type '${type}'. Use one of 'preferred' or 'allowed'." );
+    }
     # May be undefined
     my $code = shift( @_ );
     my $meth_id = "time_formats_${type}_code=" . ( $code // 'undef' );
@@ -3413,6 +3538,14 @@ sub _timezone_formats
     {
         die( "No 'type' option provided." );
     }
+    elsif( ref( $opts->{type} ) && !overload::Method( $opts->{type} => '""' ) )
+    {
+        return( $self->error( "Type provided (", overload::StrVal( $opts->{type} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( $opts->{subtype} && ref( $opts->{subtype} ) && !overload::Method( $opts->{subtype} => '""' ) )
+    {
+        return( $self->error( "Subtype provided (", overload::StrVal( $opts->{subtype} ), ") is a reference that does not stringify!" ) );
+    }
     my $meth_id = "timezone_formats_" . $opts->{type} . '_' . ( $opts->{subtype} // 'no_subtype' );
     my $pattern;
     unless( defined( $pattern = $self->{ $meth_id } ) )
@@ -3461,6 +3594,14 @@ sub _timezone_name
     {
         die( "No 'width' option provided." );
     }
+    elsif( ref( $def->{type} ) && !overload::Method( $def->{type} => '""' ) )
+    {
+        return( $self->error( "Type provided (", overload::StrVal( $def->{type} ), ") is a reference that does not stringify!" ) );
+    }
+    elsif( ref( $def->{width} ) && !overload::Method( $def->{width} => '""' ) )
+    {
+        return( $self->error( "Width provided (", overload::StrVal( $def->{width} ), ") is a reference that does not stringify!" ) );
+    }
     elsif( $def->{type} !~ /^(?:generic|standard|daylight)$/ )
     {
         die( "Bad type provided. It must be one of: generic, generic or daylight" );
@@ -3472,6 +3613,10 @@ sub _timezone_name
     elsif( !$opts->{timezone} )
     {
         return( $self->error( "No timezone was provided." ) );
+    }
+    elsif( ref( $opts->{timezone} ) && !overload::Method( $opts->{timezone} => '""' ) )
+    {
+        return( $self->error( "Time zone provided (", overload::StrVal( $opts->{timezone} ), ") is a reference that does not stringify!" ) );
     }
     my $meth_id = "timezone_name_" . $def->{type} . '_' . $def->{width} . '_tz=' . $opts->{timezone};
     my $name;
@@ -3993,7 +4138,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.4.2
+    v0.4.3
 
 =head1 DESCRIPTION
 
@@ -4978,6 +5123,11 @@ See L<Locale::Unicode::Data/interval_formats>
     my $locale = DateTime::Locale::FromCLDR->new( 'en' );
     my $diff = $locale->interval_greatest_diff( $dt1, $dt2 );
 
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $diff = $locale->interval_greatest_diff( $dt1, $dt2, day_period_first => 1 );
+    # or, using an hash reference instead:
+    # my $diff = $locale->interval_greatest_diff( $dt1, $dt2, { day_period_first => 1 } );
+
 Provided with 2 L<DateTime objects|DateTime>, and this will compute the L<greatest difference|https://unicode.org/reports/tr35/tr35-dates.html#intervalFormats>.
 
 Quoting from the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#intervalFormats>:
@@ -4985,6 +5135,44 @@ Quoting from the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dat
 "The data supplied in CLDR requires the software to determine the calendar field with the greatest difference before using the format pattern. For example, the greatest difference in "Jan 10-12, 2008" is the day field, while the greatest difference in "Jan 10 - Feb 12, 2008" is the month field. This is used to pick the exact pattern."
 
 If both C<DateTime> objects are identical, this will return an empty string.
+
+You can alter the inner working of the algorithm by providing the option C<day_period_first> with a true value. This will prioritise the day period over the AM/PM (morning vs afternoon). What this means, is that if you have two datetimes, one with an hour at C<10:00> and another one at C<13:00>, by default, the algorithm used in web browser, will return C<a> (component for AM/PM) highlighting the difference between morning and afternoon. However, if you pass the option C<day_period_first>, then, this method will prioritise the day periods difference and return C<B> (component for day periods).
+
+This is important, because of the way almost all, but 4 locales (C<bg>, C<id>, C<uz> and C<zu>), have sliced up their day periods. 
+
+For the locale C<en>, for example, the day periods are:
+
+=over 8
+
+=item * C<midnight>
+
+00:00  00:00
+
+=item * C<morning1>
+
+06:00  12:00
+
+=item * C<noon>
+
+12:00  12:00
+
+=item * C<afternoon1>
+
+12:00  18:00
+
+=item * C<evening1>
+
+18:00  21:00
+
+=item * C<night1>
+
+21:00  06:00
+
+=back
+
+As you can see, there are no occurrence of a day period that spans both morning and afternoon, and thus, because of those data, this method would always return, by default, C<a> instead of C<B>
+
+For the table of the C<CLDR> components, see L<Locale::Unicode::Data/"Format Patterns">
 
 If an error occurred, an L<exception object|DateTime::Locale::FromCLDR> is set and C<undef> is returned in scalar context, and an empty list in list context.
 
@@ -5341,6 +5529,131 @@ If a C<variant> subtag cannot be found in the C<locale>'s own L<language tree|Lo
 
 Either way, the size of the array will always be equal to the number of variants in the C<locale>
 
+=head2 number_symbols
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $ref = $locale->number_symbols;
+    my $ref = $locale->number_symbols( 'latn' );
+    # {
+    #     approximately => "~",
+    #     decimal => ".",
+    #     exponential => "E",
+    #     group => ",",
+    #     infinity => "∞",
+    #     list => ";",
+    #     minus => "-",
+    #     nan => "NaN",
+    #     per_mille => "‰",
+    #     percent => "%",
+    #     plus => "+",
+    #     superscript => "\xD7",
+    #     time_separator => ":",
+    # }
+
+Returns an hash reference of a locale's number symbols.
+
+If somehow, none were found, it returns an empty hash reference, so make sure to check for the size of the hash reference returned.
+
+Upon error, it sets an L<exception object|DateTime::Locale::FromCLDR::Exception> and returns C<undef> in scalar context, and an empty list in list context.
+
+Below are all the possible symbols available:
+
+Quoted sentences are from the L<Unicode LDML specifications|https://unicode.org/reports/tr35/tr35-numbers.html#Number_Symbols>.
+
+=over 4
+
+=item * C<approximately>
+
+"Symbol used to denote a value that is approximate but not exact."
+
+For example C<~>, C<≈>, C<≃>, C<約>
+
+=item * C<currency_decimal>
+
+"Used as the decimal separator instead of using the regular C<decimal> separator"
+
+For example C<.>
+
+=item * C<currency_group>
+
+"Used as the group separator instead of using the regular C<group> separator"
+
+For example C<.>
+
+=item * C<decimal>
+
+"Separates the integer and fractional part of the number."
+
+For example C<.>, C<٫>, C<,>
+
+=item * C<exponential>
+
+"Symbol separating the mantissa and exponent values."
+
+For example C<E>, C<e>, C<×10^>, C<·10^>
+
+=item * C<group>
+
+"Separates clusters of integer digits to make large numbers more legible"
+
+For example C<,>, C<٬>, C<.>, C<،>, C<’>, C<⹁>
+
+=item * C<infinity>
+
+"The infinity sign. Corresponds to the IEEE infinity bit pattern."
+
+For example C<∞>, C<INF>
+
+=item * C<list>
+
+"Symbol used to separate numbers in a list intended to represent structured data such as an array; must be different from the decimal value."
+
+For example C<;>
+
+=item * C<minus>
+
+"Symbol used to denote negative value."
+
+For example C<->
+
+Note that, in the CLDR data, although it is always a visually identical representation, the character itself used varies, depending on the locale used. For example: C<-> (C<\x{2D}>) vs C<-> (C<\x{D8}\x{9C}\x{2D}>)
+
+=item * C<nan>
+
+The NaN sign. Corresponds to the IEEE NaN bit pattern.
+
+For example C<NaN>, C<не число>
+
+=item * C<per_mille>
+
+"Symbol used to indicate a per-mille (1/1000th) amount."
+
+For example C<‰>, C<؉>, C<0/00>
+
+=item * C<percent>
+
+"Symbol used to indicate a percentage (1/100th) amount."
+
+For example C<%>, C<٪>
+
+=item * C<plus>
+
+"Symbol used to denote positive value."
+
+For example C<+>
+
+=item * C<superscript>
+
+For example C<×>, C<(^)>
+
+=item * C<time_separator>
+
+This is intended to replace "any use of the C<timeSeparator> pattern character in a date-time format pattern"
+
+For example C<:>, C<٫>, C<.>
+
+=back
+
 =head2 number_system
 
     my $locale = DateTime::Locale::FromCLDR->new( 'ar-EG' );
@@ -5358,6 +5671,8 @@ Returns a string representing the number system for the C<locale>
 This checks whether the C<locale> prefers the 24H format or the 12H one and returns true (C<1>) if it prefers the 24 hours format or false (C<0>) otherwise.
 
 How it finds out? It pulls the preferred time format from the CLDR data by calling L<time_format_preferred|/time_format_preferred>, and from there returns true (1) if the value is either C<H> or C<k>, or else false (0).
+
+This is as specified by the L<Unicode LDML|https://www.unicode.org/reports/tr35/tr35-dates.html#availableFormats_appendItems>, which states: "the locale's actual preference for 12-hour or 24-hour time cycle is determined from the Time Data as described above in timeFormats."
 
 =head2 quarter_format_abbreviated
 

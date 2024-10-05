@@ -14,6 +14,9 @@ t/2-Tk-CodeText-StatusBar.t
 t/3-Tk-CodeText.t
 t/4-Tk-CodeText-TagsEditor.t
 t/5-Tk-CodeText-Theme.t
+t/6-Bench
+t/color_history
+t/lib/BenchCodeText.pm
 t/ref_file.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

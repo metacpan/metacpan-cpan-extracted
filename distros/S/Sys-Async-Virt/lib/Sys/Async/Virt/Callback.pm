@@ -16,13 +16,13 @@ use experimental 'signatures';
 use Feature::Compat::Try;
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Callback v0.0.7;
+package Sys::Async::Virt::Callback v0.0.8;
 
 use Carp qw(croak);
 use Future::Queue;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.7;
+use Protocol::Sys::Virt::Remote::XDR v0.0.8;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 sub new($class, %args) {
@@ -83,7 +83,7 @@ Sys::Async::Virt::Callback - Client side proxy to remote LibVirt event source
 
 =head1 VERSION
 
-v0.0.7
+v0.0.8
 
 =head1 SYNOPSIS
 

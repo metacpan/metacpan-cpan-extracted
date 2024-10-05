@@ -18,7 +18,7 @@ use Feature::Compat::Try;
 use Future::AsyncAwait;
 use Sublike::Extended; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-package Sys::Async::Virt v0.0.7;
+package Sys::Async::Virt v0.0.8;
 
 use parent qw(IO::Async::Notifier);
 
@@ -27,30 +27,30 @@ use Future::Queue;
 use Log::Any qw($log);
 use Scalar::Util qw(reftype weaken);
 
-use Protocol::Sys::Virt::Remote::XDR v10.3.12;
+use Protocol::Sys::Virt::Remote::XDR v10.3.13;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Protocol::Sys::Virt::KeepAlive v10.3.12;
-use Protocol::Sys::Virt::Remote v10.3.12;
-use Protocol::Sys::Virt::Transport v10.3.12;
-use Protocol::Sys::Virt::URI v10.3.12; # imports parse_url
+use Protocol::Sys::Virt::KeepAlive v10.3.13;
+use Protocol::Sys::Virt::Remote v10.3.13;
+use Protocol::Sys::Virt::Transport v10.3.13;
+use Protocol::Sys::Virt::URI v10.3.13; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.0.7;
-use Sys::Async::Virt::Domain v0.0.7;
-use Sys::Async::Virt::DomainCheckpoint v0.0.7;
-use Sys::Async::Virt::DomainSnapshot v0.0.7;
-use Sys::Async::Virt::Network v0.0.7;
-use Sys::Async::Virt::NetworkPort v0.0.7;
-use Sys::Async::Virt::NwFilter v0.0.7;
-use Sys::Async::Virt::NwFilterBinding v0.0.7;
-use Sys::Async::Virt::Interface v0.0.7;
-use Sys::Async::Virt::StoragePool v0.0.7;
-use Sys::Async::Virt::StorageVol v0.0.7;
-use Sys::Async::Virt::NodeDevice v0.0.7;
-use Sys::Async::Virt::Secret v0.0.7;
+use Sys::Async::Virt::Connection::Factory v0.0.8;
+use Sys::Async::Virt::Domain v0.0.8;
+use Sys::Async::Virt::DomainCheckpoint v0.0.8;
+use Sys::Async::Virt::DomainSnapshot v0.0.8;
+use Sys::Async::Virt::Network v0.0.8;
+use Sys::Async::Virt::NetworkPort v0.0.8;
+use Sys::Async::Virt::NwFilter v0.0.8;
+use Sys::Async::Virt::NwFilterBinding v0.0.8;
+use Sys::Async::Virt::Interface v0.0.8;
+use Sys::Async::Virt::StoragePool v0.0.8;
+use Sys::Async::Virt::StorageVol v0.0.8;
+use Sys::Async::Virt::NodeDevice v0.0.8;
+use Sys::Async::Virt::Secret v0.0.8;
 
-use Sys::Async::Virt::Callback v0.0.7;
-use Sys::Async::Virt::Stream v0.0.7;
+use Sys::Async::Virt::Callback v0.0.8;
+use Sys::Async::Virt::Stream v0.0.8;
 
 use constant {
     CLOSE_REASON_ERROR                                 => 0,
@@ -901,6 +901,7 @@ sub new($class, %args) {
         secret_factory            => \&_secret_factory,
 
         url        => $args{url},
+        readonly   => $args{readonly},
         connection => $args{connection},
         transport  => $args{transport},
         remote     => $args{remote},
@@ -1149,7 +1150,8 @@ extended async sub connect($self, :$pump = undef) {
     unless ($self->{connection}) {
         my $factory =
             $self->{factory} //= Sys::Async::Virt::Connection::Factory->new;
-        my $conn = $factory->create_connection( $self->{url} );
+        my $conn = $factory->create_connection( $self->{url},
+                                                readonly => $self->{readonly} );
         $self->add_child( $conn );
         $self->{connection} = $conn;
     }
@@ -1173,6 +1175,13 @@ extended async sub connect($self, :$pump = undef) {
 
     $pump //= \&_pump;
     $self->adopt_future( $pump->( $self->{connection}, $self->{transport} ) );
+
+    await $self->auth();
+    # auth( $auth_type )
+    #  --> clients take the selected auth mechanism from the
+    #      connection URL: auth='sasl[.<mech>]" / auth='none' / auth='polkit'
+    # in order to be able to handle SASL AUTH, we'll need an Authen::SASL
+    # authentication parameter to be passed in though...
 
     if (await $self->_supports_feature(
             $self->{remote}->DRV_FEATURE_PROGRAM_KEEPALIVE )) {
@@ -1203,6 +1212,8 @@ extended async sub connect($self, :$pump = undef) {
         };
         $self->adopt_future( $keep_pump->() );
     }
+
+    await $self->open();
 
     return;
 }
@@ -1334,8 +1345,8 @@ async sub auth($self, $auth_type = undef) {
     else {
         $selected = shift $auth_types->@*;
     }
-    return if $selected == $remote->AUTH_NONE;
 
+    $log->trace( "Selected auth method: $selected" );
     if ($selected == $remote->AUTH_POLKIT) {
         await $self->_call( $remote->PROC_AUTH_POLKIT );
         return;
@@ -1351,10 +1362,11 @@ async sub auth($self, $auth_type = undef) {
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_OPEN
 # ENTRYPOINT: REMOTE_PROC_CONNECT_REGISTER_CLOSE_CALLBACK
-async sub open($self, $flags = undef) {
+async sub open($self) {
     my %parsed_url = parse_url( $self->{url} );
+    my $flags = $self->{readonly} ? RO : 0;
     await $self->_call( $remote->PROC_CONNECT_OPEN,
-                        { name => $parsed_url{name}, flags => $flags // 0 } );
+                        { name => $parsed_url{name}, flags => $flags } );
     if (await $self->_supports_feature(
             $self->{remote}->DRV_FEATURE_REMOTE_CLOSE_CALLBACK )) {
         await $self->_call( $remote->PROC_CONNECT_REGISTER_CLOSE_CALLBACK );
@@ -2004,7 +2016,7 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.7
+v0.0.8
 
 Based on LibVirt tag v10.3.0
 
@@ -2039,6 +2051,21 @@ An important difference with the C API is that this API only lists the
 C<INPUT> and C<INPUT|OUTPUT (as input)> arguments for its functions.  The
 C<OUTPUT> and C<INPUT|OUTPUT (as output)> arguments will be returned in the
 C<on_reply> event.
+
+=head2 RUNNING AGAINST OLDER SERVERS
+
+The reference LibVirt version of this module is v10.3.0. This means
+all API entry points have been implemented as they are declared in the
+protocol of that version (except for the ones listed in the section
+L</UNIMPLEMENTED ENTRYPOINTS>).  The consequence of a server being of a lower
+version is that some entry points will throw errors when being used, if not
+supported by the server.
+
+=head2 RUNNING AGAINST NEWER SERVERS
+
+The module can run against any version of LibVirt newer than v10.3.0;
+any new entry points in the API will not be available, but all existing APIs
+can be used as per the stability guarantees.
 
 =head2 STABILITY GUARANTEES
 
@@ -3431,6 +3458,8 @@ the 'id' doesn't get cleared when the domain is destroyed???)
 =item * C<@generate: none> entrypoints review (and implement relevant ones)
 
 =item * C<@generate: server> entrypoints review (and implement relevant ones)
+
+=item * libvirt client configuration (C</etc/libvirt/libvirt.conf>)
 
 =back
 

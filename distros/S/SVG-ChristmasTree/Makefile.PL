@@ -30,11 +30,11 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url => 'git://github.com/davorg/svg-christmastree.git',
-        web => 'https://github.com/davorg/svg-christmastree',
+        url => 'git://github.com/davorg-cpan/svg-christmastree.git',
+        web => 'https://github.com/davorg-cpan/svg-christmastree',
       },
       bugtracker => {
-        web => 'https://github.com/davorg/svg-christmastree/issues',
+        web => 'https://github.com/davorg-cpan/svg-christmastree/issues',
       },
     },
   },

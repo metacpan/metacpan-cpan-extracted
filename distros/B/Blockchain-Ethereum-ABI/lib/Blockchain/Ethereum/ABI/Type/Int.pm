@@ -14,7 +14,7 @@ class Blockchain::Ethereum::ABI::Type::Int
     :does(Blockchain::Ethereum::ABI::TypeRole);
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.015';          # VERSION
+our $VERSION   = '0.016';          # VERSION
 
 use Carp;
 use Math::BigInt try => 'GMP';
@@ -85,7 +85,7 @@ Blockchain::Ethereum::ABI::Type::Int - Solidity uint/int/bool type interface
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
