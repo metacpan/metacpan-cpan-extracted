@@ -1,14 +1,15 @@
 package Whelk::Schema::Definition::_Scalar;
-$Whelk::Schema::Definition::_Scalar::VERSION = '1.00';
+$Whelk::Schema::Definition::_Scalar::VERSION = '1.01';
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
-attr '?required' => sub { !defined $_[0]->default };
-attr '?default' => undef;
+attr '?required' => sub { !$_[0]->has_default };
+attr '?default' => sub { Whelk::Schema::NO_DEFAULT };
 attr '?example' => undef;
 
 sub has_default
 {
-	return defined $_[0]->default;
+	my $default = $_[0]->default;
+	return !ref $default || $default != Whelk::Schema::NO_DEFAULT;
 }
 
 sub _inhale
@@ -20,8 +21,13 @@ sub _inhale
 sub inhale
 {
 	my ($self, $value) = @_;
+	if (!defined $value && $self->has_default) {
+		$value = $self->default;
+	}
 
-	return $self->_inhale($value // $self->default);
+	return undef if $self->_valid_nullable($value);
+
+	return $self->_inhale($value);
 }
 
 sub _exhale
@@ -32,8 +38,13 @@ sub _exhale
 sub exhale
 {
 	my ($self, $value) = @_;
+	if (!defined $value && $self->has_default) {
+		$value = $self->default;
+	}
 
-	return $self->_exhale($value // $self->default);
+	return undef if $self->_valid_nullable($value);
+
+	return $self->_exhale($value);
 }
 
 1;

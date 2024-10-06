@@ -54,7 +54,7 @@ in future versions. It is not yet widely used.
 
 Michael Stapelberg, &lt;michael+xcb@stapelberg.de>,
 Maik Fischer, &lt;maikf+xcb@qu.cx>,
-Sergei Zhmylev, &lt;zhmylove@cpan.org>
+Sergei Zhmylev, &lt;zhmylove@narod.ru>
 
 # INSTALLATION
 

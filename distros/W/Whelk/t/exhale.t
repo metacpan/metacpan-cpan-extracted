@@ -59,6 +59,20 @@ subtest 'should exhale integer' => sub {
 	is $schema->exhale(4.9), 4, 'exhaled 4.9 ok';
 };
 
+subtest 'should exhale nullable integer' => sub {
+	my $schema = Whelk::Schema->build(
+		{
+			type => 'integer',
+			nullable => !!1,
+		}
+	);
+
+	is $schema->exhale(undef), undef, 'exhaled undef ok';
+	is $schema->exhale(9), 9, 'exhaled 9 ok';
+	is $schema->exhale('9'), 9, 'exhaled 9 string ok';
+	is $schema->exhale(4.9), 4, 'exhaled 4.9 ok';
+};
+
 subtest 'should exhale string' => sub {
 	my $schema = Whelk::Schema->build(
 		{
@@ -80,6 +94,18 @@ subtest 'should exhale array' => sub {
 
 	is_deeply $schema->exhale([]), [], 'exhaled empty array ok';
 	is_deeply $schema->exhale([1, 'ABC', {}]), [1, 'ABC', {}], 'exhaled array ok';
+};
+
+subtest 'should exhale nullable array' => sub {
+	my $schema = Whelk::Schema->build(
+		{
+			type => 'array',
+			nullable => 1,
+		}
+	);
+
+	is_deeply $schema->exhale(undef), undef, 'exhaled undef ok';
+	is_deeply $schema->exhale([]), [], 'exhaled empty array ok';
 };
 
 subtest 'should exhale typed array' => sub {
@@ -166,6 +192,7 @@ subtest 'should exhale defaults' => sub {
 					properties => {
 						str => {
 							type => 'string',
+							nullable => !!1,
 							default => 'holy moly',
 						}
 					},
@@ -181,6 +208,13 @@ subtest 'should exhale defaults' => sub {
 		'exhaled nested object default ok';
 	is_deeply $schema->exhale({obj => {str => 'tt'}}), {int => 15, obj => {str => 'tt'}},
 		'exhaled nested object ok';
+	is_deeply $schema->exhale({obj => {str => undef}}), {int => 15, obj => {str => 'holy moly'}},
+		'exhaled nested object with undef ok';
+
+	# NOTE: this only passes because there is no inhale (obj is undef)
+	# normally, this is an error
+	is_deeply $schema->exhale({obj => undef}), {int => 15, obj => {str => 'holy moly'}},
+		'exhaled nested object as undef ok';
 };
 
 done_testing;

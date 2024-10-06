@@ -1,9 +1,11 @@
 package Whelk::Endpoint::Parameters;
-$Whelk::Endpoint::Parameters::VERSION = '1.00';
+$Whelk::Endpoint::Parameters::VERSION = '1.01';
 use Whelk::StrictBase;
 
 use Carp;
 use Whelk::Schema;
+
+our @CARP_NOT = qw(Kelp::Base Whelk::Endpoint);
 
 attr '?-path' => sub { {} };
 attr '?-query' => sub { {} };

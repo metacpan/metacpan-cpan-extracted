@@ -5,6 +5,7 @@
 #include <xcb/xinerama.h>
 #include <xcb/randr.h>
 #include <xcb/xkb.h>
+#include <xcb/composite.h>
 
 #include "ppport.h"
 
@@ -577,6 +578,67 @@ get_keymap(conn)
     RETVAL = newRV_inc((SV *)results);
   OUTPUT:
     RETVAL
+
+HV *
+get_image_data(conn,sequence)
+    XCBConnection *conn
+    int sequence
+  PREINIT:
+    HV * hash;
+    xcb_get_image_cookie_t cookie;
+    xcb_get_image_reply_t *reply;
+  INIT:
+    hash = (HV *)sv_2mortal((SV *)newHV());
+  CODE:
+    cookie.sequence = sequence;
+    reply = xcb_get_image_reply(conn, cookie, NULL);
+    if (! reply)
+      croak("Could not get reply for: xcb_get_image_reply");
+    hv_store(hash, "sequence", strlen("sequence"), newSViv(reply->sequence), 0);
+    hv_store(hash, "length", strlen("length"), newSViv(reply->length), 0);
+    hv_store(hash, "depth", strlen("depth"), newSViv(reply->depth), 0);
+    hv_store(hash, "visual", strlen("visual"), newSViv(reply->visual), 0);
+    hv_store(hash, "data", strlen("data"), newSVpvn((const char*)xcb_get_image_data(reply), xcb_get_image_data_length(reply)), 0);
+    RETVAL = hash;
+    free(reply);
+  OUTPUT:
+    RETVAL
+
+HV *
+get_image_data_rgba(conn,sequence)
+    XCBConnection *conn
+    int sequence
+  PREINIT:
+    int i;
+    HV * hash;
+    xcb_get_image_cookie_t cookie;
+    xcb_get_image_reply_t *reply;
+  INIT:
+    hash = (HV *)sv_2mortal((SV *)newHV());
+  CODE:
+    cookie.sequence = sequence;
+    reply = xcb_get_image_reply(conn, cookie, NULL);
+    if (! reply)
+      croak("Could not get reply for: xcb_get_image_reply");
+
+    /* We've written this code with @TheTremblingDoe to optmize BGRA -> RGBA translation */
+    for (i = 0; i < xcb_get_image_data_length(reply) / sizeof(uint64_t); i++) {
+      ((uint64_t*)xcb_get_image_data(reply))[i] =
+        ((((uint64_t*)xcb_get_image_data(reply))[i] & 0x000000FF000000FF) << 16) |
+        ((((uint64_t*)xcb_get_image_data(reply))[i] & 0x00FF000000FF0000) >> 16) |
+        ((((uint64_t*)xcb_get_image_data(reply))[i] & 0xFF00FF00FF00FF00));
+    }
+
+    hv_store(hash, "sequence", strlen("sequence"), newSViv(reply->sequence), 0);
+    hv_store(hash, "length", strlen("length"), newSViv(reply->length), 0);
+    hv_store(hash, "depth", strlen("depth"), newSViv(reply->depth), 0);
+    hv_store(hash, "visual", strlen("visual"), newSViv(reply->visual), 0);
+    hv_store(hash, "data", strlen("data"), newSVpvn((const char*)xcb_get_image_data(reply), xcb_get_image_data_length(reply)), 0);
+    RETVAL = hash;
+    free(reply);
+  OUTPUT:
+    RETVAL
+
 
 SV *
 get_query_tree_children(conn, window)

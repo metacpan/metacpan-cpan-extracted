@@ -1,5 +1,5 @@
 package Whelk::Config;
-$Whelk::Config::VERSION = '1.00';
+$Whelk::Config::VERSION = '1.01';
 use Kelp::Base 'Kelp::Module::Config';
 
 attr data => sub {

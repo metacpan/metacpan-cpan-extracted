@@ -1,244 +1,243 @@
 package PDK::Device::Huawei;
 
+use 5.030;
+use strict;
+use warnings;
+
 use Moose;
-use Carp;
-use namespace::autoclean;
-use Expect;
-
-# 使用 'PDK::Device::Base' 角色
+use Expect qw'exp_continue';
+use Carp   qw'croak';
 with 'PDK::Device::Base';
+use namespace::autoclean;
 
-# 定义登录成功提示符
-sub prompt {
-  shift;
-  return '(\<(?:[^\<\>]*)\>)|(\[(?<!SubSlot \d)\])';
+has prompt => (is => 'ro', required => 1, default => '^\s*[<\[].*?[>\]]\s*$',);
+
+sub errCodes {
+  my $self = shift;
+
+  return [
+    qr/(Ambiguous|Incomplete|not recognized|Unrecognized)/i,
+    qr/(Wrong parameter|Too many parameters|does not exist)/i,
+    qr/^Error:/mi,
+  ];
 }
 
-# 定义特权模式提示符
-# sub enPrompt {
-#   shift;
-#   return ']\s*$';
-# }
-
-# 等待响应方法
 sub waitfor {
   my ($self, $prompt) = @_;
 
-  # 如果没有指定提示符，则使用默认提示符
-  $prompt //= $self->prompt();
-
-  my $exp  = $self->expect();
   my $buff = "";
+  $prompt //= $self->{prompt};
+
+  my $exp = $self->{exp};
 
   my @ret = $exp->expect(
-    10,
+    15,
     [
-      qr/---- More ----.*$/mi => sub {
+      qr/^\s*---- More ----\s*$/mi => sub {
         $exp->send(" ");
         $buff .= $exp->before();
         exp_continue;
       }
     ],
     [
-      qr/configuration will be written to the device. Are you sure.*$/mi => sub {
-        $exp->send("Y\n");
+      qr/Are you sure to continue/i => sub {
+        $exp->send("y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
-      qr/startup.cfg exists, overwrite\?.*$/mi => sub {
-        $exp->send("Y\n");
+      qr/This command will change the default screen width/i => sub {
+        $exp->send("Y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
-      qr/press the enter key.*$/mi => sub {
+      qr/press the enter key/i => sub {
         $exp->send("\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
-    [qr/$prompt/m => sub { $buff .= $exp->before() . $exp->match() }]
+    [
+      qr/$prompt/mi => sub {
+        $buff .= $exp->before() . $exp->match();
+      }
+    ],
+    [
+      eof => sub {
+        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+      }
+    ],
+    [
+      timeout => sub {
+        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+      }
+    ],
   );
 
-  # 如果发生异常，抛出错误
-  if (defined $ret[1]) {
-    croak($ret[3] . $ret[1]);
-  }
+  croak($ret[3]) if defined $ret[1];
 
-  # 修正脚本输出
-  $buff =~ s/\cM+[ ]+\cM//g;
-  $buff =~ s/\cM{2}//g;
-  $buff =~ s/\cM//g;
+  $buff =~ s/\x1b\[\d+D\s+\x1b\[\d+D//g;
+  $buff =~ s/\r\n|\n+\n/\n/g;
+  $buff =~ s/^%.+$//mg;
+  $buff =~ s/^\s*$//mg;
 
   return $buff;
 }
 
-# 执行多个命令方法
-sub execCommands {
-  my ($self, @commands) = @_;
+sub runCommands {
+  my ($self, $commands) = @_;
 
-  # 在脚本执行期间确保设备已登录并处于特权模式下
-  if ($self->{isLogin} == 0) {
-    my $result = $self->login();
-    unless ($self->isLogin) {
-      return $result;
-    }
+  croak "执行[runCommands]，必须提供一组待下发脚本" unless ref $commands eq 'ARRAY';
+
+  if ($commands->[0] !~ /^sy/i) {
+    unshift @$commands, 'system-view';
   }
 
-  if ($self->{isEnable} == 0) {
-    my $result = $self->enable();
-    unless ($self->isEnable) {
-      return $result;
-    }
+  unless ($commands->[-1] =~ /^(sa|write)/i) {
+    push @$commands, 'save';
   }
 
-  my $result = "";
-
-  # 遍历待下发脚本，并对每个脚本执行回显进行异常捕捉
-  for my $cmd (@commands) {
-    $self->send("$cmd\n");
-    my $buff = $self->waitfor();
-
-    if ($buff =~ /(% Ambiguous|% Incomplete|invalid|unrecognized).*$/i) {
-      return {success => 0, failCommand => $cmd, reason => $result . $buff};
-    }
-    elsif ($buff =~ /((% Too many parameters)|(% Wrong parameter)).*$/i) {
-      return {success => 0, failCommand => $cmd, reason => $result . $buff};
-    }
-    elsif ($buff =~ /(%\s*Error )|(^error: )/i) {
-      return {success => 0, failCommand => $cmd, reason => $result . $buff};
-    }
-    elsif ($buff =~ /(failed to pass the authorization)|(^\s*\^')/i) {
-      return {success => 0, failCommand => $cmd, reason => $result . $buff};
-    }
-    else {
-      $result .= $buff;
-    }
-  }
-
-  return {success => 1, result => $result};
+  $self->execCommands($commands);
 }
 
-# 切换到特权模式方法
-sub enable {
-  my $self     = shift;
-  my $enPrompt = $self->enPrompt();
-  my $username = $self->{username};
-  my $password = $self->{enPassword} // $self->{password};
-  my $exp      = $self->expect;
+sub getConfig {
+  my $self = shift;
 
-  $exp->send("super\n");
+  my $commands = ["screen-length disable temporary", "screen-width 512", "dis current-configuration", "save"];
 
+  my $config = $self->execCommands($commands);
+
+  if ($config->{success} == 0) {
+    return $config;
+  }
+  else {
+    my $lines = $config->{result};
+
+
+    return {success => 1, config => $lines};
+  }
+}
+
+sub ftpConfig {
+  my ($self, $hostname, $server, $username, $password) = @_;
+
+  $server   //= $ENV{PDK_FTP_SERVER};
+  $username //= $ENV{PDK_FTP_USERNAME};
+  $password //= $ENV{PDK_FTP_PASSWORD};
+
+  croak "请正确提供 FTP 服务器地址、账户和密码!" unless $username and $password and $server;
+
+  my $host = $self->{host};
+
+  my $command = "put vrpcfg.zip $self->{month}/$self->{date}/";
+
+  if ($hostname) {
+    $command .= $hostname . '_' . $host . '.zip';
+  }
+  else {
+    $command .= $host . '.zip';
+  }
+
+  if (!$self->{exp}) {
+    my $login = $self->login();
+    croak $login->{reason} if $login->{success} == 0;
+  }
+
+  my $exp    = $self->{exp};
+  my $result = $exp ? $exp->match() : "";
+
+  my $ftp_cmd = "ftp $server vpn-instance default";
+  say "[debug] 生成 FTP 备份指令：$ftp_cmd" if $self->{debug};
+
+  $exp->send("$ftp_cmd\n");
   my @ret = $exp->expect(
-    10,
+    15,
     [
-      qr/assword:\s*$/ => sub {
-        $exp->send("$password\n");
-      }
-    ],
-    [
-      qr/(ogin|name):\s*$/i => sub {
+      qr/User\s*\(/i => sub {
+        $result .= $exp->before() . $exp->match();
         $exp->send("$username\n");
         exp_continue;
       }
     ],
-    [qr/$enPrompt/ => sub { $self->isEnable(1) }],
-    [qr/\^/i       => sub { $self->isEnable(0) }],
+    [
+      qr/assword:/i => sub {
+        $result .= $exp->before() . $exp->match();
+        $exp->send("$password\n");
+      }
+    ],
+    [
+      eof => sub {
+        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+      }
+    ],
+    [
+      timeout => sub {
+        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+      }
+    ],
   );
 
-  # 如果发生异常，返回失败
-  if (defined $ret[1]) {
-    return {success => 0, failCommand => '无法切换到特权模式', reason => $ret[3]};
-  }
+  croak($ret[3]) if defined $ret[1];
 
   @ret = $exp->expect(
     10,
-    [qr/assword:\s*$/ => sub { croak("Username or enPassword is wrong!") }],
-    [qr/$enPrompt/m   => sub { $self->isEnable(1) }],
+    [
+      qr/(ftp: Login failed.|Username)/i => sub {
+        croak("FTP 会话丢失: username or password is wrong!");
+      }
+    ],
+    [
+      qr/User logged in/i => sub {
+        $result .= $exp->before() . $exp->match();
+        say "[debug] 成功连接 FTP 服务器($server)" if $self->{debug};
+      }
+    ],
+    [
+      eof => sub {
+        croak("执行[ftpConfig/检查是否成功登录FTP]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+      }
+    ],
+    [
+      timeout => sub {
+        croak("执行[ftpConfig/检查是否成功登录FTP]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+      }
+    ],
   );
 
-  # 如果发生异常，返回失败
-  if (defined $ret[1]) {
-    return {success => 0, failCommand => '无法切换到特权模式', reason => $ret[3]};
-  }
+  $exp->send("$command\n");
+  @ret = $exp->expect(
+    15,
+    [
+      qr/(No such file or directory|The system cannot)/i => sub {
+        croak "执行脚本 $command 异常，上传失败!";
+      }
+    ],
+    [
+      qr/Transfer complete.*ftp[>\]]/ms => sub {
+        $result .= $exp->before() . $exp->match() . $exp->after();
+        say "\n[debug] 脚本 $command 已执行完毕, 文件上传成功!" if $self->{debug};
+      }
+    ],
+    [
+      eof => sub {
+        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+      }
+    ],
+    [
+      timeout => sub {
+        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+      }
+    ],
+  );
 
-  return {success => 1};
-}
+  croak($ret[3]) if defined $ret[1];
+  $exp->send("quit\n");
 
-#------------------------------------------------------------------------------
-# 具体实现 runCommands，编写进入特权模式、退出保存配置的逻辑
-#------------------------------------------------------------------------------
-sub runCommands {
-  my ($self, @commands) = @_;
-
-  # 配置下发前 | 切入配置模式
-  unshift(@commands, "system-view");
-
-  # 完成配置后 | 报错具体配置
-  push(@commands, "return", "save force");
-
-  # 执行调度，配置批量下发
-  $self->execCommands(@commands);
-}
-
-# 获取设备配置方法
-sub getConfig {
-  my $self     = shift;
-  my @commands = ("screen-length disable", "dis cu");
-  my $config   = $self->execCommands(@commands);
-
-  if ($config->{success} == 1) {
-    my $lines = $config->{result};
-
-    # $lines =~ s/^\s*ntp\s+clock-period\s+\d+\s*$//mi;
-    return {success => 1, config => $lines};
-  }
-  else {
-    return $config;
-  }
-}
-
-#------------------------------------------------------------------------------
-# 具体实现 startupConfig,设置抓取设备启动配置的脚本
-#------------------------------------------------------------------------------
-sub startupConfig {
-  my $self     = shift;
-  my $commands = ["screen-length disable", "dis cu", "save force"];
-
-  return $self->execCommands(@{$commands});
-}
-
-#------------------------------------------------------------------------------
-# 具体实现 runningConfig,设置抓取设备运行配置的脚本
-#------------------------------------------------------------------------------
-sub runningConfig {
-  my $self     = shift;
-  my $commands = ["screen-length disable", "dis saved-configuration", "save force"];
-
-  return $self->execCommands(@{$commands});
-}
-
-#------------------------------------------------------------------------------
-# 具体实现 healthCheck,设置抓取设备健康检查配置的脚本
-#------------------------------------------------------------------------------
-sub healthCheck {
-  my $self     = shift;
-  my $commands = [
-    "dis cpu-usage",
-    "dis memory",
-    "dis stp down-port",
-    "dis fan",
-    "dis environment",
-    "dis clock",
-    "dis ntp-service status"
-  ];
-
-  return $self->execCommands(@{$commands});
+  return {success => 1, config => $result};
 }
 
 __PACKAGE__->meta->make_immutable;
-
 1;

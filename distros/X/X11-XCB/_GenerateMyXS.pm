@@ -138,7 +138,7 @@ $param_decl
   CODE:
     cookie = $xcb_name($xcb_param);
 
-    hash = newHV();
+    hash = (HV *)sv_2mortal((SV *)newHV());
     hv_store(hash, "sequence", strlen("sequence"), newSViv(cookie.sequence), 0);
     RETVAL = hash;
 $cleanup
@@ -223,6 +223,10 @@ sub param_sanitize {
 
 sub do_requests {
     my $x_name = $_->{name};
+
+    # TODO: unimplemented (incomplete typemap)
+    return if $x_name eq "CreateRegionFromBorderClip";
+
     my $xcb_name  = xcb_name $x_name;
 
     # XXX hack, to get eg. a xinerama_ prefix
@@ -347,7 +351,7 @@ sub do_replies($\%\%) {
         print $OUT "    reply = $name(conn, cookie, NULL);\n";
         # XXX use connection_has_error
         print $OUT qq/    if (!reply) croak("Could not get reply for: $name"); /;
-        print $OUT "    hash = newHV();\n";
+        print $OUT "    hash = (HV *)sv_2mortal((SV *)newHV());\n";
 
         # We ignore pad0 and response_type. Every reply has sequence and length
         print $OUT "    hv_store(hash, \"sequence\", strlen(\"sequence\"), newSViv(reply->sequence), 0);\n";
@@ -415,6 +419,10 @@ sub do_replies($\%\%) {
         #if (defined($rep->{list})) {
 
         print $OUT "    RETVAL = hash;\n";
+
+        # Sometimes XCB gives use a lot of data along the reply, like in xcb_get_image_reply()
+        print $OUT "    free(reply);\n";
+
         print $OUT "  OUTPUT:\n    RETVAL\n\n";
     }
 }
@@ -443,7 +451,7 @@ sub do_enums {
 sub generate {
     my $path = ExtUtils::PkgConfig->variable('xcb-proto', 'xcbincludedir') ||
         die "Package xcb-proto was not found in the pkg-config search path.";
-    my @xcb_xmls = qw/xproto.xml xinerama.xml randr.xml xkb.xml/;
+    my @xcb_xmls = qw/xproto.xml xinerama.xml randr.xml xkb.xml composite.xml/;
 
     -d $path or die "$path: $!\n";
 
@@ -489,7 +497,12 @@ __
     $const{CIRCULATE_REQUEST} = 'newSViv(XCB_CIRCULATE_REQUEST)';
 
     # ICCCM constants from xcb-util
-    for my $const (qw(XCB_ICCCM_WM_STATE_WITHDRAWN XCB_ICCCM_WM_STATE_NORMAL XCB_ICCCM_WM_STATE_ICONIC)) {
+    for my $const (qw(XCB_ICCCM_WM_STATE_WITHDRAWN XCB_ICCCM_WM_STATE_NORMAL XCB_ICCCM_WM_STATE_ICONIC
+        XCB_ICCCM_SIZE_HINT_US_POSITION XCB_ICCCM_SIZE_HINT_US_SIZE XCB_ICCCM_SIZE_HINT_P_POSITION
+        XCB_ICCCM_SIZE_HINT_P_SIZE XCB_ICCCM_SIZE_HINT_P_MIN_SIZE XCB_ICCCM_SIZE_HINT_P_MAX_SIZE
+        XCB_ICCCM_SIZE_HINT_P_RESIZE_INC XCB_ICCCM_SIZE_HINT_P_ASPECT XCB_ICCCM_SIZE_HINT_BASE_SIZE
+        XCB_ICCCM_SIZE_HINT_P_WIN_GRAVITY
+        )) {
         my ($name) = ($const =~ /XCB_(.*)/);
         $const{$name} = "newSViv($const)";
     }

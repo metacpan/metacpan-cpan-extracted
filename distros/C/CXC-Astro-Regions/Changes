@@ -1,5 +1,30 @@
 Revision history for CXC-Astro-Regions
 
+0.03      2024-10-05 13:29:42-04:00 America/New_York
+
+  [API BREAKAGE]
+
+    * DS9: rename parameters
+
+      * compass:       'center'            => 'base'
+      * point:         'position'          => 'center'
+      * text:          'position'          => 'center'
+      * annulus:       'inner' and 'outer' => 'annuli'
+      * annulus_n:     'inner' and 'outer' => 'annuli'
+      * ellipse_plain: 'rx', 'ry'          => 'radii'
+
+  [ENHANCEMENTS]
+
+    * Add CIAO and CFITSIO compatible regions
+
+    * Switch to CXC::Types::Astro::Coords to validate coordinates
+
+    * DS9: add generic mkregion() factory
+
+  [BUG FIXES]
+
+    * DS9:  compass 'base' parameter was mistakenly called 'center'
+
 0.02      2023-12-09 16:12:18-05:00 America/New_York
 
     * release to CPAN

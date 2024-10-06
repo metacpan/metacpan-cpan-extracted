@@ -1,11 +1,17 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad;
 
 package Blockchain::Ethereum::Keystore::Key;
 class Blockchain::Ethereum::Keystore::Key;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.009';          # VERSION
+our $VERSION   = '0.010';          # VERSION
 
 use Carp;
 use Crypt::PK::ECC;
@@ -79,7 +85,7 @@ Blockchain::Ethereum::Keystore::Key
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

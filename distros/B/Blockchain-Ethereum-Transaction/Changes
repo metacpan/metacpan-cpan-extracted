@@ -1,3 +1,6 @@
+0.010     2024-10-05 16:23:01-03:00 America/Sao_Paulo
+    - Include Object::Pad implied pragmata due it's deprecation
+    - Remove standalone version
 0.009     2023-10-16 01:25:55-03:00 America/Sao_Paulo
     [Improvements]
     - Dist::Zilla

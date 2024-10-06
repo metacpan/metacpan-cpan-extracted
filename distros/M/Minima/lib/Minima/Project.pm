@@ -42,10 +42,9 @@ sub create ($dir, $user_config = {})
 	    _info("mkdir $dir");
 	    $dir->mkdir;
 	}
-	if ($content) {
-	    _info(" spew $dest");
-	    $dest->spew_utf8($content);
-	}
+
+	_info(" spew $dest");
+	$dest->spew_utf8($content);
     }
 }
 

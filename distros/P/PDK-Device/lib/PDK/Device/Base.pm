@@ -1,231 +1,459 @@
 package PDK::Device::Base;
 
-# 使用 Moose 的 Role 功能
+use v5.30;
+use strict;
+use warnings;
+
 use Moose::Role;
-use Carp;
-
-# use open qw(:std :utf8);
-
-# 导入 Expect 模块，用于实现交互式脚本的功能
+use Carp qw'croak';
 use Expect;
 use namespace::autoclean;
 
-# 定义 Moose 类型约束，用于限制 Expect 类型的属性
-use Moose::Util::TypeConstraints;
-subtype Expect => as Object => where { $_->isa('Expect') };
 
-# 主机名
-has host => (is => 'ro', required => 1);
-
-# 用户名
-has username => (is => 'ro', required => 0, default => 'admin');
-
-# 密码
-has password => (is => 'ro', required => 0, default => 'Cisc0123');
-
-# 特权密码
-has enPassword => (is => 'ro', required => 0);
-
-# 端口
-has port => (is => 'ro', required => 0);
-
-# 连接协议
-has proto => (is => 'ro', required => 0, default => 'ssh');
-
-# 是否已登录
-has isLogin => (is => 'rw', required => 0, default => 0);
-
-# 是否已进入特权模式
-has isEnable => (is => 'rw', required => 0, default => 0);
-
-# Expect 对象
-has expect => (is => 'rw', isa => 'Expect');
-
-# 配置获取方法，需在具体设备类中实现
-requires 'getConfig';
+requires 'errCodes';
 requires 'waitfor';
-requires 'execCommands';
+requires 'getConfig';
 
-# 命令提示符正则表达式
-sub prompt {
-  shift;
-  return '\S+[#>]\s*\z';
-}
+has exp => (is => 'ro', required => 0,);
 
-# 特权模式命令提示符正则表达式
-sub enPrompt {
-  my $self = shift;
-  return $self->prompt();
-}
+has host => (is => 'ro', required => 0,);
 
-# Telnet 连接方法
-sub telnet {
-  my ($self, %param) = @_;
-  $param{proto} = "telnet";
-  croak("请正确提供登录设备的权限账户密码") unless $param{username} && $param{password};
-  return $self->driver(%param);
-}
+has port => (is => 'ro', required => 0, default => '',);
 
-# SSH 连接方法
-sub ssh {
-  my ($self, %param) = @_;
-  $param{proto} = "ssh";
-  croak("请正确提供登录设备的权限账户密码") unless $param{username} && $param{password};
-  return $self->driver(%param);
-}
+has proto => (is => 'ro', required => 0, default => 'ssh',);
 
-# 登录方法
+has prompt => (is => 'ro', required => 1, default => '\S+[#>]\s*\z',);
+
+has enPrompt => (is => 'ro', required => 0, default => '',);
+
+has enCommand => (is => 'ro', required => 0, default => '',);
+
+has username => (is => 'ro', required => 0, default => '',);
+
+has password => (is => 'ro', required => 0, default => '',);
+
+has enPassword => (is => 'ro', required => 0,);
+
+has passphrase => (is => 'ro', required => 0, default => '',);
+
+has mode => (is => 'ro', required => 0, default => 'normal',);
+
+has catchError => (is => 'ro', required => 0, default => 1,);
+
+has enabled => (is => 'rw', required => 0, default => 0,);
+
+has status => (is => 'rw', required => 0, default => 0,);
+
+has month => (
+  is       => 'rw',
+  required => 0,
+  default  => sub {
+    my $month = `date +%Y-%m`;
+    chomp($month);
+    return $month;
+  },
+);
+
+has date => (
+  is       => 'rw',
+  required => 0,
+  default  => sub {
+    my $date = `date +%Y-%m-%d`;
+    chomp($date);
+    return $date;
+  },
+);
+
+has workdir => (
+  is       => 'rw',
+  required => 0,
+
+  default => sub { $ENV{PDK_CONFIG_HOME} // glob("~") },
+);
+
+has debug => (is => 'rw', required => 0, default => 0,);
+
+
 sub login {
   my $self = shift;
-  return {success => $self->{isLogin}} if $self->{isLogin};
 
-  eval { $self->connect(); };
+  return {success => 1} if $self->{status} == 1;
 
-  # 处理不同的连接异常情况
-  if (!!$@) {
-    $@ =~ s/^\s+//;
-    $@ =~ s/^\s*$//g;
-    if ($@ =~ /RSA modulus too small/) {
-      eval { $self->connect('-v -1 -c des '); };
-      if (defined $@) {
-        return {success => 0, failCommand => 'RSA 模数太小', reason => $@};
+  eval {
+    if (!$self->{exp}) {
+      say "[debug] 正在初始化 Expect 对象并登录设备 $self->{host} !" if $self->{debug};
+      $self->connect();
+    }
+    else {
+      croak "执行[login/尝试连接设备]，连接 $self->{host} 异常: 已经初始化 Expect 对象，无法再次初始化！";
+    }
+  };
+
+  if ($@) {
+    chomp($@);
+
+    if ($@ =~ /RSA modulus too small/mi) {
+      eval { $self->connect('-v -1'); };
+      if ($@) {
+        chomp($@);
+        return {success => 0, reason => $@};
       }
     }
-    elsif ($@ =~ /Selected cipher type <unknown> not supported by server/i) {
-      eval { $self->connect('-c des '); };
-      if (defined $@) {
-        return {success => 0, failCommand => '服务器不支持所选密码类型 ', reason => $@};
+    elsif ($@ =~ /Selected cipher type <unknown> not supported by server/mi) {
+      eval { $self->connect('-c des'); };
+      if ($@) {
+        chomp($@);
+        return {success => 0, reason => $@};
       }
     }
-    elsif ($@ =~ /Connection refused/i) {
+    elsif ($@ =~ /no matching key exchange method found./mi) {
+      eval { $self->connect('-c des'); };
+      if ($@) {
+        chomp($@);
+        return {success => 0, reason => $@};
+      }
+    }
+    elsif ($@ =~ /Connection refused/mi) {
+      if ($self->{debug}) {
+        say "[debug] SSH会话($self->{host})异常, 尝试（仅支持默认端口自动切换）切换 [telnet] 登录！";
+      }
       eval {
         $self->{proto} = 'telnet';
         $self->connect();
       };
-      if (defined $@) {
-        return {success => 0, failCommand => '尝试 telnet 登录期间捕捉异常', reason => $@};
+      if ($@) {
+        chomp($@);
+        return {success => 0, reason => $@};
       }
     }
-    elsif ($@ =~ /IDENTIFICATION CHANGED/i) {
-      `/usr/bin/ssh-keygen -R $self->{host}`;
+    elsif ($@ =~ /IDENTIFICATION CHANGED/mi) {
+      if ($self->{debug}) {
+        my $msg = "捕捉到异常：" . $@;
+        say "[debug] 尝试刷新SSH密钥-> /usr/bin/ssh-keygen -R $self->{host} , $msg";
+      }
+
+      system("/usr/bin/ssh-keygen -R $self->{host}");
       eval { $self->connect(); };
-      if (defined $@) {
-        return {success => 0, failCommand => '设备身份识别已更改', reason => $@};
+      if ($@) {
+        chomp($@);
+        return {success => 0, reason => $@};
       }
     }
     else {
-      return {success => 0, failCommand => '尝试重新登录设备期间捕捉到异常', reason => $@};
+      return {success => 0, reason => $@};
     }
   }
 
-  return {success => $self->{isLogin}};
+  say "\n[debug] 成功登录网络设备 $self->{host};" if $self->{debug};
+
+  return {success => 1};
 }
 
-# 连接方法
 sub connect {
   my ($self, $args) = @_;
+
   $args //= "";
 
-  my $username = $self->{username};
-  my $password = $self->{password};
-  my $prompt   = $self->prompt();
-  my $command  = $self->buildConnector();
-  my $exp      = $self->expect($self->buildExpect);
+  my $username = $self->{username} || $ENV{PDK_USERNAME};
+  my $password = $self->{password} || $ENV{PDK_PASSWORD};
+  my $debug    = $self->{debug};
+  my $prompt   = $self->{prompt};
+  my $enPrompt = $self->{enPrompt};
 
-  $exp->spawn($command) or die "Expect函数执行 spawn 方法期间捕捉到异常 $command: $!\n";
+  croak("请正确提供设备登录所需账户密码凭证，或设置对象的环境变量！") unless $username && $password;
+
+  $debug = $ENV{PDK_DEBUG} if $debug == 0 && $ENV{PDK_DEBUG};
+
+  my $exp = Expect->new();
+  $exp->raw_pty(1);
+  $exp->restart_timeout_upon_receive(1);
+  $exp->debug(0);
+  $exp->log_stdout(0);
+
+  $self->{exp} = $exp;
+
+  if ($debug) {
+    if ($debug == 3) {
+
+      $self->{username} = $username if $username ne $self->{username};
+      $self->{username} = $username if $username ne $self->{username};
+    }
+
+    $self->{debug} = $debug if $debug ne $self->{debug};
+
+    $self->_debug($debug);
+  }
+
+  my $command = $self->_spawn_command($args);
+
+  $exp->spawn($command) or croak "执行[connect/连接脚本准备阶段]，Cannot spawn $command: $!";
+
   my @ret = $exp->expect(
     15,
     [
-      qr/Are you sure you want to continue connecting/i => sub {
+      qr/to continue conne/mi => sub {
         $exp->send("yes\n");
         exp_continue;
       }
     ],
     [
-      qr/(name|ogin):\s*$/ => sub {
+      qr/assword:\s*$/mi => sub {
+        $exp->send("$password\n");
+      }
+    ],
+    [
+      qr/(name|ogin|user):\s*$/mi => sub {
         $exp->send("$username\n");
         exp_continue;
       }
     ],
-    [qr/assword:\s*$/     => sub { $exp->send("$password\n") }],
-    [qr/REMOTE HOST IDEN/ => sub { croak("IDENTIFICATION CHANGED!") }],
-    [qr/$prompt/          => sub { $self->isLogin(1); }],
+    [
+      qr/REMOTE HOST IDENTIFICATION HAS CHANGED!/mi => sub {
+        croak("IDENTIFICATION CHANGED!");
+      }
+    ],
+    [
+      eof => sub {
+        croak("执行[connect/尝试登录设备阶段]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+      }
+    ],
+    [
+      timeout => sub {
+        croak("执行[connect/尝试登录设备阶段]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+      }
+    ]
   );
 
-  if (defined $ret[1]) {
-    croak($ret[3]);
-  }
+  croak($ret[3]) if defined $ret[1];
 
   @ret = $exp->expect(
     10,
-    [qr/assword:\s*$/ => sub { croak("Username or password is wrong!") }],
-    [qr/$prompt/m     => sub { $self->isLogin(1) }],
+    [
+      qr/sername|assword:\s*$/mi => sub {
+        $self->{status} = -1;
+        croak("username or password is wrong!");
+      }
+    ],
+    [
+      qr/$prompt/m => sub {
+        $self->{status} = 1;
+      }
+    ],
+    [
+      eof => sub {
+        croak("执行[connect/验证登录状态]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+      }
+    ],
+    [
+      timeout => sub {
+        croak("执行[connect/验证登录状态]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+      }
+    ]
   );
 
-  if (defined $ret[1]) {
-    croak($ret[3] . $ret[1]);
+  if ($enPrompt && $exp->match() =~ /$enPrompt/m) {
+    say "\n[debug] 尝试切换到特权模式;" if $self->{debug};
+
+    eval { $self->{enabled} = $self->enable(); };
+    if ($@ || $self->{enabled} == 0) {
+      croak "username or enPassword is wrong!";
+    }
   }
 
-  my $enPrompt = $self->enPrompt();
-  if ($exp->match() =~ /$enPrompt/) {
-    $self->isEnable(1);
-  }
-
-  return 1;
+  return $self->{status};
 }
 
-# 发送命令方法
 sub send {
   my ($self, $command) = @_;
-  my $exp = $self->expect;
+
+  my $exp = $self->{exp};
+
+  if ($self->{debug}) {
+    my $cmd = $command;
+    chomp($cmd);
+    say "\n[debug] send command: ($cmd);";
+  }
+
   $exp->send($command);
 }
 
-# 生成 Expect->new 对象
-sub buildExpect {
-  shift;
+sub enable {
+  my $self = shift;
 
-  # 实例化 Expect 函数对象
-  my $exp = Expect->new();
-  $exp->raw_pty(1);
-  $exp->debug(0);
-  $exp->restart_timeout_upon_receive(1);
+  my $username  = $self->{username};
+  my $enPasswd  = $self->{enPassword};
+  my $enCommand = $self->{enCommand};
+  my $prompt    = $self->{prompt};
 
-  # 是否打印日志，一般用于排错
-  # $exp->log_file("output.log");
-  $exp->log_stdout(1);
-  return $exp;
+  $enPasswd ||= $ENV{PDK_ENPASSWORD} || $self->{password};
+
+  my $exp = $self->{exp};
+  $exp->send("$enCommand\n");
+
+  my @ret = $exp->expect(
+    10,
+    [
+      qr/assword:\s*$/mi => sub {
+        $exp->send("$enPasswd\n");
+      }
+    ],
+    [
+      qr/(ername|ogin|user):\s*$/mi => sub {
+        $exp->send("$username\n");
+        exp_continue;
+      }
+    ],
+    [
+      eof => sub {
+        croak("执行[enable/尝试切换特权模式]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+      }
+    ],
+    [
+      timeout => sub {
+        croak("执行[enable/尝试切换特权模式]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+      }
+    ],
+  );
+
+  return 0 if defined $ret[1];
+
+  @ret = $exp->expect(
+    10,
+    [
+      qr/sername|assword:\s*$/mi => sub {
+        $self->{enabled} = -1;
+        croak("username or enPassword is wrong!");
+      }
+    ],
+    [
+      qr/(\^|Bad secrets|Permission denied|invalid)/mi => sub {
+        $self->{enabled} = -1;
+        croak("username or enPassword is wrong!");
+      }
+    ],
+    [
+      qr/$prompt/m => sub {
+        $self->{enabled} = 1;
+      }
+    ],
+    [
+      eof => sub {
+        croak("执行[enable/检查是否成功切换特权模式]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+      }
+    ],
+    [
+      timeout => sub {
+        croak("执行[enable/检查是否成功切换特权模式]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+      }
+    ],
+  );
+
+  return $self->{enabled};
 }
 
-# 驱动方法，根据连接协议选择相应的连接方式
-sub driver {
-  my ($self, %param) = @_;
+sub execCommands {
+  my ($self, $commands) = @_;
 
-  # 从参数中获取主机名、用户名、密码和连接协议，使用对象属性中的默认连接协议
-  my ($host, $username, $password, $proto) = @param{qw/host username password proto/};
+  if (not defined $self->{exp} and $self->{status} == 0) {
+    my $login = $self->login();
+    if ($login->{success} == 0) {
+      my $snapshot = "执行[execCommands/下发配置前自动登录设备]，尝试（首次）登录设备失败。";
+      if (my $exp = $self->{exp}) {
+        $snapshot .= "，相关异常：\n" . $exp->before() . $exp->match() . $exp->after();
+      }
+      return {success => 0, failCommand => join(", ", @{$commands}), snapshot => $snapshot, reason => $login->{reason}};
+    }
+  }
+  elsif ($self->{exp} and $self->{status} == -1) {
+    my $exp      = $self->{exp};
+    my $snapshot = "先前捕捉到的交互信息：" . $exp->before() . $exp->match() . $exp->after();
+    my $reason   = "执行[execCommands/下发配置前自动登录设备]，尝试（非首次）登录设备失败。";
+    return {success => 0, failCommand => join(", ", @{$commands}), snapshot => $snapshot, reason => $reason};
+  }
 
-  # 创建网络设备对象，初始化会话并获取配置信息
-  my $session = $self->new(host => $host, username => $username, password => $password, proto => $proto);
-  my $result  = $session->startupConfig();
+  my $result = $self->{exp} ? $self->{exp}->match() . $self->{exp}->after() : "";
+  my $errors = $self->errCodes();
 
-  # 返回获取配置信息的结果
-  return $result->{success} ? $result->{config} : $result;
+  if ($ENV{PDK_CATCH_ERROR} =~ /^\d+$/) {
+
+    $self->{catchError} = ($ENV{PDK_CATCH_ERROR} == 1) ? 1 : 0;
+  }
+
+  for my $cmd (@{$commands}) {
+
+    next if $cmd =~ /^\s*$/;
+    next if $cmd =~ /^[#!;]/;
+
+    my $buff = "";
+
+    $self->send("$cmd\n");
+    eval { $buff = $self->waitfor(); };
+
+    if ($@) {
+      chomp($@);
+      my $snapshot = $result . $buff;
+      my $reason   = "执行[execCommands/等待脚本回显自动交互]，捕捉到异常: \n" . $@;
+      return {success => 0, failCommand => $cmd, reason => $reason, snapshot => $snapshot};
+    }
+
+    if ($self->{catchError}) {
+      for my $error (@{$errors}) {
+        if ($buff =~ /$error/i) {
+          my $snapshot = "执行[execCommands/异常码字典拦截]，捕捉到异常: \n" . $result . $buff;
+          return {success => 0, failCommand => $cmd, reason => $error, snapshot => $snapshot};
+        }
+      }
+    }
+
+    $result .= $buff;
+  }
+
+  return {success => 1, result => $result};
 }
 
-# 根据协议生成登录脚本
-sub buildConnector {
+sub write_file {
+  my ($self, $config, $name) = @_;
+
+  croak("必须提供非空配置信息") unless $config;
+
+  $name //= $self->{host} . ".cfg";
+
+  my $workdir = "$self->{workdir}/$self->{month}/$self->{date}";
+
+  if ($self->{debug}) {
+    say "\n[debug] 准备将配置文件写入工作目录: ($workdir)";
+  }
+
+  use File::Path qw(make_path);
+  make_path($workdir) unless -d $workdir;
+
+  my $filename = "$workdir/$name";
+
+  open(my $fh, '>', $filename) or croak "无法打开文件 $filename 进行写入: $!";
+  print $fh $config            or croak "写入文件 $filename 失败: $!";
+  close($fh)                   or croak "关闭文件句柄 $filename 失败: $!";
+
+  if ($self->{debug}) {
+    say "[debug] 已将配置文件写入文本文件: $filename !";
+  }
+
+  return {success => 1};
+}
+
+sub _spawn_command {
   my ($self, $args) = @_;
 
-  # 初始化变量
-  my $user  = $self->username;
-  my $host  = $self->host;
-  my $port  = $self->port;
-  my $proto = $self->proto;
+  my $user  = $self->{username};
+  my $host  = $self->{host};
+  my $port  = $self->{port};
+  my $proto = $self->{proto};
 
-  # 动态生成会话连接参数
+  $user ||= $ENV{PDK_USERNAME};
+
   $args //= "";
   my $command;
-  if (!!$port) {
+
+  if ($port) {
     if ($proto =~ /telnet/i) {
       $command = qq{$proto $args -l $user $host $port};
     }
@@ -236,12 +464,36 @@ sub buildConnector {
   else {
     $command = qq{$proto $args -l $user $host};
   }
+
+  say "[debug] 已生成登录设备的脚本: $command" if $self->{debug};
+
   return $command;
 }
 
-sub enable {
-  shift;
-  return 0;
+sub _debug {
+  my ($self, $level) = @_;
+
+  $level //= 1;
+  $level = 3 if $level > 3;
+
+  my $workdir = "$self->{workdir}/debug/$self->{date}";
+
+  use File::Path qw(make_path);
+  make_path($workdir) unless -d $workdir;
+
+  my $exp = $self->{exp};
+
+  if ($level == 2) {
+    say '[debug] 当前 debug 级别将打开日志记录功能，并同步脚本执行回显到控制台！';
+    $exp->log_stdout(1);
+  }
+  elsif ($level == 3) {
+    say '[debug] 当前 debug 级别将打开日志记录功能，观察更详细的 Expect 信息！';
+    $exp->log_stdout(1);
+    $exp->debug($level);
+  }
+
+  $exp->log_file("$workdir/$self->{host}.log");
 }
 
 1;

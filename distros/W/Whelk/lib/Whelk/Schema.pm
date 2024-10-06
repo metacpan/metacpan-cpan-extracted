@@ -1,10 +1,14 @@
 package Whelk::Schema;
-$Whelk::Schema::VERSION = '1.00';
+$Whelk::Schema::VERSION = '1.01';
 use Kelp::Base -strict;
 use Whelk::Schema::Definition;
 use Carp;
 
+our @CARP_NOT = qw(Whelk::Endpoint);
+
 my %registered;
+
+use constant NO_DEFAULT => \undef;
 
 sub build_if_defined
 {
@@ -163,6 +167,39 @@ extended schema. C<type> cannot be replaced.
 Schema declared this way will be put into the OpenAPI document as-is, without
 referencing any other schema.
 
+=head3 Reusable schemas without OpenAPI trace
+
+All methods above will leave a trace in your OpenAPI output, which may not be
+what you want. If you for example just want to use a list of properties across
+a couple of objects, you may want to use a regular hash instead:
+
+	my %common_fields = (
+		name => {
+			type => 'string',
+		},
+		age => {
+			type => 'integer',
+		},
+	);
+
+	Whelk::Schema->build(
+		person => {
+			type => 'object,
+			properties => {
+				%common_fields,
+				id => {
+					type => 'integer',
+					nullable => !!1,
+				},
+			},
+		}
+	);
+
+This should work well as presented, but since Whelk does not usually deep-clone
+its input before using it, some nested parts of C<%common_fields> may get
+changed or blessed. Don't rely on its contents being exactly as you defined it,
+or deep-clone it yourself before passing it to Whelk.
+
 =head2 Available types
 
 Each new schema must have a C<type> defined. All types share these common configuration values:
@@ -172,6 +209,10 @@ Each new schema must have a C<type> defined. All types share these common config
 =item * required
 
 Boolean - whether the value is required to be present. C<true> by default.
+
+=item * nullable
+
+Boolean - whether the value can be null (but present). C<false> by default.
 
 =item * description
 
@@ -209,6 +250,10 @@ Extra configuration fields:
 =item * default
 
 A default value to be used when there is no value. Also assumes C<< required => !!0 >>.
+
+CAUTION: Whelk does not differentiate null value and no value. If you specify
+default, a received null value will get replaced with that default. To
+explicitly say that there is no default, use C<Whelk::Schema::NO_DEFAULT>.
 
 =item * example
 

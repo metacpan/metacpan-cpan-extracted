@@ -127,5 +127,55 @@ subtest 'build_if_defined should handle building ref schemas' => sub {
 	is $extended, $to_extend, 'ref ok';
 };
 
+subtest 'should be able to reuse partial schema defined in a hash' => sub {
+	my %partial = (
+		one => {
+			type => 'array',
+			items => {
+				type => 'null',
+			},
+		},
+		two => {
+			type => 'object',
+			properties => {
+				three => {
+					type => 'string',
+					required => !!0,
+				},
+			},
+		},
+	);
+
+	my $p1 = Whelk::Schema->build(
+		partial1 => {
+			type => 'object',
+			properties => {
+				%partial,
+				add => {
+					type => 'null',
+				},
+			},
+		}
+	);
+
+	my $p2 = Whelk::Schema->build(
+		partial2 => {
+			type => 'object',
+			properties => {
+				%partial,
+				add => {
+					type => 'null',
+				},
+			},
+		}
+	);
+
+	isa_ok $p1, 'Whelk::Schema::Definition::Object';
+	isa_ok $p2, 'Whelk::Schema::Definition::Object';
+	isnt $p1->properties, $p2->properties, 'not same schema ok';
+	is_deeply $p1->properties, $p2->properties, 'schemas ok';
+
+};
+
 done_testing;
 

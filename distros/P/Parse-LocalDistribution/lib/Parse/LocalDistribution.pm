@@ -9,7 +9,7 @@ use File::Spec;
 use File::Find;
 use Cwd ();
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 sub new {
   my ($class, $root, $opts) = @_;
@@ -54,6 +54,8 @@ sub _read_dist {
 # from PAUSE::dist;
 sub _extract_meta {
   my $self = shift;
+
+  return if $self->{META_CONTENT};
 
   my $dist = $self->{DIST};
   my @manifind = @{$self->{MANIFOUND}};
@@ -435,6 +437,10 @@ If you really need to let Parse::PMFile fork while parsing a version (as PAUSE d
 =item USERID, PERMISSIONS
 
 Parse::LocalDistribution checks permissions of a package if both USERID and PERMISSIONS (which should be an instance of L<PAUSE::Permissions>) are provided. Unauthorized packages are removed.
+
+=item META_CONTENT
+
+If you already have parsed a META file, set this to avoid parsing the same META file again.
 
 =back
 

@@ -18,7 +18,7 @@ my $t = My::Package->new(
 my $old_dbh =  $t->{_dbh};
 ok defined $old_dbh, 'dbh was created';
 
-$t->reconnect;
+$t->reconnect_dbh;
 ok $old_dbh != $t->dbh, "We created a fresh dbh on reconnect";
 
 done_testing();

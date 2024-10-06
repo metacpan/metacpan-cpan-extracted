@@ -24,7 +24,6 @@ Several dependencies should be installed prior building from source.
 
 - Data::Dump
 - Mouse
-- MouseX::NativeTraits
 - Test::Deep
 - Test::Exception
 - Try::Tiny

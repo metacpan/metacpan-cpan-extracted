@@ -10,9 +10,9 @@ use AppBase::Sort::File ();
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-06'; # DATE
+our $DATE = '2024-09-19'; # DATE
 our $DIST = 'App-sort_by_sorter'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -34,7 +34,6 @@ MARKDOWN
             pos => 0,
         },
     },
-    delete_args => [qw/ignore_case reverse/],
     modify_args => {
         files => sub {
             my $argspec = shift;
@@ -53,6 +52,11 @@ MARKDOWN
                 'x.doc.show_result' => 0,
             },
         ];
+
+        $meta->{links} //= [];
+        push @{ $meta->{links} }, {url=>'pm:Sorter'};
+        push @{ $meta->{links} }, {url=>'prog:sort-by-comparer'};
+        push @{ $meta->{links} }, {url=>'prog:sort-by-sortkey'};
     },
     output_code => sub {
         require Module::Load::Util;
@@ -88,7 +92,7 @@ App::sort_by_sorter - Sort lines of text by a Sorter module
 
 =head1 VERSION
 
-This document describes version 0.001 of App::sort_by_sorter (from Perl distribution App-sort_by_sorter), released on 2024-03-06.
+This document describes version 0.002 of App::sort_by_sorter (from Perl distribution App-sort_by_sorter), released on 2024-09-19.
 
 =head1 FUNCTIONS
 
@@ -155,6 +159,11 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-sort_b
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-sort_by_sorter>.
+
+=head1 SEE ALSO
+
+
+L<Sorter>.
 
 =head1 AUTHOR
 

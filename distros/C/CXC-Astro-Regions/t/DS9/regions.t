@@ -4,13 +4,34 @@ use Test2::V0;
 
 use CXC::Astro::Regions::DS9 -all;
 
+subtest mkregion => sub {
+
+    is(
+        mkregion(
+            annulus => center => [ 10, 20 ],
+            annuli  => [ 2, 3 ],
+            n       => 20,
+        )->render,
+        'annulus 10 20 2 3 n=20',
+        'n',
+    );
+
+    is(
+        mkregion(
+            annulus => center => [ 10, 20 ],
+            annuli  => [ 2, 3, 4, 5 ],
+        )->render,
+        'annulus 10 20 2 3 4 5',
+        'annuli',
+    );
+};
+
 subtest annulus => sub {
 
     is(
         annulus(
             center => [ 10, 20 ],
-            inner  => 2,
-            outer  => 3,
+            annuli => [ 2,  3 ],
             n      => 20,
         )->render,
         'annulus 10 20 2 3 n=20',
@@ -107,11 +128,25 @@ subtest box => sub {
 
 };
 
+subtest circle => sub {
+
+    is(
+        circle(
+            center => [ 10, 20 ],
+            radius => 2,
+        )->render,
+        'circle 10 20 2',
+        'circle',
+    );
+
+};
+
+
 subtest compass => sub {
 
     is(
         compass(
-            center => [ 10, 20 ],
+            base   => [ 10, 20 ],
             length => 30,
         )->render,
         'compass 10 20 30 # compass=physical {N} {E} 1 1',
@@ -121,7 +156,7 @@ subtest compass => sub {
     subtest label => sub {
         is(
             compass(
-                center => [ 10, 20 ],
+                base   => [ 10, 20 ],
                 length => 30,
                 north  => 'North',
             )->render,
@@ -131,7 +166,7 @@ subtest compass => sub {
 
         is(
             compass(
-                center => [ 10, 20 ],
+                base   => [ 10, 20 ],
                 length => 30,
                 east   => 'East',
             )->render,
@@ -141,7 +176,7 @@ subtest compass => sub {
 
         is(
             compass(
-                center => [ 10, 20 ],
+                base   => [ 10, 20 ],
                 length => 30,
                 north  => 'North',
                 east   => 'East',
@@ -155,7 +190,7 @@ subtest compass => sub {
     subtest arrows => sub {
         is(
             compass(
-                center => [ 10, 20 ],
+                base   => [ 10, 20 ],
                 length => 30,
                 arrows => [ split q{ }, $_ ],
             )->render,
@@ -171,9 +206,8 @@ subtest ellipse => sub {
 
     is(
         ellipse(
-            center => [ 10, 20 ],
-            rx     => '2p',
-            ry     => '3d',
+            center => [ 10,   20 ],
+            radii  => [ '2p', '3d' ],
         )->render,
         'ellipse 10 20 2p 3d',
         'default',
@@ -181,9 +215,8 @@ subtest ellipse => sub {
 
     is(
         ellipse(
-            center => [ 10, 20 ],
-            rx     => '2p',
-            ry     => '3d',
+            center => [ 10,   20 ],
+            radii  => [ '2p', '3d' ],
             fill   => 1,
         )->render,
         'ellipse 10 20 2p 3d # fill=1',
@@ -192,9 +225,8 @@ subtest ellipse => sub {
 
     is(
         ellipse(
-            center => [ 10, 20 ],
-            rx     => '2p',
-            ry     => '3d',
+            center => [ 10,   20 ],
+            radii  => [ '2p', '3d' ],
             angle  => 33,
         )->render,
         'ellipse 10 20 2p 3d 33',
@@ -249,8 +281,8 @@ subtest line => sub {
 
     is(
         line(
-            v1 => [ 0,  0 ],
-            v2 => [ 10, 10 ],
+            'v1' => [ 0,  0 ],
+            'v2' => [ 10, 10 ],
         )->render,
         'line 0 0 10 10',
         'default',
@@ -258,14 +290,35 @@ subtest line => sub {
 
     is(
         line(
-            v1     => [ 0,  0 ],
-            v2     => [ 10, 10 ],
+            'v1'   => [ 0,  0 ],
+            'v2'   => [ 10, 10 ],
             arrows => [ 0,  0 ],
         )->render,
         'line 0 0 10 10 # line= 0 0',
         'no arrows',
     );
 
+};
+
+subtest point => sub {
+
+    is(
+        point(
+            center => [ 0, 1 ],
+        )->render,
+        'point 0 1',
+        'default',
+    );
+
+    is(
+        point(
+            center => [ 0, 1 ],
+            symbol => $_,
+            size   => 22,
+        )->render,
+        "point 0 1 # point=$_ 22",
+        "type $_, size 22",
+    ) for qw( circle box diamond cross x arrow boxcircle);
 };
 
 subtest polygon => sub {
@@ -288,33 +341,12 @@ subtest polygon => sub {
     );
 };
 
-subtest point => sub {
-
-    is(
-        point(
-            position => [ 0, 1 ],
-        )->render,
-        'point 0 1',
-        'default',
-    );
-
-    is(
-        point(
-            position => [ 0, 1 ],
-            symbol   => $_,
-            size     => 22,
-        )->render,
-        "point 0 1 # point=$_ 22",
-        "type $_, size 22",
-    ) for qw( circle box diamond cross x arrow boxcircle);
-};
-
 subtest projection => sub {
 
     is(
         projection(
-            v1    => [ 0,  0 ],
-            v2    => [ 10, 10 ],
+            'v1'  => [ 0,  0 ],
+            'v2'  => [ 10, 10 ],
             width => '22p',
         )->render,
         'projection 0 0 10 10 22p',
@@ -326,8 +358,8 @@ subtest ruler => sub {
 
     is(
         ruler(
-            v1 => [ 0,  0 ],
-            v2 => [ 10, 10 ],
+            'v1' => [ 0,  0 ],
+            'v2' => [ 10, 10 ],
         )->render,
         'ruler 0 0 10 10',
         'default',
@@ -335,8 +367,8 @@ subtest ruler => sub {
 
     is(
         ruler(
-            v1     => [ 0,  0 ],
-            v2     => [ 10, 10 ],
+            'v1'   => [ 0,  0 ],
+            'v2'   => [ 10, 10 ],
             coords => $_,
         )->render,
         "ruler 0 0 10 10 # ruler=$_",
@@ -348,8 +380,8 @@ subtest text => sub {
 
     is(
         text(
-            position => [ 0, 0 ],
-            text     => 'foo',
+            center => [ 0, 0 ],
+            text   => 'foo',
         )->render,
         'text 0 0 {foo}',
     );
@@ -462,7 +494,7 @@ subtest bpanda => sub {
 
 subtest composite => sub {
 
-    my $point = point( position => [ 0, 5 ] );
+    my $point = point( center => [ 0, 5 ] );
 
     is(
         composite( center => [ 4096, 4096 ], regions => [$point] )->render,

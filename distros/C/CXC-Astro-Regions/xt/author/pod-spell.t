@@ -12,6 +12,8 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Astro
 Astrophysical
+CFITSIO
+CIAO
 CXC
 DS9
 Diab

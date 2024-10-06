@@ -1,5 +1,5 @@
 package Whelk::StrictBase;
-$Whelk::StrictBase::VERSION = '1.00';
+$Whelk::StrictBase::VERSION = '1.01';
 use strict;
 use warnings;
 

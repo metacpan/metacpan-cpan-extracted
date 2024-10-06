@@ -1,193 +1,241 @@
 package PDK::Device::Radware;
 
+use 5.030;
+use strict;
+use warnings;
+
 use Moose;
-use Carp;
-use namespace::autoclean;
-use Expect;
-
-# 使用 'PDK::Device::Base' 角色
+use Expect qw'exp_continue';
+use Carp   qw'croak';
 with 'PDK::Device::Base';
+use namespace::autoclean;
 
-# 定义登录成功提示符
-sub prompt {
-  shift;
-  return '>> Standalone ADC - (.*?)# ';
+has prompt => (is => 'ro', required => 1, default => '^>>.*?#\s*$',);
+
+sub errCodes {
+  my $self = shift;
+
+  return [qr/^Error:.*?$/m,];
 }
 
-# 等待响应方法
 sub waitfor {
   my ($self, $prompt) = @_;
 
-  # 如果没有指定提示符，则使用默认提示符
-  $prompt //= $self->prompt();
-
-  my $exp  = $self->expect();
   my $buff = "";
+  $prompt //= $self->{prompt};
+
+  my $exp = $self->{exp};
 
   my @ret = $exp->expect(
-    10,
+    15,
     [
-      qr/--more--.*$/mi => sub {
-        $exp->send(" ");
-        $buff .= $exp->before();
-        exp_continue;
-      }
-    ],
-    [
-      qr/Display private keys/mi => sub {
-        $exp->send("n\r");
-        $buff .= $exp->before() . $exp->match();
-        exp_continue;
-      }
-    ],
-    [
-      qr/Confirm Sync to Peer/mi => sub {
+      qr/Confirm saving without first applying changes/i => sub {
         $exp->send("y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
-      qr/Do you want to save your changes\?.*$/mi => sub {
+      qr/Confirm saving to FLASH/i => sub {
         $exp->send("y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
-      qr/Enter passphrase for key/mi => sub {
-        $exp->send("186XXX\r");
+      qr/Confirm dumping all information/i => sub {
+        $exp->send("y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
-    [qr/$prompt/m => sub { $buff .= $exp->before() . $exp->match() }]
+    [
+      qr/(Display|Include) private keys/i => sub {
+
+        my $passphrase = $self->{passphrase} || $ENV{PDK_FTP_PASSPHRASE};
+        $self->{passphrase} = $passphrase if $self->{passphrase} ne $passphrase;
+
+        $exp->send(defined $passphrase ? "y\r" : "n\r");
+        $buff .= $exp->before() . $exp->match();
+        exp_continue;
+      }
+    ],
+    [
+      qr/(Enter|Reconfirm) passphrase/i => sub {
+        $exp->send("$self->{passphrase}\r");
+        $buff .= $exp->before() . $exp->match();
+        exp_continue;
+      }
+    ],
+    [
+      qr/$prompt/m => sub {
+        $buff .= $exp->before() . $exp->match();
+      }
+    ],
+    [
+      eof => sub {
+        croak("执行[waitfor]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+      }
+    ],
+    [
+      timeout => sub {
+        croak("执行[waitfor]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+      }
+    ],
   );
 
-  # 如果发生异常，抛出错误
-  if (defined $ret[1]) {
-    croak($ret[3] . $ret[1]);
-  }
+  croak($ret[3]) if defined $ret[1];
 
-  # 字符串修正处理
   $buff =~ s/\x1b\[\d+D\s+\x1b\[\d+D//g;
-  $buff =~ s/\r\n|\n+\n/\n/g;
-  $buff =~ s/^%.+$//mg;
-  $buff =~ s/^\s*$//mg;
 
   return $buff;
 }
 
-# 执行多个命令方法
-sub execCommands {
-  my ($self, @commands) = @_;
-
-  # 在脚本执行期间确保设备已登录并处于特权模式下
-  if ($self->{isLogin} == 0) {
-    my $result = $self->login();
-    unless ($self->isLogin) {
-      return $result;
-    }
-  }
-
-  if ($self->{isEnable} == 0) {
-    my $result = $self->enable();
-    unless ($self->isEnable) {
-      return $result;
-    }
-  }
-
-  my $result = "";
-
-  # 遍历待下发脚本，并对每个脚本执行回显进行异常捕捉
-  for my $cmd (@commands) {
-    $self->send("$cmd\n");
-    my $buff = $self->waitfor();
-
-    if ($buff =~ /Error: .*$/i) {
-      return {success => 0, failCommand => $cmd, reason => $result . $buff};
-    }
-    elsif ($buff =~ /Command not found/i) {
-      return {success => 0, failCommand => $cmd, reason => $result . $buff};
-    }
-    elsif ($buff =~ /Invalid parameter/i) {
-      return {success => 0, failCommand => $cmd, reason => $result . $buff};
-    }
-    elsif ($buff =~ /Permission denied/i) {
-      return {success => 0, failCommand => $cmd, reason => $result . $buff};
-    }
-    elsif ($buff =~ /(Command incomplete|Configuration error)/i) {
-      return {success => 0, failCommand => $cmd, reason => $result . $buff};
-    }
-    else {
-      $result .= $buff;
-    }
-  }
-
-  return {success => 1, result => $result};
-}
-
-#------------------------------------------------------------------------------
-# 具体实现 runCommands，编写进入特权模式、退出保存配置的逻辑
-#------------------------------------------------------------------------------
 sub runCommands {
-  my ($self, @commands) = @_;
+  my ($self, $commands) = @_;
 
-  # 配置下发前 | 切入配置模式
-  unshift(@commands, "cfg");
+  croak "执行[runCommands]，必须提供一组待下发脚本" unless ref $commands eq 'ARRAY';
 
-  # 完成配置后 | 报错具体配置
-  push(@commands, "save");
+  unshift @$commands, 'cd' unless $commands->[0] =~ /^cd/mi;
 
-  # 执行调度，配置批量下发
-  $self->execCommands(@commands);
+  push @$commands, 'apply', 'save' unless $commands->[-1] =~ /^(apply|save)/mi;
+
+  $self->execCommands($commands);
 }
 
-# 获取设备配置方法
 sub getConfig {
-  my $self     = shift;
-  my @commands = ('terminal length 0', 'show configuration running');
-  my $config   = $self->execCommands(@commands);
+  my $self = shift;
 
-  if ($config->{success} == 1) {
-    my $lines = $config->{result};
+  my $commands = ["cfg/dump", "cd",];
 
-    # $lines =~ s/^\s*ntp\s+clock-period\s+\d+\s*$//mi;
-    return {success => 1, config => $lines};
+  my $config = $self->execCommands($commands);
+
+  return $config if $config->{success} == 0;
+
+  my $lines = $config->{result};
+
+  return {success => 1, config => $lines};
+}
+
+sub ftpConfig {
+  my ($self, $hostname, $server, $username, $password) = @_;
+
+  $server   //= $ENV{PDK_FTP_SERVER};
+  $username //= $ENV{PDK_FTP_USERNAME};
+  $password //= $ENV{PDK_FTP_PASSWORD};
+
+  croak "请正确提供 FTP 服务器地址、账户和密码!" unless $username and $password and $server;
+
+  my $passphrase = $self->{passphrase} || $ENV{PDK_FTP_PASSPHRASE};
+
+  my $host    = $self->{host};
+  my $command = "$self->{month}/$self->{date}/";
+
+  if ($hostname) {
+    $command .= "${hostname}_$host.tar.gz";
   }
   else {
-    return $config;
+    $command .= "$host.tar.gz";
   }
-}
 
-#------------------------------------------------------------------------------
-# 具体实现 startupConfig,设置抓取设备启动配置的脚本
-#------------------------------------------------------------------------------
-sub startupConfig {
-  my $self     = shift;
-  my $commands = ["cfg/dump", "cd"];
+  if (!$self->{exp}) {
+    my $login = $self->login();
+    croak $login->{reason} if $login->{success} == 0;
+  }
 
-  return $self->execCommands(@{$commands});
-}
+  my $exp    = $self->{exp};
+  my $result = $exp ? $exp->match() : "";
 
-#------------------------------------------------------------------------------
-# 具体实现 runningConfig,设置抓取设备运行配置的脚本
-#------------------------------------------------------------------------------
-sub runningConfig {
-  my $self     = shift;
-  my $commands = ["cfg/dump", "cd"];
+  my $connector = "cfg/ptcfg ${server} -m -mansync";
+  $exp->send("$connector\n");
+  say "[debug] 执行FTP备份脚本[$connector]，备份到目标文件为 $command" if $self->{debug};
 
-  return $self->execCommands(@{$commands});
-}
+  my @ret = $exp->expect(
+    15,
+    [
+      qr/hit return for automatic file name/i => sub {
+        $result .= $exp->before() . $exp->match();
+        $exp->send("$command\r");
+        exp_continue;
+      }
+    ],
+    [
+      qr/Enter username for FTP/i => sub {
+        $result .= $exp->before() . $exp->match();
+        $exp->send("$username\r");
+        exp_continue;
+      }
+    ],
+    [
+      qr/Enter password for username/i => sub {
+        $result .= $exp->before() . $exp->match();
+        $exp->send("$password\r");
+        exp_continue;
+      }
+    ],
+    [
+      qr/(Display|Include) private keys/i => sub {
+        $exp->send($passphrase ? "y\r" : "n\r");
+        $result .= $exp->before() . $exp->match();
+        exp_continue;
+      }
+    ],
+    [
+      qr/(Enter|Reconfirm) passphrase/i => sub {
+        $exp->send("$passphrase\r");
+        $result .= $exp->before() . $exp->match();
+        exp_continue;
+      }
+    ],
+    [
+      qr/hit return for FTP server/i => sub {
+        $result .= $exp->before() . $exp->match();
+        $exp->send("\r");
+      }
+    ],
+    [
+      eof => sub {
+        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+      }
+    ],
+    [
+      timeout => sub {
+        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+      }
+    ],
+  );
 
-#------------------------------------------------------------------------------
-# 具体实现 healthCheck,设置抓取设备健康检查配置的脚本
-#------------------------------------------------------------------------------
-sub healthCheck {
-  my $self     = shift;
-  my $commands = ["cfg/dump", "cd"];
+  croak($ret[3]) if defined $ret[1];
 
-  return $self->execCommands(@{$commands});
+  @ret = $exp->expect(
+    10,
+    [
+      qr/^Error: Illegal operation/mi => sub {
+        croak("FTP 会话丢失: username or password is wrong!");
+      }
+    ],
+    [
+      qr/Current config successfully transferred/ => sub {
+        $result .= $exp->before() . $exp->match();
+        say "FTP 配置备份：文件 $command 上传成功!" if $self->{debug};
+      }
+    ],
+    [
+      eof => sub {
+        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+      }
+    ],
+    [
+      timeout => sub {
+        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+      }
+    ],
+  );
+
+  croak($ret[3]) if defined $ret[1];
+  $exp->send("cd\r");
+
+  return {success => 1, config => $result};
 }
 
 __PACKAGE__->meta->make_immutable;

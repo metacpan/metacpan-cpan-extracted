@@ -46,19 +46,18 @@ has 'event_mask' => (
     default => sub { [] },
 );
 has 'protocols' => (
-    traits => [ 'Array' ],
     is => 'ro',
     isa => 'ArrayRef[X11::XCB::Atom]',
     default => sub { [] },
-    handles => {
-        no_protocols => 'is_empty',
-        protocols_count => 'count',
-    }
 );
 has '_hints' => (is => 'rw', isa => 'ArrayRef', default => sub { [ ] });
 has '_conn' => (is => 'ro', required => 1);
 has '_mapped' => (is => 'rw', isa => 'Int', default => 0);
 has '_created' => (is => 'rw', isa => 'Int', default => 0);
+
+# Theese two are PP implementation of MouseX::NativeTraits for 'protocols' Array
+sub no_protocols { !! @{ $_[0]->protocols } };
+sub protocols_count { 0+ @{ $_[0]->protocols } };
 
 sub _build_id {
     my $self = shift;

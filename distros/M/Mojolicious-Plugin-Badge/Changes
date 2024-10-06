@@ -1,5 +1,9 @@
 Revision history Mojolicious::Plugin::Badge
 
+1.12 2024-10-05
+    - Use "target=_blank" with "link", "label_link" and "message_link"
+    - Use Mojo::URL in all links
+
 1.11 2024-09-25
     - Added ~150 named colors
 

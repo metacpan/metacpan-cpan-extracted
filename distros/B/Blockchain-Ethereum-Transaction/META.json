@@ -4,7 +4,7 @@
       "Reginaldo Costa <refeco@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -37,21 +37,35 @@
       },
       "runtime" : {
          "requires" : {
-            "Blockchain::Ethereum::RLP" : "0.009",
+            "Blockchain::Ethereum::RLP" : "0.010",
             "Crypt::Digest::Keccak256" : "0.078",
-            "Object::Pad" : "0.79",
+            "Object::Pad" : "0.814",
             "perl" : "v5.26.0"
          }
       },
       "test" : {
          "requires" : {
-            "Blockchain::Ethereum::Keystore" : "0.008",
+            "Blockchain::Ethereum::Keystore" : "0.010",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::CheckDeps" : "0.010",
             "Test::More" : "0.94"
          }
+      }
+   },
+   "provides" : {
+      "Blockchain::Ethereum::Transaction" : {
+         "file" : "lib/Blockchain/Ethereum/Transaction.pm",
+         "version" : "0.010"
+      },
+      "Blockchain::Ethereum::Transaction::EIP1559" : {
+         "file" : "lib/Blockchain/Ethereum/Transaction/EIP1559.pm",
+         "version" : "0.010"
+      },
+      "Blockchain::Ethereum::Transaction::Legacy" : {
+         "file" : "lib/Blockchain/Ethereum/Transaction/Legacy.pm",
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -63,10 +77,10 @@
          "web" : "https://github.com/refeco/Blockchain-Ethereum-Transaction"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_authority" : "cpan:REFECO",
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "MIT"
 }
 

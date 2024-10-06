@@ -34,6 +34,11 @@ sub api
 					description => 'Name of the entity',
 					example => "John's entity",
 				},
+				value => {
+					type => 'integer',
+					nullable => !!1,
+					default => undef,
+				},
 			}
 		}
 	);

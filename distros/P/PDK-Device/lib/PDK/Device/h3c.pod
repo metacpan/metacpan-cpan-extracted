@@ -1,0 +1,104 @@
+=pod
+
+=head1 NAME
+
+PDK::Device::H3C - A module for interacting with H3C devices
+
+=head1 SYNOPSIS
+
+  use PDK::Device::H3C;
+
+  my $device = PDK::Device::H3C->new(
+    host     => '192.168.1.1',
+    username => 'admin',
+    password => 'H3Cpassword'
+  );
+
+  # Log in to the device
+  $device->login();
+
+  # Execute script in normal mode
+  $device->execCommands(['display version', 'display arp']);
+
+  # Execute script in configuration mode, automatically outfitting [system-view, save]
+  $device->runCommands(['display version']);
+
+  # Retrieve running configuration
+  my $config = $device->getConfig('hostname');
+
+  # FTP configuration backup
+  my $config = $device->ftpConfig('hostname', 'ftp_server', 'ftp_username', 'ftp_password');
+
+  # filename is optional, defaults to device IP address, e.g., 192.168.1.1.cfg
+  $device->write_file('content', 'filename');
+
+=head1 DESCRIPTION
+
+This module provides functionality to interact with H3C devices, including executing commands, retrieving configurations, and backing up configurations via FTP.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item B<prompt>
+
+The device's default prompt, defaults to '\S+[#>]\s*\z'.
+
+=item B<enPrompt>
+
+Enable mode prompt, defaults to '\S+[>]\s*\z'.
+
+=item B<enCommand>
+
+Command to switch to enable mode, defaults to 'system-view'.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<errCodes>
+
+Returns a list of possible error codes for checking errors during command execution.
+
+=item B<waitfor>
+
+Waits for a specific prompt match, automatically executing the script interactively.
+
+=item B<write_file>
+
+Writes configuration information to a text file.
+
+=item B<runCommands>
+
+Executes a series of commands and configures the sending mode.
+
+  Parameters:
+  - $commands: List of commands (array reference).
+
+=item B<getConfig>
+
+Retrieves the running configuration of the device.
+
+  Returns: A hash reference containing a success flag and configuration content.
+
+=item B<ftpConfig>
+
+Backs up the running configuration via FTP.
+
+  Parameters:
+  - $hostname: Optional hostname.
+  - $server: FTP server address.
+  - $username: FTP username.
+  - $password: FTP password.
+
+  Returns: The result of executing the command.
+
+=back
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=cut

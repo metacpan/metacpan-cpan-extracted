@@ -1,5 +1,8 @@
 Revision history for OpenAPI-Client-OpenAI
 
+0.10    2024-10-05
+        - Update MANIFEST to include missing example files
+
 0.09    2024-10-05
         - Update OpenAI spec
         - Include examples/describe_image.pl

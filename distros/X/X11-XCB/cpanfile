@@ -5,7 +5,6 @@ requires 'Module::Install';
 requires 'Module::Install::AuthorRequires';
 requires 'Module::Install::XSUtil';
 requires 'Mouse';
-requires 'MouseX::NativeTraits';
 requires 'Test::Deep';
 requires 'Test::Exception';
 requires 'Try::Tiny';

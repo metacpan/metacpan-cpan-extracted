@@ -44,13 +44,12 @@ perl_version_from 'lib/X11/XCB.pm';
 version_from 'lib/X11/XCB.pm';
 
 author 'Michael Stapelberg <michael+xcb@stapelberg.de>';
-author 'Sergei Zhmylev <zhmylove@cpan.org>';
+author 'Sergei Zhmylev <zhmylove@narod.ru>';
 
 repository 'https://github.com/zhmylove/X11-XCB';
 bugtracker 'https://github.com/zhmylove/X11-XCB/issues';
 
 requires 'Mouse';
-requires 'MouseX::NativeTraits';
 requires 'Try::Tiny';
 
 # These are build-time requirements, but there is no way to express this (that
@@ -76,7 +75,8 @@ require ExtUtils::Depends;
 ExtUtils::PkgConfig->atleast_version('xcb', '1.2')
   or die "You need at least libxcb version 1.2\n";
 
-my @xcb_libs = qw/xcb xcb-util xcb-xinerama xcb-icccm xcb-randr xcb-xkb/;
+my @xcb_libs = qw/ xcb xcb-composite xcb-icccm xcb-randr xcb-util
+  xcb-xinerama xcb-xkb /;
 @xcb_libs == grep { eval { ExtUtils::PkgConfig->find($_); 1 } } @xcb_libs
   or die "Perhaps you haven't installed the development versions?\n";
 

@@ -19,9 +19,9 @@ name: App-sort_by_sorter
 provides:
   App::sort_by_sorter:
     file: lib/App/sort_by_sorter.pm
-    version: '0.001'
+    version: '0.002'
 requires:
-  AppBase::Sort: '0.003'
+  AppBase::Sort: '0.004'
   AppBase::Sort::File: '0'
   Data::Sah::Compiler::perl::TH::array: '0.914'
   Data::Sah::Compiler::perl::TH::bool: '0.914'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-sort_by_sorter
   homepage: https://metacpan.org/release/App-sort_by_sorter
   repository: git://github.com/perlancar/perl-App-sort_by_sorter.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

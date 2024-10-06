@@ -9,14 +9,14 @@ use Template;
 use Template::Constants qw/ :debug /;
 use utf8;
 
-field $app		    :param;
-field $directory	    = 'templates';
+field $app                  :param;
+field $directory            = 'templates';
 field $template;
 
 field %settings = (
     block_indexing => 1,    # block robots with a <meta>
-    name_as_class => 1,	    # include template name in @classes
-    theme_color => '',	    # hex color for the <meta theme-color>
+    name_as_class => 1,     # include template name in @classes
+    theme_color => '',      # hex color for the <meta theme-color>
     include_extra => ['js'],# extra directories to use as include path
 );
 
@@ -24,12 +24,12 @@ field %content = (
     title => undef,
     description => undef,
     header_scripts => [],   # scripts to be loaded in <head>
-    header_css => [],	    # CSS to be loaded in <head>
-    pre => [],		    # global partials before a template
-    post => [],		    # global partials after a template
-    pre_body => [],	    # used right before the opening of <body>
-    scripts => [],	    # scripts to be embedded directly in <body>
-    classes => [],	    # classes added to <main>
+    header_css => [],       # CSS to be loaded in <head>
+    pre => [],              # global partials before a template
+    post => [],             # global partials after a template
+    pre_body => [],         # used right before the opening of <body>
+    scripts => [],          # scripts to be embedded directly in <body>
+    classes => [],          # classes added to <main>
 );
 
 ADJUST {
@@ -73,12 +73,12 @@ method set_block_indexing ($n = 1) { $settings{block_indexing} = $n }
 method set_name_as_class  ($n = 1) { $settings{name_as_class} = $n }
 
 method add_header_script  ($s) { push @{$content{header_scripts}}, $s }
-method add_header_css	  ($c) { push @{$content{header_css}}, $c }
-method add_pre		  ($p) { push @{$content{pre}}, _ext($p) }
-method add_post		  ($p) { push @{$content{post}}, _ext($p) }
-method add_pre_body	  ($p) { push @{$content{pre_body}}, $p }
-method add_script	  ($s) { push @{$content{scripts}}, $s }
-method add_class	  ($c) { push @{$content{classes}}, $c }
+method add_header_css     ($c) { push @{$content{header_css}}, $c }
+method add_pre            ($p) { push @{$content{pre}}, _ext($p) }
+method add_post           ($p) { push @{$content{post}}, _ext($p) }
+method add_pre_body       ($p) { push @{$content{pre_body}}, $p }
+method add_script         ($s) { push @{$content{scripts}}, $s }
+method add_class          ($c) { push @{$content{classes}}, $c }
 
 method render ($data = {})
 {
@@ -257,6 +257,7 @@ By default, the following configuration is used:
     {
         OUTLINE_TAG => '%%',
         ANYCASE => 1,
+        ENCODING => 'utf8',
     }
 
 These can be overwritten. Additionally, if the app is in development

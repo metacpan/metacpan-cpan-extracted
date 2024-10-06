@@ -1,11 +1,17 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad;
 
 package Blockchain::Ethereum::Keystore::Address;
 class Blockchain::Ethereum::Keystore::Address;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.009';          # VERSION
+our $VERSION   = '0.010';          # VERSION
 
 use Carp;
 use Crypt::Digest::Keccak256 qw(keccak256_hex);
@@ -57,7 +63,7 @@ Blockchain::Ethereum::Keystore::Address
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

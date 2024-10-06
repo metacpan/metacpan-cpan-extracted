@@ -322,7 +322,7 @@ our @EXPORT  = qw(%Hosts $localhost getpasswd
    no warnings;
    use BerkeleyDB;
    use Sys::Hostname;
-   our $local_hostname=&Sys::Hostname::hostname;
+   our $local_hostname=&Sys::Hostname::hostname();
    use Data::Dump::Streamer;
    use Devel::StackTrace;
    use Time::Local;
@@ -399,7 +399,7 @@ BEGIN {
    our $fa_conf='';
    if (defined $Term::Menus::fa_conf) {
       $fa_conf=$Term::Menus::fa_conf;
-      if (defined $fa_conf->[0]) {
+      if (ref $fa_conf eq 'ARRAY' && defined $fa_conf->[0]) {
          eval {
             require $fa_conf->[0];
             my $mod=substr($fa_conf->[0],(rindex $fa_conf->[0],'/')+1,-3);
@@ -412,7 +412,7 @@ BEGIN {
    our $fa_host='';
    if (defined $Term::Menus::fa_host) {
       $fa_host=$Term::Menus::fa_host;
-      if (defined $fa_host->[0]) {
+      if (ref $fa_host eq 'ARRAY' && defined $fa_host->[0]) {
          eval {
             require $fa_host->[0];
             my $mod=substr($fa_host->[0],(rindex $fa_host->[0],'/')+1,-3);
@@ -425,7 +425,7 @@ BEGIN {
    our $fa_menu='';
    if (defined $Term::Menus::fa_menu) {
       $fa_menu=$Term::Menus::fa_menu;
-      if (defined $fa_menu->[0]) {
+      if (ref $fa_menu eq 'ARRAY' && defined $fa_menu->[0]) {
          eval {
             require $fa_menu->[0];
             my $mod=substr($fa_menu->[0],(rindex $fa_menu->[0],'/')+1,-3);
@@ -3606,7 +3606,7 @@ my %show_mins=(
                      return substr($previous_selection,1,-1)." ".$s }
  
    },
-   Banner=> "   (The current time is ".&get_now_am_pm." ".
+   Banner=> "   (The current time is ".&get_now_am_pm()." ".
                 POSIX::strftime("%Z", localtime()).")\n\n".
             "   Please Select a Password Expiration Time :\n\n",
 
@@ -3632,7 +3632,7 @@ my %select_hour=(
 
    },
    Scroll=>2,
-   Banner=> "   (The current time is ".&get_now_am_pm." ".
+   Banner=> "   (The current time is ".&get_now_am_pm()." ".
                 POSIX::strftime("%Z", localtime()).")\n\n".
             "   Please Select a Password Expiration Time :\n\n",
 
@@ -4500,7 +4500,7 @@ Select => 'Many',
 
       my $plan="]P[{existing_plans}";
       $plan=~s/^["](.*)["]$/$1/s;
-      return "   (The current time is ".&get_now_am_pm." ".
+      return "   (The current time is ".&get_now_am_pm()." ".
                  POSIX::strftime("%Z", localtime()).")\n\n".
              "   Select the --MINUTE(S)-- of the Day Where\n\n   ".
              "   $plan\n\n   Will be Run :"
@@ -4634,7 +4634,7 @@ my %select_min_for_invocation=(
                 ']S[ | ]P[{existing_plans}' }
 
    },
-   Banner => "   (The current time is ".&get_now_am_pm." ".
+   Banner => "   (The current time is ".&get_now_am_pm()." ".
                  POSIX::strftime("%Z", localtime()).")\n\n".
              "   Please Select a Job Invocation Time :",
 
@@ -4658,7 +4658,7 @@ my %select_hour_for_invocation=(
                 ']S[ | ]P[{existing_plans}' }
 
    },
-   Banner => "   (The current time is ".&get_now_am_pm." ".
+   Banner => "   (The current time is ".&get_now_am_pm()." ".
                  POSIX::strftime("%Z", localtime()).")\n\n".
              "   Please Select a Job Invocation Time for\n\n   ]P[ :",
 
@@ -4678,7 +4678,7 @@ my %select_cal_mins_for_plan=(
                 ']S[ ]|[ ]P[{existing_plans}' }
 
    },
-   Banner => "   (The current time is ".&get_now_am_pm." ".
+   Banner => "   (The current time is ".&get_now_am_pm()." ".
                  POSIX::strftime("%Z", localtime()).")\n\n".
              "   Please Select a Job Invocation Time :",
 
@@ -4705,7 +4705,7 @@ my %select_cal_hours_for_plan=(
                ']S[ ]|[ ]P[{existing_plans}' }
 
    },
-   Banner => "   (The current time is ".&get_now_am_pm." ".
+   Banner => "   (The current time is ".&get_now_am_pm()." ".
                  POSIX::strftime("%Z", localtime()).")\n\n".
              "   Please Select a Job Invocation Time :",
 
@@ -6414,7 +6414,7 @@ sub check_Hosts
 
 }
 
-$Hosts{"__Master_${$}__"}{'HostName'}=&Sys::Hostname::hostname if
+$Hosts{"__Master_${$}__"}{'HostName'}=&Sys::Hostname::hostname() if
    !exists $Hosts{"__Master_${$}__"}{'HostName'};
 $Hosts{"__Master_${$}__"}{'IP'}='' if
    !exists $Hosts{"__Master_${$}__"}{'IP'};

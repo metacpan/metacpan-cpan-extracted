@@ -17,7 +17,7 @@ name: Minima
 provides:
   Minima:
     file: lib/Minima.pm
-    version: v0.1.0
+    version: v0.1.1
   Minima::App:
     file: lib/Minima/App.pm
   Minima::Controller:
@@ -35,6 +35,7 @@ provides:
 requires:
   File::Share: '0.27'
   File::ShareDir: '1.00'
+  Hash::MultiValue: '0.16'
   Path::Tiny: '0.142'
   Plack: '1.0050'
   Router::Simple: '0.17'
@@ -44,5 +45,5 @@ resources:
   bugtracker: https://github.com/tessarin/Minima/issues
   license: http://www.opensource.org/licenses/mit-license.php
   repository: https://github.com/tessarin/Minima
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

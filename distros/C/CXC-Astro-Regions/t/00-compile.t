@@ -6,10 +6,16 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'CXC/Astro/Regions.pm',
+    'CXC/Astro/Regions/CFITSIO.pm',
+    'CXC/Astro/Regions/CFITSIO/Types.pm',
+    'CXC/Astro/Regions/CFITSIO/Variant.pm',
+    'CXC/Astro/Regions/CIAO.pm',
+    'CXC/Astro/Regions/CIAO/Types.pm',
+    'CXC/Astro/Regions/CIAO/Variant.pm',
     'CXC/Astro/Regions/DS9.pm',
     'CXC/Astro/Regions/DS9/Types.pm',
     'CXC/Astro/Regions/DS9/Variant.pm'

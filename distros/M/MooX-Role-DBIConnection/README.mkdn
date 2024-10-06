@@ -64,6 +64,29 @@ The following options can be passed in the hashref to specify
     Whether to connect to the database immediately or upon the first call to the
     the `->dbh`. The default is to make the connection lazily on first use.
 
+# METHODS
+
+The following methods are mixed in through this role:
+
+## `->dbh`
+
+    my $dbh = $self->dbh;
+
+Connects to the database if needed and returns the database handle
+
+## `->reconnect_dbh`
+
+    if( my $child = fork ) {
+        ...
+    } else {
+        # in child process
+        # We need a fresh database connection
+        $self->reconnect_dbh;
+    }
+
+Opens a new database connection. If an old connection existed, it is
+not closed.
+
 # REPOSITORY
 
 The public repository of this module is

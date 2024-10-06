@@ -1,0 +1,24 @@
+---
+abstract: 'MPGA - a module that makes it easy to write PERL programs'
+author:
+  - 'Nikolay Neustroev'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MPGA
+no_index:
+  directory:
+    - t
+provides:
+  MPGA:
+    file: lib/MPGA.pm
+    version: '0.08'
+resources:
+  repository: https://github.com/nni7/MPGA.git
+version: v0.08
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

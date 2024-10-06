@@ -1,4 +1,10 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad;
 
 package Blockchain::Ethereum::Keystore::Key::PKUtil;
@@ -6,7 +12,7 @@ class Blockchain::Ethereum::Keystore::Key::PKUtil
     :isa(Crypt::Perl::ECDSA::PrivateKey);
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.009';          # VERSION
+our $VERSION   = '0.010';          # VERSION
 
 use Carp;
 
@@ -74,7 +80,7 @@ Blockchain::Ethereum::Keystore::Key::PKUtil
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 OVERVIEW
 

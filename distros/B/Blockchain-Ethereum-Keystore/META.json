@@ -4,7 +4,7 @@
       "Reginaldo Costa <refeco@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -44,7 +44,7 @@
             "File::Slurp" : "9999.32",
             "JSON::MaybeXS" : "1.004005",
             "Net::SSH::Perl" : "2.14",
-            "Object::Pad" : "0.79",
+            "Object::Pad" : "0.814",
             "perl" : "v5.26.0"
          }
       },
@@ -58,6 +58,36 @@
          }
       }
    },
+   "provides" : {
+      "Blockchain::Ethereum::Keystore" : {
+         "file" : "lib/Blockchain/Ethereum/Keystore.pm",
+         "version" : "0.010"
+      },
+      "Blockchain::Ethereum::Keystore::Address" : {
+         "file" : "lib/Blockchain/Ethereum/Keystore/Address.pm",
+         "version" : "0.010"
+      },
+      "Blockchain::Ethereum::Keystore::Key" : {
+         "file" : "lib/Blockchain/Ethereum/Keystore/Key.pm",
+         "version" : "0.010"
+      },
+      "Blockchain::Ethereum::Keystore::Key::PKUtil" : {
+         "file" : "lib/Blockchain/Ethereum/Keystore/Key/PKUtil.pm",
+         "version" : "0.010"
+      },
+      "Blockchain::Ethereum::Keystore::Keyfile" : {
+         "file" : "lib/Blockchain/Ethereum/Keystore/Keyfile.pm",
+         "version" : "0.010"
+      },
+      "Blockchain::Ethereum::Keystore::Keyfile::KDF" : {
+         "file" : "lib/Blockchain/Ethereum/Keystore/Keyfile/KDF.pm",
+         "version" : "0.010"
+      },
+      "Blockchain::Ethereum::Keystore::Seed" : {
+         "file" : "lib/Blockchain/Ethereum/Keystore/Seed.pm",
+         "version" : "0.010"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "https://github.com/refeco/Blockchain-Ethereum-Keystore",
@@ -67,10 +97,10 @@
          "web" : "https://github.com/refeco/Blockchain-Ethereum-Keystore"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_authority" : "cpan:REFECO",
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "MIT"
 }
 

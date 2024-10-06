@@ -1,5 +1,19 @@
 Revision history for libXcb Perl bindings.
 
+0.23    2024-10-05
+
+    - Add XComposite support
+
+    - Implement get_image_data() to allow receiving XImages
+      Also implement get_image_data_rgba() which does the same but returns
+      XImage data in RGBA colorspace.
+
+    - Add WM_SIZE_HINTS constants to make them usable
+
+    - Fix several memory leaks
+
+    - Remove MouseX::NativeTraits dependency
+
 0.22    2023-11-24
 
     - Add cpanfile

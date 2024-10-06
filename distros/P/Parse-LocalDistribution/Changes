@@ -1,5 +1,8 @@
 Revision history for Parse-LocalDistribution
 
+0.20 2024/10/06
+  - accept META_CONTENT as an arg to avoid reevaluation of a META file
+
 0.19 2016/11/03
   - ignore a few directories like examples, demo and such, as PAUSE
     now does

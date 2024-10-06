@@ -1,9 +1,11 @@
 package Whelk::Endpoint;
-$Whelk::Endpoint::VERSION = '1.00';
+$Whelk::Endpoint::VERSION = '1.01';
 use Whelk::StrictBase;
 use Carp;
 use Whelk::Schema;
 use Whelk::Endpoint::Parameters;
+
+our @CARP_NOT = qw(Whelk::Role::Resource);
 
 attr '?-id' => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
 attr '?-summary' => undef;

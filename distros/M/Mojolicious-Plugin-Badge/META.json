@@ -53,7 +53,7 @@
          "web" : "https://github.com/giterlizzi/perl-Mojolicious-Plugin-Badge"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_purl" : "pkg:cpan/GDT/Mojolicious-Plugin-Badge",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

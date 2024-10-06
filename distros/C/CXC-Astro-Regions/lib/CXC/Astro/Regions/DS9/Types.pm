@@ -5,9 +5,11 @@ package CXC::Astro::Regions::DS9::Types;
 use v5.20;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-use Types::Standard        qw( Enum Bool Num  );
+use CXC::Types::Astro::Coords 'Sexagesimal';
+
+use Types::Standard        qw( Enum Bool Num StrMatch  );
 use Types::Common::Numeric qw( PositiveNum );
 use Type::Utils -all;
 use Regexp::Common qw( number );
@@ -21,40 +23,32 @@ use Type::Library
   LengthPair
   OneZero
   PointType
+  PositionAsNum
   RulerCoords
   Vertex
-  XPos
-  YPos
+  XPosition
+  YPosition
   );
 
 declare OneZero, as Enum [ 1, 0 ];
 coerce OneZero, from Bool->coercibles, via { to_Bool( $_ ) ? q{1} : q{0} };
 
-my $PosNum = qr{ (?: $RE{num}{real} [drpi]?) }x;
+declare PositionAsNum,
+  as StrMatch [qr{\A (?: $RE{num}{real} [drpi]?) \z}x];
 
-# these are unsophisticated, and don't take into account the allowed
-# ranges for [DH]/M/S
-my $PosXMS = qr/(?: $RE{num}{int}:$RE{num}{int}:$RE{num}{real})/x;
-my $PosHMS = qr/(?: $RE{num}{int}h$RE{num}{int}m$RE{num}{real}s)/x;
-my $PosDMS = qr/(?: $RE{num}{int}d$RE{num}{int}m$RE{num}{real}s)/x;
+declare XPosition,
+  as PositionAsNum | Sexagesimal( [ '-ra', '-units' ] ) | Sexagesimal( [ '-ra', '-sep' ] );
+declare YPosition,
+  as PositionAsNum | Sexagesimal( [ '-dec', '-units' ] ) | Sexagesimal( [ '-dec', '-sep' ] );
+declare Vertex, as Tuple [ XPosition, YPosition ];
 
-my $XPosRE = qr/^(?: $PosNum|$PosXMS|$PosHMS )$/x;
-my $YPosRE = qr/^(?: $PosNum|$PosXMS|$PosDMS )$/x;
-
-declare XPos,   as StrMatch [$XPosRE];
-declare YPos,   as StrMatch [$YPosRE];
-declare Vertex, as Tuple [ XPos, YPos ];
-
-my $SizeRE = qr/$RE{num}{real} ["'drpi]?/x;
-
-declare Length,     as StrMatch [$SizeRE];
+declare Length,     as StrMatch [qr/$RE{num}{real} ["'drpi]?/x];
 declare LengthPair, as Tuple [ Length, Length ];
 
 declare Angle, as Num;
 
 ## no critic (RegularExpressions::ProhibitEnumeratedClasses)
-declare CoordSys,
-  as StrMatch->of( qr/wcs[a-z]/i ) | Enum->of(
+declare CoordSys, as StrMatch->of( qr/wcs[a-z]/i ) | Enum->of(
     \1,    # use Type::Tiny::Enum::closest_match
     'amplifier',
     'detector',
@@ -105,9 +99,7 @@ CXC::Astro::Regions::DS9::Types - Types for DS9 Regions
 
 =head1 VERSION
 
-version 0.02
-
-=head1 INTERNALS
+version 0.03
 
 =head1 SUPPORT
 

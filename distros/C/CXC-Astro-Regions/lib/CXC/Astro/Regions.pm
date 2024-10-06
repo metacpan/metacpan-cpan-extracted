@@ -6,7 +6,7 @@ use v5.20;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 1;
 
@@ -32,14 +32,12 @@ CXC::Astro::Regions - Astronomical region support
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 
 B<CXC::Astro::Regions> provides support for specifying and
 manipulating descriptions of regions used in astronomical software.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 
@@ -66,6 +64,14 @@ Please see those modules/websites for more information related to this module.
 =item *
 
 L<CXC::Astro::Regions::DS9|CXC::Astro::Regions::DS9>
+
+=item *
+
+L<CXC::Astro::Regions::CIAO|CXC::Astro::Regions::CIAO>
+
+=item *
+
+L<CXC::Astro::Regions::CFITSIO|CXC::Astro::Regions::CFITSIO>
 
 =back
 

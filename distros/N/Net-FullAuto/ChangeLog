@@ -19,6 +19,18 @@
 #
 #######################################################################
 
+2024-10-05  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000815 released
+
+        * Added Vim configuraton for new Cygwin
+	  installs in Makefile.PL
+
+2024-10-05  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000814 released
+
+        * Updates for Perl 40
 
 2024-09-25  Brian M. Kelly <Brian.Kelly@fullauto.com>
 

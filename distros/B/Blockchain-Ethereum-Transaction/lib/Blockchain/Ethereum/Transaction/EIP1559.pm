@@ -1,4 +1,10 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad ':experimental(init_expr)';
 # ABSTRACT: Ethereum Fee Market transaction abstraction
 
@@ -7,7 +13,7 @@ class Blockchain::Ethereum::Transaction::EIP1559
     :does(Blockchain::Ethereum::Transaction);
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.009';          # VERSION
+our $VERSION   = '0.010';          # VERSION
 
 use constant TRANSACTION_PREFIX => pack("H*", '02');
 
@@ -63,7 +69,7 @@ Blockchain::Ethereum::Transaction::EIP1559 - Ethereum Fee Market transaction abs
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

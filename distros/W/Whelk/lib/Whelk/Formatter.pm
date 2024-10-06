@@ -1,5 +1,5 @@
 package Whelk::Formatter;
-$Whelk::Formatter::VERSION = '1.00';
+$Whelk::Formatter::VERSION = '1.01';
 use Kelp::Base;
 use Carp;
 use Whelk::Exception;

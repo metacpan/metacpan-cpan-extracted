@@ -42,10 +42,6 @@ arguments or not.
 
 =over 16
 
-=item C<environment>
-
-L<Plack> environment reference.
-
 =item C<app>
 
 A reference to the L<Minima::App> instance which is initializing your

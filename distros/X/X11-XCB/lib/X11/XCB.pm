@@ -4,7 +4,7 @@ use 5.010000;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use Exporter 'import';
 
@@ -93,7 +93,7 @@ The korgwm is written entirely in Perl and based on X11::XCB.
 
 Michael Stapelberg, E<lt>michael+xcb@stapelberg.deE<gt>,
 Maik Fischer, E<lt>maikf+xcb@qu.cxE<gt>,
-Sergei Zhmylev, E<lt>zhmylove@cpan.orgE<gt>
+Sergei Zhmylev, E<lt>zhmylove@narod.ruE<gt>
 
 =head1 INSTALLATION
 

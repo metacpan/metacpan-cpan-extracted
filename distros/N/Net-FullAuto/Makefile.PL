@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000813';
+our $VERSION='1.0000815';
 
 #print `env`,"\n\n\n";
 
@@ -1109,6 +1109,11 @@ END
          }
          exit 1;
       }
+   } elsif (!(-e "$ENV{HOME}/.vimrc")) {
+      open(FH,">$ENV{HOME}/.vimrc");
+      print FH "set mouse-=a\n";
+      print FH "set paste";
+      close(FH);
    }
    if (!can_cc()) { # Can also borrow cc test from version module:
                     # version-0.9912

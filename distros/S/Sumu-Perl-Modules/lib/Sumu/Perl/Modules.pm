@@ -8,12 +8,14 @@ package Sumu::Perl::Modules;
 
 =head1 VERSION
 
-version 0.4.8
+version 0.4.9
 
 =head2 SYNOPSIS
 
     Usage:
     
+        In a full mojo app
+        
         my $module = $c->param('module');
             
             chomp $module;
@@ -23,6 +25,11 @@ version 0.4.8
         my ($mod, $dirs, $files) = $modules->_dirs(current_user => $current_user, module => "$module");
 
         my ($mod, $out) = $modules->_doc( module => "$module" );
+
+        For /_inc_dir
+
+        my $module = $c->param('module');
+        my $out = $modules->_inc_dir( inc_dir => "$module")
 
 
 =head2 DESCRIPTION
@@ -73,13 +80,13 @@ use warnings;
 
 =head2 our VERSION
 
-    our $VERSION = '0.4.8'
+    our $VERSION = '0.4.9'
 
     This version number is updated automatically!
 
 =cut
 
-our $VERSION = '0.4.8';
+our $VERSION = '0.4.9';
 
 
 =head2 Internals
@@ -338,9 +345,26 @@ sub _doc {
 
                 see sub _inc_dir 
 
+        Creates URLs like the following:
+
+        <a 
+            href="http://loclhost:20202/_inc_dir//home/ns21u2204/perl5/perlbrew/perls/perl-5.38.0/lib/5.38.0/x86_64-linux"
+            title="x86_64-linux"
+        >
+        x86_64-linux
+        </a>
+
+        <a 
+            href="http://UxUrl/_inc_dir//home/ns21u2204/p/perl/Perl-Modules-Companion/lib" 
+            title="lib"
+        >
+        lib
+        </a>
+
     Usage:
 
         my $out = $modules->_inc( module = "$module" );
+
 
 =cut
 
@@ -387,21 +411,11 @@ sub _inc {
 
     Usage:
 
-        my $out = $modules->_inc_dir( dir => "")
-
-        <a 
-            href="http://loclhost:20202/_inc_dir//home/ns21u2204/perl5/perlbrew/perls/perl-5.38.0/lib/5.38.0/x86_64-linux"
-            title="x86_64-linux"
-        >
-        x86_64-linux
-        </a>
-
-        <a 
-            href="http://CompanionUrl/_inc_dir//home/ns21u2204/p/perl/Perl-Modules-Companion/lib" 
-            title="lib"
-        >
-        lib
-        </a>
+        In a full mojo app
+        
+        my $modules = Sumu::Perl::Modules->new();
+        my $module = $c->param('module');
+        my $out = $modules->_inc_dir( inc_dir => "$module")
 
 =cut
 

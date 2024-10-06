@@ -49,6 +49,10 @@ components:
           description: Name of the entity
           example: John's entity
           type: string
+        value:
+          type: integer
+          nullable: true
+          default: null
       required:
       - id
       - name

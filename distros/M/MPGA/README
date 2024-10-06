@@ -1,0 +1,49 @@
+MPGA version 0.08
+=================
+
+MPGA - Make Perl Great Again - a module that makes it easy 
+to write programs in the PERL programming language.
+
+https://github.com/nni7/MPGA
+
+Something like "Flow driven development".
+
+Flow is a reference to an array of arguments and functions, which 
+are sequentially processed by the functions of this module.
+
+With this module you can program something like this:
+
+flow( [
+  $args, ... $args, \&fun1,
+  $another, ..., $args, \&fun2,
+  $more, ..., $args, \&fun3
+] );
+
+A prerequisite is that the functions in the flow must satisfy a few 
+simple conditions:
+ - take three arguments - ($self, $args, $flow)
+ - return a reference to an array - [ @flow_chunk ]
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module NO requires other modules and libraries
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2021 by Nikolay Neustroev (NN).
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+

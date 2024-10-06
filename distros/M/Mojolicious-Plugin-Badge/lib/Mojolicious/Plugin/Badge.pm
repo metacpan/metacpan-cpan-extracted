@@ -10,7 +10,7 @@ use Mojo::UserAgent;
 use Mojo::Util qw(b64_encode);
 use Mojolicious::Types;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use constant DEBUG => $ENV{BADGE_PLUGIN_DEBUG} || 0;
 
@@ -306,6 +306,10 @@ sub _build_options {
     my $aria_label = $title;
     $aria_label = "$label_title: $message_title" if ($label_title && $message_title);
     $aria_label = "$label: $message"             if ($label       && $message);
+
+    $link         = Mojo::URL->new($link)         if $link;
+    $label_link   = Mojo::URL->new($label_link)   if $label_link;
+    $message_link = Mojo::URL->new($message_link) if $message_link;
 
     return (
         aria_label         => $aria_label,

@@ -6,7 +6,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Module::Runtime 'module_notional_filename';
 use Ref::Util qw( is_arrayref );
@@ -190,9 +190,7 @@ CXC::Astro::Regions::DS9::Variant - Generate DS9 Region classes
 
 =head1 VERSION
 
-version 0.02
-
-=head1 INTERNALS
+version 0.03
 
 =for Pod::Coverage make_variant
 make_variant_package_name

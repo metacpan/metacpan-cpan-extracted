@@ -1,4 +1,10 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad ':experimental(init_expr)';
 # ABSTRACT: Ethereum transaction abstraction
 
@@ -6,7 +12,7 @@ package Blockchain::Ethereum::Transaction;
 role Blockchain::Ethereum::Transaction;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.009';          # VERSION
+our $VERSION   = '0.010';          # VERSION
 
 use Carp;
 use Crypt::Digest::Keccak256 qw(keccak256);
@@ -54,7 +60,7 @@ Blockchain::Ethereum::Transaction - Ethereum transaction abstraction
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

@@ -7,6 +7,7 @@ my $build = Module::Build->new(
     requires => {
 	perl => '5.40.0',
 	'File::Share' => '0.27',
+	'Hash::MultiValue', '0.16',
 	'Path::Tiny' => '0.142',
 	'Plack' => '1.0050',
 	'Router::Simple' => '0.17',

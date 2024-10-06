@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition;
-$Whelk::Schema::Definition::VERSION = '1.00';
+$Whelk::Schema::Definition::VERSION = '1.01';
 use Whelk::StrictBase;
 use Carp;
 use Kelp::Util;
@@ -13,8 +13,11 @@ use Whelk::Schema::ExtraRule;
 # no import loop, load Whelk::Schema for child classes
 require Whelk::Schema;
 
+our @CARP_NOT = qw(Whelk::Schema);
+
 attr name => undef;
 attr '?required' => !!1;
+attr '?nullable' => !!0;
 attr '?description' => undef;
 attr '?rules' => sub { [] };
 
@@ -64,18 +67,25 @@ sub _build
 		return $ret;
 	}
 	elsif (ref $item eq 'HASH') {
-		my $type = delete $item->{type};
+		my %data = %{$item};
+		my $type = delete $data{type};
 		croak 'no schema definition type specified'
 			unless defined $type;
 
 		my $class = __PACKAGE__;
 		$type = ucfirst $type;
 
-		return Kelp::Util::load_package("${class}::${type}")->new(%$item);
+		return Kelp::Util::load_package("${class}::${type}")->new(%data);
 	}
 	else {
 		croak 'can only build a definition from SCALAR, ARRAY or HASH';
 	}
+}
+
+sub _valid_nullable
+{
+	# this will get executed a lot, so skip unpacking @_
+	return !defined $_[1] && $_[0]->nullable;
 }
 
 sub _inhale_extra_rules
@@ -97,6 +107,10 @@ sub _openapi_dump_extra_rules
 	my %result;
 	foreach my $rule (@{$self->rules}) {
 		%result = (%result, %{$rule->openapi});
+	}
+
+	if ($self->nullable) {
+		$result{nullable} = JSON::PP::true;
 	}
 
 	return \%result;
@@ -240,6 +254,10 @@ creating a named schema in L<Whelk::Schema/build>.
 
 Whether this definition is required. It's needed for cases where it is nested
 inside an object or inside C<parameters> for an endpoint.
+
+=head2 nullable
+
+Whether this definiton can be C<null> regardless of type. False by default.
 
 =head2 description
 

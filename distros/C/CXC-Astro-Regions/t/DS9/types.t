@@ -62,26 +62,27 @@ subtest RuleCoords => sub {
 
 
 subtest Position => sub {
-    my @XPos = qw( 22.3 22.3d 22.3r 22.3p 22.3i
+    my @XPosition = qw( 22.3 22.3d 22.3r 22.3p 22.3i
       10:20:30 10h20m30s 10:20:30.22  10h20m30.22s
     );
 
-    my @YPos = qw( 22.3 22.3d 22.3r 22.3p 22.3i
-      180:20:30 180d20m30s 180:20:30.22 180d20m30.22s
+    my @YPosition = qw( 22.3 22.3d 22.3r 22.3p 22.3i
+      80:20:30 80d20m30s 80:20:30.22 80d20m30.22s
     );
 
-    subtest XPos => sub {
-        should_pass( $_, XPos ) for @XPos;
-        should_fail( '180d20m30s', XPos );
+    subtest XPosition => sub {
+        should_pass( $_, XPosition ) for @XPosition;
+        should_fail( '180d20m30s', XPosition );
     };
 
-    subtest YPos => sub {
-        should_pass( $_, YPos ) for @YPos;
-        should_fail( '10h20m30s', YPos );
+    subtest YPosition => sub {
+        should_pass( $_, YPosition ) for @YPosition;
+        should_fail( '180d20m30s', YPosition );
+        should_fail( '10h20m30s',  YPosition );
     };
 
     subtest Vertex => sub {
-        should_pass( $_, Vertex ) for zip [ shuffle @XPos ], [ shuffle @YPos ];
+        should_pass( $_, Vertex ) for zip [ shuffle @XPosition ], [ shuffle @YPosition ];
     };
 };
 

@@ -139,6 +139,30 @@ Returns intrinsically created array with X11 Keymap:
     ...
   ]
 
+=head2 get_image_data
+
+Returns the same hash as xcb_get_image_reply along with additional "data" field which contains the image data in BGRA.
+
+  {
+    'data' => '...',    # binary data itself encoded in BGRA
+    'depth' => 24,      # depth aka number of bits per pixel
+    'length' => 128,    # bytes count
+    'sequence' => 7,    # X11 request sequence
+    'visual' => 0       # some xcb_visualid_t (?) "NOT YET DOCUMENTED" like almost evertyhing in XCB :(
+  }
+
+=head2 get_image_data_rgba
+
+Returns the same hash as xcb_get_image_reply_data with "data" translated into RGBA colorspace.
+
+  {
+    'data' => '...',    # binary data itself encoded in RGBA
+    'depth' => 24,      # depth aka number of bits per pixel
+    'length' => 128,    # bytes count
+    'sequence' => 7,    # X11 request sequence
+    'visual' => 0       # some xcb_visualid_t (?) "NOT YET DOCUMENTED" like almost evertyhing in XCB :(
+  }
+
 =head2 get_query_tree_children
 
 Returns intrinsically created array with children windows identifiers for specified window:

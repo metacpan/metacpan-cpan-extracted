@@ -1,4 +1,10 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad;
 # ABSTRACT: Ethereum Legacy transaction abstraction
 
@@ -7,7 +13,7 @@ class Blockchain::Ethereum::Transaction::Legacy
     :does(Blockchain::Ethereum::Transaction);
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.009';          # VERSION
+our $VERSION   = '0.010';          # VERSION
 
 field $gas_price :reader :writer :param;
 
@@ -55,7 +61,7 @@ Blockchain::Ethereum::Transaction::Legacy - Ethereum Legacy transaction abstract
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

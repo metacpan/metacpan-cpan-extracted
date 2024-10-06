@@ -1,2 +1,14 @@
+v0.1.1  2024-10-05
+
+	[Changes]
+	- Improve test coverage.
+	- Add Hash::MultiValue as a direct requirement.
+
+	[Fixes]
+	- Update customization manual, which mentioned a parameter that
+	  does not exist anymore.
+	- Add missing key in documentation of configuration defaults for
+	  Minima::View::HTML.
+
 v0.1.0	2024-09-30
 	First experimental version.

@@ -1,11 +1,17 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad;
 
 package Blockchain::Ethereum::Keystore::Seed;
 class Blockchain::Ethereum::Keystore::Seed;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.009';          # VERSION
+our $VERSION   = '0.010';          # VERSION
 
 use Carp;
 use Crypt::PRNG     qw(random_bytes);
@@ -60,7 +66,7 @@ Blockchain::Ethereum::Keystore::Seed
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

@@ -49,13 +49,13 @@
         % }
 
         % if ($label_link || $link) {
-            <a xlink:href="<%= $label_link || $link %>">
+            <a target="_blank" xlink:href="<%= $label_link || $link %>">
                 <rect width="<%= $left_width %>" height="20" fill="rgba(0,0,0,0)"/>
             </a>
         % }
 
         % if ($message_link || $link) {
-            <a xlink:href="<%= $message_link || $link %>">
+            <a target="_blank" xlink:href="<%= $message_link || $link %>">
                 <rect x="<%= $left_width %>" width="<%= $right_width %>" height="20" fill="rgba(0,0,0,0)"/>
             </a>
         % }

@@ -2,8 +2,8 @@ NAME
     App::sort_by_sorter - Sort lines of text by a Sorter module
 
 VERSION
-    This document describes version 0.001 of App::sort_by_sorter (from Perl
-    distribution App-sort_by_sorter), released on 2024-03-06.
+    This document describes version 0.002 of App::sort_by_sorter (from Perl
+    distribution App-sort_by_sorter), released on 2024-09-19.
 
 FUNCTIONS
   sort_by_sorter
@@ -67,6 +67,9 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-sort_by_sorter>.
+
+SEE ALSO
+    Sorter.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

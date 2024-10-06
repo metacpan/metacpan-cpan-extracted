@@ -1,11 +1,17 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad;
 
 package Blockchain::Ethereum::Keystore::Keyfile::KDF;
 class Blockchain::Ethereum::Keystore::Keyfile::KDF;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.009';          # VERSION
+our $VERSION   = '0.010';          # VERSION
 
 use Crypt::KeyDerivation qw(pbkdf2);
 use Crypt::ScryptKDF     qw(scrypt_raw);
@@ -60,7 +66,7 @@ Blockchain::Ethereum::Keystore::Keyfile::KDF
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 AUTHOR
 

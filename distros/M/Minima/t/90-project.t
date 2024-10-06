@@ -13,6 +13,20 @@ ok(
     'lives on empty directory'
 );
 
+chdir;
+$dir = Path::Tiny->tempdir;
+chdir $dir;
+
+ok(
+    lives { Minima::Project::create(undef) },
+    'uses current directory if undef passed'
+);
+
+ok(
+    lives { Minima::Project::create($dir->child('NewDirectory')) },
+    'creates a new directory if needed'
+);
+
 like(
     dies { Minima::Project::create($dir) },
     qr/must be empty/,
@@ -38,6 +52,26 @@ like(
     Minima->VERSION,
     q/version matches Minima's version/
 );
+
+{
+    my $output;
+    open my $fake_stdout, '>', \$output;
+    my $real_stdout = select $fake_stdout;
+
+    Minima::Project::create(
+	$dir->child('AnotherNewDirectory'),
+	{ verbose => 1 },
+    );
+
+    select $real_stdout;
+    close $fake_stdout;
+
+    like(
+	$output,
+	qr/mkdir|spew/,
+	'outputs text in verbose mode'
+    );
+}
 
 chdir;
 

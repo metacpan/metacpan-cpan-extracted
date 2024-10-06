@@ -18,7 +18,7 @@ BEGIN {
   *NEW_PERL = ($] >= 5.010) ? sub(){1} : sub(){0};
 }
 
-our $VERSION = '3.040';
+our $VERSION = '3.041';
 
 
 use 5.006;
@@ -340,7 +340,8 @@ BEGIN {
       my $path=$@;
       $path=~s/Died at (.*)Term\/Menus.pm.*$/$1/s;
       chomp($path);
-      return 0 unless -e "$path$_[0]";
+      my $cwd=Cwd::cwd();
+      return 0 if (!(-e "$path$_[0]") and !(-e "$cwd/$INC[0]/$_[0]"));
       eval { require $_[0] };
       unless ($@) {
          return 1;

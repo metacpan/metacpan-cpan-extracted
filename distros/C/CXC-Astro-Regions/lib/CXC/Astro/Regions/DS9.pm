@@ -6,7 +6,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef', 'lexical_subs';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 package CXC::Astro::Regions::DS9::Role::Region {
     use Moo::Role;
@@ -17,11 +17,32 @@ use constant RegionRole => __PACKAGE__ . '::Role::Region';
 use parent 'Exporter::Tiny';
 
 use Import::Into;
-use CXC::Astro::Regions::DS9::Types -all;
+use CXC::Astro::Regions::DS9::Types qw(
+  Angle
+  ArrayRef
+  ConsumerOf
+  CoordSys
+  Enum
+  Length
+  LengthPair
+  NonEmptyStr
+  OneZero
+  PointType
+  PositiveInt
+  RulerCoords
+  Tuple
+  Vertex
+);
+
 use CXC::Astro::Regions::DS9::Variant;
 use List::Util ();
 
 use namespace::clean;
+
+my sub croak {
+    require Carp;
+    goto \&Carp::croak;
+}
 
 my sub pkgpath ( @paths ) {
     join q{::}, __PACKAGE__, map { ucfirst( $_ ) } @paths;
@@ -56,30 +77,33 @@ my sub ANGLE            { { name => 'angle',  isa => Angle, args( @_ ) } }
 my sub ANGLEPAIR        { { name => 'angles', isa => Tuple [ Angle, Angle ], args( @_ ) } }
 my sub ARROW            { { name => 'arrow',  isa => OneZero, coerce => !!1, args( @_ ) } }
 my sub ARROWS           { { name => 'arrows', isa => ArrayRef [ OneZero, 2 ], args( @_ ) } }
-my sub BOOL             { { name => undef,    isa => OneZero,    coerce => !!1, args( @_ ) } }
-my sub COORDS           { { name => 'coords', isa => CoordSys,   coerce => !!1, args( @_ ) } }
-my sub FILL             { { name => 'fill',   isa => OneZero,    coerce => !!1, args( @_ ) } }
-my sub FORMAT           { { name => 'format', isa => Str,        args( @_ ) } }
-my sub LENGTH           { { name => 'length', isa => Length,     args( @_ ) } }
-my sub LENGTHPAIR       { { name => undef,    isa => LengthPair, args( @_ ) } }
+my sub BOOL             { { name => undef,    isa => OneZero,     coerce => !!1, args( @_ ) } }
+my sub COORDS           { { name => 'coords', isa => CoordSys,    coerce => !!1, args( @_ ) } }
+my sub FILL             { { name => 'fill',   isa => OneZero,     coerce => !!1, args( @_ ) } }
+my sub FORMAT           { { name => 'format', isa => NonEmptyStr, args( @_ ) } }
+my sub LENGTH           { { name => 'length', isa => Length,      args( @_ ) } }
+my sub LENGTHPAIR       { { name => undef,    isa => LengthPair,  args( @_ ) } }
 my sub LENGTHPAIR_ARRAY { { name => undef,    isa => ArrayRef [LengthPair], args( @_ ) } }
 my sub LENGTH_ARRAY     { { name => undef,    isa => ArrayRef [Length],     args( @_ ) } }
 my sub N                { { name => 'n',      isa => PositiveInt, args( @_ ) } }
 my sub POINT { { name => 'symbol', isa => PointType, coerce => !!1, label => 'point', args( @_ ) } }
 my sub POSINT  { { name => undef, isa => PositiveInt, args( @_ ) } }
-my sub QSTRING { { name => undef, isa => Str,         format => \&format_text, args( @_ ) } }
+my sub QSTRING { { name => undef, isa => NonEmptyStr, format => \&format_text, args( @_ ) } }
 my sub RULERCOORDS {
     { name => 'coords', isa => RulerCoords, coerce => !!1, label => 'ruler', args( @_ ) };
 }
 my sub STRING { { name => undef, isa => NonEmptyStr, args( @_ ) } }
 my sub TAGS {
-    { name => 'tags', isa => ArrayRef [Str], format => \&format_tags, label => 'tag', args( @_ ) };
+    {
+        name   => 'tags',
+        isa    => ArrayRef [NonEmptyStr],
+        format => \&format_tags,
+        label  => 'tag',
+        args( @_ ) };
 }
-my sub TEXT     { { name => 'text',     isa => Str, format => \&format_text, args( @_ ) } }
-my sub VERTEX   { { name => undef,      isa => Tuple [ XPos, YPos ], args( @_ ) } }
+my sub TEXT     { { name => 'text',     isa => NonEmptyStr, format => \&format_text, args( @_ ) } }
+my sub VERTEX   { { name => undef,      isa => Vertex,      args( @_ ) } }
 my sub VERTICES { { name => 'vertices', isa => ArrayRef [Vertex], args( @_ ) } }
-my sub X        { { name => 'x',        isa => XPos, args( @_ ) } }
-my sub Y        { { name => 'y',        isa => YPos, args( @_ ) } }
 
 my @CommonProps = (
     TEXT,
@@ -101,216 +125,12 @@ my @CommonProps = (
     TAGS,
 );
 
-my %Region = (
-
-    # Annulus
-    # Usage: annulus x y inner outer n=#
-    annulus_n => {
-        name   => 'annulus',
-        params => [ VERTEX( 'center' ), LENGTH( 'inner' ), LENGTH( 'outer' ), N( label => 'n' ) ],
-    },
-
-    # Annulus
-    # Usage: annulus x y r1 r2 r3...
-    annulus_annuli => {
-        name   => 'annulus',
-        params => [ VERTEX( 'center' ), LENGTH_ARRAY( name => 'annuli' ) ],
-    },
-
-    # Box
-    # Usage: box x y width height angle # fill=[0|1]
-    box_plain => {
-        name   => 'box',
-        params => [ VERTEX( 'center' ), LENGTH( 'width' ), LENGTH( 'height' ), ANGLE( required => !!0 ) ],
-        props  => [FILL],
-    },
-
-    # Box Annulus
-    # Usage: box x y w1 h1 w2 h2 n=# [angle]
-    box_n => {
-        name   => 'box',
-        params => [
-            VERTEX( 'center' ),
-            LENGTHPAIR( 'inner' ),
-            LENGTHPAIR( 'outer' ),
-            N( label => 'n' ),
-            ANGLE( required => !!0 ),
-        ],
-    },
-
-    # Box Annulus
-    # Usage: box x y w1 h1 w2 h2 w3 h3 ... [angle]
-    box_annuli => {
-        name   => 'box',
-        params => [ VERTEX( 'center' ), LENGTHPAIR_ARRAY( name => 'annuli' ), ANGLE( required => !!0 ), ],
-    },
-
-    # Bpanda
-    # Usage: epanda x y startangle stopangle nangle inner outer nradius [angle]
-    bpanda => {
-        params => [
-            VERTEX( 'center' ),
-            ANGLEPAIR,
-            N( 'nangles' ),
-            LENGTHPAIR( 'inner' ),
-            LENGTHPAIR( 'outer' ),
-            N( 'nannuli' ),
-            ANGLE( required => !!0 ),
-        ],
-    },
-
-    # Circle
-    # Usage: circle x y radius # fill=[0|1]
-    circle => {
-        params => [ VERTEX( 'center' ), LENGTH( 'radius' ) ],
-        props  => [FILL],
-    },
-
-    # Compass
-    # Usage: compass x1 y1 length # compass=<coordinate system> <north label> <east label> [0|1] [0|1]
-    compass => {
-        params => [ VERTEX( 'center' ), LENGTH ],
-        props  => [
-            COORDS( label => 'compass', default => 'physical' ),
-            TEXT( name => 'north', label => undef, default => 'N' ),
-            TEXT( name => 'east',  label => undef, default => 'E' ),
-            ARROWS( label => undef, default => sub { [ 1, 1 ] } ),
-        ],
-    },
-
-    # Composite
-    # Usage: # composite x y angle
-    composite => {
-        comment => !!1,
-        with    => [],    # we're not a normal region, so don't compose with RegionRole
-        params  => [
-            VERTEX( 'center' ),
-            ANGLE( required => !!0 ),
-            {
-                name   => 'regions',
-                isa    => ArrayRef [ ConsumerOf [RegionRole] ],
-                render => !!0,
-            },
-        ],
-        around => [
-            render => sub ( $orig, $self ) {
-                return [ $self->$orig, map { $_->render } $self->regions->@* ];
-            },
-        ],
-    },
-
-    # Ellipse
-    # Usage: ellipse x y radius radius angle # fill=[0|1]
-    ellipse_plain => {
-        name   => 'ellipse',
-        params => [ VERTEX( 'center' ), LENGTH( 'rx' ), LENGTH( 'ry' ), ANGLE( required => !!0 ) ],
-        props  => [FILL],
-    },
-
-    # Ellipse Annulus
-    # Usage: ellipse x y r11 r12 r21 r22 n=# [angle]
-    ellipse_n => {
-        name   => 'ellipse',
-        params => [
-            VERTEX( 'center' ),
-            LENGTHPAIR( 'inner' ),
-            LENGTHPAIR( 'outer' ),
-            N( label => 'n' ),
-            ANGLE( required => !!0 ),
-        ],
-    },
-
-    # Ellipse Annulus
-    # Usage: ellipse x y r11 r12 r21 r22 r31 r32 ... [angle]
-    ellipse_annuli => {
-        name   => 'ellipse',
-        params => [ VERTEX( 'center' ), LENGTHPAIR_ARRAY( name => 'annuli' ), ANGLE( required => !!0 ), ],
-    },
-
-    # Epanda
-    # Usage: epanda x y startangle stopangle nangle inner outer nradius [angle]
-    epanda => {
-        params => [
-            VERTEX( 'center' ),
-            ANGLEPAIR,
-            N( 'nangles' ),
-            LENGTHPAIR( 'inner' ),
-            LENGTHPAIR( 'outer' ),
-            N( 'nannuli' ),
-            ANGLE( required => !!0 ),
-        ],
-    },
-
-    # Line
-    # Usage: line x1 y1 x2 y2 # line=[0|1] [0|1]
-    line => {
-        params => [ VERTEX( 'v1' ), VERTEX( 'v2' ) ],
-        props  => [ ARROWS( label => 'line' ) ],
-    },
-
-    # Panda
-    # Usage: panda x y startangle stopangle nangle inner outer nradius
-    panda => {
-        params => [
-            VERTEX( 'center' ),
-            ANGLEPAIR,
-            N( 'nangles' ),
-            LENGTH( 'inner' ),
-            LENGTH( 'outer' ),
-            N( 'nannuli' ),
-        ],
-    },
-
-    # Point
-    # Usage: point x y # point=[circle|box|diamond|cross|x|arrow|boxcircle] [size]
-    #        circle point x y
-    point => {
-        params => [ VERTEX( 'position' ) ],
-        props  => [ POINT, POSINT( name => 'size', label => undef ) ],
-    },
-
-    # Polygon
-    # Usage: polygon x1 y1 x2 y2 x3 y3 ...# fill=[0|1]
-    polygon => {
-        params => [VERTICES],
-        props  => [FILL],
-    },
-
-    # Projection
-    # Usage: projection x1 y1 x2 y2 width
-    projection => {
-        params => [ VERTEX( 'v1' ), VERTEX( 'v2' ), LENGTH( 'width' ) ],
-    },
-
-    # Ruler
-    # Usage: ruler x1 y1 x2 y2 # ruler=[pixels|degrees|arcmin|arcsec] [format=<spec>]
-    ruler => {
-        params => [ VERTEX( 'v1' ), VERTEX( 'v2' ) ],
-        props  => [ RULERCOORDS,    FORMAT ],
-    },
-
-    # Text
-    # Usage: text x y # text={Your Text Here}
-    #        text x y {Your Text Here}
-    text => {
-        params => [ VERTEX( 'position' ), TEXT ],
-    },
-
-    # Vector
-    # Usage: vector x1 y1 length angle # vector=[0|1]
-    vector => {
-        params => [ VERTEX( 'base' ), LENGTH, ANGLE ],
-        props  => [ ARROW( label => 'vector' ) ],
-    },
-
-
-);
-
 use Package::Stash;
-our @EXPORT_OK;
+our @EXPORT_OK = ( 'mkregion' );
+
 my $stash = Package::Stash->new( __PACKAGE__ );
-for my $region ( keys %Region ) {
-    my %spec = $Region{$region}->%*;
+my sub REGION ( $region, %spec ) {
+
     push( ( $spec{props} //= [] )->@*, @CommonProps );
     $spec{with} //= [RegionRole];
     my $package = pkgpath( $region );
@@ -321,11 +141,439 @@ for my $region ( keys %Region ) {
         $spec{extends} = [$parent];
     }
 
-    Variant( $region, %spec );
+    my $variant = Variant( $region, %spec );
+    Package::Stash->new( $variant )->add_symbol( q{@CARP_NOT}, [__PACKAGE__] );
+
     $stash->add_symbol( q{&} . $region, sub { $package->new( @_ ) } );
     push @EXPORT_OK, $region;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Annulus
+# Usage: annulus x y inner outer n=#
+REGION annulus_n => (
+    name   => 'annulus',
+    params => [ VERTEX( 'center' ), LENGTHPAIR( 'annuli' ), N( label => 'n' ) ],
+);
+
+# Annulus
+# Usage: annulus x y r1 r2 r3...
+REGION annulus_annuli => (
+    name   => 'annulus',
+    params => [ VERTEX( 'center' ), LENGTH_ARRAY( 'annuli' ) ],
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Box
+# Usage: box x y width height angle # fill=[0|1]
+REGION box_plain => (
+    name   => 'box',
+    params => [ VERTEX( 'center' ), LENGTH( 'width' ), LENGTH( 'height' ), ANGLE( required => !!0 ) ],
+    props  => [FILL],
+);
+
+# Box Annulus
+# Usage: box x y w1 h1 w2 h2 n=# [angle]
+REGION box_n => (
+    name   => 'box',
+    params => [
+        VERTEX( 'center' ),
+        LENGTHPAIR( 'inner' ),
+        LENGTHPAIR( 'outer' ),
+        N( label => 'n' ),
+        ANGLE( required => !!0 ),
+    ],
+);
+
+# Box Annulus
+# Usage: box x y w1 h1 w2 h2 w3 h3 ... [angle]
+REGION box_annuli => (
+    name   => 'box',
+    params => [ VERTEX( 'center' ), LENGTHPAIR_ARRAY( 'annuli' ), ANGLE( required => !!0 ), ],
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Bpanda
+# Usage: bpanda x y startangle stopangle nangle inner outer nradius [angle]
+REGION bpanda => (
+    params => [
+        VERTEX( 'center' ),
+        ANGLEPAIR,
+        N( 'nangles' ),
+        LENGTHPAIR( 'inner' ),
+        LENGTHPAIR( 'outer' ),
+        N( 'nannuli' ),
+        ANGLE( required => !!0 ),
+    ],
+);
+
+
+
+
+
+
+
+
+
+# Circle
+# Usage: circle x y radius # fill=[0|1]
+REGION circle => (
+    params => [ VERTEX( 'center' ), LENGTH( 'radius' ) ],
+    props  => [FILL],
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Compass
+# Usage: compass x1 y1 length # compass=<coordinate system> <north label> <east label> [0|1] [0|1]
+REGION compass => (
+    params => [ VERTEX( 'base' ), LENGTH ],
+    props  => [
+        COORDS( label => 'compass', default => 'physical' ),
+        TEXT( name => 'north', label => undef, default => 'N' ),
+        TEXT( name => 'east',  label => undef, default => 'E' ),
+        ARROWS( label => undef, default => sub { [ 1, 1 ] } ),
+    ],
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Composite
+# Usage: # composite x y angle
+REGION composite => (
+    comment => !!1,
+    with    => [],    # we're not a normal region, so don't compose with RegionRole
+    params  => [
+        VERTEX( 'center' ),
+        ANGLE( required => !!0 ),
+        {
+            name   => 'regions',
+            isa    => ArrayRef [ ConsumerOf [RegionRole] ],
+            render => !!0,
+        },
+    ],
+    around => [
+        render => sub ( $orig, $self ) {
+            return [ $self->$orig, map { $_->render } $self->regions->@* ];
+        },
+    ],
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Ellipse
+# Usage: ellipse x y radius radius angle # fill=[0|1]
+REGION ellipse_plain => (
+    name   => 'ellipse',
+    params => [ VERTEX( 'center' ), LENGTHPAIR( 'radii' ), ANGLE( required => !!0 ) ],
+    props  => [FILL],
+);
+
+# Ellipse Annulus
+# Usage: ellipse x y r11 r12 r21 r22 n=# [angle]
+REGION ellipse_n => (
+    name   => 'ellipse',
+    params => [
+        VERTEX( 'center' ),
+        LENGTHPAIR( 'inner' ),
+        LENGTHPAIR( 'outer' ),
+        N( label => 'n' ),
+        ANGLE( required => !!0 ),
+    ],
+);
+
+# Ellipse Annulus
+# Usage: ellipse x y r11 r12 r21 r22 r31 r32 ... [angle]
+REGION ellipse_annuli => (
+    name   => 'ellipse',
+    params => [ VERTEX( 'center' ), LENGTHPAIR_ARRAY( 'annuli' ), ANGLE( required => !!0 ), ],
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Epanda
+# Usage: epanda x y startangle stopangle nangle inner outer nradius [angle]
+REGION epanda => (
+    params => [
+        VERTEX( 'center' ),
+        ANGLEPAIR,
+        N( 'nangles' ),
+        LENGTHPAIR( 'inner' ),
+        LENGTHPAIR( 'outer' ),
+        N( 'nannuli' ),
+        ANGLE( required => !!0 ),
+    ],
+);
+
+
+
+
+
+
+
+
+
+
+
+# Line
+# Usage: line x1 y1 x2 y2 # line=[0|1] [0|1]
+REGION line => (
+    params => [ VERTEX( 'v1' ), VERTEX( 'v2' ) ],
+    props  => [ ARROWS( label => 'line' ) ],
+);
+
+
+
+
+
+
+
+
+
+
+
+# Panda
+# Usage: panda x y startangle stopangle nangle inner outer nradius
+REGION panda => (
+    params => [
+        VERTEX( 'center' ),
+        ANGLEPAIR,
+        N( 'nangles' ),
+        LENGTH( 'inner' ),
+        LENGTH( 'outer' ),
+        N( 'nannuli' ),
+    ],
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Point
+# Usage: point x y # point=[circle|box|diamond|cross|x|arrow|boxcircle] [size]
+#        circle point x y
+REGION point => (
+    params => [ VERTEX( 'center' ) ],
+    props  => [ POINT, POSINT( name => 'size', label => undef ) ],
+);
+
+
+
+
+
+
+
+
+# Polygon
+# Usage: polygon x1 y1 x2 y2 x3 y3 ...# fill=[0|1]
+REGION polygon => (
+    params => [VERTICES],
+    props  => [FILL],
+);
+
+
+
+
+
+
+
+
+
+# Projection
+# Usage: projection x1 y1 x2 y2 width
+REGION projection => ( params => [ VERTEX( 'v1' ), VERTEX( 'v2' ), LENGTH( 'width' ) ], );
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Ruler
+# Usage: ruler x1 y1 x2 y2 # ruler=[pixels|degrees|arcmin|arcsec] [format=<spec>]
+REGION ruler => (
+    params => [ VERTEX( 'v1' ), VERTEX( 'v2' ) ],
+    props  => [ RULERCOORDS,    FORMAT ],
+);
+
+
+
+
+
+
+
+# Text
+# Usage: text x y # text={Your Text Here}
+#        text x y {Your Text Here}
+REGION text => ( params => [ VERTEX( 'center' ), TEXT ], );
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Vector
+# Usage: vector x1 y1 length angle # vector=[0|1]
+REGION vector => (
+    params => [ VERTEX( 'base' ), LENGTH, ANGLE ],
+    props  => [ ARROW( label => 'vector' ) ],
+);
 
 # set up dispatch classes to handle the different types of annulus and ellipse regions
 
@@ -368,6 +616,26 @@ for my $region ( 'annulus', 'ellipse', 'box' ) {
     push @EXPORT_OK, $region;
 }
 
+
+# No longer need this; clean it up.
+undef $stash;
+
+
+
+
+
+
+
+
+
+
+
+sub mkregion ( $shape, @args ) {
+    my $class = pkgpath( $shape );
+    my $new   = $class->can( 'new' ) // croak( "unknown region: $shape" );
+    $class->$new( @args );
+}
+
 1;
 
 #
@@ -384,8 +652,9 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory boxcircle bpanda coords
-ds9 epanda num
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory FontString PositiveInt
+annuli boxcircle bpanda coords dashlist ds9 epanda highlite linewidth
+mkregion num srctype textangle
 
 =head1 NAME
 
@@ -393,13 +662,20 @@ CXC::Astro::Regions::DS9 - DS9 Compatible Regions
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
-  use CXC::Astro::Regions::DS9;
+  use CXC::Astro::Regions::DS9 'circle', 'mkregion';
 
-  $circle = circle( center => [ 4096, 4096 ], radius => 200, fill => !!1 );
+  $circle = circle( center => [ 4096, 4096 ],
+                    radius => 200, fill => !!1 );
+
+  # equivalent using factory subroutine
+  $circle = mkregion( circle =>
+                      center => [ 4096, 4096 ],
+                      radius => 200, fill => !!1 );
+
   say $circle->render;
   # outputs "circle 4096 4096 200 # fill=1"
 
@@ -418,7 +694,7 @@ specifications supported by the ds9 L<https://ds9.si.edu> astronomical
 image display and analysis program.
 
 Each type of region is mapped onto a class
-(e.g. B<CXC::Astro::Region::DS9::Center>) and an alternate constructor
+(e.g. B<CXC::Astro::Region::DS9::Circle>) and an alternate constructor
 (e.g. B<circle()>) is provided for the class.  Classes have a C<render>
 method which returns a DS9 compatible string representation of the region.
 
@@ -437,35 +713,10 @@ specified relative to the location of the composite region's location.
 Unlike the other regions, a composite region's render method returns
 an array of strings, rather than a single string.
 
-=head1 INTERNALS
-
-=head1 METHODS
-
-All regions objects have the following methods:
-
-=head3 render
-
-   $string   = $non_composite_region->render;
-   \@strings = $composite_region->render;
-
-The B<render> method returns a string (if a non-composite region) or
-an arrayref of strings (if a composite region) with B<DS9> compatible
-region specifications.
-
-=head1 REGIONS
-
-=head2 Conventions
-
-In the descriptions below, optional parameters are preceded with a
-C<?>, e.g.
-
-    circle( ..., ?fill => <boolean>);
-
-indicates that the I<fill> parameter is optional.
-
-I<< <x> >> and I<< <y> >> are I<X> an I<Y> positions.
-
 =head2 Units
+
+B<CXC::Astro::Regions::DS9> verifies that input values for positions
+and lengths are acceptable to DS9.
 
 =head3 Positions
 
@@ -518,7 +769,86 @@ If no coordinate system is specified, I<physical> is assumed.  See the
 C<DS9> I<Regions> reference manual (available from within C<DS9>) for
 more information.
 
-=head2 Constructors
+=head2 Common Properties
+
+In addition to region specific properties documented with each region,
+all share the following:
+
+=over
+
+=item *
+
+B<text> => String
+
+=item *
+
+textangle => Number
+
+=item *
+
+color => String
+
+=item *
+
+dashlist => ArrayRef [PositiveInt]
+
+=item *
+
+linewidth => PositiveInt
+
+=item *
+
+font => FontString
+
+=item *
+
+select => Boolean
+
+=item *
+
+highlite => Boolean
+
+=item *
+
+dash => Boolean
+
+=item *
+
+fixed => Boolean
+
+=item *
+
+edit => Boolean
+
+=item *
+
+move => Boolean
+
+=item *
+
+rotate => Boolean
+
+=item *
+
+delete => Boolean
+
+=item *
+
+include => Boolean
+
+defaults to true
+
+=item *
+
+srctype => Enum [ 'source', 'background' ]
+
+=item *
+
+tags => ArrayRef[Str]
+
+=back
+
+=head1 CONSTRUCTORS
 
 The following DS9 regions are supported via both the traditional
 and alternate constructors, e.g.
@@ -526,14 +856,24 @@ and alternate constructors, e.g.
   $region = CXC::Astro::Regions::DS9::Circle->new( ... );
   $region = circle( ... );
 
-=head3 annulus
+In the descriptions below, optional parameters are preceded with a
+C<?>, e.g.
+
+    circle( ..., ?fill => <boolean>);
+
+indicates that the I<fill> parameter is optional.
+
+I<< <x> >> and I<< <y> >> are I<X> an I<Y> positions.
+
+=head2 annulus
 
    $region = annulus( center => [ <x>, <y> ],
-                      inner  => <length>, outer => <length>,
+                      annuli => [ <r1>, <r2>],
                       n      => <nannuli> );
 
 This returns an instance of B<CXC::Astro::Regions::DS9::Annulus_n>,
-which extends B<CXC::Astro::Regions::DS9::Annulus>.
+which extends B<CXC::Astro::Regions::DS9::Annulus>.  It represents
+a series of I<n> nested annuli
 
    $region = annulus( center => [ <x>, <y> ],
                       annuli => [ <r1>, <r2>, ... <rn> ] );
@@ -541,7 +881,7 @@ which extends B<CXC::Astro::Regions::DS9::Annulus>.
 This returns an instance of B<CXC::Astro::Regions::DS9::Annulus_annuli>,
 which extends B<CXC::Astro::Regions::DS9::Annulus>.
 
-=head3 box
+=head2 box
 
   $region = box( center => [ <x>, <y> ],
                  width  => <length>, height => <length>,
@@ -561,15 +901,15 @@ This returns an instance of B<CXC::Astro::Regions::DS9::Box_n>,
 which extends B<CXC::Astro::Regions::DS9::Box>.
 
   $region = box( center => [ <x>, <y> ],
-                 annuli => [ [ <width>, <height> ], ... ],
+                 annuli => [ [ <width>, <height> ], [ <width>, <height> ], ... ],
                  ?angle => <angle> );
 
 This returns an instance of B<CXC::Astro::Regions::DS9::Box_annuli>,
 which extends B<CXC::Astro::Regions::DS9::Box>.
 
-=head3 bpanda
+=head2 bpanda
 
-  $region = epanda( center  => [ <x>, <y> ],
+  $region = bpanda( center  => [ <x>, <y> ],
                     angles  => [ <start angle>, <end angle> ],
                     nangles => <integer>,
                     inner   => [ <length>, <length> ],
@@ -577,15 +917,15 @@ which extends B<CXC::Astro::Regions::DS9::Box>.
                     nannuli => <integer>,
                     ?angle  => <float, degrees> );
 
-=head3 circle
+=head2 circle
 
   $region = circle( center => [ <x>, <y> ],
                     radius => <length>,
                     ?fill  => <boolean> );
 
-=head3 compass
+=head2 compass
 
-  $region = compass( center  => [ <x>, <y> ],
+  $region = compass( base  => [ <x>, <y> ],
                      length  => <length>,
                      ?coords => <coordinate system>,
                      ?north  => <string>,
@@ -610,7 +950,7 @@ indicates if the north and east vectors are decorated with arrowheads.
 
 =back
 
-=head3 composite
+=head2 composite
 
   $region = composite( center  => [ <x>, <y> ],
                        regions => [ $region, ... ],
@@ -623,10 +963,10 @@ specified relative to the composite region's reference frame.
 Unlike other the regions, a composite region object's C<render> method
 returns an arrayref of string specifications, not a single string.
 
-=head3 ellipse
+=head2 ellipse
 
   $region = ellipse( center => [ <x>, <y> ],
-                     rx     => <length>, ry => <length>,
+                     radii  => [ <xradius>, <yradius>],
                      ?angle => <angle>,
                      ?fill  => <boolean> );
 
@@ -634,8 +974,8 @@ This returns an instance of B<CXC::Astro::Regions::DS9::Ellipse_plain>,
 which extends B<CXC::Astro::Regions::DS9::Ellipse>.
 
   $region = ellipse( center => [ <x>, <y> ],
-                     inner  => [ <rx>, <ry> ],
-                     outer  => [ <rx>, <ry> ],
+                     inner  => [ <xradius>, <yradius> ],
+                     outer  => [ <xradius>, <yradius> ],
                      n      => <nannuli>,
                      ?angle => <angle> );
 
@@ -643,21 +983,13 @@ This returns an instance of B<CXC::Astro::Regions::DS9::Ellipse_n>,
 which extends B<CXC::Astro::Regions::DS9::Ellipse>.
 
   $region = ellipse( center => [ <x>, <y> ],
-                     annuli => [ [ <rx>, <ry> ], ... ],
+                     annuli => [ [ <xradius>, <yradius> ], ... ],
                      ?angle => <angle> );
 
 This returns an instance of B<CXC::Astro::Regions::DS9::Ellipse_annuli>,
 which extends B<CXC::Astro::Regions::DS9::Ellipse>.
 
-=head3 line
-
-  $region = line( v1      => [ <x>, <y> ],
-                  v2      => [ <x>, <y> ],
-                  ?arrows => [ <boolean>, <boolean> ] );
-
-where I<arrows> determines if the start and end of the line are decorated with arrowheads.
-
-=head3 epanda
+=head2 epanda
 
   $region = epanda( center  => [ <x>, <y> ],
                     angles  => [ <start angle>, <end angle> ],
@@ -667,18 +999,26 @@ where I<arrows> determines if the start and end of the line are decorated with a
                     nannuli => <integer>,
                     ?angle  => <float, degrees> );
 
-=head3 panda
+=head2 line
 
-  $region = panda( center  => [ <x>, <y> ],
-                    angles  => [ <start angle>, <end angle> ],
-                    nangles => <integer>,
-                    inner   => <length>,
-                    outer   => <length>,
-                    nannuli => <integer> );
+  $region = line( v1      => [ <x>, <y> ],
+                  v2      => [ <x>, <y> ],
+                  ?arrows => [ <boolean>, <boolean> ] );
 
-=head3 point
+where I<arrows> determines if the start and end of the line are decorated with arrowheads.
 
-  $region = point( position => [<x>, <y>],
+=head2 panda
+
+  $region = panda( center => [ <x>,           <y> ],
+                   angles   => [ <start angle>, <end angle> ],
+                   nangles  => <integer>,
+                   inner    => <length>,
+                   outer    => <length>,
+                   nannuli  => <integer> );
+
+=head2 point
+
+  $region = point( center => [<x>, <y>],
                    ?symbol  => <symbol>,
                    ?size    => <integer> );
 
@@ -690,18 +1030,18 @@ The available symbols are
 
 The default is I<boxcircle>
 
-=head3 polygon
+=head2 polygon
 
   $region = line( vertices => [ [<x>, <y>], ... ],
                   ?fill    => <boolean> );
 
-=head3 projection
+=head2 projection
 
   $region = projection( v1    => [ <x>, <y> ],
                         v2    => [ <x>, <y> ],
                         width => <length> );
 
-=head3 ruler
+=head2 ruler
 
   $region = ruler( v1      => [ <x>, <y> ],
                    v2      => [ <x>, <y> ],
@@ -711,12 +1051,12 @@ where I<coords> is one of
 
   pixels degrees arcmin arcsec
 
-=head3 text
+=head2 text
 
-  $region = text( position => [ <x>, <y> ],
+  $region = text( center => [ <x>, <y> ],
                   text => <string> );
 
-=head3 vector
+=head2 vector
 
   $region = vector( base   => [ <x>, <y> ],
                     length => <length>,
@@ -725,6 +1065,26 @@ where I<coords> is one of
 
 where I<arrow> indicates that the head of the vector should be
 decorated with an arrowhead.
+
+=head2 mkregion
+
+  $region = mkregion( $shape, @pars );
+
+A generic factory routine which calls the constructor for the named
+shape (e.g. C<circle>, C<annulus>, etc).
+
+=head1 METHODS
+
+All regions objects have the following methods:
+
+=head3 render
+
+   $string   = $non_composite_region->render;
+   \@strings = $composite_region->render;
+
+The B<render> method returns a string (if a non-composite region) or
+an arrayref of strings (if a composite region) with B<DS9> compatible
+region specifications.
 
 =head1 SUPPORT
 

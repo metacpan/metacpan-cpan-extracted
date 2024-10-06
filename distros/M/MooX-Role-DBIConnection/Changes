@@ -1,4 +1,8 @@
-0.06 2024-10-12
+0.07 2024-10-06
+    * rename ->reconnect() to ->reconnect_dbh
+    * add documentation
+
+0.06 2024-10-05
     * Add ->reconnect() method
       This changes the behaviour of the role a bit. The role now retains
       the parameters used for the DBI->connect call in C<_dbh_options>.
