@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.590';
+our $VERSION = '0.591';
 
 use 5.020;
 use Moo;
@@ -25,13 +25,13 @@ use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
 
-sub vocabulary {
+sub vocabulary ($class) {
   'https://json-schema.org/draft/2020-12/vocab/format-assertion' => 'draft2020-12';
 }
 
-sub evaluation_order { 2 }
+sub evaluation_order ($class) { 2 }
 
-sub keywords {
+sub keywords ($class, $spec_version) {
   qw(format);
 }
 
@@ -271,7 +271,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.590
+version 0.591
 
 =head1 DESCRIPTION
 

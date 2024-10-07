@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::MetaData;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Meta-Data vocabulary
 
-our $VERSION = '0.590';
+our $VERSION = '0.591';
 
 use 5.020;
 use Moo;
@@ -21,12 +21,12 @@ use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
 
-sub vocabulary {
+sub vocabulary ($class) {
   'https://json-schema.org/draft/2019-09/vocab/meta-data' => 'draft2019-09',
   'https://json-schema.org/draft/2020-12/vocab/meta-data' => 'draft2020-12';
 }
 
-sub evaluation_order { 5 }
+sub evaluation_order ($class) { 5 }
 
 sub keywords ($class, $spec_version) {
   return (
@@ -89,7 +89,7 @@ JSON::Schema::Modern::Vocabulary::MetaData - Implementation of the JSON Schema M
 
 =head1 VERSION
 
-version 0.590
+version 0.591
 
 =head1 DESCRIPTION
 

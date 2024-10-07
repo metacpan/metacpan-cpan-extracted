@@ -1,5 +1,21 @@
 Revision history for Env-Dot
 
+0.016     2024-10-07 11:33:09+02:00 Europe/Stockholm
+			* Add Twata <twata_1@yahoo.co.jp> as a contributor. [rt.cpan.org #155711]
+				* Windows compatibility. Big thanks.
+
+0.016_02  2024-10-06 10:27:25+02:00 Europe/Stockholm (TRIAL RELEASE)
+            * Remove filepath from dies test because of Windows.
+			* Add warning that script/envdot is not Windows compatible.
+			* Add GitHub Action for Windows build.
+            * Modify interpret_dotenv_filepath_var() to handle Win32 and Unix.
+            * Add more diag to tests.
+            * Add Test::Deny|Require::Platform packages. Remove Test::Require::OS::* packages.
+
+0.016_01  2024-09-26 05:50:19+02:00 Europe/Stockholm (TRIAL RELEASE)
+            * Remove filepath from dies test because of Windows.
+            * Rewrite Env::Dot::Functions::_get_parent_dotenv_filepath()
+
 0.015     2024-09-23 00:36:19+02:00 Europe/Stockholm
             * Change STATUS documentation.
             * Use IO::File when reading file.

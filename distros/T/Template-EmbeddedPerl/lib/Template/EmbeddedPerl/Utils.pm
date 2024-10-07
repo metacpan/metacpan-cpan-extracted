@@ -4,6 +4,7 @@ use warnings;
 use strict;
 use Exporter 'import'; 
 use URI::Escape ();
+use JSON::MaybeXS;
 
 our @EXPORT_OK = qw(
   normalize_linefeeds
@@ -30,27 +31,26 @@ sub normalize_linefeeds {
   return $template;
 }
 
-my %JS_ESCAPE_MAP = (
-  '\\' => '\\\\',
-  '</' => '<\/',
-  "\r\n" => '\n',
-  "\3342\2200\2250" => '\x{3342}\x{2200}\x{2250}',
-  "\3342\2200\2251" => '\x{3342}\x{2200}\x{2251}',
-  "\n" => '\n',
-  "\r" => '\n',
-  '"' => '\"',
-  "'" => "\\'"
-);
+# Create a JSON encoder
+my $json = JSON::MaybeXS->new(utf8 => 0, ascii => 1, allow_nonref => 1);
 
+# Define the escape_javascript function
 sub escape_javascript {
-  my ($javascript) = @_; 
-  if ($javascript) {
-    my $pattern = join '|', map quotemeta, keys %JS_ESCAPE_MAP;
-    my $result = $javascript =~ s/($pattern)/$JS_ESCAPE_MAP{$1}/egr;
-    return $result;
-  } else {
-      return "";
-  }
+    my ($javascript) = @_;
+    return '' unless defined $javascript;
+
+    # Encode the string as a JSON string
+    my $escaped = $json->encode($javascript);
+
+    # Remove the surrounding quotes added by JSON encoding
+    $escaped =~ s/^"(.*)"$/$1/;
+
+    # Escape additional characters not handled by JSON encoding
+    $escaped =~ s/`/\\`/g;   # Escape backticks
+    $escaped =~ s/\$/\\\$/g; # Escape dollar signs
+    $escaped =~ s/'/\\'/g;   # Escape single quotes
+
+    return $escaped;
 }
 
 sub generate_error_message {
@@ -113,7 +113,12 @@ Escape the uri string.
 
   my $escaped = escape_javascript($javascript);
 
-Escape the javascript string.
+Escape the javascript string.  This basically takes a string and escapes it so that it can be 
+embedded in a JavaScript string.  So it escapes single quotes, backticks, and dollar signs and
+that sort of this.   It is not guaranteed to protect against all forms of XSS attacks.  If you
+are embedding user input in a JavaScript string, you should be sure to have cleaned that first
+probably using HTML or URI escaping, or running the string through a JavaScript sanitizer to
+remove any potentially harmful code.
 
 =head2 generate_error_message
 

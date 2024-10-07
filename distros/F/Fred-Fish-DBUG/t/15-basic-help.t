@@ -12,6 +12,11 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+BEGIN {
+   push (@INC, File::Spec->catdir (".", "t", "off"));
+}
+use helper1234;
+
 my $start_level;
 
 sub my_warn
@@ -27,14 +32,15 @@ BEGIN {
    # Can't use any of the constants or funcs defined by this module
    # unless we use them in a separate BEGIN block!
 
-   push (@INC, File::Spec->catdir (".", "t", "off"));
+#  push (@INC, File::Spec->catdir (".", "t", "off"));
 
    # Helper module makes sure DIE & WARN traps are set ...
-   unless (use_ok ("helper1234")) {
-      done_testing ();
-      BAIL_OUT ( "Can't load helper1234" );   # Test # 1
-      exit (0);
-   }
+#  unless (use_ok ("helper1234")) {
+#     done_testing ();
+#     BAIL_OUT ( "Can't load helper1234" );   # Test # 1
+#     exit (0);
+#  }
+   ok (1, "use helper1234;");
 }
 
 BEGIN {
@@ -72,7 +78,7 @@ BEGIN {
 
    # Test # 3 ...
    $start_level = test_fish_level ();
-   is2 ($start_level, $lvl, "In the BEGIN block ...");
+   is2 ($start_level, $lvl, "Level Check In the BEGIN block ...");
 
    ok3 ( dbug_active_ok_test () );                    # Test # 4
 

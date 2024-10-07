@@ -20,6 +20,7 @@ no_index:
     - inc
 requires:
   Feature::Compat::Try: '0'
+  Future: '0'
   Future::AsyncAwait: '0'
   Future::Queue: '0'
   IO::Async::Notifier: '0'
@@ -35,5 +36,5 @@ requires:
   perl: v5.26.0
 resources:
   repository: git://github.com/ehuelsmann/perl-sys-async-virt.git
-version: v0.0.8
+version: v0.0.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

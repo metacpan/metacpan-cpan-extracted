@@ -1,5 +1,11 @@
 Revision history for Dist-Build
 
+0.016     2024-10-06 18:04:02+02:00 Europe/Brussels
+          - Add Dist::Build::DynamicPrereqs
+          - Rename main_module_name to main_module
+          - Add default module to module_sharedir in Dist::Build::ShareDir
+          - Rename the dist_name delegate to distribution
+
 0.015     2024-09-20 14:07:03+02:00 Europe/Brussels
           - Add Dist::Build::XS::Alien
           - Add support for exporting compilation flags.

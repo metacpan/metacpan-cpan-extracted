@@ -163,7 +163,7 @@ where you don't want the whitespace to affect the output.
 If you want to skip the newline after the closing tag you can use a backslash.
 
     <% Perl code %>\
-    <%= Perl expression, replaced with result, trimmed %>\
+    <%= Perl expression, replaced with result, no newline %>\
 
 You probably don't care about this so much with HTML since it collapses whitespace but it can be
 useful for other types of output like plain text or if you need some embedded Perl inside
@@ -180,6 +180,16 @@ If you really need to use the actual tags in your output you can escape them wit
     \%>       => %>
     \%=       => %=
     \%        => %
+
+Lastly you can add full line comments to your templates that will be removed from the final
+output
+
+    # This is a comment
+    <p>Regular HTML</p>
+
+A comment is declared with a single `#` at the start of the line (or with only whitespace preceeding it).
+This line will be removed from the output, including its newline.   If you really need a '#'you can escape it
+with `\#` (this is only needed if the '#' is at the beginning of the line, or there's only preceding whitespace.
 
 # METHODS
 
@@ -253,12 +263,19 @@ Creates a new `Template::EmbeddedPerl` object. Accepts the following arguments:
 
         foo bar baz
 
-- `prepend`
+- `preamble`
 
-    Perl code to prepend to the compiled template. Default is an empty string. For example
+    Add Perl code to the 'preamble' section of the compiled template. This is to top of the generated
+    script prior to the anonymous sub representing your template.Default is an empty string. For example
     you can enable modern Perl features like signatures by setting this to `'use v5.40;'`.
 
     Use this to setup any pragmas or modules you need to use in your template code.
+
+- `prepend`
+
+    Perl code to prepend to the compiled template. Default is an empty string. This goes just inside the
+    anonyous subroutine that is called to return your document string. For example you can use this to
+    pull passed arguments off `@_`.
 
 - `helpers`
 
@@ -293,6 +310,12 @@ Creates a new `Template::EmbeddedPerl` object. Accepts the following arguments:
     In the valid above the compiled template is cached and reused each time you call `render`.
 
     Obviously this only works usefully in a persistent environment like mod\_perl or a PSGI server.
+
+- `comment_mark`
+
+    Defaults to '#'. Indicates the beginning of a comment in the template which is to be removed
+    from the output.
+    &#x3d;back
 
 ## from\_string
 
@@ -344,6 +367,10 @@ no \_\_DATA\_\_ section is found.
 
 Trims leading and trailing whitespace from the provided string. Returns the
 trimmed string.
+
+## mtrim
+
+Same as `trim` but trims leading and trailing whitespace for a multiline string.
 
 ## default\_helpers
 
@@ -472,3 +499,11 @@ John Napiorkowski, `<jjnapiork@cpan.org>`
 
 This library is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 765:
+
+    You forgot a '=back' before '=head2'

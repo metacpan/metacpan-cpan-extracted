@@ -1,4 +1,4 @@
-package Test2::Require::OS::Windows;
+package Test2::Deny::Platform::DOSOrDerivative;
 use strict;
 use warnings;
 
@@ -8,10 +8,17 @@ our $VERSION = '0.000160';
 
 use English qw( -no_match_vars );    # Avoids regex performance
 
+require Test2::Require::Platform::DOSOrDerivative;
+
 sub skip {
     my $class = shift;
-    return if $OSNAME eq 'MSWin32';
-    return 'Run tests only in Windows';
+
+    if ( !Test2::Require::Platform::DOSOrDerivative::IS_PLATFORM() ) {
+        return;
+    }
+    else {
+        return ( __PACKAGE__ =~ m/^Test2::(.*)$/msx )[0];
+    }
 }
 
 1;
@@ -24,7 +31,7 @@ __END__
 
 =head1 NAME
 
-Test2::Require::OS::Windows - Only run a test if the current system is a Windows.
+Test2::Deny::Platform::DOSOrDerivative - Only run a test if the current platform is not a Unix.
 
 =head1 DESCRIPTION
 
@@ -35,7 +42,7 @@ the operating system name.
 
 =head1 SYNOPSIS
 
-    use Test2::Require::OS::Windows;
+    use Test2::Deny::Platform::DOSOrDerivative;
     ...
     done_testing;
 
@@ -56,13 +63,13 @@ F<https://github.com/Test-More/Test2-Suite/>.
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Mikko Koivunalho E<lt>mikkoi@cpan.orgE<gt>
 
 =back
 
 =head1 COPYRIGHT
 
-Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+Copyright 2024 Mikko Koivunalho E<lt>mikkoi@cpan.orgE<gt>.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

@@ -2,7 +2,7 @@ package DateTime::Format::Flexible;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use base 'DateTime::Format::Builder';
 
@@ -521,7 +521,7 @@ sub _fix_alpha
     my $stripped = $date;
     $stripped =~ s{$DELIM|$HMSDELIM}{}gm;
 
-    if ( $stripped =~ m{(\D)} )
+    if ( $stripped =~ m{(\D)} or exists $p->{time_zone})
     {
         printf( "# before lang: %s\n", $date ) if $ENV{DFF_DEBUG};
         ( $date , $p ) = $lang->_cleanup( $date , $p );
@@ -607,7 +607,7 @@ sub _parse_timezone
         }
         if ( DateTime::TimeZone->is_valid_name( $tz ) )
         {
-            printf( "#  timezone matched\n" ) if $ENV{DFF_DEBUG};
+            printf( "#  timezone matched ($tz)\n" ) if $ENV{DFF_DEBUG};
             $date =~ s{\Q$orig_tz\E}{};
             $p->{time_zone} = $tz;
             return ( $date , $p );
@@ -621,7 +621,7 @@ sub _parse_timezone
                                    |(?:\s+)?[-+]\d{2}:\d{2}  # '-04:00', '+04:00'
                                  )\.?\z}mx )
     {
-        printf( "# possible timezone (%s) in (%s)\n", $tz, $date) if $ENV{DFF_DEBUG};
+        printf( "# possible timezone (%s) in (%s)\n", $tz, $date);# if $ENV{DFF_DEBUG};
         my $original_tz = $tz;
         $tz =~ s{:}{};
         # some timezones are 2 digit hours, add the minutes part

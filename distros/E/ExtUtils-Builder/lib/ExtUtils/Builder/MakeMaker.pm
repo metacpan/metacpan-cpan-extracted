@@ -1,5 +1,5 @@
 package ExtUtils::Builder::MakeMaker;
-$ExtUtils::Builder::MakeMaker::VERSION = '0.012';
+$ExtUtils::Builder::MakeMaker::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -41,8 +41,9 @@ sub postamble {
 	$planner->add_delegate('makemaker', sub { $maker });
 	my $config = ExtUtils::Config::MakeMaker->new($maker);
 	$planner->add_delegate('config', sub { $config });
-	$planner->add_delegate('dist_name', sub { $maker->{DIST_NAME} });
-	$planner->add_delegate('dist_version', sub { $maker->{VERSION} });
+	$planner->add_delegate('distribution', sub { $maker->{DIST_NAME} });
+	$planner->add_delegate('distribution_version', sub { $maker->{VERSION} });
+	$planner->add_delegate('main_module', sub { $maker->{NAME} });
 	$planner->add_delegate('pureperl_only', sub { $maker->{PUREPERL_ONLY} });
 	$planner->add_delegate('perl_path', sub { $maker->{ABSPERLRUN} });
 	$planner->add_delegate('uninst', sub { $maker->{UNINST} });
@@ -91,7 +92,7 @@ ExtUtils::Builder::MakeMaker - A MakeMaker consumer for ExtUtils::Builder Plan o
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

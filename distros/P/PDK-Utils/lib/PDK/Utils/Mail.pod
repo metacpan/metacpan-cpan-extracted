@@ -1,0 +1,95 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+PDK::Utils::Mail - 发送邮件的模块
+
+=head1 VERSION
+
+版本 1.0
+
+=head1 SYNOPSIS
+
+    use PDK::Utils::Mail;
+
+    my $mailer = PDK::Utils::Mail->new(
+        smtp     => 'smtp.example.com',
+        from     => 'your_email@example.com',
+        username => 'your_username',
+        password => 'your_password',
+    );
+
+    $mailer->sendmail(
+        to      => 'recipient@example.com',
+        subject => '邮件主题',
+        msg     => '这是邮件内容',
+        cc      => 'cc@example.com',
+    );
+
+=head1 ATTRIBUTES
+
+=head2 smtp
+
+类型: Str
+
+描述: SMTP服务器地址，必填。
+
+=head2 username
+
+类型: Str
+
+描述: SMTP认证用户名。
+
+=head2 password
+
+类型: Str
+
+描述: SMTP认证密码。
+
+=head2 from
+
+类型: Str
+
+描述: 发件人邮箱地址，必填。
+
+=head2 charset
+
+类型: Str
+
+描述: 字符集，默认通过_buildCharset方法构建。
+
+=head2 displayFormat
+
+类型: Str
+
+描述: 邮件显示格式，默认为HTML。
+
+=head1 METHODS
+
+=head2 _buildCharset
+
+构建字符集，基于环境变量LANG。
+
+=head2 sendmail(%param)
+
+发送邮件。参数可以是哈希或哈希引用，必须包含目标地址(to)。
+
+参数：
+- to: 收件人地址，必填。
+- subject: 邮件主题。
+- msg: 邮件内容。
+- cc: 抄送地址。
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 WENWU YAN. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

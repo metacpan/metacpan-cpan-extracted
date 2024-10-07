@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.590';
+our $VERSION = '0.591';
 
 use 5.020;
 use Moo;
@@ -25,12 +25,12 @@ use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
 
-sub vocabulary {
+sub vocabulary ($class) {
   'https://json-schema.org/draft/2019-09/vocab/validation' => 'draft2019-09',
   'https://json-schema.org/draft/2020-12/vocab/validation' => 'draft2020-12';
 }
 
-sub evaluation_order { 1 }
+sub evaluation_order ($class) { 1 }
 
 sub keywords ($class, $spec_version) {
   return (
@@ -92,16 +92,15 @@ sub _eval_keyword_enum ($class, $data, $schema, $state) {
   return 1 if any { is_equal($data, $_, $s[$idx++] = {%s}) } $schema->{enum}->@*;
   return E($state, 'value does not match'
     .(!(grep $_->{path}, @s) ? ''
-      : ' (differences start '.join(', ', map 'from item #'.$_.' at "'.$s[$_]->{path}.'"', 0..$#s).')'));
+      : ' ('.join('; ', map "from enum $_ at '$s[$_]->{path}': $s[$_]->{error}", 0..$#s).')'));
 }
 
-sub _traverse_keyword_const { 1 }
+sub _traverse_keyword_const ($class, $schema, $state) { 1 }
 
 sub _eval_keyword_const ($class, $data, $schema, $state) {
   my %s = $state->%{qw(scalarref_booleans stringy_numbers)};
   return 1 if is_equal($data, $schema->{const}, \%s);
-  return E($state, 'value does not match'
-    .($s{path} ? ' (differences start at "'.$s{path}.'")' : ''));
+  return E($state, 'value does not match'.($s{path} ? " (at '$s{path}': $s{error})" : ''));
 }
 
 sub _traverse_keyword_multipleOf ($class, $schema, $state) {
@@ -328,7 +327,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.590
+version 0.591
 
 =head1 DESCRIPTION
 

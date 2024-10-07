@@ -46,7 +46,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-use Fred::Fish::DBUG::ON 2.05;
+use Fred::Fish::DBUG::ON 2.06;
 
 use Perl::AtEndOfScope;
 use Config qw( %Config );
@@ -57,7 +57,7 @@ use File::Basename;
 use Cwd 'abs_path';
 use Sub::Identify 'sub_fullname';
 
-$VERSION = "2.05";
+$VERSION = "2.06";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( DBUG_TRAP_SIGNAL  DBUG_FIND_CURRENT_TRAPS  DBUG_DIE_CONTEXT

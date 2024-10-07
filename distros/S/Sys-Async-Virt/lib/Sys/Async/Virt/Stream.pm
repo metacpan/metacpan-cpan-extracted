@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Stream v0.0.8;
+package Sys::Async::Virt::Stream v0.0.9;
 
 use parent qw( IO::Async::Notifier );
 
@@ -23,7 +23,7 @@ use Carp qw(croak);
 use Future::Queue;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.8;
+use Protocol::Sys::Virt::Remote::XDR v0.0.9;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 sub new($class, %args) {
@@ -119,9 +119,8 @@ async sub send_hole($self, $length, $flags = 0) {
 async sub abort($self) {
     await $self->{client}->_send_finish( $self->{proc}, $self->{id}, 1 );
     await $self->{finished};
-    delete $self->{_streams}->{$self->{id}};
-    $self->remove_from_parent;
-    $self->{queue} = undef;
+
+    $self->cleanup;
     if (my $e = $self->{pending_error}) {
         $self->{pending_error} = undef;
         die $e;
@@ -129,12 +128,21 @@ async sub abort($self) {
     return;
 }
 
-async sub finish($self) {
-    await $self->{client}->_send_finish( $self->{proc}, $self->{id}, 0 );
-    await $self->{finished};
+sub cleanup($self) {
     delete $self->{_streams}->{$self->{id}};
     $self->remove_from_parent;
     $self->{queue} = undef;
+    $self->{finished}->done
+        unless $self->{finished}->is_ready;
+
+    return;
+}
+
+async sub finish($self) {
+    await $self->{client}->_send_finish( $self->{proc}, $self->{id}, 0 );
+    await $self->{finished};
+
+    $self->cleanup;
     if (my $e = $self->{pending_error}) {
         $self->{pending_error} = undef;
         die $e;
@@ -158,7 +166,7 @@ Sys::Async::Virt::Stream - Client side of a data transfer channel
 
 =head1 VERSION
 
-v0.0.8
+v0.0.9
 
 =head1 SYNOPSIS
 

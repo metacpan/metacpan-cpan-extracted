@@ -9,6 +9,7 @@ use Test::LivesOK 'lives_ok';
 
 use ExtUtils::Builder::Node;
 use ExtUtils::Builder::Plan;
+use ExtUtils::Builder::Util 'code';
 use ExtUtils::Builder::Action::Code;
 use ExtUtils::Builder::Serializer;
 
@@ -18,7 +19,7 @@ my @nodes = map {
 	+"foo$_" => ExtUtils::Builder::Node->new(
 		target => "foo$_",
 		dependencies => [],
-		actions => [ ExtUtils::Builder::Action::Code->new(code => "push \@::triggered, $_" ) ],
+		actions => [ code(code => "push \@::triggered, $_" ) ],
 	)
 	]
 } 0 .. 2;

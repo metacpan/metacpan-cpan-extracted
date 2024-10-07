@@ -4,7 +4,7 @@
       "Yuki Yoshida <worthmine@users.noreply.github.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.14",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -42,9 +42,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "1.54",
             "Crypt::Passwd::XS" : "0.601",
-            "Moo" : "2.005004",
-            "Types::Standard" : "1.012004",
+            "Moo" : "2.005005",
+            "Types::Standard" : "2.006",
             "perl" : "5.008008",
             "strictures" : "2.000006"
          }
@@ -62,19 +63,19 @@
    "provides" : {
       "Text::Password::AutoMigration" : {
          "file" : "lib/Text/Password/AutoMigration.pm",
-         "version" : "0.18"
+         "version" : "0.21"
       },
       "Text::Password::CoreCrypt" : {
          "file" : "lib/Text/Password/CoreCrypt.pm",
-         "version" : "0.18"
+         "version" : "0.21"
       },
       "Text::Password::MD5" : {
          "file" : "lib/Text/Password/MD5.pm",
-         "version" : "0.18"
+         "version" : "0.21"
       },
       "Text::Password::SHA" : {
          "file" : "lib/Text/Password/SHA.pm",
-         "version" : "0.18"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -84,17 +85,19 @@
       },
       "homepage" : "https://github.com/worthmine/Text-Password-AutoMigration",
       "repository" : {
-         "url" : "git://github.com/worthmine/Text-Password-AutoMigration.git",
+         "type" : "git",
+         "url" : "https://github.com/worthmine/Text-Password-AutoMigration.git",
          "web" : "https://github.com/worthmine/Text-Password-AutoMigration"
       }
    },
-   "version" : "0.18",
+   "version" : "0.21",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "Ed Sabol <edwardjsabol@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "Yuki Yoshida <worthmine@gmail.com>"
+      "Yuki Yoshida <worthmine@gmail.com>",
+      "Yuki Yoshida(worthmine) <2944869+worthmine@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

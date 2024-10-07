@@ -1,0 +1,117 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+PDK::Utils::Cache - 简单的缓存实现
+
+=head1 VERSION
+
+版本 1.0
+
+=head1 SYNOPSIS
+
+    use PDK::Utils::Cache;
+
+    my $cache = PDK::Utils::Cache->new();
+
+    # 设置缓存值
+    $cache->set('user', 'name', 'Alice');
+
+    # 获取缓存值
+    my $name = $cache->get('user', 'name');
+
+    # 清除特定缓存
+    $cache->clear('user', 'name');
+
+    # 清除整个缓存
+    $cache->clear();
+
+=head1 ATTRIBUTES
+
+=head2 cache
+
+类型: HashRef[Ref]
+
+描述: 用于存储缓存数据的哈希引用。
+
+=head1 METHODS
+
+=head2 get(@keys)
+
+从缓存中检索值。
+
+参数:
+
+=over 4
+
+=item * C<@keys> - 一个或多个键，表示缓存中的路径。
+
+=back
+
+返回值:
+
+找到的值或 C<undef>（如果未找到）。
+
+=head2 set(@keys, $value)
+
+在缓存中设置值。
+
+参数:
+
+=over 4
+
+=item * C<@keys> - 一个或多个键，表示缓存中的路径。
+
+=item * C<$value> - 要存储的值。
+
+=back
+
+抛出:
+
+如果没有提供足够的参数，则抛出异常。
+
+=head2 clear(@keys)
+
+清除整个缓存或特定键。
+
+参数:
+
+=over 4
+
+=item * C<@keys> - （可选）要清除的特定路径。
+
+=back
+
+注意:
+
+如果不提供键，则清除整个缓存。
+
+=head2 locate(@keys)
+
+在缓存中定位特定节点。
+
+参数:
+
+=over 4
+
+=item * C<@keys> - 表示缓存中路径的键序列。
+
+=back
+
+返回值:
+
+找到的引用或 C<undef>（如果路径不存在）。
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 WENWU YAN. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

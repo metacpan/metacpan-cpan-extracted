@@ -764,7 +764,7 @@ void SPVM_CHECK_check_methods(SPVM_COMPILER* compiler) {
       // Set is_precompile field of methods
       if (basic_type->is_precompile) {
         int32_t can_precompile;
-        if (method->is_init) {
+        if (method->is_init_method) {
           can_precompile = 0;
         }
         else if (method->is_enum) {
@@ -3064,7 +3064,7 @@ void SPVM_CHECK_check_ast_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic
                 op_cur = op_class_var_access;
               }
               else {
-                SPVM_COMPILER_error(compiler, "%s variable is not found.\n  at %s line %d", var->name, op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "%s is not found.\n  at %s line %d", var->name, op_cur->file, op_cur->line);
                 return;
               }
             }

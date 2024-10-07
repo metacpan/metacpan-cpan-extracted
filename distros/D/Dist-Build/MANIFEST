@@ -10,6 +10,7 @@ README
 dist.ini
 lib/Dist/Build.pm
 lib/Dist/Build/Core.pm
+lib/Dist/Build/DynamicPrereqs.pm
 lib/Dist/Build/Serializer.pm
 lib/Dist/Build/ShareDir.pm
 lib/Dist/Build/XS.pm

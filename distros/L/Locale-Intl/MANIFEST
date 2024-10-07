@@ -1,0 +1,21 @@
+CHANGES
+CONTRIBUTING.md
+lib/Locale/Intl.pm
+lib/Locale/Intl/Boolean.pod
+lib/Locale/Intl/Exception.pod
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+t/01.load.t
+t/02.locale.t
+t/90.pod.t
+t/91.coverage.t
+t/92.manifest.t
+t/93.signature.t
+t/99.kwalitee.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

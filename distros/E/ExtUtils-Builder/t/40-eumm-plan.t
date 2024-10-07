@@ -23,8 +23,7 @@ my $touch = join ', ', map { qq{'$_'} } @touch_prefix, 'touch';
 printf $mfpl <<'END', $touch;
 use ExtUtils::MakeMaker;
 use ExtUtils::Builder::MakeMaker;
-use ExtUtils::Builder::Action::Command;
-use ExtUtils::Builder::Action::Code;
+use ExtUtils::Builder::Util qw/command code/;
 
 
 WriteMakefile(
@@ -36,8 +35,8 @@ WriteMakefile(
 
 sub MY::make_plans {
 	my ($self, $planner, $config) = @_;
-	my $action1 = ExtUtils::Builder::Action::Command->new(command => [%s, 'very_unlikely_name']);
-	my $action2 = ExtUtils::Builder::Action::Code->new(code => 'open my $fh, "\\x{3e}", "other_unlikely_name"');
+	my $action1 = command(%s, 'very_unlikely_name');
+	my $action2 = code(code => 'open my $fh, "\\x{3e}", "other_unlikely_name"');
 	$planner->create_node(target => 'foo', actions => [ $action1, $action2 ]);
 	$planner->create_node(target => 'pure_all', dependencies => [ 'foo' ], phony => 1);
 }
@@ -55,7 +54,7 @@ my $content = do { local $/; <$mf> };
 
 like($content, qr/^\t .* touch .* very_unlikely_name/xm, 'Makefile contains very_unlikely_name');
 
-my $make = $ENV{MAKE} || $Config{make};
+my $make = $ENV{MAKE} // $Config{make};
 system $make;
 ok(-e 'very_unlikely_name', "Unlikely file has been touched");
 ok(-e 'other_unlikely_name', "Unlikely file has been touched");

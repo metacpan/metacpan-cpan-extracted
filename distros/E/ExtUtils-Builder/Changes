@@ -1,5 +1,10 @@
 Revision history for ExtUtils-Builder
 
+0.013     2024-10-06 15:44:28+02:00 Europe/Brussels
+          - Add code/command/function helper functions to ExtUtils::Builder::Util
+          - Add main_module helper to ExtUtils::Builder::MakeMaker
+          - Rename dist_name to distribution in ExtUtils::Builder::MakeMaker
+
 0.012     2024-09-10 23:03:26+02:00 Europe/Brussels
           - Allow for phony dependencies of file targets
           - Add type attribute to nodes

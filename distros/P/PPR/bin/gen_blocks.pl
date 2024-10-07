@@ -208,8 +208,7 @@ Damian Conway C<< DCONWAY@cpan.org >>
 Copyright (c) 2017, Damian Conway C<< <DCONWAY@cpan.org> >>. All rights reserved.
 
 This module is free software. It may be used, redistributed
-and/or modified under the terms of the Perl Artistic License
-(see http://www.perl.com/perl/misc/Artistic.html)
+and/or modified under the same terms as Perl itself.
 
 
 =head1 DISCLAIMER OF WARRANTY

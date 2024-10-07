@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.590';
+our $VERSION = '0.591';
 
 use 5.020;
 use strictures 2;
@@ -134,7 +134,8 @@ sub is_bignum ($value) {
 # compares two arbitrary data payloads for equality, as per
 # https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.2
 # $state hashref supports the following fields:
-# - path: any differences are recorded within
+# - path: location of the first difference
+# - error: description of the difference
 # - stringy_numbers: strings will be typed as numbers if looks_like_number() is true
 sub is_equal ($x, $y, $state = {}) {
   $state->{path} //= '';
@@ -153,24 +154,34 @@ sub is_equal ($x, $y, $state = {}) {
       if ($types[1] eq 'string' or $types[1] eq 'ambiguous type') and looks_like_number($y);
   }
 
-  return 0 if $types[0] ne $types[1];
+  $state->{error} = "wrong type: $types[0] vs $types[1]", return 0 if $types[0] ne $types[1];
   return 1 if $types[0] eq 'null';
-  return $x eq $y if $types[0] eq 'string';
-  return $x == $y if grep $types[0] eq $_, qw(boolean number integer);
+  ($x eq $y and return 1), $state->{error} = 'strings not equal', return 0
+    if $types[0] eq 'string';
+  ($x == $y and return 1), $state->{error} = "$types[0]s not equal", return 0
+    if grep $types[0] eq $_, qw(boolean number integer);
 
   my $path = $state->{path};
   if ($types[0] eq 'object') {
-    return 0 if keys %$x != keys %$y;
-    return 0 if not is_equal([ sort keys %$x ], [ sort keys %$y ]);
+    $state->{error} = 'property count differs: '.keys(%$x).' vs '.keys(%$y), return 0
+      if keys %$x != keys %$y;
+
+    if (not is_equal(my $arr_x = [ sort keys %$x ], my $arr_y = [ sort keys %$y ], my $s={})) {
+      my $pos = substr($s->{path}, 1);
+      $state->{error} = 'property names differ starting at position '.$pos.' ("'.$arr_x->[$pos].'" vs "'.$arr_y->[$pos].'")';
+      return 0;
+    }
+
     foreach my $property (sort keys %$x) {
       $state->{path} = jsonp($path, $property);
       return 0 if not is_equal($x->{$property}, $y->{$property}, $state);
     }
+
     return 1;
   }
 
   if ($types[0] eq 'array') {
-    return 0 if @$x != @$y;
+    $state->{error} = 'element count differs: '.@$x.' vs '.@$y, return 0 if @$x != @$y;
     foreach my $idx (0 .. $x->$#*) {
       $state->{path} = $path.'/'.$idx;
       return 0 if not is_equal($x->[$idx], $y->[$idx], $state);
@@ -178,7 +189,7 @@ sub is_equal ($x, $y, $state = {}) {
     return 1;
   }
 
-  return 0; # should never get here
+  $state->{error} = 'uh oh', return 0; # should never get here
 }
 
 # checks array elements for uniqueness. short-circuits on first pair of matching elements
@@ -286,7 +297,7 @@ sub E ($state, $error_string, @args) {
 # - _unknown
 # - depth
 sub A ($state, $annotation) {
-  return 1 if not $state->{collect_annotations} or $state->{spec_version} eq 'draft7';
+  return 1 if not $state->{collect_annotations};
 
   # we store the absolute uri in unresolved form until needed,
   # and perform the rest of the calculations later.
@@ -405,7 +416,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.590
+version 0.591
 
 =head1 SYNOPSIS
 

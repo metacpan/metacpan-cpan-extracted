@@ -9,9 +9,19 @@ use Carp       qw( croak );
 use English    qw( -no_match_vars );    # Avoids regex performance
 use FileHandle ();
 use File::Path qw( make_path );
-use File::Spec;
+use File::Spec ();
 use File::Temp ();
-use Cwd        qw( getcwd abs_path );
+use Cwd        qw( getcwd );
+
+use FindBin qw( $RealBin );
+my $lib_path;
+
+BEGIN {
+    $lib_path = File::Spec->catdir( ( $RealBin =~ /(.+)/msx )[0], q{.}, 'lib' );
+}
+use lib "$lib_path";
+
+use Test2::Require::Platform::Unix;
 
 # $File::Temp::KEEP_ALL = 1;
 # $File::Temp::DEBUG = 1;
@@ -137,8 +147,8 @@ subtest 'Missing parent file, not okay' => sub {
     my $this = getcwd;
     ($this) = $this =~ /(.+)/msx;    # Make it non-tainted
 
-    my $subdir_path = abs_path( File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir' ) );
-    my $subdir_env  = abs_path( File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir', '.env' ) );
+    my $subdir_path = File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir' );
+    my $subdir_env  = File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir', '.env' );
 
     # CD to subdir, the bottom in the hierarcy.
     chdir $subdir_path || croak;
@@ -198,9 +208,9 @@ subtest 'Missing parent file 2, not okay' => sub {
     my $this = getcwd;
     ($this) = $this =~ /(.+)/msx;    # Make it non-tainted
 
-    my $dir_path    = abs_path( File::Spec->catdir( $tmp_dir_path, 'root', 'dir' ) );
-    my $dir_env     = abs_path( File::Spec->catdir( $tmp_dir_path, 'root', 'dir', '.env' ) );
-    my $subdir_path = abs_path( File::Spec->catdir( $tmp_dir_path, 'root', 'dir', 'subdir' ) );
+    my $dir_path    = File::Spec->catdir( $tmp_dir_path, 'root', 'dir' );
+    my $dir_env     = File::Spec->catdir( $tmp_dir_path, 'root', 'dir', '.env' );
+    my $subdir_path = File::Spec->catdir( $tmp_dir_path, 'root', 'dir', 'subdir' );
 
     # CD to subdir, the bottom in the hierarcy.
     chdir $subdir_path || croak;
@@ -245,7 +255,7 @@ subtest 'Missing parent file, okay' => sub {
     my $this = getcwd;
     ($this) = $this =~ /(.+)/msx;    # Make it non-tainted
 
-    my $subdir_path = abs_path( File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir' ) );
+    my $subdir_path = File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir' );
 
     # CD to subdir, the bottom in the hierarcy.
     chdir $subdir_path || croak;

@@ -1,5 +1,5 @@
 requires 'Catalyst', '5.90090';
-requires 'Catalyst::View::EmbeddedPerl::PerRequest', '0.001005';
+requires 'Catalyst::View::EmbeddedPerl::PerRequest', '0.001006';
 requires 'Valiant', '0.002005';
 
 on test => sub {

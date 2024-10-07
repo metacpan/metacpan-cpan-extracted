@@ -135,26 +135,26 @@ subtest rotate => sub {
 };
 
 subtest rotate_subspace => sub {
-  my $sp1= space->rot_z(.125);
-  my $sp2= $sp1->space->rot_z(.125);
-  my $sp3= $sp2->space->rot_z(.125);
-  my $sp4= $sp3->space->rot_z(.125);
-  is( $sp4, object {
-    call is_normal => T;
-    call origin => vec_check(0,0,0);
-    call xv => vec_check(0.70710678,0.70710678,0);
-    call yv => vec_check(-0.70710678,0.70710678,0);
-    call zv => vec_check(0,0,1);
-  }, 'rotate 4 times, each subspaced' );
+	my $sp1= space->rot_z(.125);
+	my $sp2= $sp1->space->rot_z(.125);
+	my $sp3= $sp2->space->rot_z(.125);
+	my $sp4= $sp3->space->rot_z(.125);
+	is( $sp4, object {
+		call is_normal => T;
+		call origin => vec_check(0,0,0);
+		call xv => vec_check(0.70710678,0.70710678,0);
+		call yv => vec_check(-0.70710678,0.70710678,0);
+		call zv => vec_check(0,0,1);
+	}, 'rotate 4 times, each subspaced' );
 };
 
 subtest project => sub {
 	my $sp= space->rot_z(.25);
 	is( $sp->project(vec3(1,1,1)), vec_check(1,-1,1), 'vec3' );
-	is( $sp->project([1,1,1]), [1,-1,1], 'array' );
-	is( $sp->project({ x => 1, y => 1, z => 1 }), { x => 1, y => -1, z => 1 }, 'hash' );
-	is( $sp->project([1,1]), [1,-1,0], 'array[2]' );
-	is( $sp->project({ x => 1, y => 1 }), { x => 1, y => -1, z => 0 }, 'hash x,y' );
+	is( $sp->project([1,1,1]), vec_check(1,-1,1), 'array' );
+	is( $sp->project({ x => 1, y => 1, z => 1 }), vec_hashref_check(1,-1,1), 'hash' );
+	is( $sp->project([1,1]), vec_arrayref_check(1,-1,0), 'array[2]' );
+	is( $sp->project({ x => 1, y => 1 }), vec_hashref_check(1,-1,0), 'hash x,y' );
 };
 
 subtest project_inplace => sub {

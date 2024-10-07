@@ -366,3 +366,9 @@ Revision history for PPR
     * Added explicit -- and extensible -- rule for (?&PerlComment)
 
     * Some minor doc fixes
+
+
+0.001010  Mon Oct  7 20:38:22 2024
+
+    * Clarified licensing of the module: "same terms as Perl itself".
+      (Thanks Gregor)

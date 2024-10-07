@@ -13,8 +13,10 @@ lib/Catalyst/View/EmbeddedPerl/PerRequest.pm
 t/lib/Example.pm
 t/lib/Example/Controller/Root.pm
 t/lib/Example/View/Captures.pm
+t/lib/Example/View/Escape.pm
 t/lib/Example/View/Hello.pm
 t/lib/Example/View/HelloName.pm
+t/lib/Example/View/NoEscape.pm
 t/lib/Example/View/Page.pm
 t/lib/Example/View/TestSubs.pm
 t/lib/Example/View/test_subs.epl

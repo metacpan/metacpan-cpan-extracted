@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Plan;
-$ExtUtils::Builder::Plan::VERSION = '0.012';
+$ExtUtils::Builder::Plan::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use Scalar::Util ();
 sub new {
 	my ($class, %args) = @_;
 	return bless {
-		nodes => $args{nodes} || {}
+		nodes => $args{nodes} // {}
 	}, $class;
 }
 
@@ -100,7 +100,7 @@ ExtUtils::Builder::Plan - An ExtUtils::Builder Plan
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

@@ -8,9 +8,9 @@ use Test2::V0;
 use Carp;
 use FileHandle ();
 use File::Path qw( make_path );
-use File::Spec;
+use File::Spec ();
 use File::Temp ();
-use Cwd        qw( getcwd abs_path );
+use Cwd        qw( getcwd );
 
 use Env::Dot::Functions ();
 
@@ -23,8 +23,8 @@ sub create_case_one {
         CLEANUP  => 1,
         DIR      => File::Spec->tmpdir,
     );
-    my $dir_path = abs_path( $dir->{'DIRNAME'} );
-    diag "Created temp dir: $dir_path";
+    my $dir_path = $dir->{'DIRNAME'};
+    note "Created temp dir: $dir_path";
     make_path( File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir' ) );
 
     my $fh_root_env = FileHandle->new( File::Spec->catfile( $dir_path, 'root', '.env' ), 'w' );
@@ -330,8 +330,9 @@ subtest 'Private subroutine _read_dotenv_file_recursively()' => sub {
         ## no critic (RegularExpressions::ProhibitComplexRegexes)
         dies { Env::Dot::Functions::_read_dotenv_file_recursively($subdir_filepath) },
 
-        # qr/Unknown \s envdot \s option: \s 'broken:option' \s row \s 4 \s file \s $dir_filepath .*$/msx,
-        qr{^ Unknown \s envdot \s option: \s 'broken:option'! \s line \s 4 \s file \s '$dir_filepath' .* $}msx,
+        # We do not put the filepath in the regex because in Windows
+        # the backslashes, '\' become escape characters.
+        qr{^ Unknown \s envdot \s option: \s 'broken:option'! \s line \s 4 \s file \s '.*' .* $}msx,
         'Died because of unknown option error',
     );
 
@@ -368,8 +369,7 @@ subtest 'Private subroutine _get_parent_dotenv_filepath()' => sub {
 
     # Jump over middle directory.
     unlink $dir_filepath;
-
-    # diag "Env::Dot::Functions::_get_parent_dotenv_filepath($subdir_filepath)";
+    note "Env::Dot::Functions::_get_parent_dotenv_filepath($subdir_filepath)";
     $parent_filepath = Env::Dot::Functions::_get_parent_dotenv_filepath($subdir_filepath);
     is( $parent_filepath, $root_filepath, 'correct parent dir and .env file' );
 

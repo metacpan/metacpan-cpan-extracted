@@ -96,7 +96,7 @@ in your fish logs.  Just be aware that you may have only one B<tie> per file
 handle.  But if your code does require ties to work, this module provides a
 way to coexist.
 
-See F<Fred::Fish::DBUG::TIE> for more details on how to enable this feature.
+See L<Fred::Fish::DBUG::TIE> for more details on how to enable this feature.
 
 =head1 FISH FOR MULTI-THREADED PERL PROGRAMS
 
@@ -190,7 +190,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION = "2.05";
+$VERSION = "2.06";
 @ISA = qw( Exporter );
 
 # ------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ sub import
    my @imports;
    my $fish_module = __PACKAGE__ . "::";
 
-   my $minVer = 2.05;
+   my $minVer = 2.06;
    if ( $on_flag ) {
       $fish_module .= "ON";
       require Fred::Fish::DBUG::ON;

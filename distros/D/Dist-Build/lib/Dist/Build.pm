@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.015';
+$Dist::Build::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -17,6 +17,7 @@ use Getopt::Long 2.36 qw/GetOptionsFromArray/;
 use Parse::CPAN::Meta;
 
 use ExtUtils::Builder::Planner 0.008;
+use ExtUtils::Builder::Util 'get_perl';
 use Dist::Build::Serializer;
 
 my $json_backend = Parse::CPAN::Meta->json_backend;
@@ -78,12 +79,12 @@ sub Build_PL {
 	$planner->install('install', dependencies => [ 'pure_all' ], install_map => $options{install_paths}->install_map);
 
 	$planner->add_delegate('meta', sub { $meta });
-	$planner->add_delegate('dist_name', sub { $meta->name });
-	$planner->add_delegate('dist_version', sub { $meta->version });
+	$planner->add_delegate('distribution', sub { $meta->name });
+	$planner->add_delegate('distribution_version', sub { $meta->version });
 	(my $main_module = $meta->name) =~ s/-/::/g;
-	$planner->add_delegate('main_module_name', sub { $main_module });
+	$planner->add_delegate('main_module', sub { $main_module });
 	$planner->add_delegate('release_status', sub { $meta->release_status });
-	$planner->add_delegate('perl_path', sub { get_perl(%options) });
+	$planner->add_delegate('perl_path', sub { get_perl(config => $options{config}, %options) });
 
 	for my $variable (qw/config install_paths verbose uninst jobs pureperl_only/) {
 		$planner->add_delegate($variable, sub { $options{$variable} });
@@ -93,6 +94,12 @@ sub Build_PL {
 		my $inner = ExtUtils::Builder::Planner->new;
 		$inner->add_delegate('config', sub { $options{config} });
 		return $inner;
+	});
+
+	my @meta_fragments;
+	$planner->add_delegate('add_meta', sub {
+		my (undef, @fragments) = @_;
+		push @meta_fragments, @fragments;
 	});
 
 	$planner->lib_dir('lib');
@@ -113,13 +120,12 @@ sub Build_PL {
 	save_json(catfile(qw/_build graph/), $serializer->serialize_plan($plan));
 	save_json(catfile(qw/_build params/), [ $args, \@env ]);
 
-	if (my $dynamic = $meta->custom('x_dynamic_prereqs')) {
-		my %meta = (%{ $meta->as_struct }, dynamic_config => 0);
-		require CPAN::Requirements::Dynamic;
-		my $dynamic_parser = CPAN::Requirements::Dynamic->new(%options, prereqs => $meta->effective_prereqs);
-		my $prereq = $dynamic_parser->evaluate($dynamic);
-		$meta{prereqs} = $prereq->as_string_hash;
-		$meta = CPAN::Meta->new(\%meta);
+	if (@meta_fragments) {
+		require CPAN::Meta::Merge;
+		my $merger = CPAN::Meta::Merge->new(default_version => '2');
+		my $metahash = $merger->merge($meta, @meta_fragments);
+		$metahash->{dynamic_config} = 0;
+		$meta = CPAN::Meta->create($metahash, { lazy_validation => 0 });
 	}
 	$meta->save('MYMETA.json');
 
@@ -162,7 +168,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -181,8 +187,6 @@ C<Dist::Build> is a Build.PL implementation. Unlike L<Module::Build::Tiny> it is
    libraries     => [ 'foo' ],
    extra_sources => [ glob 'src/*.c' ],
  );
-
- At configure time, it will run a L<dynamic-prereqs.json|CPAN::Requirements::Dynamic> file if present to determine the conditional dependencies
 
 =head1 AUTHOR
 

@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Catalyst::View::EmbeddedPerl::PerRequest::ValiantRole",
   "PREREQ_PM" => {
     "Catalyst" => "5.90090",
-    "Catalyst::View::EmbeddedPerl::PerRequest" => "0.001005",
+    "Catalyst::View::EmbeddedPerl::PerRequest" => "0.001006",
     "Valiant" => "0.002005"
   },
   "TEST_REQUIRES" => {
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::Most" => "0.34"
   },
-  "VERSION" => "0.001002",
+  "VERSION" => "0.001004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Catalyst" => "5.90090",
   "Catalyst::Test" => 0,
-  "Catalyst::View::EmbeddedPerl::PerRequest" => "0.001005",
+  "Catalyst::View::EmbeddedPerl::PerRequest" => "0.001006",
   "HTTP::Request::Common" => 0,
   "Test::Lib" => 0,
   "Test::Most" => "0.34",

@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Exporter" => "5.78",
     "File::Spec" => "3.75",
     "HTML::Escape" => "1.11",
+    "JSON::MaybeXS" => "1.004008",
     "PPI" => "1.279",
     "Scalar::Util" => "1.63",
     "URI::Escape" => "5.28"
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Most" => "0.34"
   },
-  "VERSION" => "0.001005",
+  "VERSION" => "0.001006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %FallbackPrereqs = (
   "Exporter" => "5.78",
   "File::Spec" => "3.75",
   "HTML::Escape" => "1.11",
+  "JSON::MaybeXS" => "1.004008",
   "PPI" => "1.279",
   "Scalar::Util" => "1.63",
   "Test::Most" => "0.34",

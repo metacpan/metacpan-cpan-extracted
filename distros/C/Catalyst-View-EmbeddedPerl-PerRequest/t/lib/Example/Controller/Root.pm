@@ -24,6 +24,16 @@ sub wrap :Local  {
 sub captures :Local  {
   my ($self, $c) = @_;
   return $c->view('Captures')->http_ok;
+}
+
+sub no_escape :Local  {
+  my ($self, $c) = @_;
+  return $c->view('NoEscape')->http_ok;
+} 
+
+sub escape :Local  {
+  my ($self, $c) = @_;
+  return $c->view('Escape')->http_ok;
 } 
 
 __PACKAGE__->meta->make_immutable;

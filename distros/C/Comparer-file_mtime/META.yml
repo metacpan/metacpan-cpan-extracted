@@ -19,7 +19,7 @@ name: Comparer-file_mtime
 provides:
   Comparer::file_mtime:
     file: lib/Comparer/file_mtime.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   perl: '5.010001'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Comparer-file_mtime
   homepage: https://metacpan.org/release/Comparer-file_mtime
   repository: git://github.com/perlancar/perl-Comparer-file_mtime.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

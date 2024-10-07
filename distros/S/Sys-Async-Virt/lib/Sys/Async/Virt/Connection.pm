@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection v0.0.8;
+package Sys::Async::Virt::Connection v0.0.9;
 
 use parent qw(IO::Async::Notifier);
 
@@ -32,12 +32,21 @@ async sub connect($self) {
         "The 'connect' method must be implemented by concrete sub-classes");
 }
 
+sub is_read_eof($self) {
+    return $self->{in}->is_read_eof;
+}
+
 sub is_secure($self) {
     return 0;
 }
 
+sub is_write_eof($self) {
+    return $self->{out}->is_write_eof;
+}
+
 async sub read($self, $type, $len) {
     die $log->fatal( "Unsupported transfer type $type" ) unless $type eq 'data';
+    $log->trace( "Starting read of length $len" );
     await $self->{in}->read_exactly( $len );
 }
 
@@ -72,7 +81,7 @@ Sys::Async::Virt::Connection - Connection to LibVirt server (abstract
 
 =head1 VERSION
 
-v0.0.8
+v0.0.9
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Planner;
-$ExtUtils::Builder::Planner::VERSION = '0.012';
+$ExtUtils::Builder::Planner::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -70,12 +70,14 @@ sub add_plan {
 	return;
 }
 
+my $set_subname = eval { require Sub::Util; Sub::Util->VERSION('1.40'); \&Sub::Util::set_subname } // sub { $_[1] };
+
 sub add_delegate {
 	my ($self, $name, $sub) = @_;
 	my $full_name = ref($self) . '::' . $name;
 	no strict 'refs';
 	no warnings 'redefine';
-	*{$full_name} = $sub;
+	*{$full_name} = $set_subname->($full_name, $sub);
 	return;
 }
 
@@ -92,23 +94,11 @@ sub materialize {
 	return ExtUtils::Builder::Plan->new(nodes => \%nodes);
 }
 
-my $set_subname = eval { require Sub::Util; Sub::Util->VERSION('1.40'); \&Sub::Util::set_subname } || sub { $_[1] };
-
 my %dsl_commands = (
-	command => sub {
-		my (@command) = @_;
-		return ExtUtils::Builder::Action::Command->new(command => \@command);
-	},
-	code => sub {
-		my %args = @_;
-		return ExtUtils::Builder::Action::Code->new(%args);
-	},
-	function => sub {
-		my %args = @_;
-		return ExtUtils::Builder::Action::Function->new(%args);
-	},
+	command  => \&ExtUtils::Builder::Util::command,
+	code     => \&ExtUtils::Builder::Util::code,
+	function => \&ExtUtils::Builder::Util::function,
 );
-$set_subname->($_, $dsl_commands{$_}) for keys %dsl_commands;
 
 sub run_dsl {
 	my ($self, $filename) = @_;
@@ -138,7 +128,7 @@ sub run_dsl {
 	}
 
 	my $path = File::Spec->file_name_is_absolute($filename) ? $filename : File::Spec->catfile(File::Spec->curdir, $filename);
-	eval "package $dsl_module; my \$ret = do \$path; die \$@ if \$@; defined \$ret || !\$!" or die $@ || Carp::shortmess("Can't run $path: $!");
+	eval "package $dsl_module; my \$ret = do \$path; die \$@ if \$@; defined \$ret || !\$!" or die $@ // Carp::shortmess("Can't run $path: $!");
 	return;
 }
 
@@ -158,7 +148,7 @@ ExtUtils::Builder::Planner - An ExtUtils::Builder Plan builder
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

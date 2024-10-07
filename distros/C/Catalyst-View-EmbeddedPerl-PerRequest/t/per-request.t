@@ -48,6 +48,18 @@ use_ok 'Catalyst::View::EmbeddedPerl::PerRequest';
   is $data, "<p>joe</p>\n<p>john</p>";
 }
 
+{
+  ok my $res = request GET '/no_escape';
+  ok my $data = $res->content; 
+  is $data, "<a>hello</a>";
+}
+
+{
+  ok my $res = request GET '/escape';
+  ok my $data = $res->content; 
+  is $data, "&lt;a&gt;hello&lt;/a&gt;";
+}
+
 done_testing;
 
 __END__

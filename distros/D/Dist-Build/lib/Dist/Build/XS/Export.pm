@@ -1,5 +1,5 @@
 package Dist::Build::XS::Export;
-$Dist::Build::XS::Export::VERSION = '0.015';
+$Dist::Build::XS::Export::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -30,7 +30,7 @@ sub add_methods {
 
 	$planner->add_delegate('export_headers', sub {
 		my ($self, %args) = @_;
-		my $module_name = $args{module} // $planner->main_module_name;
+		my $module_name = $args{module} // $planner->main_module;
 		(my $module_dir = $module_name) =~ s/::/-/g;
 		croak 'No directory or file given to share' if not $args{dir} and not $args{file};
 
@@ -53,7 +53,7 @@ sub add_methods {
 		my ($self, %args) = @_;
 		my %flags = map { $_ => $args{$_} } grep { $allowed_flag{$_} } keys %args;
 
-		my $module_name = $args{module} // $planner->main_module_name;
+		my $module_name = $args{module} // $planner->main_module;
 		(my $module_dir = $module_name) =~ s/::/-/g;
 		my $filename = catfile(qw/blib lib auto share module/, $module_dir, 'compile.json');
 
@@ -79,7 +79,7 @@ Dist::Build::XS::Export - Dist::Build extension to export headers for other XS m
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

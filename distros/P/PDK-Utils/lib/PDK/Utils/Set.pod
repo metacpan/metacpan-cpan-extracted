@@ -1,0 +1,114 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+PDK::Utils::Set - 处理数值范围集合的模块
+
+=head1 VERSION
+
+版本 1.0
+
+=head1 SYNOPSIS
+
+    use PDK::Utils::Set;
+
+    my $set = PDK::Utils::Set->new(mins => [1, 5], maxs => [3, 7]);
+
+    # 添加范围到集合
+    $set->addToSet(8, 10);
+
+    # 合并另一个集合
+    my $set2 = PDK::Utils::Set->new(mins => [6], maxs => [9]);
+    $set->mergeToSet($set2);
+
+    # 获取集合的长度
+    my $length = $set->length;
+
+    # 输出集合内容
+    $set->dump;
+
+=head1 ATTRIBUTES
+
+=head2 mins
+
+类型: ArrayRef[Int]
+
+描述: 最小值数组。
+
+=head2 maxs
+
+类型: ArrayRef[Int]
+
+描述: 最大值数组。
+
+=head1 METHODS
+
+=head2 BUILDARGS
+
+处理构造函数参数，根据不同输入情况构造对象参数。
+
+=head2 BUILD
+
+初始化对象并验证属性的构造函数。
+
+=head2 length
+
+返回最小值和最大值的长度。
+
+=head2 min
+
+返回最小值数组的第一个元素。
+
+=head2 max
+
+返回最大值数组的最后一个元素。
+
+=head2 dump
+
+输出最小值和最大值的对。
+
+=head2 addToSet($MIN, $MAX)
+
+将最小值和最大值添加到集合中。
+
+=head2 mergeToSet($setObj)
+
+合并另一个集合到当前集合。
+
+=head2 compare($setObj)
+
+比较两个集合的关系。
+
+=head2 isEqual($setObj)
+
+检查两个集合是否相等。
+
+=head2 notEqual($setObj)
+
+检查两个集合是否不相等。
+
+=head2 isContain($setObj)
+
+检查当前集合是否包含另一个集合。
+
+=head2 isBelong($setObj)
+
+检查当前集合是否属于另一个集合。
+
+=head2 interSet($setObj)
+
+计算当前集合和另一个集合的交集。
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 WENWU YAN. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

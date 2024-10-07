@@ -7,6 +7,7 @@ lib/Sys/Async/Virt/Callback.pm
 lib/Sys/Async/Virt/Connection.pm
 lib/Sys/Async/Virt/Connection/Factory.pm
 lib/Sys/Async/Virt/Connection/Local.pm
+lib/Sys/Async/Virt/Connection/SSH.pm
 lib/Sys/Async/Virt/Domain.pm
 lib/Sys/Async/Virt/DomainCheckpoint.pm
 lib/Sys/Async/Virt/DomainSnapshot.pm

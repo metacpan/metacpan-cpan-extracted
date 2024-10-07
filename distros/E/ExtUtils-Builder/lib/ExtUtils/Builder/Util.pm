@@ -1,10 +1,10 @@
 package ExtUtils::Builder::Util;
-$ExtUtils::Builder::Util::VERSION = '0.012';
+$ExtUtils::Builder::Util::VERSION = '0.013';
 use strict;
 use warnings;
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/get_perl require_module/;
+our @EXPORT_OK = qw/get_perl require_module command code function/;
 
 use Config;
 use ExtUtils::Config;
@@ -13,15 +13,16 @@ use Scalar::Util 'tainted';
 
 sub get_perl {
 	my (%opts) = @_;
-	return $opts{perl} if $opts{perl};
-	my $config = $opts{config} || ExtUtils::Config->new;
-	if ($config->get('userelocatableinc')) {
+	my $config = $opts{config} // ExtUtils::Config->new;
+
+	if (file_name_is_absolute($^X) and not tainted($^X)) {
+		return $^X;
+	}
+	elsif ($config->get('userelocatableinc')) {
 		require Devel::FindPerl;
 		return Devel::FindPerl::find_perl_interpreter($config);
 	}
 	else {
-		require File::Spec;
-		return $^X if file_name_is_absolute($^X) and not tainted($^X);
 		return $opts{config}->get('perlpath');
 	}
 }
@@ -31,6 +32,24 @@ sub require_module {
 	(my $filename = "$module.pm") =~ s{::}{/}g;
 	require $filename;
 	return $module;
+}
+
+sub command {
+	my (@command) = @_;
+	require ExtUtils::Builder::Action::Command;
+	return ExtUtils::Builder::Action::Command->new(command => \@command);
+}
+
+sub code {
+	my %args = @_;
+	require ExtUtils::Builder::Action::Code;
+	return ExtUtils::Builder::Action::Code->new(%args);
+}
+
+sub function {
+	my %args = @_;
+	require ExtUtils::Builder::Action::Function;
+	return ExtUtils::Builder::Action::Function->new(%args);
 }
 
 1;
@@ -49,7 +68,7 @@ ExtUtils::Builder::Util - Utility functions for ExtUtils::Builder
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 DESCRIPTION
 
@@ -57,15 +76,23 @@ This is a module containing some helper functions for L<ExtUtils::Builder>.
 
 =head1 FUNCTIONS
 
+=head2 function(%arguments)
+
+This is a shorthand for calling L<ExtUtils::Builder::Action::Function|ExtUtils::Builder::Action::Function>'s contructor.
+
+=head2 command(%arguments)
+
+This is a shorthand for calling L<ExtUtils::Builder::Action::Code|ExtUtils::Builder::Action::Code>'s contructor.
+
+=head2 code(@command)
+
+This is a shorthand for calling L<ExtUtils::Builder::Action::Code|ExtUtils::Builder::Action::Code>'s contructor, with C<@command> passed as its C<command> argument.
+
 =head2 get_perl(%options)
 
 This function takes a hash with various (optional) keys:
 
 =over 4
-
-=item * perl
-
-The location of the perl executable
 
 =item * config
 

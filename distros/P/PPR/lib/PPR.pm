@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.001009';
+our $VERSION = '0.001010';
 use utf8;
 use List::Util qw<min max>;
 
@@ -3024,7 +3024,7 @@ PPR - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR version 0.001009
+This document describes PPR version 0.001010
 
 
 =head1 SYNOPSIS

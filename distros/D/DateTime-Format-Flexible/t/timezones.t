@@ -34,7 +34,7 @@ foreach my $tz ( @TZS )
 {
     my $dt = DateTime::Format::Flexible->parse_datetime( '2010-01-24T04:58:23 '.$tz );
     is( $dt->datetime , '2010-01-24T04:58:23' , "$tz parsed" );
-    is( $dt->time_zone->name , $tz , "$tz timezone set correctly" );
+    is( $dt->time_zone->name , $tz , "$tz timezone set correctly ($dt $tz)" );
 }
 
 foreach my $line ( @DATA )

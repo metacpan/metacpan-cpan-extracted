@@ -12,10 +12,11 @@ my @files = (
     'lib/Env/Dot/ScriptFunctions.pm',
     'script/envdot',
     't/env-dot-functions-private.t',
+    't/env-dot-functions-public-unix.t',
+    't/env-dot-functions-public-win32.t',
     't/env-dot-functions-public.t',
     't/env-dot-override-example-synopsis.sh',
     't/env-dot-override-example-synopsis.t',
-    't/env-dot-private.t',
     't/env-dot-scriptfunctions.t',
     't/envdot-script-first.env',
     't/envdot-script-second.env',
@@ -27,8 +28,9 @@ my @files = (
     't/file-read-order/dummy.env-second',
     't/file-read-order/dummy.env-static',
     't/file-read-order/dummy.env-third',
-    't/lib/Test2/Require/OS/Linux.pm',
-    't/lib/Test2/Require/OS/Windows.pm',
+    't/lib/Test2/Deny/Platform/DOSOrDerivative.pm',
+    't/lib/Test2/Require/Platform/DOSOrDerivative.pm',
+    't/lib/Test2/Require/Platform/Unix.pm',
     't/recursive-read.t'
 );
 

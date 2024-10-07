@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action::Code;
-$ExtUtils::Builder::Action::Code::VERSION = '0.012';
+$ExtUtils::Builder::Action::Code::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ use ExtUtils::Builder::Util 'get_perl';
 sub new {
 	my ($class, %args) = @_;
 	Carp::croak('Need to define code') if !$args{code};
-	$args{modules} ||= [];
+	$args{modules} //= [];
 	my $self = $class->SUPER::new(%args);
 	return $self;
 }
@@ -25,7 +25,7 @@ sub execute {
 	my ($self, %opts) = @_;
 	my $code = $self->to_code();
 	if (!$opts{quiet}) {
-		my $message = $self->{message} || $code;
+		my $message = $self->{message} // $code;
 		print "$message\n";
 	}
 	eval $code . '; 1' or die $@;
@@ -41,7 +41,8 @@ sub to_code {
 sub to_command {
 	my ($self, %opts) = @_;
 	my @modules = map { "-M$_" } $self->modules;
-	return [ get_perl(%opts), @modules, '-e', $self->to_code(skip_loading => 'main') ];
+	my $perl = $opts{perl} // get_perl(%opts);
+	return [ $perl, @modules, '-e', $self->to_code(skip_loading => 'main') ];
 }
 
 1;
@@ -60,7 +61,7 @@ ExtUtils::Builder::Action::Code - Action objects for perl code
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use Template::EmbeddedPerl;
 
 extends 'Catalyst::View::BasePerRequest';
 
-our $VERSION = 0.001005;
+our $VERSION = 0.001006;
 eval $VERSION;
 
 # Args that get passed cleanly to Template::EmbeddedPerl
@@ -46,9 +46,7 @@ sub modify_init_args {
   $class->inject_helpers($temple->{sandbox_ns}, %helpers);
   # Return the merged args
   return $merged_args;
-}
-
-#   
+} 
 
 # This sets defaults to template args that can't really change without breaking everything
 sub modify_temple_args {
@@ -303,16 +301,39 @@ for yourself.
 
 =head1 HTML ESCAPING
 
-By default the view will escape all output to prevent cross site scripting attacks.
-If you want to output raw HTML you can use the C<raw> helper.  For example:
+By default this view does not automatically escape HTML output.  If you are using this
+view to generate HTML output you should be aware of the security implications of this.
+You either need to explicitly escape all output or use the C<auto_escape> option to
+enable automatic escaping.   The latter is the recommended approach.  Example:
+
+  package Example::View::Escape;
+
+  use Moose;
+  extends 'Catalyst::View::EmbeddedPerl::PerRequest';
+
+  __PACKAGE__->config(auto_escape => 1);
+
+If C<auto_escape> is enabled and you want to output raw HTML you can use the
+C<raw> helper.  For example:
 
   <%= raw $self->html %>
 
 See L<Template::EmbeddedPerl::SafeString> for more information.
 
-You can disable this feature by setting the C<auto_escape> option to false in the
-view configuration.  For example if you are not using this to generate HTML output
-you might not want it.
+If for some reason you don't want to use the C<auto_escape> feature you can use the
+C<html_escape> helper to escape HTML output.  For example:
+
+  <%= html_escape($self->html) %>
+
+Or use the C<safe> helper to mark a string as safe.  For example:
+
+  <%= safe($self->html) %>
+
+The C<safe> helper is preferred because it won't double escape content that is already
+escaped whereas the C<html_escape> helper will.
+
+Unless you are writing text output or javascript that has special encoding needs you
+really should use the C<auto_escape> feature.
 
 =head1 METHODS
 

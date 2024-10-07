@@ -1,7 +1,8 @@
 requires 'perl',            5.008008;
-requires 'Moo',             2.005004;
+requires 'Carp',            1.54;
+requires 'Moo',             2.005005;
 requires 'strictures',      2.000006;
-requires 'Types::Standard', 1.012004;
+requires 'Types::Standard', 2.006000;
 
 requires 'Crypt::Passwd::XS', 0.601;
 

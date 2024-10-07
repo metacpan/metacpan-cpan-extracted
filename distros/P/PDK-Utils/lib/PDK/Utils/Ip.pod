@@ -1,0 +1,230 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+PDK::Utils::Ip - IP地址和掩码处理工具类
+
+=head1 VERSION
+
+版本 1.0
+
+=head1 SYNOPSIS
+
+    use PDK::Utils::Ip;
+
+    my $ip_utils = PDK::Utils::Ip->new();
+
+    # 从IP范围获取整数范围
+    my ($min, $max) = $ip_utils->getRangeFromIpRange('192.168.1.1', '192.168.1.10');
+
+    # 从IP和掩码获取范围
+    my $set = $ip_utils->getRangeFromIpMask('192.168.1.1', 24);
+
+    # 获取网络IP
+    my $net_ip = $ip_utils->getNetIpFromIpMask('192.168.1.1', 24);
+
+=head1 METHODS
+
+=head2 getRangeFromIpRange($ipMin, $ipMax)
+
+从IP范围获取整数范围。
+
+参数:
+
+=over 4
+
+=item * C<$ipMin> - 最小IP地址
+
+=item * C<$ipMax> - 最大IP地址
+
+=back
+
+返回值:
+
+标量上下文：C<PDK::Utils::Set>对象
+
+列表上下文：(最小值, 最大值)
+
+=head2 getRangeFromIpMask($ip, $mask)
+
+从IP和掩码获取范围。
+
+参数:
+
+=over 4
+
+=item * C<$ip> - IP地址或IP范围
+
+=item * C<$mask> - 掩码（可选，默认为32）
+
+=back
+
+返回值:
+
+标量上下文：C<PDK::Utils::Set>对象
+
+列表上下文：(最小值, 最大值)
+
+=head2 getNetIpFromIpMask($ip, $mask)
+
+从IP和掩码获取网络IP。
+
+参数:
+
+=over 4
+
+=item * C<$ip> - IP地址
+
+=item * C<$mask> - 掩码（可选，默认为32）
+
+=back
+
+返回值:
+
+网络IP地址
+
+=head2 changeIntToIp($num)
+
+将整数转换为IP地址。
+
+参数:
+
+=over 4
+
+=item * C<$num> - 整数形式的IP
+
+=back
+
+返回值:
+
+点分十进制形式的IP地址
+
+=head2 changeIpToInt($ip)
+
+将IP地址转换为整数。
+
+参数:
+
+=over 4
+
+=item * C<$ip> - 点分十进制形式的IP地址
+
+=back
+
+返回值:
+
+整数形式的IP
+
+异常:
+
+如果IP格式非法，抛出异常。
+
+=head2 changeMaskToNumForm($mask)
+
+将掩码转换为数字形式。
+
+参数:
+
+=over 4
+
+=item * C<$mask> - 掩码（可以是点分十进制或数字形式）
+
+=back
+
+返回值:
+
+数字形式的掩码（0-32）
+
+异常:
+
+如果掩码格式非法或值超出范围，抛出异常。
+
+=head2 changeWildcardToMaskForm($wildcard)
+
+将反掩码转换为掩码形式。
+
+参数:
+
+=over 4
+
+=item * C<$wildcard> - 反掩码
+
+=back
+
+返回值:
+
+掩码形式，如果转换失败则返回C<undef>。
+
+=head2 changeMaskToIpForm($mask)
+
+将数字形式的掩码转换为IP形式。
+
+参数:
+
+=over 4
+
+=item * C<$mask> - 掩码（数字形式或IP形式）
+
+=back
+
+返回值:
+
+IP形式的掩码
+
+异常:
+
+如果掩码格式非法或值超出范围，抛出异常。
+
+=head2 getIpMaskFromRange($min, $max)
+
+从IP范围获取IP/掩码表示。
+
+参数:
+
+=over 4
+
+=item * C<$min> - 最小IP（整数形式）
+
+=item * C<$max> - 最大IP（整数形式）
+
+=back
+
+返回值:
+
+IP/掩码表示或IP范围
+
+异常:
+
+如果C<$max>未定义，抛出异常。
+
+=head2 getRangeFromService($service)
+
+从服务描述获取范围。
+
+参数:
+
+=over 4
+
+=item * C<$service> - 服务描述（格式：协议/端口）
+
+=back
+
+返回值:
+
+标量上下文：C<PDK::Utils::Set>对象
+
+列表上下文：(最小值, 最大值)
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 WENWU YAN. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

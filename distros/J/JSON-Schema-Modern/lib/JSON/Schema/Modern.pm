@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.589-7-gff74ddd3
+package JSON::Schema::Modern; # git description: v0.590-14-g5e729199
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.590';
+our $VERSION = '0.591';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -155,12 +155,10 @@ sub add_schema {
     : $_[0]->$_isa('Mojo::URL') ? shift : Mojo::URL->new;
 
   croak 'cannot add a schema with a uri with a fragment' if defined $uri->fragment;
+  croak 'insufficient arguments' if not @_;
 
-  if (not @_) {
-    my $schema_info = $self->_fetch_from_uri($uri);
-    return if not $schema_info or not defined wantarray;
-    return $schema_info->{document};
-  }
+  Carp::carp('use of deprecated form of add_schema with document')
+    if $_[0]->$_isa('JSON::Schema::Modern::Document');
 
   # document BUILD will trigger $self->traverse($schema)
   my $document = $_[0]->$_isa('JSON::Schema::Modern::Document') ? shift
@@ -169,6 +167,22 @@ sub add_schema {
       $uri ? (canonical_uri => $uri) : (),
       evaluator => $self,  # used mainly for traversal during document construction
     );
+
+  $self->add_document($uri, $document);
+}
+
+sub add_document {
+  croak 'insufficient arguments' if @_ < 2;
+  my $self = shift;
+
+  # TODO: resolve $uri against $self->base_uri
+  my $uri = !is_ref($_[0]) ? Mojo::URL->new(shift)
+    : $_[0]->$_isa('Mojo::URL') ? shift : Mojo::URL->new;
+
+  croak 'cannot add a schema with a uri with a fragment' if defined $uri->fragment;
+
+  my $document = shift or croak 'insufficient arguments';
+  croak 'wrong document type' if not $document->$_isa('JSON::Schema::Modern::Document');
 
   if ($document->has_errors) {
     my $result = JSON::Schema::Modern::Result->new(
@@ -246,6 +260,10 @@ sub evaluate_json_string ($self, $json_data, $schema, $config_override = {}) {
 # embedded resources via $id and $anchor keywords within.
 # Returns the internal $state object accumulated during the traversal.
 sub traverse ($self, $schema_reference, $config_override = {}) {
+  my %overrides = %$config_override;
+  delete @overrides{qw(callbacks initial_schema_uri metaschema_uri traversed_schema_path)};
+  croak $_.' not supported as a config override in traverse' foreach keys %overrides;
+
   # Note: the starting position is not guaranteed to be at the root of the $document.
   my $initial_uri = Mojo::URL->new($config_override->{initial_schema_uri} // '');
   my $initial_path = $config_override->{traversed_schema_path} // '';
@@ -329,8 +347,10 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     configs => {},
   };
 
-  exists $config_override->{$_} and die $_.' not supported as a config override'
-    foreach qw(output_format specification_version);
+  # note this is not quite the same list as what we use when defining $state below
+  my %overrides = %$config_override;
+  delete @overrides{qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict callbacks initial_schema_uri effective_base_uri data_path traversed_schema_path _strict_schema_data)};
+  croak $_.' not supported as a config override in evaluate' foreach keys %overrides;
 
   my $valid;
   try {
@@ -354,6 +374,9 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       };
     }
 
+    abort($state, 'EXCEPTION: collect_annotations cannot be used with specification_version draft7')
+      if $config_override->{collect_annotations} and $schema_info->{specification_version} eq 'draft7';
+
     abort($state, 'EXCEPTION: unable to find resource %s', $schema_reference)
       if not $schema_info;
     abort($state, 'EXCEPTION: %s is not a schema', $schema_reference)
@@ -375,6 +398,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       (map {
         my $val = $config_override->{$_} // $self->$_;
         defined $val ? ( $_ => $val ) : ()
+        # note: this is a subset of the allowed overrides defined above
       } qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict)),
     };
 
@@ -404,9 +428,8 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
 
   if ($state->{seen_data_properties}) {
     my @unevaluated_properties = grep !$state->{seen_data_properties}{$_}, keys $state->{seen_data_properties}->%*;
-    $valid &&= !@unevaluated_properties;
     foreach my $property (sort @unevaluated_properties) {
-      ()= E({ %$state, data_path => $property }, 'unknown keyword found in schema: %s',
+      $valid = E({ %$state, data_path => $property }, 'unknown keyword found in schema: %s',
         $property =~ m{/([^/]+)$});
     }
   }
@@ -448,9 +471,11 @@ sub get_document ($self, $uri_reference) {
 }
 
 # defined lower down:
-# sub add_vocabulary { ... }
-# sub add_encoding { ... }
-# sub add_media_type { ... }
+# sub add_media_type ($self, $media_type, $sub) { ... }
+# sub get_media_type ($self, $media_type) { ... }
+# sub add_encoding ($self, $encoding, $sub) { ... }
+# sub get_encoding ($self, $encoding) { ... }
+# sub add_vocabulary ($self, $classname) { ... }
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
@@ -740,6 +765,7 @@ sub _add_resources_unsafe {
 }
 sub _resource_index { $_[0]->{_resource_index}->%* }
 sub _canonical_resources { values(($_[0]->{_resource_index}//{})->%*) }
+sub _resource_pairs { pairs(($_[0]->{_resource_index}//{})->%*) }
 
 around _add_resources => sub {
   my ($orig, $self) = (shift, shift);
@@ -1199,7 +1225,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.590
+version 0.591
 
 =head1 SYNOPSIS
 
@@ -1590,21 +1616,31 @@ For example, to find the resolved targets of all C<$ref> keywords in a schema do
 =head2 add_schema
 
   $js->add_schema($uri => $schema);
-  $js->add_schema($uri => $document);
   $js->add_schema($schema);
-  $js->add_schema($document);
 
-Introduces the (unblessed, nested) Perl data structure or L<JSON::Schema::Modern::Document>
-object, representing a JSON Schema, to the implementation, registering it under the indicated URI if
-provided (and if not, C<''> will be used if no other identifier can be found within).
+Introduces the (unblessed, nested) Perl data structure
+representing a JSON Schema to the implementation, registering it under the indicated URI if
+provided, and all identifiers found within the document will be added as well (C<''> will be used if
+no other identifier can be found within).
 
-You B<MUST> call C<add_schema> for any external resources that a schema may reference via C<$ref>
+You B<MUST> call C<add_schema> or L</add_document> (below) for any external resources that a schema may reference via C<$ref>
 before calling L</evaluate>, other than the standard metaschemas which are loaded from a local cache
 as needed.
 
-Returns C<undef> if the resource could not be found;
-if there were errors in the document, will die with these errors;
+If there were errors in the document, will die with these errors;
 otherwise returns the L<JSON::Schema::Modern::Document> that contains the added schema.
+
+=head2 add_document
+
+  $js->add_document($uri => $document);
+  $js->add_document($document);
+
+Introduces the L<JSON::Schema::Modern::Document> (or subclass)
+object, representing a JSON Schema, to the implementation, registering it under the indicated URI if
+provided (and all known identifiers within the document will be added as well).
+
+If there were errors in the document, will die with these errors;
+otherwise returns the L<JSON::Schema::Modern::Document> object.
 
 =head2 add_format_validation
 

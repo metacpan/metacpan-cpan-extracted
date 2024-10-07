@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action::Function;
-$ExtUtils::Builder::Action::Function::VERSION = '0.012';
+$ExtUtils::Builder::Action::Function::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -14,7 +14,7 @@ sub new {
 	croak 'Attribute function is not defined' if not defined $args{function};
 	$args{fullname} = join '::', $args{module}, $args{function};
 	$args{exports} ||= !!0;
-	$args{arguments} ||= [];
+	$args{arguments} //= [];
 	my $self = $class->SUPER::new(%args);
 	return $self;
 }
@@ -46,7 +46,7 @@ sub execute {
 	require "$filename.pm";
 
 	if (!$args{quiet}) {
-		my $message = $self->{message} || sprintf "%s(%s)", $self->{fullname}, join ", ", $self->arguments;
+		my $message = $self->{message} // sprintf "%s(%s)", $self->{fullname}, join ", ", $self->arguments;
 		print "$message\n";
 	}
 
@@ -68,7 +68,8 @@ sub to_code {
 sub to_command {
 	my ($self, %opts) = @_;
 	my $module = $self->{exports} eq 'explicit' ? "-M$self->{module}=$self->{function}" : "-M$self->{module}";
-	return [ get_perl(%opts), $module, '-e', $self->to_code(skip_loading => 'main') ];
+	my $perl = $opts{perl} // get_perl(%opts);
+	return [ $perl, $module, '-e', $self->to_code(skip_loading => 'main') ];
 }
 
 1;
@@ -87,7 +88,7 @@ ExtUtils::Builder::Action::Function - Actions for perl function calls
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

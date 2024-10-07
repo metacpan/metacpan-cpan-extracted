@@ -1,5 +1,9 @@
 The following logs changes for the CPAN distribution Template-EmbeddedPerl
 
+0.001006  03 October 2024
+          - fixed the javascript_escape helper so that it works with
+            older versions of perl.
+
 0.001005  03 October 2024
           - fixed bad test cases
 

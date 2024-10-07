@@ -62,26 +62,37 @@ sub _cleanup
         printf( "#   before locate_time: %s\n", $date ) if $ENV{DFF_DEBUG};
         $date = $self->_locate_time( $plug , $date );
         printf( "#   before fix_internal_tz: %s\n", $date ) if $ENV{DFF_DEBUG};
-        ( $date , $p ) = $self->_fix_internal_tz( $plug , $date , $p );
+        ( $date , $p ) = $self->_check_internal_tz( $plug , $date , $p );
         printf( "#   finished: %s\n", $date ) if $ENV{DFF_DEBUG};
+    }
+    return ( $date , $p );
+}
+
+sub _check_internal_tz
+{
+    my ( $self , $plug , $date , $p ) = @_;
+    my %tzs = $plug->timezone_map;
+
+    while( my( $orig_tz , $new_tz ) = each ( %tzs ) )
+    {
+        if( $date =~ m{$orig_tz}mxi )
+        {
+            return ($self->_fix_internal_tz( $date , $p , $orig_tz , $new_tz ));
+        }
+        if( exists $p->{time_zone} and $p->{time_zone} eq $orig_tz )
+        {
+            return ($self->_fix_internal_tz( $date , $p , $orig_tz , $new_tz ));
+        }
     }
     return ( $date , $p );
 }
 
 sub _fix_internal_tz
 {
-    my ( $self , $plug , $date , $p ) = @_;
-    my %tzs = $plug->timezone_map;
-    while( my( $orig_tz , $new_tz ) = each ( %tzs ) )
-    {
-        if( $date =~ m{$orig_tz}mxi )
-        {
-            $p->{ time_zone } = $new_tz;
-            $date =~ s{$orig_tz}{}mxi;
-            $date =~ s{\(\)}{}g; # remove empty parens
-            return ( $date , $p );
-        }
-    }
+    my ( $self , $date , $p , $orig_tz , $new_tz ) = @_;
+    $p->{ time_zone } = $new_tz;
+    $date =~ s{$orig_tz}{}mxi;
+    $date =~ s{\(\)}{}g; # remove empty parens
     return ( $date , $p );
 }
 

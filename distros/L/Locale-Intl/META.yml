@@ -1,0 +1,38 @@
+---
+abstract: 'A Web Intl.Locale Class Implementation'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  Test::More: '1.302120'
+  Test::Pod: '1.52'
+  lib: '0.63'
+  open: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-Intl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Locale::Unicode: v0.3.8
+  Locale::Unicode::Data: v1.0.4
+  Want: '0.17'
+  parent: '0'
+  perl: '5.010001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/Locale-Intl/issues
+  repository: https://gitlab.com/jackdeguest/Locale-Intl
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Run me:
+# PERL5LIB="$(pwd)/lib" sh t/env-dot-override-example-synopsis.sh
+
 set -o errexit
 set -o nounset
 

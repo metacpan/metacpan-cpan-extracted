@@ -81,10 +81,10 @@ cmp_result(
 
 
 $js = JSON::Schema::Modern->new(strict => 1);
-$js->add_schema($document);
+$js->add_document($document);
 
 cmp_result(
-  $js->evaluate({ foo => 1 }, $document)->TO_JSON,
+  $js->evaluate({ foo => 1 }, $document->canonical_uri)->TO_JSON,
   {
     valid => false,
     errors => [
@@ -148,6 +148,31 @@ cmp_result(
     ],
   },
   'strict mode only detected one property this time - bloop is evaluated',
+);
+
+
+$schema->{'$schema'} = 'http://json-schema.org/draft-07/schema#';
+
+cmp_result(
+  $js->validate_schema($schema)->TO_JSON,
+  {
+    valid => false,
+    errors => [
+      {
+        instanceLocation => '/properties/foo/barf',
+        keywordLocation => '',
+        absoluteKeywordLocation => 'http://json-schema.org/draft-07/schema',
+        error => 'unknown keyword found in schema: barf',
+      },
+      {
+        instanceLocation => '/properties/foo/bloop',
+        keywordLocation => '',
+        absoluteKeywordLocation => 'http://json-schema.org/draft-07/schema',
+        error => 'unknown keyword found in schema: bloop',
+      },
+    ],
+  },
+  'strict mode detects unknown keywords using draft7',
 );
 
 done_testing;

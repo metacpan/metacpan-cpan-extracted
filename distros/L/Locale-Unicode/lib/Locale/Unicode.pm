@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.3.8
+## Version v0.3.9
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/10/01
+## Modified 2024/10/07
 ## All rights reserved
 ## 
 ## 
@@ -14,12 +14,12 @@
 package Locale::Unicode;
 BEGIN
 {
-    use v5.10;
+    use v5.10.1;
     use strict;
     use warnings;
     use warnings::register;
     use vars qw(
-        $ERROR $VERSION $DEBUG $FATAl_EXCEPTIONS
+        $ERROR $VERSION $DEBUG $FATAL_EXCEPTIONS
         $LOCALE_BCP47_RE $LOCALE_BCP47_NAMELESS_RE $LOCALE_RE $LOCALE_UNICODE_SUBTAG_RE
         $LOCALE_EXTENSIONS_RE $LOCALE_TRANSFORM_PARAMETERS_RE $GRANDFATHERED_IRREGULAR
         $GRANDFATHERED_REGULAR
@@ -407,7 +407,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.3.8';
+    our $VERSION = 'v0.3.9';
 };
 
 use strict;
@@ -436,7 +436,7 @@ sub new
     # u-em
     $self->{emoji}              = undef;
     $self->{extended}           = undef;
-    $self->{fatal}              = ( $FATAl_EXCEPTIONS // 0 );
+    $self->{fatal}              = ( $FATAL_EXCEPTIONS // 0 );
     # u-fw
     $self->{first_day}          = undef;
     $self->{grandfathered_irregular} = undef;
@@ -3911,12 +3911,12 @@ Locale::Unicode - Unicode Locale Identifier compliant with BCP47 and CLDR
         say "Oops: ", $e->message;
     }
 
-Or, you could set the global variable C<$FATAl_EXCEPTIONS> instead:
+Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
     use v5.34;
     use experimental 'try';
     no warnings 'experimental';
-    $Locale::Unicode::FATAl_EXCEPTIONS = 1;
+    local $Locale::Unicode::FATAL_EXCEPTIONS = 1;
     try
     {
         my $locale = Locale::Unicode->new( 'x' );
@@ -3938,7 +3938,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.3.8
+    v0.3.9
 
 =head1 DESCRIPTION
 

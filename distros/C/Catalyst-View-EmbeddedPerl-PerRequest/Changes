@@ -1,5 +1,9 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001006  06 October 2024
+          - Clarify how auto escaping works in the documentation and added a test for it.
+          - updated some dependencies
+
 0.001005  03 October 2024
           - Tweak dependency version
 

@@ -87,7 +87,7 @@ sub compare
     is( $dt->datetime , $wanted , "$given => $wanted" );
     if ( $tz )
     {
-        is( $dt->time_zone->name , $tz , "timezone => $tz" );
+        is( $dt->time_zone->name , $tz , "timezone => $tz ($given)" );
     }
 }
 

@@ -2,7 +2,7 @@ NAME
     Comparer::file_mtime - Compare file's mtime (modification time)
 
 VERSION
-    This document describes version 0.001 of Comparer::file_mtime (from Perl
+    This document describes version 0.002 of Comparer::file_mtime (from Perl
     distribution Comparer-file_mtime), released on 2024-09-19.
 
 SYNOPSIS
@@ -17,11 +17,21 @@ SYNOPSIS
      @sorted = sort { $cmp->($a,$b) } "newest", "old", "new";
      # => ("newest","new","old")
 
+    A real-world usage example (requires CLI sort-by-comparer from
+    App::sort_by_comparer):
+
+     # find directories named '*.git' that are newer than 7 days, and sort them by newest first
+     % find -maxdepth 1 -type d -name '*.git' -mtime -7 | sort-by-comparer file_mtime -r
+
 DESCRIPTION
     This comparer assumes the entries are filenames and will compare their
     modification time.
 
 COMPARER ARGUMENTS
+  follow_symlink
+    Bool, default true. If set to false, will use lstat() function instead
+    of the default stat().
+
   reverse
     Bool.
 
@@ -34,6 +44,10 @@ SOURCE
     <https://github.com/perlancar/perl-Comparer-file_mtime>.
 
 SEE ALSO
+    Sorter::file_mtime
+
+    SortKey::Num::file_by_mtime
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 

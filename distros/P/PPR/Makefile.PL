@@ -8,7 +8,7 @@ WriteMakefile(
     VERSION_FROM        => 'lib/PPR.pm',
     ABSTRACT_FROM       => 'lib/PPR.pm',
     PL_FILES            => {},
-    LICENSE             => 'artistic2',
+    LICENSE             => 'perl',
     MIN_PERL_VERSION    => 5.010,
     PREREQ_PM => {
         'Test::More' => 0,

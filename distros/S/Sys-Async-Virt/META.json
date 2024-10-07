@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Feature::Compat::Try" : "0",
+            "Future" : "0",
             "Future::AsyncAwait" : "0",
             "Future::Queue" : "0",
             "IO::Async::Notifier" : "0",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/ehuelsmann/perl-sys-async-virt"
       }
    },
-   "version" : "v0.0.8",
+   "version" : "v0.0.9",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

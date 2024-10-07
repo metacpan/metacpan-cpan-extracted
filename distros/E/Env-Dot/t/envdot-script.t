@@ -6,7 +6,16 @@ use warnings;
 use Test2::V0;
 
 use Cwd;
-use File::Spec;
+use FindBin    qw( $RealBin );
+use File::Spec ();
+my $lib_path;
+
+BEGIN {
+    $lib_path = File::Spec->catdir( ( $RealBin =~ /(.+)/msx )[0], q{.}, 'lib' );
+}
+use lib "$lib_path";
+
+use Test2::Deny::Platform::DOSOrDerivative;
 
 use Test::Script 1.28;
 
@@ -51,7 +60,9 @@ EOF
 subtest 'Script runs ENVDOT_FILEPATHS=path' => sub {
     my $path = File::Spec->rel2abs( File::Spec->catfile( File::Spec->curdir(), 't', 'envdot-script-first.env' ) );
 
-    local %ENV = ( ENVDOT_FILEPATHS => $path );
+    local %ENV = ( %ENV, ENVDOT_FILEPATHS => $path );
+
+    # for my $e (keys %ENV) { warn "$e: $ENV{$e}\n"; }
     script_runs( [ 'script/envdot', ] );
     script_runs( [ 'script/envdot', ], { interpreter_options => ['-T'], }, 'Runs with taint check enabled' );
 

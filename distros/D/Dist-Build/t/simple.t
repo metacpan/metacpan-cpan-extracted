@@ -32,7 +32,9 @@ $dist->add_file('planner/shared.pl', undent(<<'	---'));
 	dist_sharedir('share', 'Foo-Bar');
 	module_sharedir('module-share/Foo-Bar', 'Foo::Bar');
 	---
-$dist->add_file('dynamic-prereqs.json', undent(<<"	---"));
+$dist->add_file('planner/dynamic.pl', undent(<<'	---'));
+	load_module("Dist::Build::DynamicPrereqs");
+	evaluate_dynamic_prereqs();
 	---
 
 my $has_compiler = can_compile_loadable_object(quiet => 1);

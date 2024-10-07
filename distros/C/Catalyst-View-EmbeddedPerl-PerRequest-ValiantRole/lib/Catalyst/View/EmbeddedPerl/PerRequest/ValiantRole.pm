@@ -4,7 +4,7 @@ use Moose::Role;
 use Valiant::HTML::Util::Form;
 use Valiant::HTML::Util::Pager;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001004';
 eval $VERSION;
 
 # https://metacpan.org/pod/Valiant::HTML::Util::TagBuilder

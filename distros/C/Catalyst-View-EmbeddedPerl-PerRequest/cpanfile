@@ -1,4 +1,4 @@
-requires 'Template::EmbeddedPerl', '0.001005';
+requires 'Template::EmbeddedPerl', '0.001006';
 requires 'Catalyst', '5.90090';
 requires 'Moose';
 requires 'String::CamelCase';

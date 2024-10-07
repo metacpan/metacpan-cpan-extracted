@@ -10,6 +10,7 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::Fatal;
 use Test::Deep::UnorderedPairs;
+use Test::Warnings qw(warnings :no_end_test had_no_warnings);
 use List::Util 'unpairs';
 use lib 't/lib';
 use Helper;
@@ -27,8 +28,9 @@ subtest 'evaluate a document' => sub {
     });
 
   my $js = JSON::Schema::Modern->new;
+  $js->add_document($document);
   cmp_result(
-    $js->evaluate(1, $document)->TO_JSON,
+    $js->evaluate(1, $document->canonical_uri)->TO_JSON,
     {
       valid => false,
       errors => my $errors = [
@@ -65,7 +67,7 @@ subtest 'evaluate a document' => sub {
   );
 
   cmp_result(
-    $js->evaluate(1, $document)->TO_JSON,
+    $js->evaluate(1, $document->canonical_uri)->TO_JSON,
     {
       valid => false,
       errors => $errors,
@@ -197,31 +199,6 @@ subtest 'evaluate a uri' => sub {
 
 subtest 'add a uri resource' => sub {
   my $js = JSON::Schema::Modern->new;
-  cmp_result(
-    $js->add_schema(METASCHEMA),
-    all(
-      isa('JSON::Schema::Modern::Document'),
-      listmethods(
-        resource_index => [
-          (METASCHEMA) => {
-            path => '',
-            canonical_uri => str(METASCHEMA),
-            specification_version => 'draft2019-09',
-            vocabularies => $vocabularies{'draft2019-09'},
-            configs => {},
-          },
-        ],
-        canonical_uri => [ str(METASCHEMA) ],
-      ),
-    ),
-    'added the metaschema by uri',
-  );
-
-  is(
-    $js->add_schema('http://httpbin.org/status/404'),
-    undef,
-    'attempt to add a resource that does not exist',
-  );
 
   cmp_result(
     my $get_metaschema = scalar $js->get(METASCHEMA),
@@ -328,9 +305,29 @@ subtest 'add a schema associated with a uri' => sub {
   );
 
   cmp_result(
-    $js->add_schema('https://bloop.com', $document),
+    $js->add_document('https://bloop.com', $document),
     shallow($document),
     'can add the same document and associate it with another schema',
+  );
+
+  my @warnings = warnings {
+    cmp_result(
+      $js->add_schema('https://bloop.com', $document),
+      shallow($document),
+      'can add the same document twice, using deprecated interface',
+    );
+  };
+
+  cmp_result(
+    \@warnings,
+    [ re(qr/use of deprecated form of add_schema with document/) ],
+    'warned when using deprecated form of add_schema',
+  );
+
+  cmp_result(
+    $js->add_document($document),
+    shallow($document),
+    'can add the same document again with the proper interface',
   );
 
   cmp_result(
@@ -353,7 +350,7 @@ subtest 'add a document without associating it with a uri' => sub {
   my $js = JSON::Schema::Modern->new;
 
   cmp_result(
-    $js->add_schema(
+    $js->add_document(
       my $document = JSON::Schema::Modern::Document->new(
         schema => { '$id' => 'https://bar.com', allOf => [ false, true ] },
       )),
@@ -589,7 +586,7 @@ subtest 'register a document against multiple uris; do not allow duplicate uris'
         },
       },
     });
-  $js->add_schema($document);
+  $js->add_document($document);
 
   cmp_result(
     { $js->_resource_index },
@@ -614,7 +611,7 @@ subtest 'register a document against multiple uris; do not allow duplicate uris'
     'resource index from the document is copied to the main object',
   );
 
-  $js->add_schema('https://uri2.com', $document);
+  $js->add_document('https://uri2.com', $document);
 
   cmp_result(
     { $js->_resource_index },
@@ -830,7 +827,7 @@ subtest 'document with no canonical URI, but assigned a URI through add_schema' 
   # start over with a new evaluator...
   $js = JSON::Schema::Modern->new;
 
-  $js->add_schema(
+  $js->add_document(
     'https://localhost:1234/mydef.json',
     JSON::Schema::Modern::Document->new(schema => {
       '$id' => 'https://otherhost.com/mydef.json',
@@ -863,4 +860,5 @@ subtest 'document with no canonical URI, but assigned a URI through add_schema' 
   );
 };
 
+had_no_warnings if $ENV{AUTHOR_TESTING};
 done_testing;
