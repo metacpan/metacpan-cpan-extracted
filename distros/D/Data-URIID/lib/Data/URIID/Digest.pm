@@ -14,7 +14,7 @@ use parent qw(Digest::base);
 
 use Carp;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 
 # Private constructor:
@@ -62,7 +62,7 @@ Data::URIID::Digest - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

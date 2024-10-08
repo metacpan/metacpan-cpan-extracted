@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/greple-stiripe/actions/workflows/test.yml/badge.svg)](https://github.com/kaz-utashiro/greple-stiripe/actions)
+[![Actions Status](https://github.com/kaz-utashiro/greple-stripe/actions/workflows/test.yml/badge.svg)](https://github.com/kaz-utashiro/greple-stripe/actions)
 # NAME
 
 App::Greple::stripe - Greple zebra stripe module
@@ -9,12 +9,12 @@ App::Greple::stripe - Greple zebra stripe module
 
 # VERSION
 
-Version 0.99
+Version 0.9903
 
 # DESCRIPTION
 
-App::Greple::stripe is a module for **greple** to show matched text
-in zebra striping fashion.
+[App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe) is a module for [greple](https://metacpan.org/pod/App%3A%3AGreple) to show
+matched text in zebra striping fashion.
 
 The following command matches two consecutive lines.
 
@@ -63,8 +63,9 @@ are specified, only lines matching all patterns will be output, so the
     </p>
 </div>
 
-If you want to use three series with three patterns, specify `step`
-when calling the module.
+If you want to use different color series for three or more patterns,
+specify `step` count when calling the module.  The number of series
+can be increased up to 6.
 
     greple -Mstripe::set=step=3 --need=1 -E p1 -E p2 -E p3 ...
 
@@ -86,10 +87,39 @@ The following two commands have exactly the same effect.
 
     greple -Mstripe --step=3 --
 
-- **-Mstep::set**=**step**=_n_
+- **-Mstripe::set**=**step**=_n_
 - **--step**=_n_
 
     Set the step count to _n_.
+
+- **-Mstripe::set**=**darkmode**
+- **--darkmode**
+
+    Use dark background colors.
+
+    <div>
+            <p>
+            <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/darkmode.png">
+            </p>
+    </div>
+
+    Use `--face` option to set foreground color for all colormap.  The
+    following command sets the foreground color to white and fills the
+    entire line with the background color.
+
+        greple -Mstripe --darkmode -- --face +WE
+
+    <div>
+            <p>
+            <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/dark-white.png">
+            </p>
+    </div>
+
+# SEE ALSO
+
+[App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 # AUTHOR
 

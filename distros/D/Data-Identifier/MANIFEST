@@ -10,4 +10,6 @@ cpanfile
 dist.ini
 lib/Data/Identifier.pm
 t/01_load.t
+t/02_uuid.t
+t/10_mixandmatch.t
 xt/author/pod-syntax.t

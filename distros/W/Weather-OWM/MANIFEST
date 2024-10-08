@@ -1,0 +1,15 @@
+Changes
+lib/Weather/OWM.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/simple.t
+t/error.t
+xt/author/manifest.t
+xt/author/pod.t
+xt/author/pod-coverage.t
+xt/author/critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

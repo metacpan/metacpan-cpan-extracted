@@ -1,5 +1,5 @@
 package KelpX::Controller::Context;
-$KelpX::Controller::Context::VERSION = '1.01';
+$KelpX::Controller::Context::VERSION = '1.02';
 use Kelp::Base 'Kelp::Context';
 
 attr persistent_controllers => !!1;

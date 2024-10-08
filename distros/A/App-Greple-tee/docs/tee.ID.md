@@ -8,7 +8,7 @@ App::Greple::tee - modul untuk mengganti teks yang cocok dengan hasil perintah e
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -48,6 +48,28 @@ Baris data input dan output tidak harus identik ketika digunakan dengan opsi **-
 
     Gabungkan urutan baris yang tidak kosong menjadi satu baris sebelum meneruskannya ke perintah filter. Karakter baris baru di antara karakter lebar akan dihapus, dan karakter baris baru lainnya diganti dengan spasi.
 
+- **--squeeze**
+
+    Menggabungkan dua atau lebih karakter baris baru yang berurutan menjadi satu.
+
+- **-Mline** **--offload** _command_
+
+    Opsi **--offload** [teip(1)](http://man.he.net/man1/teip) diimplementasikan dalam modul **-Mline** yang berbeda.
+
+        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+
+    Anda juga dapat menggunakan modul **line** untuk memproses hanya baris bernomor genap sebagai berikut.
+
+        greple -Mtee cat -n -- -Mline 2::2
+
+# LEGACIES
+
+Opsi **--blok** tidak lagi diperlukan karena opsi **--stretch** (**-S**) telah diimplementasikan di **greple**. Anda cukup melakukan hal berikut.
+
+    greple -Mtee cat -n -- --all -SE foo
+
+Tidak disarankan untuk menggunakan **--blok** karena mungkin tidak digunakan lagi di masa mendatang.
+
 - **--blocks**
 
     Biasanya, area yang cocok dengan pola pencarian yang ditentukan dikirim ke perintah eksternal. Jika opsi ini ditentukan, bukan area yang cocok tetapi seluruh blok yang berisi area tersebut yang akan diproses.
@@ -64,10 +86,6 @@ Baris data input dan output tidak harus identik ketika digunakan dengan opsi **-
 
     Jangan gunakan **--blok** dengan opsi **--all**, karena blok akan menjadi seluruh data.
 
-- **--squeeze**
-
-    Menggabungkan dua atau lebih karakter baris baru yang berurutan menjadi satu.
-
 # WHY DO NOT USE TEIP
 
 Pertama-tama, kapanpun Anda dapat melakukannya dengan perintah **teip**, gunakanlah. Ini adalah alat yang sangat baik dan jauh lebih cepat daripada **greple**.
@@ -80,7 +98,7 @@ Selain itu, **teip** tidak dapat menangani beberapa baris data sebagai satu kesa
 
 Perintah berikutnya akan menemukan blok teks di dalam dokumen gaya [perlpod(1)](http://man.he.net/man1/perlpod) yang disertakan dalam file modul Perl.
 
-    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^(\w.+\n)+' tee.pm
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^([\w\pP].+\n)+' tee.pm
 
 Anda dapat menerjemahkannya melalui layanan DeepL dengan menjalankan perintah di atas yang diyakinkan dengan modul **-Mtee** yang memanggil perintah **deepl** seperti ini:
 

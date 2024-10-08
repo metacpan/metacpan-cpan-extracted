@@ -1,5 +1,16 @@
 Revision history for Kelp
 
+2.18 - 2024-10-08
+            [New Interface]
+            - Added after_unrendered hook to Kelp
+            - Added order attribute and compare method to routes
+
+            [Changes]
+            - Fixed bridge without trailing slash being used for longer routes on the same level
+                * bridge /admin will now work for /admin and /admin/x, but not for /admins
+            - Hooks are now run conditionally on controller objects and fall back to main app object
+            - Module should now report errors with more useful locations
+
 2.17 - 2024-07-06
             [Changes]
             - Fixed psgi routes not working with custom controllers

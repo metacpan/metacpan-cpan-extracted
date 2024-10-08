@@ -308,4 +308,99 @@ subtest "Verbatim syntax autodetect" => sub {
    }
 };
 
+subtest "Table" => sub {
+   my @p = App::sdview::Parser::Pod->new->parse_string( <<"EOPOD" );
+=begin table md
+
+| Heading | Here |
+|---------|------|
+|Data in  |Columns|
+
+=end table
+
+=begin table md
+
+| Left | Centre | Right |
+| :--- |  :---: |  ---: |
+
+=end table
+
+=begin table md
+
+Bold | B<123>
+Italic | I<456>
+
+=end table
+
+=begin table mediawiki
+
+! A1
+! A2
+|-
+| B1
+| B2
+|-
+| C1 || C2
+
+=end table
+
+EOPOD
+
+   is( scalar @p, 4, 'Received 4 paragraphs' );
+
+   is( $p[0]->type, "table", 'p[0] type' );
+
+   my @rows = $p[0]->rows;
+
+   is( scalar @rows, 2, 'table contains 2 rows' );
+
+   my @cells = $rows[0]->@*;
+
+   is( $cells[0]->type,  "table-cell", 'cells[0][0] type' );
+   is( $cells[0]->text,  "Heading",    'cells[0][0] text' );
+   is( $cells[0]->align, "left",       'cells[0][0] align' );
+   ok( $cells[0]->heading,             'cells[0][0] heading' );
+
+   is( $cells[1]->type, "table-cell", 'cells[0][1] type' );
+   is( $cells[1]->text, "Here",       'cells[0][1] text' );
+
+   @cells = $rows[1]->@*;
+
+   is( $cells[0]->type, "table-cell", 'cells[1][0] type' );
+   is( $cells[0]->text, "Data in",    'cells[1][0] text' );
+   ok( !$cells[0]->heading,           'cells[1][0] heading' );
+
+   is( $cells[1]->type, "table-cell", 'cells[1][1] type' );
+   is( $cells[1]->text, "Columns",    'cells[1][1] text' );
+
+   @rows = $p[1]->rows;
+   @cells = $rows[0]->@*;
+
+   is( $cells[0]->text,  "Left",   'col[0] text' );
+   is( $cells[0]->align, "left",   'col[0] align' );
+   is( $cells[1]->text,  "Centre", 'col[1] text' );
+   is( $cells[1]->align, "centre", 'col[1] align' );
+   is( $cells[2]->text,  "Right",  'col[2] text' );
+   is( $cells[2]->align, "right",  'col[2] align' );
+
+   @rows = $p[2]->rows;
+   my @col1 = map { $_->[1] } @rows;
+
+   is( $col1[0]->text,  "123",                     'col1[0] text' );
+   is( [ $col1[0]->text->tagnames ], [qw( bold )], 'col1[0] text tags' );
+   ok( !$col1[0]->heading,                         'col1[0] heading' );
+   is( $col1[1]->text,  "456",                       'col1[1] text' );
+   is( [ $col1[1]->text->tagnames ], [qw( italic )], 'col1[1] text tags' );
+
+   @rows = $p[3]->rows;
+   is( $rows[0][0]->text, "A1", 'mediawiki cell A1' );
+   ok( $rows[0][0]->heading,    'mediawiki cell A1 is heading' );
+   is( $rows[0][1]->text, "A2", 'mediawiki cell A2' );
+   ok( $rows[0][1]->heading,    'mediawiki cell A2 is heading' );
+   is( $rows[1][0]->text, "B1", 'mediawiki cell B1' );
+   is( $rows[1][1]->text, "B2", 'mediawiki cell B2' );
+   is( $rows[2][0]->text, "C1", 'mediawiki cell C1' );
+   is( $rows[2][1]->text, "C2", 'mediawiki cell C2' );
+};
+
 done_testing;

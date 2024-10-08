@@ -9,10 +9,12 @@ use Test2::V0;
 use App::sdview::Parser::Pod;
 use App::sdview::Output::Pod;
 
+my $table_style;
+
 sub dotest ( $name, $in_pod )
 {
    my @p = App::sdview::Parser::Pod->new->parse_string( $in_pod );
-   my $output = App::sdview::Output::Pod->new;
+   my $output = App::sdview::Output::Pod->new( table_style => $table_style );
    my $out_pod = $output->generate( @p );
 
    is( $out_pod, $in_pod, "Generated Pod for $name" );
@@ -114,6 +116,32 @@ The third item
 Has two paragraphs
 
 =back
+EOPOD
+
+$table_style = "md";
+dotest "Table (md)", <<"EOPOD";
+=begin table md
+
+A | B | C
+--- | --- | ---
+D | E | F
+
+=end table
+EOPOD
+
+$table_style = "mediawiki";
+dotest "Table (mediawiki)", <<"EOPOD";
+=begin table mediawiki
+
+! A
+! B
+! C
+|-
+| D
+| E
+| F
+
+=end table
 EOPOD
 
 done_testing;

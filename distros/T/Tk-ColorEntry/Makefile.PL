@@ -8,7 +8,6 @@ my $ld = '$(INST_LIBDIR)';
 WriteMakefile(
 	NAME => "Tk::$pm",
 	PREREQ_PM => {
-		'Convert::Color' => '0.14',
 		'Imager' => '1.019',
 		'Imager::Screenshot' => '0.014',
 		'Test::Tk' => '3.03',

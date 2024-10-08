@@ -9,7 +9,7 @@
 
 package Data::Identifier;
 
-use v5.10;
+use v5.14;
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ use Carp;
 use Math::BigInt;
 use URI;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -83,8 +83,26 @@ $_->register foreach values %well_known;
         # Unassigned: 7
         'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1'  =>   8, # language-tag-identifier
         WK_WD()                                 =>   9,
+        '923b43ae-a50e-4db3-8655-ed931d0dd6d4'  =>  10, # specialises
+        'eacbf914-52cf-4192-a42c-8ecd27c85ee1'  =>  11, # unicode-string
+        '928d02b0-7143-4ec9-b5ac-9554f02d3fb1'  =>  12, # integer
+        'dea3782c-6bcb-4ce9-8a39-f8dab399d75d'  =>  13, # unsigned-integer
+        # Unassigned: 14, 15
+        '6ba648c2-3657-47c2-8541-9b73c3a9b2b4'  =>  16, # default-context
+        '52a516d0-25d8-47c7-a6ba-80983e576c54'  =>  17, # proto-file
+        '1cd4a6c6-0d7c-48d1-81e7-4e8d41fdb45d'  =>  18, # final-file-size
+        '6085f87e-4797-4bb2-b23d-85ff7edc1da0'  =>  19, # text-fragment
+        '4c9656eb-c130-42b7-9348-a1fee3f42050'  =>  20, # also-list-contains-also
+        '298ef373-9731-491d-824d-b2836250e865'  =>  21, # proto-message
+        '7be4d8c7-6a75-44cc-94f7-c87433307b26'  =>  22, # proto-entity
+        '65bb36f2-b558-48af-8512-bca9150cca85'  =>  23, # proxy-type
+        'a1c478b5-0a85-4b5b-96da-d250db14a67c'  =>  24, # flagged-as
+        '59cfe520-ba32-48cc-b654-74f7a05779db'  =>  25, # marked-as
         '2bffc55d-7380-454e-bd53-c5acd525d692'  =>  26, # roaraudio-error-number
         WK_SID()                                =>  27,
+        # Unassigned: 28, 29, 30, 31
+        '448c50a8-c847-4bc7-856e-0db5fea8f23b'  =>  32, # final-file-encoding
+        '79385945-0963-44aa-880a-bca4a42e9002'  =>  33, # final-file-hash
         '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 112, # chat-0-word-identifier
         WK_GTIN()                               => 160,
     );
@@ -121,7 +139,23 @@ foreach my $ise (NS_WD) {
         'bfae7574-3dae-425d-89b1-9c087c140c23'  => 'tagname',
         '7f265548-81dc-4280-9550-1bd0aa4bf748'  => 'has-type',
         'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1'  => 'language-tag-identifier',
+        '923b43ae-a50e-4db3-8655-ed931d0dd6d4'  => 'specialises',
+        'eacbf914-52cf-4192-a42c-8ecd27c85ee1'  => 'unicode-string',
+        '928d02b0-7143-4ec9-b5ac-9554f02d3fb1'  => 'integer',
+        'dea3782c-6bcb-4ce9-8a39-f8dab399d75d'  => 'unsigned-integer',
+        '6ba648c2-3657-47c2-8541-9b73c3a9b2b4'  => 'default-context',
+        '52a516d0-25d8-47c7-a6ba-80983e576c54'  => 'proto-file',
+        '1cd4a6c6-0d7c-48d1-81e7-4e8d41fdb45d'  => 'final-file-size',
+        '6085f87e-4797-4bb2-b23d-85ff7edc1da0'  => 'text-fragment',
+        '4c9656eb-c130-42b7-9348-a1fee3f42050'  => 'also-list-contains-also',
+        '298ef373-9731-491d-824d-b2836250e865'  => 'proto-message',
+        '7be4d8c7-6a75-44cc-94f7-c87433307b26'  => 'proto-entity',
+        '65bb36f2-b558-48af-8512-bca9150cca85'  => 'proxy-type',
+        'a1c478b5-0a85-4b5b-96da-d250db14a67c'  => 'flagged-as',
+        '59cfe520-ba32-48cc-b654-74f7a05779db'  => 'marked-as',
         '2bffc55d-7380-454e-bd53-c5acd525d692'  => 'roaraudio-error-number',
+        '448c50a8-c847-4bc7-856e-0db5fea8f23b'  => 'final-file-encoding',
+        '79385945-0963-44aa-880a-bca4a42e9002'  => 'final-file-hash',
         '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 'chat-0-word-identifier',
 
         '5f167223-cc9c-4b2f-9928-9fe1b253b560'  => 'unicode-code-point',
@@ -269,76 +303,98 @@ sub id {
 
 
 sub uuid {
-    my ($self) = @_;
-    return $self->{id_cache}{WK_UUID()} if defined($self->{id_cache}) && defined($self->{id_cache}{WK_UUID()});
+    my ($self, %opts) = @_;
+
+    return $self->{id_cache}{WK_UUID()} if !$opts{no_defaults} && defined($self->{id_cache}) && defined($self->{id_cache}{WK_UUID()});
+
     if ($self->{type} == $well_known_uuid) {
         return $self->{id};
     }
 
-    # Try to generate a UUID and recheck cache:
-    $self->_generate;
-    return $self->{id_cache}{WK_UUID()} if defined($self->{id_cache}) && defined($self->{id_cache}{WK_UUID()});
+    unless ($opts{no_defaults}) {
+        # Try to generate a UUID and recheck cache:
+        $self->_generate;
+        return $self->{id_cache}{WK_UUID()} if defined($self->{id_cache}) && defined($self->{id_cache}{WK_UUID()});
+    }
 
+    return $opts{default} if exists $opts{default};
     croak 'Identifier has no valid UUID';
 }
 
 sub oid {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
     my $type = $well_known{oid};
-    return $self->{id_cache}{$type->ise} if defined($self->{id_cache}) && defined($self->{id_cache}{$type->ise});
+
+    return $self->{id_cache}{$type->ise} if !$opts{no_defaults} && defined($self->{id_cache}) && defined($self->{id_cache}{$type->ise});
+
     if ($self->{type} == $type) {
         return $self->{id};
     }
 
-    if (defined(my $uuid = eval {$self->uuid})) {
-        return $self->{id_cache}{$type->ise} = sprintf('2.25.%s', Math::BigInt->new('0x'.$uuid =~ tr/-//dr));
+    unless ($opts{no_defaults}) {
+        if (defined(my $uuid = eval {$self->uuid})) {
+            return $self->{id_cache}{$type->ise} = sprintf('2.25.%s', Math::BigInt->new('0x'.$uuid =~ tr/-//dr));
+        }
     }
 
+    return $opts{default} if exists $opts{default};
     croak 'Identifier has no valid OID';
 }
 
 sub uri {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
     my $type = $well_known{uri};
-    return $self->{id_cache}{$type->ise} if defined($self->{id_cache}) && defined($self->{id_cache}{$type->ise});
+
+    return $self->{id_cache}{$type->ise} if !$opts{no_defaults} && defined($self->{id_cache}) && defined($self->{id_cache}{$type->ise});
+
     if ($self->{type} == $type) {
         return $self->{id};
     }
 
-    if ($self->{type} == $well_known{wd}) {
-        return $self->{id_cache}{$type->ise} = sprintf('http://www.wikidata.org/entity/%s', $self->{id});
-    } elsif ($self->{type} == $well_known{doi}) {
-        return $self->{id_cache}{$type->ise} = sprintf('https://doi.org/%s', $self->{id});
-    } elsif (defined(my $uuid = eval {$self->uuid})) {
-        return $self->{id_cache}{$type->ise} = sprintf('urn:uuid:%s', $uuid);
-    } elsif (defined(my $oid = eval {$self->oid})) {
-        return $self->{id_cache}{$type->ise} = sprintf('urn:oid:%s', $oid);
-    } else {
-        my $u = URI->new("https://uriid.org/");
-        my $type_uuid = $self->{type}->uuid;
-        $u->path_segments('', $uuid_to_uriid_org{$type_uuid} // $type_uuid, $self->{id});
-        return $self->{id_cache}{$type->ise} = $u;
+    unless ($opts{no_defaults}) {
+        if ($self->{type} == $well_known{wd}) {
+            return $self->{id_cache}{$type->ise} = sprintf('http://www.wikidata.org/entity/%s', $self->{id});
+        } elsif ($self->{type} == $well_known{doi}) {
+            return $self->{id_cache}{$type->ise} = sprintf('https://doi.org/%s', $self->{id});
+        } elsif (defined(my $uuid = eval {$self->uuid})) {
+            return $self->{id_cache}{$type->ise} = sprintf('urn:uuid:%s', $uuid);
+        } elsif (defined(my $oid = eval {$self->oid})) {
+            return $self->{id_cache}{$type->ise} = sprintf('urn:oid:%s', $oid);
+        } else {
+            my $u = URI->new("https://uriid.org/");
+            my $type_uuid = $self->{type}->uuid;
+            $u->path_segments('', $uuid_to_uriid_org{$type_uuid} // $type_uuid, $self->{id});
+            return $self->{id_cache}{$type->ise} = $u;
+        }
     }
 
+    return $opts{default} if exists $opts{default};
     croak 'Identifier has no valid URI';
 }
 
 sub sid {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
     my $type = $well_known{sid};
     return $self->{id_cache}{$type->ise} if defined($self->{id_cache}) && defined($self->{id_cache}{$type->ise});
     if ($self->{type} == $type) {
         return $self->{id};
     }
 
+    return $opts{default} if exists $opts{default};
     croak 'Identifier has no valid SID';
 }
 
 
 
 sub ise {
-    my ($self) = @_;
-    return eval {$self->uuid} // eval {$self->oid} // $self->uri;
+    my ($self, %opts) = @_;
+    my $have_default = exists $opts{default};
+    my $default = delete $opts{default};
+    my $value = eval {$self->uuid(%opts)} // eval {$self->oid(%opts)} // eval { $self->uri(%opts); };
+
+    return $value if defined $value;
+    return $default if $have_default;
+    croak 'Identifier has no valid ISE';
 }
 
 
@@ -355,7 +411,7 @@ sub register {
     foreach my $type_name (qw(uuid oid uri sid)) {
         my $f = $self->can($type_name) || next;
         my $v = eval {$self->$f()} // next;
-         $registered{$well_known{$type_name}->uuid}{$v} = $self;
+        $registered{$well_known{$type_name}->uuid}{$v} = $self;
     }
 }
 
@@ -369,7 +425,7 @@ sub userdata {
 
 
 sub displayname {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
 
     if (defined(my $displayname = $self->{displayname})) {
         $displayname = $self->$displayname() if ref $displayname;
@@ -378,13 +434,15 @@ sub displayname {
         return $displayname if defined($displayname) && length($displayname);
     }
 
-    return $self->id.''; # force stringification.
+    return $self->id.'' unless $opts{no_defaults}; # force stringification.
+    return $opts{default} if exists $opts{default};
+    croak 'No value for displayname';
 }
 
 
-sub displaycolour { return undef; }
-sub icontext { return undef; }
-sub description { return undef; }
+sub displaycolour { my ($self, %opts) = @_; return $opts{default}; }
+sub icontext { my ($self, %opts) = @_; return $opts{default}; }
+sub description { my ($self, %opts) = @_; return $opts{default}; }
 
 # Private helpers:
 
@@ -435,7 +493,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -559,18 +617,36 @@ Returns the raw id of the identifier.
 
 =head2 uuid, oid, uri, sid
 
-    my $uuid = $identifier->uuid;
-    my $oid  = $identifier->oid;
-    my $uri  = $identifier->uri;
-    my $sid  = $identifier->sid;
+    my $uuid = $identifier->uuid( [ %opts ] );
+    my $oid  = $identifier->oid( [ %opts ] );
+    my $uri  = $identifier->uri( [ %opts ] );
+    my $sid  = $identifier->sid( [ %opts ] );
 
 Return the UUID, OID, URI, or SID (small-identifier) of the current identifier or die if no identifier of that type is known nor can be calculated.
 
+The following options (all optional) are supported:
+
+=over
+
+=item C<default>
+
+The default value to return if no other value is available.
+This can be set to C<undef> to change the method from C<die>ing in failture to returning C<undef>.
+
+=item C<no_defaults>
+
+If set true do not try to generate a matching identifier.
+Note: This does not apply to C<sid()> as small-identifiers cannot be generated. For C<sid()> the option is ignored.
+
+=back
+
 =head2 ise
 
-    my $ise = $identifier->ise;
+    my $ise = $identifier->ise( [ %opts ] );
 
 Returns the ISE (UUID, OID, or URI) for the current identifier or die if no ISE is known nor can be calculated.
+
+Supports all options also supported by L</uuid>, L</oid>, and L</uri>.
 
 =head2 namespace
 
@@ -602,18 +678,49 @@ The meaning of C<$key>, and C<$value> is up to C<__PACKAGE__>.
 
 =head2 displayname
 
-    my $displayname = $identifier->displayname;
+    my $displayname = $identifier->displayname( [ %opts ] );
 
 Returns a display name suitable to display to the user. This function always returns a string.
 This is mostly for compatibility with L<Data::TagDB::Tag>.
 
+The following options (all optional) are supported:
+
+=over
+
+=item C<default>
+
+The default value to return if no other value is available.
+This can be set to C<undef> to let this method return undef (not die).
+
+=item C<no_defaults>
+
+If set true do not try to use any identifier or other fallback as displayname.
+
+=back
+
 =head2 displaycolour, icontext, description
 
-    my $displaycolour = $identifier->displaycolour;
-    my $icontext      = $identifier->icontext;
-    my $description   = $identifier->description;
+    my $displaycolour = $identifier->displaycolour( [ %opts ] );
+    my $icontext      = $identifier->icontext( [ %opts ] );
+    my $description   = $identifier->description( [ %opts ] );
 
 These functions always return C<undef>. They are for compatibility with L<Data::TagDB::Tag>.
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<default>
+
+The default value to return if no other value is available (which is always the case).
+This is for compatibility with L</displayname> and implementations of other packages.
+
+=item C<no_defaults>
+
+This option is accepted but ignored.
+This is for compatibility with L</displayname> and implementations of other packages.
+
+=back
 
 =head1 AUTHOR
 

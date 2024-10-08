@@ -17,9 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "KelpX::Controller",
   "PREREQ_PM" => {
-    "Kelp" => "2.16"
+    "Kelp" => "2.18"
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Kelp" => "2.16"
+  "Kelp" => "2.18"
 );
 
 

@@ -1,5 +1,8 @@
 Revision history for Net-ASN
 
+1.08	03/10/24 12:40
+	CPAN RT#155918 - Fix POD (Petr Písař)
+
 1.07	09/11/16 00:08
 	Add ability to detect ASNs reserved for private use (Kevin Phair)
 	Replace limits with constants

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 use 5.020;
 use Moo;
@@ -346,7 +346,6 @@ sub _traverse_schema ($self, $schema, $state) {
   return if not is_plain_hashref($schema) or not keys %$schema;
 
   my $subschema_state = $self->evaluator->traverse($schema, {
-    %$state,  # so we don't have to enumerate everything that may be in config_override
     initial_schema_uri => canonical_uri($state),
     traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path},
     metaschema_uri => $self->json_schema_dialect,
@@ -386,7 +385,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.069
+version 0.070
 
 =head1 SYNOPSIS
 

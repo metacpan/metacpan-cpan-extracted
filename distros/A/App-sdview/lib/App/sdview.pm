@@ -9,8 +9,10 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview 0.18;
+package App::sdview 0.19;
 class App::sdview :strict(params);
+
+use Sublike::Extended;
 
 use App::sdview::Style;
 use App::sdview::Highlighter;
@@ -64,15 +66,22 @@ our $DEFAULT_OUTPUT = "terminal";
 use Module::Pluggable
    search_path => "App::sdview::Parser",
    sub_name    => "PARSERS",
+   inner       => 0,
    require     => 1;
 
 use Module::Pluggable
    search_path => "App::sdview::Output",
    sub_name    => "OUTPUTS",
+   inner       => 0,
    require     => 1;
 
-method run ( $file, %opts )
-{
+extended method run ( $file,
+   :$format = undef,
+   :$output //= $DEFAULT_OUTPUT,
+   :$highlight = 0,
+   :$output_options //= [],
+   %opts
+) {
    if( -f( my $configpath = "$ENV{HOME}/.sdviewrc" ) ) {
       App::sdview::Style->load_config( $configpath );
    }
@@ -82,13 +91,17 @@ method run ( $file, %opts )
 
    my %output_options = map {
       map { m/^(.*?)=(.*)$/ ? ( $1 => $2 ) : ( $_ => !!1 ) } split m/,/, $_;
-   } $opts{output_options}->@*;
+   } $output_options->@*;
 
    my $parser_class;
 
-   if( defined $opts{format} ) {
-      $parser_class = first { $_->can( "format" ) and $_->format eq $opts{format} } @PARSER_CLASSES or
-         die "Unrecognised format name $opts{format}\n";
+   if( defined $format ) {
+      $parser_class = first { $_->can( "format" ) and $_->format eq $format } @PARSER_CLASSES or
+         die "Unrecognised format name $format\n";
+   }
+
+   if( !defined $file ) {
+      die "Require a FILE to read - such as doc.md or doc.pod\n";
    }
 
    if( ! -f $file ) {
@@ -108,14 +121,12 @@ method run ( $file, %opts )
          die "Unable to find a handler for $file\n";
    };
 
-   $opts{output} //= $DEFAULT_OUTPUT;
-
-   my $output_class = first { $_->can( "format" ) and $_->format eq $opts{output} } @OUTPUT_CLASSES or
-      die "Unrecognised output name $opts{output}\n";
+   my $output_class = first { $_->can( "format" ) and $_->format eq $output } @OUTPUT_CLASSES or
+      die "Unrecognised output name $output\n";
 
    my @paragraphs = $parser_class->new->parse_file( $file );
 
-   if( $opts{highlight} ) {
+   if( $highlight ) {
       apply_highlights( $_ ) for @paragraphs;
    }
 

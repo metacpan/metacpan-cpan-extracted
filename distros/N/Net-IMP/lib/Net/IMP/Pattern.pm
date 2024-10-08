@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 package Net::IMP::Pattern;
 use base 'Net::IMP::Base';
@@ -32,6 +31,7 @@ sub INTERFACE {
     return [ undef, \@rv ];
 };
 
+my %_valid_act = map { $_ => 1 } qw(deny reject replace);
 sub validate_cfg {
     my ($class,%args) = @_;
 
@@ -57,11 +57,12 @@ sub validate_cfg {
 	push @err, "rx+rxlen or string need to be given for pattern";
     }
 
-    push @err, "rxdir must be 0|1" if defined $rxdir and not $rxdir ~~ [0,1];
+    push @err, "rxdir must be 0|1"
+	if defined $rxdir && $rxdir != 0 && $rxdir != 1;
 
     my $act = delete $args{action};
     push @err, "action can only be deny|reject|replace" unless
-	$act and $act ~~ [qw(deny reject replace)];
+	$act and $_valid_act{$act};
     push @err, "action $act needs actdata" if ! defined(delete $args{actdata});
 
     push @err, $class->SUPER::validate_cfg(%args);

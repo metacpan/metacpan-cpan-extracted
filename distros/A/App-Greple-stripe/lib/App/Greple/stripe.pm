@@ -3,7 +3,7 @@ package App::Greple::stripe;
 use 5.024;
 use warnings;
 
-our $VERSION = "0.99";
+our $VERSION = "0.9903";
 
 =encoding utf-8
 
@@ -17,12 +17,12 @@ App::Greple::stripe - Greple zebra stripe module
 
 =head1 VERSION
 
-Version 0.99
+Version 0.9903
 
 =head1 DESCRIPTION
 
-App::Greple::stripe is a module for B<greple> to show matched text
-in zebra striping fashion.
+L<App::Greple::stripe> is a module for L<greple|App::Greple> to show
+matched text in zebra striping fashion.
 
 The following command matches two consecutive lines.
 
@@ -63,8 +63,9 @@ C<--need=1> option is required to relax this condition.
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/random.png">
 </p>
 
-If you want to use three series with three patterns, specify C<step>
-when calling the module.
+If you want to use different color series for three or more patterns,
+specify C<step> count when calling the module.  The number of series
+can be increased up to 6.
 
     greple -Mstripe::set=step=3 --need=1 -E p1 -E p2 -E p3 ...
 
@@ -86,13 +87,39 @@ The following two commands have exactly the same effect.
 
 =over 7
 
-=item B<-Mstep::set>=B<step>=I<n>
+=item B<-Mstripe::set>=B<step>=I<n>
 
 =item B<--step>=I<n>
 
 Set the step count to I<n>.
 
+=item B<-Mstripe::set>=B<darkmode>
+
+=item B<--darkmode>
+
+Use dark background colors.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/darkmode.png">
+</p>
+
+Use C<--face> option to set foreground color for all colormap.  The
+following command sets the foreground color to white and fills the
+entire line with the background color.
+
+    greple -Mstripe --darkmode -- --face +WE
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/dark-white.png">
+</p>
+
 =back
+
+=head1 SEE ALSO
+
+L<App::Greple>
+
+L<App::Greple::xlate>
 
 =head1 AUTHOR
 
@@ -114,29 +141,40 @@ use Scalar::Util;
 use Data::Dumper;
 
 our %opt = (
-    step  => 2,
+    step     => 2,
+    darkmode => undef,
 );
 lock_keys %opt;
 sub opt :lvalue { ${$opt{+shift}} }
 
 sub hash_to_spec {
     pairmap {
-	$a = "$a|${\(uc(substr($a, 0, 1)))}";
+	my $key = "$a|${\(uc(substr($a, 0, 1)))}";
 	my $ref = ref $b;
-	if    (not defined $b)   { "$a!"  }
-	elsif ($ref eq 'SCALAR') { "$a!"  }
-	elsif (is_number($b))    { "$a=f" }
-	else                     { "$a=s" }
+	if    (not defined $b)   { "$key!"  }
+	elsif ($ref eq 'SCALAR') { "$key!"  }
+	elsif (is_number($b))    { "$key=f" }
+	else                     { "$key=s" }
     } shift->%*;
 }
 
-my @series = (
-    [ qw(/544 /533) ],
-    [ qw(/454 /353) ],
-    [ qw(/445 /335) ],
-    [ qw(/554 /553) ],
-    [ qw(/545 /535) ],
-    [ qw(/554 /553) ],
+my %series = (
+    light => [
+	[ qw(/544 /533) ],
+	[ qw(/454 /252) ],
+	[ qw(/445 /335) ],
+	[ qw(/554 /553) ],
+	[ qw(/545 /535) ],
+	[ qw(/554 /553) ],
+    ],
+    dark => [
+	[ qw(/200 /100) ],
+	[ qw(/020 /010) ],
+	[ qw(/004 /003) ],
+	[ qw(/022 /011) ],
+	[ qw(/202 /101) ],
+	[ qw(/220 /110) ],
+    ],
 );
 
 sub mod_argv {
@@ -163,10 +201,11 @@ sub finalize {
     our($mod, $my_argv, $argv) = mod_argv @_;
     getopt $my_argv, \%opt;
     my @default = qw(--stripe-postgrep);
-    my @cm;
+    my @cm = qw(@);
+    my $map = $opt{darkmode} ? $series{dark} : $series{light};
     for my $i (0, 1) {
 	for my $s (0 .. $opt{step} - 1) {
-	    push @cm, $series[$s % @series]->[$i];
+	    push @cm, $map->[$s % @$map]->[$i];
 	}
     }
     local $" = ',';
@@ -212,8 +251,6 @@ sub set {
 1;
 
 __DATA__
-
-builtin stripe-debug! $debug
 
 option --stripe-postgrep \
 	 --postgrep &__PACKAGE__::stripe

@@ -12,8 +12,9 @@ use HTML::FormatText;
 use HTML::TreeBuilder;
 use IO::All 'io';
 use MIME::Words 'encode_mimewords';
+use Encode qw( encode is_utf8 );
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 sub new {
     my $self = shift;
@@ -56,17 +57,15 @@ sub send {
 
             $mail->{text} = HTML::FormatText
                 ->new( leftmargin => 0, rightmargin => $width )
-                ->format( HTML::TreeBuilder->new->parse( $mail->{html} ) );
+                ->format( HTML::TreeBuilder->new->parse( $mail->{html} . "\n" ) );
         }
 
-        $mail->{'Content-Transfer-Encoding'} //= 'quoted-printable';
-        $mail->{'Content-Type'}              ||= 'text/plain; charset=us-ascii';
+        $mail->{text} = encode( 'UTF-8', $mail->{text} ) if is_utf8( $mail->{text} );
 
-        my $charset = ( $mail->{'Content-Type'} =~ /\bcharset\s*=\s*([^;]+)/i ) ? $1 : 'ISO-8859-1';
-        my @keys    = keys %$mail;
+        my @keys = keys %$mail;
         for my $name ( qw( to from subject ) ) {
             my ($key) = grep { lc($_) eq $name } @keys;
-            $mail->{$key} = encode_mimewords( $mail->{$key}, Charset => $charset )
+            $mail->{$key} = encode_mimewords( $mail->{$key}, Charset => 'UTF-8' )
                 if ( $key and defined $mail->{$key} and $mail->{$key} =~ /[^[:ascii:]]/ );
         }
 
@@ -105,6 +104,10 @@ sub send {
             $email_mime = Email::MIME->create(
                 header_str => $headers,
                 body       => $mail->{text},
+                attributes => {
+                    charset  => 'UTF-8',
+                    encoding => 'quoted-printable',
+                },
             );
         }
         elsif ( $mail->{text} and not $mail->{html} ) {
@@ -113,8 +116,12 @@ sub send {
                 attributes => { content_type => 'multipart/mixed' },
                 parts      => [
                     Email::MIME->create(
-                        header_str => [ map { $_ => $mail->{$_} } 'Content-Transfer-Encoding', 'Content-Type' ],
-                        body   => $mail->{text},
+                        header_str => [],
+                        body       => $mail->{text},
+                        attributes => {
+                            charset  => 'UTF-8',
+                            encoding => 'quoted-printable',
+                        },
                     ),
                     @$attachments,
                 ],
@@ -122,21 +129,15 @@ sub send {
         }
         else {
             my $html_email = Email::MIME->create_html(
-                header    => [],
-                body      => $mail->{html},
-                text_body => $mail->{text},
-                embed     => $mail->{embed},
+                header               => [],
+                body                 => $mail->{html},
+                text_body            => $mail->{text},
+                embed                => $mail->{embed},
+                text_body_attributes => {
+                    charset  => 'UTF-8',
+                    encoding => 'quoted-printable',
+                },
             );
-
-            $html_email->walk_parts( sub {
-                my ($part) = @_;
-                return if $part->subparts;
-
-                if ( $part->content_type eq 'text/plain' ) {
-                    $part->charset_set($charset);
-                    $part->encoding_set( $mail->{'Content-Transfer-Encoding'} );
-                }
-            } );
 
             $email_mime = Email::MIME->create(
                 header_str => $headers,
@@ -169,7 +170,7 @@ Email::Mailer - Multi-purpose emailer for HTML, auto-text, attachments, and temp
 
 =head1 VERSION
 
-version 1.19
+version 1.21
 
 =for markdown [![test](https://github.com/gryphonshafer/Email-Mailer/workflows/test/badge.svg)](https://github.com/gryphonshafer/Email-Mailer/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Email-Mailer/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Email-Mailer)
@@ -493,26 +494,9 @@ that and set your own transport, use the "transport" parameter.
 
 =head1 AUTOMATIC HEADER-IFICATION
 
-There are some automatic header-ification features to be aware of. Unless you
-specify a value, the C<Content-Type> and C<Content-Transfer-Encoding> are
-set as "text/plain; charset=us-ascii" and "quoted-printable" respectively, as
-if you set the following:
-
-    Email::Mailer->send(
-        to        => $to,
-        from      => $from,
-        subject   => $subject,
-        html      => $html,
-
-        'Content-Type'              => 'text/plain; charset=us-ascii',
-        'Content-Transfer-Encoding' => 'quoted-printable',
-    );
-
-Also, normally your C<to>, C<from>, and C<subject> values are left untouched;
-however, for any of these that contain non-ASCII characters, they will be
-mimewords-encoded via L<MIME::Words> using the character set defined in
-C<Content-Type>. If you don't like how that works, just encode them however
-you'd like to ASCII.
+There are some automatic header-ification features to be aware of. If any of
+your C<to>, C<from>, and C<subject> values contain non-ASCII characters, they
+will be mimewords-encoded via L<MIME::Words> using UTF-8.
 
 =head1 SEE ALSO
 

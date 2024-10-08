@@ -10,14 +10,20 @@ use Carp;
 use X11::XCB ':all';
 use X11::korgwm::Common;
 require X11::korgwm::Config;
+
+# Internal class variables
 my ($_motion_win, %_motion_start);
-my (%_on_hold, $_on_hold_w);
+
+# Sometimes we want to prevent EnterNotifies by window ID
+my %prevent_enter_notify_by_wid;
 
 # Regular motion notify, used to track inter-screen movements
 sub _motion_regular($evt) {
     return if @screens == 1 or $evt->{child};
     my $screen = screen_by_xy(@{ $evt }{qw( event_x event_y )}) or return;
     return if $focus->{screen} == $screen;
+
+    # This code runs only during inter-screen movement
     $screen->focus();
     $X->flush();
 }
@@ -71,6 +77,7 @@ sub init {
     add_event_cb(MOTION_NOTIFY, \&_motion_regular);
 
     add_event_cb(BUTTON_RELEASE, sub($evt) {
+        $cpu_saver = 0.1;
         replace_event_cb(MOTION_NOTIFY, \&_motion_regular);
         $_motion_win = undef;
     });
@@ -85,6 +92,7 @@ sub init {
             # Save the first point
             @{ _motion_start }{qw( x y )} = @{ $evt }{qw( root_x root_y )};
 
+            $cpu_saver = 0.0001;
             replace_event_cb(MOTION_NOTIFY, \&_motion_move);
         } elsif ($evt->{detail} == 3) {
             # Move mouse and save the first point
@@ -94,6 +102,7 @@ sub init {
                 $_motion_win->{real_x} + $_motion_win->{real_w}, $_motion_win->{real_y} + $_motion_win->{real_h}
             );
 
+            $cpu_saver = 0.0001;
             replace_event_cb(MOTION_NOTIFY, \&_motion_resize);
         } else {
             croak "We got unexpected mouse event, detail:" . $evt->{detail};
@@ -102,6 +111,8 @@ sub init {
 
     add_event_cb(ENTER_NOTIFY, sub($evt) {
         return if $_motion_win;
+        return if $prevent_enter_notify;
+
         my $wid = $evt->{event};
 
         # XXX Do we really need to ignore EnterNotifies on unknown windows? I'll leave it here waiting for bugs.
@@ -111,12 +122,20 @@ sub init {
         my $win = $windows->{$wid};
         return if $win->{_hidden};
 
-        # Ignore rapid notifies
-        return if $_on_hold{$wid};
-        $_on_hold{$wid} = AE::timer 0, 0.09, sub { exists $_on_hold{$wid} and delete $_on_hold{$wid} };
+        # Prevent rapid EnterNotify (they're firing during tag switching)
+        return if $prevent_enter_notify_by_wid{$wid};
+        $prevent_enter_notify_by_wid{$wid} = AE::timer 0.09, 0, sub { delete $prevent_enter_notify_by_wid{$wid} };
 
+        # Prevent FocusIn events
+        prevent_focus_in();
+
+        # There is a bug on multiple screens moving mouse between them when one screen contains a window,
+        # while another does not. So I do prefer to explicitly focus the screen by pointer coordinates.
+        # I intentionally do not use $new_screen->focus() to avoid unnecessary window->focus() from inside it.
+        # I also do not try to exploit calling win->focus() via screen->{focus} as this will trigger focus() logic
+        # unconditionally and is way too complicated for any EnterNotify. win->focus() is called only when needed
         my $new_screen = screen_by_xy($evt->{root_x}, $evt->{root_y});
-        $new_screen->focus() if $focus->{screen} != $new_screen;
+        $focus->{screen} = $new_screen;
 
         $win->focus() if ($focus->{window} // 0) != $win;
     });

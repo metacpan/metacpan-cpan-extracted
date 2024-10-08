@@ -21,7 +21,7 @@ use I18N::LangTags::Detect;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 my %names = (
     service => {
@@ -278,8 +278,32 @@ sub _ua {
 
 
 sub known {
-    my ($self, $class, $name) = @_;
-    return values %{$names{$class // ''} // croak 'Invalid class'};
+    my ($self, $class, %opts) = @_;
+    my @list;
+
+    if ($class eq ':all') {
+        foreach my $c (keys %names) {
+            push(@list, values %{$names{$c}});
+        }
+    } else {
+        @list = values %{$names{$class // ''} // croak 'Invalid class'};
+    }
+
+    # Experimental in v0.09, therefore not yet listedin POD.
+    if (defined(my $as = $opts{as})) {
+        if ($as eq 'ise') {
+            # no-op
+        } elsif ($as eq 'uuid') {
+            foreach my $e (@list) {
+                croak 'Cannot return requested data: as=uuid not supported on all elements of list. Try as=ise' unless $e =~ Data::URIID::Result->RE_UUID;
+            }
+        } elsif ($as eq 'Data::Identifier') {
+            require Data::Identifier;
+            @list = map {Data::Identifier->new(ise => $_)} @list;
+        }
+    }
+
+    return @list;
 }
 
 
@@ -341,7 +365,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 
@@ -455,7 +479,9 @@ See also L<"new">.
 
 Returns a list of known items of a class.
 Not all items may have the same level of support by this module.
-Class is one of C<service>, C<type>, or C<action>.
+Class is one of C<service>, C<type>, C<action>, or C<:all>.
+If the class is given as C<:all> this module will return the lists for all classes
+but may also return additional entries known to it.
 
 This method will return an array of ISEs if successful or C<die> otherwise.
 

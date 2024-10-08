@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
@@ -9,10 +9,12 @@ use utf8;
 
 use Object::Pad 0.807;
 
-package App::sdview::Parser::Man 0.18;
+package App::sdview::Parser::Man 0.19;
 class App::sdview::Parser::Man :strict(params);
 
 apply App::sdview::Parser;
+
+use Sublike::Extended;
 
 use Parse::Man::DOM 0.03;
 
@@ -71,11 +73,9 @@ my %FONTTAGS = (
    CW => { monospace => 1 },
 );
 
-sub _chunklist_to_taggedstring ( $chunks, %opts )
+extended sub _chunklist_to_taggedstring ( $chunks, :$linefeed = " " )
 {
    my $ret = String::Tagged->new;
-
-   my $linefeed = $opts{linefeed} // " ";
 
    foreach my $chunk ( $chunks->@* ) {
       my %tags;

@@ -11,6 +11,7 @@ my $build = Module::Build->new(
       'Object::Pad' => '0.807',
       'Object::Pad::FieldAttr::Checked' => '0.09',
       'Data::Checks' => '0.05',
+      'Sublike::Extended' => '0.26',
 
       'Config::Tiny' => 0,
       'Convert::Color' => 0,
@@ -20,7 +21,7 @@ my $build = Module::Build->new(
       'List::Util' => 0,
       'Module::Pluggable' => 0,
       'Parse::Man::DOM' => '0.03',
-      'Pod::Simple' => 0,
+      'Pod::Simple::Methody' => 0,
       'String::Tagged' => '0.15',
       'String::Tagged::Markdown' => '0.05',
       'String::Tagged::Terminal' => '0.08',

@@ -46,13 +46,13 @@ my $r = Kelp::Routes->new;
 # Similar routes with checks
 {
     $r->clear;
-    $r->add('/:a/:b' => 'a#b');
+    $r->add('/:a/:b' => {to => 'a#b', order => 10});
     $r->add('/:a/:b' => {to => 'a#c', check => {b => '\d+'}});
-    $r->add('/:a/:b' => {to => 'a#d', check => {a => '\d+'}});
+    $r->add('/:a/:b' => {to => 'a#d', check => {a => '\d+'}, order => -1});
     is_deeply _d($r->match('/aa/bb'), 'to'), [{to => 'A::b'}];
-    is_deeply _d($r->match('/aa/22'), 'to'), [{to => 'A::b'}, {to => 'A::c'}];
-    is_deeply _d($r->match('/11/bb'), 'to'), [{to => 'A::b'}, {to => 'A::d'}];
-    is_deeply _d($r->match('/11/22'), 'to'), [{to => 'A::b'}, {to => 'A::c'}, {to => 'A::d'}];
+    is_deeply _d($r->match('/aa/22'), 'to'), [{to => 'A::c'}, {to => 'A::b'}];
+    is_deeply _d($r->match('/11/bb'), 'to'), [{to => 'A::d'}, {to => 'A::b'}];
+    is_deeply _d($r->match('/11/22'), 'to'), [{to => 'A::d'}, {to => 'A::c'}, {to => 'A::b'}];
 }
 
 # Different routes (same beginning)
@@ -79,6 +79,20 @@ my $r = Kelp::Routes->new;
     is_deeply _d($r->match('/a/2'), 'to'), [{to => 'A::b'}, {to => 'A::c'}];
     is_deeply _d($r->match('/a/b'), 'to'), [{to => 'A::b'}];
     is_deeply _d($r->match('/a/b/c'), 'to'), [{to => 'A::b'}, {to => 'A::d'}];
+}
+
+# Bridges - no longer url parts than defined
+{
+    $r->clear;
+    $r->add('/test' => {to => 'a#b', bridge => 1});
+    $r->add('/test' => 'a#c');
+    $r->add('/test/a' => 'a#d');
+
+    is_deeply _d($r->match('/testing'), 'to'), [];
+    is_deeply _d($r->match('/test'), 'to'), [{to => 'A::b'}, {to => 'A::c'}];
+    is_deeply _d($r->match('/test/'), 'to'), [{to => 'A::b'}, {to => 'A::c'}];
+    is_deeply _d($r->match('/test/a'), 'to'), [{to => 'A::b'}, {to => 'A::d'}];
+    is_deeply _d($r->match('/test/aa'), 'to'), [{to => 'A::b'}];
 }
 
 # Cache

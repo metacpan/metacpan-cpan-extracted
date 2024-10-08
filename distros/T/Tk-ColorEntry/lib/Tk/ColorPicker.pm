@@ -3,7 +3,7 @@ package Tk::ColorPicker;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.09';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -12,7 +12,6 @@ Construct Tk::Widget 'ColorPicker';
 
 require Tk::NoteBook;
 require Tk::Pane;
-use Convert::Color;
 use Imager::Screenshot 'screenshot';
 
 my @colspaces = (
@@ -140,14 +139,20 @@ sub Populate {
 			my $var = 0;
 			$varpool{$channel} = \$var;
 			my %hsv = (
-				Hue => 359,
-				Saturation => 100,
-				Value => 100,
+				Hue => 359.9,
+				Saturation => 1,
+				Value => 1,
 			);
-			my (@m) = ();
-			@m = (-from => $hsv{$channel}) if exists $hsv{$channel};
+			my @m = ();
+			if (exists $hsv{$channel}) {
+				push @m, -from => $hsv{$channel};
+				unless ($channel eq 'Hue') {
+					push @m, -resolution => 0.001;
+				}
+			}
 			my $slider = $slframe->Scale(@m,
 				-to => 0,
+				
 				-orient => 'vertical',
 				-command => ['ChannelUpdate', $self, $channel],
 				-variable => \$var,
@@ -235,18 +240,8 @@ sub ChannelUpdateHSV {
 	my $vvar = $pool->{'Value'};
 	my $value = $$vvar;
 	$value = 99.9999 if $value eq 100;
-	$satur = $satur / 100;
-	$value = $value / 100;
 
-	my $hsvstring = "hsv:$hue,$satur,$value";
-	my $color = Convert::Color->new($hsvstring);
-	my ($red, $green, $blue) = $color->rgb;
-	my $depth = $self->colordepth;
-	my $mul = (2**$depth);
-
-	$red = $red * $mul;
-	$green = $green * $mul;
-	$blue = $blue * $mul;
+	my ($red, $green, $blue) = $self->hsv2rgb($hue, $satur, $value);
 	my $hex = $self->rgb2hex($red, $green, $blue);
 	$self->UpdateRGB($hex);
 	$self->UpdateCMY($hex);
@@ -604,6 +599,47 @@ sub historyUpdate {
 	}
 }
 
+sub hsv2rgb {
+
+	# The procedure below converts an HSB value to RGB.  It takes hue,
+	# saturation, and value components (floating-point, 0-1.0) as arguments,
+	# and returns a list containing RGB components (integers, 0-65535) as
+	# result.  The code here is a copy of the code on page 616 of
+	# "Fundamentals of Interactive Computer Graphics" by Foley and Van Dam.
+
+	my($self, $hue, $sat, $value) = @_;
+	my($v, $i, $f, $p, $q, $t);
+
+	my $depth = $self->colordepth;
+	my $mul = (2**$depth)/65536;
+	$hue = $hue / 360;
+
+	$v = int(65535 * $value);
+	my $ret = $v * $mul;
+	return ($ret, $ret, $ret) if $sat == 0;
+	$hue *= 6;
+	$hue = 0 if $hue >= 6;
+	$i = int($hue);
+	$f = $hue - $i;
+	$p = int(65535 * $value * (1 - $sat));
+	$q = int(65535 * $value * (1 - ($sat * $f)));
+	$t = int(65535 * $value * (1 - ($sat * (1 - $f))));
+	my @rgb = ();
+	@rgb = ($v, $t, $p) if $i == 0;
+	@rgb = ($q, $v, $p) if $i == 1;
+	@rgb = ($p, $v, $t) if $i == 2;
+	@rgb = ($p, $q, $v) if $i == 3;
+	@rgb = ($t, $p, $v) if $i == 4;
+	@rgb = ($v, $p, $q) if $i == 5;
+
+	#convert to the proper depth
+	my @r = ();
+	for (@rgb) {
+		push @r, int($_ * $mul)
+	}
+	return @r
+}
+
 sub IsCMY {
 	my ($self, $channel) = @_;
 	my %hsv = (
@@ -726,6 +762,51 @@ sub rgb2hex {
 	return '#' . $red . $green . $blue;
 }
 
+sub rgb2hsv {
+
+	# The procedure below converts an RGB value to HSB.  It takes red, green,
+	# and blue components (0-65535) as arguments, and returns a list
+	# containing HSB components (floating-point, 0-1) as result.  The code
+	# here is a copy of the code on page 615 of "Fundamentals of Interactive
+	# Computer Graphics" by Foley and Van Dam.
+
+	my($self, $red, $green, $blue) = @_;
+	my($max, $min, $sat, $range, $hue, $rc, $gc, $bc);
+
+	#convert to 16 bit;
+	my $depth = $self->colordepth;
+	my $mul = 65535/(2**$depth);
+	my @r = ();
+	for ($red, $green, $blue) {
+		push @r, int($_ * $mul)
+	}
+	($red, $green, $blue) = @r;
+	
+	$max = ($red > $green) ? (($blue > $red) ? $blue : $red) :
+	(($blue > $green) ? $blue : $green);
+	$min = ($red < $green) ? (($blue < $red) ? $blue : $red) :
+	(($blue < $green) ? $blue : $green);
+	$range = $max - $min;
+	if ($max == 0) {
+		$sat = 0;
+	} else {
+		$sat = $range / $max;
+	}
+	if ($sat == 0) {
+		$hue = 0;
+	} else {
+		$rc = ($max - $red) / $range;
+		$gc = ($max - $green) / $range;
+		$bc = ($max - $blue) / $range;
+		$hue = ($max == $red)?(0.166667*($bc - $gc)):
+		(($max == $green)?(0.166667*(2 + $rc - $bc)):
+		(0.166667*(4 + $gc - $rc)));
+	}
+	$hue += 1 if $hue < 0;
+	return ($hue * 360, $sat, $max/65535);
+
+}
+
 sub sliderheight {
 	my ($self, $height) = @_;
 	if (defined $height) {
@@ -770,18 +851,9 @@ sub UpdateHSV {
 	my ($self, $val) = @_;
 	my ($red, $green, $blue) = $self->hex2rgb($val);
 
-	my $depth = $self->colordepth;
-	my $mul = (2**$depth);
-	my $r = $red / $mul;
-	my $g = $green / $mul;
-	my $b = $blue / $mul;
-	my $rgb = Convert::Color->new("rgb:$r,$g,$b");
-	my $hsv = $rgb->convert_to('hsv');
-	my ($hue, $saturation, $value) = $hsv->hsv;
+	my ($hue, $saturation, $value) = $self->rgb2hsv($red, $green, $blue);
 
 	my $pool = $self->{VARPOOL};
-	$saturation = $saturation * 100;
-	$value = $value * 100;
 	my $hvar = $pool->{'Hue'};
 	$$hvar = $hue;
 	my $svar = $pool->{'Saturation'};

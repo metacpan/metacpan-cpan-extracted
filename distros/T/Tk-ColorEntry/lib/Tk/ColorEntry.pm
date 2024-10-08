@@ -3,7 +3,7 @@ package Tk::ColorEntry;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);

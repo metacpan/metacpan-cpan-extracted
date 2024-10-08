@@ -63,7 +63,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTTP-Message/issues
   homepage: https://github.com/libwww-perl/HTTP-Message
   repository: https://github.com/libwww-perl/HTTP-Message.git
-version: '6.46'
+version: '7.00'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -318,7 +318,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::OALDERS/Git::GatherDir'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -349,7 +349,7 @@ x_Dist_Zilla:
           git_version: 2.34.1
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -443,7 +443,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/release snapshot'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -451,7 +451,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.46
+          tag: v7.00
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -460,7 +460,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/Git::Tag'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -498,7 +498,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/post-release commit'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -510,7 +510,7 @@ x_Dist_Zilla:
           git_version: 2.34.1
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Prereqs::Soften
       config:

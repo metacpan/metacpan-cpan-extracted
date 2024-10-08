@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 use Getopt::Long qw(:config posix_default bundling);
 use AnyEvent;
 use AnyEvent::Socket qw(tcp_server tcp_connect parse_hostport format_address);
@@ -613,7 +612,7 @@ sub new {
 		# FIXME use smthg better then just debug
 		$self->xdebug("accounting $key=$value");
 
-	    } elsif ( $rtype ~~ [ IMP_PASS, IMP_PREPASS ] ) {
+	    } elsif ( $rtype == IMP_PASS || $rtype == IMP_PREPASS ) {
 		my ($dir,$offset) = @$rv;
 		$self->xdebug("got $rtype $dir|$offset passed=$imp_passed[$dir]");
 

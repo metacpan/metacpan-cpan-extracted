@@ -8,7 +8,7 @@ App::Greple::tee - 用外部命令结果替换匹配文本的模块
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -48,6 +48,28 @@ Greple的**-Mtee**模块将匹配的文本部分发送到给定的过滤命令�
 
     将一连串非空行合并为一行，然后再传递给过滤命令。宽窄字符之间的换行符会被删除，其他换行符会被空格替换。
 
+- **--squeeze**
+
+    将两个或多个连续换行符合并为一个。
+
+- **-Mline** **--offload** _command_
+
+    [teip(1)](http://man.he.net/man1/teip) 的 **--offload** 选项在不同的模块 **-Mline** 中实现。
+
+        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+
+    你也可以使用 **line** 模块只处理偶数行，如下所示。
+
+        greple -Mtee cat -n -- -Mline 2::2
+
+# LEGACIES
+
+由于 **greple** 中已经实现了 **--stretch** (**-S**) 选项，因此不再需要 **-blocks** 选项。只需执行以下操作即可。
+
+    greple -Mtee cat -n -- --all -SE foo
+
+不建议使用 **--blocks**，因为它将来可能会被废弃。
+
 - **--blocks**
 
     通常，与指定搜索模式匹配的区域将被发送到外部命令。如果指定了该选项，将处理的不是匹配区域，而是包含该区域的整个块。
@@ -64,10 +86,6 @@ Greple的**-Mtee**模块将匹配的文本部分发送到给定的过滤命令�
 
     不要将 **--blocks** 与 **--all** 选项一起使用，因为块将是整个数据。
 
-- **--squeeze**
-
-    将两个或多个连续换行符合并为一个。
-
 # WHY DO NOT USE TEIP
 
 首先，只要你能用**teip**命令做，就使用它。它是一个优秀的工具，比**greple**快得多。
@@ -80,7 +98,7 @@ Greple的**-Mtee**模块将匹配的文本部分发送到给定的过滤命令�
 
 下一个命令将找到包含在Perl模块文件中的[perlpod(1)](http://man.he.net/man1/perlpod)风格文件内的文本块。
 
-    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^(\w.+\n)+' tee.pm
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^([\w\pP].+\n)+' tee.pm
 
 你可以通过DeepL，通过执行上述命令与**-Mtee**模块相结合，调用**deepl**命令，像这样翻译它们。
 

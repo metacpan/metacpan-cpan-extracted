@@ -151,7 +151,7 @@ subtest rotate_subspace => sub {
 subtest project => sub {
 	my $sp= space->rot_z(.25);
 	is( $sp->project(vec3(1,1,1)), vec_check(1,-1,1), 'vec3' );
-	is( $sp->project([1,1,1]), vec_check(1,-1,1), 'array' );
+	is( $sp->project([1,1,1]), vec_arrayref_check(1,-1,1), 'array' );
 	is( $sp->project({ x => 1, y => 1, z => 1 }), vec_hashref_check(1,-1,1), 'hash' );
 	is( $sp->project([1,1]), vec_arrayref_check(1,-1,0), 'array[2]' );
 	is( $sp->project({ x => 1, y => 1 }), vec_hashref_check(1,-1,0), 'hash x,y' );

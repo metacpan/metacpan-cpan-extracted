@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 ############################################################################
 # BEWARE! complex stuff!
@@ -342,7 +341,7 @@ sub new_analyzer {
     $fwd_up = sub {
 	my ($dir,$buf) = @_;
 	if ( $buf->{gstart} == $buf->{gend} && ! $buf->{gap}
-	    && $buf->{rtype} ~~ [ IMP_PASS, IMP_PREPASS ]) {
+	    && ($buf->{rtype} == IMP_PASS || $buf->{rtype} == IMP_PREPASS)) {
 	    # don't repeat last (pre)pass because of empty buffer
 	    return;
 	}
@@ -584,7 +583,10 @@ sub new_analyzer {
 	for my $rv (@_) {
 	    my $rtype = shift(@$rv);
 
-	    if ( $rtype ~~ [ IMP_FATAL, IMP_DENY, IMP_DROP, IMP_ACCTFIELD ]) {
+	    if ( $rtype == IMP_FATAL
+		|| $rtype == IMP_DENY
+		|| $rtype == IMP_DROP
+		|| $rtype == IMP_ACCTFIELD ) {
 		$DEBUG && debug("callback[.][$pi] $rtype @$rv");
 		$wself->run_callback([ $rtype, @$rv ]);
 
@@ -620,7 +622,7 @@ sub new_analyzer {
 		$wself->run_callback([ IMP_CONTINUE ])
 		    if not grep { $_ } @{$pause[$dir]};
 
-	    } elsif ( $rtype ~~ [ IMP_PASS, IMP_PREPASS ] ) {
+	    } elsif ( $rtype == IMP_PASS || $rtype == IMP_PREPASS ) {
 		my ($dir,$offset) = @$rv;
 		$DEBUG && debug("callback[$dir][$pi] $rtype $offset");
 		ref(my $part = $parts[$dir][$pi]) or next; # part skippable?

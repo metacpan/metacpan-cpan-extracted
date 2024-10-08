@@ -8,7 +8,7 @@ App::Greple::tee - Modul zum Ersetzen von übereinstimmendem Text durch das Erge
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -48,6 +48,28 @@ Die Zeilen der Ein- und Ausgabedaten müssen nicht identisch sein, wenn die Opti
 
     Kombinieren Sie eine Folge von Nicht-Leerzeilen zu einer einzigen Zeile, bevor Sie sie an den Filterbefehl weitergeben. Zeilenumbrüche zwischen breiten Zeichen werden gelöscht, und andere Zeilenumbrüche werden durch Leerzeichen ersetzt.
 
+- **--squeeze**
+
+    Kombiniert zwei oder mehr aufeinanderfolgende Zeilenumbruchzeichen zu einem.
+
+- **-Mline** **--offload** _command_
+
+    Die Option **--offload** von [teip(1)](http://man.he.net/man1/teip) ist in dem anderen Modul **-Mline** implementiert.
+
+        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+
+    Sie können auch das Modul **line** verwenden, um nur geradzahlige Zeilen zu verarbeiten.
+
+        greple -Mtee cat -n -- -Mline 2::2
+
+# LEGACIES
+
+Die Option **--blocks** wird nicht mehr benötigt, da die Option **--stretch** (**-S**) in **greple** implementiert wurde. Sie können einfach das Folgende ausführen.
+
+    greple -Mtee cat -n -- --all -SE foo
+
+Es wird nicht empfohlen, **--blocks** zu verwenden, da es in Zukunft veraltet sein könnte.
+
 - **--blocks**
 
     Normalerweise wird der Bereich, der dem angegebenen Suchmuster entspricht, an den externen Befehl gesendet. Wenn diese Option angegeben wird, wird nicht der übereinstimmende Bereich, sondern der gesamte Block, der ihn enthält, verarbeitet.
@@ -64,10 +86,6 @@ Die Zeilen der Ein- und Ausgabedaten müssen nicht identisch sein, wenn die Opti
 
     Verwenden Sie die Option **--blocks** nicht mit der Option **--all**, da der Block die gesamten Daten sein werden.
 
-- **--squeeze**
-
-    Kombiniert zwei oder mehr aufeinanderfolgende Zeilenumbruchzeichen zu einem.
-
 # WHY DO NOT USE TEIP
 
 Vor allem, wenn Sie den Befehl **teip** verwenden können, sollten Sie ihn einsetzen. Er ist ein hervorragendes Werkzeug und viel schneller als **greple**.
@@ -80,7 +98,7 @@ Außerdem kann **teip** nicht mehrere Datenzeilen als eine Einheit verarbeiten, 
 
 Der nächste Befehl findet Textblöcke innerhalb des [perlpod(1)](http://man.he.net/man1/perlpod) Stildokuments, das in der Perl-Moduldatei enthalten ist.
 
-    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^(\w.+\n)+' tee.pm
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^([\w\pP].+\n)+' tee.pm
 
 Sie können sie mit dem Dienst DeepL übersetzen, indem Sie den obigen Befehl zusammen mit dem Modul **-Mtee** ausführen, das den Befehl **deepl** wie folgt aufruft:
 

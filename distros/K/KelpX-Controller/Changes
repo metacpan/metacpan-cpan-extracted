@@ -1,5 +1,9 @@
 Revision history for Perl extension KelpX::Controller.
 
+1.02 - 2024-10-08
+	- Updated for Kelp 2.18
+	- Documented a common trap (route setting in build)
+
 1.01 - 2024-07-08
 	- Attributes context and app are now readonly
 

@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 
-package App::sdview::Style 0.18;
+package App::sdview::Style 0.19;
 
 use Convert::Color;
 use Convert::Color::XTerm 0.06;

@@ -31,7 +31,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 my %digest_name_converter = (
     fc('md5')   => 'md-5-128',
@@ -431,7 +431,7 @@ my %url_parser = (
             action => 'info',
         }} qw(node way relation)),
         {
-            host => 'xkcd.com',
+            host => qr#^(?:www\.)?xkcd\.com$#,
             path => qr#^/([1-9][0-9]*)/$#,
             source => 'xkcd',
             type => 'xkcd-num',
@@ -439,7 +439,7 @@ my %url_parser = (
             action => 'render',
         },
         {
-            host => 'xkcd.com',
+            host => qr#^(?:www\.)?xkcd\.com$#,
             path => qr#^/([1-9][0-9]*)/info\.0\.json$#,
             source => 'xkcd',
             type => 'xkcd-num',
@@ -1364,7 +1364,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

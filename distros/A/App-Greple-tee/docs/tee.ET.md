@@ -8,7 +8,7 @@ App::Greple::tee - moodul sobitatud teksti asendamiseks välise käsu tulemusega
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -48,6 +48,28 @@ Sisend- ja väljundandmete read ei pea olema identsed, kui kasutatakse valikut *
 
     Ühendage mittetäielike ridade jada üheks reaks enne nende edastamist filtri käsule. Laiade laiade märkide vahel olevad read kustutatakse ja muud read asendatakse tühikutega.
 
+- **--squeeze**
+
+    Ühendab kaks või enam järjestikust uusjoonemärki üheks.
+
+- **-Mline** **--offload** _command_
+
+    [teip(1)](http://man.he.net/man1/teip)'i **--offload** valik on rakendatud erinevas moodulis **-Mline**.
+
+        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+
+    Mooduli **line** abil saab töödelda ainult paarisnumbrilisi ridu järgmiselt.
+
+        greple -Mtee cat -n -- -Mline 2::2
+
+# LEGACIES
+
+**--plokkide** valikut ei ole enam vaja, kuna **--stretch** (**-S**) valik on implementeeritud **greple**-sse. Saate lihtsalt teha järgmist.
+
+    greple -Mtee cat -n -- --all -SE foo
+
+**--blocks** ei ole soovitatav kasutada, kuna see võib tulevikus aeguda.
+
 - **--blocks**
 
     Tavaliselt saadetakse määratud otsingumustrile vastav ala välisele käsule. Kui see valik on määratud, ei töödelda mitte sobivat ala, vaid kogu seda sisaldavat plokki.
@@ -64,10 +86,6 @@ Sisend- ja väljundandmete read ei pea olema identsed, kui kasutatakse valikut *
 
     Ärge kasutage **--blocks** koos valikuga **--all**, sest plokk on kogu andmestik.
 
-- **--squeeze**
-
-    Ühendab kaks või enam järjestikust uusjoonemärki üheks.
-
 # WHY DO NOT USE TEIP
 
 Kõigepealt, kui te saate seda teha käsuga **teip**, kasutage seda. See on suurepärane vahend ja palju kiirem kui **greple**.
@@ -80,7 +98,7 @@ Samuti ei saa **teip** töödelda mitut rida andmeid ühe üksusena, samas kui *
 
 Järgmine käsk leiab tekstiplokid Perli moodulifailis sisalduva [perlpod(1)](http://man.he.net/man1/perlpod) stiilis dokumendi sees.
 
-    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^(\w.+\n)+' tee.pm
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^([\w\pP].+\n)+' tee.pm
 
 Saate neid tõlkida DeepL teenuse abil, kui täidate ülaltoodud käsu koos mooduliga **-Mtee**, mis kutsub käsu **deepl** järgmiselt:
 

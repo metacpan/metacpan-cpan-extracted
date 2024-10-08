@@ -3,5 +3,7 @@ Subject: Test Email
 To: to@example.com
 Date: [^\n]+
 MIME-Version: 1\.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
 This is a simple text-only email\.

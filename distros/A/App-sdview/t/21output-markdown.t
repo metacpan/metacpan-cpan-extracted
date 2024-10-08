@@ -60,7 +60,7 @@ dotest "Bullet lists", <<"EOMARKDOWN";
 * Third
 EOMARKDOWN
 
-dotest "Bullet lists", <<"EOMARKDOWN";
+dotest "Numbered lists", <<"EOMARKDOWN";
 1. First
 2. Second
 3. Third

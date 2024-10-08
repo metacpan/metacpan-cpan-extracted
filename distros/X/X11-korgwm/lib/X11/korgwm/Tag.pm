@@ -31,12 +31,23 @@ sub windows($self) {
 }
 
 sub destroy($self, $new_screen) {
-    # Move windows to some other place
-    my $new_tag = $new_screen->{tags}->[0];
+    # Move windows to a $new_screen
+    my $old_screen = $self->{screen};
+    my $old_screen_idx = $old_screen->{idx};
+    my $old_tag_idx = $self->{idx};
+    my $new_tag = $new_screen->{tags}->[$old_tag_idx] || $new_screen->{tags}->[0];
+
     for my $win ($self->windows()) {
         $new_tag->win_add($win);
         $self->win_remove($win);
+
+        $win->floating_move_screen($old_screen, $new_screen);
+        $win->hide() unless $new_tag == $new_screen->current_tag();
+
+        # Save preferred screen to be able to restore window position
+        $win->{pref_position}->[@screens] = [$old_screen_idx, $old_tag_idx];
     }
+
     %{ $self } = ();
 }
 
@@ -63,6 +74,7 @@ sub show($self) {
         # I believe there is no need to process focus here, right?
         $self->{max_window}->resize_and_move(@{ $self->{screen} }{qw( x y w h )}, 0);
         $self->{max_window}->show();
+        $_->show() for $self->{max_window}->transients();
     } else {
         $self->{screen}->{panel}->ws_set_visible($self->{idx} + 1, 1) if $cfg->{hide_empty_tags};
 
@@ -93,9 +105,9 @@ sub show($self) {
         # If this window is focused on this tag, just give it a focus
         $focus_win->focus();
     } else {
-        # Try to select next window and give it a focus
-        my $win = $self->first_window();
-        # XXX maybe drop focus otherwise?
+        # Try to focus previously focused window (or any window)
+        my $win = $self->{focus} || $self->first_window();
+        # XXX maybe drop focus otherwise? UPD: no. I want visible window to be focused this case
         $win->focus() if $win;
     }
 
@@ -123,7 +135,7 @@ sub win_remove($self, $win, $norefresh = undef) {
     $self->{max_window} = undef if $win == ($self->{max_window} // 0);
 
     for my $arr (map { $self->{$_} } qw( windows_float windows_tiled )) {
-        splice @{ $arr }, $_, 1 for reverse grep { $arr->[$_] == $win } 0..$#{ $arr };
+        @{ $arr } = grep { $win != $_ } @{ $arr };
     }
 
     # Remove title when removing focused window
@@ -132,6 +144,9 @@ sub win_remove($self, $win, $norefresh = undef) {
     # Update panel if tag becomes empty
     $self->{screen}->{panel}->ws_set_visible($self->{idx} + 1, 0)
         if $cfg->{hide_empty_tags} and not $self->first_window();
+
+    # Clean preferred focus for this tag if needed
+    $self->{focus} = undef if $win == $self->{focus};
 
     # If this tag is visible, call screen refresh
     $self->{screen}->refresh() if not $norefresh and $self == $self->{screen}->current_tag();
@@ -142,7 +157,7 @@ sub win_float($self, $win, $floating=undef) {
     my ($arr_from, $arr_to) = map { $self->{$_} } "windows_float", "windows_tiled";
     ($arr_from, $arr_to) = ($arr_to, $arr_from) if $floating;
 
-    splice @{ $arr_from }, $_, 1 for reverse grep { $arr_from->[$_] == $win } 0..$#{ $arr_from };
+    @{ $arr_from } = grep { $win != $_ } @{ $arr_from };
     unshift @{ $arr_to }, $win;
 }
 

@@ -32,7 +32,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Convert::Color" : "0.14",
             "Imager" : "1.019",
             "Imager::Screenshot" : "0.014",
             "Test::Tk" : "3.03",
@@ -49,6 +48,6 @@
          "web" : "https://github.com/haje61/Tk-ColorEntry"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 package Net::IMP::ProtocolPinning;
 use base 'Net::IMP::Base';
@@ -73,11 +72,12 @@ sub _compile_cfg {
     my $lastdir;
     for (my $i=0;$i<@$r;$i++) {
 	my $dir = $r->[$i]{dir};
-	die "rule$i.dir must be 0|1\n" unless ($dir//-1 ) ~~ [0,1];
+	die "rule$i.dir must be 0|1\n" unless defined $dir and
+	    $dir == 0 || $dir == 1;
 	die "rule$i.rxlen must be >0\n" unless ($r->[$i]{rxlen}||0)>0;
 	my $rx = $r->[$i]{rx};
 	die "rule$i.rx should be regex\n" if ref($rx) ne 'Regexp';
-	die "rule$i.rx should not match empty string\n" if '' ~~ $rx;
+	die "rule$i.rx should not match empty string\n" if '' =~ $rx;
 
 	if ( ! $ignore_order ) {
 	    # initial rule or direction change

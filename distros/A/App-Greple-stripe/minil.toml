@@ -5,11 +5,13 @@ static_install = "auto"
 
 [release]
 branch = "main"
-
-[unsupported]
-os = [
-    "MSWin32",
+hooks = [
+    "make -C docs",
 ]
 
 [FileGatherer]
-exclude_match = [ '^images/.*' ]
+exclude_match = [ '^images/', '^docs/.*\.json' ]
+
+[no_index]
+directory = [ 't', 'xt', 'docs' ]
+

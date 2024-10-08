@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 
 use Object::Pad 0.807;
 
-package App::sdview::Output::Pod 0.18;
+package App::sdview::Output::Pod 0.19;
 class App::sdview::Output::Pod :strict(params);
 
 apply App::sdview::Output;
@@ -105,6 +105,66 @@ method _output_list ( $para )
    $self->say( "=back" );
 }
 
+field $table_style :param :reader;
+
+method output_table ( $para )
+{
+   $self->maybe_blank;
+
+   my $method = $self->can( "output_table_$table_style" ) or return;
+   $self->$method( $para );
+}
+
+method output_table_md ( $para )
+{
+   $self->say( "=begin table md" );
+   $self->say;
+
+   my $first = 1;
+   foreach my $row ( $para->rows ) {
+      my @cells = @$row;
+      $self->say( join " | ", map { $self->_convert_str( $_->text ) } @cells );
+
+      next unless $first;
+
+      my @aligns = map {
+         my $n = length $_->text;
+         $n = 3 if $n < 3;
+         $_->align eq "centre" ? ":".("-"x($n-2)).":" :
+         $_->align eq "right"  ?     ("-"x($n-1)).":" :
+                                     ("-"x $n   );
+      } @cells;
+      $self->say( join " | ", @aligns );
+      undef $first;
+   }
+
+   $self->say;
+   $self->say( "=end table" );
+}
+
+method output_table_mediawiki ( $para )
+{
+   $self->say( "=begin table mediawiki" );
+   $self->say;
+
+   my $first = 1;
+   foreach my $row ( $para->rows ) {
+      $self->say( "|-" ) unless $first;
+
+      my @cells = @$row;
+      $self->say(
+         $_->heading ? "!" : "|",
+         " ",
+         $self->_convert_str( $_->text )
+      ) for @cells;
+
+      undef $first;
+   }
+
+   $self->say;
+   $self->say( "=end table" );
+}
+
 method _convert_str ( $s )
 {
    my $ret = "";
@@ -153,19 +213,6 @@ method _convert_str ( $s )
 
    return $ret;
 }
-
-=head1 TODO
-
-=over 4
-
-=item *
-
-Some handling of tables. Pod does not (currently?) support tables, but at
-least we could emit some kind of plain-text rendering of the contents.
-
-=back
-
-=cut
 
 =head1 AUTHOR
 

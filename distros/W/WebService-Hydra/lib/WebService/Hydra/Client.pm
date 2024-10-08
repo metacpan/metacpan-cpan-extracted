@@ -18,7 +18,7 @@ use constant OK_STATUS_CODE          => 200;
 use constant OK_NO_CONTENT_CODE      => 204;
 use constant BAD_REQUEST_STATUS_CODE => 400;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 field $http;
 field $jwks;
@@ -282,16 +282,12 @@ Exchanges the authorization code with Hydra service for access and ID tokens.
 
 =cut
 
-method exchange_token ($code, $client_id, $client_secret, $redirect_uri) {
+method exchange_token ($exchange_payload) {
     my $method     = "POST";
     my $path       = "$public_endpoint/oauth2/token";
-    my $grant_type = "authorization_code";
     my $payload    = {
-        code          => $code,
-        grant_type    => $grant_type,
-        client_id     => $client_id,
-        client_secret => $client_secret,
-        redirect_uri  => $redirect_uri
+        grant_type => 'authorization_code',
+        $exchange_payload->%*
     };
     my $result = $self->api_call($method, $path, $payload, 'FORM');
     if ($result->{code} != OK_STATUS_CODE) {

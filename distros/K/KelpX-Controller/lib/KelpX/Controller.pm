@@ -1,5 +1,5 @@
 package KelpX::Controller;
-$KelpX::Controller::VERSION = '1.01';
+$KelpX::Controller::VERSION = '1.02';
 use Kelp::Base;
 use Carp;
 
@@ -14,18 +14,6 @@ sub req
 sub res
 {
 	return $_[0]->context->res;
-}
-
-sub before_dispatch
-{
-	my $self = shift;
-	return $self->app->before_dispatch(@_);
-}
-
-sub before_finalize
-{
-	my $self = shift;
-	return $self->app->before_finalize(@_);
 }
 
 sub build
@@ -102,6 +90,20 @@ The application object. Will be loaded from L</context>.
 A build method, which will be called right after the controller is
 instantiated. Takes no arguments and does nothing by default - it's up to you
 to override it.
+
+To avoid a very common trap you may fall into if you set routes in your
+controller, you should put all route-setting code in your controller after a
+guard clause like the one below:
+
+	sub build
+	{
+		my ($self) = @_;
+
+		... # common code for controllers
+
+		return unless ref $self eq __PACKAGE__;
+		# all code below will not be repeated in subclasses
+	}
 
 =head2 req
 

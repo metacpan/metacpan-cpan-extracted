@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 6;
 use Test::Tk;
 use Tk;
 require Tk::LabFrame;
@@ -67,6 +67,18 @@ if (defined $app) {
 
 push @tests, (
 	[ sub { return defined $picker }, 1, 'ColorPicker widget created' ],
+	[ sub {
+		my @rgb = $picker->hsv2rgb(0, 1, 1);
+		return \@rgb
+	}, [255, 0, 0], 'hsv2rgb' ],
+	[ sub {
+		my @rgb = $picker->hsv2rgb(120, 1, 1);
+		return \@rgb
+	}, [0, 255, 0], 'hsv2rgb' ],
+#	[ sub {
+#		my @rgb = $picker->rgb2hsv(255, 0, 0);
+#		return \@rgb
+#	}, [0, 1, 1], 'hsv2rgb' ],
 );
 
 

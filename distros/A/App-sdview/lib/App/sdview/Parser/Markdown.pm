@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.807;
 
-package App::sdview::Parser::Markdown 0.18;
+package App::sdview::Parser::Markdown 0.19;
 class App::sdview::Parser::Markdown :strict(params);
 
 apply App::sdview::Parser;
@@ -142,9 +142,11 @@ method parse_string ( $str )
 
             next;
          }
-         elsif( $lines[0] =~ s/^[*+-]\s+// ) { # bullet list
+         elsif( $lines[0] =~ s/^\s*[*+-]\s+// ) { # bullet list
+            # TODO: Account for relative amount of leading whitespace to imply
+            # nesting indent levels
             my $raw = shift @lines;
-            while( @lines and $lines[0] !~ m/^[*+-]/ ) {
+            while( @lines and $lines[0] !~ m/^\s*[*+-]/ ) {
                $raw .= " " . ( shift(@lines) =~ m/^\s*(.*)$/ )[0];
             }
 
@@ -207,6 +209,7 @@ method parse_string ( $str )
             } @$aligns;
 
             my @rows;
+            my $heading = !!1;
 
             do {
                shift @lines;
@@ -215,9 +218,12 @@ method parse_string ( $str )
                   my $s = $cells->[$_];
                   App::sdview::Para::TableCell->new(
                      align => $colalign[$_],
+                     heading => $heading,
                      text => $self->_handle_spans( $cells->[$_] ),
                   );
                } 0 .. $#colalign ];
+
+               $heading = !!0;
             } while( @lines and $cells = _split_table_row( $lines[0] ) );
 
             push @_paragraphs, my $p = App::sdview::Para::Table->new( rows => \@rows );

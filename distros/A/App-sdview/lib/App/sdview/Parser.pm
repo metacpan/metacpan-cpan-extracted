@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
@@ -10,7 +10,7 @@ use utf8;
 use Object::Pad 0.807;
 use Object::Pad::FieldAttr::Checked 0.09;
 
-package App::sdview::Parser 0.18;
+package App::sdview::Parser 0.19;
 role App::sdview::Parser;
 
 use String::Tagged;
@@ -92,6 +92,7 @@ class App::sdview::Para::Table :strict(params) {
 class App::sdview::Para::TableCell :strict(params) {
    inherit App::sdview::Para::Plain;
 
+   field $heading :param :reader = !!0;
    field $align :param :reader :Checked(StrEq qw( left centre right ));
 
    method type { "table-cell" }

@@ -35,7 +35,7 @@ BEGIN {
 
 	Exporter::export_ok_tags('all');
 
-    	$VERSION = '1.07';
+	$VERSION = '1.08';
 }
 
 # Preloaded methods go here.
@@ -611,7 +611,7 @@ it under the terms as perl itself.
 
 =head1 REPOSITORY
 
-L<https://github.com/lochiiconnectivity/netasn.git
+L<https://github.com/lochiiconnectivity/netasn.git>
 
 perl(1)
 

@@ -1,5 +1,16 @@
 Revision history for App-sdview
 
+0.19    2024-10-07
+        [CHANGES]
+         * Experimental support for tables in Pod files, in a choice of
+           different syntaxes. Not all of them will eventually be kept, this
+           is largely a test to see what people like.
+         * Also autodetect Pod verbatim blocks if they begin with a shebang
+           line that mentions `perl`
+
+        [BUGFIXES]
+         * Accept Mkardown bullet list markers that have leading whitespace
+
 0.18    2024-07-30
         [CHANGES]
          * Pod directive `=code` is no longer sticky, and now only applies to

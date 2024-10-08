@@ -5,7 +5,6 @@ use strict;
 use warnings;
 package Net::IMP::HTTP::Example::LogFormData;
 use base 'Net::IMP::HTTP::Connection';
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 use fields (
     'rqbuf',  # buffered data from request
@@ -69,7 +68,7 @@ sub request_hdr {
 
     my $ct = $req->content_type;
     if ( $ct && $req->method eq 'POST' and 
-	$ct ~~ ['application/x-www-form-urlencoded','multipart/form-data']
+	$ct eq 'application/x-www-form-urlencoded' || $ct eq 'multipart/form-data'
 	){
 	#debug("got content-type $ct");
 	$self->{btype} = $ct;

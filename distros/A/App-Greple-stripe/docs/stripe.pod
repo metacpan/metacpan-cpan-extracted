@@ -1,0 +1,128 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::stripe - Greple zebra stripe module
+
+=head1 SYNOPSIS
+
+    greple -Mstripe [ module options -- ] ...
+
+=head1 VERSION
+
+Version 0.9903
+
+=head1 DESCRIPTION
+
+L<App::Greple::stripe> is a module for L<greple|App::Greple> to show
+matched text in zebra striping fashion.
+
+The following command matches two consecutive lines.
+
+    greple -E '(.+\n){1,2}' --face +E
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/normal.png">
+</p>
+
+However, each matched block is colored by the same color, so it is not
+clear where the block breaks.  One way is to explicitly display the
+blocks using the C<--blockend> option.
+
+    greple -E '(.+\n){1,2}' --face +E --blockend=--
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/blockend.png">
+</p>
+
+Using the stripe module, blocks matching the same pattern are colored
+with different colors of the similar color series.
+
+    greple -Mstripe -E '(.+\n){1,2}' --face +E
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/stripe.png">
+</p>
+
+By default, two color series are prepared. Thus, when multiple
+patterns are searched, an even-numbered pattern and an odd-numbered
+pattern are assigned different color series.  When multiple patterns
+are specified, only lines matching all patterns will be output, so the
+C<--need=1> option is required to relax this condition.
+
+    greple -Mstripe -E '.*[02468]$' -E '.*[13579]$' --need=1
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/random.png">
+</p>
+
+If you want to use different color series for three or more patterns,
+specify C<step> count when calling the module.  The number of series
+can be increased up to 6.
+
+    greple -Mstripe::set=step=3 --need=1 -E p1 -E p2 -E p3 ...
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/step-3.png">
+</p>
+
+=head1 MODULE OPTIONS
+
+There are options specific to the B<stripe> module.  They can be
+specified either at the time of module declaration or as options
+following the module declaration and ending with C<-->.
+
+The following two commands have exactly the same effect.
+
+    greple -Mstripe=set=step=3
+
+    greple -Mstripe --step=3 --
+
+=over 7
+
+=item B<-Mstripe::set>=B<step>=I<n>
+
+=item B<--step>=I<n>
+
+Set the step count to I<n>.
+
+=item B<-Mstripe::set>=B<darkmode>
+
+=item B<--darkmode>
+
+Use dark background colors.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/darkmode.png">
+</p>
+
+Use C<--face> option to set foreground color for all colormap.  The
+following command sets the foreground color to white and fills the
+entire line with the background color.
+
+    greple -Mstripe --darkmode -- --face +WE
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/dark-white.png">
+</p>
+
+=back
+
+=head1 SEE ALSO
+
+L<App::Greple>
+
+L<App::Greple::xlate>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright ©︎ 2024 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

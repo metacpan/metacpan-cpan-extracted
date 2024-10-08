@@ -1,7 +1,7 @@
 requires 'perl', 'v5.18.2';
 
-requires 'App::Greple', '9.07';
-requires 'App::sdif', '4.25.1';
+requires 'App::Greple', '9.1506';
+requires 'App::sdif', '4.35';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
@@ -11,7 +11,7 @@ on 'test' => sub {
 };
 
 on 'develop' => sub {
-    recommends 'App::Greple::xlate';
+    recommends 'App::Greple::xlate', '0.38';
     recommends 'App::Greple::subst::desumasu';
 };
 

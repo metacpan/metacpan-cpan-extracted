@@ -9,7 +9,7 @@ App::Greple::tee - module to replace matched text by the external command result
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -69,6 +69,33 @@ with **--discrete** option.
     width characters are deleted, and other newline characters are
     replaced with spaces.
 
+- **--squeeze**
+
+    Combines two or more consecutive newline characters into one.
+
+- **-Mline** **--offload** _command_
+
+    [teip(1)](http://man.he.net/man1/teip)'s **--offload** option is implemented in the different
+    module **-Mline**.
+
+        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+
+    You can also use the **line** module to process only even-numbered
+    lines as follows.
+
+        greple -Mtee cat -n -- -Mline 2::2
+
+# LEGACIES
+
+The **--blocks** option is no longer needed now that the **--stretch**
+(**-S**) option has been implemented in **greple**.  You can simply
+perform the following.
+
+    greple -Mtee cat -n -- --all -SE foo
+
+It is not recommended to use **--blocks** as it may be deprecated in
+the future.
+
 - **--blocks**
 
     Normally, the area matching the specified search pattern is sent to
@@ -92,10 +119,6 @@ with **--discrete** option.
     Do not use the **--blocks** with the **--all** option, since the block
     will be the entire data.
 
-- **--squeeze**
-
-    Combines two or more consecutive newline characters into one.
-
 # WHY DO NOT USE TEIP
 
 First of all, whenever you can do it with the **teip** command, use
@@ -114,7 +137,7 @@ consisting of multiple lines.
 Next command will find text blocks inside [perlpod(1)](http://man.he.net/man1/perlpod) style document
 included in Perl module file.
 
-    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^(\w.+\n)+' tee.pm
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^([\w\pP].+\n)+' tee.pm
 
 You can translate them by DeepL service by executing the above command
 convined with **-Mtee** module which calls **deepl** command like this:

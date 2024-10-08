@@ -1,0 +1,198 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::tee - moodul sobitatud teksti asendamiseks välise käsu tulemusega
+
+=head1 SYNOPSIS
+
+    greple -Mtee command -- ...
+
+=head1 VERSION
+
+Version 1.01
+
+=head1 DESCRIPTION
+
+Greple'i B<-Mtee> moodul saadab sobitatud tekstiosa antud filtrikomandole ja asendab need käsu tulemusega. Idee on tuletatud käsust nimega B<teip>. See on nagu osaliste andmete edastamine välise filtri käsule.
+
+Filtri käsk järgneb moodulideklaratsioonile (C<-Mtee>) ja lõpeb kahe kriipsuga (C<-->). Näiteks järgmine käsk kutsub käsu C<tr> käsu C<a-z A-Z> argumentidega sobiva sõna andmete jaoks.
+
+    greple -Mtee tr a-z A-Z -- '\w+' ...
+
+Ülaltoodud käsk teisendab kõik sobitatud sõnad väiketähtedest suurtähtedeks. Tegelikult ei ole see näide iseenesest nii kasulik, sest B<greple> saab sama asja tõhusamalt teha valikuga B<--cm>.
+
+Vaikimisi täidetakse käsk ühe protsessina ja kõik sobivad andmed saadetakse protsessile segamini. Kui sobitatud tekst ei lõpe newline'iga, lisatakse see enne saatmist ja eemaldatakse pärast vastuvõtmist. Sisend- ja väljundandmed kaardistatakse rea kaupa, seega peab sisend- ja väljundridade arv olema identne.
+
+Valiku B<--diskreetne> abil kutsutakse iga sobitatud tekstiala jaoks eraldi käsk. Erinevust saab eristada järgmiste käskude abil.
+
+    greple -Mtee cat -n -- copyright LICENSE
+    greple -Mtee cat -n -- copyright LICENSE --discrete
+
+Sisend- ja väljundandmete read ei pea olema identsed, kui kasutatakse valikut B<--diskreetne>.
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--discrete>
+
+Kutsuge uus käsk eraldi iga sobitatud osa jaoks.
+
+=item B<--bulkmode>
+
+Valiku <--diskreetne> puhul täidetakse iga käsk nõudmisel. Käskkiri
+<--bulkmode> option causes all conversions to be performed at once.
+
+=item B<--crmode>
+
+See valik asendab kõik uue rea märgid iga ploki keskel vagunipöördumismärkidega. Käsu täitmise tulemuses sisalduvad vagunipöörded tagastatakse uusjoonemärkideks. Seega saab mitmest reast koosnevaid plokke töödelda partiidena ilma B<--diskreetse> valikuta.
+
+=item B<--fillup>
+
+Ühendage mittetäielike ridade jada üheks reaks enne nende edastamist filtri käsule. Laiade laiade märkide vahel olevad read kustutatakse ja muud read asendatakse tühikutega.
+
+=item B<--squeeze>
+
+Ühendab kaks või enam järjestikust uusjoonemärki üheks.
+
+=item B<-Mline> B<--offload> I<command>
+
+L<teip(1)>'i B<--offload> valik on rakendatud erinevas moodulis B<-Mline>.
+
+    greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+
+Mooduli B<line> abil saab töödelda ainult paarisnumbrilisi ridu järgmiselt.
+
+    greple -Mtee cat -n -- -Mline 2::2
+
+=back
+
+=head1 LEGACIES
+
+B<--plokkide> valikut ei ole enam vaja, kuna B<--stretch> (B<-S>) valik on implementeeritud B<greple>-sse. Saate lihtsalt teha järgmist.
+
+    greple -Mtee cat -n -- --all -SE foo
+
+B<--blocks> ei ole soovitatav kasutada, kuna see võib tulevikus aeguda.
+
+
+=over 7
+
+=item B<--blocks>
+
+Tavaliselt saadetakse määratud otsingumustrile vastav ala välisele käsule. Kui see valik on määratud, ei töödelda mitte sobivat ala, vaid kogu seda sisaldavat plokki.
+
+Näiteks, et saata väliskäsule mustrit C<foo> sisaldavad read, tuleb määrata kogu reale vastav muster:
+
+    greple -Mtee cat -n -- '^.*foo.*\n' --all
+
+Kuid valikuga B<--blocks> saab seda teha nii lihtsalt kui järgnevalt:
+
+    greple -Mtee cat -n -- foo --blocks
+
+B<--blocks> valikuga käitub see moodul rohkem nagu L<teip(1)> B<-g> valik. Muidu on käitumine sarnane L<teip(1)> B<-o> valikuga.
+
+Ärge kasutage B<--blocks> koos valikuga B<--all>, sest plokk on kogu andmestik.
+
+=back
+
+=head1 WHY DO NOT USE TEIP
+
+Kõigepealt, kui te saate seda teha käsuga B<teip>, kasutage seda. See on suurepärane vahend ja palju kiirem kui B<greple>.
+
+Kuna B<greple> on mõeldud dokumendifailide töötlemiseks, on tal palju selle jaoks sobivaid funktsioone, näiteks sobitusala kontroll. Nende funktsioonide ärakasutamiseks tasuks ehk kasutada B<greple>.
+
+Samuti ei saa B<teip> töödelda mitut rida andmeid ühe üksusena, samas kui B<greple> saab täita üksikuid käske mitmest reast koosnevale andmekogumile.
+
+=head1 EXAMPLE
+
+Järgmine käsk leiab tekstiplokid Perli moodulifailis sisalduva L<perlpod(1)> stiilis dokumendi sees.
+
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^([\w\pP].+\n)+' tee.pm
+
+Saate neid tõlkida DeepL teenuse abil, kui täidate ülaltoodud käsu koos mooduliga B<-Mtee>, mis kutsub käsu B<deepl> järgmiselt:
+
+    greple -Mtee deepl text --to JA - -- --fillup ...
+
+Spetsiaalne moodul L<App::Greple::xlate::deepl> on selleks otstarbeks siiski tõhusam. Tegelikult tuli B<tee> mooduli implementatsiooni vihje B<xlate> moodulist.
+
+=head1 EXAMPLE 2
+
+Järgmine käsk leiab mingi sissekirjutatud osa LICENSE dokumendist.
+
+    greple --re '^[ ]{2}[a-z][)] .+\n([ ]{5}.+\n)*' -C LICENSE
+
+      a) distribute a Standard Version of the executables and library files,
+         together with instructions (in the manual page or equivalent) on where to
+         get the Standard Version.
+
+      b) accompany the distribution with the machine-readable source of the Package
+         with your modifications.
+
+Seda osa saab ümber vormindada, kasutades B<tee> moodulit koos B<ansifold> käsuga:
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' -- --discrete --re ...
+
+      a) distribute a Standard Version of
+         the executables and library files,
+         together with instructions (in the
+         manual page or equivalent) on where
+         to get the Standard Version.
+
+      b) accompany the distribution with the
+         machine-readable source of the
+         Package with your modifications.
+
+Valikuga --diskreetne käivitatakse mitu protsessi, seega võtab protsessi täitmine kauem aega. Seega võite kasutada valikut C<--separate '\r'> koos C<ansifold>, mis toodab ühe rea, kasutades CR-märki NL-i asemel.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+Seejärel teisendage CR märk NL-ks pärast seda käsuga L<tr(1)> või mõnega.
+
+    ... | tr '\r' '\n'
+
+=head1 EXAMPLE 3
+
+Mõelge olukorrale, kus te soovite grep'i abil leida stringid mitte-pealkirjaridadest. Näiteks võite soovida otsida Docker image'i nimesid käsust C<docker image ls>, kuid jätta pealkirjarida alles. Saate seda teha järgmise käsuga.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+Valik C<-Mline -L 2:> otsib välja eelviimased read ja saadab need käsule C<grep perl>. Valik --diskreetne on vajalik, sest sisendi ja väljundi ridade arv muutub, kuid kuna käsk täidetakse ainult üks kord, ei ole tulemuslikkuse puudujääki.
+
+Kui püüda sama asja teha käsuga B<teip>, annab C<teip -l 2- -- grep> vea, sest väljundridade arv on väiksem kui sisendridade arv. Saadud tulemusega ei ole aga mingit probleemi.
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::Greple::tee
+
+=head1 SEE ALSO
+
+L<App::Greple::tee>, L<https://github.com/kaz-utashiro/App-Greple-tee>
+
+L<https://github.com/greymd/teip>
+
+L<App::Greple>, L<https://github.com/kaz-utashiro/greple>
+
+L<https://github.com/tecolicom/Greple>
+
+L<App::Greple::xlate>
+
+=head1 BUGS
+
+Valik C<--fillup> eemaldab korea keele teksti liidestamisel Hangul-märkide vahel olevad tühikud.
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright © 2023-2024 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

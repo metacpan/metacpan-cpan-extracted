@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 package Net::IMP::Filter;
 use Net::IMP;
@@ -191,7 +190,7 @@ sub _imp_cb {
 	    my ($key,$value) = @$rv;
 	    $self->acctfld($key,$value);
 
-	} elsif ( $rtype ~~ [ IMP_PASS, IMP_PREPASS ] ) {
+	} elsif ( $rtype == IMP_PASS or $rtype == IMP_PREPASS ) {
 	    my ($dir,$offset) = @$rv;
 	    $DEBUG && debug("got %s %d|%d", $rtype,$dir,$offset);
 
@@ -298,7 +297,7 @@ sub _imp_cb {
 		$buf0->[0] = $offset;
 	    }
 
-	} elsif ( $rtype ~~ [ IMP_PAUSE, IMP_CONTINUE ] ) {
+	} elsif ( $rtype == IMP_PAUSE or $rtype == IMP_CONTINUE ) {
 	    # ignore
 	} else {
 	    die "cannot handle Net::IMP rtype $rtype";

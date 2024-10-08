@@ -12,7 +12,6 @@ use File::Temp 'tempfile';
 use Digest::MD5;
 use Carp;
 use Scalar::Util 'looks_like_number';
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 my $DEFAULT_LIMIT = 10_000_000;
 
@@ -205,7 +204,7 @@ sub validate_cfg {
     for my $k (qw(content_type method)) {
 	my $v = delete $cfg{$k} // next;
 	push @err,"$k should be string, hash or regexp" if 
-	    ref($v) and not ref($v) ~~ [ 'Regexp','HASH' ];
+	    !ref($v) or ref($v) eq 'Regexp' or rev($v) eq 'HASH';
     }
     for my $k (qw(exclude_url only_url)) {
 	my $v = delete $cfg{$k} // next;

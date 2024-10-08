@@ -8,7 +8,7 @@ App::Greple::tee - eşleşen metni harici komut sonucu ile değiştiren modül
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -48,6 +48,28 @@ Varsayılan olarak, komut tek bir süreç olarak yürütülür ve eşleşen tüm
 
     Bir dizi boş olmayan satırı filtre komutuna geçirmeden önce tek bir satırda birleştirin. Geniş karakterler arasındaki yeni satır karakterleri silinir ve diğer yeni satır karakterleri boşluklarla değiştirilir.
 
+- **--squeeze**
+
+    İki veya daha fazla ardışık satırsonu karakterini tek bir karakterde birleştirir.
+
+- **-Mline** **--offload** _command_
+
+    [teip(1)](http://man.he.net/man1/teip)'in **--offload** seçeneği farklı bir modül olan **-Mline**'da uygulanmaktadır.
+
+        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+
+    **line** modülünü sadece çift sayılı satırları işlemek için de aşağıdaki gibi kullanabilirsiniz.
+
+        greple -Mtee cat -n -- -Mline 2::2
+
+# LEGACIES
+
+**--stretch** (**-S**) seçeneği **greple** modülünde uygulandığı için **--blocks** seçeneğine artık gerek yoktur. Basitçe aşağıdakileri uygulayabilirsiniz.
+
+    greple -Mtee cat -n -- --all -SE foo
+
+Gelecekte kullanımdan kaldırılabileceği için **--blocks** seçeneğinin kullanılması önerilmez.
+
 - **--blocks**
 
     Normalde, belirtilen arama deseniyle eşleşen alan harici komuta gönderilir. Bu seçenek belirtilirse, eşleşen alan değil, onu içeren tüm blok işlenecektir.
@@ -64,10 +86,6 @@ Varsayılan olarak, komut tek bir süreç olarak yürütülür ve eşleşen tüm
 
     **--blocks** seçeneğini **--all** seçeneği ile birlikte kullanmayın, çünkü blok tüm veri olacaktır.
 
-- **--squeeze**
-
-    İki veya daha fazla ardışık satırsonu karakterini tek bir karakterde birleştirir.
-
 # WHY DO NOT USE TEIP
 
 Öncelikle, **teip** komutu ile yapabildiğiniz her şeyi kullanın. Mükemmel bir araçtır ve **greple**'den çok daha hızlıdır.
@@ -80,7 +98,7 @@ Ayrıca, **teip** birden fazla veri satırını tek bir birim olarak işleyemezk
 
 Sonraki komut, Perl modül dosyasında bulunan [perlpod(1)](http://man.he.net/man1/perlpod) tarzı belge içindeki metin bloklarını bulacaktır.
 
-    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^(\w.+\n)+' tee.pm
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^([\w\pP].+\n)+' tee.pm
 
 Yukarıdaki komutu **deepl** komutunu çağıran **-Mtee** modülü ile birlikte çalıştırarak DeepL servisi ile çevirebilirsiniz:
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::ColorEntry.
 
+0.09  Mon Oct 07 2024
+	- Removed requirement for Convert::Color.
+	- Changed resolution to 0.001 and max value 1 for Saturation and Value
+
 0.08  Wed Jun 10 2024
 	- Removed annoying print statements
 

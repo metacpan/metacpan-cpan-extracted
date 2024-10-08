@@ -8,7 +8,7 @@ App::Greple::tee - module om gematchte tekst te vervangen door het externe opdra
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -48,6 +48,28 @@ Bij gebruik van de optie **--discreet** hoeven de regels invoer- en uitvoergegev
 
     Combineer een reeks niet-blanke regels tot één regel voordat je ze doorgeeft aan de filteropdracht. Newline-tekens tussen tekens met een grote breedte worden verwijderd en andere newline-tekens worden vervangen door spaties.
 
+- **--squeeze**
+
+    Combineert twee of meer opeenvolgende newline-tekens tot één.
+
+- **-Mline** **--offload** _command_
+
+    De optie **--offload** van [teip(1)](http://man.he.net/man1/teip) is geïmplementeerd in de andere module **-Mline**.
+
+        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+
+    U kunt ook de module **line** gebruiken om alleen even genummerde regels te verwerken.
+
+        greple -Mtee cat -n -- -Mline 2::2
+
+# LEGACIES
+
+De optie **-blokken** is niet langer nodig nu de optie **--stretch** (**-S**) is geïmplementeerd in **greple**. Je kunt gewoon het volgende uitvoeren.
+
+    greple -Mtee cat -n -- --all -SE foo
+
+Het wordt niet aangeraden om **-blokken** te gebruiken omdat deze optie in de toekomst mogelijk niet meer gebruikt zal worden.
+
 - **--blocks**
 
     Normaal gesproken wordt het gebied dat overeenkomt met het opgegeven zoekpatroon naar de externe opdracht gestuurd. Als deze optie is opgegeven, wordt niet het gebied dat overeenkomt, maar het hele blok dat het bevat, verwerkt.
@@ -64,10 +86,6 @@ Bij gebruik van de optie **--discreet** hoeven de regels invoer- en uitvoergegev
 
     Gebruik de **-blokken** niet met de **--all** optie, aangezien het blok dan de volledige gegevens zijn.
 
-- **--squeeze**
-
-    Combineert twee of meer opeenvolgende newline-tekens tot één.
-
 # WHY DO NOT USE TEIP
 
 Allereerst, wanneer u het kunt doen met het commando **-teip**, gebruik het. Het is een uitstekend hulpmiddel en veel sneller dan **greple**.
@@ -80,7 +98,7 @@ Ook kan **teip** niet omgaan met meerdere regels gegevens als een enkele eenheid
 
 Het volgende commando vindt tekstblokken in [perlpod(1)](http://man.he.net/man1/perlpod) stijldocument opgenomen in het Perl-modulebestand.
 
-    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^(\w.+\n)+' tee.pm
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^([\w\pP].+\n)+' tee.pm
 
 U kunt ze vertalen door DeepL service door het bovenstaande commando uit te voeren in combinatie met **-Mtee** module die het commando **deepl** als volgt oproept:
 

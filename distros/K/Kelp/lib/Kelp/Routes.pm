@@ -8,6 +8,8 @@ use Kelp::Util;
 use Kelp::Routes::Location;
 use Try::Tiny;
 
+our @CARP_NOT = qw(Kelp::Module::Routes);
+
 attr base => '';    # the default is set by config module
 attr rebless => 0;    # do not rebless app by default
 attr pattern_obj => 'Kelp::Routes::Pattern';
@@ -287,16 +289,15 @@ sub match
     my $routes = $self->cache->get($key);
     if (!defined $routes) {
 
-        # Look through all routes, grep the ones that match and sort them by
-        # 'bridge' and 'pattern'. Perl sort function is stable, meaning it will
+        # Look through all routes, grep the ones that match and sort them with
+        # the compare method. Perl sort function is stable, meaning it will
         # preserve the initial order of records it considers equal. This means
         # that the order of registering routes is crucial when a couple of
         # routes are registered with the same pattern: routes defined earlier
         # will be run first and the first one to render will end the execution
-        # chain. If the patterns are not the same, their order will be changed
-        # by string sorting by patterns.
+        # chain.
         @$routes =
-            sort { $b->bridge <=> $a->bridge || $a->pattern cmp $b->pattern }
+            sort { $a->compare($b) }
             grep { $_->match($path, $method) } @{$self->routes};
 
         $self->cache->set($key, $routes);
@@ -324,10 +325,10 @@ sub dispatch
         unless $dest;
 
     my ($to, $controller, $action) = ($route->to, @{$dest});
-    $app = $app->context->set_controller($controller);
+    my $c = $app->context->set_controller($controller);
 
-    $app->before_dispatch($to);
-    return $action->($app, @{$route->param});
+    $app->_run_hook(before_dispatch => ($to));
+    return $action->($c, @{$route->param});
 }
 
 1;

@@ -1,6 +1,6 @@
 package Math::3Space;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 # ABSTRACT: 3D Coordinate math with an intuitive cross-space mapping API
 
 use strict;
@@ -379,7 +379,7 @@ Ed J <mohawk2@users.noreply.github.com>
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 COPYRIGHT AND LICENSE
 

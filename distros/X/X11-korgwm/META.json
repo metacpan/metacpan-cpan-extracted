@@ -1,7 +1,7 @@
 {
    "abstract" : "a tiling window manager for X11",
    "author" : [
-      "Sergei Zhmylev <zhmylove@cpan.org>"
+      "Sergei Zhmylev <zhmylove@narod.ru>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
@@ -47,7 +47,7 @@
             "POSIX" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
-            "X11::XCB" : "0.22",
+            "X11::XCB" : "0.23",
             "YAML::Tiny" : "0"
          }
       },
@@ -71,7 +71,7 @@
          "web" : "https://github.com/zhmylove/korgwm"
       }
    },
-   "version" : "3.1",
+   "version" : "4.0",
    "x_authority" : "cpan:ZHMYLOVE",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.07"

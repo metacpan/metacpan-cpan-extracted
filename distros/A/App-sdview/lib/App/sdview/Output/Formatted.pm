@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
@@ -9,8 +9,10 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Formatted 0.18;
+package App::sdview::Output::Formatted 0.19;
 class App::sdview::Output::Formatted :strict(params);
+
+use Sublike::Extended 0.26; # bugfix RT155654
 
 # This isn't itself an output module; but a base class to build them on
 # So no `format` constant.
@@ -60,12 +62,11 @@ method output ( @paragraphs )
 
 *output_item = \&_output_para;
 
-method _output_para ( $para, %opts )
-{
-   my $margin = $opts{margin} // 0;
-   my $leader = $opts{leader};
-   my $indent = $opts{indent};
-
+extended method _output_para ( $para,
+   :$margin //= 0,
+   :$leader = undef,
+   :$indent //= 0,
+) {
    my %typestyle = App::sdview::Style->para_style( $para->type )->%*;
 
    $self->say() if $_nextblank;
@@ -89,7 +90,6 @@ method _output_para ( $para, %opts )
    }
 
    $margin += ( $typestyle{margin} // 0 );
-   $indent //= 0;
 
    foreach my $line ( @lines ) {
       length $line or defined $leader or
@@ -149,11 +149,12 @@ method output_list_bullet ( $para, %opts ) { $self->_output_list( bullet => $par
 method output_list_number ( $para, %opts ) { $self->_output_list( number => $para, %opts ); }
 method output_list_text   ( $para, %opts ) { $self->_output_list( text   => $para, %opts ); }
 
-method _output_list( $listtype, $para, %opts )
-{
+extended method _output_list( $listtype, $para,
+   :$margin //= 0,
+   %  # ignore other named opts
+) {
    my $n = $para->initial;
 
-   my $margin = $opts{margin} // 0;
    $margin += App::sdview::Style->para_style( "list" )->{margin} // 0;
 
    foreach my $item ( $para->items ) {
@@ -191,10 +192,8 @@ method _output_list( $listtype, $para, %opts )
    }
 }
 
-method output_table ( $para, %opts )
+extended method output_table ( $para, :$margin //= 0 )
 {
-   my $margin = $opts{margin} // 0;
-
    my %typestyle = App::sdview::Style->para_style( "table" )->%*;
    $margin += $typestyle{margin} // 0;
 
@@ -220,9 +219,6 @@ method output_table ( $para, %opts )
          $self->say( $marginspace, "├", join( "┼", @hrules ), "┤" );
       }
 
-      my %rowstyle = %typestyle;
-      %rowstyle = ( App::sdview::Style->para_style( "table-heading" )->%*, %rowstyle ) if $firstrow;
-
       my $out = "│";
 
       foreach my $colidx ( 0 .. $maxcol ) {
@@ -230,7 +226,10 @@ method output_table ( $para, %opts )
 
          my $text = App::sdview::Style->convert_str( $cell->text );
 
-         $rowstyle{$_} and $text->apply_tag( 0, -1, $_ => $rowstyle{$_} )
+         my %cellstyle = %typestyle;
+         %cellstyle = ( App::sdview::Style->para_style( "table-heading" )->%*, %cellstyle ) if $cell->heading;
+
+         $cellstyle{$_} and $text->apply_tag( 0, -1, $_ => $cellstyle{$_} )
             for qw( fg bg bold under italic monospace );
 
          my $spare = $colwidths[$colidx] - length $text;

@@ -12,7 +12,10 @@ BEGIN {
     # Default values
     $cfg->{debug} = 0;
     $cfg->{api_host} = "127.0.0.1";
-    $cfg->{api_port} = 27015;
+
+    ## This may be way too complicated, but thus I'm sure it won't be exploited. Resolves EADDRINUSE
+    $cfg->{api_port} = ($ENV{KORGWM_DEBUG_PORT} // "") =~ m/^(\d+)$/s ? $1 : 27015;
+
     $cfg->{api_timeout} = 5;
     $cfg->{battery_format} = "%s";
     $cfg->{border_width} = 1;
@@ -35,13 +38,16 @@ BEGIN {
     $cfg->{lang_format} = " %s ";
     $cfg->{lang_names} = { 0 => chr(0x00a3), 1 => chr(0x20bd) };
     $cfg->{mouse_follow} = 1;
+    $cfg->{move_follow} = 1;
     $cfg->{panel_end} = [qw( battery clock lang )];
     $cfg->{panel_height} = 20;
     $cfg->{panel_hide} = undef;
     $cfg->{randr_cmd} = q(xrandr --output HDMI-A-0 --left-of eDP --auto --output DisplayPort-0 --right-of eDP --auto);
+    ## For 4K screens we perhaps need to override:
+    # --output HDMI-A-0 --left-of eDP --mode 1920x1080 --output DisplayPort-0 --right-of eDP --mode 1920x1080
     $cfg->{set_root_color} = 0;
     $cfg->{title_max_len} = 128;
-    $cfg->{ws_names} = [qw( T W M 4 5 6 7 8 9 )];
+    $cfg->{ws_names} = [qw( 1 2 3 4 5 6 7 8 9 )];
 
     # Default keyboard layout
     $cfg->{hotkeys} = {
@@ -73,15 +79,21 @@ BEGIN {
                 "mod_="                 => "exec(galculator)",
                 "mod_ctrl_shift_q"      => "exit()",
                 "Print"                 => "exec(flameshot gui)",
-                "XF86MonBrightnessDown" => "exec(light -U 20)",
-                "XF86MonBrightnessUp"   => "exec(light -A 20)",
-                "XF86AudioLowerVolume"  => "exec(pactl set-sink-volume 0 -10%)",
-                "XF86AudioRaiseVolume"  => "exec(pactl set-sink-volume 0 +10%)",
-                "XF86AudioMute"         => "exec(pactl set-sink-mute 0 toggle)",
+                "XF86AudioLowerVolume"  => "nop()",
+                "XF86AudioMute"         => "nop()",
+                "XF86AudioRaiseVolume"  => "nop()",
+                "XF86MonBrightnessDown" => "nop()",
+                "XF86MonBrightnessUp"   => "nop()",
+                "XF86WakeUp"            => "nop()",
+                "mod_alt_F1"            => "exec(pactl set-sink-mute 0 toggle)",
+                "mod_alt_F2"            => "exec(pactl set-sink-volume 0 -10%)",
+                "mod_alt_F3"            => "exec(pactl set-sink-volume 0 +10%)",
+                "mod_alt_F5"            => "exec(light -U 20)",
+                "mod_alt_F6"            => "exec(light -A 20)",
     };
 
     $cfg->{rules} = {
-        "mattermost"    => { screen => 2, tag => 4, follow => 1, },
+        "mattermost"    => { screen => 3, tag => 4, follow => 1, },
         "evolution"     => { screen => 1, tag => 3, follow => 0, },
         "galculator"    => { floating => 1 },
         "urxvt-float"   => { floating => 1 },
@@ -116,6 +128,7 @@ BEGIN {
 
     # Set the DEBUG
     *X11::korgwm::Common::DEBUG = $cfg->{debug} ? sub() { 1 } : sub() { undef };
+    *X11::korgwm::Common::DEBUG_API = (DEBUG or defined $ENV{KORGWM_DEBUG_API}) ? sub() { 1 } : sub() { undef };
 }
 
 1;

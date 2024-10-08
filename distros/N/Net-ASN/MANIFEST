@@ -5,5 +5,3 @@ README
 lib/Net/ASN.pm
 t/asn.t
 examples/astool
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

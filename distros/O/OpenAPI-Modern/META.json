@@ -230,15 +230,15 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       }
    },
    "release_status" : "stable",
@@ -253,7 +253,7 @@
          "web" : "https://github.com/karenetheridge/OpenAPI-Modern"
       }
    },
-   "version" : "0.069",
+   "version" : "0.070",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.041004"
@@ -1130,7 +1130,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.069",
+                  "tag" : "v0.070",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

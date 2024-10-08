@@ -8,7 +8,7 @@ App::Greple::tee - module permettant de remplacer le texte correspondant par le 
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -48,6 +48,28 @@ Il n'est pas nécessaire que les lignes de données d'entrée et de sortie soien
 
     Combiner une séquence de lignes non vides en une seule ligne avant de les passer à la commande de filtrage. Les caractères de nouvelle ligne entre les caractères de grande largeur sont supprimés, et les autres caractères de nouvelle ligne sont remplacés par des espaces.
 
+- **--squeeze**
+
+    Combine deux ou plusieurs caractères de retour à la ligne consécutifs en un seul.
+
+- **-Mline** **--offload** _command_
+
+    L'option **--offload** de [teip(1)](http://man.he.net/man1/teip) est implémentée dans le module différent **-Mline**.
+
+        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+
+    Vous pouvez également utiliser le module **line** pour ne traiter que les lignes paires comme suit.
+
+        greple -Mtee cat -n -- -Mline 2::2
+
+# LEGACIES
+
+L'option **--blocs** n'est plus nécessaire maintenant que l'option **--stretch** (**-S**) a été implémentée dans **greple**. Vous pouvez simplement procéder comme suit.
+
+    greple -Mtee cat -n -- --all -SE foo
+
+Il n'est pas recommandé d'utiliser l'option **--blocks** car elle pourrait être dépréciée à l'avenir.
+
 - **--blocks**
 
     Normalement, la zone correspondant au modèle de recherche spécifié est envoyée à la commande externe. Si cette option est spécifiée, ce n'est pas la zone correspondant au motif de recherche qui sera traitée, mais l'ensemble du bloc qui la contient.
@@ -64,10 +86,6 @@ Il n'est pas nécessaire que les lignes de données d'entrée et de sortie soien
 
     N'utilisez pas l'option **--blocks** avec l'option **--all**, car le bloc sera la totalité des données.
 
-- **--squeeze**
-
-    Combine deux ou plusieurs caractères de retour à la ligne consécutifs en un seul.
-
 # WHY DO NOT USE TEIP
 
 Tout d'abord, chaque fois que vous pouvez le faire avec la commande **teip**, utilisez-la. C'est un excellent outil et beaucoup plus rapide que **greple**.
@@ -80,7 +98,7 @@ Par ailleurs, **teip** ne peut pas traiter plusieurs lignes de données comme un
 
 La commande suivante trouvera des blocs de texte dans le document de style [perlpod(1)](http://man.he.net/man1/perlpod) inclus dans le fichier du module Perl.
 
-    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^(\w.+\n)+' tee.pm
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^([\w\pP].+\n)+' tee.pm
 
 Vous pouvez les traduire par le service DeepL en exécutant la commande ci-dessus combinée avec le module **-Mtee** qui appelle la commande **deepl** comme ceci :
 

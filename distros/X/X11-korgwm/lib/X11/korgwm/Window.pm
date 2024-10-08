@@ -7,7 +7,7 @@ use warnings;
 use feature 'signatures';
 
 use Carp;
-use List::Util qw( any first );
+use List::Util qw( any first sum0 );
 use Encode qw( encode decode );
 use X11::XCB ':all';
 use X11::korgwm::Common;
@@ -19,16 +19,19 @@ use overload '==' => sub { (refaddr($_[0]) // 0) == (refaddr($_[1]) // 0) };
 use overload '!=' => sub { (refaddr($_[0]) // 0) != (refaddr($_[1]) // 0) };
 
 # Internal class variables
-our $focus_prev;
 my $sid = 1;
+my @wm_size_hints = qw( flags x y width height min_width min_height max_width max_height width_inc height_inc
+    min_aspect_num min_aspect_den max_aspect_num max_aspect_den base_width base_height win_gravity );
+my $wm_size_hints = "LllllllllllllllllL";
 
 sub new($class, $id) {
     # Full structure is defined in architecture/05_data_structures.txt
-    bless { id => $id, sid => $sid++, on_tags => {} }, $class;
+    bless { id => $id, sid => $sid++, on_tags => {}, pref_position => [] }, $class;
 }
 
 sub DESTROY($self) {
-    $focus_prev = undef if $self == ($focus_prev // 0);
+    # Wanna free some resources? Do it inside Destroy handler: korgwm.pm/hide_window()
+    1;
 }
 
 sub _get_property($wid, $prop_name, $prop_type='UTF8_STRING', $ret_length=8) {
@@ -128,23 +131,55 @@ sub resize($self, $w, $h) {
     $X->configure_window($self->{id}, CONFIG_WINDOW_WIDTH | CONFIG_WINDOW_HEIGHT, $w, $h);
 }
 
+# Move floating windows between screens
+sub floating_move_screen($self, $old_screen, $new_screen) {
+    return unless $self->{floating};
+
+    my ($new_x, $new_y) = @{ $self }{qw( real_x real_y )};
+    $new_x -= $old_screen->{x};
+    $new_y -= $old_screen->{y};
+    $new_x += $new_screen->{x};
+    $new_y += $new_screen->{y};
+    $self->move($new_x, $new_y);
+
+    # Fix configured geometry after it was modified by move()
+    @{ $self }{qw( x y )} = @{ $self }{qw( real_x real_y )};
+}
+
+# Put the window above others
 sub _stack_above($self) {
     return if $self->{_hidden};
     $X->configure_window($self->{id}, CONFIG_WINDOW_STACK_MODE, STACK_MODE_ABOVE);
 }
 
+# Put the window below another ($top)
 sub _stack_below($self, $top) {
     return if $self->{_hidden};
     $X->configure_window($self->{id}, CONFIG_WINDOW_SIBLING | CONFIG_WINDOW_STACK_MODE, $top->{id}, STACK_MODE_BELOW);
+}
+
+# Place windows in a stack calling above/below only once per window
+sub _stack_place(@stack) {
+    return unless @stack;
+    my $above = shift @stack;
+    my %seen = ($above => undef);
+    $above->_stack_above();
+
+    for my $win (@stack) {
+        next if exists $seen{$win};
+        $seen{$win} = undef;
+        $win->_stack_below($above);
+        $above = $win;
+    }
 }
 
 sub focus($self) {
     croak "Undefined window" unless $self->{id};
 
     # Get focus pointer and reset focus for previously focused window, if any
-    if ($focus->{window} and $self != ($focus->{window} // 0)) {
-        $focus_prev = $focus->{window};
-        $focus_prev->reset_border();
+    if ($focus->{window} and $self != $focus->{window}) {
+        focus_prev_push($focus->{window});
+        $focus->{window}->reset_border();
     }
 
     $X->change_window_attributes($self->{id}, CW_BORDER_PIXEL, $cfg->{color_border_focus});
@@ -185,7 +220,14 @@ sub focus($self) {
         croak "Focusing window on multiple visible tags is not supported";
     } elsif ($self->{maximized} or (0 == @{ $tag->{windows_float} } and 0 == @{ $tag->{screen}->{always_on} })) {
         # Just raise the window if it is maximized or there are no floating windows on current tag
-        $self->_stack_above();
+        # We also must show it's transients
+
+        # Then create a stack of windows we want to show
+        my @stack = $self->transients();
+        push @stack, $self;
+
+        # Place the windows stack
+        _stack_place(@stack);
     } else {
         # The window is not maximized and there are some floating windows
         # This procedure likely fixes the bug I observed 6 years ago in WMFS1
@@ -203,17 +245,8 @@ sub focus($self) {
         push @stack, grep { $_ != $self } @{ $tag->{windows_tiled} };
 
         # Fist element of the @stack should be raised above others
-        $stack[0]->_stack_above();
-        my $last = $stack[0];
-        my %seen = ($stack[0] => undef);
-
         # Other elements should be chained below
-        for (my $i = 1; $i < @stack; $i++) {
-            next if exists $seen{$stack[$i]};
-            $seen{$stack[$i]} = undef;
-            $stack[$i]->_stack_below($last);
-            $last = $stack[$i];
-        }
+        _stack_place(@stack);
     }
 
     $X->set_input_focus(INPUT_FOCUS_POINTER_ROOT, $self->{id}, TIME_CURRENT_TIME);
@@ -224,6 +257,7 @@ sub focus($self) {
     my $screen = $self->{always_on} || $tag->{screen};
     $screen->{focus} = $self;
     $screen->{panel}->title($self->title // "");
+    $tag->{focus} = $self unless $self->{always_on};
     $focus->{window} = $self;
     $focus->{screen} = $self->{always_on} || $focus_screens[0];
 
@@ -243,21 +277,27 @@ sub update_title($self) {
     }
 }
 
-sub hide($self) {
+# Literally hide the window out of the screen not using $self->move() to avoid garbage in real_*
+sub _hide($self) {
     # We do not actually unmap them anymore, just move out of screen and mark as '_hidden'.
     $self->{_hidden} = 1;
 
-    # Not using $self->move() to avoid garbage in real_*
+    # Ask X11 to move it
     $X->configure_window($self->{id}, CONFIG_WINDOW_X | CONFIG_WINDOW_Y, $self->{sid} * 4096, $visible_max_y * 2);
+}
+
+sub hide($self) {
+    # Hide the window
+    $self->_hide();
 
     # Drop panel title
     $_->{panel}->title() for grep { ($_->{focus} // 0) == $self } $self->screens();
 
-    # Drop focus
-    $focus->{window} = undef if $self == ($focus->{window} // 0);
-
-    # Execute hooks, see Expose.pm
-    $_->($self) for our @hooks_hide;
+    # Drop focus saving $self to $focus_prev
+    if ($self == ($focus->{window} // 0)) {
+        focus_prev_push($focus->{window});
+        $focus->{window} = undef;
+    }
 }
 
 sub show($self) {
@@ -270,6 +310,12 @@ sub show($self) {
 
     # Remove _hidden mark as it was requested manually
     delete $self->{_hidden};
+}
+
+# Move the window out of the screen and ask X11 to map it. It is used for opening windows in the background
+sub show_hidden($self) {
+    $self->_hide();
+    $X->map_window($self->{id});
 }
 
 sub tags($self) {
@@ -300,6 +346,7 @@ sub transients($self) {
     map { ($windows->{$_}->transients(), $windows->{$_}) } sort @siblings_xid;
 }
 
+# Toggles or sets a particular floating
 sub toggle_floating($self, $set_floating = undef) {
     # There is no way to disable floating for transient windows
     return if $self->{transient_for};
@@ -368,10 +415,19 @@ sub toggle_maximize($self, $action = undef) {
     return unless @visible_tags; # ignore maximize requests for invisibe windows
     my $tag = $visible_tags[0];
 
+    # There is race condition creating new maximized windows like starting evince in a fullscreen mode
+    # To avoid that we want to ignore FocusIn and EnterNotify for a short time
+    # I also want to prevent EnterNotify unmaximizing a window to avoid focus switch, so calling it unconditionally
+    prevent_focus_in();
+    prevent_enter_notify();
+
     # Execute toggle
     if ($action) {
         $tag->{max_window} = $self;
         @{ $self }{qw( x y w h )} = @{ $self }{qw( real_x real_y real_w real_h )};
+
+        # Hide all the windows from tag, they will emerge on tag->show()
+        $_->_hide() for $tag->windows();
     } else {
         $tag->{max_window} = undef;
         $self->resize_and_move(@{ $self }{qw( x y w h )});
@@ -390,7 +446,7 @@ sub toggle_always_on($self) {
     } else {
         # Remove window from always_on and store it in current tag
         my $arr = $focus->{screen}->{always_on};
-        splice @{ $arr }, $_, 1 for reverse grep { $arr->[$_] == $self } 0..$#{ $arr };
+        @{ $arr } = grep { $self != $_ } @{ $arr };
         $focus->{screen}->current_tag()->win_add($self);
     }
 }
@@ -467,6 +523,13 @@ sub urgency_raise($self, $set_hint = undef) {
 }
 
 sub warp_pointer($self) {
+    # Do nothing if this window already owns the pointer not in (0, 0) position
+    my $ptr = pointer();
+    return if $self->{id} == ($ptr->{child} // 0) and sum0 map { $ptr->{$_} // () } qw( root_x root_y );
+
+    # We have to re-stack windows if the win is floating, so call focus() explicitly
+    $self->focus() if $self->{floating};
+
     $X->warp_pointer(0, $self->{id}, 0, 0, 0, 0, map {
             int($self->{$_} / 2) - $cfg->{border_width} - 1
         } qw( real_w real_h ));
@@ -547,6 +610,19 @@ sub swap($self, $new) {
     ($arr->[$pos[0]], $arr->[$pos[1]]) = ($arr->[$pos[1]], $arr->[$pos[0]]);
     $tag->show();
     $self->warp_pointer();
+}
+
+# Get WM_SIZE_HINTS
+sub size_hints_get($self) {
+    my $hints = { flags => 0 };
+
+    my $req = $X->get_property(0, $self->{id}, ATOM_WM_NORMAL_HINTS, ATOM_WM_SIZE_HINTS, 0, 64);
+    my $data = $X->get_property_reply($req->{sequence});
+
+    return $hints unless defined $data->{value};
+
+    @{ $hints }{ @wm_size_hints } = unpack($wm_size_hints, $data->{value});
+    return $hints;
 }
 
 1;

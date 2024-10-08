@@ -1,9 +1,10 @@
 LANGS    := DE EL ET FR ID JA KO NL RO RU TR UK ZH
 RM_LANGS := JA KO ZH
 IGNORE   := VERSION AUTHOR LICENSE
+USEAPI   ?= yes
 
 LIB    := ../lib/App/Greple
-SRCDIR := src
+SRCDIR := 
 
 MODS   := $(wildcard $(LIB)/*.pm)
 PM     := $(notdir $(MODS))
@@ -34,7 +35,10 @@ $(foreach ignore,$(IGNORE),$(eval \
 ))
 endif
 
-XLATE := xlate $(if $(USEAPI),-a)
+XLATE := xlate
+ifeq ($(USEAPI),yes)
+  XLATE += -a
+endif
 
 DESUMASU := NO
 ifeq ($(DESUMASU),GREPLE)

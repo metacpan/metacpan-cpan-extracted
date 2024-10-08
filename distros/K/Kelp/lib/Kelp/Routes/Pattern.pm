@@ -4,6 +4,8 @@ use Carp;
 
 use Kelp::Base;
 
+our @CARP_NOT = qw(Kelp::Routes);
+
 attr pattern => sub { die "pattern is required" };
 attr via => undef;
 attr method => sub { $_[0]->via };
@@ -12,6 +14,7 @@ attr name => sub { $_[0]->pattern };
 attr check => sub { {} };
 attr defaults => sub { {} };
 attr bridge => 0;
+attr order => 0;
 attr regex => sub { $_[0]->_build_regex };
 attr named => sub { {} };
 attr param => sub { [] };
@@ -142,8 +145,21 @@ sub _build_regex
     }
 
     $pattern = join '', @parts;
-    $pattern .= quotemeta('/') . '?' unless $trailing_slash;
-    $pattern .= '$' unless $self->bridge;
+    if ($self->bridge) {
+
+        # bridge must be followed by a slash or end of string, so that:
+        # - /test matches
+        # - /test/ matches
+        # - /test/something matches
+        # - /testsomething does not match
+        $pattern .= '(?:/|$)';
+    }
+    else {
+
+        # regular pattern must end immediately
+        $pattern .= quotemeta('/') . '?' unless $trailing_slash;
+        $pattern .= '$';
+    }
 
     return qr{^$pattern};
 }
@@ -224,6 +240,15 @@ sub match
     $self->param(\@matched);
 
     return 1;
+}
+
+sub compare
+{
+    my ($self, $other) = @_;
+
+    return $other->bridge <=> $self->bridge
+        || $self->order <=> $other->order
+        || $self->pattern cmp $other->pattern;
 }
 
 1;
@@ -331,6 +356,11 @@ of them, it will be used in case the placeholder value is missing.
 A True/False value. Specifies if the route is a bridge. For more information
 about bridges, please see L<Kelp::Routes/BRIDGES>
 
+=head2 order
+
+A numeric order of this route. Default order is C<0>, so if you want some
+routes to take priority, you can use C<-1>. Lower is earlier.
+
 =head2 regex
 
 We recommend that you stick to using patterns, because they are simpler and
@@ -402,6 +432,12 @@ should be built like this:
 
 If the pattern contains more than one unnamed items, then you should
 probably give them some names.
+
+=head2 compare
+
+C<$compare( $other )>
+
+Compares two routes. Used for sorting matched routes in a router.
 
 =head1 ACKNOWLEDGEMENTS
 

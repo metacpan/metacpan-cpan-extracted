@@ -8,7 +8,7 @@ App::Greple::tee - modul de înlocuire a textului cu rezultatul unei comenzi ext
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -48,6 +48,28 @@ Liniile de date de intrare și de ieșire nu trebuie să fie identice atunci câ
 
     Combină o secvență de linii care nu sunt goale într-o singură linie înainte de a le trece la comanda de filtrare. Caracterele newline dintre caracterele de lățime mare sunt șterse, iar celelalte caractere newline sunt înlocuite cu spații.
 
+- **--squeeze**
+
+    Combină două sau mai multe caractere de linie nouă consecutive într-unul singur.
+
+- **-Mline** **--offload** _command_
+
+    Opțiunea **--offload** a [teip(1)](http://man.he.net/man1/teip) este implementată în modulul diferit **-Mline**.
+
+        greple -Mtee cat -n -- -Mline --offload 'seq 10 20'
+
+    De asemenea, puteți utiliza modulul **line** pentru a procesa numai liniile cu număr par, după cum urmează.
+
+        greple -Mtee cat -n -- -Mline 2::2
+
+# LEGACIES
+
+Opțiunea **--blocks** nu mai este necesară acum că opțiunea **--stretch** (**-S**) a fost implementată în **greple**. Puteți efectua pur și simplu următoarele.
+
+    greple -Mtee cat -n -- --all -SE foo
+
+Nu se recomandă utilizarea opțiunii **--blocks**, deoarece aceasta poate fi depreciată în viitor.
+
 - **--blocks**
 
     În mod normal, zona care corespunde modelului de căutare specificat este trimisă la comanda externă. În cazul în care se specifică această opțiune, nu zona care corespunde, ci întregul bloc care o conține va fi procesat.
@@ -64,10 +86,6 @@ Liniile de date de intrare și de ieșire nu trebuie să fie identice atunci câ
 
     Nu utilizați **--blocks** cu opțiunea **--all**, deoarece blocul va fi reprezentat de toate datele.
 
-- **--squeeze**
-
-    Combină două sau mai multe caractere de linie nouă consecutive într-unul singur.
-
 # WHY DO NOT USE TEIP
 
 În primul rând, ori de câte ori puteți face acest lucru cu comanda **teip**, utilizați-o. Este un instrument excelent și mult mai rapid decât **greple**.
@@ -80,7 +98,7 @@ De asemenea, **teip** nu poate trata mai multe linii de date ca o singură unita
 
 Următoarea comandă va găsi blocuri de text în interiorul documentului de stil [perlpod(1)](http://man.he.net/man1/perlpod) inclus în fișierul modul Perl.
 
-    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^(\w.+\n)+' tee.pm
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^([\w\pP].+\n)+' tee.pm
 
 Puteți să le traduceți prin serviciul DeepL executând comanda de mai sus convinsă cu modulul **-Mtee** care apelează comanda **deepl** astfel:
 

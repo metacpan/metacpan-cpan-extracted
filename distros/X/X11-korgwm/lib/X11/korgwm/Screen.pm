@@ -30,13 +30,20 @@ sub new($class, $x, $y, $w, $h) {
 }
 
 sub destroy($self, $new_screen) {
-    # Remove tags
+    # Bring always_on windows back to current tag
+    for my $win (@{ $self->{always_on} }) {
+        $self->current_tag()->win_add($win);
+        $win->{always_on} = undef;
+    }
+    $self->{always_on} = [];
+
+    # Remove tags (maximized window will be transferred AS-IS)
     $_->destroy($new_screen) for @{ $self->{tags} };
 
     # Remove panel
     $self->{panel}->destroy();
 
-    # Undef other filds
+    # Undef other fields
     %{ $self } = ();
 }
 
@@ -93,7 +100,7 @@ sub win_remove($self, $win, $norefresh = undef) {
     if (($win->{always_on} // 0) == $self) {
         my $arr = $self->{always_on};
         $win->{always_on} = undef;
-        splice @{ $arr }, $_, 1 for reverse grep { $arr->[$_] == $win } 0..$#{ $arr };
+        @{ $arr } = grep { $win != $_ } @{ $arr };
     }
 }
 
@@ -104,13 +111,14 @@ sub focus($self) {
         # self->focus already points to some window on active tag
         # This condition just looks prettier in this way, so if-clause is empty
     } else {
-        # Focus some window on active tag
+        # Focus some window on active tag. It's ok if it return undef
         my $win = $tag->first_window();
         $self->{focus} = $win;
     }
 
     # If there is a win, focus it; otherwise just reset panel title and update focus structure
     if (defined $self->{focus}) {
+        # This will set focus->{screen} as well
         $self->{focus}->focus();
     } else {
         $focus->{screen} = $self;

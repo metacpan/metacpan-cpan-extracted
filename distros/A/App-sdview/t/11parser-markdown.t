@@ -155,7 +155,7 @@ subtest "Bullet lists" => sub {
 * First
 * Second
 
-* Third
+   * Third
 EOMARKDOWN
 
    is( scalar @p, 1, 'Received 1 paragraph' );
@@ -224,9 +224,13 @@ subtest "Table" => sub {
 
 | Left | Centre | Right |
 | :--- |  :---: |  ---: |
+
+| Bold | **123** |
+|------|---------|
+| Italic | *456* |
 EOMARKDOWN
 
-   is( scalar @p, 2, 'Received 2 paragraphs' );
+   is( scalar @p, 3, 'Received 3 paragraphs' );
 
    is( $p[0]->type, "table", 'p[0] type' );
 
@@ -234,32 +238,42 @@ EOMARKDOWN
 
    is( scalar @rows, 2, 'table contains 2 rows' );
 
-   my @cols = $rows[0]->@*;
+   my @cells = $rows[0]->@*;
 
-   is( $cols[0]->type,  "table-cell", 'cells[0][0] type' );
-   is( $cols[0]->text,  "Heading",    'cells[0][0] text' );
-   is( $cols[0]->align, "left",       'cells[0][0] align' );
+   is( $cells[0]->type,  "table-cell", 'cells[0][0] type' );
+   is( $cells[0]->text,  "Heading",    'cells[0][0] text' );
+   is( $cells[0]->align, "left",       'cells[0][0] align' );
+   ok( $cells[0]->heading,             'cells[0][0] heading' );
 
-   is( $cols[1]->type, "table-cell", 'cells[0][1] type' );
-   is( $cols[1]->text, "Here",       'cells[0][1] text' );
+   is( $cells[1]->type, "table-cell", 'cells[0][1] type' );
+   is( $cells[1]->text, "Here",       'cells[0][1] text' );
 
-   @cols = $rows[1]->@*;
+   @cells = $rows[1]->@*;
 
-   is( $cols[0]->type, "table-cell", 'cells[1][0] type' );
-   is( $cols[0]->text, "Data in",    'cells[1][0] text' );
+   is( $cells[0]->type, "table-cell", 'cells[1][0] type' );
+   is( $cells[0]->text, "Data in",    'cells[1][0] text' );
+   ok( !$cells[0]->heading,           'cells[1][0] heading' );
 
-   is( $cols[1]->type, "table-cell", 'cells[1][1] type' );
-   is( $cols[1]->text, "Columns",    'cells[1][1] text' );
+   is( $cells[1]->type, "table-cell", 'cells[1][1] type' );
+   is( $cells[1]->text, "Columns",    'cells[1][1] text' );
 
    @rows = $p[1]->rows;
-   @cols = $rows[0]->@*;
+   @cells = $rows[0]->@*;
 
-   is( $cols[0]->text,  "Left",   'col[0] text' );
-   is( $cols[0]->align, "left",   'col[0] align' );
-   is( $cols[1]->text,  "Centre", 'col[1] text' );
-   is( $cols[1]->align, "centre", 'col[1] align' );
-   is( $cols[2]->text,  "Right",  'col[2] text' );
-   is( $cols[2]->align, "right",  'col[2] align' );
+   is( $cells[0]->text,  "Left",   'col[0] text' );
+   is( $cells[0]->align, "left",   'col[0] align' );
+   is( $cells[1]->text,  "Centre", 'col[1] text' );
+   is( $cells[1]->align, "centre", 'col[1] align' );
+   is( $cells[2]->text,  "Right",  'col[2] text' );
+   is( $cells[2]->align, "right",  'col[2] align' );
+
+   @rows = $p[2]->rows;
+   my @col1 = map { $_->[1] } @rows;
+
+   is( $col1[0]->text,  "123",                     'col1[0] text' );
+   is( [ $col1[0]->text->tagnames ], [qw( bold )], 'col1[0] text tags' );
+   is( $col1[1]->text,  "456",                       'col1[1] text' );
+   is( [ $col1[1]->text->tagnames ], [qw( italic )], 'col1[1] text tags' );
 };
 
 done_testing;

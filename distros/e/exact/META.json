@@ -77,8 +77,8 @@
          "web" : "https://github.com/gryphonshafer/exact"
       }
    },
-   "version" : "1.26",
-   "x_generated_by_perl" : "v5.41.4",
+   "version" : "1.27",
+   "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"
 }

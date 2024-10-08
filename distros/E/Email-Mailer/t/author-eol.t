@@ -23,6 +23,7 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-synopsis.t',
+    't/encoding.t',
     't/module.t',
     't/qr/html_auto_text.qr',
     't/qr/html_auto_text_img.qr',

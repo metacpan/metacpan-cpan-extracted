@@ -1,5 +1,18 @@
 Revision history for Perl extension App-Greple-stripe
 
+0.9903 2024-10-08T07:51:28Z
+
+    - include i18n documents
+    - slightly update colors
+
+0.9902 2024-10-08T01:40:46Z
+
+    - reset colormap using --cm=@ symbol
+
+0.9901 2024-10-07T12:32:37Z
+
+    - introduce --darkmode option
+
 0.99 2024-10-07T08:05:05Z
 
     - original version

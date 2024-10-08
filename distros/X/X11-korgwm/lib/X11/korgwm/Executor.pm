@@ -14,12 +14,22 @@ use X11::korgwm::Common;
 
 # Implementation of all the commands (unless some module push here additional funcs)
 our @parser = (
+    # nop
+    [qr/nop[wlq]?\((.*)\)/, sub ($arg) { return sub { 1 }}],
+
     # Exec command
     [qr/exec\((.+)\)/, sub ($arg) { return sub {
         my $pid = fork;
         die "Cannot fork(2)" unless defined $pid;
         return if $pid;
         close $_ for *STDOUT, *STDERR, *STDIN;
+
+        # No need to 'or die' here as we do not care
+        open STDIN, "+<", "/dev/null";
+        open STDOUT, ">&STDIN";
+        open STDERR, ">&STDIN";
+
+        # Should always succeed after fork(2)
         setsid();
         exec $arg;
         die "Cannot execute $arg";
@@ -27,6 +37,9 @@ our @parser = (
 
     # Set active tag
     [qr/tag_select\((\d+)\)/, sub ($arg) { return sub {
+        # Prevent FocusIn events
+        prevent_focus_in();
+
         $focus->{screen}->tag_set_active($arg - 1);
         $focus->{screen}->refresh();
         $X->flush();
@@ -66,23 +79,40 @@ our @parser = (
 
         return if $win->{always_on};
 
-        my $new_tag = $focus->{screen}->{tags}->[$arg - 1] or return;
-        my $curr_tag = $focus->{screen}->current_tag();
+        my $screen = $focus->{screen};
+        my $new_tag = $screen->{tags}->[$arg - 1] or return;
+        my $curr_tag = $screen->current_tag();
         return if $new_tag == $curr_tag;
 
         $win->hide(); # always from visible tag to invisible
         $new_tag->win_add($win);
-        $curr_tag->win_remove($win);
+        $curr_tag->win_remove($win, 1);
 
-        $focus->{screen}->refresh();
+        # Follow the window if required
+        if ($cfg->{move_follow}) {
+            # Move pointer out of the window to avoid EnterNotify
+            $X->warp_pointer(0, $X->root->id, 0, 0, 0, 0, 0, 0);
+            $X->flush();
+
+            # Prevent FocusIn events
+            prevent_focus_in();
+
+            $screen->{focus} = $win;
+            $screen->tag_set_active($new_tag->{idx}, 0);
+        }
+
+        $screen->refresh();
         $X->flush();
+
+        $win->warp_pointer() if $cfg->{move_follow};
     }}],
 
     # Set active screen
     [qr/screen_select\((\d+)\)/, sub ($arg) { return sub {
-        while ($arg > 1) {
-            return $screens[$arg - 1]->set_active() if defined $screens[$arg - 1];
-            $arg--;
+        my $dst = $arg; # to avoid source sub corruption
+        while ($dst > 1) {
+            return $screens[$dst - 1]->set_active() if defined $screens[$dst - 1];
+            $dst--;
         }
         croak "No screens found" unless defined $screens[0];
         $screens[0]->set_active();
@@ -99,22 +129,19 @@ our @parser = (
         return if $new_screen == $old_screen;
         return if $new_screen->current_tag->{max_window} and $win->{maximized};
 
+        # Move pointer out of the window to avoid EnterNotify
+        $X->warp_pointer(0, $X->root->id, 0, 0, 0, 0, 0, 0);
+        $X->flush();
+
         my $always_on = $win->{always_on};
-        $old_screen->win_remove($win);
+        $old_screen->win_remove($win, 1);
         $new_screen->win_add($win, $always_on);
 
         # Follow focus
         $new_screen->{focus} = $win;
         $focus->{screen} = $new_screen;
 
-        if ($win->{floating}) {
-            my ($new_x, $new_y) = @{ $win }{qw( real_x real_y )};
-            $new_x -= $old_screen->{x};
-            $new_y -= $old_screen->{y};
-            $new_x += $new_screen->{x};
-            $new_y += $new_screen->{y};
-            $win->move($new_x, $new_y);
-        }
+        $win->floating_move_screen($old_screen, $new_screen);
 
         $old_screen->refresh();
         $new_screen->set_active($win);
@@ -123,7 +150,7 @@ our @parser = (
 
     # Focus previous window (screen independent)
     [qr/focus_prev\(\)/, sub ($arg) { return sub {
-        my $win = $X11::korgwm::Window::focus_prev;
+        my $win = focus_prev_get();
         return unless defined $win;
 
         my @tags = $win->tags();
@@ -131,12 +158,22 @@ our @parser = (
         return carp "Window $win is visible on multiple tags, do not know how to focus_prev() to it" if @tags;
         return carp "Previous window $win has no tags and is not always_on" unless $tag;
 
+        # Do nothing if there is _another_ maximized window on that tag
+        return if $win != ($tag->{max_window} // $win);
+
+        # We need to move the pointer out of the screen in order to avoid ENTER_NOTIFY from improper window
+        # resulting into garbaged $focus_prev
+        $X->warp_pointer(0, $X->root->id, 0, 0, 0, 0, 0, 0);
+        $X->flush();
+
         # Switch to proper tag unless it is already active
         unless (any { $tag == ($_->current_tag() // 0) } @screens) {
+            $tag->{screen}->{focus} = $win;
             $tag->{screen}->tag_set_active($tag->{idx});
             $tag->{screen}->refresh();
         }
 
+        $win->focus();
         $win->warp_pointer();
     }}],
 
@@ -145,6 +182,7 @@ our @parser = (
         my $tag = $focus->{screen}->current_tag();
         my $win = $tag->next_window($arg eq "backward");
         return unless defined $win;
+        prevent_enter_notify();
         $win->focus();
     }}],
 
@@ -213,7 +251,7 @@ our @parser = (
 );
 
 # Define some debug internals
-DEBUG and push @parser,
+DEBUG_API and push @parser,
     [qr/dump_windows\(\)/, sub ($arg) { return sub ($hdl) {
         {
             require Data::Dumper;
@@ -229,6 +267,14 @@ DEBUG and push @parser,
             require Data::Dumper;
             local $Data::Dumper::Sortkeys = 1;
             $hdl->push_write(Data::Dumper::Dumper($screen));
+        }
+    }}],
+    [qr/dump_screens\(\)/, sub ($arg) { return sub ($hdl) {
+        {
+            require Data::Dumper;
+            local $Data::Dumper::Sortkeys = 1;
+            local $Data::Dumper::Maxdepth = 3;
+            $hdl->push_write(Data::Dumper::Dumper(\@screens));
         }
     }}],
     [qr/dump_tag\((\d+\s*,\s*\d+)\)/, sub ($arg) { return sub ($hdl) {

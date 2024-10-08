@@ -6,14 +6,14 @@ use strict;
 use warnings;
 use feature 'signatures';
 
-our $VERSION = "3.1";
+our $VERSION = "4.0";
 
 # Third-party includes
-use X11::XCB 0.22 ':all';
+use X11::XCB 0.23 ':all';
 use X11::XCB::Connection;
 use Carp;
 use AnyEvent;
-use List::Util qw( any min max );
+use List::Util qw( any first min max );
 
 # Those two should be included prior any DEBUG stuf
 use X11::korgwm::Common;
@@ -58,6 +58,7 @@ my %evt_masks = (x => CONFIG_WINDOW_X, y => CONFIG_WINDOW_Y, w => CONFIG_WINDOW_
 my ($ROOT, $atom_wmstate);
 our $exit_trigger = 0;
 my $new_window_event_mask = EVENT_MASK_ENTER_WINDOW | EVENT_MASK_PROPERTY_CHANGE | EVENT_MASK_FOCUS_CHANGE;
+my $prevent_window_errors;
 
 ## Define functions
 # Handles any screen change
@@ -88,6 +89,7 @@ sub handle_screens {
     my @new_screens = grep { not defined $screens{$_} } keys %curr_screens;
     my @not_changed_screens = grep { defined $screens{$_} } keys %curr_screens;
 
+    # NOTE we do not want to throw any warnings here to make this function reentrant
     return if @del_screens == 0 and @new_screens == 0;
 
     # Create screens for new displays
@@ -100,15 +102,64 @@ sub handle_screens {
 
     DEBUG and warn "Moving stale windows to screen: $screen_for_abandoned_windows";
 
-    # Call destroy on old screens and remove them
+    # Unfortunately, in case we have to change screen configuration, we must save preferred position for all windows
+    # Now iterate over the screens we're not going to delete (the latter will be processed inside destroy() below)
+    for my $screen (grep { my $s = $_; ! first { $s == $_ } @del_screens } @screens) {
+        my $old_screen_idx = $screen->{idx};
+
+        for my $tag (@{ $screen->{tags} }) {
+            my $old_tag_idx = $tag->{idx};
+            $_->{pref_position}->[@screens] = [$old_screen_idx, $old_tag_idx] for $tag->windows();
+        }
+    }
+
+    # Call destroy on old screens and remove them saving pref_position for all their windows
     for my $s (@del_screens) {
         $screens{$s}->destroy($screen_for_abandoned_windows);
         delete $screens{$s};
-        $screen_for_abandoned_windows->refresh();
     }
 
     # Sort screens based on X axis and store them in @screens
+    DEBUG and warn "Old screens: (@screens)";
     @screens = map { $screens{$_} } sort { (split /,/, $a)[0] <=> (split /,/, $b)[0] or $a <=> $b } keys %screens;
+    DEBUG and warn "New screens: (@screens)";
+
+    # Assign indexes to use them during possible next handle_screens events
+    $screens[$_]->{idx} = $_ for 0..$#screens;
+
+    # Move the windows to preferred displays, if possible
+    for my $win (values %{ $windows }) {
+        # Skip always_on window because they can live only after manual creation
+        next if $win->{always_on};
+
+        # Try to get preferred position for the window
+        my $pref_position = $win->{pref_position}->[@screens];
+        next unless $pref_position;
+
+        my @win_screens = $win->screens();
+        my @win_tags = $win->tags();
+
+        my $old_screen = $win_screens[0];
+        my $old_tag = $win_tags[0];
+
+        # Die here if we catch strange windows
+        croak "Unimplemented preferred $win position for multiple screens=(@win_screens)" if @win_screens != 1;
+        croak "Unimplemented preferred $win position for multiple tags=(@win_tags)" if @win_tags != 1;
+
+        # Below we consider the window belongs to a single screen and tag, so just check if they're preferred
+        next if $old_screen->{idx} == $pref_position->[0];
+
+        my $new_screen = $screens[$pref_position->[0]] or croak "Impossible screen in pref_position";
+        my $new_tag = $new_screen->{tags}->[$pref_position->[1]] or croak "Impossible tag in pref_position";
+
+        $new_tag->win_add($win);
+        $old_tag->win_remove($win);
+        $win->floating_move_screen($old_screen, $new_screen);
+        $win->hide() unless $new_tag == $new_screen->current_tag();
+    }
+
+    # Refresh all the screens as we could've moved some windows around
+    $_->refresh() for @screens;
 }
 
 # Scan for existing windows and handle them
@@ -138,6 +189,7 @@ sub handle_existing_windows {
     # Set proper window information
     for my $win (values %{ $windows }) {
         $win->{floating} = 1;
+        $X->composite_redirect_window($win->{id}, COMPOSITE_REDIRECT_AUTOMATIC);
         $X->change_window_attributes($win->{id}, CW_EVENT_MASK, $new_window_event_mask);
         $X->change_property(PROP_MODE_REPLACE, $win->{id}, $atom_wmstate, $atom_wmstate, 32, 1, pack L => 1);
 
@@ -166,6 +218,11 @@ sub hide_window($wid, $delete=undef) {
     return unless $win;
     $win->{_hidden} = 1;
 
+    # Ignore Window errors [code=3] closing multiple window at a time
+    if ($delete) {
+        $prevent_window_errors = AE::timer 0.1, 0, sub { $prevent_window_errors = undef };
+    }
+
     if ($delete and $win->{transient_for}) {
         delete $win->{transient_for}->{siblings}->{$wid};
     }
@@ -177,7 +234,7 @@ sub hide_window($wid, $delete=undef) {
         }
 
         $tag->win_remove($win);
-        if ($win == ($tag->{screen}->{focus} // 0)) {
+        if ($win == $tag->{screen}->{focus}) {
             $tag->{screen}->{focus} = undef;
             $tag->{screen}->{panel}->title();
         }
@@ -196,13 +253,15 @@ sub hide_window($wid, $delete=undef) {
         # Remove from always_on
         my $arr = $on_screen->{always_on};
         $win->{always_on} = undef;
-        splice @{ $arr }, $_, 1 for reverse grep { $arr->[$_] == $win } 0..$#{ $arr };
+        @{ $arr } = grep { $win != $_ } @{ $arr };
     }
 
-    if ($win == ($focus->{window} // 0)) {
-        $focus->{focus} = undef;
+    if ($win == $focus->{window}) {
+        $focus->{window} = undef;
         $focus->{screen}->focus();
     }
+
+    focus_prev_remove($win) if $delete;
 }
 
 # Main routine
@@ -238,6 +297,9 @@ sub FireInTheHole {
 
     my ($RANDR_EVENT_BASE);
     init_extension("RANDR", \$RANDR_EVENT_BASE);
+
+    # Initialize XComposite
+    init_extension("Composite", undef);
 
     # Process existing screens
     handle_screens();
@@ -276,13 +338,32 @@ sub FireInTheHole {
         } else {
             $win = $windows->{$wid} = X11::korgwm::Window->new($wid);
 
+            # Ask X11 for composition redirect
+            $X->composite_redirect_window($wid, COMPOSITE_REDIRECT_AUTOMATIC);
+
             $X->change_window_attributes($wid, CW_EVENT_MASK, $new_window_event_mask);
 
             # Unconditionally set NormalState for any windows, we do not want to correctly process this property
             $X->change_property(PROP_MODE_REPLACE, $wid, $atom_wmstate, $atom_wmstate, 32, 1, pack L => 1);
 
             # Fix geometry if needed
-            @{ $win }{qw( x y w h )} = $win->query_geometry() unless defined $win->{x};
+            unless (defined $win->{x}) {
+                # Ask X11 about regular geometry
+                @{ $win }{qw( x y w h )} = $win->query_geometry();
+
+                # Respect also WM_SIZE_HINTS
+                my $hints = $win->size_hints_get();
+
+                if ($hints->{flags} & ICCCM_SIZE_HINT_P_MIN_SIZE) {
+                    $win->{w} = $hints->{min_width} if $win->{w} < $hints->{min_width};
+                    $win->{h} = $hints->{min_height} if $win->{h} < $hints->{min_height};
+                }
+
+                if ($hints->{flags} & ICCCM_SIZE_HINT_P_MAX_SIZE) {
+                    $win->{w} = $hints->{max_width} if $win->{w} > $hints->{max_width};
+                    $win->{h} = $hints->{max_height} if $win->{h} > $hints->{max_height};
+                }
+            }
         }
 
         # Apply rules
@@ -300,6 +381,7 @@ sub FireInTheHole {
         $transient_for = undef unless defined $windows->{$transient_for};
         if ($transient_for) {
             my $parent = $windows->{$transient_for};
+
             # toggle_floating() won't do for transient, so do some things manually
             $win->{floating} = 1;
             $rule->{follow} //= $cfg->{mouse_follow};
@@ -336,8 +418,12 @@ sub FireInTheHole {
             }
         }
 
+        # This lines will apply rules
         $win->toggle_floating(1) if $floating;
         $win->urgency_raise(1) if $rule->{urgent};
+
+        # The reason of floating does not matter here so checking the object directly
+        prevent_enter_notify() if $win->{floating};
 
         if ($follow) {
             $screen->tag_set_active($tag->{idx}, 0);
@@ -349,6 +435,7 @@ sub FireInTheHole {
                 $screen->refresh();
             } else {
                 $win->urgency_raise(1);
+                $win->show_hidden();
             }
         }
 
@@ -431,6 +518,9 @@ sub FireInTheHole {
 
     # Under certain conditions X11 grants focus to other window generating FocusIn, we'll respect this
     add_event_cb(FOCUS_IN(), sub($evt) {
+        # Sometimes X11 sends FocusIn on rapid EnterNotifies: when pointer is not where it thinks it should be
+        return if $prevent_focus_in;
+
         # Skip grab-initiated events
         return unless $evt->{mode} == 0;
 
@@ -445,6 +535,10 @@ sub FireInTheHole {
 
             # Silently skip the situation with no tags (likely always_on window), just try to warp pointer there
             for my $tag (@tags) {
+                # Right now we're pretty sure that the window we're gonna focus exists on that tag so to avoid
+                # focus_prev garbaging not only do we make the tag active, but also replace focus window for the
+                # corresponding screen in advance. This results in $win->focus() inside tag->show() as in focus_prev()
+                $tag->{screen}->{focus} = $win;
                 $tag->{screen}->tag_set_active($tag->{idx}, 0);
                 $tag->{screen}->refresh();
             }
@@ -462,6 +556,11 @@ sub FireInTheHole {
     # X11 Error handler
     add_event_cb(XCB_NONE(), sub($evt) {
         # https://www.x.org/releases/X11R7.7/doc/xproto/x11protocol.html#Encoding::Errors
+
+        # Ignore Window errors [code=3] closing multiple window at a time
+        return if 3 == ($evt->{error_code} || 0) and $prevent_window_errors;
+
+        # Log unexpected errors
         warn sprintf "X11 Error: code=%s seq=%s res=%s %s/%s", @{ $evt }{qw( error_code sequence
             resource_id major_code minor_code )};
     });
@@ -494,7 +593,11 @@ sub FireInTheHole {
     for(;;) {
         die "Segmentation fault (core dumped)\n" if $exit_trigger;
 
-        while (my $evt = $X->poll_for_event()) {
+        my $limit = 1024;
+        while ($limit--) {
+            my $evt = $X->poll_for_event();
+            last unless $evt;
+
             # MotionNotifies(6) are ignored anyways. No room for error
             DEBUG and $evt->{response_type} != 6 and warn Dumper $evt;
 
@@ -511,7 +614,7 @@ sub FireInTheHole {
         }
 
         my $pause = AE::cv;
-        my $w = AE::timer 0.1, 0, sub { $pause->send };
+        my $w = AE::timer $cpu_saver, 0, sub { $pause->send };
         $pause->recv;
     }
 
@@ -532,7 +635,7 @@ korgwm - a tiling window manager written in Perl
 Manages X11 windows in a tiling manner and supports all the stuff KorG needs.
 Built on top of XCB, AnyEvent, and Gtk3.
 It is not reparenting for purpose, so borders are rendered by X11 itself.
-There are no any command-line parameters, nor any environment variables.
+There are no any command-line parameters, (almost) nor any environment variables.
 The only way to start it is: just to execute C<korgwm> when no any other WM is running.
 Please see bundled README.md if you are interested in details.
 
@@ -568,7 +671,7 @@ And these for Archlinux:
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023 Sergei Zhmylev E<lt>zhmylove@cpan.orgE<gt>
+Copyright (c) 2023--2024 Sergei Zhmylev E<lt>zhmylove@narod.ru<gt>
 
 MIT License.  Full text is in LICENSE.
 
