@@ -3,20 +3,6 @@
 
 #include "spvm_native.h"
 #include "spvm_socket_util.h"
-
-#if defined(_WIN32)
-
-#define UNIX_PATH_MAX 108
-
-typedef struct sockaddr_un {
-  ADDRESS_FAMILY sun_family;
-  char sun_path[UNIX_PATH_MAX];
-};
-
-#else
-  #include <sys/un.h>
-#endif
-
 #include <assert.h>
 
 static const char* FILE_NAME = "Sys/Socket/Addrinfo.c";

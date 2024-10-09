@@ -5,7 +5,7 @@ LemonLDAP::NG Portal jQuery scripts
  */
 
 (function() {
-  var datas, delKey, getCookie, getQueryParam, getValues, isHiddenFormValueSet, ping, ppolicyResults, removeOidcConsent, restoreOrder, setCookie, setKey, setOrder, setResult, setSelector, translate, translatePage, translationFields,
+  var datas, delKey, displayIcon, getCookie, getQueryParam, getValues, isHiddenFormValueSet, ping, ppolicyResults, removeOidcConsent, restoreOrder, setCookie, setKey, setOrder, setResult, setSelector, translate, translatePage, translationFields, updateBorder,
     indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   translationFields = {};
@@ -15,35 +15,47 @@ LemonLDAP::NG Portal jQuery scripts
   setResult = function(field, result) {
     var ref, ref1;
     ppolicyResults[field] = result;
-    $("#" + field).removeClass('fa-times fa-check fa-spinner fa-pulse fa-info-circle fa-question-circle text-danger text-success text-info text-secondary');
-    $("#" + field).attr('role', 'status');
-    switch (result) {
-      case "good":
-        $("#" + field).addClass('fa-check text-success');
-        break;
-      case "bad":
-        $("#" + field).addClass('fa-times text-danger');
-        $("#" + field).attr('role', 'alert');
-        break;
-      case "unknown":
-        $("#" + field).addClass('fa-question-circle text-secondary');
-        break;
-      case "waiting":
-        $("#" + field).addClass('fa-spinner fa-pulse text-secondary');
-        break;
-      case "info":
-        $("#" + field).addClass('fa-info-circle text-info');
-    }
+    displayIcon(field, result);
     if (Object.values(ppolicyResults).every((function(_this) {
       return function(value) {
         return value === "good" || value === "info";
       };
     })(this))) {
-      $('.ppolicy').removeClass('border-danger').addClass('border-success');
-      return (ref = $('#newpassword').get(0)) != null ? ref.setCustomValidity('') : void 0;
+      if ((ref = $('#newpassword').get(0)) != null) {
+        ref.setCustomValidity('');
+      }
     } else {
-      $('.ppolicy').removeClass('border-success').addClass('border-danger');
-      return (ref1 = $('#newpassword').get(0)) != null ? ref1.setCustomValidity(translate('PE28')) : void 0;
+      if ((ref1 = $('#newpassword').get(0)) != null) {
+        ref1.setCustomValidity(translate('PE28'));
+      }
+    }
+    return updateBorder();
+  };
+
+  displayIcon = function(field, result) {
+    $("#" + field).removeClass('fa-times fa-check fa-spinner fa-pulse fa-info-circle fa-question-circle text-danger text-success text-info text-secondary');
+    $("#" + field).attr('role', 'status');
+    switch (result) {
+      case "good":
+        return $("#" + field).addClass('fa-check text-success');
+      case "bad":
+        $("#" + field).addClass('fa-times text-danger');
+        return $("#" + field).attr('role', 'alert');
+      case "unknown":
+        return $("#" + field).addClass('fa-question-circle text-secondary');
+      case "waiting":
+        return $("#" + field).addClass('fa-spinner fa-pulse text-secondary');
+      case "info":
+        return $("#" + field).addClass('fa-info-circle text-info');
+    }
+  };
+
+  updateBorder = function() {
+    var ref, ref1;
+    if (((ref = $('#newpassword').get(0)) != null ? ref.checkValidity() : void 0) && ((ref1 = $('#confirmpassword').get(0)) != null ? ref1.checkValidity() : void 0)) {
+      return $('.ppolicy').removeClass('border-danger').addClass('border-success');
+    } else {
+      return $('.ppolicy').removeClass('border-success').addClass('border-danger');
     }
   };
 
@@ -294,7 +306,7 @@ LemonLDAP::NG Portal jQuery scripts
   datas = {};
 
   $(window).on('load', function() {
-    var action, al, authMenuIndex, authMenuTabs, back_url, checkpassword, checksamepass, field, hiddenParams, i, l, lang, langdiv, langs, langs2, len, len1, len2, len3, link, m, menuIndex, menuTabs, method, n, nl, nlangs, queryLang, re, ref, ref1, ref2, setCookieLang, togglecheckpassword;
+    var action, al, authMenuIndex, authMenuTabs, back_url, checkpassword, checksamepass, field, hiddenParams, i, lang, langdiv, len, link, menuIndex, menuTabs, method, queryLang, ref, setCookieLang, togglecheckpassword;
     datas = getValues();
     if ("datas" in window && "choicetab" in window.datas) {
       datas.choicetab = window.datas.choicetab;
@@ -332,12 +344,8 @@ LemonLDAP::NG Portal jQuery scripts
     if (datas['choicetab']) {
       authMenuTabs.tabs("option", "active", $('#authMenu a[href="#' + datas['choicetab'] + '"]').parent().index());
     }
-    if (datas['login']) {
-      $("input[type=password]:first").focus();
-    } else {
-      if ($("input[autofocus]").length === 0) {
-        $("input[type!=hidden]:first").focus();
-      }
+    if ($("input[autofocus]").length === 0) {
+      $("input[type!=hidden]:first").focus();
     }
     if (datas['newwindow']) {
       $('#appslist a').attr("target", "_blank");
@@ -382,60 +390,20 @@ LemonLDAP::NG Portal jQuery scripts
       }
     }
     if (!lang) {
-      lang = getCookie('llnglanguage');
+      lang = window.datas['language'];
       if (lang && !queryLang) {
-        console.log('Get lang from cookie');
-      }
-    }
-    if (!lang) {
-      if (navigator) {
-        langs = [];
-        langs2 = [];
-        nlangs = [navigator.language];
-        if (navigator.languages) {
-          nlangs = navigator.languages;
-        }
-        ref = window.availableLanguages;
-        for (i = 0, len = ref.length; i < len; i++) {
-          al = ref[i];
-          langdiv += "<img class=\"langicon\" src=\"" + window.staticPrefix + "common/" + al + ".png\" title=\"" + al + "\" alt=\"[" + al + "]\"> ";
-        }
-        for (l = 0, len1 = nlangs.length; l < len1; l++) {
-          nl = nlangs[l];
-          console.log('Navigator lang', nl);
-          ref1 = window.availableLanguages;
-          for (m = 0, len2 = ref1.length; m < len2; m++) {
-            al = ref1[m];
-            console.log(' Available lang', al);
-            re = new RegExp('^' + al + '-?');
-            if (nl.match(re)) {
-              console.log('  Matching lang =', al);
-              langs.push(al);
-            } else if (al.substring(0, 1) === nl.substring(0, 1)) {
-              langs2.push(al);
-            }
-          }
-        }
-        lang = langs[0] ? langs[0] : langs2[0] ? langs2[0] : window.availableLanguages[0];
-        if (lang && !queryLang) {
-          console.log('Get lang from navigator');
-        }
-      } else {
-        lang = window.availableLanguages[0];
-        if (lang && !queryLang) {
-          console.log('Get lang from window');
-        }
+        console.log('Get lang from server');
       }
     } else if (indexOf.call(window.availableLanguages, lang) < 0) {
-      lang = window.availableLanguages[0];
+      lang = window.datas['language'];
       if (!queryLang) {
-        console.log('Lang not available -> Get default lang');
+        console.log('Lang not available -> Get lang from server');
       }
     }
     if (queryLang) {
       if (indexOf.call(window.availableLanguages, queryLang) < 0) {
-        console.log('Lang not available -> Get default lang');
-        queryLang = window.availableLanguages[0];
+        console.log('Lang not available -> Get lang from server');
+        queryLang = window.language;
       }
       console.log('Selected lang ->', queryLang);
       if (setCookieLang) {
@@ -448,9 +416,9 @@ LemonLDAP::NG Portal jQuery scripts
       translatePage(lang);
     }
     langdiv = '';
-    ref2 = window.availableLanguages;
-    for (n = 0, len3 = ref2.length; n < len3; n++) {
-      al = ref2[n];
+    ref = window.availableLanguages;
+    for (i = 0, len = ref.length; i < len; i++) {
+      al = ref[i];
       langdiv += "<img class=\"langicon\" src=\"" + window.staticPrefix + "common/" + al + ".png\" title=\"" + al + "\" alt=\"[" + al + "]\"> ";
     }
     $('#languages').html(langdiv);
@@ -469,39 +437,49 @@ LemonLDAP::NG Portal jQuery scripts
       };
       return $(document).trigger(e, info);
     };
+    checksamepass = function() {
+      var ref1, ref2, ref3, ref4, ref5;
+      if (((ref1 = $('#confirmpassword').get(0)) != null ? ref1.value : void 0) && ((ref2 = $('#confirmpassword').get(0)) != null ? ref2.value : void 0) === ((ref3 = $('#newpassword').get(0)) != null ? ref3.value : void 0)) {
+        if ((ref4 = $('#confirmpassword').get(0)) != null) {
+          ref4.setCustomValidity('');
+        }
+        displayIcon("samepassword-feedback", "good");
+        updateBorder();
+        return true;
+      } else {
+        if ((ref5 = $('#confirmpassword').get(0)) != null) {
+          ref5.setCustomValidity(translate('PE34'));
+        }
+        displayIcon("samepassword-feedback", "bad");
+        updateBorder();
+        return false;
+      }
+    };
     if ((window.datas.ppolicy != null) && $('#newpassword').length) {
       checkpassword('');
+      checksamepass();
+      $('#confirmpassword').keyup(function(e) {
+        checksamepass();
+      });
       $('#newpassword').keyup(function(e) {
         checkpassword(e.target.value);
+        checksamepass();
       });
       $('#newpassword').focusout(function(e) {
         checkpassword(e.target.value, "focusout");
+        checksamepass();
       });
     }
     togglecheckpassword = function(e) {
-      var ref3;
+      var ref1;
       if (e.target.checked) {
         $('#newpassword').off('keyup');
-        return (ref3 = $('#newpassword').get(0)) != null ? ref3.setCustomValidity('') : void 0;
+        return (ref1 = $('#newpassword').get(0)) != null ? ref1.setCustomValidity('') : void 0;
       } else {
         $('#newpassword').keyup(function(e) {
           checkpassword(e.target.value);
         });
         return checkpassword('');
-      }
-    };
-    checksamepass = function() {
-      var ref3, ref4, ref5, ref6;
-      if (((ref3 = $('#confirmpassword').get(0)) != null ? ref3.value : void 0) === ((ref4 = $('#newpassword').get(0)) != null ? ref4.value : void 0)) {
-        if ((ref5 = $('#confirmpassword').get(0)) != null) {
-          ref5.setCustomValidity('');
-        }
-        return true;
-      } else {
-        if ((ref6 = $('#confirmpassword').get(0)) != null) {
-          ref6.setCustomValidity(translate('PE34'));
-        }
-        return false;
       }
     };
     $('#newpassword').change(checksamepass);
@@ -551,7 +529,7 @@ LemonLDAP::NG Portal jQuery scripts
       }
     }
     $('#reset').change(function() {
-      var checked, ref3, ref4, ref5, ref6, ref7;
+      var checked, ref1, ref2, ref3, ref4, ref5;
       checked = $(this).prop('checked');
       console.log('Reset is checked', checked);
       if (checked === true) {
@@ -559,16 +537,16 @@ LemonLDAP::NG Portal jQuery scripts
         $('#newpasswords').hide();
         $('#newpassword').removeAttr('required');
         $('#confirmpassword').removeAttr('required');
-        return (ref3 = $('#confirmpassword').get(0)) != null ? ref3.setCustomValidity('') : void 0;
+        return (ref1 = $('#confirmpassword').get(0)) != null ? ref1.setCustomValidity('') : void 0;
       } else {
         $('#ppolicy').show();
         $('#newpasswords').show();
         $('#newpassword').attr('required', true);
         $('#confirmpassword').attr('required', true);
-        if (((ref4 = $('#confirmpassword').get(0)) != null ? ref4.value : void 0) === ((ref5 = $('#newpassword').get(0)) != null ? ref5.value : void 0)) {
-          return (ref6 = $('#confirmpassword').get(0)) != null ? ref6.setCustomValidity('') : void 0;
+        if (((ref2 = $('#confirmpassword').get(0)) != null ? ref2.value : void 0) === ((ref3 = $('#newpassword').get(0)) != null ? ref3.value : void 0)) {
+          return (ref4 = $('#confirmpassword').get(0)) != null ? ref4.setCustomValidity('') : void 0;
         } else {
-          return (ref7 = $('#confirmpassword').get(0)) != null ? ref7.setCustomValidity(translate('PE34')) : void 0;
+          return (ref5 = $('#confirmpassword').get(0)) != null ? ref5.setCustomValidity(translate('PE34')) : void 0;
         }
       }
     });
@@ -662,6 +640,14 @@ LemonLDAP::NG Portal jQuery scripts
         return $('#btn-back-to-top').css("display", "block");
       } else {
         return $('#btn-back-to-top').css("display", "none");
+      }
+    });
+    $('.btn-single-submit').on('click', function(event) {
+      if ($(this).data('data-submitted') === true) {
+        event.preventDefault();
+        return $(this).prop('disabled', true);
+      } else {
+        return $(this).data('data-submitted', true);
       }
     });
     $(document).trigger("portalLoaded");

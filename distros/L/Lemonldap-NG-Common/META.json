@@ -4,7 +4,7 @@
       "Xavier Guimard <x.guimard@free.fr>, Clement Oudot <clement@oodo.net>, Christophe Maudoux <chrmdx@gmail.com>, Maxime Besson <maxime.besson@worteks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -22,9 +22,17 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Apache::Session::Browseable" : "v1.3.9",
+            "Convert::Base32" : "0",
+            "Cookie::Baker::XS" : "0",
+            "Crypt::URandom" : "0",
+            "DBI" : "0",
+            "Date::Parse" : "0",
             "IO::String" : "0",
+            "LWP::Protocol::https" : "0",
             "MIME::Entity" : "0",
             "Net::LDAP" : "0",
+            "SOAP::Lite" : "0",
             "String::Random" : "0",
             "Test::Output" : "0",
             "Test::Pod" : "1",
@@ -53,11 +61,12 @@
             "Apache::Session" : "0",
             "Cache::Cache" : "0",
             "Config::IniFiles" : "0",
-            "Crypt::OpenSSL::Bignum" : "0",
+            "Convert::PEM" : "0",
             "Crypt::OpenSSL::RSA" : "0",
             "Crypt::OpenSSL::X509" : "0",
             "Crypt::Rijndael" : "0",
             "Crypt::URandom" : "0",
+            "Digest::MD5" : "0",
             "Digest::SHA" : "0",
             "HTML::Template" : "0",
             "JSON" : "0",
@@ -65,6 +74,7 @@
             "LWP::UserAgent" : "0",
             "Mouse" : "0",
             "Net::CIDR" : "0",
+            "Net::SSLeay" : "0",
             "Plack" : "0",
             "URI" : "0",
             "XML::LibXML" : "0"
@@ -83,6 +93,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.19.2",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v2.20.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

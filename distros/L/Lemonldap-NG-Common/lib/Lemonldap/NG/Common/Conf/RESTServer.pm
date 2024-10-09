@@ -811,35 +811,61 @@ sub metadata {
             ],
         );
     }
-    elsif ( $req->params('oidcMetadata') ) {
-        my $c = $self->getConfKey( $req, 'cfgNum' );
+    elsif ( my $oidc = $req->params('oidcMetadata')
+        or $req->params('samlMetadata') )
+    {
+        my $c    = $self->getConfKey( $req, 'cfgNum' );
+        my $type = $oidc ? 'OIDC' : 'SAML';
         return $self->sendError( $req, undef, 400 ) if ( $req->error );
         if ( $self->can('userId') ) {
             $self->userLogger->notice( 'User '
                   . $self->userId($req)
-                  . ' ask for OIDC metadata '
+                  . " ask for $type metadata "
                   . $c );
         }
         else {
-            $self->logger->info("REST request to get OIDC metadata $c");
+            $self->logger->info("REST request to get $type metadata $c");
         }
-        require Lemonldap::NG::Common::OpenIDConnect::Metadata;
-        my $path = $self->currentConf->{issuerDBOpenIDConnectPath};
-        $path =~ s#^.*?(\w+).*?$#$1/#;
-        return $self->sendJSONresponse(
-            $req,
-            Lemonldap::NG::Common::OpenIDConnect::Metadata->metadataDoc(
-                $self->currentConf->{oidcServiceMetaDataIssuer}
-                  || $self->p->portal,
-                $self->currentConf,
-                $path,
-            ),
-            pretty  => 1,
-            headers => [
-                'content-Type'        => 'application/json',
-                'Content-Disposition' => "Attachment; filename=openid-configuration.json"
-            ],
-        );
+        if ($oidc) {
+            require Lemonldap::NG::Common::OpenIDConnect::Metadata;
+            my $path = $self->currentConf->{issuerDBOpenIDConnectPath};
+            $path =~ s#^.*?(\w+).*?$#$1/#;
+            return $self->sendJSONresponse(
+                $req,
+                Lemonldap::NG::Common::OpenIDConnect::Metadata->metadataDoc(
+                    $self->currentConf->{oidcServiceMetaDataIssuer}
+                      || $self->p->portal,
+                    $self->currentConf,
+                    $path,
+                ),
+                pretty  => 1,
+                headers => [
+                    'content-Type'        => 'application/json',
+                    'Content-Disposition' =>
+                      "Attachment; filename=openid-configuration.json"
+                ],
+            );
+        }
+        else {
+            require Lemonldap::NG::Common::Conf::SAML::Metadata;
+            if ( my $metadata =
+                Lemonldap::NG::Common::Conf::SAML::Metadata->new() )
+            {
+                my $s =
+                  $metadata->serviceToXML(
+                    { %{ $self->currentConf }, portal => $self->p->portal },
+                    'all' );
+                return [
+                    200,
+                    [
+                        'Content-Type'   => 'application/xml',
+                        'Content-Length' => length($s),
+                    ],
+                    [$s]
+                ];
+            }
+            return $self->p->sendError( $req, 'Unable to build Metadata', 500 );
+        }
     }
     else {
         my $res = {};

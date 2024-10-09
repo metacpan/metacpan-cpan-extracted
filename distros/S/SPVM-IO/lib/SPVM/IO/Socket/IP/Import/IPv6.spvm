@@ -1,0 +1,103 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class IO::Socket::IP::Import::IPv6 : interface_t {
+  
+  allow IO::Socket::IP;
+  
+  use Sys::Socket::Constant as SOCKET;
+  use Sys::Socket::Sockaddr;
+  use Sys::Socket::Sockaddr::In6;
+  use Sys::Socket::In_addr_base;
+  use Sys::Socket::Util;
+  use IO::Socket::IP;
+  
+  # Interface Methods
+  method sockname : Sys::Socket::Sockaddr ();
+  
+  method sockaddr : Sys::Socket::In_addr_base () {
+    my $sockaddr_in6_sock = (Sys::Socket::Sockaddr::In6)$self->sockname;
+    
+    my $sockaddr = $sockaddr_in6_sock->sin6_addr;
+    
+    return $sockaddr;
+  }
+  
+  method sockhost : string () {
+    my $in6_addr_sock = $self->sockaddr;
+    
+    my $sockhost = (string)undef;
+    if ($in6_addr_sock) {
+      $sockhost = Sys::Socket::Util->inet_ntop(SOCKET->AF_INET6, $in6_addr_sock);
+    }
+    return $sockhost;
+  }
+  
+  method sockport : int () {
+    my $sockaddr_in6_sock = (Sys::Socket::Sockaddr::In6)$self->sockname;
+    
+    my $sockport_network_byte_order = $sockaddr_in6_sock->sin6_port;
+    
+    my $sockport = Sys::Socket->ntohs((short)$sockport_network_byte_order);
+    
+    return $sockport;
+  }
+  
+  method peername : Sys::Socket::Sockaddr ();
+  
+  method peeraddr : Sys::Socket::In_addr_base () {
+    my $sockaddr_in6 = $self->peername;
+    
+    my $in6_addr = $sockaddr_in6->(Sys::Socket::Sockaddr::In6)->sin6_addr;
+    
+    return $in6_addr;
+  }
+  
+  method peerhost : string () {
+    my $in6_addr_peer = $self->peeraddr;
+    
+    my $peerhost = (string)undef;
+    if ($in6_addr_peer) {
+      $peerhost = Sys::Socket::Util->inet_ntop(SOCKET->AF_INET6, $in6_addr_peer);
+    }
+    return $peerhost;
+  }
+  
+  method peerport : int () {
+    my $sockaddr_in6_peer = (Sys::Socket::Sockaddr::In6)$self->peername;
+    
+    my $peerport_network_byte_order = $sockaddr_in6_peer->sin6_port;
+    
+    my $peerport = Sys::Socket->ntohs((short)$peerport_network_byte_order);
+    
+    return $peerport;
+  }
+  
+  private method create_socket_address : Sys::Socket::Sockaddr ($address : string, $port : int) {
+    
+    # Socket information
+    my $socket_address = Sys::Socket::Sockaddr::In6->new;
+    $socket_address->set_sin6_family(SOCKET->AF_INET6);
+    $socket_address->set_sin6_port(Sys::Socket->htons((short)$port));
+    
+    my $res_ref = new Sys::Socket::AddrinfoLinkedList[1];
+    
+    my $hints = Sys::Socket::Addrinfo->new;
+    $hints->set_ai_family(SOCKET->AF_INET6);
+    
+    Sys::Socket->getaddrinfo($address, undef, $hints, $res_ref);
+    
+    my $res = $res_ref->[0];
+    
+    if ($res) {
+      my $res_array = $res->to_array;
+      $socket_address->set_sin6_addr($res_array->[0]->ai_addr->(Sys::Socket::Sockaddr::In6)->sin6_addr);
+    }
+    else {
+      die "Sys::Socket->getaddrinfo cannot get an address.";
+    }
+    
+    return $socket_address;
+  }
+  
+}

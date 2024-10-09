@@ -1,3 +1,4 @@
+
 use 5.008008;
 use ExtUtils::MakeMaker;
 
@@ -57,6 +58,7 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.31 ) {
 ## The earliest release of Perl I've personally tested this module with!
 ## Comment out this section out if you wish to try it with an earlier release!
 if ( $ExtUtils::MakeMaker::VERSION >= 6.48 ) {
+   $params{MIN_PERL_VERSION} = '5.014000';      # Perl Version 5.14.0
    $params{MIN_PERL_VERSION} = '5.008008';      # Perl Version 5.8.8
 }
 

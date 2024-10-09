@@ -71,7 +71,9 @@ subtest "Test IDP initiated logout" => sub {
     like( $res->[2]->[0], qr/My CAS App/, "Found CAS app name" );
     unlike( $res->[2]->[0], qr/My Other App/, "My other app is not displayed" );
 
-    my ( $host, $url, $query ) = expectForm( $res, 'auth.example.com', '/' );
+    my ( $host, $url, $query ) =
+      expectForm( $res, 'auth.example.com', '/?logout=1', 'logout' );
+    is( $query, "logout=1", "Found logout option" );
 
     relaySpFromInfo( $issuer, $res );
     is( $loggedOut->{'auth.sp.com'},
@@ -103,7 +105,9 @@ subtest "Test App initiated logout, no redirect" => sub {
         'Initiate logout'
     );
     is( expectCookie($res), 0, "Cookie was cleared" );
-    my ( $host, $url, $query ) = expectForm( $res, 'auth.example.com', '/' );
+    my ( $host, $url, $query ) =
+      expectForm( $res, 'auth.example.com', '/?logout=1', 'logout' );
+    is( $query, "logout=1", "Found logout option" );
 
     like( $res->[2]->[0], qr/My CAS App/, "Found CAS app name" );
     unlike( $res->[2]->[0], qr/My Other App/, "My other app is not displayed" );
@@ -151,6 +155,27 @@ subtest "Test App initiated logout, with redirect" => sub {
     is( $loggedOut->{'auth.sp.com'},
         $st1, "Correct ticket sent to sp for logout" );
     ok( !$loggedOut->{'auth.sp2.com'}, "No ticket sent to sp2" );
+};
+
+subtest "Test App initiated logout, no redirect, no info" => sub {
+
+    $loggedOut = {};
+
+    # Login
+    ok( $issuer = issuer(), 'Issuer portal' );
+    my $id = $issuer->login("dwho");
+
+    # Logout
+    ok(
+        $res = $issuer->_get(
+            '/cas/logout',
+            cookie => "lemonldap=$id",
+            accept => 'text/html',
+        ),
+        'Initiate logout'
+    );
+    is( expectCookie($res), 0, "Cookie was cleared" );
+    expectRedirection( $res, qr'^http://auth.example.com/\?logout=1$' );
 };
 
 sub relaySpFromInfo {

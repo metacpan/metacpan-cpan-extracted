@@ -4,6 +4,7 @@ use URI::Escape qw/uri_escape/;
 use Time::HiRes qw/usleep/;
 use Test::More;
 use Net::LDAP;
+use IPC::Run;
 
 use File::Copy "cp";
 
@@ -12,15 +13,13 @@ my $slapadd_bin;
 my $slapd_schema_dir;
 our $slapd_url = 'ldapi://' . uri_escape( $main::tmpDir . '/ldap_socket' );
 our $slapd_pid;
+our $slapd_harness;
 
 sub legacy_openldap {
     my ($slapd_bin) = @_;
 
-    use IPC::Open3;
-    my $pid    = open3( undef, my $outerr, undef, $slapd_bin, '-V' );
-    my $output = do { local $/; readline $outerr };
-    waitpid $pid, 0;
-    my $exit      = $? >> 8;
+    my $output;
+    IPC::Run::run( [ $slapd_bin, '-V' ], "2>", \$output );
 
     # Debian slapd 2.4 has an empty string as a version number
     my $is_legacy = $output =~ /slapd 2\.4/ or $output =~ /slapd  /;
@@ -83,30 +82,29 @@ sub waitForLdap {
 sub stopLdapServer {
     if ( $ENV{LLNGTESTLDAP} ) {
         note "Stopping LDAP server ($slapd_pid)";
-        my $pid = $slapd_pid;
-        kill 15, $pid;
-
-        # give the PID 10 seconds to stop
-        my $waitloop = 0;
-        while ( $waitloop < 1000 and kill 0, $pid ) {
-            $waitloop++;
-            usleep 10000;
-        }
-        if ( kill 0, $pid ) {
-            note "Could not kill LDAP server normally, sending SIGKILL";
-            kill 9, $pid;
-        }
-        else {
-            note "LDAP server stopped successfully";
-        }
+        $slapd_harness->kill_kill( grace => 5 );
     }
 }
 
 sub startLdapServer {
     note "Starting LDAP server";
+
+    my $loglevel = "0";
+    if ( $ENV{DEBUG} or ( $ENV{LLNGLOGLEVEL} || '' ) eq "debug" ) {
+        $loglevel = 'stats';
+    }
+    elsif ( $ENV{LLNGLOGLEVEL} ) {
+        $loglevel = 'none';
+    }
+
     if ( $ENV{LLNGTESTLDAP} ) {
-        system( $slapd_bin, '-s', '256', '-h', $slapd_url,
-            '-F', "$main::tmpDir/slapd.d" );
+
+        $slapd_harness = IPC::Run::start( [
+                $slapd_bin, '-s', '256', '-d', $loglevel, '-h', $slapd_url,
+
+                '-F', "$main::tmpDir/slapd.d"
+            ]
+        );
     }
     waitForLdap();
 }

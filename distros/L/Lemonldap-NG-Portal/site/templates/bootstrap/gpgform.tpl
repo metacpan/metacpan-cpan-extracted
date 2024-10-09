@@ -5,7 +5,7 @@
     <div class="input-group-prepend">
       <span class="input-group-text"><label for="userfield" class="mb-0"><i class="fa fa-user"></i></label></span>
     </div>
-    <input id="userfield" name="user" type="text" class="form-control" value="<TMPL_VAR NAME="LOGIN">" trplaceholder="mail" required aria-required="true" />
+    <input id="userfield" name="user" type="text" class="form-control" value="<TMPL_VAR NAME="LOGIN" ESCAPE=HTML>" trplaceholder="mail" required aria-required="true" />
   </div>
 
   <div class="input-group mb-3">

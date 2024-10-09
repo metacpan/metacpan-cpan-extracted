@@ -165,7 +165,7 @@ qr%<input name="code" value="" type="text" class="form-control" id="extcode" trp
     );
 
     # Verify authentication on SP
-    expectRedirection( $res, 'http://auth.sp.com' );
+    expectRedirection( $res, 'http://auth.sp.com/' );
     my $spId = expectCookie($res);
 
     ok( $res = $sp->_get( '/', cookie => "lemonldap=$spId" ), 'Get / on SP' );
@@ -213,7 +213,7 @@ qr%<input name="code" value="" type="text" class="form-control" id="extcode" trp
         ),
         'Post SAML response to SP'
     );
-    expectRedirection( $res, 'http://auth.sp.com' );
+    expectRedirection( $res, 'http://auth.sp.com/?logout=1' );
 
     # Test if logout is done
     ok(
@@ -247,7 +247,7 @@ sub issuer {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'idp.com',
-                portal                     => 'http://auth.idp.com',
+                portal                     => 'http://auth.idp.com/',
                 authentication             => 'Demo',
                 userDB                     => 'Same',
                 issuerDBSAMLActivation     => 1,
@@ -298,7 +298,7 @@ sub sp {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',
-                portal                            => 'http://auth.sp.com',
+                portal                            => 'http://auth.sp.com/',
                 authentication                    => 'SAML',
                 userDB                            => 'Same',
                 issuerDBSAMLActivation            => 0,

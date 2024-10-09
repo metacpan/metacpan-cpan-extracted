@@ -2,6 +2,7 @@ package Lemonldap::NG::Portal::Plugins::LocationDetect;
 
 use Mouse;
 use List::MoreUtils qw/uniq/;
+use Scalar::Util qw/blessed/;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR);
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -50,7 +51,7 @@ sub init {
 
 sub _get_localized {
     my ( $self, $req, $record ) = @_;
-    my $lang  = $req->cookies->{llnglanguage} || 'en';
+    my $lang  = $self->p->getLanguage($req);
     my $names = $record->names;
     if ( $names->{$lang} ) {
         return $names->{$lang};
@@ -112,9 +113,14 @@ sub getIpInfo {
     my $city =
       eval { $self->reader->$type( ip => $req->address )->city() };
     if ($@) {
+        my $msg = $@;
+        if ( blessed($@) && $@->isa('Throwable::Error') ) {
+            $msg = $@->message;
+        }
+
         $self->logger->warn( "[LocationDetect] Could not resolve city for IP "
               . $req->address . ": "
-              . $@ );
+              . $msg );
         $city_code    = "unknown";
         $city_display = "Unknown";
     }
@@ -128,10 +134,14 @@ sub getIpInfo {
     my $country =
       eval { $self->reader->$type( ip => $req->address )->country() };
     if ($@) {
+        my $msg = $@;
+        if ( blessed($@) && $@->isa('Throwable::Error') ) {
+            $msg = $@->message;
+        }
         $self->logger->warn(
                 "[LocationDetect] Could not resolve country for IP "
               . $req->address . ": "
-              . $@ );
+              . $msg );
         $country_code    = "unknown";
         $country_display = "Unknown";
     }

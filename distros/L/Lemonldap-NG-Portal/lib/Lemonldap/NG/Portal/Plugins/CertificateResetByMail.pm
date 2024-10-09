@@ -85,9 +85,12 @@ sub init {
     );
 
     # Initialize Captcha if needed
-    if ( $self->conf->{captcha_mail_enabled} ) {
-        $self->captcha(1);
-    }
+    $self->captcha(
+        $self->p->buildRule(
+            $self->conf->{captcha_mail_enabled},
+            'captchaMail'
+        )
+    );
 
     # Load registered module
     $self->registerModule(
@@ -168,8 +171,8 @@ sub _certificateReset {
         $req->{user} = $req->param('mail');
 
         # Captcha for register form
-        if ( $self->captcha ) {
-            my $result = $self->p->_captcha->check_captcha($req);
+        if ( $self->captcha->( $req, {} ) ) {
+            my $result = $self->p->getService('captcha')->check_captcha($req);
             if ($result) {
                 $self->logger->debug("Captcha code verified");
             }
@@ -193,7 +196,7 @@ sub _certificateReset {
             }
         }
 
-        unless ( $req->{user} =~ /$self->{conf}->{userControl}/o ) {
+        unless ( $req->{user} =~ /$self->{conf}->{userControl}/ ) {
             $self->setSecurity($req);
             return PE_MALFORMEDUSER;
         }
@@ -335,48 +338,19 @@ sub _certificateReset {
             }
         );
 
-        # Build mail content
-        my $tr      = $self->translate($req);
-        my $subject = $self->conf->{certificateResetByMailStep1Subject};
-        unless ($subject) {
-            $subject = 'certificateResetByMailStep1Subject';
-            $tr->( \$subject );
-        }
-        my $body;
-        my $html;
-        if ( $self->conf->{certificateResetByMailStep1Body} ) {
-
-            # We use a specific text message, no html
-            $body = $self->conf->{certificateResetByMailStep1Body};
-
-            # Replace variables in body
-            $body =~ s/\$expMailDate/$req->data->{expMailDate}/ge;
-            $body =~ s/\$expMailTime/$req->data->{expMailTime}/ge;
-            $body =~ s/\$url/$url/g;
-            $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
-
-        }
-        else {
-
-            # Use HTML template
-            $body = $self->loadMailTemplate(
+        unless (
+            $self->sendEmail(
                 $req,
-                'mail_certificateConfirm',
-                filter => $tr,
-                params => {
+                subject => $self->conf->{certificateResetByMailStep1Subject},
+                subject_trmsg => 'certificateResetByMailStep1Subject',
+                body          => $self->conf->{certificateResetByMailStep1Body},
+                body_template => 'mail_certificateConfirm',
+                dest          => $req->data->{mailAddress},
+                params        => {
                     expMailDate => $req->data->{expMailDate},
                     expMailTime => $req->data->{expMailTime},
                     url         => $url,
-                },
-            );
-            $html = 1;
-        }
-
-        # Send mail
-        unless (
-            $self->send_mail(
-                $req->data->{mailAddress},
-                $subject, $body, $html
+                }
             )
           )
         {
@@ -518,40 +492,16 @@ sub modifyCertificate {
       $self->p->getFirstValue(
         $req->{sessionInfo}->{ $self->conf->{mailSessionKey} } );
 
-    # Build mail content
-    my $tr      = $self->translate($req);
-    my $subject = $self->conf->{certificateResetByMailStep2Subject};
-    unless ($subject) {
-        $subject = 'certificateResetByMailStep2Subject';
-        $tr->( \$subject );
-    }
-    my $body;
-    my $html;
-    if ( $self->conf->{certificateResetByMailStep2Body} ) {
-
-        # We use a specific text message, no html
-        $body = $self->conf->{certificateResetByMailStep2Body};
-
-        # Replace variables in body
-        $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
-
-    }
-    else {
-
-        # Use HTML template
-        $body = $self->loadMailTemplate(
-            $req,
-            'mail_certificateReset',
-            filter => $tr,
-            params => {},
-        );
-        $html = 1;
-    }
-
     # Send mail
     return PE_MAILERROR
-      unless $self->send_mail( $req->data->{mailAddress}, $subject, $body,
-        $html );
+      unless $self->sendEmail(
+        $req,
+        subject       => $self->conf->{certificateResetByMailStep2Subject},
+        subject_trmsg => 'certificateResetByMailStep2Subject',
+        body          => $self->conf->{certificateResetByMailStep2Body},
+        body_template => 'mail_certificateReset',
+        dest          => $req->data->{mailAddress},
+      );
 
     return PE_MAILOK;
 }
@@ -559,8 +509,8 @@ sub modifyCertificate {
 sub setSecurity {
     my ( $self, $req ) = @_;
 
-    if ( $self->captcha ) {
-        $self->p->_captcha->init_captcha($req);
+    if ( $self->captcha->( $req, {} ) ) {
+        $self->p->getService('captcha')->init_captcha($req);
     }
 
     elsif ( $self->ottRule->( $req, {} ) ) {
@@ -573,21 +523,18 @@ sub display {
     my ( $self, $req ) = @_;
     $self->logger->debug( 'Display called with code: ' . $req->error );
     my %tplPrm = (
-        SKIN_PATH                       => $self->conf->{staticPrefix},
-        SKIN                            => $self->p->getSkin($req),
-        SKIN_BG                         => $self->conf->{portalSkinBackground},
-        MAIN_LOGO                       => $self->conf->{portalMainLogo},
-        AUTH_ERROR                      => $req->error,
-        AUTH_ERROR_TYPE                 => $req->error_type,
-        AUTH_ERROR_ROLE                 => $req->error_role,
-        ( 'AUTH_ERROR_' . $req->error ) => 1,
-        AUTH_URL                        => $req->data->{_url},
-        CHOICE_VALUE                    => $req->{_authChoice},
-        EXPMAILDATE                     => $req->data->{expMailDate},
-        EXPMAILTIME                     => $req->data->{expMailTime},
-        STARTMAILDATE                   => $req->data->{startMailDate},
-        STARTMAILTIME                   => $req->data->{startMailTime},
-        MAILALREADYSENT                 => $req->data->{mailAlreadySent},
+        $self->p->getErrorTplParams($req),
+        SKIN_PATH       => $self->conf->{staticPrefix},
+        SKIN            => $self->p->getSkin($req),
+        SKIN_BG         => $self->conf->{portalSkinBackground},
+        MAIN_LOGO       => $self->conf->{portalMainLogo},
+        AUTH_URL        => $req->data->{_url},
+        CHOICE_VALUE    => $req->{_authChoice},
+        EXPMAILDATE     => $req->data->{expMailDate},
+        EXPMAILTIME     => $req->data->{expMailTime},
+        STARTMAILDATE   => $req->data->{startMailDate},
+        STARTMAILTIME   => $req->data->{startMailTime},
+        MAILALREADYSENT => $req->data->{mailAlreadySent},
         (
             $req->data->{customScript}
             ? ( CUSTOM_SCRIPT => $req->data->{customScript} )

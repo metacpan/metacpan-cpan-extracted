@@ -1,0 +1,39 @@
+---
+abstract: 'An author test for Pod Coverage'
+author:
+  - 'Graham Knop <haarg@haarg.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version (undef), CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Test-Pod-Coverage-TrustMe
+provides:
+  Dist::Zilla::Plugin::Test::Pod::Coverage::TrustMe:
+    file: lib/Dist/Zilla/Plugin/Test/Pod/Coverage/TrustMe.pm
+    version: v1.0.0
+requires:
+  Data::Dumper: '0'
+  Data::Section: '0'
+  Dist::Zilla: '6.000'
+  Moose: '2.0000'
+  namespace::clean: '0'
+  perl: '5.020000'
+resources:
+  bugtracker: https://github.com/haarg/Dist-Zilla-Plugin-Test-Pod-Coverage-TrustMe/issues
+  repository: https://github.com/haarg/Dist-Zilla-Plugin-Test-Pod-Coverage-TrustMe.git
+version: v1.0.0
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1
+x_use_unsafe_inc: 0

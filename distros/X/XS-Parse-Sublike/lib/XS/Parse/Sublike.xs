@@ -403,6 +403,7 @@ static int parse(pTHX_
 
       ctx.cv = newMYSUB(floor_ix, nameop, NULL, ctx.attrs, ctx.body);
 #else
+      PERL_UNUSED_VAR(lexname_padix);
       croak("XS_PARSE_SUBLIKE_ACTION_INSTALL_LEXICAL is not supported on this version of Perl");
 #endif
     }
@@ -680,8 +681,8 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 #ifdef HAVE_LEXICAL_SUB
     if(PL_parser->bufptr > was_parser_bufptr)
       PL_parser->bufptr = was_parser_bufptr;
-#endif
 next_keyword:
+#endif
     return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
   }
 

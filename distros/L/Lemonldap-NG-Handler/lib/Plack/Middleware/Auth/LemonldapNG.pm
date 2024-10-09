@@ -75,6 +75,17 @@ Plack::Middleware::Auth::LemonldapNG - authentication middleware for Lemonldap-N
     $app;
   };
 
+  # Or through OO Interface
+  my $builder = Plack::Builder->new();
+  $builder->add_middleware(
+      "Auth::LemonldapNG",
+      llparams => {
+        configStorage => ...
+      },
+      on_reject => \&on_reject
+  );
+  $protected_app = $builder->wrap($app);
+
 =head1 DESCRIPTION
 
 Lemonldap::NG is a modular Web-SSO based on Apache::Session modules. It

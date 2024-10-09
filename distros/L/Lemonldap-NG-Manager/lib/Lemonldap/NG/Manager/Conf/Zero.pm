@@ -195,6 +195,7 @@ sub zeroConf {
             'cache_depth'        => 3,
         },
         "oidcServiceIgnoreScopeForClaims" => 1,
+        "webauthnDefaultTransports"       => "usb, nfc, ble, internal"
     };
 }
 

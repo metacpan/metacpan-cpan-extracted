@@ -6,13 +6,14 @@ use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_ERROR
+  PE_PP_PASSWORD_TOO_LONG
   PE_PP_PASSWORD_TOO_SHORT
   PE_PP_NOT_ALLOWED_CHARACTER
   PE_PP_NOT_ALLOWED_CHARACTERS
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.20.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -35,17 +36,16 @@ sub init {
             condition => $self->conf->{passwordPolicyMinSize},
             value     => $self->conf->{passwordPolicyMinSize},
             label     => "passwordPolicyMinSize",
-            order => 101,
+            order     => 101,
         }
     );
-
     $self->p->addPasswordPolicyDisplay(
         'ppolicy-minlower',
         {
             condition => $self->conf->{passwordPolicyMinLower},
             value     => $self->conf->{passwordPolicyMinLower},
             label     => "passwordPolicyMinLower",
-            order => 102,
+            order     => 102,
         }
     );
     $self->p->addPasswordPolicyDisplay(
@@ -54,7 +54,7 @@ sub init {
             condition => $self->conf->{passwordPolicyMinUpper},
             value     => $self->conf->{passwordPolicyMinUpper},
             label     => "passwordPolicyMinUpper",
-            order => 103,
+            order     => 103,
         }
     );
     $self->p->addPasswordPolicyDisplay(
@@ -63,7 +63,7 @@ sub init {
             condition => $self->conf->{passwordPolicyMinDigit},
             value     => $self->conf->{passwordPolicyMinDigit},
             label     => "passwordPolicyMinDigit",
-            order => 104,
+            order     => 104,
         }
     );
     $self->p->addPasswordPolicyDisplay(
@@ -87,6 +87,15 @@ sub init {
             value => $self->p->speChars(),
             label => "passwordPolicySpecialChar",
             order => 106,
+        }
+    );
+    $self->p->addPasswordPolicyDisplay(
+        'ppolicy-maxsize',
+        {
+            condition => $self->conf->{passwordPolicyMaxSize},
+            value     => $self->conf->{passwordPolicyMaxSize},
+            label     => "passwordPolicyMaxSize",
+            order     => 107,
         }
     );
 
@@ -114,6 +123,14 @@ sub checkBasicPolicy {
     {
         $self->logger->error("Password too short");
         return PE_PP_PASSWORD_TOO_SHORT;
+    }
+
+    # Max size
+    if ( $self->conf->{passwordPolicyMaxSize}
+        and length($password) > $self->conf->{passwordPolicyMaxSize} )
+    {
+        $self->logger->error("Password too long");
+        return PE_PP_PASSWORD_TOO_LONG;
     }
 
     # Min lower

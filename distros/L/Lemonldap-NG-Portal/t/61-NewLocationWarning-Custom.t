@@ -71,7 +71,7 @@ SKIP: {
     like( subject(), qr#Test new location mail#, ' Subject found' );
     like(
         mail(),
-qr#^Test 127\.0\.0\.2 \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} Mozilla/5\.0 \(VAX-4000; rv:36\.0\) Gecko/20350101 Firefox$#,
+qr#^Test 127\.0\.0\.2 \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \(UTC[+-][0-9]{4}\) Mozilla/5\.0 \(VAX-4000; rv:36\.0\) Gecko/20350101 Firefox$#,
         ' Mail sent (IP, Date and UA found)'
     );
 }

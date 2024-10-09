@@ -11,7 +11,7 @@ sub run {
     my $uri = $req->{env}->{REQUEST_URI};
     my $cn  = $class->tsv->{cookieName};
     my ( $id, $session );
-    if ( $uri =~ m/[\?&;]${cn}cda=(\w+)/oi ) {
+    if ( $uri =~ m/[\?&;]${cn}cda=(\w+)/i ) {
         if (    $id = $class->fetchId($req)
             and $session = $class->retrieveSession( $req, $id ) )
         {

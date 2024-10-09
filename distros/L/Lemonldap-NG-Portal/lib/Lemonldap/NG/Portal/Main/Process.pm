@@ -76,7 +76,7 @@ sub processHook {
         }
     }
     if ( $err != PE_OK ) {
-        my $msg = "Hook $hookName returned " . portalConsts->{$err};
+        my $msg = "Hook $hookName returned $err (" . portalConsts->{$err} . ")";
         if ( $err > 0 ) {
             $self->logger->warn($msg);
         }
@@ -393,6 +393,23 @@ sub checkXSSAttack {
     return 0;
 }
 
+# Relaxed version that doesn't look at URL escaped character
+# This is meant to be used for checking urldc until we find a better solution
+sub checkXSSAttackUrldc {
+    my ( $self, $name, $value ) = @_;
+
+    # Empty values are not bad
+    return 0 unless $value;
+
+    # Test value
+    if ( $value =~ m/(?:\0|<|'|"|`)/ ) {
+        $self->userLogger->error(
+            "XSS attack detected (param: $name | value: $value)");
+        return $self->conf->{checkXSS};
+    }
+    return 0;
+}
+
 # Second block: auth process (call auth or userDB object)
 # -------------------------------------------------------
 
@@ -500,7 +517,7 @@ sub setSessionInfo {
     }
 
     # Currently selected language
-    $req->{sessionInfo}->{_language} = $req->cookies->{llnglanguage} || 'en';
+    $req->{sessionInfo}->{_language} = $self->getLanguage($req);
 
     # Store URL origin in session
     $req->{sessionInfo}->{_url} = $req->{urldc};

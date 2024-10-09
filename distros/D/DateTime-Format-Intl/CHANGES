@@ -1,0 +1,7 @@
+Revision history for Perl module DateTime::Format::Intl
+
+v0.1.1 2024-10-09T16:49:39+0900
+    - Correcting unit tests
+
+v0.1.0 2024-10-04T19:42:15+0900
+	- Initial version

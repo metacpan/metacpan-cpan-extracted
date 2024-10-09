@@ -41,149 +41,98 @@ has prefix   => ( is => 'rw', default => 'generic' );
 has template => ( is => 'ro', default => 'generic2fregister' );
 has welcome  => ( is => 'ro', default => 'generic2fwelcome' );
 
-sub run {
-    my ( $self, $req, $action ) = @_;
-    my $user = $req->userData->{ $self->conf->{whatToTrace} };
-    return $self->p->sendError( $req, 'PE82', 400 )
-      unless $user;
+use constant supportedActions => {
+    sendcode => "sendcode",
+    verify   => "verify",
+    delete   => "delete",
+};
 
-    # Send a code to generic
-    if ( $action eq 'sendcode' ) {
-        my $generic = $req->param('generic');
+sub sendcode {
+    my ( $self, $req ) = @_;
+    my $user    = $req->userData->{ $self->conf->{whatToTrace} };
+    my $generic = $req->param('generic');
 
-        unless ($generic) {
-            $self->userLogger->info(
-                $self->prefix . "2f: registration -> empty validation form" );
-            return $self->p->sendError( $req, 'PE79', 200 );
-        }
-
-        # Validate format
-        unless ( $self->validateFormat($generic) ) {
-            my $error_label = $self->conf->{generic2fFormatErrorLabel}
-              || 'generic2fFormatError';
-            $self->userLogger->info(
-                $self->prefix . "2f: registration -> invalid format" );
-            return $self->p->sendError( $req, $error_label, 200 );
-        }
-
-        # Generate and send code
-
-        # Save current session info into a token
-        my $sessionInfo = { %{ $req->userData } };
-
-        # Inject candidate value
-        $sessionInfo->{destination} = $generic;
-        my $token = $self->ott->createToken($sessionInfo);
-        my $result =
-          $self->verificationModule->challenge( $req, $sessionInfo, $token );
-        return $self->p->sendError( $req, 'serverError' ) unless $result;
-
-        # Send response
-        $self->userLogger->notice( $self->prefix
-              . "2f: send verification code to $generic for $user" );
-        my $json_response = qq({"result":1,"token":"$token"});
-        return [
-            200,
-            [
-                'Content-Type'   => 'application/json',
-                'Content-Length' => length($json_response),
-            ],
-            [$json_response]
-        ];
+    unless ($generic) {
+        return $self->failResponse( $req, 'PE79', 200 );
     }
 
-    # Verification that user has a valid generic
-    elsif ( $action eq 'verify' ) {
-        my $generic     = $req->param('generic');
-        my $tokenid     = $req->param("token");
-        my $genericcode = $req->param('genericcode');
-        my $genericname = $self->checkNameSfa( $req, $self->prefix,
-            $req->param('genericname') );
-        return $self->p->sendError( $req, 'badName', 200 ) unless $genericname;
+    # Validate format
+    unless ( $self->validateFormat($generic) ) {
+        my $error_label = $self->conf->{generic2fFormatErrorLabel}
+          || 'generic2fFormatError';
+        return $self->failResponse( $req, $error_label, 200 );
+    }
 
-        # Verify code
-        my $token = $self->ott->getToken( $tokenid, 1 );
-        my $res = $self->verificationModule->verify_supplied_code( $req, $token,
-            $genericcode );
-        return $self->p->sendError( $req, "PE$res", 400 )
-          unless ( $res == PE_OK );
+    # Generate and send code
 
-        # Now generic is verified, let's store it in persistent data
-        # Reading existing 2FDevices
-        my @generic2f =
-          $self->find2fDevicesByType( $req, $req->userData, $self->prefix );
+    # Save current session info into a token
+    my $sessionInfo = { %{ $req->userData } };
 
-        # Delete previous generic if any
-        if (@generic2f) {
-            if ( $self->del2fDevices( $req, $req->userData, \@generic2f ) ) {
-                $self->logger->debug(
-                    $self->prefix . "2f: old device(s) deleted" );
-            }
-            else {
-                $self->logger->error(
-                    $self->prefix . "2f: unable to delete old device(s)" );
-                return $self->p->sendError( $req, 'serverError' );
-            }
-        }
+    # Inject candidate value
+    $sessionInfo->{destination} = $generic;
+    my $token = $self->ott->createToken($sessionInfo);
+    my $result =
+      $self->verificationModule->challenge( $req, $sessionInfo, $token );
+    return $self->failResponse( $req, 'serverError' ) unless $result;
 
-        # Add a new one
-        if (
-            $self->add2fDevice(
-                $req,
-                $req->userData,
-                {
-                    _generic => $generic,
-                    name     => $genericname,
-                    type     => $self->prefix,
-                    epoch    => time()
-                }
-            )
-          )
-        {
-            $self->markRegistered($req);
-            return [
-                200,
-                [
-                    'Content-Type'   => 'application/json',
-                    'Content-Length' => 12,
-                ],
-                ['{"result":1}']
-            ];
+    # Send response
+    $self->userLogger->notice(
+        $self->prefix . "2f: send verification code to $generic for $user" );
+    return $self->successResponse( $req, { result => 1, token => $token } );
+}
+
+sub verify {
+
+    my ( $self, $req ) = @_;
+    my $user        = $req->userData->{ $self->conf->{whatToTrace} };
+    my $generic     = $req->param('generic');
+    my $tokenid     = $req->param("token");
+    my $genericcode = $req->param('genericcode');
+    my $genericname =
+      $self->checkNameSfa( $req, $self->prefix, $req->param('genericname') );
+    return $self->failResponse( $req, 'badName', 200 ) unless $genericname;
+
+    # Verify code
+    my $token = $self->ott->getToken( $tokenid, 1 );
+    my $res   = $self->verificationModule->verify_supplied_code( $req, $token,
+        $genericcode );
+    return $self->failResponse( $req, "PE$res", 400 )
+      unless ( $res == PE_OK );
+
+    # Now generic is verified, let's store it in persistent data
+    # Reading existing 2FDevices
+    my @generic2f =
+      $self->find2fDevicesByType( $req, $req->userData, $self->prefix );
+
+    # Delete previous generic if any
+    if (@generic2f) {
+        if ( $self->del2fDevices( $req, $req->userData, \@generic2f ) ) {
+            $self->logger->debug( $self->prefix . "2f: old device(s) deleted" );
         }
         else {
-            $self->logger->debug( $self->prefix . "2f: unable to add device" );
-            return $self->p->sendError( $req, 'serverError' );
+            $self->logger->error(
+                $self->prefix . "2f: unable to delete old device(s)" );
+            return $self->failResponse( $req, 'serverError' );
         }
     }
 
-    elsif ( $action eq 'delete' ) {
-
-        # Check if unregistration is allowed
-        return $self->p->sendError( $req, 'notAuthorized', 400 )
-          unless $self->userCanRemove;
-
-        my $epoch = $req->param('epoch')
-          or return $self->p->sendError( $req,
-            $self->prefix . '2f: "epoch" parameter is missing', 400 );
-
-        if ( $self->del2fDevice( $req, $req->userData, $self->prefix, $epoch ) )
+    # Add a new one
+    my $res = $self->registerDevice(
+        $req,
+        $req->userData,
         {
-            return [
-                200,
-                [
-                    'Content-Type'   => 'application/json',
-                    'Content-Length' => 12,
-                ],
-                ['{"result":1}']
-            ];
+            _generic => $generic,
+            name     => $genericname,
+            type     => $self->prefix,
+            epoch    => time()
         }
-        $self->logger->error( $self->prefix . "2f: device not found" );
-        return $self->p->sendError( $req, '2FDeviceNotFound', 400 );
+    );
+    if ( $res == PE_OK ) {
+        return $self->successResponse( $req, { result => 1 } );
     }
-
     else {
-        $self->logger->error( $self->prefix . "2f: unknown action ($action)" );
-        return $self->p->sendError( $req, 'unknownAction', 400 );
+        $self->logger->error( $self->prefix . "2f: unable to add device" );
+        return $self->failResponse( $req, "PE$res" );
     }
 }
 

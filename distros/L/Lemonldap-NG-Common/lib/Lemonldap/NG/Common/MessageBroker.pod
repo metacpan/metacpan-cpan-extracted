@@ -1,0 +1,186 @@
+=head1 NAME
+
+=encoding utf8
+
+Lemonldap::NG::Common::MessageBroker - Doc for MessageBroker classes
+
+=head1 DESCRIPTION
+
+Starting from 2.20.0, Lemonldap::NG dispatches its events to other nodes using
+L<messages|/"MESSAGE FORMAT"> sent by a I<Lemonldap::NG::Common::MessageBroker>
+sub class.
+
+By default, only 2 kind of L<messages|/"MESSAGE FORMAT"> are dispatched:
+
+=over
+
+=item * B<configuration updates>: each time a configuration is saved.
+
+Note that default broker also adds such messages regularly following the
+C<chectTime> value I<(because it's not a real evant pub/sub system)>. This keep
+previous behavior.
+
+=item * B<session logouts>: whenever a session is terminated before it expires
+I<(either because the user logged out or by action of an administrator)>.
+
+Default broker just push this information on local node. Other will discover
+the end of session after local cache expiration I<(max 10 minutes)>.
+
+=back
+
+By default, LLNG uses only one channel, defined in C<eventQueueName>
+configuration parameter.
+
+During initialization, LLNG creates always 2 distinct objects:
+
+=over
+
+=item * B<a reader> which calls C<subscribe()> for each channel and then check
+for messages every 5 seconds
+
+=item * B<a writer> which send messages on channels
+
+=back
+
+The L<Lemonldap::NG::Hanlder::Main::MsgActions> class contains actions to be
+launched when a message enter in the main events channel.
+
+=head1 METHODS
+
+Except C<applyConf>, all this methods must exist in a Message Broker.
+
+=head2 new
+
+Constructor. Arguments:
+
+=over
+
+=item * B<$class>: class name
+
+=item * B<$conf>: current LLNG configuration
+
+=item * B<$logger>: a Lemonldap::NG::Common logger
+
+=back
+
+=head2 publish
+
+Method to insert an L<message|/"MESSAGE FORMAT">. Arguments:
+
+=over
+
+=item * B<$self>
+
+=item * B<$channel>: the channel name
+
+=item * B<$msg>: a hash reference containing the L<message|/"MESSAGE FORMAT">
+
+=back
+
+=head2 subscribe
+
+Methode called during LLNG initialization for its message reader object.
+Arguments:
+
+=over
+
+=item * B<$self>
+
+=item * B<$channel>: the channel name
+
+=back
+
+=head2 getNextMessage
+
+Non blocking method that return a L<message|/"MESSAGE FORMAT"> in the given channel if one exists.
+Arguments:
+
+=over
+
+=item * B<$self>
+
+=item * B<$channel>: the channel name
+
+=back
+
+=head2 waitForNextMessage
+
+Blocking method that waits for a L<message|/"MESSAGE FORMAT"> in the given channel and return it.
+Arguments:
+
+=over
+
+=item * B<$self>
+
+=item * B<$channel>: the channel name
+
+=back
+
+=head2 applyConf
+
+Optional method called after configuration save. It is used only with default
+message broker to launch previous behavior: call all "reload URLs".
+
+=head1 MESSAGE FORMAT
+
+A message is a HASH reference. A message in the main event channel must contain
+a key "B<action>". This key is used by
+L<Lemonldap::NG::Hanlder::Main::MsgActions> to launch the corresponding method.
+
+=over
+
+=item * B<Configuration update>
+
+  {
+    action => 'newConf'
+  }
+
+=item * B<Session end>
+
+  {
+    action => 'unlog',
+    id => '<configuration id to be removed from local cache>'
+  }
+
+=back
+
+=head1 SEE ALSO
+
+L<Lemonldap::NG::Manager>, L<Lemonldap::NG::Portal>, L<Lemonldap::NG::Handler>
+
+=head1 AUTHORS
+
+=over
+
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
+
+=head1 DOWNLOAD
+
+Lemonldap::NG is available at
+L<https://lemonldap-ng.org/download>
+
+=head1 COPYRIGHT AND LICENSE
+
+See COPYING file for details.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

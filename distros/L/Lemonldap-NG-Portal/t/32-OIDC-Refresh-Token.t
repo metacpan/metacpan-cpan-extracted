@@ -17,7 +17,7 @@ sub checkJWT {
     my ($access_token) = @_;
     my $payload = expectJWT(
         $access_token,
-        iss       => "http://auth.op.com",
+        iss       => "http://auth.op.com/",
         name      => "Frédéric Accents",
         sub       => "french",
         scope     => "openid profile email",
@@ -34,7 +34,7 @@ sub checkJWT {
 
 # Full test case
 sub runTest {
-    my ( $op, $jwt ) = @_;
+    my ( $op, $jwt, $refresh_rotation ) = @_;
 
     Time::Fake->reset;
     my ( $res, $query );
@@ -69,8 +69,7 @@ sub runTest {
     );
     ok( ( grep { $_ eq "rpid" } @{ $id_token_payload->{aud} } ),
         'Check that clientid is in audience' );
-    ok(
-        (
+    ok( (
             grep { $_ eq "http://my.extra.audience/test" }
               @{ $id_token_payload->{aud} }
         ),
@@ -96,9 +95,19 @@ sub runTest {
     $access_token = $json->{access_token};
     checkJWT($access_token) if ($jwt);
     $id_token = $json->{id_token};
-    ok( $access_token,                   "Got refreshed Access token" );
-    ok( $id_token,                       "Got refreshed ID token" );
-    ok( !defined $json->{refresh_token}, "Refresh token not present" );
+    ok( $access_token, "Got refreshed Access token" );
+    ok( $id_token,     "Got refreshed ID token" );
+
+    if ($refresh_rotation) {
+        my $old_refresh_token = $refresh_token;
+        ok( $refresh_token = $json->{refresh_token},
+            "Refresh token was updated" );
+        expectReject( refreshGrant( $op, "rpid", $old_refresh_token ),
+            400, "invalid_request" );
+    }
+    else {
+        ok( !defined $json->{refresh_token}, "Refresh token not present" );
+    }
 
     $id_token_payload = id_token_payload($id_token);
     is( $id_token_payload->{sub}, 'french', 'Found sub in ID token' );
@@ -124,7 +133,19 @@ sub runTest {
     # Refresh access token a second time
     $json         = expectJSON( refreshGrant( $op, "rpid", $refresh_token ) );
     $access_token = $json->{access_token};
-    $json         = expectJSON( getUserinfo( $op, $access_token ) );
+
+    if ($refresh_rotation) {
+        my $old_refresh_token = $refresh_token;
+        ok( $refresh_token = $json->{refresh_token},
+            "Refresh token was updated" );
+        expectReject( refreshGrant( $op, "rpid", $old_refresh_token ),
+            400, "invalid_request" );
+    }
+    else {
+        ok( !defined $json->{refresh_token}, "Refresh token not present" );
+    }
+
+    $json = expectJSON( getUserinfo( $op, $access_token ) );
     ok( $json->{'sub'} eq "french",            'Got User Info' );
     ok( $json->{'name'} eq "Frédéric Accents", 'Got User Info' );
 
@@ -145,7 +166,7 @@ my $baseConfig = {
     ini => {
         logLevel                        => $debug,
         domain                          => 'op.com',
-        portal                          => 'http://auth.op.com',
+        portal                          => 'http://auth.op.com/',
         authentication                  => 'Demo',
         userDB                          => 'Same',
         issuerDBOpenIDConnectActivation => 1,
@@ -180,19 +201,31 @@ my $baseConfig = {
 };
 
 my $op = LLNG::Manager::Test->new($baseConfig);
-runTest($op);
 
-# Re-run tests with JWT access tokens
-$baseConfig->{ini}->{oidcRPMetaDataOptions}->{rp}
-  ->{oidcRPMetaDataOptionsAccessTokenJWT} = 1;
-$op = LLNG::Manager::Test->new($baseConfig);
-runTest( $op, 1 );
+subtest "Run test with basic configuration" => sub {
+    runTest($op);
+};
 
-# Re-run tests with activity timeout.
+subtest "Run test with JWT access tokens" => sub {
+    $baseConfig->{ini}->{oidcRPMetaDataOptions}->{rp}
+      ->{oidcRPMetaDataOptionsAccessTokenJWT} = 1;
+    $op = LLNG::Manager::Test->new($baseConfig);
+    runTest( $op, 1 );
+};
+
 # Make sure Refresh tokens extend session activity
-$baseConfig->{ini}->{timeoutActivity} = 7500;
-$op = LLNG::Manager::Test->new($baseConfig);
-runTest( $op, 1 );
+subtest "Run test with activity timeout" => sub {
+    $baseConfig->{ini}->{timeoutActivity} = 7500;
+    $op = LLNG::Manager::Test->new($baseConfig);
+    runTest( $op, 1 );
+};
+
+subtest "Run test with refresh token rotation" => sub {
+    $baseConfig->{ini}->{oidcRPMetaDataOptions}->{rp}
+      ->{oidcRPMetaDataOptionsRefreshTokenRotation} = 1;
+    $op = LLNG::Manager::Test->new($baseConfig);
+    runTest( $op, 1, 1 );
+};
 
 clean_sessions();
 done_testing();

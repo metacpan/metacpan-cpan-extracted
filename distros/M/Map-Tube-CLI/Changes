@@ -1,7 +1,13 @@
 Revision history for Map::Tube::CLI
 
+0.69  Tue Oct 08 17:30:00 2024
+      - Upgraded dependency on Map::Tube v3.77.
+      - Tidied up pod document.
+      - Fixed unit test as reported FAIL.
+      http://www.cpantesters.org/cpan/report/8f3cf9e8-803a-11ef-af31-05ea6d8775ea
+
 0.68  Sun Jan 28 18:10:00 2024
-      - Added support for Map::Tube::Bielefeld, thanks Michal Josef Špaček..
+      - Added support for Map::Tube::Bielefeld, thanks Michal Josef Špaček.
 
 0.67  Thu May 19 18:55:00 2022
       - Upgraded dependency on Map::Tube v3.67.

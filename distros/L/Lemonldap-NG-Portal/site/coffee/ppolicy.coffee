@@ -18,6 +18,8 @@ $(document).on 'checkpassword', (event, context) ->
 
 	if window.datas.ppolicy.minsize > 0
 		report( password.length >= window.datas.ppolicy.minsize, 'ppolicy-minsize-feedback' )
+	if window.datas.ppolicy.maxsize > 0
+		report( password.length <= window.datas.ppolicy.maxsize, 'ppolicy-maxsize-feedback' )
 	if window.datas.ppolicy.minupper > 0
 		upper = password.match(/[A-Z]/g)
 		report( upper and upper.length >= window.datas.ppolicy.minupper, 'ppolicy-minupper-feedback' )

@@ -47,6 +47,7 @@ sub init {
             radius_secret  => $self->conf->{radius2fSecret},
             radius_server  => $self->conf->{radius2fServer},
             radius_timeout => $self->conf->{radius2fTimeout},
+            radius_msgauth => $self->conf->{radius2fMsgAuth},
             modulename     => ( $self->prefix . "2f" ),
             logger         => $self->logger,
             p              => $self->p,
@@ -71,7 +72,6 @@ sub run {
     }
 
     # Prepare form
-    my ( $checkLogins, $stayConnected ) = $self->getFormParams($req);
     my $tmp = $self->p->sendHtml(
         $req,
         'ext2fcheck',

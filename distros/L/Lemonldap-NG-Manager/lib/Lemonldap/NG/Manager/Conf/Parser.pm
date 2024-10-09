@@ -197,7 +197,7 @@ sub _scanNodes {
         ##################################
 
         # Root nodes
-        if ( $leaf->{id} =~ /^($specialNodeKeys)$/io ) {
+        if ( $leaf->{id} =~ /^($specialNodeKeys)$/i ) {
             hdebug("Root special node detected $leaf->{id}");
 
             # If node has not been opened
@@ -229,7 +229,7 @@ sub _scanNodes {
         }
 
         # 1st sublevel
-        elsif ( $leaf->{id} =~ /^($specialNodeKeys)\/([^\/]+)$/io ) {
+        elsif ( $leaf->{id} =~ /^($specialNodeKeys)\/([^\/]+)$/i ) {
             hdebug("Special node chield detected $leaf->{id}");
             my ( $base, $host ) = ( $1, $2 );
 
@@ -248,7 +248,7 @@ sub _scanNodes {
 
         # Other sub levels
         elsif ( $leaf->{id} =~
-            /^($specialNodeKeys)\/([^\/]+)\/([^\/]+)(?:\/(.*))?$/io )
+            /^($specialNodeKeys)\/([^\/]+)\/([^\/]+)(?:\/(.*))?$/i )
         {
             my ( $base, $key, $oldName, $target, $h ) =
               ( $1, $newNames{$2}, $2, $3, $4 );
@@ -324,7 +324,7 @@ sub _scanNodes {
                         }
                     }
                 }
-                elsif ( $target =~ /^$virtualHostKeys$/o ) {
+                elsif ( $target =~ /^$virtualHostKeys$/ ) {
                     $self->set( 'vhostOptions', [ $oldName, $key ],
                         $target, $leaf->{data} );
                 }
@@ -377,7 +377,7 @@ sub _scanNodes {
                     my $optKey = $&;
                     hdebug("  $base sub key: $target");
                     if ( $target =~
-                        /^(?:$samlIDPMetaDataNodeKeys|$samlSPMetaDataNodeKeys)/o
+                        /^(?:$samlIDPMetaDataNodeKeys|$samlSPMetaDataNodeKeys)/
                       )
                     {
                         $self->set(
@@ -494,7 +494,7 @@ sub _scanNodes {
                         }
                     }
                     elsif ( $target =~
-                        /^(?:$oidcOPMetaDataNodeKeys|$oidcRPMetaDataNodeKeys)/o
+                        /^(?:$oidcOPMetaDataNodeKeys|$oidcRPMetaDataNodeKeys)/
                       )
                     {
                         $self->set(
@@ -573,7 +573,7 @@ sub _scanNodes {
                         }
                     }
                     elsif ( $target =~
-                        /^(?:$casSrvMetaDataNodeKeys|$casAppMetaDataNodeKeys)/o
+                        /^(?:$casSrvMetaDataNodeKeys|$casAppMetaDataNodeKeys)/
                       )
                     {
                         $self->set(
@@ -855,7 +855,7 @@ sub _scanNodes {
         ####################
         # Other hash nodes #
         ####################
-        elsif ( $leaf->{title} =~ /^$simpleHashKeys$/o
+        elsif ( $leaf->{title} =~ /^$simpleHashKeys$/
             and not $leaf->{title} eq 'applicationList' )
         {
             hdebug( $leaf->{title} );
@@ -1226,7 +1226,7 @@ sub _unitTest {
             }
 
             # Hash parameters
-            if ( $key =~ /^$simpleHashKeys$/o ) {
+            if ( $key =~ /^$simpleHashKeys$/ ) {
                 $conf->{$key} //= {};
                 unless ( ref $conf->{$key} eq 'HASH' ) {
                     push @{ $self->errors },
@@ -1239,7 +1239,7 @@ sub _unitTest {
 
                 #TODO
             }
-            if (   $key =~ /^(?:$simpleHashKeys|$doubleHashKeys)$/o
+            if (   $key =~ /^(?:$simpleHashKeys|$doubleHashKeys)$/
                 or $attr->{type} =~ /Container$/ )
             {
                 $res = 0

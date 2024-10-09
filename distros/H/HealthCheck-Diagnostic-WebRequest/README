@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version v1.4.3
+    version v1.4.4
 
 SYNOPSIS
 
@@ -169,6 +169,43 @@ ATTRIBUTES
     By default provides a custom agent string and a default timeout of 7.
 
 METHODS
+
+ Check Methods
+
+    Individual HealthCheck results are added in this order as the return
+    value from these methods:
+
+  check_status
+
+        my $result = $self->check_status( $response );
+
+    This method takes in a HTTP::Response object and returns a healthcheck
+    result <https://grantstreetgroup.github.io/HealthCheck.html#results>
+    with a status key and an info key. The status is CRITICAL if a
+    successful HTTP status code was not received, if the Client-Warning
+    HTTP response header is 'Internal response', or if the X-Squid-Error
+    HTTP response header is set. Otherwise, it is OK.
+
+  check_response_time
+
+        my $result = $self->check_response_time( $elapsed_time );
+
+    This method takes in a number of seconds and returns a healthcheck
+    result <https://grantstreetgroup.github.io/HealthCheck.html#results>
+    with a status key and an info key. The status is WARNING if the
+    response time exceeds the response_time_threshold. Otherwise, it is OK.
+
+  check_content
+
+        my $response = $self->check_content( $response );
+
+    This method takes in a HTTP::Response object and returns a healthcheck
+    result <https://grantstreetgroup.github.io/HealthCheck.html#results>
+    with a status key and an info key. The status is CRITICAL if the
+    content of the response does not match the content_regex attribute.
+    Otherwise, it is OK.
+
+    Note, this is not called if the result of "check_status" is not OK.
 
  send_request
 

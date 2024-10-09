@@ -29,7 +29,7 @@
  {
  "displaytab":"<TMPL_VAR NAME="DISPLAY_TAB">",
  "choicetab":"<TMPL_VAR NAME="CHOICE_VALUE">",
- "login":"<TMPL_VAR NAME="LOGIN">",
+ "language": "<TMPL_VAR NAME="LANGUAGE">",
  "newwindow":<TMPL_VAR NAME="NEWWINDOW" DEFAULT="0">,
  "appslistorder":"<TMPL_VAR NAME="APPSLIST_ORDER">",
  "activeTimer":<TMPL_VAR NAME="ACTIVE_TIMER" DEFAULT="0">,
@@ -38,6 +38,7 @@
  "ppolicy": {
             "display": "<TMPL_VAR NAME="DISPLAY_PPOLICY" DEFAULT="0">",
             "minsize": "<TMPL_VAR NAME="PPOLICY_MINSIZE" DEFAULT="0">",
+            "maxsize": "<TMPL_VAR NAME="PPOLICY_MAXSIZE" DEFAULT="0">",
             "minlower": "<TMPL_VAR NAME="PPOLICY_MINLOWER" DEFAULT="0">",
             "minupper": "<TMPL_VAR NAME="PPOLICY_MINUPPER" DEFAULT="0">",
             "mindigit": "<TMPL_VAR NAME="PPOLICY_MINDIGIT" DEFAULT="0">",
@@ -49,7 +50,8 @@
  "dontStorePassword":<TMPL_VAR NAME="DONT_STORE_PASSWORD" DEFAULT="0">,
  "scrollTop":<TMPL_VAR NAME="SCROLL_TOP" DEFAULT="0">,
  "sameSite":"<TMPL_VAR NAME="SAMESITE">",
- "cookieSecure":<TMPL_VAR NAME="COOKIESECURE">
+ "cookieSecure":<TMPL_VAR NAME="COOKIESECURE">,
+ "csrf_token":"<TMPL_VAR NAME="CSRF_TOKEN">"
  }
  </script>
 

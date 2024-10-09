@@ -3,21 +3,7 @@
 
 #include "spvm_native.h"
 #include "spvm_socket_util.h"
-
 #include <assert.h>
-
-#if defined(_WIN32)
-
-#define UNIX_PATH_MAX 108
-
-typedef struct sockaddr_un {
-  ADDRESS_FAMILY sun_family;
-  char sun_path[UNIX_PATH_MAX];
-};
-
-#else
-  #include <sys/un.h>
-#endif
 
 static const char* FILE_NAME = "Sys/Socket/Sockaddr.c";
 
@@ -25,7 +11,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  struct sockaddr* socket_address = env->new_memory_block(env, stack, sizeof(struct sockaddr));
+  struct sockaddr* socket_address = env->new_memory_block(env, stack, sizeof(struct sockaddr_storage));
   
   void* obj_socket_address = env->new_pointer_object_by_name(env, stack, "Sys::Socket::Sockaddr", socket_address, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
@@ -77,7 +63,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__upgrade(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_addr = stack[0].oval;
   
   if (!obj_addr) {
-    return env->die(env, stack, "$addr must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The address $addr must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   const struct sockaddr* addr = env->get_pointer(env, stack, obj_addr);
@@ -120,3 +106,4 @@ int32_t SPVM__Sys__Socket__Sockaddr__upgrade(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   return 0;
 }
+

@@ -7,8 +7,16 @@ use Config;
 ## Search for hdf5 library and include file
 $ENV{HDF5_PATH} ||= '';
 
+sub macos_get_lib_path {
+  return if $^O ne 'darwin';
+  my $pref = `brew --prefix hdf5`;
+  return if !$pref;
+  chomp $pref;
+  "$pref/lib";
+}
 sub get_lib_paths {
   permutate(grep $_, (
+    macos_get_lib_path(),
     $ENV{HDF5_PATH}."/lib",
     $ENV{HDF5_PATH}."/lib64",
     $ENV{HDF5_LIBDIR},
@@ -112,7 +120,10 @@ my $meta_merge = {
    'name' => 'PDL-IO-HDF5',
    'abstract' => 'PDL Interface to the HDF5 Data Format',
    'release_status' => 'stable',   # 'testing',
-   'author'   => [ 'Chris Marshall <chm@cpan.org>', ],
+   'author'   => [
+     'John Cerney <j-cerney1 AT raytheon.com>',
+     'Andrew Benson <abenson AT obs.carnegiescience.edu>',
+   ],
    'license'  => [ 'perl_5' ],
    'version' => '0.73',
    'meta_spec' => {
@@ -122,13 +133,13 @@ my $meta_merge = {
    'prereqs' => {
       'runtime' => {
          'requires' => {
-            'PDL' => '2.004',
+            'PDL' => '2.064',
          },
       },
       'build' => {
          'requires' => {
             'ExtUtils::MakeMaker' => '0',
-            'PDL' => '2.007',
+            'PDL' => '2.064',
          },
       },
       test => {
@@ -139,7 +150,7 @@ my $meta_merge = {
       'configure' => {
          'requires' => {
             'ExtUtils::MakeMaker' => '0',
-            'PDL' => '2.004',
+            'PDL' => '2.064', # new types like ULL, CLD
          },
       },
    },
@@ -160,7 +171,6 @@ my $meta_merge = {
       'version' => '2',
       'url'     => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
    },
-   'generated_by' => 'Chris Marshall',
 };
 # create GENERATED subdir with *.pm files during 'make dist' (to make metacpan.org happy)
 my $preop = '$(PERL) -I$(INST_ARCHLIB) -I$(INST_LIB) -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)';

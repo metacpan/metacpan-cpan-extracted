@@ -1,5 +1,5 @@
 ---
-abstract: 'File IO, Socket, Select/Polling.'
+abstract: 'File IO, Sockets, Select/Polling.'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
@@ -21,8 +21,8 @@ requires:
   SPVM: '0.989040'
   SPVM::Go: '0.005'
   SPVM::Math: '0.11'
-  SPVM::Sys: '0.510'
+  SPVM::Sys: '0.524'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-IO.git
-version: '0.211002'
+version: '0.220001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

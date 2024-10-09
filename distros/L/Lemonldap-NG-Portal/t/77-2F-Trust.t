@@ -221,11 +221,15 @@ subtest 'Store browser, then reuse it' => sub {
     ( $res, my $secret ) = rememberBrowser( $res, $client );
     my $id   = expectCookie($res);
     my $stay = expectCookie( $res, 'llngconnection' );
+    is( getSession($id)->data->{authenticationLevel},
+        3, "Authentication level was set" );
 
     Time::Fake->offset("+15d");
     $res = init_login( $client, 'dwho', $stay, 1, 0 );
     $res = browserChallenge( $res, $client, $stay, $secret );
     $id  = expectCookie($res);
+    is( getSession($id)->data->{authenticationLevel},
+        3, "Authentication level was restored" );
     $client->logout($id);
     Time::Fake->reset;
 };

@@ -43,10 +43,15 @@ has ott     => ( is => 'rw' );
 sub init {
     my $self = shift;
 
-    if ( $self->{conf}->{captcha_login_enabled} ) {
-        $self->captcha(1);
-    }
-    else {
+    $self->captcha(
+        $self->p->buildRule(
+            $self->{conf}->{captcha_login_enabled},
+            'captchaLogin'
+        )
+    );
+
+    return 0 unless $self->captcha;
+    unless ( $self->{conf}->{captcha_login_enabled} ) {
         $self->ott( $self->p->loadModule('::Lib::OneTimeToken') ) or return 0;
         $self->ott->timeout( $self->conf->{formTimeout} );
     }
@@ -60,7 +65,7 @@ sub extractFormInfo {
     my ( $self, $req ) = @_;
 
     if ( $req->param('user') ) {
-        unless ( $req->param('user') =~ /$self->{conf}->{userControl}/o ) {
+        unless ( $req->param('user') =~ /$self->{conf}->{userControl}/ ) {
             $self->setSecurity($req);
             return PE_MALFORMEDUSER;
         }
@@ -106,23 +111,24 @@ sub extractFormInfo {
     }
 
     # Security: check for captcha or token
+    my $needCaptcha = $self->captcha->( $req, {} );
     if ( not $req->data->{'skipToken'}
-        and ( $self->captcha or $self->ottRule->( $req, {} ) ) )
+        and ( $needCaptcha or $self->ottRule->( $req, {} ) ) )
     {
         my $token;
-        unless ( $token = $req->param('token') or $self->captcha ) {
+        unless ( $token = $req->param('token') or $needCaptcha ) {
             $self->userLogger->error('Authentication tried without token');
             $self->ott->setToken($req);
             return PE_NOTOKEN;
         }
 
-        if ( $self->captcha ) {
-            my $result = $self->p->_captcha->check_captcha($req);
+        if ($needCaptcha) {
+            my $result = $self->p->getService('captcha')->check_captcha($req);
             if ($result) {
                 $self->logger->debug("Captcha code verified");
             }
             else {
-                $self->p->_captcha->init_captcha($req);
+                $self->p->getService('captcha')->init_captcha($req);
                 $self->userLogger->warn("Captcha failed");
                 return PE_CAPTCHAERROR;
             }
@@ -179,8 +185,8 @@ sub setSecurity {
     return if $req->data->{skipToken};
 
     # If captcha is enable, prepare it
-    if ( $self->captcha ) {
-        $self->p->_captcha->init_captcha($req);
+    if ( $self->captcha->( $req, {} ) ) {
+        $self->p->getService('captcha')->init_captcha($req);
     }
 
     # Else get token

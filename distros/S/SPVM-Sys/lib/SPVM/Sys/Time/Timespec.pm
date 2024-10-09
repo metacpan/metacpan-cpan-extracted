@@ -8,7 +8,7 @@ SPVM::Sys::Time::Timespec - struct timespec in the C language
 
 =head1 Description
 
-The Sys::Time::Timespec class in L<SPVM> represents L<struct timespec|https://linux.die.net/man/2/clock_gettime> in the C language.
+Sys::Time::Timespec class in L<SPVM> represents L<struct timespec|https://linux.die.net/man/2/clock_gettime> in the C language.
 
 =head1 Usage
   

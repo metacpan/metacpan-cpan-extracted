@@ -11,7 +11,7 @@ BEGIN {
     require 't/oidc-lib.pm';
 }
 
-my $debug = 'debug';
+my $debug = 'error';
 my $access_token;
 my $op;
 my $res;

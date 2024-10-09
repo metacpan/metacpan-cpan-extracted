@@ -39,7 +39,7 @@ sub check {
         $self->logger->debug("Stay Connected not allowed");
     }
 
-    my $trustedBrowser = $self->p->_trustedBrowser;
+    my $trustedBrowser = $self->p->getService('trustedBrowser');
 
     # Run TrustedBrowser challenge
     if ( $trustedBrowser->mustChallenge($req) ) {

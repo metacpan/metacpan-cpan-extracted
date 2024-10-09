@@ -2,6 +2,7 @@
 # MIT License
 
 class IO::Handle {
+  use IO;
   use Sys;
   use Sys::IO;
   use Sys::IO::Constant as IO;
@@ -14,12 +15,14 @@ class IO::Handle {
   use Sys::OS;
   
   # Fields
-  has fd : protected int;
-  has autoflush : rw byte;
-  has nonblocking : protected int;
+  has FD : protected int;
+  
+  has AutoFlush : protected byte;
+  
+  has Blocking : protected byte;
   
   # Class Methods
-  static method new : IO::Handle ($options : object[]) {
+  static method new : IO::Handle ($options : object[] = undef) {
     my $self = new IO::Handle;
     
     $self->init($options);
@@ -28,63 +31,77 @@ class IO::Handle {
   }
   
   # Instance Methods
-  method init : void ($options : object[] = undef) {
+  protected method init : void ($options : object[] = undef) {
     
-    $self->{fd} = -1;
+    Fn->check_option_names($options, $self->option_names);
     
+    my $options_h = Hash->new($options);
+    
+    my $fd = $options_h->get_or_default_int("FD", -1);
+    $self->{FD} = $fd;
+    
+    my $autoflush = $options_h->get_or_default_int("AutoFlush", 0);
+    $self->{AutoFlush} = (byte)$autoflush;
+    
+    my $blocking = $options_h->get_or_default_int("Blocking", 1);
+    $self->{Blocking} = (byte)$blocking;
+    
+    my $fields_init_only = $options_h->get_or_default_int("FieldsInitOnly", 0);
+    
+    unless ($fields_init_only) {
+      $self->configure;
+    }
+  }
+  
+  protected method configure : void () {
+    
+    my $blocking = $self->{Blocking};
+    
+    unless ($blocking) {
+      $self->set_blocking(0);
+    }
+  }
+  
+  method option_names : string[] () {
+    my $option_names = [
+      "FD",
+      "AutoFlush",
+      "Blocking",
+      "FieldsInitOnly",
+    ];
+    
+    return $option_names;
+  }
+  
+  method autoflush : int () {
+    return $self->{AutoFlush};
+  }
+  
+  method set_autoflush : void ($autoflush : int) {
+    $self->{AutoFlush} = (byte)$autoflush;
   }
   
   method opened : int () {
-    my $opened = $self->fileno >= 0;
+    my $opened = $self->{FD} >= 0;
     
     return $opened;
   }
   
   method fileno : int () {
-    return $self->{fd};
+    return $self->{FD};
   }
   
   method blocking : int () {
-    return !$self->{nonblocking};
-  }
-  
-  method print : void ($string : string) {
-    $self->write($string);
-  }
-  
-  method printf : void ($format : string, $args : object[]) {
-    my $formated_string = Format->sprintf($format, $args);
-    $self->print($formated_string);
-  }
-  
-  method say : void ($string : string) {
-    $self->print($string);
-    $self->print("\n");
-  }
-  
-  method ioctl : int ($request : int, $request_arg : object of byte[]|short[]|int[]|long[]|float[]|double[]|object = undef) {
-    my $fd = $self->fileno;
-    
-    my $ioctl_ret =  Sys->ioctl($fd, $request, $request_arg);
-    
-    return $ioctl_ret;
-  }
-  
-  method fcntl : int ($command : int, $command_arg : object of Int|Sys::IO::Flock|object = undef) {
-    my $fd = $self->fileno;
-    
-    my $fcntl_ret = Sys->fcntl($fd, $command, $command_arg);
-    
-    return $fcntl_ret;
+    return $self->{Blocking};
   }
   
   method set_blocking : void ($blocking : int) {
     
-    my $current_blocking = !$self->{nonblocking};
+    my $current_blocking = $self->{Blocking};
     
     unless (!!$blocking == $current_blocking) {
       
-      my $fd = $self->fileno;
+      my $fd = $self->{FD};
       
       if (Sys::OS->is_windows) {
         my $flags = [(int)!$blocking];
@@ -103,47 +120,57 @@ class IO::Handle {
         
         $self->fcntl(IO->F_SETFL, $newmode);
       }
-      
-      $self->{nonblocking} = !$blocking;
     }
+    
+    $self->{Blocking} = (byte)$blocking;
   }
   
-  method syswrite : int ($string : string, $length : int = -1, $offset : int = 0) {
-    my $fd = $self->fileno;
-    
-    my $write_length = Sys->syswrite($fd, $string, $length, $offset);
+  method close : void () { die "Not implemented."; }
+  
+  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0) { die "Not implemented."; }
+  
+  method write : int ($string : string, $length : int = -1, $offset : int = 0) { die "Not implemented."; }
+  
+  method print : void ($string : string) {
+    $self->write($string);
   }
   
-  method sysread : int ($string : mutable string, $length : int = -1, $offset : int = 0) {
-    my $fd = $self->fileno;
-    
-    return Sys->sysread($fd, $string, $length, $offset);
+  method printf : void ($format : string, $args : object[]) {
+    my $formated_string = Format->sprintf($format, $args);
+    $self->print($formated_string);
   }
   
-  method truncate : void ($legnth : long) {
-    my $fd = $self->fileno;
-    
-    Sys::IO->ftruncate($fd, $legnth);
+  method say : void ($string : string) {
+    $self->print($string);
+    $self->print("\n");
   }
   
   method stat : Sys::IO::Stat () {
-    my $fd = $self->fileno;
+    my $fd = $self->{FD};
     
     my $stat = Sys->fstat($fd);
     
     return $stat;
   }
   
-  method sync : void () {
-    my $fd = $self->fileno;
+  method fcntl : int ($command : int, $command_arg : object of Int|Sys::IO::Flock|object = undef) {
+    my $fd = $self->{FD};
     
-    Sys::IO->fsync($fd);
+    my $fcntl_ret = Sys->fcntl($fd, $command, $command_arg);
+    
+    return $fcntl_ret;
   }
   
-  method close : void () { die "Not implemented."; }
+  method ioctl : int ($request : int, $request_arg : object of byte[]|short[]|int[]|long[]|float[]|double[]|object = undef) {
+    my $fd = $self->{FD};
+    
+    my $ioctl_ret =  Sys->ioctl($fd, $request, $request_arg);
+    
+    return $ioctl_ret;
+  }
   
-  method write : int ($string : string, $length : int = -1, $offset : int = 0) { die "Not implemented."; }
+  method sync : void () { die "Not implemented."; }
   
-  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0) { die "Not implemented."; }
+  method truncate : void ($legnth : long) { die "Not implemented."; }
   
 }

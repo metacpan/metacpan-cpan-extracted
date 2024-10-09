@@ -57,9 +57,9 @@ LWP::Protocol::PSGI->register(
 );
 
 SKIP: {
-    eval "use Lasso;use XML::Simple";
+    eval "use Lasso";
     if ($@) {
-        skip 'Lasso or XML::Simple not found', $maintests;
+        skip 'Lasso not found', $maintests;
     }
 
     # Initialization
@@ -173,7 +173,7 @@ qr'^http://auth.idp.com/cas/login\?(service=http%3A%2F%2Fauth.proxy.com%2F.*)$'
     );
 
     # Verify authentication on SP
-    expectRedirection( $res, 'http://auth.sp.com' );
+    expectRedirection( $res, 'http://auth.sp.com/' );
     my $spId = expectCookie($res);
 
     ok( $res = $sp->_get( '/', cookie => "lemonldap=$spId" ), 'Get / on SP' );
@@ -196,7 +196,7 @@ sub issuer {
                 skipRenewConfirmation => 1,
                 logLevel              => $debug,
                 domain                => 'idp.com',
-                portal                => 'http://auth.idp.com',
+                portal                => 'http://auth.idp.com/',
                 authentication        => 'Demo',
                 userDB                => 'Same',
                 issuerDBCASActivation => 1,
@@ -215,7 +215,7 @@ sub proxy {
             ini => {
                 logLevel          => $debug,
                 domain            => 'proxy.com',
-                portal            => 'http://auth.proxy.com',
+                portal            => 'http://auth.proxy.com/',
                 authentication    => 'Choice',
                 userDB            => 'Same',
                 authChoiceParam   => 'test',
@@ -279,7 +279,7 @@ sub sp {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',
-                portal                            => 'http://auth.sp.com',
+                portal                            => 'http://auth.sp.com/',
                 authentication                    => 'SAML',
                 userDB                            => 'Same',
                 issuerDBSAMLActivation            => 0,

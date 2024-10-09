@@ -7,198 +7,204 @@ class IO::Select {
   use Sys::Time::Timeval;
   use Sys::Select;
   use Sys;
+  use Sys::Select::Constant as SELECT;
   
-  has handles : IntList;
+  # Fields
+  has fds_list : IntList;
   
+  # Class Methods
   static method new : IO::Select () {
+    
     my $self = new IO::Select;
     
-    $self->{handles} = IntList->new((int[])undef);
+    $self->{fds_list} = IntList->new;
     
     return $self;
   }
-
-  method add : int ($new_handle : int) {
+  
+  method add : void ($fd : int) {
     
     my $found = 0;
-    my $handles = $self->{handles};
+    my $fds_list = $self->{fds_list};
     
-    for (my $i = 0; $i < $handles->length; $i++) {
-      my $handle = $handles->get($i);
+    for (my $i = 0; $i < $fds_list->length; $i++) {
+      my $self_fd = $fds_list->get($i);
       
-      if ((int)$handle == $new_handle) {
+      if ((int)$self_fd == $fd) {
         $found = 1;
         last;
       }
     }
     
-    if ($found) {
-      return 0;
+    unless ($found) {
+      $fds_list->push($fd);
     }
-    else {
-      $handles->push($new_handle);
-      return 1;
-    }
-  }
-
-  method remove : int ($remove_handle : int) {
-    
-    my $new_handles = IntList->new((int[])undef);
-    my $handles = $self->{handles};
-    
-    my $removed = 0;
-    for (my $i = 0; $i < $handles->length; $i++) {
-      my $handle = $handles->get($i);
-      
-      if ((int)$handle == $remove_handle) {
-        $removed = 1;
-      }
-      else {
-        $new_handles->push($handle);
-      }
-    }
-    
-    $self->{handles} = $new_handles;
-    
-    return $removed;
   }
   
-  method exists : int ($check_handle : int) {
+  method remove : void ($fd : int) {
     
-    my $handles = $self->{handles};
+    my $fds_list = $self->{fds_list};
     
-    for (my $i = 0; $i < $handles->length; $i++) {
-      my $handle = $handles->get($i);
+    my $removed = 0;
+    for (my $i = 0; $i < $fds_list->length; $i++) {
+      my $self_fd = $fds_list->get($i);
       
-      if ((int)$handle == $check_handle) {
+      if ((int)$self_fd == $fd) {
+        $fds_list->remove($i);
+        last;
+      }
+    }
+  }
+  
+  method exists : int ($fd : int) {
+    
+    my $fds_list = $self->{fds_list};
+    
+    for (my $i = 0; $i < $fds_list->length; $i++) {
+      my $self_fd = $fds_list->get($i);
+      
+      if ((int)$self_fd == $fd) {
         return 1;
       }
     }
     
     return 0;
   }
-
-  method handles : int[] () {
-    return $self->{handles}->to_array;
-  }
-
-  method can_read : int[] ($timeout : double) {
-    my $handles_list = $self->{handles};
-    my $handles = $handles_list->to_array;
+  
+  method fds : int[] () {
     
-    my $timeout_int = 0.0;
-    my $timeout_fraction = Math->modf($timeout, \$timeout_int);
-    
-    my $tv = Sys::Time::Timeval->new;
-    $tv->set_tv_sec((int)$timeout_int);
-    $tv->set_tv_usec((int)($timeout_fraction * 1000000));
-    
-    # Set handles to fd_set
-    my $fds = Sys::Select::Fd_set->new;
-    Sys::Select->FD_ZERO($fds);
-    
-    for (my $i = 0; $i < @$handles; $i++) {
-      my $handle = $handles->[$i];
-      Sys::Select->FD_SET($handle, $fds);
-    }
-    
-    # select
-    my $success_count = &select($fds, undef, undef, $tv);
-    
-    # Can handles
-    my $can_handles = new int[$success_count];
-    
-    my $can_handles_index = 0;
-    for (my $i = 0; $i < @$handles; $i++) {
-      my $handle = $handles->[$i];
-      
-      if (Sys::Select->FD_ISSET($handle, $fds)) {
-        $can_handles->[$can_handles_index++] = $handle;
-      }
-    }
-    
-    return $can_handles;
-  }
- 
-  method can_write : int[] ($timeout : double) {
-    my $handles_list = $self->{handles};
-    my $handles = $handles_list->to_array;
-    
-    my $timeout_int = 0.0;
-    my $timeout_fraction = Math->modf($timeout, \$timeout_int);
-    
-    my $tv = Sys::Time::Timeval->new;
-    $tv->set_tv_sec((int)$timeout_int);
-    $tv->set_tv_usec((int)($timeout_fraction * 1000000));
-    
-    # Set handles to fd_set
-    my $fds = Sys::Select::Fd_set->new;
-    Sys::Select->FD_ZERO($fds);
-    
-    for (my $i = 0; $i < @$handles; $i++) {
-      my $handle = $handles->[$i];
-      Sys::Select->FD_SET($handle, $fds);
-    }
-    
-    # select
-    my $success_count = &select(undef, $fds, undef, $tv);
-    
-    # Can handles
-    my $can_handles = new int[$success_count];
-    
-    my $can_handles_index = 0;
-    for (my $i = 0; $i < @$handles; $i++) {
-      my $handle = $handles->[$i];
-      
-      if (Sys::Select->FD_ISSET($handle, $fds)) {
-        $can_handles->[$can_handles_index++] = $handle;
-      }
-    }
-    
-    return $can_handles;
-  }
-
-  method has_exception : int[] ($timeout : double) {
-    my $handles_list = $self->{handles};
-    my $handles = $handles_list->to_array;
-    
-    my $timeout_int = 0.0;
-    my $timeout_fraction = Math->modf($timeout, \$timeout_int);
-    
-    my $tv = Sys::Time::Timeval->new;
-    $tv->set_tv_sec((int)$timeout_int);
-    $tv->set_tv_usec((int)($timeout_fraction * 1000000));
-    
-    # Set handles to fd_set
-    my $fds = Sys::Select::Fd_set->new;
-    Sys::Select->FD_ZERO($fds);
-    
-    for (my $i = 0; $i < @$handles; $i++) {
-      my $handle = $handles->[$i];
-      Sys::Select->FD_SET($handle, $fds);
-    }
-    
-    # select
-    my $success_count = &select(undef, undef, $fds, $tv);
-    
-    # Can handles
-    my $can_handles = new int[$success_count];
-    
-    my $can_handles_index = 0;
-    for (my $i = 0; $i < @$handles; $i++) {
-      my $handle = $handles->[$i];
-      
-      if (Sys::Select->FD_ISSET($handle, $fds)) {
-        $can_handles->[$can_handles_index++] = $handle;
-      }
-    }
-    
-    return $can_handles;
+    return $self->{fds_list}->to_array;
   }
   
-  static method select : int ($readfds : Sys::Select::Fd_set, $writefds : Sys::Select::Fd_set, $exceptfds : Sys::Select::Fd_set, $timeout : Sys::Time::Timeval) {
-    my $nfds = 1024;
-    my $fd_number = Sys::Select->select($nfds, $readfds, $writefds, $exceptfds, $timeout);
-    return $fd_number;
+  method count : int () {
+    
+    return $self->{fds_list}->length;
   }
+  
+  method can_read : int[] ($timeout : double = -1) {
+    my $fds_list = $self->{fds_list};
+    my $fds = $fds_list->to_array;
+    
+    my $timeout_int = 0.0;
+    my $timeout_fraction = Math->modf($timeout, \$timeout_int);
+    
+    my $tv = (Sys::Time::Timeval)undef;
+    
+    if ($timeout >= 0) {
+      $tv = Sys::Time::Timeval->new;
+      $tv->set_tv_sec((int)$timeout_int);
+      $tv->set_tv_usec((int)($timeout_fraction * 1000000));
+    }
+    
+    # Set fds to fd_set
+    my $fd_set = Sys::Select::Fd_set->new;
+    Sys::Select->FD_ZERO($fd_set);
+    
+    for (my $i = 0; $i < @$fds; $i++) {
+      my $fd = $fds->[$i];
+      Sys::Select->FD_SET($fd, $fd_set);
+    }
+    
+    # select
+    my $success_count = Sys::Select->select(SELECT->FD_SETSIZE, $fd_set, undef, undef, $tv);
+    
+    # Can fds
+    my $can_fds = new int[$success_count];
+    
+    my $can_fds_index = 0;
+    for (my $i = 0; $i < @$fds; $i++) {
+      my $fd = $fds->[$i];
+      
+      if (Sys::Select->FD_ISSET($fd, $fd_set)) {
+        $can_fds->[$can_fds_index++] = $fd;
+      }
+    }
+    
+    return $can_fds;
+  }
+  
+  method can_write : int[] ($timeout : double = -1) {
+    my $fds_list = $self->{fds_list};
+    my $fds = $fds_list->to_array;
+    
+    my $timeout_int = 0.0;
+    my $timeout_fraction = Math->modf($timeout, \$timeout_int);
+    
+    my $tv = (Sys::Time::Timeval)undef;
+    
+    if ($timeout >= 0) {
+      $tv = Sys::Time::Timeval->new;
+      $tv->set_tv_sec((int)$timeout_int);
+      $tv->set_tv_usec((int)($timeout_fraction * 1000000));
+    }
+    
+    # Set fds to fd_set
+    my $fd_set = Sys::Select::Fd_set->new;
+    Sys::Select->FD_ZERO($fd_set);
+    
+    for (my $i = 0; $i < @$fds; $i++) {
+      my $fd = $fds->[$i];
+      Sys::Select->FD_SET($fd, $fd_set);
+    }
+    
+    # select
+    my $success_count = Sys::Select->select(SELECT->FD_SETSIZE, undef, $fd_set, undef, $tv);
+    
+    # Can fds
+    my $can_fds = new int[$success_count];
+    
+    my $can_fds_index = 0;
+    for (my $i = 0; $i < @$fds; $i++) {
+      my $fd = $fds->[$i];
+      
+      if (Sys::Select->FD_ISSET($fd, $fd_set)) {
+        $can_fds->[$can_fds_index++] = $fd;
+      }
+    }
+    
+    return $can_fds;
+  }
+  
+  method has_exception : int[] ($timeout : double = -1) {
+    my $fds_list = $self->{fds_list};
+    my $fds = $fds_list->to_array;
+    
+    my $timeout_int = 0.0;
+    my $timeout_fraction = Math->modf($timeout, \$timeout_int);
+    
+    my $tv = (Sys::Time::Timeval)undef;
+    
+    if ($timeout >= 0) {
+      $tv = Sys::Time::Timeval->new;
+      $tv->set_tv_sec((int)$timeout_int);
+      $tv->set_tv_usec((int)($timeout_fraction * 1000000));
+    }
+    
+    # Set fds to fd_set
+    my $fd_set = Sys::Select::Fd_set->new;
+    Sys::Select->FD_ZERO($fd_set);
+    
+    for (my $i = 0; $i < @$fds; $i++) {
+      my $fd = $fds->[$i];
+      Sys::Select->FD_SET($fd, $fd_set);
+    }
+    
+    # select
+    my $success_count = Sys::Select->select(SELECT->FD_SETSIZE, undef, undef, $fd_set, $tv);
+    
+    # Can fds
+    my $can_fds = new int[$success_count];
+    
+    my $can_fds_index = 0;
+    for (my $i = 0; $i < @$fds; $i++) {
+      my $fd = $fds->[$i];
+      
+      if (Sys::Select->FD_ISSET($fd, $fd_set)) {
+        $can_fds->[$can_fds_index++] = $fd;
+      }
+    }
+    
+    return $can_fds;
+  }
+  
 }

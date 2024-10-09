@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Locale Intl - ~/lib/Locale/Intl.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/09/16
-## Modified 2024/09/16
+## Modified 2024/10/09
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -22,7 +23,7 @@ BEGIN
     use curry;
     use Locale::Unicode::Data;
     use Want;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -1162,13 +1163,13 @@ Locale::Intl - A Web Intl.Locale Class Implementation
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
-This class inherits from L<Unicode::Locale>.
+This class inherits from L<Locale::Unicode>.
 
-Make sure to check the API of L<Unicode::Locale> for its constructor and its methods.
+Make sure to check the API of L<Locale::Unicode> for its constructor and its methods.
 
 It also accesses the Unicode CLDR (Common Locale Data Repository) data using L<Locale::Unicode::Data>
 

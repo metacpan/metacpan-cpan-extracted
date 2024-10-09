@@ -57,11 +57,11 @@
    "provides" : {
       "HealthCheck::Diagnostic::WebRequest" : {
          "file" : "lib/HealthCheck/Diagnostic/WebRequest.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.4"
       },
       "HealthCheck::WebRequests" : {
          "file" : "lib/HealthCheck/WebRequests.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.4"
       }
    },
    "release_status" : "stable",
@@ -75,8 +75,8 @@
          "web" : "https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-WebRequest"
       }
    },
-   "version" : "v1.4.3",
-   "x_generated_by_perl" : "v5.36.1",
+   "version" : "v1.4.4",
+   "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1

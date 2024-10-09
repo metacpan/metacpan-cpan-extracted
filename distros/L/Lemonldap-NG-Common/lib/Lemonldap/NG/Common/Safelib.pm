@@ -14,7 +14,7 @@ use Net::CIDR;
 use Digest::SHA;
 use Date::Parse;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 # Set here all the names of functions that must be available in Safe objects.
 # Note that only functions, not methods, can be written here
@@ -121,16 +121,21 @@ sub checkLogonHours {
 ## @function integer listMatch
 # Test if a value is found in a collection
 # @param $list Can be a hash, array or string including the separator
-# @param $value string The value to search for
+# @param $values string The values to search for
 # @param $ignorecase boolean Be case insensitive
 # @return 1 if the value was found, 0 else
 # NOTE: this function is not exported directly in this module because we don't
-# want the usr to have to worry about separator. Is is wrapped in a closure in
+# want the user to have to worry about separator. Is is wrapped in a closure in
 # Jail.pm
 sub listMatch {
-    my ( $sep, $list, $value, $ignorecase ) = @_;
-    my $flags = $ignorecase ? 'i' : '';
+    my ( $sep, $list, @values ) = @_;
+    my $flags = '';
     my @a;
+
+    if ( $values[-1] eq '1' || $values[-1] eq '0' ) {
+        $flags = pop @values ? 'i' : '';        
+    }
+    
     if ( ref($list) eq "ARRAY" ) {
         @a = @{$list};
     }
@@ -140,12 +145,12 @@ sub listMatch {
     else {
         @a = split $sep, $list;
     }
-    if ( grep /(?$flags)^\Q$value\E$/, @a ) {
-        return 1;
+
+    foreach my $value (@values) {
+        return 1 if grep /(?$flags)^\Q$value\E$/, @a;
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 ## @function integer date
@@ -320,8 +325,8 @@ sub isInNet6 {
 sub varIsInUri {
     my ( $uri, $wanteduri, $attribute, $restricted ) = @_;
     return $restricted
-      ? $uri =~ /$wanteduri$attribute$/o
-      : $uri =~ /$wanteduri$attribute/o;
+      ? $uri =~ /$wanteduri$attribute$/
+      : $uri =~ /$wanteduri$attribute/;
 }
 
 my $json = JSON::XS->new;

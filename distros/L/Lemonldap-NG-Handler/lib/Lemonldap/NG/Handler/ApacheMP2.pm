@@ -27,11 +27,6 @@ sub reload {
     return launch( 'reload', @_ );
 }
 
-sub status {
-    shift if ($#_);
-    return launch( 'getStatus', @_ );
-}
-
 # Internal method to get class to load
 sub launch {
     my ( $sub, $r ) = @_;

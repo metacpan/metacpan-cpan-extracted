@@ -51,6 +51,12 @@
               <span trspan="logout">Logout</span>
             </span></a></li>
           </TMPL_IF>
+        <TMPL_IF NAME="_PLUGIN">
+            <li class="nav-item"><a class="nav-link" href="#<TMPL_VAR NAME="_PLUGIN_ID">"><span>
+              <i class="fa fa-<TMPL_VAR NAME="_PLUGIN_LOGO">"></i>
+              <span trspan="<TMPL_VAR NAME="_PLUGIN_NAME">"><TMPL_VAR NAME="_PLUGIN_NAME"></span>
+            </span></a></li>
+        </TMPL_IF>
         </TMPL_LOOP>
       </ul>
 
@@ -263,6 +269,11 @@
         </div>
       </TMPL_IF>
 
+      <TMPL_IF NAME="_PLUGIN">
+        <div id="<TMPL_VAR NAME="_PLUGIN_ID">">
+        <TMPL_VAR NAME="_PLUGIN_HTML">
+        </div>
+      </TMPL_IF>
     </TMPL_LOOP>
 
   </div>

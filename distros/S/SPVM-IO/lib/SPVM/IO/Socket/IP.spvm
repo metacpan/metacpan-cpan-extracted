@@ -1,0 +1,311 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class IO::Socket::IP extends IO::Socket {
+  
+  use Sys::Socket::Constant as SOCKET;
+  use Sys::Socket::Sockaddr;
+  use Sys::Socket::In_addr_base;
+  
+  use IO::Socket::IP::Import::IPv4;
+  use IO::Socket::IP::Import::IPv6;
+  
+  # Fields
+  has LocalAddr : protected string;
+  
+  has LocalPort : protected int;
+  
+  has PeerAddr : protected string;
+  
+  has PeerPort : protected int;
+  
+  has ReuseAddr : protected int;
+  
+  has ReusePort : protected int;
+  
+  has Broadcast : protected int;
+  
+  # Class Methods
+  static method new : IO::Socket::IP ($options : object[] = undef) {
+    
+    my $self = new IO::Socket::IP;
+    
+    $self->init($options);
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  protected method option_names : string[] () {
+    
+    my $option_names = Array->merge_string(
+      $self->SUPER::option_names,
+      [
+        "PeerAddr",
+        "PeerPort",
+        "LocalAddr",
+        "LocalPort",
+        "ReuseAddr",
+        "ReusePort",
+        "Broadcast",
+      ]
+    );
+    
+    return $option_names;
+  }
+  
+  protected method init : void ($options : object[] = undef) {
+    
+    my $options_h = Hash->new($options);
+    
+    # Domain option
+    my $domain = $options_h->delete_or_default_int("Domain", -1);
+    unless ($domain >= 0) {
+      $domain = SOCKET->AF_INET;
+    }
+    
+    # Proto option
+    my $proto = $options_h->delete_or_default_int("Proto", SOCKET->IPPROTO_TCP);
+    
+    # Type option
+    my $type = $options_h->delete_or_default_int("Type", -1);
+    unless ($type >= 0) {
+      if ($proto == SOCKET->IPPROTO_TCP) {
+        $type = SOCKET->SOCK_STREAM;
+      }
+      elsif ($proto == SOCKET->IPPROTO_UDP) {
+        $type = SOCKET->SOCK_DGRAM;
+      }
+      elsif ($proto == SOCKET->IPPROTO_ICMP) {
+        $type = SOCKET->SOCK_RAW;
+      }
+    }
+    
+    # Reason for Blocking => 1.
+    # On Mac, non-blocking can only be set for sockets connected with connect or accept,
+    # so when you create a socket, set it to blocking.
+    my $super_options = Fn->merge_options($options, {FieldsInitOnly => 1, Domain => $domain, Proto => $proto, Type => $type});
+    
+    $self->SUPER::init($super_options);
+    
+    # LocalAddr option
+    my $local_address = $options_h->get_or_default_string("LocalAddr", undef);
+    $self->{LocalAddr} = $local_address;
+    
+    # LocalPort option
+    my $local_port = $options_h->get_or_default_int("LocalPort", -1);
+    $self->{LocalPort} = $local_port;
+    
+    # PeerAddr option
+    my $peer_address = $options_h->get_or_default_string("PeerAddr", undef);
+    $self->{PeerAddr} = $peer_address;
+    
+    # PeerPort option
+    my $peer_port = $options_h->get_or_default_int("PeerPort", -1);
+    $self->{PeerPort} = $peer_port;
+    
+    # ReuseAddr option
+    my $reuse_addr = $options_h->get_or_default_int("ReuseAddr", 0);
+    $self->{ReuseAddr} = $reuse_addr;
+    
+    # ReusePort option
+    my $reuse_port = $options_h->get_or_default_int("ReusePort", 0);
+    $self->{ReusePort} = $reuse_port;
+    
+    # Broadcast option
+    my $broadcast = $options_h->get_or_default_int("Broadcast", 0);
+    $self->{Broadcast} = $broadcast;
+    
+    # Blocking option
+    my $blocking = $options_h->get_or_default_int("Blocking", 0);
+    
+    $self->{Blocking} = (byte)$blocking;
+    
+    my $fields_init_only = $options_h->get_or_default_int("FieldsInitOnly", 0);
+    
+    unless ($fields_init_only) {
+      $self->configure;
+    }
+  }
+  
+  protected method configure : void () {
+    
+    my $reuse_addr = $self->{ReuseAddr};
+    
+    my $reuse_port = $self->{ReusePort};
+    
+    my $broadcast = $self->{Broadcast};
+    
+    my $peer_address = $self->{PeerAddr};
+    
+    my $peer_port = $self->{PeerPort};
+    
+    my $local_address = $self->{LocalAddr};
+    
+    my $local_port = $self->{LocalPort};
+    
+    my $blocking = $self->{Blocking};
+    
+    $self->socket;
+    
+    if ($reuse_addr) {
+      $self->setsockopt(SOCKET->SOL_SOCKET, SOCKET->SO_REUSEADDR, 1);
+    }
+    
+    if ($reuse_port) {
+      $self->setsockopt(SOCKET->SOL_SOCKET, SOCKET->SO_REUSEPORT, 1);
+    }
+    
+    if ($broadcast) {
+      $self->setsockopt(SOCKET->SOL_SOCKET, SOCKET->SO_BROADCAST, 1);
+    }
+    
+    if ($peer_address) {
+      my $peer_socket_address = $self->create_socket_address($peer_address, $peer_port);
+      $self->connect($peer_socket_address);
+    }
+    elsif ($local_port >= 0) {
+      my $local_socket_address = $self->create_socket_address($local_address, $local_port);
+      $self->bind($local_socket_address);
+      
+      $self->listen;
+    }
+    
+    unless ($blocking) {
+      $self->set_blocking(0);
+    }
+    
+  }
+  
+  method sockaddr : Sys::Socket::In_addr_base () {
+    my $sockaddr = $self->sockname;
+    
+    my $in_addr_base = (Sys::Socket::In_addr_base)undef;
+    
+    my $domain = $self->{Domain};
+    if ($domain == SOCKET->AF_INET) {
+      $in_addr_base = $self->IO::Socket::IP::Import::IPv4::sockaddr;
+    }
+    elsif ($domain == SOCKET->AF_INET6) {
+      $in_addr_base = $self->IO::Socket::IP::Import::IPv6::sockaddr;
+    }
+    else {
+      die "[Unexpected Error]\$domain:$domain.";
+    }
+    
+    return $in_addr_base;
+  }
+  
+  method sockhost : string () {
+    
+    my $sockhost = (string)undef;
+    
+    my $domain = $self->{Domain};
+    if ($domain == SOCKET->AF_INET) {
+      $sockhost = $self->IO::Socket::IP::Import::IPv4::sockhost;
+    }
+    elsif ($domain == SOCKET->AF_INET6) {
+      $sockhost = $self->IO::Socket::IP::Import::IPv6::sockhost;
+    }
+    else {
+      die "[Unexpected Error]\$domain:$domain.";
+    }
+    
+    return $sockhost;
+  }
+  
+  method sockport : int () {
+    
+    my $sockport = -1;;
+    
+    my $domain = $self->{Domain};
+    if ($domain == SOCKET->AF_INET) {
+      $sockport = $self->IO::Socket::IP::Import::IPv4::sockport;
+    }
+    elsif ($domain == SOCKET->AF_INET6) {
+      $sockport = $self->IO::Socket::IP::Import::IPv6::sockport;
+    }
+    else {
+      die "[Unexpected Error]\$domain:$domain.";
+    }
+    
+    return $sockport;
+  }
+  
+  method peeraddr : Sys::Socket::In_addr_base () {
+    
+    my $in_addr_base = (Sys::Socket::In_addr_base)undef;
+    
+    my $domain = $self->{Domain};
+    if ($domain == SOCKET->AF_INET) {
+      $in_addr_base = $self->IO::Socket::IP::Import::IPv4::peeraddr;
+    }
+    elsif ($domain == SOCKET->AF_INET6) {
+      $in_addr_base = $self->IO::Socket::IP::Import::IPv6::peeraddr;
+    }
+    else {
+      die "[Unexpected Error]\$domain:$domain.";
+    }
+    
+    return $in_addr_base;
+  }
+  
+  method peerhost : string () {
+    
+    my $peerhost = (string)undef;
+    
+    my $domain = $self->{Domain};
+    if ($domain == SOCKET->AF_INET) {
+      $peerhost = $self->IO::Socket::IP::Import::IPv4::peerhost;
+    }
+    elsif ($domain == SOCKET->AF_INET6) {
+      $peerhost = $self->IO::Socket::IP::Import::IPv6::peerhost;
+    }
+    else {
+      die "[Unexpected Error]\$domain:$domain.";
+    }
+    
+    return $peerhost;
+  }
+  
+  method peerport : int () {
+    
+    my $peerport = -1;;
+    
+    my $domain = $self->{Domain};
+    if ($domain == SOCKET->AF_INET) {
+      $peerport = $self->IO::Socket::IP::Import::IPv4::peerport;
+    }
+    elsif ($domain == SOCKET->AF_INET6) {
+      $peerport = $self->IO::Socket::IP::Import::IPv6::peerport;
+    }
+    else {
+      die "[Unexpected Error]\$domain:$domain.";
+    }
+    
+    return $peerport;
+  }
+  
+  private method create_socket_address : Sys::Socket::Sockaddr ($address : string, $port : int) {
+    
+    my $socket_address = (Sys::Socket::Sockaddr)undef;
+    
+    my $domain = $self->{Domain};
+    if ($domain == SOCKET->AF_INET) {
+      $socket_address = $self->IO::Socket::IP::Import::IPv4::create_socket_address($address, $port);
+    }
+    elsif ($domain == SOCKET->AF_INET6) {
+      $socket_address = $self->IO::Socket::IP::Import::IPv6::create_socket_address($address, $port);
+    }
+    else {
+      die "[Unexpected Error]\$domain:$domain.";
+    }
+    
+    return $socket_address;
+  }
+  
+  method accept : IO::Socket::IP ($peer_ref : Sys::Socket::Sockaddr[] = undef) {
+    return (IO::Socket::IP)$self->SUPER::accept($peer_ref);
+  }
+  
+}

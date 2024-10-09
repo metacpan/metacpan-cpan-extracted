@@ -2,31 +2,32 @@
 # MIT License
 
 class IO::File extends IO::Handle {
+  use Sys;
   use Sys::IO;
-  use Fn;
-  use Array;
   use Sys::IO::FileStream;
   use StringBuffer;
   
   # Fields
-  has stream : Sys::IO::FileStream;
+  has FileStream : Sys::IO::FileStream;
   
-  has input_line_number : long;
+  has InputLineNumber : long;
   
   # Class methods
-  static method new : IO::File ($file_name : string = undef, $open_mode : object of string|Int = undef, $perm : int = -1) {
+  static method new : IO::File ($file_name : string = undef, $open_mode : string = undef) {
+    
     my $self = new IO::File;
     
     $self->init;
     
     if ($file_name) {
-      $self->open($file_name, $open_mode, $perm);
+      $self->open($file_name, $open_mode);
     }
     
     return $self;
   }
   
-  static method new_from_fd : IO::Handle ($fd : int, $open_mode : string = undef) {
+  static method new_from_fd : IO::Handle ($fd : int, $open_mode : string) {
+    
     my $self = new IO::File;
     
     $self->init;
@@ -36,178 +37,193 @@ class IO::File extends IO::Handle {
     return $self;
   }
   
-  # Instance Methods
+  # Instance methods
   protected method init : void ($options : object[] = undef) {
-    $self->SUPER::init;
+    $self->SUPER::init($options);
   }
   
   method input_line_number : long () {
-    return $self->{input_line_number};
+    return $self->{InputLineNumber};
   }
   
-  method set_input_line_number : void ($input_line_number : long) {
-    $self->{input_line_number} = $input_line_number ;
-  }
-  
-  method open : void ($file_name : string, $open_mode : object of string|Int, $perm : int = -1) {
+  method open : void ($file_name : string, $open_mode : string) {
     
-    my $stream_ref = [(Sys::IO::FileStream)undef];
+    unless ($file_name) {
+      die "The file name \$file_name must be defined.";
+    }
     
     unless ($open_mode) {
-      die "\$open_mode must be defined.";
+      die "The open mode \$open_mode must be defined.";
     }
     
-    my $stream = [(Sys::IO::FileStream)undef];
-    if ($open_mode is_type string) {
-      Sys->open($stream_ref, (string)$open_mode, $file_name);
-    }
-    elsif ($open_mode is_type Int) {
-      my $fd = -1;
-      if ($perm < 0) {
-        $perm = 0666;
-      }
-      Sys->sysopen(\$fd, $file_name, $open_mode->(Int)->value, $perm);
-      Sys->fdopen($stream, $open_mode->(Int)->value, $fd);
-    }
-    else {
-      die "The type of \$open_mode must be string or Int.";
+    if ($self->opened) {
+      die "Already opened.";
     }
     
-    $self->{stream} = $stream_ref->[0];
+    my $file_stream_ref = [(Sys::IO::FileStream)undef];
+    Sys->open($file_stream_ref, (string)$open_mode, $file_name);
+    
+    my $file_stream = $file_stream_ref->[0];
+    
+    $self->{FileStream} = $file_stream;
+    
+    my $fd = Sys->fileno($file_stream);
+    
+    $self->{FD} = $fd;
   }
   
   method fdopen : void ($fd : int, $open_mode : string) {
     
-    my $stream_ref = [(Sys::IO::FileStream)undef];
+    unless ($open_mode) {
+      die "The open mode \$open_mode must be defined.";
+    }
     
-    Sys->fdopen($stream_ref, $open_mode, $fd);
+    if ($self->opened) {
+      die "Already opened.";
+    }
     
-    $self->{stream} = $stream_ref->[0];
+    my $file_stream_ref = [(Sys::IO::FileStream)undef];
+    
+    Sys->fdopen($file_stream_ref, $open_mode, $fd);
+    
+    my $file_stream = $file_stream_ref->[0];
+    
+    $self->{FileStream} = $file_stream;
+    
+    $self->{FD} = $fd;
   }
   
-  # Instance methods
-  method getline : string () {
-    my $stream = $self->{stream};
-    my $line = Sys->readline($stream);
+  method close : void () {
     
-    $self->{input_line_number}++;
+    my $file_stream = $self->{FileStream};
+    
+    Sys::IO->fclose($file_stream);
+    
+    $self->{FD} = -1;
+    
+    $self->{InputLineNumber} = 0;
+  }
+  
+  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0) {
+    
+    my $file_stream = $self->{FileStream};
+    
+    my $read_length = Sys->read($file_stream, $string, $length, $offset);
+    
+    return $read_length;
+  }
+  
+  method getc : int () {
+    
+    my $file_stream = $self->{FileStream};
+    
+    my $char = Sys->getc($file_stream);
+    
+    return $char;
+  }
+  
+  method getline : string () {
+    
+    my $file_stream = $self->{FileStream};
+    
+    my $line = Sys->readline($file_stream);
+    
+    if ($line) {
+      $self->{InputLineNumber}++;
+    }
     
     return $line;
   }
   
   method getlines : string () {
     
-    my $buffer_length = 4096;
-    my $buffer = (mutable string)new_string_len $buffer_length;
+    my $file_stream = $self->{FileStream};
+    
     my $string_buffer = StringBuffer->new;
     while (1) {
-      my $read_length = $self->read($buffer, length $buffer);
-      
-      if ($read_length < $buffer_length) {
-        $string_buffer->push(Fn->substr($buffer, 0, $read_length));
-        last;
+      my $line = Sys->readline($file_stream);
+      if ($line) {
+        $string_buffer->push($line);
       }
       else {
-        $string_buffer->push($buffer);
+        last;
       }
     }
     
-    my $string = $string_buffer->to_string;
+    my $lines_string = $string_buffer->to_string;
     
-    return $string;
-  }
-  
-  method close : void () {
-    my $stream = $self->{stream};
-    
-    Sys::IO->fclose($stream);
-    
-    $self->{stream} = undef;
-  }
-  
-  method fileno : int () {
-    my $stream = $self->{stream};
-    my $fd = Sys->fileno($stream);
-    return $fd;
-  }
-  
-  method getc : int () {
-    my $stream = $self->{stream};
-    my $char = Sys->getc($stream);
-    return $char;
-  }
-  
-  method printflush : void ($string : string) {
-    my $old_autoflush = $self->autoflush;
-    
-    # Restores the autoflush field at the end of the scope.
-    my $scope_guard = Scope::Guard->new([has handle : IO::Handle = $self, has old_autoflush : int = $old_autoflush] method : void () {
-      my $handle = $self->{handle};
-      my $old_autoflush = $self->{old_autoflush};
-      
-      $handle->set_autoflush($old_autoflush);
-    });
-    
-    $self->set_autoflush(1);
-    $self->print($string);
-  }
-  
-  method clearerr : void () {
-    
-    my $stream = $self->{stream};
-    
-    Sys::IO->clearerr($stream);
-  }
-  
-  method eof : int () {
-    my $stream = $self->{stream};
-    my $is_eof = Sys::IO->feof($stream);
-    
-    return $is_eof;
-  }
-  
-  method error : int () {
-    my $stream = $self->{stream};
-    
-    my $is_error = Sys::IO->ferror($stream);
-    
-    return $is_error;
-  }
-  
-  method flush : void () {
-    my $stream = $self->{stream};
-    
-    Sys::IO->fflush($stream);
-  }
-  
-  method ungetc : int ($c : int) {
-    my $stream = $self->{stream};
-    
-    my $c_pushed = Sys::IO->ungetc($c, $stream);
-    
-    return $c_pushed;
+    return $lines_string;
   }
   
   method write : int ($string : string, $length : int = -1, $offset : int = 0) {
     
-    my $stream = $self->{stream};
+    my $file_stream = $self->{FileStream};
     
     if ($length < 0) {
       $length = length $string;
     }
     
-    my $write_length = Sys::IO->fwrite($string, 1, $length, $stream);
+    my $write_length = Sys::IO->fwrite($string, 1, $length, $file_stream);
+    
+    my $auto_flush = $self->{AutoFlush};
+    if ($auto_flush) {
+      $self->flush;
+    }
     
     return $write_length;
   }
   
-  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0) {
+  method flush : void () {
     
-    my $stream = $self->{stream};
+    my $file_stream = $self->{FileStream};
     
-    my $read_length = Sys->read($stream, $string, $length, $offset);
+    Sys::IO->fflush($file_stream);
+  }
+  
+  method eof : int () {
     
-    return $read_length;
+    my $file_stream = $self->{FileStream};
+    
+    my $is_eof = Sys::IO->feof($file_stream);
+    
+    return $is_eof;
+  }
+  
+  method error : int () {
+    
+    my $file_stream = $self->{FileStream};
+    
+    my $is_error = Sys::IO->ferror($file_stream);
+    
+    return $is_error;
+  }
+  
+  method clearerr : void () {
+    
+    my $file_stream = $self->{FileStream};
+    
+    Sys::IO->clearerr($file_stream);
+  }
+  
+  method ungetc : int ($c : int) {
+    
+    my $file_stream = $self->{FileStream};
+    
+    my $c_pushed = Sys::IO->ungetc($c, $file_stream);
+    
+    return $c_pushed;
+  }
+  
+  method sync : void () {
+    my $fd = $self->{FD};
+    
+    Sys::IO->fsync($fd);
+  }
+  
+  method truncate : void ($legnth : long) {
+    my $fd = $self->{FD};
+    
+    Sys::IO->ftruncate($fd, $legnth);
   }
   
 }

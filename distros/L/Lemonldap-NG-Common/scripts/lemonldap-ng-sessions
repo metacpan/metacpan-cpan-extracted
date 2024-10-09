@@ -18,23 +18,28 @@ my $opts = {};
 my $help;
 my $opt_user  = '__APACHEUSER__';
 my $opt_group = '__APACHEGROUP__';
+my $out;
 
 GetOptions(
-    'help|h'        => \$help,
-    'select|s=s@'   => \$opts->{select},
-    'where|w=s'     => \$opts->{where},
-    'all|a'         => \$opts->{all},
-    'backend|b=s'   => \$opts->{backend},
-    'persistent|p'  => \$opts->{persistent},
-    'hash|cookie|c' => \$opts->{hash},
-    'id-only|i'     => \$opts->{idonly},
-    'user|u=s'      => \$opt_user,
-    'group|g=s'     => \$opt_group,
+    'help|h'         => \$help,
+    'select|s=s@'    => \$opts->{select},
+    'where|w=s'      => \$opts->{where},
+    'all|a'          => \$opts->{all},
+    'backend|b=s'    => \$opts->{backend},
+    'persistent|p'   => \$opts->{persistent},
+    'refresh-tokens' => \$opts->{refreshTokens},
+    'hash|cookie|c'  => \$opts->{hash},
+    'id-only|i'      => \$opts->{idonly},
+    'user|u=s'       => \$opt_user,
+    'group|g=s'      => \$opt_group,
+    'count'          => \$opts->{count},
+    'out|o=s'        => \$out,
 ) or pod2usage( -exitcode => 1, -verbose => 0 );
 
 pod2usage( -exitcode => 0, -verbose => 2 ) if $help;
 
 eval {
+    no warnings;
     POSIX::setgid( scalar( getgrnam($opt_group) ) );
     POSIX::setuid( scalar( getpwnam($opt_user) ) );
 };
@@ -43,6 +48,11 @@ my $action = shift @ARGV;
 
 unless ($action) {
     pod2usage( -exitcode => 1, -verbose => 0 );
+}
+
+if ( $action eq 'count' ) {
+    $action = 'search';
+    $opts->{count} = 1;
 }
 
 if ( $action eq "get" ) {
@@ -54,7 +64,7 @@ if ( $action eq "get" ) {
         );
     }
 }
-if ( $action eq "delete" ) {
+elsif ( $action eq "delete" ) {
     unless ( @ARGV >= 1 or $opts->{where} ) {
         pod2usage(
             -exitval  => 1,
@@ -63,7 +73,7 @@ if ( $action eq "delete" ) {
         );
     }
 }
-if ( $action eq "delKey" ) {
+elsif ( $action eq "delKey" ) {
     unless ( @ARGV >= 2 ) {
         pod2usage(
             -exitval  => 1,
@@ -72,7 +82,7 @@ if ( $action eq "delKey" ) {
         );
     }
 }
-if ( $action eq "setKey" ) {
+elsif ( $action eq "setKey" ) {
     unless ( @ARGV >= 3 ) {
         pod2usage(
             -exitval  => 1,
@@ -82,7 +92,7 @@ if ( $action eq "setKey" ) {
     }
 }
 
-if ( $action eq "secondfactors" ) {
+elsif ( $action eq "secondfactors" ) {
     unless ( @ARGV >= 1 ) {
         pod2usage(
             -exitval  => 1,
@@ -92,7 +102,7 @@ if ( $action eq "secondfactors" ) {
     }
 }
 
-if ( $action eq "consents" ) {
+elsif ( $action eq "consents" ) {
     unless ( @ARGV >= 2 ) {
         pod2usage(
             -exitval  => 1,
@@ -102,7 +112,16 @@ if ( $action eq "consents" ) {
     }
 }
 
-exit Lemonldap::NG::Common::CliSessions->run( $action, $opts, @ARGV );
+my $client;
+if ( $out and $out ne '-' ) {
+    open F, '>', $out or die "Unable to open file given by --out: $!";
+    $client = Lemonldap::NG::Common::CliSessions->new( { stdout => *F } );
+}
+else {
+    $client = Lemonldap::NG::Common::CliSessions->new;
+}
+
+exit $client->run( $action, $opts, @ARGV );
 
 __END__
 
@@ -126,6 +145,8 @@ B<Commands>:
 
 =item B<L</search>>: search for sessions
 
+=item B<count>: alias for B<search --count>
+
 =item B<L</delete>>: delete existing sessions
 
 =item B<L</setKey>>: add/change key in existing session
@@ -135,6 +156,10 @@ B<Commands>:
 =item B<L</secondfactors>>: manage second factors
 
 =item B<L</consents>>: manage OIDC user consents
+
+=item B<L</backup>>: dump all sessions
+
+=item B<L</restore>>: restore sessions from a dump file
 
 =back
 
@@ -148,7 +173,9 @@ B<Options>:
 
 =item B<--backend>: Specify session backend
 
-=item B<--persistent>:Search in persistent sessions
+=item B<--persistent>: Search in persistent sessions
+
+=item B<--refresh-tokens>: Search into refresh_tokens only
 
 =item B<--where>: Set search filter (search/delete only)
 
@@ -160,6 +187,11 @@ B<Options>:
 
 =item B<--hash>: When "hashed session storage" is in use, indicates that the
 given session ID is the original value (cookie value)
+
+=item B<--count> I<(only with B<L</search>>)>: display the number of matching
+sessions instead of their content
+
+=item B<--out>: write result into given file
 
 =back
 
@@ -209,6 +241,9 @@ Examples
 
     lemonldap-ng-sessions search --where '_startTime>20240410063538'
     lemonldap-ng-sessions search --where '_startTime<20240410063538'
+
+And you can just display the number of result using
+B<lemonldap-ng-sessions search --count>
 
 =head3 delete
 
@@ -297,6 +332,26 @@ Commands:
     delete <user> <id> [<id> ...]
         delete OIDC consents for a user
 
+=head3 backup
+
+    lemonldap-ng-sessions backup > file
+    # or
+    lemonldap-ng-sessions backup --out file
+    # or limited to persistent sessions
+    lemonldap-ng-sessions backup --persistent --out file
+    # or limited to OIDC refresh_tokens
+    lemonldap-ng-sessions backup --refresh-tokens --out file
+
+Simple command to dump all sessions or only persistent or refresh_tokens.
+
+=head3 restore
+
+    lemonldap-ng-sessions restore < file
+    # or
+    lemonldap-ng-sessions restore file
+
+Command to restore sessions using a file generated by L</backup> command
+
 =head2 OPTIONS
 
 =over
@@ -318,8 +373,8 @@ Examples:
 
 	--search uid=dwho
 	--search _sessionType=OIDC
-    --search '_startTime>20240410063538'
-    --search '_startTime<20240410063538'
+	--search '_startTime>20240410063538'
+	--search '_startTime<20240410063538'
 
 =item B<--backend>,B<-b>
 

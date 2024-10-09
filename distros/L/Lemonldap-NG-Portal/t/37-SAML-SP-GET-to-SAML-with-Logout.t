@@ -258,7 +258,7 @@ sub idp {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
-                portal                 => 'http://auth.idp.com',
+                portal                 => 'http://auth.idp.com/',
                 authentication         => 'Demo',
                 userDB                 => 'Same',
                 restSessionServer      => 1,
@@ -304,7 +304,7 @@ sub proxy {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'proxy.com',
-                portal                 => 'http://auth.proxy.com',
+                portal                 => 'http://auth.proxy.com/',
                 authentication         => 'SAML',
                 userDB                 => 'Same',
                 restSessionServer      => 1,
@@ -382,7 +382,7 @@ sub sp {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',
-                portal                            => 'http://auth.sp.com',
+                portal                            => 'http://auth.sp.com/',
                 authentication                    => 'SAML',
                 userDB                            => 'Same',
                 issuerDBSAMLActivation            => 0,

@@ -195,7 +195,7 @@ SKIP: {
         'Post SAML response to SP'
     );
     my $spId = expectCookie($res);
-    expectRedirection( $res, 'http://auth.sp.com' );
+    expectRedirection( $res, 'http://auth.sp.com/' );
 
     # Logout initiated by SP
     ok(
@@ -237,7 +237,7 @@ SKIP: {
         ),
         'Forward logout response to SP'
     );
-    expectRedirection( $res, 'http://auth.sp.com' );
+    expectRedirection( $res, 'http://auth.sp.com/?logout=1' );
 
     #print STDERR Dumper($res);
 }
@@ -252,7 +252,7 @@ sub op {
                 logLevel                        => $debug,
                 hashedSessionStore              => 1,
                 domain                          => 'op.com',
-                portal                          => 'http://auth.op.com',
+                portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => "1",
@@ -282,7 +282,7 @@ sub op {
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                         oidcRPMetaDataOptionsRedirectUris          =>
-                          'http://auth.proxy.com?openidconnectcallback=1',
+                          'http://auth.proxy.com/?openidconnectcallback=1',
                     }
                 },
                 oidcOPMetaDataOptions           => {},
@@ -309,7 +309,7 @@ sub proxy {
                 logLevel                   => $debug,
                 hashedSessionStore         => 1,
                 domain                     => 'proxy.com',
-                portal                     => 'http://auth.proxy.com',
+                portal                     => 'http://auth.proxy.com/',
                 authentication             => 'OpenIDConnect',
                 userDB                     => 'Same',
                 restSessionServer          => 1,
@@ -381,7 +381,7 @@ sub sp {
                 logLevel                          => $debug,
                 hashedSessionStore                => 1,
                 domain                            => 'sp.com',
-                portal                            => 'http://auth.sp.com',
+                portal                            => 'http://auth.sp.com/',
                 authentication                    => 'SAML',
                 userDB                            => 'Same',
                 issuerDBSAMLActivation            => 0,

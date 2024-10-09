@@ -1,5 +1,8 @@
 Revision history for Bible::Reference
 
+1.16      2024-10-08 10:06:17-07:00 America/Los_Angeles
+        - Fix cross-object data bleed
+
 1.15      2022-12-21 13:01:27-08:00 America/Los_Angeles
         - Add "simplify" flag and associated functionality
         - Add "require_chapter_match" flag and associated functionality

@@ -181,7 +181,7 @@ sub op {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
-                portal                          => 'http://auth.op.com',
+                portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => "1",
@@ -210,7 +210,7 @@ sub op {
                         oidcRPMetaDataOptionsLogoutType            => 'back',
                         oidcRPMetaDataOptionsLogoutSessionRequired => 1,
                         oidcRPMetaDataOptionsRedirectUris          =>
-                          'http://auth.rp.com?openidconnectcallback=1',
+                          'http://auth.rp.com/?openidconnectcallback=1',
                     }
                 },
                 oidcOPMetaDataOptions           => {},
@@ -236,7 +236,7 @@ sub rp {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',
-                portal                     => 'http://auth.rp.com',
+                portal                     => 'http://auth.rp.com/',
                 authentication             => 'OpenIDConnect',
                 userDB                     => 'Same',
                 restSessionServer          => 1,

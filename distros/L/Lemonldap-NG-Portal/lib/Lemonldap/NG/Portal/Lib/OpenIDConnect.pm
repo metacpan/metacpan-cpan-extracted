@@ -28,7 +28,7 @@ use URI;
 use Lemonldap::NG::Portal::Main::Constants
   qw(PE_OK PE_REDIRECT PE_ERROR portalConsts);
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 # PROPERTIES
 
@@ -699,7 +699,7 @@ sub getAccessTokenFromTokenEndpoint {
       || 'client_secret_post';
 
     unless ( $auth_method =~
-        /^(?:client_secret_(?:(?:pos|jw)t|basic)|private_key_jwt)$/o )
+        /^(?:client_secret_(?:(?:pos|jw)t|basic)|private_key_jwt)$/ )
     {
         $self->logger->error(
             "Bad authentication method on token endpoint for OP $op");
@@ -1158,15 +1158,25 @@ sub newAccessToken {
         %{$info},
     };
 
-    my $session = $self->getOpenIDConnectSession(
-        undef,
-        "access_token",
-        $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAccessTokenExpiration}
-          || $self->conf->{oidcServiceAccessTokenExpiration},
-        $at_info,
-    );
+    my $ttl =
+         $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAccessTokenExpiration}
+      || $self->conf->{oidcServiceAccessTokenExpiration};
+    my $session =
+      $self->getOpenIDConnectSession( undef, "access_token", $ttl, $at_info, );
 
     if ($session) {
+
+        my $user = $sessionInfo->{ $self->conf->{whatToTrace} };
+        $self->auditLog(
+            $req,
+            code    => "ISSUER_OIDC_ACCESS_TOKEN",
+            rp      => $rp,
+            message =>
+              ("Access Token for $user generated for $rp with TTL $ttl"),
+            user => $user,
+            ttl  => $ttl,
+        );
+
         if ( $self->_wantJWT($rp) ) {
             my $at_jwt =
               $self->makeJWT( $req, $rp, $scope, $session->id, $sessionInfo );
@@ -1797,7 +1807,7 @@ sub checkEndPointAuthenticationCredentials {
             }
         }
     }
-    return $rp;
+    return ( $rp, $method );
 }
 
 # Get Client ID and Client Secret
@@ -1908,13 +1918,15 @@ sub getEndPointAuthenticationCredentials {
             $self->logger->error("Unsuported client_assertion_type $atype");
         }
     }
-    elsif ( $req->param('client_id') and $req->param('client_secret') ) {
+    elsif ( $req->param('client_id')
+        and $req->body_parameters->{client_secret} )
+    {
         $scheme = 'client_secret_post';
         $self->logger->debug("Method client_secret_post used");
         $client_id     = $req->param('client_id');
         $client_secret = $req->param('client_secret');
     }
-    elsif ( $req->param('client_id') and !$req->param('client_secret') ) {
+    elsif ( $req->param('client_id') ) {
         $scheme = 'none';
         $self->logger->debug("Method none used");
         $client_id = $req->param('client_id');

@@ -43,12 +43,4 @@
     <span trspan="goToPortal">Go to portal</span>
   </a>
 </div>
-
-<!-- //if:jsminified
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/webauthn-ui.min.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/webauthnregistration.min.js"></script>
-//else -->
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/webauthn-ui.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/webauthnregistration.js"></script>
-<!-- //endif -->
 <TMPL_INCLUDE NAME="footer.tpl">

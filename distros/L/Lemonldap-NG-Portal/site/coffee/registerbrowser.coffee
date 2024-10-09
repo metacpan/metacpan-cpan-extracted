@@ -10,7 +10,8 @@ $(document).ready ->
 		setTimeout go, 500
 
 go = () ->
-	if window.localStorage
+	usetotp = Boolean(parseInt($('#usetotp').attr "value"))
+	if window.localStorage and usetotp
 		secret = $('#totpsecret').attr "value"
 		if secret
 			try

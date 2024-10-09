@@ -271,7 +271,7 @@ sub idp {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
-                portal                 => 'http://auth.idp.com',
+                portal                 => 'http://auth.idp.com/',
                 authentication         => 'Demo',
                 userDB                 => 'Same',
                 issuerDBSAMLActivation => 1,
@@ -316,7 +316,7 @@ sub sp {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'sp.com',
-                portal                          => 'http://auth.sp.com',
+                portal                          => 'http://auth.sp.com/',
                 authentication                  => 'SAML',
                 userDB                          => 'Same',
                 issuerDBSAMLActivation          => 0,
@@ -347,7 +347,7 @@ sub sp {
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                         oidcRPMetaDataOptionsRedirectUris          =>
-                          'http://auth.rp.com?openidconnectcallback=1',
+                          'http://auth.rp.com/?openidconnectcallback=1',
                     }
                 },
                 oidcOPMetaDataOptions           => {},
@@ -413,7 +413,7 @@ sub rp {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',
-                portal                     => 'http://auth.rp.com',
+                portal                     => 'http://auth.rp.com/',
                 authentication             => 'OpenIDConnect',
                 userDB                     => 'Same',
                 oidcOPMetaDataExportedVars => {

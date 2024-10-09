@@ -74,7 +74,7 @@ SKIP: {
         ),
         'Post user/password'
     );
-    expectRedirection( $res, 'http://auth.sp.com' );
+    expectRedirection( $res, 'http://auth.sp.com/' );
     my $spId = expectCookie($res);
 
     # Test if we're authenticated
@@ -117,7 +117,7 @@ sub issuer {
             ini => {
                 logLevel          => $debug,
                 domain            => 'idp.com',
-                portal            => 'http://auth.idp.com',
+                portal            => 'http://auth.idp.com/',
                 authentication    => 'Demo',
                 userDB            => 'Same',
                 soapSessionServer => 1,
@@ -133,7 +133,7 @@ sub sp {
             ini => {
                 logLevel       => $debug,
                 domain         => 'sp.com',
-                portal         => 'http://auth.sp.com',
+                portal         => 'http://auth.sp.com/',
                 authentication => 'Demo',
                 userDB         => 'Same',
                 globalStorage => 'Lemonldap::NG::Common::Apache::Session::SOAP',

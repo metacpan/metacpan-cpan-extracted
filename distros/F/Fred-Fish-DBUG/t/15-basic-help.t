@@ -12,10 +12,8 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
-BEGIN {
-   push (@INC, File::Spec->catdir (".", "t", "off"));
-}
-use helper1234;
+# BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
+# use helper1234;
 
 my $start_level;
 
@@ -32,20 +30,24 @@ BEGIN {
    # Can't use any of the constants or funcs defined by this module
    # unless we use them in a separate BEGIN block!
 
-#  push (@INC, File::Spec->catdir (".", "t", "off"));
+   push (@INC, File::Spec->catdir (".", "t", "off"));
 
    # Helper module makes sure DIE & WARN traps are set ...
-#  unless (use_ok ("helper1234")) {
-#     done_testing ();
-#     BAIL_OUT ( "Can't load helper1234" );   # Test # 1
-#     exit (0);
-#  }
-   ok (1, "use helper1234;");
+   unless (use_ok ("helper1234")) {
+      done_testing ();
+      BAIL_OUT ( "Can't load helper1234" );   # Test # 1
+      exit (0);
+   }
+   #   ok (1, "use helper1234;");
 }
 
 BEGIN {
    my $fish_module = get_fish_module ();
    my @opts = get_fish_opts ();
+
+   my %usr1 = find_fish_users ();
+   my $cnt1 = keys %usr1;
+   cmp_ok ($cnt1, '==', 1, "Found ${cnt1} users of DBUG (1).");
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {      # Test # 2
       bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
@@ -58,6 +60,33 @@ BEGIN {
       BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
       exit (0);
   }
+
+   my %usr2 = Fred::Fish::DBUG::find_all_fish_users ();
+   my $cnt2 = keys %usr2;
+   cmp_ok ($cnt2, '==', 2, "Found ${cnt2} users of DBUG (2).");
+}
+
+# List of registered uses of this module.
+sub chk_members {
+   my $opt = shift;
+   my %h = @_;
+
+   my @msgs;
+   for ( sort keys %h ) {
+      my $msg = $_ . ' ==> ' . $h{$_} . "\n";
+      push (@msgs, $msg);
+   }
+
+   if ( $opt) {
+      ok (1, "Helper list of users of module");
+      diag (@msgs);
+      my $unk = Fred::Fish::DBUG::_find_module ("IGNORE-ME");
+   } else {
+      ok (1, "Local list of users of module");
+      diag (@msgs);
+   }
+
+   return;
 }
 
 BEGIN {
@@ -79,6 +108,9 @@ BEGIN {
    # Test # 3 ...
    $start_level = test_fish_level ();
    is2 ($start_level, $lvl, "Level Check In the BEGIN block ...");
+
+   chk_members ( 1, find_fish_users(1) );
+   chk_members ( 0, Fred::Fish::DBUG::find_all_fish_users () );
 
    ok3 ( dbug_active_ok_test () );                    # Test # 4
 

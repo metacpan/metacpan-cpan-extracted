@@ -18,10 +18,12 @@ my $cli = Lemonldap::NG::Manager::Cli::Lib->new;
 
 our $opt_user  = '__APACHEUSER__';
 our $opt_group = '__APACHEGROUP__';
+our $opt_json;
 
 GetOptions(
     "user=s"  => \$opt_user,
-    "group=s" => \$opt_group
+    "group=s" => \$opt_group,
+    "json"    => \$opt_json,
 ) or die("Error in command line arguments\n");
 
 eval {
@@ -45,10 +47,17 @@ delete $refConf->{cfgAuthorIP};
 delete $refConf->{cfgDate};
 $refConf->{cfgLog} = '';
 
-# Sort keys
-$Data::Dumper::Sortkeys = 1;
-$Data::Dumper::Useperl  = 1;
-my $tmp = Dumper($refConf);
+my $tmp;
+if ($opt_json) {
+    require JSON;
+    $tmp = JSON->new->pretty->canonical->encode($refConf);
+}
+else {
+    # Sort keys
+    $Data::Dumper::Sortkeys = 1;
+    $Data::Dumper::Useperl  = 1;
+    $tmp                    = Dumper($refConf);
+}
 
 my $refFile  = File::Temp->new( UNLINK => 1 );
 my $editFile = File::Temp->new( UNLINK => 1 );
@@ -73,8 +82,14 @@ if ( $rc == 0 and compare( $refFile->filename, $editFile->filename ) == 1 ) {
     my $buf = join( '', <$F1> );
     close $F1;
 
-    my $newConf = Safe->new->reval($buf);
-    die $EVAL_ERROR if $EVAL_ERROR;
+    my $newConf;
+    if ($opt_json) {
+        $newConf = JSON::from_json($buf);
+    }
+    else {
+        $newConf = Safe->new->reval($buf);
+        die $EVAL_ERROR if $EVAL_ERROR;
+    }
 
     # Update author and date
     $newConf->{cfgAuthor} =

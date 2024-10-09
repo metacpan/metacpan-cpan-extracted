@@ -93,13 +93,16 @@ sub addSamlSp {
     return $self->sendError( $req, 'Invalid input: confKey is missing', 400 )
       unless ( defined $add->{confKey} );
 
+    my $option_entityid =
+      $add->{options} ? $add->{options}->{federationEntityID} : undef;
     return $self->sendError( $req, 'Invalid input: metadata is missing', 400 )
-      unless ( defined $add->{metadata} );
+      unless ( defined $add->{metadata} or $option_entityid );
 
     return $self->sendError( $req, 'Invalid input: confKey is empty', 400 )
       unless ( $add->{confKey} );
 
-    my $entityId = $self->_readSamlSpEntityId( $add->{metadata} );
+    my $entityId =
+      $self->_readSamlSpEntityId( $add->{metadata} ) || $option_entityid;
 
     return $self->sendError( $req,
         'Invalid input: entityID is missing in metadata', 400 )
@@ -302,12 +305,18 @@ sub _getSamlSpByEntityId {
     my ( $self, $conf, $entityId ) = @_;
 
     foreach ( keys %{ $conf->{samlSPMetaDataXML} } ) {
+        my $metadata_entityId = $self->_readSamlSpEntityId(
+            $conf->{samlSPMetaDataXML}->{$_}->{samlSPMetaDataXML} )
+          || '';
         return $self->_getSamlSpByConfKey( $conf, $_ )
-          if (
-            $self->_readSamlSpEntityId(
-                $conf->{samlSPMetaDataXML}->{$_}->{samlSPMetaDataXML}
-            ) eq $entityId
-          );
+          if ( $metadata_entityId eq $entityId );
+    }
+
+    foreach ( keys %{ $conf->{samlSPMetaDataOptions} } ) {
+        my $federated_entityId = $conf->{samlSPMetaDataOptions}->{$_}
+          ->{samlSPMetaDataOptionsFederationEntityID} || '';
+        return $self->_getSamlSpByConfKey( $conf, $_ )
+          if ( $federated_entityId eq $entityId );
     }
 
     return undef;
@@ -316,6 +325,7 @@ sub _getSamlSpByEntityId {
 sub _readSamlSpEntityId {
     my ( $self, $metadata ) = @_;
 
+    return undef unless $metadata;
     my ($entityID) = $metadata =~ /entityID=['"](.+?)['"]/;
     return $entityID;
 }
@@ -384,7 +394,8 @@ sub _pushSamlSp {
         foreach ( keys %{ $push->{options} } ) {
             my $optionName = $self->_translateOptionApiToConf( $_, 'samlSP' );
             my $optionValue =
-              $self->_translateValueApiToConf( $optionName, $push->{options}->{$_} );
+              $self->_translateValueApiToConf( $optionName,
+                $push->{options}->{$_} );
             $translatedOptions->{$optionName} = $optionValue;
         }
 
@@ -448,7 +459,11 @@ sub _pushSamlSp {
 
 sub _isNewSamlSpEntityIdUnique {
     my ( $self, $conf, $confKey, $newSp ) = @_;
-    my $newEntityId = $self->_readSamlSpEntityId( $newSp->{metadata} );
+
+    my $option_entityid =
+      $newSp->{options} ? $newSp->{options}->{federationEntityID} : undef;
+    my $newEntityId =
+      $option_entityid || $self->_readSamlSpEntityId( $newSp->{metadata} );
     my $curEntityId =
       $self->_readSamlSpEntityId(
         $self->_getSamlSpByConfKey( $conf, $confKey )->{metadata} );

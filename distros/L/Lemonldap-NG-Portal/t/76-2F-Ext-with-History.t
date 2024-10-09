@@ -17,7 +17,7 @@ my $client = LLNG::Manager::Test->new( {
             rest2fInitArgs        => { name => 'uid' },
             rest2fVerifyUrl       => 'http://auth.example.com/vrfy',
             rest2fVerifyArgs      => { code => 'code' },
-            rest2fLogo            => 'u2f.png',
+            rest2fLogo            => 'totp.png',
             totp2fActivation      => '$uid eq "dwho"',
             ext2fActivation       => 1,
             ext2fCodeActivation   => 0,
@@ -51,8 +51,8 @@ my ( $host, $url, $query ) =
 
 ok(
     $res->[2]->[0] =~
-      qq%<img src="/static/bootstrap/u2f.png" alt="rest2F" title="rest2F" />%,
-    'Found u2f.png'
+      qq%<img src="/static/bootstrap/totp.png" alt="rest2F" title="rest2F" />%,
+    'Found totp.png'
 ) or print STDERR Dumper( $res->[2]->[0] );
 
 ok(

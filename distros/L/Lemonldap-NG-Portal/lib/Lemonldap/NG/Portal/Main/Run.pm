@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -353,11 +353,11 @@ sub do {
     my $err = $req->error( $self->process( $req, nofail => $nofail ) );
 
     # Update status
-    if ( my $p = $self->HANDLER->tsv->{statusPipe} ) {
-        $p->print( ( $req->user ? $req->user : $req->address ) . ' => '
-              . $req->{env}->{REQUEST_URI}
-              . " $err\n" );
-    }
+    $self->HANDLER->publishStatus(
+        user       => ( $req->user ? $req->user : $req->address ),
+        url        => $req->{env}->{HTTP_HOST} . $req->{env}->{REQUEST_URI},
+        portalCode => $err,
+    );
 
     # Update history
     return $req->response if $err == PE_SENDRESPONSE;
@@ -370,16 +370,8 @@ sub do {
         if ( ( $err > 0 and !$req->id ) or $err eq PE_SESSIONNOTGRANTED ) {
             my $json = { result => 0, error => $err };
             if ( $req->wantErrorRender ) {
-                $json->{html} = $self->loadTemplate(
-                    $req,
-                    'errormsg',
-                    params => {
-                        AUTH_ERROR               => $err,
-                        ( 'AUTH_ERROR_' . $err ) => 1,
-                        AUTH_ERROR_TYPE          => $req->error_type,
-                        AUTH_ERROR_ROLE          => $req->error_role,
-                    }
-                );
+                $json->{html} = $self->loadTemplate( $req, 'errormsg',
+                    params => { $self->getErrorTplParams($req) } );
             }
             return $self->sendJSONresponse(
                 $req, $json,
@@ -481,8 +473,17 @@ sub autoRedirect {
     my ( $self, $req ) = @_;
 
     # Set redirection URL if needed
-    $req->{urldc} ||= $req->portal
-      if ( $req->mustRedirect and not( $req->info ) );
+    if ( $req->mustRedirect and not( $req->info ) ) {
+        if ( $req->error == PE_LOGOUT_OK ) {
+            if ( !$req->urldc or !$self->_isExternalUrl( $req, $req->urldc ) ) {
+                $req->urldc(
+                    $self->buildUrl( $req->portal, { "logout" => 1 } ) );
+            }
+        }
+        else {
+            $req->{urldc} ||= $req->portal;
+        }
+    }
 
     # Redirection should be made if urldc defined
     if ( $req->{urldc} ) {
@@ -722,6 +723,9 @@ sub updateSession {
                 $self->logger->error( $apacheSession->error );
             }
         }
+
+        # remove the corresponding session from handler cache
+        HANDLER->publishEvent( $req, { action => 'unlog', id => $id } );
     }
 }
 
@@ -762,7 +766,9 @@ sub _deleteSession {
         ) unless ($preserveCookie);
     }
 
-    HANDLER->localUnlog( $req, $session->id );
+    # Publishing an "unlog" event will automatically remove the corresponding
+    # session from handler cache. See publishEvent into Handler::Main::Run
+    HANDLER->publishEvent( $req, { action => 'unlog', id => $session->id } );
     $session->remove;
 
     # Create an obsolete cookie to remove it
@@ -1002,9 +1008,8 @@ sub _dump {
 }
 
 sub getSkinTplDir {
-    my ( $self, $req, $skin ) = @_;
+    my ( $self, $skin ) = @_;
 
-    $skin ||= $self->getSkin($req);
     my $base = $self->conf->{skinTemplateDir} || $self->conf->{templateDir};
     return ( $base . '/' . $skin );
 }
@@ -1013,7 +1018,7 @@ sub getSkinTplDir {
 sub getTrOver {
     my ( $self, $req, $templateDir ) = @_;
 
-    $templateDir //= $self->getSkinTplDir($req);
+    $templateDir //= $self->getSkinTplDir( $self->getSkin($req) );
 
     unless ( $self->trOverCache->{$templateDir} ) {
 
@@ -1058,11 +1063,11 @@ sub getTrOver {
 sub sendHtml {
     my ( $self, $req, $template, %args ) = @_;
 
-    my $skin_template_dir = $self->getSkinTplDir($req);
+    my $skin_template_dir = $self->getSkinTplDir( $self->getSkin($req) );
 
     # Look for templates in skin subdirectories instead of templateDir
     $args{templateDir} =
-      [ $skin_template_dir, $self->templateDir . "/bootstrap" ];
+      [ $skin_template_dir, $self->conf->{templateDir} . "/bootstrap" ];
 
     $args{params}->{TROVER} = $self->getTrOver( $req, $skin_template_dir );
 
@@ -1179,10 +1184,13 @@ sub imgnok {
 
 sub sendImage {
     my ( $self, $req, $img ) = @_;
+    my $u = URI->new_abs( $self->staticPrefix . "/common/$img", $req->portal )
+      ->as_string;
+
     return [
         302,
         [
-            'Location' => ($req->portal . $self->staticPrefix . "/common/$img")
+            'Location' => $u,
         ],
         [],
     ];
@@ -1279,6 +1287,7 @@ sub tplParams {
         COOKIESECURE => ( $self->conf->{securedCookie} ? 1 : 0 ),
         SKIN_BG      => $self->conf->{portalSkinBackground},
         FAVICON      => $self->conf->{portalFavicon} || 'common/favicon.ico',
+        LANGUAGE     => $self->getLanguage($req),
         CUSTOM_CSS   => $self->conf->{portalCustomCss},
         CUSTOM_JS    => $self->conf->{portalCustomJs},
         (
@@ -1287,6 +1296,20 @@ sub tplParams {
             : ()
         ),
         %templateParams
+    );
+}
+
+sub getErrorTplParams {
+    my ( $self, $req ) = @_;
+
+    my $err = $req->error;
+
+    return (
+        AUTH_ERROR               => $err,
+        ( 'AUTH_ERROR_' . $err ) => 1,
+        AUTH_ERROR_TYPE          => $req->error_type,
+        AUTH_ERROR_ROLE          => $req->error_role,
+        LOCKTIME                 => $req->lockTime(),
     );
 }
 
@@ -1350,6 +1373,34 @@ sub registerLogin {
     $self->updatePersistentSession( $req, { _loginHistory => $history, } );
 
     PE_OK;
+}
+
+# Register access to protected app
+# @param Lemonldap::NG::Portal::Main::Request $req The request
+# @param string $uid The connected user ident
+# @param string $app The application client/RP namespaced with protocol
+sub registerProtectedAppAccess {
+    my ( $self, $req, $uid, $app ) = @_;
+
+    return unless $self->conf->{appAccessHistoryEnabled};
+
+    $self->logger->debug("Registering $app access for user $uid");
+
+    my $persistentSession = $self->getPersistentSession($uid);
+    my $entry = $persistentSession->data->{_appHistory}->{$app} || {};
+
+    $entry->{access_time} = time();
+    $entry->{access_count}++;
+
+    $self->updatePersistentSession(
+        $req,
+        {
+            _appHistory => {
+                %{ $persistentSession->data->{_appHistory} }, $app => $entry
+            }
+        },
+        $uid
+    );
 }
 
 # put main session data into a hash ref
@@ -1448,7 +1499,7 @@ sub loadTemplate {
     my $tpl = HTML::Template->new(
         filename => $name,
         path     => [
-            $self->getSkinTplDir($req),
+            $self->getSkinTplDir( $self->getSkin($req) ),
             $self->conf->{templateDir} . '/bootstrap/',
             $self->conf->{templateDir} . '/common/'
         ],
@@ -1459,6 +1510,9 @@ sub loadTemplate {
         global_vars            => 0,
         ( $prm{filter} ? ( filter => $prm{filter} ) : () ),
     );
+    if ( $self->can('tplParams') ) {
+        $tpl->param( $self->tplParams($req) );
+    }
     if ( $prm{params} ) {
         $tpl->param( %{ $prm{params} } );
     }
@@ -1519,8 +1573,10 @@ sub buildUrl {
 sub rememberBrowser {
     my ( $self, $req ) = @_;
 
-    if ( $self->_trustedBrowser and $self->_trustedBrowser->can("newDevice") ) {
-        return $self->_trustedBrowser->newDevice($req);
+    if (    $self->getService('trustedBrowser')
+        and $self->getService('trustedBrowser')->can("newDevice") )
+    {
+        return $self->getService('trustedBrowser')->newDevice($req);
     }
     else {
         return PE_OK;
@@ -1530,8 +1586,10 @@ sub rememberBrowser {
 sub rememberBrowserCheck {
     my ( $self, $req ) = @_;
 
-    if ( $self->_trustedBrowser and $self->_trustedBrowser->can("check") ) {
-        return $self->_trustedBrowser->check($req);
+    if (    $self->getService('trustedBrowser')
+        and $self->getService('trustedBrowser')->can("check") )
+    {
+        return $self->getService('trustedBrowser')->check($req);
     }
     else {
         return PE_OK;

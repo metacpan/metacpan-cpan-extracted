@@ -212,11 +212,11 @@
           "type": "bool",
           "data": 1
         }, {
-          "default": 0,
+          "default": 1,
           "id": "hideOldPassword",
           "title": "hideOldPassword",
           "type": "bool",
-          "data": 0
+          "data": 1
         }, {
           "default": 0,
           "id": "mailOnPasswordChange",

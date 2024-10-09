@@ -10,11 +10,10 @@ my $maintests = 3;
 
 my $userdb = tempdb();
 
-use DBI;
 use Digest::SHA;
 
 # Hook hash function into all new DBI connections
-{
+sub hook {
     my $old_connect = \&DBI::connect;
     no warnings 'redefine';
     *DBI::connect = sub {
@@ -59,13 +58,13 @@ SKIP: {
     if ($@) {
         skip 'DBD::SQLite not found', $maintests;
     }
+    hook();
     my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do('CREATE TABLE users (user text,password text,name text)');
     $dbh->do(
 "INSERT INTO users VALUES ('dwho','\$6\$Y8KTt/guov37XOCO\$DdI67zOAFX4RfqJthruv9g2IJ7xzo5AuMaBcETfV5cgncvSoDycdvmEwbsQykOCJ45mzH65Q1fM/4UDJ/6Y/J1','Doctor who')"
     );
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => 'error',
                 useSafeJail              => 1,

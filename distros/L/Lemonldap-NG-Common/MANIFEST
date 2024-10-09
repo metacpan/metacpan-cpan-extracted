@@ -46,10 +46,16 @@ lib/Lemonldap/NG/Common/Logger/_Duplicate.pm
 lib/Lemonldap/NG/Common/Logger/Apache2.pm
 lib/Lemonldap/NG/Common/Logger/Dispatch.pm
 lib/Lemonldap/NG/Common/Logger/Log4perl.pm
+lib/Lemonldap/NG/Common/Logger/MessageBroker.pm
 lib/Lemonldap/NG/Common/Logger/Null.pm
 lib/Lemonldap/NG/Common/Logger/Sentry.pm
 lib/Lemonldap/NG/Common/Logger/Std.pm
 lib/Lemonldap/NG/Common/Logger/Syslog.pm
+lib/Lemonldap/NG/Common/MessageBroker.pod
+lib/Lemonldap/NG/Common/MessageBroker/MQTT.pm
+lib/Lemonldap/NG/Common/MessageBroker/NoBroker.pm
+lib/Lemonldap/NG/Common/MessageBroker/Pg.pm
+lib/Lemonldap/NG/Common/MessageBroker/Redis.pm
 lib/Lemonldap/NG/Common/Module.pm
 lib/Lemonldap/NG/Common/Notifications.pm
 lib/Lemonldap/NG/Common/Notifications/DBI.pm
@@ -73,6 +79,7 @@ lib/Lemonldap/NG/Common/Session/REST.pm
 lib/Lemonldap/NG/Common/TOTP.pm
 lib/Lemonldap/NG/Common/UserAgent.pm
 lib/Lemonldap/NG/Common/Util.pm
+lib/Lemonldap/NG/Common/Util/Crypto.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -113,6 +120,7 @@ t/60-Session-Cache.t
 t/60-Session-Cli.t
 t/60-U2F-Migrate.t
 t/70-User-Agent.t
+t/71-Util-Crypto.t
 t/99-pod.t
 t/data/preview-all-test-metadata.xml
 t/lemonldap-ng.ini

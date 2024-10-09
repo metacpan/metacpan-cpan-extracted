@@ -2,7 +2,7 @@
 # MIT License
 
 class Sys {
-  version "0.514001";
+  version "0.526001";
   
   use Format;
   use Sys::IO;
@@ -21,6 +21,7 @@ class Sys {
   use Sys::Process;
   use Sys::Signal;
   use Sys::User;
+  use Sys::Socket::Sockaddr::Storage;
   
   static method STDIN : Sys::IO::FileStream () { return Sys::IO->spvm_stdin; }
   
@@ -28,7 +29,7 @@ class Sys {
   
   static method STDERR : Sys::IO::FileStream () { return Sys::IO->spvm_stderr; }
   
-  static method open : void ($stream_ref : Sys::IO::FileStream[], $open_mode : string, $file_name : string) {
+  static method open : void ($stream_ref : Sys::IO::FileStream[], $open_mode : string, $file : string) {
     
     unless ($stream_ref) {
       die "\$stream_ref must be defined.";
@@ -40,7 +41,7 @@ class Sys {
     
     my $fopen_mode = &to_fopen_mode($open_mode);
     
-    my $stream = Sys::IO->fopen($file_name, $fopen_mode);
+    my $stream = Sys::IO->fopen($file, $fopen_mode);
     
     unless (Sys::OS->is_windows) {
       Sys->fcntl(Sys->fileno($stream), IO->F_SETFD, IO->FD_CLOEXEC);
@@ -96,28 +97,62 @@ class Sys {
   }
   
   static method fileno : int ($stream : Sys::IO::FileStream) {
+    
+    unless ($stream) {
+      die "The file stream \$stream must be defined.";
+    }
+    
+    if ($stream->closed) {
+      die "The file stream \$stream is already closed.";
+    }
+    
     my $fd = Sys::IO->fileno($stream);
+    
     return $fd;
   }
   
-  static method read : int ($stream : Sys::IO::FileStream, $buf : mutable string, $length : int, $buf_offset : int = 0) {
-    my $read_length = Sys::IO->fread($buf, 1, $length, $stream);
+  static method read : int ($stream : Sys::IO::FileStream, $buffer : mutable string, $length : int, $buffer_offset : int = 0) {
+    
+    unless ($stream) {
+      die "The file stream \$stream must be defined.";
+    }
+    
+    if ($stream->closed) {
+      die "The file stream \$stream is already closed.";
+    }
+    
+    my $read_length = Sys::IO->fread($buffer, 1, $length, $stream);
+    
     return $read_length;
   }
   
   static method eof : int ($stream : Sys::IO::FileStream) {
+    
+    unless ($stream) {
+      die "The file stream \$stream must be defined.";
+    }
+    
+    if ($stream->closed) {
+      die "The file stream \$stream is already closed.";
+    }
+    
     my $eof = Sys::IO->feof($stream);
+    
     return $eof;
   }
   
   precompile static method readline : mutable string ($stream : Sys::IO::FileStream) {
     
     unless ($stream) {
-      die("\$stream must be defined.");
+      die "The file stream \$stream must be defined.";
+    }
+    
+    if ($stream->closed) {
+      die "The file stream \$stream is already closed.";
     }
     
     my $capacity = 80;
-    my $buf = (mutable string)new_string_len $capacity;
+    my $buffer = (mutable string)new_string_len $capacity;
     
     my $pos = 0;
     my $end_is_eof = 0;
@@ -133,19 +168,19 @@ class Sys {
           my $new_capacity = $capacity * 2;
           my $new_buf = (mutable string)new_string_len $new_capacity;
           
-          Fn->memcpy($new_buf, 0, $buf, 0, $capacity);
+          Fn->memcpy($new_buf, 0, $buffer, 0, $capacity);
           
           $capacity = $new_capacity;
-          $buf = $new_buf;
+          $buffer = $new_buf;
         }
         
         if ($ch == '\n') {
-          $buf->[$pos] = (byte)$ch;
+          $buffer->[$pos] = (byte)$ch;
           $pos++;
           last;
         }
         else {
-          $buf->[$pos] = (byte)$ch;
+          $buffer->[$pos] = (byte)$ch;
           $pos++;
         }
       }
@@ -158,7 +193,7 @@ class Sys {
       }
       else {
         $line = (mutable string)new_string_len $pos;
-        Fn->memcpy($line, 0, $buf, 0, $pos);
+        Fn->memcpy($line, 0, $buffer, 0, $pos);
       }
     }
     
@@ -166,15 +201,35 @@ class Sys {
   }
   
   static method getc : int ($stream : Sys::IO::FileStream) {
+    
+    unless ($stream) {
+      die "The file stream \$stream must be defined.";
+    }
+    
+    if ($stream->closed) {
+      die "The file stream \$stream is already closed.";
+    }
+    
     my $char = Sys::IO->getc($stream);
+    
     return $char;
   }
   
   static method print : void ($stream : Sys::IO::FileStream, $string : string) {
+    
+    unless ($stream) {
+      die "The file stream \$stream must be defined.";
+    }
+    
+    if ($stream->closed) {
+      die "The file stream \$stream is already closed.";
+    }
+    
     Sys::IO->fwrite($string, 1, length $string, $stream);
   }
   
   static method printf : void ($stream : Sys::IO::FileStream, $format : string, $args : object[]) {
+    
     my $formated_string = Format->sprintf($format, $args);
     &print($stream, $formated_string);
   }
@@ -185,32 +240,59 @@ class Sys {
   }
   
   static method close : void ($stream : Sys::IO::FileStream) {
+    
+    unless ($stream) {
+      die "The file stream \$stream must be defined.";
+    }
+    
+    if ($stream->closed) {
+      die "The file stream \$stream is already closed.";
+    }
+    
     Sys::IO->fclose($stream);
   }
   
   static method seek : void ($stream : Sys::IO::FileStream, $offset : long, $whence : int) {
+    
+    unless ($stream) {
+      die "The file stream \$stream must be defined.";
+    }
+    
+    if ($stream->closed) {
+      die "The file stream \$stream is already closed.";
+    }
+    
     Sys::IO->fseek($stream, $offset, $whence);
   }
   
   static method tell : long ($stream : Sys::IO::FileStream) {
+    
+    unless ($stream) {
+      die "The file stream \$stream must be defined.";
+    }
+    
+    if ($stream->closed) {
+      die "The file stream \$stream is already closed.";
+    }
+    
     my $current_position = Sys::IO->ftell($stream);
     return $current_position;
   }
   
-  static method sysopen : void ($fd_ref : int*, $path : string, $flags : int, $mode : int = 0) {
+  static method sysopen : void ($fd_ref : int*, $file : string, $flags : int, $mode : int = 0) {
     
-    my $fd = Sys::IO->open($path, $flags, $mode);
+    my $fd = Sys::IO->open($file, $flags, $mode);
     
     $$fd_ref = $fd;
   }
   
-  static method sysread : int ($fd : int, $buf : mutable string, $length : int, $buf_offset : int = 0) {
-    my $read_length = Sys::IO->read($fd, $buf, $length, $buf_offset);
+  static method sysread : int ($fd : int, $buffer : mutable string, $length : int, $buffer_offset : int = 0) {
+    my $read_length = Sys::IO->read($fd, $buffer, $length, $buffer_offset);
     return $read_length;
   }
   
-  static method syswrite : int ($fd : int, $buf : string, $length : int = -1, $buf_offset : int = 0) {
-    my $write_length = Sys::IO->write($fd, $buf, $length, $buf_offset);
+  static method syswrite : int ($fd : int, $buffer : string, $length : int = -1, $buffer_offset : int = 0) {
+    my $write_length = Sys::IO->write($fd, $buffer, $length, $buffer_offset);
     return $write_length;
   }
   
@@ -233,8 +315,8 @@ class Sys {
     Sys::IO->flock($fd, $operation);
   }
   
-  static method mkdir : void ($path : string, $mode : int) {
-    Sys::IO->mkdir($path, $mode);
+  static method mkdir : void ($dir : string, $mode : int) {
+    Sys::IO->mkdir($dir, $mode);
   }
   
   static method umask : int ($mode : int) {
@@ -243,35 +325,35 @@ class Sys {
     return $current_umask;
   }
   
-  static method rmdir : void ($path : string) {
-    Sys::IO->rmdir($path);
+  static method rmdir : void ($dir : string) {
+    Sys::IO->rmdir($dir);
   }
   
-  static method unlink : void ($pathname : string) {
+  static method unlink : void ($file : string) {
     
     if (Sys::OS->is_windows) {
-      Sys::IO::Windows->unlink($pathname);
+      Sys::IO::Windows->unlink($file);
     }
     else {
-      Sys::IO->unlink($pathname);
+      Sys::IO->unlink($file);
     }
   }
   
-  static method rename : void ($oldpath : string, $newpath : string) {
+  static method rename : void ($old_path : string, $new_path : string) {
     if (Sys::OS->is_windows) {
-      Sys::IO::Windows->rename($oldpath, $newpath);
+      Sys::IO::Windows->rename($old_path, $new_path);
     }
     else {
-      Sys::IO->rename($oldpath, $newpath);
+      Sys::IO->rename($old_path, $new_path);
     }
   }
   
-  static method symlink : int ($oldpath : string, $newpath : string) {
+  static method symlink : int ($old_path : string, $new_path : string) {
     if (Sys::OS->is_windows) {
-      Sys::IO::Windows->symlink($oldpath, $newpath);
+      Sys::IO::Windows->symlink($old_path, $new_path);
     }
     else {
-      Sys::IO->symlink($oldpath, $newpath);
+      Sys::IO->symlink($old_path, $new_path);
     }
     
     my $success = 1;
@@ -297,41 +379,92 @@ class Sys {
     return $buffer;
   }
   
-  static method chdir : void ($path : string) {
-    Sys::IO->chdir($path);
+  static method chdir : void ($dir : string) {
+    Sys::IO->chdir($dir);
   }
   
-  static method chmod : void ($mode :int, $path : string) {
-    Sys::IO->chmod($path, $mode);
+  static method chmod : void ($mode :int, $file : string) {
+    Sys::IO->chmod($file, $mode);
   }
   
-  static method chown : void ($owner : int, $group : int, $path : string) {
-    Sys::IO->chown($path, $owner, $group);
+  static method chown : void ($owner : int, $group : int, $file : string) {
+    Sys::IO->chown($file, $owner, $group);
   }
   
-  static method opendir : void ($dh_ref : Sys::IO::DirStream[], $dir : string) {
+  static method opendir : void ($dir_stream_ref : Sys::IO::DirStream[], $dir : string) {
     
     my $dh = Sys::IO->opendir($dir);
     
-    $dh_ref->[0] = $dh;
+    $dir_stream_ref->[0] = $dh;
   }
   
-  static method closedir : void ($dstream : Sys::IO::DirStream) {
-    Sys::IO->closedir($dstream);
+  static method closedir : void ($dir_stream : Sys::IO::DirStream) {
+    
+    unless ($dir_stream) {
+      die "The directory stream \$dir_stream must be defined.";
+    }
+    
+    if ($dir_stream->closed) {
+      die "The directory stream \$dir_stream is already closed.";
+    }
+    
+    Sys::IO->closedir($dir_stream);
   }
   
-  static method readdir : Sys::IO::Dirent ($dstream : Sys::IO::DirStream) {
-    my $next_dirp = Sys::IO->readdir($dstream);
-    return $next_dirp;
+  static method readdir : Sys::IO::Dirent ($dir_stream : Sys::IO::DirStream) {
+    
+    unless ($dir_stream) {
+      die "The directory stream \$dir_stream must be defined.";
+    }
+    
+    if ($dir_stream->closed) {
+      die "The directory stream \$dir_stream is already closed.";
+    }
+    
+    my $dirent = Sys::IO->readdir($dir_stream);
+    
+    return $dirent;
   }
   
-  static method rewinddir : void ($dstream : Sys::IO::DirStream) {
-    Sys::IO->rewinddir($dstream);
+  static method rewinddir : void ($dir_stream : Sys::IO::DirStream) {
+    
+    unless ($dir_stream) {
+      die "The directory stream \$dir_stream must be defined.";
+    }
+    
+    if ($dir_stream->closed) {
+      die "The directory stream \$dir_stream is already closed.";
+    }
+    
+    Sys::IO->rewinddir($dir_stream);
   }
   
-  static method telldir : long ($dstream : Sys::IO::DirStream) {
-    my $current_position = Sys::IO->telldir($dstream);
-    return $current_position;
+  static method seekdir : void ($dir_stream : Sys::IO::DirStream, $offset : long) {
+    
+    unless ($dir_stream) {
+      die "The directory stream \$dir_stream must be defined.";
+    }
+    
+    if ($dir_stream->closed) {
+      die "The directory stream \$dir_stream is already closed.";
+    }
+    
+    Sys::IO->seekdir($dir_stream, $offset);
+  }
+  
+  static method telldir : long ($dir_stream : Sys::IO::DirStream) {
+    
+    unless ($dir_stream) {
+      die "The directory stream \$dir_stream must be defined.";
+    }
+    
+    if ($dir_stream->closed) {
+      die "The directory stream \$dir_stream is already closed.";
+    }
+    
+    my $offset = Sys::IO->telldir($dir_stream);
+    
+    return $offset;
   }
   
   static method popen : void ($stream_ref : Sys::IO::FileStream[], $open_mode : string, $command : string) {
@@ -361,6 +494,14 @@ class Sys {
   
   static method pclose : void ($stream : Sys::IO::FileStream) {
     
+    unless ($stream) {
+      die "The pipe stream \$stream must be defined.";
+    }
+    
+    if ($stream->closed) {
+      die "The pipe stream \$stream is already closed.";
+    }
+    
     if (Sys::OS->is_windows) {
       Sys::IO->_pclose($stream);
     }
@@ -369,7 +510,7 @@ class Sys {
     }
   }
   
-  static method select : int ($readfds : Sys::Select::Fd_set, $writefds : Sys::Select::Fd_set, $exceptfds : Sys::Select::Fd_set, $timeout : double = 0) {
+  static method select : int ($read_fds : Sys::Select::Fd_set, $write_fds : Sys::Select::Fd_set, $except_fds : Sys::Select::Fd_set, $timeout : double = 0) {
     my $nfds = 1024;
     
     my $timeout_tv = (Sys::Time::Timeval)undef;
@@ -380,7 +521,7 @@ class Sys {
       $timeout_tv = undef;
     }
     
-    my $fd_number = Sys::Select->select($nfds, $readfds, $writefds, $exceptfds, $timeout_tv);
+    my $fd_number = Sys::Select->select($nfds, $read_fds, $write_fds, $except_fds, $timeout_tv);
     
     return $fd_number;
   }
@@ -398,21 +539,21 @@ class Sys {
     return $ioctl_ret;
   }
   
-  static method stat : Sys::IO::Stat ($path : string) {
+  static method stat : Sys::IO::Stat ($file : string) {
     my $stat = Sys::IO::Stat->new;
-    Sys::IO::Stat->stat($path, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     return $stat;
   }
   
-  static method lstat : Sys::IO::Stat ($path : string) {
+  static method lstat : Sys::IO::Stat ($file : string) {
     
     my $stat = Sys::IO::Stat->new;
     
     if (Sys::OS->is_windows) {
-      Sys::IO::Windows->lstat($path, $stat);
+      Sys::IO::Windows->lstat($file, $stat);
     }
     else {
-      Sys::IO::Stat->lstat($path, $stat);
+      Sys::IO::Stat->lstat($file, $stat);
     }
     
     return $stat;
@@ -806,147 +947,190 @@ class Sys {
     return $ok;
   }
   
-  static method socket : void ($sockfd_ref : int*, $domain : int, $type : int, $protocol : int) {
+  static method socket : void ($socket_fd_ref : int*, $domain : int, $type : int, $protocol : int) {
     
-    $$sockfd_ref = Sys::Socket->socket($domain, $type, $protocol);
+    $$socket_fd_ref = Sys::Socket->socket($domain, $type, $protocol);
     
     unless (Sys::OS->is_windows) {
-      Sys->fcntl($$sockfd_ref, IO->F_SETFD, IO->FD_CLOEXEC);
+      Sys->fcntl($$socket_fd_ref, IO->F_SETFD, IO->FD_CLOEXEC);
     }
   }
   
-  static method connect : void ($sockfd : int, $addr : Sys::Socket::Sockaddr) {
-    my $addrlen = $addr->size;
+  static method connect : void ($socket_fd : int, $sockaddr : Sys::Socket::Sockaddr) {
     
-    Sys::Socket->connect($sockfd, $addr, $addrlen);
+    my $sockaddr_size = $sockaddr->size;
+    
+    Sys::Socket->connect($socket_fd, $sockaddr, $sockaddr_size);
   }
   
-  static method bind : void ($sockfd : int, $addr : Sys::Socket::Sockaddr) {
-    my $addrlen = $addr->size;
-    Sys::Socket->bind($sockfd, $addr, $addrlen);
+  static method bind : void ($socket_fd : int, $sockaddr : Sys::Socket::Sockaddr) {
+    
+    my $sockaddr_size = $sockaddr->size;
+    
+    Sys::Socket->bind($socket_fd, $sockaddr, $sockaddr_size);
   }
   
-  static method listen : void ($sockfd : int, $backlog : int) {
-    Sys::Socket->listen($sockfd, $backlog);
+  static method listen : void ($socket_fd : int, $backlog : int) {
+    
+    Sys::Socket->listen($socket_fd, $backlog);
   }
   
-  static method accept : Sys::Socket::Sockaddr ($new_sockfd_ref : int*, $sockfd : int) {
-    my $addrlen = 128;
+  static method accept : Sys::Socket::Sockaddr ($new_socket_fd_ref : int*, $socket_fd : int) {
     
-    my $addr = Sys::Socket::Sockaddr->new;
+    my $sockaddr = Sys::Socket::Sockaddr->new;
     
-    $$new_sockfd_ref = Sys::Socket->accept($sockfd, $addr, \$addrlen);
+    my $sockaddr_size = Sys::Socket::Sockaddr::Storage->new->size;
+    
+    $$new_socket_fd_ref = Sys::Socket->accept($socket_fd, $sockaddr, \$sockaddr_size);
     
     unless (Sys::OS->is_windows) {
-      Sys->fcntl($$new_sockfd_ref, IO->F_SETFD, IO->FD_CLOEXEC);
+      Sys->fcntl($$new_socket_fd_ref, IO->F_SETFD, IO->FD_CLOEXEC);
     }
     
-    $addr = $addr->upgrade;
+    $sockaddr = $sockaddr->upgrade;
     
-    return $addr;
+    return $sockaddr;
   }
   
-  static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $buf_offset : int = 0) {
-    my $recv_length = Sys::Socket->recv($sockfd, $buf, $len, $flags, $buf_offset);
+  static method recv : int ($socket_fd : int, $buffer : mutable string, $length : int, $flags : int, $buffer_offset : int = 0) {
+    
+    my $recv_length = Sys::Socket->recv($socket_fd, $buffer, $length, $flags, $buffer_offset);
     
     return $recv_length;
   }
   
-  static method send : int ($sockfd : int, $buf : string, $flags : int, $addr : Sys::Socket::Sockaddr = undef, $len : int = -1, $buf_offset : int = 0) {
-    my $send_length = -1;
+  static method recvfrom : int ($socket_fd : int, $buffer : mutable string, $length : int, $flags : int, $sockaddr_ref : Sys::Socket::Sockaddr[], $buffer_offset : int = 0) {
     
-    if ($len < 0) {
-      $len = length $buf;
+    my $sockaddr = (Sys::Socket::Sockaddr)undef;
+    
+    my $addrlen = -1;
+    
+    if ($sockaddr_ref) {
+      unless (@$sockaddr_ref == 1) {
+        die "If \$sockaddr_ref for an array for a peer socket address for output is defined, the length must be 1.";
+      }
+      
+      $sockaddr = Sys::Socket::Sockaddr->new;
     }
     
-    if ($addr) {
-      $send_length = Sys::Socket->sendto($sockfd, $buf, $len, $flags, $addr, $addr->size, $buf_offset);
+    my $recv_length = Sys::Socket->recvfrom($socket_fd, $buffer, $length, $flags, $sockaddr, \$addrlen, $buffer_offset);
+    
+    if ($sockaddr_ref) {
+      $sockaddr = $sockaddr->upgrade;
+      
+      $sockaddr_ref->[0] = $sockaddr;
     }
-    else {
-      $send_length = Sys::Socket->send($sockfd, $buf, $len, $flags, $buf_offset);
+    
+    return $recv_length;
+  }
+  
+  static method send : int ($socket_fd : int, $buffer : string, $flags : int, $length : int = -1, $buffer_offset : int = 0) {
+    
+    if ($length < 0) {
+      $length = length $buffer;
     }
+    
+    my $send_length = Sys::Socket->send($socket_fd, $buffer, $length, $flags, $buffer_offset);
     
     return $send_length;
   }
   
-  static method shutdown : void ($sockfd : int, $how : int) {
-    Sys::Socket->shutdown($sockfd, $how);
+  static method sendto : int ($socket_fd : int, $buffer : string, $flags : int, $sockaddr : Sys::Socket::Sockaddr, $length : int = -1, $buffer_offset : int = 0) {
+    
+    if ($length < 0) {
+      $length = length $buffer;
+    }
+    
+    my $addrlen = -1;
+    
+    if ($sockaddr) {
+      $addrlen = $sockaddr->size;
+    }
+    
+    my $send_length = Sys::Socket->sendto($socket_fd, $buffer, $length, $flags, $sockaddr, $addrlen, $buffer_offset);
+    
+    return $send_length;
   }
   
-  static method getpeername : Sys::Socket::Sockaddr ($sockfd : int) {
-    my $addrlen = 128;
-    
-    my $addr = Sys::Socket::Sockaddr->new;
-    
-    Sys::Socket->getpeername($sockfd, $addr, \$addrlen);
-    
-    $addr = $addr->upgrade;
-    
-    return $addr;
+  static method shutdown : void ($socket_fd : int, $how : int) {
+    Sys::Socket->shutdown($socket_fd, $how);
   }
   
-  static method getsockname : Sys::Socket::Sockaddr ($sockfd : int) {
+  static method getpeername : Sys::Socket::Sockaddr ($socket_fd : int) {
     
-    my $addrlen = 128;
+    my $sockaddr_size = Sys::Socket::Sockaddr::Storage->new->size;
     
-    my $addr = Sys::Socket::Sockaddr->new;
+    my $sockaddr = Sys::Socket::Sockaddr->new;
     
-    Sys::Socket->getsockname($sockfd, $addr, \$addrlen);
+    Sys::Socket->getpeername($socket_fd, $sockaddr, \$sockaddr_size);
     
-    $addr = $addr->upgrade;
+    $sockaddr = $sockaddr->upgrade;
     
-    return $addr;
+    return $sockaddr;
   }
   
-  static method socketpair : void ($sock_fd1_ref : int*, $sock_fd2_ref : int*, $domain : int, $type : int, $protocol : int) {
+  static method getsockname : Sys::Socket::Sockaddr ($socket_fd : int) {
+    
+    my $sockaddr_size = Sys::Socket::Sockaddr::Storage->new->size;
+    
+    my $sockaddr = Sys::Socket::Sockaddr->new;
+    
+    Sys::Socket->getsockname($socket_fd, $sockaddr, \$sockaddr_size);
+    
+    $sockaddr = $sockaddr->upgrade;
+    
+    return $sockaddr;
+  }
+  
+  static method socketpair : void ($socket_fd1_ref : int*, $socket_fd2_ref : int*, $domain : int, $type : int, $protocol : int) {
     my $pair = new int[2];
     
     Sys::Socket->socketpair($domain, $type, $protocol, $pair);
     
-    $$sock_fd1_ref = $pair->[0];
+    $$socket_fd1_ref = $pair->[0];
     
-    $$sock_fd2_ref = $pair->[1];
+    $$socket_fd2_ref = $pair->[1];
     
     unless (Sys::OS->is_windows) {
-      Sys->fcntl($$sock_fd1_ref, IO->F_SETFD, IO->FD_CLOEXEC);
+      Sys->fcntl($$socket_fd1_ref, IO->F_SETFD, IO->FD_CLOEXEC);
       
-      Sys->fcntl($$sock_fd2_ref, IO->F_SETFD, IO->FD_CLOEXEC);
+      Sys->fcntl($$socket_fd2_ref, IO->F_SETFD, IO->FD_CLOEXEC);
     }
   }
   
-  static method setsockopt : void ($sockfd : int, $level : int, $optname : int, $optval : object of string|Int) {
+  static method setsockopt : void ($socket_fd : int, $level : int, $option_name : int, $option_value : object of string|Int) {
     
-    unless ($optval) {
-      die "\$optval must be defined.";
+    unless ($option_value) {
+      die "\$option_value must be defined.";
     }
     
-    if ($optval is_type Int) {
-      my $optval_ref = [$optval->(Int)->value];
-      my $optval_string = new_string_len 4;
-      Fn->memcpy($optval_string, 0, $optval_ref, 0, 4);
+    if ($option_value is_type Int) {
+      my $option_value_ref = [$option_value->(Int)->value];
+      my $option_value_string = new_string_len 4;
+      Fn->memcpy($option_value_string, 0, $option_value_ref, 0, 4);
       
-      Sys::Socket->setsockopt($sockfd, $level, $optname, $optval_string, 4);
+      Sys::Socket->setsockopt($socket_fd, $level, $option_name, $option_value_string, 4);
     }
-    elsif ($optval is_type string) {
-      my $optval_string = (string)$optval;
-      Sys::Socket->setsockopt($sockfd, $level, $optname, $optval_string, length $optval_string);
+    elsif ($option_value is_type string) {
+      my $option_value_string = (string)$option_value;
+      Sys::Socket->setsockopt($socket_fd, $level, $option_name, $option_value_string, length $option_value_string);
     }
     else {
-      die "The type of \$optval must be the Int or string type.";
+      die "The type of \$option_value must be the Int or string type.";
     }
   }
   
-  static method getsockopt : string ($sockfd : int, $level : int, $optname : int, $optlen : int = -1) {
+  static method getsockopt : string ($socket_fd : int, $level : int, $option_name : int, $option_value_length : int = -1) {
     
-    unless ($optlen >= 0) {
-      $optlen = 4;
+    unless ($option_value_length >= 0) {
+      $option_value_length = 4;
     }
     
-    my $optval = (mutable string)new_string_len $optlen;
+    my $option_value = (mutable string)new_string_len $option_value_length;
     
-    Sys::Socket->getsockopt($sockfd, $level, $optname, $optval, \$optlen);
+    Sys::Socket->getsockopt($socket_fd, $level, $option_name, $option_value, \$option_value_length);
     
-    return $optval;
+    return $option_value;
   }
   
   static method osname : string () {
@@ -1005,7 +1189,9 @@ class Sys {
   }
   
   static method time : long () {
+    
     my $time = Sys::Time->time();
+    
     return $time;
   }
   
@@ -1035,7 +1221,7 @@ class Sys {
     return $tm;
   }
   
-  static method utime : void ($atime : long, $mtime : long, $filename : string) {
+  static method utime : void ($atime : long, $mtime : long, $file : string) {
     
     my $utimbuf = (Sys::Time::Utimbuf)undef;
     
@@ -1048,10 +1234,10 @@ class Sys {
       $utimbuf->set_modtime($mtime);
     }
     
-    Sys::Time->utime($filename, $utimbuf);
+    Sys::Time->utime($file, $utimbuf);
   }
   
-  static method signal : Sys::Signal::Handler ($signum : int, $handler_name : string) {
+  static method signal : Sys::Signal::Handler ($signal_number : int, $handler_name : string) {
     
     my $handler = (Sys::Signal::Handler)undef;
     
@@ -1065,22 +1251,22 @@ class Sys {
       die "\$handler_name \"$handler_name\" is not available.";
     }
     
-    my $old_handler = Sys::Signal->signal($signum, $handler);
+    my $old_handler = Sys::Signal->signal($signal_number, $handler);
     
     return $old_handler;
   }
   
-  static method kill : void ($sig : int, $pid : int) {
+  static method kill : void ($signal_number : int, $process_id : int) {
     if (Sys::OS->is_windows) {
-      if ($pid == Sys->process_id) {
-        Sys::Signal->raise($sig);
+      if ($process_id == Sys->process_id) {
+        Sys::Signal->raise($signal_number);
       }
       else {
-        die "\$pid must be equal to Sys->process_id in Windows.";
+        die "\$process_id must be equal to Sys->process_id in Windows.";
       }
     }
     else {
-      Sys::Signal->kill($pid, $sig);
+      Sys::Signal->kill($process_id, $signal_number);
     }
   }
   
@@ -1102,8 +1288,8 @@ class Sys {
     return $priority;
   }
   
-  static method setpriority : void ($which : int, $who : int, $prio : int) {
-    Sys::Process->setpriority($which, $who, $prio);
+  static method setpriority : void ($which : int, $who : int, $priority : int) {
+    Sys::Process->setpriority($which, $who, $priority);
   }
   
   static method sleep : int ($seconds : int) {
@@ -1120,11 +1306,11 @@ class Sys {
     return $process_id;
   }
   
-  static method waitpid : int ($pid : int, $options : int, $wstatus_ref : int*) {
+  static method waitpid : int ($process_id : int, $options : int, $wstatus_ref : int*) {
     
-    my $process_id = Sys::Process->waitpid($pid, $wstatus_ref, $options);
+    my $process_id_status_changed = Sys::Process->waitpid($process_id, $wstatus_ref, $options);
     
-    return $process_id;
+    return $process_id_status_changed;
   }
   
   static method system : int ($command : string) {
@@ -1159,16 +1345,16 @@ class Sys {
     $$write_fd_ref = $pipe_fds->[1];
   }
   
-  static method getpgrp : int ($pid : int) {
+  static method getpgrp : int ($process_id : int) {
     
-    my $process_group_id = Sys::Process->getpgid($pid);
+    my $process_group_id = Sys::Process->getpgid($process_id);
     
     return $process_group_id;
   }
   
-  static method setpgrp : void ($pid : int, $pgid : int) {
+  static method setpgrp : void ($process_id : int, $process_group_id : int) {
     
-    Sys::Process->setpgid($pid, $pgid);
+    Sys::Process->setpgid($process_id, $process_group_id);
   }
   
   static method process_id : int () {
@@ -1232,20 +1418,20 @@ class Sys {
     return $effective_group_id;
   }
   
-  static method set_real_user_id : int ($uid : int) {
+  static method set_real_user_id : void ($uid : int) {
     Sys::User->setuid($uid);
   }
   
-  static method set_effective_user_id : int ($euid : int) {
+  static method set_effective_user_id : void ($euid : int) {
     Sys::User->seteuid($euid);
   }
   
-  static method set_real_group_id : int ($gid : int) {
-    Sys::User->setgid($gid);
+  static method set_real_group_id : void ($real_group_id : int) {
+    Sys::User->setgid($real_group_id);
   }
   
-  static method set_effective_group_id : int ($egid : int) {
-    Sys::User->setegid($egid);
+  static method set_effective_group_id : void ($effective_group_id : int) {
+    Sys::User->setegid($effective_group_id);
   }
   
   static method setpwent : void () {
@@ -1280,17 +1466,17 @@ class Sys {
   
   static method getgroups : int[] () {
     
-    my $groups_length = Sys::User->getgroups(0, undef);
+    my $group_ids_length = Sys::User->getgroups(0, undef);
     
-    my $groups = new int [$groups_length];
+    my $group_ids = new int [$group_ids_length];
     
-    Sys::User->getgroups($groups_length, $groups);
+    Sys::User->getgroups($group_ids_length, $group_ids);
     
-    return $groups;
+    return $group_ids;
   }
   
-  static method setgroups : void ($groups : int[]) {
-    Sys::User->setgroups($groups);
+  static method setgroups : void ($group_ids : int[]) {
+    Sys::User->setgroups($group_ids);
   }
   
   static method getpwuid : Sys::User::Passwd ($id : int) {

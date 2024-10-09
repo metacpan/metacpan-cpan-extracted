@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -12,6 +12,8 @@ use MIME::Base64;
 use URI;
 use URI::Escape;
 use Lemonldap::NG::Common::Session;
+use Lemonldap::NG::Handler::Main::MsgActions;
+use Time::HiRes 'usleep';
 
 # Methods that must be overloaded
 
@@ -27,73 +29,88 @@ sub logout {
     return $class->unlog(@_);
 }
 
-sub status {
-    my $class;
-    $class = $#_ ? shift : __PACKAGE__;
-    return $class->getStatus(@_);
-}
-
 # Public methods
-
-# Return Handler::Lib::Status output
-sub getStatus {
-    my ( $class, $req ) = @_;
-    $class->logger->debug("Request for status");
-    my $statusPipe = $class->tsv->{statusPipe};
-    my $statusOut  = $class->tsv->{statusOut};
-    my $args       = '';
-    if ( $ENV{LLNGSTATUSHOST} ) {
-        require IO::Socket::INET;
-        foreach ( 64322 .. 64331 ) {
-            if ( $statusOut =
-                IO::Socket::INET->new( Proto => 'udp', LocalPort => $_ ) )
-            {
-                $args =
-                  ' host=' . ( $ENV{LLNGSTATUSCLIENT} || 'localhost' ) . ":$_";
-                last;
-            }
-        }
-        return $class->abort( $req,
-            "$class: status page can not be displayed, unable to open socket" )
-          unless ($statusOut);
-    }
-    return $class->abort( $req, "$class: status page can not be displayed" )
-      unless ( $statusPipe and $statusOut );
-    my $q = $req->{env}->{QUERY_STRING} || '';
-    if ( $q =~ /\s/ ) {
-        $class->logger->error("Bad characters in query");
-        return $class->FORBIDDEN;
-    }
-    $statusPipe->print(
-        "STATUS " . ( $req->{env}->{QUERY_STRING} || '' ) . "$args\n" );
-    my $buf;
-
-    while ( $_ = $statusOut->getline ) {
-        last if (/^END$/);
-        $buf .= $_;
-    }
-    $class->set_header_out( $req,
-        "Content-Type" => "text/html; charset=UTF-8" );
-    $class->print( $req, $buf );
-    return $class->OK;
-}
 
 # Method that must be called by base packages (Handler::ApacheMP2,...) to get
 # type of handler to call (Main, AuthBasic,...)
+
 sub checkType {
     my ( $class, $req ) = @_;
 
-    if ( time() - $class->lastCheck > $class->checkTime ) {
-        unless ( $class->checkConf ) {
-            $class->logger->error("$class: No configuration found");
-            $req->data->{noTry} = 1;
-            return 'Fail';
-        }
+    # Always launch "newConf" task if never started
+    msgActions->{newConf}->( $class, {}, $req )
+      unless $class->tsv and %{ $class->tsv };
+
+    # Check for event in events queue every 5 seconds
+    if ( time - $class->lastCheckMsg > $class->checkMsg ) {
+        defined( $class->checkEvent($req) ) or return 'Fail';
     }
     my $vhost = $class->resolveAlias($req);
     return ( defined $class->tsv->{type}->{$vhost} )
       ? $class->tsv->{type}->{$vhost}
       : 'Main';
+}
+
+# Method to check for event in events queue
+sub checkEvent {
+    my ( $class, $req, $delay ) = @_;
+    $class->logger->debug('Checking for events');
+    unless ( $class->tsv->{msgBrokerReader} ) {
+        $class->logger->error('Not initialized');
+        return;
+    }
+    my $ret = '';
+    while ( my $msg =
+        $class->tsv->{msgBrokerReader}
+        ->getNextMessage( $class->tsv->{eventQueueName}, $delay ) )
+    {
+        if ( $msg->{action} ) {
+            $class->logger->debug("Processing event $msg->{action}");
+            if ( my $sub = msgActions->{ $msg->{action} } ) {
+                $sub->( $class, $msg, $req );
+                $ret = $msg->{action};
+            }
+            else {
+                $class->logger->error("Unkown action $msg->{action}");
+            }
+        }
+        else {
+            $class->logger->error(
+                'Malformed message: ' . JSON::to_json($msg) );
+        }
+    }
+    $class->lastCheckMsg(time);
+    return $ret;
+}
+
+# Method to push an event into message queue.
+sub publishEvent {
+    my ( $class, $req, $msg ) = @_;
+    die unless $msg;
+    $class->logger->debug("Publishing event $msg->{action}");
+    unless ( $class->tsv->{msgBrokerWriter} ) {
+        $class->logger->error('Not initialized');
+        return;
+    }
+    $class->tsv->{msgBrokerWriter}
+      ->publish( $class->tsv->{eventQueueName}, $msg );
+    my $ret;
+    my $start = time;
+
+    # After pushing message, let's pop message queue for this node and
+    # then launch the concerning method
+    $ret = $class->checkEvent( $req, 0.1 );
+    if ( !$ret or $ret ne $msg->{action} ) {
+        usleep 100000;
+        $class->checkEvent( $req, 0.1 );
+    }
+}
+
+sub publishStatus {
+    my ( $class, %msg ) = @_;
+    return unless $class->tsv->{eventStatus};
+    $class->tsv->{msgBrokerWriter}
+      ->publish( $class->tsv->{statusQueueName}, \%msg );
 }
 
 ## @rmethod int run
@@ -188,6 +205,7 @@ sub run {
             }
         }
         $class->set_custom( $req, $custom ) if $custom;
+        $req->userData($session);
 
         # AUTHORIZATION
         return ( $class->forbidden( $req, $session ), $session )
@@ -270,13 +288,13 @@ sub unlog {
 # @param optional url string URL to log, if undefined defaults to request URI
 sub updateStatus {
     my ( $class, $req, $action, $user, $url ) = @_;
-    my $statusPipe = $class->tsv->{statusPipe} or return;
     $user ||= $req->address;
     $url  ||= $req->{env}->{REQUEST_URI};
-    eval {
-        $statusPipe->print(
-            "$user => " . $req->{env}->{HTTP_HOST} . "$url $action\n" );
-    };
+    $class->publishStatus(
+        user          => $user,
+        url           => $req->{env}->{HTTP_HOST} . $url,
+        handlerAction => $action
+    );
 }
 
 ## @rmethod void lmLog(string msg, string level)
@@ -483,13 +501,19 @@ sub encodeUrl {
 # @return Constant $class->REDIRECT
 sub goToPortal {
     my ( $class, $req, $url, $arg, $path ) = @_;
+
+    my $portal = $class->tsv->{portal}->($req);
+    if ( !$class->tsv->{useRedirectAjaxOnUnauthorized} and $req->wantJSON ) {
+        $class->set_header_out( $req, 'WWW-Authenticate' => "SSO $portal" );
+        return $class->AUTH_REQUIRED;
+    }
     $path ||= '';
     my ( $ret, $msg );
     my $urlc_init = $class->encodeUrl( $req, $url );
     $class->logger->debug(
         'Redirect ' . $req->address . " to portal (url was $url)" );
     $class->set_header_out( $req,
-            'Location' => $class->tsv->{portal}->($req)
+            'Location' => $portal
           . "$path?url=$urlc_init"
           . ( $arg ? "&$arg" : "" ) );
     return $class->REDIRECT;
@@ -520,8 +544,8 @@ sub fetchId {
           and not $class->_isHttps( $req, $vhost ) );
     my $cn    = $class->tsv->{cookieName};
     my $value = $lookForHttpCookie    # Avoid prefix and bad cookie name (#2417)
-      ? ( $t =~ /(?<![-.~])\b${cn}http=([^,; ]+)/o ? $1 : 0 )
-      : ( $t =~ /(?<![-.~])\b$cn=([^,; ]+)/o       ? $1 : 0 );
+      ? ( $t =~ /(?<![-.~])\b${cn}http=([^,; ]+)/ ? $1 : 0 )
+      : ( $t =~ /(?<![-.~])\b$cn=([^,; ]+)/       ? $1 : 0 );
 
     if ( $value && $lookForHttpCookie && $class->tsv->{securedCookie} == 3 ) {
         $value = $class->tsv->{cipher}->decryptHex( $value, "http" );

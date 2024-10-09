@@ -182,7 +182,7 @@
                               "type" : "bool"
                            },
                            {
-                              "default" : 0,
+                              "default" : 1,
                               "id" : "hideOldPassword",
                               "title" : "hideOldPassword",
                               "type" : "bool"
@@ -2658,25 +2658,6 @@
                   "_nodes" : [
                      {
                         "default" : 0,
-                        "id" : "utotp2fActivation",
-                        "title" : "utotp2fActivation",
-                        "type" : "boolOrExpr"
-                     },
-                     {
-                        "id" : "utotp2fAuthnLevel",
-                        "title" : "utotp2fAuthnLevel",
-                        "type" : "int"
-                     }
-                  ],
-                  "help" : "utotp2f.html",
-                  "id" : "utotp2f",
-                  "title" : "utotp2f",
-                  "type" : "simpleInputContainer"
-               },
-               {
-                  "_nodes" : [
-                     {
-                        "default" : 0,
                         "id" : "totp2fActivation",
                         "title" : "totp2fActivation",
                         "type" : "boolOrExpr"
@@ -2729,42 +2710,6 @@
                   "help" : "totp2f.html",
                   "id" : "totp",
                   "title" : "totp",
-                  "type" : "simpleInputContainer"
-               },
-               {
-                  "_nodes" : [
-                     {
-                        "default" : 0,
-                        "id" : "u2fActivation",
-                        "title" : "u2fActivation",
-                        "type" : "boolOrExpr"
-                     },
-                     {
-                        "default" : 0,
-                        "id" : "u2fSelfRegistration",
-                        "title" : "u2fSelfRegistration",
-                        "type" : "boolOrExpr"
-                     },
-                     {
-                        "id" : "u2fAuthnLevel",
-                        "title" : "u2fAuthnLevel",
-                        "type" : "int"
-                     },
-                     {
-                        "default" : 1,
-                        "id" : "u2fUserCanRemoveKey",
-                        "title" : "u2fUserCanRemoveKey",
-                        "type" : "bool"
-                     },
-                     {
-                        "id" : "u2fTTL",
-                        "title" : "u2fTTL",
-                        "type" : "int"
-                     }
-                  ],
-                  "help" : "u2f.html",
-                  "id" : "u2f",
-                  "title" : "u2f",
                   "type" : "simpleInputContainer"
                },
                {

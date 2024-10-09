@@ -1,0 +1,252 @@
+class TestCase::IO::Socket::Online {
+  use IO::Socket;
+  use IO::Socket::INET;
+  use IO::Socket::UNIX;
+  use Go::Sync::WaitGroup;
+  use Go;
+  use Fn;
+  
+  static method inet : int () {
+
+    # Socket
+    my $host = "google.com";
+    my $port = 80;
+    my $socket = IO::Socket::INET->new({PeerAddr => $host, PeerPort => $port});
+    
+    my $send_buffer = "GET / HTTP/1.0\r\n\r\n";
+    $socket->send($send_buffer);
+    
+    my $recv_buffer = (mutable string)new_string_len 100;
+    while (1) {
+      my $recv_length = $socket->recv($recv_buffer);
+      
+      if ($recv_length < 0) {
+        die "Read error";
+      }
+      
+      # print((string)sliceb($recv_buffer, 0, $recv_length));
+      
+      if ($recv_length < length $recv_buffer) {
+        last;
+      }
+    }
+    
+    $socket->close;
+    
+    return 1;
+  }
+
+  static method basic : int () {
+
+    # Socket
+    my $host = "google.com";
+    my $port = 80;
+    my $socket = IO::Socket::INET->new({PeerAddr => $host, PeerPort => $port});
+    
+    my $send_buffer = "GET / HTTP/1.0\r\n\r\n";
+    $socket->send($send_buffer);
+    
+    my $recv_buffer = (mutable string)new_string_len 100;
+    while (1) {
+      my $recv_length = $socket->recv($recv_buffer);
+      
+      if ($recv_length < 0) {
+        die "Read error";
+      }
+      
+      # print((string)sliceb($recv_buffer, 0, $recv_length));
+      
+      if ($recv_length < length $recv_buffer) {
+        last;
+      }
+    }
+    
+    $socket->close;
+    
+    return 1;
+  }
+
+  static method blocking : int () {
+
+    # Socket
+    my $host = "google.com";
+    my $port = 80;
+    my $socket = IO::Socket::INET->new({PeerAddr => $host, PeerPort => $port});
+    
+    $socket->set_blocking(0);
+    $socket->set_blocking(1);
+    
+    my $send_buffer = "GET / HTTP/1.0\r\n\r\n";
+    $socket->send($send_buffer);
+    
+    my $recv_buffer = (mutable string)new_string_len 100;
+    while (1) {
+      my $recv_length = $socket->recv($recv_buffer);
+      
+      if ($recv_length < 0) {
+        die "Read error";
+      }
+      
+      # print((string)sliceb($recv_buffer, 0, $recv_length));
+      
+      if ($recv_length < length $recv_buffer) {
+        last;
+      }
+    }
+    
+    $socket->close;
+    
+    return 1;
+  }
+
+
+  static method basic_interface : int () {
+
+    # Socket
+    my $host = "google.com";
+    my $port = 80;
+    my $socket = IO::Socket::INET->new({PeerAddr => $host, PeerPort => $port});
+    
+    my $send_buffer = "GET / HTTP/1.0\r\n\r\n";
+    $socket->send($send_buffer);
+    
+    my $recv_buffer = (mutable string)new_string_len 100;
+    while (1) {
+      my $recv_length = $socket->recv($recv_buffer);
+      
+      if ($recv_length < 0) {
+        die "Read error";
+      }
+      
+      # print((string)sliceb($recv_buffer, 0, $recv_length));
+      
+      if ($recv_length < length $recv_buffer) {
+        last;
+      }
+    }
+    
+    $socket->close;
+    
+    return 1;
+  }
+
+  static method basic_auto_close : int () {
+    
+    # Socket
+    my $host = "google.com";
+    my $port = 80;
+    my $socket = IO::Socket::INET->new({PeerAddr => $host, PeerPort => $port});
+    
+    my $send_buffer = "GET / HTTP/1.0\r\n\r\n";
+    $socket->send($send_buffer);
+    
+    my $recv_buffer = (mutable string)new_string_len 100;
+    while (1) {
+      my $recv_length = $socket->recv($recv_buffer);
+      
+      if ($recv_length < 0) {
+        die "Read error";
+      }
+      
+      # print((string)sliceb($recv_buffer, 0, $recv_length));
+      
+      if ($recv_length < length $recv_buffer) {
+        last;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method fileno : int () {
+
+    # Socket
+    my $host = "google.com";
+    my $port = 80;
+    my $socket = IO::Socket::INET->new({PeerAddr => $host, PeerPort => $port});
+    
+    my $fileno = $socket->fileno;
+    
+    unless ($fileno > 2) {
+      return 0;
+    }
+    
+    
+    return 1;
+  }
+
+  static method goroutine : int () {
+    
+    my $wg = Go::Sync::WaitGroup->new;
+    
+    $wg->add(2);
+    
+    Go->go([$wg : Go::Sync::WaitGroup] method : void () {
+      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        $wg->done;
+      });
+      
+      # Socket
+      my $host = "google.com";
+      my $port = 80;
+      my $socket = IO::Socket::INET->new({PeerAddr => $host, PeerPort => $port});
+      
+      my $send_buffer = "GET / HTTP/1.0\r\n\r\n";
+      $socket->send($send_buffer);
+      
+      my $recv_buffer = (mutable string)new_string_len 100;
+      while (1) {
+        my $recv_length = $socket->recv($recv_buffer);
+        
+        if ($recv_length < 0) {
+          die "Read error";
+        }
+        
+        # print((string)sliceb($recv_buffer, 0, $recv_length));
+        
+        if ($recv_length < length $recv_buffer) {
+          last;
+        }
+      }
+      
+      $socket->close;
+    });
+    
+    Go->go([$wg : Go::Sync::WaitGroup] method : void () {
+      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        $wg->done;
+      });
+      
+      # Socket
+      my $host = "google.com";
+      my $port = 80;
+      my $socket = IO::Socket::INET->new({PeerAddr => $host, PeerPort => $port});
+      
+      my $send_buffer = "GET / HTTP/1.0\r\n\r\n";
+      $socket->send($send_buffer);
+      
+      my $recv_buffer = (mutable string)new_string_len 100;
+      while (1) {
+        my $recv_length = $socket->recv($recv_buffer);
+        
+        if ($recv_length < 0) {
+          die "Read error";
+        }
+        
+        # print((string)sliceb($recv_buffer, 0, $recv_length));
+        
+        if ($recv_length < length $recv_buffer) {
+          last;
+        }
+      }
+      
+      $socket->close;
+    });
+    
+    Go->gosched;
+    
+    $wg->wait;
+    
+    return 1;
+  }
+}

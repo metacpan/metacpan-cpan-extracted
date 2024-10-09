@@ -9,6 +9,9 @@ use Lemonldap::NG::Common::Apache::Session;
 use Lemonldap::NG::Common::Session;
 use Lemonldap::NG::Common::Util qw/getPSessionID genId2F/;
 
+use constant BACKENDS       => qw(global persistent oidc saml cas);
+use constant ISREFRESHTOKEN => '_type=refresh_token';
+
 our $VERSION = '2.19.0';
 
 has opts => ( is => 'rw' );
@@ -55,6 +58,10 @@ sub _search {
     if ( $self->opts->{persistent} ) {
         $backendStorage = "persistentStorage";
     }
+    elsif ( $self->opts->{refreshTokens} ) {
+        $backendStorage = "oidcStorage";
+        $self->opts->{where} ||= ISREFRESHTOKEN;
+    }
 
     $backendStorage = "globalStorage" unless $self->conf->{$backendStorage};
 
@@ -93,6 +100,16 @@ sub _search {
             $args, ( @fields ? [@fields] : () ) );
     }
 
+    if (    $self->opts->{refreshTokens}
+        and $self->opts->{where} ne ISREFRESHTOKEN )
+    {
+        foreach my $key (%$res) {
+            delete $res->{$key}
+              unless $res->{$key}->{_type}
+              and $res->{$key}->{_type} eq 'refresh_token';
+        }
+    }
+
     return $res;
 }
 
@@ -100,14 +117,100 @@ sub search {
     my ($self) = shift;
     my $res    = $self->_search();
     my $o      = $self->stdout;
-    if ( $self->opts->{idonly} ) {
-        print $o map { $res->{$_}->{_session_id} . "\n" } keys %{$res};
+    if ( $self->opts->{count} ) {
+        my @tmp = keys %$res;
+        print $o scalar(@tmp) . "\n";
     }
     else {
-        print $o $self->_to_json( [ values %{$res} ] );
+        if ( $self->opts->{idonly} ) {
+            print $o map { $res->{$_}->{_session_id} . "\n" } keys %{$res};
+        }
+        else {
+            print $o $self->_to_json( [ values %{$res} ] );
+        }
     }
     return 0;
 
+}
+
+sub backup {
+    my $self = shift;
+    my $res  = {};
+    if ( $self->opts->{persistent} ) {
+        $res->{persistent} = $self->_search();
+    }
+    elsif ( $self->opts->{refreshTokens} ) {
+        $res->{oidc} = $self->_search();
+    }
+    else {
+        foreach my $backend (BACKENDS) {
+            next unless $self->conf->{"${backend}Storage"};
+            $self->opts->{backend} = $backend;
+            my $_res = $self->_search();
+            $res->{$backend} = $_res;
+        }
+    }
+    my $o = $self->stdout;
+    print $o to_json($res);
+    return 0;
+}
+
+sub restore {
+    my $self = shift;
+    my $obj;
+    {
+        local $/ = undef;
+        my $i = *STDIN;
+        if (@_) {
+            open( $i, '<', "$_[0]" ) or die $!;
+        }
+        while (<$i>) {
+            $obj .= $_;
+        }
+    }
+    eval {
+        $obj = from_json($obj);
+        no warnings;
+        %$obj;
+    };
+    if ($@) {
+        print STDERR "Given backup file looks bad: $@\n";
+        return 1;
+    }
+    foreach my $backend ( keys %$obj ) {
+        unless ( grep { $backend eq $_ } BACKENDS ) {
+            print STDERR
+              "Given backup file looks bad: unknpwn backend $backend\n";
+        }
+        $self->opts->{backend} = $backend;
+        foreach my $_session_id ( keys %{ $obj->{$backend} } ) {
+            $self->_insert( $_session_id, $obj->{$backend}->{$_session_id} );
+        }
+    }
+    return 0;
+}
+
+sub _insert {
+    my ( $self, $id, $content ) = @_;
+    $id = id2storage($id) if $id and $self->opts->{hash};
+
+    # Lookup backend storage from CLI options
+    my $backendStorage =
+      ( lc( $self->opts->{backend} || 'global' ) ) . "Storage";
+
+    my $as = Lemonldap::NG::Common::Session->new( {
+            hashStore            => 0,
+            storageModule        => $self->conf->{$backendStorage},
+            storageModuleOptions => $self->conf->{"${backendStorage}Options"},
+            id                   => $id,
+            force                => 1,
+            info                 => $content,
+        }
+    );
+    print STDERR "Unable to restore session $id in backend "
+      . $self->opts->{backend} . "\n"
+      unless $as;
+    return $as;
 }
 
 # Returns the session object, so we can modify it
@@ -129,6 +232,9 @@ sub _get_one_session {
     elsif ( $self->opts->{persistent} ) {
         $backendStorage = "persistentStorage";
         $id             = getPSessionID($id);
+    }
+    elsif ( $self->opts->{refreshTokens} ) {
+        $backendStorage = "oidcStorage";
     }
 
     # In any case, fall back to global storage if we couldn't find the backend
@@ -507,7 +613,7 @@ sub run {
     $self->opts($opts);
 
     # Simple commands
-    if ( $action =~ /^(?:get|search|delete|setKey|delKey)$/ ) {
+    if ( $action =~ /^(?:get|search|delete|setKey|delKey|backup|restore)$/ ) {
         return $self->$action(@_);
     }
 

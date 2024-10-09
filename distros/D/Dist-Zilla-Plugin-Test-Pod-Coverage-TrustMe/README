@@ -1,0 +1,80 @@
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/haarg/Dist-Zilla-Plugin-Test-Pod-Coverage-TrustMe/is
+    sues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Graham Knop <haarg@haarg.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by Graham Knop.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+NAME
+    Dist::Zilla::Plugin::Test::Pod::Coverage::TrustMe - An author test for
+    Pod Coverage
+
+SYNOPSIS
+        # Add this line to dist.ini
+        [Test::Pod::Coverage::TrustMe]
+
+        # Run this in the command line to test for POD coverage:
+        $ dzil test --release
+
+DESCRIPTION
+OPTIONS
+    filename
+        The name of the test file to generate. Defaults to
+        xt/author/pod-coverage.t.
+
+    modules
+        The modules to check for coverage.
+
+        Aliased as "module".
+
+    finder
+        The file finder
+        <https://metacpan.org/pod/Dist::Zilla::Role::FileFinderUser/default_
+        finders> used to find modules to check. Will only be used if a list
+        of modules is not given. Defaults to ":InstallModules".
+
+        To generate the list of modules, the output of this finder will be
+        filtered to only files ending in ".pm" and will be transformed to
+        module names after stripping an initial "lib/".
+
+    private
+        Methods to treat as private, with their coverage not checked. Will
+        be passed to Test::Pod::Coverage::TrustMe. String values can be
+        passed directly. Regexp values can be passed with the form "/.../".
+        Can be specified multiple times.
+
+    also_private
+        Exactly the same as "private", but adds to the list of default
+        private methods rather than replacing it.
+
+    trust_methods
+        A list of methods to always treat as covered. Will be passed to
+        Test::Pod::Coverage::TrustMe. Can be specified multiple times.
+
+    require_content
+    trust_parents
+    trust_roles
+    trust_packages
+    trust_pod
+    require_link
+    export_only
+    ignore_imported
+        These options are all passed directly to
+        Test::Pod::Coverage::TrustMe.
+
+    options
+        Additional options to pass to Test::Pod::Coverage::TrustMe. Options
+        should be specified like:
+
+            options = extra_option = 1
+

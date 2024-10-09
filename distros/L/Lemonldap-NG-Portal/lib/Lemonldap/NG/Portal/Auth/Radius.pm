@@ -11,17 +11,9 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends qw(Lemonldap::NG::Portal::Auth::_WebForm);
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.20';
 
 # PROPERTIES
-
-has authnLevel => (
-    is      => 'rw',
-    lazy    => 1,
-    default => sub {
-        $_[0]->conf->{radiusAuthnLevel};
-    }
-);
 
 has modulename => ( is => 'ro', default => 'radius' );
 has radiusLib  => ( is => 'rw' );
@@ -57,6 +49,7 @@ sub init {
             radius_secret  => $self->conf->{radiusSecret},
             radius_server  => $self->conf->{radiusServer},
             radius_timeout => $self->conf->{radiusTimeout},
+            radius_msgauth => $self->conf->{radiusMsgAuth},
             modulename     => "radius",
             logger         => $self->logger,
             p              => $self->p,
@@ -76,11 +69,10 @@ sub authenticate {
     # Session info is empty or unknown at this step
     my $res = $self->radiusLib->check_pwd( $req, {}, $req->user,
         $req->data->{password} );
-    unless ($res) {
-        return PE_RADIUSCONNECTFAILED;
-    }
+    return PE_RADIUSCONNECTFAILED unless $res;
     unless ( $res->{result} == 1 ) {
-        $self->userLogger->warn("Radius authentication failed for user " . $req->{user});
+        $self->userLogger->warn(
+            "Radius authentication failed for user " . $req->{user} );
         $self->setSecurity($req);
         return PE_BADCREDENTIALS;
     }
@@ -96,6 +88,8 @@ sub authenticate {
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     my $attributeMap = $self->sessionKeys;
+    $req->{sessionInfo}->{authenticationLevel} =
+      $self->conf->{radiusAuthnLevel};
 
     if ($attributeMap) {
         while ( my ( $attr_radname, $attr_value ) =
@@ -107,6 +101,8 @@ sub setAuthSessionInfo {
             }
         }
     }
+
+    return PE_OK;
 }
 
 sub authLogout {

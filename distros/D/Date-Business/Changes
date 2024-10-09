@@ -1,5 +1,8 @@
 Revision history for Perl extension Date::Business.
 
+1.2.1 Tue October 8
+  - Updated Makefile.PL to use prompt().
+
 1.1  Fri Nov 12 15:54:16 1999
 	- original version; created by h2xs 1.18
 

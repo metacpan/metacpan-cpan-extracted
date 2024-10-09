@@ -74,6 +74,15 @@
 
             </TMPL_IF>
 
+            <TMPL_IF NAME="webauthnform">
+              <TMPL_INCLUDE NAME="webauthnform.tpl">
+
+              <!-- Remember my authentication choice for this module -->
+              <TMPL_IF NAME="REMEMBERAUTHCHOICE">
+                <input type="hidden" id="rememberauthchoice" name="rememberauthchoice" value="<TMPL_IF NAME="REMEMBERAUTHCHOICEDEFAULTCHECKED">true</TMPL_IF>" />
+              </TMPL_IF>
+            </TMPL_IF>
+
             <TMPL_IF NAME="gpgform">
               <TMPL_INCLUDE NAME="gpgform.tpl">
             </TMPL_IF>
@@ -192,6 +201,23 @@
     <input type="hidden" name="timezone" />
     <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
     <TMPL_INCLUDE NAME="sslform.tpl">
+    </form>
+  </div>
+  </TMPL_IF>
+
+  <TMPL_IF NAME="DISPLAY_WEBAUTHN_FORM">
+  <div class="card">
+  <TMPL_IF NAME="module">
+    <form id="lform" action="#" method="post" class="login <TMPL_VAR NAME="module">" role="form">
+  <TMPL_ELSE>
+    <form id="lform" action="#" method="post" class="login" role="form">
+  </TMPL_IF>
+    <!-- Hidden fields -->
+    <TMPL_VAR NAME="HIDDEN_INPUTS">
+    <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
+    <input type="hidden" name="timezone" />
+    <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
+    <TMPL_INCLUDE NAME="webauthnform.tpl">
     </form>
   </div>
   </TMPL_IF>

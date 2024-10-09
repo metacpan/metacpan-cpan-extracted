@@ -42,6 +42,7 @@ $server->start;
 
 # single
 my $r = http_lambda('www.google.com')-> wait;
+plan skip_all => "connect error: $r. Offline?" if !ref($r) && $r =~ /connect/;
 ref($r) ? ok(1,"http_get(google)") : ok(0,"http_get(google):$r");
 
 # many

@@ -10,7 +10,6 @@ BEGIN {
 
 my $res;
 my $maintests = 3;
-my $client    = client();
 
 my $userdb = tempdb();
 
@@ -19,6 +18,7 @@ SKIP: {
     if ($@) {
         skip 'GSSAPI not found';
     }
+    my $client = client();
 
     subtest "Auth by SSL" => sub {
 

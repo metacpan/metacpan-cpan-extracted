@@ -16,8 +16,7 @@ SKIP: {
     skip( 'LLNGTESTLDAP is not set', $maintests ) unless ( $ENV{LLNGTESTLDAP} );
     require 't/test-ldap.pm';
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => 'error',
                 useSafeJail              => 1,
@@ -30,6 +29,7 @@ SKIP: {
                 ldapBase                 => 'ou=users,dc=example,dc=com',
                 managerDn       => 'cn=lemonldapng,ou=dsa,dc=example,dc=com',
                 managerPassword => 'lemonldapng',
+                hideOldPassword => 0,
                 ldapAllowResetExpiredPassword => 1,
                 ldapPpolicyControl            => 1,
                 passwordPolicyMinSize         => 4,

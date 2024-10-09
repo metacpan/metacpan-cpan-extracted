@@ -12,12 +12,8 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::EmailTransport;
-use Crypt::OpenSSL::RSA;
-use Convert::PEM;
-use Digest::MD5 qw(md5_base64);
-
+use Lemonldap::NG::Common::Util::Crypto;
 use URI::URL;
-use Net::SSLeay;
 
 extends qw(
   Lemonldap::NG::Manager::Plugin
@@ -103,12 +99,7 @@ sub newCertificate {
       if (@others);
     my $query = $req->jsonBodyToObj;
 
-    my ( $private, $cert ) = $self->_generateX509( $query->{password} );
-    my $keys = {
-        'private' => $private,
-        'public'  => $cert,
-        'hash'    => md5_base64($cert),
-    };
+    my $keys = $self->_generateX509( $query->{password} );
     return $self->sendJSONresponse( $req, $keys );
 }
 
@@ -126,36 +117,13 @@ sub newRSAKey {
     my ( $self, $req, @others ) = @_;
     return $self->sendError( $req, 'There is no subkey for "newRSAKey"', 400 )
       if (@others);
-    my $rsa = Crypt::OpenSSL::RSA->generate_key( $self->defaultNewKeySize );
 
+    my $key_size = $self->defaultNewKeySize;
     my $query = $req->jsonBodyToObj;
-    my $keys  = {
-        'private' => $rsa->get_private_key_string(),
-        'public'  => $rsa->get_public_key_x509_string(),
-        'hash'    => md5_base64( $rsa->get_public_key_string() ),
-    };
-    if ( $query->{password} ) {
-        my $pem = Convert::PEM->new(
-            Name => 'RSA PRIVATE KEY',
-            ASN  => q(
-                RSAPrivateKey SEQUENCE {
-                    version INTEGER,
-                    n INTEGER,
-                    e INTEGER,
-                    d INTEGER,
-                    p INTEGER,
-                    q INTEGER,
-                    dp INTEGER,
-                    dq INTEGER,
-                    iqmp INTEGER
-    }
-               )
-        );
-        $keys->{private} = $pem->encode(
-            Content  => $pem->decode( Content => $keys->{private} ),
-            Password => $query->{password},
-        );
-    }
+    my $password = $query->{password};
+
+    my $keys = Lemonldap::NG::Common::Util::Crypto::genRsaKey($key_size, $password);
+
     return $self->sendJSONresponse( $req, $keys );
 }
 
@@ -169,17 +137,8 @@ sub newRSAKey {
 #@return PSGI JSON response
 sub newEcKeys {
     my ( $self, $req, @others ) = @_;
-    require Crypt::PK::ECC;
-    my $ec_key = Crypt::PK::ECC->new();
-    $ec_key->generate_key('secp256r1');
 
-    my $pubKey = $ec_key->export_key_pem('public');
-    my $privKey = $ec_key->export_key_pem('private');
-    my $keys = {
-        private => $privKey,
-        public => $pubKey,
-        hash => md5_base64($pubKey),
-    };
+    my $keys = Lemonldap::NG::Common::Util::Crypto::genEcKey('secp256r1');
     return $self->sendJSONresponse( $req, $keys );
 }
 
@@ -189,76 +148,12 @@ sub newEcKeys {
 
 sub _generateX509 {
     my ( $self, $password ) = @_;
-    Net::SSLeay::SSLeay_add_ssl_algorithms();
     my $conf = $self->confAcc->getConf();
-
-    # Generate 2048 bits RSA key
-    my $key = Net::SSLeay::EVP_PKEY_new();
-    Net::SSLeay::EVP_PKEY_assign_RSA( $key,
-        Net::SSLeay::RSA_generate_key( $self->defaultNewKeySize, 0x10001 ) );
-
-    my $cert = Net::SSLeay::X509_new();
-
-    # Serial
-    Net::SSLeay::ASN1_INTEGER_set(
-        Net::SSLeay::X509_get_serialNumber($cert),
-        rand( 2**32 ),
-    );
-
-    # Version
-    Net::SSLeay::X509_set_version( $cert, 2 );
-
-    # Make it last 20 years
-    Net::SSLeay::ASN1_TIME_set( Net::SSLeay::X509_get_notBefore($cert),
-        time() );
-    Net::SSLeay::ASN1_TIME_set( Net::SSLeay::X509_get_notAfter($cert),
-        time() + 20 * 365 * 86400 );
-
-    # set subject
+    my $key_size = $self->defaultNewKeySize;
     my $portal_uri  = new URI::URL( $conf->{portal} || "http://localhost" );
     my $portal_host = $portal_uri->host;
-    my $subj_e      = Net::SSLeay::X509_get_subject_name($cert);
-    my $subj        = { commonName => $portal_host, };
 
-    while ( my ( $k, $v ) = each %$subj ) {
-
-        # Not everything we get is nice - try with MBSTRING_UTF8 first and if it
-        # fails try V_ASN1_T61STRING and finally V_ASN1_OCTET_STRING
-        Net::SSLeay::X509_NAME_add_entry_by_txt( $subj_e, $k, 0x1000, $v, -1,
-            0 )
-          or
-          Net::SSLeay::X509_NAME_add_entry_by_txt( $subj_e, $k, 20, $v, -1, 0 )
-          or
-          Net::SSLeay::X509_NAME_add_entry_by_txt( $subj_e, $k, 4, $v, -1, 0 )
-          or croak( "failed to add entry for $k - "
-              . Net::SSLeay::ERR_error_string( Net::SSLeay::ERR_get_error() ) );
-    }
-
-    # Set to self-sign
-    Net::SSLeay::X509_set_pubkey( $cert, $key );
-    Net::SSLeay::X509_set_issuer_name( $cert,
-        Net::SSLeay::X509_get_subject_name($cert) );
-
-    # Sign with default alg
-    Net::SSLeay::X509_sign( $cert, $key, 0 );
-
-    my $strCert = Net::SSLeay::PEM_get_string_X509($cert);
-    my $strPrivate;
-    if ($password) {
-        my $alg = Net::SSLeay::EVP_get_cipherbyname("AES-256-CBC")
-          || Net::SSLeay::EVP_get_cipherbyname("DES-EDE3-CBC");
-        $strPrivate =
-          Net::SSLeay::PEM_get_string_PrivateKey( $key, $password, $alg );
-    }
-    else {
-        $strPrivate = Net::SSLeay::PEM_get_string_PrivateKey($key);
-    }
-
-    # Free OpenSSL objects
-    Net::SSLeay::X509_free($cert);
-    Net::SSLeay::EVP_PKEY_free($key);
-
-    return ( $strPrivate, $strCert );
+    return Lemonldap::NG::Common::Util::Crypto::genCertKey($key_size, $password, $portal_host);
 }
 
 #      Sending a test Email
@@ -511,37 +406,66 @@ sub newRawConf {
         return $self->sendError( $req, undef, 400 );
     }
 
-    my $res = {};
+    require Lemonldap::NG::Manager::Conf::Parser;
+    my $parser = Lemonldap::NG::Manager::Conf::Parser->new( {
+            refConf => $self->currentConf,
+            newConf => $new,
+            req     => $req,
+        }
+    );
 
-    # When uploading a new conf, always force it since cfgNum has a few
-    # chances to be equal to last config cfgNum
-    my $s = $self->confAcc->saveConf( $new, force => 1 );
-    if ( $s > 0 ) {
-        $self->auditLog(
-            $req,
-            message => (
-                'User ' . $self->p->userId($req) . " has stored (raw) conf $s"
-            ),
-            code   => "CONF_STORED_RAW",
-            user   => $self->p->userId($req),
-            cfgNum => $s,
-        );
-        $res->{result} = 1;
-        $res->{cfgNum} = $s;
+    $parser->confChanged(1);
+
+    my $res = { result => $parser->check( $self->p ) };
+
+    # "message" fields: note that words enclosed by "__" (__word__) will be
+    # translated
+    $res->{details}->{'__errors__'} = $parser->{errors}
+      if ( @{ $parser->{errors} } );
+    unless ( @{ $parser->{errors} } ) {
+        if ( @{ $parser->{needConfirmation} } && !$req->params('force') ) {
+            $res->{needConfirm} = 1;
+            $res->{details}->{'__needConfirmation__'} =
+              $parser->{needConfirmation};
+        }
+        $res->{message} = $parser->{message};
+        foreach my $t (qw(warnings changes)) {
+            $res->{details}->{ '__' . $t . '__' } = $parser->$t
+              if ( @{ $parser->$t } );
+        }
     }
-    else {
-        $self->auditLog(
-            $req,
-            message => (
-                'Raw saving attempt rejected, asking for confirmation to '
-                  . $self->p->userId($req)
-            ),
-            code => "CONF_REJECTED_RAW",
-            user => $self->p->userId($req),
-        );
-        $res->{result}      = 0;
-        $res->{needConfirm} = 1 if ( $s == CONFIG_WAS_CHANGED );
-        $res->{message} .= '__needConfirmation__';
+    if ( $res->{result} ) {
+
+        # When uploading a new conf, always force it since cfgNum has a few
+        # chances to be equal to last config cfgNum
+        my $s = $self->confAcc->saveConf( $new, force => 1 );
+        if ( $s > 0 ) {
+            $self->auditLog(
+                $req,
+                message => (
+                    'User ' . $self->p->userId($req) . " has stored (raw) conf $s"
+                ),
+                code   => "CONF_STORED_RAW",
+                user   => $self->p->userId($req),
+                cfgNum => $s,
+            );
+            $res->{result} = 1;
+            $res->{cfgNum} = $s;
+        }
+        else {
+            $self->auditLog(
+                $req,
+                message => (
+                    'Raw saving attempt rejected, asking for confirmation to '
+                      . $self->p->userId($req)
+                ),
+                code => "CONF_REJECTED_RAW",
+                user => $self->p->userId($req),
+            );
+            $res->{result}      = 0;
+            $res->{needConfirm} = 1 if ( $s == CONFIG_WAS_CHANGED );
+            $res->{message} .= '__needConfirmation__';
+        }
     }
     return $self->sendJSONresponse( $req, $res );
 }

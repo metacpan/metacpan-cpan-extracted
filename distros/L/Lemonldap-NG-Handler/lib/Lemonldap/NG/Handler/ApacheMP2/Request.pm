@@ -1,12 +1,12 @@
 package Lemonldap::NG::Handler::ApacheMP2::Request;
 
 use strict;
-use base 'Plack::Request';
+use base 'Lemonldap::NG::Common::PSGI::Request';
 use Plack::Util;
 use URI;
 use URI::Escape;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 # Build Plack::Request (inspired from Plack::Handler::Apache2)
 sub new {
@@ -61,6 +61,7 @@ sub new {
     $env->{PATH_INFO} = uri_unescape( $uri->path );
 
     my $self = Plack::Request->new($env);
+    $self->{data} = {};
     bless $self, $class;
     return $self;
 }
@@ -72,7 +73,7 @@ sub data {
 
 sub wantJSON {
     return 1
-      if ( defined $_[0]->accept
+      if ( defined $_[0]->env->{HTTP_ACCEPT}
         and $_[0]->env->{HTTP_ACCEPT} =~ m#(?:application|text)/json#i );
     return 0;
 }

@@ -24,7 +24,7 @@ use Data::TagDB::MultiIterator;
 use Data::TagDB::WellKnown;
 use Data::URIID::Colour;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 
 
@@ -511,7 +511,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

@@ -143,10 +143,17 @@ sub saveConf {
     }
 
     $msg .= "Configuration $conf->{cfgNum} stored.\n";
-    if ( $self->{refLocalStorage} ) {
-        $self->setDefault($conf);
-        $self->setValuesFromEnv($conf);
-        $self->compactConf($conf);
+    $self->setDefault($conf);
+    $self->setValuesFromEnv($conf);
+    $self->compactConf($conf);
+
+    if (    Lemonldap::NG::Handler::Main->can('tsv')
+        and Lemonldap::NG::Handler::Main->tsv->{msgBrokerWriter} )
+    {
+        Lemonldap::NG::Handler::Main->tsv->{msgBrokerWriter}
+          ->publish( $conf->{eventQueueName}, { action => 'newConf' } );
+    }
+    else {
         eval { Lemonldap::NG::Handler::Main->reload() };
     }
 
@@ -165,12 +172,15 @@ sub saveConf {
 sub getConf {
     my ( $self, $args ) = @_;
     my $res;
-    my $local                = $args->{local};
-    my $cfgNum               = $args->{cfgNum};
-    my $localPrm             = $args->{localPrm};
-    my $noCache              = $args->{noCache};
-    my $raw                  = $args->{raw};
-    my $allow_cache_for_root = $args->{allow_cache_for_root};
+    my $local    = $args->{local};
+    my $cfgNum   = $args->{cfgNum};
+    my $localPrm = $args->{localPrm};
+    my $noCache  = $args->{noCache};
+    my $raw      = $args->{raw};
+    my $allow_cache_for_root =
+      (   $self->{localStorageOptions}
+        ? $self->{localStorageOptions}->{allow_cache_for_root}
+        : 0 );
 
     # If running as UID=0, disabled the cache unless explicitely allowed
     if ( $> == 0 and !$allow_cache_for_root ) {
@@ -231,8 +241,9 @@ sub getConf {
 
                 # Store configuration in cache
                 $self->setLocalConf($r)
-                  if ( $self->{refLocalStorage}
-                    and not( $noCache == 1 or $raw ) );
+                  if (  $self->{refLocalStorage}
+                    and ( !$noCache or $noCache != 1 )
+                    and !$raw );
             }
         }
 
@@ -362,8 +373,11 @@ sub getLocalConf {
         foreach ( $cfg->Parameters(DEFAULTSECTION) ) {
             $r->{$_} = $cfg->val( DEFAULTSECTION, $_ );
             if ( $_ eq "require" ) {
-                eval { require $r->{$_} };
-                $msg .= "Error: $@" if ($@);
+
+                foreach my $require ( split /[,\s]+/, $r->{$_} ) {
+                    eval { require $require };
+                    $msg .= "Error: $@" if ($@);
+                }
             }
             if (   $r->{$_} =~ /^[{\[].*[}\]]$/
                 || $r->{$_} =~ /^sub\s*{.*}$/ )
@@ -533,7 +547,7 @@ sub logError {
 
 sub _substPlaceHolders {
     return $_[0] unless $_[0];
-    $_[0] =~ s/$PlaceHolderRe/$ENV{$1}/geo;
+    $_[0] =~ s/$PlaceHolderRe/$ENV{$1}/ge;
     return $_[0];
 }
 
@@ -544,7 +558,7 @@ sub replacePlaceholders {
     my ( $self, $conf ) = @_;
     if ( ref $conf eq 'HASH' ) {
         foreach my $key ( keys %$conf ) {
-            if ( $key =~ /$PlaceHolderRe/o ) {
+            if ( $key =~ /$PlaceHolderRe/ ) {
                 my $val = $conf->{$key};
                 delete $conf->{$key};
                 my $nk = _substPlaceHolders($key);
@@ -554,7 +568,7 @@ sub replacePlaceholders {
             if ( ref $conf->{$key} ) {
                 $self->replacePlaceholders( $conf->{$key} );
             }
-            elsif ( $conf->{$key} =~ /$PlaceHolderRe/o ) {
+            elsif ( $conf->{$key} =~ /$PlaceHolderRe/ ) {
                 $conf->{$key} = _substPlaceHolders( $conf->{$key} );
             }
         }
@@ -564,7 +578,7 @@ sub replacePlaceholders {
             if ( ref $conf->[$i] ) {
                 $self->replacePlaceholders( $conf->[$i] );
             }
-            elsif ( $conf->[$i] =~ /$PlaceHolderRe/o ) {
+            elsif ( $conf->[$i] =~ /$PlaceHolderRe/ ) {
                 $conf->[$i] = _substPlaceHolders( $conf->[$i] );
             }
         }

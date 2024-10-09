@@ -13,6 +13,7 @@ lib/Fred/Fish/DBUG/Signal.pm
 lib/Fred/Fish/DBUG/SignalKiller.pm
 lib/Fred/Fish/DBUG/TIE.pm
 lib/Fred/Fish/DBUG/Tutorial.pm
+t/00-basic-min-perl.t
 t/00-basic-on_on.t
 t/01-basic-on_off-1.t
 t/02-basic-on_off-2.t

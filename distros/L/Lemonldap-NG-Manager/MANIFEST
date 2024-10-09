@@ -123,6 +123,7 @@ site/htdocs/static/forms/catAndAppList.html
 site/htdocs/static/forms/cmbModule.html
 site/htdocs/static/forms/cmbModuleContainer.html
 site/htdocs/static/forms/displayOidcMetadata.html
+site/htdocs/static/forms/displaySamlMetadata.html
 site/htdocs/static/forms/doubleHash.html
 site/htdocs/static/forms/file.html
 site/htdocs/static/forms/grant.html

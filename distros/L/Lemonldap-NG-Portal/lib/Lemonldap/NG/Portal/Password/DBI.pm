@@ -23,7 +23,7 @@ sub init {
 
 sub confirm {
     my ( $self, $req, $pwd ) = @_;
-    return $self->check_password( $req->user, $pwd );
+    return $self->check_password( $req, $pwd );
 }
 
 sub modifyPassword {
@@ -33,29 +33,28 @@ sub modifyPassword {
     my $table       = $self->conf->{dbiAuthTable};
     my $dynamicHash = $self->conf->{dbiDynamicHashEnabled} || 0;
     my $passwordsql;
+    my $stored_value;
 
     if ( $dynamicHash == 1 ) {
 
+        $passwordsql = "?";
+
         # Dynamic password hashes
-        $passwordsql =
-          $self->dynamic_hash_new_password( $self->dbh, $req->user, $pwd,
-            $table, $userCol, $passwordCol );
+        $stored_value =
+          $self->get_dynamic_hash_new_password( $req, $self->dbh, $req->user,
+            $pwd, $table, $userCol, $passwordCol );
     }
     else {
         # Static Password hash
         $passwordsql =
           $self->hash_password( "?", $self->conf->{dbiAuthPasswordHash} );
+        $stored_value = $pwd;
     }
 
     eval {
         my $sth = $self->dbh->prepare(
             "UPDATE $table SET $passwordCol=$passwordsql WHERE $userCol=?");
-        if ( $passwordsql =~ /.*\?.*/ ) {
-            $sth->execute( $pwd, $req->user );
-        }
-        else {
-            $sth->execute( $req->user );
-        }
+        $sth->execute( $stored_value, $req->user );
     };
     if ($@) {
 

@@ -70,6 +70,10 @@ sub loadTemplate {
 #@return reload status as boolean
 sub applyConf {
     my ( $self, $newConf ) = @_;
+    return
+      unless $self->p->api->tsv->{msgBrokerWriter}
+      and ref( $self->p->api->tsv->{msgBrokerWriter} ) =~ /NoBroker$/;
+
     my $status;
 
     # 1 Apply conf locally

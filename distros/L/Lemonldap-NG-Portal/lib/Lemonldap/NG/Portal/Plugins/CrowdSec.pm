@@ -55,7 +55,7 @@ sub check {
         'Accept'    => 'application/json',
         'X-Api-Key' => $self->conf->{crowdsecKey},
     );
-    if ( $resp->is_error ) {
+    if ( $resp->is_error and not !$self->conf->{crowdsecIgnoreFailures} ) {
         $self->logger->error( 'Bad CrowdSec response: ' . $resp->message );
         $self->logger->debug( $resp->content );
         return PE_ERROR;

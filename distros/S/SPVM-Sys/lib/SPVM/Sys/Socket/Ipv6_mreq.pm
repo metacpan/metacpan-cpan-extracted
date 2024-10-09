@@ -8,7 +8,7 @@ SPVM::Sys::Socket::Ipv6_mreq - struct ipv6_mreq in the C language
 
 =head1 Description
 
-The Sys::Socket::Ipv6_mreq class in L<SPVM> represents L<struct ipv6_mreq|https://linux.die.net/man/7/ipv6> in the C language.
+Sys::Socket::Ipv6_mreq class in L<SPVM> represents L<struct ipv6_mreq|https://linux.die.net/man/7/ipv6> in the C language.
 
 =head1 Usage
 

@@ -15,6 +15,7 @@ has radius_secret               => ( is => 'rw' );
 has radius_timeout              => ( is => 'rw' );
 has radius_req_attribute_config => ( is => 'rw' );
 has radius_dictionary           => ( is => 'rw' );
+has radius_msgauth              => ( is => 'rw' );
 has modulename                  => ( is => 'rw' );
 has p                           => ( is => 'rw' );
 has logger                      => ( is => 'rw' );
@@ -73,6 +74,7 @@ sub _get_radius {
             Authen::Radius->new(
                 Host   => $first_server,
                 Secret => $self->radius_secret,
+                ( $self->radius_msgauth ? ( Rfc3579MessageAuth => 1 ) : () ),
                 (
                     $self->radius_timeout
                     ? ( TimeOut => $self->radius_timeout )

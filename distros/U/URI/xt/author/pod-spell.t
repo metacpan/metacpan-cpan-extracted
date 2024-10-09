@@ -148,6 +148,8 @@ evalue
 file
 foy
 ftp
+ftpes
+ftps
 geo
 gerard
 gianni
@@ -165,6 +167,8 @@ http
 https
 icap
 icaps
+irc
+ircs
 isbn
 ishigaki
 jack
@@ -203,6 +207,7 @@ rtsp
 rtspu
 ryker
 schwern
+scp
 sewi
 sftp
 simbabque

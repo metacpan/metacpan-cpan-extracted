@@ -174,36 +174,12 @@ sub verify {
     my ( $self, $req, $session ) = @_;
     my $usercode;
     unless ( $usercode = $req->param('code') ) {
-        $self->auditLog(
-            $req,
-            message      => ( $self->prefix . '2f: no code found' ),
-            code         => "2FA_VERIFICATION_FAILED",
-            reason       => "Code not provided",
-            portal_error => portalConsts->{PE_FORMEMPTY},
-            user         => $session->{ $self->conf->{whatToTrace} },
-        );
         return PE_FORMEMPTY;
     }
 
     $self->populateDestAttribute( $req, $session );
 
     my $res = $self->verify_supplied_code( $req, $session, $usercode );
-
-    # If we authenticated the user using a 2F Device, log it
-    if ( $res == PE_OK && $req->data->{__2fDevice_registrable} ) {
-        my $uid    = $session->{ $self->conf->{whatToTrace} };
-        my $device = $req->data->{__2fDevice_registrable};
-        $self->auditLog(
-            $req,
-            message => (
-                "User $uid authenticated with 2F device: " . display2F($device)
-            ),
-            code   => "2FA_SUCCESS",
-            user   => $uid,
-            type   => $self->prefix,
-            device => display2F($device)
-        );
-    }
     return $res;
 }
 
@@ -234,30 +210,12 @@ sub verify_internal {
         return PE_OK;
     }
     else {
-        $self->auditLog(
-            $req,
-            message => (
-                'Second factor failed for '
-                  . $session->{ $self->conf->{whatToTrace} }
-            ),
-            code => "2FA_FAILED",
-            user => $session->{ $self->conf->{whatToTrace} },
-            type => $self->prefix,
-        );
         return PE_BADOTP;
     }
 }
 
 sub sendCodeForm {
     my ( $self, $req, %params ) = @_;
-
-    my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug( $self->prefix . "2f: checkLogins set" )
-      if $checkLogins;
-
-    my $stayconnected = $req->param('stayconnected');
-    $self->logger->debug( $self->prefix . "2f: stayconnected set" )
-      if $stayconnected;
 
     # Prepare form
     my $prefix = $self->prefix;
@@ -295,7 +253,7 @@ sub populateDestAttribute {
         if (@registered_devices) {
 
             $sessionInfo->{destination} = $registered_devices[0]->{_generic};
-            $req->data->{__2fDevice_registrable} = $registered_devices[0];
+            $req->data->{_2fDevice} = $registered_devices[0];
         }
     }
 }

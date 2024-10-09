@@ -2,7 +2,7 @@ package builtin::compat;
 use strict;
 use warnings;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.003001';
 $VERSION =~ tr/_//d;
 
 use namespace::clean ();
@@ -137,10 +137,10 @@ sub load_module ($) {
 
   local %^H;
   my $guard = bless [ $file ], 'builtin::compat::load_module::__GUARD__';
-  my $result = CORE::require($file);
+  CORE::require($file);
   pop @$guard;
 
-  return $result;
+  return $module;
 }
 END_CODE
     : sprintf(qq{#line %s "%s"\n}, __LINE__+1, __FILE__).<<'END_CODE'
@@ -148,7 +148,8 @@ sub load_module ($) {
   my $module = $_[0];
   (my $file = $module) =~ s{::}{/}g;
   $file .= ".pm";
-  return scalar CORE::require($file);
+  CORE::require($file);
+  return $module;
 }
 END_CODE
   ),

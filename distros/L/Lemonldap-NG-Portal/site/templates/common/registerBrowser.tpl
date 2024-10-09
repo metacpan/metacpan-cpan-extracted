@@ -6,6 +6,7 @@
 <body>
  <p>Please wait...</p>
  <form id="form" action="<TMPL_VAR NAME="ACTION">" method="post">
+  <input type="hidden" id="usetotp" name="usetotp" value="<TMPL_VAR NAME="USETOTP">" />
   <input type="hidden" id="totpsecret" name="totpsecret" value="<TMPL_VAR NAME="TOTPSEC">" />
   <input type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
   <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">">

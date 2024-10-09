@@ -8,7 +8,7 @@ use Lemonldap::NG::Handler::Main;
 use Lemonldap::NG::Common::Util qw(getSameSite);
 use URI;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -543,30 +543,18 @@ sub tests {
         # Warn if 2F dependencies seem missing
         sfaDependencies => sub {
             my $ok = 0;
-            foreach (qw(u totp utotp yubikey)) {
+            foreach (qw(totp yubikey)) {
                 $ok ||= $conf->{ $_ . '2fActivation' };
                 last if ($ok);
             }
             return 1 unless ($ok);
 
             # Use TOTP
-            if (   $conf->{totp2fActivation}
-                or $conf->{utotp2fActivation} )
-            {
+            if ( $conf->{totp2fActivation} ) {
                 eval "use Convert::Base32";
                 return ( 1,
                     "Convert::Base32 module is required to enable TOTP" )
                   if ($@);
-            }
-
-            # Use U2F
-            if (   $conf->{u2fActivation}
-                or $conf->{utotp2fActivation} )
-            {
-                eval "use Crypt::U2F::Server::Simple";
-                return ( 1,
-"Crypt::U2F::Server::Simple module is required to enable U2F"
-                ) if ($@);
             }
 
             # Use WebAuthn
@@ -593,17 +581,6 @@ sub tests {
                 ) if ($@);
             }
             return 1;
-        },
-
-        # Warn if TOTP or U2F is enabled with UTOTP (U2F + TOTP)
-        utotp => sub {
-            return 1 unless ( $conf->{utotp2fActivation} );
-            my $w = "";
-            foreach ( 'totp', 'u' ) {
-                $w .= uc($_) . "2F is activated twice \n"
-                  if ( $conf->{ $_ . '2fActivation' } eq '1' );
-            }
-            return ( 1, ( $w ? $w : () ) );
         },
 
         # Warn if TOTP not 6 or 8 digits long
@@ -670,12 +647,6 @@ sub tests {
                   && $conf->{ $_ . '2fSelfRegistration' };
                 last if ($ok);
             }
-
-            $ok ||= $conf->{'utotp2fActivation'}
-              && ( $conf->{'u2fSelfRegistration'}
-                || $conf->{'totp2fSelfRegistration'} );
-            $msg = "A self registrable module should be enabled to require 2FA"
-              unless ($ok);
             return ( 1, $msg );
         },
 
@@ -790,9 +761,7 @@ sub tests {
             return 1 unless ( $conf->{disablePersistentStorage} );
             return ( 1, "2FA enabled WITHOUT persistent session storage" )
               if ( $conf->{totp2fActivation}
-                || $conf->{yubikey2fActivation}
-                || $conf->{u2fActivation}
-                || $conf->{utotp2fActivation} );
+                || $conf->{yubikey2fActivation} );
             return ( 1,
                 "History plugin enabled WITHOUT persistent session storage" )
               if ( $conf->{loginHistoryEnabled} );
@@ -1103,7 +1072,7 @@ sub tests {
             return ( 1,
                 'FindUser wildcard should be allowed by parameters control' )
               unless (
-                $conf->{findUserWildcard} =~ /$conf->{findUserControl}/o );
+                $conf->{findUserWildcard} =~ /$conf->{findUserControl}/ );
             return 1;
         },
 
@@ -1271,6 +1240,36 @@ sub tests {
                   . '(only client_secret_jwt and private_key_jwt are allowed '
                   . 'when authentication is required on authorization endpoint: '
                   . join( ', ', @pb ) );
+        },
+
+        # Test password length policy if enabled
+        ppMaxSizeGreaterThanMinSize => sub {
+            return ( 1,
+                'Password maximum size should be greater than minimal size' )
+              if ( (
+                    $conf->{passwordPolicyMinSize} >=
+                    $conf->{passwordPolicyMaxSize}
+                )
+                and $conf->{passwordPolicyMaxSize}
+                and $conf->{passwordPolicyActivation}
+              );
+            return 1;
+        },
+
+        # Test password minimal size policy if enabled
+        ppMinSize => sub {
+            my $total;
+            foreach (qw(Lower Upper Digit SpeChar)) {
+                $total += $conf->{"passwordPolicyMin$_"}
+                  if $conf->{"passwordPolicyMin$_"} > 0;
+            }
+            return ( 1,
+'Password minimal size should be greater than total of minimal sizes'
+              )
+              if (  ( $conf->{passwordPolicyMinSize} < $total )
+                and $conf->{passwordPolicyMinSize}
+                and $conf->{passwordPolicyActivation} );
+            return 1;
         },
     };
 }

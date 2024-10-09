@@ -50,7 +50,7 @@ sub op {
     return LLNG::Manager::Test->new( {
             ini => {
                 domain                          => 'idp.com',
-                portal                          => 'http://auth.op.com',
+                portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => 1,

@@ -1,3 +1,133 @@
+0.526001 2024-10-09
+  [Changes]
+    * Remove unused Sys.config
+    
+0.526 2024-06-14
+  [Document Improvement]
+    * Improve docs for Sys::Socket::Constant class.
+  [Test Improvement]
+    * Restore a test for Sys::Socket#accept method in Windows.
+    * Restore a test for Sys::Socket::Sockaddr::Un class in Windows.
+    
+0.525 2024-06-14
+  [Requirement Changes]
+    * Does not upgrade IO::Socket::IP.
+
+0.524 2024-06-13
+  [Requirement Changes]
+    * Require IO::Socket::IP 0.42.
+    * Require Perl v5.20.3.
+  [New Features]
+    * Add Test::SPVM::Sys::Socket module.
+    * Add Test::SPVM::Sys::Socket::Server module.
+    * Add Test::SPVM::Sys::Socket::ServerManager module.
+    * Add Test::SPVM::Sys::Socket::ServerManager::IP module.
+    * Add Test::SPVM::Sys::Socket::ServerManager::UNIX module.
+    * Add Test::SPVM::Sys::Socket::Util module.
+    
+0.523 2024-06-10
+
+  [Test Fix]
+    * Fix tests for Sys::Stat in Sys::Stat.
+
+      A note about stat tests: SPVM::Sys uses MinGW's stat and fstat. On the other hand, Perl's implementation is based on Windows functions.
+
+      Also, the implementation will probably change depending on whether the Perl version uses the new Windows C runtime UCRT or the old MSVCRT.
+
+      This means that there is a high possibility of differences in the results.
+
+      I don't want to fail the SPVM test because of a bug in Perl's stat and fstat and MinGW's stat and fstat and Windows's _stat and _fstat.
+
+      So for Windows, write a low-confidence test: if the value matches Perl, pass. If it doesn't, print to standard error the expected value and the result.
+      
+0.522 2024-06-06
+  [Requirement Changes]
+    * Require SPVM::Resource::SocketUtil 1.002.
+  [Internal Changes]
+    * struct sockaddr_un is not defined because spvm_socket_util.h has it now.
+  [Support Removal]
+    * SPVM::Sys does not support 32bit systems.
+    
+0.521 2024-06-05
+  [Requirement Changes]
+    * Require SPVM 0.990006.
+  [Internal Changes]
+    * If SPVM_SOCKET_UTIL_DEFINE_SOCKADDR_UN macro is defined, struct sockaddr_un is not declared.
+0.520 2024-06-03
+  [Fix Warnings]
+    * Fix unneeded warning in Sys::Socket#recvfrom method.
+0.519 2024-06-03
+  [Incompatible Changes]
+    * Change an argument of Sys#recvfrom method.
+      [Before]
+      method recvfrom : int ($socket_fd : int, $buffer : mutable string, $length : int, $flags : int, $sockaddr : Sys::Socket::Sockaddr, $buffer_offset : int = 0);
+      
+      [After]
+      method recvfrom : int ($socket_fd : int, $buffer : mutable string, $length : int, $flags : int, $sockaddr_ref : Sys::Socket::Sockaddr[], $buffer_offset : int = 0);
+    
+0.518 2024-06-03
+  [Incompatible Changes]
+    * The implementation and definition of Sys::send method is replaced with the ones of Sys::send_v2 method.
+    * Sys::send_v2 method is removed.
+    * Changes the return type of Sys#set_real_user_id method from int to void.
+    * Changes the return type of Sys#set_effective_user_id method from int to void.
+    * Changes the return type of Sys#set_real_group_id method from int to void.
+    * Changes the return type of Sys#set_effective_group_id method from int to void.
+    
+0.517 2024-05-31
+  [Bug Fix]
+    * Fix the bug that Sys#getpeername method may allocate a wrong size of memory.
+    * Fix the bug that Sys#getsockname method may allocate a wrong size of memory.
+    * Fix the bug that Sys::Socket::Sockaddr#new method may allocate a wrong size of memory.
+    * Fix the bug that Sys#accept method may allocate a wrong size of memory.
+  [New Features]
+    * Add Sys::Socket#sendto method.
+    * Add Sys::Socket#recvfrom method.
+    * Add Sys#recvfrom method.
+  
+  [New Features that Will Removed in The Nearly Future]
+    * Add Sys::send_v2 method. This will replace Sys::send and will removed.
+  
+  [Future Changes with Imcompatible Changes]
+    * Sys#send method will be replaced with Sys#send_v2.
+  [Changes]
+    * Allow the $addr of Sys::Socket#sendto method undef.
+    
+0.516 2024-05-27
+  [New Features]
+    * Add push method to Sys::Poll::PollfdArray class.
+    * Add remove method to Sys::Poll::PollfdArray class.
+    * Add capacity field to Sys::Poll::PollfdArray class.
+    * Add $capacity optional argument to Sys::Poll::PollfdArray#new method.
+    
+0.515 2024-05-24
+  [Bug Fix]
+    * May fix the bug that Sys::IO#seekdir method does not work well.
+  [Exception Message Changes]
+    * Exception messages in native classes are improved.
+  [New Features]
+    * Add the seekdir method to Sys class.
+  [Changes]
+    * Sys#readdir method throws an exception if the directory stream is not defined or the directory stream is already closed.
+    * Sys#closedir method throws an exception if the directory stream is not defined or the directory stream is already closed.
+    * Sys#rewinddir method throws an exception if the directory stream is not defined or the directory stream is already closed.
+    * Sys#seekdir method throws an exception if the directory stream is not defined or the directory stream is already closed.
+    * Sys#telldir method throws an exception if the directory stream is not defined or the directory stream is already closed.
+    
+    * Sys#fileno method throws an exception if the stream is not defined or the stream is already closed.
+    * Sys#read method throws an exception if the stream is not defined or the stream is already closed.
+    * Sys#eof method throws an exception if the stream is not defined or the stream is already closed.
+    * Sys#readline method throws an exception if the stream is not defined or the stream is already closed.
+    * Sys#getc method throws an exception if the stream is not defined or the stream is already closed.
+    * Sys#print method throws an exception if the stream is not defined or the stream is already closed.
+    * Sys#close method throws an exception if the stream is not defined or the stream is already closed.
+    * Sys#seek method throws an exception if the stream is not defined or the stream is already closed.
+    * Sys#tell method throws an exception if the stream is not defined or the stream is already closed.
+    * Sys#pclose method throws an exception if the stream is not defined or the stream is already closed.
+    
+  [Test Improvement]
+    * Add tests for Sys#opendir method, Sys#readdir method, Sys#seekdir method, Sys#telldir method, Sys#rewinddir method, Sys#closedir method.
+    
 0.514001 2024-03-27
   [Bug Fix]
     * Fix bug that config files cannot be parsed for SPVM version up.

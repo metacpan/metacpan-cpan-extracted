@@ -8,7 +8,7 @@ SPVM::Sys::Time - System Calls for Time Manipulation
 
 =head1 Description
 
-The Sys::Process class in L<SPVM> has methods to call system calls for time manipulation.
+Sys::Process class in L<SPVM> has methods to call system calls for time manipulation.
 
 =head1 Usage
   

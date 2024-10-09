@@ -6,7 +6,7 @@
   <div class="row">
     <TMPL_IF NAME="SESSIONS">
     <div class="card col border-secondary">
-      <div class="text-center bg-light text-dark"><b><span trspan="activeSessions">ACTIVE SSO SESSIONS</span>: <u><TMPL_VAR NAME="LOGIN"></u></b></div>
+      <div class="text-center bg-light text-dark"><b><span trspan="activeSessions">ACTIVE SSO SESSIONS</span>: <u><TMPL_VAR NAME="LOGIN" ESCAPE=HTML></u></b></div>
       <table class="table table-sm table-hover text-center">
         <thead>
           <tr>

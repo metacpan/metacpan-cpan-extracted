@@ -3,9 +3,16 @@ use Test::More;
 use strict;
 use IO::String;
 use Data::Dumper;
+use File::Temp 'tempdir';
+
+BEGIN {
+    $LLNG::TMPDIR =
+      tempdir( 'tmpSessionXXXXX', DIR => 't/sessions', CLEANUP => 1 );
+}
 
 require 't/test-lib.pm';
 require 't/smtp.pm';
+require 't/separate-handler.pm';
 
 use_ok('Lemonldap::NG::Common::FormEncode');
 count(1);
@@ -52,6 +59,19 @@ my $id = expectCookie($res);
 # After attempting to access test1,
 # the handler sends up back to /upgradesession
 # --------------------------------------------
+
+ok(
+    $res = handler(
+        req => [
+            GET => 'http://test1.example.com/level3',
+            [ Cookie => "lemonldap=$id" ]
+        ],
+    ),
+    'Handler request'
+);
+count(1);
+expectAuthenticatedAs( $res, 'dwho' );
+expectForbidden($res);
 
 ok(
     $res = $client->_get(
@@ -148,6 +168,19 @@ $id = expectCookie($res);
 my $cookies = getCookies($res);
 ok( !$cookies->{lemonldappdata}, " Make sure no pdata is returned" );
 count(1);
+
+ok(
+    $res = handler(
+        req => [
+            GET => 'http://test1.example.com/level3',
+            [ Cookie => "lemonldap=$id" ]
+        ],
+    ),
+    'Handler request'
+);
+count(1);
+expectAuthenticatedAs( $res, 'dwho' );
+expectOK($res);
 
 clean_sessions();
 

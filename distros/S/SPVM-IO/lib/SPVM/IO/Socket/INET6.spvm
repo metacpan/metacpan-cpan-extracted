@@ -1,0 +1,22 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class IO::Socket::INET6 extends IO::Socket::IP {
+  
+  use Sys::Socket::Constant as SOCKET;
+  
+  static method new : IO::Socket::INET6 ($options : object[] = undef) {
+    
+    my $self = new IO::Socket::INET6;
+    
+    $options = Fn->merge_options($options, {Domain => SOCKET->AF_INET6});
+    
+    $self->init($options);
+    
+    return $self;
+  }
+  
+  method accept : IO::Socket::INET6 ($peer_ref : Sys::Socket::Sockaddr[] = undef) {
+    return (IO::Socket::INET6)$self->SUPER::accept($peer_ref);
+  }
+}

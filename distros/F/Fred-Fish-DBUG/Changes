@@ -23,11 +23,16 @@
 
 Version - YYYY/MM/DD
 ---------------------
+2.07 2024-10-08 08:30:00
+  - Added more tests to  t/15-basic-help.t to help narrow down the issue.
+    If it doesn't help I'll make v5.14.0 the min version of perl.
+  - Stubbed out min version of perl.  Using 5.8.8 for now, easy to upgrade to
+    5.14.0 later.
+
 2.06 2024-10-04 08:30:00
   - Rats, it didn't fix things, pre-version 5.14.0 still broken.
     helper1234 now loaded directly via use in t/15-basic-help.t  
     If this fix works, I'll fix all the other t/*.t progs in the next release.
-    If it doesn't I'll make v5.14.0 the min version of perl.
 
 2.05 2024-10-01 08:30:00
   - In researching why certain CPAN Testers fail, it looks like use_ok() inside

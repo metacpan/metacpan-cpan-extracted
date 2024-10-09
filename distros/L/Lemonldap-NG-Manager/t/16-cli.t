@@ -67,8 +67,11 @@ ok( not($@), ' result is JSON' ) or diag "error: $@";
 my $tmpFile = File::Temp->new();
 print $tmpFile $res;
 @cmd = ( 'restore', $tmpFile->filename );
-combined_like( sub { llclient->run(@cmd) },
-    qr/"cfgNum"\s*:\s*\d*/s, 'New config' );
+combined_like(
+    sub { llclient->run(@cmd) },
+    qr/Configuration has been restored as version \d*/s,
+    'New config'
+);
 
 # Test 'set' command with force
 @cmd = qw(-yes 1 -force 1 -cfgNum 2 set useSafeJail 0);

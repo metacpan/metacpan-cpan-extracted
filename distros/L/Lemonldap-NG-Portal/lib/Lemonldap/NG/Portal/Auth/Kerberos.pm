@@ -157,18 +157,12 @@ sub _request_credential {
         $self->{AjaxInitScript} =~ s/kerberosChoice/kerberos/;
 
         # In some Combination scenarios, Kerberos may be called multiple
-        # times but we only want to add the JS once
-        unless ( $req->data->{_krbJsAlreadySent} ) {
-
-            $req->data->{customScript} .= $self->{AjaxInitScript};
-            $self->logger->debug(
-                "Send init/script -> " . $req->data->{customScript} );
-            $req->data->{_krbJsAlreadySent} = 1;
+        # times but we only need to initialize the display once
+        unless ( $req->data->{_krbInitAlreadyDone} ) {
+            $self->initDisplay($req);
+            $req->data->{_krbInitAlreadyDone} = 1;
         }
 
-        #$self->p->setHiddenFormValue( $req, kerberos => 0, '', 0 );
-        eval( $self->InitCmd );
-        die 'Unable to launch init commmand ' . $self->{InitCmd} if ($@);
         $req->data->{waitingMessage} = 1;
         return PE_FIRSTACCESS;
     }

@@ -31,6 +31,28 @@
                             gv_init(gv, stash, pv, len, flags)
 #endif
 
+#if !HAVE_PERL_VERSION(5, 22, 0)
+/* copypaste from perl-v5.22.0/perl.h */
+#  ifndef DEBUGGING
+#    if __has_builtin(__builtin_unreachable) \
+       || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5 || __GNUC__ > 4) /* 4.5 -> */
+#      define ASSUME(x) ((x) ? (void) 0 : __builtin_unreachable())
+#    elif defined(_MSC_VER)
+#      define ASSUME(x) __assume(x)
+#    elif defined(__ARMCC_VERSION) /* untested */
+#      define ASSUME(x) __promise(x)
+#    else
+/* a random compiler might define assert to its own special optimization token
+   so pass it through to C lib as a last resort */
+#      define ASSUME(x) assert(x)
+#    endif
+#  else
+#    define ASSUME(x) assert(x)
+#  endif
+
+#  define NOT_REACHED ASSUME(0)
+#endif
+
 #if HAVE_PERL_VERSION(5, 26, 0)
 #  define HAVE_SUB_SIGNATURES
 #endif
@@ -234,6 +256,9 @@ static SV *S_get_metaglob_slot(pTHX_ SV *metaglob, U8 svt, const char *slotname,
     case GET_OR_UNDEF_WITH_WARNING:
     case GET_OR_UNDEF:
       return &PL_sv_undef;
+
+    default:
+      NOT_REACHED;
   }
 }
 
@@ -311,10 +336,11 @@ bool
 is_class(SV *metapkg)
   CODE:
   {
-    HV *stash = MUST_STASH_FROM_REFSV(metapkg);
 #ifdef HAVE_FEATURE_CLASS
+    HV *stash = MUST_STASH_FROM_REFSV(metapkg);
     RETVAL = HvSTASH_IS_CLASS(stash);
 #else
+    PERL_UNUSED_VAR(metapkg);
     RETVAL = false;
 #endif
   }
@@ -355,6 +381,9 @@ get_glob(SV *metapkg, SV *name)
       case GET_OR_UNDEF:
         RETVAL = &PL_sv_undef;
         break;
+
+      default:
+        NOT_REACHED;
     }
   }
   OUTPUT:
@@ -496,6 +525,9 @@ get_symbol(SV *metapkg, SV *name, SV *value = NULL)
       case GET_OR_UNDEF:
         RETVAL = &PL_sv_undef;
         break;
+
+      default:
+        NOT_REACHED;
     }
   }
   OUTPUT:
@@ -545,7 +577,6 @@ remove_symbol(SV *metapkg, SV *name)
     char sigil = SvPV_nolen(name)[0];
     SV *basename = newSVpvn_flags(SvPV_nolen(name) + 1, SvCUR(name) - 1,
         (SvUTF8(name) ? SVf_UTF8 : 0) | SVs_TEMP);
-    SV *ret = NULL;
     HE *he = hv_fetch_ent(stash, basename, 0, 0);
     if(!he)
       goto missing;
@@ -647,16 +678,16 @@ _list_symbols(SV *metapkg, SV *sigils)
       bool is_subpackage = keylen > 2 && keypv[keylen-2] == ':' && keypv[keylen-1] == ':';
       if(is_subpackage)
         continue;
-#define PUSH_SVREF_IF(sv, sigil)                               \
-      if((sv) &&                                               \
-          (!sigilfilter || strchr(sigilfilter, sigil))) {      \
-        SV *_sv = (SV *)(sv);                                  \
-        SV *namesv = newSVpvf("%c%.*s", sigil, keylen, keypv); \
-        if(HeUTF8(he)) SvUTF8_on(namesv);                      \
-        EXTEND(SP, 2);                                         \
-        mPUSHs(namesv);                                        \
-        mPUSHs(wrap_sv_refsv(_sv));                            \
-        retcount += 2;                                         \
+#define PUSH_SVREF_IF(sv, sigil)                                    \
+      if((sv) &&                                                    \
+          (!sigilfilter || strchr(sigilfilter, sigil))) {           \
+        SV *_sv = (SV *)(sv);                                       \
+        SV *namesv = newSVpvf("%c%.*s", sigil, (int)keylen, keypv); \
+        if(HeUTF8(he)) SvUTF8_on(namesv);                           \
+        EXTEND(SP, 2);                                              \
+        mPUSHs(namesv);                                             \
+        mPUSHs(wrap_sv_refsv(_sv));                                 \
+        retcount += 2;                                              \
       }
 
       SV *sv = HeVAL(he);
@@ -772,6 +803,9 @@ get(SV *cls, SV *globname)
     get_or_add = GET_OR_ADD
   CODE:
   {
+    if(SvROK(cls))
+      croak("meta::glob->get(name) should not be invoked on an instance "
+          "(did you mean to call one of the ->get_... methods?)");
     bool create = (ix == GET_OR_ADD);
 
     warn_experimental("meta::glob->get");
@@ -786,6 +820,9 @@ get(SV *cls, SV *globname)
       case GET_OR_UNDEF:
         RETVAL = &PL_sv_undef;
         break;
+
+      default:
+        NOT_REACHED;
     }
   }
   OUTPUT:
@@ -921,10 +958,11 @@ bool
 is_method(SV *metasub)
   CODE:
   {
-    CV *cv = MUST_CV_FROM_REFSV(metasub);
 #ifdef HAVE_FEATURE_CLASS
+    CV *cv = MUST_CV_FROM_REFSV(metasub);
     RETVAL = CvIsMETHOD(cv);
 #else
+    PERL_UNUSED_VAR(metasub);
     RETVAL = false;
 #endif
   }
@@ -1111,6 +1149,9 @@ mandatory_params(SV *metasig)
       case 3:
         RETVAL = slurpy ? &PL_sv_undef : newSViv(params);
         break;
+
+      default:
+        NOT_REACHED;
     }
 #endif
   }

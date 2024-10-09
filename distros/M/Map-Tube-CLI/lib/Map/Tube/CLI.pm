@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.68';
+$Map::Tube::CLI::VERSION   = '0.69';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.68
+Version 0.69
 
 =cut
 
@@ -583,14 +583,6 @@ You can also look for information at:
 =item * BUGS / ISSUES
 
 L<https://github.com/manwar/Map-Tube-CLI/issues>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Map-Tube-CLI>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Map-Tube-CLI>
 
 =item * Search MetaCPAN
 

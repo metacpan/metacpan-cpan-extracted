@@ -268,6 +268,10 @@
       $scope.downloadOidcMetadata = function() {
         return window.open($scope.confPrefix + $scope.currentCfg.cfgNum + '?oidcMetadata=1');
       };
+      // Download SAML metadata
+      $scope.downloadSamlMetadata = function() {
+        return window.open($scope.confPrefix + $scope.currentCfg.cfgNum + '?samlMetadata=1');
+      };
       // Main save function
       $scope.save = function() {
         $scope.showModal('save.html').then(function() {

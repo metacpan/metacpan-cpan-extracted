@@ -47,20 +47,20 @@ ENDKEY
         sign_count    => 18,
     );
 
-    #FIXME
     my $webauthn_tester = $webauthn_tester_1;
 
     my $res;
 
+    my $ini = {
+        logLevel                   => 'error',
+        useSafeJail                => 1,
+        webauthn2fSelfRegistration => 1,
+        webauthn2fActivation       => 1,
+        webauthn2fUserCanRemoveKey => 1,
+        webauthnDisplayNameAttr    => 'cn',
+    };
     my $client = LLNG::Manager::Test->new( {
-            ini => {
-                logLevel                   => 'error',
-                useSafeJail                => 1,
-                webauthn2fSelfRegistration => 1,
-                webauthn2fActivation       => 1,
-                webauthn2fUserCanRemoveKey => 1,
-                webauthnDisplayNameAttr    => 'cn',
-            }
+            ini => $ini
         }
     );
 
@@ -104,6 +104,12 @@ ENDKEY
             'Show WebAuthn registration'
         );
 
+        expectXpath( $res,
+                '//script[@src="/static/common/js/'
+              . 'webauthn-json.browser-global.min.js"]' );
+        expectXpath( $res,
+            '//script[@src="/static/common/js/webauthnregistration.min.js"]' );
+
         like(
             $res->[2]->[0],
             qr%<img src="/static/bootstrap/webauthn.png"%,
@@ -118,8 +124,9 @@ ENDKEY
     }
 
     sub register_new_device {
-        my ( $client, $id, $webauthn_tester, $device_name, $expected_error ) =
-          @_;
+        my ( $client, $id, $webauthn_tester, $device_name, $transports,
+            $expected_error )
+          = @_;
         my $res;
 
         ok(
@@ -153,6 +160,7 @@ ENDKEY
 
         my $credential_response =
           $webauthn_tester->get_credential_response($reg_challenge);
+        $credential_response->{response}->{transports} = $transports;
         my $registration_response = buildForm( {
                 credential =>
                   $webauthn_tester->encode_credential($credential_response),
@@ -265,7 +273,7 @@ ENDKEY
 'pQECAyYgASFYIM_oQXEUzjPwEhM4gWmIbCuOXc4Ja8jPDKxbQaZckal7Ilgg_9a693_nkf7flk1S9AV2tjrtJPF6kg8TCGbFKoeD9Wc',
                 '_signCount' => 5,
                 'name'       => "MyFirstDevice",
-                'type'       => 'WebAuthn'
+                'type'       => 'WebAuthn',
             },
             "Registration contains expected data"
         );
@@ -276,8 +284,10 @@ ENDKEY
                 '_credentialPublicKey' =>
 'pQECAyYgASFYIM_oQXEUzjPwEhM4gWmIbCuOXc4Ja8jPDKxbQaZckal7Ilgg_9a693_nkf7flk1S9AV2tjrtJPF6kg8TCGbFKoeD9Wc',
                 '_signCount' => 18,
-                'name'       => "MySecondDevice",
-                'type'       => 'WebAuthn'
+                '_transports', 'usb,nfc',
+                'name'   => "MySecondDevice",
+                'type'   => 'WebAuthn',
+                resident => 1,
             },
             "Registration contains expected data"
         );
@@ -305,7 +315,7 @@ ENDKEY
                 '_credentialId'        => encode_base64url($credential_id_1),
                 '_credentialPublicKey' =>
 'pQECAyYgASFYIM_oQXEUzjPwEhM4gWmIbCuOXc4Ja8jPDKxbQaZckal7Ilgg_9a693_nkf7flk1S9AV2tjrtJPF6kg8TCGbFKoeD9Wc',
-                '_signCount' => 6,
+                '_signCount' => 7,
                 'name'       => "MyFirstDevice",
                 'type'       => 'WebAuthn'
             },
@@ -332,7 +342,45 @@ ENDKEY
         my $epoch = $tr->getAttribute('epoch');
         ok( $epoch, "Found epoch for $name" );
 
-        my $delete_query = buildForm( { epoch => $epoch } );
+        {
+            my $delete_query = buildForm( { epoch => $epoch } );
+            $res = $client->_post(
+                '/2fregisters/webauthn/delete',
+                $delete_query,
+                length => length($delete_query),
+                cookie => "lemonldap=$id",
+            );
+            my $json = expectBadRequest($res);
+            ok(
+                $res->[2]->[0] =~ 'csrfToken',
+                "Deletion expects valid CSRF token"
+            );
+        }
+
+        {
+            my $delete_query =
+              buildForm( { epoch => $epoch, csrf_token => "123456" } );
+            $res = $client->_post(
+                '/2fregisters/webauthn/delete',
+                $delete_query,
+                length => length($delete_query),
+                cookie => "lemonldap=$id",
+            );
+            my $json = expectBadRequest($res);
+            ok(
+                $res->[2]->[0] =~ 'csrfToken',
+                "Deletion expects valid CSRF token"
+            );
+        }
+
+        $res = $client->_get(
+            '/2fregisters',
+            cookie => "lemonldap=$id",
+            accept => "test/html",
+        );
+
+        my $delete_query = buildForm(
+            { epoch => $epoch, csrf_token => getJsVars($res)->{csrf_token} } );
         ok(
             $res = $client->_post(
                 '/2fregisters/webauthn/delete',
@@ -349,18 +397,23 @@ ENDKEY
     my $id = login_and_check_display($client);
 
     my $user_handle_1 =
-      register_new_device( $client, $id, $webauthn_tester_1, "MyFirstDevice" );
+      register_new_device( $client, $id, $webauthn_tester_1, "MyFirstDevice",
+        [] );
 
     # Register same device again, fails because credential ID is already taken
     register_new_device( $client, $id, $webauthn_tester_1,
-        "MyAlreadyRegisteredDevice", "webauthnAlreadyRegistered" );
+        "MyAlreadyRegisteredDevice", [], "webauthnAlreadyRegistered" );
 
     # Make sure epoch is different
     Time::Fake->offset("+10m");
 
+    # Require resident key
+    $client->ini( { %$ini, webauthn2fResidentKey => "required" } );
+
     # Register a different device should succeed
     my $user_handle_2 =
-      register_new_device( $client, $id, $webauthn_tester_2, "MySecondDevice" );
+      register_new_device( $client, $id, $webauthn_tester_2, "MySecondDevice",
+        [ "usb", "nfc" ] );
 
     # userHandle was kept from first registration
     is( $user_handle_2, $user_handle_1,
@@ -376,8 +429,28 @@ ENDKEY
                 'type' => 'public-key'
             },
             {
-                'id'   => encode_base64url($credential_id_2),
-                'type' => 'public-key'
+                'id'         => encode_base64url($credential_id_2),
+                'type'       => 'public-key',
+                'transports' => [ 'usb', 'nfc' ],
+            }
+        ]
+    );
+
+    # Check that webauthnDefaultTransports are correctly applied
+    $client->ini(
+        { %{ $client->ini }, webauthnDefaultTransports => "usb, nfc, ble" } );
+    verify_device(
+        $client, $id,
+        $webauthn_tester_1,
+        [ {
+                'id'         => encode_base64url($credential_id_1),
+                'type'       => 'public-key',
+                'transports' => [ 'usb', 'nfc', 'ble' ],
+            },
+            {
+                'id'         => encode_base64url($credential_id_2),
+                'type'       => 'public-key',
+                'transports' => [ 'usb', 'nfc' ],
             }
         ]
     );

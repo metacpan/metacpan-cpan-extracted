@@ -8,7 +8,7 @@ SPVM::Sys::OS - OS Information
 
 =head1 Description
 
-The SPVM::Sys::OS class in L<SPVM> has methods to get OS information.
+Sys::OS class in L<SPVM> has methods to get OS information.
 
 =head1 Usage
 

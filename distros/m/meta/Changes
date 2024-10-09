@@ -1,5 +1,9 @@
 Revision history for meta
 
+0.011   2024-10-08
+        [BUGFIXES]
+         * Various small fixes to avoid upsetting `gcc -Wall`
+
 0.010   2024-10-01
         [CHANGES]
          * Added `$metasub->signature` and the meta-signature object

@@ -8,7 +8,7 @@ SPVM::Sys::Signal - Signals
 
 =head1 Description
 
-The Sys::Signal class in L<SPVM> has methods to manipulate signals.
+Sys::Signal class in L<SPVM> has methods to manipulate signals.
 
 =head1 Usage
   

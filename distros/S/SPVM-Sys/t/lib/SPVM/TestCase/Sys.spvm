@@ -8,6 +8,10 @@ class TestCase::Sys {
   use Fn;
   use Errno;
   
+  our $TEST_DIR : rw string;
+  
+  static method TEST_DIR_FTEST : string () { return "$TEST_DIR/ftest"; }
+  
   static method A : int () {
     
     {
@@ -1060,4 +1064,227 @@ class TestCase::Sys {
     
     return &env;
   }
+  
+  static method opendir : int () {
+    
+    my $test_dir = &TEST_DIR;
+    
+    my $test_dir_ftest = &TEST_DIR_FTEST;
+    
+    {
+      my $dir_stream_ref = [(Sys::IO::DirStream)undef];
+      Sys->opendir($dir_stream_ref, $test_dir_ftest);
+      my $dir_stream = $dir_stream_ref->[0];
+      
+      unless ($dir_stream) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method readdir : int () {
+    
+    my $test_dir_ftest = &TEST_DIR_FTEST;
+    
+    {
+      my $dir_stream_ref = [(Sys::IO::DirStream)undef];
+      Sys->opendir($dir_stream_ref, $test_dir_ftest);
+      my $dir_stream = $dir_stream_ref->[0];
+      
+      Fn->defer([$dir_stream : Sys::IO::DirStream] method : void () {
+        Sys->closedir($dir_stream);
+      });
+      
+      unless ($dir_stream) {
+        return 0;
+      }
+      
+      Sys->rewinddir($dir_stream);
+      Sys->rewinddir($dir_stream);
+      
+      {
+        my $current_offset = Sys->telldir($dir_stream);
+        unless ($current_offset == 0) {
+          return 0;
+        }
+      }
+      
+      {
+        my $current_offset = Sys->telldir($dir_stream);
+        unless ($current_offset == 0) {
+          return 0;
+        }
+      }
+      
+      my $check_file_count = 0;
+      while (my $dirent = Sys->readdir($dir_stream)) {
+        my $d_name = $dirent->d_name;
+        
+        if ($d_name eq "foo.txt") {
+          $check_file_count++;
+        }
+        elsif ($d_name eq "bar.txt") {
+          $check_file_count++;
+        }
+      }
+      
+      unless ($check_file_count == 2) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method seekdir : int () {
+    
+    my $test_dir_ftest = &TEST_DIR_FTEST;
+    
+    {
+      my $dir_stream_ref = [(Sys::IO::DirStream)undef];
+      Sys->opendir($dir_stream_ref, $test_dir_ftest);
+      my $dir_stream = $dir_stream_ref->[0];
+      
+      my $dirent = Sys->readdir($dir_stream);
+      
+      my $offset = Sys->telldir($dir_stream);
+      
+      my $dirent_next = Sys->readdir($dir_stream);
+      
+      my $dirent_next_d_name = $dirent_next->d_name;
+      
+      Sys->seekdir($dir_stream, $offset);
+      
+      my $dirent2 = Sys->readdir($dir_stream);
+      
+      my $dirent2_d_name = $dirent2->d_name;
+      
+      unless ($dirent) {
+        warn;
+        return 0;
+      }
+      
+      unless ($dirent2) {
+        warn;
+        return 0;
+      }
+      
+      unless ($dirent2_d_name eq $dirent_next_d_name) {
+        warn;
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method telldir : int () {
+    
+    my $test_dir_ftest = &TEST_DIR_FTEST;
+    
+    {
+      my $dir_stream_ref = [(Sys::IO::DirStream)undef];
+      Sys->opendir($dir_stream_ref, $test_dir_ftest);
+      my $dir_stream = $dir_stream_ref->[0];
+      
+      my $dirent = Sys->readdir($dir_stream);
+      
+      my $offset = Sys->telldir($dir_stream);
+      
+      my $dirent_next = Sys->readdir($dir_stream);
+      
+      my $dirent_next_d_name = $dirent_next->d_name;
+      
+      Sys->seekdir($dir_stream, $offset);
+      
+      my $dirent2 = Sys->readdir($dir_stream);
+      
+      my $dirent2_d_name = $dirent2->d_name;
+      
+      unless ($dirent) {
+        warn;
+        return 0;
+      }
+      
+      unless ($dirent2) {
+        warn;
+        return 0;
+      }
+      
+      unless ($dirent2_d_name eq $dirent_next_d_name) {
+        warn;
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method rewinddir : int () {
+    
+    my $test_dir_ftest = &TEST_DIR_FTEST;
+    
+    {
+      my $dir_stream_ref = [(Sys::IO::DirStream)undef];
+      Sys->opendir($dir_stream_ref, $test_dir_ftest);
+      my $dir_stream = $dir_stream_ref->[0];
+      
+      my $dirent = Sys->readdir($dir_stream);
+      
+      Sys->rewinddir($dir_stream);
+      
+      my $dirent2 = Sys->readdir($dir_stream);
+      
+      unless ($dirent) {
+        warn;
+        return 0;
+      }
+      
+      unless ($dirent2) {
+        warn;
+        return 0;
+      }
+      
+      unless ($dirent2->d_name eq $dirent->d_name) {
+        warn;
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method closedir : int () {
+    
+    my $test_dir_ftest = &TEST_DIR_FTEST;
+    
+    {
+      my $dir_stream_ref = [(Sys::IO::DirStream)undef];
+      Sys->opendir($dir_stream_ref, $test_dir_ftest);
+      my $dir_stream = $dir_stream_ref->[0];
+      
+      unless ($dir_stream) {
+        return 0;
+      }
+      
+      if ($dir_stream->closed) {
+        warn $dir_stream->closed;
+        return 0;
+      }
+      
+      Sys->closedir($dir_stream);
+      
+      unless ($dir_stream->closed) {
+        warn $dir_stream->closed;
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
 }

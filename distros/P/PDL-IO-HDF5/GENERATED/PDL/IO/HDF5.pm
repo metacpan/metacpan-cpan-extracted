@@ -1,19 +1,17 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::IO::HDF5;
 
 our @EXPORT_OK = qw( );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core qw/ barf/;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   our $VERSION = '0.75';
+   our $VERSION = '0.76';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::HDF5 $VERSION;
@@ -22,10 +20,12 @@ use DynaLoader;
 
 
 
+
+
+#line 2519 "hdf5.pd"
+
 use PDL::Lite;
 use PDL::Char;
-
-
 
 # Require needed here becuase dataset uses some of the XS 
 #  calls that are defined in PDL::IO::HDF5 (like PDL::IO::HDF5::H5T_NATIVE_CHAR() )
@@ -33,7 +33,6 @@ use PDL::Char;
 #
 require PDL::IO::HDF5::Group;
 require PDL::IO::HDF5::Dataset;
-
 
 use Carp;
 
@@ -59,17 +58,11 @@ sub AUTOLOAD {
     goto &$AUTOLOAD;
 }
 
-
-
-
-
-
-
+#line 22 "hdf5.pd"
 
 =head1 NAME
 
 PDL::IO::HDF5 - PDL Interface to the HDF5 Data Format.
-
 
 =head1 DESCRIPTION
 
@@ -154,7 +147,6 @@ Name of the file.
 =item accessMode
 
 Access Mode?? ( read /write etc????)
-
 
 =item attrIndex
 
@@ -251,8 +243,6 @@ B<Example:>
 
 =cut
 
-
-
 sub new {
   my $type = shift;
   my $file = shift;
@@ -291,7 +281,6 @@ sub new {
       
       $self->{accessMode} = 'r';
 
-
     }
   }
   else{  # File doesn't exist, create it:
@@ -316,14 +305,11 @@ sub new {
   bless $self, $type;
 }
 
-
-
 =head2 filename
 
 =for ref
 
 Get the filename for the HDF5 file
-
 
 B<Usage:>
 
@@ -348,7 +334,6 @@ sub filename {
 Open or create a group in the root "/" group (i.e. top level)
 of the HDF5 file.
 
-
 B<Usage:>
 
 =for usage
@@ -357,8 +342,6 @@ B<Usage:>
    
    
 Returns undef on failure, 1 on success.
-
-
 
 =cut
 
@@ -375,14 +358,12 @@ sub group {
 
 }
 
-
 =head2 groups
 
 =for ref
 
 Get a list of groups in the root "/" group (i.e. top level)
 of the HDF5 file.
-
 
 B<Usage:>
 
@@ -403,14 +384,12 @@ sub groups {
 
 }
 
-
 =head2 unlink
 
 =for ref
 
 Unlink an object from the root "/" group (i.e. top level)
 of the HDF5 file.
-
 
 B<Usage:>
 
@@ -429,14 +408,12 @@ sub unlink {
 	return 1;
 }
 
-
 =head2 dataset
 
 =for ref
 
 Open or create a dataset in the root "/" group (i.e. top level)
 of the HDF5 file.
-
 
 B<Usage:>
 
@@ -461,13 +438,11 @@ sub dataset {
 	return $self->group("/")->dataset($name);
 }
 
-
 =head2 datasets
 
 =for ref
 
 Get a list of all dataset names in the root "/" group.
-
 
 B<Usage:>
 
@@ -488,8 +463,6 @@ sub datasets{
 	
 	return $self->group("/")->datasets;
 }
-
-
 
 =head2 attrSet
 
@@ -524,7 +497,6 @@ Note: This is a convenience method that is equivalent to:
 				 .
 				);
 
-
 =cut
 
 sub attrSet {
@@ -535,8 +507,6 @@ sub attrSet {
 	
 	return $self->group("/")->attrSet(%attrs);
 }
-
-
 
 =head2 attrGet
 
@@ -553,7 +523,6 @@ B<Usage:>
 
    @attrValues = $HDFfile->attrGet( 'attr1', 'attr2' );
 
-
 =cut
 
 sub attrGet {
@@ -564,8 +533,6 @@ sub attrGet {
 	
 	return $self->group("/")->attrGet(@attrs);
 }
-
-
 
 =head2 attrDel
 
@@ -595,7 +562,6 @@ Note: This is a convenience method that is equivalent to:
 				 .
 				);
 
-
 =cut
 
 sub attrDel {
@@ -607,13 +573,11 @@ sub attrDel {
 
 }
 
-
 =head2 attrs
 
 =for ref
 
 Get a list of all attribute names in the root "/" group of the file.
-
 
 B<Usage:>
 
@@ -639,7 +603,6 @@ sub attrs {
 =for ref
 
 Create a reference to part of a dataset in the root "/" group of the file.
-
 
 B<Usage:>
 
@@ -675,17 +638,14 @@ sub reference {
 Internal Method to build the attribute index hash
 for the object
 
-
 B<Usage:>
 
 =for usage
 
    $hdf5obj->_buildAttrIndex;
 
-
  Output:
     Updated attrIndex data member
-
 
 =cut
 
@@ -717,7 +677,6 @@ sub _buildAttrIndex{
 	
 }
 
-
 =head2 clearAttrIndex
 
 =for ref
@@ -726,7 +685,6 @@ Method to clear the attribute index hash
 for the object. This is a mostly internal method that is
 called whenever some part of the HDF5 file has changed and the
 L<attrIndex> index is no longer valid.
-
 
 B<Usage:>
 
@@ -750,7 +708,6 @@ sub clearAttrIndex{
 Internal Method to build the groupIndex hash
 for the object
 
-
 B<Usage:>
 
 =for usage
@@ -764,13 +721,11 @@ B<Usage:>
  Output:
     Updated groupIndex data member
 
-
 =cut
 
 sub _buildGroupIndex{
 
 	my ($self,@attrs) = @_;
-
 
 	@attrs = sort @attrs; # Sort the attributes so the order won't matter
 	
@@ -812,7 +767,6 @@ sub _buildGroupIndex{
 
 }
 
-
 =head2 clearGroupIndex
 
 =for ref
@@ -821,7 +775,6 @@ Method to clear the group index hash
 for the object. This is a mostly internal method that is
 called whenever some part of the HDF5 file has changed and the
 L<groupIndex> index is no longer valid.
-
 
 B<Usage:>
 
@@ -923,7 +876,6 @@ sub allAttrValues{
 	if( @attrs == 1) { # Single Argument Processing
 		my $attr = $attrs[0];
 
-
 		my $group;
 
 		my @values;
@@ -1007,8 +959,6 @@ sub allAttrNames{
 	
 	my $attrIndex = $self->{attrIndex};
 
-
-
 	my $group;
 
 	my %names;
@@ -1075,7 +1025,6 @@ sub nameGet{
 		
 }
 
-
 =head2 DESTROY
 
 =for ref
@@ -1089,7 +1038,6 @@ B<Usage:>
    No Usage. Automatically called
 
 =cut
-
 
 sub DESTROY {
   my $self = shift;
@@ -1115,16 +1063,16 @@ sub packList{
 	}
 	
 
-
+#line 1080 "hdf5.pd"
 	@list = map (( $_,0 ), @list); # Intersperse zeros to make 64 bit hsize_t
 
+#line 1088 "hdf5.pd"
 	my $list = pack ("L*", @list);
 	
 	return $list;
 }
 
-
-
+#line 1095 "hdf5.pd"
 # 
 # Utility function (Not a Method!!!)
 #  to unpack a perl list from a binary structure
@@ -1144,9 +1092,10 @@ sub unpackList{
 						    # the output numbers are 64bit.
 	
 
-
+#line 1122 "hdf5.pd"
 	my $unpackString = "Lxxxx" x $listLength; # 4 xxxx used to toss upper 32 bits
 
+#line 1129 "hdf5.pd"
 	my @list = unpack( $unpackString, $binaryStruct );
 	
 	return @list;
@@ -1159,15 +1108,8 @@ John Cerney, j-cerney1@raytheon.com
 Andrew Benson, abenson@obs.carnegiescience.edu
 
 =cut
-
-
-
-;
-
-
+#line 1112 "HDF5.pm"
 
 # Exit with OK status
 
 1;
-
-		   

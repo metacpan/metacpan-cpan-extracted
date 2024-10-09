@@ -140,7 +140,7 @@ sub issuer {
                   "$main::tmpDir/main-sps-renater-metadata.xml",
                 logLevel         => $debug,
                 domain           => 'idp.com',
-                portal           => 'http://auth.idp.com',
+                portal           => 'http://auth.idp.com/',
                 authentication   => 'Demo',
                 userDB           => 'Same',
                 demoExportedVars => {
@@ -189,7 +189,7 @@ sub sp {
 "t/main-idps-renater-metadata.xml t/main-sps-renater-metadata.xml",
                 logLevel               => $debug,
                 domain                 => 'sp.com',
-                portal                 => 'http://auth.sp.com',
+                portal                 => 'http://auth.sp.com/',
                 authentication         => 'SAML',
                 userDB                 => 'Same',
                 issuerDBSAMLActivation => 0,

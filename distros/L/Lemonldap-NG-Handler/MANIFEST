@@ -24,12 +24,12 @@ lib/Lemonldap/NG/Handler/Lib/OAuth2.pm
 lib/Lemonldap/NG/Handler/Lib/PSGI.pm
 lib/Lemonldap/NG/Handler/Lib/SecureToken.pm
 lib/Lemonldap/NG/Handler/Lib/ServiceToken.pm
-lib/Lemonldap/NG/Handler/Lib/Status.pm
 lib/Lemonldap/NG/Handler/Lib/StatusConstants.pm
 lib/Lemonldap/NG/Handler/Lib/ZimbraPreAuth.pm
 lib/Lemonldap/NG/Handler/Main.pm
 lib/Lemonldap/NG/Handler/Main/Init.pm
 lib/Lemonldap/NG/Handler/Main/Jail.pm
+lib/Lemonldap/NG/Handler/Main/MsgActions.pm
 lib/Lemonldap/NG/Handler/Main/Reload.pm
 lib/Lemonldap/NG/Handler/Main/Run.pm
 lib/Lemonldap/NG/Handler/Main/SharedVariables.pm
@@ -74,6 +74,8 @@ t/05-Lemonldap-NG-Handler-Reload.t
 t/12-Lemonldap-NG-Handler-Jail.t
 t/13-Lemonldap-NG-Handler-Fake-Safe.t
 t/14-Lemonldap-NG-Handler-Rule-Building.t
+t/20-Default-Broker-with-cache.t
+t/20-Default-Broker.t
 t/50-Lemonldap-NG-Handler-SecureToken.t
 t/51-Lemonldap-NG-Handler-Zimbra.t
 t/60-Lemonldap-NG-Handler-PSGI-unprotected.t

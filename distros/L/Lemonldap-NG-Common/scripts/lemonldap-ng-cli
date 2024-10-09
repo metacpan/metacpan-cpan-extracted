@@ -47,6 +47,7 @@ elsif ( $action =~ /^(?:info|update-cache|test-email)$/ ) {
 else {
     pod2usage(1) if $action eq "help";
     pod2usage(2) if $action eq "usage";
+    pod2usage( -exitval => 2, -message => "Unknown action: $action" );
 }
 
 __END__

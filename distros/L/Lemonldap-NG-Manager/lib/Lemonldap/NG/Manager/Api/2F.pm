@@ -10,7 +10,7 @@ use Mouse;
 use JSON;
 
 use Lemonldap::NG::Common::Session;
-use Lemonldap::NG::Common::Util qw/genId2F display2F/;
+use Lemonldap::NG::Common::Util qw/genId2F display2F filterKey2F/;
 
 sub getSecondFactors {
     my ( $self, $req ) = @_;
@@ -192,14 +192,12 @@ sub _get2F {
             $self->logger->debug(
 "Check device [epoch=$device->{epoch}, type=$device->{type}, name=$device->{name}]"
             );
-            push @secondFactors,
-              {
-                id   => genId2F($device),
-                type => $device->{type},
-                name => $device->{name}
-              }
-              unless ( ( defined $type and uc($type) ne uc( $device->{type} ) )
-                or ( defined $id and $id ne genId2F($device) ) );
+            if (    ( !defined $type or uc($type) eq uc( $device->{type} ) )
+                and ( !defined $id or $id eq genId2F($device) ) )
+            {
+                push @secondFactors,
+                  { %{ filterKey2F($device) }, id => genId2F($device), };
+            }
         }
     }
     $self->logger->debug(

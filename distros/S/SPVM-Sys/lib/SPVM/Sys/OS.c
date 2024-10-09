@@ -25,7 +25,7 @@ int32_t SPVM__Sys__OS__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_macro_name = stack[0].oval;
   if (!obj_macro_name) {
-    return env->die(env, stack, "$macro_name must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The macro name $macro_name must be defined.", __func__, FILE_NAME, __LINE__);
   }
   const char* macro_name = env->get_chars(env, stack, obj_macro_name);
   
@@ -257,7 +257,7 @@ int32_t SPVM__Sys__OS__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
       *value_ref = dval;
     }
     else {
-      return env->die(env, stack, "$value_ref must be the int[], long[], or double[] type.", macro_name, __func__, FILE_NAME, __LINE__);
+      return env->die(env, stack, "The array $value_ref to store a value must be the int[], long[], or double[] type.", macro_name, __func__, FILE_NAME, __LINE__);
     }
   }
   

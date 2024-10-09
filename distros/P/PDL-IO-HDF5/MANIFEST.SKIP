@@ -66,3 +66,7 @@
 
 ^HDF5\..*
 ^xt/
+
+# Avoid CI configuration/runtime files
+\B\.github/workflows\b
+\B\.github/actions\b

@@ -45,7 +45,7 @@ sub extractFormInfo {
     }
 
     return PE_MALFORMEDUSER
-      unless ( $req->env->{$user_header} =~ /$self->{conf}->{userControl}/o );
+      unless ( $req->env->{$user_header} =~ /$self->{conf}->{userControl}/ );
 
     $req->{user} = $req->env->{$user_header};
     return PE_OK;

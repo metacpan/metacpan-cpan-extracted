@@ -14,7 +14,7 @@
         <td trspan="{{i[1]}}" id="{{i[1]+'label'}}" for="{{i[1]+'selectform'}}"></td>
         <td>
           <select id="{{i[1]+'selectform'}}" class="form-control" ng-model="currentNode.data[i[0]]" ng-change="execFilters(_findScopeByKey('authParams'))" aria-describedby="{{i[1]+'label'}}">
-            <option ng-repeat="item in _findContainer().select[i[0]]" ng-selected="item.k==currentNode.data[i[0]]" value="{{item.k}}">{{item.v}}</option>
+            <option ng-repeat="item in _findContainer().select[i[0]]" ng-selected="item.k==currentNode.data[i[0]]" value="{{item.k}}" trspan="{{item.v}}">{{item.v}}</option>
           </select>
         </td>
       </tr>

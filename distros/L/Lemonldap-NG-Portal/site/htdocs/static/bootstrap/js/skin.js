@@ -10,7 +10,7 @@ $(window).on("load", function() {
   $(".notifCheck").addClass("checkbox");
 
   // Collapse menu on click
-  $('.collapse li[class!="dropdown"]').on('click', function() {
+  $('.collapse li:not(".dropdown")').on('click', function() {
     if (!$('.navbar-toggler').hasClass('collapsed')) {
       $(".navbar-toggler").trigger("click");
     }

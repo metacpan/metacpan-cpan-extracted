@@ -149,7 +149,6 @@ sub run {
     }
 
     # Prepare form
-    my ( $checkLogins, $stayConnected ) = $self->getFormParams($req);
     my $tmp = $self->p->sendHtml(
         $req,
         'ext2fcheck',
@@ -190,6 +189,7 @@ sub verify {
     }
     my $uid = $session->{ $self->conf->{whatToTrace} };
     if ( $yubikey->{epoch} ) {
+        $req->data->{_2fDevice} = $yubikey;
         $self->userLogger->info(
             "User $uid authenticated with 2F device: " . display2F($yubikey) );
     }

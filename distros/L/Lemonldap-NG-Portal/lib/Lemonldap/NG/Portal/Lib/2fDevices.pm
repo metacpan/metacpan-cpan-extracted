@@ -79,7 +79,7 @@ sub update2fDevice {
 
 =item add2fDevice
 
-Register a new device
+Store a new device
 
     $self->add2fDevice($req, $info, $device);
 

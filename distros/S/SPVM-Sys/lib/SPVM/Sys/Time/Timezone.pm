@@ -8,7 +8,7 @@ SPVM::Sys::Time::Timezone - struct timezone in the C language
 
 =head1 Description
 
-The Sys::Time::Timezone class in L<SPVM> represents L<struct timezone|https://linux.die.net/man/2/gettimeofday> in the C language.
+Sys::Time::Timezone class in L<SPVM> represents L<struct timezone|https://linux.die.net/man/2/gettimeofday> in the C language.
 
 =head1 Usage
   

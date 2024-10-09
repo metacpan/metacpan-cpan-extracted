@@ -86,7 +86,7 @@ sub op {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'op.com',
-                portal                          => 'http://auth.op.com',
+                portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => 1,

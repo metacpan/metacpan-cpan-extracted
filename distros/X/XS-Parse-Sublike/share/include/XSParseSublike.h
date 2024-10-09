@@ -25,9 +25,7 @@ enum {
   XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL = 1<<1,
   XS_PARSE_SUBLIKE_FLAG_PREFIX        = 1<<2,
 
-  /* *Experimental* named parameter parsing support */
   XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS = 1<<3,
-  /* *Experimental* parameter attribute parsing support */
   XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES = 1<<4,
 
   /* Back-compat flags we hope to remove in the next ABI version */

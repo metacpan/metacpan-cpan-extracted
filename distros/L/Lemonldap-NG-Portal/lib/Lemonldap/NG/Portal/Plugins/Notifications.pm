@@ -70,7 +70,7 @@ sub init {
     # Search for configuration options
     my $type = $self->conf->{notificationStorage};
     unless ($type) {
-        $self->error('notificationStorage is not defined, aborting');
+        $self->logger->error('notificationStorage is not defined, aborting');
         return 0;
     }
 
@@ -78,7 +78,7 @@ sub init {
     $type = "Lemonldap::NG::Common::Notifications::$type";
     eval "require $type";
     if ($@) {
-        $self->error(
+        $self->logger->error(
             "Unable to load Lemonldap::NG::Common::Notifications::$type: $@");
         return 0;
     }
@@ -100,7 +100,7 @@ sub init {
           or return 0;
     }
     unless ( eval { $self->module->notifObject( $type->new($prms) ); } ) {
-        $self->error($@);
+        $self->logger->error($@);
         return 0;
     }
 

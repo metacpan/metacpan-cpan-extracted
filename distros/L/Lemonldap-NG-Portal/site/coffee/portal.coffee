@@ -16,31 +16,38 @@ translationFields = {}
 
 ppolicyResults = {}
 setResult = (field, result) ->
-	  ppolicyResults[field] = result
+	ppolicyResults[field] = result
 
-	  # Clear icon
-	  $("#" + field).removeClass('fa-times fa-check fa-spinner fa-pulse fa-info-circle fa-question-circle text-danger text-success text-info text-secondary')
-	  $("#" + field).attr('role', 'status')
+	displayIcon(field, result)
 
-	  # Display correct icon
-	  switch result
-		  when "good" then $("#" + field).addClass('fa-check text-success')
-		  when "bad"
-			  $("#" + field).addClass('fa-times text-danger')
-			  $("#" + field).attr('role', 'alert')
-		  when "unknown" then $("#" + field).addClass('fa-question-circle text-secondary')
-		  when "waiting" then $("#" + field).addClass('fa-spinner fa-pulse text-secondary')
-		  when "info" then $("#" + field).addClass('fa-info-circle text-info')
+	# Compute form validity from all previous results
+	if Object.values(ppolicyResults).every( (value) => ( value == "good" || value == "info" ) )
 
-	  # Compute form validity from all previous results
-	  if Object.values(ppolicyResults).every( (value) => ( value == "good" || value == "info" ) )
+			$('#newpassword').get(0)?.setCustomValidity('')
+	else
+			$('#newpassword').get(0)?.setCustomValidity(translate('PE28'))
+	updateBorder()
 
-			  $('.ppolicy').removeClass('border-danger').addClass('border-success')
-			  $('#newpassword').get(0)?.setCustomValidity('')
-	  else
-			  $('.ppolicy').removeClass('border-success').addClass('border-danger');
-			  $('#newpassword').get(0)?.setCustomValidity(translate('PE28'))
+displayIcon = (field, result) ->
+	# Clear icon
+	$("#" + field).removeClass('fa-times fa-check fa-spinner fa-pulse fa-info-circle fa-question-circle text-danger text-success text-info text-secondary')
+	$("#" + field).attr('role', 'status')
 
+	# Display correct icon
+	switch result
+		when "good" then $("#" + field).addClass('fa-check text-success')
+		when "bad"
+			$("#" + field).addClass('fa-times text-danger')
+			$("#" + field).attr('role', 'alert')
+		when "unknown" then $("#" + field).addClass('fa-question-circle text-secondary')
+		when "waiting" then $("#" + field).addClass('fa-spinner fa-pulse text-secondary')
+		when "info" then $("#" + field).addClass('fa-info-circle text-info')
+
+updateBorder = () ->
+	if $('#newpassword').get(0)?.checkValidity() and $('#confirmpassword').get(0)?.checkValidity()
+		$('.ppolicy').removeClass('border-danger').addClass('border-success')
+	else
+		$('.ppolicy').removeClass('border-success').addClass('border-danger');
 
 translatePage = (lang) ->
 	$.getJSON "#{window.staticPrefix}languages/#{lang}.json", (data) ->
@@ -301,12 +308,9 @@ $(window).on 'load', () ->
 	if datas['choicetab']
 		authMenuTabs.tabs "option", "active", $('#authMenu a[href="#' + datas['choicetab'] + '"]').parent().index()
 
-	if datas['login']
-		$("input[type=password]:first").focus()
-	else
-		# If there are no auto-focused fields, focus on first visible input
-		if $("input[autofocus]").length == 0
-			$("input[type!=hidden]:first").focus();
+	# If there are no auto-focused fields, focus on first visible input
+	if $("input[autofocus]").length == 0
+		$("input[type!=hidden]:first").focus();
 
 	# Open links in new windows if required
 	if datas['newwindow']
@@ -341,48 +345,22 @@ $(window).on 'load', () ->
 
 	# Language detection. Priority order:
 	#  0 - llnglanguage parameter
-	#  1 - cookie value
-	#  2 - first navigator.languages item that exists in window.availableLanguages
-	#  3 - first value of window.availableLanguages
+	#  1 - datas['language'] value (server-set from Cookie+Accept-Language)
 	if window.location.search
 		queryLang = getQueryParam('llnglanguage')
 		console.log 'Get lang from parameter' if queryLang
 		setCookieLang = getQueryParam('setCookieLang')
 		console.log 'Set lang cookie' if setCookieLang == 1
 	if !lang
-		lang = getCookie 'llnglanguage'
-		console.log 'Get lang from cookie' if lang && !queryLang
-	if !lang
-		if navigator
-			langs = []
-			langs2 = []
-			nlangs = [ navigator.language ]
-			if navigator.languages
-				nlangs = navigator.languages
-			for al in window.availableLanguages
-				langdiv += "<img class=\"langicon\" src=\"#{window.staticPrefix}common/#{al}.png\" title=\"#{al}\" alt=\"[#{al}]\"> "
-			for nl in nlangs
-				console.log 'Navigator lang', nl
-				for al in window.availableLanguages
-					console.log ' Available lang', al
-					re = new RegExp('^'+al+'-?')
-					if nl.match re
-						console.log '  Matching lang =', al
-						langs.push al
-					else if al.substring(0, 1) == nl.substring(0, 1)
-						langs2.push al
-			lang = if langs[0] then langs[0] else if langs2[0] then langs2[0] else window.availableLanguages[0]
-			console.log 'Get lang from navigator' if lang && !queryLang
-		else
-			lang = window.availableLanguages[0]
-			console.log 'Get lang from window' if lang && !queryLang
+		lang = window.datas['language']
+		console.log 'Get lang from server' if lang && !queryLang
 	else if lang not in window.availableLanguages
-		lang = window.availableLanguages[0]
-		console.log 'Lang not available -> Get default lang' if !queryLang
+		lang = window.datas['language']
+		console.log 'Lang not available -> Get lang from server' if !queryLang
 	if queryLang
 		if queryLang not in window.availableLanguages
-			console.log 'Lang not available -> Get default lang'
-			queryLang = window.availableLanguages[0]
+			console.log 'Lang not available -> Get lang from server'
+			queryLang = window.language
 		console.log 'Selected lang ->', queryLang
 		if setCookieLang
 			console.log 'Set cookie lang ->', queryLang
@@ -390,7 +368,6 @@ $(window).on 'load', () ->
 		translatePage(queryLang)
 	else
 		console.log 'Selected lang ->', lang
-	#	setCookie 'llnglanguage', lang, 3650 (Fix #2899)
 		translatePage(lang)
 
 	# Build language icons
@@ -411,16 +388,35 @@ $(window).on 'load', () ->
 
 		$(document).trigger(e, info)
 
+	checksamepass = () ->
+		if $('#confirmpassword').get(0)?.value and $('#confirmpassword').get(0)?.value == $('#newpassword').get(0)?.value
+			$('#confirmpassword').get(0)?.setCustomValidity('')
+			displayIcon("samepassword-feedback", "good")
+			updateBorder()
+			return true
+		else
+			$('#confirmpassword').get(0)?.setCustomValidity(translate('PE34'))
+			displayIcon("samepassword-feedback", "bad")
+			updateBorder()
+			return false
+
 	if window.datas.ppolicy? and $('#newpassword').length
 		# Initialize display
 		checkpassword ''
+		checksamepass()
+
+		$('#confirmpassword').keyup (e) ->
+			checksamepass()
+			return
 
 		$('#newpassword').keyup (e) ->
 			checkpassword e.target.value
+			checksamepass()
 			return
 
 		$('#newpassword').focusout (e) ->
 			checkpassword e.target.value, "focusout"
+			checksamepass()
 			return
 
 	# If generating password, disable policy check
@@ -434,14 +430,6 @@ $(window).on 'load', () ->
 				checkpassword e.target.value
 				return
 			checkpassword ''
-
-	checksamepass = () ->
-		if $('#confirmpassword').get(0)?.value == $('#newpassword').get(0)?.value
-			$('#confirmpassword').get(0)?.setCustomValidity('')
-			return true
-		else
-			$('#confirmpassword').get(0)?.setCustomValidity(translate('PE34'))
-			return false
 
 	$('#newpassword').change checksamepass
 	$('#confirmpassword').change checksamepass
@@ -575,6 +563,13 @@ $(window).on 'load', () ->
 			$('#btn-back-to-top').css("display","block")
 		else
 			$('#btn-back-to-top').css("display","none")
+
+	$('.btn-single-submit').on 'click', (event) ->
+		if $(this).data('data-submitted') == true
+			event.preventDefault()
+			$(this).prop('disabled',true)
+		else
+			$(this).data('data-submitted', true)
 
 	$(document).trigger "portalLoaded"
 	true

@@ -18,11 +18,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 extends
   qw/Lemonldap::NG::Portal::Main::Plugin Lemonldap::NG::Portal::Lib::SMTP/;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 # INITIALIZATION
 
 has requireOldPwdRule => ( is => 'rw' );
+has ott               => ( is => 'rw' );
 
 sub init {
     my ($self) = shift;
@@ -33,6 +34,9 @@ sub init {
         )
     );
     return 0 unless $self->requireOldPwdRule;
+
+    $self->ott( $self->p->loadModule('::Lib::OneTimeToken') ) or return 0;
+    $self->ott->timeout( $self->conf->{formTimeout} );
 
     $self->p->{_passwordDB} = $self;
 }
@@ -66,10 +70,17 @@ sub _modifyPassword {
 
     # Check if portal require old password
     if ( $oldPwdRule->( $req, $req->userData ) or $requireOldPwd ) {
-        unless ( $req->data->{oldpassword} = $req->param('oldpassword') ) {
-            $self->logger->warn("Portal require old password");
+        unless ( $req->param('oldpassword') ) {
+            $self->logger->warn('Portal require old password');
             return PE_PP_MUST_SUPPLY_OLD_PASSWORD;
         }
+        my $token;
+        $token = $self->ott->getToken( $req->param('oldpassword') )
+          if $self->conf->{hideOldPassword} && $requireOldPwd;
+        $req->data->{oldpassword} =
+            $token
+          ? $self->conf->{cipher}->decrypt( $token->{oldpassword} )
+          : $req->param('oldpassword');
 
         # Verify old password
         return PE_BADOLDPASSWORD
@@ -126,47 +137,20 @@ sub _modifyPassword {
               $self->p->getFirstValue(
                 $req->{sessionInfo}->{ $self->conf->{mailSessionKey} } );
 
-            # Build mail content
-            my $tr      = $self->translate($req);
-            my $subject = $self->conf->{mailSubject};
-            unless ($subject) {
-                $subject = 'mailSubject';
-                $tr->( \$subject );
-            }
-            my $body;
-            my $html;
             my $password = $req->data->{newpassword};
-
-            if ( $self->conf->{mailBody} ) {
-
-                # We use a specific text message, no html
-                $body = $self->conf->{mailBody};
-
-                # Replace variables in body
-                $body =~ s/\$password/$password/g;
-                $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
-
-            }
-
-            else {
-
-                # Use HTML template
-                $body = $self->loadMailTemplate(
-                    $req,
-                    'mail_password',
-                    filter => $tr,
-                    params => {
-                        password => $password,
-                    },
-                );
-                $html = 1;
-            }
 
             # Send mail
             unless (
-                $self->send_mail(
-                    $req->data->{mailAddress},
-                    $subject, $body, $html
+                $self->sendEmail(
+                    $req,
+                    subject       => $self->conf->{mailSubject},
+                    subject_trmsg => 'mailSubject',
+                    body          => $self->conf->{mailBody},
+                    body_template => 'mail_password',
+                    dest          => $req->data->{mailAddress},
+                    params        => {
+                        password => $password,
+                    }
                 )
               )
             {

@@ -73,18 +73,6 @@ class TestCase::IO::File {
     return 1;
   }
   
-  static method syswrite : int ($file : string) {
-    
-    my $io_file = IO::File->new($file, ">");
-    unless ($io_file) {
-      return 0;
-    }
-    
-    $io_file->syswrite("Hello");
-    
-    return 1;
-  }
-  
   static method print_newline : int ($file : string) {
     my $io_file = IO::File->new($file, ">");
     unless ($io_file) {
@@ -169,48 +157,7 @@ class TestCase::IO::File {
 
     return 1;
   }
-
-  static method sysread : int ($file : string) {
-    {
-      my $io_file = IO::File->new($file, "<");
-      unless ($io_file) {
-        die "Can't open file $file";
-      }
-      
-      my $buffer = (mutable string)new_string_len 5;
-      {
-        my $sysread_length = $io_file->sysread($buffer, length $buffer);
-        unless ((string)$buffer eq "abcd\n") {
-          return 0;
-        }
-        unless ($sysread_length == 5) {
-          return 0;
-        }
-      }
-      
-      {
-        my $sysread_length = $io_file->sysread($buffer, length $buffer);
-        unless ((string)$buffer eq "fghi\n") {
-          return 0;
-        }
-        unless ($sysread_length == 5) {
-          return 0;
-        }
-      }
-      {
-        my $sysread_length = $io_file->sysread($buffer, length $buffer);
-        unless (Fn->substr($buffer, 0, 4) eq "klm\n") {
-          return 0;
-        }
-        unless ($sysread_length == 4) {
-          return 0;
-        }
-      }
-    }
-
-    return 1;
-  }
-
+  
   static method getline : int ($file : string) {
     my $io_file = IO::File->new($file, "<");
     unless ($io_file) {

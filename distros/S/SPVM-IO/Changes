@@ -1,3 +1,144 @@
+0.220001 2023-10-09
+  [Test Fix]
+    * Disable server tests for IO::Socket::IP for Windows segfault for now.
+0.220 2023-10-09
+  [New Features]
+    * Add IO#open method.
+    * Add IO#opendir method.
+  [Test Improvement]
+    * Add tests for IO::Socket::IP server features with goroutines.
+0.219 2023-06-14
+  [Support Changes]
+    * Does not support 32bit systems.
+  [Requirement Changes]
+    * Require SPVM::Sys 0.524.
+    * Require Perl v5.20.3.
+    * Remove Test::TCP requirement.
+    * Remove IO 1.55 requirement.
+    * Remove Mojolicious requirement.
+    
+  [New Features]
+    * Add IO::Socket#accept method. This has existed, but not documented.
+    * Add IO::Socket::IP#accept method.
+    * Add IO::Socket::INET#accept method.
+    * Add IO::Socket::INET6#accept method.
+    * Add IO::Socket::UNIX#accept method.
+  [Incompatible Changes]
+    * The return type of IO::Socket::INET is changed from IO::Socket::IP to IO::Socket::INET.
+    * The return type of IO::Socket::INET6 is changed from IO::Socket::IP to IO::Socket::INET6.
+  [Bug Fix]
+    * Fix the bug that IO::Handle#set_blocking method set Blocking field to a wrong value.
+0.218 2023-06-03
+  [Requirement Changes]
+    * Require SPVM::Sys 0.520.
+0.217 2023-06-01
+  [New Features]
+    * Add IO::Socket#sendto method.
+    * Add IO::Socket#recvfrom method.
+  [Test Improvement]
+    * Add tests for IO::Select using a test HTTP server.
+  [Incompatible Changes]
+    * Remove an argument of IO::Socket#shutdown method.
+      [Before]
+      method shutdown : void ($sockfd : int, $how : int);
+      
+      [After]
+      method shutdown : void ($how : int);
+    * IO::Socket#close method throw an excetpion if the socket is not opened.
+    * Remove IO::Socket#peername field. The return value of peername method is not cached.
+    * Remove the argument $to of IO::Socket#send method.
+      [Before]
+      method send : int ($buffer : string, $flags : int = 0, $to : Sys::Socket::Sockaddr = undef, $length : int = -1, $buf_offset : int = 0);
+      [After]
+      method send : int ($buffer : string, $flags : int = 0, $length : int = -1, $buf_offset : int = 0);
+  [Changes]
+    * The following method in IO::Socket class becomes public.
+      
+      socket
+      connect
+      listen
+      bind
+      accept
+  [Requirement Changes]
+    * Require SPVM::Sys 0.517.
+
+0.216 2023-05-29
+  [Requirement Changes]
+    * Require SPVM::Sys 0.516.
+  [New Features]
+    * Add IO::Poll class.
+0.215 2023-05-24
+  [New Features]
+    * Add IO::Dir class.
+  [Requirement Changes]
+    * Require SPVM::Sys 0.515.
+    
+0.214 2023-05-21
+  [Imcompatible Changes]
+    * handles field in IO::Select is renamed to fds_list.
+    * The type of add method in IO::Select is changed from int to void.
+    * The type of remove method in IO::Select is changed from int to void.
+    * handles method in IO::Select is renamed to fds.
+  [New Features]
+    * Add count method to IO::Select class.
+    * An argument in IO::Select#can_read method becomes an optional argument. Negative value means block indefinitely.
+      [Before]
+      method can_read : int[] ($timeout : double);
+      
+      [After]
+      method can_read : int[] ($timeout : double = -1);
+      
+    * An argument in IO::Select#can_write method becomes an optional argument. Negative value means block indefinitely.
+      [Before]
+      method can_write : int[] ($timeout : double);
+      
+      [After]
+      method can_write : int[] ($timeout : double = -1);
+      
+    * An argument in IO::Select#can_has_exception method becomes an optional argument. Negative value means block indefinitely.
+      [Before]
+      method can_has_exception : int[] ($timeout : double);
+      
+      [After]
+      method can_has_exception : int[] ($timeout : double = -1);
+      
+0.213 2023-05-20
+  [Imcompatible Changes]
+    * stream field in IO::File is renamed to FileStream.
+    * input_file_nubmer field in IO::File is renamed to InputLineNumber.
+    * close method in IO::File set FD field to -1, instead of setting FileStream to undef.
+    * Change the following methods in the IO::File.
+
+      -  static method new : IO::File ($file_name : string = undef, $open_mode : object of string|Int = undef, $perm : int = -1);
+      +  static method new : IO::File ($file_name : string = undef, $open_mode : string = undef);
+
+      -  static method new_from_fd : IO::Handle ($fd : int, $open_mode : string = undef);
+      +  static method new_from_fd : IO::Handle ($fd : int, $open_mode : string);
+
+      -  method open : void ($file_name : string, $open_mode : object of string|Int, $perm : int = -1);
+      +  method open : void ($file_name : string, $open_mode : string);
+    * Remove printflush method from IO::File.
+    * Remove set_input_line_number from IO::File.
+  [Bug Fix]
+    * Fix the bug that AutoFlush option does not work .
+0.212 2023-05-17
+  [Buf Fix]
+    * Fix the bug that IO::Socket::INET uses IPv6 addrinfo.
+  [New Features]
+    * Add the IO::Socket::INET6 class.
+  [Imcompatible Changes]
+    * The default value of Listen option is changed from 5 to -1.
+    * "Blocking" option is removed from IO::Socket because socket is always non-blocking to work with goroutine.
+    * Remove socketpair method in IO::Socket class.
+    * socket method in IO::Socket become protected, and the doc is removed.
+    * connect, listen, bind, accept methods in IO::Socket become protected, and the docs are removed.
+    * Remove new_from_instance from IO::Socket, IO::Socket::IP, IO::Socket::Unix.
+    * fd field in IO::Handle is renamed to FD.
+    * autoflush field in IO::Handle is renamed to AutoFlush.
+    * Blocking field is moved from IO::Socket to IO::Handle.
+    * Remove sysread and sysread method from IO::Handle and IO::Socket.
+    * trancate method in IO::Handle class throws excetpion. This implementation is moved to IO::File.
+    * sync method in IO::Handle class throws excetpion. This implementation is moved to IO::File.
 0.211002 2023-12-07
   [Prerequirement Changes]
     * Require SPVM::Sys 0.510.

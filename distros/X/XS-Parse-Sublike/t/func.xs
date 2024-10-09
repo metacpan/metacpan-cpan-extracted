@@ -58,9 +58,9 @@ static void post_defop_Attribute(pTHX_ struct XPSSignatureParamContext *ctx, voi
    */
 
   HV *n = newHV();
-  hv_stores(n, "op",    newSVuv((UV)ctx->op));
-  hv_stores(n, "varop", newSVuv((UV)ctx->varop));
-  hv_stores(n, "defop", newSVuv((UV)ctx->defop));
+  hv_stores(n, "op",    newSVuv(PTR2UV(ctx->op)));
+  hv_stores(n, "varop", newSVuv(PTR2UV(ctx->varop)));
+  hv_stores(n, "defop", newSVuv(PTR2UV(ctx->defop)));
 
   AV *av = get_av("main::ATTRIBUTE_SAW_OPTREES", GV_ADD);
 

@@ -5,7 +5,7 @@ LemonLDAP::NG 2F registration script
 setMsg = (msg, level) ->
 	$('#msg').attr 'trspan', msg
 	$('#msg').html window.translate msg
-	$('#color').removeClass 'message-positive message-warning alert-success alert-warning'
+	$('#color').removeClass 'message-positive message-warning alert-success alert-warning alert-danger'
 	$('#color').addClass "message-#{level}"
 	level = 'success' if level == 'positive'
 	$('#color').addClass "alert-#{level}"
@@ -19,6 +19,10 @@ displayError = (j, status, err) ->
 		console.log 'Returned error', res
 		if res.match /module/
 			setMsg 'notAuthorized', 'warning'
+		else if res == 'csrfToken'
+			setMsg res, 'danger'
+			refresh = () -> window.location = window.location.href.split("?")[0];
+			setTimeout(refresh, 2000)
 		else
 			setMsg res, 'warning'
 
@@ -26,9 +30,7 @@ displayError = (j, status, err) ->
 delete2F = (device, epoch, prefix) ->
 		# Only needed in case pre 2.0.16 templates are used
 		if (!prefix)
-			if device == 'U2F'
-				prefix = 'u'
-			else if device == 'UBK'
+			if device == 'UBK'
 					prefix = 'yubikey'
 			else if device == 'TOTP'
 					prefix = 'totp'
@@ -41,6 +43,7 @@ delete2F = (device, epoch, prefix) ->
 			url: "#{portal}2fregisters/#{prefix}/delete"
 			data:
 				epoch: epoch
+				csrf_token: datas.csrf_token
 			dataType: 'json'
 			error: displayError
 			success: (resp) ->
@@ -54,6 +57,8 @@ delete2F = (device, epoch, prefix) ->
 					$(document).trigger e, [ { "type": device, "epoch": epoch } ]
 					if !e.isDefaultPrevented()
 						setMsg 'yourKeyIsUnregistered', 'positive'
+					refresh = () -> window.location = window.location.href.split("?")[0];
+					setTimeout(refresh, 2000)
 			error: displayError
 
 # Register "click" events

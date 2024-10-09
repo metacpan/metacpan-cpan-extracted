@@ -26,9 +26,31 @@ my $client = LLNG::Manager::Test->new(
     }
 );
 
+# Hook on sendHtml to make sure buildAuthLoop exposes the correct variables
+push @{ $client->p->hook->{sendHtml} }, sub {
+    my ( $req, $tpl, $args ) = @_;
+    my $authLoop = $args->{params}->{AUTH_LOOP};
+    if ( $$tpl eq "login" and $req->env->{doCheck} ) {
+        is( $authLoop->[0]->{key},         "1_demo",   "Correct key" );
+        is( $authLoop->[0]->{key_1_demo},  "1",        "Correct key flag" );
+        is( $authLoop->[0]->{logoFile},    "Demo.png", "Correct logo" );
+        is( $authLoop->[0]->{module},      "Demo",     "Correct module" );
+        is( $authLoop->[0]->{module_Demo}, "1",        "Correct module flag" );
+        is( $authLoop->[0]->{name},
+            " demo", "Correct (?) name, space for compat" );
+        is( $authLoop->[0]->{name_demo},    "1", "Correct name flag" );
+        is( $authLoop->[0]->{standardform}, "1", "Correct form  flag" );
+        count(8);
+    }
+};
+
 # Try to authenticate with an unknown user
 # -------------------
-ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get menu' );
+ok(
+    $res =
+      $client->_get( '/', accept => 'text/html', custom => { doCheck => 1 } ),
+    'Get menu'
+);
 my ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'token' );
 my @form = ( $res->[2]->[0] =~ m#<form.*?</form>#sg );

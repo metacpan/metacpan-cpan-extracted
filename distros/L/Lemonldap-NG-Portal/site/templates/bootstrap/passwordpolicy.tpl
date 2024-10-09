@@ -11,8 +11,9 @@
         </li>
         </TMPL_IF>
     </TMPL_LOOP>
+    <li>
+        <i id="samepassword-feedback" class="fa fa-li"> </i>
+        <span trspan="passwordPolicySamePwd"></span>
+    </li>
   </ul>
-  <TMPL_IF NAME="PPOLICY_NOPOLICY">
-    <span trspan="passwordPolicyNone">You are free to choose your password! ;-)</span>
-  </TMPL_IF>
 </div>

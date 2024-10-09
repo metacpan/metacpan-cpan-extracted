@@ -20,7 +20,7 @@ my $op = LLNG::Manager::Test->new(
         ini => {
             logLevel                           => $debug,
             domain                             => 'op.com',
-            portal                             => 'http://auth.op.com',
+            portal                             => 'http://auth.op.com/',
             authentication                     => 'Demo',
             userDB                             => 'Same',
             issuerDBOpenIDConnectActivation    => 1,
@@ -144,7 +144,7 @@ expectOK($res);
 $json = from_json( $res->[2]->[0] );
 ok( $json->{active}, "Token is valid" );
 is( $json->{sub}, "french", "Response contains the correct sub" );
-is( $json->{iss}, "http://auth.op.com",
+is( $json->{iss}, "http://auth.op.com/",
     "Response contains the correct issuer" );
 is( $json->{client_id}, "rpid", "Response contains the correct client id" );
 like( $json->{scope}, qr/\bopenid\b/,  "Response contains the default scopes" );

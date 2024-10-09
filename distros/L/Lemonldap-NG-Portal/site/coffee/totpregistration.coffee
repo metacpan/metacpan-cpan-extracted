@@ -31,8 +31,6 @@ getKey = () ->
 		# Display key and QR code
 		success: (data) ->
 			if data.error
-				if data.error.match /totpExistingKey/
-					$("#divToHide").hide()
 				return setMsg data.error, 'warning'
 			unless data.portal and data.user and data.secret
 				return setMsg('PE24', 'danger')

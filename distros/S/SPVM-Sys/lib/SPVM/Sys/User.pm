@@ -8,7 +8,7 @@ SPVM::Sys::User - User/Group System Calls
 
 =head1 Description
 
-The Sys::User class in L<SPVM> has methods to call user/group system calls.
+Sys::User class in L<SPVM> has methods to call user/group system calls.
 
 =head1 Usage
   

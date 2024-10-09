@@ -9,7 +9,6 @@ use base qw(Net::LDAP);
 use Lemonldap::NG::Portal::Main::Constants ':all';
 use Net::LDAP::Control::PasswordPolicy;
 use Encode;
-use Unicode::String qw(utf8);
 use Scalar::Util 'weaken';
 use IO::Socket::Timeout;
 use Net::LDAP qw(LDAP_PP_PASSWORD_EXPIRED LDAP_PP_ACCOUNT_LOCKED
@@ -342,10 +341,11 @@ sub userModifyPassword {
         $passwordAttribute = "unicodePwd";
 
         # Encode password for AD
-        $newpassword = utf8( chr(34) . $newpassword . chr(34) )->utf16le();
+        $newpassword = encode( "UTF-16LE",
+            decode( "UTF-8", chr(34) . $newpassword . chr(34) ) );
         if ( $oldpassword and $asUser ) {
-            $oldpassword =
-              utf8( chr(34) . $oldpassword . chr(34) )->utf16le();
+            $oldpassword = encode( "UTF-16LE",
+                decode( "UTF-8", chr(34) . $oldpassword . chr(34) ) );
         }
         $self->{portal}->logger->debug("Active Directory mode enabled");
 

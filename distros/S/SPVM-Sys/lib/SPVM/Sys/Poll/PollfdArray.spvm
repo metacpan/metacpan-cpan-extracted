@@ -6,8 +6,10 @@ class Sys::Poll::PollfdArray {
   # Fields
   has length : ro int;
   
+  has capacity : ro int;
+  
   # Class Methods
-  native static method new : Sys::Poll::PollfdArray ($length : int);
+  native static method new : Sys::Poll::PollfdArray ($length : int = 0, $capacity : int = -1);
   
   # Instance Methods
   native method DESTROY : void ();
@@ -23,4 +25,10 @@ class Sys::Poll::PollfdArray {
   native method revents : int ($index : int);
   
   native method set_revents : void ($index : int, $revents : int);
+  
+  native method push : void ($fd : int);
+  
+  native method remove : void ($index : int);
+  
+  private native method _maybe_extend : void ($min_capacity : int);
 }

@@ -116,33 +116,6 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 			$scope.waiting = false
 		$scope.showT = false
 
-	## Add 2FA device
-	#$scope.add2FA (type) = ->
-		#$scope.waiting = true
-		#$http['put']("#{scriptname}sfa/#{sessionType}/#{$scope.currentSession.id}?Key=U2F").then (response) ->
-			#$scope.currentSession = null
-			#$scope.currentScope.remove()
-			#$scope.waiting = false
-		#, (resp) ->
-			#$scope.currentSession = null
-			#$scope.currentScope.remove()
-			#$scope.waiting = false
-		#$scope.showT = false
-
-
-	## Verify 2FA device
-	#$scope.verify2FA (epoch) = ->
-		#$scope.waiting = true
-		#$http['post']("#{scriptname}sfa/#{sessionType}/#{$scope.currentSession.id}?Key=TOTP").then (response) ->
-			#$scope.currentSession = null
-			#$scope.currentScope.remove()
-			#$scope.waiting = false
-		#, (resp) ->
-			#$scope.currentSession = null
-			#$scope.currentScope.remove()
-			#$scope.waiting = false
-		#$scope.showT = true
-
 	# Open node
 	$scope.stoggle = (scope) ->
 		node = scope.$modelValue

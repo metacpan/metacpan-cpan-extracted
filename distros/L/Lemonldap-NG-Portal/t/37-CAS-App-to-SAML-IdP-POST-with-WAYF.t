@@ -57,9 +57,9 @@ LWP::Protocol::PSGI->register(
 );
 
 SKIP: {
-    eval "use Lasso;use XML::Simple";
+    eval "use Lasso";
     if ($@) {
-        skip 'Lasso or XML::Simple not found', $maintests;
+        skip 'Lasso', $maintests;
     }
 
     # Initialization
@@ -187,7 +187,7 @@ sub idp {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
-                portal                 => 'http://auth.idp.com',
+                portal                 => 'http://auth.idp.com/',
                 authentication         => 'Demo',
                 userDB                 => 'Same',
                 issuerDBSAMLActivation => 1,
@@ -232,7 +232,7 @@ sub proxy {
             ini => {
                 logLevel              => $debug,
                 domain                => 'proxy.com',
-                portal                => 'http://auth.proxy.com',
+                portal                => 'http://auth.proxy.com/',
                 authentication        => 'SAML',
                 userDB                => 'Same',
                 issuerDBCASActivation => 1,
@@ -316,7 +316,7 @@ sub app {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'app.com',
-                portal                     => 'http://auth.app.com',
+                portal                     => 'http://auth.app.com/',
                 authentication             => 'CAS',
                 userDB                     => 'Same',
                 multiValuesSeparator       => ';',

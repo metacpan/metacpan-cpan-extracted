@@ -10,7 +10,7 @@ static const char* FILE_NAME = "Sys/Time/Itimerval.c";
 
 int32_t SPVM__Sys__Time__Itimerval__new(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "The new method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::Time::Itimerval#new method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   int32_t error_id = 0;
@@ -28,7 +28,7 @@ int32_t SPVM__Sys__Time__Itimerval__new(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__Itimerval__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "The DESTROY method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::Time::Itimerval#DESTROY method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_it = stack[0].oval;
@@ -45,7 +45,7 @@ int32_t SPVM__Sys__Time__Itimerval__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__Itimerval__it_interval(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "The it_interval method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::Time::Itimerval#it_interval method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   int32_t error_id = 0;
@@ -68,7 +68,7 @@ int32_t SPVM__Sys__Time__Itimerval__it_interval(SPVM_ENV* env, SPVM_VALUE* stack
 
 int32_t SPVM__Sys__Time__Itimerval__set_it_interval(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "The set_it_interval method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::Time::Itimerval#set_it_interval method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_it = stack[0].oval;
@@ -81,7 +81,7 @@ int32_t SPVM__Sys__Time__Itimerval__set_it_interval(SPVM_ENV* env, SPVM_VALUE* s
     it_interval = env->get_pointer(env, stack, obj_it_interval);
   }
   else {
-    return env->die(env, stack, "The it_interval must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "Sys::Time::Itimerval#it_interval must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   memcpy(&it->it_interval, it_interval, sizeof(struct timeval));
@@ -92,7 +92,7 @@ int32_t SPVM__Sys__Time__Itimerval__set_it_interval(SPVM_ENV* env, SPVM_VALUE* s
 
 int32_t SPVM__Sys__Time__Itimerval__it_value(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "The it_value method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::Time::Itimerval#it_value method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   int32_t error_id = 0;
@@ -115,7 +115,7 @@ int32_t SPVM__Sys__Time__Itimerval__it_value(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__Itimerval__set_it_value(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "The set_it_value method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::Time::Itimerval#set_it_value method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_it = stack[0].oval;
@@ -128,7 +128,7 @@ int32_t SPVM__Sys__Time__Itimerval__set_it_value(SPVM_ENV* env, SPVM_VALUE* stac
     it_value = env->get_pointer(env, stack, obj_it_value);
   }
   else {
-    return env->die(env, stack, "The it_value must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "Sys::Time::Itimerval#it_value must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   memcpy(&it->it_value, it_value, sizeof(struct timeval));

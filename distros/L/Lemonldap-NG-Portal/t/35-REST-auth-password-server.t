@@ -7,110 +7,110 @@ use JSON;
 
 require 't/test-lib.pm';
 
-my $res;
-my $client = LLNG::Manager::Test->new(
-    {
-        ini => {
-            logLevel           => 'error',
-            useSafeJail        => 1,
-            requireToken       => 1,
-            restAuthServer     => 1,
-            restPasswordServer => 1,
-            authentication     => 'Combination',
-            userDB             => 'Same',
-
-            combination => '[K,Dm] or [Dm]',
-            combModules => {
-                K => {
-                    for  => 1,
-                    type => 'Kerberos',
-                },
-                Dm => {
-                    for  => 0,
-                    type => 'Demo',
-                },
-            },
-            krbKeytab => '/etc/keytab',
-            krbByJs   => 1,
-        }
+SKIP: {
+    eval "require GSSAPI";
+    if ($@) {
+        skip 'GSSAPI not found';
     }
-);
+    my $res;
+    my $client = LLNG::Manager::Test->new( {
+            ini => {
+                logLevel           => 'error',
+                useSafeJail        => 1,
+                requireToken       => 1,
+                restAuthServer     => 1,
+                restPasswordServer => 1,
+                authentication     => 'Combination',
+                userDB             => 'Same',
 
-# Test pwdConfirm endpoint
-$res = expectJSON(
-    postJSON(
-        $client,
-        "/proxy/pwdConfirm",
-        {
-            user     => "dwho",
-            password => "dwho",
+                combination => '[K,Dm] or [Dm]',
+                combModules => {
+                    K => {
+                        for  => 1,
+                        type => 'Kerberos',
+                    },
+                    Dm => {
+                        for  => 0,
+                        type => 'Demo',
+                    },
+                },
+                krbKeytab => '/etc/keytab',
+                krbByJs   => 1,
+            }
         }
-    )
-);
+    );
 
-is( $res->{result}, 1, "Correct password is accepted" );
-count(1);
+    # Test pwdConfirm endpoint
+    $res = expectJSON(
+        postJSON(
+            $client,
+            "/proxy/pwdConfirm",
+            {
+                user     => "dwho",
+                password => "dwho",
+            }
+        )
+    );
 
-$res = expectJSON(
-    postJSON(
-        $client,
-        "/proxy/pwdConfirm",
-        {
-            user     => "waldo",
-            password => "dwho",
-        }
-    )
-);
+    is( $res->{result}, 1, "Correct password is accepted" );
 
-is( $res->{result}, 0, "Incorrect user is rejected" );
-count(1);
+    $res = expectJSON(
+        postJSON(
+            $client,
+            "/proxy/pwdConfirm",
+            {
+                user     => "waldo",
+                password => "dwho",
+            }
+        )
+    );
 
-$res = expectJSON(
-    postJSON(
-        $client,
-        "/proxy/pwdConfirm",
-        {
-            user     => "dwho",
-            password => "wrongpass",
-        }
-    )
-);
+    is( $res->{result}, 0, "Incorrect user is rejected" );
 
-is( $res->{result}, 0, "Incorrect password is rejected" );
-count(1);
+    $res = expectJSON(
+        postJSON(
+            $client,
+            "/proxy/pwdConfirm",
+            {
+                user     => "dwho",
+                password => "wrongpass",
+            }
+        )
+    );
 
-# Test getUser endpoint
-# Existing user
-$res = expectJSON(
-    postJSON(
-        $client,
-        "/proxy/getUser",
-        {
-            user => "dwho",
-        }
-    )
-);
-is( $res->{result},               1,            "Correct result" );
-is( $res->{info}->{cn},           "Doctor Who", "Correct attributes" );
-is( $res->{info}->{_whatToTrace}, "dwho",       "Correct macro" );
-count(3);
+    is( $res->{result}, 0, "Incorrect password is rejected" );
 
-# Missing user
-$res = expectJSON(
-    postJSON(
-        $client,
-        "/proxy/getUser",
-        {
-            user => "notfound",
-        }
-    )
-);
-is( $res->{result}, 0,     "Correct result" );
-is( $res->{info},   undef, "No attributes" );
-count(2);
+    # Test getUser endpoint
+    # Existing user
+    $res = expectJSON(
+        postJSON(
+            $client,
+            "/proxy/getUser",
+            {
+                user => "dwho",
+            }
+        )
+    );
+    is( $res->{result},               1,            "Correct result" );
+    is( $res->{info}->{cn},           "Doctor Who", "Correct attributes" );
+    is( $res->{info}->{_whatToTrace}, "dwho",       "Correct macro" );
+
+    # Missing user
+    $res = expectJSON(
+        postJSON(
+            $client,
+            "/proxy/getUser",
+            {
+                user => "notfound",
+            }
+        )
+    );
+    is( $res->{result}, 0,     "Correct result" );
+    is( $res->{info},   undef, "No attributes" );
+}
 
 clean_sessions();
-done_testing( count() );
+done_testing();
 
 sub postJSON {
     my ( $portal, $url, $payload ) = @_;

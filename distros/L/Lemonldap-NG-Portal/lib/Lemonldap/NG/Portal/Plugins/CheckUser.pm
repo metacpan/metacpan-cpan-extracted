@@ -235,7 +235,7 @@ sub check {
     my $url  = $req->param('url')  || '';
     my $user = $req->param('user') || '';
 
-    if ( $user and $user !~ /$self->{conf}->{userControl}/o ) {
+    if ( $user and $user !~ /$self->{conf}->{userControl}/ ) {
         $user  = '';
         $attrs = {};
         return $self->p->sendError( $req, 'Malformed user', 400 )

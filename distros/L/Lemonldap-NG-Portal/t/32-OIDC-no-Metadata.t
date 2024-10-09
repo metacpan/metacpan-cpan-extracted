@@ -69,7 +69,7 @@ sub getop {
             ini => merge {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
-                portal                          => 'http://auth.op.com',
+                portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => 1,

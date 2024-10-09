@@ -15,9 +15,6 @@ my $maintests = 20;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 
-eval { require XML::Simple };
-plan skip_all => "Missing dependencies: $@" if ($@);
-
 # Redefine LWP methods for tests
 LWP::Protocol::PSGI->register(
     sub {
@@ -293,7 +290,7 @@ sub issuer {
                 skipRenewConfirmation => 1,
                 logLevel              => $debug,
                 domain                => 'idp.com',
-                portal                => 'http://auth.idp.com',
+                portal                => 'http://auth.idp.com/',
                 authentication        => 'Choice',
                 userDB                => 'Same',
                 authChoiceParam       => 'test',
@@ -325,7 +322,7 @@ sub sp {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'sp.com',
-                portal                     => 'http://auth.sp.com',
+                portal                     => 'http://auth.sp.com/',
                 authentication             => 'CAS',
                 userDB                     => 'CAS',
                 restSessionServer          => 1,

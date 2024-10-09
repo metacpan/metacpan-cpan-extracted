@@ -172,7 +172,7 @@ SKIP: {
 
     # Verify authentication on SP
     my $spId = expectCookie($res);
-    expectRedirection( $res, 'http://auth.sp.com' );
+    expectRedirection( $res, 'http://auth.sp.com/' );
 
     clean_sessions();
 }
@@ -186,7 +186,7 @@ sub issuer {
             ini => {
                 logLevel                 => $debug,
                 domain                   => 'idp.com',
-                portal                   => 'http://auth.idp.com',
+                portal                   => 'http://auth.idp.com/',
                 authentication           => 'Combination',
                 userDB                   => 'Same',
                 portalForceAuthnInterval => 5,
@@ -240,7 +240,7 @@ sub sp {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',
-                portal                            => 'http://auth.sp.com',
+                portal                            => 'http://auth.sp.com/',
                 authentication                    => 'SAML',
                 userDB                            => 'Same',
                 issuerDBSAMLActivation            => 0,

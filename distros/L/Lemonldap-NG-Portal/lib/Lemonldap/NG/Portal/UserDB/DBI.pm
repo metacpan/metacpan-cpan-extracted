@@ -118,8 +118,11 @@ sub setSessionInfo {
 
     foreach my $var ( keys %{ $self->exportedVars } ) {
         my $attr = $self->exportedVars->{$var};
-        $req->{sessionInfo}->{$var} = $req->data->{dbientry}->{$attr}
-          if ( defined $req->data->{dbientry}->{$attr} );
+        if ( defined(my $value = $req->data->{dbientry}->{$attr}) ) {
+            # Drop Unicode flag if DBD set it
+            utf8::encode($value) if utf8::is_utf8($value);
+            $req->{sessionInfo}->{$var} = $value;
+        }
     }
 
     return PE_OK;

@@ -28,6 +28,7 @@ my $sessionsdir  = "$dir/sessions";
 my $psessionsdir = "$dir/psessions";
 mkdir $sessionsdir;
 mkdir $psessionsdir;
+my $backupFile = "$dir/backup.json";
 
 my $cli = Lemonldap::NG::Common::CliSessions->new(
     conf => {
@@ -43,6 +44,28 @@ my $cli = Lemonldap::NG::Common::CliSessions->new(
         },
     }
 );
+
+sub backup {
+    my $file = shift;
+    open F, '>', $file or die $!;
+    diag 2;
+    Lemonldap::NG::Common::CliSessions->new(
+        conf => {
+            globalStorage        => "Apache::Session::File",
+            globalStorageOptions => {
+                Directory     => $sessionsdir,
+                LockDirectory => $sessionsdir,
+            },
+            persistentStorage        => "Apache::Session::File",
+            persistentStorageOptions => {
+                Directory     => $psessionsdir,
+                LockDirectory => $psessionsdir,
+            },
+        },
+        stdout => *F,
+    )->run("backup", {});
+    close F;
+}
 
 # Provision test sessions
 my @sessionsOpts = (
@@ -190,7 +213,7 @@ resetSessions;
 sub getJson {
     my @args = @_;
     my ($str) = Test::Output::output_from( sub { $cli->run(@args); } );
-    return from_json($str);
+    return $str =~ /^([\w]+)$/ ? $1 : from_json($str);
 }
 
 sub getLines {
@@ -245,33 +268,46 @@ is(
 $res = getJson( "search", {} );
 is( @{$res}, 5, "Found 5 sessions" );
 
-# Test search with different backend
-$res = getJson( "search", { backend => 'persistent' } );
-is( @{$res}, 2, "Found 2 psessions" );
+$res = getJson( "search", { count => 1 } );
+is( $res, 5, "Count gives 5 sessions" );
 
-# Persistent mode
-$res = getJson( "search", { persistent => 1 } );
-is( @{$res}, 2, "Found 2 psessions" );
+sub searchTest {
 
-# Test search with where
-$res = getJson( "search", { where => "uid=dwho" } );
-is( @{$res},                                  2, "Found 2 sessions" );
-is( ( grep { $_->{uid} eq "dwho" } @{$res} ), 2, "Both sessions are dwho" );
+    # Test search with different backend
+    $res = getJson( "search", { backend => 'persistent' } );
+    is( @{$res}, 2, "Found 2 psessions" );
 
-# Test search with where and field selection
-$res = getJson( "search",
-    { where => "uid=dwho", select => [ "uid", "_session_id" ] } );
-is( @{$res},             2, "Found 2 sessions" );
-is( keys %{ $res->[0] }, 2, "Only selected fields returned" );
+    $res = getJson( "search", { backend => 'persistent', count => 1 } );
+    is( $res, 2, "Count gives 2 psessions" );
 
-# Test search with ID output
-$res = getLines( "search", { where => "uid=dwho", idonly => 1 } );
-is( @{$res}, 2, "Got two lines" );
-is(
-    ( join ':', sort @{$res} ),
-    "9684dd2a6489bf2be2fbdd799a8028e3:f90f597566f5cce47d9641377776c0c2",
-    "Correct session IDs"
-);
+    # Persistent mode
+    $res = getJson( "search", { persistent => 1 } );
+    is( @{$res}, 2, "Found 2 psessions" );
+
+    # Test search with where
+    $res = getJson( "search", { where => "uid=dwho" } );
+    is( @{$res},                                  2, "Found 2 sessions" );
+    is( ( grep { $_->{uid} eq "dwho" } @{$res} ), 2, "Both sessions are dwho" );
+
+    # Test search with where and field selection
+    $res = getJson( "search",
+        { where => "uid=dwho", select => [ "uid", "_session_id" ] } );
+    is( @{$res},             2, "Found 2 sessions" );
+    is( keys %{ $res->[0] }, 2, "Only selected fields returned" );
+
+    # Test search with ID output
+    $res = getLines( "search", { where => "uid=dwho", idonly => 1 } );
+    is( @{$res}, 2, "Got two lines" );
+    is(
+        ( join ':', sort @{$res} ),
+        "9684dd2a6489bf2be2fbdd799a8028e3:f90f597566f5cce47d9641377776c0c2",
+        "Correct session IDs"
+    );
+}
+subtest 'Search', \&searchTest;
+
+# Backup sessions
+backup($backupFile);
 
 # Delete session
 $cli->run( 'delete', {},                  "9684dd2a6489bf2be2fbdd799a8028e3" );
@@ -333,6 +369,9 @@ $res = getJson( "secondfactors", {}, "get", "dwho" );
 is( ( keys %{$res} ), 1, "Found one second factors" );
 is( ( grep { $_->{type} eq "U2F" } values %{$res} ),  0, "U2F was removed" );
 is( ( grep { $_->{type} eq "TOTP" } values %{$res} ), 1, "TOTP survived" );
+
+$cli->run( "restore", {}, $backupFile );
+subtest 'Search after restore', \&searchTest;
 
 # Delete 2FA by type (with search)
 resetSessions;

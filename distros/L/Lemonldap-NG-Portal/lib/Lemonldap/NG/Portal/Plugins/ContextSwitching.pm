@@ -169,7 +169,7 @@ sub run {
     # ContextSwitching required -> Check user Id
     if ( $spoofId && $spoofId ne $req->{user} ) {
         $self->logger->debug("Spoofed Id: $spoofId");
-        unless ( $spoofId =~ /$self->{conf}->{userControl}/o ) {
+        unless ( $spoofId =~ /$self->{conf}->{userControl}/ ) {
             $self->userLogger->warn('Malformed spoofed Id');
             $self->logger->debug(
                 "ContextSwitching tried with spoofed Id: $spoofId");

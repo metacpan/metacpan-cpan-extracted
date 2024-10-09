@@ -127,22 +127,13 @@ sub extractFormInfo {
             return PE_CERTIFICATEREQUIRED;
         }
 
-        $self->logger->debug( 'Append ' . $self->{Name} . ' init/script' );
-        $req->data->{customScript} .= $self->{AjaxInitScript};
-        $self->logger->debug(
-            "Send init/script -> " . $req->data->{customScript} );
+        $self->initDisplay($req);
         $req->data->{waitingMessage} = 1;
-
-        eval( $self->InitCmd );
-        die 'Unable to launch init commmand ' . $self->{InitCmd} if ($@);
         return PE_FIRSTACCESS;
     }
     else {
         if ( $self->conf->{sslByAjax} ) {
-            $self->logger->debug( 'Append ' . $self->{Name} . ' init/script' );
-            $req->data->{customScript} .= $self->{AjaxInitScript};
-            $self->logger->debug(
-                "Send init/script -> " . $req->data->{customScript} );
+            $self->initDisplay($req);
             return PE_BADCERTIFICATE;
         }
         $self->userLogger->warn('No certificate found');

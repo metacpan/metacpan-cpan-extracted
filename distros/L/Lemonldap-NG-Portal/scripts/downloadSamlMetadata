@@ -1,0 +1,225 @@
+#!/usr/bin/perl
+
+use strict;
+use Getopt::Long qw/GetOptionsFromArray/;
+use Pod::Usage;
+use LWP::UserAgent;
+use MIME::Base64;
+use XML::LibXML::Reader;
+use File::Temp;
+
+# Get configuration from CLI opts
+sub get_config {
+    my ($array) = @_;
+
+    my %opts;
+
+    # Get command line options
+    my $result =
+      GetOptionsFromArray( $array, \%opts, 'output|o=s', 'metadata|m=s',
+        'verbose|v', 'dry-run|n', 'help|h', );
+
+    pod2usage(1) if $opts{help};
+
+    _check_arguments( \%opts );
+    return \%opts;
+}
+
+our $verbose = 0;
+
+sub printlog {
+    if ($verbose) {
+        print STDERR @_, "\n";
+    }
+}
+
+sub printfatal {
+    print STDERR @_, "\n";
+}
+
+sub _check_arguments {
+    my ($opts) = @_;
+
+    my @missing;
+    push @missing, "metadata URL (-m)" if !$opts->{metadata};
+    push @missing, "output path (-o)"  if !$opts->{output};
+
+    pod2usage(
+        -message => ( "Missing " . join( ' and ', @missing ) ),
+        -exitval => 2
+    ) if @missing;
+}
+
+sub _check_xml {
+    my ($tmpfile) = @_;
+
+    # Check XML syntax
+    my $reader = XML::LibXML::Reader->new( location => $tmpfile );
+    if ( !$reader ) {
+        unlink($tmpfile);
+        printfatal "Cannot read $tmpfile: $!";
+        return 0;
+    }
+
+    my $valid = 0;
+    eval {
+        while ( $reader->read ) {
+            if (    $reader->depth == 0
+                and $reader->nodeType == XML_READER_TYPE_ELEMENT )
+            {
+                if (    $reader->localName eq "EntitiesDescriptor"
+                    and $reader->namespaceURI eq
+                    "urn:oasis:names:tc:SAML:2.0:metadata" )
+                {
+                    $valid = 1;
+                }
+            }
+        }
+    };
+    if ( my $error = $@ ) {
+        unlink($tmpfile);
+        printfatal "Cannot parse $tmpfile as XML: $@";
+        return 0;
+    }
+
+    if ( $valid == 1 ) {
+        return 1;
+    }
+    else {
+        unlink($tmpfile);
+        printfatal "XML does not contain an EntitiesDescriptor";
+        return 0;
+    }
+}
+
+sub downloadSamlMetadata {
+    my ($opts) = @_;
+
+    # Get merged config
+    $verbose = $opts->{verbose};
+
+    # Download metadata file
+    my $ua = LWP::UserAgent->new;
+    $ua->timeout(10);
+    $ua->show_progress(1) if $verbose;
+    $ua->env_proxy;
+
+    my $metadata_file = $opts->{metadata};
+    my $output        = $opts->{output};
+
+    printlog("Try to download metadata file at $metadata_file");
+    my $tmpfile = mktemp("$output.XXXXXXXX");
+    printlog("Using temporary file $tmpfile");
+
+    my $response = $ua->get( $metadata_file, ':content_file' => $tmpfile );
+
+    if ( $response->is_success ) {
+        printlog("Metadata successfully downloaded");
+    }
+    else {
+        printlog("Removing $tmpfile");
+        unlink($tmpfile);
+        printfatal "Error downloading metadata ", $response->status_line;
+        return 1;
+    }
+
+    return 1 unless _check_xml($tmpfile);
+
+    if ( $opts->{'dry-run'} ) {
+        printlog("Removing $tmpfile");
+        unlink($tmpfile);
+    }
+    else {
+        # Move file
+        if ( !rename( $tmpfile, $output ) ) {
+            unlink($tmpfile);
+            printfatal "Could not atomically replace $output";
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+sub main {
+    my $config = get_config( \@ARGV );
+    exit( downloadSamlMetadata($config) );
+
+}
+
+# If run as a script
+unless (caller) {
+    main();
+}
+
+__END__
+Script to download SAML federation metadata\n\n";
+Usage: $0 -m <metadata file URL> -o <output file>\n\n";
+Options:\n";
+
+=encoding UTF-8
+
+=head1 NAME
+
+downloadSamlMetadata - Script to download SAML federation metadata 
+
+=head1 SYNOPSIS
+
+downloadSamlMetadata -m <metadata URL> -o <output file> [options]
+
+Options:
+
+    -m, --metadata          URL of metadata document
+    -o, --output            Destination file
+    -n, --dry-run           do not replace the existing file
+    -v, --verbose           increase verbosity of output
+    -h, --help              print full documentation
+
+=head1 OPTIONS
+
+=over
+
+=item B<-m I<URL>>, B<--metadata=I<URL>>
+
+Specifies the <URL> of the metadata document to import
+
+=item B<-o I<FILE>>, B<--output=I<FILE>>
+
+Specifies the <FILE> to which the metadata will be downloaded. If the
+destination file already exists, it will be atomically replaced.
+
+=item B<-n>, B<--dry-run>
+
+This option prevents the destination file from being replaced. It can be used for testing.
+
+=item B<-v>, B<--verbose>
+
+Increase verbosity during script execution
+
+=item B<-h>, B<--help>
+
+Displays the script's documentation
+
+=back
+
+=head1 SEE ALSO
+
+L<http://lemonldap-ng.org/>
+
+=head1 AUTHORS
+
+=over
+
+=item Clement Oudot, E<lt>clement@oodo.netE<gt>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
+
+=head1 DOWNLOAD
+
+Lemonldap::NG is available at
+L<https://lemonldap-ng.org/download>

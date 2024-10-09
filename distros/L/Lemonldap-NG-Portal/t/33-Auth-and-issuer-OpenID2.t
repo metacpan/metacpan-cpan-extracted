@@ -181,7 +181,7 @@ sub issuer {
             ini => {
                 logLevel                 => $debug,
                 domain                   => 'idp.com',
-                portal                   => 'http://auth.idp.com',
+                portal                   => 'http://auth.idp.com/',
                 authentication           => 'Demo',
                 userDB                   => 'Same',
                 issuerDBOpenIDActivation => 1,
@@ -197,7 +197,7 @@ sub sp {
             ini => {
                 logLevel       => $debug,
                 domain         => 'sp.com',
-                portal         => 'http://auth.sp.com',
+                portal         => 'http://auth.sp.com/',
                 authentication => 'OpenID',
                 userDB         => 'Same',
                 openIdSecret   => 'qwerty',

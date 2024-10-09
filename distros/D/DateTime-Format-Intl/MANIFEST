@@ -1,0 +1,29 @@
+CHANGES
+CONTRIBUTING.md
+lib/DateTime/Format/Intl.pm
+lib/DateTime/Format/Intl/Exception.pod
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+SIGNATURE
+t/001_load.t
+t/002_methods.t
+t/003_resolved_options.t
+t/004_supported_locales_of.t
+t/005_select_best_pattern.t
+t/006_format.t
+t/007_select_best_range_pattern.t
+t/008_format_range.t
+t/009_date_time_combination.t
+t/010_format_to_parts.t
+t/011_format_range_to_parts.t
+t/900_pod.t
+t/910_coverage.t
+t/920_manifest.t
+t/930_signature.t
+t/999_kwalitee.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

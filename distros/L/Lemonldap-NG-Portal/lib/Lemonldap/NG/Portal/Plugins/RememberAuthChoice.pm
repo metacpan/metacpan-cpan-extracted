@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -18,6 +18,8 @@ extends 'Lemonldap::NG::Portal::Main::Plugin';
 
 use constant endAuth    => 'storeRememberedAuthChoice';
 use constant beforeAuth => 'checkRememberedAuthChoice';
+use constant beforeLogout => 'removeRememberedAuthChoice';
+use constant hook       => { getAuthChoice => "autoChoice", };
 
 has rule => ( is => 'rw', default => sub { 0 } );
 
@@ -134,6 +136,53 @@ sub checkRememberedAuthChoice {
         $req->pdata->{rememberauthchoice} = $rememberauthchoice;
     }
 
+    return PE_OK;
+}
+
+sub removeRememberedAuthChoice {
+    my ( $self, $req ) = @_;
+
+    if ( $self->conf->{rememberAuthChoiceForgetAtLogout} ) {
+
+        $self->logger->debug( "RememberAuthChoice: Remove cookie "
+              . $self->rememberCookieName
+              . " at logout" );
+
+        $req->addCookie(
+            $self->p->cookie(
+                name    => $self->rememberCookieName,
+                value   => 0,
+                expires => 'Wed, 21 Oct 2015 00:00:00 GMT',
+                secure  => $self->conf->{securedCookie},
+            )
+        );
+
+        # Avoid regressions with #3228
+        $req->addCookie(
+            $self->p->genDomainCookie(
+                $req,
+                name    => $self->rememberCookieName,
+                value   => 0,
+                expires => 'Wed, 21 Oct 2015 00:00:00 GMT',
+                secure  => $self->conf->{securedCookie},
+            )
+        );
+
+    }
+    return PE_OK;
+}
+
+sub autoChoice {
+    my ( $self, $req, $context ) = @_;
+
+    if ( my $choice = $req->cookies->{ $self->rememberCookieName }
+        and $self->conf->{rememberTimer} == 0 )
+    {
+        $context->{choice} = $choice;
+
+        # Continue remembering the choice
+        $req->pdata->{rememberauthchoice} = "true";
+    }
     return PE_OK;
 }
 

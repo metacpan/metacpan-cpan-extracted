@@ -196,7 +196,7 @@ SKIP: {
         'Post SAML response to SP'
     );
     my $spId = expectCookie($res);
-    expectRedirection( $res, 'http://auth.sp.com' );
+    expectRedirection( $res, 'http://auth.sp.com/' );
 
     # Logout initiated by SP
     ok(
@@ -253,7 +253,7 @@ sub op {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'op.com',
-                portal                          => 'http://auth.op.com',
+                portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => "1",
@@ -283,7 +283,7 @@ sub op {
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                         oidcRPMetaDataOptionsRedirectUris          =>
-                          'http://auth.proxy.com?openidconnectcallback=1',
+                          'http://auth.proxy.com/?openidconnectcallback=1',
                     }
                 },
                 oidcOPMetaDataOptions           => {},
@@ -310,7 +310,7 @@ sub proxy {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'proxy.com',
-                portal                     => 'http://auth.proxy.com',
+                portal                     => 'http://auth.proxy.com/',
                 authentication             => 'OpenIDConnect',
                 userDB                     => 'Same',
                 restSessionServer          => 1,
@@ -382,7 +382,7 @@ sub sp {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',
-                portal                            => 'http://auth.sp.com',
+                portal                            => 'http://auth.sp.com/',
                 authentication                    => 'SAML',
                 userDB                            => 'Same',
                 issuerDBSAMLActivation            => 0,

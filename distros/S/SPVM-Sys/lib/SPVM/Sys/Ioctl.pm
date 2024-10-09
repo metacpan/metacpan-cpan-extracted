@@ -8,7 +8,7 @@ SPVM::Sys::Ioctl - The ioctl System Call
 
 =head1 Description
 
-The Sys::Ioctl class in L<SPVM> has methods to call the ioctl functions.
+Sys::Ioctl class in L<SPVM> has methods to call the ioctl functions.
 
 =head1 Usage
 

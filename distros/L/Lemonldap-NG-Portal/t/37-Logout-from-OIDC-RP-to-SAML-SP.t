@@ -313,7 +313,7 @@ sub op {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'op.com',
-                portal                          => 'http://auth.op.com',
+                portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => "1",
@@ -338,7 +338,7 @@ sub op {
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                         oidcRPMetaDataOptionsRedirectUris          =>
-                          'http://auth.rp.com?openidconnectcallback=1',
+                          'http://auth.rp.com/?openidconnectcallback=1',
                     }
                 },
                 oidcOPMetaDataOptions           => {},
@@ -396,7 +396,7 @@ sub rp {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',
-                portal                     => 'http://auth.rp.com',
+                portal                     => 'http://auth.rp.com/',
                 authentication             => 'OpenIDConnect',
                 userDB                     => 'Same',
                 restSessionServer          => 1,
@@ -437,7 +437,7 @@ sub sp {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',
-                portal                            => 'http://auth.sp.com',
+                portal                            => 'http://auth.sp.com/',
                 authentication                    => 'SAML',
                 userDB                            => 'Same',
                 issuerDBSAMLActivation            => 0,

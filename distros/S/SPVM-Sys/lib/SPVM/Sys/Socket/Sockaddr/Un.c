@@ -3,21 +3,7 @@
 
 #include "spvm_native.h"
 #include "spvm_socket_util.h"
-
 #include <assert.h>
-
-#if defined(_WIN32)
-
-#define UNIX_PATH_MAX 108
-
-typedef struct sockaddr_un {
-  ADDRESS_FAMILY sun_family;
-  char sun_path[UNIX_PATH_MAX];
-};
-
-#else
-  #include <sys/un.h>
-#endif
 
 static const char* FILE_NAME = "Sys/Socket/Sockaddr/Un.c";
 
@@ -95,7 +81,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__set_sun_path(SPVM_ENV* env, SPVM_VALUE*
   void* obj_path = stack[1].oval;
   
   if (!obj_path) {
-    return env->die(env, stack, "The sun_path must be be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The path $sun_path must be be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* path = env->get_chars(env, stack, obj_path);

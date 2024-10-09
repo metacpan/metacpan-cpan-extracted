@@ -190,7 +190,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION = "2.06";
+$VERSION = "2.07";
 @ISA = qw( Exporter );
 
 # ------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ sub import
    my @imports;
    my $fish_module = __PACKAGE__ . "::";
 
-   my $minVer = 2.06;
+   my $minVer = 2.07;
    if ( $on_flag ) {
       $fish_module .= "ON";
       require Fred::Fish::DBUG::ON;
@@ -370,10 +370,18 @@ sub dbug_module_used
    return ( wantarray ? ($fish_module, $key) : $fish_module );
 }
 
+sub find_all_fish_users
+{
+   return ( %global_fish_module );
+}
+
 sub _find_module
 {
    my $key = shift;
    my $mod = $global_fish_module{$key} || 'Fred::Fish::DBUG::Unknown';
+   if ( $mod =~ m/::Unknown$/ ) {
+      print STDERR "# DBUG Warning: Unknown caller: ${key}\n";
+   }
    return ( $mod );
 }
 

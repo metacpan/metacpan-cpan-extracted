@@ -1,0 +1,8 @@
+runtime:
+  requires:
+    perl: '5.020000'
+    Data::Dumper: 0
+    Data::Section: 0
+    Dist::Zilla: '6.000'
+    Moose: '2.0000'
+    namespace::clean: 0

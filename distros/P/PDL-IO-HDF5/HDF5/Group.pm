@@ -43,8 +43,6 @@ Ref to the L<PDL::IO::HDF5> object that owns this object.
 
 =head1 METHODS
 
-####---------------------------------------------------------
-
 =head2 new
 
 =for ref

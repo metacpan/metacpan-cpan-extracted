@@ -15,8 +15,14 @@ use SPVM 'TestCase::Sys';
 use SPVM 'Sys::OS';
 use File::stat ();
 
+use SPVM 'Sys::IO::Stat';
+
 # Start objects count
 my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
+
+my $test_dir = "$FindBin::Bin";
+
+SPVM::TestCase::Sys->SET_TEST_DIR($test_dir);
 
 # osname
 {
@@ -84,28 +90,24 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   {
     my $file = "$test_dir/ftest/readline_long_lines.txt";
     my $stat = SPVM::Sys->stat($file);
-    my $stat_expected = File::stat::stat($file);
+    my $stat_expected = SPVM::Sys::IO::Stat->new;
+    SPVM::Sys::IO::Stat->stat($file, $stat_expected);
     
-    is($stat->st_dev, $stat_expected->dev, "st_dev");
-    is($stat->st_ino, $stat_expected->ino, "st_ino");
-    is($stat->st_mode, $stat_expected->mode, "st_mode");
-    if ($stat->st_nlink == $stat_expected->nlink) {
-      is($stat->st_nlink, $stat_expected->nlink, "st_nlink");
-    }
-    else {
-      warn "[Test Output]Got: " . $stat->st_nlink . ", Expected: " . $stat_expected->nlink;
-    }
-    is($stat->st_uid, $stat_expected->uid, "uid");
-    is($stat->st_gid, $stat_expected->gid, "gid");
-    is($stat->st_rdev, $stat_expected->rdev, "rdev");
-    is($stat->st_size, $stat_expected->size, "size");
-    is($stat->st_atime, $stat_expected->atime, "atime");
-    is($stat->st_mtime, $stat_expected->mtime, "mtime");
-    is($stat->st_ctime, $stat_expected->ctime, "ctime");
+    is($stat->st_dev, $stat_expected->st_dev, "st_dev");
+    is($stat->st_ino, $stat_expected->st_ino, "st_ino");
+    is($stat->st_mode, $stat_expected->st_mode, "st_mode");
+    is($stat->st_nlink, $stat_expected->st_nlink, "st_nlink");
+    is($stat->st_uid, $stat_expected->st_uid, "uid");
+    is($stat->st_gid, $stat_expected->st_gid, "gid");
+    is($stat->st_rdev, $stat_expected->st_rdev, "rdev");
+    is($stat->st_size, $stat_expected->st_size, "size");
+    is($stat->st_atime, $stat_expected->st_atime, "atime");
+    is($stat->st_mtime, $stat_expected->st_mtime, "mtime");
+    is($stat->st_ctime, $stat_expected->st_ctime, "ctime");
     
     unless ($^O eq 'MSWin32') {
-      is($stat->st_blksize, $stat_expected->blksize, "blksize");
-      is($stat->st_blocks, $stat_expected->blocks, "blocks");
+      is($stat->st_blksize, $stat_expected->st_blksize, "blksize");
+      is($stat->st_blocks, $stat_expected->st_blocks, "blocks");
     }
   }
 }
@@ -289,7 +291,42 @@ ok(SPVM::TestCase::Sys->env);
 
 ok(SPVM::TestCase::Sys->set_env);
 
+# Directory stream system calls
+{
+  # opendir
+  {
+    ok(SPVM::TestCase::Sys->opendir);
+  }
+  
+  # readdir
+  {
+    ok(SPVM::TestCase::Sys->readdir);
+  }
+  
+  # seekdir
+  {
+    ok(SPVM::TestCase::Sys->seekdir);
+  }
+  
+  # telldir
+  {
+    ok(SPVM::TestCase::Sys->telldir);
+  }
+  
+  # rewinddir
+  {
+    ok(SPVM::TestCase::Sys->rewinddir);
+  }
+  
+  # closedir
+  {
+    ok(SPVM::TestCase::Sys->closedir);
+  }
+}
+
 SPVM::api->set_exception(undef);
+
+SPVM::TestCase::Sys->SET_TEST_DIR(undef);
 
 # All object is freed
 my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();

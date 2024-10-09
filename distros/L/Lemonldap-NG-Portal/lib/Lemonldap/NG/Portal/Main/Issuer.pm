@@ -263,8 +263,10 @@ sub reAuth {
     $req->data->{customScript} =
 qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/autoRenew.min.js"></script>'
       if ( $self->conf->{skipRenewConfirmation} );
+
+    my $portal_without_slash = $req->portal =~ s/\/+$//r;
     $req->data->{_url} =
-      encode_base64( $req->portal . $req->path_info, '' );
+      encode_base64( $portal_without_slash . $req->path_info, '' );
     $req->pdata->{ $self->ipath } = $self->storeRequest($req);
     push @{ $req->pdata->{keepPdata} }, $self->ipath, $self->ipath . 'Path';
     $req->pdata->{issuerTs} = time;
@@ -276,8 +278,9 @@ sub upgradeAuth {
     $req->data->{customScript} =
 qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/autoRenew.min.js"></script>'
       if ( $self->conf->{skipUpgradeConfirmation} );
+    my $portal_without_slash = $req->portal =~ s/\/+$//r;
     $req->data->{_url} =
-      encode_base64( $req->portal . $req->path_info, '' );
+      encode_base64( $portal_without_slash . $req->path_info, '' );
     $req->pdata->{ $self->ipath } = $self->storeRequest($req);
     push @{ $req->pdata->{keepPdata} }, $self->ipath, $self->ipath . 'Path';
     $req->pdata->{issuerTs} = time;

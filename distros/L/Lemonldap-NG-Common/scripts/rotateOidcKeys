@@ -9,11 +9,9 @@
 
 use strict;
 
-use Convert::PEM;
-use Crypt::OpenSSL::RSA;
-use Crypt::PK::ECC;
 use Lemonldap::NG::Common::Conf;
-use Lemonldap::NG::Common::Crypto;
+use Lemonldap::NG::Common::Util::Crypto;
+use URI;
 
 my $debug = 0;
 
@@ -24,6 +22,7 @@ my $lmconf = Lemonldap::NG::Common::Conf->new()
   or die $Lemonldap::NG::Common::Conf::msg;
 my $conf = $lmconf->getConf();
 
+my $cn = eval { URI->new( $conf->{portal} )->host } || 'localhost';
 print "Configuration loaded\n" if $debug;
 
 # Verify type
@@ -42,29 +41,16 @@ print "Type is $type\n" if $debug;
 #=============================================================================
 my $keys;
 
-my $key_id =
-  Lemonldap::NG::Common::Crypto::srandom()->randpattern("ssssssssss");
 if ( $type eq 'EC' ) {
-    my $ec_key = Crypt::PK::ECC->new();
-    $ec_key->generate_key('secp256r1');
-    $keys = {
-        private => $ec_key->export_key_pem('private'),
-        public  => $ec_key->export_key_pem('public'),
-        id      => $key_id,
-    };
+    $keys = Lemonldap::NG::Common::Util::Crypto::genEcKey('secp256r1');
 }
 else {
-    my $rsa = Crypt::OpenSSL::RSA->generate_key(2048);
-    $keys = {
-        private => $rsa->get_private_key_string(),
-        public  => $rsa->get_public_key_x509_string(),
-        id      => $key_id,
-    };
+    $keys = Lemonldap::NG::Common::Util::Crypto::genCertKey( 2048, undef, $cn );
 }
 
 print "Private key generated:\n" . $keys->{private} . "\n" if $debug;
 print "Public key generated:\n" . $keys->{public} . "\n"   if $debug;
-print "Key ID generated: " . $keys->{id} . "\n"            if $debug;
+print "Key ID generated: " . $keys->{hash} . "\n"          if $debug;
 
 #=============================================================================
 # Save configuration
@@ -93,29 +79,17 @@ else {
 # Store new key
 $conf->{oidcServiceNewPrivateKeySig} = $keys->{private};
 $conf->{oidcServiceNewPublicKeySig}  = $keys->{public};
-$conf->{oidcServiceNewKeyIdSig}      = $keys->{id};
+$conf->{oidcServiceNewKeyIdSig}      = $keys->{hash};
 $conf->{oidcServiceNewKeyTypeSig}    = $type;
 
 if ( $conf->{oidcServicePrivateKeyEnc} ) {
     $type = $conf->{oidcServiceKeyTypeEnc} || 'RSA';
-    $key_id =
-      Lemonldap::NG::Common::Crypto::srandom()->randpattern("ssssssssss");
     if ( $type eq 'EC' ) {
-        my $ec_key = Crypt::PK::ECC->new();
-        $ec_key->generate_key('secp256r1');
-        $keys = {
-            private => $ec_key->export_key_pem('private'),
-            public  => $ec_key->export_key_pem('public'),
-            id      => $key_id,
-        };
+        $keys = Lemonldap::NG::Common::Util::Crypto::genEcKey('secp256r1');
     }
     else {
-        my $rsa  = Crypt::OpenSSL::RSA->generate_key(2048);
-        $keys = {
-            'private' => $rsa->get_private_key_string(),
-            'public'  => $rsa->get_public_key_x509_string(),
-            'id'      => $key_id,
-        };
+        $keys =
+          Lemonldap::NG::Common::Util::Crypto::genCertKey( 2048, undef, $cn );
     }
 
     # Move current key into previous one
@@ -127,7 +101,7 @@ if ( $conf->{oidcServicePrivateKeyEnc} ) {
     # Store new key
     $conf->{oidcServicePrivateKeyEnc} = $keys->{private};
     $conf->{oidcServicePublicKeyEnc}  = $keys->{public};
-    $conf->{oidcServiceKeyIdEnc}      = $keys->{id};
+    $conf->{oidcServiceKeyIdEnc}      = $keys->{hash};
     $conf->{oidcServiceKeyTypeEnc}    = $type;
 }
 

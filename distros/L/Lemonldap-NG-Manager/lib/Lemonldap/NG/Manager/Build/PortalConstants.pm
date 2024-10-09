@@ -92,7 +92,7 @@ sub portalConstants {
         PE_REGISTERALREADYEXISTS             => 80,
         PE_NOTOKEN                           => 81,
         PE_TOKENEXPIRED                      => 82,
-        PE_U2FFAILED                         => 83,
+        PE_WEBAUTHNFAILED                    => 83,
         PE_UNAUTHORIZEDPARTNER               => 84,
         PE_RENEWSESSION                      => 85,
         PE_WAIT                              => 86,
@@ -120,6 +120,7 @@ sub portalConstants {
         PE_UNAUTHORIZEDURL                   => 108,
         PE_UNPROTECTEDURL                    => 109,
         PE_RETRY_2FA                         => 110,
+        PE_PP_PASSWORD_TOO_LONG              => 111,
     };
 }
 

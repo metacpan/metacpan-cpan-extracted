@@ -14,7 +14,14 @@ use warnings;
 use Carp;
 use URI;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
+
+my $HAVE_DATA_IDENTIFIER = eval {require Data::Identifier; 1;};
+
+my %_key_to_data_identifier = (
+    'small-identifier' => 'sid',
+    (map {$_ => $_} qw(uuid oid uri)),
+);
 
 
 
@@ -31,36 +38,124 @@ sub dbid {
 }
 
 
+sub _get_id {
+    my ($self, %opts) = @_;
+    my $key = $opts{_key};
+    my $value = $self->{$key} //= eval { $self->_get_data(_tag_simple_identifier => $key => $self->dbid) };
+    my $curtype;
+
+    if (!defined($value) && !$opts{no_defaults}) {
+        if (defined $self->{$key.'_defaults'}) {
+            $value = $self->{$key.'_defaults'};
+        } else {
+            my $id;
+            my $backup_key;
+            foreach my $backup_key_try (qw(uuid oid uri small-identifier)) {
+                $id = eval { $self->_get_data(_tag_simple_identifier => $backup_key_try => $self->dbid) };
+                if (defined $id) {
+                    $backup_key = $backup_key_try;
+                    last;
+                }
+            }
+            if (defined($id) && defined($backup_key)) {
+                if ($HAVE_DATA_IDENTIFIER && defined(my $type = $_key_to_data_identifier{$backup_key})) {
+                    my $did = Data::Identifier->new($type => $id);
+                    my $func = $did->can($_key_to_data_identifier{$key} // '');
+                    if (defined $func) {
+                        $value = eval {$did->$func()};
+                        $curtype = $key;
+                    }
+                } elsif ($backup_key eq 'uuid' && $key eq 'uri') {
+                    $value = sprintf('urn:uuid:%s', $id);
+                } elsif ($backup_key eq 'oid' && $key eq 'uri') {
+                    $value = sprintf('urn:oid:%s', $id);
+                } elsif ($backup_key eq 'small-identifier' && $key eq 'uri') {
+                    my $u = URI->new("https://uriid.org/");
+                    $u->path_segments('', 'sid', $id);
+                    $value = $u->as_string;
+                }
+            }
+
+            $self->{$key.'_defaults'} = $value if defined $value;
+        }
+    }
+
+    if (defined $value) {
+        my $as = $opts{as} // $key;
+        $curtype //= $key;
+
+        if ($as eq $key || $as eq 'raw') {
+            return $value;
+        } elsif ($as eq 'URI' && $curtype eq 'uri') {
+            return $self->{$key.'_URI'} //= URI->new($value); # convert and cache.
+        } elsif ($as eq 'Data::Identifier' && $HAVE_DATA_IDENTIFIER && defined(my $type = $_key_to_data_identifier{$curtype})) {
+            return Data::Identifier->new($type => $value, displayname => sub { $self->displayname(default => undef) });
+        } else {
+            croak 'Unsupported as option: '.$as;
+        }
+    }
+
+    return $opts{default} if exists $opts{default};
+    croak 'No identifier of requested type';
+}
+
 sub uuid {
-    my ($self) = @_;
-    return $self->{uuid} //= $self->_get_data(_tag_simple_identifier => uuid => $self->dbid);
+    my ($self, %opts) = @_;
+    return $self->_get_id(%opts, _key => 'uuid');
 }
 sub oid {
-    my ($self) = @_;
-    return $self->{oid} //= $self->_get_data(_tag_simple_identifier => oid => $self->dbid);
+    my ($self, %opts) = @_;
+    return $self->_get_id(%opts, _key => 'oid');
 }
 sub uri {
-    my ($self) = @_;
-    return $self->{uri} //= URI->new($self->_get_data(_tag_simple_identifier => uri => $self->dbid));
+    my ($self, %opts) = @_;
+    return $self->_get_id(%opts, _key => 'uri', as => $opts{as} // 'URI');
 }
 sub sid {
-    my ($self) = @_;
-    return $self->{sid} //= $self->_get_data(_tag_simple_identifier => 'small-identifier' => $self->dbid);
+    my ($self, %opts) = @_;
+    return $self->_get_id(%opts, _key => 'small-identifier');
 }
 
 
 sub ise {
-    my ($self) = @_;
-    return eval {$self->uuid} // eval {$self->oid} // $self->uri->as_string;
+    my ($self, %opts) = @_;
+    my $has_default     = exists $opts{default};
+    my $val_default     = delete $opts{default};
+    my $val_no_defaults = delete $opts{no_defaults};
+    my @keys = qw(uuid oid uri);
+    my $value;
+
+    $opts{default}      = undef;
+    $opts{no_defaults}  = 1;
+
+    foreach my $key (@keys) {
+        $value = $self->_get_id(%opts, _key => $key);
+        last if defined $value;
+    }
+    return $value if defined $value;
+
+    unless ($val_no_defaults) {
+        # retry with defaults
+        delete $opts{default};
+        delete $opts{no_defaults};
+        foreach my $key (@keys) {
+            my $func = $self->can($key);
+            $value = eval {$self->$func(%opts)};
+            last if defined $value;
+        }
+        return $value if defined $value;
+    }
+
+    return $val_default if $has_default;
+
+    croak 'No ISE found or unsupported as-option';
 }
 
 
 sub displayname {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
 
-    if (defined $self->{displayname}) {
-        return $self->{displayname};
-    } else {
+    unless (defined $self->{displayname}) {
         my $policies = [qw(british dash nospace lower noupper long)];
         my $db = $self->db;
         my $wk = $db->wk;
@@ -95,28 +190,38 @@ sub displayname {
             return $self->{displayname} = $name if defined($name) && length($name);
         }
 
-        $name = eval {
-            _select_string(
-                $policies,
-                $db->metadata(tag => $self, relation => $asi, no_type => [
-                        @identifier_types,
-                        $wk->uuid, $wk->oid, $wk->uri,
-                    ])->collect('data', skip_died => 1),
-            );
-        };
-        return $self->{displayname} = $name if defined($name) && length($name);
+        unless ($opts{no_defaults} || defined($self->{displayname_defaults})) {
+            $name = eval {
+                _select_string(
+                    $policies,
+                    $db->metadata(tag => $self, relation => $asi, no_type => [
+                            @identifier_types,
+                            $wk->uuid, $wk->oid, $wk->uri,
+                        ])->collect('data', skip_died => 1),
+                );
+            };
+            return $self->{displayname_defaults} = $name if defined($name) && length($name);
 
-        $name = eval {$self->ise};
-        return $self->{displayname} = $name if defined($name) && length($name);
-
-        return $self->{displayname} = 'no name';
+            $name = eval {$self->ise};
+            return $self->{displayname_defaults} = $name if defined($name) && length($name);
+        }
     }
+
+    return $self->{displayname} if defined $self->{displayname};
+    return $opts{default} if exists $opts{default};
+    unless ($opts{no_defaults}) {
+        return $self->{displayname_defaults} if defined $self->{displayname_defaults};
+        return 'no name';
+    }
+
+    croak 'No displayname found';
 }
 
 
 sub displaycolour {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
     if (exists $self->{displaycolour}) {
+        return $opts{default} if !defined($self->{displaycolour}) && exists $opts{default};
         return $self->{displaycolour};
     } else {
         my $db = $self->db;
@@ -150,14 +255,16 @@ sub displaycolour {
             return $self->{displaycolour} = $colour if defined($colour);
         }
 
+        return $opts{default} if !defined($self->{displaycolour}) && exists $opts{default};
         return $self->{displaycolour};
     }
 }
 
 
 sub icontext {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
     if (exists $self->{icontext}) {
+        return $opts{default} if !defined($self->{icontext}) && exists $opts{default};
         return $self->{icontext};
     } else {
         my $db = $self->db;
@@ -191,14 +298,16 @@ sub icontext {
             }
         }
 
+        return $opts{default} if !defined($self->{icontext}) && exists $opts{default};
         return $self->{icontext};
     }
 }
 
 
 sub description {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
     if (exists $self->{description}) {
+        return $opts{default} if !defined($self->{description}) && exists $opts{default};
         return $self->{description};
     } else {
         my $db = $self->db;
@@ -215,6 +324,7 @@ sub description {
             last if defined $self->{description};
         }
 
+        return $opts{default} if !defined($self->{description}) && exists $opts{default};
         return $self->{description};
     }
 }
@@ -361,7 +471,7 @@ Data::TagDB::Tag - Work with Tag databases
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -370,6 +480,19 @@ version v0.03
     my $db = Data::TagDB->new(...);
 
     my Data::TagDB::Tag $tag = $db->tag_by_...(...);
+
+=head1 UNIVERSAL OPTIONS
+
+The following universe options are supported by many methods of this module. Each method lists which universal options it supports.
+
+=head2 default
+
+The default value to be returned if no value could be found.
+Can be C<undef> to switch the method from C<die>ing to returning C<undef> in case no value is found.
+
+=head2 no_defaults
+
+Prevents the calculation of any fallback values.
 
 =head1 METHODS
 
@@ -388,40 +511,49 @@ It is however the best option when directly interacting with the backend databas
 
 =head2 uuid, oid, uri, sid
 
-    my     $uuid = $tag->uuid;
-    my     $oid  = $tag->oid;
-    my URI $uri  = $tag->uri;
-    my     $sid  = $tag->sid;
+    my     $uuid = $tag->uuid( [ %opts ] );
+    my     $oid  = $tag->oid( [ %opts ] );
+    my URI $uri  = $tag->uri( [ %opts ] );
+    my     $sid  = $tag->sid( [ %opts ] );
 
 Returns the tags UUID, OID, URI, or SID (small-identifier).
-It is not yet defined if those functions die or return a calculated identifier if the requested identifier is unavailable.
-This will be defined in a later version of this module.
 Identifiers may also be unavailable due to being not part of the database.
+
+The following universal options are supported: L</default>, L</no_defaults>.
 
 =head2 ise
 
-    my $ise = $tag->ise;
+    my $ise = $tag->ise( [ %opts ] );
 
 Returns an identifier (C<uuid>, C<oid>, or C<uri>) for the tag as string.
 
+Supports the same options as supported by L</uuid>, L</oid>, and L</uri>.
+
 =head2 displayname
 
-    my $displayname = $tag->displayname;
+    my $displayname = $tag->displayname( [ %opts ] );
 
-Returns a name that can be used to display to the user.
-This function always returns a plain string (even if no usable name is found).
+Returns a name that can be used to display to the user or C<die>s.
+This function always returns a plain string (even if no usable name is found) unless L</no_defaults> is given.
+
+The following universal options are supported: L</default>, L</no_defaults>.
 
 =head2 displaycolour
 
-    my $displaycolour = $tag->displaycolour;
+    my $displaycolour = $tag->displaycolour( [ %opts ] );
 
-Returns a colour that can be used to display the tag or undef.
+Returns a colour that can be used to display the tag or C<undef>.
 This will return a decoded object, most likely (but not necessarily) an instance of L<Data::URIID::Colour>.
 Later versions of this module may allow to force a specific type.
 
+B<Note:> Future versions of this method will C<die> if no value can be found.
+
+The following universal options are supported: L</default>.
+The following universal options are ignored (without warning or error): L</no_defaults>.
+
 =head2 icontext
 
-    my $icontext = $tag->icontext;
+    my $icontext = $tag->icontext( [ %opts ] );
 
 Returns a string or C<undef> that is a single unicode character that represents the tag.
 This can be used as a visual aid for the user.
@@ -429,11 +561,21 @@ It is not well defined what single character means in this case. A single charac
 to multiple unicode code points (such as a base and modifiers). If the application requies a
 specific definition of single character it must validate the value.
 
+B<Note:> Future versions of this method will C<die> if no value can be found.
+
+The following universal options are supported: L</default>.
+The following universal options are ignored (without warning or error): L</no_defaults>.
+
 =head2 description
 
-    my $description = $tag->description;
+    my $description = $tag->description( [ %opts ] );
 
 Returns a description that can be used to display to the user or C<undef>.
+
+B<Note:> Future versions of this method will C<die> if no value can be found.
+
+The following universal options are supported: L</default>.
+The following universal options are ignored (without warning or error): L</no_defaults>.
 
 =head1 AUTHOR
 

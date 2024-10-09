@@ -20,7 +20,7 @@
         </td>
         <td width="16%" ng-repeat="i in [0,1,2]">
           <select class="form-control" ng-model="c.data[i]" ng-change="execFilters(_findScopeByKey('authParams'))" aria-decribedby="{{['authlabel','userdblabel','pwdlabel'][i]}}">
-            <option ng-repeat="item in currentNode.select[i]" ng-selected="item.k==c.data[i]" value="{{item.k}}">{{item.v}}</option>
+            <option ng-repeat="item in currentNode.select[i]" ng-selected="item.k==c.data[i]" value="{{item.k}}" trspan="{{item.v}}">{{item.v}}</option>
           </select>
         </td>
         <td width="20%">

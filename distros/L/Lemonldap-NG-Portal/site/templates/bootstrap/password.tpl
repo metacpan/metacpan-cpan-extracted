@@ -17,11 +17,11 @@
 
     <TMPL_IF NAME="LOGIN">
     <div class="input-group mb-3">
-      <input name="user" type="hidden" value="<TMPL_VAR NAME=LOGIN>" />
+      <input name="user" type="hidden" value="<TMPL_VAR NAME=LOGIN ESCAPE=HTML>" />
       <div class="input-group-prepend">
         <span class="input-group-text"><label for="staticUser" class="mb-0"><i class="fa fa-user"></i></label></span>
       </div>
-      <input id="staticUser" type="text" readonly class="form-control" value="<TMPL_VAR NAME=LOGIN>" />
+      <input id="staticUser" type="text" readonly class="form-control" value="<TMPL_VAR NAME=LOGIN ESCAPE=HTML>" />
     </div>
     </TMPL_IF>
 

@@ -1,3 +1,6 @@
+1.34  - 9 Oct 2024
+	fixes for win32 perl 5.40
+
 1.33  - 15 Apr 2024
 	fix http server bug
 

@@ -22,8 +22,7 @@ SKIP: {
     $dbh->do('CREATE TABLE users (user text,password text,name text)');
     $dbh->do("INSERT INTO users VALUES ('dwho','dwho','Doctor who')");
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel       => 'error',
                 useSafeJail    => 1,
@@ -58,6 +57,7 @@ SKIP: {
                 krbKeytab           => '/etc/keytab',
                 krbByJs             => 1,
                 krbAuthnLevel       => 4,
+                customPlugins       => "t::ChoiceHookPlugin",
             }
         }
     );
@@ -87,13 +87,12 @@ SKIP: {
       )
       or explain( $res->[2]->[0],
         '<form id="lformDemo" action="https://test.example.com"' );
-    ok(
-        $res->[2]->[0] =~
-m%<script type="application/init">\s*\{"sslHost":"https://authssl.example.com:19876"\}\s*</script>%s,
-        ' SSL AJAX URL found'
-      )
-      or
-      explain( $res->[2]->[0], '<script type="application/init">\{"sslHost"' );
+
+    is(
+        getJsVars($res)->{sslHost},
+        "https://authssl.example.com:19876",
+        "Found sslHost"
+    );
     expectForm( $res, '#', undef, 'kerberos' );
     ok(
         $res->[2]->[0] =~ m%<input type="hidden" name="kerberos" value="0" />%,
@@ -127,21 +126,113 @@ m%<form id="lformKerberos" action="#" method="post" class="login Kerberos">%,
       or explain( $res->[2]->[0],
         '<img src="/static/common/logos/logo_llng_old.png"' );
 
-    # Test SQL
-    my $postString = 'user=dwho&password=dwho&test=2_sql';
+    ok(getHtmlElement( $res,
+            '//div[@id="2_sql"]//input[@id="userfield"]/@autofocus' ), "User field has focus") ;
+    is (getHtmlElement($res, '//input/@autofocus')->size, 1, "Only one field has focus");
+    count(2);
 
-    # Try to authenticate
-    # -------------------
+    # Fail password
     ok(
         $res = $client->_post(
-            '/', IO::String->new($postString),
-            length => length($postString)
+            '/',
+            {
+                user     => "dwho",
+                password => "invalid",
+                test     => "3_demo",
+            },
+            accept => "text/html",
+        ),
+        'Auth query'
+    );
+    count(1);
+    my $n = getHtmlElement( $res,
+        '//div[@id="3_demo"]//input[@id="userfield"]/@value' )->pop();
+    is( $n->value, "dwho", "login autofilled in SQL form" );
+    $n = getHtmlElement( $res,
+        '//div[@id="2_sql"]//input[@id="userfield"]/@value' )->pop();
+    is( $n->value, "", "login not autofilled in SQL form" );
+    count(2);
+
+    ok(getHtmlElement( $res,
+            '//div[@id="3_demo"]//input[@id="passwordfield"]/@autofocus' ), "Password field has focus") ;
+    is (getHtmlElement($res, '//input/@autofocus')->size, 1, "Only one field has focus");
+    count(2);
+
+    # Authenticate
+    ok(
+        $res = $client->_post(
+            '/',
+            {
+                user     => "dwho",
+                password => "dwho",
+                test     => "2_sql",
+            },
         ),
         'Auth query'
     );
     expectOK($res);
     my $id = expectCookie($res);
     $client->logout($id);
+
+    # Test selection by hook
+    ok(
+        $res = $client->_post(
+            '/',
+            {
+                user     => "dwho",
+                password => "dwho",
+            },
+            ip => '1.2.3.4',
+        ),
+        'Auth query'
+    );
+    count(1);
+    expectOK($res);
+    $id = expectCookie($res);
+    $client->logout($id);
+
+    # Select by only available choice (disabled)
+    $client->ini( {
+            %{ $client->ini },
+            authChoiceModules    => { '1_demo' => 'Demo;Demo;Null' },
+            authChoiceSelectOnly => 0
+        }
+    );
+    ok(
+        $res = $client->_post(
+            '/',
+            {
+                user     => "dwho",
+                password => "dwho",
+            },
+            accept => "text/html",
+        ),
+        'Auth query'
+    );
+    count(1);
+    expectPortalError( $res, 9 );
+
+    # Select by only available choice (enabled)
+    $client->ini( {
+            %{ $client->ini },
+            authChoiceModules    => { '1_demo' => 'Demo;Demo;Null' },
+            authChoiceSelectOnly => 1
+        }
+    );
+    ok(
+        $res = $client->_post(
+            '/',
+            {
+                user     => "dwho",
+                password => "dwho",
+            },
+            accept => "text/html",
+        ),
+        'Auth query'
+    );
+    count(1);
+    expectCookie($res);
+
     clean_sessions();
 }
 count($maintests);

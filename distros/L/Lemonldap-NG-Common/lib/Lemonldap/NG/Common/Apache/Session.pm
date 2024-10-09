@@ -60,8 +60,13 @@ sub populate {
         $self->{validate} = sub { 1 };
     }
 
+    my $allow_cache_for_root =
+      (   $self->{args}->{localStorageOptions}
+        ? $self->{args}->{localStorageOptions}->{allow_cache_for_root}
+        : 0 );
+
     # If cache is configured, use our specific object store module
-    if ( ( $> or $self->{args}->{allow_cache_for_root} )
+    if ( ( $> or $allow_cache_for_root )
         and $self->{args}->{localStorage} )
     {
         $self->{args}->{object_store} = $self->{object_store};

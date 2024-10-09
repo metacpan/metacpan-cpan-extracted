@@ -52,7 +52,7 @@ SKIP: {
             'Auth query'
         );
         my $id = expectCookie($res);
-        expectRedirection( $res, 'http://auth.idp.com' );
+        expectRedirection( $res, 'http://auth.idp.com/' );
 
         # TOTP form
         ok(
@@ -249,7 +249,7 @@ sub issuer {
             ini => {
                 logLevel          => $debug,
                 domain            => 'idp.com',
-                portal            => 'http://auth.idp.com',
+                portal            => 'http://auth.idp.com/',
                 authentication    => 'Demo',
                 userDB            => 'Same',
                 restSessionServer => 1,

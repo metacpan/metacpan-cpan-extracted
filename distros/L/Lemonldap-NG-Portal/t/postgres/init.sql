@@ -1,0 +1,2 @@
+CREATE USER llng PASSWORD 'llng';
+CREATE DATABASE llng;

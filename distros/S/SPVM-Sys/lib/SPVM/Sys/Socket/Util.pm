@@ -10,7 +10,7 @@ SPVM::Sys::Socket::Util - Socket Utilities
 
 =head1 Description
 
-The Sys::Socket::Util class in L<SPVM> has methods for socket utilities.
+Sys::Socket::Util class in L<SPVM> has methods for socket utilities.
 
 =head1 Usage
 
@@ -22,13 +22,13 @@ The Sys::Socket::Util class in L<SPVM> has methods for socket utilities.
 
 C<static method inet_aton : L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> ($address : string);>
 
-Creates a new L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object and calls the L<inet_aton|SPVM::Sys::Socket/"inet_aton"> method in the Sys::Socket class with it, and returns it.
+Creates a new L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object and calls L<Sys::Socket#inet_aton|SPVM::Sys::Socket/"inet_aton"> method with it, and returns it.
 
 =head2 inet_ntoa
 
 C<static method inet_ntoa : string ($in_addr : Sys::Socket::In_addr);>
 
-Calls the L<inet_ntoa|SPVM::Sys::Socket/"inet_ntoa"> method in the Sys::Socket class, and returns its return value.
+Calls L<Sys::Socket#inet_ntoa|SPVM::Sys::Socket/"inet_ntoa"> method, and returns its return value.
 
 =head2 inet_pton
 
@@ -36,7 +36,7 @@ C<static method inet_pton : L<Sys::Socket::In_addr_base|SPVM::Sys::Socket::In_ad
 
 Creates a new L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object or a new L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> according to the address family $family.
 
-And calls the L<inet_aton|SPVM::Sys::Socket/"inet_pton"> method in the Sys::Socket class with it, and returns it.
+And calls L<Sys::Socket#inet_aton|SPVM::Sys::Socket/"inet_aton"> method with it, and returns it.
 
 Excetpions:
 
@@ -46,7 +46,7 @@ If the address family $family is not available, an excetpion is thrown.
 
 C<static method inet_ntop : string ($family : int, $in_addr : L<Sys::Socket::In_addr_base|SPVM::Sys::Socket::In_addr_base>);>
 
-Calls the L<inet_ntop|SPVM::Sys::Socket/"inet_ntop"> method in the Sys::Socket class given enough address buffer $dst.
+Calls L<Sys::Socket#inet_ntop|SPVM::Sys::Socket/"inet_ntop"> method given enough address buffer $dst.
 
 And the got address $dst is truncated to the length the address and returns it.
 

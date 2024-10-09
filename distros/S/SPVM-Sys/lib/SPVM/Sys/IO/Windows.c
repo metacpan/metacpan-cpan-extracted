@@ -3,46 +3,20 @@
 
 #include "spvm_native.h"
 
-#include <sys/stat.h>
-
 static const char* FILE_NAME = "Sys/IO/Windows.c";
 
 #if defined(_WIN32)
 
-#define _S_IFLNK ((unsigned)(_S_IFDIR | _S_IFCHR))
-
 // These implementations are originally copied form Perl win32/win32.c and win32/win32.h
 
+#include <sys/stat.h>
 #include <unistd.h>
 #include <windows.h>
 #include <errno.h>
 #include <winbase.h>
 #include <fcntl.h>
 
-#ifndef EDQUOT			/* Not in errno.h but wanted by POSIX.pm */
-#  define EDQUOT		WSAEDQUOT
-#endif
-
-#define dTHX 
-#define bool BOOL
-#define strEQ(string1, string2) (strcmp(string1, string2) == 0)
-#define isSLASH(c) ((c) == '/' || (c) == '\\')
-
-#define savepv(string) ((char*)env->get_chars(env, stack, env->new_string(env, stack, string, strlen(string))))
-
-#define SAVEFREEPV(pv) ((void*)NULL)
-
 static OSVERSIONINFO g_osver = {0, 0, 0, 0, 0, ""};
-
-typedef BOOLEAN (__stdcall *pCreateSymbolicLinkA_t)(LPCSTR, LPCSTR, DWORD);
-
-#ifndef SYMBOLIC_LINK_FLAG_DIRECTORY
-#  define SYMBOLIC_LINK_FLAG_DIRECTORY 0x1
-#endif
-
-#ifndef SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE
-#  define SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE 0x2
-#endif
 
 typedef struct {
     USHORT SubstituteNameOffset;
@@ -51,7 +25,7 @@ typedef struct {
     USHORT PrintNameLength;
     ULONG  Flags;
     WCHAR  PathBuffer[MAX_PATH*3];
-} MY_SYMLINK_REPARSE_BUFFER, *PMY_SYMLINK_REPARSE_BUFFER;
+} MY_SYMLINK_REPARSE_BUFFER;
 
 typedef struct {
     USHORT SubstituteNameOffset;
@@ -72,7 +46,26 @@ typedef struct {
       UCHAR DataBuffer[1];
     } GenericReparseBuffer;
   } Data;
-} MY_REPARSE_DATA_BUFFER, *PMY_REPARSE_DATA_BUFFER;
+} MY_REPARSE_DATA_BUFFER;
+
+#define _S_IFLNK ((unsigned)(_S_IFDIR | _S_IFCHR))
+
+#ifndef EDQUOT			/* Not in errno.h but wanted by POSIX.pm */
+#  define EDQUOT		WSAEDQUOT
+#endif
+
+#define strEQ(string1, string2) (strcmp(string1, string2) == 0)
+#define isSLASH(c) ((c) == '/' || (c) == '\\')
+
+#ifndef SYMBOLIC_LINK_FLAG_DIRECTORY
+#  define SYMBOLIC_LINK_FLAG_DIRECTORY 0x1
+#endif
+
+#ifndef SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE
+#  define SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE 0x2
+#endif
+
+typedef BOOLEAN (__stdcall *pCreateSymbolicLinkA_t)(LPCSTR, LPCSTR, DWORD);
 
 static BOOL
 is_symlink(HANDLE h) {
@@ -113,7 +106,6 @@ is_symlink_name(const char *name) {
 static int
 win32_unlink(const char *filename)
 {
-  dTHX;
   int ret;
   DWORD attrs;
   
@@ -147,7 +139,6 @@ win32_rename(const char *oname, const char *newname)
     char szOldName[MAX_PATH+1];
     BOOL bResult;
     DWORD dwFlags = MOVEFILE_COPY_ALLOWED;
-    dTHX;
     
     if (stricmp(newname, oname))
         dwFlags |= MOVEFILE_REPLACE_EXISTING;
@@ -225,7 +216,7 @@ translate_to_errno(void)
 }
 
 static int
-do_readlink_handle(HANDLE hlink, char *buf, size_t bufsiz, bool *is_symlink) {
+do_readlink_handle(HANDLE hlink, char *buf, size_t bufsiz, BOOL *is_symlink) {
     MY_REPARSE_DATA_BUFFER linkdata;
     DWORD linkdata_returned;
 
@@ -281,7 +272,7 @@ do_readlink_handle(HANDLE hlink, char *buf, size_t bufsiz, bool *is_symlink) {
     }
 
     if (bytes_out == 0 || used_default) {
-        /* failed conversion from unicode to ANSI or otherwise failed */
+        /*() failed.conversion from unicode to ANSI or otherwise() failed.*/
         errno = EINVAL;
         return -1;
     }
@@ -334,10 +325,9 @@ win32_readlink(const char *pathname, char *buf, size_t bufsiz) {
     return bytes_out;
 }
 
-int
+static int
 win32_symlink(SPVM_ENV* env, SPVM_VALUE* stack, const char *oldfile, const char *newfile)
 {
-    dTHX;
     size_t oldfile_len = strlen(oldfile);
     pCreateSymbolicLinkA_t pCreateSymbolicLinkA =
         (pCreateSymbolicLinkA_t)GetProcAddress(GetModuleHandle("kernel32.dll"), "CreateSymbolicLinkA");
@@ -360,8 +350,7 @@ win32_symlink(SPVM_ENV* env, SPVM_VALUE* stack, const char *oldfile, const char 
         /* Win32 (or perhaps NTFS) won't follow symlinks containing
            /, so replace any with \\
         */
-        char *temp = savepv(oldfile);
-        SAVEFREEPV(temp);
+        char *temp = (char*)env->get_chars(env, stack, env->new_string(env, stack, oldfile, strlen(oldfile)));
         char *p = temp;
         while (*p) {
             if (*p == '/') {
@@ -441,7 +430,7 @@ win32_symlink(SPVM_ENV* env, SPVM_VALUE* stack, const char *oldfile, const char 
     return 0;
 }
 
-int win32_lstat(const char* path, struct stat* sbuf)
+static int win32_lstat(const char* path, struct stat* sbuf)
 {
   HANDLE f;
   int result;
@@ -464,7 +453,7 @@ int win32_lstat(const char* path, struct stat* sbuf)
     return -1;
   }
   
-  bool is_symlink;
+  BOOL is_symlink;
   
   int size = do_readlink_handle(f, NULL, 0, &is_symlink);
   
@@ -497,12 +486,12 @@ int win32_lstat(const char* path, struct stat* sbuf)
 
 int32_t SPVM__Sys__IO__Windows__unlink(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if !defined(_WIN32)
-  env->die(env, stack, "The \"unlink\" method is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::IO::Windows#unlink method is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_pathname = stack[0].oval;
   if (!obj_pathname) {
-    return env->die(env, stack, "$pathname must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The path $pathname must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* pathname = env->get_chars(env, stack, obj_pathname);
@@ -511,7 +500,7 @@ int32_t SPVM__Sys__IO__Windows__unlink(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   stack[0].ival = status;
   if (status == -1) {
-    env->die(env, stack, "[System Error]unlink failed:%s. $pathname is \"%s\".", env->strerror(env, stack, errno, 0), pathname, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]unlink() failed:%s. $pathname is \"%s\".", env->strerror_nolen(env, stack, errno), pathname, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -521,24 +510,24 @@ int32_t SPVM__Sys__IO__Windows__unlink(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Windows__rename(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if !defined(_WIN32)
-  env->die(env, stack, "The \"rename\" method is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::IO::Windows#rename method is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_oldpath = stack[0].oval;
   if (!obj_oldpath) {
-    return env->die(env, stack, "$oldpath must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The old path $oldpath must be defined.", __func__, FILE_NAME, __LINE__);
   }
   const char* oldpath = env->get_chars(env, stack, obj_oldpath);
   
   void* obj_newpath = stack[0].oval;
   if (!obj_newpath) {
-    return env->die(env, stack, "$newpath must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The new path $newpath must be defined.", __func__, FILE_NAME, __LINE__);
   }
   const char* newpath = env->get_chars(env, stack, obj_newpath);
   
   int32_t status = win32_rename(oldpath, newpath);
   if (status == -1) {
-    env->die(env, stack, "[System Error]rename failed:%s. $oldpath is \"%s\". $newpath is \"%s\".", env->strerror(env, stack, errno, 0), oldpath, newpath, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]rename() failed:%s. $oldpath is \"%s\". $newpath is \"%s\".", env->strerror_nolen(env, stack, errno), oldpath, newpath, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -550,36 +539,36 @@ int32_t SPVM__Sys__IO__Windows__rename(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Windows__readlink(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if !defined(_WIN32)
-  env->die(env, stack, "The \"readlink\" method is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::IO::Windows#readlink method is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   int32_t error_id = 0;
   
   void* obj_path = stack[0].oval;
   if (!obj_path) {
-    return env->die(env, stack, "$path must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The path $path must be defined.", __func__, FILE_NAME, __LINE__);
   }
   const char* path = env->get_chars(env, stack, obj_path);
   
   void* obj_buf = stack[1].oval;
   if (!obj_buf) {
-    return env->die(env, stack, "$buf must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The buffer $buf must be defined.", __func__, FILE_NAME, __LINE__);
   }
   char* buf = (char*)env->get_chars(env, stack, obj_buf);
   int32_t buf_length = env->length(env, stack, obj_buf);
   
   int32_t bufsiz = stack[2].ival;
   if (!(bufsiz >= 0)) {
-    return env->die(env, stack, "$bufsiz must be greater than or equal to 0.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The buffer size $bufsiz must be greater than or equal to 0.", __func__, FILE_NAME, __LINE__);
   }
   if (!(bufsiz <= buf_length)) {
-    return env->die(env, stack, "$bufsiz must be less than or equal to the length of $buf.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The buffer size $bufsiz must be less than or equal to the length of the buffer $buf.", __func__, FILE_NAME, __LINE__);
   }
   
   errno = 0;
   int32_t placed_length = win32_readlink(path, buf, bufsiz);
   if (placed_length == -1) {
-    env->die(env, stack, "[System Error]readlink failed:%s. The reading of the symbolic link of the \"%s\" file failed", env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]readlink() failed:%s. $path is \"%s\".", env->strerror_nolen(env, stack, errno), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -591,27 +580,27 @@ int32_t SPVM__Sys__IO__Windows__readlink(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Windows__symlink(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if !defined(_WIN32)
-  env->die(env, stack, "The \"symlink\" method is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::IO::Windows#symlink method is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   int32_t error_id = 0;
   
   void* obj_oldpath = stack[0].oval;
   if (!obj_oldpath) {
-    return env->die(env, stack, "$oldpath must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The old path $oldpath must be defined.", __func__, FILE_NAME, __LINE__);
   }
   const char* oldpath = env->get_chars(env, stack, obj_oldpath);
   
   void* obj_newpath = stack[1].oval;
   if (!obj_newpath) {
-    return env->die(env, stack, "$newpath must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The new path $newpath must be defined.", __func__, FILE_NAME, __LINE__);
   }
   const char* newpath = env->get_chars(env, stack, obj_newpath);
   
   errno = 0;
   int32_t status = win32_symlink(env, stack, oldpath, newpath);
   if (status == -1) {
-    env->die(env, stack, "[System Error]win32_symlink failed:%s. $oldpath is \"%s\". $newpath is \"%s\".", env->strerror(env, stack, errno, 0), oldpath, newpath, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]win32_symlink() failed:%s. $oldpath is \"%s\". $newpath is \"%s\".", env->strerror_nolen(env, stack, errno), oldpath, newpath, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -623,20 +612,20 @@ int32_t SPVM__Sys__IO__Windows__symlink(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Windows__lstat(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if !defined(_WIN32)
-  return env->die(env, stack, "lstat is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  return env->die(env, stack, "Sys::IO::Windows#lstat method is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
 #else
 
   int32_t error_id = 0;
   
   void* obj_path = stack[0].oval;
   if (!obj_path) {
-    return env->die(env, stack, "$path must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The path $path must be defined.", __func__, FILE_NAME, __LINE__);
   }
   const char* path = env->get_chars(env, stack, obj_path);
   
   void* obj_lstat = stack[1].oval;
   if (!obj_lstat) {
-    return env->die(env, stack, "$lstat must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The stat object $lstat must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   struct stat* stat_buf = env->get_pointer(env, stack, obj_lstat);
@@ -645,7 +634,7 @@ int32_t SPVM__Sys__IO__Windows__lstat(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   if (status == -1) {
     const char* path = env->get_chars(env, stack, obj_path);
-    env->die(env, stack, "[System Error]lstat failed:%s. $path is \"%s\".", path, env->strerror(env, stack, errno, 0), path, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]lstat() failed:%s. $path is \"%s\".", path, env->strerror_nolen(env, stack, errno), path, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   

@@ -1,0 +1,173 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class IO::Poll {
+  use Sys::Poll;
+  use Sys::Poll::PollfdArray;
+  use Sys::Poll::Constant as POLL;
+  use Hash;
+  
+  # Fields
+  has pollfd_array : Sys::Poll::PollfdArray;
+  
+  has fd_indexes_h : Hash of Int;
+  
+  has disabled_fd_indexes : IntList;
+  
+  # Class Methods
+  static method new : IO::Poll () {
+    
+    my $self = new IO::Poll;
+    
+    # pollfd_array field
+    my $pollfd_array = Sys::Poll::PollfdArray->new;
+    $self->{pollfd_array} = $pollfd_array;
+    
+    # fd_indexes_h field
+    my $fd_indexes_h = Hash->new;
+    $self->{fd_indexes_h} = $fd_indexes_h;
+    
+    my $disabled_fd_indexes = IntList->new;
+    $self->{disabled_fd_indexes} = $disabled_fd_indexes;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method fds : int[] () {
+    
+    my $pollfd_array = $self->{pollfd_array};
+    
+    my $pollfd_array_length = $pollfd_array->length;
+    
+    my $disabled_fd_indexes = $self->{disabled_fd_indexes};
+    
+    my $disabled_fd_indexes_length = $disabled_fd_indexes->length;
+    
+    my $fds_length = $pollfd_array_length - $disabled_fd_indexes_length;
+    
+    my $fds = new int[$fds_length];
+    
+    my $fd_index = 0;
+    for (my $pollfd_array_index = 0; $pollfd_array_index < $pollfd_array_length; $pollfd_array_index++) {
+      my $fd = $pollfd_array->fd($pollfd_array_index);
+      
+      if ($fd >= 0) {
+        $fds->[$fd_index] = $fd;
+        $fd_index++;
+      }
+    }
+    
+    return $fds;
+  }
+  
+  method mask : int ($fd : int) {
+    
+    unless ($fd >= 0) {
+      die "The file descriptor \$fd must be greater than or equal to 0.";
+    }
+    
+    my $fd_indexes_h = $self->{fd_indexes_h};
+    
+    my $fd_index_object = $fd_indexes_h->get($fd);
+    
+    my $event_mask = 0;
+    
+    if ($fd_index_object) {
+      my $fd_index = (int)$fd_index_object;
+      
+      my $pollfd_array = $self->{pollfd_array};
+      
+      $event_mask = $pollfd_array->events($fd_index);
+    }
+    
+    return $event_mask;
+  }
+  
+  method set_mask : void ($fd : int, $event_mask : int) {
+    
+    unless ($fd >= 0) {
+      die "The file descriptor \$fd must be greater than or equal to 0.";
+    }
+    
+    my $fd_indexes_h = $self->{fd_indexes_h};
+    
+    my $fd_index_object = $fd_indexes_h->get($fd);
+    
+    my $pollfd_array = $self->{pollfd_array};
+    
+    if ($event_mask) {
+      my $fd_index = -1;
+      if ($fd_index_object) {
+        $fd_index = (int)$fd_index_object;
+      }
+      else {
+        my $disabled_fd_indexes = $self->{disabled_fd_indexes};
+        
+        if ($disabled_fd_indexes->length > 0) {
+          $fd_index = (int)$disabled_fd_indexes->pop;
+          $pollfd_array->set_fd($fd_index, $fd);
+        }
+        else {
+          $pollfd_array->push($fd);
+          $fd_index = $pollfd_array->length - 1;
+        }
+        
+        $fd_indexes_h->set($fd, $fd_index);
+      }
+      
+      $pollfd_array->set_events($fd_index, $event_mask);
+    }
+    else {
+      if ($fd_index_object) {
+        my $fd_index = (int)$fd_index_object;
+        
+        $pollfd_array->set_fd($fd_index, -1);
+        
+        my $disabled_fd_indexes = $self->{disabled_fd_indexes};
+        
+        $disabled_fd_indexes->push($fd_index);
+        
+        $fd_indexes_h->delete($fd);
+      }
+    }
+  }
+  
+  method remove : void ($fd : int) {
+    
+    $self->set_mask($fd, 0);
+  }
+  
+  method poll : int ($timeout : double = -1) {
+    
+    my $pollfd_array = $self->{pollfd_array};
+    
+    my $nfds = $pollfd_array->length;
+    
+    my $timeout_ms = $timeout * 1000;
+    
+    my $ready_count = Sys::Poll->poll($pollfd_array, $nfds, (int)$timeout_ms);
+    
+    return $ready_count;
+  }
+  
+  method events : int ($fd : int) {
+    
+    my $fd_indexes_h = $self->{fd_indexes_h};
+    
+    my $fd_index_object = $fd_indexes_h->get($fd);
+    
+    my $revents = 0;
+    
+    if ($fd_index_object) {
+      my $fd_index = (int)$fd_index_object;
+      
+      my $pollfd_array = $self->{pollfd_array};
+      
+      $revents = $pollfd_array->revents($fd_index);
+    }
+    
+    return $revents;
+  }
+  
+}

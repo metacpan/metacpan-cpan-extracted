@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
         'vars'                          => 0,
         'warnings'                      => 0,
         'warnings::register'            => 0,
-        'DateTime::Locale::FromCLDR'    => 'v0.4.0',
+        'DateTime::Locale::FromCLDR'    => 'v0.4.3',
         'POSIX'                         => 0,
         'Scalar::Util'                  => 0,
         # Version compatible with perl v5.10
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
         'Test::Pod'     => '1.52',
     },
     LICENSE             => 'perl_5',
-    MIN_PERL_VERSION    => 'v5.10',
+    MIN_PERL_VERSION    => 'v5.10.1',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp', PREOP => './dev/cleanup.pl' },
     clean               => { FILES => 'DateTime-Format-Unicode-*' },

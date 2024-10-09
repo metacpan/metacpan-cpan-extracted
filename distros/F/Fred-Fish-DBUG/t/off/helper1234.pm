@@ -15,7 +15,7 @@ use Test::More 0.88;
 use File::Basename;
 use File::Spec;
 
-$VERSION = "2.03";
+$VERSION = "2.07";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( get_fish_state
@@ -24,6 +24,7 @@ $VERSION = "2.03";
               get_fish_log
               get_delay_file
               get_fish_module
+              find_fish_users
               get_fish_opts
               get_called_by_code_ref
               print_stack_trace
@@ -35,7 +36,7 @@ $VERSION = "2.03";
               test_mask_return
               test_mask_args
               simulate_windows_signal
-	      is2
+              is2
               ok2 ok3 ok9
               isa_ok2 isa_ok3
             );
@@ -210,6 +211,19 @@ sub get_fish_module
    # ok2 ( $file eq $mode, "Selected file: $file  -->  $module" );
 
    return ( wantarray ? ($module, $file ) : $module );
+}
+
+sub find_fish_users
+{
+   my $opt = shift;
+
+   my %h = Fred::Fish::DBUG::find_all_fish_users ();
+
+   if ( $opt ) {
+      $h{z_EXTRA_FILE} = (caller(0))[1] . " (IGNORE-ME)";
+   }
+
+   return ( %h );
 }
 
 sub get_fish_opts

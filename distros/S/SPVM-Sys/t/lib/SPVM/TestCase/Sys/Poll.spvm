@@ -145,8 +145,10 @@ class TestCase::Sys::Poll {
       Sys::Process->sleep(1);
       
       {
-        my $fds_legnth = 2;
-        my $fds = Sys::Poll::PollfdArray->new($fds_legnth);
+        my $fds = Sys::Poll::PollfdArray->new;
+        
+        $fds->push(0);
+        $fds->push(1);
         
         $fds->set_fd(0, $no0_socket);
         $fds->set_events(0, (short)(POLL->POLLIN));

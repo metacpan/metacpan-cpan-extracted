@@ -129,21 +129,34 @@ sub _sendAsap {
     my ( $self, $req, $pem ) = @_;
 
     my $res;
-    eval {
-        my $x509 = Crypt::OpenSSL::X509->new_from_string( $pem,
-            Crypt::OpenSSL::X509::FORMAT_PEM );
-        my $pub  = $x509->pubkey;
-        my $type = $x509->pubkey_type;
-        if ( ($type) eq "rsa" ) {
-            my $pubkey = Crypt::OpenSSL::RSA->new_public_key($pub);
-            $res = $pubkey->get_public_key_x509_string;
-        }
-        else {
-            die "Unsupported pubkey type $type";
-        }
-    };
 
-    if ( !$@ ) {
+    # Try to parse as RSA key
+    eval {
+        my $pubkey = Crypt::OpenSSL::RSA->new_public_key($pem);
+        $res = $pubkey->get_public_key_x509_string;
+    };
+    my $parse_pubkey_error = $@;
+
+    if ( !$res ) {
+
+        # Try to parse as X.509 cert
+        eval {
+            my $x509 = Crypt::OpenSSL::X509->new_from_string( $pem,
+                Crypt::OpenSSL::X509::FORMAT_PEM );
+            my $pub  = $x509->pubkey;
+            my $type = $x509->pubkey_type;
+            if ( ($type) eq "rsa" ) {
+                my $pubkey = Crypt::OpenSSL::RSA->new_public_key($pub);
+                $res = $pubkey->get_public_key_x509_string;
+            }
+            else {
+                die "Unsupported pubkey type $type";
+            }
+        };
+    }
+    my $parse_cert_error = $@;
+
+    if ($res) {
         return [
             200,
             [
@@ -155,7 +168,9 @@ sub _sendAsap {
         ];
     }
     else {
-        $self->logger->error("Could not export public key: $@");
+        $self->logger->error(
+                "Could not parse public key as RSA ($parse_pubkey_error)"
+              . " or X.509 ($parse_cert_error)" );
         return $self->p->sendError( $req, "Unsupported public key format",
             500 );
     }

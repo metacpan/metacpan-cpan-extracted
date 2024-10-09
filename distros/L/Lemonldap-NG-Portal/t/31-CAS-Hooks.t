@@ -13,9 +13,6 @@ BEGIN {
 my $debug = 'error';
 my ( $issuer, $res );
 
-eval { require XML::Simple };
-plan skip_all => "Missing dependencies: $@" if ($@);
-
 ok( $issuer = issuer(), 'Issuer portal' );
 count(1);
 
@@ -85,7 +82,7 @@ sub issuer {
             ini => {
                 logLevel              => $debug,
                 domain                => 'idp.com',
-                portal                => 'http://auth.idp.com',
+                portal                => 'http://auth.idp.com/',
                 authentication        => 'Demo',
                 userDB                => 'Same',
                 issuerDBCASActivation => 1,

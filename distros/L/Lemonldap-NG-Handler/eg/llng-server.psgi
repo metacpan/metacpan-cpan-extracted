@@ -27,10 +27,6 @@ my %builder = (
         eval "require $class";
         return $class->reload();
     },
-    status => sub {
-        eval "require $class";
-        return $class->status();
-    },
     manager => sub {
         require Lemonldap::NG::Manager;
         return Lemonldap::NG::Manager->run( {} );
@@ -62,7 +58,8 @@ my %builder = (
             return $_apps{$script}->(@_) if ( $_apps{$script} );
             $_apps{$script} = do $script;
             unless ( $_apps{$script} and ref $_apps{$script} ) {
-                die "Unable to load $_[0]->{SCRIPT_FILENAME}";
+                my $errmsg = $@ || $! || "unknown error";
+                die("Unable to load $_[0]->{SCRIPT_FILENAME}: $errmsg");
             }
             return $_apps{$script}->(@_);
         }

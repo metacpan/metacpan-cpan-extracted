@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants 'URIRE';
 
 our $VERSION = '2.18.0';
 
-extends 'Lemonldap::NG::Common::Module';
+extends 'Lemonldap::NG::Portal::Main::Plugin';
 
 # PROPERTIES
 
@@ -18,9 +18,8 @@ has menuModules => (
     lazy    => 1,
     builder => sub {
         my $conf = $_[0]->{conf};
-        my ( @res, %hash );
-        my @modules = grep { !$hash{$_}++ } split /[,\s]+/,
-          $conf->{portalDisplayOrder};
+        my (@res);
+        my @modules = $_[0]->_get_display_order( $conf->{portalDisplayOrder} );
         foreach (@modules) {
             my $cond = $conf->{"portalDisplay$_"} // 1;
             $_[0]->p->logger->debug("Evaluate condition $cond for module $_");
@@ -52,6 +51,13 @@ sub init {
     $self->sfManagerRule(
         $self->p->buildRule( $self->conf->{sfManagerRule}, 'sfManagerRule' ) );
     $self->sfManagerRule(1) unless $self->sfManagerRule;
+
+    # Allow custom plugins to register new menu tabs
+    $self->addEntryPoint(
+        does    => "Lemonldap::NG::Portal::MenuTab",
+        service => "menu",
+        method  => "_register_tab",
+    );
 
     return 1;
 }
@@ -197,6 +203,16 @@ sub displayModules {
             }
             elsif ( $module->[0] eq 'ChangePassword' ) {
                 $moduleHash->{'PPOLICY_RULES'} = $self->p->getPpolicyRules;
+            }
+
+            # If the current entry is a plugin
+            if ( $module->[2] ) {
+                my $plugin_hash = $module->[2]->display($req);
+                $moduleHash->{_PLUGIN}      = 1;
+                $moduleHash->{_PLUGIN_LOGO} = $plugin_hash->{logo};
+                $moduleHash->{_PLUGIN_NAME} = $plugin_hash->{name};
+                $moduleHash->{_PLUGIN_ID}   = $plugin_hash->{name};
+                $moduleHash->{_PLUGIN_HTML} = $plugin_hash->{html};
             }
             push @$displayModules, $moduleHash;
         }
@@ -511,6 +527,61 @@ sub _isCategoryEmpty {
         }
     }
     return 0;
+}
+
+sub _register_tab {
+    my ( $self, $plugin ) = @_;
+
+    my $rule_text = $plugin->rule // "1";
+    my $name      = $plugin->name;
+
+    if ( !$name ) {
+        $self->logger->warn("Could not load custom menu tab: missing name");
+        return;
+    }
+
+    my $compiled_rule =
+      $self->p->buildRule( $rule_text, "Rule for $name custom tab" );
+    if ( !$compiled_rule ) {
+        return;
+    }
+
+    push @{ $self->menuModules }, [ $name, $compiled_rule, $plugin ];
+
+    # Sort menuModules array
+    @{ $self->menuModules } = $self->_sort_menu( $self->menuModules,
+        $self->conf->{portalDisplayOrder} );
+    return;
+}
+
+# This function does the sorting work and should be easy to test
+sub _sort_menu {
+    my ( $self, $menuToSort, $displayOrderString ) = @_;
+
+    my @order = $self->_get_display_order($displayOrderString);
+    my $orderhash;
+    @$orderhash{@order} = 1 .. @order;
+
+    # If the position of unknown plugins was not specified, put them at the end
+    $orderhash->{_unknown} //= @order + 1;
+
+    return sort { _sort_menu_helper( $orderhash, $a, $b ) } @$menuToSort;
+}
+
+# Sort helper based on portalDisplayOrder
+# orderhash is a name => position hash
+# You can use "_unknown" in portalDisplayOrder as a placeholder for plugins of unknown position
+sub _sort_menu_helper {
+    my ( $orderhash, $a, $b ) = @_;
+
+    return ( $orderhash->{ $a->[0] } || $orderhash->{_unknown} || 0 )
+      <=> ( $orderhash->{ $b->[0] } || $orderhash->{_unknown} || 0 );
+}
+
+sub _get_display_order {
+    my ( $self, $displayOrderString ) = @_;
+    my %hash;
+    return grep { !$hash{$_}++ } split /[,\s]+/, $displayOrderString,;
 }
 
 1;

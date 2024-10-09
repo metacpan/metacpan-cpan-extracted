@@ -152,7 +152,7 @@
           "type": "bool"
         },
         {
-          "default": 0,
+          "default": 1,
           "id": "hideOldPassword",
           "title": "hideOldPassword",
           "type": "bool"
@@ -2122,23 +2122,6 @@
       "help": "register.html",
       "id": "register",
       "title": "register",
-      "type": "simpleInputContainer"
-    },
-    {
-      "_nodes": [{
-        "default": 0,
-        "id": "u2fActivation",
-        "title": "u2fActivation",
-        "type": "bool"
-      },
-      {
-        "default": 0,
-        "id": "u2fSelfRegistration",
-        "title": "u2fSelfRegistration",
-        "type": "bool"
-      }],
-      "id": "u2f",
-      "title": "u2f",
       "type": "simpleInputContainer"
     },
     {

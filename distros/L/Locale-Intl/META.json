@@ -62,6 +62,6 @@
          "web" : "https://gitlab.com/jackdeguest/Locale-Intl"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -82,7 +82,7 @@ ok(
     'Post user/password'
 );
 count(2);
-expectRedirection( $res, 'http://auth.sp.com' );
+expectRedirection( $res, 'http://auth.sp.com/' );
 $spId = expectCookie($res);
 
 # Logout
@@ -130,7 +130,7 @@ sub issuer {
     return LLNG::Manager::Test->new( {
             ini => {
                 domain            => 'idp.com',
-                portal            => 'http://auth.idp.com',
+                portal            => 'http://auth.idp.com/',
                 authentication    => 'Demo',
                 secret            => 'abc',
                 userDB            => 'Same',
@@ -145,7 +145,7 @@ sub sp {
     return LLNG::Manager::Test->new( {
             ini => {
                 domain           => 'sp.com',
-                portal           => 'http://auth.sp.com',
+                portal           => 'http://auth.sp.com/',
                 authentication   => 'Proxy',
                 userDB           => 'Same',
                 secret           => 'abc',

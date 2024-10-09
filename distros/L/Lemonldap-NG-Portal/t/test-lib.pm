@@ -110,18 +110,9 @@ Convenience method that builds a url-encoded query string from a hash of argumen
 
 sub buildForm {
     my $fields = shift;
-    my $query  = join(
-        '&',
-        map {
-            "$_="
-              . (
-                $fields->{$_}
-                ? uri_escape( uri_unescape( $fields->{$_} ) )
-                : ''
-              )
-          }
-          keys(%$fields)
-    );
+    my $query  = join( '&',
+        map { "$_=" . ( $fields->{$_} ? uri_escape( $fields->{$_} ) : '' ) }
+          keys(%$fields) );
     return $query;
 }
 
@@ -294,6 +285,20 @@ sub expectAutoPost {
     ok( $method =~ /^post$/i, ' Method is POST' ) or explain( $method, 'POST' );
     count(1);
     return @r;
+}
+
+sub getJsVars {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ($res) = @_;
+
+    my $initscripts =
+      getHtmlElement( $res, '//script[@type="application/init"]' );
+
+    my @parsed_initscripts =
+      map { from_json( $_->string_value ) } $initscripts->get_nodelist();
+
+    my %vars = map { %$_ } @parsed_initscripts;
+    return \%vars;
 }
 
 =head4 expectForm( $res, $hostRe, $uriRe, @requiredFields )
@@ -633,6 +638,17 @@ sub getHtmlElement {
     return $doc->findnodes($xpath);
 }
 
+sub expectXpath {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my ( $res, $xpath, $message ) = @_;
+    $message ||= "Found at least one result for $xpath";
+
+    ok( $res = getHtmlElement( $res, $xpath ), $message, );
+    count(1);
+    return $res;
+}
+
 =head4 getCookies($res)
 
 Returns an hash ref with names => values of cookies set by server.
@@ -877,6 +893,7 @@ our $defaultIni = {
     },
     logLevel              => 'error',
     cookieName            => 'lemonldap',
+    languages             => 'en, fr',
     domain                => 'example.com',
     templateDir           => $templateDir,
     staticPrefix          => '/static',
@@ -1135,7 +1152,7 @@ sub _get {
 
     my $res = $self->app->( {
             'HTTP_ACCEPT'          => $args{accept} // $self->accept,
-            'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
+            'HTTP_ACCEPT_LANGUAGE' => 'en-US,fr-FR;q=0.7,fr;q=0.3',
             'HTTP_CACHE_CONTROL'   => 'max-age=0',
             ( $args{cookie} ? ( HTTP_COOKIE => $args{cookie} ) : () ),
             'HTTP_HOST' => ( $args{host} ? $args{host} : 'auth.example.com' ),
@@ -1201,7 +1218,7 @@ sub _post {
       unless ( ref($body) and $body->can('read') );
     my $res = $self->app->( {
             'HTTP_ACCEPT'          => $args{accept} // $self->accept,
-            'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
+            'HTTP_ACCEPT_LANGUAGE' => 'en-US,fr-FR;q=0.7,fr;q=0.3',
             'HTTP_CACHE_CONTROL'   => 'max-age=0',
             ( $args{cookie} ? ( HTTP_COOKIE => $args{cookie} ) : () ),
             'HTTP_HOST' => ( $args{host} ? $args{host} : 'auth.example.com' ),

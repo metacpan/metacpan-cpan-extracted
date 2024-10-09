@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.20.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -44,6 +44,14 @@ has authnLevel => (
     }
 );
 
+has rule => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        return $_[0]->conf->{ $_[0]->prefix . '2fActivation' };
+    }
+);
+
 # 'type' field of stored _2fDevices
 # Defaults to the last component of the package name
 # But can be overriden by sfExtra
@@ -71,7 +79,7 @@ sub init {
 sub get2fTplParams {
     my ( $self, $req ) = @_;
 
-    return $self->p->_sfEngine->get2fTplParams($req, $self);
+    return $self->p->_sfEngine->get2fTplParams( $req, $self );
 }
 1;
 __END__
@@ -114,8 +122,8 @@ L<Lemonldap::NG::Portal> second factor plugins.
       # replace the rule to detect if user has registered a device key.
       # The rule must be like this :
       # By example :
-      $self->conf->{u2fActivation} = '$_2fDevices =~ /"type":\s*"U2F"/s'
-      # Optionally, the rule can be : '$_2fDevices and $_2fDevices =~ /"type":\s*"U2F"/s'
+      $self->conf->{totp2fActivation} = '$_2fDevices =~ /"type":\s*"TOTP"/s'
+      # Optionally, the rule can be : '$_2fDevices and $_2fDevices =~ /"type":\s*"TOTP"/s'
       # to avoid warning due to undef variable
       #
       # Required call:

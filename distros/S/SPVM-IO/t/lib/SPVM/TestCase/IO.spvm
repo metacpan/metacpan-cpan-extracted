@@ -1,0 +1,31 @@
+class TestCase::IO {
+  
+  use IO;
+  
+  static method TEST_FILES_DIR : string () { return "t/test_files"; }
+  
+  static method open : int ($file : string) {
+    {
+      my $io_file = IO->open("<", $file);
+      unless ($io_file) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method opendir : int () {
+    
+    my $dir_path = &TEST_FILES_DIR;
+    
+    {
+      my $dh = IO->opendir($dir_path);
+      
+      $dh->read;
+    }
+    
+    return 1;
+  }
+  
+}

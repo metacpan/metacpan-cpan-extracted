@@ -265,7 +265,7 @@ sub socket
 	$paddr = sockaddr_in($port,$iaddr);
 	return undef, "error creating socket:$!" unless socket($sock,PF_INET,SOCK_STREAM,$tcp_proto);
 	$sock->blocking(0);
-	return undef, "connect($host,$port) error:$!" unless CORE::connect($sock,$paddr) or $!{EINPROGRESS};
+	return undef, "connect($host,$port) error:$!" unless CORE::connect($sock,$paddr) or $!{EINPROGRESS} or $!{EWOULDBLOCK};
 	return $sock;
 }
 

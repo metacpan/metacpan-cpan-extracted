@@ -1,0 +1,80 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class IO::Dir {
+  
+  use Sys;
+  use Sys::IO;
+  use Sys::IO::DirStream;
+  use Sys::IO::Dirent;
+  
+  has dir_stream : Sys::IO::DirStream;
+  
+  # Class Methods
+  static method new : IO::Dir ($dir_path : string = undef) {
+    
+    my $self = new IO::Dir;
+    
+    if ($dir_path) {
+      $self->open($dir_path);
+    }
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method open : void ($dir_path : string) {
+    
+    my $dir_stream_ref = [(Sys::IO::DirStream)undef];
+    
+    Sys->opendir($dir_stream_ref, $dir_path);
+    
+    my $dir_stream = $dir_stream_ref->[0];
+    
+    $self->{dir_stream} = $dir_stream;
+  }
+  
+  method read : Sys::IO::Dirent () {
+    
+    my $dir_stream = $self->{dir_stream};
+    
+    my $dirent = Sys->readdir($dir_stream);
+    
+    return $dirent;
+  }
+  
+  method seek : void ($offset : long) {
+    
+    my $dir_stream = $self->{dir_stream};
+    
+    Sys->seekdir($dir_stream, $offset);
+  }
+  
+  method tell : long () {
+    
+    my $dir_stream = $self->{dir_stream};
+    
+    Sys->telldir($dir_stream);
+  }
+  
+  method rewind : void () {
+    
+    my $dir_stream = $self->{dir_stream};
+    
+    Sys->rewinddir($dir_stream);
+  }
+  
+  method close : void () {
+    
+    my $dir_stream = $self->{dir_stream};
+    
+    Sys->closedir($dir_stream);
+  }
+  
+  method opened : int () {
+    
+    my $opened = !$self->{dir_stream}->closed;
+    
+    return $opened;
+  }
+}

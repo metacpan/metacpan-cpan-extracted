@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -316,6 +316,12 @@ sub attributes {
             default => 600,
             flags   => 'hp',
         },
+        checkMsg => {
+            type          => 'int',
+            documentation => 'Timeout to check new evant',
+            default       => 5,
+            flags         => 'hp',
+        },
         defaultNewKeySize => {
             type          => 'int',
             documentation => 'Default size for new RSA key helper',
@@ -370,10 +376,16 @@ sub attributes {
             type          => 'text',
             documentation => 'Version of LLNG which build configuration',
         },
-        status => {
+        eventStatus => {
             type          => 'bool',
-            documentation => 'Status daemon activation',
+            documentation => 'Push status into message broker',
             flags         => 'h',
+        },
+        statusQueueName => {
+            type          => 'text',
+            default       => 'llng_status',
+            flags         => 'h',
+            documentation => 'Status channel name',
         },
         confirmFormMethod => {
             type   => "select",
@@ -487,7 +499,6 @@ sub attributes {
         },
         reloadUrls => {
             type          => 'keyTextContainer',
-            help          => 'configlocation.html#configuration-reload',
             keyTest       => qr/^$Regexp::Common::URI::RFC2396::host(?::\d+)?$/,
             test          => $url,
             msgFail       => '__badUrl__',
@@ -527,6 +538,12 @@ sub attributes {
             default       => '; ',
             documentation => 'Separator for multiple values',
             flags         => 'hmp',
+        },
+        rememberAuthChoiceForgetAtLogout => {
+            type          => 'bool',
+            default       => 0,
+            documentation =>
+              'Forget Auth Choice at logout',
         },
         rememberAuthChoiceRule => {
             type          => 'boolOrExpr',
@@ -1123,7 +1140,7 @@ sub attributes {
               'Enable force to authenticate when displaying portal',
         },
         portalForceAuthnInterval => {
-            default       => 5,
+            default       => 300,
             type          => 'int',
             documentation =>
 'Maximum interval in seconds since last authentication to force reauthentication',
@@ -1294,6 +1311,11 @@ sub attributes {
             default       => '[A-Z]{3}[a-z]{5}.\d{2}',
             documentation => 'Regular expression to create a random password',
         },
+        trustedBrowserUseTotp => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Use TOTP for trusted browser registration',
+        },
         trustedBrowserRule => {
             type          => 'boolOrExpr',
             default       => 0,
@@ -1338,6 +1360,12 @@ sub attributes {
             default       => 0,
             type          => 'bool',
             documentation => 'Avoid browsers to store users password',
+        },
+        useRedirectAjaxOnUnauthorized => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Redirect Ajax requests to portal for unauthorized (401)',
+            flags         => 'h',
         },
         useRedirectOnError => {
             type          => 'bool',
@@ -1406,6 +1434,10 @@ sub attributes {
         crowdsecKey => {
             type          => 'text',
             documentation => 'CrowdSec API key',
+        },
+        crowdsecIgnoreFailures => {
+            type          => 'bool',
+            documentation => 'Ignore Crowdsec errors',
         },
 
         # History
@@ -1657,17 +1689,17 @@ sub attributes {
         # Captcha
         captcha_login_enabled => {
             default       => 0,
-            type          => 'bool',
+            type          => 'boolOrExpr',
             documentation => 'Captcha on login page',
         },
         captcha_mail_enabled => {
             default       => 1,
-            type          => 'bool',
+            type          => 'boolOrExpr',
             documentation => 'Captcha on password reset page',
         },
         captcha_register_enabled => {
             default       => 1,
-            type          => 'bool',
+            type          => 'boolOrExpr',
             documentation => 'Captcha on account creation page',
         },
         captcha_size => {
@@ -1846,6 +1878,30 @@ sub attributes {
             documentation => 'List of virtualHosts with their get parameters',
         },
 
+        # Message broker
+        messageBroker => {
+            type          => 'select',
+            documentation => 'Messages broker module',
+            select        => [
+                { k => '',        v => '' },
+                { k => '::Redis', v => 'Redis' },
+                { k => '::Pg',    v => 'PostgreSQL' },
+                { k => '::MQTT',  v => 'MQTT' },
+            ],
+            flags => 'hp',
+        },
+        messageBrokerOptions => {
+            type          => 'keyTextContainer',
+            default       => {},
+            documentation => 'Options of messages broker module',
+            flags         => 'hp',
+        },
+        eventQueueName => {
+            type          => 'text',
+            default       => 'llng_events',
+            documentation => 'Event channel name',
+        },
+
         # Jitsi Meet tokens issuer
         issuerDBJitsiMeetTokensActivation => {
             type          => 'bool',
@@ -1912,7 +1968,7 @@ sub attributes {
               'Rule to require old password to change the password',
         },
         hideOldPassword => {
-            default       => 0,
+            default       => 1,
             type          => 'bool',
             documentation => 'Hide old password in portal',
         },
@@ -1925,6 +1981,11 @@ sub attributes {
             default       => 0,
             type          => 'int',
             documentation => 'Password policy: minimal size',
+        },
+        passwordPolicyMaxSize => {
+            default       => 0,
+            type          => 'int',
+            documentation => 'Password policy: maximal size',
         },
         passwordPolicyMinLower => {
             default       => 0,
@@ -2203,40 +2264,6 @@ sub attributes {
             documentation => 'Password2F device time to live ',
         },
 
-        # U2F
-        u2fActivation => {
-            type          => 'boolOrExpr',
-            default       => 0,
-            documentation => 'U2F activation',
-        },
-        u2fSelfRegistration => {
-            type          => 'boolOrExpr',
-            default       => 0,
-            documentation => 'U2F self registration activation',
-        },
-        u2fAuthnLevel => {
-            type          => 'intOrNull',
-            documentation =>
-              'Authentication level for users authentified by password+U2F'
-        },
-        u2fLabel => {
-            type          => 'text',
-            documentation => 'Portal label for U2F'
-        },
-        u2fLogo => {
-            type          => 'text',
-            documentation => 'Custom logo for U2F',
-        },
-        u2fUserCanRemoveKey => {
-            type          => 'bool',
-            default       => 1,
-            documentation => 'Authorize users to remove existing U2F key',
-        },
-        u2fTTL => {
-            type          => 'intOrNull',
-            documentation => 'U2F device time to live',
-        },
-
         # TOTP second factor
         totp2fActivation => {
             type          => 'boolOrExpr',
@@ -2293,26 +2320,6 @@ sub attributes {
             type          => 'bool',
             default       => 0,
             documentation => 'Encrypt TOTP secrets in database',
-        },
-
-        # UTOTP 2F
-        utotp2fActivation => {
-            type          => 'boolOrExpr',
-            default       => 0,
-            documentation => 'UTOTP activation (mixed U2F/TOTP module)',
-        },
-        utotp2fAuthnLevel => {
-            type          => 'intOrNull',
-            documentation =>
-'Authentication level for users authentified by password+(U2F or TOTP)'
-        },
-        utotp2fLabel => {
-            type          => 'text',
-            documentation => 'Portal label for U2F+TOTP'
-        },
-        utotp2fLogo => {
-            type          => 'text',
-            documentation => 'Custom logo for U2F+TOTP',
         },
 
         # Mail second factor
@@ -2413,6 +2420,10 @@ sub attributes {
             type          => 'int',
             default       => 20,
             documentation => 'Radius 2f verification timeout',
+        },
+        radius2fMsgAuth => {
+            type          => 'bool',
+            documentation => 'Use Message-Authentication for Radius requests',
         },
         radius2fSendInitialRequest => {
             type          => 'bool',
@@ -2605,6 +2616,16 @@ sub attributes {
             documentation =>
               'Certificate bundle for attestation trust validation',
         },
+        webauthn2fResidentKey => {
+            type   => 'select',
+            select => [
+                { k => '',            v => '' },
+                { k => 'discouraged', v => 'Discouraged' },
+                { k => 'preferred',   v => 'Preferred' },
+                { k => 'required',    v => 'Required' },
+            ],
+            documentation => 'Use discoverable credential',
+        },
         webauthn2fUserCanRemoveKey => {
             type          => 'bool',
             default       => 1,
@@ -2618,9 +2639,23 @@ sub attributes {
             type          => 'text',
             documentation => 'WebAuthn Relying Party ID',
         },
+        webauthnAppId => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Send AppID extension',
+        },
         webauthnRpName => {
             type          => 'text',
             documentation => 'WebAuthn Relying Party display name',
+        },
+        webauthnDefaultTransports => {
+            type          => 'text',
+            documentation => 'WebAuthn default transports',
+        },
+        webauthnAuthnLevel => {
+            type          => 'int',
+            default       => 3,
+            documentation => 'WebAuthn authentication level',
         },
 
         # Single session
@@ -3190,6 +3225,10 @@ sub attributes {
             type          => 'keyTextContainer',
             documentation => 'Apache::Session module parameters',
         },
+        samlAuthnContextMapExtra => {
+            type          => 'keyTextContainer',
+            documentation => 'SAML extra authn contexts',
+        },
         samlAuthnContextMapPassword => {
             type          => 'int',
             default       => 2,
@@ -3693,12 +3732,13 @@ sub attributes {
                 { k => 'REST',        v => 'REST' },
                 { k => 'SSL',         v => 'SSL' },
                 { k => 'Twitter',     v => 'Twitter' },
-                { k => 'WebID',       v => 'WebID' },
+                { k => 'WebID',       v => 'WebID (deprecated)' },
+                { k => 'WebAuthn',    v => 'WebAuthn' },
                 { k => 'Demo',        v => 'Demonstration' },
                 { k => 'Choice',      v => 'authChoice' },
                 { k => 'Combination', v => 'combineMods' },
                 { k => 'CAS',    v => 'Central Authentication Service (CAS)' },
-                { k => 'OpenID', v => 'OpenID' },
+                { k => 'OpenID', v => 'OpenID 2.0 (deprecated)' },
                 { k => 'OpenIDConnect', v => 'OpenID Connect' },
                 { k => 'SAML',          v => 'SAML v2' },
                 { k => 'Proxy',         v => 'Proxy' },
@@ -3810,13 +3850,13 @@ sub attributes {
         available2F => {
             type    => 'text',
             default => join( ',',
-                qw/UTOTP TOTP U2F REST Mail2F Ext2F WebAuthn Yubikey Radius Password Okta/
+                qw/TOTP REST Mail2F Ext2F WebAuthn Yubikey Radius Password Okta/
             ),
             documentation => 'Available second factor modules',
         },
         available2FSelfRegistration => {
-            type    => 'text',
-            default => join( ',', qw/Password TOTP U2F WebAuthn Yubikey/ ),
+            type          => 'text',
+            default       => join( ',', qw/Password TOTP WebAuthn Yubikey/ ),
             documentation =>
               'Available self-registration modules for second factor',
         },
@@ -3891,7 +3931,7 @@ sub attributes {
                 my (@s) = split( /[\s,]+/, $l );
                 foreach my $s (@s) {
                     $s =~
-m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?::\d{1,5})?/?.*)$}o
+m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?::\d{1,5})?/?.*)$}
                       or return ( 0, "__badLdapUri__: \"$s\"" );
                 }
                 return 1;
@@ -4172,7 +4212,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         radiusTimeout => {
             type => 'intOrNull',
         },
-
+        radiusMsgAuth => {
+            type          => 'bool',
+            documentation => 'Use Message-Authentication for Radius requests',
+        },
         radiusExportedVars => {
             type => 'keyTextContainer',
 
@@ -4361,9 +4404,6 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         dbiAuthChain    => { type => 'text', },
         dbiAuthUser     => { type => 'text', },
         dbiAuthPassword => { type => 'password', },
-        dbiUserChain    => { type => 'text', },
-        dbiUserUser     => { type => 'text', },
-        dbiUserPassword => { type => 'password', },
         dbiAuthTable    => { type => 'text', },
         dbiUserTable    => { type => 'text', },
 
@@ -4474,6 +4514,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'text',
             documentation => 'Auth module used by FindUser plugin',
         },
+        authChoiceSelectOnly => {
+            type          => 'bool',
+            documentation => 'Automatically select only available choice',
+        },
         authChoiceModules => {
             type       => 'authChoiceContainer',
             keyTest    => qr/^(\d*)?[a-zA-Z0-9_]+$/,
@@ -4496,7 +4540,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                     { k => 'LinkedIn',      v => 'LinkedIn' },
                     { k => 'PAM',           v => 'PAM' },
                     { k => 'Null',          v => 'None' },
-                    { k => 'OpenID',        v => 'OpenID' },
+                    { k => 'OpenID',        v => 'OpenID 2.0 (deprecated)' },
                     { k => 'OpenIDConnect', v => 'OpenID Connect' },
                     { k => 'Proxy',         v => 'Proxy' },
                     { k => 'Radius',        v => 'Radius' },
@@ -4506,7 +4550,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                     { k => 'Slave',         v => 'Slave' },
                     { k => 'SSL',           v => 'SSL' },
                     { k => 'Twitter',       v => 'Twitter' },
-                    { k => 'WebID',         v => 'WebID' },
+                    { k => 'WebID',         v => 'WebID (deprecated)' },
+                    { k => 'WebAuthn',      v => 'WebAuthn' },
                     { k => 'Custom',        v => 'customModule' },
                 ],
                 [
@@ -4520,14 +4565,14 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                     { k => 'Facebook',      v => 'Facebook' },
                     { k => 'LDAP',          v => 'LDAP' },
                     { k => 'Null',          v => 'None' },
-                    { k => 'OpenID',        v => 'OpenID' },
+                    { k => 'OpenID',        v => 'OpenID 2.0 (deprecated)' },
                     { k => 'OpenIDConnect', v => 'OpenID Connect' },
                     { k => 'Proxy',         v => 'Proxy' },
                     { k => 'REST',          v => 'REST' },
                     { k => 'Remote',        v => 'Remote' },
                     { k => 'SAML',          v => 'SAML v2' },
                     { k => 'Slave',         v => 'Slave' },
-                    { k => 'WebID',         v => 'WebID' },
+                    { k => 'WebID',         v => 'WebID (deprecated)' },
                     { k => 'Custom',        v => 'customModule' },
                 ],
                 [
@@ -4568,10 +4613,11 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                 { k => 'REST',     v => 'REST' },
                 { k => 'SSL',      v => 'SSL' },
                 { k => 'Twitter',  v => 'Twitter' },
-                { k => 'WebID',    v => 'WebID' },
+                { k => 'WebID',    v => 'WebID (deprecated)' },
+                { k => 'WebAuthn', v => 'WebAuthn' },
                 { k => 'Demo',     v => 'Demonstration' },
                 { k => 'CAS',    v => 'Central Authentication Service (CAS)' },
-                { k => 'OpenID', v => 'OpenID' },
+                { k => 'OpenID', v => 'OpenID 2.0 (deprecated)' },
                 { k => 'OpenIDConnect', v => 'OpenID Connect' },
                 { k => 'SAML',          v => 'SAML v2' },
                 { k => 'Proxy',         v => 'Proxy' },
@@ -4965,7 +5011,6 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type   => 'select',
             select =>
               [ { k => '', v => 'None' }, { k => 'jws', v => 'Signed JWT' }, ],
-            default => 'get',
         },
         oidcOPMetaDataOptionsAuthnEndpointAuthSigAlg => {
             type    => 'select',
@@ -4988,6 +5033,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         oidcOPMetaDataOptionsRequirePkce => {
             type          => 'bool',
+            default       => 0,
             documentation => 'Use PKCE with this OP',
         },
 
@@ -5016,7 +5062,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             ],
         },
         oidcRPMetaDataOptionsAuthRequiredForAuthorize => {
-            type => 'bool',
+            type    => 'bool',
+            default => 0,
         },
         oidcRPMetaDataOptionsDisplayName    => { type => 'text', },
         oidcRPMetaDataOptionsIcon           => { type => 'text', },
@@ -5132,6 +5179,11 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 0,
             documentation => 'Issue refresh tokens',
         },
+        oidcRPMetaDataOptionsRefreshTokenRotation => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Invalidate refresh token after use',
+        },
         oidcRPMetaDataOptionsAuthnLevel => {
             type          => 'intOrNull',
             documentation =>
@@ -5223,15 +5275,28 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => '"enc" algorithm for logout encryption',
         },
         oidcRPMetaDataOptionsAuthnRequireState => {
-            type => 'bool',
+            type    => 'bool',
+            default => 0,
         },
         oidcRPMetaDataOptionsAuthnRequireNonce => {
-            type => 'bool',
+            type    => 'bool',
+            default => 0,
         },
         oidcRPMetaDataOptionsUserinfoRequireHeaderToken => {
             type          => 'bool',
+            default       => 0,
             documentation =>
               '/userinfo endpoint requires authn using Bearer token',
+        },
+        oidcRPMetaDataOptionsTokenXAuthorizedRP => {
+            type          => 'text',
+            documentation =>
+              'List of RP authorized to query for an access_token of this RP',
+        },
+        appAccessHistoryEnabled => {
+            type    => 'bool',
+            default => 0,
+			documentation => 'Shall OIDC/SAML/CAS protected apps access be recorded to session?'
         },
     };
 }

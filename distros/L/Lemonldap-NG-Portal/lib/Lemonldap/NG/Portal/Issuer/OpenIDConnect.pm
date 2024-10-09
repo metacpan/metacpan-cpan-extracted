@@ -24,7 +24,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use String::Random qw/random_string/;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Issuer
@@ -914,6 +914,8 @@ sub _authorizeEndpoint {
 
         my $state = $oidc_request->{'state'};
 
+    	$self->p->registerProtectedAppAccess( $req, $req->sessionInfo->{ $self->conf->{whatToTrace} }, "oidc:$rp" );
+
         $self->auditLog(
             $req,
             code    => "ISSUER_OIDC_LOGIN_SUCCESS",
@@ -1385,7 +1387,7 @@ sub token {
     $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     $self->logger->debug("URL detected as an OpenID Connect TOKEN URL");
 
-    my $rp = $self->checkEndPointAuthenticationCredentials($req);
+    my ($rp) = $self->checkEndPointAuthenticationCredentials($req);
     return $self->invalidClientResponse($req) unless ($rp);
 
     my $grant_type = $req->param('grant_type') || '';
@@ -1641,8 +1643,8 @@ sub _handlePasswordGrant {
     my $refresh_token = undef;
 
     if ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsRefreshToken} ) {
-        my $refreshTokenSession = $self->newRefreshToken(
-            $rp,
+        my $refreshTokenSession = $self->_generateRefreshToken(
+            $req, $rp,
             {
                 scope           => $scope,
                 client_id       => $client_id,
@@ -1802,16 +1804,17 @@ sub _handleAuthorizationCodeGrant {
         {
             $userInfo{$userKey} = $apacheSession->data->{$userKey};
         }
-        my $refreshTokenSession = $self->newRefreshToken(
-            $rp,
+        my $refreshTokenSession = $self->_generateRefreshToken(
+            $req, $rp,
             {
                 %userInfo,
                 redirect_uri => $codeSession->data->{redirect_uri},
                 scope        => $scope,
                 client_id    => $client_id,
-                _session_uid => $apacheSession->data->{_user},
-                auth_time    => $apacheSession->data->{_lastAuthnUTime},
-                grant_type   => "authorizationcode",
+                _session_uid =>
+                  $apacheSession->data->{ $self->conf->{whatToTrace} },
+                auth_time  => $apacheSession->data->{_lastAuthnUTime},
+                grant_type => "authorizationcode",
             },
             1,
         );
@@ -1826,17 +1829,22 @@ sub _handleAuthorizationCodeGrant {
 
         $self->logger->debug("Generated offline refresh token: $refresh_token");
 
-        $sid = $self->getSidFromSession( $rp, $refreshTokenSession );
+        $sid = $self->getSidFromSession( $rp,
+            { _session_id => $refreshTokenSession->id } );
     }
 
     # For online access, if configured
     elsif ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsRefreshToken} ) {
-        my $refreshTokenSession = $self->newRefreshToken(
+        my $refreshTokenSession = $self->_generateRefreshToken(
+            $req,
+
             $rp,
             {
-                redirect_uri    => $codeSession->data->{redirect_uri},
-                scope           => $scope,
-                client_id       => $client_id,
+                redirect_uri => $codeSession->data->{redirect_uri},
+                scope        => $scope,
+                client_id    => $client_id,
+                _session_uid =>
+                  $apacheSession->data->{ $self->conf->{whatToTrace} },
                 user_session_id => $codeSession->data->{user_session_id},
                 grant_type      => "authorizationcode",
             },
@@ -1921,9 +1929,9 @@ sub _handleAuthorizationCodeGrant {
 }
 
 sub _handleRefreshTokenGrant {
-    my ( $self, $req, $rp ) = @_;
-    my $client_id = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID};
-    my $refresh_token = $req->param('refresh_token');
+    my ( $self, $req, $rp, $refresh_token, $client_id ) = @_;
+    $client_id     ||= $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID};
+    $refresh_token ||= $req->param('refresh_token');
 
     unless ($refresh_token) {
         $self->logger->error("Missing refresh_token parameter");
@@ -1938,6 +1946,9 @@ sub _handleRefreshTokenGrant {
         $self->logger->error("Unable to find OIDC session $refresh_token");
         return $self->sendOIDCError( $req, 'invalid_request', 400 );
     }
+
+    $refreshSession =
+      $self->_rotateRefreshSession( $req, $rp, $refreshSession );
 
     # Check we have the same client_id value
     unless ( $client_id eq $refreshSession->data->{client_id} ) {
@@ -2080,17 +2091,61 @@ sub _handleRefreshTokenGrant {
          $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAccessTokenExpiration}
       || $self->conf->{oidcServiceAccessTokenExpiration};
 
+    my $need_to_update_refresh_token =
+      ( $refresh_token ne $refreshSession->id );
+
     my $token_response = {
         access_token => "$access_token",
         token_type   => 'Bearer',
         expires_in   => $expires_in + 0,
+        (
+            $need_to_update_refresh_token
+            ? ( refresh_token => $refreshSession->id )
+            : ()
+        ),
         ( $id_token ? ( id_token => "$id_token" ) : () ),
     };
 
     $self->logger->debug("Send token response");
 
     return $self->p->sendJSONresponse( $req, $token_response );
+}
 
+sub _rotateRefreshSession {
+    my ( $self, $req, $rp, $refreshSession ) = @_;
+
+    if ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsRefreshTokenRotation} )
+    {
+        $self->logger->debug("Creating new refresh token for $rp");
+
+        my $newRefreshSession =
+          $self->_generateRefreshToken( $req, $rp, $refreshSession->data );
+
+        if ($newRefreshSession) {
+            $self->logger->debug(
+                "Generated new refresh token: " . $newRefreshSession->id );
+
+            my $old_refresh_token = $refreshSession->id;
+            if ( $refreshSession->remove ) {
+                $self->logger->debug(
+                    "Removed old refresh token: $old_refresh_token");
+            }
+            else {
+                $self->logger->error(
+                    "Failed to remove old refresh token $old_refresh_token: "
+                      . $refreshSession->error );
+            }
+
+            return $newRefreshSession;
+
+        }
+        else {
+            $self->logger->error(
+                "Unable to create OIDC session for refresh_token");
+            return $refreshSession;
+        }
+    }
+    return $refreshSession;
 }
 
 # Handle userinfo endpoint
@@ -2150,11 +2205,30 @@ sub userInfo {
     return $self->returnBearerError( 'invalid_request', 'Invalid request', 401 )
       unless ($userinfo_response);
 
+    my $attr_str = join( ',', sort( keys(%$userinfo_response) ) );
+    my $sub      = $userinfo_response->{sub};
+    my $user     = $session->data->{ $self->conf->{whatToTrace} };
+    $self->auditLog(
+        $req,
+        code    => "ISSUER_OIDC_USERINFO",
+        rp      => $rp,
+        message => (
+"User information for $user transmitted to $rp as $sub with attributes $attr_str"
+        ),
+        user       => $user,
+        oidc_sub   => $sub,
+        attributes => $userinfo_response,
+    );
+
     my $userinfo_sign_alg =
       $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsUserInfoSignAlg};
 
     unless ($userinfo_sign_alg) {
+        my $debug_response = to_json($userinfo_response);
+        utf8::downgrade($debug_response);
+        $self->logger->debug( "Return UserInfo as JSON: " . $debug_response );
         return $self->p->sendJSONresponse( $req, $userinfo_response );
+
     }
     else {
         my $userinfo_jwt = $self->encryptToken(
@@ -2204,12 +2278,13 @@ sub introspection {
     $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     $self->logger->debug("URL detected as an OpenID Connect INTROSPECTION URL");
 
-    my $rp = $self->checkEndPointAuthenticationCredentials($req);
+    my ( $rp, $authMethod ) =
+      $self->checkEndPointAuthenticationCredentials($req);
     return $self->invalidClientResponse($req) unless ($rp);
 
-    if ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsPublic} ) {
+    if ( !$authMethod or $authMethod eq 'none' ) {
         $self->logger->error(
-            "Public clients are not allowed to acces the introspection endpoint"
+"Unauthenticated clients are not allowed to access the introspection endpoint"
         );
         return $self->sendOIDCError( $req, 'unauthorized_client', 401 );
     }
@@ -2602,7 +2677,11 @@ sub logout {
                                 "OIDC back channel: unable to unlog"
                               . " $userId from $rp: "
                               . $resp->message );
-                        $self->logger->debug( $resp->content );
+                        $self->logger->debug("Logout token: $jwt");
+                        $self->logger->debug(
+                            'Upstream status: ' . $resp->status_line );
+                        $self->logger->debug(
+                            'Upstream response: ' . ( $resp->content // '' ) );
                         $code = PE_SLO_ERROR;
                     }
                     else {
@@ -2747,6 +2826,26 @@ sub _convertOldFormatConsents {
     return $count;
 }
 
+sub _generateRefreshToken {
+    my ( $self, $req, $rp, $info, $offline ) = @_;
+
+    my $user  = $info->{_session_uid};
+    my $token = $self->newRefreshToken( $rp, $info, $offline );
+    if ($token) {
+        my $offline_str = ( $offline ? 'Offline ' : '' );
+        $self->auditLog(
+            $req,
+            code    => "ISSUER_OIDC_REFRESH_TOKEN",
+            rp      => $rp,
+            message =>
+              ( "${offline_str}Refresh Token for $user generated for $rp", ),
+            user    => $user,
+            offline => ( $offline ? 1 : 0 ),
+        );
+    }
+    return $token;
+}
+
 sub _generateIDToken {
     my ( $self, $req, $rp, $scope, $sessionInfo, $release_user_claims,
         $extra_claims, $sid )
@@ -2772,11 +2871,11 @@ sub _generateIDToken {
         }
     }
 
-    my $user_id = $self->getUserIDForRP( $req, $rp, $sessionInfo );
+    my $sub = $self->getUserIDForRP( $req, $rp, $sessionInfo );
 
     my $id_token_payload_hash = {
         iss       => $self->get_issuer($req),            # Issuer Identifier
-        sub       => $user_id,                           # Subject Identifier
+        sub       => $sub,                               # Subject Identifier
         aud       => $self->getAudiences($rp),           # Audience
         exp       => $id_token_exp,                      # expiration
         iat       => time,                               # Issued time
@@ -2793,17 +2892,35 @@ sub _generateIDToken {
     }
 
     # Decided by response_type or forced in RP config
+    my $attribute_claims = {};
     if ( $release_user_claims || $self->force_id_claims($rp) ) {
 
-        my $claims =
+        $attribute_claims =
           $self->buildUserInfoResponseFromData( $req, $scope, $rp,
             $sessionInfo );
 
-        foreach ( keys %$claims ) {
-            $id_token_payload_hash->{$_} = $claims->{$_}
+        foreach ( keys %$attribute_claims ) {
+            $id_token_payload_hash->{$_} = $attribute_claims->{$_}
               unless ( $_ eq "sub" or $_ eq "sid" );
         }
     }
+
+    my $attr_str = (
+        keys %$attribute_claims
+        ? ( " with attributes "
+              . join( ',', sort( keys(%$attribute_claims) ) ) )
+        : ''
+    );
+    my $user = $sessionInfo->{ $self->conf->{whatToTrace} };
+    $self->auditLog(
+        $req,
+        code       => "ISSUER_OIDC_ID_TOKEN",
+        rp         => $rp,
+        message    => ("ID Token for $user generated for $rp as $sub$attr_str"),
+        user       => $user,
+        oidc_sub   => $sub,
+        attributes => $attribute_claims,
+    );
 
     # Create ID Token
     return $self->createIDToken( $req, $id_token_payload_hash, $rp );

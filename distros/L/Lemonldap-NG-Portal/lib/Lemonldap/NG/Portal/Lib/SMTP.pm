@@ -17,7 +17,7 @@ use Lemonldap::NG::Common::EmailTransport;
 use MIME::Base64;
 use Encode;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 our $transport;
 
@@ -59,11 +59,6 @@ sub loadMailTemplate {
     $prm{cache}                   = 0 unless defined $prm{cache};
     $prm{params}->{STATIC_PREFIX} = $self->p->staticPrefix;
     $prm{params}->{MAIN_LOGO}     = $self->conf->{portalMainLogo};
-    my %extra =
-        $self->p->can('tplParams')
-      ? $self->p->tplParams($req)
-      : ();
-    $prm{params}->{$_} = $extra{$_} for keys %extra;
 
     return $self->loadTemplate( $req, $name, %prm );
 }
@@ -71,8 +66,7 @@ sub loadMailTemplate {
 sub translate {
     my ( $self, $req ) = @_;
 
-    # Get language using llnglanguage cookie
-    my $lang_code = $req->cookies->{llnglanguage} || 'en';
+    my $lang_code = $self->p->getLanguage($req);
     my $json      = $self->conf->{templateDir} . "/common/mail/$lang_code.json";
     $json = $self->conf->{templateDir} . '/common/mail/en.json'
       unless ( -f $json );
@@ -108,7 +102,7 @@ sub gen_password {
     return $self->random->randregex($regexp);
 }
 
-# Send mail
+# Send mail (legacy API, using sendEmail is recommended instead)
 # @param mail recipient address
 # @param subject mail subject
 # @param body mail body
@@ -189,9 +183,7 @@ sub send_mail {
                 $related->attach(
                     Type => "image/" . ( $cid{$_} =~ m/\.(\w+)/ )[0],
                     Id   => $_,
-                    Path => $self->conf->{templateDir} . "/"
-                      . $self->conf->{portalSkin} . "/"
-                      . $cid{$_},
+                    Path => $self->_search_attachment( $cid{$_} ),
                 );
             }
         }
@@ -222,6 +214,24 @@ sub send_mail {
     }
 
     return 1;
+}
+
+sub _search_attachment {
+    my ( $self, $filename ) = @_;
+
+    my $from_skin =
+      $self->p->getSkinTplDir( $self->conf->{portalSkin} ) . "/" . $filename;
+
+    if ( -e $from_skin ) {
+        $self->logger->debug("found attachment at $from_skin");
+        return $from_skin;
+    }
+    else {
+        my $from_bootstrap =
+          $self->conf->{templateDir} . "/bootstrap/" . $filename;
+        $self->logger->debug("returning attachment at $from_bootstrap");
+        return $from_bootstrap;
+    }
 }
 
 ## @method string getMailSession(string user)
@@ -276,6 +286,82 @@ sub getRegisterSession {
 
     # No register session found, return empty string
     return "";
+}
+
+## @method string sendEmail(string mail)
+# High-level method for sending a templated email
+# Takes a hash of parameters
+# @param dest the destination email address
+# @param subject the plaintext subject, will not be translated
+# @param subject_trmsg the translation key that will be used as subject
+# @param body the plaintext body, may contain $variable placeholders
+# @param body_template the name of the template file to render as body
+# @param params a hashref of parameters
+# @return success status as a boolean
+sub sendEmail {
+    my ( $self, $req, %params ) = @_;
+
+    my $subject_trmsg = $params{subject_trmsg};
+    my $subject       = $params{subject};
+    my $body          = $params{body};
+    my $body_template = $params{body_template};
+    my %variables     = %{ $params{params} || {} };
+    my $dest          = $params{dest};
+
+    # Build mail content
+    my $tr = $self->translate($req);
+    unless ($subject) {
+        $subject = $subject_trmsg;
+        $tr->( \$subject );
+    }
+    my $html;
+    if ($body) {
+
+        # Replace supplied variables in body, and also handle session variables
+        while ( my ( $k, $v ) = each %variables ) {
+            $body =~ s/\$\Q$k\E\b/$v/g;
+        }
+        $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
+    }
+    else {
+
+        # Use HTML template
+        $body = $self->loadMailTemplate(
+            $req,
+            $body_template,
+            filter => $tr,
+            params => \%variables
+        );
+        $html = 1;
+    }
+    if ( $dest && $subject && $body ) {
+        if ( $self->send_mail( $dest, $subject, $body, $html ) ) {
+            $self->auditLog(
+                $req,
+                message => "Email ($body_template) sent "
+                  . "to $dest with subject '$subject'",
+                code          => "EMAIL_SENT",
+                body_template => $body_template,
+                subject       => $subject,
+                subject_trmsg => $subject_trmsg,
+                dest          => $dest,
+            );
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+    else {
+        my $message = "Could not send email:";
+        $message .= " missing destination," unless $dest;
+        $message .= " missing subject,"     unless $subject;
+        $message .= " missing body,"        unless $body;
+        chop($message);
+        $message .= ".";
+        $self->logger->warn($message);
+        return 0;
+    }
 }
 
 1;

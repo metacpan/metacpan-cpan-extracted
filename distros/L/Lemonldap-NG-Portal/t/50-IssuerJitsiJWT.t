@@ -71,7 +71,16 @@ sub testAsapKeyServer {
     # BEGIN CERTIFICATE / BEGIN RSA PUBLIC KEY are not supported by jitsi
     like( $res->[2]->[0], qr/BEGIN PUBLIC KEY/, "Found correct format" );
 }
-subtest "ASAP key server" => sub {
+
+subtest "ASAP key server (PUBLIC KEY)" => sub {
+    $client->ini(
+        { %$test_ini, oidcServicePublicKeySig => oidc_key_op_public_sig(), } );
+
+    testAsapKeyServer( $client, 0 );
+};
+
+subtest "ASAP key server (CERTIFICATE)" => sub {
+    $client->ini($test_ini);
     testAsapKeyServer( $client, 0 );
 };
 

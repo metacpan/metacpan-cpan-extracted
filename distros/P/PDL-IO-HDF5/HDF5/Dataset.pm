@@ -4,6 +4,7 @@ use Carp;
 
 use strict;
 use Config;
+use PDL::Core::Dev;
 
 # Global mapping variables
 our ($H5T_STRING, $H5T_REFERENCE, %PDLtoHDF5internalTypeMapping, %HDF5toPDLfileMapping, %PDLtoHDF5fileMapping);
@@ -46,8 +47,6 @@ Ref to the L<PDL::IO::HDF5> object that owns this object.
 =back
 
 =head1 METHODS
-
-####---------------------------------------------------------
 
 =head2 new
 
@@ -183,38 +182,50 @@ B<Usage:>
 #   Mapping of PDL types to what HDF5 calls them while we are dealing with them 
 #   outside of the HDF5 file.
 %PDLtoHDF5internalTypeMapping = (
-	$PDL::Types::PDL_B	=>	PDL::IO::HDF5::H5T_NATIVE_CHAR(),
-	$PDL::Types::PDL_S	=> 	PDL::IO::HDF5::H5T_NATIVE_SHORT(),
-	$PDL::Types::PDL_L	=> 	PDL::IO::HDF5::H5T_NATIVE_INT(),
-	$PDL::Types::PDL_LL	=> 	PDL::IO::HDF5::H5T_NATIVE_LLONG(),
-        $PDL::Types::PDL_F	=>	PDL::IO::HDF5::H5T_NATIVE_FLOAT(),
-	$PDL::Types::PDL_D	=>	PDL::IO::HDF5::H5T_NATIVE_DOUBLE(),
+  $PDL::Types::PDL_SB => PDL::IO::HDF5::H5T_NATIVE_INT8(),
+  $PDL::Types::PDL_B => PDL::IO::HDF5::H5T_NATIVE_UINT8(),
+  $PDL::Types::PDL_S => PDL::IO::HDF5::H5T_NATIVE_INT16(),
+  $PDL::Types::PDL_US => PDL::IO::HDF5::H5T_NATIVE_UINT16(),
+  $PDL::Types::PDL_L => PDL::IO::HDF5::H5T_NATIVE_INT32(),
+  $PDL::Types::PDL_UL => PDL::IO::HDF5::H5T_NATIVE_UINT32(),
+  $PDL::Types::PDL_ULL => PDL::IO::HDF5::H5T_NATIVE_UINT64(),
+  $PDL::Types::PDL_LL => PDL::IO::HDF5::H5T_NATIVE_INT64(),
+  $PDL::Types::PDL_F => PDL::IO::HDF5::H5T_NATIVE_FLOAT(),
+  $PDL::Types::PDL_D => PDL::IO::HDF5::H5T_NATIVE_DOUBLE(),
+  $PDL::Types::PDL_LD => PDL::IO::HDF5::H5T_NATIVE_LDOUBLE(),
+  # no HDF5 direct support for long doubles, nor complex numbers
+  # deliberately not supporting indx as likely to cause mayhem
 );
 
 #   Mapping of PDL types to what types they are written to in the HDF5 file.
-#   For 64 Bit machines, we might need to modify this with some smarts to determine
-#   what is appropriate
 my %PDLtoHDF5fileMapping;
-if ( $Config{byteorder} =~ m/4321$/ ) {
-    # Big endian.
-    %PDLtoHDF5fileMapping = (
-	$PDL::Types::PDL_B	=>	PDL::IO::HDF5::H5T_STD_I8BE(),
-	$PDL::Types::PDL_S	=> 	PDL::IO::HDF5::H5T_STD_I16BE(),
-	$PDL::Types::PDL_L	=> 	PDL::IO::HDF5::H5T_STD_I32BE(),
-	$PDL::Types::PDL_LL	=> 	PDL::IO::HDF5::H5T_STD_I64BE(),
-        $PDL::Types::PDL_F	=>	PDL::IO::HDF5::H5T_IEEE_F32BE(),
-	$PDL::Types::PDL_D	=>	PDL::IO::HDF5::H5T_IEEE_F64BE(),
-	);
+if ( isbigendian() ) {
+  %PDLtoHDF5fileMapping = (
+    $PDL::Types::PDL_SB => PDL::IO::HDF5::H5T_STD_I8BE(),
+    $PDL::Types::PDL_B => PDL::IO::HDF5::H5T_STD_U8BE(),
+    $PDL::Types::PDL_S => PDL::IO::HDF5::H5T_STD_I16BE(),
+    $PDL::Types::PDL_US => PDL::IO::HDF5::H5T_STD_U16BE(),
+    $PDL::Types::PDL_L => PDL::IO::HDF5::H5T_STD_I32BE(),
+    $PDL::Types::PDL_UL => PDL::IO::HDF5::H5T_STD_U32BE(),
+    $PDL::Types::PDL_ULL => PDL::IO::HDF5::H5T_STD_U64BE(),
+    $PDL::Types::PDL_LL => PDL::IO::HDF5::H5T_STD_I64BE(),
+    $PDL::Types::PDL_F => PDL::IO::HDF5::H5T_IEEE_F32BE(),
+    $PDL::Types::PDL_D => PDL::IO::HDF5::H5T_IEEE_F64BE(),
+  );
 } else {
-    # Little endian.
-    %PDLtoHDF5fileMapping = (
-	$PDL::Types::PDL_B	=>	PDL::IO::HDF5::H5T_STD_I8LE(),
-	$PDL::Types::PDL_S	=> 	PDL::IO::HDF5::H5T_STD_I16LE(),
-	$PDL::Types::PDL_L	=> 	PDL::IO::HDF5::H5T_STD_I32LE(),
-	$PDL::Types::PDL_LL	=> 	PDL::IO::HDF5::H5T_STD_I64LE(),
-        $PDL::Types::PDL_F	=>	PDL::IO::HDF5::H5T_IEEE_F32LE(),
-	$PDL::Types::PDL_D	=>	PDL::IO::HDF5::H5T_IEEE_F64LE(),
-	);
+  # Little endian.
+  %PDLtoHDF5fileMapping = (
+    $PDL::Types::PDL_SB => PDL::IO::HDF5::H5T_STD_I8LE(),
+    $PDL::Types::PDL_B => PDL::IO::HDF5::H5T_STD_U8LE(),
+    $PDL::Types::PDL_S => PDL::IO::HDF5::H5T_STD_I16LE(),
+    $PDL::Types::PDL_US => PDL::IO::HDF5::H5T_STD_U16LE(),
+    $PDL::Types::PDL_L => PDL::IO::HDF5::H5T_STD_I32LE(),
+    $PDL::Types::PDL_UL => PDL::IO::HDF5::H5T_STD_U32LE(),
+    $PDL::Types::PDL_ULL => PDL::IO::HDF5::H5T_STD_U64LE(),
+    $PDL::Types::PDL_LL => PDL::IO::HDF5::H5T_STD_I64LE(),
+    $PDL::Types::PDL_F => PDL::IO::HDF5::H5T_IEEE_F32LE(),
+    $PDL::Types::PDL_D => PDL::IO::HDF5::H5T_IEEE_F64LE(),
+  );
 }
 
 
@@ -388,24 +399,26 @@ to the following table.
  HDF5 File Type				PDL Type
  ------------------------               -----------------
  PDL::IO::HDF5::H5T_C_S1()	=>      PDL::Char Object    (Special Case for Char Strings)
- PDL::IO::HDF5::H5T_STD_I8BE()	=> 	$PDL::Types::PDL_B
- PDL::IO::HDF5::H5T_STD_I8LE()	=> 	$PDL::Types::PDL_B,
- PDL::IO::HDF5::H5T_STD_U8BE()	=> 	$PDL::Types::PDL_S,
- PDL::IO::HDF5::H5T_STD_U8LE()	=> 	$PDL::Types::PDL_S,
- PDL::IO::HDF5::H5T_STD_I16BE()	=> 	$PDL::Types::PDL_S,
- PDL::IO::HDF5::H5T_STD_I16LE()	=> 	$PDL::Types::PDL_S,
- PDL::IO::HDF5::H5T_STD_U16BE()	=> 	$PDL::Types::PDL_L,
- PDL::IO::HDF5::H5T_STD_U16LE()	=> 	$PDL::Types::PDL_L,
- PDL::IO::HDF5::H5T_STD_I32BE()	=> 	$PDL::Types::PDL_L,
- PDL::IO::HDF5::H5T_STD_I32LE()	=> 	$PDL::Types::PDL_L,
- PDL::IO::HDF5::H5T_STD_U32LE()	=> 	$PDL::Types::PDL_LL,
- PDL::IO::HDF5::H5T_STD_U32BE()	=> 	$PDL::Types::PDL_LL,
- PDL::IO::HDF5::H5T_STD_I64LE()	=> 	$PDL::Types::PDL_LL,
- PDL::IO::HDF5::H5T_STD_I64BE()	=> 	$PDL::Types::PDL_LL,
- PDL::IO::HDF5::H5T_IEEE_F32BE()=>	$PDL::Types::PDL_F,
- PDL::IO::HDF5::H5T_IEEE_F32LE()=>	$PDL::Types::PDL_F,
- PDL::IO::HDF5::H5T_IEEE_F64BE()=>	$PDL::Types::PDL_D,
- PDL::IO::HDF5::H5T_IEEE_F64LE()=>	$PDL::Types::PDL_D
+ PDL::IO::HDF5::H5T_STD_I8BE()   => $PDL::Types::PDL_SB,
+ PDL::IO::HDF5::H5T_STD_I8LE()   => $PDL::Types::PDL_SB,
+ PDL::IO::HDF5::H5T_STD_U8BE()   => $PDL::Types::PDL_B,
+ PDL::IO::HDF5::H5T_STD_U8LE()   => $PDL::Types::PDL_B,
+ PDL::IO::HDF5::H5T_STD_I16BE()  => $PDL::Types::PDL_S,
+ PDL::IO::HDF5::H5T_STD_I16LE()  => $PDL::Types::PDL_S,
+ PDL::IO::HDF5::H5T_STD_U16BE()  => $PDL::Types::PDL_U,
+ PDL::IO::HDF5::H5T_STD_U16LE()  => $PDL::Types::PDL_U,
+ PDL::IO::HDF5::H5T_STD_I32BE()  => $PDL::Types::PDL_L,
+ PDL::IO::HDF5::H5T_STD_I32LE()  => $PDL::Types::PDL_L,
+ PDL::IO::HDF5::H5T_STD_U32LE()  => $PDL::Types::PDL_UL,
+ PDL::IO::HDF5::H5T_STD_U32BE()  => $PDL::Types::PDL_UL,
+ PDL::IO::HDF5::H5T_STD_I64LE()  => $PDL::Types::PDL_LL,
+ PDL::IO::HDF5::H5T_STD_I64BE()  => $PDL::Types::PDL_LL,
+ PDL::IO::HDF5::H5T_STD_U64LE()  => $PDL::Types::PDL_ULL,
+ PDL::IO::HDF5::H5T_STD_U64BE()  => $PDL::Types::PDL_ULL,
+ PDL::IO::HDF5::H5T_IEEE_F32BE() => $PDL::Types::PDL_F,
+ PDL::IO::HDF5::H5T_IEEE_F32LE() => $PDL::Types::PDL_F,
+ PDL::IO::HDF5::H5T_IEEE_F64BE() => $PDL::Types::PDL_D,
+ PDL::IO::HDF5::H5T_IEEE_F64LE() => $PDL::Types::PDL_D
 
 For HDF5 File types not in this table, this method will attempt to
 map it to the default PDL type PDL_D.
@@ -425,27 +438,27 @@ size of all the strings in the array.
 
 #############################################################################
 # Mapping of HDF5 file types to PDL types
-#   For 64 Bit machines, we might need to modify this with some smarts to determine
-#   what is appropriate
 %HDF5toPDLfileMapping = (
-	 PDL::IO::HDF5::H5T_STD_I8BE()	=> 	$PDL::Types::PDL_B,
-	 PDL::IO::HDF5::H5T_STD_I8LE()	=> 	$PDL::Types::PDL_B,
-	 PDL::IO::HDF5::H5T_STD_U8BE()	=> 	$PDL::Types::PDL_S,
-	 PDL::IO::HDF5::H5T_STD_U8LE()	=> 	$PDL::Types::PDL_S,
-	 PDL::IO::HDF5::H5T_STD_I16BE()	=> 	$PDL::Types::PDL_S,
-	 PDL::IO::HDF5::H5T_STD_I16LE()	=> 	$PDL::Types::PDL_S,
-	 PDL::IO::HDF5::H5T_STD_U16BE()	=> 	$PDL::Types::PDL_L,
-	 PDL::IO::HDF5::H5T_STD_U16LE()	=> 	$PDL::Types::PDL_L,
-	 PDL::IO::HDF5::H5T_STD_I32BE()	=> 	$PDL::Types::PDL_L,
-	 PDL::IO::HDF5::H5T_STD_I32LE()	=> 	$PDL::Types::PDL_L,
-	 PDL::IO::HDF5::H5T_STD_U32LE()	=> 	$PDL::Types::PDL_LL,
-	 PDL::IO::HDF5::H5T_STD_U32BE()	=> 	$PDL::Types::PDL_LL,
-	 PDL::IO::HDF5::H5T_STD_I64LE()	=> 	$PDL::Types::PDL_LL,
-	 PDL::IO::HDF5::H5T_STD_I64BE()	=> 	$PDL::Types::PDL_LL,
-	 PDL::IO::HDF5::H5T_IEEE_F32BE()	=>	$PDL::Types::PDL_F,
-	 PDL::IO::HDF5::H5T_IEEE_F32LE()	=>	$PDL::Types::PDL_F,
-	 PDL::IO::HDF5::H5T_IEEE_F64BE()	=>	$PDL::Types::PDL_D,
-	 PDL::IO::HDF5::H5T_IEEE_F64LE()	=>	$PDL::Types::PDL_D
+ PDL::IO::HDF5::H5T_STD_I8BE()   => $PDL::Types::PDL_SB,
+ PDL::IO::HDF5::H5T_STD_I8LE()   => $PDL::Types::PDL_SB,
+ PDL::IO::HDF5::H5T_STD_U8BE()   => $PDL::Types::PDL_B,
+ PDL::IO::HDF5::H5T_STD_U8LE()   => $PDL::Types::PDL_B,
+ PDL::IO::HDF5::H5T_STD_I16BE()  => $PDL::Types::PDL_S,
+ PDL::IO::HDF5::H5T_STD_I16LE()  => $PDL::Types::PDL_S,
+ PDL::IO::HDF5::H5T_STD_U16BE()  => $PDL::Types::PDL_U,
+ PDL::IO::HDF5::H5T_STD_U16LE()  => $PDL::Types::PDL_U,
+ PDL::IO::HDF5::H5T_STD_I32BE()  => $PDL::Types::PDL_L,
+ PDL::IO::HDF5::H5T_STD_I32LE()  => $PDL::Types::PDL_L,
+ PDL::IO::HDF5::H5T_STD_U32LE()  => $PDL::Types::PDL_UL,
+ PDL::IO::HDF5::H5T_STD_U32BE()  => $PDL::Types::PDL_UL,
+ PDL::IO::HDF5::H5T_STD_I64LE()  => $PDL::Types::PDL_LL,
+ PDL::IO::HDF5::H5T_STD_I64BE()  => $PDL::Types::PDL_LL,
+ PDL::IO::HDF5::H5T_STD_U64LE()  => $PDL::Types::PDL_ULL,
+ PDL::IO::HDF5::H5T_STD_U64BE()  => $PDL::Types::PDL_ULL,
+ PDL::IO::HDF5::H5T_IEEE_F32BE() => $PDL::Types::PDL_F,
+ PDL::IO::HDF5::H5T_IEEE_F32LE() => $PDL::Types::PDL_F,
+ PDL::IO::HDF5::H5T_IEEE_F64BE() => $PDL::Types::PDL_D,
+ PDL::IO::HDF5::H5T_IEEE_F64LE() => $PDL::Types::PDL_D
 );
 
 $H5T_STRING    = PDL::IO::HDF5::H5T_STRING   (); #HDF5 string type
@@ -1566,4 +1579,3 @@ sub nameGet{
 
 
 1;
-

@@ -72,9 +72,12 @@ sub init {
     $self->addUnauthRoute( resetpwd => 'resetPwd', [ 'POST', 'GET' ] );
 
     # Initialize Captcha if needed
-    if ( $self->conf->{captcha_mail_enabled} ) {
-        $self->captcha(1);
-    }
+    $self->captcha(
+        $self->p->buildRule(
+            $self->conf->{captcha_mail_enabled},
+            'captchaMail'
+        )
+    );
 
     # Parse password policy activation rule
     $self->passwordPolicyActivationRule(
@@ -239,8 +242,8 @@ sub _reset {
         $req->{user} = $req->param('mail');
 
         # Captcha for register form
-        if ( $self->captcha ) {
-            my $result = $self->p->_captcha->check_captcha($req);
+        if ( $self->captcha->( $req, {} ) ) {
+            my $result = $self->p->getService('captcha')->check_captcha($req);
             if ($result) {
                 $self->logger->debug("Captcha code verified");
             }
@@ -264,7 +267,7 @@ sub _reset {
             }
         }
 
-        unless ( $req->{user} =~ /$self->{conf}->{userControl}/o ) {
+        unless ( $req->{user} =~ /$self->{conf}->{userControl}/ ) {
             $self->setSecurity($req);
             return PE_MALFORMEDUSER;
         }
@@ -338,42 +341,6 @@ sub _reset {
             }
         );
 
-        # Build mail content
-        my $tr      = $self->translate($req);
-        my $subject = $self->conf->{mailConfirmSubject};
-        unless ($subject) {
-            $subject = 'mailConfirmSubject';
-            $tr->( \$subject );
-        }
-        my ( $body, $html );
-        if ( $self->conf->{mailConfirmBody} ) {
-
-            # We use a specific text message, no html
-            $body = $self->conf->{mailConfirmBody};
-
-            # Replace variables in body
-            $body =~ s/\$expMailDate/$req->data->{expMailDate}/ge;
-            $body =~ s/\$expMailTime/$req->data->{expMailTime}/ge;
-            $body =~ s/\$url/$url/g;
-            $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
-
-        }
-        else {
-
-            # Use HTML template
-            $body = $self->loadMailTemplate(
-                $req,
-                'mail_confirm',
-                filter => $tr,
-                params => {
-                    expMailDate => $req->data->{expMailDate},
-                    expMailTime => $req->data->{expMailTime},
-                    url         => $url,
-                },
-            );
-            $html = 1;
-        }
-
         $self->logger->info( "User "
               . $req->data->{mailAddress}
               . " is trying to reset his/her password" );
@@ -381,9 +348,18 @@ sub _reset {
         # Send mail
         $self->logger->debug('Unable to send reset mail')
           unless (
-            $self->send_mail(
-                $req->data->{mailAddress},
-                $subject, $body, $html
+            $self->sendEmail(
+                $req,
+                subject       => $self->conf->{mailConfirmSubject},
+                subject_trmsg => 'mailConfirmSubject',
+                body          => $self->conf->{mailConfirmBody},
+                body_template => 'mail_confirm',
+                dest          => $req->data->{mailAddress},
+                params        => {
+                    expMailDate => $req->data->{expMailDate},
+                    expMailTime => $req->data->{expMailTime},
+                    url         => $url,
+                },
             )
           );
 
@@ -542,51 +518,28 @@ sub changePwd {
       $self->p->getFirstValue(
         $req->{sessionInfo}->{ $self->conf->{mailSessionKey} } );
 
-    # Build mail content
-    my $tr      = $self->translate($req);
-    my $subject = $self->conf->{mailSubject};
-    unless ($subject) {
-        $subject = 'mailSubject';
-        $tr->( \$subject );
-    }
-    my $body;
-    my $html;
     my $password = $req->data->{newpassword};
 
-    if ( $self->conf->{mailBody} ) {
-
-        # We use a specific text message, no html
-        $body = $self->conf->{mailBody};
-
-        # Replace variables in body
-        $body =~ s/\$password/$password/g;
-        $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
-
-    }
-    else {
-
-        # Use HTML template
-        $body = $self->loadMailTemplate(
-            $req,
-            'mail_password',
-            filter => $tr,
-            params => {
-                %tplPrms, password => $password,
-            },
-        );
-        $html = 1;
-    }
-
     # Send mail
-    return $self->send_mail( $req->data->{mailAddress}, $subject, $body, $html )
+    return $self->sendEmail(
+        $req,
+        subject       => $self->conf->{mailSubject},
+        subject_trmsg => 'mailSubject',
+        body          => $self->conf->{mailBody},
+        body_template => 'mail_password',
+        dest          => $req->data->{mailAddress},
+        params        => {
+            %tplPrms, password => $password,
+        },
+      )
       ? PE_MAILOK
       : PE_MAILERROR;
 }
 
 sub setSecurity {
     my ( $self, $req ) = @_;
-    if ( $self->captcha ) {
-        $self->p->_captcha->init_captcha($req);
+    if ( $self->captcha->( $req, {} ) ) {
+        $self->p->getService('captcha')->init_captcha($req);
     }
     elsif ( $self->ottRule->( $req, {} ) ) {
         $self->ott->setToken($req);
@@ -599,17 +552,14 @@ sub display {
     $self->logger->debug( 'Display called with code: ' . $req->error );
 
     my %tplPrm = (
-        AUTH_ERROR                      => $req->error,
-        AUTH_ERROR_TYPE                 => $req->error_type,
-        AUTH_ERROR_ROLE                 => $req->error_role,
-        ( 'AUTH_ERROR_' . $req->error ) => 1,
-        AUTH_URL                        => $req->data->{_url},
-        CHOICE_VALUE                    => $req->{_authChoice},
-        EXPMAILDATE                     => $req->data->{expMailDate},
-        EXPMAILTIME                     => $req->data->{expMailTime},
-        STARTMAILDATE                   => $req->data->{startMailDate},
-        STARTMAILTIME                   => $req->data->{startMailTime},
-        MAILALREADYSENT                 => $req->data->{mailAlreadySent},
+        $self->p->getErrorTplParams($req),
+        AUTH_URL        => $req->data->{_url},
+        CHOICE_VALUE    => $req->{_authChoice},
+        EXPMAILDATE     => $req->data->{expMailDate},
+        EXPMAILTIME     => $req->data->{expMailTime},
+        STARTMAILDATE   => $req->data->{startMailDate},
+        STARTMAILTIME   => $req->data->{startMailTime},
+        MAILALREADYSENT => $req->data->{mailAlreadySent},
         (
             $req->data->{customScript}
             ? ( CUSTOM_SCRIPT => $req->data->{customScript} )

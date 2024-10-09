@@ -20,7 +20,7 @@ use parent 'Data::TagDB::WeakBaseObject';
 
 use constant RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %table_defs = (
     tag      => 'CREATE TABLE IF NOT EXISTS tag (id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT);',
@@ -273,7 +273,7 @@ Data::TagDB::Migration - Work with Tag databases
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

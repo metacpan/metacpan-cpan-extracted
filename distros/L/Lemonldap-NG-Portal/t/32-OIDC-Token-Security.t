@@ -23,7 +23,7 @@ my $op = LLNG::Manager::Test->new( {
         ini => {
             logLevel                        => $debug,
             domain                          => 'idp.com',
-            portal                          => 'http://auth.op.com',
+            portal                          => 'http://auth.op.com/',
             authentication                  => 'Demo',
             userDB                          => 'Same',
             issuerDBOpenIDConnectActivation => 1,
@@ -403,6 +403,18 @@ subtest "Test authentication failures in token grant" => sub {
     expectReject( $res, 401, "invalid_client" );
     is( getHeader( $res, "WWW-Authenticate" ), "Basic" );
     count(1);
+
+    # Try to supply client_secret as GET parameter
+    ok(
+        $res = $op->_get(
+            "/oauth2/token",
+            query  => $query,
+            accept => 'text/html',
+        ),
+        "Use GET on token endpoint"
+    );
+    count(1);
+    expectReject( $res, 400, "invalid_client" );
 
     ok(
         $res = $op->_post(

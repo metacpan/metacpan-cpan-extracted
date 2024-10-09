@@ -216,6 +216,7 @@ sub checkGet {
     ok( ref $ret eq 'HASH' && $ret->{id} eq $id,
         "$test: check returned type is HASH and that ids match" );
     count(1);
+    return $ret;
 }
 
 sub checkGet404 {
@@ -244,6 +245,12 @@ sub checkGetList {
     );
     count(1);
     return $ret;
+}
+
+sub checkDisplay {
+    my ( $uid, $id ) = splice @_;
+    my $ret = checkGet( $uid, $id );
+    is( $ret->{mydisplay}, 1, "Found display variable" );
 }
 
 sub checkGetOnIds {
@@ -414,10 +421,11 @@ $sfaDevices = [ {
         "epoch"      => time
     },
     {
-        "name"    => "MyTOTP",
-        "type"    => "TOTP",
-        "_secret" => "123456",
-        "epoch"   => time
+        "name"      => "MyTOTP",
+        "type"      => "TOTP",
+        "_secret"   => "123456",
+        "epoch"     => time,
+        "mydisplay" => 1,
     },
     {
         "name"    => "MyYubikey",
@@ -496,8 +504,11 @@ newSession( 'donna', '127.10.0.1', 'SSO',        [] );
 newSession( 'donna', '127.10.0.1', 'Persistent', [] );
 
 # dwho
+
+$ret = checkGetList( 1, 'dwho', 'TOTP' );
+checkDisplay( 'dwho', $ret->[0]->{id} );
+
 checkGetList( 1, 'dwho', 'U2F' );
-checkGetList( 1, 'dwho', 'TOTP' );
 checkGetList( 1, 'dwho', 'UBK' );
 checkGetList( 1, 'dwho', 'WebAuthn' );
 checkGetList( 0, 'dwho', 'UBKIKI' );
@@ -505,6 +516,7 @@ $ret = checkGetList( 4, 'dwho' );
 checkGetOnIds( 'dwho', $ret );
 checkDelete( 'dwho', @$ret[0]->{id} );
 checkDelete404( 'dwho', @$ret[0]->{id} );
+
 checkGetList( 3, 'dwho' );
 checkDeleteList( 1, 'dwho', 'WebAuthn' );
 checkGetList( 0, 'dwho', 'WebAuthn' );
@@ -513,7 +525,7 @@ checkGetList( 0, 'dwho' );
 checkDeleteList( 0, 'dwho' );
 
 # msmith
-checkGetList( 0, 'msmith' );
+$ret = checkGetList( 0, 'msmith' );
 
 # rtyler
 checkGetList( 1, 'rtyler', 'U2F' );
@@ -560,8 +572,9 @@ checkAddWithBadAttributes(
     qr/Invalid input: epoch is forbidden/
 );
 checkAdd( "Add second factor",
-    "donna", undef, { type => "test", name => "test" } );
+    "donna", undef, { type => "test", name => "test", mydisplay => 1 } );
 $ret = checkGetList( 1, 'donna', 'test' );
+checkDisplay( 'donna', $ret->[0]->{id} );
 checkAdd( "Add second factor",
     "donna", undef, { type => "test", name => "test" } );
 $ret = checkGetList( 2, 'donna', 'test' );

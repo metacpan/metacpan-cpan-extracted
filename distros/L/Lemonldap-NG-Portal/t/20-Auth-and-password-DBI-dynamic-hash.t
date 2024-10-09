@@ -4,14 +4,13 @@ use MIME::Base64;
 use Test::More;
 use strict;
 use IO::String;
-use DBI;
 use Digest::SHA;
 
 require 't/test-lib.pm';
 my $maintests = 10;
 
 # Hook SHA512 function into all new DBI connections
-{
+sub hook {
     my $old_connect = \&DBI::connect;
     no warnings 'redefine';
     *DBI::connect = sub {
@@ -36,18 +35,6 @@ my $maintests = 10;
             }
         );
 
-        $connection->sqlite_create_function(
-            'unixcrypth',
-            2,
-            sub {
-                my $p    = shift;
-                my $hash = shift;
-                return
-                  unpack( 'H*',
-                    crypt( pack( 'H*', $p ), pack( 'H*', $hash ) ) );
-            }
-        );
-
         return $connection;
     }
 }
@@ -62,6 +49,7 @@ SKIP: {
     if ($@) {
         skip 'DBI/DBD::SQLite not found', $maintests;
     }
+    hook();
 
     my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
 
@@ -84,8 +72,7 @@ SKIP: {
     $dbh->do(
 "INSERT INTO users VALUES ('jenny','\$6\$LvcDEZkf9SAFXpnQ\$Dzy6.c.dxPfZ1IvE.xdIYVu7iX9ia8BYhPbR9SKv7.u1WWCd0AIFIM4eVd7q24CElR.NkGA.zlK86q48n7IUL1','The Doctors Daughter')"
     );
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                         => 'error',
                 useSafeJail                      => 1,

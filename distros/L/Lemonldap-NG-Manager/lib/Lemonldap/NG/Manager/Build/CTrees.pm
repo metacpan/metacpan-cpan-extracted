@@ -14,7 +14,7 @@
 
 package Lemonldap::NG::Manager::Build::CTrees;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 sub cTrees {
     return {
@@ -84,7 +84,6 @@ sub cTrees {
             {
                 title => 'samlIDPMetaDataOptions',
                 help  => 'authsaml.html#options',
-                form  => 'simpleInputContainer',
                 nodes => [
                     'samlIDPMetaDataOptionsNameIDFormat',
                     'samlIDPMetaDataOptionsForceAuthn',
@@ -95,7 +94,7 @@ sub cTrees {
                     {
                         title => 'samlIDPMetaDataOptionsFederation',
                         form  => 'simpleInputContainer',
-                        nodes => [ 'samlIDPMetaDataOptionsFederationEntityID', ]
+                        nodes => ['samlIDPMetaDataOptionsFederationEntityID']
                     },
                     'samlIDPMetaDataOptionsComment'
                 ],
@@ -177,13 +176,13 @@ sub cTrees {
                         title => 'oidcOPMetaDataOptionsConfiguration',
                         form  => 'simpleInputContainer',
                         nodes => [
+                            'oidcOPMetaDataOptionsRequirePkce',
+                            'oidcOPMetaDataOptionsStoreIDToken',
                             'oidcOPMetaDataOptionsConfigurationURI',
                             'oidcOPMetaDataOptionsJWKSTimeout',
                             'oidcOPMetaDataOptionsClientID',
                             'oidcOPMetaDataOptionsClientSecret',
-                            'oidcOPMetaDataOptionsStoreIDToken',
                             'oidcOPMetaDataOptionsUserAttribute',
-                            'oidcOPMetaDataOptionsRequirePkce',
                         ]
                     },
                     {
@@ -246,6 +245,7 @@ sub cTrees {
                             'oidcRPMetaDataOptionsRefreshToken',
                             'oidcRPMetaDataOptionsUserIDAttr',
                             'oidcRPMetaDataOptionsAdditionalAudiences',
+                            'oidcRPMetaDataOptionsTokenXAuthorizedRP',
                         ]
                     },
                     {
@@ -260,6 +260,7 @@ sub cTrees {
                         form  => 'simpleInputContainer',
                         nodes => [
                             'oidcRPMetaDataOptionsRequirePKCE',
+                            'oidcRPMetaDataOptionsRefreshTokenRotation',
                             'oidcRPMetaDataOptionsAllowOffline',
                             'oidcRPMetaDataOptionsAllowPasswordGrant',
                             'oidcRPMetaDataOptionsAllowClientCredentialsGrant',

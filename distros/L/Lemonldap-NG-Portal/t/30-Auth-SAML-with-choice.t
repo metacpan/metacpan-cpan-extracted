@@ -70,7 +70,7 @@ SKIP: {
 
     ok(
         $res->[2]->[0] =~
-m%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2" alt="IDP2" title="My_tooltip" />%,
+m%<img src="/static/common/icons/sfa_manager.png" class="mr-2" alt="IDP2" title="My_tooltip" />%,
         'Found IDP icon, tooltip and title tags'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $res->[2]->[0] =~ /idp_Test_DisplayName/, 'Found IDP display name' )
@@ -136,7 +136,7 @@ m%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2"
     );
 
     # Verify authentication on SP
-    expectRedirection( $res, 'http://auth.sp.com' );
+    expectRedirection( $res, 'http://auth.sp.com/' );
     my $spId = expectCookie($res);
 
     ok( $res = $sp->_get( '/', cookie => "lemonldap=$spId" ), 'Get / on SP' );
@@ -184,7 +184,7 @@ m%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2"
         ),
         'Post SAML response to SP'
     );
-    expectRedirection( $res, 'http://auth.sp.com' );
+    expectRedirection( $res, 'http://auth.sp.com/?logout=1' );
 
     # Test if logout is done
     ok(
@@ -214,7 +214,7 @@ sub sp {
         {
             ini => {
                 domain         => 'sp.com',
-                portal         => 'http://auth.sp.com',
+                portal         => 'http://auth.sp.com/',
                 logLevel       => $debug,
                 authentication => 'Choice',
                 userDB         => 'Same',
@@ -351,7 +351,7 @@ sub issuer {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
-                portal                 => 'http://auth.idp.com',
+                portal                 => 'http://auth.idp.com/',
                 authentication         => 'Demo',
                 userDB                 => 'Same',
                 issuerDBSAMLActivation => 1,

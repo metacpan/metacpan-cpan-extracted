@@ -1,0 +1,404 @@
+class TestCase::Sys::Poll::PollfdArray {
+  
+  use Sys::Poll::PollfdArray;
+  
+  # Fields
+  static method fields : int () {
+    
+    # length
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(2, 3);
+      
+      unless ($pollfds->length == 2) {
+        return 0;
+      }
+    }
+    
+    
+    # capacity
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(2, 3);
+      
+      unless ($pollfds->capacity == 3) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  # Class Methods
+  static method new : int () {
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new;
+      
+      unless ($pollfds is_type Sys::Poll::PollfdArray) {
+        return 0;
+      }
+      
+      unless ($pollfds->length == 0) {
+        return 0;
+      }
+      
+      unless ($pollfds->capacity == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(0, -1);
+      
+      unless ($pollfds is_type Sys::Poll::PollfdArray) {
+        return 0;
+      }
+      
+      unless ($pollfds->length == 0) {
+        return 0;
+      }
+      
+      unless ($pollfds->capacity == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(1, -1);
+      
+      unless ($pollfds is_type Sys::Poll::PollfdArray) {
+        return 0;
+      }
+      
+      unless ($pollfds->length == 1) {
+        return 0;
+      }
+      
+      unless ($pollfds->capacity == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(2, -1);
+      
+      unless ($pollfds is_type Sys::Poll::PollfdArray) {
+        return 0;
+      }
+      
+      unless ($pollfds->length == 2) {
+        return 0;
+      }
+      
+      unless ($pollfds->capacity == 2) {
+        return 0;
+      }
+    }
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(2, 3);
+      
+      unless ($pollfds is_type Sys::Poll::PollfdArray) {
+        return 0;
+      }
+      
+      unless ($pollfds->length == 2) {
+        return 0;
+      }
+      
+      unless ($pollfds->capacity == 3) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  # Instance Methods
+  static method fd : int () {
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(2);
+      
+      {
+        my $index = 0;
+        
+        $pollfds->set_fd($index, 10);
+      }
+      
+      {
+        my $index = 1;
+        
+        $pollfds->set_fd($index, 20);
+      }
+      
+      unless ($pollfds->fd(0) == 10) {
+        return 0;
+      }
+      
+      unless ($pollfds->fd(1) == 20) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method set_fd : int () {
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(2);
+      
+      {
+        my $index = 0;
+        
+        $pollfds->set_fd($index, 10);
+      }
+      
+      {
+        my $index = 1;
+        
+        $pollfds->set_fd($index, 20);
+      }
+      
+      unless ($pollfds->fd(0) == 10) {
+        return 0;
+      }
+      
+      unless ($pollfds->fd(1) == 20) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method events : int () {
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(2);
+      
+      {
+        my $index = 0;
+        
+        $pollfds->set_events($index, 10);
+      }
+      
+      {
+        my $index = 1;
+        
+        $pollfds->set_events($index, 20);
+      }
+      
+      unless ($pollfds->events(0) == 10) {
+        return 0;
+      }
+      
+      unless ($pollfds->events(1) == 20) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method set_events : int () {
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(2);
+      
+      {
+        my $index = 0;
+        
+        $pollfds->set_events($index, 10);
+      }
+      
+      {
+        my $index = 1;
+        
+        $pollfds->set_events($index, 20);
+      }
+      
+      unless ($pollfds->events(0) == 10) {
+        return 0;
+      }
+      
+      unless ($pollfds->events(1) == 20) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method revents : int () {
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(2);
+      
+      {
+        my $index = 0;
+        
+        $pollfds->set_revents($index, 10);
+      }
+      
+      {
+        my $index = 1;
+        
+        $pollfds->set_revents($index, 20);
+      }
+      
+      unless ($pollfds->revents(0) == 10) {
+        return 0;
+      }
+      
+      unless ($pollfds->revents(1) == 20) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method set_revents : int () {
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new(2);
+      
+      {
+        my $index = 0;
+        
+        $pollfds->set_revents($index, 10);
+      }
+      
+      {
+        my $index = 1;
+        
+        $pollfds->set_revents($index, 20);
+      }
+      
+      unless ($pollfds->revents(0) == 10) {
+        return 0;
+      }
+      
+      unless ($pollfds->revents(1) == 20) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method push : int () {
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new;
+      
+      my $fd = 10;
+      
+      $pollfds->push($fd);
+      
+      unless ($pollfds->length == 1) {
+        return 0;
+      }
+      
+      unless ($pollfds->capacity == 1) {
+        return 0;
+      }
+      
+      unless ($pollfds->fd(0) == 10) {
+        return 0;
+      }
+      
+      unless ($pollfds->events(0) == 0) {
+        return 0;
+      }
+      
+      unless ($pollfds->revents(0) == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new;
+      
+      my $fd0 = 10;
+      my $fd1 = 20;
+      
+      $pollfds->push($fd0);
+      $pollfds->push($fd1);
+      
+      unless ($pollfds->length == 2) {
+        return 0;
+      }
+      
+      unless ($pollfds->capacity >= 2) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method remove : int () {
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new;
+      
+      my $fd0 = 10;
+      my $fd1 = 20;
+      my $fd2 = 30;
+      
+      $pollfds->push($fd0);
+      $pollfds->push($fd1);
+      $pollfds->push($fd2);
+      
+      unless ($pollfds->length == 3) {
+        return 0;
+      }
+      
+      my $index = 1;
+      $pollfds->remove($index);
+      
+      unless ($pollfds->length == 2) {
+        return 0;
+      }
+      
+      unless ($pollfds->fd(0) == 10) {
+        return 0;
+      }
+      
+      unless ($pollfds->fd(1) == 30) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $pollfds = Sys::Poll::PollfdArray->new;
+      
+      for (my $fd = 0; $fd < 100; $fd++) {
+        $pollfds->push($fd);
+      }
+      
+      unless ($pollfds->length == 100) {
+        return 0;
+      }
+      
+      for (my $fd = 0; $fd < 100; $fd++) {
+        $pollfds->remove(0);
+      }
+      
+      for (my $fd = 0; $fd < 50; $fd++) {
+        $pollfds->push($fd);
+      }
+      
+      unless ($pollfds->length == 50) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+}

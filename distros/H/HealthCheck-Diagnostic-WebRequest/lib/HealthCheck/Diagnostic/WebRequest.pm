@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: Make HTTP/HTTPS requests to web servers to check connectivity
 use version;
-our $VERSION = 'v1.4.3'; # VERSION
+our $VERSION = 'v1.4.4'; # VERSION
 
 use strict;
 use warnings;
@@ -108,9 +108,9 @@ sub run {
     }
 
     my @results;
-    push @results, $self->_check_status( $response );
-    push @results, $self->_check_response_time( $elapsed_time );
-    push @results, $self->_check_content( $response )
+    push @results, $self->check_status( $response );
+    push @results, $self->check_response_time( $elapsed_time );
+    push @results, $self->check_content( $response )
         if $results[0]->{status} eq 'OK';
 
     my $info = join '; ', grep { length } map { $_->{info} } @results;
@@ -118,7 +118,7 @@ sub run {
     return { info => $info, results => \@results };
 }
 
-sub _check_status {
+sub check_status {
     my ( $self, $response ) = @_;
     my $status;
 
@@ -157,7 +157,7 @@ sub _check_status {
     return { status => $status, info => $info };
 }
 
-sub _check_content {
+sub check_content {
     my ( $self, $response ) = @_;
 
     return unless $self->{content_regex};
@@ -173,7 +173,7 @@ sub _check_content {
     };
 }
 
-sub _check_response_time {
+sub check_response_time {
     my ( $self, $elapsed_time ) = @_;
 
     my $response_time_threshold = $self->{response_time_threshold};
@@ -206,7 +206,7 @@ HealthCheck::Diagnostic::WebRequest - Make HTTP/HTTPS requests to web servers to
 
 =head1 VERSION
 
-version v1.4.3
+version v1.4.4
 
 =head1 SYNOPSIS
 
@@ -364,6 +364,37 @@ It is optional.
 By default provides a custom C<agent> string and a default C<timeout> of 7.
 
 =head1 METHODS
+
+=head2 Check Methods
+
+Individual HealthCheck results are added in this order as the return value from these methods:
+
+=head3 check_status
+
+    my $result = $self->check_status( $response );
+
+This method takes in a L<HTTP::Response> object and returns a L<healthcheck result|https://grantstreetgroup.github.io/HealthCheck.html#results>
+with a C<status> key and an C<info> key. The status is C<CRITICAL> if a successful HTTP status code was not received,
+if the C<Client-Warning> HTTP response header is 'Internal response', or if the C<X-Squid-Error> HTTP response header is set.
+Otherwise, it is C<OK>.
+
+=head3 check_response_time
+
+    my $result = $self->check_response_time( $elapsed_time );
+
+This method takes in a number of seconds and returns a L<healthcheck result|https://grantstreetgroup.github.io/HealthCheck.html#results>
+with a C<status> key and an C<info> key. The status is C<WARNING> if the response time exceeds the C<response_time_threshold>.
+Otherwise, it is C<OK>.
+
+=head3 check_content
+
+    my $response = $self->check_content( $response );
+
+This method takes in a L<HTTP::Response> object and returns a L<healthcheck result|https://grantstreetgroup.github.io/HealthCheck.html#results>
+with a C<status> key and an C<info> key. The status is C<CRITICAL> if the content of the response does not match the C<content_regex> attribute.
+Otherwise, it is C<OK>.
+
+Note, this is not called if the result of L</check_status> is not C<OK>.
 
 =head2 send_request
 

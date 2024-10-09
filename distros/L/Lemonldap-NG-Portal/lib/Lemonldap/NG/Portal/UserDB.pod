@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Lemonldap:NG::Portal::UserDB - Writing authentication modules for LemonLDAP::NG.
+Lemonldap:NG::Portal::UserDB - Writing user storage modules for LemonLDAP::NG.
 
 =head1 SYNOPSIS
 
@@ -17,7 +17,7 @@ Lemonldap:NG::Portal::UserDB - Writing authentication modules for LemonLDAP::NG.
   
   our $VERSION = '0.1';
   
-  extends 'Lemonldap::NG::Common::Module';
+  extends 'Lemonldap::NG::Portal::Main::UserDB';
 
   sub init {
       ...

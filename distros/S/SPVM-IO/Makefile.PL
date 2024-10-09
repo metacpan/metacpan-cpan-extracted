@@ -1,4 +1,4 @@
-use 5.008_007;
+use v5.20.3;
 use ExtUtils::MakeMaker;
 
 use strict;
@@ -22,6 +22,7 @@ unless ($meta) {
 my %configure_and_runtime_requires = (
   'SPVM' => '0.989040',
 );
+
 WriteMakefile(
   NAME              => 'SPVM::IO',
   VERSION_FROM      => 'lib/SPVM/IO.pm', # finds $VERSION
@@ -48,12 +49,9 @@ WriteMakefile(
   },
   PREREQ_PM         => {
     %configure_and_runtime_requires,
-    'SPVM::Sys' => '0.510',
+    'SPVM::Sys' => '0.524',
     'SPVM::Math' => '0.11',
     'SPVM::Go' => '0.005',
-  },
-  TEST_REQUIRES => {
-    
   },
 );
 

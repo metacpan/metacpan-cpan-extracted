@@ -784,6 +784,7 @@ sub run {
 
             # Push attributes
             my @attributes;
+            my %log_attributes;
 
             foreach ( keys %{ $self->spAttributes->{$sp} } ) {
 
@@ -881,6 +882,8 @@ sub run {
                 # Push attribute in attribute list
                 push @attributes, $attribute;
 
+                # For logging
+                $log_attributes{ $friendly_name || $name } = [@values];
             }
 
             # Get response assertion
@@ -1147,6 +1150,8 @@ sub run {
             $self->logger->debug(
                 "Link session $session_id to SAML session $saml_session_id");
 
+			$self->p->registerProtectedAppAccess($req, $req->{sessionInfo}->{ $self->conf->{whatToTrace} }, "saml:$spConfKey");
+
             # Send SSO Response
 
             # Register IDP in Common Domain Cookie if needed
@@ -1195,6 +1200,12 @@ sub run {
                 }
             }
             my $name_id_content = $login->nameIdentifier->content;
+            my $attr_str        = (
+                %log_attributes
+                ? ( " with attributes "
+                      . join( ',', sort( keys(%log_attributes) ) ) )
+                : ""
+            );
 
             # HTTP-POST
             if ( (
@@ -1218,10 +1229,11 @@ sub run {
                           . $req->sessionInfo->{ $self->conf->{whatToTrace} }
                           . " is authorized to access to $sp."
                           . " SAML authentication response sent to"
-                          . " SAML SP $spConfKey for $user$nameIDLog"
+                          . " SAML SP $spConfKey for $user$nameIDLog$attr_str"
                     ),
-                    user    => $user,
-                    name_id => $name_id_content,
+                    user            => $user,
+                    saml_name_id    => $name_id_content,
+                    attributes => \%log_attributes,
                 );
 
                 # Use autosubmit form
@@ -1266,10 +1278,11 @@ sub run {
                           . $req->sessionInfo->{ $self->conf->{whatToTrace} }
                           . " is authorized to access to $sp."
                           . " SAML authentication response sent to"
-                          . " SAML SP $spConfKey for $user$nameIDLog"
+                          . " SAML SP $spConfKey for $user$nameIDLog$attr_str"
                     ),
-                    user    => $user,
-                    name_id => $name_id_content,
+                    user            => $user,
+                    saml_name_id    => $name_id_content,
+                    attributes => \%log_attributes,
                 );
 
                 # Redirect user to response URL

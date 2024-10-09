@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime::Format::Unicode - ~/lib/DateTime/Format/Unicode.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/21
-## Modified 2024/09/17
+## Modified 2024/09/27
 ## All rights reserved
 ## 
 ## 
@@ -14,7 +14,7 @@
 package DateTime::Format::Unicode;
 BEGIN
 {
-    use v5.10;
+    use v5.10.1;
     use strict;
     use warnings;
     use warnings::register;
@@ -25,7 +25,7 @@ BEGIN
     use POSIX ();
     use Scalar::Util;
     use Want;
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -107,13 +107,16 @@ sub error
         });
         warn( $msg ) if( warnings::enabled() );
         my $on_error = $self->{on_error};
-        if( ref( $on_error ) eq 'CODE' )
+        if( $on_error )
         {
-            $on_error->( $self->{error} );
-        }
-        elsif( $on_error eq 'fatal' )
-        {
-            die( $self->{error} );
+            if( ref( $on_error ) eq 'CODE' )
+            {
+                $on_error->( $self->{error} );
+            }
+            elsif( $on_error eq 'fatal' )
+            {
+                die( $self->{error} );
+            }
         }
         rreturn( DateTime::Format::Unicode::NullObject->new ) if( Want::want( 'OBJECT' ) );
         return;
@@ -155,49 +158,7 @@ sub format_datetime
         $dt->set_locale( $locale );
     } || return( $self->error( "Error setting the locale value ${locale} to the DateTime object: $@" ) );
 
-    my $map =
-    {
-    'a' => \&_format_am_pm,
-    'A' => \&_format_millisecond,
-    'b' => \&_format_day_period,
-    'B' => \&_format_day_period,
-    'c' => \&_format_week_day,
-    'C' => \&_format_hour_allowed,
-    'd' => \&_format_day_of_month,
-    'D' => \&_format_day_of_year,
-    'e' => \&_format_day_of_week,
-    'E' => \&_format_day_of_week,
-    'F' => \&_format_day_of_week_in_month,
-    'g' => \&_format_day_julian,
-    'G' => \&_format_era,
-    'h' => \&_format_hour_1_12,
-    'H' => \&_format_hour_0_23,
-    'j' => \&_format_hour_flexible,
-    'J' => \&_format_hour_preferred,
-    'k' => \&_format_hour_1_24,
-    'K' => \&_format_hour_0_11,
-    'L' => \&_format_month_standalone,
-    'm' => \&_format_minute,
-    'M' => \&_format_month,
-    'O' => \&_format_timezone_gmt_offset,
-    'q' => \&_format_quarter_standalone,
-    'Q' => \&_format_quarter,
-    'r' => \&_format_year_related,
-    's' => \&_format_second,
-    'S' => \&_format_second_fractional,
-    'u' => \&_format_year_extended,
-    'U' => \&_format_cyclic_year_name,
-    'v' => \&_format_timezone_non_location,
-    'V' => \&_format_timezone_location,
-    'w' => \&_format_week_number,
-    'W' => \&_format_week_of_month,
-    'x' => \&_format_zone_offset,
-    'X' => \&_format_zone_offset_gmt,
-    'y' => \&_format_year,
-    'Y' => \&_format_week_year,
-    'z' => \&_format_timezone,
-    'Z' => \&_format_timezone_offset,
-    };
+    my $map = $self->_get_helper_methods;
 
     my $cldr_pattern = sub
     {
@@ -306,6 +267,7 @@ sub format_interval
     {
         return( $self->error( "No pattern or pattern ID is set." ) );
     }
+    # $ref is [$part1, $separator, $part2, $full_pattern]
     my $ref = $locale->interval_format( $pattern, $diff ) ||
         return( $self->pass_error( $locale->error ) );
     # Unable to find an interval pattern for this greatest difference token
@@ -313,7 +275,7 @@ sub format_interval
     # Let's try to break it down
     if( !scalar( @$ref ) )
     {
-        $ref = $locale->locale->split_interval( pattern => $pattern, greatest_diff => $diff ) ||
+        $ref = $locale->split_interval( pattern => $pattern, greatest_diff => $diff ) ||
             return( $self->pass_error( $locale->locale->error ) );
     }
     if( !scalar( @$ref ) )
@@ -336,7 +298,7 @@ sub locale
         unless( Scalar::Util::blessed( $locale ) &&
                 $locale->isa( 'DateTime::Locale::FromCLDR' ) )
         {
-            $locale = DateTime::Locale::FromCLDR->new( $locale ) ||
+            $locale = DateTime::Locale::FromCLDR->new( "$locale" ) ||
                 return( $self->pass_error( DateTime::Locale::FromCLDR->error ) );
         }
         $self->{locale} = $locale;
@@ -1027,6 +989,8 @@ sub _format_timezone
     my( $self, $token, $len, $dt ) = @_;
     my $locale = $self->{locale} || die( "Locale object value is gone!" );
     my $tz = $dt->time_zone->name;
+    # Handle this edge case.
+    $tz = 'UTC' if( $tz eq 'floating' );
     # The short specific non-location format. Where that is unavailable, falls back to the short localized GMT format ("O").
     # Example:
     # PDT
@@ -1161,6 +1125,8 @@ sub _format_timezone_non_location
     my( $self, $token, $len, $dt ) = @_;
     my $locale = $self->{locale} || die( "Locale object value is gone!" );
     my $tz = $dt->time_zone->name;
+    # Handle this edge case.
+    $tz = 'UTC' if( $tz eq 'floating' );
     if( $len == 1 )
     {
         # The short generic non-location format
@@ -1486,6 +1452,55 @@ sub _format_zone_offset
 }
 
 sub _format_zone_offset_gmt { return( shift->_format_zone_offset( @_, 1 ) ); }
+
+sub _get_helper_methods
+{
+    my $self = shift( @_ );
+    my $map =
+    {
+    'a' => \&_format_am_pm,
+    'A' => \&_format_millisecond,
+    'b' => \&_format_day_period,
+    'B' => \&_format_day_period,
+    'c' => \&_format_week_day,
+    'C' => \&_format_hour_allowed,
+    'd' => \&_format_day_of_month,
+    'D' => \&_format_day_of_year,
+    'e' => \&_format_day_of_week,
+    'E' => \&_format_day_of_week,
+    'F' => \&_format_day_of_week_in_month,
+    'g' => \&_format_day_julian,
+    'G' => \&_format_era,
+    'h' => \&_format_hour_1_12,
+    'H' => \&_format_hour_0_23,
+    'j' => \&_format_hour_flexible,
+    'J' => \&_format_hour_preferred,
+    'k' => \&_format_hour_1_24,
+    'K' => \&_format_hour_0_11,
+    'L' => \&_format_month_standalone,
+    'm' => \&_format_minute,
+    'M' => \&_format_month,
+    'O' => \&_format_timezone_gmt_offset,
+    'q' => \&_format_quarter_standalone,
+    'Q' => \&_format_quarter,
+    'r' => \&_format_year_related,
+    's' => \&_format_second,
+    'S' => \&_format_second_fractional,
+    'u' => \&_format_year_extended,
+    'U' => \&_format_cyclic_year_name,
+    'v' => \&_format_timezone_non_location,
+    'V' => \&_format_timezone_location,
+    'w' => \&_format_week_number,
+    'W' => \&_format_week_of_month,
+    'x' => \&_format_zone_offset,
+    'X' => \&_format_zone_offset_gmt,
+    'y' => \&_format_year,
+    'Y' => \&_format_week_year,
+    'z' => \&_format_timezone,
+    'Z' => \&_format_timezone_offset,
+    };
+    return( $map );
+}
 
 sub _get_args_as_hash
 {
@@ -1843,7 +1858,7 @@ which, will default to C<locale> C<en> with date medium-size format pattern C<MM
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

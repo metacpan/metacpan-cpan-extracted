@@ -100,20 +100,18 @@ sub run {
     # More than one factor has been found, display choice
     else {
         $self->logger->debug("Prepare Okta Factor choice");
-        my ( $checkLogins, $stayConnected ) = $self->getFormParams($req);
         my $res = $self->p->sendHtml(
             $req,
             'okta2fchoice',
             params => {
-                TOKEN         => $token,
-                CHECKLOGINS   => $checkLogins,
-                STAYCONNECTED => $stayConnected,
-                MODULES       => [
+                TOKEN   => $token,
+                MODULES => [
                     map { { CODE => $_, LABEL => $okta_factors->{$_} } }
                     sort keys %$okta_factors
                 ],
                 ALERT => 'positive',
-                MSG   => 'okta2fSelectFactor'
+                MSG   => 'okta2fSelectFactor',
+                $self->get2fTplParams($req),
             }
         );
         $req->response($res);

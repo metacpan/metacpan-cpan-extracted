@@ -8,7 +8,7 @@ SPVM::Sys::IO::Stat - struct stat in the C language
 
 =head1 Description
 
-The Sys::IO::Stat class in L<SPVM> represents C<struct stat> in the C language, and has utility methods for the structure.
+Sys::IO::Stat class in L<SPVM> represents C<struct stat> in the C language, and has utility methods for the structure.
 
 =head1 Usage
 
@@ -186,145 +186,145 @@ Returns C<st_ctim.tv_nsec>.
 
 C<method A : double ();>
 
-The implementation of the L<A|SPVM::Sys/"A"> method in the Sys class.
+The implementation of L<Sys#A|SPVM::Sys/"A"> method.
 
 =head2 C
 
 C<method C : double ();>
 
-The implementation of the L<C|SPVM::Sys/"C"> method in the Sys class.
+The implementation of L<Sys#C|SPVM::Sys/"C"> method.
 
 =head2 M
 
 C<method M : double ();>
 
-The implementation of the L<M|SPVM::Sys/"M"> method in the Sys class.
+The implementation of L<Sys#M|SPVM::Sys/"M"> method.
 
 =head2 O
 
 C<method O : int ();>
 
-The implementation of the L<O|SPVM::Sys/"O"> method in the Sys class.
+The implementation of L<Sys#O|SPVM::Sys/"O"> method.
 
 =head2 S
 
 C<method S : int ();>
 
-The implementation of the L<S|SPVM::Sys/"S"> method in the Sys class.
+The implementation of L<Sys#S|SPVM::Sys/"S"> method.
 
 =head2 b
 
 C<method b : int ();>
 
-The implementation of the L<b|SPVM::Sys/"b"> method in the Sys class.
+The implementation of L<Sys#b|SPVM::Sys/"b"> method.
 
 =head2 c
 
 C<method c : int ();>
 
-The implementation of the L<c|SPVM::Sys/"c"> method in the Sys class.
+The implementation of L<Sys#c|SPVM::Sys/"c"> method.
 
 =head2 d
 
 C<method d : int ();>
 
-The implementation of the L<d|SPVM::Sys/"d"> method in the Sys class.
+The implementation of L<Sys#d|SPVM::Sys/"d"> method.
 
 =head2 e
 
 C<method e : int ();>
 
-The implementation of the L<e|SPVM::Sys/"e"> method in the Sys class.
+The implementation of L<Sys#e|SPVM::Sys/"e"> method.
 
 =head2 f
 
 C<method f : int ();>
 
-The implementation of the L<f|SPVM::Sys/"f"> method in the Sys class.
+The implementation of L<Sys#f|SPVM::Sys/"f"> method.
 
 =head2 g
 
 C<method g : int ();>
 
-The implementation of the L<g|SPVM::Sys/"g"> method in the Sys class.
+The implementation of L<Sys#g|SPVM::Sys/"g"> method.
 
 =head2 k
 
 C<method k : int ();>
 
-The implementation of the L<k|SPVM::Sys/"k"> method in the Sys class.
+The implementation of L<Sys#k|SPVM::Sys/"k"> method.
 
 =head2 l
 
 C<method l : int ();>
 
-The implementation of the L<l|SPVM::Sys/"l"> method in the Sys class.
+The implementation of L<Sys#l|SPVM::Sys/"l"> method.
 
 =head2 o
 
 C<method o : int ();>
 
-The implementation of the L<o|SPVM::Sys/"o"> method in the Sys class.
+The implementation of L<Sys#o|SPVM::Sys/"o"> method.
 
 =head2 p
 
 C<method p : int ();>
 
-The implementation of the L<p|SPVM::Sys/"p"> method in the Sys class.
+The implementation of L<Sys#p|SPVM::Sys/"p"> method.
 
 =head2 s
 
 C<method s : long ();>
 
-The implementation of the L<s|SPVM::Sys/"s"> method in the Sys class.
+The implementation of L<Sys#s|SPVM::Sys/"s"> method.
 
 =head2 u
 
 C<method u : int ();>
 
-The implementation of the L<u|SPVM::Sys/"u"> method in the Sys class.
+The implementation of L<Sys#u|SPVM::Sys/"u"> method.
 
 =head2 z
 
 C<method z : int ();>
 
-The implementation of the L<z|SPVM::Sys/"z"> method in the Sys class.
+The implementation of L<Sys#z|SPVM::Sys/"z"> method.
 
 =head2 r
 
 C<method r : int ();>
 
-The implementation of the L<r|SPVM::Sys/"r"> method in the Sys class.
+The implementation of L<Sys#r|SPVM::Sys/"r"> method.
 
 =head2 w
 
 C<method w : int ();>
 
-The implementation of the L<w |SPVM::Sys/"w "> method in the Sys class.
+The implementation of the L<Sys#w|SPVM::Sys/"w"> method.
 
 =head2 x
 
 C<method x : int ();>
 
-The implementation of the L<x|SPVM::Sys/"x"> method in the Sys class.
+The implementation of L<Sys#x|SPVM::Sys/"x"> method.
 
 =head2 R
 
 C<method R : int ();>
 
-The implementation of the L<R|SPVM::Sys/"R"> method in the Sys class.
+The implementation of L<Sys#R|SPVM::Sys/"R"> method.
 
 =head2 W
 
 C<method W : int ();>
 
-The implementation of the L<W|SPVM::Sys/"W"> method in the Sys class.
+The implementation of L<Sys#W|SPVM::Sys/"W"> method.
 
 =head2 X
 
 C<method X : int ();>
 
-The implementation of the L<X|SPVM::Sys/"X"> method in the Sys class.
+The implementation of L<Sys#X|SPVM::Sys/"X"> method.
 
 =head1 Copyright & License
 

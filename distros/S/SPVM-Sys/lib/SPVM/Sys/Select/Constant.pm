@@ -8,7 +8,7 @@ SPVM::Sys::Select::Constant - Constant Values for Select.
 
 =head1 Description
 
-The Sys::Select::Constant class in L<SPVM> has methods to get constant values for the select system call.
+Sys::Select::Constant class in L<SPVM> has methods to get constant values for the select system call.
 
 =head1 Usage
 
@@ -20,7 +20,7 @@ The Sys::Select::Constant class in L<SPVM> has methods to get constant values fo
 
 C<static method FD_SETSIZE : int ();>
 
-Gets the value of C<FD_SETSIZE>. If the value is not defined in the system, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+Gets the value of C<FD_SETSIZE>. If the value is not defined in this system, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 =head1 Copyright & License
 

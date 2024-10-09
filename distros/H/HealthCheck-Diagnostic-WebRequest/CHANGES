@@ -1,6 +1,14 @@
 Changelog for HealthCheck-Diagnostic-WebRequest
 
-v1.4.3 2024-09-16T16:12:18
+v1.4.4 2024-10-08T16:51:14
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #10: SM-5150 Rename check methods to not have underscores
+   prepended to their names (Samuel Ng)
+ - SM-5150 Add pod for check methods (Samuel Ng)
+ - SM-5150 Rename check methods to not have underscores prepended to their
+   names (Samuel Ng)
+
+v1.4.3 2024-09-16T16:11:47
  - Update README / LICENSE (Brendan Byrd)
  - Pull request #9: SM-5089 (Samuel Ng)
  - SM-5089 Set default value for ref checks in string comparisons to
@@ -83,8 +91,8 @@ v1.3.2 2019-12-10T20:17:09
 
 v1.3.1 2019-10-24T21:14:21
  - Create distribution files (Andrew Hewus Fresh)
- - Remove gitc metadata (Andrew Hewus Fresh)
  - Convert to Bitbucket workflow (Andrew Hewus Fresh)
+ - Remove gitc metadata (Andrew Hewus Fresh)
 
 v1.3.0.0 2019-10-24T14:49:06
  - No changes found

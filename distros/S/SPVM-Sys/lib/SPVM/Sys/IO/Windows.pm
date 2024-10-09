@@ -10,7 +10,7 @@ SPVM::Sys::IO::Windows - IO System Call on Windows
 
 =head1 Description
 
-The SPVM::Sys::IO::Windows class in L<SPVM> has methods to manipulate IO system calls in Windows.
+Sys::IO::Windows class in L<SPVM> has methods to manipulate IO system calls in Windows.
 
 =head1 Usage
 
@@ -26,7 +26,7 @@ Delete a file.
 
 Note:
 
-This method is implemented so that the beheivior is the same as the L<readlink|SPVM::Sys::IO/"readlink"> in the Sys::IO class as possible.
+This method is implemented so that the beheivior is the same as L<Sys::IO#readlink|SPVM::Sys::IO/"readlink"> method as possible.
 
 If the file given by the path name $pathname is read-only, the flag is disabled before the file deletion. If the file deletion failed, the flag is restored.
 
@@ -48,7 +48,7 @@ Raname the file name from the old name $oldpath to the new name $newpath.
 
 Note:
 
-This method is implemented so that the beheivior is the same as the L<readlink|SPVM::Sys::IO/"readlink"> in the Sys::IO class as possible.
+This method is implemented so that the beheivior is the same as L<Sys::IO#readlink|SPVM::Sys::IO/"readlink"> method as possible.
 
 Error numbers in Windows are replaced with the ones in POSIX.
 
@@ -68,7 +68,7 @@ Creates a path $newpath symbolically linked to the path $oldpath.
 
 Note:
 
-This method is implemented so that the beheivior is the same as the L<symlink|SPVM::Sys::IO/"symlink"> in the Sys::IO class as possible.
+This method is implemented so that the beheivior is the same as L<Sys::IO#symlink|SPVM::Sys::IO/"symlink"> method as possible.
 
 Error numbers in Windows are replaced with the ones in POSIX.
 
@@ -80,7 +80,7 @@ Calls the C<readlink> function implemented for Windows.
 
 Note:
 
-This method is implemented so that the beheivior is the same as the L<readlink|SPVM::Sys::IO/"readlink"> in the Sys::IO class as possible.
+This method is implemented so that the beheivior is the same as L<Sys::IO#readlink|SPVM::Sys::IO/"readlink"> method as possible.
 
 Symbolic links and directory junctions in Windows are manipulated as symbolic links.
 
@@ -94,7 +94,7 @@ Calls the C<lstat> function implemented for Windows.
 
 Note:
 
-This method is implemented so that the beheivior is the same as the L<lstat|SPVM::Sys::IO::Stat/"lstat"> in the Sys::IO class as possible..
+This method is implemented so that the beheivior is the same as L<Sys::IO#lstat|SPVM::Sys::IO/"lstat"> method as possible..
 
 Symbolic links and directory junctions in Windows are manipulated as symbolic links.
 

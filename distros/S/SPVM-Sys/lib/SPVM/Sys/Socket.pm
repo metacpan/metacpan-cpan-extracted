@@ -8,7 +8,7 @@ SPVM::Sys::Socket - System Calls for Sockets
 
 =head1 Description
 
-The Sys::Socket class in L<SPVM> has methods to call system calls for sockets.
+Sys::Socket class in L<SPVM> has methods to call system calls for sockets.
 
 =head1 Usage
   
@@ -197,13 +197,27 @@ C<static method close : int ($fd : int);>
 
 Calls the L</"closesocket"> method in Windows.
 
-Calls the L<close|Sys::IO/"close"> method in the the Sys::IO class in other OSs.
+Calls L<the#close|SPVM::the/"close"> method Sys::IO class in other OSs.
 
 =head2 recv
 
 C<static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $buf_offset : int = 0);>
 
 Calls the L<recv|https://linux.die.net/man/2/recv> function and returns its return value.
+
+Excetpions:
+
+$buf must be defined. Otherwise an excetpion is thrown.
+
+$len must be less than the length of $buf - $buf_offset. Otherwise an excetpion is thrown.
+
+If the recv function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+=head2 recvfrom
+
+C<static method recvfrom : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $src_addr : Sys::Socket::Sockaddr, $addrlen_ref : int*, $buf_offset : int = 0);>
+
+Calls the L<recvfromv|https://linux.die.net/man/2/recvfrom> function and returns its return value.
 
 Excetpions:
 
@@ -236,8 +250,6 @@ Calls the L<sendto|https://linux.die.net/man/2/sendto> function and returns its 
 Excetpions:
 
 $buf must be defined. Otherwise an excetpion is thrown.
-
-$addr must be defined. Otherwise an excetpion is thrown.
 
 $len must be less than the length of $buf - $buf_offset. Otherwise an excetpion is thrown.
 

@@ -2,7 +2,7 @@ package Lemonldap::NG::Portal::Plugins::Impersonation;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Common::Util qw(isHiddenAttr);
+use Lemonldap::NG::Common::Util            qw(isHiddenAttr);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MALFORMEDUSER
   PE_OK PE_BADCREDENTIALS
@@ -28,7 +28,8 @@ has unrestrictedUsersRule => ( is => 'rw', default => sub { 0 } );
 has ott => ( is => 'rw' );
 
 # Captcha generator
-has captcha => ( is => 'rw' );
+has captcha     => ( is => 'rw' );
+has needCaptcha => ( is => 'rw' );
 
 # Prefix used for renaming session attributes
 has prefix => (
@@ -68,6 +69,12 @@ sub init {
     return 0 unless $self->unrestrictedUsersRule;
 
     # Initialize Captcha if needed
+    $self->needCaptcha(
+        $self->p->buildRule(
+            $self->{conf}->{captcha_login_enabled},
+            'captchaLogin'
+        )
+    );
     if ( $self->{conf}->{captcha_login_enabled} ) {
         $self->captcha( $self->p->loadModule('::Lib::Captcha') ) or return 0;
     }
@@ -102,7 +109,7 @@ sub run {
     $self->logger->debug("No impersonation required")
       if ( $spoofId eq $req->{user} );
 
-    unless ( $spoofId =~ /$self->{conf}->{userControl}/o ) {
+    unless ( $spoofId =~ /$self->{conf}->{userControl}/ ) {
         $self->userLogger->warn('Malformed spoofed Id');
         $self->logger->debug("Impersonation tried with spoofed Id: $spoofId");
         $spoofId = $req->{user};
@@ -285,7 +292,7 @@ sub _userData {
 
 sub setSecurity {
     my ( $self, $req ) = @_;
-    if ( $self->captcha ) {
+    if ( $self->needCaptcha->( $req, {} ) ) {
         $self->captcha->setCaptcha($req);
     }
     elsif ( $self->ottRule->( $req, {} ) ) {

@@ -8,7 +8,7 @@ SPVM::Sys::Socket::Addrinfo - struct addrinfo in the C language
 
 =head1 Description
 
-The Sys::Socket::Addrinfo class in L<SPVM> represents L<struct addrinfo|https://linux.die.net/man/3/getaddrinfo> in the C language.
+Sys::Socket::Addrinfo class in L<SPVM> represents L<struct addrinfo|https://linux.die.net/man/3/getaddrinfo> in the C language.
 
 =head1 Usage
 

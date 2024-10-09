@@ -18,7 +18,7 @@
         </td>
         <td>
           <select class="form-control" ng-model="s.data.type" ng-change="execFilters(_findScopeByKey('authParams'))">
-            <option ng-repeat="item in currentNode.select" ng-selected="item.k==s.data.type" value="{{item.k}}">{{item.v}}</option>
+            <option ng-repeat="item in currentNode.select" ng-selected="item.k==s.data.type" value="{{item.k}}" trspan="{{item.v}}">{{item.v}}</option>
           </select>
         </td>
         <td>

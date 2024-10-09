@@ -19,13 +19,13 @@ int32_t SPVM__Sys__Signal__Handler__eq(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_handler1 = stack[0].oval;
   
   if (!obj_handler1) {
-    return env->die(env, stack, "$handler1 must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The handler $handler1 must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   void* obj_handler2 = stack[1].oval;
   
   if (!obj_handler2) {
-    return env->die(env, stack, "$handler2 must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The handler $handler2 must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   void* handler1 = env->get_pointer(env, stack, obj_handler1);

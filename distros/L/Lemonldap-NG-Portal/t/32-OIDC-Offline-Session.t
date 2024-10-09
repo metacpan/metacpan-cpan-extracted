@@ -14,13 +14,13 @@ BEGIN {
 my $debug = "error";
 
 sub runTest {
-    my ( $op, $jwt ) = @_;
+    my ( $op, $jwt, $refresh_rotation ) = @_;
     Time::Fake->reset;
 
     my $query;
     my $res;
 
-    my $idpId = login( $op, 'french' );
+    my $idpId = $op->login( 'french', { lmAuth => '1_Demo' } );
 
     # Inital first name
     $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{french}->{cn} =
@@ -79,6 +79,17 @@ sub runTest {
 
     $json = expectJSON( refreshGrant( $op, 'rpid', $refresh_token ) );
 
+    if ($refresh_rotation) {
+        my $old_refresh_token = $refresh_token;
+        ok( $refresh_token = $json->{refresh_token},
+            "Refresh token was updated" );
+        expectReject( refreshGrant( $op, "rpid", $old_refresh_token ),
+            400, "invalid_request" );
+    }
+    else {
+        ok( !defined $json->{refresh_token}, "Refresh token not present" );
+    }
+
     # Make sure refresh token session has no _lastSeen to avoid purge
     ok( !getSamlSession($refresh_token)->{data}->{_lastSeen} );
 
@@ -90,11 +101,9 @@ sub runTest {
             sub  => "customfrench"
         );
     }
-    my $refresh_token2 = $json->{refresh_token};
     $id_token = $json->{id_token};
-    ok( $access_token,            "Got refreshed Access token" );
-    ok( $id_token,                "Got refreshed ID token" );
-    ok( !defined $refresh_token2, "Refresh token not present" );
+    ok( $access_token, "Got refreshed Access token" );
+    ok( $id_token,     "Got refreshed ID token" );
 
     $id_token_payload = id_token_payload($id_token);
     is(
@@ -120,6 +129,17 @@ sub runTest {
 
     $json = expectJSON( refreshGrant( $op, 'rpid', $refresh_token ) );
 
+    if ($refresh_rotation) {
+        my $old_refresh_token = $refresh_token;
+        ok( $refresh_token = $json->{refresh_token},
+            "Refresh token was updated" );
+        expectReject( refreshGrant( $op, "rpid", $old_refresh_token ),
+            400, "invalid_request" );
+    }
+    else {
+        ok( !defined $json->{refresh_token}, "Refresh token not present" );
+    }
+
     # Make sure refresh token session has no _lastSeen to avoid purge
     ok( !getSamlSession($refresh_token)->{data}->{_lastSeen} );
 
@@ -131,11 +151,9 @@ sub runTest {
             sub  => "customfrench"
         );
     }
-    $refresh_token2 = $json->{refresh_token};
-    $id_token       = $json->{id_token};
-    ok( $access_token,            "Got refreshed Access token" );
-    ok( $id_token,                "Got refreshed ID token" );
-    ok( !defined $refresh_token2, "Refresh token not present" );
+    $id_token = $json->{id_token};
+    ok( $access_token, "Got refreshed Access token" );
+    ok( $id_token,     "Got refreshed ID token" );
 
     $id_token_payload = id_token_payload($id_token);
     is( $id_token_payload->{auth_time},
@@ -176,7 +194,7 @@ sub runTest {
 }
 
 sub runTestRemoveUser {
-    my ($op) = @_;
+    my ( $op, $refresh_rotation ) = @_;
     Time::Fake->reset;
 
     my $query;
@@ -212,6 +230,17 @@ sub runTestRemoveUser {
     $json = expectJSON( refreshGrant( $op, 'rpid', $refresh_token ) );
     ok( $json->{access_token}, "Found access token" );
 
+    if ($refresh_rotation) {
+        my $old_refresh_token = $refresh_token;
+        ok( $refresh_token = $json->{refresh_token},
+            "Refresh token was updated" );
+        expectReject( refreshGrant( $op, "rpid", $old_refresh_token ),
+            400, "invalid_request" );
+    }
+    else {
+        ok( !defined $json->{refresh_token}, "Refresh token not present" );
+    }
+
     # Remove user from storage
     delete $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{goner};
     $json = expectReject( refreshGrant( $op, 'rpid', $refresh_token ),
@@ -222,7 +251,7 @@ my $baseConfig = {
     ini => {
         logLevel                        => $debug,
         domain                          => 'op.com',
-        portal                          => 'http://auth.op.com',
+        portal                          => 'http://auth.op.com/',
         authentication                  => 'Demo',
         timeoutActivity                 => 3600,
         userDB                          => 'Same',
@@ -261,16 +290,36 @@ my $baseConfig = {
     }
 };
 
-my $op = LLNG::Manager::Test->new($baseConfig);
-runTest($op);
+subtest "Run tests with base config" => sub {
+    my $op = LLNG::Manager::Test->new($baseConfig);
+    runTest($op);
+};
 
-# Re-run tests with JWT access tokens
-$baseConfig->{ini}->{oidcRPMetaDataOptions}->{rp}
-  ->{oidcRPMetaDataOptionsAccessTokenJWT} = 1;
-$op = LLNG::Manager::Test->new($baseConfig);
-runTest( $op, 1 );
+subtest "Removed user's offline sessions are no longer valid" => sub {
+    my $op = LLNG::Manager::Test->new($baseConfig);
+    runTestRemoveUser($op);
+};
 
-runTestRemoveUser($op);
+subtest "Run tests with JWT access tokens" => sub {
+    $baseConfig->{ini}->{oidcRPMetaDataOptions}->{rp}
+      ->{oidcRPMetaDataOptionsAccessTokenJWT} = 1;
+    my $op = LLNG::Manager::Test->new($baseConfig);
+    runTest( $op, 1 );
+};
+
+subtest "Run tests with refresh token rotation" => sub {
+    $baseConfig->{ini}->{oidcRPMetaDataOptions}->{rp}
+      ->{oidcRPMetaDataOptionsRefreshTokenRotation} = 1;
+    my $op = LLNG::Manager::Test->new($baseConfig);
+    runTest( $op, 1, 1 );
+};
+
+subtest "Using choice authentication method" => sub {
+    $baseConfig->{ini}->{authentication} = "Choice";
+    $baseConfig->{ini}->{authChoiceModules}->{'1_Demo'} = 'Demo;Demo;Null';
+    my $op = LLNG::Manager::Test->new($baseConfig);
+    runTest( $op, 1, 1 );
+};
 
 clean_sessions();
 done_testing();

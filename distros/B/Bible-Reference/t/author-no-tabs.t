@@ -23,6 +23,7 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-synopsis.t',
+    't/no_bleed.t',
     't/release-kwalitee.t',
     't/unit.t'
 );

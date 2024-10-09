@@ -6,23 +6,22 @@ class IO::Socket::UNIX extends IO::Socket {
   use Sys::Socket::Util;
   use Array;
   
+  # Fields
   has Local : string;
+  
   has Peer : string;
   
+  # Class Methods
   static method new : IO::Socket::UNIX ($options : object[] = undef) {
     
     my $self = new IO::Socket::UNIX;
     
-    $self->SUPER::init($options);
+    $self->init($options);
     
     return $self;
   }
   
   # Instance Methods
-  method new_from_instance : IO::Socket::UNIX ($options : object[] = undef) {
-    return IO::Socket::UNIX->new($options);
-  }
-  
   method option_names : string[] () {
     
     my $option_names = Array->merge_string(
@@ -36,43 +35,87 @@ class IO::Socket::UNIX extends IO::Socket {
     return $option_names;
   }
   
-  protected method configure : void ($options : object[] = undef) {
+  protected method init : void ($options : object[] = undef) {
     
     my $options_h = Hash->new($options);
     
-    my $domain = $options_h->delete_or_default_int("Domain", SOCKET->AF_UNIX);
-    
-    my $type = $options_h->delete_or_default_int("Type", SOCKET->SOCK_STREAM);
-    
-    if($options_h->exists("Blocking")) {
-      my $blocking = $options_h->get_int("Blocking");
-      $options_h->delete("Blocking");
-      $self->set_blocking($blocking);
+    # Domain option
+    my $domain = $options_h->delete_or_default_int("Domain", -1);
+    unless ($domain >= 0) {
+      $domain = SOCKET->AF_UNIX;
     }
     
-    my $protocol = 0;
-    $self->socket($domain, $type, $protocol);
+    # Proto option
+    my $proto = $options_h->delete_or_default_int("Proto", SOCKET->IPPROTO_TCP);
     
+    # Type option
+    my $type = $options_h->delete_or_default_int("Type", -1);
+    unless ($type >= 0) {
+      if ($proto == SOCKET->IPPROTO_TCP) {
+        $type = SOCKET->SOCK_STREAM;
+      }
+      elsif ($proto == SOCKET->IPPROTO_UDP) {
+        $type = SOCKET->SOCK_DGRAM;
+      }
+      elsif ($proto == SOCKET->IPPROTO_ICMP) {
+        $type = SOCKET->SOCK_RAW;
+      }
+    }
+    
+    # Reason for Blocking => 1.
+    # On Mac, non-blocking can only be set for sockets connected with connect or accept,
+    # so when you create a socket, set it to blocking.
+    my $super_options = Fn->merge_options($options, {FieldsInitOnly => 1});
+    
+    $self->SUPER::init($super_options);
+    
+    # Local option
     my $local = $options_h->delete_or_default_string("Local", undef);
+    $self->{Local} = $local;
     
-    if ($local) {
-      my $sockaddr_un_local = Sys::Socket::Util->sockaddr_un($local);
-      $self->bind($sockaddr_un_local);
-    }
-    
+    # Peer option
     my $peer = $options_h->delete_or_default_string("Peer", undef);
+    $self->{Peer} = $peer;
     
-    if ($options_h->exists("Listen") && $type != SOCKET->SOCK_DGRAM) {
-      my $listen = $options_h->delete_or_default_int("Listen", 5);
-      $self->listen($listen);
+    # Listen option
+    my $listen_backlog = $options_h->get_or_default_int("Listen", -1);
+    $self->{Listen} = $listen_backlog;
+    
+    # Blocking option
+    my $blocking = $options_h->get_or_default_int("Blocking", 0);
+    $self->{Blocking} = (byte)$blocking;
+    
+    my $fields_init_only = $options_h->get_or_default_int("FieldsInitOnly", 0);
+    
+    unless ($fields_init_only) {
+      $self->configure;
     }
-    elsif ($peer) {
+  }
+  
+  protected method configure : void () {
+    
+    my $peer = $self->{Peer};
+    
+    my $local = $self->{Local};
+    
+    my $blocking = $self->{Blocking};
+    
+    $self->socket;
+    
+    if ($peer) {
       my $sockaddr_un_peer = Sys::Socket::Util->sockaddr_un($peer);
       $self->connect($sockaddr_un_peer);
     }
+    elsif ($local) {
+      my $sockaddr_un_local = Sys::Socket::Util->sockaddr_un($local);
+      $self->bind($sockaddr_un_local);
+      
+      $self->listen;
+    }
     
-    $options_h->delete("Listen");
-    
+    unless ($blocking) {
+      $self->set_blocking(0);
+    }
   }
   
   method hostpath : string () {
@@ -89,5 +132,9 @@ class IO::Socket::UNIX extends IO::Socket {
     my $peerpath = $peer_sockaddr_un->sun_path;
     
     return $peerpath;
+  }
+  
+  method accept : IO::Socket::UNIX ($peer_ref : Sys::Socket::Sockaddr[] = undef) {
+    return (IO::Socket::UNIX)$self->SUPER::accept($peer_ref);
   }
 }

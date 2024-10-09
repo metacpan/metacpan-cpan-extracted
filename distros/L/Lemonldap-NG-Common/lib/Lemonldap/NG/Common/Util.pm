@@ -5,9 +5,10 @@ use strict;
 use Digest::MD5;
 use MIME::Base64 qw(encode_base64);
 
-our $VERSION   = '2.17.0';
-our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(getSameSite getPSessionID genId2F display2F isHiddenAttr);
+our $VERSION = '2.17.0';
+our @ISA     = qw(Exporter);
+our @EXPORT_OK =
+  qw(getSameSite getPSessionID genId2F display2F filterKey2F isHiddenAttr);
 
 sub getPSessionID {
     my ($uid) = @_;
@@ -23,6 +24,16 @@ sub genId2F {
 sub display2F {
     my ($device) = @_;
     return sprintf( "[%s]%s", $device->{type}, $device->{epoch} );
+}
+
+# Return the 2F device without private _* keys
+sub filterKey2F {
+    my ( $device, @filterKeys ) = @_;
+    my $filtered_2f =
+      { map { $_ => $device->{$_} } grep( !/^_/, keys %$device ) };
+
+    delete $filtered_2f->{$_} for @filterKeys;
+    return $filtered_2f;
 }
 
 sub isHiddenAttr {
@@ -52,7 +63,7 @@ sub isHiddenAttr {
     return
          $match
       || $hiddenAttributes{$attr}
-      || ( $regex && $attr =~ m#$regex#o );
+      || ( $regex && $attr =~ m#$regex# );
 }
 
 sub getSameSite {

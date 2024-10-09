@@ -24,17 +24,17 @@ mkdir $cachedir;
 my %session;
 
 my $cacheOpts = {
-    namespace  => 'llng',
-    cache_root => $cachedir,
+    namespace            => 'llng',
+    cache_root           => $cachedir,
+    allow_cache_for_root => 1,
 };
 
 my $args = {
-    localStorage         => 'Cache::FileCache',
-    localStorageOptions  => $cacheOpts,
-    backend              => 'Apache::Session::File',
-    Directory            => $sessionsdir,
-    LockDirectory        => "$sessionsdir/lock",
-    allow_cache_for_root => 1,
+    localStorage        => 'Cache::FileCache',
+    localStorageOptions => $cacheOpts,
+    backend             => 'Apache::Session::File',
+    Directory           => $sessionsdir,
+    LockDirectory       => "$sessionsdir/lock",
 };
 
 ok( tie( %session, 'Lemonldap::NG::Common::Apache::Session', undef, $args ),

@@ -94,6 +94,55 @@ sub _initLogger {
     }
 }
 
+sub getLanguage {
+    my ( $self, $req ) = @_;
+
+    # Get the list of allowed languages from config
+    my @langArray = split( qr/[ ,]+/, $self->languages );
+
+    # If the language in the cookie is found in allowed languages, use it
+    my $cookie_lang = $req->cookies->{llnglanguage};
+    if ( $cookie_lang and grep { $_ eq $cookie_lang } @langArray ) {
+        return $cookie_lang;
+    }
+
+    # Get ordered list of preferred languages from Accept-Language header
+    my @preferred_req_language = $self->_getLanguageListFromHeader($req);
+
+    # Go through preferred languages and pick the first allowed one
+    for my $req_lang (@preferred_req_language) {
+        if ( grep { lc($_) eq lc($req_lang) } @langArray ) {
+            return $req_lang;
+        }
+    }
+
+    # fallback: pick the first allowed language, default to english
+    return ( $langArray[0] || 'en' );
+}
+
+sub _getLanguageListFromHeader {
+    my ( $self, $req ) = @_;
+
+    # Extract [2 letter code, priority] from list of Accept-Language values
+    my @req_languages_and_prio = map {
+        my ( $lang, $prio ) = m/^(\w+)(?:.*q=(\d\.[\d+]))?/;
+        $prio ||= 1;
+
+        # Skip invalid entries
+        $lang ? ( [ $lang, $prio ] ) : ()
+      }
+      split( qr/\s*,\s*/, $req->languages || "" );
+
+    # Sort by priority (perl sort is stable by default)
+    @req_languages_and_prio =
+      sort { $b->[1] <=> $a->[1] } @req_languages_and_prio;
+
+    # Keep only language code
+    my @preferred_req_language = map { $_->[0] } @req_languages_and_prio;
+
+    return @preferred_req_language;
+}
+
 sub auditLog {
     my ( $self, $req, %info ) = @_;
     $self->_auditLogger->log( $req, %info );
@@ -293,7 +342,8 @@ sub sendJs {
         sprintf 'var staticPrefix="%s";'
       . 'var scriptname="%s";'
       . 'var availableLanguages="%s".split(/[,;] */);'
-      . 'var portal="%s";', $sp, $sc, $self->languages, $portal;
+      . 'var portal="%s";', $sp, $sc, $self->languages,
+      $portal;
     $s .= $self->javascript($req) if ( $self->can('javascript') );
     return [
         200,

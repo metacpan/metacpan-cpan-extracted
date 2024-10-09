@@ -8,7 +8,7 @@ SPVM::Sys::IO::Flock - struct flock in the C language
 
 =head1 Description
 
-The Sys::IO::Flock class in L<SPVM> is the class for C<struct flock> in the C language.
+Sys::IO::Flock class in L<SPVM> is the class for C<struct flock> in the C language.
 
 =head1 Usage
 

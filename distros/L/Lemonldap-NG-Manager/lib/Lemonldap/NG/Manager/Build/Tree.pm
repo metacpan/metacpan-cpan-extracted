@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.20.0';
 
 sub tree {
     return [ {
@@ -90,6 +90,7 @@ sub tree {
                                         'passwordPolicyActivation',
                                         'portalDisplayPasswordPolicy',
                                         'passwordPolicyMinSize',
+                                        'passwordPolicyMaxSize',
                                         'passwordPolicyMinLower',
                                         'passwordPolicyMinUpper',
                                         'passwordPolicyMinDigit',
@@ -150,7 +151,8 @@ sub tree {
                             help  => 'authchoice.html',
                             nodes => [
                                 'authChoiceParam',     'authChoiceModules',
-                                'authChoiceAuthBasic', 'authChoiceFindUser'
+                                'authChoiceAuthBasic', 'authChoiceFindUser',
+                                'authChoiceSelectOnly',
                             ]
                         },
                         {
@@ -174,24 +176,10 @@ sub tree {
                                 {
                                     title => 'dbiConnection',
                                     help  => 'authdbi.html#connection',
-                                    nodes => [ {
-                                            title => 'dbiConnectionAuth',
-                                            form  => 'simpleInputContainer',
-                                            nodes => [
-                                                'dbiAuthChain',
-                                                'dbiAuthUser',
-                                                'dbiAuthPassword'
-                                            ]
-                                        },
-                                        {
-                                            title => 'dbiConnectionUser',
-                                            form  => 'simpleInputContainer',
-                                            nodes => [
-                                                'dbiUserChain',
-                                                'dbiUserUser',
-                                                'dbiUserPassword'
-                                            ]
-                                        }
+                                    nodes => [
+                                        'dbiAuthChain',
+                                        'dbiAuthUser',
+                                        'dbiAuthPassword'
                                     ]
                                 },
                                 {
@@ -249,6 +237,14 @@ sub tree {
                                 'krbAuthnLevel', 'krbKeytab',
                                 'krbByJs',       'krbRemoveDomain',
                                 'krbAllowedDomains',
+                            ]
+                        },
+                        {
+                            title => 'webauthnParams',
+                            form  => 'simpleInputContainer',
+                            help  => 'authwebauthn.html',
+                            nodes => [
+                                'webauthnAuthnLevel',
                             ]
                         },
                         {
@@ -403,6 +399,7 @@ sub tree {
                                 'radiusSecret',
                                 'radiusServer',
                                 'radiusTimeout',
+                                'radiusMsgAuth',
                                 'radiusExportedVars',
                                 'radiusDictionaryFile',
                                 'radiusRequestAttributes',
@@ -598,10 +595,10 @@ sub tree {
                     help  => 'ssocookie.html',
                     form  => 'simpleInputContainer',
                     nodes => [
-                        'cookieName', '*domain',
-                        'cda',        'securedCookie',
-                        'httpOnly',   'cookieExpiration',
-                        'sameSite',
+                        'cookieName',    '*domain',
+                        'cda',           'httpOnly',
+                        'securedCookie', 'sameSite',
+                        'cookieExpiration',
                     ]
                 },
                 {
@@ -615,6 +612,7 @@ sub tree {
                         'timeoutActivity',
                         'timeoutActivityInterval',
                         'grantSessionRules',
+                        'appAccessHistoryEnabled',
                         {
                             title => 'sessionStorage',
                             help  => 'start.html#sessions-database',
@@ -643,11 +641,6 @@ sub tree {
                             ]
                         },
                     ]
-                },
-                {
-                    title => 'reloadParams',
-                    help  => 'configlocation.html#configuration-reload',
-                    nodes => [ 'reloadTimeout', 'compactConf', 'reloadUrls' ]
                 },
                 {
                     title => 'plugins',
@@ -778,6 +771,7 @@ sub tree {
                                 'stayConnectedTimeout',
                                 'stayConnectedCookieName',
                                 'stayConnectedSingleSession',
+                                'trustedBrowserUseTotp',
                             ],
                         },
                         {
@@ -790,6 +784,7 @@ sub tree {
                                 'rememberCookieTimeout',
                                 'rememberDefaultChecked',
                                 'rememberTimer',
+                                'rememberAuthChoiceForgetAtLogout',
                             ]
                         },
                         {
@@ -983,15 +978,6 @@ sub tree {
                             ]
                         },
                         {
-                            title => 'utotp2f',
-                            help  => 'utotp2f.html',
-                            form  => 'simpleInputContainer',
-                            nodes => [
-                                'utotp2fActivation', 'utotp2fAuthnLevel',
-                                'utotp2fLabel',      'utotp2fLogo'
-                            ]
-                        },
-                        {
                             title => 'totp2f',
                             help  => 'totp2f.html',
                             form  => 'simpleInputContainer',
@@ -1011,17 +997,6 @@ sub tree {
                             ]
                         },
                         {
-                            title => 'u2f',
-                            help  => 'u2f.html',
-                            form  => 'simpleInputContainer',
-                            nodes => [
-                                'u2fActivation',       'u2fSelfRegistration',
-                                'u2fUserCanRemoveKey', 'u2fAuthnLevel',
-                                'u2fLabel',            'u2fLogo',
-                                'u2fTTL'
-                            ]
-                        },
-                        {
                             title => 'webauthn2f',
                             help  => 'webauthn2f.html',
                             form  => 'simpleInputContainer',
@@ -1030,11 +1005,14 @@ sub tree {
                                 'webauthn2fSelfRegistration',
                                 'webauthn2fUserCanRemoveKey',
                                 'webauthn2fUserVerification',
+                                'webauthn2fResidentKey',
                                 'webauthn2fAttestation',
                                 'webauthn2fAttestationTrust',
                                 'webauthnRpName',
                                 'webauthnRpId',
+                                'webauthnAppId',
                                 'webauthnDisplayNameAttr',
+                                'webauthnDefaultTransports',
                                 'webauthn2fAuthnLevel',
                                 'webauthn2fLabel',
                                 'webauthn2fLogo',
@@ -1119,6 +1097,7 @@ sub tree {
                                 'radius2fSecret',
                                 'radius2fUsernameSessionKey',
                                 'radius2fTimeout',
+                                'radius2fMsgAuth',
                                 'radius2fDictionaryFile',
                                 'radius2fRequestAttributes',
                                 'radius2fSendInitialRequest',
@@ -1199,8 +1178,11 @@ sub tree {
                                     help  => 'crowdsec.html',
                                     form  => 'simpleInputContainer',
                                     nodes => [
-                                        'crowdsec',    'crowdsecAction',
-                                        'crowdsecUrl', 'crowdsecKey',
+                                        'crowdsec',
+                                        'crowdsecAction',
+                                        'crowdsecUrl',
+                                        'crowdsecKey',
+                                        'crowdsecIgnoreFailures',
                                     ],
                                 },
                                 {
@@ -1286,6 +1268,7 @@ sub tree {
                             nodes => [
                                 'https',
                                 'port',
+                                'useRedirectAjaxOnUnauthorized',
                                 'useRedirectOnForbidden',
                                 'useRedirectOnError',
                                 'maintenance'
@@ -1312,6 +1295,15 @@ sub tree {
                                 'redirectFormMethod', 'activeTimer',
                             ]
                         },
+                        {
+                            title => 'eventsManagement',
+                            help  => 'eventsmanagement.html',
+                            nodes => [
+                                'messageBroker', 'messageBrokerOptions',
+                                'reloadTimeout', 'reloadUrls',
+                                'compactConf',   'eventQueueName',
+                            ]
+                        },
                     ]
                 }
             ]
@@ -1324,6 +1316,7 @@ sub tree {
         'virtualHosts',
         {
             title => 'samlServiceMetaData',
+            form  => 'displaySamlMetadata',
             help  => 'samlservice.html',
             nodes => [
                 'samlEntityID',
@@ -1371,7 +1364,8 @@ sub tree {
                         'samlAuthnContextMapPassword',
                         'samlAuthnContextMapPasswordProtectedTransport',
                         'samlAuthnContextMapKerberos',
-                        'samlAuthnContextMapTLSClient'
+                        'samlAuthnContextMapTLSClient',
+                        'samlAuthnContextMapExtra'
                     ]
                 },
                 {

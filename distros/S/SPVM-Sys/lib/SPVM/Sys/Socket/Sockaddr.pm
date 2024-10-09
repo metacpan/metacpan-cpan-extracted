@@ -8,7 +8,7 @@ SPVM::Sys::Socket::Sockaddr - struct sockaddr in the C language
 
 =head1 Description
 
-The Sys::Socket::Sockaddr class in L<SPVM> represents L<struct sockaddr|https://linux.die.net/man/7/ip> in the C language.
+Sys::Socket::Sockaddr class in L<SPVM> represents L<struct sockaddr|https://linux.die.net/man/7/ip> in the C language.
 
 =head1 Usage
 

@@ -195,6 +195,18 @@ PARSE HOOKS
       in addition to those of the following keyword. These prefices may be
       further stacked.
 
+    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS
+
+      If set, use the extended signature parser of this module when parsing
+      a signature and additionally permit the use of named parameter
+      syntax, as documented in Sublike::Extended.
+
+    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES
+
+      If set, use the extended signature parser of this module when parsing
+      a signature and additionally permit the use of attribute declarations
+      on parameter variables, as documented in Sublike::Extended.
+
     In addition there are two U8 fields named require_parts and skip_parts
     which control the behaviour of various parts of the syntax which are
     usually optional. Any parts with bits set in require_parts become

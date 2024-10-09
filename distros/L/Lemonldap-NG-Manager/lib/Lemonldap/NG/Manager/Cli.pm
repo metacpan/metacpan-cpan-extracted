@@ -217,7 +217,7 @@ sub addKey {
         my $root   = shift;
         my $newKey = shift;
         my $value  = shift;
-        unless ( $root =~ /$simpleHashKeys$/o or $root =~ /$sep/o ) {
+        unless ( $root =~ /$simpleHashKeys$/ or $root =~ /$sep/ ) {
             die "$root is not a simple hash. Aborting";
         }
         $self->logger->info("CLI: Append key $root/$newKey $value");
@@ -258,7 +258,7 @@ sub delKey {
     while (@_) {
         my $root = shift;
         my $key  = shift;
-        unless ( $root =~ /$simpleHashKeys$/o or $root =~ /$sep/o ) {
+        unless ( $root =~ /$simpleHashKeys$/ or $root =~ /$sep/ ) {
             die "$root is not a simple hash. Aborting";
         }
         $self->logger->info("CLI: Remove key $root/$key");
@@ -409,8 +409,33 @@ sub restore {
     $self->logger->info("CLI: Restore conf.");
     my $res = $self->_post( '/confs/raw', '', IO::String->new($conf),
         'application/json', length($conf) );
-    use Data::Dumper;
-    print STDERR Dumper($res);
+
+    my $response = eval { from_json( $res->[2]->[0], { allow_nonref => 1 } ) };
+    if ( $res->[0] == 200 and $response->{result} == 1 ) {
+        print STDERR
+          "Configuration has been restored as version $response->{cfgNum}\n";
+
+    }
+    else {
+        if ( my $message = $response->{error} ) {
+            print STDERR "Failed to restore configuration: $message\n";
+        }
+        else {
+            print STDERR "The supplied configuration could not be restored"
+              . " because it contains errors:\n";
+
+            my @errors = eval {
+                map { $_->{message} } @{ $response->{details}->{__errors__} };
+            };
+            if (@errors) {
+                print STDERR " - $_\n" for @errors;
+            }
+            else {
+                use Data::Dumper;
+                print Dumper($res);
+            }
+        }
+    }
 }
 
 sub rollback {

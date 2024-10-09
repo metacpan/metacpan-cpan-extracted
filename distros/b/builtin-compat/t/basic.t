@@ -159,7 +159,7 @@ is trim("  \t  hi   \t   ho   \n\n\n   "), "hi   \t   ho", 'trim';
 is_deeply [indexed 13..16], [0, 13, 1, 14, 2, 15, 3, 16], 'indexed';
 
 {
-  is load_module('MyModule'), 'return', 'load_module has same return as require';
+  is load_module('MyModule'), 'MyModule', 'load_module returns the module name';
   my $x = $MyModule::loaded;
   is $MyModule::loaded, 1, 'load_module loads module';
 }

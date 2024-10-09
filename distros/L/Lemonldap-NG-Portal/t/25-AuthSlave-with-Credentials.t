@@ -20,7 +20,7 @@ my $client = LLNG::Manager::Test->new( {
             slaveUserHeader    => 'My-Test',
             slaveHeaderName    => 'Check-Slave',
             slaveHeaderContent => 'Password',
-            slaveMasterIP      => '127.0.0.1',
+            slaveMasterIP      => '127.0.0.10 127.0.0.1 , 127.1.2.0/24',
             slaveExportedVars  => {
                 name => 'Name',
             }
@@ -113,6 +113,22 @@ ok( $json->{error} == PE_MALFORMEDUSER, 'Response is PE_MALFORMEDUSER' )
 count(4);
 
 # Good credentials with accredited IP
+ok(
+    $res = $client->_get(
+        '/',
+        ip     => '127.1.2.1',
+        custom => {
+            HTTP_MY_TEST     => 'dwho',
+            HTTP_NAME        => 'Dr Who',
+            HTTP_CHECK_SLAVE => 'Password',
+        }
+
+    ),
+    'Auth query'
+);
+count(1);
+expectOK($res);
+
 ok(
     $res = $client->_get(
         '/',

@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -36,6 +36,15 @@ has registerUrl => (
     lazy    => 1,
     default => sub {
         $_[0]->conf->{registerUrl} || $_[0]->buildUrl("register");
+    }
+);
+has ott => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        my $ott = $_[0]->loadModule('::Lib::OneTimeToken');
+        $ott->timeout( $_[0]->conf->{formTimeout} );
+        return $ott;
     }
 );
 
@@ -100,14 +109,10 @@ sub displayInit {
 }
 
 sub isPP {
-    my $self = shift;
+    my $self    = shift;
     my $ppRules = $self->getPpolicyRules();
-    foreach my $rule ( @$ppRules )
-    {
-        if( $rule->{'condition'} )
-        {
-            return 1;
-        }
+    foreach (@$ppRules) {
+        return 1 if $_->{'condition'};
     }
     return 0;
 }
@@ -128,13 +133,12 @@ sub display {
         $self->logger->debug('Display: notification detected');
         $skinfile       = 'notification';
         %templateParams = (
-            AUTH_ERROR_TYPE => $req->error_type,
-            AUTH_ERROR_ROLE => $req->error_role,
-            NOTIFICATION    => $notif,
-            HIDDEN_INPUTS   => $self->buildHiddenForm($req),
-            AUTH_URL        => $req->{data}->{_url},
-            CHOICE_PARAM    => $self->conf->{authChoiceParam},
-            CHOICE_VALUE    => $req->data->{_authChoice},
+            $self->getErrorTplParams($req),
+            NOTIFICATION  => $notif,
+            HIDDEN_INPUTS => $self->buildHiddenForm($req),
+            AUTH_URL      => $req->{data}->{_url},
+            CHOICE_PARAM  => $self->conf->{authChoiceParam},
+            CHOICE_VALUE  => $req->data->{_authChoice},
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -149,19 +153,16 @@ sub display {
         $self->logger->debug('Display: confirm detected');
         $skinfile       = 'confirm';
         %templateParams = (
-            AUTH_ERROR                      => $req->error,
-            AUTH_ERROR_TYPE                 => $req->error_type,
-            AUTH_ERROR_ROLE                 => $req->error_role,
-            ( 'AUTH_ERROR_' . $req->error ) => 1,
-            AUTH_URL                        => $req->{data}->{_url},
-            MSG                             => $req->info,
-            HIDDEN_INPUTS                   => $self->buildHiddenForm($req),
-            ACTIVE_TIMER                    => $req->data->{activeTimer},
-            FORM_ACTION  => $req->data->{confirmFormAction} || "#",
-            FORM_METHOD  => $self->conf->{confirmFormMethod},
-            CHOICE_PARAM => $self->conf->{authChoiceParam},
-            CHOICE_VALUE => $req->data->{_authChoice},
-            CHECK_LOGINS => $self->conf->{portalCheckLogins}
+            $self->getErrorTplParams($req),
+            AUTH_URL      => $req->{data}->{_url},
+            MSG           => $req->info,
+            HIDDEN_INPUTS => $self->buildHiddenForm($req),
+            ACTIVE_TIMER  => $req->data->{activeTimer},
+            FORM_ACTION   => $req->data->{confirmFormAction} || "#",
+            FORM_METHOD   => $self->conf->{confirmFormMethod},
+            CHOICE_PARAM  => $self->conf->{authChoiceParam},
+            CHOICE_VALUE  => $req->data->{_authChoice},
+            CHECK_LOGINS  => $self->conf->{portalCheckLogins}
               && $req->data->{login},
             ASK_LOGINS        => $req->param('checkLogins')   || 0,
             ASK_STAYCONNECTED => $req->param('stayconnected') || 0,
@@ -180,22 +181,19 @@ sub display {
         $self->logger->debug('Display: IDP choice detected');
         $skinfile       = 'idpchoice';
         %templateParams = (
-            AUTH_ERROR                      => $req->error,
-            AUTH_ERROR_TYPE                 => $req->error_type,
-            AUTH_ERROR_ROLE                 => $req->error_role,
-            ( 'AUTH_ERROR_' . $req->error ) => 1,
-            AUTH_URL                        => $req->{data}->{_url},
-            HIDDEN_INPUTS                   => $self->buildHiddenForm($req),
-            ACTIVE_TIMER                    => $req->data->{activeTimer},
-            FORM_METHOD                     => $self->conf->{confirmFormMethod},
-            CHOICE_PARAM                    => $self->conf->{authChoiceParam},
-            CHOICE_VALUE                    => $req->data->{_authChoice},
-            CHECK_LOGINS                    => $self->conf->{portalCheckLogins}
+            $self->getErrorTplParams($req),
+            AUTH_URL      => $req->{data}->{_url},
+            HIDDEN_INPUTS => $self->buildHiddenForm($req),
+            ACTIVE_TIMER  => $req->data->{activeTimer},
+            FORM_METHOD   => $self->conf->{confirmFormMethod},
+            CHOICE_PARAM  => $self->conf->{authChoiceParam},
+            CHOICE_VALUE  => $req->data->{_authChoice},
+            CHECK_LOGINS  => $self->conf->{portalCheckLogins}
               && $req->data->{login},
             ASK_LOGINS        => $req->param('checkLogins')   || 0,
             ASK_STAYCONNECTED => $req->param('stayconnected') || 0,
             CONFIRMKEY        => $self->stamp(),
-            LIST              => $req->data->{list} || [],
+            LIST => $req->data->{list} || [],
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -212,14 +210,16 @@ sub display {
         $self->logger->debug('Hidden values :');
         $self->logger->debug( " $_: " . $req->{portalHiddenFormValues}->{$_} )
           for keys %{ $req->{portalHiddenFormValues} // {} };
-        $skinfile       = 'info';
+        $skinfile = 'info';
+
+        if ( !$req->urldc and $req->error == PE_LOGOUT_OK ) {
+            $req->urldc( $self->buildUrl( $req->portal, { logout => 1 } ) );
+        }
+
         %templateParams = (
-            AUTH_ERROR                      => $req->error,
-            AUTH_ERROR_TYPE                 => $req->error_type,
-            AUTH_ERROR_ROLE                 => $req->error_role,
-            ( 'AUTH_ERROR_' . $req->error ) => 1,
-            MSG                             => $info,
-            URL           => $req->{urldc} || $req->portal,  # Fix 2158
+            $self->getErrorTplParams($req),
+            MSG           => $info,
+            URL           => $req->urldc || $req->portal,
             HIDDEN_INPUTS => $self->buildOutgoingHiddenForm( $req, $method ),
             ACTIVE_TIMER  => $req->data->{activeTimer},
             CHOICE_PARAM  => $self->conf->{authChoiceParam},
@@ -248,10 +248,7 @@ sub display {
         my $id = $req->{sessionInfo}
           ->{ $self->conf->{openIdAttr} || $self->conf->{whatToTrace} };
         %templateParams = (
-            AUTH_ERROR                      => $self->error,
-            AUTH_ERROR_TYPE                 => $req->error_type,
-            AUTH_ERROR_ROLE                 => $req->error_role,
-            ( 'AUTH_ERROR_' . $req->error ) => 1,
+            $self->getErrorTplParams($req),
             PROVIDERURI => $self->buildUrl( $req->portal, $openid_path, "" ),
             MSG         => $req->info(),
             (
@@ -305,11 +302,11 @@ sub display {
         %templateParams = (
             AUTH_USER => $req->{sessionInfo}->{ $self->conf->{portalUserAttr} },
             NEWWINDOW => $self->conf->{portalOpenLinkInNewWindow},
-            LOGOUT_URL              => $self->buildUrl( $req->portal, { logout => 1 } ),
-            APPSLIST_ORDER          => $req->{sessionInfo}->{'_appsListOrder'},
-            PING                    => $self->conf->{portalPingInterval},
-            DONT_STORE_PASSWORD     => $self->conf->{browsersDontStorePassword},
-            HIDE_OLDPASSWORD        => 0,
+            LOGOUT_URL     => $self->buildUrl( $req->portal, { logout => 1 } ),
+            APPSLIST_ORDER => $req->{sessionInfo}->{'_appsListOrder'},
+            PING           => $self->conf->{portalPingInterval},
+            DONT_STORE_PASSWORD => $self->conf->{browsersDontStorePassword},
+            HIDE_OLDPASSWORD    => 0,
             ENABLE_PASSWORD_DISPLAY =>
               $self->conf->{portalEnablePasswordDisplay},
             %{ $self->getPasswordPolicyTemplateVars },
@@ -402,11 +399,7 @@ sub display {
     {
         $skinfile       = 'error';
         %templateParams = (
-            AUTH_ERROR                      => $req->error,
-            AUTH_ERROR_TYPE                 => $req->error_type,
-            AUTH_ERROR_ROLE                 => $req->error_role,
-            ( 'AUTH_ERROR_' . $req->error ) => 1,
-            LOCKTIME                        => $req->lockTime(),
+            $self->getErrorTplParams($req),
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -420,19 +413,17 @@ sub display {
         $skinfile = 'login';
         my $login = $req->user;
         %templateParams = (
-            AUTH_ERROR                      => $req->error,
-            AUTH_ERROR_TYPE                 => $req->error_type,
-            AUTH_ERROR_ROLE                 => $req->error_role,
-            ( 'AUTH_ERROR_' . $req->error ) => 1,
-            AUTH_URL                        => $req->{data}->{_url},
-            LOGIN                           => $login,
+            $self->getErrorTplParams($req),
+            AUTH_URL              => $req->{data}->{_url},
+            LOGIN                 => $login,
+            ACTIVE_FORM           => 1,
             DONT_STORE_PASSWORD   => $self->conf->{browsersDontStorePassword},
             CHECK_LOGINS          => $self->conf->{portalCheckLogins},
-            ASK_LOGINS            => $req->param('checkLogins')   || 0,
+            ASK_LOGINS            => $req->param('checkLogins') || 0,
             ASK_STAYCONNECTED     => $req->param('stayconnected') || 0,
             DISPLAY_RESETPASSWORD => $self->conf->{portalDisplayResetPassword},
             DISPLAY_REGISTER      => $self->conf->{portalDisplayRegister},
-            DISPLAY_UPDATECERTIF  =>
+            DISPLAY_UPDATECERTIF =>
               $self->conf->{portalDisplayCertificateResetByMail},
             MAILCERTIF_URL => $self->certificateResetUrl,
             MAIL_URL       => $self->passwordResetUrl,
@@ -526,9 +517,14 @@ sub display {
                 AUTH_LOOP             => [],
                 CHOICE_PARAM          => $self->conf->{authChoiceParam},
                 CHOICE_VALUE          => $req->data->{_authChoice},
-                OLDPASSWORD           => $self->checkXSSAttack( 'oldpassword',
-                    $req->data->{oldpassword} )
-                ? ''
+                OLDPASSWORD           => $self->conf->{hideOldPassword}
+                ? $self->ott->createToken( {
+                        oldpassword => $self->conf->{cipher}
+                          ->encrypt( $req->data->{oldpassword}, 1 )
+                    }
+                  )
+                : $self->checkXSSAttack( 'oldpassword',
+                    $req->data->{oldpassword} ) ? ''
                 : $req->data->{oldpassword},
                 HIDE_OLDPASSWORD    => $self->conf->{hideOldPassword},
                 DONT_STORE_PASSWORD => $self->conf->{browsersDontStorePassword},
@@ -620,20 +616,21 @@ sub display {
                     DISPLAY_YUBIKEY_FORM => $displayType =~ /\byubikeyform\b/
                     ? 1
                     : 0,
-                    DISPLAY_SSL_FORM  => $displayType =~ /sslform/ ? 1 : 0,
+                    DISPLAY_SSL_FORM      => $displayType =~ /sslform/ ? 1 : 0,
+                    DISPLAY_WEBAUTHN_FORM => $displayType =~ /webauthnform/ ? 1
+                    : 0,
                     DISPLAY_GPG_FORM  => $displayType =~ /gpgform/ ? 1 : 0,
-                    DISPLAY_LOGO_FORM => $displayType eq "logo" ? 1 : 0,
+                    DISPLAY_LOGO_FORM => $displayType eq "logo"    ? 1 : 0,
                     DISPLAY_FINDUSER  => scalar @$fields,
                     module            => $displayType eq "logo"
                     ? $self->getModule( $req, 'auth' )
                     : "",
                     AUTH_LOOP  => [],
-                    PORTAL_URL =>
-                      ( $displayType eq "logo" ? $req->portal : 0 ),
-                    MSG       => $req->info(),
-                    MANDATORY => $mandatory,
-                    FIELDS    => $fields,
-                    SPOOFID   => $slogin
+                    PORTAL_URL => ( $displayType eq "logo" ? $req->portal : 0 ),
+                    MSG        => $req->info(),
+                    MANDATORY  => $mandatory,
+                    FIELDS     => $fields,
+                    SPOOFID    => $slogin
                 );
             }
         }
@@ -745,7 +742,7 @@ sub getSkin {
     my $skinParam = $req->param('skin');
     if ( defined $skinParam ) {
         if ( $skinParam =~ /^[\w\-]+$/ ) {
-            if ( -d $self->getSkinTplDir( $req, $skinParam ) ) {
+            if ( -d $self->getSkinTplDir($skinParam) ) {
                 $skin = $skinParam;
                 $self->logger->debug(
                     "Skin $skin selected from GET/POST parameter");
@@ -874,8 +871,7 @@ sub mkOidcConsent {
         'oidcConsents',
         params => {
             partners => [
-                map {
-                    {
+                map { {
                         name        => $_,
                         epoch       => $consents->{$_}->{epoch},
                         scope       => $consents->{$_}->{scope},
@@ -901,6 +897,7 @@ sub getPasswordPolicyTemplateVars {
         ENABLE_CHECKHIBP => $self->conf->{checkHIBP},
         DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy},
         PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
+        PPOLICY_MAXSIZE  => $self->conf->{passwordPolicyMaxSize},
         PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
         PPOLICY_MINUPPER => $self->conf->{passwordPolicyMinUpper},
         PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
@@ -912,7 +909,7 @@ sub getPasswordPolicyTemplateVars {
         (
             $self->conf->{passwordPolicyMinSpeChar} && $self->speChars()
             ? (
-                PPOLICY_ALLOWEDSPECHAR      => $self->speChars(),
+                PPOLICY_ALLOWEDSPECHAR => $self->speChars(),
                 PPOLICY_ALLOWEDSPECHAR_JSON =>
                   to_json( $self->speChars(), { allow_nonref => 1 } ),
               )
@@ -933,7 +930,8 @@ sub getPpolicyRules {
     }
 
     # Sort ppolicy items by "order" numerically and then by "id" lexically
-    $result = [ sort { $a->{order} <=> $b->{order} || $a->{id} cmp $b->{id} } @$result ];
+    $result = [ sort { $a->{order} <=> $b->{order} || $a->{id} cmp $b->{id} }
+          @$result ];
 
     # Format data attributes for HTML::Template loop
     # data => { foo => "bar" } becomes

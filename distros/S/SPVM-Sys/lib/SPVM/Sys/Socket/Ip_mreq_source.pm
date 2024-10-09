@@ -8,7 +8,7 @@ SPVM::Sys::Socket::Ip_mreq_source - struct ip_mreq_source in the C language
 
 =head1 Description
 
-The Sys::Socket::In_addr class in L<SPVM> represents L<struct ip_mreq_source|https://linux.die.net/man/7/ip> in the C language.
+Sys::Socket::In_addr class in L<SPVM> represents L<struct ip_mreq_source|https://linux.die.net/man/7/ip> in the C language.
 
 =head1 Usage
 

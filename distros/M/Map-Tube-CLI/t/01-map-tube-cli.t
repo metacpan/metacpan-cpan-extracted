@@ -5,12 +5,12 @@ use Capture::Tiny ':all';
 use Map::Tube::CLI;
 use Test::More;
 
-my $min_tcm = 0.83;
+my $min_tcm = 1.39;
 eval "use Map::Tube::London $min_tcm";
 plan skip_all => "Map::Tube::London $min_tcm required" if $@;
 
 is(capture_stdout { Map::Tube::CLI->new({ map => 'London', start => 'Baker Street', end => 'Euston Square' })->run },
-   "Baker Street (Bakerloo, Circle, Hammersmith & City, Jubilee, Metropolitan), Great Portland Street (Circle, Hammersmith & City, Metropolitan), Euston Square (Circle, Hammersmith & City, Metropolitan)\n");
+   "Baker Street (Bakerloo, Circle, Hammersmith and City, Jubilee, Metropolitan), Great Portland Street (Circle, Hammersmith and City, Metropolitan), Euston Square (Circle, Hammersmith and City, Metropolitan, Street)\n");
 
 eval { Map::Tube::CLI->new };
 like($@, qr/Missing required arguments: map/);

@@ -64,12 +64,15 @@ sub init {
     $self->addUnauthRoute( register => 'register', [ 'POST', 'GET' ] );
 
     # Initialize Captcha if needed
-    if ( $self->conf->{captcha_register_enabled} ) {
-        $self->captcha(1);
-    }
+    $self->captcha(
+        $self->p->buildRule(
+            $self->conf->{captcha_register_enabled},
+            'captchaRegister'
+        )
+    );
 
     # Initialize form token if needed (captcha provides also a token)
-    else {
+    unless ( $self->conf->{captcha_register_enabled} ) {
         $_[0]->ott(
             $_[0]->p->loadModule('Lemonldap::NG::Portal::Lib::OneTimeToken') )
           or return 0;
@@ -158,8 +161,9 @@ sub _register {
         {
 
             # Captcha for register form
-            if ( $self->captcha ) {
-                my $result = $self->p->_captcha->check_captcha($req);
+            if ( $self->captcha->( $req, {} ) ) {
+                my $result =
+                  $self->p->getService('captcha')->check_captcha($req);
                 if ($result) {
                     $self->logger->debug("Captcha code verified");
                 }
@@ -188,8 +192,8 @@ sub _register {
 
     # Check mail
     return PE_MALFORMEDUSER
-      unless ( $req->data->{registerInfo}->{mail} =~
-        m/$self->{conf}->{userControl}/o );
+      unless (
+        $req->data->{registerInfo}->{mail} =~ m/$self->{conf}->{userControl}/ );
 
     # Search for user using UserDB module
     # If the user already exists, register is forbidden
@@ -273,49 +277,22 @@ sub _register {
             }
         );
 
-        # Build mail content
-        my $tr      = $self->translate($req);
-        my $subject = $self->conf->{registerConfirmSubject};
-        unless ($subject) {
-            $self->logger->debug('Use default confirm subject');
-            $subject = 'registerConfirmSubject';
-            $tr->( \$subject );
-        }
-        my ( $body, $html );
-        if ( $self->conf->{registerConfirmBody} ) {
-
-            # We use a specific text message, no html
-            $self->logger->debug('Use specific confirm body message');
-            $body = $self->conf->{registerConfirmBody};
-
-            # Replace variables in body
-            $body =~ s/\$url/$url/g;
-            $body =~ s/\$expMailDate/$req->{data}->{expMailDate}/g;
-            $body =~ s/\$expMailTime/$req->{data}->{expMailTime}/g;
-            $body =~ s/\$(\w+)/$req->{data}->{registerInfo}->{$1} || ''/ge;
-        }
-        else {
-
-            # Use HTML template
-            $self->logger->debug('Use default confirm HTML template body');
-            $body = $self->loadMailTemplate(
-                $req,
-                'mail_register_confirm',
-                filter => $tr,
-                params => {
-                    expMailDate => $req->data->{expMailDate},
-                    expMailTime => $req->data->{expMailTime},
-                    url         => $url,
-                    %{ $req->data->{registerInfo} || {} },
-                },
-            );
-            $html = 1;
-        }
-
         # Send mail
         return PE_MAILERROR
-          unless $self->send_mail( $req->data->{registerInfo}->{mail},
-            $subject, $body, $html );
+          unless $self->sendEmail(
+            $req,
+            subject       => $self->conf->{registerConfirmSubject},
+            subject_trmsg => 'registerConfirmSubject',
+            body          => $self->conf->{registerConfirmBody},
+            body_template => 'mail_register_confirm',
+            dest          => $req->data->{registerInfo}->{mail},
+            params        => {
+                expMailDate => $req->data->{expMailDate},
+                expMailTime => $req->data->{expMailTime},
+                url         => $url,
+                %{ $req->data->{registerInfo} || {} },
+            },
+          );
 
         $self->logger->debug('Register message sent');
         return PE_MAILCONFIRMOK;
@@ -358,45 +335,20 @@ sub _register {
         }
     );
 
-    # Build mail content
-    my $tr      = $self->translate($req);
-    my $subject = $self->conf->{registerDoneSubject};
-    unless ($subject) {
-        $self->logger->debug('Use default done subject');
-        $subject = 'registerDoneSubject';
-        $tr->( \$subject );
-    }
-    my ( $body, $html );
-    if ( $self->conf->{registerDoneBody} ) {
-
-        # We use a specific text message, no html
-        $self->logger->debug('Use specific done body message');
-        $body = $self->conf->{registerDoneBody};
-
-        # Replace variables in body
-        $body =~ s/\$url/$url/g;
-        $body =~ s/\$(\w+)/$req->{data}->{registerInfo}->{$1} || ''/ge;
-    }
-    else {
-
-        # Use HTML template
-        $self->logger->debug('Use default done HTML template body');
-        $body = $self->loadMailTemplate(
-            $req,
-            'mail_register_done',
-            filter => $tr,
-            params => {
-                url => $url,
-                %{ $req->data->{registerInfo} || {} },
-            },
-        );
-        $html = 1;
-    }
-
     # Send mail
     return PE_MAILERROR
-      unless $self->send_mail( $req->data->{registerInfo}->{mail},
-        $subject, $body, $html );
+      unless $self->sendEmail(
+        $req,
+        subject       => $self->conf->{registerDoneSubject},
+        subject_trmsg => 'registerDoneSubject',
+        body          => $self->conf->{registerDoneBody},
+        body_template => 'mail_register_done',
+        dest          => $req->data->{registerInfo}->{mail},
+        params        => {
+            url => $url,
+            %{ $req->data->{registerInfo} || {} },
+        }
+      );
 
     return PE_MAILOK;
 }
@@ -404,22 +356,19 @@ sub _register {
 sub display {
     my ( $self, $req ) = @_;
     my %templateParams = (
-        SKIN_PATH                       => $self->conf->{staticPrefix},
-        SKIN                            => $self->p->getSkin($req),
-        SKIN_BG                         => $self->conf->{portalSkinBackground},
-        MAIN_LOGO                       => $self->conf->{portalMainLogo},
-        AUTH_ERROR                      => $req->error,
-        AUTH_ERROR_TYPE                 => $req->error_type,
-        AUTH_ERROR_ROLE                 => $req->error_role,
-        ( 'AUTH_ERROR_' . $req->error ) => 1,
-        AUTH_URL                        => $req->data->{_url},
-        CHOICE_PARAM                    => $self->conf->{authChoiceParam},
-        CHOICE_VALUE                    => $req->data->{_authChoice},
-        EXPMAILDATE                     => $req->data->{expMailDate},
-        EXPMAILTIME                     => $req->data->{expMailTime},
-        STARTMAILDATE                   => $req->data->{startMailDate},
-        STARTMAILTIME                   => $req->data->{startMailTime},
-        MAILALREADYSENT                 => $req->data->{mail_already_sent},
+        $self->p->getErrorTplParams($req),
+        SKIN_PATH       => $self->conf->{staticPrefix},
+        SKIN            => $self->p->getSkin($req),
+        SKIN_BG         => $self->conf->{portalSkinBackground},
+        MAIN_LOGO       => $self->conf->{portalMainLogo},
+        AUTH_URL        => $req->data->{_url},
+        CHOICE_PARAM    => $self->conf->{authChoiceParam},
+        CHOICE_VALUE    => $req->data->{_authChoice},
+        EXPMAILDATE     => $req->data->{expMailDate},
+        EXPMAILTIME     => $req->data->{expMailTime},
+        STARTMAILDATE   => $req->data->{startMailDate},
+        STARTMAILTIME   => $req->data->{startMailTime},
+        MAILALREADYSENT => $req->data->{mail_already_sent},
         (
             $req->data->{customScript}
             ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -545,7 +494,7 @@ sub display {
 sub setSecurity {
     my ( $self, $req ) = @_;
     if ( $self->captcha ) {
-        $self->p->_captcha->init_captcha($req);
+        $self->p->getService('captcha')->init_captcha($req);
     }
     elsif ( $self->ottRule->( $req, {} ) ) {
         $self->ott->setToken($req);

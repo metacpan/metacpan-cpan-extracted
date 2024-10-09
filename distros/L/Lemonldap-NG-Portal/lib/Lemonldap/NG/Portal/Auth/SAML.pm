@@ -961,7 +961,6 @@ sub extractFormInfo {
 
         # IDP list
         my @list       = ();
-        my $portalPath = $req->portal;
 
         foreach ( keys %{ $self->idpList } ) {
             my $idpName = $self->{idpList}->{$_}->{name};
@@ -976,7 +975,7 @@ sub extractFormInfo {
                 $img_src =
                   ( $icon =~ m#^https?://# )
                   ? $icon
-                  : $portalPath . $self->p->staticPrefix . "/common/" . $icon;
+                  : $self->p->staticPrefix . "/common/" . $icon;
             }
             $self->logger->debug( "IDP "
                   . $self->{idpList}->{$_}->{name}

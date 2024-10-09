@@ -65,7 +65,7 @@ sub issuer {
             ini => {
                 logLevel          => $debug,
                 domain            => 'example.com',
-                portal            => 'http://auth.example.com',
+                portal            => 'http://auth.example.com/',
                 authentication    => 'Choice',
                 userDB            => 'Same',
                 authChoiceModules => {

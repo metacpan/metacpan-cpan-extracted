@@ -8,10 +8,6 @@ require 't/test-lib.pm';
 my $maintests = 5;
 
 SKIP: {
-    eval { require Crypt::U2F::Server; require Authen::U2F::Tester };
-    if ( $@ or $Crypt::U2F::Server::VERSION < 0.42 ) {
-        skip 'Missing libraries', $maintests;
-    }
 
     use_ok('Lemonldap::NG::Common::FormEncode');
     my $res;
@@ -19,10 +15,9 @@ SKIP: {
     my $client = LLNG::Manager::Test->new(
         {
             ini => {
-                logLevel       => 'error',
                 sfOnlyUpgrade  => 1,
-                u2fActivation  => 1,
-                u2fAuthnLevel  => 5,
+                totp2fActivation => 1,
+                totp2fAuthnLevel  => 5,
                 authentication => 'Demo',
                 userDB         => 'Same',
                 'vhostOptions' => {

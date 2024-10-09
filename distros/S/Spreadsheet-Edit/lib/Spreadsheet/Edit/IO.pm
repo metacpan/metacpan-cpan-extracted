@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.017'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-09-29'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.018'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-10-08'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -45,11 +45,13 @@ use File::Spec::Functions qw/devnull tmpdir rootdir catdir catfile/;
 # Still sometimes convenient...
 use File::Basename qw(basename);
 
+use File::BOM ();
 use File::Which qw/which/;
 use URI::file ();
 use Guard qw(guard scope_guard);
 use Fcntl qw(:flock :seek);
-use Scalar::Util qw/blessed/;
+use Symbol qw/qualify_to_ref/;
+use Scalar::Util qw/blessed openhandle/;
 use List::Util qw/none all notall first min max/;
 use Encode qw(encode decode);
 use File::Glob qw/bsd_glob GLOB_NOCASE/;
@@ -675,11 +677,11 @@ END{ $tempdir->remove_tree if $tempdir; }
 
 # Compose a unique path under $tempdir.
 # This is *not* a "tempfile" or "tempdir" object which auto-destructs,
-# in fact it does not even exist yet and we don't know here which it will be.
-# Either the user must remove it when they are done with it, or it will
-# be removed when $tempdir is removed at process exit.
+# in fact it does not even exist yet and we don't know here whether it will
+# be a file or subdirectory.  The user must remove it when they are done
+# with it, or it will be removed when $tempdir is removed at process exit.
 #
-sub _path_under_tempdir($@) {
+sub _uniqpath_under_tempdir($@) {
   my $opts = shift;
   my %args = (
     words => [$opts->{ifbase}, $opts->{sheetname}],
@@ -699,21 +701,8 @@ sub _path_under_tempdir($@) {
 # Compose csv cache subdir path
 sub _cachedir($) {
   my $opts = shift;
-  _path_under_tempdir($opts,words => [$opts->{ifbase}, "csvcache"]);
+  _uniqpath_under_tempdir($opts,words => [$opts->{ifbase}, "csvcache"]);
 }
-
-## Copy an ephemeral temp file to a path under tempdir if needed
-#sub _make_file_permanent($$) {
-#  my ($opts, $path) = @_;
-#  if (eval{ $path->cached_temp }) { # didn't throw
-#    my $suf = $path->basename =~ /\.(\w+)$/a ? $1 : undef;
-#    my $newpath = _path_under_tempdir($opts, suf => $suf);
-#    $path->move($newpath);
-#    return $newpath
-#  } else {
-#    return $path
-#  }
-#}
 
 sub _convert_using_openlibre($$$) {
   my ($opts, $src, $dst) = @_;
@@ -1198,29 +1187,83 @@ sub _parse_iolayers($) {
   ($prefix, $enclist, $suffix);
 }
 
-# Detect cvt_from and cvt_to from filenames, or peeking at the data.
-# If input is CSV, detect encoding, separator and quote characters;
-#   add quotes to values with leading zeroes (e.g. Zip codes) which would
-#   otherwise be corrupted by being read as numbers instead of text strings.
-#   The modified data is written to a temp file
-# Set default output_encoding if not specified
-# RETURNS: The effective input path, either inpath_sans_sheet or a tempfile
-sub _determine_enc_tofrom($) {
-  my $opts = shift;
+sub _slurp_ifnotslurped($$) {
+  my ($fh, $ref2octets) = @_;
+  return if defined $$ref2octets;
+  binmode($fh);
+  seek($fh, 0, SEEK_SET) or die $!;
+  local $/ = undef;
+  $$ref2octets = <$fh>;  # Now known to not have a BOM
+}
+sub _decode_slurped_data($$$;$) {
+  my ($enc, $ref2octets, $start_pos, $check) = @_;
+  oops unless $$ref2octets;
+  decode($enc, substr($$ref2octets, $start_pos),
+               $check // (Encode::FB_CROAK|Encode::LEAVE_SRC) )
+}
+
+
+# Detect cvt_from and cvt_to from filename suffixes or by peeking at the data.
+# If input is CSV, detect encoding (removing a BOM if present),
+#   detect separator and quote characters, and generate default
+#   {col_formats} which, e.g. reads items with leading zeroes
+#   (e.g. Zip codes) as character data and not numbers.
+#
+# Unless the input is usable as-is it will be slurped into memory and the
+# buffer returned by reference at $$ref2octets.  If slurped data is present
+# the caller should use that instead of reading the original input;
+# either way {input_encoding} should be used to decode.
+#
+# (If $$ref2octets was already defined it is assumed to contain
+# previously-slurped data which is used instead of the the input file.)
+#
+sub _preprocess($$) {
+  my ($opts, $ref2octets) = @_;
   my $debug = $opts->{debug};
+  my ($fh, $start_pos);
   # Skip to ==BODY== below
 
-  my sub determine_input_encoding($) {
-    my $r2octets = shift;
-    # If user specified one encoding, use it; if user specified list, try them.
-    # If user did not specify, the default is a list to try.
+  my sub set_fh_encoding() { # returns true if set
+    my $enc = $opts->{input_encoding}; # must already be resolved!
+    my $bmode = ":raw:encoding($enc):crlf";
+    binmode $fh, $bmode or die "binmode '$bmode' : $!";
+  }
+  my sub open_input() {
+    if (defined $$ref2octets) {
+      open $fh, "<:raw", $ref2octets or confess "BUG:in-mem open:$!";
+    } else {
+      my $path = $opts->{inpath_sans_sheet};
+      $fh = openhandle($path); # undef unless $path is a file handle
+      unless ($fh) {
+        open $fh, "<", $path or die "$path : $!";
+      }
+      binmode($fh);
+    }
+    if (! seek($fh, 0, SEEK_SET)) {
+      oops if defined $$ref2octets;
+      local $/ = undef;
+      $$ref2octets = <$fh>;  # N.B. includes possible BOM
+      open $fh, "<:raw", $ref2octets or confess "BUG:in-mem open:$!";
+    }
+    my $bomenc = File::BOM::get_encoding_from_filehandle($fh);
+    $start_pos = tell($fh);
+    if ($bomenc) {
+      btw "Input has BOM, bomenc=$bomenc\n" if $debug;
+      $opts->{input_encoding} = $bomenc;
+    }
+  }
+  my sub determine_input_encoding() {
+    # If one encoding was specified by the user or implied by a BOM, use it;
+    # otherwise try multiple encodings specified by the user or defaulted
+    # until one seems to work.
     $opts->{input_encoding} //= $default_input_encodings;
     my @enclist = split m#,#, $opts->{input_encoding};
     return
       if @enclist == 1;
-    $$r2octets //= $opts->{inpath_sans_sheet}->slurp_raw;
+    _slurp_ifnotslurped($fh, $ref2octets);
     for my $enc (@enclist) {
-      eval { decode($enc, $$r2octets, Encode::FB_CROAK|Encode::LEAVE_SRC) };
+      eval { _decode_slurped_data($enc, $ref2octets, $start_pos) };
+
       if ($@) {
          btw "Input encoding '$enc' did not work...($@)\n" if $debug;
          next;
@@ -1229,14 +1272,12 @@ sub _determine_enc_tofrom($) {
       @enclist = ($enc);
       last
     }
-    #croak "Could not detect encoding of $opts->{inpath_sans_sheet}\n"
     confess "Could not detect encoding of $opts->{inpath_sans_sheet}\n"
       if @enclist > 1;
     $opts->{input_encoding} = $enclist[0];
   } #determine_input_encoding
 
-  my sub readparse_csv($@) {
-    my $fh = shift;
+  my sub readparse_csv(@) {
     my %csvopts = (
       @sane_CSV_read_options,
       defined($opts->{quote_char}) ? (quote_char=>$opts->{quote_char}) : (),
@@ -1249,35 +1290,18 @@ sub _determine_enc_tofrom($) {
     my $csv = Text::CSV->new (\%csvopts)
               or croak "Text::CSV->new: ", Text::CSV->error_diag(),
                        dvis('\n## %csvopts\n');
-    my @rows;
+    seek($fh, $start_pos, SEEK_SET) or die $!; # skip over possible BOM
+    my $rows;
     while (my $F = $csv->getline( $fh )) {
-      push(@rows, $F);
+      push(@$rows, $F);
     }
-    \@rows
+    $rows
   }
 
-  my sub open_input($) {
-    my $r2octets = shift;
-    oops unless $opts->{input_encoding};
-    my $fh;
-    my $pathish = defined($$r2octets)
-                    ? \$$r2octets : $opts->{inpath_sans_sheet};
-    open($fh, "<:encoding($opts->{input_encoding})", $pathish)
-      or die "$pathish : $!";
-    $fh
-  }
-
-  my sub determine_csv_q_sep($$) {
-    my ($r2octets, $r2rows) = @_;
+  my sub determine_csv_q_sep($) {
+    my ($r2rows) = @_;
     return
       if defined($opts->{quote_char}) && defined($opts->{sep_char});
-
-    my $fh = open_input($r2octets);
-
-#    my $chars;
-#    if (defined($$r2octets)
-#      $chars = decode($opts->{input_encoding},$$r2octets,Encode::FB_CROAK);
-#    }
 
     # Try combinations starting with the most-common '"' and ',' while
     # parsing the file for unsafe unquoted values (throws on syntax error).
@@ -1290,6 +1314,7 @@ sub _determine_enc_tofrom($) {
       for my $sep (defined($opts->{sep_char})
                      ? ($opts->{sep_char}) : (",","\t")) {
         btw dvis '--- TRYING $q $sep ---' if $debug;
+
 #        # Preliminary check for an illegal use of the quote char
 #        if (defined($chars)
 #            && $chars =~ /[^${q}${sep}\x{0D}\x{0A}]
@@ -1299,7 +1324,7 @@ sub _determine_enc_tofrom($) {
 #            if $debug;
 #          next SEP
 #        }
-        $$r2rows = eval{ readparse_csv($fh, quote_char=>$q, sep_char=>$sep) };
+        $$r2rows = eval{ readparse_csv(quote_char=>$q, sep_char=>$sep) };
         if ($@ eq "") {
           warn ivis '>> Detected quote_char=$q sep_char=$sep\n' if $debug;
           $opts->{quote_char} = $q;
@@ -1307,7 +1332,6 @@ sub _determine_enc_tofrom($) {
           last Q;
         }
         warn vis '$@\nq=$q sep=$sep did not work...\n' if $debug;
-        seek $fh, 0, SEEK_SET;
       }
     }
     unless (defined($$r2rows)) {
@@ -1315,15 +1339,13 @@ sub _determine_enc_tofrom($) {
     }
   }#determine_csv_q_sep
 
-  my sub determine_csv_col_formats($$) {
-    my ($r2octets, $r2rows) = @_;
+  my sub determine_csv_col_formats($) {
+    my ($r2rows) = @_;
     return
       if defined $opts->{col_formats};
-    $$r2rows //= do{
-      my $fh = open_input($r2octets);
-      readparse_csv($fh);
-    };
-    my $max_cols = 0; for my $row (@{ $$r2rows }) { $max_cols = @$row if $max_cols < @$row }
+    $$r2rows //= readparse_csv();
+    my $max_cols = 0;
+      for my $row (@{ $$r2rows }) { $max_cols = @$row if $max_cols < @$row }
     state $curr_yy = (localtime(time))[5];
     my @col_formats;
     my sub recognized($$$$;$) {
@@ -1350,7 +1372,7 @@ sub _determine_enc_tofrom($) {
               next CX;
             }
             # If ambiguous YYYY/??/?? we can still assume it is a date and not text
-            if (length($+{y})==4) {
+            if (length( $+{y} )==4) {
               #recognized($cx,$rx,$_,""," as some kind of date, fmt unknown");
               next RX;
             }
@@ -1405,43 +1427,36 @@ sub _determine_enc_tofrom($) {
   }
   $opts->{cvt_from} =~ s/^\.txt$/.csv/i if $opts->{cvt_from};
 
-  # Detect file format and, if CSV, encoding
-  my ($octets, $rows);
+  # Detect input file format and, if CSV, encoding etc.
+  my $rows;
   if (!$opts->{cvt_from} || $opts->{cvt_from} eq "csv") {
-    determine_input_encoding(\$octets);
+    open_input();
+    determine_input_encoding();
+    set_fh_encoding();
   }
   if (!$opts->{cvt_from}) {
     # Detect the file format by looking at the data.  Actually, we only
     # support CSV in this case, so this is just a (half-baked) sanity check.
     eval {
-      determine_csv_q_sep(\$octets, \$rows);
-      if (!$opts->{cvt_from}) {
-        $rows //= do{
-          my $fh = open_input(\$octets);
-          readparse_csv($fh);
-        };
-      }
+      determine_csv_q_sep(\$rows);
+      $rows //= readparse_csv();
     };
     if ($@ eq "") {
       warn "> Detected $opts->{inpath_sans_sheet} as a seemingly-valid CSV\n"
         if $debug;
       $opts->{cvt_from} = "csv";
     } else {
+      #croak "Can not detect what kind of file ",qsh($opts->{inpath})," is\n";
       croak "Can not detect what kind of file ",qsh($opts->{inpath})," is\n";
     }
   }
+  oops if defined($rows) && $opts->{cvt_from} ne "csv";
 
-  if ($opts->{cvt_from} eq "csv") {
-    determine_csv_col_formats(\$octets, \$rows);
-  } else {
-    oops if defined($octets) or defined($rows);
-  }
-
-  # Set default ouput_encoding if not specified
   $opts->{output_encoding} //= $default_output_encoding
     if $opts->{cvt_to} eq "csv";
 
-}#_determine_enc_tofrom
+  return ($fh, $start_pos);
+}#_preprocess
 
 sub _tool_extract_all_csvs($$) {
   my ($opts, $destdir) = @_;
@@ -1508,7 +1523,7 @@ sub _tool_write_spreadsheet($$) {
 # If cached CSVs are available they are moved into {outpath}/ .
 sub _extract_all_csvs($) {
   my ($opts) = @_;
-  my $outpath = _final_outpath($opts);
+  my $outpath = _finalize_outpath($opts);
   $outpath->mkpath; # nop if exists, croaks if conflicts with file
 
   _tool_extract_all_csvs($opts, $outpath); #logs
@@ -1530,7 +1545,7 @@ sub _extract_one_csv($) {
     }
   }
 
-  my $outpath = _final_outpath($opts);
+  my $outpath = _finalize_outpath($opts);
   $outpath->remove unless -d $outpath;
 
   if (defined($opts->{sheetname})) {
@@ -1576,7 +1591,7 @@ sub _extract_one_csv($) {
 sub _write_spreadsheet($) {
   my ($opts) = @_;
 
-  my $outpath = _final_outpath($opts);
+  my $outpath = _finalize_outpath($opts);
   $outpath->remove unless -d $outpath;
 
   _tool_write_spreadsheet($opts, $outpath);
@@ -1584,14 +1599,14 @@ sub _write_spreadsheet($) {
 
 # If {outpath} is not set, set it to a unique output path in $tempdir
 # Always returns {outpath} as a Path::Tiny object.
-sub _final_outpath($) {
+sub _finalize_outpath($) {
   my $opts = shift;
   if (defined $opts->{outpath}) {
     return path($opts->{outpath});
   } else {
-    my $suf = $opts->{cvt_to} unless $opts->{allsheets};
+    my $suf = $opts->{allsheets} ? undef : $opts->{cvt_to};
     return(
-      ($opts->{outpath}=_path_under_tempdir($opts, suf=>$suf))
+      ($opts->{outpath}=_uniqpath_under_tempdir($opts, suf=>$suf))
     );
   }
 }
@@ -1606,9 +1621,10 @@ sub convert_spreadsheet(@) {
 
   # intuit cvt_from & cvt_to, detect encoding, and pre-process .csv input
   # if needed to avoid corruption of leading zeroes.
-  _determine_enc_tofrom(\%opts);
+  my $octets;
+  my ($fh, $start_pos) = _preprocess(\%opts, \$octets);
 
-  my $input_enc = $opts{input_encoding};
+  my $input_enc  = $opts{input_encoding};
   my $output_enc = $opts{output_encoding};
 
   croak "Either input or output must be 'csv'\n"
@@ -1622,54 +1638,65 @@ sub convert_spreadsheet(@) {
       if $opts{outpath} && -e $opts{outpath} && ! -d _;
   }
 
+  my sub get_outcsv_path() {
+    my $outpath = _finalize_outpath(\%opts);
+    if ($opts{allsheets}) {
+      $outpath->mkpath; # nop if exists, croaks if conflicts with file
+      return $outpath->child( $opts{ifbase}.".csv" );
+    } else {
+      return $outpath;
+    }
+  }
+
   my $done;
   if ($opts{cvt_from} eq $opts{cvt_to}) {  # csv to csv
-    if (!$opts{allsheets}) {
-      if ($input_enc ne $output_enc) {
-        # Special case #1: in & out are CSVs but different encodings.
-        warn "> Transcoding csv:  $input_enc -> $output_enc\n"
-          if $opts{debug};
-        my $octets = $opts{inpath_sans_sheet}->slurp_raw;
-        my $chars = decode($input_enc, $octets, Encode::FB_CROAK);
-        $octets = encode($output_enc, $chars, Encode::FB_CROAK);
-        path(_final_outpath(\%opts))->spew_raw($octets);
-        $done = 1;
-      } else {
-        # Special case #2: No conversion is needed: Just copy the file or
-        #   return the input path itself as the output
-        if (defined $opts{outpath}) {
-          warn "> No conversion needed, copying into ",qsh($opts{outpath}),"\n"
-            if $opts{verbose};
-          $opts{inpath_sans_sheet}->copy($opts{outpath});
-          $done = 1;
-        } else {
-          $opts{outpath} = $opts{inpath_sans_sheet};
-          warn "> No conversion needed, returning ", qsh($opts{outpath}),"\n"
-            if $opts{verbose};
-          $done = 1;
-        }
-      }
+    # Special cases: in & out are both CSVs
+    if ($input_enc ne $output_enc || $start_pos != 0) {
+      # Special case #1: In & out are CSV but using different encodings,
+      #   or the same encoding but the input contained a BOM
+      #   (which we never want in the output).
+      #   With {allsheets} the output will be inside the {outpath} directory.
+      my $dst = get_outcsv_path();
+      warn "> Transcoding csv:  $input_enc -> $output_enc in ",qsh($dst),"\n"
+        if $opts{debug};
+      _slurp_ifnotslurped($fh, \$octets);
+      my $chars = _decode_slurped_data($input_enc, \$octets, $start_pos,
+                                       Encode::FB_CROAK);
+      $octets = encode($output_enc, $chars, Encode::FB_CROAK);
+      $dst->spew_raw($octets);
+      $done = 1;
     }
-    else {
-      # Special case #2: <allsheets> with input already a csv:
-      #   Leave a symlink to the input in the <outpath> directory.
-      croak "transcoding not implemented in this situation"
-        if ($input_enc ne $output_enc);
-      my $outpath = path(_final_outpath(\%opts));
-      $outpath->mkpath; # nop if exists, croaks if conflicts with file
-      my $dest = $outpath->child( $opts{ifbase}.".csv" );
-      my $inpath = $opts{inpath_sans_sheet};
-      my $s = eval{ symlink($inpath, $dest) };
-      if ($@ or !$s) { # symlink unimplmented or insufficient permissions
-        btw dvis '>> $@' if $opts{debug};
-        warn "> No conversion needed! Copying into ", qsh($dest),"\n"
+    elsif (! $opts{allsheets}) {
+      # Special case #2: Not {allsheets} and no conversion is needed:
+      #   Just pass through the original input.
+      my $src = $opts{inpath_sans_sheet};
+      if (my $outpath = $opts{outpath}) {
+        warn "> No conversion needed! Copying to ", qsh($outpath),"\n"
           if $opts{verbose};
-        $opts{inpath_sans_sheet}->copy($dest);
+        $src->copy($outpath);
       } else {
-        warn "> No conversion needed! Left symlink at ", qsh($dest),"\n"
+        warn "> No conversion needed! Returning input as {outpath}\n"
           if $opts{verbose};
+        $opts{outpath} = $src;
       }
       $done = 1;
+    }
+    else {
+      # Special case #3: {allsheets} with CSV input, no converstion needed:
+      #   Create a symlink to the input in the {outpath} directory.
+      my $src = $opts{inpath_sans_sheet};
+      my $dst = get_outcsv_path();
+      if ((my $s = eval{symlink($src, $dst)}) && !$@) {
+        warn "> No conversion needed! Left symlink at ", qsh($dst),"\n"
+          if $opts{verbose};
+        $done = 1;
+      } else {
+        btw dvis 'symlink>> $@' if $opts{debug}; # unimplmented or perms?
+        warn "> No conversion needed! Copying into ", qsh($dst),"\n"
+          if $opts{verbose};
+        $src->copy($dst);
+        $done = 1;
+      }
     }
   }
   if (! $done) {
@@ -1713,6 +1740,7 @@ sub OpenAsCsv {
               (@_ == 1 ? (inpath => $_[0]) : (@_)),
               cvt_to => 'csv',
             );
+btw dvis('>>> OpenAsCsv %opts\n') if $opts{debug};
   # TODO: Rename {path} to {inpath} in all usages and rm this cruft;
   carp "Obsolete OpenAsCsv usage: Change path to inpath\n"
     if exists($opts{path}) and !$opts{silent};
@@ -1726,8 +1754,10 @@ sub OpenAsCsv {
   oops "sheetname key bug" if exists $h->{sheet};
 
   my $csvpath = $h->{outpath} // oops; # same as {inpath} if already a CSV
+
   open my $fh, "<", $csvpath or croak "$csvpath : $!\n";
-  binmode $fh, ":crlf:encoding(".$h->{encoding}.")" or die "binmode:$!";
+  binmode $fh, ":raw:encoding(".$h->{encoding}."):crlf" or die "binmode:$!";
+  seek($fh, 0, SEEK_SET) or oops; #"should be seekable
 
   my $r = {
     fh            => $fh,
@@ -1757,9 +1787,9 @@ Spreadsheet::Edit::IO - convert between spreadsheet and csv files
               @sane_CSV_read_options @sane_CSV_write_options/;
 
  # Open a CSV file or result of converting a sheet from a spreadsheet
- my $hash = OpenAsCsv("/path/to/spreadsheet.odt!Sheet1");  # single-arg form
+ my $hash = OpenAsCsv("/path/to/spreadsheet.odt!Sheet1");
  my $hash = OpenAsCsv(inpath => "/path/to/spreadsheet.odt",
-                      sheetname -> "Sheet1");
+                      sheetname => "Sheet1");
 
  print "Reading ",$hash->{csvpath}," with encoding ",$hash->{encoding},"\n";
  while (<$hash->{fh}>) { ... }
@@ -1933,13 +1963,14 @@ and MM/DD/YY or DD/MM/YY dates when a DD happens to be more than 12.
 
 =head3 B<'binmode' Argument For Reading result CSVs>
 
-It is not possible to control the line-ending style in output CSV files,
-but the following incantation will correctly read either DOS/Windows (CR,LF)
+The following incantation will correctly read either DOS/Windows (CR,LF)
 or *nix (LF) line endings properly, i.e. as a single \n:
 
    open my $fh, "<", $resulthash->{outpath};
    my $enc = $resulthash->{encoding};
    binmode($fh, ":raw:encoding($enc):crlf");
+
+It is not possible to control the line-ending style in output CSV files.
 
 =head2 @sane_CSV_read_options
 
@@ -1963,8 +1994,9 @@ Not exported by default.
 
 =head2 sheetname_from_spec EXPR
 
-Functions which decompose strings containing a spreadsheet path and possibly sheetname
-suffix, of the form "FILEPATH!SHEETNAME", "FILEPATH|||SHEETNAME", or "FILEPATH[SHEETNAME]".
+Functions which decompose strings containing a spreadsheet path
+and possibly sheetname suffix in any of these forms:
+"FILEPATH!SHEETNAME", "FILEPATH|||SHEETNAME", or "FILEPATH[SHEETNAME]".
 C<sheetname_from_spec> returns C<undef> if the input does not have a
 a sheetname suffix.
 Not exported by default.
@@ -1988,7 +2020,7 @@ or is an older version which does not have needed capabilities.
 
 =head2 $path = openlibreoffice_path();
 
-Returns the detected path of I<soffice> (Apache Open Office or Libre Office)
+Returns the detected path of I<soffice> (Libre Orrice or Apache Open Office)
 or undef if not found.
 
 These are not exported by default.

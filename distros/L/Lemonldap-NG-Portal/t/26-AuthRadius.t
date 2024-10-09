@@ -3,8 +3,15 @@ use Test::More;
 use strict;
 use IO::String;
 use Authen::Radius;
+use File::Temp 'tempdir';
+
+BEGIN {
+    $LLNG::TMPDIR =
+      tempdir( 'tmpSessionXXXXX', DIR => 't/sessions', CLEANUP => 1 );
+}
 
 require 't/test-lib.pm';
+require 't/separate-handler.pm';
 
 my $res;
 my $client = LLNG::Manager::Test->new( {
@@ -15,7 +22,17 @@ my $client = LLNG::Manager::Test->new( {
             radiusServer       => '127.0.0.1',
             radiusSecret       => 'test',
             requireToken       => 1,
-            portalDisplayOrder => 'Logout LoginHistory , Appslist'
+            radiusAuthnLevel   => 3,
+            portalDisplayOrder => 'Logout LoginHistory , Appslist',
+            locationRules      => {
+                'test1.example.com' => {
+                    'default'                  => 'accept',
+                    '^/level3(?#AuthnLevel=3)' => 'accept',
+                },
+                'test2.example.com' => {
+                    'default' => 'accept'
+                }
+            }
         }
     }
 );
@@ -88,6 +105,18 @@ ok(
     'Categories are well sorted'
 ) or explain( \@tabs, 'Sorted categories (logout, loginHistory, appslist)' );
 count(2);
+ok(
+    $res = handler(
+        req => [
+            GET => 'http://test1.example.com/level3',
+            [ Cookie => "lemonldap=$id" ]
+        ],
+    ),
+    'Handler request'
+);
+count(1);
+expectOK($res);
+
 $client->logout($id);
 
 clean_sessions();

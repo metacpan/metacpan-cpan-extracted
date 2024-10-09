@@ -17,40 +17,43 @@ use IO::Poll;
 my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
 my $test_dir = "$FindBin::Bin";
+
+SPVM::TestCase::Sys::IO->SET_TEST_DIR($test_dir);
+
 {
   my $tmp_dir = File::Temp->newdir;
-  ok(SPVM::TestCase::Sys::IO->open($test_dir, "$tmp_dir"));
+  ok(SPVM::TestCase::Sys::IO->open("$tmp_dir"));
 }
-ok(SPVM::TestCase::Sys::IO->read($test_dir));
-ok(SPVM::TestCase::Sys::IO->lseek($test_dir));
-ok(SPVM::TestCase::Sys::IO->close($test_dir));
+ok(SPVM::TestCase::Sys::IO->read);
+ok(SPVM::TestCase::Sys::IO->lseek);
+ok(SPVM::TestCase::Sys::IO->close);
 {
   my $tmp_dir = File::Temp->newdir;
   ok(SPVM::TestCase::Sys::IO->write("$tmp_dir"));
 }
-ok(SPVM::TestCase::Sys::IO->fopen($test_dir));
-ok(SPVM::TestCase::Sys::IO->fdopen($test_dir));
-ok(SPVM::TestCase::Sys::IO->fread($test_dir));
-ok(SPVM::TestCase::Sys::IO->feof($test_dir));
-ok(SPVM::TestCase::Sys::IO->ferror($test_dir));
-ok(SPVM::TestCase::Sys::IO->clearerr($test_dir));
-ok(SPVM::TestCase::Sys::IO->getc($test_dir));
-ok(SPVM::TestCase::Sys::IO->fgets($test_dir));
+ok(SPVM::TestCase::Sys::IO->fopen);
+ok(SPVM::TestCase::Sys::IO->fdopen);
+ok(SPVM::TestCase::Sys::IO->fread);
+ok(SPVM::TestCase::Sys::IO->feof);
+ok(SPVM::TestCase::Sys::IO->ferror);
+ok(SPVM::TestCase::Sys::IO->clearerr);
+ok(SPVM::TestCase::Sys::IO->getc);
+ok(SPVM::TestCase::Sys::IO->fgets);
 {
   my $tmp_dir = File::Temp->newdir;
   ok(SPVM::TestCase::Sys::IO->fwrite("$tmp_dir"));
 }
-ok(SPVM::TestCase::Sys::IO->fseek($test_dir));
-ok(SPVM::TestCase::Sys::IO->ftell($test_dir));
-ok(SPVM::TestCase::Sys::IO->fflush($test_dir));
-ok(SPVM::TestCase::Sys::IO->fclose($test_dir));
+ok(SPVM::TestCase::Sys::IO->fseek);
+ok(SPVM::TestCase::Sys::IO->ftell);
+ok(SPVM::TestCase::Sys::IO->fflush);
+ok(SPVM::TestCase::Sys::IO->fclose);
 
 if ($^O eq 'MSWin32') {
   eval { SPVM::Sys::IO->flock(0, 0) };
   like($@, qr|not supported|);
 }
 else {
-  ok(SPVM::TestCase::Sys::IO->flock($test_dir));
+  ok(SPVM::TestCase::Sys::IO->flock);
 }
 
 {
@@ -85,7 +88,7 @@ else {
 
 {
   my $tmp_dir = File::Temp->newdir;
-  ok(SPVM::TestCase::Sys::IO->getcwd("$tmp_dir"));
+  ok(SPVM::TestCase::Sys::IO->getcwd);
 }
 
 if ($^O eq 'MSWin32') {
@@ -93,18 +96,18 @@ if ($^O eq 'MSWin32') {
   like($@, qr|not supported|);
 }
 else {
-  ok(SPVM::TestCase::Sys::IO->realpath("$test_dir"));
+  ok(SPVM::TestCase::Sys::IO->realpath);
 }
 
 if ($^O eq 'MSWin32') {
-  ok(SPVM::TestCase::Sys::IO->_fullpath("$test_dir"));
+  ok(SPVM::TestCase::Sys::IO->_fullpath);
 }
 else {
   eval { SPVM::Sys::IO->_fullpath(undef, undef, 0) };
   like($@, qr|not supported|);
 }
 
-ok(SPVM::TestCase::Sys::IO->chdir("$test_dir"));
+ok(SPVM::TestCase::Sys::IO->chdir);
 
 {
   my $tmp_dir = File::Temp->newdir;
@@ -138,23 +141,23 @@ else {
   ok(SPVM::TestCase::Sys::IO->readlink("$tmp_dir"));
 }
 
-ok(SPVM::TestCase::Sys::IO->readline("$test_dir"));
+ok(SPVM::TestCase::Sys::IO->readline);
 
-ok(SPVM::TestCase::Sys::IO->ungetc("$test_dir"));
+ok(SPVM::TestCase::Sys::IO->ungetc);
 
 unless ($^O eq 'MSWin32') {
-  ok(SPVM::TestCase::Sys::IO->fsync("$test_dir"));
+  ok(SPVM::TestCase::Sys::IO->fsync);
 }
 
-ok(SPVM::TestCase::Sys::IO->setvbuf("$test_dir"));
+ok(SPVM::TestCase::Sys::IO->setvbuf);
 
-ok(SPVM::TestCase::Sys::IO->setbuf("$test_dir"));
+ok(SPVM::TestCase::Sys::IO->setbuf);
 
-ok(SPVM::TestCase::Sys::IO->setbuffer("$test_dir"));
+ok(SPVM::TestCase::Sys::IO->setbuffer);
 
-ok(SPVM::TestCase::Sys::IO->setlinebuf("$test_dir"));
+ok(SPVM::TestCase::Sys::IO->setlinebuf);
 
-ok(SPVM::TestCase::Sys::IO->freopen("$test_dir"));
+ok(SPVM::TestCase::Sys::IO->freopen);
 
 {
   my $tmp_dir = File::Temp->newdir;
@@ -166,19 +169,42 @@ ok(SPVM::TestCase::Sys::IO->freopen("$test_dir"));
   ok(SPVM::TestCase::Sys::IO->ftruncate("$tmp_dir"));
 }
 
-# opendir
+# Directory stream system calls
 {
-  ok(SPVM::TestCase::Sys::IO->opendir($test_dir));
-}
-
-# readdir
-{
-  ok(SPVM::TestCase::Sys::IO->readdir($test_dir));
+  # opendir
+  {
+    ok(SPVM::TestCase::Sys::IO->opendir);
+  }
+  
+  # readdir
+  {
+    ok(SPVM::TestCase::Sys::IO->readdir);
+  }
+  
+  # seekdir
+  {
+    ok(SPVM::TestCase::Sys::IO->seekdir);
+  }
+  
+  # telldir
+  {
+    ok(SPVM::TestCase::Sys::IO->telldir);
+  }
+  
+  # rewinddir
+  {
+    ok(SPVM::TestCase::Sys::IO->rewinddir);
+  }
+  
+  # closedir
+  {
+    ok(SPVM::TestCase::Sys::IO->closedir);
+  }
 }
 
 # fcntl
 {
-  ok(SPVM::TestCase::Sys::IO->fcntl($test_dir));
+  ok(SPVM::TestCase::Sys::IO->fcntl);
 }
 
 # stdin
@@ -212,6 +238,8 @@ ok(SPVM::TestCase::Sys::IO->freopen("$test_dir"));
 }
 
 SPVM::api->set_exception(undef);
+
+SPVM::TestCase::Sys::IO->SET_TEST_DIR(undef);
 
 # All object is freed
 my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();

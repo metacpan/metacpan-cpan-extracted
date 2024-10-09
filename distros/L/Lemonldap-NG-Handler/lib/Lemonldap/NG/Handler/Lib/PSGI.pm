@@ -5,7 +5,7 @@ use Mouse;
 
 #use Lemonldap::NG::Handler::Main qw(:jailSharedVars);
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 has protection => ( is => 'rw', isa => 'Str' );
 has rule       => ( is => 'rw', isa => 'Str' );
@@ -79,26 +79,6 @@ sub _run {
     }
 }
 
-sub status {
-    my ( $class, $args ) = @_;
-    $args //= {};
-    my $self = $class->new($args);
-    $self->init($args);
-
-    # Check if main handler initialization has been done
-    unless ( %{ $self->api->tsv } ) {
-        eval { $self->api->checkConf() };
-        $self->logger->error($@) if ($@);
-    }
-    return $self->psgiAdapter(
-        sub {
-            my $req = $_[0];
-            $self->api->status($req);
-            return [ 200, [ $req->spliceHdrs ], [ $req->{respBody} ] ];
-        }
-    );
-}
-
 sub reload {
     my ( $class, $args ) = @_;
     $args //= {};
@@ -138,7 +118,6 @@ sub _authAndTrace {
     my ( $res, $session ) = $type->run( $req, $self->{rule} );
     my $portal = eval { $type->tsv->{portal}->($req) };
     $self->logger->warn($@)  if $@;
-    $req->userData($session) if ($session);
 
     if ( $res < 300 ) {
         if ($noCall) {
@@ -152,16 +131,6 @@ sub _authAndTrace {
         }
     }
     elsif ( $res < 400 ) {
-        if ( $req->wantJSON ) {
-            my %h    = ( $req->spliceHdrs );
-            my $host = $req->env->{HTTP_HOST};
-            if (    $h{Location}
-                and $h{Location} =~ m#^\Q$portal\E#
-                and $h{Location} !~ m#^https?://$host# )
-            {
-                return [ 401, [ 'WWW-Authenticate' => 'SSO ' . $portal ], [] ];
-            }
-        }
         return [ $res, [ $req->spliceHdrs ], [] ];
     }
     else {

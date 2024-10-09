@@ -100,48 +100,33 @@ sub sendCode {
         return 0;
     }
 
-    # Build mail content
-    my $tr      = $self->translate($req);
-    my $subject = $self->conf->{mail2fSubject};
+    # Template engine expects $req->sessionInfo to be populated
+    # which is not the case during a resend
+    $req->sessionInfo($sessionInfo);
 
-    unless ($subject) {
-        $subject = 'mail2fSubject';
-        $tr->( \$subject );
-    }
-    my ( $body, $html );
-    if ( $self->conf->{mail2fBody} ) {
-
-        # We use a specific text message, no html
-        $body = $self->conf->{mail2fBody};
-
-        # Replace variables in body
-        $body =~ s/\$code/$code/g;
-        $body =~ s/\$(\w+)/$sessionInfo->{$1} || ''/ge;
+    # Send mail
+    if (
+        $self->sendEmail(
+            $req,
+            subject       => $self->conf->{mail2fSubject},
+            subject_trmsg => 'mail2fSubject',
+            body          => $self->conf->{mail2fBody},
+            body_template => 'mail_2fcode',
+            dest          => $dest,
+            params        => {
+                code => $code,
+            }
+        )
+      )
+    {
+        return 1;
 
     }
     else {
-
-        # Template engine expects $req->sessionInfo to be populated
-        # which is not the case during a resend
-        $req->sessionInfo($sessionInfo);
-
-        # Use HTML template
-        $body = $self->loadMailTemplate(
-            $req,
-            'mail_2fcode',
-            filter => $tr,
-            params => { code => $code }
-        );
-        $html = 1;
-    }
-
-    # Send mail
-    unless ( $self->send_mail( $dest, $subject, $body, $html ) ) {
         $self->logger->error(
             $self->prefix . "2f: unable to send code to $dest" );
         return 0;
     }
-    return 1;
 }
 
 sub verify_external {

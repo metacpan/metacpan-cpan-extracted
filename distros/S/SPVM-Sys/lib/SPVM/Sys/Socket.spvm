@@ -61,6 +61,8 @@ class Sys::Socket {
   
   native static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $buf_offset : int = 0);
   
+  native static method recvfrom : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $src_addr : Sys::Socket::Sockaddr, $addrlen_ref : int*, $buf_offset : int = 0);
+  
   native static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int, $buf_offset : int = 0);
   
   native static method sendto : int ($sockfd : int, $buf : string, $len : int, $flags : int, $addr : Sys::Socket::Sockaddr, $addrlen : int, $buf_offset : int = 0);

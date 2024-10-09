@@ -1,0 +1,107 @@
+class TestUtil {
+  
+  use IO::Socket::INET;
+  use Go;
+  use Go::Channel;
+  
+  static method run_echo_server : void ($port : int) {
+    
+    my $localhost = "127.0.0.1";
+    
+    my $server_socket = IO::Socket::INET->new({
+      LocalAddr => $localhost,
+      LocalPort => $port,
+      Listen    => 5,
+      ReuseAddr => 1,
+    });
+    
+    while (1) {
+      my $client_socket = $server_socket->accept;
+      
+      unless ($client_socket is_compile_type IO::Socket::INET) {
+        die "[Unexpected Error]Invalid class is return.";
+      }
+      
+      unless ($client_socket is_type IO::Socket::INET) {
+        die "[Unexpected Error]Invalid class is return.";
+      }
+      
+      while (1) {
+        
+        my $data = (mutable string)new_string_len 1;
+        
+        my $read_length = $client_socket->read($data);
+        
+        if ($read_length > 0) {
+          $client_socket->write($data);
+        }
+        else {
+          last;
+        }
+      }
+    }
+  }
+  
+  static method run_echo_server_go : void ($port : int) {
+    
+    my $localhost = "127.0.0.1";
+    
+    my $server_socket = IO::Socket::INET->new({
+      LocalAddr => $localhost,
+      LocalPort => $port,
+      Listen    => 5,
+      ReuseAddr => 1,
+    });
+    
+    
+    my $accept_max = 5;
+    my $accept_count = 0;
+    
+    my $select = Go->new_select;
+    
+    while (1) {
+      
+      for (my $i = $accept_count; $i < $accept_max; $i++) {
+        
+        my $ch = Go->make;
+        
+        $select->add_read($ch);
+        
+        Go->go([$ch : Go::Channel, $server_socket : IO::Socket::INET] method : void () {
+          
+          my $client_socket = $server_socket->accept;
+          
+          unless ($client_socket is_compile_type IO::Socket::INET) {
+            die "[Unexpected Error]Invalid class is return.";
+          }
+          
+          unless ($client_socket is_type IO::Socket::INET) {
+            die "[Unexpected Error]Invalid class is return.";
+          }
+          
+          while (1) {
+            
+            my $data = (mutable string)new_string_len 1;
+            
+            my $read_length = $client_socket->read($data);
+            
+            if ($read_length > 0) {
+              $client_socket->write($data);
+            }
+            else {
+              last;
+            }
+          }
+          
+          $ch->write(1);
+        });
+        
+        $accept_count++;
+      }
+      
+      $select->select;
+      
+      $accept_count--;
+    }
+  }
+}

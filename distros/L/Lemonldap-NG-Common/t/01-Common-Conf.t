@@ -59,8 +59,9 @@ sub getConfTest {
     # Invoke getConf
     $Lemonldap::NG::Common::Conf::msg = "";
     note "Invoking getConf with args ", explain $args;
-    # The test suite runs as root in CI, we need to explicitely enable caching for root
-    my $conf = $confAcc->getConf( { %$args, allow_cache_for_root => 1 } );
+
+# The test suite runs as root in CI, we need to explicitely enable caching for root
+    my $conf = $confAcc->getConf($args);
 
     # Test result keys
     if ( ref( $args{keys} ) eq "HASH" ) {

@@ -6,7 +6,7 @@ use 5.020;
 use exact;
 use exact::class;
 
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.16'; # VERSION
 
 has acronyms              => 0;
 has sorting               => 1;
@@ -335,12 +335,13 @@ $bibles->{Protestant} = $bibles->{ESV};
 $bibles->{Catholic}   = $bibles->{RSVCE};
 $bibles->{Orthodox}   = $bibles->{RSV};
 
-# has _bibles     => $bibles;
-has _bibles     => { map { $_ => [ map { [ map { [ @$_] } @$_ ] } @{ $bibles->{$_} } ] } keys %$bibles };
 has _bible      => 'Protestant';
-has _bible_data => {};
-has _data       => [];
-has _cache      => {};
+has _bible_data => sub { {} };
+has _data       => sub { [] };
+has _cache      => sub { {} };
+has _bibles     => sub {
+    return { map { $_ => [ map { [ map { [ @$_] } @$_ ] } @{ $bibles->{$_} } ] } keys %$bibles };
+};
 
 sub bible ( $self, $name = undef ) {
     return $self->_bible unless ($name);
@@ -1001,7 +1002,7 @@ Bible::Reference - Simple Bible reference parser, tester, and canonicalizer
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-Reference/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-Reference/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-Reference/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-Reference)

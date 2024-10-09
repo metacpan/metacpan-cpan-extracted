@@ -4,22 +4,25 @@ use strict;
 use IO::String;
 use JSON;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_PP_PASSWORD_TOO_SHORT PE_PP_INSUFFICIENT_PASSWORD_QUALITY
-  PE_PP_NOT_ALLOWED_CHARACTER PE_PP_NOT_ALLOWED_CHARACTERS
+  PE_PP_PASSWORD_TOO_LONG
+  PE_PP_PASSWORD_TOO_SHORT
+  PE_PP_NOT_ALLOWED_CHARACTER
+  PE_PP_NOT_ALLOWED_CHARACTERS
+  PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
 require 't/test-lib.pm';
 
 my ( $res, $json );
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                    => 'error',
             passwordDB                  => 'Demo',
             passwordPolicy              => 1,
             portalRequireOldPassword    => 1,
             passwordPolicyMinSize       => 6,
+            passwordPolicyMaxSize       => 14,
             passwordPolicyMinLower      => 3,
             passwordPolicyMinUpper      => 3,
             passwordPolicyMinDigit      => 1,
@@ -46,14 +49,14 @@ my $id = expectCookie($res);
 
 # Test min size
 # -------------
+my $query = 'oldpassword=dwho&newpassword=test&confirmpassword=test';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-            'oldpassword=dwho&newpassword=test&confirmpassword=test'),
+        IO::String->new($query),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 54
+        length => length($query)
     ),
     'Password min size not respected'
 );
@@ -67,15 +70,38 @@ ok(
 ) or explain( $json, "error => 29" );
 count(3);
 
+# Test max size
+# -------------
+$query =
+'oldpassword=dwho&newpassword=testtesttesttest&confirmpassword=testtesttesttest';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-'oldpassword=dwho&newpassword=T ESTis0k\}&confirmpassword=T ESTis0k\}'
-        ),
+        IO::String->new($query),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 68
+        length => length($query)
+    ),
+    'Password max size not respected'
+);
+expectBadRequest($res);
+
+ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
+  or print STDERR "$@\n" . Dumper($res);
+ok(
+    $json->{error} == PE_PP_PASSWORD_TOO_LONG,
+    'Response is PE_PP_PASSWORD_TOO_LONG'
+) or explain( $json, "error => 111" );
+count(3);
+
+$query = 'oldpassword=dwho&newpassword=T ESTis0k\}&confirmpassword=T ESTis0k\}';
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        accept => 'application/json',
+        length => length($query)
     ),
     'Password min size respected'
 );
@@ -84,14 +110,14 @@ count(1);
 
 # Test min lower
 # --------------
+$query = 'oldpassword=dwho&newpassword=TESTLOWer&confirmpassword=TESTLOWer';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-            'oldpassword=dwho&newpassword=TESTLOWer&confirmpassword=TESTLOWer'),
+        IO::String->new($query),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 64
+        length => length($query)
     ),
     'Password min lower not respected'
 );
@@ -104,15 +130,14 @@ ok(
 ) or explain( $json, "error => 28" );
 count(3);
 
+$query = 'oldpassword=dwho&newpassword=TESTl0wer\}&confirmpassword=TESTl0wer\}';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-'oldpassword=dwho&newpassword=TESTl0wer\}&confirmpassword=TESTl0wer\}'
-        ),
+        IO::String->new($query),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 68
+        length => length($query)
     ),
     'Password min lower respected'
 );
@@ -121,14 +146,14 @@ count(1);
 
 # Test min upper
 # --------------
+$query = 'oldpassword=dwho&newpassword=testUPper&confirmpassword=testUPper';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-            'oldpassword=dwho&newpassword=testUPper&confirmpassword=testUPper'),
+        IO::String->new($query),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 64
+        length => length($query)
     ),
     'Password min upper not respected'
 );
@@ -141,15 +166,15 @@ ok(
 ) or explain( $json, "error => 28" );
 count(3);
 
+$query = 'oldpassword=dwho&newpassword=t3stUPPER\}&confirmpassword=t3stUPPER\}';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-'oldpassword=dwho&newpassword=t3stUPPER\}&confirmpassword=t3stUPPER\}'
+        IO::String->new($query
         ),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 68
+        length => length($query)
     ),
     'Password min upper respected'
 );
@@ -158,14 +183,14 @@ count(1);
 
 # Test min digit
 # --------------
+$query = 'oldpassword=dwho&newpassword=testDIGIT&confirmpassword=testDIGIT';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-            'oldpassword=dwho&newpassword=testDIGIT&confirmpassword=testDIGIT'),
+        IO::String->new($query),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 64
+        length => length($query)
     ),
     'Password min digit not respected'
 );
@@ -178,15 +203,14 @@ ok(
 ) or explain( $json, "error => 28" );
 count(3);
 
+$query = 'oldpassword=dwho&newpassword=t3stDIGIT\}&confirmpassword=t3stDIGIT\}';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-'oldpassword=dwho&newpassword=t3stDIGIT\}&confirmpassword=t3stDIGIT\}'
-        ),
+        IO::String->new($query),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 68
+        length => length($query)
     ),
     'Password min digit respected'
 );
@@ -195,15 +219,14 @@ count(1);
 
 # Test min special char
 # ---------------------
+$query = 'oldpassword=dwho&newpassword=t3stDIGIT}&confirmpassword=t3stDIGIT}';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-            'oldpassword=dwho&newpassword=t3stDIGIT}&confirmpassword=t3stDIGIT}'
-        ),
+        IO::String->new($query),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 66
+        length => length($query)
     ),
     'Password min special char not respected'
 );
@@ -216,15 +239,14 @@ ok(
 ) or explain( $json, "error => 28" );
 count(3);
 
+$query = 'oldpassword=dwho&newpassword=t3stDIGIT}@&confirmpassword=t3stDIGIT}@';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-'oldpassword=dwho&newpassword=t3stDIGIT}@&confirmpassword=t3stDIGIT}@'
-        ),
+        IO::String->new($query),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 68
+        length => length($query)
     ),
     'Password min special char not respected'
 );
@@ -237,15 +259,15 @@ ok(
 ) or explain( $json, "error => 28" );
 count(3);
 
+$query =
+  'oldpassword=dwho&newpassword=t3stDIGIT}@}&confirmpassword=t3stDIGIT}@}';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-'oldpassword=dwho&newpassword=t3stDIGIT}@}&confirmpassword=t3stDIGIT}@}'
-        ),
+        IO::String->new($query),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 70
+        length => length($query)
     ),
     'Password special char not allowed'
 );
@@ -258,15 +280,18 @@ ok(
 ) or explain( $json, "error => 100" );
 count(3);
 
+$query =
+  'oldpassword=dwho&newpassword=t3stDIGIT}@#}&confirmpassword=t3stDIGIT}@#}';
 ok(
     $res = $client->_post(
         '/',
         IO::String->new(
-'oldpassword=dwho&newpassword=t3stDIGIT}@#}&confirmpassword=t3stDIGIT}@#}'
+            $query
+
         ),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 72
+        length => length($query)
     ),
     'Password special chars not allowed'
 );
@@ -279,15 +304,14 @@ ok(
 ) or explain( $json, "error => 100" );
 count(3);
 
+$query = 'oldpassword=dwho&newpassword=t3stDIGIT\}&confirmpassword=t3stDIGIT\}';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new(
-'oldpassword=dwho&newpassword=t3stDIGIT\}&confirmpassword=t3stDIGIT\}'
-        ),
+        IO::String->new($query),
         cookie => "lemonldap=$id",
         accept => 'application/json',
-        length => 68
+        length => length($query)
     ),
     'Password min special char respected'
 );

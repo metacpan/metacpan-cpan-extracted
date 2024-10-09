@@ -37,17 +37,21 @@ sub testRequiredMethods {
     }
     foreach my $mod (@mods) {
         subtest "$mod" => sub {
-            use_ok($mod);
-            my $o;
-          TODO: {
-                local $TODO = 'New object may fail in test context';
-                ok( $o = $mod->new(), "Able to create object" );
+          SKIP: {
+                eval "require $mod";
+                if ( my $err = $@ ) {
+                    skip "Could not load $mod";
+                }
+                my $o;
+              TODO: {
+                    local $TODO = 'New object may fail in test context';
+                    ok( $o = $mod->new(), "Able to create object" );
+                }
+                count(2);
+                foreach my $method (@$methods) {
+                    ok( $mod->can($method), "$mod implement $method" );
+                }
             }
-            count(2);
-            foreach my $method (@$methods) {
-                ok( $mod->can($method), "$mod implement $method" );
-            }
-            done_testing();
         }
     }
 }

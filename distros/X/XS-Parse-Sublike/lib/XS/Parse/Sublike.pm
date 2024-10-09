@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike 0.27;
+package XS::Parse::Sublike 0.28;
 
 use v5.14;
 use warnings;
@@ -208,6 +208,18 @@ become optional.
 If set, the keyword is considered to be a prefix that can be placed in front
 of C<sub> or another sub-like keyword, to add its set of hooks in addition to
 those of the following keyword. These prefices may be further stacked.
+
+=item XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS
+
+If set, use the extended signature parser of this module when parsing a
+signature and additionally permit the use of named parameter syntax, as
+documented in L<Sublike::Extended>.
+
+=item XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES
+
+If set, use the extended signature parser of this module when parsing a
+signature and additionally permit the use of attribute declarations on
+parameter variables, as documented in L<Sublike::Extended>.
 
 =back
 

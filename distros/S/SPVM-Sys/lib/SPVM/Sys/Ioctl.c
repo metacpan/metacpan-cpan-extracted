@@ -17,7 +17,7 @@ static const char* FILE_NAME = "Sys/Ioctl.c";
 
 int32_t SPVM__Sys__Ioctl__ioctl(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "The ioctl method in the Sys::IO class is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::IO#ioctl method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   int32_t error_id = 0;
@@ -70,12 +70,12 @@ int32_t SPVM__Sys__Ioctl__ioctl(SPVM_ENV* env, SPVM_VALUE* stack) {
       ret = ioctl(fd, request, request_arg_ref);
     }
     else {
-      return env->die(env, stack, "$request_arg_ref must be an byte[]/short[]/int[]/long[]/float[]/double[] type object or the object that is a pointer class.", __func__, FILE_NAME, __LINE__);
+      return env->die(env, stack, "The array $request_arg_ref for input or output of an ioctl argument must be an byte[]/short[]/int[]/long[]/float[]/double[] type object or the object that is a pointer class.", __func__, FILE_NAME, __LINE__);
     }
   }
   
   if (ret == -1) {
-    env->die(env, stack, "[System Error]ioctl failed: %s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]ioctl() failed:%s.", env->strerror_nolen(env, stack, errno), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -87,7 +87,7 @@ int32_t SPVM__Sys__Ioctl__ioctl(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Ioctl__ioctlsocket(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if !defined(_WIN32)
-  env->die(env, stack, "The ioctlsocket method in the Sys::IO class is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::IO#ioctlsocket method is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
 
@@ -110,7 +110,7 @@ int32_t SPVM__Sys__Ioctl__ioctlsocket(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   if (ret == -1) {
-    env->die(env, stack, "[System Error]ioctlsocket failed: %s", spvm_socket_strerror(env, stack, spvm_socket_errno(), 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]ioctlsocket() failed:%s.", spvm_socket_strerror(env, stack, spvm_socket_errno(), 0), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   

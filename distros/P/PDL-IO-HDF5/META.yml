@@ -2,16 +2,17 @@
 abstract: 'PDL Interface to the HDF5 Data Format'
 author:
   - unknown
-  - 'Chris Marshall <chm@cpan.org>'
+  - 'John Cerney <j-cerney1 AT raytheon.com>'
+  - 'Andrew Benson <abenson AT obs.carnegiescience.edu>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  PDL: '2.007'
+  PDL: '2.064'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  PDL: '2.004'
+  PDL: '2.064'
 dynamic_config: 1
-generated_by: 'Chris Marshall, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +23,7 @@ no_index:
     - t
     - inc
 requires:
-  PDL: '2.004'
+  PDL: '2.064'
 resources:
   bugtracker: https://github.com/PDLPorters/pdl-io-hdf5/issues
   homepage: http://pdl.perl.org/

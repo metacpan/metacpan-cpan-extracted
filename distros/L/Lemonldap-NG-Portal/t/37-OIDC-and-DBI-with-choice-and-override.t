@@ -84,8 +84,7 @@ LWP::Protocol::PSGI->register(
 SKIP: {
     eval { require DBI; require DBD::SQLite; };
     if ($@) {
-        skip 'DBD::SQLite not found', 1;
-        count(1);
+        skip 'DBD::SQLite not found', 0;
     }
     my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
 
@@ -259,7 +258,8 @@ sub rp {
                 authChoiceModules => {
                     sql  => 'DBI;DBI;Null',
                     demo => 'Demo;Demo;Null',
-                    oidc => 'OpenIDConnect;DBI;Null;;;{"userPivot":"mobile_id"}',
+                    oidc =>
+                      'OpenIDConnect;DBI;Null;;;{"userPivot":"mobile_id"}',
                 },
 
                 dbiAuthChain        => "dbi:SQLite:dbname=$userdb",

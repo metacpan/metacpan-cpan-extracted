@@ -1,0 +1,73 @@
+{
+   "abstract" : "A Web Intl.DateTimeFormat Class Implementation",
+   "author" : [
+      "Jacques Deguest (jack@deguest.jp)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DateTime-Format-Intl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0.42",
+            "DateTime::Format::Unicode" : "v0.1.3",
+            "DateTime::Locale::FromCLDR" : "v0.4.3",
+            "Locale::Intl" : "v0.1.0",
+            "Locale::Unicode::Data" : "v1.0.4",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Want" : "0.17",
+            "parent" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0",
+            "warnings::register" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302120",
+            "Test::Pod" : "1.52",
+            "lib" : "0.63",
+            "open" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/jackdeguest/DateTime-Format-Intl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://gitlab.com/jackdeguest/DateTime-Format-Intl"
+      }
+   },
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

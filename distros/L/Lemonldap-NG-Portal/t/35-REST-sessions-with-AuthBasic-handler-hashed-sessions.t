@@ -148,7 +148,7 @@ sub issuer {
             ini => {
                 logLevel           => $debug,
                 domain             => 'idp.com',
-                portal             => 'http://auth.idp.com',
+                portal             => 'http://auth.idp.com/',
                 authentication     => 'Demo',
                 userDB             => 'Same',
                 restSessionServer  => 1,

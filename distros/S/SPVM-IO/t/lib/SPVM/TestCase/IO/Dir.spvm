@@ -1,0 +1,257 @@
+class TestCase::IO::Dir {
+  use IO::Dir;
+  use StringList;
+  use Sort;
+  
+  static method TEST_FILES_DIR : string () { return "t/test_files"; }
+  
+  # Class Methods
+  static method new : int () {
+    
+    my $dir_path = &TEST_FILES_DIR;
+    
+    {
+      my $dh = IO::Dir->new($dir_path);
+      
+      unless ($dh is_type IO::Dir) {
+        return 0;
+      }
+      
+      my $dirent = $dh->read;
+      
+      unless ($dirent) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dh = IO::Dir->new;
+      
+      unless ($dh is_type IO::Dir) {
+        return 0;
+      }
+      
+      eval { $dh->read; }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  # Instance Methods
+  static method open : int () {
+    
+    my $dir_path = &TEST_FILES_DIR;
+    
+    {
+      my $dh = IO::Dir->new;
+      
+      $dh->open($dir_path);
+      
+      $dh->read;
+    }
+    
+    return 1;
+  }
+  
+  static method read : int () {
+    
+    my $dir_path = &TEST_FILES_DIR;
+    
+    {
+      my $dh = IO::Dir->new($dir_path);
+      
+      unless ($dh is_type IO::Dir) {
+        return 0;
+      }
+      
+      my $dirent = $dh->read;
+      
+      unless ($dirent) {
+        return 0;
+      }
+      
+      unless ($dirent->d_name) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dh = IO::Dir->new($dir_path);
+      
+      unless ($dh is_type IO::Dir) {
+        return 0;
+      }
+      
+      my $dir_names_list = StringList->new;
+      
+      while (my $dirent = $dh->read) {
+        my $dir_name = $dirent->d_name;
+        
+        $dir_names_list->push($dir_name);
+      }
+      
+      my $dir_names = $dir_names_list->to_array;
+      
+      unless (@{Fn->grep($dir_names, method : int ($dir_name : object) { return $dir_name->(string) eq "fread.txt"; })}) {
+        return 0;
+      }
+      
+      unless (@$dir_names >= 4) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method seek : int () {
+    
+    my $dir_path = &TEST_FILES_DIR;
+    
+    {
+      my $dh = IO::Dir->new($dir_path);
+      
+      my $offset = $dh->tell;
+      
+      my $dirent = $dh->read;
+      
+      my $dirent_d_name = $dirent->d_name;
+      
+      $dh->seek($offset);
+      
+      my $dirent2 = $dh->read;
+      
+      my $dirent2_d_name = $dirent->d_name;
+      
+      unless ($dirent_d_name) {
+        return 0;
+      }
+      
+      unless ($dirent2_d_name) {
+        return 0;
+      }
+      
+      unless ($dirent_d_name eq $dirent2_d_name) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method tell : int () {
+    
+    my $dir_path = &TEST_FILES_DIR;
+    
+    {
+      my $dh = IO::Dir->new($dir_path);
+      
+      my $offset = $dh->tell;
+      
+      my $dirent = $dh->read;
+      
+      my $dirent_d_name = $dirent->d_name;
+      
+      $dh->seek($offset);
+      
+      my $dirent2 = $dh->read;
+      
+      my $dirent2_d_name = $dirent->d_name;
+      
+      unless ($dirent_d_name) {
+        return 0;
+      }
+      
+      unless ($dirent2_d_name) {
+        return 0;
+      }
+      
+      unless ($dirent_d_name eq $dirent2_d_name) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method rewind : int () {
+    
+    my $dir_path = &TEST_FILES_DIR;
+    
+    {
+      my $dh = IO::Dir->new($dir_path);
+      
+      my $dirent = $dh->read;
+      
+      my $dirent_d_name = $dirent->d_name;
+      
+      $dh->rewind;
+      
+      my $dirent2 = $dh->read;
+      
+      my $dirent2_d_name = $dirent->d_name;
+      
+      unless ($dirent_d_name) {
+        return 0;
+      }
+      
+      unless ($dirent2_d_name) {
+        return 0;
+      }
+      
+      unless ($dirent_d_name eq $dirent2_d_name) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method close : int () {
+    
+    my $dir_path = &TEST_FILES_DIR;
+    
+    {
+      my $dh = IO::Dir->new($dir_path);
+      
+      $dh->close;
+      
+      if ($dh->opened) {
+        warn $dh->opened;
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method opened : int () {
+    
+    my $dir_path = &TEST_FILES_DIR;
+    
+    {
+      my $dh = IO::Dir->new($dir_path);
+      
+      unless ($dh->opened) {
+        warn $dh->opened;
+        return 0;
+      }
+      
+      $dh->close;
+      
+      if ($dh->opened) {
+        warn $dh->opened;
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+}

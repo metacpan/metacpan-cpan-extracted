@@ -10,7 +10,7 @@ SPVM::Sys::Socket::In_addr_base - Base Class of L<struct in_addr|https://linux.d
 
 =head1 Description
 
-The Sys::Socket::In_addr_base class in L<SPVM> is the base class of L<struct in_addr|https://linux.die.net/man/3/inet_network> family.
+Sys::Socket::In_addr_base class in L<SPVM> is the base class of L<struct in_addr|https://linux.die.net/man/3/inet_network> family.
 
 =head1 Usage
 

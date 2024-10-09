@@ -1,4 +1,4 @@
-# Test case for HDF5 attributes that are pdls 
+# Test case for HDF5 attributes that are pdls
 #   This is a new feature as-of version 0.64
 use strict;
 use warnings;

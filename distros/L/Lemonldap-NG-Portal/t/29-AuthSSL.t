@@ -53,11 +53,11 @@ sub testUserTokenSSLAuth {
     );
     my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
-    ok(
-        $res->[2]->[0] =~
-m%<script type="application/init">\s*\{"sslHost":"https://authssl.example.com/authssl"\}\s*</script>%s,
-        ' SSL AJAX URL found'
-    ) or print STDERR Dumper( $res->[2]->[0] );
+    is(
+        getJsVars($res)->{sslHost},
+        "https://authssl.example.com/authssl",
+        "Found sslHost"
+    );
     ok( $res->[2]->[0] =~ qr%<img src="/static/common/modules/SSL.png"%,
         'Found 5_ssl Logo' )
       or print STDERR Dumper( $res->[2]->[0] );

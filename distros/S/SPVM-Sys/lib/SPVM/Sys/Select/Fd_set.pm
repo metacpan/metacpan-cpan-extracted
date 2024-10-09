@@ -8,7 +8,7 @@ SPVM::Sys::Select::Fd_set - fd_set structure in C Language
 
 =head1 Description
 
-The Sys::Select::Fd_set class in L<SPVM> represents L<fd_set|https://linux.die.net/man/2/select> structure in the C language.
+Sys::Select::Fd_set class in L<SPVM> represents L<fd_set|https://linux.die.net/man/2/select> structure in the C language.
 
 =head1 Usage
 

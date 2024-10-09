@@ -13,7 +13,7 @@ use JSON;
 use Lemonldap::NG::Common::Apache::Session;
 use Lemonldap::NG::Common::Apache::Session::Generate::SHA256;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 # Export method needed to handle hashed storage
 our @EXPORT = qw(id2storage hashedKinds reHashedKinds);
@@ -184,7 +184,7 @@ sub BUILD {
         if ( $self->kind and $data->{_session_kind} ) {
             unless ( $data->{_session_kind} eq $self->kind ) {
                 $self->error(
-                    "Session kind mismatch : $data->{_session_kind} is not "
+                    "Session kind mismatch: $data->{_session_kind} is not "
                       . $self->kind );
                 return undef;
             }

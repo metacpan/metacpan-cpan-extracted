@@ -2,6 +2,7 @@ package Lemonldap::NG::Portal::Register::AD;
 
 use strict;
 use Mouse;
+use Encode;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_LDAPERROR
@@ -18,10 +19,12 @@ sub createUser {
       ucfirst $req->data->{registerInfo}->{firstname} . " "
       . uc $req->data->{registerInfo}->{lastname};
 
-    my $sn = uc $req->data->{registerInfo}->{lastname};
-    my $gn = ucfirst $req->data->{registerInfo}->{firstname};
+    my $sn       = uc $req->data->{registerInfo}->{lastname};
+    my $gn       = ucfirst $req->data->{registerInfo}->{firstname};
+    my $password = $req->data->{registerInfo}->{password};
     utf8::decode($sn);
     utf8::decode($gn);
+    utf8::decode($password);
     my $mesg = $self->ldap->add(
         "cn=$name," . $self->conf->{ldapBase},
         attrs => [
@@ -30,10 +33,8 @@ sub createUser {
             cn             => $name,
             sn             => $sn,
             givenName      => $gn,
-            unicodePwd     => utf8(
-                chr(34) . $req->data->{registerInfo}->{password} . chr(34)
-            )->utf16le(),
-            mail => $req->data->{registerInfo}->{mail},
+            unicodePwd => encode( "UTF-16LE", chr(34) . $password . chr(34) ),
+            mail       => $req->data->{registerInfo}->{mail},
         ]
     );
 

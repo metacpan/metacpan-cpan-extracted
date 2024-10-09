@@ -84,7 +84,7 @@ ok(
     'Post user/password'
 );
 count(2);
-expectRedirection( $res, 'http://auth.sp.com' );
+expectRedirection( $res, 'http://auth.sp.com/' );
 $spId = expectCookie($res);
 
 # Test other REST queries
@@ -340,7 +340,7 @@ sub issuer {
             ini => {
                 logLevel          => $debug,
                 domain            => 'idp.com',
-                portal            => 'http://auth.idp.com',
+                portal            => 'http://auth.idp.com/',
                 authentication    => 'Demo',
                 userDB            => 'Same',
                 restSessionServer => 1,
@@ -355,7 +355,7 @@ sub sp {
             ini => {
                 logLevel         => $debug,
                 domain           => 'sp.com',
-                portal           => 'http://auth.sp.com',
+                portal           => 'http://auth.sp.com/',
                 authentication   => 'Proxy',
                 userDB           => 'Same',
                 proxyAuthService => 'http://auth.idp.com',

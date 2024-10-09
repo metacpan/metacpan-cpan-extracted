@@ -274,7 +274,12 @@ sub checkFindByProviderId {
     my $result = from_json( $res->[2]->[0] );
     my $gotProviderId;
     if ( $providerIdName eq 'entityId' ) {
-        ($gotProviderId) = $result->{metadata} =~ m/entityID=['"](.+?)['"]/i;
+        if ( $result->{metadata} ) {
+            ($gotProviderId) =
+              $result->{metadata} =~ m/entityID=['"](.+?)['"]/i;
+        }
+        $gotProviderId ||= $result->{options}->{federationEntityID};
+
     }
     elsif ( $providerIdName eq 'serviceUrl' ) {
         $gotProviderId = shift @{ $result->{options}->{service} };
@@ -517,6 +522,24 @@ my $samlSp = {
     }
 };
 
+my $fedSamlSp = {
+    confKey            => 'myFedSamlSp1',
+    exportedAttributes => {
+        given_name => {
+            mandatory => "false",
+            name      => "givenName"
+        }
+    },
+    macros => {
+        given_name => '$givenName',
+    },
+    options => {
+        checkSLOMessageSignature => 0,
+        encryptionMode           => "assertion",
+        federationEntityID       => "https://myapp.domain.com/saml/metadata",
+    }
+};
+
 $test = "SamlSp -  Add should succeed";
 checkAdd( $test, 'saml/sp', $samlSp );
 checkGet( $test, 'saml/sp', 'mySamlSp1',
@@ -629,6 +652,17 @@ checkFindByProviderId( $test, 'saml/sp', 'entityId',
 $test = "SamlSp -  FindByEntityId should find nothing";
 checkFindByProviderIdNotFound( $test, 'saml/sp', 'entityId',
     'https://myapp3.domain.com/saml/metadata' );
+
+$test = "FederatedSalmSp - Add";
+checkAddFailsIfExists( $test, 'saml/sp', $fedSamlSp );
+$fedSamlSp->{options}->{federationEntityID} = "http://fed.example.com/";
+checkAdd( $test, 'saml/sp', $fedSamlSp );
+checkGet( $test, 'saml/sp', 'myFedSamlSp1',
+    'options/encryptionMode', 'assertion' );
+checkGet( $test, 'saml/sp', 'myFedSamlSp1',
+    'options/federationEntityID', 'http://fed.example.com/' );
+checkFindByProviderId( $test, 'saml/sp', 'entityId',
+    'http://fed.example.com/' );
 
 $test = "SamlSp -  Clean up";
 checkDelete( $test, 'saml/sp', 'mySamlSp1' );

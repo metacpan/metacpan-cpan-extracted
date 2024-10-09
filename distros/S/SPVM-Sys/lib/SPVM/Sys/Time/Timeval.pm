@@ -8,7 +8,7 @@ SPVM::Sys::Time::Timeval - struct timeval in the C language
 
 =head1 Description
 
-The Sys::Time::Timeval class in L<SPVM> represents L<struct timeval|https://linux.die.net/man/2/gettimeofday> in the C language.
+Sys::Time::Timeval class in L<SPVM> represents L<struct timeval|https://linux.die.net/man/2/gettimeofday> in the C language.
 
 =head1 Usage
   

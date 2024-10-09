@@ -150,7 +150,7 @@ SKIP: {
         );
 
         # Verify authentication on SP
-        expectRedirection( $res, 'http://auth.sp.com' );
+        expectRedirection( $res, 'http://auth.sp.com/' );
         my $spId      = expectCookie($res);
         my $rawCookie = getHeader( $res, 'Set-Cookie' );
         ok( $rawCookie =~ /;\s*SameSite=None/, 'Found SameSite=None' );
@@ -215,7 +215,7 @@ sub issuer {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
-                portal                 => 'http://auth.idp.com',
+                portal                 => 'http://auth.idp.com/',
                 authentication         => 'Demo',
                 userDB                 => 'Same',
                 globalLogoutRule       => 1,
@@ -262,7 +262,7 @@ sub sp {
             ini => {
                 logLevel          => $debug,
                 domain            => 'sp.com',
-                portal            => 'http://auth.sp.com',
+                portal            => 'http://auth.sp.com/',
                 authentication    => 'Choice',
                 userDB            => 'Same',
                 authChoiceModules => {

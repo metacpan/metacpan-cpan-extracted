@@ -25,7 +25,7 @@ require DynaLoader;
  
 @ISA = qw(Exporter DynaLoader);
 
-$VERSION = '1.2';
+our $VERSION = '1.3'; # VERSION
  
 #RCS/CVS Version
 my($RCSVERSION) = do {
@@ -456,5 +456,9 @@ Computations on dates that exceed the maximum value will wrap
 around. (i.e. the day after '20380119' is '19011214'). Computations
 that exceed the minimum value will result in the minimum
 value. (i.e. the day before '19011213' is '19011213')
+
+=head1 BUGS and Issues
+
+Please report bugs and issues at https://github.com/Perl-Date-Business/perl-date-business.
 
 =cut

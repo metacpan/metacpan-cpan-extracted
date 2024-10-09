@@ -18,11 +18,6 @@ is( $res->[0],         200, "Reload returned 200" );
 is( $counter->counter, 1,   "Reload handler was called" );
 count(4);
 
-ok( $res = $client->_get('/status'), 'Status query' );
-is( $res->[0], 200, "Status returned 200" );
-like( $res->[2]->[0], qr/Lemonldap::NG statistics/ );
-count(3);
-
 # Unauthentified query
 # --------------------
 ok( $res = $client->_get('/'), 'Unauthentified query' );

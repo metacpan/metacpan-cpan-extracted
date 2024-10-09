@@ -18,13 +18,13 @@ displayError = (j, status, err) ->
 		console.log 'Returned error', res
 		setMsg res, 'danger'
 
-webAuthnError = (error) ->
-	switch (error.name)
-		when 'unsupported' then setMsg 'webAuthnUnsupported', 'warning'
-		else setMsg 'webAuthnBrowserFailed', 'danger'
 
 # Registration function (launched by "register" button)
 register = ->
+	if !webauthnJSON.supported()
+		setMsg 'webAuthnUnsupported', 'warning'
+		return
+
 	# 1 get registration token
 	$.ajax
 		type: "POST",
@@ -34,13 +34,13 @@ register = ->
 		error: displayError
 		success: (ch) ->
 			# 2 build response
-			request = ch.request 
+			request = {publicKey: ch.request}
 			e = jQuery.Event( "webauthnRegistrationAttempt" )
 			$(document).trigger e
 			if !e.isDefaultPrevented()
 				setMsg 'webAuthnRegisterInProgress', 'warning'
 				$('#u2fPermission').show()
-				WebAuthnUI.WebAuthnUI.createCredential request
+				webauthnJSON.create request
 				. then (response) ->
 					e = jQuery.Event( "webauthnRegistrationSuccess" )
 					$(document).trigger e, [ response ]
@@ -68,10 +68,14 @@ register = ->
 					e = jQuery.Event( "webauthnRegistrationFailure" )
 					$(document).trigger e, [ error ]
 					if !e.isDefaultPrevented()
-						webAuthnError(error)
+						setMsg 'webAuthnBrowserFailed', 'danger'
 
 # Verification function (launched by "verify" button)
 verify = ->
+
+	if !webauthnJSON.supported()
+		setMsg 'webAuthnUnsupported', 'warning'
+		return
 	# 1 get challenge
 	$.ajax
 		type: "POST",
@@ -81,9 +85,9 @@ verify = ->
 		error: displayError
 		success: (ch) ->
 			# 2 build response
-			request = ch.request
+			request = {publicKey: ch.request}
 			setMsg 'webAuthnBrowserInProgress', 'warning'
-			WebAuthnUI.WebAuthnUI.getCredential request
+			webauthnJSON.get request
 			. then (response) ->
 				$.ajax
 					type: "POST"
@@ -99,7 +103,7 @@ verify = ->
 							setMsg 'yourKeyIsVerified', 'positive'
 					error: displayError
 			. catch (error) ->
-				webAuthnError(error)
+				setMsg 'webAuthnBrowserFailed', 'danger'
 
 # Register "click" events
 $(document).ready ->

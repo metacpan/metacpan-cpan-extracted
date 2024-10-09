@@ -37,12 +37,16 @@ lib/URI/file/QNX.pm
 lib/URI/file/Unix.pm
 lib/URI/file/Win32.pm
 lib/URI/ftp.pm
+lib/URI/ftpes.pm
+lib/URI/ftps.pm
 lib/URI/geo.pm
 lib/URI/gopher.pm
 lib/URI/http.pm
 lib/URI/https.pm
 lib/URI/icap.pm
 lib/URI/icaps.pm
+lib/URI/irc.pm
+lib/URI/ircs.pm
 lib/URI/ldap.pm
 lib/URI/ldapi.pm
 lib/URI/ldaps.pm
@@ -57,6 +61,7 @@ lib/URI/rlogin.pm
 lib/URI/rsync.pm
 lib/URI/rtsp.pm
 lib/URI/rtspu.pm
+lib/URI/scp.pm
 lib/URI/sftp.pm
 lib/URI/sip.pm
 lib/URI/sips.pm
@@ -78,6 +83,8 @@ t/escape-char.t
 t/escape.t
 t/file.t
 t/ftp.t
+t/ftpes.t
+t/ftps.t
 t/generic.t
 t/geo_basic.t
 t/geo_construct.t
@@ -88,6 +95,8 @@ t/http.t
 t/icap.t
 t/idna.t
 t/ipv6.t
+t/irc.t
+t/ircs.t
 t/iri.t
 t/ldap.t
 t/mailto.t
@@ -116,11 +125,14 @@ t/roytest5.html
 t/rsync.t
 t/rtsp.t
 t/scheme-exceptions.t
+t/scp.t
+t/sftp.t
 t/sip.t
 t/sort-hash-query-form.t
 t/split.t
 t/sq-brackets-legacy.t
 t/sq-brackets.t
+t/ssh.t
 t/storable-test.pl
 t/storable.t
 t/urn-isbn.t

@@ -36,7 +36,7 @@ int32_t SPVM__Sys__IO__Dirent__d_name(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Dirent__d_reclen(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(__CYGWIN__)
-  env->die(env, stack, "d_reclen is not supported in this system(defined(__CYGWIN__)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::IO::Dirent#d_reclen method is not supported in this system(defined(__CYGWIN__)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   
@@ -52,7 +52,7 @@ int32_t SPVM__Sys__IO__Dirent__d_reclen(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Dirent__d_type(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "d_type is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::IO::Dirent#d_type method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   
@@ -68,13 +68,13 @@ int32_t SPVM__Sys__IO__Dirent__d_type(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__Dirent__d_off(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "d_off is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::IO::Dirent#d_off method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #elif defined(__CYGWIN__)
-  env->die(env, stack, "d_off is not supported in this system(defined(__CYGWIN__)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::IO::Dirent#d_off method is not supported in this system(defined(__CYGWIN__)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #elif defined(__APPLE__)
-  env->die(env, stack, "d_off is not supported in this system(defined(__APPLE__)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::IO::Dirent#d_off method is not supported in this system(defined(__APPLE__)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_dirent = stack[0].oval;

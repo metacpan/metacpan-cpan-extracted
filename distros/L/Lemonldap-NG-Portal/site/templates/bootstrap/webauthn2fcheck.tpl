@@ -17,13 +17,6 @@
   <script type="application/init">
   <TMPL_VAR NAME="DATA">
   </script>
-<!-- //if:jsminified
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/webauthn-ui.min.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/webauthncheck.min.js"></script>
-//else -->
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/webauthn-ui.js"></script>
-  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">/common/js/webauthncheck.js"></script>
-<!-- //endif -->
 </TMPL_IF>
 
 </div>

@@ -88,6 +88,7 @@
       "^/logout": "logout_sso",
       "^/test-restricted_uri": "varIsInUri($ENV{REQUEST_URI}, '/test-restricted_uri/', \"$uid/\", 1)",
       "^/deny": "deny",
+      "^/level3": "$authenticationLevel>2",
       "default": "accept"
     },
     "test2.example.com": {

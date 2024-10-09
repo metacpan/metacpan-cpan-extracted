@@ -90,7 +90,7 @@ int32_t SPVM__Sys__Time__gettimeofday(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = gettimeofday(st_tv, st_tz);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]gettimeofday failed:%s.", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]gettimeofday() failed:%s.", env->strerror_nolen(env, stack, errno), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -104,7 +104,7 @@ int32_t SPVM__Sys__Time__clock(SPVM_ENV* env, SPVM_VALUE* stack) {
   int64_t cpu_time = clock();
   
   if (cpu_time == -1) {
-    env->die(env, stack, "[System Error]clock failed:%s.", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]clock() failed:%s.", env->strerror_nolen(env, stack, errno), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -130,7 +130,7 @@ int32_t SPVM__Sys__Time__clock_gettime(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = clock_gettime(clk_id, st_tp);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]clock_gettime failed:%s.", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]clock_gettime() failed:%s.", env->strerror_nolen(env, stack, errno), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -150,13 +150,13 @@ int32_t SPVM__Sys__Time__clock_getres(SPVM_ENV* env, SPVM_VALUE* stack) {
     st_res = env->get_pointer(env, stack, obj_res);
   }
   else {
-    return env->die(env, stack, "$res must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The resolution time $res must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   int32_t status = clock_getres(clk_id, st_res);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]clock_getres failed:%s.", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]clock_getres() failed:%s.", env->strerror_nolen(env, stack, errno), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -167,7 +167,7 @@ int32_t SPVM__Sys__Time__clock_getres(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__setitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "getitimer is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::User#getitimer method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   
@@ -179,7 +179,7 @@ int32_t SPVM__Sys__Time__setitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
     st_new_value = env->get_pointer(env, stack, obj_new_value);
   }
   else {
-    return env->die(env, stack, "$new_value must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The new timer $new_value must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   void* obj_old_value = stack[1].oval;
@@ -191,7 +191,7 @@ int32_t SPVM__Sys__Time__setitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = setitimer(which, st_new_value, st_old_value);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]setitimer failed:%s.", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]setitimer() failed:%s.", env->strerror_nolen(env, stack, errno), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -203,7 +203,7 @@ int32_t SPVM__Sys__Time__setitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__getitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "getitimer is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::User#getitimer method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   
@@ -222,7 +222,7 @@ int32_t SPVM__Sys__Time__getitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = getitimer(which, st_curr_value);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]getitimer failed:%s.", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]getitimer() failed:%s.", env->strerror_nolen(env, stack, errno), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -234,7 +234,7 @@ int32_t SPVM__Sys__Time__getitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__times(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "times is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::User#times method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   void* obj_tms = stack[0].oval;
@@ -249,7 +249,7 @@ int32_t SPVM__Sys__Time__times(SPVM_ENV* env, SPVM_VALUE* stack) {
   int64_t clock_tick = times(st_tms);
   
   if (errno != 0) {
-    env->die(env, stack, "[System Error]times failed:%s.", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]times() failed:%s.", env->strerror_nolen(env, stack, errno), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -261,13 +261,13 @@ int32_t SPVM__Sys__Time__times(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__clock_nanosleep(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef __APPLE__
-  env->die(env, stack, "clock_nanosleep is not supported in this system(__APPLE__).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::User#clock_nanosleep method is not supported in this system(__APPLE__).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #elif __FreeBSD__ && !(__FreeBSD__ >= 13)
-  env->die(env, stack, "clock_nanosleep is not supported in this system(__FreeBSD__ && !(__FreeBSD__ >= 13)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::User#clock_nanosleep method is not supported in this system(__FreeBSD__ && !(__FreeBSD__ >= 13)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #elif __OpenBSD__
-  env->die(env, stack, "clock_nanosleep is not supported in this system(__OpenBSD__).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::User#clock_nanosleep method is not supported in this system(__OpenBSD__).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   
@@ -282,7 +282,7 @@ int32_t SPVM__Sys__Time__clock_nanosleep(SPVM_ENV* env, SPVM_VALUE* stack) {
     st_request = env->get_pointer(env, stack, obj_request);
   }
   else {
-    return env->die(env, stack, "$request must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The request time $request must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   void* obj_remain = stack[3].oval;
@@ -295,7 +295,7 @@ int32_t SPVM__Sys__Time__clock_nanosleep(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t ret_errno = clock_nanosleep(clockid, flags, st_request, st_remain);
   
   if (ret_errno != 0) {
-    env->die(env, stack, "[System Error]clock_nanosleep failed:%s.", env->strerror(env, stack, ret_errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]clock_nanosleep() failed:%s.", env->strerror(env, stack, ret_errno, 0), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -314,7 +314,7 @@ int32_t SPVM__Sys__Time__nanosleep(SPVM_ENV* env, SPVM_VALUE* stack) {
     st_rqtp = env->get_pointer(env, stack, obj_rqtp);
   }
   else {
-    return env->die(env, stack, "$rqtp must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The request time $rqtp must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   void* obj_rmtp = stack[1].oval;
@@ -327,7 +327,7 @@ int32_t SPVM__Sys__Time__nanosleep(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = nanosleep(st_rqtp, st_rmtp);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]nanosleep failed:%s.", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]nanosleep() failed:%s.", env->strerror_nolen(env, stack, errno), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -342,7 +342,7 @@ int32_t SPVM__Sys__Time__utime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_filename = stack[0].oval;
   if (!obj_filename) {
-    return env->die(env, stack, "$filename must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The file path $filename must be defined.", __func__, FILE_NAME, __LINE__);
   }
   const char* filename = env->get_chars(env, stack, obj_filename);
 
@@ -357,7 +357,7 @@ int32_t SPVM__Sys__Time__utime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t status = utime(filename, st_times);
   if (status == -1) {
-    env->die(env, stack, "[System Error]utime failed:%s. The access and modification times of the \"%s\" file can't be changed", env->strerror(env, stack, errno, 0), filename, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]utime() failed:%s. $filename is \"%s\".", env->strerror_nolen(env, stack, errno), filename, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
@@ -368,27 +368,27 @@ int32_t SPVM__Sys__Time__utime(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__utimes(SPVM_ENV* env, SPVM_VALUE* stack) {
 #if defined(_WIN32)
-  env->die(env, stack, "utimes is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "Sys::User#utimes method is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #else
   int32_t error_id = 0;
   
   void* obj_filename = stack[0].oval;
   if (!obj_filename) {
-    return env->die(env, stack, "$filename must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The file path $filename must be defined.", __func__, FILE_NAME, __LINE__);
   }
   const char* filename = env->get_chars(env, stack, obj_filename);
   
   void* obj_times = stack[1].oval;
   
   if (!obj_times) {
-    return env->die(env, stack, "$times must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The utime infomation $times must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   int32_t times_length = env->length(env, stack, obj_times);
   
   if (!(times_length == 2)) {
-    return env->die(env, stack, "The length of $times must be 2.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The length of the utime infomation $times must be 2.", __func__, FILE_NAME, __LINE__);
   }
   
   void* obj_times0 = env->get_elem_object(env, stack, obj_times, 0);
@@ -402,7 +402,7 @@ int32_t SPVM__Sys__Time__utimes(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = utimes(filename, times);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]utimes failed:%s.", env->strerror(env, stack, errno, 0), filename, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]utimes() failed:%s.", env->strerror_nolen(env, stack, errno), filename, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   

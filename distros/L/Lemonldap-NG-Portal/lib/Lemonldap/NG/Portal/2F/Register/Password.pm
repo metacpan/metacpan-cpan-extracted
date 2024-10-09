@@ -2,6 +2,7 @@
 package Lemonldap::NG::Portal::2F::Register::Password;
 
 use strict;
+use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
 use Mouse;
 use JSON qw(from_json to_json);
 use Lemonldap::NG::Common::Crypto;
@@ -47,111 +48,68 @@ has crypto => (
     }
 );
 
-sub run {
-    my ( $self, $req, $action ) = @_;
+use constant supportedActions => {
+    verify => "verify",
+    delete => "delete",
+};
+
+# Verification that user has a valid password
+sub verify {
+    my ( $self, $req ) = @_;
     my $user = $req->userData->{ $self->conf->{whatToTrace} };
-    return $self->p->sendError( $req, 'PE82', 400 )
-      unless $user;
 
-    # Verification that user has a valid password
-    if ( $action eq 'verify' ) {
+    # Check Password
+    my $password       = $req->param('password');
+    my $passwordverify = $req->param('passwordverify');
 
-        # Check Password
-        my $password       = $req->param('password');
-        my $passwordverify = $req->param('passwordverify');
+    unless ( $password and $passwordverify ) {
+        return $self->failResponse( $req, 'missingPassword', 200 );
+    }
 
-        unless ( $password and $passwordverify ) {
-            $self->userLogger->info(
-                $self->prefix . "2f: registration -> empty validation form" );
-            return $self->p->sendError( $req, 'missingPassword', 200 );
-        }
+    # Invalid try is returned with a 200 code. Javascript will read error
+    # and propose to retry
+    if ( $password ne $passwordverify ) {
+        return $self->failResponse( $req, 'PE34', 200 );
+    }
+    $self->logger->debug( $self->prefix . '2f: code verified' );
 
-        # Invalid try is returned with a 200 code. Javascript will read error
-        # and propose to retry
-        if ( $password ne $passwordverify ) {
-            $self->userLogger->notice( $self->prefix
-                  . "2f: registration -> password verification failed for $user"
-            );
-            return $self->p->sendError( $req, 'PE34', 200 );
-        }
-        $self->logger->debug( $self->prefix . '2f: code verified' );
+    # Now password is verified, let's store it in persistent data
+    my $secret = $self->crypto->encrypt($password);
 
-        # Now password is verified, let's store it in persistent data
-        my $secret = $self->crypto->encrypt($password);
+    # Reading existing 2F passwords
+    my @password2f =
+      $self->find2fDevicesByType( $req, $req->userData, $self->type );
 
-        # Reading existing 2F passwords
-        my @password2f =
-          $self->find2fDevicesByType( $req, $req->userData, $self->type );
-
-        # Delete previous password if any
-        if (@password2f) {
-            if ( $self->del2fDevices( $req, $req->userData, \@password2f ) ) {
-                $self->logger->debug(
-                    $self->prefix . "2f: old password(s) deleted" );
-            }
-            else {
-                $self->logger->error(
-                    $self->prefix . "2f: unable to delete old password(s)" );
-                return $self->p->sendError( $req, 'serverError' );
-            }
-        }
-
-        # Add a new one
-        if (
-            $self->add2fDevice(
-                $req,
-                $req->userData,
-                {
-                    _secret => $secret,
-                    name    => 'password',
-                    type    => $self->type,
-                    epoch   => time()
-                }
-            )
-          )
-        {
-            $self->markRegistered($req);
-            return [
-                200,
-                [
-                    'Content-Type'   => 'application/json',
-                    'Content-Length' => 12,
-                ],
-                ['{"result":1}']
-            ];
+    # Delete previous password if any
+    if (@password2f) {
+        if ( $self->del2fDevices( $req, $req->userData, \@password2f ) ) {
+            $self->logger->debug(
+                $self->prefix . "2f: old password(s) deleted" );
         }
         else {
-            $self->logger->debug(
-                $self->prefix . "2f: unable to add password" );
-            return $self->p->sendError( $req, 'serverError' );
+            $self->logger->error(
+                $self->prefix . "2f: unable to delete old password(s)" );
+            return $self->failResponse( $req, 'serverError' );
         }
     }
-    elsif ( $action eq 'delete' ) {
 
-        # Check if unregistration is allowed
-        return $self->p->sendError( $req, 'notAuthorized', 400 )
-          unless $self->conf->{password2fUserCanRemoveKey};
-
-        my $epoch = $req->param('epoch')
-          or return $self->p->sendError( $req,
-            $self->prefix . '2f: "epoch" parameter is missing', 400 );
-
-        if ( $self->del2fDevice( $req, $req->userData, $self->type, $epoch ) ) {
-            $self->userLogger->notice(
-                $self->prefix . "2f: password deleted for $user" );
-            return [
-                200,
-                [
-                    'Content-Type'   => 'application/json',
-                    'Content-Length' => 12,
-                ],
-                ['{"result":1}']
-            ];
+    # Add a new one
+    my $res = $self->registerDevice(
+        $req,
+        $req->userData,
+        {
+            _secret => $secret,
+            name    => 'password',
+            type    => $self->type,
+            epoch   => time()
         }
+    );
+    if ( $res == PE_OK ) {
+        return $self->successResponse( $req, { result => 1 } );
     }
     else {
-        $self->logger->error( $self->prefix . "2f: unknown action ($action)" );
-        return $self->p->sendError( $req, 'unknownAction', 400 );
+        $self->logger->error( $self->prefix . "2f: unable to add password" );
+        return $self->failResponse( $req, "PE$res" );
     }
 }
 

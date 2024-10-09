@@ -99,7 +99,7 @@ sub run {
     $self->confAccess()->lastCfg() unless ( $self->cfgNum );
     my $action = shift;
     unless ( $action =~ /^(?:info|update-cache|test-email)$/ ) {
-        die "unknown action $action. Only info or update are accepted";
+        die "unknown action $action";
     }
     $action =~ s/\-([a-z])/uc($1)/e;
     $self->$action(@_);

@@ -8,7 +8,7 @@ SPVM::Sys::Socket::AddrinfoLinkedList - Linked List of struct addrinfo in the C 
 
 =head1 Description
 
-The Sys::Socket::AddrinfoLinkedList class in L<SPVM> represents the linked list of L<struct addrinfo|https://linux.die.net/man/3/getaddrinfo> in the C language.
+Sys::Socket::AddrinfoLinkedList class in L<SPVM> represents the linked list of L<struct addrinfo|https://linux.die.net/man/3/getaddrinfo> in the C language.
 
 =head1 Usage
 

@@ -10,7 +10,7 @@ SPVM::Sys::Time::Util - Time Utilities
 
 =head1 Description
 
-The Sys::Time::Util class in L<SPVM> has utility methods to manipulate time.
+Sys::Time::Util class in L<SPVM> has utility methods to manipulate time.
 
 =head1 Usage
 

@@ -241,3 +241,6 @@ div.input-group > p.form-control > label {
   display: none;
 }
 
+.renewcaptchaclick {
+    cursor: pointer;
+}

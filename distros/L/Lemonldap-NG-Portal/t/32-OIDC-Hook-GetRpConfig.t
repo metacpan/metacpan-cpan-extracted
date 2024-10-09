@@ -187,7 +187,7 @@ sub op {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
-                portal                          => 'http://auth.op.com',
+                portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => 1,
@@ -207,4 +207,3 @@ sub plugin {
 
 clean_sessions();
 done_testing();
-

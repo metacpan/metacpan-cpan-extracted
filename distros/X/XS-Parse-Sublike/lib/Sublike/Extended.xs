@@ -14,6 +14,7 @@ static struct XSParseSublikeHooks hooks_extended = {
   .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "Sublike::Extended/extended",
   .flags = XS_PARSE_SUBLIKE_FLAG_PREFIX|
+    XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL|
     XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS|
     XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES,
 

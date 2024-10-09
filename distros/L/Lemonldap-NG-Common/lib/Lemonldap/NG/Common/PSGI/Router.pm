@@ -138,8 +138,15 @@ sub handler {
     if ( !@path and $self->defaultRoute ) {
         @path = ( $self->defaultRoute );
     }
+    my $head = 0;
+    my $method = $req->method;
+    if ( $method eq 'HEAD' ) {
+        $head = 1;
+        $method = 'GET';
+    }
     my $res =
-      $self->followPath( $req, $self->routes->{ $req->method }, \@path );
+      $self->followPath( $req, $self->routes->{ $method }, \@path );
+    if ( $res and $head ) { $res->[2] = undef }
     return $res ? $res : $self->sendError( $req, 'Bad request', 400 );
 }
 

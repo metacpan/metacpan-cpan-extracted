@@ -96,7 +96,7 @@ sub storeEnvAndCheckGateway {
     my ( $self, $req ) = @_;
     my $service = $self->p->getHiddenFormValue( $req, 'service' )
       || $req->param('service');
-    $service = '' if ( $self->p->checkXSSAttack( 'service', $service ) );
+    $service = '' if ( $self->p->checkXSSAttackUrldc( 'service', $service ) );
     my $gateway = $self->p->getHiddenFormValue( $req, 'gateway' )
       || $req->param('gateway');
 
@@ -203,7 +203,7 @@ sub run {
         ) if ( $h != PE_OK );
 
         my $service = $cas_request->{service};
-        $service = '' if ( $self->p->checkXSSAttack( 'service', $service ) );
+        $service = '' if ( $self->p->checkXSSAttackUrldc( 'service', $service ) );
         my $renew   = $cas_request->{renew};
         my $gateway = $cas_request->{gateway};
 
@@ -339,19 +339,17 @@ sub run {
         $self->logger->debug(
             "CAS service session $casServiceSessionID created");
 
+        my $user = $req->sessionInfo->{ $self->conf->{whatToTrace} };
         $self->auditLog(
             $req,
             code => "ISSUER_CAS_LOGIN_SUCCESS",
             ( $app ? ( app => $app ) : () ),
             service => $service,
+            user    => $user,
             message => (
                 $app
-                ? ( 'User '
-                      . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-                      . " is authorized to access to $app" )
-                : (     'User '
-                      . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-                      . " is redirected to $service" )
+                ? ("User $user is authorized to access to $app")
+                : ("User $user is redirected to $service")
             ),
         );
 
@@ -372,7 +370,7 @@ sub run {
         my $logout_url     = $req->param('url');        # CAS 2.0
         my $logout_service = $req->param('service');    # CAS 3.0
         $logout_service = ''
-          if ( $self->p->checkXSSAttack( 'service', $logout_service ) );
+          if ( $self->p->checkXSSAttackUrldc( 'service', $logout_service ) );
 
         # If we use access control, check that the service URL is trusted
         if ( $self->conf->{casAccessControlPolicy} =~ /^(error|faketicket)$/i )
@@ -510,23 +508,23 @@ sub validate {
 
     # Required parameters: service and ticket
     unless ( $service and $ticket ) {
-        $self->logger->error("Service and Ticket parameters required");
-        return $self->returnCasValidateError();
+        return $self->_failValidate( $req,
+            msg => "Service and Ticket parameters required" );
     }
 
     $self->logger->debug(
         "Get validate request with ticket $ticket for service $service");
 
     unless ( $ticket =~ s/^ST-// ) {
-        $self->logger->error("Provided ticket is not a service ticket (ST)");
-        return $self->returnCasValidateError();
+        return $self->_failValidate( $req,
+            msg => "Provided ticket is not a service ticket (ST)" );
     }
 
     my $casServiceSession = $self->getCasSession($ticket);
 
     unless ($casServiceSession) {
-        $self->logger->error("Service ticket session $ticket not found");
-        return $self->returnCasValidateError();
+        return $self->_failValidate( $req,
+            msg => "Service ticket session $ticket not found" );
     }
 
     # Make sure the token is still valid, we already compensated for
@@ -536,8 +534,8 @@ sub validate {
             time >
             ( $casServiceSession->{data}->{_utime} + $self->conf->{timeout} ) )
         {
-            $self->logger->error("Session $ticket has expired");
-            return $self->returnCasValidateError();
+            return $self->_failValidate( $req,
+                msg => "Session $ticket has expired" );
         }
     }
 
@@ -559,11 +557,11 @@ sub validate {
                   . ' but difference is tolerated.' );
         }
         else {
-            $self->logger->error(
-                "Submitted service $service does not match initial service "
-                  . $casServiceSession->data->{service} );
             $self->deleteCasSession($casServiceSession);
-            return $self->returnCasValidateError();
+            return $self->_failValidate( $req,
+                msg =>
+                  "Submitted service $service does not match initial service "
+                  . $casServiceSession->data->{service} );
         }
     }
     else {
@@ -577,10 +575,10 @@ sub validate {
         $self->logger->debug("Renew flag detected ");
 
         unless ( $casServiceSession->data->{renew} ) {
-            $self->logger->error( "Authentication renew requested,"
-                  . " but not done in former authentication process" );
             $self->deleteCasSession($casServiceSession);
-            return $self->returnCasValidateError();
+            return $self->_failValidate( $req,
+                msg => "Authentication renew requested,"
+                  . " but not done in former authentication process" );
         }
     }
 
@@ -589,11 +587,11 @@ sub validate {
       $self->p->getApacheSession( $casServiceSession->data->{_cas_id} );
 
     unless ($localSession) {
-        $self->logger->warn( "Local session "
+        $self->deleteCasSession($casServiceSession);
+        return $self->_failValidate( $req,
+                msg => "Local session "
               . $casServiceSession->data->{_cas_id}
               . " notfound" );
-        $self->deleteCasSession($casServiceSession);
-        return $self->returnCasValidateError();
     }
 
     # Get username
@@ -612,7 +610,27 @@ sub validate {
 
     my $h =
       $self->p->processHook( $req, 'casGenerateValidateResponse', $username );
-    return $self->returnCasValidateError() if ( $h != PE_OK );
+    return $self->_failValidate(
+        $req,
+        res => $h,
+        msg => "casGenerateValidateResponse hook failed",
+        app => $app
+    ) if ( $h != PE_OK );
+
+    my $user   = $localSession->data->{ $self->conf->{whatToTrace} };
+    my $by_app = $app ? " by $app" : "";
+
+    $req->sessionInfo( $localSession->data );
+
+    $self->auditLog(
+        $req,
+        code    => "ISSUER_CAS_VALIDATE_SUCCESS",
+        message =>
+          ("CAS validation succeeded for ${user}${by_app} as $username"),
+        ( $app ? ( app => $app ) : () ),
+        cas_user => $username,
+        user     => $user,
+    );
 
     return $self->returnCasValidateSuccess( $req, $username );
 }
@@ -727,8 +745,11 @@ sub _validate2 {
     # Required parameters: service and ticket
     unless ( $service and $ticket ) {
         $self->logger->error("Service and Ticket parameters required");
-        return $self->returnCasServiceValidateError( $req, 'INVALID_REQUEST',
-            'Missing mandatory parameters (service, ticket)' );
+        return $self->_failValidate2(
+            $req,
+            code => 'INVALID_REQUEST',
+            msg  => 'Missing mandatory parameters (service, ticket)'
+        );
     }
 
     $self->logger->debug( "Get "
@@ -738,22 +759,31 @@ sub _validate2 {
     # Get CAS session corresponding to ticket
     if ( $urlType eq 'SERVICE' and !( $ticket =~ s/^ST-// ) ) {
         $self->logger->error("Provided ticket is not a service ticket (ST)");
-        return $self->returnCasServiceValidateError( $req, 'INVALID_TICKET',
-            'Provided ticket is not a service ticket' );
+        return $self->_failValidate2(
+            $req,
+            code => 'INVALID_TICKET',
+            msg  => 'Provided ticket is not a service ticket'
+        );
     }
     elsif ( $urlType eq 'PROXY' and !( $ticket =~ s/^(P|S)T-// ) ) {
         $self->userLogger->error(
             "Provided ticket is not a service or proxy ticket ($1T)");
-        return $self->returnCasServiceValidateError( $req, 'INVALID_TICKET',
-            'Provided ticket is not a service or proxy ticket' );
+        return $self->_failValidate2(
+            $req,
+            code => 'INVALID_TICKET',
+            msg  => 'Provided ticket is not a service or proxy ticket'
+        );
     }
 
     my $casServiceSession = $self->getCasSession($ticket);
 
     unless ($casServiceSession) {
         $self->logger->error("$urlType ticket session $ticket not found");
-        return $self->returnCasServiceValidateError( $req, 'INVALID_TICKET',
-            'Ticket not found' );
+        return $self->_failValidate2(
+            $req,
+            code => 'INVALID_TICKET',
+            msg  => 'Ticket not found'
+        );
     }
 
     # Make sure the token is still valid, we already compensated for
@@ -764,8 +794,11 @@ sub _validate2 {
             ( $casServiceSession->{data}->{_utime} + $self->conf->{timeout} ) )
         {
             $self->logger->error("$urlType ticket session $ticket has expired");
-            return $self->returnCasServiceValidateError( $req, 'INVALID_TICKET',
-                'Ticket expired' );
+            return $self->_failValidate2(
+                $req,
+                code => 'INVALID_TICKET',
+                msg  => 'Ticket expired'
+            );
         }
     }
 
@@ -793,9 +826,12 @@ sub _validate2 {
                 "Submitted service $service does not match initial service "
                   . $casServiceSession->data->{service} );
             $self->deleteCasSession($casServiceSession);
-            return $self->returnCasServiceValidateError( $req,
-                'INVALID_SERVICE',
-                'Submitted service does not match initial service' );
+            return $self->_failValidate2(
+                $req,
+                app  => $app,
+                code => 'INVALID_SERVICE',
+                msg  => 'Submitted service does not match initial service'
+            );
         }
     }
     else {
@@ -813,7 +849,13 @@ sub _validate2 {
             $self->logger->error( "Authentication renew requested,"
                   . " but not done in former authentication process" );
             $self->deleteCasSession($casServiceSession);
-            return $self->returnCasValidateError();
+            return $self->_failValidate2(
+                $req,
+                app  => $app,
+                code => 'INVALID_TICKET',
+                msg  => 'Authentication renew requested,'
+                  . ' but not done in former authentication process'
+            );
         }
 
     }
@@ -899,12 +941,19 @@ sub _validate2 {
               . $casServiceSession->data->{_cas_id}
               . " notfound" );
         $self->deleteCasSession($casServiceSession);
-        return $self->returnCasServiceValidateError( $req, 'INTERNAL_ERROR',
-            'No session associated to ticket' );
+        return $self->_failValidate2(
+            $req,
+            app  => $app,
+            code => 'INTERNAL_ERROR',
+            msg  => 'No session associated to ticket'
+        );
     }
 
     # Get username
     my $username = $self->getUsernameForApp( $req, $app, $localSession->data );
+
+    # Useful for logging
+    $req->sessionInfo( $localSession->data );
 
     $self->logger->debug("Get username $username");
 
@@ -944,11 +993,38 @@ sub _validate2 {
             $req->param('ticket') );
     }
 
+    $self->p->registerProtectedAppAccess( $req, $username, "cas:$app" );
+
     my $h =
       $self->p->processHook( $req, 'casGenerateValidateResponse', $username,
         $attributes );
-    return $self->returnCasValidateError() if ( $h != PE_OK );
+    return $self->_failValidate2(
+        $req,
+        app  => $app,
+        code => "INTERNAL_ERROR",
+        msg  => "Internal error during request validation",
+        res  => $h,
+    ) if ( $h != PE_OK );
 
+    my $user   = $req->sessionInfo->{ $self->conf->{whatToTrace} };
+    my $by_app = $app ? " by $app" : "";
+    my $attr_str =
+        ( defined($attributes) && keys %$attributes )
+      ? ( " with attributes " . join( ',', sort( keys(%$attributes) ) ) )
+      : "";
+    $self->auditLog(
+        $req,
+        code    => "ISSUER_CAS_VALIDATE_SUCCESS",
+        message => (
+                "CAS validation succeeded for ${user}${by_app}"
+              . " as ${username}${attr_str}"
+        ),
+        ( $app ? ( app => $app ) : () ),
+        user        => $user,
+        cas_user    => $username,
+        cas_proxies => $proxies,
+        attributes  => $attributes,
+    );
     return $self->returnCasServiceValidateSuccess( $req, $username,
         $casProxyGrantingTicketIOU, $proxies, $attributes );
 }
@@ -1106,6 +1182,44 @@ sub isLogoutEnabled {
     }
 }
 
+sub _failValidate1 {
+    my ( $self, $req, %params ) = @_;
+    my $reason = $params{'msg'} ? ": $params{'msg'}" : "";
+    my $res    = $params{res} || PE_ERROR;
+    my $app    = $params{app};
+
+    $self->auditLog(
+        $req,
+        code    => "ISSUER_CAS_VALIDATE_FAILED",
+        message => ( "CAS validation failed" . $reason ),
+        ( $reason ? ( reason => $reason ) : () ),
+        ( $app    ? ( app    => $app )    : () ),
+        portal_error => portalConsts->{$res},
+    );
+
+    return $self->returnCasValidateError();
+}
+
+sub _failValidate2 {
+    my ( $self, $req, %params ) = @_;
+    my $reason = $params{'msg'} ? ": $params{'msg'}" : "";
+    my $code   = $params{'code'} || 'INTERNAL_ERROR';
+    my $res    = $params{res}    || PE_ERROR;
+    my $app    = $params{app};
+
+    $self->auditLog(
+        $req,
+        code    => "ISSUER_CAS_VALIDATE_FAILED",
+        message => ( "CAS validation failed" . $reason ),
+        ( $reason ? ( reason => $reason ) : () ),
+        ( $app    ? ( app    => $app )    : () ),
+        cas_code     => $code,
+        portal_error => portalConsts->{$res},
+    );
+
+    return $self->returnCasServiceValidateError( $req, $code, $reason );
+}
+
 sub _failLogin {
     my ( $self, $req, %params ) = @_;
     my $reason = $params{'msg'} ? ": $params{'msg'}" : "";
@@ -1128,16 +1242,13 @@ sub _failLoginRule {
     my ( $self, $req, $cas_request, $app ) = @_;
     my $casAccessControlPolicy = $self->conf->{casAccessControlPolicy};
 
+    my $user = $req->sessionInfo->{ $self->conf->{whatToTrace} };
     $self->auditLog(
         $req,
         code => "ISSUER_CAS_LOGIN_FAILED",
         ( $app ? ( app => $app ) : () ),
-        message => (
-                'User '
-              . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-              . " is not authorized to access to $app"
-        ),
-        reason => "User is not authorized by access rule",
+        message => ("User $user is not authorized to access to $app"),
+        reason  => "User is not authorized by access rule",
     );
 
     if ( $casAccessControlPolicy =~ /^(error)$/i ) {

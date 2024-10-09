@@ -1,5 +1,7 @@
 Revision history for Perl module Locale::Intl
 
+v0.1.1 2024-10-09T11:19:57+0900
+    - Minor corrections to the documentation
+
 v0.1.0 2024-10-04T19:42:10+0900
 	- Initial version
-

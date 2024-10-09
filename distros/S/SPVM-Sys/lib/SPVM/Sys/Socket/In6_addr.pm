@@ -8,7 +8,7 @@ SPVM::Sys::Socket::In6_addr - struct in6_addr in the C language
 
 =head1 Description
 
-The Sys::Socket::In6_addr class in L<SPVM> represents L<struct in6_addr|https://linux.die.net/man/7/ipv6> in the C language.
+Sys::Socket::In6_addr class in L<SPVM> represents L<struct in6_addr|https://linux.die.net/man/7/ipv6> in the C language.
 
 =head1 Usage
 

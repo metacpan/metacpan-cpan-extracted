@@ -4,12 +4,12 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Common::FormEncode;
 use POSIX qw(strftime);
-use XML::Simple;
+use Hash::MultiValue;
 use XML::LibXML;
 use Lemonldap::NG::Common::UserAgent;
 use URI;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.20.0';
 
 # PROPERTIES
 
@@ -31,6 +31,14 @@ has casAppList => ( is => 'rw', default => sub { {} }, );
 has srvRules   => ( is => 'rw', default => sub { {} }, );
 has spRules    => ( is => 'rw', default => sub { {} }, );
 has spMacros   => ( is => 'rw', default => sub { {} }, );
+
+# XML parser
+has parser => (
+    is      => 'rw',
+    builder => sub {
+        return XML::LibXML->new( load_ext_dtd => 0, expand_entities => 0 );
+    }
+);
 
 # RUNNING METHODS
 
@@ -178,16 +186,12 @@ sub getCasSession {
 sub returnCasValidateError {
     my ( $self, $req ) = @_;
 
-    $self->logger->debug("Return CAS validate error");
-
     return [ 200, [ 'Content-Length' => 4 ], ["no\n\n"] ];
 }
 
 # Return success for CAS VALIDATE request
 sub returnCasValidateSuccess {
     my ( $self, $req, $username ) = @_;
-
-    $self->logger->debug("Return CAS validate success with username $username");
 
     return $self->sendSoapResponse( $req, "yes\n$username\n" );
 }
@@ -198,8 +202,6 @@ sub returnCasServiceValidateError {
 
     $code ||= 'INTERNAL_ERROR';
     $text ||= 'No description provided';
-
-    $self->logger->debug("Return CAS service validate error $code ($text)");
 
     return $self->sendSoapResponse(
         $req, "<cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
@@ -213,9 +215,6 @@ sub returnCasServiceValidateError {
 # Return success for CAS SERVICE VALIDATE request
 sub returnCasServiceValidateSuccess {
     my ( $self, $req, $username, $pgtIou, $proxies, $attributes ) = @_;
-
-    $self->logger->debug(
-        "Return CAS service validate success with username $username");
 
     my $s = "<cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
 \t<cas:authenticationSuccess>
@@ -424,20 +423,30 @@ sub validateST {
 
     return 0 if $response->is_error;
 
-    my $xml = $response->decoded_content( default_charset => 'UTF-8' );
-    utf8::encode($xml);
-    $xml = XMLin($xml);
+    my $xml         = $response->decoded_content( default_charset => 'UTF-8' );
+    my $casResponse = $self->parser->parse_string($xml)->documentElement;
 
-    if ( defined $xml->{'cas:authenticationFailure'} ) {
+    unless ( $casResponse->nodeName eq "cas:serviceResponse" ) {
         $self->logger->error( "Failed to validate Service Ticket $ticket: "
-              . $xml->{'cas:authenticationFailure'}->{content} );
+              . "unexpected top-level XML element: "
+              . $casResponse->nodeName );
+        return 0;
+    }
+
+    if ( my $failure =
+        $casResponse->getElementsByTagName('cas:authenticationFailure') )
+    {
+        $self->logger->error( "Failed to validate Service Ticket $ticket: "
+              . $failure->string_value =~ s/\R//r );
         return 0;
     }
 
     # Get proxy data and store pgtId
     if ($proxy_url) {
         my $pgtIou =
-          $xml->{'cas:authenticationSuccess'}->{'cas:proxyGrantingTicket'};
+          $casResponse->find(
+            '//cas:authenticationSuccess/cas:proxyGrantingTicket')
+          ->string_value;
 
         if ($pgtIou) {
             my $moduleOptions;
@@ -470,24 +479,37 @@ sub validateST {
         }
     }
 
-    my $user  = $xml->{'cas:authenticationSuccess'}->{'cas:user'};
-    my $attrs = {};
-    if ( my $casAttr = $xml->{'cas:authenticationSuccess'}->{'cas:attributes'} )
+    my $user =
+      $casResponse->find('//cas:authenticationSuccess/cas:user')->string_value;
+    unless ($user) {
+        $self->logger->error(
+            "Could not extract cas:user field from XML response");
+        return 0;
+    }
+
+    my $attrs = Hash::MultiValue->new;
+    if ( my $casAttr =
+        $casResponse->find('//cas:authenticationSuccess/cas:attributes/cas:*') )
     {
-        foreach my $k ( keys %$casAttr ) {
-            my $v = $casAttr->{$k};
-            if ( ref($v) eq "ARRAY" ) {
-                $v = join( $self->conf->{multiValuesSeparator}, @$v );
+        $casAttr->foreach(
+            sub {
+                my $k = $_[0]->localname;
+                my $v = $_[0]->textContent;
+                utf8::encode($v);
+                $attrs->add( $k => $v );
             }
-            utf8::encode($v);
-            $k =~ s/^cas://;
-            $attrs->{$k} = $v;
-        }
+        );
+    }
+
+    # Flatten each list of attribute values
+    my $result = {};
+    for ( $attrs->keys ) {
+        $result->{$_} = join $self->conf->{multiValuesSeparator},
+          $attrs->get_all($_);
     }
 
     # TODO store attributes for UserDBCAS
-
-    return ( $user, $attrs );
+    return ( $user, $result );
 }
 
 # Store PGT IOU and PGT ID
@@ -519,15 +541,18 @@ sub retrievePT {
 
     return 0 if $response->is_error;
 
-    my $xml = XMLin( $response->decoded_content );
+    my $casResponse = $self->parser->parse_string( $response->decoded_content )
+      ->documentElement;
 
-    if ( defined $xml->{'cas:proxyFailure'} ) {
+    if ( my $failure = $casResponse->getElementsByTagName('cas:proxyFailure') )
+    {
         $self->logger->error(
-            "Failed to get PT: " . $xml->{'cas:proxyFailure'} );
+            "Failed to get PT: " . $failure->string_value =~ s/\R//r );
         return 0;
     }
 
-    my $pt = $xml->{'cas:proxySuccess'}->{'cas:proxyTicket'};
+    my $pt =
+      $casResponse->find('//cas:proxySuccess/cas:proxyTicket')->string_value;
 
     return $pt;
 }

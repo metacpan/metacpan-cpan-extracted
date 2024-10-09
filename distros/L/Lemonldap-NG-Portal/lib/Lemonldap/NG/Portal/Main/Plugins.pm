@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -16,7 +16,6 @@ use Mouse;
 our @pList = (
     portalDisplayResetPassword          => '::Plugins::MailPasswordReset',
     portalDisplayCertificateResetByMail => '::Plugins::CertificateResetByMail',
-    portalStatus                        => '::Plugins::Status',
     cda                                 => '::Plugins::CDA',
     notification                        => '::Plugins::Notifications',
     rememberAuthChoiceRule              => '::Plugins::RememberAuthChoice',
@@ -47,11 +46,54 @@ our @pList = (
     samlFederationFiles => '::Plugins::SamlFederation',
     'or::oidcOPMetaDataOptions/*/oidcOPMetaDataOptionsRequirePkce' =>
       '::Plugins::AuthOidcPkce',
+    'or::oidcRPMetaDataOptions/*/oidcRPMetaDataOptionsTokenXAuthorizedRP' =>
+      '::Plugins::OIDCInternalTokenExchange',
 );
 
 ##@method list enabledPlugins
 #
 #@return list of enabled plugins
+#
+# List can be:
+#  * a plugin name
+#  * an array ref containing:
+#    - the property into which the plugin has to be linked
+#    - the plugin name
+#
+# If plugin name starts with '::', the prefix Lemonldap::NG::Portal will be
+# added
+
+sub enabledServices {
+    my ($self) = @_;
+    my $conf = $self->conf;
+    my @res;
+
+    # Second factor
+    push @res, [ secondFactor => $self->conf->{'sfEngine'} ];
+
+    # Portal menu
+    push @res, [ menu         => "::Main::Menu" ];
+
+    # Trusted browser
+    if ( $self->conf->{trustedBrowserRule} or $self->conf->{stayConnected} ) {
+        my $module =
+          $self->conf->{'trustedBrowserEngine'} || '::Plugins::TrustedBrowser';
+        $self->logger->debug("$module needed");
+        push @res, [ trustedBrowser => $module ];
+    }
+
+    # Captcha
+    if (   $self->conf->{captcha_mail_enabled}
+        || $self->conf->{captcha_login_enabled}
+        || $self->conf->{captcha_register_enabled} )
+    {
+        my $module = $self->conf->{'captcha'} || '::Captcha::SecurityImage';
+        $self->logger->debug("$module needed");
+        push @res, [ captcha => $module ];
+    }
+    return @res;
+}
+
 sub enabledPlugins {
     my ($self) = @_;
     my $conf = $self->conf;

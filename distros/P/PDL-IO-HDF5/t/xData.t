@@ -4,6 +4,7 @@ use warnings;
 use PDL;
 use PDL::IO::HDF5;
 use Test::More;
+use File::Spec::Functions;
 
 my $filename = "xData.hdf5";
 # get rid of filename if it already exists
@@ -34,5 +35,11 @@ is( "$xdata", $expected);
 
 # clean up file
 unlink $filename if( -e $filename);
+
+$hdf5 = PDL::IO::HDF5->new(catfile(qw(t sbyte.hdf5)));
+$dataset = $hdf5->dataset('data2');
+my $got = $dataset->get;
+$expected = pdl(-127, 127); # deliberately type double
+ok( (($got - $expected)->sum) < .001 ) or diag "got=$got\nexpected=$expected";
 
 done_testing;

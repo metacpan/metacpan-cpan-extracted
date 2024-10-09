@@ -30,3 +30,7 @@ perl Makefile.PL [ LIB=<alternate installation> ]
 make
 make test
 make install
+
+BUGS and ISSUES
+
+Bugs and issues can be submitted at https://github.com/Perl-Date-Business/perl-date-business.

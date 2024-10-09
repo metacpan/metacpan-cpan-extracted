@@ -113,7 +113,7 @@ sub op {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
-                portal                          => 'http://auth.op.com',
+                portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => "1",
@@ -163,7 +163,7 @@ sub rp {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',
-                portal                     => 'http://auth.rp.com',
+                portal                     => 'http://auth.rp.com/',
                 authentication             => 'OpenIDConnect',
                 userDB                     => 'Same',
                 oidcOPMetaDataExportedVars => {

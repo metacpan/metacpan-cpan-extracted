@@ -101,66 +101,44 @@ sub checkNewLocation {
 
 sub sendWarningEmail {
     my ( $self, $req ) = @_;
-    return $self->_sendMail($req)
-      if $req->sessionInfo->{_riskDetails}->{newLocation};
+
+    if ( $req->sessionInfo->{_riskDetails}->{newLocation} ) {
+        my $mail = $req->sessionInfo->{ $self->mailSessionKey };
+        my $user = $req->sessionInfo->{ $self->conf->{whatToTrace} };
+        if ($mail) {
+            $self->userLogger->info(
+                "User $user is signing in from a new location");
+            return $self->_sendMail( $req, $mail );
+        }
+        else {
+            $self->logger->warn( "User $user is signing in from a new location"
+                  . " but has no configured email" );
+        }
+    }
 
     return PE_OK;
 }
 
 sub _sendMail {
-    my ( $self, $req ) = @_;
-    my $date     = strftime( '%F %X', localtime );
+    my ( $self, $req, $mail ) = @_;
+    my $date     = strftime( '%F %X (UTC%z)', localtime );
     my $location = $req->sessionInfo->{_riskDetails}->{newLocation};
     my $ua       = $req->env->{HTTP_USER_AGENT};
-    my $mail     = $req->sessionInfo->{ $self->mailSessionKey };
 
-    # Build mail content
-    my $tr      = $self->translate($req);
-    my $subject = $self->conf->{newLocationWarningMailSubject};
-    unless ($subject) {
-        $self->logger->debug('Use default warning subject');
-        $subject = 'newLocationWarningMailSubject';
-        $tr->( \$subject );
-    }
-    my ( $body, $html );
-    if ( $self->conf->{newLocationWarningMailBody} ) {
+    $self->sendEmail(
+        $req,
+        subject       => $self->conf->{newLocationWarningMailSubject},
+        subject_trmsg => 'newLocationWarningMailSubject',
+        body          => $self->conf->{newLocationWarningMailBody},
+        body_template => 'mail_new_location_warning',
+        dest          => $mail,
+        params        => {
+            location => $location,
+            date     => $date,
+            ua       => $ua
+        },
+    );
 
-        # We use a specific text message, no html
-        $self->logger->debug('Use specific warning body message');
-        $body = $self->conf->{newLocationWarningMailBody};
-
-        # Replace variables in body
-        $body =~ s/\$ua\b/$ua/ge;
-        $body =~ s/\$location\b/$location/ge;
-        $body =~ s/\$date\b/$date/ge;
-        $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
-    }
-    else {
-
-        # Use HTML template
-        $body = $self->loadMailTemplate(
-            $req,
-            'mail_new_location_warning',
-            filter => $tr,
-            params => {
-                location => $location,
-                date     => $date,
-                ua       => $ua
-            },
-        );
-        $html = 1;
-    }
-    if ( $mail && $subject && $body ) {
-        $self->logger->warn("User $mail is signing in from a new location");
-
-        # Send mail
-        $self->logger->debug('Unable to send new location warning mail')
-          unless ( $self->send_mail( $mail, $subject, $body, $html ) );
-    }
-    else {
-        $self->logger->error(
-            'Unable to send new location warning mail: missing parameter(s)');
-    }
     return PE_OK;
 }
 

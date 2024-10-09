@@ -611,44 +611,110 @@ class TestCase::Sys::Socket {
       return 0;
     }
     
-    {
-      my $recv_buffer = (mutable string)new_string_len 3;
+    my $recv_string_buffer = StringBuffer->new;
+    
+    while (1) {
+      my $recv_buffer = (mutable string)new_string_len 1024;
       my $recv_length = Sys->recv($socket, $recv_buffer, length $recv_buffer, 0);
       
-      unless ($recv_length == 3) {
-        return 0;
+      if ($recv_length > 0) {
+        my $recv_string_part = Fn->substr($recv_buffer, 0, $recv_length);
+        
+        $recv_string_buffer->push($recv_string_part);
       }
-      
-      unless ($recv_buffer eq "abc") {
-        return 0;
+      else {
+        last;
       }
     }
     
-    {
-      my $recv_buffer = (mutable string)new_string_len 3;
-      my $recv_length = Sys::Socket->recv($socket, $recv_buffer, length $recv_buffer, 0);
-      
-      unless ($recv_length == 3) {
-        return 0;
-      }
-      
-      unless ($recv_buffer eq "def") {
-        return 0;
-      }
-    }
-
-    {
-      my $recv_buffer = (mutable string)new_string_len 3;
-      my $recv_length = Sys::Socket->recv($socket, $recv_buffer, length $recv_buffer, 0);
-      
-      unless ($recv_length == 0) {
-        return 0;
-      }
+    my $recv_string = $recv_string_buffer->to_string;
+    
+    unless ($recv_string eq "abcdef") {
+      return 0;
     }
     
     return 1;
   }
-
+  
+  static method sendto_and_recvfrom : int ($port : int) {
+    # Socket
+    my $socket = Sys::Socket->socket(SOCKET->AF_INET, SOCKET->SOCK_STREAM, 0);
+    
+    unless ($socket> 0) {
+      return 0;
+    }
+    
+    Fn->defer([$socket : int] method :void () {
+      Sys::Socket->close($socket);
+    });
+    
+    # IPv4 address
+    my $sockaddr = Sys::Socket::Sockaddr::In->new;
+    $sockaddr->set_sin_family((byte)SOCKET->AF_INET);
+    $sockaddr->set_sin_port(Sys::Socket->htons((short)$port));
+    my $in_addr = $sockaddr->sin_addr;
+    Sys::Socket->inet_pton(SOCKET->AF_INET, "127.0.0.1", $in_addr);
+    $sockaddr->set_sin_addr($in_addr);
+    
+    my $status_connect = Sys::Socket->connect($socket, $sockaddr, $sockaddr->size);
+    
+    unless ($status_connect == 0) {
+      Sys::Socket->close($socket);
+      return 0;
+    }
+    
+    {
+      my $send_buffer = "abcd";
+      
+      my $send_length = Sys->sendto($socket, $send_buffer, 0, undef);
+      
+      unless ($send_length == 4) {
+        return 0;
+      }
+    }
+    
+    {
+      my $send_buffer = "ef";
+      
+      my $send_length = Sys->sendto($socket, $send_buffer, 0, undef, length $send_buffer, 0);
+      
+      unless ($send_length == 2) {
+        return 0;
+      }
+    }
+    
+    my $status_shutdown = Sys::Socket->shutdown($socket, SOCKET->SHUT_WR);
+    
+    unless ($status_shutdown == 0) {
+      return 0;
+    }
+    
+    my $recv_string_buffer = StringBuffer->new;
+    
+    while (1) {
+      my $sockaddr_tmp_ref = (Sys::Socket::Sockaddr[])undef;
+      my $recv_buffer = (mutable string)new_string_len 1024;
+      my $recv_length = Sys->recvfrom($socket, $recv_buffer, length $recv_buffer, 0, $sockaddr_tmp_ref);
+      
+      if ($recv_length > 0) {
+        my $recv_string_part = Fn->substr($recv_buffer, 0, $recv_length);
+        
+        $recv_string_buffer->push($recv_string_part);
+      }
+      else {
+        last;
+      }
+    }
+    
+    my $recv_string = $recv_string_buffer->to_string;
+    
+    unless ($recv_string eq "abcdef") {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
   static method bind : int ($port : int) {
     # Socket
     my $socket = Sys::Socket->socket(SOCKET->AF_INET, SOCKET->SOCK_STREAM, 0);

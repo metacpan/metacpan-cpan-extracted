@@ -24,7 +24,7 @@
     </div>
   </div>
   <div class="buttons mb-3">
-    <button type="submit" class="btn btn-success">
+    <button type="submit" class="btn btn-success btn-single-submit">
       <span class="fa fa-sign-in"></span>
       <span trspan="connect">Connect</span>
     </button>

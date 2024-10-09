@@ -2,10 +2,11 @@
 
 package Lemonldap::NG::Manager::Build::OpenApi;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 use Lemonldap::NG::Manager::Attributes;
 use Lemonldap::NG::Manager::Api::Common qw/_listAttributes/;
+use Lemonldap::NG::Common;
 use JSON;
 
 my %TYPEMAP = (
@@ -89,7 +90,7 @@ sub openapi {
             'title'       => 'LemonLDAP::NG Manager API',
             'description' =>
 'The Manager API allows an administrator to modify the LemonLDAP::NG configuration programmatically. It is not meant to be accessed by end users. The client libraries mentionned in examples can be generated from doc/sources/manager-api/openapi-spec.yaml',
-            'version' => '2.17'
+            'version' => $Lemonldap::NG::Common::VERSION,
         },
         'servers' => [ {
                 'url' => 'https://manager-api.example.com'
@@ -609,8 +610,8 @@ sub openapi {
                     }
                 },
                 'put' => {
-                    'tags'    => ['oidcrp'],
-                    'summary' => 'Replaces an OpenID Connect Relying Party',
+                    'tags'        => ['oidcrp'],
+                    'summary'     => 'Replaces an OpenID Connect Relying Party',
                     'operationId' => 'replaceOidcRp',
                     'parameters'  => [ {
                             'name'        => 'confKey',
@@ -2086,12 +2087,12 @@ sub openapi {
                             'type'        => 'string',
                             'description' =>
                               'The type of second factor to create',
-                            'example' => 'TOTP, U2F, UBK (Yubikey), WebAuthn'
+                            'example' => 'TOTP, UBK (Yubikey), WebAuthn'
                         },
                         'name' => {
                             'type'        => 'string',
                             'description' => 'A description of the device'
-                        }
+                        },
                     },
                     'additionalProperties' => {
                         'type' => 'string'
@@ -2123,13 +2124,16 @@ sub openapi {
                         'type' => {
                             'type'        => 'string',
                             'description' => 'The type of device in use',
-                            'example' => 'TOTP, U2F, UBK (Yubikey), WebAuthn'
+                            'example'     => 'TOTP, UBK (Yubikey), WebAuthn'
                         },
                         'name' => {
                             'type'        => 'string',
                             'description' =>
                               'A user-set description of the device'
-                        }
+                        },
+                    },
+                    'additionalProperties' => {
+                        'type' => 'string'
                     }
                 },
                 'SecondFactors' => {

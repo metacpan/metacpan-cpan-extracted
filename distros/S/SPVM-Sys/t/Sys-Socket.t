@@ -9,8 +9,10 @@ use Time::HiRes 'usleep';
 
 use Socket;
 use IO::Socket;
-use IO::Socket::INET;
-use TestUtil::ServerRunner;
+use IO::Socket::IP;
+use Test::SPVM::Sys::Socket::ServerManager::IP;
+use Test::SPVM::Sys::Socket::Util;
+use Test::SPVM::Sys::Socket::Server;
 
 use SPVM 'Sys::Socket';
 use SPVM 'TestCase::Sys::Socket';
@@ -65,17 +67,21 @@ ok(SPVM::TestCase::Sys::Socket->socket);
 
 # Sys::Socket::Sockaddr
 {
-  my $port = TestUtil::ServerRunner->empty_port;
+  my $port = Test::SPVM::Sys::Socket::Util::get_available_port;
   ok(SPVM::TestCase::Sys::Socket->sockaddr($port));
 }
 
 # connect
 {
-  my $server = TestUtil::ServerRunner->new(
+  my $server = Test::SPVM::Sys::Socket::ServerManager::IP->new(
     code => sub {
-      my ($port) = @_;
+      my ($server_manager) = @_;
       
-      TestUtil::ServerRunner->run_echo_server($port);
+      my $port = $server_manager->port;
+      
+      my $server = Test::SPVM::Sys::Socket::Server->new_echo_server_ipv4_tcp(port => $port);
+      
+      $server->start;
     },
   );
   
@@ -84,11 +90,15 @@ ok(SPVM::TestCase::Sys::Socket->socket);
 
 # close
 {
-  my $server = TestUtil::ServerRunner->new(
+  my $server = Test::SPVM::Sys::Socket::ServerManager::IP->new(
     code => sub {
-      my ($port) = @_;
+      my ($server_manager) = @_;
       
-      TestUtil::ServerRunner->run_echo_server($port);
+      my $port = $server_manager->port;
+      
+      my $server = Test::SPVM::Sys::Socket::Server->new_echo_server_ipv4_tcp(port => $port);
+      
+      $server->start;
     },
   );
   
@@ -97,11 +107,15 @@ ok(SPVM::TestCase::Sys::Socket->socket);
 
 # shutdown
 {
-  my $server = TestUtil::ServerRunner->new(
+  my $server = Test::SPVM::Sys::Socket::ServerManager::IP->new(
     code => sub {
-      my ($port) = @_;
+      my ($server_manager) = @_;
       
-      TestUtil::ServerRunner->run_echo_server($port);
+      my $port = $server_manager->port;
+      
+      my $server = Test::SPVM::Sys::Socket::Server->new_echo_server_ipv4_tcp(port => $port);
+      
+      $server->start;
     },
   );
   
@@ -110,38 +124,62 @@ ok(SPVM::TestCase::Sys::Socket->socket);
 
 # send and recv
 {
-  my $server = TestUtil::ServerRunner->new(
+  my $server = Test::SPVM::Sys::Socket::ServerManager::IP->new(
     code => sub {
-      my ($port) = @_;
+      my ($server_manager) = @_;
       
-      TestUtil::ServerRunner->run_echo_server($port);
+      my $port = $server_manager->port;
+      
+      my $server = Test::SPVM::Sys::Socket::Server->new_echo_server_ipv4_tcp(port => $port);
+      
+      $server->start;
     },
   );
   
   ok(SPVM::TestCase::Sys::Socket->send_and_recv($server->port));
 }
 
+# sendto and recvfrom
 {
-  my $port = TestUtil::ServerRunner->empty_port;
+  my $server = Test::SPVM::Sys::Socket::ServerManager::IP->new(
+    code => sub {
+      my ($server_manager) = @_;
+      
+      my $port = $server_manager->port;
+      
+      my $server = Test::SPVM::Sys::Socket::Server->new_echo_server_ipv4_tcp(port => $port);
+      
+      $server->start;
+    },
+  );
+  
+  ok(SPVM::TestCase::Sys::Socket->sendto_and_recvfrom($server->port));
+}
+
+{
+  my $port = Test::SPVM::Sys::Socket::Util::get_available_port;
   ok(SPVM::TestCase::Sys::Socket->bind($port));
 }
 
 {
-  my $port = TestUtil::ServerRunner->empty_port;
+  my $port = Test::SPVM::Sys::Socket::Util::get_available_port;
   ok(SPVM::TestCase::Sys::Socket->listen($port));
 }
 # accept
-# TODO : Windows
-unless ($^O eq 'MSWin32') {
-  my $server = TestUtil::ServerRunner->new(
+{
+  my $server = Test::SPVM::Sys::Socket::ServerManager::IP->new(
     code => sub {
-      my ($port) = @_;
+      my ($server_manager) = @_;
       
-      SPVM::TestCase::Sys::Socket->run_echo_server($port);
+      my $port = $server_manager->port;
+      
+      my $server = Test::SPVM::Sys::Socket::Server->new_echo_server_ipv4_tcp(port => $port);
+      
+      $server->start;
     },
   );
   
-  my $sock = IO::Socket::INET->new(
+  my $sock = IO::Socket::IP->new(
     Proto    => 'tcp',
     PeerAddr => $localhost,
     PeerPort => $server->port,
@@ -165,11 +203,15 @@ unless ($^O eq 'MSWin32') {
 
 # getpeername
 {
-  my $server = TestUtil::ServerRunner->new(
+  my $server = Test::SPVM::Sys::Socket::ServerManager::IP->new(
     code => sub {
-      my ($port) = @_;
+      my ($server_manager) = @_;
       
-      TestUtil::ServerRunner->run_echo_server($port);
+      my $port = $server_manager->port;
+      
+      my $server = Test::SPVM::Sys::Socket::Server->new_echo_server_ipv4_tcp(port => $port);
+      
+      $server->start;
     },
   );
   
@@ -178,11 +220,15 @@ unless ($^O eq 'MSWin32') {
 
 # getsockname
 {
-  my $server = TestUtil::ServerRunner->new(
+  my $server = Test::SPVM::Sys::Socket::ServerManager::IP->new(
     code => sub {
-      my ($port) = @_;
+      my ($server_manager) = @_;
       
-      TestUtil::ServerRunner->run_echo_server($port);
+      my $port = $server_manager->port;
+      
+      my $server = Test::SPVM::Sys::Socket::Server->new_echo_server_ipv4_tcp(port => $port);
+      
+      $server->start;
     },
   );
   
@@ -198,17 +244,15 @@ else {
 }
 
 {
-  my $port = TestUtil::ServerRunner->empty_port;
+  my $port = Test::SPVM::Sys::Socket::Util::get_available_port;
   ok(SPVM::TestCase::Sys::Socket->setsockopt_int($port));
 }
 {
-  my $port = TestUtil::ServerRunner->empty_port;
+  my $port = Test::SPVM::Sys::Socket::Util::get_available_port;
   ok(SPVM::TestCase::Sys::Socket->getsockopt_int($port));
 }
 
-unless ($^O eq 'MSWin32') {
-  ok(SPVM::TestCase::Sys::Socket->sockaddr_un);
-}
+ok(SPVM::TestCase::Sys::Socket->sockaddr_un);
 
 ok(SPVM::TestCase::Sys::Socket->sockaddr_strage);
 

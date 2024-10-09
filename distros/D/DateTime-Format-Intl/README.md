@@ -1,0 +1,839 @@
+# NAME
+
+DateTime::Format::Intl - A Web Intl.DateTimeFormat Class Implementation
+
+# SYNOPSIS
+
+    use DateTime;
+    use DateTime::Format::Intl;
+    my $dt = DateTime->now;
+    my $fmt = DateTime::Format::Intl->new(
+        # You can use ja-JP (Unicode / web-style) or ja_JP (system-style), it does not matter.
+        'ja_JP', {
+            localeMatcher => 'best fit',
+            # The only one supported. You can use 'gregory' or 'gregorian' indifferently
+            calendar => 'gregorian',
+            # see getNumberingSystems() in Locale::Intl for the supported number systems
+            numberingSystem => 'latn',
+            formatMatcher => 'best fit',
+            dateStyle => 'long',
+            timeStyle => 'long',
+        },
+    ) || die( DateTime::Format::Intl->error );
+    say $fmt->format( $dt );
+
+    my $fmt = DateTime::Format::Intl->new(
+        # You can also use ja-JP (Unicode / web-style) or ja_JP (system-style), it does not matter.
+        'ja_JP', {
+            localeMatcher => 'best fit',
+            # The only one supported
+            calendar => 'gregorian',
+            numberingSystem => 'latn',
+            hour12 => 0,
+            timeZone => 'Asia/Tokyo',
+            weekday => 'long',
+            era => 'short',
+            year => 'numeric',
+            month => '2-digit',
+            day => '2-digit',
+            dayPeriod => 'long',
+            hour => '2-digit',
+            minute => '2-digit',
+            second => '2-digit',
+            fractionalSecondDigits => 3,
+            timeZoneName => 'long',
+            formatMatcher => 'best fit',
+        },
+    ) || die( DateTime::Format::Intl->error );
+    say $fmt->format( $dt );
+
+In basic use without specifying a locale, `DateTime::Format::Intl` uses the default locale and default options:
+
+    use DateTime;
+    my $date = DateTime->new(
+        year    => 2012,
+        month   => 11,
+        day     => 20,
+        hour    => 3,
+        minute  => 0,
+        second  => 0,
+        # Default
+        time_zone => 'UTC',
+    );
+    # toLocaleString without arguments depends on the implementation,
+    # the default locale, and the default time zone
+    say DateTime::Format::Intl->new->format( $date );
+    # "12/19/2012" if run with en-US locale (language) and time zone America/Los_Angeles (UTC-0800)
+
+Using `timeStyle` and `dateStyle`:
+
+Possible values are: `full`, `long`, `medium` and `short`
+
+    my $now = DateTime->new(
+        year => 2024,
+        month => 9,
+        day => 13,
+        hour => 14,
+        minute => 12,
+        second => 10,
+        time_zone => 'Europe/Paris',
+    );
+    my $shortTime = DateTime::Format::Intl->new('en', {
+        timeStyle => 'short',
+    });
+    say $shortTime->format( $now ); # "2:12 PM"
+    
+    my $shortDate = DateTime::Format::Intl->new('en', {
+        dateStyle => 'short',
+    });
+    say $shortDate->format( $now ); # "09/13/24"
+    
+    my $mediumTime = DateTime::Format::Intl->new('en', {
+        timeStyle => 'medium',
+        dateStyle => 'short',
+    });
+    say $mediumTime->format( $now ); # "09/13/24, 2:12:10 PM"
+
+    my $shortDate = DateTime::Format::Intl->new('en', {
+        dateStyle => 'medium',
+    });
+    say $shortDate->format( $now ); # "13 Sep 2024"
+
+    my $shortDate = DateTime::Format::Intl->new('en', {
+        dateStyle => 'long',
+    });
+    say $shortDate->format( $now ); # "September 13, 2024"
+
+    my $shortDate = DateTime::Format::Intl->new('en', {
+        dateStyle => 'long',
+        timeStyle => 'long',
+    });
+    say $shortDate->format( $now ); # "September 13, 2024 at 2:12:10 PM GMT+1"
+
+    my $shortDate = DateTime::Format::Intl->new('en', {
+        dateStyle => 'full',
+    });
+    say $shortDate->format( $now ); # "Friday, September 13, 2024"
+
+    my $shortDate = DateTime::Format::Intl->new('en', {
+        dateStyle => 'full',
+        timeStyle => 'full',
+    });
+    say $shortDate->format( $now ); # "Friday, September 13, 2024 at 2:12:10 PM Central European Standard Time"
+
+Using `dayPeriod`:
+
+Use the `dayPeriod` option to output a string for the times of day (`in the morning`, `at night`, `noon`, etc.). Note, that this only works when formatting for a 12 hour clock (`hourCycle => 'h12'` or `hourCycle => 'h11'`) and that for many locales the strings are the same irrespective of the value passed for the `dayPeriod`.
+
+    my $date = DateTime->new(
+        year    => 2012,
+        month   => 11,
+        day     => 17,
+        hour    => 4,
+        minute  => 0,
+        second  => 42,
+        # Default
+        time_zone => 'UTC',
+    );
+
+    say DateTime::Format::Intl->new( 'en-GB', {
+        hour        => 'numeric',
+        hourCycle   => 'h12',
+        dayPeriod   => 'short',
+        # or 'time_zone' is ok too
+        timeZone    => 'UTC',
+    })->format( $date );
+    # "4 at night" (same formatting in en-GB for all dayPeriod values)
+
+    say DateTime::Format::Intl->new( 'fr', {
+        hour        => 'numeric',
+        hourCycle   => 'h12',
+        dayPeriod   => 'narrow',
+        # or 'time_zone' is ok too
+        timeZone    => 'UTC',
+    })->format( $date );
+    # "4 mat."  (same output in French for both narrow/short dayPeriod)
+
+    say DateTime::Format::Intl->new( 'fr', {
+        hour        => 'numeric',
+        hourCycle   => 'h12',
+        dayPeriod   => 'long',
+        # or 'time_zone' is ok too
+        timeZone    => 'UTC',
+    })->format( $date );
+    # "4 du matin"
+
+Using `timeZoneName`:
+
+Use the `timeZoneName` option to output a string for the `timezone` (`GMT`, `Pacific Time`, etc.).
+
+    my $date = DateTime->new(
+        year    => 2021,
+        month   => 11,
+        day     => 17,
+        hour    => 3,
+        minute  => 0,
+        second  => 42,
+        # Default
+        time_zone => 'UTC',
+    );
+    my $timezoneNames = [qw(
+        short
+        long
+        shortOffset
+        longOffset
+        shortGeneric
+        longGeneric
+    )];
+
+    foreach my $zoneName ( @$timezoneNames )
+    {
+        # Do something with currentValue
+        my $formatter = DateTime::Format::Intl->new( 'en-US', {
+            timeZone        => 'America/Los_Angeles',
+            timeZoneName    => $zoneName,
+        });
+        say "${zoneName}: ", $formatter->format( $date);
+    }
+
+    # Yields the following:
+    # short: 12/16/2021, PST
+    # long: 12/16/2021, Pacific Standard Time
+    # shortOffset: 12/16/2021, GMT-8
+    # longOffset: 12/16/2021, GMT-08:00
+    # shortGeneric: 12/16/2021, PT
+    # longGeneric: 12/16/2021, Pacific Time
+
+    # Enabling fatal exceptions
+    use v5.34;
+    use experimental 'try';
+    no warnings 'experimental';
+    try
+    {
+        my $fmt = DateTime::Format::Intl->new( 'x', fatal => 1 );
+        # More code
+    }
+    catch( $e )
+    {
+        say "Oops: ", $e->message;
+    }
+
+Or, you could set the global variable `$FATAL_EXCEPTIONS` instead:
+
+    use v5.34;
+    use experimental 'try';
+    no warnings 'experimental';
+    local $DateTime::Format::Intl::FATAL_EXCEPTIONS = 1;
+    try
+    {
+        my $fmt = DateTime::Format::Intl->new( 'x' );
+        # More code
+    }
+    catch( $e )
+    {
+        say "Oops: ", $e->message;
+    }
+
+# VERSION
+
+    v0.1.0
+
+# DESCRIPTION
+
+This module provides the equivalent of the JavaScript implementation of [Intl.DateTimeFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat)
+
+It relies on [DateTime::Format::Unicode](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AUnicode), [DateTime::Locale::FromCLDR](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromCLDR), [Locale::Unicode::Data](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData), which provides access to all the [Unicode CLDR (Common Locale Data Repository)](https://cldr.unicode.org/), and [Locale::Intl](https://metacpan.org/pod/Locale%3A%3AIntl) to achieve similar results. It requires perl v5.10.1 minimum to run.
+
+It is very elaborate and the algorithm provides the same result you would get with a web browser. The algorithm itself is quite complex and took me several months to implement, given all the dependencies with the modules aforementioned it relies on, that I also had to build to make the whole thing work.
+
+I hope they will benefit you as they benefit me.
+
+Because, just like its JavaScript equivalent, `DateTime::Format::Intl` does quite a bit of look-ups and sensible guessing upon object instantiation, you want to create an object for a specific format, cache it and re-use it rather than creating a new one for each date formatting.
+
+`DateTime::Format::Intl` uses a set of culturally sensible default values derived directly from the web browsers own default. Upon object instantiation, it uses a culturally sensitive scoring to find the best matching format pattern available in the Unicode CLDR (Common Locale Data Repository) data for the options provided. It [appends any missing components](https://www.unicode.org/reports/tr35/tr35-dates.html#Missing_Skeleton_Fields), if any. Finally, it adjusts the best pattern retained to match perfectly the options of the user.
+
+# CONSTRUCTOR
+
+## new
+
+This takes a `locale` (a.k.a. language `code` compliant with [ISO 15924](https://en.wikipedia.org/wiki/ISO_15924) as defined by [IETF](https://en.wikipedia.org/wiki/IETF_language_tag#Syntax_of_language_tags)) and an hash or hash reference of options and will return a new [DateTime::Format::Intl](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AIntl) object, or upon failure `undef` in scalar context and an empty list in list context.
+
+Each option can also be accessed or changed using their corresponding method of the same name.
+
+See the [CLDR (Unicode Common Locale Data Repository) page](https://cldr.unicode.org/translation/date-time/date-time-patterns) for more on the format patterns used.
+
+Supported options are:
+
+### Locale options
+
+- `localeMatcher`
+
+    The locale matching algorithm to use. Possible values are `lookup` and `best fit`; the default is `best fit`. For information about this option, see [Locale identification and negotiation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locale_identification_and_negotiation).
+
+    Whatever value you provide, does not actually have any influence on the algorithm used. `best fit` will always be the one used.
+
+- `calendar`
+
+    The calendar to use, such as `chinese`, `gregorian` (or `gregory`), `persian`, and so on. For a list of calendar types, see [Intl.Locale.prototype.getCalendars()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/getCalendars#supported_calendar_types), and the perl module [Locale::Intl](https://metacpan.org/pod/Locale%3A%3AIntl). This option can also be set through the `ca` Unicode extension key; if both are provided, this options property takes precedence. See ["ca" in Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode#ca)
+
+    For example, a Japanese locale with the `japanese` calendar extension set:
+
+        my $fmt = DateTime::Format::Intl->new( 'ja-Kana-JP-u-ca-japanese' );
+
+    The only value calendar type supported by this module is `gregorian`. Any other value will return an error.
+
+- `numberingSystem`
+
+    The numbering system to use for number formatting, such as `fullwide`, `hant`, `mathsans`, and so on. For a list of supported numbering system types, see [getNumberingSystems()](https://metacpan.org/pod/Locale%3A%3AIntl#getNumberingSystems). This option can also be set through the [nu](https://metacpan.org/pod/Locale%3A%3AUnicode#nu) Unicode extension key; if both are provided, this options property takes precedence.
+
+    For example, a Japanese locale with the `jpanfin` number system extension set and with the `jptyo` time zone:
+
+        my $fmt = DateTime::Format::Intl->new( 'ja-u-nu-jpanfin-tz-jptyo' );
+
+    See [Mozilla documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/getNumberingSystems), and also the perl module [Locale::Intl](https://metacpan.org/pod/Locale%3A%3AIntl)
+
+- `hour12`
+
+    Whether to use 12-hour time (as opposed to 24-hour time). Possible values are `true` (`1`) and `false` (`0`); the default is locale dependent. When `true`, this option sets `hourCycle` to either `h11` or `h12`, depending on the locale. When `false`, it sets hourCycle to `h23`. `hour12` overrides both the hc locale extension tag and the `hourCycle` option, should either or both of those be present.
+
+- `hourCycle`
+
+    The hour cycle to use. Possible values are `h11`, `h12`, `h23`, and `h24`. This option can also be set through the `hc` Unicode extension key; if both are provided, this options property takes precedence.
+
+    See [Mozilla documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#hourcycle)
+
+- `timeZone`
+
+    The time zone to use. Time zone names correspond to the Zone and Link names of the [IANA Time Zone Database](https://www.iana.org/time-zones), such as `UTC`, `Asia/Tokyo`, `Asia/Kolkata`, and `America/New_York`. Additionally, time zones can be given as UTC offsets in the format `±hh:mm`, `±hhmm`, or `±hh`, for example as `+01:00`, `-2359`, or `+23`. The default is the runtime's default time zone.
+
+    See [Mozilla documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#timezone)
+
+### Date-time component options
+
+- `weekday`
+
+    The representation of the weekday. Possible values are:
+
+    - `long`
+
+        For example: `Thursday`
+
+    - `short`
+
+        For example: `Thu`
+
+    - `narrow`
+
+        For example: `T`
+
+        Two weekdays may have the same narrow style for some locales (e.g. `Tuesday`'s narrow style is also `T`).
+
+- `era`
+
+    The representation of the era. Possible values are:
+
+    - `long`
+
+        For example: `Anno Domini`
+
+    - `short`
+
+        For example: `AD`
+
+    - `narrow`
+
+        For example: `A`
+
+- `year`
+
+    The representation of the year. Possible values are `numeric` and `2-digit`.
+
+- `month`
+
+    The representation of the month. Possible values are:
+
+    - `numeric`
+
+        For example: `3`
+
+    - `2-digit`
+
+        For example: `03`
+
+    - `long`
+
+        For example: `March`
+
+    - `short`
+
+        For example: `Mar`
+
+    - `narrow`
+
+        For example: `M`.
+
+        Two months may have the same narrow style for some locales (e.g. `May`'s narrow style is also `M`).
+
+- `day`
+
+    The representation of the day. Possible values are `numeric` and `2-digit`.
+
+- `dayPeriod` or `day_period`
+
+    The formatting style used for day periods like `in the morning`, `am`, `noon`, `n` etc. Possible values are `narrow`, `short`, and `long`.
+
+    Note: This option only has an effect if a 12-hour clock (`hourCycle`: `h12` or `hourCycle`: `h11`) is used. Many locales use the same string irrespective of the width specified.
+
+- `hour`
+
+    The representation of the hour. Possible values are `numeric` and `2-digit`.
+
+- `minute`
+
+    The representation of the minute. Possible values are `numeric` and `2-digit`.
+
+- `second`
+
+    The representation of the second. Possible values are `numeric` and `2-digit`.
+
+- `fractionalSecondDigits`
+
+    The number of digits used to represent fractions of a second (any additional digits are truncated). Possible values are from `1` to `3`.
+
+- `timeZoneName`
+
+    The localized representation of the time zone name. Possible values are:
+
+    - `long`
+
+        Long localized form (e.g., `Pacific Standard Time`, `Nordamerikanische Westküsten-Normalzeit`)
+
+    - `short`
+
+        Short localized form (e.g.: `PST`, `GMT-8`)
+
+    - `shortOffset`
+
+        Short localized GMT format (e.g., `GMT-8`)
+
+    - `longOffset`
+
+        Long localized GMT format (e.g., `GMT-08:00`)
+
+    - `shortGeneric`
+
+        Short generic non-location format (e.g.: `PT`, `Los Angeles Zeit`).
+
+    - `longGeneric`
+
+        Long generic non-location format (e.g.: `Pacific Time`, `Nordamerikanische Westküstenzeit`)
+
+        The default value for each date-time component option is `undef`, but if all component properties are `undef`, then `year`, `month`, and `day` default to `numeric`. If any of the date-time component options is specified, then `dateStyle` and `timeStyle` must be `undef`.
+
+- `formatMatcher`
+
+    The format matching algorithm to use. Possible values are `basic` and `best fit`; the default is `best fit`. 
+
+    Whatever value you provide, does not actually have any influence on the algorithm used. `best fit` will always be the one used.
+
+    Implementations are required to support displaying at least the following subsets of date-time components:
+
+    - `weekday`, `year`, `month`, `day`, `hour`, `minute`, `second`
+    - `weekday`, `year`, `month`, `day`
+    - `year`, `month`, `day`
+    - `year`, `month`
+    - `month`, `day`
+    - `hour`, `minute`, `second`
+    - `hour`, `minute`>
+
+    Implementations may support other subsets, and requests will be negotiated against all available subset-representation combinations to find the best match. The algorithm for `best fit` is implementation-defined, and `basic` is defined by the spec. This option is only used when both `dateStyle` and `timeStyle` are undefined (so that each date-time component's format is individually customizable).
+
+### Style shortcuts
+
+- `dateStyle`
+
+    The date formatting style to use when calling `format()`. Possible values are `full`, `long`, `medium`, and `short`.
+
+- `timeStyle`
+
+    The time formatting style to use when calling `format()`. Possible values are `full`, `long`, `medium`, and `short`.
+
+Note: `dateStyle` and `timeStyle` can be used with each other, but not with other date-time component options (e.g. `weekday`, `hour`, `month`, etc.).
+
+# METHODS
+
+## format
+
+## format\_range
+
+Same as [formatRange](#formatrange)
+
+## format\_range\_to\_parts
+
+Same as [formatRangeToParts](#formatrangetoparts)
+
+## format\_to\_parts
+
+Same as [formatToParts](#formattoparts)
+
+## formatRange
+
+    my $d1 = DateTime->new(
+        year    => 2024,
+        month   => 5,
+        day     => 10,
+        hour    => 13,
+        minute  => 0,
+        second  => 0,
+    );
+    my $d2 = DateTime->new(
+        year    => 2024,
+        month   => 5,
+        day     => 11,
+        hour    => 14,
+        minute  => 0,
+        second  => 0,
+    );
+    my $fmt = DateTime::Format::Intl->new( 'fr-FR' );
+    say $fmt->formatRange( $d1 => $d2 ); # 10/05/2024 - 11/05/2024
+
+    my $fmt2 = DateTime::Format::Intl->new( 'ja-JP' );
+    say $fmt2->formatRange( $d1 => $d2 ); # 2024/05/10～2024/05/11
+
+    my $fmt3 = DateTime::Format::Intl->new( 'fr-FR', {
+        weekday => 'long',
+        year    => 'numeric',
+        month   => 'long',
+        day     => 'numeric',
+    });
+    say $fmt3->formatRange( $d1 => $d2 ); # vendredi 10 mai 2024 - samedi 11 mai 2024
+
+This `formatRange()` method takes 2 [DateTime](https://metacpan.org/pod/DateTime) objects, and formats the range between 2 dates and returns a string.
+
+The format used is the most concise way based on the locales and options provided when instantiating the new [DateTime::Format::Intl](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AIntl) object. When no option were provided upon object instantiation, it default to a short version of the date format using [date\_format\_short](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromData#date_format_short)), which, in turn, gets interpreted in various formats depending on the locale chosen. In British English, this would be `10/05/2024` for May 10th, 2024.
+
+## formatRangeToParts
+
+    my $d1 = DateTime->new(
+        year    => 2024,
+        month   => 5,
+        day     => 10,
+        hour    => 13,
+        minute  => 0,
+        second  => 0,
+    );
+    my $d2 = DateTime->new(
+        year    => 2024,
+        month   => 5,
+        day     => 11,
+        hour    => 14,
+        minute  => 0,
+        second  => 0,
+    );
+    my $fmt = DateTime::Format::Intl->new( 'fr-FR', {
+        weekday => 'long',
+        year    => 'numeric',
+        month   => 'long',
+        day     => 'numeric',
+    });
+    say $fmt->formatRange( $d1, $d2 ); # mercredi 10 janvier à 19:00 – jeudi 11 janvier à 20:00
+    my $ref = $fmt->formatRangeToParts( $d1, $d2 );
+
+This would return an array containing the following hash references:
+
+    { type => 'weekday', value => 'mercredi',   source => 'startRange' },
+    { type => 'literal', value => ' ',          source => 'startRange' },
+    { type => 'day',     value => '10',         source => 'startRange' },
+    { type => 'literal', value => ' ',          source => 'startRange' },
+    { type => 'month',   value => 'janvier',    source => 'startRange' },
+    { type => 'literal', value => ' à ',        source => 'startRange' },
+    { type => 'hour',    value => '19',         source => 'startRange' },
+    { type => 'literal', value => ':',          source => 'startRange' },
+    { type => 'minute',  value => '00',         source => 'startRange' },
+    { type => 'literal', value => ' – ',        source => 'shared' },
+    { type => 'weekday', value => 'jeudi',      source => 'endRange' },
+    { type => 'literal', value => ' ',          source => 'endRange' },
+    { type => 'day',     value => '11',         source => 'endRange' },
+    { type => 'literal', value => ' ',          source => 'endRange' },
+    { type => 'month',   value => 'janvier',    source => 'endRange' },
+    { type => 'literal', value => ' à ',        source => 'endRange' },
+    { type => 'hour',    value => '20',         source => 'endRange' },
+    { type => 'literal', value => ':',          source => 'endRange' },
+    { type => 'minute',  value => '00',         source => 'endRange' }
+
+The `formatRangeToParts()` method returns an array of locale-specific tokens representing each part of the formatted date range produced by this [DateTime::Format::Intl](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AIntl) object. It is useful for custom formatting of date strings.
+
+## formatToParts
+
+    my $d = DateTime->new(
+        year    => 2024,
+        month   => 5,
+        day     => 10,
+        hour    => 13,
+        minute  => 0,
+        second  => 0,
+    );
+    my $fmt = DateTime::Format::Intl->new( 'fr-FR', {
+        weekday => 'long',
+        year    => 'numeric',
+        month   => 'long',
+        day     => 'numeric',
+    });
+    say $fmt->format( $d ); # mercredi 10 janvier à 19:00
+    my $ref = $fmt->formatToParts( $d );
+
+This would return an array containing the following hash references:
+
+    { type => 'weekday', value => 'mercredi' },
+    { type => 'literal', value => ' ' },
+    { type => 'day',     value => '10' },
+    { type => 'literal', value => ' ' },
+    { type => 'month',   value => 'janvier' },
+    { type => 'literal', value => ' à ' },
+    { type => 'hour',    value => '19' },
+    { type => 'literal', value => ':' },
+    { type => 'minute',  value => '00' }
+
+The `formatToParts()` method takes an optional [DateTime](https://metacpan.org/pod/DateTime) object, and returns an array of locale-specific tokens representing each part of the formatted date produced by this [DateTime::Format::Intl](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AIntl) object. It is useful for custom formatting of date strings.
+
+If no [DateTime](https://metacpan.org/pod/DateTime) object is provided, it will default to the current date and time.
+
+The properties of the hash references returned are as follows:
+
+- `day`
+
+    The string used for the day, for example `17`.
+
+- `dayPeriod`
+
+    The string used for the day period, for example, `AM`, `PM`, `in the morning`, or `noon`
+
+- `era`
+
+    The string used for the era, for example `BC` or `AD`.
+
+- `fractionalSecond`
+
+    The string used for the fractional seconds, for example `0` or `00` or `000`.
+
+- `hour`
+
+    The string used for the hour, for example `3` or `03`.
+
+- `literal`
+
+    The string used for separating date and time values, for example `/`, `,`, `o'clock`, `de`, etc.
+
+- `minute`
+
+    The string used for the minute, for example `00`.
+
+- `month`
+
+    The string used for the month, for example `12`.
+
+- `relatedYear`
+
+    The string used for the related 4-digit Gregorian year, in the event that the calendar's representation would be a yearName instead of a year, for example `2019`.
+
+- `second`
+
+    The string used for the second, for example `07` or `42`.
+
+- `timeZoneName`
+
+    The string used for the name of the time zone, for example `UTC`. Default is the timezone of the current environment.
+
+- `weekday`
+
+    The string used for the weekday, for example `M`, `Monday`, or `Montag`.
+
+- `year`
+
+    The string used for the year, for example `2012` or `96`.
+
+- `yearName`
+
+    The string used for the yearName in relevant contexts, for example `geng-zi`
+
+## resolvedOptions
+
+The `resolvedOptions()` method returns an hash reference with the following properties reflecting the `locale` and date and time formatting `options` computed during the object instantiation.
+
+- `locale`
+
+    The BCP 47 language tag for the locale actually used. If any Unicode extension values were requested in the input BCP 47 language tag that led to this locale, the key-value pairs that were requested and are supported for this locale are included in locale.
+
+- `calendar`
+
+    E.g. `gregory`
+
+- `numberingSystem`
+
+    The values requested using the Unicode extension keys `ca` and `nu` or filled in as default values.
+
+- `timeZone`
+
+    The value provided for this property in the options argument; defaults to the runtime's default time zone. Should never be undefined.
+
+- `hour12`
+
+    The value provided for this property in the options argument or filled in as a default.
+
+- `weekday`, `era`, `year`, `month`, `day`, `hour`, `minute`, `second`, `timeZoneName`
+
+    The values resulting from format matching between the corresponding properties in the options argument and the available combinations and representations for date-time formatting in the selected locale. Some of these properties may not be present, indicating that the corresponding components will not be represented in formatted output.
+
+# OTHER NON-CORE METHODS
+
+## error
+
+Sets or gets an [exception object](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AIntl%3A%3AException)
+
+When called with parameters, this will instantiate a new [DateTime::Format::Intl::Exception](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AIntl%3A%3AException) object, passing it all the parameters received.
+
+When called in accessor mode, this will return the latest [exception object](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AIntl%3A%3AException) set, if any.
+
+## fatal
+
+    $fmt->fatal(1); # Enable fatal exceptions
+    $fmt->fatal(0); # Disable fatal exceptions
+    my $bool = $fmt->fatal;
+
+Sets or get the boolean value, whether to die upon exception, or not. If set to true, then instead of setting an [exception object](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AIntl%3A%3AException), this module will die with an [exception object](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AIntl%3A%3AException). You can catch the exception object then after using `try`. For example:
+
+    use v.5.34; # to be able to use try-catch blocks in perl
+    use experimental 'try';
+    no warnings 'experimental';
+    try
+    {
+        my $fmt = DateTime::Format::Intl->new( 'x', fatal => 1 );
+    }
+    catch( $e )
+    {
+        say "Error occurred: ", $e->message;
+        # Error occurred: Invalid locale value "x" provided.
+    }
+
+## greatest\_diff
+
+    my $fmt = DateTime::Format::Intl->new( 'fr-FR' );
+    say $fmt->formatRange( $d1 => $d2 ); # 10/05/2024 - 11/05/2024
+    # Found that day ('d') is the greatest difference between the two datetimes
+    my $component = $fmt->greatest_diff; # d
+
+Read-only method.
+
+Returns a string representing the component that is the greatest difference between two datetimes.
+
+This value can be retrieved after [formatRange](#formatrange) or [formatRangeToParts](#formatrangetoparts) has been called, otherwise, it would merely return `undef`
+
+This is a non-standard method, not part of the original `Intl.DateTimeFormat` JavaScript API.
+
+See also ["interval\_greatest\_diff" in DateTime::Locale::FromCLDR](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromCLDR#interval_greatest_diff) and the [Unicode LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#intervalFormats)
+
+## interval\_pattern
+
+    my $fmt = DateTime::Format::Intl->new( 'fr-FR' );
+    say $fmt->formatRange( $d1 => $d2 ); # 10/05/2024 - 11/05/2024
+    my $pattern = $fmt->interval_pattern;
+
+Read-only method.
+
+Returns a string representing the format pattern resulting from calling [formatRange](#formatrange) or [formatRangeToParts](#formatrangetoparts). This format pattern, which is most likely based on interval format patterns available in the Unicode CLDR data, may have been adjusted to match the required options.
+
+This is a non-standard method, not part of the original `Intl.DateTimeFormat` JavaScript API.
+
+## interval\_skeleton
+
+    my $fmt = DateTime::Format::Intl->new( 'fr-FR' );
+    say $fmt->formatRange( $d1 => $d2 ); # 10/05/2024 - 11/05/2024
+    my $skeleton = $fmt->interval_skeleton;
+
+Read-only method.
+
+Returns a string representing the format skeleton resulting from calling [formatRange](#formatrange) or [formatRangeToParts](#formatrangetoparts). This format skeleton, as called in the Unicode LDML specifications, is like an ID representing the underlying format pattern.
+
+This is a non-standard method, not part of the original `Intl.DateTimeFormat` JavaScript API.
+
+## pattern
+
+    my $fmt = DateTime::Format::Intl->new( 'en', { weekday => 'short' } ) ||
+        die( DateTime::Format::Intl->error );
+    my $resolved_pattern = $fmt->pattern;
+
+Read-only method.
+
+Returns a string representing the pattern resolved from the lookup based on the `locale` provided and `options` specified.
+
+This is a non-standard method, not part of the original `Intl.DateTimeFormat` JavaScript API.
+
+## skeleton
+
+    my $fmt = DateTime::Format::Intl->new( 'en', { weekday => 'short' } ) ||
+        die( DateTime::Format::Intl->error );
+    my $resolved_skeleton = $fmt->skeleton;
+
+Read-only method.
+
+Returns a string representing the skeleton resolved from the lookup based on the `locale` provided and `options` specified. This returns a value only if the neither of the constructor options `dateStyle` or `timeStyle` have been provided. Otherwise, it would be `undef`
+
+This is a non-standard method, not part of the original `Intl.DateTimeFormat` JavaScript API.
+
+# CLASS FUNCTIONS
+
+## supportedLocalesOf
+
+    my $array = DateTime::Format::Intl->supportedLocalesOf( $locales, $options1 );
+    # Try 3 locales by order of priority
+    my $array = DateTime::Format::Intl->supportedLocalesOf( ['ja-t-de-t0-und-x0-medical', 'he-IL-u-ca-hebrew-tz-jeruslm', 'en-GB'], $options1 );
+
+The `supportedLocalesOf()` class function returns an array containing those of the provided locales that are supported in [DateTime::Locale::FromCLDR](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromCLDR) without having to fall back to the runtime's default locale.
+
+It takes 2 arguments: `locales` to look up, and an hash or hash reference of `options`
+
+- `locales`
+
+    A string with a [BCP 47 language tag](https://en.wikipedia.org/wiki/IETF_language_tag#Syntax_of_language_tags), or an array of such strings. For the general form and interpretation of the locales argument, see the parameter description on the [object instantiation](#new).
+
+- `options`
+
+    An optional hash or hash reference that may have the following property:
+
+    - `localeMatcher`
+
+        The locale matching algorithm to use. Possible values are `lookup` and `best fit`; the default is `best fit`. For information about this option, see the [object instantiation](#new).
+
+        In this API, this option is not used.
+
+# EXCEPTIONS
+
+A `RangeError` exception is thrown if locales or options contain invalid values.
+
+If an error occurs, any given method will set the [error object](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AIntl%3A%3AException) and return `undef` in scalar context, or an empty list in list context.
+
+See [Mozilla documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError) for more information.
+
+# AUTHOR
+
+Jacques Deguest <`jack@deguest.jp`>
+
+# SEE ALSO
+
+[Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode), [Locale::Intl](https://metacpan.org/pod/Locale%3A%3AIntl), [Locale::Unicode::Data](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData), [DateTime::Locale::FromCLDR](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromCLDR), [DateTime::Format::Unicode](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AUnicode), [DateTime](https://metacpan.org/pod/DateTime)
+
+[Mozilla documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat)
+
+[CLDR repository for dates and time](https://github.com/unicode-org/cldr-json/tree/main/cldr-json/cldr-dates-full/main)
+
+[ICU documentation](https://unicode-org.github.io/icu/userguide/format_parse/datetime/)
+
+[CLDR website](http://cldr.unicode.org/)
+
+# COPYRIGHT & LICENSE
+
+Copyright(c) 2024 DEGUEST Pte. Ltd.
+
+All rights reserved
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

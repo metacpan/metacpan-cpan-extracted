@@ -23,7 +23,6 @@ sub init {
 
 sub testmail {
     my ( $self, $req ) = @_;
-    $self->logger->debug("coucou");
 
     # Build mail content
     my $subject        = $req->param('subject');

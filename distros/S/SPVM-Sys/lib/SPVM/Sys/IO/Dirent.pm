@@ -8,7 +8,7 @@ SPVM::Sys::IO::Dirent - struct dirent in the C language
 
 =head1 Description
 
-The Sys::IO::Dirent class in L<SPVM> represents L<struct dirent|https://linux.die.net/man/3/readdir> in the C language.
+Sys::IO::Dirent class in L<SPVM> represents L<struct dirent|https://linux.die.net/man/3/readdir> in the C language.
 
 =head1 Usage
   

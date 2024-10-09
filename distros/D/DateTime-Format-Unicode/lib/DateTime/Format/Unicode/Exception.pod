@@ -38,7 +38,7 @@ L<DateTime::Format::Unicode::Exception> objects are created by L<Locale::Unicode
 
 It takes either an L<DateTime::Format::Unicode::Exception> object or an hash reference of properties, or a list of arguments that will be concatanated to form the error message. The list of arguments can contain code reference such as reference to sub routines, who will be called and their returned value added to the error message string. For example :
 
-    my $ex = DateTime::Format::Unicode::Exception->new( "Invalid property. Value recieved are: ", sub{ Dumper( $hash ) } );
+    my $ex = DateTime::Format::Unicode::Exception->new( "Invalid property. Value received are: ", sub{ Dumper( $hash ) } );
 
     # or
 

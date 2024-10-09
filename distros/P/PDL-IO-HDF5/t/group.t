@@ -69,11 +69,8 @@ is( scalar(@groups), 0 );
 my $dataset = new PDL::IO::HDF5::Dataset( 'name'=> 'data1', parent => $rootGroup,
 					fileObj => $hdfobj);
 my $pdl = sequence(5,4);
-
 ok( $dataset->set($pdl, unlimited => 1) );
-
 my $pdl2 = $dataset->get;
-
 ok( (($pdl - $pdl2)->sum) < .001 );
 
 # Set attribute for dataset

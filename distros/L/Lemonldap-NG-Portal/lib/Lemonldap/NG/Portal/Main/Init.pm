@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.20.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -23,17 +23,22 @@ use URI;
 # Configuration storage
 has localConfig => ( is => 'rw', default => sub { {} } );
 has conf        => ( is => 'rw', default => sub { {} } );
-has menu        => ( is => 'rw', default => sub { {} } );
 has trOver      => ( is => 'rw', default => sub { { all => {} } } );
 
 # Sub modules
 has _authentication => ( is => 'rw' );
 has _userDB         => ( is => 'rw' );
 has _passwordDB     => ( is => 'rw' );
-has _sfEngine       => ( is => 'rw' );
-has _captcha        => ( is => 'rw' );
-has _trustedBrowser => ( is => 'rw' );
-has _ppRules        => ( is => 'rw', default => sub { {} } );
+
+has _loadedServices => ( is => 'rw', default => sub { {} } );
+
+# Legacy
+sub _captcha        { $_[0]->getService('captcha') }
+sub _trustedBrowser { $_[0]->getService('trustedBrowser') }
+sub _sfEngine       { $_[0]->getService('secondFactor') }
+sub menu            { $_[0]->getService('menu') }
+
+has _ppRules => ( is => 'rw', default => sub { {} } );
 
 has loadedModules => ( is => 'rw' );
 
@@ -45,6 +50,10 @@ has _jsRedirect => ( is => 'rw' );
 # TrustedDomain regexp
 has trustedDomainsRe         => ( is => 'rw' );
 has additionalTrustedDomains => ( is => 'rw', default => sub { [] } );
+
+# Entrypoints
+has _pluginEntryPoints =>
+  ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 
 # Lists to store plugins entry-points
 my @entryPoints;
@@ -104,6 +113,23 @@ has pluginSessionDataToRemember =>
 
 # INITIALIZATION
 
+sub _resetPluginsAndServices {
+    my ($self) = @_;
+    $self->loadedModules( {} );
+    $self->_loadedServices( {} );
+    $self->afterSub( {} );
+    $self->aroundSub( {} );
+    $self->spRules( {} );
+    $self->hook( {} );
+    $self->pluginSessionDataToRemember( {} );
+    $self->_pluginEntryPoints( [] );
+
+    # Reinitialize arrays
+    foreach ( qw(_macros _groups), @entryPoints ) {
+        $self->{$_} = [];
+    }
+}
+
 sub init {
     my ( $self, $args ) = @_;
     $args ||= {};
@@ -134,10 +160,7 @@ sub init {
     $self->trOver( JSON::to_json( $self->trOver ) );
 
     # Purge loaded module list
-    $self->loadedModules( {} );
-    $self->afterSub( {} );
-    $self->aroundSub( {} );
-    $self->hook( {} );
+    $self->_resetPluginsAndServices;
 
     # Insert `reloadConf` in handler reload stack
     Lemonldap::NG::Handler::Main->onReload( $self, 'reloadConf' );
@@ -231,17 +254,8 @@ sub reloadConf {
     # Reinitialize $self->conf
     %{ $self->{conf} } = %{ $self->localConfig };
 
-    # Reinitialize arrays
-    foreach ( qw(_macros _groups), @entryPoints ) {
-        $self->{$_} = [];
-    }
-    $self->afterSub( {} );
-    $self->aroundSub( {} );
-    $self->spRules( {} );
-    $self->hook( {} );
-
-    # Plugin history fields
-    $self->pluginSessionDataToRemember( {} );
+    # Purge loaded module list
+    $self->_resetPluginsAndServices;
 
     # Load conf in portal object
     foreach my $key ( keys %$conf ) {
@@ -299,7 +313,6 @@ sub reloadConf {
 
     # Load menu
     # ---------
-    $self->menu( $self->loadPlugin('::Main::Menu') );
     $self->displayInit;
 
     # Load authentication/userDB
@@ -319,28 +332,6 @@ sub reloadConf {
         return $self->fail
           unless ( $self->{"_$type"} = $self->loadPlugin($module) );
     }
-
-    # Load second-factor engine
-    return $self->fail
-      unless $self->{_sfEngine} =
-      $self->loadPlugin( $self->conf->{'sfEngine'} );
-
-    # Load trusted browser engine
-    return $self->fail
-      unless $self->_trustedBrowser(
-        $self->loadPlugin(
-            $self->conf->{'trustedBrowserEngine'}
-              || "::Plugins::TrustedBrowser"
-        )
-      );
-
-    # Load Captcha module
-    return $self->fail
-      unless $self->_captcha(
-        $self->loadPlugin(
-            $self->conf->{'captcha'} || '::Captcha::SecurityImage'
-        )
-      );
 
     # Compile macros in _macros, groups in _groups
     foreach my $type (qw(macros groups)) {
@@ -364,6 +355,11 @@ sub reloadConf {
       HANDLER->buildSub( HANDLER->substitute( $self->conf->{jsRedirect} ) )
       or $self->logger->error(
         'jsRedirect returns an error: ' . HANDLER->tsv->{jail}->error );
+
+    # Load services
+    foreach my $service ( $self->enabledServices ) {
+        $self->loadService(@$service) or return $self->fail;
+    }
 
     # Load plugins
     foreach my $plugin ( $self->enabledPlugins ) {
@@ -474,6 +470,18 @@ sub reloadConf {
 }
 
 # Method used to load plugins
+
+sub loadService {
+    my ( $self, $name, $plugin ) = @_;
+    $self->logger->debug("Loading service $name from $plugin");
+    return $self->_loadedServices->{$name} = $self->loadPlugin($plugin);
+}
+
+sub getService {
+    my ( $self, $name ) = @_;
+    return $_[0]->_loadedServices->{$name};
+}
+
 sub loadPlugin {
     my ( $self, $plugin ) = @_;
     unless ($plugin) {
@@ -567,7 +575,6 @@ sub findEP {
             }
         }
     }
-    $self->logger->debug("Plugin $plugin initialized");
 
     # Rules for menu
     if ( $obj->can('spRules') ) {
@@ -578,6 +585,45 @@ sub findEP {
             $self->spRules->{$k} = $obj->spRules->{$k};
         }
     }
+
+    # Plugin entrypoints
+    for my $ep ( @{ $self->_pluginEntryPoints } ) {
+        if (   ( $ep->{can} and $obj->can( $ep->{can} ) )
+            or ( $ep->{isa}  and $obj->isa( $ep->{isa} ) )
+            or ( $ep->{does} and $obj->does( $ep->{does} ) ) )
+        {
+            my @args = @{ $ep->{args} || [] };
+            if ( my $callback = $ep->{callback} ) {
+                $self->logger->debug(
+                    "Invoking callback registered by $ep->{_pkg}");
+                $callback->( $obj, @args );
+            }
+            elsif ( $ep->{service} && $ep->{method} ) {
+                my $service = $self->getService( $ep->{service} );
+                if ($service) {
+                    if ( my $method = $service->can( $ep->{method} ) ) {
+                        $self->logger->debug(
+                                "Invoking $ep->{method} on $ep->{service}"
+                              . " on behalf of $ep->{_pkg}" );
+                        $service->$method( $obj, @args );
+                    }
+                    else {
+                        $self->logger->warn(
+                            "Service $ep->{service} has no $ep->{method} method"
+                              . " in entrypoint added by $ep->{_pkg}" );
+                    }
+                }
+                else {
+                    $self->logger->warn(
+                            "Could not find service $ep->{service}"
+                          . " in entrypoint added by $ep->{_pkg}" );
+                }
+            }
+        }
+    }
+
+    $self->logger->debug("Plugin $plugin initialized");
+
     return $obj;
 }
 
@@ -653,6 +699,12 @@ sub buildRule {
 sub addPasswordPolicyDisplay {
     my ( $self, $id, $options ) = @_;
     $self->_ppRules->{$id} = {%$options};
+}
+
+sub _addPluginEntryPoint {
+    my ( $self, %entryPointDescription ) = @_;
+    push @{ $self->_pluginEntryPoints },
+      { _pkg => "[unknown]", %entryPointDescription };
 }
 
 1;
