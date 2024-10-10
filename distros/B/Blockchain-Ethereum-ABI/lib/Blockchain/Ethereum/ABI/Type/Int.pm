@@ -1,20 +1,15 @@
-use v5.26;
+package Blockchain::Ethereum::ABI::Type::Int;
 
+use v5.26;
 use strict;
 use warnings;
 no indirect;
-use feature 'signatures';
 
-use Object::Pad;
 # ABSTRACT: Solidity uint/int/bool type interface
-
-package Blockchain::Ethereum::ABI::Type::Int;
-class Blockchain::Ethereum::ABI::Type::Int
-    :isa(Blockchain::Ethereum::ABI::Type)
-    :does(Blockchain::Ethereum::ABI::TypeRole);
-
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.016';          # VERSION
+our $VERSION   = '0.017';          # VERSION
+
+use parent 'Blockchain::Ethereum::ABI::Type';
 
 use Carp;
 use Math::BigInt try => 'GMP';
@@ -26,26 +21,27 @@ use constant {
     HMAX             => '0x8' . '0' x 63
 };
 
-method _configure { return }
+sub _configure { return }
 
-method encode {
+sub encode {
+    my $self = shift;
 
     return $self->_encoded if $self->_encoded;
 
-    croak "Invalid numeric data @{[$self->data]}" unless looks_like_number($self->data);
+    croak "Invalid numeric data @{[$self->{data}]}" unless looks_like_number($self->{data});
 
-    my $bdata = Math::BigInt->new($self->data);
+    my $bdata = Math::BigInt->new($self->{data});
 
-    croak "Invalid numeric data @{[$self->data]}" if $bdata->is_nan;
+    croak "Invalid numeric data @{[$self->{data}]}" if $bdata->is_nan;
 
     croak "Invalid data length, signature: @{[$self->fixed_length]}, data length: @{[$bdata->length]}"
         if $self->fixed_length && $bdata->length > $self->fixed_length;
 
-    croak "Invalid negative numeric data @{[$self->data]}"
-        if $bdata->is_neg && $self->signature =~ /^uint|bool/;
+    croak "Invalid negative numeric data @{[$self->{data}]}"
+        if $bdata->is_neg && $self->{signature} =~ /^uint|bool/;
 
-    croak "Invalid bool data it must be 1 or 0 but given @{[$self->data]}"
-        if !$bdata->is_zero && !$bdata->is_one && $self->signature =~ /^bool/;
+    croak "Invalid bool data it must be 1 or 0 but given @{[$self->{data}]}"
+        if !$bdata->is_zero && !$bdata->is_one && $self->{signature} =~ /^bool/;
 
     $bdata->bneg->bxor(HFF)->binc if $bdata->is_neg;
 
@@ -54,18 +50,20 @@ method encode {
     return $self->_encoded;
 }
 
-method decode {
+sub decode {
+    my $self = shift;
 
-    my $bdata = Math::BigInt->from_hex(ref $self->data eq 'ARRAY' ? $self->data->[0] : $self->data);
+    my $bdata = Math::BigInt->from_hex(ref $self->{data} eq 'ARRAY' ? $self->{data}->[0] : $self->{data});
 
     $bdata->bxor(HFF)->binc->bneg if $bdata->copy->band(HMAX);
 
     return $bdata;
 }
 
-method fixed_length :override {
+sub fixed_length {
+    my $self = shift;
 
-    if ($self->signature =~ /[a-z](\d+)/) {
+    if ($self->{signature} =~ /[a-z](\d+)/) {
         return $1;
     }
     return DEFAULT_INT_SIZE;
@@ -85,7 +83,7 @@ Blockchain::Ethereum::ABI::Type::Int - Solidity uint/int/bool type interface
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

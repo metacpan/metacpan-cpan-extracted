@@ -27,7 +27,7 @@ use lib 'blib/lib';
 
 use utf8; # we have hardcoded unicode strings
 
-our $VERSION = '0.06';
+our $VERSION = '1.0';
 
 use Test::More;
 use Test::More::UTF8;
@@ -372,7 +372,7 @@ for my $atest (@$tests){
 		ok(-f $format_ret->{'latex'}->{'filepath'}, 'format()'." : returned latex output file (".$format_ret->{'latex'}->{'filepath'}.") is a filepath and it exists.") or BAIL_OUT;
 		# open the latex source and check if there any templated vars
 		my ($FH, $content);
-		ok(open($FH, '<', $format_ret->{'latex'}->{'filepath'}), 'format()'." : returned latex source '".$format_ret->{'latex'}->{'filepath'}."' opened for reading.") or BAIL_OUT("failed: $!");
+		ok(open($FH, '<encoding(utf-8)', $format_ret->{'latex'}->{'filepath'}), 'format()'." : returned latex source '".$format_ret->{'latex'}->{'filepath'}."' opened for reading.") or BAIL_OUT("failed: $!");
 		{ local $/ = undef; $content = <$FH> } close $FH;
 		ok($content !~ /<\:.+?\:>/, 'format()'." : called for test '$name', processor '$processor_name', and latex source (content of file '".$format_ret->{'latex'}->{'filepath'}."') does not look to contain templated var remains.") or BAIL_OUT($content."\n\nno see above latex source content.");
 
@@ -501,7 +501,7 @@ for my $atest (@$tests){
 		}
 		my $lfname = $format_ret->{'latex'}->{'filepath'};
 		my ($FH, $latexsrcstr);
-		ok(open($FH, '<', $lfname), 'format()'." : opening output latex source file ($lfname) for reading.") or BAIL_OUT("no it failed: $!");
+		ok(open($FH, '<encoding(utf-8)', $lfname), 'format()'." : opening output latex source file ($lfname) for reading.") or BAIL_OUT("no it failed: $!");
 		{ local $/ = undef; $latexsrcstr = <$FH> } close $FH;
 		ok($latexsrcstr !~ /<\:.+?\:>/, 'format()'." : called and latex src string returned back does not look to contain templated var remains.") or BAIL_OUT("${latexsrcstr}\n\nno see above latex content returned");
 

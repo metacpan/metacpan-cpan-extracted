@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     },
     LICENSE             => 'perl_5',
     # 2007-12-18
-    MIN_PERL_VERSION    => 'v5.10',
+    MIN_PERL_VERSION    => 'v5.10.1',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
     clean               => { FILES => 'DateTime-Locale-FromCLDR-*' },

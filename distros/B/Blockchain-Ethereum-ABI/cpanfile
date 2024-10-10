@@ -4,7 +4,6 @@
 requires "Crypt::Digest::Keccak256" => "0.078";
 requires "Math::BigInt" => "1.999811";
 requires "Module::Load" => "0.36";
-requires "Object::Pad" => "0.814";
 requires "Scalar::Util" => "1.63";
 requires "indirect" => "0.39";
 requires "perl" => "v5.26.0";

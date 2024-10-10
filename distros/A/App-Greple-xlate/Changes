@@ -1,5 +1,39 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.4101 2024-10-10T08:17:43Z
+
+    - duplication in unmasking process can happen
+
+0.41 2024-10-10T06:34:16Z
+
+    - introduce xlate -x option
+
+0.40 2024-10-09T11:03:07Z
+
+    - introduce --xlate-mask
+
+0.39 2024-10-08T07:10:21Z
+
+    - introduce --xlate-stripe option
+
+0.38 2024-10-05T07:45:54Z
+
+    - maintain cache data in ordered list format rather than hash
+    - introduce --xlate-update option to force update cache data
+    - undocument --cache-clear option (use --xlate-cache=clear)
+
+0.37 2024-10-04T06:39:51Z
+
+    - introduce --xlate-format colon parameter
+
+0.36 2024-09-29T04:03:54Z
+
+    - update pod translation area to include line start with punct char
+
+0.35 2024-09-26T15:30:33Z
+
+    - introduce output format "space+"
+
 0.3401 2024-09-20T03:49:59Z
 
     - update gpt4o module

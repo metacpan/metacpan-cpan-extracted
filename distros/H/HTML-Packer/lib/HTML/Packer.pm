@@ -6,10 +6,11 @@ use warnings;
 use Carp;
 use Regexp::RegGrp;
 use Digest::SHA qw(sha256_base64 sha384_base64 sha512_base64);
+use Safe::Isa;
 
 # -----------------------------------------------------------------------------
 
-our $VERSION = '2.10';
+our $VERSION = '2.11';
 
 our @BOOLEAN_ACCESSORS = (
     'remove_comments',
@@ -352,7 +353,7 @@ sub minify {
 
     unless (
         ref( $_[0] ) and
-        $_[0]->isa( __PACKAGE__ )
+        $_[0]->$_isa( __PACKAGE__ )
     ) {
         $self = __PACKAGE__->init();
 
@@ -493,7 +494,7 @@ HTML::Packer - Another HTML code cleaner
 
 =head1 VERSION
 
-Version 2.10
+Version 2.11
 
 =head1 DESCRIPTION
 

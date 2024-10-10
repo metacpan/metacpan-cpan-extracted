@@ -6,6 +6,9 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
+use helper1234;
+
 # Program:  22-return_special_scalar_join.t
 # ------------------------------------------------------------------
 # This test script demonstrates how DBUG_RETURN_SPECIAL() works when you
@@ -39,15 +42,6 @@ sub my_warn
 BEGIN {
    # Can't use any of the constants defined by this module
    # unless we use them in a separate BEGIN block!
-
-   push (@INC, File::Spec->catdir (".", "t", "off"));
-
-   # Helper module makes sure DIE & WARN traps are set ...
-   unless (use_ok ("helper1234")) {
-      done_testing ();
-      BAIL_OUT ( "Can't load helper1234" );   # Test # 1
-      exit (0);
-   }
 
    my $fish_module = get_fish_module ();
    my @opts = get_fish_opts ();

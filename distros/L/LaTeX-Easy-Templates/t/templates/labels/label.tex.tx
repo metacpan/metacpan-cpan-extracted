@@ -1,0 +1,17 @@
+\genericlabel{
+  \begin{tabular}{|c|}
+    \hline
+: if $label.sender.logo {
+    \includegraphics[width=1cm,angle=0]{<: $label.sender.logo :>}\\
+: }
+    \hline
+    <: $label.recipient.fullname :>\\
+    \hline
+: for $label.recipient.addresslines -> $addressline {
+    <: $addressline :>
+: }
+    \\
+    <: $label.recipient.postcode :>\\
+    \hline
+  \end{tabular}
+}

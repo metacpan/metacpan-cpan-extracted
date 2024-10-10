@@ -15,6 +15,9 @@ t/121-create_latex_source_from_template-pod-part2.t
 t/130-create_latex_source_from_template-tterse.t
 t/150-create_latex_source_from_template-simple-with-zero-max-filesize.t
 t/200-create_latex_source_from_template-complex.t
+t/220-Xslate-supports-function.t
+t/225-Xslate-supports-module-1.t
+t/226-Xslate-supports-module-2.t
 t/250-format-check-latex-driver-parameters-accepted.t
 t/300-ondisk-template-usage-simple.t
 t/350-ondisk-template-testing-include-paths.t
@@ -24,6 +27,8 @@ t/450-inmemory-template-testing-include-paths.t
 t/460-inmemory-template-usage-calling-other-templates.t
 t/500-mix-template-usage-calling-other-mix-templates.t
 t/800-format-simple.t
+t/900-pod-examples-labels.t
+t/910-pod-examples-nested-data-structures.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
@@ -45,8 +50,12 @@ t/templates/extra-private-sty-files/main.tex.tx
 t/templates/extra-private-sty-files/shakey.jpg
 t/templates/extra-private-sty-files/sigai.png
 t/templates/extra-private-sty-files/url.txt
+t/templates/labels/label.tex.tx
+t/templates/labels/labels.tex.tx
+t/templates/labels/logo.png
 t/templates/multi-language-xelatex/main.tex.expected_output
 t/templates/multi-language-xelatex/main.tex.tx
+t/templates/nested-data-structures/nested-data-structures.tex.tx
 t/templates/periodico/periodico-2column.tex.tx
 t/templates/periodico/url.txt
 t/templates/simple01/main.tex.expected_output

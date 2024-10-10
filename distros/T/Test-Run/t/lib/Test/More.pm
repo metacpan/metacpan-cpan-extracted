@@ -334,9 +334,6 @@ sub isnt ($$;$) {
     $Test->isnt_eq(@_);
 }
 
-*isn't = \&isnt;
-
-
 =item B<like>
 
   like( $this, qr/that/, $test_name );
@@ -1157,7 +1154,7 @@ end-users will have to upgrade Test::Harness to the latest one on
 CPAN.  If you avoid no_plan and TODO tests, the stock Test::Harness
 will work fine.
 
-If you simply depend on Test::More, it's own dependencies will cause a
+If you simply depend on Test::More, its own dependencies will cause a
 Test::Harness upgrade.
 
 =back

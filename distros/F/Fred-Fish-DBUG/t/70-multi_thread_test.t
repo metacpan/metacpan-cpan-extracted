@@ -8,6 +8,10 @@ use File::Spec;
 use File::Basename;
 use Config qw( %Config );
 
+# Defered since has to be done after Test::More due to multi-threading.
+# BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
+# use helper1234;
+
 # Program:  70-multi_thread_test.t
 # ---------------------------------------------------------------------
 # Tests out what happens when used in a multi-threaded process!
@@ -96,7 +100,7 @@ BEGIN {
    # Helper module makes sure DIE & WARN traps are set ...
    unless (use_ok ("helper1234")) {
       done_testing ();
-      BAIL_OUT ( "Can't load helper1234" );
+      BAIL_OUT ( "Can't load helper1234" );   # Test # 1
       exit (0);
    }
 

@@ -190,7 +190,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION = "2.07";
+$VERSION = "2.08";
 @ISA = qw( Exporter );
 
 # ------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ sub import
    my @imports;
    my $fish_module = __PACKAGE__ . "::";
 
-   my $minVer = 2.07;
+   my $minVer = 2.08;
    if ( $on_flag ) {
       $fish_module .= "ON";
       require Fred::Fish::DBUG::ON;
@@ -307,7 +307,7 @@ sub _find_key
    my $idx = 1;
 
    my $key = (caller ($idx))[1];
-   while ( defined $key && $key =~ m/^[(]eval/ ) {
+   while ( defined $key && ( $key =~ m/^[(]eval/ || $key =~ m/DBUG.pm$/ ) ) {
       $key = (caller (++$idx))[1];
    }
    return ( $key );

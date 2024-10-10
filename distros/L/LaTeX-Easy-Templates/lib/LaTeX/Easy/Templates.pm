@@ -10,7 +10,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '1.0';
 
 use Exporter qw(import);
 our @EXPORT = qw(
@@ -21,7 +21,7 @@ use LaTeX::Driver;
 use Text::Xslate;
 use Mojo::Log;
 use File::Spec;
-use Storable qw/dclone/;
+use Clone qw/clone/;
 use File::Temp qw/tempdir tempfile/;
 use File::Basename;
 use File::Path 'make_path';
@@ -316,7 +316,7 @@ sub format {
 		} else { $log->error(perl2dump($al)."${whoami} (via $parent), line ".__LINE__." : error, group '$group' must contain key 'filepath' or 'filename' AND 'basedir' but it didn't, above is what it has"); return undef }
 	} else {
 		# we are reading this data from 'procesors' set during construction time
-		$output_info = Storable::dclone($loaded_info->{$group});
+		$output_info = Clone::clone($loaded_info->{$group});
 	}
 	if( defined($output_info->{'basedir'}) && (! -d $output_info->{'basedir'}) ){ make_path($output_info->{'basedir'}); if( ! -d $output_info->{'basedir'} ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, dir to place output files '".$output_info->{'basedir'}."' is not a dir and could not be created."); return undef } }
 
@@ -349,7 +349,7 @@ sub format {
 		# we need template-data for sure
 		if( ! defined($template_data) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, input parameter 'template-data' (which contains data to render the templated latex file into a proper latex source file) was not specified but it is absolutely needed."); return undef }
 
-		if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : an in-memory template '".$pars{'processor'}."' has been specified ..."); }
+		if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : a template processor '".$pars{'processor'}."' has been specified ..."); }
 
 		my $tpars = {
 			%pars,
@@ -363,8 +363,8 @@ sub format {
 			$log->error(($verbosity>1?(perl2dump($tpars)."--end parameters.\n"):"")."${whoami} (via $parent), line ".__LINE__." : error, call to ".'untemplate()'." has failed for above parameters.");
 			return undef
 		}
-		$latex_info = Storable::dclone($ret->{'latex'});
-		$template_info = Storable::dclone($ret->{'template'});
+		$latex_info = Clone::clone($ret->{'latex'});
+		$template_info = Clone::clone($ret->{'template'});
 		if( $verbosity > 0 ){ $log->info(perl2dump($latex_info)."--end latex source parameters.\n${whoami} (via $parent), line ".__LINE__." : latex source file has been created from specified template and template data via ".'untemplate()'.", see details above.") }
 	}
 
@@ -443,7 +443,7 @@ sub format {
 		if( open($aFH, '<:utf8', $latex_info->{'filepath'}) ){
 			{ local $/ = undef; $filecontents = <$aFH> } close $aFH;
 		} else { $filecontents="<file contents na>"; $log->error("error, failed to open input latex file for reading '".$latex_info->{'filepath'}."' and will not be able to display the latex file contents for the error message following : $!"); }
-		$log->error("error caught:\n--begin file contents:\n${filecontents}\n--end file contents.\n\n--begin stderr:\n".($latex_driver->stderr()//"<stderr na>")."\n--end stderr.\n--begin stdout:\n".($latex_driver->stdout()//"<stdout na>")."\n--end stdout.\n\n--begin parameters:\n".perl2dump(\%drivparams)."--end parameters.\n${whoami} (via $parent), line ".__LINE__." : error, failed to run latex on file '".$latex_info->{'filepath'}."' with above parameters, exception was caught: $@");
+		$log->error("error caught:\n--begin file contents:\n${filecontents}\n--end file contents.\n\n--begin stderr:\n".($latex_driver->stderr()//"<stderr na>")."\n--end stderr.\n\n--begin parameters:\n".perl2dump(\%drivparams)."--end parameters.\n${whoami} (via $parent), line ".__LINE__." : error, failed to run latex on file '".$latex_info->{'filepath'}."' with above parameters, exception was caught: $@");
 		return undef
 	}
 	if( $ret != 1 ){
@@ -548,14 +548,15 @@ sub untemplate {
 		} else { $log->error(perl2dump($al)."${whoami} (via $parent), line ".__LINE__." : error, group '$group' must contain key 'filepath' or 'filename' AND 'basedir' but it didn't, above is what it has"); return undef }
 	} else {
 		# we are reading this data from 'procesors' set during construction time
-		$latex_info = Storable::dclone($loaded_info->{$group});
+		$latex_info = Clone::clone($loaded_info->{$group});
 	}
 	if( defined($latex_info->{'basedir'}) && (! -d $latex_info->{'basedir'}) ){ make_path($latex_info->{'basedir'}); if( ! -d $latex_info->{'basedir'} ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, dir to place latex source files '".$latex_info->{'basedir'}."' is not a dir and could not be created."); return undef } }
 
 	$group = 'template';
 	my $template_info = {};
-	# this will be set if basedir was specified, then we will copy all contents of basedir into latex dir
-	# perhaps there are images etc.
+	# this will be set if basedir was specified, then we will copy
+	# all contents of basedir into latex dir
+	# perhaps there are images in there that are needed, etc.
 	my $need_to_copy_the_whole_dir = 0;
 	if( exists($params->{$group}) && defined($al=$params->{$group}) ){
 		my ($af, $ab);
@@ -588,7 +589,7 @@ sub untemplate {
 		}
 	} else {
 		# we are reading this data from 'procesors' set during construction time
-		$template_info = Storable::dclone($loaded_info->{$group});
+		$template_info = Clone::clone($loaded_info->{$group});
 	}
 
 	# some of these filenames/paths will be undef if template is memory
@@ -604,11 +605,16 @@ sub untemplate {
 		}
 		if( ! File::Copy::Recursive::rcopy($tmpdir, $latex_info->{'basedir'}) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, failed to copy contents of template dir '$tmpdir' into output dir '".$latex_info->{'basedir'}."'."); return undef }
 		if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : template container dir ($tmpdir) was copied into the output dir (".$latex_info->{'basedir'}."). This is because 'template'->'basedir' was explicitly specified. If you do not want this then specify 'filepath' instead.") }
+	}
+
+	if( exists($template_info->{'filepath'}) && defined($template_info->{'filepath'}) ){
+		if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : template exists on-disk (with name '$processor').") }
 	} else {
 		# we have an in-memory template and templater object works well with this
 		# outdir is already created, so all is well
 		if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : template is an in-memory string (with name '$processor').") }
 	}
+
 	# copy any auxfiles/dirs into output
 	if( exists($template_info->{'auxfiles'}) && defined($template_info->{'auxfiles'}) ){
 		# we have aux files to copy to the latex dir, images, other templates, style files etc.
@@ -634,6 +640,7 @@ sub untemplate {
 	};
 
 	# e.g. xslateobj->render('hello.tx', \%vars);
+	if( $verbosity > 2 ){ $log->info("--begin template info:\n".perl2dump($template_info)."--end template info.\n${whoami} (via $parent), line ".__LINE__." : rendering template with above data ..."); }
 	my $latexstr = eval { $tobj->render($processor, $tdata) };
 	if( ! defined $latexstr ){
 		$log->error("--begin template vars:\n".perl2dump($tdata)."--end template vars.\n${whoami} (via $parent), line ".__LINE__." : error, exception caught during call to ".'templater->render()'." for ".(defined($template_info->{'filepath'})?"template file '".$template_info->{'filepath'}."'":"in-memory template '$processor'")." and above template vars data:\n\n  $@");
@@ -815,7 +822,7 @@ sub _init_processors_data {
 			);
 		}
 		# also in this group we have the latex driver parameters
-		$latex_info{'latex-driver-parameters'} = Storable::dclone($options->{$group}->{'latex-driver-parameters'});
+		$latex_info{'latex-driver-parameters'} = Clone::clone($options->{$group}->{'latex-driver-parameters'});
 		if( exists($al->{'latex-driver-parameters'}) && defined($af=$al->{'latex-driver-parameters'}) ){
 			for(keys %{ $options->{$group}->{'latex-driver-parameters'} }){
 				if( exists($af->{$_}) && defined($af->{$_}) ){ $latex_info{'latex-driver-parameters'}->{$_} = $af->{$_} }
@@ -861,7 +868,7 @@ sub _init_processors_data {
 					$template_info{'filename'}
 				);
 				my $FH;
-				if( ! open($FH, '<:utf8', $template_info{'filepath'}) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : template key '$ak' : error, failed to open specified (in options) article template file '".$template_info{'filepath'}."', $!"); return undef }
+				if( ! open($FH, '<:utf8', $template_info{'filepath'}) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : template key '$ak' : error, failed to open specified (in options) latex-template file '".$template_info{'filepath'}."', $!"); return undef }
 				{ local $/ = undef; $content = <$FH> } close $FH;
 				$template_inc_paths{ $template_info{'basedir'} }++;
 				if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : template key '$ak' : template filename : '".$template_info{'filename'}."' in dir '".$template_info{'basedir'}."'.") }
@@ -869,7 +876,7 @@ sub _init_processors_data {
 				# TODO: perhaps we don't need to load disk-based templates as inmemory???
 				# read a template file from disk, we also record its basedir and abs filename
 				my $FH;
-				if( ! open($FH, '<:utf8', $af) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : template key '$ak' : error, failed to open specified (in options) article template file '$af', $!"); return undef }
+				if( ! open($FH, '<:utf8', $af) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : template key '$ak' : error, failed to open specified (in options) latex-template file '$af', $!"); return undef }
 				{ local $/ = undef; $content = <$FH> } close $FH;
 				$template_info{'filepath'} = Cwd::abs_path($af) // $af;
 				$template_info{'filename'} = File::Basename::basename($template_info{'filepath'});
@@ -925,7 +932,7 @@ sub _init_processors_data {
 				$output_info{'filepath'} = File::Spec->catfile($output_info{'basedir'}, $output_info{'filename'});
 			}
 		} else {
-			if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : processor '$ak' : warning, there is no 'output' section, output will be determined during format() ..."); }
+			if( $verbosity > 4 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : processor '$ak' : warning, there is no 'output' section, output will be determined during format() ..."); }
 		}
 		# and save to self under '_private'->'processors'->'loaded-info' ...
 		$LI->{$ak} = \%loaded_info;
@@ -1013,15 +1020,8 @@ sub options {
 	if( exists($src->{'max-size-for-filecopy'}) && defined($x=$src->{'max-size-for-filecopy'}) ){ $dst->{'max-size-for-filecopy'} = $x }
 
 	# check templater parameters
-	if( exists($src->{'templater-parameters'}) && defined($x=$src->{'templater-parameters'}) ){
-		my $tem = $dst->{'templater-parameters'};
-		for my $k (keys %$x){
-			my $r = ref($x->{$k});
-			# we deep clone only ARRAY and HASH,
-			# we can have scalars and coderefs. dclone() can not clone coderefs, so:
-			if( $r =~ /^HASH|ARRAY$/ ){ $tem->{$k} = Storable::dclone($x->{$k}) }
-			else { $tem->{$k} = $x->{$k} }
-		}
+	if( exists($src->{'templater-parameters'}) && defined($src->{'templater-parameters'}) ){
+		$dst->{'templater-parameters'} = Clone::clone($src->{'templater-parameters'})
 	}
 	return $dst
 }
@@ -1079,7 +1079,7 @@ sub latex_driver_executable_old {
 			return $drivobj->{_program_path}->{$program_name}
 		}
 		return undef # not found
-	} else { return Storable::dclone($drivobj->{_program_path}) }
+	} else { return Clone::clone($drivobj->{_program_path}) }
 
 	return undef # should not be coming here
 }
@@ -1156,12 +1156,12 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 =head1 VERSION
 
-Version 0.06
+Version 1.0
 
 =head1 SYNOPSIS
 
 This module provides functionality to format
-text content, living in a Perl data structure,
+text content from a Perl data structure
 into printer-ready documents (PDF/Postscript/DVI).
 It utilises the idea of Templates and employs the
 powerful LaTeX (via L<LaTeX::Driver>) in order
@@ -1221,7 +1221,7 @@ for each News article, and you have lots of those:
          'paragraph2',
          ...
       ],
-      comments => [
+      usercomments => [
         {
           'author' => 'sappho',
           'content' => 'yearning ...',
@@ -1242,6 +1242,16 @@ etc. would be, you will place some tags like:
   <: $author :>
   <: $sender :>
 
+or control like:
+
+   : for $authors -> $author {
+   : # call a new template for each author and
+   : # append the result here
+   :   include "authors-template.tex.tx" {
+   :     author => $author
+   :   }
+   : }
+
 etc.
 
 The L<LaTeX::Easy::Templates> module
@@ -1251,6 +1261,10 @@ and produce the final rendered documents.
 In section L</STARTING WITH LaTeX> you will see how to easily build a LaTeX template
 from open source, publicly available, superbly styled "I<themes>".
 
+The template engine used in this module is L<Text::Xslate>, chosen
+because of its very good performance when rendering templates.
+
+
     use LaTeX::Easy::Templates;
 
     # templated LaTeX document in-memory
@@ -1259,8 +1273,8 @@ from open source, publicly available, superbly styled "I<themes>".
     % basic LaTeX document
     \documentclass[a4,12pt]{article}
     \begin{document}
-    \title{ <: $data.title :> }
-    \author{ <: $data.author.name :> <: $data.author.surname :> }
+    \title{ <: $data.['title'] :> }
+    \author{ <: $data.author.name :> <: $data.author['surname'] :> }
     \date{ <: $data.date :> }
     \maketitle
     <: $data.content :>
@@ -1278,8 +1292,21 @@ from open source, publicly available, superbly styled "I<themes>".
       'content' => 'blah blah',
     };
 
+    sub myfunc { return "funced ".$_[0] }
+
     my $latte = LaTeX::Easy::Templates->new({
       debug => {verbosity=>2, cleanup=>1},
+      'templater-parameters' => {
+        # passing parameters to Text::Xslate's constructor
+        # myfunc() will be accessible from each template
+        'function' => {
+          'myfunc' => \&myfunc,
+        },
+        'module' => [
+          # and so the exports of this module:
+          'Data::Roundtrip' => [qw/perl2json json2perl/],
+        ],
+      },
       'processors' => {
         # if it includes other in-memory templates
         # then just include them here with their name
@@ -1538,6 +1565,12 @@ For example:
         'function' => {
           'xyz' => sub { my (@params) = @_; ...; return ... }
         },
+        # installed Perl modules can be accessed
+        # from a template (caveat: complains for fully
+	# qualified sub names '::')
+        'module' => [
+          'Data::Roundtrip' => [qw/perl2json json2perl/],
+        ],
         ...
       },
 
@@ -1982,14 +2015,278 @@ Mixed templates functionality is demonstrated and tested in
 file C<t/500-mix-template-usage-calling-other-mix-templates.t>.
 
 
+=head1 EXAMPLE: PRINTING STICKY LABELS
+
+We will use the LaTeX package L<labels|https://ctan.org/pkg/labels?lang=en>
+(documented L<here|https://mirrors.ctan.org/macros/latex/contrib/labels/labels.pdf>)
+to prepare sticky labels for addressing envelopes etc. By the way, there
+is also the L<ticket|https://ctan.org/pkg/ticket?lang=en> LaTeX package
+available over at CTAN (documented L<here|http://mirrors.ctan.org/macros/latex/contrib/ticket/doc/manual.pdf>)
+which can be of similar use, printing tickets.
+
+We will create two template files. One called C<labels.tex.tx> as the
+main entry point. And one called C<label.tex.tx> to be called by the
+first one in a loop over each label item in the input data.
+
+Here they are:
+
+    % I am ./templates/labels/labels.tex.tx
+    \documentclass[12pt]{letter}
+    \usepackage{graphicx}
+    \usepackage{labels}
+    \begin{document}
+    : for $data -> $label {
+    :   include 'label.tex.tx' { label => $label };
+
+and
+
+    % I am ./templates/labels/label.tex.tx
+    \genericlabel{
+      \begin{tabular}{|c|}
+        \hline
+    : if $label.sender.logo {
+        \includegraphics[width=1cm,angle=0]{<: $label.sender.logo :>}\\
+    : }
+        \hline
+        <: $label.recipient.fullname :>\\
+        \hline
+    : for $label.recipient.addresslines -> $addressline {
+        <: $addressline :>
+    : }
+        \\
+        <: $label.recipient.postcode :>\\
+        \hline
+      \end{tabular}
+    }
+
+Save them on disk in the suggested directory structure.
+Or, if you decide to change it, make sure you adjust
+the paths in the script below.
+
+Optionally, save a logo image to
+L<./templates/images/logo.png>. If that exists then
+the template will pick it up.
+
+And here is the Perl script to harness the beast:
+
+    use LaTeX::Easy::Templates;
+    use FindBin;
+
+    my $curdir = $FindBin::Bin;
+
+    # the templates can be placed anywhere as long these
+    # paths are adjusted. As it is now, they
+    # must both be placed in ./templates/labels
+    # the main entry is ./templates/labels/labels.tex.tx
+    # which calls/includes ./templates/labels/label.tex.tx
+    my $template_filename = File::Spec->catfile($curdir, 'templates', 'labels', 'labels.tex.tx');
+    # optionally specify a logo image
+    my $logo_filename = File::Spec->catfile($curdir, 'templates', 'images', 'logo.png');
+    if( ! -e $logo_filename ){ $logo_filename = undef }
+
+    my $output_filename = 'labels.pdf';
+
+    # see LaTeX::Driver's doc for other formats, e.g. pdf(xelatex)
+    my $latex_driver_and_format = 'pdf(pdflatex)';
+
+    # debug settings:
+    my $verbosity = 1;
+    # keep intermediate latex file for inspection
+    my $cleanup = 1;
+
+    my $sender = {
+      fullname => 'Gigi Comp',
+      addresslines => [
+        'Apt 5',
+        '25, Jen Way',
+        'Balac'
+      ],
+      postcode => '1An34',
+      # this assumes that ./templates/images/logo.png exists, else comment it out:  
+      logo => $logo_filename,
+    };
+    my @labels_data = map {
+      {
+        recipient => {
+          fullname => "Teli Bingo ($_)",
+          addresslines => [
+            'Apt 5',
+            '25, Jen Way',
+            'Balac'
+          ],
+          postcode => '1An34',
+        },
+        sender => $sender,
+      }
+    } (1..42); # create many labels yummy
+
+    my $latter = LaTeX::Easy::Templates->new({
+      'debug' => {
+        'verbosity' => $verbosity,
+        'cleanup' => $cleanup
+      },
+      'processors' => {
+        'custom-labels' => {
+        'template' => {
+          'filepath' => $template_filename,
+        },
+        'latex' => {
+          'filepath' => 'xyz.tex',
+          'latex-driver-parameters' => {
+            'format' => $latex_driver_and_format,
+          }
+        }
+        },
+      }
+    });
+    die "failed to instantiate 'LaTeX::Easy::Templates'" unless defined $latter;
+
+    my $ret = $latter->format({
+      'template-data' => \@labels_data,
+      'output' => {
+        'filepath' => $output_filename,
+      },
+      'processor' => 'custom-labels',
+    });
+    die "failed to format the document, most likely latex command has failed." unless defined $ret;
+    print "$0 : done, output in '$output_filename'.\n";
+
+This is the result in very low resolution:
+
+=begin HTML
+
+<img src="data:image/jpeg;base64,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">
+
+=end HTML
+
+=head1 EXAMPLE: NESTED PERL DATA STRUCTURES TO PDF
+
+Thanks to the amazing work put in L<Text::Xslate>
+one can have access to user-defined Perl functions,
+Perl modules and macros from inside a template file.
+
+This allows recusrsion which makes possible walking and
+printing a nested Perl data structure with this
+simple template:
+
+    %templates/nested-data-structures/nested-data-structures.tex.tx
+    \documentclass[12pt]{article}
+    \begin{document}
+
+    : macro walk -> $d {
+    :   if( ref($d) == 'ARRAY' ){
+    $\lbrack$
+    :     for $d -> $item {
+    :       walk($item);
+    :     }
+    $\rbrack,$
+    :   } elsif( ref($d) == 'HASH' ){
+    $\{$
+    :     for $d.kv() -> $pair {
+            <: $pair.key() :> $=>$
+    :       walk($pair.value())
+    :     }
+    $\},$
+    :   } elsif( ref($d) == '' ){
+          <: $d :>,
+    :   } else {
+          beginUNKNOWN <: $d :> endUNKNOWN
+    :   }
+    : } # macro
+
+    <: walk($data) :>
+
+    \end{document}
+
+First we create a macro which walks the input data structure
+and recurses into it until a scalar is found.
+
+The function C<ref()> is Perl's builtin but it is not available
+from inside an L<Text::Xslate> template. So, we create our own
+function for doing this and pass it on to the L<Text::Xslate>'s
+constructor, as was demonstrated previously with the
+C<templater-parameters> hash pass to L<LaTeX::Easy::Templates>'s
+L<constructor|<new()>.
+
+Here is a Perl script to render any data structure into PDF:
+
+    use strict;
+    use warnings;
+
+    use LaTeX::Easy::Templates;
+    use FindBin;
+
+    my $curdir = $FindBin::Bin;
+
+    # the templates must be placed in ./templates/nested-data-structures
+    my $template_filename = File::Spec->catfile($curdir, 'templates', 'nested-data-structures', 'nested-data-structures.tex.tx');
+
+    my $output_filename = 'nested-data-structures.pdf';
+
+    # see LaTeX::Driver's doc for other formats, e.g. pdf(xelatex)
+    my $latex_driver_and_format = 'pdf(pdflatex)';
+
+    my $nested_data_structure = {'a' => [1,2,3], 'b' => {'c' => [4,5,6, {'z'=>1}]}};
+
+    # debug settings:
+    my $verbosity = 1;
+    # keep intermediate latex file for inspection
+    my $cleanup = 1;
+
+    my $latter = LaTeX::Easy::Templates->new({
+      'debug' => {
+        'verbosity' => $verbosity,
+        'cleanup' => $cleanup
+      },
+      'templater-parameters' => {
+        'function' => {'ref' => sub { return ref($_[0]) } }
+      },
+      'processors' => {
+        'nested-data-structures' => {
+          'template' => {
+            'filepath' => $template_filename,
+          },
+          'latex' => {
+            'filepath' => 'xyz.tex',
+            'latex-driver-parameters' => {
+              'format' => $latex_driver_and_format,
+            }
+          },
+        }
+      }
+    });
+    die "failed to instantiate 'LaTeX::Easy::Templates'" unless defined $latter;
+
+    my $ret = $latter->format({
+      'template-data' => $nested_data_structure,
+      'output' => {
+        'filepath' => $output_filename,
+      },
+      'processor' => 'nested-data-structures',
+    });
+    die "failed to format the document, most likely latex command has failed." unless defined $ret;
+    print "$0 : done, output in '$output_filename'.\n";
+
+And here is the result:
+
+=begin HTML
+
+<img src="data:image/jpeg;base64,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">
+
+=end HTML
+
+Thank you LaTeX, thank you Xslate.
+
+
 =head1 STARTING WITH LaTeX
 
 Currently, the best place to get started with LaTeX is at
 the site L<https://www.overleaf.com/> (which I am not affiliated in any way).
 There is no subscription involved or any registration required.
 
-Click on L<Templates|https://www.overleaf.com/latex/templates> and search for anything
-you are interested to typeset your data with. For example, if you are scraping a news
+Click on L<Templates|https://www.overleaf.com/latex/templates>
+and search the presented PDFs of example typeset documents
+for a look you fancy. For example, if you are scraping a news
 website you may be interested in the
 L<Committee Times|https://www.overleaf.com/latex/templates/newspaper-slash-news-letter-template/wjxxhkxdjxhw> template.
 First check its license and if you agree with that, click on B<View Source>, copy the contents and paste
@@ -2007,12 +2304,12 @@ and control structures to use in order to turn it into a template.
 Rename the file to C<main.tex.tx> and you are ready.
 
 Naturally, there will be a lot of head banging and hair pulling before you
-manage to produce anything decent.
+manage to produce results.
 
 =head1 LaTeX TEMPLATES
 
 Creating a LaTeX template is very easy. You need to start with
-a LaTeX document and identify those sections which can be
+a usual LaTeX document and identify those sections which can be
 replaced by the template variables. You can also identify
 repeated sections and replace them with loops.
 It is exactly the same procedure as with creating HTML templates
@@ -2020,7 +2317,8 @@ or email messages templates.
 
 At this moment, the template processor is L<Text::Xslate>.
 Therefore the syntax for declaring template variables, loops,
-conditionals, etc. must comply with L<Text::Xslate>. See
+conditionals, etc. must comply with what L<Text::Xslate>
+expects. See
 section L</TEMPLATE PROCESSING> for where to start
 with L<Text::Xslate>.
 
@@ -2056,7 +2354,7 @@ to make installing extra packages easy.
 I believe L<MikTeX|https://miktex.org/>
 was, at some time, aimed for M$ systems and
 L<TexLive|https://www.tug.org/texlive/>
-for the saner operating systems.
+for the proper operating systems.
 
 My Linux package manager installs
 L<TexLive|https://www.tug.org/texlive/>
@@ -2083,8 +2381,9 @@ for more information.
 This is the hard way.
 
 All available LaTeX packages are
-located at the L<Comprehensive TeX Archive Network (CTAN) site | https://ctan.org>. Search the package,
-download it, locate and change to your LaTeX installation directory (for example C</usr/share/texlive/texmf-dist>),
+located at the L<Comprehensive TeX Archive Network (CTAN) site | https://ctan.org>.
+Search the package, download it, locate and change to your
+LaTeX installation directory (for example C</usr/share/texlive/texmf-dist>),
 change to C<tex>. Decide which flavour of LaTeX (processor)
 this package is for, e.g. C<latex>, C<pdflatex> or C<xelatex>,
 change to that directory and unzip the downloaded file there.
@@ -2106,8 +2405,9 @@ these tests are not important and their possible
 failure should not cause any convern.
 
 In order to run all tests download the
-tarball of this module, extract it,
-enter the directory and do:
+tarball distribution of this module from CPAN
+(there is a link on the left side of the module's
+page for that), extract it, enter the directory and do:
 
     perl Makefile.PL
     make all
@@ -2159,7 +2459,11 @@ L<https://metacpan.org/release/LaTeX-Easy-Templates>
 
 =over
 
-=item * LaTeX - excellent typography, superb aesthetics.
+=item * TeX/LaTeX - excellent typography, superb aesthetics.
+Thank you Donald Knuth and Leslie Lamport and countless contributors.
+
+=item * L<Text::Xslate> - fast and feature-rich template engine.
+Thank you Shoichi Kaji and contributors.
 
 =back
 

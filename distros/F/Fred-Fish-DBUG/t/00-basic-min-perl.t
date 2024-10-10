@@ -13,9 +13,9 @@ use Test::More tests => 1;
 # --------------------------------------
 {
    my $ver = $];
-   my $min_ver = 5.014000;   # 5.14.0
+   my $min_ver = 5.014000;   # 5.14.0, bug has been fixed
 
-   $min_ver = 5.008008;   # Temp at 5.8.8
+   $min_ver = 5.008008;   # Now at 5.8.8 as earliest supported version off perl.
 
    my $good = ($min_ver <= $ver) ? 1 : 0;
 

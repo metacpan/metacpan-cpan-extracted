@@ -12,7 +12,7 @@ App::Greple::xlate - Greple tõlkimise tugimoodul
 
 =head1 VERSION
 
-Version 0.3401
+Version 0.4101
 
 =head1 DESCRIPTION
 
@@ -20,9 +20,9 @@ B<Greple> B<xlate> moodul leiab soovitud tekstiplokid ja asendab need tõlgitud 
 
 Kui soovite tõlkida tavalisi tekstiplokke Perli pod-stiilis kirjutatud dokumendis, kasutage käsku B<greple> koos C<xlate::deepl> ja C<perl> mooduliga niimoodi:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-Selles käsus tähendab musterjada C<^(\w.*\n)+> järjestikuseid ridu, mis algavad tähtnumbrilise tähega. See käsk näitab tõlgitavat ala esile tõstetud kujul. Valikut B<--all> kasutatakse kogu teksti koostamiseks.
+Selles käsus tähendab musterjada C<^([\w\pP].*\n)+> järjestikuseid ridu, mis algavad tähtnumbrilise ja kirjavahemärgiga. See käsk näitab tõlgitavat ala esile tõstetud kujul. Valikut B<--all> kasutatakse kogu teksti koostamiseks.
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
@@ -76,7 +76,7 @@ See normaliseerimisprotsess viiakse läbi ainult esimese (0.) ja paarisnumbrilis
 
     greple -Mxlate -E normalized -E not-normalized
 
-Seetõttu kasutage esimest mustrit teksti puhul, mida tuleb töödelda mitme rea ühendamise teel üheks reaks, ja teist mustrit eelvormindatud teksti puhul. Kui esimeses mustris ei ole sobivat teksti, siis kasutage mustrit, mis ei vasta millelegi, näiteks C<(?!)>.
+Seetõttu kasutage esimest mustrit teksti puhul, mida tuleb töödelda mitme rea ühendamise teel üheks reaks, ja teist mustrit eelnevalt vormindatud teksti puhul. Kui esimeses mustris ei ole sobivat teksti, kasutage mustrit, mis ei vasta millelegi, näiteks C<(?!)>.
 
 =head1 MASKING
 
@@ -85,6 +85,10 @@ Mõnikord on tekstiosasid, mida te ei soovi tõlkida. Näiteks markdown-failide 
     --xlate-setopt maskfile=MASKPATTERN
 
 See tõlgendab iga rida failis `MASKPATTERN` regulaaravaldisena, tõlgib sellele vastavad stringid ja taastab pärast töötlemist. C<#>-ga algavaid ridu ignoreeritakse.
+
+Keerulise mustri võib kirjutada mitmele reale koos kaldkriipsu eskaga newline.
+
+Seda, kuidas tekst on maskeerimise abil muudetud, saab näha valiku B<--xlate-mask> abil.
 
 See liides on eksperimentaalne ja võib tulevikus muutuda.
 
@@ -162,6 +166,28 @@ Originaalfaili saate taastada järgmise käsuga L<sed(1)>.
 
     sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+=item B<colon>, I<:::::::>
+
+Algne ja tõlgitud tekst väljastatakse markdowni kohandatud konteineri stiilis.
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+Ülaltoodud tekst tõlgitakse HTML-is järgmiselt.
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+Koolonite arv on vaikimisi 7. Kui määrate koolonite järjestuse nagu C<:::::>, kasutatakse seda 7 kooloni asemel.
+
 =item B<ifdef>
 
 Algne ja teisendatud tekst trükitakse L<cpp(1)> C<#ifdef> formaadis.
@@ -179,7 +205,9 @@ Saate ainult jaapani teksti taastada käsuga B<unifdef>:
 
 =item B<space>
 
-Algne ja teisendatud tekst trükitakse ühe tühja reaga eraldatuna.
+=item B<space+>
+
+Algne ja teisendatud tekst on trükitud ühe tühja reaga eraldatud. C<space+> puhul väljastab see ka uue rea pärast teisendatud teksti.
 
 =item B<xtxt>
 
@@ -201,6 +229,16 @@ Määrake selle väärtuseks 1, kui soovite tõlkida ühe rea korraga. See valik
 
 Näete tõlkimise tulemust reaalajas STDERR-väljundist.
 
+=item B<--xlate-stripe>
+
+Kasutage L<App::Greple::stripe> moodulit, et näidata sobitatud osa sebratriibu moodi. See on kasulik siis, kui sobitatud osad on omavahel ühendatud.
+
+Värvipalett vahetatakse vastavalt terminali taustavärvile. Kui soovite seda selgesõnaliselt määrata, võite kasutada B<--xlate-stripe-light> või B<--xlate-stripe-dark>.
+
+=item B<--xlate-mask>
+
+Sooritage maskeerimisfunktsioon ja kuvage teisendatud tekst sellisena, nagu see on, ilma taastamiseta.
+
 =item B<--match-all>
 
 Määrake kogu faili tekst sihtkohaks.
@@ -211,11 +249,9 @@ Määrake kogu faili tekst sihtkohaks.
 
 B<xlate> moodul võib salvestada iga faili tõlketeksti vahemällu ja lugeda seda enne täitmist, et kõrvaldada serveri küsimisega kaasnev koormus. Vaikimisi vahemälustrateegia C<auto> puhul säilitab ta vahemälu andmeid ainult siis, kui vahemälufail on sihtfaili jaoks olemas.
 
+Kasutage B<--xlate-cache=clear>, et alustada vahemälu haldamist või puhastada kõik olemasolevad vahemälu andmed. Selle valikuga käivitamisel luuakse uus vahemälufail, kui seda ei ole veel olemas, ja seejärel hooldatakse seda automaatselt.
+
 =over 7
-
-=item --cache-clear
-
-Valikut B<--cache-clear> saab kasutada vahemälu haldamise alustamiseks või kõigi olemasolevate vahemälu andmete värskendamiseks. Selle valikuga käivitamisel luuakse uus vahemälufail, kui seda ei ole veel olemas, ja seejärel hooldatakse seda automaatselt.
 
 =item --xlate-cache=I<strategy>
 
@@ -247,6 +283,10 @@ Vaikimisi käitumise kohaselt eemaldatakse kasutamata andmed vahemälufailist. K
 
 =back
 
+=item B<--xlate-update>
+
+See valik sunnib uuendama vahemälufaili isegi siis, kui see pole vajalik.
+
 =back
 
 =head1 COMMAND LINE INTERFACE
@@ -264,44 +304,49 @@ Käivitamine nagu C<xlate -GC> käivitab shell'i, kuhu on paigaldatud praegune t
 Lugege üksikasjalikult Jaapani artiklit L</SEE ALSO> osas.
 
     xlate [ options ] -t lang file [ greple options ]
-	-h   help
-	-v   show version
-	-d   debug
-	-n   dry-run
-	-a   use API
-	-c   just check translation area
-	-r   refresh cache
-	-s   silent mode
-	-e # translation engine (default "deepl")
-	-p # pattern to determine translation area
-	-w # wrap line by # width
-	-o # output format (default "xtxt", or "cm", "ifdef")
-	-f # from lang (ignored)
-	-t # to lang (required, no default)
-	-m # max length per API call
-	-l # show library files (XLATE.mk, xlate.el)
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -x # file containing mask patterns
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
     Make options
-	-M   run make
-	-n   dry-run
+        -M   run make
+        -n   dry-run
     Docker options
-	-G   mount git top-level directory
-	-B   run in non-interactive (batch) mode
-	-R   mount read-only
-	-E * specify environment variable to be inherited
-	-I * specify altanative docker image (default: tecolicom/xlate:version)
-	-D * run xlate on the container with the rest parameters
-	-C * run following command on the container, or run shell
-
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * docker image name or version (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+    
     Control Files:
-	*.LANG    translation languates
-	*.FORMAT  translation foramt (xtxt, cm, ifdef)
-	*.ENGINE  translation engine (deepl or gpt3)
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 
 =head1 EMACS
 
 Laadige repositooriumis sisalduv fail F<xlate.el>, et kasutada C<xlate> käsku Emacs redaktorist. C<xlate-region> funktsioon tõlkida antud piirkonda. Vaikimisi keel on C<EN-US> ja te võite määrata keele, kutsudes seda prefix-argumendiga.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
 
 =head1 ENVIRONMENT
 
@@ -339,33 +384,39 @@ L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt3>
 
-L<https://hub.docker.com/r/tecolicom/xlate>
+=over 2
 
-=over 7
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
 
-=item L<https://github.com/DeepLcom/deepl-python>
+Dockeri konteineri kujutis.
+
+=item * L<https://github.com/DeepLcom/deepl-python>
 
 DeepL Pythoni raamatukogu ja CLI käsk.
 
-=item L<https://github.com/openai/openai-python>
+=item * L<https://github.com/openai/openai-python>
 
 OpenAI Pythoni raamatukogu
 
-=item L<https://github.com/tecolicom/App-gpty>
+=item * L<https://github.com/tecolicom/App-gpty>
 
 OpenAI käsurea liides
 
-=item L<App::Greple>
+=item * L<App::Greple>
 
 Vt B<greple> käsiraamatust üksikasjalikult sihttekstimustri kohta. Kasutage B<--inside>, B<--outside>, B<--include>, B<--exclude> valikuid, et piirata sobitusala.
 
-=item L<App::Greple::update>
+=item * L<App::Greple::update>
 
 Saate kasutada C<-Mupdate> moodulit, et muuta faile B<greple> käsu tulemuse järgi.
 
-=item L<App::sdif>
+=item * L<App::sdif>
 
 Kasutage B<sdif>, et näidata konfliktimärkide formaati kõrvuti valikuga B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Greple B<xlate-stripe> mooduli kasutamine B<--xlate-stripe> valikuga.
 
 =back
 

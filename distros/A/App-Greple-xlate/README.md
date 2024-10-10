@@ -11,7 +11,7 @@ App::Greple::xlate - translation support module for greple
 
 # VERSION
 
-Version 0.3401
+Version 0.4101
 
 # DESCRIPTION
 
@@ -24,12 +24,12 @@ If you want to translate normal text blocks in a document written in
 the Perl's pod style, use **greple** command with `xlate::deepl` and
 `perl` module like this:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-In this command, pattern string `^(\w.*\n)+` means consecutive lines
-starting with alpha-numeric letter.  This command show the area to be
-translated highlighted.  Option **--all** is used to produce entire
-text.
+In this command, pattern string `^([\w\pP].*\n)+` means consecutive
+lines starting with alpha-numeric and punctuation letter.  This
+command show the area to be translated highlighted.  Option **--all**
+is used to produce entire text.
 
 <div>
     <p>
@@ -99,7 +99,7 @@ text matching the second pattern.
 Therefore, use the first pattern for text that is to be processed by
 combining multiple lines into a single line, and use the second
 pattern for pre-formatted text.  If there is no text to match in the
-first pattern, then a pattern that does not match anything, such as
+first pattern, use a pattern that does not match anything, such as
 `(?!)`.
 
 # MASKING
@@ -116,6 +116,12 @@ translation.
 This will interpret each line of the file \`MASKPATTERN\` as a regular
 expression, translate strings matching it, and revert after
 processing.  Lines beginning with `#` are ignored.
+
+Complex pattern can be written on multiple lines with backslash
+escpaed newline.
+
+How the text is transformed by masking can be seen by **--xlate-mask**
+option.
 
 This interface is experimental and subject to change in the future.
 
@@ -196,6 +202,30 @@ This interface is experimental and subject to change in the future.
 
             sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+    - **colon**, _:::::::_
+
+        The original and translated text are output in a markdown's custom
+        container style.
+
+            ::::::: ORIGINAL
+            original text
+            :::::::
+            ::::::: JA
+            translated Japanese text
+            :::::::
+
+        Above text will be translated to the following in HTML.
+
+            <div class="ORIGINAL">
+            original text
+            </div>
+            <div class="JA">
+            translated Japanese text
+            </div>
+
+        Number of colon is 7 by default.  If you specify colon sequence like
+        `:::::`, it is used instead of 7 colons.
+
     - **ifdef**
 
         Original and converted text are printed in [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`
@@ -213,9 +243,11 @@ This interface is experimental and subject to change in the future.
             unifdef -UORIGINAL -DJA foo.ja.pm
 
     - **space**
+    - **space+**
 
         Original and converted text are printed separated by single blank
-        line.
+        line.  For `space+`, it also outputs a newline after the converted
+        text.
 
     - **xtxt**
 
@@ -241,6 +273,21 @@ This interface is experimental and subject to change in the future.
 
     See the tranlsation result in real time in the STDERR output.
 
+- **--xlate-stripe**
+
+    Use [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe) module to show the matched part by zebra
+    striping fashion.  This is useful when the matched parts are connected
+    back-to-back.
+
+    The color palette is switched according to the background color of the
+    terminal.  If you want to specify explicitly, you can use
+    **--xlate-stripe-light** or **--xlate-stripe-dark**.
+
+- **--xlate-mask**
+
+    Perform masking function and display the converted text as is without
+    restoration.
+
 - **--match-all**
 
     Set the whole text of the file as a target area.
@@ -252,12 +299,10 @@ read it before execution to eliminate the overhead of asking to
 server.  With the default cache strategy `auto`, it maintains cache
 data only when the cache file exists for target file.
 
-- --cache-clear
-
-    The **--cache-clear** option can be used to initiate cache management
-    or to refresh all existing cache data. Once executed with this option,
-    a new cache file will be created if one does not exist and then
-    automatically maintained afterward.
+Use **--xlate-cache=clear** to initiate cache management or to clean up
+all existing cache data.  Once executed with this option, a new cache
+file will be created if one does not exist and then automatically
+maintained afterward.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
@@ -284,6 +329,9 @@ data only when the cache file exists for target file.
 
         By default behavior, unused data is removed from the cache file.  If
         you don't want to remove them and keep in the file, use `accumulate`.
+- **--xlate-update**
+
+    This option forces to update cache file even if it is not necessary.
 
 # COMMAND LINE INTERFACE
 
@@ -318,6 +366,7 @@ Read Japanese article in ["SEE ALSO"](#see-also) section for detail.
         -s   silent mode
         -e # translation engine (default "deepl")
         -p # pattern to determine translation area
+        -x # file containing mask patterns
         -w # wrap line by # width
         -o # output format (default "xtxt", or "cm", "ifdef")
         -f # from lang (ignored)
@@ -333,14 +382,14 @@ Read Japanese article in ["SEE ALSO"](#see-also) section for detail.
         -B   run in non-interactive (batch) mode
         -R   mount read-only
         -E * specify environment variable to be inherited
-        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -I * docker image name or version (default: tecolicom/xlate:version)
         -D * run xlate on the container with the rest parameters
         -C * run following command on the container, or run shell
-
+    
     Control Files:
         *.LANG    translation languates
-        *.FORMAT  translation foramt (xtxt, cm, ifdef)
-        *.ENGINE  translation engine (deepl or gpt3)
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 # EMACS
 
@@ -348,6 +397,12 @@ Load the `xlate.el` file included in the repository to use `xlate`
 command from Emacs editor.  `xlate-region` function translate the
 given region.  Default language is `EN-US` and you can specify
 language invoking it with prefix argument.
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+    </p>
+</div>
 
 # ENVIRONMENT
 
@@ -381,7 +436,9 @@ You have to install command line tools for DeepL and ChatGPT.
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
-[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+- [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
+    Docker container image.
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
@@ -410,6 +467,10 @@ You have to install command line tools for DeepL and ChatGPT.
 
     Use **sdif** to show conflict marker format side by side with **-V**
     option.
+
+- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
+
+    Greple **stripe** module use by **--xlate-stripe** option.
 
 ## ARTICLES
 

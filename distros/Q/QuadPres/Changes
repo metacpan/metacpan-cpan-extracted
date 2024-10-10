@@ -1,5 +1,8 @@
 Revision history for QuadPres
 
+0.32.0       2024-10-10
+    - document lib/QuadPres/VimIface.pm and make it use File::ShouldUpdate
+
 0.30.0       2020-07-21
     - Add ref_traverse_tree()
 

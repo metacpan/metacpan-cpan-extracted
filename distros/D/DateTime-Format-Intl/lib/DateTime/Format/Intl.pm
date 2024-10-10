@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Intl - ~/lib/DateTime/Format/Intl.pm
-## Version v0.1.1
+## Version v0.1.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/09/16
@@ -27,10 +27,9 @@ BEGIN
     use DateTime::Format::Unicode;
     use Locale::Intl;
     use Locale::Unicode::Data;
-    use POSIX ();
     use Scalar::Util ();
     use Want;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.3';
     our $CACHE = {};
     our $LAST_CACHE_CLEAR = time();
     our $MAX_CACHE_SIZE = 30;
@@ -572,7 +571,7 @@ sub new
             if( defined( $date_pattern ) && defined( $time_pattern ) )
             {
                 # Define the combine mode as the most comprehensive mode of either date or time style specified
-                my $datetime_mode = $number2mode->{ POSIX::fmax( $mode2number->{ $dateStyle }, $mode2number->{ $timeStyle } ) };
+                my $datetime_mode = $number2mode->{ _max( $mode2number->{ $dateStyle }, $mode2number->{ $timeStyle } ) };
                 my $code_datetime = $cldr->can( "datetime_format_${datetime_mode}" ) ||
                     return( $self->error( "No method datetime_format_${datetime_mode} found in ", ref( $unicode ) ) );
                 $pattern = $code_datetime->( $unicode );
@@ -2395,6 +2394,12 @@ sub _get_options_map
     return( $map );
 }
 
+sub _max
+{
+    my( $x, $y ) = @_;
+    return( ( $x > $y ) ? $x : $y );
+}
+
 sub _new_request_object
 {
     my $self = shift( @_ );
@@ -3083,7 +3088,7 @@ sub _select_best_pattern
             debug => $DEBUG,
         ) || return( $self->pass_error );
         $best_score_object = $self->_new_score_result(
-            score => ( defined( $best_score_object ) ? $best_score_object->score : POSIX::fmax( $date_score_object->score, $time_score_object->score ) ),
+            score => ( defined( $best_score_object ) ? $best_score_object->score : _max( $date_score_object->score, $time_score_object->score ) ),
             pattern_object => $pattern_object,
             request_object => $request_object,
             need_adjustment => ( ( $date_score_object->need_adjustment || $time_score_object->need_adjustment ) ? 1 : 0 ),
@@ -5133,7 +5138,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.3
 
 =head1 DESCRIPTION
 
@@ -5398,6 +5403,34 @@ Note: C<dateStyle> and C<timeStyle> can be used with each other, but not with ot
 =head1 METHODS
 
 =head2 format
+
+    my $options = 
+    {
+      weekday => 'long',
+      year => 'numeric',
+      month => 'long',
+      day => 'numeric',
+    };
+    my $date = DateTime->new(
+        year => 2012,
+        month => 6,
+        day => 1,
+        time_zone => 'UTC',
+    );
+    
+    my $dateTimeFormat1 = DateTime::Format::Intl->new('sr-RS', $options);
+    say $dateTimeFormat1->format( $date );
+    # Expected output: "петак, 1. јун 2012."
+    
+    my $dateTimeFormat2 = DateTime::Format::Intl->new('en-GB', $options);
+    say $dateTimeFormat2->format( $date );
+    # Expected output: "Friday, 1 June 2012"
+    
+    my $dateTimeFormat3 = DateTime::Format::Intl->new('en-US', $options);
+    say $dateTimeFormat3->format( $date );
+    # Expected output: "Friday, June 1, 2012"
+
+This takes a L<DateTime> object, and returns a string representing the given date formatted according to the C<locale> and formatting options of this C<DateTime::Format::Intl> object.
 
 =head2 format_range
 

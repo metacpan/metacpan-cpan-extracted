@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Blockchain/Ethereum/ABI.pm',
@@ -18,8 +18,7 @@ my @module_files = (
     'Blockchain/Ethereum/ABI/Type/Bytes.pm',
     'Blockchain/Ethereum/ABI/Type/Int.pm',
     'Blockchain/Ethereum/ABI/Type/String.pm',
-    'Blockchain/Ethereum/ABI/Type/Tuple.pm',
-    'Blockchain/Ethereum/ABI/TypeRole.pm'
+    'Blockchain/Ethereum/ABI/Type/Tuple.pm'
 );
 
 

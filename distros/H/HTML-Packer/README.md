@@ -10,7 +10,7 @@ HTML::Packer - Another HTML code cleaner
 
 # VERSION
 
-Version 2.10
+Version 2.11
 
 # DESCRIPTION
 
@@ -52,13 +52,13 @@ Second argument must be a hashref of options. Possible options are
 
     Defines compression level for javascript. Possible values are 'clean', 'obfuscate', 'shrink' and 'best'.
     Default is no compression for javascript.
-    This option only takes effect if [JavaScript::Packer](https://metacpan.org/pod/JavaScript::Packer) is installed.
+    This option only takes effect if [JavaScript::Packer](https://metacpan.org/pod/JavaScript%3A%3APacker) is installed.
 
 - do\_stylesheet
 
     Defines compression level for CSS. Possible values are 'minify' and 'pretty'.
     Default is no compression for CSS.
-    This option only takes effect if [CSS::Packer](https://metacpan.org/pod/CSS::Packer) is installed.
+    This option only takes effect if [CSS::Packer](https://metacpan.org/pod/CSS%3A%3APacker) is installed.
 
 - do\_csp
 
@@ -125,4 +125,4 @@ under the same terms as Perl itself.
 
 # SEE ALSO
 
-[HTML::Clean](https://metacpan.org/pod/HTML::Clean)
+[HTML::Clean](https://metacpan.org/pod/HTML%3A%3AClean)

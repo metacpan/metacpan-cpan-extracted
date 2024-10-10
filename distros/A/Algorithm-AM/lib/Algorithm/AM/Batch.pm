@@ -1,7 +1,7 @@
 package Algorithm::AM::Batch;
 use strict;
 use warnings;
-our $VERSION = '3.12';
+our $VERSION = '3.13';
 # ABSTRACT: Classify items in batch mode
 use feature 'state';
 use Carp;
@@ -289,7 +289,7 @@ Algorithm::AM::Batch - Classify items in batch mode
 
 =head1 VERSION
 
-version 3.12
+version 3.13
 
 =head1 C<SYNOPSIS>
 

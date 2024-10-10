@@ -11,7 +11,7 @@ use warnings;
 use vars qw ( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION   = "2.07";
+$VERSION   = "2.08";
 @ISA       = qw ( Exporter );
 @EXPORT    = qw ();
 @EXPORT_OK = qw ();

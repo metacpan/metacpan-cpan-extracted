@@ -1,31 +1,27 @@
-use v5.26;
+package Blockchain::Ethereum::ABI::Type::Bytes;
 
+use v5.26;
 use strict;
 use warnings;
 no indirect;
-use feature 'signatures';
 
-use Object::Pad;
 # ABSTRACT: Solidity bytes type interface
-
-package Blockchain::Ethereum::ABI::Type::Bytes;
-class Blockchain::Ethereum::ABI::Type::Bytes
-    :isa(Blockchain::Ethereum::ABI::Type)
-    :does(Blockchain::Ethereum::ABI::TypeRole);
-
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.016';          # VERSION
+our $VERSION   = '0.017';          # VERSION
+
+use parent 'Blockchain::Ethereum::ABI::Type';
 
 use Carp;
 
-method _configure { return }
+sub _configure { return }
 
-method encode {
+sub encode {
+    my $self = shift;
 
     return $self->_encoded if $self->_encoded;
     # remove 0x and validates the hexadecimal value
-    croak 'Invalid hexadecimal value ' . $self->data // 'undef'
-        unless $self->data =~ /^(?:0x|0X)?([a-fA-F0-9]+)$/;
+    croak 'Invalid hexadecimal value ' . $self->{data} // 'undef'
+        unless $self->{data} =~ /^(?:0x|0X)?([a-fA-F0-9]+)$/;
     my $hex = $1;
 
     my $data_length = length(pack("H*", $hex));
@@ -42,9 +38,10 @@ method encode {
     return $self->_encoded;
 }
 
-method decode {
+sub decode {
+    my $self = shift;
 
-    my @data = $self->data->@*;
+    my @data = $self->{data}->@*;
 
     my $hex_data;
     my $size = $self->fixed_length;
@@ -74,7 +71,7 @@ Blockchain::Ethereum::ABI::Type::Bytes - Solidity bytes type interface
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

@@ -1,43 +1,44 @@
-use v5.26;
+package Blockchain::Ethereum::ABI::Type;
 
+use v5.26;
 use strict;
 use warnings;
 no indirect;
-use feature 'signatures';
 
-use Object::Pad ':experimental(init_expr)';
 # ABSTRACT: Type interface
-
-package Blockchain::Ethereum::ABI::Type;
-class Blockchain::Ethereum::ABI::Type;
-
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.016';          # VERSION
+our $VERSION   = '0.017';          # VERSION
 
 use Carp;
 use Module::Load;
 
-field $signature :reader :writer :param = undef;
-field $data :reader :writer :param      = undef;
+sub new {
+    my ($class, %params) = @_;
 
-field $_static :reader(_static)                              = [];
-field $_dynamic :reader(_dynamic)                            = [];
-field $_instances :reader(_instances) :writer(set_instances) = [];
+    my $signature = $params{signature};
+    my $data      = $params{data};
 
-ADJUST {
-    if ($self->signature) {
+    my $self = {
+        signature => $signature,
+        data      => $data,
+        static    => [],
+        dynamic   => [],
+        instances => [],
+    };
+
+    if ($signature) {
         my $module;
-        if ($self->signature =~ /\[(\d+)?\]$/gm) {
+        if ($signature =~ /\[(\d+)?\]$/gm) {
             $module = "Array";
-        } elsif ($self->signature =~ /^\(.*\)/) {
+        } elsif ($signature =~ /^\(.*\)/) {
             $module = "Tuple";
-        } elsif ($self->signature =~ /^address$/) {
+        } elsif ($signature =~ /^address$/) {
             $module = "Address";
-        } elsif ($self->signature =~ /^(u)?(int|bool)(\d+)?$/) {
+        } elsif ($signature =~ /^(u)?(int|bool)(\d+)?$/) {
             $module = "Int";
-        } elsif ($self->signature =~ /^(?:bytes)(\d+)?$/) {
+        } elsif ($signature =~ /^(?:bytes)(\d+)?$/) {
             $module = "Bytes";
-        } elsif ($self->signature =~ /^string$/) {
+        } elsif ($signature =~ /^string$/) {
             $module = "String";
         } else {
             croak "Module not found for the given parameter signature $signature";
@@ -49,20 +50,39 @@ ADJUST {
 
         $self = bless $self, $package;
         $self->_configure;
+    } else {
+        $self = bless $self, $class;
     }
+
+    return $self;
 }
 
-method _push_static ($data) {
-
-    push($self->_static->@*, ref $data eq 'ARRAY' ? $data->@* : $data);
+sub _configure {
+    croak 'method _configure not implemented';
 }
 
-method _push_dynamic ($data) {
-
-    push($self->_dynamic->@*, ref $data eq 'ARRAY' ? $data->@* : $data);
+sub encode {
+    croak 'method encode not implemented';
 }
 
-method pad_right ($data) {
+sub decode {
+    croak 'method decode not implemented';
+}
+
+sub _push_static {
+    my ($self, $data) = @_;
+
+    push($self->{static}->@*, ref $data eq 'ARRAY' ? $data->@* : $data);
+}
+
+sub _push_dynamic {
+    my ($self, $data) = @_;
+
+    push($self->{dynamic}->@*, ref $data eq 'ARRAY' ? $data->@* : $data);
+}
+
+sub pad_right {
+    my ($self, $data) = @_;
 
     my @chunks;
     push(@chunks, $_ . '0' x (64 - length $_)) for unpack("(A64)*", $data);
@@ -70,7 +90,8 @@ method pad_right ($data) {
     return \@chunks;
 }
 
-method pad_left ($data) {
+sub pad_left {
+    my ($self, $data) = @_;
 
     my @chunks;
     push(@chunks, sprintf("%064s", $_)) for unpack("(A64)*", $data);
@@ -79,33 +100,38 @@ method pad_left ($data) {
 
 }
 
-method _encode_length ($length) {
+sub _encode_length {
+    my ($self, $length) = @_;
 
     return sprintf("%064s", sprintf("%x", $length));
 }
 
-method _encode_offset ($offset) {
+sub _encode_offset {
+    my ($self, $offset) = @_;
 
     return sprintf("%064s", sprintf("%x", $offset * 32));
 }
 
-method _encoded {
+sub _encoded {
+    my ($self, $offset) = @_;
 
-    my @data = ($self->_static->@*, $self->_dynamic->@*);
+    my @data = ($self->{static}->@*, $self->{dynamic}->@*);
     return scalar @data ? \@data : undef;
 }
 
-method is_dynamic {
+sub is_dynamic {
+    my $self = shift;
 
-    return $self->signature =~ /(bytes|string)(?!\d+)|(\[\])/ ? 1 : 0;
+    return $self->{signature} =~ /(bytes|string)(?!\d+)|(\[\])/ ? 1 : 0;
 }
 
 # get the first index where data is set to the encoded value
 # skipping the prefixed indexes
-method _get_initial_offset {
+sub _get_initial_offset {
+    my $self = shift;
 
     my $offset = 0;
-    for my $param ($self->_instances->@*) {
+    for my $param ($self->{instances}->@*) {
         my $encoded = $param->encode;
         if ($param->is_dynamic) {
             $offset += 1;
@@ -117,30 +143,31 @@ method _get_initial_offset {
     return $offset;
 }
 
-method fixed_length {
+sub fixed_length {
+    my $self = shift;
 
-    if ($self->signature =~ /[a-z](\d+)/) {
+    if ($self->{signature} =~ /[a-z](\d+)/) {
         return $1;
     }
     return undef;
 }
 
-method _static_size {
-
+sub _static_size {
     return 1;
 }
 
 # read the data at the encoded stack
-method _read_stack_set_data {
+sub _read_stack_set_data {
+    my $self = shift;
 
-    my @data = $self->data->@*;
+    my @data = $self->{data}->@*;
     my @offsets;
     my $current_offset = 0;
 
     # Since at this point we don't information about the chunks of data it is_dynamic
     # needed to get all the offsets in the static header, so the dynamic values can
     # be retrieved based in between the current and the next offsets
-    for my $instance ($self->_instances->@*) {
+    for my $instance ($self->{instances}->@*) {
         if ($instance->is_dynamic) {
             push @offsets, hex($data[$current_offset]) / 32;
         }
@@ -154,21 +181,21 @@ method _read_stack_set_data {
     my %response;
     # Dynamic data must to be set first since the full_size method
     # will need to use the data offset related to the size of the item
-    for (my $i = 0; $i < $self->_instances->@*; $i++) {
-        my $instance = $self->_instances->[$i];
+    for (my $i = 0; $i < $self->{instances}->@*; $i++) {
+        my $instance = $self->{instances}->[$i];
         next unless $instance->is_dynamic;
         my $offset_start = shift @offsets;
         my $offset_end   = $offsets[0] // scalar @data - 1;
         my @range        = @data[$offset_start .. $offset_end];
-        $instance->set_data(\@range);
+        $instance->{data} = \@range;
         $current_offset += scalar @range;
         $response{$i} = $instance->decode();
     }
 
     $current_offset = 0;
 
-    for (my $i = 0; $i < $self->_instances->@*; $i++) {
-        my $instance = $self->_instances->[$i];
+    for (my $i = 0; $i < $self->{instances}->@*; $i++) {
+        my $instance = $self->{instances}->[$i];
 
         if ($instance->is_dynamic) {
             $current_offset++;
@@ -178,7 +205,7 @@ method _read_stack_set_data {
         my $size = 1;
         $size = $instance->_static_size unless $instance->is_dynamic;
         my @range = @data[$current_offset .. $current_offset + $size - 1];
-        $instance->set_data(\@range);
+        $instance->{data} = \@range;
         $current_offset += $size;
 
         $response{$i} = $instance->decode();
@@ -186,7 +213,7 @@ method _read_stack_set_data {
 
     my @array_response;
     # the given order of type signatures needs to be strict followed
-    push(@array_response, $response{$_}) for 0 .. scalar $self->_instances->@* - 1;
+    push(@array_response, $response{$_}) for 0 .. scalar $self->{instances}->@* - 1;
     return \@array_response;
 }
 
@@ -204,7 +231,7 @@ Blockchain::Ethereum::ABI::Type - Type interface
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

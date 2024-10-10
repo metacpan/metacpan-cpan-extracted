@@ -1,33 +1,37 @@
-use v5.26;
+package Blockchain::Ethereum::ABI::Decoder;
 
+use v5.26;
 use strict;
 use warnings;
 no indirect;
-use feature 'signatures';
 
-use Object::Pad ':experimental(init_expr)';
 # ABSTRACT: ABI utility for decoding ethereum contract arguments
-
-package Blockchain::Ethereum::ABI::Decoder;
-class Blockchain::Ethereum::ABI::Decoder;
-
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.016';          # VERSION
+our $VERSION   = '0.017';          # VERSION
 
 use Carp;
 
 use Blockchain::Ethereum::ABI::Type;
 use Blockchain::Ethereum::ABI::Type::Tuple;
 
-field $_instances :reader(_instances) :writer(set_instances) = [];
+sub new {
+    my $class = shift;
+    my $self  = {
+        instances => [],
+    };
 
-method append ($param) {
+    return bless $self, $class;
+}
 
-    push $self->_instances->@*, Blockchain::Ethereum::ABI::Type->new(signature => $param);
+sub append {
+    my ($self, $param) = @_;
+
+    push $self->{instances}->@*, Blockchain::Ethereum::ABI::Type->new(signature => $param);
     return $self;
 }
 
-method decode ($hex_data) {
+sub decode {
+    my ($self, $hex_data) = @_;
 
     croak 'Invalid hexadecimal value ' . $hex_data // 'undef'
         unless $hex_data =~ /^(?:0x|0X)?([a-fA-F0-9]+)$/;
@@ -36,17 +40,18 @@ method decode ($hex_data) {
     my @data = unpack("(A64)*", $hex);
 
     my $tuple = Blockchain::Ethereum::ABI::Type::Tuple->new;
-    $tuple->set_instances($self->_instances);
-    $tuple->set_data(\@data);
+    $tuple->{instances} = $self->{instances};
+    $tuple->{data}      = \@data;
     my $data = $tuple->decode;
 
     $self->_clean;
     return $data;
 }
 
-method _clean {
+sub _clean {
+    my $self = shift;
 
-    $self->set_instances([]);
+    $self->{instances} = [];
 }
 
 1;
@@ -63,7 +68,7 @@ Blockchain::Ethereum::ABI::Decoder - ABI utility for decoding ethereum contract 
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

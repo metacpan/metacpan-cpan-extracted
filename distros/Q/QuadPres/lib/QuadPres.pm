@@ -1,5 +1,5 @@
 package QuadPres;
-$QuadPres::VERSION = '0.30.0';
+$QuadPres::VERSION = '0.32.0';
 use 5.016;
 use strict;
 use warnings;
@@ -8,10 +8,10 @@ use utf8;
 
 use parent 'QuadPres::Base';
 
-use Path::Tiny qw/ path /;
-use Data::Dumper  ();
-use QuadPres::Url ();
-use Carp          ();
+use Path::Tiny                         qw/ path /;
+use Data::Dumper                       ();
+use QuadPres::Url                      ();
+use Carp                               ();
 use HTML::Widgets::NavMenu::EscapeHtml qw(escape_html);
 
 my $navigation_style_class = "nav";
@@ -27,7 +27,7 @@ __PACKAGE__->mk_acc_ref(
             mode
             navigation_bar
             stage_idx
-            )
+        )
     ]
 );
 
@@ -811,7 +811,7 @@ sub ref_traverse_tree
                 {
                     __SUB__->(
                         [ @$path_ref, $sub_branch->{'url'} ],
-                        [ @$coords, $new_coord ], $sub_branch,
+                        [ @$coords,   $new_coord ], $sub_branch,
                     );
                 }
                 continue
@@ -874,7 +874,7 @@ QuadPres - a presentation / slides manager.
 
 =head1 VERSION
 
-version 0.30.0
+version 0.32.0
 
 =head1 SYNOPSIS
 

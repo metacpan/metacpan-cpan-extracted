@@ -12,7 +12,7 @@ App::Greple::xlate - greple için çeviri desteği modülü
 
 =head1 VERSION
 
-Version 0.3401
+Version 0.4101
 
 =head1 DESCRIPTION
 
@@ -20,9 +20,9 @@ B<Greple> B<xlate> modülü istenilen metin bloklarını bulur ve bunları çevr
 
 Eğer Perl'in pod stiliyle yazılmış bir belgedeki normal metin bloklarını çevirmek istiyorsanız, şu şekilde B<greple> komutunu C<xlate::deepl> ve C<perl> modülü ile kullanın:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-Bu komutta, desen dizesi C<^(\w.*\n)+>, alfanümerik harfle başlayan ardışık satırları ifade eder. Bu komut, çevrilecek alanı vurgular. Bütün metni üretmek için B<--all> seçeneği kullanılır.
+Bu komutta, desen dizesi C<^([\w\pP].*\n)+> alfa-nümerik ve noktalama işareti harfi ile başlayan ardışık satırları ifade eder. Bu komut, çevrilecek alanı vurgular.
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
@@ -76,7 +76,7 @@ Bu normalleştirme işlemi sadece ilk (0'ıncı) ve çift numaralı desen için 
 
     greple -Mxlate -E normalized -E not-normalized
 
-Bu nedenle, birden fazla satırı tek bir satıra birleştirerek işlenmesi gereken metinler için ilk deseni kullanın ve önceden biçimlendirilmiş metinler için ikinci deseni kullanın. Eğer ilk desene uyan bir metin yoksa, o zaman hiçbir şeyi eşleştirmeyen bir desen kullanın, örneğin C<(?!)> desenini.
+Bu nedenle, birden fazla satırı tek bir satıra birleştirerek işlenecek metin için ilk deseni kullanın ve önceden biçimlendirilmiş metin için ikinci deseni kullanın. İlk desende eşleşecek metin yoksa, hiçbir şeyi eşleştirmeyen bir desen kullanın, örneğin C<(?!)>.
 
 =head1 MASKING
 
@@ -85,6 +85,10 @@ Ara sıra, çevrilmesini istemediğiniz metin parçaları olabilir. Örneğin, m
     --xlate-setopt maskfile=MASKPATTERN
 
 Bu, `MASKPATTERN` dosyasının her satırını bir düzenli ifade olarak yorumlayacak, eşleşen dizeleri çevirecek ve işlem sonrasında geri dönecektir. C<#> ile başlayan satırlar görmezden gelinir.
+
+Karmaşık desen, ters eğik çizgi ile kaçış karakteri kullanılarak birden fazla satıra yazılabilir.
+
+Metnin maskeleme ile nasıl dönüştürüldüğü, B<--xlate-mask> seçeneği ile görülebilir.
 
 Bu arayüz deneyseldir ve gelecekte değişebilir.
 
@@ -162,6 +166,28 @@ Orijinal dosyayı aşağıdaki L<sed(1)> komutuyla geri alabilirsiniz.
 
     sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+=item B<colon>, I<:::::::>
+
+```markdown
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+The original and translated text are output in a markdown's custom container style.
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+Varsayılan olarak iki nokta üst üste sayısı 7'dir. Eğer C<:::::> gibi iki nokta üst üste dizisi belirtirseniz, bu 7 iki nokta üst üste yerine kullanılır.
+
 =item B<ifdef>
 
 Orjinal ve çevrilmiş metin L<cpp(1)> C<#ifdef> formatında yazdırılır.
@@ -179,7 +205,9 @@ B<unifdef> komutuyla yalnızca Japonca metni alabilirsiniz:
 
 =item B<space>
 
-Orjinal ve çevrilmiş metin tek boş satır ile ayrılmış olarak yazdırılır.
+=item B<space+>
+
+Hello, how can I help you today?
 
 =item B<xtxt>
 
@@ -201,6 +229,16 @@ Eğer bir seferde sadece bir satır çevirmek istiyorsanız, bu değeri 1 olarak
 
 STDERR çıktısında gerçek zamanlı çeviri sonucunu görün.
 
+=item B<--xlate-stripe>
+
+Tüm metni üretmek için seçenek B<--all> kullanılır.
+
+Eşleşen kısmı zebra şeritli bir moda göre göstermek için L<App::Greple::stripe> modülü kullanılır. Bu, eşleşen kısımlar birbiri ardına bağlı olduğunda faydalıdır.
+
+=item B<--xlate-mask>
+
+Maskeleme işlemini gerçekleştirin ve dönüştürülmüş metni geri yükleme olmadan görüntüleyin.
+
 =item B<--match-all>
 
 Dosyanın tüm metnini hedef alan olarak ayarlayın.
@@ -211,11 +249,9 @@ Dosyanın tüm metnini hedef alan olarak ayarlayın.
 
 B<xlate> modülü, her dosyanın çeviri önbelleğini saklayabilir ve sunucuya sorma işleminin üstesinden gelmek için yürütmeden önce onu okuyabilir. Varsayılan önbellek stratejisi C<auto> ile, hedef dosya için önbellek verisi yalnızca önbellek dosyası varsa tutulur.
 
+Önbellek yönetimini başlatmak veya mevcut tüm önbellek verilerini temizlemek için B<--xlate-cache=clear> kullanın. Bu seçenekle birlikte çalıştırıldığında, bir önbellek dosyası mevcut değilse yeni bir dosya oluşturulacak ve ardından otomatik olarak bakımı yapılacaktır.
+
 =over 7
-
-=item --cache-clear
-
-B<--cache-clear> seçeneği, önbellek yönetimini başlatmak veya mevcut tüm önbellek verilerini yenilemek için kullanılabilir. Bu seçenekle çalıştırıldığında, bir önbellek dosyası yoksa yeni bir önbellek dosyası oluşturulur ve ardından otomatik olarak sürdürülür.
 
 =item --xlate-cache=I<strategy>
 
@@ -247,6 +283,10 @@ Varsayılan davranışa göre, kullanılmayan veriler önbellek dosyasından kal
 
 =back
 
+=item B<--xlate-update>
+
+Bu seçenek, gerekli olmasa bile önbellek dosyasını güncellemeye zorlar.
+
 =back
 
 =head1 COMMAND LINE INTERFACE
@@ -264,44 +304,49 @@ C<xlate -GC> gibi çalıştırırsanız, mevcut çalışma dizinine bağlı olan
 Ayrıntılar için L</DAHA FAZLASI> bölümündeki Japonca makaleyi okuyun.
 
     xlate [ options ] -t lang file [ greple options ]
-	-h   help
-	-v   show version
-	-d   debug
-	-n   dry-run
-	-a   use API
-	-c   just check translation area
-	-r   refresh cache
-	-s   silent mode
-	-e # translation engine (default "deepl")
-	-p # pattern to determine translation area
-	-w # wrap line by # width
-	-o # output format (default "xtxt", or "cm", "ifdef")
-	-f # from lang (ignored)
-	-t # to lang (required, no default)
-	-m # max length per API call
-	-l # show library files (XLATE.mk, xlate.el)
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -x # file containing mask patterns
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
     Make options
-	-M   run make
-	-n   dry-run
+        -M   run make
+        -n   dry-run
     Docker options
-	-G   mount git top-level directory
-	-B   run in non-interactive (batch) mode
-	-R   mount read-only
-	-E * specify environment variable to be inherited
-	-I * specify altanative docker image (default: tecolicom/xlate:version)
-	-D * run xlate on the container with the rest parameters
-	-C * run following command on the container, or run shell
-
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * docker image name or version (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+    
     Control Files:
-	*.LANG    translation languates
-	*.FORMAT  translation foramt (xtxt, cm, ifdef)
-	*.ENGINE  translation engine (deepl or gpt3)
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 
 =head1 EMACS
 
 Emacs düzenleyicisinden C<xlate> komutunu kullanmak için depoda bulunan F<xlate.el> dosyasını yükleyin. C<xlate-region> işlevi verilen bölgeyi çevirir. Varsayılan dil C<EN-US>'dir ve dil belirtmek için ön ek argümanını kullanabilirsiniz.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
 
 =head1 ENVIRONMENT
 
@@ -339,33 +384,39 @@ L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt3>
 
-L<https://hub.docker.com/r/tecolicom/xlate>
+=over 2
 
-=over 7
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
 
-=item L<https://github.com/DeepLcom/deepl-python>
+Docker konteyner görüntüsü.
+
+=item * L<https://github.com/DeepLcom/deepl-python>
 
 DeepL Python kütüphanesi ve CLI komutu.
 
-=item L<https://github.com/openai/openai-python>
+=item * L<https://github.com/openai/openai-python>
 
 OpenAI Python Kütüphanesi
 
-=item L<https://github.com/tecolicom/App-gpty>
+=item * L<https://github.com/tecolicom/App-gpty>
 
 OpenAI komut satırı arabirimi
 
-=item L<App::Greple>
+=item * L<App::Greple>
 
 Hedef metin deseni hakkında ayrıntılar için B<greple> kılavuzuna bakın. Eşleşme alanını sınırlamak için B<--inside>, B<--outside>, B<--include>, B<--exclude> seçeneklerini kullanın.
 
-=item L<App::Greple::update>
+=item * L<App::Greple::update>
 
 Dosyaları B<greple> komutunun sonucuna göre değiştirmek için C<-Mupdate> modülünü kullanabilirsiniz.
 
-=item L<App::sdif>
+=item * L<App::sdif>
 
 B<-V> seçeneğiyle çakışma işaretçi formatını yan yana göstermek için B<sdif> kullanın.
+
+=item * L<App::Greple::stripe>
+
+Greple B<stripe> modülü, B<--xlate-stripe> seçeneği ile kullanılır.
 
 =back
 

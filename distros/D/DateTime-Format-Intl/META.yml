@@ -26,7 +26,7 @@ requires:
   DateTime: '0.42'
   DateTime::Format::Unicode: v0.1.3
   DateTime::Locale::FromCLDR: v0.4.3
-  Locale::Intl: v0.1.0
+  Locale::Intl: v0.1.2
   Locale::Unicode::Data: v1.0.4
   POSIX: '0'
   Scalar::Util: '0'
@@ -40,5 +40,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DateTime-Format-Intl/issues
   repository: https://gitlab.com/jackdeguest/DateTime-Format-Intl
-version: v0.1.1
+version: v0.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

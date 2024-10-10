@@ -12,7 +12,7 @@ App::Greple::xlate - модуль поддержки перевода для gre
 
 =head1 VERSION
 
-Version 0.3401
+Version 0.4101
 
 =head1 DESCRIPTION
 
@@ -20,9 +20,9 @@ Version 0.3401
 
 Если вы хотите перевести обычные текстовые блоки в документе, написанном в стиле Perl's pod, используйте команду B<greple> с модулем C<xlate::deepl> и C<perl> следующим образом:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-В этой команде строка шаблона C<^(\w.*\n)+> означает последовательные строки, начинающиеся с буквы или цифры. Эта команда показывает выделенную область, которую нужно перевести. Опция B<--all> используется для вывода всего текста.
+В этой команде строка шаблона C<^([\w\pP].*\n)+> означает последовательные строки, начинающиеся с буквенно-цифровой и знаковой буквы. Эта команда показывает область, которую нужно перевести, выделенную. Опция B<--all> используется для вывода всего текста.
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
@@ -76,7 +76,7 @@ Version 0.3401
 
     greple -Mxlate -E normalized -E not-normalized
 
-Следовательно, используйте первый шаблон для текста, который должен быть обработан путем объединения нескольких строк в одну строку, и используйте второй шаблон для предварительно отформатированного текста. Если в первом шаблоне нет текста для сопоставления, то используйте шаблон, который ничего не сопоставляет, например, C<(?!)>.
+Следовательно, используйте первый шаблон для текста, который должен быть обработан путем объединения нескольких строк в одну строку, и используйте второй шаблон для предварительно отформатированного текста. Если в первом шаблоне нет текста для сопоставления, используйте шаблон, который ничего не сопоставляет, например, C<(?!)>.
 
 =head1 MASKING
 
@@ -85,6 +85,10 @@ Version 0.3401
     --xlate-setopt maskfile=MASKPATTERN
 
 Это будет интерпретировать каждую строку файла `MASKPATTERN` как регулярное выражение, переводить строки, соответствующие ему, и возвращать после обработки. Строки, начинающиеся с C<#>, игнорируются.
+
+Сложный шаблон можно написать на нескольких строках с использованием символа обратного слеша для переноса строки.
+
+Как текст преобразуется с помощью маскировки, можно увидеть с помощью опции B<--xlate-mask>.
 
 Этот интерфейс является экспериментальным и может быть изменен в будущем.
 
@@ -162,6 +166,28 @@ Version 0.3401
 
     sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+=item B<colon>, I<:::::::>
+
+```html
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+<div style="background-color: #f4f4f4; color: #333; border: 1px solid #ccc; border-radius: 5px; padding: 10px;">
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+По умолчанию количество двоеточий равно 7. Если вы укажете последовательность двоеточий, например C<:::::>, она будет использоваться вместо 7 двоеточий.
+
 =item B<ifdef>
 
 Оригинальный и преобразованный тексты печатаются в формате L<cpp(1)> C<#ifdef>.
@@ -179,7 +205,9 @@ Version 0.3401
 
 =item B<space>
 
-Оригинальный и преобразованный тексты печатаются, разделенные одной пустой строкой.
+=item B<space+>
+
+Original text:
 
 =item B<xtxt>
 
@@ -201,6 +229,16 @@ Version 0.3401
 
 Смотрите результат перевода в реальном времени в выводе STDERR.
 
+=item B<--xlate-stripe>
+
+Используйте модуль L<App::Greple::stripe>, чтобы показать совпадающую часть в стиле зебры. Это полезно, когда совпадающие части соединены друг с другом.
+
+Палитра цветов меняется в зависимости от цвета фона терминала. Если вы хотите явно указать, вы можете использовать B<--xlate-stripe-light> или B<--xlate-stripe-dark>.
+
+=item B<--xlate-mask>
+
+Выполните функцию маскировки и отобразите преобразованный текст без восстановления.
+
 =item B<--match-all>
 
 Установите весь текст файла в качестве целевой области.
@@ -211,11 +249,9 @@ Version 0.3401
 
 Модуль B<xlate> может хранить кэшированный текст перевода для каждого файла и считывать его перед выполнением, чтобы устранить накладные расходы на запросы к серверу. Стратегия кэширования по умолчанию C<auto> поддерживает кэширование данных только при наличии файла кэша для целевого файла.
 
+Используйте B<--xlate-cache=clear>, чтобы инициировать управление кэшем или очистить все существующие кэшированные данные. После выполнения с этой опцией будет создан новый файл кэша, если его нет, и затем он будет автоматически поддерживаться.
+
 =over 7
-
-=item --cache-clear
-
-Опцию B<--cache-clear> можно использовать для инициирования управления кэшем или обновления всех существующих данных кэша. После выполнения с этой опцией будет создан новый файл кэша, если он не существует, и затем автоматически поддерживаться.
 
 =item --xlate-cache=I<strategy>
 
@@ -247,6 +283,10 @@ Version 0.3401
 
 =back
 
+=item B<--xlate-update>
+
+Эта опция заставляет обновить файл кэша даже в том случае, если это необходимо.
+
 =back
 
 =head1 COMMAND LINE INTERFACE
@@ -264,44 +304,49 @@ Version 0.3401
 Прочтите японскую статью в разделе "СМОТРИТЕ ТАКЖЕ" для получения подробной информации.
 
     xlate [ options ] -t lang file [ greple options ]
-	-h   help
-	-v   show version
-	-d   debug
-	-n   dry-run
-	-a   use API
-	-c   just check translation area
-	-r   refresh cache
-	-s   silent mode
-	-e # translation engine (default "deepl")
-	-p # pattern to determine translation area
-	-w # wrap line by # width
-	-o # output format (default "xtxt", or "cm", "ifdef")
-	-f # from lang (ignored)
-	-t # to lang (required, no default)
-	-m # max length per API call
-	-l # show library files (XLATE.mk, xlate.el)
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -x # file containing mask patterns
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
     Make options
-	-M   run make
-	-n   dry-run
+        -M   run make
+        -n   dry-run
     Docker options
-	-G   mount git top-level directory
-	-B   run in non-interactive (batch) mode
-	-R   mount read-only
-	-E * specify environment variable to be inherited
-	-I * specify altanative docker image (default: tecolicom/xlate:version)
-	-D * run xlate on the container with the rest parameters
-	-C * run following command on the container, or run shell
-
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * docker image name or version (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+    
     Control Files:
-	*.LANG    translation languates
-	*.FORMAT  translation foramt (xtxt, cm, ifdef)
-	*.ENGINE  translation engine (deepl or gpt3)
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 
 =head1 EMACS
 
 Загрузите файл F<xlate.el>, включенный в репозиторий, чтобы использовать команду C<xlate> из редактора Emacs. Функция C<xlate-region> переводит указанную область. Язык по умолчанию - C<EN-US>, и вы можете указать язык, вызывая его с аргументом-префиксом.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
 
 =head1 ENVIRONMENT
 
@@ -339,33 +384,39 @@ L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt3>
 
-L<https://hub.docker.com/r/tecolicom/xlate>
+=over 2
 
-=over 7
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
 
-=item L<https://github.com/DeepLcom/deepl-python>
+Образ контейнера Docker.
+
+=item * L<https://github.com/DeepLcom/deepl-python>
 
 Библиотека DeepL для Python и командная строка.
 
-=item L<https://github.com/openai/openai-python>
+=item * L<https://github.com/openai/openai-python>
 
 Библиотека OpenAI для Python
 
-=item L<https://github.com/tecolicom/App-gpty>
+=item * L<https://github.com/tecolicom/App-gpty>
 
 Командный интерфейс OpenAI
 
-=item L<App::Greple>
+=item * L<App::Greple>
 
 См. руководство по B<greple> для получения подробной информации о шаблоне целевого текста. Используйте опции B<--inside>, B<--outside>, B<--include>, B<--exclude>, чтобы ограничить область совпадения.
 
-=item L<App::Greple::update>
+=item * L<App::Greple::update>
 
 Вы можете использовать модуль C<-Mupdate>, чтобы изменять файлы на основе результата команды B<greple>.
 
-=item L<App::sdif>
+=item * L<App::sdif>
 
 Используйте B<sdif>, чтобы показать формат маркера конфликта рядом с опцией B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Модуль Greple B<stripe> используется с помощью опции B<--xlate-stripe>.
 
 =back
 

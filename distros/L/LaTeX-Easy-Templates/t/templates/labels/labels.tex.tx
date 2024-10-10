@@ -1,0 +1,9 @@
+\documentclass[12pt]{letter}
+\usepackage{graphicx}
+\usepackage{labels}
+
+\begin{document}
+: for $data -> $label {
+:   include 'label.tex.tx' { label => $label };
+: }
+\end{document}

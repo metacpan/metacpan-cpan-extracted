@@ -1,23 +1,31 @@
 package App::Greple::xlate::Mask;
 
-use v5.14;
+use v5.24;
 use warnings;
 use Data::Dumper;
 
+use Hash::Util qw(lock_keys);
+
 my %default = (
-    PATTERN => [],
-    TABLE => [],
-    );
+    TAG       => 'm',
+    INDEX     => 'id',
+    NUMBER    => 0,
+    PATTERN   => [],
+    TABLE     => [],
+    AUTORESET => 0,
+);
 
 sub new {
     my $class = shift;
     my $obj = bless { %default }, $class;
+    lock_keys %{$obj};
     $obj->configure(@_);
     $obj;
 }
 
 sub reset {
     my $obj = shift;
+    $obj->{NUMBER} = 0;
     $obj->{TABLE} = [];
     $obj;
 }
@@ -29,10 +37,13 @@ sub configure {
 	    my @pattern = ref $b ? @$b : $b;
 	    push @{$obj->{PATTERN}}, @pattern;
 	}
-	if ($a eq 'file') {
-	    open my $fh, $b or die "$b: $!";
-	    chomp(my @pattern = <$fh>);
-	    push @{$obj->{PATTERN}}, @pattern;
+	elsif ($a eq 'file') {
+	    open my $fh, '<:encoding(utf8)', $b or die "$b: $!\n";
+	    my @p = map s/\\(?=\n)//gr, split /(?<!\\)\n/, do { local $/; <$fh> };
+	    push @{$obj->{PATTERN}}, @p;
+	}
+	else {
+	    $obj->{$a} = $b;
 	}
     }
 }
@@ -41,14 +52,14 @@ sub mask {
     my $obj = shift;
     my $pattern = $obj->{PATTERN} // die;
     my @patterns = ref $pattern ? @$pattern : $pattern;
-    my $id = 0;
     my $fromto = $obj->{TABLE};
     # edit parameters in place
     for (@_) {
 	for my $pat (@patterns) {
 	    next if $pat =~ /^\s*(#|$)/;
 	    s{$pat}{
-		my $tag = sprintf("<m id=%d />", ++$id);
+		my $tag = sprintf("<%s %s=%d />",
+				  $obj->{TAG}, $obj->{INDEX}, ++$obj->{NUMBER});
 		push @$fromto, [ $tag, ${^MATCH} ];
 		$tag;
 	    }gpe;
@@ -61,11 +72,18 @@ sub unmask {
     my $obj = shift;
     # edit parameters in place
     for (@_) {
-	for my $fromto (@{$obj->{TABLE}}) {
+	for my $fromto (reverse @{$obj->{TABLE}}) {
 	    my($from, $to) = @$fromto;
-	    s/\Q$from/$to/g
+	    # update the first one
+	    if (s/\Q$from/$to/) {
+		# check the rest
+		if (s/\Q$from/$to/g) {
+		    warn "Masking error: \"$from\" duplicated.\n";
+		}
+	    }
 	}
     }
+    $obj->reset if $obj->{AUTORESET};
     return $obj;
 }
 

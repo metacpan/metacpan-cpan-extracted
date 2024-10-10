@@ -1,7 +1,7 @@
 package Algorithm::AM::BigInt;
 use strict;
 use warnings;
-our $VERSION = '3.12';
+our $VERSION = '3.13';
 # ABSTRACT: Helper functions for AM big integers
 use Exporter::Easy (
     OK => ['bigcmp']
@@ -72,7 +72,7 @@ Algorithm::AM::BigInt - Helper functions for AM big integers
 
 =head1 VERSION
 
-version 3.12
+version 3.13
 
 =head1 SYNOPSIS
 

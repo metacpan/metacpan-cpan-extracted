@@ -12,7 +12,7 @@ App::Greple::xlate - módulo de soporte de traducción para greple
 
 =head1 VERSION
 
-Version 0.3401
+Version 0.4101
 
 =head1 DESCRIPTION
 
@@ -20,9 +20,9 @@ El módulo B<Greple> B<xlate> encuentra bloques de texto deseados y los reemplaz
 
 Si quieres traducir bloques de texto normales en un documento escrito en el estilo pod de Perl, utiliza el comando B<greple> con los módulos C<xlate::deepl> y C<perl> de la siguiente manera:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-En este comando, la cadena de patrón C<^(\w.*\n)+> significa líneas consecutivas que comienzan con una letra alfanumérica. Este comando muestra el área que se va a traducir resaltada. La opción B<--all> se utiliza para producir todo el texto.
+En este comando, el patrón de cadena C<^([\w\pP].*\n)+> significa líneas consecutivas que comienzan con una letra alfanumérica y de puntuación. Este comando muestra el área a ser traducida resaltada. La opción B<--all> se utiliza para producir todo el texto.
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
@@ -76,7 +76,7 @@ Este proceso de normalización se realiza solo para el primer (0º) y el patrón
 
     greple -Mxlate -E normalized -E not-normalized
 
-Por lo tanto, use el primer patrón para el texto que se va a procesar combinando varias líneas en una sola línea, y use el segundo patrón para texto preformateado. Si no hay texto que coincida con el primer patrón, entonces use un patrón que no coincida con nada, como C<(?!)>.
+Por lo tanto, utiliza el primer patrón para el texto que se va a procesar combinando varias líneas en una sola línea, y utiliza el segundo patrón para el texto preformateado. Si no hay texto que coincida con el primer patrón, utiliza un patrón que no coincida con nada, como C<(?!)>.
 
 =head1 MASKING
 
@@ -85,6 +85,10 @@ Ocasionalmente, hay partes de texto que no deseas traducir. Por ejemplo, etiquet
     --xlate-setopt maskfile=MASKPATTERN
 
 Esto interpretará cada línea del archivo `MASKPATTERN` como una expresión regular, traducirá las cadenas que coincidan con ella y las revertirá después del procesamiento. Las líneas que comienzan con C<#> son ignoradas.
+
+Un patrón complejo puede ser escrito en múltiples líneas con una barra invertida para escapar el salto de línea.
+
+Cómo se transforma el texto mediante el enmascaramiento se puede ver con la opción B<--xlate-mask>.
 
 Esta interfaz es experimental y está sujeta a cambios en el futuro.
 
@@ -162,6 +166,28 @@ Puede recuperar el archivo original con el siguiente comando L<sed(1)>.
 
     sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+=item B<colon>, I<:::::::>
+
+```html
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+<div style="background-color: #f4f4f4; color: #333; border-left: 6px solid #ccc; padding: 10px; margin-bottom: 10px;">
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+El número de dos puntos es 7 por defecto. Si especificas una secuencia de dos puntos como C<:::::>, se utiliza en lugar de 7 dos puntos.
+
 =item B<ifdef>
 
 <<<<<<< HEAD
@@ -179,7 +205,9 @@ Puede recuperar solo el texto en japonés con el comando B<unifdef>:
 
 =item B<space>
 
-Original and converted text are printed in L<cpp(1)> C<#ifdef> format.
+=item B<space+>
+
+Original text:
 
 =item B<xtxt>
 
@@ -201,6 +229,16 @@ Establece este valor en 1 si deseas traducir una línea a la vez. Esta opción t
 
 Vea el resultado de la traducción en tiempo real en la salida STDERR.
 
+=item B<--xlate-stripe>
+
+Utiliza el módulo L<App::Greple::stripe> para mostrar la parte coincidente de manera rayada en estilo cebra. Esto es útil cuando las partes coincidentes están conectadas una tras otra.
+
+La paleta de colores se cambia según el color de fondo del terminal. Si deseas especificar explícitamente, puedes usar B<--xlate-stripe-light> o B<--xlate-stripe-dark>.
+
+=item B<--xlate-mask>
+
+Realice la función de enmascaramiento y muestre el texto convertido tal cual, sin restauración.
+
 =item B<--match-all>
 
 Establezca todo el texto del archivo como un área objetivo.
@@ -211,11 +249,9 @@ Establezca todo el texto del archivo como un área objetivo.
 
 El módulo B<xlate> puede almacenar el texto traducido en caché para cada archivo y leerlo antes de la ejecución para eliminar la sobrecarga de preguntar al servidor. Con la estrategia de caché predeterminada C<auto>, mantiene los datos en caché solo cuando el archivo de caché existe para el archivo objetivo.
 
+Utilice B<--xlate-cache=clear> para iniciar la gestión de la caché o limpiar todos los datos de caché existentes. Una vez ejecutado con esta opción, se creará un nuevo archivo de caché si no existe y luego se mantendrá automáticamente.
+
 =over 7
-
-=item --cache-clear
-
-La opción B<--cache-clear> se puede utilizar para iniciar la gestión de la caché o para actualizar todos los datos de caché existentes. Una vez ejecutado con esta opción, se creará un nuevo archivo de caché si no existe y luego se mantendrá automáticamente.
 
 =item --xlate-cache=I<strategy>
 
@@ -247,6 +283,10 @@ Por defecto, los datos no utilizados se eliminan del archivo de caché. Si no de
 
 =back
 
+=item B<--xlate-update>
+
+Esta opción fuerza la actualización del archivo de caché incluso si no es necesario.
+
 =back
 
 =head1 COMMAND LINE INTERFACE
@@ -264,44 +304,49 @@ Ejecutar algo como C<xlate -GC> abrirá una terminal con el repositorio git de t
 Lea el artículo en japonés en la sección "VER TAMBIÉN" para más detalles.
 
     xlate [ options ] -t lang file [ greple options ]
-	-h   help
-	-v   show version
-	-d   debug
-	-n   dry-run
-	-a   use API
-	-c   just check translation area
-	-r   refresh cache
-	-s   silent mode
-	-e # translation engine (default "deepl")
-	-p # pattern to determine translation area
-	-w # wrap line by # width
-	-o # output format (default "xtxt", or "cm", "ifdef")
-	-f # from lang (ignored)
-	-t # to lang (required, no default)
-	-m # max length per API call
-	-l # show library files (XLATE.mk, xlate.el)
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -x # file containing mask patterns
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
     Make options
-	-M   run make
-	-n   dry-run
+        -M   run make
+        -n   dry-run
     Docker options
-	-G   mount git top-level directory
-	-B   run in non-interactive (batch) mode
-	-R   mount read-only
-	-E * specify environment variable to be inherited
-	-I * specify altanative docker image (default: tecolicom/xlate:version)
-	-D * run xlate on the container with the rest parameters
-	-C * run following command on the container, or run shell
-
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * docker image name or version (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+    
     Control Files:
-	*.LANG    translation languates
-	*.FORMAT  translation foramt (xtxt, cm, ifdef)
-	*.ENGINE  translation engine (deepl or gpt3)
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 
 =head1 EMACS
 
 Carga el archivo F<xlate.el> incluido en el repositorio para usar el comando C<xlate> desde el editor Emacs. La función C<xlate-region> traduce la región dada. El idioma predeterminado es C<EN-US> y puedes especificar el idioma invocándolo con un argumento de prefijo.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
 
 =head1 ENVIRONMENT
 
@@ -339,33 +384,39 @@ L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt3>
 
-L<https://hub.docker.com/r/tecolicom/xlate>
+=over 2
 
-=over 7
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
 
-=item L<https://github.com/DeepLcom/deepl-python>
+Imagen del contenedor de Docker.
+
+=item * L<https://github.com/DeepLcom/deepl-python>
 
 Biblioteca de Python y comando CLI de DeepL.
 
-=item L<https://github.com/openai/openai-python>
+=item * L<https://github.com/openai/openai-python>
 
 Biblioteca de Python de OpenAI
 
-=item L<https://github.com/tecolicom/App-gpty>
+=item * L<https://github.com/tecolicom/App-gpty>
 
 Interfaz de línea de comandos de OpenAI
 
-=item L<App::Greple>
+=item * L<App::Greple>
 
 Consulta el manual de B<greple> para obtener detalles sobre el patrón de texto objetivo. Utiliza las opciones B<--inside>, B<--outside>, B<--include> y B<--exclude> para limitar el área de coincidencia.
 
-=item L<App::Greple::update>
+=item * L<App::Greple::update>
 
 Puedes usar el módulo C<-Mupdate> para modificar archivos según el resultado del comando B<greple>.
 
-=item L<App::sdif>
+=item * L<App::sdif>
 
 Utiliza B<sdif> para mostrar el formato de marcador de conflicto junto con la opción B<-V>.
+
+=item * L<App::Greple::stripe>
+
+El módulo Greple B<stripe> se utiliza con la opción B<--xlate-stripe>.
 
 =back
 

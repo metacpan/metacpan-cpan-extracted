@@ -12,7 +12,7 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
 =head1 VERSION
 
-Version 0.3401
+Version 0.4101
 
 =head1 DESCRIPTION
 
@@ -20,9 +20,9 @@ B<그림> B<엑스레이트> 모듈은 원하는 텍스트 블록을 찾아 번�
 
 Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 번역하려면 다음과 같이 B<greple> 명령과 C<xlate::deepl> 및 C<perl> 모듈을 사용합니다:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-이 명령에서 패턴 문자열 C<^(\w.*\n)+>는 영숫자로 시작하는 연속된 줄을 의미합니다. 이 명령은 번역할 영역을 강조 표시합니다. 옵션 B<--all>은 전체 텍스트를 생성하는 데 사용됩니다.
+이 명령에서 패턴 문자열 C<^([\w\pP].*\n)+>은 영숫자 및 구두점으로 시작하는 연속된 줄을 의미합니다. 이 명령은 번역할 영역을 강조 표시합니다. 옵션 B<--all>은 전체 텍스트를 생성하는 데 사용됩니다.
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
@@ -76,7 +76,7 @@ Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 �
 
     greple -Mxlate -E normalized -E not-normalized
 
-따라서 여러 줄을 한 줄로 합쳐서 처리할 텍스트에는 첫 번째 패턴을 사용하고, 미리 서식이 지정된 텍스트에는 두 번째 패턴을 사용합니다. 첫 번째 패턴에 일치하는 텍스트가 없는 경우 C<(?!)>와 같이 아무것도 일치하지 않는 패턴을 사용합니다.
+따라서 여러 줄을 한 줄로 결합하여 처리할 텍스트에는 첫 번째 패턴을 사용하고, 미리 서식이 지정된 텍스트에는 두 번째 패턴을 사용합니다. 첫 번째 패턴에 일치할 텍스트가 없는 경우 C<(?!)>과 같이 아무것도 일치하지 않는 패턴을 사용합니다.
 
 =head1 MASKING
 
@@ -85,6 +85,10 @@ Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 �
     --xlate-setopt maskfile=MASKPATTERN
 
 이렇게 하면 파일 `MASKPATTERN`의 각 줄을 정규식으로 해석하여 일치하는 문자열을 번역하고 처리 후 되돌려 놓습니다. C<#>로 시작하는 줄은 무시됩니다.
+
+복잡한 패턴은 백슬래시 에스파스 새줄을 사용하여 여러 줄에 작성할 수 있습니다.
+
+마스킹을 통해 텍스트가 어떻게 변환되는지는 B<--xlate-mask> 옵션에서 확인할 수 있습니다.
 
 이 인터페이스는 실험적이며 향후 변경될 수 있습니다.
 
@@ -162,6 +166,28 @@ C<xtxt> 이외의 다음 형식은 번역할 부분이 줄의 모음이라고 �
 
     sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+=item B<colon>, I<:::::::>
+
+원본 텍스트와 번역된 텍스트는 마크다운의 사용자 정의 컨테이너 스타일로 출력됩니다.
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+위의 텍스트는 HTML에서 다음과 같이 번역됩니다.
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+콜론 개수는 기본적으로 7입니다. C<:::::>와 같이 콜론 순서를 지정하면 콜론 7개 대신 사용됩니다.
+
 =item B<ifdef>
 
 원본 텍스트와 변환된 텍스트는 L<cpp(1)> C<#ifdef> 형식으로 인쇄됩니다.
@@ -179,7 +205,9 @@ C<xtxt> 이외의 다음 형식은 번역할 부분이 줄의 모음이라고 �
 
 =item B<space>
 
-원본 텍스트와 변환된 텍스트는 하나의 빈 줄로 구분하여 인쇄됩니다.
+=item B<space+>
+
+원본 텍스트와 변환된 텍스트는 하나의 빈 줄로 구분하여 인쇄됩니다. C<스페이스+>의 경우 변환된 텍스트 뒤에 줄 바꿈도 출력합니다.
 
 =item B<xtxt>
 
@@ -201,6 +229,16 @@ C<xtxt> 이외의 다음 형식은 번역할 부분이 줄의 모음이라고 �
 
 번역 결과는 STDERR 출력에서 실시간으로 확인할 수 있습니다.
 
+=item B<--xlate-stripe>
+
+일치하는 부분을 지브라 스트라이프 방식으로 표시하려면 L<App::Greple::stripe> 모듈을 사용합니다. 이 옵션은 일치하는 부분이 연속적으로 연결될 때 유용합니다.
+
+색상 팔레트는 단말기의 배경색에 따라 전환됩니다. 명시적으로 지정하고 싶으면 B<--지연 스트라이프-밝음> 또는 B<--지연 스트라이프-어두움>을 사용할 수 있습니다.
+
+=item B<--xlate-mask>
+
+마스킹 기능을 수행하여 변환된 텍스트를 복원하지 않고 그대로 표시합니다.
+
 =item B<--match-all>
 
 파일의 전체 텍스트를 대상 영역으로 설정합니다.
@@ -211,11 +249,9 @@ C<xtxt> 이외의 다음 형식은 번역할 부분이 줄의 모음이라고 �
 
 B<엑스레이트> 모듈은 각 파일에 대한 번역 텍스트를 캐시하여 저장하고 실행 전에 읽어들여 서버에 요청하는 오버헤드를 없앨 수 있습니다. 기본 캐시 전략 C<auto>를 사용하면 대상 파일에 대한 캐시 파일이 존재할 때만 캐시 데이터를 유지합니다.
 
+캐시 관리를 시작하거나 기존의 모든 캐시 데이터를 정리하려면 B<--xlate-cache=clear>를 사용합니다. 이 옵션을 실행하면 캐시 파일이 없는 경우 새 캐시 파일이 생성되고 이후 자동으로 유지 관리됩니다.
+
 =over 7
-
-=item --cache-clear
-
-B<--cache-clear> 옵션은 캐시 관리를 시작하거나 기존의 모든 캐시 데이터를 새로 고치는 데 사용할 수 있습니다. 이 옵션을 실행하면 캐시 파일이 없는 경우 새 캐시 파일이 생성되고 이후에는 자동으로 유지 관리됩니다.
 
 =item --xlate-cache=I<strategy>
 
@@ -247,6 +283,10 @@ B<--cache-clear> 옵션은 캐시 관리를 시작하거나 기존의 모든 캐
 
 =back
 
+=item B<--xlate-update>
+
+이 옵션은 필요하지 않은 경우에도 캐시 파일을 강제로 업데이트합니다.
+
 =back
 
 =head1 COMMAND LINE INTERFACE
@@ -264,44 +304,49 @@ C<xlate -GC>처럼 실행하면 현재 작업 중인 git 리포지토리가 마�
 자세한 내용은 L</또는 참조> 섹션의 일본어 기사를 참조하세요.
 
     xlate [ options ] -t lang file [ greple options ]
-	-h   help
-	-v   show version
-	-d   debug
-	-n   dry-run
-	-a   use API
-	-c   just check translation area
-	-r   refresh cache
-	-s   silent mode
-	-e # translation engine (default "deepl")
-	-p # pattern to determine translation area
-	-w # wrap line by # width
-	-o # output format (default "xtxt", or "cm", "ifdef")
-	-f # from lang (ignored)
-	-t # to lang (required, no default)
-	-m # max length per API call
-	-l # show library files (XLATE.mk, xlate.el)
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -x # file containing mask patterns
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
     Make options
-	-M   run make
-	-n   dry-run
+        -M   run make
+        -n   dry-run
     Docker options
-	-G   mount git top-level directory
-	-B   run in non-interactive (batch) mode
-	-R   mount read-only
-	-E * specify environment variable to be inherited
-	-I * specify altanative docker image (default: tecolicom/xlate:version)
-	-D * run xlate on the container with the rest parameters
-	-C * run following command on the container, or run shell
-
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * docker image name or version (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+    
     Control Files:
-	*.LANG    translation languates
-	*.FORMAT  translation foramt (xtxt, cm, ifdef)
-	*.ENGINE  translation engine (deepl or gpt3)
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 
 =head1 EMACS
 
 저장소에 포함된 F<xlate.el> 파일을 로드하여 Emacs 편집기에서 C<xlate> 명령을 사용합니다. C<xlate-region> 함수는 지정된 지역을 번역합니다. 기본 언어는 C<EN-US>이며 접두사 인수를 사용하여 호출하는 언어를 지정할 수 있습니다.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
 
 =head1 ENVIRONMENT
 
@@ -339,33 +384,39 @@ L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt3>
 
-L<https://hub.docker.com/r/tecolicom/xlate>
+=over 2
 
-=over 7
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
 
-=item L<https://github.com/DeepLcom/deepl-python>
+도커 컨테이너 이미지.
+
+=item * L<https://github.com/DeepLcom/deepl-python>
 
 DeepL 파이썬 라이브러리 및 CLI 명령.
 
-=item L<https://github.com/openai/openai-python>
+=item * L<https://github.com/openai/openai-python>
 
 OpenAI 파이썬 라이브러리
 
-=item L<https://github.com/tecolicom/App-gpty>
+=item * L<https://github.com/tecolicom/App-gpty>
 
 OpenAI 명령줄 인터페이스
 
-=item L<App::Greple>
+=item * L<App::Greple>
 
 대상 텍스트 패턴에 대한 자세한 내용은 B<greple> 매뉴얼을 참조하세요. B<--내부>, B<--외부>, B<--포함>, B<--제외> 옵션을 사용하여 일치하는 영역을 제한할 수 있습니다.
 
-=item L<App::Greple::update>
+=item * L<App::Greple::update>
 
 C<-Mupdate> 모듈을 사용하여 B<greple> 명령의 결과에 따라 파일을 수정할 수 있습니다.
 
-=item L<App::sdif>
+=item * L<App::sdif>
 
 충돌 마커 형식을 B<-V> 옵션과 함께 나란히 표시하려면 B<에스디프>를 사용합니다.
+
+=item * L<App::Greple::stripe>
+
+회색 B<줄무늬> 모듈은 B<--xlate-stripe> 옵션으로 사용합니다.
 
 =back
 

@@ -51,6 +51,11 @@ SYNOPSIS
         my $str = $locale->era_wide;
         my $str = $locale->first_day_of_week;
         my $str = $locale->format_for( 'yMEd' );
+        my $str = $locale->gmt_format(0);
+        my $str = $locale->gmt_format(3600);
+        my $str = $locale->gmt_format(-3600);
+        my $str = $locale->gmt_format(-3600, width => 'short');
+        my $str = $locale->gmt_format(-3600, { width => 'short' });
         # Alias for method 'code'
         my $obj = $locale->id;
         my $array = $locale->interval_format( GyMEd => 'd' );
@@ -65,6 +70,12 @@ SYNOPSIS
         # Equivalent to $locale->locale->as_string
         my $str = $locale->locale_as_string;
         # As per standard, it falls back to 'wide' format if it is not available
+        my $str = $locale->metazone_daylight_long( metazone => 'Taipei' );
+        my $str = $locale->metazone_daylight_short( metazone => 'Taipei' );
+        my $str = $locale->metazone_generic_long( metazone => 'Taipei' );
+        my $str = $locale->metazone_generic_short( metazone => 'Taipei' );
+        my $str = $locale->metazone_standard_long( metazone => 'Taipei' );
+        my $str = $locale->metazone_standard_short( metazone => 'Taipei' );
         my $str = $locale->month_format_abbreviated;
         my $str = $locale->month_format_narrow;
         my $str = $locale->month_format_wide;
@@ -111,6 +122,20 @@ SYNOPSIS
         my $str = $locale->time_format_short;
         # Time patterns for 'full', 'long', 'medium', and 'short' formats
         my $array = $locale->time_formats;
+        my $str = $locale->timezone_city( timezone => 'Asia/Tokyo' );
+        my $str = $locale->timezone_format_fallback;
+        my $str = $locale->timezone_format_gmt;
+        my $str = $locale->timezone_format_gmt_zero;
+        my $str = $locale->timezone_format_hour;
+        my $str = $locale->timezone_format_region;
+        my $str = $locale->timezone_format_region_daylight;
+        my $str = $locale->timezone_format_region_standard;
+        my $str = $locale->timezone_daylight_long( timezone => 'Europe/London' );
+        my $str = $locale->timezone_daylight_short( timezone => 'Europe/London' );
+        my $str = $locale->timezone_generic_long( timezone => 'Europe/London' );
+        my $str = $locale->timezone_generic_short( timezone => 'Europe/London' );
+        my $str = $locale->timezone_standard_long( timezone => 'Europe/London' );
+        my $str = $locale->timezone_standard_short( timezone => 'Europe/London' );
         # The locale's variant name, if any, in English. Here undef, because there is none
         my $str = $locale->variant;
         # The locale's variant ID, if any. Here undef, since there is none
@@ -126,8 +151,43 @@ SYNOPSIS
             locale => DateTime::Locale::FromCLDR->new( 'en' ),
         );
 
+    Enabling fatal exceptions:
+
+        use v5.34;
+        use experimental 'try';
+        no warnings 'experimental';
+        try
+        {
+            my $locale = DateTime::Locale::FromCLDR->new( 'en', fatal => 1 );
+            # Missing the 'offset' argument
+            my $str = $locale->format_gmt;
+            # More code
+        }
+        catch( $e )
+        {
+            say "Oops: ", $e->message;
+        }
+
+    Or, you could set the global variable $FATAL_EXCEPTIONS instead:
+
+        use v5.34;
+        use experimental 'try';
+        no warnings 'experimental';
+        $DateTime::Locale::FromCLDR::FATAL_EXCEPTIONS = 1;
+        try
+        {
+            my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+            # Missing the 'offset' argument
+            my $str = $locale->format_gmt;
+            # More code
+        }
+        catch( $e )
+        {
+            say "Oops: ", $e->message;
+        }
+
 VERSION
-        v0.2.0
+        v0.5.0
 
 DESCRIPTION
     This is a powerful replacement for DateTime::Locale and
@@ -278,10 +338,20 @@ METHODS
         say $locale->am_pm_standalone_wide;
 
   available_formats
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
         my $array = $locale->available_formats;
 
     Returns an array reference of all the format ID available for this
     "locale"
+
+    See "calendar_available_format" in Locale::Unicode::Data
+
+  available_format_patterns
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $ref = $locale->available_format_patterns;
+
+    Returns an hash reference of all the available format ID to their
+    corresponding pattern for the "locale"
 
     See "calendar_available_format" in Locale::Unicode::Data
 
@@ -694,6 +764,31 @@ METHODS
     Upon the last method chained, "undef" is returned in scalar context or
     an empty list in list context.
 
+  fatal
+        $cldr->fatal(1); # Enable fatal exceptions
+        $cldr->fatal(0); # Disable fatal exceptions
+        my $bool = $cldr->fatal;
+
+    Sets or get the boolean value, whether to die upon exception, or not. If
+    set to true, then instead of setting an exception object, this module
+    will die with an exception object. You can catch the exception object
+    then after using "try". For example:
+
+        use v.5.34; # to be able to use try-catch blocks in perl
+        use experimental 'try';
+        no warnings 'experimental';
+        try
+        {
+            my $cldr = DateTime::Locale::FromCLDR->new( 'en', fatal => 1 );
+            # Forgot the 'offset':
+            my $str = $locale->format_gmt;
+        }
+        catch( $e )
+        {
+            say "Error occurred: ", $e->message;
+            # Error occurred: No value for width was provided.
+        }
+
   first_day_of_week
         my $integer = $locale->first_day_of_week;
 
@@ -773,6 +868,228 @@ METHODS
         # B9:54
 
     But, this should have yielded: "夜9:54" instead.
+
+  format_gmt
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        # Get the offset in seconds from the UTC
+        my $offset = $dt->offset;
+        my $str = $locale->gmt_format( $offset );
+        # The 'width' is 'long' by default
+        my $str = $locale->gmt_format( $offset, width => 'short' );
+
+    This returns a localised and formatted GMT timezone given an offset in
+    seconds of the datetime from UTC.
+
+    For example:
+
+    *   "GMT"
+
+    *   "UTC"
+
+    *   "Гринуич"
+
+    Optionally, you can provide the "width" option that may have the value
+    "long" (default), or "short"
+
+    If the offset is 0, meaning this is the GMT time, then the localised
+    representation of "GMT" is returned using timezone_format_gmt_zero,
+    otherwise it will use the GMT format provided by timezone_format_gmt and
+    timezone_format_hour for the formatting of the "hours", "minutes" and
+    possibly "seconds".
+
+    Also, if the option "width" is provided with a value "short", then the
+    GMT hours, minutes, seconds formatting will not be zero padded.
+
+    For example:
+
+    *   "GMT+03:30"
+
+        Long
+
+    *   "GMT+3:30"
+
+        Short
+
+    *   "UTC-03.00"
+
+        Long
+
+    *   "UTC-3"
+
+        Short
+
+    *   "Гринуич+03:30"
+
+        Long
+
+    See the LDML specifications
+    <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
+    for more information.
+
+  format_timezone_location
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->format_timezone_location( timezone => 'Europe/Rome' );
+        # "Italy Time"
+        my $str = $locale->format_timezone_location( timezone => 'America/Buenos_Aires' );
+        # "Buenos Aires Time"
+
+    Returns a properly formatted "timezone" based on the "locale" and the
+    given "timezone" provided in an hash or hash reference.
+
+    Note that, if the given "timezone" is, what is called by the "LDML"
+    specifications, a "Golden Time Zone", then it represents a territory,
+    and the localised territory name is used instead of the localised
+    exemplar city for that "timezone". For example:
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->format_timezone_location( timezone => 'Asia/Taipei' );
+
+    would yield "Taiwan Time", because "Asia/Taipei" is the primary
+    "timezone" for Taiwan.
+
+  format_timezone_non_location
+        my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+        my $str = $locale->format_timezone_non_location(
+            timezone => 'America/Los_Angeles',
+            type => 'standard',
+        );
+        # アメリカ太平洋標準時
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->format_timezone_non_location(
+            timezone => 'America/Vancouver',
+            type => 'standard',
+        );
+        # Pacific Time (Canada)
+        my $str = $locale->format_timezone_non_location(
+            timezone => 'America/Phoenix',
+            type => 'standard',
+        );
+        # Mountain Time (Phoenix)
+        my $str = $locale->format_timezone_non_location(
+            timezone => 'America/Whitehorse',
+            type => 'standard',
+        );
+        # Pacific Time (Whitehorse)
+
+    Returns a properly formatted "timezone" based on the "locale", the given
+    "timezone" and the "type" provided in an hash or hash reference.
+
+    This is using a complexe algorithm defined by the LDML specifications
+    <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
+
+    The "type" can only be "generic", "standard", or "daylight":
+
+    *   "generic"
+
+        Quoting from the LDML specifications
+        <https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Names>,
+        "[t]he generic time is so-called wall-time; what clocks use when
+        they are correctly switched from standard to daylight time at the
+        mandated time of the year.". See here
+        <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Na
+        mes> too.
+
+        Quoting from the LDML specifications
+        <https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Format_T
+        erminology>:
+
+        *       Generic non-location format
+
+                Reflects "wall time" (what is on a clock on the wall): used
+                for recurring events, meetings, or anywhere people do not
+                want to be overly specific. For example, "10 am Pacific
+                Time" will be GMT-8 in the winter, and GMT-7 in the summer.
+
+                For example:
+
+                *           "Pacific Time" (long)
+
+                *           "PT" (short)
+
+        *       Generic partial location format
+
+                Reflects "wall time": used as a fallback format when the
+                generic non-location format is not specific enough.
+
+                For example:
+
+                *           "Pacific Time (Canada)" (long)
+
+                *           "PT (Whitehorse)" (short)
+
+        *       Generic location format
+
+                Reflects "wall time": a primary function of this format type
+                is to represent a time zone in a list or menu for user
+                selection of time zone. It is also a fallback format when
+                there is no translation for the generic non-location format.
+                Times can also be organized hierarchically by country for
+                easier lookup.
+
+                For example:
+
+                *           France Time
+
+                *           Italy Time
+
+                *           Japan Time
+
+                *           United States
+
+                            *               Chicago Time
+
+                            *               Denver Time
+
+                            *               Los Angeles Time
+
+                            *               New York Time
+
+                *           United Kingdom Time
+
+        Note that "[a] generic location format is constructed by a part of
+        time zone ID representing an exemplar city name or its country as
+        the final fallback."
+
+        See also the LDML specifications
+        <https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Format_T
+        erminology>
+
+    *   "standard" or "daylight"
+
+        "Reflects a specific standard or daylight time, which may or may not
+        be the wall time. For example, "10 am Pacific Standard Time" will be
+        GMT-8 in the winter and in the summer."
+
+        For example:
+
+        *   "Pacific Standard Time" (long)
+
+        *   "PST" (short)
+
+        *   "Pacific Daylight Time" (long)
+
+        *   "PDT" (short)
+
+  has_dst
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $bool = $locale->has_dst( 'Asia/Tokyo' );
+        # 0
+        my $bool = $locale->has_dst( 'America/Los_Angeles' );
+        # 1
+
+    Returns true if the given "timezone" is using daylight saving time, and
+    false otherwise.
+
+    The result is cached to ensure repeating calls for the same "timezone"
+    are returned even faster.
+
+    If an error occurred, this will set an exception object, and returns
+    "undef" in scalar context, or an empty list in list context.
+
+    How does it work? Very simply, this generates a DateTime object based on
+    the current year and given "timezone" both for January 1st and July 1st,
+    and get the "timezone" offset for each. If they do not match, the
+    "timezone" has daylight saving time.
 
   id
     This is an alias for locale
@@ -897,6 +1214,11 @@ METHODS
         my $locale = DateTime::Locale::FromCLDR->new( 'en' );
         my $diff = $locale->interval_greatest_diff( $dt1, $dt2 );
 
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $diff = $locale->interval_greatest_diff( $dt1, $dt2, day_period_first => 1 );
+        # or, using an hash reference instead:
+        # my $diff = $locale->interval_greatest_diff( $dt1, $dt2, { day_period_first => 1 } );
+
     Provided with 2 DateTime objects, and this will compute the greatest
     difference
     <https://unicode.org/reports/tr35/tr35-dates.html#intervalFormats>.
@@ -913,8 +1235,103 @@ METHODS
     If both "DateTime" objects are identical, this will return an empty
     string.
 
+    You can alter the inner working of the algorithm by providing the option
+    "day_period_first" with a true value. This will prioritise the day
+    period over the AM/PM (morning vs afternoon). What this means, is that
+    if you have two datetimes, one with an hour at "10:00" and another one
+    at "13:00", by default, the algorithm used in web browser, will return
+    "a" (component for AM/PM) highlighting the difference between morning
+    and afternoon. However, if you pass the option "day_period_first", then,
+    this method will prioritise the day periods difference and return "B"
+    (component for day periods).
+
+    This is important, because of the way almost all, but 4 locales ("bg",
+    "id", "uz" and "zu"), have sliced up their day periods.
+
+    For the locale "en", for example, the day periods are:
+
+    *       "midnight"
+
+            00:00 00:00
+
+    *       "morning1"
+
+            06:00 12:00
+
+    *       "noon"
+
+            12:00 12:00
+
+    *       "afternoon1"
+
+            12:00 18:00
+
+    *       "evening1"
+
+            18:00 21:00
+
+    *       "night1"
+
+            21:00 06:00
+
+    As you can see, there are no occurrence of a day period that spans both
+    morning and afternoon, and thus, because of those data, this method
+    would always return, by default, "a" instead of "B"
+
+    For the table of the "CLDR" components, see "Format Patterns" in
+    Locale::Unicode::Data
+
     If an error occurred, an exception object is set and "undef" is returned
     in scalar context, and an empty list in list context.
+
+  is_dst
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $dt = DateTime->new( year => 2024, month => 7, day => 1, time_zone => 'Asia/Tokyo' );
+        my $bool = $locale->is_dst( $dt );
+        # 0
+        my $dt = DateTime->new( year => 2024, month => 7, day => 1, time_zone => 'America/Los_Angeles' );
+        my $bool = $locale->is_dst( $dt );
+        # 1
+
+    Returns true if the given "timezone" is using daylight saving time, and
+    false otherwise.
+
+    The result is cached to ensure repeating calls for the same "timezone"
+    are returned even faster.
+
+    If an error occurred, this will set an exception object, and returns
+    "undef" in scalar context, or an empty list in list context.
+
+    How does it work? Very simply, this generates a DateTime object based on
+    the current year and given "timezone" both for January 1st and July 1st,
+    and get the "timezone" offset for each. If they do not match, the
+    "timezone" has daylight saving time.
+
+  is_ltr
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $bool = $locale->is_ltr;
+        # 1
+
+        # Hebrew:
+        my $locale = DateTime::Locale::FromCLDR->new( 'he' );
+        my $bool = $locale->is_ltr;
+        # 0
+
+    Returns true if the "locale" is written left-to-right, or false
+    otherwise.
+
+  is_rtl
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $bool = $locale->is_ltr;
+        # 0
+
+        # Hebrew:
+        my $locale = DateTime::Locale::FromCLDR->new( 'he' );
+        my $bool = $locale->is_ltr;
+        # 1
+
+    Returns true if the "locale" is written right-to-left, or false
+    otherwise.
 
   language
         my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
@@ -938,6 +1355,127 @@ METHODS
 
   locale
     Returns the current Locale::Unicode object used in the current object.
+
+  locale_number_system
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $array = $locale->locale_number_system;
+        # ["latn", ["0","1","2","3","4","5","6","7","8","9"]]
+        my $locale = DateTime::Locale::FromCLDR->new( 'ar' );
+        my $array = $locale->locale_number_system;
+        # ["arab", ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"]]
+
+    This returns array reference containing 2 elements for the "locale",
+    crawling along the inheritance tree until it finds a proper match:
+
+    0. the numbering system
+        For example: "latn"
+
+    1. an array reference of digits, starting from 0, in the "locale"'s own
+    writing.
+        For example: "["0","1","2","3","4","5","6","7","8","9"]"
+
+  metazone_daylight_long
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->metazone_daylight_long( metazone => 'Atlantic' );
+        # Atlantic Daylight Time
+        # America/Guadeloupe
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+        my $str = $locale->metazone_daylight_long( metazone => 'Atlantic' );
+        # heure d’été de l’Atlantique
+
+    This returns the localised metazone name for the "daylight" saving time
+    mode and "long" format for the given "metazone" ID.
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+  metazone_daylight_short
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->metazone_daylight_short( metazone => 'Atlantic' );
+        # ADT
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+        my $str = $locale->metazone_daylight_short( metazone => 'Atlantic' );
+        # HEA
+
+    This returns the localised metazone name for the "daylight" saving time
+    mode and "short" format for the given "metazone" ID.
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+  metazone_generic_long
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->metazone_generic_long( metazone => 'Atlantic' );
+        # Atlantic Time
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+        my $str = $locale->metazone_generic_long( metazone => 'Atlantic' );
+        # heure de l’Atlantique
+
+    This returns the localised metazone name for the "generic" time and
+    "long" format for the given "metazone" ID.
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+  metazone_generic_short
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->metazone_generic_short( metazone => 'Atlantic' );
+        # AT
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+        my $str = $locale->metazone_generic_short( metazone => 'Atlantic' );
+        # HA
+
+    This returns the localised metazone name for the "generic" time and
+    "short" format for the given "metazone" ID.
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+  metazone_standard_long
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->metazone_standard_long( metazone => 'Atlantic' );
+        # Atlantic Standard Time
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+        my $str = $locale->metazone_standard_long( metazone => 'Atlantic' );
+        # heure normale de l’Atlantique
+
+    This returns the localised metazone name for the "standard" time and
+    "long" format for the given "metazone" ID.
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+  metazone_standard_short
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->metazone_standard_short( metazone => 'Atlantic' );
+        # AST
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+        my $str = $locale->metazone_standard_short( metazone => 'Atlantic' );
+        # HNA
+
+    This returns the localised metazone name for the "standard" time and
+    "short" format for the given "metazone" ID.
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
 
   month_format_abbreviated
         my $locale = DateTime::Locale::FromCLDR->new( 'en' );
@@ -1116,10 +1654,178 @@ METHODS
     Either way, the size of the array will always be equal to the number of
     variants in the "locale"
 
+  number_symbols
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $ref = $locale->number_symbols;
+        my $ref = $locale->number_symbols( 'latn' );
+        # {
+        #     approximately => "~",
+        #     decimal => ".",
+        #     exponential => "E",
+        #     group => ",",
+        #     infinity => "∞",
+        #     list => ";",
+        #     minus => "-",
+        #     nan => "NaN",
+        #     per_mille => "‰",
+        #     percent => "%",
+        #     plus => "+",
+        #     superscript => "\xD7",
+        #     time_separator => ":",
+        # }
+
+    Returns an hash reference of a locale's number symbols.
+
+    If somehow, none were found, it returns an empty hash reference, so make
+    sure to check for the size of the hash reference returned.
+
+    Upon error, it sets an exception object and returns "undef" in scalar
+    context, and an empty list in list context.
+
+    Below are all the possible symbols available:
+
+    Quoted sentences are from the Unicode LDML specifications
+    <https://unicode.org/reports/tr35/tr35-numbers.html#Number_Symbols>.
+
+    *   "approximately"
+
+        "Symbol used to denote a value that is approximate but not exact."
+
+        For example "~", "≈", "≃", "約"
+
+    *   "currency_decimal"
+
+        "Used as the decimal separator instead of using the regular
+        "decimal" separator"
+
+        For example "."
+
+    *   "currency_group"
+
+        "Used as the group separator instead of using the regular "group"
+        separator"
+
+        For example "."
+
+    *   "decimal"
+
+        "Separates the integer and fractional part of the number."
+
+        For example ".", "٫", ","
+
+    *   "exponential"
+
+        "Symbol separating the mantissa and exponent values."
+
+        For example "E", "e", "×10^", "·10^"
+
+    *   "group"
+
+        "Separates clusters of integer digits to make large numbers more
+        legible"
+
+        For example ",", "٬", ".", "،", "’", "⹁"
+
+    *   "infinity"
+
+        "The infinity sign. Corresponds to the IEEE infinity bit pattern."
+
+        For example "∞", "INF"
+
+    *   "list"
+
+        "Symbol used to separate numbers in a list intended to represent
+        structured data such as an array; must be different from the decimal
+        value."
+
+        For example ";"
+
+    *   "minus"
+
+        "Symbol used to denote negative value."
+
+        For example "-"
+
+        Note that, in the CLDR data, although it is always a visually
+        identical representation, the character itself used varies,
+        depending on the locale used. For example: "-" ("\x{2D}") vs "-"
+        ("\x{D8}\x{9C}\x{2D}")
+
+    *   "nan"
+
+        The NaN sign. Corresponds to the IEEE NaN bit pattern.
+
+        For example "NaN", "не число"
+
+    *   "per_mille"
+
+        "Symbol used to indicate a per-mille (1/1000th) amount."
+
+        For example "‰", "؉", "0/00"
+
+    *   "percent"
+
+        "Symbol used to indicate a percentage (1/100th) amount."
+
+        For example "%", "٪"
+
+    *   "plus"
+
+        "Symbol used to denote positive value."
+
+        For example "+"
+
+    *   "superscript"
+
+        For example "×", "(^)"
+
+    *   "time_separator"
+
+        This is intended to replace "any use of the "timeSeparator" pattern
+        character in a date-time format pattern"
+
+        For example ":", "٫", "."
+
+  number_system
+        my $locale = DateTime::Locale::FromCLDR->new( 'ar-EG' );
+        say $locale->number_system;
+        # arab
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+        say $locale->number_system;
+        # latn
+
+    Returns a string representing the number system for the "locale"
+
+  number_system_digits
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $digits = $locale->number_system_digits( 'latn' );
+        say $digits; # [0, 1, 2, 3, 4, 5, 6, 7, 8. 9];
+
+        # Japanese traditional numbering system
+        my $digits = $locale->number_system_digits( 'jpan' );
+        say $digits; # ["〇","一","二","三","四","五","六","七","八","九"];
+
+    Provided with a valid number system ID, and this will return an array
+    reference of digits for that number system, from 0 to 9.
+
+    It sets an exception object upon error, and returns "undef" in scalar
+    context, or an empty list in list context.
+
   prefers_24_hour_time
     This checks whether the "locale" prefers the 24H format or the 12H one
     and returns true (1) if it prefers the 24 hours format or false (0)
     otherwise.
+
+    How it finds out? It pulls the preferred time format from the CLDR data
+    by calling time_format_preferred, and from there returns true (1) if the
+    value is either "H" or "k", or else false (0).
+
+    This is as specified by the Unicode LDML
+    <https://www.unicode.org/reports/tr35/tr35-dates.html#availableFormats_a
+    ppendItems>, which states: "the locale's actual preference for 12-hour
+    or 24-hour time cycle is determined from the Time Data as described
+    above in timeFormats."
 
   quarter_format_abbreviated
         my $locale = DateTime::Locale::FromCLDR->new( 'en' );
@@ -1212,6 +1918,21 @@ METHODS
   script_id
     This is an alias for script_code
 
+  split_interval
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $ref = $locale->split_interval(
+            pattern => $string,
+            greatest_diff => 'd',
+        ) || die( $locale->error );
+
+    This method actually calls "split_interval" in Locale::Unicode::Data and
+    passes it all the arguments it received, so please check its
+    documentation.
+
+    It returns the array reference it received from "split_interval" in
+    Locale::Unicode::Data, or upon error, its sets an exception object, and
+    returns "undef" in scalar context or an empty list in list context.
+
   territory
         my $locale = DateTime::Locale::FromCLDR->new( 'ja-JP' );
         my $script = $locale->territory;
@@ -1252,6 +1973,77 @@ METHODS
   territory_id
     This is an alias for territory_code
 
+  territory_info
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $ref = $locale->territory_info;
+
+    which would yield:
+
+        {
+            calendars => undef,
+            contains => undef,
+            currency => "USD",
+            first_day => 7,
+            gdp => 19490000000000,
+            languages => [qw(
+                en es zh-Hant fr de fil it vi ko ru nv yi pdc hnj haw
+                frc chr esu dak cho lkt ik mus io cic cad jbo osa zh
+            )],
+            literacy_percent => 99,
+            min_days => 1,
+            parent => "021",
+            population => 332639000,
+            status => "regular",
+            territory => "US",
+            territory_id => 297,
+            weekend => undef,
+        }
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'en-GB' );
+        my $ref = $locale->territory_info;
+
+    which would yield:
+
+        {
+            calendars => undef,
+            contains => undef,
+            currency => "GBP",
+            first_day => 1,
+            gdp => 2925000000000,
+            languages => [qw(
+                en fr de es pl pa ur ta gu sco cy bn ar zh-Hant it lt pt
+                so tr ga gd kw en-Shaw
+            )],
+            literacy_percent => 99,
+            min_days => 4,
+            parent => 154,
+            population => 65761100,
+            status => "regular",
+            territory => "GB",
+            territory_id => 121,
+            weekend => undef,
+        }
+
+    Returns an hash reference of information related to the ISO3166 country
+    code associated with the "locale". If the "locale" has no country code
+    associated, it will expand it using the Unicode LDML rule with
+    "likely_subtag" in Locale::Unicode::Data
+
+    Keep in mind that the default or fallback data are stored in the special
+    territory code 001 (World). Thus, for example, if the "calendars" field
+    is empty, the default value would be in 001, and would be
+    "["gregorian"]"
+
+  time_format_allowed
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $array = $locale->time_format_allowed;
+
+    Returns an array reference of allowed time patterns
+    <https://unicode.org/reports/tr35/tr35-dates.html#Time_Data> for the
+    "locale"'s associated territory. If the locale has no "territory"
+    associated with, it will check the likely subtag to derive the
+    "territory" for that "locale"
+
   time_format_default
     This is an alias for time_format_medium
 
@@ -1281,6 +2073,16 @@ METHODS
         say $locale->time_format_medium;
         # h:mm:ss a
         # 10:44:07 PM
+
+  time_format_preferred
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->time_format_preferred;
+
+    Returns a string representing the time preferred pattern
+    <https://unicode.org/reports/tr35/tr35-dates.html#Time_Data> for the
+    "locale"'s associated territory. If the locale has no "territory"
+    associated with, it will check the likely subtag to derive the
+    "territory" for that "locale"
 
   time_format_short
     Same as time_format_full, but returns the short format pattern.
@@ -1321,6 +2123,302 @@ METHODS
     Returns an hash reference with the keys being: "full", "long", "medium",
     "short" and their value the result of their associated time format
     methods.
+
+  timezone_canonical
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_canonical( timezone => 'America/Atka' );
+        # America/Adak
+
+    Returns the canonical version of the given "timezone".
+
+    The "CLDR" keeps all timezones, even outdated ones for reliability and
+    consistency, so this method helps switch a given "timezone" for its
+    canonical counterpart.
+
+    If the given "timezone" is already the canonical one, then it is simply
+    returned.
+
+    If none could be found somehow, an empty string would be returned.
+
+  timezone_city
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_city( timezone => 'America/St_Barthelemy' );
+        # St. Barthélemy
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+        my $str = $locale->timezone_city( timezone => 'America/St_Barthelemy' );
+        # Saint-Barthélemy
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+        my $str = $locale->timezone_city( timezone => 'America/St_Barthelemy' );
+        # サン・バルテルミー
+
+    Returns a string representing the localised version of the exemplar city
+    for a given "timezone"
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+  timezone_format_fallback
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_format_fallback;
+        # {1} ({0})
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+        my $str = $locale->timezone_format_fallback;
+        # {1}（{0}）
+
+    Returns the fallback
+    <https://unicode.org/reports/tr35/tr35-dates.html#fallbackFormat>
+    "timezone" localised format "where {1} is the metazone, and {0} is the
+    country or city." (quoting from the LDML specifications
+    <https://unicode.org/reports/tr35/tr35-dates.html#fallbackFormat>)
+
+    Do not assume you can simply use parenthesis to format it yourself,
+    since the format would change depending on the "locale" used, and even
+    the parenthesis itself varies as shown in the example above with the
+    Japanese language (here a double byte parenthesis).
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+    See the LDML specifications
+    <https://unicode.org/reports/tr35/tr35-dates.html#timeZoneNames_Elements
+    _Used_for_Fallback> for more information.
+
+  timezone_format_gmt
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_format_gmt;
+        # GMT{0}
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+        my $str = $locale->timezone_format_gmt;
+        # UTC{0}
+
+    Returns the GMT localised format.
+
+    This needs to be used in conjonction with the timezone_format_hour to
+    form a complete localised GMt formatted "timezone".
+
+    For example:
+
+    *   "GMT+03:30"
+
+        Long
+
+    *   "GMT+3:30"
+
+        Short
+
+    *   "UTC-03.00"
+
+        Long
+
+    *   "UTC-3"
+
+        Short
+
+    *   "Гринуич+03:30"
+
+        Long
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+    See the LDML specifications
+    <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
+    for more information.
+
+  timezone_format_gmt_zero
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_format_gmt_zero;
+        # GMT
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
+        my $str = $locale->timezone_format_gmt_zero;
+        # UTC
+
+    Returns the GMT localised format for when the offset is 0, i.e. when
+    this is a GMT time.
+
+    For example:
+
+    *   "GMT"
+
+    *   "UTC"
+
+    *   "Гринуич"
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+    See the LDML specifications
+    <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
+    for more information.
+
+  timezone_format_hour
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_format_hour;
+        # ["+HH:mm", "-HH:mm"]
+
+    Returns the GMT format for hour, minute and possibly seconds, as an
+    array reference containing 2 elements:
+
+    0. format for positive offset; and
+    1. format for negative offset.
+
+    If nothing can be found, an empty array reference is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+    See the LDML specifications
+    <https://unicode.org/reports/tr35/tr35-dates.html#timeZoneNames_Elements
+    _Used_for_Fallback> for more information.
+
+  timezone_format_region
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_format_region;
+        # {0} Time
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+        my $str = $locale->timezone_format_region;
+        # {0}時間
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'es' );
+        my $str = $locale->timezone_format_region;
+        # hora de {0}
+
+    Returns a string representing the "timezone" localised regional format,
+    "where {0} is the country or city." (quoting from the LDML
+    specifications
+    <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
+    )
+
+    For example, once formatted, this would yield:
+
+    *   "Japan Time"
+
+    *   "日本時間"
+
+    *   "Hora de Japón"
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+  timezone_format_region_daylight
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_format_region_daylight;
+        # {0} Daylight Time
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+        my $str = $locale->timezone_format_region_daylight;
+        # {0}夏時間
+
+    Same as timezone_format_region, but uses the "daylight" saving time
+    format.
+
+  timezone_format_region_standard
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_format_region_standard;
+        # {0} Standard Time
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+        my $str = $locale->timezone_format_region_standard;
+        # {0}標準時
+
+    Same as timezone_format_region, but uses the "daylight" saving time
+    format.
+
+  timezone_daylight_long
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_daylight_long( timezone => 'Europe/London' );
+        # British Summer Time
+
+    Returns a string of a localised representation of a given "timezone",
+    for the "daylight" saving time in "long" format.
+
+    If none exists for the given "timezone", which may often be the case,
+    you need to use the "timezone" format methods instead
+    (timezone_format_fallback, timezone_format_gmt,
+    timezone_format_gmt_zero, timezone_format_hour, timezone_format_hour,
+    timezone_format_region, timezone_format_region_daylight, and
+    timezone_format_region_standard)
+
+    If nothing can be found, an empty string is returned.
+
+    If an error occurred, an exception object is set, and "undef" is
+    returned in scalar context, or an empty list in list context.
+
+    See the LDML specifications
+    <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
+    for more information.
+
+  timezone_daylight_short
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_daylight_short( timezone => 'Europe/London' );
+        # ""
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_daylight_short( timezone => 'Pacific/Honolulu' );
+        # HDT
+
+    Same as timezone_daylight_long, but for the "daylight" saving time
+    "short" format.
+
+  timezone_generic_long
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_generic_long( timezone => 'Europe/London' );
+        # ""
+
+    Same as timezone_daylight_long, but for the "generic" "long" format.
+
+  timezone_generic_short
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_generic_short( timezone => 'Europe/London' );
+        # ""
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_generic_short( timezone => 'Pacific/Honolulu' );
+        # HST
+
+    Same as timezone_daylight_long, but for the "generic" "short" format.
+
+  timezone_id
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $bcp47_id = $locale->timezone_id( timezone => 'America/Los_Angeles' );
+        # uslax
+
+    Provided with a "timezone", and this returns its BCP47 time zone ID
+    equivalent.
+
+  timezone_standard_long
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_standard_long( timezone => 'Europe/London' );
+        # ""
+
+    Same as timezone_daylight_long, but for the "standard" "long" format.
+
+  timezone_standard_short
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_standard_short( timezone => 'Europe/London' );
+        # ""
+
+        my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+        my $str = $locale->timezone_standard_short( timezone => 'Pacific/Honolulu' );
+        # HST
+
+    Same as timezone_daylight_long, but for the "standard" "short" format.
 
   variant
         my $locale = DateTime::Locale::FromCLDR->new( 'es-valencia' );
@@ -1413,7 +2511,7 @@ SEE ALSO
 COPYRIGHT & LICENSE
     Copyright(c) 2024 DEGUEST Pte. Ltd.
 
-    All rights reserved
+    All rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

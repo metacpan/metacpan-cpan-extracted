@@ -22,7 +22,6 @@ lib/Blockchain/Ethereum/ABI/Type/Bytes.pm
 lib/Blockchain/Ethereum/ABI/Type/Int.pm
 lib/Blockchain/Ethereum/ABI/Type/String.pm
 lib/Blockchain/Ethereum/ABI/Type/Tuple.pm
-lib/Blockchain/Ethereum/ABI/TypeRole.pm
 t/00-check-deps.t
 t/00-compile.t
 t/array.t

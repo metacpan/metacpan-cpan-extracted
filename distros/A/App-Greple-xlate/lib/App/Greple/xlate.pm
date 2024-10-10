@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.3401";
+our $VERSION = "0.4101";
 
 =encoding utf-8
 
@@ -16,7 +16,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.3401
+Version 0.4101
 
 =head1 DESCRIPTION
 
@@ -29,12 +29,12 @@ If you want to translate normal text blocks in a document written in
 the Perl's pod style, use B<greple> command with C<xlate::deepl> and
 C<perl> module like this:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-In this command, pattern string C<^(\w.*\n)+> means consecutive lines
-starting with alpha-numeric letter.  This command show the area to be
-translated highlighted.  Option B<--all> is used to produce entire
-text.
+In this command, pattern string C<^([\w\pP].*\n)+> means consecutive
+lines starting with alpha-numeric and punctuation letter.  This
+command show the area to be translated highlighted.  Option B<--all>
+is used to produce entire text.
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
@@ -113,7 +113,7 @@ text matching the second pattern.
 Therefore, use the first pattern for text that is to be processed by
 combining multiple lines into a single line, and use the second
 pattern for pre-formatted text.  If there is no text to match in the
-first pattern, then a pattern that does not match anything, such as
+first pattern, use a pattern that does not match anything, such as
 C<(?!)>.
 
 =head1 MASKING
@@ -130,6 +130,12 @@ translation.
 This will interpret each line of the file `MASKPATTERN` as a regular
 expression, translate strings matching it, and revert after
 processing.  Lines beginning with C<#> are ignored.
+
+Complex pattern can be written on multiple lines with backslash
+escpaed newline.
+
+How the text is transformed by masking can be seen by B<--xlate-mask>
+option.
 
 This interface is experimental and subject to change in the future.
 
@@ -225,6 +231,30 @@ You can recover the original file by next L<sed(1)> command.
 
     sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+=item B<colon>, I<:::::::>
+
+The original and translated text are output in a markdown's custom
+container style.
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+Above text will be translated to the following in HTML.
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+Number of colon is 7 by default.  If you specify colon sequence like
+C<:::::>, it is used instead of 7 colons.
+
 =item B<ifdef>
 
 Original and converted text are printed in L<cpp(1)> C<#ifdef>
@@ -243,8 +273,11 @@ You can retrieve only Japanese text by the B<unifdef> command:
 
 =item B<space>
 
+=item B<space+>
+
 Original and converted text are printed separated by single blank
-line.
+line.  For C<space+>, it also outputs a newline after the converted
+text.
 
 =item B<xtxt>
 
@@ -272,6 +305,21 @@ option takes precedence over the C<--xlate-maxlen> option.
 
 See the tranlsation result in real time in the STDERR output.
 
+=item B<--xlate-stripe>
+
+Use L<App::Greple::stripe> module to show the matched part by zebra
+striping fashion.  This is useful when the matched parts are connected
+back-to-back.
+
+The color palette is switched according to the background color of the
+terminal.  If you want to specify explicitly, you can use
+B<--xlate-stripe-light> or B<--xlate-stripe-dark>.
+
+=item B<--xlate-mask>
+
+Perform masking function and display the converted text as is without
+restoration.
+
 =item B<--match-all>
 
 Set the whole text of the file as a target area.
@@ -285,14 +333,12 @@ read it before execution to eliminate the overhead of asking to
 server.  With the default cache strategy C<auto>, it maintains cache
 data only when the cache file exists for target file.
 
+Use B<--xlate-cache=clear> to initiate cache management or to clean up
+all existing cache data.  Once executed with this option, a new cache
+file will be created if one does not exist and then automatically
+maintained afterward.
+
 =over 7
-
-=item --cache-clear
-
-The B<--cache-clear> option can be used to initiate cache management
-or to refresh all existing cache data. Once executed with this option,
-a new cache file will be created if one does not exist and then
-automatically maintained afterward.
 
 =item --xlate-cache=I<strategy>
 
@@ -325,6 +371,10 @@ you don't want to remove them and keep in the file, use C<accumulate>.
 
 =back
 
+=item B<--xlate-update>
+
+This option forces to update cache file even if it is not necessary.
+
 =back
 
 =head1 COMMAND LINE INTERFACE
@@ -350,39 +400,40 @@ git repository mounted.
 Read Japanese article in L</SEE ALSO> section for detail.
 
     xlate [ options ] -t lang file [ greple options ]
-	-h   help
-	-v   show version
-	-d   debug
-	-n   dry-run
-	-a   use API
-	-c   just check translation area
-	-r   refresh cache
-	-s   silent mode
-	-e # translation engine (default "deepl")
-	-p # pattern to determine translation area
-	-w # wrap line by # width
-	-o # output format (default "xtxt", or "cm", "ifdef")
-	-f # from lang (ignored)
-	-t # to lang (required, no default)
-	-m # max length per API call
-	-l # show library files (XLATE.mk, xlate.el)
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -x # file containing mask patterns
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
     Make options
-	-M   run make
-	-n   dry-run
+        -M   run make
+        -n   dry-run
     Docker options
-	-G   mount git top-level directory
-	-B   run in non-interactive (batch) mode
-	-R   mount read-only
-	-E * specify environment variable to be inherited
-	-I * specify altanative docker image (default: tecolicom/xlate:version)
-	-D * run xlate on the container with the rest parameters
-	-C * run following command on the container, or run shell
-
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * docker image name or version (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+    
     Control Files:
-	*.LANG    translation languates
-	*.FORMAT  translation foramt (xtxt, cm, ifdef)
-	*.ENGINE  translation engine (deepl or gpt3)
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 
 =head1 EMACS
@@ -391,6 +442,10 @@ Load the F<xlate.el> file included in the repository to use C<xlate>
 command from Emacs editor.  C<xlate-region> function translate the
 given region.  Default language is C<EN-US> and you can specify
 language invoking it with prefix argument.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
 
 =head1 ENVIRONMENT
 
@@ -428,37 +483,43 @@ L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt3>
 
-L<https://hub.docker.com/r/tecolicom/xlate>
+=over 2
 
-=over 7
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
 
-=item L<https://github.com/DeepLcom/deepl-python>
+Docker container image.
+
+=item * L<https://github.com/DeepLcom/deepl-python>
 
 DeepL Python library and CLI command.
 
-=item L<https://github.com/openai/openai-python>
+=item * L<https://github.com/openai/openai-python>
 
 OpenAI Python Library
 
-=item L<https://github.com/tecolicom/App-gpty>
+=item * L<https://github.com/tecolicom/App-gpty>
 
 OpenAI command line interface
 
-=item L<App::Greple>
+=item * L<App::Greple>
 
 See the B<greple> manual for the detail about target text pattern.
 Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to
 limit the matching area.
 
-=item L<App::Greple::update>
+=item * L<App::Greple::update>
 
 You can use C<-Mupdate> module to modify files by the result of
 B<greple> command.
 
-=item L<App::sdif>
+=item * L<App::sdif>
 
 Use B<sdif> to show conflict marker format side by side with B<-V>
 option.
+
+=item * L<App::Greple::stripe>
+
+Greple B<stripe> module use by B<--xlate-stripe> option.
 
 =back
 
@@ -503,6 +564,7 @@ use Text::ANSI::Fold ':constants';
 use App::cdif::Command;
 use Hash::Util qw(lock_keys);
 use Unicode::EastAsianWidth;
+use List::Util qw(max);
 
 use Exporter 'import';
 our @EXPORT_OK = qw($VERSION &opt);
@@ -520,6 +582,7 @@ our %opt = (
     width    => \(our $fold_width = 70),
     auth_key => \(our $auth_key),
     method   => \(our $cache_method //= $ENV{GREPLE_XLATE_CACHE} || 'auto'),
+    update   => \(our $force_update = 0),
     dryrun   => \(our $dryrun = 0),
     maxlen   => \(our $max_length = 0),
     maxline  => \(our $max_line = 0),
@@ -532,6 +595,7 @@ lock_keys %opt;
 sub opt :lvalue { ${$opt{+shift}} }
 
 my $current_file;
+my $colon_count = 7;
 
 our %formatter = (
     xtxt => undef,
@@ -545,6 +609,16 @@ our %formatter = (
 	    ">>>>>>> $lang_to\n";
     },
     cm => 'conflict',
+    colon => sub {
+	my $colon = ':' x $colon_count;
+	join '',
+	    "$colon $lang_from\n",
+	    $_[0],
+	    "$colon\n",
+	    "$colon $lang_to\n",
+	    $_[1],
+	    "$colon\n";
+    },
     ifdef => sub {
 	join '',
 	    "#ifdef $lang_from\n",
@@ -554,8 +628,9 @@ our %formatter = (
 	    $_[1],
 	    "#endif\n";
     },
-    space   => sub { join "\n", @_ },
-    discard => sub { '' },
+    space    => sub { join("\n", @_) },
+    'space+' => sub { join("\n", @_) . "\n" },
+    discard  => sub { '' },
 );
 
 # aliases
@@ -632,7 +707,8 @@ sub postgrep {
 	my($b, @match) = @$r;
 	for my $m (@match) {
 	    my($s, $e, $i) = @$m;
-	    my $key = normalize $grep->cut(@$m), $i % 2 == 0;
+	    my $paragraph = ($i % 2 == 0);
+	    my $key = normalize $grep->cut(@$m), $paragraph;
 	    if (not exists $cache{$key}) {
 		$cache{$key} = undef;
 		push @miss, $key;
@@ -667,7 +743,7 @@ sub cache_update {
     my @chop = grep { $from[$_] =~ s/(?<!\n)\z/\n/ } keys @from;
     my @to = &XLATE(@from);
     chop @to[@chop];
-    $maskobj->unmask(@to) if $maskobj;
+    $maskobj->unmask(@to)->reset if $maskobj;
 
     _progress({label => "To"}, @to);
     die "Unmatched response:\n@to" if @from != @to;
@@ -692,7 +768,7 @@ sub strip {
     goto &paragraph_strip if $paragraph;
     my @text = $text =~ /.*\n|.+\z/g;
     my @space = map {
-	[ s/\A(\s+)// ? $1 : '', s/(\h+)$//  ? $1 : ''  ]
+	[ s/\A(\s+)// ? $1 : '', s/(\h+)$// ? $1 : '' ]
     } @text;
     $_[0] = join '', @text;
     sub { # unstrip
@@ -739,6 +815,14 @@ sub xlate {
 }
 sub callback { goto &xlate }
 
+sub mask_string {
+    my($s) = +{ @_ }->{match};
+    if ($maskobj) {
+	$maskobj->mask($s);
+    }
+    $s;
+}
+
 sub cache_file {
     my $file = sprintf("%s.xlate-%s-%s.json",
 		       $current_file, $xlate_engine, $lang_to);
@@ -761,6 +845,10 @@ sub begin {
     if (not defined $xlate_engine) {
 	die "Select translation engine.\n";
     }
+    if ($output_format =~ /^(:+)$/) {
+	$colon_count = length($1);
+	$output_format = 'colon';
+    }
     if (my $file = cache_file) {
 	my @opt;
 	if ($cache_method =~ /create|clear/i) {
@@ -768,6 +856,9 @@ sub begin {
 	}
 	if ($cache_method =~ /accumulate/i) {
 	    push @opt, accumulate => 1;
+	}
+	if ($force_update) {
+	    push @opt, force_update => 1;
 	}
 	require App::Greple::xlate::Cache;
 	tie %cache, 'App::Greple::xlate::Cache', $file, @opt;
@@ -801,6 +892,7 @@ builtin xlate-fold-width=i $fold_width
 builtin xlate-from=s       $lang_from
 builtin xlate-to=s         $lang_to
 builtin xlate-cache:s      $cache_method
+builtin xlate-update!      $force_update
 builtin xlate-engine=s     $xlate_engine
 builtin xlate-dryrun       $dryrun
 builtin xlate-maxlen=i     $max_length
@@ -825,6 +917,10 @@ option --xlate-fold --xlate --xlate-fold-line
 option --xlate-labor --xlate --deepl-method=clipboard
 option --xlabor --xlate-labor
 
+option --xlate-mask \
+	--begin    &__PACKAGE__::begin \
+	--callback &__PACKAGE__::mask_string
+
 option --cache-clear --xlate-cache=clear
 
 option --match-all       --re '\A(?s).+\z'
@@ -833,6 +929,12 @@ option --match-paragraph --re '^(.+\n)+'
 option --match-podtext   -Mperl --pod --re '^(\w.*\n)(\S.*\n)*'
 
 option --ifdef-color --re '^#ifdef(?s:.*?)^#endif.*\n'
+
+option --xlate-stripe --xlate-stripe-auto
+option --xlate-stripe-light -Mstripe
+option --xlate-stripe-dark  -Mstripe::set=darkmode
+option --xlate-stripe-auto \
+	-Mtermcolor::bg(light=-Mstripe,dark=-Mstripe::set=darkmode)
 
 #  LocalWords:  deepl ifdef unifdef Greple greple perl DeepL ChatGPT
 #  LocalWords:  gpt html img src xlabor

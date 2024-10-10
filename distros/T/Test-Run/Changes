@@ -1,3 +1,7 @@
+0.0306    2024-10-09
+    * Fix build failures on bleadperl / etc. due to the embedded Test::More
+    copy using single-quotes for namespacing.
+
 0.0305    2020-10-17
     * Remove stale links from the POD.
 

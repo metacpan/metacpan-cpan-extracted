@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime::Format::Unicode - ~/lib/DateTime/Format/Unicode.pm
-## Version v0.1.3
+## Version v0.1.4
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/21
-## Modified 2024/09/27
+## Modified 2024/10/10
 ## All rights reserved
 ## 
 ## 
@@ -21,11 +21,12 @@ BEGIN
     use vars qw(
         $ERROR $VERSION $DEBUG $ON_ERROR
     );
+    use Locale::Unicode;
     use DateTime::Locale::FromCLDR;
     use POSIX ();
     use Scalar::Util;
     use Want;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.4';
 };
 
 use strict;
@@ -83,14 +84,34 @@ sub new
         $locale = $self->locale( 'en' ) ||
             return( $self->pass_error );
     }
+    my $unicode = $self->{_unicode};
     if( !$self->{time_zone} )
     {
         $self->time_zone( 'floating' ) || return( $self->pass_error );
     }
     if( !$self->{pattern} )
     {
-        $self->{pattern} = $locale->date_format_medium ||
+        $self->{pattern} = $unicode->date_format_medium ||
             return( $self->error( "No default pattern (medium date format) available for locale ${locale} in DateTime::Locale::FromCLDR" ) );
+    }
+    my $ns_ref = $unicode->locale_number_system;
+    my $ns = $ns_ref->[0] || 'latn';
+    my $ns_digits = ( $ns_ref->[1] && ref( $ns_ref->[1] ) eq 'ARRAY' && scalar( @{$ns_ref->[1]} ) ) ? $ns_ref->[1] : [0..9];
+    $self->{_number_system} = $ns;
+    $self->{_number_system_digits} = $ns_digits;
+    # Does the locale provided have a different numbering system and does this locale support it?
+    my $num_sys = $locale->number;
+    if( $num_sys && $num_sys ne $ns )
+    {
+        my $systems = $unicode->number_systems;
+        # 'latn' is always supported by all locale as per the LDML specifications
+        if( $num_sys eq 'latn' || scalar( grep( $systems->{ $_ } eq $num_sys, qw( number_system finance native traditional ) ) ) )
+        {
+            $self->{_number_system} = $num_sys;
+            my $digits = $unicode->number_system_digits( $num_sys ) ||
+                return( $self->pass_error( $unicode->error ) );
+            $self->{_number_system_digits} = $digits;
+        }
     }
     return( $self );
 }
@@ -150,13 +171,13 @@ sub format_datetime
     }
 
     my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     my $pat = $opts->{pattern} || $self->{pattern};
     return( "No format pattern was provided." ) if( !length( $pat // '' ) );
     eval
     {
-        # $dt->set_locale( "${locale}" );
-        $dt->set_locale( $locale );
-    } || return( $self->error( "Error setting the locale value ${locale} to the DateTime object: $@" ) );
+        $dt->set_locale( $unicode );
+    } || return( $self->error( "Error setting the locale value ${unicode} to the DateTime object: $@" ) );
 
     my $map = $self->_get_helper_methods;
 
@@ -250,12 +271,13 @@ sub format_interval
     }
     splice( @_, 0, 2 );
     my $opts = $self->_get_args_as_hash( @_ );
-    my $locale = $self->locale ||
+    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} ||
         return( $self->error( "The DateTime::Locale::FromCLDR object is gone!" ) );
-    my $diff = $locale->interval_greatest_diff( $dt1, $dt2 );
+    my $diff = $unicode->interval_greatest_diff( $dt1, $dt2 );
     if( !defined( $diff ) )
     {
-        return( $self->pass_error( $locale->error ) );
+        return( $self->pass_error( $unicode->error ) );
     }
     elsif( !length( $diff ) )
     {
@@ -268,15 +290,15 @@ sub format_interval
         return( $self->error( "No pattern or pattern ID is set." ) );
     }
     # $ref is [$part1, $separator, $part2, $full_pattern]
-    my $ref = $locale->interval_format( $pattern, $diff ) ||
-        return( $self->pass_error( $locale->error ) );
+    my $ref = $unicode->interval_format( $pattern, $diff ) ||
+        return( $self->pass_error( $unicode->error ) );
     # Unable to find an interval pattern for this greatest difference token
     # Maybe the user has provided us with a custom pattern?
     # Let's try to break it down
     if( !scalar( @$ref ) )
     {
-        $ref = $locale->split_interval( pattern => $pattern, greatest_diff => $diff ) ||
-            return( $self->pass_error( $locale->locale->error ) );
+        $ref = $unicode->split_interval( pattern => $pattern, greatest_diff => $diff ) ||
+            return( $self->pass_error( $unicode->error ) );
     }
     if( !scalar( @$ref ) )
     {
@@ -296,12 +318,14 @@ sub locale
     {
         my $locale = shift( @_ );
         unless( Scalar::Util::blessed( $locale ) &&
-                $locale->isa( 'DateTime::Locale::FromCLDR' ) )
+                $locale->isa( 'Locale::Unicode' ) )
         {
-            $locale = DateTime::Locale::FromCLDR->new( "$locale" ) ||
-                return( $self->pass_error( DateTime::Locale::FromCLDR->error ) );
+            $locale = Locale::Unicode->new( "$locale" ) ||
+                return( $self->pass_error( Locale::Unicode->error ) );
         }
         $self->{locale} = $locale;
+        $self->{_unicode} = DateTime::Locale::FromCLDR->new( $locale ) ||
+            return( $self->pass_error( DateTime::Locale::FromCLDR->error ) );
     }
     return( $self->{locale} );
 }
@@ -383,24 +407,24 @@ sub time_zone
 sub _format_am_pm
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     # "a..aaa" (Abbreviated)
     # Example: am. [e.g. 12 am.]
     if( $len >= 1 && $len <= 3 )
     {
-        return( $locale->am_pm_format_abbreviated->[ $dt->hour < 12 ? 0 : 1 ] );
+        return( $unicode->am_pm_format_abbreviated->[ $dt->hour < 12 ? 0 : 1 ] );
     }
     # "aaaa" (Wide)
     # Example: am. [e.g. 12 am.]
     elsif( $len == 4 )
     {
-        return( $locale->am_pm_format_wide->[ $dt->hour < 12 ? 0 : 1 ] );
+        return( $unicode->am_pm_format_wide->[ $dt->hour < 12 ? 0 : 1 ] );
     }
     # "aaaaa" (Narrow)
     # Example: a [e.g. 12a]
     elsif( $len == 5 )
     {
-        return( $locale->am_pm_format_narrow->[ $dt->hour < 12 ? 0 : 1 ] );
+        return( $unicode->am_pm_format_narrow->[ $dt->hour < 12 ? 0 : 1 ] );
     }
     else
     {
@@ -415,26 +439,26 @@ sub _format_am_pm
 sub _format_cyclic_year_name
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     my $year = $dt->year;
     # Abbreviated
     if( $len >= 1 && $len <= 3 )
     {
-        my $era = $locale->era_abbreviated->[ $year < 0 ? 0 : 1 ];
+        my $era = $unicode->era_abbreviated->[ $year < 0 ? 0 : 1 ];
         $era = $year if( !length( $era // '' ) );
         return( $era );
     }
     # Wide
     elsif( $len == 4 )
     {
-        my $era = $locale->era_wide->[ $year < 0 ? 0 : 1 ];
+        my $era = $unicode->era_wide->[ $year < 0 ? 0 : 1 ];
         $era = $year if( !length( $era // '' ) );
         return( $era );
     }
     # Narrow
     elsif( $len == 5 )
     {
-        my $era = $locale->era_narrow->[ $year < 0 ? 0 : 1 ];
+        my $era = $unicode->era_narrow->[ $year < 0 ? 0 : 1 ];
         $era = $year if( !length( $era // '' ) );
         return( $era );
     }
@@ -451,7 +475,9 @@ sub _format_day_julian
     my( $self, $token, $len, $dt ) = @_;
     if( $len >= 1 )
     {
-        return( sprintf( '%0*d', $len, $dt->mjd ) );
+        my $rv = sprintf( '%0*d', $len, $dt->mjd );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     else
     {
@@ -466,7 +492,9 @@ sub _format_day_of_month
     my( $self, $token, $len, $dt ) = @_;
     if( $len >= 1 && $len <= 2 )
     {
-        return( sprintf( '%0*d', $len, $dt->day_of_month ) );
+        my $rv = sprintf( '%0*d', $len, $dt->day_of_month );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     else
     {
@@ -485,10 +513,10 @@ sub _format_day_of_month
 sub _format_day_of_week
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     if( $len >= 1 && $len <= 3 && $token eq 'E' )
     {
-        return( $locale->day_format_abbreviated->[ $dt->day_of_week_0 ] );
+        return( $unicode->day_format_abbreviated->[ $dt->day_of_week_0 ] );
     }
     elsif( $len >= 1 && $len <= 2 && $token eq 'e' )
     {
@@ -496,22 +524,22 @@ sub _format_day_of_week
     }
     elsif( $len == 3 && $token eq 'e' )
     {
-        return( $locale->day_format_abbreviated->[ $dt->day_of_week_0 ] );
+        return( $unicode->day_format_abbreviated->[ $dt->day_of_week_0 ] );
     }
     # Works for both E and e
     elsif( $len == 4 )
     {
-        return( $locale->day_format_wide->[ $dt->day_of_week_0 ] );
+        return( $unicode->day_format_wide->[ $dt->day_of_week_0 ] );
     }
     # Works for both E and e
     elsif( $len == 5 )
     {
-        return( $locale->day_format_narrow->[ $dt->day_of_week_0 ] );
+        return( $unicode->day_format_narrow->[ $dt->day_of_week_0 ] );
     }
     # Works for both E and e
     elsif( $len == 6 )
     {
-        return( $locale->day_format_short->[ $dt->day_of_week_0 ] );
+        return( $unicode->day_format_short->[ $dt->day_of_week_0 ] );
     }
     else
     {
@@ -529,7 +557,7 @@ sub _format_day_of_week_in_month
     if( $len == 1 )
     {
         use integer;
-        return(  ( ( $dt->day - 1 ) / 7 ) + 1 );
+        return( ( ( $dt->day - 1 ) / 7 ) + 1 );
     }
     else
     {
@@ -544,7 +572,9 @@ sub _format_day_of_year
     my( $self, $token, $len, $dt ) = @_;
     if( $len >= 1 && $len <= 3 )
     {
-        return( sprintf( '%0*d', $len, $dt->day_of_year ) );
+        my $rv = sprintf( '%0*d', $len, $dt->day_of_year );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     else
     {
@@ -559,7 +589,7 @@ sub _format_day_of_year
 sub _format_day_period
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     # "b..bbb" (Abbreviated)
     # Example: mid. [e.g. 12 mid.]
     # "B..BBB" (Abbreviated)
@@ -568,12 +598,12 @@ sub _format_day_period
     {
         if( $token eq 'B' )
         {
-            return( $locale->day_period_format_abbreviated( $dt ) );
+            return( $unicode->day_period_format_abbreviated( $dt ) );
         }
         # b
         else
         {
-            return( $locale->day_period_stand_alone_abbreviated( $dt ) );
+            return( $unicode->day_period_stand_alone_abbreviated( $dt ) );
         }
     }
     # "bbbb" (Wide)
@@ -584,11 +614,11 @@ sub _format_day_period
     {
         if( $token eq 'B' )
         {
-            return( $locale->day_period_format_wide( $dt ) );
+            return( $unicode->day_period_format_wide( $dt ) );
         }
         else
         {
-            return( $locale->day_period_stand_alone_wide( $dt ) );
+            return( $unicode->day_period_stand_alone_wide( $dt ) );
         }
     }
     # "bbbbb" (Narrow)
@@ -599,11 +629,11 @@ sub _format_day_period
     {
         if( $token eq 'B' )
         {
-            return( $locale->day_period_format_narrow( $dt ) );
+            return( $unicode->day_period_format_narrow( $dt ) );
         }
         else
         {
-            return( $locale->day_period_stand_alone_narrow( $dt ) );
+            return( $unicode->day_period_stand_alone_narrow( $dt ) );
         }
     }
     else
@@ -617,19 +647,19 @@ sub _format_day_period
 sub _format_era
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     if( $len > 0 && $len <= 3 )
     {
-        return( $locale->era_abbreviated->[ $dt->year < 0 ? 0 : 1 ] );
+        return( $unicode->era_abbreviated->[ $dt->year < 0 ? 0 : 1 ] );
     }
     elsif( $len == 4 )
     {
-        return( $locale->era_wide->[ $dt->year < 0 ? 0 : 1 ] );
+        return( $unicode->era_wide->[ $dt->year < 0 ? 0 : 1 ] );
     }
     # >= 5
     else
     {
-        return( $locale->era_narrow->[ $dt->year < 0 ? 0 : 1 ] );
+        return( $unicode->era_narrow->[ $dt->year < 0 ? 0 : 1 ] );
     }
 }
 
@@ -638,7 +668,9 @@ sub _format_hour_0_11
 {
     my( $self, $token, $len, $dt ) = @_;
     $len = 2 if( $len > 2 );
-    return( sprintf( '%0*d', $len, $dt->hour_12_0 ) );
+    my $rv = sprintf( '%0*d', $len, $dt->hour_12_0 );
+    $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+    return( $rv );
 }
 
 # NOTE: pattern H -> hour (0-23)
@@ -646,7 +678,9 @@ sub _format_hour_0_23
 {
     my( $self, $token, $len, $dt ) = @_;
     $len = 2 if( $len > 2 );
-    return( sprintf( '%0*d', $len, $dt->hour ) );
+    my $rv = sprintf( '%0*d', $len, $dt->hour );
+    $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+    return( $rv );
 }
 
 # NOTE: pattern h -> hour (1-12)
@@ -654,7 +688,9 @@ sub _format_hour_1_12
 {
     my( $self, $token, $len, $dt ) = @_;
     $len = 2 if( $len > 2 );
-    return( sprintf( '%0*d', $len, $dt->hour_12 ) );
+    my $rv = sprintf( '%0*d', $len, $dt->hour_12 );
+    $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+    return( $rv );
 }
 
 # NOTE: pattern k -> hour (1-24)
@@ -662,7 +698,9 @@ sub _format_hour_1_24
 {
     my( $self, $token, $len, $dt ) = @_;
     $len = 2 if( $len > 2 );
-    return( sprintf( '%0*d', $len, $dt->hour_1 ) );
+    my $rv = sprintf( '%0*d', $len, $dt->hour_1 );
+    $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+    return( $rv );
 }
 
 # NOTE: pattern C -> hour (allowed, first match)
@@ -671,17 +709,17 @@ sub _format_hour_allowed { return( shift->_format_hour_allowed_preferred( 'allow
 sub _format_hour_allowed_preferred
 {
     my( $self, $type, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     my $ref;
     if( $type eq 'allowed' )
     {
-        $ref = $locale->time_format_allowed;
-        return( $self->pass_error( $locale->error ) ) if( !defined( $ref ) && $locale->error );
+        $ref = $unicode->time_format_allowed;
+        return( $self->pass_error( $unicode->error ) ) if( !defined( $ref ) && $unicode->error );
     }
     elsif( $type eq 'preferred' )
     {
-        my $this = $locale->time_format_preferred;
-        return( $self->pass_error( $locale->error ) ) if( !defined( $this ) && $locale->error );
+        my $this = $unicode->time_format_preferred;
+        return( $self->pass_error( $unicode->error ) ) if( !defined( $this ) && $unicode->error );
         $ref = [$this];
     }
     else
@@ -698,16 +736,16 @@ sub _format_hour_allowed_preferred
     # Example: 8
     #          8 (morning)
     # Numeric hour (minimum digits), abbreviated dayPeriod if used
-    1 => { digits => 1, B => sub{ $locale->day_period_format_abbreviated( $dt ) }, b => sub{ $locale->day_period_stand_alone_abbreviated } },
+    1 => { digits => 1, B => sub{ $unicode->day_period_format_abbreviated( $dt ) }, b => sub{ $unicode->day_period_stand_alone_abbreviated } },
     # "CC"
     # Example: 08
     #          08 (morning)
     # Numeric hour (2 digits, zero pad if needed), abbreviated dayPeriod if used
-    2 => { digits => 2, B => sub{ $locale->day_period_format_abbreviated( $dt ) }, b => sub{ $locale->day_period_stand_alone_abbreviated( $dt ) } },
-    3 => { digits => 1, B => sub{ $locale->day_period_format_wide( $dt ) }, b => sub{ $locale->day_period_stand_alone_wide( $dt ) } },
-    4 => { digits => 2, B => sub{ $locale->day_period_format_wide( $dt ) }, b => sub{ $locale->day_period_stand_alone_wide( $dt ) } },
-    5 => { digits => 1, B => sub{ $locale->day_period_format_narrow( $dt ) }, b => sub{ $locale->day_period_stand_alone_narrow( $dt ) } },
-    6 => { digits => 2, B => sub{ $locale->day_period_format_narrow( $dt ) }, b => sub{ $locale->day_period_stand_alone_narrow( $dt ) } },
+    2 => { digits => 2, B => sub{ $unicode->day_period_format_abbreviated( $dt ) }, b => sub{ $unicode->day_period_stand_alone_abbreviated( $dt ) } },
+    3 => { digits => 1, B => sub{ $unicode->day_period_format_wide( $dt ) }, b => sub{ $unicode->day_period_stand_alone_wide( $dt ) } },
+    4 => { digits => 2, B => sub{ $unicode->day_period_format_wide( $dt ) }, b => sub{ $unicode->day_period_stand_alone_wide( $dt ) } },
+    5 => { digits => 1, B => sub{ $unicode->day_period_format_narrow( $dt ) }, b => sub{ $unicode->day_period_stand_alone_narrow( $dt ) } },
+    6 => { digits => 2, B => sub{ $unicode->day_period_format_narrow( $dt ) }, b => sub{ $unicode->day_period_stand_alone_narrow( $dt ) } },
     };
 
     # 'J' has only up to 2 characters
@@ -721,19 +759,27 @@ sub _format_hour_allowed_preferred
         my $def = $map->{ $len } || die( "Unknown length '${len}' to format hour allowed" );
         if( $tok eq 'H' )
         {
-            push( @$res, sprintf( '%0*d', $def->{digits}, $dt->hour ) );
+            my $rv = sprintf( '%0*d', $def->{digits}, $dt->hour );
+            $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+            push( @$res, $rv );
         }
         elsif( $tok eq 'h' )
         {
-            push( @$res, sprintf( '%0*d', $def->{digits}, $dt->hour_12 ) );
+            my $rv = sprintf( '%0*d', $def->{digits}, $dt->hour_12 );
+            $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+            push( @$res, $rv );
         }
         elsif( $tok eq 'K' )
         {
-            push( @$res, sprintf( '%0*d', $def->{digits}, $dt->hour_12_0 ) );
+            my $rv = sprintf( '%0*d', $def->{digits}, $dt->hour_12_0 );
+            $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+            push( @$res, $rv );
         }
         elsif( $tok eq 'k' )
         {
-            push( @$res, sprintf( '%0*d', $def->{digits}, $dt->hour_1 ) );
+            my $rv = sprintf( '%0*d', $def->{digits}, $dt->hour_1 );
+            $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+            push( @$res, $rv );
         }
         # J is the flexible "preferred hour format for the locale", except "it requests no dayPeriod marker such as “am/pm”"
         # <https://unicode.org/reports/tr35/tr35-dates.html#dfst-hour>
@@ -769,7 +815,9 @@ sub _format_millisecond
     {
         # local_rd_days, local_rd_secs, rd_nanosecs
         my @rd_values = $dt->local_rd_values;
-        return( ( $rd_values[1] * 1000 ) + $dt->millisecond );
+        my $rv = ( $rd_values[1] * 1000 ) + $dt->millisecond;
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     else
     {
@@ -785,7 +833,9 @@ sub _format_minute
     my( $self, $token, $len, $dt ) = @_;
     if( $len >= 1 && $len <= 2 )
     {
-        return( sprintf( '%0*d', $len, $dt->minute ) );
+        my $rv = sprintf( '%0*d', $len, $dt->minute );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     else
     {
@@ -799,22 +849,24 @@ sub _format_minute
 sub _format_month
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     if( $len >= 1 && $len <= 2 )
     {
-        return( sprintf( '%0*d', $len, $dt->month ) );
+        my $rv = sprintf( '%0*d', $len, $dt->month );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     elsif( $len == 3 )
     {
-        return( $locale->month_format_abbreviated->[ $dt->month_0 ] );
+        return( $unicode->month_format_abbreviated->[ $dt->month_0 ] );
     }
     elsif( $len == 4 )
     {
-        return( $locale->month_format_wide->[ $dt->month_0 ] );
+        return( $unicode->month_format_wide->[ $dt->month_0 ] );
     }
     elsif( $len == 5 )
     {
-        return( $locale->month_format_narrow->[ $dt->month_0 ] );
+        return( $unicode->month_format_narrow->[ $dt->month_0 ] );
     }
     else
     {
@@ -855,22 +907,24 @@ sub _format_offset
 sub _format_month_standalone
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     if( $len >= 1 && $len <= 2 )
     {
-        return( sprintf( '%0*d', $len, $dt->month ) );
+        my $rv = sprintf( '%0*d', $len, $dt->month );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     elsif( $len == 3 )
     {
-        return( $locale->month_stand_alone_abbreviated->[ $dt->month_0 ] );
+        return( $unicode->month_stand_alone_abbreviated->[ $dt->month_0 ] );
     }
     elsif( $len == 4 )
     {
-        return( $locale->month_stand_alone_wide->[ $dt->month_0 ] );
+        return( $unicode->month_stand_alone_wide->[ $dt->month_0 ] );
     }
     elsif( $len == 5 )
     {
-        return( $locale->month_stand_alone_narrow->[ $dt->month_0 ] );
+        return( $unicode->month_stand_alone_narrow->[ $dt->month_0 ] );
     }
     else
     {
@@ -883,26 +937,28 @@ sub _format_month_standalone
 sub _format_quarter
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     if( $len >= 1 && $len <= 2 )
     {
-        return( sprintf( '%0*d', $len, $dt->quarter ) );
+        my $rv = sprintf( '%0*d', $len, $dt->quarter );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     # Abbreviated
     elsif( $len == 3 )
     {
-        return( $locale->quarter_format_abbreviated->[ $dt->quarter_0 ] );
+        return( $unicode->quarter_format_abbreviated->[ $dt->quarter_0 ] );
     }
     # Wide
     elsif( $len == 4 )
     {
-        return( $locale->quarter_format_wide->[ $dt->quarter_0 ] );
+        return( $unicode->quarter_format_wide->[ $dt->quarter_0 ] );
     }
     # Narrow
     elsif( $len == 5 )
     {
-        # return( $locale->quarter );
-        return( $locale->quarter_format_narrow->[ $dt->quarter_0 ] );
+        # return( $unicode->quarter );
+        return( $unicode->quarter_format_narrow->[ $dt->quarter_0 ] );
     }
     else
     {
@@ -916,22 +972,24 @@ sub _format_quarter
 sub _format_quarter_standalone
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     if( $len >= 1 && $len <= 2 )
     {
-        return( sprintf( '%0*d', $len, $dt->quarter ) );
+        my $rv = sprintf( '%0*d', $len, $dt->quarter );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     elsif( $len == 3 )
     {
-        return( $locale->quarter_stand_alone_abbreviated->[ $dt->quarter_0 ] );
+        return( $unicode->quarter_stand_alone_abbreviated->[ $dt->quarter_0 ] );
     }
     elsif( $len == 4 )
     {
-        return( $locale->quarter_stand_alone_wide->[ $dt->quarter_0 ] );
+        return( $unicode->quarter_stand_alone_wide->[ $dt->quarter_0 ] );
     }
     elsif( $len == 5 )
     {
-        return( $locale->quarter_stand_alone_narrow->[ $dt->quarter_0 ] );
+        return( $unicode->quarter_stand_alone_narrow->[ $dt->quarter_0 ] );
     }
     else
     {
@@ -946,7 +1004,9 @@ sub _format_second
     my( $self, $token, $len, $dt ) = @_;
     if( $len >= 1 && $len <= 2 )
     {
-        return( sprintf( '%0*d', $len, $dt->second ) );
+        my $rv = sprintf( '%0*d', $len, $dt->second );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     else
     {
@@ -974,7 +1034,10 @@ sub _format_second_fractional
                     : $full_nanosecond / 10**$exponent
             )
         );
-        return( sprintf( '%0*u', $len, $formatted_ns ) );
+        # return( sprintf( '%0*u', $len, $formatted_ns ) );
+        my $rv = sprintf( '%0*u', $len, $formatted_ns );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     else
     {
@@ -987,7 +1050,7 @@ sub _format_second_fractional
 sub _format_timezone
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     my $tz = $dt->time_zone->name;
     # Handle this edge case.
     $tz = 'UTC' if( $tz eq 'floating' );
@@ -996,15 +1059,15 @@ sub _format_timezone
     # PDT
     if( $len >= 1 && $len <= 3 )
     {
-        my $str = $locale->format_timezone_non_location(
+        my $str = $unicode->format_timezone_non_location(
             timezone => $tz,
-            # type => [($locale->is_dst( $dt ) ? 'daylight' : 'standard'), 'generic'],
-            type => ($locale->is_dst( $dt ) ? 'daylight' : 'standard'),
+            # type => [($unicode->is_dst( $dt ) ? 'daylight' : 'standard'), 'generic'],
+            type => ($unicode->is_dst( $dt ) ? 'daylight' : 'standard'),
             width => 'short',
         );
         if( !length( $str // '' ) )
         {
-            $str = $locale->format_gmt(
+            $str = $unicode->format_gmt(
                 offset => $dt->offset,
                 width => 'short',
             );
@@ -1016,15 +1079,15 @@ sub _format_timezone
     # Pacific Daylight Time
     elsif( $len == 4 )
     {
-        my $str = $locale->format_timezone_non_location(
+        my $str = $unicode->format_timezone_non_location(
             timezone => $tz,
-            # type => [($locale->is_dst( $dt ) ? 'daylight' : 'standard'), 'generic'],
-            type => ($locale->is_dst( $dt ) ? 'daylight' : 'standard'),
+            # type => [($unicode->is_dst( $dt ) ? 'daylight' : 'standard'), 'generic'],
+            type => ($unicode->is_dst( $dt ) ? 'daylight' : 'standard'),
             width => 'long',
         );
         if( !length( $str // '' ) )
         {
-            $str = $locale->format_gmt(
+            $str = $unicode->format_gmt(
                 offset => $dt->offset,
                 width => 'long',
             );
@@ -1042,7 +1105,7 @@ sub _format_timezone
 sub _format_timezone_location
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     # Example: Asia/Tokyo
     my $tz = $dt->time_zone_long_name;
     my $str;
@@ -1056,10 +1119,10 @@ sub _format_timezone_location
         # The short generic non-location format
         # Where that is unavailable, falls back to the generic location format ("VVVV"),
         # then the short localized GMT format as the final fallback
-        $str = $locale->timezone_id(
+        $str = $unicode->timezone_id(
             timezone => $tz,
         );
-        return( $self->pass_error( $locale->error ) ) if( !defined( $str ) && $locale->error );
+        return( $self->pass_error( $unicode->error ) ) if( !defined( $str ) && $unicode->error );
         $str ||= 'unk';
         return( $str );
     }
@@ -1078,17 +1141,17 @@ sub _format_timezone_location
         # The exemplar city (location) for the time zone.
         # Where that is unavailable, the localized exemplar city name for the special zone Etc/Unknown is used as the fallback (for example, "Unknown City").
         # With the Locale::Unicode::Data extended timezones cities data, there are 89 localised versions for each of the 421 time zones exemplar cities
-        $str = $locale->timezone_city(
+        $str = $unicode->timezone_city(
             timezone => $tz,
         ) unless( $tz eq 'floating' );
-        return( $self->pass_error( $locale->error ) ) if( !defined( $str ) && $locale->error );
+        return( $self->pass_error( $unicode->error ) ) if( !defined( $str ) && $unicode->error );
         if( !length( $str // '' ) )
         {
             # Etc/Unknown is guaranteed to exist in each locale
-            $str = $locale->timezone_city(
+            $str = $unicode->timezone_city(
                 timezone => 'Etc/Unknown',
             );
-            return( $self->pass_error( $locale->error ) ) if( !defined( $str ) && $locale->error );
+            return( $self->pass_error( $unicode->error ) ) if( !defined( $str ) && $unicode->error );
         }
         return( $str );
     }
@@ -1098,14 +1161,14 @@ sub _format_timezone_location
         # The generic location format.
         # Where that is unavailable, falls back to the long localized GMT format
         # ("OOOO"; Note: Fallback is only necessary with a GMT-style Time Zone ID, like Etc/GMT-830.)
-        $str = $locale->format_timezone_location(
+        $str = $unicode->format_timezone_location(
             timezone => $tz,
         ) unless( $tz eq 'floating' );
-        return( $self->pass_error( $locale->error ) ) if( !defined( $str ) && $locale->error );
+        return( $self->pass_error( $unicode->error ) ) if( !defined( $str ) && $unicode->error );
         if( !length( $str // '' ) )
         {
             my $offset = $dt->offset;
-            $str = $locale->format_gmt(
+            $str = $unicode->format_gmt(
                 offset => $offset,
                 width => 'long',
             );
@@ -1123,7 +1186,7 @@ sub _format_timezone_location
 sub _format_timezone_non_location
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     my $tz = $dt->time_zone->name;
     # Handle this edge case.
     $tz = 'UTC' if( $tz eq 'floating' );
@@ -1132,21 +1195,21 @@ sub _format_timezone_non_location
         # The short generic non-location format
         # Where that is unavailable, falls back to the generic location format ("VVVV"),
         # then the short localized GMT format as the final fallback
-        my $str = $locale->format_timezone_non_location(
+        my $str = $unicode->format_timezone_non_location(
             timezone => $tz,
             type => 'generic',
             width => 'short',
         );
         if( !$str )
         {
-            $str = $locale->format_timezone_location(
+            $str = $unicode->format_timezone_location(
                 timezone => $tz,
             );
         }
         if( !$str )
         {
             my $offset = $dt->offset;
-            $str = $locale->format_gmt(
+            $str = $unicode->format_gmt(
                 offset => $offset,
                 width => 'short',
             );
@@ -1158,14 +1221,14 @@ sub _format_timezone_non_location
     {
         # The long generic non-location format.
         # Where that is unavailable, falls back to generic location format ("VVVV")
-        my $str = $locale->format_timezone_non_location(
+        my $str = $unicode->format_timezone_non_location(
             timezone => $tz,
             type => 'generic',
             width => 'long',
         );
         if( !$str )
         {
-            $str = $locale->format_timezone_location(
+            $str = $unicode->format_timezone_location(
                 timezone => $tz,
             );
         }
@@ -1208,7 +1271,7 @@ sub _format_timezone_gmt_offset
 sub _format_timezone_offset
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     my $offset = $dt->offset;
     # Example: +0900
     if( $len >= 1 && $len <= 3 )
@@ -1218,7 +1281,7 @@ sub _format_timezone_offset
     # Example: GMT+0900
     elsif( $len == 4 )
     {
-        my $str = $locale->format_gmt(
+        my $str = $unicode->format_gmt(
             offset => $offset,
             width => 'long',
         );
@@ -1249,38 +1312,40 @@ sub _format_timezone_offset
 sub _format_week_day
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     # Not sure the value needs to be padded
     # "c..cc"
     # Example: 2 (numeric, 1 digit)
     if( $len >= 1 && $len <= 2 )
     {
-        return( sprintf( '%0*d', $len, $dt->day_of_week ) );
+        my $rv = sprintf( '%0*d', $len, $dt->day_of_week );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     # "ccc" (Abbreviated)
     # Example: Tue
     elsif( $len == 3 )
     {
-        return( $locale->day_stand_alone_abbreviated->[ $dt->day_of_week_0 ] );
+        return( $unicode->day_stand_alone_abbreviated->[ $dt->day_of_week_0 ] );
     }
     # "cccc" (Wide)
     # Example: Tuesday
     elsif( $len == 4 )
     {
-        return( $locale->day_stand_alone_wide->[ $dt->day_of_week_0 ] );
+        return( $unicode->day_stand_alone_wide->[ $dt->day_of_week_0 ] );
     }
     # "ccccc" (Narrow)
     # Example: T
     elsif( $len == 5 )
     {
-        return( $locale->day_stand_alone_narrow->[ $dt->day_of_week_0 ] );
+        return( $unicode->day_stand_alone_narrow->[ $dt->day_of_week_0 ] );
     }
     # "cccccc" (Short)
     # Example: Tu
     # This is missing in DateTime
     elsif( $len == 6 )
     {
-        return( $locale->day_stand_alone_short->[ $dt->day_of_week_0 ] );
+        return( $unicode->day_stand_alone_short->[ $dt->day_of_week_0 ] );
     }
     else
     {
@@ -1293,10 +1358,12 @@ sub _format_week_day
 sub _format_week_number
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     if( $len >= 1 && $len <= 2 )
     {
-        return( sprintf( '%0*d', $len, $dt->week_number ) );
+        my $rv = sprintf( '%0*d', $len, $dt->week_number );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     else
     {
@@ -1309,10 +1376,13 @@ sub _format_week_number
 sub _format_week_of_month
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     if( $len == 1 )
     {
-        return( $dt->week_of_month );
+        # return( $dt->week_of_month );
+        my $rv = $dt->week_of_month;
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     else
     {
@@ -1325,30 +1395,37 @@ sub _format_week_of_month
 sub _format_week_year
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
-    return( sprintf( '%0*d', $len, $dt->week_year ) );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
+    my $rv = sprintf( '%0*d', $len, $dt->week_year );
+    $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+    return( $rv );
 }
 
 # NOTE: pattern y
 sub _format_year
 {
     my( $self, $token, $len, $dt ) = @_;
-    my $locale = $self->{locale} || die( "Locale object value is gone!" );
+    my $unicode = $self->{_unicode} || die( "DateTime::Locale::FromCLDR object is gone!" );
     my $year = $dt->year;
     if( $len == 1 )
     {
+        $year = $self->_localise_digits( $year ) if( $self->{_number_system} ne 'latn' );
         return( $year );
     }
     elsif( $len == 2 )
     {
         my $y2 = length( $year > 2 ) ? substr( $year, -2, 2 ) : $year;
         $y2 *= -1 if( $year < 0 );
-        return( sprintf( '%02d', $y2 ) );
+        my $rv = sprintf( '%02d', $y2 );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     # In the CLDR, there is no upper limit
     elsif( $len >= 3 )
     {
-        return( sprintf( '%0*d', $len, $year ) );
+        my $rv = sprintf( '%0*d', $len, $year );
+        $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+        return( $rv );
     }
     # < 0 ??
     else
@@ -1363,7 +1440,9 @@ sub _format_year_extended
 {
     my( $self, $token, $len, $dt ) = @_;
     my $year = $dt->year;
-    return( sprintf( '%0*d', $len, $year ) );
+    my $rv = sprintf( '%0*d', $len, $year );
+    $rv = $self->_localise_digits( $rv ) if( $self->{_number_system} ne 'latn' );
+    return( $rv );
 }
 
 # NOTE: pattern r
@@ -1371,7 +1450,9 @@ sub _format_year_related
 {
     my( $self, $token, $len, $dt ) = @_;
     my $year = $dt->year;
-    return( sprintf( '%0*d', $len, $year ) );
+    $year = sprintf( '%0*d', $len, $year );
+    $year = $self->_localise_digits( $year ) if( $self->{_number_system} ne 'latn' );
+    return( $year );
 }
 
 # NOTE: pattern x, or X if $has_z is true
@@ -1523,6 +1604,20 @@ sub _get_args_as_hash
     return( $ref );
 }
 
+sub _localise_digits
+{
+    my $self = shift( @_ );
+    my $num  = shift( @_ );
+    my $digits = $self->{_number_system_digits};
+    die( "Number systems digits are gone!" ) if( !$digits || ref( $digits ) ne 'ARRAY' || ( ref( $digits ) eq 'ARRAY' && !scalar( @$digits ) ) );
+    my @parts = split( //, $num );
+    for( my $i = 0; $i < scalar( @parts ); $i++ )
+    {
+        $parts[$i] = $digits->[ $parts[$i] ];
+    }
+    return( join( '', @parts ) );
+}
+
 sub FREEZE
 {
     my $self = CORE::shift( @_ );
@@ -1553,7 +1648,11 @@ sub THAW
     my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
     my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
     my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
-    $hash->{locale} = DateTime::Locale::FromCLDR->new( $hash->{locale} ) if( $hash->{locale} );
+    if( $hash->{locale} )
+    {
+        $hash->{locale} = Locale::Unicode->new( $hash->{locale} );
+        $hash->{_unicode} = DateTime::Locale::FromCLDR->new( $hash->{locale} );
+    }
     if( $hash->{time_zone} )
     {
         local $@;
@@ -1856,9 +1955,25 @@ or, maybe, just:
 
 which, will default to C<locale> C<en> with date medium-size format pattern C<MMM d, y>
 
+If you specify a C<locale> that uses a different number system than C<latn> (which is 0 to 9), then C<DateTime::Format::Unicode> will honour it. For example:
+
+    my $fmt = DateTime::Format::Unicode->new(
+        locale => 'ar-SA',
+        pattern => 'd/M/y',
+    ) || die( DateTime::Format::Unicode->error );
+    say $fmt->format; # ١٠/٩/٢٠٢٤
+
+You can also override the C<locale>'s default number system, by another one, as long as it is supported by that C<locale>. For example:
+
+    my $fmt = DateTime::Format::Unicode->new(
+        locale => 'ar-SA-u-nu-latn',
+        pattern => 'd/M/y',
+    ) || die( DateTime::Format::Unicode->error );
+    say $fmt->format; # ١٠/٩/٢٠٢٤
+
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 =head1 DESCRIPTION
 

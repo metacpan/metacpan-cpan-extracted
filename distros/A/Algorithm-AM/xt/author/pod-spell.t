@@ -17,10 +17,12 @@ BigInt
 DataSet
 Glenn
 Item
+Leach
 Logan
 Nathan
 Nick
 Result
+Richard
 Royal
 Skousen
 Stanford
@@ -33,4 +35,5 @@ lattice
 lib
 nathan
 nlogan
+richardleach
 shixilun

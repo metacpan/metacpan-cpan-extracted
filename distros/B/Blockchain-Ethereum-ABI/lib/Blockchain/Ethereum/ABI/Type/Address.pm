@@ -1,34 +1,31 @@
-use v5.26;
+package Blockchain::Ethereum::ABI::Type::Address;
 
+use v5.26;
 use strict;
 use warnings;
 no indirect;
-use feature 'signatures';
 
-use Object::Pad;
 # ABSTRACT: Solidity address type interface
-
-package Blockchain::Ethereum::ABI::Type::Address;
-class Blockchain::Ethereum::ABI::Type::Address
-    :isa(Blockchain::Ethereum::ABI::Type)
-    :does(Blockchain::Ethereum::ABI::TypeRole);
-
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.016';          # VERSION
+our $VERSION   = '0.017';          # VERSION
 
-method _configure { return }
+use parent 'Blockchain::Ethereum::ABI::Type';
 
-method encode {
+sub _configure { return }
+
+sub encode {
+    my $self = shift;
 
     return $self->_encoded if $self->_encoded;
-    $self->_push_static($self->pad_left(substr($self->data, 2)));
+    $self->_push_static($self->pad_left(substr($self->{data}, 2)));
 
     return $self->_encoded;
 }
 
-method decode {
+sub decode {
+    my $self = shift;
 
-    return '0x' . substr $self->data->[0], -40;
+    return '0x' . substr $self->{data}->[0], -40;
 }
 
 1;
@@ -45,7 +42,7 @@ Blockchain::Ethereum::ABI::Type::Address - Solidity address type interface
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

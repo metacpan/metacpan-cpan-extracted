@@ -11,7 +11,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '1.0';
 
 use Test::More;
 use Test::More::UTF8;
@@ -41,7 +41,7 @@ my $template_dir = File::Spec->catdir($curdir, 'templates', 'simple05');
 my $template_filename = File::Spec->catfile($template_dir, 'main.tex.tx');
 my $expected_latex_output_filename = $template_filename; $expected_latex_output_filename =~ s/\.tx$/.expected_output/;
 my ($template_string, $FH);
-ok(open($FH, '<', $template_filename), "template filename '$template_filename' opened for reading.") or BAIL_OUT("not it failed with $!");
+ok(open($FH, '<:encoding(utf-8)', $template_filename), "template filename '$template_filename' opened for reading.") or BAIL_OUT("not it failed with $!");
 { local $/ = undef; $template_string = <$FH> } close $FH;
 
 my $template_data = {
@@ -133,7 +133,7 @@ for my $aprocessorname (sort keys %{$latterparams->{'processors'}}){
 	ok(-f $untemplate_ret->{'latex'}->{'filepath'}, 'untemplate()'." : called for processor '$aprocessorname', and returned latex output file (".$untemplate_ret->{'latex'}->{'filepath'}.") is a filepath and it exists.") or BAIL_OUT;
 	# open the latex source and check if there any templated vars
 	my ($FH, $content);
-	ok(open($FH, '<', $untemplate_ret->{'latex'}->{'filepath'}), "Output latex source '".$untemplate_ret->{'latex'}->{'filepath'}."' opened for reading.") or BAIL_OUT("failed: $!");
+	ok(open($FH, '<:encoding(utf-8)', $untemplate_ret->{'latex'}->{'filepath'}), "Output latex source '".$untemplate_ret->{'latex'}->{'filepath'}."' opened for reading.") or BAIL_OUT("failed: $!");
 	{ local $/ = undef; $content = <$FH> } close $FH;
 	ok($content !~ /<\:.+?\:>/, 'untemplate()'." : called for processor '$aprocessorname', and latex source (content of file '".$untemplate_ret->{'latex'}->{'filepath'}."') does not look to contain templated var remains.") or BAIL_OUT($content."\n\nno see above latex source content.");
 

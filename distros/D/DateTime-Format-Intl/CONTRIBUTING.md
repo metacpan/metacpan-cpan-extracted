@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/DateTime-Format-Intl-v0.1.0/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/DateTime-Format-Intl-v0.1.2/README.md)
 
 ## Author
 

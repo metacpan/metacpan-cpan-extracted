@@ -118,6 +118,8 @@ can_ok( $locale, 'native_variant' );
 can_ok( $locale, 'native_variants' );
 can_ok( $locale, 'number_symbols' );
 can_ok( $locale, 'number_system' );
+can_ok( $locale, 'number_systems' );
+can_ok( $locale, 'number_system_digits' );
 can_ok( $locale, 'pass_error' );
 can_ok( $locale, 'prefers_24_hour_time' );
 can_ok( $locale, 'quarter_format_abbreviated' );

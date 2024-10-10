@@ -1,5 +1,7 @@
 Revision history for AM-Algorithm
 
+3.13      2024-10-09 08:59:48-05:00 America/Chicago
+    Adjust for COW-shared constant-folded PV buffers (GH #63, @richardleach)
 3.12      2021-04-03 11:27:25+02:00 Europe/Berlin
     Fixed intermittent crash on Windows
 3.11      2017-11-15 10:39:12+01:00 Europe/Berlin

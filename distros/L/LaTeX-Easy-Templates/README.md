@@ -4,12 +4,12 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 # VERSION
 
-Version 0.06
+Version 1.0
 
 # SYNOPSIS
 
 This module provides functionality to format
-text content, living in a Perl data structure,
+text content from a Perl data structure
 into printer-ready documents (PDF/Postscript/DVI).
 It utilises the idea of Templates and employs the
 powerful LaTeX (via [LaTeX::Driver](https://metacpan.org/pod/LaTeX%3A%3ADriver)) in order
@@ -69,7 +69,7 @@ for each News article, and you have lots of those:
            'paragraph2',
            ...
         ],
-        comments => [
+        usercomments => [
           {
             'author' => 'sappho',
             'content' => 'yearning ...',
@@ -90,6 +90,16 @@ etc. would be, you will place some tags like:
     <: $author :>
     <: $sender :>
 
+or control like:
+
+    : for $authors -> $author {
+    : # call a new template for each author and
+    : # append the result here
+    :   include "authors-template.tex.tx" {
+    :     author => $author
+    :   }
+    : }
+
 etc.
 
 The [LaTeX::Easy::Templates](https://metacpan.org/pod/LaTeX%3A%3AEasy%3A%3ATemplates) module
@@ -99,6 +109,9 @@ and produce the final rendered documents.
 In section ["STARTING WITH LaTeX"](#starting-with-latex) you will see how to easily build a LaTeX template
 from open source, publicly available, superbly styled "_themes_".
 
+The template engine used in this module is [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate), chosen
+because of its very good performance when rendering templates.
+
     use LaTeX::Easy::Templates;
 
     # templated LaTeX document in-memory
@@ -107,8 +120,8 @@ from open source, publicly available, superbly styled "_themes_".
     % basic LaTeX document
     \documentclass[a4,12pt]{article}
     \begin{document}
-    \title{ <: $data.title :> }
-    \author{ <: $data.author.name :> <: $data.author.surname :> }
+    \title{ <: $data.['title'] :> }
+    \author{ <: $data.author.name :> <: $data.author['surname'] :> }
     \date{ <: $data.date :> }
     \maketitle
     <: $data.content :>
@@ -126,8 +139,21 @@ from open source, publicly available, superbly styled "_themes_".
       'content' => 'blah blah',
     };
 
+    sub myfunc { return "funced ".$_[0] }
+
     my $latte = LaTeX::Easy::Templates->new({
       debug => {verbosity=>2, cleanup=>1},
+      'templater-parameters' => {
+        # passing parameters to Text::Xslate's constructor
+        # myfunc() will be accessible from each template
+        'function' => {
+          'myfunc' => \&myfunc,
+        },
+        'module' => [
+          # and so the exports of this module:
+          'Data::Roundtrip' => [qw/perl2json json2perl/],
+        ],
+      },
       'processors' => {
         # if it includes other in-memory templates
         # then just include them here with their name
@@ -309,6 +335,12 @@ specified hash and should contain these items:
                 'function' => {
                   'xyz' => sub { my (@params) = @_; ...; return ... }
                 },
+                # installed Perl modules can be accessed
+                # from a template (caveat: complains for fully
+                # qualified sub names '::')
+                'module' => [
+                  'Data::Roundtrip' => [qw/perl2json json2perl/],
+                ],
                 ...
               },
 
@@ -719,14 +751,265 @@ straightforward, just follow the above guidelines.
 Mixed templates functionality is demonstrated and tested in
 file `t/500-mix-template-usage-calling-other-mix-templates.t`.
 
+# EXAMPLE: PRINTING STICKY LABELS
+
+We will use the LaTeX package [labels](https://ctan.org/pkg/labels?lang=en)
+(documented [here](https://mirrors.ctan.org/macros/latex/contrib/labels/labels.pdf))
+to prepare sticky labels for addressing envelopes etc. By the way, there
+is also the [ticket](https://ctan.org/pkg/ticket?lang=en) LaTeX package
+available over at CTAN (documented [here](http://mirrors.ctan.org/macros/latex/contrib/ticket/doc/manual.pdf))
+which can be of similar use, printing tickets.
+
+We will create two template files. One called `labels.tex.tx` as the
+main entry point. And one called `label.tex.tx` to be called by the
+first one in a loop over each label item in the input data.
+
+Here they are:
+
+    % I am ./templates/labels/labels.tex.tx
+    \documentclass[12pt]{letter}
+    \usepackage{graphicx}
+    \usepackage{labels}
+    \begin{document}
+    : for $data -> $label {
+    :   include 'label.tex.tx' { label => $label };
+
+and
+
+    % I am ./templates/labels/label.tex.tx
+    \genericlabel{
+      \begin{tabular}{|c|}
+        \hline
+    : if $label.sender.logo {
+        \includegraphics[width=1cm,angle=0]{<: $label.sender.logo :>}\\
+    : }
+        \hline
+        <: $label.recipient.fullname :>\\
+        \hline
+    : for $label.recipient.addresslines -> $addressline {
+        <: $addressline :>
+    : }
+        \\
+        <: $label.recipient.postcode :>\\
+        \hline
+      \end{tabular}
+    }
+
+Save them on disk in the suggested directory structure.
+Or, if you decide to change it, make sure you adjust
+the paths in the script below.
+
+Optionally, save a logo image to
+["templates/images/logo.png" in .](https://metacpan.org/pod/.#templates-images-logo.png). If that exists then
+the template will pick it up.
+
+And here is the Perl script to harness the beast:
+
+    use LaTeX::Easy::Templates;
+    use FindBin;
+
+    my $curdir = $FindBin::Bin;
+
+    # the templates can be placed anywhere as long these
+    # paths are adjusted. As it is now, they
+    # must both be placed in ./templates/labels
+    # the main entry is ./templates/labels/labels.tex.tx
+    # which calls/includes ./templates/labels/label.tex.tx
+    my $template_filename = File::Spec->catfile($curdir, 'templates', 'labels', 'labels.tex.tx');
+    # optionally specify a logo image
+    my $logo_filename = File::Spec->catfile($curdir, 'templates', 'images', 'logo.png');
+    if( ! -e $logo_filename ){ $logo_filename = undef }
+
+    my $output_filename = 'labels.pdf';
+
+    # see LaTeX::Driver's doc for other formats, e.g. pdf(xelatex)
+    my $latex_driver_and_format = 'pdf(pdflatex)';
+
+    # debug settings:
+    my $verbosity = 1;
+    # keep intermediate latex file for inspection
+    my $cleanup = 1;
+
+    my $sender = {
+      fullname => 'Gigi Comp',
+      addresslines => [
+        'Apt 5',
+        '25, Jen Way',
+        'Balac'
+      ],
+      postcode => '1An34',
+      # this assumes that ./templates/images/logo.png exists, else comment it out:  
+      logo => $logo_filename,
+    };
+    my @labels_data = map {
+      {
+        recipient => {
+          fullname => "Teli Bingo ($_)",
+          addresslines => [
+            'Apt 5',
+            '25, Jen Way',
+            'Balac'
+          ],
+          postcode => '1An34',
+        },
+        sender => $sender,
+      }
+    } (1..42); # create many labels yummy
+
+    my $latter = LaTeX::Easy::Templates->new({
+      'debug' => {
+        'verbosity' => $verbosity,
+        'cleanup' => $cleanup
+      },
+      'processors' => {
+        'custom-labels' => {
+        'template' => {
+          'filepath' => $template_filename,
+        },
+        'latex' => {
+          'filepath' => 'xyz.tex',
+          'latex-driver-parameters' => {
+            'format' => $latex_driver_and_format,
+          }
+        }
+        },
+      }
+    });
+    die "failed to instantiate 'LaTeX::Easy::Templates'" unless defined $latter;
+
+    my $ret = $latter->format({
+      'template-data' => \@labels_data,
+      'output' => {
+        'filepath' => $output_filename,
+      },
+      'processor' => 'custom-labels',
+    });
+    die "failed to format the document, most likely latex command has failed." unless defined $ret;
+    print "$0 : done, output in '$output_filename'.\n";
+
+This is the result in very low resolution:
+
+# EXAMPLE: NESTED PERL DATA STRUCTURES TO PDF
+
+Thanks to the amazing work put in [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate)
+one can have access to user-defined Perl functions,
+Perl modules and macros from inside a template file.
+
+This allows recusrsion which makes possible walking and
+printing a nested Perl data structure with this
+simple template:
+
+    %templates/nested-data-structures/nested-data-structures.tex.tx
+    \documentclass[12pt]{article}
+    \begin{document}
+
+    : macro walk -> $d {
+    :   if( ref($d) == 'ARRAY' ){
+    $\lbrack$
+    :     for $d -> $item {
+    :       walk($item);
+    :     }
+    $\rbrack,$
+    :   } elsif( ref($d) == 'HASH' ){
+    $\{$
+    :     for $d.kv() -> $pair {
+            <: $pair.key() :> $=>$
+    :       walk($pair.value())
+    :     }
+    $\},$
+    :   } elsif( ref($d) == '' ){
+          <: $d :>,
+    :   } else {
+          beginUNKNOWN <: $d :> endUNKNOWN
+    :   }
+    : } # macro
+
+    <: walk($data) :>
+
+    \end{document}
+
+First we create a macro which walks the input data structure
+and recurses into it until a scalar is found.
+
+The function `ref()` is Perl's builtin but it is not available
+from inside an [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) template. So, we create our own
+function for doing this and pass it on to the [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate)'s
+constructor, as was demonstrated previously with the
+`templater-parameters` hash pass to [LaTeX::Easy::Templates](https://metacpan.org/pod/LaTeX%3A%3AEasy%3A%3ATemplates)'s
+[constructor](https://metacpan.org/pod/%3Cnew%28%29).
+
+Here is a Perl script to render any data structure into PDF:
+
+    use strict;
+    use warnings;
+
+    use LaTeX::Easy::Templates;
+    use FindBin;
+
+    my $curdir = $FindBin::Bin;
+
+    # the templates must be placed in ./templates/nested-data-structures
+    my $template_filename = File::Spec->catfile($curdir, 'templates', 'nested-data-structures', 'nested-data-structures.tex.tx');
+
+    my $output_filename = 'nested-data-structures.pdf';
+
+    # see LaTeX::Driver's doc for other formats, e.g. pdf(xelatex)
+    my $latex_driver_and_format = 'pdf(pdflatex)';
+
+    my $nested_data_structure = {'a' => [1,2,3], 'b' => {'c' => [4,5,6, {'z'=>1}]}};
+
+    # debug settings:
+    my $verbosity = 1;
+    # keep intermediate latex file for inspection
+    my $cleanup = 1;
+
+    my $latter = LaTeX::Easy::Templates->new({
+      'debug' => {
+        'verbosity' => $verbosity,
+        'cleanup' => $cleanup
+      },
+      'templater-parameters' => {
+        'function' => {'ref' => sub { return ref($_[0]) } }
+      },
+      'processors' => {
+        'nested-data-structures' => {
+          'template' => {
+            'filepath' => $template_filename,
+          },
+          'latex' => {
+            'filepath' => 'xyz.tex',
+            'latex-driver-parameters' => {
+              'format' => $latex_driver_and_format,
+            }
+          },
+        }
+      }
+    });
+    die "failed to instantiate 'LaTeX::Easy::Templates'" unless defined $latter;
+
+    my $ret = $latter->format({
+      'template-data' => $nested_data_structure,
+      'output' => {
+        'filepath' => $output_filename,
+      },
+      'processor' => 'nested-data-structures',
+    });
+    die "failed to format the document, most likely latex command has failed." unless defined $ret;
+    print "$0 : done, output in '$output_filename'.\n";
+
+And here is the result:
+
+Thank you LaTeX, thank you Xslate.
+
 # STARTING WITH LaTeX
 
 Currently, the best place to get started with LaTeX is at
 the site [https://www.overleaf.com/](https://www.overleaf.com/) (which I am not affiliated in any way).
 There is no subscription involved or any registration required.
 
-Click on [Templates](https://www.overleaf.com/latex/templates) and search for anything
-you are interested to typeset your data with. For example, if you are scraping a news
+Click on [Templates](https://www.overleaf.com/latex/templates)
+and search the presented PDFs of example typeset documents
+for a look you fancy. For example, if you are scraping a news
 website you may be interested in the
 [Committee Times](https://www.overleaf.com/latex/templates/newspaper-slash-news-letter-template/wjxxhkxdjxhw) template.
 First check its license and if you agree with that, click on **View Source**, copy the contents and paste
@@ -744,12 +1027,12 @@ and control structures to use in order to turn it into a template.
 Rename the file to `main.tex.tx` and you are ready.
 
 Naturally, there will be a lot of head banging and hair pulling before you
-manage to produce anything decent.
+manage to produce results.
 
 # LaTeX TEMPLATES
 
 Creating a LaTeX template is very easy. You need to start with
-a LaTeX document and identify those sections which can be
+a usual LaTeX document and identify those sections which can be
 replaced by the template variables. You can also identify
 repeated sections and replace them with loops.
 It is exactly the same procedure as with creating HTML templates
@@ -757,7 +1040,8 @@ or email messages templates.
 
 At this moment, the template processor is [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate).
 Therefore the syntax for declaring template variables, loops,
-conditionals, etc. must comply with [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate). See
+conditionals, etc. must comply with what [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate)
+expects. See
 section ["TEMPLATE PROCESSING"](#template-processing) for where to start
 with [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate).
 
@@ -793,7 +1077,7 @@ to make installing extra packages easy.
 I believe [MikTeX](https://miktex.org/)
 was, at some time, aimed for M$ systems and
 [TexLive](https://www.tug.org/texlive/)
-for the saner operating systems.
+for the proper operating systems.
 
 My Linux package manager installs
 [TexLive](https://www.tug.org/texlive/)
@@ -820,8 +1104,9 @@ for more information.
 This is the hard way.
 
 All available LaTeX packages are
-located at the [Comprehensive TeX Archive Network (CTAN) site ](https://metacpan.org/pod/%20https%3A#ctan.org). Search the package,
-download it, locate and change to your LaTeX installation directory (for example `/usr/share/texlive/texmf-dist`),
+located at the [Comprehensive TeX Archive Network (CTAN) site ](https://metacpan.org/pod/%20https%3A#ctan.org).
+Search the package, download it, locate and change to your
+LaTeX installation directory (for example `/usr/share/texlive/texmf-dist`),
 change to `tex`. Decide which flavour of LaTeX (processor)
 this package is for, e.g. `latex`, `pdflatex` or `xelatex`,
 change to that directory and unzip the downloaded file there.
@@ -843,8 +1128,9 @@ these tests are not important and their possible
 failure should not cause any convern.
 
 In order to run all tests download the
-tarball of this module, extract it,
-enter the directory and do:
+tarball distribution of this module from CPAN
+(there is a link on the left side of the module's
+page for that), extract it, enter the directory and do:
 
     perl Makefile.PL
     make all
@@ -887,7 +1173,10 @@ You can also look for information at:
 
 # ACKNOWLEDGEMENTS
 
-- LaTeX - excellent typography, superb aesthetics.
+- TeX/LaTeX - excellent typography, superb aesthetics.
+Thank you Donald Knuth and Leslie Lamport and countless contributors.
+- [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) - fast and feature-rich template engine.
+Thank you Shoichi Kaji and contributors.
 
 # LICENSE AND COPYRIGHT
 

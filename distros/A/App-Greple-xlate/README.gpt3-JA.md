@@ -10,7 +10,7 @@ App::Greple::xlate - grepleの翻訳サポートモジュール
 
 # VERSION
 
-Version 0.3401
+Version 0.4101
 
 # DESCRIPTION
 
@@ -18,9 +18,9 @@ Version 0.3401
 
 Perlのpodスタイルで書かれたドキュメント内の通常のテキストブロックを翻訳したい場合は、次のように`xlate::deepl`と`perl`モジュールを使用した**greple**コマンドを使用してください。
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-このコマンドでは、パターン文字列`^(\w.*\n)+`は、英数字で始まる連続した行を意味します。このコマンドは、翻訳対象のエリアをハイライト表示します。オプション**--all**は、全体のテキストを生成するために使用されます。
+このコマンドでは、パターン文字列`^([\w\pP].*\n)+`は、アルファベット、数字、句読点で始まる連続した行を意味します。このコマンドは、翻訳する領域をハイライト表示します。オプション**--all**は、全文を表示するために使用されます。
 
 <div>
     <p>
@@ -74,6 +74,10 @@ Perlのpodスタイルで書かれたドキュメント内の通常のテキス�
     --xlate-setopt maskfile=MASKPATTERN
 
 これにより、ファイル\`MASKPATTERN\`の各行を正規表現として解釈し、それに一致する文字列を翻訳し、処理後に元に戻します。行頭が`#`で始まる行は無視されます。
+
+複雑なパターンは、バックスラッシュで改行をエスケープして複数行に書くことができます。
+
+テキストがマスキングによって変換される方法は、**--xlate-mask**オプションで確認できます。
 
 このインターフェースは実験的であり、将来変更される可能性があります。
 
@@ -136,6 +140,28 @@ Perlのpodスタイルで書かれたドキュメント内の通常のテキス�
 
             sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+    - **colon**, _:::::::_
+
+        \`\`\`html
+
+            ::::::: ORIGINAL
+            original text
+            :::::::
+            ::::::: JA
+            translated Japanese text
+            :::::::
+
+        &lt;div class="translation">
+
+            <div class="ORIGINAL">
+            original text
+            </div>
+            <div class="JA">
+            translated Japanese text
+            </div>
+
+        Number of colon is 7 by default. If you specify colon sequence like \`:::::::\`, it is used instead of 7 colons.
+
     - **ifdef**
 
         オリジナルと変換されたテキストは、[cpp(1)](http://man.he.net/man1/cpp)の`#ifdef`フォーマットで印刷されます。
@@ -152,8 +178,9 @@ Perlのpodスタイルで書かれたドキュメント内の通常のテキス�
             unifdef -UORIGINAL -DJA foo.ja.pm
 
     - **space**
+    - **space+**
 
-        オリジナルと変換されたテキストは、1つの空白行で区切られて印刷されます。
+        Hello, how can I help you today?
 
     - **xtxt**
 
@@ -173,6 +200,16 @@ Perlのpodスタイルで書かれたドキュメント内の通常のテキス�
 
     STDERR出力でリアルタイムに翻訳結果を確認します。
 
+- **--xlate-stripe**
+
+    マッチした部分をゼブラストライプのように表示するために、[App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)モジュールを使用します。マッチした部分が連続している場合に便利です。
+
+    カラーパレットは、端末の背景色に応じて切り替わります。明示的に指定したい場合は、**--xlate-stripe-light**または**--xlate-stripe-dark**を使用できます。
+
+- **--xlate-mask**
+
+    マスキング機能を実行し、変換されたテキストを復元せずに表示します。
+
 - **--match-all**
 
     ファイルの全体のテキストを対象エリアとして設定します。
@@ -181,9 +218,7 @@ Perlのpodスタイルで書かれたドキュメント内の通常のテキス�
 
 **xlate**モジュールは、各ファイルの翻訳のキャッシュテキストを保存し、実行前にそれを読み込んでサーバーへの問い合わせのオーバーヘッドを排除することができます。デフォルトのキャッシュ戦略`auto`では、対象ファイルのキャッシュファイルが存在する場合にのみキャッシュデータを保持します。
 
-- --cache-clear
-
-    **--cache-clear**オプションを使用してキャッシュ管理を開始するか、すべての既存のキャッシュデータを更新できます。このオプションで実行すると、キャッシュファイルが存在しない場合は新しいキャッシュファイルが作成され、その後自動的にメンテナンスされます。
+**--xlate-cache=clear**を使用してキャッシュ管理を開始するか、既存のすべてのキャッシュデータをクリアします。このオプションを使用して実行すると、新しいキャッシュファイルが存在しない場合は作成され、その後自動的に維持されます。
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
@@ -209,6 +244,9 @@ Perlのpodスタイルで書かれたドキュメント内の通常のテキス�
     - `accumulate`
 
         デフォルトの動作では、キャッシュファイルから未使用のデータが削除されます。それらを削除せずにファイルに保持したい場合は、`accumulate`を使用してください。
+- **--xlate-update**
+
+    このオプションは、必要ない場合でもキャッシュファイルを更新するように強制します。
 
 # COMMAND LINE INTERFACE
 
@@ -235,6 +273,7 @@ Dockerとメイクオプションを組み合わせることもでき、Docker�
         -s   silent mode
         -e # translation engine (default "deepl")
         -p # pattern to determine translation area
+        -x # file containing mask patterns
         -w # wrap line by # width
         -o # output format (default "xtxt", or "cm", "ifdef")
         -f # from lang (ignored)
@@ -250,18 +289,24 @@ Dockerとメイクオプションを組み合わせることもでき、Docker�
         -B   run in non-interactive (batch) mode
         -R   mount read-only
         -E * specify environment variable to be inherited
-        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -I * docker image name or version (default: tecolicom/xlate:version)
         -D * run xlate on the container with the rest parameters
         -C * run following command on the container, or run shell
-
+    
     Control Files:
         *.LANG    translation languates
-        *.FORMAT  translation foramt (xtxt, cm, ifdef)
-        *.ENGINE  translation engine (deepl or gpt3)
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 # EMACS
 
 Emacsエディタから`xlate`コマンドを使用するには、リポジトリに含まれる`xlate.el`ファイルをロードしてください。`xlate-region`関数は指定された領域を翻訳します。デフォルトの言語は`EN-US`であり、プレフィックス引数を使用して言語を指定することができます。
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+    </p>
+</div>
 
 # ENVIRONMENT
 
@@ -295,7 +340,9 @@ DeepLとChatGPTのコマンドラインツールをインストールする必�
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
-[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+- [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
+    Dockerコンテナイメージ。
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
@@ -320,6 +367,10 @@ DeepLとChatGPTのコマンドラインツールをインストールする必�
 - [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
 
     **-V**オプションとともに、衝突マーカーフォーマットを並べて表示するために**sdif**を使用してください。
+
+- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
+
+    Greple **stripe**モジュールは、**--xlate-stripe**オプションを使用しています。
 
 ## ARTICLES
 

@@ -37,7 +37,7 @@
             "Scalar::Util" : "0",
             "Want" : "0.17",
             "overload" : "1.06",
-            "perl" : "5.010000",
+            "perl" : "5.010001",
             "strict" : "0",
             "vars" : "0",
             "warnings" : "0",
@@ -67,6 +67,6 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR"
       }
    },
-   "version" : "v0.4.3",
+   "version" : "v0.6.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

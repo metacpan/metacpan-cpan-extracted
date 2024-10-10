@@ -66,9 +66,9 @@ use Exporter;
 
 # The module whose behaviour we want to modify
 # so that we can sabotage everything else!
-use Fred::Fish::DBUG::Signal 2.07;
+use Fred::Fish::DBUG::Signal 2.08;
 
-$VERSION = "2.07";
+$VERSION = "2.08";
 @ISA = qw( Exporter );
 @EXPORT = qw( );
 @EXPORT_OK = qw( );

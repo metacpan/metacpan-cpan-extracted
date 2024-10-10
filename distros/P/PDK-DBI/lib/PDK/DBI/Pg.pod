@@ -1,0 +1,161 @@
+=encoding utf8
+
+=head1 NAME
+
+PDK::DBI::Pg - Moose-based wrapper for PostgreSQL database operations using DBIx::Custom
+
+=head1 SYNOPSIS
+
+  use PDK::DBI::Pg;
+
+  my $db = PDK::DBI::Pg->new(
+    host     => 'localhost',
+    port     => 5432,
+    dbname   => 'mydb',
+    user     => 'username',
+    password => 'password'
+  );
+
+  my $result = $db->execute("SELECT * FROM users WHERE id = ?", [1])->all;
+
+  $db->disconnect;
+
+=head1 DESCRIPTION
+
+PDK::DBI::Pg 是一个基于 Moose 的模块，为 PostgreSQL 数据库操作提供高级接口。它使用 DBIx::Custom 处理底层数据库连接和查询，并实现事务管理和连接池。
+
+=head1 ATTRIBUTES
+
+=head2 option
+
+只读的 HashRef，用于存储数据库连接选项。
+
+=head1 METHODS
+
+=head2 new(%params)
+
+构造函数，用于创建新的 PDK::DBI::Pg 对象。接受以下参数：
+
+=over 4
+
+=item * host - 数据库主机
+
+=item * port - 数据库端口
+
+=item * dbname - 数据库名称
+
+=item * user - 数据库用户名
+
+=item * password - 数据库密码
+
+=item * dsn - 数据源名称（可选，如果未提供则自动生成）
+
+=item * option - 附加数据库连接选项的 HashRef
+
+=back
+
+=head2 clone()
+
+创建当前对象的新实例，复制连接信息（dsn、用户、密码和选项）。
+
+返回值：新的 PDK::DBI::Pg 对象。
+
+=head2 batchExecute($params, $sql)
+
+执行批量 SQL 操作。
+
+=over 4
+
+=item * $params - SQL 查询参数的 ArrayRef
+
+=item * $sql - SQL 查询字符串
+
+=back
+
+=head2 disconnect()
+
+关闭数据库连接。
+
+=head2 reconnect()
+
+断开并重新建立数据库连接。
+
+=head1 INHERITED METHODS
+
+以下方法从 DBIx::Custom 继承，可以直接在 PDK::DBI::Pg 对象上调用：
+
+=over 4
+
+=item * select
+
+=item * update
+
+=item * insert
+
+=item * delete
+
+=item * execute
+
+=item * user
+
+=back
+
+=head1 TRANSACTION HANDLING
+
+所有数据库操作（execute、delete、update、insert、batchExecute）都自动包装在事务中。如果操作过程中发生错误，事务将回滚。
+
+=head1 EXAMPLES
+
+=head2 连接数据库
+
+  my $db = PDK::DBI::Pg->new(
+    host     => 'localhost',
+    port     => 5432,
+    dbname   => 'mydb',
+    user     => 'username',
+    password => 'password'
+  );
+
+=head2 执行 SELECT 查询
+
+  my $results = $db->execute("SELECT * FROM users WHERE status = ?", ['active'])->all;
+
+=head2 插入数据
+
+  $db->insert('users', {name => '张三', email => 'zhangsan@example.com'});
+
+=head2 更新数据
+
+  $db->update('users', {status => 'inactive'}, {id => 1});
+
+=head2 删除数据
+
+  $db->delete('users', {id => 1});
+
+=head2 批量执行
+
+  my $params = [
+    ['张三', 'zhangsan@example.com'],
+    ['李四', 'lisi@example.com']
+  ];
+  $db->batchExecute($params, "INSERT INTO users (name, email) VALUES (?, ?)");
+
+=head1 SEE ALSO
+
+L<Moose>, L<DBIx::Custom>, L<DBI>
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut

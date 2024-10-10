@@ -2059,7 +2059,40 @@ my $tests =
                 expects => 'GMT+9:00',
             },
         ],
-    }
+    },
+    {
+        locale => 'ar-SA',
+        name => 'localised digits',
+        tests => [
+            {
+                data => { year => 2024, month => 9, day => 10, hour => 7, minute => 12, second => 10, time_zone => 'UTC' },
+                pattern => 'd/M/y',
+                expects => '١٠/٩/٢٠٢٤',
+            },
+        ],
+    },
+    {
+        locale => 'ar-SA-u-nu-latn',
+        name => 'localised digits',
+        tests => [
+            {
+                data => { year => 2024, month => 9, day => 10, hour => 7, minute => 12, second => 10, time_zone => 'UTC' },
+                pattern => 'd/M/y',
+                expects => '10/9/2024',
+            },
+        ],
+    },
+    {
+        locale => 'fa-IR',
+        name => 'localised digits',
+        tests => [
+            {
+                data => { year => 2024, month => 9, day => 10, hour => 7, minute => 12, second => 10, time_zone => 'UTC' },
+                pattern => 'y/M/d',
+                expects => '۲۰۲۴/۹/۱۰',
+            },
+        ],
+    },
 ];
 
 foreach my $test ( @$tests )

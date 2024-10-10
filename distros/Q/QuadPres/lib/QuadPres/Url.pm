@@ -1,5 +1,5 @@
 package QuadPres::Url;
-$QuadPres::Url::VERSION = '0.30.0';
+$QuadPres::Url::VERSION = '0.32.0';
 use 5.016;
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ __PACKAGE__->mk_acc_ref(
             is_dir
             mode
             url
-            )
+        )
     ]
 );
 
@@ -171,7 +171,7 @@ __END__
 
 =head1 VERSION
 
-version 0.30.0
+version 0.32.0
 
 =head1 SYNOPSIS
 

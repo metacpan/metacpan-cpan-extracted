@@ -7,7 +7,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '1.0';
 
 use Test::More;
 use Test::More::UTF8;
@@ -35,7 +35,7 @@ ok(-d $tmpdir, "tmpdir exists $tmpdir") or BAIL_OUT;
 my $template_dir = File::Spec->catdir($curdir, 'templates', 'simple05');
 my $template_filename = File::Spec->catfile($template_dir, 'main.tex.tx');
 my ($template_string, $FH);
-ok(open($FH, '<', $template_filename), "template filename '$template_filename' opened for reading.") or BAIL_OUT("not it failed with $!");
+ok(open($FH, '<:encoding(utf-8)', $template_filename), "template filename '$template_filename' opened for reading.") or BAIL_OUT("not it failed with $!");
 { local $/ = undef; $template_string = <$FH> } close $FH;
 
 my $template_data = {

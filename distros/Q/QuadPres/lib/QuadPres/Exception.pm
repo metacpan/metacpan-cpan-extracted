@@ -1,5 +1,5 @@
 package QuadPres::Exception;
-$QuadPres::Exception::VERSION = '0.30.0';
+$QuadPres::Exception::VERSION = '0.32.0';
 use 5.016;
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ sub text
 }
 
 package QuadPres::Exception::RenderFile;
-$QuadPres::Exception::RenderFile::VERSION = '0.30.0';
+$QuadPres::Exception::RenderFile::VERSION = '0.32.0';
 use vars qw(@ISA);
 
 @ISA = qw(QuadPres::Exception);
@@ -49,7 +49,7 @@ QuadPres::Exception - exception class
 
 =head1 VERSION
 
-version 0.30.0
+version 0.32.0
 
 =head1 SYNOPSIS
 

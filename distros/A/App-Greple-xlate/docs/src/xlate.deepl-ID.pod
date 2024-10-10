@@ -12,7 +12,7 @@ App::Greple::xlate - modul dukungan penerjemahan untuk greple
 
 =head1 VERSION
 
-Version 0.3401
+Version 0.4101
 
 =head1 DESCRIPTION
 
@@ -20,9 +20,9 @@ Modul B<Greple> B<xlate> menemukan blok teks yang diinginkan dan menggantinya de
 
 Jika Anda ingin menerjemahkan blok teks normal dalam dokumen yang ditulis dengan gaya pod Perl, gunakan perintah B<greple> dengan modul C<xlate::deepl> dan C<perl> seperti ini:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-Dalam perintah ini, string pola C<^(\w.*\n)+> berarti baris berurutan yang dimulai dengan huruf alfanumerik. Perintah ini menunjukkan area yang akan diterjemahkan disorot. Opsi B<--all> digunakan untuk menghasilkan seluruh teks.
+Dalam perintah ini, string pola C<^([\w\pP].*\n)+> berarti baris berurutan yang dimulai dengan alfanumerik dan tanda baca. Perintah ini menunjukkan area yang akan diterjemahkan dengan disorot. Opsi B<--all> digunakan untuk menghasilkan seluruh teks.
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
@@ -85,6 +85,10 @@ Terkadang, ada bagian teks yang tidak ingin diterjemahkan. Misalnya, tag dalam f
     --xlate-setopt maskfile=MASKPATTERN
 
 Ini akan menginterpretasikan setiap baris dari file `MASKPATTERN` sebagai ekspresi reguler, menerjemahkan string yang cocok dengan itu, dan mengembalikannya setelah diproses. Baris yang dimulai dengan C<#> akan diabaikan.
+
+Pola kompleks dapat ditulis pada beberapa baris dengan garis miring diakhiri dengan baris baru.
+
+Bagaimana teks diubah dengan masking dapat dilihat dengan opsi B<--xlate-mask>.
 
 Antarmuka ini bersifat eksperimental dan dapat berubah di masa depan.
 
@@ -162,6 +166,28 @@ Anda dapat memulihkan file asli dengan perintah L<sed(1)> berikutnya.
 
     sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+=item B<colon>, I<:::::::>
+
+Teks asli dan terjemahan ditampilkan dalam gaya wadah khusus penurunan harga.
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+Teks di atas akan diterjemahkan ke dalam HTML berikut ini.
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+Jumlah titik dua adalah 7 secara default. Jika Anda menentukan urutan titik dua seperti C<:::::>, ini digunakan sebagai pengganti 7 titik dua.
+
 =item B<ifdef>
 
 Teks asli dan teks yang dikonversi dicetak dalam format L<cpp(1)> C<#ifdef>.
@@ -179,7 +205,9 @@ Anda hanya dapat mengambil teks bahasa Jepang dengan perintah B<unifdef>:
 
 =item B<space>
 
-Teks asli dan teks yang dikonversi dicetak dengan dipisahkan oleh satu baris kosong.
+=item B<space+>
+
+Teks asli dan teks yang dikonversi dicetak dipisahkan oleh satu baris kosong. Untuk C<spasi+>, ini juga menghasilkan baris baru setelah teks yang dikonversi.
 
 =item B<xtxt>
 
@@ -201,6 +229,16 @@ Tetapkan nilai ini ke 1 jika Anda ingin menerjemahkan satu baris dalam satu wakt
 
 Lihat hasil terjemahan secara real time dalam output STDERR.
 
+=item B<--xlate-stripe>
+
+Gunakan modul L<App::Greple::stripe> untuk menampilkan bagian yang cocok dengan mode garis zebra. Hal ini berguna ketika bagian yang dicocokkan dihubungkan secara berurutan.
+
+Palet warna dialihkan menurut warna latar belakang terminal. Jika Anda ingin menentukan secara eksplisit, Anda dapat menggunakan B<--xlate-stripe-light> atau B<--xlate-stripe-dark>.
+
+=item B<--xlate-mask>
+
+Lakukan fungsi masking dan tampilkan teks yang dikonversi apa adanya tanpa pemulihan.
+
 =item B<--match-all>
 
 Mengatur seluruh teks file sebagai area target.
@@ -211,11 +249,9 @@ Mengatur seluruh teks file sebagai area target.
 
 Modul B<xlate> dapat menyimpan teks terjemahan dalam cache untuk setiap file dan membacanya sebelum eksekusi untuk menghilangkan overhead dari permintaan ke server. Dengan strategi cache default C<auto>, modul ini mempertahankan data cache hanya ketika file cache ada untuk file target.
 
+Gunakan B<--xlate-cache=clear> untuk memulai manajemen cache atau untuk membersihkan semua data cache yang ada. Setelah dieksekusi dengan opsi ini, file cache baru akan dibuat jika belum ada dan kemudian secara otomatis dipelihara setelahnya.
+
 =over 7
-
-=item --cache-clear
-
-Opsi B<--cache-clear> dapat digunakan untuk memulai manajemen cache atau untuk menyegarkan semua data cache yang ada. Setelah dieksekusi dengan opsi ini, file cache baru akan dibuat jika belum ada dan kemudian secara otomatis dipelihara setelahnya.
 
 =item --xlate-cache=I<strategy>
 
@@ -247,6 +283,10 @@ Secara default, data yang tidak digunakan akan dihapus dari file cache. Jika And
 
 =back
 
+=item B<--xlate-update>
+
+Opsi ini memaksa untuk memperbarui file cache meskipun tidak diperlukan.
+
 =back
 
 =head1 COMMAND LINE INTERFACE
@@ -264,44 +304,49 @@ Menjalankan seperti C<xlate -GC> akan meluncurkan sebuah shell dengan repositori
 Baca artikel bahasa Jepang di bagian L</LIHAT JUGA> untuk detailnya.
 
     xlate [ options ] -t lang file [ greple options ]
-	-h   help
-	-v   show version
-	-d   debug
-	-n   dry-run
-	-a   use API
-	-c   just check translation area
-	-r   refresh cache
-	-s   silent mode
-	-e # translation engine (default "deepl")
-	-p # pattern to determine translation area
-	-w # wrap line by # width
-	-o # output format (default "xtxt", or "cm", "ifdef")
-	-f # from lang (ignored)
-	-t # to lang (required, no default)
-	-m # max length per API call
-	-l # show library files (XLATE.mk, xlate.el)
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -x # file containing mask patterns
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
     Make options
-	-M   run make
-	-n   dry-run
+        -M   run make
+        -n   dry-run
     Docker options
-	-G   mount git top-level directory
-	-B   run in non-interactive (batch) mode
-	-R   mount read-only
-	-E * specify environment variable to be inherited
-	-I * specify altanative docker image (default: tecolicom/xlate:version)
-	-D * run xlate on the container with the rest parameters
-	-C * run following command on the container, or run shell
-
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * docker image name or version (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+    
     Control Files:
-	*.LANG    translation languates
-	*.FORMAT  translation foramt (xtxt, cm, ifdef)
-	*.ENGINE  translation engine (deepl or gpt3)
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 
 =head1 EMACS
 
 Muat file F<xlate.el> yang disertakan dalam repositori untuk menggunakan perintah C<xlate> dari editor Emacs. Fungsi C<xlate-region> menerjemahkan wilayah tertentu. Bahasa default adalah C<EN-US> dan Anda dapat menentukan bahasa yang digunakan dengan argumen awalan.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
 
 =head1 ENVIRONMENT
 
@@ -339,33 +384,39 @@ L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt3>
 
-L<https://hub.docker.com/r/tecolicom/xlate>
+=over 2
 
-=over 7
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
 
-=item L<https://github.com/DeepLcom/deepl-python>
+Gambar kontainer Docker.
+
+=item * L<https://github.com/DeepLcom/deepl-python>
 
 DeepL pustaka Python dan perintah CLI.
 
-=item L<https://github.com/openai/openai-python>
+=item * L<https://github.com/openai/openai-python>
 
 Perpustakaan Python OpenAI
 
-=item L<https://github.com/tecolicom/App-gpty>
+=item * L<https://github.com/tecolicom/App-gpty>
 
 Antarmuka baris perintah OpenAI
 
-=item L<App::Greple>
+=item * L<App::Greple>
 
 Lihat manual B<greple> untuk detail tentang pola teks target. Gunakan opsi B<--inside>, B<--outside>, B<--include>, B<--exclude> untuk membatasi area pencocokan.
 
-=item L<App::Greple::update>
+=item * L<App::Greple::update>
 
 Anda dapat menggunakan modul C<-Mupdate> untuk memodifikasi file berdasarkan hasil perintah B<greple>.
 
-=item L<App::sdif>
+=item * L<App::sdif>
 
 Gunakan B<sdif> untuk menampilkan format penanda konflik berdampingan dengan opsi B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Modul Greple B<stripe> yang digunakan oleh opsi B<--xlate-stripe>.
 
 =back
 

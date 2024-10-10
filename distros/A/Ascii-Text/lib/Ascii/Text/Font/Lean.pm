@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Rope;
 use Rope::Autoload;
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 extends 'Ascii::Text::Font';
 

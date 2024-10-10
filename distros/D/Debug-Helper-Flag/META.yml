@@ -1,0 +1,36 @@
+--- #YAML:1.0
+name:               Debug-Helper-Flag
+version:            0.01
+abstract:           Define and import boolean constant DEBUG_FLAG helping to optimize code.
+author:
+    - Abdul al Hazred <451@gmx.eu>
+license:            perl_5
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:        0
+    constant:    0
+    Exporter:    0
+    feature:     0
+    perl:        5.010
+    strict:      0
+    Test::Lib:   0.003
+    Test::More:  0.98
+    warnings:    0
+resources:
+    repository:
+        type:  git
+        url:   git@github.com:AAHAZRED/perl-Debug-Helper-Flag.git
+        web:   https://github.com/AAHAZRED/perl-Debug-Helper-Flag
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  2
+dynamic_config:     0

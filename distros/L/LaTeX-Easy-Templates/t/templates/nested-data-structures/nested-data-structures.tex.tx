@@ -1,0 +1,28 @@
+\documentclass[12pt]{article}
+
+\begin{document}
+
+: macro walk -> $d {
+:   if( ref($d) == 'ARRAY' ){
+$\lbrack$
+:     for $d -> $item {
+:       walk($item);
+:     }
+$\rbrack,$
+:   } elsif( ref($d) == 'HASH' ){
+$\{$
+:     for $d.kv() -> $pair {
+        <: $pair.key() :> $=>$
+:       walk($pair.value())
+:     }
+$\},$
+:   } elsif( ref($d) == '' ){
+      <: $d :>,
+:   } else {
+      beginUNKNOWN <: $d :> endUNKNOWN
+:   }
+: } # macro
+
+<: walk($data) :>
+
+\end{document}

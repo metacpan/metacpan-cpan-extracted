@@ -28,8 +28,10 @@ no_index:
     - t
     - inc
 requires:
+  Clone: '0'
   Cwd: '0'
   Data::Roundtrip: '0.18'
+  Exporter: '0'
   File::Basename: '0'
   File::Copy::Recursive: '0'
   File::Path: '0'
@@ -39,12 +41,11 @@ requires:
   Filesys::DiskUsage: '0'
   LaTeX::Driver: v1.0.0
   Mojo::Log: '0'
-  Storable: '0'
   Text::Xslate: v3.5.6
   perl: '5.010'
 resources:
   bugtracker: https://github.com/hadjiprocopis/LaTeX-Easy-Templates/issues
   homepage: https://metacpan.org/module/LaTeX::Easy::Templates
   repository: https://github.com/hadjiprocopis/LaTeX-Easy-Templates
-version: '0.06'
+version: '1.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

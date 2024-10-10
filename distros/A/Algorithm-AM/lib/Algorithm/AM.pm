@@ -1,7 +1,7 @@
 package Algorithm::AM;
 use strict;
 use warnings;
-our $VERSION = '3.12';
+our $VERSION = '3.13';
 # ABSTRACT: Classify data with Analogical Modeling
 use feature 'state';
 use Carp;
@@ -93,9 +93,9 @@ sub _initialize {
         qw(
             itemcontextchainhead
             context_to_class
-            contextsize
+            context_size
             pointers
-            gang
+            raw_gang
         )
     );
 
@@ -109,9 +109,9 @@ sub _initialize {
         $self->{itemcontextchain},
         $self->{itemcontextchainhead},
         $self->{context_to_class},
-        $self->{contextsize},
+        $self->{context_size},
         $self->{pointers},
-        $self->{gang},
+        $self->{raw_gang},
         $self->{sum}
     );
     return;
@@ -153,11 +153,11 @@ sub classify {
     # the XS code has access to the existing reference,
     # but will be accessing the wrong variable if we
     # change it.
-    %{$self->{contextsize}}             = ();
+    %{$self->{context_size}}             = ();
     %{$self->{itemcontextchainhead}}    = ();
     %{$self->{context_to_class}}      = ();
     %{$self->{pointers}}                = ();
-    %{$self->{gang}}                    = ();
+    %{$self->{raw_gang}}                    = ();
     @{$self->{itemcontextchain}}        = ();
     # big ints are used in AM.xs; these consist of an
     # array of 8 unsigned longs
@@ -176,7 +176,7 @@ sub classify {
             $test_item->features,
             $self->exclude_nulls
         );
-        $self->{contextsize}->{$context}++;
+        $self->{context_size}->{$context}++;
         # TODO: explain itemcontextchain and itemcontextchainhead
         $self->{itemcontextchain}->[$index] =
             $self->{itemcontextchainhead}->{$context};
@@ -227,7 +227,7 @@ sub classify {
         $lattice_sizes, $self->linear ? 1 : 0);
     $result->end_time([ (localtime)[0..2] ]);
 
-    unless ($self->{pointers}->{'grandtotal'}) {
+    unless ($self->{pointers}->{'grand_total'}) {
         #TODO: is this tested yet?
         if($log->is_warn){
             $log->warn('No training items considered. ' .
@@ -244,9 +244,9 @@ sub classify {
         $self->{itemcontextchainhead},
         $self->{itemcontextchain},
         $self->{context_to_class},
-        $self->{gang},
+        $self->{raw_gang},
         $lattice_sizes,
-        $self->{contextsize}
+        $self->{context_size}
     );
     return $result;
 }
@@ -327,7 +327,7 @@ Algorithm::AM - Classify data with Analogical Modeling
 
 =head1 VERSION
 
-version 3.12
+version 3.13
 
 =head1 SYNOPSIS
 
@@ -544,7 +544,7 @@ Theron Stanford <shixilun@yahoo.com>, Nathan Glenn <garfieldnate@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Nathan Glenn Nick Logan
+=for stopwords Nathan Glenn Nick Logan Richard Leach
 
 =over 4
 
@@ -555,6 +555,10 @@ Nathan Glenn <nathan-gary.glenn@trivago.com>
 =item *
 
 Nick Logan <nlogan@gmail.com>
+
+=item *
+
+Richard Leach <richardleach@users.noreply.github.com>
 
 =back
 

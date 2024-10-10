@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/DateTime/Locale/FromCLDR.pm
-## Version v0.4.3
+## Version v0.6.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/07
-## Modified 2024/09/26
+## Modified 2024/10/10
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     # "If a given short metazone form is known NOT to be understood in a given locale and the parent locale has this value such that it would normally be inherited, the inheritance of this value can be explicitly disabled by use of the 'no inheritance marker' as the value, which is 3 simultaneous empty set characters (U+2205)."
     # <https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
     our $EMPTY_SET = "∅∅∅";
-    our $VERSION = 'v0.4.3';
+    our $VERSION = 'v0.6.0';
 };
 
 use strict;
@@ -1538,7 +1538,7 @@ sub locale_number_system
             }
             else
             {
-                die( "No digits data found numbering system '${str}' for locale '${locale}' !" );
+                die( "No digits data found for numbering system '${str}' for locale '${locale}' !" );
             }
         }
         $ref //= [];
@@ -1971,6 +1971,60 @@ sub number_system
         $self->{number_system} = $str;
     }
     return( $str );
+}
+
+sub number_systems
+{
+    my $self = shift( @_ );
+    my $def;
+    unless( defined( $def = $self->{number_systems} ) )
+    {
+        my $locale = $self->{locale} ||
+            die( "No locale is set!" );
+        my $cldr = $self->{_cldr} || die( "The Locale::Unicode::Data object is gone!" );
+        my $tree = $cldr->make_inheritance_tree( $locale ) ||
+            return( $self->pass_error( $cldr->error ) );
+        foreach my $loc ( @$tree )
+        {
+            my $ref = $cldr->locale_number_system(
+                locale => $loc,
+            );
+            return( $self->pass_error( $cldr->error ) ) if( !defined( $ref ) && $cldr->error );
+            if( $ref  )
+            {
+                $def = {};
+                my @keys = qw( number_system native traditional finance );
+                @$def{ @keys } = @$ref{ @keys };
+                last;
+            }
+        }
+        $def //= {};
+        $self->{number_systems} = $def;
+    }
+    return( $def );
+}
+
+sub number_system_digits
+{
+    my $self = shift( @_ );
+    my $num_sys = shift( @_ ) || 'latn';
+    my $digits;
+    my $meth_id = "number_system_digits=${num_sys}";
+    unless( defined( $digits = $self->{ $meth_id } ) )
+    {
+        my $cldr = $self->{_cldr} || die( "The Locale::Unicode::Data object is gone!" );
+        my $this = $cldr->number_system( number_system => $num_sys );
+        return( $self->pass_error( $cldr->error ) ) if( !defined( $this ) && $cldr->error );
+        if( $this )
+        {
+            $self->{ $meth_id } = $digits = $this->{digits};
+        }
+        else
+        {
+            return( $self->error( "No digits data found for numbering system '${num_sys}'" ) );
+        }
+    }
+    return( $digits );
 }
 
 sub pass_error
@@ -4138,7 +4192,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.4.3
+    v0.6.0
 
 =head1 DESCRIPTION
 
@@ -5665,6 +5719,51 @@ For example C<:>, C<٫>, C<.>
     # latn
 
 Returns a string representing the number system for the C<locale>
+
+=head2 number_systems
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'ar-EG' );
+    my $ref = $locale->number_systems;
+    # {
+    #     finance => undef,
+    #     native => undef,
+    #     number_system => "arab",
+    #     traditional => undef,
+    # }
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+    my $ref = $locale->number_systems;
+    # {
+    #     finance => "jpanfin",
+    #     native => undef,
+    #     number_system => undef,
+    #     traditional => "jpan",
+    # }
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'ja' );
+    my $ref = $locale->number_systems;
+    # {
+    #     finance => "hantfin",
+    #     native => "hanidec",
+    #     number_system => undef,
+    #     traditional => "hant",
+    # }
+
+Returns an hash reference containing the numbering systems for default (C<number_system>), C<finance>, C<native>, and C<traditional>. Note that not all of those properties would have a value, and thus some might be undefined.
+
+=head2 number_system_digits
+
+    my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+    my $digits = $locale->number_system_digits( 'latn' );
+    say $digits; # [0, 1, 2, 3, 4, 5, 6, 7, 8. 9];
+
+    # Japanese traditional numbering system
+    my $digits = $locale->number_system_digits( 'jpan' );
+    say $digits; # ["〇","一","二","三","四","五","六","七","八","九"];
+
+Provided with a valid number system ID, and this will return an array reference of digits for that number system, from 0 to 9.
+
+It sets an L<exception object|DateTime::Locale::FromCLDR::Exception> upon error, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 prefers_24_hour_time
 

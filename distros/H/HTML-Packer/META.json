@@ -4,7 +4,7 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,8 @@
             "CSS::Packer" : "2.01",
             "Digest::SHA" : "0",
             "JavaScript::Packer" : "2.01",
-            "Regexp::RegGrp" : "1.001_001"
+            "Regexp::RegGrp" : "1.001_001",
+            "Safe::Isa" : "0"
          }
       }
    },
@@ -52,6 +53,6 @@
          "url" : "https://github.com/leejo/html-packer-perl"
       }
    },
-   "version" : "2.10",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "2.11",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

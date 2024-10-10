@@ -1,0 +1,142 @@
+=encoding utf8
+
+=head1 NAME
+
+PDK::DBI::Role - Moose role for database operations in Netdisco applications
+
+=head1 SYNOPSIS
+
+  package MyNetdiscoDB;
+  use Moose;
+  with 'Netdisco::DBI::Role';
+
+  # Implement required methods
+  sub clone { ... }
+  sub batchExecute { ... }
+
+  # Use the role's methods
+  $self->batchInsert($columnMap, $tableName, $dataObjs);
+
+=head1 DESCRIPTION
+
+PDK::DBI::Role 是一个 Moose 角色，为应用程序提供数据库操作功能。它定义了通用的数据库连接属性和方法，
+特别是用于批量插入操作的功能。
+
+=head1 ATTRIBUTES
+
+=head2 dsn
+
+数据源名称（Data Source Name）。
+
+=head2 user
+
+数据库用户名。
+
+=head2 password
+
+数据库密码。
+
+=head2 dbi
+
+DBI 对象，延迟构建。
+
+=head1 REQUIRED METHODS
+
+使用此角色的类必须实现以下方法：
+
+=head2 clone
+
+创建对象的副本。
+
+=head2 batchExecute
+
+执行批量 SQL 操作。
+
+=head1 METHODS
+
+=head2 getAttrMembers($attrTypes, $dataObj)
+
+获取数据对象的属性成员。
+
+参数：
+  - $attrTypes: 属性类型的哈希引用
+  - $dataObj: 数据对象
+
+返回值：属性成员的哈希引用，或在列表上下文中返回 ($attrMembers, $max, $min)
+
+=head2 parseColumnMap($columnMap)
+
+解析列映射。
+
+参数：
+  - $columnMap: 列映射的数组引用
+
+返回值：包含单个属性、列表属性和属性类型的三个哈希引用
+
+=head2 batchInsert($columnMap, $tableName, $dataObjs)
+
+执行批量插入操作。
+
+参数：
+  - $columnMap: 列映射的数组引用
+  - $tableName: 要插入数据的表名
+  - $dataObjs: 要插入的数据对象的哈希引用或数组引用
+
+返回值：无
+
+=head1 EXAMPLES
+
+=head2 定义使用该角色的类
+
+  package MyNetdiscoDB;
+  use Moose;
+  with 'PDK::DBI::Role';
+
+  sub clone {
+    my $self = shift;
+    return __PACKAGE__->new(
+      map { $_ => $self->$_ } qw(dsn user password)
+    );
+  }
+
+  sub batchExecute {
+    my ($self, $params, $sql) = @_;
+    # 实现批量执行逻辑
+  }
+
+=head2 使用 batchInsert 方法
+
+  my $db = MyNetdiscoDB->new(
+    dsn      => 'dbi:mysql:database=Netdisco;host=localhost',
+    user     => 'username',
+    password => 'password'
+  );
+
+  my $columnMap = ['id', 'name', 'ip_addresses|@'];
+  my $tableName = 'Netdisco_rules';
+  my $dataObjs = [
+    { id => 1, name => 'Rule1', ip_addresses => ['192.168.1.1', '192.168.1.2'] },
+    { id => 2, name => 'Rule2', ip_addresses => ['10.0.0.1', '10.0.0.2'] }
+  ];
+
+  $db->batchInsert($columnMap, $tableName, $dataObjs);
+
+=head1 SEE ALSO
+
+L<Moose::Role>, L<DBI>
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut

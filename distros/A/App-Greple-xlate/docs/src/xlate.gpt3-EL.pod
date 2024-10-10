@@ -12,7 +12,7 @@ App::Greple::xlate - μονάδα υποστήριξης μετάφρασης γ
 
 =head1 VERSION
 
-Version 0.3401
+Version 0.4101
 
 =head1 DESCRIPTION
 
@@ -20,9 +20,9 @@ Version 0.3401
 
 Εάν θέλετε να μεταφράσετε κανονικά τμήματα κειμένου σε ένα έγγραφο που έχει γραφεί στο στυλ pod της Perl, χρησιμοποιήστε την εντολή B<greple> με το C<xlate::deepl> και το πρόσθετο C<perl> όπως εξής:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-Σε αυτήν την εντολή, η συμβολοσειρά προτύπου C<^(\w.*\n)+> σημαίνει συνεχόμενες γραμμές που ξεκινούν με αλφαριθμητικό γράμμα. Αυτή η εντολή εμφανίζει την περιοχή που πρόκειται να μεταφραστεί με επισήμανση. Η επιλογή B<--all> χρησιμοποιείται για να παράγει ολόκληρο το κείμενο.
+Σε αυτή την εντολή, το πρότυπο συμβολοσειράς C<^([\w\pP].*\n)+> σημαίνει διαδοχικές γραμμές που ξεκινούν με αλφαριθμητικούς και σημεία στίξης χαρακτήρες. Αυτή η εντολή εμφανίζει την περιοχή που πρέπει να μεταφραστεί με έντονη ανάδειξη. Η επιλογή B<--all> χρησιμοποιείται για να παράγει ολόκληρο το κείμενο.
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
@@ -76,7 +76,7 @@ Version 0.3401
 
     greple -Mxlate -E normalized -E not-normalized
 
-Επομένως, χρησιμοποιήστε το πρώτο πρότυπο για κείμενο που πρόκειται να επεξεργαστεί με τη συνδυασμό πολλών γραμμών σε μία μόνο γραμμή, και χρησιμοποιήστε το δεύτερο πρότυπο για προετοιμασμένο κείμενο. Εάν δεν υπάρχει κείμενο που να ταιριάζει με το πρώτο πρότυπο, τότε χρησιμοποιήστε ένα πρότυπο που δεν ταιριάζει με τίποτα, όπως C<(?!)>.
+Συνεπώς, χρησιμοποιήστε το πρώτο πρότυπο για κείμενο που πρόκειται να επεξεργαστεί συνδυάζοντας πολλαπλές γραμμές σε μία μόνο γραμμή, και χρησιμοποιήστε το δεύτερο πρότυπο για προ-μορφωμένο κείμενο. Αν δεν υπάρχει κείμενο που να ταιριάζει στο πρώτο πρότυπο, χρησιμοποιήστε ένα πρότυπο που δεν ταιριάζει με τίποτα, όπως C<(?!)>.
 
 =head1 MASKING
 
@@ -85,6 +85,10 @@ Version 0.3401
     --xlate-setopt maskfile=MASKPATTERN
 
 Αυτό θα ερμηνεύσει κάθε γραμμή του αρχείου `MASKPATTERN` ως έναν τακτικό εκφρασμένο, θα μεταφράσει τις συμβολοσειρές που ταιριάζουν με αυτό, και θα επαναφέρει μετά την επεξεργασία. Οι γραμμές που αρχίζουν με C<#> αγνοούνται.
+
+Ένα πολύπλοκο πρότυπο μπορεί να γραφτεί σε πολλαπλές γραμμές με αναδρομή με backslash.
+
+Πώς η μετατροπή του κειμένου με τη χρήση μάσκας μπορεί να δει κανείς μέσω της επιλογής B<--xlate-mask>.
 
 Αυτή η διεπαφή είναι πειραματική και υπόκειται σε αλλαγές στο μέλλον.
 
@@ -162,6 +166,28 @@ Version 0.3401
 
     sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+=item B<colon>, I<:::::::>
+
+```html
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+<div class="original">
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+Ο αριθμός των αίωνων είναι 7 από προεπιλογή. Εάν καθορίσετε μια ακολουθία αίωνων όπως C<:::::>, χρησιμοποιείται αντί για τους 7 αίωνες.
+
 =item B<ifdef>
 
 Ο αρχικός και μετατραπέντας κείμενος εκτυπώνονται σε μορφή L<cpp(1)> C<#ifdef>.
@@ -179,7 +205,9 @@ Version 0.3401
 
 =item B<space>
 
-Ο αρχικός και μετατραπέντας κείμενος εκτυπώνονται χωρισμένοι από μια μόνο κενή γραμμή.
+=item B<space+>
+
+Original:
 
 =item B<xtxt>
 
@@ -201,6 +229,16 @@ Version 0.3401
 
 Δείτε το αποτέλεσμα της μετάφρασης σε πραγματικό χρόνο στην έξοδο STDERR.
 
+=item B<--xlate-stripe>
+
+Χρησιμοποιήστε το πρόσθετο L<App::Greple::stripe> για να εμφανίσετε το ταιριασμένο τμήμα με τρόπο ζέβρα. Αυτό είναι χρήσιμο όταν τα ταιριασμένα τμήματα είναι συνδεδεμένα πίσω-μπροστά.
+
+Η παλέτα χρωμάτων αλλάζει ανάλογα με το χρώμα του φόντου του τερματικού. Αν θέλετε να το καθορίσετε ρητά, μπορείτε να χρησιμοποιήσετε τις επιλογές B<--xlate-stripe-light> ή B<--xlate-stripe-dark>.
+
+=item B<--xlate-mask>
+
+Εκτελέστε τη λειτουργία μάσκας και εμφανίστε το μετατραπέν κείμενο χωρίς ανάκτηση.
+
 =item B<--match-all>
 
 Ορίστε ολόκληρο το κείμενο του αρχείου ως περιοχή στόχο.
@@ -211,11 +249,9 @@ Version 0.3401
 
 Το πρόσθετο B<xlate> μπορεί να αποθηκεύει το μεταφρασμένο κείμενο για κάθε αρχείο και να το διαβάζει πριν από την εκτέλεση για να εξαλείψει τον χρόνο που απαιτείται για την επικοινωνία με τον διακομιστή. Με την προεπιλεγμένη στρατηγική προσωρινής αποθήκευσης C<auto>, διατηρεί τα δεδομένα προσωρινής αποθήκευσης μόνο όταν το αρχείο προσωρινής αποθήκευσης υπάρχει για το συγκεκριμένο αρχείο στόχο.
 
+Χρησιμοποιήστε το B<--xlate-cache=clear> για να εκκινήσετε τη διαχείριση της μνήμης cache ή για να καθαρίσετε όλα τα υπάρχοντα δεδομένα cache. Μόλις εκτελεστεί με αυτήν την επιλογή, θα δημιουργηθεί ένα νέο αρχείο cache αν δεν υπάρχει και στη συνέχεια θα διατηρείται αυτόματα.
+
 =over 7
-
-=item --cache-clear
-
-Η επιλογή B<--cache-clear> μπορεί να χρησιμοποιηθεί για την εκκίνηση της διαχείρισης της προσωρινής αποθήκευσης ή για την ανανέωση όλων των υπαρχόντων δεδομένων προσωρινής αποθήκευσης. Μόλις εκτελεστεί με αυτήν την επιλογή, θα δημιουργηθεί ένα νέο αρχείο προσωρινής αποθήκευσης αν δεν υπάρχει και στη συνέχεια θα διατηρείται αυτόματα.
 
 =item --xlate-cache=I<strategy>
 
@@ -247,6 +283,10 @@ Version 0.3401
 
 =back
 
+=item B<--xlate-update>
+
+Αυτή η επιλογή εξαναγκάζει την ενημέρωση του αρχείου cache ακόμα και αν δεν είναι απαραίτητο.
+
 =back
 
 =head1 COMMAND LINE INTERFACE
@@ -264,44 +304,49 @@ Version 0.3401
 Διαβάστε το ιαπωνικό άρθρο στην ενότητα L</ΔΕΙΤΕ ΕΠΙΣΗΣ> για λεπτομέρειες.
 
     xlate [ options ] -t lang file [ greple options ]
-	-h   help
-	-v   show version
-	-d   debug
-	-n   dry-run
-	-a   use API
-	-c   just check translation area
-	-r   refresh cache
-	-s   silent mode
-	-e # translation engine (default "deepl")
-	-p # pattern to determine translation area
-	-w # wrap line by # width
-	-o # output format (default "xtxt", or "cm", "ifdef")
-	-f # from lang (ignored)
-	-t # to lang (required, no default)
-	-m # max length per API call
-	-l # show library files (XLATE.mk, xlate.el)
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -x # file containing mask patterns
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
     Make options
-	-M   run make
-	-n   dry-run
+        -M   run make
+        -n   dry-run
     Docker options
-	-G   mount git top-level directory
-	-B   run in non-interactive (batch) mode
-	-R   mount read-only
-	-E * specify environment variable to be inherited
-	-I * specify altanative docker image (default: tecolicom/xlate:version)
-	-D * run xlate on the container with the rest parameters
-	-C * run following command on the container, or run shell
-
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * docker image name or version (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+    
     Control Files:
-	*.LANG    translation languates
-	*.FORMAT  translation foramt (xtxt, cm, ifdef)
-	*.ENGINE  translation engine (deepl or gpt3)
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 
 =head1 EMACS
 
 Φορτώστε το αρχείο F<xlate.el> που περιλαμβάνεται στο αποθετήριο για να χρησιμοποιήσετε την εντολή C<xlate> από τον επεξεργαστή Emacs. Η συνάρτηση C<xlate-region> μεταφράζει την δοθείσα περιοχή. Η προεπιλεγμένη γλώσσα είναι η C<EN-US> και μπορείτε να καθορίσετε τη γλώσσα καλώντας την με πρόθεμα.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
 
 =head1 ENVIRONMENT
 
@@ -339,33 +384,39 @@ L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt3>
 
-L<https://hub.docker.com/r/tecolicom/xlate>
+=over 2
 
-=over 7
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
 
-=item L<https://github.com/DeepLcom/deepl-python>
+Εικόνα εμφιάλωσης Docker.
+
+=item * L<https://github.com/DeepLcom/deepl-python>
 
 Βιβλιοθήκη DeepL Python και εντολή CLI.
 
-=item L<https://github.com/openai/openai-python>
+=item * L<https://github.com/openai/openai-python>
 
 Βιβλιοθήκη Python της OpenAI
 
-=item L<https://github.com/tecolicom/App-gpty>
+=item * L<https://github.com/tecolicom/App-gpty>
 
 Διεπαφή γραμμής εντολών της OpenAI
 
-=item L<App::Greple>
+=item * L<App::Greple>
 
 Δείτε το εγχειρίδιο B<greple> για λεπτομέρειες σχετικά με το πρότυπο κειμένου προορισμού. Χρησιμοποιήστε τις επιλογές B<--inside>, B<--outside>, B<--include>, B<--exclude> για να περιορίσετε την περιοχή της αντιστοίχισης.
 
-=item L<App::Greple::update>
+=item * L<App::Greple::update>
 
 Μπορείτε να χρησιμοποιήσετε τον μονάδα C<-Mupdate> για να τροποποιήσετε αρχεία με βάση το αποτέλεσμα της εντολής B<greple>.
 
-=item L<App::sdif>
+=item * L<App::sdif>
 
 Χρησιμοποιήστε το B<sdif> για να εμφανίσετε τη μορφή του δείκτη σύγκρουσης δίπλα-δίπλα με την επιλογή B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Χρήση του μοντέλου Greple B<stripe> με την επιλογή B<--xlate-stripe>.
 
 =back
 

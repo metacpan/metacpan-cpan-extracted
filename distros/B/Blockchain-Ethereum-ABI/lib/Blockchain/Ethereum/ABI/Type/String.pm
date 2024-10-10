@@ -1,28 +1,24 @@
-use v5.26;
+package Blockchain::Ethereum::ABI::Type::String;
 
+use v5.26;
 use strict;
 use warnings;
 no indirect;
-use feature 'signatures';
 
-use Object::Pad;
 # ABSTRACT: Solidity string type interface
-
-package Blockchain::Ethereum::ABI::Type::String;
-class Blockchain::Ethereum::ABI::Type::String
-    :isa(Blockchain::Ethereum::ABI::Type)
-    :does(Blockchain::Ethereum::ABI::TypeRole);
-
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.016';          # VERSION
+our $VERSION   = '0.017';          # VERSION
 
-method _configure { return }
+use parent 'Blockchain::Ethereum::ABI::Type';
 
-method encode {
+sub _configure { return }
+
+sub encode {
+    my $self = shift;
 
     return $self->_encoded if $self->_encoded;
 
-    my $hex = unpack("H*", $self->data);
+    my $hex = unpack("H*", $self->{data});
 
     # for dynamic length basic types the length must be included
     $self->_push_dynamic($self->_encode_length(length(pack("H*", $hex))));
@@ -31,9 +27,10 @@ method encode {
     return $self->_encoded;
 }
 
-method decode {
+sub decode {
+    my $self = shift;
 
-    my @data = $self->data->@*;
+    my @data = $self->{data}->@*;
 
     my $size          = hex shift @data;
     my $string_data   = join('', @data);
@@ -55,7 +52,7 @@ Blockchain::Ethereum::ABI::Type::String - Solidity string type interface
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

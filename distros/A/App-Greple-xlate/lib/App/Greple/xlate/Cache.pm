@@ -16,16 +16,19 @@ sub TIEHASH {
 
 sub EXISTS {
     my($obj, $key) = @_;
+    $obj->access($key);
     exists $obj->current->{$key} or exists $obj->saved->{$key};
 }
 
 sub FETCH {
     my($obj, $key) = @_;
+    $obj->access($key);
     $obj->get($key);
 }
 
 sub STORE {
     my($obj, $key, $val) = @_;
+    $obj->access($key);
     $obj->set($key, $val);
 }
 
@@ -35,13 +38,16 @@ sub DESTROY {
 }
 
 my %default = (
-    name => '',
-    saved => undef,
-    current => undef,
-    clear => 0,
-    accumulate => 0,
-    force_update => 0,
-    updated => 0,
+    name => '',		# cache filename
+    saved => undef,	# saved hash
+    current => undef,	# current using hash
+    clear => 0,		# clean up cache data
+    accessed => {},	# accessed keys
+    order => [],	# accessed keys in order
+    accumulate => 0,	# do not delete unused entry
+    force_update => 0,	# update cache file anyway
+    updated => 0,	# number of updated entries
+    format => 'list',	# saving cache file format
 );
 
 for my $key (keys %default) {
@@ -56,6 +62,12 @@ sub new {
     pairmap { $obj->{$a} = $b } @_;
     $obj->open if $obj->name;
     $obj;
+}
+
+sub access {
+    my $obj = shift;
+    my $key = shift;
+    push @{$obj->order}, $key if not $obj->accessed->{$key}++;
 }
 
 sub get {
@@ -95,9 +107,13 @@ sub open {
     }
     my $json_obj //= &json;
     if (CORE::open my $fh, $file) {
-	my $json = do { local $/; <$fh> };
-	my $hash = $json eq '' ? {} : $json_obj->decode($json);
-	$obj->{saved} = $hash;
+	my $data = do { local $/; <$fh> };
+	my $json = $data eq '' ? {} : $json_obj->decode($data);
+	$obj->{saved} = do {
+	    if    (ref $json eq 'HASH')  { $json }
+	    elsif (ref $json eq 'ARRAY') { +{ map @{$_}[0,1], @$json } }
+	    else  { die "unexpected json data." }
+	};
 	warn "read cache from $file\n";
     } else {
 	$obj->{saved} = {};
@@ -123,12 +139,37 @@ sub update {
     %{$obj->current} > 0 or return;
     my $json_obj //= &json; # this is necessary to be called from DESTROY
     if (CORE::open my $fh, '>', $file) {
-	my $json = $json_obj->encode($obj->current);
+	my $data = $obj->format eq 'list' ? $obj->list_data : $obj->hash_data;
+	my $json = $json_obj->encode($data);
 	print $fh $json;
 	warn "write cache to $file\n";
     } else {
 	warn "$file: $!\n";
     }
+}
+
+sub hash_data {
+    my $obj = shift;
+    $obj->current;
+}
+
+sub list_data {
+    my $obj = shift;
+    my %hash = %{$obj->current};
+    my @list;
+    for my $key (@{$obj->order}) {
+	if (exists $hash{$key}) {
+	    push @list, [ $key => delete $hash{$key} ];
+	} else {
+	    warn "$key: not in cache.";
+	}
+    }
+    for my $key (sort keys %hash) {
+	warn "$key: not in order list.";
+	push @list, [ $key => delete $hash{$key} ];
+    }
+    die if %hash;
+    \@list;
 }
 
 1;

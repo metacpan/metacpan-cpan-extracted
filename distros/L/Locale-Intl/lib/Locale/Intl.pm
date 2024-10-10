@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Locale Intl - ~/lib/Locale/Intl.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/09/16
@@ -20,10 +20,9 @@ BEGIN
     use warnings::register;
     use parent qw( Locale::Unicode );
     use vars qw( $VERSION $ERROR $DEBUG );
-    use curry;
     use Locale::Unicode::Data;
     use Want;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -96,11 +95,11 @@ sub new
     my $map =
     {
         calendar    => sub{ $self->SUPER::calendar( @_ ); },
-        caseFirst   => $self->curry::colCaseFirst,
+        caseFirst   => sub{ $self->colCaseFirst( @_ ); },
         collation   => sub{ $self->SUPER::collation( @_ ); },
-        hourCycle   => $self->curry::hour_cycle,
-        numberingSystem => $self->curry::number,
-        numeric     => $self->curry::colNumeric,
+        hourCycle   => sub{ $self->hour_cycle( @_ ); },
+        numberingSystem => sub{ $self->number( @_ ); },
+        numeric     => sub{ $self->colNumeric( @_ ); },
         script      => sub{ $self->SUPER::script( @_ ) },
     };
     foreach my $prop ( keys( %$opts ) )
@@ -1163,7 +1162,7 @@ Locale::Intl - A Web Intl.Locale Class Implementation
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

@@ -10,7 +10,7 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
 # VERSION
 
-Version 0.3401
+Version 0.4101
 
 # DESCRIPTION
 
@@ -18,9 +18,9 @@ Version 0.3401
 
 Wenn Sie normale Textblöcke in einem Dokument übersetzen wollen, das im Pod-Stil von Perl geschrieben ist, verwenden Sie den Befehl **greple** mit dem Modul `xlate::deepl` und `perl` wie folgt:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-In diesem Befehl bedeutet die Zeichenkette `^(\w.*\n)+` aufeinanderfolgende Zeilen, die mit einem alphanumerischen Buchstaben beginnen. Dieser Befehl zeigt den zu übersetzenden Bereich hervorgehoben an. Die Option **--all** wird verwendet, um den gesamten Text zu erzeugen.
+In diesem Befehl bedeutet die Zeichenkette `^([\w\pP].*\n)+` aufeinanderfolgende Zeilen, die mit einem alphanumerischen und einem Interpunktionsbuchstaben beginnen. Mit diesem Befehl wird der zu übersetzende Bereich hervorgehoben dargestellt. Die Option **--all** wird verwendet, um den gesamten Text zu übersetzen.
 
 <div>
     <p>
@@ -65,7 +65,7 @@ Dieser Normalisierungsprozess wird nur für das erste (0.) und geradzahlige Must
 
     greple -Mxlate -E normalized -E not-normalized
 
-Verwenden Sie daher das erste Muster für Text, der durch Kombination mehrerer Zeilen in einer einzigen Zeile verarbeitet werden soll, und das zweite Muster für vorformatierten Text. Wenn das erste Muster keinen Text enthält, der übereinstimmt, wird ein Muster verwendet, das mit nichts übereinstimmt, wie z. B. `(?!)`.
+Verwenden Sie daher das erste Muster für Text, der durch die Kombination mehrerer Zeilen in einer einzigen Zeile verarbeitet werden soll, und das zweite Muster für vorformatierten Text. Wenn das erste Muster keinen Text enthält, der übereinstimmt, verwenden Sie ein Muster, das auf nichts zutrifft, wie z. B. `(?!)`.
 
 # MASKING
 
@@ -74,6 +74,10 @@ Gelegentlich gibt es Textteile, die Sie nicht übersetzt haben möchten. Zum Bei
     --xlate-setopt maskfile=MASKPATTERN
 
 Dadurch wird jede Zeile der Datei \`MASKPATTERN\` als regulärer Ausdruck interpretiert, die entsprechenden Zeichenfolgen werden übersetzt und nach der Verarbeitung wiederhergestellt. Zeilen, die mit `#` beginnen, werden ignoriert.
+
+Komplexe Muster können auf mehreren Zeilen mit Backslash und escpaed newline geschrieben werden.
+
+Wie der Text durch die Maskierung umgewandelt wird, können Sie mit der Option **--xlate-mask** sehen.
 
 Diese Schnittstelle ist experimentell und kann sich in Zukunft noch ändern.
 
@@ -136,6 +140,28 @@ Diese Schnittstelle ist experimentell und kann sich in Zukunft noch ändern.
 
             sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+    - **colon**, _:::::::_
+
+        Der ursprüngliche und der übersetzte Text werden in einem benutzerdefinierten Container-Stil von Markdown ausgegeben.
+
+            ::::::: ORIGINAL
+            original text
+            :::::::
+            ::::::: JA
+            translated Japanese text
+            :::::::
+
+        Der obige Text wird in HTML wie folgt übersetzt.
+
+            <div class="ORIGINAL">
+            original text
+            </div>
+            <div class="JA">
+            translated Japanese text
+            </div>
+
+        Die Anzahl der Doppelpunkte ist standardmäßig 7. Wenn Sie eine Doppelpunktfolge wie `:::::` angeben, wird diese anstelle von 7 Doppelpunkten verwendet.
+
     - **ifdef**
 
         Original und konvertierter Text werden im Format [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` ausgedruckt.
@@ -152,8 +178,9 @@ Diese Schnittstelle ist experimentell und kann sich in Zukunft noch ändern.
             unifdef -UORIGINAL -DJA foo.ja.pm
 
     - **space**
+    - **space+**
 
-        Original und konvertierter Text werden durch eine einzelne Leerzeile getrennt gedruckt.
+        Original und konvertierter Text werden durch eine einzelne Leerzeile getrennt ausgegeben. Bei `Leerzeichen+` wird nach dem konvertierten Text auch ein Zeilenumbruch ausgegeben.
 
     - **xtxt**
 
@@ -173,6 +200,16 @@ Diese Schnittstelle ist experimentell und kann sich in Zukunft noch ändern.
 
     Sie können das Ergebnis der Übertragung in Echtzeit in der STDERR-Ausgabe sehen.
 
+- **--xlate-stripe**
+
+    Verwenden Sie das Modul [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe), um den übereinstimmenden Teil in Form eines Zebrastreifens anzuzeigen. Dies ist nützlich, wenn die übereinstimmenden Teile Rücken an Rücken verbunden sind.
+
+    Die Farbpalette wird entsprechend der Hintergrundfarbe des Terminals umgeschaltet. Wenn Sie dies explizit angeben wollen, können Sie **--xlate-stripe-light** oder **--xlate-stripe-dark** verwenden.
+
+- **--xlate-mask**
+
+    Führen Sie die Maskierungsfunktion aus und zeigen Sie den umgewandelten Text so an, wie er ist, ohne ihn wiederherzustellen.
+
 - **--match-all**
 
     Legen Sie den gesamten Text der Datei als Zielbereich fest.
@@ -181,9 +218,7 @@ Diese Schnittstelle ist experimentell und kann sich in Zukunft noch ändern.
 
 Das Modul **xlate** kann den Text der Übersetzung für jede Datei im Cache speichern und vor der Ausführung lesen, um den Overhead durch die Anfrage an den Server zu vermeiden. Bei der Standard-Cache-Strategie `auto` werden die Cache-Daten nur dann beibehalten, wenn die Cache-Datei für die Zieldatei existiert.
 
-- --cache-clear
-
-    Die Option **--cache-clear** kann verwendet werden, um die Cache-Verwaltung zu starten oder um alle vorhandenen Cache-Daten zu aktualisieren. Nach der Ausführung dieser Option wird eine neue Cachedatei erstellt, falls noch keine vorhanden ist, und anschließend automatisch beibehalten.
+Verwenden Sie **--xlate-cache=clear**, um die Cache-Verwaltung zu starten oder um alle vorhandenen Cache-Daten zu löschen. Nach der Ausführung dieser Option wird eine neue Cache-Datei erstellt, falls noch keine vorhanden ist, und anschließend automatisch gepflegt.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
@@ -209,6 +244,9 @@ Das Modul **xlate** kann den Text der Übersetzung für jede Datei im Cache spei
     - `accumulate`
 
         Standardmäßig werden nicht verwendete Daten aus der Cache-Datei entfernt. Wenn Sie sie nicht entfernen und in der Datei behalten wollen, verwenden Sie `accumulate`.
+- **--xlate-update**
+
+    Diese Option erzwingt die Aktualisierung der Cache-Datei, auch wenn dies nicht erforderlich ist.
 
 # COMMAND LINE INTERFACE
 
@@ -235,6 +273,7 @@ Lesen Sie den japanischen Artikel im Abschnitt ["SEE ALSO"](#see-also) für weit
         -s   silent mode
         -e # translation engine (default "deepl")
         -p # pattern to determine translation area
+        -x # file containing mask patterns
         -w # wrap line by # width
         -o # output format (default "xtxt", or "cm", "ifdef")
         -f # from lang (ignored)
@@ -250,18 +289,24 @@ Lesen Sie den japanischen Artikel im Abschnitt ["SEE ALSO"](#see-also) für weit
         -B   run in non-interactive (batch) mode
         -R   mount read-only
         -E * specify environment variable to be inherited
-        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -I * docker image name or version (default: tecolicom/xlate:version)
         -D * run xlate on the container with the rest parameters
         -C * run following command on the container, or run shell
-
+    
     Control Files:
         *.LANG    translation languates
-        *.FORMAT  translation foramt (xtxt, cm, ifdef)
-        *.ENGINE  translation engine (deepl or gpt3)
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 # EMACS
 
 Laden Sie die im Repository enthaltene Datei `xlate.el`, um den Befehl `xlate` im Emacs-Editor zu verwenden. Die Funktion `xlate-region` übersetzt die angegebene Region. Die Standardsprache ist `EN-US` und Sie können die Sprache mit dem Präfix-Argument angeben.
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+    </p>
+</div>
 
 # ENVIRONMENT
 
@@ -295,7 +340,9 @@ Sie müssen die Befehlszeilentools für DeepL und ChatGPT installieren.
 
 [Anwendung::Greple::xlate::gpt3](https://metacpan.org/pod/Anwendung%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
-[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+- [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
+    Docker-Container-Abbild.
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
@@ -320,6 +367,10 @@ Sie müssen die Befehlszeilentools für DeepL und ChatGPT installieren.
 - [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
 
     Verwenden Sie **sdif**, um das Format der Konfliktmarkierung zusammen mit der Option **-V** anzuzeigen.
+
+- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
+
+    Greple **stripe** Modul Verwendung durch **--xlate-stripe** Option.
 
 ## ARTICLES
 

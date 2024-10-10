@@ -10,7 +10,7 @@ App::Greple::xlate - greple을 위한 번역 지원 모듈
 
 # VERSION
 
-Version 0.3401
+Version 0.4101
 
 # DESCRIPTION
 
@@ -18,9 +18,9 @@ Version 0.3401
 
 만약 Perl의 pod 스타일로 작성된 문서에서 일반 텍스트 블록을 번역하려면 다음과 같이 `xlate::deepl`과 `perl` 모듈을 사용하는 **greple** 명령을 사용하십시오.
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-이 명령에서 패턴 문자열 `^(\w.*\n)+`은 알파벳과 숫자로 시작하는 연속된 줄을 의미합니다. 이 명령은 번역할 영역을 강조 표시합니다. 옵션 **--all**은 전체 텍스트를 생성하는 데 사용됩니다.
+이 명령어에서 패턴 문자열 `^([\w\pP].*\n)+`은 알파벳-숫자 및 구두점 문자로 시작하는 연이은 줄을 의미합니다. 이 명령어는 번역할 영역을 강조해서 보여줍니다. 옵션 **--all**은 전체 텍스트를 생성하는 데 사용됩니다.
 
 <div>
     <p>
@@ -65,7 +65,7 @@ Version 0.3401
 
     greple -Mxlate -E normalized -E not-normalized
 
-따라서 여러 줄을 한 줄로 결합하여 처리해야 하는 텍스트에는 첫 번째 패턴을 사용하고, 서식이 적용된 텍스트에는 두 번째 패턴을 사용하십시오. 첫 번째 패턴에 일치하는 텍스트가 없는 경우, 아무것도 일치하지 않는 패턴인 `(?!)`을 사용하십시오.
+따라서 여러 줄을 하나의 줄로 결합하여 처리해야 하는 텍스트에는 첫 번째 패턴을 사용하고, 서식이 있는 텍스트에는 두 번째 패턴을 사용하십시오. 첫 번째 패턴에 일치하는 텍스트가 없는 경우 `(?!)`과 같이 아무것도 일치하지 않는 패턴을 사용하십시오.
 
 # MASKING
 
@@ -74,6 +74,10 @@ Version 0.3401
     --xlate-setopt maskfile=MASKPATTERN
 
 이는 파일 \`MASKPATTERN\`의 각 줄을 정규 표현식으로 해석하여 일치하는 문자열을 번역하고 처리 후 되돌립니다. `#`로 시작하는 줄은 무시됩니다.
+
+복잡한 패턴은 백슬래시로 이스케이프된 새 줄에 여러 줄에 작성할 수 있습니다.
+
+텍스트가 가려짐으로써 어떻게 변환되는지는 **--xlate-mask** 옵션으로 확인할 수 있습니다.
 
 이 인터페이스는 실험적이며 향후 변경될 수 있습니다.
 
@@ -136,6 +140,28 @@ Version 0.3401
 
             sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+    - **colon**, _:::::::_
+
+        \`\`\`html
+
+            ::::::: ORIGINAL
+            original text
+            :::::::
+            ::::::: JA
+            translated Japanese text
+            :::::::
+
+        &lt;div style="background-color: #f4f4f4; color: #333; padding: 10px; margin: 10px 0;">
+
+            <div class="ORIGINAL">
+            original text
+            </div>
+            <div class="JA">
+            translated Japanese text
+            </div>
+
+        Number of colon is 7 by default. If you specify colon sequence like \`:::::\`, it is used instead of 7 colons.
+
     - **ifdef**
 
         원본과 변환된 텍스트는 [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` 형식으로 출력됩니다.
@@ -152,8 +178,9 @@ Version 0.3401
             unifdef -UORIGINAL -DJA foo.ja.pm
 
     - **space**
+    - **space+**
 
-        원본과 변환된 텍스트는 한 줄의 공백으로 구분되어 출력됩니다.
+        Original: Hello, how are you doing today?
 
     - **xtxt**
 
@@ -173,6 +200,16 @@ Version 0.3401
 
     STDERR 출력에서 실시간으로 번역 결과를 확인합니다.
 
+- **--xlate-stripe**
+
+    매치된 부분을 지브라 스트라이프 패션으로 보여주기 위해 [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe) 모듈을 사용합니다. 매치된 부분이 연이어 연결된 경우 유용합니다.
+
+    색상 팔레트는 터미널의 배경색에 따라 전환됩니다. 명시적으로 지정하려면 **--xlate-stripe-light** 또는 **--xlate-stripe-dark**를 사용할 수 있습니다.
+
+- **--xlate-mask**
+
+    마스킹 기능을 수행하고 변환된 텍스트를 복원 없이 표시합니다.
+
 - **--match-all**
 
     파일의 전체 텍스트를 대상 영역으로 설정합니다.
@@ -181,9 +218,7 @@ Version 0.3401
 
 **xlate** 모듈은 각 파일의 번역 캐시 텍스트를 저장하고 실행 전에 읽어들여 서버에 요청하는 오버헤드를 제거할 수 있습니다. 기본 캐시 전략인 `auto`로 설정하면 대상 파일에 대해 캐시 파일이 존재할 때만 캐시 데이터를 유지합니다.
 
-- --cache-clear
-
-    **--cache-clear** 옵션은 캐시 관리를 초기화하거나 모든 기존 캐시 데이터를 새로 고칠 때 사용할 수 있습니다. 이 옵션으로 실행하면 캐시 파일이 없는 경우 새로운 캐시 파일이 생성되고 이후 자동으로 유지됩니다.
+**--xlate-cache=clear**를 사용하여 캐시 관리를 시작하거나 기존 캐시 데이터를 모두 정리할 수 있습니다. 이 옵션을 사용하여 실행하면 새로운 캐시 파일이 없는 경우에는 새로 생성되고 그 후 자동으로 유지됩니다.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
@@ -209,6 +244,9 @@ Version 0.3401
     - `accumulate`
 
         기본 동작으로 캐시 파일에서 사용되지 않는 데이터가 제거됩니다. 이를 제거하지 않고 파일에 유지하려면 `accumulate`를 사용하십시오.
+- **--xlate-update**
+
+    이 옵션은 필요하지 않더라도 캐시 파일을 강제로 업데이트합니다.
 
 # COMMAND LINE INTERFACE
 
@@ -235,6 +273,7 @@ Docker와 make 옵션을 결합하여 Docker 환경에서 make를 실행할 수�
         -s   silent mode
         -e # translation engine (default "deepl")
         -p # pattern to determine translation area
+        -x # file containing mask patterns
         -w # wrap line by # width
         -o # output format (default "xtxt", or "cm", "ifdef")
         -f # from lang (ignored)
@@ -250,18 +289,24 @@ Docker와 make 옵션을 결합하여 Docker 환경에서 make를 실행할 수�
         -B   run in non-interactive (batch) mode
         -R   mount read-only
         -E * specify environment variable to be inherited
-        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -I * docker image name or version (default: tecolicom/xlate:version)
         -D * run xlate on the container with the rest parameters
         -C * run following command on the container, or run shell
-
+    
     Control Files:
         *.LANG    translation languates
-        *.FORMAT  translation foramt (xtxt, cm, ifdef)
-        *.ENGINE  translation engine (deepl or gpt3)
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 # EMACS
 
 Emacs 편집기에서 `xlate` 명령을 사용하려면 저장소에 포함된 `xlate.el` 파일을 로드하십시오. `xlate-region` 함수는 지정된 영역을 번역합니다. 기본 언어는 `EN-US`이며 접두사 인수로 언어를 지정할 수 있습니다.
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+    </p>
+</div>
 
 # ENVIRONMENT
 
@@ -295,7 +340,9 @@ DeepL과 ChatGPT의 명령 줄 도구를 설치해야 합니다.
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
-[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+- [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
+    도커 컨테이너 이미지.
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
@@ -320,6 +367,10 @@ DeepL과 ChatGPT의 명령 줄 도구를 설치해야 합니다.
 - [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
 
     **-V** 옵션과 함께 충돌 마커 형식을 옆에 나란히 표시하려면 **sdif**를 사용하십시오.
+
+- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
+
+    Greple **stripe** 모듈은 **--xlate-stripe** 옵션을 사용합니다.
 
 ## ARTICLES
 

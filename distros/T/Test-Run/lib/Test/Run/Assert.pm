@@ -6,7 +6,7 @@ use warnings;
 require Exporter;
 use vars qw($VERSION @EXPORT @ISA);
 
-$VERSION = '0.0305';
+$VERSION = '0.0306';
 
 @ISA = qw(Exporter);
 @EXPORT = qw(assert);

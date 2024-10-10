@@ -11,7 +11,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '1.0';
 
 use Test::More;
 use Test::More::UTF8;
@@ -99,7 +99,7 @@ ok(-d $untemplate_ret->{'latex'}->{'basedir'}, 'untemplate()'." : called and ret
 ok(-f $untemplate_ret->{'latex'}->{'filepath'}, 'untemplate()'." : called and returned latex output file (".$untemplate_ret->{'latex'}->{'filepath'}.") is a filepath and it exists.") or BAIL_OUT;
 # open the latex source and check if there any templated vars
 my ($FH, $content);
-ok(open($FH, '<', $untemplate_ret->{'latex'}->{'filepath'}), "Output latex source '".$untemplate_ret->{'latex'}->{'filepath'}."' opened for reading.") or BAIL_OUT("failed: $!");
+ok(open($FH, '<:encoding(utf-8)', $untemplate_ret->{'latex'}->{'filepath'}), "Output latex source '".$untemplate_ret->{'latex'}->{'filepath'}."' opened for reading.") or BAIL_OUT("failed: $!");
 { local $/ = undef; $content = <$FH> } close $FH;
 ok($content !~ /\[%.+?%\]/, 'untemplate()'." : called and latex source (content of file '".$untemplate_ret->{'latex'}->{'filepath'}."') does not look to contain templated var remains.") or BAIL_OUT($content."\n\nno see above latex source content.");
 

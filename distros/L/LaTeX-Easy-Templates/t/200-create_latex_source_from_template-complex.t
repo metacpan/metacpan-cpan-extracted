@@ -11,7 +11,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '1.0';
 
 use Test::More;
 use Test::More::UTF8;
@@ -186,7 +186,7 @@ for my $atest (@$tests){
 		}
 		my $lfname = $ret->{'latex'}->{'filepath'};
 		my ($FH, $latexsrcstr);
-		ok(open($FH, '<', $lfname), 'untemplate()'." : opening output latex source file ($lfname) for reading.") or BAIL_OUT("no it failed: $!");
+		ok(open($FH, '<:encoding(utf-8)', $lfname), 'untemplate()'." : opening output latex source file ($lfname) for reading.") or BAIL_OUT("no it failed: $!");
 		{ local $/ = undef; $latexsrcstr = <$FH> } close $FH;
 		ok($latexsrcstr !~ /<\:.+?\:>/, 'untemplate()'." : called and latex src string returned back does not look to contain templated var remains.") or BAIL_OUT("${latexsrcstr}\n\nno see above latex content returned");
 

@@ -54,7 +54,7 @@ use Fred::Fish::DBUG::ON;
 # use Config qw( %Config );
 # use Sub::Identify 'sub_fullname';
 
-$VERSION = "2.07";
+$VERSION = "2.08";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( 

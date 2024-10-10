@@ -26,11 +26,11 @@ or, providing a list of string that will be concatenated:
 
 =head1 DESCRIPTION
 
-This is an exception class for L<Locale::Unicode::FromCLDR>
+This is an exception class for L<DateTime::Unicode::FromCLDR>
 
 When stringified, it provides the error message along with precise information about where the error occurred.
 
-L<DateTime::Locale::FromCLDR::Exception> objects are created by L<Locale::Unicode/"error"> method.
+L<DateTime::Locale::FromCLDR::Exception> objects are created by L<DateTime::Locale::FromCLDR/"error"> method.
 
 =head1 METHODS
 
@@ -38,7 +38,7 @@ L<DateTime::Locale::FromCLDR::Exception> objects are created by L<Locale::Unicod
 
 It takes either an L<DateTime::Locale::FromCLDR::Exception> object or an hash reference of properties, or a list of arguments that will be concatanated to form the error message. The list of arguments can contain code reference such as reference to sub routines, who will be called and their returned value added to the error message string. For example :
 
-    my $ex = DateTime::Locale::FromCLDR::Exception->new( "Invalid property. Value recieved are: ", sub{ Dumper( $hash ) } );
+    my $ex = DateTime::Locale::FromCLDR::Exception->new( "Invalid property. Value received are: ", sub{ Dumper( $hash ) } );
 
     # or
 

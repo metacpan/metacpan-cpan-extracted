@@ -10,7 +10,7 @@ App::Greple::xlate - greple的翻译支持模块
 
 # VERSION
 
-Version 0.3401
+Version 0.4101
 
 # DESCRIPTION
 
@@ -18,9 +18,9 @@ Version 0.3401
 
 如果要翻译以 Perl 的 pod 风格编写的文档中的普通文本块，请使用 **greple** 命令，并像这样使用 `xlate::deepl` 和 `perl` 模块：
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-在该命令中，模式字符串 `^(\w.*\n)+` 表示以字母数字开头的连续行。该命令高亮显示要翻译的区域。选项 **--all** 用于生成整个文本。
+在该命令中，模式字符串 `^([\w\pP].*\n)+` 表示以字母和标点符号开头的连续行。该命令高亮显示要翻译的区域。选项 **--all** 用于生成整个文本。
 
 <div>
     <p>
@@ -65,7 +65,7 @@ Version 0.3401
 
     greple -Mxlate -E normalized -E not-normalized
 
-因此，对于要将多行合并为一行进行处理的文本，请使用第一个模式，而对于预格式化文本，请使用第二个模式。如果第一种模式中没有要匹配的文本，那么就使用不匹配任何内容的模式，如 `(?!)`。
+因此，第一种模式适用于将多行合并为一行进行处理的文本，第二种模式适用于预格式化文本。如果第一个模式中没有要匹配的文本，则使用不匹配任何内容的模式，如 `(?!)`。
 
 # MASKING
 
@@ -74,6 +74,10 @@ Version 0.3401
     --xlate-setopt maskfile=MASKPATTERN
 
 这将把文件 \`MASKPATTERN\` 的每一行都解释为正则表达式，翻译与之匹配的字符串，并在处理后还原。以 `#` 开头的行将被忽略。
+
+复杂的模式可以用反斜线换行写成多行。
+
+通过 **--xlate-mask** 选项可以看到屏蔽后文本的转换效果。
 
 此接口为试验性接口，将来可能会更改。
 
@@ -136,6 +140,28 @@ Version 0.3401
 
             sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+    - **colon**, _:::::::_
+
+        原文和译文以 markdown 的自定义容器样式输出。
+
+            ::::::: ORIGINAL
+            original text
+            :::::::
+            ::::::: JA
+            translated Japanese text
+            :::::::
+
+        以上文本将在 HTML 中翻译为以下内容。
+
+            <div class="ORIGINAL">
+            original text
+            </div>
+            <div class="JA">
+            translated Japanese text
+            </div>
+
+        冒号数默认为 7。如果指定冒号序列，如 `:::::`，则会使用它来代替 7 个冒号。
+
     - **ifdef**
 
         原始文本和转换后的文本以 [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` 格式打印。
@@ -152,8 +178,9 @@ Version 0.3401
             unifdef -UORIGINAL -DJA foo.ja.pm
 
     - **space**
+    - **space+**
 
-        原始文本和转换后的文本以单行空行分隔打印。
+        原始文本和转换后的文本在打印时以单行空行隔开。对于 `space+`，它还会在转换后的文本后输出一个换行符。
 
     - **xtxt**
 
@@ -173,6 +200,16 @@ Version 0.3401
 
     在STDERR输出中可以看到实时的翻译结果。
 
+- **--xlate-stripe**
+
+    使用 [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe) 模块以斑马线方式显示匹配部分。当匹配部分背靠背连接时，这种方式非常有用。
+
+    调色板会根据终端的背景颜色进行切换。如果要明确指定，可以使用 **--xlate-stripe-light** 或 **--xlate-stripe-dark**。
+
+- **--xlate-mask**
+
+    执行屏蔽功能并显示转换后的文本，无需还原。
+
 - **--match-all**
 
     将文件的整个文本设置为目标区域。
@@ -181,9 +218,7 @@ Version 0.3401
 
 **xlate**模块可以存储每个文件的翻译缓存文本，并在执行前读取它，以消除向服务器请求的开销。在默认的缓存策略`auto`下，它只在目标文件的缓存文件存在时才维护缓存数据。
 
-- --cache-clear
-
-    **--cache-clear**选项可以用来启动缓冲区管理或刷新所有现有的缓冲区数据。一旦用这个选项执行，如果不存在一个新的缓存文件，就会创建一个新的缓存文件，然后自动维护。
+使用 **--xlate-cache=clear** 启动缓存管理或清理所有现有缓存数据。使用该选项后，如果缓存文件不存在，就会创建一个新的缓存文件，然后自动维护。
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
@@ -209,6 +244,9 @@ Version 0.3401
     - `accumulate`
 
         根据默认行为，未使用的数据会从缓存文件中删除。如果你不想删除它们并保留在文件中，使用`accumulate`。
+- **--xlate-update**
+
+    即使没有必要，该选项也会强制更新缓存文件。
 
 # COMMAND LINE INTERFACE
 
@@ -235,6 +273,7 @@ Version 0.3401
         -s   silent mode
         -e # translation engine (default "deepl")
         -p # pattern to determine translation area
+        -x # file containing mask patterns
         -w # wrap line by # width
         -o # output format (default "xtxt", or "cm", "ifdef")
         -f # from lang (ignored)
@@ -250,18 +289,24 @@ Version 0.3401
         -B   run in non-interactive (batch) mode
         -R   mount read-only
         -E * specify environment variable to be inherited
-        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -I * docker image name or version (default: tecolicom/xlate:version)
         -D * run xlate on the container with the rest parameters
         -C * run following command on the container, or run shell
-
+    
     Control Files:
         *.LANG    translation languates
-        *.FORMAT  translation foramt (xtxt, cm, ifdef)
-        *.ENGINE  translation engine (deepl or gpt3)
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 # EMACS
 
 加载存储库中的`xlate.el`文件，从Emacs编辑器中使用`xlate`命令。`xlate-region`函数翻译给定的区域。默认的语言是`EN-US`，你可以用前缀参数指定调用语言。
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+    </p>
+</div>
 
 # ENVIRONMENT
 
@@ -295,7 +340,9 @@ Version 0.3401
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
-[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+- [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
+    Docker 容器镜像。
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
@@ -320,6 +367,10 @@ Version 0.3401
 - [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
 
     使用**sdif**与**-V**选项并列显示冲突标记格式。
+
+- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
+
+    通过 **--xlate-stripe** 选项查看 **stripe** 模块的使用情况。
 
 ## ARTICLES
 

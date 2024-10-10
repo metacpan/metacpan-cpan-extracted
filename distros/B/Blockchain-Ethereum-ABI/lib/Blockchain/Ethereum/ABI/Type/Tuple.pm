@@ -1,42 +1,39 @@
-use v5.26;
+package Blockchain::Ethereum::ABI::Type::Tuple;
 
+use v5.26;
 use strict;
 use warnings;
 no indirect;
-use feature 'signatures';
 
-use Object::Pad;
 # ABSTRACT: Solidity uint/int/bool type interface
-
-package Blockchain::Ethereum::ABI::Type::Tuple;
-class Blockchain::Ethereum::ABI::Type::Tuple
-    :isa(Blockchain::Ethereum::ABI::Type)
-    :does(Blockchain::Ethereum::ABI::TypeRole);
-
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.016';          # VERSION
+our $VERSION   = '0.017';          # VERSION
+
+use parent 'Blockchain::Ethereum::ABI::Type';
 
 use Carp;
 
-method _configure {
+sub _configure {
+    my $self = shift;
 
-    return unless $self->data;
+    return unless $self->{data};
 
     my @splited_signatures = $self->_split_tuple_signature->@*;
 
     for (my $sig_index = 0; $sig_index < @splited_signatures; $sig_index++) {
-        push $self->_instances->@*,
+        push $self->{instances}->@*,
             Blockchain::Ethereum::ABI::Type->new(
             signature => $splited_signatures[$sig_index],
-            data      => $self->data->[$sig_index]);
+            data      => $self->{data}->[$sig_index]);
     }
 
 }
 
-method _split_tuple_signature {
+sub _split_tuple_signature {
+    my $self = shift;
 
     # remove the parentheses from tuple signature
-    $self->signature =~ /^\((.*)\)$/;
+    $self->{signature} =~ /^\((.*)\)$/;
     my $tuple_signatures = $1;
 
     croak "Invalid tuple signature" unless $tuple_signatures;
@@ -48,13 +45,14 @@ method _split_tuple_signature {
     return \@types;
 }
 
-method encode {
+sub encode {
+    my $self = shift;
 
     return $self->_encoded if $self->_encoded;
 
     my $offset = $self->_get_initial_offset;
 
-    for my $instance ($self->_instances->@*) {
+    for my $instance ($self->{instances}->@*) {
         $instance->encode;
         if ($instance->is_dynamic) {
             $self->_push_static($self->_encode_offset($offset));
@@ -69,16 +67,18 @@ method encode {
     return $self->_encoded;
 }
 
-method decode {
+sub decode {
+    my $self = shift;
 
-    unless (scalar $self->_instances->@* > 0) {
-        push $self->_instances->@*, Blockchain::Ethereum::ABI::Type->new(signature => $_) for $self->_split_tuple_signature->@*;
+    unless (scalar $self->{instances}->@* > 0) {
+        push $self->{instances}->@*, Blockchain::Ethereum::ABI::Type->new(signature => $_) for $self->_split_tuple_signature->@*;
     }
 
     return $self->_read_stack_set_data;
 }
 
-method _static_size :override {
+sub _static_size {
+    my $self = shift;
 
     return 1 if $self->is_dynamic;
 
@@ -106,7 +106,7 @@ Blockchain::Ethereum::ABI::Type::Tuple - Solidity uint/int/bool type interface
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ App::Greple::xlate - модуль поддержки перевода для gre
 
 # VERSION
 
-Version 0.3401
+Version 0.4101
 
 # DESCRIPTION
 
@@ -18,9 +18,9 @@ Version 0.3401
 
 Если вы хотите перевести обычные текстовые блоки в документе, написанном в стиле Perl's pod, используйте команду **greple** с модулем `xlate::deepl` и `perl` следующим образом:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
-В этой команде шаблонная строка `^(\w.*\n)+` означает последовательные строки, начинающиеся с буквенно-цифрового символа. В этой команде выделяется область, подлежащая переводу. Опция **--all** используется для создания всего текста.
+В этой команде шаблонная строка `^([\w\pP].*\n)+` означает последовательные строки, начинающиеся с букв алфавитно-цифрового ряда и знаков препинания. Эта команда показывает область, которую нужно перевести, выделенной. Опция **--all** используется для перевода всего текста.
 
 <div>
     <p>
@@ -65,7 +65,7 @@ Version 0.3401
 
     greple -Mxlate -E normalized -E not-normalized
 
-Поэтому используйте первый шаблон для текста, который должен быть обработан путем объединения нескольких строк в одну строку, а второй - для предварительно отформатированного текста. Если в первом шаблоне нет текста, который можно было бы сопоставить, используйте шаблон, который ничему не соответствует, например `(?!)`.
+Поэтому используйте первый шаблон для текста, который должен быть обработан путем объединения нескольких строк в одну, а второй - для предварительно отформатированного текста. Если в первом шаблоне нет текста для проверки, используйте шаблон, который ничему не соответствует, например `(?!)`.
 
 # MASKING
 
@@ -74,6 +74,10 @@ Version 0.3401
     --xlate-setopt maskfile=MASKPATTERN
 
 При этом каждая строка файла \`MASKPATTERN\` будет интерпретироваться как регулярное выражение, переводить строки, соответствующие ему, и возвращаться после обработки. Строки, начинающиеся с `#`, игнорируются.
+
+Сложный шаблон может быть записан в нескольких строках с обратным слешем, сопровождаемым новой строкой.
+
+Как текст преобразуется при маскировании, можно увидеть с помощью опции **--xlate-mask**.
 
 Этот интерфейс является экспериментальным и может быть изменен в будущем.
 
@@ -136,6 +140,28 @@ Version 0.3401
 
             sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
 
+    - **colon**, _:::::::_
+
+        Оригинальный и переведенный текст выводятся в пользовательском стиле контейнера markdown.
+
+            ::::::: ORIGINAL
+            original text
+            :::::::
+            ::::::: JA
+            translated Japanese text
+            :::::::
+
+        Приведенный выше текст будет переведен в HTML следующим образом.
+
+            <div class="ORIGINAL">
+            original text
+            </div>
+            <div class="JA">
+            translated Japanese text
+            </div>
+
+        Количество двоеточий по умолчанию равно 7. Если вы укажете последовательность двоеточий, например `:::::`, то она будет использоваться вместо 7 двоеточий.
+
     - **ifdef**
 
         Оригинальный и преобразованный текст печатаются в формате [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`.
@@ -152,8 +178,9 @@ Version 0.3401
             unifdef -UORIGINAL -DJA foo.ja.pm
 
     - **space**
+    - **space+**
 
-        Оригинальный и преобразованный текст печатаются разделенными одной пустой строкой.
+        Оригинальный и преобразованный текст выводятся на печать, разделенные одной пустой строкой. Для `пробел+` после преобразованного текста также выводится новая строка.
 
     - **xtxt**
 
@@ -173,6 +200,16 @@ Version 0.3401
 
     Результат перевода можно увидеть в реальном времени в выводе STDERR.
 
+- **--xlate-stripe**
+
+    Используйте модуль [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe), чтобы показать совпадающие части в виде полосок зебры. Это удобно, когда совпадающие части соединены встык.
+
+    Цветовая палитра переключается в соответствии с цветом фона терминала. Если вы хотите указать его явно, можно использовать **--xlate-stripe-light** или **--xlate-stripe-dark**.
+
+- **--xlate-mask**
+
+    Выполните функцию маскирования и отобразите преобразованный текст как есть, без восстановления.
+
 - **--match-all**
 
     Установите весь текст файла в качестве целевой области.
@@ -181,9 +218,7 @@ Version 0.3401
 
 Модуль **xlate** может хранить кэшированный текст перевода для каждого файла и считывать его перед выполнением, чтобы исключить накладные расходы на запрос к серверу. При стратегии кэширования по умолчанию `auto`, он сохраняет данные кэша только тогда, когда файл кэша существует для целевого файла.
 
-- --cache-clear
-
-    Опция **--cache-clear** может быть использована для инициирования управления кэшем или для обновления всех существующих данных кэша. После выполнения этой опции будет создан новый файл кэша, если он не существует, а затем автоматически сохранен.
+Используйте **--xlate-cache=clear**, чтобы запустить управление кэшем или очистить все существующие данные кэша. После выполнения этой опции будет создан новый файл кэша, если он не существует, а затем он будет автоматически поддерживаться.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
@@ -209,6 +244,9 @@ Version 0.3401
     - `accumulate`
 
         По умолчанию неиспользуемые данные удаляются из файла кэша. Если вы не хотите удалять их и сохранять в файле, используйте `accumulate`.
+- **--xlate-update**
+
+    Эта опция заставляет обновлять файл кэша, даже если в этом нет необходимости.
 
 # COMMAND LINE INTERFACE
 
@@ -235,6 +273,7 @@ Version 0.3401
         -s   silent mode
         -e # translation engine (default "deepl")
         -p # pattern to determine translation area
+        -x # file containing mask patterns
         -w # wrap line by # width
         -o # output format (default "xtxt", or "cm", "ifdef")
         -f # from lang (ignored)
@@ -250,18 +289,24 @@ Version 0.3401
         -B   run in non-interactive (batch) mode
         -R   mount read-only
         -E * specify environment variable to be inherited
-        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -I * docker image name or version (default: tecolicom/xlate:version)
         -D * run xlate on the container with the rest parameters
         -C * run following command on the container, or run shell
-
+    
     Control Files:
         *.LANG    translation languates
-        *.FORMAT  translation foramt (xtxt, cm, ifdef)
-        *.ENGINE  translation engine (deepl or gpt3)
+        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 # EMACS
 
 Загрузите файл `xlate.el`, включенный в репозиторий, чтобы использовать команду `xlate` из редактора Emacs. Функция `xlate-region` переводит заданный регион. Язык по умолчанию - `EN-US`, и вы можете указать язык, вызывая ее с помощью аргумента prefix.
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+    </p>
+</div>
 
 # ENVIRONMENT
 
@@ -295,7 +340,9 @@ Version 0.3401
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
-[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+- [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
+    Образ контейнера Docker.
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
@@ -320,6 +367,10 @@ Version 0.3401
 - [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
 
     Используйте **sdif**, чтобы показать формат маркера конфликта бок о бок с опцией **-V**.
+
+- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
+
+    Использование модуля Greple **stripe** с помощью опции **--xlate-stripe**.
 
 ## ARTICLES
 

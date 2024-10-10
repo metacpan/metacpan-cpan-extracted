@@ -26,3 +26,19 @@ Revision history for LaTeX-Easy-Templates
 0.06    2024-08-26/23:00
         Added more verbose output when latex driver fails.
         Removed some expletives.
+
+1.00    2024-10-09/23:00
+        Replaced Storable::dclone() with Clone::clone() because
+        the former bombs when encountering CODErefs while the
+        latter just does a shallow copy as it is needed in this case.
+        This was affecting passing function CODEref to Text::Xslate's
+        constructor but it was not covered by tests so far.
+        I have now hopefully fixed it so that passing functions (and modules)
+        to Text::Xslate works. I have added 3 test files for testing this:
+          220-Xslate-supports-function.t
+          225-Xslate-supports-module-1.t
+          226-Xslate-supports-module-2.t
+        Documentation enhancements with examples on how to print labels
+        and how to print a nested perl data structure :)
+
+

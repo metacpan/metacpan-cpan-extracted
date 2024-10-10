@@ -40,6 +40,7 @@ my %WriteMakefileArgs = (
 	'Text::Xslate' => '3.5.6',
     },
     PREREQ_PM => {
+	'Exporter' => '0',
 	'LaTeX::Driver' => '1.0.0',
 	'Text::Xslate' => '3.5.6',
 	'Mojo::Log' => '0',
@@ -52,7 +53,7 @@ my %WriteMakefileArgs = (
 	'File::Copy::Recursive' => '0',
 	'File::Basename' => '0',
 	'Filesys::DiskUsage' => '0',
-	'Storable' => '0',
+	'Clone' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'LaTeX-Easy-Templates-*' },

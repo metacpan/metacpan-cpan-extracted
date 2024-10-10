@@ -23,11 +23,20 @@
 
 Version - YYYY/MM/DD
 ---------------------
+2.08 2024-10-09 08:30:00
+  - Finally found the bug!  The debugging helper methods in DBUG.pm was giving
+    credit to the wrong file for who was sourcing in the module.  So when asked
+    it couldn't find a match.  Function _find_key() was corrected.
+  - Fixed all the test cases after t/15 to do "use helper1234" rather than
+    use_ok since "make test" aborts at t/15 if there are issues, so we don't
+    need to repeat this test over & over again.
+  - Backed out the above fix for the multi-thead tests.
+
 2.07 2024-10-08 08:30:00
   - Added more tests to  t/15-basic-help.t to help narrow down the issue.
     If it doesn't help I'll make v5.14.0 the min version of perl.
-  - Stubbed out min version of perl.  Using 5.8.8 for now, easy to upgrade to
-    5.14.0 later.
+  - Stubbed out min version of perl test.  Using 5.8.8 for now, easy to upgrade
+    to 5.14.0 later.
 
 2.06 2024-10-04 08:30:00
   - Rats, it didn't fix things, pre-version 5.14.0 still broken.
@@ -53,7 +62,7 @@ Version - YYYY/MM/DD
     expected.  Since so much logic depends on it.
   - CPAN Tester hack, didn't like me calling dbug_level() from BEGIN ?
     So added test in DBUG.pm to verify since I can't reproduce it (-100).
-    (used to verfy CPAN Tester issue of v2.05)
+    (used to verfy CPAN Tester issue described more fully in v2.05)
   - Updated the POD NAME for all *.pm files to be fully qualified.
   - Depreciate DEBUG.pm & Log.pm, now just POD stubs.
   - Fixed unexpected warning error ecountered by a CPAN tester on test case

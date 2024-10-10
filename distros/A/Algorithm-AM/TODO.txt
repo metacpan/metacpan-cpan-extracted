@@ -79,7 +79,7 @@ properly destroy project or AM object on error so that illegal state is not poss
 	- data/exemplar/train/item. Note that "train" is a misnomer but is normal practice.
 	- test, labeled test item, given
 	- classify
-	- grandtotal/total_pointers/total_score
+	- grand_total/total_pointers/total_score
 	- datacap
 - Where the documentation says to see 'the red book' or 'the green book' for details, remove the reference and put the details in the text!
 - Change the POD to use Pod::Weaver properly (=method, etc.).

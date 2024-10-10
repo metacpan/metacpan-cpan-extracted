@@ -14,6 +14,9 @@ use warnings;
 use File::Spec;
 use Test::More;
 
+BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
+use helper1234;
+
 my $start_level;
 
 sub my_warn
@@ -32,15 +35,6 @@ my $fish_module;
 BEGIN {
    # Can't use any of the constants defined by this module
    # unless we use them in a separate BEGIN block!
-
-   push (@INC, File::Spec->catdir (".", "t", "off"));
-
-   # Helper module makes sure DIE & WARN traps are set ...
-   unless (use_ok ("helper1234")) {
-      done_testing ();
-      BAIL_OUT ( "Can't load helper1234" );   # Test # 1
-      exit (0);
-   }
 
    $fish_module = get_fish_module ();
    my @opts = get_fish_opts ();
@@ -100,6 +94,10 @@ BEGIN {
    ok3 ( dbug_active_ok_test () );
 
    ok3 ( 1, "Fish Log: " . DBUG_FILE_NAME() );
+
+   my %usr = find_fish_users ();
+   my $cnt = keys %usr;
+   cmp_ok ($cnt, '==', 4, "Found ${cnt} users of DBUG (4).");
 
    DBUG_VOID_RETURN ();
 }
