@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Intl - ~/lib/DateTime/Format/Intl.pm
-## Version v0.1.3
+## Version v0.1.4
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/09/16
-## Modified 2024/10/09
+## Modified 2024/10/10
 ## All rights reserved
 ## 
 ## 
@@ -29,7 +29,7 @@ BEGIN
     use Locale::Unicode::Data;
     use Scalar::Util ();
     use Want;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.4';
     our $CACHE = {};
     our $LAST_CACHE_CLEAR = time();
     our $MAX_CACHE_SIZE = 30;
@@ -313,9 +313,18 @@ sub new
         }
     }
 
+    my $systems = $unicode->number_systems;
+    my $ns_default = $unicode->number_system;
     # NOTE: number system check
     if( $num_sys )
     {
+        # 'latn' is always supported by all locale as per the LDML specifications
+        if( !( $num_sys eq 'latn' || scalar( grep( ( $systems->{ $_ } // '' ) eq $num_sys, qw( number_system native ) ) ) ) )
+        {
+            warn( "Warning only: unsupported numbering system provided \"${num_sys}\" for locale \"${locale}\"." ) if( warnings::enabled() );
+            undef( $num_sys );
+        }
+
         my $ref = $cldr->number_system( number_system => $num_sys );
         return( $self->pass_error( $cldr->error ) ) if( !defined( $ref ) && $cldr->error );
         # The proper behaviour is to ignore bad value and fall back to 'latn'
@@ -327,22 +336,19 @@ sub new
     }
     if( !defined( $num_sys ) && ( my $locale_num_sys = $locale->number ) )
     {
-        my $ref = $cldr->number_system( number_system => $locale_num_sys );
-        return( $self->pass_error( $cldr->error ) ) if( !defined( $ref ) && $cldr->error );
-        if( $ref )
+        if( $locale_num_sys eq 'latn' || scalar( grep( ( $systems->{ $_ } // '' ) eq $locale_num_sys, qw( number_system native ) ) ) )
         {
             $num_sys = $locale_num_sys;
         }
         else
         {
-            warn( "Warning only: invalid numbering system provided (${locale_num_sys}) via the locale \"nu\" extension (${locale})." ) if( warnings::enabled() );
+            warn( "Warning only: unsupported numbering system provided (${locale_num_sys}) via the locale \"nu\" extension (${locale})." ) if( warnings::enabled() );
         }
     }
     # Still have not found anything
     if( !length( $num_sys // '' ) )
     {
-        $num_sys = $unicode->number_system;
-        $num_sys //= 'latn';
+        $num_sys //= $ns_default || 'latn';
     }
     $resolved->{numberingSystem} = $num_sys;
 
@@ -678,14 +684,26 @@ sub format
     $dt->set_locale( $unicode );
 
     # This is built upon object instantiation, so that format(9 can be called multiple times and run more rapidly.
-    my $pattern = $self->{_pattern} || die( "Saved pattern is gone!" );
-    my $fmt = DateTime::Format::Unicode->new(
-        locale => $locale,
-        pattern => $pattern,
-        time_zone => $tz,
-    );
-    my $str = $fmt->format_datetime( $dt );
-    return( $self->error( "Error formatting CLDR pattern \"${pattern}\" for locale ${locale}: ", $fmt->error ) ) if( !defined( $str ) && $fmt->error );
+#     my $pattern = $self->{_pattern} || die( "Saved pattern is gone!" );
+#     my $fmt = DateTime::Format::Unicode->new(
+#         locale => $locale,
+#         pattern => $pattern,
+#         time_zone => $tz,
+#     );
+#     my $str = $fmt->format_datetime( $dt );
+#     return( $self->error( "Error formatting CLDR pattern \"${pattern}\" for locale ${locale}: ", $fmt->error ) ) if( !defined( $str ) && $fmt->error );
+#     return( $str );
+
+
+    my $parts = $self->format_to_parts( $this,
+        datetime => $dt,
+    ) || return( $self->pass_error );
+    if( !scalar( @$parts ) )
+    {
+        return( $self->error( "Error formatting datetime to parts. No data received!" ) );
+    }
+
+    my $str = join( '', map( $_->{value}, @$parts ) );
     return( $str );
 }
 
@@ -1543,7 +1561,16 @@ sub _format_to_parts
     my $pat = $args->{pattern} || die( "No pattern was provided." );
     my $dt  = $args->{datetime} || die( "No DateTime object was provided." );
     my $locale = $self->{locale} || die( "Our Locale::Unicode object is gone!" );
-    my $fmt = DateTime::Format::Unicode->new;
+    my $opts = $self->resolvedOptions;
+    unless( $opts->{numberingSystem} eq 'latn' )
+    {
+        my $clone = Locale::Intl->new( "$locale" ) ||
+            return( $self->pass_error( Locale::Intl->error ) );
+        $clone->number( $opts->{numberingSystem} );
+        $locale = $clone;
+    }
+    my $fmt = DateTime::Format::Unicode->new( locale => $locale, time_zone => $opts->{timeZone} ) ||
+        return( $self->pass_error( DateTime::Format::Unicode->error ) );
     my $map = $fmt->_get_helper_methods ||
         return( $self->pass_error );
     my $comp_map = 
@@ -5138,7 +5165,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 =head1 DESCRIPTION
 
@@ -5190,9 +5217,21 @@ The only value calendar type supported by this module is C<gregorian>. Any other
 
 The numbering system to use for number formatting, such as C<fullwide>, C<hant>, C<mathsans>, and so on. For a list of supported numbering system types, see L<getNumberingSystems()|Locale::Intl/getNumberingSystems>. This option can also be set through the L<nu|Locale::Unicode/nu> Unicode extension key; if both are provided, this options property takes precedence.
 
-For example, a Japanese locale with the C<jpanfin> number system extension set and with the C<jptyo> time zone:
+For example, a Japanese locale with the C<latn> number system extension set and with the C<jptyo> time zone:
+
+    my $fmt = DateTime::Format::Intl->new( 'ja-u-nu-latn-tz-jptyo' );
+
+However, note that you can only provide a number system that is supported by the C<locale>. For instance, you cannot specify a C<locale> C<ar-SA> (arab as spoken in Saudi Arabia) with a number system of Japan:
+
+    my $fmt = DateTime::Format::Intl->new( 'ar-SA', { numberingSystem => 'japn' } );
+    say $fmt->resolvedOptions->{numberingSystem}; # arab
+
+It would reject it, and issue a warning, if warnings are enabled, and fallback to the C<locale>'s default number system, which is, in this case, C<arab>
+
+Additionally, even though the number system C<jpanfin> is supported by the locale C<ja>, it would not be acceptable, because it is not suitable for datetime formatting, or at least this is how it is treated by web browsers. This API could easily make it acceptable, but it was designed to closely mimic the web browser implementation of the JavaScript API C<Intl.DateTimeFormat>. Thus:
 
     my $fmt = DateTime::Format::Intl->new( 'ja-u-nu-jpanfin-tz-jptyo' );
+    say $fmt->resolvedOptions->{numberingSystem}; # latn
 
 See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/getNumberingSystems>, and also the perl module L<Locale::Intl>
 

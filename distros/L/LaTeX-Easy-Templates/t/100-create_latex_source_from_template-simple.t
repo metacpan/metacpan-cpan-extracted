@@ -11,7 +11,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 use Test::More;
 use Test::More::UTF8;
@@ -24,7 +24,7 @@ use Data::Roundtrip qw/perl2dump json2perl jsonfile2perl no-unicode-escape-perma
 
 use LaTeX::Easy::Templates;
 
-my $VERBOSITY = 1;
+my $VERBOSITY = 100;
 
 my $log = Mojo::Log->new;
 
@@ -71,11 +71,10 @@ my $latterparams = {
 	},
 	'log' => $log,
 	'processors' => {
-		# 1 in memory string
 		'simple05-in-memory' => {
 		   'latex' => {
 			# untemplate the in-memory template into this latex source file:
-			'basedir' => '/tmp/adir',
+			'basedir' => File::Spec->catdir($tmpdir, 'adir'),
 			# this must end in .tex
 			'filename' => 'aaa.tex',
 		   },
@@ -89,7 +88,6 @@ my $latterparams = {
 			'filename' => 'inmemory.pdf',
 		   },
 		},
-		# 1 in memory string
 		'simple05-on-disk' => {
 		   'latex' => {
 			'filename' => undef, # create tmp
@@ -106,6 +104,7 @@ my $latterparams = {
 		},
 	},
 };
+
 my $latter = LaTeX::Easy::Templates->new($latterparams);
 ok(defined($latter), 'LaTeX::Easy::Templates->new()'." : called and got good result.") or BAIL_OUT;
 
@@ -173,4 +172,4 @@ do {
 } unless exists($ENV{'TEMP_DIRS_KEEP'}) && $ENV{'TEMP_DIRS_KEEP'}>0;
 
 # END
-done_testing()
+done_testing();

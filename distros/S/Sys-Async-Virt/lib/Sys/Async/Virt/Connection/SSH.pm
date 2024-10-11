@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection::SSH v0.0.9;
+package Sys::Async::Virt::Connection::SSH v0.0.10;
 
 use parent qw(Sys::Async::Virt::Connection);
 
@@ -141,7 +141,7 @@ Sys::Async::Virt::Connection::SSH - Connection to LibVirt server over SSH
 
 =head1 VERSION
 
-v0.0.9
+v0.0.10
 
 =head1 SYNOPSIS
 
@@ -160,9 +160,23 @@ the system PATH.
 =head1 URL PARAMETERS
 
 This connection driver supports these parameters in the query string
-of the URL:
+of the URL, as per L<LibVirt's documentation|https://libvirt.org/uri.html#ssh-transport>:
 
 =over 8
+
+=item * command
+
+=item * keyfile
+
+=item * mode
+
+=item * netcat
+
+=item * no_tty
+
+=item * no_verify
+
+=item * proxy
 
 =item * socket
 

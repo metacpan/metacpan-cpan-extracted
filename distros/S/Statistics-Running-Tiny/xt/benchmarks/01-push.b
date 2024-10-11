@@ -8,6 +8,8 @@ use Statistics::Running::Tiny;
 use Test::More;
 use Benchmark qw/timethese cmpthese :hireswallclock/;
 
+our $VERSION = '0.04';
+
 use constant VERBOSE => 1; # prints out several junk
 my $num_repeats = 1000;
 my $NUM_DATAPOINTS = 1000;

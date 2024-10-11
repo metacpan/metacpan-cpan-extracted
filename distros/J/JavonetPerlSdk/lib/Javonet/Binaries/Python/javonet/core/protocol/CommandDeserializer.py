@@ -12,9 +12,9 @@ class CommandDeserializer:
     command = 0
     buffer_len = 0
 
-    def __init__(self, buffer, buffer_len):
+    def __init__(self, buffer):
         self.buffer = buffer
-        self.buffer_len = buffer_len
+        self.buffer_len = len(buffer)
         self.command = Command(RuntimeName(buffer[0]), CommandType(buffer[10]), [])
         self.position = 11
 
@@ -68,7 +68,7 @@ class CommandDeserializer:
 
     def read_string(self):
         p = self.position
-        string_encoding_mode = StringEncodingMode(self.buffer[p+1])
+        string_encoding_mode = StringEncodingMode(self.buffer[p + 1])
         size = TypeDeserializer.deserialize_int(self.buffer[p + 2:p + 6])
         self.position += 6
         p = self.position
@@ -87,7 +87,7 @@ class CommandDeserializer:
         self.position += 2
         p = self.position
         self.position += size
-        return TypeDeserializer.deserialize_bool(self.buffer[p:p+size])
+        return TypeDeserializer.deserialize_bool(self.buffer[p:p + size])
 
     def read_float(self):
         size = 4
@@ -95,20 +95,20 @@ class CommandDeserializer:
         p = self.position
         self.position += size
         return TypeDeserializer.deserialize_float(self.buffer[p:p + size])
-    
+
     def read_byte(self):
         size = 1
         self.position += 2
         p = self.position
         self.position += size
-        return TypeDeserializer.deserialize_byte(self.buffer[p:p+size])
-    
+        return TypeDeserializer.deserialize_byte(self.buffer[p:p + size])
+
     def read_char(self):
         size = 1
         self.position += 2
         p = self.position
         self.position += size
-        return TypeDeserializer.deserialize_char(self.buffer[p:p+size])
+        return TypeDeserializer.deserialize_char(self.buffer[p:p + size])
 
     def read_longlong(self):
         size = 8
@@ -144,4 +144,3 @@ class CommandDeserializer:
         p = self.position
         self.position += size
         return TypeDeserializer.deserialize_none(self.buffer[p:p + size])
-    

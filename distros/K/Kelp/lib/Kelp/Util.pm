@@ -138,17 +138,16 @@ sub adapt_psgi
         $path =~ s{^/?}{/};
         $path =~ s{/?$}{$trailing_slash};
 
-        # adjust script and path
-        $env->{SCRIPT_NAME} = $orig_path;
-        $env->{SCRIPT_NAME} =~ s{\Q$path\E$}{};
-        $env->{PATH_INFO} = $path;
+        my $result = do {
 
-        # run the callback
-        my $result = $app->($env);
+            # adjust script and path
+            local $env->{SCRIPT_NAME} = $orig_path;
+            $env->{SCRIPT_NAME} =~ s{\Q$path\E$}{};
+            local $env->{PATH_INFO} = $path;
 
-        # restore old script and path
-        $env->{SCRIPT_NAME} = $orig_script;
-        $env->{PATH_INFO} = $orig_path;
+            # run the callback
+            $app->($env);
+        };
 
         # produce a response
         if (ref $result eq 'ARRAY') {

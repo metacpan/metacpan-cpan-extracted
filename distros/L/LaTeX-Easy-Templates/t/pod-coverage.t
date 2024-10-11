@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 unless ( $ENV{RELEASE_TESTING} ) {
     plan( skip_all => "Author tests not required for installation" );

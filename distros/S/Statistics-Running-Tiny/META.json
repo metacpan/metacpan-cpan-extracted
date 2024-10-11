@@ -1,10 +1,10 @@
 {
-   "abstract" : "Basic descriptive statistics (mean/stdev/min/max/skew/kurtosis) over data without the need to store data points ever. OOP style.",
+   "abstract" : "Basic descriptive statistics (mean/stdev/min/max/skew/kurtosis) over data without the need to store data points ever. OOP style. The Tiny version.",
    "author" : [
       "Andreas Hadjiprocopis <bliako@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -35,9 +35,14 @@
          "requires" : {
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

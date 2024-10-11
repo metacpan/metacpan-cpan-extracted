@@ -1,0 +1,32 @@
+Math-LiveStats version 1.00
+===========================
+
+Pure perl module to make mean, standard deviation, and p-values available for given window sizes in streaming data
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+none
+
+  
+COPYRIGHT AND LICENCE
+
+                    GNU GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+Copyright (C) 2024 Chris Drake
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

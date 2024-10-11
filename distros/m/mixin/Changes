@@ -1,3 +1,8 @@
+0.09  2024-10-11
+  Bug Fixes:
+  * Avoid depracated single-quotes for package separation. Fixes build
+  on bleadperl.
+
 0.07  Fri Jan 22 10:43:10 PST 2010
   Bug Fixes:
   * Classes which defined constants did not work with mixin on

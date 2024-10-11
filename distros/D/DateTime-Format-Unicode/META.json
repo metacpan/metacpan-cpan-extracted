@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "DateTime::Locale::FromCLDR" : "v0.5.0",
+            "DateTime::Locale::FromCLDR" : "v0.6.0",
             "Locale::Unicode" : "v0.3.9",
             "POSIX" : "0",
             "Scalar::Util" : "0",
@@ -67,6 +67,6 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Format-Unicode"
       }
    },
-   "version" : "v0.1.4",
+   "version" : "v0.1.5",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

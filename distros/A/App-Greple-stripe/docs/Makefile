@@ -39,6 +39,10 @@ XLATE := xlate
 ifeq ($(USEAPI),yes)
   XLATE += -a
 endif
+MASKFILE=PATTERN_MASK
+ifneq ($(wildcard $(MASKFILE)),)
+  XLATE += -x $(MASKFILE)
+endif
 
 DESUMASU := NO
 ifeq ($(DESUMASU),GREPLE)
@@ -65,9 +69,9 @@ endif
 define LANG_POD
   $(SRCPATH)%.$1.pod: $(SRCPATH)%.pod Makefile
   ifdef $1_FILTER
-	$$(XLATE) -t $1 $$< | $$($1_FILTER) > $$@
+	$$(XLATE) -t $1 $$< $$(GREPLEOPT) | $$($1_FILTER) > $$@
   else
-	$$(XLATE) -t $1 $$< > $$@
+	$$(XLATE) -t $1 $$< $$(GREPLEOPT) > $$@
   endif
 endef
 

@@ -3,7 +3,7 @@ package Tk::PodViewer;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.04';
 use base qw(Tk::Derived Tk::Frame);
 
 Construct Tk::Widget 'PodViewer';
@@ -100,6 +100,8 @@ sub Populate {
 		-scrollbars => $scrollbars,		
 		-wrap => 'word',
 	)->pack(-expand => 1, -fill => 'both');
+	$text->bind('<Down>', [$text, 'yviewScroll', 1, 'units']);
+	$text->bind('<Up>', [$text, 'yviewScroll', -1, 'units']);
 	$self->Advertise('txt', $text);
 	
 	$self->{CURRENT} = undef;

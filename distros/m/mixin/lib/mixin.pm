@@ -4,7 +4,7 @@ use strict;
 use warnings;
 no strict 'refs';
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 
 =head1 NAME
@@ -202,8 +202,11 @@ A mixin will not warn if the mixin and the user define the same method.
 
 =head1 AUTHOR
 
-Michael G Schwern E<lt>schwern@pobox.comE<gt>
+Current ( ~ 2024 ) maintainer: Shlomi Fish ( L<https://www.shlomifish.org/me/contact-me/> ).
 
+Original author/maintainer:
+
+Michael G Schwern E<lt>schwern@pobox.comE<gt>
 
 =head1 LICENSE
 
@@ -214,6 +217,7 @@ under the same terms as Perl itself.
 
 L<http://dev.perl.org/licenses/>
 
+Shlomi Fish disclaims all copyright ownership to his changes.
 
 =head1 SEE ALSO
 

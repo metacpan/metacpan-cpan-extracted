@@ -10,7 +10,13 @@ callbackFunction = CMPFUNC(callbackFunc)
 
 class TransmitterWrapper:
     file_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    arch = 'X64' if platform.machine().endswith('64') else 'X86'
+    machine = platform.machine().lower()
+    if '64' in machine:
+        arch = 'X64'
+    elif 'arm' in machine:
+        arch = 'ARM64' if '64' in machine else 'ARM'
+    else:
+        arch = 'X86'
 
     if platform.system() == 'Windows':
         python_lib_path = file_path + f'/Binaries/Native/Windows/{arch}/JavonetPythonRuntimeNative.dll'

@@ -8,7 +8,7 @@ App::Greple::stripe - Greple 斑马纹模块
 
 # VERSION
 
-Version 0.9903
+Version 1.00
 
 # DESCRIPTION
 
@@ -44,7 +44,7 @@ Version 0.9903
     </p>
 </div>
 
-默认情况下，会准备两个颜色系列。因此，当搜索多个图案时，偶数图案和奇数图案会被分配不同的颜色系列。如果指定了多个图案，则只会输出符合所有图案的行，因此需要使用 `--need=1` 选项来放宽这一条件。
+默认情况下，会准备两个颜色系列。因此，在搜索多个图案时，偶数图案和奇数图案会被分配不同的颜色系列。
 
     greple -Mstripe -E '.*[02468]$' -E '.*[13579]$' --need=1
 
@@ -53,6 +53,8 @@ Version 0.9903
     <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/random.png">
     </p>
 </div>
+
+如果像上例那样指定了多个模式，则只会输出与所有模式匹配的行。因此，需要使用 `--need=1` 选项来放宽这一条件。
 
 如果要为三个或更多图案使用不同的颜色系列，请在调用模块时指定 `step` 数量。系列数最多可以增加到 6 个。
 

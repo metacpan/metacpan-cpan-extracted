@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension CatalystX-ControllerPerContext.
 
+0.008 - 10 October 2024
+  - Tweaks to some of the experimental base object stuff
+
 0.007 - 02 January 2024
   - No changes to CatalystX::ControllerPerContext.
   - Catalyst::ControllerRole::View now supports the concept of view fragments.

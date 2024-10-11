@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.0
+    Version 1.01
 
 SYNOPSIS
 
@@ -169,8 +169,7 @@ SYNOPSIS
           'processor' => 'mytemplate'
         });
         die unless $ret;
-
-    In this way you can nicely and easily typeset your data into a PDF.
+        # check output xyz.pdf !
 
 EXPORT
 
@@ -821,6 +820,8 @@ EXAMPLE: PRINTING STICKY LABELS
         \begin{document}
         : for $data -> $label {
         :   include 'label.tex.tx' { label => $label };
+        : }
+        \end{document}
 
     and
 
@@ -1162,6 +1163,13 @@ TESTING
         make all
         make test
         make authortest
+
+CAVEATS
+
+    There are a lot of temporary files/directories created by this package
+    and its dependencies (e.g. LaTeX::Driver, Capture::Tiny, etc.). If you
+    observe stray temporary files remaining in /tmp or equivalent, please
+    let me know.
 
 AUTHOR
 

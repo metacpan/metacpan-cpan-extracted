@@ -25,14 +25,14 @@ produces output
     ABCDEFGABCDEFG
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Libdeflate-0.09/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Libdeflate-0.10/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.09 of Gzip-Libdeflate
-corresponding to L<git commit b9c89732037088204db21ff48cc6e7aaed85bf4b|https://github.com/benkasminbullock/gzip-libdeflate/commit/b9c89732037088204db21ff48cc6e7aaed85bf4b> released on Mon Aug 5 07:37:43 2024 +0900. This
-distribution also includes libdeflate version 1.21. 
+This documents version 0.10 of Gzip-Libdeflate
+corresponding to L<git commit 055904bb978be388ddf1d4798a17dd6c231e88a8|https://github.com/benkasminbullock/gzip-libdeflate/commit/055904bb978be388ddf1d4798a17dd6c231e88a8> released on Fri Oct 11 17:06:21 2024 +0900. This
+distribution also includes libdeflate version 1.22. 
 
 =head1 DESCRIPTION
 

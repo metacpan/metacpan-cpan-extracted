@@ -11,7 +11,7 @@ use Class::Inspector;
 use List::Util qw(any);
 use Scalar::Util qw(blessed);
 
-our $VERSION = '2.18';
+our $VERSION = '2.19';
 
 # Basic attributes
 attr -host => hostname;
@@ -21,6 +21,7 @@ attr -name => sub { (ref($_[0]) =~ /(\w+)$/) ? $1 : 'Noname' };
 attr request_obj => 'Kelp::Request';
 attr response_obj => 'Kelp::Response';
 attr context_obj => 'Kelp::Context';
+attr middleware_obj => 'Kelp::Middleware';
 
 # Debug
 attr long_error => $ENV{KELP_LONG_ERROR} // 0;
@@ -267,25 +268,64 @@ sub run
 
     Kelp::Util::_DEBUG(1 => 'Running the application...');
 
-    # Add middleware
-    if (defined(my $middleware = $self->config('middleware'))) {
-        for my $class (@$middleware) {
+    my $middleware = Kelp::Util::load_package($self->middleware_obj)->new(
+        app => $self,
+    );
 
-            # Make sure the middleware was not already loaded
-            # This does not apply for testing, in which case we want
-            # the middleware to wrap every single time
-            next if $self->{_loaded_middleware}->{$class}++ && !$ENV{KELP_TESTING};
+    return $middleware->wrap($app);
+}
 
-            my $mw = Plack::Util::load_class($class, 'Plack::Middleware');
-            my $args = $self->config("middleware_init.$class") // {};
+sub _psgi_internal
+{
+    my ($self, $match) = @_;
+    my $req = $self->req;
+    my $res = $self->res;
 
-            Kelp::Util::_DEBUG(modules => "Wrapping app in $mw middleware with args: ", $args);
+    # Go over the entire route chain
+    for my $route (@$match) {
 
-            $app = $mw->wrap($app, %$args);
+        # Dispatch
+        $req->named($route->named);
+        $req->route_name($route->name);
+        my $data = $self->routes->dispatch($self, $route);
+
+        if ($route->bridge) {
+
+            # Is it a bridge? Bridges must return a true value to allow the
+            # rest of the routes to run. They may also have rendered
+            # something, in which case trust that and don't render 403 (but
+            # still end the execution chain)
+
+            if (!$data) {
+                $res->render_403 unless $res->rendered;
+            }
         }
+        elsif (defined $data) {
+
+            # If the non-bridge route returned something, then analyze it and render it
+
+            # Handle delayed response if CODE
+            return $data if ref $data eq 'CODE';
+            $res->render($data) unless $res->rendered;
+        }
+
+        # Do not go any further if we got a render
+        last if $res->rendered;
     }
 
-    return $app;
+    # If nothing got rendered
+    if (!$res->rendered) {
+        $self->_run_hook(after_unrendered => ($match));
+    }
+
+    return $self->finalize;
+}
+
+sub NEXT_APP
+{
+    return sub {
+        (shift @{$_[0]->{'kelp.execution_chain'}})->($_[0]);
+    };
 }
 
 sub psgi
@@ -307,45 +347,12 @@ sub psgi
     }
 
     return try {
+        $env->{'kelp.execution_chain'} = [
+            (grep { defined } map { $_->psgi_middleware } @$match),
+            sub { $self->_psgi_internal($match) },
+        ];
 
-        # Go over the entire route chain
-        for my $route (@$match) {
-
-            # Dispatch
-            $req->named($route->named);
-            $req->route_name($route->name);
-            my $data = $self->routes->dispatch($self, $route);
-
-            if ($route->bridge) {
-
-                # Is it a bridge? Bridges must return a true value to allow the
-                # rest of the routes to run. They may also have rendered
-                # something, in which case trust that and don't render 403 (but
-                # still end the execution chain)
-
-                if (!$data) {
-                    $res->render_403 unless $res->rendered;
-                }
-            }
-            elsif (defined $data) {
-
-                # If the non-bridge route returned something, then analyze it and render it
-
-                # Handle delayed response if CODE
-                return $data if ref $data eq 'CODE';
-                $res->render($data) unless $res->rendered;
-            }
-
-            # Do not go any further if we got a render
-            last if $res->rendered;
-        }
-
-        # If nothing got rendered
-        if (!$res->rendered) {
-            my $c = $self->_run_hook(after_unrendered => ($match));
-        }
-
-        return $self->finalize;
+        return Kelp->NEXT_APP->($env);
     }
     catch {
         my $exception = $_;
@@ -555,13 +562,13 @@ routes, then analyzing the response.
 
 =head1 ATTRIBUTES
 
-=head2 hostname
+=head2 host
 
 Gets the current hostname.
 
     sub some_route {
         my $self = shift;
-        if ( $self->hostname eq 'prod-host' ) {
+        if ( $self->host eq 'prod-host' ) {
             ...
         }
     }
@@ -580,6 +587,11 @@ L<Kelp::Module::Config> for more information.
 
 Provide a custom package name to define the ::Context object. Defaults to
 L<Kelp::Context>.
+
+=head2 middleware_obj
+
+Provide a custom package name to define the middleware object. Defaults to
+L<Kelp::Middleware>.
 
 =head2 request_obj
 
@@ -852,8 +864,8 @@ every route.
 
 =head2 run
 
-This method builds and returns the PSGI app. You can override it in order to
-include middleware. See L<Kelp::Manual/Adding middleware> for an example.
+This method builds and returns the PSGI app. You can override it to get more
+control over PSGI representation of the app.
 
 =head2 param
 
@@ -943,6 +955,22 @@ Example new JSON encoder type defined in config:
             },
         },
     },
+
+=head2 NEXT_APP
+
+Helper method for giving Kelp back the control over PSGI application. It must
+be used when declaring route-level middleware. It is context-independent and
+can be called from C<Kelp> package.
+
+    use Plack::Builder;
+
+    builder {
+        enable 'SomeMiddleware';
+        Kelp->NEXT_APP;
+    }
+
+Internally, it uses C<kelp.execution_chain> PSGI environment to dynamically
+construct a wrapped PSGI app without too much overhead.
 
 =head1 AUTHOR
 

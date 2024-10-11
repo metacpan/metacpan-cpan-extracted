@@ -3,7 +3,7 @@ package App::Greple::stripe;
 use 5.024;
 use warnings;
 
-our $VERSION = "0.9903";
+our $VERSION = "1.00";
 
 =encoding utf-8
 
@@ -17,7 +17,7 @@ App::Greple::stripe - Greple zebra stripe module
 
 =head1 VERSION
 
-Version 0.9903
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -53,15 +53,17 @@ with different colors of the similar color series.
 
 By default, two color series are prepared. Thus, when multiple
 patterns are searched, an even-numbered pattern and an odd-numbered
-pattern are assigned different color series.  When multiple patterns
-are specified, only lines matching all patterns will be output, so the
-C<--need=1> option is required to relax this condition.
+pattern are assigned different color series.
 
     greple -Mstripe -E '.*[02468]$' -E '.*[13579]$' --need=1
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/random.png">
 </p>
+
+When multiple patterns are specified as in the above example, only
+lines matching all patterns will be output.  So the C<--need=1> option
+is required to relax this condition.
 
 If you want to use different color series for three or more patterns,
 specify C<step> count when calling the module.  The number of series

@@ -22,8 +22,8 @@ sub view {
 sub view_at {
   my ($self, $view_name_proto, @args) = @_;
   my ($view_name, $view_fragment) = split(/\./, $view_name_proto);
-
   push @args, view_fragment => $view_fragment if $view_fragment;
+
   $view_name = "@{[$self->path_prefix]}/$view_name" if $self->path_prefix;
   my $namepart = String::CamelCase::camelize($view_name);
   $namepart =~s/\//::/g;
@@ -35,12 +35,15 @@ sub view_at {
 
 sub view_for {
   my ($self, $proto, @args) = @_;
-  my ($action_proto, $view_fragment) = split(/\./, $proto);
+  my ($action_proto, $view_fragment) = Scalar::Util::blessed($proto)
+    ? ($proto, undef)
+    : split(/\./, $proto);
   
   push @args, view_fragment => $view_fragment if $view_fragment;
-  my $action = Scalar::Util::blessed($action_proto) ?
-    $action_proto :
-      $self->action_for($action_proto);
+
+  my $action = Scalar::Util::blessed($action_proto)
+    ? $action_proto
+    : $self->action_for($action_proto);
 
   return $self->view_at($proto, @args) unless $action; # Not sure if this is right
 
@@ -71,14 +74,24 @@ sub _build_view_name {
   $self->ctx->log->debug( "Content-Type: $content_type, Matched: $matched_content_type") if $self->ctx->debug;
 
   my $view = $self->_view_from_parts($matched_content_type, $action_namepart);
-  return $view;
+  return $view if $view;
+
+  $self->ctx->log->warn("Using default prefix 'HTML'"); 
+  return $self->_view_from_parts('HTML', $action_namepart); 
 }
 
 sub _view_from_parts {
-  my ($self, @view_parts) = @_;
-  my $view = join('::', @view_parts);
+  my ($self, $matched_content_type, $action_namepart) = @_;
+  my $view = join('::', $matched_content_type, $action_namepart);
   $self->ctx->log->debug("Negotiated View: $view") if $self->ctx->debug;
-  return $view;
+
+  my $appclass = ref($self->ctx);
+  my $check = "${appclass}::View::${view}";
+  my $comps = $self->ctx->components;
+  return $view if exists $comps->{$check};
+
+  $self->ctx->log->warn("View not found: $check");
+  return undef;
 }
 
 has '_content_negotiation' => (is => 'ro', required=>1);

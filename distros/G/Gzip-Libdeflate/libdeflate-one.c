@@ -23,7 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.21/lib/adler32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/adler32.c */
 
 
 /* #include "lib_common.h" */
@@ -74,8 +74,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -1074,8 +1074,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -2279,12 +2279,14 @@ adler32_arm_neon(u32 adler, const u8 *p, size_t len)
 #endif 
 
 
-#if HAVE_DOTPROD_INTRIN && CPU_IS_LITTLE_ENDIAN()
+#if HAVE_DOTPROD_INTRIN && CPU_IS_LITTLE_ENDIAN() && \
+	!defined(LIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_DOTPROD)
 #  define adler32_arm_neon_dotprod	adler32_arm_neon_dotprod
 #  ifdef __clang__
 #    define ATTRIBUTES	_target_attribute("dotprod")
    
-#  elif GCC_PREREQ(13, 2) || defined(__ARM_FEATURE_JCVT)
+#  elif GCC_PREREQ(14, 0) || defined(__ARM_FEATURE_JCVT) \
+			  || defined(__ARM_FEATURE_DOTPROD)
 #    define ATTRIBUTES	_target_attribute("+dotprod")
 #  else
 #    define ATTRIBUTES	_target_attribute("arch=armv8.2-a+dotprod")
@@ -2473,8 +2475,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -4289,7 +4291,8 @@ ADD_SUFFIX(adler32_x86)(u32 adler, const u8 *p, size_t len)
 #endif
 
 
-#if GCC_PREREQ(12, 1) || CLANG_PREREQ(12, 0, 13000000) || MSVC_PREREQ(1930)
+#if (GCC_PREREQ(12, 1) || CLANG_PREREQ(12, 0, 13000000) || MSVC_PREREQ(1930)) && \
+	!defined(LIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_AVX_VNNI)
 #  define adler32_x86_avx2_vnni	adler32_x86_avx2_vnni
 #  define SUFFIX			   _avx2_vnni
 #  define ATTRIBUTES		_target_attribute("avx2,avxvnni")
@@ -4691,7 +4694,8 @@ ADD_SUFFIX(adler32_x86)(u32 adler, const u8 *p, size_t len)
 
 #endif
 
-#if GCC_PREREQ(8, 1) || CLANG_PREREQ(6, 0, 10000000) || MSVC_PREREQ(1920)
+#if (GCC_PREREQ(8, 1) || CLANG_PREREQ(6, 0, 10000000) || MSVC_PREREQ(1920)) && \
+	!defined(LIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_AVX512VNNI)
 
 #  define adler32_x86_avx512_vl256_vnni	adler32_x86_avx512_vl256_vnni
 #  define SUFFIX				   _avx512_vl256_vnni
@@ -5562,7 +5566,7 @@ libdeflate_adler32(u32 adler, const void *buffer, size_t len)
 		return 1;
 	return adler32_impl(adler, buffer, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.21/lib/crc32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/crc32.c */
 
 
 
@@ -5615,8 +5619,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -7564,8 +7568,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -9431,13 +9435,15 @@ tail:
 #endif
 
 
-#if HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN && HAVE_SHA3_INTRIN
+#if HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN && HAVE_SHA3_INTRIN && \
+	!defined(LIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_SHA3)
 #  define crc32_arm_pmullx12_crc_eor3	crc32_arm_pmullx12_crc_eor3
 #  define SUFFIX				 _pmullx12_crc_eor3
 #  ifdef __clang__
 #    define ATTRIBUTES	_target_attribute("aes,crc,sha3")
    
-#  elif GCC_PREREQ(13, 2) || defined(__ARM_FEATURE_JCVT)
+#  elif GCC_PREREQ(14, 0) || defined(__ARM_FEATURE_JCVT) \
+			  || defined(__ARM_FEATURE_DOTPROD)
 #    define ATTRIBUTES	_target_attribute("+crypto,+crc,+sha3")
 #  else
 #    define ATTRIBUTES	_target_attribute("arch=armv8.2-a+crypto+crc+sha3")
@@ -9825,8 +9831,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -11554,7 +11560,8 @@ reduce_x0:
 #endif
 
 
-#if GCC_PREREQ(8, 3) || CLANG_PREREQ(6, 0, 10000000)
+#if (GCC_PREREQ(8, 3) || CLANG_PREREQ(6, 0, 10000000)) && \
+	!defined(LIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_VPCLMULQDQ)
 #  define crc32_x86_vpclmulqdq_avx2	crc32_x86_vpclmulqdq_avx2
 #  define SUFFIX				 _vpclmulqdq_avx2
 #  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx2")
@@ -11907,7 +11914,8 @@ reduce_x0:
 
 #endif
 
-#if GCC_PREREQ(8, 1) || CLANG_PREREQ(6, 0, 10000000) || MSVC_PREREQ(1920)
+#if (GCC_PREREQ(8, 1) || CLANG_PREREQ(6, 0, 10000000) || MSVC_PREREQ(1920)) && \
+	!defined(LIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_VPCLMULQDQ)
 
 #  define crc32_x86_vpclmulqdq_avx512_vl256  crc32_x86_vpclmulqdq_avx512_vl256
 #  define SUFFIX				      _vpclmulqdq_avx512_vl256
@@ -12682,7 +12690,7 @@ libdeflate_crc32(u32 crc, const void *p, size_t len)
 		return 0;
 	return ~crc32_impl(~crc, p, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.21/lib/deflate_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/deflate_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -12737,8 +12745,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -13787,8 +13795,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -14774,8 +14782,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -15933,8 +15941,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -17428,8 +17436,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -18415,8 +18423,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -19574,8 +19582,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -21018,8 +21026,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -22005,8 +22013,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -23164,8 +23172,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -27553,7 +27561,7 @@ libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 	
 	return (5 * max_blocks) + in_nbytes;
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.21/lib/deflate_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/deflate_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -27604,8 +27612,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -29746,8 +29754,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -31487,7 +31495,7 @@ libdeflate_free_decompressor(struct libdeflate_decompressor *d)
 	if (d)
 		d->free_func(d);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.21/lib/gzip_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/gzip_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -31542,8 +31550,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -32538,7 +32546,7 @@ libdeflate_gzip_compress_bound(struct libdeflate_compressor *c,
 	return GZIP_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.21/lib/gzip_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/gzip_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -32589,8 +32597,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -33630,7 +33638,7 @@ libdeflate_gzip_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.21/lib/utils.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/utils.c */
 
 
 /* #include "lib_common.h" */
@@ -33681,8 +33689,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -34671,7 +34679,7 @@ libdeflate_assertion_failed(const char *expr, const char *file, int line)
 	abort();
 }
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.21/lib/zlib_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/zlib_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -34726,8 +34734,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -35690,7 +35698,7 @@ libdeflate_zlib_compress_bound(struct libdeflate_compressor *c,
 	return ZLIB_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.21/lib/zlib_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/zlib_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -35741,8 +35749,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -36718,7 +36726,7 @@ libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.21/lib/arm/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/arm/cpu_features.c */
 
 
 
@@ -36795,8 +36803,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -37781,8 +37789,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI
@@ -39004,7 +39012,7 @@ void libdeflate_init_arm_cpu_features(void)
 }
 
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.21/lib/x86/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/x86/cpu_features.c */
 
 
 /* #include "cpu_features_common.h" - no include guard */ 
@@ -39062,8 +39070,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	21
-#define LIBDEFLATE_VERSION_STRING	"1.21"
+#define LIBDEFLATE_VERSION_MINOR	22
+#define LIBDEFLATE_VERSION_STRING	"1.22"
 
 
 #ifndef LIBDEFLATEAPI

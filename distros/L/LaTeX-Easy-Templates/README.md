@@ -4,7 +4,7 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 # VERSION
 
-Version 1.0
+Version 1.01
 
 # SYNOPSIS
 
@@ -176,9 +176,7 @@ because of its very good performance when rendering templates.
       'processor' => 'mytemplate'
     });
     die unless $ret;
-
-In this way you can nicely and easily typeset your data
-into a PDF.
+    # check output xyz.pdf !
 
 # EXPORT
 
@@ -773,6 +771,8 @@ Here they are:
     \begin{document}
     : for $data -> $label {
     :   include 'label.tex.tx' { label => $label };
+    : }
+    \end{document}
 
 and
 
@@ -1136,6 +1136,13 @@ page for that), extract it, enter the directory and do:
     make all
     make test
     make authortest
+
+# CAVEATS
+
+There are a lot of temporary files/directories created
+by this package and its dependencies (e.g. [LaTeX::Driver](https://metacpan.org/pod/LaTeX%3A%3ADriver), [Capture::Tiny](https://metacpan.org/pod/Capture%3A%3ATiny), etc.).
+If you observe stray temporary files remaining in `/tmp` or equivalent, please
+let me know.
 
 # AUTHOR
 

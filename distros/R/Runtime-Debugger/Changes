@@ -1,6 +1,20 @@
 Revision history for Runtime-Debugger
 
 =================
+1.07 - 2024-10-10
+=================
+
+Installs system readline by its self.
+
+=================
+1.06 - 2024-10-10
+=================
+
+Fixed bug with not being able to use global
+variable like %ENV and %ENV inside of a string:
+    say "$ENV{HOME}"
+
+=================
 1.05 - 2024-09-24
 =================
 

@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w 
+
+use strict;
+use warnings;
+use v5.10;
+use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
+    
+use Test::More tests => 5;
+
+use_ok('File::Information');
+use_ok('File::Information::Base');
+use_ok('File::Information::Filesystem');
+use_ok('File::Information::Link');
+use_ok('File::Information::Inode');
+
+exit 0;

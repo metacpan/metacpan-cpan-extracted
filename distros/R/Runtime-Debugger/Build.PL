@@ -12,12 +12,49 @@ sub _remove_old_history {
 }
 
 sub _readme {
-    print "Building README\n";
+    print "\nBuilding README\n";
+    my ($installed) = grep { -e "$_/pod2markdown" } split /:/, $ENV{PATH};
+    return if !$installed;
     system "pod2markdown lib/Runtime/Debugger.pm > README.md";
+}
+
+sub _install_readline_dev {
+    print "\nInstalling readline-dev\n";
+    my $os_name;
+
+    my $os_file = "/etc/os-release";
+    if (-e $os_file){
+        open my $fh, "<", $os_file or warn $!;
+        while (<$fh>) {
+            next unless / ^ ID = "(\S+)" /x;
+            $os_name = lc($1 // "");
+            last;
+        }
+        close $fh;
+        return if !$os_name;
+    }
+    elsif( $ENV{PREFIX} ){
+        return if $ENV{PREFIX} !~ / \b termux \b /xi;
+        $os_name = "termux";
+    }
+
+    my %commands = (
+        centos => 'sudo dnf install -y readline-devel',
+        gentoo => 'sudo emerge --ask sys-libs/readline',
+        debian => 'sudo apt install -y libreadline-dev',
+        ubuntu => 'sudo apt install -y libreadline-dev',
+        termux => 'pkg install readline',
+    );
+    my $install_command = $commands{$os_name};
+    return if !$install_command;
+
+    print "Installing readline-dev for '$os_name' via '$install_command'\n";
+    system "$install_command";
 }
 
 _remove_old_history();
 _readme();
+_install_readline_dev();
 
 my $class = Module::Build->subclass(
     code => q{

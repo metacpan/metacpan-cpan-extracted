@@ -11,4 +11,8 @@ dist.ini
 lib/File/ValueFile.pm
 lib/File/ValueFile/Simple/Reader.pm
 lib/File/ValueFile/Simple/Writer.pm
+t/01_load.t
+t/10_known.t
+t/20_simple_reader.t
+t/21_simple_writer.t
 xt/author/pod-syntax.t

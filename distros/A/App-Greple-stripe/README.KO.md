@@ -8,7 +8,7 @@ App::Greple::stripe - Greple 지브라 스트라이프 모듈
 
 # VERSION
 
-Version 0.9903
+Version 1.00
 
 # DESCRIPTION
 
@@ -44,7 +44,7 @@ Version 0.9903
     </p>
 </div>
 
-기본적으로 두 가지 색상 계열이 준비되어 있습니다. 따라서 여러 패턴이 검색되면 짝수 패턴과 홀수 패턴에 서로 다른 색상 계열이 할당됩니다. 여러 패턴을 지정하면 모든 패턴과 일치하는 줄만 출력되므로 이 조건을 완화하려면 `--need=1` 옵션이 필요합니다.
+기본적으로 두 가지 색상 계열이 준비되어 있습니다. 따라서 여러 패턴을 검색할 때 짝수 패턴과 홀수 패턴에는 서로 다른 색상 계열이 할당됩니다.
 
     greple -Mstripe -E '.*[02468]$' -E '.*[13579]$' --need=1
 
@@ -53,6 +53,8 @@ Version 0.9903
     <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/random.png">
     </p>
 </div>
+
+위의 예와 같이 여러 패턴을 지정하면 모든 패턴과 일치하는 줄만 출력됩니다. 따라서 이 조건을 완화하려면 `--need=1` 옵션이 필요합니다.
 
 세 개 이상의 패턴에 서로 다른 색상 계열을 사용하려면 모듈을 호출할 때 `단계` 개수를 지정하세요. 계열 수는 최대 6까지 늘릴 수 있습니다.
 

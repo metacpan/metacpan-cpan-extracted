@@ -4,7 +4,7 @@
       "Michael G Schwern E<lt>schwern@pobox.comE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "mixin",
       "inheritance",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "mixin",
    "prereqs" : {
@@ -39,26 +39,26 @@
    "provides" : {
       "mixin" : {
          "file" : "lib/mixin.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "mixin::with" : {
          "file" : "lib/mixin/with.pm",
-         "version" : "0.07"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/evalEmpire/mixin/issues"
+         "web" : "https://github.com/shlomif/mixin/issues"
       },
-      "homepage" : "https://github.com/evalEmpire/mixin",
+      "homepage" : "https://github.com/shlomif/mixin",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/evalEmpire/mixin"
+         "url" : "https://github.com/shlomif/mixin"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

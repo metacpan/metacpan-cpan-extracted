@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Stream v0.0.9;
+package Sys::Async::Virt::Stream v0.0.10;
 
 use parent qw( IO::Async::Notifier );
 
@@ -23,7 +23,7 @@ use Carp qw(croak);
 use Future::Queue;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.9;
+use Protocol::Sys::Virt::Remote::XDR v0.0.10;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 sub new($class, %args) {
@@ -166,7 +166,7 @@ Sys::Async::Virt::Stream - Client side of a data transfer channel
 
 =head1 VERSION
 
-v0.0.9
+v0.0.10
 
 =head1 SYNOPSIS
 

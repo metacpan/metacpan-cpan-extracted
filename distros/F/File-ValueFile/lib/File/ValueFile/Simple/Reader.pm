@@ -20,7 +20,7 @@ use Data::Identifier;
 use constant KEYWORD_OK => qr/^[a-zA-Z0-9\-:\._~]*$/;
 use constant FORMAT_ISE => '54bf8af4-b1d7-44da-af48-5278d11e8f32';
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 
 
@@ -243,7 +243,7 @@ File::ValueFile::Simple::Reader - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

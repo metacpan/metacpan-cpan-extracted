@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Test::More;
 
+our $VERSION = '0.04';
+
 plan tests => 3;
 
 sub not_in_file_ok {

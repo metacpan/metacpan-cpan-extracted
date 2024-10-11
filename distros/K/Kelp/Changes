@@ -1,9 +1,20 @@
 Revision history for Kelp
 
+2.19 - 2024-10-10
+            [New Interface]
+            - Added middleware_obj attribute to Kelp
+            - Added NEXT_APP method to Kelp
+            - Added psgi_middleware attribute to Kelp::Routes::Pattern
+
+            [Changes]
+            - Middleware building is now done using Kelp::Middleware, making it easier to customize
+            - Kelp now uses a dynamic PSGI execution chain, allowing adding PSGI middlewares at route level
+            - Fixed trailing slash bridges not applying for deeper paths (broken in 2.18)
+
 2.18 - 2024-10-08
             [New Interface]
             - Added after_unrendered hook to Kelp
-            - Added order attribute and compare method to routes
+            - Added order attribute and compare method to Kelp::Routes::Pattern
 
             [Changes]
             - Fixed bridge without trailing slash being used for longer routes on the same level

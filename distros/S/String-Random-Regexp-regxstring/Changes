@@ -24,3 +24,6 @@ Revision history for String-Random-Regexp-regxstring
         I set a MyFree() function in XS code so as to
 	free externally malloc'ed memory with libc's free()
         as per https://www.perlmonks.org/?node_id=742205
+
+1.03    10/10/2024
+        Refreshed.

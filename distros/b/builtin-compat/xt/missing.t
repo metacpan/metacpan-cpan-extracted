@@ -20,6 +20,7 @@ use builtin::compat ();
 plan tests => scalar @builtins;
 
 my @excluded = qw(
+  bootstrap
   export_lexically
 );
 my %excluded = map +($_ => 1), @excluded;

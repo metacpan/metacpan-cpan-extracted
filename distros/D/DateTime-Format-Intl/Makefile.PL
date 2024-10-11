@@ -28,8 +28,8 @@ my %WriteMakefileArgs = (
         'warnings::register'            => 0,
         # 2008-02-29
         'DateTime'                      => '0.42',
-        'DateTime::Locale::FromCLDR'    => 'v0.4.3',
-        'DateTime::Format::Unicode'     => 'v0.1.3',
+        'DateTime::Locale::FromCLDR'    => 'v0.6.0',
+        'DateTime::Format::Unicode'     => 'v0.1.5',
         'Locale::Intl'                  => 'v0.1.2',
         'Locale::Unicode::Data'         => 'v1.0.4',
         'POSIX'                         => 0,

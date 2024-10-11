@@ -9,7 +9,7 @@ App::Greple::stripe - Greple zebra stripe module
 
 # VERSION
 
-Version 0.9903
+Version 1.00
 
 # DESCRIPTION
 
@@ -51,9 +51,7 @@ with different colors of the similar color series.
 
 By default, two color series are prepared. Thus, when multiple
 patterns are searched, an even-numbered pattern and an odd-numbered
-pattern are assigned different color series.  When multiple patterns
-are specified, only lines matching all patterns will be output, so the
-`--need=1` option is required to relax this condition.
+pattern are assigned different color series.
 
     greple -Mstripe -E '.*[02468]$' -E '.*[13579]$' --need=1
 
@@ -62,6 +60,10 @@ are specified, only lines matching all patterns will be output, so the
     <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-stiripe/refs/heads/main/images/random.png">
     </p>
 </div>
+
+When multiple patterns are specified as in the above example, only
+lines matching all patterns will be output.  So the `--need=1` option
+is required to relax this condition.
 
 If you want to use different color series for three or more patterns,
 specify `step` count when calling the module.  The number of series

@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Module::Build;
+use Module::Build ();
 
 my $build = Module::Build->new(
     module_name         => "mixin",
@@ -14,7 +14,7 @@ my $build = Module::Build->new(
     configure_requires => {
         "Module::Build" => '0.36'
     },
-    
+
     requires            => {
         "base"                  => 0,
     },
@@ -28,9 +28,9 @@ my $build = Module::Build->new(
 
     meta_merge          => {
         resources       => {
-            homepage    => "https://github.com/evalEmpire/mixin",
-            bugtracker  => "https://github.com/evalEmpire/mixin/issues",
-            repository  => "https://github.com/evalEmpire/mixin",
+            homepage    => "https://github.com/shlomif/mixin",
+            bugtracker  => "https://github.com/shlomif/mixin/issues",
+            repository  => "https://github.com/shlomif/mixin",
         },
         keywords        => [qw(mixin inheritance devel)],
     }

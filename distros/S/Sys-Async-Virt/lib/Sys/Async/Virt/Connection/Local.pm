@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection::Local v0.0.9;
+package Sys::Async::Virt::Connection::Local v0.0.10;
 
 use parent qw(Sys::Async::Virt::Connection);
 
@@ -70,7 +70,7 @@ Sys::Async::Virt::Connection::Local - Connection to LibVirt server over Unix
 
 =head1 VERSION
 
-v0.0.9
+v0.0.10
 
 =head1 SYNOPSIS
 
@@ -89,9 +89,11 @@ socket.
 =head1 URL PARAMETERS
 
 This connection driver supports these parameters in the query string
-of the URL:
+of the URL, as per L<LibVirt's documentation|https://libvirt.org/uri.html#unix-transport>:
 
 =over 8
+
+=item * mode (todo)
 
 =item * socket
 

@@ -10,7 +10,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 use Exporter qw(import);
 our @EXPORT = qw(
@@ -386,16 +386,18 @@ sub format {
 		# file contains some form of a dir, at least './' etc.
 		#'output' => $outfile,
 		# pdflatex is standard in installations i guess, this can be
-		# overwritten with the 'latex-driver-parameters' specified
+		# will be overwritten with the 'latex-driver-parameters' if specified
 		'format' => 'pdf(pdflatex)',
 		# use xelatex when you have unicodez and multi-language, you can set this on per-case
 		#'format' => 'pdf(xelatex)',
 		'DEBUG'  => $verbosity,
 #		'texinputs' => $latex_info->{'basedir'},
 #		'basedir' => $outdir,
-		# if tmpdir=1 it will override the 'basedir' param below
-		# which will die if tex file depends on images/sty files in the folder
-		'tmpdir' => 0, # use a tempdir that it will make itself for output the aux files and shit, no need to retain this.
+		# if tmpdir=1 it will copy the src latex file (ONLY!)
+		# to a generated tmpdir and do the processing there
+		# however, what about dependencies like images etc.?
+		# this is a no-go, so set it to 0
+		'tmpdir' => 0,
 		# removes all tmp files created, use 'none' not to
 		'cleanup' => ($self->cleanup()>0) ? 'tempfiles' : 'none',
 		'capture_stderr' => 1,
@@ -438,7 +440,7 @@ sub format {
 
 	# this returns 1 on success or exception on failure
 	my $ret = eval { $latex_driver->run() };
-	if( $@ ){
+	if( (! defined $ret ) || $@ ){
 		my ($filecontents, $aFH);
 		if( open($aFH, '<:utf8', $latex_info->{'filepath'}) ){
 			{ local $/ = undef; $filecontents = <$aFH> } close $aFH;
@@ -1156,7 +1158,7 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 =head1 VERSION
 
-Version 1.0
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -1329,9 +1331,7 @@ because of its very good performance when rendering templates.
       'processor' => 'mytemplate'
     });
     die unless $ret;
-
-In this way you can nicely and easily typeset your data
-into a PDF.
+    # check output xyz.pdf !
 
 =head1 EXPORT
 
@@ -2037,6 +2037,8 @@ Here they are:
     \begin{document}
     : for $data -> $label {
     :   include 'label.tex.tx' { label => $label };
+    : }
+    \end{document}
 
 and
 
@@ -2414,6 +2416,12 @@ page for that), extract it, enter the directory and do:
     make test
     make authortest
 
+=head1 CAVEATS
+
+There are a lot of temporary files/directories created
+by this package and its dependencies (e.g. L<LaTeX::Driver>, L<Capture::Tiny>, etc.).
+If you observe stray temporary files remaining in C</tmp> or equivalent, please
+let me know.
 
 =head1 AUTHOR
 

@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Domain v0.0.9;
+package Sys::Async::Virt::Domain v0.0.10;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.9;
+use Protocol::Sys::Virt::Remote::XDR v0.0.10;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -687,6 +687,18 @@ sub new($class, %args) {
         client => $args{client},
     }, $class;
 }
+
+# @@@TODO: ENTRYPOINT: REMOTE_PROC_DOMAIN_GET_VCPU_PIN_INFO
+#
+# Check out Sys::Virt::Domain::get_vcpu_info
+#
+# async sub get_vcpu_pin_info($self, $flags = 0) {
+#     my $maplen = await $self->{client}->_maplen;
+#     return $self->{client}->_call(
+#         $remote->PROC_DOMAIN_GET_VCPU_INFO,
+#         { dom => $self->{id}, ncpumaps => ...,
+#           maplen => $maplen, flags => $flags // 0 });
+# }
 
 sub _migrate_perform($self, $cookie, $uri, $flags, $dname, $resource) {
     return $self->{client}->_call(
@@ -1572,7 +1584,7 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.0.9
+v0.0.10
 
 =head1 SYNOPSIS
 

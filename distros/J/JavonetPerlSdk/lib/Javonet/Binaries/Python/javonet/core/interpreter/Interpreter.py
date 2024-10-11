@@ -5,30 +5,26 @@ from javonet.utils.ConnectionType import ConnectionType
 from javonet.utils.RuntimeName import RuntimeName
 from javonet.utils.connectionData.IConnectionData import IConnectionData
 
+handler = Handler()
+
+
 class Interpreter:
 
     def execute(self, command, connection_data: IConnectionData):
-        command_serializer = CommandSerializer()
-        serialized_command = command_serializer.serialize(command, connection_data)
-        response = None
+        message_byte_array = CommandSerializer().serialize(command, connection_data)
         if connection_data.connection_type == ConnectionType.WebSocket:
             from javonet.core.webSocketClient.WebSocketClient import WebSocketClient
-            response = WebSocketClient().send_message(connection_data, serialized_command)
-        elif (command.runtime_name == RuntimeName.python) & (connection_data.connection_type == ConnectionType.InMemory):
+            response_byte_array = WebSocketClient().send_message(connection_data, message_byte_array)
+        elif (command.runtime_name == RuntimeName.python) & (
+                connection_data.connection_type == ConnectionType.InMemory):
             from javonet.core.receiver.Receiver import Receiver
-            response = Receiver().SendCommand(serialized_command, len(serialized_command))
+            response_byte_array = Receiver().SendCommand(message_byte_array, len(message_byte_array))
         else:
             from javonet.core.transmitter.Transmitter import Transmitter
-            response = Transmitter.send_command(serialized_command)
+            response_byte_array = Transmitter.send_command(message_byte_array)
 
-        command_deserializer = CommandDeserializer(response, len(response))
-        return command_deserializer.deserialize()
+        return CommandDeserializer(response_byte_array).deserialize()
 
-    def process(self, byte_array, byte_array_len, connection_data: IConnectionData):
-        command_deserializer = CommandDeserializer(byte_array, byte_array_len)
-        received_command = command_deserializer.deserialize()
-        python_handler = Handler()
-        command_serializer = CommandSerializer()
-        response_command = python_handler.handle_command(received_command)
-        encoded_response = command_serializer.serialize(response_command, connection_data)
-        return encoded_response
+    def process(self, message_byte_array):
+        received_command = CommandDeserializer(message_byte_array).deserialize()
+        return handler.handle_command(received_command)

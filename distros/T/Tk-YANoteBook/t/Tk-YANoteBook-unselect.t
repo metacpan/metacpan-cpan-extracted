@@ -17,9 +17,9 @@ if (defined $app) {
 	my $nbf = $app->Frame(-relief => 'groove', -borderwidth => 4);
 	my $adjuster;
 	$nb = $nbf->YANoteBook(
-		-background => 'red',
-		-relief => 'groove',
-		-borderwidth => 4,
+#		-background => 'red',
+#		-relief => 'groove',
+#		-borderwidth => 4,
 		-autoupdate => 1,
 		-onlyselect => 0,
 		-rigid => 0,
@@ -32,8 +32,8 @@ if (defined $app) {
 			my $tf = $nb->Subwidget('TabFrame');
 			my $offset = ($tf->cget('-borderwidth') + $nb->cget('-borderwidth')) * 2;
 # 			print "offset $offset\n";
-			$nb->GeometryRequest($nb->width, $tf->height + $offset + $pf->reqheight);
-			$adjuster = $app->Adjuster(-side =>'top', -widget => $nb)->pack(-after => $nbf, -fill => 'x');
+#			$nb->GeometryRequest($nb->width, $tf->height + $offset + $pf->reqheight);
+#			$adjuster = $app->Adjuster(-side =>'top', -widget => $nb)->pack(-after => $nbf, -fill => 'x');
 			
 		},
 		-unselecttabcall => sub {
@@ -41,11 +41,11 @@ if (defined $app) {
 # 			print "unselect $t\n";
 # 			$nb->packForget;
 # 			$app->update;
-			$adjuster->destroy;
+#			$adjuster->destroy;
 # 			$app->update;
-			my $tf = $nb->Subwidget('TabFrame');
-			my $offset = ($tf->cget('-borderwidth') + $nb->cget('-borderwidth')) * 2;
-			$nb->GeometryRequest($nb->width, $nb->Subwidget('TabFrame')->height + $offset);
+#			my $tf = $nb->Subwidget('TabFrame');
+#			my $offset = ($tf->cget('-borderwidth') + $nb->cget('-borderwidth')) * 2;
+#			$nb->GeometryRequest($nb->width, $nb->Subwidget('TabFrame')->height + $offset);
 # 			$nb->pack(-expand => 1, -fill => 'both');
 		},
 # 		-borderwidth => 2,
@@ -67,9 +67,9 @@ if (defined $app) {
 			-borderwidth => 3,
 		)->pack(-fill => 'y');
 	}
-	$nbf->pack(-fill => 'both');
- 	my $mfr = $app->Frame(-relief => 'groove', -borderwidth => 4)->pack(-expand => 1, -fill => 'both');
-	$mfr->Label(-text => '------')->pack;
+	$nbf->pack(-expand => 1, -fill => 'both');
+# 	my $mfr = $app->Frame(-relief => 'groove', -borderwidth => 4)->pack(-expand => 1, -fill => 'both');
+#	$mfr->Label(-text => '------')->pack;
 	$app->geometry('700x500+100+100');
 }
 

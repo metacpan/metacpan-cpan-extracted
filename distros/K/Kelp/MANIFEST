@@ -21,6 +21,7 @@ lib/Kelp/Less.pm
 lib/Kelp/Manual.pod
 lib/Kelp/Manual/Controllers.pod
 lib/Kelp/Manual/Cookbook.pod
+lib/Kelp/Middleware.pm
 lib/Kelp/Module.pm
 lib/Kelp/Module/Config.pm
 lib/Kelp/Module/Config/Less.pm

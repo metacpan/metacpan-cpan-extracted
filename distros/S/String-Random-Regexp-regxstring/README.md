@@ -4,7 +4,7 @@ String::Random::Regexp::regxstring - Generate random strings from a regular expr
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # SYNOPSIS
 
@@ -173,7 +173,7 @@ You can also look for information at:
 
 - Review this module at PerlMonks
 
-    not yet...
+    [https://perlmonks.org/?node\_id=11160309](https://perlmonks.org/?node_id=11160309)
 
 - Search CPAN
 

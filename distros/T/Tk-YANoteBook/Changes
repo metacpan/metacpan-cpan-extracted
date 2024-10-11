@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::YANoteBook.
 
+0.09  Thu Oct 10 2024
+	cover frame now disappears when page is unselected
+
 0.08  Sat Sep 28 2024
 	adjusted sizes of the name tabs and the more button
 	added options -tabpadx and -tabpady

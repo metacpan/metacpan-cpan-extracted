@@ -25,7 +25,18 @@ sub initialize {
         my $current_dir = path($dir)->parent(3);
         my $perl_native_lib;
 
-        my $arch = (uname())[4] =~ /64/ ? "X64" : "X86";
+        my $arch = do {
+            my $uname = (uname())[4];
+            if ($uname =~ /64/) {
+                "X64";
+            } elsif ($uname =~ /arm64|aarch64/) {
+                "ARM64";
+            } elsif ($uname =~ /arm/) {
+                "ARM";
+            } else {
+                "X86";
+            }
+        };
 
         if ($osname eq "linux") {
             $perl_native_lib = "Binaries/Native/Linux/$arch/libJavonetPerlRuntimeNative.so";

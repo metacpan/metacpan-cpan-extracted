@@ -1,5 +1,8 @@
 Revision history for Perl module DateTime::Format::Intl
 
+v0.1.4 2024-10-10T22:54:15+0900
+    - Improved handling of number systems
+
 v0.1.3 2024-10-09T21:12:27+0900
     - Improved documentation
 

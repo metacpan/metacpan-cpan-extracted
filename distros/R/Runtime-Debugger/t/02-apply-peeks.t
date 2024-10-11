@@ -4,7 +4,7 @@ package MyTest;
 
 use 5.006;
 use strict;
-use Test::More tests => 3294;
+use Test::More tests => 3321;
 use Runtime::Debugger;
 use feature qw( say );
 
@@ -410,6 +410,14 @@ sub run_suite {
                 },
             },
         },
+        {
+            name     => "Get hash - %ENV",
+            input    => '$ENV{HOME}',
+            expected => {
+                apply_peeks => '${$Runtime::Debugger::PEEKS{qq(\%ENV)}}{HOME}',
+                eval_result => $ENV{HOME},
+            },
+        },
 
         # Quoted: "
         {
@@ -579,6 +587,15 @@ sub run_suite {
                 },
             },
         },
+        {
+            name     => "Double quoted hash key - %ENV",
+            input    => '"$ENV{HOME}"',
+            expected => {
+                apply_peeks =>
+                  '"${$Runtime::Debugger::PEEKS{qq(\%ENV)}}{HOME}"',
+                eval_result => $ENV{HOME},
+            },
+        },
 
         # Quoted: '
         {
@@ -745,6 +762,14 @@ sub run_suite {
                 vars_after  => sub {
                     is_deeply \%h, { a => 1, b => 2 }, shift;
                 },
+            },
+        },
+        {
+            name     => "Single quoted hash key - %ENV",
+            input    => q('$ENV{HOME}'),
+            expected => {
+                apply_peeks => q('$ENV{HOME}'),
+                eval_result => '$ENV{HOME}',
             },
         },
 

@@ -7,6 +7,8 @@ use warnings;
 use Statistics::Running::Tiny;
 use Test::More;
 
+our $VERSION = '0.04';
+
 my $num_tests = 0;
 
 my $RU1 = Statistics::Running::Tiny->new();

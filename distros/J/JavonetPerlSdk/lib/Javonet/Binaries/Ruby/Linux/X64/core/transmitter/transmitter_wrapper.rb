@@ -1,7 +1,18 @@
 module TransmitterWrapper
   extend FFI::Library
 
-  arch = FFI::Platform::ARCH == 'x86_64' ? 'X64' : 'X86'
+  arch = case FFI::Platform::ARCH
+         when 'x86_64'
+           'X64'
+         when 'x86'
+           'X86'
+         when 'arm'
+           'ARM'
+         when 'aarch64'
+           'ARM64'
+         else
+           raise "Unsupported architecture: #{FFI::Platform::ARCH}"
+         end
 
   if OS.linux?
     ffi_lib File.expand_path("../../../Binaries/Native/Linux/#{arch}/libJavonetRubyRuntimeNative.so", __FILE__)

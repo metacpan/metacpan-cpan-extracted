@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-stripe
 
+1.00 2024-10-11T00:41:23Z
+
+    - version 1.00
+
 0.9903 2024-10-08T07:51:28Z
 
     - include i18n documents

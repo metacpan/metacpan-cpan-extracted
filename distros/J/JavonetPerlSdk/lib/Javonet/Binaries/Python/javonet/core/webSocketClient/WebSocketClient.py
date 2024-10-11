@@ -1,4 +1,3 @@
-import asyncio
 import struct
 from websockets.sync.client import connect
 

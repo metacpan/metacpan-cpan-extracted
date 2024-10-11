@@ -112,8 +112,9 @@ my $tests =
                 year => 'numeric',
                 month => 'numeric',
                 day => 'numeric',
+                # number system 'jpanfin' is actually ignored in web browsers, because it is not commonly used for datetime formatting
                 locale => 'ja-Kana-JP-u-ca-gregory-nu-jpanfin-tz-jptyo',
-                numberingSystem => 'jpanfin',
+                numberingSystem => 'latn',
                 # The time zone passed as option takes precedence over the locale 'ca' extension
                 timeZone => 'Europe/Zurich',
             },
@@ -129,10 +130,27 @@ my $tests =
                 year => 'numeric',
                 month => 'numeric',
                 day => 'numeric',
+                # number system 'jpanfin' is actually ignored in web browsers, because it is not commonly used for datetime formatting
                 locale => 'ja-Kana-JP-u-ca-gregory-nu-jpanfin-tz-jptyo',
-                numberingSystem => 'jpanfin',
+                numberingSystem => 'latn',
                 # The time zone passed as option takes precedence over the locale 'ca' extension
                 timeZone => 'Asia/Tokyo',
+            },
+    },
+    # NOTE: ar-EG-u-ca-gregory-nu-arab-tz-egcai -> {}
+    {
+        locale => 'ar-EG-u-ca-gregory-nu-arab-tz-egcai',
+        options => {},
+        expects => 
+            {
+                calendar => 'gregorian',
+                year => 'numeric',
+                month => 'numeric',
+                day => 'numeric',
+                locale => 'ar-EG-u-ca-gregory-nu-arab-tz-egcai',
+                numberingSystem => 'arab',
+                # The time zone passed as option takes precedence over the locale 'ca' extension
+                timeZone => 'Africa/Cairo',
             },
     },
     # Checking all 47 possibilities

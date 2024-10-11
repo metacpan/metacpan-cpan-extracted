@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use overload
 	'+' => \&concatenate,
@@ -41,6 +41,9 @@ sub     new {
 sub     add {
 	my $self = $_[0];
 	my $x = $_[1];
+
+	# ADDED 22/02/2019
+	if( ! defined $x ){ print STDERR "add() : attempted to push undefined value."; return }
 
 	my $aref = ref($x);
 
@@ -245,12 +248,12 @@ __END__
 
 =head1 NAME
 
-Statistics::Running::Tiny - Basic descriptive statistics (mean/stdev/min/max/skew/kurtosis) over data without the need to store data points ever. OOP style.
+Statistics::Running::Tiny - Basic descriptive statistics (mean/stdev/min/max/skew/kurtosis) over data without the need to store data points ever. OOP style. The Tiny version.
 
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 
 =head1 SYNOPSIS
@@ -549,9 +552,9 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-Running>
 
 L<http://annocpan.org/dist/Statistics-Running>
 
-=item * CPAN Ratings
+=item * Review this module at PerlMonks
 
-L<http://cpanratings.perl.org/d/Statistics-Running>
+L<https://www.perlmonks.org/?node_id=21144>
 
 =item * Search CPAN
 

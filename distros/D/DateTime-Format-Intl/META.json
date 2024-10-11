@@ -33,8 +33,8 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.42",
-            "DateTime::Format::Unicode" : "v0.1.3",
-            "DateTime::Locale::FromCLDR" : "v0.4.3",
+            "DateTime::Format::Unicode" : "v0.1.5",
+            "DateTime::Locale::FromCLDR" : "v0.6.0",
             "Locale::Intl" : "v0.1.2",
             "Locale::Unicode::Data" : "v1.0.4",
             "POSIX" : "0",
@@ -68,6 +68,6 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Format-Intl"
       }
    },
-   "version" : "v0.1.3",
+   "version" : "v0.1.4",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

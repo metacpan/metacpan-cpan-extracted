@@ -8,7 +8,7 @@ Pre-Requirements
 ----------------
 
 On Debian:
-$ apt-get install libdist-zilla-plugins-cjm-perl libdist-zilla-plugin-git-per libdist-zilla-plugin-repository-perl libdist-zilla-plugin-podweaver-perl
+$ apt-get install libdist-zilla-plugins-cjm-perl libdist-zilla-plugin-git-perl libdist-zilla-plugin-repository-perl libdist-zilla-plugin-podweaver-perl
 
 
 Building

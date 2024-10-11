@@ -16,8 +16,7 @@
    "no_index" : {
       "directory" : [
          "t",
-         "xt",
-         "docs"
+         "xt"
       ]
    },
    "prereqs" : {
@@ -54,7 +53,7 @@
    "provides" : {
       "App::Greple::stripe" : {
          "file" : "lib/App/Greple/stripe.pm",
-         "version" : "0.9903"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -69,7 +68,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-stripe"
       }
    },
-   "version" : "0.9903",
+   "version" : "1.00",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

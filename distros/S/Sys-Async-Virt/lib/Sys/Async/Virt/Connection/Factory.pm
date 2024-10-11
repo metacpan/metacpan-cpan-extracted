@@ -15,24 +15,26 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection::Factory v0.0.9;
+package Sys::Async::Virt::Connection::Factory v0.0.10;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 use Protocol::Sys::Virt::URI; # imports 'parse_url'
 
+our @default_drivers = (
+    { transport => '', class => 'Local', host => 0 },
+    { transport => 'unix', class => 'Local', host => 0 },
+    # { transport => '', class => 'TCP', host => 1 },
+    # { transport => 'tls', class => 'TCP' },
+    # { transport => 'tcp', class => 'TCP' },
+    { transport => 'ext', class => 'Process' },
+    { transport => 'ssh', class => 'SSH' },
+    );
+
 sub new {
     my ($class, %args) = @_;
     return bless {
-        drivers => [
-            { transport => '', class => 'Local', host => 0 },
-            { transport => 'unix', class => 'Local', host => 0 },
-            # { transport => '', class => 'TCP', host => 1 },
-            # { transport => 'tls', class => 'TCP' },
-            # { transport => 'tcp', class => 'TCP' },
-            # { transport => 'ext', class => 'Process' },
-            { transport => 'ssh', class => 'SSH' },
-            ],
+        drivers => $args{drivers} // \@default_drivers,
     }, $class;
 }
 
@@ -83,7 +85,7 @@ Sys::Async::Virt::Connection::Factory - Class for
 
 =head1 VERSION
 
-v0.0.9
+v0.0.10
 
 =head1 SYNOPSIS
 
@@ -104,6 +106,16 @@ v0.0.9
 
 This module provides a central entrypoint to instantiate connections to
 LibVirt servers for configured means of transport.
+
+=head1 VARIABLES
+
+=head2 @default_drivers
+
+  push @Sys::Async::Virt::Connection::Factory::default_drivers,
+    { transport => 'tls', class => 'TCP' };
+
+List of drivers to be used when no drivers have been provided to the
+factory's C<new> constructor.
 
 =head1 CONSTRUCTOR
 

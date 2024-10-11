@@ -1,5 +1,8 @@
 Revision history for Perl module DateTime::Format::Unicode
 
+v0.1.5 2024-10-10T20:17:50+0900
+    - Minor correction to align handling of number system closer to standard
+
 v0.1.4 2024-10-10T15:17:49+0900
     - Added support for number system other than latn
 

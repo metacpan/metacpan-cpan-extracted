@@ -7,7 +7,9 @@ Text::Password::AutoMigration - generate and verify Password with any contexts
 
     my $pwd = Text::Password::AutoMigration->new();
     my( $raw, $hash ) = $pwd->generate();          # list context is required
-    my $input = $req->body_parameters->{passwd};
+    my $input = $req->body_parameters->{passwd};　# in Plack
+       $input = $req->param('passwd');             # in CGI
+       $input = $raw;                              # in CLI
     my $data = $pwd->encrypt($input);              # you don't have to care about salt
     my $flag = $pwd->verify( $input, $data );
 
@@ -80,7 +82,7 @@ So you can replace hash in your Database easily like below:
     my $db_hash_ref = $dbh->fetchrow_hashref(...);
     my $param = $req->body_parameters;
 
-    my $hash = $pwd->verify( $param->{passwd}, $db_hash_ref->{passwd} );
+    my $hash = $pwd->verify( $param->{passwd} || $raw, $db_hash_ref->{passwd} );
     my $verified = length $hash;
     if ( $verified ) { # don't have to execute it every time
        my $sth = $dbh->prepare('UPDATE DB SET passwd=? WHERE uid =?') or die $dbh->errstr;

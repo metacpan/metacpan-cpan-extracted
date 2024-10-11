@@ -8,6 +8,7 @@ README.ZH.md
 README.md
 cpanfile
 docs/Makefile
+docs/PATTERN_MASK
 docs/README.md
 docs/stripe.JA.md
 docs/stripe.JA.pod

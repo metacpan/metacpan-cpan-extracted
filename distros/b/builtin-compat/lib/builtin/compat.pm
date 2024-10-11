@@ -2,7 +2,7 @@ package builtin::compat;
 use strict;
 use warnings;
 
-our $VERSION = '0.003001';
+our $VERSION = '0.003002';
 $VERSION =~ tr/_//d;
 
 use namespace::clean ();
@@ -181,7 +181,16 @@ while (my ($sub, $fb) = splice @fb, 0, 2) {
   }
 
   if (!defined &{'builtin::'.$sub}) {
-    *{'builtin::'.$sub} = \&$sub;
+    my $subref = \&$sub;
+    if ($] < '5.038000' && (ref $fb || prototype($subref) eq '')) {
+      require Scalar::Util;
+      my $wrap = sub { goto &$subref };
+      Scalar::Util::set_prototype(\&$wrap, prototype($subref));
+      *{'builtin::'.$sub} = $wrap;
+    }
+    else {
+      *{'builtin::'.$sub} = $subref;
+    }
   }
 }
 

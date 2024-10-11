@@ -33,7 +33,7 @@ use feature qw( say );
 use parent  qw( Exporter );
 use subs    qw( uniq );
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 our @EXPORT  = qw( run repl d dd np p );
 our %PEEKS;
 
@@ -508,8 +508,11 @@ sub _set_peeks {
     my $peek_our = peek_our( $levels );
     my $peek_my  = peek_my( $levels );
 
-    # Add a reference to the repl.
+    # Add predefined references.
     $peek_my->{'$repl'} = \$self;
+    $peek_our->{'%ENV'} = \%ENV;
+    $peek_our->{'%INC'} = \%INC;
+    $peek_our->{'@INC'} = \@INC;
 
     # Link for cleaner access later.
     %PEEKS = ( %$peek_our, %$peek_my );
@@ -1383,7 +1386,7 @@ sub _restore_history {
             return;
         }
         $all //= {};
-        @history = @{$all->{history} //= [] };
+        @history = @{ $all->{history} //= [] };
     }
 
     @history = ( "q" ) if not @history;    # avoid blank history.

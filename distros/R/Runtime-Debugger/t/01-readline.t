@@ -82,58 +82,73 @@ sub _setup_testmode_debugger {
     $_repl;
 }
 
+sub uniq {
+    my %h;
+    grep { !$h{$_}++ } @_;
+}
+
 sub _define_expected_vars {
     my ( $_repl ) = @_;
 
-    {
-        commands              => [ 'd', 'dd', 'help', 'hist', 'p', 'q' ],
-        commands_and_vars_all => [
-            '$my_array',     '$my_arrayref', '$my_coderef', '$my_hash',
-            '$my_hashref',   '$my_obj',      '$my_str',     '$our_array',
-            '$our_arrayref', '$our_coderef', '$our_hash',   '$our_hashref',
-            '$our_obj',      '$our_str',     '$repl',       '%my_hash',
-            '%our_hash',     '@my_array',    '@my_hash',    '@our_array',
-            '@our_hash',     'd', 'dd',            'help',        'hist',
-            'p',             'q',
-        ],
-        debug        => 0,
-        history_file => "$ENV{HOME}/.runtime_debugger_testmode.info",
-        vars_all     => [
-            '$my_array',     '$my_arrayref', '$my_coderef', '$my_hash',
-            '$my_hashref',   '$my_obj',      '$my_str',     '$our_array',
-            '$our_arrayref', '$our_coderef', '$our_hash',   '$our_hashref',
-            '$our_obj',      '$our_str',     '$repl',       '%my_hash',
-            '%our_hash',     '@my_array',    '@my_hash',    '@our_array',
-            '@our_hash'
-        ],
-        vars_array    => [ '@my_array', '@my_hash', '@our_array', '@our_hash' ],
-        vars_arrayref => [ '$my_arrayref', '$our_arrayref' ],
-        vars_code     => [ '$my_coderef',  '$our_coderef' ],
-        vars_global   => [
-            '$our_arrayref', '$our_coderef', '$our_hashref', '$our_obj',
-            '$our_str',      '%our_hash',    '@our_array'
-        ],
-        vars_hash    => [ '%my_hash',    '%our_hash' ],
-        vars_hashref => [ '$my_hashref', '$our_hashref' ],
-        vars_lexical => [
-            '$my_arrayref', '$my_coderef', '$my_hashref', '$my_obj',
-            '$my_str',      '$repl',       '%my_hash',    '@my_array'
-        ],
+    my @vars_scalar = (
+        '$ENV',        '$INC',         '$my_array',     '$my_arrayref',
+        '$my_coderef', '$my_hash',     '$my_hashref',   '$my_obj',
+        '$my_str',     '$our_array',   '$our_arrayref', '$our_coderef',
+        '$our_hash',   '$our_hashref', '$our_obj',      '$our_str',
+        '$repl',
+    );
+    my @vars_string = ( '$my_str', '$our_str' );
+    my @vars_ref    = (
+        '$my_arrayref',  '$my_coderef',  '$my_hashref',  '$my_obj',
+        '$our_arrayref', '$our_coderef', '$our_hashref', '$our_obj',
+        '$repl'
+    );
+    my @vars_arrayref = ( '$my_arrayref', '$our_arrayref' );
+    my @vars_hashref  = ( '$my_hashref',  '$our_hashref' );
+    my @vars_code     = ( '$my_coderef',  '$our_coderef' );
+    my @vars_obj      = ( '$my_obj',      '$our_obj', '$repl' );
+    my @vars_ref_else = ();
 
-        vars_obj => [ '$my_obj', '$our_obj', '$repl' ],
-        vars_ref => [
-            '$my_arrayref',  '$my_coderef',  '$my_hashref',  '$my_obj',
-            '$our_arrayref', '$our_coderef', '$our_hashref', '$our_obj',
-            '$repl'
-        ],
-        vars_ref_else => [],
-        vars_scalar   => [
-            '$my_array',     '$my_arrayref', '$my_coderef', '$my_hash',
-            '$my_hashref',   '$my_obj',      '$my_str',     '$our_array',
-            '$our_arrayref', '$our_coderef', '$our_hash',   '$our_hashref',
-            '$our_obj',      '$our_str',     '$repl',
-        ],
-        vars_string => [ '$my_str', '$our_str', ],
+    my @vars_array =
+      ( '@ENV', '@INC', '@my_array', '@my_hash', '@our_array', '@our_hash' );
+
+    my @vars_hash = ( '%ENV', '%INC', '%my_hash', '%our_hash' );
+
+    my @vars_lexical = (
+        '$my_arrayref', '$my_coderef', '$my_hashref', '$my_obj',
+        '$my_str',      '$repl',       '%my_hash',    '@my_array'
+    );
+    my @vars_global = (
+        '$our_arrayref', '$our_coderef', '$our_hashref', '$our_obj',
+        '$our_str',      '%ENV',         '%INC',         '%our_hash',
+        '@INC',          '@our_array'
+    );
+    my @vars_all = (
+        uniq sort { $a cmp $b } @vars_lexical,
+        @vars_global, @vars_scalar, @vars_array, @vars_hash,
+    );
+
+    my @commands              = ( 'd', 'dd', 'help', 'hist', 'p', 'q' );
+    my @commands_and_vars_all = ( sort { $a cmp $b } @commands, @vars_all );
+
+    {
+        debug                 => 0,
+        history_file          => "$ENV{HOME}/.runtime_debugger_testmode.info",
+        vars_scalar           => \@vars_scalar,
+        vars_string           => \@vars_string,
+        vars_ref              => \@vars_ref,
+        vars_arrayref         => \@vars_arrayref,
+        vars_hashref          => \@vars_hashref,
+        vars_code             => \@vars_code,
+        vars_obj              => \@vars_obj,
+        vars_ref_else         => \@vars_ref_else,
+        vars_array            => \@vars_array,
+        vars_hash             => \@vars_hash,
+        vars_lexical          => \@vars_lexical,
+        vars_global           => \@vars_global,
+        vars_all              => \@vars_all,
+        commands              => \@commands,
+        commands_and_vars_all => \@commands_and_vars_all,
     };
 }
 
@@ -299,7 +314,7 @@ sub _define_test_cases {
             input            => 'd' . $TAB,
             expected_results => {
                 line   => 'd',
-                comp => [ 'd', 'dd' ],
+                comp   => [ 'd', 'dd' ],
                 stdout => [],
             },
         },
@@ -309,11 +324,11 @@ sub _define_test_cases {
             expected_results => {
                 comp   => $_repl->{vars_all},
                 line   => 'd',
-                comp => [ 'd', 'dd' ],
+                comp   => [ 'd', 'dd' ],
                 stdout => [],
             },
         },
-        
+
         # Devel::Peek Dump.
         {
             name             => 'Devel::Peek Dump TAB complete: "d<TAB>"',

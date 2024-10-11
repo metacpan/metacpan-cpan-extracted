@@ -103,6 +103,11 @@ NOTES
     A mixin will not warn if the mixin and the user define the same method.
 
 AUTHOR
+    Current ( ~ 2024 ) maintainer: Shlomi Fish (
+    <https://www.shlomifish.org/me/contact-me/> ).
+
+    Original author/maintainer:
+
     Michael G Schwern <schwern@pobox.com>
 
 LICENSE
@@ -112,6 +117,8 @@ LICENSE
     under the same terms as Perl itself.
 
     <http://dev.perl.org/licenses/>
+
+    Shlomi Fish disclaims all copyright ownership to his changes.
 
 SEE ALSO
     Role::Tiny - A stand alone implementation of traits/roles, like mixins

@@ -7,7 +7,7 @@
 */
 
 /*
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 */
 
 #ifdef __cplusplus

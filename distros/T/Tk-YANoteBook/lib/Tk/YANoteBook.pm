@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 use Tk;
 require Tk::YANoteBook::NameTab;
@@ -332,13 +332,18 @@ sub ConfigureCall {
 	$self->UpdateTabs;
 }
 
+sub CoverClear {
+	my $self = shift;
+	my $cover = $self->{COVERFRAME};
+	return unless defined $cover;
+	$cover->placeForget;
+}
+
 sub CoverUp {
 	my $self = shift;
-	my $curcover = $self->{COVERFRAME};
-	if (defined $curcover) {
-		$curcover->destroy;
-		$self->{COVERFRAME} = undef;
-	}
+	$self->CoverClear;
+	my $cover = $self->{COVERFRAME};
+	$cover = $self->Subwidget('BarFrame')->Frame unless defined $cover;
 	
 	my $page = $self->Selected;
 	return unless defined $page;
@@ -369,16 +374,17 @@ sub CoverUp {
 		$cx = - $tbw;
 		$cy =  $tab->y + $tbw;
 	}
-	my $cf = $self->Subwidget('BarFrame')->Frame(
+	$cover->configure(
 #		-background => 'red',
 		-height => $cheight,
 		-width => $cwidth,
-	)->place(
+	);
+	$cover->place(
 		-x => $cx,
 		-y => $cy,
 	);
-	$cf->raise;
-	$self->{COVERFRAME} = $cf;
+	$cover->raise;
+	$self->{COVERFRAME} = $cover;
 }
 
 =item B<deletePage>I<($name)>
@@ -788,7 +794,8 @@ sub unselectPage {
 		);
 		$frame->packForget;
 		$self->{SELECTED} = undef;
-		$self->Subwidget('PageFrame')->packForget unless $self->cget('-rigid');;
+		$self->Subwidget('PageFrame')->packForget unless $self->cget('-rigid');
+		$self->CoverClear;
 		$self->Callback('-unselecttabcall', $name);
 	}
 }

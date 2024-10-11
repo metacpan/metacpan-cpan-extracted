@@ -13,13 +13,14 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
  
 sub alien_helper {
   my($class) = @_;
   return {
-    ruby => sub { $class->ruby_exe },
-    gem  => sub { $class->gem_exe  },
+    ruby   => sub { $class->ruby_exe   },
+    gem    => sub { $class->gem_exe    },
+    bundle => sub { $class->bundle_exe }
   };
 }
 
@@ -29,6 +30,10 @@ sub ruby_exe {
 
 sub gem_exe {
     'gem';
+}
+
+sub bundle_exe {
+    'bundle';
 }
 
 1;
@@ -50,7 +55,7 @@ Alien::Ruby - Find or install Ruby
  system(q(ruby -e 'puts "Hello from Ruby!"'));
 
  system('gem install pry');
- 
+
 =head1 DESCRIPTION
  
 This distribution provides the Ruby programming language so that it can be used
@@ -60,11 +65,12 @@ found, the Ruby source code will be downloaded from the internet and it will be
 compiled and installed to a private share location for the use of other Perl
 modules.
 
-=head1 GEM
+=head1 GEM / BUNDLER
 
-Because RubyGems is included with Ruby, and the C<gem> executable is installed
-into the same directory as the <ruby> executable, you can use Alien::Ruby as if
-it were Alien::Gem.
+Because RubyGems (since Ruby 1.9) and Bundler (since Ruby 2.6) are included with
+Ruby, and the C<gem> and C<bundle> executables are installed into the same
+directory as the C<ruby> executable, you can use Alien::Ruby as if it were
+Alien::Gem or Alien::Bundler.
 
 Please be mindful of the C<$ENV{GEM_HOME}> and C<$ENV{GEM_PATH}> environment
 variables. These variables will change the default locations where Gem's can be
@@ -78,6 +84,26 @@ environment variable before installing Alien::Ruby:
   $ ALIEN_RUBY_VERSION=2.7.7 cpanm Alien::Ruby
 
 The minimum supported Ruby version is 2.1.0.
+
+=head1 HELPERS
+
+=head2 ruby
+
+ %{ruby}
+
+Returns the name of the ruby command which is just 'ruby'.
+
+=head2 gem
+
+ %{gem}
+
+Returns the name of the gem command which is just 'gem'.
+
+=head2 bundle
+
+ %{bundle}
+
+Returns the name of the bundle command which is just 'bundle'.
 
 =head1 WINDOWS
 

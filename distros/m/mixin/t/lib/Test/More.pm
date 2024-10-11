@@ -334,9 +334,6 @@ sub isnt ($$;$) {
     $Test->isnt_eq(@_);
 }
 
-*isn't = \&isnt;
-
-
 =item B<like>
 
   like( $this, qr/that/, $test_name );

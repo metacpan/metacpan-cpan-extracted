@@ -81,6 +81,7 @@ t/templates/Xslate/with-include/hellos-in-subdir.txt.tx
 t/templates/Xslate/with-include/hellos.txt.tx
 t/templates/Xslate/with-include/subdir/hello-in-subdir.txt.tx
 xt/810-format-complex.t
+xt/890-check-remaining-tempfiles.t
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

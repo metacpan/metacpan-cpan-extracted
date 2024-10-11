@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## DateTime::Format::Unicode - ~/lib/DateTime/Format/Unicode.pm
-## Version v0.1.4
+## Version v0.1.5
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/21
@@ -26,7 +26,7 @@ BEGIN
     use POSIX ();
     use Scalar::Util;
     use Want;
-    our $VERSION = 'v0.1.4';
+    our $VERSION = 'v0.1.5';
 };
 
 use strict;
@@ -95,7 +95,7 @@ sub new
             return( $self->error( "No default pattern (medium date format) available for locale ${locale} in DateTime::Locale::FromCLDR" ) );
     }
     my $ns_ref = $unicode->locale_number_system;
-    my $ns = $ns_ref->[0] || 'latn';
+    my $ns = $ns_ref->[0] || $unicode->number_system;
     my $ns_digits = ( $ns_ref->[1] && ref( $ns_ref->[1] ) eq 'ARRAY' && scalar( @{$ns_ref->[1]} ) ) ? $ns_ref->[1] : [0..9];
     $self->{_number_system} = $ns;
     $self->{_number_system_digits} = $ns_digits;
@@ -105,7 +105,7 @@ sub new
     {
         my $systems = $unicode->number_systems;
         # 'latn' is always supported by all locale as per the LDML specifications
-        if( $num_sys eq 'latn' || scalar( grep( $systems->{ $_ } eq $num_sys, qw( number_system finance native traditional ) ) ) )
+        if( $num_sys eq 'latn' || scalar( grep( ( $systems->{ $_ } // '' ) eq $num_sys, qw( number_system native ) ) ) )
         {
             $self->{_number_system} = $num_sys;
             my $digits = $unicode->number_system_digits( $num_sys ) ||
@@ -1604,6 +1604,9 @@ sub _get_args_as_hash
     return( $ref );
 }
 
+# We localise the numerals
+# "The digits should be whatever are appropriate for the locale used to format the time zone, not necessarily from the western digits, 0..9. For example, they might be from ०..९."
+# <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
 sub _localise_digits
 {
     my $self = shift( @_ );
@@ -1973,7 +1976,7 @@ You can also override the C<locale>'s default number system, by another one, as 
 
 =head1 VERSION
 
-    v0.1.4
+    v0.1.5
 
 =head1 DESCRIPTION
 

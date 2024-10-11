@@ -23,7 +23,7 @@ POSTAMBLE
 #	prove --blib --verbose $^
 
 WriteMakefile(
-#   INSTALL_BASE      => "$ENV{HOME}/usr",
+   INSTALL_BASE      => "$ENV{HOME}/usr",
     NAME	     => 'Statistics::Running::Tiny',
     AUTHOR	   => q{Andreas Hadjiprocopis <bliako@cpan.org>},
     VERSION_FROM     => 'lib/Statistics/Running/Tiny.pm',
@@ -33,6 +33,9 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.006',
     CONFIGURE_REQUIRES => {
 	'ExtUtils::MakeMaker' => '0',
+    },
+    TEST_REQUIRES => {
+	'Test::More' => '0',
     },
     BUILD_REQUIRES => {
 	'Test::More' => '0',

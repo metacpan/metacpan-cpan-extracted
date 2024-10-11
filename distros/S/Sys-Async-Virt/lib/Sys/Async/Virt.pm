@@ -18,7 +18,7 @@ use Feature::Compat::Try;
 use Future::AsyncAwait;
 use Sublike::Extended; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-package Sys::Async::Virt v0.0.9;
+package Sys::Async::Virt v0.0.10;
 
 use parent qw(IO::Async::Notifier);
 
@@ -36,22 +36,22 @@ use Protocol::Sys::Virt::Remote v10.3.13;
 use Protocol::Sys::Virt::Transport v10.3.13;
 use Protocol::Sys::Virt::URI v10.3.13; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.0.9;
-use Sys::Async::Virt::Domain v0.0.9;
-use Sys::Async::Virt::DomainCheckpoint v0.0.9;
-use Sys::Async::Virt::DomainSnapshot v0.0.9;
-use Sys::Async::Virt::Network v0.0.9;
-use Sys::Async::Virt::NetworkPort v0.0.9;
-use Sys::Async::Virt::NwFilter v0.0.9;
-use Sys::Async::Virt::NwFilterBinding v0.0.9;
-use Sys::Async::Virt::Interface v0.0.9;
-use Sys::Async::Virt::StoragePool v0.0.9;
-use Sys::Async::Virt::StorageVol v0.0.9;
-use Sys::Async::Virt::NodeDevice v0.0.9;
-use Sys::Async::Virt::Secret v0.0.9;
+use Sys::Async::Virt::Connection::Factory v0.0.10;
+use Sys::Async::Virt::Domain v0.0.10;
+use Sys::Async::Virt::DomainCheckpoint v0.0.10;
+use Sys::Async::Virt::DomainSnapshot v0.0.10;
+use Sys::Async::Virt::Network v0.0.10;
+use Sys::Async::Virt::NetworkPort v0.0.10;
+use Sys::Async::Virt::NwFilter v0.0.10;
+use Sys::Async::Virt::NwFilterBinding v0.0.10;
+use Sys::Async::Virt::Interface v0.0.10;
+use Sys::Async::Virt::StoragePool v0.0.10;
+use Sys::Async::Virt::StorageVol v0.0.10;
+use Sys::Async::Virt::NodeDevice v0.0.10;
+use Sys::Async::Virt::Secret v0.0.10;
 
-use Sys::Async::Virt::Callback v0.0.9;
-use Sys::Async::Virt::Stream v0.0.9;
+use Sys::Async::Virt::Callback v0.0.10;
+use Sys::Async::Virt::Stream v0.0.10;
 
 use constant {
     CLOSE_REASON_ERROR                                 => 0,
@@ -903,7 +903,7 @@ sub new($class, %args) {
         node_device_factory       => \&_node_device_factory,
         secret_factory            => \&_secret_factory,
 
-        url        => $args{url},
+        url        => $args{url} // $ENV{LIBVIRT_DEFAULT_URI},
         readonly   => $args{readonly},
         connection => $args{connection},
         transport  => $args{transport},
@@ -919,9 +919,19 @@ sub new($class, %args) {
 }
 
 sub _domain_instance($self, $id) {
-    my $c = $self->{_domains}->{$id->{uuid}}
+    # Use $id->{id} as part of the cache key so we return a different domain
+    # instance between the cases where the server includes an 'id' and where
+    # it does not, such as:
+    #   my ($off_dom) = $virt->list_all_domains->@*;
+    #   my $on_dom = $off_dom->create;
+    #
+    # Here, $off_dom does not have an 'id' value. $on_dom has been assigned
+    # an 'id' because it's running.
+    my $dom_id = $id->{id} // '';
+    my $key = "$dom_id/$id->{uuid}";
+    my $c = $self->{_domains}->{$key}
        //= $self->{domain_factory}->( client => $self, remote => $self->{remote}, id => $id );
-    weaken $self->{_domains}->{$id->{uuid}};
+    weaken $self->{_domains}->{$key};
     return $c;
 }
 
@@ -1007,7 +1017,7 @@ sub _secret_instance($self, $id) {
 }
 
 extended async sub _call($self, $proc, $args = {}, :$unwrap = '', :$stream = '', :$empty = '') {
-    die 'RPC call without remote connection'
+    die $log->fatal( "RPC call without remote connection (proc: $proc)" )
         unless $self->is_connected;
     my $serial = await $self->{remote}->call( $proc, $args );
     my $f = $self->loop->new_future;
@@ -1031,6 +1041,14 @@ extended async sub _call($self, $proc, $args = {}, :$unwrap = '', :$stream = '',
         push @rv, $s;
     }
     return @rv;
+}
+
+async sub _maplen($self) {
+    return $self->{_maplen} if $self->{_maplen};
+
+    my $info = await $self->node_get_info;
+    return ($self->{_maplen} =
+            $info->{nodes}*$info->{sockets}*$info->{cores}*$info->{threads});
 }
 
 async sub _send($self, $proc, $serial, %args) {
@@ -1164,6 +1182,14 @@ sub is_opened($self) {
             and $self->{_substate} eq 'OPENED');
 }
 
+# ENTRYPOINT: REMOTE_PROC_CONNECT_IS_SECURE
+async sub is_secure($self) {
+    return ($self->is_opened
+        and $self->{connection}->is_secure
+        and await $self->_call( $remote->PROC_CONNECT_IS_SECURE,
+                                {}, unwrap => 'secure' ));
+}
+
 extended async sub connect($self, :$pump = undef) {
     return if $self->{_state} ne 'DISCONNECTED';
 
@@ -1208,6 +1234,7 @@ extended async sub connect($self, :$pump = undef) {
         sub {
             $self->_close( $self->CLOSE_REASON_ERROR );
         });
+    $self->{_input_pump_future} = $f;
 
     $self->{_substate} = 'AUTHENTICATING';
     await $self->auth();
@@ -1246,7 +1273,9 @@ extended async sub connect($self, :$pump = undef) {
                 }
             }
         };
-        $self->adopt_future( $keep_pump->() );
+        my $f = $keep_pump->();
+        $self->adopt_future( $f );
+        $self->{_keepalive_pump_future} = $f;
     }
 
     $self->{_substate} = 'OPENING';
@@ -1262,7 +1291,7 @@ extended async sub connect($self, :$pump = undef) {
 async sub domain_event_register_any($self, $eventID, $domain = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_DOMAIN_EVENT_CALLBACK_REGISTER_ANY,
-        { eventID => $eventID, dom => $domain });
+        { eventID => $eventID, dom => $domain->{id} });
     my $dereg = $remote->PROC_CONNECT_DOMAIN_EVENT_CALLBACK_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
@@ -1281,7 +1310,7 @@ async sub domain_event_register_any($self, $eventID, $domain = undef) {
 async sub network_event_register_any($self, $eventID, $network = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_NETWORK_EVENT_REGISTER_ANY,
-        { eventID => $eventID, net => $network });
+        { eventID => $eventID, net => $network->{id} });
     my $dereg = $remote->PROC_CONNECT_NETWORK_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
@@ -1299,7 +1328,7 @@ async sub network_event_register_any($self, $eventID, $network = undef) {
 async sub storage_pool_event_register_any($self, $eventID, $pool = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_STORAGE_POOL_EVENT_REGISTER_ANY,
-        { eventID => $eventID, pool => $pool });
+        { eventID => $eventID, pool => $pool->{id} });
     my $dereg = $remote->PROC_CONNECT_STORAGE_POOL_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
@@ -1317,7 +1346,7 @@ async sub storage_pool_event_register_any($self, $eventID, $pool = undef) {
 async sub node_device_event_register_any($self, $eventID, $dev = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_NODE_DEVICE_EVENT_REGISTER_ANY,
-        { eventID => $eventID, dev => $dev });
+        { eventID => $eventID, dev => $dev->{id} });
     my $dereg = $remote->PROC_CONNECT_NODE_DEVICE_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
@@ -1335,7 +1364,7 @@ async sub node_device_event_register_any($self, $eventID, $dev = undef) {
 async sub secret_event_register_any($self, $eventID, $secret = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_SECRET_EVENT_REGISTER_ANY,
-        { eventID => $eventID, secret => $secret });
+        { eventID => $eventID, secret => $secret->{id} });
     my $dereg = $remote->PROC_CONNECT_SECRET_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
@@ -1420,7 +1449,7 @@ async sub open($self) {
 async sub _close($self, $reason) {
     return unless $self->{_state} eq 'CONNECTED';
 
-    $self->{_state} = 'CLEANING UP';
+    $self->{_substate} = 'CLEANING UP';
     unless ($self->{connection}->is_read_eof
             or $self->{connection}->is_write_eof) {
         # when orderly connected both for reading and writing,
@@ -1428,21 +1457,31 @@ async sub _close($self, $reason) {
         try {
             await Future->wait_all(
                 (map { $_->cancel }
-                 values $self->{_callbacks}->%*),
+                 grep values $self->{_callbacks}->%*),
                 (map { $_->abort }
-                 values $self->{_streams}->%*)
+                 grep values $self->{_streams}->%*)
                 );
+            $log->debug( 'Unregistering CLOSE CALLBACK' );
             await $self->_call(
                 $remote->PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK );
 
-            $self->{_state} = 'CLOSING';
-            await $self->_call( $remote->PROC_CONNECT_CLOSE, {} );
+            $log->debug( 'Closing session' );
+            $self->{_substate} = 'CLOSING';
+            await $self->_call( $remote->PROC_CONNECT_CLOSE );
 
+            # stop loops reading from and writing to the connection
+            $self->{_input_pump_future}->cancel;
+            $self->{_keepalive_pump_future}->cancel;
             $self->{connection}->close;
         }
         catch ($e) {
             $log->error( "Error during release of server resources: $e" );
         }
+    }
+    else {
+        # stop loops reading from and writing to the connection
+        $self->{_input_pump_future}->cancel;
+        $self->{_keepalive_pump_future}->cancel;
     }
 
     # These *should* have been de-allocated above; however,
@@ -1456,14 +1495,14 @@ async sub _close($self, $reason) {
             $cb->cleanup;
         }
     }
-    if (my @streams = values $self->{_streams}->%*) {
+    if (my @streams = grep values $self->{_streams}->%*) {
         $log->debug( 'Cleaning up streams not deregistered from the server' );
         for my $stream (@streams) {
             # 'cleanup' cleans the items from the array
             $stream->cleanup;
         }
     }
-    if (my @replies = keys $self->{_replies}->%*) {
+    if (my @replies = grep keys $self->{_replies}->%*) {
         $log->debug( 'Cleaning up (failing) on-going RPC calls' );
         for my $serial (@replies) {
             my $reply = delete $self->{_replies}->{$serial};
@@ -2110,7 +2149,7 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.9
+v0.0.10
 
 Based on LibVirt tag v10.3.0
 
@@ -2124,8 +2163,7 @@ Based on LibVirt tag v10.3.0
 
   $loop->add( $client );
   await $client->connect;
-  await $client->auth( $remote->AUTH_NONE );
-  await $client->open( 'qemu:///system' );
+  my $domains = await $client->list_all_domains;
 
 
 =head1 DESCRIPTION
@@ -2198,14 +2236,6 @@ Receives all messages which either don't classify as a callback invocation
 for which no callback has been registered through one of the callback
 registration functions.
 
-=head2 on_stream
-
-  $on_stream->( @@@TODO );
-
-Receives all messages for which no stream has been instantiated and returned
-through the relevant API calls.
-
-
 =head2 on_close
 
   $on_close->( $client, $reason );
@@ -2261,7 +2291,7 @@ Returns a L<Sys::Async::Virt::Callback> instance.
 
 =head2 new
 
-  $client = Sys::Async::Virt->new( remote => $remote, ... );
+  $client = Sys::Async::Virt->new( url => $url, ... );
 
 Creates a new client instance.  The constructor supports these parameters:
 
@@ -2269,17 +2299,36 @@ Creates a new client instance.  The constructor supports these parameters:
 
 =item * C<factory> (optional)
 
+An instance of L<Sys::Async::Virt::Connection::Factory> or derived class. Not
+required when the C<connection> parameter is supplied.
+
 =item * C<connection> (optional)
+
+An instance of L<Sys::Async::Virt::Connection> or derived class.  The
+C<connect> method will be called to establish the actual connection.
 
 =item * C<transport> (optional)
 
+An instance of L<Protocol::Sys::Virt::Transport> or derived class configured
+to send the output through the C<connection> passed in.
+
 =item * C<remote> (optional)
+
+An instance of L<Protocol::Sys::Virt::Remote> or derived class configured
+in a C<client> role.  The C<remote> will be registered with the C<tranport>
+as part of the C<connect> procedure.
 
 =item * C<keepalive> (optional)
 
+An instance of L<Protocol::Sys::Virt::KeepAlive> or derived class configured
+to reply to PING messages using a PONG message as well as closing the
+C<connection> when the keepalive threshold is exceeded.
+
 =item * C<url> (optional)
 
-=item * C<on_stream> (optional)
+The URL of the hypervisor to connect to as per L<https://libvirt.org/uri.html>.
+
+When not supplied, defaults to the environment variable C<LIBVIRT_DEFAULT_URI>.
 
 =back
 
@@ -2293,9 +2342,14 @@ Creates a new client instance.  The constructor supports these parameters:
 
 =head2 connect
 
-  await $client->connect( $url );
+  await $client->connect( async sub pump($connection, $transport) { ... } );
 
-Sets up the transport connection to the server indicated by C<url>.
+Sets up the transport connection to the server, including authentication
+keep alive monitoring and close callback registration.
+
+Calls C<pump> to receive data from the C<$connection>, sending the received
+data into C<$transport>. The function should throw an exception in case of
+error or return in case of an C<End-Of-File (EOF)> condition.
 
 =head2 auth
 
@@ -2325,6 +2379,11 @@ by the server, is used.
 =head2 is_opened
 
   my $bool = $client->is_opened;
+
+
+=head2 is_secure
+
+  my $bool = await $client->is_secure;
 
 
 =head2 open
@@ -3550,25 +3609,14 @@ replies.
 
 =over 8
 
-=item * Updated SYNOPSIS
-
-=item * Update C<new> and C<connect> parameters documentation
-
-=item * Update the cached proxy instances (e.g. domains) after creation
-to include 'id' (e.g. domain 'id')
-
-Although this doesn't seem a prerequisite for the API to work correctly,
-it seems sloppy that there's no update of the domain 'id' when one becomes
-available when the domain is started. (Looking at the sources of LibVirt,
-the 'id' doesn't get cleared when the domain is destroyed???)
-
 =item * Modules implementing connections for various protocols (tcp, tls, etc)
 
 =item * C<@generate: none> entrypoints review (and implement relevant ones)
 
 =item * C<@generate: server> entrypoints review (and implement relevant ones)
 
-=item * libvirt client configuration (C</etc/libvirt/libvirt.conf>)
+=item * libvirt client configuration (C</etc/libvirt/libvirt.conf> (for C<root>
+ or C<$XDG_CONFIG_HOME/libvirt/libvirt.conf> (for other users))
 
 =back
 
@@ -3700,8 +3748,6 @@ towards implementation are greatly appreciated.
 =item * @generate: server (include/libvirt/libvirt-host.h)
 
 =over 8
-
-=item * REMOTE_PROC_CONNECT_IS_SECURE
 
 =item * REMOTE_PROC_NODE_GET_CELLS_FREE_MEMORY
 

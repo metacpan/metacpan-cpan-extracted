@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::LiveStats
+
+1.00  Wed Oct  9 02:58:14 UTC 2024
+	- original version; created by h2xs 1.23 with options
+		-AX -n Math::LiveStats
+
