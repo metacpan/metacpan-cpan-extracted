@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -23,13 +22,13 @@ is( $parser->from_string( "foo" ), "foo", 'Identifier' );
 
 is( $parser->from_string( "x" ), "x", 'Single-letter identifier' );
 
-is( exception { $parser->from_string( "123" ) },
+is( dies { $parser->from_string( "123" ) },
    qq[Expected ident on line 1 at:\n] .
    qq[123\n] .
    qq[^\n],
    'Exception from "123" failure' );
 
-ok( exception { $parser->from_string( "some-ident" ) }, '"some-ident" fails on default identifier' );
+ok( dies { $parser->from_string( "some-ident" ) }, '"some-ident" fails on default identifier' );
 
 $parser = TestParser->new(
    patterns => { ident => qr/[[:alpha:]_][\w-]+/ },

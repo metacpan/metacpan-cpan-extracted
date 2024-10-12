@@ -3,10 +3,13 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 my @positions;
 my @wheres;
+
+my $diemsg;
+my $warnmsg;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -18,7 +21,7 @@ package TestParser {
       main::is( $self->pos,
          $positions[0],
          '->pos before parsing' );
-      main::is_deeply( [ $self->where ],
+      main::is( [ $self->where ],
          $wheres[0],
          '->where before parsing' );
 
@@ -26,7 +29,7 @@ package TestParser {
       main::is( $self->pos,
          $positions[1],
          '->pos during parsing' );
-      main::is_deeply( [ $self->where ],
+      main::is( [ $self->where ],
          $wheres[1],
          '->where during parsing' );
 
@@ -34,9 +37,12 @@ package TestParser {
       main::is( $self->pos,
          $positions[2],
          '->pos after parsing' );
-      main::is_deeply( [ $self->where ],
+      main::is( [ $self->where ],
          $wheres[2],
          '->where after parsing' );
+
+      $self->die( $diemsg ) if $diemsg;
+      $self->warn( $warnmsg ) if $warnmsg;
 
       return 1;
    }
@@ -57,5 +63,19 @@ $parser->from_string( "hello world" );
    [ 1, 5, "hello" ],
    [ 2, 5, "world" ], );
 $parser->from_string( "hello\nworld" );
+
+{
+   $diemsg = "stop here";
+   like( dies { $parser->from_string( "hello\nworld" ) },
+      qr/^stop here on line 2 at:\nworld\n/, 'Exception from ->die failure' );
+   undef $diemsg;
+}
+
+{
+   $warnmsg = "note here";
+   is( warnings { $parser->from_string( "hello\nworld" ) },
+      [ match(qr/^note here on line 2 at:\nworld\n/) ],
+      'Warning from ->warn' );
+}
 
 done_testing;

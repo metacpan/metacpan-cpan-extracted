@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use lib ".";
 require "examples/parse-pod.pl";
@@ -14,7 +14,7 @@ sub test
 {
    my ( $str, $expect, $name ) = @_;
 
-   is_deeply( $parser->from_string( $str ), $expect, $name );
+   is( $parser->from_string( $str ), $expect, $name );
 }
 
 test "Plain text",

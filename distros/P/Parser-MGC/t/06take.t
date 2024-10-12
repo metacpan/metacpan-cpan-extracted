@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -19,7 +19,7 @@ package TestParser {
 
 my $parser = TestParser->new;
 
-is_deeply( $parser->from_string( "Hello There" ),
+is( $parser->from_string( "Hello There" ),
    [ "Hello", " Ther", "e" ],
    '"Hello There"' );
 

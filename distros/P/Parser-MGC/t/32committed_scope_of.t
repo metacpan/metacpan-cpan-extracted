@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 my $fallback;
 
@@ -32,7 +31,7 @@ my $parser = TestParser->new;
 
 is( $parser->from_string( "(123)" ), 123, '"(123)"' );
 
-ok( exception { $parser->from_string( "(abc)" ) }, '"(abc)"' );
+ok( dies { $parser->from_string( "(abc)" ) }, '"(abc)"' );
 ok( !$fallback, '"(abc) does not invoke fallback case' );
 
 done_testing;

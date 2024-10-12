@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -37,15 +36,15 @@ package TestParser2 {
 
 my $parser = TestParser->new;
 
-is_deeply( $parser->from_string( "123" ), [ int => 123 ], '"123"' );
-is_deeply( $parser->from_string( q["hi"] ), [ str => "hi" ], '"hi"' );
-is_deeply( $parser->from_string( "foobar" ), [ ident => "foobar" ], '"foobar"' );
+is( $parser->from_string( "123" ), [ int => 123 ], '"123"' );
+is( $parser->from_string( q["hi"] ), [ str => "hi" ], '"hi"' );
+is( $parser->from_string( "foobar" ), [ ident => "foobar" ], '"foobar"' );
 
-is( exception { $parser->from_string( "@" ) }, "Here I fail\n",
+is( dies { $parser->from_string( "@" ) }, "Here I fail\n",
    'Exception from "@" failure' );
 
-ok( exception { $parser->from_string( "+" ) }, '"+" fails' );
+ok( dies { $parser->from_string( "+" ) }, '"+" fails' );
 
-is_deeply( TestParser2->new->from_string( "456" ), [ int => 456 ], '"456" as method name' );
+is( TestParser2->new->from_string( "456" ), [ int => 456 ], '"456" as method name' );
 
 done_testing;

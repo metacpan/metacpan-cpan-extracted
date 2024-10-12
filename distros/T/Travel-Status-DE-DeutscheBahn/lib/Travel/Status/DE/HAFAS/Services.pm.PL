@@ -154,6 +154,7 @@ my %hafas_instance = (
 		micmac => 1,
 	},
 	KVB   => { load_instance( 'de/kvb', lang => 'deu' ), },
+	mobiliteit => { load_instance( 'lu/mobiliteit-lu', lang => 'deu' ) },
 	NAHSH => {
 		load_instance('de/nahsh'),
 		stopfinder => 'https://nah.sh.hafas.de/bin/ajax-getstop.exe',
@@ -230,7 +231,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '6.10';
+our $VERSION = '6.11';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

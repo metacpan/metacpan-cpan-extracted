@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -41,15 +40,15 @@ package TestParser {
 
 my $parser = TestParser->new( toplevel => "parse_hello" );
 
-is_deeply( $parser->from_string( "hello world" ),
+is( $parser->from_string( "hello world" ),
    [ "hello", "world" ],
    '"hello world"' );
 
-is_deeply( $parser->from_string( "  hello world  " ),
+is( $parser->from_string( "  hello world  " ),
    [ "hello", "world" ],
    '"  hello world  "' );
 
-is( exception { $parser->from_string( "goodbye world" ) },
+is( dies { $parser->from_string( "goodbye world" ) },
    qq[Expected (?^u:hello) on line 1 at:\n] . 
    qq[goodbye world\n] . 
    qq[^\n],
@@ -66,13 +65,13 @@ is( $parser->from_string( "Bar" ), "Bar", "FooBar parser first case" );
 
 $parser = TestParser->new( toplevel => "parse_numrange" );
 
-is_deeply( $parser->from_string( "123-456" ), [ 123, 456 ], "Number range parser complete" );
+is( $parser->from_string( "123-456" ), [ 123, 456 ], "Number range parser complete" );
 
 {
    my $warnings = "";
    local $SIG{__WARN__} = sub { $warnings .= join "", @_ };
 
-   is_deeply( $parser->from_string( "789" ), [ 789, undef ],   "Number range parser lacking max" );
+   is( $parser->from_string( "789" ), [ 789, undef ],   "Number range parser lacking max" );
    is( $warnings, "", "Number range lacking max yields no warnings" );
 }
 

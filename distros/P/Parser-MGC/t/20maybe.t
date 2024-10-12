@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 my $diemsg;
 
@@ -38,7 +37,7 @@ is( $parser->from_string( "hello" ), "hello", '"hello"' );
 is( $parser->from_string( "123" ), 123, '"123"' );
 
 $diemsg = "Now have to fail";
-is( exception { $parser->from_string( "456" ) },
+is( dies { $parser->from_string( "456" ) },
    qq[Now have to fail on line 1 at:\n] .
    qq[456\n] .
    qq[^\n],

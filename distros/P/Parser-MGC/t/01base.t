@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 my $STARTED;
 my $ENDED;
@@ -34,14 +34,13 @@ package TestParser {
 
 my $parser = TestParser->new;
 
-isa_ok( $parser, "TestParser", '$parser' );
-isa_ok( $parser, "Parser::MGC", '$parser' );
+isa_ok( $parser, [ "TestParser", "Parser::MGC" ], '$parser' );
 
 # ->from_string
 {
    my $tokens = $parser->from_string( "1 2 3" );
 
-   is_deeply( $tokens, [ 1, 2, 3 ], '->from_string' );
+   is( $tokens, [ 1, 2, 3 ], '->from_string' );
 
    ok( $STARTED, '->on_parse_start was invoked' );
    is( $ENDED, $tokens, '->on_parse_end was invoked on result' );
@@ -51,7 +50,7 @@ isa_ok( $parser, "Parser::MGC", '$parser' );
 {
    my $tokens = $parser->from_file( \*DATA );
 
-   is_deeply( $tokens, [ 4, 5, 6 ], '->from_file(\*DATA)' );
+   is( $tokens, [ 4, 5, 6 ], '->from_file(\*DATA)' );
 }
 
 done_testing;

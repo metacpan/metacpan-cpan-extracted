@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection v0.0.10;
+package Sys::Async::Virt::Connection v0.0.11;
 
 use parent qw(IO::Async::Notifier);
 
@@ -81,11 +81,11 @@ Sys::Async::Virt::Connection - Connection to LibVirt server (abstract
 
 =head1 VERSION
 
-v0.0.10
+v0.0.11
 
 =head1 SYNOPSIS
 
-  use v5.20;
+  use v5.26;
   use Future::AsyncAwait;
   use Sys::Async::Virt::Connection::Factory;
 

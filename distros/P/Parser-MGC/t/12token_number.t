@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -35,6 +34,6 @@ approx( $parser->from_string( "12." ),    12,    'Trailing DP' );
 approx( $parser->from_string( ".34" ),     0.34, 'Leading DP' );
 approx( $parser->from_string( "8.9" ),     8.9,  'Infix DP' );
 
-ok( exception { $parser->from_string( "hello" ) }, '"hello" fails' );
+ok( dies { $parser->from_string( "hello" ) }, '"hello" fails' );
 
 done_testing;

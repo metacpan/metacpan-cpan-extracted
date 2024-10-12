@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 ###################################################################
-#### NOTE env-var TEMP_DIRS_KEEP=1 will stop erasing tmp files
+#### NOTE env-var PERL_TEST_TEMPDIR_TINY_NOCLEANUP=1 will stop erasing tmp files
 ###################################################################
 
 use strict;
@@ -11,13 +11,13 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Test::More;
 use Test::More::UTF8;
 use Mojo::Log;
 use FindBin;
-use File::Temp 'tempdir';
+use Test::TempDir::Tiny;
 use File::Compare;
 
 use Data::Roundtrip qw/perl2dump json2perl jsonfile2perl no-unicode-escape-permanently/;
@@ -33,7 +33,7 @@ my $curdir = $FindBin::Bin;
 # which is needed for deleting them all at the end
 $File::Temp::KEEP_ALL = 1;
 # if for debug you change this make sure that it has path in it e.g. ./xyz
-my $tmpdir = File::Temp::tempdir(CLEANUP=>1); # will not be erased if env var is set
+my $tmpdir = tempdir(); # will be erased unless a BAIL_OUT or env var set
 ok(-d $tmpdir, "tmpdir exists $tmpdir") or BAIL_OUT;
 
 my $template_data = {
@@ -115,16 +115,7 @@ my $outfile = exists($format_ret->{'output'}) && exists($format_ret->{'output'}-
 ok(defined($outfile), 'format()'." : called and output file ($outfile) exists on the returned output data.") or BAIL_OUT;
 ok(-f $outfile, 'format()'." : called and output file ($outfile) exists on disk.") or BAIL_OUT;
 
-# if you set env var TEMP_DIRS_KEEP=1 when running
-# the temp files WILL NOT BE DELETED otherwise
-# they are deleted automatically, unless some other module
-# messes up with $File::Temp::KEEP_ALL
-diag "temp dir: $tmpdir ...";
-do {
-	$File::Temp::KEEP_ALL = 0;
-	File::Temp::cleanup;
-	diag "temp files cleaned!";
-} unless exists($ENV{'TEMP_DIRS_KEEP'}) && $ENV{'TEMP_DIRS_KEEP'}>0;
+diag "temp dir: $tmpdir ..." if exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && $ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0;
 
 # END
 done_testing()

@@ -7,13 +7,13 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Test::More;
 use Test::More::UTF8;
 use Mojo::Log;
 use FindBin;
-use File::Temp 'tempdir';
+use Test::TempDir::Tiny;
 use File::Basename;
 use File::Spec;
 
@@ -27,8 +27,8 @@ my $log = Mojo::Log->new;
 
 my $curdir = $FindBin::Bin;
 
-# if for debug you change this make sure that it has path in it e.g. ./shit
-my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+# if for debug you change this make sure that it has path in it e.g. ./xyz
+my $tmpdir = tempdir(); # will be erased unless a BAIL_OUT or env var set
 ok(-d $tmpdir, "tmpdir exists $tmpdir") or BAIL_OUT;
 
 my $processor_name = 'complex-on-disk';
@@ -188,6 +188,8 @@ my $format_ret = $latter->format({
 	'outfile' => $outfile,
 });
 ok(!defined($format_ret), 'format()'." : called and got good result.") or BAIL_OUT;
+
+diag "temp dir: $tmpdir ..." if exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && $ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0;
 
 # END
 done_testing()

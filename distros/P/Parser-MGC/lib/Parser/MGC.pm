@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package Parser::MGC 0.21;
+package Parser::MGC 0.22;
 
 use v5.14;
 use warnings;
@@ -18,6 +18,8 @@ use Scalar::Util qw( blessed );
 C<Parser::MGC> - build simple recursive-descent parsers
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    package My::Grammar::Parser;
    use base qw( Parser::MGC );
@@ -95,7 +97,7 @@ attempt will be aborted by the L</die> method.
 
 =head2 new
 
-   $parser = Parser::MGC->new( %args )
+   $parser = Parser::MGC->new( %args );
 
 Returns a new instance of a C<Parser::MGC> object. This must be called on a
 subclass that provides method of the name provided as C<toplevel>, by default
@@ -230,7 +232,7 @@ their parsing.
 
 =head2 on_parse_start
 
-   $parser->on_parse_start
+   $parser->on_parse_start;
 
 I<Since version 0.21.>
 
@@ -239,7 +241,7 @@ operation, just before invoking the toplevel structure method.
 
 =head2 on_parse_end
 
-   $result = $parser->on_parse_end( $result )
+   $result = $parser->on_parse_end( $result );
 
 I<Since version 0.21.>
 
@@ -256,7 +258,7 @@ method itself.
 
 =head2 from_string
 
-   $result = $parser->from_string( $str )
+   $result = $parser->from_string( $str );
 
 Parse the given literal string and return the result from the toplevel method.
 
@@ -290,7 +292,7 @@ sub from_string
 
 =head2 from_file
 
-   $result = $parser->from_file( $file, %opts )
+   $result = $parser->from_file( $file, %opts );
 
 Parse the given file, which may be a pathname in a string, or an opened IO
 handle, and return the result from the toplevel method.
@@ -304,7 +306,7 @@ The following options are recognised:
 If set, applies the given binmode to the filehandle before reading. Typically
 this can be used to set the encoding of the file.
 
-   $parser->from_file( $file, binmode => ":encoding(UTF-8)" )
+   $parser->from_file( $file, binmode => ":encoding(UTF-8)" );
 
 =back
 
@@ -334,7 +336,7 @@ sub from_file
 
 =head2 filename
 
-   $filename = $parser->filename
+   $filename = $parser->filename;
 
 I<Since version 0.20.>
 
@@ -351,7 +353,7 @@ sub filename
 
 =head2 from_reader
 
-   $result = $parser->from_reader( \&reader )
+   $result = $parser->from_reader( \&reader );
 
 I<Since version 0.05.>
 
@@ -360,7 +362,7 @@ called in scalar context to generate portions of string to parse, being passed
 the C<$parser> object. The function should return C<undef> when it has no more
 string to return.
 
-   $reader->( $parser )
+   $reader->( $parser );
 
 Note that because it is not generally possible to detect exactly when more
 input may be required due to failed regexp parsing, the reader function is
@@ -393,7 +395,7 @@ sub from_reader
 
 =head2 pos
 
-   $pos = $parser->pos
+   $pos = $parser->pos;
 
 I<Since version 0.09.>
 
@@ -410,7 +412,7 @@ sub pos
 
 =head2 take
 
-   $str = $parser->take( $len )
+   $str = $parser->take( $len );
 
 I<Since version 0.16.>
 
@@ -436,7 +438,7 @@ sub take
 
 =head2 where
 
-   ( $lineno, $col, $text ) = $parser->where
+   ( $lineno, $col, $text ) = $parser->where;
 
 Returns the current parse position, as a line and column number, and
 the entire current line of text. The first line is numbered 1, and the first
@@ -472,9 +474,9 @@ sub where
 
 =head2 fail_from
 
-   $parser->fail( $message )
+   $parser->fail( $message );
 
-   $parser->fail_from( $pos, $message )
+   $parser->fail_from( $pos, $message );
 
 I<C<fail_from> since version 0.09.>
 
@@ -515,9 +517,9 @@ sub fail_from
 
 =head2 die_from
 
-   $parser->die( $message )
+   $parser->die( $message );
 
-   $parser->die_from( $pos, $message )
+   $parser->die_from( $pos, $message );
 
 I<Since version 0.20.>
 
@@ -551,9 +553,42 @@ sub die_from
    die Parser::MGC::Failure->new( $message, $self, $pos )->STRING;
 }
 
+=head2 warn
+
+=head2 warn_from
+
+   $parser->warn( $message );
+
+   $parser->warn_from( $pos, $message );
+
+I<Since version 0.22.>
+
+Issues a warning as normal for the C<warn> core Perl function, appending
+information to the message string giving the current line and column position
+and the line of input the parser was working on, as it does in the L</fail>
+method.
+
+=cut
+
+sub warn :method
+{
+   my $self = shift;
+   my ( $message ) = @_;
+   $self->warn_from( $self->pos, $message );
+}
+
+sub warn_from
+{
+   my $self = shift;
+   my ( $pos, $message ) = @_;
+   # Convenient just to use the ->STRING method of a Failure object but don't
+   # throw it directly
+   warn Parser::MGC::Failure->new( $message, $self, $pos )->STRING;
+}
+
 =head2 at_eos
 
-   $eos = $parser->at_eos
+   $eos = $parser->at_eos;
 
 Returns true if the input string is at the end of the string.
 
@@ -586,7 +621,7 @@ sub at_eos
 
 =head2 scope_level
 
-   $level = $parser->scope_level
+   $level = $parser->scope_level;
 
 I<Since version 0.05.>
 
@@ -602,7 +637,7 @@ sub scope_level
 
 =head2 include_string
 
-   $result = $parser->include_string( $str, %opts )
+   $result = $parser->include_string( $str, %opts );
 
 I<Since version 0.21.>
 
@@ -678,11 +713,16 @@ as
 
 =head2 maybe
 
-   $ret = $parser->maybe( $code )
+   $ret = $parser->maybe( $code );
 
 Attempts to execute the given C<$code> in scalar context, and returns what it
 returned, accepting that it might fail. C<$code> may either be a CODE
 reference or a method name given as a string.
+
+   $ret = $parser->maybe( $code, @args );
+
+I<Since version 0.22> this method passes any additional arguments into the
+invoked code. This is especially useful if the C<$code> is a method name.
 
 If the code fails (either by calling C<fail> itself, or by propagating a
 failure from another method it invoked) before it has invoked C<commit>, then
@@ -712,7 +752,7 @@ This may be considered to be similar to the C<?> regexp qualifier.
 sub maybe
 {
    my $self = shift;
-   my ( $code ) = @_;
+   my ( $code, @args ) = @_;
 
    my $pos = pos $self->{str};
 
@@ -720,7 +760,7 @@ sub maybe
    local $self->{committer} = sub { $committed++ };
 
    try {
-      return $self->$code;
+      return $self->$code( @args );
    }
    catch ( $e ) {
       pos($self->{str}) = $pos;
@@ -732,7 +772,7 @@ sub maybe
 
 =head2 scope_of
 
-   $ret = $parser->scope_of( $start, $code, $stop )
+   $ret = $parser->scope_of( $start, $code, $stop );
 
 Expects to find the C<$start> pattern, then attempts to execute the given
 C<$code>, then expects to find the C<$stop> pattern. Returns whatever the
@@ -798,7 +838,7 @@ sub _scope_of
 
 =head2 committed_scope_of
 
-   $ret = $parser->committed_scope_of( $start, $code, $stop )
+   $ret = $parser->committed_scope_of( $start, $code, $stop );
 
 I<Since version 0.16.>
 
@@ -817,7 +857,7 @@ sub committed_scope_of
 
 =head2 list_of
 
-   $ret = $parser->list_of( $sep, $code )
+   $ret = $parser->list_of( $sep, $code );
 
 Expects to find a list of instances of something parsed by C<$code>,
 separated by the C<$sep> pattern. Returns an ARRAY ref containing a list of
@@ -895,7 +935,7 @@ sub list_of
 
 =head2 sequence_of
 
-   $ret = $parser->sequence_of( $code )
+   $ret = $parser->sequence_of( $code );
 
 A shortcut for calling C<list_of> with an empty string as separator; expects
 to find at least one instance of something parsed by C<$code>, separated only
@@ -925,7 +965,7 @@ sub sequence_of
 
 =head2 any_of
 
-   $ret = $parser->any_of( @codes )
+   $ret = $parser->any_of( @codes );
 
 I<Since version 0.06.>
 
@@ -960,7 +1000,11 @@ choices will be attempted.
 
 If none of the choices match then a simple failure message is printed:
 
+=for highlighter
+
    Found nothing parseable
+
+=for highlighter language=perl
 
 As this is unlikely to be helpful to users, a better message can be provided
 by the final choice instead. Don't forget to C<commit> before printing the
@@ -1006,7 +1050,7 @@ sub one_of {
 
 =head2 commit
 
-   $parser->commit
+   $parser->commit;
 
 Calling this method will cancel the backtracking behaviour of the innermost
 C<maybe>, C<list_of>, C<sequence_of>, or C<any_of> structure forming method.
@@ -1018,19 +1062,19 @@ Typically this will be called once the grammatical structure alter has been
 determined, ensuring that any further failures are raised as real exceptions,
 rather than by attempting other alternatives.
 
- sub parse_statement
- {
-    my $self = shift;
+   sub parse_statement
+   {
+      my $self = shift;
 
-    $self->any_of(
-       ...
-       sub {
-          $self->scope_of( "{",
-             sub { $self->commit; $self->parse_statements; },
-          "}" ),
-       },
-    );
- }
+      $self->any_of(
+         ...
+         sub {
+            $self->scope_of( "{",
+               sub { $self->commit; $self->parse_statements; },
+            "}" ),
+         },
+      );
+   }
 
 Though in this common pattern, L</committed_scope_of> may be used instead.
 
@@ -1083,11 +1127,11 @@ sub skip_ws
 
 =head2 expect
 
-   $str = $parser->expect( $literal )
+   $str = $parser->expect( $literal );
 
-   $str = $parser->expect( qr/pattern/ )
+   $str = $parser->expect( qr/pattern/ );
 
-   @groups = $parser->expect( qr/pattern/ )
+   @groups = $parser->expect( qr/pattern/ );
 
 Expects to find a literal string or regexp pattern match, and consumes it.
 In scalar context, this method returns the string that was captured. In list
@@ -1102,9 +1146,9 @@ with zero-width.
 
 =head2 maybe_expect
 
-   $str = $parser->maybe_expect( ... )
+   $str = $parser->maybe_expect( ... );
 
-   @groups = $parser->maybe_expect( ... )
+   @groups = $parser->maybe_expect( ... );
 
 I<Since version 0.10.>
 
@@ -1149,9 +1193,9 @@ sub expect
 
 =head2 substring_before
 
-   $str = $parser->substring_before( $literal )
+   $str = $parser->substring_before( $literal );
 
-   $str = $parser->substring_before( qr/pattern/ )
+   $str = $parser->substring_before( qr/pattern/ );
 
 I<Since version 0.06.>
 
@@ -1181,9 +1225,9 @@ strings, or similar cases where whitespace should be preserved.
 
 =head2 nonempty_substring_before
 
-   $str = $parser->nonempty_substring_before( $literal )
+   $str = $parser->nonempty_substring_before( $literal );
 
-   $str = $parser->nonempty_substring_before( qr/pattern/ )
+   $str = $parser->nonempty_substring_before( qr/pattern/ );
 
 I<Since version 0.20.>
 
@@ -1261,7 +1305,7 @@ sub nonempty_substring_before
 
 =head2 generic_token
 
-   $val = $parser->generic_token( $name, $re, $convert )
+   $val = $parser->generic_token( $name, $re, $convert );
 
 I<Since version 0.08.>
 
@@ -1318,7 +1362,7 @@ sub _token_generic
 
 =head2 token_int
 
-   $int = $parser->token_int
+   $int = $parser->token_int;
 
 Expects to find an integer in decimal, octal or hexadecimal notation, and
 consumes it. Negative integers, preceeded by C<->, are also recognised.
@@ -1346,7 +1390,7 @@ sub token_int
 
 =head2 token_float
 
-   $float = $parser->token_float
+   $float = $parser->token_float;
 
 I<Since version 0.04.>
 
@@ -1370,7 +1414,7 @@ sub token_float
 
 =head2 token_number
 
-   $number = $parser->token_number
+   $number = $parser->token_number;
 
 I<Since version 0.09.>
 
@@ -1386,13 +1430,15 @@ sub token_number
 
 =head2 token_string
 
-   $str = $parser->token_string
+   $str = $parser->token_string;
 
 Expects to find a quoted string, and consumes it. The string should be quoted
 using C<"> or C<'> quote marks.
 
 The content of the quoted string can contain character escapes similar to
 those accepted by C or Perl. Specifically, the following forms are recognised:
+
+=for highlighter
 
    \a               Bell ("alert")
    \b               Backspace
@@ -1403,6 +1449,8 @@ those accepted by C or Perl. Specifically, the following forms are recognised:
    \t               Horizontal Tab
    \0, \012         Octal character
    \x34, \x{5678}   Hexadecimal character
+
+=for highlighter language=perl
 
 C's C<\v> for vertical tab is not supported as it is rarely used in practice
 and it collides with Perl's C<\v> regexp escape. Perl's C<\c> for forming other
@@ -1459,7 +1507,7 @@ sub token_string
 
 =head2 token_ident
 
-   $ident = $parser->token_ident
+   $ident = $parser->token_ident;
 
 Expects to find an identifier, and consumes it.
 
@@ -1477,7 +1525,7 @@ sub token_ident
 
 =head2 token_kw
 
-   $keyword = $parser->token_kw( @keywords )
+   $keyword = $parser->token_kw( @keywords );
 
 Expects to find a keyword, and consumes it. A keyword is defined as an
 identifier which is exactly one of the literal values passed in.
@@ -1573,6 +1621,8 @@ result. Because of this, it can perform some error checking while it parses;
 namely, rejecting duplicate keys.
 
 =head1 TODO
+
+=for highlighter
 
 =over 4
 

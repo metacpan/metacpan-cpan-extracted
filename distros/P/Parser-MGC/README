@@ -78,7 +78,7 @@ CONSTRUCTOR
 
  new
 
-       $parser = Parser::MGC->new( %args )
+       $parser = Parser::MGC->new( %args );
 
     Returns a new instance of a Parser::MGC object. This must be called on
     a subclass that provides method of the name provided as toplevel, by
@@ -152,7 +152,7 @@ SUBCLASSING METHODS
 
  on_parse_start
 
-       $parser->on_parse_start
+       $parser->on_parse_start;
 
     Since version 0.21.
 
@@ -161,7 +161,7 @@ SUBCLASSING METHODS
 
  on_parse_end
 
-       $result = $parser->on_parse_end( $result )
+       $result = $parser->on_parse_end( $result );
 
     Since version 0.21.
 
@@ -174,14 +174,14 @@ METHODS
 
  from_string
 
-       $result = $parser->from_string( $str )
+       $result = $parser->from_string( $str );
 
     Parse the given literal string and return the result from the toplevel
     method.
 
  from_file
 
-       $result = $parser->from_file( $file, %opts )
+       $result = $parser->from_file( $file, %opts );
 
     Parse the given file, which may be a pathname in a string, or an opened
     IO handle, and return the result from the toplevel method.
@@ -193,11 +193,11 @@ METHODS
       If set, applies the given binmode to the filehandle before reading.
       Typically this can be used to set the encoding of the file.
 
-         $parser->from_file( $file, binmode => ":encoding(UTF-8)" )
+         $parser->from_file( $file, binmode => ":encoding(UTF-8)" );
 
  filename
 
-       $filename = $parser->filename
+       $filename = $parser->filename;
 
     Since version 0.20.
 
@@ -206,7 +206,7 @@ METHODS
 
  from_reader
 
-       $result = $parser->from_reader( \&reader )
+       $result = $parser->from_reader( \&reader );
 
     Since version 0.05.
 
@@ -215,7 +215,7 @@ METHODS
     parse, being passed the $parser object. The function should return
     undef when it has no more string to return.
 
-       $reader->( $parser )
+       $reader->( $parser );
 
     Note that because it is not generally possible to detect exactly when
     more input may be required due to failed regexp parsing, the reader
@@ -229,7 +229,7 @@ METHODS
 
  pos
 
-       $pos = $parser->pos
+       $pos = $parser->pos;
 
     Since version 0.09.
 
@@ -238,7 +238,7 @@ METHODS
 
  take
 
-       $str = $parser->take( $len )
+       $str = $parser->take( $len );
 
     Since version 0.16.
 
@@ -251,7 +251,7 @@ METHODS
 
  where
 
-       ( $lineno, $col, $text ) = $parser->where
+       ( $lineno, $col, $text ) = $parser->where;
 
     Returns the current parse position, as a line and column number, and
     the entire current line of text. The first line is numbered 1, and the
@@ -261,9 +261,9 @@ METHODS
 
  fail_from
 
-       $parser->fail( $message )
+       $parser->fail( $message );
     
-       $parser->fail_from( $pos, $message )
+       $parser->fail_from( $pos, $message );
 
     fail_from since version 0.09.
 
@@ -280,9 +280,9 @@ METHODS
 
  die_from
 
-       $parser->die( $message )
+       $parser->die( $message );
     
-       $parser->die_from( $pos, $message )
+       $parser->die_from( $pos, $message );
 
     Since version 0.20.
 
@@ -298,15 +298,30 @@ METHODS
     input was correctly recognised at a grammar level, but is requesting
     something that cannot be fulfilled semantically.
 
+ warn
+
+ warn_from
+
+       $parser->warn( $message );
+    
+       $parser->warn_from( $pos, $message );
+
+    Since version 0.22.
+
+    Issues a warning as normal for the warn core Perl function, appending
+    information to the message string giving the current line and column
+    position and the line of input the parser was working on, as it does in
+    the "fail" method.
+
  at_eos
 
-       $eos = $parser->at_eos
+       $eos = $parser->at_eos;
 
     Returns true if the input string is at the end of the string.
 
  scope_level
 
-       $level = $parser->scope_level
+       $level = $parser->scope_level;
 
     Since version 0.05.
 
@@ -314,7 +329,7 @@ METHODS
 
  include_string
 
-       $result = $parser->include_string( $str, %opts )
+       $result = $parser->include_string( $str, %opts );
 
     Since version 0.21.
 
@@ -366,11 +381,16 @@ STRUCTURE-FORMING METHODS
 
  maybe
 
-       $ret = $parser->maybe( $code )
+       $ret = $parser->maybe( $code );
 
     Attempts to execute the given $code in scalar context, and returns what
     it returned, accepting that it might fail. $code may either be a CODE
     reference or a method name given as a string.
+
+       $ret = $parser->maybe( $code, @args );
+
+    Since version 0.22 this method passes any additional arguments into the
+    invoked code. This is especially useful if the $code is a method name.
 
     If the code fails (either by calling fail itself, or by propagating a
     failure from another method it invoked) before it has invoked commit,
@@ -397,7 +417,7 @@ STRUCTURE-FORMING METHODS
 
  scope_of
 
-       $ret = $parser->scope_of( $start, $code, $stop )
+       $ret = $parser->scope_of( $start, $code, $stop );
 
     Expects to find the $start pattern, then attempts to execute the given
     $code, then expects to find the $stop pattern. Returns whatever the
@@ -434,7 +454,7 @@ STRUCTURE-FORMING METHODS
 
  committed_scope_of
 
-       $ret = $parser->committed_scope_of( $start, $code, $stop )
+       $ret = $parser->committed_scope_of( $start, $code, $stop );
 
     Since version 0.16.
 
@@ -445,7 +465,7 @@ STRUCTURE-FORMING METHODS
 
  list_of
 
-       $ret = $parser->list_of( $sep, $code )
+       $ret = $parser->list_of( $sep, $code );
 
     Expects to find a list of instances of something parsed by $code,
     separated by the $sep pattern. Returns an ARRAY ref containing a list
@@ -478,7 +498,7 @@ STRUCTURE-FORMING METHODS
 
  sequence_of
 
-       $ret = $parser->sequence_of( $code )
+       $ret = $parser->sequence_of( $code );
 
     A shortcut for calling list_of with an empty string as separator;
     expects to find at least one instance of something parsed by $code,
@@ -498,7 +518,7 @@ STRUCTURE-FORMING METHODS
 
  any_of
 
-       $ret = $parser->any_of( @codes )
+       $ret = $parser->any_of( @codes );
 
     Since version 0.06.
 
@@ -549,7 +569,7 @@ STRUCTURE-FORMING METHODS
 
  commit
 
-       $parser->commit
+       $parser->commit;
 
     Calling this method will cancel the backtracking behaviour of the
     innermost maybe, list_of, sequence_of, or any_of structure forming
@@ -562,19 +582,19 @@ STRUCTURE-FORMING METHODS
     been determined, ensuring that any further failures are raised as real
     exceptions, rather than by attempting other alternatives.
 
-     sub parse_statement
-     {
-        my $self = shift;
+       sub parse_statement
+       {
+          my $self = shift;
     
-        $self->any_of(
-           ...
-           sub {
-              $self->scope_of( "{",
-                 sub { $self->commit; $self->parse_statements; },
-              "}" ),
-           },
-        );
-     }
+          $self->any_of(
+             ...
+             sub {
+                $self->scope_of( "{",
+                   sub { $self->commit; $self->parse_statements; },
+                "}" ),
+             },
+          );
+       }
 
     Though in this common pattern, "committed_scope_of" may be used
     instead.
@@ -586,11 +606,11 @@ TOKEN PARSING METHODS
 
  expect
 
-       $str = $parser->expect( $literal )
+       $str = $parser->expect( $literal );
     
-       $str = $parser->expect( qr/pattern/ )
+       $str = $parser->expect( qr/pattern/ );
     
-       @groups = $parser->expect( qr/pattern/ )
+       @groups = $parser->expect( qr/pattern/ );
 
     Expects to find a literal string or regexp pattern match, and consumes
     it. In scalar context, this method returns the string that was
@@ -605,9 +625,9 @@ TOKEN PARSING METHODS
 
  maybe_expect
 
-       $str = $parser->maybe_expect( ... )
+       $str = $parser->maybe_expect( ... );
     
-       @groups = $parser->maybe_expect( ... )
+       @groups = $parser->maybe_expect( ... );
 
     Since version 0.10.
 
@@ -617,9 +637,9 @@ TOKEN PARSING METHODS
 
  substring_before
 
-       $str = $parser->substring_before( $literal )
+       $str = $parser->substring_before( $literal );
     
-       $str = $parser->substring_before( qr/pattern/ )
+       $str = $parser->substring_before( qr/pattern/ );
 
     Since version 0.06.
 
@@ -652,9 +672,9 @@ TOKEN PARSING METHODS
 
  nonempty_substring_before
 
-       $str = $parser->nonempty_substring_before( $literal )
+       $str = $parser->nonempty_substring_before( $literal );
     
-       $str = $parser->nonempty_substring_before( qr/pattern/ )
+       $str = $parser->nonempty_substring_before( qr/pattern/ );
 
     Since version 0.20.
 
@@ -691,7 +711,7 @@ TOKEN PARSING METHODS
 
  generic_token
 
-       $val = $parser->generic_token( $name, $re, $convert )
+       $val = $parser->generic_token( $name, $re, $convert );
 
     Since version 0.08.
 
@@ -719,7 +739,7 @@ TOKEN PARSING METHODS
 
  token_int
 
-       $int = $parser->token_int
+       $int = $parser->token_int;
 
     Expects to find an integer in decimal, octal or hexadecimal notation,
     and consumes it. Negative integers, preceeded by -, are also
@@ -727,7 +747,7 @@ TOKEN PARSING METHODS
 
  token_float
 
-       $float = $parser->token_float
+       $float = $parser->token_float;
 
     Since version 0.04.
 
@@ -738,7 +758,7 @@ TOKEN PARSING METHODS
 
  token_number
 
-       $number = $parser->token_number
+       $number = $parser->token_number;
 
     Since version 0.09.
 
@@ -746,7 +766,7 @@ TOKEN PARSING METHODS
 
  token_string
 
-       $str = $parser->token_string
+       $str = $parser->token_string;
 
     Expects to find a quoted string, and consumes it. The string should be
     quoted using " or ' quote marks.
@@ -771,13 +791,13 @@ TOKEN PARSING METHODS
 
  token_ident
 
-       $ident = $parser->token_ident
+       $ident = $parser->token_ident;
 
     Expects to find an identifier, and consumes it.
 
  token_kw
 
-       $keyword = $parser->token_kw( @keywords )
+       $keyword = $parser->token_kw( @keywords );
 
     Expects to find a keyword, and consumes it. A keyword is defined as an
     identifier which is exactly one of the literal values passed in.

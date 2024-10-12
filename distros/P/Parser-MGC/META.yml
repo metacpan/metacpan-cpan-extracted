@@ -4,12 +4,11 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   File::Temp: '0'
-  Test::Fatal: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,14 +17,15 @@ name: Parser-MGC
 provides:
   Parser::MGC:
     file: lib/Parser/MGC.pm
-    version: '0.21'
+    version: '0.22'
   Parser::MGC::Examples::EvaluateExpression:
     file: lib/Parser/MGC/Examples/EvaluateExpression.pm
+    version: '0.22'
 requires:
   Feature::Compat::Try: '0'
   Scalar::Util: '0'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

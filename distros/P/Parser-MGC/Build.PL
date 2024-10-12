@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -13,8 +14,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'File::Temp' => 0,
-      'Test::Fatal' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

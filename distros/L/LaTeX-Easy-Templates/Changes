@@ -43,3 +43,19 @@ Revision history for LaTeX-Easy-Templates
 
 1.01    2024-10-10/23:00
         Documentation fixes.
+
+1.02    2024-10-12/23:00
+        In unit tests, I have migrated from File::Temp to
+        Test::TempDir::Tiny because
+        the former uses global/"our" variables to set
+        important behaviour like keeping tempfiles on exit for inspection.
+        This affects Capture::Tiny which also uses File::Temp
+        and keeps its temp files if I set the global variable
+        in my test file!
+        Similarly, it can affect any package imported
+        directly or indirectly which uses File::Temp!!!!
+        The result is leaking temp files indiscriminately and
+        cluelessly. Even File::Temp's OO API uses these damn
+        global variables and it is not safe to use either.
+        Great, now I have to import the latter for unit testing
+        and the former for main package code./rant off, sorry.

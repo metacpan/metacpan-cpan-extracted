@@ -3,16 +3,18 @@ abstract: 'Easily format content into PDF/PS/DVI with LaTeX templates.'
 author:
   - 'Andreas Hadjiprocopis <bliako@cpan.org>'
 build_requires:
+  Capture::Tiny: '0'
   Data::Roundtrip: '0.18'
   ExtUtils::MakeMaker: '0'
   File::Basename: '0'
   File::Compare: '0'
+  File::Find::Rule: '0'
   File::Spec: '0'
-  File::Temp: '0'
   FindBin: '0'
   Mojo::Log: '0'
   Test::More: '0'
   Test::More::UTF8: '0'
+  Test::TempDir::Tiny: '0'
   Text::Xslate: v3.5.6
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -47,5 +49,5 @@ resources:
   bugtracker: https://github.com/hadjiprocopis/LaTeX-Easy-Templates/issues
   homepage: https://metacpan.org/module/LaTeX::Easy::Templates
   repository: https://github.com/hadjiprocopis/LaTeX-Easy-Templates
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

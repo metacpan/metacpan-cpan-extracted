@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -27,7 +27,7 @@ my @strings = (
    "tokens"
 );
 
-is_deeply( $parser->from_reader( sub { return shift @strings } ),
+is( $parser->from_reader( sub { return shift @strings } ),
    [qw( here is a list of some more tokens )],
    'tokens from reader' );
 

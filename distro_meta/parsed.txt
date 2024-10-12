@@ -94579,3 +94579,12 @@ W/WO/WORTHMINE/Text-Password-AutoMigration-0.31.tar.gz
 H/HA/HANJE/Tk-PodViewer-0.04.tar.gz
 H/HA/HANJE/Tk-YANoteBook-0.09.tar.gz
 I/IN/INGY/YAMLScript-0.1.80.tar.gz
+S/SK/SKAJI/App-PerlGzipScript-v0.0.2.tar.gz
+B/BL/BLIAKO/LaTeX-Easy-Templates-1.02.tar.gz
+J/JJ/JJATRIA/OpenTelemetry-0.024.tar.gz
+S/SV/SVW/Log-Log4perl-Config-YamlConfigurator-1.0.2.tar.gz
+G/GB/GBROWN/Net-RDAP-0.32.tar.gz
+P/PE/PEVANS/Parser-MGC-0.22.tar.gz
+K/KI/KIMOTO/SPVM-0.990020.tar.gz
+E/EH/EHUELS/Sys-Async-Virt-v0.0.11.tar.gz
+D/DE/DERF/Travel-Status-DE-DeutscheBahn-6.11.tar.gz

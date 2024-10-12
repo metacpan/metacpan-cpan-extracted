@@ -16,11 +16,14 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.051",
+            "perl" : "v5.40.0"
          }
       },
       "runtime" : {
          "requires" : {
+            "File::Slurper" : "0.014",
+            "Gzip::Libdeflate" : "0.10",
             "perl" : "v5.40.0"
          }
       }
@@ -28,7 +31,7 @@
    "provides" : {
       "App::PerlGzipScript" : {
          "file" : "lib/App/PerlGzipScript.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       }
    },
    "release_status" : "stable",
@@ -43,7 +46,7 @@
          "web" : "https://github.com/skaji/perl-gzip-script"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.0.2",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

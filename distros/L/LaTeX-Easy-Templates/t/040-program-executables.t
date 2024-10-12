@@ -7,7 +7,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Test::More;
 use Test::More::UTF8;

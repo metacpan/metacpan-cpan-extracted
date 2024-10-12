@@ -1,5 +1,18 @@
 -----
 
+0.0.11   2024-10-11
+    [Breaking]
+       * Callback event futures resolved data no longer includes
+         'callbackID'
+       * Callback event data has the elements from the 'msg' element
+         flattened into the toplevel (this mirrors the C API)
+    [Added]
+       * Documentation for events and event callbacks
+       * Example demonstrating event consumption (eg/wait-domain-state.pl)
+    [Fixed]
+       * Warning 'reference is already weak' triggered by event callbacks
+       * Replace 'use v5.20;' with 'use v5.26' everywhere
+
 0.0.10   2024-10-10
     [Added]
        * Support for external process transport ('...+ext://')

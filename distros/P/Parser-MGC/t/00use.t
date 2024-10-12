@@ -3,8 +3,9 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Parser::MGC" );
+require Parser::MGC;
 
+pass( 'Modules loaded' );
 done_testing;

@@ -69,6 +69,6 @@
          "web" : "https://github.com/gbxyz/perl-Net-RDAP"
       }
    },
-   "version" : "0.31",
+   "version" : "0.32",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

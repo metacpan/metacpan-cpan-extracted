@@ -1,4 +1,7 @@
 Revision history for App-PerlGzipScript
 
+v0.0.2  2024-10-12 14:55:47 JST
+  - Use Gzip-Libdeflate (#1)
+
 v0.0.1  2024-07-20 21:49:18 JST
   - Initial version

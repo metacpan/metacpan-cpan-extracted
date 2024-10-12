@@ -2,11 +2,12 @@
 use v5.40;
 
 use File::Basename ();
+use File::Slurper ();
 use File::Temp ();
 use Getopt::Long ();
-use IO::Compress::Gzip ();
+use Gzip::Libdeflate;
 
-my $VERSION = v0.0.1;
+my $VERSION = v0.0.2;
 
 my $HELP = <<'EOF';
 Usage: perl-gzip-script [options] SCRIPT
@@ -48,11 +49,9 @@ die $@ if $@;
 __DATA__
 EOF
 
-IO::Compress::Gzip::gzip $script, $out,
-    Append => 1,
-    Minimal => 1,
-    Level => IO::Compress::Gzip::Z_BEST_COMPRESSION,
-or die $IO::Compress::Gzip::GzipError;
+my $content = File::Slurper::read_binary($script);
+my $content_gzip = Gzip::Libdeflate->new(level => 12)->compress($content) or die;
+$out->print($content_gzip);
 
 exit if !$in_place;
 

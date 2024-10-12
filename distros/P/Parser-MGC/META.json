@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -29,18 +29,18 @@
       "test" : {
          "requires" : {
             "File::Temp" : "0",
-            "Test::Fatal" : "0",
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Parser::MGC" : {
          "file" : "lib/Parser/MGC.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Parser::MGC::Examples::EvaluateExpression" : {
-         "file" : "lib/Parser/MGC/Examples/EvaluateExpression.pm"
+         "file" : "lib/Parser/MGC/Examples/EvaluateExpression.pm",
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.21",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

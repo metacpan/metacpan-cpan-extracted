@@ -10,7 +10,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Exporter qw(import);
 our @EXPORT = qw(
@@ -1059,33 +1059,6 @@ sub latex_driver_executable {
 	return \%ret;
 }
 
-# to be removed
-sub latex_driver_executable_old {
-	# NOTE you can check program names without LaTeX::Driver object
-	# like this: LaTeX::Driver->program_name('xelatex')
-	my ($program_name) = @_;
-	my $parent = ( caller(1) )[3] || "N/A";
-	my $whoami = ( caller(0) )[3];
-	my ($fh, $tmpfil) = File::Temp::tempfile(SUFFIX => '.tex');
-	my $drivobj = eval { LaTeX::Driver->new('source' => $tmpfil) };
-	if( ! defined($drivobj) ){ print STDERR "${whoami} (via $parent), line ".__LINE__." : error, failed to instantiate LaTeX::Driver: $@"; return undef }
-	close $fh; unlink $tmpfil;
-	if( defined $program_name ){
-		if( exists($drivobj->{_program_path}->{$program_name})
-		 && defined($drivobj->{_program_path}->{$program_name})
-		# LaTeX::Driver seems to return 'xelatex' (note: no path)
-		# even if xelatex is not on the system,
-		# so add this check too:
-		 && (-x $drivobj->{_program_path}->{$program_name})
-		){
-			return $drivobj->{_program_path}->{$program_name}
-		}
-		return undef # not found
-	} else { return Clone::clone($drivobj->{_program_path}) }
-
-	return undef # should not be coming here
-}
-
 sub templater { 
 	my ($self, $m) = @_;
 	if( defined $m ){
@@ -1158,7 +1131,7 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 

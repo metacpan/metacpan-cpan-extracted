@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 my %vars = (
    ONE => 1,
@@ -47,7 +46,7 @@ my $parser = TestParser->new;
 # ->where position reporting
 {
    is( $parser->from_string( q(Position $HERE) ), "Position X", 'Result of $HERE test' );
-   is_deeply( $where, [ 1, 1, "X" ], 'Position during $HERE' );
+   is( $where, [ 1, 1, "X" ], 'Position during $HERE' );
 }
 
 done_testing;

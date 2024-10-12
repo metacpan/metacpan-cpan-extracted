@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -54,8 +53,8 @@ my $parser = TestParser->new;
 
 is( $parser->from_string( "(123)" ), 123, '"(123)"' );
 
-ok( exception { $parser->from_string( "(abc)" ) }, '"(abc)"' );
-ok( exception { $parser->from_string( "456" ) }, '"456"' );
+ok( dies { $parser->from_string( "(abc)" ) }, '"(abc)"' );
+ok( dies { $parser->from_string( "456" ) }, '"456"' );
 
 is( TestParser2->new->from_string( "(67)" ), 67, '"(67)" as method name' );
 
@@ -64,6 +63,6 @@ $parser = DynamicDelimParser->new;
 is( $parser->from_string( "(45)" ), 45, '"(45)"' );
 is( $parser->from_string( "[45]" ), 45, '"[45]"' );
 
-ok( exception { $parser->from_string( "(45]" ) }, '"(45]" fails' );
+ok( dies { $parser->from_string( "(45]" ) }, '"(45]" fails' );
 
 done_testing;

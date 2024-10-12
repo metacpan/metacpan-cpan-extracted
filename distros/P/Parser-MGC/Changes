@@ -1,5 +1,15 @@
 Revision history for Parser-MGC
 
+0.22    2024-10-11
+        [CHANGES]
+         * Added `->warn` and `->warn_from`
+         * Pass additional arguments to `->maybe` method through to invoked
+           code
+         * Swap unit tests from `Test::More` to `Test2::V0`; avoids need for
+           `Test::Fatal`
+         * General module style updates/refresh to code style, documentation,
+           etc..
+
 0.21    2022-02-23
         [CHANGES]
          * Add stall-detection to list-repeating methods, in order to detect

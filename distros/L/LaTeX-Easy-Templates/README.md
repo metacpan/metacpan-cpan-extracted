@@ -4,7 +4,7 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # SYNOPSIS
 

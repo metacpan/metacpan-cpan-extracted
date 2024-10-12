@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More tests => 5;
+use Test2::V0;
 
 use lib ".";
 require "examples/parse-xml.pl";
@@ -17,7 +17,7 @@ sub test
 {
    my ( $str, $expect, $name ) = @_;
 
-   is_deeply( $parser->from_string( $str ), $expect, $name );
+   is( $parser->from_string( $str ), $expect, $name );
 }
 
 test q[<xml>Hello world</xml>],

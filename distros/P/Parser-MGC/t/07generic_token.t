@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 my $re;
 my $convert;
@@ -24,7 +23,7 @@ my $parser = TestParser->new;
 
 $re = qr/[A-Z]+/;
 is( $parser->from_string( "HELLO" ), "HELLO", 'Simple RE' );
-ok( exception { $parser->from_string( "hello" ) }, 'Simple RE fails' );
+ok( dies { $parser->from_string( "hello" ) }, 'Simple RE fails' );
 
 $re = qr/[A-Z]+/i;
 is( $parser->from_string( "Hello" ), "Hello", 'RE with flags' );

@@ -22,7 +22,7 @@ use Travel::Status::DE::HAFAS::Product;
 use Travel::Status::DE::HAFAS::Services;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '6.10';
+our $VERSION = '6.11';
 
 # {{{ Endpoint Definition
 
@@ -430,7 +430,6 @@ sub post_with_cache {
 	my $content = $reply->content;
 
 	if ($cache) {
-		say "freeeez";
 		$cache->freeze( $self->{post}, \$content );
 	}
 
@@ -891,7 +890,7 @@ monitors
 
 =head1 VERSION
 
-version 6.10
+version 6.11
 
 =head1 DESCRIPTION
 

@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -50,7 +49,7 @@ my $parser = TestParser->new;
 is( $parser->from_string( "123" ), 123, '"123"' );
 is( $parser->from_string( '("hi")' ), "hi", '("hi")' );
 
-is( exception { $parser->from_string( "(456)" ) },
+is( dies { $parser->from_string( "(456)" ) },
    qq[Expected string delimiter on line 1 at:\n].
    qq[(456)\n].
    qq[ ^\n],
@@ -58,11 +57,11 @@ is( exception { $parser->from_string( "(456)" ) },
 
 $parser = IntStringPairsParser->new;
 
-is_deeply( $parser->from_string( "1 'one' 2 'two'" ),
-           [ [ 1, "one" ], [ 2, "two" ] ],
-           "1 'one' 2 'two'" );
+is( $parser->from_string( "1 'one' 2 'two'" ),
+   [ [ 1, "one" ], [ 2, "two" ] ],
+   "1 'one' 2 'two'" );
 
-is( exception { $parser->from_string( "1 'one' 2" ) },
+is( dies { $parser->from_string( "1 'one' 2" ) },
    qq[Expected string on line 1 at:\n].
    qq[1 'one' 2\n].
    qq[         ^\n],

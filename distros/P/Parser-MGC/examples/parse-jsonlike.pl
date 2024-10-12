@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 # DO NOT RELY ON THIS AS A REAL JSON PARSER

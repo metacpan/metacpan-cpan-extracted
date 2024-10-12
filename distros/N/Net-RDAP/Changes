@@ -1,5 +1,8 @@
 Revision history for perl module Net::RDAP:
 
+0.32 - 2024-10-11
+  - fix the license. no code changes.
+
 0.31 - 2024-10-03
   - fix dependencies in Makefile.PL (thanks Petr Pisar)
 

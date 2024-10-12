@@ -1,5 +1,16 @@
 Revision history for OpenTelemetry
 
+0.024     2024-10-11 18:36:41+01:00 Europe/London
+
+    * Expand test coverage and documentation for logging code
+
+0.023001  2024-09-28 14:48:24+01:00 Europe/London (TRIAL RELEASE)
+
+    * Updated the documentation to remove remaining mentions of the
+      span's 'add_link' method, which was removed to comply with the
+      specification
+    * Add experimental support for logs
+
 0.023     2024-06-03 10:31:57+01:00 Europe/London
 
     * Fixed an issue with experimental cleanup where "DBI::db::execute"

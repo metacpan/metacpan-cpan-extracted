@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection::SSH v0.0.10;
+package Sys::Async::Virt::Connection::SSH v0.0.11;
 
 use parent qw(Sys::Async::Virt::Connection);
 
@@ -141,7 +141,7 @@ Sys::Async::Virt::Connection::SSH - Connection to LibVirt server over SSH
 
 =head1 VERSION
 
-v0.0.10
+v0.0.11
 
 =head1 SYNOPSIS
 

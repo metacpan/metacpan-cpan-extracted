@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use lib ".";
 require "examples/synopsis.pl";
@@ -14,7 +14,7 @@ sub test
 {
    my ( $str, $expect ) = @_;
 
-   is_deeply( $parser->from_string( $str ), [ $expect ], qq("$str") );
+   is( $parser->from_string( $str ), [ $expect ], qq("$str") );
 }
 
 test "123", 123;

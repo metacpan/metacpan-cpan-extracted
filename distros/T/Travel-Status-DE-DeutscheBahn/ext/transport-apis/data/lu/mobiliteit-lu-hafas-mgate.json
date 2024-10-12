@@ -4,7 +4,7 @@
     "hafasMgate": true
   },
   "supportedLanguages": [
-    "de",
+	  "de",
     "en",
     "fr"
   ],
@@ -23,7 +23,7 @@
     }
   },
   "options": {
-    "endpoint": "https://cdt.hafas.de/bin/mgate.exe",
+    "endpoint": "https://cdt.hafas.de/gate",
     "client": {
       "type": "WEB",
       "id": "MMILUX",

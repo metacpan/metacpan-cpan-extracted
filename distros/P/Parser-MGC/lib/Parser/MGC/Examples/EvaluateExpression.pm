@@ -1,4 +1,4 @@
-package Parser::MGC::Examples::EvaluateExpression;
+package Parser::MGC::Examples::EvaluateExpression 0.22;
 
 =head1 NAME
 
@@ -17,6 +17,8 @@ handle the two different precedence levels.
 =cut
 
 =head2 Boilerplate
+
+=for highlighter language=perl
 
 We start off by declaring a package and subclassing L<Parser::MGC>.
 
@@ -73,6 +75,8 @@ total value is returned to the caller.
 
 This function recognises input matching the following EBNF grammar:
 
+=for highlighter
+
    EXPR = TERM { ( '+' | '-' ) TERM };
 
 =cut
@@ -90,6 +94,8 @@ factor it expects to find after those. This continues until there are no more
 =cut
 
 =pod
+
+=for highlighter language=perl
 
    sub parse_term
    {
@@ -140,6 +146,8 @@ numerical value.
 
 =pod
 
+=for highlighter language=perl
+
    sub parse_factor
    {
       my $self = shift;
@@ -155,6 +163,8 @@ numerical value.
 =pod
 
 This function recognises input matching the following EBNF grammar:
+
+=for highlighter
 
    FACTOR = '(' EXPR ')'
           | integer
@@ -412,3 +422,9 @@ the (real) end of input, so returns the final answer.
 
  INPUT:    (15 - 2) * 3
  OUTPUT:   39
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

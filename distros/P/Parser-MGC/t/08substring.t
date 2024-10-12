@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -23,11 +22,11 @@ package TestParser {
 my $parser = TestParser->new;
 
 {
-   is_deeply( $parser->from_string( "Hello, world!" ),
+   is( $parser->from_string( "Hello, world!" ),
       [ "Hello, world", "!" ],
       '"Hello, world!"' );
 
-   is_deeply( $parser->from_string( "!" ),
+   is( $parser->from_string( "!" ),
       [ "", "!" ],
       '"!"' );
 }
@@ -35,7 +34,7 @@ my $parser = TestParser->new;
 {
    local $TestParser::Nonempty = 1;
 
-   is( exception { $parser->from_string( "!" ) },
+   is( dies { $parser->from_string( "!" ) },
       qq[Expected to find a non-empty substring before \(\?^u:\\!\) on line 1 at:\n] .
       qq[!\n] .
       qq[^\n],

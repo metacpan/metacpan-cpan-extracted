@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 ###################################################################
-#### NOTE env-var TEMP_DIRS_KEEP=1 will stop erasing tmp files
+#### NOTE env-var PERL_TEST_TEMPDIR_TINY_NOCLEANUP=1 will stop erasing tmp files
 ###################################################################
 
 use strict;
@@ -11,14 +11,14 @@ use lib 'blib/lib';
 
 use utf8;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Test::More;
 use Test::More::UTF8;
 use Mojo::Log;
 use File::Basename;
 use FindBin;
-use File::Temp 'tempdir';
+use Test::TempDir::Tiny;
 use File::Compare;
 
 use Data::Roundtrip qw/perl2dump perl2json json2perl jsonfile2perl no-unicode-escape-permanently/;
@@ -31,11 +31,8 @@ my $log = Mojo::Log->new;
 
 my $curdir = $FindBin::Bin;
 
-# use this for keeping all tempfiles while CLEANUP=>1
-# which is needed for deleting them all at the end
-$File::Temp::KEEP_ALL = 1;
 # if for debug you change this make sure that it has path in it e.g. ./xyz
-my $tmpdir = File::Temp::tempdir(CLEANUP=>1); # will not be erased if env var is set
+my $tmpdir = tempdir(); # will be erased unless a BAIL_OUT or env var set
 ok(-d $tmpdir, "tmpdir exists $tmpdir") or BAIL_OUT;
 
 my $template_dir = File::Spec->catdir($curdir, 'templates', 'simple05');
@@ -129,17 +126,7 @@ for my $aprocessorname ('test-module'){
 		is(File::Compare::compare($latexsrcf, $expected_latex_output_filename), 0, 'untemplate()'." : called for processor '$aprocessorname', and latex output file ($latexsrcf) is exactly the same as the expected output ($expected_latex_output_filename).") or BAIL_OUT;
 	}
 }
-
-# if you set env var TEMP_DIRS_KEEP=1 when running
-# the temp files WILL NOT BE DELETED otherwise
-# they are deleted automatically, unless some other module
-# messes up with $File::Temp::KEEP_ALL
-diag "temp dir: $tmpdir ...";
-do {
-	$File::Temp::KEEP_ALL = 0;
-	File::Temp::cleanup;
-	diag "temp files cleaned!";
-} unless exists($ENV{'TEMP_DIRS_KEEP'}) && $ENV{'TEMP_DIRS_KEEP'}>0;
+diag "temp dir: $tmpdir ..." if exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && $ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0;
 
 # END
 done_testing();

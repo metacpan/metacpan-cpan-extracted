@@ -6,9 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 36;
+plan tests => 41;
 
 my @module_files = (
+    'Log/Any/Adapter/OpenTelemetry.pm',
     'OpenTelemetry.pm',
     'OpenTelemetry/Attributes.pm',
     'OpenTelemetry/Baggage.pm',
@@ -21,6 +22,10 @@ my @module_files = (
     'OpenTelemetry/Integration/HTTP/Tiny.pm',
     'OpenTelemetry/Integration/LWP/UserAgent.pm',
     'OpenTelemetry/Integration/namespace.pm',
+    'OpenTelemetry/Logs/LogRecord/Processor.pm',
+    'OpenTelemetry/Logs/Logger.pm',
+    'OpenTelemetry/Logs/LoggerProvider.pm',
+    'OpenTelemetry/Processor.pm',
     'OpenTelemetry/Propagator.pm',
     'OpenTelemetry/Propagator/Baggage.pm',
     'OpenTelemetry/Propagator/Composite.pm',

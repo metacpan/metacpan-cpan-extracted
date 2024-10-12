@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -56,12 +55,12 @@ $parser = TestParser->new(
 );
 
 is( $parser->from_string( q["double"] ), "double", 'Double quoted string still passes' );
-ok( exception { $parser->from_string( q['single'] ) }, 'Single quoted string now fails' );
+ok( dies { $parser->from_string( q['single'] ) }, 'Single quoted string now fails' );
 
 $parser = StringPairParser->new;
 
-is_deeply( $parser->from_string( q["foo" "bar"] ),
-           [ "foo", "bar" ],
-           'String-matching pattern is non-greedy' );
+is( $parser->from_string( q["foo" "bar"] ),
+   [ "foo", "bar" ],
+   'String-matching pattern is non-greedy' );
 
 done_testing;

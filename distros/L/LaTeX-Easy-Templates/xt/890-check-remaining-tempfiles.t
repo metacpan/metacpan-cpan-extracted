@@ -1,23 +1,44 @@
 #!/usr/bin/env perl
 
 ###################################################################
-#### NOTE env-var TEMP_DIRS_KEEP=1 will stop erasing tmp files
+#### NOTE env-var PERL_TEST_TEMPDIR_TINY_NOCLEANUP=1 will stop erasing tmp files
 ###################################################################
 
+# NOTE: what we are trying to test here is whether we have remaining temp files/dirs
+# after running the pipeline successfully and un-successfully
+# the tempdir should disappear on >>program exit<< which we need to simulate
+# so we run the test in a system(). We can't do it in an eval $prog because
+# it keeps only one state for done_testing()!
+# So, 1) count tmp files if any, 2) system($prog), 3) count tmp files if any and compare.
+
+use strict;
+use warnings;
+
+our $VERSION = '1.02';
+
+use Test::More;
+use Test::More::UTF8;
+use File::Find::Rule;
+use Capture::Tiny qw/capture/;
+
+my $erase_tmp_prog =<<'EOEV';
+use Test::TempDir::Tiny;
+my $tmpdir = tempdir('xx');
+EOEV
+
+my $prog =<<'EOEV';
 use strict;
 use warnings;
 
 use lib 'blib/lib';
 
-#use utf8;
-
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Test::More;
 use Test::More::UTF8;
 use Mojo::Log;
 use FindBin;
-use File::Temp 'tempdir';
+use Test::TempDir::Tiny;
 use File::Compare;
 
 use Data::Roundtrip qw/perl2dump json2perl jsonfile2perl no-unicode-escape-permanently/;
@@ -28,18 +49,16 @@ my $VERBOSITY = 100;
 
 my $log = Mojo::Log->new;
 
-my $tmpfiles_at_start = scalar @{ [ glob("/tmp/{*,}.*") ] };
-
 my $curdir = $FindBin::Bin;
 
 # use this for keeping all tempfiles while CLEANUP=>1
 # which is needed for deleting them all at the end
 $File::Temp::KEEP_ALL = 1;
 # if for debug you change this make sure that it has path in it e.g. ./xyz
-my $tmpdir = File::Temp::tempdir(CLEANUP=>1); # will not be erased if env var is set
+my $tmpdir = tempdir($$); # will be erased unless a BAIL_OUT or env var set
 ok(-d $tmpdir, "tmpdir exists $tmpdir") or BAIL_OUT;
 
-my $template_dir = File::Spec->catdir($curdir, '..', 't', 'templates', 'simple05');
+my $template_dir = File::Spec->catdir($curdir, 't', 'templates', 'simple05');
 my $template_filename = File::Spec->catfile($template_dir, 'main.tex.tx');
 my $expected_latex_output_filename = $template_filename; $expected_latex_output_filename =~ s/\.tx$/.expected_output/;
 my ($template_string, $FH);
@@ -162,19 +181,47 @@ for my $aprocessorname (sort keys %{$latterparams->{'processors'}}){
 	}
 }
 
-# if you set env var TEMP_DIRS_KEEP=1 when running
-# the temp files WILL NOT BE DELETED otherwise
-# they are deleted automatically, unless some other module
-# messes up with $File::Temp::KEEP_ALL
-diag "temp dir: $tmpdir ...";
-do {
-	$File::Temp::KEEP_ALL = 0;
-	File::Temp::cleanup;
-	diag "temp files cleaned!";
-} unless exists($ENV{'TEMP_DIRS_KEEP'}) && $ENV{'TEMP_DIRS_KEEP'}>0;
-
-my $tmpfiles_at_end = scalar @{ [ glob("/tmp/{*,}.*") ] };
-
-is($tmpfiles_at_start, $tmpfiles_at_end, "there are no remaining temp files in /tmp, before $tmpfiles_at_start, after $tmpfiles_at_end.") or BAIL_OUT("no the number of temp files has increased, of course this can be because of external process! Don't rely too much on this test.");
-# END
+diag "temp dir: $tmpdir ..." if exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && $ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0;
+# make me bomb: BAIL_OUT("bombing be design");
 done_testing();
+EOEV
+
+# WARNING: we need to capture the output from the system()'s
+# executing perl test code because it messes the TAP output
+# and make test gets confused.
+# so use Capture::Tiny
+
+my ($tmpfiles_at_start, $tmpfiles_at_end);
+
+# first erase any tmp dir
+capture { system($^X, '-e', $erase_tmp_prog); };
+is($?, 0, "system command OK, any tmp dir was erased for a fresh start.") or BAIL_OUT("system command has failed, your logic is faulty. report this.");
+# no tmp dir should now exist
+
+$tmpfiles_at_start = scalar @{ [ File::Find::Rule->name("*")->in("tmp") ]};
+  # run the above program:
+  capture { system($^X, '-e', $prog); };
+  is($?, 0, "system command OK.") or BAIL_OUT("system command has failed, your logic is faulty. report this.");
+  # no tmp dir should now exist
+$tmpfiles_at_end = scalar @{ [ File::Find::Rule->name("*")->in("tmp") ]};
+is($tmpfiles_at_start, $tmpfiles_at_end, "there are no remaining temp files in ./tmp, before $tmpfiles_at_start, after $tmpfiles_at_end.") or BAIL_OUT("no the number of temp files is not the same as when we started, there is a temp files leak in dir ./tmp. Any temp files created should have been erased because the test succeeded.");
+
+# NOW, run the above program but make it bomb
+$prog =~ s/# make me bomb: //;
+
+# and repeat
+$tmpfiles_at_start = scalar @{ [ File::Find::Rule->name("*")->in("tmp") ]};
+  # run the above program:
+  capture { system($^X, '-e', $prog); };
+  ok($?!=0, "system command bombed OK as expected.") or BAIL_OUT("system command has not failed, your logic is faulty. report this.");
+$tmpfiles_at_end = scalar @{ [ File::Find::Rule->name("*")->in("tmp") ]};
+ok($tmpfiles_at_start < $tmpfiles_at_end, "there are remaining temp files in ./tmp, before $tmpfiles_at_start, after $tmpfiles_at_end.") or BAIL_OUT("no the number of temp files is the same, it seems temp files are not kept when test bails out.");
+
+# at this stage there is tmp dir, erase it.
+capture { system($^X, '-e', $erase_tmp_prog); };
+is($?, 0, "system command OK, any tmp dir was erased for a fresh start.") or BAIL_OUT("system command has failed, your logic is faulty. report this.");
+# no tmp dir should now exist
+
+# and now there is no tmp.
+
+done_testing;

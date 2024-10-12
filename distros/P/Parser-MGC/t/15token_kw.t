@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 package TestParser {
    use base qw( Parser::MGC );
@@ -21,7 +20,7 @@ my $parser = TestParser->new;
 
 is( $parser->from_string( "foo" ), "foo", 'Keyword' );
 
-is( exception { $parser->from_string( "splot" ) },
+is( dies { $parser->from_string( "splot" ) },
    qq[Expected any of foo, bar on line 1 at:\n] .
    qq[splot\n] .
    qq[^\n],
