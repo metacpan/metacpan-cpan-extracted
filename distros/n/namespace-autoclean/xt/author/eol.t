@@ -28,8 +28,8 @@ my @files = (
     't/sub-install.t',
     't/sub-name.t',
     'xt/author/00-compile.t',
-    'xt/author/changes_has_content.t',
     'xt/author/clean-namespaces.t',
+    'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
     'xt/author/minimum-version.t',
@@ -76,7 +76,6 @@ my @files = (
     'xt/overload.t',
     'xt/release/changes_has_content.t',
     'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t',
     'xt/role_tiny.t'
 );
 

@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Navigator - Navigate opened documents and files
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.11";
+$VERSION="0.15";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -21,6 +21,9 @@ use base qw( Tk::AppWindow::BaseClasses::Extension );
  $app->MainLoop;
 
 =head1 DESCRIPTION
+
+B<Obsolete> use L<Tk::AppWindow::Ext::SideBars> instead.
+Will be removed in the next version of I<Tk::AppWindow>.
 
 Adds a navigator panel to your application. By default
 it sits on the left side of your application. You
@@ -37,6 +40,8 @@ Inherits L<Tk::AppWindow::BaseClasses::Extension>.
 Default value 'LEFT'. Sets the name of the panel home to B<NavigatorPanel>.
 
 Only available at create time.
+
+=back
 
 =cut
 

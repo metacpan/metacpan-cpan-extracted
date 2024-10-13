@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.05;
+$VERSION = 0.11;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -37,12 +37,11 @@ my @contextmenu = (
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_, 'NavigatorPanel');
+	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 
 	$self->cmdConfig('fb_open', ['OpenSelection', $self]);
-	my $tp = $self->extGet('NavigatorPanel');
-	my $page = $tp->addPage('FileBrowser', 'folder', undef, 'Browse your file system');
+	my $page = $self->ToolNavigPageAdd('FileBrowser', 'folder', undef, 'Browse your file system', 400);
 	my $b = $page->FileBrowser(
 		-invokefile => ['cmdExecute', $self, 'doc_open'],
 		-listmenu => $self->extGet('MenuBar')->menuStack(@contextmenu),
@@ -89,7 +88,7 @@ sub OpenSelection {
 sub Unload {
 	my $self = shift;
 	$self->cmdRemove('fb_open');
-	$self->extGet('NavigatorPanel')->deletePage('FileBrowser');
+	$self->ToolNavigPageRemove('FileBrowser');
 	return $self->SUPER::Unload
 }
 

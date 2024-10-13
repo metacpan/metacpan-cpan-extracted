@@ -9,7 +9,7 @@ App::Codit::Macro - Little applets for line to line text tasks.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.09;
+$VERSION =  0.11;
 use Tk;
 
 =head1 SYNOPSIS
@@ -37,6 +37,7 @@ sub new {
 	my $self = {
 		CALL => $mdi->CreateCallback(@$call),
 		DOC => $doc,
+		COUNTREF => undef,
 		INTERVAL => 1,
 		LAST => undef,
 		LINE => 1,
@@ -62,6 +63,12 @@ sub busy {
 
 sub call {	return $_[0]->{CALL} }
 
+sub countref {
+	my $self = shift;
+	$self->{COUNTREF} = shift if @_;
+	return $self->{COUNTREF}
+}
+
 sub cycle {
 	my $self = shift;
 	my $line = $self->line;
@@ -72,6 +79,8 @@ sub cycle {
 	} else {
 		$self->line($line);
 	}
+	my $c = $self->countref;
+	$$c ++
 }
 
 sub dem {
@@ -146,6 +155,20 @@ sub start {
 	my $self = shift;
 	return if $self->busy;
 	$self->dem->jobAdd($self->jobname, $self->interval, 'cycle', $self);
+
+	my $mdi = $self->mdi;
+
+	my $count = 0;
+	$self->countref(\$count);
+
+	my $last = $self->last;
+	unless (defined $last) {
+		my $w = $mdi->docGet($self->doc);
+		$last = $w->linenumber('end - 1c');
+	}
+
+	my $size = $last - $self->line;
+	$mdi->progressAdd($self->jobname, $self->name, $size, \$count);
 }
 
 =item B<stop>
@@ -159,7 +182,9 @@ sub stop {
 	my $self = shift;
 	return unless $self->busy;
 	$self->dem->jobRemove($self->jobname);
-	$self->mdi->macroRemove($self->doc, $self->name) unless $self->remain;
+	my $mdi = $self->mdi;
+	$mdi->macroRemove($self->doc, $self->name) unless $self->remain;
+	$mdi->progressRemove($self->jobname);
 }
 
 =item B<remain>I<(?$flag?)>

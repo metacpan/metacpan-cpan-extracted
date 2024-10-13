@@ -42,7 +42,7 @@ sub new {
 	$self->{CURRENT} = undef;
 #	my $tp = $self->extGet('ToolPanel');
 #	my $page = $tp->addPage('Snippets', 'insert-text', undef, 'Snippets');
-	my $page = $self->ToolRightPageAdd('Snippets', 'insert-text', undef, 'Snippets');
+	my $page = $self->ToolRightPageAdd('Snippets', 'insert-text', undef, 'Snippets', 350);
 
 	my @padding = (-padx => 2, -pady => 2);
 

@@ -30,7 +30,7 @@ INTERNAL METHODS
 SCRUBBING OUTPUT
     When you force debug with dump_info=1, RenderView is capable of removing
     classes from the objects in your stash. By default it will replace any
-    DBIx::Class resultsource objects with the class name, which cleans up
+    DBIx::Class ResultSource objects with the class name, which cleans up
     the debug output considerably, but you can change what gets scrubbed by
     setting a list of classes in
     $c->config->{'Action::RenderView'}->{ignore_classes}. For instance:
@@ -55,8 +55,8 @@ EXTENDING
     simply place it in the "end" method:
 
         sub end : ActionClass('RenderView') {
-          my ( $self, $c ) = @_;
-          # do stuff here; the RenderView action is called afterwards
+            my ( $self, $c ) = @_;
+            # do stuff here; the RenderView action is called afterwards
         }
 
     To add things to an "end" action that are called *after* rendering, you
@@ -64,22 +64,24 @@ EXTENDING
 
         sub render : ActionClass('RenderView') { }
 
-        sub end : Private { 
-          my ( $self, $c ) = @_;
-          $c->forward('render');
-          # do stuff here
+        sub end : Private {
+            my ( $self, $c ) = @_;
+            $c->forward('render');
+            # do stuff here
         }
 
 AUTHORS
-    Marcus Ramberg <marcus@thefeed.no>
+    *   Marcus Ramberg <marcus@thefeed.no>
 
-    Florian Ragwitz <rafl@debian.org>
+    *   Florian Ragwitz <rafl@debian.org>
 
-COPYRIGHT
-    Copyright (c) 2006 - 2009 the Catalyst::Action::RenderView "AUTHOR" as
-    listed above.
+CONTRIBUTOR
+    Graham Knop <haarg@haarg.org>
 
-LICENSE
-    This library is free software. You can redistribute it and/or modify it
-    under the same terms as Perl itself.
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2006 - 2009 by Marcus Ramberg and Florian
+    Ragwitz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

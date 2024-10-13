@@ -21,7 +21,6 @@ t/2color.svg
 t/3_zoom.t
 t/4_select.t
 t/5_filter.t
-t/91_critic.t
 t/bigpic.svg
 t/perlcriticrc
 t/transp-blue.svg

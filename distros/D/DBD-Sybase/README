@@ -116,6 +116,24 @@ The syntax is:
 
 perl Makefile.PL --accept_test_defaults --chained {Y, N} --threaded_libs {Y, N}
 
+Note that the test defaults are what is found in PWD.factory, and are unlikely to 
+be correct for your situation. You can run an unattended build by setting the 
+following environment variables:
+
+  DBD_SYB_CHAINED (set to Y or N, defaults to Y)
+  DBD_SYB_THREADED_LIBS (set to Y or N, defaults to N)
+  DBD_SYB_SRV (set to the Sybase server name you wish to use)
+  DBD_SYB_DB (set to the database you want to use on that server)
+  DBD_SYB_UID (set to the login ID on the server)
+  DBD_SYB_PWD (set to the password for that login ID)
+
+and run
+  perl Makefile.PL --use_env
+
+If any of the environment variables mentioned above are missing the default value will
+be used (e.g. the build currently defaults to using CHAINED mode and not using the 
+threaded libs). You can also set DBD_SYB_USE_ENV to Y to avoid using the --use_env 
+command line switch.
 
 
 Known Problems:

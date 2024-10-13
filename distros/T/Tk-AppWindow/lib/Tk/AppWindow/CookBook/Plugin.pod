@@ -33,45 +33,45 @@ Tk::AppWindow::CookBook::Plugin - Write your own plugin
  =cut
 
  sub new {
-    my $class = shift;
-    my $self = $class->SUPER::new(@_, 'RequiredExtension');
-    return undef unless defined $self;
-    
-    #Create your Tk stuff;
-    $self->{'widg'} = $self->ExtraOrdinaryWidget->pack;
-    
-    #hook to a command
-    $self->cmdHookBefore('command1', 'Hook1', $self);
-    $self->cmdHookAfter('command1', 'Hook2', $self);
+   my $class = shift;
+   my $self = $class->SUPER::new(@_, 'RequiredExtension');
+   return undef unless defined $self;
+   
+   #Create your Tk stuff;
+   $self->{'widg'} = $self->ExtraOrdinaryWidget->pack;
+   
+   #hook to a command
+   $self->cmdHookBefore('command1', 'Hook1', $self);
+   $self->cmdHookAfter('command1', 'Hook2', $self);
 
-    #hook to a config variable
-    $self->configHookBefore('-configvariable', 'Hook3', $self);
-    $self->configHookAfter('-configvariable', 'Hook4', $self);
- 
-    return $self;
+   #hook to a config variable
+   $self->configHookBefore('-configvariable', 'Hook3', $self);
+   $self->configHookAfter('-configvariable', 'Hook4', $self);
+
+   return $self;
  }
  
  sub Hook1 {
- 	my $self = shift;
- 	print "before command1\n"
+   my $self = shift;
+   print "before command1\n"
  	
- 	#sometimes you want to keep the parameters for use in Hook2
- 	$self->{'safe_param'} = [@_];
+   #sometimes you want to keep the parameters for use in Hook2
+   $self->{'safe_param'} = [@_];
  	
- 	#when there is no parameter but you know it concerns a document
- 	$self->{'safe_param'} = [$self->extGet('CoditMDI)->docSelected];
- 	
+   #when there is no parameter but you know it concerns a document
+   $self->{'safe_param'} = [$self->extGet('CoditMDI)->docSelected];
+   
    #use passed on parameters
    my ($first, $second) = @_;
  
    #do your thing
    
- 	return @_
+   return @_
  }
  
  sub Hook2 {
- 	my $self = shift;
- 	print "after command1\n"
+   my $self = shift;
+   print "after command1\n"
    
    #use passed on parameters
    my ($first, $second) = @_;
@@ -83,23 +83,24 @@ Tk::AppWindow::CookBook::Plugin - Write your own plugin
    
    #do your thing
 
- 	return @_
+   return @_
  }
  
  sub Hook3 {
- 	my $self = shift;
- 	print "before -configvariable\n"
- 	return @_
+   my $self = shift;
+   print "before -configvariable\n"
+   return @_
  }
  
  sub Hook4 {
- 	my $self = shift;
- 	print "after -configvariable\n"
- 	return @_
+    my $self = shift;
+    print "after -configvariable\n"
+    return @_
  }
  
  sub Unload {
     my $self = shift;
+    #remember: leave no trace
     $self->cmdUnhookBefore('command1', 'Hook1', $self);
     $self->cmdUnhookAfter('command1', 'Hook2', $self);
     $self->configUnhookBefore('configvariable', 'Hook3', $self);

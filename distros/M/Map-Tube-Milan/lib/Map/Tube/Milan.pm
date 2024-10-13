@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Map::Tube::Milan;
-$Map::Tube::Milan::VERSION = '0.007';
+$Map::Tube::Milan::VERSION = '0.008';
 use 5.010_000;
 # ABSTRACT: Interface to the Milan tube map
 
@@ -27,7 +27,7 @@ Map::Tube::Milan - Interface to the Milan tube map
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

@@ -16,7 +16,7 @@ my %prereq = (
 	'Pod::Usage'            => '2.01',
 	'Scalar::Util'						    => '1.62',
 	'Scalar::Util::Numeric'	=> '0.40',
-	'Test::Tk'							    => '3.03',
+	'Test::Tk'							    => '3.04',
 	'Test::More'            => '1.3',
 	'Tk'                   	=> '804.023',
 	'Tk::DocumentTree'      => '0.08',
@@ -24,7 +24,7 @@ my %prereq = (
 	'Tk::PodViewer'         => '0.03',
 	'Tk::QuickForm'         => '0.05',
 	'Tk::YADialog'          => '0.04',
-	'Tk::YANoteBook'        => '0.07',
+	'Tk::YANoteBook'        => '0.09',
 );
 
 WriteMakefile(

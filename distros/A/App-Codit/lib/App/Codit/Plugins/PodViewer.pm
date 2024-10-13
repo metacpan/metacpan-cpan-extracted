@@ -75,6 +75,8 @@ sub new {
 	my $pod = $page->PodViewerFull(@vopt,
 		-font => $font,
 	)->pack(-expand => 1, -fill => 'both');
+	my $sb = $self->sidebars;
+	$sb->pageSelectCall('Pod', sub { $self->after(100, ['Refresh', $self]) });
 	$self->{PODWIDGET} = $pod;
 
 	return $self;
@@ -101,12 +103,15 @@ sub Refresh {
 
 	return unless $self->_visible;
 
-	my $widg = $self->docWidget;
+	my $widg = $self->mdi->docWidget;
 	return unless defined $widg;
 
 	my $text = $widg->get('1.0', 'end -1c');
 	my $pod = $self->{PODWIDGET};
+	my $podtxt = $pod->Subwidget('txt');
+	my ($v) = $podtxt->yview;
 	$pod->load(\$text);
+	$podtxt->yviewMoveto($v);
 }
 
 sub Unload {

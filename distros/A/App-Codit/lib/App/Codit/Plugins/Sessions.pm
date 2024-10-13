@@ -9,7 +9,7 @@ App::Codit::Plugins::Sessions - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.10;
+$VERSION = 0.11;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -144,7 +144,8 @@ sub sessionClose {
 		for (@list) {
 			$self->cmdExecute('doc_close', $_);
 			$count ++;
-			$self->update;
+#			$self->update;
+			$self->pause(20);
 		}
 		$self->progressRemove('multi_close');
 		$mdi->silentMode(0);
@@ -272,7 +273,8 @@ sub sessionOpen {
 				$mdi->deferredOptions($file, $options);
 			}
 			$count ++;
-			$self->update;
+#			$self->update;
+			$self->pause(20);
 		}
 	}
 	$self->progressRemove('multi_open');

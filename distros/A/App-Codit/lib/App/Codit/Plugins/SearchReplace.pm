@@ -9,7 +9,7 @@ App::Codit::Plugins::SearchReplace - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.10;
+$VERSION = 0.11;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 require Tk::LabFrame;
@@ -42,7 +42,7 @@ sub new {
 	
 #	my $tp = $self->extGet('ToolPanel');
 #	my $page = $tp->addPage('SearchReplace', 'edit-find-replace', undef, 'Search and replace');
-	my $page = $self->ToolRightPageAdd('SearchReplace', 'edit-find-replace', undef, 'Search and replace');
+	my $page = $self->ToolRightPageAdd('SearchReplace', 'edit-find-replace', undef, 'Search and replace', 350);
 
 	my $searchterm = '';
 	my $replaceterm = '';

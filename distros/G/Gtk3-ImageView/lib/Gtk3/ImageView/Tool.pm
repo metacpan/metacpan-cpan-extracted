@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Glib qw(TRUE FALSE);    # To get TRUE and FALSE
 
-our $VERSION = '11';
+our $VERSION = '12';
 
 sub new {
     my $class = shift;

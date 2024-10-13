@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Keyboard - adding easy keyboard bindings
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.15";
 use Tk;
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
@@ -82,7 +82,7 @@ sub ConfigureBindings {
 	}
 }
 
-=item B<Convert2TkI<($key)>
+=item B<Convert2Tk>I<($key)>
 
 Converts the modern description of a keyboard to to the Tk version.
 For example, 'CTRL+C' becomes 'Control-c'.

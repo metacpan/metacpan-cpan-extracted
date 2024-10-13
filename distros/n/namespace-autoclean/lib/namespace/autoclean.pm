@@ -1,14 +1,38 @@
 use strict;
 use warnings;
 
-package namespace::autoclean; # git description: 0.28-24-g964adcf
+package namespace::autoclean; # git description: 0.30-TRIAL-2-ga0e6aea
 # ABSTRACT: Keep imports out of your namespace
 # KEYWORDS: namespaces clean dirty imports exports subroutines methods development
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 
 use B::Hooks::EndOfScope 0.12;
 use List::Util qw( first );
+
+BEGIN {
+    if (eval { require Sub::Util } && defined &Sub::Util::subname) {
+        *subname = \&Sub::Util::subname;
+    }
+    else {
+        require B;
+        *subname = sub {
+            my ($coderef) = @_;
+            die 'Not a subroutine reference'
+                unless ref $coderef;
+            my $cv = B::svref_2object($coderef);
+            die 'Not a subroutine reference'
+                unless $cv->isa('B::CV');
+            my $gv = $cv->GV;
+            return undef
+                if $gv->isa('B::SPECIAL');
+            my $stash = $gv->STASH;
+            my $package = $stash->isa('B::SPECIAL') ? '__ANON__' : $stash->NAME;
+            return $package . '::' . $gv->NAME;
+        };
+    }
+}
+
 use namespace::clean 0.20;
 
 #pod =head1 SYNOPSIS
@@ -197,11 +221,10 @@ sub _method_check {
         my $does = $package->can('does') ? 'does'
                  : $package->can('DOES') ? 'DOES'
                  : undef;
-        require Sub::Identify;
         return sub {
             return 1 if $_[0] =~ /^\(/;
             my $coderef = do { no strict 'refs'; \&{ $package . '::' . $_[0] } };
-            my $code_stash = Sub::Identify::stash_name($coderef);
+            my ($code_stash) = subname($coderef) =~ /\A(.*)::/s;
             return 1 if $code_stash eq $package;
             return 1 if $code_stash eq 'constant';
             # TODO: consider if we really need this eval
@@ -225,7 +248,7 @@ namespace::autoclean - Keep imports out of your namespace
 
 =head1 VERSION
 
-version 0.29
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -395,7 +418,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Graham Knop Dave Rolsky Kent Fredric Tomas Doran Shawn M Moore Felix Ostmann Chris Prather Andrew Rodland
+=for stopwords Karen Etheridge Graham Knop Dave Rolsky Kent Fredric Tomas Doran Shawn M Moore Felix Ostmann Andrew Rodland Chris Prather
 
 =over 4
 
@@ -429,11 +452,11 @@ Felix Ostmann <sadrak@cpan.org>
 
 =item *
 
-Chris Prather <chris@prather.org>
+Andrew Rodland <arodland@cpan.org>
 
 =item *
 
-Andrew Rodland <arodland@cpan.org>
+Chris Prather <chris@prather.org>
 
 =back
 

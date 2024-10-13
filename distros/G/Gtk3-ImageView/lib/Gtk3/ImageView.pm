@@ -3,7 +3,6 @@ package Gtk3::ImageView;
 use warnings;
 use strict;
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
-use feature 'switch';
 use Cairo;
 use Glib qw(TRUE FALSE);    # To get TRUE and FALSE
 use Gtk3;
@@ -16,7 +15,7 @@ use Carp;
 use Readonly;
 Readonly my $MAX_ZOOM => 100;
 
-our $VERSION = '11';
+our $VERSION = '12';
 
 use Glib::Object::Subclass Gtk3::DrawingArea::, signals => {
     'zoom-changed' => {

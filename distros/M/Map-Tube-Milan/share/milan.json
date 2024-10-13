@@ -42,10 +42,23 @@
 
             { "id": "DUOMO", "name": "Duomo", "line": "M1,M3", "link": "CORDUSIO,MONTENAPOLEONE,MISSORI,SANBABILA" },
 
-            { "id": "SANBABILA", "name": "San Babila", "line": "M1,M5", "link": "DUOMO,PALESTRO,DATEO" },
+            { "id": "SANBABILA", "name": "San Babila", "line": "M1,M4,M5", "link": "DUOMO,PALESTRO,TRICOLORE,SFORZAPOLICLINICO" },
             { "id": "PALESTRO", "name": "Palestro", "line": "M1", "link": "SANBABILA,PTAVENEZIA" },
             { "id": "PTAVENEZIA", "name": "Porta Venezia", "line": "M1", "link": "PALESTRO,LIMA" },
             { "id": "LIMA", "name": "Lima", "line": "M1", "link": "PTAVENEZIA,LORETO" },
+
+            { "id": "SFORZAPOLICLINICO", "name": "Sforza Policlinico", "line": "M4", "link": "SANBABILA,SSOFIA" },
+            { "id": "SSOFIA", "name": "S. Sofia", "line": "M4", "link": "SFORZAPOLICLINICO,VETRA" },
+            { "id": "VETRA", "name": "Vetra", "line": "M4", "link": "SSOFIA,DEAMICIS" },
+            { "id": "DEAMICIS", "name": "De Amicis", "line": "M4", "link": "VETRA,SAMBROGIO" },
+            { "id": "CONIZUGNA", "name": "Coni Zugna", "line": "M4", "link": "SAMBROGIO,CALIFORNIA" },
+            { "id": "CALIFORNIA", "name": "California", "line": "M4", "link": "CONIZUGNA,BOLIVAR" },
+            { "id": "BOLIVAR", "name": "Bolivar", "line": "M4", "link": "CALIFORNIA,TOLSTOJ" },
+            { "id": "TOLSTOJ", "name": "Tolstoj", "line": "M4", "link": "BOLIVAR,FRATTINI" },
+            { "id": "FRATTINI", "name": "Frattini", "line": "M4", "link": "TOLSTOJ,GELSOMINI" },
+            { "id": "GELSOMINI", "name": "Gelsomini", "line": "M4", "link": "FRATTINI,SEGNERI" },
+            { "id": "SEGNERI", "name": "Segneri", "line": "M4", "link": "GELSOMINI,SANCRISTOFORO" },
+            { "id": "SANCRISTOFORO", "name": "San Cristoforo", "line": "M4", "link": "SEGNERI" },
 
             { "id": "LORETO", "name": "Loreto", "line": "M1,M2", "link": "LIMA,CAIAZZO,PIOLA,PASTEUR" },
 
@@ -67,7 +80,7 @@
             { "id": "ROMOLO", "name": "Romolo", "line": "M2", "link": "FAMAGOSTA,PTAGENOVAFS" },
             { "id": "PTAGENOVAFS", "name": "Porta Genova F.S.", "line": "M2", "link": "ROMOLO,SAGOSTINO" },
             { "id": "SAGOSTINO", "name": "S. Agostino", "line": "M2", "link": "PTAGENOVAFS,SAMBROGIO" },
-            { "id": "SAMBROGIO", "name": "S. Ambrogio", "line": "M2", "link": "SAGOSTINO,CADORNAFN" },
+            { "id": "SAMBROGIO", "name": "S. Ambrogio", "line": "M2,M4", "link": "SAGOSTINO,CADORNAFN,DEAMICIS,CONIZUGNA" },
             { "id": "LANZA", "name": "Lanza", "line": "M2", "link": "CADORNAFN,MOSCOVA" },
             { "id": "MOSCOVA", "name": "Moscova", "line": "M2", "link": "LANZA,GARIBALDIFS" },
 
@@ -147,7 +160,8 @@
             { "id": "STAZIONEFORLANINI", "name": "Stazione Forlanini", "line": "M4", "link": "REPETTI,ARGONNE" },
             { "id": "ARGONNE", "name": "Argonne", "line": "M4", "link": "STAZIONEFORLANINI,SUSA" },
             { "id": "SUSA", "name": "Susa", "line": "M4", "link": "ARGONNE,DATEO" },
-            { "id": "DATEO", "name": "Dateo", "line": "M4", "link": "SUSA,SANBABILA" }
+            { "id": "DATEO", "name": "Dateo", "line": "M4", "link": "SUSA,TRICOLORE" },
+            { "id": "TRICOLORE", "name": "Tricolore", "line": "M4", "link": "DATEO,SANBABILA" }
 
         ]
     }

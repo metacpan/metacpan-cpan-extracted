@@ -238,7 +238,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.10";
+$VERSION="0.11";
 use Tk;
 use App::Codit::CodeTextManager;
 
@@ -254,7 +254,7 @@ sub Populate {
 	my %opts = (
 #		-appname => 'Codit',
 		-logo => Tk::findINC('App/Codit/codit_logo.png'),
-		-extensions => [qw[Art CoditMDI ToolBar StatusBar MenuBar Navigator Help Settings Plugins]],
+		-extensions => [qw[Art CoditMDI ToolBar StatusBar MenuBar Selector Help Settings Plugins]],
 		-preconfig => [
 			-uniqueinstance => ['METHOD', undef, undef, 0],
 		],
@@ -637,6 +637,31 @@ sub ToolBottomPageRemove {
 	my $sb = $self->sidebars;
 	$self->sidebars->pageDelete('tool panel bottom', $page);
 	$self->ToolBottomBookRemove unless $sb->pageCount('tool panel bottom');
+}
+
+=item B<ToolNavigPageAdd>I<($name, $image, $text, $statustext, $initialsize)>
+
+See also the B<pageAdd> method in L<Tk::AppWindow::Ext::SideBars>.
+Adds a new page to the navigator panel at the left.
+
+=cut
+
+sub ToolNavigPageAdd {
+	my $self = shift;
+	return $self->sidebars->pageAdd('navigator panel', @_);
+}
+
+=item B<ToolNavigPageRemove>I<($name)>
+
+See also the B<pageDelete> method in L<Tk::AppWindow::Ext::SideBars>.
+Removes page $name from the navigator panel at the left.
+
+=cut
+
+sub ToolNavigPageRemove {
+	my ($self, $page) = @_;
+	my $sb = $self->sidebars;
+	$self->sidebars->pageDelete('navigator panel', $page);
 }
 
 sub ToolRightBookAdd {

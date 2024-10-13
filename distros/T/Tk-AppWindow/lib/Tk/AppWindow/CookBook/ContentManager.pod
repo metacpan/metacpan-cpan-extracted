@@ -15,6 +15,9 @@ Tk::AppWindow::CookBook::ContentManager - Write your own content manager
 =head1 A SIMPLE TEXT CONTENT MANAGER
 
  package TextManager;
+ 
+ use strict;
+ use warnings;
 
  use base qw(Tk::Derived Tk::AppWindow::BaseClasses::ContentManager);
  Construct Tk::Widget 'TextManager';

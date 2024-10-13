@@ -25,6 +25,7 @@ lib/Tk/AppWindow/Ext/NavigatorPanel.pm
 lib/Tk/AppWindow/Ext/Panels.pm
 lib/Tk/AppWindow/Ext/Plugins.pm
 lib/Tk/AppWindow/Ext/SDI.pm
+lib/Tk/AppWindow/Ext/Selector.pm
 lib/Tk/AppWindow/Ext/Settings.pm
 lib/Tk/AppWindow/Ext/SideBars.pm
 lib/Tk/AppWindow/Ext/StatusBar.pm
@@ -64,6 +65,7 @@ t/210-Tk-AppWindow-Ext-ToolPanel.t
 t/220-Tk-AppWindow-Ext-Settings.t
 t/230-Tk-AppWindow-Ext-MDI.t
 t/240-Tk-AppWindow-Ext-Navigator.t
+t/245-Tk-AppWindow-Ext-Selector.t
 t/250-Tk-AppWindow-Ext-Plugins.t
 t/lib/Alternative/NameSpace.pm
 t/lib/Alternative/NameSpace/Ext/TestExt.pm

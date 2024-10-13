@@ -9,7 +9,7 @@ App::Codit::Plugins::Colors - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.05;
+$VERSION = 0.11;
 
 require Tk::ColorPicker;
 use Tie::Watch;
@@ -37,7 +37,7 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 	
-	my $page = $self->ToolRightPageAdd('Colors', 'fill-color', undef, 'Select and insert colors');
+	my $page = $self->ToolRightPageAdd('Colors', 'fill-color', undef, 'Select and insert colors', 350);
 	
 	my @padding = (-padx => 3, -pady => 3);
 

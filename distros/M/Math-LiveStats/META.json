@@ -1,5 +1,5 @@
 {
-   "abstract" : "Pure perl module to make mean, standard deviation, and p-values available for given window sizes in streaming data",
+   "abstract" : "Pure perl module to make mean, standard deviation, vwap, and p-values available for one or more window sizes in streaming data",
    "author" : [
       "Chris Drake<cdrake@cpan.org>"
    ],
@@ -35,6 +35,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.00",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

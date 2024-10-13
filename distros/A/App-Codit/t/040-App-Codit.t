@@ -4,7 +4,7 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 15;
+use Test::More tests => 20;
 use File::Spec;
 $mwclass = 'App::Codit';
 $delay = 1500;
@@ -23,9 +23,13 @@ createapp(
 );
 
 my $mdi;
+my $macro;
 if (defined $app) {
 	$mdi = $app->extGet('CoditMDI');
+	$macro = App::Codit::Macro->new($mdi, 'dummy', '', [sub{}]);
 }
+
+testaccessors($macro, qw/countref interval last line remain/);
 
 push @tests, (
 	[ sub {
@@ -44,8 +48,8 @@ push @tests, (
 		return $app->extExists('MenuBar')
 	}, 1, 'Extension MenuBar loaded' ],
 	[ sub {
-		return $app->extExists('Navigator')
-	}, 1, 'Extension Navigator loaded' ],
+		return $app->extExists('Selector')
+	}, 1, 'Extension Selector loaded' ],
 	[ sub {
 		return $app->extExists('Help')
 	}, 1, 'Extension Help loaded' ],

@@ -1,0 +1,9 @@
+runtime:
+  requires:
+    perl: 5.008005
+    Catalyst::Runtime: 5.80030
+    Data::Visitor: 0.24
+    MRO::Compat: 0
+test:
+  requires:
+    Test::More: 0.88

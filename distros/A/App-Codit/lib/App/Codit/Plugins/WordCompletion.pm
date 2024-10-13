@@ -69,8 +69,8 @@ sub new {
 	$self->{ACTIVEDELAY} = 300;
 	$self->{DOCPOOL} = {};
 	$self->{POPBLOCK} = 0;
-	$self->{POPSIZE} = 4;
-	$self->{SCANSIZE} = 6;
+	$self->{POPSIZE} = 5;
+	$self->{SCANSIZE} = 5;
 	$self->{TRIGGERWORD} = '';
 
 	$self->cmdHookBefore('deferred_open', 'docOpen', $self);

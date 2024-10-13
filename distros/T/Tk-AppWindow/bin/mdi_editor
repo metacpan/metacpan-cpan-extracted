@@ -109,7 +109,7 @@ my $se = Tk::AppWindow->new(
 		[	'menu_separator',	'Edit::', 		'e2' ], 
 		[	'menu_normal',		'Edit::',		"~Select all",			'<Control-a>',				'edit-select-all','*CTRL+A'			], 
 	],
-	-extensions => [qw[Art Balloon MDI ToolBar StatusBar MenuBar Navigator Help Settings]],
+	-extensions => [qw[Art Balloon MDI ToolBar StatusBar MenuBar Selector Help Settings]],
 	-toolitems => [
 #			 type					label			cmd					icon					help		
 		[	'tool_separator' ],

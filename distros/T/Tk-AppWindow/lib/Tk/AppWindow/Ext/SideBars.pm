@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::SideBars - Basic functionality for side bars.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.12";
+$VERSION = "0.15";
 use Tk;
 require Tk::YANoteBook;
 
@@ -51,6 +51,7 @@ sub new {
 	$self->{PAGES} = {};
 	$self->{PANELS} = {};
 	$self->{SELECTCALLS} = {};
+	$self->{UNSELECTCALLS} = {};
 	$self->{TABSIDES} = {};
 	$self->{TEXTSIDES} = {};
 
@@ -95,13 +96,13 @@ sub nbAdd {
 		-tabside => $tabside,
 		-unselecttabcall => ['TabUnselect', $self, $name],
 	)->pack(-expand => 1, -fill=> 'both', -padx => 2, -pady => 2);
-	$self->geoAddCall($panel, 'OnResize', $self, $name);
 	$self->{TABSIDES}->{$name} = $tabside;
 	$self->Advertise($name . 'NB', $nb);
 	my $pn = $self->extGet('Panels');
 	$pn->adjusterWidget($panel, $nb);
 	$pn->adjusterActive($panel, 0);
 	$pn->panelAssign($name, $panel);
+	$pn->panelShow($panel);
 }
 
 =item B<nbDelete>I<($name)>
@@ -174,7 +175,8 @@ sub nbMaximize {
 			$width = 300;
 		}
 	}
-	$nb->GeometryRequest($width, $height);
+	$nb->configure(-width => $width);
+	$nb->configure(-height => $height);
 }
 
 =item B<nbMinimize>I<($name, $tab)>
@@ -190,13 +192,16 @@ sub nbMinimize {
 	$self->{LASTSIZE}->{$tab} = [$nb->width, $nb->height];
 	my $ts = $self->{TABSIDES}->{$notebook};
 	my $offset = $self->nbOffset($notebook);
-	my @size = ();
+	my ($width, $height);
 	if (($ts eq 'top') or ($ts eq 'bottom')) {
-		@size = ($nb->width + $offset, $tf->height + $offset);
+		$width = $nb->width + $offset;
+		$height = $tf->height + $offset;
 	} else {
-		@size = ($tf->width + $offset, $nb->height + $offset);
+		$width = $tf->width + $offset;
+		$height = $nb->height + $offset;
 	}
-	$nb->GeometryRequest(@size);
+	$nb->configure(-width => $width);
+	$nb->configure(-height => $height);
 }
 
 sub nbOffset {
@@ -214,22 +219,6 @@ sub nbTextSide {
 	my ($self, $name, $side) = @_;
 	$self->textsides->{$name} = $side if defined $side;
 	return $self->textsides->{$name}
-}
-
-sub OnResize {
-	my ($self, $notebook) = @_;
-	my $nb = $self->nbGet($notebook);
-	my $pn = $self->extGet('Panels');
-	my $p = $pn->panelAssign($notebook);
-	my $panel = $self->Subwidget($p);
-
-	my $owidth = $nb->width;
-	my $oheight = $nb->height;
-	my $offset = $self->panelOffset($notebook);
-	my $width = $panel->width - $offset;
-	my $height = $panel->height - $offset;
-	
-	$nb->GeometryRequest($width, $height) if ($width ne $owidth) or ($height ne $oheight);
 }
 
 =item B<pageAdd>I<($notebook, $name, $image, $text, $statustext, $initialsize)>
@@ -287,6 +276,7 @@ sub pageDelete {
 	delete $self->{INITIALSIZES}->{$name};
 	delete $self->{LASTSIZE}->{$name};
 	delete $self->{SELECTCALLS}->{$name};
+	delete $self->{UNSELECTCALLS}->{$name};
 	delete $self->pages->{$name}
 }
 
@@ -326,10 +316,28 @@ sub pageImage {
 
 sub pages { return $_[0]->{PAGES} }
 
+=item B<pageSelectCall>I<($page, @callback)>
+
+Creates a callback called when $page is selected.
+
+=cut
+
 sub pageSelectCall {
 	my $self = shift;
 	my $page = shift;
 	$self->{SELECTCALLS}->{$page} = $self->CreateCallback(@_);
+}
+
+=item B<pageUnselectCall>I<($page, @callback)>
+
+Creates a callback called when $page is unselected.
+
+=cut
+
+sub pageUnselectCall {
+	my $self = shift;
+	my $page = shift;
+	$self->{UNSELECTCALLS}->{$page} = $self->CreateCallback(@_);
 }
 
 sub panelOffset {
@@ -383,6 +391,8 @@ sub TabUnselect {
 	$pn->adjusterActive($p, 0);
 	$self->geoBlock(1);
 	$self->nbMinimize($notebook, $tab);
+	my $call = $self->{UNSELECTCALLS}->{$tab};
+	$call->execute if defined $call;
 	$self->after(400, ['geoBlock', $self, 0]);
 }
 

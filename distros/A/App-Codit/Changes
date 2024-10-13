@@ -1,5 +1,16 @@
 Revision history for Perl extension App::Codit.
 
+0.10 Sat Oct 12 2024
+	- Using extension Selector instead of Navigator
+	- Added ToolNavigPageAdd and ToolNavigPageRemove methods to App::Codit
+	- Plugin PodViewer keeps the view intact after reload
+	- Plugin Sessions takes a pause between opening and closing files
+	- Plugin PodViewer now refreshes when selected
+	- Plugin Console takes focus when selected and gives the text widget focus when unselected
+	- Fixed opening files in unique mode
+	- Running macros show a progress bar
+	- Plugin Git loads projects in a non blocking manner and shows a progress bar
+
 0.10 Tue Sep 28 2024
 	- Entering beta phase.
 	- Plugin PodViewer now uses Tk::PodViewer instead of Tk::Pod

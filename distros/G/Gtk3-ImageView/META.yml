@@ -14,7 +14,6 @@ build_requires:
   Test::Deep: '0'
   Test::MockObject: '0'
   Test::More: '0'
-  Test::Perl::Critic: '0'
   Try::Tiny: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -36,19 +35,19 @@ no_index:
 provides:
   Gtk3::ImageView:
     file: lib/Gtk3/ImageView.pm
-    version: '11'
+    version: '12'
   Gtk3::ImageView::Tool:
     file: lib/Gtk3/ImageView/Tool.pm
-    version: '11'
+    version: '12'
   Gtk3::ImageView::Tool::Dragger:
     file: lib/Gtk3/ImageView/Tool/Dragger.pm
-    version: '11'
+    version: '12'
   Gtk3::ImageView::Tool::Selector:
     file: lib/Gtk3/ImageView/Tool/Selector.pm
-    version: '11'
+    version: '12'
   Gtk3::ImageView::Tool::SelectorDragger:
     file: lib/Gtk3/ImageView/Tool/SelectorDragger.pm
-    version: '11'
+    version: '12'
 requires:
   Cairo: '0'
   Carp: '0'
@@ -59,7 +58,6 @@ requires:
   Readonly: '0'
   Scalar::Util: '0'
   base: '0'
-  feature: '0'
   if: '0'
   strict: '0'
   warnings: '0'
@@ -67,7 +65,7 @@ resources:
   bugtracker: https://github.com/DarthGandalf/gtk3-imageview/issues
   homepage: https://github.com/DarthGandalf/gtk3-imageview
   repository: https://github.com/DarthGandalf/gtk3-imageview.git
-version: '11'
+version: '12'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

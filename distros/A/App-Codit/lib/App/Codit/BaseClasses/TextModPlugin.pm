@@ -9,7 +9,7 @@ App::Codit::BaseClasses::TextModPlugin - baseclass for plugins that respond to t
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.10;
+$VERSION = 0.11;
 use Tk;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
@@ -71,16 +71,6 @@ sub docSelect {
 	return @_
 }
 
-sub docWidget {
-	my $self = shift;
-	my $mdi = $self->extGet('CoditMDI');
-	my $name = $mdi->docSelected;
-	return undef unless defined $name;
-	my $doc = $mdi->docGet($name);
-	return undef unless defined $doc;
-	return $doc->CWidg;
-}
- 
 sub Refresh {
 	my $self = shift;
 	delete $self->{'active_id'};

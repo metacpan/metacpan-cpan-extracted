@@ -9,7 +9,7 @@ App::Codit::Plugins::PerlSubs - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.05;
+$VERSION = 0.11;
 use base qw( App::Codit::BaseClasses::TextModPlugin );
 
 use Data::Compare;
@@ -33,11 +33,10 @@ line and it is scrolled into visibility.
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_, 'NavigatorPanel');
+	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 	
-	my $tp = $self->extGet('NavigatorPanel');
-	my $page = $tp->addPage('PerlSubs', 'code-context', undef, 'Find your Perl subs');
+	my $page = $self->ToolNavigPageAdd('PerlSubs', 'code-context', undef, 'Find your Perl subs');
 
 	$self->{CURRENT} = [];
 	
@@ -77,7 +76,7 @@ sub Refresh {
 	my @new = ();
 
 	my $mdi = $self->extGet('CoditMDI');
-	my $doc = $self->docWidget;
+	my $doc = $self->mdi->docWidget;
 	return unless defined $doc;
 	my $end = $doc->index('end - 1c');
 	my $numlines = $end;
@@ -125,7 +124,7 @@ sub Refresh {
 sub Select {
 	my ($self, $name) = @_;
 	my $hlist = $self->{HLIST};
-	my $doc = $self->docWidget;
+	my $doc = $self->mdi->docWidget;
 	if (defined $doc) {
 		my $line = $hlist->infoData($name);
 		my $index = "$line.0";
@@ -137,7 +136,7 @@ sub Select {
 
 sub Unload {
 	my $self = shift;
-	$self->extGet('NavigatorPanel')->deletePage('PerlSubs');
+	$self->ToolNavigPageRemove('PerlSubs');
 	return $self->SUPER::Unload
 }
 

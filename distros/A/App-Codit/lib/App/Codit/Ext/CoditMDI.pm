@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.10";
+$VERSION="0.11";
 
 use base qw( Tk::AppWindow::Ext::MDI );
 
@@ -73,6 +73,18 @@ Sets and returns the wrap option of the currently selected document.
 =head1 COMMANDS
 
 =over 4
+
+=item B<bookmark_add>
+
+=item B<bookmark_clear>
+
+=item B<bookmark_fill>
+
+=item B<bookmark_next>
+
+=item B<bookmark_prev>
+
+=item B<bookmark_remove>
 
 =item B<doc_autoindent>
 
@@ -160,6 +172,7 @@ sub new {
 #	$self->Require('Navigator');
 	$self->{MACROS} = {};
 	$self->{SHOWSPACES} = 0;
+	$self->{FIXINDENTSPACES} = 3;
 
 	my $nav = $self->Subwidget('NAVTREE');
 
@@ -434,8 +447,10 @@ sub docFixIndent {
 	my $widg = $self->docGet($name)->CWidg;
 
 	my $val = $widg->cget('-indentstyle');
-	$val = 3 if $val eq 'tab';
+	$val = $self->{FIXINDENTSPACES} if $val eq 'tab';
+	$val = 3 unless defined $val;
 	my $spaces_per_tab = $self->popEntry('Spaces', 'Spaces per tab:', $val);
+	$self->{FIXINDENTSPACES} = $spaces_per_tab;
 
 	if (defined $spaces_per_tab) {
 		my $macro = $self->macroInit($name, 'fix_indent', ['docFixIndentCycle', $self, $spaces_per_tab]);
@@ -610,6 +625,23 @@ sub docViewStatus {
 	return $self->docOption('-showstatus', @_);
 }
 
+=item B<docWidget>
+
+Returns a reference to the Tk::CodeText widget
+of the current selected document. Returns undef
+if no document is selected.
+
+=cut
+
+sub docWidget {
+	my $self = shift;
+	my $name = $self->docSelected;
+	return undef unless defined $name;
+	my $doc = $self->docGet($name);
+	return undef unless defined $doc;
+	return $doc->CWidg;
+}
+ 
 sub docWrap {
 	my $self = shift;
 	return $self->docOption('-contentwrap', @_);

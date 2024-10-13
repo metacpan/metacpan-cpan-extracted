@@ -103,7 +103,14 @@ my $file = $codit->lockfile;
 
 if ((defined $file) and (@ARGV)){
 	if (open OUT, '>', $file) {
-		for (@ARGV) { print OUT "$_\n" }
+		for (@ARGV) { 
+			my $file = File::Spec->rel2abs($_);
+			unless (-e $file) {
+				warn "File $_ does not exit";
+				next;
+			}
+			print OUT "$file\n" 
+		}
 		close OUT;
 	}
 	$codit->destroy;

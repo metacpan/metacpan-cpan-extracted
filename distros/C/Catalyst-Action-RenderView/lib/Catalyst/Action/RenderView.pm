@@ -3,7 +3,7 @@ package Catalyst::Action::RenderView;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use base 'Catalyst::Action';
 
@@ -20,7 +20,7 @@ sub execute {
     $c->config->{'Action::RenderView'}->{ignore_classes} =
         ( ref($c->config->{'debug'}) eq 'HASH' ? $c->config->{'debug'}->{ignore_classes} : undef )
         || [ qw/
-        DBIx::Class::ResultSource::Table 
+        DBIx::Class::ResultSource::Table
         DBIx::Class::ResultSourceHandle
         DateTime
         / ] unless exists $c->config->{'Action::RenderView'}->{ignore_classes};
@@ -58,6 +58,14 @@ sub execute {
 };
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=for :stopwords Marcus Ramberg Florian Ragwitz and 3xx ResultSource
 
 =head1 NAME
 
@@ -99,17 +107,17 @@ See L<Catalyst::Action/METHODS/action>.
 
 When you force debug with dump_info=1, RenderView is capable of removing
 classes from the objects in your stash. By default it will replace any
-DBIx::Class resultsource objects with the class name, which cleans up the
-debug output considerably, but you can change what gets scrubbed by 
-setting a list of classes in 
+DBIx::Class ResultSource objects with the class name, which cleans up the
+debug output considerably, but you can change what gets scrubbed by
+setting a list of classes in
 $c->config->{'Action::RenderView'}->{ignore_classes}.
 For instance:
 
-    $c->config->{'Action::RenderView'}->{ignore_classes} = []; 
-    
-To disable the functionality. You can also set 
-config->{'Action::RenderView'}->{scrubber_func} to change what it does with the 
-classes. For instance, this will undef it instead of putting in the 
+    $c->config->{'Action::RenderView'}->{ignore_classes} = [];
+
+To disable the functionality. You can also set
+config->{'Action::RenderView'}->{scrubber_func} to change what it does with the
+classes. For instance, this will undef it instead of putting in the
 class name:
 
     $c->config->{'Action::RenderView'}->{scrubber_func} = sub { undef $_ };
@@ -117,8 +125,8 @@ class name:
 =head2 Deprecation notice
 
 This plugin used to be configured by setting C<< $c->config->{debug} >>.
-That configuration key is still supported in this release, but is 
-deprecated, please use the C< 'Action::RenderView' > namespace as shown 
+That configuration key is still supported in this release, but is
+deprecated, please use the C< 'Action::RenderView' > namespace as shown
 above for configuration in new code.
 
 =head1 EXTENDING
@@ -127,8 +135,8 @@ To add something to an C<end> action that is called before rendering,
 simply place it in the C<end> method:
 
     sub end : ActionClass('RenderView') {
-      my ( $self, $c ) = @_;
-      # do stuff here; the RenderView action is called afterwards
+        my ( $self, $c ) = @_;
+        # do stuff here; the RenderView action is called afterwards
     }
 
 To add things to an C<end> action that are called I<after> rendering,
@@ -136,28 +144,37 @@ you can set it up like this:
 
     sub render : ActionClass('RenderView') { }
 
-    sub end : Private { 
-      my ( $self, $c ) = @_;
-      $c->forward('render');
-      # do stuff here
+    sub end : Private {
+        my ( $self, $c ) = @_;
+        $c->forward('render');
+        # do stuff here
     }
 
 =head1 AUTHORS
 
+=over 4
+
+=item *
+
 Marcus Ramberg <marcus@thefeed.no>
 
-Florian Ragwitz E<lt>rafl@debian.orgE<gt>
+=item *
 
-=head1 COPYRIGHT
+Florian Ragwitz <rafl@debian.org>
 
-Copyright (c) 2006 - 2009
-the Catalyst::Action::RenderView L</AUTHOR>
-as listed above.
+=back
 
-=head1 LICENSE
+=head1 CONTRIBUTOR
 
-This library is free software. You can redistribute it and/or modify it
-under the same terms as Perl itself.
+=for stopwords Graham Knop
+
+Graham Knop <haarg@haarg.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 - 2009 by Marcus Ramberg and Florian Ragwitz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

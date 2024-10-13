@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::StatusBar - adding a status bar
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.11";
+$VERSION="0.15";
 use Tk;
 require Tk::Frame;
 require Tk::Balloon;

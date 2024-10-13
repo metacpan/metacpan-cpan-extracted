@@ -30,7 +30,6 @@ do { my $x = {
                                       'Readonly' => '0',
                                       'Scalar::Util' => '0',
                                       'base' => '0',
-                                      'feature' => '0',
                                       'if' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
@@ -50,7 +49,6 @@ do { my $x = {
                                    'Test::Deep' => '0',
                                    'Test::MockObject' => '0',
                                    'Test::More' => '0',
-                                   'Test::Perl::Critic' => '0',
                                    'Try::Tiny' => '0'
                                  }
                  }

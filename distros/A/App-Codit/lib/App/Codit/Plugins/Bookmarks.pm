@@ -9,7 +9,7 @@ App::Codit::Plugins::Bookmarks - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.10;
+$VERSION = 0.11;
 
 use Data::Compare;
 require Tk::ITree;
@@ -36,8 +36,7 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 
-	my $tp = $self->extGet('NavigatorPanel');
-	my $page = $tp->addPage('Bookmarks', 'bookmarks', undef, 'Manage your bookmarks');
+	my $page = $self->ToolNavigPageAdd('Bookmarks', 'bookmarks', undef, 'Manage your bookmarks');
 
 	$self->cmdConfig(
 		bm_plug_next => ['bmNext', $self],
@@ -326,7 +325,7 @@ sub Unload {
 	}
 	$self->cmdUnhookAfter('bookmark_add', 'RefreshSelected', $self);
 	$self->cmdUnhookAfter('bookmark_remove', 'RefreshSelected', $self);
-	$self->extGet('NavigatorPanel')->deletePage('Bookmarks');
+	$self->ToolNavigPageRemove('Bookmarks');
 	return $self->SUPER::Unload;
 }
 

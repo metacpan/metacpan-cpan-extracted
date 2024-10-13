@@ -1,5 +1,13 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.15 Sat Oct 12 2024
+	- Added pause method to Tk::AppWindow
+	- Added extension Selector
+	- Removed method OnResize in Tk::AppWindow::Ext::SideBars
+	- Deprecated extensions Navigator, NavigatorPanel and ToolPanel.
+	- Updated documentation.
+	- Fixed all pod errors.
+
 0.14 Tue Sep 17 2024
 	- Fixed bug with selecting page in extension SideBars.
 

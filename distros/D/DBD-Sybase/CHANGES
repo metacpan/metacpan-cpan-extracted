@@ -1,3 +1,8 @@
+Release 1.25
+    Fix issue in bigtime/bigdatetime ISO conversion.
+    Allow ability to set configuration options via environment
+    variables (see README)
+
 Release 1.24
     Added support for asymmetric password encryption.
     Fix issue with milliseconds not being returned for bigdatetime in ISO mode.

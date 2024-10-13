@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Navigator - Navigate opened documents and files
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.12";
+$VERSION="0.15";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -23,6 +23,9 @@ require Tk::DocumentTree;
  $app->MainLoop;
 
 =head1 DESCRIPTION
+
+B<Obsolete> use L<Tk::AppWindow::Ext::Selector> instead.
+Will be removed in the next version of I<Tk::AppWindow>.
 
 Adds a document list to your application.
 Loads extension NavigatorPanel if it is not already loaded.

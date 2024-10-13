@@ -4,3 +4,10 @@ Revision history for Perl extension Math::LiveStats
 	- original version; created by h2xs 1.23 with options
 		-AX -n Math::LiveStats
 
+1.01  Sat Oct 12 23:57:18 UTC 2024
+	- Added vwap and vwapdev features
+	- more tests
+
+1.02  Sun Oct 13 01:18:55 UTC 2024
+	- Update documentation
+

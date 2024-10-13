@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.14";
+$VERSION="0.15";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -84,12 +84,13 @@ Default value '#FF0000' (red).
 
 Specifies the list of extensions to be loaded.
 
- my $app = $k::AppWindw->new(
+ my $app = Tk::AppWindow->new(
     -extensions => [ 
-       qw/Art Balloon ConfigFolder
+       qw/Art ConfigFolder Daemons 
        Help Keyboard MDI MenuBar
-       Navigator Panels Plugins
-       SDI Settings StatusBar ToolBar/
+       Panels Plugins SDI Selector
+       Settings SideBars StatusBar
+       ToolBar/
     ],
  );
 
@@ -892,6 +893,19 @@ sub openURL {
 	} else {
 		system("xdg-open \"$url\"");
 	}
+}
+
+=item B<pause>I<($time)>
+
+Pauses the app for $time miliseconds in a non blocking way.
+
+=cut
+
+sub pause {
+	my ($self, $time) = @_;
+	my $var = 0;
+	$self->after($time, sub { $time = 1 });
+	$self->waitVariable(\$time);
 }
 
 =item B<popDialog>I<($title, $message, $icon, @buttons)>

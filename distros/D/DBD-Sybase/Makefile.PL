@@ -31,12 +31,18 @@ my $file;
 my $chained;
 my $threaded_libs;
 my $accept_test_defaults;
+my $use_env;
 GetOptions(
   '--file'                 => \$file,
   '--chained:s'            => \$chained,
   '--threaded_libs:s'      => \$threaded_libs,
-  '--accept_test_defaults' => \$accept_test_defaults
+  '--accept_test_defaults' => \$accept_test_defaults,
+  '--use_env'              => \$use_env
 );
+
+if ($ENV{DBD_SYB_USE_ENV} and $ENV{DBD_SYB_USE_ENV} =~ /y/i) {
+  $use_env = 1;
+}
 
 select(STDOUT);
 $| = 1;
@@ -453,7 +459,12 @@ sub configPwd {
   }
   close(IN);
 
-  if ($accept_test_defaults) {
+  if ($use_env) {
+    $pwd{SRV} = $ENV{DBD_SYB_SRV} || "SYBASE";
+    $pwd{UID} = $ENV{DBD_SYB_UID} || "sa";
+    $pwd{PWD} = $ENV{DBD_SYB_PWD};
+    $pwd{DB}  = $ENV{DBD_SYB_DB};
+  } elsif ($accept_test_defaults) {
     $pwd{SRV} = $pwd{SRV};
     $pwd{UID} = $pwd{UID};
     $pwd{PWD} = $pwd{PWD};
@@ -511,7 +522,9 @@ Sybase implements AutoCommit handling for both its ODBC and JDBC drivers.
 EOF
   print "Use 'CHAINED' mode by default (Y/N) [Y]: ";
   my $ans;
-  if ( defined($chained) ) {
+  if ( $use_env ) {
+    $ans = $ENV{DBD_SYB_CHAINED} || 'Y';
+  } elsif ( defined($chained) ) {
     $ans = $chained;
   } else {
     $ans = getAns(0);
@@ -541,7 +554,9 @@ EOF
     print "Use the threaded (lib..._r) libraries [N]: ";
     my $ans;
 
-    if ( defined($threaded_libs) ) {
+    if ($use_env) {
+      $ans = $ENV{DBD_SYB_THREADED_LIBS} || 'N';
+    } elsif ( defined($threaded_libs) ) {
       $ans = $threaded_libs;
     } else {
       $ans = getAns(0);

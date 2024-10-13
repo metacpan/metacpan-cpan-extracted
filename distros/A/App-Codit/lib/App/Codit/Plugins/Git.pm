@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.09;
+$VERSION = 0.11;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -92,7 +92,7 @@ Same as git_remove but first asks nicely if you really want to do this.
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_, 'Navigator');
+	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 
 	#load only if git command line is installed
@@ -114,8 +114,7 @@ sub new {
 
 	$self->{PROJECTS} = {};
 
-	my $tp = $self->extGet('NavigatorPanel');
-	my $page = $tp->addPage('Git', 'git-icon', undef, 'Manage your projects');
+	my $page = $self->ToolNavigPageAdd('Git', 'git-icon', undef, 'Manage your projects', 250);
 	
 	my $pframe = $page->Frame->pack(-fill => 'x');
 	$pframe->Label(-text => 'Project:')->pack(-side => 'left');
@@ -131,7 +130,7 @@ sub new {
 	$mb->configure(-menu => $menu);
 	$self->{PMENU} = $menu;
 
-	my $nav = $self->extGet('Navigator');
+	my $nav = $self->extGet('Selector');
 	my $gtree = $page->DocumentTree(
 		-entryselect => ['selectInternal', $self],
 		-diriconcall => ['GetDirIcon', $nav],
@@ -387,9 +386,15 @@ sub projectRefresh {
 	return if $cur eq '';
 
 	my @list  = $self->gitFileList($cur);
+	my $size = @list;
+	my $count = 0;
+	$self->mdi->progressAdd('git load', 'Loading project', $size, \$count);
 	for (@list) {
-		$tree->entryAdd($_)
+		$tree->entryAdd($_);
+		$count ++;
+		$self->pause(20);
 	}
+	$self->mdi->progressRemove('git load');
 }
 
 sub projectRemove {
@@ -447,7 +452,7 @@ sub selectInternal {
 
 sub Unload {
 	my $self = shift;
-	$self->extGet('NavigatorPanel')->deletePage('Git');
+	$self->ToolNavigPageRemove('Git');
 	for (
 		'git_add', 
 		'git_collapse', 

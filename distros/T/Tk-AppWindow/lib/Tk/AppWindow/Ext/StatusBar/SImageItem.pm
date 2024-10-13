@@ -1,9 +1,11 @@
 package Tk::AppWindow::Ext::StatusBar::SImageItem;
 
+use strict;
+use warnings;
+
 use Tk;
 use base qw( Tk::AppWindow::Ext::StatusBar::STextItem);
 Construct Tk::Widget 'SImageItem';
-require Tk::Compound;
 
 sub Populate {
 	my ($self,$args) = @_;
@@ -19,7 +21,7 @@ sub Populate {
 sub Update {
 	my $self = shift;
 	my $value = $self->Callback(-updatecommand => $self);
-	$imagehash = $self->cget('-valueimages');
+	my $imagehash = $self->cget('-valueimages');
 	my $image = $imagehash->{$value};
 	$image = 'error' unless defined $image;
 	unless (ref $image) {

@@ -63,7 +63,7 @@ sub new {
 	return undef unless defined $self;
 	return undef if $mswin; #will not load on windows.
 
-	my $page = $self->ToolBottomPageAdd('Console', 'utilities-terminal', undef, 'Execute system commands', 500);
+	my $page = $self->ToolBottomPageAdd('Console', 'utilities-terminal', undef, 'Execute system commands', 250);
 	
 	my @pad = (-padx => 2, -pady => 2);
 	
@@ -83,6 +83,12 @@ sub new {
 	)->pack(@pad, -expand => 1, -fill => 'both');
 	$self->{TXT} = $text;
 	$workdir = $text->cget('-workdir');
+	my $sb = $self->sidebars;
+	$sb->pageSelectCall('Console', sub { $text->focus });
+	$sb->pageUnselectCall('Console', sub { 
+		my $w = $self->mdi->docWidget;
+		$w->focus if defined $w;
+	});
 	
 
 	return $self;
@@ -101,6 +107,16 @@ sub dirSet { # TODO
 	}
 }
 
+sub docWidget {
+	my $self = shift;
+	my $mdi = $self->mdi;
+	my $name = $mdi->docSelected;
+	return undef unless defined $name;
+	my $doc = $mdi->docGet($name);
+	return undef unless defined $doc;
+	return $doc->CWidg;
+}
+ 
 sub linkSelect {
 	my ($self, $text) = @_;
 	if ($text =~ /^([^\s]+)\s+line\s+(\d+)/) {

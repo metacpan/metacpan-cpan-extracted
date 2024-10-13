@@ -1,5 +1,12 @@
 Revision history for namespace-autoclean
 
+0.31      2024-10-12 16:06:26Z
+  - no changes from last trial release
+
+0.30      2021-04-20 17:51:47Z (TRIAL RELEASE)
+  - switch from Sub::Identify to Sub::Util (core in modern perls), falling
+    back to B.pm as needed
+
 0.29      2019-08-24 17:07:22Z
   - switch from Test::Requires to Test::Needs
   - report on the installed versions of more optional modules

@@ -1,7 +1,7 @@
-Math-LiveStats version 1.00
+Math-LiveStats version 1.02
 ===========================
 
-Pure perl module to make mean, standard deviation, and p-values available for given window sizes in streaming data
+Pure perl module to make mean, standard deviation, vwap, and p-values available for one or more window sizes in streaming data
 
 
 INSTALLATION

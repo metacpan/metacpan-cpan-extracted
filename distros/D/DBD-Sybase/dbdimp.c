@@ -5344,9 +5344,11 @@ static int datetime2str(ColData *colData, CS_DATAFMT *srcfmt, char *buff,
 
     cs_dt_crack(context, datatype, value, &rec);
     /* Issue 130 - cs_dt_crack on bigdatetime does not set datemsecond - instead if fills
-       datesecfrack */
+       datesecfrack
+       Issue 136 - datesecprec is not initialized to 0, so the check needs to be done
+       only if the datatype is a bigdate/bigtime */
 #if defined(CS_BIGDATETIME_TYPE)
-    if (rec.datesecprec > 0) {
+    if (srcfmt->datatype == CS_BIGDATETIME_TYPE && rec.datesecprec > 0) {
       rec.datemsecond = rec.datesecfrac / 1000;
     }
 #endif
@@ -5433,9 +5435,11 @@ static int time2str(ColData *colData, CS_DATAFMT *srcfmt, char *buff, CS_INT len
 
     cs_dt_crack(context, datatype, value, &rec);
     /* Issue 130 - cs_dt_crack on bigdatetime does not set datemsecond - instead if fills
-       datesecfrack */
+       datesecfrack
+       Issue 136 - datesecprec is not initialized to 0, so the check needs to be done
+       only if the datatype is a bigdate/bigtime */
 #if defined(CS_BIGTIME_TYPE)
-    if (rec.datesecprec > 0) {
+    if (srcfmt->datatype == CS_BIGTIME_TYPE && rec.datesecprec > 0) {
       rec.datemsecond = rec.datesecfrac / 1000;
     }
 #endif

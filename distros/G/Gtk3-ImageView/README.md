@@ -4,7 +4,7 @@ Gtk3 imager viewer widget modelled after the GtkImageView C widget by Björn
 Lindqvist <bjourne@gmail.com>
 
 To discuss Gtk3::ImageView or gtk3-perl, ask questions and flame/praise the
-authors, join gtk-perl-list@gnome.org at lists.gnome.org.
+authors, join [mailing list](mailto:gtk-perl-list@gnome.org) at lists.gnome.org.
 
 ## INSTALLATION
 
@@ -28,24 +28,24 @@ Or you can use `dzil build` to get the directory of the release in current dir, 
 `dzil help`, [dzil.org](http://dzil.org) and [Dist::Zilla::Tutorial](https://metacpan.org/pod/Dist::Zilla::Tutorial#BUILDING-YOUR-DIST) have more details.
 
 This will install the module to the subdirectory lib/perl5 under the given
-prefix.  If this is not already in perl's include path, you'll need to tell
+prefix. If this is not already in perl's include path, you'll need to tell
 perl how to get to this library directory so you can use it; there are three
 ways:
 
-* in your environment (the easiest):
+- in your environment (the easiest):
 
 ```shell
 PERL5LIB=/some/other/place/lib/perl5/site_perl
 export PERL5LIB
 ```
 
-* on the perl command line:
+- on the perl command line:
 
 ```shell
 perl -I /some/other/place/lib/perl5/site_perl yourscript
 ```
 
-* in the code of your perl script:
+- in the code of your perl script:
 
 ```shell
 use lib '/some/other/place/lib/perl5/site_perl';
@@ -55,11 +55,11 @@ use lib '/some/other/place/lib/perl5/site_perl';
 
 This module requires these other modules and libraries:
 
-* perl >= 5.8.0
-* Glib >= 1.163 (Perl module)
-* GTK+ 3.x (C library)
-* Gtk3 (Perl module)
-* Readonly (Perl module)
+- perl >= 5.8.0
+- Glib >= 1.163 (Perl module)
+- GTK+ 3.x (C library)
+- Gtk3 (Perl module)
+- Readonly (Perl module)
 
 ## BUG REPORTS
 

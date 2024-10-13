@@ -146,8 +146,28 @@ Interface to your webbrowser.
 =head1 HOOKS
 
 Hooks are a feature of the L<Tk::AppWindow::BaseClasses::Callback> object.
-All commands and config variables of the B<configInit>type can have hooks
+All commands and config variables of the B<configInit> type can have hooks
 applied to them. Used mainly to facilitate loading and unloading of plugins.
+See the following methods in L<Tk::AppWindow>:
+
+    cmdHookAfter
+    cmdHookBefore
+    cmdUnhookAfter
+    cmdUnhookBefore
+    
+    configHookAfter
+    configHookBefore
+    configUnhookAfter
+    configUnhookBefore
+
+A good programming practice is to always use the command instead of the method that
+is called by it. This way hooks can be honoured. So:
+
+ $app->cmdExecute('doc_open', $file);
+
+Instead of:
+
+ $mdi->docOpen($file);
 
 =head1 PLUGINS
 
@@ -169,7 +189,55 @@ Hans Jeuken (hanje at cpan dot org)
 
 =item L<Tk::AppWindow>
 
+=item L<Tk::AppWindow::CookBook>
+
+=item L<Tk::AppWindow::CookBook::ContentManager>
+
+=item L<Tk::AppWindow::CookBook::Extension>
+
+=item L<Tk::AppWindow::CookBook::Plugin>
+
+=item L<Tk::AppWindow::BaseClasses::Callback>
+
+=item L<Tk::AppWindow::BaseClasses::ContentManager>
+
 =item L<Tk::AppWindow::BaseClasses::Extension>
+
+=item L<Tk::AppWindow::BaseClasses::Plugin>
+
+=item L<Tk::AppWindow::BaseClasses::PluginJobs>
+
+=item L<Tk::AppWindow::Ext::Art>
+
+=item L<Tk::AppWindow::Ext::ConfigFolder>
+
+=item L<Tk::AppWindow::Ext::Daemons>
+
+=item L<Tk::AppWindow::Ext::Help>
+
+=item L<Tk::AppWindow::Ext::Keyboard>
+
+=item L<Tk::AppWindow::Ext::MDI>
+
+=item L<Tk::AppWindow::Ext::MenuBar>
+
+=item L<Tk::AppWindow::Ext::Panels>
+
+=item L<Tk::AppWindow::Ext::Plugins>
+
+=item L<Tk::AppWindow::Ext::SDI>
+
+=item L<Tk::AppWindow::Ext::Selector>
+
+=item L<Tk::AppWindow::Ext::Settings>
+
+=item L<Tk::AppWindow::Ext::SideBars>
+
+=item L<Tk::AppWindow::Ext::StatusBar>
+
+=item L<Tk::AppWindow::Ext::ToolBar>
+
+=item L<Tk::AppWindow::PluginsForm>
 
 =back
 

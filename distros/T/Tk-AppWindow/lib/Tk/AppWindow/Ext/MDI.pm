@@ -11,7 +11,7 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION="0.07";
+$VERSION="0.15";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -311,7 +311,7 @@ sub CmdDocSave {
 			if ($doc->Save($name)) {
 				$self->monitorUpdate($name);
 				$self->log("Saved '$name'");
-				my $nav = $self->extGet('Navigator');
+				my $nav = $self->navigator;
 				$nav->EntrySaved($name) if defined $nav; 
 				return $name
 			} else {
@@ -980,7 +980,7 @@ sub Interface {
 =item B<interfaceAdd>I<($name)>
 
 Adds $name to the multiple document interface and to the
-Navigator if the Navigator extension is loaded.
+Selector if the Selector extension is loaded.
 
 =cut
 
@@ -1001,7 +1001,7 @@ sub interfaceAdd {
 	}
 
 	#add to navigator
-	my $navigator = $self->extGet('Navigator');
+	my $navigator = $self->navigator;
 	if (defined $navigator) {
 		$navigator->Add($name) if defined $navigator;
 #		$self->interfaceCollapse;
@@ -1010,7 +1010,7 @@ sub interfaceAdd {
 
 =item B<interfaceCollapse>
 
-Collapses all folder trees in the document tree except the path of the selected entry, if extension Navigator is loaded.
+Collapses all folder trees in the document tree except the path of the selected entry, if extension Selector is loaded.
 
 =cut
 
@@ -1022,7 +1022,7 @@ sub interfaceCollapse {
 
 =item B<interfaceExpand>
 
-Opens all folder trees in the document tree, if extension Navigator is loaded.
+Opens all folder trees in the document tree, if extension Selector is loaded.
 
 =cut
 
@@ -1032,10 +1032,16 @@ sub interfaceExpand {
 	$t->expandAll if defined $t;
 }
 
+sub interfaceGet {
+	my $self = shift;
+	my $navigator = $self->navigator;
+	return $navigator
+}
+
 =item B<interfaceRemove>I<($name, ?$flag?)>
 
 Removes $name from the multiple document interface and from the
-Navigator if the Navigator extension is loaded.
+Selector if the Selector extension is loaded.
 
 =cut
 
@@ -1048,7 +1054,7 @@ sub interfaceRemove {
 	$if->deletePage($name) if (defined $if) and $flag;
 
 	#remove from navigator
-	my $navigator = $self->extGet('Navigator');
+	my $navigator = $self->interfaceGet;
 	$navigator->Delete($name) if defined $navigator;
 }
 
@@ -1075,7 +1081,7 @@ sub interfaceRename {
 	}
 
 	#rename in navigator
-	my $navigator = $self->extGet('Navigator');
+	my $navigator = $self->interfaceGet;
 	if (defined $navigator) {
 		$navigator->Delete($old);
 		$navigator->Add($new);
@@ -1097,13 +1103,13 @@ sub interfaceSelect {
 	$if->selectPage($name) if defined $if;
 
 	#select on  navigator
-	my $navigator = $self->extGet('Navigator');
+	my $navigator = $self->interfaceGet;
 	$navigator->SelectEntry($name) if defined $navigator;
 }
 
 =item B<interfaceShow>I<($name)>
 
-Makes I<$name> visible in the Navigator.
+Makes I<$name> visible in the Selector.
 
 =cut
 
@@ -1235,7 +1241,7 @@ sub monitorModified {
 #	print "monitorModified $name\n";
 	my $mod = $self->{MONITOR}->{$name}->{'modified'};
 	my $docmod = $self->docModified($name);
-	my $nav = $self->extGet('Navigator');
+	my $nav = $self->navigator;
 	if ($mod ne $docmod) {
 		if ($docmod) {
 			$nav->EntryModified($name) if defined $nav;
@@ -1271,6 +1277,13 @@ sub monitorUpdate {
 	my ($self, $name) = @_;
 	croak 'Name not defined' unless defined $name;
 	$self->{MONITOR}->{$name}->{'timestamp'} = ctime(stat($name)->mtime);
+}
+
+sub navigator {
+	my $self = shift;
+	my $nav = $self->extGet('Selector');
+	$nav = $self->extGet('Navigator') unless defined $nav;
+	return $nav
 }
 
 sub ReConfigure {
@@ -1418,7 +1431,7 @@ Unknown. If you find any, please contact the author.
 
 =item L<Tk::AppWindow::Ext::ConfigFolder>
 
-=item L<Tk::AppWindow::Ext::Navigator>
+=item L<Tk::AppWindow::Ext::Selector>
 
 =back
 

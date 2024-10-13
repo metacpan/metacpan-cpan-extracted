@@ -15,6 +15,8 @@ Tk::AppWindow::CookBook::Extension - Write your own extension
 =head1 AN ABSTRACT RECIPY
 
  package Tk::AppWindow::Ext::Abstract;
+ # or
+ # package My::NameSpace::Ext::Abstract;
  
  use strict;
  use warnings;
@@ -34,8 +36,8 @@ Tk::AppWindow::CookBook::Extension - Write your own extension
        -option2 => ['CALLBACK', undef, undef, ['Method2', $self]],
 	 );
  
-	 #configure options through configInit
-	 $self->configInit(
+    #configure options through configInit
+    $self->configInit(
        -option3 => ['Method3', $self, 'default value')],
     );
  
@@ -64,30 +66,30 @@ Tk::AppWindow::CookBook::Extension - Write your own extension
  sub MenuItems {
     my $self = shift;
     return (
- #	      type	             menupath				     label					    cmd			       icon					      keyb			
-		[	'menu_normal',		  'appname::Quit',	"~Command1", 	'command1',		'help-about',		'SHIFT+F1'	], 
-		[	'menu_separator',	'appname::Quit',	'h1'], 
+ #       type              menupath         label         cmd          icon          keyb			
+      [	'menu_normal',    'appname::Quit', "~Command1",  'command1',  'help-about', 'SHIFT+F1' ], 
+      [	'menu_separator', 'appname::Quit', 'h1'], 
     )
  }
  
  sub Method2 {
- 	my ($self, $val) = @_;
- 	$self->{VALUE2} = $val if defined $val;
- 	return $self->{VALUE2}
+   my ($self, $val) = @_;
+   $self->{VALUE2} = $val if defined $val;
+   return $self->{VALUE2}
  }
 
  sub Method3 {
- 	my ($self, $val) = @_;
- 	$self->{VALUE3} = $val if defined $val;
- 	return $self->{VALUE3}
+   my ($self, $val) = @_;
+   $self->{VALUE3} = $val if defined $val;
+   return $self->{VALUE3}
  }
 
  sub ToolItems {
     my $self = shift;
-  	 return (
- #     type					        label		     cmd					    icon					    help		
-       [ 'tool_button', 'Command1', 'command1',	'help-about',	'Run command1'],
-       [ 'tool_separator' ],
+    return (
+ #     type           label       cmd         icon          help		
+    [ 'tool_button', 'Command1', 'command1', 'help-about', 'Run command1'],
+    [ 'tool_separator' ],
     )
  }
 
