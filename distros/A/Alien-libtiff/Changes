@@ -1,5 +1,8 @@
 Revision history for Alien::libtiff
 
+1.02 2024-10-14
+    - Clean share dir before installation
+
 1.01 2020-05-04
     - Fix library name in POD
 

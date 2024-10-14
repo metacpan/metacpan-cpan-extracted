@@ -1,0 +1,104 @@
+=head1 NAME
+
+PDK::Device::Hillstone - A Perl module for interacting with Hillstone devices
+
+=head1 SYNOPSIS
+
+    use PDK::Device::Hillstone;
+    my $device = PDK::Device::Hillstone->new();
+    my $config = $device->getConfig();
+
+=head1 DESCRIPTION
+
+This module is used to automate interactions with Hillstone devices using an interactive CLI session through the Expect module.
+
+=head1 ATTRIBUTES
+
+=head2 prompt
+
+The default prompt used for detecting Hillstone CLI output.
+
+=head1 METHODS
+
+=head2 errCodes
+
+Returns a reference to an array of regular expressions representing possible error patterns in command execution. These patterns can be used to detect errors like incomplete commands or unrecognized keywords.
+
+    $device->errCodes();
+
+Returns:
+
+    [
+        qr/incomplete|ambiguous|unrecognized keyword|\^-----/,
+        qr/syntax error|missing argument|unknown command|^Error:/,
+    ]
+
+=head2 waitfor
+
+Waits for a specified or default prompt from the device and captures the output until that prompt appears.
+
+    $device->waitfor($prompt);
+
+=over 4
+
+=item * C<$prompt> - (Optional) A custom prompt to wait for. Defaults to the prompt attribute.
+
+=back
+
+Returns:
+
+    The captured output from the device.
+
+=head2 getConfig
+
+Retrieves the current running configuration from the Hillstone device.
+
+    my $config = $device->getConfig();
+
+Returns:
+
+    A hash reference containing the configuration details or an error if the retrieval fails.
+
+    {
+        success => 1,
+        config  => $config_content,
+    }
+
+=head2 ftpConfig
+
+(BETA) Backup the configuration to an FTP server. This method is under development and not yet finalized for use.
+
+=over 4
+
+=item * C<$server>   - The FTP server address.
+
+=item * C<$hostname> - (Optional) Hostname for the backup file.
+
+=item * C<$username> - The FTP username.
+
+=item * C<$password> - The FTP password.
+
+=back
+
+Returns:
+
+    A hash reference with the success status and details of the operation.
+
+    {
+        success => 1,
+        config  => $ftp_result,
+    }
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut

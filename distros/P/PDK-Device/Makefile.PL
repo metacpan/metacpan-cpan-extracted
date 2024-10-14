@@ -2,28 +2,55 @@
 use strict;
 use warnings;
 
-
+use 5.030000;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Provides basic interaction functionality with network devices, including login, sending commands, and error handling.",
+  "ABSTRACT" => "Moose based OOB modules for network automation!",
   "AUTHOR" => "WENWU.YAN <968828\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "PDK-Device",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.030000",
   "NAME" => "PDK::Device",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.009",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Expect" => 0,
+    "File::Path" => 0,
+    "Moose" => 0,
+    "Moose::Role" => 0,
+    "POSIX" => 0,
+    "Parallel::ForkManager" => 0,
+    "Thread::Queue" => 0,
+    "Try::Tiny" => 0,
+    "namespace::autoclean" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => ""
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Expect" => 0,
+  "File::Path" => 0,
+  "Moose" => 0,
+  "Moose::Role" => 0,
+  "POSIX" => 0,
+  "Parallel::ForkManager" => 0,
+  "Thread::Queue" => 0,
+  "Try::Tiny" => 0,
+  "namespace::autoclean" => 0,
+  "strict" => 0,
+  "warnings" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

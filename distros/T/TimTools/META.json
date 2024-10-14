@@ -4,7 +4,7 @@
       "Tim Potapov <tim.potapov[AT]gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
@@ -48,7 +48,7 @@
       },
       "TimTools" : {
          "file" : "lib/TimTools.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -57,12 +57,12 @@
          "web" : "https://github.com/poti1/timtools/issues"
       },
       "license" : [
-         "http://opensource.org/licenses/artistic-license-2.0.php"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
          "url" : "https://github.com/poti1/timtools"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

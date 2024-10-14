@@ -89,7 +89,7 @@ share {
   }
   
   build [
-    "%{configure} $with_local $with_cpp11 $build_static",
+    "%{configure} $with_local $with_cpp11 $build_static --disable-xmldocs",
     \&pause,
     $make_cmd,
     $make_inst_cmd,

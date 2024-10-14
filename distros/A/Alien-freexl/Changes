@@ -1,5 +1,9 @@
 Revision history for Alien::freexl
 
+1.06 2024-10-14
+    - Disable xmldoc building as it requires minizip which is 
+      no longer packaged wfor many OSes
+
 1.05 2022-12-06
     - Skip cflags and libs tests on system installs
 

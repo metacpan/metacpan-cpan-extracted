@@ -33,7 +33,7 @@
    "provides" : {
       "Subs::Trace" : {
          "file" : "lib/Subs/Trace.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "url" : "https://github.com/poti1/subs-trace"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

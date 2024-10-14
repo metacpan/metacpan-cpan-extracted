@@ -17,11 +17,12 @@ use Carp;
 use File::Spec;
 use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S_IWGRP S_IWOTH SEEK_SET);
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
-my $HAVE_XATTR = eval {require File::ExtAttr; 1;};
-my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
-my $HAVE_DATA_IDENTIFIER = eval {require Data::Identifier; 1;};
+my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
+my $HAVE_UUID_TINY          = eval {require UUID::Tiny; 1;};
+my $HAVE_FILE_VALUEFILE     = eval {require File::ValueFile::Simple::Reader; 1;};
+my $HAVE_DATA_IDENTIFIER    = eval {require Data::Identifier; 1;};
 
 my %_tagpool_directory_setting_tagmap; # define here, but only load (below) if we $HAVE_FILE_VALUEFILE
 
@@ -47,7 +48,7 @@ my %_wk_tagged_as_tags = (
 );
 
 my %_properties = (
-    (map {$_ => {loader => \&_load_stat}}qw(st_dev st_ino st_mode st_nlink st_uid st_gid st_rdev st_size st_blksize st_blocks st_atime st_mtime st_ctime stat_readonly)),
+    (map {$_ => {loader => \&_load_stat}}qw(st_dev st_ino st_mode st_nlink st_uid st_gid st_rdev st_size st_blksize st_blocks st_atime st_mtime st_ctime stat_readonly stat_cachehash)),
     magic_mediatype => {loader => \&_load_magic, rawtype => 'mediatype'},
 );
 
@@ -65,6 +66,18 @@ if ($HAVE_XATTR) {
     $_properties{'xattr_utag_'.($_ =~ tr/.-/__/r)} = {loader => \&_load_xattr, rawtype => 'ise', xattr_key => 'utag.'.$_} foreach qw(ise write-mode final-mode);
     $_properties{'xattr_utag_final_'.($_ =~ tr/.-/__/r)} = {loader => \&_load_xattr, lifecycle => 'final', xattr_key => 'utag.final.'.$_} foreach qw(file.size file.encoding);
     $_properties{'xattr_utag_final_file_encoding'}{parts} = [qw(ise mediatype)];
+}
+
+if ($HAVE_UUID_TINY) {
+    $_properties{content_sha_3_512_uuid} = {loader => sub {
+            my ($self, $key, %opts) = @_;
+            my $lifecycle = $opts{lifecycle};
+            my $digest = $self->digest('sha-3-512', as => 'utag', lifecycle => $lifecycle, default => undef);
+            if (defined $digest) {
+                my $uuid = UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_SHA1(), '66d488c0-3b19-4e6c-856f-79edf2484f37', $digest);
+                (($self->{properties_values} //= {})->{$lifecycle} //= {})->{$key} = {raw => $uuid};
+            }
+        }, rawtype => 'uuid'};
 }
 
 if ($HAVE_FILE_VALUEFILE) {
@@ -232,6 +245,17 @@ sub filesystem {
 }
 
 
+sub tagpool {
+    my ($self) = @_;
+    my $tagpools = $self->{_tagpools} //= do {
+        my $pools = $self->instance->_tagpool;
+        [map {$pools->{$_}} keys %{$self->_tagpool_paths}]
+    };
+
+    return wantarray ? @{$tagpools} : ($tagpools->[0] // croak 'Not part of any tagpool');
+}
+
+
 sub peek {
     my ($self, %opts) = @_;
     my $wanted = $opts{wanted} || 0;
@@ -254,6 +278,8 @@ sub peek {
     return $self->{_peek_buffer} = $buffer;
 }
 
+# ----------------
+
 sub _get_fh {
     my ($self) = @_;
     my $fh = $self->{handle};
@@ -263,6 +289,104 @@ sub _get_fh {
     return $fh;
 }
 
+sub _tagpool_paths {
+    my ($self) = @_;
+
+    unless (defined $self->{_tagpool_paths}) {
+        my File::Information $instance = $self->instance;
+        my $sysfile_cache = $instance->_tagpool_sysfile_cache;
+        my @stat;
+        my %paths;
+        my $found;
+
+        return unless scalar @{$instance->_tagpool_path};
+
+        @stat = stat($self->{handle});
+        return $self->{_tagpool_paths} = {} unless scalar(@stat) && S_ISREG($stat[2]);
+
+        # Try the cache first:
+        {
+            my $key = $stat[1].'@'.$stat[0];
+
+            foreach my $pool_path (keys %{$sysfile_cache}) {
+                $found = $sysfile_cache->{$pool_path}{$key};
+                if (defined $found) {
+                    $paths{$pool_path} = $found;
+                }
+            }
+        }
+
+        # Then guess:
+        unless (defined($found)) {
+            if (defined $self->{path}) {
+                outer:
+                foreach my $uuid ($self->{path} =~ /([0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})/g) {
+                    foreach my $pool_path (@{$instance->_tagpool_path}) {
+                        my $info_path = File::Spec->catdir($pool_path => 'data', 'info.'.$uuid);
+                        my $info;
+
+                        next unless -f $info_path;
+                        $info = eval {
+                            my $reader = File::ValueFile::Simple::Reader->new($info_path, supported_formats => [], supported_features => []);
+                            $reader->read_as_simple_tree;
+                        };
+
+                        if (defined($info) && defined($info->{'pool-name-suffix'})) {
+                            my $local_cache = $sysfile_cache->{$pool_path} //= {};
+                            my @c_stat = stat(File::Spec->catfile($pool_path, 'data', $info->{'pool-name-suffix'}));
+
+                            next unless scalar @c_stat;
+
+                            $local_cache->{$c_stat[1].'@'.$c_stat[0]} = $info->{'pool-name-suffix'};
+
+                            if ($c_stat[0] eq $stat[0] && $c_stat[1] eq $stat[1]) {
+                                $found = $info->{'pool-name-suffix'};
+                                $paths{$pool_path} = $found;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        # Then try the pool:
+        unless (defined($found)) {
+            outer:
+            foreach my $pool_path (@{$instance->_tagpool_path}) {
+                my $data_path = File::Spec->catdir($pool_path => 'data');
+                my $local_cache = $sysfile_cache->{$pool_path} //= {};
+
+                next if $local_cache->{complete};
+
+                if (opendir(my $dir, $data_path)) {
+                    my @c_stat = stat($dir);
+
+                    next if $c_stat[0] ne $stat[0];
+
+                    while (my $entry = readdir($dir)) {
+                        $entry =~ /^file\./ or next; # skip everything that is not a file.* to begin with.
+
+                        @c_stat = stat(File::Spec->catfile($data_path, $entry));
+                        next unless scalar @c_stat;
+
+                        $local_cache->{$c_stat[1].'@'.$c_stat[0]} = $entry;
+
+                        if ($c_stat[0] eq $stat[0] && $c_stat[1] eq $stat[1]) {
+                            $found = $entry;
+                            $paths{$pool_path} = $found;
+                        }
+                    }
+
+                    $local_cache->{complete} = 1;
+                }
+            }
+        }
+
+        $self->{_tagpool_paths} = \%paths;
+    }
+
+    return $self->{_tagpool_paths};
+}
 
 sub _load_stat {
     my ($self, undef, %opts) = @_;
@@ -284,6 +408,7 @@ sub _load_stat {
         }
 
         $pv->{stat_readonly} = {raw => !($values[2] & (S_IWUSR|S_IWGRP|S_IWOTH))};
+        $pv->{stat_cachehash} = {raw => $values[1].'@'.$values[0]} if $values[1] > 0 && $values[0] ne '';
 
         $self->{_loaded_stat} = 1;
     }
@@ -439,88 +564,8 @@ sub _load_tagpool_file {
         $c->{tagpool_file_mtime} = {raw => $stat[9]};
     }
 
-    # First we need to find the file:
-
-    # Try the cache first:
-    {
-        my $key = $stat[1].'@'.$stat[0];
-
-        foreach my $pool_path (keys %{$sysfile_cache}) {
-            $found = $sysfile_cache->{$pool_path}{$key};
-            if (defined $found) {
-                $in_pool = $pool_path;
-                last;
-            }
-        }
-    }
-
-    # Then guess:
-    unless (defined($in_pool) && defined($found)) {
-        if (defined $self->{path}) {
-            outer:
-            foreach my $uuid ($self->{path} =~ /([0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})/g) {
-                foreach my $pool_path (@{$instance->_tagpool_path}) {
-                    my $info_path = File::Spec->catdir($pool_path => 'data', 'info.'.$uuid);
-                    my $info;
-
-                    next unless -f $info_path;
-                    $info = eval {
-                        my $reader = File::ValueFile::Simple::Reader->new($info_path, supported_formats => [], supported_features => []);
-                        $reader->read_as_simple_tree;
-                    };
-
-                    if (defined($info) && defined($info->{'pool-name-suffix'})) {
-                        my $local_cache = $sysfile_cache->{$pool_path} //= {};
-                        my @c_stat = stat(File::Spec->catfile($pool_path, 'data', $info->{'pool-name-suffix'}));
-
-                        next unless scalar @c_stat;
-
-                        $local_cache->{$c_stat[1].'@'.$c_stat[0]} = $info->{'pool-name-suffix'};
-
-                        if ($c_stat[0] eq $stat[0] && $c_stat[1] eq $stat[1]) {
-                            $found = $info->{'pool-name-suffix'};
-                            $in_pool = $pool_path;
-                            last outer;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    # Then try the pool:
-    unless (defined($in_pool) && defined($found)) {
-        outer:
-        foreach my $pool_path (@{$instance->_tagpool_path}) {
-            my $data_path = File::Spec->catdir($pool_path => 'data');
-            my $local_cache = $sysfile_cache->{$pool_path} //= {};
-
-            next if $local_cache->{complete};
-
-            if (opendir(my $dir, $data_path)) {
-                my @c_stat = stat($dir);
-
-                next if $c_stat[0] ne $stat[0];
-
-                while (my $entry = readdir($dir)) {
-                    $entry =~ /^file\./ or next; # skip everything that is not a file.* to begin with.
-
-                    @c_stat = stat(File::Spec->catfile($data_path, $entry));
-                    next unless scalar @c_stat;
-
-                    $local_cache->{$c_stat[1].'@'.$c_stat[0]} = $entry;
-
-                    if ($c_stat[0] eq $stat[0] && $c_stat[1] eq $stat[1]) {
-                        $found = $entry;
-                        $in_pool = $pool_path;
-                        last outer;
-                    }
-                }
-
-                $local_cache->{complete} = 1;
-            }
-        }
-    }
+    # Try to find the file:
+    ($in_pool, $found) = %{$self->_tagpool_paths};
 
     return unless defined($in_pool) && defined($found);
 
@@ -682,11 +727,24 @@ File::Information::Inode - generic module for extrating information from filesys
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
     use File::Information;
+
+    my File::Information $instance = File::Information->new(%config);
+
+    my File::Information::Inode $inode = $instance->for_handle($handle);
+
+    my File::Information::Inode $inode = $instance->for_link($path)->inode;
+
+B<Note:> This package inherits from L<File::Information::Base>.
+
+This module represents an inode on a filesystem. An inode contains basic file metadata (such as type and size) and the file's content.
+Inodes are commonly represented by an inode number (but this is subject to filesystem implementation and limitations).
+In order to access inodes they most commonly need to have at least one hardlink pointing to them.
+See also L<File::Information::Link>.
 
 =head1 METHODS
 
@@ -708,6 +766,19 @@ This can also be C<undef> which switches
 from C<die>-ing when no value is available to returning C<undef>.
 
 =back
+
+=head2 tagpool
+
+    my File::Information::Tagpool $tagpool = $inode->tagpool;
+    # or:
+    my                            @tagpool = $inode->tagpool;
+
+This method returns any tagpool instances this file is part of.
+If called in scalar context only one is returned and if none have been found this function C<die>s.
+If called in list context the list is returned and an empty list is returned in case none have been found.
+
+If called in scalar context it is not clear which is returned in case the file is part of multiple pools.
+However the result is cached and for the same instance of this object always the same tagpool instance is returned.
 
 =head2 peek
 

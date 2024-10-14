@@ -1,90 +1,85 @@
 package PDK::Device::Cisco::Nxos;
 
-use 5.030;
-use strict;
-use warnings;
-
+use v5.30;
 use Moose;
 use Expect qw'exp_continue';
 use Carp   qw'croak';
 extends 'PDK::Device::Cisco';
 use namespace::autoclean;
 
-sub ftpConfig {
+sub ftp_config {
   my ($self, $hostname, $server, $username, $password) = @_;
+
+  if (!$self->{exp}) {
+    my $login = $self->login();
+    croak $login->{reason} if $login->{success} == 0;
+  }
 
   $server   //= $ENV{PDK_FTP_SERVER};
   $username //= $ENV{PDK_FTP_USERNAME};
   $password //= $ENV{PDK_FTP_PASSWORD};
 
-  croak "请正确提供 FTP 服务器地址、账户和密码!" unless $username and $password and $server;
+  croak "请正确提供 FTP 服务器地址、账户和密码，或者设置相关的环境变量！" unless $username && $password && $server;
 
   my $host = $self->{host};
 
-  my $command = "copy running-config ftp://$username" . '@' . "$server/$self->{month}/$self->{date}/";
+  my $command = "copy running-config ftp://$username\@$server/$self->{month}/$self->{date}/";
 
-  if ($hostname) {
-    $command .= $hostname . '_' . $host . '.cfg';
+  if (!!$hostname) {
+    $command .= "${hostname}_${host}.cfg";
   }
   else {
-    $command .= $host . '.cfg';
-  }
-
-  if (!$self->{exp}) {
-    my $login = $self->login();
-    if ($login->{success} != 1) {
-      croak $login->{reason};
-    }
+    $command .= "$host.cfg";
   }
 
   my $exp    = $self->{exp};
-  my $result = $exp->match() // '';
+  my $result = $exp->match() || '';
 
   my $vrf = 'default';
+  $self->dump("准备连接到 FTP 服务器");
 
-  $exp->send("$command\n");
+  $self->send("$command\n");
+
   my @ret = $exp->expect(
     15,
     [
-      qr/Enter vrf/mi => sub {
+      qr/Enter vrf/i => sub {
+        $self->send("$vrf\n");
         $result .= $exp->before() . $exp->match();
-        $exp->send("$vrf\n");
         exp_continue;
       }
     ],
     [
-      qr/assword:/mi => sub {
+      qr/assword:/i => sub {
+        $self->send("$password\n");
         $result .= $exp->before() . $exp->match();
-        $exp->send("$password\n");
       }
     ],
     [
       eof => sub {
-        croak("执行[$command/尝试FTP备份配置]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+        croak("执行[$command/尝试FTP备份配置]，与设备 $self->{host} 会话丢失，连接被意外关闭！原因：\n" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[$command/尝试FTP备份配置]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+        croak("执行[$command/尝试FTP备份配置]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！原因：\n" . $exp->before());
       }
     ],
   );
 
-  if (defined $ret[1]) {
-    croak $ret[3];
-  }
+  croak($ret[3]) if defined $ret[1];
 
   @ret = $exp->expect(
     10,
     [
       qr/Transfer of file aborted \*/mi => sub {
-        croak "执行脚本 $command 异常，上传失败!";
+        croak "执行脚本 $command 异常，上传失败！";
       }
     ],
     [
       qr/Copy complete\./mi => sub {
         $result .= $exp->before() . $exp->match();
-        say "[debug] 脚本 $command 已执行完毕, 文件上传成功!" if $self->{debug};
+        $self->dump("脚本 $command 已执行完毕，文件上传成功");
         exp_continue;
       }
     ],
@@ -95,19 +90,17 @@ sub ftpConfig {
     ],
     [
       eof => sub {
-        croak("执行[$command/检查备份任务是否完成]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+        croak("执行[$command/检查备份任务是否完成]，与设备 $self->{host} 会话丢失，连接被意外关闭！原因：\n" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[$command/检查备份任务是否完成]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+        croak("执行[$command/检查备份任务是否完成]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！原因：\n" . $exp->before());
       }
     ],
   );
 
-  if (defined $ret[1]) {
-    croak $ret[3];
-  }
+  croak($ret[3]) if defined $ret[1];
 
   return {success => 1, config => $result};
 }

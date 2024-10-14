@@ -1,14 +1,12 @@
 package PDK::Device::Huawei;
 
-use 5.030;
-use strict;
-use warnings;
-
+use v5.30;
 use Moose;
-use Expect qw'exp_continue';
-use Carp   qw'croak';
-with 'PDK::Device::Base';
+use Expect qw(exp_continue);
+use Carp   qw(croak);
 use namespace::autoclean;
+
+with 'PDK::Device::Base';
 
 has prompt => (is => 'ro', required => 1, default => '^\s*[<\[].*?[>\]]\s*$',);
 
@@ -34,28 +32,28 @@ sub waitfor {
     15,
     [
       qr/^\s*---- More ----\s*$/mi => sub {
-        $exp->send(" ");
+        $self->send(" ");
         $buff .= $exp->before();
         exp_continue;
       }
     ],
     [
       qr/Are you sure to continue/i => sub {
-        $exp->send("y\r");
+        $self->send("y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
       qr/This command will change the default screen width/i => sub {
-        $exp->send("Y\r");
+        $self->send("y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
       qr/press the enter key/i => sub {
-        $exp->send("\r");
+        $self->send("\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
@@ -92,6 +90,8 @@ sub runCommands {
 
   croak "执行[runCommands]，必须提供一组待下发脚本" unless ref $commands eq 'ARRAY';
 
+  $self->{mode} = 'deployCommands';
+
   if ($commands->[0] !~ /^sy/i) {
     unshift @$commands, 'system-view';
   }
@@ -124,14 +124,18 @@ sub getConfig {
 sub ftpConfig {
   my ($self, $hostname, $server, $username, $password) = @_;
 
+  if (!$self->{exp}) {
+    my $login = $self->login();
+    croak $login->{reason} if $login->{success} == 0;
+  }
+
   $server   //= $ENV{PDK_FTP_SERVER};
   $username //= $ENV{PDK_FTP_USERNAME};
   $password //= $ENV{PDK_FTP_PASSWORD};
 
   croak "请正确提供 FTP 服务器地址、账户和密码!" unless $username and $password and $server;
 
-  my $host = $self->{host};
-
+  my $host    = $self->{host};
   my $command = "put vrpcfg.zip $self->{month}/$self->{date}/";
 
   if ($hostname) {
@@ -141,31 +145,27 @@ sub ftpConfig {
     $command .= $host . '.zip';
   }
 
-  if (!$self->{exp}) {
-    my $login = $self->login();
-    croak $login->{reason} if $login->{success} == 0;
-  }
-
   my $exp    = $self->{exp};
-  my $result = $exp ? $exp->match() : "";
+  my $result = $exp ? ($exp->match() || '') : '';
 
   my $ftp_cmd = "ftp $server vpn-instance default";
-  say "[debug] 生成 FTP 备份指令：$ftp_cmd" if $self->{debug};
+  $self->dump("生成 FTP 备份指令：$ftp_cmd");
 
-  $exp->send("$ftp_cmd\n");
+  $self->dump("正在连接 FTP 服务器");
+  $self->send("$ftp_cmd\n");
   my @ret = $exp->expect(
     15,
     [
       qr/User\s*\(/i => sub {
+        $self->send("$username\n");
         $result .= $exp->before() . $exp->match();
-        $exp->send("$username\n");
         exp_continue;
       }
     ],
     [
       qr/assword:/i => sub {
+        $self->send("$password\n");
         $result .= $exp->before() . $exp->match();
-        $exp->send("$password\n");
       }
     ],
     [
@@ -192,7 +192,7 @@ sub ftpConfig {
     [
       qr/User logged in/i => sub {
         $result .= $exp->before() . $exp->match();
-        say "[debug] 成功连接 FTP 服务器($server)" if $self->{debug};
+        $self->dump("成功连接 FTP 服务器($server)");
       }
     ],
     [
@@ -207,7 +207,10 @@ sub ftpConfig {
     ],
   );
 
-  $exp->send("$command\n");
+  croak($ret[3]) if defined $ret[1];
+
+  $self->dump("正在执行FTP备份任务");
+  $self->send("$command\n");
   @ret = $exp->expect(
     15,
     [
@@ -218,7 +221,7 @@ sub ftpConfig {
     [
       qr/Transfer complete.*ftp[>\]]/ms => sub {
         $result .= $exp->before() . $exp->match() . $exp->after();
-        say "\n[debug] 脚本 $command 已执行完毕, 文件上传成功!" if $self->{debug};
+        $self->dump("脚本 $command 已执行完毕, 文件上传成功");
       }
     ],
     [
@@ -234,7 +237,7 @@ sub ftpConfig {
   );
 
   croak($ret[3]) if defined $ret[1];
-  $exp->send("quit\n");
+  $self->send("quit\n");
 
   return {success => 1, config => $result};
 }

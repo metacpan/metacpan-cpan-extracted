@@ -6,16 +6,39 @@ use warnings;
 use Module::Build;
 Module::Build->VERSION( '0.4004' );
 
-sub _readme {
-    eval { require Pod::Markdown };
-    return if $@;
-    print "Building README\n";
-    system "pod2markdown lib/e.pm > README.md";
-}
-_readme();
-
 my $class = Module::Build->subclass(
     code => q{
+        use Cwd qw( cwd );
+
+        #---------------------------------
+        #            Build
+        #---------------------------------
+
+        sub ACTION_build {
+            my ($s) = @_;
+            $s->_readme();
+            $s->SUPER::ACTION_build;
+        }
+
+        # Only for the maintainer on "Build build".
+        sub _readme {
+            my ($s) = @_;
+            return if cwd() !~ m{ / git / perlmy / [^/]+ $ }x;
+
+            my ($installed) =
+                grep { -x "$_/pod2markdown" }
+                split /:/, $ENV{PATH};
+            return if !$installed;
+
+            print "Building README\n";
+            my $lib = $s->{properties}{dist_version_from};
+            system "pod2markdown $lib > README.md";
+        }
+
+        #---------------------------------
+        #           Install
+        #---------------------------------
+
         sub ACTION_install {
             my ($s) = @_;
             $s->SUPER::ACTION_install;

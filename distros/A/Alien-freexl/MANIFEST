@@ -1,5 +1,6 @@
 alienfile
 Changes
+cpanfile
 lib/Alien/freexl.pm
 LICENSE
 Makefile.PL

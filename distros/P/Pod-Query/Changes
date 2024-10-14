@@ -1,5 +1,6 @@
 Revision history for Pod-Query
 
+0.39    2024-10-13 - Improved Build process.
 0.38    2024-06-11 - Updated git flow for perl v5.40.
 0.37
         2022-10-18 - Added complex CI.

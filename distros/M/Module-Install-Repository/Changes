@@ -1,5 +1,12 @@
 Revision history for Perl extension Module::Install::Repository
 
+0.08  Mon Oct 14 02:36:27 PDT 2024
+        - remove test
+
+0.07  Fri Oct 13 22:52:00 PDT 2024
+        - Support git remotes named 'github' (Mark Fowler)
+        - Remove dependencies bundled in inc/
+
 0.06  Wed Aug 12 17:35:30 PDT 2009
         - Added Path::Class to test_requires (gfx)
 

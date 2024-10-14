@@ -668,20 +668,24 @@ Examples:
 
 =head2 repeat
 
-C<static method repeat : double ($string : string, $count : int);>
+C<static method repeat : string ($string : string, $count : int);>
 
 Concatenates $string the number of times specified in $count and return it.
 
 Exceptions:
 
-$string must be defined. Otherwise an exception is thrown.
+The $string must be defined. Otherwise an exception is thrown.
 
-$repeat count must be greater than or equal to 0.
+The repeat count $count count be a non-negative integer. Otherwise an exception is thrown.
 
 Examples:
   
   # "abcabcabc"
   my $repeat_string = Fn->repeat("abc", 3);
+
+See Also:
+
+See L<Array#repeat|SPVM::Array/"repeat"> method about repeating an array.
 
 =head2 replace_chars
 

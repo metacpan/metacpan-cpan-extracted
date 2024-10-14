@@ -1,5 +1,11 @@
 Revision history for Test-ExpectAndCheck
 
+0.07    2024-10-13
+        [CHANGES]
+         * Added `namedargs()` helper for dealing with methods that take named
+           arguments in maybe-unreliable orders due to hash order randomisation
+         * Added optional VERBOSE debugging mode
+
 0.06    2023-10-17
         [CHANGES]
          * Ensure that the callback in `->will_return_using` can modify caller

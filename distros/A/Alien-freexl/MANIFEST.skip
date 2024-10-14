@@ -1,15 +1,22 @@
 _alien
 
 .git
+.github
+.gitignore
 
 .travis.yml
 appveyor.yml
+.cirrus.yml
 
 MANIFEST.bak
 
 ^Makefile$
+^Makefile.old
 
 MYMETA.json
 MYMETA.yml
 
 blib
+
+.tar$
+.tar.gz$

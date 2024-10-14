@@ -4,7 +4,7 @@ package Module::Install::Repository;
 use strict;
 use 5.005;
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 use base qw(Module::Install::Base);
 

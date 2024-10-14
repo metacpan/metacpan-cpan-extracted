@@ -1,16 +1,14 @@
 package PDK::Device::Paloalto;
 
-use 5.030;
-use strict;
-use warnings;
-
+use v5.30;
 use Moose;
-use Expect qw'exp_continue';
-use Carp   qw'croak';
-with 'PDK::Device::Base';
+use Expect qw(exp_continue);
+use Carp   qw(croak);
 use namespace::autoclean;
 
-has prompt => (is => 'ro', required => 1, default => '^.*?\((?:active|passive)\)[>#]\s*$',);
+with 'PDK::Device::Base';
+
+has prompt => (is => 'ro', required => 1, default => '^.*?\((?:active|passive|suspended)\)[>#]\s*$',);
 
 sub errCodes {
   my $self = shift;
@@ -29,15 +27,15 @@ sub waitfor {
   my @ret = $exp->expect(
     10,
     [
-      qr/^lines\s*\d+-\d+\s*$/mi => sub {
-        $exp->send(" ");
+      qr/^lines\s*\d+-\d+\s*$/i => sub {
+        $self->send(" ");
         $buff .= $exp->before();
         exp_continue;
       }
     ],
     [
-      qr/are you sure\?/mi => sub {
-        $exp->send("y\r");
+      qr/are you sure\?/i => sub {
+        $self->send("y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
@@ -49,9 +47,7 @@ sub waitfor {
     ],
   );
 
-  if (defined $ret[1]) {
-    croak($ret[3]);
-  }
+  croak($ret[3]) if defined $ret[1];
 
   $buff =~ s/ \cH//g;
   $buff =~ s/(\c[\S+)+\cM(\c[\[K)?//g;
@@ -63,7 +59,7 @@ sub waitfor {
 sub getConfig {
   my $self = shift;
 
-  my $commands = [" set cli pager off", "set cli config-output-format set", "show", "exit",];
+  my $commands = ["set cli pager off", "set cli config-output-format set", "configure", "show", "exit",];
 
   my $config = $self->execCommands($commands);
 

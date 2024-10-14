@@ -16,7 +16,7 @@ name: Pod-Query
 provides:
   Pod::Query:
     file: lib/Pod/Query.pm
-    version: '0.38'
+    version: '0.39'
 requires:
   Pod::LOL: '0.08'
   Role::Tiny: '2.002004'
@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/poti1/pod-query/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/poti1/pod-query
-version: '0.38'
+version: '0.39'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

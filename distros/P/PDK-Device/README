@@ -1,7 +1,7 @@
 This archive contains the distribution PDK-Device,
-version 0.009:
+version 0.010:
 
-  Provides basic interaction functionality with network devices, including login, sending commands, and error handling.
+  Moose based OOB modules for network automation!
 
 This software is copyright (c) 2024 by WENWU.YAN.
 

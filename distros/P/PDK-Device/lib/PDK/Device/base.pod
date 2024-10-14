@@ -1,0 +1,276 @@
+=pod
+
+=head1 NAME
+
+PDK::Device::Base - Provides basic interaction functionality with network devices, including login, sending commands, and error handling.
+
+=head1 SYNOPSIS
+
+  package PDK::Device::Cisco;
+  with "PDK::Device::Base";
+
+  # Initialize the object
+  my $device = PDK::Device::Cisco->new(
+    host => '192.168.1.1',
+    username => 'admin',
+    password => 'password',
+  );
+
+  # Login to the device
+  my $login_status = $device->login();
+  if ($login_status->{success}) {
+    $device->send('show running-config');
+  }
+
+  # Retrieve running configuration
+  $device->getConfig();
+
+  # FTP configuration backup
+  $device->ftpConfig();
+
+  # Execute commands in normal mode
+  $device->execCommands(['show ip int b', 'show ver']);
+
+  # Execute commands in privileged mode, automatically entering config view
+  $device->runCommands(['show ver', 'show lldp n']);
+
+  # Write configuration information to a text file
+  $device->write_file($device->getConfig(), '192.168.1.1_startup.cfg');
+
+=head1 DESCRIPTION
+
+PDK::Device::Base provides basic interaction functionality with network devices, including login, sending commands, and error handling.
+
+=head1 ENVIRONMENT VARIABLES
+
+PDK-Device supports the following environment variables:
+
+=over 4
+
+=item PDK_DEVICE_USERNAME
+
+Device login username.
+
+=item PDK_DEVICE_PASSWORD
+
+Device login password.
+
+=item PDK_DEVICE_ENPASSWORD
+
+Device enable mode password.
+
+=item PDK_FTP_SERVER
+
+FTP server address.
+
+=item PDK_FTP_USERNAME
+
+FTP username.
+
+=item PDK_FTP_PASSWORD
+
+FTP password.
+
+=item PDK_DEVICE_CONFIG_HOME
+
+Root directory for configuration backups, defaults to /opt/pdk.
+
+=item PDK_DEVICE_DEBUG
+
+Project debug level:
+1 - Print logs
+2 - Print CLI interaction
+3 - Print Expect low-level details
+
+=item PDK_CATCH_ERROR
+
+Whether to enable exception code interception, supports only 1 (enabled) and 0 (disabled); values other than 1 will be converted to 0.
+
+=back
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item exp
+
+Expect object used for interaction with the device.
+
+=item host
+
+Device hostname or IP address.
+
+=item port
+
+Device connection port, defaults to an empty string.
+
+=item proto
+
+Connection protocol, defaults to SSH.
+
+=item prompt
+
+Normal prompt, defaults to '\S+[#>]\s*\z'.
+
+=item enPrompt
+
+Enable prompt.
+
+=item enCommand
+
+Command to enter enable mode.
+
+=item username
+
+Device username, defaults to an empty string.
+
+=item password
+
+Device password, defaults to an empty string.
+
+=item enPassword
+
+Enable mode password.
+
+=item passphrase
+
+Key phrase, defaults to an empty string.
+
+=item mode
+
+Current mode, defaults to 'normal'.
+
+=item catchError
+
+Whether to catch errors, defaults to 1 (enabled).
+
+=item enabled
+
+Device enable mode status, defaults to 0 (disabled).
+
+=item status
+
+Device login status, defaults to 0 (not logged in).
+
+=item month
+
+Current month formatted as YYYY-MM.
+
+=item date
+
+Current date formatted as YYYY-MM-DD.
+
+=item workdir
+
+Root directory for configuration files, defaults to PDK_CONFIG_HOME environment variable or user's home directory.
+
+=item debug
+
+Debug switch, defaults to 0 (disabled).
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item login
+
+Attempts to log in to the device. If already logged in, it returns a success status directly.
+
+=over 4
+
+=item Exception reconnection scenarios
+
+1. **Network connection lost**:
+   - When the device loses network connection, login will fail. This will trigger reconnection logic.
+   - If SSH (preferred) connection fails (port unreachable but machine online), it will attempt to log in via Telnet.
+   - Automatic fixing of SSH protocol compatibility issues.
+   - Automatic updating of SSH keys, such as when the machine is replaced and the key corruption warning appears.
+
+2. **Device unresponsive**:
+   - If the device does not respond during the login process (timeout), it will attempt to reconnect and log in.
+
+3. **Authentication failure**:
+   - If login fails due to incorrect username, password, or enable password, the system will allow a certain number of retries.
+
+=item Basic implementation logic
+
+1. **Check current status**:
+   - If already logged in, return a success status to avoid unnecessary retries.
+
+2. **Send login command**:
+   - Send a login request to the device using the configured credentials (username and password).
+
+3. **Capture exceptions**:
+   - The login request may fail due to network issues, timeouts, or authentication errors. These exceptions will be captured and logged.
+
+4. **Reconnection mechanism**:
+   - After capturing an exception, the system will enter reconnection logic. Based on the configured retry count, it will wait a certain amount of time before retrying login.
+   - Each retry will attempt to reconnect to the device and send a login request.
+
+5. **Limit retry count**:
+   - To avoid long retry loops, the system will limit the maximum retry count (e.g., 5 times), and return a failure status after exceeding this count.
+
+6. **Return status**:
+   - If login is successful, return `{ success => 1 }`.
+   - If all retries fail, return `{ success => 0, reason => 'Error reason' }`, and log detailed retry information.
+
+=back
+
+=item connect($args)
+
+Establish a connection with the device.
+
+Return values:
+  - Return status, 1 for success, -1 for failure.
+
+=item send($command)
+
+Send a command to the device.
+
+=item enable
+
+Switch to enable mode.
+
+Return values:
+  - 1 for success, 0 for failure.
+
+=item execCommands($commands)
+
+Execute a series of commands and process the results.
+
+Parameters:
+  - $commands: List of commands as an array reference.
+
+Return values:
+  - On success, returns { success => 1, result => 'Execution result' }
+  - On failure, returns { success => 0, failCommand => 'Failed command', reason => 'Error reason', snapshot => 'Relevant snapshot' }
+
+=item write_file($config, $name)
+
+Write the configuration to the specified file.
+
+Parameters:
+  - $config: The configuration content to be written.
+  - $name: Optional, the filename (defaults to hostname plus ".cfg").
+
+=back
+
+=head1 SEE ALSO
+
+L<https://github.com/railsboot/PDK-Device>.
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut

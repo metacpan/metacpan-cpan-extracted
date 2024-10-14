@@ -1,0 +1,54 @@
+{
+   "abstract" : "Automatically sets repository URL from svn/svk/Git checkout",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.21, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Module-Install-Repository",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Path::Class" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.005"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/miyagawa/module-install-repository.git"
+      }
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

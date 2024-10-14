@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.591';
+our $VERSION = '0.592';
 
 use 5.020;
 use Moo;
@@ -32,8 +32,8 @@ sub evaluation_order ($class) { 4 }
 
 sub keywords ($class, $spec_version) {
   return (
-    qw(contentEncoding contentMediaType),
-    $spec_version ne 'draft7' ? 'contentSchema' : (),
+    $spec_version !~ /^draft[46]$/ ? qw(contentEncoding contentMediaType) : (),
+    $spec_version !~ /^draft[467]$/ ? 'contentSchema' : (),
   );
 }
 
@@ -129,7 +129,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.591
+version 0.592
 
 =head1 DESCRIPTION
 

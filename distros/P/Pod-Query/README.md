@@ -2,10 +2,6 @@
 
 Pod::Query - Query pod documents
 
-# VERSION
-
-Version 0.38
-
 # SYNOPSIS
 
 Query POD information from a file

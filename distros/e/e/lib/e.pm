@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.30
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.31
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.30';
+our $VERSION = '1.31';
 
 =head1 SYNOPSIS
 
@@ -395,8 +395,6 @@ Work with arrays.
     my $collection = c(1, 2, 3);
 
 Turn list into a L<Mojo::Collection> object.
-
-=cut
 
 =head3 set
 

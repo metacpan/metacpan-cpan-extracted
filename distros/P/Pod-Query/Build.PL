@@ -6,13 +6,39 @@ use warnings;
 use Module::Build;
 Module::Build->VERSION( '0.4004' );
 
-sub readme {
-    print "Building README\n";
-    system "pod2markdown lib/Pod/Query.pm > README.md";
-}
-readme();
+my $class = Module::Build->subclass(
+    code => q{
+        use Cwd qw( cwd );
 
-my $builder = Module::Build->new(
+        #---------------------------------
+        #            Build
+        #---------------------------------
+
+        sub ACTION_build {
+            my ($s) = @_;
+            $s->_readme();
+            $s->SUPER::ACTION_build;
+        }
+
+        # Only for the maintainer on "Build build".
+        sub _readme {
+            my ($s) = @_;
+            return if cwd() !~ m{ / git / perlmy / [^/]+ $ }x;
+
+            my ($installed) =
+                grep { -x "$_/pod2markdown" }
+                split /:/, $ENV{PATH};
+            return if !$installed;
+
+            print "Building README\n";
+            my $lib = $s->{properties}{dist_version_from};
+            system "pod2markdown $lib > README.md";
+        }
+
+    },
+);
+
+my $builder = $class->new(
     module_name        => 'Pod::Query',
     license            => 'artistic_2',
     dist_author        => q{Tim Potapov <tim.potapov[AT]gmail.com>},

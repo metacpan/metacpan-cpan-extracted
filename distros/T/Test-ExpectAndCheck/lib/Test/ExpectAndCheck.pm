@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Test::ExpectAndCheck 0.06;
+package Test::ExpectAndCheck 0.07;
 
 use v5.14;
 use warnings;
@@ -15,6 +15,9 @@ use Scalar::Util qw( blessed );
 
 use Test::Deep ();
 
+use Exporter 'import';
+our @EXPORT_OK = qw( namedargs );
+
 use constant EXPECTATION_CLASS => "Test::ExpectAndCheck::_Expectation";
 
 =head1 NAME
@@ -22,6 +25,8 @@ use constant EXPECTATION_CLASS => "Test::ExpectAndCheck::_Expectation";
 C<Test::ExpectAndCheck> - C<expect/check>-style unit testing with object methods
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Test::More;
    use Test::ExpectAndCheck;
@@ -47,7 +52,26 @@ method calls. Each method call is checked that it received the right
 arguments, and will return a prescribed result. At the end of each test, each
 object is checked to ensure all the expected methods were called.
 
+=head2 Verbose Mode
+
+Sometimes when debugging a failing test it can be useful to see a log of which
+expectations have been called. By setting the C<$VERBOSE> package variable to
+a true value, extra printing will happen during the test.
+
+   {
+      local $Test::ExpectAndCheck::VERBOSE = 1;
+
+      $controller->expect( ... );
+
+      ...
+   }
+
+This is printed directly to C<STDERR> and is intended for temporary debugging
+during development.
+
 =cut
+
+our $VERBOSE = 0;
 
 =head1 METHODS
 
@@ -88,7 +112,8 @@ name, with the given arguments.
 
 The argument values are compared using L<Test::Deep/cmp_deeply>. Values can
 be specified literally, or using any of the "Special Comparisons" defined by
-L<Test::Deep>.
+L<Test::Deep>. Additionally, the L</namedargs> function listed below can also
+appear as the final argument test.
 
 The test script can call the L</will_return> or L</will_throw> methods on the
 expectation to set what the result of invoking this method will be.
@@ -154,15 +179,25 @@ sub whenever
 
 sub _stringify
 {
-   my ( $v ) = @_;
+   my ( $v, $autoquote ) = @_;
    if( !defined $v ) {
+      return "+undef" if $autoquote;
       return "undef";
    }
    elsif( blessed $v and $v->isa( "Test::Deep::Ignore" ) ) {
       return "ignore()";
    }
+   elsif( blessed $v and $v->isa( "Test::ExpectAndCheck::_NamedArgsChecker" ) ) {
+      my %args = %{ $v->{val} };
+      return "namedargs(" .
+         join( ", ", map { sprintf "%s => %s", _stringify($_, 1), _stringify($args{$_}) } sort keys %args )
+         . ")";
+   }
    elsif( $v =~ m/^-?[0-9]+$/ ) {
       return sprintf "%d", $v;
+   }
+   elsif( $autoquote and $v =~ m/^[[:alpha:]_][[:alnum:]_]*$/ ) {
+      return $v;
    }
    elsif( $v =~ m/^[\x20-\x7E]*\z/ ) {
       $v =~ s/([\\'])/\\$1/g;
@@ -247,6 +282,92 @@ sub check_and_clear
    }
 }
 
+=head1 FUNCTIONS
+
+=head2 namedargs
+
+   $cmp = namedargs(name => $val, ...)
+
+I<Since version 0.07.>
+
+This exportable function may be used as the final argument to an L</expect>
+or L</whenever> expectation, to indicate that all of the remaining arguments
+passed at that position should be treated like named parameters in a list of
+key/value pairs. This makes then insensitive to the order that the values are
+passed by the caller.
+
+Each value given can be a literal value or a special comparison from
+C<Test::Deep>.
+
+For example, this simple expectation will fail 50% of the time due to hash
+order randomisation:
+
+   $controller->expect( m => x => "X", y => "Y" );
+
+   my %args = ( x => "X", y => "Y" );
+   $puppet->m( %args );
+
+This is solved by using the C<namedargs()> function.
+
+   use Test::ExpectAndCheck 'namedargs';
+
+   $controller->expect( m => namedargs(x => "X", y => "Y") );
+
+Additionally, positional arguments may appear before this call.
+
+   $controller->expect( n => 1, 2, namedargs(x => "X", y => "Y") );
+   $puppet->n( $one, $two, %args );
+
+=cut
+
+## named arg support
+sub namedargs
+{
+   my %args = @_;
+   return Test::ExpectAndCheck::_NamedArgsChecker->new( \%args );
+}
+
+package Test::ExpectAndCheck::_FirstAndFinalChecker
+{
+   use base 'Test::Deep::Cmp';
+
+   sub init
+   {
+      my ( $self, @vals ) = @_;
+      my $final = pop @vals;
+
+      $self->{first} = \@vals;
+      $self->{final} = $final;
+   }
+
+   sub descend
+   {
+      my ( $self, $got ) = @_;
+      return 0 unless ref $got eq "ARRAY";
+      my @got = @$got;
+
+      foreach my $exp1 ( @{ $self->{first} } ) {
+         return 0 unless Test::Deep::descend( shift @got, $exp1 );
+      }
+
+      return Test::Deep::descend( \@got, $self->{final} );
+   }
+}
+
+package Test::ExpectAndCheck::_NamedArgsChecker
+{
+   use base 'Test::Deep::Hash';
+
+   sub descend
+   {
+      my ( $self, $got ) = @_;
+      return 0 unless ref $got eq "ARRAY";
+      my %got = @$got;
+
+      return $self->SUPER::descend( \%got );
+   }
+}
+
 package
    Test::ExpectAndCheck::_Expectation;
 
@@ -264,11 +385,21 @@ sub new
 {
    my $class = shift;
    my ( $method, $args, $file, $line ) = @_;
+
+   my $argcheck;
+   if( @$args and ( ref $args->[-1] // "" ) eq "Test::ExpectAndCheck::_NamedArgsChecker" ) {
+      $argcheck = Test::ExpectAndCheck::_FirstAndFinalChecker->new( @$args );
+   }
+   else {
+      $argcheck = Test::Deep::array( $args );
+   }
+
    return bless {
-      method => $method,
-      args   => $args,
-      file   => $file,
-      line   => $line,
+      method   => $method,
+      args     => $args,
+      argcheck => $argcheck,
+      file     => $file,
+      line     => $line,
    }, $class;
 }
 
@@ -411,11 +542,14 @@ sub _consume
    $method eq $self->{method} or
       return 0;
 
-   my ( $ok, $stack ) = Test::Deep::cmp_details( \@args, $self->{args} );
+   my ( $ok, $stack ) = Test::Deep::cmp_details( \@args, $self->{argcheck} );
    unless( $ok ) {
       $self->{diag} = Test::Deep::deep_diag( $stack );
       return 0;
    }
+
+   print STDERR "[Test::ExpectAndCheck] called " . $self->_stringify . "\n"
+      if $VERBOSE;
 
    $self->{called}++;
    return 1;

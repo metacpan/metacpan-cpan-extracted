@@ -16,7 +16,7 @@ name: e
 provides:
   e:
     file: lib/e.pm
-    version: '1.30'
+    version: '1.31'
 requires:
   App::Pod: '0.39'
   Data::Printer: '0'
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/poti1/e/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/poti1/e
-version: '1.30'
+version: '1.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

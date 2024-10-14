@@ -38,11 +38,11 @@
    "provides" : {
       "Test::ExpectAndCheck" : {
          "file" : "lib/Test/ExpectAndCheck.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Test::ExpectAndCheck::Future" : {
          "file" : "lib/Test/ExpectAndCheck/Future.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

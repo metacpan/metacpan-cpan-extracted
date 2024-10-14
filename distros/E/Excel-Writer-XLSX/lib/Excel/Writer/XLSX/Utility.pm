@@ -27,7 +27,7 @@ use Digest::MD5 qw(md5_hex);
 use File::Basename 'fileparse';
 
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 # Row and column functions
 my @rowcol = qw(
@@ -218,21 +218,95 @@ sub xl_range_formula {
 #
 # Sheetnames used in references should be quoted if they contain any spaces,
 # special characters or if they look like something that isn't a sheet name.
+# The rules are shown inline below.
 #
 sub quote_sheetname {
 
-    my $sheetname = $_[0];
+    my $sheetname     = shift;
+    my $uc_sheetname  = uc( $sheetname );
+    my $needs_quoting = 0;
+    my $row_max       = 1_048_576;
+    my $col_max       = 16_384;
 
-    # Use Excel's conventions and quote the sheet name if it contains any
-    # non-word character or if it isn't already quoted.
-    if ( $sheetname =~ /\W/ && $sheetname !~ /^'/ ) {
+    # Don't quote sheetname if it is already quoted by the user.
+    if ( $sheetname !~ /^'/ ) {
+
+
+        # Rule 1. Sheet names that contain anything other than \w and "."
+        # characters must be quoted.
+        if ( $sheetname =~ /[^\w\.\p{Emoticons}]/ ) {
+            $needs_quoting = 1;
+        }
+
+        # Rule 2. Sheet names that start with a digit or "." must be quoted.
+        elsif ( $sheetname =~ /^[\d\.\p{Emoticons}]/ ) {
+            $needs_quoting = 1;
+        }
+
+        # Rule 3. Sheet names must not be a valid A1 style cell reference.
+        # Valid means that the row and column values are within Excel limits.
+        elsif ( $uc_sheetname =~ /^([A-Z]{1,3}\d+)$/ ) {
+            my ( $row, $col ) = xl_cell_to_rowcol( $1 );
+
+            if ( $row >= 0 && $row < $row_max && $col >= 0 && $col < $col_max )
+            {
+                $needs_quoting = 1;
+            }
+        }
+
+        # Rule 4. Sheet names must not *start* with a valid RC style cell
+        # reference. Valid means that the row and column values are within
+        # Excel limits.
+
+        # Rule 4a. Check for some single R/C references.
+        elsif ($uc_sheetname eq "R"
+            || $uc_sheetname eq "C"
+            || $uc_sheetname eq "RC" )
+        {
+            $needs_quoting = 1;
+
+        }
+
+        # Rule 4b. Check for C1 or RC1 style references. References without
+        # trailing characters (like C12345) are caught by Rule 3.
+        elsif ( $uc_sheetname =~ /^R?C(\d+)/ ) {
+            my $col = $1;
+            if ( $col > 0 && $col <= $col_max ) {
+                $needs_quoting = 1;
+            }
+        }
+
+        # Rule 4c. Check for R1C1 style references where both the number
+        # ranges are optional. Note that only 1 of the number ranges is
+        # required to be valid.
+        elsif ( $uc_sheetname =~ /^R(\d+)?C(\d+)?/ ) {
+            if ( defined $1 ) {
+                my $row = $1;
+                if ( $row > 0 && $row <= $row_max ) {
+                    $needs_quoting = 1;
+                }
+            }
+
+            if ( defined $2 ) {
+                my $col = $1;
+                if ( $col > 0 && $col <= $col_max ) {
+                    $needs_quoting = 1;
+                }
+            }
+        }
+    }
+
+
+    if ( $needs_quoting ) {
         # Double quote any single quotes.
         $sheetname =~ s/'/''/g;
         $sheetname = q(') . $sheetname . q(');
     }
 
+
     return $sheetname;
 }
+
 
 
 ###############################################################################
@@ -1030,7 +1104,7 @@ This functions takes a cell reference string in A1 notation and decrements the c
 
 =head1 TIME AND DATE FUNCTIONS
 
-Dates and times in Excel are represented by real numbers, for example "Jan 1 2001 12:30 AM" is represented by the number 36892.521.
+Dates and times in Excel are represented by real numbers, for example "Jan 1 2001 12:30:14 PM" is represented by the number 36892.521.
 
 The integer part of the number stores the number of days since the epoch and the fractional part stores the percentage of the day in seconds.
 
@@ -1038,7 +1112,7 @@ A date or time in Excel is like any other number. To display the number as a dat
 
     $date = xl_date_list( 2001, 1, 1, 12, 30 );
     $format->set_num_format( 'mmm d yyyy hh:mm AM/PM' );
-    $worksheet->write( 'A1', $date, $format );    # Jan 1 2001 12:30 AM
+    $worksheet->write( 'A1', $date, $format );    # Jan 1 2001 12:30 PM
 
 The date handling functions below are supplied for historical reasons. In the current version of the module it is easier to just use the C<write_date_time()> function to write dates or times. See the DATES AND TIME IN EXCEL section of the main L<Excel::Writer::XLSX> documentation for details.
 
@@ -1233,6 +1307,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXIV, John McNamara.
+Copyright MM-MMXXIV, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

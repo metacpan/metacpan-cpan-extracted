@@ -22,7 +22,7 @@ use Carp;
 use Excel::Writer::XLSX::Package::XMLwriter;
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 
 ###############################################################################
@@ -794,7 +794,7 @@ sub _write_sub_border {
 
     $self->xml_start_tag( $type, @attributes );
 
-    if ( $color && $color != 64 ) {
+    if ( $color && $color ne "64" ) {
         $color = $self->_get_palette_color( $color );
 
         $self->xml_empty_tag( 'color', 'rgb' => $color );
@@ -1211,7 +1211,7 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXIV, John McNamara.
+(c) MM-MMXXIV, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.
 

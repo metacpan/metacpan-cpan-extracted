@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.591';
+our $VERSION = '0.592';
 
 use 5.020;
 use Moo;
@@ -72,7 +72,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.591
+version 0.592
 
 =head1 SYNOPSIS
 
@@ -144,10 +144,11 @@ construct a tree-like structure of errors.
 =head2 TO_JSON
 
 Returns a data structure suitable for serialization. Corresponds to one output unit as specified in
-L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10.4.2> and
-L<https://json-schema.org/draft/2019-09/output/schema>, except that C<instanceLocation> and
-C<keywordLocation> are JSON pointers, B<not> URI fragments. (See the
-C<strict_basic> L<JSON::Schema::Modern/output_format>
+L<https://json-schema.org/draft/2020-12/json-schema-core#section-12.3> and
+L<https://json-schema.org/draft/2020-12/output/schema>,
+except that C<instanceLocation> and
+C<keywordLocation> are JSON pointers, B<not> URI fragments, even in draft2019-09. (See the
+C<strict_basic> L<JSON::Schema::Modern/output_format>, only available in that version,
 if the distinction is important to you.)
 
 =head2 dump

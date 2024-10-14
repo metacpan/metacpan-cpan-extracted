@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::MetaData;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Meta-Data vocabulary
 
-our $VERSION = '0.591';
+our $VERSION = '0.592';
 
 use 5.020;
 use Moo;
@@ -31,8 +31,9 @@ sub evaluation_order ($class) { 5 }
 sub keywords ($class, $spec_version) {
   return (
     qw(title description default),
-    $spec_version ne 'draft7' ? 'deprecated' : (),
-    qw(readOnly writeOnly examples),
+    $spec_version !~ /^draft[467]$/ ? 'deprecated' : (),
+    $spec_version !~ /^draft[46]$/ ? qw(readOnly writeOnly) : (),
+    $spec_version ne 'draft4' ? 'examples' : (),
   );
 }
 
@@ -89,7 +90,7 @@ JSON::Schema::Modern::Vocabulary::MetaData - Implementation of the JSON Schema M
 
 =head1 VERSION
 
-version 0.591
+version 0.592
 
 =head1 DESCRIPTION
 
@@ -112,6 +113,14 @@ the equivalent Draft 2019-09 keywords, indicated in metaschemas with the URI C<h
 =item *
 
 the equivalent Draft 7 keywords that correspond to this vocabulary and are formally specified in L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-10>.
+
+=item *
+
+the equivalent Draft 6 keywords that correspond to this vocabulary and are formally specified in L<https://json-schema.org/draft-06/draft-wright-json-schema-validation-01#rfc.section.7>.
+
+=item *
+
+the equivalent Draft 4 keywords that correspond to this vocabulary and are formally specified in L<https://json-schema.org/draft-04/draft-fge-json-schema-validation-00#rfc.section.6>.
 
 =back
 

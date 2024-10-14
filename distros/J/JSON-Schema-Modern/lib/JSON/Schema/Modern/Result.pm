@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.591';
+our $VERSION = '0.592';
 
 use 5.020;
 use Moo;
@@ -263,7 +263,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.591
+version 0.592
 
 =head1 SYNOPSIS
 
@@ -395,7 +395,8 @@ See C<&> at L</OVERLOADS>.
 =head2 dump
 
 Returns a JSON string representing the result object, using the requested L</format>, according to
-the L<specification|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>.
+the L<draft2019-09 specification|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>
+and the L<draft2020-12 specification|https://json-schema.org/draft/2020-12/json-schema-core#section-12>.
 
 =head1 SERIALIZATION
 

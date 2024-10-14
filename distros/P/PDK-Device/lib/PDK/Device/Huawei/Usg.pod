@@ -1,0 +1,100 @@
+pod
+
+=head1 NAME
+
+PDK::Device::Huawei::Usg - A Perl module for managing Huawei USG devices
+
+=head1 SYNOPSIS
+
+    use PDK::Device::Huawei::Usg;
+
+    # Create a new instance of the device
+    my $device = PDK::Device::Huawei::Usg->new();
+
+    # Get the current configuration from the device
+    my $config = $device->getConfig();
+
+    # Backup configuration to an FTP server
+    my $ftp_result = $device->ftpConfig($hostname, $server, $username, $password);
+
+=head1 DESCRIPTION
+
+C<PDK::Device::Huawei::Usg> is a Perl module designed to manage and interact with Huawei USG series devices. This module provides methods to retrieve the device configuration and perform FTP backups of the configuration. It extends the base functionality provided by C<PDK::Device::Huawei>.
+
+=head1 METHODS
+
+=head2 getConfig
+
+    my $config = $device->getConfig();
+
+This method retrieves the current configuration from the Huawei USG device. It sends a series of commands to the device to display the running configuration and ensure that the configuration is saved.
+
+Returns a hash reference with the following keys:
+
+=over 4
+
+=item *
+
+C<success> - A flag indicating whether the operation was successful (1 for success, 0 for failure).
+
+=item *
+
+C<config> - The configuration content retrieved from the device.
+
+=back
+
+=head2 ftpConfig
+
+    my $ftp_result = $device->ftpConfig($hostname, $server, $username, $password);
+
+This method connects to an FTP server and uploads the current configuration file. It supports loading the FTP credentials from environment variables if they are not provided as arguments.
+
+Arguments:
+
+=over 4
+
+=item *
+
+C<$hostname> (optional) - The hostname to use when naming the configuration file.
+
+=item *
+
+C<$server> - The FTP server address.
+
+=item *
+
+C<$username> - The FTP username.
+
+=item *
+
+C<$password> - The FTP password.
+
+=back
+
+Returns a hash reference with the following keys:
+
+=over 4
+
+=item *
+
+C<success> - A flag indicating whether the FTP operation was successful (1 for success, 0 for failure).
+
+=item *
+
+C<config> - The output from the FTP session, including the result of the upload.
+
+=back
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut

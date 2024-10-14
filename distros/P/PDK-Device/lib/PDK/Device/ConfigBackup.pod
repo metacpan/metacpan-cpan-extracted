@@ -1,0 +1,110 @@
+=head1 NAME
+
+PDK::Device::ConfigBackup - Device Configuration Backup and Management Module
+
+=head1 SYNOPSIS
+
+  use PDK::Device::ConfigBackup;
+
+  my $cb = PDK::Device::ConfigBackup->new();
+
+  # Retrieve the list of devices from the database
+  my $devices = $cb->getDevicesFromDB();
+
+  # Fetch device configurations in parallel
+  $cb->getConfigJob($devices);
+
+  # Send commands to devices
+  $cb->execCommandsJob($devices, ['conf t', 'no ip do loo', 'end', 'wri']);
+
+  # Execute FTP backup
+  $cb->ftpConfigJob($devices);
+
+=head1 DESCRIPTION
+
+This module provides a set of methods for fetching configurations from devices, sending commands to devices, and executing FTP backups. It supports parallel processing to enhance efficiency.
+
+=head1 USAGE EXAMPLE
+
+Here is a complete example demonstrating the usage of this module:
+
+  #!/usr/bin/perl
+
+  use 5.030;              # Use Perl version 5.30
+  use strict;             # Enable strict mode to catch potential errors
+  use warnings;           # Enable warnings for robustness
+
+  use Test::More;         # Import Test::More module for unit testing
+  use PDK::DBI::Pg;       # Import PDK::DBI::Pg module for database operations
+  use PDK::Device::ConfigBackup;
+
+  # Database connection parameters
+  my $db_params = {
+    host     => '192.168.99.99',
+    port     => 5432,
+    dbname   => 'netdisco',
+    user     => 'netdisco',
+    password => 'Cisc0123'
+  };
+
+  # Create a database connection
+  my $dbi = PDK::DBI::Pg->new($db_params);
+
+  # SQL query to retrieve device information
+  my $sql = <<SQL;
+  SELECT name, ip, os
+    FROM device
+  SQL
+
+  # Execute the query and retrieve all devices
+  my $devices = $dbi->execute($sql)->all;
+
+  # Initialize the configuration backup object
+  my $cb = PDK::Device::ConfigBackup->new(dbi => $dbi);
+
+  # Fetch device configurations in parallel
+  $cb->getConfigJob($devices);
+
+  # Send a set of commands to the devices
+  $cb->execCommandsJob($devices, ['conf t', 'no ip do loo', 'end', 'wri']);
+
+  # Execute FTP backup
+  $cb->ftpConfigJob($devices);
+
+=head1 METHODS
+
+=head2 getConfigJob
+
+Fetch device configurations in parallel.
+
+  $cb->getConfigJob($devices);
+
+=head2 execCommandsJob
+
+Send the same commands to multiple devices in parallel.
+
+  $cb->execCommandsJob($devices, \@commands);
+
+=head2 ftpConfigJob
+
+Execute FTP backup for multiple devices in parallel.
+
+  $cb->ftpConfigJob($devices);
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=head1 SEE ALSO
+
+PDK::DBI::Pg, Parallel::ForkManager, Thread::Queue
+
+=cut

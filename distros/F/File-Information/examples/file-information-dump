@@ -24,6 +24,7 @@ foreach my $filename (@ARGV) {
     dump_base(Link  => $link);
     dump_base(Inode => scalar eval {$link->inode});
     dump_base(Filesystem => scalar eval {$link->filesystem});
+    dump_base(Tagpool => $_) foreach eval {$link->tagpool};
 }
 
 sub dump_base {

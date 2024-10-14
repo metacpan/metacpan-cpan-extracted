@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,12 +26,12 @@ provides:
     file: lib/My/Role/ColoredHelp.pm
   TimTools:
     file: lib/TimTools.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Mojolicious: '9.27'
 resources:
   bugtracker: https://github.com/poti1/timtools/issues
-  license: http://opensource.org/licenses/artistic-license-2.0.php
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/poti1/timtools
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -21,7 +21,7 @@ warn $@ if $@;
 
 diag ('bin dir: ' . join (' ', Alien::libtiff->bin_dir));
 my @bin = Alien::libtiff->bin_dir;
-warn "no proj bin dir found via bin_dir method\n" if not @bin;
+warn "no libtiff bin dir found via bin_dir method\n" if not @bin;
 
 TODO: {
     local $TODO = 'leftover from gdal - might not need to be todo';

@@ -8,8 +8,8 @@ my $on_automated_rig
   || $ENV{PERL_CPAN_REPORTER_CONFIG}
   || $ENV{AUTOMATED_TESTING}
   || $ENV{TRAVIS}
-  || $ENV{APPVEYOR};
-  #|| $ENV{CI};
+  || $ENV{APPVEYOR}
+  || $ENV{CI};
 
 
 use Cwd;
@@ -98,9 +98,18 @@ share {
   #  @PATH = grep {not $_ =~ m|Git[/\\]usr[/\\]bin$|} @PATH;
   #  #say $ENV{PATH};
   #}
+  meta->around_hook(
+    build => sub {
+      my ($orig, $build, @args) = @_;
+      $build->log("Setting CCACHE_BASEDIR to " . getcwd());
+      local $ENV{CCACHE_BASEDIR} = getcwd();
+      $orig->($build, @args);
+    }
+  );
+
 
   build [
-    "%{configure} $with_local $with_cpp11 $build_static",
+    "%{configure} $with_local $with_cpp11 $build_static --disable-docs",
     \&pause,
     $make_cmd,
     $make_inst_cmd,

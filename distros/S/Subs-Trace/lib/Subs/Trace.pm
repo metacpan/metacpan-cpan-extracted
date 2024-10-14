@@ -10,7 +10,7 @@ Subs::Trace - Trace all calls in a package.
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 

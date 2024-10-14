@@ -22,7 +22,7 @@ use constant { # Taken from Data::Identifier
     WK_FINAL    => 'f418cdb9-64a7-4f15-9a18-63f7755c5b47',
 };
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -98,7 +98,7 @@ my %_ise_keys = map {$_ => 1} qw(ise uuid oid uri);
 my %_data_identifier_keys = map {$_ => 1} keys %_ise_keys;
 
 my %_properties = (
-    uuid        => {loader => \&_load_aggreate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag uuid(xattr_utag_ise) :self dev_disk_by_uuid)], rawtype => 'uuid'},
+    uuid        => {loader => \&_load_aggreate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag uuid(xattr_utag_ise) :self dev_disk_by_uuid tagpool_pool_uuid)], rawtype => 'uuid'},
     oid         => {loader => \&_load_aggreate, sources => [qw(::Inode oid(xattr_utag_ise))], rawtype => 'oid'},
     uri         => {loader => \&_load_aggreate, sources => [qw(::Inode uri(xattr_utag_ise))], rawtype => 'uri'},
     ise         => {loader => \&_load_aggreate, sources => [qw(:self uuid oid uri ::Inode xattr_utag_ise)], rawtype => 'ise'},
@@ -458,7 +458,7 @@ File::Information::Base - generic module for extrating information from filesyst
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

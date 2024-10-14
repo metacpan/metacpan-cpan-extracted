@@ -1,0 +1,64 @@
+=pod
+
+=head1 NAME
+
+PDK::Device::Paloalto - A module to interact with Palo Alto devices, including configuration retrieval and command execution.
+
+=head1 SYNOPSIS
+
+  use PDK::Device::Paloalto;
+
+  my $device = PDK::Device::Paloalto->new(
+    host     => '192.168.1.1',
+    username => 'admin',
+    password => 'password'
+  );
+
+  $device->login();
+  $device->getConfig();
+
+=head1 DESCRIPTION
+
+The C<PDK::Device::Paloalto> module provides methods to interact with Palo Alto devices using CLI commands. It allows retrieving configurations, executing commands, and interacting with the device's CLI in an automated way.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item prompt
+
+The regular expression that matches the device's prompt, set by default to capture both active, passive, or suspended states.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item errCodes
+
+Returns a list of regular expressions that match common error messages such as C<"Unknown command"> or C<"Invalid syntax">.
+
+=item waitfor
+
+Waits for a specific prompt while interacting with the device in an automated manner. It processes output until the expected prompt is matched.
+
+=item getConfig
+
+Retrieves the device's current configuration by executing a sequence of commands, including disabling the pager and setting the output format to the C<set> format.
+
+=back
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut

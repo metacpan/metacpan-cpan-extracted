@@ -18,8 +18,9 @@ use File::Spec;
 use File::Information::Link;
 use File::Information::Inode;
 use File::Information::Filesystem;
+use File::Information::Tagpool;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
 
@@ -89,6 +90,12 @@ sub for_handle {
     }
 
     return File::Information::Inode->_new(instance => $self, (map {$_ => $opts{$_}} qw(handle)));
+}
+
+
+sub tagpool {
+    my ($self) = @_;
+    return values %{$self->_tagpool}
 }
 
 
@@ -272,6 +279,15 @@ sub _tagpool_sysfile_cache {
     return $self->{_tagpool_sysfile_cache} //= {};
 }
 
+sub _tagpool {
+    my ($self) = @_;
+    my $pools = $self->{tagpool} //= {
+        map {$_ => File::Information::Tagpool->_new(instance => $self, path => $_)} @{$self->_tagpool_path}
+    };
+
+    return $pools;
+}
+
 sub _load_filesystems {
     my ($self) = @_;
     unless (defined $self->{filesystems}) {
@@ -332,7 +348,7 @@ File::Information - generic module for extrating information from filesystems
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -435,6 +451,15 @@ The following options are supported:
 Required if not using the one-argument form. Gives an open handle to the inode.
 
 =back
+
+=head2 tagpool
+
+    my @tagpool = $inode->tagpool;
+
+Returns the list of found tagpools if any (See L<File::Information::Tagpool>).
+
+B<Note:>
+There is no order to the returned values. The order may change between any two calls.
 
 =head2 extractor
 

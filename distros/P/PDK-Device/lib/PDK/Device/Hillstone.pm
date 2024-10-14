@@ -1,14 +1,12 @@
 package PDK::Device::Hillstone;
 
-use 5.030;
-use strict;
-use warnings;
-
+use v5.30;
 use Moose;
 use Expect qw'exp_continue';
 use Carp   qw'croak';
-with 'PDK::Device::Base';
 use namespace::autoclean;
+
+with 'PDK::Device::Base';
 
 has prompt => (is => 'ro', required => 1, default => '^.*?(\((?:M|B|F)\))?[>#]\s*$',);
 
@@ -17,7 +15,7 @@ sub errCodes {
 
   return [
     qr/incomplete|ambiguous|unrecognized keyword|\^-----/,
-    qr/syntax error, expecting|missing argument|unknown command|^Error:/,
+    qr/syntax error|missing argument|unknown command|^Error:/,
   ];
 }
 
@@ -32,15 +30,15 @@ sub waitfor {
   my @ret = $exp->expect(
     10,
     [
-      qr/^ --More-- /mi => sub {
-        $exp->send(" ");
+      qr/^\s*--More-- /i => sub {
+        $self->send(" ");
         $buff .= $exp->before();
         exp_continue;
       }
     ],
     [
-      qr/are you sure\?/mi => sub {
-        $exp->send("y\r");
+      qr/are you sure\?/i => sub {
+        $self->send("y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }

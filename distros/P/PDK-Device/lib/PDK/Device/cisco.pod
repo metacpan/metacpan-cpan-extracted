@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-PDK::Device::Cisco - A module for interacting with Cisco devices
+PDK::Device::Cisco - Interacts with Cisco devices, managing connections, commands, and configuration backups.
 
 =head1 SYNOPSIS
 
@@ -11,46 +11,33 @@ PDK::Device::Cisco - A module for interacting with Cisco devices
   my $device = PDK::Device::Cisco->new(
     host     => '192.168.1.1',
     username => 'admin',
-    password => 'Cisco'
+    password => 'password'
   );
 
-  # Log in to the device
   $device->login();
-
-  # Execute script in normal mode
-  $device->execCommands(['show version', 'show ip arp']);
-
-  # Execute script in configuration mode, automatically outfitting [config terminal, write]
-  $device->runCommands(['show version']);
-
-  # Retrieve running configuration
-  my $config = $device->getConfig('hostname');
-
-  # FTP configuration backup
-  my $config = $device->ftpConfig('hostname', 'ftp_server', 'ftp_username', 'ftp_password');
-
-  # filename is optional, defaults to device IP address, e.g., 192.168.1.1.cfg
-  $device->write_file('content', 'filename');
+  $device->send('show running-config');
+  $device->getConfig();
+  $device->ftpConfig();
 
 =head1 DESCRIPTION
 
-This module provides functionality to interact with Cisco devices, including executing commands, retrieving configurations, and backing up configurations via FTP.
+This module provides methods to interact with Cisco devices, including login, command execution, and configuration backups over FTP.
 
 =head1 ATTRIBUTES
 
 =over 4
 
-=item B<prompt>
+=item prompt
 
-The device's default prompt, defaults to '\S+[#>]\s*\z'.
+Regex for the normal mode prompt (default: '\S+[#>]\s*\z').
 
-=item B<enPrompt>
+=item enPrompt
 
-Enable mode prompt, defaults to '\S+[>]\s*\z'.
+Regex for non-privileged mode prompt (default: '\S+[>]\s*\z').
 
-=item B<enCommand>
+=item enCommand
 
-Command to switch to enable mode, defaults to 'enable'.
+Command to switch to enable mode (default: 'enable').
 
 =back
 
@@ -58,47 +45,38 @@ Command to switch to enable mode, defaults to 'enable'.
 
 =over 4
 
-=item B<errCodes>
+=item errCodes
 
-Returns a list of possible error codes for checking errors during command execution.
+Returns an array of regexes for common error patterns (e.g., "Permission denied", "Invalid command").
 
-=item B<waitfor>
+=item waitfor
 
-Waits for a specific prompt match, automatically executing the script interactively.
+Waits for the specified prompt and handles device responses interactively.
 
-=item B<write_file>
+=item runCommands
 
-Writes configuration information to a text file.
+Executes a list of commands in configuration mode, automatically adding commands like "configure terminal" and "copy running-config startup-config" if needed.
 
-=item B<runCommands>
+=item getConfig
 
-Executes a series of commands and configures the sending mode.
+Retrieves the device's running configuration, excluding specific lines (e.g., "ntp clock-period").
 
-  Parameters:
-  - $commands: List of commands (array reference).
+=item ftpConfig
 
-=item B<getConfig>
-
-Retrieves the running configuration of the device.
-
-  Returns: A hash reference containing a success flag and configuration content.
-
-=item B<ftpConfig>
-
-Backs up the running configuration via FTP.
-
-  Parameters:
-  - $hostname: Optional hostname.
-  - $server: FTP server address.
-  - $username: FTP username.
-  - $password: FTP password.
-
-  Returns: The result of executing the command.
+Backs up the running configuration to an FTP server.
 
 =back
 
 =head1 AUTHOR
 
 WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
 
 =cut

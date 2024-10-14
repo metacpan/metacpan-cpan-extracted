@@ -4,13 +4,81 @@ use 5.006;
 use strict;
 use warnings;
 
+our $VERSION = '0.08';
+
+=head1 LOGO
+
+ ~         __               __       ~
+ ~   _____/ /_  ___  ____ _/ /______ ~
+ ~  / ___/ __ \/ _ \/ __ `/ __/ ___/ ~
+ ~ / /__/ / / /  __/ /_/ / /_(__  )  ~
+ ~ \___/_/ /_/\___/\__,_/\__/____/   ~
+ ~                                   ~
+
+=cut
+
 =head1 NAME
 
 App::Cheats - Cheatsheet
 
 =cut
 
-our $VERSION = '0.07';
+=head1 Summary
+
+Useful commands collected over the years
+
+=head1 Installation:
+
+Install bash completion support.
+
+ % apt install bash-completion
+
+Install cpanm.
+
+ % cpan App::cpanminus
+
+Install module dependencies.
+
+ % cpanm --installdeps .
+
+Install tab completion.
+
+ % source bashrc_pod
+
+=head1 Usage:
+
+ # Show help.
+ pod
+ pod -h
+
+=head1 Examples:
+
+View summary of Mojo::UserAgent:
+
+ % pod Mojo::UserAgent
+
+View summary of a specific method.
+
+ % pod Mojo::UserAgent get
+
+Edit the module
+
+ % pod Mojo::UserAgent -e
+
+Edit the module and jump to the specific method definition right away.
+(Press "n" to next match if neeeded).
+
+ % pod Mojo::UserAgent get -e
+
+Run perldoc on the module (for convience)
+
+ % pod Mojo::UserAgent -d
+
+List all available methods.
+If no methods are found normally, then this will automatically be enabled.
+(pod was made to work with Mojo pod styling).
+
+ % pod Mojo::UserAgent -a
 
 =head1 ENVIRONMENT
 
@@ -29,48 +97,11 @@ Optionally you can set this flag:
 If neither is provided, will search for a cheat
 file in the same location as this script.
 
-=head1 AUTHOR
-
-Tim Potapov, C<< <Tim.Potapov[AT]gmail.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-app-cheats at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Cheats>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc App::Cheats
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Cheats>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/App-Cheats>
-
-=item * Search CPAN
-
-L<https://metacpan.org/release/App-Cheats>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
+=cut
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by Tim Potapov.
+This software is Copyright (c) 2024 by Tim Potapov.
 
 This is free software, licensed under:
 
@@ -78,4 +109,10 @@ This is free software, licensed under:
 
 =cut
 
-1;    # End of App::Cheats
+=head1 AUTHOR
+
+Tim Potapov, C<< <Tim.Potapov[AT]gmail.com> >>
+
+=cut
+
+1;

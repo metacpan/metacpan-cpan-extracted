@@ -1,14 +1,12 @@
 package PDK::Device::Radware;
 
-use 5.030;
-use strict;
-use warnings;
-
+use v5.30;
 use Moose;
 use Expect qw'exp_continue';
 use Carp   qw'croak';
-with 'PDK::Device::Base';
 use namespace::autoclean;
+
+with 'PDK::Device::Base';
 
 has prompt => (is => 'ro', required => 1, default => '^>>.*?#\s*$',);
 
@@ -30,45 +28,44 @@ sub waitfor {
     15,
     [
       qr/Confirm saving without first applying changes/i => sub {
-        $exp->send("y\r");
+        $self->send("y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
       qr/Confirm saving to FLASH/i => sub {
-        $exp->send("y\r");
+        $self->send("y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
       qr/Confirm dumping all information/i => sub {
-        $exp->send("y\r");
+        $self->send("y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
       qr/(Display|Include) private keys/i => sub {
-
         my $passphrase = $self->{passphrase} || $ENV{PDK_FTP_PASSPHRASE};
         $self->{passphrase} = $passphrase if $self->{passphrase} ne $passphrase;
 
-        $exp->send(defined $passphrase ? "y\r" : "n\r");
+        $self->send(!!$passphrase ? "y\r" : "n\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
       qr/(Enter|Reconfirm) passphrase/i => sub {
-        $exp->send("$self->{passphrase}\r");
+        $self->send("$self->{passphrase}\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
-      qr/$prompt/m => sub {
+      qr/$prompt/mi => sub {
         $buff .= $exp->before() . $exp->match();
       }
     ],
@@ -120,69 +117,69 @@ sub getConfig {
 sub ftpConfig {
   my ($self, $hostname, $server, $username, $password) = @_;
 
+  if (!$self->{exp}) {
+    my $login = $self->login();
+    croak $login->{reason} if $login->{success} == 0;
+  }
+
   $server   //= $ENV{PDK_FTP_SERVER};
   $username //= $ENV{PDK_FTP_USERNAME};
   $password //= $ENV{PDK_FTP_PASSWORD};
 
   croak "请正确提供 FTP 服务器地址、账户和密码!" unless $username and $password and $server;
 
-  my $passphrase = $self->{passphrase} || $ENV{PDK_FTP_PASSPHRASE};
+  my $passphrase = $self->{passphrase} || $ENV{PDK_FTP_PASSPHRASE} || $self->{$password};
 
   my $host    = $self->{host};
   my $command = "$self->{month}/$self->{date}/";
 
-  if ($hostname) {
+  if (!!$hostname) {
     $command .= "${hostname}_$host.tar.gz";
   }
   else {
     $command .= "$host.tar.gz";
   }
 
-  if (!$self->{exp}) {
-    my $login = $self->login();
-    croak $login->{reason} if $login->{success} == 0;
-  }
-
   my $exp    = $self->{exp};
-  my $result = $exp ? $exp->match() : "";
+  my $result = $exp ? ($exp->match() || '') : '';
 
   my $connector = "cfg/ptcfg ${server} -m -mansync";
-  $exp->send("$connector\n");
-  say "[debug] 执行FTP备份脚本[$connector]，备份到目标文件为 $command" if $self->{debug};
+  $self->dump("执行FTP备份脚本[$connector]，备份到目标文件为 $command");
 
+  $self->send("$connector\n");
   my @ret = $exp->expect(
     15,
     [
       qr/hit return for automatic file name/i => sub {
         $result .= $exp->before() . $exp->match();
-        $exp->send("$command\r");
+        $self->send("$command\r");
         exp_continue;
       }
     ],
     [
       qr/Enter username for FTP/i => sub {
+        $self->send("$username\r");
         $result .= $exp->before() . $exp->match();
-        $exp->send("$username\r");
         exp_continue;
       }
     ],
     [
       qr/Enter password for username/i => sub {
+        $self->send("$password\r");
         $result .= $exp->before() . $exp->match();
-        $exp->send("$password\r");
         exp_continue;
       }
     ],
     [
       qr/(Display|Include) private keys/i => sub {
-        $exp->send($passphrase ? "y\r" : "n\r");
+        $self->send($passphrase ? "y\r" : "n\r");
         $result .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
       qr/(Enter|Reconfirm) passphrase/i => sub {
-        $exp->send("$passphrase\r");
+        $self->send("$passphrase\r");
         $result .= $exp->before() . $exp->match();
         exp_continue;
       }
@@ -190,7 +187,7 @@ sub ftpConfig {
     [
       qr/hit return for FTP server/i => sub {
         $result .= $exp->before() . $exp->match();
-        $exp->send("\r");
+        $self->send("\r");
       }
     ],
     [
@@ -217,7 +214,7 @@ sub ftpConfig {
     [
       qr/Current config successfully transferred/ => sub {
         $result .= $exp->before() . $exp->match();
-        say "FTP 配置备份：文件 $command 上传成功!" if $self->{debug};
+        $self->dump("FTP 配置备份：文件 $command 上传成功");
       }
     ],
     [
@@ -233,7 +230,7 @@ sub ftpConfig {
   );
 
   croak($ret[3]) if defined $ret[1];
-  $exp->send("cd\r");
+  $self->send("cd\r");
 
   return {success => 1, config => $result};
 }

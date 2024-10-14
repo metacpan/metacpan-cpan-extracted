@@ -20,7 +20,7 @@ use File::Basename ();
 
 use File::Information::Inode;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my $HAVE_XML_SIMPLE = eval {require XML::Simple; 1;};
 my $HAVE_URI_FILE = eval {require URI::file; 1;};
@@ -77,6 +77,12 @@ sub inode {
 sub filesystem {
     my ($self, @args) = @_;
     return $self->{filesystem} //= $self->inode->filesystem(@args);
+}
+
+
+sub tagpool {
+    my ($self, @args) = @_;
+    return $self->inode->tagpool(@args);
 }
 
 sub _load_dotcomments {
@@ -210,7 +216,7 @@ File::Information::Link - generic module for extrating information from filesyst
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -219,6 +225,12 @@ version v0.01
     my File::Information $instance = File::Information->new(%config);
 
     my File::Information::Link $link = $instance->for_link($path);
+
+B<Note:> This package inherits from L<File::Information::Base>.
+
+This module represents a hardlink on a filesystem. A hardlink is is basically a name for an inode.
+Each inode can have zero or more hardlinks. (The exact limits are subject to filesystem limitations.)
+See also L<File::Information::Inode>.
 
 =head1 METHODS
 
@@ -233,6 +245,14 @@ Provide the inode object for the current link.
     my File::Information::Filesystem $filesystem = $link->filesystem;
 
 Proxy for L<File::Information::Inode/filesystem>.
+
+=head2 tagpool
+
+    my File::Information::Tagpool $tagpool = $link->tagpool;
+    # or:
+    my                            @tagpool = $link->tagpool;
+
+Proxy for L<File::Information::Inode/tagpool>.
 
 =head1 AUTHOR
 

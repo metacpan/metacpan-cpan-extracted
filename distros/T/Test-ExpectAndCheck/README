@@ -30,6 +30,23 @@ DESCRIPTION
     the end of each test, each object is checked to ensure all the expected
     methods were called.
 
+ Verbose Mode
+
+    Sometimes when debugging a failing test it can be useful to see a log
+    of which expectations have been called. By setting the $VERBOSE package
+    variable to a true value, extra printing will happen during the test.
+
+       {
+          local $Test::ExpectAndCheck::VERBOSE = 1;
+    
+          $controller->expect( ... );
+    
+          ...
+       }
+
+    This is printed directly to STDERR and is intended for temporary
+    debugging during development.
+
 METHODS
 
  create
@@ -53,7 +70,8 @@ METHODS
 
     The argument values are compared using "cmp_deeply" in Test::Deep.
     Values can be specified literally, or using any of the "Special
-    Comparisons" defined by Test::Deep.
+    Comparisons" defined by Test::Deep. Additionally, the "namedargs"
+    function listed below can also appear as the final argument test.
 
     The test script can call the "will_return" or "will_throw" methods on
     the expectation to set what the result of invoking this method will be.
@@ -91,6 +109,42 @@ METHODS
     Checks that by now, every expected method has been called, and emits a
     new test output line via Test::Builder. Regardless, the expectations
     are also cleared out ready for the start of the next test.
+
+FUNCTIONS
+
+ namedargs
+
+       $cmp = namedargs(name => $val, ...)
+
+    Since version 0.07.
+
+    This exportable function may be used as the final argument to an
+    "expect" or "whenever" expectation, to indicate that all of the
+    remaining arguments passed at that position should be treated like
+    named parameters in a list of key/value pairs. This makes then
+    insensitive to the order that the values are passed by the caller.
+
+    Each value given can be a literal value or a special comparison from
+    Test::Deep.
+
+    For example, this simple expectation will fail 50% of the time due to
+    hash order randomisation:
+
+       $controller->expect( m => x => "X", y => "Y" );
+    
+       my %args = ( x => "X", y => "Y" );
+       $puppet->m( %args );
+
+    This is solved by using the namedargs() function.
+
+       use Test::ExpectAndCheck 'namedargs';
+    
+       $controller->expect( m => namedargs(x => "X", y => "Y") );
+
+    Additionally, positional arguments may appear before this call.
+
+       $controller->expect( n => 1, 2, namedargs(x => "X", y => "Y") );
+       $puppet->n( $one, $two, %args );
 
 EXPECTATIONS
 

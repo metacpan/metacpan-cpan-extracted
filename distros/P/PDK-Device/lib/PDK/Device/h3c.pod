@@ -17,19 +17,19 @@ PDK::Device::H3C - A module for interacting with H3C devices
   # Log in to the device
   $device->login();
 
-  # Execute script in normal mode
+  # Execute commands in normal mode
   $device->execCommands(['display version', 'display arp']);
 
-  # Execute script in configuration mode, automatically outfitting [system-view, save]
+  # Execute commands in configuration mode, automatically adding [system-view, save]
   $device->runCommands(['display version']);
 
   # Retrieve running configuration
   my $config = $device->getConfig('hostname');
 
   # FTP configuration backup
-  my $config = $device->ftpConfig('hostname', 'ftp_server', 'ftp_username', 'ftp_password');
+  my $backup = $device->ftpConfig('hostname', 'ftp_server', 'ftp_username', 'ftp_password');
 
-  # filename is optional, defaults to device IP address, e.g., 192.168.1.1.cfg
+  # Write content to a file (filename is optional, defaults to device IP address, e.g., 192.168.1.1.cfg)
   $device->write_file('content', 'filename');
 
 =head1 DESCRIPTION
@@ -93,12 +93,24 @@ Backs up the running configuration via FTP.
   - $username: FTP username.
   - $password: FTP password.
 
-  Returns: The result of executing the command.
+  Returns: A hash reference indicating the result of executing the command.
 
 =back
 
 =head1 AUTHOR
 
 WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=head1 SEE ALSO
+
+L<Moose>, L<Expect>
 
 =cut

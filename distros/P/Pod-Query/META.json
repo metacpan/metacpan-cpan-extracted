@@ -36,7 +36,7 @@
    "provides" : {
       "Pod::Query" : {
          "file" : "lib/Pod/Query.pm",
-         "version" : "0.38"
+         "version" : "0.39"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "url" : "https://github.com/poti1/pod-query"
       }
    },
-   "version" : "0.38",
+   "version" : "0.39",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

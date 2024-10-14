@@ -1,5 +1,6 @@
 Revision history for App-Cheats
 
+0.08    Improved Build process.
 0.06
         Added new git flow.
 0.03    Added environmental variable: CHEAT_DIRS.

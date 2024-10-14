@@ -1,18 +1,16 @@
 package PDK::Device::Cisco;
 
-use 5.030;
-use strict;
-use warnings;
-
+use v5.30;
 use Moose;
-use Expect qw'exp_continue';
-use Carp   qw'croak';
-with 'PDK::Device::Base';
+use Expect qw(exp_continue);
+use Carp   qw(croak);
 use namespace::autoclean;
 
-has prompt => (is => 'ro', required => 1, default => '^\s*.*?[#>]\s*$',);
+with 'PDK::Device::Base';
 
-has enPrompt => (is => 'ro', required => 0, default => '^\s*.*?[>]\s*$',);
+has prompt => (is => 'ro', required => 1, default => '^\s*\S+[#>]\s*$',);
+
+has enPrompt => (is => 'ro', required => 0, default => '^\s*\S+[>]\s*$',);
 
 has enCommand => (is => 'ro', required => 0, default => 'enable',);
 
@@ -20,9 +18,9 @@ sub errCodes {
   my $self = shift;
 
   return [
-    qr/(Ambiguous|Incomplete|Unrecognized|Bad|not recognized)/i,
-    qr/(Permission denied|syntax error|authorization failed)/i,
-    qr/(Invalid (parameter|command|input)|Unknown command|Login invalid)/i,
+    qr/(Ambiguous|Incomplete|Unrecognized|not recognized|%Error)/mi,
+    qr/(Permission denied|syntax error|authorization failed)/mi,
+    qr/(Invalid (parameter|command|input)|Unknown command|Login invalid)/mi,
   ];
 }
 
@@ -34,17 +32,17 @@ sub waitfor {
 
   my $exp = $self->{exp};
   my @ret = $exp->expect(
-    10,
+    45,
     [
       qr/^.+more\s*.+$/mi => sub {
-        $exp->send(" ");
+        $self->send(" ");
         $buff .= $exp->before();
         exp_continue;
       }
     ],
     [
       qr/\[startup-config\]\?/i => sub {
-        $exp->send("\r");
+        $self->send("\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
@@ -64,7 +62,7 @@ sub waitfor {
       }
     ],
     [
-      qr/$prompt/m => sub {
+      qr/$prompt/mi => sub {
         $buff .= $exp->before() . $exp->match();
       }
     ],
@@ -132,23 +130,30 @@ sub getConfig {
 sub ftpConfig {
   my ($self, $hostname, $server) = @_;
 
+  if (!$self->{exp}) {
+    my $login = $self->login();
+    croak $login->{reason} if $login->{success} == 0;
+  }
+
   $server ||= $ENV{PDK_FTP_SERVER};
 
   my $host    = $self->{host};
   my $command = "copy running-config ftp://$server/$self->{month}/$self->{date}/";
 
-  if ($hostname) {
+  if (!!$hostname) {
     $command .= $hostname . '_' . $host . '.cfg';
   }
   else {
     $command .= $host . '.cfg';
   }
 
+  $self->dump("正在执行FTP备份任务");
   my $result = $self->execCommands([$command]);
   if ($result->{success} == 0) {
     croak "执行[ftpConfig/配置备份异常]，$result->{reason}";
   }
   else {
+    $self->dump("FTP备份任务成功执行完毕");
     return $result;
   }
 }

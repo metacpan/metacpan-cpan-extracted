@@ -1,0 +1,116 @@
+pod
+
+=head1 NAME
+
+PDK::Device::Cisco::Nxos - Module for backing up Cisco NX-OS device configuration via FTP
+
+=head1 SYNOPSIS
+
+  use PDK::Device::Cisco::Nxos;
+
+  my $device = PDK::Device::Cisco::Nxos->new( host => 'device_ip' );
+  $device->ftp_config( $hostname, $server, $username, $password );
+
+=head1 DESCRIPTION
+
+The PDK::Device::Cisco::Nxos module provides functionality to back up the running configuration of Cisco NX-OS devices via FTP. It extends C<PDK::Device::Cisco> and interacts with the device using the Expect module to automate the backup process.
+
+=head1 METHODS
+
+=head2 ftp_config
+
+  $device->ftp_config( $hostname, $server, $username, $password );
+
+Backs up the running configuration of a Cisco NX-OS device to an FTP server.
+
+=over 4
+
+=item *
+
+C<$hostname> - Optional hostname to include in the backup filename.
+
+=item *
+
+C<$server> - The FTP server address. If not provided, it will be loaded from the environment variable C<PDK_FTP_SERVER>.
+
+=item *
+
+C<$username> - The FTP username. If not provided, it will be loaded from the environment variable C<PDK_FTP_USERNAME>.
+
+=item *
+
+C<$password> - The FTP password. If not provided, it will be loaded from the environment variable C<PDK_FTP_PASSWORD>.
+
+=back
+
+The method connects to the device, executes the backup command, and saves the configuration file on the FTP server using the default VRF ('default'). If the environment requires a different VRF (such as 'management'), modifications can be made.
+
+=head1 ERROR HANDLING
+
+If the connection to the device or the FTP server fails, the method will throw an exception using C<croak>. Common errors include:
+
+=over 4
+
+=item *
+
+Failure to log in to the device.
+
+=item *
+
+Invalid FTP server address, username, or password.
+
+=item *
+
+Connection timeouts during the backup process.
+
+=back
+
+=head1 RETURN VALUE
+
+Returns a hash reference containing:
+
+=over 4
+
+=item *
+
+C<success> - A boolean indicating whether the backup was successful.
+
+=item *
+
+C<config> - The result of the command execution, including device responses and log details.
+
+=back
+
+=head1 DEPENDENCIES
+
+This module depends on the following Perl modules:
+
+=over 4
+
+=item *
+
+C<Moose> - For object-oriented programming.
+
+=item *
+
+C<Expect> - For interacting with devices through terminal sessions.
+
+=item *
+
+C<Carp> - For error handling with C<croak>.
+
+=back
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut

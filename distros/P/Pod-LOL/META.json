@@ -33,7 +33,7 @@
    "provides" : {
       "Pod::LOL" : {
          "file" : "lib/Pod/LOL.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "url" : "https://github.com/poti1/pod-lol"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

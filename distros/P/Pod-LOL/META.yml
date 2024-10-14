@@ -16,12 +16,12 @@ name: Pod-LOL
 provides:
   Pod::LOL:
     file: lib/Pod/LOL.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   perl: '5.012'
 resources:
   bugtracker: https://github.com/poti1/pod-lol/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/poti1/pod-lol
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

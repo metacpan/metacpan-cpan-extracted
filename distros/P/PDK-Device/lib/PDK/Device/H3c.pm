@@ -1,14 +1,12 @@
 package PDK::Device::H3c;
 
-use 5.030;
-use strict;
-use warnings;
-
+use v5.30;
 use Moose;
-use Expect qw'exp_continue';
-use Carp   qw'croak';
-with 'PDK::Device::Base';
+use Expect qw(exp_continue);
+use Carp   qw(croak);
 use namespace::autoclean;
+
+with 'PDK::Device::Base';
 
 has prompt => (is => 'ro', required => 1, default => '^\s*[<\[].*?[>\]]\s*$',);
 
@@ -16,8 +14,8 @@ sub errCodes {
   my $self = shift;
 
   return [
-    qr/(Ambiguous|Incomplete|not recognized|Unrecognized)/si,
-    qr/(Too many parameters|Invalid (input|command|file)|Unknown command|Wrong parameter)/si,
+    qr/(Ambiguous|Incomplete|not recognized|Unrecognized)/i,
+    qr/(Too many parameters|Invalid (input|command|file)|Unknown command|Wrong parameter)/i,
   ];
 }
 
@@ -30,37 +28,37 @@ sub waitfor {
   my $exp = $self->{exp};
 
   my @ret = $exp->expect(
-    15,
+    45,
     [
       qr/---- More ----.*$/mi => sub {
-        $exp->send(" ");
+        $self->send(" ");
         $buff .= $exp->before();
         exp_continue;
       }
     ],
     [
       qr/(Are you sure|overwrite|Continue|save operation)\? \[Y\/N\]:/i => sub {
-        $exp->send("Y\r");
+        $self->send("Y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
       qr/Before pressing ENTER you must choose/i => sub {
-        $exp->send("Y\r");
+        $self->send("Y\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
       qr/press the enter key/i => sub {
-        $exp->send("\r");
+        $self->send("\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
-      qr/$prompt/m => sub {
+      qr/$prompt/mi => sub {
         $buff .= $exp->before() . $exp->match();
       }
     ],
@@ -89,6 +87,8 @@ sub runCommands {
   my ($self, $commands) = @_;
 
   croak "执行[runCommands]，必须提供一组待下发脚本" unless ref $commands eq 'ARRAY';
+
+  $self->{mode} = 'deployCommands';
 
   if ($commands->[0] !~ /^sy/i) {
     unshift @$commands, 'system-view';
@@ -122,6 +122,11 @@ sub getConfig {
 sub ftpConfig {
   my ($self, $hostname, $server, $username, $password) = @_;
 
+  if (!$self->{exp}) {
+    my $login = $self->login();
+    croak $login->{reason} if $login->{success} == 0;
+  }
+
   $server   //= $ENV{PDK_FTP_SERVER};
   $username //= $ENV{PDK_FTP_USERNAME};
   $password //= $ENV{PDK_FTP_PASSWORD};
@@ -131,35 +136,31 @@ sub ftpConfig {
   my $host    = $self->{host};
   my $command = "put startup.cfg $self->{month}/$self->{date}/";
 
-  if ($hostname) {
+  if (!!$hostname) {
     $command .= $hostname . '_' . $host . '.cfg';
   }
   else {
     $command .= $host . '.cfg';
   }
 
-  if (!$self->{exp}) {
-    my $login = $self->login();
-    croak $login->{reason} if $login->{success} == 0;
-  }
-
   my $exp    = $self->{exp};
-  my $result = $exp ? $exp->match() : "";
+  my $result = $exp ? ($exp->match() || '') : '';
 
-  $exp->send("ftp $server\n");
+  $self->dump("正在连接 FTP 服务器");
+  $self->send("ftp $server\n");
   my @ret = $exp->expect(
     15,
     [
       qr/User \(/mi => sub {
         $result .= $exp->before() . $exp->match();
-        $exp->send("$username\n");
+        $self->send("$username\n");
         exp_continue;
       }
     ],
     [
       qr/assword:/mi => sub {
         $result .= $exp->before() . $exp->match();
-        $exp->send("$password\n");
+        $self->send("$password\n");
       }
     ],
     [
@@ -185,8 +186,8 @@ sub ftpConfig {
     ],
     [
       qr/User logged in/i => sub {
+        $self->dump("成功连接 FTP 服务器($server)");
         $result .= $exp->before() . $exp->match();
-        say "成功连接 FTP 服务器($server)" if $self->{debug};
       }
     ],
     [
@@ -201,9 +202,12 @@ sub ftpConfig {
     ],
   );
 
-  $exp->send("$command\n");
+  croak($ret[3]) if defined $ret[1];
+
+  $self->dump("正在执行FTP备份任务");
+  $self->send("$command\n");
   @ret = $exp->expect(
-    15,
+    30,
     [
       qr/(No such file or directory|The system cannot)/i => sub {
         croak "执行脚本 $command 异常，上传失败!";
@@ -211,8 +215,8 @@ sub ftpConfig {
     ],
     [
       qr/Transfer complete.*ftp>/ms => sub {
+        $self->dump("脚本 $command 已执行完毕, 文件上传成功");
         $result .= $exp->before() . $exp->match() . $exp->after();
-        say "脚本 $command 已执行完毕, 文件上传成功!" if $self->{debug};
       }
     ],
     [
@@ -228,7 +232,7 @@ sub ftpConfig {
   );
 
   croak($ret[3]) if defined $ret[1];
-  $exp->send("quit\n");
+  $self->send("quit\n");
 
   return {success => 1, config => $result};
 }

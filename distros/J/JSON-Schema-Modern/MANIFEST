@@ -46,6 +46,8 @@ share/draft2020-12/meta/unevaluated.json
 share/draft2020-12/meta/validation.json
 share/draft2020-12/output/schema.json
 share/draft2020-12/schema.json
+share/draft4/schema.json
+share/draft6/schema.json
 share/draft7/schema.json
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -158,6 +160,10 @@ t/results/draft2019-09-invalid-schemas.txt
 t/results/draft2020-12-acceptance-format.txt
 t/results/draft2020-12-acceptance.txt
 t/results/draft2020-12-additional-tests.txt
+t/results/draft4-acceptance-format.txt
+t/results/draft4-acceptance.txt
+t/results/draft6-acceptance-format.txt
+t/results/draft6-acceptance.txt
 t/results/draft7-acceptance-format.txt
 t/results/draft7-acceptance.txt
 t/results/draft7-additional-tests.txt
@@ -169,10 +175,15 @@ t/traverse.t
 t/type.t
 t/unsupported-keywords.t
 t/validate-schema.t
+t/vocabularies.t
 t/zzz-acceptance-draft2019-09-format.t
 t/zzz-acceptance-draft2019-09.t
 t/zzz-acceptance-draft2020-12-format.t
 t/zzz-acceptance-draft2020-12.t
+t/zzz-acceptance-draft4-format.t
+t/zzz-acceptance-draft4.t
+t/zzz-acceptance-draft6-format.t
+t/zzz-acceptance-draft6.t
 t/zzz-acceptance-draft7-format.t
 t/zzz-acceptance-draft7.t
 t/zzz-check-breaks.t

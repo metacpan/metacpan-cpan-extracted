@@ -1,0 +1,72 @@
+=pod
+
+=head1 NAME
+
+PDK::Device::Radware - A module for interacting with Radware devices, enabling configuration retrieval, command execution, and automated management.
+
+=head1 SYNOPSIS
+
+  use PDK::Device::Radware;
+
+  my $device = PDK::Device::Radware->new(
+    host     => '192.168.1.1',
+    username => 'admin',
+    password => 'password'
+  );
+
+  $device->login();
+  my $config = $device->getConfig();
+
+=head1 DESCRIPTION
+
+The C<PDK::Device::Radware> module provides methods to interact with Radware devices. It includes capabilities for retrieving configurations, executing commands, and automating CLI-based interactions. The module handles prompts, error detection, and special input scenarios such as confirmations or passphrase requests.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item prompt
+
+A regular expression that matches the Radware device's prompt. The default is set to capture common device prompt formats.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item errCodes
+
+Returns an array of regular expressions that match common error messages, such as C<"Error:">, helping to identify issues during command execution.
+
+=item waitfor
+
+Waits for a specific prompt during interaction with the device. This method captures output, manages paging, handles confirmations, and processes passphrases if required.
+
+=item runCommands
+
+Executes a series of commands in configuration mode. Automatically adds commands to switch to the root view and ensures the configuration is saved by appending necessary save commands.
+
+=item getConfig
+
+Retrieves the current configuration from the Radware device. This is done by running a series of commands, and the configuration is returned as a hash reference containing the status and configuration data.
+
+=item ftpConfig
+
+Backs up the device configuration using FTP. It connects to an FTP server, uploads the configuration file, and handles authentication using provided credentials or environment variables.
+
+=back
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut

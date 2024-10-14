@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 
 1;
@@ -34,7 +34,7 @@ Alien::feexl - Compile the FreeXL library
 
 
 This Alien package is probably most useful for compilation of other modules,
-e.g. it is need to compile L<Alien::spatialite>.
+e.g. it is needed to compile L<Alien::spatialite>.
 
 
 =head1 REPORTING BUGS

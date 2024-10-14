@@ -15,7 +15,7 @@ use parent 'File::Information::Base';
 
 use Carp;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my %_properties = (
     dev_disk_by_uuid        => {rawtype => 'uuid'},
@@ -79,11 +79,19 @@ File::Information::Filesystem - generic module for extrating information from fi
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
     use File::Information;
+
+    my File::Information::Filesystem $filesystem = $instance->for_link($path)->filesystem;
+
+    my File::Information::Filesystem $filesystem = $instance->for_handle($path)->filesystem;
+
+B<Note:> This package inherits from L<File::Information::Base>.
+
+This module represents a filesystem. A filesystem is the the stroage structure for inodes, hardlinks and maybe other types of objects.
 
 =head1 METHODS
 

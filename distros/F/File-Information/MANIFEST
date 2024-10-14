@@ -14,6 +14,8 @@ lib/File/Information/Base.pm
 lib/File/Information/Filesystem.pm
 lib/File/Information/Inode.pm
 lib/File/Information/Link.pm
+lib/File/Information/Lock.pm
+lib/File/Information/Tagpool.pm
 t/01_load.t
 t/02_instance.t
 xt/author/pod-syntax.t

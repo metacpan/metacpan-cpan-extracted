@@ -1,0 +1,53 @@
+---
+abstract: 'greple under-line module'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Greple-under
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Greple::under:
+    file: lib/App/Greple/under.pm
+    version: '0.99'
+  App::Greple::under::bake:
+    file: lib/App/Greple/under/bake.pm
+    version: '0.99'
+  App::Greple::under::line:
+    file: lib/App/Greple/under/line.pm
+    version: '0.99'
+  App::Greple::under::mise:
+    file: lib/App/Greple/under/mise.pm
+    version: '0.99'
+requires:
+  App::Greple: '9.17'
+  Term::ANSIColor::Concise: '0'
+  Text::ANSI::Fold: '0'
+  Text::ANSI::Fold::Util: '0'
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/kaz-utashiro/greple-under/issues
+  homepage: https://github.com/kaz-utashiro/greple-under
+  repository: https://github.com/kaz-utashiro/greple-under.git
+version: '0.99'
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

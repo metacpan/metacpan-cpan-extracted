@@ -17,10 +17,10 @@ name: Test-ExpectAndCheck
 provides:
   Test::ExpectAndCheck:
     file: lib/Test/ExpectAndCheck.pm
-    version: '0.06'
+    version: '0.07'
   Test::ExpectAndCheck::Future:
     file: lib/Test/ExpectAndCheck/Future.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   List::Util: '0'
   Test::Builder: '1.302'
@@ -29,5 +29,5 @@ requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAnnotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Annotation vocabulary
 
-our $VERSION = '0.591';
+our $VERSION = '0.592';
 
 use 5.020;
 use Moo;
@@ -83,7 +83,7 @@ JSON::Schema::Modern::Vocabulary::FormatAnnotation - Implementation of the JSON 
 
 =head1 VERSION
 
-version 0.591
+version 0.592
 
 =head1 DESCRIPTION
 
@@ -106,6 +106,14 @@ the equivalent Draft 2019-09 keyword, indicated in metaschemas with the URI C<ht
 =item *
 
 the equivalent Draft 7 keyword, as formally specified in L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-7>.
+
+=item *
+
+the equivalent Draft 6 keyword, as formally specified in L<https://json-schema.org/draft-06/draft-wright-json-schema-validation-01#rfc.section.8>.
+
+=item *
+
+the equivalent Draft 4 keyword, as formally specified in L<https://json-schema.org/draft-04/draft-fge-json-schema-validation-00#rfc.section.7>.
 
 =back
 

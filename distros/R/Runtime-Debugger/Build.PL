@@ -6,59 +6,94 @@ use warnings;
 use Module::Build;
 Module::Build->VERSION( '0.4004' );
 
-sub _remove_old_history {
-    my $old = "$ENV{HOME}/.runtime_debugger.info";
-    unlink $old if -e $old;
-}
-
-sub _readme {
-    print "\nBuilding README\n";
-    my ($installed) = grep { -e "$_/pod2markdown" } split /:/, $ENV{PATH};
-    return if !$installed;
-    system "pod2markdown lib/Runtime/Debugger.pm > README.md";
-}
-
-sub _install_readline_dev {
-    print "\nInstalling readline-dev\n";
-    my $os_name;
-
-    my $os_file = "/etc/os-release";
-    if (-e $os_file){
-        open my $fh, "<", $os_file or warn $!;
-        while (<$fh>) {
-            next unless / ^ ID = "(\S+)" /x;
-            $os_name = lc($1 // "");
-            last;
-        }
-        close $fh;
-        return if !$os_name;
-    }
-    elsif( $ENV{PREFIX} ){
-        return if $ENV{PREFIX} !~ / \b termux \b /xi;
-        $os_name = "termux";
-    }
-
-    my %commands = (
-        centos => 'sudo dnf install -y readline-devel',
-        gentoo => 'sudo emerge --ask sys-libs/readline',
-        debian => 'sudo apt install -y libreadline-dev',
-        ubuntu => 'sudo apt install -y libreadline-dev',
-        termux => 'pkg install readline',
-    );
-    my $install_command = $commands{$os_name};
-    return if !$install_command;
-
-    print "Installing readline-dev for '$os_name' via '$install_command'\n";
-    system "$install_command";
-}
-
-_remove_old_history();
-_readme();
-_install_readline_dev();
-
 my $class = Module::Build->subclass(
     code => q{
         use ExtUtils::MakeMaker;
+        use Cwd qw( cwd );
+
+        #---------------------------------
+        #             new
+        #---------------------------------
+
+        # Detect and fix prerequisite issues.
+        sub prereq_failures {
+            my ($s) = @_;
+            my $err = $s->SUPER::prereq_failures;
+
+            if ( $err and ref($err) eq "HASH" ) {
+                if ( $err->{requires} ) {
+                    if ( $err->{requires}{"Term::ReadLine::Gnu"} ) {
+                        $s->_install_readline_dev();
+                    }
+                }
+            }
+
+            $err;
+        }
+
+        sub _install_readline_dev {
+            print "\nInstalling readline-dev\n";
+            my $os_name;
+
+            my $os_file = "/etc/os-release";
+            if (-e $os_file){
+                open my $fh, "<", $os_file or warn $!;
+                while (<$fh>) {
+                    next unless / ^ ID = "(\S+)" /x;
+                    $os_name = lc($1 // "");
+                    last;
+                }
+                close $fh;
+                return if !$os_name;
+            }
+            elsif( $ENV{PREFIX} ){
+                return if $ENV{PREFIX} !~ / \b termux \b /xi;
+                $os_name = "termux";
+            }
+
+            my %commands = (
+                centos => 'sudo dnf install -y readline-devel',
+                gentoo => 'sudo emerge --ask sys-libs/readline',
+                debian => 'sudo apt install -y libreadline-dev',
+                ubuntu => 'sudo apt install -y libreadline-dev',
+                termux => 'pkg install readline ncurses && cpanm -v --notest Term::ReadLine::Gnu',
+            );
+            my $install_command = $commands{$os_name};
+            return if !$install_command;
+
+            print "Installing readline-dev for '$os_name' via '$install_command'\n";
+            system "$install_command";
+        }
+
+        #---------------------------------
+        #            Build
+        #---------------------------------
+
+        sub ACTION_build {
+            my ($s) = @_;
+            $s->_readme();
+            $s->SUPER::ACTION_build;
+        }
+
+        # Only for the maintainer on "Build build".
+        sub _readme {
+            my ($s) = @_;
+            return if cwd() !~ m{ / git / perlmy / [^/]+ $ }x;
+
+            my ($installed) =
+                grep { -x "$_/pod2markdown" }
+                split /:/, $ENV{PATH};
+            return if !$installed;
+
+            print "Building README\n";
+            my $lib = $s->{properties}{dist_version_from};
+            system "pod2markdown $lib > README.md";
+        }
+
+        #---------------------------------
+        #             Deps
+        #---------------------------------
+
         sub ACTION_installdeps {
             my ($s) = @_;
             print "Checking if our version of ExtUtils::MakeMaker is ok\n";
@@ -71,6 +106,22 @@ my $class = Module::Build->subclass(
             }
             $s->SUPER::ACTION_installdeps;
         }
+
+        #---------------------------------
+        #           Install
+        #---------------------------------
+
+        sub ACTION_install {
+            my ($s) = @_;
+            $s->_remove_old_history();
+            $s->SUPER::ACTION_install;
+        }
+
+        sub _remove_old_history {
+            my $old = "$ENV{HOME}/.runtime_debugger.info";
+            unlink $old if -e $old;
+        }
+
     },
 );
 

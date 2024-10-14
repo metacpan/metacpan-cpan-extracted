@@ -20,7 +20,7 @@ use Exporter;
 use Excel::Writer::XLSX::Workbook;
 
 our @ISA     = qw(Excel::Writer::XLSX::Workbook Exporter);
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 
 ###############################################################################
@@ -2440,8 +2440,8 @@ Excel allows up to 7 outline levels. Therefore the C<$level> parameter should be
 
 This method is the same as C<set_column()> except that C<$width> is in pixels.
 
-    $worksheet->set_column( 0, 0, 10 );    # Column A width set to 20 in character units
-    $worksheet->set_column( 1, 1, 75 );    # Column B set to the same width in pixels
+    $worksheet->set_column       ( 0, 0, 10 ); # Column A width set to 10 in character units
+    $worksheet->set_column_pixels( 1, 1, 75 ); # Column B set to the same width in pixels
 
 
 
@@ -3639,7 +3639,7 @@ Set the font size. Excel adjusts the height of a row to accommodate the largest 
 
     Default state:      Excels default color, usually black
     Default action:     Set the default color
-    Valid args:         Integers from 8..63 or the following strings:
+    Valid args:         Html RGB strings like "#FF0000" or the following shortcut strings:
                         'black'
                         'blue'
                         'brown'
@@ -3807,7 +3807,7 @@ Using format strings you can define very sophisticated formatting of numbers.
     $worksheet->write( 8, 0, 36892.521, $format09 );    # 1 January 2001
 
     $format10->set_num_format( 'dd/mm/yyyy hh:mm AM/PM' );
-    $worksheet->write( 9, 0, 36892.521, $format10 );    # 01/01/2001 12:30 AM
+    $worksheet->write( 9, 0, 36892.521, $format10 );    # 01/01/2001 12:30 PM
 
     $format11->set_num_format( '0 "dollar and" .00 "cents"' );
     $worksheet->write( 10, 0, 1.87, $format11 );        # 1 dollar and .87 cents
@@ -4400,7 +4400,7 @@ If you write a date string with C<write()> then all you will get is a string:
 
     $worksheet->write( 'A1', '02/03/04' );   # !! Writes a string not a date. !!
 
-Dates and times in Excel are represented by real numbers, for example "Jan 1 2001 12:30 AM" is represented by the number 36892.521.
+Dates and times in Excel are represented by real numbers, for example "Jan 1 2001 12:30 PM" is represented by the number 36892.521.
 
 The integer part of the number stores the number of days since the epoch and the fractional part stores the percentage of the day.
 
@@ -7376,7 +7376,7 @@ different features and options of the module. See L<Excel::Writer::XLSX::Example
     defined_name.pl         Example of how to create defined names.
     diag_border.pl          A simple example of diagonal cell borders.
     dynamic_arrays.pl       Example of using new Excel 365 dynamic functions.
-    embedded_images.pl      Example of embedding imges in worksheet cells.
+    embedded_images.pl      Example of embedding images in worksheet cells.
     filehandle.pl           Examples of working with filehandles.
     headers.pl              Examples of worksheet headers and footers.
     hide_row_col.pl         Example of hiding rows and columns.
@@ -7716,6 +7716,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXIV, John McNamara.
+Copyright MM-MMXXIV, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

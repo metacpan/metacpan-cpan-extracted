@@ -1,5 +1,14 @@
 Revision history for Dist::Zilla::Plugin::Test::Perl::Critic
 
+3.002     2024-10-13 19:34:56Z
+  - Removed old and broken links from Pod
+  - Test::Perl::Critic is no longer a direct dependency. It is used in the
+    generated test, but not by the module itself.
+  - add filename option to customize the generated file name
+  - critic_config option will no longer be ignored if the file doesn't exist
+  - add verbose option to set Perl::Critic's verbose option
+  - add profile as an alias for the critic_config option
+
 3.001     2017-05-09 22:32:01Z
  - Test::Perl::Critic is now injected into the distribution as a develop prereq
  - Test::Perl::Critic is now used unconditionally in the test (i.e. with no eval)

@@ -1,7 +1,20 @@
+0.990021 2023-10-12
+  [New Features]
+    * Add Array#repeat method.
+    
+  [Improvement]
+    
+    * Fix an exception message in Fn#repeat method.
+    * Improve the performance of Fn#repeat method.
+    * Fix docs in Fn#repeat method. The return type was wrong.
+    
 0.990020 2023-10-12
   [Bug Fix]
     * Fix a bug that child class does not call DESTROY method of its super class.
-
+  
+  [Changes]
+    * Allow the same type and name field in a child class.
+    
 0.990019 2023-10-08
   [New Features]
     * Add --dependency-cpan option to spvmcc command.

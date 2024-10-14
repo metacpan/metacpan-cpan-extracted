@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
-package Test::ExpectAndCheck::Future 0.06;
+package Test::ExpectAndCheck::Future 0.07;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,8 @@ use constant EXPECTATION_CLASS => "Test::ExpectAndCheck::Future::_Expectation";
 C<Test::ExpectAndCheck::Future> - C<expect/check>-style unit testing with C<Future>-returning methods
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Test::More;
    use Test::ExpectAndCheck::Future;

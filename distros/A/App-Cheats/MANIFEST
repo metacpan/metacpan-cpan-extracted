@@ -7,8 +7,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
 META.yml
-README
-README.pod
+README.md
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t

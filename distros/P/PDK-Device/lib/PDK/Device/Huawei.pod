@@ -1,0 +1,167 @@
+pod
+
+=head1 NAME
+
+PDK::Device::Huawei - Module for managing Huawei devices and backing up configurations via FTP
+
+=head1 SYNOPSIS
+
+  use PDK::Device::Huawei;
+
+  my $device = PDK::Device::Huawei->new( host => 'device_ip' );
+  my $config = $device->getConfig();
+  $device->ftpConfig( $hostname, $server, $username, $password );
+
+=head1 DESCRIPTION
+
+The PDK::Device::Huawei module provides functionality for interacting with Huawei devices. It includes methods for fetching configurations, running commands, and backing up the device configuration via FTP. The module extends L<PDK::Device::Base> and uses the C<Expect> module for interacting with the device.
+
+=head1 ATTRIBUTES
+
+=head2 prompt
+
+  is       => 'ro',
+  required => 1,
+  default  => '^\s*[<\[].*?[>\]]\s*$',
+
+This attribute defines the regular expression used to match the device's command prompt. It defaults to the common Huawei CLI prompt format.
+
+=head1 METHODS
+
+=head2 errCodes
+
+  $device->errCodes();
+
+Returns an array reference of regular expressions representing possible error patterns that may occur during command execution.
+
+=head2 waitfor
+
+  $device->waitfor( $prompt );
+
+Waits for a specific prompt (or uses the default prompt) and captures the output from the device. This method handles pagination (C<--More-->) and confirmation prompts (e.g., "Are you sure to continue") and returns the captured output.
+
+=over 4
+
+=item *
+
+C<$prompt> - Optional, specifies the prompt to wait for. If not provided, the default device prompt is used.
+
+=back
+
+=head2 runCommands
+
+  $device->runCommands( \@commands );
+
+Executes a series of commands on the device. This method automatically ensures that configuration mode is entered, and the configuration is saved after the commands are executed.
+
+=over 4
+
+=item *
+
+C<\@commands> - An array reference containing the list of commands to execute.
+
+=back
+
+=head2 getConfig
+
+  $device->getConfig();
+
+Fetches the current configuration of the device. This method runs commands to display the current configuration and returns the output. The result is returned as a hash reference containing a success flag and the configuration content.
+
+=head2 ftpConfig
+
+  $device->ftpConfig( $hostname, $server, $username, $password );
+
+Backs up the current device configuration to an FTP server. This method connects to the specified FTP server, uploads the device's configuration, and returns the result.
+
+=over 4
+
+=item *
+
+C<$hostname> - Optional, specifies a custom hostname to use in the backup filename.
+
+=item *
+
+C<$server> - The FTP server address. If not provided, it is loaded from the environment variable C<PDK_FTP_SERVER>.
+
+=item *
+
+C<$username> - The FTP username. If not provided, it is loaded from the environment variable C<PDK_FTP_USERNAME>.
+
+=item *
+
+C<$password> - The FTP password. If not provided, it is loaded from the environment variable C<PDK_FTP_PASSWORD>.
+
+=back
+
+The method ensures that the FTP connection is established, uploads the configuration file, and verifies the successful completion of the transfer.
+
+=head1 ERROR HANDLING
+
+The module uses C<croak> to throw exceptions when errors occur, including:
+
+=over 4
+
+=item *
+
+Connection timeouts to the device or FTP server.
+
+=item *
+
+Failed logins or incorrect credentials.
+
+=item *
+
+Unexpected disconnections during command execution.
+
+=back
+
+=head1 RETURN VALUES
+
+Methods typically return a hash reference with the following keys:
+
+=over 4
+
+=item *
+
+C<success> - A boolean indicating whether the method completed successfully.
+
+=item *
+
+C<config> - A string containing the captured output or configuration.
+
+=back
+
+=head1 DEPENDENCIES
+
+This module depends on the following Perl modules:
+
+=over 4
+
+=item *
+
+C<Moose> - For object-oriented programming.
+
+=item *
+
+C<Expect> - For interacting with devices through terminal sessions.
+
+=item *
+
+C<Carp> - For error handling with C<croak>.
+
+=back
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut
