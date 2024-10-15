@@ -1,5 +1,10 @@
 Revision history for meta
 
+0.012   2024-10-14
+        [BUGFIXES]
+         * Make `$metasub->signature` work correctly on `method` subs of
+           Perl 5.38
+
 0.011   2024-10-08
         [BUGFIXES]
          * Various small fixes to avoid upsetting `gcc -Wall`

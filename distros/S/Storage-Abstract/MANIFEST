@@ -14,11 +14,15 @@ lib/Storage/Abstract/Driver/Composite.pm
 lib/Storage/Abstract/Driver/Directory.pm
 lib/Storage/Abstract/Driver/Memory.pm
 lib/Storage/Abstract/Driver/Null.pm
+lib/Storage/Abstract/Driver/Subpath.pm
+lib/Storage/Abstract/Role/Metadriver.pm
 lib/Storage/Abstract/X.pm
 t/author-pod-syntax.t
+t/constructor.t
 t/driver/composite.t
 t/driver/directory.t
 t/driver/memory.t
+t/driver/subpath.t
 t/lib/Storage/Abstract/Test.pm
 t/paths.t
 t/readonly.t

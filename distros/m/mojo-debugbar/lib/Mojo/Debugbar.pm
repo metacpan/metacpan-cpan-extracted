@@ -5,7 +5,7 @@ use Mojo::Debugbar::Monitors;
 use Mojo::Loader qw(load_class);
 use Mojo::Server;
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 has 'app' => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') }, weak => 1;
 has 'config' => sub {{
@@ -36,12 +36,20 @@ has 'monitors' => sub {
     );
 };
 
+=head2 inject
+
+    Inject monitors via javascript
+
+=cut
+
 sub inject {
     return shift->monitors->inject;
 }
 
 =head2 render
+
     Proxy for monitors->render
+
 =cut
 
 sub render {
@@ -49,7 +57,9 @@ sub render {
 }
 
 =head2 stop
+
     Proxy for monitors->stop
+
 =cut
 
 sub stop {
@@ -61,7 +71,9 @@ sub stop {
 }
 
 =head2 start
+
     Proxy for monitors->start
+
 =cut
 
 sub start {
@@ -74,7 +86,9 @@ sub start {
 
 
 =head2 _monitor
+
     Load monitor
+
 =cut
 
 sub _monitor {
@@ -125,6 +139,12 @@ L<Mojo::Debugbar> inherits all attributes from L<Mojo::Base>.
 
 L<Mojo::Debugbar> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
+
+=head2 inject
+
+    $debugbar->inject;
+
+Injects the monitors via javascript.
 
 =head2 render
 

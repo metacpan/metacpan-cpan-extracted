@@ -15,8 +15,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.018'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-10-08'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.019'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-10-14'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -760,8 +760,8 @@ sub __self_ifexists {
 sub __selfmust { # sheet must exist, otherwise throw
   &__self_ifexists || do{
     my $pkg = caller(1);
-    #croak __methname()," : No sheet is defined in $pkg\n"
-    confess __methname()," : No sheet is defined in $pkg\n"
+    #croak __methname()," : No sheet is active in package $pkg\n"
+    confess __methname()," : No sheet is active in package $pkg\n"
   };
 }
 
@@ -2906,7 +2906,7 @@ sub write_spreadsheet(*;@) {
   my ($self, $opts, $outpath) = &__self_opthash_1arg;
 
   if ($outpath =~ /\.csv$/i) {
-    goto &write_csv;
+    return $self->write_csv($opts, $outpath);
   }
 
   my $colx = $$self->{colx};
@@ -2932,9 +2932,9 @@ sub write_spreadsheet(*;@) {
   local $opts->{col_formats} = $cf; # transformed form, or undef if not given
 
   # First convert to a temporary .csv named "<outputbasename>.csv"
-  # so that the 'sheet name' in the spreadsheet will be <outputbasename>.
+  # so that the 'sheet name' in the spreadsheet will be <outputbasename> .
   #
-  my $tdir = Path::Tiny->tempdir(); # auto-delted when destroyed
+  my $tdir = Path::Tiny->tempdir(); # auto-deleted when destroyed
   my $csvpath = $tdir->child( path($outpath)->basename(qr/\.\w+$/).".csv" );
   { local $$self->{verbose} = 0;
     $self->write_csv($csvpath->canonpath,

@@ -106,12 +106,17 @@ static SV *S_wrap_stash(pTHX_ HV *stash)
 struct CVwithOP {
   CV *cv;
   OP *op;
+  U32 flags;
 };
 
-#define wrap_cv_signature(cv, op)  S_wrap_cv_signature(aTHX_ cv, op)
-static SV *S_wrap_cv_signature(pTHX_ CV *cv, OP *op)
+enum {
+  CVSIGNATURE_IS_METHOD = (1<<0),
+};
+
+#define wrap_cv_signature(cv, op, flags)  S_wrap_cv_signature(aTHX_ cv, op, flags)
+static SV *S_wrap_cv_signature(pTHX_ CV *cv, OP *op, U32 flags)
 {
-  struct CVwithOP ret = { .cv = CvREFCNT_inc(cv), .op = op, };
+  struct CVwithOP ret = { .cv = CvREFCNT_inc(cv), .op = op, .flags = flags };
   return sv_setref_pvn(newSV(0), "meta::subsignature", (const char *)&ret, sizeof(ret));
 }
 
@@ -1075,6 +1080,8 @@ signature(SV *metasub)
     assert(oproot->op_type == OP_LEAVESUB);
     OP *o = cUNOPx(oproot)->op_first;
 
+    U32 flags = 0;
+
     /* Descend into OP_NULL / OP_LINESEQ trees while skipping past COPs
      */
     while(o) {
@@ -1084,6 +1091,10 @@ signature(SV *metasub)
         o = (o->op_flags & OPf_KIDS) ? cUNOPo->op_first : NULL;
       else if(o->op_type == OP_NEXTSTATE || o->op_type == OP_DBSTATE)
         o = OpSIBLING(o);
+#  ifdef HAVE_FEATURE_CLASS
+      else if(o->op_type == OP_METHSTART)
+        o = OpSIBLING(o), flags |= CVSIGNATURE_IS_METHOD;
+#  endif
       else
         break;
     }
@@ -1091,7 +1102,7 @@ signature(SV *metasub)
     if(!o || o->op_type != OP_ARGCHECK)
       goto nosig;
 
-    RETVAL = wrap_cv_signature(cv, o);
+    RETVAL = wrap_cv_signature(cv, o, flags);
 
     nosig:
       ;
@@ -1126,7 +1137,7 @@ mandatory_params(SV *metasig)
     struct CVwithOP *cvop = (struct CVwithOP *)SvPVX(SvRV(metasig));
 #  if HAVE_PERL_VERSION(5, 31, 5)
     struct op_argcheck_aux *aux = (struct op_argcheck_aux *)cUNOP_AUXx(cvop->op)->op_aux;
-    int params     = aux->params;
+    int params     = aux->params + ((cvop->flags & CVSIGNATURE_IS_METHOD) ? 1 : 0);
     int opt_params = aux->opt_params;
     char slurpy    = aux->slurpy;
 #  else

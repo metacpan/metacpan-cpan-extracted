@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Null;
-$Storage::Abstract::Driver::Null::VERSION = '0.002';
+$Storage::Abstract::Driver::Null::VERSION = '0.003';
 use v5.14;
 use warnings;
 

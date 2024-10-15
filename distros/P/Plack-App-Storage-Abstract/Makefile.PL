@@ -18,12 +18,13 @@ my %WriteMakefileArgs = (
   "NAME" => "Plack::App::Storage::Abstract",
   "PREREQ_PM" => {
     "Plack" => 0,
-    "Storage::Abstract" => 0
+    "Storage::Abstract" => "0.002",
+    "Try::Tiny" => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,8 +33,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Plack" => 0,
-  "Storage::Abstract" => 0,
-  "Test2::V0" => 0
+  "Storage::Abstract" => "0.002",
+  "Test2::V0" => 0,
+  "Try::Tiny" => 0
 );
 
 

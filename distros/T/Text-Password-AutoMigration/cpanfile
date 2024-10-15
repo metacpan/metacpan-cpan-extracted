@@ -1,5 +1,5 @@
 requires 'perl',            5.008008;
-requires 'Carp',            1.54;
+requires 'Carp',            1.50;
 requires 'Moo',             2.005005;
 requires 'strictures',      2.000006;
 requires 'Types::Standard', 2.006000;

@@ -63,7 +63,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 9.1506
+Version 9.1701
 
 
 =head1 SYNOPSIS
@@ -702,7 +702,7 @@ $opt_join = 1 if $opt_joinby ne "";
 ##------------------------------------------------------------
 ## colors
 ##
-my %colormap = (
+our %colormap = (
     FILE     => "G",
     LINE     => "Y",
     TEXT     => "",
@@ -713,7 +713,7 @@ my %colormap = (
     BOTTOM   => "",
     );
 
-my @colors;
+our @colors;
 
 use Getopt::EX::Colormap;
 my $color_handler = Getopt::EX::Colormap
@@ -748,12 +748,12 @@ for my $opt (@opt_face) {
 	my($mk, $s) = ($+{mk} // '', $+{s});
 	for my $c (@colors) {
 	    if ($mk eq '-') {
-		$c =~ s/[\Q$+{s}\E]//g if $s ne '';
+		$c =~ s/[\Q$s\E]//g if $s ne '';
 	    } elsif ($mk eq '=') {
 		$c = $s;
-	    } else {
-		my $spec = $s =~ s/[\Q$c\E]//gr;
-		$c .= '^' . ${spec} if $spec;
+	    } elsif ($s ne '') {
+		$c .= "^" if $c ne '';
+		$c .= $s;
 	    }
 	}
     }
@@ -1461,6 +1461,59 @@ __END__
     $ cpanm App::Greple
 
 
+=head1 SUMMARY (AI GENERATED)
+
+
+B<GREPLE> is a sophisticated and versatile grep-like command-line tool
+designed primarily for advanced text searching and manipulation in
+document files. While it can handle various text formats, it
+particularly excels in processing structured documents, such as source
+code, markup files, and other text-based content. Here are some key
+features that make greple especially suitable for document processing:
+
+=over 2
+
+=item * Flexible pattern matching: greple supports complex search
+patterns, including multi-line matching and logical combinations of
+keywords, which is particularly useful for searching within structured
+documents.
+
+=item * Region control: With options like C<--inside>, C<--outside>,
+C<--include>, and C<--exclude>, greple allows precise targeting of
+specific sections within documents, such as code blocks, comments, or
+particular markup regions.
+
+=item * Block-oriented processing: The ability to define and work with
+custom text blocks makes it ideal for handling document structures
+like paragraphs, sections, or other logical units within a text.
+
+=item * Multi-byte text support: greple is particularly adept at
+handling Asian languages, especially Japanese, making it valuable for
+multilingual document processing.
+
+=item * Extensibility through modules: Users can create custom modules
+to implement document-specific search and manipulation functions,
+enhancing its capabilities for particular document types or formats.
+
+=item * Colorized output: The advanced color options allow for clear
+visualization of search results, which is particularly helpful when
+analyzing document structure or content.
+
+=item * Integration with other text processing tools: greple can be
+easily combined with other Unix tools and custom scripts for more
+complex document analysis and transformation tasks.
+
+=back
+
+While greple can be used for various text processing tasks, its
+feature set is particularly well-suited for working with structured
+documents, source code files, and other text-based content where
+context, structure, and precise matching are important. It may not be
+the best choice for processing very large data files or high-volume
+log analysis, but it excels in scenarios where detailed examination
+and manipulation of document content is required.
+
+
 =head1 DESCRIPTION
 
 
@@ -1936,7 +1989,7 @@ So the file:
     C
 
 makes the pattern as C<A|B|C>, or more precisely
-C<(?^m:A)(?^m:B)(?^m:C)>.
+C<(?^m:A)|(?^m:B)|(?^m:C)>.
 
 Each of these patterns are evaluated independently only with C<m>
 modifier.  So if you enable some flags in a pattern, they are only
@@ -2276,6 +2329,7 @@ with other special effects:
     ;    No effect
     /    Toggle foreground/background
     ^    Reset to foreground
+    @    Reset index list
 
 If the spec includes C</>, left side is considered as foreground color
 and right side as background.  If multiple colors are given in same
@@ -2285,6 +2339,10 @@ a result, the last one takes effect.
 Effect characters are case insensitive, and can be found anywhere and
 in any order in color spec string.  Character C<;> does nothing and
 can be used just for readability, like C<SD;K/544>.
+
+If the special reset symbol C<@> is encountered, the index list is
+reset to empty at that point.  The reset symbol must be used alone and
+may not be combined with other characters.
 
 Example:
 

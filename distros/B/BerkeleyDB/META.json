@@ -29,6 +29,11 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -43,6 +48,6 @@
          "web" : "https://github.com/pmqs/BerkeleyDB"
       }
    },
-   "version" : "0.65",
+   "version" : "0.66",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

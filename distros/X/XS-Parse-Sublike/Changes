@@ -1,5 +1,11 @@
 Revision history for XS-Parse-Sublike
 
+0.29    2024-10-14
+        [CHANGES]
+         * Allow `Sublike::Extended` to take over core perl's handling of
+           `sub` or `method`, allowing extended sublike syntax without needing
+           the `extended` keyword.
+
 0.28    2024-10-08
         [CHANGES]
          * Make the subroutine body optional when using `extended` subs

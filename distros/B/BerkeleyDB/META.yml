@@ -17,9 +17,11 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  Test::More: '0'
 resources:
   bugtracker: https://github.com/pmqs/BerkeleyDB/issues
   homepage: https://github.com/pmqs/BerkeleyDB
   repository: git://github.com/pmqs/BerkeleyDB.git
-version: '0.65'
+version: '0.66'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

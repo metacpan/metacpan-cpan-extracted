@@ -2,7 +2,7 @@ package App::Greple::under;
 use 5.024;
 use warnings;
 
-our $VERSION = "0.99";
+our $VERSION = "0.9902";
 
 =encoding utf-8
 
@@ -38,19 +38,19 @@ next line.
 
 Above command will produce output like this:
 
-    ┌───────────────────────────────────────────────────────────────────────┐
-    │   The license agreements of most software companies try to keep users │
-    │       ▔▔▔▔▔▔▔ ▔▔▔▔▔▔▔▔▔▔         ▔▔▔▔▔▔▔▔                             │
-    │ at the mercy of those companies.  By contrast, our General Public     │
-    │ License is intended to guarantee your freedom to share and change free│
-    │                                       ▔▔▔▔▔▔▔                         │
-    │ software--to make sure the software is free for all its users.  The   │
-    │ ▔▔▔▔▔▔▔▔                   ▔▔▔▔▔▔▔▔                                   │
-    │ General Public License applies to the Free Software Foundation's      │
-    │ software and to any other program whose authors commit to using it.   │
-    │ ▔▔▔▔▔▔▔▔                                                              │
-    │ You can use it for your programs, too.                                │
-    └───────────────────────────────────────────────────────────────────────┘
+ ┌───────────────────────────────────────────────────────────────────────┐
+ │   The license agreements of most software companies try to keep users │
+ │       ▔▔▔▔▔▔▔ ▔▔▔▔▔▔▔▔▔▔         ▔▔▔▔▔▔▔▔                             │
+ │ at the mercy of those companies.  By contrast, our General Public     │
+ │ License is intended to guarantee your freedom to share and change free│
+ │                                       ▔▔▔▔▔▔▔                         │
+ │ software--to make sure the software is free for all its users.  The   │
+ │ ▔▔▔▔▔▔▔▔                   ▔▔▔▔▔▔▔▔                                   │
+ │ General Public License applies to the Free Software Foundation's      │
+ │ software and to any other program whose authors commit to using it.   │
+ │ ▔▔▔▔▔▔▔▔                                                              │
+ │ You can use it for your programs, too.                                │
+ └───────────────────────────────────────────────────────────────────────┘
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-under/main/images/under-line.png">
@@ -66,6 +66,10 @@ the C<-Munder::bake> module.
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-under/main/images/mise-bake.png">
 </p>
 
+=head1 SEE ALSO
+
+L<App::Greple>
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
@@ -79,27 +83,44 @@ it under the same terms as Perl itself.
 
 =cut
 
+use Exporter 'import';
+our @EXPORT_OK = qw(%config &config &finalize);
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
+
 use App::Greple::Common qw(@color_list);
 use Term::ANSIColor::Concise qw(ansi_code);
 use Text::ANSI::Fold;
 use Text::ANSI::Fold::Util qw(ansi_width);
+use Hash::Util qw(lock_keys);
 use Data::Dumper;
+
+use App::Greple::Config qw(config);
+
+my $config = App::Greple::Config->new(
+    type => 'overline',
+    space => ' ',
+    'custom-colormap' => 1,
+);
+
+sub finalize {
+    our($mod, $argv) = @_;
+    $config->deal_with($argv);
+    if (not $config->{'custom-colormap'}) {
+	$mod->setopt('--under-custom-colormap' => '$<ignore>');
+    }
+}
 
 $Term::ANSIColor::Concise::NO_RESET_EL = 1;
 Text::ANSI::Fold->configure(expand => 1);
 
-my $config = {
-    type => 'eighth',
-    "custom-colormap" => 1,
-};
-
-my $space = ' ';
 my %marks  = (
-    eighth => [ "\N{UPPER ONE EIGHTH BLOCK}" ],
-    half =>   [ "\N{UPPER HALF BLOCK}" ],
+    eighth   => [ "\N{UPPER ONE EIGHTH BLOCK}" ],
+    half     => [ "\N{UPPER HALF BLOCK}" ],
     overline => [ "\N{OVERLINE}" ],
-    macron => [ "\N{MACRON}" ],
-    number => [ "0" .. "9" ],
+    macron   => [ "\N{MACRON}" ],
+    caret    => [ "^" ],
+    sign     => [ "+", "-" ],
+    number   => [ "0" .. "9" ],
     alphabet => [ "a" .. "z", "A" .. "Z" ],
     block => [
 	"\N{UPPER ONE EIGHTH BLOCK}",
@@ -128,12 +149,12 @@ my %marks  = (
 	"\N{BOX DRAWINGS DOUBLE UP AND HORIZONTAL}",
     ],
 );
-my @marks = $marks{$config->{type}}->@*;
 
 my $re;
 my %index;
+my @marks;
 
-sub setup {
+sub prepare {
     @color_list == 0 and die "color table is not available.\n";
     my @ansi = map { ansi_code($_) } @color_list;
     my @ansi_re = map { s/\\\e/\\e/gr } map { quotemeta($_) } @ansi;
@@ -143,10 +164,20 @@ sub setup {
 	local $" = '|';
 	qr/(?<ansi>@ansi_re) (?<text>[^\e]*) (?<reset>$reset_re)/x;
     };
+    my $type = $config->{type};
+    if (my $mark = $marks{$type}) {
+	@marks = $mark->@*;
+    } else {
+	if ($type =~ /\A\X\z/) {
+	    @marks = ($type);
+	} else {
+	    die "$type: invalid type.\n";
+	}
+    }
 }
 
 sub line {
-    setup();
+    prepare() if not $re;
     while (<>) {
 	local @_;
 	my @under;
@@ -155,7 +186,7 @@ sub line {
 	    push @_, $+{pre}, $+{text};
 	    my $mark = $marks[$index{$+{ansi}} % @marks];
 	    push @under,
-		$space x ansi_width($+{pre}),
+		$config->{space} x ansi_width($+{pre}),
 		$mark  x ansi_width($+{text});
 	    $pos = pos;
 	}
@@ -176,6 +207,7 @@ sub line {
 __DATA__
 
 option --under-line \
+    $<move> \
     --pf &__PACKAGE__::line
 
 option --under-custom-colormap \

@@ -4734,7 +4734,7 @@ partial_set(db, offset, length)
 	INIT:
 	    ckActive_Database(db->active) ;
 	PPCODE:
-	    if (GIMME == G_ARRAY) {
+	    if (GIMME_V == G_ARRAY) {
 		XPUSHs(sv_2mortal(newSViv(db->partial == DB_DBT_PARTIAL))) ;
 		XPUSHs(sv_2mortal(newSViv(db->doff))) ;
 		XPUSHs(sv_2mortal(newSViv(db->dlen))) ;
@@ -4752,7 +4752,7 @@ partial_clear(db)
 	INIT:
 	    ckActive_Database(db->active) ;
 	PPCODE:
-	    if (GIMME == G_ARRAY) {
+	    if (GIMME_V == G_ARRAY) {
 		XPUSHs(sv_2mortal(newSViv(db->partial == DB_DBT_PARTIAL))) ;
 		XPUSHs(sv_2mortal(newSViv(db->doff))) ;
 		XPUSHs(sv_2mortal(newSViv(db->dlen))) ;
@@ -5374,7 +5374,7 @@ partial_set(db, offset, length)
 	INIT:
           ckActive_Cursor(db->active) ;
 	PPCODE:
-	    if (GIMME == G_ARRAY) {
+	    if (GIMME_V == G_ARRAY) {
 		XPUSHs(sv_2mortal(newSViv(db->partial == DB_DBT_PARTIAL))) ;
 		XPUSHs(sv_2mortal(newSViv(db->doff))) ;
 		XPUSHs(sv_2mortal(newSViv(db->dlen))) ;
@@ -5392,7 +5392,7 @@ partial_clear(db)
 	INIT:
           ckActive_Cursor(db->active) ;
 	PPCODE:
-	    if (GIMME == G_ARRAY) {
+	    if (GIMME_V == G_ARRAY) {
 		XPUSHs(sv_2mortal(newSViv(db->partial == DB_DBT_PARTIAL))) ;
 		XPUSHs(sv_2mortal(newSViv(db->doff))) ;
 		XPUSHs(sv_2mortal(newSViv(db->dlen))) ;

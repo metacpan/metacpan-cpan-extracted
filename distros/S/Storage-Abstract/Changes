@@ -1,5 +1,17 @@
 Revision history for Storage-Abstract
 
+0.003 - 2024-10-14
+	- Added subpath driver
+	- Improved constructor behavior with hash references and driver instances
+	- Driver name can now be prefixed with + to force full custom namespace
+	- Changed the behavior of Composite driver
+		- no longer catches errors raised in its sources
+		- will not fall back to other sources if one of the sources encounters a problem
+		- errors field was removed
+		- sources field was renamed to source
+	- Removed Feature::Compat::Try dependency
+	- Increased minimum Type::Tiny version to 2
+
 0.002 - 2024-10-13
 	- Added 'size' to list of common properties
 	- Added 'list' delegated method to Storage::Abstract

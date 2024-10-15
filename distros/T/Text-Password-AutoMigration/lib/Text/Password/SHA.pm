@@ -1,5 +1,5 @@
 package Text::Password::SHA;
-our $VERSION = "0.31";
+our $VERSION = "0.41";
 
 use Moo;
 use strictures 2;
@@ -79,9 +79,9 @@ sub verify {
     carp 'Invalid hash'  unless length $data;
 
     return $data eq Crypt::Passwd::XS::unix_sha512_crypt( $input, $data )
-        if $data =~ m|^\$6\$[!-~]{1,$m}\$[\w/\.]{86}$|;
+        if $data =~ m|^\$6\$[!-~\s]{1,$m}\$[\w/\.]{86}$|;
     return $data eq Crypt::Passwd::XS::unix_sha256_crypt( $input, $data )
-        if $data =~ m|^\$5\$[!-~]{1,$m}\$[\w/\.]{43}$|;
+        if $data =~ m|^\$5\$[!-~\s]{1,$m}\$[\w/\.]{43}$|;
     return $data eq sha1_hex($input) if $data =~ /^[\da-f]{40}$/i;
     carp __PACKAGE__, " doesn't support this hash: ", $data;
     return;

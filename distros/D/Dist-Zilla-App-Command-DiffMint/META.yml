@@ -1,0 +1,41 @@
+---
+abstract: 'Compare files to what a minting profile produces'
+author:
+  - 'Graham Knop <haarg@haarg.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-DiffMint
+provides:
+  Dist::Zilla::App::Command::DiffMint:
+    file: lib/Dist/Zilla/App/Command/DiffMint.pm
+    version: v0.1.0
+requires:
+  Digest::SHA: '0'
+  Dist::Zilla::App: '6.000'
+  Dist::Zilla::Stash::Rights: '6.000'
+  Moose: '2.0000'
+  Term::ANSIColor: '0'
+  Text::Diff: '0'
+  namespace::autoclean: '0'
+  perl: '5.020000'
+resources:
+  bugtracker: https://github.com/haarg/Dist-Zilla-App-Command-DiffMint/issues
+  repository: https://github.com/haarg/Dist-Zilla-App-Command-DiffMint.git
+version: v0.1.0
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1
+x_use_unsafe_inc: 0

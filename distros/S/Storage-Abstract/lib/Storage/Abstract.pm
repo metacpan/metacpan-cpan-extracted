@@ -1,5 +1,5 @@
 package Storage::Abstract;
-$Storage::Abstract::VERSION = '0.002';
+$Storage::Abstract::VERSION = '0.003';
 use v5.14;
 use warnings;
 
@@ -26,28 +26,59 @@ has param 'driver' => (
 );
 
 around BUILDARGS => sub {
-	my ($orig, $self, @args) = @_;
+	my ($orig, $self, @raw_args) = @_;
+	my %args;
 
-	return $self->$orig(@args)
-		unless @args % 2 == 0;
+	if (@raw_args == 1 && ref $raw_args[0] eq 'HASH') {
+		%args = %{$raw_args[0]};
+	}
+	else {
+		%args = @raw_args;
+	}
 
-	return $self->$orig(
-		driver => {@args},
-	);
+	my %other_args = %args;
+	%args = ();
+	foreach my $base_key (qw(driver)) {
+		$args{$base_key} = delete $other_args{$base_key};
+	}
+
+	if (!ref $args{driver}) {
+		$args{driver} = {
+			driver => $args{driver},
+			%other_args,
+		};
+	}
+
+	return $self->$orig(%args);
 };
 
 sub load_driver
 {
-	my ($class, $args) = @_;
-	my $driver = delete $args->{driver};
+	my ($class, @raw_args) = @_;
+	my %args;
+
+	if (@raw_args == 1 && ref $raw_args[0] eq 'HASH') {
+		%args = %{$raw_args[0]};
+	}
+	else {
+		%args = @raw_args;
+	}
+
+	my $driver = delete $args{driver};
 	die 'driver is required in Storage::Abstract' unless defined $driver;
 
 	my $name = ucfirst $driver;
-	my $full_namespace = "Storage::Abstract::Driver::$name";
+	my $full_namespace;
+	if ($name =~ /^\+/) {
+		$full_namespace = substr $name, 1;
+	}
+	else {
+		$full_namespace = "Storage::Abstract::Driver::$name";
+	}
 
 	(my $file_path = $full_namespace) =~ s{::}{/}g;
 	require "$file_path.pm";
-	return $full_namespace->new($args);
+	return $full_namespace->new(%args);
 }
 
 1;
@@ -114,7 +145,9 @@ extra attributes that driver need. All implementation details depend on the
 chosen driver, this module only contains methods which delegate to same methods
 of the driver.
 
-The module comes with the following driver implementations:
+There are drivers and metadrivers. Metadrivers do not implement any file
+storage by themselves, but rather change the way other storages work. The module
+comes with the following driver implementations:
 
 =over
 
@@ -128,8 +161,14 @@ This driver stores the files in a local machine's directory.
 
 =item * L<Storage::Abstract::Driver::Composite>
 
-This driver can be configured to keep a couple other drivers at once and use
-them all in sequence until it finds a file.
+This metadriver can be configured to keep a couple source storages at once and
+use them all in sequence until it finds a file.
+
+=item * L<Storage::Abstract::Driver::Subpath>
+
+This metadriver is useful when you want to have a modify the base path of
+another storage, to restrict access or adapt a path (for example for HTTP
+public directory).
 
 =item * L<Storage::Abstract::Driver::Null>
 
@@ -219,9 +258,13 @@ constructing the driver.
 B<Required> - This is the name of the driver to use. It must be a partial class
 name from namespace C<Storage::Abstract::Driver::>, for example C<Directory>
 will point to L<Storage::Abstract::Driver::Directory>. First letter of the
-driver will be capitalized.
+driver will be capitalized. If the name is prefixed with C<+>, the rest of the
+name will be used as full namespace without adding the standard prefix, same as
+in Plack.
 
 After the object is created, this will point to an instance of the driver.
+Alternatively, an already constructed driver object can be passed, and will be
+used as-is.
 
 =head2 Methods
 
@@ -230,16 +273,18 @@ These are common methods not dependant on a driver.
 =head3 new
 
 	$obj = Storage::Abstract->new(%args);
+	$obj = Storage::Abstract->new(\%args);
 
 Moose-flavoured constructor, but C<%args> will be used to construct the driver
 rather than this class.
 
 =head3 load_driver
 
+	$driver_obj = Storage::Abstract->load_driver(%args);
 	$driver_obj = Storage::Abstract->load_driver(\%args);
 
-Loads the driver package and constructs the driver using C<%args>. Returns an
-instance of L<Storage::Abstract::Driver>.
+Loads the driver package and constructs the driver using C<%args> (same as in
+the constructor). Returns an instance of L<Storage::Abstract::Driver>.
 
 =head2 Delegated methods
 
@@ -308,6 +353,10 @@ Sets the readonly status of the storage to a new value.
 =head1 AUTHOR
 
 Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
+
+=head1 ACKNOWLEDGEMENTS
+
+Thank you to Alexander Karelas for his feedback during module development.
 
 =head1 COPYRIGHT AND LICENSE
 

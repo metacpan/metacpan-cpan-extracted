@@ -7,6 +7,8 @@ use JSON;
 use Clone 'clone';
 use File::Slurp;
 use IO::Interface::Simple;
+use Math::BigInt;
+use Scalar::Util qw(looks_like_number);
 
 =head1 NAME
 
@@ -14,11 +16,11 @@ OSLV::Monitor::Backends::cgroups - Backend for Linux cgroups.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 1.0.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '1.0.0';
 
 =head1 SYNOPSIS
 
@@ -46,8 +48,8 @@ Anything else is formed like below.
 
 The following ps to stats mapping are as below.
 
-    %cpu -> cpu_usage_per
-    %mem -> mem_usage_per
+    %cpu -> percent-cpu
+    %mem -> percent-memory
     rss -> rss
     vsize -> virtual-size
     trs -> text-size
@@ -63,6 +65,16 @@ the names kept as is.
     io.stat
     memory.stat
 
+The following mappings are done though.
+
+    pgfault -> minor-faults
+    pgmajfault -> major-faults
+    usage_usec -> cpu-time
+    system_usec -> system-time
+    user_usec -> user-time
+    throttled_usec -> throttled-time
+    burst_usec -> burst-time
+
 =head2 METHODS
 
 =head2 new
@@ -71,12 +83,33 @@ Initiates the backend object.
 
     my $backend=OSLV::MOnitor::Backend::cgroups->new(obj=>$obj)
 
+    - base_dir :: Path to use for the base dir, where the proc/cgroup
+            cache, linux_cache.json, is is created.
+        Default :: /var/cache/oslv_monitor
+
     - obj :: The OSLVM::Monitor object.
+
+    - time_divider :: What to use for "usec" to sec conversion. While normally
+              the usec counters are microseconds, sometimes the value is in
+              nanoseconds, despit the name.
+        Default :: 1000000
 
 =cut
 
 sub new {
 	my ( $blank, %opts ) = @_;
+
+	if ( !defined( $opts{base_dir} ) ) {
+		$opts{base_dir} = '/var/cache/oslv_monitor';
+	}
+
+	if ( !defined( $opts{time_divider} ) ) {
+		$opts{time_divider} = 1000000;
+	} else {
+		if ( !looks_like_number( $opts{time_divider} ) ) {
+			die('time_divider is not a number');
+		}
+	}
 
 	if ( !defined( $opts{obj} ) ) {
 		die('$opts{obj} is undef');
@@ -85,6 +118,7 @@ sub new {
 	}
 
 	my $self = {
+		time_divider    => $opts{time_divider},
 		version         => 1,
 		cgroupns_usable => 1,
 		mappings        => {},
@@ -94,6 +128,57 @@ sub new {
 		docker_info     => {},
 		uid_mapping     => {},
 		obj             => $opts{obj},
+		cache_file      => $opts{base_dir} . '/linux_cache.json',
+		counters        => {
+			'cpu-time'                     => 1,
+			'system-time'                  => 1,
+			'user-time'                    => 1,
+			'throttled-time'               => 1,
+			'burst-time'                   => 1,
+			'core_sched.force_idle-time'   => 1,
+			'read-blocks'                  => 1,
+			'major-faults'                 => 1,
+			'involuntary-context-switches' => 1,
+			'minor-faults'                 => 1,
+			'received-messages'            => 1,
+			'sent-messages'                => 1,
+			'swaps'                        => 1,
+			'voluntary-context-switches'   => 1,
+			'written-blocks'               => 1,
+			'copy-on-write-faults'         => 1,
+			'signals-taken'                => 1,
+			'rbytes'                       => 1,
+			'wbytes'                       => 1,
+			'dbytes'                       => 1,
+			'rios'                         => 1,
+			'wios'                         => 1,
+			'dios'                         => 1,
+			'pgactivate'                   => 1,
+			'pgdeactivate'                 => 1,
+			'pglazyfree'                   => 1,
+			'pglazyfreed'                  => 1,
+			'pgrefill'                     => 1,
+			'pgscan'                       => 1,
+			'pgscan_direct'                => 1,
+			'pgscan_khugepaged'            => 1,
+			'pgscan_kswapd'                => 1,
+			'pgsteal'                      => 1,
+			'pgsteal_direct'               => 1,
+			'pgsteal_khugepaged'           => 1,
+			'pgsteal_kswapd'               => 1,
+			'thp_fault_alloc'              => 1,
+			'thp_collapse_alloc'           => 1,
+			'thp_swpout'                   => 1,
+			'thp_swpout_fallback'          => 1,
+			'system_usec'                  => 1,
+			'usage_usec'                   => 1,
+			'user_usec'                    => 1,
+			'zswpin'                       => 1,
+			'zswpout'                      => 1,
+			'zswpwb'                       => 1,
+		},
+		cache     => {},
+		new_cache => {},
 	};
 	bless $self;
 
@@ -112,165 +197,213 @@ sub run {
 	my $data = {
 		errors => [],
 		oslvms => {},
+		has    => {
+			'linux_mem_stats' => 1,
+			'rwdops'          => 0,
+			'rwdbytes'        => 0,
+			'rwdblocks'       => 0,
+			'signals-taken'   => 0,
+			'recv_sent_msgs'  => 0,
+			'cows'            => 0,
+			'stack-size'      => 0,
+			'swaps'           => 0,
+			'sock'            => 1,
+			'burst_time'      => 0,
+			'throttled_time'  => 0,
+			'burst_count'     => 0,
+			'throttled_count' => 0,
+		},
 		totals => {
-			procs                        => 0,
-			cpu_usage_per                => 0,
-			mem_usage_per                => 0,
-			rbytes                       => 0,
-			wbytes                       => 0,
-			rios                         => 0,
-			wios                         => 0,
-			dbytes                       => 0,
-			dios                         => 0,
-			usage_usec                   => 0,
-			user_usec                    => 0,
-			system_usec                  => 0,
-			'core_sched.force_idle_usec' => 0,
-			nr_periods                   => 0,
-			nr_throttled                 => 0,
-			throttled_usec               => 0,
-			nr_bursts                    => 0,
-			burst_usec                   => 0,
-			anon                         => 0,
-			file                         => 0,
-			kernel                       => 0,
-			kernel_stack                 => 0,
-			pagetables                   => 0,
-			sec_pagetables               => 0,
-			percpu                       => 0,
-			sock                         => 0,
-			vmalloc                      => 0,
-			shmem                        => 0,
-			zswap                        => 0,
-			zswapped                     => 0,
-			file_mapped                  => 0,
-			file_dirty                   => 0,
-			file_writeback               => 0,
-			swapcached                   => 0,
-			anon_thp                     => 0,
-			file_thp                     => 0,
-			shmem_thp                    => 0,
-			inactive_anon                => 0,
-			active_anon                  => 0,
-			inactive_file                => 0,
-			active_file                  => 0,
-			unevictable                  => 0,
-			slab_reclaimable             => 0,
-			slab_unreclaimable           => 0,
-			slab                         => 0,
-			workingset_refault_anon      => 0,
-			workingset_refault_file      => 0,
-			workingset_activate_anon     => 0,
-			workingset_activate_file     => 0,
-			workingset_restore_anon      => 0,
-			workingset_restore_file      => 0,
-			workingset_nodereclaim       => 0,
-			pgscan                       => 0,
-			pgsteal                      => 0,
-			pgscan_kswapd                => 0,
-			pgscan_direct                => 0,
-			pgscan_khugepaged            => 0,
-			pgsteal_kswapd               => 0,
-			pgsteal_direct               => 0,
-			pgsteal_khugepaged           => 0,
-			pgfault                      => 0,
-			pgmajfault                   => 0,
-			pgrefill                     => 0,
-			pgactivate                   => 0,
-			pgdeactivate                 => 0,
-			pglazyfree                   => 0,
-			pglazyfreed                  => 0,
-			zswpin                       => 0,
-			zswpout                      => 0,
-			thp_fault_alloc              => 0,
-			thp_collapse_alloc           => 0,
-			rss                          => 0,
-			'data-size'                  => 0,
-			'text-size'                  => 0,
-			'size'                       => 0,
-			'virtual-size'               => 0,
+			procs                          => 0,
+			'percent-cpu'                  => 0,
+			'percent-memory'               => 0,
+			'system-time'                  => 0,
+			'cpu-time'                     => 0,
+			'user-time'                    => 0,
+			rbytes                         => 0,
+			wbytes                         => 0,
+			rios                           => 0,
+			wios                           => 0,
+			dbytes                         => 0,
+			dios                           => 0,
+			'core_sched.force_idle_usec'   => 0,
+			nr_periods                     => 0,
+			nr_throttled                   => 0,
+			throttled_usec                 => 0,
+			nr_bursts                      => 0,
+			burst_usec                     => 0,
+			anon                           => 0,
+			file                           => 0,
+			kernel                         => 0,
+			kernel_stack                   => 0,
+			pagetables                     => 0,
+			sec_pagetables                 => 0,
+			sock                           => 0,
+			vmalloc                        => 0,
+			shmem                          => 0,
+			zswap                          => 0,
+			zswapped                       => 0,
+			file_mapped                    => 0,
+			file_dirty                     => 0,
+			file_writeback                 => 0,
+			swapcached                     => 0,
+			anon_thp                       => 0,
+			file_thp                       => 0,
+			shmem_thp                      => 0,
+			inactive_anon                  => 0,
+			active_anon                    => 0,
+			inactive_file                  => 0,
+			active_file                    => 0,
+			unevictable                    => 0,
+			slab_reclaimable               => 0,
+			slab_unreclaimable             => 0,
+			slab                           => 0,
+			workingset_refault_anon        => 0,
+			workingset_refault_file        => 0,
+			workingset_activate_anon       => 0,
+			workingset_activate_file       => 0,
+			workingset_restore_anon        => 0,
+			workingset_restore_file        => 0,
+			workingset_nodereclaim         => 0,
+			pgscan                         => 0,
+			pgsteal                        => 0,
+			pgscan_kswapd                  => 0,
+			pgscan_direct                  => 0,
+			pgscan_khugepaged              => 0,
+			pgsteal_kswapd                 => 0,
+			pgsteal_direct                 => 0,
+			pgsteal_khugepaged             => 0,
+			'minor-faults'                 => 0,
+			'major-faults'                 => 0,
+			pgrefill                       => 0,
+			pgactivate                     => 0,
+			pgdeactivate                   => 0,
+			pglazyfree                     => 0,
+			pglazyfreed                    => 0,
+			zswpin                         => 0,
+			zswpout                        => 0,
+			thp_fault_alloc                => 0,
+			thp_collapse_alloc             => 0,
+			rss                            => 0,
+			'data-size'                    => 0,
+			'text-size'                    => 0,
+			'size'                         => 0,
+			'virtual-size'                 => 0,
+			'elapsed-times'                => 0,
+			'involuntary-context-switches' => 0,
+			'voluntary-context-switches'   => 0,
 		},
 	};
 
+	my $proc_cache;
+	my $new_cache = {};
+	if ( -f $self->{cache_file} ) {
+		eval {
+			my $raw_cache = read_file( $self->{cache_file} );
+			$self->{cache} = decode_json($raw_cache);
+		};
+		if ($@) {
+			push(
+				@{ $data->{errors} },
+				'reading proc cache "' . $self->{cache_file} . '" failed... using a empty one...' . $@
+			);
+			$data->{cache_failure} = 1;
+			return $data;
+		}
+	} ## end if ( -f $self->{cache_file} )
+
 	my $base_stats = {
-		procs                        => 0,
-		cpu_usage_per                => 0,
-		mem_usage_per                => 0,
-		rbytes                       => 0,
-		wbytes                       => 0,
-		rios                         => 0,
-		wios                         => 0,
-		dbytes                       => 0,
-		dios                         => 0,
-		usage_usec                   => 0,
-		user_usec                    => 0,
-		system_usec                  => 0,
-		'core_sched.force_idle_usec' => 0,
-		nr_periods                   => 0,
-		nr_throttled                 => 0,
-		throttled_usec               => 0,
-		nr_bursts                    => 0,
-		burst_usec                   => 0,
-		anon                         => 0,
-		file                         => 0,
-		kernel                       => 0,
-		kernel_stack                 => 0,
-		pagetables                   => 0,
-		sec_pagetables               => 0,
-		percpu                       => 0,
-		sock                         => 0,
-		vmalloc                      => 0,
-		shmem                        => 0,
-		zswap                        => 0,
-		zswapped                     => 0,
-		file_mapped                  => 0,
-		file_dirty                   => 0,
-		file_writeback               => 0,
-		swapcached                   => 0,
-		anon_thp                     => 0,
-		file_thp                     => 0,
-		shmem_thp                    => 0,
-		inactive_anon                => 0,
-		active_anon                  => 0,
-		inactive_file                => 0,
-		active_file                  => 0,
-		unevictable                  => 0,
-		slab_reclaimable             => 0,
-		slab_unreclaimable           => 0,
-		slab                         => 0,
-		workingset_refault_anon      => 0,
-		workingset_refault_file      => 0,
-		workingset_activate_anon     => 0,
-		workingset_activate_file     => 0,
-		workingset_restore_anon      => 0,
-		workingset_restore_file      => 0,
-		workingset_nodereclaim       => 0,
-		pgscan                       => 0,
-		pgsteal                      => 0,
-		pgscan_kswapd                => 0,
-		pgscan_direct                => 0,
-		pgscan_khugepaged            => 0,
-		pgsteal_kswapd               => 0,
-		pgsteal_direct               => 0,
-		pgsteal_khugepaged           => 0,
-		pgfault                      => 0,
-		pgmajfault                   => 0,
-		pgrefill                     => 0,
-		pgactivate                   => 0,
-		pgdeactivate                 => 0,
-		pglazyfree                   => 0,
-		pglazyfreed                  => 0,
-		zswpin                       => 0,
-		zswpout                      => 0,
-		thp_fault_alloc              => 0,
-		thp_collapse_alloc           => 0,
-		rss                          => 0,
-		'data-size'                  => 0,
-		'text-size'                  => 0,
-		'size'                       => 0,
-		'virtual-size'               => 0,
-		'ip'                         => [],
-		'path'                       => [],
+		procs                          => 0,
+		'percent-cpu'                  => 0,
+		'percent-memory'               => 0,
+		'system-time'                  => 0,
+		'cpu-time'                     => 0,
+		'user-time'                    => 0,
+		rbytes                         => 0,
+		wbytes                         => 0,
+		rios                           => 0,
+		wios                           => 0,
+		dbytes                         => 0,
+		dios                           => 0,
+		'core_sched.force_idle_usec'   => 0,
+		nr_periods                     => 0,
+		nr_throttled                   => 0,
+		throttled_usec                 => 0,
+		nr_bursts                      => 0,
+		burst_usec                     => 0,
+		anon                           => 0,
+		file                           => 0,
+		kernel                         => 0,
+		kernel_stack                   => 0,
+		pagetables                     => 0,
+		sec_pagetables                 => 0,
+		sock                           => 0,
+		vmalloc                        => 0,
+		shmem                          => 0,
+		zswap                          => 0,
+		zswapped                       => 0,
+		file_mapped                    => 0,
+		file_dirty                     => 0,
+		file_writeback                 => 0,
+		swapcached                     => 0,
+		anon_thp                       => 0,
+		file_thp                       => 0,
+		shmem_thp                      => 0,
+		inactive_anon                  => 0,
+		active_anon                    => 0,
+		inactive_file                  => 0,
+		active_file                    => 0,
+		unevictable                    => 0,
+		slab_reclaimable               => 0,
+		slab_unreclaimable             => 0,
+		slab                           => 0,
+		workingset_refault_anon        => 0,
+		workingset_refault_file        => 0,
+		workingset_activate_anon       => 0,
+		workingset_activate_file       => 0,
+		workingset_restore_anon        => 0,
+		workingset_restore_file        => 0,
+		workingset_nodereclaim         => 0,
+		pgscan                         => 0,
+		pgsteal                        => 0,
+		pgscan_kswapd                  => 0,
+		pgscan_direct                  => 0,
+		pgscan_khugepaged              => 0,
+		pgsteal_kswapd                 => 0,
+		pgsteal_direct                 => 0,
+		pgsteal_khugepaged             => 0,
+		'minor-faults'                 => 0,
+		'major-faults'                 => 0,
+		pgrefill                       => 0,
+		pgactivate                     => 0,
+		pgdeactivate                   => 0,
+		pglazyfree                     => 0,
+		pglazyfreed                    => 0,
+		zswpin                         => 0,
+		zswpout                        => 0,
+		thp_fault_alloc                => 0,
+		thp_collapse_alloc             => 0,
+		rss                            => 0,
+		'data-size'                    => 0,
+		'text-size'                    => 0,
+		'size'                         => 0,
+		'virtual-size'                 => 0,
+		'elapsed-times'                => 0,
+		'involuntary-context-switches' => 0,
+		'voluntary-context-switches'   => 0,
+		'ip'                           => [],
+		'path'                         => [],
+	};
+
+	my $stat_mapping = {
+		'pgmajfault'                 => 'major-faults',
+		'pgfault'                    => 'minor-faults',
+		'usage_usec'                 => 'cpu-time',
+		'user_usec'                  => 'user-time',
+		'system_usec'                => 'system-time',
+		'throttled_usec'             => 'throttled-time',
+		'burst_usec'                 => 'burst-time',
+		'core_sched.force_idle_usec' => 'core_sched.force_idle-time',
 	};
 
 	#
@@ -382,10 +515,10 @@ sub run {
 	#
 	# gets of procs for finding a list of containers
 	#
-	my $ps_output = `ps -haxo pid,cgroupns,%cpu,%mem,rss,vsize,trs,drs,size,cgroup 2> /dev/null`;
+	my $ps_output = `ps -haxo pid,uid,gid,cgroupns,%cpu,%mem,rss,vsize,trs,drs,size,cgroup 2> /dev/null`;
 	if ( $? != 0 ) {
 		$self->{cgroupns_usable} = 0;
-		$ps_output = `ps -haxo pid,%cpu,%mem,rss,vsize,trs,drs,size,cgroup 2> /dev/null`;
+		$ps_output = `ps -haxo pid,uid,gid,%cpu,%mem,rss,vsize,trs,drs,size,etimes,cgroup 2> /dev/null`;
 	}
 	my @ps_output_split = split( /\n/, $ps_output );
 	my %found_cgroups;
@@ -397,43 +530,85 @@ sub run {
 	my %cgroups_trs;
 	my %cgroups_drs;
 	my %cgroups_size;
+	my %cgroups_etimes;
+	my %cgroups_invvol_ctxt_switches;
+	my %cgroups_vol_ctxt_switches;
 
 	foreach my $line (@ps_output_split) {
 		$line =~ s/^\s+//;
-		my ( $pid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $cgroup );
+		my $vol_ctxt_switches   = 0;
+		my $invol_ctxt_switches = 0;
+		my ( $pid, $uid, $gid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup );
 		if ( $self->{cgroupns_usable} ) {
-			( $pid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $cgroup ) = split( /\s+/, $line );
+			( $pid, $uid, $gid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup )
+				= split( /\s+/, $line );
 		} else {
-			( $pid, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $cgroup ) = split( /\s+/, $line );
+			( $pid, $uid, $gid, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup )
+				= split( /\s+/, $line );
 		}
 		if ( $cgroup =~ /^0\:\:\// ) {
-			$found_cgroups{$cgroup}         = $cgroupns;
-			$data->{totals}{cpu_usage_per}  = $data->{totals}{cpu_usage_per} + $percpu;
-			$data->{totals}{mem_usage_per}  = $data->{totals}{mem_usage_per} + $permem;
-			$data->{totals}{rss}            = $data->{totals}{rss} + $rss;
-			$data->{totals}{'virtual-size'} = $data->{totals}{'virtual-size'} + $vsize;
-			$data->{totals}{'text-size'}    = $data->{totals}{'text-size'} + $trs;
-			$data->{totals}{'data-size'}    = $data->{totals}{'data-size'} + $drs;
-			$data->{totals}{'size'}         = $data->{totals}{'size'} + $size;
+
+			my $cache_name = 'proc-' . $pid . '-' . $uid . '-' . $gid . '-' . $cgroup;
+
+			$found_cgroups{$cgroup}           = $cgroup;
+			$data->{totals}{'percent-cpu'}    = $data->{totals}{'percent-cpu'} + $percpu;
+			$data->{totals}{'percent-memory'} = $data->{totals}{'percent-memory'} + $permem;
+			$data->{totals}{rss}              = $data->{totals}{rss} + $rss;
+			$data->{totals}{'virtual-size'}   = $data->{totals}{'virtual-size'} + $vsize;
+			$data->{totals}{'text-size'}      = $data->{totals}{'text-size'} + $trs;
+			$data->{totals}{'data-size'}      = $data->{totals}{'data-size'} + $drs;
+			$data->{totals}{'size'}           = $data->{totals}{'size'} + $size;
+			$data->{totals}{'elapsed-times'}  = $data->{totals}{'elapsed-times'} + $etimes;
+
+			eval {
+				if ( -f '/proc/' . $pid . '/status' ) {
+					my @switches_find
+						= grep( /voluntary\_ctxt\_switches\:/, read_file( '/proc/' . $pid . '/status' ) );
+					foreach my $found_switch (@switches_find) {
+						chomp($found_switch);
+						my @switch_split = split( /\:[\ \t]+/, $found_switch );
+						if ( defined( $switch_split[0] ) && defined( $switch_split[1] ) ) {
+							if ( $switch_split[0] eq 'voluntary_ctxt_switches' ) {
+								$vol_ctxt_switches = $switch_split[1];
+							} elsif ( $switch_split[0] eq 'involuntary_ctxt_switches' ) {
+								$invol_ctxt_switches = $switch_split[1];
+							}
+						}
+					} ## end foreach my $found_switch (@switches_find)
+				} ## end if ( -f '/proc/' . $pid . '/status' )
+			};
+			$vol_ctxt_switches = $self->cache_process( $cache_name, 'voluntary-context-switches', $vol_ctxt_switches );
+			$data->{totals}{'voluntary-context-switches'}
+				= $data->{totals}{'voluntary-context-switches'} + $vol_ctxt_switches;
+			$invol_ctxt_switches
+				= $self->cache_process( $cache_name, 'involuntary-context-switches', $invol_ctxt_switches );
+			$data->{totals}{'involuntary-context-switches'}
+				= $data->{totals}{'involuntary-context-switches'} + $invol_ctxt_switches;
 
 			if ( !defined( $cgroups_permem{$cgroup} ) ) {
-				$cgroups_permem{$cgroup} = $permem;
-				$cgroups_percpu{$cgroup} = $percpu;
-				$cgroups_procs{$cgroup}  = 1;
-				$cgroups_rss{$cgroup}    = $rss;
-				$cgroups_vsize{$cgroup}  = $vsize;
-				$cgroups_trs{$cgroup}    = $trs;
-				$cgroups_drs{$cgroup}    = $drs;
-				$cgroups_size{$cgroup}   = $size;
+				$cgroups_permem{$cgroup}               = $permem;
+				$cgroups_percpu{$cgroup}               = $percpu;
+				$cgroups_procs{$cgroup}                = 1;
+				$cgroups_rss{$cgroup}                  = $rss;
+				$cgroups_vsize{$cgroup}                = $vsize;
+				$cgroups_trs{$cgroup}                  = $trs;
+				$cgroups_drs{$cgroup}                  = $drs;
+				$cgroups_size{$cgroup}                 = $size;
+				$cgroups_etimes{$cgroup}               = $etimes;
+				$cgroups_invvol_ctxt_switches{$cgroup} = $invol_ctxt_switches;
+				$cgroups_vol_ctxt_switches{$cgroup}    = $vol_ctxt_switches;
 			} else {
 				$cgroups_permem{$cgroup} = $cgroups_permem{$cgroup} + $permem;
 				$cgroups_percpu{$cgroup} = $cgroups_percpu{$cgroup} + $percpu;
 				$cgroups_procs{$cgroup}++;
-				$cgroups_rss{$cgroup}   = $cgroups_rss{$cgroup} + $rss;
-				$cgroups_vsize{$cgroup} = $cgroups_vsize{$cgroup} + $vsize;
-				$cgroups_trs{$cgroup}   = $cgroups_trs{$cgroup} + $trs;
-				$cgroups_drs{$cgroup}   = $cgroups_drs{$cgroup} + $drs;
-				$cgroups_size{$cgroup}  = $cgroups_size{$cgroup} + $size;
+				$cgroups_rss{$cgroup}                  = $cgroups_rss{$cgroup} + $rss;
+				$cgroups_vsize{$cgroup}                = $cgroups_vsize{$cgroup} + $vsize;
+				$cgroups_trs{$cgroup}                  = $cgroups_trs{$cgroup} + $trs;
+				$cgroups_drs{$cgroup}                  = $cgroups_drs{$cgroup} + $drs;
+				$cgroups_size{$cgroup}                 = $cgroups_size{$cgroup} + $size;
+				$cgroups_etimes{$cgroup}               = $cgroups_etimes{$cgroup} + $etimes;
+				$cgroups_invvol_ctxt_switches{$cgroup} = $cgroups_invvol_ctxt_switches{$cgroup} + $invol_ctxt_switches;
+				$cgroups_vol_ctxt_switches{$cgroup}    = $cgroups_vol_ctxt_switches{$cgroup} + $vol_ctxt_switches;
 			} ## end else [ if ( !defined( $cgroups_permem{$cgroup} ) )]
 		} ## end if ( $cgroup =~ /^0\:\:\// )
 	} ## end foreach my $line (@ps_output_split)
@@ -458,17 +633,20 @@ sub run {
 		# only process this cgroup if the include check returns true, otherwise ignore it
 		if ( $self->{obj}->include($name) ) {
 
+			my $cache_name = 'cgroup-' . $name;
+
 			$data->{oslvms}{$name} = clone($base_stats);
 
-			$data->{oslvms}{$name}{cpu_usage_per}  = $cgroups_percpu{$cgroup};
-			$data->{oslvms}{$name}{mem_usage_per}  = $cgroups_permem{$cgroup};
-			$data->{oslvms}{$name}{procs}          = $cgroups_procs{$cgroup};
-			$data->{totals}{procs}                 = $data->{totals}{procs} + $cgroups_procs{$cgroup};
-			$data->{oslvms}{$name}{rss}            = $cgroups_rss{$cgroup};
-			$data->{oslvms}{$name}{'virtual-size'} = $cgroups_vsize{$cgroup};
-			$data->{oslvms}{$name}{'text-size'}    = $cgroups_trs{$cgroup};
-			$data->{oslvms}{$name}{'data-size'}    = $cgroups_drs{$cgroup};
-			$data->{oslvms}{$name}{'size'}         = $cgroups_size{$cgroup};
+			$data->{oslvms}{$name}{'percent-cpu'}    = $cgroups_percpu{$cgroup};
+			$data->{oslvms}{$name}{'percent-memory'} = $cgroups_permem{$cgroup};
+			$data->{oslvms}{$name}{procs}            = $cgroups_procs{$cgroup};
+			$data->{totals}{procs}                   = $data->{totals}{procs} + $cgroups_procs{$cgroup};
+			$data->{oslvms}{$name}{rss}              = $cgroups_rss{$cgroup};
+			$data->{oslvms}{$name}{'virtual-size'}   = $cgroups_vsize{$cgroup};
+			$data->{oslvms}{$name}{'text-size'}      = $cgroups_trs{$cgroup};
+			$data->{oslvms}{$name}{'data-size'}      = $cgroups_drs{$cgroup};
+			$data->{oslvms}{$name}{'size'}           = $cgroups_size{$cgroup};
+			$data->{oslvms}{$name}{'elapsed-times'}  = $cgroups_etimes{$cgroup};
 
 			if ( $name =~ /^p\_/ || $name =~ /^d\_/ ) {
 				my $container_name = $name;
@@ -491,11 +669,27 @@ sub run {
 					my @cpu_stats_split = split( /\n/, $cpu_stats_raw );
 					foreach my $line (@cpu_stats_split) {
 						my ( $stat, $value ) = split( /\s+/, $line, 2 );
-						if ( defined( $data->{oslvms}{$name}{$stat} ) && defined($value) && $value =~ /[0-9\.]+/ ) {
-							$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $value;
-							$data->{totals}{$stat} = $data->{totals}{$stat} + $value;
+						if ( defined( $stat_mapping->{$stat} ) ) {
+							$stat = $stat_mapping->{$stat};
 						}
-					}
+						if ( defined( $data->{oslvms}{$name}{$stat} ) && defined($value) && $value =~ /[0-9\.]+/ ) {
+							$value                        = $self->cache_process( $cache_name, $stat, $value );
+							$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $value;
+							$data->{totals}{$stat}        = $data->{totals}{$stat} + $value;
+							if ( $stat eq 'nr_bursts' ) {
+								$data->{has}{burst_count} = 1;
+							}
+							if ( $stat eq 'burst-time' ) {
+								$data->{has}{burst_time} = 1;
+							}
+							if ( $stat eq 'throttled-time' ) {
+								$data->{has}{throttled_time} = 1;
+							}
+							if ( $stat eq 'nr_throttled' ) {
+								$data->{has}{throttled_count} = 1;
+							}
+						} ## end if ( defined( $data->{oslvms}{$name}{$stat...}))
+					} ## end foreach my $line (@cpu_stats_split)
 				} ## end if ( defined($cpu_stats_raw) )
 			} ## end if ( -f $base_dir . '/cpu.stat' && -r $base_dir...)
 
@@ -506,11 +700,15 @@ sub run {
 					my @memory_stats_split = split( /\n/, $memory_stats_raw );
 					foreach my $line (@memory_stats_split) {
 						my ( $stat, $value ) = split( /\s+/, $line, 2 );
-						if ( defined( $data->{oslvms}{$name}{$stat} ) && defined($value) && $value =~ /[0-9\.]+/ ) {
-							$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $value;
-							$data->{totals}{$stat} = $data->{totals}{$stat} + $value;
+						if ( defined( $stat_mapping->{$stat} ) ) {
+							$stat = $stat_mapping->{$stat};
 						}
-					}
+						if ( defined( $data->{oslvms}{$name}{$stat} ) && defined($value) && $value =~ /[0-9\.]+/ ) {
+							$value                        = $self->cache_process( $cache_name, $stat, $value );
+							$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $value;
+							$data->{totals}{$stat}        = $data->{totals}{$stat} + $value;
+						}
+					} ## end foreach my $line (@memory_stats_split)
 				} ## end if ( defined($memory_stats_raw) )
 			} ## end if ( -f $base_dir . '/memory.stat' && -r $base_dir...)
 
@@ -518,17 +716,23 @@ sub run {
 			if ( -f $base_dir . '/io.stat' && -r $base_dir . '/io.stat' ) {
 				eval { $io_stats_raw = read_file( $base_dir . '/io.stat' ); };
 				if ( defined($io_stats_raw) ) {
+					$data->{has}{rwdops}   = 1;
+					$data->{has}{rwdbytes} = 1;
 					my @io_stats_split = split( /\n/, $io_stats_raw );
 					foreach my $line (@io_stats_split) {
 						my @line_split = split( /\s/, $line );
 						shift(@line_split);
 						foreach my $item (@line_split) {
 							my ( $stat, $value ) = split( /\=/, $line, 2 );
-							if ( defined( $data->{oslvms}{$name}{$stat} ) && defined($value) && $value =~ /[0-9]+/ ) {
-								$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $value;
-								$data->{totals}{$stat} = $data->{totals}{$stat} + $value;
+							if ( defined( $stat_mapping->{$stat} ) ) {
+								$stat = $stat_mapping->{$stat};
 							}
-						}
+							if ( defined( $data->{oslvms}{$name}{$stat} ) && defined($value) && $value =~ /[0-9]+/ ) {
+								$value                        = $self->cache_process( $cache_name, $stat, $value );
+								$data->{oslvms}{$name}{$stat} = $data->{oslvms}{$name}{$stat} + $value;
+								$data->{totals}{$stat}        = $data->{totals}{$stat} + $value;
+							}
+						} ## end foreach my $item (@line_split)
 					} ## end foreach my $line (@io_stats_split)
 				} ## end if ( defined($io_stats_raw) )
 			} ## end if ( -f $base_dir . '/io.stat' && -r $base_dir...)
@@ -536,6 +740,13 @@ sub run {
 	} ## end foreach my $cgroup ( keys( %{ $self->{mappings}...}))
 
 	$data->{uid_mapping} = $self->{uid_mapping};
+
+	# save the proc cache for next run
+	eval { write_file( $self->{cache_file}, encode_json( $self->{new_cache} ) ); };
+	if ($@) {
+		push( @{ $data->{errors} }, 'saving proc cache failed, "' . $self->{proc_cache} . '"... ' . $@ );
+		$data->{cache_failure} = 1;
+	}
 
 	return $data;
 } ## end sub run
@@ -639,6 +850,82 @@ sub ip_to_if {
 
 	return $if->name;
 } ## end sub ip_to_if
+
+sub cache_process {
+	my $self      = $_[0];
+	my $name      = $_[1];
+	my $var       = $_[2];
+	my $new_value = $_[3];
+
+	if ( !defined($name) || !defined($var) || !defined($new_value) ) {
+		warn('name, var, or new_value is undef');
+		return 0;
+	}
+
+	# is a gauge and not a counter
+	if ( !defined( $self->{counters}{$var} ) ) {
+		return $new_value;
+	}
+
+	# not seen it yet
+	if ( !defined( $self->{new_cache}{$name} ) ) {
+		$self->{new_cache}{$name} = {};
+	}
+	$self->{new_cache}{$name}{$var} = $new_value;
+
+	# not seen it yet
+	if ( !defined( $self->{cache}{$name}{$var} ) ) {
+		if ( $new_value != 0 ) {
+			if (   $var eq 'cpu-time'
+				|| $var eq 'system-time'
+				|| $var eq 'user-time'
+				|| $var eq 'throttled-time'
+				|| $var eq 'burst-time'
+				|| $var eq 'core_sched.force_idle-time' )
+			{
+				$new_value = $new_value / $self->{time_divider};
+			}
+			$new_value = $new_value / 300;
+		} ## end if ( $new_value != 0 )
+		return $new_value;
+	} ## end if ( !defined( $self->{cache}{$name}{$var}...))
+
+	if ( $new_value >= $self->{cache}{$name}{$var} ) {
+		$new_value = $new_value - $self->{cache}{$name}{$var};
+		if ( $new_value != 0 ) {
+			if (   $var eq 'cpu-time'
+				|| $var eq 'system-time'
+				|| $var eq 'user-time'
+				|| $var eq 'throttled-time'
+				|| $var eq 'burst-time'
+				|| $var eq 'core_sched.force_idle-time' )
+			{
+				$new_value = $new_value / $self->{time_divider};
+			}
+			$new_value = $new_value / 300;
+		} ## end if ( $new_value != 0 )
+		if ( $new_value > 10000000000 ) {
+			$self->{new_cache}{$name}{$var} = 0;
+			return 0;
+		}
+		return $new_value;
+	} ## end if ( $new_value >= $self->{cache}{$name}{$var...})
+
+	if ( $new_value != 0 ) {
+		if (   $var eq 'cpu-time'
+			|| $var eq 'system-time'
+			|| $var eq 'user-time'
+			|| $var eq 'throttled-time'
+			|| $var eq 'burst-time'
+			|| $var eq 'core_sched.force_idle-time' )
+		{
+			$new_value = $new_value / $self->{time_divider};
+		}
+		$new_value = $new_value / 300;
+	} ## end if ( $new_value != 0 )
+
+	return $new_value;
+} ## end sub cache_process
 
 =head1 AUTHOR
 

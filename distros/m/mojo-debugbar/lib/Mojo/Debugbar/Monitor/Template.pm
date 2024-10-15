@@ -4,19 +4,11 @@ use Mojo::Base "Mojo::Debugbar::Monitor";
 has 'icon' => '<i class="icon-file-code"></i>';
 has 'name' => 'Templates';
 
-sub inject {
-    my $self = shift;
-
-    my $rows = $self->rows;
-
-    # replace "`" with "'" $rows
-    $rows =~ s/`/'/g;
-
-    return sprintf('$(\'table[data-debugbar-ref="%s"] tbody\').prepend(`%s`);', ref($self), $rows);
-}
 
 =head2 render
+
     Returns the html
+
 =cut
 
 sub render {
@@ -34,6 +26,12 @@ sub render {
         ref($self), $self->rows
     );
 }
+
+=head2 rows
+
+    Build the rows
+
+=cut
 
 sub rows {
     my $self = shift;

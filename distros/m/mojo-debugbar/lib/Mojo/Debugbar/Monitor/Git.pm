@@ -57,8 +57,10 @@ sub rows {
 }
 
 =head2 start
+
     Listen for "after_dispatch" event and if there's anything in stash for validate_tiny.errors key,
     store the field name and the error
+
 =cut
 
 sub start {
@@ -110,8 +112,6 @@ sub git_info {
         date => $date,
         comment => $comment
     };
-
-
 }
 
 1;

@@ -429,6 +429,10 @@ METHODS ON SUBROUTINE METASIGNATURES
     that must be passed to any call of this function and does not count a
     final slurpy parameter.
 
+    Note that the implicit $self parameter to a method subroutine is
+    included in this count. This count will always be at least 1 on such a
+    method.
+
  optional_params
 
        $n = $metasig->optional_params;
@@ -458,8 +462,6 @@ METHODS ON SUBROUTINE METASIGNATURES
     parameter.
 
 TODO
-
-      * Some kind of access around the signature of a signatured sub.
 
       * Access to the new parts of API introduced by Perl 5.38 to deal with
       classes, methods, fields.

@@ -65,6 +65,9 @@ t/11-encrypt.t
 t/12-sign.t
 t/13-keygen.t
 t/14-sha2-verify.t
+t/17-issue-19482.t
+t/18-issue-20931.t
+t/19-issue-79798.t
 t/51-gh7.t
 t/samples/cfg.gnupg
 t/samples/cfg.pgp2
@@ -72,6 +75,8 @@ t/samples/gpg/ring.pub
 t/samples/gpg/ring.sec
 t/samples/gpg/sha2.pub
 t/samples/gpg/sha2.sec
+t/samples/gpg/subkeys-ring.pub
+t/samples/gpg/subkeys-ring.sec
 t/samples/message.asc
 t/samples/sha2.asc
 t/test-common.pl

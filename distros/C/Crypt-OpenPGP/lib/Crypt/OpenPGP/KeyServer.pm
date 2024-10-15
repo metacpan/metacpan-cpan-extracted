@@ -86,7 +86,7 @@ Crypt::OpenPGP::KeyServer - Interface to HKP keyservers
 
     my $key_id = '...';
     my $server = Crypt::OpenPGP::KeyServer->new(
-        Server => 'wwwkeys.us.pgp.net'
+        Server => 'keyserver.ubuntu.com'
     );
     my $kb = $server->find_keyblock_by_keyid($key_id);
     print $kb->primary_uid, "\n";
@@ -114,10 +114,11 @@ I<%arg> can contain:
 
 =item * Server
 
-The hostname of the HKP keyserver. This is a required argument. You can get
-a list of keyservers through
+The hostname of the HKP keyserver. This is a required argument. There are a
+number of keyservers including:
 
-    % host -l pgp.net | grep wwwkeys
+    keyserver.ubuntu.com
+    keys.openpgp.org
 
 =item * IncludeRevoked
 

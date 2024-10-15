@@ -3,34 +3,52 @@ abstract: 'obtain expiration date of certificate'
 author:
   - 'HIROSE Masaaki <hirose31 _at_ gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
+  Test::Base: '0'
+  Test::More: '0.96'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-SSL-ExpireDate
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
+provides:
+  Net::SSL::ExpireDate:
+    file: lib/Net/SSL/ExpireDate.pm
+    version: '1.25'
 requires:
-  Class::Accessor: 0
-  Crypt::OpenSSL::X509: 0
-  Date::Parse: 0
-  DateTime: 0
-  DateTime::Duration: 0
-  Filter::Util::Call: 0
-  IO::Socket: 0
-  Time::Duration::Parse: 0
-  UNIVERSAL::require: 0
-  perl: 5.6.0
+  Class::Accessor: '0'
+  Crypt::OpenSSL::X509: '0'
+  Date::Parse: '0'
+  DateTime: '0'
+  DateTime::Duration: '0'
+  IO::Socket: '0'
+  Time::Duration::Parse: '0'
+  UNIVERSAL::require: '0'
+  perl: '5.008005'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/hirose31/Net-SSL-ExpireDate.git
-version: '1.24'
+  bugtracker: https://github.com/hirose31/Net-SSL-ExpireDate/issues
+  homepage: https://github.com/hirose31/Net-SSL-ExpireDate
+  repository: https://github.com/hirose31/Net-SSL-ExpireDate.git
+version: '1.25'
+x_contributors:
+  - '68user <mc68030@gmail.com>'
+  - 'antonc42 <anton.c42@gmail.com>'
+  - 'Dan Conway <danconway@goldenwest.com>'
+  - 'hirose31 <hirose31@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+  - 'Jamie Hill <jamie@stratusnine.com>'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

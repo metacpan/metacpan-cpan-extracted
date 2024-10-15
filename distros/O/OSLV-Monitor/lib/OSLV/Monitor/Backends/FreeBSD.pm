@@ -86,7 +86,19 @@ sub run {
 		errors        => [],
 		cache_failure => 0,
 		oslvms        => {},
-		totals        => {
+		has           => {
+			'linux_mem_stats' => 0,
+			'rwdops'          => 0,
+			'rwdbytes'        => 0,
+			'rwdblocks'       => 1,
+			'signals-taken'   => 1,
+			'recv_sent_msgs'  => 1,
+			'cows'            => 1,
+			'stack-size'      => 1,
+			'swaps'           => 1,
+			'sock'            => 0,
+		},
+		totals => {
 			'copy-on-write-faults'         => 0,
 			'cpu-time'                     => 0,
 			'data-size'                    => 0,
@@ -127,6 +139,7 @@ sub run {
 			);
 			$data->{cache_failure} = 1;
 			$proc_cache = {};
+			return $data;
 		}
 	} ## end if ( -f $self->{proc_cache} )
 
@@ -165,7 +178,7 @@ sub run {
 	my @IP_keys = ( 'ip4.addr', 'ip6.addr' );
 	eval { $jls = decode_json($output) };
 	if ($@) {
-		push( @{ $data->{errors} }, 'decoding output from "jls -s --libxo json 2> /dev/null" failed... ' . $@ );
+		push( @{ $data->{errors} }, 'decoding output from "jls -h --libxo json 2> /dev/null" failed... ' . $@ );
 		return $data;
 	}
 	if (   defined($jls)
@@ -360,7 +373,7 @@ sub run {
 								$seconds = $seconds + ( 60 * $time_split[1] ) + $time_split[1];
 							}
 							$stat_value = $seconds;
-							$proc->{$stat}=$stat_value;
+							$proc->{$stat} = $stat_value;
 						} ## end if ( $times->{$stat} )
 
 						if ( looks_like_number($stat_value) ) {

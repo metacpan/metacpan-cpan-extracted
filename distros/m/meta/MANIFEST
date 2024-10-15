@@ -18,6 +18,7 @@ t/12sub-signature.t
 t/20add.t
 t/21remove.t
 t/60class.t
+t/61method-signature.t
 t/80subname+Sub-Util.t
 t/94warnings.t
 t/99pod.t

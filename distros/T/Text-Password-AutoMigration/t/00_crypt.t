@@ -5,8 +5,8 @@ use Test::More tests => 11;
 
 use_ok 'Text::Password::CoreCrypt';                                                          # 1
 my $pwd = new_ok('Text::Password::CoreCrypt');                                               # 2
-like $pwd->nonce(),  qr/^[!-~]{8}$/, "succeed to make nonce with length 8 automatically";    # 3
-like $pwd->nonce(4), qr/^[!-~]{4}$/, "succeed to make nonce with length 4";                  # 4
+like $pwd->nonce(),  qr/^\S[!-~\s]{7}$/, "succeed to make nonce with length 8 automatically";    # 3
+like $pwd->nonce(4), qr/^\S[!-~\s]{3}$/, "succeed to make nonce with length 4";                  # 4
 
 eval { $pwd->nonce(3) };
 like $@, qr/^Unvalid length for nonce was set/, "fail to make nonce with enough length";     # 5
@@ -23,9 +23,9 @@ SKIP: {
     subtest "generate with CORE::crypt" => sub {                                          # 9
         plan tests => 6;
         my ( $raw, $hash ) = $pwd->generate;
-        like $raw,  qr/^[!-~]{8}$/, "succeed to generate raw passwd";                          # 9.1
-        like $raw,  qr/^[^0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]{8}$/, "is readable";    # 9.2
-        like $hash, qr/^[!-~]{13}$/, "succeed to generate hash with CORE::crypt";              # 9.3
+        like $raw,  qr/^\S[!-~\s]{7}$/, "succeed to generate raw passwd";                          # 9.1
+        like $raw,  qr/^\S[^0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]{7}$/, "is readable";    # 9.2
+        like $hash, qr/^\S[!-~]{12}$/, "succeed to generate hash with CORE::crypt";              # 9.3
         is $pwd->verify( $raw,        $hash ), 1,  "succeed to verify";                        # 9.4
         is $pwd->verify( $pwd->nonce, $hash ), '', "fail to verify with random strings";       # 9.5
         is $pwd->verify( '',          $hash ), '', "fail to verify with empty string";         # 9.6
@@ -36,8 +36,8 @@ subtest "generate unreadable strings" => sub {    #10
     plan tests => 3;
     $pwd->readability(0);
     my ( $raw, $hash ) = $pwd->generate;
-    like $raw,  qr/^[!-~]{8}$/,  "succeed to generate raw passwd";    #10.1
-    like $hash, qr/^[!-~]{13}$/, "succeed to generate hash";          #10.2
+    like $raw,  qr/^\S[!-~\s]{7}$/,  "succeed to generate raw passwd";    #10.1
+    like $hash, qr/^\S[!-~\s]{12}$/, "succeed to generate hash";          #10.2
     is $pwd->verify( $raw, $hash ), 1, "succeed to verify";           #10.3
 };
 

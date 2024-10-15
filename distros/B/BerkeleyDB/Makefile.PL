@@ -59,6 +59,7 @@ WriteMakefile(
 	VERSION_FROM	=> 'BerkeleyDB.pm',
 	XSPROTOARG	=> '-noprototypes',
 	DEFINE		=> "$OS2 $WALL $TRACE",
+    PREREQ_PM   => { 'Test::More' => 0 },
 	#'macro'		=> { INSTALLDIRS => 'perl' },
         'dist'          => {COMPRESS=>'gzip', SUFFIX=>'gz'},
 	($] >= 5.005

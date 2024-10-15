@@ -1,5 +1,8 @@
 Revision history for Dist::Zilla::Plugin::Test::Perl::Critic
 
+3.003     2024-10-14 17:34:00Z
+  - fix ignored options (RT#156116)
+
 3.002     2024-10-13 19:34:56Z
   - Removed old and broken links from Pod
   - Test::Perl::Critic is no longer a direct dependency. It is used in the

@@ -5,7 +5,7 @@ greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 9.1506
+Version 9.1701
 
 # SYNOPSIS
 
@@ -109,6 +109,47 @@ Version 9.1506
 ## CPANMINUS
 
     $ cpanm App::Greple
+
+# SUMMARY (AI GENERATED)
+
+**GREPLE** is a sophisticated and versatile grep-like command-line tool
+designed primarily for advanced text searching and manipulation in
+document files. While it can handle various text formats, it
+particularly excels in processing structured documents, such as source
+code, markup files, and other text-based content. Here are some key
+features that make greple especially suitable for document processing:
+
+- Flexible pattern matching: greple supports complex search
+patterns, including multi-line matching and logical combinations of
+keywords, which is particularly useful for searching within structured
+documents.
+- Region control: With options like `--inside`, `--outside`,
+`--include`, and `--exclude`, greple allows precise targeting of
+specific sections within documents, such as code blocks, comments, or
+particular markup regions.
+- Block-oriented processing: The ability to define and work with
+custom text blocks makes it ideal for handling document structures
+like paragraphs, sections, or other logical units within a text.
+- Multi-byte text support: greple is particularly adept at
+handling Asian languages, especially Japanese, making it valuable for
+multilingual document processing.
+- Extensibility through modules: Users can create custom modules
+to implement document-specific search and manipulation functions,
+enhancing its capabilities for particular document types or formats.
+- Colorized output: The advanced color options allow for clear
+visualization of search results, which is particularly helpful when
+analyzing document structure or content.
+- Integration with other text processing tools: greple can be
+easily combined with other Unix tools and custom scripts for more
+complex document analysis and transformation tasks.
+
+While greple can be used for various text processing tasks, its
+feature set is particularly well-suited for working with structured
+documents, source code files, and other text-based content where
+context, structure, and precise matching are important. It may not be
+the best choice for processing very large data files or high-volume
+log analysis, but it excels in scenarios where detailed examination
+and manipulation of document content is required.
 
 # DESCRIPTION
 
@@ -556,7 +597,7 @@ If you don't want these conversion, use `-E` (or `--re`) option.
         C
 
     makes the pattern as `A|B|C`, or more precisely
-    `(?^m:A)(?^m:B)(?^m:C)`.
+    `(?^m:A)|(?^m:B)|(?^m:C)`.
 
     Each of these patterns are evaluated independently only with `m`
     modifier.  So if you enable some flags in a pattern, they are only
@@ -869,6 +910,7 @@ If you don't want these conversion, use `-E` (or `--re`) option.
         ;    No effect
         /    Toggle foreground/background
         ^    Reset to foreground
+        @    Reset index list
 
     If the spec includes `/`, left side is considered as foreground color
     and right side as background.  If multiple colors are given in same
@@ -878,6 +920,10 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     Effect characters are case insensitive, and can be found anywhere and
     in any order in color spec string.  Character `;` does nothing and
     can be used just for readability, like `SD;K/544`.
+
+    If the special reset symbol `@` is encountered, the index list is
+    reset to empty at that point.  The reset symbol must be used alone and
+    may not be combined with other characters.
 
     Example:
 

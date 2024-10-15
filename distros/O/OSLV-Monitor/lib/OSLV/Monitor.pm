@@ -3,6 +3,7 @@ package OSLV::Monitor;
 use 5.006;
 use strict;
 use warnings;
+use Scalar::Util qw(looks_like_number);
 
 =head1 NAME
 
@@ -10,11 +11,11 @@ OSLV::Monitor - OS level virtualization monitoring extend for LibreNMS.
 
 =head1 VERSION
 
-Version 0.1.0
+Version 1.0.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '1.0.0';
 
 =head1 SYNOPSIS
 
@@ -63,10 +64,21 @@ The keys are list as below.
             processed after the include array.
         - Default :: []
 
+    - time_divider :: What to pass to the backend for the time_divider for that if needed.
+        Default :: 1000000
+
 =cut
 
 sub new {
 	my ( $blank, %opts ) = @_;
+
+	if ( !defined( $opts{time_divider} ) ) {
+		$opts{time_divider} = 1000000;
+	} else {
+		if ( ! looks_like_number( $opts{time_divider} ) ) {
+			die('time_divider is not a number');
+		}
+	}
 
 	if ( !defined( $opts{backend} ) ) {
 		$opts{backend} = 'FreeBSD';
@@ -111,16 +123,17 @@ sub new {
 		$opts{base_dir} = '/var/cache/oslv_monitor';
 	}
 
-	if (!-d $opts{base_dir}) {
-		mkdir($opts{base_dir}) || die($opts{base_dir}.' was not a directory and could not be created');
+	if ( !-d $opts{base_dir} ) {
+		mkdir( $opts{base_dir} ) || die( $opts{base_dir} . ' was not a directory and could not be created' );
 	}
 
 	my $self = {
-		version  => 1,
-		backend  => $opts{backend},
-		base_dir => $opts{base_dir},
-		include  => $opts{include},
-		exclude  => $opts{exclude},
+		time_divider => $opts{time_divider},
+		version      => 1,
+		backend      => $opts{backend},
+		base_dir     => $opts{base_dir},
+		include      => $opts{include},
+		exclude      => $opts{exclude},
 	};
 	bless $self;
 
@@ -147,10 +160,13 @@ sub load {
 	my $usable;
 	my $test_string = '
 use OSLV::Monitor::Backends::' . $self->{backend} . ';
-$backend_test=OSLV::Monitor::Backends::' . $self->{backend} . '->new(base_dir=>$self->{base_dir}, obj=>$self);
+$backend_test=OSLV::Monitor::Backends::'
+		. $self->{backend}
+		. '->new(base_dir=>$self->{base_dir}, obj=>$self, time_divider=>$self->{time_divider});
 $usable=$backend_test->usable;
 ';
 	eval($test_string);
+
 	if ($usable) {
 		$self->{backend_mod} = $backend_test;
 		$loaded = 1;

@@ -16,7 +16,6 @@ hax/wrap_keyword_plugin.c.inc
 inc/Module/Build/with/XSTests.pm
 include/parse_subsignature_ex.h
 lib/Sublike/Extended.pm
-lib/Sublike/Extended.xs
 lib/XS/Parse/Sublike.pm
 lib/XS/Parse/Sublike.xs
 lib/XS/Parse/Sublike/Builder.pm

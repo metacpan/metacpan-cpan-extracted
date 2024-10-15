@@ -17,15 +17,15 @@ oslv_monitor - LibreNMS style JSON SNMP extend for OS level virtualization monit
 
 =head1 VERSION
 
-0.1.0
+1.0.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '1.0.0';
 
 =head1 SYNOPSIS
 
-oslv_monitor [B<-c>] [B<-f> <config file>] [B<-b> <base dir>] [B<-q>]
+oslv_monitor [B<-c>] [B<-f> <config file>] [B<-b> <base dir>] [B<-q>] [B<-t> <time divider>]
 
 =head1 DESCRIPTION
 
@@ -56,6 +56,10 @@ Default :: /usr/local/etc/oslv_monitor.json
 
 Do not print the results.
 
+=head2 -t <time divider>
+
+What to use for the time divider.
+
 =head1 CONFIG FILE
 
 The following keys are used in the JSON config file.
@@ -67,6 +71,17 @@ The following keys are used in the JSON config file.
         Default :: undef
 
     - backend :: Override the the backend and automatically choose it.
+
+    - time_divider :: Override the time_divider value. The default value varies
+        per backend and if it is needed.
+
+Time divider notes.
+
+    - cgroups :: While the default for usec to sec conversion should be 1000000,
+              some settings report the value in nanoseconds, requiring 1000000000.
+        Default :: 1000000
+
+    - FreeBSD :: not used
 
 By Defaults the backends are as below.
 
@@ -97,10 +112,12 @@ my $quiet;
 my $backend;
 my $exclude;
 my $include;
+my $time_divider;
 my $config_file = '/usr/local/etc/oslv_monitor.json';
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
+	't=s'     => \$time_divider,
 	'version' => \$version,
 	'v'       => \$version,
 	'help'    => \$help,
@@ -128,6 +145,12 @@ if ( -f $config_file ) {
 		{
 			$backend = $parsed_config->{backend};
 		}
+		if (  !defined($time_divider)
+			&& defined( $parsed_config->{time_divider} )
+			&& ref( $parsed_config->{time_divider} ) eq '' )
+		{
+			$time_divider = $parsed_config->{time_divider};
+		}
 		if ( defined( $parsed_config->{include} ) && ref( $parsed_config->{include} ) eq 'ARRAY' ) {
 			$include = $parsed_config->{include};
 		}
@@ -140,8 +163,13 @@ if ( -f $config_file ) {
 	}
 } ## end if ( -f $config_file )
 
-my $monitor
-	= OSLV::Monitor->new( backend => $backend, base_dir => $base_dir, include => $include, exclude => $exclude );
+my $monitor = OSLV::Monitor->new(
+	backend      => $backend,
+	base_dir     => $base_dir,
+	include      => $include,
+	exclude      => $exclude,
+	time_divider => $time_divider
+);
 
 if ( !-d $base_dir ) {
 	mkdir($base_dir) || die( 'Unable to mkdir "' . $base_dir . '"' );

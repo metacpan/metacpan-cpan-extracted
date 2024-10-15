@@ -1,0 +1,17 @@
+Changes
+lib/DBIx/Class/ResultSet/PrettyPrint.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/01-test-db-init.t
+t/02-pretty-print.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/lib/Schema.pm
+t/lib/Schema/Result/Book.pm
+t/lib/TestDB.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

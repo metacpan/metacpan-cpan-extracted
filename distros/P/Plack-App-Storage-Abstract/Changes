@@ -1,5 +1,9 @@
 Revision history for Plack-App-Storage-Abstract
 
+0.002 - 2024-10-14
+	- Fixed minimum Storage::Abstract version
+	- Now uses Try::Tiny instead of Feature::Compat::Try
+
 0.001 - 2024-10-13
 	- First version
 

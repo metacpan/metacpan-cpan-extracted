@@ -3,7 +3,7 @@ package Full::Class;
 use Full::Pragmata qw(:v1);
 use parent qw(Full::Pragmata);
 
-our $VERSION = '1.003'; # VERSION
+our $VERSION = '1.004'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8

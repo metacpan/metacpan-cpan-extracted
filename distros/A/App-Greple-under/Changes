@@ -1,5 +1,14 @@
 Revision history for Perl extension App-Greple-under
 
+0.9902 2024-10-15T06:21:24Z
+
+    - move --under-custom-colormap option to the end of options
+    - make "custom-colormap" parameter effective
+
+0.9901 2024-10-15T03:57:47Z
+
+    - implement --config module option
+
 0.99 2024-10-14T09:15:58Z
 
     - original version

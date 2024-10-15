@@ -2,7 +2,7 @@
 package BerkeleyDB;
 
 
-#     Copyright (c) 1997-2022 Paul Marquess. All rights reserved.
+#     Copyright (c) 1997-2024 Paul Marquess. All rights reserved.
 #     This program is free software; you can redistribute it and/or
 #     modify it under the same terms as Perl itself.
 #
@@ -17,7 +17,7 @@ use Carp;
 use vars qw($VERSION @ISA @EXPORT $AUTOLOAD
 		$use_XSLoader);
 
-$VERSION = '0.65';
+$VERSION = '0.66';
 
 require Exporter;
 
@@ -826,7 +826,7 @@ sub env_remove
 
     if (defined $got->{Config}) {
     	croak("Config parameter must be a hash reference")
-            if ! ref $got->{Config} eq 'HASH' ;
+            if ref $got->{Config} ne 'HASH' ;
 
         @BerkeleyDB::a = () ;
 	my $k = "" ; my $v = "" ;
@@ -994,7 +994,7 @@ sub new
     my %config ;
     if (defined $got->{Config}) {
     	croak("Config parameter must be a hash reference")
-            if ! ref $got->{Config} eq 'HASH' ;
+            if ref $got->{Config} ne 'HASH' ;
 
 	%config = %{ $got->{Config} } ;
         @BerkeleyDB::a = () ;

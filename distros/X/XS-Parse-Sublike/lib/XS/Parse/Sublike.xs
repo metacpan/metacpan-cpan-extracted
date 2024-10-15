@@ -647,6 +647,31 @@ static const struct XSParseSublikeHooks hooks_lexical_sub = {
 };
 #endif
 
+/* Sublike::Extended */
+
+static struct XSParseSublikeHooks hooks_extended = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
+  .permit_hintkey = "Sublike::Extended/extended",
+  .flags = XS_PARSE_SUBLIKE_FLAG_PREFIX|
+    XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL|
+    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS|
+    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES,
+
+  /* No hooks */
+};
+
+static struct XSParseSublikeHooks hooks_extended_sub = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
+  .permit_hintkey = "Sublike::Extended/extended-sub",
+  .flags = XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL|
+    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS|
+    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES,
+
+  /* No hooks */
+};
+
+/* keyword plugin */
+
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
 
 static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
@@ -723,11 +748,11 @@ next_keyword:
 
     lex_read_space(0);
 
-    /* We permit 'sub' as a NULL set of hooks; anything else should be a registered keyword */
-    if(kwlen == 3 && strEQ(kw, "sub"))
-      break;
-
     reg = find_permitted(aTHX_ kw, kwlen);
+
+    /* We permit 'sub' as a NULL set of hooks; anything else should be a registered keyword */
+    if(!reg && kwlen == 3 && strEQ(kw, "sub"))
+      break;
     if(!reg)
       croak("Expected a keyword to introduce a sub or sub-like construction, found " QUOTED_PVNf,
         QUOTED_PVNfARG(kw, kwlen));
@@ -741,6 +766,25 @@ next_keyword:
     hd[nhooks].hooks = hooks;
     hd[nhooks].data  = reg->hookdata;
     nhooks++;
+  }
+
+  /* See if Sublike::Extended wants to claim this one. If it wanted 'sub' it
+   * has already claimed that above */
+  if(kwlen != 3 || !strEQ(kw, "sub")) {
+    HV *hints = GvHV(PL_hintgv);
+    SV *keysv = sv_2mortal(newSVpvf("Sublike::Extended/extended-%.*s", (int)kwlen, kw));
+    if(hints && hv_exists_ent(hints, keysv, 0)) {
+      if(SvLEN(hdlsv) < (nhooks + 1) * sizeof(struct HooksAndData)) {
+        SvGROW(hdlsv, SvLEN(hdlsv) * 2);
+        hd = (struct HooksAndData *)SvPVX(hdlsv);
+      }
+      /* This hook has the prefix flag set, but it doesn't matter because
+       * we've finished processing those already
+       */
+      hd[nhooks].hooks = &hooks_extended;
+      hd[nhooks].data  = NULL;
+      nhooks++;
+    }
   }
 
   return parse(aTHX_ hd, nhooks, op_ptr);
@@ -846,5 +890,8 @@ BOOT:
 #endif
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
+
+  register_sublike(aTHX_ "extended", &hooks_extended,     NULL, 4);
+  register_sublike(aTHX_ "sub",      &hooks_extended_sub, NULL, 4);
 
   boot_parse_subsignature_ex();

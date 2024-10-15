@@ -1,5 +1,5 @@
 package Text::Password::CoreCrypt;
-our $VERSION = "0.31";
+our $VERSION = "0.41";
 
 require 5.008_008;
 use autouse 'Carp' => qw(croak carp);
@@ -17,7 +17,7 @@ no Moo::sification;
 
 my @w     = ( 0 .. 9, 'a' .. 'z', 'A' .. 'Z' );
 my @seeds = ( @w,     '.', '/' );
-my @ascii = ( @seeds, '#', ',', qw# ! $ % & ( ) * + - : ; < = > ? @ [ ] ^ _ ` { | } ~ # ); # ", ' and \ are omitted for security reasons
+my @ascii = ( @seeds, ' ', '#', ',', qw# ! % & ( ) * + - : ; < = > ? @ [ ] ^ _ ` { | } ~ # ); # ", ' $ and \ are omitted for security reasons
 
 =encoding utf-8
 
@@ -84,7 +84,7 @@ sub verify {
     my $self = shift;
     my ( $input, $data ) = @_;
     warn __PACKAGE__, " makes 13 bytes hash strings. Your data must be wrong: ", $data
-        unless $data =~ /^[ !-~]{13}$/;
+        unless $data =~ /^\S[\s!-~]{12}$/;
     return $data eq CORE::crypt( $input, $data );
 }
 
@@ -150,9 +150,9 @@ sub generate {
 
     my $raw;
     do {    # redo unless it gets enough readability
-        $raw = $self->nonce($length);
+        do { $raw = $self->nonce($length) } while $raw =~ /^\s?[\$'"]/;
         return $raw, $self->encrypt($raw) unless $self->readability();
-    } while $raw =~ /[0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]/;
+    } while $raw =~ /[0Oo1Il|!2Zz5sS6b9qCcKkUuVvWwXx.,:;~\-^`]/;
     return $raw, $self->encrypt($raw);
 }
 

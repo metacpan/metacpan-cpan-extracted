@@ -1,6 +1,6 @@
 package Full;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use utf8;

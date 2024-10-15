@@ -43,6 +43,8 @@
       "runtime" : {
          "requires" : {
             "App::Greple" : "9.17",
+            "Hash::Util" : "0",
+            "List::Util" : "0",
             "Term::ANSIColor::Concise" : "0",
             "Text::ANSI::Fold" : "0",
             "Text::ANSI::Fold::Util" : "0",
@@ -56,21 +58,21 @@
       }
    },
    "provides" : {
+      "App::Greple::Config" : {
+         "file" : "lib/App/Greple/Config.pm"
+      },
       "App::Greple::under" : {
          "file" : "lib/App/Greple/under.pm",
-         "version" : "0.99"
+         "version" : "0.9902"
       },
       "App::Greple::under::bake" : {
-         "file" : "lib/App/Greple/under/bake.pm",
-         "version" : "0.99"
+         "file" : "lib/App/Greple/under/bake.pm"
       },
       "App::Greple::under::line" : {
-         "file" : "lib/App/Greple/under/line.pm",
-         "version" : "0.99"
+         "file" : "lib/App/Greple/under/line.pm"
       },
       "App::Greple::under::mise" : {
-         "file" : "lib/App/Greple/under/mise.pm",
-         "version" : "0.99"
+         "file" : "lib/App/Greple/under/mise.pm"
       }
    },
    "release_status" : "stable",
@@ -85,7 +87,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-under"
       }
    },
-   "version" : "0.99",
+   "version" : "0.9902",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

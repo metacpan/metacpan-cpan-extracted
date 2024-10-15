@@ -2062,3 +2062,5 @@ foo.bar#show platform jericho2 tcam summary
      12                   dbSystem6              -
      15                 dbMacSystem              -
 
+[1;31mError in authentication[0m
+

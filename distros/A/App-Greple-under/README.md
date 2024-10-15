@@ -65,6 +65,10 @@ the `-Munder::bake` module.
     </p>
 </div>
 
+# SEE ALSO
+
+[App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
+
 # AUTHOR
 
 Kazumasa Utashiro

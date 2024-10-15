@@ -2,7 +2,7 @@ package Crypt::OpenPGP;
 use strict;
 use 5.008_001;
 
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 use Crypt::OpenPGP::Constants qw( DEFAULT_CIPHER );
 use Crypt::OpenPGP::KeyRing;
@@ -363,9 +363,10 @@ sub verify {
     } else {
         return $pgp->error("SigFile contents are strange");
     }
+    my @pte = ($sig->{type} == 1 ? (Mode => "t") : () );
     unless ($data) {
         if ($param{Data}) {
-            $data = Crypt::OpenPGP::Plaintext->new( Data => $param{Data} );
+            $data = Crypt::OpenPGP::Plaintext->new( Data => $param{Data}, @pte );
         }
         else {
             ## if no Signature or detached sig in SigFile
@@ -374,7 +375,7 @@ sub verify {
             my $fdata = $pgp->_read_files(@files);
             return $pgp->error("Reading data files failed: " . $pgp->errstr)
                 unless defined $fdata;
-            $data = Crypt::OpenPGP::Plaintext->new( Data => $fdata );
+            $data = Crypt::OpenPGP::Plaintext->new( Data => $fdata, @pte );
        }
     }
     my($cert, $kb);
@@ -394,7 +395,7 @@ sub verify {
                 unpack('H*', $key_id))
                 unless $kb;
         }
-        $cert = $kb->signing_key;
+        $cert = $kb->key_by_id($sig->key_id);
     }
 
 ## pgp2 and pgp5 do not trim trailing whitespace from "canonical text"
@@ -608,7 +609,7 @@ sub decrypt {
         return $pgp->error("Can't find a secret key to decrypt message")
             unless $kb || $cert;
         if ($kb) {
-            $cert = $kb->encrypting_key;
+            $cert = $kb->key_by_id($sym_key->key_id);
             $cert->uid($kb->primary_uid);
         }
         if ($cert->is_protected) {

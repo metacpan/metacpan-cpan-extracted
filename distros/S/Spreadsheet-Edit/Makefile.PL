@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Clone" => 0,
     "Data::Dumper" => 0,
     "Data::Dumper::Interp" => "7.003",
+    "Data::Hexify" => 0,
     "Devel::Symdump" => 0,
     "Digest::MD5" => 0,
     "Encode" => 0,
@@ -62,7 +63,6 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => 0,
     "Carp::Always" => 0,
     "Cwd" => 0,
-    "Data::Hexify" => 0,
     "English" => 0,
     "Env" => 0,
     "File::Path" => 0,
@@ -81,7 +81,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "open" => 0
   },
-  "VERSION" => "1000.018",
+  "VERSION" => "1000.019",
   "test" => {
     "TESTS" => "t/*.t"
   }

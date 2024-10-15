@@ -2,9 +2,9 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Test::Perl::Critic; # git description: v3.001-16-ga4df0a2
+package Dist::Zilla::Plugin::Test::Perl::Critic; # git description: v3.002-3-g6e7f370
 # ABSTRACT: Tests to check your code against best practices
-our $VERSION = '3.002';
+our $VERSION = '3.003';
 use Moose;
 
 use Moose::Util::TypeConstraints qw(
@@ -176,7 +176,7 @@ Dist::Zilla::Plugin::Test::Perl::Critic - Tests to check your code against best 
 
 =head1 VERSION
 
-version 3.002
+version 3.003
 
 =head1 SYNOPSIS
 
@@ -234,7 +234,7 @@ Jerome Quelin
 
 =head1 CONTRIBUTORS
 
-=for stopwords Jérôme Quelin Karen Etheridge Graham Knop Kent Fredric Olivier Mengué Gryphon Shafer Stephen R. Scaffidi Mike Doherty
+=for stopwords Jérôme Quelin Karen Etheridge Graham Knop Kent Fredric Olivier Mengué Gryphon Shafer Stephen R. Scaffidi Alexander Hartmaier Mike Doherty
 
 =over 4
 
@@ -268,6 +268,10 @@ Stephen R. Scaffidi <stephen@scaffidi.net>
 
 =item *
 
+Alexander Hartmaier <abraxxa@cpan.org>
+
+=item *
+
 Mike Doherty <doherty@cs.dal.ca>
 
 =back
@@ -288,5 +292,5 @@ ___[ test-perl-critic ]___
 use strict;
 use warnings;
 
-use Test::Perl::Critic{{ %$options ? ' ' . $dumper->($options) : '' }};
+use Test::Perl::Critic{{ %$options ? ' %{+' . $dumper->($options) . '}' : '' }};
 all_critic_ok();

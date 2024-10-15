@@ -15,12 +15,13 @@ meta-spec:
 name: Plack-App-Storage-Abstract
 requires:
   Plack: '0'
-  Storage::Abstract: '0'
+  Storage::Abstract: '0.002'
+  Try::Tiny: '0'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/bbrtj/perl-plack-app-storage-abstract/issues
   repository: git://github.com/bbrtj/perl-plack-app-storage-abstract.git
-version: '0.001'
+version: '0.002'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

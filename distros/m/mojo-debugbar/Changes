@@ -17,3 +17,6 @@ Revision history for Mojo::Debugbar
 
 0.1.2   2024-09-12
         Bump version
+
+0.1.3   2024-10-14
+        Fix documenation

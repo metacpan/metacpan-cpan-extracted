@@ -17,16 +17,15 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Storage::Abstract",
   "PREREQ_PM" => {
-    "Feature::Compat::Try" => 0,
     "Moo" => 2,
     "Mooish::AttributeBuilder" => "1.002",
-    "Type::Tiny" => 0,
+    "Type::Tiny" => 2,
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t t/driver/*.t"
   }
@@ -34,11 +33,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Feature::Compat::Try" => 0,
   "Moo" => 2,
   "Mooish::AttributeBuilder" => "1.002",
   "Test2::V0" => 0,
-  "Type::Tiny" => 0,
+  "Type::Tiny" => 2,
   "namespace::autoclean" => 0
 );
 

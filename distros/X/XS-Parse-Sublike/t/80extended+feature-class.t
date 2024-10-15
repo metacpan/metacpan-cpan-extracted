@@ -13,6 +13,8 @@ BEGIN {
       unless $^V ge v5.37.10;
 }
 
+use Test2::Require::Module 'Sublike::Extended' => '0.29';
+
 use Sublike::Extended;
 
 use feature 'class';
@@ -25,7 +27,19 @@ no warnings 'experimental::class';
    }
 
    is( C1->new->f( x => "first", y => "second" ), "x=first y=second",
-      'async method' );
+      'extended method' );
+}
+
+# method + S:E 0.29
+{
+   use Sublike::Extended 'method';
+
+   class C2 {
+      method f (:$x, :$y) { return "x=$x y=$y" }
+   }
+
+   is( C2->new->f( x => "third", y => "fourth" ), "x=third y=fourth",
+      'method with extended keyword' );
 }
 
 done_testing;

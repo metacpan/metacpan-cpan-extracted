@@ -45,11 +45,27 @@ our @ATTRIBUTE_APPLIED;
 {
    extended sub t5 ($x :Attribute, $y :Attribute(Value)) { }
 
+   my @t5_attributes;
+   BEGIN { @t5_attributes = @ATTRIBUTE_APPLIED; @ATTRIBUTE_APPLIED = (); }
+
    # No need to call it just to see these
 
-   is( \@ATTRIBUTE_APPLIED,
+   is( \@t5_attributes,
       [ '$x' => undef, '$y' => "Value" ],
       ':Attribute applied to subroutine parameters' );
+}
+
+{
+   use Sublike::Extended 'sub';
+
+   sub t6 ( $z :Attribute, :$alpha :Attribute(Value) ) { }
+
+   my @t6_attributes;
+   BEGIN { @t6_attributes = @ATTRIBUTE_APPLIED; @ATTRIBUTE_APPLIED = (); }
+
+   is( \@t6_attributes,
+      [ '$z' => undef, ':$alpha' => "Value" ],
+      ':Attribute applied to subroutine parameters of `sub` directly' );
 }
 
 done_testing;

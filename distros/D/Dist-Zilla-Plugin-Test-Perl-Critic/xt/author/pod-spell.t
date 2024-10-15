@@ -10,6 +10,7 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( examples lib script t xt ) );
 __DATA__
+Alexander
 Critic
 CriticTests
 Dist
@@ -18,6 +19,7 @@ Etheridge
 Fredric
 Graham
 Gryphon
+Hartmaier
 Jerome
 Jérôme
 Karen
@@ -34,6 +36,7 @@ Shafer
 Stephen
 Test
 Zilla
+abraxxa
 doherty
 dolmen
 ether

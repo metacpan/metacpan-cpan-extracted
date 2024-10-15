@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Dist::Zilla::Plugin::CriticTests;
 # ABSTRACT: (DEPRECATED) tests to check your code against best practices.
-our $VERSION = '3.002';
+our $VERSION = '3.003';
 use Moose;
 extends 'Dist::Zilla::Plugin::Test::Perl::Critic';
 use namespace::autoclean;
@@ -41,7 +41,7 @@ Dist::Zilla::Plugin::CriticTests - (DEPRECATED) tests to check your code against
 
 =head1 VERSION
 
-version 3.002
+version 3.003
 
 =head1 SYNOPSIS
 

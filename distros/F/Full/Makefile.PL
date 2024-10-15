@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Object::Pad::FieldAttr::Checked" => "0.12",
     "Role::Tiny" => "2.002004",
     "Signature::Attribute::Checked" => "0.06",
-    "Sublike::Extended" => "0.23",
+    "Sublike::Extended" => "0.29",
     "Syntax::Keyword::Defer" => "0.11",
     "Syntax::Keyword::Dynamically" => "0.14",
     "Syntax::Keyword::Match" => "0.15",
@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => "0.010",
     "Test::More" => "0.98"
   },
-  "VERSION" => "1.003",
+  "VERSION" => "1.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,7 +80,7 @@ my %FallbackPrereqs = (
   "Object::Pad::FieldAttr::Checked" => "0.12",
   "Role::Tiny" => "2.002004",
   "Signature::Attribute::Checked" => "0.06",
-  "Sublike::Extended" => "0.23",
+  "Sublike::Extended" => "0.29",
   "Syntax::Keyword::Defer" => "0.11",
   "Syntax::Keyword::Dynamically" => "0.14",
   "Syntax::Keyword::Match" => "0.15",

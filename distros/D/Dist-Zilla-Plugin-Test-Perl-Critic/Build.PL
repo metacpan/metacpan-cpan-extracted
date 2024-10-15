@@ -89,7 +89,7 @@ EOW
         "Jerome Quelin"
       ],
       "dist_name" => "Dist-Zilla-Plugin-Test-Perl-Critic",
-      "dist_version" => "3.002",
+      "dist_version" => "3.003",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::Test::Perl::Critic",
       "recursive_test_files" => 1,

@@ -1,5 +1,42 @@
 Revision history for Perl module Crypt::OpenPGP
 
+1.18 -- Mon Oct 14 22:09:32 ADT 2024
+
+    [Changes since 1.17]
+
+    - Merge GH https://github.com/btrott/Crypt-OpenPGP/pull/34 from @pinmarch
+    - fixes decryption of cipher text encrypted with a subkey 
+
+    [Detailed Changelog]
+    - 85c2923 Add Release notes to MANIFEST.SKIP
+    - 57f909e Add test for Fix for RT #79798 - Symkey decrypt failed: Invalid secret key ID
+    - 0bf6750 solves error (Symkey decrypt failed: Invalid secret key ID)
+    - 68371b4 v1.17
+
+1.17 -- Mon Oct 14 14:23:37 ADT 2024
+
+    [Changes since 1.16]
+    - Same as 1.15 - but referencing correct github repo
+
+    [Detailed Changelog]
+    - fb350bd (HEAD -> master) Reference correct github Repo
+
+1.16 -- Mon Oct 14 11:06:32 ADT 2024
+
+    [Changes since 1.15]
+    - Small fixes to longstanding issues
+    - (SAMV) RT#20931 fix verification of OpenPGP cleartext signatures
+    - RT#19482 Choose the correct signing key for verification
+
+    [Detailed Changelog]
+    - 300a1f5 Missed keyserver zone xfer reference
+    - ed451ac update pod referencing keyservers
+    - 7417b1d Apply fix for RT#20931
+    - ec61503 Fixes Issue RT#19482
+    - 42e7e72 v1.15
+    - eef0803 Fixes RT#57861 - bump Crypt::DSA version
+    - ff161e7 v1.14
+
 1.15 -- Wed Oct 02 07:45:07 ADT 2024
 
     [Module Status]

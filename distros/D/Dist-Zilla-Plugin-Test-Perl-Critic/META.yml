@@ -29,10 +29,10 @@ no_index:
 provides:
   Dist::Zilla::Plugin::CriticTests:
     file: lib/Dist/Zilla/Plugin/CriticTests.pm
-    version: '3.002'
+    version: '3.003'
   Dist::Zilla::Plugin::Test::Perl::Critic:
     file: lib/Dist/Zilla/Plugin/Test/Perl/Critic.pm
-    version: '3.002'
+    version: '3.003'
 requires:
   Data::Dumper: '0'
   Data::Section: '0.004'
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-Perl-Critic
   homepage: https://github.com/karenetheridge/Dist-Zilla-Plugin-Test-Perl-Critic
   repository: https://github.com/karenetheridge/Dist-Zilla-Plugin-Test-Perl-Critic.git
-version: '3.002'
+version: '3.003'
 x_Dist_Zilla:
   perl:
     version: '5.041004'
@@ -745,7 +745,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.002
+          tag: v3.003
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -860,7 +860,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: Test::Perl::Critic
-      version: '3.002'
+      version: '3.003'
     -
       class: Dist::Zilla::Plugin::Test::CheckBreaks
       config:
@@ -934,6 +934,7 @@ x_contributors:
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'Gryphon Shafer <gryphon@goldenguru.com>'
   - 'Stephen R. Scaffidi <stephen@scaffidi.net>'
+  - 'Alexander Hartmaier <abraxxa@cpan.org>'
   - 'Mike Doherty <doherty@cs.dal.ca>'
 x_generated_by_perl: v5.41.4
 x_serialization_backend: 'YAML::Tiny version 1.74'

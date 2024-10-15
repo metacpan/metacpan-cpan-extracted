@@ -60,7 +60,7 @@
             "Object::Pad::FieldAttr::Checked" : "0.12",
             "Role::Tiny" : "2.002004",
             "Signature::Attribute::Checked" : "0.06",
-            "Sublike::Extended" : "0.23",
+            "Sublike::Extended" : "0.29",
             "Syntax::Keyword::Defer" : "0.11",
             "Syntax::Keyword::Dynamically" : "0.14",
             "Syntax::Keyword::Match" : "0.15",
@@ -96,23 +96,23 @@
    "provides" : {
       "Full" : {
          "file" : "lib/Full.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       },
       "Full::Class" : {
          "file" : "lib/Full/Class.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       },
       "Full::Pragmata" : {
          "file" : "lib/Full/Pragmata.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       },
       "Full::Role" : {
          "file" : "lib/Full/Role.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       },
       "Full::Script" : {
          "file" : "lib/Full/Script.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       }
    },
    "release_status" : "stable",
@@ -127,7 +127,7 @@
          "web" : "https://github.com/team-at-cpan/Full"
       }
    },
-   "version" : "1.003",
+   "version" : "1.004",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Tom Molesworth <tom@audioboundary.com>"

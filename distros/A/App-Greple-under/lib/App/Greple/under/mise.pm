@@ -1,8 +1,8 @@
 package App::Greple::under::mise;
-use 5.024;
+use strict;
 use warnings;
 
-our $VERSION = "0.99";
+use App::Greple::under ':all';
 
 1;
 

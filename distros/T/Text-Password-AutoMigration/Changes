@@ -1,5 +1,11 @@
 Revision history for Perl extension Text-Password-AutoMigration
 
+0.41 2024-10-15T02:04:21Z
+ - downgrade required Carp to 1.50 from 1.54
+ 
+0.40 2024-10-15T00:28:19Z
+ - allow to contain whitespaces in salts
+
 0.31 2024-10-11T04:04:28Z
  - fixed the POD
 

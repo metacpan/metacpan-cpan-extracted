@@ -39,10 +39,10 @@ my $can_extract_allsheets   = Spreadsheet::Edit::IO::can_extract_allsheets();
 sub verif_Sheet1(;$){
   my $msg = $_[0] // "";
   eq_deeply(title_rx(), 0) or die "${msg} title_rx is not 0";
-  eq_deeply([@{ title_row() }],["First Name","Last Name","Email","Date"])
+  eq_deeply([@{ title_row() }],["First Name","Last Name","Email","Date","Zipcode"])
     or confess "${msg} Sheet1 titles wrong\n", dvis('${\title_rx()} @{ title_row() }');
   #eq_deeply([@{ $rows[3] }],["Françoise-Athénaïs","de Rochechouart","","Oct 5, 1640"])
-  my $exp = ["Françoise-Athénaïs","de Rochechouart","","10/05/1640"];
+  my $exp = ["Françoise-Athénaïs","de Rochechouart","","10/05/1640","00007"];
   eq_deeply([@{ $rows[3] }],$exp)
     or confess "${msg} Sheet1 row 4 is wrong,\n",
                "  got: ",avis(@{ $rows[3] }),"\n",
@@ -91,24 +91,24 @@ my $exp_CRLFchars = $exp_chars =~ s/\n/\x0D\x0A/gr;
 # Well, we can't prevent CR,LF line endings on Windows.  So first
 # convert the test data .csv to "local" line endings so it will match.
 my $local_testcsv_UTF8 = Path::Tiny->tempfile("local_testcsv_UTF8_XXXXX");
-$local_testcsv_UTF8->spew({binmode => ":perlio:encoding(UTF-8)"}, $exp_chars);
+$local_testcsv_UTF8->spew({binmode => ":raw:encoding(UTF-8)"}, $exp_chars);
 
 (my $local_testcsv_UTF8CRLF = Path::Tiny->tempfile("local_testcsv_UTF8CRLF_XXXXX"))
-  ->spew({binmode => ":perlio:encoding(UTF-8)"}, $exp_CRLFchars);
+  ->spew({binmode => ":raw:encoding(UTF-8)"}, $exp_CRLFchars);
 
 (my $local_testcsv_UTF16 = Path::Tiny->tempfile("local_testcsv_UTF16_XXXXX"))
-  ->spew({binmode => ":perlio:encoding(UTF-16)"}, $exp_chars);
+  ->spew({binmode => ":raw:encoding(UTF-16)"}, $exp_chars);
 
 (my $local_testcsv_UTF16BECRLF = Path::Tiny->tempfile("local_testcsv_UTF16BECRLF_XXXXX"))
-  ->spew({binmode => ":perlio:encoding(UTF-16BE)"}, $exp_CRLFchars);
+  ->spew({binmode => ":raw:encoding(UTF-16BE)"}, $exp_CRLFchars);
 
 (my $local_testcsv_UTF16LE = Path::Tiny->tempfile("local_testcsv_UTF16LE_XXXXX"))
-  ->spew({binmode => ":perlio:encoding(UTF-16LE)"}, $exp_chars);
+  ->spew({binmode => ":raw:encoding(UTF-16LE)"}, $exp_chars);
 
 my $local_testcsv_UTF8CRLFWithBOM = Path::Tiny->tempfile("local_testcsv_UTF8CRLFWithBOM_XXXXX");
 {
-  $local_testcsv_UTF8CRLF->spew({binmode => ":perlio:encoding(UTF-8)"}, $exp_CRLFchars);
-  $local_testcsv_UTF8CRLFWithBOM->spew({binmode => ":perlio:encoding(UTF-8)"}, "\N{U+feff}");
+  $local_testcsv_UTF8CRLF->spew({binmode => ":raw:encoding(UTF-8)"}, $exp_CRLFchars);
+  $local_testcsv_UTF8CRLFWithBOM->spew({binmode => ":raw:encoding(UTF-8)"}, "\N{U+feff}");
   $local_testcsv_UTF8CRLFWithBOM->append_utf8($exp_CRLFchars);
 }
 
@@ -143,8 +143,12 @@ foreach (
     my %debug_opts = @_;
 
     # Call convert_spreadsheet() directly, passing inpath as an option
-    my $h_cs = doconvert(inpath => $input_csvpath, cvt_to => 'csv',
-                         @inenc_opts, @outenc_opts, %debug_opts);
+##    my $h_cs = doconvert(inpath => $input_csvpath, cvt_to => 'csv',
+##                         @inenc_opts, @outenc_opts, %debug_opts);
+    my $h_cs = convert_spreadsheet(
+                 debug => $debug, verbose => $verbose, silent => $silent,
+                 inpath => $input_csvpath, cvt_to => 'csv',
+                 @inenc_opts, @outenc_opts, %debug_opts);
     my $got_passthru = ($h_cs->{outpath} eq $input_csvpath);
     if (!!$got_passthru ne !!$exp_passthru) {
       die( ($exp_passthru
@@ -166,11 +170,14 @@ foreach (
     };
     my $reslurp_data = do{
       my $oenc = $h_cs->{encoding} // die "{encoding} not set in result";
-      path($h_cs->{outpath})->slurp( {binmode => ":encoding($oenc):crlf"} );
+      path($h_cs->{outpath})->slurp( {binmode => ":raw:encoding($oenc):crlf"} );
     };
-    die dvis 'Data from slurp with result encoding does not match!\n'
-          .'$input_csvpath $h_cs\n@inenc_opts @outenc_opts\n $input_data\n$reslurp_data'
-    unless $input_data eq $reslurp_data;
+    unless ($input_data eq $reslurp_data) {
+      die dvis 'Data from slurp with result encoding does not match!\n'
+          .'$input_csvpath $h_cs @inenc_opts @outenc_opts\n\n'
+          .'$input_data\n\n'
+          .'$reslurp_data\n'
+    }
 
     # Try OpenAsCsv, which by the way calls convert_spreadsheet with a
     # separate inpath arg. It returns a file descriptor to read the data.
@@ -288,7 +295,7 @@ if ($can_cvt_spreadsheets) {
   {
     my $h1 = doconvert(inpath => $local_testcsv_UTF8, cvt_to => "ods");
     my $h2 = doconvert(inpath => $h1->{outpath}, cvt_to => "csv");
-    my $got_chars = path($h2->{outpath})->slurp_utf8;
+    my $got_chars = path($h2->{outpath})->slurp({binmode => ":raw:encoding(UTF-8):crlf"});
     if ($got_chars eq $exp_chars) {
       say "> Round-trip csv->ods->csv succeeded!" unless $silent;
     } else {

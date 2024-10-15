@@ -1,5 +1,7 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1000.019 : Fix leading-zero corruption bug which came back in 1000.018
+           Fix BOM-related test issues on Windows.
 1000.018 : Support reading csv files with a BOM
 1000.016 : Avoid warnings about !$foo ne $bar with perl v5.41.5
 1000.016 : Allow {data_soruce} as option to read_spreadsheet()

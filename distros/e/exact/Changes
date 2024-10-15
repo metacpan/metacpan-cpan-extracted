@@ -1,5 +1,8 @@
 Revision history for exact
 
+1.28      2024-10-14 11:50:51-07:00 America/Los_Angeles
+        - deat usability update
+
 1.27      2024-10-07 17:57:37-07:00 America/Los_Angeles
         - Add Carp helper functions
 

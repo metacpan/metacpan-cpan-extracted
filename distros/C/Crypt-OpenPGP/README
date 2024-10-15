@@ -191,10 +191,11 @@ USAGE
 
     *   KeyServer
 
-        The hostname of the HKP keyserver. You can get a list of keyservers
-        through
+        The hostname of the HKP keyserver. This is a required argument.
+        There are a number of keyservers including:
 
-            % host -l pgp.net | grep wwwkeys
+            keyserver.ubuntu.com
+            keys.openpgp.org
 
         If *AutoKeyRetrieve* is set to a true value, keys will be
         automatically retrieved from the keyserver if they are not found in

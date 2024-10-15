@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package meta 0.011;
+package meta 0.012;
 
 use v5.14;
 use warnings;
@@ -480,6 +480,9 @@ defaulting expression). This is the minimum number of argument values that
 must be passed to any call of this function and does not count a final slurpy
 parameter.
 
+Note that the implicit C<$self> parameter to a C<method> subroutine is
+included in this count. This count will always be at least 1 on such a method.
+
 =head2 optional_params
 
    $n = $metasig->optional_params;
@@ -512,10 +515,6 @@ C<undef> if the function uses a slurpy final parameter.
 =head1 TODO
 
 =over 4
-
-=item
-
-Some kind of access around the signature of a signatured sub.
 
 =item
 
