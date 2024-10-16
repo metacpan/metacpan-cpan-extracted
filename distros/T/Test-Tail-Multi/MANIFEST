@@ -1,6 +1,6 @@
+Build.PL
 Changes
 MANIFEST
-Makefile.PL
 README
 lib/Test/Tail/Multi.pm
 t/01load.t
@@ -17,4 +17,6 @@ t/bar
 t/baz
 t/foo
 t/quux
-META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+META.yml
+META.json

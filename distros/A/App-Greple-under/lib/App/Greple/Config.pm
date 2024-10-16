@@ -24,7 +24,7 @@ sub load { goto &deal_with }
 sub deal_with {
     my $obj = shift;
     my($my_argv, $argv) = split_argv(shift);
-    getopt($my_argv, $obj) if @$my_argv;
+    getopt($my_argv, $obj, @_) if @$my_argv;
 }
 
 ######################################################################
@@ -46,11 +46,13 @@ use Getopt::EX::Func;
 *arg2kvlist = \&Getopt::EX::Func::arg2kvlist;
 
 sub getopt {
-    my($argv, $opt) = @_;
+    my $argv = shift;
+    my $opt = shift;
     return if @{ $argv //= [] } == 0;
-    GetOptionsFromArray
+    GetOptionsFromArray(
 	$argv,
-	"config=s" => sub { config arg2kvlist($_[1]) }
+	"config=s" => sub { config arg2kvlist($_[1]) },
+	@_ )
 	or die "Option parse error.\n";
 }
 

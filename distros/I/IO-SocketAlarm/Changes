@@ -1,3 +1,8 @@
+Version 0.003 - 2024-10-15
+
+  - More compatibility fixes
+  - Document the caveat about signals during object destructors
+
 Version 0.002 - 2024-08-28
 
   - Fix compat with FreeBSD, older perls, and various Linux

@@ -13,7 +13,7 @@ WriteMakefile(
         #PREOP => 'bin/dist'
     },
     'EXE_FILES' => [ map {"bin/$_"} @programs_to_install ],
-    'PREREQ_PM' => { 
+    'PREREQ_PM' => {
         'Cwd'          => 0,
         'File::Temp'   => 0,
         'LWP'          => 5.48,

@@ -1,4 +1,7 @@
 Revision history for Perl extension Test::Tail::Multi.
+0.07  Mon Oct 14 15:42:45 PDT 2024
+  - Converted to Build.PL for better CPAN Testers integration.
+
 0.06  Tue Jul 12 21:39:02 PDT 2011
 	- simplified error check in 03add.t for localized error messages
 

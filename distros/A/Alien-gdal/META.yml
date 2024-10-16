@@ -7,14 +7,15 @@ build_requires:
   Alien::Build::MM: '1.74'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
   Alien::Build::Plugin::PkgConfig::PPWrapper: '0'
-  Alien::MSYS: '0'
   Alien::cmake3: '0.02'
   Alien::geos::af: '1.010'
   Alien::libtiff: '0'
   Alien::patch: '0'
+  Alien::patchelf: '0'
   Alien::proj: '1.24'
   Alien::sqlite: '1.02'
   Archive::Tar: '0'
+  Config: '0'
   Env::ShellWords: '0.01'
   ExtUtils::MakeMaker: '6.52'
   FFI::CheckLib: '0.23'
@@ -42,6 +43,7 @@ configure_requires:
   Alien::geos::af: '1.010'
   Alien::libtiff: '0'
   Alien::patch: '0'
+  Alien::patchelf: '0'
   Alien::proj: '1.24'
   Alien::sqlite: '1.02'
   ExtUtils::MakeMaker: '6.52'
@@ -71,18 +73,18 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-gdal/issues/
   repository: https://github.com/shawnlaffan/perl-alien-gdal
-version: '1.37'
+version: '1.38'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.80'
+  generated_by: 'Alien::Build::MM version 2.83'
   requires:
     share:
-      Alien::MSYS: '0'
       Alien::cmake3: '0.02'
       Alien::geos::af: '0'
       Alien::libtiff: '0'
       Alien::proj: '0'
       Alien::sqlite: '0'
       Archive::Tar: '0'
+      Config: '0'
       Env::ShellWords: '0.01'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'

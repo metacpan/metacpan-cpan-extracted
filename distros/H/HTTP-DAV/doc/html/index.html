@@ -13,8 +13,6 @@
 
 
 
-
-
 <div id="content">
 <H1>PerlDAV -- A WebDAV client library for Perl5</H1>
 </div><div id="content">
@@ -41,16 +39,16 @@
 
 <p>The lazy way to install PerlDAV:</p>
 
-<pre><code>   $ cpan HTTP::DAV</code></pre>
+<pre><code>$ cpan HTTP::DAV</code></pre>
 
 <p>Or the normal way:</p>
 
 <p>Retrieve the latest copy from CPAN: https://metacpan.org/module/HTTP-DAV/</p>
 
-<pre><code>   $ perl Makefile.PL # Creates the Makefile
-   $ make             # Runs the makefile
-   $ make test        # Optional (See Interopability below)
-   $ make install     # Installs dave and HTTP::DAV</code></pre>
+<pre><code>$ perl Makefile.PL # Creates the Makefile
+$ make             # Runs the makefile
+$ make test        # Optional (See Interopability below)
+$ make install     # Installs dave and HTTP::DAV</code></pre>
 
 <p>With this method you will first have to install the pre-requisites: LWP and XML::DOM, see <a href="#what-are-the-prerequisites">&quot;what are the prerequisites?&quot;</a>.</p>
 
@@ -58,7 +56,7 @@
 
 <p><code>dave</code> will be installed to /usr/local/bin. This suits most people but you can modify this by using the INSTALLBIN flag:</p>
 
-<pre><code>   $ perl Makefile.PL INSTALLBIN=&quot;/home/user/bin&quot;</code></pre>
+<pre><code>$ perl Makefile.PL INSTALLBIN=&quot;/home/user/bin&quot;</code></pre>
 
 <h2 id="What-Are-The-Prerequisites">What Are The Prerequisites?</h2>
 
@@ -111,10 +109,8 @@ then:
 
 <p>Once you&#39;ve installed PerlDAV, you can type:</p>
 
-<pre><code>   $ perldoc HTTP::DAV
-   $ man dave</code></pre>
-
-
+<pre><code>$ perldoc HTTP::DAV
+$ man dave</code></pre>
 
 
 <P>Or you can view them here:
@@ -167,34 +163,36 @@ then:
 <p>Need to convert XML::DOM to a DOM Level 2 compliant parser like XML::Gdome.</p>
 
 
-
-
 <P>See <A HREF="TODO.html">TODO</A> for what is left to be done.</P>
 
 <h1 id="AUTHOR-AND-COPYRIGHT">AUTHOR AND COPYRIGHT</h1>
 
 <p>This module is Copyright (C) 2001 by</p>
 
-<pre><code>   Patrick Collins
-   G03 Gloucester Place, Kensington
-   Sydney, Australia
+<pre><code>Patrick Collins
+G03 Gloucester Place, Kensington
+Sydney, Australia
 
-   mailto:pcollins@cpan.org
-   Phone: +61 2 9663 4916</code></pre>
+mailto:pcollins@cpan.org
+Phone: +61 2 9663 4916</code></pre>
 
 <p>All rights reserved.</p>
 
 <h1 id="MAINTAINER">MAINTAINER</h1>
 
-<p>The current maintainer of HTTP-DAV is Cosimo Streppone for Opera Software ASA. You can contact us at <code>cosimo@cpan.org</code> or <code>opera@cpan.org</code>.</p>
+<p>The current maintainer of HTTP-DAV is Cosimo Streppone for Kahoot!, and previously for Opera Software ASA. You can contact me at <code>cosimo@cpan.org</code>.</p>
+
+<h1 id="GITHUB-REPOSITORY">GITHUB REPOSITORY</h1>
+
+<p>The official repository for HTTP-DAV is now on Github:</p>
+
+<pre><code>https://github.com/cosimo/perl5-http-dav</code></pre>
 
 <h1 id="LICENSE">LICENSE</h1>
 
 <p>You may distribute this module under the terms of either the GNU General Public License or the Artistic License, as specified in the Perl README file.</p>
 
 <p>$Id$</p>
-
-
 
 
 </div>

@@ -1,5 +1,11 @@
 Revision history for Convert::PEM
 
+0.09 -- Tue Oct 15 22:59:26 ADT 2024
+
+    - 55f01eb Bump Repo Version
+    - 4072ab2 Fixes RT#27574: encode test occasionlly fails
+    - 204ffeb Convert build to Dist::Zilla
+
 0.08  2010.12.06
     - Altered explode() to canonicalize line endings to \n, handling
       DOS (\r\n) and older mac (\r) line breaks cleanly. Thanks to Matt

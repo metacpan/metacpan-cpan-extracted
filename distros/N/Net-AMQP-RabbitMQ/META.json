@@ -4,7 +4,7 @@
       "Mike \"manchicken\" Stemle <hello@mikestemle.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mozilla_1_1"
    ],
@@ -56,7 +56,7 @@
          "web" : "https://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq"
       }
    },
-   "version" : "2.40012",
+   "version" : "2.40013",
    "x_contributors" : [
       "mstemle - Mike \"manchicken\" Stemle <hello@mikestemle.com>",
       "jesus - Theo Schlossnagle <jesus@omniti.com>",
@@ -71,5 +71,5 @@
       "FGA - Fabrice Gabolde <fga@cpan.org>",
       "ikegami - Eric Brine <ikegami@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

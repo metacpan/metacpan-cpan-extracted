@@ -38,5 +38,10 @@ Revision history for Automate-Animate
 
 0.11    12-04-2024 13:00
         Still trying to fix double encoding of unicoded filenames in M$ the attempted fix is at line 286 of lib/Automate/Animate/FFmpeg.pm
-        Changes in t/100-input-patterns.t to deebug this
+        Changes in t/100-input-patterns.t to debug this.
+
+0.12    15-10-2024 17:00
+        The issue of v0.11 seems to have gone but keeping an eye on it.
+        The detection of ffmpeg executable is done in Makefile.PL
+        Now make exits(1) if no ffmpeg executable is found.
 

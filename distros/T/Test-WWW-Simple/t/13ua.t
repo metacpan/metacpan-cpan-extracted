@@ -1,7 +1,3 @@
-#!/usr/bin/env perl
-use strict;
-use warnings;
-
 use Test::More tests=>5;
 use Test::WWW::Simple;
 use Test::Warnings qw(:all);

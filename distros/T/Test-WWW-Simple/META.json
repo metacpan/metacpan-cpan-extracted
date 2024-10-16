@@ -1,41 +1,33 @@
 {
-   "abstract" : "Test Web applications using TAP",
+   "abstract" : "Simple text-based tests for web pages",
    "author" : [
       "Joe McMahon <mcmahon@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "Test-WWW-Simple",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Mojolicious" : "8.11"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "requires" : {
             "HTML::Tree" : "0",
-            "Mojolicious" : "0",
             "Regexp::Common" : "0",
-            "Test2::V0" : "0",
             "Test::Builder" : "0",
             "Test::LongString" : "0",
             "Test::Tester" : "0",
@@ -44,7 +36,18 @@
          }
       }
    },
+   "provides" : {
+      "Test::WWW::Simple" : {
+         "file" : "lib/Test/WWW/Simple.pm",
+         "version" : "0.41"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.40",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.41",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

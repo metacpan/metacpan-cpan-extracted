@@ -19,6 +19,7 @@ my @files = (
     't/02-2021.t',
     't/03-2022.t',
     't/04-2023.t',
+    't/05-2024.t',
     't/lib/Test/TestFinanceAW.pm'
 );
 

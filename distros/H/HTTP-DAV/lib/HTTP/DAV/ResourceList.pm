@@ -26,8 +26,8 @@ sub _init {
 
    my @pa = HTTP::DAV::Utils::rearrange( \@arg_names, @p);
 
-   $self->{_resources} = ();
-
+   $self->{_resources} = [];
+   $self->{_resource_indexes} = {};
 }
 
 ####
@@ -36,17 +36,11 @@ sub _init {
 sub get_resources {
    my ($self) =shift;
 
-   my $arr = $self->{_resources};
-   return (defined $arr ) ? @{$self->{_resources}} : ();
+   return @{$self->{_resources}};
 }
 
 sub get_urls {
-   my ($self) =shift;
-   my @arr;
-   foreach my $r ( $self->get_resources() ) {
-      push( @arr, $r->get_uri() );
-   }
-   return @arr;
+   return map { $_->get_uri } shift->get_resources;
 }
 
 
@@ -56,60 +50,40 @@ sub count_resources {
 
 sub get_member {
    my ($self,$uri) = @_;
-   $uri = HTTP::DAV::Utils::make_uri($uri);
+   $uri = HTTP::DAV::Utils::make_uri_canonical($uri);
 
-   foreach my $r ( $self->get_resources ) {
-      if ( HTTP::DAV::Utils::compare_uris($uri,$r->get_uri) ) {
-         return $r;
-      }
-   }
-
-   return 0;
+   my $idx = $self->{_resource_indexes}{$uri};
+   return $idx ? $self->{_resources}[$idx] : 0;
 }
 
 sub add_resource {
    my ($self,$resource) = @_;
-#   print "Adding $resource\n";
-#   print "Before: ". $self->as_string . "\n";
+
    $self->remove_resource($resource);
    $resource->set_parent_resourcelist($self);
-   push (@{$self->{_resources}}, $resource);
-#   print "After: ". $self->as_string . "\n";
+
+   push @{$self->{_resources}}, $resource;
+
+   my $uri = HTTP::DAV::Utils::make_uri_canonical($resource->get_uri);
+   $self->{_resource_indexes}{$uri} = $self->count_resources - 1;
 }
 
 
 # Synopsis: $list->remove_resource( resource_obj : HTTP::DAV::Resource );
 sub remove_resource {
-   my ($self,$resource ) = @_;
-   my $uri;
+   my ($self, $resource) = @_;
    my $ret;
 
-   $uri = HTTP::DAV::Utils::make_uri($resource->get_uri);
-   if (defined $uri && $uri->scheme ) {
-      my $found_index = -1;
-      foreach my $i ( 0 .. $#{$self->{_resources}} ) {
-         my $this_resource = $self->{_resources}[$i];
-         my $equiv = HTTP::DAV::Utils::compare_uris($uri,$this_resource->get_uri);
-         if ( $equiv || $resource eq $this_resource ) {
-            $found_index = $i;
-            last;
-         }
-      }
-   
-      if ( $found_index != -1 ) {
-         $resource = splice(@{$self->{_resources}},$found_index,1);
-         $resource->set_parent_resourcelist();
-         $ret = $resource;
-      } else {
-         $ret = 0;
-      }
-   } else {
-      $ret = 0;
-   }
+   my $uri = HTTP::DAV::Utils::make_uri_canonical($resource->get_uri);
 
-   #print "Removing $ret\n" if $HTTP::DAV::DEBUG>2;
-   return $ret;
-   
+   my $idx = $self->{_resource_indexes}{$uri};
+   return 0 unless $idx;
+
+   $resource = splice(@{$self->{_resources}}, $idx, 1);
+   $resource->set_parent_resourcelist();
+   delete $self->{_resource_indexes}{$uri};
+
+   return $resource;
 }
 
 ###########################################################################
@@ -229,7 +203,5 @@ sub showlocks {
    }
    $return;
 }
-
-1;
 
 1;

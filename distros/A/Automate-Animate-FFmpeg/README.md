@@ -4,7 +4,7 @@ Automate::Animate::FFmpeg - Create animation from a sequence of images using FFm
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 

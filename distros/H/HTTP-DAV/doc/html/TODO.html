@@ -13,78 +13,74 @@
 
 
 
-
-
 <div id="content"><H1>TODO</H1></div><div id="content">
 
 <h2 id="dave">dave</h2>
 
-<pre><code>   - globs on lock(),unlock(),steal(),options()?,move(),copy(),propfind(),proppatch() (and set/unset).
-   - rework ls to use globs.
-   - multistatus responses don&#39;t come through nicely.</code></pre>
+<pre><code>- globs on lock(),unlock(),steal(),options()?,move(),copy(),propfind(),proppatch() (and set/unset).
+- rework ls to use globs.
+- multistatus responses don&#39;t come through nicely.</code></pre>
 
 <h2 id="HTTP::DAV">HTTP::DAV</h2>
 
-<pre><code>   - Rework the file transfer code to avoid slurping complete files in memory
-     and read through a fixed size buffer, to avoid memory hogs or crashes
-     when transferring huge files.
-   - LWP doesn&#39;t allow callback on upload, only download. This means
-     we can&#39;t do progress indicators on &quot;PUT&quot;. How to do it? Could patch
-     LWP? Specialise LWP::UserAgent? Ugh.
-   - doco globs in DAV.pm
-   - fix get references
-   - _put calls propfind on every call throughout a recursive _put().
-     need to adjust this so that it does it only once, in put(). After 
-     the first time, we should be able to KNOW whether it is a collection
-     or not instead of having to propfind to find out becasue in theory
-     WE were the ones who put the file there.
+<pre><code>- Rework the file transfer code to avoid slurping complete files in memory
+  and read through a fixed size buffer, to avoid memory hogs or crashes
+  when transferring huge files.
+- LWP doesn&#39;t allow callback on upload, only download. This means
+  we can&#39;t do progress indicators on &quot;PUT&quot;. How to do it? Could patch
+  LWP? Specialise LWP::UserAgent? Ugh.
+- doco globs in DAV.pm
+- fix get references
+- _put calls propfind on every call throughout a recursive _put().
+  need to adjust this so that it does it only once, in put(). After 
+  the first time, we should be able to KNOW whether it is a collection
+  or not instead of having to propfind to find out becasue in theory
+  WE were the ones who put the file there.
 
-   - finish &quot;source&quot; property in DAV::Resource.pm
-   - redo POD Resource.pm
+- finish &quot;source&quot; property in DAV::Resource.pm
+- redo POD Resource.pm
 
-   - setup_if_headers need to get just Rsource&#39;s locks not all RL&#39;s locks.
-   - discovery still isn&#39;t resetting locks properly ????
-   - DAV.pm as_string needs working resource
-   - finish lock (bug against mod_dav somewhere)
+- setup_if_headers need to get just Rsource&#39;s locks not all RL&#39;s locks.
+- discovery still isn&#39;t resetting locks properly ????
+- DAV.pm as_string needs working resource
+- finish lock (bug against mod_dav somewhere)
 
-   - mod t/* for IIS 5 lock and proppatch deficiencies.
-   - how to we handle degradation for incomplete servers in test suite (IIS)?
-   - mod_dav has a very strange bug with lock-null resources.
-     The following combination of commands makes it weird out:
-        $ mkdir dir1
-        $ lock dir1
-        $ lock dir2 (this is a lock null)
-        $ move dir1 dir2
-        Now, the spec says that dir2 should now be the copy of dir1 and it should be locked.
-        However, mod_dav has an unlocked dir2. Even worse, if you delete dir2, there is 
-        a shadowed lock-null resource called dir2 sitting behind the scenes. Bad.</code></pre>
+- mod t/* for IIS 5 lock and proppatch deficiencies.
+- how to we handle degradation for incomplete servers in test suite (IIS)?
+- mod_dav has a very strange bug with lock-null resources.
+  The following combination of commands makes it weird out:
+     $ mkdir dir1
+     $ lock dir1
+     $ lock dir2 (this is a lock null)
+     $ move dir1 dir2
+     Now, the spec says that dir2 should now be the copy of dir1 and it should be locked.
+     However, mod_dav has an unlocked dir2. Even worse, if you delete dir2, there is 
+     a shadowed lock-null resource called dir2 sitting behind the scenes. Bad.</code></pre>
 
 <h2 id="Wishlist-functions">Wishlist functions</h2>
 
-<pre><code>   - testing against Zope
-   - dave:implement netrc?
-   - dave:tab completion? history?
-   - dave:implement more advanced command-line interaction
-   - dave:copy/move should allow the user to set &#39;depth&#39; and &#39;overwrite&#39;
-   - redo auth as a callback? If so, needs 2 functions, get and success.</code></pre>
+<pre><code>- testing against Zope
+- dave:implement netrc?
+- dave:tab completion? history?
+- dave:implement more advanced command-line interaction
+- dave:copy/move should allow the user to set &#39;depth&#39; and &#39;overwrite&#39;
+- redo auth as a callback? If so, needs 2 functions, get and success.</code></pre>
 
 <h2 id="Wishlist-projects">Wishlist projects</h2>
 
-<pre><code>   - Namespaces are not currently supported. I munge around them since
-     they are not supported in DOM1 which is what XML::DOM uses.
-   - Rework Response.pm now that LWP::Status supports the status codes.
+<pre><code>- Namespaces are not currently supported. I munge around them since
+  they are not supported in DOM1 which is what XML::DOM uses.
+- Rework Response.pm now that LWP::Status supports the status codes.
 
-   - support for LWPng which is fully HTTP/1.1 compliant.
-   - DAV Bindings
-   - DAV Redirects Reference
-   - DAV Ordered collections
-   - DAV DASL support
-   - DAV Delta-V
-   - DAV ACL&#39;s</code></pre>
+- support for LWPng which is fully HTTP/1.1 compliant.
+- DAV Bindings
+- DAV Redirects Reference
+- DAV Ordered collections
+- DAV DASL support
+- DAV Delta-V
+- DAV ACL&#39;s</code></pre>
 
 <p>$Id$</p>
-
-
 
 </div>
 

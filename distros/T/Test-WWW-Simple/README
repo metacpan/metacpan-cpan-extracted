@@ -14,10 +14,6 @@ or not page fetches are cached; using caching for pages which do not change
 on each fetch can dramatically decrease the runtime of tests which do multiple
 checks on the same URL.
 
-Test::WWW::Simple has been upgraded to make sure that it can handle https
-connections; older releases were prior to the web's shift to primarily
-https connections instead of http. The http protocol is still supported.
-
 INSTALLATION
 
 To install this module type the following:
@@ -35,7 +31,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005 by Yahoo!, 2010-2020 by Joe McMahon
+Copyright (C) 2005 by Yahoo!
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.5 or,

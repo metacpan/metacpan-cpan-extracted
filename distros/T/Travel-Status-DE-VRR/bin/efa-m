@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -95,7 +95,7 @@ if ($use_cache) {
 @grep_mots      = split( qr{,}, join( q{,}, @grep_mots ) );
 @grep_platforms = split( qr{,}, join( q{,}, @grep_platforms ) );
 
-my ( $place, $input, $stopseq );
+my ( $place, $input, $coord, $stopseq, $stopfinder );
 
 if ( @ARGV == 1 ) {
 	if ( $ARGV[0] =~ m{ ^ ([^@]*) @ ([^@]*) [(] ([^)]*) [)] (.*)  $ }x ) {
@@ -104,6 +104,17 @@ if ( @ARGV == 1 ) {
 			stop_id   => $2,
 			date      => $3,
 			key       => $4
+		};
+	}
+	elsif ( $ARGV[0] =~ m{ ^ [?] (?<name> .*) $ }x ) {
+		$stopfinder = {
+			name => $+{name},
+		};
+	}
+	elsif ( $ARGV[0] =~ m{ ^ (?<lat> [0-9.]+ ) : (?<lon> [0-9].+ ) $ }x ) {
+		$coord = {
+			lat => $+{lat},
+			lon => $+{lon},
 		};
 	}
 	else {
@@ -123,6 +134,7 @@ for my $efield (@edata_pre) {
 	elsif ( $efield eq 'b' ) { $edata{route_before} = 1; $full_routes = 1 }
 	elsif ( $efield eq 'f' ) { $edata{fullroute}    = 1; $full_routes = 1 }
 	elsif ( $efield eq 'r' ) { $edata{route}        = 1; $full_routes = 1 }
+	elsif ( $efield eq 'i' ) { $edata{info}         = 1 }
 	elsif ( $efield eq 'm' ) { $edata{messages}     = 1 }
 	else                     { $edata{$efield}      = 1 }
 }
@@ -159,6 +171,8 @@ sub new_efa {
 		full_routes    => $full_routes,
 		place          => $place,
 		name           => $input,
+		coord          => $coord,
+		stopfinder     => $stopfinder,
 		stopseq        => $stopseq,
 		time           => $time,
 		type           => $input_type,
@@ -214,40 +228,47 @@ sub format_route {
 		}
 		my $occupancy
 		  = $stop->occupancy ? format_occupancy( $stop->occupancy ) : q{ };
+		my $delay = q{     };
+		if ( $stop->delay ) {
+			$delay = sprintf( '(%+3d)', $stop->delay );
+		}
 		if ( defined $stop->arr and defined $stop->dep ) {
 			if ( $stop->arr->epoch == $stop->dep->epoch ) {
 				$output .= sprintf(
-					"    %5s      %s %40s %s\n",
+					"    %5s      %s %s %35s %s\n",
 					$stop->arr->strftime('%H:%M'),
-					$occupancy, $stop->full_name, $stop->platform,
+					$delay, $occupancy, $stop->full_name, $stop->platform,
 				);
 			}
 			else {
 				$output .= sprintf(
-					"%5s → %5s  %s %40s %s\n",
+					"%5s → %5s  %s %s %35s %s\n",
 					$stop->arr->strftime('%H:%M'),
 					$stop->dep->strftime('%H:%M'),
-					$occupancy, $stop->full_name, $stop->platform,
+					$delay,
+					$occupancy,
+					$stop->full_name,
+					$stop->platform,
 				);
 			}
 		}
 		elsif ( defined $stop->arr ) {
 			$output .= sprintf(
-				"%5s          %s %40s %s\n",
+				"%5s          %s %s %35s %s\n",
 				$stop->arr->strftime('%H:%M'),
-				$occupancy, $stop->full_name, $stop->platform,
+				$delay, $occupancy, $stop->full_name, $stop->platform,
 			);
 		}
 		elsif ( defined $stop->dep ) {
 			$output .= sprintf(
-				"        %5s  %s %40s %s\n",
+				"        %5s  %s %s %35s %s\n",
 				$stop->dep->strftime('%H:%M'),
-				$occupancy, $stop->full_name, $stop->platform,
+				$delay, $occupancy, $stop->full_name, $stop->platform,
 			);
 		}
 		elsif ( $stop->full_name ) {
-			$output .= sprintf( "               %s %40s %s\n",
-				$occupancy, $stop->full_name, $stop->platform, );
+			$output .= sprintf( "               %s %s %35s %s\n",
+				$delay, $occupancy, $stop->full_name, $stop->platform, );
 		}
 		else {
 			$output .= "?\n";
@@ -293,20 +314,50 @@ sub display_result {
 	return;
 }
 
+sub show_coord {
+	my $max_len = max map { length( $_->full_name ) } $efa->results;
+	for my $stop ( $efa->results ) {
+		printf(
+			"%5.1f km  %-${max_len}s  %s\n",
+			$stop->distance_m * 1e-3,
+			$stop->full_name, $stop->id
+		);
+	}
+}
+
+sub show_stopfinder {
+	my $max_len = max map { length( $_->full_name ) } $efa->results;
+	for my $stop ( $efa->results ) {
+		printf( "%-${max_len}s  %s\n", $stop->full_name, $stop->id );
+	}
+}
+
 sub show_stopseq {
 	my $trip = $efa->result;
 
-	printf( "%s %s → %s\n",
-		$trip->line, $trip->number // q{},
-		$trip->dest_name );
+	printf( "%s %s → %s\n", $trip->type, $trip->line // q{}, $trip->dest_name );
+
+	printf(
+		"Fahrt %s am %s\n",
+		$trip->number || $stopseq,
+		( $trip->route )[0]->sched_dep->strftime('%d.%m.%Y'),
+	);
+	say q{};
+
+	my $delay_len = 0;
+	my $max_delay = max map { abs( $_->delay // 0 ) } $trip->route;
+	if ($max_delay) {
+		$delay_len = length( sprintf( '%+d', $max_delay ) ) + 1;
+	}
 
 	for my $stop ( $trip->route ) {
 		printf(
-			"%s → %s  %s (%s) %s\n",
+			"%s → %s%${delay_len}s  %s (%s) %s\n",
 			$stop->arr ? $stop->arr->strftime('%H:%M')
 			: q{     },
 			$stop->dep ? $stop->dep->strftime('%H:%M')
 			: q{     },
+			$stop->delay ? sprintf( ' %+d', $stop->delay ) : q{},
 			$stop->full_name,
 			$stop->niveau,
 			$stop->platform
@@ -369,8 +420,8 @@ sub show_results {
 			say $stop->full_name;
 		}
 	}
-	elsif ( $efa->stop_name ) {
-		say $efa->stop_name;
+	elsif ( $efa->stop->full_name ) {
+		say $efa->stop->full_name;
 	}
 
 	for my $d ( $efa->results ) {
@@ -460,6 +511,18 @@ sub show_results {
 
 	display_result(@output);
 
+	if ( $edata{info} ) {
+		for my $info ( $efa->infos ) {
+			say q{};
+			if ( $info->subject and $info->subtitle ne $info->subject ) {
+				printf( "# %s\n%s\n", $info->subtitle, $info->subject );
+			}
+			else {
+				printf( "# %s\n", $info->subtitle );
+			}
+		}
+	}
+
 	return;
 }
 
@@ -508,6 +571,12 @@ if ($json_output) {
 		say JSON->new->convert_blessed->encode( [ $efa->results ] );
 	}
 }
+elsif ($coord) {
+	show_coord();
+}
+elsif ($stopfinder) {
+	show_stopfinder();
+}
 elsif ($stopseq) {
 	show_stopseq();
 }
@@ -522,27 +591,38 @@ __END__
 
 =head1 NAME
 
-efa-m - Unofficial interface to the efa.vrr.de departure monitor
+efa-m - Unofficial interface to the efa.vrr.de departure and trip monitor
 
 =head1 SYNOPSIS
 
-B<efa-m> [B<-Lr>] [B<-d> I<dd.mm.yyyy>] [B<-t> I<hh:mm>]
-[B<-l> I<lines>] [B<-p> I<platforms>] [B<-u> I<url>]
+B<efa-m> [B<-jLr>] [B<-d> I<dd.mm.yyyy>] [B<-t> I<hh:mm>]
+[B<-l> I<lines>] [B<-p> I<platforms>] [B<-s> I<service>]
 [I<city>] [I<type>B<:>]I<name>
+
+B<efa-m> [B<-s> I<service>] B<?>I<query>|I<lat>B<:>I<lon>
+
+B<efa-m> [B<-s> I<service>] I<tripid>
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 
-B<efa-m> lists scheduled tram, bus and train departures at the location I<name>.
+B<efa-m> is an interface to EFA public transport services.
 
-For each departure, it shows
+It can serve as a departure monitor, request details about a specific
+trip/journey, and look up public transport stops by name or geolocation.
+The operating mode depends on the contents of its mandatory argument.
+
+=head2 Departure Monitor (I<name>)
+
+Shows departures it I<name> or I<city> I<name>. For each departure,
+B<efa-m> shows
 
 =over
 
-=item * scheduled departure time,
+=item * estimated departure time (including delay, if available),
 
 =item * delay in minutes,
 
@@ -564,11 +644,25 @@ but C<< efa "E Hbf" >> does not.
 By default, I<name> refers to a stop, this can be changed by specifying
 I<type>.  Supported types are B<address> and B<poi> (point of interest).
 
+=head2 Location Search (B<?>I<query>|I<lat>B<:>I<lon>)
+
+List stops that match I<query> or that are located in the vicinity of
+I<lat>B<:>I<lon> geocoordinates.
+
+=head2 Trip Details (I<JourneyID>)
+
+List trip information as well as arrival and departure time, name, and platform
+of each stop on the trip's route.
+
 =head1 OPTIONS
+
+Values in brackets indicate options that only apply to the corresponding
+operating mode(s).
+
 
 =over
 
-=item B<-A>, B<--auto-url>, B<--discover-and-print>
+=item B<-A>, B<--auto-url>, B<--discover-and-print> (monitor)
 
 Probe all known EFA entry points for the specified stop. Print the first
 result which was not an error.
@@ -577,15 +671,21 @@ Note that this may take a while and will not necessarily return the best
 result.  Also, using thi option by default is not recommended, as it puts EFA
 services under considerable additional load.
 
-=item B<-d>, B<--date> I<dd.mm.yyyy>
+=item B<-d>, B<--date> I<dd.mm.yyyy> (monitor)
 
 Show departures for I<date> instead of today.
 May also be specified as I<dd.mm.>
 
-=item B<-D>, B<--discover>
+=item B<-D>, B<--discover> (monitor)
 
 Probe all known EFA entry points for the specified stop. Print the URLs and
 names of all entry points which did not return an error.
+
+=item B<-j>, B<--with-jid> (monitor)
+
+Show journey ID for each departure.
+The ID can be used to query details with a subsequent B<efa-m> invocation
+(trip details mode).
 
 =item B<--json>
 
@@ -593,14 +693,14 @@ Print result(s) as JSON and exit. This is a dump of internal data structures
 and not guaranteed to remain stable between minor versions. Please use the
 Travel::Status::DE::EFA(3pm) module if you need a proper API.
 
-=item B<-L>, B<--linelist>
+=item B<-L>, B<--linelist> (monitor)
 
 Do not show departures. Instead, list all lines serving the specified place.
 Note that this information may be incomplete -- only lines which are in
 service either at the time of the B<efa-m> call or at the time specifed
 using B<--date> and B<--time> are guaranteed to be included.
 
-=item B<-l>, B<--line> I<lines>
+=item B<-l>, B<--line> I<lines> (monitor)
 
 Only show departures of I<lines> (comma-separatad list, option may be
 repeated)
@@ -610,7 +710,7 @@ repeated)
 List supported EFA services with their URLs (see B<-u>) and abbreviations (see
 B<-s>).
 
-=item B<-m>, B<--mot> I<motlist>
+=item B<-m>, B<--mot> I<motlist> (monitor)
 
 Only show departures whose type appears in I<motlist> (comma-separated list,
 this option may be repeated).
@@ -619,11 +719,11 @@ The following departure types ("modes of transport") are supported:
 zug, s-bahn, u-bahn, stadtbahn, tram, stadtbus, regionalbus, schnellbus,
 seilbahn, schiff, ast, sonstige
 
-=item B<-o>, B<--offset> I<minutes>
+=item B<-o>, B<--offset> I<minutes> (monitor)
 
 Ignore departures which are less than I<minutes> from now.
 
-=item B<-O>, B<--output> I<outputtypes>
+=item B<-O>, B<--output> I<outputtypes> (monitor)
 
 For each result, show additional information as specified by I<outputtypes>.
 I<outputtypes> is a comma-separated list, the B<-O>/B<--output> option may
@@ -649,6 +749,12 @@ requested station.
 Show each departure's full route (timestamps and stop names) before and
 after the requested station.
 
+=item i / info
+
+Show station-specific information messages. These typically relate to
+construction work, broken elevators or escalators, or special announcements
+for large-scale events.
+
 =item r / route
 
 Show up to three stops between the requested station and the departure's
@@ -663,12 +769,12 @@ availability, delay reasons, and more.
 
 =back
 
-=item B<-p>, B<--platform> I<platforms>
+=item B<-p>, B<--platform> I<platforms> (monitor)
 
 Only show departures at I<platforms> (comma-separated list, option may be
 repeated).  Note that the C<< Bstg. >> / C<< Gleis >> prefix must be omitted.
 
-=item B<-r>, B<--relative>
+=item B<-r>, B<--relative> (monitor)
 
 Show relative departure times in minutes (i.e. the time difference between
 the departure and the time of the request).  In this case, realtime data is
@@ -679,7 +785,7 @@ already included.
 Short name of the EFA entry point. See Travel::Status::DE::EFA(3pm) and the
 B<--list> option for a list of services.
 
-=item B<-t>, B<--time> I<hh:mm>
+=item B<-t>, B<--time> I<hh:mm> (monitor)
 
 Show departures starting at I<time> instead of now.
 
@@ -688,7 +794,7 @@ Show departures starting at I<time> instead of now.
 Set timeout for HTTP requests. Default: 10 seconds. Set to 0 or a negative
 value to disable it.
 
-=item B<-v>, B<--via> I<station>
+=item B<-v>, B<--via> I<station> (monitor)
 
 Only show trains serving I<station> after the requseted stop, and show the
 arrival time at I<station> after the departure time at the current stop.

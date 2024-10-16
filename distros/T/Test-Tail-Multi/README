@@ -1,32 +1,51 @@
-Test-Tail-Multi version 0.01
-============================
+NAME
+    Test::Tail::Multi - execute code, monitor dynamic file contents
 
-This module is a generic means of executing arbitrary code and then watching
-the dynamic contents of associated files. It uses a callback-based structure
-to allow othe modules using it to set up whatever relationships are required
-between code and files being monitored.
+SYNOPSIS
+      use Test::Tail::Multi files => [qw(file1 file2)] tests=>2;
+      # Can add files dynamically as well
+      add_file('file3', "decided to add file3 too");
 
-INSTALLATION
+      # Execute a command and check against output
+      contents_like {system('my_command -my_args")}   # Note no trailing comma!
+                    qr/expected value/,
+                    "got the expected output");
 
-To install this module type the following:
+      # if code to execute is undef, check against previously captured new content
+      contents_unlike undef,                          # trailing command REQUIRED
+                      qr/unexpected text/,
+                      "unexpected stuff not found in same text");
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+      # Shorten the delay to 1 second.
+      delay(1, "Now a 1 second delay");
+      contents_like(sub {system('fast_command')},     # trailing comma in parens
+                    qr/expected/,
+                    "this command runs faster");
 
-DEPENDENCIES
+DESCRIPTION
+    "Test::Tail::Multi" allows you to create tests or test classes that
+    permit you to monitor the contents of one or more files a la <tail -f>
+    using the nice "File::Tail" module. You can execute arbitrary code and
+    then run tests versus the new content in the files.
 
-This module requires these other modules and libraries:
+    If you choose, you can run multiple tests against the same content by
+    passing "undef" as the code to be executed; "Test::Tail::Multi" will
+    then reuse the contents it last extracted.
 
-  File::Tail for file contents monitoring
-  Test::Builder for the TAP infrastructure
-  Test::Tester for testing the module
+    You can also adjust the delay time to be used to allow the code you
+    called to "settle down" before checking the tails.
 
-COPYRIGHT AND LICENCE
+    "Test::Tail::Multi" comes in handy for those testing jobs that require
+    you to monitor several files at once to see what's happening in each
+    one.
 
-Copyright (C) 2005 by Joe McMahon and Yahoo!
+AUTHOR
+    Joe McMahon, <mcmahon@yahoo-inc.com>
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.6 or,
-at your option, any later version of Perl 5 you may have available.
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Joe McMahon and Yahoo!
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: mozilla
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ requires:
 resources:
   bugtracker: https://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq/issues
   repository: git://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq.git
-version: '2.40012'
+version: '2.40013'
 x_contributors:
   - 'mstemle - Mike "manchicken" Stemle <hello@mikestemle.com>'
   - 'jesus - Theo Schlossnagle <jesus@omniti.com>'

@@ -19,4 +19,7 @@ Revision history for Mojo::Debugbar
         Bump version
 
 0.1.3   2024-10-14
-        Fix documenation
+        Fix documentation
+
+0.1.4   2024-10-15
+        Fix documentation for git monitor

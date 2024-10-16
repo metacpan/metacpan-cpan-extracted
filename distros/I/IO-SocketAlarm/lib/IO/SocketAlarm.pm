@@ -1,5 +1,5 @@
 package IO::SocketAlarm;
-$IO::SocketAlarm::VERSION = '0.002';
+$IO::SocketAlarm::VERSION = '0.003';
 # VERSION
 # ABSTRACT: Perform asynchronous actions when a socket changes status
 
@@ -12,7 +12,7 @@ XSLoader::load('IO::SocketAlarm', $IO::SocketAlarm::VERSION);
 
 # All exports are part of the Util sub-package.
 {package IO::SocketAlarm::Util;
-$IO::SocketAlarm::Util::VERSION = '0.002';
+$IO::SocketAlarm::Util::VERSION = '0.003';
    our @EXPORT_OK= qw( socketalarm get_fd_table_str is_socket );
    use Exporter 'import';
    # Declared in XS
@@ -115,6 +115,14 @@ way to wake it up is to close the file handles it is using.  For DBD::mysql and 
 doesn't even work because of mysql_auto_reconnect, and besides which, mysql servers don't
 notice that clients are gone until the current query ends.  Stopping a long-running mysql query
 can (seemingly) only be accomplished by running SQL on the server.
+
+B<Fifth caveat:> If you throw an exception in response to the signal and it occurs while an
+object destructor is running, the exception doesn't interrupt the main program flow.  This is
+a general problem with Perl's exceptions during destructors.  This is unlikely to impact you
+(if a destructor was running, then presumably the program wasn't stuck waiting on a long
+blocking process... unless it creates objects in a loop during that process) but if it does,
+you can work around it by writing a smarter signal handler that changes program state to
+indicate it's time to stop, rather than relying on Perl exceptions to bubble all the way up.
 
 =head1 EXPORTS
 
@@ -289,7 +297,7 @@ Render the alarm as user-readable text, for diagnosis and logging.
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

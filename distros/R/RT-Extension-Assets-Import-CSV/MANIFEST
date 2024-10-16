@@ -1,4 +1,3 @@
-bin/rt-assets-import-csv
 bin/rt-assets-import-csv.in
 Changes
 inc/Module/Install.pm

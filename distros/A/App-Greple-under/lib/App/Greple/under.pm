@@ -2,7 +2,7 @@ package App::Greple::under;
 use 5.024;
 use warnings;
 
-our $VERSION = "0.9902";
+our $VERSION = "0.9904";
 
 =encoding utf-8
 
@@ -14,7 +14,7 @@ App::Greple::under - greple under-line module
 
     greple -Munder::line ...
 
-    greple -Munder::mise ... | greple -Munder::bake
+    greple -Munder::mise ... | greple -Munder::place
 
 =head1 DESCRIPTION
 
@@ -58,13 +58,43 @@ Above command will produce output like this:
 
 If you want to process the search results before underlining them,
 process them in the C<-Munder::mise> module and then pass them through
-the C<-Munder::bake> module.
+the C<-Munder::place> module.
 
-    greple -Munder::mise ... | ... | greple -Munder::bake
+    greple -Munder::mise ... | ... | greple -Munder::place
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-under/main/images/mise-bake.png">
 </p>
+
+=head1 MODULE OPTION
+
+=head2 B<--config>
+
+Set config parameters.
+
+    greple -Munder::line --config type=eighth -- ...
+
+Configuable parameters:
+
+=over 4
+
+=item C<type>
+
+Set under-line type.
+
+=item C<sequence>
+
+Set under-line sequence.  The given string is broken down into single
+character sequences.
+
+=back
+
+=head2 B<--show-colormap>
+
+Print custom colormaps separated by whitespace characters.  You can
+read them into an array by L<bash(1)> like this:
+
+    read -a MAP < <(greple -Munder::place --show-colormap --)
 
 =head1 SEE ALSO
 
@@ -99,14 +129,26 @@ use App::Greple::Config qw(config);
 my $config = App::Greple::Config->new(
     type => 'overline',
     space => ' ',
+    sequence => '',
     'custom-colormap' => 1,
+    'show-colormap' => 0,
 );
 
 sub finalize {
     our($mod, $argv) = @_;
-    $config->deal_with($argv);
+    $config->deal_with($argv,
+		       "show-colormap!" => \$config->{"show-colormap"},
+		   );
     if (not $config->{'custom-colormap'}) {
 	$mod->setopt('--under-custom-colormap' => '$<ignore>');
+    }
+}
+
+sub prologue {
+    if ($config->{"show-colormap"}) {
+	prepare();
+	print "@color_list\n";
+	exit 0;
     }
 }
 
@@ -119,7 +161,7 @@ my %marks  = (
     overline => [ "\N{OVERLINE}" ],
     macron   => [ "\N{MACRON}" ],
     caret    => [ "^" ],
-    sign     => [ "+", "-" ],
+    sign     => [ qw( + - ~ ) ],
     number   => [ "0" .. "9" ],
     alphabet => [ "a" .. "z", "A" .. "Z" ],
     block => [
@@ -156,6 +198,7 @@ my @marks;
 
 sub prepare {
     @color_list == 0 and die "color table is not available.\n";
+
     my @ansi = map { ansi_code($_) } @color_list;
     my @ansi_re = map { s/\\\e/\\e/gr } map { quotemeta($_) } @ansi;
     %index = map { $ansi[$_] => $_ } keys @ansi;
@@ -164,15 +207,14 @@ sub prepare {
 	local $" = '|';
 	qr/(?<ansi>@ansi_re) (?<text>[^\e]*) (?<reset>$reset_re)/x;
     };
-    my $type = $config->{type};
-    if (my $mark = $marks{$type}) {
+    if (my $s = $config->{sequence}) {
+	@marks = $s =~ /\S/g;
+    }
+    elsif (my $mark = $marks{$config->{type}}) {
 	@marks = $mark->@*;
-    } else {
-	if ($type =~ /\A\X\z/) {
-	    @marks = ($type);
-	} else {
-	    die "$type: invalid type.\n";
-	}
+    }
+    else {
+	die "$config->{type}: invalid type.\n";
     }
 }
 
@@ -206,11 +248,14 @@ sub line {
 
 __DATA__
 
-option --under-line \
+option default \
+    --prologue &__PACKAGE__::prologue
+
+option --place-line \
     $<move> \
     --pf &__PACKAGE__::line
 
-option --under-custom-colormap \
+option --use-custom-colormap \
     $<move> \
     --cm @ \
     --cm {SGR26;1},{SGR26;2},{SGR26;3} \

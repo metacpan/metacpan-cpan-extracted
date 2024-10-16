@@ -3,7 +3,7 @@ package Test::XML::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Test::Builder;
 use Test::More;
@@ -40,8 +40,8 @@ sub xml_valid($;$) {
 
 sub _valid_xml {
   my $xml = shift;
- 
-  local $Test::Builder::Level = $Test::Builder::Level + 2; 
+
+  local $Test::Builder::Level = $Test::Builder::Level + 2;
   return fail("XML is not defined") unless defined $xml;
   return fail("XML is missing")     unless $xml;
   if ( ref $xml ) {
@@ -49,7 +49,7 @@ sub _valid_xml {
       $Xml = $xml;
   }
   else {
-    return fail("string can't contain XML: no tags") 
+    return fail("string can't contain XML: no tags")
       unless ($xml =~ /</ and $xml =~/>/);
     eval { $Xml = XML::LibXML->new->parse_string($xml); };
     do { chomp $@; return fail($@) } if $@;
@@ -60,11 +60,11 @@ sub _valid_xml {
 sub _find {
   my ($xml_xpath, $xpath) = @_;
   my @nodeset = $xml_xpath->findnodes($xpath);
-  local $Test::Builder::Level = $Test::Builder::Level + 2; 
+  local $Test::Builder::Level = $Test::Builder::Level + 2;
   return fail("Couldn't find $xpath") unless @nodeset;
   wantarray ? @nodeset : \@nodeset;
 }
-  
+
 
 sub xml_node($$;$) {
   my ($xml, $xpath, $comment) = @_;
@@ -90,7 +90,7 @@ sub xml_is_long($$$;$) {
 sub _xml_is {
   my ($comp_sub, $xml, $xpath, $value, $comment) = @_;
 
-  local $Test::Builder::Level = $Test::Builder::Level + 2; 
+  local $Test::Builder::Level = $Test::Builder::Level + 2;
   my $parsed_xml = _valid_xml($xml);
   return 0 unless $parsed_xml;
 
@@ -133,7 +133,7 @@ sub _xml_is_deeply {
 
   my $candidate_xp;
   eval {$candidate_xp = XML::LibXML->new->parse_string($candidate) };
-  return 0 unless $candidate_xp; 
+  return 0 unless $candidate_xp;
 
   my $parsed_thing    = $parsed_xml->findnodes($xpath)->[0];
   my $candidate_thing = $candidate_xp->findnodes('/')->[0];
@@ -141,7 +141,7 @@ sub _xml_is_deeply {
   $candidate_thing = $candidate_thing->documentElement
     if $parsed_thing->isa('XML::LibXML::Element');
 
-  $is_sub->($parsed_thing->toString, 
+  $is_sub->($parsed_thing->toString,
             $candidate_thing->toString,
             $comment);
 }

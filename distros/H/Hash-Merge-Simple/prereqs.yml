@@ -1,0 +1,8 @@
+runtime:
+  requires:
+    perl: 5.006000
+    Clone: 0
+    Storable: 0
+test:
+  requires:
+    Test::More: 0.88

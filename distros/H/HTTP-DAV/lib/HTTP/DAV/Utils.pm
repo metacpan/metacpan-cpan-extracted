@@ -215,6 +215,13 @@ sub make_uri {
     return $uri;
 }
 
+sub make_uri_canonical {
+    $_ = make_uri(shift);
+    s{/$}{};
+    s{(%[0-9a-fA-F][0-9a-fA-F])}{lc $1}eg;
+    return $_;
+}
+
 sub make_trail_slash {
     my ($uri) = @_;
     $uri =~ s{/*$}{}g;
@@ -225,13 +232,7 @@ sub make_trail_slash {
 sub compare_uris {
     my ($uri1,$uri2) = @_;
 
-    for ($uri1, $uri2) {
-        $_ = make_uri($_);
-        s{/$}{};
-        s{(%[0-9a-fA-F][0-9a-fA-F])}{lc $1}eg;
-	}
-
-    return $uri1 eq $uri2;
+    return make_uri_canonical($uri1) eq make_uri_canonical($uri2);
 }
 
 # This subroutine takes a URI and gets the last portion 

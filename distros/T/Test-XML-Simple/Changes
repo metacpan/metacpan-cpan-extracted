@@ -1,4 +1,8 @@
 Revision history for Perl extension Test::XML::Simple.
+1.06 Mon Oct 14, 18:49:5 PDT 2024
+  - Convert to Module::Build for better CPAN testing integration
+  - Fix failing test
+
 1.05 Tue Jan 3, 11:13:05 PST 2017
     - Yet more fixes from Sergiy Borodych (thanks for your patience!):
     -- Mark code in README with triple backticks

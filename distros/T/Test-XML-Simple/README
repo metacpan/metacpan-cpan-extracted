@@ -1,0 +1,83 @@
+NAME
+    Test::XML::Simple - easy testing for XML
+
+SYNOPSIS
+      use Test::XML::Simple tests => 8;
+
+      # pass string with XML as argument
+      xml_valid $xml, "Is valid XML";
+      xml_node $xml, "/xpath/expression", "specified xpath node is present";
+      xml_is, $xml, '/xpath/expr', "expected value", "specified text present";
+      xml_like, $xml, '/xpath/expr', qr/expected/, "regex text present";
+      xml_is_deeply, $xml, '/xpath/expr', $xml2, "structure and contents match";
+
+      # XML::LibXML::Document can be passed as argument too
+      #  that allow you to test a big documents with several tests
+      my $xml_doc = XML::LibXML->createDocument( '1.0' );
+      xml_valid $xml_doc, 'Is valid XML';
+      xml_node $xml_doc, '/xpath/expression', 'specified xpath node is present';
+      xml_like, $xml_doc, '/xpath/expression', qr/expected result/, 'regex present';
+
+      # Not yet implemented:
+      # xml_like_deeply would be nice too...
+
+DESCRIPTION
+    "Test::XML::Simple" is a very basic class for testing XML. It uses the
+    XPath syntax to locate nodes within the XML. You can also check all or
+    part of the structure vs. an XML fragment. All routines accept as first
+    argument string with XML or XML::LibXML::Document object.
+
+TEST ROUTINES
+  xml_valid $xml, 'test description'
+    Pass an XML file or fragment to this test; it succeeds if the XML
+    (fragment) is valid.
+
+  xml_node $xml, $xpath, 'test description'
+    Checks the supplied XML to see if the node described by the supplied
+    XPath expression is present. Test fails if it is not present.
+
+  xml_is_long $xml, $xpath, $value, 'test description'
+    Finds the node corresponding to the supplied XPath expression and
+    compares it to the supplied value. Succeeds if the two values match.
+    Uses Test::More's "is" function to do the comparison.
+
+  xml_is $xml, $xpath, $value, 'test description'
+    Finds the node corresponding to the supplied XPath expression and
+    compares it to the supplied value. Succeeds if the two values match.
+    Uses Test::LongString's "is_string" function to do the test.
+
+  xml_like_long $xml, $xpath, $regex, 'test description'
+    Find the XML corresponding to the the XPath expression and check it
+    against the supplied regular expression. Succeeds if they match. Uses
+    Test::More's "like" function to do the comparison.
+
+  xml_like $xml, $xpath, $regex, 'test description'
+    Find the XML corresponding to the the XPath expression and check it
+    against the supplied regular expression. Succeeds if they match. Uses
+    Test::LongString's "like_string" function to do the test.
+
+  xml_is_deeply_long $xml, $xpath, $xml2, 'test description'
+    Find the piece of XML corresponding to the XPath expression, and compare
+    its structure and contents to the second XML (fragment) supplied.
+    Succeeds if they match in structure and content. Uses Test::More's "is"
+    function to do the comparison.
+
+  xml_is_deeply $xml, $xpath, $xml2, 'test description'
+    Find the piece of XML corresponding to the XPath expression, and compare
+    its structure and contents to the second XML (fragment) supplied.
+    Succeeds if they match in structure and content. Uses Test::LongString's
+    "is_string" function to do the test.
+
+AUTHOR
+    Joe McMahon, <mcmahon@cpan.org>
+
+LICENSE
+    Copyright (c) 2005-2013 by Yahoo! and Joe McMahon
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6.1 or, at
+    your option, any later version of Perl 5 you may have available.
+
+SEE ALSO
+    XML::LibXML, Test::More, Test::Builder.
+

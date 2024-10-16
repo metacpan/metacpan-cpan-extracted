@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use utf8; # filenames can be in utf8
 
@@ -379,7 +379,7 @@ Automate::Animate::FFmpeg - Create animation from a sequence of images using FFm
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 
 =head1 SYNOPSIS

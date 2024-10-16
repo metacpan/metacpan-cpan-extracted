@@ -1,24 +1,149 @@
-Tie::Hash::MultiValue.pm 
+NAME
+    Tie::Hash::MultiValue - store multiple values per key
 
-A simple module implementing a tied class for hashes which can store 
-multiple values per key. It's specifically designed to be used in code 
-that was already using a standard hash and now needs to be able to store 
-multiple items per key. (This is in contrast to Data::MultiValueHash, which 
-creates an object which implements multiple values per key, but handles 
-access via method calls rather than the standard hash interface.)
+SYNOPSIS
+      use Tie::Hash::MultiValue;
+      my $controller = tie %hash, 'Tie::Hash::MultiValue';
+      $hash{'foo'} = 'one';
+      $hash{'bar'} = 'two';
+      $hash{'bar'} = 'three';
 
-In addition, you can specify that you want only unique items to be stored;
-you can even supply your own function to make the decision as to what's 
-unique and what's not yourself.
+      # Fetch the values as references to arrays.
+      $controller->refs;
+      my @values  = @{$hash{'foo'}};   # @values = ('one');
+      my @more    = @{$hash{'bar'}};   # @more   = ('two', 'three');
+      my @nothing = @{$hash{'baz'}};   # empty list if nothing there
 
-See the man page for further details.
+      # You can tie an anonymous hash as well.
+      my $hashref = {};
+      tie %$hashref, 'Tie::Hash::MultiValue';
+      $hashref->{'sample'} = 'one';
+      $hashref->{'sample'} = 'two';
+      # $hashref->{'sample'} now contains ['one','two']
 
-To install:
+      # Iterate over the items stored under a key.
+      $controller->iterators;
+      while(my $value = $hash{bar}) {
+        print "bar: $value\n";
+      }
+      # prints
+      #   bar: two
+      #   bar: three
 
-perl Makefile.PL
-make
-make test
-make install
+DESCRIPTION
+    "Tie::Hash::MultiValue" allows you to have hashes which store their
+    values in anonymous arrays, appending any new value to the
+    already-existing ones.
 
+    This means that you can store as many items as you like under a single
+    key, and access them all at once by accessing the value stored under the
+    key.
 
-If you are on a windows box you should use 'nmake' rather than 'make'.
+USAGE
+    See the synopsis for a typical usage.
+
+BUGS
+    None currently known.
+
+SUPPORT
+    Contact the author for support.
+
+AUTHOR
+            Joe McMahon
+            CPAN ID: MCMAHON
+            mcmahon@ibiblio.org
+            http://ibiblio.org/mcmahon
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    Tie::Hash, perl(1), Perl Cookbook (1st version) recipe 13.15, program
+    13-5.
+
+METHODS
+    This class is a subclass of "Tie::ExtraHash"; it needs to override the
+    "TIEHASH" method to save the instance data (in $self->[1]), and the
+    "STORE" method to actually save the values in an anonymous array.
+
+  TIEHASH
+    If the 'unique' argument is supplied, we check to see if it supplies a
+    subroutine reference to be used to compare items. If it does, we store
+    that reference in the object describing this tie; if not, we supply a
+    function which simply uses 'eq' to test for equality.
+
+   The 'unique' function
+    This funtion will receive two scalar arguments. No assumption is made
+    about whether or not either argument is defined, nor whether these are
+    simple scalars or references. You can make any of these assumptions if
+    you choose, but you are responsible for checking your input.
+
+    You can perform whatever tests you like in your routine; you should
+    return a true value if the arguments are determined to be equal, and a
+    false one if they are not.
+
+  STORE
+    Push the value(s) supplied onto the list of values stored here. The
+    anonymous array is created automatically if it doesn't yet exist.
+
+    If the 'unique' argument was supplied at the time the hash was tied, we
+    will use the associated function (either yours, if you supplied one; or
+    ours, if you didn't) and only add the item or items that are not
+    present.
+
+  FETCH
+    Fetches the current value(s) for a key, depending on the current mode
+    we're in.
+
+    *   'refs' mode
+
+        Always returns an anonymous array containing the values stored under
+        this key, or an empty anonymous array if there are none.
+
+    *   'iterators' mode
+
+        If there is a single entry, acts just like a normal hash fetch. If
+        there are multiple entries for a key, we automatically iterate over
+        the items stored under the key, returning undef when the last item
+        under that key has been fetched.
+
+        Storing more elements into a key while you're iterating over it will
+        result in the new elements being returned at the end of the list. If
+        you've turned on 'unique', remember that they won't be stored if
+        they're already in the value list for the key.
+
+            NOTE: If you store undef in your hash, and then store other
+            values, the iterator will, when it sees your undef, return it as
+            a normal value. This means that you won't be able to tell
+            whether that's *your* undef, or the 'I have no more data here'
+            undef. Using 'list' or 'refs' mode is strongly suggested if you
+            need to store data that may include undefs.
+
+        Note that every key has its own iterator, so you can mix accesses
+        across keys and still get all the values:
+
+          my $controller = tie %hash, 'Tie::Hash::MultiValue';
+          $controller->iterators;
+          $hash{x} = $_ for qw(a b c);
+          $hash{y} = $_ for qw(d e f);
+          while ( my($x, $y) = ($hash{x}, $hash{y}) {
+             # gets (a,d) (b,e) (c,f)
+          }
+
+  iterators
+    Called on the object returned from tie(). Tells FETCH to return elements
+    one at a time each time the key is accessed until no more element
+    remain.
+
+  refs
+    Tells FETCH to always return the reference associated with a key. (This
+    allows you to, for instance, replace all of the values at once with
+    different ones.)
+
+  mode
+    Tells you what mode you're currently in. Does *not* let you change it!
+

@@ -4,7 +4,10 @@ use warnings;
 package RT::Extension::Assets::Import::CSV;
 use Text::CSV_XS;
 
-our $VERSION = '2.3';
+use Data::Dumper;
+$Data::Dumper::Deparse = 1;
+
+our $VERSION = '2.4';
 
 sub _column {
     ref($_[0]) ? (ref($_[0]) eq "CODE" ?
@@ -16,10 +19,11 @@ sub _column {
 sub run {
     my $class = shift;
     my %args  = (
-        CurrentUser => undef,
-        File        => undef,
-        Update      => undef,
-        Insert      => undef,
+        CurrentUser     => undef,
+        File            => undef,
+        Update          => undef,
+        Insert          => undef,
+        DryRun          => undef,
         @_,
     );
 
@@ -39,8 +43,18 @@ sub run {
 
     my $field2csv = RT->Config->Get('AssetsImportFieldMapping');
     my $csv2fields = {};
-    push @{$csv2fields->{ $field2csv->{$_} }}, $_
-        for grep { not ref $field2csv->{$_} } keys %{$field2csv};
+    for my $field (keys %$field2csv) {
+        if (ref $field2csv->{$field} eq "CODE") {
+            my $code = Dumper($field2csv->{$field});
+            $code =~ s/^\$VAR1 = //;
+            my @fields = $code =~ /\$_\[0\]\{'(.*?)'\}/g;
+            $csv2fields->{$_} = $field for @fields;
+        } elsif (ref $field2csv->{$field}) {
+            next;
+        } else {
+            $csv2fields->{$field2csv->{$field}} = $field;
+        }
+    }
 
     my %cfmap;
     for my $fieldname (keys %{ $field2csv }) {
@@ -82,10 +96,13 @@ sub run {
         return (0, 0, 0);
     }
 
-    RT->Logger->debug( "Found unused column '$_'" )
-        for grep {not $csv2fields->{$_}} keys %{ $items[0] };
-    RT->Logger->warning( "No column $_ found for @{$csv2fields->{$_}}" )
-        for grep {not exists $items[0]->{$_} } keys %{ $csv2fields };
+    my ( $ok, @warnings) = $class->sanity_check( $args{CurrentUser}, \@items, $field2csv, $csv2fields, $unique, $unique_cf );
+
+    RT->Logger->warning( $_ ) for @warnings;
+
+    if ($args{DryRun}) {
+        RT->Logger->warn( "Dry run mode, not importing" );
+    }
 
     RT->Logger->debug( 'Found ' . scalar(@items) . ' record(s)' );
     my ( $created, $updated, $skipped ) = (0) x 3;
@@ -93,7 +110,19 @@ sub run {
     my @later;
     for my $item (@items) {
         $i++;
-        next unless grep {/\S/} values %{$item};
+        next unless grep { defined && /\S/ } values %{$item};
+
+        if ($item->{'_skip'}) {
+            RT->Logger->warning(
+                "Skipping row $i: $item->{'_skip_reason'}"
+            );
+            push @warnings,
+                $args{CurrentUser}->loc(
+                    "Skipping row [_1]: ".$item->{'_skip_reason'}, $i
+                );
+            $skipped++;
+            next;
+        }
 
         my @missing = grep {not $item->{$_}} @required_columns;
         if (@missing) {
@@ -103,6 +132,11 @@ sub run {
             } else {
                 RT->Logger->warning(
                     "Missing value for required column@{[@missing > 1 ? 's':'']} @missing at row $i, skipping");
+                push @warnings,
+                    $args{CurrentUser}->loc(
+                        "Missing value for required column@{[@missing > 1 ? 's':'']} @missing at row $i"
+                    );
+
                 $skipped++;
             }
             next;
@@ -124,6 +158,10 @@ sub run {
                 RT->Logger->warning(
                     "Found multiple assets for @{[$unique||'id']} = $id_value"
                 );
+                push @warnings,
+                    $args{CurrentUser}->loc(
+                        "Found multiple assets for @{[$unique||'id']} = $id_value"
+                    );
                 $skipped++;
                 next;
             }
@@ -131,6 +169,10 @@ sub run {
                 RT->Logger->debug(
                     "Found existing asset at row $i but without 'Update' option, skipping."
                 );
+                push @warnings,
+                    $args{CurrentUser}->loc(
+                        "Found existing asset at row $i but without 'Update' option, skipping."
+                    );
                 $skipped++;
                 next;
             }
@@ -157,12 +199,18 @@ sub run {
                     next if grep {$_->Content and $_->Content eq $value} @current;
 
                     $changes++;
-                    my ($ok, $msg) = $asset->AddCustomFieldValue(
-                        Field => $cfmap{$cfname}->id,
-                        Value => $value,
-                    );
-                    unless ($ok) {
-                        RT->Logger->error("Failed to set CF $cfname to $value for row $i: $msg");
+                    unless ( $args{DryRun} ) {
+                        my ($ok, $msg) = $asset->AddCustomFieldValue(
+                            Field => $cfmap{$cfname}->id,
+                            Value => $value,
+                        );
+                        unless ($ok) {
+                            RT->Logger->error("Failed to set CF $cfname to $value for row $i: $msg");
+                            push @warnings,
+                                $args{CurrentUser}->loc(
+                                    "Failed to set CF $cfname to $value for row $i: $msg"
+                                );
+                        }
                     }
                 } elsif ($asset->HasRole($field)) {
                     my $user = RT::User->new( $args{CurrentUser} );
@@ -171,9 +219,15 @@ sub run {
                     next if $asset->RoleGroup($field)->HasMember( $user->PrincipalId );
 
                     $changes++;
-                    my ($ok, $msg) = $asset->AddRoleMember( PrincipalId => $user->PrincipalId, Type => $field );
-                    unless ($ok) {
-                        RT->Logger->error("Failed to set $field to $value for row $i: $msg");
+                    unless ( $args{DryRun} ) {
+                        my ($ok, $msg) = $asset->AddRoleMember( PrincipalId => $user->PrincipalId, Type => $field );
+                        unless ($ok) {
+                            RT->Logger->error("Failed to set $field to $value for row $i: $msg");
+                            push @warnings,
+                                $args{CurrentUser}->loc(
+                                    "Failed to set $field to $value for row $i: $msg"
+                                );
+                        }
                     }
                 } else {
                     if ($field eq "Catalog") {
@@ -184,10 +238,16 @@ sub run {
 
                     if ($asset->$field ne $value) {
                         $changes++;
-                        my $method = "Set" . $field;
-                        my ($ok, $msg) = $asset->$method( $value );
-                        unless ($ok) {
-                            RT->Logger->error("Failed to set $field to $value for row $i: $msg");
+                        unless ( $args{DryRun} ) {
+                            my $method = "Set" . $field;
+                            my ($ok, $msg) = $asset->$method( $value );
+                            unless ($ok) {
+                                RT->Logger->error("Failed to set $field to $value for row $i: $msg");
+                                push @warnings,
+                                    $args{CurrentUser}->loc(
+                                        "Failed to set $field to $value for row $i: $msg"
+                                    );
+                            }
                         }
                     }
                 }
@@ -199,31 +259,39 @@ sub run {
             }
         } else {
             my $asset = RT::Asset->new( $args{CurrentUser} );
-            my %args;
+            my %asset_args;
 
             for my $field (keys %$field2csv ) {
                 my $value = $class->get_value($field2csv->{$field}, $item);
                 next unless defined $value and length $value;
                 if ($field =~ /^CF\.(.*)/) {
                     my $cfname = $1;
-                    $args{"CustomField-".$cfmap{$cfname}->id} = $value;
+                    $asset_args{"CustomField-".$cfmap{$cfname}->id} = $value;
                 } else {
-                    $args{$field} = $value;
+                    $asset_args{$field} = $value;
                 }
             }
 
-            my ($ok, $msg, $err) = $asset->Create( %args );
-            if ($ok) {
+
+            if ( $args{DryRun} ) {
+                # Would try to create
                 $created++;
-            } elsif ($err and @{$err}) {
-                RT->Logger->warning(join("\n", "Warnings during create for row $i: ", @{$err}) );
             } else {
-                RT->Logger->error("Failed to create asset for row $i: $msg");
+                my ($ok, $msg, $err) = $asset->Create( %asset_args );
+                if ($ok) {
+                    $created++;
+                } elsif ($err and @{$err}) {
+                    RT->Logger->warning(join("\n", "Warnings during create for row $i: ", @{$err}) );
+                    push @warnings, join("\n", "Warnings during create for row $i: ", @{$err});
+                } else {
+                    RT->Logger->error("Failed to create asset for row $i: $msg");
+                    push @warnings, "Failed to create asset for row $i: $msg";
+                }
             }
         }
     }
 
-    unless ($unique) {
+    unless ($unique && !$args{DryRun}) {
         # Update Asset sequence; mysql and SQLite do this implicitly
         my $dbtype = RT->Config->Get('DatabaseType');
         my $dbh = RT->DatabaseHandle->dbh;
@@ -245,30 +313,71 @@ sub run {
     for my $item (@later) {
         my $row = delete $item->{''};
         my $asset = RT::Asset->new( $args{CurrentUser} );
-        my %args;
+        my %asset_args;
 
         for my $field (keys %$field2csv ) {
             my $value = $class->get_value($field2csv->{$field}, $item);
             next unless defined $value and length $value;
             if ($field =~ /^CF\.(.*)/) {
                 my $cfname = $1;
-                $args{"CustomField-".$cfmap{$cfname}->id} = $value;
+                $asset_args{"CustomField-".$cfmap{$cfname}->id} = $value;
             } else {
-                $args{$field} = $value;
+                $asset_args{$field} = $value;
             }
         }
 
-        my ($ok, $msg, $err) = $asset->Create( %args );
-        if ($ok) {
+        if ( $args{DryRun} ) {
+            # Would try to create
             $created++;
-        } elsif ($err and @{$err}) {
-            RT->Logger->warning(join("\n", "Warnings during create for row $row: ", @{$err}) );
         } else {
-            RT->Logger->error("Failed to create asset for row $row: $msg");
+            my ($ok, $msg, $err) = $asset->Create( %asset_args );
+            if ($ok) {
+                $created++;
+            } elsif ($err and @{$err}) {
+                RT->Logger->warning(join("\n", "Warnings during create for row $row: ", @{$err}) );
+                push @warnings, join("\n", "Warnings during create for row $row: ", @{$err});
+            } else {
+                RT->Logger->error("Failed to create asset for row $row: $msg");
+                push @warnings, "Failed to create asset for row $row: $msg";
+            }
         }
     }
 
-    return ( $created, $updated, $skipped );
+    return ( $created, $updated, $skipped, @warnings);
+}
+
+sub sanity_check {
+    my $class = shift;
+    my ($CurrentUser, $items, $field2csv, $csv2fields, $unique, $unique_cf) = @_;
+
+    my $ok = 1;
+    my @warnings;
+
+    # Check if number of columns in CSV matches the number of columns in the mapping
+    my @columns = keys %{ $items->[0] };
+    my @mapped_columns = keys %{ $field2csv };
+    if (scalar @columns != scalar @mapped_columns) {
+        push @warnings, $CurrentUser->loc(
+            'Number of columns in CSV ([_1]) does not match the number of expected columns ([_2])',
+            scalar @columns, scalar @mapped_columns );
+        $ok = 0;
+    }
+
+    # Check if all columns in the CSV are used in the mapping
+    for ( grep {not $csv2fields->{$_}} keys %{ $items->[0] } ) {
+        push @warnings, $CurrentUser->loc(
+            'Found unused column "[_1]" in CSV', $_ );
+        $ok = 0;
+    }
+
+    # Check if all columns of the mapping are present in the CSV
+    for ( grep {not exists $items->[0]->{$_} } keys %{ $csv2fields } ) {
+        push @warnings, $CurrentUser->loc(
+            'No column "[_1]" found in CSV', $_ );
+        $ok = 0;
+    }
+
+    return wantarray ? ($ok, @warnings) : $ok;
 }
 
 sub get_value {
@@ -288,7 +397,8 @@ sub parse_csv {
     my $file  = shift;
 
     my @rows;
-    my $csv = Text::CSV_XS->new( { binary => 1 } );
+    my $opts = RT->Config->Get( 'AssetsImportParserOptions' ) // { binary => 1 };
+    my $csv  = Text::CSV_XS->new( $opts );
 
     open my $fh, '<', $file or die "failed to read $file: $!";
     my $header = $csv->getline($fh);
@@ -296,6 +406,11 @@ sub parse_csv {
     my @items;
     while ( my $row = $csv->getline($fh) ) {
         my $item;
+        if (scalar @$header != scalar @$row) {
+            $item->{'_skip'} = 1;
+            $item->{'_skip_reason'} = 'Number of columns does not match CSV header. Broken CSV?';
+        }
+
         for ( my $i = 0 ; $i < @$header ; $i++ ) {
             if ( $header->[$i] ) {
                 $item->{ $header->[$i] } = $row->[$i];
@@ -417,6 +532,24 @@ the C<%AssetsImportFieldMapping>:
 
 This requires that, after the import, RT becomes the generator of all
 asset ids.  Otherwise, asset id conflicts may occur.
+
+=head2 Configuring Text::CSV_XS
+
+This extension is built upon L<Text::CSV_XS>, which takes a number of
+options for controlling its behavior. You may have a different
+field delimiter, or byte-order-marking (BOM), for example, and need to
+enable configuration to support it. Options set in
+C<%AssetsImportParserOptions> will be passed directly to C<new()> in
+L<Text::CSV_XS>:
+
+    Set( $AssetsImportParserOptions, {
+        binary     => 1,
+        detect_bom => 1,
+        sep_char   => '|',
+    });
+
+The only default option is C<binary =E<gt> 1>. More information is available
+in the L<Text::CSV_XS> documentation.
 
 =head1 AUTHOR
 

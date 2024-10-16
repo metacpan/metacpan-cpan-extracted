@@ -1,5 +1,12 @@
 Revision history for Perl module XML::RSS
 
+1.64    2024-10-16
+    - Avoid double $VERSION
+        - https://github.com/shlomif/perl-XML-RSS/pull/23
+        - https://github.com/shlomif/perl-XML-RSS/issues/18
+        - Thanks to @yoshikazusawa
+        - Thanks to @hvds
+
 1.63    2023-12-26
     - Add allow_empty .
         - https://github.com/shlomif/perl-XML-RSS/issues/20

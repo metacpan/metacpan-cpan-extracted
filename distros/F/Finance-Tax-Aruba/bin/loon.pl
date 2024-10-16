@@ -130,10 +130,11 @@ my @order = qw(
     fringe
     bonus
     bruto
+    -
     werving
+    pensioen_employee
     jaarloon
     -
-    pensioen_employee
     azv
     aov
     -
@@ -298,7 +299,7 @@ loon.pl - A salary cost calculator
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

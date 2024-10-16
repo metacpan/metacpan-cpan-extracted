@@ -1,4 +1,19 @@
 Revision history for Perl extension Dist-Zilla-App-Command-DiffMint
 
+v0.2.0  2024-10-16
+  - reverse the order of the diff
+  - allow specifying files to diff rather than entire dist
+
+v0.1.3  2024-10-15
+  - fix file headers when files don't exist to properly use /dev/null
+  - fix mode headers to match git
+
+v0.1.2  2024-10-15
+  - fix duplicate output of diffs
+  - remove debugging warning
+
+v0.1.1  2024-10-15
+  - fixed command name in documentation
+
 v0.1.0  2024-10-15
   - initial release

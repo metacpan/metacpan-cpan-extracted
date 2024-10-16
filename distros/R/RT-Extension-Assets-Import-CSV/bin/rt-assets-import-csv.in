@@ -9,7 +9,8 @@ use lib qw(/opt/rt5/local/lib /opt/rt5/lib);
 
 use Getopt::Long;
 my %opt;
-GetOptions( \%opt, 'help|h', 'update|u', 'insert|i', 'debug|d', 'mdy', 'dmy', 'config|c=s' );
+GetOptions( \%opt, 'help|h', 'update|u', 'insert|i', 'debug|d',
+            'mdy', 'dmy', 'config|c=s', 'dry-run');
 my $file = shift @ARGV;
 
 if ( $opt{help} || !$file ) {
@@ -50,17 +51,27 @@ unless ( $current_user->Id ) {
 }
 
 my ( $created, $updated, $skipped ) = RT::Extension::Assets::Import::CSV->run(
-    CurrentUser => $current_user,
-    File        => $file,
-    Update      => $opt{update},
-    Insert      => $opt{insert},
+    CurrentUser     => $current_user,
+    File            => $file,
+    Update          => $opt{update},
+    Insert          => $opt{insert},
+    DryRun          => $opt{"dry-run"},
 );
 
-print <<"EOF";
-created: $created
-updated: $updated
-skipped: $skipped
+if ( $opt{"dry-run"} ) {
+    print <<"EOF";
+    dry-run: no changes made
+    Would create: $created
+    Would update: $updated
+    Would skip: $skipped
 EOF
+} else {
+    print <<"EOF";
+    created: $created
+    updated: $updated
+    skipped: $skipped
+EOF
+}
 
 __END__
 
@@ -109,6 +120,11 @@ id as needed) after all other operations.
 Force RT to parse dates as C<mm/dd/yy> or C<dd/mm/yy>, respectively.  In
 the absence of this option, RT will default to the C<DateDayBeforeMonth>
 setting, which defaults to C<dd/mm/yy>.
+
+=item dry-run
+
+If this option is provided, the script will only read the CSV and
+perform sanity checks, but will not import or update any assets.
 
 =item C<--debug>
 

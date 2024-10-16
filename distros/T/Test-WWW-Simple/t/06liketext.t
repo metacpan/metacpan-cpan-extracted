@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 use strict;
 BEGIN {
   unshift @INC, './t';
@@ -15,7 +14,7 @@ BEGIN {
 }
 
 use Test::Tester;
-use Test::More tests =>11;
+use Test::More;
 use Test::WWW::Simple;
 use LocalServer;
 use WWW::Mechanize;
@@ -34,10 +33,7 @@ my $html = <<HTML;
 <head><title>%s</title></head>
 <body>
 Wha<i>t</i>ev<blink>e</blink><b>r</b>.
-Session: %s
-Query: %s
-Categories: %s and %s
-<</body>
+</body>
 </html>
 HTML
 
@@ -47,6 +43,7 @@ SKIP: {
   my $server = LocalServer->spawn( html => $html );
   isa_ok( $server, "LocalServer" );
 
+  # look for perl on perl.org - should succeed
   @results = run_tests(
       sub {
             text_like($server->url(), qr/Whatever/, "clean text match")
@@ -56,7 +53,7 @@ SKIP: {
   is($results[1]->{diag}, '', 'no diagnostic');
 
   # 2. Page not like the regex
-  $message1 = qr|\s+got: "/ Whatever. |;
+  $message1 = qr|\s+got: "/ Whatever. "\n|;
   $message2 = qr|\s+length: \d+\n|;
   $message3 = qr|\s+doesn't match .*?Definite|;
 
@@ -65,8 +62,7 @@ SKIP: {
           text_like($server->url(), qr/Definite/, "Looking for text not there");
       },
     );
-  like($results[1]->{diag}, qr/$message1/, 'message about right')
-    or diag $results[1]->{diag};
+  like($results[1]->{diag}, qr/$message1/, 'message about right');
   like($results[1]->{diag}, qr/$message2/, 'message about right');
   like($results[1]->{diag}, qr/$message3/, 'message about right');
   ok(!$results[1]->{ok}, 'failed as expected');
@@ -102,3 +98,4 @@ ok(!$results[1]->{ok}, 'worked as expected');
   );
 is($results[1]->{diag}, '', "No diag to match");
 ok(!$results[1]->{ok}, "worked as expected");
+done_testing;

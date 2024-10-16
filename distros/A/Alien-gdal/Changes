@@ -1,7 +1,15 @@
 Revision history for Alien::gdal
 
+1.38 2024-xx-xx
+    - Share builds:
+        Use the internal libgeotiff
+        Disable Java bindings for faster builds
+        Disable use of system libspatialite if Alien::proj is a share build.
+          This sidesteps seg faults due to use of two libproj instances.
+    - Tweaks to the build system.
+
 1.37 2024-05-28
-    - More effective search for the data dir for systems installs using homebrew
+    - More effective search for the data dir for system installs using homebrew
 
 1.36 2022-11-28
     - Unices: fix rpath check for lib, lib64 and lib32

@@ -16,12 +16,7 @@ void watch_thread_log(void* buffer, int len) {
 #endif
 
 void* watch_thread_main(void* unused) {
-   sigset_t mask;
-   sigfillset(&mask);
-   if (pthread_sigmask(SIG_BLOCK, &mask, NULL) != 0)
-      perror("pthread_sigmask");
-   else
-      while (do_watch()) {}
+   while (do_watch()) {}
    return NULL;
 }
 
@@ -230,6 +225,8 @@ bool do_watch() {
 // May only be called by Perl's thread
 static bool watch_list_add(struct socketalarm *alarm) {
    int i;
+   const char *error= NULL;
+
    if (pthread_mutex_lock(&watch_list_mutex))
       croak("mutex_lock failed");
 
@@ -268,23 +265,28 @@ static bool watch_list_add(struct socketalarm *alarm) {
    
    // If the thread is not running, start it.  Also create pipe if needed.
    if (control_pipe[1] < 0) {
-      if (pipe(control_pipe) != 0) {
-         pthread_mutex_unlock(&watch_list_mutex);
-         croak("pipe() failed");
-      }
+      int ret= 0;
+      sigset_t mask, orig;
+      sigfillset(&mask);
 
-      if (pthread_create(&watch_thread, NULL, (void*(*)(void*)) watch_thread_main, NULL) != 0) {
-         pthread_mutex_unlock(&watch_list_mutex);
-         croak("pthread_create failed");
-      }
+      if (pipe(control_pipe) != 0)
+         error= "pipe() failed";
+      // Block all signals before creating thread so that the new thread inherits it,
+      // then restore the original signals.
+      else if (pthread_sigmask(SIG_SETMASK, &mask, &orig) != 0)
+         error= "pthread_sigmask(BLOCK) failed";
+      else if (pthread_create(&watch_thread, NULL, (void*(*)(void*)) watch_thread_main, NULL) != 0)
+         error= "pthread_create failed";
+      else if (pthread_sigmask(SIG_SETMASK, &orig, NULL) != 0)
+         error= "pthread_sigmask(UNBLOCK) failed";
    } else {
       char msg= CONTROL_REWATCH;
-      if (write(control_pipe[1], &msg, 1) != 1) {
-         pthread_mutex_unlock(&watch_list_mutex);
-         croak("failed to notify watch_thread");
-      }
+      if (write(control_pipe[1], &msg, 1) != 1)
+         error= "failed to notify watch_thread";
    }
    pthread_mutex_unlock(&watch_list_mutex);
+   if (error)
+      croak(error);
    return i < 0;
 }
 

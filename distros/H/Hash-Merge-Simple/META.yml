@@ -3,17 +3,36 @@ abstract: 'Recursively merge two or more hashes, simply'
 author:
   - 'Robert Krimen <robertkrimen@gmail.com>'
 build_requires:
-  Test::Most: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 6.31
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.102400'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Hash-Merge-Simple
+provides:
+  Hash::Merge::Simple:
+    file: lib/Hash/Merge/Simple.pm
+    version: '0.052'
 requires:
-  Clone: 0
-  Storable: 0
-version: 0.051
+  Clone: '0'
+  Storable: '0'
+  perl: '5.006000'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Merge-Simple
+  repository: https://github.com/haarg/Hash-Merge-Simple.git
+version: '0.052'
+x_contributors:
+  - 'Graham Knop <haarg@haarg.org>'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1
+x_use_unsafe_inc: 0

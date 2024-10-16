@@ -1,4 +1,11 @@
 Revision history for HTTP::DAV
+  v0.50 (released 2024/10/16):
+    *   bug fixes
+
+        Fixed missing custom headers when calling PUT methods. Closes
+        "RT#100756". Thanks Georg Acher for the patch and for patiently
+        waiting a decade (!) for a fix.
+
   v0.49 (released 2018/11/28):
     *   bug fixes
 
@@ -8,7 +15,7 @@ Revision history for HTTP::DAV
         Fixed "propfind" response handling to also consider successful an
         HTTP 207 status code. Closes "RT#127591".
 
-        Fixed "clone()" method to properly respect the class name. Closes
+        Fixed clone() method to properly respect the class name. Closes
         "RT#123528". Thanks to Ricardo Signes for the patch.
 
     *   documentation fixes
@@ -24,8 +31,8 @@ Revision history for HTTP::DAV
   v0.47 (released 2012/03/24):
     *   bug fixes
 
-        Improve "propfind()" resilience when server response contains
-        broken, truncated or no XML at all. RT#75011.
+        Improve propfind() resilience when server response contains broken,
+        truncated or no XML at all. RT#75011.
 
   v0.46 (released 2012/01/11):
     *   improvements

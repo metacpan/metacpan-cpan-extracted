@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
 		'pod2htmd.tmp'
     ] },
     postamble => {
-        LIVE_FILES => 'xt/live/*.t'
+        LIVE_FILES => 'xt/*.t'
     },
     # Thanks to marto @ Perlmonks.org
     # see https://perlmonks.org/?displaytype=displaycode;node_id=359256;part=1;abspart=1
@@ -112,7 +112,7 @@ if( ! defined $ffmpeg_exe ){
 if( ! defined $ffmpeg_exe ){
 	print STDERR "============================================\n$0 : Warning, FFmpeg executable was not found anywhere in the path. If you have it installed, then set environment variable AUTOMATE_ANIMATE_FFMPEG_PATH to the executables's fullpath and rerun the make procedure. Or install it. \n============================================\n";
 	# we are bailing out, no ffmpeg executable was found
-	#exit(1);
+	exit(1);
 }
 
 # we have found FFmpeg executable:

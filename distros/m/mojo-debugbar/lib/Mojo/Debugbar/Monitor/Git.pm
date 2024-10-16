@@ -79,6 +79,12 @@ sub start {
     });
 }
 
+=head2 git_info
+
+    Get the git info
+
+=cut
+
 sub git_info {
     my $self = shift;
     my $home = shift;

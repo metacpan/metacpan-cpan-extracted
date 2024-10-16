@@ -1,8 +1,9 @@
+Build.PL
 Changes
-lib/Test/XML/Simple.pm
-Makefile.PL
 MANIFEST
+Makefile.PL
 README.md
+lib/Test/XML/Simple.pm
 t/01load.t
 t/02import.t
 t/03valid.t
@@ -13,5 +14,6 @@ t/07deeply.t
 t/08attr.t
 t/pod-coverage.t
 t/pod.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+README
+META.yml
+META.json

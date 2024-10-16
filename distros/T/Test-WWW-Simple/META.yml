@@ -1,31 +1,31 @@
 ---
-abstract: 'Test Web applications using TAP'
+abstract: 'Simple text-based tests for web pages'
 author:
   - 'Joe McMahon <mcmahon@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Mojolicious: '8.11'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: unknown
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Test-WWW-Simple
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Test::WWW::Simple:
+    file: lib/Test/WWW/Simple.pm
+    version: '0.41'
 requires:
   HTML::Tree: '0'
-  Mojolicious: '0'
   Regexp::Common: '0'
-  Test2::V0: '0'
   Test::Builder: '0'
   Test::LongString: '0'
   Test::Tester: '0'
   WWW::Mechanize: '0'
   WWW::Mechanize::Pluggable: '1.07'
-version: '0.40'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

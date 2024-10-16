@@ -10,7 +10,7 @@ dave - DAV Explorer
 
     dave [OPTIONS] URL
 
-E.g. 
+e.g. 
 
    $ dave -u pcollins -p mypass www.host.org/dav_dir/
    ...
@@ -82,7 +82,7 @@ $help->parse_from_filehandle(\*DATA);
 
 ## Setup the valid commands and synonyms
 my @valid_commands = qw( cd cat copy delete edit get help
-   lcd lls ls lock mkcol move open options propfind put pwd
+   lcd lls ls lpwd lock mkcol move open options propfind put pwd
    quit set sh showlocks steal unlock unset );
 
 my %command_synonyms = qw(
@@ -300,7 +300,6 @@ sub command_edit {
 }
 
 
-
 sub command_get { 
    my ($remote,$local) = @_;
    $local ||= ".";
@@ -395,6 +394,11 @@ sub command_lls {
    system("ls @args");
 }
 
+# LPWD
+sub command_lpwd {
+  system("pwd");
+}
+
 # LS (client)
 sub command_ls {
    my $resource = $gdc->propfind(@_);
@@ -440,7 +444,7 @@ sub AUTOLOAD {
 }
 
 ######################################################################
-# CALLBACKS for cat,get and put
+# CALLBACKS for cat, get and put
 {
    my $in_transfer=0;
    
@@ -890,6 +894,13 @@ lists local directory contents
 
 This command simply execs the local ls command and is 
 equivalent to "!ls"
+
+=item B<lpwd>
+
+prints the current working directory, locally
+
+This command simply execs the local ls command and is 
+equivalent to "!pwd"
 
 =item B<dir [URL]>
 

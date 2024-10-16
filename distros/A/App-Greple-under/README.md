@@ -7,7 +7,7 @@ App::Greple::under - greple under-line module
 
     greple -Munder::line ...
 
-    greple -Munder::mise ... | greple -Munder::bake
+    greple -Munder::mise ... | greple -Munder::place
 
 # DESCRIPTION
 
@@ -55,15 +55,41 @@ Above command will produce output like this:
 
 If you want to process the search results before underlining them,
 process them in the `-Munder::mise` module and then pass them through
-the `-Munder::bake` module.
+the `-Munder::place` module.
 
-    greple -Munder::mise ... | ... | greple -Munder::bake
+    greple -Munder::mise ... | ... | greple -Munder::place
 
 <div>
     <p>
     <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-under/main/images/mise-bake.png">
     </p>
 </div>
+
+# MODULE OPTION
+
+## **--config**
+
+Set config parameters.
+
+    greple -Munder::line --config type=eighth -- ...
+
+Configuable parameters:
+
+- `type`
+
+    Set under-line type.
+
+- `sequence`
+
+    Set under-line sequence.  The given string is broken down into single
+    character sequences.
+
+## **--show-colormap**
+
+Print custom colormaps separated by whitespace characters.  You can
+read them into an array by [bash(1)](http://man.he.net/man1/bash) like this:
+
+    read -a MAP < <(greple -Munder::place --show-colormap --)
 
 # SEE ALSO
 

@@ -1,7 +1,7 @@
 use v5.20; use warnings; use experimental qw(signatures postderef);
 package Dist::Zilla::App::Command::DiffMint;
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.2.0';
 
 use Dist::Zilla::App -command;
 
@@ -41,8 +41,6 @@ sub execute ($self, $opt, $arg) {
       }
     };
 
-  my $zilla = $self->zilla;
-
   my $minter = $self->_minter($provider, $profile);
 
   $_->gather_files       for @{ $minter->plugins_with(-FileGatherer) };
@@ -52,28 +50,54 @@ sub execute ($self, $opt, $arg) {
 
   require Digest::SHA;
 
-  for my $file ($minter->files->@*) {
-    my $name = $file->name;
-    next
-      if $name =~ m{^lib/|^t/|^Changes$|^Changelog$}i;
+  my $root = $self->zilla->root;
 
-    my $mint = {
+  my %files = map +($_->name => $_), $minter->files->@*;
+  my @files = map $_->name, $minter->files->@*;
+  if (@$arg) {
+    my @matched;
+    for my $arg (@$arg) {
+      my $dir = $arg =~ s{/\z}{};
+
+      if ($files{$arg}) {
+        push @matched, $arg;
+      }
+      elsif (-f $root->child($arg)) {
+        push @matched, $arg;
+      }
+      elsif (my @sub = grep m{\A$dir/}, @files) {
+        push @matched, @sub;
+      }
+      else {
+        die "Unknown file or directory $arg!\n";
+      }
+    }
+    @files = @matched;
+  }
+  else {
+      @files = grep !m{^lib/|^t/|^Changes$|^Changelog$}i, @files;
+  }
+
+  for my $name (@files) {
+    my $file = $files{$name};
+
+    my $mint = $file ? {
       name      => "mint/$name",
+      realname  => "mint/$name",
       encoding  => $file->encoding,
       content   => $file->content,
       mode      => sprintf("%06o", $file->mode | 0100644),
       sha       => _sha($file->encoded_content),
-    };
+    } : _null("mint/$name");
 
-    my $disk = $self->_file_data($self->zilla->root->child($name));
-    $disk->{name} = "dist/$name";
+    my $disk = $self->_file_data($root, $name);
 
-    my $diff = $reverse ? _diff($disk, $mint) : _diff($mint, $disk);
+    my ($old, $new) = $reverse ? ($mint, $disk) : ($disk, $mint);
+
+    my $diff = _diff($old, $new);
 
     next
       if !defined $diff;
-
-    print $diff;
 
     if ($color) {
       print { $out } _colorize($diff);
@@ -84,35 +108,48 @@ sub execute ($self, $opt, $arg) {
   }
 }
 
-sub _file_data ($self, $file) {
-  my $disk = {};
-  if (open my $fh, '<:raw', $file) {
+sub _null ($name) {
+  return {
+    name      => $name,
+    realname  => '/dev/null',
+    content   => '',
+    mode      => '',
+    sha       => '0' x 40,
+    encoding  => 'UTF-8',
+  };
+}
+
+sub _file_data ($self, $root, $name) {
+  my $file = $root->child($name);
+
+  if (open my $fh, '<:raw', $file->stringify) {
     my $mode = (stat($fh))[2] | 0100644;
     my $binary = -B $fh;
-    $disk->{mode} = sprintf "%06o", $mode;
     my $content = do { local $/; <$fh> };
-    $disk->{sha} = _sha($content);
+    my $sha = _sha($content);
+    my $encoding;
     if ($binary) {
-      $disk->{encoding} = 'bytes';
-      $disk->{content} = $content;
+      $encoding = 'bytes';
     }
     else {
       require Encode::Guess;
-      my $encoding = Encode::Guess::guess_encoding($content, qw(UTF-8 Latin1 ASCII));
-      $disk->{encoding} = $encoding->name;
-      $disk->{content} = $encoding->decode($content);
+      my $encoder = Encode::Guess::guess_encoding($content, qw(UTF-8 Latin1 ASCII));
+      $encoding = $encoder->name;
+      $content = $encoder->decode($content);
     }
     close $fh;
-  }
-  else {
-    $disk->{content} = '';
-    $disk->{name} = '/dev/null';
-    $disk->{mode} = '';
-    $disk->{sha} = '0' x 40;
-    $disk->{encoding} = 'UTF-8';
+
+    return {
+      name      => "dist/$name",
+      realname  => "dist/$name",
+      content   => $content,
+      mode      => sprintf("%06o", $mode),
+      sha       => $sha,
+      encoding  => $encoding,
+    };
   }
 
-  return $disk;
+  return _null("dist/$name");
 }
 
 sub _minter ($self, $opt_provider, $opt_profile) {
@@ -180,24 +217,23 @@ sub _diff ($old, $new) {
   require Text::Diff;
   my $mode_diff = '';
   if ($new->{mode} ne $old->{mode}) {
-    warn "what the fuck $new->{mode} $old->{mode}";
-    $mode_diff .= "old mode $old->{mode}\n"
+    $mode_diff .= "old file mode $old->{mode}\n"
       if $old->{mode};
-    $mode_diff .= "new mode $new->{mode}\n"
+    $mode_diff .= "new file mode $new->{mode}\n"
       if $new->{mode};
   }
 
   my $text_diff;
   if ($old->{encoding} eq 'bytes' || $new->{encoding} eq 'bytes') {
     if ($old->{content} ne $new->{content}) {
-      $text_diff = "Binary files $old->{name} and $new->{name} differ\n";
+      $text_diff = "Binary files $old->{realname} and $new->{realname} differ\n";
     }
   }
   else {
     $text_diff = Text::Diff::diff(\$old->{content}, \$new->{content}, {
       STYLE => 'Unified',
-      FILENAME_A => $old->{name},
-      FILENAME_B => $new->{name},
+      FILENAME_A => $old->{realname},
+      FILENAME_B => $new->{realname},
     }) // '';
   }
 
@@ -292,7 +328,7 @@ Dist::Zilla::App::Command::CompareMint - Compare files to what a minting profile
 
 =head1 SYNOPSIS
 
-  $ dzil compare-mint [ --provider=<provider> ] [ --profile=<profile> ]
+  $ dzil diff-mint [ --provider=<provider> ] [ --profile=<profile> ] [ <file> ]
 
 =head1 DESCRIPTION
 

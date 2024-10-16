@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title></title>
+<title>dave - DAV Explorer</title>
 <link rel="stylesheet" href="http://www.webdav.org/perldav/perldav_plain.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -18,13 +18,13 @@
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
-<pre><code>    dave [OPTIONS] URL</code></pre>
+<pre><code>dave [OPTIONS] URL</code></pre>
 
-<p>E.g.</p>
+<p>e.g.</p>
 
-<pre><code>   $ dave -u pcollins -p mypass www.host.org/dav_dir/
-   ...
-   dave&gt; get file.txt</code></pre>
+<pre><code>$ dave -u pcollins -p mypass www.host.org/dav_dir/
+...
+dave&gt; get file.txt</code></pre>
 
 <p>Use <code>dave -h</code> to get help on options.</p>
 
@@ -92,7 +92,7 @@
 
 <p>You will need to use a pager like <code>more</code> or <code>less</code>. e.g.</p>
 
-<pre><code>    dave -man |less</code></pre>
+<pre><code>dave -man |less</code></pre>
 
 </dd>
 <dt id="p-password"><code>-p &lt;password&gt;</code></dt>
@@ -124,9 +124,9 @@
 
 <p>changes directories</p>
 
-<pre><code>   dave&gt; open host.org/dav_dir/
-   dave&gt; cd dir1
-   dave&gt; cd ../dir2</code></pre>
+<pre><code>dave&gt; open host.org/dav_dir/
+dave&gt; cd dir1
+dave&gt; cd ../dir2</code></pre>
 
 </dd>
 <dt id="cat-URL"><b>cat URL</b></dt>
@@ -134,8 +134,8 @@
 
 <p>shows the contents of a remote file</p>
 
-<pre><code>   dave&gt; open host.org/dav_dir/
-   dave&gt; cat index.html</code></pre>
+<pre><code>dave&gt; open host.org/dav_dir/
+dave&gt; cat index.html</code></pre>
 
 <p>Note: you cannot cat a directory (collection).</p>
 
@@ -149,20 +149,20 @@
 
 <p>copies one remote resource to another</p>
 
-<pre><code>  dave&gt; open host.org/dav_dir/</code></pre>
+<pre><code>dave&gt; open host.org/dav_dir/</code></pre>
 
 <p>Create a copy of dir1/ as dav2/</p>
 
-<pre><code>  dave&gt; cp dir1 dav2</code></pre>
+<pre><code>dave&gt; cp dir1 dav2</code></pre>
 
 <p>Create a copy of dir1/file.txt as dav2/file.txt</p>
 
-<pre><code>  dave&gt; cd dir1
-  dave&gt; copy file.txt ../dav2</code></pre>
+<pre><code>dave&gt; cd dir1
+dave&gt; copy file.txt ../dav2</code></pre>
 
 <p>Create a copy of file.txt as ../dav2/new_file.txt</p>
 
-<pre><code>  dave&gt; copy file.txt dav2/new_file.txt</code></pre>
+<pre><code>dave&gt; copy file.txt dav2/new_file.txt</code></pre>
 
 <p>Aliases: cp</p>
 
@@ -180,11 +180,11 @@
 
 <p>deletes a remote resource</p>
 
-<pre><code>   dave&gt; open host.org/dav_dir/
-   dave&gt; delete index.html
-   dave&gt; rmdir ./dir1
-   dave&gt; delete /dav_dir/dir2/
-   dave&gt; delete /dav_dir/*.html</code></pre>
+<pre><code>dave&gt; open host.org/dav_dir/
+dave&gt; delete index.html
+dave&gt; rmdir ./dir1
+dave&gt; delete /dav_dir/dir2/
+dave&gt; delete /dav_dir/*.html</code></pre>
 
 <p>This command recursively deletes directories. BE CAREFUL :)</p>
 
@@ -198,16 +198,16 @@
 
 <p>edits the contents of a remote file</p>
 
-<pre><code>   dave&gt; open host.org/dav_dir/
-   dave&gt; edit index.html</code></pre>
+<pre><code>dave&gt; open host.org/dav_dir/
+dave&gt; edit index.html</code></pre>
 
 <p>Edit is equivalent to the following sequence of commands:</p>
 
-<pre><code>   LOCK index.html (if allowed)
-   GET index.html /tmp/dave.perldav.421341234124
-   sh $EDITOR /tmp/dave.perldav.421341234124
-   PUT index.html (if modified)
-   UNLOCK index.html (if locked)</code></pre>
+<pre><code>LOCK index.html (if allowed)
+GET index.html /tmp/dave.perldav.421341234124
+sh $EDITOR /tmp/dave.perldav.421341234124
+PUT index.html (if modified)
+UNLOCK index.html (if locked)</code></pre>
 
 <p>Where $EDITOR is determined from the environment variables DAV_EDITOR or EDITOR.</p>
 
@@ -229,29 +229,29 @@
 
 <p>If FILE is not specified it will be saved to your current working directory using the same name as the remote name.</p>
 
-<pre><code>  dave&gt; open host.org/dav_dir/</code></pre>
+<pre><code>dave&gt; open host.org/dav_dir/</code></pre>
 
 <p>Recursively get remote my_dir/ to .</p>
 
-<pre><code>  dave&gt; get my_dir/  </code></pre>
+<pre><code>dave&gt; get my_dir/  </code></pre>
 
 <p>Recursively get remote my_dir/ to /tmp/my_dir/</p>
 
-<pre><code>  dave&gt; get my_dir /tmp</code></pre>
+<pre><code>dave&gt; get my_dir /tmp</code></pre>
 
 <p>Get remote my_dir/index.html to /tmp/index.html</p>
 
-<pre><code>  dave&gt; get /dav_dir/my_dir/index.html /tmp</code></pre>
+<pre><code>dave&gt; get /dav_dir/my_dir/index.html /tmp</code></pre>
 
 <p>Get remote index.html to /tmp/index1.html</p>
 
-<pre><code>  dave&gt; get index.html /tmp/index1.html</code></pre>
+<pre><code>dave&gt; get index.html /tmp/index1.html</code></pre>
 
 <p>Use globs and save to /tmp</p>
 
-<pre><code>  dave&gt; get index* /tmp                   # Gets index*.html, index*.txt, etc.
-  dave&gt; get index*.html /tmp/index1.html  # Gets index*.html
-  dave&gt; get index[12].htm?                # Gets file1 and file2, .htm and .html</code></pre>
+<pre><code>dave&gt; get index* /tmp                   # Gets index*.html, index*.txt, etc.
+dave&gt; get index*.html /tmp/index1.html  # Gets index*.html
+dave&gt; get index[12].htm?                # Gets file1 and file2, .htm and .html</code></pre>
 
 </dd>
 <dt id="CMD"><b>? [CMD]</b></dt>
@@ -267,9 +267,9 @@
 
 <p>prints list of commands or help for CMD</p>
 
-<pre><code>  dave&gt; ?
+<pre><code>dave&gt; ?
 
-  dave&gt; help get</code></pre>
+dave&gt; help get</code></pre>
 
 <p>Aliases: ?, h</p>
 
@@ -279,7 +279,7 @@
 
 <p>changes local directory</p>
 
-<pre><code>  dave&gt; lcd /tmp</code></pre>
+<pre><code>dave&gt; lcd /tmp</code></pre>
 
 </dd>
 <dt id="lls-DIR"><b>lls [DIR]</b></dt>
@@ -287,11 +287,19 @@
 
 <p>lists local directory contents</p>
 
-<pre><code>  dave&gt; lcd /tmp
-  dave&gt; lls
-  dave&gt; lls /home</code></pre>
+<pre><code>dave&gt; lcd /tmp
+dave&gt; lls
+dave&gt; lls /home</code></pre>
 
 <p>This command simply execs the local ls command and is equivalent to &quot;!ls&quot;</p>
+
+</dd>
+<dt id="lpwd"><b>lpwd</b></dt>
+<dd>
+
+<p>prints the current working directory, locally</p>
+
+<p>This command simply execs the local ls command and is equivalent to &quot;!pwd&quot;</p>
 
 </dd>
 <dt id="dir-URL"><b>dir [URL]</b></dt>
@@ -303,22 +311,22 @@
 
 <p>lists remote directory contents or file props</p>
 
-<pre><code>  dave&gt; ls
-  Listing of http://host.org/dav_dir/
-                  ./          Aug 29 02:26  &lt;dir&gt;
-     mtx_0.04.tar.gz   52640  Aug 11 11:45
-          index.html    4580  Aug 11 11:45
-      index0.04.html    4936  Nov 11  2000
-              mydir/          Aug 19 21:14  &lt;dir&gt;,&lt;locked&gt;
+<pre><code>dave&gt; ls
+Listing of http://host.org/dav_dir/
+                ./          Aug 29 02:26  &lt;dir&gt;
+   mtx_0.04.tar.gz   52640  Aug 11 11:45
+        index.html    4580  Aug 11 11:45
+    index0.04.html    4936  Nov 11  2000
+            mydir/          Aug 19 21:14  &lt;dir&gt;,&lt;locked&gt;
 
-  dave&gt; ls index.html
-  URL: http://www.webdav.org/perldav/index.html
-  Content-type: text/html
-  Creation date: Sun Aug 12 21:58:02 2001
-  Last modified:
-  Size: 4580 bytes
-  Locks supported: write/exclusive write/shared
-  Locks:</code></pre>
+dave&gt; ls index.html
+URL: http://www.webdav.org/perldav/index.html
+Content-type: text/html
+Creation date: Sun Aug 12 21:58:02 2001
+Last modified:
+Size: 4580 bytes
+Locks supported: write/exclusive write/shared
+Locks:</code></pre>
 
 <p>Use propfind to get a similar printout of a collection (directory).</p>
 
@@ -352,9 +360,9 @@
 
 <p>make a remote collection (directory)</p>
 
-<pre><code>  dave&gt; open host.org/dav_dir/
-  dave&gt; mkcol new_dir
-  dave&gt; mkdir /dav_dir/new_dir</code></pre>
+<pre><code>dave&gt; open host.org/dav_dir/
+dave&gt; mkcol new_dir
+dave&gt; mkdir /dav_dir/new_dir</code></pre>
 
 <p>Aliases: mkdir</p>
 
@@ -368,20 +376,20 @@
 
 <p>moves a remote resource to another</p>
 
-<pre><code>  dave&gt; open host.org/dav_dir/</code></pre>
+<pre><code>dave&gt; open host.org/dav_dir/</code></pre>
 
 <p>Move dir1/ to dav2/</p>
 
-<pre><code>  dave&gt; move dir1 dav2</code></pre>
+<pre><code>dave&gt; move dir1 dav2</code></pre>
 
 <p>Move file dir2/file.txt to ../file.txt</p>
 
-<pre><code>  dave&gt; cd dir2
-  dave&gt; move file.txt ..</code></pre>
+<pre><code>dave&gt; cd dir2
+dave&gt; move file.txt ..</code></pre>
 
 <p>Move file.txt to dav2/new_file.txt</p>
 
-<pre><code>  dave&gt; move file.txt dav2/new_file.txt</code></pre>
+<pre><code>dave&gt; move file.txt dav2/new_file.txt</code></pre>
 
 <p>Aliases: mv</p>
 
@@ -391,7 +399,7 @@
 
 <p>connects to the WebDAV-enabled server at URL</p>
 
-<pre><code>   dave&gt; open host.org/dav_dir/</code></pre>
+<pre><code>dave&gt; open host.org/dav_dir/</code></pre>
 
 <p>Note that if authorization details are required you will be prompted for them.</p>
 
@@ -403,9 +411,9 @@
 
 <p>show the HTTP methods allowed for a URL</p>
 
-<pre><code>   dave&gt; options index.html
-   OPTIONS, GET, HEAD, POST, DELETE, TRACE, PROPFIND, 
-   PROPPATCH, COPY, MOVE, LOCK, UNLOCK</code></pre>
+<pre><code>dave&gt; options index.html
+OPTIONS, GET, HEAD, POST, DELETE, TRACE, PROPFIND, 
+PROPPATCH, COPY, MOVE, LOCK, UNLOCK</code></pre>
 
 <p>Note that Microsoft&#39;s IIS does not support LOCK on collections (directories). Nor does it support PROPPATCH.</p>
 
@@ -415,14 +423,14 @@
 
 <p>show the properties of a resource</p>
 
-<pre><code>  dave&gt; propfind test
-  URL: http://host.org/dav_dir/test/
-  Content-type: httpd/unix-directory
-  Creation date: Wed Aug 29 00:36:42 2001
-  Last modified:
-  Size:  bytes
-  Locks supported: write/exclusive write/shared
-  Locks:</code></pre>
+<pre><code>dave&gt; propfind test
+URL: http://host.org/dav_dir/test/
+Content-type: httpd/unix-directory
+Creation date: Wed Aug 29 00:36:42 2001
+Last modified:
+Size:  bytes
+Locks supported: write/exclusive write/shared
+Locks:</code></pre>
 
 <p>Using ls will get you the same printout if you ls a file. But ls&#39;ing a collection will show you the collections contents.</p>
 
@@ -434,27 +442,27 @@
 
 <p>If URL is an existing collection then the dir/file will be copied INTO that collection.</p>
 
-<pre><code>  dave&gt; open host.org/dav_dir/</code></pre>
+<pre><code>dave&gt; open host.org/dav_dir/</code></pre>
 
 <p>Recursively put local my_dir/ to host.org/dav_dir/my_dir/:</p>
 
-<pre><code>  dave&gt; put my_dir/  </code></pre>
+<pre><code>dave&gt; put my_dir/  </code></pre>
 
 <p>Put local index.html to host.org/dav_dir/index1.html:</p>
 
-<pre><code>  dave&gt; put /tmp/index.html index1.html</code></pre>
+<pre><code>dave&gt; put /tmp/index.html index1.html</code></pre>
 
 <p>Put * to remote directory</p>
 
-<pre><code>  dave&gt; put *</code></pre>
+<pre><code>dave&gt; put *</code></pre>
 
 <p>Put index[12].htm? to remote directory /dav_dir (/dav_dir must exist)</p>
 
-<pre><code>  dave&gt; put index[12].htm? /dav_dir</code></pre>
+<pre><code>dave&gt; put index[12].htm? /dav_dir</code></pre>
 
 <p>Put index[1234].htm? to remote directory /dav_dir (/dav_dir must exist)</p>
 
-<pre><code>  dave&gt; put index[1-4].htm? /dav_dir</code></pre>
+<pre><code>dave&gt; put index[1-4].htm? /dav_dir</code></pre>
 
 <p>Glob types supported are, * (matches any characters), ? (matches any one character), [...] (matches any characters in the set ...).</p>
 
@@ -464,10 +472,10 @@
 
 <p>prints the currently opened URL (working directory)</p>
 
-<pre><code> dave&gt; open host.org/dav_dir/
- dave&gt; cd new_dir/
- dave&gt; pwd
- http://host.org/dav_dir/new_dir/</code></pre>
+<pre><code>dave&gt; open host.org/dav_dir/
+dave&gt; cd new_dir/
+dave&gt; pwd
+http://host.org/dav_dir/new_dir/</code></pre>
 
 </dd>
 <dt id="q"><b>q</b></dt>
@@ -493,8 +501,8 @@
 
 <p>sets a custom property on a resource</p>
 
-<pre><code>   dave&gt; set file.txt author &quot;Patrick Collins&quot;
-   dave&gt; set file.txt author &quot;Patrick Collins&quot; &quot;mynamespace&quot;</code></pre>
+<pre><code>dave&gt; set file.txt author &quot;Patrick Collins&quot;
+dave&gt; set file.txt author &quot;Patrick Collins&quot; &quot;mynamespace&quot;</code></pre>
 
 <p>The NAMESPACE by default is &quot;DAV:&quot;.</p>
 
@@ -508,9 +516,9 @@
 
 <p>executes a local command (alias !)</p>
 
-<pre><code>   dave&gt; sh cat localfile
-   dave&gt; !gzip localfile.gz
-   dave&gt; ! &quot;cat localfile | less&quot;</code></pre>
+<pre><code>dave&gt; sh cat localfile
+dave&gt; !gzip localfile.gz
+dave&gt; ! &quot;cat localfile | less&quot;</code></pre>
 
 <p>Aliases: !</p>
 
@@ -546,8 +554,8 @@
 
 <p>unsets a property from a resource</p>
 
-<pre><code>   dave&gt; unset file.txt author
-   dave&gt; unset file.txt author &quot;mynamespace&quot;</code></pre>
+<pre><code>dave&gt; unset file.txt author
+dave&gt; unset file.txt author &quot;mynamespace&quot;</code></pre>
 
 <p>The NAMESPACE by default is &quot;DAV:&quot;.</p>
 
@@ -576,12 +584,12 @@
 
 <p>This module is Copyright (C) 2001 by</p>
 
-<pre><code>    Patrick Collins
-    G03 Gloucester Place, Kensington
-    Sydney, Australia
+<pre><code>Patrick Collins
+G03 Gloucester Place, Kensington
+Sydney, Australia
 
-    Email: pcollins@cpan.org
-    Phone: +61 2 9663 4916</code></pre>
+Email: pcollins@cpan.org
+Phone: +61 2 9663 4916</code></pre>
 
 <p>All rights reserved.</p>
 

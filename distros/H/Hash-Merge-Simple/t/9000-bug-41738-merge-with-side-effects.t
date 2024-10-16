@@ -1,10 +1,7 @@
 use strict;
 use warnings;
 
-use Test::Most;
-use Test::Deep;
-
-plan qw/no_plan/;
+use Test::More;
 
 #use Data::Dump qw/dump/;
 #print dump($left), "\n";
@@ -21,8 +18,8 @@ SKIP: {
     $result = clone_merge( $left, $right );
     $left->{foo}{bar} = 3 ;
     $left->{foo}{aaa} = 5 ;
-    cmp_deeply $left, { foo => { bar => 3, aaa => 5 } };
-    cmp_deeply $result, { foo => { bar => 2 }, baz => 4 };
+    is_deeply $left, { foo => { bar => 3, aaa => 5 } };
+    is_deeply $result, { foo => { bar => 2 }, baz => 4 };
 }
 
 SKIP: {
@@ -32,8 +29,8 @@ SKIP: {
     $result = dclone_merge( $left, $right );
     $left->{foo}{bar} = 3 ;
     $left->{foo}{aaa} = 5 ;
-    cmp_deeply $left, { foo => { bar => 3, aaa => 5 } };
-    cmp_deeply $result, { foo => { bar => 2 }, baz => 4 };
+    is_deeply $left, { foo => { bar => 3, aaa => 5 } };
+    is_deeply $result, { foo => { bar => 2 }, baz => 4 };
 }
 
 $left = { foo => { bar => 2 } };
@@ -41,5 +38,7 @@ $right = { baz => 4 };
 $result = merge( $left, $right );
 $left->{foo}{bar} = 3 ;
 $left->{foo}{aaa} = 5 ;
-cmp_deeply $left, { foo => { bar => 3, aaa => 5 } };
-cmp_deeply $result, { foo => { aaa => 5, bar => 3 }, baz => 4 };
+is_deeply $left, { foo => { bar => 3, aaa => 5 } };
+is_deeply $result, { foo => { aaa => 5, bar => 3 }, baz => 4 };
+
+done_testing;

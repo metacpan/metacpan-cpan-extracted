@@ -1,9 +1,6 @@
 NAME
     Hash::Merge::Simple - Recursively merge two or more hashes, simply
 
-VERSION
-    version 0.051
-
 SYNOPSIS
         use Hash::Merge::Simple qw/ merge /;
 
@@ -20,7 +17,7 @@ SYNOPSIS
         my $c = merge $a, $b;
         # $c is { a => 100, b => 2, c => 3, d => { i => 2, l => 4 }, r => {} }
 
-        # You can also merge more than two hashes at the same time 
+        # You can also merge more than two hashes at the same time
         # The precedence increases from left to right (the rightmost has the most precedence)
         my $everything = merge $this, $that, $mine, $yours, $kitchen_sink, ...;
 
@@ -81,7 +78,7 @@ USAGE
     This is useful in cases where you need to ensure that the result can be
     tweaked without fear of giving/receiving any side effects
 
-    This method will use Storable (dclone) to do the cloning
+    This method will use Storable ("dclone") to do the cloning
 
 SEE ALSO
     Hash::Merge
@@ -99,11 +96,23 @@ ACKNOWLEDGEMENTS
 
     Yuval Kogman "nothingmuch@woobling.org"
 
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Merge-Simple> or
+    by email to bug-Hash-Merge-Simple@rt.cpan.org
+    <mailto:bug-Hash-Merge-Simple@rt.cpan.org>.
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
 AUTHOR
     Robert Krimen <robertkrimen@gmail.com>
 
+CONTRIBUTOR
+    Graham Knop <haarg@haarg.org>
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2010 by Robert Krimen.
+    This software is copyright (c) 2008 by Robert Krimen.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

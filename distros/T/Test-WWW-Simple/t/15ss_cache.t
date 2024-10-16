@@ -1,7 +1,4 @@
-#!/usr/bin/env perl
-use strict;
-use warnings;
-
+#!/usr/local/bin/perl
 use Test::More;
 plan tests => 1;
 

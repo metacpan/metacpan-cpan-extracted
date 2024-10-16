@@ -6,13 +6,13 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 
 Travel::Status::DE::EFA::Stop->mk_ro_accessors(
-	qw(sched_arr rt_arr arr
-	  sched_dep rt_dep dep
-	  occupancy
-	  place name full_name id latlon
+	qw(sched_arr rt_arr arr arr_delay
+	  sched_dep rt_dep dep dep_delay
+	  occupancy delay distance_m
+	  place name full_name id stop_id latlon
 	  platform niveau)
 );
 
@@ -21,8 +21,38 @@ sub new {
 
 	my $ref = \%conf;
 
+	if ( $ref->{sched_arr} and $ref->{arr_delay} and not $ref->{rt_arr} ) {
+		$ref->{rt_arr}
+		  = $ref->{sched_arr}->clone->add( minutes => $ref->{arr_delay} );
+	}
+
+	if ( $ref->{sched_dep} and $ref->{dep_delay} and not $ref->{rt_dep} ) {
+		$ref->{rt_dep}
+		  = $ref->{sched_dep}->clone->add( minutes => $ref->{dep_delay} );
+	}
+
 	$ref->{arr} //= $ref->{rt_arr} // $ref->{sched_arr};
 	$ref->{dep} //= $ref->{rt_dep} // $ref->{sched_dep};
+
+	if (    $ref->{rt_arr}
+		and $ref->{sched_arr}
+		and not defined $ref->{arr_delay} )
+	{
+		$ref->{arr_delay}
+		  = $ref->{rt_arr}->subtract_datetime( $ref->{sched_arr} )
+		  ->in_units('minutes');
+	}
+
+	if (    $ref->{rt_dep}
+		and $ref->{sched_dep}
+		and not defined $ref->{dep_delay} )
+	{
+		$ref->{dep_delay}
+		  = $ref->{rt_dep}->subtract_datetime( $ref->{sched_dep} )
+		  ->in_units('minutes');
+	}
+
+	$ref->{delay} = $ref->{dep_delay} // $ref->{arr_delay};
 
 	return bless( $ref, $obj );
 }
@@ -63,7 +93,7 @@ in a Travel::Status::DE::EFA::Result's route
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 
@@ -75,34 +105,78 @@ delays or changed platforms are not taken into account.
 
 =head2 ACCESSORS
 
+Most accessors return undef if the corresponding data is not available.
+
 =over
+
+=item $stop->sched_arr
+
+DateTime(3pm) object holding scheduled arrival date and time.
+
+=item $stop->rt_arr
+
+DateTime(3pm) object holding estimated (real-time) arrival date and time.
 
 =item $stop->arr
 
-DateTime(3pm) object holding arrival date and time. undef if this is the
-first scheduled stop.
+DateTime(3pm) object holding arrival date and time. Real-time data if
+available, schedule data otherwise.
+
+=item $stop->arr_delay
+
+Arrival delay in minutes.
+
+=item $stop->sched_dep
+
+DateTime(3pm) object holding scheduled departure date and time.
+
+=item $stop->rt_dep
+
+DateTime(3pm) object holding estimated (real-time) departure date and time.
 
 =item $stop->dep
 
-DateTime(3pm) object holding departure date and time. undef if this is the
-final scheduled stop.
+DateTime(3pm) object holding departure date and time. Real-time data if
+available, schedule data otherwise.
+
+=item $stop->dep_delay
+
+Departure delay in minutes.
+
+=item $stop->delay
+
+Delay in minutes. Departure delya if available, arrival delay otherwise.
+
+=item $stop->distance_m
+
+Distance from request coordinates in meters. undef if the object has not
+been obtained by means of a coord request.
 
 =item $stop->id
 
 Stop ID.
 
+=item $stop->stop_id
+
+The other kind of stop ID.
+Yes, EFA has two.
+
 =item $stop->place
 
-City name, for instance "Essen".
+Place or city name, for instance "Essen".
 
 =item $stop->full_name
 
-stop name with city prefix ("I<City> I<Stop>", for instance
+stop name with place or city prefix ("I<City> I<Stop>", for instance
 "Essen RE<uuml>ttenscheider Stern").
 
 =item $stop->name
 
-stop name without city prefix, for instance "RE<uuml>ttenscheider Stern".
+stop name without place or city prefix, for instance "RE<uuml>ttenscheider Stern".
+
+=item $stop->latlon
+
+Arrayref describing the stop's latitude and longitude in WGS84 coordinates.
 
 =item $stop->platform
 
@@ -139,7 +213,8 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-None known.
+This module is a Work in Progress.
+Its API may change between minor versions.
 
 =head1 SEE ALSO
 

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -71,7 +71,7 @@ json2perl.pl : convert JSON data to a Perl variable (dump) which can be parsed o
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =head1 SYNOPSIS
 

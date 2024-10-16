@@ -17,7 +17,7 @@ use File::Basename;
 
 use Automate::Animate::FFmpeg;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my $aaFF = Automate::Animate::FFmpeg->new();
 ok(defined $aaFF, 'Automate::Animate::FFmpeg->new()'." : called and got defined result.") or BAIL_OUT;

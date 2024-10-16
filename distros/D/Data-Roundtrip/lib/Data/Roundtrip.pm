@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -655,7 +655,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =head1 SYNOPSIS
 

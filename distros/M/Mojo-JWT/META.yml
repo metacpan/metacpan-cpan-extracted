@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.028, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.042, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,19 +15,15 @@ name: Mojo-JWT
 provides:
   Mojo::JWT:
     file: lib/Mojo/JWT.pm
-    version: '0.09'
-recommends:
-  Crypt::OpenSSL::Bignum: '0'
-  Crypt::OpenSSL::RSA: '0'
+    version: '1.01'
 requires:
-  Digest::SHA: '0'
-  MIME::Base64: '3.11'
+  CryptX: '0.029'
   Mojolicious: '5.00'
   perl: '5.010'
 resources:
   bugtracker: http://github.com/jberger/Mojo-JWT/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojo-JWT
-version: '0.09'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

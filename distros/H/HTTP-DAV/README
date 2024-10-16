@@ -147,9 +147,14 @@ AUTHOR AND COPYRIGHT
     All rights reserved.
 
 MAINTAINER
-    The current maintainer of HTTP-DAV is Cosimo Streppone for Opera
-    Software ASA. You can contact us at "cosimo@cpan.org" or
-    "opera@cpan.org".
+    The current maintainer of HTTP-DAV is Cosimo Streppone for Kahoot!, and
+    previously for Opera Software ASA. You can contact me at
+    "cosimo@cpan.org".
+
+GITHUB REPOSITORY
+    The official repository for HTTP-DAV is now on Github:
+
+        https://github.com/cosimo/perl5-http-dav
 
 LICENSE
     You may distribute this module under the terms of either the GNU General

@@ -1,3 +1,16 @@
+Travel::Status::DE::VRR 3.02 - Wed Oct 16 2024
+
+    * Stop: Add ar_delay, dep_delay, delay, stop_id accessos
+    * EFA: Fix place_candidates
+    * EFA: Add stop and stops functions
+    * EFA: Add static get_services method
+    * efa-m: Add -j / --with-jid option
+    * efa-m -Oa, -Ob, -Of: Show delays
+    * EFA, efa-m: Add stopfinder ("?foo") and stop search ("lat:lon") modes
+    * Add ...::Trip and ...::Info modules
+    * Info, Stop, Trip: Note that the API of these modules is not yet final
+      and may change between minor versions
+
 Travel::Status::DE::VRR 3.01 - Thu Oct 03 2024
 
     * Fix Departure->route_interesting

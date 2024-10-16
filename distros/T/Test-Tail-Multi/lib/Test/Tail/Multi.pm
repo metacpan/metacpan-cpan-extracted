@@ -4,7 +4,7 @@ use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use File::Tail;
 use Test::Builder;
@@ -53,12 +53,12 @@ sub delay($;$) {
   $tail_delay = $delay if defined $delay;
   $Test->diag($comment) if defined $comment;
 }
-  
+
 
 sub add_file($;$) {
   my($file, $comment) = @_;
   push @monitored, File::Tail->new($file);
-  $Test->diag($comment) if defined $comment; 
+  $Test->diag($comment) if defined $comment;
 }
 
 sub contents_like(&$;$) {
@@ -120,23 +120,23 @@ Test::Tail::Multi - execute code, monitor dynamic file contents
   contents_like(sub {system('fast_command')},     # trailing comma in parens
                 qr/expected/,
                 "this command runs faster");
-                 
+
 
 =head1 DESCRIPTION
 
 C<Test::Tail::Multi> allows you to create tests or test classes that permit
 you to monitor the contents of one or more files a la <tail -f> using the
-nice C<File::Tail> module. You can execute arbitrary code and then run tests 
+nice C<File::Tail> module. You can execute arbitrary code and then run tests
 versus the new content in the files.
 
-If you choose, you can run multiple tests against the same content by 
+If you choose, you can run multiple tests against the same content by
 passing C<undef> as the code to be executed; C<Test::Tail::Multi> will then
 reuse the contents it last extracted.
 
-You can also adjust the delay time to be used to allow the code you called 
+You can also adjust the delay time to be used to allow the code you called
 to "settle down" before checking the tails.
 
-C<Test::Tail::Multi> comes in handy for those testing jobs that require 
+C<Test::Tail::Multi> comes in handy for those testing jobs that require
 you to monitor several files at once to see what's happening in each one.
 
 =head1 AUTHOR

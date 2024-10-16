@@ -101,7 +101,7 @@ the file descriptor, indicating that descriptor number has been closed or recycl
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

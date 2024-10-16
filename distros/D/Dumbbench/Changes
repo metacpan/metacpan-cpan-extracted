@@ -1,5 +1,9 @@
 Revision history for Perl module Dumbbench
 
+0.505 2024-10-15T17:43:05Z
+	* fix a Pod problem
+	* no other changes 
+
 0.504 2024-07-09T15:31:31Z
 	* use the 'name' parameter in examples, from Alceu Rodrigues de Freitas Junior (#21)
 	* make the SOOT features depend on the availability of SOOT, in the xt/ tests

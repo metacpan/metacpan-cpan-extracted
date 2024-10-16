@@ -5,7 +5,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Data::Roundtrip qw/:all no-unicode-escape-permanently/;
 use Data::Random::Structure::UTF8;

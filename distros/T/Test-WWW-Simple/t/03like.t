@@ -1,7 +1,3 @@
-#!/usr/bin/env perl
-use strict;
-use warnings;
-
 use Test::Tester;
 use Test::More tests =>16;
 use Test::WWW::Simple;
@@ -23,7 +19,7 @@ my $res = $ua->request($req);
 
 # Check the outcome of the response
 my $dns_disadvantage = ($res->code != 404);
-
+  
 
 my ($message1, $message2, $message3);
 my @results;
@@ -55,7 +51,7 @@ SKIP: {
 
 @results = run_tests(
     sub {
-        page_like("http://switch-to-python.perl.org",
+        page_like("http://switch-to-python.perl.org", 
                   qr/text not there/,
                   "this server doesn't exist")
     },
@@ -67,7 +63,7 @@ ok(!$results[1]->{ok}, 'failed as expected');
 # 4. bad page
 @results = run_tests(
     sub {
-        page_like("http://perl.org/gack",
+        page_like("http://perl.org/gack", 
                   qr/text not there/,
                   "this server doesn't exist")
     },

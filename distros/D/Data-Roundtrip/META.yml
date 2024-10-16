@@ -41,5 +41,5 @@ resources:
   bugtracker: https://github.com/hadjiprocopis/data-roundtrip/issues
   homepage: https://metacpan.org/module/Data::Roundtrip
   repository: https://github.com/hadjiprocopis/data-roundtrip
-version: '0.28'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

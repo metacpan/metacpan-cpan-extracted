@@ -6,6 +6,7 @@ use Env qw /@PATH @LD_LIBRARY_PATH @DYLD_LIBRARY_PATH @PROJ_LIB/;
 use Path::Tiny qw /path/;
 use List::Util;
 use FFI::CheckLib;
+use Config;
 
 my $on_windows = $^O =~ /mswin/i;
 my $on_automated_rig
@@ -202,10 +203,13 @@ share {
     my @with_args = (
       #https://gdal.org/build_hints.html#cmdoption-arg-GDAL_USE_-Packagename_in_upper_case-BOOL
       @automated_rig_config_args,
+      '-DGDAL_USE_GEOTIFF_INTERNAL:BOOL=ON',  #  until we have an alien
       '-DGDAL_USE_MSSQL_ODBC=OFF',
       '-DGDAL_USE_MSSQL_NCLI=OFF',
       '-DGDAL_USE_MYSQL=OFF',
       '-DBUILD_CSHARP_BINDINGS:BOOL=OFF',
+      '-DBUILD_PYTHON_BINDINGS:BOOL=OFF',
+      '-DBUILD_JAVA_BINDINGS:BOOL=OFF',
       #'--without-pg',
       #'--without-ogdi',
       #'--with-mongocxxv3=no',
@@ -216,8 +220,10 @@ share {
     Alien::Build->log('LD_LIBRARY_PATH: ' . join ':', map {defined $_ ? $_ : ''} @LD_LIBRARY_PATH);
     my @ld_flags;
     my @ld_lib_path;
+    my @cmake_prefix_path;
     #  system installs won't necessarily have dist dirs
     if (Alien::proj->install_type eq 'share') {
+      push @cmake_prefix_path, path('Alien::proj'->dist_dir);
       push @with_args, '-DPROJ_INCLUDE_DIR=' . path (Alien::proj->dist_dir . '/include')->stringify;
       my $libfile = find_lib_file (
         lib   => 'proj',
@@ -245,6 +251,7 @@ share {
       }
     }
     if (Alien::libtiff->install_type eq 'share') {
+      push @cmake_prefix_path, path('Alien::libtiff'->dist_dir);
       my $libtiff_include = path ('Alien::libtiff'->dist_dir . '/include')->stringify;
       my $libfile = find_lib_file (
         lib   => 'tiff',
@@ -259,26 +266,36 @@ share {
       }
     }
     if ($have_spatialite && Alien::spatialite->install_type eq 'share') {
+      push @cmake_prefix_path, path('Alien::spatialite'->dist_dir);
       #  need to check for this under cmake?
     }
+    elsif (Alien::proj->install_type eq 'share') {
+      #  spatialite depends on proj and this can cause grief if proj is a share install
+      #  and spatialite is found by CMake
+      #  https://gdal.org/en/latest/development/building_from_source.html#conflicting-proj-libraries
+      push @with_args, '-DGDAL_USE_SPATIALITE=OFF';
+    }
+
     if (Alien::sqlite->install_type eq 'share') {
+      push @cmake_prefix_path, path('Alien::sqlite'->dist_dir);
       my $sqlite_include = path ('Alien::sqlite'->dist_dir . '/include')->stringify;
       my $libfile = find_lib_file (
           lib   => 'sqlite3',
           alien => 'Alien::sqlite',
       );
-      my $exe_extension = ($on_windows ? '.exe' : '');
-      my $sqlite_exe = path ('Alien::sqlite'->dist_dir . "/bin/sqlite3$exe_extension");
+      # my $exe_extension = ($on_windows ? '.exe' : '');
+      # my $sqlite_exe = path ('Alien::sqlite'->dist_dir . "/bin/sqlite3$exe_extension");
       push @with_args, (
-        "-DEXE_SQLITE3=$sqlite_exe",
-        "-DSQLITE3_LIBRARY=$libfile",
-        "-DSQLITE3_INCLUDE_DIR=$sqlite_include",
+        # "-DEXE_SQLITE3=$sqlite_exe",
+        "-DSQLite3_LIBRARY=$libfile",
+        "-DSQLite3_INCLUDE_DIR=$sqlite_include",
       );
       if (!$on_windows) {
         push @ld_lib_path, (Alien::sqlite->dist_dir . '/lib');
       }
     }
     if (Alien::geos::af->install_type eq 'share') {
+      push @cmake_prefix_path, path('Alien::geos::af'->dist_dir);
       my $libfile = find_lib_file (
           lib   => 'geos',
           alien => 'Alien::geos::af',
@@ -316,16 +333,27 @@ share {
     #  hack
     if ($^O =~ /darwin/) {
       push @DYLD_LIBRARY_PATH, @ld_lib_path;
-      Alien::Build->log('DYLD_LIBRARY_PATH: ' . join ':', @DYLD_LIBRARY_PATH);
+      Alien::Build->log('DYLD_LIBRARY_PATH: ' . join ':', grep {defined} @DYLD_LIBRARY_PATH);
     }
     else {
       push @LD_LIBRARY_PATH, @ld_lib_path;
-      Alien::Build->log('LD_LIBRARY_PATH: ' . join ':', @LD_LIBRARY_PATH);
+      Alien::Build->log('LD_LIBRARY_PATH: ' . join ':', grep {defined} @LD_LIBRARY_PATH);
     }
 
     #foreach my $env_var (qw /LD_LIBRARY_PATH DYLD_LIBRARY_PATH LDFLAGS CFLAGS CXXFLAGS/) {
     #  say "ENV: $env_var is " . ($ENV{$env_var} // '');
     #}
+    if (@cmake_prefix_path) {
+      my $path = join $Config{path_sep}, @cmake_prefix_path;
+      meta->around_hook(
+        build => sub {
+          my ($orig, $build, @args) = @_;
+          $build->log("Setting CMAKE_PREFIX_PATH to $path");
+          local $ENV{CMAKE_PREFIX_PATH} = $path;
+          $orig->($build, @args);
+        }
+      );
+    }
     
     my $cmake_cmd = [
       '%{cmake}',
@@ -335,10 +363,8 @@ share {
       '-DBUILD_TESTING=OFF',
       '-DBUILD_SHARED_LIBS=ON',
       @with_args,
-      '-DBUILD_PROJSYNC=OFF',
       '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
       '-DCMAKE_BUILD_TYPE=Release',
-      '-DBUILD_PYTHON_BINDINGS:BOOL=OFF',
       @drivers_to_disable,
       '..'
     ];

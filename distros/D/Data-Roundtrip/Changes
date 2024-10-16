@@ -157,3 +157,10 @@ Revision history for Data-Roundtrip
         by specific caller request.
         Test "t/04-dump2-use-is-explicit.t" has been added to check that
         these subs are not exported by default.
+
+0.29    2024-10-15 18:00
+        Test file "t/12-from-file.t", still fails because of the issue
+        mentioned Changes of v0.28. Therefore I have reduced the number
+        of digits to zero. This is a minor issue and spent more energy than
+        necessary for it.
+

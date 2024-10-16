@@ -22,7 +22,7 @@ requires:
 resources:
   bugtracker: https://github.com/ap/titlecase/issues
   repository: https://github.com/ap/titlecase.git
-version: '1.005'
+version: '1.015'
 x_copyright:
   holder: 'John Gruber, Aristotle Pagaltzis'
   year: 2018

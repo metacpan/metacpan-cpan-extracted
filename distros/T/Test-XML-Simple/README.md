@@ -1,6 +1,7 @@
 #Test::XML::Simple
 
 [![Build Status](https://travis-ci.org/joemcmahon/test-xml-simple.svg?branch=master)](https://travis-ci.org/joemcmahon/test-xml-simple)
+[![Coverage Status](https://coveralls.io/repos/joemcmahon/test-xml-simple/badge.png?branch=master)](https://coveralls.io/r/joemcmahon/test-xml-simple?branch=master)
 
 This module provides a test class which makes it easy to do basic
 Test::More style tests on XML input.

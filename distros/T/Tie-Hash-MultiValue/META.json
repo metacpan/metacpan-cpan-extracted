@@ -1,10 +1,10 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Automatically store multiple values under a single key",
    "author" : [
-      "Joe McMahon (mcmahon@ibiblio.org)"
+      "Joe McMahon (mcmahon@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "unknown"
    ],
@@ -13,21 +13,10 @@
       "version" : 2
    },
    "name" : "Tie-Hash-MultiValue",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
@@ -37,7 +26,13 @@
          }
       }
    },
+   "provides" : {
+      "Tie::Hash::MultiValue" : {
+         "file" : "lib/Tie/Hash/MultiValue.pm",
+         "version" : "1.07"
+      }
+   },
    "release_status" : "stable",
-   "version" : 1.06,
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

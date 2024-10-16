@@ -2,6 +2,18 @@ $Id: Changes,v 1.6 2001/07/28 06:36:50 btrott Exp $
 
 Revision history for Data::Buffer
 
+0.06 -- Tue Oct 15 19:57:00 ADT 2024
+
+    - e020e72 Create .gitignore and MANIFEST.SKIP
+    - 7c00387 Forgot to update the Changes file
+
+0.05 -- Mon Oct 14 14:46:56 ADT 2024 
+    - 9f6ec5b Use Dist::Zilla for build
+    - 947604d Update Compyight Year
+    - cfe3102 (nextversion) Move tests to Test2::v0
+    - 783b591 Move to more modern structure
+    - 36ccff6 Initial Import of Data-Buffer-0.04
+
 0.04  2001.07.27
     - Added new_with_init.
     - Added set_offset and reset_offset.

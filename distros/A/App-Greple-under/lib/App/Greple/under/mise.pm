@@ -10,4 +10,4 @@ __DATA__
 
 option default \
     -Munder \
-    --under-custom-colormap
+    --use-custom-colormap

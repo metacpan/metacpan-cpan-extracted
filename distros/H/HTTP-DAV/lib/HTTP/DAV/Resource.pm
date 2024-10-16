@@ -3,7 +3,7 @@ package HTTP::DAV::Resource;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '0.31';
+$VERSION = '0.50';
 
 use HTTP::DAV;
 use HTTP::DAV::Utils;
@@ -575,7 +575,7 @@ sub put {
     my $headers = HTTP::DAV::Headers->new();
 
     $self->_setup_if_headers($headers);
-    $self->_setup_custom_headers($custom_headers);
+    $self->_setup_custom_headers($headers, $custom_headers);
 
     if (!defined $content) {
         $content = $self->get_content();
@@ -1272,7 +1272,7 @@ sub _setup_custom_headers {
     if ($custom_headers && ref $custom_headers eq 'HASH') {
         for my $hdr_name (keys %{$custom_headers}) {
             my $hdr_value = $custom_headers->{$hdr_name};
-            warn "Setting custom header $hdr_name to '$hdr_value'\n";
+            warn "Setting custom header $hdr_name to '$hdr_value'\n" if $HTTP::DAV::DEBUG;
             $headers->header($hdr_name => $hdr_value);
         }
     }

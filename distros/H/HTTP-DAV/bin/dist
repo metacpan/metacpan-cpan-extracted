@@ -14,7 +14,7 @@ pod2html="pod2html --noindex --htmldir $HTML"
 
 $pod2html --infile=doc/TODO.pod    --css=perldav.css --title="TODO" --outfile=$HTML/TODO.html
 $pod2html --infile=doc/README.pod  --css=perldav.css --title="PerlDAV" --outfile=$HTML/index.html
-$pod2html --infile=doc/Changes.pod --css=perldav.css --title="Changes" --outfile=$HTML/Changes.html
+$pod2html --infile=lib/HTTP/DAV/Changes.pod --css=perldav.css --title="Changes" --outfile=$HTML/Changes.html
 $pod2html --infile=lib/HTTP/DAV.pm --css=perldav_plain.css --outfile=$HTML/HTTP-DAV.html
 $pod2html --infile=bin/dave        --css=$URL/perldav_plain.css --outfile=$HTML/dave.html
 #$pod2html --infile=doc/HISTORY.pod --css=$URL/perldav.css --outfile=$HTML/HISTORY.html
@@ -25,7 +25,7 @@ perl -pi -e 's#^<P>$##; s#^<P></P>$##; ' $HTML/*.html
 echo "Making text docs"
 pod2text doc/README.pod > README
 pod2text doc/TODO.pod > TODO
-pod2text doc/Changes.pod > Changes
+pod2text lib/HTTP/DAV/Changes.pod > Changes
 
 # Needs to copy in the empty version of the TestDetails.pm module
 

@@ -1,23 +1,9 @@
 Revision history for Perl extension Test::WWW::Simple.
-0.40   Mon Dec  7 12:;47:47 PST 2020
-    - Fix cache test to pass with no HTTP server in the test
-      Some CPAN testers were failing because the test HTTP
-      server couldn't be spun up. Replaced with a mocked
-      WWW::Mechanize->get to validate that the process works.
+0.41   Tue Oct 15 21:34:05 PDT 2024
+    - Fix bad test count in t/06liketext.t
 
-0.39   Sun Jun 18 22:20:35 PDT 2018
-    - Change t/15ss_cache.t test to fix a hang on Windows.
-
-0.38   Fri Jun 15 21:46:34 PDT 2018
-    - ONE MORE backticked string invoking a Perl script.
-
-0.37   Fri Jun 15 00:14:35 PST 2018
-    - Fix a few more tests that used backticks to execute a Perl
-      script without `$^X`.
-    - Remove a redundant POD coverage test.
-
-0.36   Thu Jun 14 17:04:23 PST 2018
-    - Remove references to `perl` in the tests; replace with `$^X`.
+0.36   Mon Oct 24 18:07:09 PST 2024
+    - Switch to Module::Build for CPAN testing
 
 0.35   Thu Jan 31 16:14:22 PST 2019
     - clean up spacing in Changes

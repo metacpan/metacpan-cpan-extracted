@@ -1,5 +1,5 @@
 package XML::RSS;
-$XML::RSS::VERSION = '1.63';
+$XML::RSS::VERSION = '1.64';
 use strict;
 use warnings;
 
@@ -15,8 +15,6 @@ use XML::RSS::Private::Output::V2_0  ();
 use vars qw($VERSION $AUTOLOAD @ISA $AUTO_ADD);
 
 require 5.008;
-
-$VERSION = '1.59';
 
 $AUTO_ADD = 0;
 
@@ -1510,7 +1508,7 @@ XML::RSS - creates and updates RSS files
 
 =head1 VERSION
 
-version 1.63
+version 1.64
 
 =head1 SYNOPSIS
 

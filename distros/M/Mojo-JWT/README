@@ -71,12 +71,17 @@ ATTRIBUTES
  public
 
     The public key to be used in decoding an asymmetrically signed JWT (eg.
-    RSA).
+    RSA). This can be any public key in a string format accepted by
+    Crypt::PK::RSA or a Crypt::PK::RSA object (if used a
+    Crypt::OpenSSL::RSA object will be converted).
 
  secret
 
     The symmetric secret (eg. HMAC) or else the private key used in
-    encoding an asymmetrically signed JWT (eg. RSA).
+    encoding an asymmetrically signed JWT (eg. RSA). Symmetric secrets
+    should be a string. A private key can be in a string format accepted by
+    Crypt::PK::RSA or a Crypt::PK::RSA object (if used a
+    Crypt::OpenSSL::RSA object will be converted).
 
  set_iat
 

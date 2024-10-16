@@ -1,5 +1,5 @@
 Changes
-Makefile.PL
+Build.PL
 MANIFEST			This list of files
 META.yml
 README

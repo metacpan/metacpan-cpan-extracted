@@ -1,7 +1,3 @@
-#!/usr/bin/env perl
-use strict;
-use warnings;
-
 use Test::Tester tests=>8;
 use Test::WWW::Simple;
 use Test::More;

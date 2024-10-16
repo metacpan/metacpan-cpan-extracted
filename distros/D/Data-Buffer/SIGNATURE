@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 5a1bfa2b95661a647f4427cc9f4ae6605d262d15fd23146d9bae6f222ac2ca90 Changes
+SHA256 fc96d87c346aea24cd76d6ca8427e45efcbdcee4f8df43a694fcd2f79f9d2a20 LICENSE
+SHA256 8cf5677712022e8ace1db8698759f9f6c1549ece295650ee8f76fe600890ae54 MANIFEST
+SHA256 d0f4e76bd518407c9e27b9f225e980459bfc4edda979eba81acd647469c17103 MANIFEST.SKIP
+SHA256 8c9ec00db2d4530861cd8635d57e18a162fa0a91d69653f5ee8c4d77ee4bb7d5 META.json
+SHA256 244d23623952e30ee18c75c463f703c42d9d7a7ecf08c1d83e4a8c8f75ca86f7 META.yml
+SHA256 7e99ee58a15b6ebe9cd27d46a2d36797cf34f348d5cbdf340ea39b60b02b9aea Makefile.PL
+SHA256 4a3d6f7f5527c749b8dc0508a17eb51588402b051ed056e548b9a548fbca67cd README
+SHA256 3dc2f180871a58964a122b5d64e483825ef0234dde0ba1023ea62752f8dcf96b dist.ini
+SHA256 d1e7d63d95153e2b72a075030a87bc8e14d7aa2711360bd7247ac495cbea8ceb lib/Data/Buffer.pm
+SHA256 22e84ba19589dd4734eb46f35b31dcba13cd14813ec87cb65ef4de18c8f8bc45 t/test.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmcO8zwACgkQ1fh7LgYG
+pfnn1Q/9FZoH+s2UA79TYrQbk7jcZbwMgSLbdr+2IH7SIzzs9nd1R/yZL02wicvo
+EI2PGPP2Il8/iGJqDZGE3eW/nKKyTy9zVtwbgNAVli82bHjg294t2xerF9pwXmBB
+WWDa1KAkZDcXs5WwqLbKUiBNHyVdsY3rr2j37duKrg/gLz5r8nOlg0oPczkTTxd+
+i2sWLSQkFZ9pRAptlUwdXglxN31ERC8kqZXFC5i137RZk/cr+0jb1lcp0r1+6z8Q
+d9f0sOKfYS+CiYgWCfDoXdQspBnUGSfBQembFBtndZKfm69IJWfjwrrrOFlOJRwA
+9mQKFcsF1l0PtDfFj31CxL2fX1Ul60Au1+VD83oVyFYaN0EorT+v3ywOnWt+d9KR
+1zFvPHflclOwVb7HrObBn7fZVBvjPr9C4ZMGtQZv7dhAg5RDIb5Dehv2yVTMvoky
+oLGnJJpYIT92nC1/cZQihUCEGKn45HSrUdDj8ZSSebmAfnmbmwoiHr/axVODH2h7
+Utw7BYAR8ZNbUD75BvUl0f7dtpdYyKemtJZvZcnVqXiWte8ietU+NjmnTOfImQRQ
+qY73Zgt6+xymHBh4WvpfwEF/4v4mcw+SSCjuhY0Yh2sqJrwrv9skhzk7ZfHu7J+i
+Dg8zDwl1afKEP1P06RbH0fSuALzZMn8DRZr0FxYbatjMhLbkaRQ=
+=ci4x
+-----END PGP SIGNATURE-----

@@ -11,7 +11,7 @@ use Carp qw( croak );
 use Convert::PEM::CBC;
 
 use vars qw( $VERSION );
-$VERSION = '0.08';
+our $VERSION = '0.09'; # VERSION
 
 sub new {
     my $class = shift;

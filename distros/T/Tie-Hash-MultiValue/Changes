@@ -1,4 +1,7 @@
 Revision history for Perl module Tie::Hash::MultiValue
+1.07 Mon Oct 14 13:29:56 PDT 2024
+    - Moved POD tests to XT, but did not fix MANIFEST. Fixed.
+
 1.06 Wed Feb 19 14:30:10 PDT 2020
     - Notified that it had been removed from CPAN.
       Almost certainly pilot error.

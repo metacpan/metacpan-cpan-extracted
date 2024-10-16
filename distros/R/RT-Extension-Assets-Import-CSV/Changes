@@ -1,3 +1,13 @@
+2.4 2024-10-10
+ - Allow to directly pass config options to Text::CSV_XS for custom delimiter,
+   quote_char, etc
+ - Add some sanity checks to the import process for avoiding processing
+   broken CSV files or files without the expected columns
+ - Add a Dry-Run mode to the import process for testing the import without
+   actually changing the database
+ - Skip lines with less columns than the header
+ - Fix %args being redeclared in the same scope
+
 2.3 2021-06-11
  - Make it compatible with RT 5
 

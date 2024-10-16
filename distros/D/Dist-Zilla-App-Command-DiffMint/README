@@ -3,7 +3,7 @@ NAME
     profile produces
 
 SYNOPSIS
-      $ dzil compare-mint [ --provider=<provider> ] [ --profile=<profile> ]
+      $ dzil diff-mint [ --provider=<provider> ] [ --profile=<profile> ] [ <file> ]
 
 DESCRIPTION
     Displays a diff of the current dist with what would be created by

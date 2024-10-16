@@ -3,7 +3,7 @@ package Test::WWW::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use Test::Builder;
 use Test::LongString;

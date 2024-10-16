@@ -1,6 +1,3 @@
-#!/usr/bin/env perl
-use strict;
-use warnings;
 use Test::More tests=>2;
 use Test::WWW::Simple no_agent=>1;
 

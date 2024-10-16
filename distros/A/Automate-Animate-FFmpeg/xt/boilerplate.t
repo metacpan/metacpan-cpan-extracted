@@ -50,7 +50,7 @@ TODO: {
     "placeholder date/time"       => qr(Date/time)
   );
 
-  module_boilerplate_ok('lib/Automate/Animate.pm');
+  module_boilerplate_ok('lib/Automate/Animate/FFmpeg.pm');
 
 
 }

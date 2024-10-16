@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -13,6 +13,7 @@ use DateTime::Format::Strptime;
 use Encode qw(encode);
 use JSON;
 use Travel::Status::DE::EFA::Departure;
+use Travel::Status::DE::EFA::Info;
 use Travel::Status::DE::EFA::Line;
 use Travel::Status::DE::EFA::Services;
 use Travel::Status::DE::EFA::Stop;
@@ -70,7 +71,14 @@ sub new {
 		delete $opt{timeout};
 	}
 
-	if ( not( $opt{name} or $opt{stopseq} or $opt{from_json} ) ) {
+	if (
+		not(   $opt{coord}
+			or $opt{name}
+			or $opt{stopfinder}
+			or $opt{stopseq}
+			or $opt{from_json} )
+	  )
+	{
 		confess('You must specify a name');
 	}
 	if ( $opt{type}
@@ -84,7 +92,13 @@ sub new {
 			= Travel::Status::DE::EFA::Services::get_service( $opt{service} ) )
 		{
 			$opt{efa_url} = $service->{url};
-			if ( $opt{stopseq} ) {
+			if ( $opt{coord} ) {
+				$opt{efa_url} .= '/XML_COORD_REQUEST';
+			}
+			elsif ( $opt{stopfinder} ) {
+				$opt{efa_url} .= '/XML_STOPFINDER_REQUEST';
+			}
+			elsif ( $opt{stopseq} ) {
 				$opt{efa_url} .= '/XML_STOPSEQCOORD_REQUEST';
 			}
 			else {
@@ -158,7 +172,33 @@ sub new {
 		json => JSON->new->utf8,
 	};
 
-	if ( $opt{stopseq} ) {
+	if ( $opt{coord} ) {
+
+		# outputFormat => 'JSON' returns invalid JSON
+		$self->{post} = {
+			coord => sprintf( '%.7f:%.7f:%s',
+				$opt{coord}{lon}, $opt{coord}{lat}, 'WGS84[DD.ddddd]' ),
+			radius_1              => 1320,
+			type_1                => 'STOP',
+			coordListOutputFormat => 'list',
+			max                   => 30,
+			inclFilter            => 1,
+			outputFormat          => 'rapidJson',
+		};
+	}
+	elsif ( $opt{stopfinder} ) {
+
+		# filter: 2 (stop) | 4 (street) | 8 (address) | 16 (crossing) | 32 (poi) | 64 (postcod)
+		$self->{post} = {
+			locationServerActive => 1,
+			type_sf              => 'any',
+			name_sf              => $opt{stopfinder}{name},
+			anyObjFilter_sf      => 2,
+			coordOutputFormat    => 'WGS84[DD.DDDDD]',
+			outputFormat         => 'JSON',
+		};
+	}
+	elsif ( $opt{stopseq} ) {
 
 		# outputFormat => 'JSON' also works; leads to different output
 		$self->{post} = {
@@ -379,7 +419,7 @@ sub check_for_ambiguous {
 		}
 		if ( $m->{name} eq 'error' and $m->{value} eq 'place list' ) {
 			$self->{errstr} = "ambiguous name parameter";
-			$self->{name_candidates}
+			$self->{place_candidates}
 			  = [ map { $_->{name} } @{ $json->{dm}{points} // [] } ];
 			return;
 		}
@@ -388,10 +428,23 @@ sub check_for_ambiguous {
 	return;
 }
 
-sub stop_name {
+sub stop {
 	my ($self) = @_;
+	if ( $self->{stop} ) {
+		return $self->{stop};
+	}
 
-	return $self->{response}{dm}{points}{point}{name};
+	my $point = $self->{response}{dm}{points}{point};
+	my $place = $point->{ref}{place};
+
+	$self->{stop} = Travel::Status::DE::EFA::Stop->new(
+		place     => $place,
+		full_name => $point->{name},
+		name      => $point->{name} =~ s{\Q$place\E,? ?}{}r,
+		id        => $point->{stateless},
+	);
+
+	return $self->{stop};
 }
 
 sub stops {
@@ -422,6 +475,23 @@ sub stops {
 
 	$self->{stops} = \@stops;
 	return @stops;
+}
+
+sub infos {
+	my ($self) = @_;
+
+	if ( $self->{infos} ) {
+		return @{ $self->{infos} };
+	}
+
+	for my $info ( @{ $self->{response}{dm}{points}{point}{infos} // [] } ) {
+		push(
+			@{ $self->{infos} },
+			Travel::Status::DE::EFA::Info->new( json => $info )
+		);
+	}
+
+	return @{ $self->{infos} // [] };
 }
 
 sub lines {
@@ -458,14 +528,73 @@ sub parse_line {
 
 sub results {
 	my ($self) = @_;
-	my @results;
 
 	if ( $self->{results} ) {
 		return @{ $self->{results} };
 	}
 
+	if ( $self->{post}{coord} ) {
+		return $self->results_coord;
+	}
+	elsif ( $self->{post}{name_sf} ) {
+		return $self->results_stopfinder;
+	}
+	else {
+		return $self->results_dm;
+	}
+}
+
+sub results_coord {
+	my ($self) = @_;
 	my $json = $self->{response};
 
+	my @results;
+	for my $stop ( @{ $json->{locations} // [] } ) {
+		push(
+			@results,
+			Travel::Status::DE::EFA::Stop->new(
+				place      => $stop->{parent}{name},
+				full_name  => $stop->{properties}{STOP_NAME_WITH_PLACE},
+				distance_m => $stop->{properties}{distance},
+				name       => $stop->{name},
+				id         => $stop->{id},
+			)
+		);
+	}
+
+	$self->{results} = \@results;
+
+	return @results;
+}
+
+sub results_stopfinder {
+	my ($self) = @_;
+	my $json = $self->{response};
+
+	my @results;
+	for my $stop ( @{ $json->{stopFinder}{points} // [] } ) {
+		push(
+			@results,
+			Travel::Status::DE::EFA::Stop->new(
+				place     => $stop->{ref}{place},
+				full_name => $stop->{name},
+				name      => $stop->{object},
+				id        => $stop->{stateless},
+				stop_id   => $stop->{ref}{gid},
+			)
+		);
+	}
+
+	$self->{results} = \@results;
+
+	return @results;
+}
+
+sub results_dm {
+	my ($self) = @_;
+	my $json = $self->{response};
+
+	my @results;
 	for my $departure ( @{ $json->{departureList} // [] } ) {
 		push(
 			@results,
@@ -495,6 +624,17 @@ sub result {
 # static
 sub get_service_ids {
 	return Travel::Status::DE::EFA::Services::get_service_ids(@_);
+}
+
+sub get_services {
+	my @services;
+	for my $service ( Travel::Status::DE::EFA::Services::get_service_ids() ) {
+		my %desc
+		  = %{ Travel::Status::DE::EFA::Services::get_service($service) };
+		$desc{shortname} = $service;
+		push( @services, \%desc );
+	}
+	return @services;
 }
 
 # static
@@ -529,14 +669,16 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 
 Travel::Status::DE::EFA is an unofficial interface to EFA-based departure
 monitors.
 
-It reports all upcoming tram/bus/train departures at a given place.
+It can serve as a departure monitor, request details about a specific
+trip/journey, and look up public transport stops by name or geolocation.
+The operating mode depends on its constructor arguments.
 
 =head1 METHODS
 
@@ -544,9 +686,9 @@ It reports all upcoming tram/bus/train departures at a given place.
 
 =item my $status = Travel::Status::DE::EFA->new(I<%opt>)
 
-Requests the departures as specified by I<opts> and returns a new
-Travel::Status::DE::EFA object.  B<service> and B<name> are
-mandatory.  Dies if the wrong I<opts> were passed.
+Requests data as specified by I<opts> and returns a new Travel::Status::DE::EFA
+object. B<service> and exactly one of B<coord>, B<stopfinder>, B<stopseq> or
+B<name> are mandatory.  Dies if the wrong I<opts> were passed.
 
 Arguments:
 
@@ -558,6 +700,25 @@ EFA service. See C<< efa-m --list >> for known services.
 If you found a service not listed there, please notify
 E<lt>derf+efa@finalrewind.orgE<gt>.
 
+=item B<coord> => I<hashref>
+
+Look up stops in the vicinity of the given coordinates.  I<hashref> must
+contain a B<lon> and a B<lat> element providing WGS84 longitude/latitude.
+
+=item B<stopfinder> => { B<name> => I<name> }
+
+Look up stops matching I<name>.
+
+=item B<stopseq> => I<hashref>
+
+Look up trip details. I<hashref> must provide B<stateless> (line ID),
+B<stop_id> (stop ID used as start for the reported route), B<key> (line trip
+number), and B<date> (departure date as YYYYMMDD string).
+
+=item B<name> => I<name>
+
+List departure for address / point of interest / stop I<name>.
+
 =item B<place> => I<place>
 
 Name of the place/city
@@ -566,10 +727,6 @@ Name of the place/city
 
 Type of the following I<name>.  B<poi> means "point of interest".  Defaults to
 B<stop> (stop/station name).
-
-=item B<name> => I<name>
-
-address / poi / stop name to list departures for.
 
 =item B<datetime> => I<DateTime object>
 
@@ -640,10 +797,29 @@ nothing (undef / empty list) otherwise.
 Returns a list of B<place> candidates if I<place> is ambiguous. Returns
 nothing (undef / empty list) otherwise.
 
+=item $status->stop
+
+Returns a Travel::Status::DE::EFA::Stop(3pm) instance describing the requested
+stop.
+
+=item $status->stops
+
+In case the requested place/name is served by multiple stops and the backend
+provides a list of those: returns a list of Travel::Status::DE::EFA::Stop(3pm)
+instances describing each of them. Returns an empty list otherwise.
+
 =item $status->results
 
-Returns a list of Travel::Status::DE::EFA::Departure(3pm) objects, each one describing
-one departure.
+In departure monitor mode: returns a list of
+Travel::Status::DE::EFA::Departure(3pm) objects, each one describing one
+departure.
+
+In coord or stopfinder mode: returns a list of
+Travel::Status::DE::EFA::Stop(3pm) objects.
+
+=item $status->result
+
+In stopseq mode: Returns a Travel::Status::DE::EFA::Trip(3pm) object.
 
 =item Travel::Status::DE::EFA::get_service_ids()
 
@@ -679,6 +855,11 @@ hashref contains two optional keys: B<area> (GeoJSON) and B<regions> (list of
 strings, e.g. "DE" or "CH-BE").
 
 =back
+
+=item Travel::Status::DE::EFA::get_services()
+
+Returns a list of hashrefs describing all supported services. In addition
+to the keys listed above, each service contains a B<shortname> (service ID).
 
 =back
 

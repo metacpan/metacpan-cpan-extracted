@@ -2,7 +2,7 @@ use 5.008001; use strict; use warnings; use utf8;
 
 package Lingua::EN::Titlecase::Simple;
 
-our $VERSION = '1.005';
+our $VERSION = '1.015';
 
 our @SMALL_WORD
 	= qw/ (?<!q&)a an and as at(?!&t) but by en for if in of on or the to v[.]? via vs[.]? /;
@@ -12,10 +12,12 @@ my $apos = q/ (?: ['’] [[:lower:]]* )? /;
 sub titlecase {
 	my @str = @_ or return;
 
+	my $small_re = join '|', @SMALL_WORD;
+
 	for ( @str ) {
 		s{\A\s+}{}, s{\s+\z}{};
 
-		$_ = lc $_ unless /[[:lower:]]/;
+		$_ = lc $_ if not /[[:lower:]]/;
 
 		s{
 			\b (_*) (?:
@@ -23,33 +25,53 @@ sub titlecase {
 				[-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ $apos |    # URL, domain, or email or
 				[0-9] [0-9,._ ]+ $apos )                           # a numeric literal
 				|
-				( (?i) ${\join '|', @SMALL_WORD} $apos )           # or small word (case-insensitive)
+				( (?i: $small_re ) $apos )                         # or small word (case-insensitive)
 				|
 				( [[:alpha:]] [[:lower:]'’()\[\]{}]* $apos )       # or word w/o internal caps
 				|
 				( [[:alpha:]] [[:alpha:]'’()\[\]{}]* $apos )       # or some other word
-			) (?= _* \b )
+			) (_*) \b
 		}{
-			$1 .
-			( defined $2 ? $2         # preserve URL, domain, or email
-			: defined $3 ? lc $3      # lowercase small word
-			: defined $4 ? ucfirst $4 # capitalize lower-case word
-			: $5 )                    # preserve other kinds of word
-		}exgo;
+			$1 . (
+			defined $2 ? $2         # preserve URL, domain, or email
+			: defined $3 ? "\L$3"     # lowercase small word
+			: defined $4 ? "\u\L$4"   # capitalize word w/o internal caps
+			: $5                      # preserve other kinds of word
+			) . $6
+		}xeg;
 
-		# exceptions for small words: capitalize at start and end of title
+
+		# Exceptions for small words: capitalize at start and end of title
 		s{
-			( \A [[:punct:]]*          # start of title...
+			(  \A [[:punct:]]*         # start of title...
 			|  [:.;?!][ ]+             # or of subsentence...
 			|  [ ]['"“‘(\[][ ]*     )  # or of inserted subphrase...
-			( ${\join '|', @SMALL_WORD} ) \b  # ... followed by small word
-		}{$1\u\L$2}xigo;
+			( $small_re ) \b           # ... followed by small word
+		}{$1\u\L$2}xig;
 
 		s{
-			\b ( ${\join '|', @SMALL_WORD} )  # small word...
+			\b ( $small_re )      # small word...
 			(?= [[:punct:]]* \Z   # ... at the end of the title...
 			|   ['"’”)\]] [ ] )   # ... or of an inserted subphrase?
-		}{\u\L$1}xigo;
+		}{\u\L$1}xig;
+
+		# Exceptions for small words in hyphenated compound words
+		## e.g. "in-flight" -> In-Flight
+		s{
+			\b
+			(?<! -)					# Negative lookbehind for a hyphen; we don't want to match man-in-the-middle but do want (in-flight)
+			( $small_re )
+			(?= -[[:alpha:]]+)		# lookahead for "-someword"
+		}{\u\L$1}xig;
+
+		## # e.g. "Stand-in" -> "Stand-In" (Stand is already capped at this point)
+		s{
+			\b
+			(?<!…)					# Negative lookbehind for a hyphen; we don't want to match man-in-the-middle but do want (stand-in)
+			( [[:alpha:]]+- )		# $1 = first word and hyphen, should already be properly capped
+			( $small_re )           # ... followed by small word
+			(?!	- )					# Negative lookahead for another '-'
+		}{$1\u$2}xig;
 	}
 
 	wantarray ? @str : ( @str > 1 ) ? \@str : $str[0];
@@ -112,8 +134,6 @@ strings in scalar context is therefore L<discouraged|perlpolicy/discouraged>.
 =head2 C<@SMALL_WORD>
 
 Contains the list of words to avoid capitalizing.
-It may be changed before the first call to the C<titlecase> function.
-Any changes after that will have no effect.
 
 =head1 SEE ALSO
 

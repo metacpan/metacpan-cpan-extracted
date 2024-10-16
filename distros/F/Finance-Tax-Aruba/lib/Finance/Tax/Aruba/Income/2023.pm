@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income::2023;
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 use Moose;
 use namespace::autoclean;
 
@@ -41,6 +41,7 @@ sub is_year {
     my $self = shift;
     my $year = shift;
     return 1 if $year == 2023;
+    return 1 if $year == 2024;
     return 0;
 }
 
@@ -59,7 +60,7 @@ Finance::Tax::Aruba::Income::2023 - Income tax calculator for the year 2023
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

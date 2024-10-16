@@ -11,7 +11,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION='0.28';
+our $VERSION='0.29';
 
 use Test::More;
 use Test2::Plugin::UTF8;

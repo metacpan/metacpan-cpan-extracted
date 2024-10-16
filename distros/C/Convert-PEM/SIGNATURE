@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 0fc251ee320061843f4f2ecb60acbaedb88852af6df928030943b82e34229b83 Changes
+SHA256 a6baf35c651ea8b931bfb6c0542d59bf42835eb55f997ee31081886d8b5e2244 LICENSE
+SHA256 04948b05e9a9b673a83802945067a87c9529f438228f58c75f2d993e50224b37 MANIFEST
+SHA256 cee69261d42289cccec2b79ede7fde9cf389b9fc81803db5c9f2c0b3101c3780 META.json
+SHA256 6252db285649cb86421e803dffaa1284cc1dfd26a663952e2d819db56a26f2fa META.yml
+SHA256 f45435f8920ea86a269c17bf310777633980145c238122ed1e15eaab7f9c9568 Makefile.PL
+SHA256 9f5994e7377b0fa071a047f802eaec0221c1dd07acffd543c987cd329fe0fa11 README
+SHA256 3e3089d655ee53f06c7b83090c0f5fe0ce53e7ffc66628f6fc3a130b3441c5c7 dist.ini
+SHA256 ab5f8bbad498019969e049ec1903889fdf1a3a9dc423de7779b3e755418b0479 lib/Convert/PEM.pm
+SHA256 a446d7f00382b96f2af7d666a48f2e0a343b55eaabb92f5e0db5a459b7c50877 lib/Convert/PEM/CBC.pm
+SHA256 7bccdccfcf97374ba5669237bced4efc9f7b7fb24ddb10a76b3f284e5eeaefd4 t/00-compile.t
+SHA256 5097462c005132233b511571ba0c572dd34fa17318fbd5033830f8eccaa8cd1a t/01-readwrite.t
+SHA256 54977ffdd2048bef5008d7d4430c9f2a91bc2e006eb2e65291fec4363f612e79 t/02-encode.t
+SHA256 ff9b80fa2c9d6dc25349851f81c94ac31b691c1a7855c47261ab46a4730069c5 t/03-ede3.t
+SHA256 f5520c318f9d4fc6a8b2dc581214433aae377eae82ca76727848b06093b01252 t/04-explode.t
+SHA256 b0db96e65e2b5300f140170b054f3b6c4bb171240b085f4d5e21f16f961bcac9 xt/pod.t
+SHA256 4d08fdb69fdc6a461a32b5f4248525360ff123184ffc49b0de19768714d06fd8 xt/synopsis.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmcPHf8ACgkQ1fh7LgYG
+pflh7w//d7myRBO5jRmFydflxBVT+rt0BRpSyjgo63QASQz9IUjWhj0KoZzrjSFC
+BoKmb7OdVBL1ok86wowMOfgWSacsYZifFU6UlXxQNZntUBWzR6fsOB3OW0sNmpKR
+NR6QzJpOtnwzDEX4BpxUN55N/oCfeI58YHZnRNXw1qqohFfvXOKp8WG4nJGOIvRD
+1koGnLFkLhGV+6MVcPFzotQTP5NFn95V25GICEV9I7xs2qr/de6HfDr7flDBPqb0
+mf9cvxLWVND3h3DOyjNXu9qYfh3JYlOVEraEBDd3IrN3r5rMlB6dCRu94UTUiprV
+ePg0KltIWRqkb8B6xkCuHb0qifltvA5scCis6tZrup8mB9gocNdpO+6kriVlbSxM
+azz1jMyr25DoHdxvIZViBzrNkjfXftDHZU5Ar8xQd+FYP40j723hLufxfL+JbnVu
+u8ODC4xKtYIXSZDoYljbB+Y0Ptad1cTGH19aaJMUDWb/cKhnsiO8LdgmTv1utZGN
+yYC6z3k50KIOP2JyIzz5VUYr1hY7JdsutDrgh9/bTsr8WnqYpgUgB5Th7m0z3TqR
+Dxrn9kIciBkjb+OXtrpfhRNbmpM+jaZnXghPz+i+DclQTffIXG6eT64nBvgZWc2Q
+BAGdnfo1KE2lMaDwxxfL5ZsAIA4VkoTvbo0ZBXL1H5e3KvP1WDE=
+=kI8E
+-----END PGP SIGNATURE-----

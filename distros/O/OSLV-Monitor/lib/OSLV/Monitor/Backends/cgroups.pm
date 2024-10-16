@@ -16,11 +16,11 @@ OSLV::Monitor::Backends::cgroups - Backend for Linux cgroups.
 
 =head1 VERSION
 
-Version 1.0.0
+Version 1.0.2
 
 =cut
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.2';
 
 =head1 SYNOPSIS
 
@@ -296,7 +296,8 @@ sub run {
 	};
 
 	my $proc_cache;
-	my $new_cache = {};
+	my $new_cache    = {};
+	my $cache_is_new = 0;
 	if ( -f $self->{cache_file} ) {
 		eval {
 			my $raw_cache = read_file( $self->{cache_file} );
@@ -310,7 +311,9 @@ sub run {
 			$data->{cache_failure} = 1;
 			return $data;
 		}
-	} ## end if ( -f $self->{cache_file} )
+	} else {
+		$cache_is_new = 1;
+	}
 
 	my $base_stats = {
 		procs                          => 0,
@@ -515,11 +518,11 @@ sub run {
 	#
 	# gets of procs for finding a list of containers
 	#
-	my $ps_output = `ps -haxo pid,uid,gid,cgroupns,%cpu,%mem,rss,vsize,trs,drs,size,cgroup 2> /dev/null`;
-	if ( $? != 0 ) {
-		$self->{cgroupns_usable} = 0;
-		$ps_output = `ps -haxo pid,uid,gid,%cpu,%mem,rss,vsize,trs,drs,size,etimes,cgroup 2> /dev/null`;
-	}
+	#	my $ps_output = `ps -haxo pid,uid,gid,cgroupns,%cpu,%mem,rss,vsize,trs,drs,size,cgroup 2> /dev/null`;
+	#	if ( $? != 0 ) {
+	#		$self->{cgroupns_usable} = 0;
+	my $ps_output = `ps -haxo pid,uid,gid,%cpu,%mem,rss,vsize,trs,drs,size,etimes,cgroup 2> /dev/null`;
+	#	}
 	my @ps_output_split = split( /\n/, $ps_output );
 	my %found_cgroups;
 	my %cgroups_percpu;
@@ -539,13 +542,13 @@ sub run {
 		my $vol_ctxt_switches   = 0;
 		my $invol_ctxt_switches = 0;
 		my ( $pid, $uid, $gid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup );
-		if ( $self->{cgroupns_usable} ) {
-			( $pid, $uid, $gid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup )
-				= split( /\s+/, $line );
-		} else {
-			( $pid, $uid, $gid, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup )
-				= split( /\s+/, $line );
-		}
+		#		if ( $self->{cgroupns_usable} ) {
+		#			( $pid, $uid, $gid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup )#
+		#				= split( /\s+/, $line );
+		#		} else {
+		( $pid, $uid, $gid, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup )
+			= split( /\s+/, $line );
+		#		}
 		if ( $cgroup =~ /^0\:\:\// ) {
 
 			my $cache_name = 'proc-' . $pid . '-' . $uid . '-' . $gid . '-' . $cgroup;
@@ -617,8 +620,8 @@ sub run {
 	# build a list of mappings
 	#
 	foreach my $cgroup ( keys(%found_cgroups) ) {
-		my $cgroupns = $found_cgroups{$cgroup};
-		my $map_to   = $self->cgroup_mapping( $cgroup, $cgroupns );
+		#my $cgroupns = $found_cgroups{$cgroup};
+		my $map_to = $self->cgroup_mapping($cgroup);
 		if ( defined($map_to) ) {
 			$self->{mappings}{$cgroup} = $map_to;
 		}
@@ -748,6 +751,17 @@ sub run {
 		$data->{cache_failure} = 1;
 	}
 
+	if ($cache_is_new) {
+		delete( $data->{oslvms} );
+		$data->{oslvms} = {};
+		my @total_keys = keys( %{ $data->{totals} } );
+		foreach my $total_key (@total_keys) {
+			if ( ref( $data->{totals}{$total_key} ) eq '' ) {
+				$data->{totals}{$total_key} = 0;
+			}
+		}
+	} ## end if ($cache_is_new)
+
 	return $data;
 } ## end sub run
 
@@ -777,7 +791,7 @@ sub usable {
 sub cgroup_mapping {
 	my $self        = $_[0];
 	my $cgroup_name = $_[1];
-	my $cgroupns    = $_[2];
+	#my $cgroupns    = $_[2];
 
 	if ( !defined($cgroup_name) ) {
 		return undef;

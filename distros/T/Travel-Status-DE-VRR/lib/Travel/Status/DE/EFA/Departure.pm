@@ -10,7 +10,7 @@ use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 
 Travel::Status::DE::EFA::Departure->mk_ro_accessors(
 	qw(countdown datetime delay destination is_cancelled key line lineref mot
@@ -150,9 +150,11 @@ sub parse_route {
 		push(
 			@ret,
 			Travel::Status::DE::EFA::Stop->new(
-				arr       => $arr,
-				dep       => $dep,
-				id        => $stop->{ref}{id},
+				sched_arr => $arr,
+				sched_dep => $dep,
+				arr_delay => $ref->{arrValid} ? $ref->{arrDelay} : undef,
+				dep_delay => $ref->{depValid} ? $ref->{depDelay} : undef,
+				id        => $ref->{id},
 				full_name => $stop->{name},
 				place     => $stop->{place},
 				name      => $stop->{nameWO},
@@ -281,7 +283,7 @@ departure received by Travel::Status::DE::EFA
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

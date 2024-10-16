@@ -13,7 +13,7 @@ our @CARP_NOT = qw(
   Dumbbench::Result
 );
 
-our $VERSION = '0.503';
+our $VERSION = '0.505';
 
 require Exporter;
 
@@ -483,7 +483,7 @@ This chart is sorted from slowest to fastest, and shows the percent speed differ
 as well as the uncertainties on the rates and the relative speed difference. The uncertainty on a speed difference
 may be omitted if it is below one tenth of a percent.
 
-c<cmpthese> can also be passed the data structure that C<timethese()> returns:
+C<cmpthese> can also be passed the data structure that C<timethese()> returns:
 
   my $results = timethese( 100.01, { a => "++\$i", b => "\$i *= 2" } ) ;
   cmpthese( $results );

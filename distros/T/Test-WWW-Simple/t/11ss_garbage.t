@@ -1,11 +1,8 @@
-#!/usr/bin/env perl
-use strict;
-use warnings;
-
+#!/usr/local/bin/perl
 use Test::More tests=>2;
 
-my @output = `$^X -Iblib/lib examples/simple_scan<examples/ss_garbage1.in`;
-my @expected = ();
+@output = `$^X -Iblib/lib examples/simple_scan<examples/ss_garbage1.in`;
+@expected = ();
 is_deeply(\@output, \@expected, "working output as expected");
 
 @output = `examples/simple_scan<examples/ss_garbage2.in`;

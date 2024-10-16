@@ -29,7 +29,7 @@ my $DIAG_verbose = 0;
 use Data::Dump qw/pp/;
 use utf8;
 
-our $VERSION='0.28';
+our $VERSION='0.29';
 
 use File::Temp;
 use File::Spec;
@@ -178,7 +178,7 @@ if( $DIAG_verbose > 0 ){ diag "done testing called."; }
 sub fix_scalar {
 	#return $_[0]; # short-circuit it, no need to fix anything
 	my $instr = $_[0];
-	$instr =~ s/^(['"]?)(\d+\.\d{4})\d+(['"]?)$/$1$2$3/g;
+	$instr =~ s/^(['"]?)(\d+)\.\d{4}\d+(['"]?)$/$1$2$3/g;
 	return $instr;
 }
 

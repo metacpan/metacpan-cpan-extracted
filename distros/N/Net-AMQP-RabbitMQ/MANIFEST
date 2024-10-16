@@ -13,7 +13,10 @@ amqp_url.c
 Changes
 ci/run-ci-tests.sh
 CODE_OF_CONDUCT.md
+Containerfile
 CONTRIBUTING.md
+doc/protocol-scenarios.md
+doc/rabbitmq-c_notes.md
 inc/Devel/CheckLib.pm
 LICENSE
 LICENSE-MIT
@@ -22,6 +25,7 @@ MANIFEST			This list of files
 manual_tests/001_dead_letter_headers.t
 perl_math_int64.c
 perl_math_int64.h
+podman-build.sh
 ppport.h
 rabbitmq-include/amqp_openssl_bio.h
 rabbitmq-include/amqp_private.h

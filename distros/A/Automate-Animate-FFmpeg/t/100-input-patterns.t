@@ -19,7 +19,7 @@ use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
 use Automate::Animate::FFmpeg;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my $curdir = Cwd::abs_path($FindBin::Bin);
 

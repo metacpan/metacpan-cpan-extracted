@@ -1,6 +1,4 @@
-$Id$
-
-=for html 
+=for html
 <div id="content">
 <H1>PerlDAV -- A WebDAV client library for Perl5</H1>
 </div><div id="content">
@@ -11,17 +9,17 @@ $Id$
 
 =end text
 
-PerlDAV is a Perl library for modifying content on webservers using the WebDAV protocol. Now you can LOCK, DELETE and PUT files and much more on a DAV-enabled webserver. 
+PerlDAV is a Perl library for modifying content on webservers using the WebDAV protocol. Now you can LOCK, DELETE and PUT files and much more on a DAV-enabled webserver.
 
 The PerlDAV library consists of:
 
 =over 4
 
-=item * 
+=item *
 
 B<HTTP::DAV> - an object-oriented Web-DAV client API.
 
-=item * 
+=item *
 
 B<dave> - the DAV Explorer, an end-user Unix console program for interacting with WebDAV servers. dave looks and feels like a standard Unix ftp program.
 
@@ -48,7 +46,7 @@ Retrieve the latest copy from CPAN: https://metacpan.org/module/HTTP-DAV/
 
 With this method you will first have to install the pre-requisites: LWP and XML::DOM, see L<what are the prerequisites?>.
 
-When you install PerlDAV, the HTTP::DAV library will be installed to your Perl library location (usually /usr/local/lib/perl5) 
+When you install PerlDAV, the HTTP::DAV library will be installed to your Perl library location (usually /usr/local/lib/perl5)
 
 C<dave> will be installed to /usr/local/bin. This suits most people but you can modify this by using the INSTALLBIN flag:
 
@@ -62,17 +60,17 @@ C<dave> will be installed to /usr/local/bin. This suits most people but you can 
 
 Perl 5.6.0+
 
-=item * 
+=item *
 
-LWP (Have not tested lower than v5.48) 
+LWP (Have not tested lower than v5.48)
 
 =item *
 
 Scalar::Util (standard library from 5.8.0+)
 
-=item * 
+=item *
 
-XML::DOM (Have not tested lower than v1.26). 
+XML::DOM (Have not tested lower than v1.26).
 Requires James Clark's expat library:
 
 =item *
@@ -111,7 +109,7 @@ HTTP::DAV and dave are pure perl so only needs Perl 5.6.0 (or later). PerlDAV is
 
 =head1 WHERE ARE THE MANUALS?
 
-Once you've installed PerlDAV, you can type: 
+Once you've installed PerlDAV, you can type:
 
    $ perldoc HTTP::DAV
    $ man dave
@@ -131,7 +129,7 @@ There is a mailing list for PerlDAV for use by Developers and Users.  Please see
 
 You will notice that the standard C<make test> command invokes a large set of test procedures, but most will be skipped.  This standard test is sufficient to give you a good indication that PerlDAV has installed properly.
 
-If you'd like to see how well PerlDAV performs against a particular DAV server then you should set the URL (and username,password) in the test suite t/TestDetails.pm. Then you can run C<make test> again and watch the test suite perform as many operations as the server supports. Please note that the test suite will perofrm well over 200 HTTP requests to your server. 
+If you'd like to see how well PerlDAV performs against a particular DAV server then you should set the URL (and username,password) in the test suite t/TestDetails.pm. Then you can run C<make test> again and watch the test suite perform as many operations as the server supports. Please note that the test suite will perofrm well over 200 HTTP requests to your server.
 
 I have tested PerlDAV against IIS5, mod_dav and the Xythos WFS.
 
@@ -155,7 +153,7 @@ Delete previous server output: rm /tmp/perldav_debug.txt
 
 =item *
 
-Run that single test again: 
+Run that single test again:
 
 $make test TEST_FILES=t/thetest.t TEST_VERBOSE=1 > testoutput.log
 
@@ -193,8 +191,14 @@ All rights reserved.
 =head1 MAINTAINER
 
 The current maintainer of HTTP-DAV is Cosimo Streppone for
-Opera Software ASA. You can contact us at C<cosimo@cpan.org>
-or C<opera@cpan.org>.
+Kahoot!, and previously for Opera Software ASA. You can contact me
+at C<cosimo@cpan.org>.
+
+=head1 GITHUB REPOSITORY
+
+The official repository for HTTP-DAV is now on Github:
+
+    https://github.com/cosimo/perl5-http-dav
 
 =head1 LICENSE
 

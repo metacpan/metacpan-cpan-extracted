@@ -1,0 +1,24 @@
+---
+abstract: 'Data::Buffer - Read/write buffer class'
+author:
+  - 'Benjamin Trott / ben@rhumba.pair.com'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Buffer
+resources:
+  homepage: https://github.com/perl-Crypt-OpenPGP/Data-Buffer
+  repository: https://github.com/perl-Crypt-OpenPGP/Data-Buffer.git
+version: '0.06'
+x_generated_by_perl: v5.38.2
+x_maintainers:
+  - 'Timothy Legge <timlegge@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

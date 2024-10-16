@@ -15,11 +15,11 @@ OSLV::Monitor::Backends::FreeBSD - backend for FreeBSD jails
 
 =head1 VERSION
 
-Version 0.0.3
+Version 0.0.4
 
 =cut
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 =head1 SYNOPSIS
 
@@ -127,6 +127,7 @@ sub run {
 
 	my $proc_cache;
 	my $new_proc_cache = {};
+	my $cache_is_new   = 0;
 	if ( -f $self->{proc_cache} ) {
 		eval {
 			my $raw_cache = read_file( $self->{proc_cache} );
@@ -141,7 +142,9 @@ sub run {
 			$proc_cache = {};
 			return $data;
 		}
-	} ## end if ( -f $self->{proc_cache} )
+	} else {
+		$cache_is_new = 1;
+	}
 
 	my $base_stats = {
 		'copy-on-write-faults'         => 0,
@@ -412,6 +415,17 @@ sub run {
 	if ($@) {
 		push( @{ $data->{errors} }, 'saving proc cache failed, "' . $self->{proc_cache} . '"... ' . $@ );
 	}
+
+	if ($cache_is_new) {
+		delete( $data->{oslvms} );
+		$data->{oslvms} = {};
+		my @total_keys = keys( %{ $data->{totals} } );
+		foreach my $total_key (@total_keys) {
+			if ( ref( $data->{totals}{$total_key} ) eq '' ) {
+				$data->{totals}{$total_key} = 0;
+			}
+		}
+	} ## end if ($cache_is_new)
 
 	return $data;
 } ## end sub run

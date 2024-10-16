@@ -12,6 +12,18 @@ Revision history for HTTP::DAV
 
 =end text
 
+=head2 v0.50 (released 2024/10/16):
+
+=over 4
+
+=item * B<bug fixes>
+
+Fixed missing custom headers when calling PUT methods. Closes C<RT#100756>.
+Thanks Georg Acher for the patch and for patiently waiting a decade (!) for a
+fix.
+
+=back
+
 =head2 v0.49 (released 2018/11/28):
 
 =over 4

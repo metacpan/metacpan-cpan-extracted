@@ -108,13 +108,13 @@ int snprint_fd_table(char *buf, size_t sizeof_buf, int max_fd) {
             len += snprintf(bufpos, avail, "%4d: inet [%s]:%d", i, addr_str, ntohs(sin->sin_port));
          }
          else if (addr.ss_family == AF_UNIX) {
-            struct sockaddr_un *sun= (struct sockaddr_un*) &addr;
+            struct sockaddr_un *s_un= (struct sockaddr_un*) &addr;
             char *p;
             // sanitize socket name, which will be random bytes if anonymous
-            for (p= sun->sun_path; *p; p++)
+            for (p= s_un->sun_path; *p; p++)
                if (*p <= 0x20 || *p >= 0x7F)
                   *p= '?';
-            len += snprintf(bufpos, avail, "%4d: unix [%s]", i, sun->sun_path);
+            len += snprintf(bufpos, avail, "%4d: unix [%s]", i, s_un->sun_path);
          }
          else {
             len += snprintf(bufpos, avail, "%4d: ? socket family %d", i, addr.ss_family);
@@ -131,13 +131,13 @@ int snprint_fd_table(char *buf, size_t sizeof_buf, int max_fd) {
                len += snprintf(bufpos, avail, " -> [%s]:%d\n", addr_str, ntohs(sin->sin_port));
             }
             else if (addr.ss_family == AF_UNIX) {
-               struct sockaddr_un *sun= (struct sockaddr_un*) &addr;
+               struct sockaddr_un *s_un= (struct sockaddr_un*) &addr;
                char *p;
                // sanitize socket name, which will be random bytes if anonymous
-               for (p= sun->sun_path; *p; p++)
+               for (p= s_un->sun_path; *p; p++)
                   if (*p <= 0x20 || *p >= 0x7F)
                      *p= '?';
-               len += snprintf(bufpos, avail, " -> unix [%s]\n", sun->sun_path);
+               len += snprintf(bufpos, avail, " -> unix [%s]\n", s_un->sun_path);
             }
             else {
                len += snprintf(bufpos, avail, " -> socket family %d\n", addr.ss_family);

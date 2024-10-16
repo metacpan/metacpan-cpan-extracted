@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 package LocalServer;
 
 # start a fake webserver, fork, and connect to ourselves
