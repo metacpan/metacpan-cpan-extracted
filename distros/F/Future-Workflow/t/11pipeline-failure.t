@@ -2,9 +2,10 @@
 
 use v5.26;
 use warnings;
-use experimental 'signatures';
 
-use Test::More;
+use Test2::V0;
+
+use experimental 'signatures';
 
 use Future::Workflow::Pipeline;
 
@@ -29,7 +30,7 @@ use Future;
 
    await $p->push_input( $_ ) for 1 .. 3;
 
-   is_deeply( \@finished, [qw( 1-A 3-A )],
+   is( \@finished, [qw( 1-A 3-A )],
       '@finished after failing stage still sees successful items'
    );
    like( $warnings, qr/^Pipeline stage failed: No evens /,
@@ -51,8 +52,8 @@ use Future;
       },
       on_failure => sub ( $f ) {
          $failed++;
-         Test::More::isa_ok( $f, "Future", '$f' );
-         Test::More::is( $f->failure, "Always fails\n", '$f->failure' );
+         ::isa_ok( $f, [ "Future" ], '$f' );
+         ::is( $f->failure, "Always fails\n", '$f->failure' );
       }
    );
 

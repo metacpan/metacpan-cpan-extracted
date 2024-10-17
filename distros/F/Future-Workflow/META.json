@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -22,25 +22,25 @@
       "runtime" : {
          "requires" : {
             "Future::AsyncAwait" : "0.47",
-            "Object::Pad" : "0.43",
+            "Object::Pad" : "0.800",
             "experimental" : "0",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Future::Workflow" : {
          "file" : "lib/Future/Workflow.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Future::Workflow::Pipeline" : {
          "file" : "lib/Future/Workflow/Pipeline.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

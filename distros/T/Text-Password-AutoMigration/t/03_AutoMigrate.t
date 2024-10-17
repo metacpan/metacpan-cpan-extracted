@@ -17,7 +17,7 @@ subtest 'verify with CORE::Crypt 100 times' => sub {    # 3
     plan tests => 100;
     foreach ( 1 .. 100 ) {
         $flag = $pwd->verify( $raw, $hash );
-        like $flag, qr|^\$6\$[!-~\s]{1,$m}\$[\w/\.]{86}$|, "verify: " . $flag;
+        like $flag, qr|^\$6\$[ -~]{1,$m}\$[\w/\.]{86}$|, "verify: " . $flag;
     }
 };
 
@@ -33,7 +33,7 @@ SKIP: {
         plan tests => 100;
         foreach ( 1 .. 100 ) {
             $flag = $pwd->verify( $raw, $hash );
-            like $flag, qr|^\$6\$[!-~\s]{1,$m}\$[\w/\.]{86}$|, "verify: " . $flag;
+            like $flag, qr|^\$6\$[ -~]{1,$m}\$[\w/\.]{86}$|, "verify: " . $flag;
             ( $raw, $hash ) = $pwd->Text::Password::MD5::generate;
 
         }
@@ -48,7 +48,7 @@ subtest 'verify with SHA512 100 times' => sub {    # 5
     plan tests => 2000;
     foreach ( 1 .. 1000 ) {
         $flag = $pwd->verify( $raw, $hash );
-        like $flag, qr|^\$6\$[!-~\s]{1,$m}\$[\w/\.]{86}$|, "verify: " . $flag;    # 5.1
+        like $flag, qr|^\$6\$[ -~]{1,$m}\$[\w/\.]{86}$|, "verify: " . $flag;    # 5.1
         isnt $flag, $hash;                                                      # 5.2
     }
 };

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Exception;
+use Test::Fatal;
 
 my $m; BEGIN { use_ok($m = "Catalyst::Authentication::User") }
 
@@ -39,17 +39,17 @@ ok( $o->supports("top_level"), "simple top level feature check");
 ok( $o->supports(qw/feature subfeature/), "traversal");
 ok( !$o->supports(qw/feature unsupported_subfeature/), "traversal terminating in false");
 
-lives_ok {
+is exception {
     $o->supports("bad_key");
-} "can check for non existent feature";
+}, undef, "can check for non existent feature";
 
 #dies_ok {
 #    $o->supports(qw/bad_key subfeature/)
 #} "but can't traverse into one";
 
-lives_ok {
+is exception {
     is $o->other_method, 'FNAR', 'Delegation onto user object works';
-} 'Delegation lives';
+}, undef, 'Delegation lives';
 
 done_testing;
 

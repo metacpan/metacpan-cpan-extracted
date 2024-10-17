@@ -1,8 +1,13 @@
-#<<<
-use strict; use warnings;
-#>>>
+use strict;
+use warnings;
 
-use Config                        qw( %Config );
+use Config qw( %Config );
+
+BEGIN {
+  require './maint/AuthorExtensions.pl'
+    unless ( $Config{ osname } =~ m/\A(?:freebsd|openbsd|solaris)\z/ or exists( $ENV{ MAKELEVEL } ) );
+}
+
 use ExtUtils::MakeMaker::CPANfile qw( WriteMakefile );
 
 if ( !$Config{ d_alarm } ) {
@@ -21,15 +26,15 @@ my %WriteMakefileArgs = (
     provides    => {
       'Time::Out' => {
         file    => 'lib/Time/Out.pm',
-        version => '0.24',
+        version => '1.0.0',
       },
       'Time::Out::Exception' => {
         file    => 'lib/Time/Out/Exception.pm',
-        version => '0.24',
+        version => '1.0.0',
       },
       'Time::Out::ParamConstraints' => {
         file    => 'lib/Time/Out/ParamConstraints.pm',
-        version => '0.24',
+        version => '1.0.0',
       },
     },
     resources => {
@@ -48,8 +53,5 @@ my %WriteMakefileArgs = (
   realclean => { FILES                => 'local' },
   test      => { RECURSIVE_TEST_FILES => 1 },
 );
-
-require './maint/AuthorExtensions.pl'
-  unless ( $Config{ osname } =~ m/\A(?:freebsd|openbsd|solaris)\z/ or exists( $ENV{ MAKELEVEL } ) );
 
 WriteMakefile( %WriteMakefileArgs );

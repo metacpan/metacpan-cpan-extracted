@@ -3,15 +3,13 @@ package Catalyst::Plugin::Authentication;
 use Moose;
 use namespace::clean -except => 'meta';
 use MRO::Compat;
-use Tie::RefHash;
-use Class::Inspector;
 use Catalyst::Authentication::Realm;
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(qw/_user/);
 
-our $VERSION = "0.10023";
+our $VERSION = '0.10024';
 
 sub set_authenticated {
     my ( $c, $user, $realmname ) = @_;

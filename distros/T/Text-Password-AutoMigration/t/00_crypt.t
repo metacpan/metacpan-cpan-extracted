@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 use_ok 'Text::Password::CoreCrypt';                                                          # 1
 my $pwd = new_ok('Text::Password::CoreCrypt');                                               # 2
@@ -23,7 +23,7 @@ SKIP: {
     subtest "generate with CORE::crypt" => sub {                                          # 9
         plan tests => 6;
         my ( $raw, $hash ) = $pwd->generate;
-        like $raw,  qr/^\S[!-~\s]{7}$/, "succeed to generate raw passwd";                          # 9.1
+        like $raw,  qr/^\S[ -~]{7}$/, "succeed to generate raw passwd";                          # 9.1
         like $raw,  qr/^\S[^0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]{7}$/, "is readable";    # 9.2
         like $hash, qr/^\S[!-~]{12}$/, "succeed to generate hash with CORE::crypt";              # 9.3
         is $pwd->verify( $raw,        $hash ), 1,  "succeed to verify";                        # 9.4
@@ -36,13 +36,22 @@ subtest "generate unreadable strings" => sub {    #10
     plan tests => 3;
     $pwd->readability(0);
     my ( $raw, $hash ) = $pwd->generate;
-    like $raw,  qr/^\S[!-~\s]{7}$/,  "succeed to generate raw passwd";    #10.1
-    like $hash, qr/^\S[!-~\s]{12}$/, "succeed to generate hash";          #10.2
+    like $raw,  qr/^\S[ -~]{7}$/,  "succeed to generate raw passwd";    #10.1
+    like $hash, qr/^\S[ -~]{12}$/, "succeed to generate hash";          #10.2
     is $pwd->verify( $raw, $hash ), 1, "succeed to verify";           #10.3
 };
 
 my ( $raw, $hash ) = eval { $pwd->generate(3) };
 like $@, qr/^Text::Password::CoreCrypt::generate requires at least 4 length/,
     "fail to make too short password";                                #11
+
+subtest "rondom tests" => sub {                                                         # 12
+    plan tests => 1000;
+    for (1..500){
+        ( $raw, $hash ) = $pwd->generate;
+        like $hash, qr/^\S[ -~]{12}$/, "succeed to generate hash";          # 12.1
+        is $pwd->verify( $raw,        $hash ), 1,  "succeed to verify";     # 12.2
+    }
+};
 
 done_testing;

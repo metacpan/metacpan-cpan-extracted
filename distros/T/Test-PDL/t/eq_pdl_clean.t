@@ -25,7 +25,7 @@ my $expected_stderr = '';
 {
 	my $rc;
 	my( $stdout, $stderr ) = Capture::Tiny::capture( sub {
-			my @cmd = ( $^X, '-Ilib', '-MTest::PDL=eq_pdl', '-e', 'eq_pdl(3,4)' );
+			my @cmd = ( $^X, '-Ilib', '-MTest::PDL=eq_pdl', '-e', 'scalar eq_pdl(3,4)' );
 			$rc = system @cmd;
 		} );
 	cmp_ok $rc, '==', 0, 'system() succeeded';
@@ -33,16 +33,16 @@ my $expected_stderr = '';
 	is $stderr, $expected_stderr, 'eq_pdl() does not produce output on stderr';
 }
 
-# test that eq_pdl_diag() doesn't produce any output so it can safely be used in non-test code
+# test that eq_pdl() doesn't produce any output in list context so it can safely be used in non-test code
 {
 	my $rc;
 	my( $stdout, $stderr ) = Capture::Tiny::capture( sub {
-			my @cmd = ( $^X, '-Ilib', '-MTest::PDL=eq_pdl_diag', '-e', 'eq_pdl_diag(3,4)' );
+			my @cmd = ( $^X, '-Ilib', '-MTest::PDL=eq_pdl', '-e', '(eq_pdl(3,4))' );
 			$rc = system @cmd;
 		} );
 	cmp_ok $rc, '==', 0, 'system() succeeded';
-	is $stdout, '', 'eq_pdl_diag() does not produce output on stdout';
-	is $stderr, $expected_stderr, 'eq_pdl_diag() does not produce output on stderr';
+	is $stdout, '', 'eq_pdl() does not produce output on stdout in list context';
+	is $stderr, $expected_stderr, 'eq_pdl() does not produce output on stderr in list context';
 }
 
 done_testing;

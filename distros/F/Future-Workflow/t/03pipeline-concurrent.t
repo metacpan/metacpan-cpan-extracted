@@ -2,9 +2,10 @@
 
 use v5.26;
 use warnings;
-use experimental 'signatures';
 
-use Test::More;
+use Test2::V0;
+
+use experimental 'signatures';
 
 use Future::Workflow::Pipeline;
 
@@ -31,7 +32,7 @@ use Future;
 
    ( shift @f )->done( "result" ) while @f;
 
-   is_deeply( \@finished, [qw( result result result )],
+   is( \@finished, [qw( result result result )],
       '@finished after stage completed'
    );
 }

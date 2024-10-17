@@ -16,13 +16,10 @@ EXAMPLE
 
 INSTALLATION
 
-Your system must support alarm(2). To install this module manually, run the
-following commands:
+To install this module, use your preferred CPAN client. If this is cpanm then
+run the command
 
-  perl Makefile.PL
-  make
-  make test
-  make install
+  cpanm Time::Out
 
 DOCUMENTATION
 
@@ -34,15 +31,12 @@ MAINTENANCE
 
 To maintain this module, run the following commands:
 
-  perl Makefile.PL
-  make PERL_CPANM_OPT="--notest --with-develop --with-recommends" installdeps 
+  cpanm --notest --with-configure --with-develop --no-man-pages --local-lib-contained local --installdeps .
   perl Makefile.PL
   make
-  make RELEASE_TESTING=1 test
-  make cover
-
-The second command installs the module dependencies in a "local" directory
-using "cpanm".
+  make RELEASE_TESTING=1 test  # use Test::Harness
+  make RELEASE_TESTING=1 testp # use TAP::Harness
+  make cover                   # coverage statistics in vim format
 
 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,5 @@
 use Test2::V0 -target => 'HealthCheck::Diagnostic::RemoteHealth',
-    qw< is mock done_testing >;
+    qw< field hash is match mock done_testing >;
 use JSON;
 use LWP::Protocol::http;
 
@@ -29,21 +29,27 @@ my $hc = HealthCheck::Diagnostic::RemoteHealth->new(
 my $mock_web = mock_web_request();
 my $res      = $hc->check;
 
-is $res, {
-    status  => 'OK',
-    id      => 'remotehealth',
-    label   => 'RemoteHealth',
-    results => [ { status => 'OK', info => 'Ok!' } ],
+is $res, hash {
+    field status  => 'OK';
+    field id      => 'remotehealth'; 
+    field label   => 'RemoteHealth';
+    field results => [
+        { status => 'OK', info => match(qr/^Request took [\d.e\-]+ seconds?/) },
+        { status => 'OK', info => 'Ok!' },
+    ];
 }, 'Expected OK HealthCheck from 200 HTTP Response.';
 
 $mock_web = mock_web_request(code => 503);
 $res      = $hc->check;
 
-is $res, {
-    status  => 'OK',
-    id      => 'remotehealth',
-    label   => 'RemoteHealth',
-    results => [ { status => 'OK', info => 'Ok!' } ],
+is $res, hash {
+    field status  => 'OK';
+    field id      => 'remotehealth'; 
+    field label   => 'RemoteHealth';
+    field results => [
+        { status => 'OK', info => match(qr/^Request took [\d.e\-]+ seconds?/) },
+        { status => 'OK', info => 'Ok!' },
+    ];
 }, 'Expected OK HealthCheck from 503 HTTP Response.';
 
 $mock_web = mock_web_request(
@@ -51,52 +57,55 @@ $mock_web = mock_web_request(
 );
 $res      = $hc->check;
 
-is $res, {
-    status  => 'CRITICAL',
-    id      => 'remotehealth',
-    label   => 'RemoteHealth',
-    results => [ { status => 'CRITICAL', info => 'Ouch!' } ],
+is $res, hash {
+    field status  => 'CRITICAL';
+    field id      => 'remotehealth'; 
+    field label   => 'RemoteHealth';
+    field results => [
+        { status => 'OK', info => match(qr/^Request took [\d.e\-]+ seconds?/) },
+        { status => 'CRITICAL', info => 'Ouch!' },
+    ];
 }, 'Expected CRITICAL HealthCheck from JSON object with CRITICAL status.';
 
 $mock_web = mock_web_request(die => 'I have died!');
 $res      = $hc->check;
 
-is $res, {
-    status  => 'CRITICAL',
-    info    => 'User Agent returned: I have died!',
-    id      => 'remotehealth',
-    label   => 'RemoteHealth',
-    results => [ {
-        status => 'CRITICAL',
-        info   => 'User Agent returned: I have died!',
-    } ],
+is $res, hash {
+    field status  => 'CRITICAL';
+    field info    => match(qr/^User Agent returned: I have died!; Request took [\d.e\-]+ seconds?/);
+    field id      => 'remotehealth'; 
+    field label   => 'RemoteHealth';
+    field results => [
+        { status => 'CRITICAL', info => 'User Agent returned: I have died!' },
+        { status => 'OK', info => match(qr/^Request took [\d.e\-]+ seconds?/) },
+    ];
 }, 'Expected CRITICAL status from web request that dies.';
 
 $mock_web = mock_web_request(response => 'Not a valid JSON Object.');
 $res      = $hc->check;
 
-is $res, {
-    id      => 'remotehealth',
-    label   => 'RemoteHealth',
-    status  => 'CRITICAL',
-    info    => 'Could not decode JSON.',
-    data    => 'Not a valid JSON Object.',
+is $res, hash {
+    field status  => 'CRITICAL';
+    field id      => 'remotehealth'; 
+    field label   => 'RemoteHealth';
+    field results => [
+        { status => 'OK', info => match(qr/^Request took [\d.e\-]+ seconds?/) },
+        { status => 'CRITICAL', info => 'Could not decode JSON.', data => 'Not a valid JSON Object.' },
+    ];
 }, 'Expected CRITICAL status when it cannot decode JSON.';
 
 $mock_web = mock_web_request(code => 400);
 $res      = $hc->check;
 
-is $res, {
-    id      => 'remotehealth',
-    label   => 'RemoteHealth',
-    status  => 'CRITICAL',
-    info    =>
-        'Requested http://foo.test/healthz and got status code 400, expected 200, 503',
-    results => [ {
-        status => 'CRITICAL',
-        info   =>
-            'Requested http://foo.test/healthz and got status code 400, expected 200, 503',
-    } ],
+is $res, hash {
+    field status  => 'CRITICAL';
+    field info    => match(qr{^\QRequested http://foo.test/healthz and got status code 400, expected 200, 503;\E Request took [\d.e\-]+ seconds?});
+    field id      => 'remotehealth'; 
+    field label   => 'RemoteHealth';
+    field results => [
+        { status => 'CRITICAL', info => 'Requested http://foo.test/healthz and got status code 400, expected 200, 503' },
+        { status => 'OK', info => match(qr/^Request took [\d.e\-]+ seconds?/) },
+    ];
 }, 'Expected CRITICAL status when it gets unwanted status code.';
 
 done_testing;

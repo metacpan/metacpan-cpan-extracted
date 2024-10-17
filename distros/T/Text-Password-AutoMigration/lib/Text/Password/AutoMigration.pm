@@ -1,5 +1,5 @@
 package Text::Password::AutoMigration;
-our $VERSION = "0.41";
+our $VERSION = "0.42";
 
 use autouse 'Carp' => qw(croak carp);
 use Moo;
@@ -16,7 +16,7 @@ Text::Password::AutoMigration - generate and verify Password with any contexts
 
  my $pwd = Text::Password::AutoMigration->new();
  my( $raw, $hash ) = $pwd->generate();          # list context is required
- my $input = $req->body_parameters->{passwd};　# in Plack
+ my $input = $req->body_parameters->{passwd};　 # in Plack
     $input = $req->param('passwd');             # in CGI
     $input = $raw;                              # in CLI
  my $data = $pwd->encrypt($input);              # you don't have to care about salt

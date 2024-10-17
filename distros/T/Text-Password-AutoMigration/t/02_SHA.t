@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 SKIP: {
     eval { require Digest::SHA };
-    skip 'Digest::SHA is not installed', 11 if $@;
+    skip 'Digest::SHA is not installed', 12 if $@;
 
     use_ok 'Text::Password::SHA';               # 1
     my $pwd = new_ok('Text::Password::SHA');    # 2
@@ -12,7 +12,7 @@ SKIP: {
 
     my ( $raw, $hash ) = $pwd->generate;
 
-    like $pwd->encrypt($raw), qr|^\$6\$[!-~\s]{1,$m}\$[\w/\.]{86}$|, "encrypt with SHA512 from raw"; # 3
+    like $pwd->encrypt($raw), qr|^\$6\$[ -~]{1,$m}\$[\w/\.]{86}$|, "encrypt with SHA512 from raw"; # 3
     is $pwd->verify( $raw,        $hash ), 1,  "succeed to verify with SHA512";                    # 4
     is $pwd->verify( $pwd->nonce, $hash ), '', "fail to verify with random strings";               # 5
 
@@ -39,9 +39,18 @@ SKIP: {
         plan tests => 3;
         my ( $raw, $hash ) = $pwd->generate;
 
-        like $hash, qr|^\$6\$[!-~\s]{1,$m}\$[\w/\.]{86}$|, "succeed to generate hash with SHA512";   # 11.1
+        like $hash, qr|^\$6\$[ -~]{1,$m}\$[\w/\.]{86}$|, "succeed to generate hash with SHA512";   # 11.1
         is $pwd->verify( $raw,        $hash ), 1,  "succeed to verify";                            # 11.2
         is $pwd->verify( $pwd->nonce, $hash ), '', "fail to verify with random strings";           # 11.3
+    };
+
+    subtest "rondom tests" => sub {                                                         # 12
+        plan tests => 1000;
+        for (1..500){
+            ( $raw, $hash ) = $pwd->generate;
+            like $hash, qr|^\$6\$[ -~]{1,$m}\$[\w/\.]{86}$|, "succeed to generate hash with SHA512";    # 12.1
+            is $pwd->verify( $raw, $hash ), 1,  "succeed to verify";                                    # 12.2
+        }
     };
 }
 

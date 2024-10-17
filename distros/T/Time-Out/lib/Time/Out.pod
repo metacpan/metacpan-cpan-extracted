@@ -18,10 +18,10 @@ Time::Out - Easily timeout long running operations
 
 =head1 DESCRIPTION
 
-The C<Time::Out> module provides an easy interface to alarm(2) based timeouts.
-Nested timeouts are supported. The module exports the C<timeout()> function by
-default. The function returns whatever the code placed inside the subroutine
-reference returns:
+The C<Time::Out> module provides an easy interface to L<alarm(2)> based
+timeouts.  Nested timeouts are supported. The module exports the C<timeout()>
+function by default. The function returns whatever the code placed inside the
+subroutine reference returns:
 
   use Time::Out qw( timeout );
 
@@ -47,7 +47,7 @@ timeout values to be used effectively:
 
 =item Blocking I/O on MSWin32
 
-alarm(2) doesn't interrupt blocking I/O on MSWin32, so C<timeout()> won't do
+L<alarm(2)> doesn't interrupt blocking I/O on MSWin32, so C<timeout()> won't do
 that either.
 
 =item @_
@@ -84,7 +84,7 @@ exception, if it refers to a timeout:
       die "bad\n";
     } catch {
       # rethrow exception, if it refers to a timeout
-      die $_ if blessed $_ && $_->isa( 'Time::Out::Exception' );
+      die $_ if defined blessed $_ and $_->isa( 'Time::Out::Exception' );
       # handle all other exceptions
     }
   };
@@ -93,7 +93,7 @@ exception, if it refers to a timeout:
 
 =head1 SEE ALSO
 
-alarm(2), L<Sys::AlarmCall>
+L<alarm(2)>, L<Sys::AlarmCall>
 
 =head1 AUTHORS
 

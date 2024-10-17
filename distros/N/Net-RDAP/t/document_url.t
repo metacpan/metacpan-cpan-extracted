@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use LWP::Online qw(:skip_all);
 use Test::More;
 use URI;
 use JSON;

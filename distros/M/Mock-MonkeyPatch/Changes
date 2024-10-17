@@ -1,5 +1,8 @@
 Revision history for Perl module Mock-MonkeyPatch
 
+1.03 2024-10-16
+  - Fix some meta information (szabgab)
+
 1.02 2020-08-26
   - Future-proof against a potential strict-by-default perl interpreter
 

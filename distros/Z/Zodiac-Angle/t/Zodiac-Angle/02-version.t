@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Zodiac::Angle;
 
 # Test.
-is($Zodiac::Angle::VERSION, 0.05, 'Version.');
+is($Zodiac::Angle::VERSION, 0.06, 'Version.');

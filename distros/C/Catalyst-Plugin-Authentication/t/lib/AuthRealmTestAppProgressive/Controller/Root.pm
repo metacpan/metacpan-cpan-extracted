@@ -6,7 +6,6 @@ use base qw/Catalyst::Controller/;
 __PACKAGE__->config(namespace => '');
 
 use Test::More;
-use Test::Exception;
 
 sub progressive : Local {
     my ( $self, $c ) = @_;

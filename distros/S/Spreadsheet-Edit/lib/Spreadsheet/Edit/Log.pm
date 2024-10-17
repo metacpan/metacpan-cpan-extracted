@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.019'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-10-14'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.020'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-10-16'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 

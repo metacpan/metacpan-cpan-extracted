@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 use List::Util qw(any);
+use LWP::Online qw(:skip_all);
 use Test::More;
 use URI;
 use JSON;

@@ -1,5 +1,17 @@
 Revision history for Perl extension Catalyst::Plugin::Authentication
 
+0.10024 - 2024-10-16
+    - update to prefer modern Catalyst APIs
+    - silence expected warnings in tests
+    - move repository to GitHub
+    - convert tests from Test::WWW::Mechanize::Catalyst to Catalyst::Test
+    - don't load unneeded Tie::RefHash
+    - switch from Digest::SHA1 to Digest::SHA
+    - switch from Test::Exception to Test::Fatal
+    - drop unused dependency Class::Inspector
+    - Don't load password when password_type is 'none',
+      for example when used for authorization
+
 0.10023 11 Jan 2013
    - Add Howto on using the auth from the proxy server with
      ::Credential::Remote (Robert Rothenberg)

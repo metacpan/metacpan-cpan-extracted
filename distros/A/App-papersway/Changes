@@ -1,5 +1,11 @@
 Revision history for App::papersway
 
+1.003     2024-10-17 10:15:39+08:00 Asia/Shanghai
+    - Clear caffeinated status when we receive a close event for the
+      caffeinated window.
+    - Fix unconditionally disabling monocle mode when switching to a fresh
+      workspace.
+
 1.002     2024-08-28 13:17:17+08:00 Asia/Shanghai
     - Reduce resize flickering when moving along the row of windows.
     - Prune windows that no longer exist from the lists of windows pushed off.

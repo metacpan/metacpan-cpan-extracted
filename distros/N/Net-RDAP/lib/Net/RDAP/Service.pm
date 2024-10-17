@@ -7,7 +7,7 @@ use warnings;
 sub new {
     my ($package, $base, $client) = @_;
     return bless({
-        'base'      => $base->isa('REF') ? $base : URI->new($base),
+        'base'      => $base->isa('URI') ? $base : URI->new($base),
         'client'    => $client || Net::RDAP->new,
     }, $package);
 }
@@ -17,7 +17,7 @@ sub fetch {
 
     my $uri = dclone($self->base);
 
-    $uri->path_segments(grep { defined } (
+    $uri->path_segments(grep { defined && length > 0 } (
         $uri->path_segments,
         $type,
         'ARRAY' eq ref($segments) ? @{$segments} : $segments

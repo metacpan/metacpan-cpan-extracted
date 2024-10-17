@@ -1,9 +1,12 @@
-#<<<
-use strict; use warnings;
-#>>>
+use strict;
+use warnings;
+
 package Time::Out::ParamConstraints;
 
-our $VERSION = '0.24';
+# keeping the following $VERSION declaration on a single line is important
+#<<<
+use version 0.9915; our $VERSION = version->declare( '1.0.0' );
+#>>>
 
 use Exporter     qw( import );
 use Scalar::Util qw( blessed looks_like_number reftype );

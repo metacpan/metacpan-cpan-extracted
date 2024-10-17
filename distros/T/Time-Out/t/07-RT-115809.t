@@ -1,6 +1,5 @@
-#<<<
-use strict; use warnings;
-#>>>
+use strict;
+use warnings;
 
 use Time::Out qw( timeout );
 use Test::More import => [ qw( is ) ], tests => 2;

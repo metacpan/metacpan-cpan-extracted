@@ -6,7 +6,6 @@ use base qw/Catalyst::Controller/;
 __PACKAGE__->config(namespace => '');
 
 use Test::More;
-use Test::Exception;
 
 use Digest::MD5 qw/md5/;
 

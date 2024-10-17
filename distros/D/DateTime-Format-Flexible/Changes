@@ -1,10 +1,16 @@
 Revision history for Perl module DateTime::Format::Flexible
 
-0.35 Sun Oct 6 2024
-  - Olson DB 2024b removes old System V timezone names which was causing tests to fail, so we now convert them to real timezones
-    - thanks ppisar rt #155591 and gregoa rt #155962
+0.36 Wed Oct 16 2024
+  - further changes to be backwards compatible with DateTime::TimeZone 2.62 and below.
+    - thanks ppisar rt #155996
+  - fix stray debug statement
+    - thanks ppisar rt #155995
 
-0.34 Tue Jul 06 2021
+0.35 Sun Oct 6 2024
+  - support changes in DateTime::Timeone 2.63
+  - thanks ppisar rt #155591 and gregoa rt #155962
+
+0.34 Wed Jul 7 2021
   - support timezones in parenthesis
   - Add support for YYYY-MM-DD HH:MM P.M. format
     - thanks Michael Schout for the patch!

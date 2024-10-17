@@ -38,10 +38,9 @@ my $can_extract_allsheets   = Spreadsheet::Edit::IO::can_extract_allsheets();
 
 sub verif_Sheet1(;$){
   my $msg = $_[0] // "";
-  eq_deeply(title_rx(), 0) or die "${msg} title_rx is not 0";
+  eq_deeply(title_rx(), 0) or confess "${msg} title_rx is not 0";
   eq_deeply([@{ title_row() }],["First Name","Last Name","Email","Date","Zipcode"])
     or confess "${msg} Sheet1 titles wrong\n", dvis('${\title_rx()} @{ title_row() }');
-  #eq_deeply([@{ $rows[3] }],["Françoise-Athénaïs","de Rochechouart","","Oct 5, 1640"])
   my $exp = ["Françoise-Athénaïs","de Rochechouart","","10/05/1640","00007"];
   eq_deeply([@{ $rows[3] }],$exp)
     or confess "${msg} Sheet1 row 4 is wrong,\n",
@@ -83,192 +82,6 @@ sub doread($$) {
   confess "num_cols is not positive" unless $num_cols > 0;
 }
 
-#my $testcsv_path = $dirpath->child("Sheet1.csv");
-my $testcsv_path = $tlib->child("Sheet1_unquoted.csv");
-my $exp_chars = $testcsv_path->slurp({binmode => ":raw:encoding(UTF-8):crlf"});
-my $exp_CRLFchars = $exp_chars =~ s/\n/\x0D\x0A/gr;
-
-# Well, we can't prevent CR,LF line endings on Windows.  So first
-# convert the test data .csv to "local" line endings so it will match.
-my $local_testcsv_UTF8 = Path::Tiny->tempfile("local_testcsv_UTF8_XXXXX");
-$local_testcsv_UTF8->spew({binmode => ":raw:encoding(UTF-8)"}, $exp_chars);
-
-(my $local_testcsv_UTF8CRLF = Path::Tiny->tempfile("local_testcsv_UTF8CRLF_XXXXX"))
-  ->spew({binmode => ":raw:encoding(UTF-8)"}, $exp_CRLFchars);
-
-(my $local_testcsv_UTF16 = Path::Tiny->tempfile("local_testcsv_UTF16_XXXXX"))
-  ->spew({binmode => ":raw:encoding(UTF-16)"}, $exp_chars);
-
-(my $local_testcsv_UTF16BECRLF = Path::Tiny->tempfile("local_testcsv_UTF16BECRLF_XXXXX"))
-  ->spew({binmode => ":raw:encoding(UTF-16BE)"}, $exp_CRLFchars);
-
-(my $local_testcsv_UTF16LE = Path::Tiny->tempfile("local_testcsv_UTF16LE_XXXXX"))
-  ->spew({binmode => ":raw:encoding(UTF-16LE)"}, $exp_chars);
-
-my $local_testcsv_UTF8CRLFWithBOM = Path::Tiny->tempfile("local_testcsv_UTF8CRLFWithBOM_XXXXX");
-{
-  $local_testcsv_UTF8CRLF->spew({binmode => ":raw:encoding(UTF-8)"}, $exp_CRLFchars);
-  $local_testcsv_UTF8CRLFWithBOM->spew({binmode => ":raw:encoding(UTF-8)"}, "\N{U+feff}");
-  $local_testcsv_UTF8CRLFWithBOM->append_utf8($exp_CRLFchars);
-}
-
-# Confirm that conflicting specs are caught
-eval{my $dum=read_spreadsheet {sheetname => "Sheet1", verbose => $verbose}, $input_xlsx_path."!Another Sheet" };
-die "Conflicting sheetname opt and !suffix not caught" if $@ eq "";
-
-# "Read" a csv; should be a pass-thru without conversion when possible
-foreach (
-   #  path              exp_passthru  input_encoding     output_encoding
-   [$local_testcsv_UTF8,           1, undef             ,undef           ],
-   [$local_testcsv_UTF8CRLF,       1, undef             ,undef           ],
-   [$local_testcsv_UTF8,           0, undef             ,"UTF-16BE"      ],
-   [$local_testcsv_UTF8CRLFWithBOM,0, undef             ,undef           ],
-   [$local_testcsv_UTF8CRLFWithBOM,0,"UTF-32"           ,undef           ], # BOM overrides
-   [$local_testcsv_UTF16,          0,"UTF-32"           ,undef           ], # BOM overrides
-   [$local_testcsv_UTF16BECRLF,    0,"UTF-32,UTF-16BE"  ,undef           ], # no BOM
-   [$local_testcsv_UTF16BECRLF,    1,"UTF-32,UTF-16BE"  ,"UTF-16BE"      ], # no BOM
-   [$local_testcsv_UTF16LE,        0,"UTF-16LE,UTF-32"  ,"UTF-32"        ], # no BOM
-   [$local_testcsv_UTF16LE,        0,"UTF-16LE,UTF-32"  ,"UTF-16BE"      ], # no BOM
-       ) {
-  my ($input_csvpath, $exp_passthru, $input_enc, $output_enc) = @$_;
-  my @inenc_opts  = ($input_enc  ? (input_encoding  => $input_enc ) : ());
-  my @outenc_opts = ($output_enc ? (output_encoding => $output_enc) : ());
-
-  warn "--- Expect passthru=",!!$exp_passthru," for $input_csvpath ienc=",u($input_enc)," oenc=",u($output_enc),"\n"
-    if $verbose;
-
-  ### This is sometimes failing to detect $local_testcsv as a CSV on Solaris ;
-  ### try to show enough information to debug it...
-  my sub _passthru_test(@) {
-    my %debug_opts = @_;
-
-    # Call convert_spreadsheet() directly, passing inpath as an option
-##    my $h_cs = doconvert(inpath => $input_csvpath, cvt_to => 'csv',
-##                         @inenc_opts, @outenc_opts, %debug_opts);
-    my $h_cs = convert_spreadsheet(
-                 debug => $debug, verbose => $verbose, silent => $silent,
-                 inpath => $input_csvpath, cvt_to => 'csv',
-                 @inenc_opts, @outenc_opts, %debug_opts);
-    my $got_passthru = ($h_cs->{outpath} eq $input_csvpath);
-    if (!!$got_passthru ne !!$exp_passthru) {
-      die( ($exp_passthru
-             ? "Expected null conversion but output is different"
-             : "Expected differing output but got pass-thru"),
-           qx/set -x; ls -ld $input_csvpath/,
-           qx/set -x; ls -ld $h_cs->{outpath}/,
-           qx/set -x; od -t x1a $h_cs->{outpath}/
-      );
-    }
-    # Re-read the file ourself and check the data
-    my $input_data = do{
-      my ($benc,$spill) = open_bom(my $inFH, $input_csvpath, ":raw");
-      oops if $spill;
-      my $enc = $benc || ($input_csvpath =~ s/.*UTF/UTF-/r =~ s/WithBOM|CRLF|_.*//gr);
-      binmode($inFH, ":raw:encoding($enc):crlf") or die $!;
-      warn dvis '##BBB $input_csvpath $enc $benc $spill\n' if $debug;
-      local $/; <$inFH>
-    };
-    my $reslurp_data = do{
-      my $oenc = $h_cs->{encoding} // die "{encoding} not set in result";
-      path($h_cs->{outpath})->slurp( {binmode => ":raw:encoding($oenc):crlf"} );
-    };
-    unless ($input_data eq $reslurp_data) {
-      die dvis 'Data from slurp with result encoding does not match!\n'
-          .'$input_csvpath $h_cs @inenc_opts @outenc_opts\n\n'
-          .'$input_data\n\n'
-          .'$reslurp_data\n'
-    }
-
-    # Try OpenAsCsv, which by the way calls convert_spreadsheet with a
-    # separate inpath arg. It returns a file descriptor to read the data.
-    my $h_oac = OpenAsCsv(inpath => $input_csvpath,
-                          @inenc_opts, @outenc_opts, %debug_opts);
-    die dvis 'OpenAsCsv result {inpath} wrong\n$h_oac\n$h_cs'
-      unless $h_oac->{inpath} eq $input_csvpath;
-    die dvis 'OpenAsCsv result {encoding} wrong\n$h_oac\n$h_cs'
-      unless $h_oac->{encoding} eq $h_cs->{encoding};
-    my $oac_fh_data = do{
-      my $fh = $h_oac->{fh};
-      local $/;
-      <$fh>
-    };
-    die dvis 'Data from OpenAsCsv result fh does not match!\n'
-          .'$input_csvpath $h_oac\n@inenc_opts @outenc_opts\n $input_data\n$oac_fh_data'
-    unless $input_data eq $oac_fh_data;
-
-    # Try via read_spreadsheet
-    read_spreadsheet {@inenc_opts, %debug_opts}, $input_csvpath;
-    warn qx/set -x; hexdump -C $input_csvpath/ if $debug && $^O eq 'linux';
-    warn dvis '## @${\sheet()}' if $debug;
-    verif_Sheet1 "($input_csvpath)";
-  };
-
-  eval { _passthru_test(debug => $debug, verbose => $verbose) };
-  if ($@) {
-    warn __FILE__,":",__LINE__," - failed: $@\nRE_TRYING WITH DEBUG...\n";
-    $Carp::Verbose = 1;
-     _passthru_test(debug => 1, verbose => 1);
-    die "should have died by now";
-  }
-
-  print "> Passthru test ok for $input_csvpath ienc=",u($input_enc)," oenc=",u($output_enc),"\n"
-    unless $silent;
-}
-
-{
-### This is failing to auto-detect $local_testcsv_UTF8 as a CSV on Solaris ;
-### try to show enough information to debug it...
-eval {
-  read_spreadsheet {debug => $debug, verbose => $verbose}, $local_testcsv_UTF8;
-};
-if ($@) {
-  warn __FILE__,":",__LINE__," - failed: $@\nRE_TRYING WITH DEBUG...\n";
-  read_spreadsheet {debug => 1, verbose => 1}, $local_testcsv_UTF8;
-  die "should have died by now";
-}
-
-  verif_Sheet1 "(extracted csv)";
-  my $hash = doconvert(inpath=>$local_testcsv_UTF8, cvt_to => 'csv');
-  die "expected null conversion" unless $hash->{outpath} eq $local_testcsv_UTF8;
-}
-
-# Extract "allsheets" from a csv (symlink or copy into outdir)
-{ my $h3 = doconvert(allsheets => 1, inpath => $local_testcsv_UTF8, cvt_to => 'csv');
-  warn dvis '##YY $h3' if $debug;
-  my @got = path($h3->{outpath})->children;
-  unless (@got==1 && (my $got_chars=$got[0]->slurp_utf8) eq $exp_chars) {
-    die "'allsheets' from csv did not work",
-        dvis '\n$local_testcsv_UTF8\n$h3\n@got\n$got_chars'
-  }
-}
-
-# csv-to-csv with transcoding
-{
-  my $tdir = Path::Tiny->tempdir();
-  for my $enc (qw/UTF-8 UTF-16 UTF-32/) {
-    say "------------- Transcode to/from $enc -------------" if $debug;
-    my $fromutf8_result;
-    {
-      my $h = doconvert(inpath => $local_testcsv_UTF8,
-                        outpath => $tdir->child("${enc}.csv"),
-                        output_encoding => $enc);
-      my $got_octets = path($h->{outpath})->slurp_raw;
-      my $got_chars = decode($enc,$got_octets,Encode::FB_CROAK|Encode::LEAVE_SRC);
-      die "transcoding to $enc did not work\n",dvis('$got_octets\n$got_chars\n$exp_chars\n') unless $got_chars eq $exp_chars;
-      $fromutf8_result = $h->{outpath};
-    }
-    { my $h = doconvert(inpath => $fromutf8_result,
-                        cvt_to => "csv",
-                        input_encoding => $enc,
-                        #output_encoding => 'utf8'
-                       );
-      my $got_octets = path($h->{outpath})->slurp_raw;
-      my $got_chars = decode("UTF-8",$got_octets,Encode::FB_CROAK|Encode::LEAVE_SRC);
-      die "transcoding back to utf8 did not work\n",dvis('$got_octets\n$got_chars\n$exp_chars\n') unless $got_chars eq $exp_chars;
-    }
-  }
-}
-
 # Test the various ways of specifying a sheet name
 if ($can_cvt_spreadsheets) {
   if ($can_extract_named_sheet) {
@@ -293,7 +106,10 @@ if ($can_cvt_spreadsheets) {
 
   # Round-trip csv -> ods -> csv check
   {
-    my $h1 = doconvert(inpath => $local_testcsv_UTF8, cvt_to => "ods");
+    my $testcsv_path = $tlib->child("Sheet1_unquoted.csv");
+    my $exp_chars
+      = $testcsv_path->slurp({binmode => ":raw:encoding(UTF-8):crlf"});
+    my $h1 = doconvert(inpath => $testcsv_path->canonpath(), cvt_to => "ods");
     my $h2 = doconvert(inpath => $h1->{outpath}, cvt_to => "csv");
     my $got_chars = path($h2->{outpath})->slurp({binmode => ":raw:encoding(UTF-8):crlf"});
     if ($got_chars eq $exp_chars) {
@@ -308,6 +124,225 @@ if ($can_cvt_spreadsheets) {
 } else {
   warn "# Spreadsheet tests skipped because soffice is not installed\n" unless $silent;
 }
+
+########################################################################
+# Do lots of tests using specified test data.
+# This is called twice, once with real data and again with empty data
+# (the latter to verify that logically-empty files i.e. BOM only, work)
+########################################################################
+sub do_encoding_tests($) {
+  my $exp_chars = shift;
+  my $exp_CRLFchars = $exp_chars =~ s/\n/\x0D\x0A/gr;
+  my $emptydata = $exp_chars eq "";
+
+  # Well, we can't prevent CR,LF line endings being written on Windows
+  # (when writing with :crlf).  This prevents comparing :crlf-written
+  # results with our golden files written on Linux.
+  #
+  # Q: Should CSVs always be written *without* :crlf to be in *nix form??
+  # A?: Allow :crlf to be specifed in an arg, e.g. output_binmode ?
+  #
+  # (OLD:)So first convert the test data .csv
+  # to "local" line endings so it will match.
+  my $local_testcsv_UTF8 = Path::Tiny->tempfile("local_testcsv_UTF8_XXXXX");
+  $local_testcsv_UTF8->spew({binmode => ":raw:encoding(UTF-8)"}, $exp_chars);
+
+  (my $local_testcsv_UTF8CRLF = Path::Tiny->tempfile("local_testcsv_UTF8CRLF_XXXXX"))
+    ->spew({binmode => ":raw:encoding(UTF-8)"}, $exp_CRLFchars);
+
+  (my $local_testcsv_UTF16 = Path::Tiny->tempfile("local_testcsv_UTF16_XXXXX"))
+    ->spew({binmode => ":raw:encoding(UTF-16)"}, $exp_chars);
+
+  (my $local_testcsv_UTF16BECRLF = Path::Tiny->tempfile("local_testcsv_UTF16BECRLF_XXXXX"))
+    ->spew({binmode => ":raw:encoding(UTF-16BE)"}, $exp_CRLFchars);
+
+  (my $local_testcsv_UTF16LE = Path::Tiny->tempfile("local_testcsv_UTF16LE_XXXXX"))
+    ->spew({binmode => ":raw:encoding(UTF-16LE)"}, $exp_chars);
+
+  my $local_testcsv_UTF8CRLFWithBOM = Path::Tiny->tempfile("local_testcsv_UTF8CRLFWithBOM_XXXXX");
+  {
+    $local_testcsv_UTF8CRLF->spew({binmode => ":raw:encoding(UTF-8)"}, $exp_CRLFchars);
+    $local_testcsv_UTF8CRLFWithBOM->spew({binmode => ":raw:encoding(UTF-8)"}, "\N{U+feff}");
+    $local_testcsv_UTF8CRLFWithBOM->append_utf8($exp_CRLFchars);
+  }
+
+  # Confirm that conflicting specs are caught
+  eval{my $dum=read_spreadsheet {sheetname => "Sheet1", verbose => $verbose}, $input_xlsx_path."!Another Sheet" };
+  die "Conflicting sheetname opt and !suffix not caught" if $@ eq "";
+
+  # "Read" a csv; should be a pass-thru without conversion when possible
+  foreach (
+     #  path              exp_passthru  input_encoding     output_encoding
+     [$local_testcsv_UTF8,           1, undef             ,undef           ],
+     [$local_testcsv_UTF8CRLF,       1, undef             ,undef           ],
+     [$local_testcsv_UTF8,           0, undef             ,"UTF-16BE"      ],
+     [$local_testcsv_UTF8CRLFWithBOM,0, undef             ,undef           ],
+     [$local_testcsv_UTF8CRLFWithBOM,0,"UTF-32"           ,undef           ], # BOM overrides
+     [$local_testcsv_UTF16,          0,"UTF-32"           ,undef           ], # BOM overrides
+     [$local_testcsv_UTF16BECRLF,    0,"UTF-32,UTF-16BE"  ,undef           ], # no BOM
+     [$local_testcsv_UTF16LE,        1,"UTF-16LE"         ,"UTF-16LE"      ], # no BOM
+     [$local_testcsv_UTF16BECRLF,    1,"UTF-16BE"         ,"UTF-16BE"      ], # no BOM
+     [$local_testcsv_UTF16BECRLF, (!$emptydata),"UTF-32,UTF-16BE"  ,"UTF-16BE"      ], # no BOM
+     [$local_testcsv_UTF16LE,        0,"UTF-16LE,UTF-32"  ,"UTF-32"        ], # no BOM
+     [$local_testcsv_UTF16LE,        0,"UTF-16LE,UTF-32"  ,"UTF-16BE"      ], # no BOM
+         ) {
+    my ($input_csvpath, $exp_passthru, $input_enc, $output_enc) = @$_;
+    my @inenc_opts  = ($input_enc  ? (input_encoding  => $input_enc ) : ());
+    my @outenc_opts = ($output_enc ? (output_encoding => $output_enc) : ());
+
+    warn "--- Expect passthru=",!!$exp_passthru," for $input_csvpath ienc=",u($input_enc)," oenc=",u($output_enc),"\n"
+      if $verbose;
+
+    ### This is sometimes failing to detect $local_testcsv as a CSV on Solaris ;
+    ### try to show enough information to debug it...
+    my sub _passthru_test(@) {
+      my %debug_opts = @_;
+
+      # Call convert_spreadsheet() directly, passing inpath as an option
+  ##    my $h_cs = doconvert(inpath => $input_csvpath, cvt_to => 'csv',
+  ##                         @inenc_opts, @outenc_opts, %debug_opts);
+warn "#------------ _passthru_test ------------------\n" if $debug_opts{debug};
+      my $h_cs = convert_spreadsheet(
+                   debug => $debug, verbose => $verbose, silent => $silent,
+                   inpath => $input_csvpath, cvt_to => 'csv',
+                   @inenc_opts, @outenc_opts, %debug_opts);
+      my $got_passthru = ($h_cs->{outpath} eq $input_csvpath);
+      if (!!$got_passthru ne !!$exp_passthru) {
+        die( ($exp_passthru
+               ? "Expected null conversion but output is different"
+               : "Expected differing output but got pass-thru"),
+             "\n",
+             qx/(set -x; ls -ld $input_csvpath) 2>&1/,
+             qx/(set -x; ls -ld $h_cs->{outpath}) 2>&1/,
+             qx/(set -x; od -t x1a $h_cs->{outpath}) 2>&1/,
+             " "
+        );
+      }
+      # Re-read the file ourself and check the data
+      my $input_data = do{
+        my ($benc,$spill) = open_bom(my $inFH, $input_csvpath, ":raw");
+        oops if $spill;
+        my $enc = $benc || ($input_csvpath =~ s/.*UTF/UTF-/r =~ s/WithBOM|CRLF|_.*//gr);
+        binmode($inFH, ":raw:encoding($enc):crlf") or die $!;
+        warn dvis '##BBB $input_csvpath $enc $benc $spill\n' if $debug;
+        local $/; <$inFH>
+      };
+      my $reslurp_data = do{
+        my $oenc = $h_cs->{encoding} // die "{encoding} not set in result";
+        path($h_cs->{outpath})->slurp( {binmode => ":raw:encoding($oenc):crlf"} );
+      };
+      unless ($input_data eq $reslurp_data) {
+        die dvis 'Data from slurp with result encoding does not match!\n'
+            .'$input_csvpath $h_cs @inenc_opts @outenc_opts\n\n'
+            .'$input_data\n\n'
+            .'$reslurp_data\n'
+      }
+
+      # Try OpenAsCsv, which by the way calls convert_spreadsheet with a
+      # separate inpath arg. It returns a file descriptor to read the data.
+      my $h_oac = OpenAsCsv(inpath => $input_csvpath,
+                            @inenc_opts, @outenc_opts, %debug_opts);
+      die dvis 'OpenAsCsv result {inpath} wrong\n$h_oac\n$h_cs'
+        unless $h_oac->{inpath} eq $input_csvpath;
+      die dvis 'OpenAsCsv result {encoding} wrong\n$h_oac\n$h_cs'
+        unless $h_oac->{encoding} eq $h_cs->{encoding};
+      my $oac_fh_data = do{
+        my $fh = $h_oac->{fh};
+        local $/;
+        <$fh>
+      };
+      die dvis 'Data from OpenAsCsv result fh does not match!\n'
+            .'$input_csvpath $h_oac\n@inenc_opts @outenc_opts\n $input_data\n$oac_fh_data'
+      unless $input_data eq $oac_fh_data;
+
+      # Try via read_spreadsheet
+      read_spreadsheet {@inenc_opts, %debug_opts}, $input_csvpath;
+      warn qx/set -x; hexdump -C $input_csvpath/ if $debug && $^O eq 'linux';
+      warn dvis '## @${\sheet()}' if $debug;
+      if ($emptydata) {
+        die "Expected empty spreadsheet ($input_csvpath)" unless @rows == 0;
+      } else {
+        verif_Sheet1 "($input_csvpath)";
+      }
+    };
+
+    eval { _passthru_test(debug => $debug, verbose => $verbose) };
+    if ($@) {
+      warn __FILE__,":",__LINE__," - failed: $@\nRE_TRYING WITH DEBUG...\n";
+      $Carp::Verbose = 1;
+       _passthru_test(debug => 1, verbose => 1);
+      die "should have died by now";
+    }
+
+    print "> Passthru test ok for $input_csvpath ienc=",u($input_enc)," oenc=",u($output_enc),"\n"
+      unless $silent;
+  }
+
+  {
+    ### This is failing to auto-detect $local_testcsv_UTF8 as a CSV on Solaris ;
+    ### try to show enough information to debug it...
+    eval {
+      read_spreadsheet {debug => $debug, verbose => $verbose}, $local_testcsv_UTF8;
+    };
+    if ($@) {
+      warn __FILE__,":",__LINE__," - failed: $@\nRE_TRYING WITH DEBUG...\n";
+      read_spreadsheet {debug => 1, verbose => 1}, $local_testcsv_UTF8;
+      die "should have died by now";
+    }
+
+    if ($emptydata) {
+      die "Expected empty spreadsheet ($local_testcsv_UTF8)" unless @rows == 0;
+    } else {
+      verif_Sheet1 "($local_testcsv_UTF8)";
+    }
+    my $hash = doconvert(inpath=>$local_testcsv_UTF8, cvt_to => 'csv');
+    die "expected null conversion" unless $hash->{outpath} eq $local_testcsv_UTF8;
+  }
+
+  # Extract "allsheets" from a csv (symlink or copy into outdir)
+  { my $h3 = doconvert(allsheets => 1, inpath => $local_testcsv_UTF8, cvt_to => 'csv');
+    warn dvis '##YY $h3' if $debug;
+    my @got = path($h3->{outpath})->children;
+    unless (@got==1 && (my $got_chars=$got[0]->slurp_utf8) eq $exp_chars) {
+      die "'allsheets' from csv did not work",
+          dvis '\n$local_testcsv_UTF8\n$h3\n@got\n$got_chars'
+    }
+  }
+
+  # csv-to-csv with transcoding
+  {
+    my $tdir = Path::Tiny->tempdir();
+    for my $enc (qw/UTF-8 UTF-16 UTF-32/) {
+      say "------------- Transcode to/from $enc -------------" if $debug;
+      my $fromutf8_result;
+      {
+        my $h = doconvert(inpath => $local_testcsv_UTF8,
+                          outpath => $tdir->child("${enc}.csv"),
+                          output_encoding => $enc);
+        my $got_octets = path($h->{outpath})->slurp_raw;
+        my $got_chars = decode($enc,$got_octets,Encode::FB_CROAK|Encode::LEAVE_SRC);
+        die "transcoding to $enc did not work\n",dvis('$got_octets\n$got_chars\n$exp_chars\n') unless $got_chars eq $exp_chars;
+        $fromutf8_result = $h->{outpath};
+      }
+      { my $h = doconvert(inpath => $fromutf8_result,
+                          cvt_to => "csv",
+                          input_encoding => $enc,
+                          #output_encoding => 'utf8'
+                         );
+        my $got_octets = path($h->{outpath})->slurp_raw;
+        my $got_chars = decode("UTF-8",$got_octets,Encode::FB_CROAK|Encode::LEAVE_SRC);
+        die "transcoding back to utf8 did not work\n",dvis('$got_octets\n$got_chars\n$exp_chars\n') unless $got_chars eq $exp_chars;
+      }
+    }
+  }
+}#do_encoding_tests($exp_chars)
+
+#my $testcsv_path = $dirpath->child("Sheet1.csv");
+my $testcsv_path = $tlib->child("Sheet1_unquoted.csv");
+do_encoding_tests(
+  $testcsv_path->slurp({binmode => ":raw:encoding(UTF-8):crlf"}) );
+
+do_encoding_tests("");
 
 say "Done." unless $silent;
 exit 0;

@@ -206,19 +206,19 @@ sub timezone_map
 {
     # http://home.tiscali.nl/~t876506/TZworld.html
     return (
-        EST => 'America/New_York',
-        EDT => 'America/New_York',
-        CST => 'America/Chicago',
-        CDT => 'America/Chicago',
-        MST => 'America/Denver',
-        MDT => 'America/Denver',
-        PST => 'America/Los_Angeles',
-        PDT => 'America/Los_Angeles',
+        EST  => 'America/New_York',
+        EDT  => 'America/New_York',
+        CST  => 'America/Chicago',
+        CDT  => 'America/Chicago',
+        MST  => 'America/Denver',
+        MDT  => 'America/Denver',
+        PST  => 'America/Los_Angeles',
+        PDT  => 'America/Los_Angeles',
         AKST => 'America/Juneau',
         AKDT => 'America/Juneau',
         HAST => 'America/Adak',
         HADT => 'America/Adak',
-        HST => 'Pacific/Honolulu',
+        HST  => 'Pacific/Honolulu',
     );
 }
 

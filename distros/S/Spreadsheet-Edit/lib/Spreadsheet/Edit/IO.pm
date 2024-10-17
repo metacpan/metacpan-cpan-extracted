@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.019'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-10-14'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.020'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-10-16'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -821,8 +821,8 @@ sub _convert_using_openlibre($$$) {
     # OutputFilterName[:paramtoken,paramtoken,...]
     if ($opts->{cvt_to} eq "csv") {
       my $filter_name = $suf2ofilter->{$opts->{cvt_to}} or oops;
-      my $enc = $opts->{output_encoding};
-oops dvis '$opts' unless defined $enc;
+      #my $enc = $opts->{output_encoding};
+      my ($enc) = ($opts->{output_binmode} =~ /:encoding\((.*?)\)/) or oops;
       my $charset = _name2LOcharsetnum($enc); # dies if unknown enc
       $filter_name.":"
       # Tokens 1-4: FldSep=, TxtDelim=" Charset FirstLineNum
@@ -1109,8 +1109,8 @@ sub form_spec_with_sheetname($$) {
   #$sheetname ? "${filepath}|||${sheetname}" : $filepath
 }
 
+our $default_output_binmode= ":raw:encoding(UTF-8):crlf";
 our $default_input_encodings = "UTF-8,windows-1252,UTF-16BE,UTF-16LE";
-our $default_output_encoding = "UTF-8";
 
 # Return digested %opts setting
 #   sheetname, inpath_sans_sheet (as Path::Tiny), encoding or default
@@ -1174,32 +1174,17 @@ sub _process_args($;@) {
   %opts
 }#_process_args
 
-# Extract the of encoding(s) specified in an iolayers string
-# Parse iolayers string, returning ($prefix,[encodings],$suffix)
-# For example from ":raw:encodings(utf8,windows-1252):zz" the output
-# would be (":raw", [:utf8","windows-1252"], ":zz")
-sub _parse_iolayers($) {
-  local $_ = (shift) // "";
-  /\A(<prefix>.*?)
-     (<encspec>:utf8|:encoding\(([^\)]+)\))
-     (<suffix>.*?)\z/ or croak "Invalid iolayers spec '$_'\n";
-  (my $prefix, $_, my $suffix) = ($+{prefix}, $+{encspec}, $+{suffix});
-  /^:(utf8)$/ || /^:encoding\(([^\)]+)\)$/ or oops($_);
-  my $enclist = [split /,/, $1]; # comma,separated,list,of,encodings
-  ($prefix, $enclist, $suffix);
-}
-
 sub _slurp_ifnotslurped($$) {
   my ($fh, $ref2octets) = @_;
   return if defined $$ref2octets;
   binmode($fh);
   seek($fh, 0, SEEK_SET) or die $!;
   local $/ = undef;
-  $$ref2octets = <$fh>;  # Now known to not have a BOM
+  $$ref2octets = <$fh>//"";  # Now known to not have a BOM.
 }
 sub _decode_slurped_data($$$;$) {
   my ($enc, $ref2octets, $start_pos, $check) = @_;
-  oops unless $$ref2octets;
+  oops unless defined $$ref2octets;
   decode($enc, substr($$ref2octets, $start_pos),
                $check // (Encode::FB_CROAK|Encode::LEAVE_SRC) )
 }
@@ -1268,7 +1253,7 @@ sub _preprocess($$) {
     if (! seek($fh, 0, SEEK_SET)) {
       oops if defined $$ref2octets;
       local $/ = undef;
-      $$ref2octets = <$fh>;  # N.B. includes possible BOM
+      $$ref2octets = <$fh>//"";  # N.B. includes possible BOM
       close $fh;
       $fh = undef;
       open $fh, "<:raw", $ref2octets or confess "BUG:in-mem open:$!";
@@ -1277,9 +1262,9 @@ sub _preprocess($$) {
     my $bomenc = File::BOM::get_encoding_from_filehandle($fh);
     $start_pos = tell($fh);
     if ($bomenc) {
-      btw "Input has BOM, bomenc=$bomenc\n" if $debug;
+      btw dvis 'Input has BOM, $bomenc $start_pos' if $debug;
       $opts->{input_encoding} = $bomenc;
-      binmode($fh);
+      binmode($fh); # unnecessary???
       binmode($fh, ":raw:encoding($bomenc):crlf") or die "binmode: $!";
     }
     #_dump_fh("CCC final");
@@ -1372,17 +1357,24 @@ sub _preprocess($$) {
     unless (defined($$r2rows)) {
       #confess "Input file is not valid CSV (or we have a bug)\n"
       seek($fh, $start_pos, SEEK_SET) or die $!; # skip over possible BOM
-      my $somechars = substr(do {local $/; <$fh>}, 0, 100);
-      my @layers = PerlIO::get_layers($fh);
-      warn dvis '$start_pos @layers $somechars\n';
-      if (open my $fh99, "<:raw", $opts->{inpath}) {
-        if ((my $nb = read $fh99, my $octets, 128) != 0) {
-          warn "First $nb octets are as follows:\n", Hexify($octets), "\n";
-        } else {
-          warn "File appears to be EMPTY\n";
+      # <$fh> returns undef (i.e. EOF) if the input file is empty!
+      my $somechars = substr(do {local $/; <$fh>//""}, 0, 100);
+      if ($somechars eq "") {
+        warn "File has NO CONTENT.  Treating it like an (empty) CSV\n"
+          if $debug;
+        $$r2rows = [];
+      } else {
+        my @layers = PerlIO::get_layers($fh);
+        warn dvis '$start_pos @layers $somechars\n';
+        if (open my $fh99, "<:raw", $opts->{inpath}) {
+          if ((my $nb = read $fh99, my $octets, 128) != 0) {
+            warn "First $nb octets are as follows:\n", Hexify($octets), "\n";
+          } else {
+            oops
+          }
         }
+        confess "Input file is not valid CSV (or we have a bug)\n"
       }
-      confess "Input file is not valid CSV (or we have a bug)\n"
     }
     else {
       warn dvis '#### CSV DETECTED $opts->{quote_char} $opts->{sep_char}'
@@ -1515,8 +1507,19 @@ sub _preprocess($$) {
   } else {
     oops if defined($rows);
   }
-  $opts->{output_encoding} //= $default_output_encoding
-    if $opts->{cvt_to} eq "csv";
+
+  if ($opts->{cvt_to} eq "csv") {
+    if ($opts->{output_encoding}) {
+      croak "Only one of {output_encoding} or {output_binmode} may be specified"
+        if $opts->{output_binmode};
+      ($opts->{output_binmode} = $default_output_binmode)
+        =~ s/:encoding(.*?)/":encoding(".$opts->{output_encoding}.")"/e or oops;
+    } else {
+      $opts->{output_binmode} //= $default_output_binmode;
+      croak "output_binmode must include ':encoding(...)'\n"
+        unless $opts->{output_binmode} =~ /:encoding\(.+?\)/;
+    }
+  }
 
   return ($fh, $start_pos);
 }#_preprocess
@@ -1685,10 +1688,11 @@ sub convert_spreadsheet(@) {
   # intuit cvt_from & cvt_to, detect encoding, and pre-process .csv input
   # if needed to avoid corruption of leading zeroes.
   my $octets;
-  my ($fh, $start_pos) = _preprocess(\%opts, \$octets);
+  my ($fh, $start_pos) = _preprocess(\%opts, \$octets); # sets defaults etc.
 
   my $input_enc  = $opts{input_encoding};
-  my $output_enc = $opts{output_encoding};
+  my ($output_enc) = $opts{output_binmode}
+                       && $opts{output_binmode} =~ /:encoding\((.+?)\)/ or oops;
 
   croak "Either input or output must be 'csv'\n"
     unless $opts{cvt_from} eq 'csv' || $opts{cvt_to} eq 'csv';
@@ -1870,7 +1874,7 @@ Spreadsheet::Edit::IO - convert between spreadsheet and csv files
  # Transcode a CSV from windows-1252 to UTF-8
  convert_spreadsheet(
      inpath  => "input.csv",  input_encoding   => 'windows-1252',
-     outpath => "output.csv", output_encodoutg => 'UTF-8',
+     outpath => "output.csv", output_binmode => ':raw:encoding(UTF-8):crlf'
  );
 
  # Translate between 0-based column index and letter code (A, B, etc.)
@@ -1919,11 +1923,11 @@ by C<convert_spreadsheet>.
 INPUT may be a csv or spreadsheet workbook path; if a spreadsheet,
 then a single "sheet" is converted, specified by either a !SHEETNAME suffix
 in the INPUT path, a separate C<< sheetname => SHEETNAME >> option,
-or unspecified to extract the only sheet (croaks if there is more than one).
+or if unspecified to extract the only sheet (croaks if there is more than one).
 
-The resulting file handle refers to a guaranteed-seekable CSV file;
-this will either be a temporary file (auto-removed at process exit),
-or the original INPUT if it was already a seekable csv file.
+The resulting file handle refers to a guaranteed-seekable BOM-less CSV file.
+This will either be a temporary file (auto-removed at process exit),
+or the original INPUT if it was already a seekable csv file without a BOM.
 
 RETURNS: A ref to a hash containing the following:
 
@@ -1943,7 +1947,7 @@ RETURNS: A ref to a hash containing:
 
  {
   outpath   => path to the output file (or directory with 'allsheets')
-               (a temporary file/dir or as you specified in OPTIONS).
+               (a temp file/dir if you did not specify outpath in OPTIONS).
 
   encoding  => the encoding used when writing .csv files
  }
@@ -1952,21 +1956,22 @@ INPUT is the input file path; it may be a separate first argument as
 shown above, or else included in OPTIONS as C<< inpath =E<gt> INPUT >>.
 
 If C<outpath =E<gt> OUTPATH> is specifed then results are I<always> saved
-to that path.  With C<allsheets> this is a directory, which will be created
-if necessary.
+to that path.  With C<allsheets> this must be a directory, which will be
+created if necessary.
 
 If C<outpath> is NOT specified in OPTIONS then, with one exception,
 results are saved to a temporary file or directory and that path is returned
 as C<outpath> in the result hash.
 The exception is if no conversion is necessary
-(i.e. C<cvt_from> is the same as C<cvt_to>), when the
-input file itself is returned as C<outpath>.
+when the input file itself is returned as C<outpath>
+(i.e. C<cvt_from> is the same as C<cvt_to> and, if 'csv',
+there was no BOM and an encoding change is not needed).
 
 In all cases C<outpath> in the result hash points to the results.
 
-C<cvt_to> or C<cvt_from> are filename suffixes (sans dot)
-e.g. "csv", "xlsx", etc., and need not be specified when indicated by
-C<outpath> or INPUT parameters.
+C<cvt_from> or C<cvt_to> are filename suffixes (sans dot)
+e.g. "csv", "xlsx", etc., and are only required if INPATH or C<outpath>
+parameters do not contain a .suffix .
 
 OPTIONS may also include:
 
@@ -1991,11 +1996,15 @@ Specifies the encoding of INPUT if it is a csv file.
 ENCODING may be a comma-separated list of encoding
 names which will be tried in the order until one seems to work.
 If only one is specified it will be used without trying it first.
-The default is "UTF-8,windows-1252".
+The default is "UTF-8,windows-1252".  If a BOM is present it overrides.
+
+=item output_binmode => "..."
+
+Used when writing csv file(s), defaults to ':raw:encoding(UTF-8):crlf'.
 
 =item output_encoding => ENCODING
 
-Used when writing csv file(s), defaults to 'UTF-8'.
+(Deprecated) Implies output_binmode => ':raw:encoding(ENCODIING):crlf'.
 
 =item col_formats => [...]
 
@@ -2013,12 +2022,15 @@ Elements may also contain the numeric format codes defined by LibreOffice
 at L<https://wiki.documentfoundation.org/Documentation/DevGuide/Spreadsheet_Documents#Filter_Options_for_the_CSV_Filter>
 
 B<Automatic format detection:>
-Input CSV data is pre-scanned to auto-detect column formats
-as much as possible.  This usually works well as long as dates are
-represented unambiguously, e.g. "2021-01-01" or "Jan 1, 2023".
+If I<col_formats> is not specified, input CSV data is pre-scanned
+to auto-detect column formats as much as possible.
+This usually works well as long as dates are
+represented unambiguously, e.g. 2021-01-01 or "Jan 1, 2023".
 
-Specifically, this detects leading zeroes such as in U.S. Zip Codes,
-and MM/DD/YY or DD/MM/YY dates when a DD happens to be more than 12.
+Specifically, this reads columns containing leading zeroes as "text"
+(such as in U.S. Zip Codes);
+date forms MM/DD/YY or DD/MM/YY are read with corresponding format
+if a DD happens to be more than 12 (otherwise LibreOffice's default is used).
 
 =item verbose => BOOL
 
@@ -2032,8 +2044,6 @@ or *nix (LF) line endings properly, i.e. as a single \n:
    open my $fh, "<", $resulthash->{outpath};
    my $enc = $resulthash->{encoding};
    binmode($fh, ":raw:encoding($enc):crlf");
-
-It is not possible to control the line-ending style in output CSV files.
 
 =head2 @sane_CSV_read_options
 

@@ -18,6 +18,16 @@ $num_tests += scalar( @TZS ) * 2;
 
 plan tests => $num_tests;
 
+# DateTime::TimeZone 2.63 normalized these timezone names and we are doing an internal conversion
+# This compatibility map is for previous versions of DateTime::TimeZone so that
+# our internal conversion continues to work correctly.
+my $tz_map = {
+    CET => 'Europe/Berlin',
+    EST => 'America/New_York',
+    HST => 'Pacific/Honolulu',
+    MST => 'America/Denver',
+};
+
 {
     my $dt = DateTime::Format::Flexible->parse_datetime( '2009-10-06 GMT.' , strip => qr{\.\z} );
     is( $dt->datetime , '2009-10-06T00:00:00' , 'GMT. timezone parsed/stripped' );
@@ -33,8 +43,14 @@ plan tests => $num_tests;
 foreach my $tz ( @TZS )
 {
     my $dt = DateTime::Format::Flexible->parse_datetime( '2010-01-24T04:58:23 '.$tz );
+    my $wanted_tz = $tz;
+
     is( $dt->datetime , '2010-01-24T04:58:23' , "$tz parsed" );
-    is( $dt->time_zone->name , $tz , "$tz timezone set correctly ($dt $tz)" );
+    if( exists $tz_map->{$tz} )
+    {
+        $wanted_tz = $tz_map->{$tz};
+    }
+    is( $dt->time_zone->name , $wanted_tz , "$tz timezone set correctly ($dt $tz)" );
 }
 
 foreach my $line ( @DATA )

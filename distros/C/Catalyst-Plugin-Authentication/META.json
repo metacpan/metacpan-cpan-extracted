@@ -1,0 +1,76 @@
+{
+   "abstract" : "Infrastructure plugin for the Catalyst authentication framework.",
+   "author" : [
+      "Yuval Kogman <nothingmuch@woobling.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-Plugin-Authentication",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Catalyst::Plugin::Session" : "0.10",
+            "Catalyst::Plugin::Session::State::Cookie" : "0",
+            "Digest::SHA" : "0",
+            "Test::EOL" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Runtime" : "0",
+            "MRO::Compat" : "0",
+            "Moose" : "0",
+            "MooseX::Emulate::Class::Accessor::Fast" : "0",
+            "String::RewritePrefix" : "0",
+            "Try::Tiny" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Catalyst-Plugin-Authentication@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Authentication"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perl-catalyst/Catalyst-Plugin-Authentication.git",
+         "web" : "https://github.com/perl-catalyst/Catalyst-Plugin-Authentication"
+      }
+   },
+   "version" : "0.10024",
+   "x_authority" : "cpan:BOBTFISH",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.43;
+use warnings;
+use Object::Pad 0.800;
 
-package Future::Workflow::Pipeline 0.01;
+package Future::Workflow::Pipeline 0.02;
 class Future::Workflow::Pipeline;
 
 use Carp;
@@ -16,6 +17,73 @@ use Future::AsyncAwait;
 =head1 NAME
 
 C<Future::Workflow::Pipeline> - a pipeline of processing stages
+
+=head1 SYNOPSIS
+
+=for highlighter language=perl
+
+   # 1: Make a pipeline
+   my $pipeline = Future::Workflow::Pipeline->new;
+
+
+   # 2: Add some stages to it
+ 
+   # An async stage; e.g. perform an HTTP fetch
+   my $ua = Net::Future::HTTP->new;
+   $pipeline->append_stage_async( async sub ($url) {
+      return await $ua->GET( $url );
+   });
+
+   # A synchronous (in-process) stage; e.g. some HTML parsing
+   $pipeline->append_stage_sync( sub ($response) {
+      my $dom = Mojo::DOM->new( $response->decoded_content );
+      return $dom->at('div[id="main"]')->text;
+   });
+
+   # A detached (out-of-process/thread) stage; e.g. some silly CPU-intensive task
+   $pipeline->append_stage_detached( sub ($text) {
+      my $iter = Algorithm::Permute->new([ split m/\s+/, $text ]);
+
+      my $best; my $bestscore;
+      while(my @words = $iter->next) {
+         my $str = join "\0", @words;
+         my $score = md5sum( $str );
+         next if defined $bestscore and $score ge $bestscore;
+
+         $best      = $str;
+         $bestscore = $score;
+      }
+
+      return $best;
+   });
+
+
+   # 3: Give it an output
+
+   # These are alternatives:
+
+   # An asynchronous output
+   my $dbh = Database::Async->new( ... );
+   $pipeline->set_output_async( async sub ($best) {
+      await $dbh->do('INSERT INTO Results VALUES (?)', $best);
+   });
+
+   # A synchronous output
+   $pipeline->set_output_sync( sub ($best) {
+      print "MD5 minimized sort order is:\n";
+      print "  $_\n" for split m/\0/, $best;
+   });
+
+
+   # 4: Now start it running on some input values
+
+   foreach my $url (slurp_lines("urls.txt")) {
+      await $pipeline->push_input($url);
+   }
+
+
+   # 5: Wait for it all to finish
+   await $pipeline->drain;
 
 =head1 DESCRIPTION
 
@@ -45,8 +113,8 @@ The constructor takes no additional parameters.
 
 =cut
 
-has $_output;
-has @_stages;
+field $_output;
+field @_stages;
 
 =head1 METHODS
 
@@ -147,7 +215,7 @@ method append_stage ( $code, %args )
 
 =head2 append_stage_sync
 
-   $pipeline->append_stage_sync( $code, %args )
+   $pipeline->append_stage_sync( $code, %args );
 
       $result = $code->( $item );
 
@@ -193,22 +261,22 @@ class Future::Workflow::Pipeline::_Stage :strict(params) {
 
    use Future;
 
-   has $_code :param;
-   has $_output :writer;
+   field $_code :param;
+   field $_output :writer;
 
-   has $_on_failure :param = sub ( $f ) {
+   field $_on_failure :param = sub ( $f ) {
       warn "Pipeline stage failed: ", scalar $f->failure;
    };
 
    # $_concurrent == maximum size of @_work_f
-   has $_concurrent :param = 1;
-   has @_work_f;
+   field $_concurrent :param = 1;
+   field @_work_f;
 
    # $_max_queue == maximum size of @_queue, or undef for unbounded
-   has $_max_queue :param = undef;
-   has @_queue;
+   field $_max_queue :param = undef;
+   field @_queue;
 
-   has @_awaiting_input;
+   field @_awaiting_input;
 
    async method _do ( $item )
    {
@@ -250,6 +318,28 @@ class Future::Workflow::Pipeline::_Stage :strict(params) {
       }
    }
 }
+
+=head1 UNSOLVED QUESTIONS
+
+=over 4
+
+=item *
+
+Is each work item represented by some object that gets passed around?
+
+Can we store context, maybe in a hash or somesuch, that each stage can inspect
+and append more things into? It might be useful to remember at least the
+initial URLs by the time we generate the outputs
+
+=item *
+
+Tuning parameters. In particular, being able to at least set overall
+concurrency of C<async> and C<detached> stages, the detachment model of the
+C<detached> stages (threads vs. forks), inter-stage buffering?
+
+=back
+
+=cut
 
 =head1 AUTHOR
 

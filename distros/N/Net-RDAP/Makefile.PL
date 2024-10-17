@@ -19,6 +19,7 @@ WriteMakefile(
         'HTTP::Date'                => 0,
         'HTTP::Request::Common'     => 0,
         'JSON'                      => 0,
+        'LWP::Online'               => 0,
         'LWP::Protocol::https'      => 0,
         'LWP::UserAgent'            => 0,
         'List::Util'                => 0,

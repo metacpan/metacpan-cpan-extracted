@@ -1,6 +1,5 @@
-#<<<
-use strict; use warnings;
-#>>>
+use strict;
+use warnings;
 
 use Time::HiRes qw();
 use Time::Out   qw( timeout );

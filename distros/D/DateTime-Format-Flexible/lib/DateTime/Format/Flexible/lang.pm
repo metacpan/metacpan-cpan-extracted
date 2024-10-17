@@ -72,7 +72,6 @@ sub _check_internal_tz
 {
     my ( $self , $plug , $date , $p ) = @_;
     my %tzs = $plug->timezone_map;
-
     while( my( $orig_tz , $new_tz ) = each ( %tzs ) )
     {
         if( $date =~ m{$orig_tz}mxi )

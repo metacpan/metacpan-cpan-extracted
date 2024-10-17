@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 requires:
   Class::Utils: 0.03
   Error::Pure: 0
-  List::MoreUtils: 0
+  List::Util: 1.33
   Readonly: 0
   Unicode::UTF8: 0
   perl: 5.6.2
@@ -37,4 +37,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Zodiac-Angle
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Zodiac-Angle
-version: '0.05'
+version: '0.06'

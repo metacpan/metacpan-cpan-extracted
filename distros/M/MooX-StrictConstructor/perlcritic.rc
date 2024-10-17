@@ -1,2 +1,0 @@
-[TestingAndDebugging::RequireUseStrict]
-equivalent_modules = Moo, Moo::Role

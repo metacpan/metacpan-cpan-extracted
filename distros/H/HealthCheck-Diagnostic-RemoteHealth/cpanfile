@@ -4,7 +4,7 @@ requires 'parent';
 requires 'strict';
 requires 'warnings';
 
-requires 'HealthCheck::Diagnostic::WebRequest';
+requires 'HealthCheck::Diagnostic::WebRequest', 'v1.4.4';
 requires 'JSON';
 
 on test => sub {

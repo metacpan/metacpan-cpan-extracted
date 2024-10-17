@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More 0.88;
 use Test::Deep qw( cmp_deeply code );
-use Test::PDL qw( :deep eq_pdl eq_pdl_diag );
+use Test::PDL qw( :deep eq_pdl );
 use Test::Builder::Tester;
 use Test::Exception;
 use PDL;
@@ -22,15 +22,15 @@ for my $type ( @types ) {
 	my $got      = { name => 'Histogram', data => $pdl1 };
 	my $pdl2     = pdl( 1,2,3.13 );
 	my $expected = { name => 'Histogram', data => $pdl2 };
-	throws_ok { ok $pdl1 == $pdl2 } qr/multielement (piddle|ndarray) in conditional expression /, '== dies with an error message';
-	throws_ok { is $pdl1, $pdl2 } qr/multielement (piddle|ndarray) in conditional expression /, 'is() dies with an error message';
+	throws_ok { ok $pdl1 == $pdl2 } qr/multielement ndarray in conditional expression /, '== dies with an error message';
+	throws_ok { is $pdl1, $pdl2 } qr/multielement ndarray in conditional expression /, 'is() dies with an error message';
 }
 
 {
 	my $pdl      = pdl( 1,2,3.13 );
 	my $got      = { name => 'Histogram', data => $pdl };
 	my $expected = { name => 'Histogram', data => $pdl };
-	throws_ok { ok $pdl == $pdl } qr/^multielement (piddle|ndarray) in conditional expression /, 'even shallow reference comparisons do not work with ==';
+	throws_ok { ok $pdl == $pdl } qr/^multielement ndarray in conditional expression /, 'even shallow reference comparisons do not work with ==';
 }
 
 {
@@ -71,7 +71,7 @@ test that
 
 	{ data => test_long( @vals ) }
 	{ data => test_pdl( long(@vals) ) }
-	{ data => code( sub { eq_pdl_diag shift, long(@vals) } ) }
+	{ data => code( sub { eq_pdl shift, long(@vals) } ) }
 
 yield the same results.
 
@@ -94,7 +94,7 @@ for my $vals ( [ 0 ], [ 2,3,0,1,99 ], [ 99,99,99 ] ) {
 		test_out 'ok 1';
 		cmp_deeply $got, $expected2;
 		test_test "... ($type) also when ndarray is supplied directly (@vals)";
-		my $expected3 = { data => code( sub { eq_pdl_diag shift, $pdl } ) };
+		my $expected3 = { data => code( sub { eq_pdl shift, $pdl } ) };
 		test_out 'ok 1';
 		cmp_deeply $got, $expected3;
 		test_test "... ($type) and it's the same thing as using code() (@vals)";
@@ -109,20 +109,20 @@ for my $vals ( [ 0 ], [ 2,3,0,1,99 ], [ 99,99,99 ] ) {
 	my $expected = { data => test_pdl( $pdl2 ) };
 	test_out 'not ok 1';
 	test_fail +5;
-	test_diag 'Comparing $data->{"data"} as a ndarray:',
-		  'received value is not a ndarray';
+	test_diag 'Comparing $data->{"data"} as an ndarray:',
+		  'received value is not an ndarray';
 	test_err  "/#    got : \\('2'\\)/",
 		  '/# expect : Double\s+D\s+\[3\].*/';
 	cmp_deeply $got, $expected;
-	test_test 'fails with correct message and diagnostics when received value is not a ndarray';
+	test_test 'fails with correct message and diagnostics when received value is not an ndarray';
 	test_out 'not ok 1';
 	test_fail +6;
 	test_diag 'Ran coderef at $data->{"data"} on';
 	test_err  '/#?\s*/';
 	test_diag "'2'",
 		  'and it said',
-		  'received value is not a ndarray';
-	cmp_deeply $got, { data => code( sub { eq_pdl_diag shift, $pdl2 } ) };
+		  'received value is not an ndarray';
+	cmp_deeply $got, { data => code( sub { eq_pdl shift, $pdl2 } ) };
 	test_test '... but the diagnostics are better than with code()';
 }
 
@@ -134,8 +134,8 @@ for my $vals ( [ 0 ], [ 2,3,0,1,99 ], [ 99,99,99 ] ) {
 	my $expected = { data => test_pdl( $pdl2 ) };
 	test_out 'not ok 1';
 	test_fail +5;
-	test_diag 'Comparing $data->{"data"} as a ndarray:',
-		  'values do not match';
+	test_diag 'Comparing $data->{"data"} as an ndarray:',
+		  '1/3 values do not match';
 	test_err  '/#    got : Double\s+D\s+\[3\].*/',
 		  '/# expect : Double\s+D\s+\[3\].*/';
 	cmp_deeply $got, $expected;
@@ -146,8 +146,8 @@ for my $vals ( [ 0 ], [ 2,3,0,1,99 ], [ 99,99,99 ] ) {
 	test_err  '/#?\s*/',
 		  '/# PDL=SCALAR\(0x[0-9A-Fa-f]+\)/';
 	test_diag 'and it said',
-		  'values do not match';
-	cmp_deeply $got, { data => code( sub { eq_pdl_diag shift, $pdl2 } ) };
+		  '1/3 values do not match';
+	cmp_deeply $got, { data => code( sub { eq_pdl shift, $pdl2 } ) };
 	test_test '... but the diagnostics are better than with code()';
 }
 
@@ -159,8 +159,8 @@ for my $vals ( [ 0 ], [ 2,3,0,1,99 ], [ 99,99,99 ] ) {
 	my $expected = { data => test_pdl( $pdl2 ) };
 	test_out 'not ok 1';
 	test_fail +5;
-	test_diag 'Comparing $data->{"data"} as a ndarray:',
-		  'types do not match (EQUAL_TYPES is true)';
+	test_diag 'Comparing $data->{"data"} as an ndarray:',
+		  'types do not match (\'require_equal_types\' is true)';
 	test_err  '/#    got : Short\s+D\s+\[3\].*/',
 		  '/# expect : Long\s+D\s+\[3\].*/';
 	cmp_deeply $got, $expected;
@@ -171,8 +171,8 @@ for my $vals ( [ 0 ], [ 2,3,0,1,99 ], [ 99,99,99 ] ) {
 	test_err  '/#?\s*/',
 		  '/# PDL=SCALAR\(0x[0-9A-Fa-f]+\)/';
 	test_diag 'and it said',
-		  'types do not match (EQUAL_TYPES is true)';
-	cmp_deeply $got, { data => code( sub { eq_pdl_diag shift, $pdl2 } ) };
+		  'types do not match (\'require_equal_types\' is true)';
+	cmp_deeply $got, { data => code( sub { eq_pdl shift, $pdl2 } ) };
 	test_test '... but the diagnostics are better than with code()';
 }
 

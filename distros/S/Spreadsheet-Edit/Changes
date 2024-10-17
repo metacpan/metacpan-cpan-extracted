@@ -1,5 +1,6 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1000.020 : Fix bug with BOM+empty files.
 1000.019 : Fix leading-zero corruption bug which came back in 1000.018
            Fix BOM-related test issues on Windows.
 1000.018 : Support reading csv files with a BOM

@@ -4,26 +4,44 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    eval { require Test::WWW::Mechanize::Catalyst; require Catalyst::Plugin::Session; require Catalyst::Plugin::Session::State::Cookie };
-    plan skip_all => "This test needs Test::WWW::Mechanize::Catalyst, Catalyst::Plugin::Session and Catalyst::Plugin::Session::State::Cookie installed" if $@;
-    plan skip_all => "This test needs Test::WWW::Mechanize::Catalyst >= 0.50, you have only $Test::WWW::Mechanize::Catalyst::VERSION"
-        unless $Test::WWW::Mechanize::Catalyst::VERSION >= 0.50;
+    eval {
+      require Catalyst::Plugin::Session;
+      require Catalyst::Plugin::Session::State::Cookie;
+    } or do {
+      plan skip_all => "This test needs Catalyst::Plugin::Session and Catalyst::Plugin::Session::State::Cookie installed";
+    }
 }
 
 use lib 't/lib';
-use Test::WWW::Mechanize::Catalyst qw/AuthSessionTestApp/; # for the cookie support
+use Catalyst::Test qw/AuthSessionTestApp/;
+use HTTP::Cookies;
+use HTTP::Request::Common qw(GET);
 
-my $m = Test::WWW::Mechanize::Catalyst->new;
+my $jar = HTTP::Cookies->new;
+sub _request {
+    my $url = shift;
+    $url =~ s{^/}{http://localhost/};
+    my $req = GET $url;
+    $jar->add_cookie_header($req);
+    my $res = request($req);
+    $jar->extract_cookies($res);
+    return $res;
+}
 
-$m->get_ok("http://localhost/moose", "get ok");
-$m->get_ok("http://localhost/elk", "get ok");
+my $res;
 
-$m->get("http://localhost/yak");
-ok(!$m->success, 'Not ok, user unable to be resotred == nasal demons');
+$res = _request('/moose');
+ok +$res->is_success, 'get ok';
+
+$res = _request('/elk');
+ok +$res->is_success, 'get ok';
+
+$res = _request('/yak');
+ok !$res->is_success, 'Not ok, user unable to be resotred == nasal demons';
 
 foreach my $type (qw/ goat fluffy_bunny possum butterfly /) {
-    $m->get_ok("http://localhost/$type", "get $type ok");
+    $res = _request("/$type");
+    ok +$res->is_success, "get $type ok";
 }
 
 done_testing;
-

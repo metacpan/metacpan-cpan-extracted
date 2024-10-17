@@ -7,7 +7,7 @@ use JSON;
 
 # ABSTRACT: Get results from an HTTP HealthCheck
 use version;
-our $VERSION = 'v0.1.1'; # VERSION
+our $VERSION = 'v0.1.2'; # VERSION
 
 sub new {
     my ($class, @params) = @_;
@@ -32,9 +32,11 @@ sub run {
     # Throws away the HTTP status check if OK,
     # since it's implied to be successful
     # if it retrieves the encoded JSON object.
-    return $result->{results}->[1]
-        if @{$result->{results} || []} == 2
-        and $result->{results}->[0]->{status} eq 'OK';
+    if (($result->{results}->[0]->{status} || '') eq 'OK' ) {
+        shift @{ $result->{results} };
+        # info key is removed since it is redundant with the result-level info keys
+        return { results => $result->{results} };
+    }
     return $result;
 }
 
@@ -51,7 +53,7 @@ sub check_content {
         data   => $response->content,
     } if $@ or ref($remote_result) ne 'HASH';
 
-    return { results => [ $remote_result ] };
+    return $remote_result;
 }
 
 1;
@@ -68,7 +70,7 @@ HealthCheck::Diagnostic::RemoteHealth - Get results from an HTTP HealthCheck
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
 
 =head1 SYNOPSIS
 
@@ -120,7 +122,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Grant Street Group.
+This software is Copyright (c) 2021 - 2024 by Grant Street Group.
 
 This is free software, licensed under:
 

@@ -1,8 +1,8 @@
 use strict;                     # redundant, but quiets perlcritic
+use warnings;
 package Method::Generate::Constructor::Role::StrictConstructor;
-$Method::Generate::Constructor::Role::StrictConstructor::VERSION = '0.011';
-# ABSTRACT: a role to make Moo constructors strict.
 
+our $VERSION = '0.012';
 
 use Moo::Role;
 use B ();
@@ -26,7 +26,7 @@ around _assign_new => sub {
 
     my $state = ($] >= 5.010) ? "use feature 'state'; state" : "my";
 
-    my $body .= <<"EOF";
+    my $body = <<"EOF";
 
     # MooX::StrictConstructor
     $state \$attrs = { @attrs };
@@ -43,20 +43,19 @@ EOF
     return $body;
 };
 
-
 1;
 
 __END__
 
 =pod
 
+=encoding UTF-8
+
+=for :stopwords George Hartzell
+
 =head1 NAME
 
-Method::Generate::Constructor::Role::StrictConstructor - a role to make Moo constructors strict.
-
-=head1 VERSION
-
-version 0.011
+Method::Generate::Constructor::Role::StrictConstructor - a role to make Moo constructors strict
 
 =head1 DESCRIPTION
 
@@ -75,13 +74,24 @@ L<MooseX::StrictConstructor>.
 
 =item *
 
-L<MooX::InsideOut>
+L<MooseX::StrictConstructor>
 
 =item *
 
-L<MooseX::StrictConstructor>
+L<MooX::InsideOut>
 
 =back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-StrictConstructor>
+or by email to
+L<bug-MooX-StrictConstructor@rt.cpan.org|mailto:bug-MooX-StrictConstructor@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 
@@ -89,7 +99,7 @@ George Hartzell <hartzell@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by George Hartzell.
+This software is copyright (c) 2013 by George Hartzell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

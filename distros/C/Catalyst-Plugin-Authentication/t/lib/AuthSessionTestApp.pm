@@ -29,6 +29,7 @@ our $users = {
 __PACKAGE__->config(authentication => {users => $users});
 
 __PACKAGE__->setup;
+__PACKAGE__->log->levels();
 
 $users->{foo}{store} = __PACKAGE__->default_auth_store;
 

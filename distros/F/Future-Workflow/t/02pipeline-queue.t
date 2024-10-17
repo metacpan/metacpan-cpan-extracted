@@ -2,9 +2,10 @@
 
 use v5.26;
 use warnings;
-use experimental 'signatures';
 
-use Test::More;
+use Test2::V0;
+
+use experimental 'signatures';
 
 use Future::Workflow::Pipeline;
 
@@ -30,7 +31,7 @@ use Future;
    $fstage->done( "result-2" );
    $fstage->done( "result-3" );
 
-   is_deeply( \@finished, [qw( result-1 result-2 result-3 )],
+   is( \@finished, [qw( result-1 result-2 result-3 )],
       '@finished after stages completed'
    );
 }
@@ -65,7 +66,7 @@ use Future;
    $fstage->done( "result-3" );
    $fstage->done( "result-4" );
 
-   is_deeply( \@finished, [qw( result-1 result-2 result-3 result-4 )],
+   is( \@finished, [qw( result-1 result-2 result-3 result-4 )],
       '@finished after stages completed'
    );
 }

@@ -25,7 +25,7 @@ use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 use warnings;
 
-$VERSION = '0.32';
+$VERSION = '0.33';
 
 =pod
 
@@ -544,12 +544,19 @@ sub object_from_response {
 }
 
 #
-# simple check that a server response is indeed an RDAP object
+# a simple check that a server response is indeed an RDAP response
 #
 sub is_rdap {
     my ($self, $response) = @_;
 
-    return ((!$response->base || 'file' eq $response->base->scheme) || ($response->header('Content-Type') =~ /^application\/rdap\+json/ || $response->header('Content-Type') =~ /^application\/json/));
+    return (
+        !$response->base ||
+        'file' eq $response->base->scheme
+    ) ||
+    (
+        $response->header('content-type') &&
+        $response->header('content-type') =~ /^application\/(rdap\+|)json/
+    );
 }
 
 #

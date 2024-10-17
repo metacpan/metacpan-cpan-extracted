@@ -49,15 +49,15 @@ sub authenticate {
 
     my $remuser;
     if ($self->source eq "REMOTE_USER") {    
-        # compatibility hack:
-        if ($c->engine->can('env') && defined($c->engine->env)) {
-            # BEWARE: $c->engine->env was broken prior 5.80005
-            $remuser = $c->engine->env->{REMOTE_USER};
-        }
-        elsif ($c->req->can('remote_user')) {
+        if ($c->req->can('remote_user')) {
             # $c->req->remote_users was introduced in 5.80005; if not evailable we are
             # gonna use $c->req->user that is deprecated but more or less works as well 
             $remuser = $c->req->remote_user;
+        }
+        # compatibility hack:
+        elsif ($c->engine->can('env') && defined($c->engine->env)) {
+            # BEWARE: $c->engine->env was broken prior 5.80005
+            $remuser = $c->engine->env->{REMOTE_USER};
         }
         elsif ($c->req->can('user')) {
             # maybe show warning that we are gonna use DEPRECATED $req->user            
@@ -77,13 +77,16 @@ sub authenticate {
         # in different variables
         # BEWARE: $c->engine->env was broken prior 5.80005
         my $nam=$self->source;
-        if ($c->engine->can('env')) {
+        if ($c->request->can('env')) {
+            $remuser = $c->request->env->{$nam};
+        }
+        elsif ($c->engine->can('env')) {
             $remuser = $c->engine->env->{$nam};
         }
         else {
             # this happens on Catalyst 5.80004 and before (when using FastCGI)
             Catalyst::Exception->throw( "Cannot handle parameter 'source=$nam'".
-                " as runnig Catalyst engine has broken \$c->engine->env" );
+                " as running Catalyst engine has broken \$c->engine->env" );
         }
     }
     else {

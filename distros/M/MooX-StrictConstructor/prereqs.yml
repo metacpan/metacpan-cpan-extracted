@@ -1,0 +1,10 @@
+runtime:
+  requires:
+    perl: 5.008
+    Moo: 1.001000  # $Moo::MAKERS support
+    Moo::Role: 0
+    Class::Method::Modifiers: 0
+test:
+  requires:
+    Test::More: 0.88
+    Test::Fatal: 0

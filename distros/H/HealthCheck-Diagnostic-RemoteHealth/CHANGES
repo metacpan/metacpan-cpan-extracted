@@ -1,6 +1,15 @@
 Changelog for HealthCheck-Diagnostic-RemoteHealth
 
-v0.1.1 2021-12-10T17:24:32
+v0.1.2 2024-10-16T18:57:14
+ - Pull request #4: SM-5143 (Samuel Ng)
+ - SM-5143 Upgrade HealthCheck::Diagnostic::WebRequest to v1.4.4 to revert
+   the unwanted underscore change on check methods (Samuel Ng)
+ - SM-5143 Rewrite run logic to not depend on number of results (Samuel Ng)
+ - SM-5143 Ran make update (Samuel Ng)
+ - SM-5143 Upgrade HealthCheck::Diagnostic::WebRequest to v1.4.3 and fix
+   run method and tests to account for new response time check (Samuel Ng)
+
+v0.1.1 2021-12-10T17:24:16
  - Update README (Andrew Hewus Fresh)
  - Pull request #3: SM-3392 (Matthew Ito)
  - Use http for test and use IETF test domains (Matthew Ito)

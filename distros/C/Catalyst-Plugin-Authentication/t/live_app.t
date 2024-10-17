@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    plan skip_all => "Digest::SHA1 is required for this test" unless eval { require Digest::SHA1 };
+    plan skip_all => "Digest::SHA is required for this test" unless eval { require Digest::SHA };
     plan "no_plan";
 }
 

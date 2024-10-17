@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 11;
-use Test::Exception;
+use Test::Fatal;
 use Class::MOP;
 use Class::MOP::Class;
 use Moose::Object;
@@ -22,7 +22,7 @@ $user_meta->add_method('get' => sub { $user_get_password_field_name = $_[1]; ret
     local $user_password = undef;        # The user returns an undef password,
     local $user_get_password_field_name; # as there is no field named 'mistyped'
     my $config = { password_type => 'clear', password_field => 'mistyped' };
-    my $i; lives_ok { $i = $m->new($config, $app_meta->name->new, $realm_meta->name->new) } 'Construct instance';
+    my $i; is exception { $i = $m->new($config, $app_meta->name->new, $realm_meta->name->new) }, undef, 'Construct instance';
     ok($i, 'Have instance');
     my $r = $i->check_password($user_meta->name->new, { username => 'someuser', password => 'password' });
     is($user_get_password_field_name, 'mistyped',
@@ -35,7 +35,7 @@ $user_meta->add_method('get' => sub { $user_get_password_field_name = $_[1]; ret
     local $user_password = 'mypassword';
     local $user_get_password_field_name;
     my $config = { password_type => 'clear', password_field => 'the_password_field' };
-    my $i; lives_ok { $i = $m->new($config, $app_meta->name->new, $realm_meta->name->new) } 'Construct instance';
+    my $i; is exception { $i = $m->new($config, $app_meta->name->new, $realm_meta->name->new) }, undef, 'Construct instance';
     ok($i, 'Have instance');
     my $r = $i->check_password($user_meta->name->new, { username => 'someuser', the_password_field => 'mypassword' });
     is($user_get_password_field_name, 'the_password_field',

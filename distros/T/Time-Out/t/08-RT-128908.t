@@ -1,6 +1,5 @@
-#<<<
-use strict; use warnings;
-#>>>
+use strict;
+use warnings;
 
 use Scalar::Util qw( blessed  );
 use Time::Out    qw( timeout );
@@ -14,7 +13,7 @@ timeout 1, sub {
     die "bad\n";
   } catch {
     # rethrow exception, if it refers to a timeout
-    die $_ if blessed $_ && $_->isa( 'Time::Out::Exception' ); ## no critic (RequireCarping)
+    die $_ if defined blessed $_ and $_->isa( 'Time::Out::Exception' ); ## no critic (RequireCarping)
     fail( 'timeout should fire before die' );
   }
 };

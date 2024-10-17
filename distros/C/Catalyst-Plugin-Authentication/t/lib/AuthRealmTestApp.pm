@@ -8,7 +8,6 @@ use Catalyst qw/
 /;
 
 use Test::More;
-use Test::Exception;
 
 our $members = {
     bob => {

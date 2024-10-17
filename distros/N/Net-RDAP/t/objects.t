@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use LWP::Online qw(:skip_all);
 use Net::DNS;
 use Net::IP;
 use Net::ASN;

@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use LWP::Online qw(:skip_all);
 use List::Util qw(any);
 use Test::More;
 use URI;

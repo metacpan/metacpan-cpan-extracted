@@ -5,10 +5,10 @@ use Catalyst qw/
    Authentication
 /;
 
-use base qw/Catalyst/;
-unless ($Catalyst::VERSION >= 5.89000) {
-    __PACKAGE__->engine_class('RemoteTestEngine');
-}
+use Moose;
+extends 'Catalyst';
+with 'RemoteTestData';
+
 __PACKAGE__->config(
     'Plugin::Authentication' => {
         default_realm => 'remote',
@@ -28,10 +28,5 @@ __PACKAGE__->config(
     },
 );
 __PACKAGE__->setup;
-if ($Catalyst::VERSION >= 5.89000) {
-    require RemoteTestEngineRole;
-    RemoteTestEngineRole->meta->apply(__PACKAGE__->engine);
-}
 
 1;
-

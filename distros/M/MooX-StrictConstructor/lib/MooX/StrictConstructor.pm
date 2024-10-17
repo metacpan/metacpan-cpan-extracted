@@ -1,18 +1,17 @@
-use strict;                     # redundant, but quiets perlcritic
+use strict;
+use warnings;
 package MooX::StrictConstructor;
-$MooX::StrictConstructor::VERSION = '0.011';
-# ABSTRACT: Make your Moo-based object constructors blow up on unknown attributes.
 
+our $VERSION = '0.012';
 
-use Moo 1.001000 ();    # $Moo::MAKERS support
+use Moo ();
 use Moo::Role ();
+use Carp ();
 
 use Class::Method::Modifiers qw(install_modifier);
 
-use strictures 1;
-
 use constant
-    CON_ROLE => 'Method::Generate::Constructor::Role::StrictConstructor';
+    _CON_ROLE => 'Method::Generate::Constructor::Role::StrictConstructor';
 
 #
 # The gist of this code was copied directly from Graham Knop (HAARG)'s
@@ -23,7 +22,7 @@ sub import {
     my $class  = shift;
     my $target = caller;
     unless ( $Moo::MAKERS{$target} && $Moo::MAKERS{$target}{is_class} ) {
-        die "MooX::StrictConstructor can only be used on Moo classes.";
+        Carp::croak("MooX::StrictConstructor can only be used on Moo classes.");
     }
 
     _apply_role($target);
@@ -35,11 +34,10 @@ sub import {
 
 sub _apply_role {
     my $target = shift;
-    my $con = Moo->_constructor_maker_for($target);
-    Moo::Role->apply_roles_to_object($con, CON_ROLE)
-        unless Role::Tiny::does_role($con, CON_ROLE);
+    my $con = Moo->_constructor_maker_for($target); ## no critic (Subroutines::ProtectPrivateSubs)
+    Moo::Role->apply_roles_to_object($con, _CON_ROLE)
+        unless Role::Tiny::does_role($con, _CON_ROLE);
 }
-
 
 1;
 
@@ -47,13 +45,13 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
+=for :stopwords George Hartzell
+
 =head1 NAME
 
-MooX::StrictConstructor - Make your Moo-based object constructors blow up on unknown attributes.
-
-=head1 VERSION
-
-version 0.011
+MooX::StrictConstructor - Make your Moo-based object constructors blow up on unknown attributes
 
 =head1 SYNOPSIS
 
@@ -91,15 +89,15 @@ that implements the strictness was lifted from L<MooseX::StrictConstructor>.
 
 L<MooseX::StrictConstructor> documents two tricks for subverting strictness and
 avoid having problematic arguments cause an exception: handling them in BUILD
-or handle them in BUILDARGS.
+or handle them in C<BUILDARGS>.
 
-In L<MooX::StrictConstructor> you can use a BUILDARGS function to handle them,
-e.g. this will allow you to pass in a parameter called "spy" without raising an
-exception.  Useful?  Only you can tell.
+In L<MooX::StrictConstructor> you can use a C<BUILDARGS> function to handle
+them, e.g. this will allow you to pass in a parameter called "spy" without
+raising an exception.  Useful?  Only you can tell.
 
    sub BUILDARGS {
        my ($self, %params) = @_;
-       my $spy delete $params{spy};
+       my $spy = delete $params{spy};
        # do something useful with the spy param
        return \%params;
    }
@@ -151,13 +149,60 @@ L<MooseX::StrictConstructor>
 
 =back
 
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-StrictConstructor>
+or by email to
+L<bug-MooX-StrictConstructor@rt.cpan.org|mailto:bug-MooX-StrictConstructor@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
 George Hartzell <hartzell@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords George Hartzell Graham Knop JJ Merelo jrubinator mohawk2 Samuel Kaufman Tim Bunce
+
+=over 4
+
+=item *
+
+George Hartzell <hartzell@alerce.com>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+JJ Merelo <jjmerelo@gmail.com>
+
+=item *
+
+jrubinator <jjrs.pam+github@gmail.com>
+
+=item *
+
+mohawk2 <mohawk2@users.noreply.github.com>
+
+=item *
+
+Samuel Kaufman <samuel.c.kaufman@gmail.com>
+
+=item *
+
+Tim Bunce <Tim.Bunce@pobox.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by George Hartzell.
+This software is copyright (c) 2013 by George Hartzell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

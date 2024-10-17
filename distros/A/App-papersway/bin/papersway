@@ -150,12 +150,16 @@ $wmipc->subscribe({
 	}
 
 	# Other container changes we need to handle outside of any callback.
-	elsif ($e->{change} && exists $paper_ws{$focused_ws}
+	elsif ($e->{change} && $e->{change} eq "close") {
+	    clear_caffeinated()
+	      if $caffe_id && $caffe_id == $e->{container}{id};
+	    queue_event $e if exists $paper_ws{$focused_ws};
+	} elsif ($e->{change} && exists $paper_ws{$focused_ws}
 	       && (# A container stopped floating: it's as though it's new.
 		   $e->{change} eq "floating"
 		   && $e->{container}{type} ne "floating_con"
 
-		   || $e->{change} eq "close" || $e->{change} eq "focus"
+		   || $e->{change} eq "focus"
 
 	 	   || $e->{change} eq "move"
 	 	   && $e->{container} && $e->{container}{type} eq "con"))
@@ -492,7 +496,7 @@ sub normalise_ws_cols {
     # Simple class to batch up commands before sending them.
     # Currently used only within process_msg subroutine.
     package App::papersway::cmds;
-$App::papersway::cmds::VERSION = '1.002';
+$App::papersway::cmds::VERSION = '1.003';
 sub new { bless { cmds => [], need_signal => 0 } => shift };
     sub cmd { my $self = shift; push $self->{cmds}->@*, @_ }
     sub need_signal { shift->{need_signal}++ }
@@ -734,7 +738,8 @@ sub fresh_workspace {
 	# its monocle mode container, then that workspace will get an empty
 	# event, and we'll lose track of any windows pushed off to the sides.
 	# So turn off monocle mode first.
-	ensure_disable_monocle(my $ws = $paper_ws{$focused_ws});
+	ensure_disable_monocle(my $ws = $paper_ws{$focused_ws})
+	  if $opts{send};
 
 	# We need to ensure that the monitoring loop doesn't process the move
 	# event before it knows about the workspace change.  Otherwise, that
@@ -882,7 +887,7 @@ papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 

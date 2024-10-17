@@ -2,7 +2,7 @@ package DateTime::Format::Flexible;
 use strict;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use base 'DateTime::Format::Builder';
 
@@ -621,7 +621,7 @@ sub _parse_timezone
                                    |(?:\s+)?[-+]\d{2}:\d{2}  # '-04:00', '+04:00'
                                  )\.?\z}mx )
     {
-        printf( "# possible timezone (%s) in (%s)\n", $tz, $date);# if $ENV{DFF_DEBUG};
+        printf( "# possible timezone (%s) in (%s)\n", $tz, $date) if $ENV{DFF_DEBUG};
         my $original_tz = $tz;
         $tz =~ s{:}{};
         # some timezones are 2 digit hours, add the minutes part

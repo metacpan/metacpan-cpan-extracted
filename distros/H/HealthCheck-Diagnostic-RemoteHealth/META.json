@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -21,12 +21,15 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Zilla::PluginBundle::Author::GSG" : "0"
+            "Dist::Zilla::PluginBundle::Author::GSG" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
-            "HealthCheck::Diagnostic::WebRequest" : "0",
+            "HealthCheck::Diagnostic::WebRequest" : "v1.4.4",
             "JSON" : "0",
             "parent" : "0",
             "perl" : "v5.10.0",
@@ -52,7 +55,7 @@
    "provides" : {
       "HealthCheck::Diagnostic::RemoteHealth" : {
          "file" : "lib/HealthCheck/Diagnostic/RemoteHealth.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       }
    },
    "release_status" : "stable",
@@ -66,8 +69,8 @@
          "web" : "https://github.com/GrantStreetGroup/p5-healthcheck-diagnostic-remotehealth"
       }
    },
-   "version" : "v0.1.1",
-   "x_generated_by_perl" : "v5.34.0",
+   "version" : "v0.1.2",
+   "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1

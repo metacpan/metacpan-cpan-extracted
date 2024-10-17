@@ -65,7 +65,7 @@ sub mirror {
             }
         }
 
-        utime(undef, $mtime, $file);
+        utime($mtime, $mtime, $file);
         chmod(0600, $file);
     }
 

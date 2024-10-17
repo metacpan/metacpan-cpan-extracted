@@ -1,0 +1,66 @@
+use PDL::Types qw(ppdefs_all);
+
+# use pp_addbegin() to force =head1 NAME to appear before =head1 FUNCTIONS
+pp_addbegin(<<'EOD');
+
+# ABSTRACT: PP helper for Test::PDL
+
+=head1 NAME
+
+Test::PDL::Helper - PP helper for Test::PDL
+
+=head1 DESCRIPTION
+
+This module contains the implementation of a PP helper for Test::PDL.
+
+=cut
+
+# silence Test::Pod::Coverage warning
+=for Pod::Coverage set_boundscheck set_debugging approx_artol
+
+=cut
+
+EOD
+
+our $VERSION = '0.21';
+pp_setversion($VERSION);
+
+# from PDL::Primitive, only very loosely based on `exceeds_tolerances`
+pp_def('approx_artol',
+  Pars => 'got(); expected(); sbyte [o] result()',
+  OtherPars => 'double atol; double rtol',
+  OtherParsDefaults => { atol => 1e-6, rtol => 0 },
+  GenericTypes => [ppdefs_all],
+  ArgOrder => 1,
+  HandleBad => 1,
+  Code => <<'EOF',
+double atol2 = $COMP(atol)*$COMP(atol), rtol2 = $COMP(rtol)*$COMP(rtol);
+char got_badflag = !!$PDLSTATEISBAD(got), exp_badflag = !!$PDLSTATEISBAD(expected);
+broadcastloop %{
+$GENERIC() expctd = $expected();
+if (PDL_ISNAN_$PPSYM()($got()) && PDL_ISNAN_$PPSYM()(expctd)) { $result() = 1; continue; }
+if (PDL_ISNAN_$PPSYM()($got()) || PDL_ISNAN_$PPSYM()(expctd)) { $result() = 0; continue; }
+PDL_IF_BAD(
+  if ((got_badflag && $ISBAD(got())) && (exp_badflag && $ISBADVAR(expctd,expected))) { $result() = 1; continue; }
+  if ((got_badflag && $ISBAD(got())) || (exp_badflag && $ISBADVAR(expctd,expected))) { $result() = 0; continue; }
+,)
+$GENERIC() diff = $got() - expctd;
+double abs_diff2 = PDL_IF_GENTYPE_REAL(
+  diff * diff,
+  (creall(diff) * creall(diff)) + (cimagl(diff) * cimagl(diff))
+);
+if (abs_diff2 <= atol2)                 { $result() = 1; continue; }
+double rel_diff2 = rtol2 * PDL_IF_GENTYPE_REAL(
+  expctd * expctd,
+  (creall(expctd) * creall(expctd)) + (cimagl(expctd) * cimagl(expctd))
+);
+if (abs_diff2 <= rel_diff2)             { $result() = 1; continue; }
+$result() = 0;
+%}
+EOF
+  Doc => undef,
+);
+
+pp_done();
+
+# vim:set filetype=perl:

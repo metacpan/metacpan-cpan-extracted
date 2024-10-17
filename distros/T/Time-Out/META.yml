@@ -6,19 +6,22 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   IO::Handle: '0'
   Test::Fatal: '0'
-  Test::More: '0'
+  Test::Harness: '3.50'
+  Test::More: '1.001005'
   Test::Needs: '0'
 configure_requires:
-  App::cpanminus: '1.7046'
   Config: '0'
+  ExtUtils::MakeMaker: '6.76'
   ExtUtils::MakeMaker::CPANfile: '0.09'
+  File::Basename: '0'
   File::Spec: '0'
   lib: '0'
   strict: '0'
   subs: '0'
+  version: '0.9915'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,25 +34,27 @@ no_index:
 provides:
   Time::Out:
     file: lib/Time/Out.pm
-    version: '0.24'
+    version: v1.0.0
   Time::Out::Exception:
     file: lib/Time/Out/Exception.pm
-    version: '0.24'
+    version: v1.0.0
   Time::Out::ParamConstraints:
     file: lib/Time/Out/ParamConstraints.pm
-    version: '0.24'
+    version: v1.0.0
 recommends:
   Time::HiRes: '1.9726'
 requires:
-  Carp: '0'
+  Carp: '1.32'
   Exporter: '0'
   Scalar::Util: '0'
   Try::Tiny: '0'
   overload: '0'
   perl: '5.008000'
   strict: '0'
+  version: '0.9915'
   warnings: '0'
 resources:
   bugtracker: https://github.com/XSven/Time-Out/issues
   repository: git://github.com/XSven/Time-Out.git
-version: '0.24'
+version: 1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

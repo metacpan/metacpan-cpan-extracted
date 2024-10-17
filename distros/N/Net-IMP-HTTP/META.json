@@ -43,6 +43,6 @@
          "url" : "https://github.com/noxxi/p5-net-imp-http"
       }
    },
-   "version" : "0.524",
+   "version" : "0.525",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

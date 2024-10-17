@@ -1,40 +1,35 @@
 ---
 abstract: 'Infrastructure plugin for the Catalyst authentication framework.'
 author:
-  - 'Yuval Kogman, C<nothingmuch@woobling.org> - original author'
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
 build_requires:
-  Class::MOP: 0
-  ExtUtils::MakeMaker: 6.59
-  Moose: 0
-  Test::Exception: 0
-  Test::More: 0.88
+  Test::Fatal: '0'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Catalyst-Plugin-Authentication
 no_index:
   directory:
-    - inc
     - t
+    - xt
 requires:
-  Catalyst::Plugin::Session: 0.10
-  Catalyst::Runtime: 0
-  Class::Inspector: 0
-  MRO::Compat: 0
-  Moose: 0
-  MooseX::Emulate::Class::Accessor::Fast: 0
-  String::RewritePrefix: 0
-  Try::Tiny: 0
-  namespace::autoclean: 0
-  perl: 5.8.1
+  Catalyst::Runtime: '0'
+  MRO::Compat: '0'
+  Moose: '0'
+  MooseX::Emulate::Class::Accessor::Fast: '0'
+  String::RewritePrefix: '0'
+  Try::Tiny: '0'
+  namespace::autoclean: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Authentication
   license: http://dev.perl.org/licenses/
-  repository: git://git.shadowcat.co.uk/catagits/Catalyst-Plugin-Authentication.git
-version: 0.10023
+  repository: https://github.com/perl-catalyst/Catalyst-Plugin-Authentication.git
+version: '0.10024'
 x_authority: cpan:BOBTFISH
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

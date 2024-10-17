@@ -60,7 +60,6 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
-  List::MoreUtils
   File::Map
 );
 

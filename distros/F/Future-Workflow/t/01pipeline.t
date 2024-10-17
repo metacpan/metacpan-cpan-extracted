@@ -2,9 +2,10 @@
 
 use v5.26;
 use warnings;
-use experimental 'signatures';
 
-use Test::More;
+use Test2::V0;
+
+use experimental 'signatures';
 
 use Future::Workflow::Pipeline;
 
@@ -24,7 +25,7 @@ use Future;
    await $p->push_input( "one" );
    await $p->push_input( "two" );
 
-   is_deeply( \@finished, [qw( one two )],
+   is( \@finished, [qw( one two )],
       '@finished after two items'
    );
 }
@@ -43,7 +44,7 @@ use Future;
 
    await $p->push_input( "three" );
 
-   is_deeply( \@finished, [qw( three-A-B )],
+   is( \@finished, [qw( three-A-B )],
       '@finished after two stages'
    );
 }
@@ -64,7 +65,7 @@ use Future;
    is( scalar @finished, 0, '@finished has no items' );
 
    $f1->done( "result" );
-   is_deeply( \@finished, [qw( result )],
+   is( \@finished, [qw( result )],
       '@finished after stage completed'
    );
 }

@@ -1,5 +1,13 @@
 Revision history for Future-Workflow
 
+0.02    2024-10-16
+        [CHANGES]
+         * Update to Object::Pad 0.800
+            + requires explicit `use warnings`
+            + use `field` instead of `has` (RT156142)
+         * General module style refresh
+         * Added synopsis example code
+
 0.01    2021-11-25
         First version, released on an unsuspecting world.
 

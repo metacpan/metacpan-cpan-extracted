@@ -1,6 +1,5 @@
-#<<<
-use strict; use warnings;
-#>>>
+use strict;
+use warnings;
 
 # Load Time::Out before Test::More: Recent version of Test::More load
 # Time::HiRes. This should be avoided.

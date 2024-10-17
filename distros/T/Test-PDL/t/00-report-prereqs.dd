@@ -17,7 +17,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Exporter' => '0',
-                                      'PDL' => '2.039',
+                                      'PDL' => '2.040',
                                       'Test::Builder' => '0',
                                       'Test::Deep::Cmp' => '0',
                                       'base' => '0',
@@ -35,13 +35,11 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'List::MoreUtils' => '0',
-                                   'PDL' => '2.039',
+                                   'PDL' => '2.040',
                                    'Test::Builder::Tester' => '0',
                                    'Test::Deep' => '0',
                                    'Test::Exception' => '0',
                                    'Test::More' => '0.88',
-                                   'Test::NoWarnings' => '0',
                                    'perl' => '5.006'
                                  }
                  }

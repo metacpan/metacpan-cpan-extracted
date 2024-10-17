@@ -96,7 +96,7 @@ void SPVM_CHECK_check_basic_types_relation(SPVM_COMPILER* compiler) {
     const char* parent_basic_type_name = basic_type->parent_name;
     if (parent_basic_type_name) {
       SPVM_BASIC_TYPE* parent_basic_type = SPVM_HASH_get(compiler->basic_type_symtable, parent_basic_type_name, strlen(parent_basic_type_name));
-
+      
       if (!SPVM_BASIC_TYPE_is_class_type(compiler, parent_basic_type->id)) {
         SPVM_COMPILER_error(compiler, "The parant class must be a class type.\n  at %s line %d", basic_type->op_extends->file, basic_type->op_extends->line);
         return;
@@ -239,6 +239,13 @@ void SPVM_CHECK_check_class_vars(SPVM_COMPILER* compiler) {
         return;
       }
     }
+    
+    // Class variable
+    for (int32_t i = 0; i < basic_type->class_vars->length; i++) {
+      SPVM_CLASS_VAR* class_var = SPVM_LIST_get(basic_type->class_vars, i);
+      
+      class_var->index = i;
+    }
   }
 }
 
@@ -247,26 +254,6 @@ void SPVM_CHECK_check_fields(SPVM_COMPILER* compiler) {
     int32_t compile_error = 0;
     SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
     const char* basic_type_name = basic_type->name;
-    
-    // Check class var
-    for (int32_t class_var_index = 0; class_var_index < basic_type->class_vars->length; class_var_index++) {
-      SPVM_CLASS_VAR* class_var = SPVM_LIST_get(basic_type->class_vars, class_var_index);
-      SPVM_TYPE* class_var_type = class_var->type;
-      int32_t is_mulnum_t = SPVM_TYPE_is_mulnum_type(compiler, class_var_type->basic_type->id, class_var_type->dimension, class_var_type->flag);
-      
-      // valut_t cannnot become class variable
-      if (is_mulnum_t) {
-        SPVM_COMPILER_error(compiler, "The multi-numeric type cannnot used in the definition of the class variable.\n  at %s line %d", class_var->op_class_var->file, class_var->op_class_var->line);
-        return;
-      }
-    }
-    
-    // Class variable
-    for (int32_t i = 0; i < basic_type->class_vars->length; i++) {
-      SPVM_CLASS_VAR* class_var = SPVM_LIST_get(basic_type->class_vars, i);
-      
-      class_var->index = i;
-    }
     
     // Multi-numeric type limitation
     if (basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM) {
@@ -497,7 +484,7 @@ void SPVM_CHECK_check_methods(SPVM_COMPILER* compiler) {
               int32_t need_data_conversion = 0;
               int32_t allow_narrowing_conversion = SPVM_CHECK_check_allow_narrowing_conversion(compiler, arg_type, op_arg_default);
               int32_t interface_match = 0;
-              char error_reason[1024] = {0};
+              char error_reason[SPVM_COMPILER_C_ERROR_REASON_SIZE] = {0};
               int32_t satisfy_assignment_requirement = SPVM_TYPE_satisfy_assignment_requirement(
                 compiler,
                 arg_type->basic_type->id, arg_type->dimension, arg_type->flag,
@@ -803,7 +790,7 @@ void SPVM_CHECK_check_methods(SPVM_COMPILER* compiler) {
         break;
       }
       
-      char error_reason[1024] = {0};
+      char error_reason[SPVM_COMPILER_C_ERROR_REASON_SIZE] = {0};
       int32_t has_interface = SPVM_BASIC_TYPE_has_interface_common(compiler, basic_type->id, parent_basic_type->id, error_reason);
       
       if (!has_interface) {
@@ -818,7 +805,7 @@ void SPVM_CHECK_check_methods(SPVM_COMPILER* compiler) {
     for (int32_t interface_basic_type_index = 0; interface_basic_type_index < basic_type->interface_basic_types->length; interface_basic_type_index++) {
       SPVM_BASIC_TYPE* interface_basic_type = SPVM_LIST_get(basic_type->interface_basic_types, interface_basic_type_index);
       
-      char error_reason[1024] = {0};
+      char error_reason[SPVM_COMPILER_C_ERROR_REASON_SIZE] = {0};
       int32_t has_interface = SPVM_BASIC_TYPE_has_interface(compiler, basic_type->id, interface_basic_type->id, error_reason);
       
       if (!has_interface) {
@@ -2218,7 +2205,7 @@ void SPVM_CHECK_check_ast_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic
               int32_t need_data_conversion = 0;
               int32_t allow_narrowing_conversion = 0;
               
-              char error_reason[1024] = {0};
+              char error_reason[SPVM_COMPILER_C_ERROR_REASON_SIZE] = {0};
               int32_t satisfy_assignment_requirement_without_data_conversion = SPVM_TYPE_satisfy_assignment_requirement_without_data_conversion(
                 compiler,
                 type->basic_type->id, type->dimension, type->flag,
@@ -3384,7 +3371,7 @@ void SPVM_CHECK_check_ast_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic
             SPVM_TYPE* cast_type = SPVM_CHECK_get_type(compiler, op_cast);
             assert(cast_type);
             
-            char error_reason[1024] = {0};
+            char error_reason[SPVM_COMPILER_C_ERROR_REASON_SIZE] = {0};
             int32_t castability = SPVM_TYPE_satisfy_cast_requirement(
               compiler,
               cast_type->basic_type->id, cast_type->dimension, cast_type->flag,
@@ -4246,7 +4233,7 @@ SPVM_OP* SPVM_CHECK_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_type, 
   int32_t need_data_conversion = 0;
   int32_t allow_narrowing_conversion = SPVM_CHECK_check_allow_narrowing_conversion(compiler, dist_type, op_src);
   int32_t interface_match = 0;
-  char error_reason[1024] = {0};
+  char error_reason[SPVM_COMPILER_C_ERROR_REASON_SIZE] = {0};
   int32_t satisfy_assignment_requirement = SPVM_TYPE_satisfy_assignment_requirement(
     compiler,
     dist_type_basic_type_id, dist_type_dimension, dist_type_flag,

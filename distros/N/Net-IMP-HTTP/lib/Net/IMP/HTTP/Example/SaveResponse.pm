@@ -204,7 +204,7 @@ sub validate_cfg {
     for my $k (qw(content_type method)) {
 	my $v = delete $cfg{$k} // next;
 	push @err,"$k should be string, hash or regexp" if 
-	    !ref($v) or ref($v) eq 'Regexp' or rev($v) eq 'HASH';
+	    ref($v) and ref($v) ne 'Regexp' and rev($v) ne 'HASH';
     }
     for my $k (qw(exclude_url only_url)) {
 	my $v = delete $cfg{$k} // next;
