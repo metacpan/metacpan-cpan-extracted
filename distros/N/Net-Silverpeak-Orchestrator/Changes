@@ -1,5 +1,8 @@
 Revision history for Net-Silverpeak-Orchestrator
 
+0.016000  2024-10-17 17:51:03+02:00 Europe/Vienna
+    - add get_appliance_backups
+
 0.015002  2024-09-04 15:51:17+02:00 Europe/Vienna
     - ensure all URI parameters are URI encoded
 

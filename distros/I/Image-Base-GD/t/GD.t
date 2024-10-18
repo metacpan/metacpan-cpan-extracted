@@ -131,7 +131,7 @@ sub my_bounding_box_and_sides {
 # VERSION
 
 {
-  my $want_version = 16;
+  my $want_version = 17;
   is ($Image::Base::GD::VERSION, $want_version, 'VERSION variable');
   is (Image::Base::GD->VERSION,  $want_version, 'VERSION class method');
 

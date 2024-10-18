@@ -1,0 +1,28 @@
+File-SharedVar version 1.00
+===========================
+
+File::SharedVar - Pure-Perl extension to share variables between Perl processes using files and file locking for their transport
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  JSON (either JSON::XS or JSON::PP)
+  Fcntl
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2024 Chris Drake. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.30.0 or,
+at your option, any later version of Perl 5 you may have available.

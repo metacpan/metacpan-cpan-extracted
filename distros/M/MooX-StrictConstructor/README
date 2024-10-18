@@ -8,7 +8,7 @@ SYNOPSIS
         use Moo;
         use MooX::StrictConstructor;
 
-        has 'size' => ( is => 'rw');
+        has 'size' => ( is => 'rw' );
 
         # then somewhere else, when constructing a new instance
         # of My::Class ...
@@ -22,25 +22,17 @@ DESCRIPTION
     does not declare, then it dies. This is a great way to catch small
     typos.
 
-    Your application can use Carp::Always to generate stack traces on "die".
-    Previously all exceptions contained traces, but this could potentially
-    leak sensitive information, e.g.
-
-        My::Sensitive::Class->new( password => $sensitive, extra_value => 'foo' );
-
   STANDING ON THE SHOULDERS OF ...
-    Most of this package was lifted from MooX::InsideOut and most of the
-    Role that implements the strictness was lifted from
-    MooseX::StrictConstructor.
+    This module was inspired by MooseX::StrictConstructor, and includes some
+    implementation details taken from it.
 
   SUBVERTING STRICTNESS
-    MooseX::StrictConstructor documents two tricks for subverting strictness
-    and avoid having problematic arguments cause an exception: handling them
-    in BUILD or handle them in "BUILDARGS".
+    There are two options for subverting the strictness to handle
+    problematic arguments. They can be handled in "BUILDARGS" or in "BUILD".
 
-    In MooX::StrictConstructor you can use a "BUILDARGS" function to handle
-    them, e.g. this will allow you to pass in a parameter called "spy"
-    without raising an exception. Useful? Only you can tell.
+    You can use a "BUILDARGS" function to handle them, e.g. this will allow
+    you to pass in a parameter called "spy" without raising an exception.
+    Useful? Only you can tell.
 
        sub BUILDARGS {
            my ($self, %params) = @_;
@@ -49,39 +41,45 @@ DESCRIPTION
            return \%params;
        }
 
-    Because "BUILD" methods are run after an object has been constructed and
-    this code runs before the object is constructed the "BUILD" trick will
-    not work.
+    It is also possible to handle extra parameters in "BUILD". This requires
+    the strictness check to be performed at the end of object construction
+    rather than at the beginning.
+
+        use MooX::StrictConstuctor -late;
+
+        sub BUILD {
+            my ($self, $params) = @_;
+            if ( my $spy = delete $params->{spy} ) {
+                # do something useful
+            }
+        }
+
+    When using this option, the object will be fully constructed before
+    checking the parameters, and a failure will cause the destructor to be
+    run.
 
 BUGS/ODDITIES
   Inheritance
-    A class that uses MooX::StrictConstructor but extends another class that
-    does not will not be handled properly. This code hooks into the
-    constructor as it is being strung up (literally) and that happens in the
-    parent class, not the one using strict.
+    A class that uses MooX::StrictConstructor but extends a non-Moo class
+    will not be handled properly. This code hooks into the constructor as it
+    is being strung up (literally) and that happens in the parent class, not
+    the one using strict.
 
     A class that inherits from a Moose based class will discover that the
     Moose class's attributes are disallowed. Given sufficient Moose meta
     knowledge it might be possible to work around this. I'd appreciate pull
     requests and or an outline of a solution.
 
-  Subverting strictness
-    MooseX::StrictConstructor documents a trick for subverting strictness
-    using BUILD. This does not work here because strictness is enforced in
-    the early stage of object construction but the BUILD subs are run after
-    the objects has been built.
-
   Interactions with namespace::clean
     MooX::StrictConstructor creates a "new" method that namespace::clean
     will over-zealously clean. Workarounds include using
-    MooX::StrictConstructor after namespace::autoclean or telling
-    namespace::clean to ignore "new" with something like:
+    namespace::autoclean, using MooX::StrictConstructor after
+    namespace::clean or telling namespace::clean to ignore "new" with
+    something like:
 
-      use namespace::clean -except => ['new','meta'];
+      use namespace::clean -except => ['new'];
 
 SEE ALSO
-    *   MooX::InsideOut
-
     *   MooseX::StrictConstructor
 
 BUGS

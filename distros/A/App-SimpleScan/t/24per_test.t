@@ -4,7 +4,7 @@ use Test::Differences;
 
 $ENV{HARNESS_PERL_SWITCHES} = "" unless defined $ENV{HARNESS_PERL_SWITCHES};
 
-@output = `$^X -It bin/simple_scan --gen <examples/ss_country.in`;
+@output = `$^X -It -Iblib/lib bin/simple_scan --gen <examples/ss_country.in`;
 @expected = map {"$_\n"} split /\n/,<<EOF;
 use Test::More tests=>4;
 use Test::WWW::Simple;
@@ -29,7 +29,7 @@ EOF
 push @expected, "\n";
 eq_or_diff(\@output, \@expected, "uninserted output as expected");
 
-@output = `$^X -It bin/simple_scan --test_expand --gen <examples/ss_country.in`;
+@output = `$^X -It -Iblib/lib bin/simple_scan --test_expand --gen <examples/ss_country.in`;
 @expected = map {"$_\n"} split /\n/,<<EOF;
 use Test::More tests=>4;
 use Test::WWW::Simple;

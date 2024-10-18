@@ -42,6 +42,13 @@ if (@errors) {
 $csaf->writer(directory => '/var/www/html/csaf')->write;
 ```
 
+## Command-Line Utility
+
+- `csaf-downloader`, Download CSAF documents
+- `csaf-rolie`, Create ROLIE feed
+- `csaf-validator`, Validate a CSAF document
+- `csaf2html`, Convert CSAF documents in HTML
+
 ## Install
 
 Using Makefile.PL:
@@ -62,6 +69,7 @@ Using App::cpanminus:
 
  - `perldoc CSAF`
  - https://metacpan.org/release/CSAF
+ - https://docs.oasis-open.org/csaf/csaf/v2.0/os/csaf-v2.0-os.html
 
 
 ## Copyright

@@ -12,7 +12,7 @@ use File::LibMagic;
 use Carp qw(confess);
 use Data::Dumper;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 our $CLIENT = "Mail-JMAPTalk";
 our $AGENT = "$CLIENT/$VERSION";
@@ -25,7 +25,7 @@ Mail::JMAPTalk - Basic interface to talk to JMAP Servers
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -513,7 +513,10 @@ sub _get_type {
   return $info->{mime_type};
 }
 
-=head2 $Self->Upload($data, $mimetype, $accountId)
+=head2 $Self->Upload($Headers?, $data, $mimetype, $accountId)
+
+If the first argument is a hash reference, it will be shifted
+and used as additional headers.
 
 Uploads the bytes in $data with either the given mimetype or
 if the mimetype is not given, the type picked by File::LibMagic.
@@ -562,9 +565,13 @@ Example:
 =cut
 
 sub Upload {
-  my ($Self, $data, $type, $accountId) = @_;
-
+  my $Self = shift;
   my %Headers;
+  if (ref($_[0]) eq 'HASH') {
+      %Headers = %{ (shift) };
+  }
+  my ($data, $type, $accountId) = @_;
+
   $Headers{'Content-Type'} = $type || _get_type($data);
   $accountId = $accountId || $Self->{user};
 

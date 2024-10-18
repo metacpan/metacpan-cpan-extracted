@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.015002';
+$Net::Silverpeak::Orchestrator::VERSION = '0.016000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -381,6 +381,18 @@ sub get_appliance_bgp_neighbors ($self, $id, $params = {}) {
 }
 
 
+sub get_appliance_backups ($self, $id, $params = {}) {
+    $params->{runningConfig} = 'false'
+        unless exists $params->{runningConfig};
+    my $res = $self->_is_version_93
+        ? $self->get('/gms/rest/appliance/backup', { nePk => $id, $params->%* })
+        : $self->get('/gms/rest/appliance/backup/' . uri_escape($id), $params);
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
 sub list_template_applianceassociations($self) {
     my $res = $self->get('/gms/rest/template/applianceAssociation');
     $self->_error_handler($res)
@@ -604,7 +616,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.015002
+version 0.016000
 
 =head1 SYNOPSIS
 
@@ -792,6 +804,17 @@ Returns a hashref containing the BGP system config for all VRFs indexed by VRF I
 Takes an appliance id and an optional hashref with additional query parameters.
 
 Returns a hashref containing all BGP neighbors.
+
+=head2 get_appliance_backups
+
+Takes an appliance id and an optional hashref with additional query parameters.
+The runningConfig parameter defaults to false vs. true when not specified so
+the contents of all backups aren't fetched.
+
+By passing { runningConfig => 'true', id => $id } as parameters, the contents
+of a single backup can be fetched.
+
+Returns an arrayref of hashrefs containing all available backups.
 
 =head2 list_template_applianceassociations
 

@@ -1,0 +1,10 @@
+This file documents the revision history for Business::PAYONE
+
+2024-10-18 (0.3.0)
+  - added reference to GitHub repository
+
+2024-10-18 (0.2.0)
+  - fixed missing dependency
+
+2024-10-16 (0.1.0)
+  - initial release

@@ -1,4 +1,14 @@
 Revision history for CSAF.
 
+0.23 2024-10-18
+    - Added "CVSS" module prerequisite
+    - Added "csaf2html(1)" command
+    - Improved Mandatory tests (6.1.9 and 6.1.10)
+    - Improved "CSAF::Downloader"
+        - Added "--before" and "--after" for "csaf-downloader(1)"
+        - Added "before_date" and "after_date" option in "CSAF::Options::Downloader"
+        - Follow ROLIE feed URLs in "provider-metadata.json"
+        - Added date-range downloads support
+
 0.22 2024-04-23
     - First public release of CSAF

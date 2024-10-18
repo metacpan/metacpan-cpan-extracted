@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011 Kevin Ryde
+# Copyright 2010, 2011, 2024 Kevin Ryde
 
 # This file is part of Image-Base-GD.
 #
@@ -30,7 +30,7 @@ use Image::Base::GD;
 
 use GD;
 GD::Image->can('gif')
-  or plan skip_all => "due to no gif support in GD -- $@";
+  or plan skip_all => "due to no gif support in GD";
 
 plan tests => 14;
 

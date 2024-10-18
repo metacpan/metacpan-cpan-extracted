@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use App::CSAF::Renderer;
+
+exit App::CSAF::Renderer->run(@ARGV) unless caller();
+
+1;
+
+__END__
+=encoding utf-8
+
+=head1 NAME
+
+csaf2html - Convert CSAF documents in HTML
+
+=head1 SYNOPSIS
+
+    csaf2html --file FILE
+    csaf2html [--help|--man|--version]
+
+    Options:
+      -f, --file=FILE               Input CSAF document
+      -o, --output=FILE             Output filename
+      -t, --template=NAME,PATH      Template name or path
+
+      -v, --verbose                 Verbose
+
+          --help                    Brief help message
+          --man                     Full documentation
+          --version                 Print version
+
+=head1 DESCRIPTION
+
+C<csaf2html> Convert CSAF documents in HTML
+
+=head1 EXAMPLES
+
+Converts the CSAF document and writes the rendered HTML content to STDOUT:
+
+    $ csaf2html -f csaf-document.json
+
+Converts the CSAF document and writes the rendered HTML content to a file:
+
+    $ csaf2html -f csaf-document.json -o csaf-document.html
+
+Use a custom template file (See "Template Toolkit Documentation"):
+
+    $ csaf2html -f csaf-document.json -t my-cool-template.tt2
+
+=head1 SEE ALSO
+
+L<csaf-validator>
+
+=head1 AUTHOR
+
+L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2023-2024 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+
+You may use and distribute this module according to the same terms
+that Perl is distributed under.

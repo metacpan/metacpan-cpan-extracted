@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2019, 2024 Kevin Ryde
 
 # This file is part of Image-Base-GD.
 #
@@ -23,7 +23,7 @@ use warnings;
 use Carp;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 16;
+$VERSION = 17;
 
 use Image::Base 1.12; # version 1.12 for ellipse() $fill
 @ISA = ('Image::Base');
@@ -598,8 +598,8 @@ Colour names for drawing are
 
 See L<GD::Simple> for its C<color_names()> list.  Special "None" means
 transparent.  Colours are allocated when first used.  GD works in 8-bit
-components so 3 and 4-digit hex forms are truncated to the high 2 digits,
-and 1-digit hex "#123" expands to "#112233".
+components so 3 and 4-digit hex forms are truncated to the high 2 hex
+digits, and 1-digit hex "#123" expands to "#112233".
 
 =head2 File Formats
 
@@ -609,6 +609,9 @@ C<GD> can read and write
     jpeg     with libjpeg
     gif      unless disabled in GD.pm
     wbmp     wireless app bitmap
+
+And prior to libgd version 2.32 (now gone),
+
     gd       GD's own format, raw
     gd2      GD's own format, compressed
 
@@ -623,12 +626,12 @@ built with its option to disable GIF.
 
 C<load()> auto-detects the file format and calls the corresponding
 C<newFromPng()> etc.  "gd" file format differs between libgd 1.x and 2.x.
-libgd 2.x can load the 1.x format, but always writes 2.x so that's what
-C<save()> here gives.  Both "gd" formats are a byte dump mainly intended for
-temporary files.
+libgd 2.x could load the 1.x format, but always wrote 2.x so that's what
+C<save()> here gives.  Both "gd" formats were a byte dump mainly intended
+for temporary files but are unsupported in current libgd.
 
 WBMP is a bitmap format and is treated by GD as colours black "#000000" for
-0 and white "#FFFFFF" for 1.  On save any non-black is treated as white 1
+0 and white "#FFFFFF" for 1.  On save, any non-black is treated as white 1
 too, but not sure that's a documented feature.
 
 =head2 Other GD Modules
@@ -705,7 +708,7 @@ consistent with other C<Image::Base> modules.
 Draw an ellipse within the rectangle with top-left corner C<$x1>,C<$y1> and
 bottom-right C<$x2>,C<$y2>.  Optional C<$fill> true means a filled ellipse.
 
-In the current implementation ellipses with odd length sides (meaning
+In the current implementation, ellipses with odd length sides (meaning
 C<$x2-$x1+1> and C<$y2-$y1+1> both odd numbers) are drawn with GD.  The rest
 go to C<Image::Base> because GD circa 2.0.36 doesn't seem to draw even
 widths very well.  This different handling for different sizes is a bit
@@ -719,10 +722,10 @@ functions.
     $image->add_colours ('red', 'green', '#FF00FF');
 
 The drawing functions automatically add a colour if it doesn't already exist
-so C<add_colours()> in not needed, but it can be used to initialize the
+so C<add_colours()> is not needed, but it can be used to initialize the
 palette with particular desired colours.
 
-For a truecolor GD C<add_colours()> does nothing since in that case each
+For a truecolor GD, C<add_colours()> does nothing since in that case each
 pixel has its own RGBA rather than an index into a palette.
 
 =item C<< $image->load >>
@@ -820,7 +823,7 @@ http://user42.tuxfamily.org/image-base-gd/index.html
 
 =head1 LICENSE
 
-Image-Base-GD is Copyright 2010, 2011, 2012, 2019 Kevin Ryde
+Image-Base-GD is Copyright 2010, 2011, 2012, 2019, 2024 Kevin Ryde
 
 Image-Base-GD is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

@@ -1,34 +1,45 @@
---- #YAML:1.0
-name:               App-SimpleScan
-version:            3.01
-abstract:           simple_scan's core code
+---
+abstract: "simple_scan's core code"
 author:
-    - Joe McMahon <mcmahon@yahoo-inc.com >
-license:            unknown
-distribution_type:  module
+  - 'Joe McMahon <mcmahon@cpan.org>'
+build_requires: {}
 configure_requires:
-    ExtUtils::MakeMaker:  0
-build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Clone:                0.20
-    Encode:               0
-    Getopt::Long:         0
-    Graph:                0.65
-    IO::ScalarArray:      2.110
-    Regexp::Common:       0
-    Scalar::Util:         0
-    Sub::Installer:       0
-    Test::Differences:    0
-    Test::More:           0
-    Test::WWW::Simple:    0.18
-    WWW::Mechanize:       1.16
-    WWW::Mechanize::Pluggable:  0.09
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-SimpleScan
+provides:
+  App::SimpleScan:
+    file: lib/App/SimpleScan.pm
+    version: v4.0.1
+  App::SimpleScan::Substitution:
+    file: lib/App/SimpleScan/Substitution.pm
+    version: '1.00'
+  App::SimpleScan::Substitution::Line:
+    file: lib/App/SimpleScan/Substitution/Line.pm
+    version: '1.00'
+  App::SimpleScan::TestSpec:
+    file: lib/App/SimpleScan/TestSpec.pm
+    version: '0.24'
+requires:
+  Class::Accessor: '0'
+  Clone: '0.20'
+  Encode: '0'
+  Getopt::Long: '0'
+  Graph: '0.65'
+  IO::ScalarArray: '2.110'
+  Regexp::Common: '0'
+  Scalar::Util: '0'
+  Sub::Installer: '0'
+  TAP::Parser: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  Test::WWW::Simple: '0.41'
+  WWW::Mechanize: '1.16'
+  WWW::Mechanize::Pluggable: '0.09'
+version: v4.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

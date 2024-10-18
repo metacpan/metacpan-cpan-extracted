@@ -5,8 +5,8 @@
 # related or neighboring rights.  Attribution is requested but is not required.
 use strict; use warnings FATAL => 'all';
 
-our $VERSION = '1.026'; # VERSION
-our $DATE = '2024-09-24'; # DATE
+our $VERSION = '1.027'; # VERSION
+our $DATE = '2024-10-17'; # DATE
 
 #use 5.12; # for unicode_strings
 use v5.18; # for lexical_subs
@@ -33,8 +33,8 @@ use List::Util qw/min max any first/;
 use List::MoreUtils qw/indexes/;
 use Scalar::Util qw/openhandle/;
 use Pod::Usage qw/pod2usage/;
-use Spreadsheet::Edit 1000.016 qw(title2ident);
-use Spreadsheet::Edit::IO qw/convert_spreadsheet
+use Spreadsheet::Edit 1000.020 qw(title2ident);
+use Spreadsheet::Edit::IO 1000.020 qw/convert_spreadsheet
              sheetname_from_spec filepath_from_spec form_spec_with_sheetname/;
 use Spreadsheet::Edit::Log ':btw=DS ${lno}:';
 use Term::ReadKey ();
@@ -671,6 +671,7 @@ sub new {
       eval {
         $sh->title_rx( { required => [compile_if_regex
                                  @$always_show_columns,@$id_columns,@columns],
+                         silent => 1, # don't show conflicts with letter codes
                        },
                        "auto"
                      );

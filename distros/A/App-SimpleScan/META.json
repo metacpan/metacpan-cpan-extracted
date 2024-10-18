@@ -1,0 +1,63 @@
+{
+   "abstract" : "simple_scan's core code",
+   "author" : [
+      "Joe McMahon <mcmahon@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-SimpleScan",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "Clone" : "0.20",
+            "Encode" : "0",
+            "Getopt::Long" : "0",
+            "Graph" : "0.65",
+            "IO::ScalarArray" : "2.110",
+            "Regexp::Common" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Installer" : "0",
+            "TAP::Parser" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0",
+            "Test::WWW::Simple" : "0.41",
+            "WWW::Mechanize" : "1.16",
+            "WWW::Mechanize::Pluggable" : "0.09"
+         }
+      }
+   },
+   "provides" : {
+      "App::SimpleScan" : {
+         "file" : "lib/App/SimpleScan.pm",
+         "version" : "v4.0.1"
+      },
+      "App::SimpleScan::Substitution" : {
+         "file" : "lib/App/SimpleScan/Substitution.pm",
+         "version" : "1.00"
+      },
+      "App::SimpleScan::Substitution::Line" : {
+         "file" : "lib/App/SimpleScan/Substitution/Line.pm",
+         "version" : "1.00"
+      },
+      "App::SimpleScan::TestSpec" : {
+         "file" : "lib/App/SimpleScan/TestSpec.pm",
+         "version" : "0.24"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v4.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -1,3 +1,5 @@
+use strict;
+
 =head1 NAME
 
 App::SimpleScan::Cookbook
@@ -153,7 +155,7 @@ currently no easy way to track the expansions and debug them.
 
 First: be sure that the non-ASCII character you're seeing on the screen is actually
 present in the HTML source. You could be looking at an HTML entity that gets rendered
-as the character in question. For instance a degree symbol is actually C<&xB0;>. 
+as the character in question. For instance a degree symbol is actually C<&xB0;>.
 
 You can match a specific entity with its actual text:
 
@@ -169,9 +171,9 @@ comes relative imprecision. There's a handy table of Latin-1 entities at
 L<http://www.ramsch.org/martin/uni/fmi-hp/iso8859-1.html>.
 
 In some cases (e.g., Yahoo!'s fr.search search results), there will actually be
-non-Latin1 characters that are not HTML encoded. This is probably not good 
+non-Latin1 characters that are not HTML encoded. This is probably not good
 practice, but it still exists here and there. To deal with pages like this,
-copy and paste the exact text from a "view source" into the regex you want 
+copy and paste the exact text from a "view source" into the regex you want
 to use.
 
 Newer versions of simple_scan handle data smoothly without any special
@@ -195,7 +197,7 @@ methods to be called to process the pragma.
     my ($app, $args);
     # Parse the arguments. You have access to
     # all of the methods in App::SimpleScan as
-    # well as any subs defined here. You may 
+    # well as any subs defined here. You may
     # want to export methods to the App::SimpleScan
     # namespace in your import() method.
   }
@@ -245,7 +247,7 @@ current C<App::SimpleScan::TestSpec> object.
 =head2 Altering code/inserting code for every test stacked
 
 Create a C<filter> subroutine. This will get called with an array of strings
-corresponding to the code that's about to be stacked; you can do whatever 
+corresponding to the code that's about to be stacked; you can do whatever
 additions or alterations you like. Just return your altered code as an array
 of strings; if you've added any tests to it, use the test_count() method in the
 app() object to up the test count appropriately.
@@ -254,7 +256,7 @@ app() object to up the test count appropriately.
 
 Currently, there are six C<simple_scan> plugins available on CPAN:
 
-=over 
+=over
 
 =item Cache - the cache plugin extends C<simple_scan>'s caching to actually store the cached pages on disk. This allows subsequent runs to (if they choose) reuse pages that were fetched by previous runs. This is most useful in situations where you want to explore a number of different tests on a page, and you want to minimize the impact of your fetching the page to test it.
 
@@ -269,3 +271,7 @@ Currently, there are six C<simple_scan> plugins available on CPAN:
 =item Snaphot - lets you set up to be able to automatically (either for every get, or only when there are errors) snapshot the page as it was when the GET request was made. This can be very useful in visually debugging problems with C<simple_scan> tests. See C<App::SimpleScan::Plugin::Snapshot> for detailed usage information.
 
 =back
+
+=cut
+
+1; # Allow this "module" to be loaded for POD testing

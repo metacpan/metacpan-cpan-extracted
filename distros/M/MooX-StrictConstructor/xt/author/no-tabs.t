@@ -7,8 +7,11 @@ use Test::More 0.88;
 use Test::NoTabs;
 
 my @files = (
-    'lib/Method/Generate/Constructor/Role/StrictConstructor.pm',
     'lib/MooX/StrictConstructor.pm',
+    'lib/MooX/StrictConstructor/Role/BuildAll.pm',
+    'lib/MooX/StrictConstructor/Role/Constructor.pm',
+    'lib/MooX/StrictConstructor/Role/Constructor/Base.pm',
+    'lib/MooX/StrictConstructor/Role/Constructor/Late.pm',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',

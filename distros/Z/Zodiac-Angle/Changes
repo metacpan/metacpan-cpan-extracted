@@ -1,3 +1,8 @@
+0.07 2024-10-17T13:43:56+02:00
+ - Add 'struct' output to angle2zodiac().
+ - Add default values to angle2zodiac() doc.
+ - Update copyright years.
+
 0.06 2024-10-17T10:18:26+02:00
  - Add test for 'second_round'.
  - Add tests for ascii output without seconds and minutes.

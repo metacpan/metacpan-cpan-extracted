@@ -6,12 +6,11 @@ my %runs = (
   qq(echo "http://perl.org/ /python/ TY later..." | $^X $ENV{HARNESS_PERL_SWITCHES} -Iblib/lib bin/simple_scan 2>&1) => <<EOS,
 1..1
 not ok 1 - later... [http://perl.org/] [/python/ should match] # TODO Doesn't match now but should later
-
 #   Failed (TODO) test 'later... [http://perl.org/] [/python/ should match]'
 #   in .../Test/WWW/Simple.pm at line ....
-#          got: "<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Trans"...
+#          got: "...<!DOCTYPE html>"...
 #       length: ****
-#     doesn't match '(?-xism:python)'
+#     doesn\'t match \'...python...\'
 
 EOS
   qq(echo "http://perl.org/ /python/ SY later..." | $^X $ENV{HARNESS_PERL_SWITCHES} -Iblib/lib bin/simple_scan) => <<EOS,
@@ -30,12 +29,14 @@ EOS
 
 for my $cmd (keys %runs) {
   my @output = qx($cmd);
-  for (@output) { 
-    s/length: \d+/length: ****/; 
-    s{(in|at) .*?/Test/WWW/Simple}{in .../Test/WWW/Simple}; 
-    s/(at )?line \d+/at line .../;
+  for (@output) {
+    s/length: \d+/length: ****/;
+    s/got: ".*<!DOCTYPE html>.*/got: "...<!DOCTYPE html>".../;
+    s|at .* line|in .../Test/WWW/Simple.pm line|;
+    s/line .*/at line ..../;
+    s/doesn't match .*python.*/doesn't match '...python...'/;
   }
-  
+
   my @expected = map {"$_\n"} (split /\n/, $runs{$cmd});
   eq_or_diff \@output, \@expected, "good output";
 }

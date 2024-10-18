@@ -1,0 +1,2 @@
+1..1
+ok 1 - News homepage rendered OK (asia) [http://asia.search.yahoo.com/news] [/<form name=/ should match]

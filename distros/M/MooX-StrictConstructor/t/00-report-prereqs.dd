@@ -24,8 +24,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Class::Method::Modifiers' => '0',
-                                      'Moo' => '1.001000',
+                                      'Moo' => '2.004000',
                                       'Moo::Role' => '0',
                                       'perl' => '5.008'
                                     }

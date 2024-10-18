@@ -291,6 +291,45 @@ SKIP: {
         },
         'get_appliance_bgp_neighbors ok');
 
+    is(my $backups = $orchestrator->get_appliance_backups($test_appliance->{id}),
+        array {
+            all_items hash {
+                field id            => match qr/^\d+$/;
+                field backupTime    => match qr/^\d+$/;
+                field runningConfig => U();
+                etc();
+            };
+            etc();
+        },
+        'get_appliance_backups ok');
+
+    is($orchestrator->get_appliance_backups($test_appliance->{id}, { runningConfig => 'true' }),
+        array {
+            all_items hash {
+                field id            => match qr/^\d+$/;
+                field backupTime    => match qr/^\d+$/;
+                field runningConfig => D();
+                etc();
+            };
+            etc();
+        },
+        'get_appliance_backups with runningConfig ok');
+
+    my $test_backup = $backups->[0];
+    diag "using appliance backup id '$test_backup->{id}' for tests";
+
+    is($orchestrator->get_appliance_backups($test_appliance->{id}, { runningConfig => 'true', id => $test_backup->{id} }),
+        array {
+            item hash {
+                field id            => $test_backup->{id};
+                field backupTime    => match qr/^\d+$/;
+                field runningConfig => D();
+                etc();
+            };
+            etc();
+        },
+        'get_appliance_backups with runningConfig and id ok');
+
     is($orchestrator->list_applianceids_by_templategroupname(
         $ENV{NET_SILVERPEAK_ORCHESTRATOR_POLICY}),
         array {

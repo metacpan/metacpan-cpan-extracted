@@ -7,8 +7,8 @@
 package App::diff_spreadsheets;
 use strict; use warnings;  # placate Test::kwalitee
 
-our $DATE = '2024-09-24'; # DATE
-our $VERSION = '1.026'; # VERSION
+our $DATE = '2024-10-17'; # DATE
+our $VERSION = '1.027'; # VERSION
 
 1;
 

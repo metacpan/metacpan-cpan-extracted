@@ -1,5 +1,12 @@
 Revision history for MooX-StrictConstructor
 
+0.013   2024-10-18
+  - fixed extends not being cleaned up by "no Moo"
+  - rename internal role used to be in under the namespace of the main module
+  - fix the reported location of the error to be the caller
+  - fix object being partially constructed before checking arguments
+  - add -late option, allowing non-attribute arguments to be handled in BUILD
+
 0.012   2024-10-16
   - drop strictures prerequisite
   - minor Pod cleanups

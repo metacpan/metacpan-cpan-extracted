@@ -9,60 +9,73 @@ use List::Util 1.33 qw(none);
 use Readonly;
 use Unicode::UTF8 qw(decode_utf8);
 
-Readonly::Array our @SIGN_TYPES => qw(sign ascii);
+Readonly::Array our @SIGN_TYPES => qw(ascii sign struct);
 Readonly::Hash our %ZODIAC => (
 	1 => {
 		'sign' => decode_utf8('♈'), # Aries/Beran
 		'ascii' => 'ar',
+		'ascii_long' => 'aries',
 	},
 	2 => {
 		'sign' => decode_utf8('♉'), # Taurus/Býk
 		'ascii' => 'ta',
+		'ascii_long' => 'taurus',
 	},
 	3 => {
 		'sign' => decode_utf8('♊'), # Gemini/Blíženci
 		'ascii' => 'ge',
+		'ascii_long' => 'gemini',
 	},
 	4 => {
 		'sign' => decode_utf8('♋'), # Cancer/Rak
 		'ascii' => 'cn',
+		'ascii_long' => 'cancer',
 	},
 	5 => {
 		'sign' => decode_utf8('♌'), # Leo/Lev
 		'ascii' => 'le',
+		'ascii_long' => 'leo',
 	},
 	6 => {
 		'sign' => decode_utf8('♍'), # Virgo/Panna
 		'ascii' => 'vi',
+		'ascii_long' => 'virgo',
 	},
 	7 => {
 		'sign' => decode_utf8('♎'), # Libra/Váhy
 		'ascii' => 'li',
+		'ascii_long' => 'libra',
 	},
 	8 => {
 		'sign' => decode_utf8('♏'), # Scorpio/Štír
 		'ascii' => 'sc',
+		'ascii_long' => 'scorpio',
 	},
 	9 => {
 		'sign' => decode_utf8('♐'), # Sagittarius/Střelec
 		'ascii' => 'sa',
+		'ascii_long' => 'sagittarius',
 	},
 	10 => {
 		'sign' => decode_utf8('♑'), # Capricorn/Kozoroh
 		'ascii' => 'cp',
+		'ascii_long' => 'capricorn',
 	},
 	11 => {
 		'sign' => decode_utf8('♒'), # Aquarius/Vodnář
 		'ascii' => 'aq',
+		'ascii_long' => 'aquarius',
 	},
 	12 => {
 		'sign' => decode_utf8('♓'), # Pisces/Ryby
 		'ascii' => 'pi',
+		'ascii_long' => 'pisces',
 	},
 );
 Readonly::Scalar our $SPACE => ' ';
+Readonly::Scalar our $SEP => '|';
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -94,7 +107,7 @@ sub angle2zodiac {
 		$opts_hr->{'sign_type'} = 'sign';
 	}
 	if (none { $opts_hr->{'sign_type'} eq $_ } @SIGN_TYPES) {
-		err "Parameter 'sign_type' is bad. Possible values are 'sign' and 'ascii'.";
+		err "Parameter 'sign_type' is bad. Possible values are 'sign', 'ascii' and 'struct'.";
 	}
 
 	my $ret = {};
@@ -138,13 +151,24 @@ sub angle2zodiac {
 		}
 
 	# Output with ascii.
-	} else {
+	} elsif ($opts_hr->{'sign_type'} eq 'ascii') {
 		$zodiac_angle = $ret->{'angle_degree'}.$SPACE.
 			$ZODIAC{$ret->{'sign'} + 1}->{'ascii'};
 		if ($opts_hr->{'minute'}) {
 			$zodiac_angle .= $SPACE.$ret->{'angle_minute'}."'";
 			if ($opts_hr->{'second'}) {
 				$zodiac_angle .= $ret->{'angle_second'}."''";
+			}
+		}
+
+	# Structure.
+	} else {
+		$zodiac_angle = $ret->{'angle_degree'}.decode_utf8('°').$SEP.
+			$ZODIAC{$ret->{'sign'} + 1}->{'ascii_long'};
+		if ($opts_hr->{'minute'}) {
+			$zodiac_angle .= $SEP.$ret->{'angle_minute'}.decode_utf8("′");
+			if ($opts_hr->{'second'}) {
+				$zodiac_angle .= $SEP.$ret->{'angle_second'}.decode_utf8("′′");
 			}
 		}
 	}
@@ -198,8 +222,9 @@ Returns instance of 'Zodiac::Angle'.
 Convert angle to Zodiac angle.
 
 Options defined C<$opts_hr> control output. Possible keys in reference to hash
-are: minute (0/1 print minutes), second (0/1 print second), second_round (number
-of round numbers, default 4), sign_type (sign or ascii, default sign).
+are: minute (0/1 print minutes, default 1), second (0/1 print second, default 0),
+second_round (number of round numbers, default 4), sign_type (sign, ascii and
+struct, default sign).
 
 Default value of C<$opts_hr> is { minute => 1 }.
 
@@ -220,7 +245,7 @@ Returns angle.
                  Unknown parameter '%s'.
 
  angle2zodiac():
-         Parameter 'sign_type' is bad. Possible values are 'sign' and 'ascii'.
+         Parameter 'sign_type' is bad. Possible values are 'sign', 'ascii' and 'struct'.
 
 =head1 EXAMPLE1
 
@@ -361,6 +386,43 @@ Returns angle.
  # Angle: 0.5
  # Zodiac angle: 0° ar 30'0.0000''
 
+=head1 EXAMPLE5
+
+=for comment filename=angle_to_zodiac_struct_output.pl
+
+ use strict;
+ use warnings;
+
+ use Zodiac::Angle;
+ use Unicode::UTF8 qw(encode_utf8);
+
+ # Object.
+ my $obj = Zodiac::Angle->new;
+
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 angle\n";
+         exit 1;
+ }
+ my $angle = $ARGV[0];
+
+ my $zodiac_angle = Zodiac::Angle->new->angle2zodiac($angle, {
+         'minute' => 1,
+         'second' => 1,
+         'second_round' => 4,
+         'sign_type' => 'struct',
+ });
+
+ # Print out.
+ print 'Angle: '.$angle."\n";
+ print 'Zodiac angle: '.encode_utf8($zodiac_angle)."\n";
+
+ # Output without arguments:
+ # Usage: __SCRIPT__ angle
+
+ # Output with '0.5' argument:
+ # Angle: 0.5
+ # Zodiac angle: 0°|aries|30′|0.0000′′
+
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
@@ -399,12 +461,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

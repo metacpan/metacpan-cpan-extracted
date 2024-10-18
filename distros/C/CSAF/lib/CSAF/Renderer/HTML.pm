@@ -10,6 +10,7 @@ use Template;
 
 use Moo;
 extends 'CSAF::Renderer::Base';
+with 'CSAF::Util::Log';
 
 sub render {
 
@@ -29,14 +30,11 @@ sub render {
         }
     }
 
-    # TODO  Add option to use custom templates (eg. $renderer->html(template => '/path/my-template.tt'))
-
-    my $tt = Template->new(
-        INCLUDE_PATH => tt_templates_path,
-        PRE_CHOMP    => 1,
-        TRIM         => 1,
-        ENCODING     => 'UTF-8',
-        VARIABLES    => {
+    my %tt_options = (
+        PRE_CHOMP => 1,
+        TRIM      => 1,
+        ENCODING  => 'UTF-8',
+        VARIABLES => {
             document        => $self->csaf->document,
             product_tree    => $self->csaf->product_tree,
             vulnerabilities => $self->csaf->vulnerabilities,
@@ -48,13 +46,23 @@ sub render {
                 return $products->{$product_id} || $product_id;
             }
         }
-    ) or Carp::croak $Template::ERROR;
+    );
 
     my $template = $options{template} || 'default';
     my $vars     = $options{vars}     || {};
     my $output   = undef;
 
-    $tt->process("$template.tt", $vars, \$output) or Carp::croak $tt->error;
+    $template .= '.tt2' unless $template =~ /\.tt2$/;
+
+    unless (-e $template) {
+        $tt_options{INCLUDE_PATH} = tt_templates_path;
+    }
+
+    my $tt = Template->new(%tt_options) or Carp::croak $Template::ERROR;
+
+    $self->log->debug("Render CSAF document using $template template");
+
+    $tt->process($template, $vars, \$output) or Carp::croak $tt->error;
 
     return $output;
 

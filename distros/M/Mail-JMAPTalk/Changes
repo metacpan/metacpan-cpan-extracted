@@ -1,5 +1,8 @@
 Revision history for Perl extension Mail::JMAPTalk.
 
+0.16  Thu Oct 17 20:01:00 EDT 2024
+    - add the ability to pass extra headers to the Upload function
+
 0.15  Tue May 26 11:01:00 AEST 2019
     - Actually encode the filename when creating a URI
 

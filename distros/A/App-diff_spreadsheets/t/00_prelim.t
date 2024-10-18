@@ -30,14 +30,14 @@ if ($^O ne "MSWin32") {
 # On Windows, the 'nul' device (from File::Spec->devnull) does not behave
 # like /dev/null on unix; attempts to copy from 'nul' fail with "No such file"
 # So create a real empty file to read from.
-my $empty = Path::Tiny->tempfile(); $empty->spew("");
+my $empty = Path::Tiny->tempfile(); $empty->spew_raw("");
 
 # Every single cpantesters test fails with errors like
 #   Can't load '/opt/perl-5.37.10/lib/5.37.10/x86_64-linux/auto/Fcntl/Fcntl.so'
 # What is going on???
 
 { my $wstat = run_perlscript $progpath, @debug_opt, $empty, $empty;
-  ok($wstat==0, "status==0 for $progname emptyfile emptyfile");
+  ok($wstat==0, "status==0 for $progname emptyfile emptyfile", visnew->dvish('$wstat'));
 }
 
 # Test arg help

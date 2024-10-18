@@ -1,0 +1,6 @@
+Revision history for Perl extension File::SharedVar.
+
+1.00  Tue Oct 15 15:07:16 2024
+	- original version; created by h2xs 1.23 with options
+		-AX -n File::SharedVar
+

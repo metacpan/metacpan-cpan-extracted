@@ -10,17 +10,18 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+Base
+BuildAll
 Bunce
 Constructor
-Generate
 George
 Graham
 Hartzell
 JJ
 Kaufman
 Knop
+Late
 Merelo
-Method
 MooX
 Role
 Samuel

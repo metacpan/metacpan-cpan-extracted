@@ -1,0 +1,8 @@
+1..1
+not ok 1 - Deliberately broken test (asia) [http://asia.search.yahoo.com/search/news?p=bush&ei=UTF-8&fr=sfp&fl=0&x=wrt&debug=qa] [/fnord/ should match]
+#   Failed test 'Deliberately broken test (asia) [http://asia.search.yahoo.com/search/news?p=bush&ei=UTF-8&fr=sfp&fl=0&x=wrt&debug=qa] [/fnord/ should match]'
+#   in /home/y/lib/perl5/site_perl/5.6.1/Test/WWW/Simple.pm at line 65.
+#          got: "<!doctype html public "-//W3C//DTD HTML 4.01//EN" "...
+#       length: 37943
+#     doesn't match '(?-xism:fnord)'
+# Looks like you failed 1 test of 1.

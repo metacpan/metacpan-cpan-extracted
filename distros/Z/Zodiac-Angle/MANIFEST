@@ -4,6 +4,7 @@ examples/angle_to_zodiac.pl
 examples/angle_to_zodiac_ascii_output.pl
 examples/angle_to_zodiac_explicit_second_with_round.pl
 examples/angle_to_zodiac_only_minute.pl
+examples/angle_to_zodiac_struct_output.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

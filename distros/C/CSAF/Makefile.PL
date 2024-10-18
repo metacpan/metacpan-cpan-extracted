@@ -11,7 +11,7 @@ WriteMakefile(
     VERSION_FROM       => 'lib/CSAF.pm',
     ABSTRACT_FROM      => 'lib/CSAF.pm',
     LICENSE            => 'artistic_2',
-    EXE_FILES          => ['bin/csaf-validator', 'bin/csaf-rolie', 'bin/csaf-downloader'],
+    EXE_FILES          => ['bin/csaf-validator', 'bin/csaf-rolie', 'bin/csaf-downloader', 'bin/csaf2html'],
     MIN_PERL_VERSION   => 5.010,
     PL_FILES           => {},
     CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => '0'},
@@ -35,6 +35,7 @@ WriteMakefile(
         'Time::Piece'           => '0',    # CORE
         'URI::PackageURL'       => '0',
         'YAML::XS'              => '0',
+        'CVSS'                  => '0',
     },
     META_MERGE => {
         'meta-spec' => {version => 2},

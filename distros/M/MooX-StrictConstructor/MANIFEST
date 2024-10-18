@@ -8,8 +8,11 @@ META.yml
 Makefile.PL
 README
 dist.ini
-lib/Method/Generate/Constructor/Role/StrictConstructor.pm
 lib/MooX/StrictConstructor.pm
+lib/MooX/StrictConstructor/Role/BuildAll.pm
+lib/MooX/StrictConstructor/Role/Constructor.pm
+lib/MooX/StrictConstructor/Role/Constructor/Base.pm
+lib/MooX/StrictConstructor/Role/Constructor/Late.pm
 prereqs.yml
 t/00-compile.t
 t/00-report-prereqs.dd

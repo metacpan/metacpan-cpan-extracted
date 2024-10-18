@@ -136,7 +136,7 @@ Get the last element of collection.
 
 =item map
 
-Evalutate the callback and create a new collection.
+Evaluate the callback and create a new collection.
 
     CSAF::Util::List->new(1,2,3)->map(sub { $_ * 2 });
 

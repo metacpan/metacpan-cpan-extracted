@@ -1,16 +1,32 @@
 Revision history for App-SimpleScan
+4.0.1 Thu Oct 17 8:56:59 PDT 2024
+  - add files missed in the 4.0.0 commit
+
+4.00  Tue Oct 15 22:07:39 PDT 2024
+  - Remove Class::Accessor::Fast so we don't have build issues in cpantesters
+  - Update prereq to use newest Test::WWW::Simple
+  - Reorg tests to remove dependencies on network access for an install
+  - Complete rewrite of simple_report to use TAP::Parser
+  - Fixing failing POD coverage test on cookbook
+  - Remove all indirect object syntax
+  - Remove duplicate tests
+  - More accurate counts in simple_report
+  - Accept both list and anonymous array return from plugins
+  - Genericized output checks to prevent issues with different Perl versions
+  - Clean up MANIFEST
+
 3.01  Tue Jun  8 14:49:48 PDT 2010
-	- Revamped cookbook to make it much more useful.
+  - Revamped cookbook to make it much more useful.
 
 3.00  Mon Jun  7 18:13:41 PDT 2010
-	- Completely revamped simple_report to us TAP::Harness
-	  instead of Test::Harness. Output is the same, but now
-	  we're using a much better TAP parsing engine.
-	- Cleaned up test dependent on external sites that 
-	  had changed their HTML, moved it to xt/
-        - Various minor changes to support temp plugin used in tests
-	- No actual changes to App::SimpleScan, but it's the module
-	  we get our version from.
+  - Completely revamped simple_report to us TAP::Harness
+    instead of Test::Harness. Output is the same, but now
+    we're using a much better TAP parsing engine.
+  - Cleaned up test dependent on external sites that
+    had changed their HTML, moved it to xt/
+  - Various minor changes to support temp plugin used in tests
+  - No actual changes to App::SimpleScan, but it's the module
+    we get our version from.
 
 2.02  Thu Sep 28 13:25:20 PDT 2006
 	- longstanding bug with quoted strings containing backslashes

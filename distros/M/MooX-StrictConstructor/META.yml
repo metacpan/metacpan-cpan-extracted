@@ -19,21 +19,29 @@ meta-spec:
   version: '1.4'
 name: MooX-StrictConstructor
 provides:
-  Method::Generate::Constructor::Role::StrictConstructor:
-    file: lib/Method/Generate/Constructor/Role/StrictConstructor.pm
-    version: '0.012'
   MooX::StrictConstructor:
     file: lib/MooX/StrictConstructor.pm
-    version: '0.012'
+    version: '0.013'
+  MooX::StrictConstructor::Role::BuildAll:
+    file: lib/MooX/StrictConstructor/Role/BuildAll.pm
+    version: '0.013'
+  MooX::StrictConstructor::Role::Constructor:
+    file: lib/MooX/StrictConstructor/Role/Constructor.pm
+    version: '0.013'
+  MooX::StrictConstructor::Role::Constructor::Base:
+    file: lib/MooX/StrictConstructor/Role/Constructor/Base.pm
+    version: '0.013'
+  MooX::StrictConstructor::Role::Constructor::Late:
+    file: lib/MooX/StrictConstructor/Role/Constructor/Late.pm
+    version: '0.013'
 requires:
-  Class::Method::Modifiers: '0'
-  Moo: '1.001000'
+  Moo: '2.004000'
   Moo::Role: '0'
   perl: '5.008'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-StrictConstructor
   repository: https://github.com/haarg/MooX-StrictConstructor.git
-version: '0.012'
+version: '0.013'
 x_contributors:
   - 'George Hartzell <hartzell@alerce.com>'
   - 'Graham Knop <haarg@haarg.org>'

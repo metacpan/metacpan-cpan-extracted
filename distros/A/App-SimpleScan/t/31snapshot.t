@@ -4,7 +4,7 @@ use Test::Differences;
 $ENV{HARNESS_PERL_SWITCHES} = "" unless defined $ENV{HARNESS_PERL_SWITCHES};
 
 $expected = <<EOS;
-UNNAMED_TEST: tests=9, ok=8, failed=1, skipped=1, todo=2 (1 UNEXPECTEDLY SUCCEEDED)
+UNNAMED_TEST: tests=9, ok=6, failed=2, skipped=1, todo=2 (1 UNEXPECTEDLY SUCCEEDED)
 F 7 Deliberately broken test (asia) [http://asia.search.yahoo.com/search/news?p=bush&ei=UTF-8&fr=sfp&fl=0&x=wrt&debug=qa] [/fnord/ should match]
 #   Failed test 'Deliberately broken test (asia) [http://asia.search.yahoo.com/search/news?p=bush&ei=UTF-8&fr=sfp&fl=0&x=wrt&debug=qa] [/fnord/ should match]'
 #   in /home/y/lib/perl5/site_perl/5.6.1/Test/WWW/Simple.pm at line 65.

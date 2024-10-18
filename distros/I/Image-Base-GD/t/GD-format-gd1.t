@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011 Kevin Ryde
+# Copyright 2010, 2011, 2024 Kevin Ryde
 
 # This file is part of Image-Base-GD.
 #
@@ -20,13 +20,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More;
 
 use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
 use Image::Base::GD;
+
+use GD;
+GD::Image->can('gd')
+  or plan skip_all => "due to no gd file format support in GD";
+
+plan tests => 8;
 
 
 #------------------------------------------------------------------------------

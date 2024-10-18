@@ -9,7 +9,9 @@ README
 cpanfile
 dist.ini
 lib/Data/Identifier.pm
+lib/Data/Identifier/Generate.pm
 t/01_load.t
 t/02_uuid.t
 t/10_mixandmatch.t
+t/20_generate.t
 xt/author/pod-syntax.t

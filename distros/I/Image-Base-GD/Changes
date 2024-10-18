@@ -1,4 +1,4 @@
-Copyright 2010, 2011, 2012, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2019, 2024 Kevin Ryde
 
 This file is part of Image-Base-GD.
 
@@ -16,6 +16,9 @@ You can get a copy of the GNU General Public License online at
 <http://www.gnu.org/licenses/>.
 
 
+
+Version 17, October 2024
+    - GD-format-gd.t, GD-format-gd1.t allow for gd and gd2 formats gone
 
 Version 16, February 2019
     - TEST_REQUIRES separate

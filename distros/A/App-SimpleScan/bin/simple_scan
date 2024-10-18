@@ -8,7 +8,7 @@ our $VERSION = "1.02";
 
 use App::SimpleScan;
 
-my $app = new App::SimpleScan;
+my $app = App::SimpleScan->new;
 exit $app->go;
 
 __END__

@@ -1,7 +1,8 @@
 package App::SimpleScan::Plugin::Tester;
 
 sub options {
-  return('tester', \$tester);
+  # Test that the option handler unpacks this correctly.
+  ['tester', \$tester];
 }
 
 sub pragmas {
@@ -15,5 +16,4 @@ sub test_modules {
 sub per_test_code {
   return (qq(diag "test code inserted"));
 }
-
 1;

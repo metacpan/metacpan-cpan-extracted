@@ -22,9 +22,9 @@ METHODS
     Convert angle to Zodiac angle.
 
     Options defined $opts_hr control output. Possible keys in reference to
-    hash are: minute (0/1 print minutes), second (0/1 print second),
-    second_round (number of round numbers, default 4), sign_type (sign or
-    ascii, default sign).
+    hash are: minute (0/1 print minutes, default 1), second (0/1 print
+    second, default 0), second_round (number of round numbers, default 4),
+    sign_type (sign, ascii and struct, default sign).
 
     Default value of $opts_hr is { minute => 1 }.
 
@@ -43,7 +43,7 @@ ERRORS
                      Unknown parameter '%s'.
 
      angle2zodiac():
-             Parameter 'sign_type' is bad. Possible values are 'sign' and 'ascii'.
+             Parameter 'sign_type' is bad. Possible values are 'sign', 'ascii' and 'struct'.
 
 EXAMPLE1
      use strict;
@@ -172,6 +172,40 @@ EXAMPLE4
      # Angle: 0.5
      # Zodiac angle: 0° ar 30'0.0000''
 
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Zodiac::Angle;
+     use Unicode::UTF8 qw(encode_utf8);
+
+     # Object.
+     my $obj = Zodiac::Angle->new;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 angle\n";
+             exit 1;
+     }
+     my $angle = $ARGV[0];
+
+     my $zodiac_angle = Zodiac::Angle->new->angle2zodiac($angle, {
+             'minute' => 1,
+             'second' => 1,
+             'second_round' => 4,
+             'sign_type' => 'struct',
+     });
+
+     # Print out.
+     print 'Angle: '.$angle."\n";
+     print 'Zodiac angle: '.encode_utf8($zodiac_angle)."\n";
+
+     # Output without arguments:
+     # Usage: __SCRIPT__ angle
+
+     # Output with '0.5' argument:
+     # Angle: 0.5
+     # Zodiac angle: 0°|aries|30′|0.0000′′
+
 DEPENDENCIES
     Class::Utils, Error::Pure, List::Util, Readonly, Unicode::UTF8.
 
@@ -194,10 +228,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020-2023 Michal Josef Špaček
+    © 2020-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

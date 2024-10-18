@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "CVSS" : "0",
             "Cpanel::JSON::XS" : "0",
             "Digest::SHA" : "0",
             "File::Basename" : "0",
@@ -70,7 +71,7 @@
          "web" : "https://github.com/giterlizzi/perl-CSAF"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_purl" : "pkg:cpan/GDT/CSAF",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

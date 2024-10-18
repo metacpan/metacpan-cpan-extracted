@@ -26,6 +26,9 @@ use Test::More 0.88;
     use MooX::StrictConstructor;
 
     has 'thing' => ( is => 'rw' );
+
+    our $DESTROY;
+    sub DEMOLISH { $DESTROY++ }
 }
 
 {
@@ -68,7 +71,7 @@ use Test::More 0.88;
     package Tricky;
 
     use Moo;
-    use MooX::StrictConstructor;
+    use MooX::StrictConstructor -late;
 
     has 'thing' => ( is => 'rw' );
 
@@ -118,11 +121,14 @@ use Test::More 0.88;
 is( exception { Standard->new( thing => 1, bad => 99 ) },
     undef, 'standard Moo class ignores unknown params' );
 
+$Stricter::DEMOLISH = 0;
 like(
     exception { Stricter->new( thing => 1, bad => 99 ) },
     qr/unknown attribute.+: bad/,
     'strict constructor blows up on unknown params'
 );
+
+is $Stricter::DEMOLISH, 0, 'Object destructor not called';
 
 is( exception { Subclass->new( thing => 1, size => 'large' ) },
     undef, 'subclass constructor handles known attributes correctly' );
@@ -155,12 +161,9 @@ like(
     q{strict subclass from parent that doesn't use strict correctly recognizes bad attribute}
 );
 
-TODO: {
-    local $TODO = "Moose trick.  Doesn't work 'cuz my code runs before object built.";
-    is( exception { Tricky->new( thing => 1, spy => 99 ) },
-        undef,
-        'can work around strict constructor by deleting params in BUILD()' );
-}
+is( exception { Tricky->new( thing => 1, spy => 99 ) },
+    undef,
+    'can work around strict constructor by deleting params in BUILD()' );
 
 is( exception { TrickyBuildArgs->new( thing => 1, spy => 99 ) },
     undef,
@@ -192,6 +195,11 @@ is( exception { InitArg->new( other => 1 ) },
 unlike( exception{ InTrace->be_strict },
     qr/unredacted/,
     'Stack traces are not dumped by default'
+);
+
+like( exception{ InTrace->be_strict },
+    qr/\Q${\__FILE__}\E/,
+    'Stack traces reference caller file'
 );
 
 done_testing();

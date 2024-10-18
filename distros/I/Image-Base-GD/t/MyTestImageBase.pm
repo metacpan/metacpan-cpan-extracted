@@ -1,6 +1,6 @@
 # MyTestImageBase.pm -- some tests for Image::Base subclasses
 
-# Copyright 2010, 2011, 2012, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2015, 2019 Kevin Ryde
 
 # MyTestImageBase.pm is shared by several distributions.
 #
@@ -37,7 +37,7 @@ use vars '@CARP_NOT';
 @CARP_NOT = ('Test');
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 
 sub min {

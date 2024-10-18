@@ -1,6 +1,7 @@
 #!/usr/local/bin/perl
 use Test::More tests=>1;
 use Test::Differences;
+use lib 't';
 
 $ENV{HARNESS_PERL_SWITCHES} = "" unless defined $ENV{HARNESS_PERL_SWITCHES};
 

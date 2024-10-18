@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use English qw(-no_match_vars);
 
-our $VERSION = '3.01';
+our $VERSION = '4.0.1';
 
 use Carp;
 use Getopt::Long;
@@ -19,16 +19,16 @@ use Graph;
 
 use Module::Pluggable search_path => [qw(App::SimpleScan::Plugin)];
 
-use base qw(Class::Accessor::Fast);
-__PACKAGE__->mk_accessors(qw(sub_engine tests test_count 
+use base qw(Class::Accessor);
+__PACKAGE__->mk_accessors(qw(sub_engine tests test_count
                              next_line_callbacks _deps));
 
 $|++;                                                   ##no critic
 
 use App::SimpleScan::TestSpec;
 
-my $reference_mech = new WWW::Mechanize::Pluggable;
-my $sub_engine     = new App::SimpleScan::Substitution;
+my $reference_mech = WWW::Mechanize::Pluggable->new;
+my $sub_engine     = App::SimpleScan::Substitution->new;
 
 my @local_pragma_support =
   (
@@ -43,7 +43,7 @@ my($cache_from_cmdline, $no_agent);
 my($run_status);
 
 # Option-to-variable mappings for Getopt::Long
-my %basic_options = 
+my %basic_options =
   ('generate'  => \$generate,
    'run'       => \$run,
    'warn'      => \$warn,
@@ -79,7 +79,7 @@ my $in_or_out_bracketed = qr/ ($out_angled) | ($in_angled) /x;
 ################################
 # Basic class methods.
 
-# Create the object. 
+# Create the object.
 # - load and install plugins
 # - make object available to test specs for callbacks
 # - clear the tests and test count
@@ -147,7 +147,7 @@ sub go {
        warn $result,"\n";
        $exit_code = 1;
     }
-  } 
+  }
   else {
     if (${$self->warn}) {
       $self->stack_test(qq(fail "No tests were found in your input file.\n"));
@@ -217,7 +217,7 @@ sub transform_test_specs {
     # will have been queued on the input if there
     # where any substitutions.
     #
-    # We do this *after* pragma processing because 
+    # We do this *after* pragma processing because
     # if we have this:
     #  %%foo bar baz
     #  %%quux <foo> is the value
@@ -235,7 +235,7 @@ sub transform_test_specs {
     # No substitutions in this line, so just process it.
     my $item = App::SimpleScan::TestSpec->new($_);
 
-    # Store it in case a plugin needs to look at the 
+    # Store it in case a plugin needs to look at the
     # test spec in an overriding method.
     $self->set_current_spec($item);
 
@@ -259,8 +259,8 @@ END_MSG
 # Calls each plugin's test_modules method
 # to stack any other test modules needed to
 # properly handle the test code. (Plugins may
-# want to generate test code that needs 
-# something like Test::Differences, etc. - 
+# want to generate test code that needs
+# something like Test::Differences, etc. -
 # this lets them load that module so the
 # tests actually work.)
 #
@@ -282,7 +282,7 @@ sub finalize_tests {
   # Handle conditional user agent initialization.
   # This was added because some servers (e.g., WAP
   # servers) refuse connections from known user agents,
-  # but others (e.g., Yahoo!'s web servers) refuse 
+  # but others (e.g., Yahoo!'s web servers) refuse
   # login attempts from non-browser user agents.
   #
   # Set the user agent unless --no-agent was given.
@@ -290,17 +290,17 @@ sub finalize_tests {
   if (!$self->no_agent) {
     push @prepends, qq(mech->agent_alias("Windows IE 6");\n);
   }
- 
-  # Add the boilerplate testing stuff. 
-  unshift @prepends, 
+
+  # Add the boilerplate testing stuff.
+  unshift @prepends,
     (
       "use Test::More tests=>@{[$self->test_count]};\n",
       "use Test::WWW::Simple;\n",
       "use strict;\n",
       "\n",
     );
-  
-  
+
+
   $self->tests( [ @prepends, @tests ] );
   return;
 }
@@ -341,7 +341,7 @@ sub expand_backticked {
   # any other switches. Boy, that's simpler.
   my @data = ($text =~ /$item/g);
 
-  # Evaluate the tokens. 
+  # Evaluate the tokens.
   my @result;
   local $_;
   for (@data) {
@@ -380,7 +380,7 @@ sub get_current_spec {
   return $self->{CurrentTestSpec};
 }
 
-# If there are any substitutions, build them, stack them on the input,  
+# If there are any substitutions, build them, stack them on the input,
 # and return true. Otherwise, just return false so the line will be passed on.
 sub _queue_substituted_lines {
   my ($self, $line) = @_;
@@ -403,7 +403,7 @@ sub _queue_substituted_lines {
 }
 
 # Wrapper function for setter/getter that implements the
-# override function (command-line substitutions override 
+# override function (command-line substitutions override
 # substitutions in the input).
 sub _substitution_data {
   my ($self, $pragma_name, @pragma_values) = @_;
@@ -412,7 +412,7 @@ sub _substitution_data {
   }
 
   if (@pragma_values) {
-    if (${$self->override} and 
+    if (${$self->override} and
         $self->{Predefs}->{$pragma_name}) {
       if (${$self->debug}) {
         $self->stack_code(qq(diag "Substitution $pragma_name not altered to '@pragma_values'";\n));
@@ -425,7 +425,7 @@ sub _substitution_data {
   else {
     $self->sub_engine->substitution_value($pragma_name);
   }
-  return 
+  return
     wantarray ? @{$self->sub_engine->dictionary->{$pragma_name}}
               : $self->sub_engine->dictionary->{$pragma_name};
 }
@@ -467,7 +467,7 @@ sub handle_options {
 
   # If anything was predefined, save it in the substitutions.
   for my $def (keys %{$self->{Predefs}}) {
-    $self->sub_engine->substitution_value($def, 
+    $self->sub_engine->substitution_value($def,
                             (split /\s+/mx, $self->{Predefs}->{$def}));
   }
 
@@ -478,7 +478,7 @@ sub handle_options {
     $self->sub_engine->substitution_value('agent', 'Windows IE 6');
     $self->stack_code("mech->agent_alias('Windows IE 6');\n");
   }
-  
+
   $self->app_defaults;
   return;
 }
@@ -511,6 +511,12 @@ sub app_defaults {
 # set/get the option values.
 sub install_options {
   my ($self, @options) = @_;
+  # If plugin returned options as anonymous array, unpack it.
+  if (@options != 2) {
+    if (@options == 1 and ref $options[0] eq 'ARRAY') {
+      @options = @{ $options[0] };
+    }
+  }
   if (! defined $self->{Options}) {
     $self->{Options} = {};
   }
@@ -522,13 +528,13 @@ sub install_options {
   while (@options) {
     # This coding is deliberate.
     #
-    # We want a separate copy of $option and 
+    # We want a separate copy of $option and
     # $receiver each time; we don't want a new
     # copy of @options, because we want to keep
     # effectively shifting two values off each
     # time around the loop.
     #
-    # Note that the generated method returns a 
+    # Note that the generated method returns a
     # reference to the variable that the option is
     # stored into; this makes it simpler to code
     # the accessor here. If you use an array or
@@ -553,7 +559,7 @@ sub install_options {
     if (! $self->can($option)) {
       use Sub::Installer;
       __PACKAGE__->install_sub(
-        { $option => sub { 
+        { $option => sub {
                            my ($self, $value) = @_;
                            if (defined $value) {
                              $self->{Options}->{$option} = $value;
@@ -561,7 +567,7 @@ sub install_options {
                            return $self->{Options}->{$option};
                          }
         }
-      ); 
+      );
     }
   }
   return;
@@ -583,7 +589,7 @@ sub _load_plugins {
     if ($plugin->can('filters')) {
       push @{$self->{Filters}}, $plugin->filters();
     }
-    # Initialize plugin data if possible. 
+    # Initialize plugin data if possible.
     if ($plugin->can('init')) {
       $plugin->init($self);
     }
@@ -595,7 +601,7 @@ sub _load_plugins {
 # Call Getopt::Long to parse the command line.
 sub parse_command_line {
   my ($self) = @_;
-  return GetOptions(%{$self->{Options}});
+  return GetOptions(%{$self->{Options}}) if ref $self->{Options} eq 'HASH' and keys %{$self->{Options}};
 }
 
 # Install any pragmas supplied by plugins.
@@ -604,7 +610,7 @@ sub parse_command_line {
 sub install_pragma_plugins {
   my ($self) = @_;
 
-  foreach my $plugin (@local_pragma_support, 
+  foreach my $plugin (@local_pragma_support,
                       __PACKAGE__->plugins) {
     if (ref $plugin eq 'ARRAY') {
       $self->pragma(@{ $plugin });
@@ -638,8 +644,8 @@ sub _do_agent {
   my ($self, $rest) = @_;
   $rest = reverse $rest;
   my ($maybe_agent) = ($rest =~/^\s*(.*)$/mx);
-  
-  $maybe_agent = reverse $maybe_agent; 
+
+  $maybe_agent = reverse $maybe_agent;
   if (grep { $_ eq $maybe_agent } $reference_mech->known_agent_aliases) {
     $self->_substitution_data('agent', $maybe_agent)
   }
@@ -750,7 +756,7 @@ sub stack_test {
 # Dependency checking
 
 # It's necessary to make sure that the substitution pragmas
-# don't have looping dependencies; these would cause the 
+# don't have looping dependencies; these would cause the
 # input stack to grow without limit as it tries to resolve
 # all of the substitutions.
 #
@@ -772,12 +778,12 @@ sub _check_dependencies {
 
   # Add the new dependencies.
   $self->_depend($var, @dependencies);
- 
+
   # Run a topological sort to make sure that the
   # graph remains a DAG. If not, returns a cycle.
   # Note that it's possible that there's more than one
   # cycle, though not liekely, since we're checking
-  # every time we add a new variable. 
+  # every time we add a new variable.
   unless ($graph->is_dag) {
     return (0, $graph->find_a_cycle);
   }
@@ -819,9 +825,9 @@ This document describes App::SimpleScan version 0.0.1
     use App::SimpleScan;
     my $app = new App::SimpleScan;
     $app->go;
-    
 
-  
+
+
 =head1 DESCRIPTION
 
 C<App::SimpleScan> allows us to package the core of C<simple_scan>
@@ -831,7 +837,7 @@ this module or this C<simple_scan> application.
 
 =head1 IMPORTANT NOTE
 
-The interfaces to this module are still evolving; plugin 
+The interfaces to this module are still evolving; plugin
 developers should monitor CPAN and look for new versions of
 this module. Henceforth, any change to the externals of this
 module will be denoted by a full version increase (e.g., from
@@ -841,7 +847,7 @@ module will be denoted by a full version increase (e.g., from
 
 =head2 Class methods
 
-=head2 new 
+=head2 new
 
 Creates a new instance of the application. Also invokes
 all of the basic setup so that when C<go> is called, all
@@ -863,7 +869,7 @@ switches and runs the generated program, prints it, or both.
 
 =head4 create_tests
 
-Transforms the input into code, and finalizes them, 
+Transforms the input into code, and finalizes them,
 returning the actual test code (if any) to its caller.
 
 =head2 transform_test_specs
@@ -874,7 +880,7 @@ pragmas, and handling substitutions.
 
 =head2 finalize_tests
 
-Adds all of the Perl modules required to run the tests to the 
+Adds all of the Perl modules required to run the tests to the
 test code generated by this module. This includes any
 modules specified by plugins via the plugin's C<test_modules>
 class method.
@@ -889,7 +895,7 @@ the generated code.
 =head4 parse_command_line
 
 Parses the command line and sets the corresponding fields in the
-C<App::SimpleScan> object. See the X<EXTENDING SIMPLESCAN> section 
+C<App::SimpleScan> object. See the X<EXTENDING SIMPLESCAN> section
 for more information.
 
 =head4 handle_options
@@ -904,27 +910,27 @@ actually parse the command line and set the options.
 Plugin method - optional.
 
 Installs an entry into the options description passed
-to C<GeOptions> when C<parse_command_line> is called. This 
+to C<GeOptions> when C<parse_command_line> is called. This
 automatically creates an accessor for the option.
-The option description(s) should conform to the requirements 
+The option description(s) should conform to the requirements
 of C<GetOpt::Long>.
 
-You may specify as many option descriptions as you like in a 
+You may specify as many option descriptions as you like in a
 single call. Remember that your option definitions will cause
 a new method to be created for each option; be careful not to
-accidentally override a pre-existing method ... unless you 
+accidentally override a pre-existing method ... unless you
 want to do that, for whatever reason.
 
 =head4 app_defaults
 
-Set up the default assumptions for the application. Simply 
+Set up the default assumptions for the application. Simply
 turns C<run> on if neither C<run> nor C<generate> is specified.
 
 =head2 Pragma methods
 
 =head3 install_pragma_plugins
 
-This installs the standard pragmas (C<cache>, C<nocache>, and 
+This installs the standard pragmas (C<cache>, C<nocache>, and
 C<agent>). Checks each plugin for a C<pragmas> method and
 calls it to get the pragmas to be installed. In addition,
 if any pragmas are found, calls the corresponding plugin's
@@ -932,7 +938,7 @@ C<init> method if it exists.
 
 =head3 pragma
 
-Provides access to pragma-processing code. Useful in plugins to 
+Provides access to pragma-processing code. Useful in plugins to
 get to the pragmas installed for the plugin concerned.
 
 =head2 Input/output methods
@@ -940,7 +946,7 @@ get to the pragmas installed for the plugin concerned.
 =head3 next_line
 
 Reads the next line of input, handling the possibility that a plugin
-or substitution processing has stacked lines on the input queue to 
+or substitution processing has stacked lines on the input queue to
 be read and processed (or perhaps reprocessed).
 
 =head3 expand_backticked
@@ -950,7 +956,7 @@ Core and plugin method - a useful line-parsing utility.
 Expands single-quoted, double-quoted, and backticked items in a
 text string as follows:
 
-=over 4 
+=over 4
 
 =item * single-quoted: remove the quotes and use the string as-is.
 
@@ -981,7 +987,7 @@ these get processed before any other pending input does.
 
 =head3 set_current_spec
 
-Save the object passed as the current test spec. If no 
+Save the object passed as the current test spec. If no
 argument is passed, deletes the current test spec object.
 
 =head3 get_current_spec
@@ -1003,7 +1009,7 @@ plugins to look at the current line.
 Plugin and core method.
 
 Adds code to the final output without incrementing the number of tests.
-Does I<not> go through code filters, and does I<not> increment the 
+Does I<not> go through code filters, and does I<not> increment the
 test count.
 
 =head3 stack_test
@@ -1020,28 +1026,28 @@ Accessor that stores the test code generated during the run.
 =head2 Adding new command-line options
 
 Plugins can add new command-line options by defining an
-C<options> class method which returns a list of 
-parameter/variable pairs, like those used to define 
-options with C<Getopt::Long>. 
+C<options> class method which returns a list of
+parameter/variable pairs, like those used to define
+options with C<Getopt::Long>.
 
-C<App::SimpleScan> will check for the C<options> method in 
-your plugin when it is loaded, and call it to install your 
+C<App::SimpleScan> will check for the C<options> method in
+your plugin when it is loaded, and call it to install your
 options automatically.
 
 =head2 Adding new pragmas
 
 Plugins can install new pragmas by implementing a C<pragmas>
 class method. This method should return a list of array
-references, with each array reference containing a 
+references, with each array reference containing a
 pragma name and a code reference which will implement the
 pragma.
 
 The actual pragma implementation will, when called by
-C<transform_test_specs>, receive a reference to the 
+C<transform_test_specs>, receive a reference to the
 C<App::SimpleScan> object and the arguments to the pragma
 (from the pragma line in the input) as a string of text. It is
-up to the pragma to parse the string; the use of 
-C<expand_backticked> is recommended for pragmas which 
+up to the pragma to parse the string; the use of
+C<expand_backticked> is recommended for pragmas which
 take a variable number of arguments, and wish to adhere
 to the same syntax that standard substitutions use.
 
@@ -1064,12 +1070,12 @@ to the base class, or to add instance variables dynamically.
 Note that the class passed in to this method is the class
 of the I<plugin>, not of the caller (C<App::SimpleScan>
 or a derived class). You should use C<caller()> if you wish
-to export subroutines into the package corresponding to the 
+to export subroutines into the package corresponding to the
 base class object.
 
 =head3 pragmas
 
-Defines any pragmas that this plugin implements. Returns a 
+Defines any pragmas that this plugin implements. Returns a
 list of names and subroutine references. These will be called
 with a reference to the C<App::SimpleScan> object.
 
@@ -1077,14 +1083,14 @@ with a reference to the C<App::SimpleScan> object.
 
 Defines any code filters that this plugin wants to add to the
 output filter queue. These methods are called with a copy
-of the App::SimpleScan object and an array of code that is 
-about to be stacked. The filter should return an array 
+of the App::SimpleScan object and an array of code that is
+about to be stacked. The filter should return an array
 containing either the unaltered code, or the code with any
 changes the plugin sees fit to make.
 
-If your filter wants to stack tests, it should call 
+If your filter wants to stack tests, it should call
 C<stack_code> and increment the test count itself (by
-a call to test_count); trying to use C<stack_test> in 
+a call to test_count); trying to use C<stack_test> in
 a filter will cause it to be called again and again in
 an infinite recursive loop.
 
@@ -1098,15 +1104,15 @@ of these modules.
 
 Defines options to be added to the command-line options.
 You should return an array of items that would be suitable
-for passing to C<Getopt::Long>, which is what we'll do 
+for passing to C<Getopt::Long>, which is what we'll do
 with them.
 
 =head3 validate_options
 
 Validate your options. You can access any of the variables
-you passed to C<options>; these will be initialized with 
+you passed to C<options>; these will be initialized with
 whatever values C<Getopt::Long> got from the command line.
-You should try to ignore invalid values and choose defaults 
+You should try to ignore invalid values and choose defaults
 for missing items if possible; if not, you should C<die>
 with an appropriate message.
 
@@ -1116,33 +1122,33 @@ with an appropriate message.
 
 If a plugin wishes to read the input stream for its own
 purposes, it may do so by using C<next_line>. This returns
-either a string or undef (at end of file). 
+either a string or undef (at end of file).
 
 =head3 stack_input
 
-Adds lines to the input queue ahead of the next line to 
+Adds lines to the input queue ahead of the next line to
 be read from whatever source is supplying them. This allows
 your plugin to process a line into multiple lines "in place".
 
 =head2 Methods for outputting code
 
-Your pragma will probably use one of the following methods to 
+Your pragma will probably use one of the following methods to
 output code:
 
 =head3 stack_code
 
-A call to C<stack_code> will cause the string passed back to 
+A call to C<stack_code> will cause the string passed back to
 be emitted immediately into the code stream. The test count
-will remain at its current value. 
+will remain at its current value.
 
 =head3 stack_test
 
 C<stack_test> will immediately emit the code supplied as
 its argument, and will increment the test count by one. You
 should use multiple calls to C<stack_test> if you need
-to stack more than one test. 
+to stack more than one test.
 
-Code passed to stack_test will go through all of the 
+Code passed to stack_test will go through all of the
 filters in the output filter queue; be careful to not
 call C<stack_test> in an output filter, as this will
 cause a recursive loop that will run you out of memory.
@@ -1151,7 +1157,7 @@ cause a recursive loop that will run you out of memory.
 
 =head2 get_current_spec
 
-Returns the current App::SimpleScan::TestSpec 
+Returns the current App::SimpleScan::TestSpec
 object, if there is one. If code in your plugin is
 called when either we haven't read any lines yet,
 or the last line read was a pragma, there won't be

@@ -16,8 +16,9 @@ use warnings;
 use Carp;
 use Math::BigInt;
 use URI;
+use UUID::Tiny ();
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -40,6 +41,8 @@ use constant {
     WK_DOI  => '931f155e-5a24-499b-9fbb-ed4efefe27fe', # doi
 
     NS_WD   => '9e10aca7-4a99-43ac-9368-6cbfa43636df', # Wikidata-namespace
+    NS_INT  => '5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99', # integer-namespace
+    NS_DATE => 'fc43fbba-b959-4882-b4c8-90a288b7d416', # gregorian-date-namespace
 };
 
 my %uuid_to_uriid_org = (
@@ -103,6 +106,10 @@ $_->register foreach values %well_known;
         # Unassigned: 28, 29, 30, 31
         '448c50a8-c847-4bc7-856e-0db5fea8f23b'  =>  32, # final-file-encoding
         '79385945-0963-44aa-880a-bca4a42e9002'  =>  33, # final-file-hash
+        '3fde5688-6e34-45e9-8f33-68f079b152c8'  =>  34, # SEEK_SET
+        'bc598c52-642e-465b-b079-e9253cd6f190'  =>  35, # SEEK_CUR
+        '06aff30f-70e8-48b4-8b20-9194d22fc460'  =>  36, # SEEK_END
+        '59a5691a-6a19-4051-bc26-8db82c019df3'  =>  37, # inode
         '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 112, # chat-0-word-identifier
         WK_GTIN()                               => 160,
     );
@@ -116,7 +123,7 @@ $_->register foreach values %well_known;
 }
 
 # Some extra tags such as namespaces:
-foreach my $ise (NS_WD) {
+foreach my $ise (NS_WD, NS_INT, NS_DATE) {
     my $identifier = __PACKAGE__->new(ise => $ise);
     $identifier->register; # re-register
 }
@@ -134,6 +141,8 @@ foreach my $ise (NS_WD) {
         WK_BIC()                                => 'bic',
         WK_DOI()                                => 'doi',
         NS_WD()                                 => 'Wikidata-namespace',
+        NS_INT()                                => 'integer-namespace',
+        NS_DATE()                               => 'gregorian-date-namespace',
 
         'ddd60c5c-2934-404f-8f2d-fcb4da88b633'  => 'also-shares-identifier',
         'bfae7574-3dae-425d-89b1-9c087c140c23'  => 'tagname',
@@ -156,6 +165,10 @@ foreach my $ise (NS_WD) {
         '2bffc55d-7380-454e-bd53-c5acd525d692'  => 'roaraudio-error-number',
         '448c50a8-c847-4bc7-856e-0db5fea8f23b'  => 'final-file-encoding',
         '79385945-0963-44aa-880a-bca4a42e9002'  => 'final-file-hash',
+        '3fde5688-6e34-45e9-8f33-68f079b152c8'  => 'SEEK_SET',
+        'bc598c52-642e-465b-b079-e9253cd6f190'  => 'SEEK_CUR',
+        '06aff30f-70e8-48b4-8b20-9194d22fc460'  => 'SEEK_END',
+        '59a5691a-6a19-4051-bc26-8db82c019df3'  => 'inode',
         '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 'chat-0-word-identifier',
 
         '5f167223-cc9c-4b2f-9928-9fe1b253b560'  => 'unicode-code-point',
@@ -175,6 +188,41 @@ __PACKAGE__->wellknown;
 sub new {
     my ($pkg, $type, $id, %opts) = @_;
     my $self = bless {};
+
+    if (!ref($type) && $type eq 'from') {
+        if (ref($id)) {
+            my $from = $id;
+            if ($id->isa('Data::Identifier')) {
+                if (scalar(keys %opts)) {
+                    $type = $id->type;
+                    $id   = $id->id;
+                } else {
+                    return $id;
+                }
+            } elsif ($id->isa('URI')) {
+                $type = 'uri';
+            } elsif ($id->isa('Data::URIID::Colour') || $id->isa('Data::URIID::Service')) {
+                $type = 'ise';
+                $id   = $id->ise;
+            } elsif ($id->isa('Data::URIID::Result')) {
+                $opts{displayname} //= sub { return $from->attribute('displayname', default => undef) };
+                $type = $id->id_type;
+                $id   = $id->id;
+            } elsif ($id->isa('Data::TagDB::Tag')) {
+                $opts{displayname} //= sub { $from->displayname };
+                $type = 'ise';
+                $id   = $id->ise;
+            } elsif ($id->isa('Business::ISBN')) {
+                $type = $well_known{gtin};
+                $id   = $id->as_isbn13->as_string([]);
+            } else {
+                croak 'Unsupported input data';
+            }
+        } else {
+            # If it's not a ref, try as ise.
+            $type = 'ise';
+        }
+    }
 
     if (!ref($type) && $type eq 'ise') {
         if ($id =~ /^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/) { # allow less normalised form than RE_UUID
@@ -469,8 +517,6 @@ sub _generate {
                 }
 
                 if (defined $input) {
-                    require UUID::Tiny;
-
                     $self->{id_cache}{WK_UUID()} = UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_SHA1(), $ns, $input);
                 }
             }
@@ -493,7 +539,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -526,16 +572,28 @@ might not always get back exactly the identifier you passed in but an equivalent
 Also note that deduplication is done with performance in mind. This means that there is no
 guarantee for two equal identifiers to become deduplicated. See also L</register>.
 
+=head1 METHODS
+
 =head2 new
 
     my Data::Identifier $identifier = Data::Identifier->new($type => $id, %opts);
 
 Creates a new identifier.
 
-C<$type> needs to be a L<Data::Identifier>, a well known name, a UUID, C<wellknown>, or C<ise>.
+C<$type> needs to be a L<Data::Identifier>, a well known name, a UUID, C<wellknown>, C<ise>, or C<from>.
+
 If it is an UUID a type is created as needed.
+
 If it is C<ise> it is parsed as C<uuid>, C<oid>, or C<uri> according to it's format.
+
 If it is C<wellknown> it refers to an identifier from the well known list.
+
+If it is C<from> then C<$id> should refer to an object of some kind that should be converted to identifier.
+In this case not all options might be supported. Currently it is possible to convert from:
+L<Data::Identifier>,
+L<Data::URIID::Colour>, L<Data::URIID::Service>, L<Data::URIID::Result>,
+L<Data::TagDB::Tag>,
+and L<Business::ISBN>. If C<$id> is not a reference it is parsed as with C<ise>.
 
 The following type names are currently well known:
 

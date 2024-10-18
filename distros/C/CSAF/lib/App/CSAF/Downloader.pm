@@ -25,8 +25,10 @@ sub run {
         \@args, \%options, qw(
             url|u=s
             directory|d=s
+            after=s
+            before=s
             insecure|k
-            verbose!
+            verbose|v
             validate:s
             integrity-check
             signature-check
@@ -39,7 +41,7 @@ sub run {
 
             help|h
             man
-            version|v
+            version
         )
     ) or pod2usage(-verbose => 0);
 
@@ -67,6 +69,8 @@ sub run {
     $downloader->options->include_pattern($options{include})                 if defined $options{include};
     $downloader->options->exclude_pattern($options{exclude})                 if defined $options{exclude};
     $downloader->options->parallel_downloads($options{'parallel-downloads'}) if defined $options{'parallel-downloads'};
+    $downloader->options->after_date($options{'after'})                      if defined $options{'after'};
+    $downloader->options->before_date($options{'before'})                    if defined $options{'before'};
 
     unless ($downloader->options->url) {
         cli_error("Specify URL");

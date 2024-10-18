@@ -6,11 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Method/Generate/Constructor/Role/StrictConstructor.pm',
-    'MooX/StrictConstructor.pm'
+    'MooX/StrictConstructor.pm',
+    'MooX/StrictConstructor/Role/BuildAll.pm',
+    'MooX/StrictConstructor/Role/Constructor.pm',
+    'MooX/StrictConstructor/Role/Constructor/Base.pm',
+    'MooX/StrictConstructor/Role/Constructor/Late.pm'
 );
 
 

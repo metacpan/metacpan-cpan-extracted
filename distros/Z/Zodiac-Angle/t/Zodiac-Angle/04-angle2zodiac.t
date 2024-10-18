@@ -121,6 +121,6 @@ eval {
 		'sign_type' => 'foo',
 	});
 };
-is($EVAL_ERROR, "Parameter 'sign_type' is bad. Possible values are 'sign' and 'ascii'.\n",
+is($EVAL_ERROR, "Parameter 'sign_type' is bad. Possible values are 'sign', 'ascii' and 'struct'.\n",
 	"Parameter 'sign_type' is bad.");
 clean();

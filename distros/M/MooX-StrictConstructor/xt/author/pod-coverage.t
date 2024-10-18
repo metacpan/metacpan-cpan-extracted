@@ -6,8 +6,11 @@ use Test::Pod::Coverage::TrustMe;
 
 my $config = {};
 my $modules = [
-  "Method::Generate::Constructor::Role::StrictConstructor",
   "MooX::StrictConstructor",
+  "MooX::StrictConstructor::Role::BuildAll",
+  "MooX::StrictConstructor::Role::Constructor",
+  "MooX::StrictConstructor::Role::Constructor::Base",
+  "MooX::StrictConstructor::Role::Constructor::Late",
 ];
 
 plan tests => scalar @$modules;

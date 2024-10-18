@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>1e373b1a-b3af-4767-a12b-2bb9f3f253c1</MessageSerialNumber>
-  <MessageDate>Mon, 14 Oct 2024 04:44:21 BST</MessageDate>
+  <MessageSerialNumber>b0ef9a1b-a849-40c5-a423-fc33e79445d1</MessageSerialNumber>
+  <MessageDate>Thu, 17 Oct 2024 04:43:28 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -1693,6 +1693,40 @@
       </Rules>
     </Group>
     <Group>
+      <Prefix>978-634</Prefix>
+      <Agency>Indonesia</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-0499999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>0500000-1999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>2000000-3499999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>3500000-6999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>7000000-7999999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>8000000-9599999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9600000-9999999</Range>
+          <Length>5</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
       <Prefix>978-65</Prefix>
       <Agency>Brazil</Agency>
       <Rules>
@@ -2897,12 +2931,8 @@
           <Length>5</Length>
         </Rule>
         <Rule>
-          <Range>6498800-6498899</Range>
+          <Range>6498800-6498999</Range>
           <Length>6</Length>
-        </Rule>
-        <Rule>
-          <Range>6498900-6498999</Range>
-          <Length>0</Length>
         </Rule>
         <Rule>
           <Range>6499000-8999999</Range>

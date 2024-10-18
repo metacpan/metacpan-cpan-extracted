@@ -1,3 +1,8 @@
+Version 1.05: 2024-10-17
+
+  - Use 'our' instead of 'use vars' (HAARG).
+  - Minimum perl version is now 5.8.1.
+
 Version 1.04: 2021-04-01
 
    No-change release updating maintainer to ARODLAND
