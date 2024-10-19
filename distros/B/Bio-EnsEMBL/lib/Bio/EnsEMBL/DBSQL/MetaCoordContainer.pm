@@ -29,7 +29,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::DBSQL::MetaCoordContainer;
-$Bio::EnsEMBL::DBSQL::MetaCoordContainer::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::MetaCoordContainer::VERSION = '113.0.0';
 use strict;
 use warnings;
 

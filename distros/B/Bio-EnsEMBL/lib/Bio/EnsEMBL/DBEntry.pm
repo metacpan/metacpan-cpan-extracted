@@ -43,7 +43,7 @@ Ensembl objects.
 =cut
 
 package Bio::EnsEMBL::DBEntry;
-$Bio::EnsEMBL::DBEntry::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBEntry::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings qw(uninitialized);

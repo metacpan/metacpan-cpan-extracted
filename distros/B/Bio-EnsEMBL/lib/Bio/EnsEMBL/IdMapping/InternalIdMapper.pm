@@ -40,7 +40,7 @@ limitations under the License.
 
 
 package Bio::EnsEMBL::IdMapping::InternalIdMapper;
-$Bio::EnsEMBL::IdMapping::InternalIdMapper::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::InternalIdMapper::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

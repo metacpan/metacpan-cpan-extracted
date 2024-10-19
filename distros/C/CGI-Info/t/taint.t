@@ -4,6 +4,8 @@
 
 use strict;
 use warnings;
+
+use Test::DescribeMe qw(author);
 use Test::Most tests => 7;
 use Test::Needs 'Test::Taint';
 use Taint::Runtime qw(enable $TAINT taint_env taint_start);
@@ -15,12 +17,10 @@ BEGIN {
 }
 
 Test::Taint->import();
-if($ENV{'AUTHOR_TESTING'}) {
-	taint_checking_ok();
-} else {
-	ok(1);
-}
+taint_checking_ok();
+
 require_ok('CGI::Info');
+CGI::Info->import();
 
 $ENV{'C_DOCUMENT_ROOT'} = $ENV{'HOME'};
 delete $ENV{'DOCUMENT_ROOT'};

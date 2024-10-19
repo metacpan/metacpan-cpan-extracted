@@ -61,7 +61,7 @@ use strict;
 use warnings;
 
 package Bio::EnsEMBL::DensityFeature;
-$Bio::EnsEMBL::DensityFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::DensityFeature::VERSION = '113.0.0';
 use Bio::EnsEMBL::Feature;
 use Bio::EnsEMBL::Utils::Argument qw(rearrange);
 use Bio::EnsEMBL::Utils::Exception qw(throw);

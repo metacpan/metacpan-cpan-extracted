@@ -58,7 +58,7 @@ members.
 
 
 package Bio::EnsEMBL::MicroRNA;
-$Bio::EnsEMBL::MicroRNA::VERSION = '112.0.0';
+$Bio::EnsEMBL::MicroRNA::VERSION = '113.0.0';
 use vars qw($AUTOLOAD);
 use strict;
 use warnings;

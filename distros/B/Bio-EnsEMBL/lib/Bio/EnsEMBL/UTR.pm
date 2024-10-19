@@ -58,7 +58,7 @@ of a transcript. It can be 5' or 3'
 use strict;
 
 package Bio::EnsEMBL::UTR;
-$Bio::EnsEMBL::UTR::VERSION = '112.0.0';
+$Bio::EnsEMBL::UTR::VERSION = '113.0.0';
 use vars qw(@ISA);
 
 use Bio::EnsEMBL::Feature;

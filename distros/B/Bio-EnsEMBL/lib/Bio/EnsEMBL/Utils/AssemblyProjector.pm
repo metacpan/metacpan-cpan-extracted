@@ -131,7 +131,7 @@ scripts for the details.
 =cut
 
 package Bio::EnsEMBL::Utils::AssemblyProjector;
-$Bio::EnsEMBL::Utils::AssemblyProjector::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::AssemblyProjector::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings qw(uninitialized);

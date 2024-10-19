@@ -67,7 +67,7 @@ directly.
 =cut
 
 package Bio::EnsEMBL::IdMapping::TinyFeature;
-$Bio::EnsEMBL::IdMapping::TinyFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::TinyFeature::VERSION = '113.0.0';
 # internal data structure (array indices):
 #
 #  0  dbID

@@ -39,7 +39,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::Utils::VegaCuration::Gene;
-$Bio::EnsEMBL::Utils::VegaCuration::Gene::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::VegaCuration::Gene::VERSION = '113.0.0';
 use strict;
 use warnings;
 use vars qw(@ISA);

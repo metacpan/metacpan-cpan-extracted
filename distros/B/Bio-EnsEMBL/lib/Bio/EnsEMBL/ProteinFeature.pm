@@ -52,7 +52,7 @@ on a peptide sequence.
 =cut
 
 package Bio::EnsEMBL::ProteinFeature;
-$Bio::EnsEMBL::ProteinFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::ProteinFeature::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::FeaturePair;

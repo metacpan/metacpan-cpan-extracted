@@ -62,7 +62,7 @@ Alternative allele groupings
 =cut
 
 package Bio::EnsEMBL::DBSQL::AltAlleleGroupAdaptor;
-$Bio::EnsEMBL::DBSQL::AltAlleleGroupAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::AltAlleleGroupAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 

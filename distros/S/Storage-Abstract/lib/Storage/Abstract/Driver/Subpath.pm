@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Subpath;
-$Storage::Abstract::Driver::Subpath::VERSION = '0.003';
+$Storage::Abstract::Driver::Subpath::VERSION = '0.005';
 use v5.14;
 use warnings;
 
@@ -98,7 +98,7 @@ Storage::Abstract::Driver::Subpath - Change root metadriver
 	# subpath of the file storage for public files
 	my $public_storage = Storage::Abstract->new(
 		driver => 'subpath',
-		source => $directory,
+		source => $storage,
 		subpath => '/public',
 	);
 

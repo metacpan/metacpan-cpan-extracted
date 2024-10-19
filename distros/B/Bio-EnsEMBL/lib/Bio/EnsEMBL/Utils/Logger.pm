@@ -61,7 +61,7 @@ and does logging.
 =cut
 
 package Bio::EnsEMBL::Utils::Logger;
-$Bio::EnsEMBL::Utils::Logger::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Logger::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

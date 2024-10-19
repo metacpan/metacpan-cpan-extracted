@@ -54,7 +54,7 @@ features from the database.
 =cut
 
 package Bio::EnsEMBL::DBSQL::DensityFeatureAdaptor;
-$Bio::EnsEMBL::DBSQL::DensityFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::DensityFeatureAdaptor::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

@@ -45,7 +45,7 @@ is carried out using C<subseq()> calls.
 =cut
 
 package Bio::EnsEMBL::PaddedSlice;
-$Bio::EnsEMBL::PaddedSlice::VERSION = '112.0.0';
+$Bio::EnsEMBL::PaddedSlice::VERSION = '113.0.0';
 use strict;
 use warnings;
 

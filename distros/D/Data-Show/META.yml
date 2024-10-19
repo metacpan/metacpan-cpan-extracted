@@ -22,5 +22,5 @@ requires:
   PPR: '0.001009'
   Test::More: '0'
   version: '0'
-version: '0.004001'
+version: '0.004002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

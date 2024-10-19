@@ -42,7 +42,7 @@ moment.
 =cut
 
 package Bio::EnsEMBL::DBSQL::OntologyDBAdaptor;
-$Bio::EnsEMBL::DBSQL::OntologyDBAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::OntologyDBAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 

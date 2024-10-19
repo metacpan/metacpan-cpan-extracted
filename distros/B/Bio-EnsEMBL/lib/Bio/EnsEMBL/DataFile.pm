@@ -18,7 +18,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::DataFile;
-$Bio::EnsEMBL::DataFile::VERSION = '112.0.0';
+$Bio::EnsEMBL::DataFile::VERSION = '113.0.0';
 use strict;
 use warnings;
 

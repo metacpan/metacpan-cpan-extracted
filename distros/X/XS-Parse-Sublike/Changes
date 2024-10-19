@@ -1,5 +1,11 @@
 Revision history for XS-Parse-Sublike
 
+0.30    2024-10-18
+        [BUGFIXES]
+         * Ensure that named parameter variables are introduced before the
+           next variable's defaulting expression is parsed, just like
+           positional ones already do
+
 0.29    2024-10-14
         [CHANGES]
          * Allow `Sublike::Extended` to take over core perl's handling of

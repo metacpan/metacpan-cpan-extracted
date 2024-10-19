@@ -72,7 +72,7 @@ as any other feature can be.
 =cut
 
 package Bio::EnsEMBL::KaryotypeBand;
-$Bio::EnsEMBL::KaryotypeBand::VERSION = '112.0.0';
+$Bio::EnsEMBL::KaryotypeBand::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 

@@ -63,7 +63,7 @@ This isn't very clean OO design but it's efficient and easy to use...
 
 
 package Bio::EnsEMBL::IdMapping::BaseObject;
-$Bio::EnsEMBL::IdMapping::BaseObject::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::BaseObject::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

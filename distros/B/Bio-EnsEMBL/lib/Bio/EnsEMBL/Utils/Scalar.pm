@@ -18,7 +18,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::Utils::Scalar;
-$Bio::EnsEMBL::Utils::Scalar::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Scalar::VERSION = '113.0.0';
 =pod
 
 
@@ -744,7 +744,7 @@ sub scope_guard {
 
 #### SUPER SECRET PACKAGE. IGNORE ME
 package Bio::EnsEMBL::Utils::Scalar::ScopeGuard;
-$Bio::EnsEMBL::Utils::Scalar::ScopeGuard::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Scalar::ScopeGuard::VERSION = '113.0.0';
 sub DESTROY {
   my ($self) = @_;
   $self->();

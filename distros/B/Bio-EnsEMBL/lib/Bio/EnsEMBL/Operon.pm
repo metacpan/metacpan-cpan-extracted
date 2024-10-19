@@ -58,7 +58,7 @@ An operon is a collection of one or more polycistronic transcripts which contain
 =cut
 
 package Bio::EnsEMBL::Operon;
-$Bio::EnsEMBL::Operon::VERSION = '112.0.0';
+$Bio::EnsEMBL::Operon::VERSION = '113.0.0';
 use strict;
 use warnings;
 

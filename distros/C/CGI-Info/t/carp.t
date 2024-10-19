@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
+
 use Test::Carp;
-use Test::Most tests => 8;
+use Test::Most tests => 9;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -41,4 +42,6 @@ CARP: {
 		},
 		qr/^POST failed/
 	);
+
+	does_carp_that_matches(sub { CGI::Info->new({ expect => 'foo' }); }, qr/must be a reference to an array/);
 }

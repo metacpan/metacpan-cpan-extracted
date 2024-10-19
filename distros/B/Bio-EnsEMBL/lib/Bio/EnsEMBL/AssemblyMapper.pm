@@ -79,7 +79,7 @@ generic mapper object between disjoint coordinate systems.
 
 
 package Bio::EnsEMBL::AssemblyMapper;
-$Bio::EnsEMBL::AssemblyMapper::VERSION = '112.0.0';
+$Bio::EnsEMBL::AssemblyMapper::VERSION = '113.0.0';
 use strict;
 use warnings;
 

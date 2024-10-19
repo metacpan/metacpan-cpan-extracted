@@ -26,11 +26,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.83
+Version 0.84
 
 =cut
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ sub new
 
 	if($args{expect}) {
 		if(ref($args{expect}) ne 'ARRAY') {
-			warn __PACKAGE__, ': expect must be a reference to an array';
+			Carp::carp(__PACKAGE__, ': expect must be a reference to an array');
 			return;
 		}
 		warn __PACKAGE__, ': expect is deprecated, use allow instead';
@@ -765,6 +765,7 @@ sub params {
 			   ($value =~ /((\%27)|(\'))union/ix) ||
 			   ($value =~ /select[[a-z]\s\*]from/ix) ||
 			   ($value =~ /\sAND\s1=1/ix) ||
+			   ($value =~ /\sOR\s.+\sAND\s/) ||
 			   ($value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				if($self->{logger}) {

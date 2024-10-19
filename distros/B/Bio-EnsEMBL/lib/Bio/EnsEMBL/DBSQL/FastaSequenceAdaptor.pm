@@ -43,7 +43,7 @@ we cannot return the required data.
 =cut
 
 package Bio::EnsEMBL::DBSQL::FastaSequenceAdaptor;
-$Bio::EnsEMBL::DBSQL::FastaSequenceAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::FastaSequenceAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 
@@ -141,7 +141,7 @@ sub store {
   throw "Unsupported operation. Cannot store sequence in a fasta file";
 }
 
-=head2 _fetch_raw_seq
+=head _fetch_raw_seq
 
   Description : Provides access to the underlying faindex object and returns a sequence scalar ref
 

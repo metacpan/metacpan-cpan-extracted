@@ -60,7 +60,7 @@ stored in the database.
 =cut
 
 package Bio::EnsEMBL::Utils::RNAProductTypeMapper;
-$Bio::EnsEMBL::Utils::RNAProductTypeMapper::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::RNAProductTypeMapper::VERSION = '113.0.0';
 use strict;
 use warnings;
 

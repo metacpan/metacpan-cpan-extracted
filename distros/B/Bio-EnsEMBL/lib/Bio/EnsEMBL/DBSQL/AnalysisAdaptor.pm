@@ -57,7 +57,7 @@ Bio::EnsEMBL::DBSQL::AnalysisAdaptor
 
 
 package Bio::EnsEMBL::DBSQL::AnalysisAdaptor;
-$Bio::EnsEMBL::DBSQL::AnalysisAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::AnalysisAdaptor::VERSION = '113.0.0';
 use Bio::EnsEMBL::Analysis;
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;
 use Bio::EnsEMBL::Utils::Exception;

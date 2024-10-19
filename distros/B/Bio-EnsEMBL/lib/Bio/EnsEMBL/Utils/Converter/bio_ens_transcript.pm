@@ -45,7 +45,7 @@ Bio::EnsEMBL::Utils::Converter::bio_ens_transcript - the instance converter
 =cut
 
 package Bio::EnsEMBL::Utils::Converter::bio_ens_transcript;
-$Bio::EnsEMBL::Utils::Converter::bio_ens_transcript::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Converter::bio_ens_transcript::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 use Bio::EnsEMBL::Transcript;

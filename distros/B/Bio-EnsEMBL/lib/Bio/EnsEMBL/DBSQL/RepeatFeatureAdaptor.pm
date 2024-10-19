@@ -50,7 +50,7 @@ superclass BaseFeatureAdaptor.
 =cut
 
 package Bio::EnsEMBL::DBSQL::RepeatFeatureAdaptor;
-$Bio::EnsEMBL::DBSQL::RepeatFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::RepeatFeatureAdaptor::VERSION = '113.0.0';
 use strict;
 use Bio::EnsEMBL::DBSQL::BaseFeatureAdaptor;
 use Bio::EnsEMBL::RepeatFeature;

@@ -1285,10 +1285,15 @@ SKIP: {
 	SKIP: {
 		if (!grep /^moz_use_non_spec_compliant_pointer_origin$/, $capabilities->enumerate()) {
 			diag("\$capabilities->moz_use_non_spec_compliant_pointer_origin is not supported for " . $capabilities->browser_version());
-			skip("\$capabilities->moz_use_non_spec_compliant_pointer_origin is not supported for " . $capabilities->browser_version(), 1);
+			my $moz_use_non_spec_compliant_pointer_origin = $capabilities->moz_use_non_spec_compliant_pointer_origin();
+			if (defined $moz_use_non_spec_compliant_pointer_origin) {
+				ok($moz_use_non_spec_compliant_pointer_origin == 0, "\$capabilities->moz_use_non_spec_compliant_pointer_origin() is set to false");
+			} else {
+				ok(1, "\$capabilities->moz_use_non_spec_compliant_pointer_origin() is not defined");
+			}
+		} else {
+			ok($capabilities->moz_use_non_spec_compliant_pointer_origin() == 1, "\$capabilities->moz_use_non_spec_compliant_pointer_origin() is set to true");
 		}
-		local $TODO = $capabilities->browser_name() =~ /waterfox/i ? "\$firefox->moz_use_non_spec_compliant_pointer_origin() may not work for waterfox" : undef;
-		ok($capabilities->moz_use_non_spec_compliant_pointer_origin() == 1, "\$capabilities->moz_use_non_spec_compliant_pointer_origin() is set to true");
 	}
 	SKIP: {
 		if (!grep /^moz_accessibility_checks$/, $capabilities->enumerate()) {
@@ -1768,6 +1773,13 @@ SKIP: {
 			foreach my $result ($firefox->resolve('localhost', type => 0, flags => 0)) {
 				ok($result =~ /^(127[.]0[.]0[.]1|::1)/smx, "\$firefox->resolve('localhost', type => 0, flags => 0) returned correctly:$result");
 			}
+			if ($major_version >= 78) {
+				my $test_dns_name = 'custom-weird.example.com';
+				my $ip_address = '127.0.0.84';
+				foreach my $result ($firefox->resolve_override($test_dns_name, $ip_address)->resolve($test_dns_name)) {
+					ok($result eq $ip_address, "\$firefox->resolve_override('$test_dns_name', '$ip_address') worked correctly:$result");
+				}
+			}
 		}
 		my $json;
 		if ($major_version < 50) {
@@ -1941,6 +1953,7 @@ SKIP: {
 				local $TODO = $TODO || ($major_version < 128 && $name =~ /^(?:CLEAR_CREDENTIAL_MANAGER_STATE|CLEAR_COOKIE_BANNER_EXCEPTION|CLEAR_COOKIE_BANNER_EXECUTED_RECORD|CLEAR_FINGERPRINTING_PROTECTION_STATE|CLEAR_BOUNCE_TRACKING_PROTECTION_STATE|CLEAR_FORGET_ABOUT_SITE|CLEAR_STORAGE_PERMISSIONS|CLEAR_COOKIES_AND_SITE_DATA)$/) ? "Old firefox (less than 128) can have different values for Firefox::Marionette::Cache constants" : q[];
 				local $TODO = $TODO || ($major_version < 129 && $name =~ /^(?:CLEAR_PERMISSIONS|CLEAR_FORGET_ABOUT_SITE)$/) ? "Old firefox (less than 129) can have different values for Firefox::Marionette::Cache constants" : q[];
 				local $TODO = $TODO || ($major_version < 130 && $name =~ /^(?:CLEAR_ALL_CACHES|CLEAR_FORGET_ABOUT_SITE)$/) ? "Old firefox (less than 130) can have different values for Firefox::Marionette::Cache constants" : q[];
+				local $TODO = $TODO || ($major_version < 132 && $name =~ /^(?:CLEAR_SESSION_HISTORY|CLEAR_FORGET_ABOUT_SITE)$/) ? "Old firefox (less than 132) can have different values for Firefox::Marionette::Cache constants" : q[];
 				my $result = $firefox->check_cache_key($name);
 				ok($result == &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which should be $result and is " . &$name());
 			}
@@ -4816,6 +4829,8 @@ SKIP: {
 		$firefox->script(qq[alert('$alert_text')]);
 		ok($firefox->accept_alert(), "\$firefox->accept_alert() accepts alert box");
 	}
+	my $certificate = Firefox::Marionette::Certificate->new();
+	ok(!$certificate->is_server_cert(), "Firefox::Marionette::Certificate->new() does not produce a server cert (test coverage)");
 	my @certificates;
 	eval { @certificates = $firefox->certificates(); };
 	SKIP: {

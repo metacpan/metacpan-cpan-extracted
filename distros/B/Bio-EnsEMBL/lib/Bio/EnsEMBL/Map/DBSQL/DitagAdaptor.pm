@@ -46,7 +46,7 @@ Provides database interaction for the Bio::EnsEMBL::Map::Ditag object
 =cut
 
 package Bio::EnsEMBL::Map::DBSQL::DitagAdaptor;
-$Bio::EnsEMBL::Map::DBSQL::DitagAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::Map::DBSQL::DitagAdaptor::VERSION = '113.0.0';
 use strict;
 use vars ('@ISA');
 

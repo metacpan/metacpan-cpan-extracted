@@ -28,7 +28,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::DBSQL::Driver;
-$Bio::EnsEMBL::DBSQL::Driver::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::Driver::VERSION = '113.0.0';
 use warnings;
 use strict;
 

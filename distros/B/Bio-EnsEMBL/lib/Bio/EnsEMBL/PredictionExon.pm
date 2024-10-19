@@ -66,7 +66,7 @@ predcition transcript. See Bio::EnsEMBL:PredictionTranscript
 =cut
 
 package Bio::EnsEMBL::PredictionExon;
-$Bio::EnsEMBL::PredictionExon::VERSION = '112.0.0';
+$Bio::EnsEMBL::PredictionExon::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

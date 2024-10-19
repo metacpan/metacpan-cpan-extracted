@@ -42,7 +42,7 @@ InternalIdMapper implementation for genes
 =cut
 
 package Bio::EnsEMBL::IdMapping::InternalIdMapper::EnsemblGeneGeneric;
-$Bio::EnsEMBL::IdMapping::InternalIdMapper::EnsemblGeneGeneric::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::InternalIdMapper::EnsemblGeneGeneric::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

@@ -2,14 +2,14 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 10;
+use Test::Most tests => 12;
 use Test::NoWarnings;
 
 BEGIN {
 	use_ok('CGI::Info');
 }
 
-PARAMS: {
+STATUS: {
 	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
 	$ENV{'REQUEST_METHOD'} = 'GET';
 	$ENV{'QUERY_STRING'} = 'foo=bar';
@@ -25,4 +25,7 @@ PARAMS: {
 
 	$ENV{'REQUEST_METHOD'} = 'POST';
 	is(new_ok('CGI::Info')->status(), 411, 'Notify that CONTENT_LENGTH is needed for POST');
+
+	$ENV{'REQUEST_METHOD'} = 'OPTIONS';
+	cmp_ok(new_ok('CGI::Info')->status(), '==', 405, "Notify that OPTIONS isn't suported");
 }

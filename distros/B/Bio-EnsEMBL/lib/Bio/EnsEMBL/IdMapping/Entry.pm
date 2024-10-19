@@ -52,7 +52,7 @@ mapping.
 =cut
 
 package Bio::EnsEMBL::IdMapping::Entry;
-$Bio::EnsEMBL::IdMapping::Entry::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::Entry::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

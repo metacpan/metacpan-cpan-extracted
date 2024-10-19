@@ -42,7 +42,7 @@ augmented AVL binary balanced trees.
 =cut
 
 package Bio::EnsEMBL::Utils::Tree::Interval::Mutable::PP;
-$Bio::EnsEMBL::Utils::Tree::Interval::Mutable::PP::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Tree::Interval::Mutable::PP::VERSION = '113.0.0';
 use strict;
 use Carp;
 

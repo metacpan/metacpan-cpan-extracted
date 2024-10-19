@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 174;
+use Test::Most tests => 179;
 use Test::NoWarnings;
 use File::Spec;
 use lib 't/lib';
@@ -77,6 +77,7 @@ PARAMS: {
 	%p = %{$i->params()};
 	ok($p{foo} eq 'bar');
 	ok($p{fred} eq 'wilma');
+	cmp_ok($i->foo(), 'eq', 'bar', 'Test AUTOLOAD');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
 
 	# Catch XSS attempts
@@ -94,6 +95,13 @@ PARAMS: {
 	$ENV{'QUERY_STRING'} = "page=surnames&surname='Stock%20or%20(1,2\)=(SELECT*from(select%20name_const(CHAR(111,108,111,108,111,115,104,101,114\),1\),name_const(CHAR( <-- HERE 111,108,111,108,111,115,104,101,114\),1\)\)a\)%20--%20and%201%3D1'";
 	$i = new_ok('CGI::Info');
 	ok(!defined($i->params()));
+	ok($i->as_string() eq '');
+
+	# Seen in vwf.log
+	$ENV{'QUERY_STRING'} = 'entry=-4346" OR 1749\=1749 AND "dgiO"\="dgiO;page=people';
+	$i = new_ok('CGI::Info');
+	ok(!defined($i->params()));
+	ok(!defined($i->entry()));
 	ok($i->as_string() eq '');
 
 	$ENV{'QUERY_STRING'} = '<script>alert(123)</script>=wilma';

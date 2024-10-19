@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Null;
-$Storage::Abstract::Driver::Null::VERSION = '0.003';
+$Storage::Abstract::Driver::Null::VERSION = '0.005';
 use v5.14;
 use warnings;
 
@@ -9,6 +9,8 @@ use Types::Common -types;
 use namespace::autoclean;
 
 extends 'Storage::Abstract::Driver';
+
+with 'Storage::Abstract::Role::Driver';
 
 sub store_impl
 {

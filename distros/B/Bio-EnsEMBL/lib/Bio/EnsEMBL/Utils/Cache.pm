@@ -35,7 +35,7 @@ limitations under the License.
 #
 
 package Bio::EnsEMBL::Utils::Cache;
-$Bio::EnsEMBL::Utils::Cache::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Cache::VERSION = '113.0.0';
 use strict;
 use vars qw(
  $VERSION $Debug $STRUCT_SIZE $REF_SIZE

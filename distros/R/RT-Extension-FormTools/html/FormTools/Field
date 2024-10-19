@@ -183,7 +183,7 @@ $default = '' unless defined $default;
 
 %   # try loading CFs for this Queue, followed by Global, followed by any CF of given $name
 %   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, Queue => $queue->id ) if (defined $queue);
-%   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, Queue => 0 ) unless ( $cf->id );
+%   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, Queue => 0 ) unless ( $dependent_cf->id );
 %   if ( $dependent_cf ) {
     data-dependent-name="<% GetCustomFieldInputName( Object => $ticket, CustomField => $dependent_cf ) %>"
     data-dependent-values="<% JSON($ARGS{dependent_validation}{values} || []) %>"

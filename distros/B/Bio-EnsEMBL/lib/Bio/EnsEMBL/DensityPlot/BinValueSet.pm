@@ -42,7 +42,7 @@ Bio::EnsEMBL::DensityPlot::BinValueSet
 =cut
 
 package Bio::EnsEMBL::DensityPlot::BinValueSet;
-$Bio::EnsEMBL::DensityPlot::BinValueSet::VERSION = '112.0.0';
+$Bio::EnsEMBL::DensityPlot::BinValueSet::VERSION = '113.0.0';
 use vars qw($AUTOLOAD @ISA);
 use strict;
 use Bio::EnsEMBL::DensityPlot::BinValue;

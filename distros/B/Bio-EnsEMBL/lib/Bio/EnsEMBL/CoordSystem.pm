@@ -72,7 +72,7 @@ use strict;
 use warnings;
 
 package Bio::EnsEMBL::CoordSystem;
-$Bio::EnsEMBL::CoordSystem::VERSION = '112.0.0';
+$Bio::EnsEMBL::CoordSystem::VERSION = '113.0.0';
 use Bio::EnsEMBL::Storable;
 
 use Bio::EnsEMBL::Utils::Argument  qw(rearrange);

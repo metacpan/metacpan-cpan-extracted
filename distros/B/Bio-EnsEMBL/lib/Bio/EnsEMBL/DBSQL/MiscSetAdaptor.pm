@@ -51,7 +51,7 @@ MiscSets are used to classify MiscFeatures into groups.
 =cut
 
 package Bio::EnsEMBL::DBSQL::MiscSetAdaptor;
-$Bio::EnsEMBL::DBSQL::MiscSetAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::MiscSetAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 

@@ -39,7 +39,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::IdMapping::InternalIdMapper::EnsemblExonGeneric;
-$Bio::EnsEMBL::IdMapping::InternalIdMapper::EnsemblExonGeneric::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::InternalIdMapper::EnsemblExonGeneric::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

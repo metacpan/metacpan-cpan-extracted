@@ -1,6 +1,7 @@
 use Test2::V0;
 use Storage::Abstract;
 use File::Temp qw(tempdir);
+use File::Spec;
 
 use lib 't/lib';
 use Storage::Abstract::Test;
@@ -37,6 +38,27 @@ is $storage->list, bag {
 
 $storage->dispose('/some/file');
 ok !$storage->is_stored('/some/file'), 'foo disposed ok';
+
+subtest 'should create a directory' => sub {
+	my $new_dir = File::Spec->catdir($dir, 'nonexistent');
+
+	like dies {
+		Storage::Abstract->new(
+			driver => 'directory',
+			directory => $new_dir,
+		);
+	}, qr{does not exist};
+
+	ok lives {
+		Storage::Abstract->new(
+			driver => 'directory',
+			directory => $new_dir,
+			create_directory => 1,
+		);
+	}, 'created driver ok';
+
+	ok -d $new_dir, 'directory created ok';
+};
 
 done_testing;
 

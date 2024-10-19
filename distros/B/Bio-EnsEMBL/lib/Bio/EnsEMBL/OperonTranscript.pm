@@ -51,7 +51,7 @@ A representation of a polycistronic transcript from an operon within the Ensembl
 =cut
 
 package Bio::EnsEMBL::OperonTranscript;
-$Bio::EnsEMBL::OperonTranscript::VERSION = '112.0.0';
+$Bio::EnsEMBL::OperonTranscript::VERSION = '113.0.0';
 use strict;
 use warnings;
 

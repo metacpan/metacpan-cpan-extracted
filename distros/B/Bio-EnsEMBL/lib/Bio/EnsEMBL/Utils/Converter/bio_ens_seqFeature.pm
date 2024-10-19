@@ -47,7 +47,7 @@ Please read Bio::EnsEMBL::Utils::Converter
 =cut
 
 package Bio::EnsEMBL::Utils::Converter::bio_ens_seqFeature;
-$Bio::EnsEMBL::Utils::Converter::bio_ens_seqFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Converter::bio_ens_seqFeature::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 use Bio::EnsEMBL::SeqFeature;

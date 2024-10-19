@@ -126,6 +126,8 @@ SKIP: {
 
         # *** --align ****
         # alignment.txt
+        # *** IMPORTANT ****
+        # We only compare NUMERIC results, not ASCII alignment!!!
         my $align_file;
         $reference_file = catfile( 't', 'ref_align.csv' );
         $align_file     = catfile( 't', 'tar_align.csv' );

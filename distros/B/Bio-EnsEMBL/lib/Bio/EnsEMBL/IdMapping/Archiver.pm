@@ -72,7 +72,7 @@ without a corresponding peptide_archive entry).
 
 
 package Bio::EnsEMBL::IdMapping::Archiver;
-$Bio::EnsEMBL::IdMapping::Archiver::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::Archiver::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

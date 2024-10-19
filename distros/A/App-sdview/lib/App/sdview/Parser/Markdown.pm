@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.807;
 
-package App::sdview::Parser::Markdown 0.19;
+package App::sdview::Parser::Markdown 0.20;
 class App::sdview::Parser::Markdown :strict(params);
 
 apply App::sdview::Parser;

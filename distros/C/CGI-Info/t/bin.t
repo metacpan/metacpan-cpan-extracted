@@ -7,7 +7,9 @@
 use strict;
 
 use Test::Most tests => 13;
-use Test::Script 1.12;
+use Test::Needs { 'Test::Script' => '1.12' };
+
+Test::Script->import();
 
 script_compiles('bin/info.pl');
 script_runs(['bin/info.pl', 'foo=bar']);

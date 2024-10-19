@@ -62,7 +62,7 @@ Transcript will not affect the Mapper's results.
 =cut
 
 package Bio::EnsEMBL::TranscriptMapper;
-$Bio::EnsEMBL::TranscriptMapper::VERSION = '112.0.0';
+$Bio::EnsEMBL::TranscriptMapper::VERSION = '113.0.0';
 use strict;
 use warnings;
 

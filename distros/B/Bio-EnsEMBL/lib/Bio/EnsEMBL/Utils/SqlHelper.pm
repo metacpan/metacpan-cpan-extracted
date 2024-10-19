@@ -80,7 +80,7 @@ Easier database interaction
 =cut
 
 package Bio::EnsEMBL::Utils::SqlHelper;
-$Bio::EnsEMBL::Utils::SqlHelper::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::SqlHelper::VERSION = '113.0.0';
 use warnings;
 use strict;
 

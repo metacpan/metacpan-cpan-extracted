@@ -5,7 +5,7 @@ cpanfile
 eg/etc/routes.map
 eg/lib/Controller.pm
 eg/minima.psgi
-eg/templates/home.tt
+eg/templates/home.ht
 etc/minima.psgi
 etc/routes.map
 lib/Minima.pm
@@ -32,11 +32,11 @@ share/templates/etc-config.pl.stpl
 share/templates/etc-routes.map.stpl
 share/templates/lib-Controller-Main.pm.stpl
 share/templates/static-css-main.css.dtpl
-share/templates/templates-e404.tt.stpl
-share/templates/templates-e500.tt.stpl
-share/templates/templates-footer.tt.stpl
-share/templates/templates-header.tt.dtpl
-share/templates/templates-home.tt.stpl
+share/templates/templates-e404.ht.stpl
+share/templates/templates-e500.ht.stpl
+share/templates/templates-footer.ht.stpl
+share/templates/templates-header.ht.dtpl
+share/templates/templates-home.ht.stpl
 t/00-load.t
 t/01-setup.t
 t/02-router.t

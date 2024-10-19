@@ -62,7 +62,7 @@ Bio::EnsEMBL::Biotype
 
 
 package Bio::EnsEMBL::Biotype;
-$Bio::EnsEMBL::Biotype::VERSION = '112.0.0';
+$Bio::EnsEMBL::Biotype::VERSION = '113.0.0';
 use strict;
 use warnings;
 

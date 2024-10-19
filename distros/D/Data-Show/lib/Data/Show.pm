@@ -9,7 +9,7 @@ use warnings;
 use utf8;
 use PPR;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.004002';
 
 # Be a ninja...
 our @CARP_NOT;
@@ -836,7 +836,7 @@ Data::Show - Dump data structures with name and point-of-origin information
 
 =head1 VERSION
 
-This document describes Data::Show version 0.004001
+This document describes Data::Show version 0.004002
 
 
 =head1 SYNOPSIS

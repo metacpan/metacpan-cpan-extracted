@@ -73,7 +73,7 @@ cigar line:
 =cut
 
 package Bio::EnsEMBL::Utils::CigarString;
-$Bio::EnsEMBL::Utils::CigarString::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::CigarString::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 

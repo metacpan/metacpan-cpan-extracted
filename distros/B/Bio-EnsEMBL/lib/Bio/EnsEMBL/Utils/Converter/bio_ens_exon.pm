@@ -45,7 +45,7 @@ Bio::EnsEMBL::Utils::Converter::bio_ens_exon
 =cut
 
 package Bio::EnsEMBL::Utils::Converter::bio_ens_exon;
-$Bio::EnsEMBL::Utils::Converter::bio_ens_exon::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Converter::bio_ens_exon::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA %GTF_ENS_PHASE);
 use Bio::EnsEMBL::Utils::Converter;

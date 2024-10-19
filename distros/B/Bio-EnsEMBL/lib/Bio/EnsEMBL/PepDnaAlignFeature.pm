@@ -42,7 +42,7 @@ alignment feature
 =cut 
 
 package Bio::EnsEMBL::PepDnaAlignFeature;
-$Bio::EnsEMBL::PepDnaAlignFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::PepDnaAlignFeature::VERSION = '113.0.0';
 use Bio::EnsEMBL::BaseAlignFeature;
 
 use vars qw(@ISA);

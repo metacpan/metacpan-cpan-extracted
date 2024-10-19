@@ -41,7 +41,7 @@ IdMapping application
 
 
 package Bio::EnsEMBL::IdMapping::Cache;
-$Bio::EnsEMBL::IdMapping::Cache::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::Cache::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

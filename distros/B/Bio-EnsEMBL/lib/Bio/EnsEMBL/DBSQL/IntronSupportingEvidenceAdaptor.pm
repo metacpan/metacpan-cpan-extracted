@@ -18,7 +18,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::DBSQL::IntronSupportingEvidenceAdaptor;
-$Bio::EnsEMBL::DBSQL::IntronSupportingEvidenceAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::IntronSupportingEvidenceAdaptor::VERSION = '113.0.0';
 =pod
 
 

@@ -3,7 +3,7 @@ package HTML::Form::KeygenInput;
 use strict;
 use parent 'HTML::Form::Input';
 
-our $VERSION = '6.11';
+our $VERSION = '6.12';
 
 # ABSTRACT: An HTML form keygen input element for use with HTML::Form
 
@@ -31,7 +31,7 @@ HTML::Form::KeygenInput - An HTML form keygen input element for use with HTML::F
 
 =head1 VERSION
 
-version 6.11
+version 6.12
 
 =head1 AUTHOR
 

@@ -62,7 +62,7 @@ Any number of pair alignments can be added to the PairAlign object
 =cut
 
 package Bio::EnsEMBL::Analysis::PairAlign;
-$Bio::EnsEMBL::Analysis::PairAlign::VERSION = '112.0.0';
+$Bio::EnsEMBL::Analysis::PairAlign::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

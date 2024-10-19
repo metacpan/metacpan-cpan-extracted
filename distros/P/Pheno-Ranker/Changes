@@ -1,5 +1,10 @@
 Revision history for Perl distribution Pheno-Ranker
 
+0.12 2024-10-18T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Added UTF-8 encoding for writing alignment text files
+ - Added parser to guess labels for variables without a key.label
+
 0.11 2024-09-29T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Added support for BFF pedigrees (excluded by default via regex in config)

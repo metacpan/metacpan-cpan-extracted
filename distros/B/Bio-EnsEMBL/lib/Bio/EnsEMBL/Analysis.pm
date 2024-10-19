@@ -64,7 +64,7 @@ Object to store details of an analysis run.
 =cut
 
 package Bio::EnsEMBL::Analysis;
-$Bio::EnsEMBL::Analysis::VERSION = '112.0.0';
+$Bio::EnsEMBL::Analysis::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

@@ -64,7 +64,7 @@ unnecessarily from the Bio::EnsEMBL::Root or Bio::Root object.
 =cut
 
 package Bio::EnsEMBL::Utils::Argument;
-$Bio::EnsEMBL::Utils::Argument::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Argument::VERSION = '113.0.0';
 use strict;
 use warnings;
 

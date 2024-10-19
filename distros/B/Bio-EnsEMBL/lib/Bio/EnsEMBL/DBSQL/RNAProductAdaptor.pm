@@ -63,7 +63,7 @@ RNAProduct.
 =cut
 
 package Bio::EnsEMBL::DBSQL::RNAProductAdaptor;
-$Bio::EnsEMBL::DBSQL::RNAProductAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::RNAProductAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 

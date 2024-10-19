@@ -49,7 +49,7 @@ when it goes out of scope and there are no other open statement handles.
 =cut
 
 package Bio::EnsEMBL::DBSQL::StatementHandle;
-$Bio::EnsEMBL::DBSQL::StatementHandle::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::StatementHandle::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

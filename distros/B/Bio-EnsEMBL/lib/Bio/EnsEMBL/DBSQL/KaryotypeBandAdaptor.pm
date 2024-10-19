@@ -55,7 +55,7 @@ Database adaptor to provide access to KaryotypeBand objects
 =cut
 
 package Bio::EnsEMBL::DBSQL::KaryotypeBandAdaptor;
-$Bio::EnsEMBL::DBSQL::KaryotypeBandAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::KaryotypeBandAdaptor::VERSION = '113.0.0';
 use strict;
 
 use vars qw(@ISA);

@@ -50,7 +50,7 @@ objects.
 =cut
 
 package Bio::EnsEMBL::DBSQL::OperonAdaptor;
-$Bio::EnsEMBL::DBSQL::OperonAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::OperonAdaptor::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Utils::Exception qw( throw warning );

@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Composite;
-$Storage::Abstract::Driver::Composite::VERSION = '0.003';
+$Storage::Abstract::Driver::Composite::VERSION = '0.005';
 use v5.14;
 use warnings;
 
@@ -219,6 +219,12 @@ C<NotFound> exception should not be raised unless no sources store that file.
 
 Unless you want to possibly have duplicated files in your sources, you should
 mark all but one nested drivers as readonly.
+
+B<IMPORTANT NOTE:> this driver only looks at top-level readonly status. This
+means that if you use other metadrivers which are not readonly with readonly
+drivers underneath, it will not be able to check readonly status properly and
+will throw an exception of class C<Storage::Abstract::X::Readonly>. All level 1
+sources should have their readonly status configured properly before using it.
 
 =head1 CUSTOM INTERFACE
 

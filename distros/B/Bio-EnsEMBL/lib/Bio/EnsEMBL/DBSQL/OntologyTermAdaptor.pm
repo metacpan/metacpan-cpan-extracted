@@ -57,7 +57,7 @@ terms, creates Bio::EnsEMBL::OntologyTerm objects.
 =cut
 
 package Bio::EnsEMBL::DBSQL::OntologyTermAdaptor;
-$Bio::EnsEMBL::DBSQL::OntologyTermAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::OntologyTermAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 

@@ -7,7 +7,7 @@ use 5.030000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "PDK::Concern::H3c::Netdisco - Explore and manage LLDP topology for H3C devices",
+  "ABSTRACT" => "Based Moose for network device discovery and management",
   "AUTHOR" => "WENWU.YAN <968828\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,11 +17,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.030000",
   "NAME" => "PDK::Concern",
   "PREREQ_PM" => {
+    "Carp" => 0,
+    "Data::Dumper" => 0,
+    "File::Path" => 0,
     "Moose" => 0,
+    "Moose::Role" => 0,
+    "namespace::autoclean" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => ""
   }
@@ -29,7 +34,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Data::Dumper" => 0,
+  "File::Path" => 0,
   "Moose" => 0,
+  "Moose::Role" => 0,
+  "namespace::autoclean" => 0,
   "strict" => 0,
   "warnings" => 0
 );

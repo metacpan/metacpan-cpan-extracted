@@ -109,7 +109,7 @@ This whole module has a status of At Risk as it is under development.
 =cut
 
 package Bio::EnsEMBL::DBSQL::ArchiveStableIdAdaptor;
-$Bio::EnsEMBL::DBSQL::ArchiveStableIdAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::ArchiveStableIdAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings qw(uninitialized);

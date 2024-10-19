@@ -1,4 +1,3 @@
-bin/rt-insert-formtools-config
 bin/rt-insert-formtools-config.in
 Changes
 etc/sample_form.json

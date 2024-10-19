@@ -2,7 +2,7 @@ package HTML::Form::Input;
 
 use strict;
 
-our $VERSION = '6.11';
+our $VERSION = '6.12';
 
 # ABSTRACT: A generic HTML form input element for use with HTML::Form
 
@@ -113,6 +113,8 @@ sub form_name_value {
     return if $self->disabled;
     my $value = $self->value;
     return unless defined $value;
+    s/\x0d?\x0a|\x0d/\x0d\x0a/g
+      for $name, $value;
     return ( $name => $value );
 }
 
@@ -167,7 +169,7 @@ HTML::Form::Input - A generic HTML form input element for use with HTML::Form
 
 =head1 VERSION
 
-version 6.11
+version 6.12
 
 =head1 AUTHOR
 

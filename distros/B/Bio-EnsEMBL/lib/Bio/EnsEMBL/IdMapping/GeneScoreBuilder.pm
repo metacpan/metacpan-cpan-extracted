@@ -42,7 +42,7 @@ Java application.
 =cut
 
 package Bio::EnsEMBL::IdMapping::GeneScoreBuilder;
-$Bio::EnsEMBL::IdMapping::GeneScoreBuilder::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::GeneScoreBuilder::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

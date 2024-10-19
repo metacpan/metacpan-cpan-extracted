@@ -64,7 +64,7 @@ Manipulation:
 =cut
 
 package Bio::EnsEMBL::PredictionTranscript;
-$Bio::EnsEMBL::PredictionTranscript::VERSION = '112.0.0';
+$Bio::EnsEMBL::PredictionTranscript::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

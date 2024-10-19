@@ -1,12 +1,9 @@
 #!perl -w
 
 use strict;
+use warnings;
 
-use Test::Most;
-eval 'use Test::Apocalypse';
+use Test::Needs 'Test::Apocalypse';
 
-if ($@){
-	plan skip_all => 'Test::Apocalypse required for testing the distribution';
-} else {
-	is_apocalypse_here();
-}
+Test::Apocalypse->import();
+is_apocalypse_here();

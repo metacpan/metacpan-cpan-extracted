@@ -50,7 +50,7 @@ Bio::EnsEMBL::DBSQL::Utils).
 =cut
 
 package Bio::EnsEMBL::TranscriptFactory;
-$Bio::EnsEMBL::TranscriptFactory::VERSION = '112.0.0';
+$Bio::EnsEMBL::TranscriptFactory::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Exon;

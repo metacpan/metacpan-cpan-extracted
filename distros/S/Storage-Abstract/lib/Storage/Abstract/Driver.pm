@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver;
-$Storage::Abstract::Driver::VERSION = '0.003';
+$Storage::Abstract::Driver::VERSION = '0.005';
 use v5.14;
 use warnings;
 
@@ -16,12 +16,6 @@ use Storage::Abstract::X;
 use constant UPDIR_STR => '..';
 use constant CURDIR_STR => '.';
 use constant DIRSEP_STR => '/';
-
-has param 'readonly' => (
-	writer => 1,
-	isa => Bool,
-	default => !!0,
-);
 
 # HELPERS
 
@@ -185,7 +179,7 @@ sub store
 		$handle = $self->open_handle($handle);
 	}
 
-	Storage::Abstract::X::StorageError->raise('storage is readonly')
+	Storage::Abstract::X::Readonly->raise('storage is readonly')
 		if $self->readonly;
 
 	$self->store_impl($self->resolve_path($name), $handle);
@@ -214,7 +208,7 @@ sub dispose
 {
 	my ($self, $name) = @_;
 
-	Storage::Abstract::X::StorageError->raise('storage is readonly')
+	Storage::Abstract::X::Readonly->raise('storage is readonly')
 		if $self->readonly;
 
 	my $path = $self->resolve_path($name);
@@ -248,6 +242,10 @@ Storage::Abstract::Driver - Base class for drivers
 	use Moo;
 	extends 'Storage::Abstract::Driver';
 
+	# consume one of those roles
+	with 'Storage::Abstract::Role::Driver';
+	with 'Storage::Abstract::Role::Metadriver';
+
 	# these methods need implementing
 	sub store_impl { ... }
 	sub is_stored_impl { ... }
@@ -261,7 +259,9 @@ discussed in L<Storage::Abstract/Delegated methods>), a couple of unimplemented
 methods which must be implemented in the subclasses, and a couple of helpers
 which may be used or reimplemented in the subclasses when needed.
 
-This class should never be instantiated directly.
+This class should never be instantiated directly. Its subclasses should consume
+one of the roles, either L<Storage::Abstract::Role::Driver> or
+L<Storage::Abstract::Role::Metadriver>.
 
 =head1 INTERFACE
 
@@ -273,6 +273,13 @@ These attributes are common to all drivers.
 
 Boolean - whether this driver is readonly. False by default. May be changed
 using C<set_readonly>.
+
+This attribute is not applicable to metadrivers. This type of drivers don't
+store its own readonly status, but instead reports the status of its source via
+C<readonly>. Calling C<set_readonly> on metadrivers will call C<set_readonly>
+of the underlying driver. If the metadriver holds more than one source (for
+example L<Storage::Abstract::Driver::Composite>), calling C<set_readonly> will
+throw an exception.
 
 =head2 Helper methods
 

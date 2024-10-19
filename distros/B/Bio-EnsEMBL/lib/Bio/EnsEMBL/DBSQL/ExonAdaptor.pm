@@ -50,7 +50,7 @@ inherited from the B<Bio::EnsEMBL::DBSQL::BaseFeatureAdaptor> class.
 =cut
 
 package Bio::EnsEMBL::DBSQL::ExonAdaptor;
-$Bio::EnsEMBL::DBSQL::ExonAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::ExonAdaptor::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::DBSQL::BaseFeatureAdaptor;

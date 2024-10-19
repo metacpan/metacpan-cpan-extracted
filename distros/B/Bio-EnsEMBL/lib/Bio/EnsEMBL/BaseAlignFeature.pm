@@ -31,7 +31,7 @@ limitations under the License.
 =head1 NAME
 
 Bio::EnsEMBL::BaseAlignFeature - Baseclass providing a common abstract
-implementation for alignment features
+implmentation for alignment features
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ implementation for alignment features
 
 
 package Bio::EnsEMBL::BaseAlignFeature;
-$Bio::EnsEMBL::BaseAlignFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::BaseAlignFeature::VERSION = '113.0.0';
 use Bio::EnsEMBL::FeaturePair;
 use Bio::EnsEMBL::Utils::Argument qw(rearrange);
 use Bio::EnsEMBL::Utils::Exception qw(throw warning);

@@ -32,7 +32,7 @@ limitations under the License.
 
 Bio::EnsEMBL::External::ExternalFeatureAdaptor
 
-=head1 SUMMARY
+=head 1 SUMMARY
 
 Allows features created externally from Ensembl in a single
 coordinate system to be retrieved in several other (Ensembl-style)
@@ -121,7 +121,7 @@ explicitly by calling the ExternalFeatureAdaptor ensembl_db method.
 =cut
 
 package Bio::EnsEMBL::External::ExternalFeatureAdaptor;
-$Bio::EnsEMBL::External::ExternalFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::External::ExternalFeatureAdaptor::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Utils::Exception qw(warning throw);

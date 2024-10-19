@@ -68,7 +68,7 @@ is assumed that this interval is on a circular chromosome spanning the origin.
 =cut
 
 package Bio::EnsEMBL::Utils::Interval;
-$Bio::EnsEMBL::Utils::Interval::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Interval::VERSION = '113.0.0';
 use strict;
 
 use Scalar::Util qw(looks_like_number);

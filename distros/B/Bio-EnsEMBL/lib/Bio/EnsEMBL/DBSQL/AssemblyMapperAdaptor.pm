@@ -80,7 +80,7 @@ common mapping to an intermediate coordinate system.
 =cut
 
 package Bio::EnsEMBL::DBSQL::AssemblyMapperAdaptor;
-$Bio::EnsEMBL::DBSQL::AssemblyMapperAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::AssemblyMapperAdaptor::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

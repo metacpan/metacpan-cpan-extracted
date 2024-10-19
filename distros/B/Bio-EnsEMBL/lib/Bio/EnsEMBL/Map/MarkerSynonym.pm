@@ -43,7 +43,7 @@ Represents an alias for a marker in the EnsEMBL database.
 =cut
 
 package Bio::EnsEMBL::Map::MarkerSynonym;
-$Bio::EnsEMBL::Map::MarkerSynonym::VERSION = '112.0.0';
+$Bio::EnsEMBL::Map::MarkerSynonym::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 

@@ -56,7 +56,7 @@ use strict;
 use warnings;
 
 package Bio::EnsEMBL::DensityType;
-$Bio::EnsEMBL::DensityType::VERSION = '112.0.0';
+$Bio::EnsEMBL::DensityType::VERSION = '113.0.0';
 use Bio::EnsEMBL::Storable;
 use Bio::EnsEMBL::Utils::Argument qw(rearrange);
 use Bio::EnsEMBL::Utils::Exception qw(throw);

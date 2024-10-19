@@ -70,7 +70,7 @@ new method of the database object
 =cut
 
 package Bio::EnsEMBL::DBLoader;
-$Bio::EnsEMBL::DBLoader::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBLoader::VERSION = '113.0.0';
 use strict;
 
 

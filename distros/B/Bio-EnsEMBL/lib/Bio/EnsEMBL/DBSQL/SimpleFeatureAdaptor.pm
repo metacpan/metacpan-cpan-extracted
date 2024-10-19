@@ -58,7 +58,7 @@ Simple Feature Adaptor - database access for simple features
 =cut
 
 package Bio::EnsEMBL::DBSQL::SimpleFeatureAdaptor;
-$Bio::EnsEMBL::DBSQL::SimpleFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::SimpleFeatureAdaptor::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

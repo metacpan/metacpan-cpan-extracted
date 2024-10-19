@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.807;
 
-package App::sdview::Output::Pod 0.19;
+package App::sdview::Output::Pod 0.20;
 class App::sdview::Output::Pod :strict(params);
 
 apply App::sdview::Output;

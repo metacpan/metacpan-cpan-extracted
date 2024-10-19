@@ -28,7 +28,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::DBSQL::Driver::mysql;
-$Bio::EnsEMBL::DBSQL::Driver::mysql::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::Driver::mysql::VERSION = '113.0.0';
 use warnings;
 use strict;
 

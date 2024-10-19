@@ -62,7 +62,7 @@ to false;
 =cut
 
 package Bio::EnsEMBL::Utils::URI;
-$Bio::EnsEMBL::Utils::URI::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::URI::VERSION = '113.0.0';
 use strict;
 use warnings;
 

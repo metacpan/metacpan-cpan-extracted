@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Memory;
-$Storage::Abstract::Driver::Memory::VERSION = '0.003';
+$Storage::Abstract::Driver::Memory::VERSION = '0.005';
 use v5.14;
 use warnings;
 
@@ -14,6 +14,8 @@ has field 'files' => (
 	isa => HashRef,
 	default => sub { {} },
 );
+
+with 'Storage::Abstract::Role::Driver';
 
 sub store_impl
 {

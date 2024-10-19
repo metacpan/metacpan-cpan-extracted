@@ -28,7 +28,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::DBSQL::Driver::Oracle;
-$Bio::EnsEMBL::DBSQL::Driver::Oracle::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::Driver::Oracle::VERSION = '113.0.0';
 use warnings;
 use strict;
 

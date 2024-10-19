@@ -49,7 +49,7 @@ where not mapped in a specific process i.e. xref, cDNA, Markers.
 =cut
 
 package Bio::EnsEMBL::DBSQL::UnmappedObjectAdaptor;
-$Bio::EnsEMBL::DBSQL::UnmappedObjectAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::UnmappedObjectAdaptor::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

@@ -18,7 +18,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::Utils::Iterator;
-$Bio::EnsEMBL::Utils::Iterator::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Iterator::VERSION = '113.0.0';
 
 =head1 CONTACT
 

@@ -2,42 +2,42 @@
 
 =head1 NAME
 
-PDK::Concern::H3c::Netdisco - Explore and manage LLDP topology for H3C devices
+PDK::Concern::Netdisco::Cisco - Explore and manage CDP topology for Cisco devices
 
 =head1 SYNOPSIS
 
-  use PDK::Concern::H3c::Netdisco;
+  use PDK::Concern::Netdisco::Cisco;
 
-  my $h3c_device = PDK::Device::H3c->new(...);
-  my $netdisco = PDK::Concern::H3c::Netdisco->new(device => $h3c_device);
+  my $cisco_device = PDK::Device::Cisco->new(...);
+  my $netdisco = PDK::Concern::Netdisco::Cisco->new(device => $cisco_device);
   my $result = $netdisco->explore_topology();
 
 =head1 DESCRIPTION
 
-PDK::Concern::H3c::Netdisco provides functionality to explore LLDP (Link Layer Discovery Protocol) topology
-for H3C devices and generate interface descriptions based on the discovered neighbors. This module
-is designed to work with H3C network devices and automate the process of updating interface
-descriptions based on LLDP information.
+PDK::Concern::Netdisco::Cisco provides functionality to explore CDP (Cisco Discovery Protocol) topology
+for Cisco devices and generate interface descriptions based on the discovered neighbors. This module
+is designed to work with Cisco network devices and automate the process of updating interface
+descriptions based on CDP information.
 
 =head1 METHODS
 
-=head2 new(device => $h3c_device)
+=head2 new(device => $cisco_device)
 
-Creates a new instance of the PDK::Concern::H3c::Netdisco class.
+Creates a new instance of the PDK::Concern::Netdisco::Cisco class.
 
 =over 4
 
 =item * device
 
-A required parameter. Must be an instance of PDK::Device::H3c.
+A required parameter. Must be an instance of PDK::Device::Cisco.
 
 =back
 
-  my $netdisco = PDK::Concern::H3c::Netdisco->new(device => $h3c_device);
+  my $netdisco = PDK::Concern::Netdisco::Cisco->new(device => $cisco_device);
 
 =head2 explore_topology()
 
-Explores the LLDP topology of the device and generates interface descriptions.
+Explores the CDP topology of the device and generates interface descriptions.
 
 Returns a hashref with the result of executing the generated commands.
 
@@ -56,13 +56,13 @@ Generates interface description commands based on the provided topology data.
 
 =item * $topology_data
 
-An arrayref containing the raw LLDP neighbor information.
+An arrayref containing the raw CDP neighbor information.
 
 =back
 
 Returns an array of configuration commands.
 
-  my @topology_data = $device->get_lldp_data();
+  my @topology_data = $device->get_cdp_data();
   my @commands = $netdisco->gen_iface_desc(\@topology_data);
 
 =head2 refine_if($name)
@@ -90,22 +90,15 @@ This module requires the following modules:
 
 =item * Moose
 
-=item * PDK::Device::H3c (not on CPAN, presumably part of your internal PDK framework)
+=item * Data::Dumper
+
+=item * PDK::Device::Cisco
 
 =back
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-PDK::Concern::H3c::Netdisco requires no configuration files or environment variables.
-
-=head1 INCOMPATIBILITIES
-
-None known.
-
-=head1 BUGS AND LIMITATIONS
-
-There are no known bugs in this module. Please report problems to the maintainer.
-Patches are welcome.
+PDK::Concern::Netdisco::Cisco may requires environment variables.
 
 =head1 AUTHOR
 

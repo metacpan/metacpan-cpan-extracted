@@ -79,7 +79,7 @@ implementing classes.
 =cut
 
 package Bio::EnsEMBL::IdMapping::Serialisable;
-$Bio::EnsEMBL::IdMapping::Serialisable::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::Serialisable::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

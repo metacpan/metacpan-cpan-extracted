@@ -1,5 +1,8 @@
 Change history for HTML-Form
 
+6.12      2024-10-18 16:19:06Z
+    - Fix CRLF normalization with HTTP::Message 7.00 (GH#53) (Graham Knop)
+
 6.11      2023-02-11 11:49:19Z
     - Perl::Tidy-ed the entire codebase (GH#42) (Julien Fiegehenn)
     - Split extra packages inside HTML::Form into their own module files

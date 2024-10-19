@@ -58,7 +58,7 @@ through the use of start_Exon/end_Exon, and start/end attributes.
 
 
 package Bio::EnsEMBL::Translation;
-$Bio::EnsEMBL::Translation::VERSION = '112.0.0';
+$Bio::EnsEMBL::Translation::VERSION = '113.0.0';
 use vars qw($AUTOLOAD @ISA);
 use strict;
 

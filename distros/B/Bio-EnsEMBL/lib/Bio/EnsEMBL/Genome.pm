@@ -59,7 +59,7 @@ Bio::EnsEMBL::DBSQL::GenomeContainer
 =cut
 
 package Bio::EnsEMBL::Genome;
-$Bio::EnsEMBL::Genome::VERSION = '112.0.0';
+$Bio::EnsEMBL::Genome::VERSION = '113.0.0';
 use strict;
 use warnings;
 

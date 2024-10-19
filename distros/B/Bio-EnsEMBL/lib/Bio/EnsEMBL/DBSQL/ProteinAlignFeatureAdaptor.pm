@@ -48,7 +48,7 @@ Adaptor for ProteinAlignFeatures
 
 
 package Bio::EnsEMBL::DBSQL::ProteinAlignFeatureAdaptor;
-$Bio::EnsEMBL::DBSQL::ProteinAlignFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::ProteinAlignFeatureAdaptor::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

@@ -52,7 +52,7 @@ MySQL Database queries to load and store external object references.
 =cut
 
 package Bio::EnsEMBL::DBSQL::DBEntryAdaptor;
-$Bio::EnsEMBL::DBSQL::DBEntryAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::DBEntryAdaptor::VERSION = '113.0.0';
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;
 
 use Bio::EnsEMBL::DBEntry;
@@ -381,7 +381,7 @@ sub get_all_masters {
 }
 
 
-=head2 fetch_all_by_name
+=head fetch_all_by_name
 
   Arg [1]    : string $name - The name of the external reference.
                found in accession, display_label or synonym

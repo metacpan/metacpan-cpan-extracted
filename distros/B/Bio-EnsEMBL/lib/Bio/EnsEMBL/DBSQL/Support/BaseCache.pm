@@ -81,7 +81,7 @@ target adaptor.
 =cut
 
 package Bio::EnsEMBL::DBSQL::Support::BaseCache;
-$Bio::EnsEMBL::DBSQL::Support::BaseCache::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::Support::BaseCache::VERSION = '113.0.0';
 use strict;
 use warnings;
 

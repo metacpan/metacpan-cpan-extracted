@@ -79,7 +79,7 @@ registration.
 =cut
 
 package Bio::EnsEMBL::Mapper::RangeRegistry;
-$Bio::EnsEMBL::Mapper::RangeRegistry::VERSION = '112.0.0';
+$Bio::EnsEMBL::Mapper::RangeRegistry::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Utils::Exception qw(throw);

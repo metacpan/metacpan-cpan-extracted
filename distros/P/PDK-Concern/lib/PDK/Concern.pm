@@ -3,5 +3,5 @@ use warnings;
 
 package PDK::Concern;
 
-# ABSTRACT: PDK::Concern::H3c::Netdisco - Explore and manage LLDP topology for H3C devices
+# ABSTRACT: Based Moose for network device discovery and management
 1;

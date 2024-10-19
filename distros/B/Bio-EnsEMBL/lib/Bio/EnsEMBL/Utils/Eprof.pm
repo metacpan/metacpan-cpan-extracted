@@ -55,7 +55,7 @@ This is an Ensembl profiler as we broke the Perl profilers.
 =cut
 
 package Bio::EnsEMBL::Utils::Eprof;
-$Bio::EnsEMBL::Utils::Eprof::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Eprof::VERSION = '113.0.0';
 use strict;
 use warnings;
 

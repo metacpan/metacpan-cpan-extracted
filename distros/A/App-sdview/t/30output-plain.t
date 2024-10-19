@@ -139,6 +139,14 @@ The third item
 
 Has two paragraphs
 
+=item ABC
+
+inline
+
+=item DEFG
+
+wrapped
+
 =back
 EOPOD
 <<"EOF";
@@ -152,6 +160,11 @@ EOPOD
           The third item
 
           Has two paragraphs
+
+      ABC inline
+
+      DEFG
+          wrapped
 EOF
 
 dotest "Nested lists", pod => <<"EOPOD",

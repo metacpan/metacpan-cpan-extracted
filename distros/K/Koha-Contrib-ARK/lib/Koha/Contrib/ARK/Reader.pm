@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Reader;
 # ABSTRACT: Read Koha biblio records with/without ARK
-$Koha::Contrib::ARK::Reader::VERSION = '1.0.5';
+$Koha::Contrib::ARK::Reader::VERSION = '1.1.0';
 use Moose;
 use Moose::Util::TypeConstraints;
 use Modern::Perl;
@@ -25,6 +25,11 @@ has select => (
     default => 'All',
 );
 
+has fromwhere => (
+    is => 'rw',
+    isa => 'Str'
+);
+
 
 has total => ( is => 'rw', isa => 'Int', default => 0 );
 
@@ -37,10 +42,17 @@ sub BUILD {
  
     my $dbh = C4::Context->dbh;
     my $fromwhere = "FROM biblio_metadata";
-    $fromwhere .= " WHERE " .
-        $self->ark->field_query .
-        ($self->select eq 'WithoutArk' ? " =''" : " <> ''" )
-            if $self->select ne 'All';
+    if ($self->fromwhere) {
+        $fromwhere .= " WHERE " . $self->fromwhere;
+    }
+    else {
+        $fromwhere .= " WHERE " .
+            $self->ark->field_query .
+            ($self->select eq 'WithoutArk' ? " =''" : " <> ''" )
+                if $self->select ne 'All';
+    }
+
+    #$fromwhere = "FROM biblio_metadata WHERE biblionumber=875167";
 
     my $total = $dbh->selectall_arrayref("SELECT COUNT(*) $fromwhere");
     $total = $total->[0][0];
@@ -60,12 +72,13 @@ sub read {
 
     $self->count( $self->count + 1 );
 
-    my $record = GetMarcBiblio({ biblionumber => $biblionumber });
-    $record = MARC::Moose::Record::new_from($record, 'Legacy');
-    
-    $self->ark->set_current( $biblionumber, $record );
+    my ($biblio, $record);
+    if ($biblio = Koha::Biblios->find( $biblionumber )) {
+        $record = MARC::Moose::Record::new_from($biblio->metadata->record(), 'Legacy');
+    } 
+    $self->ark->set_current( $biblio, $record );
 
-    return ($biblionumber, $record);
+    return ($biblio, $record);
 }
 
 
@@ -83,7 +96,7 @@ Koha::Contrib::ARK::Reader - Read Koha biblio records with/without ARK
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.0
 
 =head1 ATTRIBUTES
 
@@ -105,7 +118,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Fréderic Demians.
+This software is Copyright (c) 2024 by Fréderic Demians.
 
 This is free software, licensed under:
 

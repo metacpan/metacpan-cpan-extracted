@@ -51,7 +51,7 @@ use strict;
 use warnings;
 
 package Bio::EnsEMBL::Storable;
-$Bio::EnsEMBL::Storable::VERSION = '112.0.0';
+$Bio::EnsEMBL::Storable::VERSION = '113.0.0';
 
 use Bio::EnsEMBL::Utils::Exception qw(throw warning);
 use Bio::EnsEMBL::Utils::Argument qw(rearrange);

@@ -48,7 +48,7 @@ PredictionExons.
 =cut
 
 package Bio::EnsEMBL::DBSQL::PredictionExonAdaptor;
-$Bio::EnsEMBL::DBSQL::PredictionExonAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::PredictionExonAdaptor::VERSION = '113.0.0';
 use vars qw( @ISA );
 use strict;
 

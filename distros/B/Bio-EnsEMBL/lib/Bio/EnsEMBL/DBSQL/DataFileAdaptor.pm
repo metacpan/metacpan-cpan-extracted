@@ -18,7 +18,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::DBSQL::DataFileAdaptor;
-$Bio::EnsEMBL::DBSQL::DataFileAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::DataFileAdaptor::VERSION = '113.0.0';
 =pod
 
 

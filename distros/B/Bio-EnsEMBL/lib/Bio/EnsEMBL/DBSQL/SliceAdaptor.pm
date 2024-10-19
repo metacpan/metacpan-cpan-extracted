@@ -101,7 +101,7 @@ Bio::EnsEMBL::Slice module.
 
 
 package Bio::EnsEMBL::DBSQL::SliceAdaptor;
-$Bio::EnsEMBL::DBSQL::SliceAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::SliceAdaptor::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

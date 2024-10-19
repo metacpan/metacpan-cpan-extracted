@@ -18,7 +18,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::IntronSupportingEvidence;
-$Bio::EnsEMBL::IntronSupportingEvidence::VERSION = '112.0.0';
+$Bio::EnsEMBL::IntronSupportingEvidence::VERSION = '113.0.0';
 =pod
 
 

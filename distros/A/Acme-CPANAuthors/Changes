@@ -1,5 +1,8 @@
 Revision history for Acme-CPANAuthors
 
+0.27 2024/10/19
+  - use https
+
 0.26 2015/12/09
   - repackaging to add recommendation in META files (GH #4, XSAWYER++)
 

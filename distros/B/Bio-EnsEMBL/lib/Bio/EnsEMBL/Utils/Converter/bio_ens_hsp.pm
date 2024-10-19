@@ -30,7 +30,7 @@ limitations under the License.
 
 
 package Bio::EnsEMBL::Utils::Converter::bio_ens_hsp;
-$Bio::EnsEMBL::Utils::Converter::bio_ens_hsp::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Converter::bio_ens_hsp::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 use Bio::EnsEMBL::Utils::Converter::bio_ens;

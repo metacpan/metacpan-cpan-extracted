@@ -45,7 +45,7 @@ features from the database.
 =cut
 
 package Bio::EnsEMBL::DBSQL::SupportingFeatureAdaptor;
-$Bio::EnsEMBL::DBSQL::SupportingFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::SupportingFeatureAdaptor::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;

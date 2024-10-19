@@ -9,13 +9,13 @@ if(!-w $tmpdir) {
 	exit(0);
 }
 
-my $distargs = {
+my $dist = {
 	COMPRESS => 'gzip -9f',
 	SUFFIX => 'gz'
 };
 
 if($^O eq 'darwin') {
-	$distargs->{'TAR'} = 'gtar';
+	$dist->{'TAR'} = 'gtar';
 }
 
 WriteMakefile(
@@ -35,6 +35,7 @@ WriteMakefile(
 		'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
+		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::NoWarnings' => 0,
@@ -66,7 +67,7 @@ WriteMakefile(
 		'Class::Autouse' => 0,
 		'namespace::clean' => 0,
 		'Sys::Path' => 0,
-	}, dist => $distargs,
+	}, dist => $dist,
 	clean		=> { FILES => 'CGI-Info-*' },
 	# META_ADD => {
 		# provides => {}

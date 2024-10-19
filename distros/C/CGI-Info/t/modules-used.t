@@ -1,16 +1,10 @@
 #!perl -w
 
 use strict;
+
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs 'Test::Module::Used';
 
-unless($ENV{'AUTHOR_TESTING'}) {
-	plan(skip_all => 'Author tests not required for installation');
-}
-
-eval 'use Test::Module::Used';
-if($@) {
-	plan(skip_all => 'Test::Module::Used required for testing all modules needed');
-} else {
-	my $used = Test::Module::Used->new(meta_file => 'MYMETA.yml');
-	$used->ok();
-}
+my $used = Test::Module::Used->new(meta_file => 'MYMETA.yml');
+$used->ok();

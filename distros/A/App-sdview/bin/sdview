@@ -67,6 +67,8 @@ language:
 
    $ sdview -f Pod bin/sdview
 
+Request C<-f ?> to print a list of parser format names.
+
 =head2 -t, --output FORMAT
 
 Specifies that a different form of output will be generated, instead of
@@ -74,6 +76,8 @@ rendering formatted output directly to the terminal. Useful for cross-
 converting between file types:
 
    $ sdview lib/App/sdview.pm -t Markdown > sdview.md
+
+Request C<-t ?> to print a list of output format names.
 
 =head2 -O, --output-option KEY=VALUE,...
 

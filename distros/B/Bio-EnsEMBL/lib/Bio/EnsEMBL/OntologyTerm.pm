@@ -42,7 +42,7 @@ and translations using the relevant adaptors and methods.
 =cut
 
 package Bio::EnsEMBL::OntologyTerm;
-$Bio::EnsEMBL::OntologyTerm::VERSION = '112.0.0';
+$Bio::EnsEMBL::OntologyTerm::VERSION = '113.0.0';
 use strict;
 use warnings;
 

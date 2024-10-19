@@ -72,7 +72,7 @@ elements sometimes are found.
 =cut
 
 package Bio::EnsEMBL::Upstream;
-$Bio::EnsEMBL::Upstream::VERSION = '112.0.0';
+$Bio::EnsEMBL::Upstream::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 use Bio::EnsEMBL::DBSQL::DBAdaptor;

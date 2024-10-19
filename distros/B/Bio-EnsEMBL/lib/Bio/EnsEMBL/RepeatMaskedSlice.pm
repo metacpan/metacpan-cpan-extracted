@@ -55,7 +55,7 @@ repeat masked genomic sequence rather than normal genomic sequence.
 =cut
 
 package Bio::EnsEMBL::RepeatMaskedSlice;
-$Bio::EnsEMBL::RepeatMaskedSlice::VERSION = '112.0.0';
+$Bio::EnsEMBL::RepeatMaskedSlice::VERSION = '113.0.0';
 use strict;
 use warnings;
 

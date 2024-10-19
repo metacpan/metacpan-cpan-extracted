@@ -131,7 +131,7 @@ untangle the tree (i.e. try to avoid overlapping lines).
 =cut
 
 package Bio::EnsEMBL::StableIdHistoryTree;
-$Bio::EnsEMBL::StableIdHistoryTree::VERSION = '112.0.0';
+$Bio::EnsEMBL::StableIdHistoryTree::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

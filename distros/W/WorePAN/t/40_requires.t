@@ -11,6 +11,7 @@ my $worepan = WorePAN->new(
     'Acme-CPANAuthors-Japanese' => 0.071226,
   },
   no_network => 0,
+  use_backpan => 1,
   cleanup => 1,
 );
 

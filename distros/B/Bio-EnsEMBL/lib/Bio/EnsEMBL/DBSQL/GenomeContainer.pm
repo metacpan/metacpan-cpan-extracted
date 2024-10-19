@@ -65,7 +65,7 @@ Genome is an abstract object which contains information linking the species, the
 =cut
 
 package Bio::EnsEMBL::DBSQL::GenomeContainer;
-$Bio::EnsEMBL::DBSQL::GenomeContainer::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::GenomeContainer::VERSION = '113.0.0';
 use strict;
 use warnings;
 

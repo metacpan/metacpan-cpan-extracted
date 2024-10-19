@@ -67,7 +67,7 @@ design.
 =cut
 
 package Bio::EnsEMBL::IdMapping::TinyTranscript;
-$Bio::EnsEMBL::IdMapping::TinyTranscript::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::TinyTranscript::VERSION = '113.0.0';
 # internal data structure (array indices):
 #
 #  0-4 see TinyFeature

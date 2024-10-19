@@ -60,7 +60,7 @@ more alternative transcripts.
 =cut
 
 package Bio::EnsEMBL::Gene;
-$Bio::EnsEMBL::Gene::VERSION = '112.0.0';
+$Bio::EnsEMBL::Gene::VERSION = '113.0.0';
 use strict;
 
 use POSIX;

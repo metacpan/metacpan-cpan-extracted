@@ -45,7 +45,7 @@ has one marker feature per mapped location.
 =cut
 
 package Bio::EnsEMBL::Map::MarkerFeature;
-$Bio::EnsEMBL::Map::MarkerFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::Map::MarkerFeature::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 

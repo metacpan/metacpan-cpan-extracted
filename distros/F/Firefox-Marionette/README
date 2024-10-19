@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.60
+    Version 1.61
 
 SYNOPSIS
 
@@ -2728,6 +2728,29 @@ SUBROUTINES/METHODS
         foreach my $ip_address ($firefox->resolve($hostname, flags => Firefox::Marionette::DNS::RESOLVE_REFRESH_CACHE() | Firefox::Marionette::DNS::RESOLVE_BYPASS_CACHE(), type => Firefox::Marionette::DNS::RESOLVE_TYPE_DEFAULT())) {
            say "$hostname resolves to $ip_address;
         }
+
+ resolve_override
+
+    accepts a hostname and an IP address as parameters. This method then
+    forces the browser to override any future DNS requests for the supplied
+    hostname.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new();
+        my $hostname = 'metacpan.org';
+        my $ip_address = '127.0.0.1';
+        foreach my $result ($firefox->resolve_override($hostname, $ip_address)->resolve($hostname)) {
+           if ($result eq $ip_address) {
+             warn "local metacpan time?";
+           } else {
+             die "This should not happen";
+           }
+        }
+        $firefox->go('https://metacpan.org'); # this tries to contact a webserver on 127.0.0.1
+
+    This method returns itself to aid in chaining methods.
 
  restart
 

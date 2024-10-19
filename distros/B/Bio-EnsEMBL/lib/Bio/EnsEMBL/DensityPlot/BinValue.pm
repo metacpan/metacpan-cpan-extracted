@@ -43,7 +43,7 @@ This object deals with the raw data to built the density plots
 =cut
 
 package Bio::EnsEMBL::DensityPlot::BinValue;
-$Bio::EnsEMBL::DensityPlot::BinValue::VERSION = '112.0.0';
+$Bio::EnsEMBL::DensityPlot::BinValue::VERSION = '113.0.0';
 use vars qw($AUTOLOAD @ISA);
 use strict;
 

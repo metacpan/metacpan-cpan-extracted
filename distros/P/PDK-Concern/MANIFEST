@@ -5,8 +5,13 @@ META.yml
 Makefile.PL
 README
 dist.ini
+examples/cisco.pl
 examples/fork.pl
 examples/h3c.pl
 lib/PDK/Concern.pm
-lib/PDK/Concern/H3c/Netdisco.pm
-lib/PDK/Concern/H3c/Netdisco.pod
+lib/PDK/Concern/Netdisco/Cisco.pm
+lib/PDK/Concern/Netdisco/Cisco.pod
+lib/PDK/Concern/Netdisco/H3c.pm
+lib/PDK/Concern/Netdisco/H3c.pod
+lib/PDK/Concern/Netdisco/Role.pm
+lib/PDK/Concern/Netdisco/Role.pod

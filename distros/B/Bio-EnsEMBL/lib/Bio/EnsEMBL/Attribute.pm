@@ -61,7 +61,7 @@ Bio::EnsEMBL::DBSQL::AttributeAdaptor
 =cut
 
 package Bio::EnsEMBL::Attribute;
-$Bio::EnsEMBL::Attribute::VERSION = '112.0.0';
+$Bio::EnsEMBL::Attribute::VERSION = '113.0.0';
 use strict;
 use warnings;
 

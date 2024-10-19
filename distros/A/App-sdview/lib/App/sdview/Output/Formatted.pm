@@ -9,10 +9,10 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Formatted 0.19;
+package App::sdview::Output::Formatted 0.20;
 class App::sdview::Output::Formatted :strict(params);
 
-use Sublike::Extended 0.26; # bugfix RT155654
+use Sublike::Extended 0.29 'method';
 
 # This isn't itself an output module; but a base class to build them on
 # So no `format` constant.
@@ -62,7 +62,7 @@ method output ( @paragraphs )
 
 *output_item = \&_output_para;
 
-extended method _output_para ( $para,
+method _output_para ( $para,
    :$margin //= 0,
    :$leader = undef,
    :$indent //= 0,
@@ -123,8 +123,8 @@ extended method _output_para ( $para,
             $leaderstyle{$_} and $leader->apply_tag( 0, -1, $_ => $leaderstyle{$_} )
                for qw( fg bg bold under italic monospace );
 
-            if( length $leader <= $indent ) {
-               # If the leader will fit on the same line
+            if( length($leader) + 1 <= $indent ) {
+               # If the leader will fit on the same line with at least one space
                $prefix .= $leader . " "x($indent - length $leader);
             }
             else {
@@ -149,7 +149,7 @@ method output_list_bullet ( $para, %opts ) { $self->_output_list( bullet => $par
 method output_list_number ( $para, %opts ) { $self->_output_list( number => $para, %opts ); }
 method output_list_text   ( $para, %opts ) { $self->_output_list( text   => $para, %opts ); }
 
-extended method _output_list( $listtype, $para,
+method _output_list( $listtype, $para,
    :$margin //= 0,
    %  # ignore other named opts
 ) {
@@ -192,7 +192,7 @@ extended method _output_list( $listtype, $para,
    }
 }
 
-extended method output_table ( $para, :$margin //= 0 )
+method output_table ( $para, :$margin //= 0 )
 {
    my %typestyle = App::sdview::Style->para_style( "table" )->%*;
    $margin += $typestyle{margin} // 0;

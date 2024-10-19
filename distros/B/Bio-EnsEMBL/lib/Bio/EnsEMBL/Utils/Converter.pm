@@ -68,7 +68,7 @@ What the ready conversions are,
 
 
 package Bio::EnsEMBL::Utils::Converter;
-$Bio::EnsEMBL::Utils::Converter::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Converter::VERSION = '113.0.0';
 use strict;
 
 =head2 new

@@ -130,7 +130,7 @@ sub write_array2txt {
     my $data = $arg->{data};
 
     # Watch out for RAM usage!!!
-    path($file)->spew( join( "\n", @$data ) . "\n" );
+    path($file)->spew_utf8( join( "\n", @$data ) . "\n" );
     return 1;
 }
 

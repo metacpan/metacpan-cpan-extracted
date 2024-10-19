@@ -5,7 +5,7 @@ use WorePAN;
 
 plan skip_all => "set WOREPAN_NETWORK_TEST to test" unless $ENV{WOREPAN_NETWORK_TEST};
 
-my $worepan = WorePAN->new(cleanup => 1, no_network => 0);
+my $worepan = WorePAN->new(cleanup => 1, no_network => 0, use_backpan => 1);
 
 {
   $worepan->add_files(qw{

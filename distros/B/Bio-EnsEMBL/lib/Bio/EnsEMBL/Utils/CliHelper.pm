@@ -87,7 +87,7 @@ See subroutines.
 =cut
 
 package Bio::EnsEMBL::Utils::CliHelper;
-$Bio::EnsEMBL::Utils::CliHelper::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::CliHelper::VERSION = '113.0.0';
 use warnings;
 use strict;
 

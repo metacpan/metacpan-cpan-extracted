@@ -46,7 +46,7 @@ release version of the Ensembl Core API.
 =cut
 
 package Bio::EnsEMBL::ApiVersion;
-$Bio::EnsEMBL::ApiVersion::VERSION = '112.0.0';
+$Bio::EnsEMBL::ApiVersion::VERSION = '113.0.0';
 use strict;
 use warnings;
 
@@ -56,7 +56,7 @@ use base qw( Exporter );
 
 our @EXPORT = qw( software_version );
 
-my $API_VERSION = 112;
+my $API_VERSION = 113;
 
 sub software_version { return $API_VERSION }
 

@@ -66,7 +66,7 @@ design.
 =cut
 
 package Bio::EnsEMBL::IdMapping::TinyGene;
-$Bio::EnsEMBL::IdMapping::TinyGene::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::TinyGene::VERSION = '113.0.0';
 # internal data structure (array indices):
 #
 #  0-4 see TinyFeature

@@ -77,7 +77,7 @@ scores are combined.
 =cut
 
 package Bio::EnsEMBL::IdMapping::SyntenyRegion;
-$Bio::EnsEMBL::IdMapping::SyntenyRegion::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::SyntenyRegion::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

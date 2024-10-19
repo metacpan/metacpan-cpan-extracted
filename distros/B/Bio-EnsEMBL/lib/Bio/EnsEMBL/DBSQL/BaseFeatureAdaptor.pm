@@ -49,7 +49,7 @@ common to all feature adaptors.
 =cut
 
 package Bio::EnsEMBL::DBSQL::BaseFeatureAdaptor;
-$Bio::EnsEMBL::DBSQL::BaseFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::BaseFeatureAdaptor::VERSION = '113.0.0';
 use vars qw(@ISA @EXPORT);
 use strict;
 

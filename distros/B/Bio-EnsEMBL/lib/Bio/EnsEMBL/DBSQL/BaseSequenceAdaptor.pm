@@ -60,7 +60,7 @@ the seq chunk power and the number of sequences cached.
 =cut
 
 package Bio::EnsEMBL::DBSQL::BaseSequenceAdaptor;
-$Bio::EnsEMBL::DBSQL::BaseSequenceAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::BaseSequenceAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 

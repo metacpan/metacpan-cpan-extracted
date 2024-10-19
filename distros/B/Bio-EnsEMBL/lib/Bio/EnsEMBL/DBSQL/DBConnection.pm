@@ -67,7 +67,7 @@ the Bio::EnsEMBL::Registry and will not be instantiated directly.
 
 
 package Bio::EnsEMBL::DBSQL::DBConnection;
-$Bio::EnsEMBL::DBSQL::DBConnection::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::DBConnection::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

@@ -73,7 +73,7 @@ use strict;
 use Bio::EnsEMBL::Utils::Cache;
 
 package Bio::EnsEMBL::Utils::SeqRegionCache;
-$Bio::EnsEMBL::Utils::SeqRegionCache::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::SeqRegionCache::VERSION = '113.0.0';
 our $SEQ_REGION_CACHE_SIZE = 40000;
 
 

@@ -62,7 +62,7 @@ parameters and their values to pass to another script.
 =cut
 
 package Bio::EnsEMBL::Utils::ConfParser;
-$Bio::EnsEMBL::Utils::ConfParser::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::ConfParser::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

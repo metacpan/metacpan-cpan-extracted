@@ -57,7 +57,7 @@ It represents the coding regions of a transcript.
 use strict;
 
 package Bio::EnsEMBL::CDS;
-$Bio::EnsEMBL::CDS::VERSION = '112.0.0';
+$Bio::EnsEMBL::CDS::VERSION = '113.0.0';
 use vars qw(@ISA);
 
 use Bio::EnsEMBL::Feature;

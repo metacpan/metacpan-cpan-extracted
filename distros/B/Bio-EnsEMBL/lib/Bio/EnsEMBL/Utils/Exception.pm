@@ -97,7 +97,7 @@ handling methods.
 =cut
 
 package Bio::EnsEMBL::Utils::Exception;
-$Bio::EnsEMBL::Utils::Exception::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Exception::VERSION = '113.0.0';
 use strict;
 use warnings;
 

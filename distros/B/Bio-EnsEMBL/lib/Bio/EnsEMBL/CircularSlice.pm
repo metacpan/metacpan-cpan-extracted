@@ -66,7 +66,7 @@ retrieve sequence or features from an area of interest.
 =cut
 
 package Bio::EnsEMBL::CircularSlice;
-$Bio::EnsEMBL::CircularSlice::VERSION = '112.0.0';
+$Bio::EnsEMBL::CircularSlice::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

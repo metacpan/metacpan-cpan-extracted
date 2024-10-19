@@ -6,7 +6,7 @@ use Carp;
 use base qw( Exporter );
 use File::Spec;
 
-our $VERSION   = '0.25'; # see RT #43388
+our $VERSION   = '0.27'; # see RT #43388
 our @EXPORT_OK = qw( cpan_authors cpan_packages );
 
 my $CPANFiles = {};

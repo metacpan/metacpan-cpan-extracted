@@ -66,7 +66,7 @@ resources:
   bugtracker: https://github.com/Ensembl/ensembl/issues
   homepage: http://www.ensembl.org
   repository: git://github.com/Ensembl/ensembl.git
-version: 112.0.0
-x_generated_by_perl: v5.38.2
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: 113.0.0
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Apache-2.0

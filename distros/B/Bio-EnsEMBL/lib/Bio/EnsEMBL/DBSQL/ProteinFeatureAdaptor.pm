@@ -54,7 +54,7 @@ Bio::EnsEMBL::DBSQL::ProteinFeatureAdaptor
 =cut
 
 package Bio::EnsEMBL::DBSQL::ProteinFeatureAdaptor;
-$Bio::EnsEMBL::DBSQL::ProteinFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::ProteinFeatureAdaptor::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;

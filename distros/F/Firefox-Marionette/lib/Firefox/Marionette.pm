@@ -73,7 +73,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.60';
+our $VERSION = '1.61';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -1016,6 +1016,19 @@ sub downloads {
     my ( $self, $download_directory ) = @_;
     $download_directory ||= $self->_download_directory();
     return $self->_directory_listing( {}, $download_directory );
+}
+
+sub resolve_override {
+    my ( $self, $host_name, $ip_address ) = @_;
+    my $old    = $self->_context('chrome');
+    my $result = $self->script(
+        $self->_compress_script(
+            <<'_JS_'), args => [ $host_name, $ip_address ] );
+const override = Components.classes["@mozilla.org/network/native-dns-override;1"].getService(Components.interfaces.nsINativeDNSResolverOverride);
+override.addIPOverride(arguments[0], arguments[1]);
+_JS_
+    $self->_context($old);
+    return $self;
 }
 
 sub resolve {
@@ -2036,14 +2049,17 @@ let bookmarkStatus = (async function(bookmarkArguments) {
         );
       }
     } else {
-      let iconResult = placesUtils.PlacesUtils.favicons.setAndFetchFaviconForPage(
-        url,
-        rIconUrl,
-        true,
-        placesUtils.PlacesUtils.favicons.FAVICON_LOAD_NON_PRIVATE,
-        null,
-        Services.scriptSecurityManager.getSystemPrincipal()
-      );
+      if (placesUtils.PlacesUtils.favicons.setFaviconForPage) {
+      } else if (placesUtils.PlacesUtils.favicons.setAndFetchFaviconForPage) {
+        let iconResult = placesUtils.PlacesUtils.favicons.setAndFetchFaviconForPage(
+          url,
+          rIconUrl,
+          true,
+          placesUtils.PlacesUtils.favicons.FAVICON_LOAD_NON_PRIVATE,
+          null,
+          Services.scriptSecurityManager.getSystemPrincipal()
+        );
+      }
     }
   }
   return bookmark;
@@ -4191,7 +4207,7 @@ _JS_
     $self->_context($old);
     my @certificates;
     foreach my $certificate ( @{$certificates} ) {
-        push @certificates, Firefox::Marionette::Certificate->new($certificate);
+        push @certificates, Firefox::Marionette::Certificate->new(%{$certificate});
     }
     return @certificates;
 }
@@ -12259,7 +12275,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.60
+Version 1.61
 
 =head1 SYNOPSIS
 
@@ -14383,6 +14399,27 @@ accepts a hostname as an argument and resolves it to a list of matching IP addre
        say "$hostname resolves to $ip_address;
     }
 
+
+=head2 resolve_override
+
+accepts a hostname and an IP address as parameters.  This method then forces the browser to override any future DNS requests for the supplied hostname.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new();
+    my $hostname = 'metacpan.org';
+    my $ip_address = '127.0.0.1';
+    foreach my $result ($firefox->resolve_override($hostname, $ip_address)->resolve($hostname)) {
+       if ($result eq $ip_address) {
+         warn "local metacpan time?";
+       } else {
+         die "This should not happen";
+       }
+    }
+    $firefox->go('https://metacpan.org'); # this tries to contact a webserver on 127.0.0.1
+
+This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 restart
 

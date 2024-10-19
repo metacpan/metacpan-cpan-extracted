@@ -196,7 +196,10 @@ sub compare_and_rank {
     # nsort does not yield same results as canonical from JSON::XS
     # NB: we're sorting here and in create_binary_digit_string()
     my @sort_keys_glob_hash = sort keys %{$glob_hash};
-    my @labels = map { exists $nomenclature{$_} ? $nomenclature{$_} : $_ }
+
+    # Creating @labels array from {id,label}, or guess_label()
+    my @labels =
+      map { exists $nomenclature{$_} ? $nomenclature{$_} : guess_label($_) }
       @sort_keys_glob_hash;
 
     # Die if #elements in arrays differ
@@ -460,8 +463,9 @@ sub create_glob_and_ref_hashes {
 
         # For consistency, we obtain the primary_key for both BFF/PXF
         # from $_->{id} (not from subject.id)
-        my $id = $element->{$primary_key} 
-           or die "Sorry but the JSON document [$count] does not have the primary_key <$primary_key> defined\n";
+        my $id = $element->{$primary_key}
+          or die
+"Sorry but the JSON document [$count] does not have the primary_key <$primary_key> defined\n";
 
         # Remapping hash
         say "Flattening and remapping <id:$id> ..." if $self->{verbose};
@@ -945,6 +949,24 @@ sub prune_keys_with_weight_zero {
         # Delete the key if its value is 0
         delete $hash_ref->{$key} if $hash_ref->{$key} == 0;
     }
+}
+
+sub guess_label {
+
+    my $input_string = shift;
+
+    if (
+        $input_string =~ /\.      # Match a literal dot
+                       ([^\.]+)  # Match and capture everything except a dot
+                       $        # Anchor to the end of the string
+                      /x
+      )
+    {
+        return $1;
+    }
+
+    # If no dot is found, return the original string
+    return $input_string;
 }
 
 1;

@@ -52,7 +52,7 @@ It represents an Ensembl transcript that has a matching RefSeq equivalent
 use strict;
 
 package Bio::EnsEMBL::MANE;
-$Bio::EnsEMBL::MANE::VERSION = '112.0.0';
+$Bio::EnsEMBL::MANE::VERSION = '113.0.0';
 use vars qw(@ISA);
 
 use Bio::EnsEMBL::Feature;

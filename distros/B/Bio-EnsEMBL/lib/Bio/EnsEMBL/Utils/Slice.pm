@@ -51,7 +51,7 @@ Bio::EnsEMBL::Utils::Slice - Utility functions for slices
 
 
 package Bio::EnsEMBL::Utils::Slice;
-$Bio::EnsEMBL::Utils::Slice::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Slice::VERSION = '113.0.0';
 use strict;
 use warnings;
 

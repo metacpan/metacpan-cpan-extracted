@@ -13,8 +13,10 @@ my $view = Minima::View::HTML->new(app => $app);
 
 my $dir = Path::Tiny->tempdir;
 chdir $dir;
-my $t_home = $dir->child('home.tt');
+my $t_home = $dir->child('home.ht');
 $t_home->spew('h');
+my $t_about = $dir->child('about.tt');
+$t_about->spew('t');
 
 # Basic template check
 like(
@@ -33,9 +35,15 @@ like(
 
 $view->set_template('home');
 is( $view->render, 'h', 'renders properly' );
-pass( 'automatically adds .tt extension' );
+pass( 'automatically adds .ht extension' );
+
+$config->{template_ext} = 'tt';
+$view->set_template('about');
+is( $view->render, 't', 'adds custom template extension' );
+delete $config->{template_ext};
 
 # Data
+$view->set_template('home');
 $t_home->spew('[% d %]');
 is( $view->render({ d => 'secret' }), 'secret', 'passes data' );
 
@@ -63,7 +71,7 @@ is( $view->render, 'a b', 'outputs proper class set' );
 # Includes
 $t_home->spew('@');
 my $i = 0;
-$dir->child("$_.tt")->spew(++$i) for qw/ pre1 pre2 post1 post2 /;
+$dir->child("$_.ht")->spew(++$i) for qw/ pre1 pre2 post1 post2 /;
 $view->add_pre('pre1');
 $view->add_pre('pre2');
 $view->add_post('post1');

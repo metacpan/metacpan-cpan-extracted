@@ -84,7 +84,7 @@ Also see B<Bio::EnsEMBL::Attribute>
 =cut
 
 package Bio::EnsEMBL::SeqEdit;
-$Bio::EnsEMBL::SeqEdit::VERSION = '112.0.0';
+$Bio::EnsEMBL::SeqEdit::VERSION = '113.0.0';
 use strict;
 use warnings;
 

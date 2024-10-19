@@ -44,7 +44,7 @@ the target region is in a deletion.
 =cut
 
 package Bio::EnsEMBL::Mapper::IndelCoordinate;
-$Bio::EnsEMBL::Mapper::IndelCoordinate::VERSION = '112.0.0';
+$Bio::EnsEMBL::Mapper::IndelCoordinate::VERSION = '113.0.0';
 use Bio::EnsEMBL::Mapper::Gap;
 use Bio::EnsEMBL::Mapper::Coordinate;
 

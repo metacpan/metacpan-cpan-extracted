@@ -7,7 +7,7 @@ use JSON::PP ();
 
 my $ua;
 
-sub _uri { "http://api.cpanauthors.org/kwalitee/" . shift }
+sub _uri { "https://api.cpanauthors.org/kwalitee/" . shift }
 
 sub _ua {
   my $class = shift;

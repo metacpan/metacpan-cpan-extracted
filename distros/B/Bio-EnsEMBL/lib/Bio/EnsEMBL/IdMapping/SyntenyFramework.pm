@@ -76,7 +76,7 @@ therefor has built-in support to run the process in parallel via LSF.
 =cut
 
 package Bio::EnsEMBL::IdMapping::SyntenyFramework;
-$Bio::EnsEMBL::IdMapping::SyntenyFramework::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::SyntenyFramework::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

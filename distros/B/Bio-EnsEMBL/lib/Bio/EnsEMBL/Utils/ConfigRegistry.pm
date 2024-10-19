@@ -48,7 +48,7 @@ of database that is being loaded.
 =cut
 
 package Bio::EnsEMBL::Utils::ConfigRegistry;
-$Bio::EnsEMBL::Utils::ConfigRegistry::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::ConfigRegistry::VERSION = '113.0.0';
 use strict;
 use warnings;
 

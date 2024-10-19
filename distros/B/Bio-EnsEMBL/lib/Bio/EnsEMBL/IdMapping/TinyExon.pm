@@ -81,7 +81,7 @@ design.
 
 
 package Bio::EnsEMBL::IdMapping::TinyExon;
-$Bio::EnsEMBL::IdMapping::TinyExon::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::TinyExon::VERSION = '113.0.0';
 # internal data structure (array indices):
 #
 #  0-4 see TinyFeature

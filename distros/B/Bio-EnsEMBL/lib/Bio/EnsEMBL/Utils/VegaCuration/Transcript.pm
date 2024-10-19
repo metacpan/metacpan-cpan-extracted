@@ -39,7 +39,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::Utils::VegaCuration::Transcript;
-$Bio::EnsEMBL::Utils::VegaCuration::Transcript::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::VegaCuration::Transcript::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

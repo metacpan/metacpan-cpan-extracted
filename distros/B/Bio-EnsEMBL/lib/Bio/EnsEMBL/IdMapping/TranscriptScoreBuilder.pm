@@ -44,7 +44,7 @@ Java application.
 =cut
 
 package Bio::EnsEMBL::IdMapping::TranscriptScoreBuilder;
-$Bio::EnsEMBL::IdMapping::TranscriptScoreBuilder::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::TranscriptScoreBuilder::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';
@@ -330,6 +330,7 @@ sub score_matrix_from_flag_matrix {
           my $source_transcript_biotype_group = $self->get_biotype_group($source_transcript->biotype());
           my $target_transcript_biotype_group = $self->get_biotype_group($target_transcript->biotype());
 
+=cut
           # debug
           $self->logger->info($source_transcript->id.":".$target_transcript->id.
             " source score: $source_transcript_score".
@@ -340,7 +341,8 @@ sub score_matrix_from_flag_matrix {
             " target biotype:" . $target_transcript->biotype() .
             " target group: $target_transcript_biotype_group".
             " target length: $target_transcript_length\n");
-
+=cut
+          
           my $transcript_score =
             ($source_transcript_score + $target_transcript_score) /
             ($source_transcript_length + $target_transcript_length);

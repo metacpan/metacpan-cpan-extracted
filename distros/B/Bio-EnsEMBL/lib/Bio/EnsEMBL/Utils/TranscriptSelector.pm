@@ -57,7 +57,7 @@ Bio::EnsEMBL::Utils::TranscriptSelector - Finds canonical transcripts
 =cut
 
 package Bio::EnsEMBL::Utils::TranscriptSelector;
-$Bio::EnsEMBL::Utils::TranscriptSelector::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::TranscriptSelector::VERSION = '113.0.0';
 use strict;
 use warnings;
 use Bio::EnsEMBL::Utils::Exception;

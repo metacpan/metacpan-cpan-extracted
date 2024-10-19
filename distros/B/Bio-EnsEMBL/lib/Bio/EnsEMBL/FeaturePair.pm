@@ -86,7 +86,7 @@ represented by the hstart, hend, hstrand attributes.
 =cut
 
 package Bio::EnsEMBL::FeaturePair;
-$Bio::EnsEMBL::FeaturePair::VERSION = '112.0.0';
+$Bio::EnsEMBL::FeaturePair::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

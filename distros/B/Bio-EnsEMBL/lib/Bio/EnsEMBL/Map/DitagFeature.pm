@@ -62,7 +62,7 @@ e.g. which only have a 5\'tag ("F").
 =cut
 
 package Bio::EnsEMBL::Map::DitagFeature;
-$Bio::EnsEMBL::Map::DitagFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::Map::DitagFeature::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 

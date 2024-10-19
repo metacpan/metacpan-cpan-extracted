@@ -52,7 +52,7 @@ database meta information
 =cut
 
 package Bio::EnsEMBL::DBSQL::MetaContainer;
-$Bio::EnsEMBL::DBSQL::MetaContainer::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::MetaContainer::VERSION = '113.0.0';
 use strict;
 use warnings;
 

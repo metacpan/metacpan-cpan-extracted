@@ -66,7 +66,7 @@ my %WriteMakefileArgs = (
     "vars" => 0,
     "warnings" => 0
   },
-  "VERSION" => "112.0.0",
+  "VERSION" => "113.0.0",
   "test" => {
     "TESTS" => ""
   }

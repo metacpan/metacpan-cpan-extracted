@@ -57,7 +57,7 @@ Bio::EnsEMBL::Utils::ConversionSupport
 =cut
 
 package Bio::EnsEMBL::Utils::SchemaConversion;
-$Bio::EnsEMBL::Utils::SchemaConversion::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::SchemaConversion::VERSION = '113.0.0';
 use strict;
 use warnings;
 

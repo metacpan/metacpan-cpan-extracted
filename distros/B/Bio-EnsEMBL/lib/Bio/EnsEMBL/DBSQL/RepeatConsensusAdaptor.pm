@@ -51,7 +51,7 @@ objects.
 =cut
 
 package Bio::EnsEMBL::DBSQL::RepeatConsensusAdaptor;
-$Bio::EnsEMBL::DBSQL::RepeatConsensusAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::RepeatConsensusAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;

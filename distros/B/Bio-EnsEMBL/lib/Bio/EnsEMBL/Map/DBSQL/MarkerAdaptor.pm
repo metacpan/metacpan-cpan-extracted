@@ -43,7 +43,7 @@ Provides database interaction for the Bio::EnsEMBL::Map::Marker object
 =cut
 
 package Bio::EnsEMBL::Map::DBSQL::MarkerAdaptor;
-$Bio::EnsEMBL::Map::DBSQL::MarkerAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::Map::DBSQL::MarkerAdaptor::VERSION = '113.0.0';
 use strict;
 
 use vars ('@ISA');

@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Directory;
-$Storage::Abstract::Driver::Directory::VERSION = '0.003';
+$Storage::Abstract::Driver::Directory::VERSION = '0.005';
 use v5.14;
 use warnings;
 
@@ -23,8 +23,28 @@ use constant CURDIR_STR => File::Spec->curdir;
 use constant DIRSEP_STR => File::Spec->catfile('', '');
 
 has param 'directory' => (
-	isa => SimpleStr->where(q{-d}),
+	isa => SimpleStr,
 );
+
+has param 'create_directory' => (
+	isa => Bool,
+	default => !!0,
+);
+
+with 'Storage::Abstract::Role::Driver';
+
+sub BUILD
+{
+	my ($self) = @_;
+
+	my $directory = $self->directory;
+	if ($self->create_directory) {
+		make_path($directory);
+	}
+
+	die "directory $directory does not exist"
+		unless -d $directory;
+}
 
 sub get_list
 {
@@ -151,4 +171,9 @@ contain any OS-specific syntax in them, an exception will be thrown.
 B<Required> - A string path to a directory which will serve as root. The
 directory must already exist when the object is built. This should be in format
 specific to the filesystem.
+
+=head3 create_directory
+
+Whether the directory should be created. If true, will create the entire path
+with default permissions on object construction.
 

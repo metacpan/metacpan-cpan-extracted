@@ -60,7 +60,7 @@ display_label and score attributes.
 use strict;
 
 package Bio::EnsEMBL::SimpleFeature;
-$Bio::EnsEMBL::SimpleFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::SimpleFeature::VERSION = '113.0.0';
 use vars qw(@ISA);
 
 use Bio::EnsEMBL::Feature;

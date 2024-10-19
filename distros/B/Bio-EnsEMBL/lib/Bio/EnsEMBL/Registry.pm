@@ -1,16 +1,32 @@
-# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
-# Copyright [2016-2024] EMBL-European Bioinformatics Institute
+=head1 LICENSE
 
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# http://www.apache.org/licenses/LICENSE-2.0
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016-2024] EMBL-European Bioinformatics Institute
 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut
+
+
+=head1 CONTACT
+
+  Please email comments or questions to the public Ensembl
+  developers list at <http://lists.ensembl.org/mailman/listinfo/dev>.
+
+  Questions may also be sent to the Ensembl help desk at
+  <http://www.ensembl.org/Help/Contact>.
+
+=cut
 
 =head1 NAME
 
@@ -113,7 +129,7 @@ These are accessed by the get_adaptor subroutine i.e.
 
 
 package Bio::EnsEMBL::Registry;
-$Bio::EnsEMBL::Registry::VERSION = '112.0.0';
+$Bio::EnsEMBL::Registry::VERSION = '113.0.0';
 use strict;
 use warnings;
 
@@ -229,7 +245,7 @@ sub load_all {
     $verbose  ||= 0;
     $no_clear ||= 0;
     $no_cache ||= 0;
-
+    
     my $original_count = $class->get_DBAdaptor_count();
 
     if ( !defined($config_file) ) {
@@ -390,14 +406,14 @@ sub load_all {
               # To make the web code avoid doing this again we delete first
               delete $INC{$config_file};
             }
-
+            
             #Now raise the exception just in case something above is 
             #catching this
             if ($@ or (!$test_eval)) { die($@) }
 
         }
     } ## end else [ if ( !defined($config_file...
-
+    
     my $count = $class->get_DBAdaptor_count() - $original_count;
     return $count >= 0 ? $count : 0; 
 } ## end sub load_all
@@ -415,7 +431,7 @@ sub load_all {
 
 sub clear{
   my ($self);
-
+  
   foreach my $dba (@{$registry_register{'_DBA'}}){
     if($dba->dbc->connected){
       $dba->dbc->db_handle->disconnect();
@@ -990,7 +1006,7 @@ sub add_adaptor {
 
 sub add_switchable_adaptor {
   my ($class, $species, $group, $adaptor_type, $instance, $override) = @_;
-
+  
   my $ispecies = $class->get_alias($species);
   throw "Cannot decode given species ${species} to an internal registry name" if ! $species;
   throw "No group given" if ! $group;
@@ -1029,7 +1045,7 @@ sub add_switchable_adaptor {
 
 sub has_switchable_adaptor {
   my ($class, $species, $group, $adaptor_type) = @_;
-
+  
   my $ispecies = $class->get_alias($species);
   throw "Cannot decode given species ${species} to an internal registry name" if ! $species;
   throw "No group given" if ! $group;
@@ -1097,13 +1113,13 @@ sub get_adaptor {
     throw("Can not find internal name for species '$species'");
   }
   else { $species = $ispecies }
-
+  
   throw 'No adaptor group given' if ! defined $group;
   throw 'No adaptor type given' if ! defined $type;
 
   $group = lc($group);
   my $lc_type = lc($type);
-
+  
 
   if($type =~ /Adaptor$/i) {
     warning("Detected additional Adaptor string in given the type '$type'. Removing it to avoid possible issues. Alter your type to stop this message");
@@ -1437,14 +1453,14 @@ sub disconnect_all {
   return;
 }
 
-=head2 get_DBAdaptor_count
+=head get_DBAdaptor_count
 
   Example     : Bio::EnsEMBL::Registry->get_DBAdaptor_count();
   Description : Returns the count of database adaptors currently held by 
                 the registry
   Returntype  : Int count of database adaptors currently known
   Exceptions  : None
-
+ 
 =cut
 
 sub get_DBAdaptor_count {
@@ -1512,15 +1528,15 @@ sub change_access{
 
   Example : load_registry_from_url(
             'mysql://anonymous@ensembldb.ensembl.org:3306');
-
+            
             load_registry_from_url(
             'mysql://anonymous@ensembldb.ensembl.org:3306/homo_sapiens_core_65_37?group=core&species=homo_sapiens'
             );
-
+            
             load_registry_from_url(
             'mysql://anonymous@ensembldb.ensembl.org:3306/homo_sapiens_core_65_37?group=core'
             );
-
+            
 
   Description: Will load the correct versions of the ensembl
                databases for the software release it can find on
@@ -1531,12 +1547,12 @@ sub change_access{
                by adding a slash and the version number but your
                script may crash as the API version won't match the
                DB version.
-
+               
                You can also specify a database name which will cause the 
                loading of a single DBAdaptor instance. Parameters are
                mapped from a normal URL parameter set to their DBAdaptor
                equivalent. Group must be defined.
-
+               
   Returntype : Int count of the DBAdaptor instances which can be found in the 
                registry
 
@@ -1544,12 +1560,12 @@ sub change_access{
                scheme and if the specified database cannot be connected to 
                (see L<load_registry_from_db> for more information)
   Status     : Stable
-
+ 
 =cut
 
 sub load_registry_from_url {
   my ( $self, $url, $verbose, $no_cache ) = @_;
-
+  
   if ( $url =~ /^mysql\:\/\/([^\@]+\@)?([^\:\/]+)(\:\d+)?(\/\d+)?\/?$/x ) {
     my $user_pass = $1;
     my $host      = $2;
@@ -1748,7 +1764,7 @@ sub load_registry_from_db {
   }
 
   $wait_timeout ||= 0;
-
+  
   my $original_count = $self->get_DBAdaptor_count();
 
   my $err_pattern = 'Cannot %s to the Ensembl MySQL server at %s:%d; check your settings & DBI error message: %s';
@@ -1757,7 +1773,7 @@ sub load_registry_from_db {
             throw(sprintf($err_pattern, 'connect', $host, $port, $DBI::errstr));
   $dbh->ping() or 
             throw(sprintf($err_pattern, 'ping', $host, $port, $DBI::errstr));
-
+  
   my $res = $dbh->selectall_arrayref('SHOW DATABASES');
   my @dbnames = map { $_->[0] } @$res;
 
@@ -1891,7 +1907,7 @@ sub load_registry_from_db {
         # Skip multi-species databases.
         next;
       }
-
+    
 
       my ( $prefix, $species, $num ) =
         ( $database =~ /(^$db_prefix)([a-z]+_[a-z0-9]+(?:_[a-z0-9]+)?)  # species name
@@ -1937,12 +1953,12 @@ sub load_registry_from_db {
           "SELECT species_id, meta_value FROM %s.meta "
             . "WHERE meta_key = 'species.db_name'",
           $dbh->quote_identifier($multidb) ) );
-
+  
       $sth->execute();
-
+  
       my ( $species_id, $species );
       $sth->bind_columns( \( $species_id, $species ) );
-
+  
       while ( $sth->fetch() ) {
         my $dba = Bio::EnsEMBL::DBSQL::DBAdaptor->new(
           -group           => "core",
@@ -1957,7 +1973,7 @@ sub load_registry_from_db {
           -wait_timeout    => $wait_timeout,
           -no_cache        => $no_cache
         );
-
+  
         if ($verbose) {
           printf( "Species '%s' (id:%d) loaded from database '%s'\n",
             $species, $species_id, $multidb );
@@ -1979,7 +1995,7 @@ sub load_registry_from_db {
         # Skip multi-species databases.
         next;
       }
-
+  
       my ($species) = ( $userupload_db =~ /(^.+)_userdata$/ );
       my $dba =
         Bio::EnsEMBL::DBSQL::DBAdaptor->new(
@@ -1992,7 +2008,7 @@ sub load_registry_from_db {
                                            -wait_timeout => $wait_timeout,
                                            -dbname   => $userupload_db,
                                            -no_cache => $no_cache );
-
+  
       if ($verbose) {
         printf( "%s loaded\n", $userupload_db );
       }
@@ -2009,12 +2025,12 @@ sub load_registry_from_db {
           "SELECT species_id, meta_value FROM %s.meta "
             . "WHERE meta_key = 'species.db_name'",
           $dbh->quote_identifier($multidb) ) );
-
+  
       $sth->execute();
-
+  
       my ( $species_id, $species );
       $sth->bind_columns( \( $species_id, $species ) );
-
+  
       while ( $sth->fetch() ) {
         my $dba = Bio::EnsEMBL::DBSQL::DBAdaptor->new(
           -group           => "userupload",
@@ -2029,7 +2045,7 @@ sub load_registry_from_db {
           -wait_timeout    => $wait_timeout,
           -no_cache        => $no_cache
         );
-
+  
         if ($verbose) {
           printf( "Species '%s' (id:%d) loaded from database '%s'\n",
             $species, $species_id, $multidb );
@@ -2058,7 +2074,7 @@ sub load_registry_from_db {
     }
 
     for my $variation_db (@variation_dbs) {
-
+	
       if ( index( $variation_db, 'collection' ) != -1 ) {
 	  # Skip multi-species databases.
 	  next;
@@ -2094,12 +2110,12 @@ sub load_registry_from_db {
             $dbh->quote_identifier($multidb) )
              . "WHERE meta_key = 'species.db_name'"
         );
-
+  
         $sth->execute();
-
+  
         my ( $species_id, $species );
         $sth->bind_columns( \( $species_id, $species ) );
-
+  
         while ( $sth->fetch() ) {
           my $dba = Bio::EnsEMBL::Variation::DBSQL::DBAdaptor->new(
             -group           => 'variation',
@@ -2114,7 +2130,7 @@ sub load_registry_from_db {
             -wait_timeout    => $wait_timeout,
             -no_cache        => $no_cache
           );
-
+  
           if ($verbose) {
             printf( "Species '%s' (id:%d) loaded from database '%s'\n",
               $species, $species_id, $multidb );
@@ -2135,7 +2151,7 @@ sub load_registry_from_db {
   } else {
     my @funcgen_dbs =
       grep { /^[a-z]+_[a-z0-9]+(?:_[a-z0-9]+)?_funcgen_(?:\d+_)?\d+_/ } @dbnames;
-
+      
     if(! @funcgen_dbs && $verbose) {
       print("No funcgen databases found\n");
     }
@@ -2176,12 +2192,12 @@ sub load_registry_from_db {
             $dbh->quote_identifier($multidb) )
             . "WHERE meta_key = 'species.db_name'"
         );
-
+  
         $sth->execute();
-
+  
         my ( $species_id, $species );
         $sth->bind_columns( \( $species_id, $species ) );
-
+  
         while ( $sth->fetch() ) {
           my $dba = Bio::EnsEMBL::Funcgen::DBSQL::DBAdaptor->new(
             -group           => 'funcgen',
@@ -2196,7 +2212,7 @@ sub load_registry_from_db {
             -wait_timeout    => $wait_timeout,
             -no_cache        => $no_cache
           );
-
+  
           if ($verbose) {
             printf( "Species '%s' (id:%d) loaded from database '%s'\n",
               $species, $species_id, $multidb );
@@ -2230,12 +2246,12 @@ sub load_registry_from_db {
           # registered as 'pan_homology', ensembl_compara_53 is
           # registered as 'multi', and the alias 'compara' still
           # operates.
-
+  
           my ($species) =
             $compara_db =~ /^ensembl_compara_(\w+)(?:_\d+){2}$/xm;
-
+  
           $species ||= 'multi';
-
+  
           my $dba = Bio::EnsEMBL::Compara::DBSQL::DBAdaptor->new(
             -group        => 'compara',
             -species      => $species.$species_suffix,
@@ -2247,7 +2263,7 @@ sub load_registry_from_db {
             -dbname       => $compara_db,
             -no_cache     => $no_cache
           );
-
+  
           if ($verbose) {
             printf( "%s loaded\n", $compara_db );
           }
@@ -2333,7 +2349,7 @@ sub load_registry_from_db {
   # Taxonomy
 
   if ( ( defined $taxonomy_db ) || ( defined $taxonomy_db_versioned ) ) {
-
+     
     my $has_taxonomy = eval {require Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyDBAdaptor};
     if($@ or (!defined $has_taxonomy)) {
         if($verbose) {
@@ -2367,11 +2383,11 @@ sub load_registry_from_db {
   elsif ($verbose) {
     print("No taxonomy database found\n");
   }
-
+  
   # ensembl_metadata
 
   if ( ( defined $ensembl_metadata_db ) || ( defined $ensembl_metadata_db_versioned ) ) {
-
+     
     my $has_metadata = eval {require Bio::EnsEMBL::MetaData::DBSQL::MetaDataDBAdaptor};
     if($@ or (!defined $has_metadata)) {
         if($verbose) {
@@ -2473,7 +2489,7 @@ sub load_registry_from_db {
                                '-species_suffix' => $species_suffix );
 
   $dbh->disconnect();
-
+  
   my $count = $self->get_DBAdaptor_count() - $original_count;
   return $count >= 0 ? $count : 0; 
 
@@ -2546,7 +2562,7 @@ sub find_and_add_aliases {
 
   my ($adaptor, $group, $dbh, $species_suffix ) =
     rearrange( [ 'ADAPTOR', 'GROUP', 'HANDLE', 'SPECIES_SUFFIX' ], @_ );
-
+  
   #Can be undef; needs to be something to avoid warnings
   $species_suffix ||=  q{};
 
@@ -2571,7 +2587,7 @@ sub find_and_add_aliases {
   } else {
     @dbas = @{ $class->get_all_DBAdaptors( '-GROUP' => $group ) };
   }
-
+  
   my $aliases_for_dbc = {};
 
   foreach my $dba (@dbas) {
@@ -2579,7 +2595,7 @@ sub find_and_add_aliases {
     my $species = $dba->species();
 
     if ( defined($dbh) ) {
-
+    	
     	my $dbname = $dba->dbc()->dbname();
 
           if (!defined $aliases_for_dbc->{$dbname}) {
@@ -2726,7 +2742,7 @@ sub load_registry_from_multiple_dbs {
   }
 
   %registry_register = %merged_register;
-
+  
   my $count = $self->get_DBAdaptor_count() - $original_count;
   return $count >= 0 ? $count : 0; 
 } ## end sub load_registry_from_multiple_dbs
@@ -2794,7 +2810,7 @@ sub default_track {
   Exceptions : none
   Called by  : UserConfig.pm
   Status     : At Risk.
-
+  
 =cut
 
 sub add_new_tracks{
@@ -2821,16 +2837,16 @@ sub add_new_tracks{
 }
 
 =head2 no_version_check
-
+  
   getter/setter for whether to run the version checking
-
+  
   Arg[0]     : (optional) int
   Returntype : int or undef if not set
   Exceptions : none
   Status     : At Risk.
 
 =cut
-
+  
 sub no_version_check {
   my ( $self, $arg ) = @_;
   ( defined $arg )
@@ -2857,19 +2873,19 @@ sub no_cache_warnings {
   return $Bio::EnsEMBL::DBSQL::BaseFeatureAdaptor::SILENCE_CACHE_WARNINGS;
 }
 
-
+  
 =head2 version_check
-
+  
   run the database/API code version check for a DBAdaptor
-
+  
   Arg[0]     : DBAdaptor to check
   Returntype : int 1 if okay, 0 if not the same 
   Exceptions : none
   Status     : At Risk.
 
 =cut
-
-
+  
+  
 sub version_check {
   my ( $self, $dba ) = @_;
 
@@ -2963,7 +2979,7 @@ sub version_check {
                the list to apply to non-core database types.
   Example    : my @species_names = @{ $reg->get_all_species() };
   Returntype : Listref of species names
-
+  
 =cut
 
 sub get_all_species {
@@ -2998,7 +3014,7 @@ sub get_all_species {
 
   Arg [4]    :  String known_db_type (optional)
                 The database type, if known
-
+                
   Example    :  my $stable_id = 'ENST00000326632';
 
                 my ( $species, $object_type, $db_type ) =
@@ -3063,7 +3079,7 @@ my %stable_id_stmts = (
                       . 'JOIN %1$s.meta m USING (species_id) '
                       . 'WHERE stable_id = ? '
                       . 'AND m.meta_key = "species.production_name"',
-
+ 
 );
 
 my %compara_stable_id_stmts = (
@@ -3089,9 +3105,9 @@ sub get_species_and_object_type {
         return;
       }
     }
-
+       
     $known_db_type = 'core' if ! $known_db_type;
-
+      
     my %get_adaptors_args = ('-GROUP' => $known_db_type);
 	  $get_adaptors_args{'-species'} = $known_species if $known_species; 
 
@@ -3099,7 +3115,7 @@ sub get_species_and_object_type {
       sort { $a->dbc->host cmp $b->dbc->host || $a->dbc->port <=> $b->dbc->port } 
       grep { $_->dbc->dbname !~ m{ \A ensembl_metadata | ncbi_taxonomy }msx }
       @{$self->get_all_DBAdaptors(%get_adaptors_args)};    
-
+    
     foreach my $dba (@dbas) {
       my @results;
       my $dba_adaptor_type = $group2adaptor{$dba->group()};
@@ -3112,7 +3128,7 @@ sub get_species_and_object_type {
       return @results if scalar(@results) > 0;
     } ## end foreach my $dba ( sort { $a...})
   }
-
+  
   return;
 } ## end sub get_species_and_object_type
 

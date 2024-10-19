@@ -52,7 +52,7 @@ my $transcripts = $truncated_gene->get_all_Transcripts();
 =cut
 
 package Bio::EnsEMBL::SubSlicedFeature;
-$Bio::EnsEMBL::SubSlicedFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::SubSlicedFeature::VERSION = '113.0.0';
 use strict;
 use warnings;
 

@@ -1,5 +1,5 @@
 package Storage::Abstract;
-$Storage::Abstract::VERSION = '0.003';
+$Storage::Abstract::VERSION = '0.005';
 use v5.14;
 use warnings;
 
@@ -166,7 +166,7 @@ use them all in sequence until it finds a file.
 
 =item * L<Storage::Abstract::Driver::Subpath>
 
-This metadriver is useful when you want to have a modify the base path of
+This metadriver is useful when you want to modify the base path of
 another storage, to restrict access or adapt a path (for example for HTTP
 public directory).
 
@@ -349,6 +349,9 @@ exception on L</store> and L</dispose>.
 	$obj->set_readonly($bool)
 
 Sets the readonly status of the storage to a new value.
+
+This method does not work and throws an exception for metadrivers using
+multiple sources of storage, like L<Storage::Abstract::Driver::Composite>.
 
 =head1 AUTHOR
 

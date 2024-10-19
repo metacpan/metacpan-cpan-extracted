@@ -55,7 +55,7 @@ object
 =cut
 
 package Bio::EnsEMBL::Map::DBSQL::DitagFeatureAdaptor;
-$Bio::EnsEMBL::Map::DBSQL::DitagFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::Map::DBSQL::DitagFeatureAdaptor::VERSION = '113.0.0';
 use strict;
 use vars ('@ISA');
 

@@ -52,7 +52,7 @@ transcript objects.
 =cut
 
 package Bio::EnsEMBL::DBSQL::OperonTranscriptAdaptor;
-$Bio::EnsEMBL::DBSQL::OperonTranscriptAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::OperonTranscriptAdaptor::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Utils::Exception qw( throw warning );

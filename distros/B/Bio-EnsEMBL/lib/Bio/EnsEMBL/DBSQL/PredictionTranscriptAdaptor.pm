@@ -51,7 +51,7 @@ Performs database interaction related to PredictionTranscripts
 =cut
 
 package Bio::EnsEMBL::DBSQL::PredictionTranscriptAdaptor;
-$Bio::EnsEMBL::DBSQL::PredictionTranscriptAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::PredictionTranscriptAdaptor::VERSION = '113.0.0';
 use vars qw( @ISA );
 use strict;
 

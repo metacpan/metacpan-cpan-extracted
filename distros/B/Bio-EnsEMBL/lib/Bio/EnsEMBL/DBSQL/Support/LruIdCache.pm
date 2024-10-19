@@ -54,7 +54,7 @@ http://en.wikipedia.org/wiki/Cache_algorithms#Least_Recently_Used
 =cut
 
 package Bio::EnsEMBL::DBSQL::Support::LruIdCache;
-$Bio::EnsEMBL::DBSQL::Support::LruIdCache::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::Support::LruIdCache::VERSION = '113.0.0';
 use strict;
 use warnings;
 use base qw/Bio::EnsEMBL::DBSQL::Support::BaseCache/;

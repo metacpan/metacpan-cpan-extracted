@@ -45,7 +45,7 @@ Bio::EnsEMBL::Utils::Converter::bio_ens_featurePair
 =cut
 
 package Bio::EnsEMBL::Utils::Converter::bio_ens_featurePair;
-$Bio::EnsEMBL::Utils::Converter::bio_ens_featurePair::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Converter::bio_ens_featurePair::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 

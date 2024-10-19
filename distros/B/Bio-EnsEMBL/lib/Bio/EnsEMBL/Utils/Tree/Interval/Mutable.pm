@@ -63,7 +63,7 @@ case; it falls back to the PP implementation otherwise.
 =cut
 
 package Bio::EnsEMBL::Utils::Tree::Interval::Mutable;
-$Bio::EnsEMBL::Utils::Tree::Interval::Mutable::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Tree::Interval::Mutable::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Utils::Scalar qw(assert_ref);

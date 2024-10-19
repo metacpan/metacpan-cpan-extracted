@@ -1,5 +1,8 @@
 Revision history for WorePAN
 
+0.18 2024/10/19
+  - use secure transport
+
 0.17 2017/04/22
   - tweak self-made whois index to include has_cpandir
 

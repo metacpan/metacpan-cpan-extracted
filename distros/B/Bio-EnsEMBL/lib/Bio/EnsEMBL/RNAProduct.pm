@@ -58,7 +58,7 @@ commonly play a role in gene expression.
 
 
 package Bio::EnsEMBL::RNAProduct;
-$Bio::EnsEMBL::RNAProduct::VERSION = '112.0.0';
+$Bio::EnsEMBL::RNAProduct::VERSION = '113.0.0';
 use vars qw($AUTOLOAD);
 use strict;
 use warnings;

@@ -26,7 +26,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::IdMapping::StableIdGenerator::PristionchusPacificus;
-$Bio::EnsEMBL::IdMapping::StableIdGenerator::PristionchusPacificus::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::StableIdGenerator::PristionchusPacificus::VERSION = '113.0.0';
 # Class to generate WormBase conform Pristionchus IDs to be injected into the mapper
 
 use strict;

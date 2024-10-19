@@ -62,7 +62,7 @@ protein_align_feature table as the following cigar line:
 =cut
 
 package Bio::EnsEMBL::Utils::Converter::bio_ens_hit;
-$Bio::EnsEMBL::Utils::Converter::bio_ens_hit::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Converter::bio_ens_hit::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 use Bio::EnsEMBL::Utils::Converter::bio_ens;

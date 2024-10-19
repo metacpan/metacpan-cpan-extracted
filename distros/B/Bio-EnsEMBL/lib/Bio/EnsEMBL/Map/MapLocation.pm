@@ -45,7 +45,7 @@ etc.
 
 
 package Bio::EnsEMBL::Map::MapLocation;
-$Bio::EnsEMBL::Map::MapLocation::VERSION = '112.0.0';
+$Bio::EnsEMBL::Map::MapLocation::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 

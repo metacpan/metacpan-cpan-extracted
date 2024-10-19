@@ -46,7 +46,7 @@ supporting features from the database.
 =cut
 
 package Bio::EnsEMBL::DBSQL::TranscriptSupportingFeatureAdaptor;
-$Bio::EnsEMBL::DBSQL::TranscriptSupportingFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::TranscriptSupportingFeatureAdaptor::VERSION = '113.0.0';
 use strict;
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;
 

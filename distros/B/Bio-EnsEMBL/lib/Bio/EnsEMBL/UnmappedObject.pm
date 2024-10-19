@@ -64,7 +64,7 @@ found.
 
 
 package Bio::EnsEMBL::UnmappedObject;
-$Bio::EnsEMBL::UnmappedObject::VERSION = '112.0.0';
+$Bio::EnsEMBL::UnmappedObject::VERSION = '113.0.0';
 use strict;
 use warnings;
 

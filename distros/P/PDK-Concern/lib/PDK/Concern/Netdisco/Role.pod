@@ -1,0 +1,91 @@
+=head1 NAME
+
+PDK::Concern::Netdisco::Role - A Moose role for network device discovery and management
+
+=head1 SYNOPSIS
+
+  package MyNetworkManager;
+  use Moose;
+  with 'PDK::Concern::Netdisco::Role';
+
+  # Implement required methods
+  sub gen_iface_desc { ... }
+  sub commands { ... }
+
+  # Use the role's methods
+  $self->explore_topology();
+  $self->write_file($config, $filename);
+
+=head1 DESCRIPTION
+
+This role provides functionality for network device discovery, topology exploration, and configuration management. It is designed to be used with classes that represent network devices and their management interfaces.
+
+=head1 ATTRIBUTES
+
+=head2 device
+
+A read-only attribute that must be an instance of a class that does the PDK::Device::Base role. This represents the network device being managed.
+
+=head2 month
+
+A read-only attribute that lazily loads the current month in YYYY-MM format.
+
+=head2 date
+
+A read-only attribute that lazily loads the current date in YYYY-MM-DD format.
+
+=head2 workdir
+
+A read-write attribute representing the working directory. Defaults to the value of the PDK_CONCERN_HOME environment variable or the user's home directory.
+
+=head2 debug
+
+A read-write attribute that controls debug output. Defaults to the value of the PDK_CONCERN_DEBUG environment variable or 0.
+
+=head1 METHODS
+
+=head2 now
+
+Returns the current date and time in "YYYY-MM-DD HH:MM:SS" format.
+
+=head2 dump($message)
+
+Prints debug information. If debug level is 1, it prints to STDOUT. If debug level is greater than 1, it writes to a file in the dump directory.
+
+=head2 write_file($config, $name)
+
+Writes the provided configuration to a file in the working directory. The filename defaults to the device's hostname with a .txt extension.
+
+=head2 explore_topology
+
+Explores the network topology by executing commands on the device and generating interface descriptions.
+
+=head2 refine_if($interface_name)
+
+Normalizes interface names by applying a set of predefined replacements.
+
+=head1 REQUIRED METHODS
+
+Classes consuming this role must implement the following methods:
+
+=over 4
+
+=item * gen_iface_desc
+
+=item * commands
+
+=back
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut

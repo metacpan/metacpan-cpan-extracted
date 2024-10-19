@@ -56,7 +56,7 @@ This module is part of the Ensembl project http://www.ensembl.org
 
 
 package Bio::EnsEMBL::DensityFeatureSet;
-$Bio::EnsEMBL::DensityFeatureSet::VERSION = '112.0.0';
+$Bio::EnsEMBL::DensityFeatureSet::VERSION = '113.0.0';
 use strict;
 use warnings;
 

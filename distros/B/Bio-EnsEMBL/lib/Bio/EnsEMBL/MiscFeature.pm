@@ -114,7 +114,7 @@ MiscFeatures.
 
 
 package Bio::EnsEMBL::MiscFeature;
-$Bio::EnsEMBL::MiscFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::MiscFeature::VERSION = '113.0.0';
 use strict;
 use warnings;
 

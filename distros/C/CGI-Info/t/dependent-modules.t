@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Test::DescribeMe qw(author);
 use Test::Needs 'Test::DependentModules';
 use Test::DependentModules 'test_modules';
 use Test::Most;
@@ -10,9 +11,8 @@ use Test::Most;
 my @modules = ('CGI::Lingua');
 
 SKIP: {
-	skip '$ENV{AUTHOR_TESTING} not set', scalar @modules
-		unless $ENV{'AUTHOR_TESTING'};
 	delete $ENV{'AUTHOR_TESTING'};
+	Test::DependentModules->import();
 	test_modules(@modules);
 }
 

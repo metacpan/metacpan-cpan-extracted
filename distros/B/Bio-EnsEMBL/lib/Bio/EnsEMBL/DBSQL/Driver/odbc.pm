@@ -30,7 +30,7 @@ limitations under the License.
 # FIXME: should this be ::ODBC rather than ::odbc ??
 
 package Bio::EnsEMBL::DBSQL::Driver::odbc;
-$Bio::EnsEMBL::DBSQL::Driver::odbc::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::Driver::odbc::VERSION = '113.0.0';
 use warnings;
 use strict;
 

@@ -46,7 +46,7 @@ Bio::EnsEMBL::Mapper::Pair.
 
 
 package Bio::EnsEMBL::Mapper::Unit;
-$Bio::EnsEMBL::Mapper::Unit::VERSION = '112.0.0';
+$Bio::EnsEMBL::Mapper::Unit::VERSION = '113.0.0';
 use strict;
 
 sub new {

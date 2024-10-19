@@ -81,7 +81,7 @@ normal assembly mapper.
 =cut
 
 package Bio::EnsEMBL::ChainedAssemblyMapper;
-$Bio::EnsEMBL::ChainedAssemblyMapper::VERSION = '112.0.0';
+$Bio::EnsEMBL::ChainedAssemblyMapper::VERSION = '113.0.0';
 use strict;
 use warnings;
 use integer; #use proper arithmetic bitshifts

@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Storage::Abstract",
   "PREREQ_PM" => {
+    "List::Util" => "1.33",
     "Moo" => 2,
     "Mooish::AttributeBuilder" => "1.002",
     "Type::Tiny" => 2,
@@ -25,7 +26,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t t/driver/*.t"
   }
@@ -33,6 +34,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "List::Util" => "1.33",
   "Moo" => 2,
   "Mooish::AttributeBuilder" => "1.002",
   "Test2::V0" => 0,

@@ -1,3 +1,13 @@
+v0.2.0  2024-10-18
+
+	[Changes]
+	- New default template file extension.
+	- Add configuration option to change the template file
+	  extension.
+
+	[Fixes]
+	- Broken documentation links.
+
 v0.1.1  2024-10-05
 
 	[Changes]

@@ -70,7 +70,7 @@ intervals spanning the origin of a circular chromosome.
 =cut
 
 package Bio::EnsEMBL::Utils::Tree::Interval::Immutable;
-$Bio::EnsEMBL::Utils::Tree::Interval::Immutable::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Tree::Interval::Immutable::VERSION = '113.0.0';
 use strict;
 
 use Tie::RefHash;

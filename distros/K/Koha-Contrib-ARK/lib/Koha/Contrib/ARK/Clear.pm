@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Clear;
 # ABSTRACT: Clear Koha ARK field
-$Koha::Contrib::ARK::Clear::VERSION = '1.0.5';
+$Koha::Contrib::ARK::Clear::VERSION = '1.1.0';
 use Moose;
 use Modern::Perl;
 
@@ -34,6 +34,8 @@ sub action {
     else {
         $record->delete($tag);
     }
+
+    $self->ark->current_modified();
 }
 
 
@@ -52,7 +54,7 @@ Koha::Contrib::ARK::Clear - Clear Koha ARK field
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.0
 
 =head1 AUTHOR
 
@@ -60,7 +62,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Fréderic Demians.
+This software is Copyright (c) 2024 by Fréderic Demians.
 
 This is free software, licensed under:
 

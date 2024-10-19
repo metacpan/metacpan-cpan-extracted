@@ -97,7 +97,7 @@ stable Id mapping application.
 =cut
 
 package Bio::EnsEMBL::IdMapping::ScoredMappingMatrix;
-$Bio::EnsEMBL::IdMapping::ScoredMappingMatrix::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::ScoredMappingMatrix::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

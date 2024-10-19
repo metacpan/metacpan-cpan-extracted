@@ -73,7 +73,7 @@ system.
 
 
 package Bio::EnsEMBL::Feature;
-$Bio::EnsEMBL::Feature::VERSION = '112.0.0';
+$Bio::EnsEMBL::Feature::VERSION = '113.0.0';
 use strict;
 use warnings;
 

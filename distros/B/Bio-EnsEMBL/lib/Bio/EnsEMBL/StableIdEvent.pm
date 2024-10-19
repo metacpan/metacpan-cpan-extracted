@@ -78,7 +78,7 @@ ArchiveStableIds with a mapping score.
 =cut
 
 package Bio::EnsEMBL::StableIdEvent;
-$Bio::EnsEMBL::StableIdEvent::VERSION = '112.0.0';
+$Bio::EnsEMBL::StableIdEvent::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

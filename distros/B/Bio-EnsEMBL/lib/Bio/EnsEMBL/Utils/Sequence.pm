@@ -54,7 +54,7 @@ Bio::EnsEMBL::Utils::Sequence - Utility functions for sequences
 
 
 package Bio::EnsEMBL::Utils::Sequence;
-$Bio::EnsEMBL::Utils::Sequence::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Sequence::VERSION = '113.0.0';
 use strict;
 use warnings;
 

@@ -39,7 +39,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::IdMapping::StableIdMapper;
-$Bio::EnsEMBL::IdMapping::StableIdMapper::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::StableIdMapper::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

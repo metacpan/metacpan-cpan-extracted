@@ -45,7 +45,7 @@ Bio::EnsEMBL::Mapper::Pair, when one of the regions is an indel.
 =cut
 
 package Bio::EnsEMBL::Mapper::IndelPair;
-$Bio::EnsEMBL::Mapper::IndelPair::VERSION = '112.0.0';
+$Bio::EnsEMBL::Mapper::IndelPair::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

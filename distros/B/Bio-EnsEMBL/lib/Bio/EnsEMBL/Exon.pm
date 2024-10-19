@@ -66,7 +66,7 @@ See Bio::EnsEMBL:Transcript
 =cut
 
 package Bio::EnsEMBL::Exon;
-$Bio::EnsEMBL::Exon::VERSION = '112.0.0';
+$Bio::EnsEMBL::Exon::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Feature;

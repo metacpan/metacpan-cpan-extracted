@@ -93,7 +93,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::AltAlleleGroup;
-$Bio::EnsEMBL::AltAlleleGroup::VERSION = '112.0.0';
+$Bio::EnsEMBL::AltAlleleGroup::VERSION = '113.0.0';
 use strict;
 use warnings;
 #use constant {

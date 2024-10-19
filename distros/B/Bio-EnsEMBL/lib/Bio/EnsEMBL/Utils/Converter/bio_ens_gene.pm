@@ -48,7 +48,7 @@ Bio::SeqFeature::Gene::GeneStructure to those of Bio::EnsEMBL::Gene
 =cut
 
 package Bio::EnsEMBL::Utils::Converter::bio_ens_gene;
-$Bio::EnsEMBL::Utils::Converter::bio_ens_gene::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Converter::bio_ens_gene::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 use Bio::EnsEMBL::Utils::Converter::bio_ens;

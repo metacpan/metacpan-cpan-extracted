@@ -58,7 +58,7 @@ Bio::EnsEMBL::StableIdHistoryTree
 =cut
 
 package Bio::EnsEMBL::ArchiveStableId;
-$Bio::EnsEMBL::ArchiveStableId::VERSION = '112.0.0';
+$Bio::EnsEMBL::ArchiveStableId::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings qw(uninitialized);

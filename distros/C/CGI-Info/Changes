@@ -1,5 +1,11 @@
 Revision history for CGI-Info
 
+0.84	Fri Oct 18 08:21:05 EDT 2024
+	Intercept SQL Injection
+		entry=-4346" OR 1749\=1749 AND "dgiO"\="dgiO;page=people
+	Use Test::DescribeMe to simplify tests
+	Don't fail on systems that Test::Script fails to install on (e.g. Haiku)
+
 0.83	Sun  8 Sep 08:52:23 EDT 2024
 	Mark Go-http-client as a robot
 	Support CircleCI

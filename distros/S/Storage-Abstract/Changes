@@ -1,5 +1,15 @@
 Revision history for Storage-Abstract
 
+0.005 - 2024-10-19
+	- Added X::Readonly, used to throw exception on readonly instead of X::StorageError
+	- Metadrivers no longer have readonly attribute, they now report the readonly status of their sources
+	- Driver::Composite now throws an exception on set_readonly
+	- Driver implementations should now consume one of the roles from Storage::Abstract::Role namespace
+
+0.004 - 2024-10-18
+	- Added create_directory option to Directory driver
+	- Documentation fixes
+
 0.003 - 2024-10-14
 	- Added subpath driver
 	- Improved constructor behavior with hash references and driver instances

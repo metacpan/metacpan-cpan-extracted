@@ -55,7 +55,7 @@ sequence from 5' and 3' end like GIS or GSC tags.
 =cut
 
 package Bio::EnsEMBL::Map::Ditag;
-$Bio::EnsEMBL::Map::Ditag::VERSION = '112.0.0';
+$Bio::EnsEMBL::Map::Ditag::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 

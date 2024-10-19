@@ -132,7 +132,7 @@ by an adaptor/factory.
 =cut
 
 package Bio::EnsEMBL::MappedSlice;
-$Bio::EnsEMBL::MappedSlice::VERSION = '112.0.0';
+$Bio::EnsEMBL::MappedSlice::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

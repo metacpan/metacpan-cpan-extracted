@@ -44,7 +44,7 @@ when the target region maps on to valid sequence.
 =cut
 
 package Bio::EnsEMBL::Mapper::Coordinate;
-$Bio::EnsEMBL::Mapper::Coordinate::VERSION = '112.0.0';
+$Bio::EnsEMBL::Mapper::Coordinate::VERSION = '113.0.0';
 use strict;
 
 =head2 new

@@ -41,7 +41,7 @@ Bio::EnsEMBL::Utils::ScriptUtils;
 =cut
 
 package Bio::EnsEMBL::Utils::ScriptUtils;
-$Bio::EnsEMBL::Utils::ScriptUtils::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::ScriptUtils::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

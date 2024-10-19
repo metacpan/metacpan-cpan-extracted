@@ -50,7 +50,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::DBSQL::BiotypeAdaptor;
-$Bio::EnsEMBL::DBSQL::BiotypeAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::BiotypeAdaptor::VERSION = '113.0.0';
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;
 use Bio::EnsEMBL::Utils::Exception qw(throw deprecate warning);
 use Bio::EnsEMBL::Biotype;

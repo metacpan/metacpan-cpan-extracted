@@ -29,7 +29,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::IdMapping::StableIdGenerator::AedesAegypti;
-$Bio::EnsEMBL::IdMapping::StableIdGenerator::AedesAegypti::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::StableIdGenerator::AedesAegypti::VERSION = '113.0.0';
 # Package that implements incrementing and verification of Aedes aegypti
 # stable IDs as used by the VectorBase project.
 

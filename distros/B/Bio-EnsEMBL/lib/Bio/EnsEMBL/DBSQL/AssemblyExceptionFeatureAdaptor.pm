@@ -50,7 +50,7 @@ exception features.
 =cut
 
 package Bio::EnsEMBL::DBSQL::AssemblyExceptionFeatureAdaptor;
-$Bio::EnsEMBL::DBSQL::AssemblyExceptionFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::AssemblyExceptionFeatureAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings qw(uninitialized);

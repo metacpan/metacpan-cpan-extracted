@@ -115,7 +115,7 @@ mapper on the existing MappedSlices.
 =cut
 
 package Bio::EnsEMBL::MappedSliceContainer;
-$Bio::EnsEMBL::MappedSliceContainer::VERSION = '112.0.0';
+$Bio::EnsEMBL::MappedSliceContainer::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

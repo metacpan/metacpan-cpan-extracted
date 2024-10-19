@@ -141,7 +141,7 @@ above.
 =cut
 
 package Bio::EnsEMBL::DB::ExternalFeatureFactoryI;
-$Bio::EnsEMBL::DB::ExternalFeatureFactoryI::VERSION = '112.0.0';
+$Bio::EnsEMBL::DB::ExternalFeatureFactoryI::VERSION = '113.0.0';
 use strict;
 use warnings;
 

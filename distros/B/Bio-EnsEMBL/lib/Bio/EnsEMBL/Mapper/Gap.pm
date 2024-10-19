@@ -44,7 +44,7 @@ target region is in a gap.
 =cut
 
 package Bio::EnsEMBL::Mapper::Gap;
-$Bio::EnsEMBL::Mapper::Gap::VERSION = '112.0.0';
+$Bio::EnsEMBL::Mapper::Gap::VERSION = '113.0.0';
 use strict;
 
 =head2 new

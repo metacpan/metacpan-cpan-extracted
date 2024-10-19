@@ -9,10 +9,10 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview 0.19;
+package App::sdview 0.20;
 class App::sdview :strict(params);
 
-use Sublike::Extended;
+use Sublike::Extended 0.29 'method';
 
 use App::sdview::Style;
 use App::sdview::Highlighter;
@@ -75,19 +75,34 @@ use Module::Pluggable
    inner       => 0,
    require     => 1;
 
-extended method run ( $file,
+# Must call this *before* ->run entersub so that DEFAULT_OUTPUT is overridden properly
+my @OUTPUT_CLASSES = OUTPUTS();
+
+method run ( $file,
    :$format = undef,
    :$output //= $DEFAULT_OUTPUT,
    :$highlight = 0,
    :$output_options //= [],
    %opts
 ) {
+   my @PARSER_CLASSES = sort { $a->sort_order <=> $b->sort_order } PARSERS();
+
+   if( ( $format // "" ) eq "?" ) {
+      say "Parser format types:";
+      $_->can( "format" ) and say "  " . $_->format . "  (provided by $_)"
+         for @PARSER_CLASSES;
+      exit 0;
+   }
+   if( ( $output // "" ) eq "?" ) {
+      say "Output format types:";
+      $_->can( "format" ) and say "  " . $_->format . "  (provided by $_)"
+         for @OUTPUT_CLASSES;
+      exit 0;
+   }
+
    if( -f( my $configpath = "$ENV{HOME}/.sdviewrc" ) ) {
       App::sdview::Style->load_config( $configpath );
    }
-
-   my @PARSER_CLASSES = sort { $a->sort_order <=> $b->sort_order } PARSERS();
-   my @OUTPUT_CLASSES = OUTPUTS();
 
    my %output_options = map {
       map { m/^(.*?)=(.*)$/ ? ( $1 => $2 ) : ( $_ => !!1 ) } split m/,/, $_;

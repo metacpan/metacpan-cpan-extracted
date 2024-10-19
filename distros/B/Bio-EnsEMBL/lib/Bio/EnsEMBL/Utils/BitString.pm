@@ -43,7 +43,7 @@ Convey's book "Object Oriented Perl".
 
 
 package Bio::EnsEMBL::Utils::BitString;
-$Bio::EnsEMBL::Utils::BitString::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::BitString::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

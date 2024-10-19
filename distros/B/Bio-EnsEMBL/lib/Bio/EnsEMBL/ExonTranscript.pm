@@ -50,7 +50,7 @@ the relation to a specific transcript.
 use strict;
 
 package Bio::EnsEMBL::ExonTranscript;
-$Bio::EnsEMBL::ExonTranscript::VERSION = '112.0.0';
+$Bio::EnsEMBL::ExonTranscript::VERSION = '113.0.0';
 use vars qw(@ISA);
 
 use Bio::EnsEMBL::Exon;

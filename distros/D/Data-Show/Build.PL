@@ -10,6 +10,7 @@ my $builder = Module::Build->new(
     requires => {
         'Test::More' => 0,
         'Data::Dump' => 1.17,
+        'PPR'        => 0.001009,
         'version'    => 0,
     },
     add_to_cleanup      => [ 'Data-Show-*' ],

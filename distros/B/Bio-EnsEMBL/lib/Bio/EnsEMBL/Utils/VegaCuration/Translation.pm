@@ -31,7 +31,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::Utils::VegaCuration::Translation;
-$Bio::EnsEMBL::Utils::VegaCuration::Translation::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::VegaCuration::Translation::VERSION = '113.0.0';
 use strict;
 use warnings;
 use vars qw(@ISA);

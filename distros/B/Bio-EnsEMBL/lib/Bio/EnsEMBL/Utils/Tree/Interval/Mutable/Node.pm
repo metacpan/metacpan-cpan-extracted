@@ -40,7 +40,7 @@ Represents a node in the mutable interval tree pure perl implementation.
 =cut
 
 package Bio::EnsEMBL::Utils::Tree::Interval::Mutable::Node;
-$Bio::EnsEMBL::Utils::Tree::Interval::Mutable::Node::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Tree::Interval::Mutable::Node::VERSION = '113.0.0';
 use strict;
 
 use Scalar::Util qw(looks_like_number weaken);
@@ -131,7 +131,7 @@ sub intervals {
   return shift->{intervals};
 }
 
-=head2 add_interval
+=head add_interval 
 
   Arg []      : none
   Description : Add an interval to the node's set of intervals

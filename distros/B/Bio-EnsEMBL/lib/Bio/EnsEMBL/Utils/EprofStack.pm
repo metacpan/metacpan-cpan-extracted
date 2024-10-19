@@ -41,7 +41,7 @@ Bio::EnsEMBL::Util::EprofStack - DESCRIPTION of Object
 =cut
 
 package Bio::EnsEMBL::Utils::EprofStack;
-$Bio::EnsEMBL::Utils::EprofStack::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::EprofStack::VERSION = '113.0.0';
 use strict;
 use warnings;
 

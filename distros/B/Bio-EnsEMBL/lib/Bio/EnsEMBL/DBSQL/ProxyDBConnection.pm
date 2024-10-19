@@ -57,7 +57,7 @@ you are aware of what it will do and what the consequences of its usage are.
 =cut
 
 package Bio::EnsEMBL::DBSQL::ProxyDBConnection;
-$Bio::EnsEMBL::DBSQL::ProxyDBConnection::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::ProxyDBConnection::VERSION = '113.0.0';
 use strict;
 use warnings;
 

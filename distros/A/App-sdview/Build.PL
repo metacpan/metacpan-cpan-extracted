@@ -11,7 +11,7 @@ my $build = Module::Build->new(
       'Object::Pad' => '0.807',
       'Object::Pad::FieldAttr::Checked' => '0.09',
       'Data::Checks' => '0.05',
-      'Sublike::Extended' => '0.26',
+      'Sublike::Extended' => '0.29',
 
       'Config::Tiny' => 0,
       'Convert::Color' => 0,

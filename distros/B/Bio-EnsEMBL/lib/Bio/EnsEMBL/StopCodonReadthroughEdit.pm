@@ -64,7 +64,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::StopCodonReadthroughEdit;
-$Bio::EnsEMBL::StopCodonReadthroughEdit::VERSION = '112.0.0';
+$Bio::EnsEMBL::StopCodonReadthroughEdit::VERSION = '113.0.0';
 use strict;
 use warnings;
 

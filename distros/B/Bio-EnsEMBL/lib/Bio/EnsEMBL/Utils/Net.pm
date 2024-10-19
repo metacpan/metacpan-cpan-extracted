@@ -18,7 +18,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::Utils::Net;
-$Bio::EnsEMBL::Utils::Net::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Net::VERSION = '113.0.0';
 =pod
 
 

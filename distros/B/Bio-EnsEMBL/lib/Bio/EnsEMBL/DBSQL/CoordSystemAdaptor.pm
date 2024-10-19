@@ -118,7 +118,7 @@ instead.
 =cut
 
 package Bio::EnsEMBL::DBSQL::CoordSystemAdaptor;
-$Bio::EnsEMBL::DBSQL::CoordSystemAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::CoordSystemAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 

@@ -41,7 +41,7 @@ Instances of this class represent nodes in a centered immutable interval tree.
 =cut
 
 package Bio::EnsEMBL::Utils::Tree::Interval::Immutable::Node;
-$Bio::EnsEMBL::Utils::Tree::Interval::Immutable::Node::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Tree::Interval::Immutable::Node::VERSION = '113.0.0';
 use strict;
 
 use Scalar::Util qw(looks_like_number);

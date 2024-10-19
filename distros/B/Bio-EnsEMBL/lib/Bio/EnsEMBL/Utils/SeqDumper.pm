@@ -61,7 +61,7 @@ good for dumping very large sequences such as whole chromosomes.
 
 
 package Bio::EnsEMBL::Utils::SeqDumper;
-$Bio::EnsEMBL::Utils::SeqDumper::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::SeqDumper::VERSION = '113.0.0';
 use strict;
 
 use IO::File;

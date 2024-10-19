@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 
-package App::sdview::Highlighter 0.19;
+package App::sdview::Highlighter 0.20;
 
 use constant HAVE_TEXT_TREESITTER => defined eval {
    require Text::Treesitter;

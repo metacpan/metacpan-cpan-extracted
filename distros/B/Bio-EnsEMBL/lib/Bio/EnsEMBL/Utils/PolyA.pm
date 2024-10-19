@@ -58,7 +58,7 @@ Bio::EnsEMBL::Utils::PolyA
 =cut
 
 package Bio::EnsEMBL::Utils::PolyA;
-$Bio::EnsEMBL::Utils::PolyA::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::PolyA::VERSION = '113.0.0';
 use Bio::Seq;
 use vars qw(@ISA);
 

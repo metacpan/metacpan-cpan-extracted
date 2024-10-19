@@ -9,12 +9,12 @@ use utf8;
 
 use Object::Pad 0.807;
 
-package App::sdview::Parser::Man 0.19;
+package App::sdview::Parser::Man 0.20;
 class App::sdview::Parser::Man :strict(params);
 
 apply App::sdview::Parser;
 
-use Sublike::Extended;
+use Sublike::Extended 0.29 'sub';
 
 use Parse::Man::DOM 0.03;
 
@@ -73,7 +73,7 @@ my %FONTTAGS = (
    CW => { monospace => 1 },
 );
 
-extended sub _chunklist_to_taggedstring ( $chunks, :$linefeed = " " )
+sub _chunklist_to_taggedstring ( $chunks, :$linefeed = " " )
 {
    my $ret = String::Tagged->new;
 

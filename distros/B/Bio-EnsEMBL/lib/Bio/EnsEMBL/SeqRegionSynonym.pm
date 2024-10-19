@@ -45,7 +45,7 @@ Ensembl seq regions.
 =cut
 
 package Bio::EnsEMBL::SeqRegionSynonym;
-$Bio::EnsEMBL::SeqRegionSynonym::VERSION = '112.0.0';
+$Bio::EnsEMBL::SeqRegionSynonym::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings qw(uninitialized);

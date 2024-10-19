@@ -45,7 +45,7 @@ An adaptor for the retrieval of DNA sequence from the EnsEMBL database
 =cut
 
 package Bio::EnsEMBL::DBSQL::SequenceAdaptor;
-$Bio::EnsEMBL::DBSQL::SequenceAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::SequenceAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 

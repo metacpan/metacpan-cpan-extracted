@@ -72,7 +72,7 @@ identifier but with different evidence tags.  For this reason a single
 =cut
 
 package Bio::EnsEMBL::OntologyXref;
-$Bio::EnsEMBL::OntologyXref::VERSION = '112.0.0';
+$Bio::EnsEMBL::OntologyXref::VERSION = '113.0.0';
 use strict;
 use warnings;
 

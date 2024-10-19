@@ -69,7 +69,7 @@ methods is to return Features on both Strands.
 =cut
 
 package Bio::EnsEMBL::Slice;
-$Bio::EnsEMBL::Slice::VERSION = '112.0.0';
+$Bio::EnsEMBL::Slice::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

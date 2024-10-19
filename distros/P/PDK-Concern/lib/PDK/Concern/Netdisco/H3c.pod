@@ -1,0 +1,113 @@
+=pod
+
+=head1 NAME
+
+PDK::Concern::H3c::Netdisco - Explore and manage LLDP topology for H3C devices
+
+=head1 SYNOPSIS
+
+  use PDK::Concern::H3c::Netdisco;
+
+  my $h3c_device = PDK::Device::H3c->new(...);
+  my $netdisco = PDK::Concern::H3c::Netdisco->new(device => $h3c_device);
+  my $result = $netdisco->explore_topology();
+
+=head1 DESCRIPTION
+
+PDK::Concern::H3c::Netdisco provides functionality to explore LLDP (Link Layer Discovery Protocol) topology
+for H3C devices and generate interface descriptions based on the discovered neighbors. This module
+is designed to work with H3C network devices and automate the process of updating interface
+descriptions based on LLDP information.
+
+=head1 METHODS
+
+=head2 new(device => $h3c_device)
+
+Creates a new instance of the PDK::Concern::H3c::Netdisco class.
+
+=over 4
+
+=item * device
+
+A required parameter. Must be an instance of PDK::Device::H3c.
+
+=back
+
+  my $netdisco = PDK::Concern::H3c::Netdisco->new(device => $h3c_device);
+
+=head2 explore_topology()
+
+Explores the LLDP topology of the device and send generated interface descriptions.
+
+Returns a hashref with the result of executing the generated commands.
+
+  my $result = $netdisco->explore_topology();
+  if ($result->{success}) {
+    print "Topology exploration and interface description update successful.\n";
+  } else {
+    print "Failed: " . $result->{reason} . "\n";
+  }
+
+=head2 gen_iface_desc($topology_data)
+
+Generates interface description commands based on the provided topology data.
+
+=over 4
+
+=item * $topology_data
+
+An arrayref containing the raw LLDP neighbor information.
+
+=back
+
+Returns an array of configuration commands.
+
+  my @topology_data = $device->get_lldp_data();
+  my @commands = $netdisco->gen_iface_desc(\@topology_data);
+
+=head2 refine_if($name)
+
+Refines the interface name by standardizing various interface name formats.
+
+=over 4
+
+=item * $name
+
+The original interface name to be refined.
+
+=back
+
+Returns the refined interface name.
+
+  my $refined_name = $netdisco->refine_if('GigabitEthernet1/0/1');
+  # Returns: 'GE1/0/1'
+
+=head1 DEPENDENCIES
+
+This module requires the following modules:
+
+=over 4
+
+=item * Moose
+
+=item * PDK::Device::H3c
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+PDK::Concern::H3c::Netdisco requires no configuration files or environment variables.
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut

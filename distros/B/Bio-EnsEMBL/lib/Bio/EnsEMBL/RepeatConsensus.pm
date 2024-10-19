@@ -29,7 +29,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::RepeatConsensus;
-$Bio::EnsEMBL::RepeatConsensus::VERSION = '112.0.0';
+$Bio::EnsEMBL::RepeatConsensus::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Storable;

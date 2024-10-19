@@ -44,6 +44,7 @@ Gil
 Gisle
 Gondwana
 Graeme
+Graham
 Grossmann
 HTML
 Hanak
@@ -63,6 +64,7 @@ Karaban
 Kennedy
 KeygenInput
 Kilgore
+Knop
 Koenig
 Lance
 Lipcon
@@ -133,6 +135,7 @@ gilmagno
 gisle
 github
 gpeters
+haarg
 hfroehlich
 iank
 jefflee

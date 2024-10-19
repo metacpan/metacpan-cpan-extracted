@@ -69,7 +69,7 @@ See Bio::EnsEMBL::Transcript for details of the Transcript class.
 =cut
 
 package Bio::EnsEMBL::DBSQL::TranscriptAdaptor;
-$Bio::EnsEMBL::DBSQL::TranscriptAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::TranscriptAdaptor::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::DBSQL::BaseFeatureAdaptor;

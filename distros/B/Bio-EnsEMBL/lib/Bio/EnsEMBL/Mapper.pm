@@ -137,7 +137,7 @@ sorting key. Here is an excerpt.
 =cut
 
 package Bio::EnsEMBL::Mapper;
-$Bio::EnsEMBL::Mapper::VERSION = '112.0.0';
+$Bio::EnsEMBL::Mapper::VERSION = '113.0.0';
 use strict;
 use integer;
 

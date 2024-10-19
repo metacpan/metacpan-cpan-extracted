@@ -67,7 +67,7 @@ most classes.
 =cut
 
 package Bio::EnsEMBL::Utils::Proxy;
-$Bio::EnsEMBL::Utils::Proxy::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Proxy::VERSION = '113.0.0';
 use strict;
 use warnings;
 

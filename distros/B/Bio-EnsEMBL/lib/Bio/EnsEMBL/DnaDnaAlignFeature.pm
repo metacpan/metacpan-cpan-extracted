@@ -41,7 +41,7 @@ alignment feature
 
 
 package Bio::EnsEMBL::DnaDnaAlignFeature;
-$Bio::EnsEMBL::DnaDnaAlignFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::DnaDnaAlignFeature::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::BaseAlignFeature;

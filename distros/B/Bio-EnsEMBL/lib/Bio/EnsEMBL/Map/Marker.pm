@@ -45,7 +45,7 @@ represented by the MarkerFeature object.
 =cut
 
 package Bio::EnsEMBL::Map::Marker;
-$Bio::EnsEMBL::Map::Marker::VERSION = '112.0.0';
+$Bio::EnsEMBL::Map::Marker::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 

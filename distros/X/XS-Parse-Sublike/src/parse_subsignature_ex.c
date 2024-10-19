@@ -729,6 +729,12 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
   if(paramctx.is_named) {
     ctx->named_elem_defops = op_append_elem(OP_LINESEQ, ctx->named_elem_defops,
         paramctx.op);
+
+    /* Introduce the named parameter variable so later expressions can see it.
+     * This is done implicitly by newSTATEOP() for positional ones, but we
+     * must do it manually here.
+     */
+    intro_my();
   }
   else {
     /* This call to newSTATEOP() must come AFTER parsing the defaulting

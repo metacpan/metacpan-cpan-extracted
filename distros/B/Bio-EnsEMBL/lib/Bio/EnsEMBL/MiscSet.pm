@@ -61,7 +61,7 @@ MapFrags
 =cut
 
 package Bio::EnsEMBL::MiscSet;
-$Bio::EnsEMBL::MiscSet::VERSION = '112.0.0';
+$Bio::EnsEMBL::MiscSet::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Storable;

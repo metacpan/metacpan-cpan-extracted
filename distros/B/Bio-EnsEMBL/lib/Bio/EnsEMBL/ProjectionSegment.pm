@@ -59,7 +59,7 @@ $segment->from_start(), $segement->from_end(), $segment->to_Slice().
 =cut
 
 package Bio::EnsEMBL::ProjectionSegment;
-$Bio::EnsEMBL::ProjectionSegment::VERSION = '112.0.0';
+$Bio::EnsEMBL::ProjectionSegment::VERSION = '113.0.0';
 use strict;
 use warnings;
 

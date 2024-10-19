@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Update;
 # ABSTRACT: Update Koha ARK fields
-$Koha::Contrib::ARK::Update::VERSION = '1.0.5';
+$Koha::Contrib::ARK::Update::VERSION = '1.1.0';
 use Moose;
 use Modern::Perl;
 
@@ -37,6 +37,7 @@ sub action {
             tag => $kfield->{tag}, value => $ark ) );
     }
     $self->ark->what_append('add');
+    $self->ark->current_modified();
 }
 
 
@@ -55,7 +56,7 @@ Koha::Contrib::ARK::Update - Update Koha ARK fields
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.0
 
 =head1 AUTHOR
 
@@ -63,7 +64,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Fréderic Demians.
+This software is Copyright (c) 2024 by Fréderic Demians.
 
 This is free software, licensed under:
 

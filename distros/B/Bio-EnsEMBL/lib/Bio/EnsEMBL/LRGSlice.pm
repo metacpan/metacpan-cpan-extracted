@@ -66,7 +66,7 @@ sequence or features from an area of interest.
 =cut
 
 package Bio::EnsEMBL::LRGSlice;
-$Bio::EnsEMBL::LRGSlice::VERSION = '112.0.0';
+$Bio::EnsEMBL::LRGSlice::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

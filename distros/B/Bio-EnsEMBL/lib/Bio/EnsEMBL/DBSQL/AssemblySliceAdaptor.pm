@@ -70,7 +70,7 @@ container slice coordinate system.
 =cut
 
 package Bio::EnsEMBL::DBSQL::AssemblySliceAdaptor;
-$Bio::EnsEMBL::DBSQL::AssemblySliceAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::AssemblySliceAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

@@ -61,7 +61,7 @@ method set_directory ($d)
 
 method set_template ($t)
 {
-    $template = _ext($t);
+    $template = $self->_ext($t);
 }
 
 method add_include_path ($d)
@@ -74,8 +74,8 @@ method set_name_as_class  ($n = 1) { $settings{name_as_class} = $n }
 
 method add_header_script  ($s) { push @{$content{header_scripts}}, $s }
 method add_header_css     ($c) { push @{$content{header_css}}, $c }
-method add_pre            ($p) { push @{$content{pre}}, _ext($p) }
-method add_post           ($p) { push @{$content{post}}, _ext($p) }
+method add_pre            ($p) { push @{$content{pre}}, $self->_ext($p) }
+method add_post           ($p) { push @{$content{post}}, $self->_ext($p) }
 method add_pre_body       ($p) { push @{$content{pre_body}}, $p }
 method add_script         ($s) { push @{$content{scripts}}, $s }
 method add_class          ($c) { push @{$content{classes}}, $c }
@@ -129,9 +129,10 @@ method render ($data = {})
     $body;
 }
 
-sub _ext ($file)
+method _ext ($file)
 {
-    $file = "$file.tt" unless $file =~ /\.\w+$/;
+    my $ext = $app->config->{template_ext} // 'ht';
+    $file = "$file.$ext" unless $file =~ /\.\w+$/;
 }
 
 __END__
@@ -249,6 +250,8 @@ A color to be set on the C<E<lt>meta name="theme-color"E<gt>> tag.
 
 =head1 CONFIGURATION
 
+=head2 tt
+
 The C<tt> key may be used in the main L<Minima::App> configuration hash
 to customize L<Template Toolkit|Template>.
 
@@ -263,6 +266,12 @@ By default, the following configuration is used:
 These can be overwritten. Additionally, if the app is in development
 mode (see L<Minima::App/development>), C<DEBUG> is set to
 C<DEBUG_UNDEF>.
+
+=head2 template_ext
+
+The C<template_ext> key may be used to set a default file extension for
+templates. By default, F<ht> will be used. This extension is added
+automatically to template file names if none is provided.
 
 =head1 METHODS
 
@@ -313,16 +322,18 @@ called, the default F<templates> directory will be used.
 
     method set_template ($title)
 
-Sets the template name to be used. If no extension is present, F<.tt>
-will be added. A dot (C<.>) must not be present in the template name.
+Sets the template name to be used. If no extension is present, the
+extension set by the L<C<template_ext>|/template_ext> configuration key
+(F<ht> by default) will be added. The template file name must not
+contain a dot (C<.>), except for the one used in the extension.
 
 =head2 add_include_path
 
     method add_include_path ($directory)
 
 Adds the passed directory as a include path in conjunction with the main
-directory (set by L<C<set_directory>|set_directory>). This method can be
-called multiple times to add multiple paths.
+directory (set by L<C<set_directory>|/set_directory>). This method can
+be called multiple times to add multiple paths.
 
 =head2 set_block_indexing
 

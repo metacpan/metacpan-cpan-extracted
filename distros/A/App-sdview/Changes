@@ -1,5 +1,15 @@
 Revision history for App-sdview
 
+0.20    2024-10-18
+        [CHANGES]
+         * List the recognised parser or output types and exit if requesting
+           a type named '?'
+
+        [BUGFIXES]
+         * Account for the space between line leader and paragraph content
+           when testing if it will fit on one line (RT156204)
+         * Ensure that override logic of $DEFAULT_OUTPUT still works
+
 0.19    2024-10-07
         [CHANGES]
          * Experimental support for tables in Pod files, in a choice of

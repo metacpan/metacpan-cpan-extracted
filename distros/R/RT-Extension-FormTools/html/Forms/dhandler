@@ -96,9 +96,9 @@ jQuery(function () {
 
             let source_values = [];
             const name = source.attr('name');
-            if ( source.is(':checkbox') || source.is(':radio') ) {
-                jQuery(':input[name="' + name +'"]:checked').each( function () {
-                    source_values.push(source.val());
+            if (source.is(':checkbox') || source.is(':radio')) {
+                jQuery(':input[name="' + name +'"]:checked').each(function () {
+                    source_values.push(jQuery(this).val());
                 });
             }
             else {

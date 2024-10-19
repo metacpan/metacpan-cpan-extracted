@@ -52,7 +52,7 @@ ScoreBuilder.
 =cut
 
 package Bio::EnsEMBL::IdMapping::ScoreBuilder;
-$Bio::EnsEMBL::IdMapping::ScoreBuilder::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::ScoreBuilder::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

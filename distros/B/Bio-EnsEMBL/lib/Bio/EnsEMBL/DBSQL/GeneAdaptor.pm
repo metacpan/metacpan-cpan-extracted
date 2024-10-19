@@ -69,7 +69,7 @@ objects.
 =cut
 
 package Bio::EnsEMBL::DBSQL::GeneAdaptor;
-$Bio::EnsEMBL::DBSQL::GeneAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::GeneAdaptor::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Utils::Exception qw( throw warning );

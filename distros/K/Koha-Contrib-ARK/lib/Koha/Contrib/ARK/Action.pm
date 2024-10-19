@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Action;
 # ABSTRACT: ARK Action roles
-$Koha::Contrib::ARK::Action::VERSION = '1.0.5';
+$Koha::Contrib::ARK::Action::VERSION = '1.1.0';
 use Moose::Role;
 use Modern::Perl;
 
@@ -29,7 +29,7 @@ Koha::Contrib::ARK::Action - ARK Action roles
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.0
 
 =head1 ATTRIBUTES
 
@@ -49,7 +49,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Fréderic Demians.
+This software is Copyright (c) 2024 by Fréderic Demians.
 
 This is free software, licensed under:
 

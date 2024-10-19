@@ -65,7 +65,7 @@ MiscFeatures may belong to more than one set.
 =cut
 
 package Bio::EnsEMBL::DBSQL::MiscFeatureAdaptor;
-$Bio::EnsEMBL::DBSQL::MiscFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::MiscFeatureAdaptor::VERSION = '113.0.0';
 use strict;
 use Bio::EnsEMBL::DBSQL::BaseFeatureAdaptor;
 use Bio::EnsEMBL::MiscFeature;

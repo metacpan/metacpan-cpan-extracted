@@ -101,7 +101,7 @@ Requirements for a StableIdGenerator plugin:
 =cut
 
 package Bio::EnsEMBL::IdMapping::StableIdGenerator::EnsemblGeneric;
-$Bio::EnsEMBL::IdMapping::StableIdGenerator::EnsemblGeneric::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::StableIdGenerator::EnsemblGeneric::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

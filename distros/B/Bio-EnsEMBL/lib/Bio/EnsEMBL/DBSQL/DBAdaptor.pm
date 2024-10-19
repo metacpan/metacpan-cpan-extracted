@@ -63,7 +63,7 @@ Please use Bio::EnsEMBL::Registry to retrieve object adaptors.
 =cut
 
 package Bio::EnsEMBL::DBSQL::DBAdaptor;
-$Bio::EnsEMBL::DBSQL::DBAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::DBAdaptor::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::DBSQL::DBConnection;
@@ -245,7 +245,7 @@ sub find_and_add_species_id {
   my $sth = $dbc->prepare(sprintf "SELECT DISTINCT species_id FROM %s.meta " .
               "WHERE meta_key='species.alias' AND INSTR(meta_value, ?) > 0", 
               $dbc->db_handle->quote_identifier($dbc->dbname));
-  $sth->bind_param(1, $species);
+  $sth->bind_param(1, "$species");
   $sth->execute() or
     throw "Error querying for species_id: perhaps the DB doesn't have a meta table?\n" .
       "$DBI::err .... $DBI::errstr\n";

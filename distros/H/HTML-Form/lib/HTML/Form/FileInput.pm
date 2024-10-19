@@ -3,7 +3,7 @@ package HTML::Form::FileInput;
 use strict;
 use parent 'HTML::Form::TextInput';
 
-our $VERSION = '6.11';
+our $VERSION = '6.12';
 
 # ABSTRACT: An HTML form file input element for use with HTML::Form
 
@@ -84,7 +84,7 @@ HTML::Form::FileInput - An HTML form file input element for use with HTML::Form
 
 =head1 VERSION
 
-version 6.11
+version 6.12
 
 =head1 AUTHOR
 

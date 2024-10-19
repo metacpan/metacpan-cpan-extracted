@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package Main;
-$Main::VERSION = '1.0.5';
+$Main::VERSION = '1.1.0';
 # PODNAME: koha-ark
 # ABSTRACT: Manage ARK identifiers in a Koha Catalog
 
@@ -12,10 +12,11 @@ use Koha::Contrib::ARK;
 
 binmode(STDOUT, ':encoding(UTF8)');
 
-my ($help, $verbose, $doit, $debug) = (0, 1, 0, 0);
+my ($help, $verbose, $where, $doit, $debug) = (0, 1, '', 0, 0);
 GetOptions( 
     'verbose!' => \$verbose,
     'doit'     => \$doit,
+    'where=s'  => \$where,
     'help|h'   => \$help,
     'debug'    => \$debug,
 );
@@ -29,10 +30,11 @@ sub usage {
 usage() if $help || @ARGV != 1;
 
 my $cmd = shift @ARGV;
-usage() if $cmd !~ /clear|update|check/;
+usage() if $cmd !~ /clear|update|fix|check/;
 
 my $ark = Koha::Contrib::ARK->new(
     cmd          => $cmd,
+    fromwhere    => $where,
     debug        => $debug,
     verbose      => $verbose,
     doit         => $doit,
@@ -51,7 +53,7 @@ koha-ark - Manage ARK identifiers in a Koha Catalog
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.0
 
 =head1 DESCRIPTION
 
@@ -78,44 +80,44 @@ ARK_CONF system preference must contains several elements:
 
 =item *
 
-B<NMHA> — Name Mapping Authority Hostport. Usually it's a hostname, the
+B<NMHA> - Name Mapping Authority Hostport. Usually it's a hostname, the
 hostname of the Koha system itself, or the hostname of a proxy server (or link
 resolver).
 
 =item *
 
-B<NAAN> — Name Assigning Authority Number. It's a number identifying the
+B<NAAN> - Name Assigning Authority Number. It's a number identifying the
 institution, ie the Library using Koha. This number is provided for example by
 the California Digital Library (CDL),
 
 =item *
 
-B<ARK> — It's a template used to build the ARK. Three placeholders can be used
+B<ARK> - It's a template used to build the ARK. Three placeholders can be used
 in the template: C<NMHA> and C<NAAN> from ARK_CONF, and C<id> (Koha
 biblio record unique identifier extracted from koha.id field).
 
 =item *
 
-B<koha.id> — The biblio record field which contains Koha unique id
+B<koha.id> - The biblio record field which contains Koha unique id
 (biblionumber or another id). Contains 2 variables: C<tag> and C<letter>, si it
 could be a control or a standard field. For example, C<{"tag": "001"}> or
 C<{"tag": "099", "letter": "a"}>.
 
 =item *
 
-B<koha.ark> — The biblio record field used to store the ARK. It could be a
+B<koha.ark> - The biblio record field used to store the ARK. It could be a
 control or standard field. That's this field in which this script will store
 the generated field. This is also the field that this script can clear
 entirely.
 
 =back
 
-There are three commands: check, clear, and update
+There are four commands: check, clear, update, and fix
 
 =head2 check
 
 Process all biblio records, and check them for: bad ARK, correct ARK in the
-wrong field.
+wrong field, bad ARK in the correct field.
 
 =head2 clear
 
@@ -131,6 +133,11 @@ C<9877> biblionumber will have this in 003 field:
 
  http://myspecial.institution.fr/ark:/12345/biblio9877
 
+=head2 fix
+
+Verify that the correct ARK is present in the correct ARK field. All biblio
+records are scanned. If an invalid ARK is found, it's fixed (with --doit).
+
 =head1 USAGE
 
 =over
@@ -145,10 +152,17 @@ C<9877> biblionumber will have this in 003 field:
  koha-ark update --noverbose --doit
  koha-ark update --debug
  koha-ark check
+ koha-ark fix
 
 =head1 PARAMETERS
 
 =over
+
+=item B<--fromwhere>
+
+WHERE clause of the SELECT biblio_metadata used to retrieved biblio records
+from C<biblio_metadata> table. For example: C<biblionumber BETWEEN 100 AND 200>
+or C<ExtractValue(metdatata, '//datafield[tag=099]/subfield[@code="a"]'='a')>.
 
 =item B<--doit>
 
@@ -245,7 +259,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Fréderic Demians.
+This software is Copyright (c) 2024 by Fréderic Demians.
 
 This is free software, licensed under:
 

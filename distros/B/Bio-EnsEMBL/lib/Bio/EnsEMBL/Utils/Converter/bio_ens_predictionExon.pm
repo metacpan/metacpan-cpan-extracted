@@ -51,7 +51,7 @@ Bio::EnsEMBL::Utils::Converter::bio_ens_predictionExon
 =cut
 
 package Bio::EnsEMBL::Utils::Converter::bio_ens_predictionExon;
-$Bio::EnsEMBL::Utils::Converter::bio_ens_predictionExon::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::Converter::bio_ens_predictionExon::VERSION = '113.0.0';
 use strict;
 use vars qw(@ISA);
 use Bio::EnsEMBL::Utils::Converter;

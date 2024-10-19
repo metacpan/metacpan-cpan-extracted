@@ -64,7 +64,7 @@ and so is only safe to use with the C<fetch_all_XXX> or C<get_all_XXX> methods.
 
 
 package Bio::EnsEMBL::DBSQL::MergedAdaptor;
-$Bio::EnsEMBL::DBSQL::MergedAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::MergedAdaptor::VERSION = '113.0.0';
 use strict;
 use warnings;
 

@@ -50,6 +50,19 @@ BEGIN { $^H{"t::func/nfunc"}++ }
    is( withy(),           "Y", 'named param applies default' );
 }
 
+# named param defaulting expressions can still see earlier named params
+{
+   my $ret_y; my $got_x;
+   sub y_from_x ($x) { $got_x = $x; return $ret_y; }
+
+   nfunc withdefaults(:$x, :$y = y_from_x($x)) { return "$x-$y" }
+
+   $ret_y = "Y_VALUE";
+   is( withdefaults( x => "X_VALUE" ), "X_VALUE-Y_VALUE",
+      'named param defaults can see earlier default params' );
+   is( $got_x, "X_VALUE", 'param default expression was invoked' );
+}
+
 # named params can use //= and ||=
 {
    nfunc withdefined(:$x //= "default") { return $x }

@@ -73,7 +73,7 @@ use strict;
 use warnings;
 
 package Bio::EnsEMBL::TopLevelAssemblyMapper;
-$Bio::EnsEMBL::TopLevelAssemblyMapper::VERSION = '112.0.0';
+$Bio::EnsEMBL::TopLevelAssemblyMapper::VERSION = '113.0.0';
 use Bio::EnsEMBL::Utils::Exception qw(throw);
 use Bio::EnsEMBL::Mapper;
 use Bio::EnsEMBL::CoordSystem;

@@ -7,7 +7,7 @@ use Path::Extended::Tiny ();
 use File::Spec;
 use HTTP::Tiny;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 sub new {
   my ($class, %args) = @_;
@@ -28,9 +28,9 @@ sub new {
     warn "'root' is missing; created a temporary WorePAN directory: $args{root}\n" if $args{verbose};
   }
   $args{root} = Path::Extended::Tiny->new($args{root})->mkdir;
-  $args{cpan} ||= "http://www.cpan.org/";
+  $args{cpan} ||= "https://www.cpan.org/";
   if ($args{use_backpan}) {
-    $args{backpan} ||= "http://backpan.cpan.org/";
+    $args{backpan} ||= "https://backpan.cpanauthors.org/";
   }
   $args{no_network} = 1 if !defined $args{no_network} && $ENV{HARNESS_ACTIVE};
 
@@ -166,7 +166,7 @@ sub _dists2files {
   require URI::QueryParam;
   require JSON::PP;
 
-  my $uri = URI->new('http://api.cpanauthors.org/uploads/dist');
+  my $uri = URI->new('https://api.cpanauthors.org/uploads/dist');
   my @keys = keys %$dists;
   my @files;
   while (@keys) {
@@ -472,11 +472,11 @@ sub files {
 sub latest_distributions {
   my $self = shift;
 
-  require CPAN::DistnameInfo;
+  require Parse::Distname;
 
   my %dists;
   for my $file (@{ $self->files || [] }) {
-    my $dist = CPAN::DistnameInfo->new($file);
+    my $dist = Parse::Distname->new($file);
     my $name = $dist->dist or next;
     if (
       !exists $dists{$name}
@@ -558,7 +558,7 @@ a CPAN mirror from where you'd like to fetch files.
 
 =item files
 
-takes an arrayref of filenames to fetch. As of this writing they should be paths to existing files or path parts that follow C<http://your.CPAN.mirror/authors/id/>.
+takes an arrayref of filenames to fetch. As of this writing they should be paths to existing files or path parts that follow C<https://your.CPAN.mirror/authors/id/>.
 
 =item dists
 

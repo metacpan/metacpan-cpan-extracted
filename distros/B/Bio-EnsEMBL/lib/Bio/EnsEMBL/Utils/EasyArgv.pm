@@ -87,7 +87,7 @@ rather than the verbose
 =cut
 
 package Bio::EnsEMBL::Utils::EasyArgv;
-$Bio::EnsEMBL::Utils::EasyArgv::VERSION = '112.0.0';
+$Bio::EnsEMBL::Utils::EasyArgv::VERSION = '113.0.0';
 use strict;
 use vars qw($debug);
 use Exporter ();

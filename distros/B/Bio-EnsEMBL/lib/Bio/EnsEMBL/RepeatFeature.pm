@@ -74,7 +74,7 @@ This a feature representing a repeat region on a sequence
 =cut
 
 package Bio::EnsEMBL::RepeatFeature;
-$Bio::EnsEMBL::RepeatFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::RepeatFeature::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Utils::Exception qw(throw);

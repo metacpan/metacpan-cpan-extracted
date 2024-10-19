@@ -49,7 +49,7 @@ to database meta information
 =cut
 
 package Bio::EnsEMBL::DBSQL::BaseMetaContainer;
-$Bio::EnsEMBL::DBSQL::BaseMetaContainer::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::BaseMetaContainer::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

@@ -73,7 +73,7 @@ checking and convenience methods.
 =cut
 
 package Bio::EnsEMBL::IdMapping::MappingList;
-$Bio::EnsEMBL::IdMapping::MappingList::VERSION = '112.0.0';
+$Bio::EnsEMBL::IdMapping::MappingList::VERSION = '113.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

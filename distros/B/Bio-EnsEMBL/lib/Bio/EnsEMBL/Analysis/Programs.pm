@@ -29,7 +29,7 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::Analysis::Programs;
-$Bio::EnsEMBL::Analysis::Programs::VERSION = '112.0.0';
+$Bio::EnsEMBL::Analysis::Programs::VERSION = '113.0.0';
 use strict;
 use vars qw( %Program_Paths );
 use Carp;

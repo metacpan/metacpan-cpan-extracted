@@ -77,7 +77,7 @@ Translation.
 =cut
 
 package Bio::EnsEMBL::DBSQL::TranslationAdaptor;
-$Bio::EnsEMBL::DBSQL::TranslationAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::TranslationAdaptor::VERSION = '113.0.0';
 use vars qw(@ISA);
 use strict;
 

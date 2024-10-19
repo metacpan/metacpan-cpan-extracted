@@ -55,7 +55,7 @@ features.
 =cut
 
 package Bio::EnsEMBL::AssemblyExceptionFeature;
-$Bio::EnsEMBL::AssemblyExceptionFeature::VERSION = '112.0.0';
+$Bio::EnsEMBL::AssemblyExceptionFeature::VERSION = '113.0.0';
 use strict;
 
 use vars qw(@ISA);

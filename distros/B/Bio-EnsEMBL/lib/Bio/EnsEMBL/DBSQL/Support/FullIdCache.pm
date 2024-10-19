@@ -49,7 +49,7 @@ Provides extra functionality to compute additional lookup keys.
 =cut
 
 package Bio::EnsEMBL::DBSQL::Support::FullIdCache;
-$Bio::EnsEMBL::DBSQL::Support::FullIdCache::VERSION = '112.0.0';
+$Bio::EnsEMBL::DBSQL::Support::FullIdCache::VERSION = '113.0.0';
 use strict;
 use warnings;
 use base qw/Bio::EnsEMBL::DBSQL::Support::BaseCache/;

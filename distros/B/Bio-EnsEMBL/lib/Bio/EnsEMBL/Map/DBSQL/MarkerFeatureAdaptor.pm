@@ -47,7 +47,7 @@ Bio::EnsEMBL::DBSQL::BaseFeatureAdaptor
 =cut
 
 package Bio::EnsEMBL::Map::DBSQL::MarkerFeatureAdaptor;
-$Bio::EnsEMBL::Map::DBSQL::MarkerFeatureAdaptor::VERSION = '112.0.0';
+$Bio::EnsEMBL::Map::DBSQL::MarkerFeatureAdaptor::VERSION = '113.0.0';
 use strict;
 
 use Bio::EnsEMBL::Map::MarkerFeature;
