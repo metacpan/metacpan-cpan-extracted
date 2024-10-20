@@ -14,4 +14,4 @@ bad()
         SV *sv;
 
     CODE:
-        char *str = Perl_SvPV(sv, len);
+        char *str = Perl_SvPVbyte(sv, len);

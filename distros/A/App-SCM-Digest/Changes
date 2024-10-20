@@ -1,5 +1,9 @@
 Revision history for App-SCM-Digest
 
+0.14    20 October 2024
+        - Set the default branch name for Git operations (RT #156205).
+        - Update the Git pull command to merge by default.
+
 0.13    5 November 2017
         - Fix wrong skip test counts.
 

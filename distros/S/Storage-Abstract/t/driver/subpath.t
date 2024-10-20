@@ -3,7 +3,6 @@ use Storage::Abstract;
 
 use lib 't/lib';
 use Storage::Abstract::Test;
-use File::Spec;
 
 ################################################################################
 # This tests the subpath driver

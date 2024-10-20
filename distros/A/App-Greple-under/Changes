@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-under
 
+0.9905 2024-10-19T09:53:47Z
+
+    - sequence parameter accept combining character
+
 0.9904 2024-10-16T07:03:47Z
 
     - introduce --show-colormap module option

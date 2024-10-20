@@ -112,7 +112,7 @@ user@host:tmp$ scm-digest --conf /tmp/config.yml --get-email | sendmail user@hos
 
 ### Copyright and licence
 
-Copyright (C) 2015-2017 Tom Harrison
+Copyright (C) 2015-2024 Tom Harrison
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

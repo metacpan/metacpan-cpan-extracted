@@ -3,7 +3,7 @@ package Test::XS::Check;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Test2::API qw( context );
 use XS::Check 0.07;
@@ -46,9 +46,9 @@ Test::XS::Check - Test that your XS files are problem-free with XS::Check
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
-=head2 SYNOPSIS
+=head1 SYNOPSIS
 
     use Test2::V0;
     use Test::XS::Check qw( xs_ok );
@@ -57,16 +57,16 @@ version 0.01
 
     done_testing();
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 This module wraps Ben Bullock's L<XS::Check> module in a test module that you
 can incorporate into your distribution's test suite.
 
-=head2 EXPORTS
+=head1 EXPORTS
 
 This module exports one subroutine on request.
 
-=head3 xs_ok($path)
+=head2 xs_ok($path)
 
 Given a path to an XS file, this subroutine will run that file through
 L<XS::Check>. If any XS issues are found, the test fails and the problems are
@@ -75,8 +75,6 @@ emitted as diagnostics. If no issues are found, the test passes.
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Test-XS-Check/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -97,7 +95,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://houseabsolute.com/foss-donations/>.
 
 =head1 AUTHOR
 
@@ -105,7 +103,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2017 - 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

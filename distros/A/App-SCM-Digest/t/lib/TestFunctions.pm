@@ -12,13 +12,13 @@ our @EXPORT_OK = qw(initialise_git_repository
 
 sub initialise_git_repository
 {
-    system_ad("git init-db");
+    system_ad("git init-db -b master");
     initialise_git_clone();
 }
 
 sub initialise_bare_git_repository
 {
-    system_ad("git init-db --bare");
+    system_ad("git init-db --bare -b master");
     initialise_git_clone();
 }
 

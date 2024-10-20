@@ -1,5 +1,17 @@
 Revision history for Data-Pageset-Exponential:
 
+v0.4.0    2024-10-19 11:29:58+01:00 Europe/London
+  [Incompatible Changes]
+  - Bumped the minimum Perl to v5.20.
+
+  [Enhancements]
+  - The code uses newer Perl syntax features.
+
+  - Internal code improvements.
+
+  [Documentation]
+  - Update copyright year.
+
 v0.3.3    2023-06-11 10:54:59+01:00 Europe/London
   [Enhanceents]
   - Simplified type imports.

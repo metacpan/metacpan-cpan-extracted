@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Subpath;
-$Storage::Abstract::Driver::Subpath::VERSION = '0.005';
+$Storage::Abstract::Driver::Subpath::VERSION = '0.006';
 use v5.14;
 use warnings;
 
@@ -110,6 +110,7 @@ Storage::Abstract::Driver::Subpath - Change root metadriver
 
 This metadriver can modify another driver to use a different path than root. It
 will work as if the root of the L</source> driver was changed to L</subpath>.
+It does the opposite of L<Storage::Abstract::Driver::Superpath>.
 
 It is impossible (as intended) to get files outside the L</subpath> using this
 driver.

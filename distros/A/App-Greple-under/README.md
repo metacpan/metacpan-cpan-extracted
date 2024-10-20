@@ -61,7 +61,7 @@ the `-Munder::place` module.
 
 <div>
     <p>
-    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-under/main/images/mise-bake.png">
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-under/main/images/mise-place.png">
     </p>
 </div>
 

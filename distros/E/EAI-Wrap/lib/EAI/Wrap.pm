@@ -1,4 +1,4 @@
-package EAI::Wrap 1.915;
+package EAI::Wrap 1.916;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract ();
@@ -15,8 +15,9 @@ BEGIN {
 };
 use EAI::Common; use EAI::DateUtil; use EAI::DB; use EAI::File; use EAI::FTP;
 
+# first structures and functions from this module, then from DateUtil, DB, File, FTP, Common; last useful external functions
 our @EXPORT = qw(%common %config %execute @loads @optload %opt removeFilesinFolderOlderX openDBConn openFTPConn redoFiles getLocalFiles getFilesFromFTP getFiles checkFiles extractArchives getAdditionalDBData readFileData dumpDataIntoDB markProcessed writeFileFromDB writeFileFromMemory putFileInLocalDir markForHistoryDelete uploadFileToFTP uploadFileCMD uploadFile processingEnd processingPause processingContinues standardLoop moveFilesToHistory deleteFiles
-monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addMonths subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern
+monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addMonths subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD convertJulianToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern
 newDBH beginWork commit rollback readFromDB readFromDBHash doInDB storeInDB deleteFromDB updateInDB getConn setConn
 readText readExcel readXML writeText writeExcel
 removeFilesOlderX fetchFiles putFile moveTempFile archiveFiles removeFiles login getHandle setHandle
@@ -37,10 +38,10 @@ sub INIT {
 	$execute{homedir} = File::Basename::dirname(File::Spec->rel2abs((caller(0))[1])); # folder, where the main script is being executed.
 	$execute{scriptname} = File::Basename::fileparse((caller(0))[1]);
 	my ($homedirnode) = ($execute{homedir} =~ /^.*[\\\/](.*?)$/);
-	print STDOUT "\$execute{homedir}: $execute{homedir}, \$execute{scriptname}: $execute{scriptname}, \$homedirnode: $homedirnode\n";
 	$execute{envraw} = $config{folderEnvironmentMapping}{$homedirnode};
 	my $modulepath = File::Basename::dirname(File::Spec->rel2abs(__FILE__)); # get this module's folder as additional folderEnvironmentMapping.
 	$execute{envraw} = $config{folderEnvironmentMapping}{$modulepath} if !$execute{envraw}; # if nothing found check if modulepath is configured to get envraw from there...
+	print STDOUT "\$execute{homedir}: $execute{homedir}, \$execute{scriptname}: $execute{scriptname}, \$homedirnode: $homedirnode, \$modulepath: $modulepath, \$execute{envraw}: $execute{envraw}\n";
 	if ($execute{envraw}) {
 		$execute{env} = $execute{envraw};
 		readConfigs($execute{envraw}); # read configs again for different environment

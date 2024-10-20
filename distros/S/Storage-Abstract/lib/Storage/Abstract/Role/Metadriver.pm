@@ -1,5 +1,5 @@
 package Storage::Abstract::Role::Metadriver;
-$Storage::Abstract::Role::Metadriver::VERSION = '0.005';
+$Storage::Abstract::Role::Metadriver::VERSION = '0.006';
 use v5.14;
 use warnings;
 

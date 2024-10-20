@@ -2,16 +2,18 @@ package Data::Pageset::Exponential;
 
 # ABSTRACT: Page numbering for very large page numbers
 
-use v5.10.1;
+use v5.20;
 
 use Moo;
 
-use List::Util 1.33 qw/ all min /;
-use PerlX::Maybe;
-use POSIX qw/ ceil floor /;
+use List::Util 1.33 qw( all min );
+use PerlX::Maybe    qw( maybe );
+use POSIX           qw( ceil floor );
 use MooX::Aliases;
 use MooX::TypeTiny;
-use Types::Common 2.000000 qw/ is_Int Int ArrayRef is_HashRef PositiveOrZeroInt PositiveInt /;
+use Types::Common 2.000000 qw( is_Int Int ArrayRef is_HashRef PositiveOrZeroInt PositiveInt );
+
+use experimental qw( postderef signatures );
 
 
 use asa 'Data::Page';
@@ -21,7 +23,7 @@ use namespace::autoclean;
 # RECOMMEND PREREQ: Type::Tiny::XS
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.3.3';
+our $VERSION = 'v0.4.0';
 
 
 has total_entries => (
@@ -50,7 +52,7 @@ has current_page => (
     isa     => Int,
     lazy    => 1,
     default => \&first_page,
-    coerce  => sub { floor( $_[0] // 0 ) },
+    coerce  => sub($val) { floor( $val // 0 ) },
 );
 
 
@@ -79,11 +81,10 @@ has pages_per_set => (
     is      => 'lazy',
     isa     => PositiveInt,
     alias   => 'max_pages_per_set',
-    builder => sub {
-        my ($self) = @_;
+    builder => sub($self) {
         use integer;
         my $n = $self->pages_per_exponent * ( $self->exponent_max + 1 );
-        return ($n - 1) * 2 + 1;
+        return ( $n - 1 ) * 2 + 1;
     },
 );
 
@@ -91,9 +92,7 @@ has pages_per_set => (
 has series => (
     is      => 'lazy',
     isa     => ArrayRef [Int],
-    builder => sub {
-        my ($self) = @_;
-
+    builder => sub($self) {
         use integer;
 
         my @series;
@@ -117,21 +116,18 @@ has series => (
 
         }
 
-        my @prevs = map { -$_ } reverse @series[1..$#series];
+        my @prevs = map { -$_ } reverse @series[ 1 .. $#series ];
 
-
-        return [@prevs, @series];
+        return [ @prevs, @series ];
     },
 );
 
-around current_page => sub {
-    my $next = shift;
-    my $self = shift;
+around current_page => sub( $next, $self, @args ) {
 
     # N.B. unlike Data::Page, setting a value outside the first_page
     # or last_page will not return that value.
 
-    my $page = $self->$next(@_);
+    my $page = $self->$next(@args);
 
     return $self->first_page if $page < $self->first_page;
 
@@ -141,9 +137,7 @@ around current_page => sub {
 };
 
 
-sub entries_on_this_page {
-    my ($self) = @_;
-
+sub entries_on_this_page($self) {
     if ( $self->total_entries ) {
         return $self->last - $self->first + 1;
     }
@@ -153,16 +147,14 @@ sub entries_on_this_page {
 }
 
 
-sub last_page {
-    my ($self) = @_;
+sub last_page($self) {
     return $self->total_entries
       ? ceil( $self->total_entries / $self->entries_per_page )
       : $self->first_page;
 }
 
 
-sub first {
-    my ($self) = @_;
+sub first($self) {
     if ( $self->total_entries ) {
         return ( $self->current_page - 1 ) * $self->entries_per_page + 1;
     }
@@ -172,8 +164,7 @@ sub first {
 }
 
 
-sub last {
-    my ($self) = @_;
+sub last($self) {
     if ( $self->current_page == $self->last_page ) {
         return $self->total_entries;
     }
@@ -183,8 +174,7 @@ sub last {
 }
 
 
-sub previous_page {
-    my ($self) = @_;
+sub previous_page($self) {
     my $page = $self->current_page;
 
     return $page > $self->first_page
@@ -193,8 +183,7 @@ sub previous_page {
 }
 
 
-sub next_page {
-    my ($self) = @_;
+sub next_page($self) {
     my $page = $self->current_page;
 
     return $page < $self->last_page
@@ -203,10 +192,8 @@ sub next_page {
 }
 
 
-sub splice {
-    my ( $self, $items ) = @_;
-
-    my $last = min( $self->last, scalar(@$items) );
+sub splice( $self, $items ) {
+    my $last = min( $self->last, scalar( $items->@* ) );
 
     return $last
       ? @{$items}[ $self->first - 1 .. $last - 1 ]
@@ -214,23 +201,19 @@ sub splice {
 }
 
 
-sub skipped {
-    my ($self) = @_;
+sub skipped($self) {
     return $self->total_entries
-        ? $self->first - 1
-        : 0;
+      ? $self->first - 1
+      : 0;
 }
 
 # Ideally, we'd use a trigger instead, but Moo does not pass the old
 # value to a trigger.
 
-around entries_per_page => sub {
-    my $next = shift;
-    my $self = shift;
+around entries_per_page => sub( $next, $self, @args ) {
+    if (@args) {
 
-    if (@_) {
-
-        my $value = shift;
+        my ($value) = @args;
 
         my $first = $self->first;
 
@@ -248,9 +231,7 @@ around entries_per_page => sub {
 };
 
 
-sub pages_in_set {
-    my ($self) = @_;
-
+sub pages_in_set($self) {
     use integer;
 
     my $first = $self->first_page;
@@ -259,53 +240,47 @@ sub pages_in_set {
 
     return [
         grep { $first <= $_ && $_ <= $last }
-        map { $page + $_ } @{ $self->series }
+        map  { $page + $_ } @{ $self->series }
     ];
 }
 
 
-sub previous_set {
-    my ($self) = @_;
-
-    my $page = $self->current_page - (2 * $self->pages_per_exponent) - 1;
+sub previous_set($self) {
+    my $page = $self->current_page - ( 2 * $self->pages_per_exponent ) - 1;
     return $page < $self->first_page
-        ? undef
-        : $page;
+      ? undef
+      : $page;
 }
 
 
-sub next_set {
-    my ($self) = @_;
-
-    my $page = $self->current_page + (2 * $self->pages_per_exponent) - 1;
+sub next_set($self) {
+    my $page = $self->current_page + ( 2 * $self->pages_per_exponent ) - 1;
     return $page > $self->last_page
-        ? undef
-        : $page;
+      ? undef
+      : $page;
 }
 
 
-sub change_entries_per_page {
-    my ($self, $value) = @_;
-
+sub change_entries_per_page( $self, $value ) {
     $self->entries_per_page($value);
 
     return $self->current_page;
 }
 
 
-sub BUILDARGS {
-    my ( $class, @args ) = @_;
+sub BUILDARGS( $class, @args ) {
 
-    if (@args == 1 && is_HashRef(@args)) {
+    if ( @args == 1 && is_HashRef(@args) ) {
         return $args[0];
     }
 
     if ( @args && ( @args <= 3 ) && all { is_Int($_) } @args ) {
 
         return {
-                  total_entries    => $args[0],
-            maybe entries_per_page => $args[1],
-            maybe current_page     => $args[2],
+            total_entries => $args[0],
+            maybe
+              entries_per_page => $args[1],
+            maybe current_page => $args[2],
         };
 
     }
@@ -328,7 +303,7 @@ Data::Pageset::Exponential - Page numbering for very large page numbers
 
 =head1 VERSION
 
-version v0.3.3
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -506,7 +481,7 @@ exponent is set to C<1>:
 
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
-This module requires Perl v5.10.1 or later.
+Since v0.8.0, the this module requires Perl v5.20 or later.
 
 Future releases may only support Perl versions released in the last ten years.
 
@@ -546,7 +521,7 @@ Test code was adapted from L<Data::Page> to ensure compatability.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

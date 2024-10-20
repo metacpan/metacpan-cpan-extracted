@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Memory;
-$Storage::Abstract::Driver::Memory::VERSION = '0.005';
+$Storage::Abstract::Driver::Memory::VERSION = '0.006';
 use v5.14;
 use warnings;
 

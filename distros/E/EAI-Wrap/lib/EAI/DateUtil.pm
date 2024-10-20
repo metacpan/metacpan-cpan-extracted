@@ -1,9 +1,9 @@
-package EAI::DateUtil 1.915;
+package EAI::DateUtil 1.916;
 
 use strict; use warnings; use feature 'unicode_strings'; use utf8;
 use Exporter qw(import); use Time::Local qw( timelocal_modern timegm_modern ); use Time::localtime; use POSIX qw(mktime);
 
-our @EXPORT = qw(monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addDatePart subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern);
+our @EXPORT = qw(monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addDatePart subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD convertJulianToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern);
 
 my %monthsToInt = (
 	"en" => {"jan" => "01","feb" => "02","mar" => "03","apr" => "04","may" => "05","jun" => "06","jul" => "07","aug" => "08","sep" => "09","oct" => "10","nov" => "11","dec" => "12"},
@@ -412,7 +412,7 @@ sub addDays ($$$$;$) {
 	return undef if !$day or !$mon or !$year or !$dayDiff;
 	$locale = "en" if !$locale;
 	my $curDateEpoch = timelocal_modern(0,0,0,$$day,$$mon-1,$$year);
-	my $diffDate = localtime($curDateEpoch + $dayDiff * 60 * 60 * 25);
+	my $diffDate = localtime($curDateEpoch + $dayDiff * 60 * 60 * 24);
 	# dereference, so the passed variable is changed
 	$$year = $diffDate->year+1900;
 	$$mon = $diffDate->mon+1;
@@ -561,7 +561,14 @@ sub convertEpochToYYYYMMDD ($) {
 		my $date = localtime($arg);
 		return sprintf("%04d%02d%02d",$date->year()+1900,$date->mon()+1,$date->mday());
 	}
+}
 
+sub convertJulianToYYYYMMDD ($) {
+	my ($arg) = @_;
+	# excel calculates 0 as being 00.01.1900 which would be an invalid time object, so take 31.12.1899 instead
+	my $date = localtime(timelocal_modern(0,0,0,31,11,1899) + $arg * 60 * 60 * 24 - 1);
+	# why subtract 1 here ? excel wrongly assumes 1900 is a leap year: https://learn.microsoft.com/en-us/office/troubleshoot/excel/wrongly-assumes-1900-is-leap-year
+	return sprintf("%04d%02d%02d",$date->year()+1900,$date->mon()+1,$date->mday());
 }
 1;
 __END__
@@ -959,6 +966,12 @@ returns time epoch from given datestring (yyyymmdd)
 returns datestring (yyyymmdd) from epoch/Time::piece
 
  $arg .. date either as epoch (seconds since 1.1.1970) or as Time::piece object
+
+=item convertJulianToYYYYMMDD ($)
+
+returns datestring (yyyymmdd) from julian date (excel representation of dates)
+
+ $arg .. date as a julian date (integer/float, counting days from 0.1.1900)
 
 =back
 

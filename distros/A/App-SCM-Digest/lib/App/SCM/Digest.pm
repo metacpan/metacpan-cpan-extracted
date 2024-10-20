@@ -26,7 +26,7 @@ use constant EMAIL_ATTRIBUTES => (
     encoding     => 'quoted-printable',
 );
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 sub new
 {
@@ -500,7 +500,7 @@ Tom Harrison, C<< <tomhrr at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2015 Tom Harrison
+Copyright (C) 2015-2024 Tom Harrison
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

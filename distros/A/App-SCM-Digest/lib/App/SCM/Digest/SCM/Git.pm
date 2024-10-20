@@ -86,7 +86,7 @@ sub pull
 
     $self->prune();
 
-    system_ad("git pull -X theirs");
+    system_ad("git pull -X theirs --rebase");
 
     return 1;
 }

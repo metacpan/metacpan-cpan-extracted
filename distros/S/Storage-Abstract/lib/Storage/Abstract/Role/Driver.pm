@@ -1,5 +1,5 @@
 package Storage::Abstract::Role::Driver;
-$Storage::Abstract::Role::Driver::VERSION = '0.005';
+$Storage::Abstract::Role::Driver::VERSION = '0.006';
 use v5.14;
 use warnings;
 

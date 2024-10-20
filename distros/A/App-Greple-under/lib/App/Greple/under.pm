@@ -2,7 +2,7 @@ package App::Greple::under;
 use 5.024;
 use warnings;
 
-our $VERSION = "0.9904";
+our $VERSION = "0.9905";
 
 =encoding utf-8
 
@@ -63,7 +63,7 @@ the C<-Munder::place> module.
     greple -Munder::mise ... | ... | greple -Munder::place
 
 =for html <p>
-<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-under/main/images/mise-bake.png">
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-under/main/images/mise-place.png">
 </p>
 
 =head1 MODULE OPTION
@@ -161,6 +161,7 @@ my %marks  = (
     overline => [ "\N{OVERLINE}" ],
     macron   => [ "\N{MACRON}" ],
     caret    => [ "^" ],
+    ring     => [ "\N{NBSP}\N{COMBINING RING ABOVE}" ],
     sign     => [ qw( + - ~ ) ],
     number   => [ "0" .. "9" ],
     alphabet => [ "a" .. "z", "A" .. "Z" ],
@@ -208,7 +209,7 @@ sub prepare {
 	qr/(?<ansi>@ansi_re) (?<text>[^\e]*) (?<reset>$reset_re)/x;
     };
     if (my $s = $config->{sequence}) {
-	@marks = $s =~ /\S/g;
+	@marks = grep { ! /\A\s\z/ } $s =~ /\X/g;
     }
     elsif (my $mark = $marks{$config->{type}}) {
 	@marks = $mark->@*;

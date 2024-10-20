@@ -1,5 +1,5 @@
 package Storage::Abstract::Driver::Directory;
-$Storage::Abstract::Driver::Directory::VERSION = '0.005';
+$Storage::Abstract::Driver::Directory::VERSION = '0.006';
 use v5.14;
 use warnings;
 

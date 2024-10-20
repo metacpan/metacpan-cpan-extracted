@@ -1,5 +1,5 @@
 package Storage::Abstract;
-$Storage::Abstract::VERSION = '0.005';
+$Storage::Abstract::VERSION = '0.006';
 use v5.14;
 use warnings;
 
@@ -169,6 +169,11 @@ use them all in sequence until it finds a file.
 This metadriver is useful when you want to modify the base path of
 another storage, to restrict access or adapt a path (for example for HTTP
 public directory).
+
+=item * L<Storage::Abstract::Driver::Superpath>
+
+This metadriver does the opposite of C<subpath> - allows you to modify path of
+a storage to virtually put it into a nested directory as a whole.
 
 =item * L<Storage::Abstract::Driver::Null>
 

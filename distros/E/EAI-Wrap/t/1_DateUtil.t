@@ -1,6 +1,6 @@
 use strict; use warnings; use Test::More; use utf8;
 use EAI::DateUtil; use Time::Piece;
-use Test::More tests => 198;
+use Test::More tests => 199;
 # for consistent time results set to timezone to UTC and invoke scalar localtime
 $ENV{TZ} = 'UTC';
 scalar localtime;
@@ -208,4 +208,5 @@ is(formatTime(make_time("122003"),"%02d%02d%02d%02d"),"00122003",'formatTime fro
 is(formatTime(make_time("122003"),"%02d%02d%02d%02d%02d"),undef,'formatTime with unsupported format');
 is(formatTime(make_time("122003",60),"%02d%02d"),"1221",'formatTime with format %02d%02d from make_time("122003",60)');
 like(formatTime(get_curtime_epochs(),"%02d%02d"),qr/\d{2}\d{2}/,'formatTime(get_curtime_epochs(),"%02d%02d")');
+is(convertJulianToYYYYMMDD(45582),"20241017",'convertJulianToYYYYMMDD');
 done_testing();

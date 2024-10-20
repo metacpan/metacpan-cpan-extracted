@@ -36,9 +36,10 @@ do { my $x = {
                                       'PerlX::Maybe' => '0',
                                       'Types::Common' => '2.000000',
                                       'asa' => '0',
+                                      'experimental' => '0',
                                       'integer' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.1'
+                                      'perl' => 'v5.20.0'
                                     }
                     },
        'test' => {

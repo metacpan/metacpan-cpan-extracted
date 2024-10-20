@@ -1,5 +1,5 @@
 package Storage::Abstract::X;
-$Storage::Abstract::X::VERSION = '0.005';
+$Storage::Abstract::X::VERSION = '0.006';
 use v5.14;
 use warnings;
 
@@ -60,27 +60,27 @@ sub as_string
 ## SUBCLASSES
 
 package Storage::Abstract::X::NotFound {
-$Storage::Abstract::X::NotFound::VERSION = '0.005';
+$Storage::Abstract::X::NotFound::VERSION = '0.006';
 use parent -norequire, 'Storage::Abstract::X';
 }
 
 package Storage::Abstract::X::Readonly {
-$Storage::Abstract::X::Readonly::VERSION = '0.005';
+$Storage::Abstract::X::Readonly::VERSION = '0.006';
 use parent -norequire, 'Storage::Abstract::X';
 }
 
 package Storage::Abstract::X::PathError {
-$Storage::Abstract::X::PathError::VERSION = '0.005';
+$Storage::Abstract::X::PathError::VERSION = '0.006';
 use parent -norequire, 'Storage::Abstract::X';
 }
 
 package Storage::Abstract::X::HandleError {
-$Storage::Abstract::X::HandleError::VERSION = '0.005';
+$Storage::Abstract::X::HandleError::VERSION = '0.006';
 use parent -norequire, 'Storage::Abstract::X';
 }
 
 package Storage::Abstract::X::StorageError {
-$Storage::Abstract::X::StorageError::VERSION = '0.005';
+$Storage::Abstract::X::StorageError::VERSION = '0.006';
 use parent -norequire, 'Storage::Abstract::X';
 }
 

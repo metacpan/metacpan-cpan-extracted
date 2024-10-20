@@ -43,8 +43,7 @@ use Test::XS::Check qw( xs_ok );
             };
             event Diag => sub {
                 call message =>
-                    q{Remove the 'Perl_' prefix from Perl_SvPV at line 17};
-
+                    q{Remove the 'Perl_' prefix from Perl_SvPVbyte at line 17};
             };
             end();
         },

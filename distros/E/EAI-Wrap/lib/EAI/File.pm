@@ -1,4 +1,4 @@
-package EAI::File 1.915;
+package EAI::File 1.916;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import);use Text::CSV();use Data::XLSX::Parser();use Spreadsheet::ParseExcel();use Spreadsheet::WriteExcel();use Excel::Writer::XLSX();use Data::Dumper qw(Dumper);use XML::LibXML();use XML::LibXML::Debugging();
@@ -565,6 +565,7 @@ sub writeText ($$;$) {
 	my $logger = get_logger();
 	my $filename = $File->{filename};
 	my $writemode = ($File->{append} ? ">>" : ">");
+	$logger->debug("sepHead: ".Data::Dumper::qquote($File->{format_sepHead}).", sep: ".Data::Dumper::qquote($File->{format_sep}));
 	if (ref($data) ne 'ARRAY') {
 		$logger->error("passed data in \$data is not a ref to array (you have to initialize it as an array):".Dumper($data));
 		return 0;

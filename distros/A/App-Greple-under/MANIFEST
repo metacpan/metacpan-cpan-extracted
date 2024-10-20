@@ -4,7 +4,7 @@ LICENSE
 META.json
 README.md
 cpanfile
-images/mise-bake.png
+images/mise-place.png
 images/normal.png
 images/under-line.png
 lib/App/Greple/Config.pm

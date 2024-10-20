@@ -1,5 +1,8 @@
 Revision history for Storage-Abstract
 
+0.006 - 2024-10-19
+	- Added superpath driver
+
 0.005 - 2024-10-19
 	- Added X::Readonly, used to throw exception on readonly instead of X::StorageError
 	- Metadrivers no longer have readonly attribute, they now report the readonly status of their sources
