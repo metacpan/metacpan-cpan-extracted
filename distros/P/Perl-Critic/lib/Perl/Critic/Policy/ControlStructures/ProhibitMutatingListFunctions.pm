@@ -11,7 +11,7 @@ use Perl::Critic::Utils qw{
 
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ sub applies_to       { return 'PPI::Token::Word' }
 #-----------------------------------------------------------------------------
 
 sub initialize_if_enabled {
-    my ($self, $config) = @_;
+    my ($self, undef) = @_;
 
     $self->{_all_list_funcs} = {
         hashify keys %{ $self->{_list_funcs} }, keys %{ $self->{_add_list_funcs} }

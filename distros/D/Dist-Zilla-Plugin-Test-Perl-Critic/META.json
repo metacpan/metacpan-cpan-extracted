@@ -54,7 +54,7 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::No404s" : "0",
             "Test::Portability::Files" : "0",
-            "Test::Spelling" : "0.12"
+            "Test::Spelling" : "0.17"
          }
       },
       "runtime" : {
@@ -62,6 +62,7 @@
             "Data::Dumper" : "0",
             "Data::Section" : "0.004",
             "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::Role::FileFinderUser" : "0",
             "Dist::Zilla::Role::FileGatherer" : "0",
             "Dist::Zilla::Role::FileMunger" : "0",
             "Dist::Zilla::Role::PrereqSource" : "0",
@@ -175,11 +176,11 @@
    "provides" : {
       "Dist::Zilla::Plugin::CriticTests" : {
          "file" : "lib/Dist/Zilla/Plugin/CriticTests.pm",
-         "version" : "3.003"
+         "version" : "3.004"
       },
       "Dist::Zilla::Plugin::Test::Perl::Critic" : {
          "file" : "lib/Dist/Zilla/Plugin/Test/Perl/Critic.pm",
-         "version" : "3.003"
+         "version" : "3.004"
       }
    },
    "release_status" : "stable",
@@ -196,7 +197,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#distzilla"
    },
-   "version" : "3.003",
+   "version" : "3.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.041004"
@@ -422,7 +423,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::MinimumVersion",
-            "version" : "2.000010"
+            "version" : "2.000011"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -453,7 +454,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::PodSpelling",
-            "version" : "2.007005"
+            "version" : "2.007006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Pod::No404s",
@@ -489,7 +490,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::Portability",
-            "version" : "2.001001"
+            "version" : "2.001002"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::CleanNamespaces",
@@ -1106,7 +1107,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v3.003",
+                  "tag" : "v3.004",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1263,7 +1264,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
             "name" : "Test::Perl::Critic",
-            "version" : "3.003"
+            "version" : "3.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::CheckBreaks",
@@ -1352,8 +1353,8 @@
    },
    "x_authority" : "cpan:JQUELIN",
    "x_contributors" : [
-      "J\u00e9r\u00f4me Quelin <jquelin@gmail.com>",
       "Karen Etheridge <ether@cpan.org>",
+      "J\u00e9r\u00f4me Quelin <jquelin@gmail.com>",
       "Graham Knop <haarg@haarg.org>",
       "Kent Fredric <kentfredric@gmail.com>",
       "Olivier Mengu\u00e9 <dolmen@cpan.org>",

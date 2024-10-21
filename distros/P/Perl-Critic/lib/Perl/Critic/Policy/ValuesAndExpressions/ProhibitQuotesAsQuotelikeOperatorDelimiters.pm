@@ -10,7 +10,7 @@ use Perl::Critic::Utils qw{
 };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -89,7 +89,7 @@ sub applies_to {
 #-----------------------------------------------------------------------------
 
 sub initialize_if_enabled {
-    my ($self, $config) = @_;
+    my ($self, undef) = @_;
 
     $self->{_allowed_operators_by_delimiter} = {
         $QUOTE    => $self->_single_quote_allowed_operators(),

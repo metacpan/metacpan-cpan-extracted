@@ -65,7 +65,7 @@
    "provides" : {
       "Dist::Zilla::App::Command::DiffMint" : {
          "file" : "lib/Dist/Zilla/App/Command/DiffMint.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/haarg/Dist-Zilla-App-Command-DiffMint"
       }
    },
-   "version" : "v0.2.0",
+   "version" : "v0.3.0",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

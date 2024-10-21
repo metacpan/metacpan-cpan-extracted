@@ -1,12 +1,40 @@
+package MooseX::Attribute::Catalyst::View::EmbeddedPerl::ExportedAttribute;
+  
+use Moose::Role;
+ 
+has 'exported_to_template' => (is=>'ro');
+ 
+around '_process_options' => sub {
+  my ($orig, $self, $name, $options) = (@_);
+  if(delete($options->{export})) {
+    $options->{exported_to_template} = 1;
+  } else {
+    $options->{exported_to_template} = 0;
+  }
+  return $self->$orig($name, $options);
+};
+
+package Moose::Meta::Attribute::Custom::Trait::Catalyst::View::EmbeddedPerl::ExportedAttribute;
+sub register_implementation { 'MooseX::Attribute::Catalyst::View::EmbeddedPerl::ExportedAttribute' }
+
 package Catalyst::View::EmbeddedPerl::PerRequest;
 
 use Moose;
 use String::CamelCase;
 use Template::EmbeddedPerl;
+use Moose::Util::MetaRole;
+use MooseX::MethodAttributes;
+
+Moose::Util::MetaRole::apply_metaroles(
+  for => __PACKAGE__,
+  class_metaroles => {
+    attribute  => ['MooseX::Attribute::Catalyst::View::EmbeddedPerl::ExportedAttribute'],
+  },
+);
 
 extends 'Catalyst::View::BasePerRequest';
 
-our $VERSION = 0.001006;
+our $VERSION = 0.001007;
 eval $VERSION;
 
 # Args that get passed cleanly to Template::EmbeddedPerl
@@ -22,9 +50,31 @@ my @proxy_methods = qw(
 
 has _temple => (is=>'ro', required=>1, handles=>\@proxy_methods); # The underlying temple object
 has _doc => (is=>'ro', required=>1); # The underlying parsed template object
+has _parent_views => (is=>'ro', required=>1); # All parent classes that inherit from Catalyst::View::EmbeddedPerl::PerRequest
+has _exported_attributes => (is=>'ro', required=>1); # All attributes that are exported to the template
 
 sub modify_init_args {
   my ($class, $app, $merged_args) = @_;
+
+  ## Get All parent objects that inherit from Catalyst::View::EMbeddedPerl::PerRequest 
+  ## except for the current object and Catalyst::View::EmbeddedPerl::PerRequest itself
+
+  my @parent_views = grep {
+    $_->isa('Catalyst::View::EmbeddedPerl::PerRequest')
+    && $_ ne $class
+    && $_ ne 'Catalyst::View::EmbeddedPerl::PerRequest'
+  } $class->meta->linearized_isa;
+
+  $merged_args->{_parent_views} = \@parent_views;
+
+  # Find all the attributes that have a 'export' flag via the meta object
+  my @exported_attributes =
+    map { $_->name  } 
+    grep {
+      $_->can('exported_to_template') && $_->exported_to_template
+    } $class->meta->get_all_attributes;
+
+  $merged_args->{_exported_attributes} = \@exported_attributes;
 
   # First pull out all the args we are sending to Template::EmbeddedPerl a.k.a. 'Temple'
   my %temple_args = ();
@@ -36,8 +86,12 @@ sub modify_init_args {
   # Next update template args to have the correct namespace, etc.
   %temple_args = $class->modify_temple_args($app, %temple_args);
 
+  foreach my $exported_attr (@exported_attributes) {
+    $temple_args{prepend} .= "my \$$exported_attr = \$self->$exported_attr; ";
+  }
+
   # Finally, build the temple object
-  my ($temple, $doc) = $class->build_temple($app, %temple_args);
+  my ($temple, $doc) = $class->build_temple($app, $merged_args->{_parent_views}, %temple_args);
   $merged_args->{_temple} = $temple;
   $merged_args->{_doc} = $doc;
 
@@ -55,6 +109,7 @@ sub modify_temple_args {
   $temple_args{prepend} = $class->prepare_prepend_arg($app, $temple_args{prepend});
   $temple_args{sandbox_ns} ||= "${class}::EmbeddedPerl::SandBox";
   $temple_args{template_extension} = 'epl' unless $temple_args{template_extension};
+  $temple_args{use_cache} = 1;
   return %temple_args;
 }
 
@@ -64,28 +119,45 @@ sub prepare_prepend_arg {
 }
 
 sub build_temple {
-  my ($class, $app, %temple_args) = @_;
+  my ($class, $app, $parent_views, %temple_args) = @_;
+
   my ($data, $path) = $class->find_template($app, $temple_args{template_extension});
   $temple_args{source} = $path;
 
   my $temple = Template::EmbeddedPerl->new(%temple_args);
   my $compiled = $temple->from_string($data);
 
-  return ($temple, $compiled);
+  my @parent_compiled = ();
+  foreach my $parent_class (@$parent_views) {
+    my ($data, $path) = $parent_class->find_template($app, $temple_args{template_extension});
+    my $local_template = bless +{
+      %$temple,
+      preamble=>'',
+      sandbox_ns=>"${parent_class}::EmbeddedPerl::SandBox"
+    }, ref $temple;
+    my $obj = $local_template->from_string($data);
+
+    push @parent_compiled, $obj;  
+  }
+
+  return ($temple, [$compiled, @parent_compiled]);
 }
 
+my %cached_templates = ();
 sub find_template {
   my ($class, $app, $template_extension) = @_;
 
   # Ok so first check __DATA__ for the template
   my $data_fh = do { no warnings 'once'; no strict 'refs'; *{"${class}::DATA"}{IO} };
   if (defined $data_fh) {
+    return $cached_templates{$class} if exists $cached_templates{$class};
     my $data = do { local $/; <$data_fh> };
     close($data_fh);
     if($data) {
       my $package_file = $class;
       $package_file =~ s/::/\//g;
       my $path = $INC{"${package_file}.pm"};
+      $cached_templates{$class} = $data;
       return ($data, "${path}/DATA");
     }
   }
@@ -131,6 +203,21 @@ sub build_helpers {
     %$init_arg_helpers,
     ($class->can('helpers') ? $class->helpers() : ())
   );
+
+  # Using meta, get all the methods with the Helper attribute
+  my @helper_methods = grep {
+    $_->can('attributes') && (grep { $_ eq 'Helper' } @{$_->attributes})
+  } $class->meta->get_all_methods;
+
+  foreach my $helper_method (@helper_methods) {
+    my $helper_name = $helper_method->name;
+    $helpers{$helper_name} = sub {
+      my ($self, $c, @args) = @_;
+      return $self->$helper_name(@args);
+    };
+  }
+
+
   return %helpers;
 }
 
@@ -174,20 +261,31 @@ sub render {
     return $error;
   };
 
-  $c->log->debug("Template @{[ ref $self ]} successfully rendered") if $c->debug;    
+  $c->log->debug("Template @{[ ref $self ]} successfully rendered") if $c->debug;
 
   return $rendered;
 }
 
 sub render_template {
   my ($self, $c, @args) = @_;
-  my $ns = $self->_temple->{sandbox_ns};
 
-  no strict 'refs';
-  no warnings 'redefine';
-  local *{"${ns}::__SELF"} = sub { $self };
+  my $rendered_template = '';
+  my @docs = @{$self->_doc};
+  foreach my $doc (@docs) {
+    my $ns = $doc->{yat}->{sandbox_ns};  
+    no strict 'refs';
+    no warnings 'redefine';
+    local *{"${ns}::__SELF"} = sub { $self };
 
-  return my $page = $self->_doc->render($self, $c, @args);
+    $rendered_template = $doc->render($self, $c, @args);
+    $rendered_template = $self->_temple->{auto_escape}
+      ? $self->raw($rendered_template)
+      : $rendered_template;
+
+    @args = ($rendered_template);
+  }
+
+  return $rendered_template;
 }
 
 sub read_attribute_for_html {
@@ -206,8 +304,24 @@ sub attribute_exists_for_html {
 
 sub view {
   my ($self, $view, @args) = @_;
-  return $self->ctx->view($view, @args)->get_rendered;
+  my $response = $self->ctx->view($view, @args)->get_rendered;
+
+  ## If temple is auto escape, we need to mark the string as safe
+  ## so that embedded views properly escape the content.  This is ok
+  ## because the temple object will escape the content when it renders
+
+  $response = $self->_temple->{auto_escape}
+    ? $self->raw($response)
+    : $response;
+
+  return $response;
 }
+
+# Rendered is always a string, never an array so no need to flatten
+around 'flatten_rendered' => sub {
+  my ($orig, $self, @args) = @_;
+  return $args[0];
+};
 
 __PACKAGE__->meta->make_immutable;
 
@@ -224,18 +338,22 @@ Declare a view in your Catalyst application:
   use Moose;
   extends 'Catalyst::View::EmbeddedPerl::PerRequest';
 
-  has 'name' => (is => 'ro', isa => 'Str');
+  has 'name' => (is => 'ro', isa => 'Str', export=>1);
+
+  sub title :Helper { 'Hello Title' }
 
   __PACKAGE__->meta->make_immutable;
   __DATA__
-  <p>Hello <%= $self->name %></p>
+  <title><%= title() %></title>
+  <p>Hello <%= $name %></p>
 
 You can also use a standalone text file as a template.  This text file
 will be located in the same directory as the view module and will have
 a 'snake case' version of the view module name with a '.epl' extension.
 
   # In hello_name.epl
-  <p>Hello <%= $self->name %>!</p>
+  <title><%= title() %></title>
+  <p>Hello <%= $name %></p>
 
 In your Catalyst controller:
 
@@ -246,6 +364,7 @@ In your Catalyst controller:
 
 Produces the following output:
 
+  <title>Hello Title</title>
   <p>Hello Perl Hacker!</p>
 
 =head1 DESCRIPTION
@@ -469,6 +588,113 @@ Example:
       },
    );
   }
+
+Lastly, experimentally you can use the C<Helper> attribute to define helpers in your view
+module.  This requires L<MooseX::MethodAttributes>.
+
+Example:
+
+  package MyApp::View::MyView;
+
+  use Moose;
+  use MooseX::MethodAttributes;
+
+  extends 'Catalyst::View::EmbeddedPerl::PerRequest';
+
+  sub my_helper :Helper {
+    my ($self, $c, $arg) = @_;
+    return "Hello $arg";
+  }
+
+  __PACKAGE__->meta->make_immutable;
+
+Please note that if you override a helper method in a subclass you currently need
+to also add the Helper attribute to the method in the subclass.
+
+=head1 TEMPLATE INHERITANCE
+
+This is an experimental feature that allows you to inherit from other views. When
+you inherit from a view, the parent's template automatically becomes the base template
+Example:
+
+    package Example::View::Base;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::View::EmbeddedPerl::PerRequest';
+
+    sub title :Helper { 'Missing title' }
+
+    sub styles {
+      my ($self, $cb) = @_;
+      my $styles = $self->content('css') || return '';
+      return $cb->($styles);
+    }
+
+    __PACKAGE__->meta->make_immutable;
+    __PACKAGE__->config(
+      auto_escape => 1,
+      content_type => 'text/html',
+    );
+    
+    __DATA__
+    <html>
+      <head>
+        <title><%= title() %></title>
+        %= $self->styles(sub {
+          <style>
+            %= shift
+          </style>
+        % })
+      </head>
+      <body>
+        <%= $content %>
+      </body>
+    </html>
+
+And an inheriting view:
+
+    package Example::View::Inherit;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Example::View::Base';
+
+    has 'name' => (is => 'ro', isa => 'Str', export=>1);
+
+    sub title :Helper  { 'Inherited Title' }
+
+    __PACKAGE__->meta->make_immutable;
+    __DATA__
+    # Style content
+    % content_for('css', sub {
+          p { color: red; }
+    % });
+    # Main content
+      <p>hello <%= $name %></p>
+
+When called from a controller like this:
+
+    sub inherit :Local  {
+      my ($self, $c) = @_;
+      return $c->view('Inherit', name=>'joe')->http_ok;
+    }
+
+Produced output similar to:
+
+    <html>
+      <head>
+        <title>Inherited Title</title>
+        <style>
+          p { color: red; }
+        </style>
+      </head>
+      <body>
+        <p>hello joe</p>
+      </body>
+    </html>
 
 =head1 DEFAULT HELPERS
 

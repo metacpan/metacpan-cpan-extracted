@@ -100,9 +100,7 @@ for my $perl (@perls) {
         my $in_yytokentype;
         while(<$in>) {
             next if /PERL_CORE|PERL_IN_TOKE_C/;
-            if ($canon_version =~ /^5\.(?:36|37\.0)/) {
-                s!(YYEMPTY = -2,)!/* $1 */!;
-            }
+            s!(YYEMPTY = -2,)!/* $1 */!;
             print $out $_;
             $perly .= $_;
             if (/enum yytokentype/) {
@@ -144,22 +142,21 @@ for my $perl (@perls) {
                 }
                 if (/\s*\{\s*0,/) {
                     # add undeclared tokens
-                    print $out "    /* added by Perl::Lexer */\n";
+                    $token_info .= "    /* added by Perl::Lexer */\n";
                     for my $token (sort {$yytokentype{$a} <=> $yytokentype{$b}} grep {$yytokentype{$_}} keys %yytokentype) {
-                        print $out qq/    { $token, TOKENTYPE_OPNUM, "$token" },\n/;
+                        $token_info .= qq/    { $token, TOKENTYPE_OPNUM, "$token" },\n/;
                         # print "added $token to token_info\n";
                     }
                 }
                 if (/DEBUG_TOKEN\s*\((\w+),\s*(\w+)\)\s*,/) {
                     my ($type, $name) = ($1, $2);
-                    print $out qq/    { $name, TOKENTYPE_$type, "$name" },\n/;
-                } else {
-                    print $out $_;
+                    $_ = qq/    { $name, TOKENTYPE_$type, "$name" },\n/;
                 }
                 $token_info .= $_;
                 $flag = 0 if /^\s*$/;
             }
         }
+        print $out $token_info;
     }
 
     my ($revision, $major, $minor) = split /\./, $canon_version;

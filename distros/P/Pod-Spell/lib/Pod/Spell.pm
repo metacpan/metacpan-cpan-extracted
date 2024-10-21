@@ -3,7 +3,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -22,9 +22,6 @@ sub new {
     my $parser = Pod::Spell::_Processor->new;
     $parser->stopwords($stopwords);
     $parser->_is_debug($debug);
-    open my $output_fh, '>&:encoding(UTF-8)', \*STDOUT
-      or die "can't dup STDOUT: $!";
-    $parser->output_fh($output_fh);
 
     my %self = (
         processor => $parser,
@@ -40,11 +37,13 @@ sub _is_debug { (shift)->{debug} ? 1 : 0; }
 sub stopwords { (shift)->{stopwords} }
 
 sub parse_from_file {
-    shift->{processor}->parse_from_file(@_)
+    my $self = shift;
+    $self->{processor}->parse_from_file(@_);
 }
 
 sub parse_from_filehandle {
-    shift->{processor}->parse_from_file(@_)
+    my $self = shift;
+    $self->parse_from_file(@_);
 }
 
 package # Hide from indexing
@@ -72,6 +71,16 @@ my %track_elements = (
     C         => 1,
     F         => 1,
 );
+
+sub output_fh {
+    my $self = shift;
+    if (@_) {
+        my ($fh) = @_;
+        my $encoded_fh = grep $_ eq 'utf8', PerlIO::get_layers(*$fh);
+        $self->{_encoded_fh} = $encoded_fh;
+    }
+    return $self->SUPER::output_fh(@_);
+}
 
 sub _handle_element_start {
     my ($self, $element_name, $attr) = @_;
@@ -146,7 +155,14 @@ sub _handle_element_end {
         if !length $out;
 
     local $Text::Wrap::huge = 'overflow';
-    print { $fh } Text::Wrap::wrap( '', '', $out ) . "\n\n";
+    my $wrapped = Text::Wrap::wrap( '', '', $out ) . "\n\n";
+
+    if ($self->{_encoded_fh}) {
+        print { $fh } $wrapped;
+    }
+    else {
+        print { $fh } Encode::encode('UTF-8', $wrapped);
+    }
 }
 
 1;
@@ -165,7 +181,7 @@ Pod::Spell - a formatter for spellchecking Pod
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -389,6 +405,20 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Sean M. Burke <sburke@cpan.org>
+
+=item *
+
+Caleb Cushing <xenoterracide@gmail.com>
+
+=back
+
 =head1 CONTRIBUTORS
 
 =for stopwords David Golden Graham Knop Kent Fredric Mohammad S Anwar Olivier Mengué Paulo Custodio
@@ -421,23 +451,9 @@ Paulo Custodio <pauloscustodio@gmail.com>
 
 =back
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
-
-Sean M. Burke <sburke@cpan.org>
-
-=item *
-
-Caleb Cushing <xenoterracide@gmail.com>
-
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Olivier Mengué.
+This software is Copyright (c) 2024 by Olivier Mengué.
 
 This is free software, licensed under:
 

@@ -3,7 +3,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.070';
+our $VERSION = '0.071';
 
 use 5.020;
 use Moo;
@@ -15,7 +15,7 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use JSON::Schema::Modern::Utilities 0.583 qw(assert_keyword_type annotate_self E is_type jsonp);
+use JSON::Schema::Modern::Utilities qw(assert_keyword_type annotate_self E is_type jsonp);
 use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
@@ -119,7 +119,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.070
+version 0.071
 
 =head1 DESCRIPTION
 

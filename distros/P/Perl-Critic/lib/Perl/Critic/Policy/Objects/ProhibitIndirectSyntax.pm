@@ -9,7 +9,7 @@ use Readonly;
 
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ sub applies_to           { return 'PPI::Token::Word'         }
 #-----------------------------------------------------------------------------
 
 sub violates {
-    my ( $self, $elem, $doc ) = @_;
+    my ( $self, $elem, undef ) = @_;
 
     # We are only interested in the functions we have been told to check.
     # Do this before calling is_function_call() because we want to weed

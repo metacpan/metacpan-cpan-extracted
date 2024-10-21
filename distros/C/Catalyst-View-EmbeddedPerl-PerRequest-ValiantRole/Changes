@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest-ValiantRole
 
+0.001005  20 October 2024
+          - Fixed issues with auto-escaping
+
 0.001004  06 October 2024
           - Fixed metadata goof
 

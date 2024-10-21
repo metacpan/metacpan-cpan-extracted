@@ -2,10 +2,10 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Test::MinimumVersion; # git description: v2.000009-3-gb990056
+package Dist::Zilla::Plugin::Test::MinimumVersion; # git description: v2.000010-9-g75411f8
 # ABSTRACT: Author tests for minimum required versions
 
-our $VERSION = '2.000010';
+our $VERSION = '2.000011';
 
 use Moose;
 with
@@ -98,9 +98,6 @@ __PACKAGE__->meta->make_immutable;
 #pod     [Test::MinimumVersion]
 #pod     max_target_perl = 5.10.1
 #pod
-#pod 1;
-#pod __END__
-#pod
 #pod =head1 DESCRIPTION
 #pod
 #pod =for Pod::Coverage FILENAME gather_files munge_file register_prereqs
@@ -127,7 +124,7 @@ Dist::Zilla::Plugin::Test::MinimumVersion - Author tests for minimum required ve
 
 =head1 VERSION
 
-version 2.000010
+version 2.000011
 
 =head1 SYNOPSIS
 
@@ -135,9 +132,6 @@ In C<dist.ini>:
 
     [Test::MinimumVersion]
     max_target_perl = 5.10.1
-
-1;
-__END__
 
 =head1 DESCRIPTION
 
@@ -182,7 +176,7 @@ Marcel Grünauer <marcel@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Marcel Gruenauer Chris Weyl Kent Fredric
+=for stopwords Karen Etheridge Marcel Gruenauer Graham Knop Chris Weyl Kent Fredric
 
 =over 4
 
@@ -193,6 +187,10 @@ Karen Etheridge <ether@cpan.org>
 =item *
 
 Marcel Gruenauer <hanekomu@gmail.com>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
 
 =item *
 

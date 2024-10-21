@@ -13,7 +13,7 @@ use Perl::Critic::Utils qw( :severities :classification
 );
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -122,7 +122,7 @@ sub _find_close_invocations_or_return {
 
     my $closes = $parent->find(sub {
         ##no critic (ProhibitExplicitReturnUndef)
-        my ($parent, $candidate) = @_;  ## no critic(Variables::ProhibitReusedNames)
+        my (undef, $candidate) = @_;  ## no critic(Variables::ProhibitReusedNames)
         return undef if $candidate->isa('PPI::Statement::Sub');
         my $candidate_loc = $candidate->location;
         return undef if !defined $candidate_loc->[0];

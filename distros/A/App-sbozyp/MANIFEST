@@ -1,0 +1,14 @@
+bin/sbozyp
+lib/App/sbozyp.pm
+
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+cpanfile
+
+package/sbozyp.SlackBuild
+package/slack-desc
+package/sbozyp.conf.example
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

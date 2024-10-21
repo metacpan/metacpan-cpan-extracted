@@ -1,10 +1,10 @@
 {
-   "abstract" : "Hades realm for Moose",
+   "abstract" : "Hades realm for Rope",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -32,9 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Hades" : "0.22",
-            "Hades::Realm::OO" : "0.07",
-            "Moose" : "1.00",
+            "Hades" : "0.23",
+            "Hades::Realm::OO" : "0.08",
             "Rope" : "0.36",
             "perl" : "5.006"
          }
@@ -46,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.03,
+   "version" : 0.04,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

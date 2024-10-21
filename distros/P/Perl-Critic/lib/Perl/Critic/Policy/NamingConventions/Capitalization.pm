@@ -22,7 +22,7 @@ use PPIx::Utils::Traversal qw<
 
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -202,7 +202,7 @@ sub applies_to          { return qw< PPI::Statement PPI::Token::Label > }
 #-----------------------------------------------------------------------------
 
 sub initialize_if_enabled {
-    my ($self, $config) = @_;
+    my ($self, undef) = @_;
 
     my $configuration_exceptions =
         Perl::Critic::Exception::AggregateConfiguration->new();
@@ -508,7 +508,7 @@ sub _foreach_variable_capitalization {
 }
 
 sub _label_capitalization {
-    my ($self, $elem, $name) = @_;
+    my ($self, $elem) = @_;
 
     return if _is_not_real_label($elem);
     ( my $label = $elem->content() ) =~ s< \s* : \z ><>xms;
@@ -647,7 +647,6 @@ There are other opinions on the specifics, for example, in
 L<perlstyle|perlstyle>.  This
 policy can be configured to match almost any style that you can think of.
 
-
 =head1 CONFIGURATION
 
 You can specify capitalization rules for the following things:
@@ -713,6 +712,9 @@ C<subroutine_exemptions> defaults to
 C<AUTOLOAD BUILD BUILDARGS CLEAR CLOSE DELETE DEMOLISH DESTROY EXISTS EXTEND FETCH FETCHSIZE FIRSTKEY GETC NEXTKEY POP PRINT PRINTF PUSH READ READLINE SCALAR SHIFT SPLICE STORE STORESIZE TIEARRAY TIEHANDLE TIEHASH TIESCALAR UNSHIFT UNTIE WRITE>
 which should cover all the standard Perl subroutines plus those from
 L<Moose|Moose>.
+
+Note that that C<package_exemptions> does not check complete package names.
+For C<Foo::Bar::baz>, it will check C<Foo>, C<Bar> and C<baz> sequentially.
 
 For example, if you want all local variables to be in all lower-case
 and global variables to start with "G_" and otherwise not contain

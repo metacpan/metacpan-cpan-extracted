@@ -13,7 +13,7 @@ use PPIx::QuoteLike;
 use Perl::Critic::Utils qw< :characters :severities >;
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ sub applies_to           { return qw< PPI::Document >    }
 #-----------------------------------------------------------------------------
 
 sub violates {
-    my ( $self, $elem, $document ) = @_;
+    my ( $self, undef, $document ) = @_;
 
     my %symbol_usage;
     _get_symbol_usage( \%symbol_usage, $document );

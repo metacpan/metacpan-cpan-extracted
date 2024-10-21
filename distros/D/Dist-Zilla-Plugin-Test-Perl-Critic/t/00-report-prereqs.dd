@@ -32,7 +32,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12'
+                                      'Test::Spelling' => '0.17'
                                     }
                     },
        'runtime' => {
@@ -40,6 +40,7 @@ do { my $x = {
                                       'Data::Dumper' => '0',
                                       'Data::Section' => '0.004',
                                       'Dist::Zilla::File::InMemory' => '0',
+                                      'Dist::Zilla::Role::FileFinderUser' => '0',
                                       'Dist::Zilla::Role::FileGatherer' => '0',
                                       'Dist::Zilla::Role::FileMunger' => '0',
                                       'Dist::Zilla::Role::PrereqSource' => '0',

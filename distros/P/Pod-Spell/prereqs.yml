@@ -1,0 +1,18 @@
+runtime:
+  requires:
+    Carp: 0
+    Class::Tiny: 0
+    File::ShareDir: 0
+    Lingua::EN::Inflect: 0
+    POSIX: 0
+    Pod::Escapes: 0
+    Pod::Simple: 3.27
+    Text::Wrap: 0
+    constant: 0
+    locale: 0
+    parent: 0
+    perl: 5.008001
+test:
+  requires:
+    File::Temp: 0
+    Test::More: 0.88

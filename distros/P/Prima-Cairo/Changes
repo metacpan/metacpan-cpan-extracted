@@ -1,5 +1,8 @@
 Revision history for Perl module Prima-Cairo
 
+1.08 2024-10-20
+ - API update
+
 1.07 2019-11-17
  - Support ARGB Win32 surfaces
 

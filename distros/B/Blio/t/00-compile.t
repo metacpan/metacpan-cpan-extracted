@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5;
 
 my @module_files = (
     'Blio.pm',
@@ -97,7 +97,6 @@ foreach my $file (@scripts)
 
 
 
-is(scalar(@warnings), 0, 'no warnings found')
-    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) ) if $ENV{AUTHOR_TESTING};
+# no warning checks;
 
 

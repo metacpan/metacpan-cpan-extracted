@@ -1,14 +1,14 @@
 ---
 abstract: 'Extract and verify Smart Health Card information'
 author:
-  - 'Timothy Legge <timlegge@cpan.org>'
+  - 'Timothy Legge <timlegge@gmail.com>'
 build_requires:
   Test::Exception: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,13 +17,13 @@ name: Health-SHC
 provides:
   Health::SHC:
     file: lib/Health/SHC.pm
-    version: '0.005'
+    version: '0.006'
   Health::SHC::Extract:
     file: lib/Health/SHC/Extract.pm
-    version: '0.005'
+    version: '0.006'
   Health::SHC::Validate:
     file: lib/Health/SHC/Validate.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Barcode::ZBar: '0'
   Crypt::JWT: '0'
@@ -36,7 +36,7 @@ requires:
 resources:
   bugtracker: https://github.com/timlegge/perl-Health-SHC/issues
   repository: git://github.com/timlegge/perl-Health-SHC.git
-version: '0.005'
-x_generated_by_perl: v5.32.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.006'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

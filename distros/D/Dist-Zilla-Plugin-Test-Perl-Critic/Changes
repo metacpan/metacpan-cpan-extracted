@@ -1,5 +1,8 @@
 Revision history for Dist::Zilla::Plugin::Test::Perl::Critic
 
+3.004     2024-10-20 22:37:37Z
+  - added files and filter options to specify files to criticise
+
 3.003     2024-10-14 17:34:00Z
   - fix ignored options (RT#156116)
 

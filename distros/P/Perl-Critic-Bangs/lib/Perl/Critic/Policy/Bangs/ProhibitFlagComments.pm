@@ -5,7 +5,7 @@ use warnings;
 use Perl::Critic::Utils;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.12';
+our $VERSION = '1.14';
 
 #----------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ sub violates {
     my ( $self, $elem, $doc ) = @_;
 
     foreach my $keyword ( keys %{ $self->{'_keywords'} } ) {
-        if ( index( $elem->content(), $keyword ) != -1 ) { ## no critic (ProhibitMagicNumbers)
+        if ( $elem->content() =~ /\b\Q$keyword\E\b/ ) {
             my $desc = qq(Flag comment '$keyword' found);
             my $expl = qq(Comments containing "$keyword" typically indicate bugs or problems that the developer knows exist);
             return $self->violation( $desc, $expl, $elem );
@@ -79,7 +79,7 @@ Based on App::Fluff by Andy Lester, "<andy at petdance.com>"
 
 =head1 COPYRIGHT
 
-Copyright (c) 2006-2013 Andy Lester <andy@petdance.com> and Andrew
+Copyright (c) 2006-2024 Andy Lester <andy@petdance.com> and Andrew
 Moore <amoore@mooresystems.com>.
 
 This library is free software; you can redistribute it and/or modify

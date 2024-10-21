@@ -1,5 +1,9 @@
 The following logs changes for the CPAN distribution Template-EmbeddedPerl
 
+0.001006  20 October 2024
+          - When using auto exscape with auto flatten, we don't accidently
+            remove the 'safe' marker when flattening.
+
 0.001006  03 October 2024
           - fixed the javascript_escape helper so that it works with
             older versions of perl.

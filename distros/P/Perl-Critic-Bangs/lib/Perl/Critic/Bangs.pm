@@ -11,11 +11,11 @@ Perl::Critic::Bangs - A collection of handy Perl::Critic policies
 
 =head1 VERSION
 
-Version 1.12
+Version 1.14
 
 =cut
 
-our $VERSION = '1.12';
+our $VERSION = '1.14';
 
 =head1 SYNOPSIS
 
@@ -25,6 +25,10 @@ will help make your code better.
 =head1 DESCRIPTION
 
 The rules included with the Perl::Critic::Bangs group include:
+
+=head2 L<Perl::Critic::Policy::Bangs::ProhibitBitwiseOperators>
+
+Bitwise operators are usually accidentally used instead of logical boolean operators.
 
 =head2 L<Perl::Critic::Policy::Bangs::ProhibitCommentedOutCode>
 
@@ -47,10 +51,6 @@ distinguished.
 
 Determining the class in a constructor by using C<ref($proto) || $proto> is usually
 a cut-n-paste that is incorrect.
-
-=head2 L<Perl::Critic::Policy::Bangs::ProhibitUselessTopic>
-
-Explicitly matching or substituting against C<$_> is clutter.
 
 =head2 L<Perl::Critic::Policy::Bangs::ProhibitUselessRegexModifiers>
 
@@ -121,6 +121,7 @@ L<http://github.com/petdance/perl-critic-bangs>
 =head1 ACKNOWLEDGMENTS
 
 Thanks to
+Ville Skyttä,
 William Braswell,
 Oliver Trosien,
 Fred Moyer,
@@ -132,7 +133,7 @@ and the rest of the Perl::Critic team for ongoing support.
 
 =head1 COPYRIGHT
 
-Copyright 2006-2017 Andy Lester.
+Copyright 2006-2021 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

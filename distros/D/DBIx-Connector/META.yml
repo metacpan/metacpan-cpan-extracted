@@ -24,7 +24,7 @@ resources:
   bugtracker: https://github.com/ap/DBIx-Connector/issues
   license: https://dev.perl.org/licenses/
   repository: https://github.com/ap/DBIx-Connector.git
-version: '0.59'
+version: '0.60'
 x_copyright:
   holder: 'David E. Wheeler'
   year: 2016

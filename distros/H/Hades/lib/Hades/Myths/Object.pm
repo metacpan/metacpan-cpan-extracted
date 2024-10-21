@@ -2,7 +2,7 @@ package Hades::Myths::Object;
 use strict;
 use warnings;
 use POSIX qw/locale_h/;
-our $VERSION = 0.22;
+our $VERSION = 0.23;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );

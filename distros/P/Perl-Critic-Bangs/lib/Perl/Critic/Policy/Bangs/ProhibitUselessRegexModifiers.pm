@@ -7,7 +7,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :severities :classification :ppi };
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.12';
+our $VERSION = '1.14';
 
 Readonly::Scalar my $DESC => q{Prohibits adding "m" modifier to compiled regular expressions where it does nothing};
 Readonly::Scalar my $EXPL => <<'EOF';

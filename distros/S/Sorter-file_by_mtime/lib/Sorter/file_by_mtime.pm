@@ -7,13 +7,14 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-09-19'; # DATE
 our $DIST = 'Sorter-file_by_mtime'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub meta {
     return +{
         v => 1,
         summary => 'Sort files by mtime (modification time)',
         args => {
+            follow_symlink => {schema=>'bool*', default=>1},
             reverse => {schema => 'bool*'},
             ci => {schema => 'bool*'},
         },
@@ -23,14 +24,15 @@ sub meta {
 sub gen_sorter {
     my %args = @_;
 
+    my $follow_symlink = $args{follow_symlink} // 1;
     my $reverse = $args{reverse};
 
     sub {
         my @items = @_;
-        my @mtimes = map { -M $_ } @items;
+        my @mtimes = map { my @st = $follow_symlink ? stat($_) : lstat($_); $st[9] } @items;
 
         map { $items[$_] } sort {
-            $reverse ? $mtimes[$a] <=> $mtimes[$b] : $mtimes[$b] <=> $mtimes[$a]
+            $reverse ? $mtimes[$b] <=> $mtimes[$a] : $mtimes[$a] <=> $mtimes[$b]
         } 0 .. $#items;
     };
 }
@@ -50,7 +52,7 @@ Sorter::file_by_mtime
 
 =head1 VERSION
 
-This document describes version 0.001 of Sorter::file_by_mtime (from Perl distribution Sorter-file_by_mtime), released on 2024-09-19.
+This document describes version 0.002 of Sorter::file_by_mtime (from Perl distribution Sorter-file_by_mtime), released on 2024-09-19.
 
 =head1 SYNOPSIS
 
@@ -75,6 +77,11 @@ This sorter assumes items are filenames and sort them by modification time
 
 =head1 SORTER ARGUMENTS
 
+=head2 follow_symlink
+
+Bool, default true. If set to false, will use C<lstat()> function instead of the
+default C<stat()>.
+
 =head2 reverse
 
 Bool.
@@ -86,6 +93,12 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sorter-fil
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Sorter-file_by_mtime>.
+
+=head1 SEE ALSO
+
+L<Comparer::file_mtime>
+
+L<SortKey::Num::file_mtime>
 
 =head1 AUTHOR
 

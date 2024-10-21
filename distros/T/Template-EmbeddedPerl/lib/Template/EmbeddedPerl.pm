@@ -1,6 +1,6 @@
 package Template::EmbeddedPerl;
 
-our $VERSION = '0.001006';
+our $VERSION = '0.001007';
 $VERSION = eval $VERSION;
 
 use warnings;
@@ -295,8 +295,15 @@ sub compile {
   my ($self, $template, $source, @parsed) = @_;
 
   my $compiled = '';
-  my $safe_or_not = $self->{auto_escape} ? ' safe ' : '';
-  my $flatten_or_not = $self->{auto_flatten_expr} ? ' join "", ' : '';
+  my $safe_or_not = '';
+  my $flatten_or_not = '';
+
+  if($self->{auto_escape} && $self->{auto_flatten_expr}) {
+    $safe_or_not = ' safe_concat ';
+  } else {
+    $safe_or_not = $self->{auto_escape} ? ' safe ' : '';
+    $flatten_or_not = $self->{auto_flatten_expr} ? ' join "", ' : '';
+  }
 
   for my $block (@parsed) {
     next if $block eq '';

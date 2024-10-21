@@ -4,7 +4,7 @@ use warnings;
 package Dist::Zilla::Plugin::PortabilityTests;
 # ABSTRACT: (DEPRECATED) Release tests for portability
 
-our $VERSION = '2.001001';
+our $VERSION = '2.001002';
 
 use Moose;
 use namespace::autoclean;
@@ -31,7 +31,7 @@ Dist::Zilla::Plugin::PortabilityTests - (DEPRECATED) Release tests for portabili
 
 =head1 VERSION
 
-version 2.001001
+version 2.001002
 
 =for test_synopsis BEGIN { die "SKIP: synopsis isn't perl code" }
 

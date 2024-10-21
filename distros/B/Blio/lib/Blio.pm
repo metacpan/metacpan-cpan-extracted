@@ -1,9 +1,9 @@
 package Blio;
-use 5.010;
+use v5.24;
 
 # ABSTRACT: domms blogging "engine"
 
-our $VERSION = '2.007'; # VERSION
+our $VERSION = '2.008'; # VERSION
 
 use Moose;
 use MooseX::Types::Path::Class;
@@ -208,8 +208,7 @@ sub write_tree_up {
     $self->_write($node);
     my $siblings = $node->older_younger;
     for my $sib (values %$siblings) {
-        $sib->date($node->date);
-        $self->_write($sib);
+        $self->_write($sib, $node->date);
     }
 
     if (my $p = $node->parent) {
@@ -229,13 +228,13 @@ sub write_tree_down {
 
 
 sub _write {
-    my ($self, $node) = @_;
+    my ($self, $node, $utime) = @_;
     say "writing ".$node->url unless $self->quiet;
     if ($node->paged_list) {
         $node->write_paged_list($self);
     }
     else {
-        $node->write($self);
+        $node->write($self, $utime);
     }
 }
 
@@ -264,7 +263,7 @@ Blio - domms blogging "engine"
 
 =head1 VERSION
 
-version 2.007
+version 2.008
 
 =head1 SYNOPSIS
 
@@ -361,7 +360,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2022 by Thomas Klausner.
+This software is copyright (c) 2013 - 2024 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

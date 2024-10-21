@@ -1,0 +1,32 @@
+NAME
+    Alien::fpm = Find or install fpm
+
+SYNOPSIS
+    use Alien::fpm;
+
+    use Env qw( @PATH @GEM_PATH );
+
+    unshift @PATH, Alien::fpm->bin_dir; unshift @GEM_PATH,
+    Alien::fpm->fpm_gem_home;
+
+    system('fpm --verbose -s cpan -t rpm Fennec');
+
+DESCRIPTION
+    This package can be used by other Perl modules that require fpm.
+
+SEE ALSO
+    Alien
+        Documentation on the Alien concept itself.
+
+    Alien::Base
+        The base class for this Alien.
+
+    Alien::Build::Manual::AlienUser
+        Detailed manual for users of Alien classes.
+
+AUTHOR
+    Nicholas Hubbard <nicholashubbard@posteo.net>
+
+CONTRIBUTORS
+    *   Zakariyya Mughal
+

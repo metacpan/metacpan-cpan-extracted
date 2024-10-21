@@ -29,14 +29,15 @@ no_index:
 provides:
   Dist::Zilla::Plugin::CriticTests:
     file: lib/Dist/Zilla/Plugin/CriticTests.pm
-    version: '3.003'
+    version: '3.004'
   Dist::Zilla::Plugin::Test::Perl::Critic:
     file: lib/Dist/Zilla/Plugin/Test/Perl/Critic.pm
-    version: '3.003'
+    version: '3.004'
 requires:
   Data::Dumper: '0'
   Data::Section: '0.004'
   Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileFinderUser: '0'
   Dist::Zilla::Role::FileGatherer: '0'
   Dist::Zilla::Role::FileMunger: '0'
   Dist::Zilla::Role::PrereqSource: '0'
@@ -53,7 +54,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-Perl-Critic
   homepage: https://github.com/karenetheridge/Dist-Zilla-Plugin-Test-Perl-Critic
   repository: https://github.com/karenetheridge/Dist-Zilla-Plugin-Test-Perl-Critic.git
-version: '3.003'
+version: '3.004'
 x_Dist_Zilla:
   perl:
     version: '5.041004'
@@ -229,7 +230,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::MinimumVersion:
           max_target_perl: '5.008003'
       name: '@Author::ETHER/Test::MinimumVersion'
-      version: '2.000010'
+      version: '2.000011'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::ETHER/PodSyntaxTests'
@@ -253,7 +254,7 @@ x_Dist_Zilla:
             - irc
           wordlist: Pod::Wordlist
       name: '@Author::ETHER/Test::PodSpelling'
-      version: '2.007005'
+      version: '2.007006'
     -
       class: Dist::Zilla::Plugin::Test::Pod::No404s
       name: '@Author::ETHER/Test::Pod::No404s'
@@ -280,7 +281,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::Portability:
           options: ''
       name: '@Author::ETHER/Test::Portability'
-      version: '2.001001'
+      version: '2.001002'
     -
       class: Dist::Zilla::Plugin::Test::CleanNamespaces
       config:
@@ -745,7 +746,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.003
+          tag: v3.004
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -860,7 +861,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: Test::Perl::Critic
-      version: '3.003'
+      version: '3.004'
     -
       class: Dist::Zilla::Plugin::Test::CheckBreaks
       config:
@@ -927,8 +928,8 @@ x_author_pledge:
   version: 1
 x_authority: cpan:JQUELIN
 x_contributors:
-  - 'Jérôme Quelin <jquelin@gmail.com>'
   - 'Karen Etheridge <ether@cpan.org>'
+  - 'Jérôme Quelin <jquelin@gmail.com>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'Kent Fredric <kentfredric@gmail.com>'
   - 'Olivier Mengué <dolmen@cpan.org>'

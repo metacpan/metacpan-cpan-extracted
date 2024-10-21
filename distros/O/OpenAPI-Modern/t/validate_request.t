@@ -1592,7 +1592,7 @@ YAML
           instanceLocation => '/request/uri/query/bar',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post parameters 0 schema maximum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post parameters 0 schema maximum)))->to_string,
-          error => 'value is larger than 10',
+          error => 'value is greater than 10',
         },
         {
           instanceLocation => '/request/uri/query/bar',
@@ -1604,7 +1604,7 @@ YAML
           instanceLocation => '/request/header/Foo-Bar',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post parameters 1 schema maximum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post parameters 1 schema maximum)))->to_string,
-          error => 'value is larger than 10',
+          error => 'value is greater than 10',
         },
         {
           instanceLocation => '/request/header/Foo-Bar',
@@ -1616,7 +1616,7 @@ YAML
           instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema maximum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema maximum)))->to_string,
-          error => 'value is larger than 10',
+          error => 'value is greater than 10',
         },
         # at least for now, passed-in numbers are validated as numbers...
         {
@@ -1818,7 +1818,7 @@ YAML
           instanceLocation => '/request/uri/query/query_plain',
           keywordLocation => jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} post parameters 0 schema maximum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} post parameters 0 schema maximum)))->to_string,
-          error => 'value is larger than 10',
+          error => 'value is greater than 10',
         },
         {
           instanceLocation => '/request/uri/query/query_encoded',
@@ -1830,7 +1830,7 @@ YAML
           instanceLocation => '/request/header/Header-Plain',
           keywordLocation => jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} post parameters 2 schema maximum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} post parameters 2 schema maximum)))->to_string,
-          error => 'value is larger than 10',
+          error => 'value is greater than 10',
         },
         {
           instanceLocation => '/request/header/Header-Encoded',
@@ -1842,7 +1842,7 @@ YAML
           instanceLocation => '/request/uri/path/path_plain',
           keywordLocation => jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} parameters 0 schema maximum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} parameters 0 schema maximum)))->to_string,
-          error => 'value is larger than 10',
+          error => 'value is greater than 10',
         },
         {
           instanceLocation => '/request/uri/path/path_encoded',
@@ -1874,7 +1874,7 @@ YAML
           instanceLocation => '/request/uri/path/path_plain',
           keywordLocation => jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} parameters 0 schema maximum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} parameters 0 schema maximum)))->to_string,
-          error => 'value is larger than 10',
+          error => 'value is greater than 10',
         },
         {
           instanceLocation => '/request/uri/path/path_encoded',

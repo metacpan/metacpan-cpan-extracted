@@ -10,7 +10,7 @@ use List::SomeUtils qw(any);
 use Perl::Critic::Utils qw{ :severities };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ sub applies_to           { return 'PPI::Document'          }
 #-----------------------------------------------------------------------------
 
 sub violates {
-    my ( $self, $elem, $doc ) = @_;
+    my ( $self, undef, $doc ) = @_;
 
     return if $doc->find_first( \&_is_version_declaration );
 

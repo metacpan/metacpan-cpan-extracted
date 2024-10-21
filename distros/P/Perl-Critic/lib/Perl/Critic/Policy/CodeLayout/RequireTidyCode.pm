@@ -14,7 +14,7 @@ use Perl::Critic::Exception::Fatal::Generic qw{ throw_generic };
 use Perl::Critic::Utils qw{ :booleans :characters :severities };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ sub applies_to       { return 'PPI::Document'       }
 #-----------------------------------------------------------------------------
 
 sub initialize_if_enabled {
-    my ($self, $config) = @_;
+    my ($self, undef) = @_;
 
     # Set configuration if defined
     if (defined $self->{_perltidyrc} && $self->{_perltidyrc} eq $EMPTY) {

@@ -1,3 +1,8 @@
+0.821 (10.20.2024) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug in generated trigger methods for foreign keys and many-
+      to-one relationships (RT 156245)
+
 0.820 (06.26.2021) - John Siracusa <siracusa@gmail.com>
 
     * Added missing semicolon(!) in Rose::DB::Object::Metadata.

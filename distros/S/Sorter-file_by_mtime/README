@@ -2,7 +2,7 @@ NAME
     Sorter::file_by_mtime
 
 VERSION
-    This document describes version 0.001 of Sorter::file_by_mtime (from
+    This document describes version 0.002 of Sorter::file_by_mtime (from
     Perl distribution Sorter-file_by_mtime), released on 2024-09-19.
 
 SYNOPSIS
@@ -23,6 +23,10 @@ DESCRIPTION
     time (mtime).
 
 SORTER ARGUMENTS
+  follow_symlink
+    Bool, default true. If set to false, will use lstat() function instead
+    of the default stat().
+
   reverse
     Bool.
 
@@ -33,6 +37,11 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Sorter-file_by_mtime>.
+
+SEE ALSO
+    Comparer::file_mtime
+
+    SortKey::Num::file_mtime
 
 AUTHOR
     perlancar <perlancar@cpan.org>

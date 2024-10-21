@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test::Tester;
 use Test::More 0.88;
-use Test::Needs;
 
 use Dist::Zilla::Tester;
 use Path::Tiny;
@@ -11,10 +10,6 @@ use Cwd ();
 BEGIN {
   plan skip_all => 'Perl must be in your path for these tests'
     unless qx/perl -e "print 123"/ == 123;
-
-  if ( $^O eq 'MSWin32' ) {
-    test_needs { 'Test::Spelling' => 0.17 };
-  }
 }
 
 # This test uses a custom "spell checker" defined in corpus/*/dist.ini
@@ -75,7 +70,7 @@ sub spell_check_dist {
     },
     [
       # results we're expecting
-      map {
+      map
         +{
           # expected test result ('ok' or 'not ok')
           ok => 1,
@@ -86,9 +81,7 @@ sub spell_check_dist {
           # overridden expectations (in args to spell_check_dist)
           %{ $_->[1] },
         },
-      }
-      map { ref $_ eq 'ARRAY' ? $_ : [$_ => {}] }
-        @files
+        map ref $_ eq 'ARRAY' ? $_ : [$_ => {}], @files
     ],
     "spell check pod for $dir"
   );

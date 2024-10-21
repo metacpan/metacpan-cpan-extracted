@@ -19,7 +19,7 @@ name: Sorter-file_by_mtime
 provides:
   Sorter::file_by_mtime:
     file: lib/Sorter/file_by_mtime.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   perl: '5.010001'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sorter-file_by_mtime
   homepage: https://metacpan.org/release/Sorter-file_by_mtime
   repository: git://github.com/perlancar/perl-Sorter-file_by_mtime.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

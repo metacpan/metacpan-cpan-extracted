@@ -60,6 +60,31 @@ use_ok 'Catalyst::View::EmbeddedPerl::PerRequest';
   is $data, "&lt;a&gt;hello&lt;/a&gt;";
 }
 
+{
+  ok my $res = request GET '/inherit';
+  ok my $data = $res->content;
+  is $data, "<html>
+  <head>
+    <title>Inherited Title: 1</title>
+    <style>
+      p { color: red; }
+    </style>
+  </head>
+  <body>
+    Inherited Title    
+joe1
+joe2
+joe3
+joe4
+1
+bbb1
+ccc1
+  <p>hello world</p>
+  </body>
+</html>";
+
+}
+
 done_testing;
 
 __END__

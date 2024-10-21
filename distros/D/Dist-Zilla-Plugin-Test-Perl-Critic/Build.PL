@@ -89,7 +89,7 @@ EOW
         "Jerome Quelin"
       ],
       "dist_name" => "Dist-Zilla-Plugin-Test-Perl-Critic",
-      "dist_version" => "3.003",
+      "dist_version" => "3.004",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::Test::Perl::Critic",
       "recursive_test_files" => 1,
@@ -97,6 +97,7 @@ EOW
         "Data::Dumper" => 0,
         "Data::Section" => "0.004",
         "Dist::Zilla::File::InMemory" => 0,
+        "Dist::Zilla::Role::FileFinderUser" => 0,
         "Dist::Zilla::Role::FileGatherer" => 0,
         "Dist::Zilla::Role::FileMunger" => 0,
         "Dist::Zilla::Role::PrereqSource" => 0,

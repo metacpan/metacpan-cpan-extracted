@@ -1,32 +1,30 @@
 #!/usr/bin/perl
-use 5.008;
+use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 use Pod::Spell;
 
-if ($] ge '5.008001') {
-  # Try to get the encoding from the locale
-  my $encoding = eval {
+# Try to get the encoding from the locale
+my $encoding = eval {
     require POSIX;
     POSIX::setlocale(POSIX::LC_CTYPE(), '');
     require I18N::Langinfo;
     I18N::Langinfo::langinfo(I18N::Langinfo::CODESET())
-  };
+};
 
-  if ($encoding) {
+if ($encoding) {
     binmode(STDOUT, ":encoding($encoding)");
-  }
 }
 
 if(@ARGV) {  # iterate over files, sending to STDOUT
-  foreach my $x (@ARGV) {
-    Pod::Spell->new->parse_from_file($x, '-');
-  }
+    foreach my $x (@ARGV) {
+        Pod::Spell->new->parse_from_file($x, '-');
+    }
 } else {     # take from STDIN, send to STDOUT
-  Pod::Spell->new->parse_from_filehandle();
+    Pod::Spell->new->parse_from_filehandle();
 }
 
 __END__
@@ -43,7 +41,7 @@ podspell - pod spell checking command line interface
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -75,7 +73,7 @@ Caleb Cushing <xenoterracide@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Olivier Mengué.
+This software is Copyright (c) 2024 by Olivier Mengué.
 
 This is free software, licensed under:
 

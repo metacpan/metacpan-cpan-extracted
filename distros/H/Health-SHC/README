@@ -47,7 +47,7 @@ DESCRIPTION
 
     Health::SHC supports QR codes for the following regions:
 
-        * Québec
+        * QuÃ©bec
         * British Columbia
         * Saskatchewan
         * Alberta
@@ -69,7 +69,7 @@ COPYRIGHT
     The following copyright notice applies to all the files provided in this
     distribution, including binary files, unless explicitly noted otherwise.
 
-    Copyright 2021 Timothy Legge <timlegge@cpan.org>
+    Copyright 2021 - 2024 Timothy Legge <timlegge@gmail.com>
 
 LICENCE
     This library is free software; you can redistribute it and/or modify it

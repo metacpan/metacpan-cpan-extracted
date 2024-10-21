@@ -54,6 +54,6 @@
          "web" : "https://salsa.debian.org/wouter/media-convert"
       }
    },
-   "version" : "v1.2.0",
+   "version" : "v1.3.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Hades'              => '0.20',
+        'Hades'              => '0.23',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Hades-Realm-OO-*' },

@@ -9,7 +9,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :severities :ppi };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ sub applies_to           { return 'PPI::Token::Word'         }
 #-----------------------------------------------------------------------------
 
 sub violates {
-    my ($self, $elem, $document) = @_;
+    my ($self, $elem, undef) = @_;
 
     my $handler = $RECOVER_ENCODING{ $elem->content() }
         or return;  # If we don't have a handler, we're not interested.

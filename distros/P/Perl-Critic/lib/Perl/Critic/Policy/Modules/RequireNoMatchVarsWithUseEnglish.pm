@@ -9,7 +9,7 @@ use Readonly;
 use Perl::Critic::Utils qw< :characters :severities >;
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ sub applies_to           { return 'PPI::Statement::Include' }
 #-----------------------------------------------------------------------------
 
 sub violates {
-    my ( $self, $elem, $doc ) = @_;
+    my ( $self, $elem, undef ) = @_;
 
     # "require"ing English is kind of useless.
     return if $elem->type() ne 'use';

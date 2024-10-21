@@ -1,13 +1,14 @@
 use strict;
 use warnings;
 
+use File::Which;
 # ABSTRACT: Extract the Smart Health Card information from files
 
 use PostScript::Convert;
 
 package Health::SHC::Extract;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 =head1 NAME
 
@@ -55,7 +56,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021 Timothy Legge <timlegge@cpan.org>
+Copyright 2021 - 2024 Timothy Legge <timlegge@gmail.com>
 
 =head1 LICENCE
 
@@ -103,7 +104,14 @@ sub extract_qr_from_pdf {
     use File::Temp qw/ tempfile tempdir /;
     my ($fh, $output_filename) = tempfile('shctempfileXXXXX', SUFFIX => '.png');
 
-    PostScript::Convert::psconvert($filename, filename => $output_filename, format => 'pnggray');
+    my $ret;
+    eval {
+        my $gs_exec = File::Which::which('gs');
+        $ret = defined $gs_exec ? 1 : 0;
+        PostScript::Convert::psconvert($filename, filename => $output_filename, format => 'pnggray') if $ret;
+    };
+    return () if (!$ret);
+
     my @qrcodes = $self->extract_qr_from_png($output_filename);
 
     unlink $output_filename;

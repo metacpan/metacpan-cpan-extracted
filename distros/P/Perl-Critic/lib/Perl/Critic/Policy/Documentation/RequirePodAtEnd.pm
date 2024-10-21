@@ -10,7 +10,7 @@ use List::Util qw(first);
 use Perl::Critic::Utils qw{ :severities };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ sub applies_to           { return 'PPI::Document'         }
 #-----------------------------------------------------------------------------
 
 sub violates {
-    my ( $self, $elem, $doc ) = @_;
+    my ( $self, undef, $doc ) = @_;
 
     # No POD means no violation
     my $pods_ref = $doc->find('PPI::Token::Pod');

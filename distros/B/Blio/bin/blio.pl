@@ -1,11 +1,13 @@
 #!/usr/bin/env perl
+
+use v5.24;
 use strict;
 use warnings;
 use Blio;
 
 # ABSTRACT: Blio - domm's blogging "engine"
 # PODNAME: blio.pl
-our $VERSION = '2.007'; # VERSION
+our $VERSION = '2.008'; # VERSION
 
 Blio->new_with_options->run;
 
@@ -21,7 +23,7 @@ blio.pl - Blio - domm's blogging "engine"
 
 =head1 VERSION
 
-version 2.007
+version 2.008
 
 =head1 SYNOPSIS
 
@@ -293,7 +295,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2022 by Thomas Klausner.
+This software is copyright (c) 2013 - 2024 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

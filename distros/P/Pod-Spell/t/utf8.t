@@ -44,31 +44,105 @@ my @cases = (
     },
 );
 
+
+
 for my $c ( @cases ) {
+    my $check = sub {
+        my ($name, $content) = @_;
+        my @words = split " ", $content;
 
-    my $textfile = File::Temp->new;
-    binmode $textfile, ":utf8";
+        my @expected = @{ $c->{expected} };
 
-    # reread from beginning
-    $podfile->seek( 0, 0 );
+        is scalar @words, scalar @expected, "$c->{label}: word count";
 
-    my $p = new_ok 'Pod::Spell' => [ debug => 1, %{ $c->{options} } ];
+        is_deeply [ sort @words ], [ sort @expected ], "$name - $c->{label}: words match"
+            or diag "@words";
+    };
 
-    $p->parse_from_filehandle( $podfile, $textfile );
+    my $parse = sub {
+        my $p = Pod::Spell->new( %{ $c->{options} });
+        $podfile->seek( 0, 0 );
+        $p->parse_from_filehandle( $podfile, @_ );
+    };
 
-    # reread from beginning
-    $textfile->seek( 0, 0 );
+    {
+        my $textfile = File::Temp->new( 'pod-spell-XXXXX', TMPDIR => 1, UNLINK => 1 );
+        $parse->($textfile);
 
-    my $in = do { local $/ = undef, <$textfile> };
+        $textfile->seek( 0, 0 );
+        my $content = do { local $/; <$textfile> };
 
-    my @words = split " ", $in;
+        $check->('temp file', Encode::decode_utf8($content));
+    }
 
-    my @expected = @{ $c->{expected} };
+    {
+        my $textfile = File::Temp->new( 'pod-spell-XXXXX', TMPDIR => 1, UNLINK => 1 );
+        binmode $textfile, ':utf8';
+        $parse->($textfile);
 
-    is scalar @words, scalar @expected, "$c->{label}: word count";
+        $textfile->seek( 0, 0 );
+        my $content = do { local $/; <$textfile> };
 
-    is_deeply [ sort @words ], [ sort @expected ], "$c->{label}: words match"
-        or diag "@words";
+        $check->('temp file (utf8)', $content);
+    }
+
+    {
+        my $content = '';
+        open my $fh, '>', \$content;
+        $parse->($fh);
+
+        $check->('in memory', Encode::decode_utf8($content));
+    }
+
+    {
+        my $content = '';
+        open my $fh, '>:utf8', \$content;
+        $parse->($fh);
+
+        $check->('in memory (utf8)', Encode::decode_utf8($content));
+    }
+
+    {
+        open(my $oldout, '>&', \*STDOUT)
+            or die "Can't dup STDOUT: $!";
+
+        my ($fh, $file) = File::Temp::tempfile( 'pod-spell-XXXXX', TMPDIR => 1, UNLINK => 1 );
+
+        open(STDOUT, '>', $file)
+            or die "Can't redirect STDOUT: $!";
+
+        $parse->();
+
+        open(STDOUT, '>&', $oldout)
+            or die "Can't dup \$oldout: $!";
+
+        seek $fh, 0, 0;
+        my $content = do { local $/; <$fh> };
+
+        $check->('STDOUT', Encode::decode_utf8($content));
+    }
+
+    {
+        open(my $oldout, '>&', \*STDOUT)
+            or die "Can't dup STDOUT: $!";
+
+        my ($fh, $file) = File::Temp::tempfile( 'pod-spell-XXXXX', TMPDIR => 1, UNLINK => 1 );
+
+        open(STDOUT, '>:utf8', $file)
+            or die "Can't redirect STDOUT: $!";
+
+        $parse->();
+
+        close STDOUT;
+
+        open(STDOUT, '>&', $oldout)
+            or die "Can't dup \$oldout: $!";
+
+        seek $fh, 0, 0;
+        my $content = do { local $/; <$fh> };
+
+        $check->('STDOUT (utf8)', Encode::decode_utf8($content));
+    }
 }
 
 done_testing;

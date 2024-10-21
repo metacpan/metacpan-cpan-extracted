@@ -22,12 +22,10 @@ my %files = (
   'oas/meta/base.schema.json'  => 'https://spec.openapis.org/oas/3.1/meta/base',
 
   # openapi document schema + custom json schema dialect
-  #'oas/schema-base.json' => 'https://spec.openapis.org/oas/3.1/schema-base',
-  'oas/schema-base.json' => 'https://spec.openapis.org/oas/3.1/schema-base/latest',
+  'oas/schema-base.json' => 'https://spec.openapis.org/oas/3.1/schema-base/2022-10-07',
 
   # the main openapi document schema
-  #'oas/schema.json' => 'https://spec.openapis.org/oas/3.1/schema',
-  'oas/schema.json' => 'https://spec.openapis.org/oas/3.1/schema/latest',
+  'oas/schema.json' => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07',
 
   'oas/LICENSE' => 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/LICENSE',
 );

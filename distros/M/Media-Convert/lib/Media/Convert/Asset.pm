@@ -137,6 +137,12 @@ The duration of this asset.
 
 =cut
 
+has 'canonical_duration' => (
+        is => 'ro',
+        isa => 'Str',
+        default => 'container',
+);
+
 has 'duration' => (
 	is => 'rw',
 	builder => '_probe_duration',
@@ -149,7 +155,16 @@ sub _probe_duration {
 		return $self->reference->duration;
 	}
 	if($self->duration_style eq "seconds") {
-		return $self->_get_probedata->{format}{duration};
+                if($self->canonical_duration eq 'container') {
+                        return $self->_get_probedata->{format}{duration};
+                } elsif($self->canonical_duration eq 'video') {
+                        return $self->_get_videodata->{duration};
+                } elsif($self->canonical_duration eq 'audio') {
+                        return $self->_get_audiodata->{duration};
+                } else {
+                        # don't support this
+                        ...
+                }
 	} else {
 		return $self->duration_frames;
 	}
@@ -671,6 +686,32 @@ sub _probe_blackspots {
 	return $blacks;
 }
 
+
+=head2 channel_layouts
+
+Returns an array of audio channel layouts, as detected by ffprobe.
+
+=cut
+
+has 'channel_layouts' => (
+        is => 'rw',
+        traits => ['Array'],
+        isa => 'ArrayRef[Str]',
+        builder => '_probe_channel_layouts',
+        lazy => 1,
+);
+
+sub _probe_channel_layouts {
+        my $self = shift;
+        my $rv = [];
+        foreach my $stream(@{$self->_get_probedata->{streams}}) {
+                if($stream->{codec_type} eq "audio") {
+                        push @$rv, $stream->{channel_layout};
+                }
+        }
+        return $rv;
+}
+
 =head2 astream_ids
 
 Returns an array with the IDs for the audio streams in this file.
@@ -694,13 +735,13 @@ has 'astream_ids' => (
 
 sub _probe_astream_ids {
 	my $self = shift;
-	my @rv;
+	my $rv = [];
 	foreach my $stream(@{$self->_get_probedata->{streams}}) {
 		if($stream->{codec_type} eq "audio") {
-			push @rv, $stream->{index};
+			push @$rv, $stream->{index};
 		}
 	}
-	return \@rv;
+	return $rv;
 }
 
 =head2 audio_channel_count

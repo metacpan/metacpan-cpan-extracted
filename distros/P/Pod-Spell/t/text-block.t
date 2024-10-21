@@ -24,6 +24,6 @@ $p->parse_from_filehandle( $podfile, $textfile );
 my $wordlist = $p->stopwords->wordlist;
 
 ok $wordlist->{$_}, "stopword added: $_"
-  for qw( Pleumgh zpaph myormsp snickh blah blargh bazh );
+    for qw( Pleumgh zpaph myormsp snickh blah blargh bazh );
 
 done_testing;

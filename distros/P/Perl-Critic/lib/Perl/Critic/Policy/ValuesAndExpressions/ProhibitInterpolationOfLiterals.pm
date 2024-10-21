@@ -10,7 +10,7 @@ use List::SomeUtils qw(any);
 use Perl::Critic::Utils qw{ :characters :severities :data_conversion };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ sub applies_to       { return qw(PPI::Token::Quote::Double
 Readonly::Scalar my $MAX_SPECIFICATION_LENGTH => 3;
 
 sub _parse_allow {
-    my ($self, $parameter, $config_string) = @_;
+    my ($self, undef, $config_string) = @_;
 
     my @allow;
 

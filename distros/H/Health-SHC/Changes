@@ -1,6 +1,11 @@
 Revision history for Health-SHC
 
-0.005 -- Sun Jan 02 14:16:23 AST 2022
+0.006 -- Sun Oct 20 23:44:43 ADT 2024
+
+  - bfbcc5d Update Copyright and email address
+  - db6a8f0 Fixes #1 t/001-extract-from-pdf.t fails (if gs is not installed?)
+  - 7fb0b37 Update some pod information
+  - 9db9f25 v0.004
 
 0.004 -- Wed Dec 29 12:42:08 AST 2021
 

@@ -1,5 +1,13 @@
 Revision history for Perl-Critic-Bangs
 
+1.14    Sun Oct 20 23:22:43 CDT 2024
+====================================
+[FIXES]
+ProhibitFlagComments now checks for entire words, not just partial words.
+The heading "BUGS" will no longer give a positive on "BUG". Thanks, Amory
+Meltzer. (GH #24)
+
+
 1.12    Wed May 24 22:57:31 CDT 2017
 ====================================
 [DOCUMENTATION]

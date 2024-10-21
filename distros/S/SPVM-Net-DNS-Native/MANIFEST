@@ -1,0 +1,19 @@
+.gitattributes
+.github/workflows/linux-ubuntu-latest-perl-v5.20.3.yml
+.github/workflows/linux-ubuntu-latest.yml
+.github/workflows/macos-latest.yml
+.github/workflows/windows-2019.yml
+.github/workflows/windows-latest.yml
+.gitignore
+Changes
+lib/SPVM/Net/DNS/Native.pm
+lib/SPVM/Net/DNS/Native.spvm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/lib/SPVM/TestCase/Net/DNS/Native.spvm
+t/Net-DNS-Native.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

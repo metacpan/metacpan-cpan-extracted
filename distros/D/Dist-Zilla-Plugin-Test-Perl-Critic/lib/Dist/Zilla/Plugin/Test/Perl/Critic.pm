@@ -2,9 +2,9 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Test::Perl::Critic; # git description: v3.002-3-g6e7f370
+package Dist::Zilla::Plugin::Test::Perl::Critic; # git description: v3.003-6-g370e62d
 # ABSTRACT: Tests to check your code against best practices
-our $VERSION = '3.003';
+our $VERSION = '3.004';
 use Moose;
 
 use Moose::Util::TypeConstraints qw(
@@ -17,11 +17,14 @@ use Data::Dumper ();
 use namespace::autoclean;
 
 # and when the time comes, treat them like templates
-with qw(
-    Dist::Zilla::Role::FileGatherer
-    Dist::Zilla::Role::FileMunger
-    Dist::Zilla::Role::TextTemplate
-    Dist::Zilla::Role::PrereqSource
+with (
+    'Dist::Zilla::Role::FileFinderUser' => {
+        default_finders => [],
+    },
+    'Dist::Zilla::Role::FileGatherer',
+    'Dist::Zilla::Role::FileMunger',
+    'Dist::Zilla::Role::TextTemplate',
+    'Dist::Zilla::Role::PrereqSource',
 );
 
 has filename => (
@@ -46,6 +49,10 @@ sub mvp_aliases { {
     profile => 'critic_config',
 } }
 
+sub mvp_multivalue_args { qw(
+    files
+) }
+
 has critic_config => (
     is      => 'ro',
     isa     => 'Str',
@@ -53,6 +60,27 @@ has critic_config => (
 
 has verbose => (
     is => 'ro',
+);
+
+has files => (
+    is => 'ro',
+    isa => 'ArrayRef[Str]',
+);
+
+has all_files => (
+    is => 'ro',
+    lazy => 1,
+    isa => 'Maybe[ArrayRef[Str]]',
+    default => sub {
+        my $self = shift;
+        my $files = $self->files;
+        return undef
+            if !@{ $self->finder } && !$files;
+        return [
+          @{ $files || [] },
+          (map $_->name, @{ $self->found_files }),
+        ];
+    },
 );
 
 sub gather_files {
@@ -112,6 +140,7 @@ sub munge_file {
                 plugin  => \$self,
                 dumper  => \\&_dumper,
                 options => \$options,
+                files   => \$self->all_files,
             }
         )
     );
@@ -164,6 +193,17 @@ __PACKAGE__->meta->make_immutable;
 #pod
 #pod If configured, overrides the C<-verbose> option to L<Perl::Critic>.
 #pod
+#pod =head2 files
+#pod
+#pod If specified, will be used as the list of files to check. If neither C<files>
+#pod C<finder> is specified, L<Test::Perl::Critic>'s default behavior of checking
+#pod all files will be used.
+#pod
+#pod =head2 finder
+#pod
+#pod Can be specified to use a L<file finder|Dist::Zilla::Role::FileFinderUser/default_finders>
+#pod to select the files to check, rather than checking all files.
+#pod
 #pod =cut
 
 =pod
@@ -176,7 +216,7 @@ Dist::Zilla::Plugin::Test::Perl::Critic - Tests to check your code against best 
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 SYNOPSIS
 
@@ -220,6 +260,17 @@ The option can also be configured using the C<profile> alias.
 
 If configured, overrides the C<-verbose> option to L<Perl::Critic>.
 
+=head2 files
+
+If specified, will be used as the list of files to check. If neither C<files>
+C<finder> is specified, L<Test::Perl::Critic>'s default behavior of checking
+all files will be used.
+
+=head2 finder
+
+Can be specified to use a L<file finder|Dist::Zilla::Role::FileFinderUser/default_finders>
+to select the files to check, rather than checking all files.
+
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-Perl-Critic>
@@ -234,17 +285,17 @@ Jerome Quelin
 
 =head1 CONTRIBUTORS
 
-=for stopwords Jérôme Quelin Karen Etheridge Graham Knop Kent Fredric Olivier Mengué Gryphon Shafer Stephen R. Scaffidi Alexander Hartmaier Mike Doherty
+=for stopwords Karen Etheridge Jérôme Quelin Graham Knop Kent Fredric Olivier Mengué Gryphon Shafer Stephen R. Scaffidi Alexander Hartmaier Mike Doherty
 
 =over 4
 
 =item *
 
-Jérôme Quelin <jquelin@gmail.com>
+Karen Etheridge <ether@cpan.org>
 
 =item *
 
-Karen Etheridge <ether@cpan.org>
+Jérôme Quelin <jquelin@gmail.com>
 
 =item *
 
@@ -293,4 +344,4 @@ use strict;
 use warnings;
 
 use Test::Perl::Critic{{ %$options ? ' %{+' . $dumper->($options) . '}' : '' }};
-all_critic_ok();
+all_critic_ok({{ $files ? '@{' . $dumper->($files) . '}' : '' }});

@@ -3,12 +3,18 @@ use warnings;
 
 use Test::More tests => 5;
 use Test::Exception;
+use File::Which qw( which );
 
 use Health::SHC::Extract;
 use Health::SHC::Validate;
 
 my $shc = Health::SHC::Extract->new();
 isa_ok($shc, 'Health::SHC::Extract');
+
+my $gs = which 'gs';
+
+SKIP: {
+    skip("Ghostscript is not installed", 4) if (!$gs);
 
 my @qrcodes = $shc->extract_qr_from_pdf('t/testdata/sample-qr-code.pdf');
 ok(@qrcodes, 'Successfull called extract_qr_from_pdf');
@@ -17,7 +23,6 @@ my $keys_json = 't/testdata/sample-qr-code-keys.json';
 my $shc_valid = Health::SHC::Validate->new();
 isa_ok($shc_valid, 'Health::SHC::Validate');
 
-use Data::Dumper;
 foreach my $qr (@qrcodes) {
     ok($qr =~ m/shc:\//, '    Smart Health Card Data Found');
     my $data = $shc_valid->get_valid_data($qr, $keys_json);
@@ -50,4 +55,5 @@ foreach my $qr (@qrcodes) {
         }
         print "\n";
     }
+}
 }

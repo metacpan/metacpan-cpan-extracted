@@ -1,3 +1,8 @@
+0.002   2024-09-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add argument follow_symlink, like in SortKey::Num::file_mtime.
+
+
 0.001   2024-09-19  Released-By: PERLANCAR
 
         - First release.

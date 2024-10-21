@@ -1,0 +1,41 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::DNS::Native {
+  version "0.001";
+  
+  use Go;
+  use Go::Sync::WaitGroup;
+  use Thread;
+  
+  static method new : Net::DNS::Native () {
+    
+    my $self = new Net::DNS::Native;
+    
+    return $self;
+  }
+  
+  method getaddrinfo : void ($node : string, $service : string, $hints : Sys::Socket::Addrinfo, $res_ref : Sys::Socket::AddrinfoLinkedList[]) {
+    
+    my $wg = Go::Sync::WaitGroup->new;
+    
+    $wg->add(1);
+    
+    Go->go([$wg : Go::Sync::WaitGroup, $node : string, $service : string, $hints : Sys::Socket::Addrinfo, $res_ref : Sys::Socket::AddrinfoLinkedList[]] method : void () {
+      
+      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        $wg->done;
+      });
+      
+      my $thread = Thread->new([$node : string, $service : string, $hints : Sys::Socket::Addrinfo, $res_ref : Sys::Socket::AddrinfoLinkedList[]] method : void () {
+        
+        Sys::Socket->getaddrinfo($node, $service, $hints, $res_ref);
+      });
+      
+      $thread->join;
+    });
+    
+    $wg->wait;
+  }
+  
+}

@@ -13,7 +13,7 @@ use Perl::Critic::Utils qw{
 };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ sub applies_to       { return qw(PPI::Token::Symbol
 #-----------------------------------------------------------------------------
 
 sub initialize_if_enabled {
-    my ($self, $config) = @_;
+    my ($self, undef) = @_;
 
     $self->{_all_packages} = {
         hashify keys %{ $self->{_packages} }, keys %{ $self->{_add_packages} }

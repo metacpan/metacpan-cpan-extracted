@@ -1,5 +1,11 @@
 Revision history for Perl extension Dist-Zilla-App-Command-DiffMint
 
+v0.3.0  2024-10-20
+  - allow running in a directory without a dist.ini
+  - fix detection of encoding
+  - fix encoding of output
+  - fix specifying a directory to diff
+
 v0.2.0  2024-10-16
   - reverse the order of the diff
   - allow specifying files to diff rather than entire dist

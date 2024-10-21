@@ -2,7 +2,7 @@ use strict; use warnings;
 
 package DBIx::Connector::Driver;
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 DRIVERS: {
     my %DRIVERS;
@@ -11,9 +11,11 @@ DRIVERS: {
         my ($class, $driver) = @_;
         return $DRIVERS{$driver} ||= do {
             my $subclass = __PACKAGE__ . "::$driver";
-            eval "require $subclass";
-            $class = $subclass unless $@;
-            bless { driver => $driver } => $class;
+            ( my $path = $subclass ) =~ s!::!/!g;
+            local $@;
+            my $ok = eval "require $subclass";
+            die $@ unless $ok or $@ =~ /^Can't locate $path\.pm in \@INC \(/;
+            bless { driver => $driver } => ( $ok ? $subclass : $class );
         };
     }
 }

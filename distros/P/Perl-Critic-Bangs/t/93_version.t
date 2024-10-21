@@ -2,6 +2,7 @@
 
 use warnings;
 use strict;
+use 5.010;
 
 use lib 't/tlib';
 
@@ -11,12 +12,15 @@ use Test::More;
 plan 'no_plan';
 
 my $last_version;
-find({wanted => \&check_version, no_chdir => 1}, 'blib');
+find({wanted => \&_check_version, no_chdir => 1}, 'blib');
 if (! defined $last_version) {
     fail('Failed to find any files with $VERSION');
 }
 
-sub check_version {
+exit 0;
+
+
+sub _check_version {
     return if (! m{blib/script/} && ! m{\.pm\z});
 
     local $/ = undef;
@@ -49,12 +53,3 @@ sub check_version {
 
     return;
 }
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 78
-#   indent-tabs-mode: nil
-#   c-indentation-style: bsd
-# End:
-# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab :

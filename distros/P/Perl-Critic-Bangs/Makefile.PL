@@ -1,7 +1,10 @@
 #!perl
+
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use 5.010;
+
+use ExtUtils::MakeMaker 6.46;
 
 
 my %parms = (
@@ -10,7 +13,10 @@ my %parms = (
     VERSION_FROM        => 'lib/Perl/Critic/Bangs.pm',
     ABSTRACT            => 'Perl::Critic::Bangs - A collection of policies for Perl::Critic',
     PL_FILES            => {},
+    MIN_PERL_VERSION    => '5.10.1',
+    LICENSE             => 'artistic_2',
     PREREQ_PM => {
+        'List::MoreUtils'               => 0,
         'Perl::Critic'                  => 1.122,
         'Perl::Critic::Policy'          => 0,
         'Perl::Critic::PolicyFactory'   => 0,
@@ -22,24 +28,21 @@ my %parms = (
         'PPI::Cache'                    => 0,
         'PPI::Document'                 => 0,
         'Readonly'                      => 0,
+    },
+    TEST_REQUIRES => {
         'Test::More'                    => '0.96', # For subtest()
         'Test::Perl::Critic'            => 1.01,
     },
-    LICENSE             => 'artistic_2',
-
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Perl-Critic-Bangs-*' },
-);
-
-if ( $ExtUtils::MakeMaker::VERSION ge '6.46' ) {
-    $parms{META_MERGE} = {
+    META_MERGE => {
         resources => {
-            license     => 'http://dev.perl.org/licenses/',
+            license     => 'https://opensource.org/licenses/Artistic-2.0',
             bugtracker  => 'https://github.com/petdance/perl-critic-bangs',
             repository  => 'git://github.com/petdance/perl-critic-bangs.git',
         }
-    };
-}
+    },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean               => { FILES => 'Perl-Critic-Bangs-*' },
+);
 
 WriteMakefile( %parms );
 

@@ -62,7 +62,7 @@ apc_cairo_surface_create( Handle widget, int request)
 		p = apc_widget_get_size( widget );
 #ifdef HAVE_X11_EXTENSIONS_XRENDER_H
 		if ( sys-> flags. layered )
-			result = cairo_xlib_surface_create_with_xrender_format(DISP, sys->gdrawable, ScreenOfDisplay(DISP,SCREEN), pguts->xrender_argb_pic_format, p.x, p.y);
+			result = cairo_xlib_surface_create_with_xrender_format(DISP, sys->gdrawable, ScreenOfDisplay(DISP,SCREEN), pguts->xrender_argb32_format, p.x, p.y);
 		else
 #endif
 	 		result = cairo_xlib_surface_create(DISP, sys->gdrawable, VISUAL, p.x, p.y);
@@ -72,7 +72,7 @@ apc_cairo_surface_create( Handle widget, int request)
 	default:
 #ifdef HAVE_X11_EXTENSIONS_XRENDER_H
 		if ( sys-> flags. layered )
-			result = cairo_xlib_surface_create_with_xrender_format(DISP, sys->gdrawable, ScreenOfDisplay(DISP,SCREEN), pguts->xrender_argb_pic_format, var->w, var->h);
+			result = cairo_xlib_surface_create_with_xrender_format(DISP, sys->gdrawable, ScreenOfDisplay(DISP,SCREEN), pguts->xrender_argb32_format, var->w, var->h);
 		else
 #endif
 			result = cairo_xlib_surface_create(DISP, sys->gdrawable, VISUAL, var->w, var->h);

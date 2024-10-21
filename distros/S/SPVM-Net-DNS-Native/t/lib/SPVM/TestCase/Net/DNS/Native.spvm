@@ -1,0 +1,112 @@
+class TestCase::Net::DNS::Native {
+  use Net::DNS::Native;
+  use Sys::Socket::AddrinfoLinkedList;
+  use Sys::Socket::Addrinfo;
+  use Sys::Socket::Constant as SOCKET;
+  use Sys::Socket::Util;
+  
+  static method new : int () {
+    
+    my $dns = Net::DNS::Native->new;
+    
+    unless ($dns is_type Net::DNS::Native) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method getaddrinfo : int () {
+    
+    {
+      my $domain = "google.com";
+      
+      my $service = (string)undef;
+      
+      my $res_ref = new Sys::Socket::AddrinfoLinkedList[1];
+      
+      my $hints = Sys::Socket::Addrinfo->new;
+      
+      $hints->set_ai_family(SOCKET->AF_INET);
+      
+      my $dns = Net::DNS::Native->new;
+      
+      eval { 
+        $dns->getaddrinfo($domain, $service, $hints, $res_ref);
+      }
+      
+      if ($@ && eval_error_id isa_error Error::System) {
+        warn "[Skip Test]getaddrinfo failed. A system error occurs.";
+      }
+      else {
+        my $res = $res_ref->[0];
+        
+        my $res_array = $res->to_array;
+        
+        my $addr = $res_array->[0]->ai_addr->(Sys::Socket::Sockaddr::In)->sin_addr;
+        
+        my $ip_address = Sys::Socket::Util->inet_ntoa($addr);
+        
+        unless (Fn->contains($ip_address, ".")) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method getaddrinfo_go : int () {
+    my $executed_ref = [0];
+    my $test_ref = [1];
+    Go->go([$executed_ref : int[], $test_ref : int[]] method : void () {
+      
+      my $domain = "google.com";
+      
+      my $service = (string)undef;
+      
+      my $res_ref = new Sys::Socket::AddrinfoLinkedList[1];
+      
+      my $hints = Sys::Socket::Addrinfo->new;
+      
+      $hints->set_ai_family(SOCKET->AF_INET);
+      
+      my $dns = Net::DNS::Native->new;
+      
+      eval { 
+        $dns->getaddrinfo($domain, $service, $hints, $res_ref);
+      }
+      
+      if ($@ && eval_error_id isa_error Error::System) {
+        warn "[Skip Test]getaddrinfo failed. A system error occurs.";
+      }
+      else {
+        my $res = $res_ref->[0];
+        
+        my $res_array = $res->to_array;
+        
+        my $addr = $res_array->[0]->ai_addr->(Sys::Socket::Sockaddr::In)->sin_addr;
+        
+        my $ip_address = Sys::Socket::Util->inet_ntoa($addr);
+        
+        unless (Fn->contains($ip_address, ".")) {
+          $test_ref->[0] = 0;
+        }
+      }
+      $executed_ref->[0] = 1;
+    });
+    
+    Go->gosched;
+    
+    unless ($executed_ref->[0]) {
+      return 0;
+    }
+    
+    unless ($test_ref->[0]) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+}

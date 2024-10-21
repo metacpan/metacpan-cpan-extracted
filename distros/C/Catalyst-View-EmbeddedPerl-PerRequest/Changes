@@ -1,5 +1,10 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001007  20 October 2024
+          - experimental support for inheritance
+          - exterimental support for Helper attribute and export trait
+          - fixed issues when using auto escaping
+
 0.001006  06 October 2024
           - Clarify how auto escaping works in the documentation and added a test for it.
           - updated some dependencies

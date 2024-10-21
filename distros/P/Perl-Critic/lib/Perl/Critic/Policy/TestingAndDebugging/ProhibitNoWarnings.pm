@@ -11,7 +11,7 @@ use Perl::Critic::Exception::Fatal::Internal qw{ throw_internal };
 use Perl::Critic::Utils qw{ :characters :severities :data_conversion };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ sub applies_to       { return 'PPI::Statement::Include' }
 #-----------------------------------------------------------------------------
 
 sub _parse_allow {
-    my ($self, $parameter, $config_string) = @_;
+    my ($self, undef, $config_string) = @_;
 
     $self->{_allow} = {};
 

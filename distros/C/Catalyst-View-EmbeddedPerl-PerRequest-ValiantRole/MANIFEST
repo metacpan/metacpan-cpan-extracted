@@ -13,5 +13,6 @@ lib/Catalyst/View/EmbeddedPerl/PerRequest/ValiantRole.pm
 t/basic.t
 t/lib/Example.pm
 t/lib/Example/Controller/Root.pm
-t/lib/Example/View.pm
+t/lib/Example/View/Base.pm
 t/lib/Example/View/Hello.pm
+t/lib/Example/View/Page.pm

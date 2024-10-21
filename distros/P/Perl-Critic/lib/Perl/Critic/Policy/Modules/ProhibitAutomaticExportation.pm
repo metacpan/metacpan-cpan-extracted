@@ -9,7 +9,7 @@ use Perl::Critic::Utils qw{ :severities };
 use List::SomeUtils qw(any);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ sub applies_to           { return 'PPI::Document' }
 #-----------------------------------------------------------------------------
 
 sub violates {
-    my ( $self, $elem, $doc ) = @_;
+    my ( $self, undef, $doc ) = @_;
 
     if ( _uses_exporter($doc) ) {
         if ( my $exp = _has_exports($doc) ) {

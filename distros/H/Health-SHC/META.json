@@ -1,10 +1,10 @@
 {
    "abstract" : "Extract and verify Smart Health Card information",
    "author" : [
-      "Timothy Legge <timlegge@cpan.org>"
+      "Timothy Legge <timlegge@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,7 +23,7 @@
       "develop" : {
          "requires" : {
             "Test::Perl::Critic" : "0",
-            "Test::Spelling" : "0.12"
+            "Test::Spelling" : "0.17"
          }
       },
       "runtime" : {
@@ -47,15 +47,15 @@
    "provides" : {
       "Health::SHC" : {
          "file" : "lib/Health/SHC.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Health::SHC::Extract" : {
          "file" : "lib/Health/SHC/Extract.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Health::SHC::Validate" : {
          "file" : "lib/Health/SHC/Validate.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -69,9 +69,9 @@
          "web" : "https://github.com/timlegge/perl-Health-SHC"
       }
    },
-   "version" : "0.005",
-   "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "0.006",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

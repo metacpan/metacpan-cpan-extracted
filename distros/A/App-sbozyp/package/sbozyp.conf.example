@@ -1,0 +1,26 @@
+# Please read the sbozyp.conf(5) man page for detailed information about this
+# configuration file.
+
+# The location to store our local copies of the SBo repository
+# REPO_ROOT=/var/lib/sbozyp/SBo
+
+### Directory used to contain working files specific to sbozyp.
+# TMPDIR=/tmp
+
+### By default built packages are removed after install. Set to 0 to keep them around.
+# CLEANUP=1
+
+### REPOS
+REPO_PRIMARY=15.0
+
+REPO_0_NAME=15.0
+REPO_0_GIT_BRANCH=15.0
+REPO_0_GIT_URL=git://git.slackbuilds.org/slackbuilds.git
+
+REPO_1_NAME=ponce
+REPO_1_GIT_BRANCH=current
+REPO_1_GIT_URL=https://github.com/Ponce/slackbuilds.git
+
+REPO_2_NAME=master
+REPO_2_GIT_BRANCH=master
+REPO_2_GIT_URL=git://git.slackbuilds.org/slackbuilds.git

@@ -173,7 +173,7 @@ sub make_methods
 
         unless(defined $column->builtin_trigger_index('on_set', $trigger_name))
         {
-          my $wolumn = Scalar::Util::weaken($column);
+          Scalar::Util::weaken(my $wolumn = $column);
 
           $column->add_builtin_trigger(
             event => 'on_set',

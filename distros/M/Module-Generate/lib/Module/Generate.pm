@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -546,7 +546,7 @@ sub _perl_tidy {
 	my $stderr_string;
 	my $errorfile_string;
 	my $argv = "-npro -pbp -nst -se -nola -t";
-
+	
 	my $error = Perl::Tidy::perltidy(
 		argv	=> $argv,
 		source      => \$source,
@@ -627,7 +627,7 @@ BEGIN {
 			return sprintf q|is_deeply(%s, %s, q{%s});|, $_[1], $_[2], $_[3] || $_[1];
 		},
 		eval => sub {
-			return sprintf q|eval {%s}; like($@, qr/%s/, q{%s});|, $_[1], $_[2], $_[3] || $_[1];
+			return sprintf q|eval {%s}; like($@, qr/%s/i, q{%s});|, $_[1], $_[2], $_[3] || $_[1];
 		}
 	);
 }
@@ -715,7 +715,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 

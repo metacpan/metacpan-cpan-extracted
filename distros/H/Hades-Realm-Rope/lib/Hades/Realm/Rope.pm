@@ -2,7 +2,7 @@ package Hades::Realm::Rope;
 use strict;
 use warnings;
 use base qw/Hades::Realm::OO/;
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -155,11 +155,11 @@ __END__
 
 =head1 NAME
 
-Hades::Realm::Rope - Hades realm for Moose
+Hades::Realm::Rope - Hades realm for Rope
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =cut
 

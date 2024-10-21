@@ -4,7 +4,7 @@ author LNATION
 email email@lnation.org
 version 0.03
 Hades::Realm::Rope base Hades::Realm::OO {
-	abstract { Hades realm for Moose }
+	abstract { Hades realm for Rope }
 	synopsis {
 Quick summary of what the module does:
 

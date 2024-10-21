@@ -22,7 +22,7 @@ use Perl::Critic::Utils::PPI qw< is_ppi_expression_or_generic_statement >;
 
 use Exporter 'import';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 # Exportable symbols here.
@@ -711,13 +711,19 @@ sub is_hash_key {
     return if !$parent;
     my $grandparent = $parent->parent();
     return if !$grandparent;
-    return 1 if $grandparent->isa('PPI::Structure::Subscript');
+    if ( $grandparent->isa('PPI::Structure::Subscript') ) {
+        # If followed by a non-(fat)comma, then it's not a hash slice,
+        # so a function call without parentheses.
+        return if $sib && !($sib->isa('PPI::Token::Operator')
+                            && ($sib eq $COMMA || $sib eq $FATCOMMA));
+        return 1;
+    }
 
     #Check declarative style: %hash = (foo => bar);
     return
         $sib
         && $sib->isa('PPI::Token::Operator')
-        && $sib eq '=>'
+        && $sib eq $FATCOMMA
     ;
 }
 

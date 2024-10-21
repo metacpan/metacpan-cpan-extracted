@@ -4,10 +4,12 @@ author:
   - 'Andy Lester <andy@petdance.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0.96'
+  Test::Perl::Critic: '1.01'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,6 +20,7 @@ no_index:
     - t
     - inc
 requires:
+  List::MoreUtils: '0'
   PPI::Cache: '0'
   PPI::Document: '0'
   Perl::Critic: '1.122'
@@ -29,11 +32,10 @@ requires:
   Perl::Critic::Utils: '0'
   Perl::Critic::Violation: '0'
   Readonly: '0'
-  Test::More: '0.96'
-  Test::Perl::Critic: '1.01'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/petdance/perl-critic-bangs
-  license: http://dev.perl.org/licenses/
+  license: https://opensource.org/licenses/Artistic-2.0
   repository: git://github.com/petdance/perl-critic-bangs.git
-version: '1.12'
+version: '1.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

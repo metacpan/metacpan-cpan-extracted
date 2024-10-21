@@ -11,7 +11,7 @@ use Perl::Critic::Utils qw{ :characters :severities };
 
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -28,14 +28,14 @@ sub applies_to           { return 'PPI::Document'   }
 #-----------------------------------------------------------------------------
 
 sub prepare_to_scan_document {
-    my ( $self, $document ) = @_;
+    my ( undef, $document ) = @_;
     return $document->is_module();   # Must be a library or module.
 }
 
 #-----------------------------------------------------------------------------
 
 sub violates {
-    my ($self, $elem, $doc) = @_;
+    my ($self, undef, $doc) = @_;
 
     # 'Foo::Bar' -> ('Foo', 'Bar')
     my $pkg_node = $doc->find_first('PPI::Statement::Package');

@@ -2,9 +2,9 @@ use strict;
 use warnings;
 package Dist::Zilla::Plugin::PodSpellingTests;
 # ABSTRACT: (DEPRECATED) The old name of the PodSpelling plugin
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
 
-our $VERSION = '2.007005';
+our $VERSION = '2.007006';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::Test::PodSpelling';
@@ -33,7 +33,7 @@ Dist::Zilla::Plugin::PodSpellingTests - (DEPRECATED) The old name of the PodSpel
 
 =head1 VERSION
 
-version 2.007005
+version 2.007006
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHORS
 

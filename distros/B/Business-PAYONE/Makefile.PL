@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Business::PAYONE",
   "PREREQ_PM" => {
     "Crypt::Mac::HMAC" => 0,
+    "Data::Dump" => 0,
     "DateTime" => 0,
     "DateTime::Format::HTTP" => 0,
     "Mojolicious" => "9.28",
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => "0.27",
     "version" => 0
   },
-  "VERSION" => "0.3.0",
+  "VERSION" => "0.4.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,6 +36,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Crypt::Mac::HMAC" => 0,
+  "Data::Dump" => 0,
   "DateTime" => 0,
   "DateTime::Format::HTTP" => 0,
   "Mojolicious" => "9.28",

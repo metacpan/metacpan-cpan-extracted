@@ -2,7 +2,7 @@ package Perl::Critic::Policy::Bangs::ProhibitDebuggingModules;
 use strict;
 use warnings;
 
-our $VERSION = '1.12';
+our $VERSION = '1.14';
 
 use List::MoreUtils qw(any);
 use Readonly;
@@ -35,7 +35,7 @@ The current list of detected debugging modules is:
 =back
 
 To add more modules that shouldn't be loaded unless you're actively debugging
-something, add them in F<.perlcriticrc> using the C<deubgging_modules> option.
+something, add them in F<.perlcriticrc> using the C<debugging_modules> option.
 
 =cut
 

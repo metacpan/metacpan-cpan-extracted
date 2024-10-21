@@ -2,12 +2,14 @@
 
 use strict;
 use warnings;
+use 5.010;
+
 use PPI::Document;
 use Test::More;
 use Perl::Critic::TestUtils qw(bundled_policy_names);
 use English qw(-no_match_vars);
 
-our $VERSION = '1.12';
+our $VERSION = '1.14';
 
 Perl::Critic::TestUtils::block_perlcriticrc();
 
@@ -46,17 +48,5 @@ for my $mod ( @bundled_policy_names ) {
     }
 }
 
-#-----------------------------------------------------------------------------
 
-# ensure we run true if this test is loaded by
-# t/00_modules.t_without_optional_dependencies.t
-1;
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 78
-#   indent-tabs-mode: nil
-#   c-indentation-style: bsd
-# End:
-# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab :
+exit 0;

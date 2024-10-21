@@ -1,7 +1,10 @@
 Revision history Pod-Spell
 
-1.26      2023-03-13
+1.27    2024-10-20
+    - fix encoding of output as UTF-8
+    - fix link in Pod
 
+1.26      2023-03-13
     - encode output as UTF-8
 
 1.25      2022-10-04

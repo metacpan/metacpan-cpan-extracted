@@ -4,7 +4,6 @@ Changes
 Makefile.PL
 Cairo.xs
 lib/Prima/Cairo.pm
-examples/star_and_ring.pl
 examples/deathvalley_panorama.jpg
 examples/knife_hand.png
 examples/raycaster.pl

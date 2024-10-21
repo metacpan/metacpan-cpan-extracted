@@ -1,9 +1,11 @@
 use v5.20; use warnings; use experimental qw(signatures postderef);
 package Dist::Zilla::App::Command::DiffMint;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.3.0';
 
 use Dist::Zilla::App -command;
+
+use Path::Tiny ();
 
 use namespace::autoclean;
 
@@ -17,6 +19,40 @@ sub opt_spec { (
   [ 'no-pager',     'avoid pager' ],
 ) }
 
+sub _zilla ($self) {
+  return $self->{_zilla}
+    if exists $self->{_zilla};
+
+  my $zilla;
+  local $@;
+  eval {
+    $zilla = $self->zilla;
+    1;
+  } or do {
+    my $e = $@;
+    if ($e !~ /^no configuration/) {
+      die $e;
+    }
+  };
+  $self->{_zilla} = $zilla;
+}
+
+sub _global_stashes ($self) {
+  return $self->{_global_stashes}
+    if exists $self->{_global_stashes};
+
+  ## no critic (Subroutines::ProtectPrivateSubs)
+  return $self->{_global_stashes} = $self->app->_build_global_stashes;
+}
+
+sub _root ($self) {
+  return $self->{_root}
+    if exists $self->{_root};
+
+  my $zilla = $self->_zilla;
+  return $self->{_root} = $zilla ? $zilla->root : Path::Tiny->cwd;
+}
+
 sub execute ($self, $opt, $arg) {
   my $provider = $opt->provider;
   my $profile = $opt->profile;
@@ -27,19 +63,17 @@ sub execute ($self, $opt, $arg) {
     : $opt->color eq 'never'                          ? 0
     : die q[Error: option 'color' expects "always", "auto", or "never", not "] . $opt->color . qq["!\n];
 
-  my $out
-    = $opt->no_pager ? \*STDOUT
-    : !-t *STDOUT    ? \*STDOUT
-    : do {
-      local $ENV{LESS} = $ENV{LESS} || 'SRFX';
-      my $pager = $ENV{PAGER} || 'less';
-      if (open my $fh, '|-', $pager) {
-        $fh;
-      }
-      else {
-        \*STDOUT;
-      }
-    };
+  my $out;
+  if (!$opt->no_pager && !-t *STDOUT) {
+    my $pager = $ENV{PAGER} || 'less';
+    local $ENV{LESS} = $ENV{LESS} || 'SRFX';
+    open $out, '|-', $pager
+      or undef $out;
+  }
+  if (!$out) {
+    open $out, '>&=:raw', \*STDOUT
+      or die "Can't dup STDOOUT: $!";
+  }
 
   my $minter = $self->_minter($provider, $profile);
 
@@ -50,14 +84,14 @@ sub execute ($self, $opt, $arg) {
 
   require Digest::SHA;
 
-  my $root = $self->zilla->root;
+  my $root = $self->_root;
 
   my %files = map +($_->name => $_), $minter->files->@*;
   my @files = map $_->name, $minter->files->@*;
   if (@$arg) {
     my @matched;
     for my $arg (@$arg) {
-      my $dir = $arg =~ s{/\z}{};
+      my $dir = $arg =~ s{/\z}{}r;
 
       if ($files{$arg}) {
         push @matched, $arg;
@@ -99,6 +133,9 @@ sub execute ($self, $opt, $arg) {
     next
       if !defined $diff;
 
+    require Encode;
+    $diff = Encode::encode($disk->{encoding}, $diff);
+
     if ($color) {
       print { $out } _colorize($diff);
     }
@@ -126,18 +163,23 @@ sub _file_data ($self, $root, $name) {
     my $mode = (stat($fh))[2] | 0100644;
     my $binary = -B $fh;
     my $content = do { local $/; <$fh> };
+    close $fh;
     my $sha = _sha($content);
     my $encoding;
     if ($binary) {
       $encoding = 'bytes';
     }
     else {
-      require Encode::Guess;
-      my $encoder = Encode::Guess::guess_encoding($content, qw(UTF-8 Latin1 ASCII));
-      $encoding = $encoder->name;
-      $content = $encoder->decode($content);
+      require Encode;
+      local $@;
+      eval {
+        $content = Encode::decode('UTF-8', $content, Encode::FB_CROAK());
+        $encoding = 'UTF-8';
+        1;
+      } or do {
+        $encoding = 'ISO-8859-1';
+      };
     }
-    close $fh;
 
     return {
       name      => "dist/$name",
@@ -153,12 +195,12 @@ sub _file_data ($self, $root, $name) {
 }
 
 sub _minter ($self, $opt_provider, $opt_profile) {
-  my $zilla = $self->zilla;
-
-  my $global_stash = $self->app->_build_global_stashes; ## no critic (Subroutines::ProtectPrivateSubs)
+  my $global_stash = $self->_global_stashes;
+  my $zilla = $self->_zilla;
 
   my $global_mint_stash = $global_stash->{'%Mint'};
-  my $dist_mint_stash = $zilla->stash_named('%Mint');
+  my $dist_mint_stash = $zilla && $zilla->stash_named('%Mint');
+  my $name = '';
 
   my $provider
     = $opt_provider
@@ -179,7 +221,7 @@ sub _minter ($self, $opt_provider, $opt_profile) {
     [ $provider, $profile ],
     {
       chrome  => $self->app->chrome,
-      name    => $zilla->name,
+      name    => $zilla ? $zilla->name : $self->_root->basename,
       _global_stashes => {
         %$global_stash,
         %$stashes,
@@ -189,21 +231,22 @@ sub _minter ($self, $opt_provider, $opt_profile) {
 }
 
 sub _stashes ($self) {
-  my $zilla = $self->zilla;
+  my $zilla = $self->_zilla;
   my $stashes = {};
-  if ($zilla->authors->@*) {
+  if ($zilla && $zilla->authors->@*) {
     $stashes->{'%User'} = $self->_authors_stash([ $zilla->authors->@* ]);
   }
 
-  require Dist::Zilla::Stash::Rights;
-  my $license = $zilla->license;
-  my $license_class = ref $license;
-  $license_class =~ s/^(Software::License::)?/$1 ? '' : '='/e;
-  $stashes->{'%Rights'} = Dist::Zilla::Stash::Rights->new(
-    copyright_holder => $license->holder,
-    copyright_year => $license->year,
-    license_class => $license_class,
-  );
+  if ($zilla and my $license = $zilla->license) {
+    require Dist::Zilla::Stash::Rights;
+    my $license_class = ref $license;
+    $license_class =~ s/^(Software::License::)?/$1 ? '' : '='/e;
+    $stashes->{'%Rights'} = Dist::Zilla::Stash::Rights->new(
+      copyright_holder => $license->holder,
+      copyright_year => $license->year,
+      license_class => $license_class,
+    );
+  }
 
   return $stashes;
 }

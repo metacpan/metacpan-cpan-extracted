@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Test::Portability; # git description: v2.001000-19-gc84ea5c
+package Dist::Zilla::Plugin::Test::Portability; # git description: v2.001001-5-g5dd4329
 # ABSTRACT: Author tests for portability
 
-our $VERSION = '2.001001';
+our $VERSION = '2.001002';
 
 use Moose;
 with qw/
@@ -134,7 +134,7 @@ Dist::Zilla::Plugin::Test::Portability - Author tests for portability
 
 =head1 VERSION
 
-version 2.001001
+version 2.001002
 
 =for test_synopsis BEGIN { die "SKIP: synopsis isn't perl code" }
 
@@ -197,7 +197,7 @@ Mike Doherty <doherty@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Marcel Gruenauer Mike Doherty Randy Stauner Dave Rolsky Graham Knop Kent Fredric Peter Vereshagin
+=for stopwords Karen Etheridge Marcel Gruenauer Mike Doherty Graham Knop Randy Stauner Dave Rolsky Kent Fredric Peter Vereshagin
 
 =over 4
 
@@ -219,15 +219,15 @@ Mike Doherty <mike@mikedoherty.ca>
 
 =item *
 
+Graham Knop <haarg@haarg.org>
+
+=item *
+
 Randy Stauner <randy@magnificent-tears.com>
 
 =item *
 
 Dave Rolsky <autarch@urth.org>
-
-=item *
-
-Graham Knop <haarg@haarg.org>
 
 =item *
 

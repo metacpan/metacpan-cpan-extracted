@@ -4,13 +4,13 @@
       "Andy Lester <andy@petdance.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Perl-Critic-Bangs",
    "no_index" : {
@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "List::MoreUtils" : "0",
             "PPI::Cache" : "0",
             "PPI::Document" : "0",
             "Perl::Critic" : "1.122",
@@ -43,6 +44,11 @@
             "Perl::Critic::Utils" : "0",
             "Perl::Critic::Violation" : "0",
             "Readonly" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::More" : "0.96",
             "Test::Perl::Critic" : "1.01"
          }
@@ -54,13 +60,13 @@
          "web" : "https://github.com/petdance/perl-critic-bangs"
       },
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://opensource.org/licenses/Artistic-2.0"
       ],
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/petdance/perl-critic-bangs.git"
       }
    },
-   "version" : "1.12",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.14",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

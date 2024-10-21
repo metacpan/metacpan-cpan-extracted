@@ -34,6 +34,11 @@ sub no_escape :Local  {
 sub escape :Local  {
   my ($self, $c) = @_;
   return $c->view('Escape')->http_ok;
+}
+
+sub inherit :Local  {
+  my ($self, $c) = @_;
+  return $c->view('Inherit', aaa=>1)->http_ok;
 } 
 
 __PACKAGE__->meta->make_immutable;

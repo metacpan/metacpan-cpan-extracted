@@ -91,7 +91,6 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::TextTemplate" => 0,
     "Moose" => 0,
     "Sub::Exporter::ForMethods" => 0,
-    "Test::Portability::Files" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -107,7 +106,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Warnings" => "0.009"
   },
-  "VERSION" => "2.001001",
+  "VERSION" => "2.001002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -130,7 +129,6 @@ my %FallbackPrereqs = (
   "Test::DZil" => 0,
   "Test::Deep" => 0,
   "Test::More" => "0.96",
-  "Test::Portability::Files" => 0,
   "Test::Warnings" => "0.009",
   "namespace::autoclean" => 0,
   "strict" => 0,

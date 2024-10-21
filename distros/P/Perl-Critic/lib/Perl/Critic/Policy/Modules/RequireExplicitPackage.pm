@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :booleans :severities :classification };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.152';
+our $VERSION = '1.154';
 
 #-----------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ sub prepare_to_scan_document {
 }
 
 sub violates {
-    my ( $self, $elem, $doc ) = @_;
+    my ( $self, undef, $doc ) = @_;
 
     # Find the first 'package' statement
     my $package_stmnt = $doc->find_first( 'PPI::Statement::Package' );
@@ -90,6 +90,9 @@ sub _is_statement_of_interest {
             $self->{_allow_import_of}{$module}
                 and return $FALSE;
         }
+        elsif ( $elem->version ) {
+            return $FALSE;
+        }
     }
 
     return $TRUE;
@@ -125,6 +128,11 @@ decency require your module to keep its innards to itself.
 There are some valid reasons for not having a C<package> statement at
 all.  But make sure you understand them before assuming that you
 should do it too.
+
+One of those reasons is having a C<use VERSION> line as the first line
+of your Perl file. It I<declares> which version of the Perl language
+the following code is written. Because the effect is lexical, the previous
+remarks about the caller's package do not apply.
 
 The maximum number of violations per document for this policy defaults
 to 1.

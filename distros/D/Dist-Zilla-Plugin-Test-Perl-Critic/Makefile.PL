@@ -86,6 +86,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Data::Section" => "0.004",
     "Dist::Zilla::File::InMemory" => 0,
+    "Dist::Zilla::Role::FileFinderUser" => 0,
     "Dist::Zilla::Role::FileGatherer" => 0,
     "Dist::Zilla::Role::FileMunger" => 0,
     "Dist::Zilla::Role::PrereqSource" => 0,
@@ -105,7 +106,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.94",
     "autodie" => 0
   },
-  "VERSION" => "3.003",
+  "VERSION" => "3.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -115,6 +116,7 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "Data::Section" => "0.004",
   "Dist::Zilla::File::InMemory" => 0,
+  "Dist::Zilla::Role::FileFinderUser" => 0,
   "Dist::Zilla::Role::FileGatherer" => 0,
   "Dist::Zilla::Role::FileMunger" => 0,
   "Dist::Zilla::Role::PrereqSource" => 0,

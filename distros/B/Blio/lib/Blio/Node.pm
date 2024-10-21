@@ -2,9 +2,9 @@ package Blio::Node;
 
 # ABSTRACT: A Blio Node
 
-our $VERSION = '2.007'; # VERSION
+our $VERSION = '2.008'; # VERSION
 
-use 5.010;
+use v5.24;
 use Moose;
 use namespace::autoclean;
 use MooseX::Types::Path::Class;
@@ -15,6 +15,7 @@ use Markup::Unified;
 use Blio::Image;
 use XML::Atom::SimpleFeed;
 use DateTime::Format::RFC3339;
+use List::Util qw(any);
 
 class_type 'DateTime';
 coerce 'DateTime' => from 'Int' => via {
@@ -79,21 +80,20 @@ sub _build_content {
         $raw_content=~s/<blioimg#(\d+)>/$self->call_on_image_by_index($1,'url')/ge;
     }
 
-    no if $] >= 5.018, 'warnings', "experimental::smartmatch"; # TODO # why, oh, why???
-    given ($converter) {
-        when ('html') { return $raw_content }
-        when ([qw(textile markdown bbcode)]) {
-            my $o = Markup::Unified->new();
-            return $o->format($raw_content, $converter)->formatted;
+    if ($converter eq 'html') {
+        return $raw_content;
+    }
+    elsif (any { $converter eq $_ } qw(textile markdown bbcode)) {
+        my $o = Markup::Unified->new();
+        return $o->format($raw_content, $converter)->formatted;
+    }
+    else {
+        my $method = 'convert_'.$converter;
+        if ($self->can($method)) {
+            return $self->$method($raw_content);
         }
-        default {
-            my $method = 'convert_'.$converter;
-            if ($self->can($method)) {
-                return $self->$method($raw_content);
-            }
-            else {
-                return "<pre>No such converter: $converter</pre>".$raw_content;
-            }
+        else {
+            return "<pre>No such converter: $converter</pre>".$raw_content;
         }
     }
 }
@@ -211,7 +211,7 @@ sub parse {
 }
 
 sub write {
-    my ($self, $blio) = @_;
+    my ($self, $blio, $utime) = @_;
     return if $self->list_only;
 
     my $tt = $blio->tt;
@@ -228,13 +228,13 @@ sub write {
         binmode => ':utf8',
     ) || die $tt->error;
 
-    my $utime = $self->date->epoch;
+    my $utime_ep = $utime ? $utime->epoch : $self->date->epoch;
     if ($self->has_children) {
         my $children = $self->sorted_children;
         my $child_utime = $children->[0]->date->epoch;
-        $utime = $child_utime if $child_utime > $utime;
+        $utime_ep = $child_utime if $child_utime > $utime_ep;
     }
-    utime($utime,$utime,$outfile->stringify);
+    utime($utime_ep,$utime_ep,$outfile->stringify);
 
     if ($self->has_images) {
         foreach my $img (@{$self->images}) {
@@ -556,7 +556,7 @@ Blio::Node - A Blio Node
 
 =head1 VERSION
 
-version 2.007
+version 2.008
 
 =head1 AUTHOR
 
@@ -564,7 +564,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2022 by Thomas Klausner.
+This software is copyright (c) 2013 - 2024 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

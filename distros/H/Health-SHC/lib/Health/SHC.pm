@@ -5,7 +5,7 @@ package Health::SHC;
 
 # ABSTRACT: Extract and verify Smart Health Card information
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 =head1 NAME
 
@@ -86,7 +86,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021 Timothy Legge <timlegge@cpan.org>
+Copyright 2021 - 2024 Timothy Legge <timlegge@gmail.com>
 
 =head1 LICENCE
 

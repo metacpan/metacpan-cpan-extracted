@@ -5,14 +5,38 @@
 my $foo = '#XXX';
 # this comment is OK
 my $XXX = 'foo';
+my $SITE_XXX = 'foo';
+# Site_XXX is also OK
 
 #-----------------------------------------------------------------------------
 
-## name XXX Comments
-## failures 1
+## name Unacceptable Comments
+## failures 3
 ## cut
 
 # XXX I need to fix this comment
+# I need to FIXME this
+# TODO-Change this
+
+#-----------------------------------------------------------------------------
+
+## name Special Characters
+## parms { keywords => 'WE*RD' };
+## failures 0
+## cut
+
+# WEIRD
+# WERD
+
+#-----------------------------------------------------------------------------
+
+## name Special Characters failing
+## parms { keywords => 'WE*RD' };
+## failures 1
+## cut
+
+# WE*RD
+# WEIRD
 
 #-----------------------------------------------------------------------------
 

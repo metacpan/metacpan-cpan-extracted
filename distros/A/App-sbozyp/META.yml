@@ -1,0 +1,26 @@
+---
+abstract: "a package manager for Slackware's SlackBuilds.org"
+author:
+  - 'Nicholas Hubbard <nicholashubbard@posteo.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-sbozyp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.034000'
+resources:
+  bugtracker: https://github.com/NicholasBHubbard/sbozyp/issues
+  repository: https://github.com/NicholasBHubbard/sbozyp
+version: v0.0.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

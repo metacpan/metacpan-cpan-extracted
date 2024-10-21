@@ -4,7 +4,7 @@
       "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,6 +41,7 @@
             "File::Copy" : "0",
             "File::ShareDir" : "0",
             "Imager" : "0",
+            "List::Util" : "0",
             "MIME::Base64" : "0",
             "Markup::Unified" : "0",
             "Moose" : "0",
@@ -52,9 +53,8 @@
             "Path::Class::Iterator" : "0",
             "Template" : "0",
             "XML::Atom::SimpleFeed" : "0",
-            "if" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.010"
+            "perl" : "v5.24.0"
          }
       },
       "test" : {
@@ -74,15 +74,15 @@
    "provides" : {
       "Blio" : {
          "file" : "lib/Blio.pm",
-         "version" : "2.007"
+         "version" : "2.008"
       },
       "Blio::Image" : {
          "file" : "lib/Blio/Image.pm",
-         "version" : "2.007"
+         "version" : "2.008"
       },
       "Blio::Node" : {
          "file" : "lib/Blio/Node.pm",
-         "version" : "2.007"
+         "version" : "2.008"
       }
    },
    "release_status" : "stable",
@@ -97,9 +97,9 @@
          "web" : "https://github.com/domm/Blio"
       }
    },
-   "version" : "2.007",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "version" : "2.008",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

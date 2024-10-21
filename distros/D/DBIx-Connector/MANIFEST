@@ -6,14 +6,15 @@ lib/DBIx/Connector.pm
 lib/DBIx/Connector/Driver.pm
 lib/DBIx/Connector/Driver/Firebird.pm
 lib/DBIx/Connector/Driver/MSSQL.pm
+lib/DBIx/Connector/Driver/MariaDB.pm
 lib/DBIx/Connector/Driver/Oracle.pm
 lib/DBIx/Connector/Driver/Pg.pm
 lib/DBIx/Connector/Driver/SQLite.pm
 lib/DBIx/Connector/Driver/mysql.pm
+t/00-load.t
 t/base.t
 t/driver.t
 t/lib/Hook/Guard.pm
-t/load.t
 t/run.t
 t/run_fixup.t
 t/run_ping.t

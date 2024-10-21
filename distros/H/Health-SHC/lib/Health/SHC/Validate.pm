@@ -5,7 +5,7 @@ use warnings;
 
 package Health::SHC::Validate;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 #use IO::Uncompress::RawInflate qw/ rawinflate /;
 #use MIME::Base64 qw/ decode_base64url /;
@@ -51,7 +51,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021 Timothy Legge <timlegge@cpan.org>
+Copyright 2021 - 2024 Timothy Legge <timlegge@gmail.com>
 
 =head1 LICENCE
 

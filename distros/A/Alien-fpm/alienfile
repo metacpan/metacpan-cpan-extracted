@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+use alienfile;
+
+use Env qw( @GEM_PATH );
+use Path::Tiny;
+
+plugin 'Probe::CommandLine' => (
+    command => 'fpm',
+    args    => [ '--version' ],
+    match   => qr/([\d\.]+)/,
+    version => qr/([\d\.]+)/
+);
+
+share {
+    requires 'Alien::Ruby';
+    download [ '%{gem} fetch fpm' ];
+    plugin 'Extract::File';
+    build [
+        sub {
+            my ($build) = @_;
+            $build->log('Writing to gemrc');
+            # solves gem shebang issue when using a --enable-load-relative ruby (which Alien::Ruby share installs provide): https://github.com/rubygems/rubygems/issues/8135
+            Path::Tiny::path('gemrc')->spew(
+                qq{custom_shebang: \$ruby\n}
+            );
+        },
+        '%{gem} install --config-file gemrc --install-dir %{.install.prefix} --no-document %{.install.download}'
+    ];
+
+    gather sub {
+        my ($build) = @_;
+        unshift @GEM_PATH, $build->install_prop->{prefix};
+        $build->runtime_prop->{version} = (`fpm --version` =~ /([\d\.]+)/)[0];
+    };
+}

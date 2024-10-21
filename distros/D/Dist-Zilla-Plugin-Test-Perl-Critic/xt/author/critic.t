@@ -3,5 +3,7 @@
 use strict;
 use warnings;
 
-use Test::Perl::Critic;
+use Test::Perl::Critic %{+{
+  "-profile" => "perlcritic.rc",
+}};
 all_critic_ok();

@@ -3,12 +3,12 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 use Lingua::EN::Inflect 'PL';
 use File::Spec ();
 use constant {
-    MAXWORDLENGTH => 50,
+    _MAXWORDLENGTH => 50,
 };
 
 use Class::Tiny {
@@ -101,7 +101,7 @@ sub strip_stopwords {
     # Count the things in $text
     print "Content: <", $text, ">\n" if $self->_is_debug;
 
-    my @words = grep { length($_) < MAXWORDLENGTH } split " ", $text;
+    my @words = grep { length($_) < _MAXWORDLENGTH } split " ", $text;
 
     for ( @words ) {
         print "Parsing word: <$_>\n" if $self->_is_debug;
@@ -192,7 +192,7 @@ Pod::Wordlist - English words that come up in Perl documentation
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 DESCRIPTION
 
@@ -214,7 +214,7 @@ private lexicon.
     $wordlist->learn_stopwords( $text );
 
 Modifies the stopword list based on a text block. See the rules
-for <adding stopwords|Pod::Spell/ADDING STOPWORDS> for details.
+for L<adding stopwords|Pod::Spell/ADDING STOPWORDS> for details.
 
 =head2 is_stopword
 
@@ -281,7 +281,7 @@ Caleb Cushing <xenoterracide@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Olivier Mengué.
+This software is Copyright (c) 2024 by Olivier Mengué.
 
 This is free software, licensed under:
 

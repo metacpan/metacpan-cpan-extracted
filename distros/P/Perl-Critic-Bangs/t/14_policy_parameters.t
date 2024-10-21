@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use 5.010;
 
 use English qw(-no_match_vars);
 
@@ -31,13 +32,15 @@ Perl::Critic::TestUtils::block_perlcriticrc();
 my @all_policies = sort ( bundled_policy_names() );
 
 for my $policy ( @all_policies ) {
-    test_has_declared_parameters( $policy );
-    test_supported_parameters( $policy );
+    _test_has_declared_parameters( $policy );
+    _test_supported_parameters( $policy );
 }
 
-#-----------------------------------------------------------------------------
 
-sub test_supported_parameters {
+exit 0;
+
+
+sub _test_supported_parameters {
     my $policy_name = shift;
     my @supported_params = $policy_name->supported_parameters();
     my $config = Perl::Critic::Config->new( -profile => 'NONE' );
@@ -70,9 +73,8 @@ sub test_supported_parameters {
     return;
 }
 
-#-----------------------------------------------------------------------------
 
-sub test_has_declared_parameters {
+sub _test_has_declared_parameters {
     my $policy = shift;
     if ( not $policy->can('supported_parameters') ) {
         fail( qq{I don't know if $policy supports params} );
@@ -80,19 +82,3 @@ sub test_has_declared_parameters {
     }
     return;
 }
-
-#-----------------------------------------------------------------------------
-
-# ensure we run true if this test is loaded by
-# t/14_policy_parameters.t_without_optional_dependencies.t
-1;
-
-###############################################################################
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 78
-#   indent-tabs-mode: nil
-#   c-indentation-style: bsd
-# End:
-# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab shiftround :

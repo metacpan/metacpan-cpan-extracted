@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Test-PodSpelling
 
+2.007006  2024-10-20 18:45:15Z
+          - bump dependency on Test::Spelling, and move it to a test prereq
+
 2.007005  2017-12-17 19:08:45Z
           - remove the use of Test::Script in tests
 

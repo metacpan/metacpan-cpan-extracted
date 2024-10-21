@@ -15,10 +15,12 @@ Dist
 Doherty
 Etheridge
 Fredric
+Graham
 Gruenauer
 Grünauer
 Karen
 Kent
+Knop
 Marcel
 Mike
 MinimumVersion
@@ -30,6 +32,7 @@ Zilla
 cweyl
 doherty
 ether
+haarg
 hanekomu
 irc
 kentfredric
